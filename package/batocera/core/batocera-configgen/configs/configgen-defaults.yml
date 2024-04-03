@@ -19,8 +19,8 @@ default:
   emulator: libretro
   core:     opera
 3ds:
-  emulator: lime3ds
-  core:     lime3ds
+  emulator: lemonade
+  core:     lemonade
 abuse:
   emulator: abuse
   core:     abuse
