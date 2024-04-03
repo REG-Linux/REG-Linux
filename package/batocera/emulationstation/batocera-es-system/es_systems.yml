@@ -2117,7 +2117,9 @@ x1:
   extensions: [3ds, 3dsx, cxi, axf, elf]
   emulators:
     lime3ds:
-      lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]          }
+      lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]      }
+    lemonade:
+      lemonade: { requireAnyOf: [BR2_PACKAGE_LEMONADE]    }
     libretro:
       citra: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_CITRA] }
 
