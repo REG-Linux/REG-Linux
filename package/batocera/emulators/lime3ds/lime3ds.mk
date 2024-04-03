@@ -36,11 +36,11 @@ ifeq ($(BR2_PACKAGE_QT6),y)
     LIME3DS_CONF_OPTS += -DENABLE_QT=ON
     LIME3DS_CONF_OPTS += -DENABLE_QT_TRANSLATION=ON
     LIME3DS_CONF_OPTS += -DENABLE_QT_UPDATER=OFF
-    LIME3DS_BIN = citra-qt
+    LIME3DS_BIN = lime-qt
 else
     LIME3DS_CONF_OPTS += -DENABLE_QT=OFF
     LIME3DS_CONF_OPTS += -DENABLE_SDL2_FRONTEND=ON
-    LIME3DS_BIN = citra
+    LIME3DS_BIN = lime
 endif
 
 LIME3DS_CONF_ENV += LDFLAGS=-lpthread
@@ -54,7 +54,7 @@ endef
 
 define LIME3DS_EVMAP
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/citra/3ds.citra.keys \
+	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/lime3ds/3ds.lime3ds.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 

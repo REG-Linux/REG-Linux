@@ -291,10 +291,6 @@ iortcw:
 jaguar:
   emulator: libretro
   core:     virtualjaguar
-kodi:
-  emulator: kodi
-  options:
-    videomode: default
 laser310:
   emulator: libretro
   core:     mame

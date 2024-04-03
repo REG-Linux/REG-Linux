@@ -118,19 +118,6 @@ case ${1,,} in
         fi
     ;;
 
-    --kodi)
-        RC_PID=$(check_emurun)
-        [[ -n $RC_PID ]] && emu_kill && sleep 2
-
-        /etc/init.d/S31emulationstation stop
-        batocera-kodilauncher &
-        wait $!
-        exitcode=$?
-        [[ $exitcode -eq 0 ]] && /etc/init.d/S31emulationstation start
-        [[ $exitcode -eq 10 ]] && shutdown -r now
-        [[ $exitcode -eq 11 ]] && shutdown -h now
-    ;;
-
     --version|--arch|--update)
         [[ ${2,,} == "butterfly" ]] && BRANCH=butterfly || BRANCH=stable
         if [[ -f /usr/share/batocera/batocera.version ]]; then
@@ -223,7 +210,6 @@ case ${1,,} in
 		BATOCERA SWISS KNIFE FOR EmulationStation
 		  Please parse parameters to this script!
 		  --restart  will RESTART EmulationStation only
-		  --kodi     will startup KODI Media Center stopping ES
 		  --reboot   will REBOOT whole system
 		  --shutdown will SHUTDOWN whole system
 		  --emukill  will exit any running EMULATORS
