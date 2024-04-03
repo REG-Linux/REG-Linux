@@ -1,3 +1,8 @@
+# REG-Linux 2024.04
+### First Release
+
+# Fork Point from batocera.linux
+
 # 2024/xx/xx - batocera.linux 40 -
 ### Special Notes
 
