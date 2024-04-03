@@ -25,6 +25,7 @@ endef
 
 define VITA3K_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/bin/vita3k/
+	$(TARGET_STRIP) $(@D)/buildroot-build/bin/Vita3K
 	cp -R $(@D)/buildroot-build/bin/* $(TARGET_DIR)/usr/bin/vita3k/
 endef
 

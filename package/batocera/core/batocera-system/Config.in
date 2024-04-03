@@ -164,7 +164,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
     select BR2_PACKAGE_NTFS_3G                              # ntfs
     select BR2_PACKAGE_NTFS_3G_NTFSPROGS                    # ntfs
     select BR2_PACKAGE_BTRFS_PROGS                          # btrfs
-    select BR2_PACKAGE_WINBTRFS                             # btrfs
+    #nope select BR2_PACKAGE_WINBTRFS                             # btrfs
     select BR2_PACKAGE_CONNMAN                              # network manager
     select BR2_PACKAGE_CONNMAN_WIFI                         # network manager
     select BR2_PACKAGE_CONNMAN_CLIENT                       # network manager
@@ -187,7 +187,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
     select BR2_PACKAGE_BOOST_ATOMIC                         # library that provides atomic data types and operations on these data types
     select BR2_PACKAGE_UTIL_LINUX_LIBSMARTCOLS              # library is used for smart adaptive formatting of tabular data
     select BR2_PACKAGE_UTIL_LINUX_SETTERM                   # Set terminal attributes
-    select BR2_PACKAGE_OPENVPN                              # VPN support
+    #nope select BR2_PACKAGE_OPENVPN                              # VPN support
     select BR2_PACKAGE_USB_MODESWITCH                       # USB modeswitch support
     select BR2_PACKAGE_UMTOOL                               # command line tool for configuring Ultimarc arcade hardware
     select BR2_PACKAGE_PYTHON_HIDAPI                        # Communication with USB HID devices via Python
@@ -680,7 +680,7 @@ config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
     select BR2_PACKAGE_LIBRETRO_LUTRO   if !BR2_PACKAGE_BATOCERA_TARGET_H3
 
     # PyGAME
-    select BR2_PACKAGE_BATOCERA_PYGAME if !BR2_PACKAGE_BATOCERA_TARGET_H3
+    #nope select BR2_PACKAGE_BATOCERA_PYGAME if !BR2_PACKAGE_BATOCERA_TARGET_H3
 
     # RPG engine : Solarus
     select BR2_PACKAGE_SOLARUS_ENGINE  if !BR2_riscv # LuajIT does not support riscv ?
@@ -694,7 +694,7 @@ config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
     select BR2_PACKAGE_LIBRETRO_FAKE08      # ALL
     select BR2_PACKAGE_LEXALOFFLE_PICO8     # ALL
     select BR2_PACKAGE_LEXALOFFLE_VOXATRON  if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # No engine for ARM yet
-    select BR2_PACKAGE_PYTHON_PYXEL         if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
+    #nope select BR2_PACKAGE_PYTHON_PYXEL         if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
     select BR2_PACKAGE_LIBRETRO_WASM4       if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY #  Requires X11
 
     # Fighting games engine
@@ -735,7 +735,7 @@ config BR2_PACKAGE_BATOCERA_SEGADC
                                                 BR2_PACKAGE_BATOCERA_TARGET_H6
 
 
-select BR2_PACKAGE_REDREAM              if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
+# nope select BR2_PACKAGE_REDREAM              if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
                                         # Redream not working with Sway => || BR2_PACKAGE_BATOCERA_TARGET_BCM2711 || \
                                         # BR2_PACKAGE_BATOCERA_TARGET_BCM2712
 
@@ -755,10 +755,6 @@ config BR2_PACKAGE_BATOCERA_ARCADE_SYSTEMS
 
     # Naomi and Atomiswave
     select BR2_PACKAGE_BATOCERA_SEGADC
-
-    # Demul emulator - multiple Sega arcade systems
-    # Disabled until controllers can be resolved under Wine.
-    #select BR2_PACKAGE_DEMUL           if BR2_PACKAGE_BATOCERA_WINE
 
     # Laserdic emulation
     select BR2_PACKAGE_DAPHNE           # daphne
@@ -862,7 +858,7 @@ config BR2_PACKAGE_BATOCERA_HANDHELD_SYSTEMS
 config BR2_PACKAGE_BATOCERA_MSDOS_SYSTEMS
     bool "batocera.linux MS/DOS emulation packages"
 
-    select BR2_PACKAGE_DOSBOX					if  BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # || BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # Need libGLEW
+    #nope select BR2_PACKAGE_DOSBOX					if  BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # || BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # Need libGLEW
 
     select BR2_PACKAGE_DOSBOX_X                 if  !BR2_PACKAGE_BATOCERA_TARGET_RK3326     && \
                                                     !BR2_PACKAGE_BATOCERA_TARGET_BCM2835    && \
