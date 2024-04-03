@@ -1,5 +1,5 @@
 name: Report a bug
-description: Report a bug and help us improve Batocera.
+description: Report a bug and help us improve REG Linux.
 body:
   - type: markdown
     attributes:
@@ -11,11 +11,11 @@ body:
         Note: Bug reports are NOT for feature requests or for help with coding or compiling.
         If you need real-time help or need to discuss Batocera, join us on Discord - https://discord.gg/bPKRgsVzAR
   - type: input
-    id: batocera_build
+    id: reglinux_build
     attributes:
-      label: Batocera build version
+      label: REG Linux build version
       description: |
-        Batocera version used.
+        REG Linux version used.
         GUI: SYSTEM SETTINGS -> INFORMATION
         Terminal: cat /usr/share/batocera/batocera.version
         Or details can be obtained from batocera-info in your support file. (See logs below)
@@ -59,10 +59,10 @@ body:
         2. Include any "but only when" conditions you have discovered.
         3. Describe what happens when the issue occurs, anything to look out for, anything to check the issue has indeed occurred.
       placeholder: |
-        I installed Batocera on a USB using Etcher.
+        I installed REG Linux on a USB using Etcher.
         I plugged the USB into my laptops USB port.
         The I booted my PC and changed the BIOS boot order to boot off the USB.
-        When Batocera attempts to boot I see a resizing screen with a progess bar.
+        When REG Linux attempts to boot I see a resizing screen with a progess bar.
         The annother screen with a intro video.
         After that is goes blank.
         I heve no video or sound, just a balnk screen.
@@ -92,7 +92,7 @@ body:
       label: Logs and data
       description: |
         Provide all the relevant logs and information relevant to the issue.
-        Include any information about the stable versions of Batocera the issue is present/not present on, whether the issue is present on a fresh install or not.
+        Include any information about the stable versions of REG Linux the issue is present/not present on, whether the issue is present on a fresh install or not.
         Many useful logs are collected in a [Batocera support file](https://wiki.batocera.org/troubleshooting#create_a_batocera_support_file) which should be attached in your report.
       placeholder: Attach logs and don't paste the content.
     validations:
