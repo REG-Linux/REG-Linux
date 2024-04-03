@@ -1,5 +1,5 @@
-config BR2_PACKAGE_CITRA
-    bool "citra"
+config BR2_PACKAGE_LIME3DS
+    bool "lime3ds"
     select BR2_PACKAGE_BATOCERA_QT6               
     select BR2_PACKAGE_FMT
     select BR2_PACKAGE_BOOST
