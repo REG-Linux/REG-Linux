@@ -2,7 +2,7 @@
 REG Linux is an open-source Retro Emulation Gaming Linux system.
 It is a friendly [batocera.linux](https://batocera.org) fork maintaining compatiblity with it.
 
-[![Activity](https://img.shields.io/github/commit-activity/m/batocera-linux/batocera.linux)](https://github.com/batocera-linux/batocera.linux)
+[![Activity](https://img.shields.io/github/commit-activity/m/REG-Linux/REG-Linux)](https://github.com/REG-Linux/REG-Linux)
 [![PR](https://img.shields.io/github/issues-pr-closed/batocera-linux/batocera.linux)](https://github.com/batocera-linux/batocera.linux)
 [![Stars](https://img.shields.io/github/stars/batocera-linux?style=social)](https://github.com/batocera-linux/batocera.linux)
 [![Forks](https://img.shields.io/github/forks/batocera-linux/batocera.linux?style=social)](https://github.com/batocera-linux/batocera.linux)
