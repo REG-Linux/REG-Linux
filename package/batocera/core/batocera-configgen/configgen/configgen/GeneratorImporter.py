@@ -7,10 +7,6 @@ import generators
 
 def getGenerator(emulator):
 
-    if emulator == 'kodi':
-        from generators.kodi.kodiGenerator import KodiGenerator
-        return KodiGenerator()
-
     if emulator == 'libretro':
         from generators.libretro.libretroGenerator import LibretroGenerator
         return LibretroGenerator()
@@ -71,9 +67,9 @@ def getGenerator(emulator):
         from generators.ppsspp.ppssppGenerator import PPSSPPGenerator
         return PPSSPPGenerator()
 
-    if emulator == 'citra' :
-        from generators.citra.citraGenerator import CitraGenerator
-        return CitraGenerator()
+    if emulator == 'lime3ds' :
+        from generators.lime3ds.lime3DSGenerator import Lime3DSGenerator
+        return Lime3DSGenerator()
 
     if emulator == 'daphne' :
         from generators.daphne.daphneGenerator import DaphneGenerator

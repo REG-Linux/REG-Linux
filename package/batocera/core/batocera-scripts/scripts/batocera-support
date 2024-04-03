@@ -24,7 +24,7 @@ d_cp() {
     test -d "$1" && cp -pr "$1" "$2"
 }
 
-if mkdir "${TMPDIR}" && mkdir "${TMPDIR}/system" "${TMPDIR}/joysticks" "${TMPDIR}/lirc" "${TMPDIR}/kodi" "${TMPDIR}/coredumps"
+if mkdir "${TMPDIR}" && mkdir "${TMPDIR}/system" "${TMPDIR}/joysticks" "${TMPDIR}/lirc" "${TMPDIR}/coredumps"
 then
     if ! cd "${TMPDIR}"
     then
@@ -113,13 +113,6 @@ cp "/var/run/sinden/p"*"/sinden-"*".log" "${DJOYS}" 2>/dev/null
 # lirc
 DLIRC="${TMPDIR}/lirc"
 f_cp "${DHOME}/.config/lirc/lircd.conf" "${DLIRC}"
-
-# kodi
-DKODI="${TMPDIR}/kodi"
-f_cp "${DHOME}/.kodi/userdata/Lircmap.xml"          	      "${DKODI}"
-d_cp "${DHOME}/.kodi/userdata/addon_data/peripheral.joystick" "${DKODI}"
-d_cp "${DHOME}/.kodi/userdata/remotes"              	      "${DKODI}"
-f_cp "${DHOME}/.kodi/temp/kodi.log"                 	      "${DKODI}"
 
 # core dumps
 DCORE="${TMPDIR}/coredumps"

@@ -7,7 +7,7 @@
 HURRICAN_VERSION = 67da195a2fea7cb43202626a18f13357ac6adac2
 HURRICAN_SITE = https://github.com/HurricanGame/Hurrican
 
-HURRICAN_DEPENDENCIES = sdl2 sdl2_mixer sdl2_image libepoxy
+HURRICAN_DEPENDENCIES = sdl2 sdl2_mixer sdl2_image libepoxy libopenmpt
 HURRICAN_SITE_METHOD=git
 HURRICAN_GIT_SUBMODULES=YES
 HURRICAN_LICENSE = GPL-2.0
