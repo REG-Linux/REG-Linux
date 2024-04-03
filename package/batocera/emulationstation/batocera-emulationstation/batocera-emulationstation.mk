@@ -1,11 +1,11 @@
 ################################################################################
 #
-# batocera-emulationstation
+# REG-emulationstation
 #
 ################################################################################
 # Last update: Commits on Mar 29, 2024
 BATOCERA_EMULATIONSTATION_VERSION = ddfa9c31cba02301d09f4eaefead932a90773970
-BATOCERA_EMULATIONSTATION_SITE = https://github.com/batocera-linux/batocera-emulationstation
+BATOCERA_EMULATIONSTATION_SITE = https://github.com/REG-linux/REG-emulationstation
 BATOCERA_EMULATIONSTATION_SITE_METHOD = git
 BATOCERA_EMULATIONSTATION_LICENSE = MIT
 BATOCERA_EMULATIONSTATION_GIT_SUBMODULES = YES

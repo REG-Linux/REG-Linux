@@ -13,5 +13,5 @@ config BR2_PACKAGE_LIME3DS
     select BR2_PACKAGE_FDK_AAC
 
     help
-      Citra is an open-source emulator for the Nintendo 3DS.
-      https://citra-emu.org/
+      Lime3DS is an open-source emulator for the Nintendo 3DS.
+      https://github.com/Lime3DS/Lime3DS

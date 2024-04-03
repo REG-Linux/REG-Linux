@@ -20,8 +20,6 @@ class SonicRetroGenerator(Generator):
         
         iniFile = rom + "/settings.ini"
         
-        # Some code copied from Citra's generator and adapted.
-        
         sonicButtons = {
             "Up":       "11",
             "Down":     "12",
