@@ -3,9 +3,9 @@ REG Linux is an open-source Retro Emulation Gaming Linux system.
 It is a friendly [batocera.linux](https://batocera.org) fork maintaining compatiblity with it.
 
 [![Activity](https://img.shields.io/github/commit-activity/m/REG-Linux/REG-Linux)](https://github.com/REG-Linux/REG-Linux)
-[![PR](https://img.shields.io/github/issues-pr-closed/batocera-linux/batocera.linux)](https://github.com/batocera-linux/batocera.linux)
-[![Stars](https://img.shields.io/github/stars/batocera-linux?style=social)](https://github.com/batocera-linux/batocera.linux)
-[![Forks](https://img.shields.io/github/forks/batocera-linux/batocera.linux?style=social)](https://github.com/batocera-linux/batocera.linux)
+[![PR](https://img.shields.io/github/issues-pr-closed/REG-Linux/REG-Linux)](https://github.com/REG-Linux/REG-Linux)
+[![Stars](https://img.shields.io/github/stars/REG-Linux?style=social)](https://github.com/REG-Linux/REG-Linux)
+[![Forks](https://img.shields.io/github/forks/REG-Linux/REG-Linux?style=social)](https://github.com/REG-Linux/REG-Linux)
 [![Website](https://img.shields.io/website?down_color=red&down_message=down&up_color=green&up_message=up&url=https%3A%2F%2Fwww.batocera.org)](https://www.batocera.org)
 [![Discord Server](https://img.shields.io/discord/357518249883205632.svg)](https://discord.com/invite/JXhfRTr)\
 [![Reddit](https://img.shields.io/reddit/subreddit-subscribers/batocera?style=social)](https://www.reddit.com/r/batocera/)
