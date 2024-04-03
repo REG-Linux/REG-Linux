@@ -55,6 +55,8 @@ VPINBALL_CONF_OPTS += -DPOST_BUILD_COPY_EXT_LIBS=OFF
 
 define VPINBALL_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/bin/vpinball
+    # strip binary
+    $(TARGET_STRIP) $(@D)/buildroot-build/VPinballX_GL
     # install binary
     $(INSTALL) -D -m 0755 $(@D)/buildroot-build/VPinballX_GL \
         $(TARGET_DIR)/usr/bin/vpinball
