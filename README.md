@@ -1,5 +1,6 @@
 ## :video_game::penguin: REG Linux :video_game::penguin:
-REG Linux is an open-source [batocera.linux](https://batocera.org) fork.
+REG Linux is an open-source Retro Emulation Gaming Linux system.
+It is a friendly [batocera.linux](https://batocera.org) fork maintaining compatiblity with it.
 
 [![Activity](https://img.shields.io/github/commit-activity/m/batocera-linux/batocera.linux)](https://github.com/batocera-linux/batocera.linux)
 [![PR](https://img.shields.io/github/issues-pr-closed/batocera-linux/batocera.linux)](https://github.com/batocera-linux/batocera.linux)
