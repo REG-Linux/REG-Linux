@@ -11,7 +11,6 @@ REG Linux is an open-source [batocera.linux](https://batocera.org) fork.
 [![Twitter](https://img.shields.io/twitter/follow/batocera_linux?style=social)](https://twitter.com/batocera_linux/)
 [![Youtube](https://img.shields.io/youtube/channel/views/UClFpqHKoXsOIV-GjyZqoZcw?style=social)](https://www.youtube.com/channel/UClFpqHKoXsOIV-GjyZqoZcw/featured)
 
-## :video_game::penguin: Batocera Linux :video_game::penguin:
 Batocera Linux is an open-source and completely free retro-gaming distribution that can be copied to a USB stick or an SD card with the aim of turning any computer/nano computer into a gaming console during a game or permanently. Batocera Linux does not require any modification on your computer. It supports [many emulators and game engines](https://www.batocera.org/compatibility.php) out of the box. 
 
 ## Get information on the project
