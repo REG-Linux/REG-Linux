@@ -32,7 +32,10 @@ do_start() {
         SMB_CONFIG_FILE="/etc/samba/smb.conf"
     fi
 
-    OPTS=""
+    # wssd-native requires username, use root
+    OPTS="-U root"
+    # wssd-native needs to be run as unix daemon
+    OPTS="--unixd ${OPTS}"
 
     # try to extract workgroup with Samba's testparm
     if which testparm >/dev/null 2>/dev/null; then
@@ -45,7 +48,7 @@ do_start() {
     fi
 
     if [ -n "${GROUP}" ]; then
-        OPTS="-w ${GROUP} ${OPTS}"
+        OPTS="-W ${GROUP} ${OPTS}"
     fi
 
     start-stop-daemon --start --background --make-pidfile --pidfile "${PIDFILE}" --output "${LOG_FILE}" --exec ${DAEMON} -- ${OPTS}
