@@ -1,5 +1,62 @@
 #!/bin/ash
 
+# update the modules if needed
+do_update_modules() {
+    if test -e /boot_root/boot/modules.update
+    then
+      mount -o remount,rw /boot_root || return 1
+      mv /boot_root/boot/modules.update /boot_root/boot/modules || return 1
+      # remove the overlay when updating
+      if test -e /boot_root/boot/overlay
+      then
+	  mv /boot_root/boot/overlay /boot_root/boot/overlay.old  || return 1
+      fi
+      mount -o remount,ro /boot_root || return 1
+    fi
+}
+
+# update the firmware if needed
+do_update_firmware() {
+    if test -e /boot_root/boot/firmware.update
+    then
+      mount -o remount,rw /boot_root || return 1
+      mv /boot_root/boot/firmware.update /boot_root/boot/firmware || return 1
+      # remove the overlay when updating
+      if test -e /boot_root/boot/overlay
+      then
+	  mv /boot_root/boot/overlay /boot_root/boot/overlay.old  || return 1
+      fi
+      mount -o remount,ro /boot_root || return 1
+    fi
+}
+
+# update the rootfs if needed
+do_update_rootfs() {
+    if test -e /boot_root/boot/batocera.update
+    then
+      mount -o remount,rw /boot_root || return 1
+      mv /boot_root/boot/batocera.update /boot_root/boot/batocera || return 1
+      # remove the overlay when updating
+      if test -e /boot_root/boot/overlay
+      then
+	  mv /boot_root/boot/overlay /boot_root/boot/overlay.old      || return 1
+      fi
+      mount -o remount,ro /boot_root || return 1
+    fi
+}
+
+# mount the modules
+do_mount_modules() {
+    mkdir -p /new_root/lib/modules
+    mount /boot_root/boot/modules /new_root/lib/modules || return 1
+}
+
+# mount the firmware
+do_mount_firmware() {
+    mkdir -p /new_root/lib/firmware
+    mount /boot_root/boot/firmware /new_root/lib/firmware || return 1
+}
+
 do_mount() {
     if mount -o ro "${1}"           /boot_root; then return 0; fi
     return 1
@@ -32,18 +89,9 @@ do_root() {
         sleep 1
     done
 
-    # update the squashfs
-    if test -e /boot_root/boot/batocera.update
-    then
-      mount -o remount,rw /boot_root || return 1
-      mv /boot_root/boot/batocera.update /boot_root/boot/batocera || return 1
-      # remove the overlay when updating
-      if test -e /boot_root/boot/overlay
-      then
-	  mv /boot_root/boot/overlay /boot_root/boot/overlay.old      || return 1
-      fi
-      mount -o remount,ro /boot_root || return 1
-    fi
+    do_update_modules
+    do_update_firmware
+    do_update_rootfs
 
     # create an overlay on memory
     mount -t tmpfs -o size=256M tmpfs /overlay_root || return 1
@@ -60,7 +108,7 @@ do_root() {
 	fi
     fi
 
-    # mount the squashfs
+    # mount the rootfs
     mount /boot_root/boot/batocera /overlay_root/base || return 1
 
     # mount the future root in read write
@@ -70,12 +118,19 @@ do_root() {
 	mount /boot_root/boot/batocera /new_root || return 1
     fi
 
+    do_mount_firmware
+    do_mount_modules
+
     # moving current mounts
-    mount --move /boot_root    /new_root/boot    || return 1
-    mount --move /overlay_root /new_root/overlay || return 1
-    mount --move /sys  	       /new_root/sys  	 || return 1
-    mount --move /proc 	       /new_root/proc 	 || return 1
-    mount --move /dev  	       /new_root/dev  	 || return 1
+    mount --move /boot_root    /new_root/boot     || return 1
+    mount --move /overlay_root /new_root/overlay  || return 1
+    mount --move /sys  	       /new_root/sys  	  || return 1
+    mount --move /proc 	       /new_root/proc 	  || return 1
+    mount --move /dev  	       /new_root/dev  	  || return 1
+
+    # moving modules and firmware to proper location
+    #mount --move /new_root/modules  /new_root/lib/modules  || return 1
+    #mount --move /new_root/firmware /new_root/lib/firmware || return 1
 
     # switch to the new root
     exec switch_root /new_root /sbin/init || return 1
@@ -83,6 +138,6 @@ do_root() {
 
 if ! do_root
 then
-    echo "oooutch !"
+    echo "Cannot boot to mounted filesystem !"
     /bin/ash
 fi

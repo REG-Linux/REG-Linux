@@ -22,6 +22,8 @@ cp     "${BOARD_DIR}/boot/config.txt"       "${BATOCERA_BINARIES_DIR}/boot/" || 
 cp     "${BOARD_DIR}/boot/cmdline.txt"      "${BATOCERA_BINARIES_DIR}/boot/" || exit 1
 
 cp "${BINARIES_DIR}/zImage"             "${BATOCERA_BINARIES_DIR}/boot/boot/linux"              || exit 1
+cp "${BINARIES_DIR}/modules"         "${BATOCERA_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
+cp "${BINARIES_DIR}/firmware"        "${BATOCERA_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
 cp "${BINARIES_DIR}/initrd.lz4"         "${BATOCERA_BINARIES_DIR}/boot/boot/"                   || exit 1
 cp "${BINARIES_DIR}/rootfs.squashfs"    "${BATOCERA_BINARIES_DIR}/boot/boot/batocera.update"    || exit 1
 

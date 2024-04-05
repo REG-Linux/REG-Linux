@@ -69,9 +69,9 @@ do
 
     # create *.img
     if [ "${BATOCERA_LOWER_TARGET}" = "${BATOCERA_SUBTARGET}" ]; then
-        BATOCERAIMG="${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/batocera-${BATOCERA_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
+        BATOCERAIMG="${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/reglinux-${BATOCERA_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
     else
-        BATOCERAIMG="${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/batocera-${BATOCERA_LOWER_TARGET}-${BATOCERA_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
+        BATOCERAIMG="${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/reglinux-${BATOCERA_LOWER_TARGET}-${BATOCERA_SUBTARGET}-${SUFFIXVERSION}-${SUFFIXDATE}.img"
     fi
     echo "creating images/${BATOCERA_SUBTARGET}/"$(basename "${BATOCERAIMG}")"..." >&2
     rm -rf "${GENIMAGE_TMP}" || exit 1
@@ -108,7 +108,7 @@ do
 done
 
 #### md5 and sha256 #######################
-for FILE in "${BATOCERA_BINARIES_DIR}/images/"*"/boot.tar.xz" "${BATOCERA_BINARIES_DIR}/images/"*"/batocera-"*".img.gz"
+for FILE in "${BATOCERA_BINARIES_DIR}/images/"*"/boot.tar.xz" "${BATOCERA_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
 do
     echo "creating ${FILE}.md5"
     CKS=$(md5sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
