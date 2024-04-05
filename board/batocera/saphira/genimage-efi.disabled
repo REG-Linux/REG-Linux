@@ -1,0 +1,9 @@
+image boot.efi {
+    vfat {
+        extraargs = "-F 32 -n REGLINUX"
+        @files
+    }   
+    size = 256M
+    mountpoint = "/"
+}
+
