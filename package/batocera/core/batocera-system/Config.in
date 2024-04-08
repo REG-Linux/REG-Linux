@@ -86,9 +86,6 @@ if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY || BR2_PACKAGE_BATOCERA_TARGET_BCM2711 ||
     default y
 endif
 
-config BR2_PACKAGE_BATOCERA_CORES_STILL_COMMERCIALIZED
-    bool "batocera is limited to abandoned systems"
-
 
 ##########################################
 config BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
@@ -623,6 +620,9 @@ config BR2_PACKAGE_BATOCERA_ALL_SYSTEMS
     select BR2_PACKAGE_BATOCERA_RETROARCH
     select BR2_PACKAGE_BATOCERA_RETROACHIEVEMENTS_SOUNDS
 
+    # Include multi-system emulators
+    select BR2_PACKAGE_BATOCERA_MULTI_SYSTEMS
+
     # Include other systems
     select BR2_PACKAGE_BATOCERA_ARCADE_SYSTEMS
     select BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
@@ -639,6 +639,14 @@ config BR2_PACKAGE_BATOCERA_ALL_SYSTEMS
 
     help
         batocera.linux all supported emulation systems
+
+### Multi platform systems ###
+config BR2_PACKAGE_BATOCERA_MULTI_SYSTEMS
+    bool "batocera.linux multisystems emulators support"
+
+    # Wine (windows) layer
+    select BR2_PACKAGE_MEDNAFEN        if BR2_aarch64 || BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
+
 
 #### Wine Layer ####
 config BR2_PACKAGE_BATOCERA_WINE_SYSTEMS
@@ -1143,8 +1151,8 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
                                                         BR2_PACKAGE_BATOCERA_TARGET_A3GEN2     || \
                                                         BR2_PACKAGE_BATOCERA_TARGET_RK3588
 
-    select BR2_PACKAGE_SUYU							if	BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY && BR2_PACKAGE_BATOCERA_CORES_STILL_COMMERCIALIZED
-    select BR2_PACKAGE_RYUJINX						if	BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY && BR2_PACKAGE_BATOCERA_CORES_STILL_COMMERCIALIZED
+    select BR2_PACKAGE_SUYU			    if	BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
+    select BR2_PACKAGE_RYUJINX			    if	BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY 
 
     # Triforce
     select BR2_PACKAGE_DOLPHIN_TRIFORCE				if	BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
