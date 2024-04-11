@@ -562,3 +562,9 @@ menu "Audio"
 endmenu
 
 endmenu
+
+menu "REG.linux"
+
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reg-rescue/Config.in"
+
+endmenu

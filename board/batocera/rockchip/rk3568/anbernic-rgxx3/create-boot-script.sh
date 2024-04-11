@@ -24,6 +24,7 @@ cp "${BINARIES_DIR}/initrd.lz4"                  "${BATOCERA_BINARIES_DIR}/boot/
 cp "${BINARIES_DIR}/rootfs.squashfs"             "${BATOCERA_BINARIES_DIR}/boot/boot/batocera.update" || exit 1
 cp "${BINARIES_DIR}/modules"                     "${BATOCERA_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
 cp "${BINARIES_DIR}/firmware"                    "${BATOCERA_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
+cp "${BINARIES_DIR}/rescue"                      "${BATOCERA_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
 cp "${BINARIES_DIR}/rk3566-anbernic-rg353p.dtb"     "${BATOCERA_BINARIES_DIR}/boot/boot/"             || exit 1
 cp "${BINARIES_DIR}/rk3566-anbernic-rg353ps.dtb"    "${BATOCERA_BINARIES_DIR}/boot/boot/"             || exit 1

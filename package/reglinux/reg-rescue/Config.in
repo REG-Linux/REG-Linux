@@ -1,0 +1,4 @@
+config BR2_PACKAGE_REG_RESCUE
+        bool "reg-rescue"
+        help
+          minimal rootfs for rescue/update mode

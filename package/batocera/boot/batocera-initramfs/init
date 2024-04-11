@@ -39,7 +39,7 @@ do_update_rootfs() {
       # remove the overlay when updating
       if test -e /boot_root/boot/overlay
       then
-	  mv /boot_root/boot/overlay /boot_root/boot/overlay.old      || return 1
+	  mv /boot_root/boot/overlay /boot_root/boot/overlay.old  || return 1
       fi
       mount -o remount,ro /boot_root || return 1
     fi
@@ -89,6 +89,7 @@ do_root() {
         sleep 1
     done
 
+    # Process updates if any
     do_update_modules
     do_update_firmware
     do_update_rootfs
