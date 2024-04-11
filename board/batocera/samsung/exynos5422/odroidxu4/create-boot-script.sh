@@ -20,9 +20,12 @@ mkdir -p "${BATOCERA_BINARIES_DIR}/boot/extlinux"   || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"            "${BATOCERA_BINARIES_DIR}/boot/extlinux/" || exit 1
 cp "${BINARIES_DIR}/exynos5422-odroidxu4.dtb"   "${BATOCERA_BINARIES_DIR}/boot/boot/"     || exit 1
 
-cp "${BINARIES_DIR}/zImage"             "${BATOCERA_BINARIES_DIR}/boot/boot/linux"              || exit 1
-cp "${BINARIES_DIR}/initrd.lz4"         "${BATOCERA_BINARIES_DIR}/boot/boot/initrd.lz4"         || exit 1
-cp "${BINARIES_DIR}/rootfs.squashfs"    "${BATOCERA_BINARIES_DIR}/boot/boot/batocera.update"    || exit 1
+cp "${BINARIES_DIR}/zImage"          "${BATOCERA_BINARIES_DIR}/boot/boot/linux"           || exit 1
+cp "${BINARIES_DIR}/initrd.lz4"      "${BATOCERA_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
+cp "${BINARIES_DIR}/rootfs.squashfs" "${BATOCERA_BINARIES_DIR}/boot/boot/batocera.update" || exit 1
+cp "${BINARIES_DIR}/modules"         "${BATOCERA_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
+cp "${BINARIES_DIR}/firmware"        "${BATOCERA_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
+cp "${BINARIES_DIR}/rescue"          "${BATOCERA_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
 # because otherwise tzw overlapse
 dd if="${BINARIES_DIR}/u-boot.bin" of="${BINARIES_DIR}/u-boot.bin.reduced" bs=512 count=1440
