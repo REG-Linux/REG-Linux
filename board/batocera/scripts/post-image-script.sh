@@ -94,14 +94,14 @@ do
     fi
     ###
     "${HOST_DIR}/bin/genimage" --rootpath="${TARGET_DIR}" --inputpath="${BATOCERA_BINARIES_DIR}/boot" --outputpath="${BATOCERA_BINARIES_DIR}" --config="${BATOCERA_BINARIES_DIR}/genimage.cfg" --tmppath="${GENIMAGE_TMP}" || exit 1
- 
+
     rm -f "${BATOCERA_BINARIES_DIR}/boot.vfat" || exit 1
     rm -f "${BATOCERA_BINARIES_DIR}/userdata.ext4" || exit 1
     mv "${BATOCERA_BINARIES_DIR}/batocera.img" "${BATOCERAIMG}" || exit 1
-    gzip "${BATOCERAIMG}" || exit 1
+    pigz "${BATOCERAIMG}" || exit 1
 
-    # rename the boot to boot_arch
-    mv "${BATOCERA_BINARIES_DIR}/boot" "${BOOTNAMEDDIR}" || exit 1
+    # delete the boot
+    rm -rf "${BATOCERA_BINARIES_DIR}/boot" || exit 1
 
     # copy the version file needed for version check
     cp "${TARGET_DIR}/usr/share/batocera/batocera.version" "${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
