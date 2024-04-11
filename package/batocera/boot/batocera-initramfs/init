@@ -1,5 +1,20 @@
 #!/bin/ash
 
+# update the rescue if needed
+do_update_rescue() {
+    if test -e /boot_root/boot/rescue.update
+    then
+      mount -o remount,rw /boot_root || return 1
+      mv /boot_root/boot/rescue.update /boot_root/boot/rescue || return 1
+      # remove the overlay when updating
+      if test -e /boot_root/boot/overlay
+      then
+	  mv /boot_root/boot/overlay /boot_root/boot/overlay.old  || return 1
+      fi
+      mount -o remount,ro /boot_root || return 1
+    fi
+}
+
 # update the modules if needed
 do_update_modules() {
     if test -e /boot_root/boot/modules.update
@@ -62,6 +77,44 @@ do_mount() {
     return 1
 }
 
+do_rescue() {
+    # mount the rootfs
+    mount /boot_root/boot/rescue /overlay_root/base || return 1
+
+    # mount the future root in read write
+    if ! mount -t overlay overlay -o rw,lowerdir=/overlay_root/base,upperdir=/overlay_root/overlay,workdir=/overlay_root/work /new_root
+    then
+	# mount only as squashfs, no overlay (xu4 doesn't support overlayfs)
+	mount /boot_root/boot/rescue /new_root || return 1
+    fi
+
+    do_mount_firmware
+    do_mount_modules
+
+    # TODO find userdata partition
+    #part=$1
+    #part=${part#/dev/}
+    #disk=$(readlink /sys/class/block/$part)
+    #disk=${disk%/*}
+    #disk=/dev/${disk##*/}
+
+    # TODO mount userdata partition
+    #mkdir -p /new_root/userdata
+    #mount $disk /new_root/userdata || return 1
+
+    # moving current mounts
+    mount --move /boot_root    /new_root/boot     || return 1
+    mount --move /overlay_root /new_root/overlay  || return 1
+    mount --move /sys  	       /new_root/sys  	  || return 1
+    mount --move /proc 	       /new_root/proc 	  || return 1
+    mount --move /dev  	       /new_root/dev  	  || return 1
+    return 0
+}
+
+do_update() {
+    do_rescue || return 1
+}
+
 do_root() {
     mkdir -p /boot_root /new_root /overlay_root /sys /proc || return 1
     mount -t proc  -o nodev,noexec,nosuid proc  /proc  	|| return 1
@@ -90,6 +143,7 @@ do_root() {
     done
 
     # Process updates if any
+    do_update_rescue
     do_update_modules
     do_update_firmware
     do_update_rootfs
@@ -107,6 +161,28 @@ do_root() {
 	    cp -pr /overlay_root/saved/* /overlay_root/overlay || return 1
 	    umount /overlay_root/saved                         || return 1
 	fi
+    fi
+
+    # First test for RESCUE mode
+    if test -f /boot_root/REG_RESCUE
+    then
+        mount -o remount,rw /boot_root || return 1
+        rm -f /boot/root/REG_RESCUE
+        mount -o remount,ro /boot_root || return 1
+        do_rescue || return 1
+        # switch to the new root
+        exec switch_root /new_root /sbin/init || return 1
+        return 0
+    fi
+
+    # Then test for UPDATE mode
+    if test -f /boot_root/REG_UPDATE
+    then
+        mount -o remount,rw /boot_root || return 1
+        rm -f /boot/root/REG_UPDATE
+        mount -o remount,ro /boot_root || return 1
+        do_update || return 1
+        return 0
     fi
 
     # mount the rootfs
@@ -128,10 +204,6 @@ do_root() {
     mount --move /sys  	       /new_root/sys  	  || return 1
     mount --move /proc 	       /new_root/proc 	  || return 1
     mount --move /dev  	       /new_root/dev  	  || return 1
-
-    # moving modules and firmware to proper location
-    #mount --move /new_root/modules  /new_root/lib/modules  || return 1
-    #mount --move /new_root/firmware /new_root/lib/firmware || return 1
 
     # switch to the new root
     exec switch_root /new_root /sbin/init || return 1
