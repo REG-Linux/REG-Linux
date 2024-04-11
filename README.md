@@ -7,7 +7,7 @@ It is a friendly [batocera.linux](https://batocera.org) fork maintaining compati
 [![Stars](https://img.shields.io/github/stars/REG-Linux?style=social)](https://github.com/REG-Linux/REG-Linux)
 [![Forks](https://img.shields.io/github/forks/REG-Linux/REG-Linux?style=social)](https://github.com/REG-Linux/REG-Linux)
 [![Website](https://img.shields.io/website?down_color=red&down_message=down&up_color=green&up_message=up&url=https%3A%2F%2Fwww.reglinux.org)](https://www.reglinux.org)
-[![Discord Server](https://img.shields.io/discord/357518249883205632.svg)](https://discord.com/invite/JXhfRTr)\
+[![Discord Server](https://img.shields.io/discord/357518249883205632.svg)](https://discord.gg/fRuETpyg)\
 [![Reddit](https://img.shields.io/reddit/subreddit-subscribers/batocera?style=social)](https://www.reddit.com/r/batocera/)
 [![Twitter](https://img.shields.io/twitter/follow/REG_linux?style=social)](https://twitter.com/REG_linux)
 [![Youtube](https://img.shields.io/youtube/channel/views/UClFpqHKoXsOIV-GjyZqoZcw?style=social)](https://www.youtube.com/channel/UClFpqHKoXsOIV-GjyZqoZcw/featured)
