@@ -59,10 +59,10 @@ do
     cp     "${BINARIES_DIR}/batocera-boot.conf" "${BATOCERA_BINARIES_DIR}/boot/" || exit 1
     echo   "${BATOCERA_SUBTARGET}" > "${BATOCERA_BINARIES_DIR}/boot/boot/batocera.board" || exit 1
 
-    #### boot.tar.xz ###############
-    echo "creating images/${BATOCERA_SUBTARGET}/boot.tar.xz"
+    #### boot.tar.zst ###############
+    echo "creating images/${BATOCERA_SUBTARGET}/boot.tar.zst"
     mkdir -p "${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
-    (cd "${BATOCERA_BINARIES_DIR}/boot" && tar -I "xz -T0" -cf "${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot.tar.xz" *) || exit 1
+    (cd "${BATOCERA_BINARIES_DIR}/boot" && tar -I "zstd" -cf "${BATOCERA_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot.tar.zst" *) || exit 1
     
     # rename the squashfs : the .update is the version that will be renamed at boot to replace the old version
     mv "${BATOCERA_BINARIES_DIR}/boot/boot/batocera.update" "${BATOCERA_BINARIES_DIR}/boot/boot/batocera" || exit 1
@@ -108,7 +108,7 @@ do
 done
 
 #### md5 and sha256 #######################
-for FILE in "${BATOCERA_BINARIES_DIR}/images/"*"/boot.tar.xz" "${BATOCERA_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
+for FILE in "${BATOCERA_BINARIES_DIR}/images/"*"/boot.tar.zst" "${BATOCERA_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
 do
     echo "creating ${FILE}.md5"
     CKS=$(md5sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
