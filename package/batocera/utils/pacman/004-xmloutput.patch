@@ -112,7 +112,7 @@ diff '--color=auto' -uri pacman-5.2.2-lbrpdx/src/pacman/package.c pacman-5.2.2/s
 +		  printf("    <arch>%s</arch>\n",                      alpm_pkg_get_arch(pkg));
 +
 +		  if(!strcmp(alpm_db_get_name(db),"batocera")){
-+		    snprintf(protected_string, 2048, "https://store.batocera.org/thumbnails/%s.png", alpm_pkg_get_name(pkg));
++		    snprintf(protected_string, 2048, "https://store.reglinux.org/thumbnails/%s.png", alpm_pkg_get_name(pkg));
 +		    argz_replace(&protected_string, &n, "<", "&lt;", NULL);
 +		    argz_replace(&protected_string, &n, ">", "&gt;", NULL);
 +		    printf("    <preview_url>%s</preview_url>\n", protected_string);
