@@ -55,3 +55,6 @@ BR2_PACKAGE_HOST_MTOOLS=y
 
 # spi flash support
 BR2_PACKAGE_MTD=y
+
+# choices can be put in _defconfig files only
+BR2_PACKAGE_BATOCERA_SPLASH_IMAGE=y
