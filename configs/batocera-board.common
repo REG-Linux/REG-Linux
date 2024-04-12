@@ -85,6 +85,9 @@ BR2_PACKAGE_GLIBC_UTILS=y
 # disable the mosquitto broker which is on by default
 BR2_PACKAGE_MOSQUITTO_BROKER=n
 
+# force enable ffplay
+BR2_PACKAGE_FFMPEG_FFPLAY=y
+
 # System
 BR2_PACKAGE_BATOCERA_SYSTEM=y
 BR2_PACKAGE_BATOCERA_EXTRAS=y
