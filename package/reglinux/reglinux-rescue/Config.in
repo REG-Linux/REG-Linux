@@ -1,0 +1,4 @@
+config BR2_PACKAGE_REGLINUX_RESCUE
+        bool "reglinux-rescue"
+        help
+          minimal rootfs for rescue/update mode

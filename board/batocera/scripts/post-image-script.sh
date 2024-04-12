@@ -98,7 +98,7 @@ do
     rm -f "${BATOCERA_BINARIES_DIR}/boot.vfat" || exit 1
     rm -f "${BATOCERA_BINARIES_DIR}/userdata.ext4" || exit 1
     mv "${BATOCERA_BINARIES_DIR}/batocera.img" "${BATOCERAIMG}" || exit 1
-    pigz "${BATOCERAIMG}" || exit 1
+    "${HOST_DIR}/usr/bin/pigz" "${BATOCERAIMG}" || exit 1
 
     # delete the boot
     rm -rf "${BATOCERA_BINARIES_DIR}/boot" || exit 1
