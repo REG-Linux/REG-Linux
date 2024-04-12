@@ -48,7 +48,7 @@ echo "Starting the upgrade..."
 
 # --- Prepare update URLs ---
 
-updateurl="https://updates.batocera.org"
+updateurl="https://updates.reglinux.org"
 
 board=$(cat /boot/boot/batocera.board)
 oldboard="$board"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-updateurl="https://updates.batocera.org"
+updateurl="https://updates.reglinux.org"
 
 # customizable upgrade url website
 settingsupdateurl="$(/usr/bin/batocera-settings-get updates.url)"
