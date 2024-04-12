@@ -1,0 +1,39 @@
+--- a/libavfilter/vf_deinterlace_v4l2m2m.c	2024-04-12 22:07:49.514751631 +0200
++++ b/libavfilter/vf_deinterlace_v4l2m2m.c	2024-04-12 22:06:31.521037274 +0200
+@@ -71,6 +71,10 @@
+ #define V4L2_PIX_FMT_NV12_COL128 v4l2_fourcc('N', 'C', '1', '2') /* 12  Y/CbCr 4:2:0 128 pixel wide column */
+ #endif
+ 
++#ifndef V4L2_TYPE_IS_CAPTURE
++#define V4L2_TYPE_IS_CAPTURE(type) (!V4L2_TYPE_IS_OUTPUT(type))
++#endif
++
+ typedef struct V4L2Queue V4L2Queue;
+ typedef struct DeintV4L2M2MContextShared DeintV4L2M2MContextShared;
+ 
+--- a/libavcodec/v4l2_context.c	2024-04-12 22:10:48.218678389 +0200
++++ b/libavcodec/v4l2_context.c	2024-04-12 22:11:12.623214521 +0200
+@@ -36,6 +36,10 @@
+ #include "v4l2_m2m.h"
+ #include "weak_link.h"
+ 
++#ifndef V4L2_TYPE_IS_CAPTURE
++#define V4L2_TYPE_IS_CAPTURE(type) (!V4L2_TYPE_IS_OUTPUT(type))
++#endif
++
+ struct v4l2_format_update {
+     uint32_t v4l2_fmt;
+     int update_v4l2;
+--- a/libavcodec/v4l2_buffers.c	2024-04-12 22:13:34.030320716 +0200
++++ b/libavcodec/v4l2_buffers.c	2024-04-12 22:14:01.366921111 +0200
+@@ -39,6 +39,10 @@
+ #include "v4l2_req_dmabufs.h"
+ #include "weak_link.h"
+ 
++#ifndef V4L2_TYPE_IS_CAPTURE
++#define V4L2_TYPE_IS_CAPTURE(type) (!V4L2_TYPE_IS_OUTPUT(type))
++#endif
++
+ #define USEC_PER_SEC 1000000
+ static const AVRational v4l2_timebase = { 1, USEC_PER_SEC };
+ 
