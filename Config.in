@@ -4,7 +4,7 @@ menu "System"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-system/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-configgen/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-desktopapps/Config.in"
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-splash/Config.in"
+  #source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-splash/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-scripts/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-triggerhappy/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-settings/Config.in"
@@ -565,6 +565,7 @@ endmenu
 
 menu "REG.linux"
 
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reg-rescue/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-rescue/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-splash/Config.in"
 
 endmenu

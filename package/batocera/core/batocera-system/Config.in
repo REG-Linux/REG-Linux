@@ -404,6 +404,9 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
     # leds
     select BR2_PACKAGE_AYN_PLATFORM     if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
 
+    # REG-Linux
+    select BR2_PACKAGE_REGLINUX_SPLASH  # boot splash
+
     help
         Install the batocera.linux system files
 
