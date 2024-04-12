@@ -7,7 +7,7 @@ index 0f6ec4c..31d32b0 100644
  
  ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 -SUGGESTIONS_FILE = f'https://raw.githubusercontent.com/vinifmor/{__app_name__}-files/master/flatpak/suggestions.txt'
-+SUGGESTIONS_FILE = f'https://updates.batocera.org/flatpak.suggestions'
++SUGGESTIONS_FILE = f'https://updates.reglinux.org/flatpak.suggestions'
  CONFIG_FILE = f'{CONFIG_DIR}/flatpak.yml'
  FLATPAK_CONFIG_DIR = f'{CONFIG_DIR}/flatpak'
  UPDATES_IGNORED_FILE = f'{FLATPAK_CONFIG_DIR}/updates_ignored.txt'

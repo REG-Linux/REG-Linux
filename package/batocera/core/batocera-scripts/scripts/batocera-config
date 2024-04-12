@@ -15,7 +15,7 @@ extra3="$5"
 extra4="$6"
 board=`cat /boot/boot/batocera.board`
 
-updateurl="https://updates.batocera.org"
+updateurl="https://updates.reglinux.org"
 
 preBootConfig() {
     mount -o remount,rw /boot
