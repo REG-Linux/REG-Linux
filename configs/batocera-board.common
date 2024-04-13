@@ -117,3 +117,5 @@ BR2_PACKAGE_LIBV4L=y
 
 # Enables ccache
 BR2_CCACHE=y
+
+BR_PACKAGE_GOOFY=y
