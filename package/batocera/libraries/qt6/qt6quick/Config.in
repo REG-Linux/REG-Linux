@@ -1,0 +1,11 @@
+config BR2_PACKAGE_QT6QUICK
+	bool "qt6quick"
+	select BR2_PACKAGE_QT6BASE_GUI
+	help
+	  Qt is a cross-platform application and UI framework for
+	  developers using C++.
+
+	  Qt Quick3DQtprovides a high-level API for creating 3D content and 3D user interfaces based on Qt Quick. 
+	  Rather than using an external engine, which creates syncing issues and additional layers of abstraction, 
+
+	  https://doc.qt.io/qt-6/qtquick3d-index.html
