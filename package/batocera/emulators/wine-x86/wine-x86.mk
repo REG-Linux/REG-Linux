@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-WINE_X86_VERSION = $(BATOCERA_SYSTEM_VERSION)
+WINE_X86_VERSION = 40-dev
 WINE_X86_SOURCE = wine-x86-$(WINE_X86_VERSION).tar.lzma
 WINE_X86_SITE = https://github.com/batocera-linux/wine-x86/releases/download/$(WINE_X86_VERSION)
 
