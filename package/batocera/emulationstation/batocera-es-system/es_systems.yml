@@ -2118,8 +2118,8 @@ x1:
   emulators:
     lime3ds:
       lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]      }
-    lemonade:
-      lemonade: { requireAnyOf: [BR2_PACKAGE_LEMONADE]    }
+    citra:
+      citra: { requireAnyOf: [BR2_PACKAGE_CITRA]          }
     libretro:
       citra: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_CITRA] }
 

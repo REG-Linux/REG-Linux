@@ -71,9 +71,9 @@ def getGenerator(emulator):
         from generators.lime3ds.lime3DSGenerator import Lime3DSGenerator
         return Lime3DSGenerator()
 
-    if emulator == 'lemonade' :
-        from generators.lemonade.lemonadeGenerator import LemonadeGenerator
-        return LemonadeGenerator()
+    if emulator == 'citra' :
+        from generators.citra.citraGenerator import CitraGenerator
+        return CitraGenerator()
 
     if emulator == 'daphne' :
         from generators.daphne.daphneGenerator import DaphneGenerator

@@ -5,7 +5,7 @@
 
 # 2024/xx/xx - batocera.linux 40 -
 ### Special Notes
-The standalone Citra emulator has migrated to it's successor, Lemonade emulator. You should be able to move your saves from /userdata/saves/3ds/citra to the equivalent lemonade directory.
+
 ### Hardware
 Add support for the Pironman case with RPI4 devices.
 Add support for OrangePi Zero 3 (all variants)
@@ -79,7 +79,7 @@ Initial support for the Lenovo Legion Go
 - Ikemen Go to 0.99
 - Amiberry to 5.6.8
 - GroovyMAME to 0.264 SR 0.220b
-- DOSBox-Staging to 0.81.0
+- DOSBox-Staging to 0.81.1
 - DOSBox-X to 2024.03.01
 - SimCoupe to 1.2.13
 - Tsugaru to 20240223
@@ -107,10 +107,10 @@ Initial support for the Lenovo Legion Go
 - Wayland-protocols to 1.33
 - Wlroots to 0.17.1
 - Sway to 1.9
-- Mesa3d to 24.0.4
+- Mesa3d to 24.0.5
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.8.4
+- X86_64 kernel to 6.8.6
 - Switchres 0.220
 - Btop to 1.3.2
 - Linux firmware to 20240312
