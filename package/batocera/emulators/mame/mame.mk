@@ -194,8 +194,10 @@ define MAME_INSTALL_TARGET_CMDS
 	cp -R -u $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
 
 	# Copy data plugin information
-	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/dats			$(TARGET_DIR)/usr/bin/mame/
-	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/history			$(TARGET_DIR)/usr/bin/mame/
+	mkdir -p $(TARGET_DIR)/usr/bin/mame/dats
+	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/dats                         $(TARGET_DIR)/usr/bin/mame/dats/
+	mkdir -p $(TARGET_DIR)/usr/bin/mame/history
+	gunzip -c $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/history/history.xml.gz > $(TARGET_DIR)/usr/bin/mame/history/history.xml
 
 	# gameStop script when exiting a rotated screen
 	mkdir -p $(TARGET_DIR)/usr/share/batocera/configgen/scripts
