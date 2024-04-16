@@ -16,7 +16,7 @@ LIBSMBCLIENT_SELINUX_MODULES = samba
 LIBSMBCLIENT_DEPENDENCIES = \
 	host-e2fsprogs host-flex host-heimdal host-nfs-utils \
 	host-perl host-perl-parse-yapp host-python3 \
-	cmocka e2fsprogs gnutls popt zlib openldap \
+	cmocka e2fsprogs gnutls popt zlib \
 	$(if $(BR2_PACKAGE_ICU),icu) \
 	$(if $(BR2_PACKAGE_LIBAIO),libaio) \
 	$(if $(BR2_PACKAGE_LIBCAP),libcap) \
@@ -93,6 +93,13 @@ else
 LIBSMBCLIENT_CONF_OPTS += --without-libarchive
 endif
 
+ifeq ($(BR2_PACKAGE_LIBUNWIND),y)
+LIBSMBCLIENT_CONF_OPTS += --with-libunwind
+LIBSMBCLIENT_DEPENDENCIES += libunwind
+else
+LIBSMBCLIENT_CONF_OPTS += --without-libunwind
+endif
+
 ifeq ($(BR2_PACKAGE_NCURSES),y)
 LIBSMBCLIENT_CONF_ENV += NCURSES_CONFIG="$(STAGING_DIR)/usr/bin/$(NCURSES_CONFIG_SCRIPTS)"
 LIBSMBCLIENT_DEPENDENCIES += ncurses
@@ -124,7 +131,7 @@ define LIBSMBCLIENT_CONFIGURE_CMDS
 		PERL="$(HOST_DIR)/bin/perl" \
 		$(TARGET_CONFIGURE_OPTS) \
 		$(LIBSMBCLIENT_CONF_ENV) \
-		./buildtools/bin/waf configure \
+		./configure \
 			--prefix=/usr \
 			--sysconfdir=/etc \
 			--localstatedir=/var \
