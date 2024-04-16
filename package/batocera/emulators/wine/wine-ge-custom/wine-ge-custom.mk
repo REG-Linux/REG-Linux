@@ -161,9 +161,9 @@ else
 WINE_GE_CUSTOM_CONF_OPTS += --without-pulse
 endif
 
-ifeq ($(BR2_PACKAGE_SAMBA4),y)
+ifeq ($(BR2_PACKAGE_REGLINUX_SAMBA),y)
 WINE_GE_CUSTOM_CONF_OPTS += --with-netapi
-WINE_GE_CUSTOM_DEPENDENCIES += samba4
+WINE_GE_CUSTOM_DEPENDENCIES += reglinux-samba
 else
 WINE_GE_CUSTOM_CONF_OPTS += --without-netapi
 endif

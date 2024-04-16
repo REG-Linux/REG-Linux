@@ -1,0 +1,35 @@
+From 255c0386275b64477801075b17edb3a647b01fd1 Mon Sep 17 00:00:00 2001
+From: Oliver Tappe <zooey at hirschkaefer.de>
+Date: Fri, 26 Sep 2014 18:37:17 +0200
+Subject: [PATCH] build: add smbclient and install_smbclient targets
+
+This (together with patches to buildroot's samba4.mk) makes it
+possible to build libsmbclient.so and all of its dependencies
+without needing to build all of samba.
+---
+ Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 5f220fa..bcc886c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,9 +7,15 @@ WAF=WAF_MAKE=1 $(WAF_BINARY)
+ all:
+ 	$(WAF) build
+ 
++smbclient:
++	$(WAF) build --targets=smbclient
++
+ install:
+ 	$(WAF) install
+ 
++install_smbclient:
++	$(WAF) install --targets=smbclient
++
+ uninstall:
+ 	$(WAF) uninstall
+ 
+-- 
+1.8.4.5
+

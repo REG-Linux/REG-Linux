@@ -1,0 +1,31 @@
+comment "libsmbclient needs a uClibc or glibc toolchain w/ wchar, dynamic library, NPTL"
+	depends on BR2_TOOLCHAIN_HAS_SYNC_4
+	depends on !BR2_USE_WCHAR || BR2_TOOLCHAIN_USES_MUSL \
+		|| BR2_STATIC_LIBS || !BR2_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on BR2_USE_MMU
+
+config BR2_PACKAGE_LIBSMBCLIENT
+	bool "libsmbclient"
+
+        depends on BR2_USE_MMU # fork()
+        depends on BR2_USE_WCHAR # python
+        depends on BR2_TOOLCHAIN_HAS_THREADS_NPTL # python -> libffi
+        depends on !BR2_STATIC_LIBS # cmocka, python, gnutls
+        depends on !BR2_nios2 # binary too large, relocations don't fit
+        depends on BR2_TOOLCHAIN_HAS_SYNC_4
+        depends on !BR2_TOOLCHAIN_USES_MUSL
+        select BR2_PACKAGE_CMOCKA
+        select BR2_PACKAGE_E2FSPROGS
+        select BR2_PACKAGE_GNUTLS
+        select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
+        select BR2_PACKAGE_LIBTIRPC if !BR2_TOOLCHAIN_HAS_NATIVE_RPC
+	select BR2_PACKAGE_OPENLDAP
+        select BR2_PACKAGE_POPT
+        select BR2_PACKAGE_ZLIB
+
+	help
+	  libsmbclient is a library toolset that permits applications
+	  to manipulate CIFS/SMB network resources using many of the
+	  standards POSIX functions available for manipulating local
+	  files.
+

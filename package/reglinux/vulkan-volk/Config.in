@@ -1,0 +1,5 @@
+config BR2_PACKAGE_VULKAN_VOLK
+	bool "vulkan-volk"
+		help
+		Meta loader for Vulkan
+		https://github.com/zeux/volk
