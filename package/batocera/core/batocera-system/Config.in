@@ -487,11 +487,10 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "rockchip/rk3568/odroid-m1 rockchip/rk3568/rock-3a rockchip/rk3568/rock-3c rockchip/rk3568/anbernic-rgxx3 rockchip/rk3568/firefly-station-m2 rockchip/rk3568/firefly-station-p2" \
 													if BR2_PACKAGE_BATOCERA_TARGET_RK3568
 	default "allwinner/h3/orangepi-pc allwinner/h3/orangepi-one allwinner/h3/orangepi-plus2e allwinner/h3/bananapi-m2-zero allwinner/h3/cha" \
-	default "saphira"										if BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA
 													if BR2_PACKAGE_BATOCERA_TARGET_H3
+	default "saphira"										if BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA
 	choice
 	prompt "batocera.linux target"
-	default BR2_PACKAGE_BATOCERA_TARGET_BCM2836
 	help
 	  Select batocera.linux target hardware
 
