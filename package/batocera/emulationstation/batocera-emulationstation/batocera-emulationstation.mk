@@ -3,8 +3,8 @@
 # REG-emulationstation
 #
 ################################################################################
-# Last update: Commits on Apr 15, 2024
-BATOCERA_EMULATIONSTATION_VERSION = 0f0ef3fd730353d16218a25a09f2b51d0cca0614
+# Last update: Commits on Apr 17, 2024
+BATOCERA_EMULATIONSTATION_VERSION = f37c2dcc658ac9e5894de892313119d963d8b515
 BATOCERA_EMULATIONSTATION_SITE = https://github.com/REG-linux/REG-emulationstation
 BATOCERA_EMULATIONSTATION_SITE_METHOD = git
 BATOCERA_EMULATIONSTATION_LICENSE = MIT
