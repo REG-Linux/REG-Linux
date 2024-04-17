@@ -10,11 +10,25 @@ SONIC3_AIR_SITE_METHOD = git
 SONIC3_AIR_GIT_SUBMODULES = YES
 SONIC3_AIR_LICENSE = GPL-3.0
 SONIC3_AIR_LICENSE_FILE = COPYING.txt
-# CMakeLists.txt in subfolder
-SONIC3_AIR_SUBDIR = Oxygen/sonic3air/build/_cmake
 
-SONIC3_AIR_DEPENDENCIES += alsa-lib pulseaudio libcurl libglu mesa3d 
-SONIC3_AIR_DEPENDENCIES += xlib_libXxf86vm xlib_libXcomposite zlib
+# Custom GLES 2.0 cmake
+define SONIC3_AIR_ADD_GLES2_CMAKE
+	mkdir -p $(@D)/Oxygen/sonic3air/build/_gles2/
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/sonic3-air/CMakeLists.txt.gles2 $(@D)/Oxygen/sonic3air/build/_gles2/CMakeLists.txt
+endef
+SONIC3_AIR_PRE_CONFIGURE_HOOKS += SONIC3_AIR_ADD_GLES2_CMAKE
+
+# CMakeLists.txt in subfolder
+ifeq ($(BR2_PACKAGE_XORG7),y)
+SONIC3_AIR_SUBDIR = Oxygen/sonic3air/build/_cmake
+else
+SONIC3_AIR_SUBDIR = Oxygen/sonic3air/build/_gles2
+endif
+
+SONIC3_AIR_DEPENDENCIES += alsa-lib pulseaudio libcurl mesa3d zlib
+ifeq ($(BR2_PACKAGE_XORG7),y)
+SONIC3_AIR_DEPENDENCIES += xlib_libXxf86vm xlib_libXcomposite glu
+endif
 
 SONIC3_AIR_SUPPORTS_IN_SOURCE_BUILD = NO
 
