@@ -3,8 +3,8 @@
 do_clean() {
     test -n "${GETPERPID}" && kill -9 "${GETPERPID}"
     rm -f "/userdata/system/upgrade/upgrade_message.txt"
-    rm -f "/userdata/system/upgrade/boot.tar.xz"
-    rm -f "/userdata/system/upgrade/boot.tar.xz.md5"
+    rm -f "/userdata/system/upgrade/boot.tar.zst"
+    rm -f "/userdata/system/upgrade/boot.tar.zst.md5"
     if test $# -eq 1; then
         [ "$1" = "0" ] && echo "Finally syncing of disk ...>>>100"
         [ "$1" = "1" ] && echo "removed downloaded files, sync disk now"
@@ -34,7 +34,7 @@ do_badgeines() {
             COUNT=$((COUNT+5))
             sleep 0.1
         else
-            CURVAL=$(stat --printf="%s" "/userdata/system/upgrade/boot.tar.xz")
+            CURVAL=$(stat --printf="%s" "/userdata/system/upgrade/boot.tar.zst")
             CURVAL=$((CURVAL / 1024 / 1024))
             PER=$((CURVAL * 100 / TARVAL))
             echo "$CURVAL of $TARVAL MB downloaded ... >>> ${PER}%"
@@ -52,8 +52,6 @@ updateurl="https://updates.reglinux.org"
 
 board=$(cat /boot/boot/batocera.board)
 oldboard="$board"
-test "${board}" = "rpi4" && board=rpi464 # "temporarly" download on rpi464 for rpi4
-
 updatetype="$(/usr/bin/batocera-settings-get updates.type)"
 settingsupdateurl="$(/usr/bin/batocera-settings-get updates.url)"
 
@@ -61,7 +59,7 @@ settingsupdateurl="$(/usr/bin/batocera-settings-get updates.url)"
 test -n "${settingsupdateurl}" && updateurl="${settingsupdateurl}"
 
 # force a default value in case the value is removed or miswritten
-test "${updatetype}" != "stable" -a "${updatetype}" != "unstable" -a "${updatetype}" != "butterfly" && updatetype="stable"
+test "${updatetype}" != "stable" -a "${updatetype}" != "dev" && updatetype="stable"
 
 # custom the url directory
 DWD_HTTP_DIR="${updateurl}/${board}/${updatetype}/last"
@@ -77,11 +75,11 @@ test $# -eq 1 && DWD_HTTP_DIR="$1"
 # Check if "manual" argument is provided
 if [ "$1" == "manual" ]; then
     # Check if the local file exists
-    if [ -f "/userdata/system/upgrade/boot.tar.xz" ]; then
-        size=$(du -m "/userdata/system/upgrade/boot.tar.xz" | awk '{print $1}')
-        echo "Using local file: /userdata/system/upgrade/boot.tar.xz (${size}MB)"
+    if [ -f "/userdata/system/upgrade/boot.tar.zst" ]; then
+        size=$(du -m "/userdata/system/upgrade/boot.tar.zst" | awk '{print $1}')
+        echo "Using local file: /userdata/system/upgrade/boot.tar.zst (${size}MB)"
     else
-        echo "Error: Local file /userdata/system/upgrade/boot.tar.xz not found."
+        echo "Error: Local file /userdata/system/upgrade/boot.tar.zst not found."
         exit 1
     fi
 else
@@ -89,7 +87,7 @@ else
     mkdir -p /userdata/system/upgrade || exit 1
 
     # get size to download
-    url="${DWD_HTTP_DIR}/boot.tar.xz"
+    url="${DWD_HTTP_DIR}/boot.tar.zst"
     echo "url: ${url}"
     headers=$(curl -A "batocera-upgrade.header" -sfIL "${url}")
     test $? -eq 0 || exit 1
@@ -99,17 +97,10 @@ else
     echo "need to download ${size}mb"
 fi
 
-# check free space on fs
-if [ "$1" != "manual" ]; then
-    filesystems="/userdata /boot"
-else
-    filesystems="/boot"
-fi
-
-# Check free space on filesystems
+# Check free space on /userdata
 for fs in $filesystems
 do
-    freespace=$(df -m "${fs}" | tail -1 | awk '{print $4}')
+    freespace=$(df -m "/userdata" | tail -1 | awk '{print $4}')
     test $? -eq 0 || exit 1
     if test "${size}" -gt "${freespace}"
     then
@@ -123,26 +114,26 @@ done
 if [ "$1" != "manual" ]; then
     if [ $TERMINAL -eq 0 ]; then
         # download inside ES with badge
-        touch "/userdata/system/upgrade/boot.tar.xz"
+        touch "/userdata/system/upgrade/boot.tar.zst"
         do_badgeines "${size}" &
         GETPERPID=$!
-        curl -A "batocera-upgrade" -sfL "${url}" -o "/userdata/system/upgrade/boot.tar.xz" || exit 1
+        curl -A "batocera-upgrade" -sfL "${url}" -o "/userdata/system/upgrade/boot.tar.zst" || exit 1
         do_upgmsg "Calculating md5 checksum ..."
     else
         # download inside SSH or terminal
-        curl -A "batocera-upgrade" -fL "${url}" -o "/userdata/system/upgrade/boot.tar.xz" || exit 1
+        curl -A "batocera-upgrade" -fL "${url}" -o "/userdata/system/upgrade/boot.tar.zst" || exit 1
         echo "Check proper file download, checking md5sum - please wait"
     fi
 fi
 
 # try to download an md5 checksum
 if [ "$1" != "manual" ]; then
-    curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "/userdata/system/upgrade/boot.tar.xz.md5"
+    curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "/userdata/system/upgrade/boot.tar.zst.md5"
 fi
-if test -e "/userdata/system/upgrade/boot.tar.xz.md5"
+if test -e "/userdata/system/upgrade/boot.tar.zst.md5"
 then
-    DISTMD5=$(cat "/userdata/system/upgrade/boot.tar.xz.md5")
-    CURRMD5=$(md5sum "/userdata/system/upgrade/boot.tar.xz" | sed -e s+' .*$'++)
+    DISTMD5=$(cat "/userdata/system/upgrade/boot.tar.zst.md5")
+    CURRMD5=$(md5sum "/userdata/system/upgrade/boot.tar.zst" | sed -e s+' .*$'++)
     if test "${DISTMD5}" = "${CURRMD5}"
     then
         do_upgmsg "Checksum validated ..." 2
@@ -177,9 +168,9 @@ do
     fi
 done
 
-# extract file on /boot
+# extract file on /userdata/system/upgrade
 do_upgmsg "Extracting files ..."
-if ! (cd /boot && xz -dc < "/userdata/system/upgrade/boot.tar.xz" | tar xvf - --no-same-owner)
+if ! (cd /userdata/system/upgrade && zstd -dc < "/userdata/system/upgrade/boot.tar.zst" | tar xvf - --no-same-owner)
 then
     exit 1
 fi
@@ -197,9 +188,11 @@ do
     fi
 done
 
-# remount /boot in ro
+# mark /boot as UPDATE mode
 do_upgmsg "Doing final cleanups ..." 0.5
-if ! mount -o remount,ro /boot
+touch /boot/REG_UPDATE
+mount -o remount,ro /boot
+if ! rm "/userdata/system/upgrade/boot.tar.zst"
 then
     exit 1
 fi
