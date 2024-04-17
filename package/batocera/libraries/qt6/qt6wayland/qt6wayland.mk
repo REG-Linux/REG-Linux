@@ -21,11 +21,11 @@ QT6WAYLAND_LICENSE_FILES = \
     LICENSES/GFDL-1.3-no-invariants-only.txt
 
 QT6WAYLAND_CONF_OPTS = \
-    -GNinja \
     -DQT_HOST_PATH=$(HOST_DIR) \
     -DBUILD_WITH_PCH=OFF \
     -DQT_BUILD_EXAMPLES=OFF \
-    -DQT_BUILD_TESTS=OFF
+    -DQT_BUILD_TESTS=OFF \
+    -DQT_FEATURE_wayland_server=OFF
 
 QT6WAYLAND_DEPENDENCIES = qt6base host-qt6wayland
 
@@ -42,4 +42,14 @@ define QT6WAYLAND_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(cmake-package))
+
+HOST_QT6WAYLAND_CONF_OPTS = \
+    -DQT_HOST_PATH=$(HOST_DIR) \
+    -DBUILD_WITH_PCH=OFF \
+    -DQT_BUILD_EXAMPLES=OFF \
+    -DQT_BUILD_TESTS=OFF \
+    -DQT_FEATURE_wayland_server=OFF
+
+HOST_QT6WAYLAND_DEPENDENCIES = host-qt6base
+
 $(eval $(host-cmake-package))
