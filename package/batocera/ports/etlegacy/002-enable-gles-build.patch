@@ -1,0 +1,26 @@
+--- a/cmake/ETLSetupFeatures.cmake	2024-04-17 11:36:26.410011188 +0200
++++ b/cmake/ETLSetupFeatures.cmake	2024-04-17 11:59:41.475667843 +0200
+@@ -10,9 +10,11 @@
+ #-----------------------------------------------------------------
+ if(BUILD_CLIENT)
+ 
+-	if(NOT WIN32 AND NOT APPLE AND NOT ANDROID) # Dependency of GLEW and SDL_syswm.h
+-		find_package(X11 REQUIRED)
+-		target_include_directories(client_libraries INTERFACE ${X11_INCLUDE_DIR})
++	if (NOT ETL_ARM)
++		if(NOT WIN32 AND NOT APPLE AND NOT ANDROID) # Dependency of GLEW and SDL_syswm.h
++			find_package(X11 REQUIRED)
++			target_include_directories(client_libraries INTERFACE ${X11_INCLUDE_DIR})
++		endif()
+ 	endif()
+ 
+ 	if(ETL_ARM AND NOT ANDROID)
+@@ -39,7 +41,7 @@
+ 	endif()
+ 
+ 	# temp. added vulkan to the list of dependencies
+-	if(FEATURE_RENDERER1 OR FEATURE_RENDERER2 OR FEATURE_RENDERER_VULKAN)
++	if(NOT ETL_ARM AND (FEATURE_RENDERER1 OR FEATURE_RENDERER2 OR FEATURE_RENDERER_VULKAN))
+ 		# ghost target to link all opengl renderer libraries
+ 		add_library(opengl_renderer_libs INTERFACE)
+ 		if(NOT BUNDLED_GLEW)
