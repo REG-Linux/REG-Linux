@@ -3,8 +3,8 @@
 # duckstation
 #
 ################################################################################
-# Version: latest master Apr 15 2024
-DUCKSTATION_VERSION = 9fd2994b7392a60dbdb4b1cf84042f9348a23a1a
+# Version: latest master Apr 16 2024
+DUCKSTATION_VERSION = e40c022a0fd1909bb98eb4ebd34e08b49af19688
 DUCKSTATION_SITE = https://github.com/stenzek/duckstation.git
 DUCKSTATION_SITE_METHOD=git
 DUCKSTATION_GIT_SUBMODULES=YES
@@ -37,13 +37,14 @@ else
     DUCKSTATION_CONF_OPTS += -DENABLE_VULKAN=OFF
 endif
 
-# QT6 under wayland is failing currently
-ifeq ($(BR2_PACKAGE_QT6)$(BR2_PACKAGE_XORG7),yy)
+ifeq ($(BR2_PACKAGE_QT6)$(BR2_PACKAGE_BATOCERA_WAYLAND),yy)
+    DUCKSTATION_CONF_OPTS += -DBUILD_QT_FRONTEND=ON
+    DUCKSTATION_DEPENDENCIES += qt6base qt6tools qt6svg
+else ifeq ($(BR2_PACKAGE_QT6)$(BR2_PACKAGE_XORG7),yy)
     DUCKSTATION_CONF_OPTS += -DBUILD_QT_FRONTEND=ON
     DUCKSTATION_DEPENDENCIES += qt6base qt6tools qt6svg
 else
     DUCKSTATION_CONF_OPTS += -DBUILD_QT_FRONTEND=OFF
-    DUCKSTATION_CONF_OPTS += -DBUILD_NOGUI_FRONTEND=ON
     DUCKSTATION_DEPENDENCIES += libdrm sdl2 libevdev libxkbcommon
 endif
 
