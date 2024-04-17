@@ -182,6 +182,8 @@ do_root() {
         rm -f /boot/root/REG_UPDATE
         mount -o remount,ro /boot_root || return 1
         do_update || return 1
+	sync
+	reboot
         return 0
     fi
 
