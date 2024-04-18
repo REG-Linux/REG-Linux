@@ -139,9 +139,9 @@ IMG_MESA3D_CONF_OPTS += \
 	-Dshared-glapi=enabled \
 	-Dgallium-drivers=$(subst $(space),$(comma),$(IMG_MESA3D_GALLIUM_DRIVERS-y)) \
 	-Dgallium-extra-hud=true
-ifeq ($(BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_PVR),y)
-IMG_MESA3D_DEPENDENCIES += img-gpu-powervr
-endif
+#ifeq ($(BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_PVR),y)
+#IMG_MESA3D_DEPENDENCIES += img-gpu-powervr
+#endif
 endif
 
 ifeq ($(BR2_PACKAGE_IMG_MESA3D_VULKAN_DRIVER),)
