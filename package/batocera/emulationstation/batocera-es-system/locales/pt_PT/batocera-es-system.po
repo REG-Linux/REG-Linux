@@ -5468,7 +5468,7 @@ msgctxt "game_options"
 msgid "Enhancement. Remove the sixteen sprites per line limit."
 msgstr "Mehoramento. Remove o limite de dezesseis imagens por linha."
 
-#. TRANSLATION: libretro/mednafen_wswan, drastic
+#. TRANSLATION: libretro/mednafen_wswan, drastic, vpinball, vpinball, vpinball, ...
 msgctxt "game_options"
 msgid "Manual"
 msgstr "Manual"
@@ -12272,12 +12272,12 @@ msgstr "INTERRUPTORES DE ECRÃ DE TUBO (CRT)"
 #. TRANSLATION: mame
 msgctxt "game_options"
 msgid "Play this game on several screens (if available)"
-msgstr ""
+msgstr "Jogue este jogo em vários ecrãs (se disponível)"
 
 #. TRANSLATION: mame
 msgctxt "game_options"
 msgid "MULTISCREENS"
-msgstr ""
+msgstr "MÚLTIPLOS ECRÃS"
 
 #. TRANSLATION: mame
 msgctxt "game_options"
@@ -13039,22 +13039,22 @@ msgstr "Aplicável somente ao usar OpenGL."
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "0.5x (360p/540p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "0,5x (360p/540p) [EXPERIMENTAL]"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "0.75x (540p/810p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "0.75x (540p/810p) [EXPERIMENTAL]"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "1x (720p/1080p)"
-msgstr ""
+msgstr "1x (720p/1080p)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "1.5x (1080p/1620p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "1.5x (1080p/1620p) [EXPERIMENTAL]"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -13084,12 +13084,12 @@ msgstr "6x (4320p/6480p)"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "7x (5040p/7560p)"
-msgstr ""
+msgstr "7x (5040p/7560p)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "8x (5760p/8640p)"
-msgstr ""
+msgstr "8x (5760p/8640p)"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -13109,7 +13109,7 @@ msgstr "Forçar 16:10"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Force 32:9"
-msgstr ""
+msgstr "Forçar 32:9"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13118,26 +13118,29 @@ msgid ""
 "tearing as it recovers from a slow down. Mailbox can have lower latency but "
 "may drop frames."
 msgstr ""
+"Corrija o screen tearing. FIFO (Vsync) não elimina frames. FIFO relaxado "
+"permite tearing enquanto se recupera de uma desaceleração. A caixa de "
+"correio pode ter latência menor, mas pode perder frames."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Immediate"
-msgstr ""
+msgstr "Imediata"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Mailbox (Recommended)"
-msgstr ""
+msgstr "Caixa de correio (recomendado)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "FIFO (VSync On)"
-msgstr ""
+msgstr "FIFO (VSync ativado)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "FIFO Relaxed"
-msgstr ""
+msgstr "FIFO relaxado"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13150,6 +13153,8 @@ msgid ""
 "FXAA has a lower performance impact, goof for low resolutions. SMAA offers "
 "best quality."
 msgstr ""
+"FXAA tem um impacto menor no desempenho, o que é uma brincadeira para "
+"resoluções baixas. Ofertas SMAA melhor qualidade."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13159,7 +13164,7 @@ msgstr "MÉTODO ANTI-ALIASING"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "SMAA"
-msgstr ""
+msgstr "SMAA"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13174,7 +13179,7 @@ msgstr "ScaleForce"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "AMD FidelityFX Super Resolution"
-msgstr ""
+msgstr "Super resolução AMD FidelityFX"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13182,16 +13187,19 @@ msgid ""
 "GPU emulation accuracy. Most games render fine with Normal. High is required "
 "to ensure particles render correctly."
 msgstr ""
+"Precisão de emulação de GPU. A maioria dos jogos funciona bem com Normal. "
+"Alto é obrigatório para garantir que as partículas sejam renderizadas "
+"corretamente."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "ACCURACY LEVEL"
-msgstr ""
+msgstr "NÍVEL DE PRECISÃO"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Extreme"
-msgstr ""
+msgstr "Extremo"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13206,22 +13214,22 @@ msgstr "Mono"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Choose whether the virtual switch is docked or not."
-msgstr ""
+msgstr "Escolha se o switch virtual está encaixado ou não."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "DOCK MODE"
-msgstr ""
+msgstr "MODO DOCA"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Undocked"
-msgstr ""
+msgstr "Desencaixado"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Docked (Default)"
-msgstr ""
+msgstr "Encaixado (Padrão)"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -14273,11 +14281,6 @@ msgstr "Computador de última geração"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "Manual (Default)"
-msgstr "Manual (Padrão)"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid "Alternative Coloured Dot Matrix Display (needs additional file)."
 msgstr ""
 "Display alternativo de matriz de pontos coloridos (precisa de arquivo "
@@ -14287,6 +14290,21 @@ msgstr ""
 msgctxt "game_options"
 msgid "ALTCOLOR"
 msgstr "ALTCOLOR"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Playfield configuration"
+msgstr ""
+
+#. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
+msgctxt "game_options"
+msgid "WINDOWS POSITIONS"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD"
+msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14337,17 +14355,12 @@ msgstr "Posição superior esquerda, Grande"
 #. TRANSLATION: vpinball, vpinball, vpinball
 msgctxt "game_options"
 msgid "On screen 2 if available"
-msgstr ""
+msgstr "No ecrã 2, se disponível"
 
 #. TRANSLATION: vpinball, vpinball
 msgctxt "game_options"
 msgid "On screen 3 if available"
-msgstr ""
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
-msgid "PinMAME DMD disabled"
-msgstr "PinMAME DMD desativado"
+msgstr "No ecrã 3, se disponível"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14366,11 +14379,6 @@ msgstr "FLEX DMD"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "FlexDMD disabled"
-msgstr "FlexDMD desativado"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid ""
 "Upright glass panel displaying some illuminated artwork. By default, "
 "settings come from the VPinballX.ini configuration file."
@@ -14382,11 +14390,6 @@ msgstr ""
 msgctxt "game_options"
 msgid "BACKGLASS (B2S)"
 msgstr "VIDRO TRASEIRO (B2S)"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
-msgid "Backglass disabled"
-msgstr "Vidro traseiro desativado"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14404,15 +14407,27 @@ msgstr "VISOR DE VIDRO DMD"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid ""
-"Inverse the Backglass and the Playfield. Usefull to use the Backglass as "
-"main screen for other emulators."
+msgid "DMD window ratio"
 msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "INVERSE PLAYFIELD AND B2S"
+msgid "DMD SIZE"
 msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid ""
+"Inverse the Backglass and the Playfield. Usefull to use the Backglass as "
+"main screen for other emulators."
+msgstr ""
+"Inverta o Backglass e o Playfield. Útil para usar o Backglass como ecrã "
+"principal para outros emuladores."
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "INVERSE PLAYFIELD AND B2S"
+msgstr "CAMPO DE JOGO INVERSO E B2S"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14865,12 +14880,12 @@ msgstr "BUFFER TRIPLO"
 #. TRANSLATION: steam.keys
 msgctxt "keys_files"
 msgid "Exit Steam"
-msgstr ""
+msgstr "Sair do Steam"
 
 #. TRANSLATION: flatpak.keys
 msgctxt "keys_files"
 msgid "Exit running Flatpak"
-msgstr ""
+msgstr "Saia da execução do Flatpak"
 
 #. TRANSLATION: raze.keys, gzdoom.keys, eduke32.keys
 msgctxt "keys_files"
@@ -15533,28 +15548,17 @@ msgid "Graphics filtering on/off"
 msgstr "Ligar/Desligar o filtro de gráficos"
 
 #~ msgctxt "game_options"
-#~ msgid ""
-#~ "Turn on to configure settings from this GUI (Recommended). If disabled, "
-#~ "you have to manually edit the Config File (Experts only - not "
-#~ "recommended)."
-#~ msgstr ""
-#~ "Ative para definir as configurações desta GUI (recomendado). Se "
-#~ "desativado, você terá que editar manualmente o arquivo de configuração "
-#~ "(somente para especialistas - não recomendado)."
+#~ msgid "Manual (Default)"
+#~ msgstr "Manual (Padrão)"
 
 #~ msgctxt "game_options"
-#~ msgid "ENABLE EMULATIONSTATION CONFIGURATION"
-#~ msgstr "ATIVAR CONFIGURAÇÃO DA ESTAÇÃO DE EMULAÇÃO"
+#~ msgid "PinMAME DMD disabled"
+#~ msgstr "PinMAME DMD desativado"
 
 #~ msgctxt "game_options"
-#~ msgid "AMD FidelityFX (Vulkan Only)"
-#~ msgstr "AMD FidelityFX (Somente Vulkan)"
+#~ msgid "FlexDMD disabled"
+#~ msgstr "FlexDMD desativado"
 
 #~ msgctxt "game_options"
-#~ msgid ""
-#~ "Runners simplify compatibility of running Windows games. If choosing "
-#~ "Custom, you must have a runner in /userdata/system/wine/custom."
-#~ msgstr ""
-#~ "Os corredores simplificam a compatibilidade da execução de jogos do "
-#~ "Windows. Se escolher Personalizado, você deve ter um executador em /"
-#~ "userdata/system/wine/custom."
+#~ msgid "Backglass disabled"
+#~ msgstr "Vidro traseiro desativado"

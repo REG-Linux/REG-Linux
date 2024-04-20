@@ -7,10 +7,10 @@ Subject: [PATCH] RK3288: Add merge tinker into tinker-s
  arch/arm/boot/dts/rk3288-tinker-s.dts | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/rk3288-tinker-s.dts b/arch/arm/boot/dts/rk3288-tinker-s.dts
+diff --git a/arch/arm/boot/dts/rockchip/rk3288-tinker-s.dts b/arch/arm/boot/dts/rockchip/rk3288-tinker-s.dts
 index 970e13859..baeca6632 100644
---- a/arch/arm/boot/dts/rk3288-tinker-s.dts
-+++ b/arch/arm/boot/dts/rk3288-tinker-s.dts
+--- a/arch/arm/boot/dts/rockchip/rk3288-tinker-s.dts
++++ b/arch/arm/boot/dts/rockchip/rk3288-tinker-s.dts
 @@ -9,7 +9,7 @@
  
  / {
