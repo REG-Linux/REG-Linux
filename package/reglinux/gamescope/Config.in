@@ -1,0 +1,25 @@
+config BR2_PACKAGE_GAMESCOPE
+    bool "gamescope"
+    select BR2_PACKAGE_WAYLAND
+    select BR2_PACKAGE_WLROOTS
+    select BR2_PACKAGE_STB
+    select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_LIBDECOR
+    select BR2_PACKAGE_GLSLANG
+    select BR2_PACKAGE_SPIRV_TOOLS
+    select BR2_PACKAGE_XWAYLAND
+    select BR2_PACKAGE_WLROOTS_XWAYLAND
+    select BR2_PACKAGE_XORG7
+    select BR2_PACKAGE_LIBXCB
+    select BR2_PACKAGE_XLIB_LIBXCOMPOSITE
+    select BR2_PACKAGE_XLIB_LIBXDAMAGE
+    select BR2_PACKAGE_XLIB_LIBXRES
+    select BR2_PACKAGE_XLIB_LIBXXF86VM
+    select BR2_PACKAGE_XLIB_LIBXTST
+    select BR2_PACKAGE_XLIB_LIBXCURSOR
+    select BR2_PACKAGE_XLIB_LIBXMU
+
+    help
+        Valve Gamescope compositor.
+
+	https://github.com/ValveSoftware/gamescope
