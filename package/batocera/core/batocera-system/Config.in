@@ -1618,6 +1618,19 @@ config BR2_PACKAGE_BATOCERA_WAYLAND_SWAY
 	select BR2_PACKAGE_SWAY
 	select BR2_PACKAGE_SWAYBG
 
+config BR2_PACKAGE_BATOCERA_WAYLAND_GAMESCOPE
+       bool "batocera.linux wayland gamescope packages selection"
+
+       # Wayland Protocol
+       select BR2_PACKAGE_BATOCERA_WAYLAND
+
+       # Seat management daemon
+       select BR2_PACKAGE_SEATD
+       select BR2_PACKAGE_SEATD_DAEMON
+
+       # Compositor for wayland
+       select BR2_PACKAGE_GAMESCOPE
+
 config BR2_PACKAGE_BATOCERA_XWAYLAND
 	bool "batocera.linux xwayland packages selection"
 
