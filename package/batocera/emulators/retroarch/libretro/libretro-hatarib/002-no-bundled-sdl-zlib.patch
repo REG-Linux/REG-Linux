@@ -1,0 +1,27 @@
+--- a/makefile	2024-04-20 12:25:57.538035375 +0200
++++ b/makefile	2024-04-20 12:27:11.019703537 +0200
+@@ -107,24 +107,7 @@
+ 
+ # clean and rebuild everything (including static libs)
+ full:
+-	$(MAKE) -f makefile.zlib clean
+-	$(MAKE) -f makefile.sdl clean
+ 	$(MAKE) clean
+-	$(MAKE) -f makefile.zlib
+-	$(MAKE) -f makefile.sdl MULTITHREAD=$(MULTITHREAD)
+-	$(MAKE) default
+-
+-sdl:
+-	$(MAKE) -f makefile.sdl MULTITHREAD=$(MULTITHREAD)
+-
+-zlib:
+-	$(MAKE) -f makefile.zlib
+-
+-# to test a reconfiguration of SDL only
+-sdlreconfig:
+-	$(MAKE) -f makefile.sdl clean
+-	$(MAKE) clean
+-	$(MAKE) -f makefile.sdl MULTITHREAD=$(MULTITHREAD)
+ 	$(MAKE) default
+ 
+ directories:
