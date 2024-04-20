@@ -10,13 +10,13 @@ This patch is taken from the patches provided by the ARMbian team.
 
 Signed-off-by: Myy Miouyouyou <myy@miouyouyou.fr>
 ---
- arch/arm/boot/dts/rk3288.dtsi | 2 +-
+ arch/arm/boot/rockchip/dts/rk3288.dtsi | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+diff --git a/arch/arm/boot/dts/rockchip/rk3288.dtsi b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 index 5b789528..9ed532cc 100644
---- a/arch/arm/boot/dts/rk3288.dtsi
-+++ b/arch/arm/boot/dts/rk3288.dtsi
+--- a/arch/arm/boot/dts/rockchip/rk3288.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 @@ -334,7 +334,7 @@
  		dma-names = "tx", "rx";
  		interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
