@@ -17,13 +17,13 @@ https://www.spinics.net/lists/arm-kernel/msg673162.html
 
 Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
 ---
- arch/arm/boot/dts/rk3288.dtsi | 6 ++++--
+ arch/arm/boot/dts/rockchip/rk3288.dtsi | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+diff --git a/arch/arm/boot/dts/rockchip/rk3288.dtsi b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 index d23c7fa55..ff04aab5e 100644
---- a/arch/arm/boot/dts/rk3288.dtsi
-+++ b/arch/arm/boot/dts/rk3288.dtsi
+--- a/arch/arm/boot/dts/rockchip/rk3288.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 @@ -867,12 +867,14 @@
  		rockchip,grf = <&grf>;
  		#clock-cells = <1>;

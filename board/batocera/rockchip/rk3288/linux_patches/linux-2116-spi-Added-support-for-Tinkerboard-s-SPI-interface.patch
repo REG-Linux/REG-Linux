@@ -2,18 +2,18 @@ diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
 index b2775d82d2d..555dd3cb7d7 100644
 --- a/drivers/spi/spidev.c
 +++ b/drivers/spi/spidev.c
-@@ -691,6 +691,7 @@ static const struct spi_device_id spidev_spi_ids[] = {
- 	{ .name = "m53cpld" },
- 	{ .name = "spi-petra" },
+@@ -714,6 +714,7 @@
  	{ .name = "spi-authenta" },
-+	{ .name = "spi_tinker" },
+ 	{ .name = "em3581" },
+ 	{ .name = "si3210" },
+++	{ .name = "spi_tinker" },
  	{},
  };
  MODULE_DEVICE_TABLE(spi, spidev_spi_ids);
-@@ -717,6 +718,7 @@ static const struct of_device_id spidev_dt_ids[] = {
- 	{ .compatible = "menlo,m53cpld", .data = &spidev_of_check },
- 	{ .compatible = "cisco,spi-petra", .data = &spidev_of_check },
- 	{ .compatible = "micron,spi-authenta", .data = &spidev_of_check },
+@@ -742,6 +743,7 @@
+ 	{ .compatible = "semtech,sx1301", .data = &spidev_of_check },
+ 	{ .compatible = "silabs,em3581", .data = &spidev_of_check },
+ 	{ .compatible = "silabs,si3210", .data = &spidev_of_check },
 +	{ .compatible = "rockchip,spi_tinker", .data = &spidev_of_check },
  	{},
  };

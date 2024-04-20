@@ -19,13 +19,13 @@ https://forum.armbian.com/topic/13515-panfrost-on-rk3288-and-gpu-on-600mhz-probl
 
 Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
 ---
- arch/arm/boot/dts/rk3288.dtsi | 4 ++++
+ arch/arm/boot/dts/rockchip/rk3288.dtsi | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+diff --git a/arch/arm/boot/dts/rockchip/rk3288.dtsi b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 index a66412547..ef7457f79 100644
---- a/arch/arm/boot/dts/rk3288.dtsi
-+++ b/arch/arm/boot/dts/rk3288.dtsi
+--- a/arch/arm/boot/dts/rockchip/rk3288.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 @@ -1312,6 +1312,10 @@ opp-400000000 {
  			opp-hz = /bits/ 64 <400000000>;
  			opp-microvolt = <1100000>;
