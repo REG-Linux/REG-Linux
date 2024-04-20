@@ -22,7 +22,7 @@ Initial support for the Lenovo Legion Go
 - DMD server (handling any dmd supported by libdmd) integrated with vpinball
 - Support for multi screens (for pincab, mame multi games)
 - Evmapy keys file to help exit running flatpak app
-- Steering wheel support for Thrustmaster T150RS
+- Steering wheel support for Thrustmaster T150RS and T80 (gamepad mode only)
 ### Fixed
 - RG552 Splash-screen rotation
 - RG552 Vibrator enabled
@@ -90,7 +90,7 @@ Initial support for the Lenovo Legion Go
 - Kodi to 20.5-Nexus
 - RPCS3 to 0.0.31
 - Solarus-engine: bump to Mar 10, 2024 build
-- Cemu to v2.0-72
+- Cemu to v2.0-78
 - Sonic3-AIR to v24.02.02.0-stable
 - Ruffle to 2024-03-28
 - Xenia Canary to build 122f58c (Commits on Mar 26, 2024)
@@ -100,6 +100,8 @@ Initial support for the Lenovo Legion Go
 - PCSX2 to v1.7.5663
 - Play! & Libretro Play! to Apr 3, 2024 builds
 - Dolphin to 5.0-21303
+- Libretro-hatarib: bump to v0.3
+- Hatari to v2.5.0
 ### System
 - Mainline Kernel 6.6.y bump to 6.6.23
 - Nvidia Production driver to 550.67
@@ -110,7 +112,7 @@ Initial support for the Lenovo Legion Go
 - Mesa3d to 24.0.5
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.8.6
+- X86_64 kernel to 6.8.7
 - Switchres 0.220
 - Btop to 1.3.2
 - Linux firmware to 20240312

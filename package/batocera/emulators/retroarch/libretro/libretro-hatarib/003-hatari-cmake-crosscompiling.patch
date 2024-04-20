@@ -1,0 +1,10 @@
+--- a/hatari/CMakeLists.txt	2024-04-15 08:18:13.000000000 +0200
++++ b/hatari/CMakeLists.txt	2024-04-20 16:07:54.644889543 +0200
+@@ -6,6 +6,7 @@
+ set(APP_NAME "Hatari")
+ 
+ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
++set(CMAKE_CROSSCOMPILING TRUE)
+ 
+ include(CheckIncludeFiles)
+ include(CheckFunctionExists)

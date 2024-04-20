@@ -9,13 +9,13 @@ Taken from @TonyMac32, Butchered by @Miouyouyou .
 
 Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
 ---
- arch/arm/boot/dts/rk3288-tinker.dts | 25 +++++++++++++++++++++++++
+ arch/arm/boot/dts/rockchip/rk3288-tinker.dts | 25 +++++++++++++++++++++++++
  1 file changed, 25 insertions(+)
 
-diff --git a/arch/arm/boot/dts/rk3288-tinker.dts b/arch/arm/boot/dts/rk3288-tinker.dts
+diff --git a/arch/arm/boot/dts/rockchip/rk3288-tinker.dts b/arch/arm/boot/dts/rockchip/rk3288-tinker.dts
 index b92e59c1e..96d05fc6b 100644
---- a/arch/arm/boot/dts/rk3288-tinker.dts
-+++ b/arch/arm/boot/dts/rk3288-tinker.dts
+--- a/arch/arm/boot/dts/rockchip/rk3288-tinker.dts
++++ b/arch/arm/boot/dts/rockchip/rk3288-tinker.dts
 @@ -40,6 +40,31 @@
  	};
  };
