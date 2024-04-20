@@ -7,13 +7,13 @@ Taken from the various patches provided by @TonyMac32 .
 
 Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
 ---
- arch/arm/boot/dts/rk3288-tinker.dtsi | 2 +-
+ arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/rk3288-tinker.dtsi b/arch/arm/boot/dts/rk3288-tinker.dtsi
+diff --git a/arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi b/arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi
 index aa107ee41..3da1c830f 100644
---- a/arch/arm/boot/dts/rk3288-tinker.dtsi
-+++ b/arch/arm/boot/dts/rk3288-tinker.dtsi
+--- a/arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi
 @@ -164,7 +164,7 @@
  				regulator-always-on;
  				regulator-boot-on;

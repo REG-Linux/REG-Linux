@@ -9,13 +9,13 @@ Subject: [PATCH]  RK3288-MiQi: Adjust cpu and gpu regulator configs to
  <ierokipides.dem@gmail.com>
 
 ---
- arch/arm/boot/dts/rk3288-miqi.dts | 14 ++++++++++----
+ arch/arm/boot/dts/rockchip/rk3288-miqi.dts | 14 ++++++++++----
  1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/boot/dts/rk3288-miqi.dts b/arch/arm/boot/dts/rk3288-miqi.dts
+diff --git a/arch/arm/boot/dts/rockchip/rk3288-miqi.dts b/arch/arm/boot/dts/rockchip/rk3288-miqi.dts
 index db1eb648e..aeaf15331 100644
---- a/arch/arm/boot/dts/rk3288-miqi.dts
-+++ b/arch/arm/boot/dts/rk3288-miqi.dts
+--- a/arch/arm/boot/dts/rockchip/rk3288-miqi.dts
++++ b/arch/arm/boot/dts/rockchip/rk3288-miqi.dts
 @@ -30,9 +30,15 @@ ext_gmac: external-gmac-clock {
  	leds {
  		compatible = "gpio-leds";

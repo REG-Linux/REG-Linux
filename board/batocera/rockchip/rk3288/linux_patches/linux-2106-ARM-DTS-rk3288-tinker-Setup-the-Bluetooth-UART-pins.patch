@@ -40,13 +40,13 @@ sleep 1
 
 Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
 ---
- arch/arm/boot/dts/rk3288-tinker.dts | 6 ++++++
+ arch/arm/boot/dts/rockchip/rk3288-tinker.dts | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm/boot/dts/rk3288-tinker.dts b/arch/arm/boot/dts/rk3288-tinker.dts
+diff --git a/arch/arm/boot/dts/rockchip/rk3288-tinker.dts b/arch/arm/boot/dts/rockchip/rk3288-tinker.dts
 index d4df13bed..b92e59c1e 100644
---- a/arch/arm/boot/dts/rk3288-tinker.dts
-+++ b/arch/arm/boot/dts/rk3288-tinker.dts
+--- a/arch/arm/boot/dts/rockchip/rk3288-tinker.dts
++++ b/arch/arm/boot/dts/rockchip/rk3288-tinker.dts
 @@ -73,3 +73,9 @@
  	status = "okay";
  	supports-sdio;
