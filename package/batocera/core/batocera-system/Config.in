@@ -246,7 +246,6 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_AVAHI				# service discovery on local network
 	select BR2_PACKAGE_AVAHI_DAEMON				# ping batocera.local
 	select BR2_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY		# bonjour
-	select BR2_PACKAGE_WSDD					# service discovery on local network (windows network neighborhood)
 	select BR2_PACKAGE_NTP
 	select BR2_PACKAGE_RSYNC
 	select BR2_PACKAGE_LIBOPENSSL_BIN			# required to encode the wifi password
@@ -424,6 +423,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	# REG-Linux
 	select BR2_PACKAGE_REGLINUX_SPLASH	# boot splash
 	select BR2_PACKAGE_REGLINUX_SAMBA	# samba
+	select BR2_PACKAGE_WSDD_NATIVE		# service discovery on local network (windows network neighborhood)
 
 	help
 	  Install the batocera.linux system files
