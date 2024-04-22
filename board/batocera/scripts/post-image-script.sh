@@ -107,6 +107,9 @@ do
     cp "${TARGET_DIR}/usr/share/batocera/batocera.version" "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
 done
 
+# Remove lingering GENIMAGE_TMP directory from build after last image
+rm -rf ${GENIMAGE_TMP}
+
 #### md5 and sha256 #######################
 for FILE in "${REGLINUX_BINARIES_DIR}/images/"*"/boot.tar.zst" "${REGLINUX_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
 do
