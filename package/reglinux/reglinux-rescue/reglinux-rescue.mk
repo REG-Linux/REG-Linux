@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGLINUX_RESCUE_VERSION = 0.1
+REGLINUX_RESCUE_VERSION = 0.2
 REGLINUX_RESCUE_ARCH = ""
 ifeq ($(BR2_aarch64),y)
 REGLINUX_RESCUE_ARCH = aarch64
