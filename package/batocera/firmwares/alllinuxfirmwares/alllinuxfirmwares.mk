@@ -15,6 +15,10 @@ ifneq ($(BR2_x86_64),y)
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/intel $(@D)/i915 $(@D)/nvidia $(@D)/radeon $(@D)/qat_* $(@D)/ql2* $(@D)/iwlwifi* $(@D)/qed $(@D)/amd*
 endif
 
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
+endif
+
 ifeq ($(BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI)$(BR2_PACKAGE_EXTRALINUXFIRMWARES),y)
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/brcm
 endif
