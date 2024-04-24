@@ -1,32 +1,32 @@
 config BR2_PACKAGE_REGLINUX_SPLASH
-    bool "reglinux-splash"
+	bool "reglinux-splash"
 
-    select BR2_PACKAGE_DEJAVU_SANS   if BR2_PACKAGE_REGLINUX_SPLASH_OMXPLAYER
-    select BR2_PACKAGE_OMXPLAYER     if BR2_PACKAGE_REGLINUX_SPLASH_OMXPLAYER
-    select BR2_PACKAGE_MPV           if BR2_PACKAGE_REGLINUX_SPLASH_MPV
-    select BR2_PACKAGE_LIBASS        if BR2_PACKAGE_REGLINUX_SPLASH_MPV || BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY
-    select BR2_PACKAGE_FFPMPEG       if BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY
-    select BR2_PACKAGE_FFPLAY        if BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY
+	select BR2_PACKAGE_DEJAVU_SANS	if BR2_PACKAGE_REGLINUX_SPLASH_OMXPLAYER
+	select BR2_PACKAGE_OMXPLAYER	if BR2_PACKAGE_REGLINUX_SPLASH_OMXPLAYER
+	select BR2_PACKAGE_MPV		if BR2_PACKAGE_REGLINUX_SPLASH_MPV
+	select BR2_PACKAGE_LIBASS	if BR2_PACKAGE_REGLINUX_SPLASH_MPV || BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY
+	select BR2_PACKAGE_FFMPEG	if BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY
+	select BR2_PACKAGE_FFPLAY	if BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY
 
-    help
-      REG-Linux splash
+	help
+	  REG-Linux splash
 
 choice
-        prompt "splash type"
-        default BR2_PACKAGE_REGLINUX_SPLASH_IMAGE
-        help
-          Select REG-Linux splash type
+	prompt "splash type"
+	default BR2_PACKAGE_REGLINUX_SPLASH_IMAGE
+	help
+	  Select REG-Linux splash type
 
 config BR2_PACKAGE_REGLINUX_SPLASH_IMAGE
-        bool "image"
+	bool "image"
 
 config BR2_PACKAGE_REGLINUX_SPLASH_OMXPLAYER
-        bool "omxplayer"
+	bool "omxplayer"
 
 config BR2_PACKAGE_REGLINUX_SPLASH_MPV
-        bool "mpv"
+	bool "mpv"
 
 config BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY
-        bool "ffmpeg"
+	bool "ffmpeg"
 
 endchoice
