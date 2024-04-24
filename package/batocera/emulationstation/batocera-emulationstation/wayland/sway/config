@@ -5,7 +5,7 @@ set $alt Mod1
 seat * hide_cursor 500
 
 # Default wallpaper
-output * bg /usr/share/emulationstation/resources/logo.png fill
+output * bg #000000 solid_color
 
 # Set keyboard layout (default US)
 input * {
