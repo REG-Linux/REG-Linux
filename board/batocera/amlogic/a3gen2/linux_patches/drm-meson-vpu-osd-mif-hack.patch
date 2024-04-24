@@ -1,0 +1,26 @@
+--- a/common_drivers/drivers/drm/vpu-hw/meson_vpu_osd_mif.c	2024-04-24 16:12:12.876133584 +0200
++++ b/common_drivers/drivers/drm/vpu-hw/meson_vpu_osd_mif.c	2024-04-24 16:14:51.527663284 +0200
+@@ -19,6 +19,14 @@
+ #include <linux/amlogic/media/vpu_secure/vpu_secure.h>
+ #endif
+ 
++/* v2 extend secure bits */
++#define OSD4_INPUT_SECURE       BIT(9)
++
++/* v1 secure bits */
++#define OSD3_INPUT_SECURE       BIT(4)
++#define OSD2_INPUT_SECURE       BIT(1)
++#define OSD1_INPUT_SECURE       BIT(0)
++
+ #include "meson_vpu_pipeline.h"
+ #include "meson_crtc.h"
+ #include "meson_vpu_reg.h"
+@@ -1075,7 +1083,7 @@
+ {
+ 	static u32 data32[2];
+ 
+-	if (cpu_after_eq(MESON_CPU_MAJOR_ID_T7)) {
++	/*if (cpu_after_eq(MESON_CPU_MAJOR_ID_T7))*/ {
+ 		if (is_meson_t3_cpu()) {
+ 			/* set osd, video two port */
+ 			if (set == 1) {

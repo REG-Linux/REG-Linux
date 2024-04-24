@@ -1,0 +1,14 @@
+--- a/common_drivers/drivers/drm/vpu-hw/meson_vpu_osdblend.c	2024-04-24 16:04:22.105662483 +0200
++++ b/common_drivers/drivers/drm/vpu-hw/meson_vpu_osdblend.c	2024-04-24 16:04:30.901858852 +0200
+@@ -20,9 +20,9 @@
+ #define BLEND_DOUT_DEF_HSIZE 3840
+ #define BLEND_DOUT_DEF_VSIZE 2160
+ 
+-#ifdef CONFIG_AMLOGIC_MEDIA_ENHANCEMENT_DOLBYVISION
++//#ifdef CONFIG_AMLOGIC_MEDIA_ENHANCEMENT_DOLBYVISION
+ static int osd_enable[MESON_MAX_OSDS] = {1, 0, 1, 0};
+-#endif
++//#endif
+ 
+ static struct osdblend_reg_s osdblend_reg = {
+ 	VIU_OSD_BLEND_CTRL,

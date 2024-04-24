@@ -1,0 +1,11 @@
+--- a/common_drivers/drivers/Kconfig	2024-04-24 15:18:47.359970372 +0200
++++ b/common_drivers/drivers/Kconfig	2024-04-24 15:18:53.120090360 +0200
+@@ -59,6 +59,6 @@
+ source "$(COMMON_DRIVERS_DIR)/drivers/timestamp/Kconfig"
+ source "$(COMMON_DRIVERS_DIR)/drivers/seckey/Kconfig"
+ source "$(COMMON_DRIVERS_DIR)/drivers/aml_trusted_keys/Kconfig"
+-source "$(COMMON_DRIVERS_DIR)/drivers/media_modules/Kconfig"
+-source "$(COMMON_DRIVERS_DIR)/drivers/npu/Kconfig"
++#source "$(COMMON_DRIVERS_DIR)/drivers/media_modules/Kconfig"
++#source "$(COMMON_DRIVERS_DIR)/drivers/npu/Kconfig"
+ endmenu

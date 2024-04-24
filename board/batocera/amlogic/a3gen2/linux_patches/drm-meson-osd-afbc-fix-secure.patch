@@ -1,0 +1,36 @@
+--- a/common_drivers/drivers/drm/vpu-hw/meson_osd_afbc.c	2024-04-24 15:58:52.166263765 +0200
++++ b/common_drivers/drivers/drm/vpu-hw/meson_osd_afbc.c	2024-04-24 15:59:35.047229753 +0200
+@@ -592,9 +592,10 @@
+ 	reverse_x = (plane_info->rotation & DRM_MODE_REFLECT_X) ? 1 : 0;
+ 	reverse_y = (plane_info->rotation & DRM_MODE_REFLECT_Y) ? 1 : 0;
+ 
++#ifdef CONFIG_AMLOGIC_MEDIA_SECURITY
+ 	if (pipeline_state->sec_src)
+ 		pipeline_state->sec_src |= MALI_AFBCD_SECURE;
+-
++#endif
+ 	/* set osd path misc ctrl */
+ 	reg_ops->rdma_write_reg_bits(OSD_PATH_MISC_CTRL, 0x1,
+ 				(osd_index + 4), 1);
+@@ -722,8 +723,10 @@
+ 			afbc_reg = &afbc->afbc_regs[osd_index];
+ 			plane_info = &mvps->plane_info[osd_index];
+ 
++#ifdef CONFIG_AMLOGIC_MEDIA_SECURITY
+ 			if (mvps->sec_src)
+ 				mvps->sec_src |= MALI_AFBCD_SECURE;
++#endif
+ 
+ 			t7_osd_afbc_enable(vblk, reg_ops, afbc_stat_reg, osd_index, 1);
+ 
+@@ -902,8 +905,10 @@
+ 			afbc_reg = &afbc->afbc_regs[osd_index];
+ 			plane_info = &mvps->plane_info[osd_index];
+ 
++#ifdef CONFIG_AMLOGIC_MEDIA_SECURITY
+ 			if (mvps->sec_src)
+ 				mvps->sec_src |= MALI_AFBCD_SECURE;
++#endif
+ 
+ 			t7_osd_afbc_enable(vblk, reg_ops, afbc_stat_reg, osd_index, 1);
+ 

@@ -1,0 +1,11 @@
+--- a/common_drivers/drivers/drm/vpu-hw/meson_vpu_postblend.c	2024-04-24 16:07:58.658487636 +0200
++++ b/common_drivers/drivers/drm/vpu-hw/meson_vpu_postblend.c	2024-04-24 16:08:12.982806216 +0200
+@@ -237,7 +237,7 @@
+ 			struct am_meson_crtc *amcrtc)
+ {
+ 	if (amcrtc->force_crc_chk ||
+-	    (amcrtc->vpp_crc_enable && cpu_after_eq(MESON_CPU_MAJOR_ID_SM1))) {
++	    (amcrtc->vpp_crc_enable /*&& cpu_after_eq(MESON_CPU_MAJOR_ID_SM1)*/)) {
+ 		reg_ops->rdma_write_reg(VPP_CRC_CHK, 1);
+ 		amcrtc->force_crc_chk--;
+ 	}

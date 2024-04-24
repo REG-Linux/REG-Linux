@@ -1,0 +1,17 @@
+--- a/common_drivers/drivers/Makefile	2024-04-24 15:29:27.365480973 +0200
++++ b/common_drivers/drivers/Makefile	2024-04-24 15:30:34.442910344 +0200
+@@ -60,10 +60,10 @@
+ obj-y              			+= firmware/
+ obj-$(CONFIG_AMLOGIC_SOC_TIMESTAMP)	+= timestamp/
+ obj-$(CONFIG_AMLOGIC_SECKEY)		+= seckey/
+-obj-y                       += media_modules/
+-obj-y                       += amlisp/
+-obj-y                       += armisp/
+-obj-y                       += armisp-g12b/
++#obj-y                       += media_modules/
++#obj-y                       += amlisp/
++#obj-y                       += armisp/
++#obj-y                       += armisp-g12b/
+ obj-$(CONFIG_AMLOGIC_NPU) += npu/
+ obj-y                       += adla/
+ 

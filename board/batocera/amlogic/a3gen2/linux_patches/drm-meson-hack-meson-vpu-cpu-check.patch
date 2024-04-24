@@ -1,0 +1,11 @@
+--- a/common_drivers/drivers/drm/meson_vpu.c	2024-04-24 15:37:48.692192207 +0200
++++ b/common_drivers/drivers/drm/meson_vpu.c	2024-04-24 15:38:05.540553036 +0200
+@@ -115,7 +115,7 @@
+ 	u32 crc;
+ 	struct drm_crtc *crtc = &amcrtc->base;
+ 
+-	if (amcrtc->vpp_crc_enable && cpu_after_eq(MESON_CPU_MAJOR_ID_SM1)) {
++	if (amcrtc->vpp_crc_enable /*&& cpu_after_eq(MESON_CPU_MAJOR_ID_SM1)*/) {
+ 		crc = meson_vpu_read_reg(VPP_RO_CRCSUM);
+ 		drm_crtc_add_crc_entry(crtc, true,
+ 				       drm_crtc_accurate_vblank_count(crtc),
