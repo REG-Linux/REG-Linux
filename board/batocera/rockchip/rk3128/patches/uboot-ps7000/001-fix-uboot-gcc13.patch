@@ -51,3 +51,14 @@
  	int i;
  
  	for (i = 0; i < ctrl->niomux_routes; i++) {
+--- a/Makefile	2024-04-25 18:10:17.552060756 +0200
++++ b/Makefile	2024-04-25 18:11:50.594063079 +0200
+@@ -606,6 +606,8 @@
+ 
+ KBUILD_CFLAGS += $(call cc-option,-Wno-format-nonliteral)
+ KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
++KBUILD_CFLAGS += $(call cc-disable-warning, enum-int-mismatch)
++KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
+ 
+ # turn jbsr into jsr for m68k
+ ifeq ($(ARCH),m68k)
