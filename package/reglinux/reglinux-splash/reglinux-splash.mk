@@ -12,10 +12,6 @@ REGLINUX_SPLASH_TGVERSION=$(BATOCERA_SYSTEM_VERSION) $(BATOCERA_SYSTEM_DATE)
 ifeq ($(BR2_PACKAGE_REGLINUX_SPLASH_OMXPLAYER),y)
     REGLINUX_SPLASH_SCRIPT=Ssplash-omx
     REGLINUX_SPLASH_MEDIA=video
-else ifeq ($(BR2_PACKAGE_REGLINUX_SPLASH_MPV),y)
-    REGLINUX_SPLASH_SCRIPT=Ssplash-mpv
-    REGLINUX_SPLASH_DEPENDENCIES=mpv
-    REGLINUX_SPLASH_MEDIA=video
 else ifeq ($(BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY),y)
     REGLINUX_SPLASH_SCRIPT=Ssplash-ffplay
     REGLINUX_SPLASH_DEPENDENCIES=ffmpeg
@@ -23,19 +19,6 @@ else ifeq ($(BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY),y)
 else
     REGLINUX_SPLASH_SCRIPT=Ssplash-image
     REGLINUX_SPLASH_MEDIA=image
-endif
-
-# MPV options
-ifeq ($(BR2_PACKAGE_REGLINUX_SPLASH_MPV),y)
-    ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
-        # drm doesn't work on my nvidia card. sdl run smoothly.
-        REGLINUX_SPLASH_PLAYER_OPTIONS=--vo=drm,sdl --hwdec=yes
-    else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_AMLOGIC_ANY)$(BR2_PACKAGE_BATOCERA_RPI_ANY)$(BR2_PACKAGE_BATOCERA_TARGET_RK3326)$(BR2_PACKAGE_BATOCERA_TARGET_RK3399)$(BR2_PACKAGE_BATOCERA_TARGET_RK3128)$(BR2_PACKAGE_BATOCERA_TARGET_H6)$(BR2_PACKAGE_BATOCERA_TARGET_H616)$(BR2_PACKAGE_BATOCERA_TARGET_RK3588),y)
-        # hwdec=yes doesnt work for n2
-        REGLINUX_SPLASH_PLAYER_OPTIONS=
-    else
-        REGLINUX_SPLASH_PLAYER_OPTIONS=--hwdec=yes
-    endif
 endif
 
 # FFPLAY options
@@ -99,7 +82,8 @@ endef
 # Hack for CHA, custom Capcom splash video
 define REGLINUX_SPLASH_INSTALL_VIDEO_CAPCOM
     mkdir -p $(TARGET_DIR)/usr/share/batocera/splash
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/videos/Capcom.mp4 $(TARGET_DIR)/usr/share/batocera/splash/Capcom.mp4
+    rm $(TARGET_DIR)/usr/share/batocera/splash/splash.mp4
+    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/videos/Capcom.mp4 $(TARGET_DIR)/usr/share/batocera/splash/splash.mp4
     echo -e "1\n00:00:00,000 --> 00:00:02,000\n$(REGLINUX_SPLASH_TGVERSION)" > "${TARGET_DIR}/usr/share/batocera/splash/splash.srt"
 endef
 

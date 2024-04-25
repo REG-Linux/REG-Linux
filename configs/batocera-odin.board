@@ -43,4 +43,4 @@ BR2_TARGET_GRUB2_ARM64_EFI=y
 BR2_TARGET_GRUB2_BUILTIN_MODULES_EFI="boot linux ext2 fat squash4 part_msdos part_gpt normal efi_gop search search_fs_file search_fs_uuid search_label chain reboot"
 
 # Batocera Splash Support
-#BR2_PACKAGE_REGLINUX_SPLASH_MPV=y
+#BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y
