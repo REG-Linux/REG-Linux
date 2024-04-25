@@ -1,6 +1,6 @@
 --- a/Makefile	2023-06-06 14:02:37.252001779 +0200
 +++ b/Makefile	2023-06-06 14:03:59.853928255 +0200
-@@ -662,11 +662,22 @@
+@@ -662,11 +662,24 @@
  KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
  KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
  KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
@@ -25,6 +25,8 @@
 +KBUILD_CFLAGS   += $(call cc-disable-warning,stringop-overread)
 +KBUILD_CFLAGS   += $(call cc-disable-warning,dangling-pointer)
 +KBUILD_CFLAGS   += $(call cc-disable-warning,address)
++KBUILD_CFLAGS   += $(call cc-disable-warning,int-to-pointer-cast)
++KBUILD_CFLAGS   += $(call cc-disable-warning,enum-int-mismatch)
  
  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
  KBUILD_CFLAGS	+= -Os
