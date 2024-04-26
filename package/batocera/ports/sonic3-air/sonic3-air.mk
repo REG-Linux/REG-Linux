@@ -27,7 +27,7 @@ endif
 
 SONIC3_AIR_DEPENDENCIES += alsa-lib pulseaudio libcurl mesa3d zlib
 ifeq ($(BR2_PACKAGE_XORG7),y)
-SONIC3_AIR_DEPENDENCIES += xlib_libXxf86vm xlib_libXcomposite glu
+SONIC3_AIR_DEPENDENCIES += xlib_libXxf86vm xlib_libXcomposite libglu
 endif
 
 SONIC3_AIR_SUPPORTS_IN_SOURCE_BUILD = NO
