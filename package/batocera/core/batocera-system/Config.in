@@ -402,10 +402,6 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	# FUN R1 Gamepad
 	select BR2_PACKAGE_FUN_R1_GAMEPAD	if BR2_PACKAGE_BATOCERA_TARGET_S905
 
-	# required gcc flags
-	# required for different emulators, i suggest to enable it always to not have different behavior depending on boards
-	select BR2_GCC_ENABLE_OPENMP
-
 	# odin wifi baseband dependencies
 	select BR2_PACKAGE_PD_MAPPER		if BR2_PACKAGE_BATOCERA_TARGET_ODIN
 	select BR2_PACKAGE_QRTR			if BR2_PACKAGE_BATOCERA_TARGET_ODIN
