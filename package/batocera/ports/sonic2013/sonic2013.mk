@@ -16,7 +16,7 @@ SONIC2013_DEPENDENCIES = sdl2 libogg libvorbis
 ifneq ($(BR2_PACKAGE_LIBGLEW),y)
     SONIC2013_VERSION = f9718af
 else
-    SONIC2013_DEPENDENCIES += libglew
+    SONIC2013_DEPENDENCIES += libglew libglu
 endif
 
 define SONIC2013_BUILD_CMDS
