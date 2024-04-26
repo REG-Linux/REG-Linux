@@ -58,6 +58,12 @@ rm -f "${TARGET_DIR}/etc/init.d/S40bluetoothd" || exit 1
 # we want an empty boot directory (grub installation copy some files in the target boot directory)
 rm -rf "${TARGET_DIR}/boot/grub" || exit 1
 
+# we do not want python test units
+if test -e  "${TARGET_DIR}/usr/lib/python3.11/site-packages"
+then
+    find "${TARGET_DIR}/usr/lib/python3.11/site-packages" | grep "/tests/" | xargs rm -rf
+fi
+
 # reorder the boot scripts for the network boot
 if test -e "${TARGET_DIR}/etc/init.d/S10udev"
 then
