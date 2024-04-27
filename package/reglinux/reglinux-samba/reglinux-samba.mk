@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGLINUX_SAMBA_VERSION = 0.1
+REGLINUX_SAMBA_VERSION = 0.2
 REGLINUX_SAMBA_SOURCE =
 
 REGLINUX_SAMBA_DEPENDENCIES =

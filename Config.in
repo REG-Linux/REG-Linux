@@ -567,6 +567,7 @@ endmenu
 
 menu "REG.linux"
 
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-emulationstation/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-rescue/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-splash/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/goofy/Config.in"

@@ -5,9 +5,9 @@
 securityenabled="$(/usr/bin/batocera-settings-get system.security.enabled)"
 
 if [ "$securityenabled" = "1" ]; then
-    CONFIGFILE="/etc/samba/smb-secure.conf"
+    CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"
 else
-    CONFIGFILE="/etc/samba/smb.conf"
+    CONFIGFILE="/etc/ksmbd/ksmbd.conf"
 fi
 
 # Make directories.
@@ -25,32 +25,24 @@ start() {
 	echo -n "Starting SMB services: "
 	modprobe ksmbd
 	RETVAL1=$?
-	ksmbd.adduser -a reglinux -p reglinux
-	RETVAL2=$?
-	ksmbd.addshare -a reglinux -o "guest ok = yes, writable = yes, path = /userdata"
-	RETVAL3=$?
 	ksmbd.mountd
-	RETVAL4=$?
+	RETVAL2=$?
 	echo "done"
 
-	[ $RETVAL1 -eq 0 -a $RETVAL2 -eq 0 -a $RETVAL3 -eq 0 -a $RETVAL4 -eq 0 ] && touch /var/lock/subsys/smb || \
+	[ $RETVAL1 -eq 0 -a $RETVAL2 -eq 0 ] && touch /var/lock/subsys/smb || \
 	   RETVAL=1
 	return $RETVAL
 }
 
 stop() {
 	echo -n "Shutting down SMB services: "
-	ksmbd.addshare -d reglinux
-	RETVAL1=$?
-	ksmbd.adduser -d reglinux
-	RETVAL2=$?
 	ksmbd.control -s
-	RETVAL3=$?
+	RETVAL1=$?
 	rmmod ksmbd
-	RETVAL4=$?
+	RETVAL2=$?
 	echo "done"
 
-	[ $RETVAL1 -eq 0 -a $RETVAL2 -eq 0 -a $RETVAL3 -eq 0 -a $RETVAL4 -eq 0 ] && rm -f /var/lock/subsys/smb
+	[ $RETVAL1 -eq 0 -a $RETVAL2 -eq 0 ] && rm -f /var/lock/subsys/smb
 	echo "done"
 	return $RETVAL
 }
@@ -62,8 +54,7 @@ restart() {
 
 reload() {
         echo -n "Reloading smb.conf file: "
-	ksmbd.control -s
-	ksmbd.mountd
+	ksmbd.control -r
 	RETVAL=$?
 	echo "done"
 	return $RETVAL
