@@ -142,7 +142,7 @@ DISPLAYRES=$(batocera-resolution currentResolution)
 if [ ! -z "$WAYLAND_DISPLAY" ]; then
     DISPLAYRATE=$(batocera-resolution currentMode | awk -F'[x.]' '{printf "%.3f", $3 / 1000}')
 else
-    DISPLAYRATE=$(batocera-resolution currentMode | awk -F'\\.' '{print $2"."$3}')
+    DISPLAYRATE=$(batocera-resolution currentMode | awk -F'\\.' '{print $4}')
 fi
 echo "Display Resolution: ${DISPLAYRES}"
 echo "Display Refresh Rate: ${DISPLAYRATE}Hz"
