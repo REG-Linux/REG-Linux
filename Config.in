@@ -488,7 +488,6 @@ menu "Utils"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/ledspicer/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/innoextract/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/mokutil/Config.in"
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/wsdd-native/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/zramswap/Config.in"
 endmenu
 
@@ -575,5 +574,6 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-samba/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/vulkan-volk/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/gamescope/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/wsdd-native/Config.in"
 
 endmenu
