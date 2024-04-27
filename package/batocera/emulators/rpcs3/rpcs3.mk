@@ -27,18 +27,18 @@ RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF
 RPCS3_CONF_OPTS += -DUSE_SYSTEM_CURL=ON
 RPCS3_CONF_OPTS += -DUSE_SYSTEM_LIBUSB=ON
 RPCS3_CONF_OPTS += -DUSE_LIBEVDEV=ON
-RPCS3_CONF_OPTS += -DUSE_SYSTEM_FAUDIO=OFF
+RPCS3_CONF_OPTS += -DUSE_SYSTEM_FAUDIO=ON
 # this is ugly, but necessary... for now...
-RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVCODEC=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavcodec.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVFORMAT=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavformat.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVUTIL=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavutil.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWSCALE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswscale.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWRESAMPLE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswresample.a
+RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=ON
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVCODEC=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavcodec.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVFORMAT=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavformat.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVUTIL=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavutil.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWSCALE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswscale.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWRESAMPLE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswresample.a
 
 RPCS3_CONF_ENV = LIBS="-ncurses -ltinfo"
 
-ifeq ($(BR2_PACKAGE_SDL2),y)
+ifeq ($(BR2_PACKAGE_SDL2)$(BR2_x86_64),yy)
     RPCS3_CONF_OPTS += -DUSE_SDL=ON
 else
     RPCS3_CONF_OPTS += -DUSE_SDL=OFF

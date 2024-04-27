@@ -1,0 +1,22 @@
+--- a/3rdparty/glslang/glslang/SPIRV/SpvTools.h	2024-04-28 00:19:10.367438090 +0200
++++ b/3rdparty/glslang/glslang/SPIRV/SpvTools.h	2024-04-28 00:19:23.391720638 +0200
+@@ -47,7 +47,7 @@
+ #include "spirv-tools/libspirv.h"
+ #endif
+ 
+-#include "glslang/MachineIndependent/localintermediate.h"
++#include "../glslang/MachineIndependent/localintermediate.h"
+ #include "Logger.h"
+ 
+ namespace glslang {
+--- a/3rdparty/glslang/glslang/SPIRV/GlslangToSpv.h	2024-04-28 00:24:51.862960123 +0200
++++ b/3rdparty/glslang/glslang/SPIRV/GlslangToSpv.h	2024-04-28 00:25:01.063165402 +0200
+@@ -40,7 +40,7 @@
+ #endif
+ 
+ #include "SpvTools.h"
+-#include "glslang/Include/intermediate.h"
++#include "../glslang/Include/intermediate.h"
+ 
+ #include <string>
+ #include <vector>
