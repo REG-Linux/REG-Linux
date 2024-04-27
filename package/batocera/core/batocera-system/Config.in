@@ -614,7 +614,9 @@ config BR2_PACKAGE_BATOCERA_TOOLS
 	select BR2_PACKAGE_EVTEST				# joysticks tester
 	select BR2_PACKAGE_LINUXCONSOLETOOLS			# tools for linux events calibration
 	select BR2_PACKAGE_LINUXCONSOLETOOLS_JOYSTICK		# tools for linux events calibration
-	select BR2_PACKAGE_LINUXCONSOLETOOLS_FORCEFEEDBACK 	# tools for linux events calibration
+	select BR2_PACKAGE_LINUXCONSOLETOOLS_FORCEFEEDBACK	# tools for linux events calibration
+	select BR2_PACKAGE_NCURSES				# ncurses
+	select BR2_PACKAGE_NCURSES_WCHAR			# utf-8 support for ncurses
 	select BR2_PACKAGE_VIM					if !BR2_PACKAGE_BATOCERA_TARGET_CHA # basic vi emulator
 	select BR2_PACKAGE_NANO					# basic nano emulator
 	select BR2_PACKAGE_ZIP					# zip tool

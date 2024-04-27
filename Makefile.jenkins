@@ -69,10 +69,13 @@ ccache-dir:
 dl-dir:
 	@mkdir -p $(DL_DIR)
 
+gh-token:
+	@cp ~/gh_token $(PROJECT_DIR)/gh_token
+
 %-supported:
 	$(if $(findstring $*, $(TARGETS)),,$(error "$* not supported!"))
 
-%-clean: batocera-docker-image output-dir-%
+%-clean: gh-token batocera-docker-image output-dir-%
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -84,7 +87,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
 
-%-config: batocera-docker-image output-dir-%
+%-config: gh-token batocera-docker-image output-dir-%
 	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/batocera-$*
 	@for opt in $(EXTRA_OPTS); do \
 		echo $$opt >> $(PROJECT_DIR)/configs/batocera-$*_defconfig ; \
@@ -100,7 +103,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot batocera-$*_defconfig
 
-%-build: batocera-docker-image %-config ccache-dir dl-dir
+%-build: gh-token batocera-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -113,7 +116,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
 
-%-source: batocera-docker-image %-config ccache-dir dl-dir
+%-source: gh-token batocera-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -126,7 +129,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
 
-%-show-build-order: batocera-docker-image %-config ccache-dir dl-dir
+%-show-build-order: gh-token batocera-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -139,7 +142,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order
 
-%-kernel: batocera-docker-image %-config ccache-dir dl-dir
+%-kernel: gh-token batocera-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -152,7 +155,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot linux-menuconfig
 
-%-graph-depends: batocera-docker-image %-config ccache-dir dl-dir
+%-graph-depends: gh-token batocera-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -165,7 +168,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-depends
 
-%-shell: batocera-docker-image output-dir-%
+%-shell: gh-token batocera-docker-image output-dir-%
 	$(if $(BATCH_MODE),$(if $(CMD),,$(error "not suppoorted in BATCH_MODE if CMD not specified!")),)
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
@@ -180,7 +183,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		$(CMD)
 
-%-ccache-stats: batocera-docker-image %-config ccache-dir dl-dir
+%-ccache-stats: gh-token batocera-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -193,7 +196,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot ccache-stats
 
-%-cleanbuild: %-clean %-build
+%-cleanbuild: gh-token %-clean %-build
 	@echo
 
 %-pkg:
