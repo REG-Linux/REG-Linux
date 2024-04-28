@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2024-04-08 14:09+0800\n"
+"PO-Revision-Date: 2024-04-25 10:17+0800\n"
 "Last-Translator: wanger\n"
 "Language-Team: 王二,monyxie\n"
 "Language: zh_CN\n"
@@ -20,28 +20,42 @@ msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
-msgid "Adjust the cpu power profile while in-game."
-msgstr "游玩中调整CPU功率配置文件。"
+msgid ""
+"Adjust the cpu power frequency profile whilst in-game. Some systems will "
+"benefit from improved voltage handling."
+msgstr "在游戏中调整cpu电源频率配置文件. 一些系统将受益于改进的电压处理."
 
 #. TRANSLATION: shared
 msgctxt "game_options"
 msgid "POWER MODE"
 msgstr "功率模式"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "High Performance"
 msgstr "高性能"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Balanced"
 msgstr "均衡"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Power Saver"
 msgstr "节能优化"
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid ""
+"Adjust the cpu power profile whist on battery. Overwrites previous Power "
+"Mode(s)."
+msgstr "在使用电池的情况下调整cpu功率配置文件. 覆盖以前的电源模式."
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid "BATTERY MODE"
+msgstr "电池模式"
 
 #. TRANSLATION: shared
 msgctxt "game_options"
@@ -13974,17 +13988,17 @@ msgstr "备用颜色"
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Playfield configuration"
-msgstr ""
+msgstr "游戏区域配置"
 
 #. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
 msgctxt "game_options"
 msgid "WINDOWS POSITIONS"
-msgstr ""
+msgstr "窗口位置"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "PLAYFIELD"
-msgstr ""
+msgstr "游戏区域"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14034,12 +14048,12 @@ msgstr "左上角位置，大"
 #. TRANSLATION: vpinball, vpinball, vpinball
 msgctxt "game_options"
 msgid "On screen 2 if available"
-msgstr "如果可用则在第二屏幕上."
+msgstr "如果可用则在第二屏幕上"
 
 #. TRANSLATION: vpinball, vpinball
 msgctxt "game_options"
 msgid "On screen 3 if available"
-msgstr "如果可用则在第三屏幕上."
+msgstr "如果可用则在第三屏幕上"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14084,13 +14098,23 @@ msgstr "显示器背面玻璃DMD"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
+msgid "When the Backglass is activated, display the grill."
+msgstr "当背景板被激活时显示格栅."
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DISPLAY BACKGLASS GRILL"
+msgstr "显示背景板格栅"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
 msgid "DMD window ratio"
-msgstr ""
+msgstr "DMD窗口比例"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "DMD SIZE"
-msgstr ""
+msgstr "DMD大小"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14103,6 +14127,33 @@ msgstr "倒置背景板和游戏区域. 对于其他模拟器将背景板用作�
 msgctxt "game_options"
 msgid "INVERSE PLAYFIELD AND B2S"
 msgstr "倒置游戏区域和B2S"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid ""
+"FULLSCREEN gives you a top-down view on the playfield. For cabinet use or "
+"multi-window on desktop."
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD MODE"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DESKTOP"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULLSCREEN"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULL SINGLE SCREEN"
+msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -15218,6 +15269,10 @@ msgstr "菜单"
 msgctxt "keys_files"
 msgid "Graphics filtering on/off"
 msgstr "打开/关闭图形过滤"
+
+#~ msgctxt "game_options"
+#~ msgid "Adjust the cpu power profile while in-game."
+#~ msgstr "游玩中调整CPU功率配置文件。"
 
 #~ msgctxt "game_options"
 #~ msgid "Manual (Default)"
