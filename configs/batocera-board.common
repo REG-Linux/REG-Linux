@@ -102,9 +102,17 @@ BR2_PACKAGE_DROPBEAR_LOCALOPTIONS_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/bato
 # Disable generating rootfs tar (speedup)
 BR2_TARGET_ROOTFS_TAR=n
 
-# images
+# post-build/post-image scripts
 BR2_ROOTFS_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/scripts/post-build-script.sh"
 BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/scripts/post-image-script.sh"
+
+# squashfs images
+BR2_PACKAGE_HOST_SQUASHFS=y
+BR2_PACKAGE_SQUASHFS=y
+BR2_PACKAGE_SQUASHFS_ZSTD=y
+BR2_PACKAGE_SQUASHFS_LZ4=y
+BR2_PACKAGE_SQUASHFS_XZ=y
+BR2_TARGET_ROOTFS_SQUASHFS=y
 BR2_TARGET_ROOTFS_SQUASHFS_EXCLUDE_DIRS="$(TARGET_DIR)/lib/firmware $(TARGET_DIR)/lib/modules"
 
 # Batocera
