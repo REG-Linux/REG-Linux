@@ -98,7 +98,7 @@ do
     rm -f "${REGLINUX_BINARIES_DIR}/boot.vfat" || exit 1
     rm -f "${REGLINUX_BINARIES_DIR}/userdata.ext4" || exit 1
     mv "${REGLINUX_BINARIES_DIR}/reglinux.img" "${BATOCERAIMG}" || exit 1
-    "${HOST_DIR}/usr/bin/pigz" "${BATOCERAIMG}" || exit 1
+    "${HOST_DIR}/usr/bin/pigz" -1 -p 4 "${BATOCERAIMG}" || exit 1
 
     # delete the boot
     rm -rf "${REGLINUX_BINARIES_DIR}/boot" || exit 1
