@@ -1,0 +1,65 @@
+From ca69baedbdffe0559c77e393fdee6f68caed73c7 Mon Sep 17 00:00:00 2001
+From: David Barbion <davidb@230ruedubac.fr>
+Date: Mon, 29 Apr 2024 10:50:04 -0400
+Subject: [PATCH 2/3] feat: add piboy dmg panel for kms driver
+
+---
+ drivers/gpu/drm/panel/panel-simple.c | 35 ++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index b9ff78db5..da3232275 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -3446,6 +3446,38 @@ static const struct panel_desc retroflag_gpi2w = {
+ 	.connector_type = DRM_MODE_CONNECTOR_DPI,
+ };
+ 
++static const struct display_timing xpi_piboydmg_timing = {
++	.pixelclock = { 32000000, 32000000, 32200000},
++	.hactive = { 640, 640, 640 },
++	.hfront_porch = { 130, 80, 30 },
++	.hback_porch = { 130, 80, 30 },
++	.hsync_len = { 130, 80, 30},
++	.vactive = { 480, 480, 480 },
++	.vfront_porch = { 13, 13, 13},
++	.vback_porch = { 13, 13, 13 },
++	.vsync_len = { 13, 13, 13 },
++	.flags = DRM_MODE_FLAG_PVSYNC | DRM_MODE_FLAG_PHSYNC,
++};
++
++static const struct panel_desc xpi_piboydmg = {
++	.timings = &xpi_piboydmg_timing,
++	.num_timings = 1,
++	.bpc = 6,
++	.size = {
++		.width = 112,
++		.height = 84,
++	},
++	.delay = {
++		.prepare = 50,
++		.enable = 200,
++		.disable = 110,
++		.unprepare = 200,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB666_1X24_CPADHI,
++	.bus_flags = DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE,
++	.connector_type = DRM_MODE_CONNECTOR_DPI,
++};
++
+ static const struct drm_display_mode raspberrypi_7inch_mode = {
+ 	.clock = 27777,
+ 	.hdisplay = 800,
+@@ -4530,6 +4562,9 @@ static const struct of_device_id platform_of_match[] = {
+ 	}, {
+ 		.compatible = "retroflag,gpi2w",
+ 		.data = &retroflag_gpi2w,
++	}, {
++		.compatible = "xpi,piboydmg",
++		.data = &xpi_piboydmg,
+  	}, {
+ 		.compatible = "raspberrypi,7inch-dsi",
+ 		.data = &raspberrypi_7inch,
+-- 
+2.44.0
+
