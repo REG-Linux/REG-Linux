@@ -1,0 +1,18 @@
+--- a/src/common/fs/path_util.cpp	2024-04-29 17:59:04.552741261 +0200
++++ b/src/common/fs/path_util.cpp	2024-04-29 17:59:46.957712696 +0200
+@@ -121,12 +121,12 @@
+         GenerateSudachiPath(SudachiPath::ConfigDir, sudachi_path_config);
+         GenerateSudachiPath(SudachiPath::CrashDumpsDir, sudachi_path / CRASH_DUMPS_DIR);
+         GenerateSudachiPath(SudachiPath::DumpDir, sudachi_path / DUMP_DIR);
+-        GenerateSudachiPath(SudachiPath::KeysDir, sudachi_path / KEYS_DIR);
++        GenerateSudachiPath(SudachiPath::KeysDir, "/userdata/bios/switch");
+         GenerateSudachiPath(SudachiPath::LoadDir, sudachi_path / LOAD_DIR);
+-        GenerateSudachiPath(SudachiPath::LogDir, sudachi_path / LOG_DIR);
++        GenerateSudachiPath(SudachiPath::LogDir, "/userdata/system/logs");
+         GenerateSudachiPath(SudachiPath::NANDDir, sudachi_path / NAND_DIR);
+         GenerateSudachiPath(SudachiPath::PlayTimeDir, sudachi_path / PLAY_TIME_DIR);
+-        GenerateSudachiPath(SudachiPath::ScreenshotsDir, sudachi_path / SCREENSHOTS_DIR);
++        GenerateSudachiPath(SudachiPath::ScreenshotsDir, "/userdata/screenshots/switch/suyu");
+         GenerateSudachiPath(SudachiPath::SDMCDir, sudachi_path / SDMC_DIR);
+         GenerateSudachiPath(SudachiPath::ShaderDir, sudachi_path / SHADER_DIR);
+         GenerateSudachiPath(SudachiPath::TASDir, sudachi_path / TAS_DIR);
