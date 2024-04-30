@@ -128,11 +128,29 @@ define BATOCERA_CONFIGGEN_COMPILE_NUITKA
 	$(HOST_DIR)/usr/bin/pip install pyudev
 	$(HOST_DIR)/usr/bin/pip install evdev
 	$(HOST_DIR)/usr/bin/pip install pillow
+	$(HOST_DIR)/usr/bin/pip install ordered-set
+	$(HOST_DIR)/usr/bin/pip install zstandard
+	$(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install pyudev
+	$(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install evdev
+	$(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install pillow
+	$(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install ordered-set
+	# Exec format error $(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install zstandard
 	cd $(@D)/ && \
 	NUITKA_CACHE_DIR=$(HOME)/.buildroot-ccache \
-	PATH=$(HOST_DIR)/usr/bin:$(PATH) \
-	$(HOST_DIR)/usr/bin/python -m nuitka --standalone configgen/emulatorlauncher.py --onefile --prefer-source-code --include-package=configgen --static-libpython=yes && \
+	PYTHONPATH=$(TARGET_DIR)/usr/lib/python3.11 \
+	CC=$(TARGET_CC) LD=$(TARGET_LD) \
+	SYSROOT="$(STAGING_DIR)" \
+	PATH=$(STAGING_DIR)/usr/bin:$(PATH) \
+	QEMU_USER=$(QEMU_USER) \
+	$(QEMU_USER) \
+	$(TARGET_DIR)/usr/bin/python -m nuitka --standalone configgen/emulatorlauncher.py \
+	--prefer-source-code --include-package=configgen
 	install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
+	#PATH=$(HOST_DIR)/usr/bin:$(PATH) \
+	#NUITKA_BINARY_NAME=$(HOST_DIR)/usr/bin/qemu-arm
+# --static-libpython=yes && \
+# --onefile
+
 endef
 
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_COMPILE_NUITKA
