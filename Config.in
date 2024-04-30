@@ -579,5 +579,6 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/vulkan-volk/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/gamescope/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/wsdd-native/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-gpicase/Config.in"
 
 endmenu
