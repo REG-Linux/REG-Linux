@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import pyudev
 profiler = None
 
 # 1) touch /var/run/emulatorlauncher.perf

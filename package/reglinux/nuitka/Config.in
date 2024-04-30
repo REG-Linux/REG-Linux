@@ -1,0 +1,16 @@
+config BR2_PACKAGE_NUITKA
+    bool "nuitka"
+
+    #select BR2_PACKAGE_PATCHELF
+    select BR2_PACKAGE_HOST_PATCHELF
+    select BR2_PACKAGE_HOST_PYTHON3
+    select BR2_PACKAGE_HOST_ZSTD
+    select BR2_PACKAGE_PYTHON3
+
+    select BR2_PACKAGE_HOST_PYTHON_PIP
+    select BR2_PACKAGE_PYTHON_PIP
+
+    help
+      Nuitka is the optimizing Python compiler written in Python that creates executables that run without a separate installer.
+      
+      https://github.com/Nuitka/Nuitka

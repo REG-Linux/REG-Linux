@@ -7,7 +7,7 @@
 BATOCERA_CONFIGGEN_VERSION = 1.4
 BATOCERA_CONFIGGEN_LICENSE = GPL
 BATOCERA_CONFIGGEN_SOURCE=
-BATOCERA_CONFIGGEN_DEPENDENCIES = python3 python-pyyaml
+BATOCERA_CONFIGGEN_DEPENDENCIES = python3 python-pyyaml host-nuitka nuitka
 BATOCERA_CONFIGGEN_INSTALL_STAGING = YES
 
 CONFIGGEN_DIR = $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-configgen
@@ -94,11 +94,12 @@ define BATOCERA_CONFIGGEN_CONFIGS
 	    $(TARGET_DIR)/usr/share/batocera/configgen/
 endef
 
-define BATOCERA_CONFIGGEN_BINS
-    chmod a+x $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py
-	(mkdir -p $(TARGET_DIR)/usr/bin/ && cd $(TARGET_DIR)/usr/bin/ && \
-	    ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher)
-endef
+# not with Nuitka
+#define BATOCERA_CONFIGGEN_BINS
+#    chmod a+x $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py
+#	(mkdir -p $(TARGET_DIR)/usr/bin/ && cd $(TARGET_DIR)/usr/bin/ && \
+#	    ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher)
+#endef
 
 define BATOCERA_CONFIGGEN_ES_HOOKS
 	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/powermode_launch_hooks.sh \
@@ -114,7 +115,7 @@ define BATOCERA_CONFIGGEN_X86_HOOKS
 endef
 
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS = BATOCERA_CONFIGGEN_CONFIGS
-BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_BINS
+# not with nuitka BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_BINS
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_ES_HOOKS
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
@@ -122,5 +123,18 @@ ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
 endif
 
 BATOCERA_CONFIGGEN_SETUP_TYPE = setuptools
+
+define BATOCERA_CONFIGGEN_COMPILE_NUITKA
+	$(HOST_DIR)/usr/bin/pip install pyudev
+	$(HOST_DIR)/usr/bin/pip install evdev
+	$(HOST_DIR)/usr/bin/pip install pillow
+	cd $(@D)/ && \
+	NUITKA_CACHE_DIR=$(HOME)/.buildroot-ccache \
+	PATH=$(HOST_DIR)/usr/bin:$(PATH) \
+	$(HOST_DIR)/usr/bin/python -m nuitka --standalone configgen/emulatorlauncher.py --onefile --prefer-source-code --include-package=configgen --static-libpython=yes && \
+	install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
+endef
+
+BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_COMPILE_NUITKA
 
 $(eval $(python-package))
