@@ -49,10 +49,13 @@ HOST_QT6TOOLS_DEPENDENCIES = \
     host-double-conversion \
     host-libb2 \
     host-pcre2 \
-    host-zlib
+    host-zlib \
+    host-qt6svg
 
 HOST_QT6TOOLS_CONF_OPTS = \
+    -DQT_HOST_PATH=$(HOST_DIR) \
     -DQT_FEATURE_linguist=ON \
+    -DQT_FEATURE_clangcpp=OFF \
     -DQT_FEATURE_qdbus=OFF \
     -DQT_FEATURE_qtattributionsscanner=ON \
     -DQT_FEATURE_qtdiag=ON \

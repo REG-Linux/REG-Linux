@@ -1,0 +1,22 @@
+--- a/core/core.c	2024-04-20 17:25:14.734027212 +0200
++++ b/core/core.c	2024-04-20 17:25:21.950196475 +0200
+@@ -31,7 +31,7 @@
+ #define DEBUG_RETRO_SET_ENVIRONMENT   0
+ 
+ // make sure this matches ../info/hatarib.info
+-#define CORE_VERSION   "v0.3 " SHORTHASH " " __DATE__ " " __TIME__;
++#define CORE_VERSION   "v0.3 " " " __DATE__ " " __TIME__;
+ 
+ // make sure this matches ../info/hatarib.info
+ static const char* const CORE_FILE_EXTENSIONS = "st|msa|dim|stx|ipf|ctr|m3u|m3u8|zip|gz|acsi|ahd|vhd|scsi|shd|ide|gem";
+--- a/core/core_osk.c	2024-04-20 17:25:01.313712177 +0200
++++ b/core/core_osk.c	2024-04-20 17:23:40.215800756 +0200
+@@ -79,7 +79,7 @@
+ 	"",
+ 	"https://github.com/bbbradsmith/hatariB/",
+ 	"https://hatari.tuxfamily.org/",
+-	SHORTHASH " " __DATE__ " " __TIME__,
++	" " __DATE__ " " __TIME__,
+ };
+ 
+ // Keyboard layouts

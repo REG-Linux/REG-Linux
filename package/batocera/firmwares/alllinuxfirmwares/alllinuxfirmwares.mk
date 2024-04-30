@@ -4,15 +4,21 @@
 #
 ################################################################################
 
-ALLLINUXFIRMWARES_VERSION = 20240312
+ALLLINUXFIRMWARES_VERSION = 20240410
 ALLLINUXFIRMWARES_SOURCE = linux-firmware-$(ALLLINUXFIRMWARES_VERSION).tar.gz
 ALLLINUXFIRMWARES_SITE = https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot
 
 # exclude some dirs not required on batocera
 ALLLINUXFIRMWARES_REMOVE_DIRS = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(@D)/dpaa2 $(@D)/bnx2x $(@D)/cxgb4 $(@D)/mrvl/prestera
 
-ifeq ($(BR2_arm)$(BR2_aarch64),y)
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/amd $(@D)/amdgpu $(@D)/intel $(@D)/i915 $(@D)/nvidia $(@D)/radeon $(@D)/s5p-* $(@D)/qat_* $(@D)/ql2*
+ifneq ($(BR2_x86_64),y)
+    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/intel $(@D)/i915 $(@D)/nvidia $(@D)/radeon $(@D)/qat_* $(@D)/ql2* $(@D)/iwlwifi* $(@D)/qed $(@D)/amd*
+endif
+
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
+    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/brcm $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
+    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ti $(@D)/b43 $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm
 endif
 
 ifeq ($(BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI)$(BR2_PACKAGE_EXTRALINUXFIRMWARES),y)

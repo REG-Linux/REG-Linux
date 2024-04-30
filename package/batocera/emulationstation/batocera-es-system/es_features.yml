@@ -5,11 +5,18 @@ shared:
   cfeatures:
     powermode:
       prompt: POWER MODE
-      description: Adjust the cpu power profile while in-game.
+      description: Adjust the cpu power frequency profile whilst in-game. Some systems will benefit from improved voltage handling.
       choices:
         "High Performance": highperformance
-        "Balanced": balanced
-        "Power Saver": powersaver
+        "Balanced":         balanced
+        "Power Saver":      powersaver
+    batterymode:
+      prompt: BATTERY MODE
+      description: Adjust the cpu power profile whist on battery. Overwrites previous Power Mode(s).
+      choices:
+        "High Performance": highperformance
+        "Balanced":         balanced
+        "Power Saver":      powersaver
     tdp:
       archs_include: [x86_64]
       prompt: RYZEN THERMAL DESIGN POWER
@@ -322,7 +329,7 @@ shared:
         "hidden": "hidden"
 
 global:
-  shared: [powermode, tdp, videomode, ratio, shaderset, smooth, integerscale, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, ai_service_enabled, ai_target_lang, ai_service_url, ai_service_pause, rewind, runahead, secondinstance, video_frame_delay_auto, vrr_runloop_enable, video_threaded, rumble_gain]
+  shared: [powermode, batterymode, tdp, videomode, ratio, shaderset, smooth, integerscale, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, ai_service_enabled, ai_target_lang, ai_service_url, ai_service_pause, rewind, runahead, secondinstance, video_frame_delay_auto, vrr_runloop_enable, video_threaded, rumble_gain]
 
 libretro:
   shared: [powermode, tdp, videomode, ratio, shaderset, smooth, integerscale, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, ai_service_enabled, ai_target_lang, ai_service_url, ai_service_pause, runahead, secondinstance, video_frame_delay_auto, vrr_runloop_enable, video_threaded, rumble_gain, audio_volume, bordersmode]
@@ -12493,65 +12500,96 @@ vpinball:
         "Default Performance Settings": "defaults"
         "Low-end Computer": "lowend"
         "High-end Computer": "highend"
-        "Manual (Default)": "manual"
+        "Manual": "manual"
     vpinball_altcolor:
       group: DISPLAY
       prompt: ALTCOLOR
       description: Alternative Coloured Dot Matrix Display (needs additional file).
       preset: switchon
+    vpinball_playfield:
+      group: WINDOWS POSITIONS
+      prompt: PLAYFIELD
+      description: Playfield configuration
+      choices:
+        "Manual": "manual"
     vpinball_pinmame:
-      group: DISPLAY
+      group: WINDOWS POSITIONS
       prompt: PINMAME DMD
       description: Extra DMD (Dot Matrix Display) window to display the score for tables with a pinmame rom. By default, settings come from the VPinballX.ini configuration file.
       choices:
-        "Top-Right Position, Small": "pinmame_topright_small"
-        "Top-Right Position, Medium": "pinmame_topright_medium"
-        "Top-Right Position, Large": "pinmame_topright_large"
-        "Top-Left Position, Small": "pinmame_topleft_small"
-        "Top-Left Position, Medium": "pinmame_topleft_medium"
-        "Top-Left Position, Large": "pinmame_topleft_large"
+        "Top-Right Position, Small": "topright_small"
+        "Top-Right Position, Medium": "topright_medium"
+        "Top-Right Position, Large": "topright_large"
+        "Top-Left Position, Small": "topleft_small"
+        "Top-Left Position, Medium": "topleft_medium"
+        "Top-Left Position, Large": "topleft_large"
         "On screen 2 if available": "screen2"
         "On screen 3 if available": "screen3"
-        "PinMAME DMD disabled": "pinmame_disabled"
+        "Disabled": "disabled"
+        "Manual": "manual"
     vpinball_flexdmd:
-      group: DISPLAY
+      group: WINDOWS POSITIONS
       prompt: FLEX DMD
       description: Extra DMD (Dot Matrix Display) window to display the score for tables without a rom. By default, settings come from the VPinballX.ini configuration file.
       choices:
-        "Top-Right Position, Small": "flexdmd_topright_small"
-        "Top-Right Position, Medium": "flexdmd_topright_medium"
-        "Top-Right Position, Large": "flexdmd_topright_large"
-        "Top-Left Position, Small": "flexdmd_topleft_small"
-        "Top-Left Position, Medium": "flexdmd_topleft_medium"
-        "Top-Left Position, Large": "flexdmd_topleft_large"
+        "Top-Right Position, Small": "topright_small"
+        "Top-Right Position, Medium": "topright_medium"
+        "Top-Right Position, Large": "topright_large"
+        "Top-Left Position, Small": "topleft_small"
+        "Top-Left Position, Medium": "topleft_medium"
+        "Top-Left Position, Large": "topleft_large"
         "On screen 2 if available": "screen2"
         "On screen 3 if available": "screen3"
-        "FlexDMD disabled": "flexdmd_disabled"
+        "Disabled": "disabled"
+        "Manual": "manual"
     vpinball_b2s:
-      group: DISPLAY
+      group: WINDOWS POSITIONS
       prompt: BACKGLASS (B2S)
       description: Upright glass panel displaying some illuminated artwork. By default, settings come from the VPinballX.ini configuration file.
       choices:
-        "Top-Right Position, Small": "b2s_topright_small"
-        "Top-Right Position, Medium": "b2s_topright_medium"
-        "Top-Right Position, Large": "b2s_topright_large"
-        "Top-Left Position, Small": "b2s_topleft_small"
-        "Top-Left Position, Medium": "b2s_topleft_medium"
-        "Top-Left Position, Large": "b2s_topleft_large"
+        "Top-Right Position, Small": "topright_small"
+        "Top-Right Position, Medium": "topright_medium"
+        "Top-Right Position, Large": "topright_large"
+        "Top-Left Position, Small": "topleft_small"
+        "Top-Left Position, Medium": "topleft_medium"
+        "Top-Left Position, Large": "topleft_large"
         "On screen 2 if available": "screen2"
-        "Backglass disabled": "b2s_disabled"
+        "Disabled": "disabled"
+        "Manual": "manual"
     vpinball_b2sdmd:
-      group: DISPLAY
+      group: WINDOWS POSITIONS
       prompt: DISPLAY BACKGLASS DMD
       description: When the Backglass is activated, display the small additional part with the scores.
       preset: switchon
+    vpinball_b2sgrill:
+      group: WINDOWS POSITIONS
+      prompt: DISPLAY BACKGLASS GRILL
+      description: When the Backglass is activated, display the grill.
+      preset: switchon
+    vpinball_dmdsize:
+      group: WINDOWS POSITIONS
+      prompt: DMD SIZE
+      description: DMD window ratio
+      choices:
+        "128x16": "128x16"
+        "128x32": "128x32"
+        "192x64": "192x64"
+        "256x64": "256x64"
     vpinball_inverseplayfieldandb2s:
-      group: DISPLAY
+      group: WINDOWS POSITIONS
       prompt: INVERSE PLAYFIELD AND B2S
       description: Inverse the Backglass and the Playfield. Usefull to use the Backglass as main screen for other emulators.
       choices:
         "On": 1
         "Off": 0
+    vpinball_playfieldmode:
+      group: WINDOWS POSITIONS
+      prompt: PLAYFIELD MODE
+      description: FULLSCREEN gives you a top-down view on the playfield. For cabinet use or multi-window on desktop.
+      choices:
+        "DESKTOP": 0
+        "FULLSCREEN": 1
+        "FULL SINGLE SCREEN": 2
     vpinball_musicvolume:
       group: AUDIO
       prompt: MUSIC VOLUME

@@ -1,0 +1,110 @@
+diff -u glm/detail/type_vec_simd.inl ../REG-Linux/output/odroidxu4/build/reglinux-emulationstation-b6effce2c7a1489885abe27b700f1663f74463e9/external/glm/glm/detail/type_vec_simd.inl
+--- a/external/glm/glm/detail/type_vec_simd.inl	2024-04-26 20:21:46.093149930 +0200
++++ b/external/glm/glm/detail/type_vec_simd.inl	2024-04-26 20:18:08.719702278 +0200
+@@ -921,7 +921,7 @@
+ 	{
+ 		static bool call(vec<L, float, Q> const& v1, vec<L, float, Q> const& v2)
+ 		{
+-			return !compute_vec_equal<float, Q, false, 32, true>::call(v1, v2);
++			return !compute_vec_equal<L, float, Q, false, 32, true>::call(v1, v2);
+ 		}
+ 	};
+ 
+@@ -930,7 +930,7 @@
+ 	{
+ 		static bool call(vec<L, uint, Q> const& v1, vec<L, uint, Q> const& v2)
+ 		{
+-			return !compute_vec_equal<uint, Q, false, 32, true>::call(v1, v2);
++			return !compute_vec_equal<L, uint, Q, false, 32, true>::call(v1, v2);
+ 		}
+ 	};
+ 
+@@ -939,7 +939,7 @@
+ 	{
+ 		static bool call(vec<L, int, Q> const& v1, vec<L, int, Q> const& v2)
+ 		{
+-			return !compute_vec_equal<int, Q, false, 32, true>::call(v1, v2);
++			return !compute_vec_equal<L, int, Q, false, 32, true>::call(v1, v2);
+ 		}
+ 	};
+ 
+--- a/external/glm/glm/detail/func_common_simd.inl	2024-04-26 20:21:46.089149831 +0200
++++ b/external/glm/glm/detail/func_common_simd.inl	2024-04-26 21:04:33.756316494 +0200
+@@ -569,44 +569,58 @@
+ 			}
+ 		};
+ 
++#if 0
+ 		template<length_t L, qualifier Q>
+ 		struct compute_splat<L, float, Q, true> {
+ 			template<int c>
+-			GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call(vec<L, float, Q> const& a)
+-			{}
++			struct detailNEON
++			{};
+ 
+ 			template<>
+-			GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<0>(vec<L, float, Q> const& a)
++			struct detailNEON<0>
+ 			{
+-				vec<L, float, Q> Result;
+-				Result.data = vdupq_lane_f32(vget_low_f32(a.data), 0);
+-				return Result;
+-			}
++				GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<0>(vec<L, float, Q> const& a)
++				{
++					vec<L, float, Q> Result;
++					Result.data = vdupq_lane_f32(vget_low_f32(a.data), 0);
++					return Result;
++				}
++			]
+ 
+ 			template<>
+-			GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<1>(vec<L, float, Q> const& a)
++			struct detailNEON<1>
+ 			{
+-				vec<L, float, Q> Result;
+-				Result.data = vdupq_lane_f32(vget_low_f32(a.data), 1);
+-				return Result;
++				GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<1>(vec<L, float, Q> const& a)
++				{
++					vec<L, float, Q> Result;
++					Result.data = vdupq_lane_f32(vget_low_f32(a.data), 1);
++					return Result;
++				}
+ 			}
+ 
+ 			template<>
+-			GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<2>(vec<L, float, Q> const& a)
++			struct detailNEON<2>
+ 			{
+-				vec<L, float, Q> Result;
+-				Result.data = vdupq_lane_f32(vget_high_f32(a.data), 0);
+-				return Result;
++				GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<2>(vec<L, float, Q> const& a)
++				{
++					vec<L, float, Q> Result;
++					Result.data = vdupq_lane_f32(vget_high_f32(a.data), 0);
++					return Result;
++				}
+ 			}
+ 
+ 			template<>
+-			GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<3>(vec<L, float, Q> const& a)
++			struct detailNEON<3>
+ 			{
+-				vec<L, float, Q> Result;
+-				Result.data = vdupq_lane_f32(vget_high_f32(a.data), 1);
+-				return Result;
++				GLM_FUNC_QUALIFIER GLM_CONSTEXPR static vec<L, float, Q> call<3>(vec<L, float, Q> const& a)
++				{
++					vec<L, float, Q> Result;
++					Result.data = vdupq_lane_f32(vget_high_f32(a.data), 1);
++					return Result;
++				}
+ 			}
+ 	};
++#endif
+ 
+ }//namespace detail
+ }//namespace glm

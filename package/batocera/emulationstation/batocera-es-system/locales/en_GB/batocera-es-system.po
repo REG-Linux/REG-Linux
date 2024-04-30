@@ -20,7 +20,9 @@ msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
-msgid "Adjust the cpu power profile while in-game."
+msgid ""
+"Adjust the cpu power frequency profile whilst in-game. Some systems will "
+"benefit from improved voltage handling."
 msgstr ""
 
 #. TRANSLATION: shared
@@ -28,19 +30,31 @@ msgctxt "game_options"
 msgid "POWER MODE"
 msgstr ""
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "High Performance"
 msgstr ""
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Balanced"
 msgstr ""
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Power Saver"
+msgstr ""
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid ""
+"Adjust the cpu power profile whist on battery. Overwrites previous Power "
+"Mode(s)."
+msgstr ""
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid "BATTERY MODE"
 msgstr ""
 
 #. TRANSLATION: shared
@@ -5375,7 +5389,7 @@ msgctxt "game_options"
 msgid "Enhancement. Remove the sixteen sprites per line limit."
 msgstr ""
 
-#. TRANSLATION: libretro/mednafen_wswan, drastic
+#. TRANSLATION: libretro/mednafen_wswan, drastic, vpinball, vpinball, vpinball, ...
 msgctxt "game_options"
 msgid "Manual"
 msgstr ""
@@ -13909,17 +13923,27 @@ msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "Manual (Default)"
-msgstr ""
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid "Alternative Coloured Dot Matrix Display (needs additional file)."
 msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "ALTCOLOR"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Playfield configuration"
+msgstr ""
+
+#. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
+msgctxt "game_options"
+msgid "WINDOWS POSITIONS"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD"
 msgstr ""
 
 #. TRANSLATION: vpinball
@@ -13977,11 +14001,6 @@ msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "PinMAME DMD disabled"
-msgstr ""
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid ""
 "Extra DMD (Dot Matrix Display) window to display the score for tables "
 "without a rom. By default, settings come from the VPinballX.ini "
@@ -13991,11 +14010,6 @@ msgstr ""
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "FLEX DMD"
-msgstr ""
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
-msgid "FlexDMD disabled"
 msgstr ""
 
 #. TRANSLATION: vpinball
@@ -14012,11 +14026,6 @@ msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "Backglass disabled"
-msgstr ""
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid ""
 "When the Backglass is activated, display the small additional part with the "
 "scores."
@@ -14029,6 +14038,26 @@ msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
+msgid "When the Backglass is activated, display the grill."
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DISPLAY BACKGLASS GRILL"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DMD window ratio"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DMD SIZE"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
 msgid ""
 "Inverse the Backglass and the Playfield. Usefull to use the Backglass as "
 "main screen for other emulators."
@@ -14037,6 +14066,33 @@ msgstr ""
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "INVERSE PLAYFIELD AND B2S"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid ""
+"FULLSCREEN gives you a top-down view on the playfield. For cabinet use or "
+"multi-window on desktop."
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD MODE"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DESKTOP"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULLSCREEN"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULL SINGLE SCREEN"
 msgstr ""
 
 #. TRANSLATION: vpinball

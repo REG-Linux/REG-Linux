@@ -1,33 +1,21 @@
 ################################################################################
 #
-# REG-emulationstation
+# batocera-emulationstation
 #
 ################################################################################
-# Last update: Commits on Apr 18, 2024
-BATOCERA_EMULATIONSTATION_VERSION = 6aa0cda3d5d73ed43c0537e98ab9df16877cc3d8
-BATOCERA_EMULATIONSTATION_SITE = https://github.com/REG-linux/REG-emulationstation
+# Last update: Commits on Apr 27, 2024
+BATOCERA_EMULATIONSTATION_VERSION = 775a5a8c23a5bde2215b46fcd4e0f6a97f5b6a66
+BATOCERA_EMULATIONSTATION_SITE = https://github.com/batocera-linux/batocera-emulationstation
 BATOCERA_EMULATIONSTATION_SITE_METHOD = git
 BATOCERA_EMULATIONSTATION_LICENSE = MIT
 BATOCERA_EMULATIONSTATION_GIT_SUBMODULES = YES
 BATOCERA_EMULATIONSTATION_LICENSE = MIT, Apache-2.0
-BATOCERA_EMULATIONSTATION_DEPENDENCIES = sdl2 sdl2_mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext
+BATOCERA_EMULATIONSTATION_DEPENDENCIES = sdl2 sdl2_mixer vlc libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext
 # install in staging for debugging (gdb)
 BATOCERA_EMULATIONSTATION_INSTALL_STAGING = YES
 # BATOCERA_EMULATIONSTATION_OVERRIDE_SRCDIR = /sources/batocera-emulationstation
 
 BATOCERA_EMULATIONSTATION_CONF_OPTS += -DCMAKE_CXX_FLAGS=-D$(call UPPERCASE,$(BATOCERA_SYSTEM_ARCH))
-
-ifeq ($(BR2_PACKAGE_BATOCERA_DEV)$(BR2_PACKAGE_BATOCERA_DEBUG),y)
-BATOCERA_EMULATIONSTATION_CONF_OPTS += -DCMAKE_BUILD_TYPE=Debug
-endif
-
-# Goofy
-#ifeq ($(BR2_x86_64),y)
-#BATOCERA_EMULATIONSTATION_CONF_OPTS += -DUSE_GOOFY=ON -DUSE_DXT1=ON
-#endif
-#ifeq ($(BR2_arm)$(BR2_aarch64)$(BR2_riscv),y)
-#BATOCERA_EMULATIONSTATION_CONF_OPTS += -DUSE_GOOFY=ON -DUSE_ETC1=ON
-#endif
 
 ifeq ($(BR2_PACKAGE_HAS_LIBMALI),y)
 BATOCERA_EMULATIONSTATION_DEPENDENCIES += libmali

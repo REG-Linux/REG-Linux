@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Batocera_options\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2024-04-04 18:30+0200\n"
+"PO-Revision-Date: 2024-04-12 16:18+0200\n"
 "Last-Translator: Svein Jakobsen <svein.jakobsen@gmail.com>\n"
 "Language-Team: nb_NO\n"
 "Language: nb\n"
@@ -14,28 +14,42 @@ msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
-msgid "Adjust the cpu power profile while in-game."
-msgstr "Juster cpu-strømprofilen mens du spiller."
+msgid ""
+"Adjust the cpu power frequency profile whilst in-game. Some systems will "
+"benefit from improved voltage handling."
+msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
 msgid "POWER MODE"
 msgstr "STØM MODUS"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "High Performance"
 msgstr "Høy ytelse"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Balanced"
 msgstr "Balansert"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Power Saver"
 msgstr "Strømsparer"
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid ""
+"Adjust the cpu power profile whist on battery. Overwrites previous Power "
+"Mode(s)."
+msgstr ""
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid "BATTERY MODE"
+msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
@@ -5357,7 +5371,7 @@ msgstr "100 % (innfødt)"
 #. TRANSLATION: libretro/mednafen_psx
 msgctxt "game_options"
 msgid "Small performance increase (may drop frames)."
-msgstr "Liten ytelsesøkning (kan slippe frames)."
+msgstr "Liten ytelsesøkning (kan hoppe over bilder)."
 
 #. TRANSLATION: libretro/mednafen_psx
 msgctxt "game_options"
@@ -5454,7 +5468,7 @@ msgctxt "game_options"
 msgid "Enhancement. Remove the sixteen sprites per line limit."
 msgstr "Forbedring. Fjern grensen på seksten sprites per linje."
 
-#. TRANSLATION: libretro/mednafen_wswan, drastic
+#. TRANSLATION: libretro/mednafen_wswan, drastic, vpinball, vpinball, vpinball, ...
 msgctxt "game_options"
 msgid "Manual"
 msgstr "Manuell"
@@ -9347,7 +9361,7 @@ msgctxt "game_options"
 msgid ""
 "When running outside of 100%, adjusts the temp instead of dropping frames."
 msgstr ""
-"Når du kjører utenfor 100 %, justeres temperaturen i stedet for å slippe "
+"Når du kjører utenfor 100 %, justeres temperaturen i stedet for å hoppe over "
 "bilder."
 
 #. TRANSLATION: duckstation, rpcs3, rpcs3, rpcs3, rpcs3, ...
@@ -10843,7 +10857,7 @@ msgstr "8x 4K (3840x2176)"
 #. TRANSLATION: ppsspp
 msgctxt "game_options"
 msgid "Automatically reduce frameskip if the system has spare overhead."
-msgstr "Reduser frameskip automatisk hvis systemet har ledig overhead."
+msgstr "Reduser frameskip automatisk hvis systemet har ledig kapasitet."
 
 #. TRANSLATION: ppsspp
 msgctxt "game_options"
@@ -11823,7 +11837,7 @@ msgstr "4:3 (standard)"
 msgctxt "game_options"
 msgid "Enable auto frameskipping for performance on lower-end systems."
 msgstr ""
-"Aktiver automatisk rammespring for å øke ytelsen på mindre avanserte "
+"Aktiver automatisk frameskipping for å øke ytelsen på mindre avanserte "
 "systemer."
 
 #. TRANSLATION: redream
@@ -12177,7 +12191,7 @@ msgstr "Accel"
 #. TRANSLATION: mame
 msgctxt "game_options"
 msgid "Fix screen tearing, but may drop frames."
-msgstr "Fikser skjermriving, men kan føre til færre bilder."
+msgstr "Fikser skjermriving, men kan hoppe over bilder."
 
 #. TRANSLATION: mame
 msgctxt "game_options"
@@ -12560,7 +12574,7 @@ msgid ""
 "consecutively."
 msgstr ""
 "Når frameskip-typen er automatisk eller manuell, hopper du over så mange "
-"frames etter hverandre."
+"bilder etter hverandre."
 
 #. TRANSLATION: drastic
 msgctxt "game_options"
@@ -12991,22 +13005,22 @@ msgstr "Gjelder kun ved bruk av OpenGL."
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "0.5x (360p/540p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "0.5x (360p/540p) [EKSPERIMENTELL]"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "0.75x (540p/810p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "0.75x (540p/810p) [EKSPERIMENTELL]"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "1x (720p/1080p)"
-msgstr ""
+msgstr "1x (720p/1080p)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "1.5x (1080p/1620p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "1.5x (1080p/1620p) [EKSPERIMENTELL]"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -13036,12 +13050,12 @@ msgstr "6x (4320p/6480p)"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "7x (5040p/7560p)"
-msgstr ""
+msgstr "7x (5040p/7560p)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "8x (5760p/8640p)"
-msgstr ""
+msgstr "8x (5760p/8640p)"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -13061,7 +13075,7 @@ msgstr "Tving 16:10"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Force 32:9"
-msgstr ""
+msgstr "Tving 32:9"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13070,26 +13084,29 @@ msgid ""
 "tearing as it recovers from a slow down. Mailbox can have lower latency but "
 "may drop frames."
 msgstr ""
+"Fiks skjermrivning. FIFO (Vsync) hopper ikke over bilder. FIFO Avslappet "
+"tillater riving når den kommer seg etter en hastighets-senking. Postboks kan "
+"ha lavere ventetid, men kan hoppe over bilder."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Immediate"
-msgstr ""
+msgstr "Umiddelbar"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Mailbox (Recommended)"
-msgstr ""
+msgstr "Postboks (anbefalt)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "FIFO (VSync On)"
-msgstr ""
+msgstr "FIFO (VSync På)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "FIFO Relaxed"
-msgstr ""
+msgstr "FIFO Avslappet"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13102,6 +13119,8 @@ msgid ""
 "FXAA has a lower performance impact, goof for low resolutions. SMAA offers "
 "best quality."
 msgstr ""
+"FXAA har en lavere ytelseseffekt, tull for lave oppløsninger. SMAA tilbyr "
+"best kvalitet."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13111,7 +13130,7 @@ msgstr "ANTI-ALIASING-METODE"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "SMAA"
-msgstr ""
+msgstr "SMAA"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13126,7 +13145,7 @@ msgstr "ScaleForce"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "AMD FidelityFX Super Resolution"
-msgstr ""
+msgstr "AMD FidelityFX Super Oppløsning"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13134,16 +13153,18 @@ msgid ""
 "GPU emulation accuracy. Most games render fine with Normal. High is required "
 "to ensure particles render correctly."
 msgstr ""
+"GPU-emuleringsnøyaktighet. De fleste spill gjengis bra med Normal. Høy er "
+"nødvendig for å sikre at partikler gjengis riktig."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "ACCURACY LEVEL"
-msgstr ""
+msgstr "NØYAKTIGHETSNIVÅ"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Extreme"
-msgstr ""
+msgstr "Ekstrem"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13158,22 +13179,22 @@ msgstr "Mono"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Choose whether the virtual switch is docked or not."
-msgstr ""
+msgstr "Velg om den virtuelle switchen er dokket eller ikke."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "DOCK MODE"
-msgstr ""
+msgstr "DOKKMODUS"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Undocked"
-msgstr ""
+msgstr "Ikke dokket"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Docked (Default)"
-msgstr ""
+msgstr "Dokket (standard)"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -14224,11 +14245,6 @@ msgstr "Høy-ytelses datamaskin"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "Manual (Default)"
-msgstr "Manuell (standard)"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid "Alternative Coloured Dot Matrix Display (needs additional file)."
 msgstr "Alternativ farget punktmatriseskjerm (krever ekstra fil)."
 
@@ -14236,6 +14252,21 @@ msgstr "Alternativ farget punktmatriseskjerm (krever ekstra fil)."
 msgctxt "game_options"
 msgid "ALTCOLOR"
 msgstr "ALTCOLOR"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Playfield configuration"
+msgstr ""
+
+#. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
+msgctxt "game_options"
+msgid "WINDOWS POSITIONS"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD"
+msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14295,11 +14326,6 @@ msgstr "På skjerm 3 hvis tilgjengelig"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "PinMAME DMD disabled"
-msgstr "PinMAME DMD deaktivert"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid ""
 "Extra DMD (Dot Matrix Display) window to display the score for tables "
 "without a rom. By default, settings come from the VPinballX.ini "
@@ -14313,11 +14339,6 @@ msgstr ""
 msgctxt "game_options"
 msgid "FLEX DMD"
 msgstr "FLEX DMD"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
-msgid "FlexDMD disabled"
-msgstr "FlexDMD deaktivert"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14335,11 +14356,6 @@ msgstr "BAKGLASS (B2S)"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "Backglass disabled"
-msgstr "Bakglasset er deaktivert"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid ""
 "When the Backglass is activated, display the small additional part with the "
 "scores."
@@ -14350,6 +14366,26 @@ msgstr ""
 msgctxt "game_options"
 msgid "DISPLAY BACKGLASS DMD"
 msgstr "VIS BAKGLASS DMD"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "When the Backglass is activated, display the grill."
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DISPLAY BACKGLASS GRILL"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DMD window ratio"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DMD SIZE"
+msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14364,6 +14400,33 @@ msgstr ""
 msgctxt "game_options"
 msgid "INVERSE PLAYFIELD AND B2S"
 msgstr "BYTT OM PLAYFIELD OG B2S"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid ""
+"FULLSCREEN gives you a top-down view on the playfield. For cabinet use or "
+"multi-window on desktop."
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD MODE"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DESKTOP"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULLSCREEN"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULL SINGLE SCREEN"
+msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -15479,6 +15542,26 @@ msgstr "Meny"
 msgctxt "keys_files"
 msgid "Graphics filtering on/off"
 msgstr "Grafikkfiltrering på/av"
+
+#~ msgctxt "game_options"
+#~ msgid "Adjust the cpu power profile while in-game."
+#~ msgstr "Juster cpu-strømprofilen mens du spiller."
+
+#~ msgctxt "game_options"
+#~ msgid "Manual (Default)"
+#~ msgstr "Manuell (standard)"
+
+#~ msgctxt "game_options"
+#~ msgid "PinMAME DMD disabled"
+#~ msgstr "PinMAME DMD deaktivert"
+
+#~ msgctxt "game_options"
+#~ msgid "FlexDMD disabled"
+#~ msgstr "FlexDMD deaktivert"
+
+#~ msgctxt "game_options"
+#~ msgid "Backglass disabled"
+#~ msgstr "Bakglasset er deaktivert"
 
 #~ msgctxt "game_options"
 #~ msgid ""

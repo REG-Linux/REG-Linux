@@ -5,12 +5,16 @@
 
 # 2024/xx/xx - batocera.linux 40 -
 ### Special Notes
-
+Batocera now has a global battery mode option under Game Setting to determine the power mode when a handheld is unplugged.
+To potentially improve battery consumption, you can adjust the mode the handheld operates at when running on battery.
+By default the power mode will be set to `balanced` mode when unplugged. Other options are `highperformance` or `powersave`
+Note: The `powersave` mode will have the biggest impact on CPU performance whilst gaming to reduce battery consumption as much as possible.
 ### Hardware
 Add support for the Pironman case with RPI4 devices.
 Add support for OrangePi Zero 3 (all variants)
 Add support for Radxa Rock 3C
 Initial support for the Lenovo Legion Go
+Support for Nvidia cards requiring the legacy 340.108 driver.
 ### Added
 - Support for Lexaloffle Voxatron (needs official engine, no emulator provided)
 - C64: support for REU (RAM Expansion Unit), .d71 and .g64 ROM format
@@ -22,7 +26,10 @@ Initial support for the Lenovo Legion Go
 - DMD server (handling any dmd supported by libdmd) integrated with vpinball
 - Support for multi screens (for pincab, mame multi games)
 - Evmapy keys file to help exit running flatpak app
-- Steering wheel support for Thrustmaster T150RS
+- Steering wheel support for:
+  - Thrustmaster T150RS
+  - Thrustmaster T80 (gamepad mode only)
+  - Driving Wheel SV200
 ### Fixed
 - RG552 Splash-screen rotation
 - RG552 Vibrator enabled
@@ -38,6 +45,8 @@ Initial support for the Lenovo Legion Go
 - Daphne crosshair not hidden by default when a light gun is detected
 - Libretro-mesen light gun not loading up
 - Vulkan driver version via System Information whne using a multi-GPU systems was sometimes wrong
+- Fix SteamDeck LCD mono audio which snuck in with the v39 release.
+- ScummVM configuration file location & ensure native file system is turned off
 ### Changed
 - RK3326 Replaced the mali-G31 driver with mesa3d
 - Amiga BIOS files now go into the bios/amiga/ subfolder
@@ -83,23 +92,26 @@ Initial support for the Lenovo Legion Go
 - DOSBox-X to 2024.03.01
 - SimCoupe to 1.2.13
 - Tsugaru to 20240223
-- Redream (x86_64) to Mar 10, 2024 build
+- Redream to 1.5.0-1125-g0f0a5c3
 - Fallout 1 CE to v1.1.0 (March 2024 release)
 - DevilutionX to 1.5.2
 - Commander Genius to 3.5.0
 - Kodi to 20.5-Nexus
-- RPCS3 to 0.0.31
+- RPCS3 to 0.0.31-16388
 - Solarus-engine: bump to Mar 10, 2024 build
-- Cemu to v2.0-72
+- Cemu to v2.0-78
 - Sonic3-AIR to v24.02.02.0-stable
 - Ruffle to 2024-03-28
 - Xenia Canary to build 122f58c (Commits on Mar 26, 2024)
 - Xemu to v0.7.120
 - ScummVM to 2.8.1
 - fheroes2 to 1.0.13
-- PCSX2 to v1.7.5663
+- PCSX2 to v1.7.5748
 - Play! & Libretro Play! to Apr 3, 2024 builds
-- Dolphin to 5.0-21303
+- Dolphin to 5.0-21453
+- Libretro-hatarib: bump to v0.3
+- Hatari to v2.5.0
+- Citra to ra8e601a
 ### System
 - Mainline Kernel 6.6.y bump to 6.6.23
 - Nvidia Production driver to 550.67
@@ -110,10 +122,10 @@ Initial support for the Lenovo Legion Go
 - Mesa3d to 24.0.5
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.8.6
+- X86_64 kernel to 6.8.7
 - Switchres 0.220
 - Btop to 1.3.2
-- Linux firmware to 20240312
+- Linux firmware to 20240410
 - Buildroot to 2024.02.1
 - Xpad-Noone to Jan 10, 2024
 - XpadNeo to Mar 11, 2024
@@ -121,6 +133,8 @@ Initial support for the Lenovo Legion Go
 - Fdupes to 2.3.0
 - FAudio to 24.03
 - Sound Open Firmware to 2023.12.1
+- RyzenAdj to v0.15.0
+- Qt to 6.7.0
 
 # 2024/03/04 - batocera.linux 39 - Painted Lady
 ### Special Notes

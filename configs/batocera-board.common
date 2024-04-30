@@ -6,11 +6,13 @@ BR2_OPTIMIZE_2=y
 BR2_ENABLE_LTO=y
 BR2_SHARED_STATIC_LIBS=y
 BR2_GCC_ENABLE_GRAPHITE=y
+BR2_GCC_ENABLE_OPENMP=y
 BR2_TOOLCHAIN_BUILDROOT_GLIBC=y
 BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_GCC_VERSION_13_X=y
 # required for utf-8
 BR2_TOOLCHAIN_GLIBC_GCONV_LIBS_COPY=y
-BR2_STRIP_EXCLUDE_DIRS="usr/ryujinx usr/bin/vpinball usr/share/ecwolf usr/bin/vita3k"
+BR2_STRIP_EXCLUDE_DIRS="usr/ryujinx usr/bin/vpinball usr/share/ecwolf usr/bin/vita3k usr/bin/dmdserver"
 
 # Allow to build GOLD linker, but do not use as default
 BR2_BINUTILS_EXTRA_CONFIG_OPTIONS="--enable-gold --enable-plugins"
@@ -59,8 +61,8 @@ BR2_PACKAGE_WATCHDOG=y
 BR2_PACKAGE_WHICH=y
 
 # system
-BR2_TARGET_GENERIC_HOSTNAME="batocera"
-BR2_TARGET_GENERIC_ISSUE="READY TO RETRO"
+BR2_TARGET_GENERIC_HOSTNAME="REGlinux"
+BR2_TARGET_GENERIC_ISSUE="Retro Emulation Gaming Linux"
 BR2_INIT_SYSV=y
 BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y
 BR2_TARGET_GENERIC_ROOT_PASSWD="linux"
@@ -100,9 +102,17 @@ BR2_PACKAGE_DROPBEAR_LOCALOPTIONS_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/bato
 # Disable generating rootfs tar (speedup)
 BR2_TARGET_ROOTFS_TAR=n
 
-# images
+# post-build/post-image scripts
 BR2_ROOTFS_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/scripts/post-build-script.sh"
 BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/scripts/post-image-script.sh"
+
+# squashfs images
+BR2_PACKAGE_HOST_SQUASHFS=y
+BR2_PACKAGE_SQUASHFS=y
+BR2_PACKAGE_SQUASHFS_ZSTD=y
+BR2_PACKAGE_SQUASHFS_LZ4=y
+BR2_PACKAGE_SQUASHFS_XZ=y
+BR2_TARGET_ROOTFS_SQUASHFS=y
 BR2_TARGET_ROOTFS_SQUASHFS_EXCLUDE_DIRS="$(TARGET_DIR)/lib/firmware $(TARGET_DIR)/lib/modules"
 
 # Batocera

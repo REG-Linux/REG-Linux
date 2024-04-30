@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBRETRO_CORE_INFO_VERSION = v1.16.0
+LIBRETRO_CORE_INFO_VERSION = v1.18.0
 LIBRETRO_CORE_INFO_SITE = $(call github,libretro,libretro-core-info,$(LIBRETRO_CORE_INFO_VERSION))
 LIBRETRO_CORE_INFO_LICENSE = GPL
 
@@ -28,12 +28,10 @@ define LIBRETRO_CORE_INFO_INSTALL_TARGET_CMDS
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf vbam_libretro.info                 vba-m_libretro.info
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf mednafen_vb_libretro.info          vb_libretro.info
 
-	# emuscv_libretro.info         => no info found
 	# mamevirtual_libretro.so      => no info found
 	# superflappybirds_libretro.so => no info found
 	# zc210_libretro.so            => no info found
-	# hatarib_libretro.info       => no info found
-	touch $(TARGET_DIR)/usr/share/libretro/info/emuscv_libretro.info
+	# hatarib_libretro.info        => no info found
 	touch $(TARGET_DIR)/usr/share/libretro/info/mamevirtual_libretro.info
 	touch $(TARGET_DIR)/usr/share/libretro/info/superflappybirds_libretro.info
 	touch $(TARGET_DIR)/usr/share/libretro/info/zc210_libretro.info
