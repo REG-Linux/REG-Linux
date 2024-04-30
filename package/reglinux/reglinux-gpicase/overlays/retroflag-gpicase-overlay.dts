@@ -1,0 +1,42 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2835";
+
+    fragment@0 {
+        target = <&audio_pins>;
+        __overlay__ {
+            brcm,pins = < 18 19 >;
+            brcm,function = < 2 >; /* alt5 alt5 */
+        };
+    };
+
+    fragment@1 {
+        target = <&chosen>;
+        __overlay__  {
+            bootargs = "snd_bcm2835.enable_headphones=1";
+        };
+    };
+
+    fragment@2 {
+        target = <&leds>;
+        __overlay__ {
+            pinctrl-names = "default";
+            pinctrl-0 = <&dpi24_pins>;
+        };
+    };
+
+    fragment@3 {
+        target = <&gpio>;
+        __overlay__ {
+            dpi24_pins: dpi24_pins {
+                brcm,pins = <0 1 2 3 4 5 6 7 8 9 10 11
+                         12 13 14 15 16 17 20
+                         21 22 23 24 25 26 27>;
+                brcm,function = <6>; /* alt2 */
+                brcm,pull = <0>; /* no pull */
+            };
+        };
+    };
+ };
