@@ -1,6 +1,6 @@
 ## :video_game::penguin: REG Linux :video_game::penguin:
 REG Linux is an open-source Retro Emulation Gaming Linux system.
-It is a friendly [batocera.linux](https://batocera.org) fork maintaining compatiblity with it, aiming at be lighter and faster, especially on SBCs (ARM 32-bit / AArch64 / RISC-V 64bit) and hanhdeld devices.
+It is a friendly [batocera.linux](https://batocera.org) fork maintaining compatiblity with it, aiming at be lighter and faster, especially on SBCs (ARM 32-bit / AArch64 / RISC-V 64bit) and handdeld devices.
 
 [![Activity](https://img.shields.io/github/commit-activity/m/REG-Linux/REG-Linux)](https://github.com/REG-Linux/REG-Linux)
 [![PR](https://img.shields.io/github/issues-pr-closed/REG-Linux/REG-Linux)](https://github.com/REG-Linux/REG-Linux)
@@ -27,10 +27,10 @@ Batocera Linux is an open-source and completely free retro-gaming distribution t
 
 ## How can you help Batocera?
 
- - :wrench: If you want to help with development, [we accept PRs](https://makeapullrequest.com/) -- anyone is welcome, we embrace the [Bazaar development principles](https://en.wikipedia.org/wiki/The_Cathedral_and_the_Bazaar)
- - :art: No need to be a developer, you can also [help with translations](https://wiki.batocera.org/help_with_translation), talk about our project on [Youtube](https://www.youtube.com/channel/UClFpqHKoXsOIV-GjyZqoZcw/featured) or [Twitter](https://twitter.com/batocera_linux/), create [themes for EmulationStation](https://wiki.batocera.org/themes)
- - :dollar: If you like Batocera, you can help us with a [Paypal donation](https://www.paypal.com/paypalme/nadenislamarre), it's always appreciated!
- - :bowtie: Finally, you can now proudly rock some offcial [Batocera T-shirts, hoodies and other merch](https://batocera.printify.me/).
+ - :wrench: If you want to help with development, [we accept PRs](https://makeapullrequest.com/)
+ - :art: No need to be a developer, you can also [help with translations](https://wiki.batocera.org/help_with_translation), talk about our project on [Youtube](https://www.youtube.com/channel/UClFpqHKoXsOIV-GjyZqoZcw/featured) or [Twitter](https://twitter.com/REG_linux/), create [themes for EmulationStation](https://wiki.batocera.org/themes)
+ - :dollar: If you like Batocera, you can help us with a [Paypal donation](), it's always appreciated!
+ - :bowtie: Finally, you can now proudly rock some offcial [T-shirts, hoodies and other merch]().
 
 ## Directory navigation
 

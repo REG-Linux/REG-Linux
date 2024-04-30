@@ -19,7 +19,7 @@ DAPHNE_CONF_OPTS = ../src -DBUILD_SHARED_LIBS=OFF
 define DAPHNE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/build/hypseus $(TARGET_DIR)/usr/bin/
 		mkdir -p $(TARGET_DIR)/usr/share/daphne
-	
+
 	# copy support files
 	cp -pr $(@D)/pics $(TARGET_DIR)/usr/share/daphne
 	cp -pr $(@D)/fonts $(TARGET_DIR)/usr/share/daphne
@@ -41,6 +41,11 @@ define DAPHNE_INSTALL_BEZELS
 	cp -f $(@D)/bezels/singe/*.png $(TARGET_DIR)/usr/share/daphne/bezels
 	cp -f $(@D)/bezels/singe/gungames/*.png $(TARGET_DIR)/usr/share/daphne/bezels
 	cp -f $(@D)/bezels/singe/gungames/actionmax/*.png $(TARGET_DIR)/usr/share/daphne/bezels
+endef
+
+define DAPHNE_INSTALL_BEZELS_SINDEN
+    mkdir -p $(@D)/bezels
+    cd $(@D)/bezels && unzip -x -o $(DL_DIR)/$(DAPHNE_DL_SUBDIR)/$(DAPHNE_BEZELS_SOURCE)
 	# Sinden
 	mkdir -p $(TARGET_DIR)/usr/share/daphne/bezels/sinden
 	cp -f $(@D)/bezels/singe/sinden/actionmax/*.png $(TARGET_DIR)/usr/share/daphne/bezels/sinden
@@ -50,5 +55,9 @@ endef
 
 # Extract the bezels we want
 DAPHNE_POST_INSTALL_TARGET_HOOKS = DAPHNE_INSTALL_BEZELS
+
+ifneq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+DAPHNE_POST_INSTALL_TARGET_HOOKS += DAPHNE_INSTALL_BEZELS_SINDEN
+endif
 
 $(eval $(cmake-package))

@@ -6,7 +6,7 @@ index b2775d82d2d..555dd3cb7d7 100644
  	{ .name = "spi-authenta" },
  	{ .name = "em3581" },
  	{ .name = "si3210" },
-++	{ .name = "spi_tinker" },
++	{ .name = "spi_tinker" },
  	{},
  };
  MODULE_DEVICE_TABLE(spi, spidev_spi_ids);

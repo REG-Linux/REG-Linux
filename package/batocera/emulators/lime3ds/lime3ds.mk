@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIME3DS_VERSION = 2109
+LIME3DS_VERSION = 2110
 LIME3DS_SITE = https://github.com/Lime3DS/Lime3DS.git
 LIME3DS_SITE_METHOD = git
 LIME3DS_GIT_SUBMODULES=YES

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: emulationstation\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-15 23:48+0100\n"
-"PO-Revision-Date: 2024-02-29 10:14+0000\n"
+"PO-Revision-Date: 2024-04-18 10:04+0000\n"
 "Last-Translator: THa_MuSHeR\n"
 "Language-Team: Dutch (Netherlands)\n"
 "Language: nl-NL\n"
@@ -17,28 +17,42 @@ msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
-msgid "Adjust the cpu power profile while in-game."
-msgstr "Pas het CPU-energieprofiel aan tijdens het gamen."
+msgid ""
+"Adjust the cpu power frequency profile whilst in-game. Some systems will "
+"benefit from improved voltage handling."
+msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
 msgid "POWER MODE"
 msgstr "POWER-MODUS"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "High Performance"
 msgstr "Hoge performance"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Balanced"
 msgstr "Gebalanceerd"
 
-#. TRANSLATION: shared
+#. TRANSLATION: shared, shared
 msgctxt "game_options"
 msgid "Power Saver"
 msgstr "Energiebespaarder"
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid ""
+"Adjust the cpu power profile whist on battery. Overwrites previous Power "
+"Mode(s)."
+msgstr ""
+
+#. TRANSLATION: shared
+msgctxt "game_options"
+msgid "BATTERY MODE"
+msgstr ""
 
 #. TRANSLATION: shared
 msgctxt "game_options"
@@ -5471,14 +5485,14 @@ msgstr "Analoge Joystick (Flystick)"
 #. TRANSLATION: libretro/mednafen_psx, libretro/mednafen_psx
 msgctxt "game_options"
 msgid "Justifier"
-msgstr ""
+msgstr "Justifier"
 
 #. TRANSLATION: libretro/mednafen_supergrafx, libretro/pce, libretro/pce_fast, libretro/pcfx
 msgctxt "game_options"
 msgid "Enhancement. Remove the sixteen sprites per line limit."
 msgstr "Verbetering. Verwijder de 16 sprites per regel limiet."
 
-#. TRANSLATION: libretro/mednafen_wswan, drastic
+#. TRANSLATION: libretro/mednafen_wswan, drastic, vpinball, vpinball, vpinball, ...
 msgctxt "game_options"
 msgid "Manual"
 msgstr "Handmatig"
@@ -6460,7 +6474,7 @@ msgstr "Parasite Eve 2/Vandal Hearts 1&2 Fix"
 #. TRANSLATION: libretro/pcsx_rearmed, libretro/pcsx_rearmed
 msgctxt "game_options"
 msgid "Hyper Blaster/Justifier"
-msgstr ""
+msgstr "Hyper Blaster/Justifier"
 
 #. TRANSLATION: libretro/pokemini
 msgctxt "game_options"
@@ -7749,52 +7763,52 @@ msgstr "Koalapad"
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "Some games and homebrews require more RAM"
-msgstr ""
+msgstr "Sommige spellen en homebrews vereisen meer RAM"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "RAM EXPANSION UNIT"
-msgstr ""
+msgstr "RAM UITBREIDINGSEENHEID"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "128kB (1700)"
-msgstr ""
+msgstr "128kB (1700)"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "256kB (1764)"
-msgstr ""
+msgstr "256kB (1764)"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "512kB (1750)"
-msgstr ""
+msgstr "512kB (1750)"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "1024kB"
-msgstr ""
+msgstr "1024kB"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "2048kB"
-msgstr ""
+msgstr "2048kB"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "4096kB"
-msgstr ""
+msgstr "4096kB"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "8192kB"
-msgstr ""
+msgstr "8192kB"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_x128
 msgctxt "game_options"
 msgid "16384kB"
-msgstr ""
+msgstr "16384kB"
 
 #. TRANSLATION: libretro/vice_x64, libretro/vice_x64sc, libretro/vice_xscpu64, libretro/vice_x128, libretro/vice_xplus4, ...
 msgctxt "game_options"
@@ -8693,11 +8707,12 @@ msgstr "JOYSTICK NAAR CURSOR GEVOELIGHEID"
 msgctxt "game_options"
 msgid "Hide crosshairs in supported games e.g. ActionMax, Maddog II."
 msgstr ""
+"Verberg het draadkruis in ondersteunde games, b.v. ActionMax, Maddog II."
 
 #. TRANSLATION: daphne, dolphin/uzem
 msgctxt "game_options"
 msgid "LIGHT GUNS"
-msgstr ""
+msgstr "LIGHTGUNS"
 
 #. TRANSLATION: daphne
 msgctxt "game_options"
@@ -8707,12 +8722,12 @@ msgstr "VERBERG LIGHT GUN DRAADKRUIS"
 #. TRANSLATION: daphne
 msgctxt "game_options"
 msgid "Hidden"
-msgstr ""
+msgstr "Verborgen"
 
 #. TRANSLATION: daphne
 msgctxt "game_options"
 msgid "Shown"
-msgstr ""
+msgstr "Getoond"
 
 #. TRANSLATION: daphne
 msgctxt "game_options"
@@ -8821,21 +8836,23 @@ msgstr "Wiimote Zijwaarts + Nunchuk"
 msgctxt "game_options"
 msgid "Position of wii sensor bar relative to the disaply for real wiimotes."
 msgstr ""
+"Positie van de Wii-sensorbalk ten opzichte van het scherm voor echte Wii-"
+"motes."
 
 #. TRANSLATION: dolphin/uzem
 msgctxt "game_options"
 msgid "SENSOR BAR POSITION"
-msgstr ""
+msgstr "POSITIE VAN DE SENSORBALK"
 
 #. TRANSLATION: dolphin/uzem
 msgctxt "game_options"
 msgid "Bottom (Default)"
-msgstr ""
+msgstr "Onder (Standaard)"
 
 #. TRANSLATION: dolphin/uzem
 msgctxt "game_options"
 msgid "Top"
-msgstr ""
+msgstr "Boven"
 
 #. TRANSLATION: dolphin/uzem
 msgctxt "game_options"
@@ -9577,7 +9594,7 @@ msgstr "PRESTATIES"
 #. TRANSLATION: duckstation
 msgctxt "game_options"
 msgid "CROSSHAIR"
-msgstr ""
+msgstr "CROSSHAIR"
 
 #. TRANSLATION: flycast/uzem
 msgctxt "game_options"
@@ -12293,12 +12310,12 @@ msgstr "CRT SWITCHRES"
 #. TRANSLATION: mame
 msgctxt "game_options"
 msgid "Play this game on several screens (if available)"
-msgstr ""
+msgstr "Speel dit spel op meerdere schermen (indien beschikbaar)"
 
 #. TRANSLATION: mame
 msgctxt "game_options"
 msgid "MULTISCREENS"
-msgstr ""
+msgstr "MULTISCHERM"
 
 #. TRANSLATION: mame
 msgctxt "game_options"
@@ -12352,11 +12369,13 @@ msgid ""
 "Runners simplify compatibility of running Windows games. You must have a "
 "runner in it's own directory under /userdata/system/wine/custom."
 msgstr ""
+"Runners vereenvoudigen de compatibiliteit van Windows-games. Je moet een "
+"runner in zijn eigen map hebben onder /userdata/system/wine/custom."
 
 #. TRANSLATION: wine
 msgctxt "game_options"
 msgid "WINE RUNNER"
-msgstr ""
+msgstr "WINE RUNNER"
 
 #. TRANSLATION: wine
 msgctxt "game_options"
@@ -13060,22 +13079,22 @@ msgstr "Alleen van toepassing bij gebruik van OpenGL."
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "0.5x (360p/540p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "0.5x (360p/540p) [EXPERIMENTEEL]"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "0.75x (540p/810p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "0.75x (540p/810p) [EXPERIMENTEEL]"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "1x (720p/1080p)"
-msgstr ""
+msgstr "1x (720p/1080p)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "1.5x (1080p/1620p) [EXPERIMENTAL]"
-msgstr ""
+msgstr "1.5x (1080p/1620p) [EXPERIMENTEEL]"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -13105,12 +13124,12 @@ msgstr "6x (4320p/6480p)"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "7x (5040p/7560p)"
-msgstr ""
+msgstr "7x (5040p/7560p)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "8x (5760p/8640p)"
-msgstr ""
+msgstr "8x (5760p/8640p)"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -13130,7 +13149,7 @@ msgstr "Forceer 16:10"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Force 32:9"
-msgstr ""
+msgstr "Forceer 32:9"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13139,26 +13158,29 @@ msgid ""
 "tearing as it recovers from a slow down. Mailbox can have lower latency but "
 "may drop frames."
 msgstr ""
+"Schermscheuren verhelpen. FIFO (Vsync) laat geen frames vallen. FIFO Relaxed "
+"maakt scheuren mogelijk terwijl het herstelt van een vertraging. Mailbox kan "
+"een lagere latentie hebben, maar er kunnen frames wegvallen."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Immediate"
-msgstr ""
+msgstr "Onmiddellijk"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Mailbox (Recommended)"
-msgstr ""
+msgstr "Mailbox (Aanbevolen)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "FIFO (VSync On)"
-msgstr ""
+msgstr "FIFO (VSync Aan)"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "FIFO Relaxed"
-msgstr ""
+msgstr "FIFO Relaxed"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13171,6 +13193,8 @@ msgid ""
 "FXAA has a lower performance impact, goof for low resolutions. SMAA offers "
 "best quality."
 msgstr ""
+"FXAA heeft een lagere impact op de prestaties, goed voor lage resoluties. "
+"SMAA biedt de beste kwaliteit."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13180,7 +13204,7 @@ msgstr "ANTI-ALIASING METHODE"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "SMAA"
-msgstr ""
+msgstr "SMAA"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13195,7 +13219,7 @@ msgstr "ScaleForce"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "AMD FidelityFX Super Resolution"
-msgstr ""
+msgstr "AMD FidelityFX Super Resolutie"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13203,16 +13227,19 @@ msgid ""
 "GPU emulation accuracy. Most games render fine with Normal. High is required "
 "to ensure particles render correctly."
 msgstr ""
+"Nauwkeurigheid van GPU-emulatie. De meeste games worden prima weergegeven "
+"met Normaal. Hoog is vereist om ervoor te zorgen dat deeltjes correct worden "
+"weergegeven."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "ACCURACY LEVEL"
-msgstr ""
+msgstr "NAUWKEURIGHEIDSNIVEAU"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Extreme"
-msgstr ""
+msgstr "Extreem"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
@@ -13227,22 +13254,22 @@ msgstr "Mono"
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Choose whether the virtual switch is docked or not."
-msgstr ""
+msgstr "Kies of de virtuele switch is gedockt of niet."
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "DOCK MODE"
-msgstr ""
+msgstr "DOCK-MODUS"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Undocked"
-msgstr ""
+msgstr "Undocked"
 
 #. TRANSLATION: suyu
 msgctxt "game_options"
 msgid "Docked (Default)"
-msgstr ""
+msgstr "Docked (Standaard)"
 
 #. TRANSLATION: suyu, ryujinx
 msgctxt "game_options"
@@ -13978,7 +14005,7 @@ msgstr "45s"
 #. TRANSLATION: xenia, xenia-canary
 msgctxt "game_options"
 msgid "60s"
-msgstr ""
+msgstr "60s"
 
 #. TRANSLATION: xenia, xenia-canary
 msgctxt "game_options"
@@ -14297,11 +14324,6 @@ msgstr "High-end Computer"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "Manual (Default)"
-msgstr "Handmatig (Standaard)"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid "Alternative Coloured Dot Matrix Display (needs additional file)."
 msgstr "Alternatief Colored Dot Matrix Display (vereist extra bestand)."
 
@@ -14309,6 +14331,21 @@ msgstr "Alternatief Colored Dot Matrix Display (vereist extra bestand)."
 msgctxt "game_options"
 msgid "ALTCOLOR"
 msgstr "ALTCOLOR"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Playfield configuration"
+msgstr "Speelveldconfiguratie"
+
+#. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
+msgctxt "game_options"
+msgid "WINDOWS POSITIONS"
+msgstr "VENSTERPOSITIES"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD"
+msgstr "SPEELVELD"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14359,17 +14396,12 @@ msgstr "Positie linksboven, Groot"
 #. TRANSLATION: vpinball, vpinball, vpinball
 msgctxt "game_options"
 msgid "On screen 2 if available"
-msgstr ""
+msgstr "Op scherm 2, indien beschikbaar"
 
 #. TRANSLATION: vpinball, vpinball
 msgctxt "game_options"
 msgid "On screen 3 if available"
-msgstr ""
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
-msgid "PinMAME DMD disabled"
-msgstr "PinMAME DMD uitgeschakeld"
+msgstr "Op scherm 3, indien beschikbaar"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14389,11 +14421,6 @@ msgstr "FLEX DMD X"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid "FlexDMD disabled"
-msgstr "FlexDMD uitgeschakeld"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
 msgid ""
 "Upright glass panel displaying some illuminated artwork. By default, "
 "settings come from the VPinballX.ini configuration file."
@@ -14405,11 +14432,6 @@ msgstr ""
 msgctxt "game_options"
 msgid "BACKGLASS (B2S)"
 msgstr "KOPRUIT (B2S)"
-
-#. TRANSLATION: vpinball
-msgctxt "game_options"
-msgid "Backglass disabled"
-msgstr "Kopruit uitgeschakeld"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14427,14 +14449,63 @@ msgstr "TOON KOPRUIT DMD"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
-msgid ""
-"Inverse the Backglass and the Playfield. Usefull to use the Backglass as "
-"main screen for other emulators."
+msgid "When the Backglass is activated, display the grill."
 msgstr ""
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
+msgid "DISPLAY BACKGLASS GRILL"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DMD window ratio"
+msgstr "DMD vensterverhouding"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DMD SIZE"
+msgstr "DMD GROOTTE"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid ""
+"Inverse the Backglass and the Playfield. Usefull to use the Backglass as "
+"main screen for other emulators."
+msgstr ""
+"Draai de kopruit en het speelveld om. Handig om de Backglass als hoofdscherm "
+"voor andere emulators te gebruiken."
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
 msgid "INVERSE PLAYFIELD AND B2S"
+msgstr "DRAAI SPEELVELD EN B2S OM"
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid ""
+"FULLSCREEN gives you a top-down view on the playfield. For cabinet use or "
+"multi-window on desktop."
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "PLAYFIELD MODE"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "DESKTOP"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULLSCREEN"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "FULL SINGLE SCREEN"
 msgstr ""
 
 #. TRANSLATION: vpinball
@@ -14888,12 +14959,12 @@ msgstr "Drievoudige Buffering"
 #. TRANSLATION: steam.keys
 msgctxt "keys_files"
 msgid "Exit Steam"
-msgstr ""
+msgstr "Sluit Steam af"
 
 #. TRANSLATION: flatpak.keys
 msgctxt "keys_files"
 msgid "Exit running Flatpak"
-msgstr ""
+msgstr "Stop het draaien van Flatpak"
 
 #. TRANSLATION: raze.keys, gzdoom.keys, eduke32.keys
 msgctxt "keys_files"
@@ -15408,7 +15479,7 @@ msgstr "Sluit Dosbox-X"
 #. TRANSLATION: daphne.daphne.keys
 msgctxt "keys_files"
 msgid "Service menu"
-msgstr ""
+msgstr "Servicemenu"
 
 #. TRANSLATION: wiiu.keys
 msgctxt "keys_files"
@@ -15556,27 +15627,5 @@ msgid "Graphics filtering on/off"
 msgstr "Grafische filtering aan/uit"
 
 #~ msgctxt "game_options"
-#~ msgid ""
-#~ "Turn on to configure settings from this GUI (Recommended). If disabled, "
-#~ "you have to manually edit the Config File (Experts only - not "
-#~ "recommended)."
-#~ msgstr ""
-#~ "Schakel dit in om instellingen vanuit deze GUI te configureren "
-#~ "(aanbevolen). Indien uitgeschakeld, moet u het configuratiebestand "
-#~ "handmatig bewerken (Alleen experts - niet aanbevolen)."
-
-#~ msgctxt "game_options"
-#~ msgid "ENABLE EMULATIONSTATION CONFIGURATION"
-#~ msgstr "CONFIGURATIE VAN EMULATIONSTATION INSCHAKELEN"
-
-#~ msgctxt "game_options"
-#~ msgid "AMD FidelityFX (Vulkan Only)"
-#~ msgstr "AMD FidelityFX (Alleen Vulkan)"
-
-#~ msgctxt "game_options"
-#~ msgid "Hide crosshairs in supported games e.g. ActionMax."
-#~ msgstr "Verberg het draadkruis in ondersteunde spellen, b.v. ActionMax."
-
-#~ msgctxt "game_options"
-#~ msgid "Namco GunCon (Rumble)"
-#~ msgstr "Namco GunCon (Rumble)"
+#~ msgid "Adjust the cpu power profile while in-game."
+#~ msgstr "Pas het CPU-energieprofiel aan tijdens het gamen."

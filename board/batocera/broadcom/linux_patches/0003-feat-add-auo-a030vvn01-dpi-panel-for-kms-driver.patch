@@ -1,0 +1,59 @@
+From 63d02f9f84b539fefec51b15da6d6fabab6db338 Mon Sep 17 00:00:00 2001
+From: David Barbion <davidb@230ruedubac.fr>
+Date: Mon, 29 Apr 2024 10:51:29 -0400
+Subject: [PATCH 3/3] feat: add auo a030vvn01 dpi panel for kms driver
+
+---
+ drivers/gpu/drm/panel/panel-simple.c | 29 ++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index da3232275..68963b06d 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -3478,6 +3478,32 @@ static const struct panel_desc xpi_piboydmg = {
+ 	.connector_type = DRM_MODE_CONNECTOR_DPI,
+ };
+
++static const struct display_timing auo_a030vvn01_timing = {
++	.pixelclock = { 19750000, 24000000, 28220000},
++	.hactive = { 640, 640, 640 },
++	.hfront_porch = { 20, 41, 50 },
++	.hback_porch = { 19, 41, 50 },
++	.hsync_len = { 1, 40, 50},
++	.vactive = { 480, 480, 480 },
++	.vfront_porch = { 1, 18, 30},
++	.vback_porch = { 2, 18, 32 },
++	.vsync_len = { 1, 9, 18 },
++	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
++};
++
++static const struct panel_desc auo_a030vvn01 = {
++	.timings = &auo_a030vvn01_timing,
++	.num_timings = 1,
++	.bpc = 6,
++	.size = {
++		.width = 60,
++		.height = 45,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB666_1X24_CPADHI,
++	.bus_flags = DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE,
++	.connector_type = DRM_MODE_CONNECTOR_DPI,
++};
++
+ static const struct drm_display_mode raspberrypi_7inch_mode = {
+ 	.clock = 27777,
+ 	.hdisplay = 800,
+@@ -4565,6 +4591,9 @@ static const struct of_device_id platform_of_match[] = {
+ 	}, {
+ 		.compatible = "xpi,piboydmg",
+ 		.data = &xpi_piboydmg,
++	}, {
++		.compatible = "auo,a030vvn01",
++		.data = &auo_a030vvn01,
+  	}, {
+ 		.compatible = "raspberrypi,7inch-dsi",
+ 		.data = &raspberrypi_7inch,
+--
+2.44.0
+

@@ -88,7 +88,7 @@ menu "System"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/batocera-nvidia/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/batocera-nvidia-driver/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/batocera-nvidia-legacy-driver/Config.in"
-    #source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/batocera-nvidia340-legacy-driver/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/batocera-nvidia340-legacy-driver/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/batocera-nvidia390-legacy-driver/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/rockchip-mpp/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/gpu/rockchip-rga/Config.in"
@@ -422,6 +422,7 @@ menu "Emulators"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/etlegacy/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/sonic3-air/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/sonic-mania/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/uqm/Config.in"
   endmenu
 
   menu "mupen64plus"
@@ -487,7 +488,6 @@ menu "Utils"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/ledspicer/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/innoextract/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/mokutil/Config.in"
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/wsdd-native/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/utils/zramswap/Config.in"
 endmenu
 
@@ -501,6 +501,7 @@ endmenu
 
 menu "Screens"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/screens/dmd-simulator/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/screens/batocera-backglass/Config.in"
 endmenu
 
 menu "Libraries"
@@ -551,6 +552,9 @@ menu "Libraries"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python3-gpiod/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/libgraphene/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/libportmidi/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/shaderc/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python-proxy-tools/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/pywebview/Config.in"
 endmenu
 
 menu "Audio"
@@ -566,11 +570,15 @@ endmenu
 
 menu "REG.linux"
 
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-emulationstation/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-rescue/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-splash/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/goofy/Config.in"
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/shaderc/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/sudachi/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-samba/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/vulkan-volk/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/gamescope/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/wsdd-native/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-gpicase/Config.in"
 
 endmenu

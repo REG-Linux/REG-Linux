@@ -4,12 +4,12 @@
 #
 ################################################################################
 # Version: latest master Apr 16 2024
-DUCKSTATION_VERSION = e40c022a0fd1909bb98eb4ebd34e08b49af19688
+DUCKSTATION_VERSION = 4e0c417add264226b3db065c1466791f0591a1b5
 DUCKSTATION_SITE = https://github.com/stenzek/duckstation.git
 DUCKSTATION_SITE_METHOD=git
 DUCKSTATION_GIT_SUBMODULES=YES
 DUCKSTATION_LICENSE = GPLv2
-DUCKSTATION_DEPENDENCIES = fmt boost ffmpeg libcurl ecm shaderc qt6tools
+DUCKSTATION_DEPENDENCIES = fmt boost ffmpeg libcurl ecm shaderc qt6tools webp
 
 DUCKSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 

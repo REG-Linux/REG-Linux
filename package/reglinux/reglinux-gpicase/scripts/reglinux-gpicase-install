@@ -1,0 +1,49 @@
+#!/bin/sh
+
+CONFIGRULES=/etc/udev/rules.d/99-gpicase.rules
+CONFIGFILE=/boot/config.txt
+RPIMODEL="/proc/device-tree/model"
+CONFIGMODIFIED=0
+
+if grep -q "^Raspberry Pi Zero 2" ${RPIMODEL}
+then
+    video="dtoverlay=retroflag-gpicase2w"
+else
+    video="dtoverlay=retroflag-gpicase"
+fi
+
+setup="# ====== GPi Case setup section =====
+${video}
+
+dtparam=act_led_trigger=none
+dtparam=act_led_activelow=on
+# ====== GPi Case setup section end =====
+# This will preserve always the default GPi settings if enabled, needed if some values were wrong setted by user"
+
+echo "${setup}" | (
+while read LINE
+do
+    if ! grep -qE "^${LINE}$" "${CONFIGFILE}"
+    then
+        test "${CONFIGMODIFIED}" = 0 && mount -o remount,rw /boot
+        echo "${LINE}" >> "${CONFIGFILE}"
+        CONFIGMODIFIED=1
+    fi
+done
+
+# We don't want install to be called on every boot
+if [ -e "${CONFIGRULES}" ];
+then
+    rm -rf "${CONFIGRULES}"
+    batocera-save-overlay
+fi
+
+#Reboot if there was a change in line
+if test "${CONFIGMODIFIED}" = 1
+then
+        echo "Rebooting now..."
+        shutdown -r now
+fi
+)
+
+exit 0
