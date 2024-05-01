@@ -1,0 +1,54 @@
+---
+ drivers/gpu/drm/panel/panel-simple.c | 29 ++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index 68963b06d..3db534923 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -3420,6 +3420,32 @@ static const struct panel_desc rocktech_rk043fn48h = {
+ 	.connector_type = DRM_MODE_CONNECTOR_DPI,
+ };
+
++static const struct drm_display_mode retroflag_gpi_mode = {
++	.clock = 6400,
++	.hdisplay = 240,
++	.hsync_start = 240 + 38,
++	.hsync_end = 240 + 38 + 10,
++	.htotal = 240 + 38 + 10 + 20,
++	.vdisplay = 320,
++	.vsync_start = 320 + 20,
++	.vsync_end = 320 + 20 + 4,
++	.vtotal = 320 + 20 + 4 + 4,
++	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
++};
++
++static const struct panel_desc retroflag_gpi = {
++	.modes = &retroflag_gpi_mode,
++	.num_modes = 1,
++	.bpc = 8,
++	.size = {
++		.width = 30,
++		.height = 40,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB666_1X24_CPADHI,
++	.bus_flags = DRM_BUS_FLAG_DE_LOW | DRM_BUS_FLAG_SYNC_DRIVE_NEGEDGE,
++	.connector_type = DRM_MODE_CONNECTOR_DPI,
++};
++
+ static const struct display_timing retroflag_gpi2w_timing = {
+ 	.pixelclock = { 19200000, 19200000, 19200000},
+ 	.hactive = { 640, 640, 640 },
+@@ -4585,6 +4611,9 @@ static const struct of_device_id platform_of_match[] = {
+ 	}, {
+ 		.compatible = "rocktech,rk043fn48h",
+ 		.data = &rocktech_rk043fn48h,
++	}, {
++		.compatible = "retroflag,gpi",
++		.data = &retroflag_gpi,
+ 	}, {
+ 		.compatible = "retroflag,gpi2w",
+ 		.data = &retroflag_gpi2w,
+--
+2.45.0
+
