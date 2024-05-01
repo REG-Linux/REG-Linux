@@ -136,7 +136,7 @@ dtparam=audio=on
 dtparam=krnbt=on
 
 # Enable DRM VC4 V3D driver
-dtoverlay=vc4-kms-v3d,cma-128
+dtoverlay=vc4-kms-v3d
 
 [DPI]
 # Put any DPI required display code here
