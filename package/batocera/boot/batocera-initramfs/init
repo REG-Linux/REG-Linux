@@ -91,7 +91,20 @@ do_rescue() {
     do_mount_firmware
     do_mount_modules
 
-    # TODO find userdata partition
+    # moving current mounts
+    mount --move /boot_root    /new_root/boot     || return 1
+    mount --move /overlay_root /new_root/overlay  || return 1
+    mount --move /sys  	       /new_root/sys  	  || return 1
+    mount --move /proc 	       /new_root/proc 	  || return 1
+    mount --move /dev  	       /new_root/dev  	  || return 1
+
+    # Switch to rescue filesystem
+    exec switch_root /new_root /sbin/init || return 1
+
+    # This code has to be executed by RESCUE init
+    # Find SHARE partition (UGLY)
+    #share_part = lsblk -l -o NAME,LABEL | grep SHARE | cut -d " " -f 1
+    #share_device = /dev/$(share_part)
     #part=$1
     #part=${part#/dev/}
     #disk=$(readlink /sys/class/block/$part)
@@ -99,15 +112,11 @@ do_rescue() {
     #disk=/dev/${disk##*/}
 
     # TODO mount userdata partition
-    #mkdir -p /new_root/userdata
-    #mount $disk /new_root/userdata || return 1
+    #mkdir -p /userdata
+    #mount $share_device /userdata || return 1
 
-    # moving current mounts
-    mount --move /boot_root    /new_root/boot     || return 1
-    mount --move /overlay_root /new_root/overlay  || return 1
-    mount --move /sys  	       /new_root/sys  	  || return 1
-    mount --move /proc 	       /new_root/proc 	  || return 1
-    mount --move /dev  	       /new_root/dev  	  || return 1
+    #mount --move /userdata     /new_root/userdata || return 1
+
     return 0
 }
 
@@ -170,8 +179,8 @@ do_root() {
         rm -f /boot/root/REG_RESCUE
         mount -o remount,ro /boot_root || return 1
         do_rescue || return 1
-        # switch to the new root
-        exec switch_root /new_root /sbin/init || return 1
+        sync
+        reboot
         return 0
     fi
 
