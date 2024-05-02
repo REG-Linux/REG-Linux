@@ -4,9 +4,11 @@
 #
 ################################################################################
 
-NUITKA_VERSION = 2.1.6
-NUITKA_SOURCE = $(NUITKA_VERSION).tar.gz
-NUITKA_SITE = https://github.com/Nuitka/Nuitka/archive/refs/tags
+NUITKA_VERSION = 6a1239c1f505e7d9e2c1873f3211f79f8e671d7c
+NUITKA_TOKEN = $(shell cat /build/gh_token)
+NUITKA_SITE = https://$(NUITKA_TOKEN)@github.com/REG-Linux/Nuitka.git
+NUITKA_SITE_METHOD = git
+NUITKA_GIT_SUBMODULES = YES
 NUITKA_SETUP_TYPE = setuptools host-python3 python3
 NUITKA_LICENSE_FILES = LICENSE
 NUITKA_DEPENDENCIES += patchelf host-patchelf host-zstd host-python-pip python-pip

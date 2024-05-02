@@ -94,12 +94,11 @@ define BATOCERA_CONFIGGEN_CONFIGS
 	    $(TARGET_DIR)/usr/share/batocera/configgen/
 endef
 
-# not with Nuitka
-#define BATOCERA_CONFIGGEN_BINS
-#    chmod a+x $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py
-#	(mkdir -p $(TARGET_DIR)/usr/bin/ && cd $(TARGET_DIR)/usr/bin/ && \
-#	    ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher)
-#endef
+define BATOCERA_CONFIGGEN_BINS
+    chmod a+x $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py
+	(mkdir -p $(TARGET_DIR)/usr/bin/ && cd $(TARGET_DIR)/usr/bin/ && \
+	    ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher)
+endef
 
 define BATOCERA_CONFIGGEN_ES_HOOKS
 	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/powermode_launch_hooks.sh \
@@ -115,7 +114,6 @@ define BATOCERA_CONFIGGEN_X86_HOOKS
 endef
 
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS = BATOCERA_CONFIGGEN_CONFIGS
-# not with nuitka BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_BINS
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_ES_HOOKS
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
@@ -123,6 +121,17 @@ ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
 endif
 
 BATOCERA_CONFIGGEN_SETUP_TYPE = setuptools
+
+# Cross-compile ABI
+# TODO : riscv64
+BATOCERA_CONFIGGEN_CROSS_ABI = unknown
+ifeq ($(BR2_x86_64),y)
+BATOCERA_CONFIGGEN_CROSS_ABI = x86_64-linux-gnu
+else ifeq ($(BR2_arm),y)
+BATOCERA_CONFIGGEN_CROSS_ABI = arm-linux-gnueabihf
+else ifeq ($(BR2_aarch64),y)
+BATOCERA_CONFIGGEN_CROSS_ABI = aarch64-linux-gnu
+endif
 
 define BATOCERA_CONFIGGEN_CROSS_COMPILE_NUITKA
 	$(HOST_DIR)/usr/bin/pip install pyudev
@@ -134,27 +143,27 @@ define BATOCERA_CONFIGGEN_CROSS_COMPILE_NUITKA
 	$(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install evdev
 	$(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install pillow
 	$(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install ordered-set
-	# Exec format error $(QEMU_USER) $(TARGET_DIR)/usr/bin/python -m pip install zstandard
 	cd $(@D)/ && \
 	NUITKA_CACHE_DIR=$(HOME)/.buildroot-ccache \
 	PYTHONPATH=$(TARGET_DIR)/usr/lib/python3.11 \
+	ABI=$(BATOCERA_CONFIGGEN_CROSS_ABI) \
 	CC=$(TARGET_CC) LD=$(TARGET_LD) \
-	SYSROOT="$(STAGING_DIR)" \
+	SYSROOT="$(STAGING_DIR)/usr" \
 	PATH=$(STAGING_DIR)/usr/bin:$(PATH) \
 	QEMU_USER=$(QEMU_USER) \
 	$(QEMU_USER) \
 	$(TARGET_DIR)/usr/bin/python -m nuitka \
 	--python-for-scons=$(HOST_DIR)/usr/bin/python \
 	--standalone configgen/emulatorlauncher.py \
-	--prefer-source-code --include-package=configgen
-	#PATH=$(HOST_DIR)/usr/bin:$(PATH) \
-	#NUITKA_BINARY_NAME=$(HOST_DIR)/usr/bin/qemu-arm
-# --static-libpython=yes && \
-# --onefile
+	--static-libpython=yes \
+	--prefer-source-code
+
+	# Enabling LTO breaks on linker --lto=yes
 
 	#install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
 	cp -r $(@D)/emulatorlauncher.dist/* $(TARGET_DIR)/usr/bin/
 	cd $(TARGET_DIR)/usr/bin && mv emulatorlauncher.bin emulatorlauncher
+	rm -rf $(TARGET_DIR)/usr/lib/python3.11/site-packages/nuitka
 endef
 
 define BATOCERA_CONFIGGEN_COMPILE_NUITKA
@@ -166,23 +175,32 @@ define BATOCERA_CONFIGGEN_COMPILE_NUITKA
 	cd $(@D)/ && \
 	QEMU_USER="" \
 	PATH=$(STAGING_DIR)/usr/bin:$(PATH) \
+	CC=$(TARGET_CC) LD=$(TARGET_LD) \
+	SYSROOT="$(STAGING_DIR)/usr" \
+	ABI=$(BATOCERA_CONFIGGEN_CROSS_ABI) \
 	NUITKA_CACHE_DIR=$(HOME)/.buildroot-ccache \
 	$(HOST_DIR)/usr/bin/python -m nuitka \
 	--python-for-scons=$(HOST_DIR)/usr/bin/python \
-	--static-libpython=yes \
 	--standalone configgen/emulatorlauncher.py \
-	--prefer-source-code --include-package=configgen
+	--static-libpython=yes \
+	#--prefer-source-code \
+
+	#--lto=yes
 	#PATH=$(HOST_DIR)/usr/bin:$(PATH) \
-	# --onefile
 	#install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
 	cp -r $(@D)/emulatorlauncher.dist/* $(TARGET_DIR)/usr/bin/
 	cd $(TARGET_DIR)/usr/bin && mv emulatorlauncher.bin emulatorlauncher
+	rm -rf $(TARGET_DIR)/usr/lib/python3.11/site-packages/nuitka
 endef
 
+ifeq ($(BR2_PACKAGE_NUITKA),y)
 ifeq ($(BR2_x86_64),y)
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_COMPILE_NUITKA
 else
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_CROSS_COMPILE_NUITKA
+endif
+else
+BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_BINS
 endif
 
 $(eval $(python-package))
