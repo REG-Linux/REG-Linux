@@ -1,0 +1,80 @@
+diff -u -r ./build/DataComposerInterface.py /home/romain/dev/REG-Linux/output/x86_64/host/usr/lib/python3.11/site-packages/nuitka/build/DataComposerInterface.py
+--- a/nuitka/build/DataComposerInterface.py	2024-05-02 00:27:50.203134560 +0200
++++ b/nuitka/build/DataComposerInterface.py	2024-05-02 16:53:57.331075845 +0200
+@@ -58,17 +58,29 @@
+ 
+     with withEnvironmentVarsOverridden(mapping):
+         try:
+-            subprocess.check_call(
+-                [
+-                    os.environ["QEMU_USER"],
+-                    sys.executable,
+-                    data_composer_path,
+-                    source_dir,
+-                    blob_filename,
+-                    stats_filename,
+-                ],
+-                shell=False,
+-            )
++            if os.environ["QEMU_USER"]:
++                subprocess.check_call(
++                    [
++                        os.environ["QEMU_USER"],
++                        sys.executable,
++                        data_composer_path,
++                        source_dir,
++                        blob_filename,
++                        stats_filename,
++                    ],
++                    shell=False,
++                )
++            else:
++                subprocess.check_call(
++                    [
++                        sys.executable,
++                        data_composer_path,
++                        source_dir,
++                        blob_filename,
++                        stats_filename,
++                    ],
++                    shell=False,
++                )
+         except subprocess.CalledProcessError:
+             data_composer_logger.sysexit(
+                 "Error executing data composer, please report the above exception."
+diff -u -r ./utils/Execution.py /home/romain/dev/REG-Linux/output/x86_64/host/usr/lib/python3.11/site-packages/nuitka/utils/Execution.py
+--- a/nuitka/utils/Execution.py	2024-05-02 00:27:50.239135411 +0200
++++ b/nuitka/utils/Execution.py	2024-05-02 17:25:05.239871039 +0200
+@@ -348,11 +348,15 @@
+ 
+     # Allow to avoid repeated scans in PATH for the tool.
+     command[0] = getExecutablePath(tool)
++
++    # Terrible hack to handle patchelf properly in buildroot cross-compile
+     is_target_patchelf = "target/usr/bin/patchelf" in command[0]
+     is_staging_patchelf = "sysroot/usr/bin/patchelf" in command[0]
+-    # /cha/host/arm-buildroot-linux-gnueabihf/sysroot/usr/bin/patchelf
+     if is_target_patchelf or is_staging_patchelf:
+-        command.insert(0, os.environ["QEMU_USER"])
++        if os.environ["QEMU_USER"]:
++            command.insert(0, os.environ["QEMU_USER"])
++        else:
++            command[0] = "/x86_64/host/usr/bin/patchelf"
+     print("executeToolChecked " , command)
+     process = subprocess.Popen(
+         command,
+diff -u -r ./utils/ReExecute.py /home/romain/dev/REG-Linux/output/x86_64/host/usr/lib/python3.11/site-packages/nuitka/utils/ReExecute.py
+--- a/nuitka/utils/ReExecute.py	2024-05-02 00:27:50.239135411 +0200
++++ b/nuitka/utils/ReExecute.py	2024-05-02 16:54:31.463942824 +0200
+@@ -55,7 +55,10 @@
+ def reExecuteNuitka(pgo_filename):
+     # Execute with full path as the process name, so it can find itself and its
+     # libraries.
+-    args = [os.environ["QEMU_USER"], sys.executable, sys.executable]
++    if os.environ["QEMU_USER"]:
++        args = [os.environ["QEMU_USER"], sys.executable, sys.executable]
++    else:
++        args = [sys.executable, sys.executable]
+ 
+     if sys.version_info >= (3, 7) and sys.flags.utf8_mode:
+         args += ["-X", "utf8"]

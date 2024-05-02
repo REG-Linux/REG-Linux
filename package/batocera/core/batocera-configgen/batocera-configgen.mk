@@ -124,7 +124,7 @@ endif
 
 BATOCERA_CONFIGGEN_SETUP_TYPE = setuptools
 
-define BATOCERA_CONFIGGEN_COMPILE_NUITKA
+define BATOCERA_CONFIGGEN_CROSS_COMPILE_NUITKA
 	$(HOST_DIR)/usr/bin/pip install pyudev
 	$(HOST_DIR)/usr/bin/pip install evdev
 	$(HOST_DIR)/usr/bin/pip install pillow
@@ -147,14 +147,42 @@ define BATOCERA_CONFIGGEN_COMPILE_NUITKA
 	--python-for-scons=$(HOST_DIR)/usr/bin/python \
 	--standalone configgen/emulatorlauncher.py \
 	--prefer-source-code --include-package=configgen
-	install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
 	#PATH=$(HOST_DIR)/usr/bin:$(PATH) \
 	#NUITKA_BINARY_NAME=$(HOST_DIR)/usr/bin/qemu-arm
 # --static-libpython=yes && \
 # --onefile
 
+	#install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
+	cp -r $(@D)/emulatorlauncher.dist/* $(TARGET_DIR)/usr/bin/
+	cd $(TARGET_DIR)/usr/bin && mv emulatorlauncher.bin emulatorlauncher
 endef
 
+define BATOCERA_CONFIGGEN_COMPILE_NUITKA
+	$(HOST_DIR)/usr/bin/pip install pyudev
+	$(HOST_DIR)/usr/bin/pip install evdev
+	$(HOST_DIR)/usr/bin/pip install pillow
+	$(HOST_DIR)/usr/bin/pip install ordered-set
+	$(HOST_DIR)/usr/bin/pip install zstandard
+	cd $(@D)/ && \
+	QEMU_USER="" \
+	PATH=$(STAGING_DIR)/usr/bin:$(PATH) \
+	NUITKA_CACHE_DIR=$(HOME)/.buildroot-ccache \
+	$(HOST_DIR)/usr/bin/python -m nuitka \
+	--python-for-scons=$(HOST_DIR)/usr/bin/python \
+	--static-libpython=yes \
+	--standalone configgen/emulatorlauncher.py \
+	--prefer-source-code --include-package=configgen
+	#PATH=$(HOST_DIR)/usr/bin:$(PATH) \
+	# --onefile
+	#install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
+	cp -r $(@D)/emulatorlauncher.dist/* $(TARGET_DIR)/usr/bin/
+	cd $(TARGET_DIR)/usr/bin && mv emulatorlauncher.bin emulatorlauncher
+endef
+
+ifeq ($(BR2_x86_64),y)
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_COMPILE_NUITKA
+else
+BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS += BATOCERA_CONFIGGEN_CROSS_COMPILE_NUITKA
+endif
 
 $(eval $(python-package))
