@@ -143,7 +143,9 @@ define BATOCERA_CONFIGGEN_COMPILE_NUITKA
 	PATH=$(STAGING_DIR)/usr/bin:$(PATH) \
 	QEMU_USER=$(QEMU_USER) \
 	$(QEMU_USER) \
-	$(TARGET_DIR)/usr/bin/python -m nuitka --standalone configgen/emulatorlauncher.py \
+	$(TARGET_DIR)/usr/bin/python -m nuitka \
+	--python-for-scons=$(HOST_DIR)/usr/bin/python \
+	--standalone configgen/emulatorlauncher.py \
 	--prefer-source-code --include-package=configgen
 	install -D -m 0755 $(@D)/emulatorlauncher.bin $(TARGET_DIR)/usr/bin/emulatorlauncher
 	#PATH=$(HOST_DIR)/usr/bin:$(PATH) \
