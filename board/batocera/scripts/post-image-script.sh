@@ -63,9 +63,6 @@ do
     echo "creating images/${BATOCERA_SUBTARGET}/boot.tar.zst"
     mkdir -p "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
     (cd "${REGLINUX_BINARIES_DIR}/boot" && tar -I "zstd" -cf "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot.tar.zst" *) || exit 1
-    
-    # rename the squashfs : the .update is the version that will be renamed at boot to replace the old version
-    mv "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" "${REGLINUX_BINARIES_DIR}/boot/boot/batocera" || exit 1
 
     # create *.img
     if [ "${BATOCERA_LOWER_TARGET}" = "${BATOCERA_SUBTARGET}" ]; then
