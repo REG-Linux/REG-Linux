@@ -69,12 +69,12 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Mupen64plus-video-rice bump to Jun 11, 2023 build
 - Mupen64plus-gliden64 bump to Feb 18, 2024 build
 - PPSSPP: bump to 1.17.1
-- Duckstation: bump to Feb 25, 2024 build
+- Duckstation to v0.1-6658
 - Libretro-ppsspp: bump to 1.17.1
 - Libretro-81: bump to Nov 1, 2023 build
 - Libretro-fbneo: bump to Feb 23, 2024 build (v1.0.0.03)
 - Libretro-genesisplusgx: bump to Feb 23, 2024 build
-- Libretro-mame: bump to Apr 5, 2024 build (mame 0.264)
+- Libretro-mame: to 0.265
 - Libretro-mame2003-plus: bump to Feb 21, 2024 build
 - Libretro-mupen64plus-next: bump to Feb 6, 2024 build
 - Libretro-neocd: bump to Feb 1, 2024 build
@@ -87,7 +87,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Redream to 1.5.0-1103-g47bc2b7
 - Ikemen Go to 0.99
 - Amiberry to 5.6.8
-- GroovyMAME to 0.264 SR 0.220b
+- GroovyMAME to 0.265 SR 0.220c
 - DOSBox-Staging to 0.81.1
 - DOSBox-X to 2024.03.01
 - SimCoupe to 1.2.13
@@ -102,7 +102,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Cemu to v2.0-78
 - Sonic3-AIR to v24.02.02.0-stable
 - Ruffle to 2024-03-28
-- Xenia Canary to build 122f58c (Commits on Mar 26, 2024)
+- Xenia Canary to build 5ca173c (Commits on Apr 26, 2024)
 - Xemu to v0.7.120
 - ScummVM to 2.8.1
 - fheroes2 to 1.0.13
@@ -112,6 +112,13 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Libretro-hatarib: bump to v0.3
 - Hatari to v2.5.0
 - Citra to ra8e601a
+- ETLegacy to v2.82.1
+- GZDoom to v4.12.2
+- Fallout2-CE to v1.3.0
+- Raze to v1.10.2
+- Vice to v3.8
+- The Force Engine to Apr 29, 2024 build
+- DXX-Rebirth to Apr 22, 2024 build
 ### System
 - Mainline Kernel 6.6.y bump to 6.6.23
 - Nvidia Production driver to 550.67
@@ -122,7 +129,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Mesa3d to 24.0.5
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.8.7
+- X86_64 kernel to 6.8.9
 - Switchres 0.220
 - Btop to 1.3.2
 - Linux firmware to 20240410
