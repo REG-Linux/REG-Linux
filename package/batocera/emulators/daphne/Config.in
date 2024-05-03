@@ -8,6 +8,8 @@ config BR2_PACKAGE_DAPHNE
     select BR2_PACKAGE_LIBVORBIS
     select BR2_PACKAGE_LIBMPEG2
     select BR2_PACKAGE_LIBZIP
+    # add ffmpeg dependency for configgen
+    select BR2_PACKAGE_FFMPEG
     help
       Hypseus is a fork of Daphne. A program that
       "lets one play the original versions of many

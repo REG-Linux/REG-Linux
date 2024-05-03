@@ -11,6 +11,9 @@ default:
 gba:
   emulator: libretro
   core:     gpsp
+nds:
+  emulator: drastic
+  core:     drastic
 mame:
   emulator: libretro
   core:     imame4all
@@ -54,11 +57,11 @@ atari2600:
   emulator: libretro
   core:     stella2014
 fbneo:
-  emulator: fba2x
-  core:     fba2x
+  emulator: libretro
+  core:     fbalpha
 neogeo:
-  emulator: fba2x
-  core:     fba2x
+  emulator: libretro
+  core:     fbalpha
 scummvm:
   emulator: libretro
   core:     scummvm

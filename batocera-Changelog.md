@@ -14,6 +14,7 @@ Add support for the Pironman case with RPI4 devices.
 Add support for OrangePi Zero 3 (all variants)
 Add support for Radxa Rock 3C
 Initial support for the Lenovo Legion Go
+Support for Nvidia cards requiring the legacy 340.108 driver.
 ### Added
 - Support for Lexaloffle Voxatron (needs official engine, no emulator provided)
 - C64: support for REU (RAM Expansion Unit), .d71 and .g64 ROM format
@@ -91,7 +92,7 @@ Initial support for the Lenovo Legion Go
 - DOSBox-X to 2024.03.01
 - SimCoupe to 1.2.13
 - Tsugaru to 20240223
-- Redream (x86_64) to Mar 10, 2024 build
+- Redream to 1.5.0-1125-g0f0a5c3
 - Fallout 1 CE to v1.1.0 (March 2024 release)
 - DevilutionX to 1.5.2
 - Commander Genius to 3.5.0

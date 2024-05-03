@@ -38,7 +38,7 @@ define SUDACHI_INSTALL_TARGET_CMDS
     $(INSTALL) -D $(@D)/buildroot-build/bin/sudachi-room $(TARGET_DIR)/usr/bin/
     #evmap config
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/sudachi/switch.sudachi.keys \
+    cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/sudachi/switch.sudachi.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 

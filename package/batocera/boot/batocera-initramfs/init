@@ -47,10 +47,10 @@ do_update_firmware() {
 
 # update the rootfs if needed
 do_update_rootfs() {
-    if test -e /boot_root/boot/batocera.update
+    if test -e /boot_root/boot/reglinux.update
     then
       mount -o remount,rw /boot_root || return 1
-      mv /boot_root/boot/batocera.update /boot_root/boot/batocera || return 1
+      mv /boot_root/boot/reglinux.update /boot_root/boot/reglinux || return 1
       # remove the overlay when updating
       if test -e /boot_root/boot/overlay
       then
@@ -188,13 +188,13 @@ do_root() {
     fi
 
     # mount the rootfs
-    mount /boot_root/boot/batocera /overlay_root/base || return 1
+    mount /boot_root/boot/reglinux /overlay_root/base || return 1
 
     # mount the future root in read write
     if ! mount -t overlay overlay -o rw,lowerdir=/overlay_root/base,upperdir=/overlay_root/overlay,workdir=/overlay_root/work /new_root
     then
 	# mount only as squashfs, no overlay (xu4 doesn't support overlayfs)
-	mount /boot_root/boot/batocera /new_root || return 1
+	mount /boot_root/boot/reglinux /new_root || return 1
     fi
 
     do_mount_firmware

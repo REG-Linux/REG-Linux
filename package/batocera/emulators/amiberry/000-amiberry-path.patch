@@ -41,7 +41,7 @@
  std::string get_whdbootpath()
  {
 -	return fix_trailing(whdboot_path);
-+	return std::string("/userdata/system/configs/amiberry/whdboot/");
++	return std::string("/usr/share/amiberry/whdboot/");
  }
  
  void set_whdbootpath(const std::string& newpath)
