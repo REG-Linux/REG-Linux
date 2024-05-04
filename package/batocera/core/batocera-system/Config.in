@@ -145,7 +145,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 
 	# minimal system required packages
 	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
-	select BR2_PACKAGE_BATOCERA_INITRAMFS		# initramfs to boot the system
+	#select BR2_PACKAGE_BATOCERA_INITRAMFS		# initramfs to boot the system
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
 	select BR2_PACKAGE_RNG_TOOLS			if !BR2_PACKAGE_BATOCERA_TARGET_RK3128 # system entropy. Currently disabled for RK3128 due to high CPU impact
 	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
@@ -411,6 +411,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_AYN_PLATFORM		if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
 
 	# REG-Linux
+	select BR2_PACKAGE_REGLINUX_INITRAMFS	# initramfs to boot the system
 	select BR2_PACKAGE_REGLINUX_SPLASH	# boot splash
 	select BR2_PACKAGE_REGLINUX_SAMBA	# samba
 	select BR2_PACKAGE_WSDD_NATIVE		# service discovery on local network (windows network neighborhood)
