@@ -7,12 +7,27 @@ import shutil
 import os
 import controllersConfig
 import filecmp
-import cv2
+import subprocess
+import shlex
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 class DaphneGenerator(Generator):
+
+    @staticmethod
+    # Returns: 1280x720 then we need to split the string in width and height values
+    def get_resolution(video_path):
+        cmd = "ffprobe -v error -select_streams v -show_entries stream=width,height -of csv=p=0:s=x"
+        args = shlex.split(cmd)
+        args.append(pathToInputVideo)
+        # run the ffprobe process, decode stdout into utf-8
+        ffprobeOutput = subprocess.check_output(args).decode('utf-8')
+
+        # find height and width
+        width  = ffprobeOutput.split("x")[0]
+        height = ffprobeOutput.split("x")[1]
+        return width, height
 
     @staticmethod
     def find_m2v_from_txt(txt_file):
@@ -36,14 +51,6 @@ class DaphneGenerator(Generator):
                 return os.path.join(root, filename)
 
         return None
-
-    @staticmethod
-    def get_resolution(video_path):
-        cap = cv2.VideoCapture(video_path)
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        cap.release()
-        return width, height
 
     # Main entry of the module
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
