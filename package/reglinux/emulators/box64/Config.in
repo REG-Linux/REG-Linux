@@ -1,0 +1,11 @@
+config BR2_PACKAGE_BOX64
+    bool "box86"
+    depends on BR2_aarch64
+    depends on BR2_PACKAGE_HOST_PYTHON3
+  
+    help
+      Box64
+
+      https://github.com/ptitseb/box64
+
+

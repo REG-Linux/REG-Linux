@@ -1,0 +1,11 @@
+config BR2_PACKAGE_BOX86
+    bool "box86"
+    depends on BR2_arm
+    depends on BR2_PACKAGE_HOST_PYTHON3
+  
+    help
+      Box86
+
+      https://github.com/ptitseb/box86
+
+
