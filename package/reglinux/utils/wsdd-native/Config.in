@@ -1,6 +1,8 @@
 config BR2_PACKAGE_WSDD_NATIVE
         bool "wsdd-native"
 	select BR2_HOST_CMAKE_AT_LEAST_3_26
+	select BR2_HOST_PACKAGE_LIBXML2
+	select BR2_PACKAGE_LIBXML2
 
         help
           wsdd implements a Web Service Discovery host daemon. This
