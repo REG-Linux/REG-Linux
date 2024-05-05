@@ -664,6 +664,12 @@ config BR2_PACKAGE_BATOCERA_ALL_SYSTEMS
 config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     bool "REG-Linux multisystems emulators support"
 
+    # Box86 user-mode x86 emulation for ARM
+    select BR2_PACKAGE_BOX86			if BR2_arm && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835
+
+    # Box64 user-mode x64_64 emulation for AArch64
+    select BR2_PACKAGE_BOX64			if BR2_aarch64
+
     # Mednafen
     select BR2_PACKAGE_MEDNAFEN			if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_riscv # build fails on RISC-V
 
