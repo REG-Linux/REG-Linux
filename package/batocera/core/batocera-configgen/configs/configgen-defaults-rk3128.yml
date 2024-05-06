@@ -2,6 +2,7 @@ default:
   emulator:
   core:
   options:
+    hud_support:     false
     videomode:      default
     ratio:          auto
     video_threaded: true
