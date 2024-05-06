@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-REGLINUX_RESCUE_VERSION = 0.2
+REGLINUX_RESCUE_VERSION = 0.3
+REGLINUX_RESCUE_DATE = 20240506
 REGLINUX_RESCUE_ARCH = ""
 ifeq ($(BR2_aarch64),y)
 REGLINUX_RESCUE_ARCH = aarch64
@@ -19,7 +20,7 @@ REGLINUX_RESCUE_ARCH = armv7
 endif
 endif
 
-REGLINUX_RESCUE_SOURCE = REG-linux-rescue-$(REGLINUX_RESCUE_ARCH)
+REGLINUX_RESCUE_SOURCE = REG-linux-rescue-$(REGLINUX_RESCUE_ARCH)-$(REGLINUX_RESCUE_VERSION)-$(REGLINUX_RESCUE_DATE)
 REGLINUX_RESCUE_SITE = https://github.com/REG-Linux/REG-rescue/releases/download/$(REGLINUX_RESCUE_VERSION)
 
 define REGLINUX_RESCUE_EXTRACT_CMDS

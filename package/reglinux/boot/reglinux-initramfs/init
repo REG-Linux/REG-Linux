@@ -20,6 +20,10 @@ do_update_modules() {
     if test -e /boot_root/boot/modules.update
     then
       mount -o remount,rw /boot_root || return 1
+      if test -e /boot_root/boot/modules
+      then
+        rm /boot_root/boot/modules || return 1
+      fi
       mv /boot_root/boot/modules.update /boot_root/boot/modules || return 1
       # remove the overlay when updating
       if test -e /boot_root/boot/overlay
@@ -35,6 +39,10 @@ do_update_firmware() {
     if test -e /boot_root/boot/firmware.update
     then
       mount -o remount,rw /boot_root || return 1
+      if test -e /boot_root/boot/firmware
+      then
+        rm /boot_root/boot/firmware || return 1
+      fi
       mv /boot_root/boot/firmware.update /boot_root/boot/firmware || return 1
       # remove the overlay when updating
       if test -e /boot_root/boot/overlay
@@ -101,22 +109,6 @@ do_rescue() {
     # Switch to rescue filesystem
     exec switch_root /new_root /sbin/init || return 1
 
-    # This code has to be executed by RESCUE init
-    # Find SHARE partition (UGLY)
-    #share_part = lsblk -l -o NAME,LABEL | grep SHARE | cut -d " " -f 1
-    #share_device = /dev/$(share_part)
-    #part=$1
-    #part=${part#/dev/}
-    #disk=$(readlink /sys/class/block/$part)
-    #disk=${disk%/*}
-    #disk=/dev/${disk##*/}
-
-    # TODO mount userdata partition
-    #mkdir -p /userdata
-    #mount $share_device /userdata || return 1
-
-    #mount --move /userdata     /new_root/userdata || return 1
-
     return 0
 }
 
@@ -158,7 +150,7 @@ do_root() {
     do_update_rootfs
 
     # create an overlay on memory
-    mount -t tmpfs -o size=256M tmpfs /overlay_root || return 1
+    mount -t tmpfs -o size=32M tmpfs /overlay_root || return 1
     mkdir /overlay_root/base /overlay_root/overlay /overlay_root/work /overlay_root/saved || return 1
 
     # fill the overlay with the stored one
@@ -176,7 +168,7 @@ do_root() {
     if test -f /boot_root/REG_RESCUE
     then
         mount -o remount,rw /boot_root || return 1
-        rm -f /boot/root/REG_RESCUE
+        rm -f /boot_root/REG_RESCUE
         mount -o remount,ro /boot_root || return 1
         do_rescue || return 1
         sync
@@ -188,7 +180,7 @@ do_root() {
     if test -f /boot_root/REG_UPDATE
     then
         mount -o remount,rw /boot_root || return 1
-        rm -f /boot/root/REG_UPDATE
+        rm -f /boot_root/REG_UPDATE
         mount -o remount,ro /boot_root || return 1
         do_update || return 1
 	sync
