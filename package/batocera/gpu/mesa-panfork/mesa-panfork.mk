@@ -6,7 +6,8 @@
 
 MESA_PANFORK_VERSION = 120202c675749c5ef81ae4c8cdc30019b4de08f4
 #MESA_PANFORK_SOURCE = mesa-$(MESA_PANFORK_VERSION).tar.xz
-MESA_PANFORK_SITE = https://gitlab.com/panfork/mesa.git
+# Now panfork is gone no more https://gitlab.com/panfork/mesa.git
+MESA_PANFORK_SITE = https://github.com/hbiyik/mesa
 MESA_PANFORK_SITE_METHOD = git
 MESA_PANFORK_LICENSE = MIT, SGI, Khronos
 MESA_PANFORK_LICENSE_FILES = docs/license.rst
