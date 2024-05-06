@@ -1,8 +1,8 @@
 default:
   options:
-    hud_support: false
     video_threaded: true
     smooth: false
+    hud_support: false
     retroarch.menu_driver: xmb
     retroarch.audio_driver: alsathread
 
