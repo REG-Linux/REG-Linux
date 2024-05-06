@@ -1,5 +1,6 @@
 default:
   options:
+    hud_support: none
     # menu retroarch
     retroarch.audio_latency:   64
     retroarch.video_hard_sync: 0
@@ -22,10 +23,6 @@ psx:
 fmtowns:
   emulator: libretro
   core:     mame
-n64:
-  options:
-    # hud breaking mupen64
-    hud_support: none
 nds:
   emulator: drastic
   core:     drastic

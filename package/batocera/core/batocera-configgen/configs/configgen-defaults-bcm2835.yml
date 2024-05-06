@@ -1,5 +1,6 @@
 default:
   options:
+    rewind:      false
     hud_support: false
     video_threaded: true
     videomode: max-1280x720
