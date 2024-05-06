@@ -1,3 +1,7 @@
+default:
+  options:
+    hud_support: false
+
 nds:
   emulator: drastic
   core:     drastic
