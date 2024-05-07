@@ -51,7 +51,7 @@ index 0000000..957855f
 +	//rockchip,lane-rate = <1000>;
 +	dsi0_panel: panel@0 {
 +		status = "okay";
-+		compatible = "simple-panel-dsi";
++		compatible = "simple-panel-dsi", "gameforce,hx8399c";
 +		reg = <0>;
 +		backlight = <&backlight>;
 +		reset-delay-ms = <120>;
@@ -141,3 +141,48 @@ index 0000000..957855f
 +	};
 +
 +};
+--- a/drivers/gpu/drm/panel/panel-simple.c	2024-05-07 19:29:49.656066751 +0200
++++ b/drivers/gpu/drm/panel/panel-simple.c	2024-05-07 19:50:03.819584530 +0200
+@@ -4254,6 +4252,32 @@
+ 	.flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
+ };
+ 
++static const struct drm_display_mode hx8399c_mode = {
++	.clock = 136000,
++	.hdisplay = 1080,
++	.hsync_start = 1080 + 32,
++	.hsync_end = 1080 + 32 + 8,
++	.htotal = 1080 + 32 + 8 + 32,
++	.vdisplay = 1920,
++	.vsync_start = 1920 + 22,
++	.vsync_end = 1920 + 22 + 2,
++	.vtotal = 1920 + 22 + 2 + 23,
++	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
++};
++
++static const struct panel_desc hx8399c = {
++	.modes = &hx8399c_mode,
++	.num_modes = 1,
++	.bpc = 8,
++	.size = {
++		.width = 68,
++		.height = 120,
++	},
++	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
++	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
++	.connector_type = DRM_MODE_CONNECTOR_DSI,
++};
++
+ static const struct panel_desc yes_optoelectronics_ytc700tlag_05_201c = {
+ 	.modes = &yes_optoelectronics_ytc700tlag_05_201c_mode,
+ 	.num_modes = 1,
+@@ -4688,6 +4712,9 @@
+ 		.compatible = "yes-optoelectronics,ytc700tlag-05-201c",
+ 		.data = &yes_optoelectronics_ytc700tlag_05_201c,
+ 	}, {
++		.compatible = "gameforce,hx8399c",
++		.data = &hx8399c,
++	}, {
+ 		/* Must be the last entry */
+ 		.compatible = "panel-dpi",
+ 		.data = &panel_dpi,

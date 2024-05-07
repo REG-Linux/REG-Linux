@@ -12,15 +12,17 @@ BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
 BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/patches"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/fsoverlay"
 
-# Linux headers same as kernel, a 5.10 series
+# Linux headers same as kernel, a 6.1 series
 BR2_KERNEL_HEADERS_AS_KERNEL=y
-BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_10=y
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_1=y
 
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_GIT=y
+#BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/Joshua-Riek/linux-rockchip.git"
+#BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="c07dc64a761d90a6db91a980f28ab15c818e4b89"
 BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/armbian/linux-rockchip.git"
-BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="494c0a303537c55971421b5552d98eb55e652cf3"
+BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="cdbd7566a3a017d407c8a9a9af176c7ca46c8c69"
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/linux_patches"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/linux-defconfig.config"
