@@ -3,7 +3,7 @@ config BR2_PACKAGE_FLYCAST
     depends on BR2_PACKAGE_SDL2
     depends on BR2_PACKAGE_LIBPNG
     depends on BR2_PACKAGE_LIBZIP
-    depends on BR2_GCC_ENABLE_OPENMP
+    depends on BR2_TOOLCHAIN_HAS_OPENMP
     select BR2_PACKAGE_BOOST
     select BR2_PACKAGE_BOOST_NOWIDE
     select BR2_PACKAGE_LIBAO

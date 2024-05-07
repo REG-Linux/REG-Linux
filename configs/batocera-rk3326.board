@@ -1,3 +1,4 @@
+include bootlin-aarch64.common
 include batocera-board.common
 
 # Target definition

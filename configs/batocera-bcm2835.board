@@ -1,3 +1,4 @@
+include bootlin-armhf.common
 include batocera-board.common
 
 # Target definiton

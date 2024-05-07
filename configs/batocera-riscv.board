@@ -1,3 +1,4 @@
+include bootlin-riscv64.common
 include batocera-board.common
 
 # Target definition (RV64GC, aka riscv64gc)
