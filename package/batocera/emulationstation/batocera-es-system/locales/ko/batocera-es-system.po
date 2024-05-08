@@ -10823,7 +10823,7 @@ msgstr "픽셀당"
 
 #. TRANSLATION: fpinball
 msgctxt "game_options"
-msgid "Allow mapping Future Pinabll with Pad to Keyboard."
+msgid "Allow mapping Future Pinball with Pad to Keyboard."
 msgstr ""
 
 #. TRANSLATION: fpinball
@@ -13092,36 +13092,24 @@ msgid "Enable vertical sync to avoid tearing in some cases."
 msgstr "경우에 따라 찢어짐을 방지하기 위해 수직 동기화를 활성화합니다."
 
 #. TRANSLATION: redream
-#, fuzzy
 msgctxt "game_options"
-msgid ""
-"Choose the amount of polygon sort accuracy (Higher may cause artifacts)."
+msgid "RENDER MODE"
 msgstr ""
-"다각형 정렬 정확도의 양을 선택합니다(높을수록 아티팩트가 발생할 수 있음)."
 
 #. TRANSLATION: redream
-#, fuzzy
 msgctxt "game_options"
-msgid "POLYGON SORT ACCURACY"
-msgstr "다각형 정렬 정확도"
+msgid "HLE (per-strip)"
+msgstr ""
 
 #. TRANSLATION: redream
-#, fuzzy
 msgctxt "game_options"
-msgid "Per-strip (Default)"
-msgstr "스트립당(기본값)"
+msgid "HLE (per-pixel)"
+msgstr ""
 
 #. TRANSLATION: redream
-#, fuzzy
 msgctxt "game_options"
-msgid "Per-pixel (32 layers)"
-msgstr "픽셀당(32개 레이어)"
-
-#. TRANSLATION: redream
-#, fuzzy
-msgctxt "game_options"
-msgid "Per-pixel (64 layers)"
-msgstr "픽셀당(64개 레이어)"
+msgid "LLE"
+msgstr ""
 
 #. TRANSLATION: redream
 msgctxt "game_options"
@@ -15069,7 +15057,7 @@ msgstr ""
 #. TRANSLATION: xenia, xenia-canary
 msgctxt "game_options"
 msgid ""
-"This option enables the ability to play Xbox Live Arcacde games. May cause "
+"This option enables the ability to play Xbox Live Arcade games. May cause "
 "compatibility issues with non-XBLA games."
 msgstr ""
 
@@ -15792,6 +15780,71 @@ msgstr ""
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "FULL SINGLE SCREEN"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Enable the custom values below."
+msgstr ""
+
+#. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
+msgctxt "game_options"
+msgid "DISPLAY PHYSICAL SETUP"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "ENABLE CUSTOM DISPLAY PHYSICAL SETUP"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Long visible screen edge (cm)"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "SCREEN WIDTH"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Short visible screen edge (cm)"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "SCREEN HEIGHT"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Screen inclination (degree)"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "SCREEN INCLINATION"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Player distance from lower screen edge (cm)"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "SCREEN PLAYER Y"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "Player's eyes distance from lower screen edge (cm)"
+msgstr ""
+
+#. TRANSLATION: vpinball
+msgctxt "game_options"
+msgid "SCREEN PLAYER Z"
 msgstr ""
 
 #. TRANSLATION: vpinball
@@ -16935,6 +16988,33 @@ msgstr ""
 msgctxt "keys_files"
 msgid "Configuration menu"
 msgstr ""
+
+#, fuzzy
+#~ msgctxt "game_options"
+#~ msgid ""
+#~ "Choose the amount of polygon sort accuracy (Higher may cause artifacts)."
+#~ msgstr ""
+#~ "다각형 정렬 정확도의 양을 선택합니다(높을수록 아티팩트가 발생할 수 있음)."
+
+#, fuzzy
+#~ msgctxt "game_options"
+#~ msgid "POLYGON SORT ACCURACY"
+#~ msgstr "다각형 정렬 정확도"
+
+#, fuzzy
+#~ msgctxt "game_options"
+#~ msgid "Per-strip (Default)"
+#~ msgstr "스트립당(기본값)"
+
+#, fuzzy
+#~ msgctxt "game_options"
+#~ msgid "Per-pixel (32 layers)"
+#~ msgstr "픽셀당(32개 레이어)"
+
+#, fuzzy
+#~ msgctxt "game_options"
+#~ msgid "Per-pixel (64 layers)"
+#~ msgstr "픽셀당(64개 레이어)"
 
 #~ msgctxt "game_options"
 #~ msgid "AMD FidelityFX (Vulkan Only)"
