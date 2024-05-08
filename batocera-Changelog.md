@@ -107,7 +107,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Sonic3-AIR to v24.02.02.0-stable
 - Ruffle to 2024-03-28
 - Xenia Canary to build 5ca173c (Commits on Apr 26, 2024)
-- Xemu to v0.7.120
+- Xemu to v0.7.121
 - ScummVM to 2.8.1
 - fheroes2 to 1.0.13
 - PCSX2 to v1.7.5748
@@ -124,6 +124,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - The Force Engine to Apr 29, 2024 build (Supports HD Textures)
 - DXX-Rebirth to Apr 22, 2024 build
 - BigPemu to v113 (Linux Build)
+- Xenia to v1.0.2810
 ### System
 - Mainline Kernel 6.6.y bump to 6.6.23
 - Nvidia Production driver to 550.67
