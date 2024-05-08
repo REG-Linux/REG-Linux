@@ -8256,7 +8256,7 @@ fpinball:
   cfeatures:
     fpcontroller:
       prompt: CONTROLLER CONFIGURATION
-      description: Allow mapping Future Pinabll with Pad to Keyboard.
+      description: Allow mapping Future Pinball with Pad to Keyboard.
       choices:
         "Disabled (Default)": false
         "Enabled":            true
@@ -9566,7 +9566,7 @@ redream:
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
   cfeatures:
       redreamResolution:
-          prompt:      RENDERING RESOLUTION
+          prompt: RENDERING RESOLUTION
           description: Choose your render resolution (Requires personal redream.key file).
           choices:
               "1x (640x480)":            1
@@ -9576,42 +9576,40 @@ redream:
               "5x (3200x2400)":          5
               "6x (3840x2880)":          6
       redreamRatio:
-          prompt:      ASPECT RATIO
+          prompt: ASPECT RATIO
           description: Choose your preferred aspect ratio.
           choices:
               "4:3 (Default)": "4:3"
               "16:9":          "16:9"
               "Stretch":       stretch
       redreamFrameSkip:
-          prompt:      FRAMESKIP
+          prompt: FRAMESKIP
           description: Enable auto frameskipping for performance on lower-end systems.
           choices:
               "Off (Default)" : 0
               "On"            : 1
       redreamVsync:
-          group: ADVANCED OPTIONS
-          prompt:      VSYNC
+          prompt: VSYNC
           description: Enable vertical sync to avoid tearing in some cases.
           choices:
               "Off (Default)": 0
               "On"           : 1
-      redreamPolygon:
+      redreamRender:
           group: ADVANCED OPTIONS
-          prompt:      POLYGON SORT ACCURACY
-          description: Choose the amount of polygon sort accuracy (Higher may cause artifacts).
+          prompt: RENDER MODE
           choices:
-              "Per-strip (Default)":   0
-              "Per-pixel (32 layers)": 32
-              "Per-pixel (64 layers)": 64
+              "HLE (per-strip)": hle_perstrip
+              "HLE (per-pixel)": 1hle_perpixel
+              "LLE":             lle
       redreamRegion:
-          prompt:      REGION
+          prompt: REGION
           description: Choose the Dreamcast console region.
           choices:
               "USA (Default)": usa
               "Europe":        europe
               "Japan":         japan
       redreamLanguage:
-          prompt:      LANGUAGE
+          prompt: LANGUAGE
           description: Choose the Dreamcast console language.
           choices:
               "English (Default)": english
@@ -9621,7 +9619,7 @@ redream:
               "Italian":           italian
               "Japanese":          japanese
       redreamBroadcast:
-          prompt:      BROADCAST
+          prompt: BROADCAST
           description: Choose broadcast standard (for older TV's).
           choices:
               "NTSC (Default)": ntsc
@@ -9629,7 +9627,7 @@ redream:
               "PAL_M":          pal_m
               "PAL_N":          pal_n
       redreamCable:
-          prompt:      CABLE
+          prompt: CABLE
           description: Choose cable type for the TV.
           choices:
               "VGA (Default)": vga
@@ -11974,7 +11972,7 @@ xenia:
                 "Enabled":  "true"
         xeniaLicense:
             prompt: XBOX LIVE ARCADE
-            description: This option enables the ability to play Xbox Live Arcacde games. May cause compatibility issues with non-XBLA games.
+            description: This option enables the ability to play Xbox Live Arcade games. May cause compatibility issues with non-XBLA games.
             choices:
                 "No licenses enabled":                      0
                 "XBLA license enabled (Default)":           1
@@ -12095,7 +12093,7 @@ xenia-canary:
   cfeatures:
         xeniaLicense:
             prompt: XBOX LIVE ARCADE
-            description: This option enables the ability to play Xbox Live Arcacde games. May cause compatibility issues with non-XBLA games.
+            description: This option enables the ability to play Xbox Live Arcade games. May cause compatibility issues with non-XBLA games.
             choices:
                 "No licenses enabled":                     0
                 "XBLA license enabled (Default)":          1
@@ -12604,6 +12602,41 @@ vpinball:
         "DESKTOP": 0
         "FULLSCREEN": 1
         "FULL SINGLE SCREEN": 2
+    vpinball_customphysicalsetup:
+      group: DISPLAY PHYSICAL SETUP
+      prompt: ENABLE CUSTOM DISPLAY PHYSICAL SETUP
+      description: Enable the custom values below.
+      preset: switch
+    vpinball_screenwidth:
+      group: DISPLAY PHYSICAL SETUP
+      prompt: SCREEN WIDTH
+      description: Long visible screen edge (cm)
+      preset: slider
+      preset_parameters: 20 120 0.5 90
+    vpinball_screenheight:
+      group: DISPLAY PHYSICAL SETUP
+      prompt: SCREEN HEIGHT
+      description: Short visible screen edge (cm)
+      preset: slider
+      preset_parameters: 10 80 0.5 50
+    vpinball_screeninclination:
+      group: DISPLAY PHYSICAL SETUP
+      prompt: SCREEN INCLINATION
+      description: Screen inclination (degree)
+      preset: slider
+      preset_parameters: 0 90 0.5 0
+    vpinball_screenplayery:
+      group: DISPLAY PHYSICAL SETUP
+      prompt: SCREEN PLAYER Y
+      description: Player distance from lower screen edge (cm)
+      preset: slider
+      preset_parameters: -30 50 0.5 0
+    vpinball_screenplayerz:
+      group: DISPLAY PHYSICAL SETUP
+      prompt: SCREEN PLAYER Z
+      description: Player's eyes distance from lower screen edge (cm)
+      preset: slider
+      preset_parameters: 15 120 0.5 70
     vpinball_musicvolume:
       group: AUDIO
       prompt: MUSIC VOLUME
