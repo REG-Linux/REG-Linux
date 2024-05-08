@@ -19,14 +19,14 @@ endef
 SONIC3_AIR_PRE_CONFIGURE_HOOKS += SONIC3_AIR_ADD_GLES2_CMAKE
 
 # CMakeLists.txt in subfolder
-ifeq ($(BR2_PACKAGE_XORG7),y)
+ifeq ($(BR2_x86_64),y)
 SONIC3_AIR_SUBDIR = Oxygen/sonic3air/build/_cmake
 else
 SONIC3_AIR_SUBDIR = Oxygen/sonic3air/build/_gles2
 endif
 
 SONIC3_AIR_DEPENDENCIES += alsa-lib pulseaudio libcurl mesa3d zlib
-ifeq ($(BR2_PACKAGE_XORG7),y)
+ifeq ($(BR2_x86_64),y)
 SONIC3_AIR_DEPENDENCIES += xlib_libXxf86vm xlib_libXcomposite libglu
 endif
 

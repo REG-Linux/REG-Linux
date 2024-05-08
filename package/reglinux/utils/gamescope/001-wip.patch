@@ -1,0 +1,413 @@
+--- a/src/rendervulkan.cpp	2024-05-08 23:34:25.633228023 +0200
++++ b/src/rendervulkan.cpp	2024-05-08 23:24:56.368126029 +0200
+@@ -287,18 +287,35 @@
+ 	#undef VK_FUNC
+ 
+ 	if (!selectPhysDev(surface))
++	{
++		fprintf(stderr, "selectPhysDev failed");
+ 		return false;
++	}
+ 	if (!createDevice())
++	{
++		fprintf(stderr, "createDevice failed");
+ 		return false;
++	}
+ 	if (!createLayouts())
++	{
++		fprintf(stderr, "createLayouts failed");
+ 		return false;
++	}
+ 	if (!createPools())
++	{
++		fprintf(stderr, "createPools failed");
+ 		return false;
++	}
+ 	if (!createShaders())
++	{
++		fprintf(stderr, "createShaders failed");
+ 		return false;
++	}
+ 	if (!createScratchResources())
++	{
++		fprintf(stderr, "createScratchResources failed");
+ 		return false;
+-
++	}
+ 	m_bInitialized = true;
+ 
+ 	std::thread piplelineThread([this](){compileAllPipelines();});
+@@ -436,7 +453,10 @@
+ 	vk_log.infof( "physical device %s DRM format modifiers", m_bSupportsModifiers ? "supports" : "does not support" );
+ 
+ 	if ( !GetBackend()->ValidPhysicalDevice( physDev() ) )
++	{
++		fprintf(stderr, "\nGetBackend()->ValidPhysicalDevice() failed\n");
+ 		return false;
++	}
+ 
+ #if HAVE_DRM
+ 	// XXX(JoshA): Move this to ValidPhysicalDevice.
+@@ -486,7 +506,7 @@
+ #endif
+ 	{
+ 		vk_log.errorf( "physical device doesn't support VK_EXT_physical_device_drm" );
+-		return false;
++		// $HACK return false;
+ 	}
+ 
+ 	if ( m_bSupportsModifiers && !supportsForeignQueue ) {
+@@ -538,6 +558,7 @@
+ 
+ 	if ( GetBackend()->UsesVulkanSwapchain() )
+ 	{
++		fprintf(stderr, "\n USE VULKAN SWAPCHAIN TRUE \n");
+ 		enabledExtensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
+ 		enabledExtensions.push_back( VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME );
+ 
+@@ -547,6 +568,7 @@
+ 
+ 	if ( m_bSupportsModifiers )
+ 	{
++		fprintf(stderr, "\n SUPPORTS MODIFIERS TRUE \n");
+ 		enabledExtensions.push_back( VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME );
+ 		enabledExtensions.push_back( VK_EXT_QUEUE_FAMILY_FOREIGN_EXTENSION_NAME );
+ 	}
+@@ -554,10 +576,7 @@
+ 	enabledExtensions.push_back( VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME );
+ 	enabledExtensions.push_back( VK_EXT_EXTERNAL_MEMORY_DMA_BUF_EXTENSION_NAME );
+ 
+-	enabledExtensions.push_back( VK_EXT_ROBUSTNESS_2_EXTENSION_NAME );
+-#if 0
+-	enabledExtensions.push_back( VK_KHR_MAINTENANCE_5_EXTENSION_NAME );
+-#endif
++	//enabledExtensions.push_back( VK_EXT_ROBUSTNESS_2_EXTENSION_NAME );
+ 
+ 	if ( supportsHDRMetadata )
+ 		enabledExtensions.push_back( VK_EXT_HDR_METADATA_EXTENSION_NAME );
+@@ -565,36 +584,8 @@
+ 	for ( auto& extension : GetBackend()->GetDeviceExtensions( physDev() ) )
+ 		enabledExtensions.push_back( extension );
+ 
+-#if 0
+-	VkPhysicalDeviceMaintenance5FeaturesKHR maintenance5 = {
+-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_FEATURES_KHR,
+-		.maintenance5 = VK_TRUE,
+-	};
+-#endif
+-
+-	VkPhysicalDeviceVulkan13Features features13 = {
+-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
+-#if 0
+-		.pNext = &maintenance5,
+-#endif
+-		.dynamicRendering = VK_TRUE,
+-	};
+-
+-	VkPhysicalDevicePresentWaitFeaturesKHR presentWaitFeatures = {
+-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_WAIT_FEATURES_KHR,
+-		.pNext = &features13,
+-		.presentWait = VK_TRUE,
+-	};
+-
+-	VkPhysicalDevicePresentIdFeaturesKHR presentIdFeatures = {
+-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PRESENT_ID_FEATURES_KHR,
+-		.pNext = &presentWaitFeatures,
+-		.presentId = VK_TRUE,
+-	};
+-
+ 	VkPhysicalDeviceFeatures2 features2 = {
+ 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+-		.pNext = &presentIdFeatures,
+ 		.features = {
+ 			.shaderInt16 = m_bSupportsFp16,
+ 		},
+@@ -602,33 +593,12 @@
+ 
+ 	VkDeviceCreateInfo deviceCreateInfo = {
+ 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+-		.pNext = &features2,
+ 		.queueCreateInfoCount = m_queueFamily == m_generalQueueFamily ? 1u : 2u,
+ 		.pQueueCreateInfos = queueCreateInfos,
+ 		.enabledExtensionCount = (uint32_t)enabledExtensions.size(),
+ 		.ppEnabledExtensionNames = enabledExtensions.data(),
+ 	};
+ 
+-	VkPhysicalDeviceVulkan12Features vulkan12Features = {
+-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+-		.pNext = std::exchange(features2.pNext, &vulkan12Features),
+-		.shaderFloat16 = m_bSupportsFp16,
+-		.scalarBlockLayout = VK_TRUE,
+-		.timelineSemaphore = VK_TRUE,
+-	};
+-
+-	VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcrFeatures = {
+-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES,
+-		.pNext = std::exchange(features2.pNext, &ycbcrFeatures),
+-		.samplerYcbcrConversion = VK_TRUE,
+-	};
+-
+-	VkPhysicalDeviceRobustness2FeaturesEXT robustness2Features = {
+-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT,
+-		.pNext = std::exchange(features2.pNext, &robustness2Features),
+-		.nullDescriptor = VK_TRUE,
+-	};
+-
+ 	VkResult res = vk.CreateDevice(physDev(), &deviceCreateInfo, nullptr, &m_device);
+ 	if ( res == VK_ERROR_NOT_PERMITTED_KHR && g_bNiceCap )
+ 	{
+@@ -1988,6 +1958,7 @@
+ 			modifiers.push_back( modifier );
+ 		}
+ 
++		/* HACK
+ 		assert( modifiers.size() > 0 );
+ 
+ 		modifierListInfo = {
+@@ -1996,18 +1967,21 @@
+ 			.drmFormatModifierCount = uint32_t(modifiers.size()),
+ 			.pDrmFormatModifiers = modifiers.data(),
+ 		};
++		*/
+ 
+-		externalImageCreateInfo = {
++		/* TO HACK OR NOT TO HACK */
++		/*externalImageCreateInfo = {
+ 			.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO,
+ 			.pNext = std::exchange(imageInfo.pNext, &externalImageCreateInfo),
+ 			.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT,
+-		};
++		};*/
+ 
+ 		imageInfo.tiling = tiling = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
+ 	}
+ 
+ 	if ( GetBackend()->UsesModifiers() && flags.bFlippable == true && tiling != VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT )
+ 	{
++		fprintf( stderr, "\n want scanout image (MESA ext) \n");
+ 		// We want to scan-out the image
+ 		wsiImageCreateInfo = {
+ 			.sType = VK_STRUCTURE_TYPE_WSI_IMAGE_CREATE_INFO_MESA,
+@@ -2015,9 +1989,10 @@
+ 			.scanout = VK_TRUE,
+ 		};
+ 	}
+-	
++
+ 	if ( pDMA != nullptr )
+ 	{
++		fprintf( stderr, "\n pMDA not null, pMDA = 0x%x \n", pDMA);
+ 		externalImageCreateInfo = {
+ 			.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO,
+ 			.pNext = std::exchange(imageInfo.pNext, &externalImageCreateInfo),
+@@ -2047,7 +2022,10 @@
+ 		vk_errorf( res, "vkCreateImage failed" );
+ 		return false;
+ 	}
+-	
++	else {
++		fprintf (stderr, "\nvkCreateImage OK\n");
++	}
++
+ 	VkMemoryRequirements memRequirements;
+ 	g_device.vk.GetImageMemoryRequirements(g_device.device(), m_vkImage, &memRequirements);
+ 
+@@ -2077,7 +2055,7 @@
+ 				.image = m_vkImage,
+ 			};
+ 		}
+-		
++
+ 		if ( flags.bExportable == true && pDMA == nullptr )
+ 		{
+ 			// We'll export it to DRM
+@@ -2087,7 +2065,7 @@
+ 				.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT,
+ 			};
+ 		}
+-		
++
+ 		if ( pDMA != nullptr )
+ 		{
+ 			// TODO: multi-planar DISTINCT DMA-BUFs support (see vkBindImageMemory2
+@@ -2117,12 +2095,14 @@
+ 					.fd = fd,
+ 			};
+ 		}
+-		
++
+ 		res = g_device.vk.AllocateMemory( g_device.device(), &allocInfo, nullptr, &memoryHandle );
+ 		if ( res != VK_SUCCESS )
+ 		{
+ 			vk_errorf( res, "vkAllocateMemory failed" );
+ 			return false;
++		} else {
++			fprintf (stderr, "\nvkAllocateMemory OK\n");
+ 		}
+ 
+ 		m_vkImageMemory = memoryHandle;
+@@ -2141,10 +2121,13 @@
+ 	{
+ 		vk_errorf( res, "vkBindImageMemory failed" );
+ 		return false;
++	} else {
++			fprintf (stderr, "\nvkBindImageMemory OK\n");
+ 	}
+ 
+ 	if ( flags.bMappable == true )
+ 	{
++		fprintf (stderr, "\n flags.bMappable = true\n");
+ 		assert( tiling != VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT );
+ 		const VkImageSubresource image_subresource = {
+ 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+@@ -2156,6 +2139,7 @@
+ 
+ 		if (isYcbcr())
+ 		{
++			fprintf (stderr, "\n isYcbcr = true\n");
+ 			const VkImageSubresource lumaSubresource = {
+ 				.aspectMask = VK_IMAGE_ASPECT_PLANE_0_BIT,
+ 			};
+@@ -2178,6 +2162,7 @@
+ 	
+ 	if ( flags.bExportable == true )
+ 	{
++		fprintf (stderr, "\nflags.bExportable = true\n");
+ 		// We assume we own the memory when doing this right now.
+ 		// We could support the import scenario as well if needed (but we
+ 		// already have a DMA-BUF in that case).
+@@ -2190,16 +2175,24 @@
+ 		};
+ 		assert( dmabuf.format != DRM_FORMAT_INVALID );
+ 
++		fprintf( stderr, "dmabuf width %d height %d format 0x%x", dmabuf.width, dmabuf.height, dmabuf.format);
++
+ 		// TODO: disjoint planes support
+ 		const VkMemoryGetFdInfoKHR memory_get_fd_info = {
+ 			.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR,
+ 			.memory = memoryHandle,
+ 			.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT,
+ 		};
++		assert(g_device.vk.GetMemoryFdKHR);
++		//assert(memory_get_fd_info);
++		//assert(dmabuf);
++		assert(dmabuf.fd);
+ 		res = g_device.vk.GetMemoryFdKHR(g_device.device(), &memory_get_fd_info, &dmabuf.fd[0]);
+ 		if ( res != VK_SUCCESS ) {
+ 			vk_errorf( res, "vkGetMemoryFdKHR failed" );
+ 			return false;
++		} else {
++			fprintf (stderr, "\nvkGetMemoryFdKHR OKAY \n");
+ 		}
+ 
+ 		if ( tiling == VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT )
+@@ -2214,6 +2207,8 @@
+ 			if ( res != VK_SUCCESS ) {
+ 				vk_errorf( res, "vkGetImageDrmFormatModifierPropertiesEXT failed" );
+ 				return false;
++			} else {
++				fprintf (stderr, "\nvkGetImageDrmFormatModifierPropertiesEXT OKAY\n");
+ 			}
+ 			dmabuf.modifier = imgModifierProps.drmFormatModifier;
+ 
+@@ -2305,6 +2300,8 @@
+ 		if ( res != VK_SUCCESS ) {
+ 			vk_errorf( res, "vkCreateImageView failed" );
+ 			return false;
++		} else {
++			fprintf (stderr, "\nvkCreateImageView OKAY (1)");
+ 		}
+ 
+ 		if ( flags.bSampled )
+@@ -2319,6 +2316,8 @@
+ 			if ( res != VK_SUCCESS ) {
+ 				vk_errorf( res, "vkCreateImageView failed" );
+ 				return false;
++			} else {
++				fprintf (stderr, "\nvkCreateImageView OKAY (2)");
+ 			}
+ 		}
+ 
+@@ -2333,6 +2332,8 @@
+ 			if ( res != VK_SUCCESS ) {
+ 				vk_errorf( res, "vkCreateImageView failed" );
+ 				return false;
++			} else {
++				fprintf (stderr, "\nvkCreateImageView OKAY (3)");
+ 			}
+ 
+ 			createInfo.pNext = NULL;
+@@ -2342,6 +2343,8 @@
+ 			if ( res != VK_SUCCESS ) {
+ 				vk_errorf( res, "vkCreateImageView failed" );
+ 				return false;
++			} else {
++				fprintf (stderr, "\nvkCreateImageView OKAY (4)");
+ 			}
+ 
+ 			createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+@@ -2363,12 +2366,17 @@
+ 				vk_errorf( res, "vkMapMemory failed" );
+ 				return false;
+ 			}
++			else {
++				fprintf (stderr, "\nvkMapMemory OKAY");
++			}
+ 			m_pMappedData = (uint8_t*)pData;
+ 		}
+ 	}
+ 	
+ 	m_bInitialized = true;
+ 	
++	fprintf (stderr, "\nBinit returns OKAY\n");
++
+ 	return true;
+ }
+ 
+@@ -3267,7 +3275,7 @@
+ 			.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+ 			.pEngineName        = "hopefully not just some code",
+ 			.engineVersion      = VK_MAKE_VERSION(1, 0, 0),
+-			.apiVersion         = VK_API_VERSION_1_3,
++			.apiVersion         = VK_API_VERSION_1_2,
+ 		};
+ 
+ 		const VkInstanceCreateInfo createInfo = {
+@@ -3293,10 +3301,16 @@
+ bool vulkan_init( VkInstance instance, VkSurfaceKHR surface )
+ {
+ 	if (!g_device.BInit(instance, surface))
++	{
++                fprintf( stderr, "g_device.BInit failed" );
+ 		return false;
++	}
+ 
+ 	if (!init_nis_data())
++	{
++                fprintf( stderr, "init_nis_data failed" );
+ 		return false;
++	}
+ 
+ 	if ( GetBackend()->UsesVulkanSwapchain() )
+ 	{
+--- a/src/drm.cpp	2024-05-08 23:34:25.633228023 +0200
++++ b/src/drm.cpp	2024-05-08 22:40:34.614641702 +0200
+@@ -1393,6 +1393,7 @@
+ 	uint32_t handles[4] = {0};
+ 	uint64_t modifiers[4] = {0};
+ 	for ( int i = 0; i < dma_buf->n_planes; i++ ) {
++		fprintf (stderr, "\ndrmPrimeFDToHandle drm->fd=%d dma_buf->fd[%d]=%d",drm->fd,i,dma_buf->fd[i]);
+ 		if ( drmPrimeFDToHandle( drm->fd, dma_buf->fd[i], &handles[i] ) != 0 )
+ 		{
+ 			drm_log.errorf_errno("drmPrimeFDToHandle failed");
+@@ -2991,7 +2992,9 @@
+ 
+ 		virtual bool Init() override
+ 		{
+-			if ( !vulkan_init( vulkan_get_instance(), VK_NULL_HANDLE ) )
++			VkInstance vkInstance = vulkan_get_instance();
++			fprintf( stderr, "vulkan_get_instance() returns 0x%x", vkInstance);
++			if ( !vulkan_init( vkInstance, VK_NULL_HANDLE ) )
+ 			{
+ 				fprintf( stderr, "Failed to initialize Vulkan\n" );
+ 				return false;

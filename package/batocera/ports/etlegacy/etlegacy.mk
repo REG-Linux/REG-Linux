@@ -13,7 +13,8 @@ ETLEGACY_LICENSE_FILE = COPYING.txt
 
 ETLEGACY_DEPENDENCIES += freetype libcurl libpng libtheora
 ETLEGACY_DEPENDENCIES += libvorbis lua openal openssl sdl2
-ifeq ($(BR2_PACKAGE_XORG7),y)
+
+ifeq ($(BR2_x86_64),y)
 ETLEGACY_DEPENDENCIES += libglew
 endif
 
