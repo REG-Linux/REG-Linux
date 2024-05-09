@@ -13,6 +13,8 @@ snes:
       bsnes:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES]       }
       bsnes_hd:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_HD]    }
       mesen-s:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS]      }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:snes
   comment_fr: |
@@ -202,6 +204,8 @@ nes:
       fceumm:   { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FCEUMM] }
       nestopia: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_NESTOPIA] }
       mesen:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESEN] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:nes
   comment_fr: |
@@ -258,6 +262,8 @@ gba:
       mgba:   { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
       vba-m:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
       gpsp:   { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GPSP] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:gba
   comment_fr: |
@@ -277,6 +283,8 @@ gbc:
       mgba:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
       vba-m:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
       mesen-s:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:gbc
   comment_fr: |
@@ -387,6 +395,8 @@ virtualboy:
   emulators:
     libretro:
       vb: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_VB] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 lcdgames:
   name:       LCD Games
@@ -497,6 +507,8 @@ megadrive:
       genesisplusgx-wide: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GENESISPLUSGX_WIDE] }
       picodrive:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
       blastem:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BLASTEM] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:megadrive
   comment_fr: |
@@ -552,6 +564,8 @@ mastersystem:
       picodrive:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
       smsplus:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SMSPLUS_GX]}
       gearsystem:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARSYSTEM]}
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 pico:
   name:       Sega Pico
@@ -578,6 +592,8 @@ gamegear:
       picodrive:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
       smsplus:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SMSPLUS_GX]}
       gearsystem:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARSYSTEM]}
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 sg1000:
   name:       SG-1000
@@ -636,6 +652,8 @@ psx:
     duckstation:
       duckstation:        { requireAnyOf: [BR2_PACKAGE_DUCKSTATION] }
       duckstation-legacy: { requireAnyOf: [BR2_PACKAGE_DUCKSTATION_LEGACY] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:psx
   comment_fr: |
@@ -653,6 +671,8 @@ pcengine:
     libretro:
       pce:      { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE] }
       pce_fast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 pcenginecd:
   name:       PC Engine CD
@@ -665,6 +685,8 @@ pcenginecd:
     libretro:
       pce:      { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE] }
       pce_fast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 supergrafx:
   name:       Supergrafx
@@ -675,6 +697,8 @@ supergrafx:
   emulators:
     libretro:
       mednafen_supergrafx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_SUPERGRAFX] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 pcfx:
   name:       PC-FX
@@ -1123,6 +1147,8 @@ lynx:
     libretro:
       mednafen_lynx:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_LYNX] }
       handy:          { requireAnyOf: [BR2_PACKAGE_LIBRETRO_HANDY] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 ngp:
   name:       Neo-Geo Pocket
@@ -1133,6 +1159,8 @@ ngp:
   emulators:
     libretro:
       mednafen_ngp: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_NGP] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 ngpc:
   name:       Neo-Geo Pocket Color
@@ -1155,6 +1183,8 @@ wswan:
   emulators:
     libretro:
       mednafen_wswan: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_WSWAN] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 wswanc:
   name:       WonderSwan Color
@@ -1167,6 +1197,8 @@ wswanc:
   emulators:
     libretro:
       mednafen_wswan: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_WSWAN] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 prboom:
   name:       PrBoom
@@ -1910,6 +1942,8 @@ apple2:
       gsplus: { requireAnyOf: [BR2_PACKAGE_GSPLUS], incompatible_extensions: [mfi, dfi, rti, edd, woz, wav, zip, 7z, chd, hdv, 2mg] }
     applewin:
       applewin: { requireAnyOf: [BR2_PACKAGE_APPLEWIN], incompatible_extensions: [chd] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 saturn:
   name:       Saturn
@@ -2230,7 +2264,7 @@ daphne:
         |   tells emulationstation to add this to the menu,
         |   and "badlands" tells daphne to use that game engine)
         |
-        |-- badlands.daphne     
+        |-- badlands.daphne
         |   |-- badlands.commands (Optional extra command-
         |   |                      line parameters)
         |   |-- badlands.txt      (Framefile)
@@ -2241,7 +2275,7 @@ daphne:
         |   (All rom zips files go into this roms folder)
         |-- roms
             |-- badlands.zip
-    
+
     Singe games should now be run out of the singe rom directory.
 
     For more info: https://wiki.batocera.org/systems:daphne
@@ -2267,7 +2301,7 @@ singe:
 
     roms
     |-- singe
-        |-- maddog.daphne    
+        |-- maddog.daphne
             |-- maddog.singe      (Singe Game LUA)
             |-- maddog.txt        (Framefile)
             |-- maddog.m2v
@@ -3055,6 +3089,8 @@ apple2gs:
       mame: { requireAnyOf: [BR2_PACKAGE_MAME] }
     gsplus:
       gsplus: { requireAnyOf: [BR2_PACKAGE_GSPLUS], incompatible_extensions: [mfi, dfi, rti, edd, woz, hfe, mfm, td0, imd, d77, d88, 1dd, cqm, cqui, ima, img, ufi, 360, ipf, dc42, zip, 7z] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
           If your game does not start using LR-Mame. Ensure you choose the right floppy type for the rom extension.
           i.e. some extensions require you to choose the 3 1/2 inch floppy drive (Drive 3).
@@ -3783,6 +3819,8 @@ macintosh:
       mame:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME] }
     mame:
       mame: { requireAnyOf: [BR2_PACKAGE_MAME] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
           MAME requires a number of BIOS and device files, place in the bios folder in zip format.
           Boot disks are from MAME's software lists, floppy images need to be extracted and renamed.
