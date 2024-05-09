@@ -1146,7 +1146,12 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_BATOCERA_SEGADC
 
 	# PSX
-	select BR2_PACKAGE_DUCKSTATION			if (!BR2_riscv) && (!BR2_arm) && BR2_PACKAGE_BATOCERA_GLES3 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 # newer versions of duckstation stricter on OpenGL 3.1, RISC-V/QT6 fails
+
+	# newer versions of duckstation stricter on OpenGL ES 3.x, RISC-V+QT6 fails, no more support for KMS/DRM
+	select BR2_PACKAGE_DUCKSTATION			if (!BR2_riscv) && (!BR2_arm) && BR2_PACKAGE_BATOCERA_GLES3 \
+							   && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 \
+							   && !BR2_PACKAGE_BATOCERA_TARGET_S9GEN4 \
+							   && !BR2_PACKAGE_BATOCERA_TARGET_A3GEN2
 
 	select BR2_PACKAGE_DUCKSTATION_LEGACY		if !BR2_riscv					&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835		&& \
