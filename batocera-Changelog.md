@@ -103,7 +103,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Kodi to 20.5-Nexus
 - RPCS3 to 0.0.31-16388
 - Solarus-engine: bump to Mar 10, 2024 build
-- Cemu to v2.0-78
+- Cemu to v2.0-82
 - Sonic3-AIR to v24.02.02.0-stable
 - Ruffle to 2024-03-28
 - Xenia Canary to build 5ca173c (Commits on Apr 26, 2024)
@@ -125,6 +125,8 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - DXX-Rebirth to Apr 22, 2024 build
 - BigPemu to v113 (Linux Build)
 - Xenia to v1.0.2810
+- Vita3K to build 3596
+- Sonic-Mania to Mar 7, 2024 build
 ### System
 - Mainline Kernel 6.6.y bump to 6.6.23
 - Nvidia Production driver to 550.67
@@ -132,7 +134,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Wayland-protocols to 1.33
 - Wlroots to 0.17.1
 - Sway to 1.9
-- Mesa3d to 24.0.5
+- Mesa3d to 24.0.7
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
 - X86_64 kernel to 6.8.9
@@ -141,13 +143,16 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Linux firmware to 20240410
 - Buildroot to 2024.02.1
 - Xpad-Noone to Jan 10, 2024
-- XpadNeo to Mar 11, 2024
+- XpadNeo to Apr 23, 2024 build
 - Xone to Mar 30, 2024
 - Fdupes to 2.3.0
-- FAudio to 24.03
+- FAudio to 24.05
 - Sound Open Firmware to 2023.12.1
 - RyzenAdj to v0.15.0
 - Qt to 6.7.0
+- DXVK to 2.3.1
+- DXVK-NVAPI to 0.7.0
+- VKD3D-Proton to v2.12
 
 # 2024/03/04 - batocera.linux 39 - Painted Lady
 ### Special Notes
