@@ -1,6 +1,6 @@
 config BR2_PACKAGE_REGLINUX_GPICASE
         bool "reglinux-gpicase"
-	depends on BR2_PACKAGE_RPI_USERLAND || BR2_PACKAGE_MESA3D
+	depends on BR2_PACKAGE_BATOCERA_RPI_ANY
 
 comment "reglinux-gpicase"
-	depends on BR2_PACKAGE_RPI_USERLAND || BR2_PACKAGE_MESA3D
+	depends on BR2_PACKAGE_BATOCERA_RPI_ANY
