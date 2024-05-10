@@ -57,6 +57,17 @@ endef
 REGLINUX_INITRAMFS_PRE_INSTALL_TARGET_HOOKS += REGLINUX_INITRAMFS_RISCV_EARLY_FIRMWARE
 endif
 
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_A3GEN2),y)
+define REGLINUX_INITRAMFS_AARCH64_EARLY_MODULES
+	mkdir -p $(INITRAMFS_DIR)/etc
+	cp -R $(TARGET_DIR)/lib/modules/* $(INITRAMFS_DIR)/lib/modules
+	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/a3gen2/fsoverlay/etc/* $(INITRAMFS_DIR)/etc/
+	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/a3gen2/fsoverlay/etc/initramfs-tools/modules $(INITRAMFS_DIR)/etc/modules
+	rm $(INITRAMFS_DIR)/etc/modules.conf
+endef
+REGLINUX_INITRAMFS_PRE_INSTALL_TARGET_HOOKS += REGLINUX_INITRAMFS_AARCH64_EARLY_MODULES
+endif
+
 define REGLINUX_INITRAMFS_INSTALL_TARGET_CMDS
 	mkdir -p $(INITRAMFS_DIR)
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/boot/reglinux-initramfs/init $(INITRAMFS_DIR)/init

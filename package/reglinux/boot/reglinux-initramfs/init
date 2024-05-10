@@ -133,6 +133,11 @@ do_root() {
     # look for devices
     mount -t devtmpfs none /dev
 
+    # mount initramfs modules if any
+    while IFS='' read -r line || [ -n "$line" ]; do
+        modprobe $line
+    done < /etc/modules
+
     MOUNTARG=none
     test -n "${dev}"   && MOUNTARG=${dev}
     test -n "${label}" && MOUNTARG=LABEL=${label}
