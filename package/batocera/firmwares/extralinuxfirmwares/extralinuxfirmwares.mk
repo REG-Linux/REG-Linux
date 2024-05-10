@@ -3,8 +3,8 @@
 # extralinuxfirmware
 #
 ################################################################################
-# Version.: Commits on Apr 29, 2023
-EXTRALINUXFIRMWARES_VERSION = 5ba8541f5ae4a5a8402d5770fb43efe70ca9ce67
+# Version.: Commits on May 10, 2024
+EXTRALINUXFIRMWARES_VERSION = e9c1d95f2d707ddd7bb0ef9e4711914de3cb60c2
 EXTRALINUXFIRMWARES_SITE = $(call github,batocera-linux,extralinuxfirmwares,$(EXTRALINUXFIRMWARES_VERSION))
 EXTRALINUXFIRMWARES_DEPENDENCIES = alllinuxfirmwares
 
