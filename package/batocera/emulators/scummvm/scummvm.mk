@@ -13,12 +13,6 @@ SCUMMVM_DEPENDENCIES += libpng libtheora faad2 freetype libjpeg-bato
 SCUMMVM_ADDITIONAL_FLAGS += -I$(STAGING_DIR)/usr/include -lpthread -lm
 SCUMMVM_ADDITIONAL_FLAGS += -L$(STAGING_DIR)/usr/lib -lGLESv2 -lEGL
 
-ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
-    SCUMMVM_ADDITIONAL_FLAGS += -I$(STAGING_DIR)/usr/include/interface/vcos/pthreads \
-        -I$(STAGING_DIR)/usr/include/interface/vmcs_host/linux -lbcm_host -lvchostif
-    SCUMMVM_CONF_OPTS += --host=raspberrypi
-endif
-
 ifeq ($(BR2_aarch64)$(BR2_arm),y)
     SCUMMVM_CONF_OPTS += --host=arm-linux
 endif
@@ -27,7 +21,7 @@ ifeq ($(BR2_riscv),y)
     SCUMMVM_CONF_OPTS += --host=riscv64-linux
 endif
 
-SCUMMVM_CONF_ENV += RANLIB="$(TARGET_RANLIB)" STRIP="$(TARGET_STRIP)" 
+SCUMMVM_CONF_ENV += RANLIB="$(TARGET_RANLIB)" STRIP="$(TARGET_STRIP)"
 SCUMMVM_CONF_ENV += AR="$(TARGET_AR) cru" AS="$(TARGET_AS)"
 
 SCUMMVM_CONF_OPTS += --opengl-mode=auto --disable-debug --enable-optimizations \

@@ -24,17 +24,9 @@ PCSX2_CONF_OPTS += -DUSE_SYSTEM_LIBS=AUTO
 # The following flag is misleading and *needed* ON to avoid doing -march=native
 PCSX2_CONF_OPTS += -DDISABLE_ADVANCE_SIMD=ON
 
-ifeq ($(BR2_PACKAGE_XORG7),y)
-    PCSX2_CONF_OPTS += -DX11_API=ON
-else
-    PCSX2_CONF_OPTS += -DX11_API=OFF
-endif
-
-ifeq ($(BR2_PACKAGE_BATOCERA_WAYLAND),y)
-    PCSX2_CONF_OPTS += -DWAYLAND_API=ON
-else
-    PCSX2_CONF_OPTS += -DWAYLAND_API=OFF
-endif
+# pcsx2 is x86_64, we always enable wayland and XWayland
+PCSX2_CONF_OPTS += -DX11_API=ON
+PCSX2_CONF_OPTS += -DWAYLAND_API=ON
 
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
     PCSX2_CONF_OPTS += -DUSE_OPENGL=ON

@@ -1,3 +1,6 @@
+model3:
+  emulator: supermodel
+  core:     supermodel-legacy
 gamecube:
   emulator: libretro
   core:     dolphin

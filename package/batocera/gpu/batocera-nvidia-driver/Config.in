@@ -19,22 +19,22 @@ config BR2_PACKAGE_BATOCERA_NVIDIA_DRIVER
 if BR2_PACKAGE_BATOCERA_NVIDIA_DRIVER
 
 comment "nvidia-driver X.org drivers needs a modular Xorg server"
-	depends on !BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR
+	depends on !BR2_PACKAGE_XWAYLAND
 
 config BR2_PACKAGE_BATOCERA_NVIDIA_DRIVER_XORG
 	bool "X.org drivers"
 	default y
-	depends on BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR
+	depends on BR2_PACKAGE_XWAYLAND
 #batocera mesa3d and nvidia-driver must coexist
-	select BR2_PACKAGE_MESA3D
+	depends on BR2_PACKAGE_MESA3D
 	select BR2_PACKAGE_XLIB_LIBX11
 	select BR2_PACKAGE_XLIB_LIBXEXT
-	select BR2_PACKAGE_HAS_LIBGL
-	select BR2_PACKAGE_HAS_LIBEGL
-	select BR2_PACKAGE_HAS_LIBEGL_WAYLAND
+	depends on BR2_PACKAGE_HAS_LIBGL
+	depends on BR2_PACKAGE_HAS_LIBEGL
+	depends on BR2_PACKAGE_HAS_LIBEGL_WAYLAND
 #batocera GLES support is not enable in mesa3d by default
 #	select BR2_PACKAGE_HAS_LIBGLES
-	select BR2_PACKAGE_LIBGLVND
+	depends on BR2_PACKAGE_LIBGLVND
 
 if BR2_PACKAGE_BATOCERA_NVIDIA_DRIVER_XORG
 
