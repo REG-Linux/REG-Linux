@@ -17,13 +17,13 @@ BATOCERA_SCRIPT_TYPE=drm
 endif
 
 ifeq ($(BR2_PACKAGE_REGLINUX_SWAY),y)
-BATOCERA_SCRIPT_TYPE=wayland-sway
+#BATOCERA_SCRIPT_TYPE=wayland-sway
 BATOCERA_RESOLUTION_DEPENDENCIES += grim wf-recorder
 endif
 
 define BATOCERA_RESOLUTION_INSTALL_TARGET_CMDS
-	install -m 0755 $(BATOCERA_RESOLUTION_PATH)/resolution/batocera-resolution.$(BATOCERA_SCRIPT_TYPE) $(TARGET_DIR)/usr/bin/batocera-resolution
-	install -m 0755 $(BATOCERA_RESOLUTION_PATH)/screenshot/batocera-screenshot.$(BATOCERA_SCRIPT_TYPE) $(TARGET_DIR)/usr/bin/batocera-screenshot
+	install -m 0755 $(BATOCERA_RESOLUTION_PATH)/resolution/batocera-resolution.drm $(TARGET_DIR)/usr/bin/batocera-resolution
+	install -m 0755 $(BATOCERA_RESOLUTION_PATH)/screenshot/batocera-screenshot.drm $(TARGET_DIR)/usr/bin/batocera-screenshot
 endef
 
 define BATOCERA_RESOLUTION_INSTALL_RK3128
@@ -36,7 +36,7 @@ define BATOCERA_RESOLUTION_INSTALL_XORG
 endef
 
 define BATOCERA_RESOLUTION_INSTALL_RECORDER
-	install -m 0755 $(BATOCERA_RESOLUTION_PATH)/recorder/batocera-record.$(BATOCERA_SCRIPT_TYPE) $(TARGET_DIR)/usr/bin/batocera-record
+	install -m 0755 $(BATOCERA_RESOLUTION_PATH)/recorder/batocera-record.drm $(TARGET_DIR)/usr/bin/batocera-record
 endef
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3128),y)
@@ -44,7 +44,7 @@ ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3128),y)
 endif
 
 # REG for kmsdrm look at https://ffmpeg.org/ffmpeg-devices.html#kmsgrab
-ifeq ($(BR2_PACKAGE_REGLINUX_WESTON)$(BR2_PACKAGE_REGLINUX_SWAY)$(BR2_PACKAGE_REGLINUX_WESTON),y)
+ifeq ($(BR2_PACKAGE_REGLINUX_WESTON)$(BR2_PACKAGE_REGLINUX_SWAY)$(BR2_PACKAGE_REGLINUX_GAMESCOPE),y)
 	BATOCERA_RESOLUTION_POST_INSTALL_TARGET_HOOKS += BATOCERA_RESOLUTION_INSTALL_RECORDER
 endif
 
