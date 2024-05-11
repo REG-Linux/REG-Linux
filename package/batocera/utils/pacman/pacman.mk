@@ -8,7 +8,7 @@ PACMAN_VERSION = 5.2.2
 PACMAN_SITE = https://sources.archlinux.org/other/pacman
 PACMAN_SOURCE = pacman-$(PACMAN_VERSION).tar.gz
 PACMAN_LICENSE = GPLv2
-PACMAN_DEPENDENCIES = glibc libarchive libcurl libgpgme openssl
+PACMAN_DEPENDENCIES = glibc libarchive libcurl libgpgme openssl python-httplib2
 
 ifeq ($(BR2_x86_64),y)
 PACMAN_ARCH = x86_64

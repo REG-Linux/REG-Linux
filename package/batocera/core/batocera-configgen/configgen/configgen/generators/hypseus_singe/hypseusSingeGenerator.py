@@ -9,6 +9,7 @@ import controllersConfig
 import filecmp
 import subprocess
 import shlex
+import json
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -90,13 +91,13 @@ class HypseusSingeGenerator(Generator):
         # Copy/update directories
         for directory in directories:
             copy_resources(directory["source"], directory["destination"])
-               
+
         # extension used .daphne and the file to start the game is in the folder .daphne with the extension .txt
         romName = os.path.splitext(os.path.basename(rom))[0]
         frameFile = rom + "/" + romName + ".txt"
         commandsFile = rom + "/" + romName + ".commands"
         singeFile = rom + "/" + romName + ".singe"
-        
+
         bezelFile = romName + ".png"
         bezelPath = batoceraFiles.hypseusDatadir + "/bezels/" + bezelFile
         sindenBezelPath = batoceraFiles.hypseusDatadir + "/bezels/sinden/" + bezelFile

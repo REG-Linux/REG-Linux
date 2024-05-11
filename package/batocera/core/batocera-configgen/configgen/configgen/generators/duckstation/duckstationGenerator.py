@@ -6,7 +6,7 @@ import batoceraFiles
 import controllersConfig
 import configparser
 import os.path
-import httplib2
+import requests
 import json
 from utils.logger import get_logger
 from os import environ
@@ -305,16 +305,13 @@ class DuckstationGenerator(Generator):
             leaderbd  = system.config.get('retroachievements.leaderboards', "")
             login_cmd = f"dorequest.php?r=login&u={username}&p={password}"
             try:
-                cnx = httplib2.Http()
-            except:
-                eslog.error("ERROR: Unable to connect to " + login_url)
-            try:
-                res, rout = cnx.request(login_url + login_cmd, method="GET", body=None, headers=headers)
-                if (res.status != 200):
-                    eslog.warning(f"ERROR: RetroAchievements.org responded with #{res.status} [{res.reason}] {rout}")
+                res = requests.get(login_url + login_cmd, headers=headers)
+                if (res.status_code != 200):
+                    eslog.warning(f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]")
                     settings.set("Cheevos", "Enabled",  "false")
                 else:
-                    parsedout = json.loads(rout.decode('utf-8'))
+                    res.encoding = 'utf-8'
+                    parsedout = json.loads(res.json())
                     if not parsedout['Success']:
                         eslog.warning(f"ERROR: RetroAchievements login failed with ({str(parsedout)})")
                     token = parsedout['Token']
