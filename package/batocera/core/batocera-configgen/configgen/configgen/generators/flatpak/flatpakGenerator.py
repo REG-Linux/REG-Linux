@@ -5,6 +5,10 @@ import Command
 import os
 
 class FlatpakGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
+
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 

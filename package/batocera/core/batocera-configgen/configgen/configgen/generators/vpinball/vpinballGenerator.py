@@ -15,6 +15,9 @@ from . import vpinballOptions
 eslog = get_logger(__name__)
 
 class VPinballGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # files

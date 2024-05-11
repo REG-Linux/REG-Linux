@@ -34,7 +34,7 @@ def getGenerator(emulator):
     if emulator == 'mupen64plus':
         from generators.mupen.mupenGenerator import MupenGenerator
         return MupenGenerator()
-    
+
     if emulator == 'vice':
         from generators.vice.viceGenerator import ViceGenerator
         return ViceGenerator()
@@ -166,11 +166,11 @@ def getGenerator(emulator):
     if emulator == 'duckstation':
         from generators.duckstation.duckstationGenerator import DuckstationGenerator
         return DuckstationGenerator()
-    
+
     if emulator == 'duckstation-legacy':
         from generators.duckstation_legacy.duckstationLegacyGenerator import DuckstationLegacyGenerator
         return DuckstationLegacyGenerator()
-    
+
     if emulator == 'drastic':
         from generators.drastic.drasticGenerator import DrasticGenerator
         return DrasticGenerator()
@@ -208,16 +208,12 @@ def getGenerator(emulator):
         return SonicRetroGenerator()
 
     if emulator == 'soniccd':
-        from generators.sonicretro.sonicretroGenerator import SonicRetroGenerator        
+        from generators.sonicretro.sonicretroGenerator import SonicRetroGenerator
         return SonicRetroGenerator()
 
     if emulator == 'gsplus':
         from generators.gsplus.gsplusGenerator import GSplusGenerator
         return GSplusGenerator()
-
-    if emulator == 'fba2x':
-        from generators.fba2x.fba2xGenerator import Fba2xGenerator
-        return Fba2xGenerator()
 
     if emulator == 'suyu':
         from generators.suyu.suyuGenerator import SuyuGenerator
@@ -270,7 +266,7 @@ def getGenerator(emulator):
     if emulator == 'odcommander':
         from generators.odcommander.odcommanderGenerator import OdcommanderGenerator
         return OdcommanderGenerator()
-    
+
     if emulator == 'gzdoom':
         from generators.gzdoom.gzdoomGenerator import GZDoomGenerator
         return GZDoomGenerator()
@@ -302,7 +298,7 @@ def getGenerator(emulator):
     if emulator == 'play':
         from generators.play.playGenerator import PlayGenerator
         return PlayGenerator()
-    
+
     if emulator == "ioquake3":
         from generators.ioquake3.ioquake3Generator import IOQuake3Generator
         return IOQuake3Generator()
@@ -326,11 +322,11 @@ def getGenerator(emulator):
     if emulator == 'stella':
         from generators.stella.stellaGenerator import StellaGenerator
         return StellaGenerator()
-    
+
     if emulator == "theforceengine":
         from generators.theforceengine.theforceengineGenerator import TheForceEngineGenerator
         return TheForceEngineGenerator()
-    
+
     if emulator == "iortcw":
         from generators.iortcw.iortcwGenerator import IORTCWGenerator
         return IORTCWGenerator()

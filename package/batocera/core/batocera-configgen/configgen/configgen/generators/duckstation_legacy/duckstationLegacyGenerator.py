@@ -14,6 +14,13 @@ from os import environ
 eslog = get_logger(__name__)
 
 class DuckstationLegacyGenerator(Generator):
+    # this emulator/core might require wayland compositor to run
+    def requiresWayland(self):
+        if os.path.exists('/usr/bin/duckstation-nogui'):
+            return False
+        else:
+            return True
+
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # Test if it's a m3u file
         if os.path.splitext(rom)[1] == ".m3u":
@@ -511,7 +518,7 @@ class DuckstationLegacyGenerator(Generator):
             array=commandArray,
             env={
                 "XDG_CONFIG_HOME": batoceraFiles.CONF,
-                "QT_QPA_PLATFORM": "xcb",
+                "QT_QPA_PLATFORM": "wayland",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
                 "SDL_JOYSTICK_HIDAPI": "0"
             }

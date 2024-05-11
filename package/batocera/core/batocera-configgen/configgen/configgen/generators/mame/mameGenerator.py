@@ -25,6 +25,11 @@ import utils.videoMode as videoMode
 eslog = get_logger(__name__)
 
 class MameGenerator(Generator):
+    # MAME requires a wayland compositor *if* bgfx is used
+    def requiresWayland(self):
+        if system.isOptSet("video") and system.config["video"] == "bgfx":
+            return True
+        return False
 
     def supportsInternalBezels(self):
         return True

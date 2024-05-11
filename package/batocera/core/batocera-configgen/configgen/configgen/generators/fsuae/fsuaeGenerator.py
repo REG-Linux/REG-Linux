@@ -12,6 +12,9 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class FsuaeGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
 
     # from one file (x1.zip), get the list of all existing files with the same extension + last char (as number) suffix
     # for example, "/path/toto0.zip" becomes ["/path/toto0.zip", "/path/toto1.zip", "/path/toto2.zip"]

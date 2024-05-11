@@ -12,6 +12,9 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class MelonDSGenerator(Generator):
+    # this emulator/core requires wayland compositor to run
+    def requiresWayland(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         romBasename = path.basename(rom)
@@ -162,4 +165,4 @@ class MelonDSGenerator(Generator):
 
         commandArray = ["/usr/bin/melonDS", "-f", rom]
         return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":batoceraFiles.CONF, \
-            "XDG_DATA_HOME":batoceraFiles.SAVES, "QT_QPA_PLATFORM":"xcb"})
+            "XDG_DATA_HOME":batoceraFiles.SAVES, "QT_QPA_PLATFORM":"wayland"})
