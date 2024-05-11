@@ -98,6 +98,7 @@ setup(name='batocera-configgen',
         'configgen.generators.sh',
         'configgen.settings',
         'configgen.utils',
+        'configgen.utils.video',
         ],
         package_data={
           'configgen.generators.xash3d_fwgs': ['gamepad.cfg'],
