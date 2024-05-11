@@ -14,6 +14,10 @@ from os import environ
 eslog = get_logger(__name__)
 
 class DuckstationGenerator(Generator):
+    # Duckstation is now QT-only, requires wayland compositor to run
+    def requiresWayland(self):
+        return True
+
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # Test if it's a m3u file
         if os.path.splitext(rom)[1] == ".m3u":
@@ -518,17 +522,11 @@ class DuckstationGenerator(Generator):
         dbfile = "/usr/share/duckstation/resources/gamecontrollerdb.txt"
         controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
 
-        # check if we're running wayland
-        if os.environ.get("WAYLAND_DISPLAY"):
-            qt_qpa_platform = "wayland"
-        else:
-            qt_qpa_platform = "xcb"
-        
         return Command.Command(
             array=commandArray,
             env={
                 "XDG_CONFIG_HOME": batoceraFiles.CONF,
-                "QT_QPA_PLATFORM": qt_qpa_platform,
+                "QT_QPA_PLATFORM": "wayland",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
                 "SDL_JOYSTICK_HIDAPI": "0"
             }

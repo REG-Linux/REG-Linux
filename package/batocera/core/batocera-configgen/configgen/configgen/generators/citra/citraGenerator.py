@@ -14,6 +14,10 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class CitraGenerator(Generator):
+    # this emulator/core requires X server to run
+    # TODO I think this is wrong and it can runs on wayland...
+    def requiresX11(self):
+        return True
 
     # Main entry of the module
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
@@ -23,7 +27,7 @@ class CitraGenerator(Generator):
             commandArray = ['/usr/bin/citra-qt', rom]
         else:
             commandArray = ['/usr/bin/citra', rom]
-        return Command.Command(array=commandArray, env={ 
+        return Command.Command(array=commandArray, env={
             "XDG_CONFIG_HOME":batoceraFiles.CONF,
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/3ds",
             "XDG_CACHE_HOME":batoceraFiles.CACHE,
@@ -40,7 +44,7 @@ class CitraGenerator(Generator):
             return False
         else:
             return True
-    
+
     @staticmethod
     def writeCITRAConfig(citraConfigFile, system, playersControllers):
         # Pads
@@ -196,7 +200,7 @@ class CitraGenerator(Generator):
             citraConfig.set("Renderer", "use_frame_limit", "false")
         else:
             citraConfig.set("Renderer", "use_frame_limit", "true")
-        
+
         ## [WEB SERVICE]
         if not citraConfig.has_section("WebService"):
             citraConfig.add_section("WebService")
@@ -227,7 +231,7 @@ class CitraGenerator(Generator):
         citraConfig.set("Utility", "async_custom_loading\\default", "true")
         citraConfig.set("Utility", "custom_textures\\default", "false")
         citraConfig.set("Utility", "preload_textures\\default", "false")
-        
+
         ## [CONTROLS]
         if not citraConfig.has_section("Controls"):
             citraConfig.add_section("Controls")

@@ -19,6 +19,10 @@ import subprocess
 eslog = get_logger(__name__)
 
 class Pcsx2Generator(Generator):
+    # PCSX2 requires wayland compositor to run
+    # TODO check if it works without X (it should)
+    def requiresWayland(self):
+        return True
 
     wheelTypeMapping = {
         "DrivingForce":    "0",
@@ -84,7 +88,7 @@ class Pcsx2Generator(Generator):
                 eslog.warning("CPU does not support SSE4.1 which is required by pcsx2.  The emulator will likely crash with SIGILL (illegal instruction).")
 
         envcmd = { "XDG_CONFIG_HOME":batoceraFiles.CONF,
-                   "QT_QPA_PLATFORM":"xcb",
+                   "QT_QPA_PLATFORM":"wayland",
                    "SDL_JOYSTICK_HIDAPI": "0"
                   }
 

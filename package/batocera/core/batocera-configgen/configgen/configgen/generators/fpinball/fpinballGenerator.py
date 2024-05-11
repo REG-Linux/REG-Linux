@@ -14,6 +14,9 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class FpinballGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         wineprefix = "/userdata/system/wine-bottles/fpinball"

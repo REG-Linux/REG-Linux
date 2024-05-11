@@ -6,6 +6,9 @@ import os
 import batoceraFiles
 
 class DXX_RebirthGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         

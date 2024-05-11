@@ -5,6 +5,9 @@ import Command
 import os
 
 class SteamGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         basename = os.path.basename(rom)

@@ -28,6 +28,9 @@ def set_joystick_setting(ini_file, set_gz_joystick):
         file.writelines(lines)
 
 class GZDoomGenerator(Generator):
+    # this emulator/core requires wayland compositor to run
+    def requiresWayland(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         config_dir = f"{batoceraFiles.CONF}/gzdoom"
