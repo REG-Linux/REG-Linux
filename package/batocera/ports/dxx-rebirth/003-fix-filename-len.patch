@@ -1,0 +1,11 @@
+--- a/common/main/fwd-inferno.h	2024-05-11 09:56:48.188414915 +0200
++++ b/common/main/fwd-inferno.h	2024-05-11 09:57:18.935634430 +0200
+@@ -26,7 +26,7 @@
+ namespace dcx {
+ 
+ // the maximum length of a filename
+-constexpr std::integral_constant<std::size_t, 13> FILENAME_LEN{};
++constexpr std::integral_constant<std::size_t, 64> FILENAME_LEN{};
+ 
+ struct d_fname;
+ struct d_interface_unique_state;

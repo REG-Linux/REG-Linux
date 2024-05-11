@@ -13,6 +13,8 @@ define BATOCERA_NVIDIA_INSTALL_TARGET_CMDS
 	    $(TARGET_DIR)/usr/bin/
 	
 	# [Xorg]
+	mkdir -p $(TARGET_DIR)/etc/X11/xorg.conf.d
+
 	ln -sf /userdata/system/99-nvidia.conf $(TARGET_DIR)/etc/X11/xorg.conf.d/99-nvidia.conf
 
 	# [Blacklist & Modprobe]
