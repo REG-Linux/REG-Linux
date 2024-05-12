@@ -1,0 +1,14 @@
+--- a/libweston/renderer-gl/egl-glue.c	2024-05-11 19:45:40.089499185 +0200
++++ b/libweston/renderer-gl/egl-glue.c	2024-05-11 19:46:14.338277228 +0200
+@@ -40,6 +40,11 @@
+ 
+ #include <assert.h>
+ 
++// libmali hack
++#ifndef EGL_DRM_RENDER_NODE_FILE_EXT
++#define EGL_DRM_RENDER_NODE_FILE_EXT            0x3377
++#endif
++
+ struct egl_config_print_info {
+ 	const EGLint *attrs;
+ 	unsigned attrs_count;
