@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Stop sway through swaymsg
+swaymsg exit
+
+# TODO remove ugly sleep for debug
+sleep 5
+
+# Remove XDG / Wayland environment variables
+unset WAYLAND_DISPLAY
+unset XDG_RUNTIME_DIR
+unset SWAYSOCK
+unset SDL_VIDEODRIVER
