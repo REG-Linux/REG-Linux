@@ -1,0 +1,12 @@
+--- a/libweston/backend-drm/fb.c	2024-05-11 19:53:21.496320575 +0200
++++ b/libweston/backend-drm/fb.c	2024-05-11 19:54:08.493491462 +0200
+@@ -44,6 +44,9 @@
+ #include "drm-internal.h"
+ #include "linux-dmabuf.h"
+ 
++// libMali Hack
++#define gbm_bo_get_fd_for_plane(x,y) gbm_bo_get_fd(x)
++
+ static void
+ drm_fb_destroy(struct drm_fb *fb)
+ {
