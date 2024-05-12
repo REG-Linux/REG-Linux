@@ -117,13 +117,21 @@ def stop_weston(generator, system):
 def start_sway(generator, system):
     global sway_launched
     if not sway_launched:
-        os.system("/usr/bin/start-sway")
+        os.system("WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -c /etc/sway/config -d & > /userdata/system/logs/sway.log 2>&1")
+        os.environ["WAYLAND_DISPLAY"]="wayland-1"
+        os.environ["XDG_RUNTIME_DIR"]="/var/run"
+        os.environ["SWAYSOCK"]="/var/run/sway-ipc.0.sock"
+        os.environ["SDL_VIDEODRIVER"]="wayland"
         sway_launched = True
 
 def stop_sway(generator, system):
     global sway_launched
     if sway_launched:
-        os.system("/usr/bin/stop-sway")
+        os.system("swaymsg exit")
+        del os.environ["WAYLAND_DISPLAY"]
+        del os.environ["XDG_RUNTIME_DIR"]
+        del os.environ["SWAYSOCK"]
+        del os.environ["SDL_VIDEODRIVER"]
         sway_launched = False
 
 # TODO handle gamescope
