@@ -59,7 +59,9 @@ endif
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_A3GEN2),y)
 define REGLINUX_INITRAMFS_AARCH64_EARLY_MODULES
+	mkdir -p $(INITRAMFS_DIR)
 	mkdir -p $(INITRAMFS_DIR)/etc
+	mkdir -p $(INITRAMFS_DIR)/lib/modules
 	cp -R $(TARGET_DIR)/lib/modules/* $(INITRAMFS_DIR)/lib/modules
 	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/a3gen2/fsoverlay/etc/* $(INITRAMFS_DIR)/etc/
 	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/a3gen2/fsoverlay/etc/initramfs-tools/modules $(INITRAMFS_DIR)/etc/modules
