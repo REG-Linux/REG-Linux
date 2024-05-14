@@ -17,8 +17,8 @@ VCMI_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 VCMI_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 VCMI_CONF_OPTS += -DBUILD_STATIC_LIBS=OFF
 
-# Launcher requires Qt
-ifeq ($(BR2_PACKAGE_QT6),)
+# Launcher requires Qt6
+ifneq ($(BR2_PACKAGE_QT6),y)
 VCMI_CONF_OPTS += -DENABLE_LAUNCHER=OFF
 else
 VCMI_DEPENDENCIES += qt6base qt6tools
@@ -26,9 +26,5 @@ ifeq ($(BR2_PACKAGE_QT6WAYLAND),y)
 VCMI_DEPENDENCIES += qt6wayland
 endif
 endif
-
-# Install into proper prefix
-#VCMI_INSTALL_TARGET_OPTS = DESTDIR="$(TARGET_DIR)" install
-
 
 $(eval $(cmake-package))
