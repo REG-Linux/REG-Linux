@@ -3,7 +3,7 @@
 # switchres
 #
 ################################################################################
-# Version: Commits on Feb XX, 2024
+# Version: Commits on Feb 15, 2024
 SWITCHRES_VERSION = v2.2.0
 SWITCHRES_SITE = $(call github,antonioginer,switchres,$(SWITCHRES_VERSION))
 SWITCHRES_LICENSE = GPL-2.0+
