@@ -106,7 +106,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Cemu to v2.0-82
 - Sonic3-AIR to v24.02.02.0-stable
 - Ruffle to 2024-03-28
-- Xenia Canary to build 5ca173c (Commits on Apr 26, 2024)
+- Xenia Canary to build 2ca752c (Commits on May 9, 2024)
 - Xemu to v0.7.121
 - ScummVM to 2.8.1
 - fheroes2 to 1.0.13
@@ -137,7 +137,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Mesa3d to 24.0.7
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.8.9
+- X86_64 kernel to 6.9
 - Switchres 0.220
 - Btop to 1.3.2
 - Linux firmware to 20240410
