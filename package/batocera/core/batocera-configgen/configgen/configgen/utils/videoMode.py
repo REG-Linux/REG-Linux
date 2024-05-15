@@ -23,7 +23,9 @@ def getCurrentResolution(name=None):
     return drmGetCurrentResolution(name)
 
 def minTomaxResolution():
-    return drmMinTomaxResolution()
+    current = getCurrentResolution()
+    resolution = str(current["width"]) + "x" + str(current["height"])
+    return drmMinTomaxResolution(resolution)
 
 def getRefreshRate():
     proc = subprocess.Popen(["batocera-resolution refreshRate"], stdout=subprocess.PIPE, shell=True)
