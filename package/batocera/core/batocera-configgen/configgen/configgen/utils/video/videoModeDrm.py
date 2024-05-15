@@ -98,9 +98,9 @@ def drmMinTomaxResolution(videomode):
     width = videomode.split("x")[0]
     height = videomode.split("x")[1]
     # Clamp to 1920x1080 because of 4K TVs
-    if width > 1920:
+    if int(width) > 1920:
         width = 1920
-    if height > 1080:
+    if int(height) > 1080:
         height = 1080
     maxWidth = width
     maxHeight = height
