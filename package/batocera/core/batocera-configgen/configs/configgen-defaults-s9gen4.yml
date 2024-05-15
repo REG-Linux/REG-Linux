@@ -21,4 +21,9 @@ naomi:
 flash:
   emulator: lightspark
   core:     lightspark
-
+gamecube:
+  emulator: libretro
+  core:     dolphin
+wii:
+  emulator: libretro
+  core:     dolphin
