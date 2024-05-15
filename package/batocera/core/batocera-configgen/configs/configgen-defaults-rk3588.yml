@@ -1,11 +1,11 @@
 gamecube:
-  emulator: libretro
+  emulator: dolphin
   core:     dolphin
 nds:
   emulator: libretro
   core:     melonds
 wii:
-  emulator: libretro
+  emulator: dolphin
   core:     dolphin
 fmtowns:
   emulator: libretro
