@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIME3DS_VERSION = 2110
+LIME3DS_VERSION = 2112
 LIME3DS_SITE = https://github.com/Lime3DS/Lime3DS.git
 LIME3DS_SITE_METHOD = git
 LIME3DS_GIT_SUBMODULES=YES
@@ -30,17 +30,16 @@ LIME3DS_CONF_OPTS += -DUSE_SYSTEM_SDL2=ON    # important to avoid HIDAPI
 LIME3DS_CONF_OPTS += -DCITRA_ENABLE_BUNDLE_TARGET=ON
 LIME3DS_CONF_OPTS += -DENABLE_LTO=OFF
 
-# future support for arm using SDL2 gui?
 ifeq ($(BR2_PACKAGE_QT6),y)
     LIME3DS_DEPENDENCIES += qt6base qt6tools qt6multimedia
     LIME3DS_CONF_OPTS += -DENABLE_QT=ON
     LIME3DS_CONF_OPTS += -DENABLE_QT_TRANSLATION=ON
     LIME3DS_CONF_OPTS += -DENABLE_QT_UPDATER=OFF
-    LIME3DS_BIN = lime-qt
+    LIME3DS_BIN = lime3ds-gui
 else
     LIME3DS_CONF_OPTS += -DENABLE_QT=OFF
     LIME3DS_CONF_OPTS += -DENABLE_SDL2_FRONTEND=ON
-    LIME3DS_BIN = lime
+    LIME3DS_BIN = lime3ds-cli
 endif
 
 LIME3DS_CONF_ENV += LDFLAGS=-lpthread

@@ -17,6 +17,9 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class XeniaGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
 
     @staticmethod
     def sync_directories(source_dir, dest_dir):

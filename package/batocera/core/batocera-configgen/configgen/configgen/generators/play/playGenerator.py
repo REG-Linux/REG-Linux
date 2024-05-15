@@ -14,6 +14,9 @@ playConfigFile = playConfig + '/Play Data Files/config.xml'
 playInputFile = playConfig + '/Play Data Files/inputprofiles/default.xml'
 
 class PlayGenerator(Generator):
+    # Play is QT6 based, requires wayland compositor to run
+    def requiresWayland(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
@@ -138,7 +141,7 @@ class PlayGenerator(Generator):
                 "XDG_CONFIG_HOME":playConfig,
                 "XDG_DATA_HOME":playConfig,
                 "XDG_CACHE_HOME":batoceraFiles.CACHE,
-                "QT_QPA_PLATFORM":"xcb",
+                "QT_QPA_PLATFORM":"wayland",
             }
         )
 

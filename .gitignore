@@ -30,3 +30,4 @@ package/reglinux/reglinux-emulationstation/keys.txt
 *.po~
 batocera-mok.key
 gh_token
+.idea

@@ -3,8 +3,8 @@
 # flycast
 #
 ################################################################################
-# Version: Commits on Mar 15, 2024
-FLYCAST_VERSION = v2.3
+
+FLYCAST_VERSION = v2.3.2
 FLYCAST_SITE = https://github.com/flyinghead/flycast.git
 FLYCAST_SITE_METHOD=git
 FLYCAST_GIT_SUBMODULES=YES
@@ -26,15 +26,10 @@ else ifeq ($(BR2_PACKAGE_BATOCERA_GLES2),y)
     FLYCAST_CONF_OPTS += -DUSE_GLES2=ON -DUSE_GLES=OFF -DUSE_OPENGL=ON
 endif
 
-ifeq ($(BR2_PACKAGE_BATOCERA_VULKAN),y)
+ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     FLYCAST_CONF_OPTS += -DUSE_VULKAN=ON
 else
     FLYCAST_CONF_OPTS += -DUSE_VULKAN=OFF
-endif
-
-# RPI: use the legacy Broadcom GLES libraries
-ifeq ($(BR2_PACKAGE_BATOCERA_RPI_VCORE),y)
-    FLYCAST_CONF_OPTS += -DUSE_VIDEOCORE=ON
 endif
 
 ifeq ($(BR2_PACKAGE_HAS_LIBMALI),y)

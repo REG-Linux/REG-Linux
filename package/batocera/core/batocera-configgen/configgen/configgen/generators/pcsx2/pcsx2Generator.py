@@ -11,7 +11,7 @@ import configparser
 import io
 import controllersConfig
 import json
-import httplib2
+import requests
 import time
 import shutil
 import subprocess
@@ -19,6 +19,10 @@ import subprocess
 eslog = get_logger(__name__)
 
 class Pcsx2Generator(Generator):
+    # PCSX2 requires wayland compositor to run
+    # TODO check if it works without X (it should)
+    def requiresWayland(self):
+        return True
 
     wheelTypeMapping = {
         "DrivingForce":    "0",
@@ -84,7 +88,7 @@ class Pcsx2Generator(Generator):
                 eslog.warning("CPU does not support SSE4.1 which is required by pcsx2.  The emulator will likely crash with SIGILL (illegal instruction).")
 
         envcmd = { "XDG_CONFIG_HOME":batoceraFiles.CONF,
-                   "QT_QPA_PLATFORM":"xcb",
+                   "QT_QPA_PLATFORM":"wayland",
                    "SDL_JOYSTICK_HIDAPI": "0"
                   }
 
@@ -251,16 +255,13 @@ def configureINI(config_directory, bios_directory, system, rom, controllers, met
         leaderbd  = system.config.get('retroachievements.leaderboards', "")
         login_cmd = f"dorequest.php?r=login&u={username}&p={password}"
         try:
-                cnx = httplib2.Http()
-        except:
-                eslog.error("ERROR: Unable to connect to " + login_url)
-        try:
-                res, rout = cnx.request(login_url + login_cmd, method="GET", body=None, headers=headers)
-                if (res.status != 200):
-                    eslog.warning(f"ERROR: RetroAchievements.org responded with #{res.status} [{res.reason}] {rout}")
+                res = requests.get(login_url + login_cmd, headers=headers)
+                if (res.status_code != 200):
+                    eslog.warning(f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]")
                     settings.set("Cheevos", "Enabled",  "false")
                 else:
-                    parsedout = json.loads(rout.decode('utf-8'))
+                    res.encoding = 'utf-8'
+                    parsedout = json.loads(res.json())
                     if not parsedout['Success']:
                         eslog.warning(f"ERROR: RetroAchievements login failed with ({str(parsedout)})")
                     token = parsedout['Token']

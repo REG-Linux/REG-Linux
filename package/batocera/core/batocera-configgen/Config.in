@@ -6,6 +6,7 @@ config BR2_PACKAGE_BATOCERA_CONFIGGEN
 	select BR2_PACKAGE_PYTHON_PSUTIL
 	select BR2_PACKAGE_PYTHON_PYUDEV # for guns
 	select BR2_PACKAGE_MANGOHUD      if BR2_x86_64 || BR2_PACKAGE_BATOCERA_TARGET_GLES3
+	select BR2_PACKAGE_PYTHON_REQUESTS # for retroachievements
 
         help
           The configuration utility for batocera

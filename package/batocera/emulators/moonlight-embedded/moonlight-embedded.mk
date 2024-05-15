@@ -24,10 +24,6 @@ ifeq ($(BR2_PACKAGE_LIBVA),y)
     MOONLIGHT_EMBEDDED_DEPENDENCIES += libva-intel-driver intel-mediadriver
 endif
 
-ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
-    MOONLIGHT_EMBEDDED_DEPENDENCIES += rpi-userland
-endif
-
 ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
     MOONLIGHT_EMBEDDED_DEPENDENCIES += rockchip-mpp rockchip-rga
 endif

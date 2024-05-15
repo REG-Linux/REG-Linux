@@ -28,3 +28,12 @@ class Generator(object):
     def getInGameRatio(self, config, gameResolution, rom):
         # put a default value, but it should be overriden by generators
         return 4/3
+
+    # this emulator/core requires wayland compositor to run
+    def requiresWayland(self):
+        return False
+
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return False
+

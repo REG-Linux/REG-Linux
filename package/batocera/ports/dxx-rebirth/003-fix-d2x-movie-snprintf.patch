@@ -1,0 +1,11 @@
+--- a/d2x-rebirth/main/movie.cpp	2024-05-13 04:00:10.056213398 +0200
++++ b/d2x-rebirth/main/movie.cpp	2024-05-13 04:01:07.775094941 +0200
+@@ -617,7 +617,7 @@
+ static PHYSFS_ErrorCode init_movie(const char *movielib, char resolution, int required, LoadedMovie &movie)
+ {
+ 	std::array<char, FILENAME_LEN + 2> filename;
+-	snprintf(filename.data(), filename.size(), "%s-%c.mvl", movielib, resolution);
++	snprintf(filename.data(), filename.size(), "%.8s-%c.mvl", movielib, resolution);
+ 	auto r = PHYSFSX_addRelToSearchPath(filename.data(), movie.pathname, physfs_search_path::prepend);
+ 	if (r != PHYSFS_ERR_OK)
+ 	{

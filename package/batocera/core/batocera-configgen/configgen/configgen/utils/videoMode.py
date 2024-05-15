@@ -1,38 +1,31 @@
 #!/usr/bin/env python
-import os
-import sys
-import batoceraFiles
-import re
-import time
-import subprocess
-import json
 import csv
+import os
+import re
+import subprocess
+import sys
+
+from utils.video.videoModeDrm import drmChangeMode, drmGetCurrentMode, drmGetCurrentResolution, drmMinTomaxResolution
+from utils.video.videoModeWayland import waylandChangeMode, waylandGetCurrentMode, waylandGetCurrentResolution
+from utils.video.videoModeX11 import X11ChangeMode, X11GetCurrentMode, X11GetCurrentResolution
 from .logger import get_logger
 
 eslog = get_logger(__name__)
 
 # Set a specific video mode
 def changeMode(videomode):
-    if checkModeExists(videomode):
-        cmd = ["batocera-resolution", "setMode", videomode]
-        eslog.debug(f"setVideoMode({videomode}): {cmd}")
-        max_tries = 2  # maximum number of tries to set the mode
-        for i in range(max_tries):
-            try:
-                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-                eslog.debug(result.stdout.strip())
-                return
-            except subprocess.CalledProcessError as e:
-                eslog.error(f"Error setting video mode: {e.stderr}")
-                if i == max_tries - 1:
-                    raise
-                time.sleep(1)
+    return drmChangeMode(videomode)
 
 def getCurrentMode():
-    proc = subprocess.Popen(["batocera-resolution currentMode"], stdout=subprocess.PIPE, shell=True)
-    (out, err) = proc.communicate()
-    for val in out.decode().splitlines():
-        return val # return the first line
+    return drmGetCurrentMode()
+
+def getCurrentResolution(name=None):
+    return drmGetCurrentResolution(name)
+
+def minTomaxResolution():
+    current = getCurrentResolution()
+    resolution = str(current["width"]) + "x" + str(current["height"])
+    return drmMinTomaxResolution(resolution)
 
 def getRefreshRate():
     proc = subprocess.Popen(["batocera-resolution refreshRate"], stdout=subprocess.PIPE, shell=True)
@@ -61,38 +54,29 @@ def getScreensInfos(config):
         return res
 
     resolution3 = getCurrentResolution(config["videooutput3"])
-    res.append({"width": resolution3["width"], "height": resolution3["height"], "x": resolution1["width"]+resolution2["width"], "y": 0})
+    res.append({"width": resolution3["width"], "height": resolution3["height"],
+                "x": resolution1["width"] + resolution2["width"], "y": 0})
 
     eslog.debug("Screens:")
     eslog.debug(res)
     return res
 
-def getScreens():    
+
+def getScreens():
     proc = subprocess.Popen(["batocera-resolution listOutputs"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return out.decode().splitlines()
 
-def minTomaxResolution():
-    proc = subprocess.Popen(["batocera-resolution minTomaxResolution"], stdout=subprocess.PIPE, shell=True)
-    (out, err) = proc.communicate()
-
-def getCurrentResolution(name = None):
-    if name is None:
-        proc = subprocess.Popen(["batocera-resolution currentResolution"], stdout=subprocess.PIPE, shell=True)
-    else:
-        proc = subprocess.Popen(["batocera-resolution --screen {} currentResolution".format(name)], stdout=subprocess.PIPE, shell=True)
-
-    (out, err) = proc.communicate()
-    vals = out.decode().split("x")
-    return { "width": int(vals[0]), "height": int(vals[1]) }
 
 def supportSystemRotation():
     proc = subprocess.Popen(["batocera-resolution supportSystemRotation"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return proc.returncode == 0
 
+
 def isResolutionReversed():
     return os.path.exists("/var/run/rk-rotation")
+
 
 def checkModeExists(videomode):
     # max resolution given
@@ -106,11 +90,12 @@ def checkModeExists(videomode):
     (out, err) = proc.communicate()
     for valmod in out.decode().splitlines():
         vals = valmod.split(":")
-        if(videomode == vals[0]):
+        if (videomode == vals[0]):
             return True
 
     eslog.error(f"invalid video mode {videomode}")
     return False
+
 
 def changeMouse(mode):
     eslog.debug(f"changeMouseMode({mode})")
@@ -121,13 +106,14 @@ def changeMouse(mode):
     proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
 
+
 def getGLVersion():
     try:
-        # optim for most sbc having not glxinfo
-        if os.path.exists("/usr/bin/glxinfo") == False:
+        # Use eglinfo since we are KMS/DRM
+        if os.path.exists("/usr/bin/eglinfo") == False:
             return 0
 
-        glxVerCmd = 'glxinfo | grep "OpenGL version"'
+        glxVerCmd = 'eglinfo | grep "OpenGL version"'
         glVerOutput = subprocess.check_output(glxVerCmd, shell=True).decode(sys.stdout.encoding)
         glVerString = glVerOutput.split()
         glVerTemp = glVerString[3].split(".")
@@ -138,13 +124,14 @@ def getGLVersion():
     except:
         return 0
 
+
 def getGLVendor():
     try:
-        # optim for most sbc having not glxinfo
-        if os.path.exists("/usr/bin/glxinfo") == False:
+        # Use eglinfo since we are KMS/DRM
+        if os.path.exists("/usr/bin/eglinfo") == False:
             return "unknown"
 
-        glxVendCmd = 'glxinfo | grep "OpenGL vendor string"'
+        glxVendCmd = 'eglinfo | grep "OpenGL vendor string"'
         glVendOutput = subprocess.check_output(glxVendCmd, shell=True).decode(sys.stdout.encoding)
         glVendString = glVendOutput.split()
         glVendor = glVendString[3].casefold()
@@ -152,15 +139,16 @@ def getGLVendor():
     except:
         return "unknown"
 
+
 def getAltDecoration(systemName, rom, emulator):
     # Returns an ID for games that need rotated bezels/shaders or have special art
     # Vectrex will actually return an abbreviated game name for overlays, all others will return 0, 90, or 270 for rotation angle
     # 0 will be ignored.
     # Currently in use with bezels & libretro shaders
-    if not emulator in [ 'mame', 'retroarch' ]:
+    if not emulator in ['mame', 'retroarch']:
         return "standalone"
 
-    if not systemName in [ 'lynx', 'wswan', 'wswanc', 'mame', 'fbneo', 'naomi', 'atomiswave', 'nds', '3ds', 'vectrex' ]:
+    if not systemName in ['lynx', 'wswan', 'wswanc', 'mame', 'fbneo', 'naomi', 'atomiswave', 'nds', '3ds', 'vectrex']:
         return "0"
 
     # Look for external file, exit if not set up

@@ -11,6 +11,9 @@ import shutil
 from shutil import copyfile
 
 class SupermodelGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         commandArray = ["supermodel", "-fullscreen", "-channels=2"]

@@ -18,12 +18,12 @@ config BR2_PACKAGE_BATOCERA_NVIDIA340_LEGACY_DRIVER
 if BR2_PACKAGE_BATOCERA_NVIDIA340_LEGACY_DRIVER
 
 comment "batocera-nvidia340-legacy-driver X.org drivers needs a modular Xorg server"
-	depends on !BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR
+	depends on !BR2_PACKAGE_XWAYLAND
 
 config BR2_PACKAGE_BATOCERA_NVIDIA340_LEGACY_DRIVER_XORG
 	bool "X.org drivers"
 	default y
-	depends on BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR
+	#depends on BR2_PACKAGE_XWAYLAND || BR2_PACKAGE_SERVER_XORG_SERVER_MODULAR
 #batocera mesa3d and batocera-nvidia340-legacy-driver must coexist
 	select BR2_PACKAGE_MESA3D
 	select BR2_PACKAGE_XLIB_LIBX11

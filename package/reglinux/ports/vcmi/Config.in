@@ -1,5 +1,6 @@
 config BR2_PACKAGE_VCMI
 	bool "vcmi"
+	select BR2_PACKAGE_MINIZIP
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_SDL2_IMAGE
 	select BR2_PACKAGE_SDL2_MIXER
@@ -12,7 +13,6 @@ config BR2_PACKAGE_VCMI
 	select BR2_PACKAGE_BOOST_LOCALE
 	select BR2_PACKAGE_BOOST_PROGRAM_OPTIONS
 	select BR2_PACKAGE_BOOST_THREAD
-	select BR2_PACKAGE_BATOCERA_QT6
 
 	help
 	  Heroes of Might and Magic 3 engine.
