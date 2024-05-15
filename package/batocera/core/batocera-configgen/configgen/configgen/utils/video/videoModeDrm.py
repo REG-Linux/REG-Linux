@@ -102,9 +102,9 @@ def drmMinTomaxResolution(videomode):
         width = 1920
     if int(height) > 1080:
         height = 1080
-    maxWidth = width
-    maxHeight = height
-    if current["width"] < maxWidth and current["height"] < maxHeight:
+    maxWidth = int(width)
+    maxHeight = int(height)
+    if int(current["width"]) < maxWidth and int(current["height"]) < maxHeight:
         # TODO arch rpi4 refuses 1360x768
         # ARCH =$(cat / usr / share / batocera / batocera.arch)
         # if ! test "${ARCH}" = "bcm2711" -a "${CURRENTWIDTH}" = 1360 -a "${CURRENTHEIGHT}" = 768
