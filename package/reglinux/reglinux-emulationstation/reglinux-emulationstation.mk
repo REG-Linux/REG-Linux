@@ -167,8 +167,7 @@ REGLINUX_EMULATIONSTATION_POST_INSTALL_TARGET_HOOKS += REGLINUX_EMULATIONSTATION
 endif
 
 ## on Wayland sway runs ES
-ifeq ($(BR2_PACKAGE_REGLINUX_FORCE_SWAY),y)
-REGLINUX_EMULATIONSTATION_CMD = sway-launch
+ifeq ($(BR2_PACKAGE_REGLINUX_SWAY),y)
 REGLINUX_EMULATIONSTATION_DEPENDENCIES += sway
 REGLINUX_EMULATIONSTATION_POST_INSTALL_TARGET_HOOKS += REGLINUX_EMULATIONSTATION_WAYLAND_SWAY
 endif
@@ -178,9 +177,8 @@ define REGLINUX_EMULATIONSTATION_XORG
 endef
 
 define REGLINUX_EMULATIONSTATION_WAYLAND_SWAY
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/04-sway.sh  $(TARGET_DIR)/etc/profile.d/04-sway.sh
-    $(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/config      $(TARGET_DIR)/etc/sway/config
-    $(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/sway-launch $(TARGET_DIR)/usr/bin/sway-launch
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/config      $(TARGET_DIR)/etc/sway/config
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/sway-launch $(TARGET_DIR)/usr/bin/sway-launch
 endef
 
 define REGLINUX_EMULATIONSTATION_BOOT
