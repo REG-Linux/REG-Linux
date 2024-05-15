@@ -93,11 +93,17 @@ def drmGetScreens():
     (out, err) = proc.communicate()
     return out.decode().splitlines()
 
-def drmMinTomaxResolution():
+def drmMinTomaxResolution(videomode):
     current = drmGetCurrentResolution()
+    width = videomode.split("x")[0]
+    height = videomode.split("x")[1]
     # Clamp to 1920x1080 because of 4K TVs
-    maxWidth = 1920
-    maxHeight = 1080
+    if width > 1920:
+        width = 1920
+    if height > 1080:
+        height = 1080
+    maxWidth = width
+    maxHeight = height
     if current["width"] < maxWidth and current["height"] < maxHeight:
         # TODO arch rpi4 refuses 1360x768
         # ARCH =$(cat / usr / share / batocera / batocera.arch)
@@ -116,7 +122,7 @@ def drmMinTomaxResolution():
     #if test "${SUGGWIDTH}" -le "${MAXWIDTH}" -a "${SUGGHEIGHT}" -le "${MAXHEIGHT}"
     #then
     #echo "${SUGGMODE}" | cut - d "." - f 2 > / var / run / drmMode
-    #exit0
+    #exit 0
 
 def drmGetCurrentResolution(name = None):
     if name is None:
