@@ -25,6 +25,10 @@ cemuDatadir = '/usr/bin/cemu'
 
 class CemuGenerator(Generator):
 
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
+
     # disable hud & bezels for now - causes game issues
     def hasInternalMangoHUDCall(self):
         return True

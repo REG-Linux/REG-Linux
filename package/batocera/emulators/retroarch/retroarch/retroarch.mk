@@ -13,7 +13,7 @@ RETROARCH_INSTALL_STAGING = YES
 
 RETROARCH_CONF_OPTS = --disable-oss --enable-zlib --disable-qt --enable-threads --enable-ozone \
     --enable-xmb --disable-discord --enable-flac --enable-lua --enable-networking \
-	--enable-translate --enable-rgui --disable-cdrom
+	--enable-translate --enable-rgui --disable-cdrom --disable-videocore
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
     RETROARCH_CONF_OPTS += --enable-debug
@@ -37,12 +37,6 @@ else
 	else
         RETROARCH_CONF_OPTS += --disable-sdl
 	endif
-endif
-
-ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
-    RETROARCH_CONF_OPTS += --enable-videocore
-else
-    RETROARCH_CONF_OPTS += --disable-videocore
 endif
 
 ifeq ($(BR2_PACKAGE_LIBDRM),y)
@@ -216,7 +210,7 @@ ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
     LIBRETRO_PLATFORM += neon
 endif
 
-ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2835),y)
     LIBRETRO_PLATFORM += rpi armv
 endif
 

@@ -12,7 +12,7 @@ DOLPHIN_TRIFORCE_VERSION = 1.0.0-001
 DOLPHIN_TRIFORCE_LICENSE = GPLv2+
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
-	DOLPHIN_TRIFORCE_DEPENDENCIES = xserver_xorg-server
+	DOLPHIN_TRIFORCE_DEPENDENCIES = xwayland
 endif
 
 # Includes custom game configs required to successfully launch and play them.

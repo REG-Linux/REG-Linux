@@ -19,7 +19,7 @@ PLAY_CONF_OPTS += -DBUILD_TESTS=OFF
 PLAY_CONF_OPTS += -DENABLE_AMAZON_S3=OFF
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
-    PLAY_DEPENDENCIES += xserver_xorg-server libglew
+    PLAY_DEPENDENCIES += xwayland libglew
     PLAY_CONF_OPTS += -DOpenGL_GL_PREFERENCE=GLVND
 else
     PLAY_DEPENDENCIES += qt6wayland
@@ -28,7 +28,7 @@ else
     PLAY_CONF_OPTS += -DUSE_GLES=ON
 endif
 
-ifeq ($(BR2_PACKAGE_BATOCERA_VULKAN),y)
+ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     PLAY_DEPENDENCIES += vulkan-headers vulkan-loader
 endif
 

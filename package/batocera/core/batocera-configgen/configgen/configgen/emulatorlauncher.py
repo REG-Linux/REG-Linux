@@ -98,6 +98,66 @@ def main(args, maxnbplayers):
     else:
         return start_rom(args, maxnbplayers, args.rom, args.rom)
 
+sway_launched = False
+weston_launched = False
+gamescope_launched = False
+
+# TODO implement start_weston
+def start_weston(generator, system):
+    global weston_launched
+    if not weston_launched:
+        weston_launched = True
+
+# TODO implement stop_weston
+def stop_weston(generator, system):
+    global weston_launched
+    if weston_launched:
+        weston_launched = False
+
+def start_sway(generator, system):
+    global sway_launched
+    if not sway_launched:
+        os.system("WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -c /etc/sway/config -d & > /userdata/system/logs/sway.log 2>&1")
+        os.environ["WAYLAND_DISPLAY"]="wayland-1"
+        os.environ["XDG_RUNTIME_DIR"]="/var/run"
+        os.environ["SWAYSOCK"]="/var/run/sway-ipc.0.sock"
+        os.environ["SDL_VIDEODRIVER"]="wayland"
+        sway_launched = True
+
+def stop_sway(generator, system):
+    global sway_launched
+    if sway_launched:
+        os.system("swaymsg exit")
+        del os.environ["WAYLAND_DISPLAY"]
+        del os.environ["XDG_RUNTIME_DIR"]
+        del os.environ["SWAYSOCK"]
+        del os.environ["SDL_VIDEODRIVER"]
+        sway_launched = False
+
+# TODO handle gamescope
+def start_compositor(generator, system):
+    # If Weston is present, we should use it
+    if os.path.exists("/usr/bin/weston"):
+        start_weston(generator, system)
+        return
+
+    # Fallback on Sway (default case)
+    if os.path.exists("/usr/bin/sway"):
+        start_sway(generator, system)
+        return
+
+# TODO handle gamescope
+def stop_compositor(generator, system):
+    # Stop sway if launched
+    if sway_launched:
+        stop_sway(generator, system)
+        return
+
+    # Stop weston if launched
+    if weston_launched:
+        stop_weston(generator, system)
+        return
+
 def start_rom(args, maxnbplayers, rom, romConfiguration):
     global profiler
 
@@ -256,6 +316,10 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
         callExternalScripts("/usr/share/batocera/configgen/scripts", "gameStart", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
         callExternalScripts("/userdata/system/scripts", "gameStart", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
 
+        # start a compositor if needed
+        if generator.requiresWayland() or generator.requiresX11():
+            start_compositor(generator, system)
+
         # run the emulator
         try:
             from Evmapy import Evmapy
@@ -286,6 +350,11 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
                 profiler.enable()
         finally:
             Evmapy.stop()
+
+        # kill the running compositor if needed
+        if generator.requiresWayland() or generator.requiresX11():
+            stop_compositor(generator, system)
+
 
         # run a script after emulator shuts down
         callExternalScripts("/userdata/system/scripts", "gameStop", [systemName, system.config['emulator'], effectiveCore, effectiveRom])

@@ -1,0 +1,22 @@
+--- a/libweston/drm-formats.c	2024-05-12 14:38:08.046250718 +0200
++++ b/libweston/drm-formats.c	2024-05-12 14:41:21.474406963 +0200
+@@ -128,7 +128,8 @@
+ 	struct weston_drm_format *fmt;
+ 
+ 	/* We should not try to add repeated formats to an array. */
+-	assert(!weston_drm_format_array_find_format(formats, format));
++	if (weston_drm_format_array_find_format(formats, format))
++		return NULL;
+ 
+ 	fmt = wl_array_add(&formats->arr, sizeof(*fmt));
+ 	if (!fmt) {
+@@ -448,7 +449,8 @@
+ 	uint64_t *mod;
+ 
+ 	/* We should not try to add repeated modifiers to a set. */
+-	assert(!weston_drm_format_has_modifier(format, modifier));
++	if (weston_drm_format_has_modifier(format, modifier))
++		return -1;
+ 
+ 	mod = wl_array_add(&format->modifiers, sizeof(*mod));
+ 	if (!mod) {

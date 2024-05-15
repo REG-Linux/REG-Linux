@@ -7,16 +7,24 @@
 OPENMSX_VERSION = RELEASE_19_1
 OPENMSX_SITE = $(call github,openMSX,openMSX,$(OPENMSX_VERSION))
 OPENMSX_LICENSE = GPLv2
-OPENMSX_DEPENDENCIES = zlib sdl2 sdl2_ttf libpng tcl freetype
+OPENMSX_DEPENDENCIES = zlib sdl2 sdl2_ttf libpng tcl freetype libogg libvorbis libtheora
+
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+OPENMSX_DEPENDENCIES += libglew
+endif
 
 OPENMSX_CONF_ENV += $(TARGET_CONFIGURE_OPTS) \
+                OPENMSX_TARGET_CPU=$(BR2_ARCH) \
+                OPENMSX_TARGET_OS="linux" \
                 CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" \
                 CC_FOR_BUILD="$(TARGET_CC)" GCC_FOR_BUILD="$(TARGET_CC)" \
                 CXX_FOR_BUILD="$(TARGET_CXX)" \
                 CROSS_COMPILE="$(STAGING_DIR)/usr/bin/" \
                 PREFIX="$(STAGING_DIR)" \
+                SYSROOT="$(STAGING_DIR)" \
                 PKG_CONFIG="$(STAGING_DIR)/usr/bin/pkg-config" \
-                PATH="$(HOST_DIR)/bin:$(HOST_DIR)/sbin:$(PATH):$(STAGING_DIR)/usr/bin" \
+                PYTHON="$(HOST_DIR)/usr/bin/python" \
+                PATH="$(STAGING_DIR)/usr/bin:$(HOST_DIR)/bin:$(HOST_DIR)/sbin:$(PATH)" \
                 TCL_CONFIG="$(STAGING_DIR)/usr/lib" LD_FOR_BUILD="$(TARGET_CROSS)ld"
 
 # additional config options

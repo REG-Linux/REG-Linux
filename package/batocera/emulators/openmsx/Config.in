@@ -1,8 +1,5 @@
 config BR2_PACKAGE_OPENMSX
     bool "openmsx"
-    depends on BR2_x86_64
-    depends on BR2_PACKAGE_XORG7
-    depends on BR2_PACKAGE_HAS_LIBGL # libglew
     select BR2_PACKAGE_SDL2
     select BR2_PACKAGE_SDL2_TTF
     select BR2_PACKAGE_LIBPNG
@@ -13,7 +10,7 @@ config BR2_PACKAGE_OPENMSX
     select BR2_PACKAGE_TCL
     select BR2_PACKAGE_ZLIB
     select BR2_PACKAGE_ALSA_LIB
-    select BR2_PACKAGE_LIBGLEW
+    select BR2_PACKAGE_LIBGLEW	if BR2_PACKAGE_HAS_LIBGL
     select BR2_PACKAGE_FREETYPE
     help
       A MSX emulator that aims for perfection.

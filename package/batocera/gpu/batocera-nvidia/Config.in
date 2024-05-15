@@ -1,7 +1,7 @@
 config BR2_PACKAGE_BATOCERA_NVIDIA
     bool "batocera-nvidia"
 
-    depends on BR2_PACKAGE_XSERVER_XORG_SERVER
+    select BR2_PACKAGE_XWAYLAND
 
     # drivers
     select BR2_PACKAGE_BATOCERA_NVIDIA_DRIVER           # the last driver

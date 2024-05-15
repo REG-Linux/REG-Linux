@@ -15,6 +15,10 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class DolphinGenerator(Generator):
+    # this emulator/core requires X server to run
+    # TODO I think this is wrong and it can runs on wayland...
+    def requiresX11(self):
+        return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         if not os.path.exists(os.path.dirname(batoceraFiles.dolphinIni)):
