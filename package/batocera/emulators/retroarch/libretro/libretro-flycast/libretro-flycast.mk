@@ -3,8 +3,7 @@
 # libretro-flycast
 #
 ################################################################################
-# Version: Commits on Apr 5, 2024
-LIBRETRO_FLYCAST_VERSION = 9d6eab74e1eb182d627f63e1db79752852e9d230
+LIBRETRO_FLYCAST_VERSION = v2.3.2
 LIBRETRO_FLYCAST_SITE = https://github.com/flyinghead/flycast.git
 LIBRETRO_FLYCAST_SITE_METHOD=git
 LIBRETRO_FLYCAST_GIT_SUBMODULES=YES
@@ -30,11 +29,6 @@ ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     LIBRETRO_FLYCAST_CONF_OPTS += -DUSE_VULKAN=ON
 else
     LIBRETRO_FLYCAST_CONF_OPTS += -DUSE_VULKAN=OFF
-endif
-
-# RPI: use the legacy Broadcom GLES libraries
-ifeq ($(BR2_PACKAGE_BATOCERA_RPI_VCORE),y)
-    LIBRETRO_FLYCAST_CONF_OPTS += -DUSE_VIDEOCORE=ON
 endif
 
 ifeq ($(BR2_PACKAGE_HAS_LIBMALI),y)

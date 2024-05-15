@@ -86,8 +86,8 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Libretro-stella: bump to Jan 2, 2024 build
 - Libretro-swanstation: bump to Jan 25, 2024 build
 - Libretro-pcsx: bump to Feb 14, 2024 build
-- Libretro-flycast: bump to v2.3
-- Flycast: bump to v2.3
+- Libretro-Flycast: bump to v2.3.2
+- Flycast: bump to v2.3.2
 - Redream to 1.5.0-1103-g47bc2b7
 - Ikemen Go to 0.99
 - Amiberry to 5.6.8
@@ -129,7 +129,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Sonic-Mania to Mar 7, 2024 build
 ### System
 - Mainline Kernel 6.6.y bump to 6.6.23
-- Nvidia Production driver to 550.67
+- Nvidia Production driver to 550.78
 - Nvidia Legacy driver to 470.239.06
 - Wayland-protocols to 1.33
 - Wlroots to 0.17.1
@@ -140,7 +140,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - X86_64 kernel to 6.9
 - Switchres 0.220
 - Btop to 1.3.2
-- Linux firmware to 20240410
+- Linux firmware to 20240513
 - Buildroot to 2024.02.1
 - Xpad-Noone to Jan 10, 2024
 - XpadNeo to Apr 23, 2024 build
