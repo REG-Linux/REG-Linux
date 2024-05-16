@@ -2,7 +2,7 @@ config BR2_PACKAGE_GRIM
     bool "grim"
     depends on BR2_PACKAGE_WAYLAND
     select BR2_PACKAGE_PIXMAN
-    select BR2_PACKAGE_JPEG
+    select BR2_PACKAGE_LIBPNG
 
     help
         Grab images from a Wayland compositor.
