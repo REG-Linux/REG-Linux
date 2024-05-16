@@ -12,6 +12,7 @@ define LIBRETRO_SAME_CDI_BUILD_CMDS
 	# First, we need to build genie for host
 	cd $(@D); \
 	PATH="$(HOST_DIR)/bin:$$PATH" \
+	CCACHE_SLOPPINESS="pch_defines,time_macros,include_file_ctime,include_file_mtime" \
 	$(MAKE) TARGETOS=linux OSD=sdl genie \
 	TARGET=mame SUBTARGET=tiny \
 	NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
