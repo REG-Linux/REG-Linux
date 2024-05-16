@@ -10,12 +10,9 @@ GRIM_SITE = https://git.sr.ht/~emersion/grim/refs/download/v$(GRIM_VERSION)
 GRIM_LICENSE = MIT
 GRIM_LICENSE_FILES = LICENSE
 
-GRIM_DEPENDENCIES = wayland pixman jpeg
+GRIM_DEPENDENCIES = wayland pixman libpng
 
 GRIM_CONF_OPTS = -Dman-pages=disabled -Dwerror=false
-
-ifeq ($(BR2_riscv),y)
 GRIM_CONF_OPTS += -Djpeg=disabled
-endif
 
 $(eval $(meson-package))
