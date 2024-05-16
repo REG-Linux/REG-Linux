@@ -15,7 +15,7 @@ MAME_CFLAGS =
 MAME_LDFLAGS =
 
 # Limit number of jobs not to eat too much RAM....
-MAME_MAX_JOBS = 17
+MAME_MAX_JOBS = 8
 MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(MAME_MAX_JOBS) ]; then echo $(MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
 
 # Set PTR64 on/off according to architecture
@@ -98,7 +98,7 @@ define MAME_BUILD_CMDS
 	LDFLAGS="--sysroot=$(STAGING_DIR) $(MAME_LDFLAGS)"  MPARAM="" \
 	PKG_CONFIG="$(HOST_DIR)/usr/bin/pkg-config --define-prefix" \
 	PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig" \
-	CCACHE_SLOPPINESS="pch_defines,time_macros" \
+	CCACHE_SLOPPINESS="pch_defines,time_macros,include_file_ctime,include_file_mtime" \
 	$(MAKE) -j$(MAME_JOBS) TARGETOS=linux OSD=sdl \
 	TARGET=mame \
 	SUBTARGET=mame \
