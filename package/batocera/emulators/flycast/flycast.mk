@@ -9,7 +9,7 @@ FLYCAST_SITE = https://github.com/flyinghead/flycast.git
 FLYCAST_SITE_METHOD=git
 FLYCAST_GIT_SUBMODULES=YES
 FLYCAST_LICENSE = GPLv2
-FLYCAST_DEPENDENCIES = boost sdl2 libpng libzip libcurl libao libminiupnpc elfutils glslang
+FLYCAST_DEPENDENCIES = boost sdl2 libpng libzip libcurl libao libminiupnpc elfutils
 
 FLYCAST_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -28,6 +28,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     FLYCAST_CONF_OPTS += -DUSE_VULKAN=ON
+    FLYCAST_DEPENDENCIES += glslang
     FLYCAST_CONF_OPTS += -DUSE_HOST_GLSLANG=ON
 else
     FLYCAST_CONF_OPTS += -DUSE_VULKAN=OFF
