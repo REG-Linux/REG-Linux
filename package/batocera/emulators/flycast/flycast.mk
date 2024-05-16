@@ -9,7 +9,7 @@ FLYCAST_SITE = https://github.com/flyinghead/flycast.git
 FLYCAST_SITE_METHOD=git
 FLYCAST_GIT_SUBMODULES=YES
 FLYCAST_LICENSE = GPLv2
-FLYCAST_DEPENDENCIES = boost sdl2 libpng libzip libcurl libao libminiupnpc elfutils
+FLYCAST_DEPENDENCIES = boost sdl2 libpng libzip libcurl libao libminiupnpc elfutils glslang
 
 FLYCAST_SUPPORTS_IN_SOURCE_BUILD = NO
 
