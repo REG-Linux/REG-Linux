@@ -43,7 +43,7 @@ do_start ()
     MODELOPTS="/etc/opts.$V_BOARD_MODEL"
     test -e "${MODELOPTS}" && . "${MODELOPTS}"
 
-    test -e /dev/fb0 && fbv ${FBV_OPTS} -i "${image}"
+    test -e /dev/fb0 && /usr/bin/fbv ${FBV_OPTS} -i "${image}"
 }
 
 case "$1" in
