@@ -19,6 +19,8 @@ Add support for OrangePi Zero 3 (all variants)
 Add support for Radxa Rock 3C
 Initial support for the Lenovo Legion Go
 Support for Nvidia cards requiring the legacy 340.108 driver.
+Add support for the Ayaneo 2S
+Add support for the Ayaneo Air Plus (6800U) model
 ### Added
 - Support for Lexaloffle Voxatron (needs official engine, no emulator provided)
 - C64: support for REU (RAM Expansion Unit), .d71 and .g64 ROM format
@@ -61,6 +63,7 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Preferred vulkan driver name now listed in System Information
 - Start advisiong people on Vulkan GPU driver capabilities for Emualtors
 - Added additional Atari Lynx extensions for Beetle Lynx & Handy
+- Name the Bluetooth connection based on the host system hardware name.
 ### Updated
 - Retroarch to 1.18.0
 - Libretro cores for retroarch 1.17.0 [#11113](https://github.com/batocera-linux/batocera.linux/pull/11113/files)
@@ -127,6 +130,10 @@ Support for Nvidia cards requiring the legacy 340.108 driver.
 - Xenia to v1.0.2810
 - Vita3K to build 3596
 - Sonic-Mania to Mar 7, 2024 build
+- Libretro-Cap32 to May 15, 2024 build
+- Libretro-Arduous to May 14, 2024 build
+- Libretro-Beetle-PCE to May 3, 2024 build
+- Libretro-Beetle-PCE-Fast to May 10, 2024 build
 ### System
 - Mainline Kernel 6.6.y bump to 6.6.23
 - Nvidia Production driver to 550.78
