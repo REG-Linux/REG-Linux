@@ -94,7 +94,8 @@ endif
 if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY          || \
    BR2_PACKAGE_BATOCERA_TARGET_BCM2711          || \
    BR2_PACKAGE_BATOCERA_TARGET_BCM2712          || \
-   BR2_PACKAGE_BATOCERA_TARGET_RISCV            || \
+   BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2      || \
+   BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3      || \
    BR2_PACKAGE_BATOCERA_TARGET_H616             || \
    BR2_PACKAGE_BATOCERA_TARGET_AMLOGIC_GLES3    || \
    BR2_PACKAGE_BATOCERA_TARGET_ROCKCHIP_GLES3   || \
@@ -149,7 +150,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	bool "batocera.linux minimal"
 
 	# RISC-V support needs a hack here to declare as RV64GC, needed for Rust
-	select BR2_RISCV_ISA_RVC			if BR2_PACKAGE_BATOCERA_TARGET_RISCV
+	select BR2_RISCV_ISA_RVC			if BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2 || BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
 
 	# minimal system required packages
 	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
@@ -314,7 +315,8 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_REGLINUX_VULKAN	if  BR2_PACKAGE_BATOCERA_TARGET_X86_ANY || \
 						    BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
 						    BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
-						    BR2_PACKAGE_BATOCERA_TARGET_RISCV
+						    BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2 || \
+						    BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
 
 	# wireless drivers
 	# use the morrownr RTL8812au & RTL8821au drivers
@@ -456,7 +458,8 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "x86_64"										if BR2_PACKAGE_BATOCERA_TARGET_X86_64
 	default "znver2"										if BR2_PACKAGE_BATOCERA_TARGET_ZNVER2
 	default "qualcomm/sd845/odin"									if BR2_PACKAGE_BATOCERA_TARGET_ODIN
-	default "riscv/visionfive2"									if BR2_PACKAGE_BATOCERA_TARGET_RISCV
+	default "riscv/visionfive2"									if BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2
+	default "riscv/bananapi-f3"									if BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
 	default "allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/x96-mate" \
 													if BR2_PACKAGE_BATOCERA_TARGET_H616
 	default "amlogic/s922x/ogu amlogic/s922x/gtkingpro amlogic/s922x/gtking amlogic/s922x/odroidn2l amlogic/s922x/vim3 amlogic/s922x/odroidn2 amlogic/s922x/odroidn2plus amlogic/s922x/zero2" \
@@ -585,8 +588,11 @@ config BR2_PACKAGE_BATOCERA_TARGET_XU4
 
 # RISCV
 # -------------------------------------
-config BR2_PACKAGE_BATOCERA_TARGET_RISCV
-	bool "riscv"
+config BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2
+	bool "visionfive2"
+
+config BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
+	bool "bananapi-f3"
 
 endchoice
 
@@ -963,7 +969,8 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 							   !BR2_PACKAGE_BATOCERA_TARGET_H6	&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_RK3128	&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_RK3326	&& \
-							   !BR2_PACKAGE_BATOCERA_TARGET_RISCV	&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2	&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3	&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_ODIN
 
 	# Hydra Castle Labyrinth
