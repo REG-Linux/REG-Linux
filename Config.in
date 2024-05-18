@@ -69,7 +69,6 @@ menu "System"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/firmwares/firmware-armbian/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/firmwares/firmware-orangepi/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/firmwares/firmware-khadas-vim4/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/firmwares/firmware-radxa-rkwifibt/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/firmwares/firmware-rk3588/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/firmwares/sound-open-firmware/Config.in"
   endmenu
@@ -563,8 +562,8 @@ endmenu
 endmenu
 
 menu "REG.linux"
-
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/reglinux-initramfs/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/uboot-bananapi-f3/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box86/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box64/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mednafen/Config.in"
@@ -581,5 +580,6 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-splash/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-gpicase/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-samba/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/firmwares/firmware-radxa-rkwifibt/Config.in"
 
 endmenu
