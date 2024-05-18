@@ -1,49 +1,57 @@
 #!/bin/sh
 
-CONFIGRULES=/etc/udev/rules.d/99-gpicase.rules
 CONFIGFILE=/boot/config.txt
-RPIMODEL="/proc/device-tree/model"
-CONFIGMODIFIED=0
 
-if grep -q "^Raspberry Pi Zero 2" ${RPIMODEL}
-then
-    video="dtoverlay=retroflag-gpicase2w"
-else
-    video="dtoverlay=retroflag-gpicase"
+f_usage() {
+    echo "${0} gpicase" >&2
+    echo "${0} gpicase2" >&2
+    echo "${0} gpicase2w" >&2
+}
+
+do_config(){
+    setup="# ====== GPi Case setup section =====
+    ${video}
+    dtparam=act_led_trigger=none
+    dtparam=act_led_activelow=on
+    # ====== GPi Case setup section end ====="
+
+    echo "${setup}" | (
+    while read LINE
+    do
+        if ! grep -qE "^${LINE}$" "${CONFIGFILE}"
+        then
+            mount -o remount,rw /boot
+            echo "${LINE}" >> "${CONFIGFILE}"
+        fi
+    done
+    )
+    >&2 echo "${ACTION} support installed!"
+    >&2 echo "Please reboot the system so that the changes take effect!"
+}
+
+if [ $# -eq 0 ]; then
+    f_usage
+    exit 1
 fi
 
-setup="# ====== GPi Case setup section =====
-${video}
+ACTION=$1
 
-dtparam=act_led_trigger=none
-dtparam=act_led_activelow=on
-# ====== GPi Case setup section end =====
-# This will preserve always the default GPi settings if enabled, needed if some values were wrong setted by user"
-
-echo "${setup}" | (
-while read LINE
-do
-    if ! grep -qE "^${LINE}$" "${CONFIGFILE}"
-    then
-        test "${CONFIGMODIFIED}" = 0 && mount -o remount,rw /boot
-        echo "${LINE}" >> "${CONFIGFILE}"
-        CONFIGMODIFIED=1
-    fi
-done
-
-# We don't want install to be called on every boot
-if [ -e "${CONFIGRULES}" ];
-then
-    rm -rf "${CONFIGRULES}"
-    batocera-save-overlay
-fi
-
-#Reboot if there was a change in line
-if test "${CONFIGMODIFIED}" = 1
-then
-        echo "Rebooting now..."
-        shutdown -r now
-fi
-)
-
+case "${ACTION}" in
+    "gpicase")
+        video="dtoverlay=retroflag-gpicase"
+        do_config
+    ;;
+    "gpicase2")
+        video="dtoverlay=retroflag-gpicase2"
+        do_config
+    ;;
+    "gpicase2w")
+        video="dtoverlay=retroflag-gpicase2w"
+        do_config
+    ;;
+    *)
+        f_usage
+        >&2 echo "error: invalid command ${ACTION}"
+        exit 1
+esac
 exit 0
