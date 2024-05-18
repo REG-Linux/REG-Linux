@@ -90,12 +90,13 @@ endef
 
 define REGLINUX_SPLASH_INSTALL_IMAGE
     mkdir -p $(TARGET_DIR)/usr/share/batocera/splash
-    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo.png" -fill white -pointsize 30 -annotate +50+1020 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version.png"
-    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-3-2-480-rotate.png" -fill white -pointsize 15 -annotate 270x270+300+440 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-320x480.png"
-    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-16-9-480-rotate.png" -fill white -pointsize 20 -annotate 270x270+440+814 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-480x854.png"
-    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-480p.png" -fill white -pointsize 20 -annotate +40+440 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-640x480.png"
-    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-240.png" -fill white -pointsize 15 -annotate +20+220 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-320x240.png"
-    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-480-dmg.png" -fill white -pointsize 20 -annotate +40+440 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-640x480-dmg.png"
+    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo.png" -fill black -pointsize 30 -annotate +50+1020 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version.png"
+    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-3-2-480-rotate.png" -fill black -pointsize 15 -annotate 270x270+300+440 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-320x480.png"
+    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-16-9-480-rotate.png" -fill black -pointsize 20 -annotate 270x270+440+814 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-480x854.png"
+    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-480p.png" -fill black -pointsize 20 -annotate +40+440 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-640x480.png"
+    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-240.png" -fill black -pointsize 15 -annotate +20+220 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-320x240.png"
+    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-240-rotate.png" -fill black -pointsize 15 -annotate 90x90+20+20 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-240x320.png"
+    convert "$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-splash/images/logo-480-dmg.png" -fill black -pointsize 20 -annotate +40+440 "$(REGLINUX_SPLASH_TGVERSION)" "${TARGET_DIR}/usr/share/batocera/splash/logo-version-640x480-dmg.png"
 endef
 
 $(eval $(generic-package))
