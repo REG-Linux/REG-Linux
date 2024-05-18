@@ -1,0 +1,4 @@
+config BR2_PACKAGE_UBOOT_BANANAPI_F3
+    bool "uboot files for BananaPi F3"
+    help
+        uboot files for BananaPi F3
