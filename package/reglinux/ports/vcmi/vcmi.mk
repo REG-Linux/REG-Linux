@@ -1,6 +1,6 @@
 ################################################################################
 #
-# VCMI
+# vcmi
 #
 ################################################################################
 
@@ -11,11 +11,14 @@ VCMI_GIT_SUBMODULES=YES
 VCMI_DEPENDENCIES = minizip sdl2 sdl2_image sdl2_mixer sdl2_ttf ffmpeg tbb boost
 VCMI_SUPPORTS_IN_SOURCE_BUILD = NO
 
-VCMI_CONF_OPTS += -DENABLE_TEST=OFF -DENABLE_EDITOR=OFF
-VCMI_CONF_OPTS += -DENABLE_MONOLITHIC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="/usr/vcmi/" -DQT_VERSION_MAJOR=6
 VCMI_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 VCMI_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
-VCMI_CONF_OPTS += -DBUILD_STATIC_LIBS=OFF
+VCMI_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
+VCMI_CONF_OPTS += -DENABLE_TEST=OFF
+VCMI_CONF_OPTS += -DENABLE_EDITOR=OFF
+VCMI_CONF_OPTS += -DENABLE_MONOLITHIC_INSTALL=ON
+VCMI_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr/vcmi/"
+VCMI_CONF_OPTS += -DQT_VERSION_MAJOR=6
 
 # Launcher requires Qt6
 ifneq ($(BR2_PACKAGE_QT6),y)
