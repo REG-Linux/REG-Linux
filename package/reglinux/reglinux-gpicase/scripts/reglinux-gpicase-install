@@ -39,6 +39,7 @@ ACTION=$1
 case "${ACTION}" in
     "gpicase")
         video="dtoverlay=retroflag-gpicase"
+        batocera-settings-set system.es.environment sway
         do_config
     ;;
     "gpicase2")
