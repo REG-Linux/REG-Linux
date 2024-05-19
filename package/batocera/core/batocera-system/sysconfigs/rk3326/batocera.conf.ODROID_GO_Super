@@ -3,5 +3,5 @@
 # default resolution
 es.resolution=854x480
 
-# default rotation
-display.rotate=3
+# default sway environment (rotate)
+system.es.environment=sway
