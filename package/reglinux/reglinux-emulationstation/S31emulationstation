@@ -8,7 +8,13 @@ case "$1" in
 	start)
 	    enabled="$(/usr/bin/batocera-settings-get system.es.atstartup)"
 	    if [ "$enabled" != "0" ]; then
-		%REGLINUX_EMULATIONSTATION_CMD% %REGLINUX_EMULATIONSTATION_POSTFIX%
+	    	environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
+		if [ "$environment" = "sway" ]; then
+			SWAY_LOG_FILE=/userdata/system/logs/sway.log
+			WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -d > ${SWAY_LOG_FILE} 2>&1 &
+		else
+			%REGLINUX_EMULATIONSTATION_CMD% %REGLINUX_EMULATIONSTATION_POSTFIX%
+		fi
 	    fi
 	    ;;
 
