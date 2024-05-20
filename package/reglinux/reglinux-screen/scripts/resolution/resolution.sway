@@ -142,3 +142,11 @@ mapTouchScreen() {
         swaymsg input "${TOUCHSCREEN}" map_to_output "${OUTPUT}"
     fi
 }
+
+minTomaxResolution() {
+    f_minTomaxResolution "$1"
+}
+
+supportSystemRotation() {
+    exit 0
+}
