@@ -1,0 +1,5 @@
+#!/bin/bash
+
+screenshot() {
+    fbdump > "${FILE}" 2>/dev/null || exit 1
+}
