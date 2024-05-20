@@ -1,0 +1,16 @@
+#!/bin/bash
+
+environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
+
+if [ "$environment" = "sway" ]; then
+    source /etc/reglinux/screenshot.sway
+else
+    source /etc/reglinux/screenshot.drm
+fi
+
+FILE=$1
+if [ -z ${FILE} ]; then
+    FILE="/userdata/screenshots/screenshot-$(date +%Y.%m.%d-%Hh%M.%S).png"
+fi
+
+screenshot
