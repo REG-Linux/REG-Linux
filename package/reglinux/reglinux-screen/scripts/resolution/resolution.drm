@@ -155,5 +155,13 @@ setRotation() {
 }
 
 getDisplayMode() {
-        echo "drm"
+    echo "drm"
+}
+
+minTomaxResolution() {
+    f_minTomaxResolution "$1"
+}
+
+supportSystemRotation() {
+    exit 1
 }
