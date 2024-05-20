@@ -1,0 +1,10 @@
+config BR2_PACKAGE_REGLINUX_RESOLUTION
+	bool "reglinux-resolution"
+
+	select BR2_PACKAGE_BASH
+	select BR2_PACKAGE_PCIUTILS
+	select BR2_PACKAGE_GRIM         if BR2_PACKAGE_REGLINUX_SWAY
+	select BR2_PACKAGE_WF_RECORDER  if BR2_PACKAGE_REGLINUX_SWAY
+
+	help
+	  REGLinux resolution
