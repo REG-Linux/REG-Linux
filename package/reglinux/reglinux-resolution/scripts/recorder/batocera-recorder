@@ -1,0 +1,36 @@
+#!/bin/bash
+
+environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
+
+if [ "$environment" = "sway" ]; then
+    source /etc/reglinux/recorder.sway
+else
+    source /etc/reglinux/recorder.drm
+fi
+
+usage() {
+    echo "${1} --default"     >&2
+    echo "${1} --fast"        >&2
+    echo "${1} --compress"    >&2
+}
+
+ACTION=$1
+
+case "${ACTION}" in
+        --fast)
+        fast_record
+        ;;
+        --default)
+        default_record
+        ;;
+        --compress)
+        compress_record
+        ;;
+        -h|--help)
+        usage "${0}"
+        exit 0
+        ;;
+        *)
+        default_record
+        ;;
+esac

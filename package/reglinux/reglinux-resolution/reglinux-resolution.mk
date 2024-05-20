@@ -19,6 +19,10 @@ define REGLINUX_RESOLUTION_INSTALL_TARGET_CMDS
 	install -m 0755 $(REGLINUX_RESOLUTION_PATH)/resolution/resolution.drm		$(TARGET_DIR)/etc/reglinux/
 	install -m 0755 $(REGLINUX_RESOLUTION_PATH)/resolution/resolution.sway		$(TARGET_DIR)/etc/reglinux/
 	install -m 0755 $(REGLINUX_RESOLUTION_PATH)/resolution/batocera-resolution	$(TARGET_DIR)/usr/bin/
+
+	install -m 0755 $(REGLINUX_RESOLUTION_PATH)/recorder/recorder.drm		$(TARGET_DIR)/etc/reglinux/
+	install -m 0755 $(REGLINUX_RESOLUTION_PATH)/recorder/recorder.sway		$(TARGET_DIR)/etc/reglinux/
+	install -m 0755 $(REGLINUX_RESOLUTION_PATH)/recorder/batocera-recorder		$(TARGET_DIR)/usr/bin/
 endef
 
 $(eval $(generic-package))
