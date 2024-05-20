@@ -580,6 +580,6 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-splash/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-gpicase/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-samba/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-screen/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/firmwares/firmware-radxa-rkwifibt/Config.in"
-
 endmenu

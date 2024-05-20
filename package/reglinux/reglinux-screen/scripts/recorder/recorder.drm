@@ -1,0 +1,17 @@
+#!/bin/bash
+
+RESOLUTION=$(batocera-resolution currentResolution)
+OUTPUT="/userdata/screenshots/capture-$(date +%Y.%m.%d-%Hh%M.%S).mkv"
+mkdir -p /userdata/screenshots || exit 1
+
+default_record(){
+    ffmpeg -video_size "${RESOLUTION}" -framerate 25 -f kmsgrab -i :0.0+0,0 "${OUTPUT}"
+}
+
+fast_record(){
+    ffmpeg -video_size "${RESOLUTION}" -framerate 30 -f kmsgrab -i :0.0 -c:v libx264rgb -crf 0 -preset ultrafast "${OUTPUT}"
+}
+
+compress_record(){
+    ffmpeg -video_size "${RESOLUTION}" -framerate 30 -f kmsgrab -i :0.0 -c:v libx264rgb -crf 20 -preset veryfast "${OUTPUT}"
+}
