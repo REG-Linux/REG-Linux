@@ -1,0 +1,66 @@
+#!/bin/bash
+
+environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
+
+if [ "$environment" = "sway" ]; then
+    source /etc/reglinux/resolution.sway
+else
+    source /etc/reglinux/resolution.drm
+fi
+
+f_usage() {
+    echo "${0} listModes" >&2
+    echo "${0} listOutputs" >&2
+    echo "${0} currentMode" >&2
+    echo "${0} currentOutput" >&2
+    echo "${0} currentResolution" >&2
+    echo "${0} setMode <MODE>" >&2
+    echo "${0} setOutput <OUTPUT>" >&2
+    echo "${0} setRotation (0|1|2|3)" >&2
+    echo "${0} getDisplayMode" >&2
+}
+
+if [ $# -eq 0 ]; then
+    f_usage
+    exit 1
+fi
+
+ACTION=$1
+
+case "${ACTION}" in
+    "listModes")
+        listModes
+    ;;
+    "listOutputs")
+        listOutputs
+    ;;
+    "currentMode")
+        currentMode
+    ;;
+    "currentOutput")
+        currentOutput
+    ;;
+    "currentResolution")
+        currentResolution
+    ;;
+    "setMode")
+        setMode
+    ;;
+    "setOutput")
+        setOutput
+    ;;
+    "setRotation")
+        setRotation
+    ;;
+    "getDisplayMode")
+        getDisplayMode
+    ;;
+    "mapTouchScreen")
+        mapTouchScreen
+    ;;
+    *)
+        f_usage
+        >&2 echo "error: invalid command ${ACTION}"
+        exit 1
+esac
+exit 0
