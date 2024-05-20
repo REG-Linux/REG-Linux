@@ -1,0 +1,6 @@
+#!/bin/bash
+
+screenshot() {
+    OUTPUT=$(batocera-resolution currentOutput)
+    grim -o "$OUTPUT" "$FILE" 2>/dev/null || exit 1
+}

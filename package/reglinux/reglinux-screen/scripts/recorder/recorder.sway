@@ -1,0 +1,17 @@
+#!/bin/bash
+
+DISPLAY=$(batocera-resolution currentOutput)
+OUTPUT="/userdata/screenshots/capture-$(date +%Y.%m.%d-%Hh%M.%S).mp4"
+mkdir -p /userdata/screenshots || exit 1
+
+default_record(){
+    wf-recorder -a -o $DISPLAY -f ${OUTPUT}
+}
+
+fast_record(){
+    default_record
+}
+
+compress_record(){
+    default_record
+}
