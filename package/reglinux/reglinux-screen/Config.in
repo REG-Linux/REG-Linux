@@ -1,5 +1,5 @@
-config BR2_PACKAGE_REGLINUX_RESOLUTION
-	bool "reglinux-resolution"
+config BR2_PACKAGE_REGLINUX_SCREEN
+	bool "reglinux-screen"
 
 	select BR2_PACKAGE_BASH
 	select BR2_PACKAGE_PCIUTILS
@@ -7,4 +7,4 @@ config BR2_PACKAGE_REGLINUX_RESOLUTION
 	select BR2_PACKAGE_WF_RECORDER  if BR2_PACKAGE_REGLINUX_SWAY
 
 	help
-	  REGLinux resolution
+	  REGLinux screen configuration
