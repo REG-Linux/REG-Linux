@@ -574,8 +574,8 @@ config BR2_PACKAGE_BATOCERA_TARGET_X86
 config BR2_PACKAGE_BATOCERA_TARGET_X86_64
 	bool "x86_64"
 
-config BR2_PACKAGE_BATOCERA_TARGET_ZNVER2
-	bool "x86_64_znver2"
+config BR2_PACKAGE_BATOCERA_TARGET_ZEN3
+	bool "x86_64-v3"
 
 # Snapdragon & Samsung
 # -------------------------------------
