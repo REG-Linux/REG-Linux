@@ -1,8 +1,6 @@
 #!/bin/bash
 
-environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
-
-if [ "$environment" = "sway" ]; then
+if [ $(pgrep -x sway) ]; then
     source /etc/reglinux/resolution.sway
 else
     source /etc/reglinux/resolution.drm
