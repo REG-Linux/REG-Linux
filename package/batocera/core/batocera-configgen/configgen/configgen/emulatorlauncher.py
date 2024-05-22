@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import psutil
 profiler = None
 
 # 1) touch /var/run/emulatorlauncher.perf
@@ -321,7 +320,7 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
 
         # start a compositor if needed
         if generator.requiresWayland() or generator.requiresX11():
-            if not process_status("sway"):
+            if not videoMode.process_status("sway"):
                 start_compositor(generator, system)
 
         # run the emulator

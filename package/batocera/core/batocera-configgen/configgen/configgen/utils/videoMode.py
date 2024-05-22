@@ -4,9 +4,10 @@ import os
 import re
 import subprocess
 import sys
+import psutil
 
 from utils.video.videoModeDrm import drmChangeMode, drmGetCurrentMode, drmGetCurrentResolution, drmMinTomaxResolution
-from utils.video.videoModeWayland import waylandChangeMode, waylandGetCurrentMode, waylandGetCurrentResolution
+from utils.video.videoModeWayland import waylandChangeMode, waylandGetCurrentMode, waylandGetCurrentResolution, waylandMinTomaxResolution
 from utils.video.videoModeX11 import X11ChangeMode, X11GetCurrentMode, X11GetCurrentResolution
 from .logger import get_logger
 
@@ -14,18 +15,30 @@ eslog = get_logger(__name__)
 
 # Set a specific video mode
 def changeMode(videomode):
-    return drmChangeMode(videomode)
+    if process_status("sway"):
+        return waylandChangeMode(videomode)
+    else:
+        return drmChangeMode(videomode)
 
 def getCurrentMode():
-    return drmGetCurrentMode()
+    if process_status("sway"):
+        return waylandGetCurrentMode()
+    else:
+        return drmGetCurrentMode()
 
 def getCurrentResolution(name=None):
-    return drmGetCurrentResolution(name)
+    if process_status("sway"):
+        return waylandGetCurrentResolution(name)
+    else:
+        return drmGetCurrentResolution(name)
 
 def minTomaxResolution():
     current = getCurrentResolution()
     resolution = str(current["width"]) + "x" + str(current["height"])
-    return drmMinTomaxResolution(resolution)
+    if process_status("sway"):
+        return waylandMinTomaxResolution(resolution)
+    else:
+        return drmMinTomaxResolution(resolution)
 
 def getRefreshRate():
     proc = subprocess.Popen(["batocera-resolution refreshRate"], stdout=subprocess.PIPE, shell=True)
@@ -171,3 +184,9 @@ def getAltDecoration(systemName, rom, emulator):
                 return str(row[1])
 
     return "0"
+
+def process_status(process_name):
+    for process in psutil.process_iter(['pid', 'name']):
+        if process.info['name'] == process_name:
+            return True
+    return False

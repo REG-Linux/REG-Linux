@@ -65,9 +65,10 @@ def waylandGetScreens():
     (out, err) = proc.communicate()
     return out.decode().splitlines()
 
-def waylandMinTomaxResolution():
-    proc = subprocess.Popen(["batocera-resolution minTomaxResolution"], stdout=subprocess.PIPE, shell=True)
+def waylandMinTomaxResolution(resolution):
+    proc = subprocess.Popen(["batocera-resolution minTomaxResolution {}".format(resolution)], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
+    return out.decode().splitlines()
 
 def waylandGetCurrentResolution(name = None):
     if name is None:
