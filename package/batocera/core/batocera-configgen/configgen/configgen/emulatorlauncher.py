@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import psutil
 profiler = None
 
 # 1) touch /var/run/emulatorlauncher.perf
@@ -320,7 +321,8 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
 
         # start a compositor if needed
         if generator.requiresWayland() or generator.requiresX11():
-            start_compositor(generator, system)
+            if not process_status("sway"):
+                start_compositor(generator, system)
 
         # run the emulator
         try:
@@ -639,6 +641,12 @@ def signal_handler(signal, frame):
     if proc:
         eslog.debug('killing proc')
         proc.kill()
+
+def process_status(process_name):
+    for process in psutil.process_iter(['pid', 'name']):
+        if process.info['name'] == process_name:
+            return True
+    return False
 
 if __name__ == '__main__':
     proc = None
