@@ -117,12 +117,13 @@ def stop_weston(generator, system):
 def start_sway(generator, system):
     global sway_launched
     if not sway_launched:
-        os.system("WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -c /etc/sway/config -d & > /userdata/system/logs/sway.log 2>&1")
+        os.system("WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -c /etc/sway/launchconfig -d & > /userdata/system/logs/sway.log 2>&1")
         os.environ["WAYLAND_DISPLAY"]="wayland-1"
         os.environ["XDG_RUNTIME_DIR"]="/var/run"
         os.environ["SWAYSOCK"]="/var/run/sway-ipc.0.sock"
         os.environ["SDL_VIDEODRIVER"]="wayland"
         sway_launched = True
+        eslog.debug("Composer started!")
 
 def stop_sway(generator, system):
     global sway_launched
@@ -133,6 +134,7 @@ def stop_sway(generator, system):
         del os.environ["SWAYSOCK"]
         del os.environ["SDL_VIDEODRIVER"]
         sway_launched = False
+        eslog.debug("Composer finished!")
 
 # TODO handle gamescope
 def start_compositor(generator, system):
@@ -318,7 +320,8 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
 
         # start a compositor if needed
         if generator.requiresWayland() or generator.requiresX11():
-            start_compositor(generator, system)
+            if not videoMode.process_status("sway"):
+                start_compositor(generator, system)
 
         # run the emulator
         try:
@@ -471,7 +474,7 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
             if abs((infos_left  - ((bezel_width-img_width)/2.0)) / img_width) > max_cover:
                 eslog.debug(f"bezel left covers too much the game image : {infos_left  - ((bezel_width-img_width)/2.0)} / {img_width} > {max_cover}")
                 return None
-        
+
     if "right" not in infos:
         eslog.debug(f"bezel has no right info in {overlay_info_file}")
         # assume default is 4/3 over 16/9
@@ -637,6 +640,12 @@ def signal_handler(signal, frame):
     if proc:
         eslog.debug('killing proc')
         proc.kill()
+
+def process_status(process_name):
+    for process in psutil.process_iter(['pid', 'name']):
+        if process.info['name'] == process_name:
+            return True
+    return False
 
 if __name__ == '__main__':
     proc = None
