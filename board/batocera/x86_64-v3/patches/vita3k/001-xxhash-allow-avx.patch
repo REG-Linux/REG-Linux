@@ -1,0 +1,11 @@
+--- a/external/xxHash/xxh_x86dispatch.c	2024-05-23 12:49:29.591413856 +0200
++++ b/external/xxHash/xxh_x86dispatch.c	2024-05-23 12:52:44.179480011 +0200
+@@ -89,6 +89,8 @@
+ #  define XXH_X86DISPATCH_ALLOW_AVX
+ #endif
+ 
++// Force AVX for x86_64-v3 sublevel target
++#define XXH_X86DISPATCH_ALLOW_AVX
+ #if defined(__AVX__) && !defined(XXH_X86DISPATCH_ALLOW_AVX)
+ #  error "Error: if xxh_x86dispatch.c is compiled with AVX enabled, the resulting binary will crash on sse2-only cpus !! " \
+          "If you nonetheless want to do that, please enable the XXH_X86DISPATCH_ALLOW_AVX build variable"
