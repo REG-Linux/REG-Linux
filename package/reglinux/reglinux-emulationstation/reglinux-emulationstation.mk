@@ -177,7 +177,8 @@ define REGLINUX_EMULATIONSTATION_XORG
 endef
 
 define REGLINUX_EMULATIONSTATION_WAYLAND_SWAY
-    $(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/config      $(TARGET_DIR)/etc/sway/config
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/config		$(TARGET_DIR)/etc/sway/config
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/launchconfig	$(TARGET_DIR)/etc/sway/launchconfig
 endef
 
 define REGLINUX_EMULATIONSTATION_BOOT
