@@ -1,0 +1,21 @@
+--- a/render/allocator/gbm.c	2024-05-23 16:32:28.265570228 +0200
++++ b/render/allocator/gbm.c	2024-05-23 16:32:53.442064673 +0200
+@@ -33,7 +33,6 @@
+ 	attribs.format = gbm_bo_get_format(bo);
+ 	attribs.modifier = 0;
+ 
+-	int i;
+ 	int32_t handle = -1;
+ 
+ 	// Only one plane in libmali
+@@ -57,9 +56,7 @@
+ 	return true;
+ 
+ error_fd:
+-	for (int j = 0; j < i; ++j) {
+-		close(attribs.fd[0]);
+-	}
++	close(attribs.fd[0]);
+ 	return false;
+ }
+ 

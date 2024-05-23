@@ -17,6 +17,8 @@ endif
 
 ifeq ($(BR2_PACKAGE_MESA3D),y)
 GL4ES_DEPENDENCIES += mesa3d
+else
+GL4ES_DEPENDENCIES += libgles
 endif
 
 define GL4ES_FIX_SO

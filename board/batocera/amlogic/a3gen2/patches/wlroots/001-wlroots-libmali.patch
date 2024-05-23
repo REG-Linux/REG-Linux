@@ -1,0 +1,115 @@
+--- a/render/allocator/gbm.c	2024-05-23 16:11:22.405533800 +0200
++++ b/render/allocator/gbm.c	2024-05-23 16:23:12.441796063 +0200
+@@ -27,64 +27,38 @@
+ 		struct wlr_dmabuf_attributes *out) {
+ 	struct wlr_dmabuf_attributes attribs = {0};
+ 
+-	attribs.n_planes = gbm_bo_get_plane_count(bo);
+-	if (attribs.n_planes > WLR_DMABUF_MAX_PLANES) {
+-		wlr_log(WLR_ERROR, "GBM BO contains too many planes (%d)",
+-			attribs.n_planes);
+-		return false;
+-	}
+-
++	attribs.n_planes = 1;
+ 	attribs.width = gbm_bo_get_width(bo);
+ 	attribs.height = gbm_bo_get_height(bo);
+ 	attribs.format = gbm_bo_get_format(bo);
+-	attribs.modifier = gbm_bo_get_modifier(bo);
++	attribs.modifier = 0;
+ 
+ 	int i;
+ 	int32_t handle = -1;
+-	for (i = 0; i < attribs.n_planes; ++i) {
+-#if HAVE_GBM_BO_GET_FD_FOR_PLANE
+-		(void)handle;
+-
+-		attribs.fd[i] = gbm_bo_get_fd_for_plane(bo, i);
+-		if (attribs.fd[i] < 0) {
+-			wlr_log(WLR_ERROR, "gbm_bo_get_fd_for_plane failed");
+-			goto error_fd;
+-		}
+-#else
+-		// GBM is lacking a function to get a FD for a given plane. Instead,
+-		// check all planes have the same handle. We can't use
+-		// drmPrimeHandleToFD because that messes up handle ref'counting in
+-		// the user-space driver.
+-		union gbm_bo_handle plane_handle = gbm_bo_get_handle_for_plane(bo, i);
+-		if (plane_handle.s32 < 0) {
+-			wlr_log(WLR_ERROR, "gbm_bo_get_handle_for_plane failed");
+-			goto error_fd;
+-		}
+-		if (i == 0) {
+-			handle = plane_handle.s32;
+-		} else if (plane_handle.s32 != handle) {
+-			wlr_log(WLR_ERROR, "Failed to export GBM BO: "
+-				"all planes don't have the same GEM handle");
+-			goto error_fd;
+-		}
+-
+-		attribs.fd[i] = gbm_bo_get_fd(bo);
+-		if (attribs.fd[i] < 0) {
+-			wlr_log(WLR_ERROR, "gbm_bo_get_fd failed");
+-			goto error_fd;
+-		}
+-#endif
+ 
+-		attribs.offset[i] = gbm_bo_get_offset(bo, i);
+-		attribs.stride[i] = gbm_bo_get_stride_for_plane(bo, i);
++	// Only one plane in libmali
++	union gbm_bo_handle bo_handle = gbm_bo_get_handle(bo);
++	if (bo_handle.s32 < 0) {
++		wlr_log(WLR_ERROR, "gbm_bo_get_handle failed");
++		goto error_fd;
++	}
++	handle = bo_handle.s32;
++
++	attribs.fd[0] = gbm_bo_get_fd(bo);
++	if (attribs.fd[0] < 0) {
++		wlr_log(WLR_ERROR, "gbm_bo_get_fd failed");
++		goto error_fd;
+ 	}
+ 
++	attribs.offset[0] = 0;
++	attribs.stride[0] = gbm_bo_get_stride(bo);
++	handle = handle;
+ 	*out = attribs;
+ 	return true;
+ 
+ error_fd:
+ 	for (int j = 0; j < i; ++j) {
+-		close(attribs.fd[j]);
++		close(attribs.fd[0]);
+ 	}
+ 	return false;
+ }
+@@ -95,24 +69,12 @@
+ 
+ 	assert(format->len > 0);
+ 
+-	bool has_modifier = true;
++	bool has_modifier = false;
+ 	uint64_t fallback_modifier = DRM_FORMAT_MOD_INVALID;
+-	struct gbm_bo *bo = gbm_bo_create_with_modifiers(gbm_device, width, height,
+-		format->format, format->modifiers, format->len);
+-	if (bo == NULL) {
+-		uint32_t usage = GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING;
+-		if (format->len == 1 &&
+-				format->modifiers[0] == DRM_FORMAT_MOD_LINEAR) {
+-			usage |= GBM_BO_USE_LINEAR;
+-			fallback_modifier = DRM_FORMAT_MOD_LINEAR;
+-		} else if (!wlr_drm_format_has(format, DRM_FORMAT_MOD_INVALID)) {
+-			// If the format doesn't accept an implicit modifier, bail out.
+-			wlr_log(WLR_ERROR, "gbm_bo_create_with_modifiers failed");
+-			return NULL;
+-		}
+-		bo = gbm_bo_create(gbm_device, width, height, format->format, usage);
+-		has_modifier = false;
+-	}
++	uint32_t usage = GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING | GBM_BO_USE_LINEAR;
++	struct gbm_bo *bo = gbm_bo_create(gbm_device, width, height, format->format, usage);
++	has_modifier = false;
++
+ 	if (bo == NULL) {
+ 		wlr_log(WLR_ERROR, "gbm_bo_create failed");
+ 		return NULL;
