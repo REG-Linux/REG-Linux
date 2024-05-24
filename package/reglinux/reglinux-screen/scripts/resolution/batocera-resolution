@@ -52,13 +52,13 @@ case "${ACTION}" in
         currentResolution
     ;;
     "setMode")
-        setMode
+        setMode $1
     ;;
     "setOutput")
-        setOutput
+        setOutput $1
     ;;
     "setRotation")
-        setRotation
+        setRotation $1
     ;;
     "getDisplayMode")
         getDisplayMode
@@ -67,7 +67,7 @@ case "${ACTION}" in
         mapTouchScreen
     ;;
     "minTomaxResolution")
-        minTomaxResolution
+        minTomaxResolution $1
     ;;
     "supportSystemRotation")
         supportSystemRotation
