@@ -3,8 +3,8 @@
 # rtw89-temp
 #
 ################################################################################
-# Version: Commits on Jan 18, 2023
-RTW89_TEMP_VERSION = fce040c12fbf93bfd904ded48df60dea2c8d4423
+# Version: Commits on May 7, 2024
+RTW89_TEMP_VERSION = 239cc6670a67a1e7b6f43bd681efdfedf6a53bb1
 RTW89_TEMP_SITE = $(call github,lwfinger,rtw89,$(RTW89_TEMP_VERSION))
 RTW89_TEMP_LICENSE = GPL-2.0
 RTW89_TEMP_LICENSE_FILES = LICENSE

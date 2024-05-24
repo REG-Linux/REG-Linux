@@ -14,7 +14,7 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-DTB="rk3588-evb1-lp4-v10-linux.dtb"
+DTB="rk3588-quartzpro64.dtb"
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
