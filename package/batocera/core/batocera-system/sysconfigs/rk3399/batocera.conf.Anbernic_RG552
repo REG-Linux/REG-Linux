@@ -8,3 +8,4 @@ system.shutdowndelay=1
 
 # default sway environment (rotate)
 system.es.environment=sway
+display.rotate=3
