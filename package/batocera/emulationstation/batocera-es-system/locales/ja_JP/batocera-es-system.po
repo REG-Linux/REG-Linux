@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: batocera-es v40b(2024/04/07)\n"
+"Project-Id-Version: batocera-es v40b(2024/05/22)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2024-04-07 21:45+0900\n"
+"PO-Revision-Date: 2024-05-22 19:27+0900\n"
 "Last-Translator: mikakunin\n"
 "Language-Team: mikakunin\n"
 "Language: ja\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #. TRANSLATION: shared
 msgctxt "game_options"
@@ -19,11 +19,13 @@ msgid ""
 "Adjust the cpu power frequency profile whilst in-game. Some systems will "
 "benefit from improved voltage handling."
 msgstr ""
+"ゲーム中に CPU 電力周波数プロファイルを調整します。一部のシステムでは、電圧処"
+"理の改善によるメリットが得られます"
 
 #. TRANSLATION: shared, shared, shared
 msgctxt "game_options"
 msgid "POWER OPTIONS"
-msgstr ""
+msgstr "電源オプション"
 
 #. TRANSLATION: shared
 msgctxt "game_options"
@@ -51,11 +53,13 @@ msgid ""
 "Adjust the cpu power profile whist on battery. Overwrites previous Power "
 "Mode(s)."
 msgstr ""
+"バッテリーを使用しながら CPU 電力プロファイルを調整します。以前の電力モードを"
+"上書きします"
 
 #. TRANSLATION: shared
 msgctxt "game_options"
 msgid "BATTERY MODE"
-msgstr ""
+msgstr "バッテリーモード"
 
 #. TRANSLATION: shared
 msgctxt "game_options"
@@ -4740,6 +4744,11 @@ msgstr "Philips CD-i CD-ROM"
 
 #. TRANSLATION: libretro/mame, mame/pcsx2
 msgctxt "game_options"
+msgid "Tandy Radio Shack Color Computer cassettes"
+msgstr ""
+
+#. TRANSLATION: libretro/mame, mame/pcsx2
+msgctxt "game_options"
 msgid "Tandy Radio Shack Color Computer cartridges"
 msgstr "Tandy Radio Shack Color Computer カートリッジ"
 
@@ -6730,12 +6739,12 @@ msgstr "CPU 速度"
 #. TRANSLATION: libretro/puae
 msgctxt "game_options"
 msgid "PAL 288x576px 50Hz (auto)"
-msgstr "PAL 288x576px 50Hz (auto)"
+msgstr "PAL 288x576px 50Hz (自動)"
 
 #. TRANSLATION: libretro/puae
 msgctxt "game_options"
 msgid "NTSC 240x480px 60Hz (auto)"
-msgstr "NTSC 240x480px 60Hz (auto)"
+msgstr "NTSC 240x480px 60Hz (自動)"
 
 #. TRANSLATION: libretro/puae, libretro/puae2021
 msgctxt "game_options"
@@ -9279,7 +9288,7 @@ msgstr "スケーリングされたディザリング"
 msgctxt "game_options"
 msgid ""
 "When running outside of 100%, adjusts the temp instead of dropping frames."
-msgstr "100% 超えで動作している場合、フレームを落とさずに音質を調整します"
+msgstr "100% 以外で動作している場合、フレームを落とさずに音質を調整します"
 
 #. TRANSLATION: duckstation, rpcs3, rpcs3, rpcs3, rpcs3, ...
 msgctxt "game_options"
@@ -9434,32 +9443,32 @@ msgstr "0.05 秒間隔、合計  5秒 (550MB|100MB)"
 #. TRANSLATION: duckstation
 msgctxt "game_options"
 msgid "Per 0.1s, 10s total (1100MB|200MB)"
-msgstr " 0.1秒間隔、合計 10秒 (1100MB|200MB)"
+msgstr "0.1秒間隔、合計10秒 (1100MB|200MB)"
 
 #. TRANSLATION: duckstation
 msgctxt "game_options"
 msgid "Per 1s, 15s total (165MB|30MB)"
-msgstr "   1 秒間隔、合計 15秒 (165MB|30MB)"
+msgstr " 1 秒間隔、合計 15秒 (165MB|30MB)"
 
 #. TRANSLATION: duckstation
 msgctxt "game_options"
 msgid "Per 1s, 30s total (330MB|60MB)"
-msgstr "   1 秒間隔、合計 30秒 (330MB|60MB)"
+msgstr " 1 秒間隔、合計 30秒 (330MB|60MB)"
 
 #. TRANSLATION: duckstation
 msgctxt "game_options"
 msgid "Per 1s, 60s total (660MB|120MB)"
-msgstr "   1 秒間隔、合計 60秒 (660MB|120MB)"
+msgstr " 1 秒間隔、合計 60秒 (660MB|120MB)"
 
 #. TRANSLATION: duckstation
 msgctxt "game_options"
 msgid "Per 1s, 90s total (990MB|180MB)"
-msgstr "   1 秒間隔、合計 90秒 (990MB|180MB)"
+msgstr " 1 秒間隔、合計 90秒 (990MB|180MB)"
 
 #. TRANSLATION: duckstation
 msgctxt "game_options"
 msgid "Per 1s, 120s total (1320MB|240MB)"
-msgstr "   1 秒間隔、合計120秒 (1320MB|240MB)"
+msgstr " 1 秒間隔、合計120秒 (1320MB|240MB)"
 
 #. TRANSLATION: duckstation
 msgctxt "game_options"
@@ -9606,7 +9615,7 @@ msgstr "ピクセル単位"
 #. TRANSLATION: fpinball
 msgctxt "game_options"
 msgid "Allow mapping Future Pinball with Pad to Keyboard."
-msgstr ""
+msgstr "パッドからキーボードへの Future Pinabll の割り当てを許可します"
 
 #. TRANSLATION: fpinball
 msgctxt "game_options"
@@ -11733,22 +11742,22 @@ msgstr "場合によっては画面ずれ回避のために、垂直同期を有
 #. TRANSLATION: redream
 msgctxt "game_options"
 msgid "RENDER MODE"
-msgstr ""
+msgstr "レンダーモード"
 
 #. TRANSLATION: redream
 msgctxt "game_options"
 msgid "HLE (per-strip)"
-msgstr ""
+msgstr "HLE (ストリップごと)"
 
 #. TRANSLATION: redream
 msgctxt "game_options"
 msgid "HLE (per-pixel)"
-msgstr ""
+msgstr "HLE (ピクセルごと)"
 
 #. TRANSLATION: redream
 msgctxt "game_options"
 msgid "LLE"
-msgstr ""
+msgstr "LLE"
 
 #. TRANSLATION: redream
 msgctxt "game_options"
@@ -11863,11 +11872,13 @@ msgid ""
 "use a value larger than 100% so that the steering feels less sensitive on a "
 "thumbstick."
 msgstr ""
+"ゲームパッドでドライビング ゲームをプレイする場合は、100％% sより大きい値で、"
+"スティックの感度を鈍くすることをお勧めします"
 
 #. TRANSLATION: supermodel
 msgctxt "game_options"
 msgid "STEERING SENSITIVITY"
-msgstr ""
+msgstr "ステアリング 感度"
 
 #. TRANSLATION: supermodel
 msgctxt "game_options"
@@ -13537,6 +13548,8 @@ msgid ""
 "This option enables the ability to play Xbox Live Arcade games. May cause "
 "compatibility issues with non-XBLA games."
 msgstr ""
+"Xbox Live Arcacde ゲームをプレイできるようになります\n"
+"非 XBLA ゲームとの互換性の問題が発生する可能性があります"
 
 #. TRANSLATION: xenia, xenia-canary
 msgctxt "game_options"
@@ -13967,12 +13980,12 @@ msgstr "FXAAは、ギザギザのエッジを滑らかにする技術です"
 #. TRANSLATION: vita3k
 msgctxt "game_options"
 msgid "You can hide the pointer on touchscreen devices."
-msgstr ""
+msgstr "タッチスクリーンではポインタを非表示にすることができます"
 
 #. TRANSLATION: vita3k
 msgctxt "game_options"
 msgid "SHOW POINTER"
-msgstr ""
+msgstr "ポインタの表示"
 
 #. TRANSLATION: ioquake3
 msgctxt "game_options"
@@ -14138,17 +14151,17 @@ msgstr "アルトカラー"
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Playfield configuration"
-msgstr ""
+msgstr "プレーフィールドの構成"
 
 #. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
 msgctxt "game_options"
 msgid "WINDOWS POSITIONS"
-msgstr ""
+msgstr "ウィンドウの位置"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "PLAYFIELD"
-msgstr ""
+msgstr "プレイフィールド"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14249,22 +14262,22 @@ msgstr "BACKGLASS DMD 表示"
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "When the Backglass is activated, display the grill."
-msgstr ""
+msgstr "BACKGLASSが有効になると、グリル窓が表示されます"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "DISPLAY BACKGLASS GRILL"
-msgstr ""
+msgstr "BACKGLASS GRILL 表示"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "DMD window ratio"
-msgstr ""
+msgstr "DMDウィンドウ比"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "DMD SIZE"
-msgstr ""
+msgstr "DMDサイズ"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14286,91 +14299,93 @@ msgid ""
 "FULLSCREEN gives you a top-down view on the playfield. For cabinet use or "
 "multi-window on desktop."
 msgstr ""
+"フルスクリーンでは、プレイフィールドをトップダウンで見ることができます。キャ"
+"ビネット用途やデスクトップのマルチウィンドウ向き"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "PLAYFIELD MODE"
-msgstr ""
+msgstr "プレイフィールド モード"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "DESKTOP"
-msgstr ""
+msgstr "デスクトップ"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "FULLSCREEN"
-msgstr ""
+msgstr "フルスクリーン"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "FULL SINGLE SCREEN"
-msgstr ""
+msgstr "フルシングルスクリーン"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Enable the custom values below."
-msgstr ""
+msgstr "次のカスタム値を有効にします"
 
 #. TRANSLATION: vpinball, vpinball, vpinball, vpinball, vpinball, ...
 msgctxt "game_options"
 msgid "DISPLAY PHYSICAL SETUP"
-msgstr ""
+msgstr "物理ディスプレイのセットアップ"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "ENABLE CUSTOM DISPLAY PHYSICAL SETUP"
-msgstr ""
+msgstr "カスタムディスプレイの物理セットアップを有効"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Long visible screen edge (cm)"
-msgstr ""
+msgstr "画面横端が長い (cm)"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "SCREEN WIDTH"
-msgstr ""
+msgstr "画面の幅"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Short visible screen edge (cm)"
-msgstr ""
+msgstr "画面横端が短い (cm)"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "SCREEN HEIGHT"
-msgstr ""
+msgstr "画面の高さ"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Screen inclination (degree)"
-msgstr ""
+msgstr "画面の傾き（度）"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "SCREEN INCLINATION"
-msgstr ""
+msgstr "画面の向き"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Player distance from lower screen edge (cm)"
-msgstr ""
+msgstr "画面下端からのプレイヤーの距離 (cm)"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "SCREEN PLAYER Y"
-msgstr ""
+msgstr "画面表示 Y"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "Player's eyes distance from lower screen edge (cm)"
-msgstr ""
+msgstr "画面下端からプレイヤーの目の距離 (cm)"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "SCREEN PLAYER Z"
-msgstr ""
+msgstr "画面表示 Z"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
@@ -14408,12 +14423,12 @@ msgctxt "game_options"
 msgid ""
 "This should not be necessary, unless you are not using the default pad2key "
 "mapping."
-msgstr ""
+msgstr "デフォルトのpad2key 割当を使用しない限り、これは必要ありません"
 
 #. TRANSLATION: vpinball
 msgctxt "game_options"
 msgid "USE JOYPAD SOUTH BUTTON TO ADD CREDIT"
-msgstr ""
+msgstr "ジョイパッドの南ボタンを使用してクレジットを追加します"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
@@ -14448,7 +14463,7 @@ msgstr "960p"
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "WIDESCREEN"
-msgstr ""
+msgstr "ワイドスクリーン "
 
 #. TRANSLATION: theforceengine, iortcw
 msgctxt "game_options"
@@ -14518,22 +14533,22 @@ msgstr "GPU / OpenGL (標準)"
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "COLOUR MODE"
-msgstr ""
+msgstr "カラーモード"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "8-bit (Classic)"
-msgstr ""
+msgstr "8ビット (クラシック)"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "8-bit Interpolated"
-msgstr ""
+msgstr "8ビット補間"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "True Colour"
-msgstr ""
+msgstr "トゥルーカラー"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
@@ -14541,16 +14556,18 @@ msgid ""
 "Choose to render high definition graphics textures. Requires OpenGL, True "
 "Colour and the enhanced.gob file."
 msgstr ""
+"高解像度のグラフィック テクスチャをレンダリングすることを選択します\n"
+"OpenGL、トゥルーカラー、およびenhanced.gobファイルが必要です"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "HD TEXTURES"
-msgstr ""
+msgstr "HD テクスチャ"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "BILINEAR FILTER"
-msgstr ""
+msgstr "バイリニアフィルタ"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
@@ -14560,7 +14577,7 @@ msgstr "ブルーム後処理の使用を選択します"
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
 msgid "BLOOM"
-msgstr ""
+msgstr "BLOOM"
 
 #. TRANSLATION: theforceengine
 msgctxt "game_options"
@@ -15525,7 +15542,7 @@ msgstr "グラフィックフィルタリングのオン/オフ"
 #. TRANSLATION: jaguar.bigpemu.keys
 msgctxt "keys_files"
 msgid "Configuration menu"
-msgstr ""
+msgstr "設定メニュー"
 
 #~ msgctxt "game_options"
 #~ msgid "105% (Use caution"
@@ -15574,18 +15591,6 @@ msgstr ""
 #~ msgstr "ピクセルごと(64レイヤー)"
 
 #~ msgctxt "game_options"
-#~ msgid "Allow mapping Future Pinabll with Pad to Keyboard."
-#~ msgstr "パッドからキーボードへの Future Pinabll の割り当てを許可します"
-
-#~ msgctxt "game_options"
-#~ msgid ""
-#~ "This option enables the ability to play Xbox Live Arcacde games. May "
-#~ "cause compatibility issues with non-XBLA games."
-#~ msgstr ""
-#~ "Xbox Live Arcacde ゲームをプレイする機能を有効にしますが、\n"
-#~ "非 XBLA ゲームとの互換性の問題が発生する可能性があります"
-
-#~ msgctxt "game_options"
 #~ msgid "ENABLE TRUE COLOUR"
 #~ msgstr "トゥルーカラーを有効"
 
@@ -15604,159 +15609,3 @@ msgstr ""
 #~ msgctxt "game_options"
 #~ msgid "ENABLE BLOOM"
 #~ msgstr "ブルームを有効"
-
-#~ msgctxt "game_options"
-#~ msgid "Adjust the cpu power profile while in-game."
-#~ msgstr "ゲーム中の CPUの電力プロファイルを調整します"
-
-#~ msgctxt "game_options"
-#~ msgid "Manual (Default)"
-#~ msgstr "手動 (標準)"
-
-#~ msgctxt "game_options"
-#~ msgid "PinMAME DMD disabled"
-#~ msgstr "PinMAME DMD 無効"
-
-#~ msgctxt "game_options"
-#~ msgid "FlexDMD disabled"
-#~ msgstr "FlexDMD 無効"
-
-#~ msgctxt "game_options"
-#~ msgid "Backglass disabled"
-#~ msgstr "BACKGLASS 無効"
-
-#~ msgctxt "game_options"
-#~ msgid "AMD FidelityFX (Vulkan Only)"
-#~ msgstr "AMD FidelityFX (Vulkanのみ)"
-
-#~ msgctxt "game_options"
-#~ msgid ""
-#~ "Turn on to configure settings from this GUI (Recommended). If disabled, "
-#~ "you have to manually edit the Config File (Experts only - not "
-#~ "recommended)."
-#~ msgstr ""
-#~ "この GUI から設定を行う場合はオンにします (推奨)無効にした場合は、構成ファ"
-#~ "イルを手動で編集する必要があります (エキスパートのみ - 推奨されません)"
-
-#~ msgctxt "game_options"
-#~ msgid "ENABLE EMULATIONSTATION CONFIGURATION"
-#~ msgstr "EMULATIONSTATION構成を有効"
-
-#~ msgctxt "game_options"
-#~ msgid "Glorius Eggroll Proton (Default)"
-#~ msgstr "Glorius Eggroll Proton (標準)"
-
-#~ msgctxt "game_options"
-#~ msgid "User Provided Runner"
-#~ msgstr "ユーザー提供 ランナー"
-
-#~ msgctxt "game_options"
-#~ msgid "Namco GunCon (Rumble)"
-#~ msgstr "ナムコ ガンコン(振動有)"
-
-#~ msgctxt "game_options"
-#~ msgid "Horizontal position (in percentage of the screen width)."
-#~ msgstr "水平位置 (画面幅のパーセンテージ)"
-
-#~ msgctxt "game_options"
-#~ msgid "Vertical position (in percentage of the screen height)."
-#~ msgstr "垂直位置 (画面の高さのパーセンテージ)"
-
-#~ msgctxt "game_options"
-#~ msgid "PINMAME DMD Y"
-#~ msgstr "PINMAME DMD Y位置"
-
-#~ msgctxt "game_options"
-#~ msgid "Horizontal width (in percentage of the screen width)."
-#~ msgstr "水平幅 (画面幅のパーセンテージ)"
-
-#~ msgctxt "game_options"
-#~ msgid "PINMAME DMD WIDTH"
-#~ msgstr "PINMAME DMD 幅"
-
-#~ msgctxt "game_options"
-#~ msgid "Vertical height (in percentage of the screen height)."
-#~ msgstr "垂直方向の高さ (画面の高さのパーセンテージ)"
-
-#~ msgctxt "game_options"
-#~ msgid "PINMAME DMD HEIGHT"
-#~ msgstr "PINMAME DMD 高さ"
-
-#~ msgctxt "game_options"
-#~ msgid ""
-#~ "Extra DMD (Dot Matrix Display) window to display the score for tables "
-#~ "without a rom."
-#~ msgstr ""
-#~ "ROM のないテーブルスコア表示用の追加 DMD (ドット マトリックス ディスプレ"
-#~ "イ) ウィンドウ"
-
-#~ msgctxt "game_options"
-#~ msgid "FLEX DMD X"
-#~ msgstr "FLEX DMD X位置"
-
-#~ msgctxt "game_options"
-#~ msgid "FLEX DMD Y"
-#~ msgstr "FLEX DMD Y位置"
-
-#~ msgctxt "game_options"
-#~ msgid "FLEX DMD WIDTH"
-#~ msgstr "FLEX DMD 幅"
-
-#~ msgctxt "game_options"
-#~ msgid "FLEX DMD HEIGHT"
-#~ msgstr "FLEX DMD 高さ"
-
-#~ msgctxt "game_options"
-#~ msgid "BACKGLASS X"
-#~ msgstr "BACKGLASS X位置"
-
-#~ msgctxt "game_options"
-#~ msgid "BACKGLASS Y"
-#~ msgstr "BACKGLASS Y位置"
-
-#~ msgctxt "game_options"
-#~ msgid "BACKGLASS WIDTH"
-#~ msgstr "BACKGLASS 幅"
-
-#~ msgctxt "game_options"
-#~ msgid "BACKGLASS HEIGHT"
-#~ msgstr "BACKGLASS 高さ"
-
-#~ msgctxt "game_options"
-#~ msgid ""
-#~ "Hides the Extra DMD (Dot Matrix Display) integrated in the Backglass."
-#~ msgstr ""
-#~ "バックガラスに組み込みの追加の DMD (ドット マトリックス ディスプレイ) を非"
-#~ "表示にします"
-
-#~ msgctxt "game_options"
-#~ msgid "B2S DMD X"
-#~ msgstr "B2S DMD X位置"
-
-#~ msgctxt "game_options"
-#~ msgid "B2S DMD Y"
-#~ msgstr "B2S DMD Y位置"
-
-#~ msgctxt "game_options"
-#~ msgid "B2S DMD WIDTH"
-#~ msgstr "B2S DMD 幅"
-
-#~ msgctxt "game_options"
-#~ msgid "B2S DMD HEIGHT"
-#~ msgstr "B2S DMD 高さ"
-
-#~ msgctxt "game_options"
-#~ msgid "FOLDERS ORGANISATION"
-#~ msgstr "フォルダー整理"
-
-#~ msgctxt "game_options"
-#~ msgid "INSTALL MEDIA FOUNDATION"
-#~ msgstr "Media Foundationをインストール"
-
-#~ msgctxt "game_options"
-#~ msgid "Enable XIM support."
-#~ msgstr "XIMのサポートを有効にします"
-
-#~ msgctxt "game_options"
-#~ msgid "105% (Use caution)"
-#~ msgstr "105% (注意してください)"

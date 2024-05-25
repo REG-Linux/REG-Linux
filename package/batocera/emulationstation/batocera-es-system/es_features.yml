@@ -2966,6 +2966,7 @@ libretro:
                       description: Use MAME software lists to identify ROM
                       choices:
                           "Don't Use (Default)":                          none
+                          "Tandy Radio Shack Color Computer cassettes":   coco_cass
                           "Tandy Radio Shack Color Computer cartridges":  coco_cart
                           "Tandy Radio Shack Color Computer disk images": coco_flop
                   altmodel:
@@ -2982,8 +2983,9 @@ libretro:
                       prompt:      MEDIA TYPE
                       description: Type of ROM file to load.
                       choices:
-                          "Cassette":    cass
-                          "Cartridge":   cart
+                          "Cassette":       cass
+                          "Cartridge":      cart
+                          "Disk (Drive 1)": flop1
                   enableui:
                       group: ADVANCED OPTIONS
                       prompt:      UI KEYS
@@ -10236,6 +10238,7 @@ mame:
                     description: Use MAME software lists to identify ROM
                     choices:
                         "Don't Use (Default)":                          none
+                        "Tandy Radio Shack Color Computer cassettes":   coco_cass
                         "Tandy Radio Shack Color Computer cartridges":  coco_cart
                         "Tandy Radio Shack Color Computer disk images": coco_flop
                 altmodel:
@@ -10252,8 +10255,9 @@ mame:
                     prompt:      MEDIA TYPE
                     description: Type of ROM file to load.
                     choices:
-                        "Cassette":    cass
-                        "Cartridge":   cart
+                        "Cassette":       cass
+                        "Cartridge":      cart
+                        "Disk (Drive 1)": flop1
                 enableui:
                     group: ADVANCED OPTIONS
                     prompt:      UI KEYS
@@ -12343,12 +12347,13 @@ vita3k:
   shared: [powermode, tdp, videomode]
   features: []
   cfeatures:
-    vita3k_gfxbackend:
-      prompt:      GRAPHICS API
-      description: Choose which graphics API library to use.
-      choices:
-        "OpenGL": "OpenGL"
-        "Vulkan": "Vulkan"
+    # Disabled until vulkan fixed upstream
+    #vita3k_gfxbackend:
+    #  prompt:      GRAPHICS API
+    #  description: Choose which graphics API library to use.
+    #  choices:
+    #    "OpenGL": "OpenGL"
+    #    "Vulkan": "Vulkan"
     vita3k_resolution:
       prompt:      RENDERING RESOLUTION
       description: Enhancement. Increase the rendering resolution. Makes 3D objects clearer.
@@ -12364,33 +12369,19 @@ vita3k:
     vita3k_surface:
       prompt: DISABLE SURFACE SYNC
       description: Speed hack, enable to disable surface syncing between CPU and GPU. Surface syncing is needed by a few games.
-      choices:
-        "Disabled":          "false"
-        "Enabled (Default)": "true"
+      preset: switchoff
     vita3k_linear:
       prompt: LINEAR FILTERING
       description: The image will be softer which could help with aliasing.
-      choices:
-        "Disabled (Default)": "false"
-        "Enabled":            "true"
+      preset: switchoff
     vita3k_fxaa:
       prompt: FXAA
       description: Anti-aliasing is a technique for smoothing out jagged edges.
-      choices:
-        "Disabled (Default)": "false"
-        "Enabled":            "true"
+      preset: switchoff
     vita3k_vsync:
       prompt: VSYNC
       description: Fix screen tearing.
-      choices:
-        "Disabled":          "false"
-        "Enabled (Default)": "true"
-    vita3k_show_pointer:
-      prompt: SHOW POINTER
-      description: You can hide the pointer on touchscreen devices.
-      choices:
-        "Enabled (Default)": "true"
-        "Disabled":          "false"
+      preset: switchon
     vita3k_anisotropic:
       prompt:      ANISOTROPIC FILTERING
       description: Improves clarity of distant textures.
@@ -12400,6 +12391,10 @@ vita3k:
         "4x":  4
         "8x":  8
         "16x": 16
+    vita3k_show_pointer:
+      prompt: SHOW POINTER
+      description: You can hide the pointer on touchscreen devices.
+      preset: switchon
 
 bigpemu:
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]

@@ -12,7 +12,7 @@ index ecb88cd285..16bb9d7596 100644
  	SDL2::SDL2
  )
  
-diff --git a/src/Cafe/CMakeLists.txt b/src/Cafe/CMakeLists.txt.new
+diff --git a/src/Cafe/CMakeLists.txt b/src/Cafe/CMakeLists.txt
 index 6657bc9cd4..2ba0632709 100644
 --- a/src/Cafe/CMakeLists.txt
 +++ b/src/Cafe/CMakeLists.txt

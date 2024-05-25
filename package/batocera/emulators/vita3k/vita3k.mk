@@ -3,8 +3,8 @@
 # vita3k
 #
 ################################################################################
-# Version: Vita3K Build: 3596 - Commits on May 14, 2024
-VITA3K_VERSION = d4c0c499a490bec87c626fdcb5ea0035a43a36d1
+# Version: Commits on May 22, 2024
+VITA3K_VERSION = b8ef1dd732cd36bde8b05afa54fc64e2b7f90b1f
 VITA3K_SITE = https://github.com/vita3k/vita3k
 VITA3K_SITE_METHOD=git
 VITA3K_GIT_SUBMODULES=YES
@@ -18,6 +18,12 @@ VITA3K_CONF_OPTS = -DCMAKE_BUILD_TYPE=Release \
                    -DUSE_DISCORD_RICH_PRESENCE=OFF \
                    -DUSE_VITA3K_UPDATE=OFF \
                    -DBUILD_EXTERNAL=ON
+
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_V3),y)
+    VITA3K_CONF_OPTS += -DXXH_X86DISPATCH_ALLOW_AVX=ON
+else
+    VITA3K_CONF_OPTS += -DXXH_X86DISPATCH_ALLOW_AVX=OFF
+endif
 
 define VITA3K_GET_SUBMODULE
     mkdir -p $(@D)/external
