@@ -1,0 +1,13 @@
+--- a/drivers/amlogic/drm/meson_hdmi.c	2024-05-23 22:21:26.197167932 +0200
++++ b/drivers/amlogic/drm/meson_hdmi.c	2024-05-23 22:22:44.494861271 +0200
+@@ -825,8 +825,8 @@
+ {
+ 	struct am_hdmitx_connector_state *new_hdmitx_state, *old_hdmitx_state;
+ 	struct drm_crtc_state *new_crtc_state = NULL;
+-	struct am_hdmi_tx *am_hdmitx = connector_to_am_hdmi(connector);
+-	/*unsigned int hdmitx_content_type =
++	/*struct am_hdmi_tx *am_hdmitx = connector_to_am_hdmi(connector);
++	unsigned int hdmitx_content_type =
+ 		am_hdmitx->hdmitx_dev->get_content_types();*/
+ 
+ 	if (!state) {

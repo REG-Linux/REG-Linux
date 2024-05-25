@@ -1,0 +1,282 @@
+--- a/drivers/amlogic/drm/meson_hdmi.c	2023-04-28 08:00:11.000000000 +0200
++++ b/drivers/amlogic/drm/meson_hdmi.c	2024-05-23 22:13:19.534752958 +0200
+@@ -628,6 +628,8 @@
+ 
+ static int hdcp_rx_ver(void)
+ {
++	return 0;
++#if 0
+ 	unsigned int hdcp_rx_type = am_hdmi_info.hdmitx_dev->get_rx_hdcp_cap();
+ 
+ 	/* Detect RX support HDCP14
+@@ -640,11 +642,14 @@
+ 		return 14;
+ 
+ 	return 0;
++#endif
+ }
+ 
+ /*like hdmitx hdcp_mode node*/
+ static int get_hdcp_mode(void)
+ {
++	return 0;
++#if 0
+ 	int hdcp_mode_flag = 0;
+ 
+ 	if (am_hdmi_info.hdcp_mode) {
+@@ -658,6 +663,7 @@
+ 	}
+ 
+ 	return hdcp_mode_flag;
++#endif
+ }
+ 
+ static int am_hdmitx_connector_atomic_set_property
+@@ -838,6 +844,7 @@
+ 		return -EINVAL;
+ 	}
+ 
++#if 0
+ 	/*check content type.*/
+ 	if (((1 << new_hdmitx_state->base.content_type) &
+ 		hdmitx_content_type) == 0) {
+@@ -847,6 +854,7 @@
+ 			hdmitx_content_type);
+ 		return -EINVAL;
+ 	}
++#endif
+ 
+ 	if (new_hdmitx_state->base.crtc)
+ 		new_crtc_state = drm_atomic_get_new_crtc_state(state,
+@@ -918,8 +926,8 @@
+ 
+ 	__drm_atomic_helper_connector_reset(connector, &hdmitx_state->base);
+ 
+-	hdmitx_state->base.hdcp_content_type = am_hdmi_info.hdcp_request_content_type;
+-	hdmitx_state->base.content_protection = am_hdmi_info.hdcp_request_content_protection;
++	hdmitx_state->base.hdcp_content_type = 0; //am_hdmi_info.hdcp_request_content_type;
++	hdmitx_state->base.content_protection = 0; //am_hdmi_info.hdcp_request_content_protection;
+ 
+ 	hdmitx_state->pref_hdr_policy = MESON_PREF_DV;
+ 
+@@ -935,7 +943,7 @@
+ 	struct am_hdmitx_connector_state *hdmitx_state =
+ 		to_am_hdmitx_connector_state(state);
+ 
+-	drm_printf(p, "\tdrm hdmitx state:\n");
++	/*drm_printf(p, "\tdrm hdmitx state:\n");
+ 	drm_printf(p, "\t\t VRR_CAP:[%u]\n", am_hdmi_info.hdmitx_dev->get_vrr_cap ?
+ 		am_hdmi_info.hdmitx_dev->get_vrr_cap() : 0);
+ 	drm_printf(p, "\t\t android_path:[%d]\n", am_hdmi_info.android_path);
+@@ -944,11 +952,13 @@
+ 		hdmitx_state->color_attr_para.colorformat,
+ 		hdmitx_state->color_attr_para.bitdepth,
+ 		hdmitx_state->pref_hdr_policy);
+-	drm_printf(p, "\t\t picture_aspect_ratio:[%d]\n", state->picture_aspect_ratio);
++	drm_printf(p, "\t\t picture_aspect_ratio:[%d]\n", state->picture_aspect_ratio);*/
+ }
+ 
+ static bool meson_hdmitx_is_hdcp_running(void)
+ {
++	return false;
++#if 0
+ 	if (am_hdmi_info.hdcp_state == HDCP_STATE_DISCONNECT ||
+ 		am_hdmi_info.hdcp_state == HDCP_STATE_STOP)
+ 		return false;
+@@ -958,6 +968,7 @@
+ 			am_hdmi_info.hdcp_state);
+ 
+ 	return true;
++#endif
+ }
+ 
+ static void meson_hdmitx_set_hdcp_result(int result)
+@@ -965,15 +976,14 @@
+ 	struct drm_connector *connector = &am_hdmi_info.base.connector;
+ 	struct drm_modeset_lock *mode_lock =
+ 		&connector->dev->mode_config.connection_mutex;
+-	bool locked_outer = drm_modeset_is_locked(mode_lock);
++	drm_modeset_unlock(mode_lock);
++#if 0
+ 
+ 	if (result == HDCP_AUTH_OK) {
+ 		am_hdmi_info.hdcp_state = HDCP_STATE_SUCCESS;
+ 		if (!locked_outer)
+ 			drm_modeset_lock(mode_lock, NULL);
+ 		drm_hdcp_update_content_protection(connector, DRM_MODE_CONTENT_PROTECTION_ENABLED);
+-		if (!locked_outer)
+-			drm_modeset_unlock(mode_lock);
+ 		DRM_DEBUG("hdcp [%d] set result ok.\n", am_hdmi_info.hdcp_mode);
+ 	} else if (result == HDCP_AUTH_FAIL) {
+ 		am_hdmi_info.hdcp_state = HDCP_STATE_FAIL;
+@@ -992,10 +1002,12 @@
+ 				drm_modeset_unlock(mode_lock);
+ 		}
+ 	}
++#endif
+ }
+ 
+ static void meson_hdmitx_start_hdcp(int hdcp_mode)
+ {
++#if 0
+ 	if (hdcp_mode == HDCP_NULL)
+ 		return;
+ 
+@@ -1004,31 +1016,38 @@
+ 	am_hdmi_info.hdmitx_dev->hdcp_enable(hdcp_mode);
+ 	DRM_DEBUG("start hdcp [%d-%d]...\n",
+ 		am_hdmi_info.hdcp_request_content_type, am_hdmi_info.hdcp_mode);
++#endif
+ }
+ 
+ static void meson_hdmitx_stop_hdcp(void)
+ {
++#if 0
+ 	if (meson_hdmitx_is_hdcp_running()) {
+ 		am_hdmi_info.hdmitx_dev->hdcp_disable();
+ 		am_hdmi_info.hdcp_state = HDCP_STATE_STOP;
+ 		am_hdmi_info.hdcp_mode = HDCP_NULL;
+ 		meson_hdmitx_set_hdcp_result(HDCP_AUTH_UNKNOWN);
+ 	}
++#endif
+ }
+ 
+ static void meson_hdmitx_disconnect_hdcp(void)
+ {
++#if 0
+ 	if (meson_hdmitx_is_hdcp_running()) {
+ 		am_hdmi_info.hdmitx_dev->hdcp_disconnect();
+ 		am_hdmi_info.hdcp_state = HDCP_STATE_DISCONNECT;
+ 		am_hdmi_info.hdcp_mode = HDCP_NULL;
+ 		meson_hdmitx_set_hdcp_result(HDCP_AUTH_UNKNOWN);
+ 	}
++#endif
+ }
+ 
+ static int meson_hdmitx_get_hdcp_request(struct am_hdmi_tx *tx,
+ 	int request_type_mask)
+ {
++	return HDCP_NULL;
++#if 0
+ 	struct meson_hdmitx_dev *tx_dev = tx->hdmitx_dev;
+ 	int type;
+ 	unsigned int hdcp_tx_type = tx_dev->get_tx_hdcp_cap();
+@@ -1065,10 +1084,12 @@
+ 		break;
+ 	}
+ 	return type;
++#endif
+ }
+ 
+ void meson_hdmitx_update_hdcp(void)
+ {
++#if 0
+ 	int hdcp_request_mode = HDCP_NULL;
+ 	int hdcp_request_mask = HDCP_NULL;
+ 
+@@ -1109,6 +1130,7 @@
+ 		meson_hdmitx_start_hdcp(hdcp_request_mode);
+ 	else
+ 		DRM_ERROR("No valid hdcp mode exit, maybe hdcp havenot init.\n");
++#endif
+ }
+ 
+ void meson_hdmitx_update(struct drm_connector_state *new_state,
+@@ -1144,21 +1166,10 @@
+ 	}
+ 
+ 	/*Linux only implement*/
+-	if (old_state->hdcp_content_type
+-			!= new_state->hdcp_content_type ||
+-		(old_state->content_protection !=
+-			new_state->content_protection &&
+-		new_state->content_protection !=
+-			DRM_MODE_CONTENT_PROTECTION_ENABLED)) {
+-		/*check hdcp property update*/
+-		am_hdmi_info.hdcp_request_content_type =
+-			new_state->hdcp_content_type;
+-		am_hdmi_info.hdcp_request_content_protection =
+-			new_state->content_protection;
+-
+-		if (new_state->crtc && !drm_atomic_crtc_needs_modeset(new_state->crtc->state))
+-			meson_hdmitx_update_hdcp();
+-	}
++	am_hdmi_info.hdcp_request_content_type = 0;
++	am_hdmi_info.hdcp_request_content_protection = 0;
++	if (new_state->crtc && !drm_atomic_crtc_needs_modeset(new_state->crtc->state))
++		meson_hdmitx_update_hdcp();
+ }
+ 
+ static void meson_hdmitx_hdcp_notify(void *data, int type, int result)
+@@ -1166,6 +1177,8 @@
+ 	struct drm_connector *connector = &am_hdmi_info.base.connector;
+ 	struct drm_modeset_lock *mode_lock =
+ 		&connector->dev->mode_config.connection_mutex;
++	drm_modeset_unlock(mode_lock);
++#if 0
+ 	bool locked_outer = drm_modeset_is_locked(mode_lock);
+ 
+ 	if (!locked_outer)
+@@ -1205,8 +1218,8 @@
+ 	}
+ end:
+ 	if (!locked_outer)
+-		drm_modeset_unlock(mode_lock);
+ 	return;
++#endif
+ }
+ 
+ static const struct drm_connector_helper_funcs am_hdmi_connector_helper_funcs = {
+@@ -1657,6 +1670,7 @@
+ static void meson_hdmitx_init_hdcp_ver_property(struct drm_device *drm_dev,
+ 						  struct am_hdmi_tx *am_hdmi)
+ {
++#if 0
+ 	struct drm_property *prop;
+ 
+ 	prop = drm_property_create_range(drm_dev, 0,
+@@ -1668,11 +1682,13 @@
+ 	} else {
+ 		DRM_ERROR("Failed to hdcp_ver property\n");
+ 	}
++#endif
+ }
+ 
+ static void meson_hdmitx_init_hdcp_mode_property(struct drm_device *drm_dev,
+ 						  struct am_hdmi_tx *am_hdmi)
+ {
++#if 0
+ 	struct drm_property *prop;
+ 
+ 	prop = drm_property_create_range(drm_dev, 0,
+@@ -1684,6 +1700,7 @@
+ 	} else {
+ 		DRM_ERROR("Failed to hdcp_mode property\n");
+ 	}
++#endif
+ }
+ 
+ /* Optional colorspace properties. */
+@@ -1893,8 +1910,11 @@
+ 		am_hdmi_info.android_path = true;
+ 	} else if (am_hdmi_info.hdmitx_dev->hdcp_init) {
+ 		am_hdmi_info.hdmitx_dev->hdcp_init();
+-		if (hdcp_ctl_lvl == 1) {
+-			/*TODO: for westeros start hdcp by driver, will move to userspace.*/
++		am_hdmi_info.hdcp_request_content_type =
++			DRM_MODE_HDCP_CONTENT_TYPE0;
++		am_hdmi_info.hdcp_request_content_protection =
++			DRM_MODE_CONTENT_PROTECTION_UNDESIRED;
++		/*if (hdcp_ctl_lvl == 1) {
+ 			am_hdmi_info.hdcp_request_content_type =
+ 				DRM_MODE_HDCP_CONTENT_TYPE0;
+ 			am_hdmi_info.hdcp_request_content_protection =
+@@ -1904,7 +1924,7 @@
+ 				DRM_MODE_HDCP_CONTENT_TYPE0;
+ 			am_hdmi_info.hdcp_request_content_protection =
+ 				DRM_MODE_CONTENT_PROTECTION_UNDESIRED;
+-		}
++		}*/
+ 	} else {
+ 		DRM_ERROR("%s no HDCP func registered.\n", __func__);
+ 		am_hdmi_info.android_path = true;

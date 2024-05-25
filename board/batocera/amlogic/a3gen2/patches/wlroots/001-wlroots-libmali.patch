@@ -106,7 +106,7 @@
 -		bo = gbm_bo_create(gbm_device, width, height, format->format, usage);
 -		has_modifier = false;
 -	}
-+	uint32_t usage = GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING | GBM_BO_USE_LINEAR;
++	uint32_t usage = GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING;
 +	struct gbm_bo *bo = gbm_bo_create(gbm_device, width, height, format->format, usage);
 +	has_modifier = false;
 +
