@@ -1,0 +1,10 @@
+--- a/src/generated/lcf/rpg/encounter.h	2024-05-26 12:54:04.705998466 +0200
++++ b/src/generated/lcf/rpg/encounter.h	2024-05-26 12:54:20.337532242 +0200
+@@ -12,6 +12,7 @@
+ #ifndef LCF_RPG_ENCOUNTER_H
+ #define LCF_RPG_ENCOUNTER_H
+ #include "lcf/context.h"
++#include <cstdint>
+ #include <ostream>
+ #include <type_traits>
+ 

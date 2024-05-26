@@ -1,0 +1,11 @@
+--- a/Makefile	2024-05-26 16:36:09.439884840 +0200
++++ b/Makefile	2024-05-26 16:36:26.087552660 +0200
+@@ -20,7 +20,7 @@
+ OBJDUMP = $(CROSS_COMPILE)objdump
+ NM = $(CROSS_COMPILE)nm
+ 
+-CFLAGS	:= -Wall -Os -fno-pic -mno-abicalls -mno-check-zero-division -ffreestanding -flto
++CFLAGS	:= -Wall -Os -fno-pic -mno-abicalls -mno-check-zero-division -ffreestanding -fno-stack-protector -flto
+ CFLAGS	+= $(CFLAGS_all)
+ CPPFLAGS := -DBOARD_$(BOARD) -DJZ_VERSION=$(JZ_VERSION)
+ LDFLAGS := -nostdlib -EL

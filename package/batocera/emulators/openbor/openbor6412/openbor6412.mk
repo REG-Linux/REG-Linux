@@ -14,15 +14,14 @@ OPENBOR6412_EXTRAOPTS=""
 
 ifeq ($(BR2_x86_64),y)
 	OPENBOR6412_EXTRAOPTS=BUILD_LINUX=1 BUILD_PLATFORM=x86_64
-endif
-ifeq ($(BR2_riscv),y)
+else ifeq ($(BR2_riscv),y)
 	OPENBOR6412_EXTRAOPTS=BUILD_LINUX=1 BUILD_PLATFORM=x86_64
-endif
-ifeq ($(BR2_x86_i686),y)
+else ifeq ($(BR2_x86_i686),y)
 	OPENBOR6412_EXTRAOPTS=BUILD_LINUX=1
-endif
-ifeq ($(BR2_arm)$(BR2_aarch64),y)
+else ifeq ($(BR2_arm)$(BR2_aarch64),y)
 	OPENBOR6412_EXTRAOPTS=BUILD_ARM=1
+else ifeq ($(BR2_mipsel),y)
+	OPENBOR6412_EXTRAOPTS=BUILD_MIPSEL=1
 endif
 
 define OPENBOR6412_BUILD_CMDS
