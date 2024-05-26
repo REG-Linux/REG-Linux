@@ -1,0 +1,103 @@
+--- a/mininit.c	2023-08-17 14:30:22.064086503 +0200
++++ b/mininit.c	2023-08-17 14:40:35.101799784 +0200
+@@ -24,9 +24,12 @@
+ 
+ 
+ #define ROOTFS_TYPE    "squashfs"
+-#define ROOTFS_CURRENT "rootfs." ROOTFS_TYPE
+-#define ROOTFS_BACKUP  ROOTFS_CURRENT ".bak"
+-#define ROOTFS_UPDATE  "update_r.bin"
++#define ROOTFS_CURRENT "boot/batocera"
++#define ROOTFS_UPDATE  "boot/batocera.update"
++
++#define MODULES_TYPE    "squashfs"
++#define MODULES_CURRENT "boot/modules"
++#define MODULES_UPDATE  "boot/modules.update"
+ 
+ 
+ int create_mount_point(const char *path)
+@@ -40,11 +43,11 @@
+ 	return 0;
+ }
+ 
+-void perform_updates(bool is_backup)
++void perform_updates()
+ {
+ 	bool boot_ro = access(".", W_OK) && errno == EROFS;
+-	bool update_modules = !access("update_m.bin", R_OK);
+-	bool update_rootfs = !access("update_r.bin", R_OK);
++	bool update_modules = !access(MODULES_UPDATE, R_OK);
++	bool update_rootfs = !access(ROOTFS_UPDATE, R_OK);
+ 
+ 	if (update_modules || update_rootfs) {
+ 		if (boot_ro) {
+@@ -58,25 +61,12 @@
+ 
+ 		if (update_modules) {
+ 			INFO("performing modules update\n");
+-			rename("modules.squashfs", "modules.squashfs.bak");
+-			rename("modules.squashfs.sha1", "modules.squashfs.bak.sha1");
+-			rename("update_m.bin", "modules.squashfs");
+-			rename("update_m.bin.sha1", "modules.squashfs.sha1");
++			rename(MODULES_UPDATE, MODULES_CURRENT);
+ 		}
+ 
+ 		if (update_rootfs) {
+ 			INFO("performing rootfs update\n");
+-
+-			/* If rootfs_bak was not passed, or the backup is not available,
+-			* make a backup of the current rootfs before the update */
+-			if (!is_backup || access(ROOTFS_BACKUP, F_OK)) {
+-				rename(ROOTFS_CURRENT, ROOTFS_BACKUP);
+-				rename(ROOTFS_CURRENT ".sha1", ROOTFS_BACKUP ".sha1");
+-			}
+-
+ 			rename(ROOTFS_UPDATE, ROOTFS_CURRENT);
+-			rename(ROOTFS_UPDATE ".sha1", ROOTFS_CURRENT ".sha1");
+-
+ 			chown(ROOTFS_CURRENT, 0, 0);
+ 			chmod(ROOTFS_CURRENT, 0444);
+ 		}
+@@ -115,20 +105,11 @@
+ #endif /* __KLIBC__ */
+ 		logfile = kmsg;
+ 	}
+-	INFO("OpenDingux mininit 2.0.2\n");
++	INFO("Batocera.linux mininit 2.0.2 (based on OpenDingux)\n");
+ 	if (!kmsg) {
+ 		WARNING("Failed to open '/dev/kmsg': %d\n", errno);
+ 	}
+ 
+-	/* Look for "rootfs_bak" parameter. */
+-	bool is_backup = false;
+-	for (int i = 1; i < argc; i++) {
+-		if (!strcmp(argv[i], "rootfs_bak")) {
+-			is_backup = true;
+-			break;
+-		}
+-	}
+-
+ 	const char *boot_mount = mount_boot();
+ 	if (!boot_mount) {
+ 		return -1;
+@@ -139,7 +120,7 @@
+ 		return -1;
+ 	}
+ 
+-	perform_updates(is_backup);
++	perform_updates();
+ 
+ 	/* Get free loop device. */
+ 	int devnr = logetfree();
+@@ -152,10 +133,7 @@
+ 	sprintf(loop_dev, "/dev/loop%i", devnr);
+ 
+ 	/* Set the rootfs as the backing file for the loop device. */
+-	const char *rootfs_img =
+-		  is_backup && !access(ROOTFS_BACKUP, F_OK)
+-		? ROOTFS_BACKUP
+-		: ROOTFS_CURRENT;
++	const char *rootfs_img = ROOTFS_CURRENT;
+ 	losetup(loop_dev, rootfs_img);
+ 
+ 	/* Mount the loop device that was just set up. */
