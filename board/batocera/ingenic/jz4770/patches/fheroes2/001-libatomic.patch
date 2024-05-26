@@ -1,0 +1,8 @@
+--- a/src/fheroes2/CMakeLists.txt	2024-05-26 14:30:52.634781056 +0200
++++ b/src/fheroes2/CMakeLists.txt	2024-05-26 14:31:26.170265094 +0200
+@@ -114,4 +114,5 @@
+ 	fheroes2
+ 	engine
+ 	${USE_SDL_VERSION}::${USE_SDL_VERSION}main
++	atomic
+ 	)

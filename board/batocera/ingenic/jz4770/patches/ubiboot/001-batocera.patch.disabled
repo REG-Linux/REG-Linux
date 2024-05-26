@@ -1,0 +1,26 @@
+--- a/Makefile	2022-11-01 16:10:55.000000000 +0100
++++ b/Makefile	2023-08-17 17:37:53.162403910 +0200
+@@ -20,10 +20,10 @@
+ OBJDUMP = $(CROSS_COMPILE)objdump
+ NM = $(CROSS_COMPILE)nm
+ 
+-CFLAGS	:= -Wall -Os -fno-pic -mno-abicalls -mno-check-zero-division -ffreestanding -flto
++CFLAGS	:= -Wall -Os -fno-pic -mno-abicalls -mno-check-zero-division -ffreestanding -flto -fno-stack-protector -U_FORTIFY_SOURCE
+ CFLAGS	+= $(CFLAGS_all)
+ CPPFLAGS := -DBOARD_$(BOARD) -DJZ_VERSION=$(JZ_VERSION)
+-LDFLAGS := -nostdlib -EL
++LDFLAGS := -nostdlib -EL -fno-stack-protector
+ 
+ ifneq ($(findstring $(JZ_VERSION),JZ4740 JZ4750),)
+ LDFLAGS += -T ldscripts/target-jz4740.ld
+--- a/src/config-gcw0.h	2023-08-17 17:39:50.129003722 +0200
++++ b/src/config-gcw0.h	2023-08-17 17:41:51.615697685 +0200
+@@ -9,8 +9,6 @@
+ 
+ #define MBR_PRELOAD_ADDR	0x80000000
+ 
+-#define SYSPART_INIT		"/mininit-syspart"
+-
+ #define RFKILL_STATE		0
+ 
+ #define USES_HIGHMEM
