@@ -2,6 +2,7 @@ config BR2_PACKAGE_MALI_MP400_GBM
 	bool "mali-mp400-gbm"
 	depends on BR2_arm
 	select BR2_PACKAGE_HAS_LIBEGL
+	select BR2_PACKAGE_HAS_LIBGBM
 	select BR2_PACKAGE_HAS_LIBGLES
 	select BR2_PACKAGE_HAS_LIBMALI
 	select BR2_PACKAGE_GBM
@@ -20,6 +21,9 @@ config BR2_PACKAGE_PROVIDES_LIBGLES
 	default "mali-mp400-gbm"
 
 config BR2_PACKAGE_PROVIDES_LIBMALI
+	default "mali-mp400-gbm"
+
+config BR2_PACKAGE_PROVIDES_LIBGBM
 	default "mali-mp400-gbm"
 
 endif
