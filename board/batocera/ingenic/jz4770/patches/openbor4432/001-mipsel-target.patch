@@ -1,0 +1,25 @@
+--- a/Makefile	2023-08-15 22:08:46.644272778 +0200
++++ b/Makefile	2023-08-15 22:08:39.540112619 +0200
+@@ -251,6 +251,22 @@
+ OBJTYPE         = elf
+ endif
+ 
++ifdef BUILD_MIPSEL
++TARGET 	 = $(VERSION_NAME).elf
++TARGET_FINAL    = $(VERSION_NAME)
++TARGET_PLATFORM = LINUX
++BUILD_LINUX     = 1
++BUILD_SDL       = 1
++BUILD_GFX       = 1
++BUILD_PTHREAD   = 1
++BUILD_SDL_IO    = 1
++BUILD_VORBIS    = 1
++BUILD_WEBM      = 1
++BUILDING        = 1
++INCLUDES        = $(SDKPATH)/include
++OBJTYPE         = elf
++endif
++
+ ifdef BUILD_WII
+ TARGET 	        = $(VERSION_NAME).elf
+ TARGET_MAP      = $(TARGET).map

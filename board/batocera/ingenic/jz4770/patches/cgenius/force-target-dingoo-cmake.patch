@@ -1,0 +1,15 @@
+--- a/src/CMakeLists.txt	2024-05-26 14:12:53.808719366 +0200
++++ b/src/CMakeLists.txt	2024-05-26 14:13:10.564373570 +0200
+@@ -17,11 +17,7 @@
+     SET(BUILD_TARGET APPLE)
+ endif()
+ 
+-IF(NOT DEFINED BUILD_TARGET)
+-    MESSAGE( STATUS "WARNING: You did not specify the build type with the -DBUILD_TARGET= Parameter. ${BUILD_TARGET} has been choosen" )
+-    MESSAGE( STATUS "Available builds are: WIN32, LINUX GP2X. WIZ, CAANOO, DINGOO, NANONOTE" )
+-ENDIF(NOT DEFINED BUILD_TARGET)
+-
++SET(BUILD_TARGET DINGOO)
+ 
+ SET(USRDIR /usr)
+ 

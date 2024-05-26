@@ -1,0 +1,14 @@
+--- a/engine/source/utils.c	2024-05-26 13:08:55.228308407 +0200
++++ b/engine/source/utils.c	2024-05-26 13:09:27.954914585 +0200
+@@ -312,9 +312,9 @@
+         writeToLogFile("Out of memory!\n");
+         writeToLogFile("Allocation of size %i failed in function '%s' at %s:%i.\n", size, func, file, line);
+ #ifndef WIN
+-        writeToLogFile("Memory usage at exit: %u\n", mallinfo().arena);
++        //writeToLogFile("Memory usage at exit: %u\n", mallinfo().arena);
+ #elif LINUX
+-        writeToLogFile("Memory usage at exit: %u\n", mallinfo2().arena);
++        //writeToLogFile("Memory usage at exit: %u\n", mallinfo2().arena);
+ #endif
+         borExit(2);
+     }

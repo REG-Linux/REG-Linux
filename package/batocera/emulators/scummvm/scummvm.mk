@@ -15,10 +15,10 @@ SCUMMVM_ADDITIONAL_FLAGS += -L$(STAGING_DIR)/usr/lib -lGLESv2 -lEGL
 
 ifeq ($(BR2_aarch64)$(BR2_arm),y)
     SCUMMVM_CONF_OPTS += --host=arm-linux
-endif
-
-ifeq ($(BR2_riscv),y)
+else ifeq ($(BR2_riscv),y)
     SCUMMVM_CONF_OPTS += --host=riscv64-linux
+else ifeq ($(BR2_mipsel),y)
+    SCUMMVM_CONF_OPTS += --host=mipsel-linux
 endif
 
 SCUMMVM_CONF_ENV += RANLIB="$(TARGET_RANLIB)" STRIP="$(TARGET_STRIP)"

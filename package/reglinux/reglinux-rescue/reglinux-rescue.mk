@@ -11,6 +11,8 @@ ifeq ($(BR2_aarch64),y)
 REGLINUX_RESCUE_ARCH = aarch64
 else ifeq ($(BR2_riscv),y)
 REGLINUX_RESCUE_ARCH = riscv64
+else ifeq ($(BR2_mipsel),y)
+REGLINUX_RESCUE_ARCH = mipsel
 else ifeq ($(BR2_x86_64),y)
 REGLINUX_RESCUE_ARCH = x86_64
 else ifeq ($(BR2_arm),y)

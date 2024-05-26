@@ -8,7 +8,11 @@ PACMAN_VERSION = 5.2.2
 PACMAN_SITE = https://sources.archlinux.org/other/pacman
 PACMAN_SOURCE = pacman-$(PACMAN_VERSION).tar.gz
 PACMAN_LICENSE = GPLv2
-PACMAN_DEPENDENCIES = glibc libarchive libcurl libgpgme openssl python-httplib2
+PACMAN_DEPENDENCIES = libarchive libcurl libgpgme openssl python-httplib2
+
+ifneq ($(BR2_mipsel),y)
+PACMAN_DEPENDENCIES += glibc
+endif
 
 ifeq ($(BR2_x86_64),y)
 PACMAN_ARCH = x86_64
@@ -20,6 +24,8 @@ else ifeq ($(BR2_arm),y)
 PACMAN_ARCH = armv7l
 else ifeq ($(BR2_riscv),y)
 PACMAN_ARCH = riscv
+else ifeq ($(BR2_mipsel),y)
+PACMAN_ARCH = mipsel
 else
 $(error This architecture won't be supported with pacman on Batocera)
 endif

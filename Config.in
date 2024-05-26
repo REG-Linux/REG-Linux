@@ -565,6 +565,8 @@ endmenu
 menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/reglinux-initramfs/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/uboot-bananapi-f3/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/ubiboot/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/mininit/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box86/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box64/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mednafen/Config.in"
