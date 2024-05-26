@@ -66,13 +66,4 @@ define LIBRETRO_MAME_INSTALL_TARGET_CMDS
 	cp -R -u $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
 endef
 
-define LIBRETRO_MAME_INSTALL_STAGING_CMDS
-	$(INSTALL) -D $(@D)/mamearcade_libretro.so \
-		$(STAGING_DIR)/usr/lib/libretro/mame_libretro.so
-	mkdir -p $(STAGING_DIR)/usr/share/lr-mame/hash
-	cp -R $(@D)/hash $(STAGING_DIR)/usr/share/lr-mame
-	mkdir -p $(TARGET_DIR)/usr/share/mame
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/blank.fmtowns $(TARGET_DIR)/usr/share/mame/blank.fmtowns
-endef
-
 $(eval $(generic-package))
