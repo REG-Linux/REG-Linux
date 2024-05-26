@@ -306,45 +306,28 @@ class DuckstationLegacyGenerator(Generator):
             presence  = system.config.get('retroachievements.richpresence', "")
             indicator = system.config.get('retroachievements.challenge_indicators', "")
             leaderbd  = system.config.get('retroachievements.leaderboards', "")
-            login_cmd = f"dorequest.php?r=login&u={username}&p={password}"
-            try:
-                res = requests.get(login_url + login_cmd, headers=headers)
-                if (res.status_code != 200):
-                    eslog.warning(f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]")
-                    settings.set("Cheevos", "Enabled",  "false")
-                else:
-                    res.encoding = 'utf-8'
-                    parsedout = json.loads(res.json())
-                    if not parsedout['Success']:
-                        eslog.warning(f"ERROR: RetroAchievements login failed with ({str(parsedout)})")
-                    token = parsedout['Token']
-                    settings.set("Cheevos", "Enabled",       "true")
-                    settings.set("Cheevos", "Username",      username)
-                    settings.set("Cheevos", "Token",         token)
-
-                    if hardcore == '1':
-                        settings.set("Cheevos", "ChallengeMode", "true")    # For "hardcore" retroachievement points (no save, no rewind...)
-                    else:
-                        settings.set("Cheevos", "ChallengeMode", "false")
-                    if presence == '1':
-                        settings.set("Cheevos", "RichPresence",  "true")    # Enable rich presence information will be collected and sent to the server where supported
-                    else:
-                        settings.set("Cheevos", "RichPresence",  "false")
-                    if indicator == '1':
-                        settings.set("Cheevos", "PrimedIndicators",  "true")
-                    else:
-                        settings.set("Cheevos", "PrimedIndicators",  "false")
-                    if leaderbd == '1':
-                        settings.set("Cheevos", "Leaderboards",  "true")
-                    else:
-                        settings.set("Cheevos", "Leaderboards",  "false")
-                    #settings.set("Cheevos", "UseFirstDiscFromPlaylist", "false") # When enabled, the first disc in a playlist will be used for achievements, regardless of which disc is active
-                    #settings.set("Cheevos", "TestMode",      "false")            # DuckStation will assume all achievements are locked and not send any unlock notifications to the server.
-
-                    eslog.debug(f"Duckstation RetroAchievements enabled for {username}")
-            except Exception as e:
-                eslog.error(f"ERROR: Impossible to get a RetroAchievements token ({e})")
-                settings.set("Cheevos", "Enabled", "false")
+            token     = system.config.get('retroachievements.token', "")
+            settings.set("Cheevos", "Enabled",       "true")
+            settings.set("Cheevos", "Username",      username)
+            settings.set("Cheevos", "Token",         token)
+            if hardcore == '1':
+                settings.set("Cheevos", "ChallengeMode", "true")    # For "hardcore" retroachievement points (no save, no rewind...)
+            else:
+                settings.set("Cheevos", "ChallengeMode", "false")
+            if presence == '1':
+                settings.set("Cheevos", "RichPresence",  "true")    # Enable rich presence information will be collected and sent to the server where supported
+            else:
+                settings.set("Cheevos", "RichPresence",  "false")
+            if indicator == '1':
+                settings.set("Cheevos", "PrimedIndicators",  "true")
+            else:
+                settings.set("Cheevos", "PrimedIndicators",  "false")
+            if leaderbd == '1':
+                settings.set("Cheevos", "Leaderboards",  "true")
+            else:
+                settings.set("Cheevos", "Leaderboards",  "false")
+            #settings.set("Cheevos", "UseFirstDiscFromPlaylist", "false") # When enabled, the first disc in a playlist will be used for achievements, regardless of which disc is active
+            #settings.set("Cheevos", "TestMode",      "false")            # DuckStation will assume all achievements are locked and not send any unlock notifications to the server.
         else:
             settings.set("Cheevos", "Enabled", "false")
 

@@ -134,7 +134,7 @@ endef
 # default for most of architectures
 REGLINUX_EMULATIONSTATION_PREFIX = SDL_NOMOUSE=1
 REGLINUX_EMULATIONSTATION_CMD = emulationstation-standalone
-REGLINUX_EMULATIONSTATION_ARGS = --no-splash $${EXTRA_OPTS}
+REGLINUX_EMULATIONSTATION_ARGS = $${EXTRA_OPTS}
 REGLINUX_EMULATIONSTATION_POSTFIX = \&
 
 # disabling cec. causing perf issue on init/deinit

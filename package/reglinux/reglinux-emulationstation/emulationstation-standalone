@@ -130,77 +130,7 @@ do
     then
 	batocera-resolution setOutput "${settings_output}" "${settings_output2}" "${settings_output3}" # empty or invalid values defaults to the first valid
     fi
-    ###################
-    
-    ###################
 
-    ### keyboard ###
-    # TODO: xorg/wayland
-    ###################
-
-    # TODO: Remove specific commands from emulationstation-standalone.
-    if which xrandr # if xrandr available
-    then
-        ### dpi override for nvidia gpus ###
-        settings_output="$(batocera-settings-get global.dpi)"
-        [ ! -z "${settings_output}" ] && batocera-resolution setDPI "${settings_output}"
-        ###################
-
-        ### keyboard (specific to xorg) ###
-        map_name="$(batocera-settings-get system.kblayout)"
-        variant_type="$(batocera-settings-get system.kbvariant)"
-        if test -n "${map_name}"
-        then
-            if test -n "${variant_type}"
-            then
-                setxkbmap "${map_name}" -variant "${variant_type}"
-            else
-                setxkbmap "${map_name}"
-            fi
-        else
-        map_name=$(echo $settings_lang | cut -c 1-2)
-            if map_name="en"
-            then
-                map_name=$(echo $settings_lang | cut -c 4- | tr '[:upper:]' '[:lower:]')
-            fi
-        setxkbmap "${map_name}"
-        fi
-        ###################
-                
-        forcedresolution="$(/usr/bin/batocera-settings-get -f $BOOTCONF es.forcedresolution)"
-        if test -n "${forcedresolution}"
-        then
-            batocera-resolution forceMode "${forcedresolution}"
-        fi
-
-        # Multitouch for touch screens
-        TOUCHSCREEN=$(xinput | grep pointer | tail -n +2 | grep -Ei 'touchscreen|2808:1015' | sed -E 's/[^a-zA-Z0-9]*((\S+ ?)+[a-zA-Z0-9\(\)]+)\s*id=([0-9]+)\s*(.*)/"\1"/')
-        if ! test -z "${TOUCHSCREEN}"
-        then
-            killall -9 touchegg
-            touchegg --daemon &
-            touchegg --client&
-        fi
-
-        #####################
-        ## CUSTOMISATIONS ###
-        # to customize your display, you can create the file /userdata/system/custom-es-config
-        # including this kind of commands
-        # rotate the screen
-        # xrandr -o left
-        # xrandr -o right
-        # xrandr -o inverted
-
-        # change the resolution
-        # xrandr -s 640x480
-
-        # change the resolution and the Hz
-        # xrandr -s 640x480 -r 60
-        #####################
-
-        test -e /userdata/system/custom-es-config && bash /userdata/system/custom-es-config &
-        ###################
-    fi
     CUSTOMESOPTIONS="$(/usr/bin/batocera-settings-get es.customsargs)"
 
     # launch automatically a game only the first time

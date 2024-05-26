@@ -57,11 +57,14 @@ class VPinballGenerator(Generator):
         # options
         vpinballOptions.configureOptions(vpinballSettings, system)
 
+        # dmd
+        hasDmd = (batoceraServices.getServiceStatus("dmd_real") == "started")
+
         # windows
-        vpinballWindowing.configureWindowing(vpinballSettings, system, gameResolution)
+        vpinballWindowing.configureWindowing(vpinballSettings, system, gameResolution, hasDmd)
 
         # DMDServer
-        if batoceraServices.isServiceEnabled("dmd_real"):
+        if hasDmd:
             vpinballSettings.set("Standalone", "DMDServer","1")
         else:
             vpinballSettings.set("Standalone", "DMDServer","0")
