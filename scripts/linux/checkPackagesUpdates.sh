@@ -245,9 +245,6 @@ PACKAGES_WINE="d8vk
                vkd3d-proton
                wine-ge-custom
                wine-ge-custom-wow64_32
-               wine-lutris
-               wine-lutris-wow64_32
-               wine-mono-lutris
                wine-mono-proton
                wine-proton
                wine-proton-wow64_32"
