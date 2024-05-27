@@ -3,8 +3,8 @@
 # suyu
 #
 ################################################################################
-# Version: Commits on Apr 13, 2024
-SUDACHI_VERSION = 4ce69bc41f33e3816b9a73ecc6268bd808e44367
+# Version: Commits on May 25, 2024
+SUDACHI_VERSION = v1.0.1
 SUDACHI_SITE = https://github.com/sudachi-emu/sudachi.git
 SUDACHI_SITE_METHOD=git
 SUDACHI_GIT_SUBMODULES=YES
