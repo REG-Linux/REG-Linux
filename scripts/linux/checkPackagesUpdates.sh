@@ -31,7 +31,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-bsnes-hd
                    libretro-cap32
                    libretro-chailove
-                   libretro-citra
                    libretro-craft
                    libretro-desmume
                    libretro-dinothawr
@@ -83,7 +82,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-pc88
                    libretro-pc98
                    libretro-pcsx
-                   libretro-pcsx2
                    libretro-picodrive
                    libretro-play
                    libretro-pocketsnes
@@ -190,6 +188,7 @@ PACKAGES_EMULATORS="amiberry
                     sugarbox
                     supermodel
                     supermodel-es
+                    sudachi
                     suyu
                     thextech
                     tsugaru
