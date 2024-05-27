@@ -3,8 +3,8 @@
 # REG-emulationstation
 #
 ################################################################################
-# Last update: Commits on May 26, 2024
-REGLINUX_EMULATIONSTATION_VERSION = bfb9fb905cfbc20c92ea80311b5306205df7f77b
+# Last update: Commits on May 27, 2024
+REGLINUX_EMULATIONSTATION_VERSION = 39ef4d740fe69af37df6fb653cf38b2fe3078ddc
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_EMULATIONSTATION_SITE = https://$(REGLINUX_EMULATIONSTATION_TOKEN)@github.com/REG-Linux/REG-ES
 REGLINUX_EMULATIONSTATION_SITE_METHOD = git
