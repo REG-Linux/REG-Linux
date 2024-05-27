@@ -4,12 +4,13 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.7.121
+XEMU_VERSION = v0.7.122
 XEMU_SITE = https://github.com/xemu-project/xemu.git
 XEMU_SITE_METHOD=git
 XEMU_GIT_SUBMODULES=YES
 XEMU_LICENSE = GPLv2
-XEMU_DEPENDENCIES = sdl2 libsamplerate slirp
+XEMU_DEPENDENCIES = host-meson host-pkgconf host-python3 host-python-distlib libglib2 zlib
+XEMU_DEPENDENCIES += sdl2 libsamplerate slirp host-python-pyyaml
 
 XEMU_EXTRA_DOWNLOADS = https://github.com/mborgerson/xemu-hdd-image/releases/download/1.0/xbox_hdd.qcow2.zip
 

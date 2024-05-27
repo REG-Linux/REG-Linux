@@ -26,9 +26,16 @@ SCUMMVM_CONF_ENV += AR="$(TARGET_AR) cru" AS="$(TARGET_AS)"
 
 SCUMMVM_CONF_OPTS += --opengl-mode=auto --disable-debug --enable-optimizations \
     --enable-mt32emu --enable-flac --enable-mad --enable-vorbis --disable-tremor \
-    --enable-all-engines --enable-fluidsynth --disable-taskbar --disable-timidity \
+    --enable-all-engines --disable-taskbar --disable-timidity \
     --disable-alsa --enable-vkeybd --enable-release --disable-eventrecorder \
     --prefix=/usr --with-sdl-prefix="$(STAGING_DIR)/usr/bin"
+
+ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
+    SCUMMVM_DEPENDENCIES += fluidsynth
+    SCUMMVM_CONF_OPTS += --enable-fluidsynth
+else
+    SCUMMVM_CONF_OPTS += --disable-fluidsynth
+endif
 
 ifeq ($(BR2_PACKAGE_LIBMPEG2),y)
     SCUMMVM_CONF_OPTS += --enable-mpeg2 --with-mpeg2-prefix="$(STAGING_DIR)/usr/lib"
