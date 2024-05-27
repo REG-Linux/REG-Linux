@@ -461,7 +461,8 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "amlogic/s812"										if BR2_PACKAGE_BATOCERA_TARGET_S812
 	default "samsung/exynos5422/odroidxu4"								if BR2_PACKAGE_BATOCERA_TARGET_XU4
 	default "x86"											if BR2_PACKAGE_BATOCERA_TARGET_X86
-	default "x86_64"										if BR2_PACKAGE_BATOCERA_TARGET_X86_64 || BR2_PACKAGE_BATOCERA_TARGET_X86_64_V3
+	default "x86_64"										if BR2_PACKAGE_BATOCERA_TARGET_X86_64
+	default "x86_64_v3"										if BR2_PACKAGE_BATOCERA_TARGET_X86_64_V3
 	default "qualcomm/sd845/odin"									if BR2_PACKAGE_BATOCERA_TARGET_ODIN
 	default "riscv/visionfive2"									if BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2
 	default "riscv/bananapi-f3"									if BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
