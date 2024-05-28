@@ -1,0 +1,1 @@
+../x86_64/create-boot-script.sh
