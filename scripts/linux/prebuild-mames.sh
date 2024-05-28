@@ -19,6 +19,9 @@ echo "Building MAME/lr-mame combo version ($MAME_VERSION) for all archs"
 # Create prebuilt output directory
 mkdir -p prebuilt
 
+# Enable the flag to build MAME from source
+sed s/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/ configs/batocera-board.common > configs/batocera-board.common
+
 # Loop over archs
 # bcm2836 can be used for h3 (cortex_a7)
 # rk3326 can be used for s9gen4 (cortex_a35)
@@ -38,3 +41,7 @@ for arch in s812 bcm2836 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk358
 	# Clean again
 	make ${arch}-clean
 done
+
+# Disable the flag to build MAME from source
+sed s/BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/ configs/batocera-board.common > configs/batocera-board.common
+
