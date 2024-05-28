@@ -13,7 +13,7 @@ LIBRETRO_MAME_LICENSE = MAME
 LIBRETRO_MAME_DEPENDENCIES = alsa-lib
 
 # Limit number of jobs not to eat too much RAM....
-LIBRETRO_MAME_MAX_JOBS = 8
+LIBRETRO_MAME_MAX_JOBS = 16
 LIBRETRO_MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_MAME_MAX_JOBS) ]; then echo $(LIBRETRO_MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
 
 ifeq ($(BR2_x86_64),y)

@@ -1,0 +1,7 @@
+config BR2_PACKAGE_REGLINUX_MAME
+	bool "reglinux-mame"
+	
+	help
+	  MAME and libretro-mame prebuilt package
+
+	  https://github.com/REG-Linux/REG-MAME

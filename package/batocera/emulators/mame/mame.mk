@@ -15,7 +15,7 @@ MAME_CFLAGS =
 MAME_LDFLAGS =
 
 # Limit number of jobs not to eat too much RAM....
-MAME_MAX_JOBS = 8
+MAME_MAX_JOBS = 16
 MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(MAME_MAX_JOBS) ]; then echo $(MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
 
 # Set PTR64 on/off according to architecture
