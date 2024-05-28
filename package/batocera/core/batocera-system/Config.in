@@ -1279,6 +1279,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_BIGPEMU			if BR2_x86_64
 
 	# NEC PC-FX
+	# Note : We need to fix this package once for good instead of disabling / patching / hacking (x86 asm wronly triggered)
 	select BR2_PACKAGE_LIBRETRO_BEETLE_PCFX		if !BR2_mipsel && !BR2_riscv			&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836		&& \
@@ -1290,6 +1291,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 							   !BR2_PACKAGE_BATOCERA_TARGET_H5		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_H616		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_H6
+							   !BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA
 
 	# SNK Neo Geo CD
 	select BR2_PACKAGE_LIBRETRO_NEOCD		# ALL
