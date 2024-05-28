@@ -1,0 +1,18 @@
+--- a/3rdparty/FreeImageLite/CMakeLists.txt	2024-05-28 02:07:26.586626089 +0200
++++ b/3rdparty/FreeImageLite/CMakeLists.txt	2024-05-28 02:10:11.827565571 +0200
+@@ -435,13 +435,13 @@
+             CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*" )
+             message("--- MIPS detected ---")
+             set(PNG_MIPS_MSA_POSSIBLE_VALUES on off)
+-            set(PNG_MIPS_MSA "on" CACHE STRING "Enable MIPS_MSA optimizations:
++            set(PNG_MIPS_MSA "off" CACHE STRING "Enable MIPS_MSA optimizations:
+                 off: disable the optimizations")
+             set_property(CACHE PNG_MIPS_MSA PROPERTY STRINGS ${PNG_MIPS_MSA_POSSIBLE_VALUES})
+             list(FIND PNG_MIPS_MSA_POSSIBLE_VALUES ${PNG_MIPS_MSA} index)
+             if(index EQUAL -1)
+                 message(FATAL_ERROR " PNG_MIPS_MSA must be one of [${PNG_MIPS_MSA_POSSIBLE_VALUES}]")
+-            elseif(NOT ${PNG_MIPS_MSA} STREQUAL "no")
++            elseif(NOT ${PNG_MIPS_MSA} STREQUAL "off")
+                 set(libpng_mips_sources
+                     Source/3rdParty/LibPNG/mips/mips_init.c
+                     Source/3rdParty/LibPNG/mips/filter_msa_intrinsics.c)

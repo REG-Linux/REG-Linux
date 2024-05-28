@@ -59,6 +59,14 @@ ifeq ($(BR2_arm),y)
     PPSSPP_CONF_OPTS += -DUSING_EGL=OFF
 endif
 
+# mips
+ifeq ($(BR2_mipsel),y)
+    PPSSPP_CONF_OPTS += -DMIPS=ON
+    PPSSPP_CONF_OPTS += -DUSING_GLES2=ON
+    PPSSPP_CONF_OPTS += -DUSING_EGL=OFF
+endif
+
+# aarch64
 ifeq ($(BR2_aarch64),y)
     PPSSPP_CONF_OPTS += -DARM=ON
     PPSSPP_CONF_OPTS += -DARM64=ON
