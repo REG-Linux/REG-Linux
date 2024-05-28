@@ -1,0 +1,19 @@
+--- a/Makefile	2024-05-28 02:19:18.589357704 +0200
++++ b/Makefile	2024-05-28 02:20:05.416479949 +0200
+@@ -454,6 +454,16 @@
+ 	HAVE_DYNAREC := 1
+ 	CPU_ARCH := mips
+ 
++# JZ4770
++else ifeq ($(platform), jz4770)
++	TARGET := $(TARGET_NAME)_libretro.so
++	SHARED := -shared -nostdlib -Wl,--version-script=link.T
++	fpic := -fPIC -DPIC
++	CFLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
++	CFLAGS += -DMIPS_HAS_R2_INSTS
++	HAVE_DYNAREC := 1
++	CPU_ARCH := mips
++
+ # RETROFW
+ else ifeq ($(platform), retrofw)
+ 	TARGET := $(TARGET_NAME)_libretro.so
