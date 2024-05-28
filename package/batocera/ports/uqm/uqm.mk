@@ -10,6 +10,10 @@ UQM_SITE_METHOD = git
 UQM_DEPENDENCIES = sdl2 libpng libvorbis libzip
 UQM_SUBDIR = sc2
 
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_JZ4770),y)
+UQM_CONF_OPTS += -DNETPLAY=OFF
+endif
+
 define UQM_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	$(INSTALL) -m 0755 $(@D)/sc2/src/urquan -D $(TARGET_DIR)/usr/bin/urquan
