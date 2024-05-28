@@ -11,7 +11,7 @@ LIBRETRO_ZC210_GIT_SUBMODULES=YES
 LIBRETRO_ZC210_LICENSE = GPLv2
 
 define LIBRETRO_ZC210_BUILD_CMDS
-	$(ZC210_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D)/ -f Makefile platform="unix" \
+	$(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D)/ -f Makefile platform="unix" \
         GIT_VERSION="-$(shell echo $(LIBRETRO_ZC210_VERSION) | cut -c 1-7)"
 endef
 
