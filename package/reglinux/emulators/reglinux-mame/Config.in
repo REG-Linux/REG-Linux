@@ -1,6 +1,13 @@
+config BR2_PACKAGE_HAS_MAME
+        bool
+
+config BR2_PACKAGE_HAS_LIBRETRO_MAME
+        bool
+
 config BR2_PACKAGE_REGLINUX_MAME
 	bool "reglinux-mame"
-	
+	select BR2_PACKAGE_HAS_MAME
+	select BR2_PACKAGE_HAS_LIBRETRO_MAME
 	help
 	  MAME and libretro-mame prebuilt package
 
