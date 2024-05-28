@@ -13,12 +13,7 @@ CGENIUS_DEPENDENCIES += boost libcurl host-xxd python3-configobj
 
 CGENIUS_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 CGENIUS_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
-# No OpenGL ES support
-#ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_ANY),y)
-#CGENIUS_CONF_OPTS += -DUSE_OPENGL=ON
-#else
-#CGENIUS_CONF_OPTS += -DUSE_OPENGL=OFF
-#endif
+
 # compile the cosmos engine too
 CGENIUS_CONF_OPTS += -DBUILD_COSMOS=1
 

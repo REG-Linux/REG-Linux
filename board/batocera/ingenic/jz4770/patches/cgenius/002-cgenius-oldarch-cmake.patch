@@ -1,0 +1,12 @@
+--- a/src/oldArch.cmake	2024-05-28 02:40:44.620178877 +0200
++++ b/src/oldArch.cmake	2024-05-28 02:41:51.502755484 +0200
+@@ -33,9 +33,6 @@
+                 ADD_DEFINITIONS(-DNOKEYBOARD)
+                 SET(OGG Yes)
+ 	ELSEIF(BUILD_TARGET STREQUAL DINGOO)
+-		SET(USRDIR /opt/opendingux-toolchain/usr/)
+-		SET(CMAKE_C_COMPILER ${USRDIR}/bin/mipsel-linux-gcc)
+-		SET(CMAKE_CXX_COMPILER ${USRDIR}/bin/mipsel-linux-g++)
+                 include_directories(${USRDIR}/include/tremor)
+ 		ADD_DEFINITIONS(-DDINGOO)
+                 ADD_DEFINITIONS(-DNOKEYBOARD)
