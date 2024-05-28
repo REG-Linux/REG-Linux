@@ -4,7 +4,7 @@ HOST_DIR=$1
 BOARD_DIR=$2
 IMAGES_DIR=$3
 # ARM Trusted Firmware BL31
-export BL31="${BINARIES_DIR}/bl31.elf"
+export BL31="${BINARIES_DIR}/bl31.bin"
 
 UBOOT_VERSION=24aafd7efc6827dc44cae0bfc28c08d989b34869
 
