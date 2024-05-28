@@ -12,6 +12,10 @@ ECWOLF_LICENSE = Non-commercial
 ECWOLF_DEPENDENCIES = host-ecwolf sdl2 sdl2_mixer sdl2_net zlib bzip2 jpeg
 ECWOLF_SUPPORTS_IN_SOURCE_BUILD = NO
 
+ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
+ECWOLF_DEPENDENCIES += fluidsynth
+endif
+
 # We need the tools from the host package to build the target package
 HOST_ECWOLF_DEPENDENCIES = zlib bzip2
 HOST_ECWOLF_CONF_OPTS += -DTOOLS_ONLY=ON
@@ -21,14 +25,14 @@ define HOST_ECWOLF_INSTALL_CMDS
 	# Skipping install, the tools are used directly via `ImportExecutables.cmake` from the build directory.
 endef
 
-ECWOLF_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release \
-                    -DBUILD_SHARED_LIBS=OFF \
-                    -DGPL=ON \
-					-DIMPORT_EXECUTABLES="$(HOST_ECWOLF_BUILDDIR)/ImportExecutables.cmake" \
-					-DFORCE_CROSSCOMPILE=ON \
-					-DINTERNAL_JPEG=ON \
-					-DINTERNAL_SDL_NET=ON \
-					-DINTERNAL_SDL_MIXER=ON
+ECWOLF_CONF_OPTS +=	-DCMAKE_BUILD_TYPE=Release \
+			-DBUILD_SHARED_LIBS=OFF \
+			-DGPL=ON \
+			-DIMPORT_EXECUTABLES="$(HOST_ECWOLF_BUILDDIR)/ImportExecutables.cmake" \
+			-DFORCE_CROSSCOMPILE=ON \
+			-DINTERNAL_JPEG=ON \
+			-DINTERNAL_SDL_NET=ON \
+			-DINTERNAL_SDL_MIXER=ON
 
 # Copy the headers that are usually generated on the target machine
 # but must be provided when cross-compiling.
