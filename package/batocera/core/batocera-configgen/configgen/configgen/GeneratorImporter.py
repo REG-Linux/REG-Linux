@@ -19,10 +19,6 @@ def getGenerator(emulator):
         from generators.scummvm.scummvmGenerator import ScummVMGenerator
         return ScummVMGenerator()
 
-    if emulator == 'dosbox':
-        from generators.dosbox.dosboxGenerator import DosBoxGenerator
-        return DosBoxGenerator()
-
     if emulator == 'dosbox_staging':
         from generators.dosboxstaging.dosboxstagingGenerator import DosBoxStagingGenerator
         return DosBoxStagingGenerator()
