@@ -1,0 +1,46 @@
+diff -u -r a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2023-07-25 04:18:45.000000000 +0200
++++ b/CMakeLists.txt	2024-05-29 20:07:06.191702017 +0200
+@@ -183,7 +183,9 @@
+ 		message(STATUS "Using system libjpeg, includes found at ${JPEG_INCLUDE_DIR}")
+ 	endif()
+ 
+-	include(LocateSDL2.cmake)
++	find_package(SDL2 REQUIRED)
++	find_package(SDL2_net REQUIRED)
++	find_package(SDL2_mixer REQUIRED)
+ endif()
+ 
+ if(MSVC)
+diff -u -r a/src/CMakeLists.txt b/src/CMakeLists.txt
+--- a/src/CMakeLists.txt	2024-05-29 20:09:19.768242252 +0200
++++ b/src/CMakeLists.txt	2024-05-29 20:07:06.399696626 +0200
+@@ -320,10 +320,15 @@
+ target_sources(engine PRIVATE ${HEADER_FILES})
+ 
+ add_dependencies(engine revision_check)
++
++find_package(SDL2 REQUIRED)
++find_package(SDL2_net REQUIRED)
++find_package(SDL2_mixer REQUIRED)
++
+ target_link_libraries(engine PRIVATE
+-	SDL2_mixer::SDL2_mixer
+-	SDL2_net::SDL2_net
+-	SDL2::SDL2
++	SDL2_mixer
++	SDL2_net
++	SDL2
+ 	${BZIP2_LIBRARIES}
+ 	${JPEG_LIBRARIES}
+ 	lzma
+@@ -334,6 +339,9 @@
+ target_include_directories(engine PRIVATE
+ 	${BZIP2_INCLUDE_DIR}
+ 	${JPEG_INCLUDE_DIR}
++	${SDL2_INCLUDE_DIR}
++	${SDL2_NET_INCLUDE_DIR}
++	${SDL2_MIXER_INCLUDE_DIR}
+ 	${CMAKE_CURRENT_BINARY_DIR}
+ 	${CMAKE_CURRENT_SOURCE_DIR}
+ 	${CMAKE_CURRENT_SOURCE_DIR}/g_shared
