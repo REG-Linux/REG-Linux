@@ -7,9 +7,9 @@ IMAGES_DIR=$3
 export BL31="${BINARIES_DIR}/bl31.elf"
 
 # Download U-Boot mainline
-wget "https://ftp.denx.de/pub/u-boot/u-boot-2022.10.tar.bz2"
-tar xf u-boot-2022.10.tar.bz2
-cd u-boot-2022.10
+wget "https://ftp.denx.de/pub/u-boot/u-boot-2024.01.tar.bz2"
+tar xf u-boot-2024.01.tar.bz2
+cd u-boot-2024.01
 
 # Apply patches
 PATCHES="${BR2_EXTERNAL_BATOCERA_PATH}/board/batocera/rockchip/rk3328/patches/uboot/*.patch"
