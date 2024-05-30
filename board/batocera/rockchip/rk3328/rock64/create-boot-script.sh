@@ -14,10 +14,6 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-rock64"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-rock64/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-rock64/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
-
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
 
@@ -29,6 +25,6 @@ cp "${BINARIES_DIR}/firmware"        "${REGLINUX_BINARIES_DIR}/boot/boot/firmwar
 cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
 cp "${BINARIES_DIR}/rk3328-rock64.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
-cp "${BOARD_DIR}/boot/extlinux.conf"       "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BOARD_DIR}/boot/extlinux.conf"      "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
 
 exit 0

@@ -1,5 +1,6 @@
 config BR2_PACKAGE_UBOOT_MULTIBOARD
   bool "U-Boot for multiple boards"
+  select BR2_PACKAGE_HOST_PYTHON_PYELFTOOLS
   select BR2_TARGET_ARM_TRUSTED_FIRMWARE if !BR2_PACKAGE_BATOCERA_TARGET_H3 && !BR2_PACKAGE_BATOCERA_TARGET_CHA
   select BR2_TARGET_ARM_TRUSTED_FIRMWARE_LATEST_VERSION
   select BR2_TARGET_ARM_TRUSTED_FIRMWARE_BL32 \
@@ -19,6 +20,7 @@ if BR2_PACKAGE_UBOOT_MULTIBOARD
 config BR2_PACKAGE_UBOOT_MULTIBOARD_CONFIGS
   string "U-Boot configs"
   default "miqi-rk3288 tinker-s-rk3288" if BR2_PACKAGE_BATOCERA_TARGET_RK3288
+  default "rock64-rk3328 roc-cc-rk3328" if BR2_PACKAGE_BATOCERA_TARGET_RK3328
   default "orangepi-rk3399 rock960-rk3399 rock-pi-4-rk3399 rockpro64-rk3399" if BR2_PACKAGE_BATOCERA_TARGET_RK3399
   default "orangepi_one orangepi_pc orangepi_pc_plus orangepi_plus2e bananapi_m2_zero" if BR2_PACKAGE_BATOCERA_TARGET_H3
   default "libretech_all_h3_cc_h3"						if BR2_PACKAGE_BATOCERA_TARGET_CHA
@@ -36,6 +38,7 @@ config BR2_PACKAGE_UBOOT_MULTIBOARD_BINARIES
   string "U-Boot binaries"
   default "u-boot-sunxi-with-spl.bin" if BR2_PACKAGE_BATOCERA_TARGET_H3 || BR2_PACKAGE_BATOCERA_TARGET_CHA || BR2_PACKAGE_BATOCERA_TARGET_H5 || BR2_PACKAGE_BATOCERA_TARGET_H6 || BR2_PACKAGE_BATOCERA_TARGET_H616
   default "idbloader.img u-boot.img"  if BR2_PACKAGE_BATOCERA_TARGET_RK3288
+  default "idbloader.img u-boot.img u-boot-rockchip.bin"  if BR2_PACKAGE_BATOCERA_TARGET_RK3328
   default "idbloader.img u-boot.itb"  if BR2_PACKAGE_BATOCERA_TARGET_RK3399
   default ""
   help
