@@ -1,12 +1,12 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Batocera feature requests
-    url: https://discord.gg/hgNcPXrQDH
-    about: Batocera.linux requests, for emulation and general operating system features
+  - name: REG-Linux feature requests
+    url: https://discord.gg/23wJ69eaCh
+    about: REG-Linux requests, for emulation and general operating system features
   - name: EmulationStation GUI feature requests
-    url: https://discord.gg/vpnbV2KeBH
-    about: EmulationStation GUI requests, for features in the ES front-end in Batocera
+    url: https://discord.gg/23wJ69eaCh
+    about: EmulationStation GUI requests, for features in the ES front-end in REG-Linux
   - name: Help and support
-    url: https://discord.gg/p7K5v5TZ3k
-    about: For support with using Batocera
+    url: https://discord.gg/23wJ69eaCh
+    about: For support with using REG-Linux
 
