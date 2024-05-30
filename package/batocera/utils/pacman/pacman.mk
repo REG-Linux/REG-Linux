@@ -10,7 +10,7 @@ PACMAN_SOURCE = pacman-$(PACMAN_VERSION).tar.gz
 PACMAN_LICENSE = GPLv2
 PACMAN_DEPENDENCIES = libarchive libcurl libgpgme openssl python-httplib2
 
-ifneq ($(BR2_mipsel),y)
+ifeq ($(BR2_TOOLCHAIN_USES_GLIBC),y)
 PACMAN_DEPENDENCIES += glibc
 endif
 

@@ -1,0 +1,38 @@
+--- a/meson.build	2024-05-30 20:09:40.318191603 +0200
++++ b/meson.build	2024-05-30 20:11:55.649187351 +0200
+@@ -210,6 +210,15 @@
+   conf.set('CAIRO_HAS_DLSYM', 1)
+ endif
+ 
++execinfo_dep = cc.find_library('execinfo', required: true)
++if execinfo_dep.found()
++  deps += [execinfo_dep]
++endif
++backtrace_dep = cc.find_library('backtrace', required: true)
++if backtrace_dep.found()
++  deps += [backtrace_dep]
++endif
++
+ feature_conf = configuration_data()
+ 
+ # Array of dictionaries, used to generate per-feature pc files
+--- a/util/meson.build	2024-05-30 20:14:57.201200886 +0200
++++ b/util/meson.build	2024-05-30 20:15:25.749831567 +0200
+@@ -38,7 +38,7 @@
+   util_deps = util.get(1, {}).get('deps', [])
+   executable(exe_name, util[0],
+     include_directories: [incbase],
+-    dependencies: deps + util_deps + [libcairo_dep, libcairoscript_dep],
++    dependencies: deps + util_deps + execinfo_dep + backtrace_dep + [libcairo_dep, libcairoscript_dep],
+   )
+ endforeach
+ 
+--- a/util/meson.build	2024-05-30 21:47:10.669977884 +0200
++++ b/util/meson.build	2024-05-30 21:47:40.606636505 +0200
+@@ -43,5 +43,5 @@
+ endforeach
+ 
+ if conf.get('CAIRO_HAS_DLSYM', 0) == 1 and cc.has_header('execinfo.h')
+-  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : dl_dep)
++  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : [dl_dep, execinfo_dep, backtrace_dep])
+ endif

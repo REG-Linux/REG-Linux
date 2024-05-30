@@ -1,0 +1,20 @@
+--- a/modules/afsocket/afsocket-source.c	2024-05-30 22:39:42.185862076 +0200
++++ b/modules/afsocket/afsocket-source.c	2024-05-30 22:39:53.694158569 +0200
+@@ -41,7 +41,7 @@
+ #include <linux/sock_diag.h>
+ #endif
+ 
+-#if SYSLOG_NG_ENABLE_AFSOCKET_MEMINFO_METRICS
++#if 0
+ static const glong PACKET_STATS_TIMER_MSECS = 1000;
+ #endif
+ 
+@@ -810,7 +810,7 @@
+     }
+ }
+ 
+-#if SYSLOG_NG_ENABLE_AFSOCKET_MEMINFO_METRICS
++#if 0
+ 
+ static void
+ _packet_stats_timer_start(AFSocketSourceDriver *self)
