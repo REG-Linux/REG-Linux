@@ -21,7 +21,7 @@ settingsWlan="$(/usr/bin/batocera-settings-get -f "$BATOCONF" wifi.enabled)"
 #
 # Later in the boot process, /etc/init.d/S26system will then reset the
 # hostname to the value specified in the system.hostname setting
-# ("BATOCERA" by default), but will do so *only* if the
+# ("REGLINUX" by default), but will do so *only* if the
 # system.hostname setting is absent or blank.
 #
 # This leaves the user in control of the hostname to be set, and also
@@ -34,8 +34,8 @@ batocera_hostname() {
         echo "Setting initial hostname from system.hostname: ${settings_hostname}" >> /tmp/hostname.log
         hostname="$settings_hostname"
     else
-        echo "Setting default initial hostname BATOCERA" >> /tmp/hostname.log
-        hostname="BATOCERA"
+        echo "Setting default initial hostname REGLINUX" >> /tmp/hostname.log
+        hostname="REGLINUX"
     fi
 
     hostname "${hostname}"
