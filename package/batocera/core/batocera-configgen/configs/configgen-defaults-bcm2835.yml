@@ -1,13 +1,13 @@
 default:
   options:
-    rewind:      false
-    hud_support: false
-    video_threaded: true
-    videomode: max-1280x720
-    smooth:         false
-    audio_latency:  96
+    rewind:                 false
+    video_threaded:         true
+    videomode:              max-640x480
+    smooth:                 false
+    audio_latency:          96
+    retroarch.audio_driver: alsathread
     # menu retroarch
-    retroarch.menu_driver: rgui
+    retroarch.menu_driver:  rgui
 
 gba:
   emulator: libretro

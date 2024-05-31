@@ -16,21 +16,14 @@ model3:
   core:     supermodel-legacy
   options:
     videomode: max-1920x1080
-    decorations: none
-    hud_support: none
 scummvm:
   emulator: scummvm
   core:     scummvm
-  options:
-    decorations: none
-    hud_support: none
 quake3:
   emulator: ioquake3
   core:     ioquake3
   options:
     videomode: max-1920x1080
-    decorations: none
-    hud_support: none
 gamecube:
   emulator: dolphin
   core:     dolphin
