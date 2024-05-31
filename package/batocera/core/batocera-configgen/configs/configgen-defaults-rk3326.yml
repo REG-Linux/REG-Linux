@@ -1,17 +1,8 @@
 default:
   options:
-    gfxbackend: gl
     video_threaded: true
-    retroarch.video_rotation: 0 # for people upgrading
-    # menu retroarch
     retroarch.menu_driver: rgui
 
-n64:
-  options:
-    mupen64plus.Video-General.Rotate: 0 # for people upgrading
-psp:
-  options:
-    ppsspp.General.InternalScreenRotation: 0 # for people upgrading
 nds:
   emulator: drastic
   core:     drastic

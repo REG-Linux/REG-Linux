@@ -1,10 +1,10 @@
 default:
   options:
-    hud_support: none
     # menu retroarch
     retroarch.audio_latency:   64
     retroarch.video_hard_sync: 0
     retroarch.audio_driver: alsathread
+
 dreamcast:
   options:
     # menu retroarch

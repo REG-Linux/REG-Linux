@@ -1,13 +1,11 @@
 default:
-  emulator:
-  core:
   options:
-    hud_support:        true
+    hud_support:        false
     videomode:          default
     ratio:              auto
     video_threaded:     false
     smooth:             true
-    shaderset:          sharp-bilinear-simple
+    shaderset:          none
     rewind:             false
     bezel:              consoles
     forceNoBezel:       false
@@ -335,6 +333,9 @@ model2:
 model3:
   emulator: supermodel
   core:     supermodel
+  options:
+    decorations: none
+    hud_support: false
 moonlight:
   emulator: moonlight
   core:     moonlight
@@ -485,6 +486,8 @@ psp:
 psvita:
   emulator: vita3k
   core:     vita3k
+  options:
+    hud_support: false
 psx:
   emulator: libretro
   core:     pcsx_rearmed
@@ -500,6 +503,9 @@ pyxel:
 quake3:
   emulator: ioquake3
   core:     ioquake3
+  options:
+    decorations: none
+    hud_support: false
 raze:
   emulator: raze
   core:     raze
@@ -518,6 +524,9 @@ saturn:
 scummvm:
   emulator: scummvm
   core:     scummvm
+  options:
+    decorations: none
+    hud_support: false
 scv:
   emulator: libretro
   core:     emuscv
