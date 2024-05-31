@@ -13,9 +13,6 @@ wii:
 fmtowns:
   emulator: libretro
   core:     mame
-psx:
-  options:
-    hud_support: false # duckstation doesn't like it on n2+
 ps2:
   emulator: libretro
   core:     play
