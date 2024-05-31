@@ -145,7 +145,7 @@ class OpenmsxGenerator(Generator):
         if system.name == "spectravideo":
             commandArray[1:1] = ["-machine", "Spectravideo_SVI-328"]
         
-        if system.isOptSet("hud") and system.config["hud"] != "":
+        if system.isOptSet("hud") and os.path.exists("/usr/bin/mangohud") and system.config["hud"] != "":
             commandArray.insert(0, "mangohud")
         
         # setup the media types
