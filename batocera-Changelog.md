@@ -168,10 +168,10 @@ Add support for the Ayaneo Air Plus (6800U) model
 - Wayland-protocols to 1.33
 - Wlroots to 0.17.1
 - Sway to 1.9
-- Mesa3d to 24.0.7
+- Mesa3d to 24.1
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.9.2
+- X86_64 kernel to 6.9.3
 - Switchres 0.220
 - Btop to 1.3.2
 - Linux firmware to 20240513
@@ -181,7 +181,7 @@ Add support for the Ayaneo Air Plus (6800U) model
 - Xone to Mar 30, 2024
 - Fdupes to 2.3.0
 - FAudio to 24.05
-- Sound Open Firmware to 2023.12.1
+- Sound Open Firmware to 2024.03
 - RyzenAdj to v0.15.0
 - Qt to 6.7.0
 - DXVK to 2.3.1
