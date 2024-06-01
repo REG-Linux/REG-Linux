@@ -1,6 +1,10 @@
 default:
   options:
     video_threaded: true
+    videomode: max-1280x720
+    retroarch.audio_driver: alsathread
+    # menu retroarch
+    retroarch.menu_driver:  xmb
 
 amiga500:
   emulator: amiberry
