@@ -29,31 +29,4 @@ define HYPSEUS_SINGE_INSTALL_TARGET_CMDS
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
-define HYPSEUS_SINGE_INSTALL_BEZELS
-    mkdir -p $(@D)/bezels
-    cd $(@D)/bezels && unzip -x -o $(DL_DIR)/$(HYPSEUS_SINGE_DL_SUBDIR)/$(HYPSEUS_SINGE_BEZELS_SOURCE)
-	mkdir -p $(TARGET_DIR)/usr/share/hypseus-singe/bezels
-	cp -f $(@D)/bezels/daphne/Daphne.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels
-	cp -f $(@D)/bezels/daphne/v2/*.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels
-	cp -f $(@D)/bezels/singe/*.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels
-	cp -f $(@D)/bezels/singe/gungames/*.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels
-	cp -f $(@D)/bezels/singe/gungames/actionmax/*.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels
-endef
-
-define HYPSEUS_SINGE_INSTALL_BEZELS_SINDEN
-    mkdir -p $(@D)/bezels
-    cd $(@D)/bezels && unzip -x -o $(DL_DIR)/$(HYPSEUS_SINGE_DL_SUBDIR)/$(HYPSEUS_SINGE_BEZELS_SOURCE)
-	# Sinden
-	mkdir -p $(TARGET_DIR)/usr/share/hypseus-singe/bezels/sinden
-	cp -f $(@D)/bezels/singe/sinden/actionmax/*.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels/sinden
-	cp -f $(@D)/bezels/singe/sinden/original/*.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels/sinden
-	cp -f $(@D)/bezels/singe/sinden/shaded/*.png $(TARGET_DIR)/usr/share/hypseus-singe/bezels/sinden
-endef
-
-# Extract the bezels we want
-HYPSEUS_SINGE_POST_INSTALL_TARGET_HOOKS = HYPSEUS_SINGE_INSTALL_BEZELS
-ifneq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
-DAPHNE_POST_INSTALL_TARGET_HOOKS += HYPSEUS_SINGE_INSTALL_BEZELS_SINDEN
-endif
-
 $(eval $(cmake-package))
