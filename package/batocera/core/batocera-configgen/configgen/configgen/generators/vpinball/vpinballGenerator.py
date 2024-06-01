@@ -23,6 +23,7 @@ class VPinballGenerator(Generator):
         # files
         vpinballConfigPath     = batoceraFiles.CONF + "/vpinball"
         vpinballConfigFile     = vpinballConfigPath + "/VPinballX.ini"
+        vpinballLogFile        = vpinballConfigPath + "/vpinball.log"
         vpinballPinmameIniPath = batoceraFiles.CONF + "/vpinball/pinmame/ini"
 
         # create vpinball config directory and default config file if they don't exist
@@ -32,6 +33,8 @@ class VPinballGenerator(Generator):
             shutil.copy("/usr/bin/vpinball/assets/Default_VPinballX.ini", vpinballConfigFile)
         if not os.path.exists(vpinballPinmameIniPath):
             os.makedirs(vpinballPinmameIniPath)
+        if os.path.exists(vpinballLogFile):
+            os.rename(vpinballLogFile, vpinballLogFile + ".1")
 
         ## [ VPinballX.ini ] ##
         try:
