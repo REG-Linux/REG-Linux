@@ -224,21 +224,26 @@ shared:
         "On": 1
         "Off": 0
     use_guns:
-      group: LIGHT GUN
+      order: 99
+      group: CONTROLS
+      submenu: LIGHT GUNS
       prompt: USE LIGHT GUNS
       description: Use light guns instead of pads if light guns are connected.
       choices:
         "On":  1
         "Off": 0
     use_wheels:
-      group: WHEELS
+      order: 100
+      group: CONTROLS
+      submenu: WHEELS
       prompt: USE WHEELS
       description: Use wheels instead of pads if wheels are connected.
       choices:
         "On":  1
         "Off": 0
     wheel_rotation:
-      group: WHEELS
+      group: CONTROLS
+      submenu: WHEELS
       prompt: WHEEL ROTATION
       description: Maximum wheel rotation from left to right (in degrees)
       choices:
@@ -252,7 +257,8 @@ shared:
         "900": 900
         "1080": 1080
     wheel_deadzone:
-      group: WHEELS
+      group: CONTROLS
+      submenu: WHEELS
       prompt: WHEEL DEADZONE
       description: Zone for which the game doesn't react to the wheel (in degrees)
       choices:
@@ -267,7 +273,8 @@ shared:
         "45": 45
         "50": 50
     wheel_midzone:
-      group: WHEELS
+      group: CONTROLS
+      submenu: WHEELS
       prompt: WHEEL MIDZONE
       description: Reserve a non dead zone at the center of the wheel to go straight ahead (in degrees)
       choices:
@@ -7154,39 +7161,42 @@ hypseus-singe:
                 "0 degrees":   0
                 "90 degrees":  90
                 "270 degrees": 270
+        hypseus_bezels:
+            prompt: BEZELS
+            description: Enable or disable bezels being added when content is a 4:3 aspect with a widescreen display.
+            preset: switchon          
         hypseus_filter:
             prompt: SMOOTH GAMES (BILINEAR FILTERING)
-            choices:
-                "On":  1
-                "Off": 0
+            preset: switchoff
         hypseus_scanlines:
             archs_include: [x86, x86_64]
             group: ADVANCED OPTIONS
             prompt: SCANLINES
-            description: Use with the stretch aspect ratio and adjust joystick sensitivity as required.
             choices:
-                "Off":                          0
-                "On":                           1
+                "Off":      0
+                "Shunt 2":  2
+                "Shunt 3":  3
+                "Shunt 4":  4
+                "Shunt 5":  5
+                "Shunt 6":  6
+                "Shunt 7":  7
+                "Shunt 8":  8
+                "Shunt 9":  9
+                "Shunt 10": 10
         hypseus_axis:
             prompt: INVERT AXIS
             description: Invert the vertical joystick axis on flight games.
-            choices:
-                "Off": 0
-                "On":  1
+            preset: switchoff
         hypseus_texturestream:
             group: ADVANCED OPTIONS
             prompt: SDL TEXTURE ACCESS STREAMING
             description: Can improve video performance. Do not use with ActionMax games or scanlines.
-            choices:
-                "Off":                          0
-                "On":                           1
+            preset: switchoff
         hypseus_joy:
             group: ADVANCED OPTIONS
             prompt: CUSTOM CONTROLLER
             description: Use controller settings manually defined in custom.ini.
-            choices:
-                "Off":                          0
-                "On":                           1
+            preset: switchoff
   systems:
     singe:
       cfeatures:
@@ -7206,7 +7216,7 @@ hypseus-singe:
             "15": 15
             "20": 20
         singe_crosshair:
-          group: LIGHT GUNS
+          group: LIGHT GUN
           prompt: HIDE LIGHT GUN CROSSHAIRS
           description: Hide crosshairs in supported games e.g. ActionMax, Maddog II.
           choices:
@@ -7235,6 +7245,11 @@ dolphin:
                 "Force 16:9":        1
                 "Force 4:3":         2
                 "Stretch to window": 3
+        vsync:
+            submenu: DISPLAY
+            prompt: VSYNC
+            description: Fix screen tearing. CPU heavy.
+            preset: switchon       
         gfxbackend:
             archs_include: [x86, x86_64, bcm2711, bcm2712]
             submenu: RENDERING
@@ -7269,25 +7284,88 @@ dolphin:
             submenu: RENDERING
             prompt: PRE-CACHE SHADERS
             description: Compile shaders on next launch of game (one time). Reduces micro-freezes.
+            preset: switchoff
+        anisotropic_filtering:
+            submenu: RENDERING
+            prompt: ANISOTROPIC FILTERING
+            description: Improves clarity of distant textures.
             choices:
-                "Off (default)": 0
-                "On":            1
+                "Off": 0
+                "2x":  1
+                "4x":  2
+                "8x":  3
+                "16x": 4
+        antialiasing:
+            submenu: RENDERING
+            prompt: ANTI-ALIASING
+            description: Enhancement. Smooth out jagged edges on 3D object polygons.
+            choices:
+                "Off": 0
+                "2x":  2
+                "4x":  4
+                "8x":  8
+        use_ssaa:
+            submenu: RENDERING
+            prompt: ANTI-ALIASING MODE
+            description: Use SSAA instead of MSAA for anti-aliasing. SSAA may look better but has a higher performance cost.
+            preset: switchoff
+        hires_textures:
+            submenu: RENDERING
+            prompt: LOAD CUSTOM TEXTURES
+            preset: switchoff
+        manual_texture_sampling:
+            submenu: RENDERING
+            prompt: MANUAL TEXTURE SAMPLING
+            description: Enabling will allow for correct emulation of texture wrapping. This comes at a cost of potential worse performance.
+            preset: switchoff           
+        dual_core:
+            submenu: EMULATION
+            prompt: DUAL CORE MODE
+            description: Usually not much faster than single core mode.
+            preset: switchoff
+        gpu_sync:
+            submenu: EMULATION
+            prompt: GPU SYNC
+            description: Speed hack for dual core mode to fix some glitches.
+            preset: switchoff
         perf_hacks:
-            group: ADVANCED OPTIONS
+            submenu: EMULATION
             prompt: PERFORMANCE HACKS
             description: Increase emulator performance, at the cost of accuracy/stability.
-            choices:
-                "Off": 0
-                "On":  1
+            preset: switchoff             
+        enable_cheats:
+            submenu: EMULATION
+            prompt: ENABLE CHEATS
+            description: To use game cheats or 16/9 Aspect Ratio Fix codes.
+            preset: switchoff
+        enable_mmu:
+            submenu: EMULATION
+            prompt: MEMORY MANAGEMENT UNIT
+            description: Required by some games.
+            preset: switchoff
+        enable_fastdisc:
+            submenu: EMULATION
+            prompt: FAST DISK TRANSFER RATE
+            description: Enhancement. Removes disc loading.
+            preset: switchoff             
+        vbi_hack:
+            submenu: EMULATION
+            prompt: VBI SKIP
+            description: Skips Vertical Blank Interrupts when lag is detected, allowing for smooth audio playback when emulation speed is not 100%.
+            preset: switchoff      
         use_pad_profiles:
-            group: ADVANCED OPTIONS
+            group: CONTROLS
             prompt: USE PAD PROFILES
             description: Search for custom configured joystick profiles.
-            choices:
-                "Off": 0
-                "On":  1
+            preset: switchoff
+        rumble:
+            group: CONTROLS
+            prompt: RUMBLE
+            description: Enable controller rumble capabilities if supported by the controller.
+            preset: switchon       
         dolphin_port_1_type:
-            submenu: CONTROLLER 1
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 1
             prompt: GAMECUBE PORT 1 TYPE
             description: Change what's plugged into the virtual GameCube ports.
             choices:
@@ -7301,7 +7379,8 @@ dolphin:
                 #"GBA (TCP)":                  5
                 "Keyboard":                   7
         dolphin_port_2_type:
-            submenu: CONTROLLER 2
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 2
             prompt: GAMECUBE PORT 2 TYPE
             description: Change what's plugged into the virtual GameCube ports.
             choices:
@@ -7315,7 +7394,8 @@ dolphin:
                 #"GBA (TCP)":                  5
                 "Keyboard":                   7
         dolphin_port_3_type:
-            submenu: CONTROLLER 3
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 3
             prompt: GAMECUBE PORT 3 TYPE
             description: Change what's plugged into the virtual GameCube ports.
             choices:
@@ -7329,7 +7409,8 @@ dolphin:
                 #"GBA (TCP)":                  5
                 "Keyboard":                   7
         dolphin_port_4_type:
-            submenu: CONTROLLER 4
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 4
             prompt: GAMECUBE PORT 4 TYPE
             description: Change what's plugged into the virtual GameCube ports.
             choices:
@@ -7343,130 +7424,40 @@ dolphin:
                 #"GBA (TCP)":                  5
                 "Keyboard":                   7
         alt_mappings_1:
-            submenu: CONTROLLER 1
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 1
             prompt: ALT INPUT MAPPING
             description: Use alternative input mappings. Only applies to Standard Controller type.
             choices:
                 "Face Buttons (CW)":         buttons_cw
                 "Face Buttons (CCW)":        buttons_ccw
         alt_mappings_2:
-            submenu: CONTROLLER 2
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 2
             prompt: ALT INPUT MAPPING
             description: Use alternative input mappings. Only applies to Standard Controller type.
             choices:
                 "Face Buttons (CW)":         buttons_cw
                 "Face Buttons (CCW)":        buttons_ccw
         alt_mappings_3:
-            submenu: CONTROLLER 3
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 3
             prompt: ALT INPUT MAPPING
             description: Use alternative input mappings. Only applies to Standard Controller type.
             choices:
                 "Face Buttons (CW)":         buttons_cw
                 "Face Buttons (CCW)":        buttons_ccw
         alt_mappings_4:
-            submenu: CONTROLLER 4
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 4
             prompt: ALT INPUT MAPPING
             description: Use alternative input mappings. Only applies to Standard Controller type.
             choices:
                 "Face Buttons (CW)":         buttons_cw
                 "Face Buttons (CCW)":        buttons_ccw
-        anisotropic_filtering:
-            submenu: RENDERING
-            prompt: ANISOTROPIC FILTERING
-            description: Improves clarity of distant textures.
-            choices:
-                "Off": 0
-                "2x":  1
-                "4x":  2
-                "8x":  3
-                "16x": 4
-        dual_core:
-            group: ADVANCED OPTIONS
-            prompt: DUAL CORE MODE
-            description: Usually not much faster than single core mode.
-            choices:
-                "Off": 0
-                "On":  1
-        gpu_sync:
-            group: ADVANCED OPTIONS
-            prompt: GPU SYNC
-            description: Speed hack for dual core mode to fix some glitches.
-            choices:
-                "Off": 0
-                "On":  1
-        antialiasing:
-            submenu: RENDERING
-            prompt: ANTI-ALIASING
-            description: Enhancement. Smooth out jagged edges on 3D object polygons.
-            choices:
-                "Off": 0
-                "2x":  2
-                "4x":  4
-                "8x":  8
-        use_ssaa:
-            submenu: RENDERING
-            prompt: ANTI-ALIASING MODE
-            description: Toggle MSAA/SSAA. Depends on anti-aliasing being enabled.
-            choices:
-                "MSAA (default)": 0
-                "SSAA":           1
-        hires_textures:
-            submenu: RENDERING
-            prompt: LOAD CUSTOM TEXTURES
-            choices:
-                "Off": 0
-                "On":  1
-        manual_texture_sampling:
-            submenu: RENDERING
-            prompt: MANUAL TEXTURE SAMPLING
-            description: Enabling will allow for correct emulation of texture wrapping. This comes at a cost of potential worse performance.
-            choices:
-                "Off": 0
-                "On":  1
-        enable_cheats:
-            group: ADVANCED OPTIONS
-            prompt: ENABLE CHEATS
-            description: To use game cheats or 16/9 Aspect Ratio Fix codes.
-            choices:
-                "Off": 0
-                "On":  1
-        enable_mmu:
-            group: ADVANCED OPTIONS
-            prompt: MEMORY MANAGEMENT UNIT
-            description: Required by some games.
-            choices:
-                "Off": 0
-                "On":  1
-        enable_fastdisc:
-            group: ADVANCED OPTIONS
-            prompt: FAST DISK TRANSFER RATE
-            description: Enhancement. Removes disc loading.
-            choices:
-                "Off": 0
-                "On":  1
-        vsync:
-            submenu: DISPLAY
-            prompt: VSYNC
-            description: Fix screen tearing. CPU heavy.
-            choices:
-                "Off": 0
-                "On":  1
-        ShowDpMsg:
-            submenu: DISPLAY
-            prompt: SHOW ON-SCREEN DISPLAY MESSAGES
-            description: Show on screen display messages (memory card saves..).
-            choices:
-                "Off": 0
-                "On":  1
-        vbi_hack:
-            group: ADVANCED OPTIONS
-            prompt: VBI SKIP
-            description: Skips Vertical Blank Interrupts when lag is detected, allowing for smooth audio playback when emulation speed is not 100%.
-            choices:
-                "Off": "False"
-                "On":  "True"
         deadzone_1:
-            submenu: CONTROLLER 1
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 1
             prompt: DEADZONE
             description: Set joystick deadzone.
             choices:
@@ -7478,7 +7469,8 @@ dolphin:
                 "25%":           25.0
                 "30%":           30.0
         deadzone_2:
-            submenu: CONTROLLER 2
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 2
             prompt: DEADZONE
             description: Set joystick deadzone.
             choices:
@@ -7490,7 +7482,8 @@ dolphin:
                 "25%":           25.0
                 "30%":           30.0
         deadzone_3:
-            submenu: CONTROLLER 3
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 3
             prompt: DEADZONE
             description: Set joystick deadzone.
             choices:
@@ -7502,7 +7495,8 @@ dolphin:
                 "25%":           25.0
                 "30%":           30.0
         deadzone_4:
-            submenu: CONTROLLER 4
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 4
             prompt: DEADZONE
             description: Set joystick deadzone.
             choices:
@@ -7514,7 +7508,8 @@ dolphin:
                 "25%":           25.0
                 "30%":           30.0
         jsgate_size_1:
-            submenu: CONTROLLER 1
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 1
             prompt: JOYSTICK GATE SIZE
             description: Set virtual joysticks gate size. Smaller increases sensitivity. Larger decreases it.
             choices:
@@ -7522,7 +7517,8 @@ dolphin:
                 "Normal (Default)": normal
                 "Larger":           larger
         jsgate_size_2:
-            submenu: CONTROLLER 2
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 2
             prompt: JOYSTICK GATE SIZE
             description: Set virtual joysticks gate size. Smaller increases sensitivity. Larger decreases it.
             choices:
@@ -7530,7 +7526,8 @@ dolphin:
                 "Normal (Default)": normal
                 "Larger":           larger
         jsgate_size_3:
-            submenu: CONTROLLER 3
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 3
             prompt: JOYSTICK GATE SIZE
             description: Set virtual joysticks gate size. Smaller increases sensitivity. Larger decreases it.
             choices:
@@ -7538,20 +7535,24 @@ dolphin:
                 "Normal (Default)": normal
                 "Larger":           larger
         jsgate_size_4:
-            submenu: CONTROLLER 4
+            group: CONTROLS
+            submenu: GAMECUBE CONTROLLER 4
             prompt: JOYSTICK GATE SIZE
             description: Set virtual joysticks gate size. Smaller increases sensitivity. Larger decreases it.
             choices:
                 "Smaller":          smaller
                 "Normal (Default)": normal
-                "Larger":           larger
+                "Larger":           larger                             
         dplii:
-            group: ADVANCED OPTIONS
+            group: AUDIO
             prompt: DOLBY PRO LOGIC II
             description: Enables Dolby Pro Logic II for surround sound. May impact performance.
-            choices:
-                "Off": 0
-                "On":  1
+            preset: switchoff
+        ShowDpMsg:
+            submenu: DISPLAY
+            prompt: SHOW ON-SCREEN DISPLAY MESSAGES
+            description: Show on screen display messages (memory card saves..).
+            preset: switchoff              
   systems:
     gamecube:
         cfeatures:
@@ -7559,18 +7560,14 @@ dolphin:
                 submenu: DISPLAY
                 prompt: WIDESCREEN HACK (GLITCHY)
                 description: Enhancement. Only works with a 16/9 ratio and bezels disabled.
-                choices:
-                    "Off": 0
-                    "On":  1
+                preset: switchoff
             dolphin_SkipIPL:
-                group: ADVANCED OPTIONS
+                submenu: EMULATION
                 prompt: ENABLE BOOT ANIMATION
                 description: Enable Gamecube boot animation and BIOS access (requires IPL.bin BIOS in appropriate user directory).
-                choices:
-                    "Off": 0
-                    "On":  1
+                preset: switchoff
             gamecube_language:
-                group: ADVANCED OPTIONS
+                submenu: EMULATION
                 prompt: GAMECUBE LANGUAGE
                 description: Change the Gamecube system language.
                 choices:
@@ -7591,14 +7588,14 @@ dolphin:
                     "4:3":  0
                     "16:9": 1
             emulatedwiimotes:
-                submenu: CONTROLLERS
+                group: CONTROLS
+                submenu: WII CONTROLLERS
                 prompt: EMULATE WIIMOTE
                 description: Map your controller to an emulated Wiimote.
-                choices:
-                    "Off": 0
-                    "On":  1
+                preset: switchoff
             controller_mode:
-                submenu: CONTROLLERS
+                group: CONTROLS
+                submenu: WII CONTROLLERS
                 prompt: CUSTOMIZE EMULATED WIIMOTE & GAMEPAD
                 description: Emulate a Wiimote Sideway with L2 for Shake and Nunchuk on R-stick.
                 choices:
@@ -7610,38 +7607,30 @@ dolphin:
                     "Wiimote Sideway + Tilt":    it
                     "Wiimote Sideway + Nunchuk": in
             sensorbar_position:
-                submenu: CONTROLLERS
+                group: CONTROLS
+                submenu: WII CONTROLLERS
                 prompt: SENSOR BAR POSITION
                 description: Position of wii sensor bar relative to the disaply for real wiimotes.
                 choices:
                     "Bottom (Default)": 0
                     "Top":  1
             dsmotion:
-                submenu: CONTROLLERS
+                group: CONTROLS
+                submenu: WII CONTROLLERS
                 prompt: DUALSHOCK MOTION CONTROL
                 description: Emulate the Wiimote pointer with a DS4's gyroscope.
-                choices:
-                    "Off": 0
-                    "On":  1
+                preset: switchoff
             mouseir:
-                submenu: CONTROLLERS
+                group: CONTROLS
+                submenu: WII CONTROLLERS
                 prompt: MOUSE AS WIIMOTE POINTER
                 description: Emulate the Wiimote pointer with a mouse.
-                choices:
-                    "Off": 0
-                    "On":  1
+                preset: switchoff
             dolphin-lightgun-hide-crosshair:
-                group: LIGHT GUNS
+                group: CONTROLS
+                submenu: LIGHT GUNS
                 prompt: SHOW LIGHT GUN CROSSHAIRS
-                choices:
-                    "Off": 0
-                    "On":  1
-            rumble:
-                prompt: RUMBLE
-                description: Enable controller rumble capabilities if supported by the controller.
-                choices:
-                    "Off": 0
-                    "On":  1
+                preset: switchoff
 
 dolphin_triforce:
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
@@ -9673,7 +9662,7 @@ supermodel:
                 "On":       1
         joystickSensitivity:
             prompt: STEERING SENSITIVITY
-            description: For playing driving games with a game pad, it is sometimes a good idea to use a value larger than 100% so that the steering feels less sensitive on a thumbstick.
+            description: For playing driving games with a game pad, it is sometimes a good idea to use a value larger than 100%% so that the steering feels less sensitive on a thumbstick.
             preset: slider
             preset_parameters: 70 200 10 100 %
         pedalSwap:

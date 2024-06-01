@@ -136,4 +136,7 @@ hikaru:
     videomode: max-640x480
 jaguar:
   emulator: bigpemu
-  core:    bigpemu
+  core:     bigpemu
+chihiro:
+  emulator: xemu
+  core:     xemu
