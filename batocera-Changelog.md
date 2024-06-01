@@ -42,6 +42,8 @@ Add support for the Ayaneo Air Plus (6800U) model
   - .cas/.dsk default autoload behaviors (.bas in rom basename uses CLOAD/RUN)
   - user overrides declarable in `system/configs/mame/autoload/coco_{cass,flop}_autoload.csv`
 - "Tandy Radio Shack Color Computer cassettes" softList added to coco Advanced Game Options
+- RetroAchievements for Flycast & Libretro-Flycast
+- Chihiro support via Xemu for Xbox compatible Chihiro patched games.
 ### Fixed
 - RG552 Splash-screen rotation
 - RG552 Vibrator enabled
@@ -169,7 +171,7 @@ Add support for the Ayaneo Air Plus (6800U) model
 - Mesa3d to 24.0.7
 - RPI kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.9
+- X86_64 kernel to 6.9.2
 - Switchres 0.220
 - Btop to 1.3.2
 - Linux firmware to 20240513
