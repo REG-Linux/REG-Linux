@@ -1,6 +1,5 @@
 default:
   options:
-    video_threaded: true
     retroarch.menu_driver: rgui
 
 nds:
