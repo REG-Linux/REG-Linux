@@ -1,7 +1,7 @@
 default:
   options:
-    video_threaded: true
     videomode: max-1280x720
+    retroarch.audio_driver: alsathread
 
 amiga500:
   emulator: libretro
