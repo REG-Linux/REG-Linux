@@ -430,6 +430,7 @@ endmenu
 
 menu "Looks"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/looks/adwaita-icon-theme-light/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/looks/hypseus-singe-bezels/Config.in"
 endmenu
 
 menu "Utils"
@@ -543,6 +544,7 @@ menu "Libraries"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/shaderc/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python-proxy-tools/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/pywebview/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/ffmpeg-python/Config.in"
 endmenu
 
 menu "Audio"
