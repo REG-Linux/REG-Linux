@@ -1,6 +1,8 @@
 default:
   options:
     videomode:                  max-640x480
+    video_threaded:             true
+    smooth:                     false
     retroarch.audio_driver:     alsathread
     retroarch.audio_out_rate:   44100
     retroarch.audio_latency:    96
