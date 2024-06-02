@@ -6,12 +6,8 @@
 kernel=boot/linux
 initramfs boot/initrd.lz4
 
-# Firmware configurations
-start_file=start.elf
-fixup_file=fixup.dat
-
 # sets the initial CEC name of the device
-cec_osd_name=batocera
+cec_osd_name=reglinux
 
 # uncomment will lead to "safe mode" settings being used to try to boot with maximum HDMI compatibility.
 #hdmi_safe=1
@@ -105,7 +101,7 @@ boot_delay=3
 
 # uncomment to avoid the firmware parsing the EDID of any HDMI attached display
 # that way the Linux video mode system (KMS) will then parse the EDID itself and pick an appropriate mode.
-#disable_fw_kms_setup=1
+disable_fw_kms_setup=1
 
 # uncomment for lirc-rpi
 #dtoverlay=lirc-rpi
@@ -136,7 +132,7 @@ dtparam=audio=on
 dtparam=krnbt=on
 
 # Enable DRM VC4 V3D driver
-dtoverlay=vc4-kms-v3d
+dtoverlay=vc4-kms-v3d,cma-128
 
 [DPI]
 # Put any DPI required display code here
