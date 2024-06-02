@@ -161,7 +161,7 @@
 	cpu-supply = <&vdd_arm>;
 };
 
-/*&cpu0_opp_table {
+&cpu_opp_table {
 	opp-1008000000 {
 		clock-latency-ns = <40000>;
 		opp-hz = /bits/ 64 <1008000000>;
@@ -225,7 +225,7 @@
 		opp-microvolt-L2 = <1100000 1100000 1380000>;
 		opp-suspend;
 	};
-};*/
+};
 
 /*&dfi {
 	status = "okay";
