@@ -1,0 +1,50 @@
+diff --git a/Documentation/devicetree/bindings/media/rockchip-vpu.yaml b/Documentation/devicetree/bindings/media/rockchip-vpu.yaml
+index c57e1f488895..d1b47b14ca57 100644
+--- a/Documentation/devicetree/bindings/media/rockchip-vpu.yaml
++++ b/Documentation/devicetree/bindings/media/rockchip-vpu.yaml
+@@ -26,7 +26,9 @@ properties:
+           - rockchip,rk3568-vpu
+           - rockchip,rk3588-av1-vpu
+       - items:
+-          - const: rockchip,rk3188-vpu
++          - enum:
++              - rockchip,rk3128-vpu
++              - rockchip,rk3188-vpu
+           - const: rockchip,rk3066-vpu
+       - items:
+           - const: rockchip,rk3228-vpu
+diff --git a/arch/arm/boot/dts/rockchip/rk3128.dtsi b/arch/arm/boot/dts/rockchip/rk3128.dtsi
+index fb98873fd94e..c11f55677841 100644
+--- a/arch/arm/boot/dts/rockchip/rk3128.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3128.dtsi
+@@ -252,6 +252,30 @@ power-domain@RK3128_PD_GPU {
+ 		};
+ 	};
+ 
++	vpu: video-codec@10106000 {
++		compatible = "rockchip,rk3128-vpu", "rockchip,rk3066-vpu";
++		reg = <0x10106000 0x800>;
++		interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-names = "vepu", "vdpu";
++		clocks = <&cru ACLK_VDPU>, <&cru HCLK_VDPU>,
++			 <&cru ACLK_VEPU>, <&cru HCLK_VEPU>;
++		clock-names = "aclk_vdpu", "hclk_vdpu",
++			      "aclk_vepu", "hclk_vepu";
++		iommus = <&vpu_mmu>;
++		power-domains = <&power RK3128_PD_VIDEO>;
++	};
++
++	vpu_mmu: iommu@10106800 {
++		compatible = "rockchip,iommu";
++		reg = <0x10106800 0x100>;
++		interrupts = <GIC_SPI 67 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&cru ACLK_VEPU>, <&cru HCLK_VDPU>;
++		clock-names = "aclk", "iface";
++		power-domains = <&power RK3128_PD_VIDEO>;
++		#iommu-cells = <0>;
++	};
++
+ 	vop: vop@1010e000 {
+ 		compatible = "rockchip,rk3126-vop";
+ 		reg = <0x1010e000 0x300>;
