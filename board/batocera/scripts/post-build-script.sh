@@ -29,9 +29,6 @@ ln -sf "/usr/share/emulationstation/themes"         "${TARGET_DIR}/etc/emulation
 mkdir -p "${TARGET_DIR}/usr/share/batocera/datainit/cheats" || exit 1
 ln -sf "/userdata/cheats" "${TARGET_DIR}/usr/share/batocera/datainit/cheats/custom" || exit 1
 
-# we don't want the kodi startup script
-rm -f "${TARGET_DIR}/etc/init.d/S50kodi" || exit 1
-
 # we have custom urandom scripts
 rm -f "${TARGET_DIR}/etc/init.d/S20urandom" || exit 1
 
@@ -91,11 +88,6 @@ then
     mv "${TARGET_DIR}/etc/init.d/S21rngd"    "${TARGET_DIR}/etc/init.d/S33rngd"    || exit 1 # move because it takes several seconds (on odroidgoa for example)
     sed -i "s/start-stop-daemon -S -q /start-stop-daemon -S -q -N 10 /g" "${TARGET_DIR}/etc/init.d/S33rngd"  || exit 1 # set rngd niceness to 10 (to decrease slowdown of other processes)
 fi
-
-# remove kodi default joystick configuration files
-# while as a minimum, the file joystick.Sony.PLAYSTATION(R)3.Controller.xml makes references to PS4 controllers with axes which doesn't exist (making kodi crashing)
-# i prefer to put it here than in packages/kodi while there are already a lot a lot of things
-rm -rf "${TARGET_DIR}/usr/share/kodi/system/keymaps/joystick."*.xml || exit 1
 
 # tmpfs or sysfs is mounted over theses directories
 # clear these directories is required for the upgrade (otherwise, tar xf fails)
