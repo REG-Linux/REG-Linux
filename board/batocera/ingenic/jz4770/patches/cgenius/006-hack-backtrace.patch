@@ -1,0 +1,10 @@
+--- a/GsKit/base/interface/Debug.cpp	2024-06-02 14:28:56.353068224 +0200
++++ b/GsKit/base/interface/Debug.cpp	2024-06-02 14:29:16.221654405 +0200
+@@ -414,6 +414,7 @@
+ #include <execinfo.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <backtrace.h>
+ 
+ void DumpCallstackPrintf(void* callpnt) {
+ 	void *callstack[128];
