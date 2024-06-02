@@ -1,0 +1,44 @@
+--- a/CMakeLists.txt	2024-06-02 23:13:36.348612652 +0200
++++ b/CMakeLists.txt	2024-06-02 23:14:38.181986934 +0200
+@@ -513,11 +513,10 @@
+ 
+ if(ENABLE_LAUNCHER OR ENABLE_EDITOR)
+ 	# Widgets finds its own dependencies (QtGui and QtCore).
+-	find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network)
+-	find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network)
++	find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
+ 
+ 	if(ENABLE_TRANSLATIONS)
+-		find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS LinguistTools)
++		find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+ 		add_definitions(-DENABLE_QT_TRANSLATIONS)
+ 	endif()
+ endif()
+@@ -751,7 +750,7 @@
+ 	endif()
+ 
+ 	if(ENABLE_LAUNCHER OR ENABLE_EDITOR)
+-		get_target_property(QtCore_location Qt${QT_VERSION_MAJOR}::Core LOCATION)
++		get_target_property(QtCore_location Qt6::Core LOCATION)
+ 		get_filename_component(Qtbin_folder ${QtCore_location} PATH)
+ 		file(GLOB dep_files
+ 			${dep_files}
+@@ -760,15 +759,15 @@
+ 			${Qtbin_folder}/Qt5Widgets${debug_postfix}.dll
+ 			${Qtbin_folder}/Qt5Network${debug_postfix}.dll
+ 			${Qtbin_folder}/icu*.dll)
+-		get_target_property(integration_type Qt${QT_VERSION_MAJOR}::QWindowsIntegrationPlugin TYPE)
++		get_target_property(integration_type Qt6::QWindowsIntegrationPlugin TYPE)
+ 		if(NOT(integration_type STREQUAL "INTERFACE_LIBRARY"))
+-			get_target_property(integration_loc Qt${QT_VERSION_MAJOR}::QWindowsIntegrationPlugin LOCATION)
++			get_target_property(integration_loc Qt6::QWindowsIntegrationPlugin LOCATION)
+ 			install(
+ 				FILES ${integration_loc}
+ 				DESTINATION ${BIN_DIR}/platforms
+ 			)
+ 			install(
+-				FILES "$<TARGET_FILE:Qt${QT_VERSION_MAJOR}::QWindowsVistaStylePlugin>" 
++				FILES "$<TARGET_FILE:Qt6::QWindowsVistaStylePlugin>" 
+ 				DESTINATION ${BIN_DIR}/styles) 
+ 		endif()
+ 	endif()
