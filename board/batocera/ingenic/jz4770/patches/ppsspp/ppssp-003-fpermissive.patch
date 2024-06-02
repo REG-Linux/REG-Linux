@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2024-06-02 18:23:51.827804391 +0200
++++ b/CMakeLists.txt	2024-06-02 18:24:02.480056640 +0200
+@@ -459,7 +459,7 @@
+ 	add_definitions(-DUSING_WIN_UI)
+ endif()
+ 
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flax-vector-conversions -fpermissive")
+ 
+ if(NOT ANDROID)
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
