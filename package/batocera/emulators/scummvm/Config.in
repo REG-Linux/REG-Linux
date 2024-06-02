@@ -6,7 +6,8 @@ config BR2_PACKAGE_SCUMMVM
     select BR2_PACKAGE_JPEG
     select BR2_PACKAGE_LIBJPEG_BATO
     select BR2_PACKAGE_LIBOGG
-    select BR2_PACKAGE_LIBVORBIS
+    select BR2_PACKAGE_LIBVORBIS	if !BR2_arm && !BR2_mipsel
+    select BR2_PACKAGE_TREMOR		if  BR2_arm || BR2_mipsel
     select BR2_PACKAGE_FLAC
     select BR2_PACKAGE_LIBMAD
     select BR2_PACKAGE_LIBPNG

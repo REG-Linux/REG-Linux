@@ -7,12 +7,14 @@
 SCUMMVM_VERSION = v2.8.1
 SCUMMVM_SITE = $(call github,scummvm,scummvm,$(SCUMMVM_VERSION))
 SCUMMVM_LICENSE = GPLv2
-SCUMMVM_DEPENDENCIES += sdl2 zlib libmpeg2 libogg libvorbis flac libmad
-SCUMMVM_DEPENDENCIES += libpng libtheora faad2 freetype libjpeg-bato
+SCUMMVM_DEPENDENCIES += sdl2 zlib libpng freetype libjpeg-bato
+SCUMMVM_DEPENDENCIES += libogg flac libmad faad2
+SCUMMVM_DEPENDENCIES += libmpeg2 libtheora
 
 SCUMMVM_ADDITIONAL_FLAGS += -I$(STAGING_DIR)/usr/include -lpthread -lm
 SCUMMVM_ADDITIONAL_FLAGS += -L$(STAGING_DIR)/usr/lib -lGLESv2 -lEGL
 
+# Select host architecture
 ifeq ($(BR2_aarch64)$(BR2_arm),y)
     SCUMMVM_CONF_OPTS += --host=arm-linux
 else ifeq ($(BR2_riscv),y)
@@ -24,12 +26,53 @@ endif
 SCUMMVM_CONF_ENV += RANLIB="$(TARGET_RANLIB)" STRIP="$(TARGET_STRIP)"
 SCUMMVM_CONF_ENV += AR="$(TARGET_AR) cru" AS="$(TARGET_AS)"
 
-SCUMMVM_CONF_OPTS += --opengl-mode=auto --disable-debug --enable-optimizations \
-    --enable-mt32emu --enable-flac --enable-mad --enable-vorbis --disable-tremor \
-    --enable-all-engines --disable-taskbar --disable-timidity \
-    --disable-alsa --enable-vkeybd --enable-release --disable-eventrecorder \
-    --prefix=/usr --with-sdl-prefix="$(STAGING_DIR)/usr/bin"
+# Common options
+SCUMMVM_CONF_OPTS += --opengl-mode=auto \
+    --enable-flac --enable-mad --disable-taskbar \
+    --disable-timidity --disable-alsa --enable-vkeybd \
+    --enable-release --enable-optimizations --disable-debug \
+    --disable-eventrecorder --prefix=/usr \
+    --with-sdl-prefix="$(STAGING_DIR)/usr/bin"
 
+# ScummVM Engines options
+SCUMMVM_CONF_OPTS += --enable-all-engines --disable-all-unstable-engines
+# Build static binary on x86_64, plugins + everything dynamic on embedded
+ifneq ($(BR2_x86_64),y)
+SCUMMVM_CONF_OPTS += --enable-plugins --default-dynamic
+endif
+
+# Vorbis/Tremor options
+ifeq ($(BR2_mipsel)$(BR2_arm),y)
+SCUMMVM_CONF_OPTS += --enable-tremor --disable-vorbis
+SCUMMVM_DEPENDENCIES += tremor
+else
+SCUMMVM_CONF_OPTS += --enable-vorbis --disable-tremor
+SCUMMVM_DEPENDENCIES += libvorbis
+endif
+
+# Architecture-specific optimizations
+ifeq ($(BR2_arm)$(BR2_ARM_CPU_HAS_NEON),yy)
+SCUMMVM_CONF_OPTS += --enable-ext-neon
+else ifeq ($(BR2_x86_64),y)
+SCUMMVM_CONF_OPTS += --enable-ext-sse2
+ifeq ($(BR2_x86_64_v3),y)
+SCUMMVM_CONF_OPTS += --enable-ext-avx2
+endif
+# Disable scalers on MIPS32
+# Disable high-res engines on MIPS32
+else ifeq ($(BR2_mipsel),y)
+SCUMMVM_CONF_OPTS += --disable-scalers
+SCUMMVM_CONF_OPTS += --disable-highres
+endif
+
+# Munt (MT32-Emulator) options, CPU-hungry
+ifeq ($(BR2_aarch64)$(BR2_x86_64),y)
+SCUMMVM_CONF_OPTS += --enable-mt32emu
+else
+SCUMMVM_CONF_OPTS += --disable-mt32emu
+endif
+
+# FluidSynth (MIDI rendering) options
 ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
     SCUMMVM_DEPENDENCIES += fluidsynth
     SCUMMVM_CONF_OPTS += --enable-fluidsynth
@@ -37,6 +80,7 @@ else
     SCUMMVM_CONF_OPTS += --disable-fluidsynth
 endif
 
+# LibMPEG2 options
 ifeq ($(BR2_PACKAGE_LIBMPEG2),y)
     SCUMMVM_CONF_OPTS += --enable-mpeg2 --with-mpeg2-prefix="$(STAGING_DIR)/usr/lib"
 endif
