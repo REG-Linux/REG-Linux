@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA_PANFORK_VERSION = 120202c675749c5ef81ae4c8cdc30019b4de08f4
+MESA_PANFORK_VERSION = 2e8aead001663e1732e148597c466d8d4093be87
 #MESA_PANFORK_SOURCE = mesa-$(MESA_PANFORK_VERSION).tar.xz
 # Now panfork is gone no more https://gitlab.com/panfork/mesa.git
 MESA_PANFORK_SITE = https://github.com/hbiyik/mesa
