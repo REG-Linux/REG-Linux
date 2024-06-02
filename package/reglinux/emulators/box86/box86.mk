@@ -3,8 +3,8 @@
 # Box86 emulator
 #
 ################################################################################
-# Version.: Release on Dec 15, 2023
-BOX86_VERSION = v0.3.4
+# Version.: Release on May 21, 2024
+BOX86_VERSION = v0.3.6
 BOX86_SITE = https://github.com/ptitseb/box86
 BOX86_SITE_METHOD=git
 BOX86_LICENSE = GPLv3
