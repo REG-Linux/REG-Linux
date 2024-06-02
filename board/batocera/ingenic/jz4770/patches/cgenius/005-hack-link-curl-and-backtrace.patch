@@ -1,0 +1,8 @@
+--- a/src/engine/CMakeLists.txt	2024-06-02 14:22:14.155964943 +0200
++++ b/src/engine/CMakeLists.txt	2024-06-02 14:22:30.912571995 +0200
+@@ -98,4 +98,4 @@
+                       unzip
+                       depklite)
+ 
+-TARGET_LINK_LIBRARIES(engine ${CURL_LIBRARIES})
++TARGET_LINK_LIBRARIES(engine curl execinfo backtrace)
