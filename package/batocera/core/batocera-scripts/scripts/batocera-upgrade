@@ -50,7 +50,7 @@ test -n "${settingsupdateurl}" && updateurl="${settingsupdateurl}"
 test "${updatetype}" != "stable" -a "${updatetype}" != "dev" && updatetype="stable"
 
 # custom the url directory
-DWD_HTTP_DIR="${updateurl}/${board}/${updatetype}/last"
+DWD_HTTP_DIR="${updateurl}/${updatetype}/${board}/"
 
 # custom CLI url
 test $# -eq 1 && DWD_HTTP_DIR="$1"
