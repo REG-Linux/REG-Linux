@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2024-06-03 22:32:01.053033241 +0200
++++ b/CMakeLists.txt	2024-06-03 22:32:09.696860132 +0200
+@@ -94,7 +94,7 @@
+ 
+ SET (SRCSDL
+   filereq_sdl.c
+-  gui_x11.c
++  gui_android.c
+   msgbox_sdl.c
+ )
+ 
