@@ -1,0 +1,10 @@
+config BR2_PACKAGE_DHEWM3
+	bool "dhewm3"
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_SDL2
+
+	help
+	  Doom 3 source port.
+
+	  https://dhewm3.org/
