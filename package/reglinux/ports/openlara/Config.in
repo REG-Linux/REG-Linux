@@ -1,0 +1,10 @@
+config BR2_PACKAGE_OPENLARA
+	bool "openlara"
+	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_SDL2
+
+	help
+	  OpenLara Tomb Raider 1 (2, 3 WIP) open-source engine
+
+	  https://github.com/XProger/OpenLara

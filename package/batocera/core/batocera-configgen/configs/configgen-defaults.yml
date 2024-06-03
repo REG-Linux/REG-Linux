@@ -91,8 +91,8 @@ bbc:
   emulator: libretro
   core:     mame
 boom3:
-  emulator: libretro
-  core:     boom3
+  emulator: dhewm3
+  core:     dhewm3
 c64:
   emulator: libretro
   core:     vice_x64
@@ -424,7 +424,7 @@ openjazz:
   emulator: openjazz
   core:     openjazz
 openlara:
-  emulator: libretro
+  emulator: openlara
   core:     openlara
   options:
     gfxbackend: gl
