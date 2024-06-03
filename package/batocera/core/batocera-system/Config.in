@@ -688,6 +688,9 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     # Box64 user-mode x64_64 emulation for AArch64 / RV64
     select BR2_PACKAGE_BOX64			if BR2_aarch64 || BR2_RISCV_64
 
+    # CLK - Clock Signal emulator
+    select BR2_PACKAGE_CLK			if BR2_PACKAGE_HAS_LIBGL
+
     # Mednafen
     select BR2_PACKAGE_MEDNAFEN			if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_mipsel && !BR2_RISCV_64 # build fails on RISC-V
 
