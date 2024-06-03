@@ -4827,19 +4827,17 @@ psvita:
 
     Consulte o wiki - https://wiki.batocera.org/playground:systems:psvita
 
-boom3:
-  name: Boom3
+doom3:
+  name: Doom3
   manufacturer: Ports
   release: 2004
   hardware: port
-  extensions: [boom3]
+  extensions: [doom3]
   platform: pc
   group: ports
   emulators:
     dhewm3:
       dhewm3: { requireAnyOf: [BR2_PACKAGE_DHEWM3] }
-    libretro:
-      boom3: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BOOM3] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:boom3
   comment_fr: |
