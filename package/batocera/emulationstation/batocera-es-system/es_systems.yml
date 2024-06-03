@@ -4836,6 +4836,8 @@ boom3:
   platform: pc
   group: ports
   emulators:
+    dhewm3:
+      dhewm3: { requireAnyOf: [BR2_PACKAGE_DHEWM3] }
     libretro:
       boom3: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BOOM3] }
   comment_en: |
@@ -4872,8 +4874,8 @@ openlara:
   platform: pc
   group: ports
   emulators:
-    libretro:
-      openlara: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_OPENLARA] }
+    openlara:
+      openlara: { requireAnyOf: [BR2_PACKAGE_OPENLARA] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:openlara
   comment_fr: |

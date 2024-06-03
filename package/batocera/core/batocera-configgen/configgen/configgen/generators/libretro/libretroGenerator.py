@@ -338,12 +338,6 @@ class LibretroGenerator(Generator):
             directory_path = '/'.join(rom.split('/')[:-1])
             rom = f"{directory_path}/{first_line}"
         
-        if system.name == 'openlara':
-            with open(rom, 'r') as file:
-                first_line = file.readline().strip()
-            directory_path = '/'.join(rom.split('/')[:-1])
-            rom = f"{directory_path}/{first_line}"
-                
         # Use command line instead of ROM file for MAME variants
         if system.config['core'] in [ 'mame', 'mess', 'mamevirtual', 'same_cdi' ]:
             dontAppendROM = True
@@ -382,7 +376,7 @@ def getGFXBackend(system):
             core = system.config['core']
             if backend == "gl" and core in [ 'kronos', 'citra', 'mupen64plus-next', 'melonds', 'beetle-psx-hw' ]:
                 backend = "glcore"
-            if backend == "glcore" and core in [ 'parallel_n64', 'yabasanshiro', 'openlara', 'boom3' ]:
+            if backend == "glcore" and core in [ 'parallel_n64', 'yabasanshiro', 'boom3' ]:
                 backend = "gl"
 
         return backend
