@@ -245,20 +245,6 @@ class LibretroGenerator(Generator):
             # set the updated core name
             retroarchCore = batoceraFiles.retroarchCores + system.config['core'] + "_libretro.so"
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
-        # boom3
-        elif system.name == 'boom3':
-            with open(rom, 'r') as file:
-                first_line = file.readline().strip()
-            # extracting the directory path from the original 'rom' variable
-            directory_path = '/'.join(rom.split('/')[:-1])
-            # creating the new 'rom' variable by combining the directory path and the first line
-            rom = f"{directory_path}/{first_line}"
-            # choose core based on new rom directory
-            directory_path = os.path.dirname(rom)
-            if "d3xp" in directory_path:
-                system.config['core'] = "boom3_xp" 
-            retroarchCore = batoceraFiles.retroarchCores + system.config['core'] + "_libretro.so"
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
         # super mario wars - verify assets from Content Downloader
         elif system.name == 'superbroswar':
             romdir = os.path.dirname(os.path.abspath(rom))
@@ -376,7 +362,7 @@ def getGFXBackend(system):
             core = system.config['core']
             if backend == "gl" and core in [ 'kronos', 'citra', 'mupen64plus-next', 'melonds', 'beetle-psx-hw' ]:
                 backend = "glcore"
-            if backend == "glcore" and core in [ 'parallel_n64', 'yabasanshiro', 'boom3' ]:
+            if backend == "glcore" and core in [ 'parallel_n64', 'yabasanshiro' ]:
                 backend = "gl"
 
         return backend
