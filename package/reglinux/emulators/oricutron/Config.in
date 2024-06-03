@@ -1,0 +1,11 @@
+config BR2_PACKAGE_ORICUTRON
+    bool "oricutron"
+
+    select BR2_PACKAGE_SDL2
+  
+    help
+      Oricutron Oric computers emulator
+
+      https://github.com/pete-gordon/oricutron
+
+

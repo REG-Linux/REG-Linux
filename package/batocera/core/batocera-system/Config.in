@@ -1112,6 +1112,9 @@ config BR2_PACKAGE_BATOCERA_COMPUTER_SYSTEMS
 	# Atari 800 computers
 	select BR2_PACKAGE_LIBRETRO_ATARI800	# ALL
 
+	# Tangerine Oric computers
+	select BR2_PACKAGE_ORICUTRON		# ALL
+
 	# Sinclair ZX Spectrum
 	select BR2_PACKAGE_LIBRETRO_FUSE	# ALL
 
