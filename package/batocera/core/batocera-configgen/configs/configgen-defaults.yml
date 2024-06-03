@@ -90,7 +90,7 @@ atomiswave:
 bbc:
   emulator: libretro
   core:     mame
-boom3:
+doom3:
   emulator: dhewm3
   core:     dhewm3
 c64:
