@@ -1,0 +1,120 @@
+From 23807d6b95289d56a82502484dc55e4bcf0ae224 Mon Sep 17 00:00:00 2001
+From: Romain TISSERAND <romain.tisserand@gmail.com>
+Date: Mon, 3 Jun 2024 00:02:53 +0200
+Subject: [PATCH] Try to fix mmap64 already defined error in custommem.c
+
+---
+ CMakeLists.txt   |  1 +
+ src/custommem.c  | 27 +--------------------------
+ src/custommmap.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+), 26 deletions(-)
+ create mode 100644 src/custommmap.c
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 75f0c6086..eccde0a25 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -313,6 +313,7 @@ set(ELFLOADER_SRC
+     "${BOX64_ROOT}/src/box64context.c"
+     "${BOX64_ROOT}/src/build_info.c"
+     "${BOX64_ROOT}/src/custommem.c"
++    "${BOX64_ROOT}/src/custommmap.c"
+     "${BOX64_ROOT}/src/dynarec/dynarec.c"
+     "${BOX64_ROOT}/src/elfs/elfloader.c"
+     "${BOX64_ROOT}/src/elfs/elfparser.c"
+diff --git a/src/custommem.c b/src/custommem.c
+index 476a68370..e5cf2e46f 100644
+--- a/src/custommem.c
++++ b/src/custommem.c
+@@ -66,7 +66,7 @@ rbtree* memprot = NULL;
+ int have48bits = 0;
+ static int inited = 0;
+ 
+-static rbtree*  mapallmem = NULL;
++rbtree*  mapallmem = NULL;
+ static rbtree*  mmapmem = NULL;
+ 
+ typedef struct blocklist_s {
+@@ -1713,28 +1713,3 @@ int internal_munmap(void* addr, unsigned long length)
+     #endif
+     return ret;
+ }
+-
+-void* my_mmap64(x64emu_t* emu, void *addr, unsigned long length, int prot, int flags, int fd, ssize_t offset);
+-
+-extern int running32bits;
+-EXPORT void* mmap64(void *addr, unsigned long length, int prot, int flags, int fd, ssize_t offset)
+-{
+-    void* ret;
+-    if(!addr && ((running32bits && box64_mmap32) || (flags&0x40)))
+-        ret = my_mmap64(NULL, addr, length, prot, flags | 0x40, fd, offset);
+-    else
+-        ret = internal_mmap(addr, length, prot, flags, fd, offset);
+-    if(ret!=MAP_FAILED && mapallmem)
+-        setProtection((uintptr_t)ret, length, prot);
+-    return ret;
+-}
+-EXPORT void* mmap(void *addr, unsigned long length, int prot, int flags, int fd, ssize_t offset) __attribute__((alias("mmap64")));
+-
+-EXPORT int munmap(void* addr, unsigned long length)
+-{
+-    int ret = internal_munmap(addr, length);
+-    if(!ret && mapallmem) {
+-        freeProtection((uintptr_t)addr, length);
+-    }
+-    return ret;
+-}
+diff --git a/src/custommmap.c b/src/custommmap.c
+new file mode 100644
+index 000000000..93173098c
+--- /dev/null
++++ b/src/custommmap.c
+@@ -0,0 +1,48 @@
++#define _GNU_SOURCE         /* See feature_test_macros(7) */
++#include <unistd.h>
++#include <stdint.h>
++
++#ifndef MAP_FAILED
++#define MAP_FAILED ((void *) -1)
++#endif
++
++#define EXPORT __attribute__((visibility("default")))
++#ifdef BUILD_DYNAMIC
++#define EXPORTDYN __attribute__((visibility("default")))
++#else
++#define EXPORTDYN
++#endif
++
++typedef void x64emu_t;
++extern void* mapallmem;
++void setProtection(uintptr_t addr, size_t size, uint32_t prot);
++void freeProtection(uintptr_t addr, size_t size);
++void* internal_mmap(void *addr, unsigned long length, int prot, int flags, int fd, ssize_t offset);
++int internal_munmap(void* addr, unsigned long length);
++
++void* my_mmap64(x64emu_t* emu, void *addr, unsigned long length, int prot, int flags, int fd, ssize_t offset);
++
++extern int running32bits;
++extern int box64_mmap32;
++
++EXPORT void* mmap64(void *addr, unsigned long length, int prot, int flags, int fd, ssize_t offset)
++{
++    void* ret;
++    if(!addr && ((running32bits && box64_mmap32) || (flags&0x40)))
++        ret = my_mmap64(NULL, addr, length, prot, flags | 0x40, fd, offset);
++    else
++        ret = internal_mmap(addr, length, prot, flags, fd, offset);
++    if(ret!=MAP_FAILED && mapallmem)
++        setProtection((uintptr_t)ret, length, prot);
++    return ret;
++}
++EXPORT void* mmap(void *addr, unsigned long length, int prot, int flags, int fd, ssize_t offset) __attribute__((alias("mmap64")));
++
++EXPORT int munmap(void* addr, unsigned long length)
++{
++    int ret = internal_munmap(addr, length);
++    if(!ret && mapallmem) {
++        freeProtection((uintptr_t)addr, length);
++    }
++    return ret;
++}
