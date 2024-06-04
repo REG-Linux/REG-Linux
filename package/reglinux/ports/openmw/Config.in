@@ -1,0 +1,21 @@
+config BR2_PACKAGE_OPENMW
+	bool "openmw"
+	depends on BR2_PACKAGE_HAS_LIBGL
+	depends on BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_FFMPEG
+	select BR2_PACKAGE_SQLITE
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_LZ4
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_YAML_CPP
+	select BR2_PACKAGE_BULLET
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_FONTCONFIG
+	select BR2_PACKAGE_FREETYPE
+
+	help
+	  OpenMW is a free and open-source game engine recreation 
+          that reimplements the one powering open-world role-playing game 
+          The Elder Scrolls III: Morrowind
+
+	  https://openmw.org
