@@ -7283,7 +7283,7 @@ dolphin:
         wait_for_shaders:
             submenu: RENDERING
             prompt: PRE-CACHE SHADERS
-            description: Compile shaders on next launch of game (one time). Reduces micro-freezes.
+            description: Compile shaders on next launch of game (one time). Reduces micro-freezes. Vulkan only.
             preset: switchoff
         anisotropic_filtering:
             submenu: RENDERING
@@ -7362,7 +7362,7 @@ dolphin:
             group: CONTROLS
             prompt: RUMBLE
             description: Enable controller rumble capabilities if supported by the controller.
-            preset: switchon       
+            preset: switchoff       
         dolphin_port_1_type:
             group: CONTROLS
             submenu: GAMECUBE CONTROLLER 1
@@ -7757,6 +7757,7 @@ dosbox-x:
 
 duckstation:
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, use_guns, use_wheels, wheel_rotation, wheel_deadzone, wheel_midzone]
+  features: [cheevos]
   cfeatures:
         duckstation_clocking:
             submenu: EMULATION
@@ -8064,6 +8065,7 @@ duckstation:
 
 flycast:
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, use_wheels, wheel_rotation, wheel_deadzone, wheel_midzone]
+  features: [cheevos]
   cfeatures:
     flycast_ratio:
       prompt:      GAME ASPECT RATIO
@@ -9860,6 +9862,13 @@ mame:
             choices:
                 "On":            1
                 "Off (Default)": 0
+        mame_crosshair:
+            group: LIGHT GUN
+            prompt: CROSSHAIR
+            description:
+            choices:
+                "Disabled (Default)": "0"
+                "Enabled":            "1"
   systems:
        adam:
             cfeatures:
