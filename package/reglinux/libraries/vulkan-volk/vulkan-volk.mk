@@ -3,7 +3,7 @@
 # Vulkan VOLK
 #
 ################################################################################
-VULKAN_VOLK_VERSION = vulkan-sdk-1.3.280.0
+VULKAN_VOLK_VERSION = vulkan-sdk-1.3.283.0
 VULKAN_VOLK_SITE = https://github.com/zeux/volk
 VULKAN_VOLK_SITE_METHOD=git
 VULKAN_VOLK_GIT_SUBMODULES = YES
@@ -19,11 +19,5 @@ VULKAN_VOLK_CONF_OPTS += -DBUILD_SHARED_LIBS=FALSE
 VULKAN_VOLK_CONF_OPTS += -DVOLK_INSTALL=ON
 
 VULKAN_VOLK_CONF_ENV += LDFLAGS=-lpthread
-
-#define VULKAN_VOLK_GIT_SYNC_DEPS
-#	cd $(@D) && ./utils/git-sync-deps
-#endef
-
-#VULKAN_VOLK_PRE_CONFIGURE_HOOKS += VULKAN_VOLK_GIT_SYNC_DEPS
 
 $(eval $(cmake-package))
