@@ -1042,10 +1042,10 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	select BR2_PACKAGE_HURRICAN			# ALL
 
 	# OpenTyrian (shmup game)
-	select BR2_PACKAGE_TYRIAN			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_TYRIAN			# ALL
 
 	# CorsixTH (Theme Hospital engine)
-	select BR2_PACKAGE_CORSIXTH			if BR2_x86_64 || BR2_aarch64 || BR2_RISCV_64
+	select BR2_PACKAGE_CORSIXTH			if BR2_ARCH_IS_64
 
 	# The Force Engine
 	select BR2_PACKAGE_THEFORCEENGINE		if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY || (BR2_aarch64 && BR2_PACKAGE_HAS_LIBGL) # Requires OpenGL 3.3 or later
@@ -1065,17 +1065,11 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	# Wolfenstein: Enemy Territory
 	select BR2_PACKAGE_ETLEGACY			if BR2_x86_64 || (BR2_aarch64 && BR2_PACKAGE_BATOCERA_GLES3)
 
-	# Sonic 3 A.I.R. (Angel Island Revisited)
-	select BR2_PACKAGE_SONIC3_AIR			if BR2_x86_64 || (BR2_aarch64 && BR2_PACKAGE_BATOCERA_GLES3)
-
-	# Sonic Mania
-	select BR2_PACKAGE_SONIC_MANIA			if BR2_x86_64 || (BR2_aarch64 && BR2_PACKAGE_BATOCERA_GLES3)
-
 	# Ur-Quan Masters
 	select BR2_PACKAGE_UQM				if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# Jazz Jackrabbit
-	select BR2_PACKAGE_OPENJAZZ			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_OPENJAZZ			# ALL
 
 	# Tomb Raider
 	select BR2_PACKAGE_OPENLARA			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
@@ -1089,8 +1083,17 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	# ECWolf
 	select BR2_PACKAGE_ECWOLF			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
-	# Sonic Retro Engine
+	# Sonic 3 AIR (Angel Island Revisited)
+	# Only disabled on CHA because it bundles 144 MB of data. Should live in content downloader
+	select BR2_PACKAGE_SONIC3_AIR			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+
+	# Sonic Mania
+	select BR2_PACKAGE_SONIC_MANIA			# ALL
+
+	# Sonic 1/2 decompilation
 	select BR2_PACKAGE_SONIC2013			# ALL
+
+	# Sonic CD decompilation
 	select BR2_PACKAGE_SONICCD			# ALL
 
 	help
