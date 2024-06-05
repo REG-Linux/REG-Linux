@@ -595,8 +595,8 @@ supervision:
   emulator: libretro
   core:     potator
 switch:
-  emulator: suyu
-  core:     suyu
+  emulator: sudachi
+  core:     sudachi
   options:
     hud_support: false
 systemsp:
