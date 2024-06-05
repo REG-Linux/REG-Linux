@@ -4,17 +4,19 @@
 #
 ################################################################################
 
-AMIBERRY_VERSION = v5.7.0
+AMIBERRY_VERSION = v5.7.1
 AMIBERRY_SITE = $(call github,BlitterStudio,amiberry,$(AMIBERRY_VERSION))
 AMIBERRY_LICENSE = GPLv3
-AMIBERRY_DEPENDENCIES = sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac libpng libserialport libportmidi libzlib
+AMIBERRY_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac
+AMIBERRY_DEPENDENCIES += libpng libserialport libportmidi libzlib libcapsimage
+AMIBERRY_SUPPORTS_IN_SOURCE_BUILD = NO
 
 AMIBERRY_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release -DWITH_LTO=ON
 
 define AMIBERRY_INSTALL_TARGET_CMDS
 	# Strip and install binary
-	$(TARGET_STRIP) $(@D)/amiberry
-	$(INSTALL) -D $(@D)/amiberry $(TARGET_DIR)/usr/bin/amiberry
+	$(TARGET_STRIP) $(@D)/buildroot-build/amiberry
+	$(INSTALL) -D $(@D)/buildroot-build/amiberry $(TARGET_DIR)/usr/bin/amiberry
 
 	# Create config and nvram directories, copy default config
 	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/amiberry/conf
@@ -31,6 +33,10 @@ define AMIBERRY_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/amiberry
 	cp -pr $(@D)/whdboot $(TARGET_DIR)/usr/share/amiberry/
 	cp -pr $(@D)/data $(TARGET_DIR)/usr/share/amiberry/
+
+	# Copy plugins
+	mkdir -p $(TARGET_DIR)/usr/share/amiberry/plugins
+	$(INSTALL) -D $(@D)/buildroot-build/plugins/* $(TARGET_DIR)/usr/share/amiberry/plugins
 endef
 
 define AMIBERRY_EVMAP
