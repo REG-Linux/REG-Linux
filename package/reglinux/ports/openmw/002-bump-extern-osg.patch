@@ -1,0 +1,13 @@
+--- a/extern/CMakeLists.txt	2023-08-08 11:23:20.000000000 +0200
++++ b/extern/CMakeLists.txt	2024-06-05 22:22:11.111486917 +0200
+@@ -150,8 +150,8 @@
+     # OSGoS branch 3.6
+     include(FetchContent)
+     FetchContent_Declare(osg
+-        URL https://github.com/OpenMW/osg/archive/01cc2b585c8456a4ff843066b7e1a8715558289f.zip
+-        URL_HASH SHA512=9b0a94c1c1d99c767f1857629d43c7a53bfcb74ef760993a121567831e168a1ebbfc10b0c67d7f2241c7b6c6dab2d0e6b876d9f17aca0fabe1a8c86b2279f956
++        URL https://github.com/OpenMW/osg/archive/673f30ad3820faf2a5e901ffe403b5246b8918fe.zip
++        URL_HASH SHA512=91506778120f0deddd347a5fbdf9e11eea6c68c2372a544985e0dbc882f1488a400fdcec6340a4648745cbb7c90fbbf244f7767007bcd595eef64032917a88ff
+         SOURCE_DIR fetched/osg
+     )
+     FetchContent_MakeAvailableExcludeFromAll(osg)
