@@ -1,0 +1,10 @@
+--- a/src/CMakeLists.txt	2024-06-05 03:05:17.697594547 +0200
++++ b/src/CMakeLists.txt	2024-06-05 03:05:25.593758863 +0200
+@@ -115,7 +115,6 @@
+         -Werror=all
+         -Werror=extra
+         -Werror=missing-declarations
+-        -Werror=shadow
+         -Werror=unused
+ 
+         -Wno-attributes

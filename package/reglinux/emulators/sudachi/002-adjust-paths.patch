@@ -12,7 +12,7 @@
          GenerateSudachiPath(SudachiPath::NANDDir, sudachi_path / NAND_DIR);
          GenerateSudachiPath(SudachiPath::PlayTimeDir, sudachi_path / PLAY_TIME_DIR);
 -        GenerateSudachiPath(SudachiPath::ScreenshotsDir, sudachi_path / SCREENSHOTS_DIR);
-+        GenerateSudachiPath(SudachiPath::ScreenshotsDir, "/userdata/screenshots/switch/suyu");
++        GenerateSudachiPath(SudachiPath::ScreenshotsDir, "/userdata/screenshots/switch/sudachi");
          GenerateSudachiPath(SudachiPath::SDMCDir, sudachi_path / SDMC_DIR);
          GenerateSudachiPath(SudachiPath::ShaderDir, sudachi_path / SHADER_DIR);
          GenerateSudachiPath(SudachiPath::TASDir, sudachi_path / TAS_DIR);

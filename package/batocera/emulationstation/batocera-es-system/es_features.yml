@@ -11594,11 +11594,11 @@ steam:
   features: [padtokeyboard]
   shared: [powermode, tdp, videomode]
 
-suyu:
+sudachi:
   features: [padtokeyboard]
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
   cfeatures:
-        suyu_scale:
+        sudachi_scale:
           submenu: VIDEO
           prompt: RENDERING RESOLUTION
           description: Enhancement. Increase the rendering resolution. Makes 3D objects clearer.
@@ -11614,7 +11614,7 @@ suyu:
             "6x (4320p/6480p)":                  8
             "7x (5040p/7560p)":                  9
             "8x (5760p/8640p)":                  10
-        suyu_ratio:
+        sudachi_ratio:
           submenu: VIDEO
           prompt: ASPECT RATIO
           description: Change the output resolution ratio.
@@ -11625,14 +11625,14 @@ suyu:
             "Force 16:10":       3
             "Force 32:9":        4
             "Stretch to window": 5
-        suyu_backend:
+        sudachi_backend:
           submenu: RENDERING
           prompt: GRAPHICS API
           description: Choose which graphics API library to use.
           choices:
             "OpenGL": 0
             "Vulkan": 1
-        suyu_anisotropy:
+        sudachi_anisotropy:
           submenu: RENDERING
           prompt: ANISOTROPIC FILTERING
           description: Improves clarity of distant textures.
@@ -11642,7 +11642,7 @@ suyu:
             "4x":      3
             "8x":      4
             "16x":     5
-        suyu_vsync:
+        sudachi_vsync:
           submenu: RENDERING
           prompt: VSYNC
           description: Fix screen tearing. FIFO (Vsync) does not drop frames. FIFO Relaxed allows tearing as it recovers from a slow down. Mailbox can have lower latency but may drop frames.
@@ -11651,14 +11651,14 @@ suyu:
             "Mailbox (Recommended)": 1
             "FIFO (VSync On)":       2
             "FIFO Relaxed":          3
-        suyu_async_shaders:
+        sudachi_async_shaders:
           submenu: RENDERING
           prompt: ASYNC SHADER COMPILE
           description: Speed up shader compilation.
           choices:
             "Disabled": "false"
             "Enabled":  "true"
-        suyu_aliasing_method:
+        sudachi_aliasing_method:
           submenu: RENDERING
           prompt: ANTI-ALIASING METHOD
           description: FXAA has a lower performance impact, goof for low resolutions. SMAA offers best quality.
@@ -11666,7 +11666,7 @@ suyu:
             "None": 0
             "FXAA": 1
             "SMAA": 2
-        suyu_scale_filter:
+        sudachi_scale_filter:
           submenu: RENDERING
           prompt: TEXTURE FILTERING
           description: Smooth textures on 3D objects.
@@ -11677,7 +11677,7 @@ suyu:
             "Gaussian":                        3
             "ScaleForce":                      4
             "AMD FidelityFX Super Resolution": 5
-        suyu_accuracy:
+        sudachi_accuracy:
           submenu: RENDERING
           prompt: ACCURACY LEVEL
           description: GPU emulation accuracy. Most games render fine with Normal. High is required to ensure particles render correctly.
@@ -11685,19 +11685,19 @@ suyu:
             "Normal":  0
             "High":    1
             "Extreme": 2
-        suyu_sound_mode:
+        sudachi_sound_mode:
           prompt: CHOOSE SOUND OUTPUT MODE
           choices:
             "Mono":     0
             "Stereo":   1
             "Surround": 2
-        suyu_dock_mode:
+        sudachi_dock_mode:
           prompt: DOCK MODE
           description: Choose whether the virtual switch is docked or not.
           choices:
             "Undocked":         "false"
             "Docked (Default)": "true"
-        suyu_language:
+        sudachi_language:
           prompt: LANGUAGE
           description: Change the game's language.
           choices:
@@ -11719,7 +11719,7 @@ suyu:
             "Simplified Chinese":     15
             "Traditional Chinese":    16
             "Brazilian Portuguese":   17
-        suyu_region:
+        sudachi_region:
           prompt: CHOOSE CONSOLE REGION
           description: Choose your console region.
           choices:
@@ -11730,7 +11730,7 @@ suyu:
             "China":     4
             "Korea":     5
             "Taiwan":    6
-        suyu_timezone:
+        sudachi_timezone:
           prompt: CHOOSE CONSOLE TIMEZONE
           description: Choose your console timezone.
           choices:
