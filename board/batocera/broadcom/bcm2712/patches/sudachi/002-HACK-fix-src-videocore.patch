@@ -1,0 +1,10 @@
+--- a/src/video_core/CMakeLists.txt	2024-06-05 02:55:44.741662926 +0200
++++ b/src/video_core/CMakeLists.txt	2024-06-05 02:56:17.142338356 +0200
+@@ -352,7 +352,6 @@
+         # error: implicit conversion loses integer precision: 'int' to 'boost::icl::bound_type' (aka 'unsigned char')
+         target_compile_options(video_core PRIVATE -Wno-shadow -Wno-unused-local-typedef)
+     else()
+-        target_compile_options(video_core PRIVATE -Werror=conversion -msse4.1)
+     endif()
+ 
+     target_compile_options(video_core PRIVATE
