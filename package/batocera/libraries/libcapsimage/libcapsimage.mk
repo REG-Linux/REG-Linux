@@ -49,6 +49,11 @@ define LIBCAPSIMAGE_INSTALL_TARGET_CMDS
 	ln -sf /usr/lib/libcapsimage.so.5.1 \
 		$(TARGET_DIR)/usr/share/fs-uae/Plugins/capsimg.so
         echo "$(CAPSIMG_VERSION)" > $(TARGET_DIR)/usr/share/fs-uae/Plugins/Version.txt
+
+	# Amiberry specific install
+	mkdir -p $(TARGET_DIR)/usr/share/amiberry/plugins
+	ln -sf /usr/lib/libcapsimage.so.5.1 \
+		$(TARGET_DIR)/usr/share/amiberry/plugins/capsimg.so
 endef
 
 define LIBCAPSIMAGE_PRE_CONFIGURE_FIXUP

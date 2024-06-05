@@ -11,6 +11,7 @@ config BR2_PACKAGE_AMIBERRY
     select BR2_PACKAGE_LIBSERIALPORT
     select BR2_PACKAGE_LIBPORTMIDI
     select BR2_PACKAGE_ZLIB
+    select BR2_PACKAGE_LIBCAPSIMAGE
 
     help
     	An amiga emulator for arm
