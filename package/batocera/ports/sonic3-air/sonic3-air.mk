@@ -25,7 +25,21 @@ else
 SONIC3_AIR_SUBDIR = Oxygen/sonic3air/build/_gles2
 endif
 
-SONIC3_AIR_DEPENDENCIES += alsa-lib pulseaudio libcurl mesa3d zlib
+SONIC3_AIR_DEPENDENCIES += alsa-lib libcurl zlib
+
+# Dynamic dependencies
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+SONIC3_AIR_DEPENDENCIES += libgl
+else ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
+SONIC3_AIR_DEPENDENCIES += libgles
+endif
+
+# Do not enforce pulseaudio
+ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
+SONIC3_AIR_DEPENDENCIES += pulseaudio
+endif
+
+# Do not enforce X
 ifeq ($(BR2_PACKAGE_XORG7),y)
 SONIC3_AIR_DEPENDENCIES += xlib_libXxf86vm xlib_libXcomposite libglu
 endif
