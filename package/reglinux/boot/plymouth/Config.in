@@ -1,0 +1,8 @@
+config BR2_PACKAGE_PLYMOUTH
+	bool "plymouth"
+	select BR2_PACKAGE_PANGO
+
+	help
+	  Nice bootup
+
+	  https://gitlab.freedesktop.org/plymouth/plymouth
