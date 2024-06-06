@@ -156,14 +156,14 @@ define BATOCERA_NVIDIA390_LEGACY_DRIVER_RENAME_KERNEL_MODULES
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia/modules
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia/xorg/
     # rename the kernel modules to avoid conflict
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-legacy.ko
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-modeset-legacy.ko
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-drm-legacy.ko	
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-uvm-legacy.ko
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-legacy.ko.zst
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-modeset-legacy.ko.zst
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-drm-legacy.ko.zst	
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-uvm-legacy.ko.zst
 	mv -f $(TARGET_DIR)/usr/lib/xorg/modules/extensions/libglx.so.$(BATOCERA_NVIDIA390_LEGACY_DRIVER_VERSION) \
 	    $(TARGET_DIR)/usr/share/nvidia/xorg/libglx.so.$(BATOCERA_NVIDIA390_LEGACY_DRIVER_VERSION)
 	# set the driver version file
