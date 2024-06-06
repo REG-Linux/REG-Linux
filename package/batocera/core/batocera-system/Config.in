@@ -207,7 +207,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_USB_MODESWITCH		# USB modeswitch support
 	select BR2_PACKAGE_UMTOOL			if !BR2_PACKAGE_BATOCERA_TARGET_CHA # command line tool for configuring Ultimarc arcade hardware
 	select BR2_PACKAGE_PYTHON_HIDAPI		# Communication with USB HID devices via Python
-	select BR2_PACKAGE_LEDSPICER			if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # LED Manager for Linux
+	select BR2_PACKAGE_LEDSPICER			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770  && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # LED Manager for Linux
 	select BR2_PACKAGE_INNOEXTRACT			if !BR2_PACKAGE_BATOCERA_TARGET_CHA # Extract InnoSetup files (useful for Wine and GOG games)
 	select BR2_PACKAGE_TREE				# recursive directory listing (useful for generating documentation on rom directory structure)
 
@@ -270,7 +270,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_FLATPAK				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak app packaging system
 	select BR2_PACKAGE_BAUH					if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak gui
 	select BR2_PACKAGE_RYZENADJ				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # ryzen apu configuration
-	select BR2_PACKAGE_SYNCTHING				if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_CHA # sync files across multiple batoceras
+	select BR2_PACKAGE_SYNCTHING				if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # sync files across multiple batoceras
 	select BR2_PACKAGE_RCLONE				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # sync files in the cloud (require x86_64)
 	select BR2_PACKAGE_BTOP					# htop alternative
 	select BR2_PACKAGE_MOKUTIL				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # mokutil machine owner key utility
@@ -640,7 +640,7 @@ config BR2_PACKAGE_BATOCERA_TOOLS
 	select BR2_PACKAGE_HTOP					# multi-cpus usage
 	select BR2_PACKAGE_NCDU					# Disk Usage
 	select BR2_PACKAGE_FFMPEG_XCBGRAB			if BR2_PACKAGE_XORG7
-	select BR2_PACKAGE_SWITCHRES				if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 # switchres 15kHz
+	select BR2_PACKAGE_SWITCHRES				# switchres 15kHz
 	select BR2_PACKAGE_LIBGPIOD_TOOLS			if BR2_PACKAGE_LIBGPIOD
 
 	help
@@ -1084,8 +1084,9 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	select BR2_PACKAGE_ECWOLF			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# Sonic 3 AIR (Angel Island Revisited)
-	# Only disabled on CHA because it bundles 144 MB of data. Should live in content downloader
-	select BR2_PACKAGE_SONIC3_AIR			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	# Disabled on CHA because it bundles 144 MB of data. Should live in content downloader
+	# Disabled with musl libc because it does not link (libatomic should do it but it does not work so far)
+	select BR2_PACKAGE_SONIC3_AIR			if !BR2_TOOLCHAIN_USES_MUSL && !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# Sonic Mania
 	select BR2_PACKAGE_SONIC_MANIA			# ALL
