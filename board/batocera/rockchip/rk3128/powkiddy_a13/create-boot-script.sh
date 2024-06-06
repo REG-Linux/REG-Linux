@@ -24,10 +24,11 @@ cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.
 cp "${BINARIES_DIR}/initrd.lz4"      "${REGLINUX_BINARIES_DIR}/boot/boot/"                || exit 1
 cp "${BINARIES_DIR}/rootfs.squashfs" "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
 
-for DTB in rk3128-powkiddy-a13-rev-ab.dtb rk3128-powkiddy-a12-rev-c.dtb rk3128-powkiddy-a12-rev-d.dtb
-do
-	cp "${BINARIES_DIR}/${DTB}" "${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
-done
+#for DTB in rk3128-powkiddy-a13-rev-ab.dtb rk3128-powkiddy-a12-rev-c.dtb rk3128-powkiddy-a12-rev-d.dtb
+#do
+#	cp "${BINARIES_DIR}/${DTB}" "${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+#done
+cp "${BINARIES_DIR}/rk3128-xpi-3128.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 
 cp "${BOARD_DIR}/boot/extlinux.conf"    "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
 
