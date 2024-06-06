@@ -2148,8 +2148,6 @@ x1:
       lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]      }
     citra:
       citra: { requireAnyOf: [BR2_PACKAGE_CITRA]          }
-    libretro:
-      citra: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_CITRA] }
 
 openbor:
   name: OpenBOR

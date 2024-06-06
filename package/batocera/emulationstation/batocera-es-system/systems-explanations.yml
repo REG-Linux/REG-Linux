@@ -8,9 +8,11 @@ default:
     lime3ds:
       lime3ds: &citra_standalone_core
         explanation: |
-          Standalone lime3ds works better, but lacks mouse and bezels support which libretro/citra has.
-    libretro:
+          Standalone lime3ds emulator.
+    citra:
       citra: *citra_standalone_core
+        explanation: |
+          Standalone citra emulator.
 
   amiga:
     amiberry:
