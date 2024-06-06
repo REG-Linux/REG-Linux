@@ -25,6 +25,8 @@ cp "${BINARIES_DIR}/firmware"        "${REGLINUX_BINARIES_DIR}/boot/boot/firmwar
 cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
 cp "${BINARIES_DIR}/rk3128-ps5000.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/rk3128-xpi-3128.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/rk3128-evb.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"    "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
 
 exit 0
