@@ -1041,15 +1041,6 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
         else:
             coreSettings.save('pcfx_nospritelimit', '"enabled"')
 
-    # Nintendo 3DS
-    # TODO: Add CORE Options for 3DS
-    if (system.config['core'] == 'citra'):
-        # Set OpenGL rendering
-        if not os.path.exists(batoceraFiles.CONF + "/retroarch/3ds.cfg"):
-            f = open(batoceraFiles.CONF + "/retroarch/3ds.cfg", "w")
-            f.write("video_driver = \"glcore\"\n")
-            f.close()
-
     # Nintendo 64
     if (system.config['core'] == 'mupen64plus-next'):
         # Threaded Rendering
