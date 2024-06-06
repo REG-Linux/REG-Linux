@@ -16,58 +16,37 @@
 	model = "Game Simulator Board";
 	compatible = "rockchip,rk3128-gamesim", "rockchip,rk3128";
 
+	aliases {
+		mmc0 = &emmc;
+		mmc1 = &sdmmc;
+	};
+
+	memory@60000000 {
+		device_type = "memory";
+		reg = <0x60000000 0x40000000>;
+	};
+
 	chosen {
 		stdout-path = &uart0;
-		bootargs = "earlycon=uart8250,mmio32,0x20060000 rootwait console=ttyFIQ0,115200n8 swiotlb=1 root=PARTUUID=fd800c6c-2fdb-4502-82cb-e61f66b9a221";
 	};
 
-	vcc_sys: vcc-sys {	// from USB OTG or from battery
+	vcc_sys: vcc-sys-regulator { // from USB OTG or from battery
 		compatible = "regulator-fixed";
 		regulator-name = "vcc_sys";
-		regulator-always-on;
-		regulator-boot-on;
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+		regulator-boot-on;
 	};
 
-	vcc_io: vcc-io {
+	vcc_io: vcc-io-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc_io";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		regulator-always-on;
-		regulator-boot-on;
 		vin-supply = <&vcc_sys>;
-	};
-
-	vdd_arm: vdd-arm {
-		compatible = "pwm-regulator";
-		pwms = <&pwm1 0 5000 0>;
-		regulator-name = "vdd_arm";
-		regulator-min-microvolt = <880000>;
-		regulator-max-microvolt = <1380000>;
-		regulator-init-microvolt = <1100000>;
-		regulator-early-min-microvolt = <1100000>;
 		regulator-always-on;
 		regulator-boot-on;
-		pwm-supply = <&vcc_sys>;
-		pwm-dutycycle-range = <100 0>;
-		pwm-dutycycle-unit = <100>;
-	};
-
-	vdd_log: vdd-log {
-		compatible = "pwm-regulator";
-		pwms = <&pwm2 0 5000 0>;
-		regulator-name = "vdd_log";
-		regulator-min-microvolt = <900000>;
-		regulator-max-microvolt = <1400000>;
-		regulator-init-microvolt = <1100000>;
-		regulator-early-min-microvolt = <1100000>;
-		regulator-always-on;
-		regulator-boot-on;
-		pwm-supply = <&vcc_sys>;
-		pwm-dutycycle-range = <100 0>;
-		pwm-dutycycle-unit = <100>;
 	};
 
 	hdmi-connnector {
@@ -81,7 +60,40 @@
 		};
 	};
 
-	fiq-debugger {
+	vdd_arm: vdd-arm-regulator {
+		compatible = "pwm-regulator";
+		regulator-name = "vdd_arm";
+		pwms = <&pwm1 0 5000 0>;
+		pwm-supply = <&vcc_sys>;
+		pwm-dutycycle-range = <100 0>;
+		pwm-dutycycle-unit = <100>;
+		regulator-min-microvolt = <880000>;
+		regulator-max-microvolt = <1380000>;
+		regulator-init-microvolt = <1100000>;
+		regulator-early-min-microvolt = <1100000>;
+	};
+
+	/*
+	 * Since there are HW blocks in PD_LOGIC (which are all driven by
+	 * this supply), that either do not have a driver at all or the
+	 * driver does not implement regulator support we have to make
+	 * sure here that the voltage never drops below 1050 mV.
+	 */
+	vdd_log: vdd-log-regulator {
+		compatible = "pwm-regulator";
+		regulator-name = "vdd_log";
+		pwms = <&pwm2 0 25000 1>;
+		pwm-dutycycle-range = <30 100>;
+		pwm-supply = <&vcc_sys>;
+		/*regulator-min-microvolt = <900000>;*/
+		regulator-min-microvolt = <1050000>;
+		regulator-max-microvolt = <1400000>;
+		regulator-ramp-delay = <4000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	/*fiq-debugger {
 		compatible = "rockchip,fiq-debugger";
 		rockchip,serial-id = <0>;
 		rockchip,wake-irq = <159>;
@@ -90,9 +102,9 @@
 		rockchip,irq-mode-enable = <1>;
 		rockchip,baudrate = <115200>;
 		status = "okay";
-	};
+	};*/
 
-	reserved-memory {
+	/*reserved-memory {
 		#address-cells = <0x01>;
 		#size-cells = <0x01>;
 		ranges;
@@ -101,7 +113,7 @@
 			compatible = "rockchip,drm-logo";
 			reg = <0x00 0x00>;
 		};
-	};
+	};*/
 
 	/*sound: sound {
 		compatible = "simple-audio-card";
@@ -161,71 +173,6 @@
 	cpu-supply = <&vdd_arm>;
 };
 
-&cpu_opp_table {
-	opp-1008000000 {
-		clock-latency-ns = <40000>;
-		opp-hz = /bits/ 64 <1008000000>;
-		opp-microvolt = <1200000 1200000 1380000>;
-		opp-microvolt-L0 = <1200000 1200000 1380000>;
-		opp-microvolt-L1 = <1175000 1175000 1380000>;
-		opp-microvolt-L2 = <1225000 1225000 1380000>;
-	};
-
-	opp-1200000000 {
-		clock-latency-ns = <40000>;
-		opp-hz = /bits/ 64 <1200000000>;
-		opp-microvolt = <1325000 1325000 1380000>;
-		opp-microvolt-L0 = <1325000 1325000 1380000>;
-		opp-microvolt-L1 = <1300000 1300000 1380000>;
-		opp-microvolt-L2 = <1375000 1375000 1380000>;
-	};
-
-	opp-216000000 {
-		clock-latency-ns = <40000>;
-		opp-hz = /bits/ 64 <216000000>;
-		opp-microvolt = <925000 925000 1380000>;
-		opp-microvolt-L0 = <925000 925000 1380000>;
-		opp-microvolt-L1 = <925000 925000 1380000>;
-		opp-microvolt-L2 = <950000 950000 1380000>;
-	};
-
-	opp-408000000 {
-		clock-latency-ns = <40000>;
-		opp-hz = /bits/ 64 <408000000>;
-		opp-microvolt = <950000 950000 1380000>;
-		opp-microvolt-L0 = <950000 950000 1380000>;
-		opp-microvolt-L1 = <925000 925000 1380000>;
-		opp-microvolt-L2 = <950000 950000 1380000>;
-	};
-
-	opp-600000000 {
-		clock-latency-ns = <40000>;
-		opp-hz = /bits/ 64 <600000000>;
-		opp-microvolt = <975000 975000 1380000>;
-		opp-microvolt-L0 = <975000 975000 1380000>;
-		opp-microvolt-L1 = <950000 950000 1380000>;
-		opp-microvolt-L2 = <975000 975000 1380000>;
-	};
-
-	opp-696000000 {
-		clock-latency-ns = <40000>;
-		opp-hz = /bits/ 64 <696000000>;
-		opp-microvolt = <1000000 1000000 1380000>;
-		opp-microvolt-L0 = <1000000 1000000 1380000>;
-		opp-microvolt-L1 = <975000 975000 1380000>;
-		opp-microvolt-L2 = <1050000 1050000 1380000>;
-	};
-
-	opp-816000000 {
-		clock-latency-ns = <40000>;
-		opp-hz = /bits/ 64 <816000000>;
-		opp-microvolt = <1075000 1075000 1380000>;
-		opp-microvolt-L0 = <1075000 1075000 1380000>;
-		opp-microvolt-L1 = <1050000 1050000 1380000>;
-		opp-microvolt-L2 = <1100000 1100000 1380000>;
-		opp-suspend;
-	};
-};
 
 /*&dfi {
 	status = "okay";
@@ -251,11 +198,6 @@
 	status = "okay";
 };*/
 
-&gpu {
-	status = "okay";
-	mali-supply = <&vdd_log>;
-};
-
 /*&rng {
 	status = "okay";
 };*/
@@ -268,14 +210,6 @@
 	status = "okay";
 };*/
 
-&vpu {
-	status = "okay";
-};
-
-&vpu_mmu {
-	status = "okay";
-};
-
 /*&vpu_combo {
 	status = "okay";
 };
@@ -284,13 +218,22 @@
 	status = "okay";
 };*/
 
+&vpu {
+	status = "okay";
+};
+
+&vpu_mmu {
+	status = "okay";
+};
+
 &vop {
 	status = "okay";
 };
 
-/*&vop_mmu {
+&gpu {
+	mali-supply = <&vdd_log>;
 	status = "okay";
-};*/
+};
 
 &hdmi {
 	status = "okay";
@@ -320,9 +263,9 @@
 	#sound-dai-cells = <0>;
 };*/
 
-/*&sfc {
+&sfc {
 	status = "okay";
-};*/
+};
 
 &sdmmc {
 	status = "okay";
@@ -370,10 +313,6 @@
 	is_rk3128 = <1>;
 };*/
 
-&dphy {
-	status = "okay";
-};
-
 &pwm1 {
 	status = "okay";
 };
@@ -383,8 +322,8 @@
 };
 
 &saradc {
-	status = "okay";
 	vref-supply = <&vcc_io>;
+	status = "okay";
 };
 
 &i2c0 {
@@ -705,8 +644,6 @@
 
 &display_subsystem {
 	status = "okay";
-	logo-memory-region = <&drm_logo>;
-
 	route {
 		/*route_rgb: route-rgb {
 			connect = <&vop_out_rgb>;
@@ -719,6 +656,10 @@
 		};
 	};
 
+};
+
+&dphy {
+	status = "disabled";
 };
 
 /*&rgb {
