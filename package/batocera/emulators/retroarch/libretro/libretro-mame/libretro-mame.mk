@@ -13,7 +13,7 @@ LIBRETRO_MAME_LICENSE = MAME
 LIBRETRO_MAME_DEPENDENCIES = alsa-lib
 
 # Limit number of jobs not to eat too much RAM....
-LIBRETRO_MAME_MAX_JOBS = 16
+LIBRETRO_MAME_MAX_JOBS = 32
 LIBRETRO_MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_MAME_MAX_JOBS) ]; then echo $(LIBRETRO_MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
 
 ifeq ($(BR2_x86_64),y)
@@ -36,14 +36,29 @@ LIBRETRO_MAME_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU= PLATFORM=arm64
 LIBRETRO_MAME_ARCHOPTS += -D__aarch64__ -DASMJIT_BUILD_X86
 endif
 
+# Enforce symbols debugging with O0
 ifeq ($(BR2_ENABLE_DEBUG),y)
 	LIBRETRO_MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
+# Stick with O2, too much bloat with O3 !!
+else ifeq ($(BR2_x86_64),y)
+	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=s
+else
+	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=2
 endif
 
 define LIBRETRO_MAME_BUILD_CMDS
 	# create some dirs while with parallelism, sometimes it fails because this directory is missing
 	mkdir -p $(@D)/build/libretro/obj/x64/libretro/src/osd/libretro/libretro-internal
 
+	# remove skeleton drivers to save space
+	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 1 -d ":" > $(@D)/build/skel.list
+	cat $(@D)/build/skel.list | while read file ; do sed -i '/MACHINE_IS_SKELETON/d' $$file ; done
+	rm $(@D)/build/skel.list
+	# Remove reference to skeleton drivers in mame.lst
+        cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/retroarch/libretro/libretro-mame/mame.flt $(@D)/mame.flt
+	cat $(@D)/mame.flt | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
+
+	# Compile
 	CCACHE_SLOPPINESS="pch_defines,time_macros,include_file_ctime,include_file_mtime" \
 	$(MAKE) -j$(LIBRETRO_MAME_JOBS) -C $(@D)/ OPENMP=1 REGENIE=1 VERBOSE=1 NOWERROR=1 PYTHON_EXECUTABLE=python3 \
 		CONFIG=libretro LIBRETRO_OS="unix" ARCH="" PROJECT="" ARCHOPTS="$(LIBRETRO_MAME_ARCHOPTS)" \
