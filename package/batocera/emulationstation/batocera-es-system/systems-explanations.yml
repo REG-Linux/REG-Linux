@@ -6,11 +6,11 @@ default:
           Only available on selected boards; requires a powerful one.
   3ds:
     lime3ds:
-      lime3ds: &citra_standalone_core
+      lime3ds: &lime3ds_standalone_core
         explanation: |
           Standalone lime3ds emulator.
     citra:
-      citra: *citra_standalone_core
+      citra: &citra_standalone_core
         explanation: |
           Standalone citra emulator.
 
