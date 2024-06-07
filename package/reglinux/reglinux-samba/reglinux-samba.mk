@@ -20,8 +20,8 @@ define REGLINUX_SAMBA_INSTALL_SMBD_INIT
 	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-samba/S91smbd $(TARGET_DIR)/etc/init.d/S91smbd
 endef
 
-# We need samba4 on x86 for Wine
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_ANY),y)
+# We need samba4 for Wine
+ifeq ($(BR2_PACKAGE_BATOCERA_WINE),y)
 REGLINUX_SAMBA_DEPENDENCIES += samba4
 endif
 

@@ -313,14 +313,14 @@ define BATOCERA_NVIDIA_DRIVER_RENAME_KERNEL_MODULES
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia/modules
     # rename the kernel modules to avoid conflict
-	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-production.ko
-	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-modeset-production.ko
-	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-drm-production.ko	
-	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-uvm-production.ko
+	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-production.ko.zst
+	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-modeset-production.ko.zst
+	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-drm-production.ko.zst	
+	cp $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-uvm-production.ko.zst
 	# set the driver version file
 	echo $(BATOCERA_NVIDIA_DRIVER_VERSION) > $(TARGET_DIR)/usr/share/nvidia/production.version
 endef
