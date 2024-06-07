@@ -15,7 +15,7 @@ MAME_CFLAGS =
 MAME_LDFLAGS =
 
 # Limit number of jobs not to eat too much RAM....
-MAME_MAX_JOBS = 16
+MAME_MAX_JOBS = 32
 MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(MAME_MAX_JOBS) ]; then echo $(MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
 
 # Set PTR64 on/off according to architecture
@@ -53,11 +53,14 @@ MAME_CFLAGS += -D__ARM_NEON__ -D__ARM_NEON -DEGL_NO_X11=1
 MAME_LDFLAGS += -fuse-ld=gold -Wl,--long-plt
 endif
 
+# No error on unused function
+MAME_CFLAGS += -Wno-error=unused-function
+
 ifeq ($(BR2_RISCV_64),y)
 MAME_CROSS_ARCH = riscv64
 # Proper architecture flags
 MAME_CFLAGS += -mabi=lp64d -march=rv64imafdczbb_zba -mcpu=sifive-u74
-# Force OPTIMIZE level 1 to avoid fatal linking relocation issue so far....
+# Force OPTIMIZE level 2
 MAME_CROSS_OPTS += OPTIMIZE=2
 # Cast alignment warnings cause errors on riscv64
 MAME_CFLAGS += -Wno-error=cast-align
@@ -86,6 +89,17 @@ ifeq ($(BR2_cortex_a73_a53),y)
 MAME_CFLAGS += -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53
 endif
 
+# Enforce symbols debugging with O0
+ifeq ($(BR2_ENABLE_DEBUG),y)
+	MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
+# Stick with Os on x86_64 too much bloat with O2/O3 !!
+else ifeq ($(BR2_x86_64),y)
+	MAME_EXTRA_ARGS += OPTIMIZE=s
+# Use O2 on other archs
+else
+	MAME_EXTRA_ARGS += OPTIMIZE=2
+endif
+
 define MAME_BUILD_CMDS
 	# First, we need to build genie for host
 	cd $(@D); \
@@ -94,6 +108,15 @@ define MAME_BUILD_CMDS
 	TARGET=mame SUBTARGET=tiny \
 	NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
 	USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
+
+	# Remove skeleton drivers to save space
+	mkdir -p $(@D)/build
+	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 1 -d ":" > $(@D)/build/skel.list
+	cat $(@D)/build/skel.list | while read file ; do sed -i '/MACHINE_IS_SKELETON/d' $$file ; done
+	rm $(@D)/build/skel.list
+	# Remove reference to skeleton drivers in mame.lst
+        cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/mame.flt $(@D)/mame.flt
+	cat $(@D)/mame.flt | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 
 	# Compile emulation target (MAME)
 	cd $(@D); \
@@ -112,6 +135,7 @@ define MAME_BUILD_CMDS
 	OVERRIDE_LD="$(TARGET_LD)" \
 	OVERRIDE_AR="$(TARGET_AR)" \
 	OVERRIDE_STRIP="$(TARGET_STRIP)" \
+	$(MAME_EXTRA_ARGS) \
 	CROSS_BUILD=1 \
 	CROSS_ARCH="$(MAME_CROSS_ARCH)" \
 	$(MAME_CROSS_OPTS) \
