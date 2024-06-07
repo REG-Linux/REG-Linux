@@ -68,7 +68,7 @@ then
             do
 		RELATIVE_PATH="${FILE#$IN/}"
 		DEST_FILE="$OUT/$RELATIVE_PATH"
-            
+
 		# Check if the source file is newer than the destination file
 		if [ "$FILE" -nt "$DEST_FILE" ]; then
                     echo "Updating $DEST_FILE"
@@ -85,7 +85,7 @@ fi
 # there are almost empty, it's just for the structure
 # the user can delete the directory, it will recreate the structure
 # the user can delete files, files will not be recreated
-for FILE in music bios extractions library saves screenshots splash \
+for FILE in music bios extractions library saves screenshots \
             system/.config/lirc/lircd.conf \
             system/configs/emulationstation/es_input.cfg \
             system/configs/emulationstation/es_settings.cfg \

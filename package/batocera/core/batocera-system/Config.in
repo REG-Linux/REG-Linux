@@ -426,7 +426,6 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 
 	# REG-Linux
 	select BR2_PACKAGE_REGLINUX_INITRAMFS	# initramfs to boot the system
-	select BR2_PACKAGE_REGLINUX_SPLASH	# boot splash
 	select BR2_PACKAGE_REGLINUX_SAMBA	# samba
 	select BR2_PACKAGE_WSDD_NATIVE		# service discovery on local network (windows network neighborhood)
 
