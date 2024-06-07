@@ -180,10 +180,7 @@ endef
 # 	$(BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_GL_DEV)
 # endef
 
-# For target, install libraries and X.org modules
-define BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_TARGET_CMDS
-	$(call BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
-	$(call BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
+define BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_COMMON
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_drv.so \
 			$(TARGET_DIR)/usr/lib/xorg/modules/drivers/nvidia_legacy_drv.so
 	$(foreach p,$(BATOCERA_NVIDIA_LEGACY_DRIVER_PROGS), \
@@ -213,6 +210,19 @@ define BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0644 $(@D)/firmware/* $(TARGET_DIR)/lib/firmware/nvidia/$(BATOCERA_NVIDIA_LEGACY_DRIVER_VERSION)
 
 endef
+
+# For target, install libraries and X.org modules
+ifeq ($(BR2_x86_64),y)
+define BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_TARGET_CMDS
+	$(call BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
+	$(call BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_COMMON)
+endef
+else ifeq ($(BR2_i686),y)
+define BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_TARGET_CMDS
+	$(call BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
+	$(call BATOCERA_NVIDIA_LEGACY_DRIVER_INSTALL_COMMON)
+endef
+endif
 
 define BATOCERA_NVIDIA_LEGACY_DRIVER_VULKANJSON_X86_64
     mkdir -p $(TARGET_DIR)/usr/share/vulkan/nvidia
@@ -244,7 +254,7 @@ define BATOCERA_NVIDIA_LEGACY_DRIVER_RENAME_KERNEL_MODULES
 	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko.zst \
 	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-modeset-legacy.ko.zst
 	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-drm-legacy.ko.zst	
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-drm-legacy.ko.zst
 	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
 	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-uvm-legacy.ko.zst
 	# set the driver version file
