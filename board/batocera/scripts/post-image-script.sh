@@ -59,10 +59,10 @@ do
     cp     "${BINARIES_DIR}/batocera-boot.conf" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
     echo   "${BATOCERA_SUBTARGET}" > "${REGLINUX_BINARIES_DIR}/boot/boot/batocera.board" || exit 1
 
-    #### boot.tar.zst ###############
-    echo "creating images/${BATOCERA_SUBTARGET}/boot.tar.zst"
+    #### boot-$ARCH.tar.zst ###############
+    echo "creating images/${BATOCERA_SUBTARGET}/boot-${BATOCERA_LOWER_TARGET}.tar.zst"
     mkdir -p "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
-    (cd "${REGLINUX_BINARIES_DIR}/boot" && tar -I "zstd" -cf "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot.tar.zst" *) || exit 1
+    (cd "${REGLINUX_BINARIES_DIR}/boot" && tar -I "zstd" -cf "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot-${BATOCERA_LOWER_TARGET}.tar.zst" *) || exit 1
 
     # create *.img
     if [ "${BATOCERA_LOWER_TARGET}" = "${BATOCERA_SUBTARGET}" ]; then
@@ -108,7 +108,7 @@ done
 rm -rf ${GENIMAGE_TMP}
 
 #### md5 and sha256 #######################
-for FILE in "${REGLINUX_BINARIES_DIR}/images/"*"/boot.tar.zst" "${REGLINUX_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
+for FILE in "${REGLINUX_BINARIES_DIR}/images/"*"/boot-${BATOCERA_LOWER_TARGET}.tar.zst" "${REGLINUX_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
 do
     echo "creating ${FILE}.md5"
     CKS=$(md5sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
