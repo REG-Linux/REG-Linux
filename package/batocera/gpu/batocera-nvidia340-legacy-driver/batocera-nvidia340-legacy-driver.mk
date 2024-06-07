@@ -178,10 +178,7 @@ define BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_32
 	)
 endef
 
-# For target, install libraries and X.org modules
-define BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_TARGET_CMDS
-	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
-	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_COMMON
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_drv.so \
 	    $(TARGET_DIR)/usr/lib/xorg/modules/drivers/nvidia340_legacy_drv.so
 	$(INSTALL) -D -m 0644 $(@D)/libglx.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
@@ -197,27 +194,24 @@ define BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/share/nvidia/X11/20-nvidia.conf
 endef
 
+# For target, install libraries and X.org modules
+ifeq ($(BR2_x86_64),y)
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_TARGET_CMDS
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_COMMON)
+endef
+else ifeq ($(BR2_i686),y)
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_TARGET_CMDS
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_INSTALL_COMMON)
+endef
+endif
+
+
 KVER = $(shell expr $(BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE))
 
-# move to avoid the production driver conflicts
-define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES
-	mkdir -p $(TARGET_DIR)/usr/share/nvidia
-	mkdir -p $(TARGET_DIR)/usr/share/nvidia/modules
-    # rename the kernel modules to avoid conflict
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-legacy.ko.zst
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-uvm-legacy.ko.zst
-	# move .so.340.108 files
-	mkdir -p $(TARGET_DIR)/usr/share/nvidia/libraries
-	mv -f $(TARGET_DIR)/usr/lib/libGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
-	mv -f $(TARGET_DIR)/usr/lib/libEGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/libEGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
-	mv -f $(TARGET_DIR)/usr/lib/libGLESv1_CM.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGLESv1_CM.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
-	mv -f $(TARGET_DIR)/usr/lib/libGLESv2.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGLESv2.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES_32BITS
+	# move .so.340.108 files (32-bits)
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia/libraries/32
 	mv -f $(TARGET_DIR)/lib32/libGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
 	    $(TARGET_DIR)/usr/share/nvidia/libraries/32/libGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
@@ -227,9 +221,48 @@ define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES
 	    $(TARGET_DIR)/usr/share/nvidia/libraries/32/libGLESv1_CM.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
 	mv -f $(TARGET_DIR)/lib32/libGLESv2.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
 	    $(TARGET_DIR)/usr/share/nvidia/libraries/32/libGLESv2.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
+
+endef
+
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES_64BITS
+	# move .so.340.108 files (64-bits)
+	mkdir -p $(TARGET_DIR)/usr/share/nvidia/libraries
+	mv -f $(TARGET_DIR)/usr/lib/libGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
+	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
+	mv -f $(TARGET_DIR)/usr/lib/libEGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
+	    $(TARGET_DIR)/usr/share/nvidia/libraries/libEGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
+	mv -f $(TARGET_DIR)/usr/lib/libGLESv1_CM.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
+	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGLESv1_CM.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
+	mv -f $(TARGET_DIR)/usr/lib/libGLESv2.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
+	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGLESv2.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION)
+
+endef
+
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES_COMMON
+	mkdir -p $(TARGET_DIR)/usr/share/nvidia
+	mkdir -p $(TARGET_DIR)/usr/share/nvidia/modules
+	# rename the kernel modules to avoid conflict
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-legacy.ko.zst
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-uvm-legacy.ko.zst
+
 	# set the driver version file
 	echo $(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) > $(TARGET_DIR)/usr/share/nvidia/legacy340.version
 endef
+
+# move to avoid the production driver conflicts
+ifeq ($(BR2_x86_64),y)
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES_COMMON)
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES_64BITS)
+endef
+else ifeq ($(BR2_i686),y)
+define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES_COMMON)
+	$(call BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES_32BITS)
+endef
+endif
 
 BATOCERA_NVIDIA340_LEGACY_DRIVER_POST_INSTALL_TARGET_HOOKS += BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES
 
