@@ -1,0 +1,11 @@
+--- a/Makefile.libretro	2024-06-07 23:09:24.696150587 +0200
++++ b/Makefile.libretro	2024-06-07 23:13:00.620795104 +0200
+@@ -82,7 +82,7 @@
+ 	BUILDFLAGS += CONFIG=libretrodbg
+ 	BUILDFLAGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
+ else
+-	BUILDFLAGS += CONFIG=libretro
++	BUILDFLAGS += CONFIG=libretro OPTIMIZE=s
+ endif
+ 
+ ###########################################################################
