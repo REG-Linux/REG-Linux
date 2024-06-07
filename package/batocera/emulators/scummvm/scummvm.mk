@@ -36,10 +36,8 @@ SCUMMVM_CONF_OPTS += --opengl-mode=auto \
 
 # ScummVM Engines options
 SCUMMVM_CONF_OPTS += --enable-all-engines --disable-all-unstable-engines
-# Build static binary on x86_64, plugins + everything dynamic on embedded
-ifneq ($(BR2_x86_64),y)
+# Build plugins + everything as dynamic
 SCUMMVM_CONF_OPTS += --enable-plugins --default-dynamic
-endif
 
 # Vorbis/Tremor options
 ifeq ($(BR2_mipsel)$(BR2_arm),y)

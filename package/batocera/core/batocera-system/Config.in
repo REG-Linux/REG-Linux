@@ -268,7 +268,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_E2FSPROGS_RESIZE2FS			# fs resize
 	select BR2_PACKAGE_PACMAN				# pacman package manager
 	select BR2_PACKAGE_FLATPAK				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak app packaging system
-	select BR2_PACKAGE_BAUH					if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak gui
+	#select BR2_PACKAGE_BAUH					if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak gui
 	select BR2_PACKAGE_RYZENADJ				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # ryzen apu configuration
 	select BR2_PACKAGE_SYNCTHING				if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # sync files across multiple batoceras
 	select BR2_PACKAGE_RCLONE				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # sync files in the cloud (require x86_64)
