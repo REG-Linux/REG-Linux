@@ -130,16 +130,13 @@ define BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_32
 	)
 endef
 
-# For target, install libraries and X.org modules
-define BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_TARGET_CMDS
-	$(call BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
-	$(call BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
+define BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_COMMON
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_drv.so \
 			$(TARGET_DIR)/usr/lib/xorg/modules/drivers/nvidia390_legacy_drv.so
 	$(INSTALL) -D -m 0644 $(@D)/libglx.so.$(BATOCERA_NVIDIA390_LEGACY_DRIVER_VERSION) \
 	        $(TARGET_DIR)/usr/lib/xorg/modules/extensions/libglx.so.$(BATOCERA_NVIDIA390_LEGACY_DRIVER_VERSION)
 	$(BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_KERNEL_MODULE)
-	
+
 	# batocera install files needed by libglvnd
 	$(INSTALL) -D -m 0644 $(@D)/10_nvidia.json \
 		$(TARGET_DIR)/usr/share/glvnd/egl_vendor.d/10_nvidia390_legacy.json
@@ -149,6 +146,20 @@ define BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0644 $(@D)/nvidia-drm-outputclass.conf \
 		$(TARGET_DIR)/usr/share/nvidia/X11/10-nvidia390-legacy-drm-outputclass.conf
 endef
+
+# For target, install libraries and X.org modules
+ifeq ($(BR2_x86_64),y)
+define BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_TARGET_CMDS
+	$(call BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
+	$(call BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_COMMON)
+endef
+else ifeq ($(BR2_i686),y)
+define BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_TARGET_CMDS
+	$(call BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
+	$(call BATOCERA_NVIDIA390_LEGACY_DRIVER_INSTALL_COMMON)
+endef
+endif
+
 
 # move to avoid the production driver
 define BATOCERA_NVIDIA390_LEGACY_DRIVER_RENAME_KERNEL_MODULES
@@ -161,7 +172,7 @@ define BATOCERA_NVIDIA390_LEGACY_DRIVER_RENAME_KERNEL_MODULES
 	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko.zst \
 	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-modeset-legacy.ko.zst
 	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-drm-legacy.ko.zst	
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-drm-legacy.ko.zst
 	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
 	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia390-uvm-legacy.ko.zst
 	mv -f $(TARGET_DIR)/usr/lib/xorg/modules/extensions/libglx.so.$(BATOCERA_NVIDIA390_LEGACY_DRIVER_VERSION) \
