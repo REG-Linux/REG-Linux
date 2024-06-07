@@ -1,0 +1,11 @@
+--- a/scripts/genie.lua	2024-06-07 20:21:28.483872505 +0200
++++ b/scripts/genie.lua	2024-06-07 20:49:34.897825800 +0200
+@@ -859,7 +859,7 @@
+ 		}
+ -- same flags are needed by linker
+ 		linkoptions {
+-			"-flto=1",
++			"-flto=auto",
+ --          "-Wl,-no-keep-memory",
+ 			"-Wl,-v",
+ 			"-Wl,-allow-multiple-definition",
