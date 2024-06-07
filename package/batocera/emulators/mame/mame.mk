@@ -94,7 +94,7 @@ ifeq ($(BR2_ENABLE_DEBUG),y)
 	MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
 # Stick with Os on x86_64 too much bloat with O2/O3 !!
 else ifeq ($(BR2_x86_64),y)
-	MAME_EXTRA_ARGS += OPTIMIZE=s
+	MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
 # Use O2 on other archs
 else
 	MAME_EXTRA_ARGS += OPTIMIZE=2
