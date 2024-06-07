@@ -204,10 +204,10 @@ define BATOCERA_NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia/modules
     # rename the kernel modules to avoid conflict
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-legacy.ko
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-uvm-legacy.ko
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-legacy.ko.zst
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia340-uvm-legacy.ko.zst
 	# move .so.340.108 files
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia/libraries
 	mv -f $(TARGET_DIR)/usr/lib/libGL.so.$(BATOCERA_NVIDIA340_LEGACY_DRIVER_VERSION) \
