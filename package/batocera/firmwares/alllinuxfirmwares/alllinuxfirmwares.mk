@@ -13,6 +13,8 @@ ALLLINUXFIRMWARES_REMOVE_DIRS = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(
 
 ifneq ($(BR2_x86_64),y)
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/intel $(@D)/i915 $(@D)/nvidia $(@D)/radeon $(@D)/qat_* $(@D)/ql2* $(@D)/iwlwifi* $(@D)/qed $(@D)/amd*
+else
+    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
 endif
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
