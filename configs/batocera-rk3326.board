@@ -30,9 +30,6 @@ BR2_PACKAGE_BATOCERA_PANFROST_MESA3D=y
 # needed for rotation (TODO force sway on launch)
 BR2_PACKAGE_REGLINUX_SWAY=y
 
-# batocera splash screen
-BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y
-
 # Controller
 BR2_PACKAGE_UINPUT_JOYSTICK=y
 
