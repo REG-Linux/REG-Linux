@@ -112,9 +112,9 @@ endif
 
 # sudachi
 ifeq ($(BR2_PACKAGE_SUDACHI),y)
-  BATOCERA_DESKTOPAPPS_SCRIPTS += batocera-config-sudachi
-  BATOCERA_DESKTOPAPPS_APPS    += sudachi-config.desktop
-  BATOCERA_DESKTOPAPPS_ICONS   += sudachi.png
+ # BATOCERA_DESKTOPAPPS_SCRIPTS += batocera-config-sudachi
+ # BATOCERA_DESKTOPAPPS_APPS    += sudachi-config.desktop
+ # BATOCERA_DESKTOPAPPS_ICONS   += sudachi.png
 endif
 
 # ryujinx
