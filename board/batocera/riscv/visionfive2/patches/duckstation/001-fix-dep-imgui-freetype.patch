@@ -1,0 +1,18 @@
+--- a/dep/imgui/src/imgui_freetype.cpp	2024-06-08 20:04:01.815402195 +0200
++++ b/dep/imgui/src/imgui_freetype.cpp	2024-06-08 20:04:39.980303208 +0200
+@@ -34,6 +34,9 @@
+ 
+ // FIXME: cfg.OversampleH, OversampleV are not supported (but perhaps not so necessary with this rasterizer).
+ 
++#pragma GCC push_options
++#pragma GCC optimize ("O0")
++
+ #include "imgui.h"
+ #ifndef IMGUI_DISABLE
+ #include "imgui_freetype.h"
+@@ -948,3 +951,5 @@
+ #endif
+ 
+ #endif // #ifndef IMGUI_DISABLE
++
++#pragma GCC pop_options
