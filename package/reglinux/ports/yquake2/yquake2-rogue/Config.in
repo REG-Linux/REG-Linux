@@ -1,0 +1,7 @@
+config BR2_PACKAGE_YQUAKE2_ROGUE
+	bool "yquake2-rogue"
+
+	help
+	  Yamagi Quake 2 Rogue
+
+	  https://github.com/yquake2/rogue

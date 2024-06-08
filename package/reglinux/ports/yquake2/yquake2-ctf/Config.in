@@ -1,0 +1,7 @@
+config BR2_PACKAGE_YQUAKE2_CTF
+	bool "yquake2-ctf"
+
+	help
+	  Yamagi Quake 2 CTF
+
+	  https://github.com/yquake2/ctf

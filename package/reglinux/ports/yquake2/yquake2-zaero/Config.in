@@ -1,0 +1,7 @@
+config BR2_PACKAGE_YQUAKE2_ZAERO
+	bool "yquake2-zaero"
+
+	help
+	  Yamagi Quake 2 Zaero
+
+	  https://github.com/yquake2/zaero

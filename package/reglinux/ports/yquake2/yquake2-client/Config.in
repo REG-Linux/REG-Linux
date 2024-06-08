@@ -1,0 +1,9 @@
+config BR2_PACKAGE_YQUAKE2_CLIENT
+	bool "yquake2"
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_YQUAKE2_XATRIX
+
+	help
+	  Yamagi Quake 2
+
+	  https://github.com/yquake2/yquake2
