@@ -1,0 +1,7 @@
+config BR2_PACKAGE_YQUAKE2_XATRIX
+	bool "yquake2-xatrix"
+
+	help
+	  Yamagi Quake 2 Xatrix
+
+	  https://github.com/yquake2/xatrix
