@@ -11,8 +11,8 @@ class OpenJazzGenerator(Generator):
         try:
             os.chdir("/userdata/roms/openjazz/")
         except:
-            eslog.error("ERROR: Game assets not installed. You can get them from the Batocera Content Downloader.")
-        commandArray = ["OpenJazz"]
+            eslog.error("ERROR: Game assets not installed. You can install your own or get them from the Content Downloader.")
+        commandArray = ["OpenJazz", "-f", "/userdata/roms/openjazz/" + rom]
 
         return Command.Command(
             array=commandArray,
