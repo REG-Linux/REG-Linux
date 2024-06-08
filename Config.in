@@ -561,6 +561,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/uboot-bananapi-f3/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/ubiboot/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/mininit/Config.in"
+
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box86/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box64/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/clk/Config.in"
@@ -568,21 +569,28 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/oricutron/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/reglinux-mame/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/sudachi/Config.in"
+
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/libretro/libretro-geolith/Config.in"
+
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/dhewm3/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/fheroes2/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/openjazz/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/openlara/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/vcmi/Config.in"
+
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/goofy/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/vulkan-volk/Config.in"
+
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/utils/gamescope/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/utils/wsdd-native/Config.in"
+
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-emulationstation/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-rescue/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-splash/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-gpicase/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-samba/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-screen/Config.in"
+
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/firmwares/firmware-radxa-rkwifibt/Config.in"
 endmenu

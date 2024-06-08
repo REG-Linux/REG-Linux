@@ -1,0 +1,127 @@
+--- a/libretro/Makefile	2024-06-08 15:50:41.851402372 +0200
++++ b/libretro/Makefile	2024-06-08 15:52:39.193908102 +0200
+@@ -149,7 +149,7 @@
+ 	ifeq ($(platform), psl1ght)
+ 		FLAGS += -D__PSL1GHT__ -I$(PS3DEV)/ppu/include
+ 	endif
+-	
++
+ # Nintendo Game Cube
+ else ifeq ($(platform), ngc)
+ 	EXT=a
+@@ -304,7 +304,7 @@
+ 	CFLAGS += -fsigned-char
+ 	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
+ 	fpic := -fPIC
+-	
++
+ # RETROFW
+ else ifeq ($(platform), retrofw)
+ 	TARGET := $(TARGET_NAME)_libretro.so
+@@ -314,7 +314,7 @@
+ 	CFLAGS += -fsigned-char
+ 	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+ 	fpic := -fPIC
+-	
++
+ # MIYOO
+ else ifeq ($(platform), miyoo)
+ 	TARGET := $(TARGET_NAME)_libretro.so
+@@ -330,8 +330,8 @@
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-	CFLAGS+=-fsigned-char
+-	FLAGS += -DARM11 
++	CFLAGS += -fsigned-char
++	FLAGS += -DARM11
+ 	FLAGS += -marm -march=armv6j -mfpu=vfp -mfloat-abi=hard
+ 	FLAGS += -fomit-frame-pointer -ffast-math
+ 
+@@ -340,8 +340,8 @@
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-	CFLAGS+=-fsigned-char
+-	FLAGS += -DARM 
++	CFLAGS += -fsigned-char
++	FLAGS += -DARM
+ 	FLAGS += -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
+ 	FLAGS += -fomit-frame-pointer -ffast-math
+ 
+@@ -350,8 +350,8 @@
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-	CFLAGS+=-fsigned-char
+-	FLAGS += -DARM 
++	CFLAGS += -fsigned-char
++	FLAGS += -DARM
+ 	FLAGS += -marm -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+ 	FLAGS += -fomit-frame-pointer -ffast-math
+ 
+@@ -360,8 +360,8 @@
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-	CFLAGS+=-fsigned-char
+-	FLAGS += -DARM 
++	CFLAGS += -fsigned-char
++	FLAGS += -DARM
+ 	FLAGS += -mcpu=cortex-a53 -mtune=cortex-a53
+ 	FLAGS += -fomit-frame-pointer -ffast-math
+ 
+@@ -370,11 +370,21 @@
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-	CFLAGS+=-fsigned-char
+-	FLAGS += -DARM 
++	CFLAGS += -fsigned-char
++	FLAGS += -DARM
+ 	FLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
+ 	FLAGS += -fomit-frame-pointer -ffast-math
+ 
++# Raspberry Pi 5
++else ifeq ($(platform), rpi5)
++	TARGET := $(TARGET_NAME)_libretro.so
++	fpic := -fPIC
++	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++	CFLAGS += -fsigned-char
++	FLAGS += -DARM
++	FLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
++	FLAGS += -fomit-frame-pointer -ffast-math
++
+ else ifeq ($(platform), emscripten)
+ 	TARGET := $(TARGET_NAME)_libretro_$(platform).bc
+ 	STATIC_LINKING = 1
+@@ -626,7 +636,7 @@
+ 	ifneq (,$(findstring uwp,$(PlatformSuffix)))
+ 		LIB := $(shell IFS=$$'\n'; cygpath -w "$(LIB)/store")
+ 	endif
+-    
++
+ 	export INCLUDE := $(INCLUDE);$(WindowsSDKSharedIncludeDir);$(WindowsSDKUCRTIncludeDir);$(WindowsSDKUMIncludeDir)
+ 	export LIB := $(LIB);$(WindowsSDKUCRTLibDir);$(WindowsSDKUMLibDir)
+ 	TARGET := $(TARGET_NAME)_libretro.dll
+@@ -670,9 +680,9 @@
+ endif
+ 
+ LDFLAGS += $(fpic) $(SHARED)
+-FLAGS += $(fpic) 
++FLAGS += $(fpic)
+ FLAGS += $(INCFLAGS)
+-FLAGS += $(EXTRA_INCLUDES) 
++FLAGS += $(EXTRA_INCLUDES)
+ FLAGS += $(INCFLAGS_PLATFORM)
+ 
+ ifeq ($(OLD_GCC), 1)
+@@ -707,7 +717,7 @@
+ endif
+ else
+ 	OBJOUT   = -o
+-	LINKOUT  = -o 
++	LINKOUT  = -o
+ 	LD = $(CC)
+ endif
+ 

@@ -702,8 +702,8 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
             coreSettings.save('o2em_low_pass_filter', '"disabled"')
             coreSettings.save('o2em_low_pass_range',  '"0"')
 
-    # MAME/MESS/MAMEVirtual
-    if (system.config['core'] in [ 'mame', 'mess', 'mamevirtual' ]):
+    # MAME/MESS
+    if (system.config['core'] in [ 'mame' ]):
         # Lightgun mode
         coreSettings.save('mame_lightgun_mode', '"lightgun"')
         # Enable cheats
