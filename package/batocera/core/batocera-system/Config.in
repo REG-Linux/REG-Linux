@@ -633,7 +633,6 @@ config BR2_PACKAGE_BATOCERA_TOOLS
 	select BR2_PACKAGE_LINUXCONSOLETOOLS_FORCEFEEDBACK	# tools for linux events calibration
 	select BR2_PACKAGE_NCURSES				# ncurses
 	select BR2_PACKAGE_NCURSES_WCHAR			# utf-8 support for ncurses
-	select BR2_PACKAGE_VIM					if !BR2_PACKAGE_BATOCERA_TARGET_CHA # basic vi emulator
 	select BR2_PACKAGE_NANO					# basic nano emulator
 	select BR2_PACKAGE_ZIP					# zip tool
 	select BR2_PACKAGE_P7ZIP				# zip tool
@@ -1078,7 +1077,8 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	select BR2_PACKAGE_FHEROES2			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# HoMM3 open source engine
-	select BR2_PACKAGE_VCMI				if BR2_x86_64 || (BR2_aarch64 && BR2_PACKAGE_BATOCERA_GLES3)
+	# Disabled for space right now
+	#select BR2_PACKAGE_VCMI			if BR2_x86_64 || (BR2_aarch64 && BR2_PACKAGE_BATOCERA_GLES3)
 
 	# ECWolf
 	select BR2_PACKAGE_ECWOLF			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
