@@ -1,0 +1,5 @@
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-client/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-xatrix/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-rogue/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-ctf/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-zaero/Config.in"
