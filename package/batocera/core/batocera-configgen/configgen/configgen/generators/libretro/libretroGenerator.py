@@ -25,10 +25,6 @@ class LibretroGenerator(Generator):
     # Main entry of the module
     # Configure retroarch and return a command
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        # Fix for the removed MESS cores
-        if system.config['core'] in [ 'mess' ]:
-            system.config['core'] = 'mame'
-
         # Get the graphics backend first
         gfxBackend = getGFXBackend(system)
 
@@ -75,7 +71,7 @@ class LibretroGenerator(Generator):
                 lightgun = system.getOptBoolean('lightgun_map')
             else:
                 # Lightgun button mapping breaks lr-mame's inputs, disable if left on auto
-                if system.config['core'] in [ 'mess', 'same_cdi', 'mame078plus', 'mame0139' ]:
+                if system.config['core'] in [ 'same_cdi', 'mame078plus', 'mame0139' ]:
                     lightgun = False
                 else:
                     lightgun = True
@@ -325,9 +321,9 @@ class LibretroGenerator(Generator):
             rom = f"{directory_path}/{first_line}"
         
         # Use command line instead of ROM file for MAME variants
-        if system.config['core'] in [ 'mame', 'mess', 'same_cdi' ]:
+        if system.config['core'] in [ 'mame', 'same_cdi' ]:
             dontAppendROM = True
-            if system.config['core'] in [ 'mame', 'mess' ]:
+            if system.config['core'] in [ 'mame' ]:
                 corePath = 'lr-' + system.config['core']
             else:
                 corePath = system.config['core']

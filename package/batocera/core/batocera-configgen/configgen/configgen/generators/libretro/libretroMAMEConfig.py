@@ -44,14 +44,14 @@ retroPad = {
 }
 
 def generateMAMEConfigs(playersControllers, system, rom, guns):
-    # Generate command line for MAME/MESS
+    # Generate command line for MAME
     commandLine = []
     romBasename = os.path.basename(rom)
     romDirname  = os.path.dirname(rom)
     romDrivername = os.path.splitext(romBasename)[0]
     specialController = 'none'
 
-    if system.config['core'] in [ 'mame', 'mess' ]:
+    if system.config['core'] in [ 'mame' ]:
         corePath = 'lr-' + system.config['core']
     else:
         corePath = system.config['core']
