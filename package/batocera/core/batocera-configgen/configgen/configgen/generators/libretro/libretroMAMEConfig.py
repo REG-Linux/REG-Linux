@@ -44,14 +44,14 @@ retroPad = {
 }
 
 def generateMAMEConfigs(playersControllers, system, rom, guns):
-    # Generate command line for MAME/MESS/MAMEVirtual
+    # Generate command line for MAME/MESS
     commandLine = []
     romBasename = os.path.basename(rom)
     romDirname  = os.path.dirname(rom)
     romDrivername = os.path.splitext(romBasename)[0]
     specialController = 'none'
 
-    if system.config['core'] in [ 'mame', 'mess', 'mamevirtual' ]:
+    if system.config['core'] in [ 'mame', 'mess' ]:
         corePath = 'lr-' + system.config['core']
     else:
         corePath = system.config['core']
@@ -81,7 +81,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
         messMode = -1
         messModel = ''
     else:
-        # Set up command line for MESS or MAMEVirtual
+        # Set up command line for MESS
         softDir = "/var/run/mame_software/"
         subdirSoftList = [ "mac_hdd", "bbc_hdd", "cdi", "archimedes_hdd", "fmtowns_cd" ]
         if system.isOptSet("softList") and system.config["softList"] != "none":
