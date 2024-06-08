@@ -1,0 +1,11 @@
+config BR2_PACKAGE_LIBRETRO_GEOLITH
+    bool "libretro-geolith"
+    depends on BR2_INSTALL_LIBSTDCPP
+
+    help
+        Neo Geo AES / MVS emulator for libretro
+
+	https://github.com/libretro/geolith-libretro
+
+comment "LIBRETRO_GEOLITH needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
