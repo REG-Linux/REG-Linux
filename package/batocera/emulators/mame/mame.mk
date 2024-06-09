@@ -6,7 +6,7 @@
 # Version: GroovyMAME 0.265 - Switchres 2.220c
 MAME_VERSION = gm0265sr220c
 MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
-MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm pulseaudio
+MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
 MAME_LICENSE = MAME
 
 MAME_CROSS_ARCH = unknown
@@ -35,9 +35,11 @@ else
 MAME_CROSS_OPTS += NO_X11=1 NO_OPENGL=1 NO_USE_XINPUT=1 NO_USE_BGFX_KHRONOS=1 FORCE_DRC_C_BACKEND=1 USE_WAYLAND=1
 endif
 
-# Disable pulseaudio if not built
-ifeq ($(BR2_PACKAGE_PULSEAUDIO),)
-MAME_CROSS_OPTS += NO_USE_PULSEAUDIO = 1
+# Handle alsa vs pulse/pipewire audio stack
+ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
+MAME_DEPENDENCIES += pulseaudio
+else
+MAME_CROSS_OPTS += NO_USE_PULSEAUDIO=1
 endif
 
 # Allow cross-architecture compilation with MAME build system

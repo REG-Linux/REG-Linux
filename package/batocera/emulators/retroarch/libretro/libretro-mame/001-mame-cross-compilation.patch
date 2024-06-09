@@ -1,0 +1,260 @@
+diff -ur ./3rdparty/minimp3/minimp3.h /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/3rdparty/minimp3/minimp3.h
+--- a/3rdparty/minimp3/minimp3.h	2020-10-27 02:00:36.000000000 +0100
++++ b/3rdparty/minimp3/minimp3.h	2020-11-10 17:13:17.377760626 +0100
+@@ -84,6 +84,10 @@
+ #define MINIMP3_MIN(a, b)           ((a) > (b) ? (b) : (a))
+ #define MINIMP3_MAX(a, b)           ((a) < (b) ? (b) : (a))
+ 
++#ifndef HAVE_SSE
++#define HAVE_SSE 0
++#endif
++
+ #if !defined(MINIMP3_NO_SIMD)
+ 
+ #if !defined(MINIMP3_ONLY_SIMD) && (defined(_M_X64) || defined(_M_ARM64) || defined(__x86_64__) || defined(__aarch64__))
+@@ -96,6 +100,9 @@
+ #include <intrin.h>
+ #endif /* defined(_MSC_VER) */
+ #include <immintrin.h>
++#ifdef HAVE_SSE
++#undef HAVE_SSE
++#endif
+ #define HAVE_SSE 1
+ #define HAVE_SIMD 1
+ #define VSTORE _mm_storeu_ps
+@@ -844,6 +851,7 @@
+         VSTORE(right + i, VSUB(vl, vr));
+     }
+ #endif /* HAVE_SIMD */
++    i = (n >> 2) << 2;
+     for (; i < n; i++)
+     {
+         float a = left[i];
+diff -ur ./makefile /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/makefile
+--- a/makefile	2020-10-27 02:00:36.000000000 +0100
++++ b/makefile	2020-11-09 18:56:15.179960037 +0100
+@@ -32,6 +32,7 @@
+ # SDL2_MULTIAPI = 1
+ # NO_USE_MIDI = 1
+ # NO_USE_PORTAUDIO = 1
++# NO_USE_BGFX_KHRONOS = 1
+ # NO_USE_PULSEAUDIO = 1
+ # USE_TAPTUN = 1
+ # USE_PCAP = 1
+@@ -87,11 +87,13 @@
+ # BUILDDIR = build
+ # TARGETOS = windows
+ # CROSS_BUILD = 1
++# CROSS_ARCH =
+ # TOOLCHAIN =
+ # OVERRIDE_CC = cc
+ # OVERRIDE_CXX = c++
+ # OVERRIDE_LD = ld
+ # OVERRIDE_AR = ar
++# OVERRIDE_STRIP = strip
+ 
+ # DEPRECATED = 0
+ # LTO = 1
+@@ -329,6 +333,10 @@
+ 
+ else
+ CROSS_BUILD := 1
++ifdef CROSS_ARCH
++PLATFORM := $(CROSS_ARCH)
++UNAME := $(CROSS_ARCH)
++endif
+ endif # TARGET_OS
+ 
+ ifdef PTR64
+@@ -573,6 +581,12 @@
+ LD := $(OVERRIDE_LD)
+ endif
+ endif
++ifdef OVERRIDE_STRIP
++PARAMS += --STRIP='$(OVERRIDE_STRIP)'
++ifndef CROSS_BUILD
++STRIP := $(OVERRIDE_STRIP)
++endif
++endif
+ 
+ #-------------------------------------------------
+ # sanity check the configuration
+@@ -740,6 +760,10 @@
+ PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
+ endif
+ 
++ifdef NO_USE_BGFX_KHRONOS
++PARAMS += --NO_USE_BGFX_KHRONOS='$(NO_USE_BGFX_KHRONOS)'
++endif
++
+ ifdef NO_USE_PORTAUDIO
+ PARAMS += --NO_USE_PORTAUDIO='$(NO_USE_PORTAUDIO)'
+ endif
+diff -ur ./scripts/genie.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/genie.lua
+--- a/scripts/genie.lua	2020-10-27 02:00:36.000000000 +0100
++++ b/scripts/genie.lua	2020-11-09 19:09:38.958845876 +0100
+@@ -195,6 +195,16 @@
+ }
+ 
+ newoption {
++	trigger = "AR",
++	description = "AR replacement",
++}
++
++newoption {
++	trigger = "STRIP",
++	description = "STRIP replacement",
++}
++
++newoption {
+ 	trigger = "TOOLCHAIN",
+ 	description = "Toolchain prefix"
+ }
+@@ -390,6 +400,11 @@
+ }
+ 
+ newoption {
++	trigger = "NO_USE_BGFX_KHRONOS",
++	description = "Skip including bgfx 3rdparty khronos headers (rely on system ones)",
++}
++
++newoption {
+ 	trigger = "DEBUG_DIR",
+ 	description = "Default directory for debugger.",
+ }
+diff -ur ./scripts/src/3rdparty.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/src/3rdparty.lua
+--- a/scripts/src/3rdparty.lua	2020-10-27 02:00:36.000000000 +0100
++++ b/scripts/src/3rdparty.lua	2020-11-09 18:03:17.288620257 +0100
+@@ -1346,9 +1346,14 @@ end
+ 		MAME_DIR .. "3rdparty/bx/include",
+ 		MAME_DIR .. "3rdparty/bimg/include",
+ 		MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/directx",
+-		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+ 	}
+ 
++	if not _OPTIONS["NO_USE_BGFX_KHRONOS"] then
++		includedirs {
++			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
++		}
++	end
++
+ 	configuration { "android-*"}
+ 		buildoptions {
+ 			"-Wno-macro-redefined",
+diff -ur ./scripts/src/osd/modules.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/src/osd/modules.lua
+--- a/scripts/src/osd/modules.lua	2020-10-27 02:00:36.000000000 +0100
++++ b/scripts/src/osd/modules.lua	2020-11-09 17:59:35.068394429 +0100
+@@ -255,11 +255,16 @@
+ 		MAME_DIR .. "3rdparty/bgfx/examples/common",
+ 		MAME_DIR .. "3rdparty/bgfx/include",
+ 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
+-		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+ 		MAME_DIR .. "3rdparty/bx/include",
+ 		ext_includedir("rapidjson")
+ 	}
+ 
++	if not _OPTIONS["NO_USE_BGFX_KHRONOS"] then
++		includedirs {
++			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
++		}
++	end
++
+ 	if _OPTIONS["NO_USE_PORTAUDIO"]=="1" then
+ 		defines {
+ 			"NO_USE_PORTAUDIO",
+diff -ur ./scripts/toolchain.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/toolchain.lua
+--- a/scripts/toolchain.lua	2020-10-27 02:00:36.000000000 +0100
++++ b/scripts/toolchain.lua	2020-11-09 19:09:29.890677516 +0100
+@@ -207,7 +207,11 @@
+ 				premake.gcc.cc   = "@gcc -V 4.2"
+ 				premake.gcc.cxx  = "@g++-4.2"
+ 			end
+-			premake.gcc.ar  = "ar"
++			if _OPTIONS["AR"]~=nil then
++				premake.gcc.ar = _OPTIONS["AR"]
++			else
++				premake.gcc.ar  = "ar"
++			end
+ 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
+ 		end
+ 
+@@ -737,6 +741,18 @@
+ 	configuration { "linux-gcc", "x64", "Debug" }
+ 		targetdir (_buildDir .. "linux_gcc" .. "/bin/x64/Debug")
+ 
++	configuration { "linux-gcc", "arm64" }
++		objdir (_buildDir .. "linux_gcc" .. "/obj")
++		buildoptions {
++			"",
++		}
++
++	configuration { "linux-gcc", "arm64", "Release" }
++		targetdir (_buildDir .. "linux_gcc" .. "/bin/arm64/Release")
++
++	configuration { "linux-gcc", "arm64", "Debug" }
++		targetdir (_buildDir .. "linux_gcc" .. "/bin/arm64/Debug")
++
+ 	configuration { "linux-clang", "x32" }
+ 		objdir (_buildDir .. "linux_clang" .. "/obj")
+ 		buildoptions {
+@@ -712,10 +712,17 @@
+ 		}
+ 
+ 	configuration { "linux-*" }
++		if _OPTIONS['STRIP']~=nil then
++		postbuildcommands {
++			"$(SILENT) echo Stripping symbols.",
++			"$(SILENT) " .. _OPTIONS['STRIP'] .. " -s \"$(TARGET)\""
++		}
++	else
+ 		postbuildcommands {
+ 			"$(SILENT) echo Stripping symbols.",
+ 			"$(SILENT) strip -s \"$(TARGET)\""
+ 		}
++	end
+ 
+ 	configuration { "mingw*", "x64" }
+ 		postbuildcommands {
+--- a/scripts/src/osd/retro_modules.lua	2024-04-27 00:52:42.000000000 +0200
++++ b/scripts/src/osd/retro_modules.lua	2024-06-09 07:00:43.927518587 +0200
+@@ -127,6 +127,7 @@
+ 	defines {
+         "NO_USE_MIDI",
+         "NO_USE_PORTAUDIO",
++        "NO_USE_PULSEAUDIO",
+         "NO_USE_BGFX",
+         "USE_QTDEBUG=0",
+         "USE_OPENGL=0",
+@@ -218,6 +219,15 @@
+ 	},
+ }
+ 
++newoption {
++	trigger = "NO_USE_PULSEAUDIO",
++	description = "Disable PulseAudio interface",
++	allowed = {
++		{ "0",  "Enable PulseAudio"  },
++		{ "1",  "Disable PulseAudio" },
++	},
++}
++
+ newoption {
+ 	trigger = "NO_USE_BGFX",
+ 	description = "Disable BGFX",
+--- a/scripts/genie.lua	2024-06-09 07:12:25.604638111 +0200
++++ b/scripts/genie.lua	2024-06-09 07:12:39.712971507 +0200
+@@ -1036,14 +1036,6 @@
+ 	end
+ end
+ 
+--- On Linux targets link libgcc and libstdc++ statically.  See #137
+-if _OPTIONS["targetos"]=="linux" then
+-		linkoptions {
+-			"-static-libgcc -static-libstdc++"
+-		}
+-end
+-
+-
+ -- add a basic set of warnings
+ 	buildoptions {
+ 		"-Wall",
