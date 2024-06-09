@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-HYPSEUS_SINGE_BEZELS_VERSION = 10799146e803a7194ccccd365a4fae77945b3e60
+HYPSEUS_SINGE_BEZELS_VERSION = 7f3fea989aff51716bb5611e02ed312ba71fde14
 HYPSEUS_SINGE_BEZELS_SITE = \
-    $(call github,Tovarichtch,hypseus_singe_daphne_bezels,$(HYPSEUS_SINGE_BEZELS_VERSION))
+    $(call github,REG-Linux,hypseus_singe_daphne_bezels,$(HYPSEUS_SINGE_BEZELS_VERSION))
 HYPSEUS_SINGE_BEZELS_LICENSE = LGPL-3.0
 HYPSEUS_SINGE_BEZELS_LICENSE_FILES = LICENSE
 

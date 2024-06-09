@@ -433,7 +433,7 @@ dreamcast:
   extensions: [cdi, cue, gdi, chd, m3u]
   emulators:
     libretro:
-      flycast:      { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCAST] }
+      flycast:      { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCAST]   }
       flycastvl:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCASTVL] }
     flycast:
       flycast:        { requireAnyOf: [BR2_PACKAGE_FLYCAST]          }
@@ -917,12 +917,12 @@ mame:
   platform:   arcade
   emulators:
     libretro:
-      imame4all:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_IMAME]          }
-      mame078plus:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME2003_PLUS]  }
-      mame0139:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME2010]       }
-      mame:         { requireAnyOf: [BR2_PACKAGE_HAS_LIBRETRO_MAME]       }
+      imame4all:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_IMAME]         }
+      mame078plus:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME2003_PLUS] }
+      mame0139:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME2010]      }
+      mame:         { requireAnyOf: [BR2_PACKAGE_HAS_LIBRETRO_MAME]      }
     mame:
-      mame:         { requireAnyOf: [BR2_PACKAGE_HAS_MAME]                }
+      mame:         { requireAnyOf: [BR2_PACKAGE_HAS_MAME]               }
 
   comment_en: |
     The system uses libretro mame2003+ as default core: compatible ROMs must come from set 0.78+
