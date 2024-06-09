@@ -12,6 +12,13 @@ LIBRETRO_MAME_LICENSE = MAME
 
 LIBRETRO_MAME_DEPENDENCIES = alsa-lib
 
+# Disable pulseaudio if not built
+ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
+LIBRETRO_MAME_DEPENDENCIES += pulseaudio
+else
+LIBRETRO_MAME_EXTRA_ARGS += NO_USE_PULSEAUDIO=1
+endif
+
 # Limit number of jobs not to eat too much RAM....
 LIBRETRO_MAME_MAX_JOBS = 32
 LIBRETRO_MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_MAME_MAX_JOBS) ]; then echo $(LIBRETRO_MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
@@ -43,12 +50,20 @@ ifeq ($(BR2_ENABLE_DEBUG),y)
 else ifeq ($(BR2_x86_64),y)
 	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
 else
-	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=2
+	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1
 endif
 
 define LIBRETRO_MAME_BUILD_CMDS
 	# create some dirs while with parallelism, sometimes it fails because this directory is missing
 	mkdir -p $(@D)/build/libretro/obj/x64/libretro/src/osd/libretro/libretro-internal
+
+        # First, we need to build genie for host
+        cd $(@D); \
+        PATH="$(HOST_DIR)/bin:$$PATH" \
+        $(MAKE) TARGETOS=linux OSD=sdl genie \
+        TARGET=mame SUBTARGET=tiny \
+        NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
+        USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
 
 	# remove skeleton drivers to save space
 	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 1 -d ":" > $(@D)/build/skel.list
@@ -64,8 +79,8 @@ define LIBRETRO_MAME_BUILD_CMDS
 		CONFIG=libretro LIBRETRO_OS="unix" ARCH="" PROJECT="" ARCHOPTS="$(LIBRETRO_MAME_ARCHOPTS)" \
 		DISTRO="debian-stable" OVERRIDE_CC="$(TARGET_CC)" OVERRIDE_CXX="$(TARGET_CXX)"             \
 		OVERRIDE_LD="$(TARGET_LD)" RANLIB="$(TARGET_RANLIB)" AR="$(TARGET_AR)"                     \
-		$(LIBRETRO_MAME_EXTRA_ARGS) CROSS_BUILD=1 TARGET="mame" SUBTARGET="mame" RETRO=1         \
-		OSD="retro" DEBUG=0
+		$(LIBRETRO_MAME_EXTRA_ARGS) CROSS_BUILD=1 TARGET="mame" SUBTARGET="mame" RETRO=1           \
+		OSD="retro" DEBUG=0 LDOPTS="-lasound"
 endef
 
 define LIBRETRO_MAME_INSTALL_TARGET_CMDS
