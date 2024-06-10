@@ -26,7 +26,7 @@ new file mode 100644
 index 000000000..735d49fb5
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-h618-orangepi-zero2w.dts
-@@ -0,0 +1,292 @@
+@@ -0,0 +1,293 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright (C) 2023 Arm Ltd.
@@ -151,6 +151,7 @@ index 000000000..735d49fb5
 +
 +&gpu {
 +	mali-supply = <&reg_dcdc1>;
++	status = "okay";
 +};
 +
 +&mmc0 {
