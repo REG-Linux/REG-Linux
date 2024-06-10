@@ -1,4 +1,10 @@
 config BR2_PACKAGE_XXD
 	bool "xxd"
+
 	help
-	  xxd - a hexdump utility by Juergen Weigert, v1.11 by Vadim Vygonets
+	  This is the well-known hex-dump-type utility xxd commonly
+	  distributed as a part of the vim-project. The version of
+	  xxd in this repository has been adapted for MSVC/GCC/clang
+	  standalone build.
+
+		https://github.com/ckormanyos/xxd
