@@ -210,6 +210,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_LEDSPICER			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770  && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # LED Manager for Linux
 	select BR2_PACKAGE_INNOEXTRACT			if !BR2_PACKAGE_BATOCERA_TARGET_CHA # Extract InnoSetup files (useful for Wine and GOG games)
 	select BR2_PACKAGE_TREE				# recursive directory listing (useful for generating documentation on rom directory structure)
+	select BR2_PACKAGE_XXD				# hexdump utility
 
 	# Python and SSL
 	select BR2_PACKAGE_HOST_PYTHON3
