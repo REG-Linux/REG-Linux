@@ -5,7 +5,7 @@ case "$1" in
 	# early in the process start plymouthd and show splash
 	if [ -x /usr/sbin/plymouthd -a -x /usr/bin/plymouth ]
 	then
-		/usr/sbin/plymouthd --graphical-boot --attach-to-session --mode=boot --kernel-command-line="quiet splash"
+		/usr/sbin/plymouthd --graphical-boot --attach-to-session --mode=boot
 		/usr/bin/plymouth --show-splash
 	fi
         ;;
