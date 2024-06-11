@@ -43,6 +43,3 @@ BR2_PACKAGE_FIRMWARE_ARMBIAN=y
 
 # Bootloader
 BR2_PACKAGE_UBOOT_VIM1S=y
-
-# choices can be put in _defconfig files only
-BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y

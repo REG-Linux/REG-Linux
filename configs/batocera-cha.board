@@ -42,8 +42,5 @@ BR2_PACKAGE_HOST_MTOOLS=y
 # spi flash support
 BR2_PACKAGE_MTD=y
 
-# Batocera Splash Support
-BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y
-
 # Exception for CHA
 BR2_PACKAGE_AMIBERRY=y

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+	# early in the process start plymouthd and show splash
+	if [ -x /usr/sbin/plymouthd -a -x /usr/bin/plymouth ]
+	then
+		/usr/sbin/plymouthd --graphical-boot --attach-to-session --mode=boot
+		/usr/bin/plymouth --show-splash
+	fi
+        ;;
+    stop)
+	# Save the boot log to file and stop splash
+	if [ -x /usr/bin/plymouth ] && /usr/bin/plymouth --ping
+	then
+		/usr/bin/plymouth update-root-fs --read-write
+		/usr/bin/plymouth --wait --quit
+	fi
+        ;;
+    restart|reload)
+        "$0" stop
+        "$0" start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
