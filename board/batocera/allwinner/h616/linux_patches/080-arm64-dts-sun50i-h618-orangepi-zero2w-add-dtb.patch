@@ -323,3 +323,31 @@ index 000000000..735d49fb5
 --
 2.45.2
 
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h618-orangepi-zero2w.dts	2024-06-11 19:12:51.525441114 +0200
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h618-orangepi-zero2w.dts	2024-06-11 19:14:39.716464310 +0200
+@@ -291,3 +291,25 @@
+ 	usb1_vbus-supply = <&reg_vcc5v>;
+ 	status = "okay";
+ };
++
++&codec {
++	allwinner,audio-routing =
++	"Line Out", "LINEOUT";
++	status = "okay";
++};
++
++&ahub_dam_plat {
++	status = "okay";
++};
++
++&ahub_dam_mach {
++	status = "okay";
++};
++
++&ahub1_plat {
++	status = "okay";
++};
++
++&ahub1_mach {
++	status = "okay";
++};
