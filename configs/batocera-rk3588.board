@@ -34,9 +34,6 @@ BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/r
 # Use 'extreme' ZSTD compression for a smaller image, but a bit more CPU to decompress
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 
-# Show a nice movie at bootup
-BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y
-
 # Enable Wayland
 BR2_PACKAGE_REGLINUX_SWAY=y
 

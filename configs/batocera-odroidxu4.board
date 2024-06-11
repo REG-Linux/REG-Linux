@@ -31,9 +31,6 @@ BR2_PACKAGE_BATOCERA_PANFROST_MESA3D=y
 # allow wayland
 BR2_PACKAGE_REGLINUX_SWAY=y
 
-# batocera splash screen
-BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y
-
 # odroid-xu4 bootloader
 BR2_PACKAGE_UBOOT_ODROID_XU4=y
 

@@ -42,6 +42,3 @@ BR2_PACKAGE_BATOCERA_RPI_MESA3D=y
 
 # needed for gpicase (TODO force sway if gpicase detected)
 BR2_PACKAGE_REGLINUX_SWAY=y
-
-# batocera splash screen
-BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y

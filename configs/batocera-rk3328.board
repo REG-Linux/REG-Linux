@@ -41,6 +41,3 @@ BR2_PACKAGE_BATOCERA_LIMA_MESA3D=y
 
 # allow wayland
 BR2_PACKAGE_REGLINUX_SWAY=y
-
-# choices can be put in _defconfig files only
-BR2_PACKAGE_REGLINUX_SPLASH_FFPLAY=y
