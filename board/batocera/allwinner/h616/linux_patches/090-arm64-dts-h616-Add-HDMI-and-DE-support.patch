@@ -1,0 +1,84 @@
+From 55795f77ae2e3f5b4ac1f97d9dadf45b3dba0653 Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Sun, 12 May 2024 15:51:19 +1200
+Subject: [PATCH] Add HDMI and DE support to -2024 dts
+
+---
+ .../arm64/boot/dts/allwinner/sun50i-h616.dtsi |  6 ++++
+ .../sun50i-h700-anbernic-rg35xx-2024.dts      | 32 +++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 0ed8a527ebbb..92224957edf0 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -60,6 +60,12 @@ cpu3: cpu@3 {
+ 		};
+ 	};
+ 
++	de: display-engine {
++		compatible = "allwinner,sun50i-h6-display-engine";
++		allwinner,pipelines = <&mixer0>;
++		status = "disabled";
++	};
++
+ 	reserved-memory {
+ 		#address-cells = <2>;
+ 		#size-cells = <2>;
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index ee30584b6ad7..fcc1174b8da6 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -24,6 +24,17 @@ aliases {
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
++	
++	connector {
++		compatible = "hdmi-connector";
++		type = "d";
++
++		port {
++			hdmi_con_in: endpoint {
++				remote-endpoint = <&hdmi_out_con>;
++			};
++		};
++	};
+ 
+ 	gpio_keys_gamepad: gpio-keys-gamepad {
+ 		compatible = "gpio-keys";
+@@ -175,10 +186,31 @@ &cpu0 {
+ 	cpu-supply = <&reg_dcdc1>;
+ };
+ 
++&de {
++	status = "okay";
++};
++
+ &ehci0 {
+ 	status = "okay";
+ };
+ 
++&gpu {
++	mali-supply = <&reg_dcdc2>;
++	power-domains = <&r_ccu 0>;
++	status = "okay";
++};
++	
++&hdmi {
++	hvcc-supply = <&reg_bldo1>;
++	status = "okay";
++};
++
++&hdmi_out {
++	hdmi_out_con: endpoint {
++		remote-endpoint = <&hdmi_con_in>;
++	};
++};
++
+ &mmc0 {
+ 	vmmc-supply = <&reg_cldo3>;
+ 	disable-wp;
+-- 
+2.43.4
+

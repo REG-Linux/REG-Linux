@@ -90,19 +90,6 @@ index 165c00459..f2fe1a9a9 100644
  #include <dt-bindings/thermal/thermal.h>
  
  / {
-@@ -57,6 +60,12 @@ cpu3: cpu@3 {
- 		};
- 	};
- 
-+	de: display-engine {
-+		compatible = "allwinner,sun50i-h6-display-engine";
-+		allwinner,pipelines = <&mixer0>;
-+		status = "disabled";
-+	};
-+
- 	reserved-memory {
- 		#address-cells = <2>;
- 		#size-cells = <2>;
 @@ -113,6 +122,50 @@ soc {
  		#size-cells = <1>;
  		ranges = <0x0 0x0 0x0 0x40000000>;
