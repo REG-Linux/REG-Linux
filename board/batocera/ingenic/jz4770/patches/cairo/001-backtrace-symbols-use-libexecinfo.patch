@@ -1,0 +1,29 @@
+diff -u -r a/meson.build b/meson.build
+--- a/meson.build	2024-06-12 13:56:28.455193456 +0200
++++ b/meson.build	2024-06-12 16:23:24.169757692 +0200
+@@ -210,6 +210,12 @@
+   conf.set('CAIRO_HAS_DLSYM', 1)
+ endif
+ 
++# musl patch
++execinfo_dep = cc.find_library('execinfo', required: true)
++if execinfo_dep.found() and cc.has_function('backtrace_symbols', dependencies: [execinfo_dep])
++  deps += [execinfo_dep]
++endif
++
+ feature_conf = configuration_data()
+ 
+ # Array of dictionaries, used to generate per-feature pc files
+diff -u -r a/util/meson.build b/util/meson.build
+--- a/util/meson.build	2023-09-23 16:18:32.000000000 +0200
++++ b/util/meson.build	2024-06-12 16:23:24.177757876 +0200
+@@ -42,6 +42,8 @@
+   )
+ endforeach
+ 
++execinfo_dep = cc.find_library('execinfo', required: true)
++
+ if conf.get('CAIRO_HAS_DLSYM', 0) == 1 and cc.has_header('execinfo.h')
+-  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : dl_dep)
++  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : [dl_dep, execinfo_dep])
+ endif
