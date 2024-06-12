@@ -14,6 +14,20 @@ MAME_CROSS_OPTS = PRECOMPILE=0
 MAME_CFLAGS =
 MAME_LDFLAGS =
 
+MAME_SUBTARGET=mame
+MAME_SUFFIX=
+
+define MAME_COPY_FILES
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/arcade.flt $(@D)/src/mame/
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/mess.flt   $(@D)/src/mame/
+endef
+MAME_PRE_CONFIGURE_HOOKS += MAME_COPY_FILES
+
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+MAME_SUBTARGET=arcade
+MAME_SUFFIX=arcade
+endif
+
 # Limit number of jobs not to eat too much RAM....
 MAME_MAX_JOBS = 32
 MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(MAME_MAX_JOBS) ]; then echo $(MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
@@ -131,7 +145,7 @@ define MAME_BUILD_CMDS
 	CCACHE_SLOPPINESS="pch_defines,time_macros,include_file_ctime,include_file_mtime" \
 	$(MAKE) -j$(MAME_JOBS) TARGETOS=linux OSD=sdl \
 	TARGET=mame \
-	SUBTARGET=mame \
+	SUBTARGET=$(MAME_SUBTARGET) \
 	OVERRIDE_CC="$(TARGET_CC)" \
 	OVERRIDE_CXX="$(TARGET_CXX)" \
 	OVERRIDE_LD="$(TARGET_LD)" \
@@ -175,7 +189,7 @@ define MAME_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin/mame/roms
 
 	# Install binaries and default distro
-	$(INSTALL) -D $(@D)/mame	$(TARGET_DIR)/usr/bin/mame/mame
+	$(INSTALL) -D $(@D)/mame$(MAME_SUFFIX)	$(TARGET_DIR)/usr/bin/mame/mame
 	cp $(@D)/COPYING			$(TARGET_DIR)/usr/bin/mame/
 	cp $(@D)/README.md			$(TARGET_DIR)/usr/bin/mame/
 	cp $(@D)/uismall.bdf		$(TARGET_DIR)/usr/bin/mame/
