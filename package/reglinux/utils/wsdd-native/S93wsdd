@@ -1,12 +1,13 @@
 #!/bin/sh
 #
-# 93wsdd - init.d script for WSDD on Batocera
+# 93wsdd - init.d script for WSDD on REG-Linux
 # "I haven't written a straight init.d script in 2 decades" Edition
 # (c) 2023 Jay Moore - dewdude@pickmy.org - Now With More Gross Hacks!
 # Distributed under the terms of the MIT license
 #
 # Modified by n2qz and other Batocera contributors, for inclusion in
 # Batocera.
+# Modified by Romain Tisserand for REG Linux
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="wsdd"
