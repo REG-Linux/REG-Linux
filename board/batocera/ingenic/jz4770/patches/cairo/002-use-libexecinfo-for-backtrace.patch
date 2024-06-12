@@ -1,0 +1,14 @@
+--- a/meson.build	2024-06-12 16:04:42.068524212 +0200
++++ b/meson.build	2024-06-12 16:07:46.548582329 +0200
+@@ -211,7 +211,10 @@
+ endif
+ 
+ # musl patch
+-deps += cc.find_library('execinfo', required: true)
++execinfo_dep = cc.find_library('execinfo', required: true)
++if execinfo_dep.found() and cc.has_function('backtrace_symbols', dependencies: [execinfo_dep])
++  deps += [execinfo_dep]
++endif
+ 
+ feature_conf = configuration_data()
+ 

@@ -1,0 +1,9 @@
+--- a/util/meson.build	2024-06-12 16:16:04.619531432 +0200
++++ b/util/meson.build	2024-06-12 16:22:07.871993193 +0200
+@@ -45,5 +45,5 @@
+ execinfo_dep = cc.find_library('execinfo', required: true)
+ 
+ if conf.get('CAIRO_HAS_DLSYM', 0) == 1 and cc.has_header('execinfo.h')
+-  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : dl_dep + execinfo_dep)
++  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : [dl_dep, execinfo_dep])
+ endif

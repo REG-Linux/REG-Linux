@@ -1,0 +1,24 @@
+--- a/util/meson.build	2024-06-12 16:14:43.261743424 +0200
++++ b/util/meson.build	2024-06-12 16:15:12.134377978 +0200
+@@ -33,11 +33,6 @@
+   ]
+ endif
+ 
+-execinfo_dep = cc.find_library('execinfo', required: false)
+-if execinfo_dep.found() and cc.has_function('backtrace_symbols', dependencies: [execinfo_dep])
+-  deps += [execinfo_dep]
+-endif
+-
+ foreach util : cairo_utils
+   exe_name = util[0].split('.')[0]
+   util_deps = util.get(1, {}).get('deps', [])
+@@ -47,6 +42,8 @@
+   )
+ endforeach
+ 
++execinfo_dep = cc.find_library('execinfo', required: true)
++
+ if conf.get('CAIRO_HAS_DLSYM', 0) == 1 and cc.has_header('execinfo.h')
+-  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : dl_dep)
++  libmallocstats = library('malloc-stats', 'malloc-stats.c', dependencies : dl_dep + execinfo_dep)
+ endif
