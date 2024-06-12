@@ -1,17 +1,21 @@
 [Plymouth Theme]
 Name=REGLinux
-Description=Simple theme that shows a rotating infinity sign in the center of the screen
+Description=Theme REGLinux
 ModuleName=two-step
 
 [two-step]
 ScaleBackgroundImage=false
-ImageDir=/usr/share/plymouth/themes//reglinux
+ImageDir=/usr/share/plymouth/themes/reglinux
+
 BackgroundStartColor=0x343434
 BackgroundEndColor=0x000000
+
 WatermarkHorizontalAlignment=0.5
 WatermarkVerticalAlignment=0.5
+
 HorizontalAlignment=0.5
 VerticalAlignment=0.55
+
 ProgressBarHorizontalAlignment=0.5
 ProgressBarVerticalAlignment=1.0
 ProgressBarWidth=1920
@@ -24,12 +28,12 @@ UseProgressBar=true
 UseAnimation=true
 
 [shutdown]
-UseProgressBar=true
-UseAnimation=true
+UseProgressBar=false
+UseAnimation=false
 
 [reboot]
-UseProgressBar=true
-UseAnimation=true
+UseProgressBar=false
+UseAnimation=false
 
 [updates]
 UseProgressBar=true
