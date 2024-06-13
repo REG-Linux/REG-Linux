@@ -2,10 +2,12 @@ config BR2_PACKAGE_LIBRETRO_SCUMMVM
     bool "libretro-scummvm"
 	depends on BR2_PACKAGE_RETROARCH
 	depends on BR2_INSTALL_LIBSTDCPP
-      help
-        A libretro SCUMMVM emulator core for ARM.
+	select BR2_PACKAGE_HAS_LIBRETRO_SCUMMVM
 
-	  http://www.libretro.com
+      help
+        Libretro-core version of ScummVM
+
+	  https://github.com/scummvm/scummvm/
 
 comment "LIBRETRO_SCUMMVM needs a toolchain w/ C++"
 	depends on !BR2_INSTALL_LIBSTDCPP
