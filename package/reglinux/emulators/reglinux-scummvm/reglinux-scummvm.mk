@@ -69,11 +69,11 @@ REGLINUX_SCUMMVM_ARCH = x86_64
 endif
 
 # Compute the archive source file name
-REGLINUX_SCUMMVM_SOURCE = reglinux-mame-$(REGLINUX_SCUMMVM_VERSION)-$(REGLINUX_SCUMMVM_ARCH).tar.gz
+REGLINUX_SCUMMVM_SOURCE = reglinux-scummvm-$(REGLINUX_SCUMMVM_VERSION)-$(REGLINUX_SCUMMVM_ARCH).tar.gz
 
 define REGLINUX_SCUMMVM_DOWNLOAD_ARCHIVE
-	echo "Downloading https://github.com/REG-Linux/REG-MAME/releases/download/$(REGLINUX_SCUMMVM_VERSION)/$(REGLINUX_SCUMMVM_SOURCE)"
-	cd $(@D) && wget https://github.com/REG-Linux/REG-MAME/releases/download/$(REGLINUX_SCUMMVM_VERSION)/$(REGLINUX_SCUMMVM_SOURCE)
+	echo "Downloading https://github.com/REG-Linux/REG-ScummVM/releases/download/$(REGLINUX_SCUMMVM_VERSION)/$(REGLINUX_SCUMMVM_SOURCE)"
+	cd $(@D) && wget https://github.com/REG-Linux/REG-ScummVM/releases/download/$(REGLINUX_SCUMMVM_VERSION)/$(REGLINUX_SCUMMVM_SOURCE)
 endef
 
 REGLINUX_SCUMMVM_POST_BUILD_HOOKS = REGLINUX_SCUMMVM_DOWNLOAD_ARCHIVE

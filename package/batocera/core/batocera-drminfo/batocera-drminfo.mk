@@ -3,8 +3,8 @@
 # drminfo
 #
 ################################################################################
-# Version.: Commits on May 27, 2020
-BATOCERA_DRMINFO_VERSION = 1
+# Version.: Commits on Jun 14, 2024
+BATOCERA_DRMINFO_VERSION = 2
 BATOCERA_DRMINFO_SOURCE =
 BATOCERA_DRMINFO_LICENSE = GPLv3+
 BATOCERA_DRMINFO_DEPENDENCIES = libdrm
@@ -19,8 +19,9 @@ endif
 BATOCERA_DRMINFO_MAIN=batocera-drminfo.c
 
 # this resolution seems to cause issues on the rpi4 (dmanlfc)
+# REG copy/pasting the whole source code instead of a #define is dubious...
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2711),y)
-BATOCERA_DRMINFO_MAIN=batocera-drminfo-no-1360x768.c
+	BATOCERA_DRMINFO_FLAGS += -DHAVE_IGNORE_1360x768_MODE
 endif
 
 define BATOCERA_DRMINFO_BUILD_CMDS
