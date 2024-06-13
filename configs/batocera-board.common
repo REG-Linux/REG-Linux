@@ -136,11 +136,13 @@ BR2_PACKAGE_SEATD=y
 # Prefer using prebuilt mame
 #BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y
 
+# Prefer using prebuilt scummvm
+#BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y
+
 # Enables ccache
 BR2_CCACHE=y
 
 BR2_PACKAGE_JPEG_TURBO=y
-BR_PACKAGE_GOOFY=y
 
 # REGlinux splash screen
 BR2_PACKAGE_PLYMOUTH=y
