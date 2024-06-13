@@ -1,0 +1,32 @@
+config BR2_PACKAGE_HAS_SCUMMVM
+        bool
+
+config BR2_PACKAGE_HAS_LIBRETRO_SCUMMVM
+        bool
+
+config BR2_PACKAGE_REGLINUX_SCUMMVM
+	bool "reglinux-scummvm"
+
+	# Make sure to build the dependencies even if prebuilt ScummVM
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_LIBMPEG2
+	select BR2_PACKAGE_JPEG
+	select BR2_PACKAGE_LIBJPEG_BATO
+	select BR2_PACKAGE_LIBOGG
+	select BR2_PACKAGE_LIBVORBIS	if !BR2_arm && !BR2_mipsel
+	select BR2_PACKAGE_TREMOR	if  BR2_arm || BR2_mipsel
+	select BR2_PACKAGE_FLAC
+	select BR2_PACKAGE_LIBMAD
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_LIBTHEORA
+	select BR2_PACKAGE_FAAD2
+	select BR2_PACKAGE_FREETYPE
+	select BR2_PACKAGE_ZLIB
+
+	# Virtual packages for ES systems
+	select BR2_PACKAGE_HAS_SCUMMVM
+	select BR2_PACKAGE_HAS_LIBRETRO_SCUMMVM
+	help
+	  ScummVM and libretro-scummvm prebuilt package
+
+	  https://github.com/REG-Linux/REG-ScummVM
