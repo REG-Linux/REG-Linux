@@ -15,6 +15,7 @@ config BR2_PACKAGE_SCUMMVM
     select BR2_PACKAGE_FAAD2
     select BR2_PACKAGE_FREETYPE
     select BR2_PACKAGE_ZLIB
+    select BR2_PACKAGE_HAS_SCUMMVM
     help
       ScummVM point and click
       

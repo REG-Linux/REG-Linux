@@ -568,6 +568,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mednafen/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/oricutron/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/reglinux-mame/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/reglinux-scummvm/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/sudachi/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/libretro/libretro-geolith/Config.in"
@@ -579,7 +580,6 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/vcmi/Config.in"
 
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/goofy/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/vulkan-volk/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/utils/gamescope/Config.in"

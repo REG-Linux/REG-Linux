@@ -57,7 +57,7 @@ REGLINUX_MAME_ARCH = bpif3
 # X86_64-v3 subarchitecture
 else ifeq ($(BR2_x86_64_v3),y)
 REGLINUX_MAME_ARCH = x86_64_v3
-# X86_64 subarchitecture
+# X86_64 architecture
 else ifeq ($(BR2_x86_64),y)
 REGLINUX_MAME_ARCH = x86_64
 endif
