@@ -107,6 +107,10 @@ config BR2_PACKAGE_MAME_BUILD_FROM_SOURCE
 	bool "mame-build-from-source"
 	default n
 
+config BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE
+	bool "scummvm-build-from-source"
+	default n
+
 ##########################################
 config BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
 	bool "batocera.linux music formats support"
@@ -727,9 +731,14 @@ config BR2_PACKAGE_BATOCERA_GAMESTREAM_SYSTEMS
 config BR2_PACKAGE_BATOCERA_SCUMMVM_SYSTEMS
 	bool "batocera.linux ScummVM emulators/cores"
 
-	# ScummVM
-	select BR2_PACKAGE_SCUMMVM		# ALL
-	select BR2_PACKAGE_LIBRETRO_SCUMMVM	# ALL
+	# ScummVM (standalone)
+	select BR2_PACKAGE_SCUMMVM		if  BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
+
+	# ScummVM (libretro core)
+	select BR2_PACKAGE_LIBRETRO_SCUMMVM	if  BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
+
+	# ScummvM / lr-scummvm prebuilt combo
+	select BR2_PACKAGE_REGLINUX_SCUMMVM	if !BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
 
 #### Homebrew ####
 config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
