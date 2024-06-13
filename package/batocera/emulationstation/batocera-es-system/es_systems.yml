@@ -719,9 +719,9 @@ scummvm:
   platform:   scummvm
   emulators:
     scummvm:
-      scummvm: { requireAnyOf: [BR2_PACKAGE_SCUMMVM]          }
+      scummvm: { requireAnyOf: [BR2_PACKAGE_HAS_SCUMMVM]          }
     libretro:
-      scummvm: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SCUMMVM] }
+      scummvm: { requireAnyOf: [BR2_PACKAGE_HAS_LIBRETRO_SCUMMVM] }
   comment_en: |
     Put scummvm games in this folder.
 
