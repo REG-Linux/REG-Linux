@@ -62,7 +62,7 @@ do
     #### boot-$BOARD.tar.zst ###############
     echo "creating images/${BATOCERA_SUBTARGET}/boot-${BATOCERA_SUBTARGET}.tar.zst"
     mkdir -p "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
-    (cd "${REGLINUX_BINARIES_DIR}/boot" && tar -I "zstd" -cf "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot-${BATOCERA_LOWER_TARGET}.tar.zst" *) || exit 1
+    (cd "${REGLINUX_BINARIES_DIR}/boot" && tar -I "zstd" -cf "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot-${BATOCERA_SUBTARGET}.tar.zst" *) || exit 1
 
     # create *.img
     if [ "${BATOCERA_LOWER_TARGET}" = "${BATOCERA_SUBTARGET}" ]; then
@@ -104,21 +104,25 @@ do
     cp "${TARGET_DIR}/usr/share/batocera/batocera.version" "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
 done
 
+#### md5 and sha256 #######################
+for BATOCERA_PATHSUBTARGET in ${BATOCERA_IMAGES_TARGETS}
+do
+    BATOCERA_SUBTARGET=$(basename "${BATOCERA_PATHSUBTARGET}")
+    for FILE in "${REGLINUX_BINARIES_DIR}/images/"*"/boot-${BATOCERA_SUBTARGET}.tar.zst" "${REGLINUX_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
+    do
+        echo "creating ${FILE}.md5"
+        CKS=$(md5sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
+        echo "${CKS}" > "${FILE}.md5"
+        echo "${CKS}  $(basename "${FILE}")" >> "${REGLINUX_BINARIES_DIR}/MD5SUMS"
+        echo "creating ${FILE}.sha256"
+        CKS=$(sha256sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
+        echo "${CKS}" > "${FILE}.sha256"
+        echo "${CKS}  $(basename "${FILE}")" >> "${REGLINUX_BINARIES_DIR}/SHA256SUMS"
+    done
+done
+
 # Remove lingering GENIMAGE_TMP directory from build after last image
 rm -rf ${GENIMAGE_TMP}
-
-#### md5 and sha256 #######################
-for FILE in "${REGLINUX_BINARIES_DIR}/images/"*"/boot-${BATOCERA_SUBTARGET}.tar.zst" "${REGLINUX_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
-do
-    echo "creating ${FILE}.md5"
-    CKS=$(md5sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
-    echo "${CKS}" > "${FILE}.md5"
-    echo "${CKS}  $(basename "${FILE}")" >> "${REGLINUX_BINARIES_DIR}/MD5SUMS"
-    echo "creating ${FILE}.sha256"
-    CKS=$(sha256sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
-    echo "${CKS}" > "${FILE}.sha256"
-    echo "${CKS}  $(basename "${FILE}")" >> "${REGLINUX_BINARIES_DIR}/SHA256SUMS"
-done
 
 #### update the target dir with some information files
 cp "${TARGET_DIR}/usr/share/batocera/batocera.version" "${REGLINUX_BINARIES_DIR}" || exit 1
