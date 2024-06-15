@@ -584,6 +584,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/vulkan-volk/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/utils/gamescope/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/utils/vkbasalt/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/utils/lgogdownloader/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/utils/wsdd-native/Config.in"
 
