@@ -26,7 +26,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-beetle-wswan
                    libretro-blastem
                    libretro-bluemsx
-                   libretro-boom3
                    libretro-bsnes
                    libretro-bsnes-hd
                    libretro-cap32
@@ -52,6 +51,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-gearsystem
                    libretro-genesisplusgx
                    libretro-genesisplusgx-wide
+                   libretro-geolith
                    libretro-gpsp
                    libretro-gw
                    libretro-handy
@@ -76,7 +76,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-nestopia
                    libretro-nxengine
                    libretro-o2em
-                   libretro-openlara
                    libretro-opera
                    libretro-parallel-n64
                    libretro-pc88
@@ -116,7 +115,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-vemulator
                    libretro-vice
                    libretro-virtualjaguar
-                   libretro-vitaquake2
                    libretro-wasm4
                    libretro-watara
                    libretro-xmil
@@ -143,8 +141,11 @@ PACKAGES_OPENBOR="openbor4432
 PACKAGES_EMULATORS="amiberry
                     applewin
                     bigpemu
+                    box86
+                    box64
                     cemu
                     citra
+                    clk
                     hypseus-singe
                     demul
                     dolphin-emu
@@ -167,10 +168,12 @@ PACKAGES_EMULATORS="amiberry
                     lexaloffle-voxatron
                     lightspark
                     mame
+                    mednafen
                     melonds
                     model2
                     moonlight-embedded
                     openmsx
+                    oricutron
                     pcsx2
                     pifba
                     play
@@ -178,6 +181,8 @@ PACKAGES_EMULATORS="amiberry
                     python-pygame2
                     python-pyxel
                     redream
+                    reglinux-mame
+                    reglinux-scummvm
                     rpcs3
                     ruffle
                     ryujinx
@@ -189,7 +194,6 @@ PACKAGES_EMULATORS="amiberry
                     supermodel
                     supermodel-es
                     sudachi
-                    suyu
                     thextech
                     tsugaru
                     vice
@@ -206,6 +210,7 @@ PACKAGES_PORTS="abuse
                 cgenius
                 corsixth
                 devilutionx
+                dhewm3
                 dxx-rebirth
                 ecwolf
                 eduke32
@@ -219,6 +224,7 @@ PACKAGES_PORTS="abuse
                 ioquake3
                 iortcw
                 openjazz
+                openlara
                 raze
                 sdlpop
                 sonic3-air
@@ -229,6 +235,11 @@ PACKAGES_PORTS="abuse
                 tyrian
                 uqm
                 vcmi
+                yquake2-client
+                yquake2-ctf
+                yquake2-rogue
+                yquake2-xatrix
+                yquake2-zaero
                 hlsdk-xash3d
                 hlsdk-xash3d-dmc
                 hlsdk-xash3d-opfor
@@ -325,7 +336,7 @@ show_help() {
 isFunction() { [[ "$(declare -Ff "$1")" ]]; }
 
 pkg_GETCURVERSION() {
-  X=$(find ./package/batocera/ -name "${1}.mk" -type f 2>/dev/null)
+  X=$(find ./package/batocera/ ./package/reglinux/ -name "${1}.mk" -type f 2>/dev/null)
   if [ ! -e "$X" ]
   then
     echo "not found (run from the top buildroot directory)"
@@ -965,7 +976,7 @@ create_pkg_functions_GitLabFreeDesktop() {
 source_site_eval() {
   for pkg in ${PACKAGES}
   do
-    PACKAGEMKFILE=$(find ./package/batocera/ -name "${pkg}.mk" -type f 2>/dev/null)
+    PACKAGEMKFILE=$(find ./package/batocera/ ./package/reglinux/ -name "${pkg}.mk" -type f 2>/dev/null)
     case "$PACKAGEMKFILE" in
       "" )
         echo "\"${pkg}\" not found!"
@@ -1116,7 +1127,7 @@ source_site_eval() {
               create_pkg_functions_No_Site "${pkg}"
             ;;
             * )
-              echo -e "\n*** UNKNOWN SITE\n  $(find ./package/batocera/ -name "${pkg}.mk" -type f) \n  $TESTSTRING \n***\n"
+              echo -e "\n*** UNKNOWN SITE\n  $(find ./package/batocera/ ./package/reglinux/ -name "${pkg}.mk" -type f) \n  $TESTSTRING \n***\n"
             ;;
           esac
         fi
@@ -1143,7 +1154,7 @@ setPGroups() {
   PGROUPS="$@"
   if test "${PGROUPS}" = "ALL"
   then
-    PACKAGES=$(find ./package/batocera/ -name "*.mk" -type f | grep -vE '/batocera\.mk$' | sed -e s#"^.*/\([^/]*\).mk$"#"\1"# | tr '\n' ' ')
+    PACKAGES=$(find ./package/batocera/ ./package/reglinux/ -name "*.mk" -type f | grep -vE '/batocera\.mk$' | sed -e s#"^.*/\([^/]*\).mk$"#"\1"# | tr '\n' ' ')
     return
   fi
   if test "${PGROUPS}" = "ALLGROUPS"
@@ -1229,7 +1240,7 @@ run() {
 
 base_UPDATE() {
   VARNAMEUPPERCASE="${1^^}"
-  sed -i -e "/^\([ ]*${VARNAMEUPPERCASE//-/_}_VERSION[ ]*=[ ]*\).*$/{s//\1${2}/;:a" -e '$!N;$!ba' -e '}' $(find ./package/batocera/ -name "${1}.mk" -type f)
+  sed -i -e "/^\([ ]*${VARNAMEUPPERCASE//-/_}_VERSION[ ]*=[ ]*\).*$/{s//\1${2}/;:a" -e '$!N;$!ba' -e '}' $(find ./package/batocera/ ./package/reglinux/ -name "${1}.mk" -type f)
 }
 
 run_update() {
