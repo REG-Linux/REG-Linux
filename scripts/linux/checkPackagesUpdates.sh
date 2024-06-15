@@ -51,6 +51,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-gearsystem
                    libretro-genesisplusgx
                    libretro-genesisplusgx-wide
+                   libretro-geolith
                    libretro-gpsp
                    libretro-gw
                    libretro-handy
@@ -114,7 +115,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-vemulator
                    libretro-vice
                    libretro-virtualjaguar
-                   libretro-vitaquake2
                    libretro-wasm4
                    libretro-watara
                    libretro-xmil
@@ -141,8 +141,11 @@ PACKAGES_OPENBOR="openbor4432
 PACKAGES_EMULATORS="amiberry
                     applewin
                     bigpemu
+                    box86
+                    box64
                     cemu
                     citra
+                    clk
                     hypseus-singe
                     demul
                     dolphin-emu
@@ -165,10 +168,12 @@ PACKAGES_EMULATORS="amiberry
                     lexaloffle-voxatron
                     lightspark
                     mame
+                    mednafen
                     melonds
                     model2
                     moonlight-embedded
                     openmsx
+                    oricutron
                     pcsx2
                     pifba
                     play
@@ -176,6 +181,8 @@ PACKAGES_EMULATORS="amiberry
                     python-pygame2
                     python-pyxel
                     redream
+                    reglinux-mame
+                    reglinux-scummvm
                     rpcs3
                     ruffle
                     ryujinx
@@ -187,7 +194,6 @@ PACKAGES_EMULATORS="amiberry
                     supermodel
                     supermodel-es
                     sudachi
-                    suyu
                     thextech
                     tsugaru
                     vice
@@ -204,6 +210,7 @@ PACKAGES_PORTS="abuse
                 cgenius
                 corsixth
                 devilutionx
+                dhewm3
                 dxx-rebirth
                 ecwolf
                 eduke32
@@ -217,6 +224,7 @@ PACKAGES_PORTS="abuse
                 ioquake3
                 iortcw
                 openjazz
+                openlara
                 raze
                 sdlpop
                 sonic3-air
@@ -227,6 +235,11 @@ PACKAGES_PORTS="abuse
                 tyrian
                 uqm
                 vcmi
+                yquake2-client
+                yquake2-ctf
+                yquake2-rogue
+                yquake2-xatrix
+                yquake2-zaero
                 hlsdk-xash3d
                 hlsdk-xash3d-dmc
                 hlsdk-xash3d-opfor
