@@ -1,7 +1,12 @@
 // Common parameter
 console=ttyS0,115200
-init=/init
-bootdelay=0
+knl_name=/boot/linux
+init=/boot/initrd.gz
+mmc_rootfstype=ext4
+root=/dev/mmcblk0p5
+rootfs=/dev/mmcblk0p5
+mmc_rootfs=/dev/mmcblk0p5
+bootargs=initrd=/boot/initrd.gz label=REGLINUX root=/dev/mmcblk0p5 rootwait rootfstype=ext4 quiet loglevel=0 console=ttyS0,115200 console=tty3 vt.global_cursor_default=0
+bootdelay=5
 loglevel=8
-
 
