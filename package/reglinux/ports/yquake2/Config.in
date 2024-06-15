@@ -3,3 +3,16 @@
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-rogue/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-ctf/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/yquake2/yquake2-zaero/Config.in"
+
+config BR2_PACKAGE_YQUAKE2
+        bool "yquake2"
+	select BR2_PACKAGE_YQUAKE2_CLIENT
+	select BR2_PACKAGE_YQUAKE2_XATRIX
+	select BR2_PACKAGE_YQUAKE2_ROGUE
+	select BR2_PACKAGE_YQUAKE2_CTF
+	select BR2_PACKAGE_YQUAKE2_ZAERO
+
+        help
+          Yamagi Quake 2 source port.
+
+          https://www.yamagi.org/quake2/
