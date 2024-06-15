@@ -18,7 +18,7 @@ BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 BR2_KERNEL_HEADERS_AS_KERNEL=y
 BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_1=y
 
-# Kernel - Version: 6.1.y dev
+# Kernel - Version: 6.1.y-vendor
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_GIT=y
 BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/BPI-SINOVOIP/pi-linux.git"
@@ -27,10 +27,14 @@ BR2_LINUX_KERNEL_DEFCONFIG="k1"
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/linux-defconfig-fragment.config $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/bananapi-f3/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_INSTALL_TARGET=y
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
+# Vendor-specific FIT kernel image format (until mainline)
+BR2_LINUX_KERNEL_IMAGE_TARGET_CUSTOM=y
+BR2_LINUX_KERNEL_IMAGE_TARGET_NAME="Image.itb"
+BR2_LINUX_KERNEL_IMAGE_NAME="Image.itb"
 
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
-BR2_LINUX_KERNEL_INTREE_DTS_NAME="spacemit/k1-x_evb spacemit/k1-x_MINI-PC spacemit/k1-x_MUSE-N1 spacemit/k1-x_MUSE-Pi"
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="spacemit/k1-x_deb1 spacemit/k1-x_deb2 spacemit/k1-x_evb spacemit/k1-x_hs450 spacemit/k1-x_kx312 spacemit/k1-x_mingo spacemit/k1-x_MUSE-N1 spacemit/k1-x_MUSE-Pi"
 
 # use blob + patched mesa
 BR2_PACKAGE_IMG_GPU_POWERVR=y
