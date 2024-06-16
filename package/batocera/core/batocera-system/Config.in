@@ -1058,7 +1058,7 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 
 	# Yamagi Quake 2 (source port)
 	# Note: Needs CMake work to build on GLES2 + gl4es
-	select BR2_PACKAGE_YQUAKE2			if BR2_PACKAGE_BATOCERA_GLES3
+	select BR2_PACKAGE_YQUAKE2			if BR2_PACKAGE_HAS_LIBGL
 
 	# Quake 3
 	select BR2_PACKAGE_IOQUAKE3			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770		&& \
