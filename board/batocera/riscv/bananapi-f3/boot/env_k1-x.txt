@@ -1,0 +1,11 @@
+// Common parameter
+console=ttyS0,115200
+init=/boot/initrd.lz4
+bootdelay=5
+loglevel=9
+rootfs=/dev/mmcblk0p5
+knl_name=/boot/linux
+dtb=/k1-x_deb1.dtb
+bootargs=rootwait label=REGLINUX
+
+
