@@ -80,7 +80,7 @@ then
         3) 
            # resize the partition
            echo "Step $i: Resizing the partition to 100%" >> "$log"
-           textoutput $i 50 "parted -s -m -f ${DISK} resizepart 4 100%";;
+           textoutput $i 50 "parted -s -m -f ${DISK} resizepart 6 100%";;
         
         5)
            # update the kernel
