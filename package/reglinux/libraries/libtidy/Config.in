@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LIBTIDY
+	bool "libtidy"
+
+	help
+	  HTACG HTML Tidy
+
+	  https://github.com/htacg/tidy-html5

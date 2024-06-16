@@ -1,0 +1,18 @@
+config BR2_PACKAGE_LGOGDOWNLOADER
+	bool "lgogdownloader"
+
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select BR2_PACKAGE_BOOST_FILESYSTEM
+	select BR2_PACKAGE_BOOST_DATE_TIME
+	select BR2_PACKAGE_BOOST_REGEX
+	select BR2_PACKAGE_BOOST_IOSTREAMS
+	select BR2_PACKAGE_JSONCPP
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_LIBTIDY
+	select BR2_PACKAGE_TINYXML2
+	select BR2_PACKAGE_RHASH
+	help
+	  Unofficial GOG downloader
+
+	  https://github.com/Sude-/lgogdownloader

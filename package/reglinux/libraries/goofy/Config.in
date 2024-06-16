@@ -1,5 +1,0 @@
-config BR2_PACKAGE_GOOFY
-	bool "goofy"
-		help
-		Goofy ETC + SSE2NEON
-		https://github.com/rtissera/Goofy
