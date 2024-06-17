@@ -3,8 +3,8 @@
 # libretro-mrboom
 #
 ################################################################################
-# Version: Commits on May 17, 2024
-LIBRETRO_MRBOOM_VERSION = d9695504924344eb681b526d0cc3bb5e3884a32b
+# Version: 5.5 on May 17, 2024
+LIBRETRO_MRBOOM_VERSION = 5.5
 LIBRETRO_MRBOOM_SITE = https://github.com/Javanaise/mrboom-libretro.git
 LIBRETRO_MRBOOM_SITE_METHOD=git
 LIBRETRO_MRBOOM_GIT_SUBMODULES=YES
@@ -14,10 +14,11 @@ ifeq ($(BR2_ARM_FPU_NEON_VFPV4)$(BR2_ARM_FPU_NEON)$(BR2_ARM_FPU_NEON_FP_ARMV8),y
 LIBRETRO_MRBOOM_EXTRA_ARGS = HAVE_NEON=1
 endif
 
+LIBRETRO_MRBOOM_EXTRA_ARGS += SKIP_GIT=1
+
 define LIBRETRO_MRBOOM_BUILD_CMDS
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" \
-	    -C $(@D)/ -f Makefile platform=unix $(LIBRETRO_MRBOOM_EXTRA_ARGS) \
-        GIT_VERSION="-$(shell echo $(LIBRETRO_MRBOOM_VERSION) | cut -c 1-7)"
+	    -C $(@D)/ -f Makefile platform=unix $(LIBRETRO_MRBOOM_EXTRA_ARGS)
 endef
 
 define LIBRETRO_MRBOOM_INSTALL_TARGET_CMDS
