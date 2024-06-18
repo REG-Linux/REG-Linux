@@ -476,7 +476,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 
 	# Amlogic targets
 	default "amlogic/s812"										if BR2_PACKAGE_BATOCERA_TARGET_S812
-	default "amlogic/s905/nanopi-k2 amlogic/s905/odroid-c2 amlogic/s905/s905-tvbox amlogic/s905/lepotato amlogic/s905/kahdas-vim1 amlogic/s905/p201 amlogic/s905/lepotato-v2 amlogic/s905/minix-neo-u1" \
+	default "amlogic/s905/nanopi-k2 amlogic/s905/odroid-c2 amlogic/s905/s905-tvbox amlogic/s905/lepotato amlogic/s905/khadas-vim1 amlogic/s905/p201 amlogic/s905/lepotato-v2 amlogic/s905/minix-neo-u1" \
 													if BR2_PACKAGE_BATOCERA_TARGET_S905
 	default "amlogic/s905gen2/radxa-zero amlogic/s905gen2/khadas-vim2"				if BR2_PACKAGE_BATOCERA_TARGET_S905GEN2
 	default "amlogic/s905gen3/odroid-c4 amlogic/s905gen3/khadas-vim3l amlogic/s905gen3/s905x3-tvbox" \
