@@ -56,6 +56,25 @@ function textoutput()
     return $ret
 }
 
+# Executing parameters and watch background pid
+# Changes text messages parsed to dialog --mixedgauge
+function textoutput_lazy()
+{
+    local cmd="$3"
+    local percent="$2"
+    local pid ret
+    echo "cmd:$cmd" >> "$LOG"
+    $cmd >> "$LOG" 2>&1 &
+    pid=$!
+    arr[$1]=7 #msg: In Progress
+    dialogoutput "$percent"
+    wait $pid
+    ret=$?
+    echo "cmd code:$ret" >> "$LOG"
+    arr[$1]=$ret #msg: Depends from return value
+    return $ret
+}
+
 # only when resizing is wanted
 if grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
     # Preparing text arrays
@@ -89,7 +108,7 @@ if grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
         1) 
            # move backup GPT data structures to the end of the disk
            echo "Step $i: Moving 2nd GPT table to the end of the disk" >> "$LOG"
-           textoutput $i 10 "sgdisk -e ${DISK}"
+           textoutput_lazy $i 10 "sgdisk -e ${DISK}"
            ;;
         3) 
            # resize the partition
