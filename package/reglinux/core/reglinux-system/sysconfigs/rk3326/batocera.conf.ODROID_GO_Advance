@@ -1,0 +1,4 @@
+# odroid-go advance default values
+
+# default sway environment (rotate)
+system.es.environment=sway

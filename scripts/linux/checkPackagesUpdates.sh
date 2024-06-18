@@ -150,7 +150,6 @@ PACKAGES_EMULATORS="amiberry
                     demul
                     dolphin-emu
                     dolphin-triforce
-                    dosbox
                     dosbox-staging
                     dosbox-x
                     drastic
@@ -175,7 +174,6 @@ PACKAGES_EMULATORS="amiberry
                     openmsx
                     oricutron
                     pcsx2
-                    pifba
                     play
                     ppsspp
                     python-pygame2
