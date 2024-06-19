@@ -3,8 +3,8 @@
 # rpcs3
 #
 ################################################################################
-# Version: 0.0.32-16518 - Commits on May 22, 2024
-RPCS3_VERSION = 5d6d42d15d329841155339857f2c76af96a993f6
+# Version: 0.0.32-16614 - Commits on Jun 15, 2024
+RPCS3_VERSION = 5b973448bf75a239f34fd9c7698c8a02b04e2ea9
 RPCS3_SITE = https://github.com/RPCS3/rpcs3.git
 RPCS3_SITE_METHOD=git
 RPCS3_GIT_SUBMODULES=YES
@@ -23,18 +23,19 @@ RPCS3_CONF_OPTS += -DUSE_NATIVE_INSTRUCTIONS=OFF
 RPCS3_CONF_OPTS += -DLLVM_DIR=$(STAGING_DIR)/usr/lib/cmake/llvm/
 RPCS3_CONF_OPTS += -DUSE_PRECOMPILED_HEADERS=OFF
 RPCS3_CONF_OPTS += -DSTATIC_LINK_LLVM=OFF
-RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF
+RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=ON
 RPCS3_CONF_OPTS += -DUSE_SYSTEM_CURL=ON
 RPCS3_CONF_OPTS += -DUSE_SYSTEM_LIBUSB=ON
 RPCS3_CONF_OPTS += -DUSE_LIBEVDEV=ON
-RPCS3_CONF_OPTS += -DUSE_SYSTEM_FAUDIO=OFF
+RPCS3_CONF_OPTS += -DUSE_SYSTEM_FAUDIO=ON
+RPCS3_CONF_OPTS += -DUSE_SYSTEM_SDL=ON
 # this is ugly, but necessary... for now...
-RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVCODEC=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavcodec.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVFORMAT=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavformat.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVUTIL=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavutil.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWSCALE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswscale.a
-RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWRESAMPLE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswresample.a
+#RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVCODEC=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavcodec.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVFORMAT=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavformat.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVUTIL=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavutil.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWSCALE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswscale.a
+#RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWRESAMPLE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswresample.a
 
 RPCS3_CONF_ENV = LIBS="-ncurses -ltinfo"
 
