@@ -15,7 +15,7 @@ SOLARUS_ENGINE_LICENSE_FILES = license.txt
 # Install libsolarus.so
 SOLARUS_ENGINE_INSTALL_STAGING = YES
 
-SOLARUS_ENGINE_DEPENDENCIES += batocera-luajit glm libmodplug libogg libvorbis
+SOLARUS_ENGINE_DEPENDENCIES += reglinux-luajit glm libmodplug libogg libvorbis
 SOLARUS_ENGINE_DEPENDENCIES += openal physfs sdl2 sdl2_image sdl2_ttf
 
 # Disable launcher GUI (requires Qt5)
