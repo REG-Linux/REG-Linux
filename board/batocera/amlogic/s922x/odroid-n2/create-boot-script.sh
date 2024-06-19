@@ -21,12 +21,12 @@ cd "${REGLINUX_BINARIES_DIR}/build-uboot-odroidn2/" && ./build-uboot.sh "${HOST_
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
 
-cp "${BINARIES_DIR}/Image"           "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
-cp "${BINARIES_DIR}/initrd.lz4"      "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
-cp "${BINARIES_DIR}/rootfs.squashfs" "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
-cp "${BINARIES_DIR}/modules"         "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
-cp "${BINARIES_DIR}/firmware"        "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
-cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
+cp "${BINARIES_DIR}/Image"              "${REGLINUX_BINARIES_DIR}/boot/boot/linux"              || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.lz4"    "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"         || exit 1
+cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update"    || exit 1
+cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"     || exit 1
+cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
+cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"      || exit 1
 
 cp "${BOARD_DIR}/boot/boot.ini"                    "${REGLINUX_BINARIES_DIR}/boot/boot/boot.ini"                 || exit 1
 cp "${BINARIES_DIR}/meson-g12b-odroid-n2.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/meson-g12b-odroid-n2.dtb" || exit 1

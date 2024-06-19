@@ -1,0 +1,55 @@
+---
+ modules.d/05busybox-rootfs/module-setup.sh | 42 ++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+ create mode 100755 modules.d/05busybox-rootfs/module-setup.sh
+
+diff --git a/modules.d/05busybox-rootfs/module-setup.sh b/modules.d/05busybox-rootfs/module-setup.sh
+new file mode 100755
+index 0000000..f66caa7
+--- /dev/null
++++ b/modules.d/05busybox-rootfs/module-setup.sh
+@@ -0,0 +1,42 @@
++#!/bin/bash
++
++# called by dracut
++check() {
++    require_binaries busybox || return 1
++
++    return 255
++}
++
++# called by dracut
++depends() {
++    return 0
++}
++
++# called by dracut
++install() {
++    local _i _busybox
++    local _bin=("[" "[[" "arch" "ascii" "ash" "base32" "bc"
++                "blkdiscard" "bzcat" "cat" "cp" "crc32" "dmesg"
++                "dnsdomainname" "echo" "egrep" "factor" "fallocate"
++                "fgrep" "hexedit" "link" "linux32" "linux64" "ls"
++                "lsscsi" "lzcat" "mkdir" "mkpasswd" "mount" "mv" "nl"
++                "nproc" "nsenter" "paste" "resume" "rm" "setfattr" "setpriv"
++                "sh" "shred" "sleep" "ssl_client" "svc" "svok" "test" "tree"
++                "ts" "tsort" "umount" "unshare" "xxd" "xzcat" "zcat")
++    local _sbin=("fsfreeze" "i2ctransfer" "ifdown" "ifup" "ipneigh" "mim"
++                "mkdosfs" "mke2fs" "nologin" "partprobe" "poweroff" "reboot"
++                "run-init" "seedrng" "swapoff" "swapon" "switch_root" "ubirename")
++
++    _busybox=$(find_binary busybox)
++    inst "$_busybox" /bin/busybox
++    inst /init /init
++    ln_r /bin/busybox /linuxrc
++
++    for _i in "${_bin[@]}"; do
++        ln_r /bin/busybox /bin/"$_i"
++    done
++
++    for _i in "${_sbin[@]}"; do
++        ln_r /bin/busybox /bin/"$_i"
++    done
++}
+--
+2.45.2
