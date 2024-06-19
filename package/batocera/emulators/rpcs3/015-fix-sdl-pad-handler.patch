@@ -1,0 +1,11 @@
+--- a/rpcs3/Input/sdl_pad_handler.h	2024-06-19 17:26:24.503586084 +0200
++++ b/rpcs3/Input/sdl_pad_handler.h	2024-06-19 17:27:45.433214161 +0200
+@@ -3,7 +3,7 @@
+ #ifdef HAVE_SDL2
+ 
+ #include "Emu/Io/PadHandler.h"
+-#include "SDL.h"
++#include "SDL2/SDL.h"
+ 
+ class SDLDevice : public PadDevice
+ {
