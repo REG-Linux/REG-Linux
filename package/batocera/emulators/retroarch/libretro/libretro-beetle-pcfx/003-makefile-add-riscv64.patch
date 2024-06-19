@@ -1,0 +1,18 @@
+--- a/Makefile	2024-06-19 22:35:32.370563196 +0200
++++ b/Makefile	2024-06-19 22:36:19.783610419 +0200
+@@ -189,6 +189,15 @@
+    FLAGS += -mcpu=cortex-a75
+    ASFLAGS += -mcpu=cortex-a75
+ 
++else ifneq (,$(findstring riscv64,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++
+ # iOS
+ else ifneq (,$(findstring ios,$(platform)))
+ 

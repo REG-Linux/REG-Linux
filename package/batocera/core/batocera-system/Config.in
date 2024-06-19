@@ -159,9 +159,6 @@ config BR2_PACKAGE_REGLINUX_VULKAN
 config BR2_PACKAGE_BATOCERA_SYSTEM
 	bool "batocera.linux minimal"
 
-	# RISC-V support needs a hack here to declare as RV64GC, needed for Rust
-	#select BR2_RISCV_ISA_RVC			if BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2 || BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
-
 	# minimal system required packages
 	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
@@ -310,6 +307,10 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 							   BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # piboy rpi3/rpi4
 	select BR2_PACKAGE_PICADE			if BR2_PACKAGE_BATOCERA_RPI_ANY # picade arcade case
 	select BR2_PACKAGE_PIRONMAN			if BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # pironman case is rpi4 only
+
+	# LUA
+	select BR2_PACKAGE_LUA
+	select BR2_PACKAGE_LUA_5_4
 
 	# screens
 	#nope select BR2_PACKAGE_DMD_SIMULATOR
@@ -789,7 +790,8 @@ config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
 	select BR2_PACKAGE_BATOCERA_PYGAME	if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# RPG engine : Solarus
-	select BR2_PACKAGE_SOLARUS_ENGINE	if !BR2_PACKAGE_BATOCERA_TARGET_CHA && !BR2_RISCV_64 # LuajIT does not support riscv ?
+	# Note: experimental LuaJIT RISC-V 64 support
+	select BR2_PACKAGE_SOLARUS_ENGINE	if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# RPG engine : EasyRPG / RPG MAker
 	select BR2_PACKAGE_EASYRPG_PLAYER	if !BR2_PACKAGE_BATOCERA_TARGET_CHA # standalone
@@ -1248,7 +1250,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_BATOCERA_SEGADC
 
 	# PSX
-	# newer versions of duckstation stricter on OpenGL ES 3.x, RISC-V+QT6 fails, no more support for KMS/DRM
+	# newer versions of duckstation stricter on OpenGL ES 3.x, no more support for KMS/DRM
 	select BR2_PACKAGE_DUCKSTATION			if (!BR2_mipsel) && (!BR2_arm) && BR2_PACKAGE_BATOCERA_GLES3 \
 							   && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 \
 							   && !BR2_PACKAGE_BATOCERA_TARGET_S9GEN4 \
@@ -1345,7 +1347,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 
 	# NEC PC-FX
 	# Note : We need to fix this package once for good instead of disabling / patching / hacking (x86 asm wronly triggered)
-	select BR2_PACKAGE_LIBRETRO_BEETLE_PCFX		if !BR2_mipsel && !BR2_RISCV_64			&& \
+	select BR2_PACKAGE_LIBRETRO_BEETLE_PCFX		if !BR2_mipsel					&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2837		&& \
