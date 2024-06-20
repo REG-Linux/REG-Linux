@@ -1,0 +1,89 @@
+// SPDX-License-Identifier: GPL-2.0 OR MIT
+/*
+ * Copyright (C) 2022 StarFive Technology Co., Ltd.
+ * Copyright (C) 2022 Emil Renner Berthing <kernel@esmil.dk>
+ */
+
+/dts-v1/;
+#include "starfive/jh7110-starfive-visionfive-2.dtsi"
+
+/ {
+	model = "Milk-V Mars";
+	compatible = "milk-v,mars", "starfive,jh7110";
+
+	gpio-restart {
+		compatible = "gpio-restart";
+		gpios = <&sysgpio 35 GPIO_ACTIVE_HIGH>;
+		priority = <160>;
+	};
+
+};
+
+&phy0 {
+		rgmii_sw_dr_2 = <0x0>;
+		rgmii_sw_dr = <0x3>;
+		rgmii_sw_dr_rxc = <0x6>;
+		rxc_dly_en = <0>;
+		rx_delay_sel = <0xa>;
+		tx_delay_sel_fe = <5>;
+		tx_delay_sel = <0xa>;
+		tx_inverted_10 = <0x1>;
+		tx_inverted_100 = <0x1>;
+		tx_inverted_1000 = <0x1>;
+};
+
+&phy1 {
+		rgmii_sw_dr_2 = <0x0>;
+		rgmii_sw_dr = <0x3>;
+		rgmii_sw_dr_rxc = <0x6>;
+		tx_delay_sel_fe = <5>;
+		tx_delay_sel = <0>;
+		rxc_dly_en = <0>;
+		rx_delay_sel = <0x2>;
+		tx_inverted_10 = <0x1>;
+		tx_inverted_100 = <0x1>;
+		tx_inverted_1000 = <0x0>;
+};
+
+&gmac0 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+};
+
+&gmac1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+};
+
+/*&gmac0 {
+	starfive,tx-use-rgmii-clk;
+	assigned-clocks = <&aoncrg JH7110_AONCLK_GMAC0_TX>;
+	assigned-clock-parents = <&aoncrg JH7110_AONCLK_GMAC0_RMII_RTX>;
+};
+
+&gmac1 {
+	starfive,tx-use-rgmii-clk;
+	assigned-clocks = <&syscrg JH7110_SYSCLK_GMAC1_TX>;
+	assigned-clock-parents = <&syscrg JH7110_SYSCLK_GMAC1_RMII_RTX>;
+};
+
+&phy0 {
+	motorcomm,tx-clk-adj-enabled;
+	motorcomm,tx-clk-100-inverted;
+	motorcomm,tx-clk-1000-inverted;
+	motorcomm,rx-clk-drv-microamp = <3970>;
+	motorcomm,rx-data-drv-microamp = <2910>;
+	rx-internal-delay-ps = <1500>;
+	tx-internal-delay-ps = <1500>;
+};
+
+&phy1 {
+	motorcomm,tx-clk-adj-enabled;
+	motorcomm,tx-clk-100-inverted;
+	motorcomm,rx-clk-drv-microamp = <3970>;
+	motorcomm,rx-data-drv-microamp = <2910>;
+	rx-internal-delay-ps = <300>;
+	tx-internal-delay-ps = <0>;
+};*/

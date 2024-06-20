@@ -31,6 +31,7 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="starfive/jh7110-starfive-visionfive-2-v1.2a starfive/jh7110-starfive-visionfive-2-v1.3b"
+BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/visionfive2/dts/jh7110-milkv-mars.dts"
 
 # use blob + patched mesa
 BR2_PACKAGE_IMG_GPU_POWERVR=y
