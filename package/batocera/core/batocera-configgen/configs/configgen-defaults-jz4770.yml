@@ -11,6 +11,9 @@ amiga1200:
 amigacd32:
   emulator: libretro
   core:     puae
+atari2600:
+  emulator: libretro
+  core:     stella2014
 mastersystem:
   emulator: libretro
   core:     picodrive
