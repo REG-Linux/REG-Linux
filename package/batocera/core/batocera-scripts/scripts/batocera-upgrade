@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Get latest release from GitHub
+get_latest_release() {
+  curl --silent "https://api.github.com/repos/$1/releases/latest" | # Get latest release from GitHub api
+    grep '"tag_name":' |                                            # Get tag line
+    sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+}
+
 # Create upgrade messages for the badge (TERMINAL=0) or plain text output
 do_upgmsg() {
     if [ $TERMINAL -eq 0 ]; then
@@ -11,7 +18,8 @@ do_upgmsg() {
 }
 
 do_badgeines() {
-    TARVAL=$1
+    BOARD=$1
+    TARVAL=$2
     COUNT=0
     while true
     do
@@ -22,7 +30,7 @@ do_badgeines() {
             COUNT=$((COUNT+5))
             sleep 0.1
         else
-            CURVAL=$(stat --printf="%s" "/userdata/system/upgrade/boot.tar.zst")
+            CURVAL=$(stat --printf="%s" "/userdata/system/upgrade/boot-${BOARD}.tar.zst")
             CURVAL=$((CURVAL / 1024 / 1024))
             PER=$((CURVAL * 100 / TARVAL))
             echo "$CURVAL of $TARVAL MB downloaded ... >>> ${PER}%"
@@ -36,53 +44,77 @@ echo "Starting the upgrade..."
 
 # --- Prepare update URLs ---
 
-updateurl="https://updates.reglinux.org"
-
 board=$(cat /boot/boot/batocera.board)
 oldboard="$board"
 updatetype="$(/usr/bin/batocera-settings-get updates.type)"
-settingsupdateurl="$(/usr/bin/batocera-settings-get updates.url)"
 
+
+# REG we do NOT support that
 # customizable upgrade url website
-test -n "${settingsupdateurl}" && updateurl="${settingsupdateurl}"
+# settingsupdateurl="$(/usr/bin/batocera-settings-get updates.url)"
+# test -n "${settingsupdateurl}" && updateurl="${settingsupdateurl}"
 
 # force a default value in case the value is removed or miswritten
 test "${updatetype}" != "stable" -a "${updatetype}" != "dev" && updatetype="stable"
 
-# custom the url directory
-DWD_HTTP_DIR="${updateurl}/${updatetype}/${board}/"
+if [ "${updatetype}" = "dev" ]; then
+	# Build up URL
+	DWD_HTTP_DIR="https://updates.reglinux.org/${updatetype}/${board}/"
 
-# custom CLI url
-test $# -eq 1 && DWD_HTTP_DIR="$1"
+	# REG we do NOT support that
+	# custom CLI url
+	# test $# -eq 1 && DWD_HTTP_DIR="$1"
 
-# started from Terminal/SSH (TERMINAL=1) or from ES (TERMINAL=0)
-[ -t 1 ] && TERMINAL=1 || TERMINAL=0
+	# started from Terminal/SSH (TERMINAL=1) or from ES (TERMINAL=0)
+	[ -t 1 ] && TERMINAL=1 || TERMINAL=0
 
-# --- Prepare file downloads ---
+	# --- Prepare file downloads ---
 
-# Check if "manual" argument is provided
-if [ "$1" == "manual" ]; then
-    # Check if the local file exists
-    if [ -f "/userdata/system/upgrade/boot.tar.zst" ]; then
-        size=$(du -m "/userdata/system/upgrade/boot.tar.zst" | awk '{print $1}')
-        echo "Using local file: /userdata/system/upgrade/boot.tar.zst (${size}MB)"
-    else
-        echo "Error: Local file /userdata/system/upgrade/boot.tar.zst not found."
-        exit 1
-    fi
+	# Check if "manual" argument is provided
+	if [ "$1" == "manual" ]; then
+		# Check if the local file exists
+		if [ -f "/userdata/system/upgrade/boot-${board}.tar.zst" ]; then
+			size=$(du -m "/userdata/system/upgrade/boot-${board}.tar.zst" | awk '{print $1}')
+			echo "Using local file: /userdata/system/upgrade/boot-${board}.tar.zst (${size}MB)"
+		else
+			echo "Error: Local file /userdata/system/upgrade/boot-${board}.tar.zst not found."
+			exit 1
+		fi
+	else
+		# download directory
+		mkdir -p /userdata/system/upgrade || exit 1
+
+		# get size to download
+		url="${DWD_HTTP_DIR}/boot-${board}.tar.zst"
+		echo "url: ${url}"
+		headers=$(curl -A "batocera-upgrade.header" -sfIL "${url}")
+		test $? -eq 0 || exit 1
+		size=$(echo "$headers" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
+		size=$((size / 1024 / 1024))
+		test $? -eq 0 || exit 1
+		echo "need to download ${size}mb"
+	fi
 else
-    # download directory
-    mkdir -p /userdata/system/upgrade || exit 1
+	latestrelease=`get_latest_release "REG-Linux/REG-Linux"`
+	# Build up URL
+	DWD_HTTP_DIR="https://github.com/REG-Linux/REG-Linux/releases/download/${latestrelease}"
+	# started from Terminal/SSH (TERMINAL=1) or from ES (TERMINAL=0)
+	[ -t 1 ] && TERMINAL=1 || TERMINAL=0
 
-    # get size to download
-    url="${DWD_HTTP_DIR}/boot.tar.zst"
-    echo "url: ${url}"
-    headers=$(curl -A "batocera-upgrade.header" -sfIL "${url}")
-    test $? -eq 0 || exit 1
-    size=$(echo "$headers" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
-    size=$((size / 1024 / 1024))
-    test $? -eq 0 || exit 1
-    echo "need to download ${size}mb"
+	# TODO write code for comparing current release (batocera.version against latest_release and GitHub release download
+
+	# download directory
+	mkdir -p /userdata/system/upgrade || exit 1
+
+	# get size to download
+	url="${DWD_HTTP_DIR}/boot-${board}.tar.zst"
+	echo "url: ${url}"
+	headers=$(curl -A "batocera-upgrade.header" -sfIL "${url}")
+	test $? -eq 0 || exit 1
+	size=$(echo "$headers" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
+	size=$((size / 1024 / 1024))
+	test $? -eq 0 || exit 1
+	echo "need to download ${size}mb"
 fi
 
 # Check free space on /userdata
@@ -102,26 +134,26 @@ done
 if [ "$1" != "manual" ]; then
     if [ $TERMINAL -eq 0 ]; then
         # download inside ES with badge
-        touch "/userdata/system/upgrade/boot.tar.zst"
-        do_badgeines "${size}" &
+        touch "/userdata/system/upgrade/boot-${board}.tar.zst"
+        do_badgeines "${board}" "${size}" &
         GETPERPID=$!
-        curl -A "batocera-upgrade" -sfL "${url}" -o "/userdata/system/upgrade/boot.tar.zst" || exit 1
+        curl -A "batocera-upgrade" -sfL "${url}" -o "/userdata/system/upgrade/boot-${board}.tar.zst" || exit 1
         do_upgmsg "Calculating md5 checksum ..."
     else
         # download inside SSH or terminal
-        curl -A "batocera-upgrade" -fL "${url}" -o "/userdata/system/upgrade/boot.tar.zst" || exit 1
+        curl -A "batocera-upgrade" -fL "${url}" -o "/userdata/system/upgrade/boot-${board}.tar.zst" || exit 1
         echo "Check proper file download, checking md5sum - please wait"
     fi
 fi
 
 # try to download an md5 checksum
 if [ "$1" != "manual" ]; then
-    curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "/userdata/system/upgrade/boot.tar.zst.md5"
+    curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "/userdata/system/upgrade/boot-${board}.tar.zst.md5"
 fi
-if test -e "/userdata/system/upgrade/boot.tar.zst.md5"
+if test -e "/userdata/system/upgrade/boot-${board}.tar.zst.md5"
 then
-    DISTMD5=$(cat "/userdata/system/upgrade/boot.tar.zst.md5")
-    CURRMD5=$(md5sum "/userdata/system/upgrade/boot.tar.zst" | sed -e s+' .*$'++)
+    DISTMD5=$(cat "/userdata/system/upgrade/boot-${board}.tar.zst.md5")
+    CURRMD5=$(md5sum "/userdata/system/upgrade/boot-${board}.tar.zst" | sed -e s+' .*$'++)
     if test "${DISTMD5}" = "${CURRMD5}"
     then
         do_upgmsg "Checksum validated ..." 2
