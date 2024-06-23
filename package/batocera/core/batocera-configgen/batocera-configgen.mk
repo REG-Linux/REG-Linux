@@ -105,7 +105,9 @@ endef
 define BATOCERA_CONFIGGEN_BINS
     chmod a+x $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py
 	(mkdir -p $(TARGET_DIR)/usr/bin/ && cd $(TARGET_DIR)/usr/bin/ && \
-	    ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher)
+	    ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher.py)
+	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/emulatorlauncher.sh \
+	    $(TARGET_DIR)/usr/bin/emulatorlauncher
 endef
 
 define BATOCERA_CONFIGGEN_ES_HOOKS

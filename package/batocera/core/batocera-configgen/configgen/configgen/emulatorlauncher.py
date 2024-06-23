@@ -76,7 +76,7 @@ def squashfs_end(rommountpoint):
     # umount
     return_code = subprocess.call(["umount", rommountpoint])
     if return_code != 0:
-        eslog.debug(f"squashfs_begin: unmounting {rommountpoint} failed")
+        eslog.debug(f"squashfs_end: unmounting {rommountpoint} failed")
         raise Exception(f"unable to umount the file {rommountpoint}")
 
     # cleaning the empty directory
@@ -85,18 +85,23 @@ def squashfs_end(rommountpoint):
 def main(args, maxnbplayers):
     # squashfs roms if squashed
     extension = os.path.splitext(args.rom)[1][1:].lower()
-    if extension == "squashfs":
-        exitCode = 0
-        need_end = False
-        try:
-            need_end, rommountpoint, rom = squashfs_begin(args.rom)
-            exitCode = start_rom(args, maxnbplayers, rom, args.rom)
-        finally:
-            if need_end:
-                squashfs_end(rommountpoint)
-        return exitCode
-    else:
+    if args.command == "start":
+        if extension == "squashfs":
+            exitCode = 0
+            need_end = False
+            try:
+                need_end, rommountpoint, rom = squashfs_begin(args.rom)
+                exitCode = start_rom(args, maxnbplayers, rom, args.rom)
+            finally:
+                return exitCode
         return start_rom(args, maxnbplayers, args.rom, args.rom)
+    if args.command == "stop":
+        if extension == "squashfs":
+            exitCode = 0
+            squashfs_end(rommountpoint)
+            return exitCode
+        return stop_rom(args, maxnbplayers, args.rom, args.rom)
+    return exitCode
 
 sway_launched = False
 weston_launched = False
@@ -349,15 +354,50 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
             if profiler:
                 profiler.disable()
             exitCode = runCommand(cmd)
-            if profiler:
-                profiler.enable()
         finally:
-            Evmapy.stop()
+
+    finally:
+
+    # exit
+    return exitCode
+
+def stop_rom(args, maxnbplayers, rom, romConfiguration):
+    global profiler
+
+    # find the system to run
+    systemName = args.system
+    eslog.debug(f"Stopping system: {systemName}")
+    system = Emulator(systemName, romConfiguration)
+
+    if args.emulator is not None:
+        system.config["emulator"] = args.emulator
+        system.config["emulator-forced"] = True
+    if args.core is not None:
+        system.config["core"] = args.core
+        system.config["core-forced"] = True
+    debugDisplay = system.config.copy()
+    if "retroachievements.password" in debugDisplay:
+        debugDisplay["retroachievements.password"] = "***"
+    eslog.debug(f"Settings: {debugDisplay}")
+    if "emulator" in system.config and "core" in system.config:
+        eslog.debug("emulator: {}, core: {}".format(system.config["emulator"], system.config["core"]))
+    else:
+        if "emulator" in system.config:
+            eslog.debug("emulator: {}".format(system.config["emulator"]))
+
+    # find the generator
+    generator = GeneratorImporter.getGenerator(system.config['emulator'])
+
+    resolutionChanged = False
+    mouseChanged = False
+    exitCode = -1
+    try:
+        profiler.enable()
+        Evmapy.stop()
 
         # kill the running compositor if needed
         if generator.requiresWayland() or generator.requiresX11():
             stop_compositor(generator, system)
-
 
         # run a script after emulator shuts down
         callExternalScripts("/userdata/system/scripts", "gameStop", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
@@ -666,6 +706,7 @@ if __name__ == '__main__':
         parser.add_argument("-p{}nbhats"    .format(p), help="player{} controller number of hats"   .format(p), type=str, required=False)
         parser.add_argument("-p{}nbaxes"    .format(p), help="player{} controller number of axes"   .format(p), type=str, required=False)
 
+    parser.add_argument("-command",        help="can be either start or stop", type=str, required=True)
     parser.add_argument("-system",         help="select the system to launch", type=str, required=True)
     parser.add_argument("-rom",            help="rom absolute path",           type=str, required=True)
     parser.add_argument("-emulator",       help="force emulator",              type=str, required=False)
