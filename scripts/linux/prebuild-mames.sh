@@ -27,7 +27,7 @@ sed -i s/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/BR2_PACKAGE_MAME_BUILD_FROM_SOURC
 # h5 can be used for h6, h616, s905, s905gen2, rk3328 (cortex_a53)
 # s905gen3 can be used for rk3566/rk3568 (cortex_a55)
 # s922x can be used for a3gen2 (cortex_a73_a53)
-for arch in s812 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x saphira visionfive2 bpif3 x86_64 x86_64_v3; do
+for arch in s812 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x saphira jh7110 k1 x86_64 x86_64_v3; do
 	# Clean
 	make ${arch}-clean
 	# Build
