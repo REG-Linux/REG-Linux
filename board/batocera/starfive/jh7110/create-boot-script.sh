@@ -27,6 +27,7 @@ cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/resc
 
 cp "${BINARIES_DIR}/jh7110-starfive-visionfive-2-v1.2a.dtb" "${REGLINUX_BINARIES_DIR}/boot/dtbs/starfive/" || exit 1
 cp "${BINARIES_DIR}/jh7110-starfive-visionfive-2-v1.3b.dtb" "${REGLINUX_BINARIES_DIR}/boot/dtbs/starfive/" || exit 1
+cp "${BINARIES_DIR}/jh7110-milkv-mars.dtb"                  "${REGLINUX_BINARIES_DIR}/boot/dtbs/starfive/" || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"                        "${REGLINUX_BINARIES_DIR}/boot/extlinux/"      || exit 1
 
 exit 0

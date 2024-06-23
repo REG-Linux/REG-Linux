@@ -5,13 +5,13 @@ BR2_riscv=y
 BR2_RISCV_64=y
 BR2_RISCV_ISA_RVC=y
 BR2_riscv_g=y
-BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2=y
+BR2_PACKAGE_BATOCERA_TARGET_JH7110=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mabi=lp64d -mcpu=sifive-u74"
 BR2_BINUTILS_VERSION_2_41_X=y
 #BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/visionfive2/patches"
-BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/visionfive2/fsoverlay"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/starfive/jh7110/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/starfive/jh7110/fsoverlay"
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 
 # Linux headers same as kernel, a 6.6 series
@@ -23,15 +23,15 @@ BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="$(call github,starfive-tech,linux,22919f9dcd75788d1a38d0884e060bc6f4389937)/linux-22919f9dcd75788d1a38d0884e060bc6f4389937.tar.gz"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/linux-defconfig.config"
-BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/linux-defconfig-fragment.config $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/visionfive2/linux-defconfig-fragment.config"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/starfive/jh7110/linux-defconfig.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/starfive/jh7110/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_INSTALL_TARGET=y
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="starfive/jh7110-starfive-visionfive-2-v1.2a starfive/jh7110-starfive-visionfive-2-v1.3b"
-BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/riscv/visionfive2/dts/jh7110-milkv-mars.dts"
+BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/starfive/jh7110/dts/jh7110-milkv-mars.dts"
 
 # use blob + patched mesa
 BR2_PACKAGE_IMG_GPU_POWERVR=y
