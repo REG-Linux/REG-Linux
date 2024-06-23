@@ -147,6 +147,9 @@ do
     # dbus launch is required for the gio/gvfs/trash:///...
     eval "$(dbus-launch --sh-syntax --exit-with-session)"
 
+    # Stop splash
+    /etc/init.d/S00plymouth stop
+
     cd /userdata # es need a PWD
     %REGLINUX_EMULATIONSTATION_PREFIX% emulationstation ${GAMELAUNCHOPT} --exit-on-reboot-required %REGLINUX_EMULATIONSTATION_ARGS% ${CUSTOMESOPTIONS}
 
