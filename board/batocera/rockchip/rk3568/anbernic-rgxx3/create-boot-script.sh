@@ -20,18 +20,18 @@ cd "${REGLINUX_BINARIES_DIR}/build-uboot-anbernic-rgxx3/" && ./build-uboot.sh "$
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot/extlinux" || exit 1
 
-cp "${BINARIES_DIR}/Image"                       "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
-cp "${BINARIES_DIR}/initrd.lz4"                  "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
-cp "${BINARIES_DIR}/rootfs.squashfs"             "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
-cp "${BINARIES_DIR}/modules"                     "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
-cp "${BINARIES_DIR}/firmware"                    "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
-cp "${BINARIES_DIR}/rescue"                      "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
+cp "${BINARIES_DIR}/Image"              "${REGLINUX_BINARIES_DIR}/boot/boot/linux"              || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.lz4"    "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"         || exit 1
+cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update"    || exit 1
+cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"     || exit 1
+cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
+cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"      || exit 1
 
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353p.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353p-linux.dtb"     || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353v.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353v-linux.dtb"     || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353v-v2.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353v-v2-linux.dtb"     || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353vs.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353vs-linux.dtb"     || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg503.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg503-linux.dtb"     || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353p.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353p-linux.dtb"    || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353v.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353v-linux.dtb"    || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353v-v2.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353v-v2-linux.dtb" || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353vs.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353vs-linux.dtb"   || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg503.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg503-linux.dtb"     || exit 1
 
 cp "${BOARD_DIR}/boot/extlinux.conf"        "${REGLINUX_BINARIES_DIR}/boot/boot/extlinux/" || exit 1
 
