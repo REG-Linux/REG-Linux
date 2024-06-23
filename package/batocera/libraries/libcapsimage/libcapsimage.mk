@@ -34,7 +34,7 @@ define LIBCAPSIMAGE_INSTALL_STAGING_CMDS
 	mkdir -p $(STAGING_DIR)/usr/lib/capsimage
 	cp $(@D)/capsimg_source_linux_macosx/CAPSImg/libcapsimage.so.5.1 \
 		$(STAGING_DIR)/usr/lib
-	ln -sf $(STAGING_DIR)/usr/lib/libcapsimage.so.5.1 $(STAGING_DIR)/usr/lib/libcapsimage.so
+	ln -sf libcapsimage.so.5.1 $(STAGING_DIR)/usr/lib/libcapsimage.so
 endef
 
 define LIBCAPSIMAGE_INSTALL_TARGET_CMDS
@@ -42,7 +42,7 @@ define LIBCAPSIMAGE_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/lib/capsimage
 	cp $(@D)/capsimg_source_linux_macosx/CAPSImg/libcapsimage.so.5.1 \
 		$(TARGET_DIR)/usr/lib
-	ln -sf /usr/lib/libcapsimage.so.5.1 $(TARGET_DIR)/usr/lib/libcapsimage.so.5
+	ln -sf libcapsimage.so.5.1 $(TARGET_DIR)/usr/lib/libcapsimage.so.5
 
 	# FS-UAE specific install
 	mkdir -p $(TARGET_DIR)/usr/share/fs-uae/Plugins
