@@ -6,7 +6,13 @@ BOOTCONF="/boot/batocera-boot.conf"
 
 case "$1" in
 	start)
-		/etc/init.d/S02plymouth stop
+		# Save the boot log to file and stop splash
+		if [ -x /usr/bin/plymouth ] && /usr/bin/plymouth --ping
+		then
+			/usr/bin/plymouth update-root-fs --read-write
+			/usr/bin/plymouth --quit
+		fi
+
 		enabled="$(/usr/bin/batocera-settings-get system.es.atstartup)"
 		if [ "$enabled" != "0" ]; then
 			environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
