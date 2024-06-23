@@ -16,18 +16,18 @@ REGLINUX_BINARIES_DIR=$6
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 
-cp "${BINARIES_DIR}/uImage"          "${REGLINUX_BINARIES_DIR}/boot/boot/uImage"          || exit 1
-cp "${BINARIES_DIR}/uInitrd"         "${REGLINUX_BINARIES_DIR}/boot/boot/uInitrd"         || exit 1
-cp "${BINARIES_DIR}/rootfs.squashfs" "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
-cp "${BINARIES_DIR}/modules"         "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
-cp "${BINARIES_DIR}/firmware"        "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
-cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
+cp "${BINARIES_DIR}/uImage"             "${REGLINUX_BINARIES_DIR}/boot/boot/uImage"          || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.uboot"  "${REGLINUX_BINARIES_DIR}/boot/boot/uInitrd"         || exit 1
+cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
+cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
+cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
+cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
-cp "${BINARIES_DIR}/meson8m2-mxiii.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
-cp "${BINARIES_DIR}/meson8m2-mxiii-plus.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
-cp "${BINARIES_DIR}/meson8m2-m8s.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
-cp "${BINARIES_DIR}/meson8-minix-neo-x8.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
-cp "${BINARIES_DIR}/meson8-tronsmart-s82.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/meson8m2-mxiii.dtb"         "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/meson8m2-mxiii-plus.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/meson8m2-m8s.dtb"           "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/meson8-minix-neo-x8.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/meson8-tronsmart-s82.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 # cp "${BINARIES_DIR}/meson8m2-wetek-core.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 
 "${HOST_DIR}/bin/mkimage" -C none -A arm -T script -d "${BOARD_DIR}/boot/s805_autoscript.cmd" "${REGLINUX_BINARIES_DIR}/boot/s805_autoscript" || exit 1
