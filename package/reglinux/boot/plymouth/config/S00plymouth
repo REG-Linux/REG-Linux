@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+    stop)
+	# Save the boot log to file and stop splash
+	if [ -x /usr/bin/plymouth ] && /usr/bin/plymouth --ping
+	then
+		/usr/bin/plymouth update-root-fs --read-write
+		/usr/bin/plymouth quit --retain-splash
+	fi
+        ;;
+    *)
+esac
+
+exit $?
