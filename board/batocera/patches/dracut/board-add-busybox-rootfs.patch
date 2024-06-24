@@ -40,8 +40,8 @@ index 0000000..f619679
 +                "setfattr" "setpriv" "sh" "shred" "sleep" "ssl_client"
 +                "svc" "svok" "test" "tree""ts" "tsort" "umount"
 +                 "unshare" "xxd" "xzcat" "zcat")
-+    local _sbin=("fsfreeze" "i2ctransfer" "ifdown" "ifup" "ipneigh"
-+                "mim" "mkdosfs" "mke2fs" "nologin" "partprobe"
++    local _sbin=("fbsplash" "fsfreeze" "i2ctransfer" "ifdown" "ifup"
++                "ipneigh" "mim" "mkdosfs" "mke2fs" "nologin" "partprobe"
 +                "poweroff" "reboot" "run-init" "seedrng" "swapoff"
 +                "swapon" "switch_root" "ubirename")
 +

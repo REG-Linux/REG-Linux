@@ -1,5 +1,5 @@
 From 3fd58c7a39a89a74e00c702ac777da2c585919eb Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Juliano=20Dorig=C3=A3o?= <jdorigao@gmail.com>
+From: Juliano Dorigão <jdorigao@gmail.com>
 Date: Tue, 18 Jun 2024 09:11:08 -0400
 Subject: [PATCH] no busybox link
 
@@ -14,7 +14,7 @@ index 4158968..aa985c3 100755
 @@ -80,58 +80,4 @@ rm -f "$prefix/bin/busybox" || exit 1
  mkdir -p "$prefix/bin" || exit 1
  install -m 755 busybox "$prefix/bin/busybox" || exit 1
- 
+
 -for i in $h; do
 -	appdir=`dirname "$i"`
 -	app=`basename "$i"`
@@ -70,6 +70,6 @@ index 4158968..aa985c3 100755
 -done
 -
  exit 0
--- 
+--
 2.45.2
 
