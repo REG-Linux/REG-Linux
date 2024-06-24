@@ -9,7 +9,7 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report. We appreciate you taking the time & effort.
         Note: Bug reports are NOT for feature requests or for help with coding or compiling.
-        If you need real-time help or need to discuss Batocera, join us on Discord - https://discord.gg/bPKRgsVzAR
+        If you need real-time help or need to discuss REG Linux, join us on Discord - https://discord.gg/8YYY7etRTX
   - type: input
     id: reglinux_build
     attributes:
@@ -27,7 +27,7 @@ body:
     attributes:
       label: Your architecture
       description: |
-        Architecture and board type on which Batocera is running.
+        Architecture and board type on which REG Linux is running.
         Outline if the device is a handheld or a laptop or a Single Board Computer (SBC).
       placeholder: Rasperry Pi 4 B, X86_64, Steam Deck, Odroid C4, Orange Pi 5, etc.
     validations:
@@ -47,7 +47,7 @@ body:
     attributes:
       label: Issue description
       description: A brief explanation of the issue. Keep this concise. We don't need your life story.
-      placeholder: I have a black screen after the splash screen when booting Batocera.
+      placeholder: I have a black screen after the splash screen when booting REG Linux.
     validations:
       required: true
   - type: textarea
@@ -81,8 +81,8 @@ body:
   - type: textarea
     id: any_mods
     attributes:
-      label: Details of any modifications you have made to Batocera.
-      description: If you have modified Batocera in any way. Please let us know.
+      label: Details of any modifications you have made to REG Linux.
+      description: If you have modified REG Linux in any way. Please let us know.
       placeholder: I have installed a third-party package from ...
     validations:
       required: true

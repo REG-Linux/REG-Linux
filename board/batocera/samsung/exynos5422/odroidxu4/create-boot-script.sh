@@ -20,12 +20,12 @@ mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux"   || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"            "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
 cp "${BINARIES_DIR}/exynos5422-odroidxu4.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 
-cp "${BINARIES_DIR}/zImage"          "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
-cp "${BINARIES_DIR}/initrd.lz4"      "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
-cp "${BINARIES_DIR}/rootfs.squashfs" "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
-cp "${BINARIES_DIR}/modules"         "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
-cp "${BINARIES_DIR}/firmware"        "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
-cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
+cp "${BINARIES_DIR}/zImage"             "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.lz4"    "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
+cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
+cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"  || exit 1
+cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
+cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
 # because otherwise tzw overlapse
 dd if="${BINARIES_DIR}/u-boot.bin" of="${BINARIES_DIR}/u-boot.bin.reduced" bs=512 count=1440

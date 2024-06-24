@@ -20,12 +20,12 @@ mkdir -p "${REGLINUX_BINARIES_DIR}/boot/EFI/batocera"  || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/grub"          || exit 1
 
 # Batocera kernel, initrd, and root
-cp "${BINARIES_DIR}/bzImage"         "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
-cp "${BINARIES_DIR}/initrd.gz"       "${REGLINUX_BINARIES_DIR}/boot/boot/"                || exit 1
-cp "${BINARIES_DIR}/rootfs.squashfs" "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
-cp "${BINARIES_DIR}/modules"         "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update" || exit 1
-cp "${BINARIES_DIR}/firmware"        "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
-cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"  || exit 1
+cp "${BINARIES_DIR}/bzImage"            "${REGLINUX_BINARIES_DIR}/boot/boot/linux"              || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.gz"     "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.gz"          || exit 1
+cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update"    || exit 1
+cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"     || exit 1
+cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
+cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"      || exit 1
 
 cp "${BOARD_DIR}/boot/syslinux.cfg"       "${REGLINUX_BINARIES_DIR}/boot/boot/"          || exit 1
 cp "${BOARD_DIR}/boot/syslinux.cfg"       "${REGLINUX_BINARIES_DIR}/boot/boot/syslinux/" || exit 1

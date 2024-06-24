@@ -91,8 +91,8 @@ endif
 if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY          || \
    BR2_PACKAGE_BATOCERA_TARGET_BCM2711          || \
    BR2_PACKAGE_BATOCERA_TARGET_BCM2712          || \
-   BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2      || \
-   BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3      || \
+   BR2_PACKAGE_BATOCERA_TARGET_JH7110           || \
+   BR2_PACKAGE_BATOCERA_TARGET_K1               || \
    BR2_PACKAGE_BATOCERA_TARGET_H616             || \
    BR2_PACKAGE_BATOCERA_TARGET_AMLOGIC_GLES3    || \
    BR2_PACKAGE_BATOCERA_TARGET_ROCKCHIP_GLES3   || \
@@ -183,7 +183,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_E2FSPROGS			# ext4
 	select BR2_PACKAGE_NTFS_3G			# ntfs
 	select BR2_PACKAGE_NTFS_3G_NTFSPROGS		# ntfs
-	select BR2_PACKAGE_BTRFS_PROGS			if !BR2_PACKAGE_BATOCERA_TARGET_CHA && !BR2_PACKAGE_BATOCERA_TARGET_H3 # btrfs
+	select BR2_PACKAGE_BTRFS_PROGS			# btrfs
 	select BR2_PACKAGE_CONNMAN			# network manager
 	select BR2_PACKAGE_CONNMAN_WIFI			# network manager
 	select BR2_PACKAGE_CONNMAN_CLIENT		# network manager
@@ -199,7 +199,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_UTIL_LINUX_LIBMOUNT		# for util-linux compilation to work (so, may be removed in the future)
 	select BR2_PACKAGE_FBDUMP			# tool to capture snapshots from the Linux kernel framebuffer device and write them out as a PPM file
 	select BR2_PACKAGE_FBGRAB			# framebuffer screenshot program, capturing the linux frambuffer and converting it to a png-picture
-	select BR2_PACKAGE_FBV				# very simple graphic file viewer for the framebuffer console, capable of displaying GIF, JPEG, PNG and BMP files using libungif, libjpeg and libpng
+	#nope select BR2_PACKAGE_FBV				# very simple graphic file viewer for the framebuffer console, capable of displaying GIF, JPEG, PNG and BMP files using libungif, libjpeg and libpng
 	select BR2_PACKAGE_EUDEV_RULES_GEN		# fork of systemd-udev with the goal of obtaining better compatibility with existing software such as OpenRC and Upstart
 	select BR2_PACKAGE_BOOST_ATOMIC			# library that provides atomic data types and operations on these data types
 	select BR2_PACKAGE_UTIL_LINUX_LIBSMARTCOLS	# library is used for smart adaptive formatting of tabular data
@@ -233,7 +233,6 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_BATOCERA_AUDIO_ALSA			if BR2_PACKAGE_BATOCERA_TARGET_BCM2835 || \
 								   BR2_PACKAGE_BATOCERA_TARGET_BCM2836 || \
 								   BR2_PACKAGE_BATOCERA_TARGET_CHA     || \
-								   BR2_PACKAGE_BATOCERA_TARGET_H3      || \
 								   BR2_PACKAGE_BATOCERA_TARGET_RK3128  || \
 								   BR2_PACKAGE_BATOCERA_TARGET_JZ4770
 	# Use PipeWire audio stack for all other platforms
@@ -342,8 +341,8 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_REGLINUX_VULKAN	if  BR2_PACKAGE_BATOCERA_TARGET_X86_ANY || \
 						    BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
 						    BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
-						    BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2 || \
-						    BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
+						    BR2_PACKAGE_BATOCERA_TARGET_JH7110  || \
+						    BR2_PACKAGE_BATOCERA_TARGET_K1
 
 	# wireless drivers
 	# use the morrownr RTL8812au & RTL8821au drivers
@@ -393,7 +392,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 
 	# tools
 	select BR2_PACKAGE_I2C_TOOLS
-	select BR2_PACKAGE_MDADM	if !BR2_PACKAGE_BATOCERA_TARGET_CHA # RAID
+	select BR2_PACKAGE_MDADM	if !BR2_PACKAGE_BATOCERA_TARGET_H3 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # RAID
 	select BR2_PACKAGE_MC		if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 	select BR2_PACKAGE_OD_COMMANDER if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 	select BR2_PACKAGE_FDUPES
@@ -515,9 +514,11 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	# Qualcomm targets
 	default "qualcomm/sd845/odin"									if BR2_PACKAGE_BATOCERA_TARGET_ODIN
 
-	# RISC-V targets
-	default "riscv/visionfive2"									if BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2
-	default "riscv/bananapi-f3"									if BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
+	# Starfive targets
+	default "starfive/jh7110"									if BR2_PACKAGE_BATOCERA_TARGET_JH7110
+	
+	# SpacemiT targets
+	default "spacemit/bananapi-f3"									if BR2_PACKAGE_BATOCERA_TARGET_K1
 
 	# Saphira target
 	default "saphira"										if BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA
@@ -642,11 +643,11 @@ config BR2_PACKAGE_BATOCERA_TARGET_XU4
 
 # RISC-V
 # -------------------------------------
-config BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2
-	bool "visionfive2"
+config BR2_PACKAGE_BATOCERA_TARGET_JH7110
+	bool "jh7110"
 
-config BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
-	bool "bananapi-f3"
+config BR2_PACKAGE_BATOCERA_TARGET_K1
+	bool "k1"
 
 endchoice
 
@@ -789,7 +790,7 @@ config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
 
 	# RPG engine : Solarus
 	# Note: experimental LuaJIT RISC-V 64 support
-	select BR2_PACKAGE_SOLARUS_ENGINE	if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_SOLARUS_ENGINE	# ALL
 
 	# RPG engine : EasyRPG / RPG MAker
 	select BR2_PACKAGE_EASYRPG_PLAYER	if !BR2_PACKAGE_BATOCERA_TARGET_CHA # standalone
@@ -808,7 +809,7 @@ config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
 	select BR2_PACKAGE_IKEMEN               if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY || (BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL)
 
 	# SMBX engine
-	select BR2_PACKAGE_THEXTECH		if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_THEXTECH		# ALL
 
 #### Sega Dreamcast, Naomi and Atomiswave ####
 config BR2_PACKAGE_BATOCERA_SEGADC
@@ -1068,8 +1069,8 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 							   !BR2_PACKAGE_BATOCERA_TARGET_H6		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_RK3128		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_RK3326		&& \
-							   !BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2	&& \
-							   !BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3	&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_JH7110		&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_K1		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_ODIN
 
 	# Raze requires both 64-bit arch AND OpenGL or GLES 3.0

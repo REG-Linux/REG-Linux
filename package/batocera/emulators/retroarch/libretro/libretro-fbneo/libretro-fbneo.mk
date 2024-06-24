@@ -3,8 +3,8 @@
 # libretro-fbneo
 #
 ################################################################################
-# Version: Commits on Feb 24, 2024
-LIBRETRO_FBNEO_VERSION = 4a555e062b3a388dfc0893515cde78ce0b0b3909
+# Version: Commits on Jun 2, 2024
+LIBRETRO_FBNEO_VERSION = 634d207adade213bbe83684be2a183d158f56e52
 LIBRETRO_FBNEO_SITE = $(call github,libretro,FBNeo,$(LIBRETRO_FBNEO_VERSION))
 LIBRETRO_FBNEO_LICENSE = Non-commercial
 
@@ -21,6 +21,8 @@ else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2711),y)
 LIBRETRO_FBNEO_PLATFORM = unix-rpi4_64
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2712),y)
 LIBRETRO_FBNEO_PLATFORM = unix-rpi5_64
+else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_H3)$(BR2_PACKAGE_BATOCERA_TARGET_CHA)$(BR2_PACKAGE_BATOCERA_TARGET_RK3128),y)
+LIBRETRO_FBNEO_PLATFORM = classic_armv7_a7
 endif
 
 ifeq ($(BR2_arm),y)

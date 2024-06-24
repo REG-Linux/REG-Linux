@@ -1,0 +1,39 @@
+From 6c46e292f1d36245c556d685df7309834d738251 Mon Sep 17 00:00:00 2001
+From: Juliano Dorigão <jdorigao@gmail.com>
+Date: Fri, 21 Jun 2024 16:29:19 -0400
+Subject: [PATCH] plymouth no systemd
+
+---
+ modules.d/50plymouth/module-setup.sh | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/modules.d/50plymouth/module-setup.sh b/modules.d/50plymouth/module-setup.sh
+index cc6629b..880200b 100755
+--- a/modules.d/50plymouth/module-setup.sh
++++ b/modules.d/50plymouth/module-setup.sh
+@@ -37,17 +37,15 @@ install() {
+         . "$moddir"/plymouth-populate-initrd.sh
+     else
+         PLYMOUTH_POPULATE_SOURCE_FUNCTIONS="$dracutfunctions" \
++            PLYMOUTH_SYSROOT="$dracutsysrootdir" \
++            PLYMOUTH_LDD="$DRACUT_LDD" \
++            PLYMOUTH_LDD_PATH="$DRACUT_PATH" \
++            PLYMOUTH_PLUGIN_PATH="/usr/lib/plymouth/" \
++            PLYMOUTH_THEME_NAME="reglinux" \
+             "$dracutsysrootdir""${PKGLIBDIR}"/plymouth-populate-initrd -t "$initdir"
+     fi
+
+-    inst_hook emergency 50 "$moddir"/plymouth-emergency.sh
+-
+-    inst_multiple readlink
++    inst_libdir_file "libdrm.*"
+
+     inst_multiple plymouthd plymouth plymouth-set-default-theme
+-
+-    if ! dracut_module_included "systemd"; then
+-        inst_hook pre-trigger 10 "$moddir"/plymouth-pretrigger.sh
+-        inst_hook pre-pivot 90 "$moddir"/plymouth-newroot.sh
+-    fi
+ }
+--
+2.45.2
