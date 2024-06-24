@@ -33,6 +33,9 @@ else ifeq ($(BR2_arm),y)
 else ifeq ($(BR2_x86_64),y)
     IOQUAKE3_BUILD_ARGS += COMPILE_ARCH=x86_64
     IOQUAKE3_ARCH = x86_64
+else ifeq ($(BR2_RISCV_64),y)
+    IOQUAKE3_BUILD_ARGS += COMPILE_ARCH=riscv64
+    IOQUAKE3_ARCH = riscv64
 endif
 
 define IOQUAKE3_BUILD_CMDS

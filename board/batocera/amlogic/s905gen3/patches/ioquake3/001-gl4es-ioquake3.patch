@@ -1,11 +1,12 @@
 diff -u -r a/code/sdl/sdl_glimp.c b/code/sdl/sdl_glimp.c
 --- a/code/sdl/sdl_glimp.c	2023-07-06 11:10:06.000000000 +0200
 +++ b/code/sdl/sdl_glimp.c	2023-07-17 20:18:30.069483092 +0200
-@@ -35,6 +35,25 @@
+@@ -35,6 +35,27 @@
  #include "../sys/sys_local.h"
  #include "sdl_icon.h"
  
 +// GL4ES BEGIN
++#ifdef USE_GL4ES
 +#include <gl4es/gl4esinit.h>
 +#include <gl4es/gl4eshint.h>
 +
@@ -22,32 +23,41 @@ diff -u -r a/code/sdl/sdl_glimp.c b/code/sdl/sdl_glimp.c
 +        return SDL_GL_GetProcAddress (name);
 +        //return gEngfuncs.GL_GetProcAddress( name );
 +}
++#endif
 +// GL4ES END
 +
  typedef enum
  {
  	RSERR_OK,
-@@ -244,7 +263,7 @@
+@@ -244,7 +263,11 @@
  #ifdef __SDL_NOGETPROCADDR__
  #define GLE( ret, name, ... ) qgl##name = gl#name;
  #else
 -#define GLE( ret, name, ... ) qgl##name = (name##proc *) SDL_GL_GetProcAddress("gl" #name); \
++#ifdef USE_GL4ES
 +#define GLE( ret, name, ... ) qgl##name = (name##proc *) gl4es_GetProcAddress("gl" #name); \
++#else
++#define GLE( ret, name, ... ) qgl##name = (name##proc *) SDL_GL_GetProcAddress("gl" #name); \
++#endif
  	if ( qgl##name == NULL ) { \
  		ri.Printf( PRINT_ALL, "ERROR: Missing OpenGL function %s\n", "gl" #name ); \
  		success = qfalse; \
-@@ -277,30 +296,30 @@
+@@ -277,30 +296,40 @@
  	}
  
  	if ( fixedFunction ) {
 -		if ( QGL_VERSION_ATLEAST( 1, 1 ) ) {
++#ifdef USE_GL4ES
 +		/*if ( QGL_VERSION_ATLEAST( 1, 1 ) ) {*/
++#endif
  			QGL_1_1_PROCS;
  			QGL_1_1_FIXED_FUNCTION_PROCS;
  			QGL_DESKTOP_1_1_PROCS;
  			QGL_DESKTOP_1_1_FIXED_FUNCTION_PROCS;
 -		} else if ( qglesMajorVersion == 1 && qglesMinorVersion >= 1 ) {
++#ifdef USE_GL4ES
 +		/*} else if (( qglesMajorVersion == 1 && qglesMinorVersion >= 1 ) || ( qglesMajorVersion == 2 && qglesMinorVersion >= 0 )) {
++#endif
  			// OpenGL ES 1.1 (2.0 is not backward compatible)
  			QGL_1_1_PROCS;
  			QGL_1_1_FIXED_FUNCTION_PROCS;
@@ -59,62 +69,67 @@ diff -u -r a/code/sdl/sdl_glimp.c b/code/sdl/sdl_glimp.c
  		} else {
  			Com_Error( ERR_FATAL, "Unsupported OpenGL Version (%s), OpenGL 1.1 is required", version );
 -		}
++#ifdef USE_GL4ES
 +		}*/
++#endif
  	} else {
 -		if ( QGL_VERSION_ATLEAST( 2, 0 ) ) {
++#ifdef USE_GL4ES
 +		/*if ( QGL_VERSION_ATLEAST( 2, 0 ) ) {*/
++#endif
  			QGL_1_1_PROCS;
  			QGL_DESKTOP_1_1_PROCS;
  			QGL_1_3_PROCS;
  			QGL_1_5_PROCS;
  			QGL_2_0_PROCS;
 -		} else if ( QGLES_VERSION_ATLEAST( 2, 0 ) ) {
++#ifdef USE_GL4ES
 +		/*} else if ( QGLES_VERSION_ATLEAST( 2, 0 ) ) {
++#endif
  			QGL_1_1_PROCS;
  			QGL_ES_1_1_PROCS;
  			QGL_1_3_PROCS;
-@@ -310,7 +329,7 @@
+@@ -310,7 +329,9 @@
  			Com_Error( ERR_FATAL, "Unsupported OpenGL Version: %s", version );
  		} else {
  			Com_Error( ERR_FATAL, "Unsupported OpenGL Version (%s), OpenGL 2.0 is required", version );
 -		}
++#ifdef USE_GL4ES
 +		}*/
++#endif
  	}
  
  	if ( QGL_VERSION_ATLEAST( 3, 0 ) || QGLES_VERSION_ATLEAST( 3, 0 ) ) {
-@@ -644,6 +663,7 @@
+@@ -644,6 +663,9 @@
  			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
  			if ((SDL_glContext = SDL_GL_CreateContext(SDL_window)) == NULL)
  			{
++#ifdef USE_GL4ES
 +				initialize_gl4es();
++#endif
  				ri.Printf(PRINT_ALL, "SDL_GL_CreateContext failed: %s\n", SDL_GetError());
  				ri.Printf(PRINT_ALL, "Reverting to default context\n");
  
-@@ -656,6 +676,7 @@
+@@ -656,6 +676,9 @@
  				const char *renderer;
  
  				ri.Printf(PRINT_ALL, "SDL_GL_CreateContext succeeded.\n");
++#ifdef USE_GL4ES
 +				initialize_gl4es();
++#endif
  
  				if ( GLimp_GetProcAddresses( fixedFunction ) )
  				{
-@@ -696,6 +717,7 @@
+@@ -696,6 +717,9 @@
  				SDL_window = NULL;
  				continue;
  			}
++#ifdef USE_GL4ES
 +			initialize_gl4es();
++#endif
  
  			if ( !GLimp_GetProcAddresses( fixedFunction ) )
  			{
-@@ -778,7 +800,7 @@
- 		r_fullscreen->modified = qfalse;
- 		fullscreen = qfalse;
- 	}
--	
-+
- 	err = GLimp_SetMode(mode, fullscreen, noborder, gl3Core);
- 
- 	switch ( err )
 @@ -885,9 +907,9 @@
  		{
  			if ( r_ext_multitexture->value )
@@ -122,9 +137,9 @@ diff -u -r a/code/sdl/sdl_glimp.c b/code/sdl/sdl_glimp.c
 -				qglMultiTexCoord2fARB = SDL_GL_GetProcAddress( "glMultiTexCoord2fARB" );
 -				qglActiveTextureARB = SDL_GL_GetProcAddress( "glActiveTextureARB" );
 -				qglClientActiveTextureARB = SDL_GL_GetProcAddress( "glClientActiveTextureARB" );
-+				qglMultiTexCoord2fARB = gl4es_GetProcAddress( "glMultiTexCoord2fARB" );
-+				qglActiveTextureARB = gl4es_GetProcAddress( "glActiveTextureARB" );
-+				qglClientActiveTextureARB = gl4es_GetProcAddress( "glClientActiveTextureARB" );
++				GLE(void, "MultiTexCoord2fARB" );
++				GLE(void, "ActiveTextureARB" );
++				GLE(void, "ClientActiveTextureARB" );
  
  				if ( qglActiveTextureARB )
  				{
@@ -134,26 +149,23 @@ diff -u -r a/code/sdl/sdl_glimp.c b/code/sdl/sdl_glimp.c
  				ri.Printf( PRINT_ALL, "...using GL_EXT_compiled_vertex_array\n" );
 -				qglLockArraysEXT = ( void ( APIENTRY * )( GLint, GLint ) ) SDL_GL_GetProcAddress( "glLockArraysEXT" );
 -				qglUnlockArraysEXT = ( void ( APIENTRY * )( void ) ) SDL_GL_GetProcAddress( "glUnlockArraysEXT" );
-+				qglLockArraysEXT = ( void ( APIENTRY * )( GLint, GLint ) ) gl4es_GetProcAddress( "glLockArraysEXT" );
-+				qglUnlockArraysEXT = ( void ( APIENTRY * )( void ) ) gl4es_GetProcAddress( "glUnlockArraysEXT" );
++				qglLockArraysEXT = ( void ( APIENTRY * )( GLint, GLint ) ) GLE( void, "LockArraysEXT" );
++				qglUnlockArraysEXT = ( void ( APIENTRY * )( void ) ) GLE( void, "UnlockArraysEXT" );
  				if (!qglLockArraysEXT || !qglUnlockArraysEXT)
  				{
  					ri.Error (ERR_FATAL, "bad getprocaddress");
-@@ -1007,6 +1029,9 @@
+@@ -1007,6 +1029,11 @@
  
  	ri.Sys_GLimpInit( );
  
++#ifdef USE_GL4ES
 +        set_getprocaddress( GL4ES_GetProcAddress );
 +        set_getmainfbsize( GL4ES_GetMainFBSize );
 +
++#endif
  	// Create the window and set up the context
  	if(GLimp_StartDriverAndSetMode(r_mode->integer, r_fullscreen->integer, r_noborder->integer, fixedFunction))
  		goto success;
-@@ -1135,3 +1160,4 @@
- 		r_fullscreen->modified = qfalse;
- 	}
- }
-+
 diff -u -r a/Makefile b/Makefile
 --- a/Makefile	2023-07-06 11:10:06.000000000 +0200
 +++ b/Makefile	2023-07-17 18:56:49.305785987 +0200
