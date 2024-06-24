@@ -1063,15 +1063,19 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	# Note: Needs CMake work to build on GLES2 + gl4es
 	select BR2_PACKAGE_YQUAKE2			if BR2_PACKAGE_HAS_LIBGL
 
-	# Quake 3
+	# Quake 3 (source port)
+	# Note : needs work on gl4es patch (applying it only if no desktop GL support)
 	select BR2_PACKAGE_IOQUAKE3			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835		&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_CHA		&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_H3		&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_H5		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_H6		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_RK3128		&& \
-							   !BR2_PACKAGE_BATOCERA_TARGET_RK3326		&& \
-							   !BR2_PACKAGE_BATOCERA_TARGET_JH7110		&& \
-							   !BR2_PACKAGE_BATOCERA_TARGET_K1		&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_RK3328		&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_S812		&& \
+							   !BR2_PACKAGE_BATOCERA_TARGET_S905		&& \
 							   !BR2_PACKAGE_BATOCERA_TARGET_ODIN
 
 	# Raze requires both 64-bit arch AND OpenGL or GLES 3.0
