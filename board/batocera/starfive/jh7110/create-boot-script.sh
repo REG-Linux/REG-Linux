@@ -14,8 +14,9 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
-mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
+mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"          || exit 1
+mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux"      || exit 1
+mkdir -p "${REGLINUX_BINARIES_DIR}/boot/dtbs/starfive" || exit 1
 
 cp "${BINARIES_DIR}/Image"              "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
 cp "${BINARIES_DIR}/rootfs.cpio.lz4"    "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
@@ -24,7 +25,9 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
-cp "${BINARIES_DIR}/rk3399-rock-pi-4b.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
-cp "${BOARD_DIR}/boot/extlinux.conf"        "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BINARIES_DIR}/jh7110-starfive-visionfive-2-v1.2a.dtb" "${REGLINUX_BINARIES_DIR}/boot/dtbs/starfive/" || exit 1
+cp "${BINARIES_DIR}/jh7110-starfive-visionfive-2-v1.3b.dtb" "${REGLINUX_BINARIES_DIR}/boot/dtbs/starfive/" || exit 1
+cp "${BINARIES_DIR}/jh7110-milkv-mars.dtb"                  "${REGLINUX_BINARIES_DIR}/boot/dtbs/starfive/" || exit 1
+cp "${BOARD_DIR}/boot/extlinux.conf"                        "${REGLINUX_BINARIES_DIR}/boot/extlinux/"      || exit 1
 
 exit 0

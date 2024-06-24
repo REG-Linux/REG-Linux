@@ -6,11 +6,13 @@ BOOTCONF="/boot/batocera-boot.conf"
 
 case "$1" in
 	start)
-		/etc/init.d/S02plymouth stop
 		enabled="$(/usr/bin/batocera-settings-get system.es.atstartup)"
 		if [ "$enabled" != "0" ]; then
 			environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
 			if [ "$environment" = "sway" ]; then
+				# Stop splash
+				/etc/init.d/S00plymouth stop
+				# Start sway
 				SWAY_LOG_FILE=/userdata/system/logs/sway.log
 				WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -d > ${SWAY_LOG_FILE} 2>&1 &
 			else

@@ -1,14 +1,19 @@
+From c15c71a8a0b6b182ef752baaa4f62e3edb4d8932 Mon Sep 17 00:00:00 2001
+From: Juliano Dorigão <jdorigao@gmail.com>
+Date: Sat, 22 Jun 2024 11:00:14 -0400
+Subject: [PATCH] add busybox rootfs
+
 ---
- modules.d/05busybox-rootfs/module-setup.sh | 42 ++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ modules.d/05busybox-rootfs/module-setup.sh | 44 ++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
  create mode 100755 modules.d/05busybox-rootfs/module-setup.sh
 
 diff --git a/modules.d/05busybox-rootfs/module-setup.sh b/modules.d/05busybox-rootfs/module-setup.sh
 new file mode 100755
-index 0000000..f66caa7
+index 0000000..f619679
 --- /dev/null
 +++ b/modules.d/05busybox-rootfs/module-setup.sh
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,44 @@
 +#!/bin/bash
 +
 +# called by dracut
@@ -31,12 +36,14 @@ index 0000000..f66caa7
 +                "dnsdomainname" "echo" "egrep" "factor" "fallocate"
 +                "fgrep" "hexedit" "link" "linux32" "linux64" "ls"
 +                "lsscsi" "lzcat" "mkdir" "mkpasswd" "mount" "mv" "nl"
-+                "nproc" "nsenter" "paste" "resume" "rm" "setfattr" "setpriv"
-+                "sh" "shred" "sleep" "ssl_client" "svc" "svok" "test" "tree"
-+                "ts" "tsort" "umount" "unshare" "xxd" "xzcat" "zcat")
-+    local _sbin=("fsfreeze" "i2ctransfer" "ifdown" "ifup" "ipneigh" "mim"
-+                "mkdosfs" "mke2fs" "nologin" "partprobe" "poweroff" "reboot"
-+                "run-init" "seedrng" "swapoff" "swapon" "switch_root" "ubirename")
++                "nproc" "nsenter" "paste" "readlink" "resume" "rm"
++                "setfattr" "setpriv" "sh" "shred" "sleep" "ssl_client"
++                "svc" "svok" "test" "tree""ts" "tsort" "umount"
++                 "unshare" "xxd" "xzcat" "zcat")
++    local _sbin=("fsfreeze" "i2ctransfer" "ifdown" "ifup" "ipneigh"
++                "mim" "mkdosfs" "mke2fs" "nologin" "partprobe"
++                "poweroff" "reboot" "run-init" "seedrng" "swapoff"
++                "swapon" "switch_root" "ubirename")
 +
 +    _busybox=$(find_binary busybox)
 +    inst "$_busybox" /bin/busybox
@@ -48,7 +55,7 @@ index 0000000..f66caa7
 +    done
 +
 +    for _i in "${_sbin[@]}"; do
-+        ln_r /bin/busybox /bin/"$_i"
++        ln_r /bin/busybox /sbin/"$_i"
 +    done
 +}
 --

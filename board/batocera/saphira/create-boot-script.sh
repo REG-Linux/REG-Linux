@@ -20,14 +20,14 @@ mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/EFI" || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/EFI/batocera"     || exit 1
 
-cp "${BINARIES_DIR}/Image"           "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
-cp "${BINARIES_DIR}/initrd.lz4"      "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
-cp "${BINARIES_DIR}/rootfs.squashfs" "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
-cp "${BINARIES_DIR}/rescue"          "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
+cp "${BINARIES_DIR}/Image"              "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.lz4"    "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"      || exit 1
+cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update" || exit 1
+cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
 # EFI loader
-cp -r "${BOARD_DIR}/boot/EFI/BOOT/"           "${REGLINUX_BINARIES_DIR}/boot/EFI/" || exit 1
-cp -r "${BOARD_DIR}/boot/EFI/batocera/"           "${REGLINUX_BINARIES_DIR}/boot/EFI/" || exit 1
+cp -r "${BOARD_DIR}/boot/EFI/BOOT/"     "${REGLINUX_BINARIES_DIR}/boot/EFI/" || exit 1
+cp -r "${BOARD_DIR}/boot/EFI/batocera/" "${REGLINUX_BINARIES_DIR}/boot/EFI/" || exit 1
 
 # Include all dtbs in specific directory
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/dtb/apple"     || exit 1
