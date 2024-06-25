@@ -1,0 +1,13 @@
+config BR2_PACKAGE_APPSTREAM
+	bool "appstream"
+	select BR2_PACKAGE_LIBXMLB
+	select BR2_PACKAGE_ITSTOOL
+	#select BR2_PACKAGE_LIBGTK3
+	#select BR2_PACKAGE_LIBYAML
+	#select BR2_PACKAGE_JSON_GLIB
+
+	help 
+	    AppStream makes machine-readable software metadata easily accessible. 
+	    This library provides objects and helper methods to help reading and writing AppStream metadata.
+
+		https://github.com/ximion/appstream

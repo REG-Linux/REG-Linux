@@ -1,0 +1,11 @@
+config BR2_PACKAGE_LIBXMLB
+	bool "libxmlb"
+	#select BR2_PACKAGE_LIBGTK3
+	#select BR2_PACKAGE_LIBYAML
+	#select BR2_PACKAGE_JSON_GLIB
+
+	help 
+	    This allows an application to mmap the binary XML file, do an XPath query and return some strings without actually parsing the entire document. 
+	    This is all done using (almost) zero allocations and no actual copying of the binary data.
+
+		https://github.com/hughsie/libxmlb

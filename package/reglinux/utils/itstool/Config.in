@@ -1,0 +1,10 @@
+config BR2_PACKAGE_ITSTOOL
+	bool "itstool"
+	#select BR2_PACKAGE_LIBGTK3
+	#select BR2_PACKAGE_LIBYAML
+	#select BR2_PACKAGE_JSON_GLIB
+
+	help 
+	    Translate XML with PO files using W3C Internationalization Tag Set rules
+
+		https://github.com/itstool/itstool
