@@ -1,0 +1,11 @@
+--- a/meson.build	2024-06-25 13:01:28.124493619 +0200
++++ b/meson.build	2024-06-25 13:01:33.100605805 +0200
+@@ -223,7 +223,7 @@
+ subdir('po/')
+ subdir('data/')
+ subdir('contrib/')
+-subdir('docs/')
++#subdir('docs/')
+ subdir('tests/')
+ if get_option('qt')
+     subdir('qt/')
