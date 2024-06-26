@@ -352,7 +352,7 @@ static int modeset_prepare(int fd, int do_current)
 #ifdef HAVE_IGNORE_1360x768_MODE
 		      if(!(conn->modes[j].hdisplay == 1360 && conn->modes[j].vdisplay == 768))
 #endif
-#ifdef HAVE_LIMIT_1080P_MODE
+#ifdef FORCE_1080P_MAX
 		      if(!(conn->modes[j].hdisplay > 1920 || conn->modes[j].vdisplay > 1080))
 #endif
 		      printf("%d.%d:%s %dx%d %uHz (%s%s)\n",
@@ -372,7 +372,7 @@ static int modeset_prepare(int fd, int do_current)
 #ifdef HAVE_IGNORE_1360x768_MODE
 		    if(!(conn->modes[j].hdisplay == 1360 && conn->modes[j].vdisplay == 768))
 #endif
-#ifdef HAVE_LIMIT_1080P_MODE
+#ifdef FORCE_1080P_MAX
 		      if(!(conn->modes[j].hdisplay > 1920 || conn->modes[j].vdisplay > 1080))
 #endif
 		    printf("%d.%d:%s %dx%d %uHz (%s%s)\n",
