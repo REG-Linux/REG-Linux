@@ -1,0 +1,512 @@
+#### targets ####
+source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/core/reglinux-system/Config.in.targets"
+
+#### systems ####
+source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/core/reglinux-system/Config.in.systems"
+
+#### GPU stack ####
+source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/core/reglinux-system/Config.in.gpu"
+
+
+config BR2_PACKAGE_MAME_BUILD_FROM_SOURCE
+	bool "mame-build-from-source"
+	default n
+
+config BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE
+	bool "scummvm-build-from-source"
+	default n
+
+##########################################
+config BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
+	bool "batocera.linux music formats support"
+
+	# MIDI renderer (CPU hog)
+	select BR2_PACKAGE_FLUIDSYNTH		if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770  && \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836 && \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3128  && \
+						   !BR2_PACKAGE_BATOCERA_TARGET_H3      && \
+						   !BR2_PACKAGE_BATOCERA_TARGET_CHA
+
+	# MIDI tools
+	select BR2_PACKAGE_ALSA_UTILS_ACONNECT  if BR2_PACKAGE_ALSA_UTILS
+	select BR2_PACKAGE_ALSA_UTILS_APLAYMIDI if BR2_PACKAGE_ALSA_UTILS
+
+	help
+	  Music support packages (MIDI and ALSA)
+
+config BR2_PACKAGE_REGLINUX_SYSTEM
+	bool "batocera.linux minimal"
+
+	# RISC-V support needs a hack here to declare as RV64GC, needed for Rust
+	#select BR2_RISCV_ISA_RVC			if BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2 || BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
+
+	# minimal system required packages
+	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
+	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
+	select BR2_PACKAGE_RNG_TOOLS			if !BR2_PACKAGE_BATOCERA_TARGET_RK3128 # system entropy. Currently disabled for RK3128 due to high CPU impact
+	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
+	select BR2_PACKAGE_ES_THEME_CARBON		# emulationstation theme
+	select BR2_PACKAGE_ES_BACKGROUND_MUSICS		# emulationstation musics
+	select BR2_PACKAGE_BATOCERA_ES_SYSTEM		# emulation station es_systems.cfg generator + default roms
+	select BR2_PACKAGE_BATOCERA_CONFIGGEN		# emulation station external command launcher
+	select BR2_PACKAGE_BATOCERA_TRIGGERHAPPY	# multimedia/power buttons
+	select BR2_PACKAGE_BATOCERA_UDEV_RULES		# extra udev rules for specifics joysticks/devices
+	select BR2_PACKAGE_BATOCERA_USERDATAINIT	# userdata init files
+	select BR2_PACKAGE_XOSD				if BR2_PACKAGE_XSERVER_XORG_SERVER # osd information displaying
+	select BR2_PACKAGE_BATOCERA_BATTERY_CHECKER	if BR2_PACKAGE_XOSD
+	select BR2_PACKAGE_CIFS_UTILS			# required for boot mounts
+	select BR2_PACKAGE_BATOCERA_IMAGE		# tools to generate batocera image
+	select BR2_PACKAGE_DOSFSTOOLS			# fat
+	select BR2_PACKAGE_DOSFSTOOLS_FSCK_FAT		# fat
+	select BR2_PACKAGE_DOSFSTOOLS_MKFS_FAT		# fat
+	select BR2_PACKAGE_EXFAT			# exfat
+	select BR2_PACKAGE_EXFAT_UTILS			# exfat
+	select BR2_PACKAGE_E2FSPROGS			# ext4
+	select BR2_PACKAGE_NTFS_3G			# ntfs
+	select BR2_PACKAGE_NTFS_3G_NTFSPROGS		# ntfs
+	select BR2_PACKAGE_BTRFS_PROGS			if !BR2_PACKAGE_BATOCERA_TARGET_CHA && !BR2_PACKAGE_BATOCERA_TARGET_H3 # btrfs
+	select BR2_PACKAGE_CONNMAN			# network manager
+	select BR2_PACKAGE_CONNMAN_WIFI			# network manager
+	select BR2_PACKAGE_CONNMAN_CLIENT		# network manager
+	select BR2_PACKAGE_CONNMAN_LOOPBACK		# network manager
+	select BR2_PACKAGE_BATOCERA_WPA			# wireless tools
+	select BR2_PACKAGE_WIRELESS_REGDB		# wireless regulatory DB
+	select BR2_PACKAGE_IW				# wireless country config for regulatoryDB
+	select BR2_PACKAGE_WIRELESS_TOOLS		# wireless tools
+	select BR2_PACKAGE_WIRELESS_TOOLS_LIB		# wireless tools
+	select BR2_PACKAGE_DROPBEAR			# ssh server
+	select BR2_PACKAGE_PM_UTILS			# suspend
+	select BR2_PACKAGE_EVSIEVE			# linux tool to manipulate events (like joining them) ; armv8 in 32 bits seems not supported
+	select BR2_PACKAGE_UTIL_LINUX_LIBMOUNT		# for util-linux compilation to work (so, may be removed in the future)
+	select BR2_PACKAGE_FBDUMP			# tool to capture snapshots from the Linux kernel framebuffer device and write them out as a PPM file
+	select BR2_PACKAGE_FBGRAB			# framebuffer screenshot program, capturing the linux frambuffer and converting it to a png-picture
+	select BR2_PACKAGE_FBV				# very simple graphic file viewer for the framebuffer console, capable of displaying GIF, JPEG, PNG and BMP files using libungif, libjpeg and libpng
+	select BR2_PACKAGE_EUDEV_RULES_GEN		# fork of systemd-udev with the goal of obtaining better compatibility with existing software such as OpenRC and Upstart
+	select BR2_PACKAGE_BOOST_ATOMIC			# library that provides atomic data types and operations on these data types
+	select BR2_PACKAGE_UTIL_LINUX_LIBSMARTCOLS	# library is used for smart adaptive formatting of tabular data
+	select BR2_PACKAGE_UTIL_LINUX_SETTERM		# Set terminal attributes
+	#nope select BR2_PACKAGE_OPENVPN			# VPN support
+	select BR2_PACKAGE_USB_MODESWITCH		# USB modeswitch support
+	select BR2_PACKAGE_UMTOOL			if !BR2_PACKAGE_BATOCERA_TARGET_CHA # command line tool for configuring Ultimarc arcade hardware
+	select BR2_PACKAGE_PYTHON_HIDAPI		# Communication with USB HID devices via Python
+	select BR2_PACKAGE_LEDSPICER			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770  && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # LED Manager for Linux
+	select BR2_PACKAGE_INNOEXTRACT			if !BR2_PACKAGE_BATOCERA_TARGET_CHA # Extract InnoSetup files (useful for Wine and GOG games)
+	select BR2_PACKAGE_TREE				# recursive directory listing (useful for generating documentation on rom directory structure)
+	select BR2_PACKAGE_XXD				# hexdump utility
+
+	# Python and SSL
+	select BR2_PACKAGE_HOST_PYTHON3
+	select BR2_PACKAGE_HOST_PYTHON3_SSL
+	select BR2_PACKAGE_PYTHON3
+	select BR2_PACKAGE_PYTHON3_SSL
+	select BR2_PACKAGE_PYTHON3_PYOPENSSL
+
+	select BR2_PACKAGE_PARTED				# partition management (for the first boot)
+	select BR2_PACKAGE_USBMOUNT				# usb key/sd card mounter
+	select BR2_PACKAGE_USBUTILS				# usb key/sd card tools
+	#select BR2_PACKAGE_BATOCERA_SPLASH			# boot splash
+	select BR2_PACKAGE_BATOCERA_SCRIPTS			# batocera scripts
+	select BR2_PACKAGE_REGLINUX_SCREEN			# reglinux screen configuration
+	#select BR2_PACKAGE_BATOCERA_RESOLUTION			# batocera resolution
+	select BR2_PACKAGE_BATOCERA_SETTINGS			# batocera-settings-get/set
+
+	# Use ALSA light audio stack for weak platforms
+	select BR2_PACKAGE_BATOCERA_AUDIO_ALSA			if BR2_PACKAGE_BATOCERA_TARGET_BCM2835 || \
+								   BR2_PACKAGE_BATOCERA_TARGET_BCM2836 || \
+								   BR2_PACKAGE_BATOCERA_TARGET_CHA     || \
+								   BR2_PACKAGE_BATOCERA_TARGET_RK3128  || \
+								   BR2_PACKAGE_BATOCERA_TARGET_JZ4770
+	# Use PipeWire audio stack for all other platforms
+	select BR2_PACKAGE_BATOCERA_AUDIO			if !BR2_PACKAGE_BATOCERA_AUDIO_ALSA
+	select BR2_PACKAGE_BATOCERA_BLUETOOTH			# batocera bluetooth
+	select BR2_PACKAGE_BATOCERA_NOTICE			# boot pdf notice
+	select BR2_PACKAGE_BATOCERA_TEST			# batocera test script
+	select BR2_PACKAGE_WGET					# download tools
+	select BR2_PACKAGE_LIBCURL_CURL				# download tools
+	select BR2_PACKAGE_NGHTTP2				# required for curl http2
+	select BR2_PACKAGE_CA_CERTIFICATES			# ssl certificates
+	select BR2_PACKAGE_ROCKCHIP_RGA				if BR2_PACKAGE_BATOCERA_TARGET_RK3128 # Used for screen rotation (SDL, Retroarch, Moonlight)
+
+	select BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_BATOCERA_DRMINFO			if BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_LIRC_TOOLS				if !BR2_PACKAGE_BATOCERA_TARGET_CHA # lirc (remote control)
+	select BR2_PACKAGE_LIBCEC				# libcec
+	select BR2_PACKAGE_LIBCEC_LINUX_API			# libcec linux api
+	select BR2_PACKAGE_EDID_DECODE				# edid monitor/tv support
+	select BR2_PACKAGE_READ_EDID				# edid monitor/tv support
+	select BR2_SYSTEM_ENABLE_NLS				# locales
+	select BR2_PACKAGE_ACPID				if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	select BR2_PACKAGE_AVAHI				# service discovery on local network
+	select BR2_PACKAGE_AVAHI_DAEMON				# ping batocera.local
+	select BR2_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY		# bonjour
+	select BR2_PACKAGE_NTP
+	select BR2_PACKAGE_RSYNC
+	select BR2_PACKAGE_LIBOPENSSL_BIN			# required to encode the wifi password
+	select BR2_PACKAGE_KBD					# loadkeys
+	select BR2_PACKAGE_XKEYBOARD_CONFIG			if BR2_PACKAGE_LIBXKBCOMMON # requirement for xkb to work, xkb is used by kodi, even without x for the keyboard
+	select BR2_PACKAGE_GESFTPSERVER				# required to access folders via sftp and should be replaced by openssh
+	select BR2_PACKAGE_GPTFDISK				# fs resize
+	select BR2_PACKAGE_GPTFDISK_SGDISK			# fs resize
+	select BR2_PACKAGE_E2FSPROGS				# fs resize
+	select BR2_PACKAGE_E2FSPROGS_RESIZE2FS			# fs resize
+	select BR2_PACKAGE_PACMAN				# pacman package manager
+	select BR2_PACKAGE_FLATPAK				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak app packaging system
+	#select BR2_PACKAGE_BAUH					if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak gui
+	select BR2_PACKAGE_RYZENADJ				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # ryzen apu configuration
+	select BR2_PACKAGE_SYNCTHING				if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # sync files across multiple batoceras
+	select BR2_PACKAGE_RCLONE				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # sync files in the cloud (require x86_64)
+	select BR2_PACKAGE_BTOP					# htop alternative
+	select BR2_PACKAGE_MOKUTIL				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # mokutil machine owner key utility
+
+	# Controllers
+	select BR2_PACKAGE_XONE					if !BR2_mipsel && !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # xbox receiver (require linux >= 4.15)
+	select BR2_PACKAGE_XPAD_NOONE				if !BR2_mipsel && !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # xbox receiver (require linux >= 4.15)
+	select BR2_PACKAGE_XPADNEO				if !BR2_mipsel && !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # xbox receiver (require linux >= 4.18)
+	select BR2_PACKAGE_WII_U_GC_ADAPTER			if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # wii-u-gc-adapter
+	select BR2_PACKAGE_WIIMOTES_RULES			if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # wiimotes
+	select BR2_PACKAGE_WIIMOTE_3RDPARTY			if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # some non official wiimotes
+	select BR2_PACKAGE_XWIIMOTE				if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # a tool to analye wiimote events (mainly to debug, but helps and is funny)
+	select BR2_PACKAGE_BATOCERA_GUNS			if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_RK3128 && !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_BATOCERA_WHEEL_CALIBRATOR		if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_RK3128 && !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_NEW_LG4FF				if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_RK3128 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # Improved Linux module driver for Logitech driving wheels (the lg4ff is disabled in kernels)
+	select BR2_PACKAGE_HID_NX				if !BR2_mipsel && !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # updated nintendo switch controller driver, requires kernel > 4.4
+	select BR2_PACKAGE_JOYCOND				if BR2_PACKAGE_HID_NX # nintendo switch joycon daemon (requires hid-nx)
+	select BR2_PACKAGE_JAMMASD				if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_QTSIXA_SHANWAN			if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # ps3 pad
+	select BR2_PACKAGE_XARCADE2JSTICK			if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # keyboard events of the Xarcade Tankstick
+
+	# Case
+	select BR2_PACKAGE_ELEMENT14_PI_DESKTOP		if BR2_PACKAGE_BATOCERA_TARGET_BCM2836 || BR2_PACKAGE_BATOCERA_TARGET_BCM2837 # rpi2/rpi3
+	select BR2_PACKAGE_REGLINUX_GPICASE		if BR2_PACKAGE_BATOCERA_TARGET_BCM2835 || BR2_PACKAGE_BATOCERA_TARGET_BCM2836 || BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # retroflag gpicase
+	select BR2_PACKAGE_ROSHAMBO_CASE		if BR2_PACKAGE_BATOCERA_TARGET_RK3399 # roshambo case
+	select BR2_PACKAGE_RPIGPIOSWITCH		if BR2_PACKAGE_BATOCERA_RPI_ANY # gpio switchs
+	select BR2_PACKAGE_RETROGAME			if BR2_PACKAGE_BATOCERA_RPI_ANY # gpio pads
+	select BR2_PACKAGE_DESKPIPRO_CASE		if BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # deskpi pro case rpi4 only
+	select BR2_PACKAGE_PIBOY			if BR2_PACKAGE_BATOCERA_TARGET_BCM2836	|| \
+							   BR2_PACKAGE_BATOCERA_TARGET_BCM2837	|| \
+							   BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # piboy rpi3/rpi4
+	select BR2_PACKAGE_PICADE			if BR2_PACKAGE_BATOCERA_RPI_ANY # picade arcade case
+	select BR2_PACKAGE_PIRONMAN			if BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # pironman case is rpi4 only
+
+	# screens
+	#nope select BR2_PACKAGE_DMD_SIMULATOR
+	#nope select BR2_PACKAGE_DMD_SIMULATOR_PLAYER
+	#nope select BR2_PACKAGE_BATOCERA_BACKGLASS if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+
+	# swap, no thank you
+	#select BR2_PACKAGE_SWAPIT		if BR2_PACKAGE_BATOCERA_TARGET_RK3128	|| \
+	#					   BR2_PACKAGE_BATOCERA_TARGET_RK3326	|| \
+	#					   BR2_PACKAGE_BATOCERA_TARGET_BCM2835	|| \
+	#					   BR2_PACKAGE_BATOCERA_TARGET_BCM2836	|| \
+	#					   BR2_PACKAGE_BATOCERA_TARGET_BCM2837
+
+	# swap on zram, optional user-enabled service
+	select BR2_PACKAGE_ZRAMSWAP             if BR2_PACKAGE_BATOCERA_TARGET_BCM2835 || \
+						   BR2_PACKAGE_BATOCERA_TARGET_BCM2836 || \
+						   BR2_PACKAGE_BATOCERA_TARGET_BCM2837 || \
+						   BR2_PACKAGE_BATOCERA_TARGET_RK3128  || \
+						   BR2_PACKAGE_BATOCERA_TARGET_RK3326  || \
+						   BR2_PACKAGE_BATOCERA_TARGET_JZ4770
+
+	# irq balancing
+	select BR2_PACKAGE_IRQBALANCE
+
+	# music support
+	select BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
+
+	# Vulkan-enabled targets
+	select BR2_PACKAGE_REGLINUX_VULKAN	if  BR2_PACKAGE_BATOCERA_TARGET_X86_ANY || \
+						    BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
+						    BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
+						    BR2_PACKAGE_BATOCERA_TARGET_VISIONFIVE2 || \
+						    BR2_PACKAGE_BATOCERA_TARGET_BANANAPI_F3
+
+	# wireless drivers
+	# use the morrownr RTL8812au & RTL8821au drivers
+	select BR2_PACKAGE_RTL8812AU		if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770		&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835		&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_H3		&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_CHA		&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3326		&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3588		&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3128		&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_ODIN
+
+	select BR2_PACKAGE_RTL8821AU_MORROWNR	if BR2_PACKAGE_BATOCERA_TARGET_S922X || BR2_PACKAGE_BATOCERA_TARGET_A3GEN2 || BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL88X2BU		if BR2_PACKAGE_BATOCERA_TARGET_S922X || BR2_PACKAGE_BATOCERA_TARGET_A3GEN2 || BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL8723BU		if BR2_PACKAGE_BATOCERA_TARGET_S922X || BR2_PACKAGE_BATOCERA_TARGET_A3GEN2 || BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL8188EU		if BR2_PACKAGE_BATOCERA_TARGET_S922X || BR2_PACKAGE_BATOCERA_TARGET_A3GEN2 || BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL8821CU		if BR2_PACKAGE_BATOCERA_TARGET_S922X || BR2_PACKAGE_BATOCERA_TARGET_A3GEN2 || \
+						   BR2_PACKAGE_BATOCERA_TARGET_X86_ANY || BR2_PACKAGE_BATOCERA_TARGET_RK3588
+	select BR2_PACKAGE_RTL8189ES		if BR2_PACKAGE_BATOCERA_TARGET_S905 || BR2_PACKAGE_BATOCERA_TARGET_S905GEN2 || BR2_PACKAGE_BATOCERA_TARGET_S905GEN3
+	select BR2_PACKAGE_RTL8189FS		if BR2_PACKAGE_BATOCERA_TARGET_H3	|| \
+						   BR2_PACKAGE_BATOCERA_TARGET_S922X	|| \
+						   BR2_PACKAGE_BATOCERA_TARGET_A3GEN2	|| \
+						   BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+
+	# do NOT remove this one for OGA
+	select BR2_PACKAGE_RTL8192EU		if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770  && \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835	&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_H3	&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3128	&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3588
+
+	select BR2_PACKAGE_RTW89_TEMP		if BR2_PACKAGE_BATOCERA_TARGET_RK3588
+
+	select BR2_PACKAGE_RTL8822CS		if BR2_PACKAGE_BATOCERA_TARGET_S905GEN3
+
+	# ethernet
+	#select BR2_PACKAGE_R8125		if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	#select BR2_PACKAGE_R8168		if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+
+	# compression tools
+	select BR2_PACKAGE_UNZIP	# for /userdata/system/upgrade/share.zip
+	select BR2_PACKAGE_XZ		# for updates
+	select BR2_PACKAGE_ZSTD		# for btrfs compression
+	select BR2_PACKAGE_LZ4		# for initramfs compression
+
+	# script tool
+	select BR2_PACKAGE_DIALOG
+	select BR2_PACKAGE_MOSQUITTO # connected object interface (https://wiki.batocera.org/hardware:lcd_led_marquees)
+
+	# tools
+	select BR2_PACKAGE_I2C_TOOLS
+	select BR2_PACKAGE_MDADM	if !BR2_PACKAGE_BATOCERA_TARGET_CHA # RAID
+	select BR2_PACKAGE_MC		if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_OD_COMMANDER if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_FDUPES
+	select BR2_PACKAGE_PYTHON_SERIAL		if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	select BR2_PACKAGE_BATOCERA_ETHTOOL
+	select BR2_PACKAGE_SMARTMONTOOLS
+
+	# gpio controllers
+	select BR2_PACKAGE_DB9_GPIO_RPI					if BR2_PACKAGE_BATOCERA_RPI_ANY
+	select BR2_PACKAGE_GAMECON_GPIO_RPI				if BR2_PACKAGE_BATOCERA_RPI_ANY
+	select BR2_PACKAGE_MK_ARCADE_JOYSTICK_RPI			if BR2_PACKAGE_BATOCERA_RPI_ANY
+	select BR2_PACKAGE_PYTHON_RPI_GPIO				if BR2_PACKAGE_BATOCERA_RPI_ANY && !BR2_PACKAGE_BATOCERA_TARGET_BCM2712
+	select BR2_PACKAGE_PYTHON_GPIOZERO				if BR2_PACKAGE_BATOCERA_TARGET_BCM2835 || BR2_PACKAGE_BATOCERA_TARGET_BCM2836
+	select BR2_PACKAGE_PYTHON_ADAFRUIT_CIRCUITPYTHON_WS2801		if BR2_PACKAGE_BATOCERA_RPI_ANY && !BR2_PACKAGE_BATOCERA_TARGET_BCM2712
+	select BR2_PACKAGE_PYTHON3_GPIOD				if BR2_PACKAGE_BATOCERA_TARGET_BCM2712
+
+	# GPIO kernel driver
+	select BR2_PACKAGE_LIBGPIOD		if BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
+						  !BR2_PACKAGE_BATOCERA_TARGET_BCM2711	&& \
+						  !BR2_PACKAGE_BATOCERA_TARGET_BCM2835	&& \
+						  !BR2_PACKAGE_BATOCERA_TARGET_BCM2836	&& \
+						  !BR2_PACKAGE_BATOCERA_TARGET_BCM2837	&& \
+						   BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_8
+
+	# joy 2 pad
+	select BR2_PACKAGE_EVMAPY
+	select BR2_PACKAGE_EVMAPY_SYSTEM_CONFIG
+
+	# FUN R1 Gamepad
+	select BR2_PACKAGE_FUN_R1_GAMEPAD	if BR2_PACKAGE_BATOCERA_TARGET_S905
+
+	# odin wifi baseband dependencies
+	select BR2_PACKAGE_PD_MAPPER		if BR2_PACKAGE_BATOCERA_TARGET_ODIN
+	select BR2_PACKAGE_QRTR			    if BR2_PACKAGE_BATOCERA_TARGET_ODIN
+	select BR2_PACKAGE_RMTFS		    if BR2_PACKAGE_BATOCERA_TARGET_ODIN
+	select BR2_PACKAGE_TQFTPSERV		if BR2_PACKAGE_BATOCERA_TARGET_ODIN
+
+	# leds
+	select BR2_PACKAGE_AYN_PLATFORM		  if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+	select BR2_PACKAGE_AYANEO_PLATFORM    if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+
+	# REG-Linux
+	select BR2_PACKAGE_REGLINUX_INITRAMFS	# initramfs to boot the system
+	select BR2_PACKAGE_REGLINUX_SAMBA	# samba
+	select BR2_PACKAGE_WSDD_NATIVE		# service discovery on local network (windows network neighborhood)
+
+	help
+	  Install the batocera.linux system files
+
+config BR2_PACKAGE_BATOCERA_DEBUG
+	bool "add debug options"
+
+	select BR2_PACKAGE_TMUX
+	select BR2_PACKAGE_STRACE
+	select BR2_PACKAGE_VALGRIND
+	select BR2_BINUTILS_GPROFNG
+	select BR2_PACKAGE_GDB
+	select BR2_PACKAGE_GDB_DEBUGGER
+	select BR2_PACKAGE_LINUX_TOOLS_PERF
+	select BR2_PACKAGE_LINUX_TOOLS_PERF_TUI
+	select BR2_PACKAGE_X11VNC			if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+
+	help
+	  Install debug packages for batocera.linux
+
+config BR2_PACKAGE_BATOCERA_EXTRAS
+	bool "batocera.linux tools packages selection"
+
+	help
+	  Tools to extends the batocera system (but not required)
+
+config BR2_PACKAGE_BATOCERA_TOOLS
+	bool "batocera.linux system tools packages selection"
+
+	select BR2_PACKAGE_JSTEST2				# joysticks tester
+	select BR2_PACKAGE_EVTEST				# joysticks tester
+	select BR2_PACKAGE_LINUXCONSOLETOOLS			# tools for linux events calibration
+	select BR2_PACKAGE_LINUXCONSOLETOOLS_JOYSTICK		# tools for linux events calibration
+	select BR2_PACKAGE_LINUXCONSOLETOOLS_FORCEFEEDBACK	# tools for linux events calibration
+	select BR2_PACKAGE_NCURSES				# ncurses
+	select BR2_PACKAGE_NCURSES_WCHAR			# utf-8 support for ncurses
+	select BR2_PACKAGE_NANO					# basic nano emulator
+	select BR2_PACKAGE_ZIP					# zip tool
+	select BR2_PACKAGE_P7ZIP				# zip tool
+	select BR2_PACKAGE_HTOP					# multi-cpus usage
+	select BR2_PACKAGE_NCDU					# Disk Usage
+	select BR2_PACKAGE_FFMPEG_XCBGRAB			if BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_SWITCHRES				# switchres 15kHz
+	select BR2_PACKAGE_LIBGPIOD_TOOLS			if BR2_PACKAGE_LIBGPIOD
+
+	help
+	  System tools
+
+config BR2_PACKAGE_BATOCERA_GUNS
+	bool "batocera guns support"
+	select BR2_PACKAGE_AIMTRAK_GUNS				# aimtrak guns
+	select BR2_PACKAGE_SAMCO_GUNS				# samco guns
+	select BR2_PACKAGE_FUSION_LIGHTGUNS			# fusion lightguns
+	select BR2_PACKAGE_DOLPHINBAR_GUNS			# dolphinbar guns
+	#nope select BR2_PACKAGE_SINDEN_GUNS			# sinden guns (Needs to pull and build mono from scratch !!!!)
+	select BR2_PACKAGE_AELIGHTGUN				# ae light gun
+	select BR2_PACKAGE_GUN4IR_GUNS				# gun4ir guns
+	select BR2_PACKAGE_RETROSHOOTER_GUNS			# retroshooter guns
+	select BR2_PACKAGE_GUNCON				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY || BR2_PACKAGE_BATOCERA_TARGET_BCM2711 || BR2_PACKAGE_BATOCERA_TARGET_BCM2837 # guncon
+	select BR2_PACKAGE_GUNCON3				if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # guncon3
+	select BR2_PACKAGE_LIGHTGUNS_GAMES_PRECALIBRATIONS
+	select BR2_PACKAGE_DOLPHINCROSSHAIRSPACK		if BR2_PACKAGE_DOLPHIN_EMU
+	select BR2_PACKAGE_STEAMDECKGUN				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY
+
+config BR2_PACKAGE_BATOCERA_WPA
+	bool "batocera.linux WPA supplicant"
+
+	select BR2_PACKAGE_WPA_SUPPLICANT				if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_CLI				if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_DBUS				if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_DBUS_INTROSPECTION		if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_WIRED				if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wpa_supplicant driver, 2.10 requires kernel > 4.4
+	select BR2_PACKAGE_WPA_SUPPLICANT_WPA3				if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_NL80211			if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wpa_supplicant driver
+	select BR2_PACKAGE_WPA_SUPPLICANT_WEXT				if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wpa_supplicant driver
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44				if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44_CLI			if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44_DBUS			if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44_DBUS_INTROSPECTION	if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44_WIRED			if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wpa_supplicant driver, 2.10 requires kernel > 4.4
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44_WPA3			if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44_NL80211			if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wpa_supplicant driver
+	select BR2_PACKAGE_WPA_SUPPLICANT_K44_WEXT			if BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 # wpa_supplicant driver
+
+
+config BR2_PACKAGE_BATOCERA_QT6
+	bool "batocera.linux Qt6 stack"
+
+	select BR2_PACKAGE_QT6
+	select BR2_PACKAGE_QT6_VERSION_LATEST
+	select BR2_PACKAGE_QT6BASE
+	select BR2_PACKAGE_QT6BASE_CONCURRENT
+	select BR2_PACKAGE_QT6BASE_DBUS
+	select BR2_PACKAGE_QT6BASE_FONTCONFIG
+	select BR2_PACKAGE_QT6BASE_GIF
+	select BR2_PACKAGE_QT6BASE_GUI
+	select BR2_PACKAGE_QT6BASE_JPEG
+	select BR2_PACKAGE_QT6BASE_NETWORK
+	select BR2_PACKAGE_QT6BASE_PNG
+	select BR2_PACKAGE_QT6BASE_PRINTSUPPORT
+	select BR2_PACKAGE_QT6BASE_SQL
+	select BR2_PACKAGE_QT6BASE_TEST
+	select BR2_PACKAGE_QT6BASE_WIDGETS
+	select BR2_PACKAGE_QT6BASE_XML
+	select BR2_PACKAGE_QT6BASE_OPENGL		if BR2_PACKAGE_HAS_LIBGL
+	select BR2_PACKAGE_QT6BASE_OPENGL_DESKTOP	if BR2_PACKAGE_HAS_LIBGL
+	select BR2_PACKAGE_QT6BASE_OPENGL_ES2		if BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_QT6BASE_EGLFS		if BR2_PACKAGE_HAS_LIBEGL
+	select BR2_PACKAGE_QT6BASE_XCB			if BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_QT6DECLARATIVE
+	select BR2_PACKAGE_QT6MULTIMEDIA
+	select BR2_PACKAGE_QT6SHADERTOOLS
+	select BR2_PACKAGE_QT6SVG
+	select BR2_PACKAGE_QT6TOOLS
+	select BR2_PACKAGE_QT6TOOLS_LINGUIST_TOOLS
+	select BR2_PACKAGE_QT6WAYLAND
+	select BR2_PACKAGE_QT6WEBSOCKETS
+
+config BR2_PACKAGE_BATOCERA_LINUX_FIRMWARES
+	bool "batocera.linux Firmwares packages selection"
+
+	# alllinuxfirmwares
+	select BR2_PACKAGE_ALLLINUXFIRMWARES		if !BR2_PACKAGE_BATOCERA_TARGET_H616
+
+	# buildroot firmware
+	select BR2_PACKAGE_LINUX_FIRMWARE		if BR2_PACKAGE_BATOCERA_TARGET_RK3288
+
+	# common firmwares
+	select BR2_PACKAGE_UX500_FIRMWARE
+	select BR2_PACKAGE_WILC1000_FIRMWARE
+	select BR2_PACKAGE_ZD1211_FIRMWARE
+	select BR2_PACKAGE_B43_FIRMWARE
+
+	# audio
+	select BR2_PACKAGE_SOUND_OPEN_FIRMWARE			if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+
+	# x86 (maybe some firmware could be for all, to be checked)
+	select BR2_PACKAGE_WILINK_BT_FIRMWARE			if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
+
+	# RaspberryPi Firmwares bluetooth and wifi
+	select BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI		if BR2_PACKAGE_BATOCERA_RPI_ANY
+	select BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI_BT	if BR2_PACKAGE_BATOCERA_RPI_ANY
+	select BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI_WIFI	if BR2_PACKAGE_BATOCERA_RPI_ANY
+
+	# RK3588
+	select BR2_PACKAGE_FIRMWARE_RK3588			if BR2_PACKAGE_BATOCERA_TARGET_RK3588
+
+	# Extra linux firmware
+	select BR2_PACKAGE_EXTRALINUXFIRMWARES			if BR2_PACKAGE_BATOCERA_TARGET_H616		|| \
+								   BR2_PACKAGE_BATOCERA_TARGET_H6		|| \
+								   BR2_PACKAGE_BATOCERA_TARGET_AMLOGIC_ANY	|| \
+								   BR2_PACKAGE_BATOCERA_TARGET_RK3399
+	# orangepi firmware
+	select BR2_PACKAGE_FIRMWARE_ORANGEPI			if BR2_PACKAGE_BATOCERA_TARGET_H3	|| \
+								   BR2_PACKAGE_BATOCERA_TARGET_H5	|| \
+								   BR2_PACKAGE_BATOCERA_TARGET_H6	|| \
+								   BR2_PACKAGE_BATOCERA_TARGET_H616
+
+config BR2_PACKAGE_BATOCERA_SDL2
+	bool "BATOCERA SDL2"
+
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_GFX
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_SDL2_NET
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_SDL2_OPENGLES
+	select BR2_PACKAGE_SDL2_OPENGL		if BR2_PACKAGE_HAS_LIBGL
+	select BR2_PACKAGE_SDL2_X11		if BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_SDL2_KMSDRM
+	select BR2_PACKAGE_SDL2_WAYLAND
+	select BR2_PACKAGE_FLAC			# flac
+	select BR2_PACKAGE_LIBMAD		# mp3
+	select BR2_PACKAGE_LIBMODPLUG		# modules (mod,xm,s3m,it...)
+	select BR2_PACKAGE_LIBVORBIS		# ogg
+
+config BR2_PACKAGE_REGLINUX_XORGAPPS
+	bool "REG-Linux xorg desktop environment"
+	depends on BR2_PACKAGE_XORG7
+
+	# Xorg apps
+	select BR2_PACKAGE_BATOCERA_DESKTOPAPPS		# batocera applications config and scripts
+	select BR2_PACKAGE_LIBGTK3			# gtk3 library
+	select BR2_PACKAGE_L3AFPAD			# gtk3 text editor
+	select BR2_PACKAGE_PCMANFM			# file manager
+	select BR2_PACKAGE_GVFS				# file systems (trash, smb, ... in pcmanfm)
+	select BR2_PACKAGE_ADWAITA_ICON_THEME_LIGHT	# theme for file manager
+	select BR2_PACKAGE_XTERM			# terminal
+	select BR2_PACKAGE_XLIB_LIBXFT			# font size for xterm
+
+### ### ###

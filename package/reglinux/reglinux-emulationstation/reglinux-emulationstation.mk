@@ -15,7 +15,7 @@ REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl2 sdl2_mixer ffmpeg libyuv libfreeim
 
 # REG investigate this, looks like an old "hack" we should remove/avoid
 # Pass arch (uppercase) as compiler define
-REGLINUX_EMULATIONSTATION_CONF_OPTS += -DCMAKE_CXX_FLAGS=-D$(call UPPERCASE,$(BATOCERA_SYSTEM_ARCH))
+REGLINUX_EMULATIONSTATION_CONF_OPTS += -DCMAKE_CXX_FLAGS=-D$(call UPPERCASE,$(REGLINUX_SYSTEM_ARCH))
 
 # Always build with "batocera" special code
 REGLINUX_EMULATIONSTATION_CONF_OPTS += -DBATOCERA=ON
