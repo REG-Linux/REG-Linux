@@ -1,0 +1,11 @@
+--- a/common/edid.c	2023-01-09 16:07:33.000000000 +0000
++++ b/common/edid.c	2024-06-25 22:38:26.403079356 +0100
+@@ -180,7 +180,7 @@
+ 	int i;
+ 
+ 	for (i = 0; i < count && !found; i++, t++)
+-		if (EDID_DETAILED_TIMING_PIXEL_CLOCK(*t) != 0) {
++		if (EDID_DETAILED_TIMING_PIXEL_CLOCK(*t) > 0 && EDID_DETAILED_TIMING_PIXEL_CLOCK(*t) < 150000000) {
+ 			decode_timing((u8 *)t, timing);
+ 			if (mode_valid)
+ 				found = mode_valid(mode_valid_priv,
