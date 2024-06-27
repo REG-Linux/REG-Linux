@@ -24,11 +24,8 @@ ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2711),y)
 	BATOCERA_DRMINFO_FLAGS += -DHAVE_IGNORE_1360x768_MODE
 endif
 
-# this limits max resolution to 1080p on AllWinner H3 devices
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_H3),y)
-	BATOCERA_DRMINFO_FLAGS += -DFORCE_1080P_MAX
-endif
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+# this limits max resolution to 1080p on ARM/AArch64 devices
+ifeq ($(BR2_arm)$(BR2_aarch64),y)
 	BATOCERA_DRMINFO_FLAGS += -DFORCE_1080P_MAX
 endif
 
