@@ -350,10 +350,12 @@ static int modeset_prepare(int fd, int do_current)
 		  for (j = 0; (int)j < conn->count_modes; j++) {
 		    if(crtc_cmp(&live_crtc->mode, conn->modes+j) == 0) {
 #ifdef HAVE_IGNORE_1360x768_MODE
-		      if(!(conn->modes[j].hdisplay == 1360 && conn->modes[j].vdisplay == 768))
+		      if((conn->modes[j].hdisplay == 1360 && conn->modes[j].vdisplay == 768))
+			continue;
 #endif
 #ifdef FORCE_1080P_MAX
-		      if(!(conn->modes[j].hdisplay > 1920 || conn->modes[j].vdisplay > 1080))
+		      if((conn->modes[j].hdisplay > 1920 || conn->modes[j].vdisplay > 1080))
+			continue;
 #endif
 		      printf("%d.%d:%s %dx%d %uHz (%s%s)\n",
 			     i, j,
@@ -370,10 +372,12 @@ static int modeset_prepare(int fd, int do_current)
 		if(do_current == 0) {
 		  for (j = 0; (int)j < conn->count_modes; j++) {
 #ifdef HAVE_IGNORE_1360x768_MODE
-		    if(!(conn->modes[j].hdisplay == 1360 && conn->modes[j].vdisplay == 768))
+		    if((conn->modes[j].hdisplay == 1360 && conn->modes[j].vdisplay == 768))
+			continue;
 #endif
 #ifdef FORCE_1080P_MAX
-		      if(!(conn->modes[j].hdisplay > 1920 || conn->modes[j].vdisplay > 1080))
+		      if((conn->modes[j].hdisplay > 1920 || conn->modes[j].vdisplay > 1080))
+			continue;
 #endif
 		    printf("%d.%d:%s %dx%d %uHz (%s%s)\n",
 			   i, j,
@@ -385,7 +389,7 @@ static int modeset_prepare(int fd, int do_current)
 			   (conn->modes[j].type & DRM_MODE_TYPE_PREFERRED) == 0 ? "" : "*");
 		  }
 		}
-		
+
 
 		/* free connector data and link device into global list */
 		drmModeFreeConnector(conn);
