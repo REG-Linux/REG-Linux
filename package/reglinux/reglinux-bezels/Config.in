@@ -1,0 +1,6 @@
+config BR2_PACKAGE_REGLINUX_BEZELS
+        bool "REG Linux bezels"
+        help
+          REG Linux bezels
+
+	  https://github.com/REG-Linux/REG-bezel
