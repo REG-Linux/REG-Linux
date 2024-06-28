@@ -1,13 +1,13 @@
 ################################################################################
 #
-# batocera bezel
+# REG-Linux bezels
 #
 ################################################################################
 # Version.: Commits on Mar 18, 2023
-BATOCERA_BEZEL_VERSION = 6fec5f21bb31dc1b1e44fa3ad7d246c13bc40892
-BATOCERA_BEZEL_SITE = $(call github,batocera-linux,batocera-bezel,$(BATOCERA_BEZEL_VERSION))
+REGLINUX_BEZELS_VERSION = 6fec5f21bb31dc1b1e44fa3ad7d246c13bc40892
+REGLINUX_BEZELS_SITE = $(call github,REG-Linux,REG-bezel,$(REGLINUX_BEZELS_VERSION))
 
-define BATOCERA_BEZEL_INSTALL_TARGET_CMDS
+define REGLINUX_BEZELS_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/decorations
 	cp -rf $(@D)/ambiance_broadcast	      $(TARGET_DIR)/usr/share/batocera/datainit/decorations
 	cp -rf $(@D)/ambiance_gameroom 	      $(TARGET_DIR)/usr/share/batocera/datainit/decorations
