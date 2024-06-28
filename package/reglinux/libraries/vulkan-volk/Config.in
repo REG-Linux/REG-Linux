@@ -1,4 +1,5 @@
 config BR2_PACKAGE_VULKAN_VOLK
+	select BR2_PACKAGE_VULKAN_HEADERS
 	bool "vulkan-volk"
 		help
 		Meta loader for Vulkan
