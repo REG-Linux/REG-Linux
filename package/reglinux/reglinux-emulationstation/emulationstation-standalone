@@ -148,7 +148,10 @@ do
     eval "$(dbus-launch --sh-syntax --exit-with-session)"
 
     # Stop splash
-    /etc/init.d/S00plymouth stop
+    if [ ! $(pgrep -x sway) ]
+    then
+        /etc/init.d/S00plymouth stop
+    fi
 
     cd /userdata # es need a PWD
     %REGLINUX_EMULATIONSTATION_PREFIX% emulationstation ${GAMELAUNCHOPT} --exit-on-reboot-required %REGLINUX_EMULATIONSTATION_ARGS% ${CUSTOMESOPTIONS}
