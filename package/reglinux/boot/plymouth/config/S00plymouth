@@ -4,7 +4,7 @@ case "$1" in
     start)
 	if [ -x /usr/sbin/plymouthd -a -x /usr/bin/plymouth ]
 	then
-		plymouthd --graphical-boot --attach-to-session --mode=boot
+		plymouthd --mode=boot --graphical-boot --attach-to-session
 		plymouth --show-splash
 	fi
 	;;
@@ -13,7 +13,10 @@ case "$1" in
 	if [ -x /usr/bin/plymouth ] && /usr/bin/plymouth --ping
 	then
 		plymouth update-root-fs --read-write
-		plymouth quit --retain-splash
+		plymouth --wait quit --retain-splash
+	else
+		plymouthd --mode=shutdown --graphical-boot --attach-to-session
+		plymouth --show-splash
 	fi
         ;;
     *)
