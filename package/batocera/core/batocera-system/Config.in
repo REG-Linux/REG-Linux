@@ -469,7 +469,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "allwinner/h3/cha"									if BR2_PACKAGE_BATOCERA_TARGET_CHA
 	default "allwinner/h5/tritium-h5 allwinner/h5/orangepi-pc2"					if BR2_PACKAGE_BATOCERA_TARGET_H5
 	default "allwinner/h6/orangepi-3-lts allwinner/h6/orangepi-3 allwinner/h6/orangepi-one-plus"	if BR2_PACKAGE_BATOCERA_TARGET_H6
-	default "allwinner/h616/anbernic-rg35xx allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/x96-mate" \
+	default "allwinner/h616/anbernic-rg35xx allwinner/h616/bananapi-m4-berry allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/x96-mate" \
 													if BR2_PACKAGE_BATOCERA_TARGET_H616
 
 	# Amlogic targets
@@ -477,9 +477,9 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "amlogic/s905/nanopi-k2 amlogic/s905/odroid-c2 amlogic/s905/s905-tvbox amlogic/s905/lepotato amlogic/s905/khadas-vim1 amlogic/s905/p201 amlogic/s905/lepotato-v2 amlogic/s905/minix-neo-u1" \
 													if BR2_PACKAGE_BATOCERA_TARGET_S905
 	default "amlogic/s905gen2/radxa-zero amlogic/s905gen2/khadas-vim2"				if BR2_PACKAGE_BATOCERA_TARGET_S905GEN2
-	default "amlogic/s905gen3/odroid-c4 amlogic/s905gen3/khadas-vim3l amlogic/s905gen3/s905x3-tvbox" \
+	default "amlogic/s905gen3/odroid-c4 amlogic/s905gen3/khadas-vim3l amlogic/s905gen3/bananapi-m5 amlogic/s905gen3/s905x3-tvbox" \
 													if BR2_PACKAGE_BATOCERA_TARGET_S905GEN3
-	default "amlogic/s922x/odroid-go-ultra amlogic/s922x/beelink-gtking-pro amlogic/s922x/beelink-gtking amlogic/s922x/odroid-n2l amlogic/s922x/khadas-vim3 amlogic/s922x/odroid-n2 amlogic/s922x/odroid-n2plus amlogic/s922x/radxa-zero2" \
+	default "amlogic/s922x/odroid-go-ultra amlogic/s922x/beelink-gtking-pro amlogic/s922x/beelink-gtking amlogic/s922x/odroid-n2l amlogic/s922x/khadas-vim3 amlogic/s922x/odroid-n2 amlogic/s922x/odroid-n2plus amlogic/s922x/radxa-zero2 amlogic/s922x/bananapi-m2s" \
 													if BR2_PACKAGE_BATOCERA_TARGET_S922X
 	default "amlogic/s9gen4/khadas-vim1s"								if BR2_PACKAGE_BATOCERA_TARGET_S9GEN4
 	default "amlogic/a3gen2/khadas-vim4"								if BR2_PACKAGE_BATOCERA_TARGET_A3GEN2
@@ -500,7 +500,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 													if BR2_PACKAGE_BATOCERA_TARGET_RK3399
 	default "rockchip/rk3568/odroid-m1 rockchip/rk3568/rock-3a rockchip/rk3568/rock-3c rockchip/rk3568/anbernic-rgxx3 rockchip/rk3568/firefly-station-m2 rockchip/rk3568/firefly-station-p2" \
 													if BR2_PACKAGE_BATOCERA_TARGET_RK3568
-	default "rockchip/rk3588/gameforce-ace rockchip/rk3588/rock-5c rockchip/rk3588/rock-5b rockchip/rk3588/rock-5a rockchip/rk3588/orangepi-5 rockchip/rk3588/orangepi-5b rockchip/rk3588/orangepi-5-plus rockchip/rk3588/indiedroid-nova rockchip/rk3588/khadas-edge-2" \
+	default "rockchip/rk3588/gameforce-ace rockchip/rk3588/rock-5c rockchip/rk3588/rock-5b rockchip/rk3588/rock-5a rockchip/rk3588/orangepi-5 rockchip/rk3588/orangepi-5b rockchip/rk3588/orangepi-5-plus rockchip/rk3588/bananapi-m7 rockchip/rk3588/indiedroid-nova rockchip/rk3588/khadas-edge-2" \
 													if BR2_PACKAGE_BATOCERA_TARGET_RK3588
 	# disabled RK3588 boards we don't own and can't test: rockchip/rk3588/quartzpro64 rockchip/rk3588/mekotronics-r58 rockchip/rk3588/firefly-station-m3
 
