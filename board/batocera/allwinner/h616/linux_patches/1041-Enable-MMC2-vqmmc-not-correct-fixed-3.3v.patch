@@ -1,0 +1,43 @@
+From f05fe257fbceb4c5c8d117801da6abb391869526 Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Sat, 11 May 2024 20:27:32 +1200
+Subject: [PATCH 41/53] Enable MMC2 (vqmmc not correct fixed@3.3v)
+
+---
+ .../allwinner/sun50i-h700-anbernic-rg35xx-2024.dts  | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index cbc7e2d2e1b1..855f68c42c7c 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -240,6 +240,15 @@ &mmc0 {
+ 	status = "okay";
+ };
+ 
++&mmc2 {
++	vmmc-supply = <&reg_cldo4>;
++	vqmmc-supply = <&reg_aldo1>;
++	disable-wp;
++	cd-gpios = <&pio 4 22 GPIO_ACTIVE_LOW>; /* PE22 */
++	bus-width = <4>;
++	status = "okay";
++};
++
+ &ohci0 {
+ 	status = "okay";
+ };
+@@ -294,7 +303,9 @@ reg_dcdc3: dcdc3 {
+ 			};
+ 
+ 			reg_aldo1: aldo1 {
+-				/* 1.8v - unused */
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-name = "vcc-1v8-sd2";
+ 			};
+ 
+ 			reg_aldo2: aldo2 {
+-- 
+2.34.1
+

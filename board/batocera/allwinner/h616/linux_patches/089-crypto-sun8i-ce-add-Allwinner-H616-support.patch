@@ -1,0 +1,413 @@
+Subject: [PATCH v2 1/4] dt-bindings: crypto: sun8i-ce: Add compatible for H616
+Date: Tue, 25 Jun 2024 00:21:07 +0100
+Message-Id: <20240624232110.9817-2-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.39.4
+In-Reply-To: <20240624232110.9817-1-andre.przywara@arm.com>
+References: <20240624232110.9817-1-andre.przywara@arm.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240624_162259_098236_BD07BCDA 
+X-CRM114-Status: UNSURE (   9.46  )
+X-CRM114-Notice: Please train this message.
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org
+
+The Allwinner H616 has a crypto engine very similar to the one in the
+H6, although all addresses in the DMA descriptors are shifted by 2 bits,
+to accommodate for the larger physical address space. That makes it
+incompatible to the H6 variant, and thus requires a new compatible
+string. Clock wise it relies on the internal oscillator for the TRNG,
+so needs all four possible clocks specified.
+
+Add the compatible string to the list of recognised names, and add the
+H616 to list of devices requiring all four clocks.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Chen-Yu Tsai <wens@csie.org>
+---
+ .../devicetree/bindings/crypto/allwinner,sun8i-ce.yaml          | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
+index 4287678aa79f4..da47b601c165e 100644
+--- a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
++++ b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
+@@ -18,6 +18,7 @@ properties:
+       - allwinner,sun50i-a64-crypto
+       - allwinner,sun50i-h5-crypto
+       - allwinner,sun50i-h6-crypto
++      - allwinner,sun50i-h616-crypto
+ 
+   reg:
+     maxItems: 1
+@@ -49,6 +50,7 @@ if:
+     compatible:
+       enum:
+         - allwinner,sun20i-d1-crypto
++        - allwinner,sun50i-h616-crypto
+ then:
+   properties:
+     clocks:
+
+Subject: [PATCH v2 2/4] crypto: sun8i-ce - wrap accesses to descriptor address
+ fields
+Date: Tue, 25 Jun 2024 00:21:08 +0100
+Message-Id: <20240624232110.9817-3-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.39.4
+In-Reply-To: <20240624232110.9817-1-andre.przywara@arm.com>
+References: <20240624232110.9817-1-andre.przywara@arm.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240624_162301_037530_9D2C72F5 
+X-CRM114-Status: GOOD (  16.90  )
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org
+
+The Allwinner H616 (and later) SoCs support more than 32 bits worth of
+physical addresses. To accommodate the larger address space, the CE task
+descriptor fields holding addresses are now encoded as "word addresses",
+so take the actual address divided by four.
+This is true for the fields within the descriptor, but also for the
+descriptor base address, in the CE_TDA register.
+
+Wrap all accesses to those fields in a function, which will do the
+required division if needed. For now this in unused, so there should be
+no change in behaviour.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Chen-Yu Tsai <wens@csie.org>
+---
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c   |  8 ++++----
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  2 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c |  6 +++---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c |  6 +++---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c |  2 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h      | 15 +++++++++++++++
+ 6 files changed, 27 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index de50c00ba218f..19b7fb4a93e86 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -190,7 +190,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 		err = -EFAULT;
+ 		goto theend;
+ 	}
+-	cet->t_key = cpu_to_le32(rctx->addr_key);
++	cet->t_key = desc_addr_val_le32(ce, rctx->addr_key);
+ 
+ 	ivsize = crypto_skcipher_ivsize(tfm);
+ 	if (areq->iv && crypto_skcipher_ivsize(tfm) > 0) {
+@@ -208,7 +208,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 			err = -ENOMEM;
+ 			goto theend_iv;
+ 		}
+-		cet->t_iv = cpu_to_le32(rctx->addr_iv);
++		cet->t_iv = desc_addr_val_le32(ce, rctx->addr_iv);
+ 	}
+ 
+ 	if (areq->src == areq->dst) {
+@@ -236,7 +236,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 
+ 	len = areq->cryptlen;
+ 	for_each_sg(areq->src, sg, nr_sgs, i) {
+-		cet->t_src[i].addr = cpu_to_le32(sg_dma_address(sg));
++		cet->t_src[i].addr = desc_addr_val_le32(ce, sg_dma_address(sg));
+ 		todo = min(len, sg_dma_len(sg));
+ 		cet->t_src[i].len = cpu_to_le32(todo / 4);
+ 		dev_dbg(ce->dev, "%s total=%u SG(%d %u off=%d) todo=%u\n", __func__,
+@@ -251,7 +251,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 
+ 	len = areq->cryptlen;
+ 	for_each_sg(areq->dst, sg, nr_sgd, i) {
+-		cet->t_dst[i].addr = cpu_to_le32(sg_dma_address(sg));
++		cet->t_dst[i].addr = desc_addr_val_le32(ce, sg_dma_address(sg));
+ 		todo = min(len, sg_dma_len(sg));
+ 		cet->t_dst[i].len = cpu_to_le32(todo / 4);
+ 		dev_dbg(ce->dev, "%s total=%u SG(%d %u off=%d) todo=%u\n", __func__,
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index 0408b2d5d533b..6d45c1e559f7d 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -172,7 +172,7 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
+ 	writel(v, ce->base + CE_ICR);
+ 
+ 	reinit_completion(&ce->chanlist[flow].complete);
+-	writel(ce->chanlist[flow].t_phy, ce->base + CE_TDQ);
++	writel(desc_addr_val(ce, ce->chanlist[flow].t_phy), ce->base + CE_TDQ);
+ 
+ 	ce->chanlist[flow].status = 0;
+ 	/* Be sure all data is written before enabling the task */
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+index ee2a28c906ede..6072dd9f390b4 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+@@ -403,7 +403,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 
+ 	len = areq->nbytes;
+ 	for_each_sg(areq->src, sg, nr_sgs, i) {
+-		cet->t_src[i].addr = cpu_to_le32(sg_dma_address(sg));
++		cet->t_src[i].addr = desc_addr_val_le32(ce, sg_dma_address(sg));
+ 		todo = min(len, sg_dma_len(sg));
+ 		cet->t_src[i].len = cpu_to_le32(todo / 4);
+ 		len -= todo;
+@@ -414,7 +414,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 		goto theend;
+ 	}
+ 	addr_res = dma_map_single(ce->dev, result, digestsize, DMA_FROM_DEVICE);
+-	cet->t_dst[0].addr = cpu_to_le32(addr_res);
++	cet->t_dst[0].addr = desc_addr_val_le32(ce, addr_res);
+ 	cet->t_dst[0].len = cpu_to_le32(digestsize / 4);
+ 	if (dma_mapping_error(ce->dev, addr_res)) {
+ 		dev_err(ce->dev, "DMA map dest\n");
+@@ -445,7 +445,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	}
+ 
+ 	addr_pad = dma_map_single(ce->dev, buf, j * 4, DMA_TO_DEVICE);
+-	cet->t_src[i].addr = cpu_to_le32(addr_pad);
++	cet->t_src[i].addr = desc_addr_val_le32(ce, addr_pad);
+ 	cet->t_src[i].len = cpu_to_le32(j);
+ 	if (dma_mapping_error(ce->dev, addr_pad)) {
+ 		dev_err(ce->dev, "DMA error on padding SG\n");
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+index 80815379f6fc5..762459867b6c5 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+@@ -132,10 +132,10 @@ int sun8i_ce_prng_generate(struct crypto_rng *tfm, const u8 *src,
+ 	cet->t_sym_ctl = cpu_to_le32(sym);
+ 	cet->t_asym_ctl = 0;
+ 
+-	cet->t_key = cpu_to_le32(dma_iv);
+-	cet->t_iv = cpu_to_le32(dma_iv);
++	cet->t_key = desc_addr_val_le32(ce, dma_iv);
++	cet->t_iv = desc_addr_val_le32(ce, dma_iv);
+ 
+-	cet->t_dst[0].addr = cpu_to_le32(dma_dst);
++	cet->t_dst[0].addr = desc_addr_val_le32(ce, dma_dst);
+ 	cet->t_dst[0].len = cpu_to_le32(todo / 4);
+ 	ce->chanlist[flow].timeout = 2000;
+ 
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
+index 9c35f2a83eda8..e1e8bc15202e0 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
+@@ -77,7 +77,7 @@ static int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wa
+ 	cet->t_sym_ctl = 0;
+ 	cet->t_asym_ctl = 0;
+ 
+-	cet->t_dst[0].addr = cpu_to_le32(dma_dst);
++	cet->t_dst[0].addr = desc_addr_val_le32(ce, dma_dst);
+ 	cet->t_dst[0].len = cpu_to_le32(todo / 4);
+ 	ce->chanlist[flow].timeout = todo;
+ 
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 93d4985def87a..3b5c2af013d0d 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -149,6 +149,7 @@ struct ce_variant {
+ 	bool hash_t_dlen_in_bits;
+ 	bool prng_t_dlen_in_bytes;
+ 	bool trng_t_dlen_in_bytes;
++	bool needs_word_addresses;
+ 	struct ce_clock ce_clks[CE_MAX_CLOCKS];
+ 	int esr;
+ 	unsigned char prng;
+@@ -241,6 +242,20 @@ struct sun8i_ce_dev {
+ #endif
+ };
+ 
++static inline u32 desc_addr_val(struct sun8i_ce_dev *dev, dma_addr_t addr)
++{
++	if (dev->variant->needs_word_addresses)
++		return addr / 4;
++
++	return addr;
++}
++
++static inline __le32 desc_addr_val_le32(struct sun8i_ce_dev *dev,
++					dma_addr_t addr)
++{
++	return cpu_to_le32(desc_addr_val(dev, addr));
++}
++
+ /*
+  * struct sun8i_cipher_req_ctx - context for a skcipher request
+  * @op_dir:		direction (encrypt vs decrypt) for this request
+
+Subject: [PATCH v2 3/4] crypto: sun8i-ce - add Allwinner H616 support
+Date: Tue, 25 Jun 2024 00:21:09 +0100
+Message-Id: <20240624232110.9817-4-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.39.4
+In-Reply-To: <20240624232110.9817-1-andre.przywara@arm.com>
+References: <20240624232110.9817-1-andre.przywara@arm.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240624_162302_959669_14C86DEF 
+X-CRM114-Status: GOOD (  12.31  )
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org
+
+The crypto engine in the Allwinner H616 is very similar to the H6, but
+needs the base address for the task descriptor and the addresses within
+it to be expressed in words, not in bytes.
+
+Add a new variant struct entry for the H616, and set the new flag to
+mark the use of 34 bit addresses. Also the internal 32K oscillator is
+required for TRNG operation, so specify all four clocks.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Chen-Yu Tsai <wens@csie.org>
+Tested-by: Ryan Walklin <ryan@testtoast.com>
+Tested-by: Philippe Simons <simons.philippe@gmail.com>
+---
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index 6d45c1e559f7d..e55e58e164db3 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -92,6 +92,30 @@ static const struct ce_variant ce_h6_variant = {
+ 	.trng = CE_ALG_TRNG_V2,
+ };
+ 
++static const struct ce_variant ce_h616_variant = {
++	.alg_cipher = { CE_ALG_AES, CE_ALG_DES, CE_ALG_3DES,
++	},
++	.alg_hash = { CE_ALG_MD5, CE_ALG_SHA1, CE_ALG_SHA224, CE_ALG_SHA256,
++		CE_ALG_SHA384, CE_ALG_SHA512
++	},
++	.op_mode = { CE_OP_ECB, CE_OP_CBC
++	},
++	.cipher_t_dlen_in_bytes = true,
++	.hash_t_dlen_in_bits = true,
++	.prng_t_dlen_in_bytes = true,
++	.trng_t_dlen_in_bytes = true,
++	.needs_word_addresses = true,
++	.ce_clks = {
++		{ "bus", 0, 200000000 },
++		{ "mod", 300000000, 0 },
++		{ "ram", 0, 400000000 },
++		{ "trng", 0, 0 },
++		},
++	.esr = ESR_H6,
++	.prng = CE_ALG_PRNG_V2,
++	.trng = CE_ALG_TRNG_V2,
++};
++
+ static const struct ce_variant ce_a64_variant = {
+ 	.alg_cipher = { CE_ALG_AES, CE_ALG_DES, CE_ALG_3DES,
+ 	},
+@@ -1097,6 +1121,8 @@ static const struct of_device_id sun8i_ce_crypto_of_match_table[] = {
+ 	  .data = &ce_h5_variant },
+ 	{ .compatible = "allwinner,sun50i-h6-crypto",
+ 	  .data = &ce_h6_variant },
++	{ .compatible = "allwinner,sun50i-h616-crypto",
++	  .data = &ce_h616_variant },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(of, sun8i_ce_crypto_of_match_table);
+
+Subject: [PATCH v2 4/4] arm64: dts: allwinner: h616: add crypto engine node
+Date: Tue, 25 Jun 2024 00:21:10 +0100
+Message-Id: <20240624232110.9817-5-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.39.4
+In-Reply-To: <20240624232110.9817-1-andre.przywara@arm.com>
+References: <20240624232110.9817-1-andre.przywara@arm.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240624_162305_675847_3AD0AA0D 
+X-CRM114-Status: UNSURE (   8.84  )
+X-CRM114-Notice: Please train this message.
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org
+
+The Allwinner H616 SoC contains a crypto engine very similar to the H6
+version, but with all base addresses in the DMA descriptors shifted by
+two bits. This requires a new compatible string.
+Also the H616 CE relies on the internal osciallator for the TRNG
+operation, so we need to reference this clock.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 921d5f61d8d6a..187663d45ed72 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -113,6 +113,16 @@ soc {
+ 		#size-cells = <1>;
+ 		ranges = <0x0 0x0 0x0 0x40000000>;
+ 
++		crypto: crypto@1904000 {
++			compatible = "allwinner,sun50i-h616-crypto";
++			reg = <0x01904000 0x1000>;
++			interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_CE>, <&ccu CLK_CE>,
++				 <&ccu CLK_MBUS_CE>, <&rtc CLK_IOSC>;
++			clock-names = "bus", "mod", "ram", "trng";
++			resets = <&ccu RST_BUS_CE>;
++		};
++
+ 		syscon: syscon@3000000 {
+ 			compatible = "allwinner,sun50i-h616-system-control";
+ 			reg = <0x03000000 0x1000>;

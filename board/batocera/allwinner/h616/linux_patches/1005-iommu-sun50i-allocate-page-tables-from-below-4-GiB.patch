@@ -1,0 +1,45 @@
+From 65e03f086ea8d1ed05434013d2786c82419abd03 Mon Sep 17 00:00:00 2001
+From: Andre Przywara <andre.przywara@arm.com>
+Date: Fri, 31 May 2024 00:37:57 +0100
+Subject: [PATCH 05/53] iommu: sun50i: allocate page tables from below 4 GiB
+
+The Allwinner IOMMU is a strict 32-bit device, with the page table root
+pointer as well as both level's page tables and also the target addresses
+all required to be below 4GB.
+The Allwinner H6 SoC only supports 32-bit worth of physical addresses
+anyway, so this isn't a problem so far, but the H616 and later SoCs extend
+the PA space beyond 32 bit to accommodate more DRAM.
+To make sure we stay within the 32-bit PA range required by the IOMMU,
+force the memory for the page tables to come from below 4GB. by using
+allocations with the DMA32 flag.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ drivers/iommu/sun50i-iommu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/iommu/sun50i-iommu.c b/drivers/iommu/sun50i-iommu.c
+index dd3f07384624..c3244db5ac02 100644
+--- a/drivers/iommu/sun50i-iommu.c
++++ b/drivers/iommu/sun50i-iommu.c
+@@ -680,7 +680,7 @@
+ 	if (!sun50i_domain)
+ 		return NULL;
+ 
+-	sun50i_domain->dt = (u32 *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
++	sun50i_domain->dt = (u32 *)__get_free_pages(GFP_KERNEL | GFP_DMA32,
+ 						    get_order(DT_SIZE));
+ 	if (!sun50i_domain->dt)
+ 		goto err_free_domain;
+@@ -997,7 +998,7 @@ static int sun50i_iommu_probe(struct platform_device *pdev)
+ 
+ 	iommu->pt_pool = kmem_cache_create(dev_name(&pdev->dev),
+ 					   PT_SIZE, PT_SIZE,
+-					   SLAB_HWCACHE_ALIGN,
++					   SLAB_HWCACHE_ALIGN | SLAB_CACHE_DMA32,
+ 					   NULL);
+ 	if (!iommu->pt_pool)
+ 		return -ENOMEM;
+-- 
+2.34.1
+

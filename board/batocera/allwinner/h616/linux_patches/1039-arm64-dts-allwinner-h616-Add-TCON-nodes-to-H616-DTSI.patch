@@ -1,0 +1,36 @@
+From ef4e06d5523d6f28f5310045da38e6a2ac02964a Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Sat, 25 May 2024 17:20:27 +1200
+Subject: [PATCH 39/53] arm64: dts: allwinner: h616: Add TCON nodes to H616
+ DTSI
+
+The Allwinner H616 has a display pipeline similar to other Allwinner
+devices, specifically the A10. Not all output pins are exposed on all
+package variants (for example only the H700 and T507 have LCD pins
+exposed, but all variants support at least HDMI outputs connected to a
+display engine via a TCON TOP and one or more timing controllers
+(TCONs).
+
+Add TCON nodes for the TOP, and the LCD and TV timing controllers.
+
+Signed-off-by: Ryan Walklin <ryan@testtoast.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 31f0b3caa0c5..2f4c16548893 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -928,7 +928,7 @@ tcon_top_hdmi_out: port@5 {
+ 					reg = <5>;
+ 
+ 					tcon_top_hdmi_out_hdmi: endpoint {
+-						// remote-endpoint = <&hdmi_in_tcon_top>;
++						remote-endpoint = <&hdmi_in_tcon_top>;
+ 					};
+ 				};
+ 			};
+-- 
+2.34.1
+

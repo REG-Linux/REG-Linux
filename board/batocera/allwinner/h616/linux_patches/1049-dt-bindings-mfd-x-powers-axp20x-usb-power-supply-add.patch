@@ -1,0 +1,29 @@
+From faa622e30d408da5ed6585ab4a9ffd15ffeb51ff Mon Sep 17 00:00:00 2001
+From: Chris Morgan <macromorgan@hotmail.com>
+Date: Wed, 22 May 2024 18:01:30 -0500
+Subject: [PATCH 49/53] dt-bindings: mfd: x-powers,axp20x-usb-power-supply: add
+ AXP717
+
+Add binding for the AXP717 USB power supply.
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ .../bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml  | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml b/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml
+index 34b7959d6772..a50c3bafa707 100644
+--- a/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml
++++ b/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml
+@@ -26,6 +26,7 @@ properties:
+           - x-powers,axp202-usb-power-supply
+           - x-powers,axp221-usb-power-supply
+           - x-powers,axp223-usb-power-supply
++          - x-powers,axp717-usb-power-supply
+           - x-powers,axp813-usb-power-supply
+       - items:
+           - const: x-powers,axp803-usb-power-supply
+-- 
+2.34.1
+

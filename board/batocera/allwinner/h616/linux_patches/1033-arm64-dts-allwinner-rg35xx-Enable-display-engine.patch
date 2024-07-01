@@ -1,0 +1,31 @@
+From 7b191bf32bb6d6b53386be3f23f8b8aba40afb69 Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Thu, 23 May 2024 21:53:29 +1200
+Subject: [PATCH 33/53] arm64: dts: allwinner: rg35xx: Enable display engine
+
+The RG35XX has LCD and HDMI display outputs. Enable the display engine
+to support them.
+
+Signed-off-by: Ryan Walklin <ryan@testtoast.com>
+---
+ .../boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts   | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index afb49e65859f..694147cfe8f5 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -175,6 +175,10 @@ &cpu0 {
+ 	cpu-supply = <&reg_dcdc1>;
+ };
+ 
++&de {
++	status = "okay";
++};
++
+ &ehci0 {
+ 	status = "okay";
+ };
+-- 
+2.34.1
+

@@ -1,0 +1,30 @@
+From d6559eaff2e18adc0a25fe8966ebd1a44b3b5f54 Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Sat, 11 May 2024 20:27:53 +1200
+Subject: [PATCH 42/53] Experiment with GPIO control for SD2 low-voltage IO
+
+---
+ .../dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts     | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index 855f68c42c7c..86b3a432668b 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -262,6 +262,13 @@ &pio {
+ 	vcc-pg-supply = <&reg_aldo4>;
+ 	vcc-ph-supply = <&reg_cldo3>;
+ 	vcc-pi-supply = <&reg_cldo3>;
++
++	lvs-gpio {
++		gpio-hog;
++		gpios = <&pio 4 4 GPIO_ACTIVE_LOW>;
++		output-low;
++		line-name = "lvs-switch-gpio";
++	};
+ };
+ 
+ &r_rsb {
+-- 
+2.34.1
+

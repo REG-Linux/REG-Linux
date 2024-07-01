@@ -1,0 +1,40 @@
+From 24a865cac8f3fb19103a0e3cb3817f99d1fe2ed4 Mon Sep 17 00:00:00 2001
+From: Chris Morgan <macromorgan@hotmail.com>
+Date: Wed, 22 May 2024 18:01:32 -0500
+Subject: [PATCH 51/53] arm64: dts: allwinner: Anbernic RG35XX: add AXP717 USB
+ power
+
+Add the necessary node for the USB power driver and bind it to the OTG
+port.
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+ .../boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts  | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index a31c384a1430..0e9f926979c0 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -391,6 +391,10 @@ reg_cpusldo: cpusldo {
+ 				/* unused */
+ 			};
+ 		};
++
++		usb_power: usb-power {
++			compatible = "x-powers,axp717-usb-power-supply";
++		};
+ 	};
+ };
+ 
+@@ -407,6 +411,7 @@ &usbotg {
+ };
+ 
+ &usbphy {
++	usb0_vbus_power-supply = <&usb_power>;
+ 	status = "okay";
+ };
+ 
+-- 
+2.34.1
+

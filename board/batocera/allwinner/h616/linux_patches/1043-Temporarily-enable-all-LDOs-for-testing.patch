@@ -1,0 +1,64 @@
+From 48b8900944c78d4868019744be0f3fbdd7deb42f Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Sat, 11 May 2024 21:04:46 +1200
+Subject: [PATCH 43/53] Temporarily enable all LDOs for testing
+
+---
+ .../allwinner/sun50i-h700-anbernic-rg35xx-2024.dts   | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index 86b3a432668b..7146ca04201c 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -317,10 +317,14 @@ reg_aldo1: aldo1 {
+ 
+ 			reg_aldo2: aldo2 {
+ 				/* 1.8v - unused */
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
+ 			};
+ 
+ 			reg_aldo3: aldo3 {
+ 				/* 1.8v - unused */
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
+ 			};
+ 
+ 			reg_aldo4: aldo4 {
+@@ -331,6 +335,8 @@ reg_aldo4: aldo4 {
+ 
+ 			reg_bldo1: bldo1 {
+ 				/* 1.8v - unused */
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
+ 			};
+ 
+ 			reg_bldo2: bldo2 {
+@@ -342,10 +348,14 @@ reg_bldo2: bldo2 {
+ 
+ 			reg_bldo3: bldo3 {
+ 				/* 2.8v - unused */
++				regulator-min-microvolt = <2800000>;
++				regulator-max-microvolt = <2800000>;
+ 			};
+ 
+ 			reg_bldo4: bldo4 {
+ 				/* 1.2v - unused */
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <1200000>;
+ 			};
+ 
+ 			reg_cldo1: cldo1 {
+@@ -354,6 +364,8 @@ reg_cldo1: cldo1 {
+ 
+ 			reg_cldo2: cldo2 {
+ 				/* 3.3v - unused */
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
+ 			};
+ 
+ 			reg_cldo3: cldo3 {
+-- 
+2.34.1
+

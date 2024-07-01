@@ -1,0 +1,40 @@
+From 5f982fb732a4eae273b3dfbbc73f264ab8f407c1 Mon Sep 17 00:00:00 2001
+From: Andre Przywara <andre.przywara@arm.com>
+Date: Fri, 31 May 2024 00:38:00 +0100
+Subject: [PATCH 08/53] arm64: dts: allwinner: h616: add IOMMU node
+
+The Allwinner H616 contains a scatter-gather IOMMU connected to some
+video related devices. It's almost compatible to the one used in the H6,
+though with minor incompatibilities.
+
+Add the DT node describing its resources, so that devices like the video
+or display engine can connect to it.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 921d5f61d8d6..4895bbaf9442 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -295,6 +295,15 @@ x32clk_fanout_pin: x32clk-fanout-pin {
+ 			};
+ 		};
+ 
++		iommu: iommu@30f0000 {
++			compatible = "allwinner,sun50i-h616-iommu";
++			reg = <0x030f0000 0x10000>;
++			interrupts = <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_IOMMU>;
++			resets = <&ccu RST_BUS_IOMMU>;
++			#iommu-cells = <1>;
++		};
++
+ 		gic: interrupt-controller@3021000 {
+ 			compatible = "arm,gic-400";
+ 			reg = <0x03021000 0x1000>,
+-- 
+2.34.1
+

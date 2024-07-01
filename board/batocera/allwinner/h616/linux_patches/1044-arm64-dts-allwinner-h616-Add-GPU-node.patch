@@ -1,0 +1,24 @@
+From f62408fbbf8fd37cf50e101f3cea3dafa0ef6ca5 Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Tue, 28 May 2024 14:15:17 +1200
+Subject: [PATCH 44/53] arm64: dts: allwinner: h616: Add GPU node
+
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 9b0cb58eb0f2..a45cbf9c2434 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -1057,6 +1071,7 @@ r_ccu: clock@7010000 {
+ 			clock-names = "hosc", "losc", "iosc", "pll-periph";
+ 			#clock-cells = <1>;
+ 			#reset-cells = <1>;
++			#power-domain-cells = <1>;
+ 		};
+ 
+ 		nmi_intc: interrupt-controller@7010320 {
+-- 
+2.34.1
+

@@ -1,0 +1,41 @@
+From 63ac55f4ee5aba8abd6213f1a4f6200f543d222a Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Wed, 5 Jun 2024 18:58:36 +1200
+Subject: [PATCH 01/53] cpufreq: sun50i: add Allwinner H700 speed bin
+
+Support for the Allwinner H618, H618 and H700 was added to the sun50i
+cpufreq-nvmem driver recently [1] however at the time some operating
+points supported by the H700 (1.008, 1.032 and 1.512 GHz) and in use by
+vendor BSPs were found to be unstable during testing, so the H700 speed
+bin and  the 1.032 GHz OPP were not included in the mainline driver.
+
+Retesting with kernel 6.10rc2 (which carries additional fixes for the
+driver) now shows stable operation with these points.
+
+Add the H700 speed bin to the driver.
+
+Signed-off-by: Ryan Walklin <ryan@testtoast.com>
+Tested-by: Philippe Simons <simons.philippe@gmail.com>
+--
+[1] https://lore.kernel.org/linux-sunxi/20240418154408.1740047-1-andre.przywara@arm.com
+---
+ drivers/cpufreq/sun50i-cpufreq-nvmem.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/cpufreq/sun50i-cpufreq-nvmem.c b/drivers/cpufreq/sun50i-cpufreq-nvmem.c
+index 0b882765cd66..969f22aadd95 100644
+--- a/drivers/cpufreq/sun50i-cpufreq-nvmem.c
++++ b/drivers/cpufreq/sun50i-cpufreq-nvmem.c
+@@ -91,6 +91,9 @@ static u32 sun50i_h616_efuse_xlate(u32 speedbin)
+ 	case 0x5d00:
+ 		value = 0;
+ 		break;
++	case 0x6c00:
++		value = 5;
++		break;
+ 	default:
+ 		pr_warn("sun50i-cpufreq-nvmem: unknown speed bin 0x%x, using default bin 0\n",
+ 			speedbin & 0xffff);
+-- 
+2.34.1
+

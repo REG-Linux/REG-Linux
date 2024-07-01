@@ -1,0 +1,46 @@
+From 4261195443934a4c7e432ca7caa98a5e6629f331 Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Sat, 11 May 2024 20:27:04 +1200
+Subject: [PATCH 03/53] arm64: dts: allwinner: rg35xx: Enable DVFS CPU
+ frequency scaling
+
+The Anbernic RG35XX device variants (-2024, -H, -Plus and -SP) are the
+only currently known devices to have an Allwinner H700 SoC. The closely
+related RG28XX also has the H700 but a mainline DT for this device has
+not yet been submitted.
+
+Include the H616 CPU OPP table in the base device DTS, and increase the
+DCDC1 regulator (vdd-cpu) upper voltage range to 1.16V, allowing the
+CPU to reach 1.5GHz.
+
+Signed-off-by: Ryan Walklin <ryan@testtoast.com>
+Tested-by: Philippe Simons <simons.philippe@gmail.com>
+---
+ .../boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts   | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+index ee30584b6ad7..afb49e65859f 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-anbernic-rg35xx-2024.dts
+@@ -6,7 +6,7 @@
+ /dts-v1/;
+ 
+ #include "sun50i-h616.dtsi"
+-
++#include "sun50i-h616-cpu-opp.dtsi"
+ #include <dt-bindings/gpio/gpio.h>
+ #include <dt-bindings/input/linux-event-codes.h>
+ #include <dt-bindings/interrupt-controller/arm-gic.h>
+@@ -221,7 +221,7 @@ regulators {
+ 			reg_dcdc1: dcdc1 {
+ 				regulator-always-on;
+ 				regulator-min-microvolt = <900000>;
+-				regulator-max-microvolt = <1100000>;
++				regulator-max-microvolt = <1160000>;
+ 				regulator-name = "vdd-cpu";
+ 			};
+ 
+-- 
+2.34.1
+
