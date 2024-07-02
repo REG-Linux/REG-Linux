@@ -108,7 +108,10 @@ done
 for BATOCERA_PATHSUBTARGET in ${BATOCERA_IMAGES_TARGETS}
 do
     BATOCERA_SUBTARGET=$(basename "${BATOCERA_PATHSUBTARGET}")
-    for FILE in "${REGLINUX_BINARIES_DIR}/images/"*"/boot-${BATOCERA_SUBTARGET}.tar.zst" "${REGLINUX_BINARIES_DIR}/images/"*"/reglinux-"*".img.gz"
+    if [ "${BATOCERA_LOWER_TARGET}" = "${BATOCERA_SUBTARGET}" ]; then
+        BATOCERA_SUBTARGET="${BATOCERA_LOWER_TARGET}"
+    fi
+    for FILE in "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/boot-${BATOCERA_SUBTARGET}.tar.zst" "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}/reglinux-"*".img.gz"
     do
         echo "creating ${FILE}.md5"
         CKS=$(md5sum "${FILE}" | sed -e s+'^\([^ ]*\) .*$'+'\1'+)
