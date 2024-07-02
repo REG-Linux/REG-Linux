@@ -204,7 +204,10 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_BOOST_ATOMIC			# library that provides atomic data types and operations on these data types
 	select BR2_PACKAGE_UTIL_LINUX_LIBSMARTCOLS	# library is used for smart adaptive formatting of tabular data
 	select BR2_PACKAGE_UTIL_LINUX_SETTERM		# Set terminal attributes
-	#nope select BR2_PACKAGE_OPENVPN			# VPN support
+	#select BR2_PACKAGE_OPENVPN			# OpenVPN support
+	#select BR2_PACKAGE_WIREGUARD_TOOLS		# WireGuard VPN support
+	#select BR2_PACKAGE_WIREGUARD_LINUX_COMPAT	if !BR2_TOOLCHAIN_HEADERS_AT_LEAST_5_6 # Kernel < 5.6 backwards compatibility
+	#select BR2_PACKAGE_OPENRESOLV			# DNS resolver
 	select BR2_PACKAGE_USB_MODESWITCH		# USB modeswitch support
 	select BR2_PACKAGE_UMTOOL			if !BR2_PACKAGE_BATOCERA_TARGET_CHA # command line tool for configuring Ultimarc arcade hardware
 	select BR2_PACKAGE_PYTHON_HIDAPI		# Communication with USB HID devices via Python
@@ -375,6 +378,9 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 						   !BR2_PACKAGE_BATOCERA_TARGET_RK3588
 
 	select BR2_PACKAGE_RTL8822CS		if BR2_PACKAGE_BATOCERA_TARGET_S905GEN3
+
+	# Rock 5c
+	select BR2_PACKAGE_AIC8800		if BR2_PACKAGE_BATOCERA_TARGET_RK3588
 
 	# ethernet
 	#select BR2_PACKAGE_R8125		if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
@@ -1527,7 +1533,6 @@ config BR2_PACKAGE_BATOCERA_CORES_EXPERIMENTAL
 
 	# Apple 2
 	select BR2_PACKAGE_APPLEWIN		# ALL
-
 
 	help
 	  Emulators under development (Experimental)

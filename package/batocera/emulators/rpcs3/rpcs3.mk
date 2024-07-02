@@ -3,8 +3,8 @@
 # rpcs3
 #
 ################################################################################
-# Version: 0.0.32-16614 - Commits on Jun 15, 2024
-RPCS3_VERSION = 5b973448bf75a239f34fd9c7698c8a02b04e2ea9
+# Version: 0.0.32-16618 - Commits on Jun 21, 2024
+RPCS3_VERSION = bceaf46e2fcaed3e32e0830b977716e33fec949d
 RPCS3_SITE = https://github.com/RPCS3/rpcs3.git
 RPCS3_SITE_METHOD=git
 RPCS3_GIT_SUBMODULES=YES
@@ -29,13 +29,6 @@ RPCS3_CONF_OPTS += -DUSE_SYSTEM_LIBUSB=ON
 RPCS3_CONF_OPTS += -DUSE_LIBEVDEV=ON
 RPCS3_CONF_OPTS += -DUSE_SYSTEM_FAUDIO=ON
 RPCS3_CONF_OPTS += -DUSE_SYSTEM_SDL=ON
-# this is ugly, but necessary... for now...
-#RPCS3_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF
-#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVCODEC=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavcodec.a
-#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVFORMAT=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavformat.a
-#RPCS3_CONF_OPTS += -DFFMPEG_LIB_AVUTIL=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libavutil.a
-#RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWSCALE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswscale.a
-#RPCS3_CONF_OPTS += -DFFMPEG_LIB_SWRESAMPLE=../3rdparty/ffmpeg/lib/linux/ubuntu-22.04/x86_64/libswresample.a
 
 RPCS3_CONF_ENV = LIBS="-ncurses -ltinfo"
 
