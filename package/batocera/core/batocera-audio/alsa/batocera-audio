@@ -45,7 +45,7 @@ case "${ACTION}" in
                     LANG=C pactl set-default-sink "${MODE}" || exit 1
                     ;;
                 "s922x")
-                    if [ "$BOARD" == "ogu" ]; then
+                    if [ "$BOARD" == "odroid-go-ultra" ]; then
                         LANG=C pactl set-default-sink INTERNAL
                         amixer -c 0 -q sset "Master" 100%
                         amixer -c 0 sset 'Playback Mux' SPK
