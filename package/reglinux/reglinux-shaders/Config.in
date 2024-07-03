@@ -1,0 +1,6 @@
+config BR2_PACKAGE_REGLINUX_SHADERS
+        bool "REG-Linux shaders"
+	depends on BR2_PACKAGE_RETROARCH
+        select BR2_PACKAGE_GLSL_SHADERS
+        help
+          REG-Linux shaders for retroarch
