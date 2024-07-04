@@ -4,7 +4,11 @@
 #
 ################################################################################
 
+ifeq ($(BR2_x86_64),y)
+AMIBERRY_VERSION = preview-v6.3.3
+else
 AMIBERRY_VERSION = v5.7.3
+endif
 AMIBERRY_SITE = $(call github,BlitterStudio,amiberry,$(AMIBERRY_VERSION))
 AMIBERRY_LICENSE = GPLv3
 AMIBERRY_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac
