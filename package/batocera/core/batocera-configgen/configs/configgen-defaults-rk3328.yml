@@ -1,7 +1,13 @@
+default:
+  options:
+    video_threaded: true
+    smooth: false
+    retroarch.menu_driver: xmb
+    retroarch.audio_driver: alsathread
+
 fmtowns:
   emulator: libretro
   core:     mame
 flash:
   emulator: lightspark
   core:     lightspark
-

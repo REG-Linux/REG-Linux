@@ -2,15 +2,6 @@ default:
   options:
     videomode: max-1280x720
 
-amiga500:
-  emulator: libretro
-  core:     uae4arm
-amiga1200:
-  emulator: libretro
-  core:     uae4arm
-amigacd32:
-  emulator: libretro
-  core:     uae4arm
 amigacdtv:
   emulator: libretro
   core:     uae4arm
