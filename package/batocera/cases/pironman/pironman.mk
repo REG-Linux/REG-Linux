@@ -9,9 +9,13 @@ PIRONMAN_SITE = $(call github,sunfounder,pironman,$(PIRONMAN_VERSION))
 PIRONMAN_LICENSE = GPL-2.0
 PIRONMAN_LICENSE_FILE = LICENSE
 
-PIRONMAN_DEPENDENCIES += freetype getent i2c-tools libpng lirc-tools
+PIRONMAN_DEPENDENCIES += freetype getent i2c-tools libpng
 PIRONMAN_DEPENDENCIES += net-tools openjpeg python-rpi-gpio python-rpi-ws281x
 PIRONMAN_DEPENDENCIES += python-smbus-cffi python-spidev python3 tiff zlib
+
+ifeq ($(BR2_PACKAGE_LIRC_TOOLS),y)
+PIRONMAN_DEPENDENCIES += lirc-tools
+endif
 
 define PIRONMAN_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/bin/pironman $(TARGET_DIR)/usr/bin/

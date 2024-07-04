@@ -7,7 +7,10 @@
 DESKPIPRO_CASE_VERSION = e4200553775bc88e93af1ced1bda8214cc87a00c
 DESKPIPRO_CASE_SITE = $(call github,DeskPi-Team,deskpi,$(DESKPIPRO_CASE_VERSION))
 DESKPIPRO_CASE_LICENSE = GPL-3.0+
-DESKPIPRO_CASE_DEPENDENCIES = lirc-tools
+
+ifeq ($(BR2_PACKAGE_LIRC_TOOLS),y)
+DESKPIPRO_CASE_DEPENDENCIES += lirc-tools
+endif
 
 define DESKPIPRO_CASE_BUILD_CMDS
 	$(HOST_DIR)/bin/aarch64-linux-gcc -o $(@D)/drivers/c/fanStop $(@D)/drivers/c/fanStop.c
