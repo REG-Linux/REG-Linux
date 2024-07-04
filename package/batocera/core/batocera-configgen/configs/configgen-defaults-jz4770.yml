@@ -1,6 +1,9 @@
 default:
   options:
     video_threaded: true
+    smooth: false
+    retroarch.menu_driver: rgui
+    retroarch.audio_driver: alsathread
 
 amiga500:
   emulator: libretro
@@ -9,6 +12,9 @@ amiga1200:
   emulator: libretro
   core:     puae
 amigacd32:
+  emulator: libretro
+  core:     puae
+amigacdtv:
   emulator: libretro
   core:     puae
 mastersystem:
