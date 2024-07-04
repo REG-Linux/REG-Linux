@@ -29,17 +29,17 @@ advision:
   emulator: libretro
   core:     mame
 amiga500:
-  emulator: libretro
-  core:     puae
+  emulator: amiberry
+  core:     A500
 amiga1200:
-  emulator: libretro
-  core:     puae
+  emulator: amiberry
+  core:     A1200
 amigacd32:
-  emulator: libretro
-  core:     puae
+  emulator: amiberry
+  core:     CD32
 amigacdtv:
-  emulator: libretro
-  core:     puae
+  emulator: amiberry
+  core:     CDTV
 amstradcpc:
   emulator: libretro
   core:     cap32

@@ -3,15 +3,6 @@ default:
     retroarch.menu_driver: xmb
     retroarch.audio_driver: alsathread
 
-amiga500:
-  emulator: amiberry
-  core:     A500
-amiga1200:
-  emulator: amiberry
-  core:     A1200
-amigacd32:
-  emulator: amiberry
-  core:     CD32
 mastersystem:
   emulator: libretro
   core:     picodrive
