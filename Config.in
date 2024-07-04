@@ -573,6 +573,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/vcmi/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/appstream/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/cpuinfo/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/libtidy/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/libxmlb/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/vulkan-volk/Config.in"
