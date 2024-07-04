@@ -1,3 +1,10 @@
+default:
+  options:
+    video_threaded: true
+    smooth: false
+    retroarch.menu_driver: xmb
+    retroarch.audio_driver: alsathread
+
 nds:
   emulator: drastic
   core:     drastic

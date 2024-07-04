@@ -1,6 +1,9 @@
 default:
   options:
     video_threaded: true
+    smooth: false
+    retroarch.menu_driver: rgui
+    retroarch.audio_driver: alsathread
 
 amiga500:
   emulator: libretro
