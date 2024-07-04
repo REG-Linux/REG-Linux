@@ -6,9 +6,6 @@ default:
     retroarch.menu_driver: xmb
     retroarch.audio_driver: alsathread
 
-amigacdtv:
-  emulator: libretro
-  core:     uae4arm
 nds:
   emulator: drastic
   core:     drastic

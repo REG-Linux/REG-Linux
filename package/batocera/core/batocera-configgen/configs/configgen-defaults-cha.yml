@@ -5,9 +5,6 @@ default:
     retroarch.menu_driver: xmb
     retroarch.audio_driver: alsathread
 
-amigacdtv:
-  emulator: libretro
-  core:     uae4arm
 mastersystem:
   emulator: libretro
   core:     picodrive

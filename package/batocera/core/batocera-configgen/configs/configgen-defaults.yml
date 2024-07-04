@@ -38,8 +38,8 @@ amigacd32:
   emulator: amiberry
   core:     CD32
 amigacdtv:
-  emulator: libretro
-  core:     puae
+  emulator: amiberry
+  core:     CDTV
 amstradcpc:
   emulator: libretro
   core:     cap32

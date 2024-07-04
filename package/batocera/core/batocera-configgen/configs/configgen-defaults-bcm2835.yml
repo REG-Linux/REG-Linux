@@ -8,6 +8,18 @@ default:
     retroarch.audio_latency:    96
     retroarch.menu_driver:      rgui
 
+amiga500:
+  emulator: libretro
+  core:     uae4arm
+amiga1200:
+  emulator: libretro
+  core:     uae4arm
+amigacd32:
+  emulator: libretro
+  core:     uae4arm
+amigacdtv:
+  emulator: libretro
+  core:     uae4arm
 gba:
   emulator: libretro
   core:     gpsp
