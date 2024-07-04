@@ -5,7 +5,6 @@ config BR2_PACKAGE_PIRONMAN
 	select BR2_PACKAGE_GETENT
 	select BR2_PACKAGE_I2C_TOOLS
 	select BR2_PACKAGE_LIBPNG
-	select BR2_PACKAGE_LIRC_TOOLS
 	select BR2_PACKAGE_NET_TOOLS
 	select BR2_PACKAGE_OPENJPEG
 	select BR2_PACKAGE_PYTHON_RPI_GPIO
@@ -16,5 +15,5 @@ config BR2_PACKAGE_PIRONMAN
 	select BR2_PACKAGE_ZLIB
 	help
 	  Enable OLED, fan, RGB & infrared for the Pironman case.
-      
+
 	  https://github.com/sunfounder/pironman
