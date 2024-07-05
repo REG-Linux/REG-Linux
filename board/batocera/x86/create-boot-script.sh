@@ -21,7 +21,7 @@ mkdir -p "${REGLINUX_BINARIES_DIR}/boot/grub"          || exit 1
 
 # Batocera kernel, initrd, and root
 cp "${BINARIES_DIR}/bzImage"            "${REGLINUX_BINARIES_DIR}/boot/boot/linux"              || exit 1
-cp "${BINARIES_DIR}/rootfs.cpio.gz"     "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.gz"          || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.lz4"    "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"         || exit 1
 cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update"    || exit 1
 cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"     || exit 1
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
