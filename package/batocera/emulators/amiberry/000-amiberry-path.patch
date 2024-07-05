@@ -5,7 +5,7 @@
  std::string get_data_path()
  {
 -	return fix_trailing(data_dir);
-+	return std::string("/userdata/system/configs/amiberry/data/");
++	return std::string("/usr/share/amiberry/data/");
  }
  
  void get_saveimage_path(char* out, int size, int dir)
@@ -94,6 +94,15 @@
  	write_string_option("ripper_path", ripper_path);
  	write_string_option("inputrecordings_dir", input_dir);
  	write_string_option("nvram_dir", nvram_dir);
+@@ -4014,7 +4014,7 @@
+ 	harddrive_path.append("/harddrives/");
+ 	cdrom_path.append("/cdroms/");
+ 	logfile_path.append("/amiberry.log");
+-	rom_path.append("/kickstarts/");
++	rom_path = "/userdata/bios/amiga/";
+ 	rp9_path.append("/rp9/");
+ 	saveimage_dir.append("/savestates/");
+ 	savestate_dir.append("/savestates/");
 @@ -4127,7 +4127,7 @@
  		abort();
  	}
