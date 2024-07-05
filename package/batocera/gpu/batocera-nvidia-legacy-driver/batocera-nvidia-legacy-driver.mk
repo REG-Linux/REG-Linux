@@ -249,14 +249,14 @@ define BATOCERA_NVIDIA_LEGACY_DRIVER_RENAME_KERNEL_MODULES
     mkdir -p $(TARGET_DIR)/usr/share/nvidia
 	mkdir -p $(TARGET_DIR)/usr/share/nvidia/modules
 	# rename the kernel modules to avoid conflict
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-legacy.ko.zst
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-modeset-legacy.ko.zst
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-drm-legacy.ko.zst
-	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko.zst \
-	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-uvm-legacy.ko.zst
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia.ko \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-legacy.ko
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-modeset.ko \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-modeset-legacy.ko
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-drm.ko \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-drm-legacy.ko
+	mv -f $(TARGET_DIR)/lib/modules/$(LINUX_VERSION_PROBED)/updates/nvidia-uvm.ko \
+	    $(TARGET_DIR)/usr/share/nvidia/modules/nvidia-uvm-legacy.ko
 	# set the driver version file
 	echo $(BATOCERA_NVIDIA_LEGACY_DRIVER_VERSION) > $(TARGET_DIR)/usr/share/nvidia/legacy.version
 endef
