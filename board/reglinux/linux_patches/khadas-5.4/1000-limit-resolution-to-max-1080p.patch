@@ -1,0 +1,11 @@
+--- a/drivers/gpu/drm/drm_edid.c	2024-07-05 16:15:06.136116643 +0200
++++ b/drivers/gpu/drm/drm_edid.c	2024-07-05 16:17:35.471699500 +0200
+@@ -2859,7 +2859,7 @@
+ 	struct detailed_mode_closure *closure = c;
+ 	struct drm_display_mode *newmode;
+ 
+-	if (timing->pixel_clock) {
++	if ((timing->pixel_clock > 0) && (timing->pixel_clock < 15000)) {
+ 		newmode = drm_mode_detailed(closure->connector->dev,
+ 					    closure->edid, timing,
+ 					    closure->quirks);
