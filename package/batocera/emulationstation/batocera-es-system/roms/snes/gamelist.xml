@@ -1,17 +1,30 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <gameList>
-  <game>
-    <path>./DonkeyKongClassic (Shiru).smc</path>
-    <name>Classic Kong</name>
-    <desc>What's more fun than a barrel of monkeys? A Donkey Kong double feature! In DONKEY KONG you'll duck barrel bombs and flaming fireballs as you help Mario save his girlfriend Pauline from the clutches of Donkey Kong. In DONKEY KONG JR., you'll join forces with these madcap monkeys to help Donkey Kong Jr. rescue his father from Mario's prison. Are you ready for laughter? You'd better be. Because this double dose of monkey business will have you rolling in the aisles!</desc>
-    <image>./images/DonkeyKongClassic (Shiru)-image.png</image>
-    <video>./videos/DonkeyKongClassic (Shiru)-video.mp4</video>
-    <marquee>./images/DonkeyKongClassic (Shiru)-marquee.png</marquee>
-    <thumbnail>./images/DonkeyKongClassic (Shiru)-thumb.png</thumbnail>
-    <releasedate>20120101T000000</releasedate>
-    <developer>Shiru</developer>
-    <publisher>BubbleZap Games</publisher>
-    <genre>Action</genre>
-    <players>1-2</players>
-  </game>
+	<game>
+		<path>./Dottie Flowers (v1.1).sfc</path>
+		<name>Dottie Flowers</name>
+		<desc>A charming platformer game created as a tribute to the fantastic SNES community and an homage to the German 16-bit video game developers of the early nineties. In this game, players step into the shoes - or rather, fly on the broom - of a witch named Dottie Flowers. Dottie has the critical task of saving her city using her magical powers and trusty broom.</desc>
+		<image>./images/Dottie Flowers.jpg</image>
+		<video>./videos/Dottie Flowers.mp4</video>
+		<releasedate>20231231T000000</releasedate>
+		<developer>Goldlocke</developer>
+		<publisher>https://goldlocke.itch.io/dottie-flowers</publisher>
+		<genre>Platformer</genre>
+		<players>1</players>
+		<lang>en</lang>
+	</game>
+	<game>
+		<path>./Super Boss Gaiden (v1.2).sfc</path>
+		<name>Super Boss Gaiden</name>
+		<desc>Humorous beat'em up game, where the fictional President of a video game company gets angry when his executives deliver the news that the last remaining prototype has fallen into the hands of the general public and has been emulated. Being a very hands-on executive, instead of calmly discussing the situation and planning out the proper legal counter action, the titular Boss takes on employees and resources with both fists and feet.</desc>
+		<image>./images/Super Boss Gaiden.jpg</image>
+		<video>./videos/Super Boss Gaiden.mp4</video>
+		<manual>./manuals/Super Boss Gaiden.pdf</manual>
+		<releasedate>20180812T000000</releasedate>
+		<developer>Dieter von Laser; ChronoMoogle</developer>
+		<publisher>https://superbossgaiden.superfamicom.org/</publisher>
+		<genre>Beat'em up</genre>
+		<players>1</players>
+		<lang>en</lang>
+	</game>
 </gameList>
