@@ -12,7 +12,8 @@ Bomberman is controlled with the keyboard or with (up to 8) joypads.
 		<rating>0.9</rating>
 		<publisher>Libretro</publisher>
 		<developer>Remdy Software</developer>
-		<image>./images/mrboom.png</image>
+		<image>./images/MrBoom.jpg</image>
+		<video>./videos/MrBoom.mp4</video>
 		<players>8</players>
 		<genre>Action</genre>
 	</game>

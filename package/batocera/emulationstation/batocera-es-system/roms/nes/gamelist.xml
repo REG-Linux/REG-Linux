@@ -1,24 +1,18 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <gameList>
 	<game>
-		<path>./2048 (tsone).nes</path>
-		<name>2048</name>
-		<desc>2048 is an originally Smartphone Game. You must play with tile to add them pair by pair to obtain 2048.</desc>
-		<image>./images/2048 (tsone)-image.png</image>
-		<video>./videos/2048 (tsone)-video.mp4</video>
-		<marquee>./images/2048 (tsone)-marquee.png</marquee>
-		<thumbnail>./images/2048 (tsone)-thumb.png</thumbnail>
-		<releasedate>20140621T000000</releasedate>
-		<developer>tsone</developer>
-		<publisher>tsone</publisher>
-		<genre>Puzzle-Game</genre>
+		<path>./Alter Ego.nes</path>
+		<name>Alter Ego</name>
+		<desc>Freeware puzzle game for NES, a port of the original (by Denis Grachev for the ZX Spectrum). Swap positions with your 'alter ego' to move about the level and obtain all the bouncing pixels.</desc>
+		<image>./images/Alter Ego.jpg</image>
+		<video>./videos/Alter Ego.mp4</video>
+		<manual>./manuals/Alter Ego.pdf</manual>
+		<rating>0.6</rating>
+		<releasedate>20110724T000000</releasedate>
+		<developer>Shiru</developer>
+		<publisher>https://shiru.untergrund.net/</publisher>
+		<genre>Puzzle</genre>
 		<players>1</players>
-		<playcount>1</playcount>
-		<lastplayed>19791231T200311</lastplayed>
-		<crc32>73E0D658</crc32>
-		<md5>8544a91dafff6b0a268fe67c3655104c</md5>
 		<lang>en</lang>
-		<cheevosHash>BE1063151F68C58D712138C568C73C8B</cheevosHash>
-		<cheevosId>6070</cheevosId>
 	</game>
 </gameList>
