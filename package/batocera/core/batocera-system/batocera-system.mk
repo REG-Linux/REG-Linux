@@ -90,6 +90,8 @@ define BATOCERA_SYSTEM_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/share/batocera/batocera.version
 
 	# datainit
+        mkdir -p $(TARGET_DIR)/usr/share/batocera
+        rsync -arv $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/datainit/ $(TARGET_DIR)/usr/share/batocera/datainit/
 	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/batocera.conf \
 	    $(TARGET_DIR)/usr/share/batocera/datainit/system
