@@ -4061,7 +4061,7 @@ msgctxt "game_options"
 msgid "SCREEN BORDERS"
 msgstr "ГРАНИЦЫ ЭКРАНА"
 
-#. TRANSLATION: libretro/hatarib
+#. TRANSLATION: libretro/hatarib, hypseus-singe/uzem
 msgctxt "game_options"
 msgid "Hide"
 msgstr "Скрыть"
@@ -5567,16 +5567,6 @@ msgstr "Пол"
 msgctxt "game_options"
 msgid "Skynet"
 msgstr "Скайнет"
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "Enable or disable monsters in battle."
-msgstr "Включает или отключает монстров в бою."
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "MONSTERS"
-msgstr "МОНСТРЫ"
 
 #. TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
@@ -8645,16 +8635,6 @@ msgstr "Скрыть прицел в поддерживаемых играх, н
 msgctxt "game_options"
 msgid "HIDE LIGHT GUN CROSSHAIRS"
 msgstr "СКРЫТЬ ПЕРЕКРЕСТИЕ СВЕТОВОГО ПИСТОЛЕТА"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Hidden"
-msgstr "Скрыть"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Shown"
-msgstr "Показать"
 
 #. TRANSLATION: hypseus-singe/uzem
 msgctxt "game_options"
@@ -15754,6 +15734,22 @@ msgstr "Фильтрация графики вкл/выкл"
 msgctxt "keys_files"
 msgid "Configuration menu"
 msgstr "Меню настроек"
+
+#~ msgctxt "game_options"
+#~ msgid "Enable or disable monsters in battle."
+#~ msgstr "Включает или отключает монстров в бою."
+
+#~ msgctxt "game_options"
+#~ msgid "MONSTERS"
+#~ msgstr "МОНСТРЫ"
+
+#~ msgctxt "game_options"
+#~ msgid "Hidden"
+#~ msgstr "Скрыть"
+
+#~ msgctxt "game_options"
+#~ msgid "Shown"
+#~ msgstr "Показать"
 
 #~ msgctxt "game_options"
 #~ msgid ""

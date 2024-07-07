@@ -24,7 +24,9 @@ Initial support for the Lenovo Legion Go
 Support for Nvidia cards requiring the legacy 340.108 driver.
 Add support for the Ayaneo 2S
 Add support for the Ayaneo Air Plus (6800U) model
-Add support for the Rock 5c
+Add support for the Radxa Rock 5c
+Add support for the Banana Pi BPI-M7
+Add support for the Pironman 5 case with RPi5 devices.
 ### Added
 - Support for Lexaloffle Voxatron (needs official engine, no emulator provided)
 - C64: support for REU (RAM Expansion Unit), .d71 and .g64 ROM format
@@ -191,10 +193,10 @@ Add support for the Rock 5c
 - Wayland Protocols to 1.33
 - Wlroots to 0.17.1
 - Sway to 1.9
-- Mesa3D to 24.1.2
+- Mesa3D to 24.1.3
 - RPi kernel to 6.6.20
 - Pipewire to 1.0.4
-- X86_64 kernel to 6.9.5
+- X86_64 kernel to 6.9.8
 - Switchres 0.220
 - Btop to 1.3.2
 - Linux firmware to 20240513
@@ -211,6 +213,7 @@ Add support for the Rock 5c
 - DXVK-NVAPI to 0.7.0
 - VKD3D-Proton to v2.12
 - Vulkan headers to 1.3.286
+- Bluez to 5.76
 
 # 2024/03/04 - batocera.linux 39 - Painted Lady
 ### Special Notes

@@ -4051,7 +4051,7 @@ msgctxt "game_options"
 msgid "SCREEN BORDERS"
 msgstr ""
 
-#. TRANSLATION: libretro/hatarib
+#. TRANSLATION: libretro/hatarib, hypseus-singe/uzem
 msgctxt "game_options"
 msgid "Hide"
 msgstr ""
@@ -5540,16 +5540,6 @@ msgstr "الجنس"
 msgctxt "game_options"
 msgid "Skynet"
 msgstr ""
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "Enable or disable monsters in battle."
-msgstr "تفعيل أو تعطيل الوحوش في المعركة."
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "MONSTERS"
-msgstr "الوحوش"
 
 #. TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
@@ -8593,16 +8583,6 @@ msgstr ""
 #. TRANSLATION: hypseus-singe/uzem
 msgctxt "game_options"
 msgid "HIDE LIGHT GUN CROSSHAIRS"
-msgstr ""
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Hidden"
-msgstr ""
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Shown"
 msgstr ""
 
 #. TRANSLATION: hypseus-singe/uzem
@@ -15480,6 +15460,14 @@ msgstr ""
 msgctxt "keys_files"
 msgid "Configuration menu"
 msgstr ""
+
+#~ msgctxt "game_options"
+#~ msgid "Enable or disable monsters in battle."
+#~ msgstr "تفعيل أو تعطيل الوحوش في المعركة."
+
+#~ msgctxt "game_options"
+#~ msgid "MONSTERS"
+#~ msgstr "الوحوش"
 
 #~ msgctxt "keys_files"
 #~ msgid "Aspect ratio correction on/off"

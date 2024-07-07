@@ -27,5 +27,7 @@ cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firm
 cp "${BINARIES_DIR}/rootfs.cpio.lz4"    "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.lz4"         || exit 1
 cp "${BINARIES_DIR}/rootfs.squashfs"    "${REGLINUX_BINARIES_DIR}/boot/boot/reglinux.update"    || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"      || exit 1
+# Pironman5 case overlay
+cp "${BINARIES_DIR}/pironman5/sunfounder-pironman5.dtbo" "${BATOCERA_BINARIES_DIR}/boot/overlays/" || exit 1
 
 exit 0
