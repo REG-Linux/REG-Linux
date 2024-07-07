@@ -1,3 +1,10 @@
+default:
+  options:
+    video_threaded: true
+    smooth: false
+    retroarch.menu_driver: xmb
+    retroarch.audio_driver: alsathread
+
 mastersystem:
   emulator: libretro
   core:     picodrive
@@ -8,20 +15,20 @@ snes:
   emulator: libretro
   core:     snes9x
 c64:
-  emulator: vice
-  core:     x64
-c128:
-  emulator: vice
-  core:     x128
+  emulator: libretro
+  core:     vice_x64
 c20:
-  emulator: vice
-  core:     xvic
-pet:
-  emulator: vice
-  core:     xpet
+  emulator: libretro
+  core:     vice_xvic
+c128:
+  emulator: libretro
+  core:     vice_x128
 cplus4:
-  emulator: vice
-  core:     xplus4
+  emulator: libretro
+  core:     vice_xplus4
+pet:
+  emulator: libretro
+  core:     vice_xpet
 fbneo:
   options:
     frameskip: auto
