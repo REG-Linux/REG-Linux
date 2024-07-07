@@ -5,6 +5,6 @@ config BR2_PACKAGE_GRIM
     select BR2_PACKAGE_LIBPNG
 
     help
-        Grab images from a Wayland compositor.
+      Grab images from a Wayland compositor.
 
-	    https://git.sr.ht/~emersion/grim
+      https://git.sr.ht/~emersion/grim

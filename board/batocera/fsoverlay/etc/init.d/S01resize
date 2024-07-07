@@ -113,7 +113,6 @@ if grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
 
 	# remove the trigger
 	cmdoutput 90 "remove_trigger autoresize"  "Removing trigger..............."
-
 else
 	###### format internal share #####
 	FORMAT_INTERNAL_TYPE=$(grep -E '^[ ]*format-internal[ ]*=.*$' "${BOOTCONF}" | head -1 | sed -e s+"^[ ]*format-internal[ ]*=[ ]*\(.*\)[ ]*$"+"\1"+)

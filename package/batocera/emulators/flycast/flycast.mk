@@ -3,7 +3,6 @@
 # flycast
 #
 ################################################################################
-
 FLYCAST_VERSION = v2.3.2
 FLYCAST_SITE = https://github.com/flyinghead/flycast.git
 FLYCAST_SITE_METHOD=git
