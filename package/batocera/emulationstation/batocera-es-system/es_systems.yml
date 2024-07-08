@@ -2145,7 +2145,7 @@ x1:
   manufacturer: Nintendo
   release: 2011
   hardware: portable
-  extensions: [3ds, 3dsx, cxi, axf, elf, app]
+  extensions: [3ds, 3dsx, cxi, axf, elf, app, squashfs]
   emulators:
     lime3ds:
       lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]      }
@@ -2588,6 +2588,16 @@ imageviewer:
   hardware: system
   extensions: [jpg, jpeg, png, bmp, psd, tga, gif, hdr, pic, ppm, pgm, mkv, pdf, mp4, avi, webm]
   path:       /userdata/screenshots
+  platform:   imageviewer
+  force:      True
+
+recordings:
+  name:       Recordings
+  manufacturer: Misc. System
+  release:
+  hardware: system
+  extensions: [mkv, mp4, avi, webm, mp3, wav, ogg, flac]
+  path:       /userdata/recordings
   platform:   imageviewer
   force:      True
 

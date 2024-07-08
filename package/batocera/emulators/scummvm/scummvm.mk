@@ -108,6 +108,7 @@ define SCUMMVM_ADD_VIRTUAL_KEYBOARD
         $(TARGET_DIR)/usr/share/scummvm
     cp -f $(@D)/backends/vkeybd/packs/vkeybd_small.zip \
         $(TARGET_DIR)/usr/share/scummvm
+    mkdir -p $(TARGET_DIR)/usr/share/evmapy/
     cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/scummvm/scummvm.keys \
         $(TARGET_DIR)/usr/share/evmapy/
 endef

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2024-06-02 01:41+0800\n"
+"PO-Revision-Date: 2024-06-07 22:57+0800\n"
 "Last-Translator: wanger\n"
 "Language-Team: 王二,monyxie\n"
 "Language: zh_CN\n"
@@ -3995,7 +3995,7 @@ msgctxt "game_options"
 msgid "SCREEN BORDERS"
 msgstr "屏幕边框"
 
-#. TRANSLATION: libretro/hatarib
+#. TRANSLATION: libretro/hatarib, hypseus-singe/uzem
 msgctxt "game_options"
 msgid "Hide"
 msgstr "隐藏"
@@ -5484,16 +5484,6 @@ msgstr "性别"
 msgctxt "game_options"
 msgid "Skynet"
 msgstr "Skynet"
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "Enable or disable monsters in battle."
-msgstr "在战斗中启用或禁用怪物。"
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "MONSTERS"
-msgstr "怪物"
 
 #. TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
@@ -8531,16 +8521,6 @@ msgstr "隐藏光枪十字准线"
 
 #. TRANSLATION: hypseus-singe/uzem
 msgctxt "game_options"
-msgid "Hidden"
-msgstr "隐藏"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Shown"
-msgstr "显示"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
 msgid "This option is required for some gun games when playing with a mouse."
 msgstr "在玩鼠标时，某些枪支游戏需要此选项。"
 
@@ -8821,7 +8801,7 @@ msgctxt "game_options"
 msgid ""
 "Compile shaders on next launch of game (one time). Reduces micro-freezes. "
 "Vulkan only."
-msgstr ""
+msgstr "在下次启动游戏时编译着色器(仅一次). 减少微冻结. 仅适用于Vulkan."
 
 #. TRANSLATION: dolphin
 msgctxt "game_options"
@@ -11831,6 +11811,8 @@ msgid ""
 "use a value larger than 100%% so that the steering feels less sensitive on a "
 "thumbstick."
 msgstr ""
+"玩驾驶游戏时如果使用游戏手柄, 有时使用大于100%的数值会更好, 这样用拇指摇杆转"
+"向就不会过于灵敏."
 
 #. TRANSLATION: supermodel
 msgctxt "game_options"
@@ -15439,6 +15421,22 @@ msgstr "打开/关闭图形过滤"
 msgctxt "keys_files"
 msgid "Configuration menu"
 msgstr "配置菜单"
+
+#~ msgctxt "game_options"
+#~ msgid "Enable or disable monsters in battle."
+#~ msgstr "在战斗中启用或禁用怪物。"
+
+#~ msgctxt "game_options"
+#~ msgid "MONSTERS"
+#~ msgstr "怪物"
+
+#~ msgctxt "game_options"
+#~ msgid "Hidden"
+#~ msgstr "隐藏"
+
+#~ msgctxt "game_options"
+#~ msgid "Shown"
+#~ msgstr "显示"
 
 #~ msgctxt "game_options"
 #~ msgid ""
