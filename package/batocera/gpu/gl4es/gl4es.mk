@@ -1,6 +1,6 @@
 ################################################################################
 #
-# GL4ES
+# gl4es
 #
 ################################################################################
 
@@ -20,7 +20,7 @@ GL4ES_DEPENDENCIES += mesa3d
 endif
 
 define GL4ES_FIX_SO
-	cd $(STAGING_DIR)/usr/lib/gl4es && ln -s libGL.so.1 libGL.so
+	cd $(STAGING_DIR)/usr/lib/gl4es && ln -sf libGL.so.1 libGL.so
 endef
 
 GL4ES_POST_INSTALL_STAGING_HOOKS += GL4ES_FIX_SO

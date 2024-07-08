@@ -3982,7 +3982,7 @@ msgctxt "game_options"
 msgid "SCREEN BORDERS"
 msgstr ""
 
-#. TRANSLATION: libretro/hatarib
+#. TRANSLATION: libretro/hatarib, hypseus-singe/uzem
 msgctxt "game_options"
 msgid "Hide"
 msgstr ""
@@ -5470,16 +5470,6 @@ msgstr ""
 #. TRANSLATION: libretro/mrboom
 msgctxt "game_options"
 msgid "Skynet"
-msgstr ""
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "Enable or disable monsters in battle."
-msgstr ""
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "MONSTERS"
 msgstr ""
 
 #. TRANSLATION: libretro/mupen64plus-next
@@ -8512,16 +8502,6 @@ msgstr ""
 #. TRANSLATION: hypseus-singe/uzem
 msgctxt "game_options"
 msgid "HIDE LIGHT GUN CROSSHAIRS"
-msgstr ""
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Hidden"
-msgstr ""
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Shown"
 msgstr ""
 
 #. TRANSLATION: hypseus-singe/uzem

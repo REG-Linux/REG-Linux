@@ -21,6 +21,7 @@ ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/brcm $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ti $(@D)/b43 $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm
+    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/s5p-* $(@D)/myri*
 endif
 
 ifeq ($(BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI)$(BR2_PACKAGE_EXTRALINUXFIRMWARES),y)

@@ -4034,7 +4034,7 @@ msgctxt "game_options"
 msgid "SCREEN BORDERS"
 msgstr ""
 
-#. TRANSLATION: libretro/hatarib
+#. TRANSLATION: libretro/hatarib, hypseus-singe/uzem
 msgctxt "game_options"
 msgid "Hide"
 msgstr ""
@@ -5533,16 +5533,6 @@ msgstr "Berhubungan"
 msgctxt "game_options"
 msgid "Skynet"
 msgstr "Skynet"
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "Enable or disable monsters in battle."
-msgstr "Aktifkan atau matikan monster dalam pertarungan"
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "MONSTERS"
-msgstr "MONSTER"
 
 #. TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
@@ -8595,16 +8585,6 @@ msgstr ""
 msgctxt "game_options"
 msgid "HIDE LIGHT GUN CROSSHAIRS"
 msgstr "SEMBUNYIKAN CORSAIR PISTOL RINGAN"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Hidden"
-msgstr ""
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Shown"
-msgstr ""
 
 #. TRANSLATION: hypseus-singe/uzem
 msgctxt "game_options"
@@ -15536,6 +15516,14 @@ msgstr ""
 msgctxt "keys_files"
 msgid "Configuration menu"
 msgstr ""
+
+#~ msgctxt "game_options"
+#~ msgid "Enable or disable monsters in battle."
+#~ msgstr "Aktifkan atau matikan monster dalam pertarungan"
+
+#~ msgctxt "game_options"
+#~ msgid "MONSTERS"
+#~ msgstr "MONSTER"
 
 #~ msgctxt "game_options"
 #~ msgid ""

@@ -57,9 +57,11 @@ class PPSSPPGenerator(Generator):
 
         return Command.Command(
             array=commandArray, 
-            env={"XDG_CONFIG_HOME":batoceraFiles.CONF, 
-            "XDG_RUNTIME_DIR":batoceraFiles.HOME_INIT,
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)}
+            env={
+                "XDG_CONFIG_HOME":batoceraFiles.CONF,
+                "XDG_DATA_HOME":batoceraFiles.SAVES,
+                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
+            }
         )
 
     @staticmethod

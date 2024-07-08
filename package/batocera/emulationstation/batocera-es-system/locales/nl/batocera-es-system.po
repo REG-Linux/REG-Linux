@@ -4079,7 +4079,7 @@ msgctxt "game_options"
 msgid "SCREEN BORDERS"
 msgstr "SCHERM RANDEN"
 
-#. TRANSLATION: libretro/hatarib
+#. TRANSLATION: libretro/hatarib, hypseus-singe/uzem
 msgctxt "game_options"
 msgid "Hide"
 msgstr "Verbergen"
@@ -5584,16 +5584,6 @@ msgstr "Geslacht"
 msgctxt "game_options"
 msgid "Skynet"
 msgstr "Skynet"
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "Enable or disable monsters in battle."
-msgstr "Schakel monsters in battle aan of uit."
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "MONSTERS"
-msgstr "MONSTERS"
 
 #. TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
@@ -8664,16 +8654,6 @@ msgstr ""
 msgctxt "game_options"
 msgid "HIDE LIGHT GUN CROSSHAIRS"
 msgstr "VERBERG LIGHT GUN DRAADKRUIS"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Hidden"
-msgstr "Verborgen"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Shown"
-msgstr "Getoond"
 
 #. TRANSLATION: hypseus-singe/uzem
 msgctxt "game_options"
@@ -12096,6 +12076,9 @@ msgid ""
 "use a value larger than 100%% so that the steering feels less sensitive on a "
 "thumbstick."
 msgstr ""
+"Voor het spelen van racegames met een gamepad is het soms een goed idee om "
+"een ​​waarde groter dan 100%% te gebruiken, zodat de besturing op een "
+"thumbstick minder gevoelig aanvoelt."
 
 #. TRANSLATION: supermodel
 msgctxt "game_options"
@@ -15804,6 +15787,22 @@ msgstr "Grafische filtering aan/uit"
 msgctxt "keys_files"
 msgid "Configuration menu"
 msgstr "Configuratiemenu"
+
+#~ msgctxt "game_options"
+#~ msgid "Enable or disable monsters in battle."
+#~ msgstr "Schakel monsters in battle aan of uit."
+
+#~ msgctxt "game_options"
+#~ msgid "MONSTERS"
+#~ msgstr "MONSTERS"
+
+#~ msgctxt "game_options"
+#~ msgid "Hidden"
+#~ msgstr "Verborgen"
+
+#~ msgctxt "game_options"
+#~ msgid "Shown"
+#~ msgstr "Getoond"
 
 #, c-format
 #~ msgctxt "game_options"

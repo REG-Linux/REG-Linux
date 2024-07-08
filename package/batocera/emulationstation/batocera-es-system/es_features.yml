@@ -3921,12 +3921,6 @@ libretro:
                     "Color":  Color
                     "Sex":    Sex
                     "Skynet": Skynet
-            mrboom-nomonster:
-                prompt:      MONSTERS
-                description: Enable or disable monsters in battle.
-                choices:
-                    "Off":    OFF
-                    "On":     ON
     mupen64plus-next:
       features: [cheevos]
       shared: [autosave, use_wheels, wheel_rotation, wheel_deadzone, wheel_midzone]
@@ -7173,8 +7167,8 @@ hypseus-singe:
           prompt: HIDE LIGHT GUN CROSSHAIRS
           description: Hide crosshairs in supported games e.g. ActionMax, Maddog II.
           choices:
-            "Hidden": 1
-            "Shown":  0
+            "Hide": 1
+            "Show": 0
         singe_abs:
             group: ADVANCED OPTIONS
             prompt: ABSOLUTE MOUSE INPUT
@@ -12299,7 +12293,6 @@ vita3k:
   shared: [powermode, tdp, videomode]
   features: []
   cfeatures:
-    # Disabled until vulkan fixed upstream
     vita3k_gfxbackend:
       prompt:      GRAPHICS API
       description: Choose which graphics API library to use.

@@ -43,7 +43,7 @@ REGLINUX_INITRAMFS_INITRDA=arm
 endif
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY)$(BR2_PACKAGE_BATOCERA_TARGET_A3GEN2)$(BR2_PACKAGE_BATOCERA_TARGET_S9GEN4),y)
-    COMPRESSION_TYPE_COMMAND=(cd $(INITRAMFS_DIR) && find . | cpio -H newc -o | gzip -9 > $(BINARIES_DIR)/initrd.gz)
+    COMPRESSION_TYPE_COMMAND=(cd $(INITRAMFS_DIR) && find . | cpio -H newc -o | $(HOST_DIR)/bin/lz4    > $(BINARIES_DIR)/initrd.lz4)
 else
     # -l is needed to make initramfs boot, this compresses using Legacy format (Linux kernel compression)
     COMPRESSION_TYPE_COMMAND=(cd $(INITRAMFS_DIR) && find . | cpio -H newc -o | $(HOST_DIR)/bin/lz4 -l > $(BINARIES_DIR)/initrd.lz4)
