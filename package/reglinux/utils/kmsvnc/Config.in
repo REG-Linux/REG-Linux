@@ -1,0 +1,8 @@
+config BR2_PACKAGE_KMSVNC
+	bool "kmsvnc"
+
+	select BR2_PACKAGE_LIBDRM
+	help
+	  KMS/DRM VNC server
+
+	  https://github.com/isjerryxiao/kmsvnc

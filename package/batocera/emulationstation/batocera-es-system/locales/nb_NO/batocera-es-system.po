@@ -4056,7 +4056,7 @@ msgctxt "game_options"
 msgid "SCREEN BORDERS"
 msgstr "SKJERMGRENSER"
 
-#. TRANSLATION: libretro/hatarib
+#. TRANSLATION: libretro/hatarib, hypseus-singe/uzem
 msgctxt "game_options"
 msgid "Hide"
 msgstr "Skjul"
@@ -5559,16 +5559,6 @@ msgstr "Sex"
 msgctxt "game_options"
 msgid "Skynet"
 msgstr "Skynet"
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "Enable or disable monsters in battle."
-msgstr "Aktiver eller deaktiver monstre i kamp."
-
-#. TRANSLATION: libretro/mrboom
-msgctxt "game_options"
-msgid "MONSTERS"
-msgstr "MONSTRE"
 
 #. TRANSLATION: libretro/mupen64plus-next
 msgctxt "game_options"
@@ -8637,16 +8627,6 @@ msgstr "Sjul trådkorset i støttede spill som f.eks. ActionMax, Maddog II."
 msgctxt "game_options"
 msgid "HIDE LIGHT GUN CROSSHAIRS"
 msgstr "SKJUL TRÅDKORSET TIL LYSPISTOLER"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Hidden"
-msgstr "Skjult"
-
-#. TRANSLATION: hypseus-singe/uzem
-msgctxt "game_options"
-msgid "Shown"
-msgstr "Vist"
 
 #. TRANSLATION: hypseus-singe/uzem
 msgctxt "game_options"
@@ -15717,6 +15697,22 @@ msgstr "Grafikkfiltrering på/av"
 msgctxt "keys_files"
 msgid "Configuration menu"
 msgstr "Konfigurasjonsmeny"
+
+#~ msgctxt "game_options"
+#~ msgid "Enable or disable monsters in battle."
+#~ msgstr "Aktiver eller deaktiver monstre i kamp."
+
+#~ msgctxt "game_options"
+#~ msgid "MONSTERS"
+#~ msgstr "MONSTRE"
+
+#~ msgctxt "game_options"
+#~ msgid "Hidden"
+#~ msgstr "Skjult"
+
+#~ msgctxt "game_options"
+#~ msgid "Shown"
+#~ msgstr "Vist"
 
 #~ msgctxt "game_options"
 #~ msgid ""
