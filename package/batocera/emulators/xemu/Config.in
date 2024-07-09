@@ -5,6 +5,7 @@ config BR2_PACKAGE_XEMU
     select BR2_PACKAGE_LIBSAMPLERATE
     select BR2_PACKAGE_SLIRP
     select BR2_PACKAGE_PYTHON_PYYAML
+    select BR2_PACKAGE_LIBPCAP
     help
         Xbox (og) emulator based on QEMU
         
