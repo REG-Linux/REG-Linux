@@ -4,14 +4,14 @@
 #
 ################################################################################
 
-CEMU_VERSION = v2.0-86
+CEMU_VERSION = v2.0-88
 CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
 CEMU_GIT_SUBMODULES=YES
 CEMU_DEPENDENCIES = sdl2 host-libcurl host-pugixml pugixml rapidjson boost libpng \
                     libzip host-glslang glslang zlib zstd wxwidgets fmt glm upower \
- 		    host-nasm host-zstd host-libusb
+                    host-nasm host-zstd host-libusb libusb
 
 CEMU_SUPPORTS_IN_SOURCE_BUILD = NO
 
