@@ -1,6 +1,0 @@
-config BR2_PACKAGE_REDREAM
-    bool "redream"
-    help
-      Redream is a Dreamcast Emulator for Windows / Mac & Linux.
-
-      https://redream.io
