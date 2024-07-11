@@ -439,8 +439,6 @@ dreamcast:
       flycastvl:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCASTVL] }
     flycast:
       flycast:        { requireAnyOf: [BR2_PACKAGE_FLYCAST]          }
-    redream:
-      redream:        { requireAnyOf: [BR2_PACKAGE_REDREAM]          }
     demul:
       demul:          { requireAnyOf: [BR2_PACKAGE_DEMUL]            }
   comment_en: |

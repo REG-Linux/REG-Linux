@@ -36,7 +36,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-dolphin
                    libretro-dosbox-pure
                    libretro-easyrpg
-                   libretro-ecwolf
                    libretro-emuscv
                    libretro-fake08
                    libretro-fbalpha
@@ -178,7 +177,6 @@ PACKAGES_EMULATORS="amiberry
                     ppsspp
                     python-pygame2
                     python-pyxel
-                    redream
                     reglinux-mame
                     reglinux-scummvm
                     rpcs3
