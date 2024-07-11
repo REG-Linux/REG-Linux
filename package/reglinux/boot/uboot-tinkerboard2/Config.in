@@ -1,0 +1,4 @@
+config BR2_PACKAGE_UBOOT_TINKERBOARD2
+    bool "uboot files for Tinkerboard 2"
+    help
+        uboot files for Tinkerboard 2
