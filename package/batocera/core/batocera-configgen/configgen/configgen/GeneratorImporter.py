@@ -127,10 +127,6 @@ def getGenerator(emulator):
         from generators.easyrpg.easyrpgGenerator import EasyRPGGenerator
         return EasyRPGGenerator()
 
-    if emulator == 'redream':
-        from generators.redream.redreamGenerator import RedreamGenerator
-        return RedreamGenerator()
-
     if emulator == 'supermodel':
         from generators.supermodel.supermodelGenerator import SupermodelGenerator
         return SupermodelGenerator()
