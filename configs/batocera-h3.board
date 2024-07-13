@@ -29,7 +29,7 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
-BR2_LINUX_KERNEL_INTREE_DTS_NAME="allwinner/sun8i-h3-libretech-all-h3-cc allwinner/sun8i-h3-orangepi-pc allwinner/sun8i-h3-orangepi-pc-plus allwinner/sun8i-h3-orangepi-one allwinner/sun8i-h3-orangepi-plus2e allwinner/sun8i-h2-plus-bananapi-m2-zero"
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="allwinner/sun8i-h3-orangepi-pc allwinner/sun8i-h3-orangepi-pc-plus allwinner/sun8i-h3-orangepi-one allwinner/sun8i-h3-orangepi-plus2e allwinner/sun8i-h2-plus-bananapi-m2-zero"
 
 # GPU
 BR2_PACKAGE_BATOCERA_LIMA_MESA3D=y
