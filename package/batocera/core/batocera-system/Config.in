@@ -464,7 +464,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	string "target images"
 
 	# Allwinner targets
-	default "allwinner/h3/tritium-h3 allwinner/h3/orangepi-pc allwinner/h3/orangepi-one allwinner/h3/orangepi-plus2e allwinner/h3/bananapi-m2-zero" \
+	default "allwinner/h3/orangepi-pc allwinner/h3/orangepi-one allwinner/h3/orangepi-plus2e allwinner/h3/bananapi-m2-zero" \
 													if BR2_PACKAGE_BATOCERA_TARGET_H3
 	default "allwinner/h3/cha"									if BR2_PACKAGE_BATOCERA_TARGET_CHA
 	default "allwinner/h5/tritium-h5 allwinner/h5/orangepi-pc2"					if BR2_PACKAGE_BATOCERA_TARGET_H5
@@ -707,9 +707,22 @@ config BR2_PACKAGE_BATOCERA_ALL_SYSTEMS
 
 	select BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS	if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 	select BR2_PACKAGE_REGLINUX_PINBALL_SYSTEMS	if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	#select BR2_PACKAGE_REGLINUX_MOBILE_SYSTEMS	if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	help
 	  batocera.linux all supported emulation systems
+
+### Mobile systems ###
+config BR2_PACKAGE_REGLINUX_MOBILE_SYSTEMS
+	 bool "REG-Linux mobile systems support"
+
+	# Symbian OS / Nokia N-Gage emulator
+	select BR2_PACKAGE_EKA2L1		if BR2_x86_64				|| \
+						   BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
+						   BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
+						   BR2_PACKAGE_BATOCERA_TARGET_S922X	|| \
+						   BR2_PACKAGE_BATOCERA_TARGET_RK3588
+
 
 ### Pinball systems ###
 config BR2_PACKAGE_REGLINUX_PINBALL_SYSTEMS
@@ -1520,14 +1533,6 @@ config BR2_PACKAGE_BATOCERA_CORES_EXPERIMENTAL
 						   BR2_PACKAGE_BATOCERA_TARGET_RK3568	|| \
 						   BR2_PACKAGE_BATOCERA_TARGET_H616
 
-	# Symbian OS / Nokia N-Gage emulator
-	select BR2_PACKAGE_EKA2L1		if BR2_x86_64				|| \
-						   BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
-						   BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
-						   BR2_PACKAGE_BATOCERA_TARGET_S922X	|| \
-						   BR2_PACKAGE_BATOCERA_TARGET_RK3568	|| \
-						   BR2_PACKAGE_BATOCERA_TARGET_H616
-
 	# Supermodel OpenGL ES port
 	select BR2_PACKAGE_SUPERMODEL_ES	if BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
 						   BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
@@ -1579,7 +1584,7 @@ config BR2_PACKAGE_BATOCERA_WPA
 
 
 config BR2_PACKAGE_BATOCERA_QT6
-	bool "batocera.linux Qt6 stack"
+	bool "batocera-qt6"
 
 	select BR2_PACKAGE_QT6
 	select BR2_PACKAGE_QT6_VERSION_LATEST
