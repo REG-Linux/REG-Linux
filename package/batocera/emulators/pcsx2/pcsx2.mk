@@ -3,7 +3,7 @@
 # pcsx2
 #
 ################################################################################
-PCSX2_VERSION = v1.7.5971
+PCSX2_VERSION = v2.0.2
 PCSX2_SITE = https://github.com/pcsx2/pcsx2.git
 PCSX2_SITE_METHOD = git
 PCSX2_GIT_SUBMODULES = YES
@@ -16,7 +16,6 @@ PCSX2_DEPENDENCIES += xorgproto alsa-lib freetype zlib libpng shaderc ecm
 PCSX2_DEPENDENCIES += libaio portaudio libsoundtouch sdl2 libpcap yaml-cpp
 PCSX2_DEPENDENCIES += libsamplerate fmt qt6base qt6tools qt6svg libcurl
 PCSX2_DEPENDENCIES += host-libcurl libbacktrace
-#wxwidgets libgtk3 
 
 PCSX2_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 PCSX2_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
