@@ -1,0 +1,18 @@
+From 4b01dfe3b07ba5fb7cad773cc5df2f645127238e Mon Sep 17 00:00:00 2001
+From: ntemis <ierokipides.dem@gmail.com>
+Date: Thu, 9 Mar 2023 05:32:26 +0200
+Subject: [PATCH] Add cha support
+
+---
+ configs/libretech_all_h3_cc_h3_defconfig | 2 +-
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/configs/libretech_all_h3_cc_h3_defconfig b/configs/libretech_all_h3_cc_h3_defconfig
+index 5275fdc3..8d69ee82 100644
+--- a/configs/libretech_all_h3_cc_h3_defconfig
++++ b/configs/libretech_all_h3_cc_h3_defconfig
+@@ -9,3 +9,4 @@
+ CONFIG_SUN8I_EMAC=y
+ CONFIG_USB_EHCI_HCD=y
+ CONFIG_USB_OHCI_HCD=y
++CONFIG_SUPPORT_EMMC_BOOT=y
