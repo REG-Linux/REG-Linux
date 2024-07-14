@@ -2,14 +2,17 @@
 <gameList>
 	<game>
 		<path>./sdlpop.sdlpop</path>
-		<name>SdlPop</name>
+		<name>SDLPoP</name>
 		<desc>An open-source port of Prince of Persia, based on the disassembly of the DOS version, extended with new features.</desc>
 		<rating>0.7</rating>
 		<publisher>https://github.com/NagyD/SDLPoP</publisher>
 		<developer>NagyD</developer>
-		<image>./images/sdlpop.jpg</image>
-		<video>./videos/sdlpop.mp4</video>
+		<image>./images/sdlpop-image.jpg</image>
+		<video>./videos/sdlpop-video.mp4</video>
+    <marquee>./images/sdlpop-marquee.png</marquee>
+    <thumbnail>./images/sdlpop-thumb.png</thumbnail>
 		<players>1</players>
 		<genre>Adventure</genre>
+		<lang>en</lang>
 	</game>
 </gameList>
