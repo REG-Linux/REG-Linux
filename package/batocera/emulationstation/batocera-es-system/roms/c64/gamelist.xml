@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
 <gameList>
 	<game>
-		<path>./Relentless 64.d64</path>
+		<path>./Relentless64.d64</path>
 		<name>Relentless 64</name>
 		<desc>Similar to the original, Relentless 64 is a high speed, non-stop score-chasing shmup with some neat score chaining mechanics. The enemy waves come at you thick and fast, and taking out an entire wave rewards you with an increasing score multipler, resetting back to 1x should you miss a ship or crash.</desc>
-		<image>./images/Relentless 64.jpg</image>
-		<video>./videos/Relentless 64.mp4</video>
+		<image>./images/Relentless64-image.png</image>
+		<video>./videos/Relentless64-video.mp4</video>
+    <marquee>./images/Relentless64-marquee.png</marquee>
+    <thumbnail>./images/Relentless64-thumb.png</thumbnail>
+    <rating></rating>
 		<releasedate>20190601T000000</releasedate>
 		<developer>RGCD.DEV</developer>
 		<publisher>https://rgcddev.itch.io/relentless-64</publisher>
@@ -16,12 +19,20 @@
 	<game>
 		<path>./Showdown.d64</path>
 		<name>Showdown</name>
-		<desc> A game is inspired by a host of older titles with the same theme, going all the way back to Gun Fight from 1975. You play a cowboy out to win a fierce gun duel. The first one to outwit and knock down the opponent 5 times is the winner of the duel.</desc>
-		<image>./images/Showdown.jpg</image>
-		<video>./videos/Showdown.mp4</video>
+		<desc>A game is inspired by a host of older titles with the same theme, going all the way back to Gun Fight from 1975. You play a cowboy out to win a fierce gun duel. The first one to outwit and knock down the opponent 5 times is the winner of the duel.
+
+Instructions:
+Each gun can carry 5 bullets. You reload by manually replacing the bullets with a click of the joystick button, or you can pick up bullet packs from the ground. But beware! If your opponent catches you out of the safety of the cacti, then you might get knocked down!
+Explosive crates appear around the play area. They explode when shot, so better stay away from them if you value you life, cowboy!
+    </desc>
+		<image>./images/Showdown-image.png</image>
+		<video>./videos/Showdown-video.mp4</video>
+    <marquee>./images/Showdown-marquee.png</marquee>
+    <thumbnail>./images/Showdown-thumb.png</thumbnail>
+    <rating></rating>
 		<releasedate>20201106T000000</releasedate>
 		<developer>Badgerpunch Games; Henning Ludvigsen</developer>
-		<publisher>https://badgerpunch.itch.io/showdown</publisher>
+		<publisher>https://www.badgerpunch.com/title/showdown/</publisher>
 		<genre>Shooter</genre>
 		<players>2</players>
 		<lang>en</lang>
