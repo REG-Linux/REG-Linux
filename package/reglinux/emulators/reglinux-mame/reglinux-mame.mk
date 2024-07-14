@@ -50,10 +50,10 @@ else ifeq ($(BR2_saphira),y)
 REGLINUX_MAME_ARCH = saphira
 # RISC-V 64 (rv64gc, aka imafd)
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_JH7110),y)
-REGLINUX_MAME_ARCH = visionfive2
+REGLINUX_MAME_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_K1),y)
-REGLINUX_MAME_ARCH = bpif3
+REGLINUX_MAME_ARCH = k1
 # X86_64-v3 subarchitecture
 else ifeq ($(BR2_x86_64_v3),y)
 REGLINUX_MAME_ARCH = x86_64_v3
