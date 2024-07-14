@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DUCKSTATION_VERSION = e25bb4801c524aaae17b0628b58669b51c6c64eb
+DUCKSTATION_VERSION = 1771bfad583443f2a9093461197406c278c348c9
 DUCKSTATION_SITE = https://github.com/stenzek/duckstation.git
 DUCKSTATION_SITE_METHOD=git
 DUCKSTATION_GIT_SUBMODULES=YES
@@ -13,6 +13,7 @@ DUCKSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 
 DUCKSTATION_DEPENDENCIES = fmt boost ffmpeg libcurl ecm shaderc webp
 DUCKSTATION_DEPENDENCIES += qt6base qt6tools qt6svg libbacktrace
+DUCKSTATION_DEPENDENCIES += cpuinfo spirv-cross
 
 DUCKSTATION_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
 DUCKSTATION_CONF_OPTS += -DBUILD_SHARED_LIBS=FALSE
@@ -49,8 +50,12 @@ define DUCKSTATION_INSTALL_TARGET_CMDS
     rm -f $(TARGET_DIR)/usr/share/duckstation/resources/gamecontrollerdb.txt
 
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/duckstation/psx.duckstation.keys \
+    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/duckstation/psx.duckstation.keys \
         $(TARGET_DIR)/usr/share/evmapy
+endef
+
+define DUCKSTATION_PREPARE_TRANSLATIONS
+    mkdir -p $(@D)/buildroot-build/bin/resources
 endef
 
 define DUCKSTATION_TRANSLATIONS
@@ -59,6 +64,7 @@ define DUCKSTATION_TRANSLATIONS
         $(TARGET_DIR)/usr/share/duckstation/
 endef
 
+DUCKSTATION_POST_CONFIGURE_HOOKS += DUCKSTATION_PREPARE_TRANSLATIONS
 DUCKSTATION_POST_INSTALL_TARGET_HOOKS += DUCKSTATION_TRANSLATIONS
 
 $(eval $(cmake-package))

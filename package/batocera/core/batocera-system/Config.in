@@ -166,9 +166,11 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	# minimal system required packages
 	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
+	# Note RNG_TOOLS not useful anymore we use seedrng from plymouth
 	#select BR2_PACKAGE_RNG_TOOLS			if !BR2_PACKAGE_BATOCERA_TARGET_RK3128 # system entropy. Currently disabled for RK3128 due to high CPU impact
 	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
-	#select BR2_PACKAGE_ES_THEME_CARBON		# emulationstation theme
+	# Note : TODO Bundle carbon in content downloader
+	# select BR2_PACKAGE_ES_THEME_CARBON		# emulationstation theme
 	select BR2_PACKAGE_ES_THEME_NEUTRAL		# emulationstation theme
 	select BR2_PACKAGE_ES_BACKGROUND_MUSICS		# emulationstation musics
 	select BR2_PACKAGE_BATOCERA_ES_SYSTEM		# emulation station es_systems.cfg generator + default roms
@@ -1150,8 +1152,7 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	select BR2_PACKAGE_FHEROES2			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# HoMM3 open source engine
-	# Disabled on x86_64 for space right now
-	select BR2_PACKAGE_VCMI				if !BR2_x86_64 && (BR2_ARCH_IS_64 && BR2_PACKAGE_BATOCERA_GLES3)
+	select BR2_PACKAGE_VCMI				if (BR2_ARCH_IS_64 && BR2_PACKAGE_BATOCERA_GLES3)
 
 	# ECWolf
 	select BR2_PACKAGE_ECWOLF			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
@@ -1279,7 +1280,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 
 	# PSX
 	# newer versions of duckstation stricter on OpenGL ES 3.x, no more support for KMS/DRM
-	select BR2_PACKAGE_DUCKSTATION			if (!BR2_mipsel) && (!BR2_arm) && BR2_PACKAGE_BATOCERA_GLES3 \
+	select BR2_PACKAGE_DUCKSTATION			if (!BR2_mipsel) && BR2_PACKAGE_BATOCERA_GLES3 \
 							   && !BR2_PACKAGE_BATOCERA_TARGET_RK3326 \
 							   && !BR2_PACKAGE_BATOCERA_TARGET_S9GEN4 \
 							   && !BR2_PACKAGE_BATOCERA_TARGET_A3GEN2
