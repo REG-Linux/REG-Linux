@@ -30,4 +30,3 @@ for_window [instance="dolphin-emu"] border none, fullscreen
 for_window [instance="batocera-config-dolphin"] border none, fullscreen
 for_window [instance="batocera-config-scummvm"] border none, fullscreen
 for_window [instance="xterm"] border none, fullscreen
-
