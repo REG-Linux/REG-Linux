@@ -1,3 +1,4 @@
+include toolchain-gcc13-glibc.common
 include batocera-board.common
 
 # Target definition (AArch64 ARMv8.4-A 16K page size)
