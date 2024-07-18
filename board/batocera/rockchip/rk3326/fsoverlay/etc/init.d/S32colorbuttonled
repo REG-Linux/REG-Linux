@@ -1,16 +1,18 @@
 #!/bin/sh
 
-if test "${1}" = "start"
-then
-    if test -e /userdata/system/buttoncolorled.save
-    then
-        COLORLED=$(cat /userdata/system/buttoncolorled.save)
-        batocera-gameforce "buttonColorLed" ${COLORLED}
-    fi
+MODEL=$(cat /sys/firmware/devicetree/base/model)
 
-    if test -e /userdata/system/powerled.save
-    then
-        POWERLED=$(cat /userdata/system/powerled.save)
-        batocera-gameforce "powerLed" ${POWERLED}
-    fi
+test "$1" != "start" && exit 0
+test "${MODEL}" != "GameForce Chi" && exit 0
+
+if test -e /userdata/system/buttoncolorled.save
+then
+	COLORLED=$(cat /userdata/system/buttoncolorled.save)
+	batocera-gameforce "buttonColorLed" ${COLORLED}
+fi
+
+if test -e /userdata/system/powerled.save
+then
+	POWERLED=$(cat /userdata/system/powerled.save)
+	batocera-gameforce "powerLed" ${POWERLED}
 fi
