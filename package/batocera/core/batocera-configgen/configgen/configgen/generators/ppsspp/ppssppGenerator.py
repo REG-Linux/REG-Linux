@@ -63,7 +63,7 @@ class PPSSPPGenerator(Generator):
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
-
+    
     @staticmethod
     def isLowResolution(gameResolution):
         return gameResolution["width"] <= 480 or gameResolution["height"] <= 480
