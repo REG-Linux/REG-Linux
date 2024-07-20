@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-HYPSEUS_SINGE_BEZELS_VERSION = 7f3fea989aff51716bb5611e02ed312ba71fde14
+HYPSEUS_SINGE_BEZELS_VERSION = 87a5eaded9cd1a31fcd2d4a36d3e14f976264315
 HYPSEUS_SINGE_BEZELS_SITE = \
     $(call github,REG-Linux,hypseus_singe_daphne_bezels,$(HYPSEUS_SINGE_BEZELS_VERSION))
 HYPSEUS_SINGE_BEZELS_LICENSE = LGPL-3.0

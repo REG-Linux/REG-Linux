@@ -1,13 +1,13 @@
-Subject: [PATCH v7 1/3] dt-bindings: rng: Add Rockchip RK3568 TRNG
+Subject: [PATCH v8 1/3] dt-bindings: rng: Add Rockchip RK3568 TRNG
 Message-ID: 
- <0373ea61e6c765d282c70927030ecba97efcbbef.1720969799.git.daniel@makrotopia.org>
-References: <cover.1720969799.git.daniel@makrotopia.org>
+ <19c94cbeae8175b8c6f920c3e3029082ade85ae6.1721522430.git.daniel@makrotopia.org>
+References: <cover.1721522430.git.daniel@makrotopia.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <cover.1720969799.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1721522430.git.daniel@makrotopia.org>
 X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20240714_081613_823653_3A5CE04A 
-X-CRM114-Status: GOOD (  13.68  )
+X-CRM114-CacheID: sfid-20240720_174730_104780_6EC36AAA 
+X-CRM114-Status: GOOD (  16.40  )
 X-BeenThere: linux-rockchip@lists.infradead.org
 X-Mailman-Version: 2.1.34
 Precedence: list
@@ -32,17 +32,17 @@ Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- .../bindings/rng/rockchip,rk3568-rng.yaml     | 61 +++++++++++++++++++
+ .../bindings/rng/rockchip,rk3568-rng.yaml     | 82 +++++++++++++++++++
  MAINTAINERS                                   |  6 ++
- 2 files changed, 67 insertions(+)
+ 2 files changed, 88 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
 
 diff --git a/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
 new file mode 100644
-index 000000000000..e0595814a6d9
+index 000000000000..383a39e60ad8
 --- /dev/null
 +++ b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,82 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
@@ -75,6 +75,23 @@ index 000000000000..e0595814a6d9
 +      - const: core
 +      - const: ahb
 +
++  quality:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 0
++    description:
++      Estimated number of bits of true entropy per 1024 bits read from the rng.
++      Defaults to zero which causes the kernel's default quality to be used
++      instead.  Note that the default quality is usually zero which disables
++      using this rng to automatically fill the kernel's entropy pool.
++
++  rockchip,sample-count:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 1000
++    description:
++      Bits to skip on TRNG osc ring output before collection.
++      The value is a tradeoff between speed and quality, the higher the slower
++      and the better quality.
++
 +  resets:
 +    maxItems: 1
 +
@@ -83,7 +100,9 @@ index 000000000000..e0595814a6d9
 +  - reg
 +  - clocks
 +  - clock-names
++  - quality
 +  - resets
++  - rockchip,sample-count
 +
 +additionalProperties: false
 +
@@ -99,16 +118,18 @@ index 000000000000..e0595814a6d9
 +        reg = <0x0 0xfe388000 0x0 0x4000>;
 +        clocks = <&cru CLK_TRNG_NS>, <&cru HCLK_TRNG_NS>;
 +        clock-names = "core", "ahb";
++        quality = <900>;
 +        resets = <&cru SRST_TRNG_NS>;
++        rockchip,sample-count = <1000>;
 +      };
 +    };
 +
 +...
 diff --git a/MAINTAINERS b/MAINTAINERS
-index fb1df8c29f5a..7b2b8b1f526c 100644
+index 61053a8c625e..41aecf9736c9 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -19693,6 +19693,12 @@ F:	Documentation/userspace-api/media/v4l/metafmt-rkisp1.rst
+@@ -19707,6 +19707,12 @@ F:	Documentation/userspace-api/media/v4l/metafmt-rkisp1.rst
  F:	drivers/media/platform/rockchip/rkisp1
  F:	include/uapi/linux/rkisp1-config.h
  
@@ -122,16 +143,16 @@ index fb1df8c29f5a..7b2b8b1f526c 100644
  M:	Jacob Chen <jacob-chen@iotwrt.com>
  M:	Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
 
-Subject: [PATCH v7 2/3] hwrng: add hwrng driver for Rockchip RK3568 SoC
+Subject: [PATCH v8 2/3] hwrng: add hwrng driver for Rockchip RK3568 SoC
 Message-ID: 
- <f606403145588d28dda14a55ba3afef85720a4dc.1720969799.git.daniel@makrotopia.org>
-References: <cover.1720969799.git.daniel@makrotopia.org>
+ <583e3716c1e829e25e7cbc3e3501a13b201972a9.1721522430.git.daniel@makrotopia.org>
+References: <cover.1721522430.git.daniel@makrotopia.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <cover.1720969799.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1721522430.git.daniel@makrotopia.org>
 X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20240714_081630_642172_2747529F 
-X-CRM114-Status: GOOD (  31.61  )
+X-CRM114-CacheID: sfid-20240720_174819_668058_B820F681 
+X-CRM114-Status: GOOD (  31.29  )
 X-BeenThere: linux-rockchip@lists.infradead.org
 X-Mailman-Version: 2.1.34
 Precedence: list
@@ -158,27 +179,25 @@ greatly inspired from the downstream driver.
 
 The TRNG device does not seem to have a signal conditionner and the FIPS
 140-2 test returns a lot of failures. They can be reduced by increasing
-RK_RNG_SAMPLE_CNT, in a tradeoff between quality and speed. This value
-has been adjusted to get ~90% of successes and the quality value has
-been set accordingly.
+rockchip,sample-count in DT, in a tradeoff between quality and speed.
 
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-[daniel@makrotpia.org: code style fixes]
+[daniel@makrotpia.org: code style fixes, add DT properties]
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
  MAINTAINERS                           |   1 +
  drivers/char/hw_random/Kconfig        |  14 ++
  drivers/char/hw_random/Makefile       |   1 +
- drivers/char/hw_random/rockchip-rng.c | 227 ++++++++++++++++++++++++++
- 4 files changed, 243 insertions(+)
+ drivers/char/hw_random/rockchip-rng.c | 230 ++++++++++++++++++++++++++
+ 4 files changed, 246 insertions(+)
  create mode 100644 drivers/char/hw_random/rockchip-rng.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 7b2b8b1f526c..2745cfe56774 100644
+index 41aecf9736c9..64b21b434acd 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -19698,6 +19698,7 @@ M:	Daniel Golle <daniel@makrotopia.org>
+@@ -19712,6 +19712,7 @@ M:	Daniel Golle <daniel@makrotopia.org>
  M:	Aurelien Jarno <aurelien@aurel32.net>
  S:	Maintained
  F:	Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
@@ -187,10 +206,10 @@ index 7b2b8b1f526c..2745cfe56774 100644
  ROCKCHIP RASTER 2D GRAPHIC ACCELERATION UNIT DRIVER
  M:	Jacob Chen <jacob-chen@iotwrt.com>
 diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 442c40efb200..2b62cd08f91a 100644
+index 01e2e1ef82cf..4a339c18a3cc 100644
 --- a/drivers/char/hw_random/Kconfig
 +++ b/drivers/char/hw_random/Kconfig
-@@ -573,6 +573,20 @@ config HW_RANDOM_JH7110
+@@ -572,6 +572,20 @@ config HW_RANDOM_JH7110
  	  To compile this driver as a module, choose M here.
  	  The module will be called jh7110-trng.
  
@@ -223,10 +242,10 @@ index 32549a1186dc..01f012eab440 100644
  obj-$(CONFIG_HW_RANDOM_JH7110) += jh7110-trng.o
 diff --git a/drivers/char/hw_random/rockchip-rng.c b/drivers/char/hw_random/rockchip-rng.c
 new file mode 100644
-index 000000000000..a8ccaf14c2c2
+index 000000000000..9ef4920007a2
 --- /dev/null
 +++ b/drivers/char/hw_random/rockchip-rng.c
-@@ -0,0 +1,227 @@
+@@ -0,0 +1,230 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * rockchip-rng.c True Random Number Generator driver for Rockchip RK3568 SoC
@@ -254,13 +273,6 @@ index 000000000000..a8ccaf14c2c2
 +#define RK_RNG_POLL_PERIOD_US		100
 +#define RK_RNG_POLL_TIMEOUT_US		10000
 +
-+/*
-+ * TRNG collects osc ring output bit every RK_RNG_SAMPLE_CNT time. The value is
-+ * a tradeoff between speed and quality and has been adjusted to get a quality
-+ * of ~900 (~90% of FIPS 140-2 successes).
-+ */
-+#define RK_RNG_SAMPLE_CNT		1000
-+
 +/* TRNG registers from RK3568 TRM-Part2, section 5.4.1 */
 +#define TRNG_RST_CTL			0x0004
 +#define TRNG_RNG_CTL			0x0400
@@ -284,6 +296,7 @@ index 000000000000..a8ccaf14c2c2
 +	struct reset_control *rst;
 +	int clk_num;
 +	struct clk_bulk_data *clk_bulks;
++	u32 sample_cnt;
 +};
 +
 +/* The mask in the upper 16 bits determines the bits that are updated */
@@ -306,7 +319,7 @@ index 000000000000..a8ccaf14c2c2
 +	}
 +
 +	/* set the sample period */
-+	writel(RK_RNG_SAMPLE_CNT, rk_rng->base + TRNG_RNG_SAMPLE_CNT);
++	writel(rk_rng->sample_cnt, rk_rng->base + TRNG_RNG_SAMPLE_CNT);
 +
 +	/* set osc ring speed and enable it */
 +	rk_rng_write_ctl(rk_rng, TRNG_RNG_CTL_LEN_256_BIT |
@@ -362,6 +375,7 @@ index 000000000000..a8ccaf14c2c2
 +{
 +	struct device *dev = &pdev->dev;
 +	struct rk_rng *rk_rng;
++	u32 quality;
 +	int ret;
 +
 +	rk_rng = devm_kzalloc(dev, sizeof(*rk_rng), GFP_KERNEL);
@@ -382,6 +396,14 @@ index 000000000000..a8ccaf14c2c2
 +		return dev_err_probe(dev, PTR_ERR(rk_rng->rst),
 +				     "Failed to get reset property\n");
 +
++	ret = of_property_read_u32(dev->of_node, "rockchip,sample-count", &rk_rng->sample_cnt);
++	if (ret)
++		return dev_err_probe(dev, ret, "Failed to get sample-count property\n");
++
++	ret = of_property_read_u32(dev->of_node, "quality", &quality);
++	if (ret || quality > 1024)
++		return dev_err_probe(dev, ret, "Failed to get quality property\n");
++
 +	reset_control_assert(rk_rng->rst);
 +	udelay(2);
 +	reset_control_deassert(rk_rng->rst);
@@ -395,7 +417,7 @@ index 000000000000..a8ccaf14c2c2
 +	}
 +	rk_rng->rng.read = rk_rng_read;
 +	rk_rng->rng.priv = (unsigned long) dev;
-+	rk_rng->rng.quality = 900;
++	rk_rng->rng.quality = quality;
 +
 +	pm_runtime_set_autosuspend_delay(dev, RK_RNG_AUTOSUSPEND_DELAY);
 +	pm_runtime_use_autosuspend(dev);
@@ -455,16 +477,16 @@ index 000000000000..a8ccaf14c2c2
 +MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
 +MODULE_LICENSE("GPL");
 
-Subject: [PATCH v7 3/3] arm64: dts: rockchip: add DT entry for RNG to RK356x
+Subject: [PATCH v8 3/3] arm64: dts: rockchip: add DT entry for RNG to RK356x
 Message-ID: 
- <ec37c94a99856a0c2cd24b9ea19653a36f34b9c5.1720969799.git.daniel@makrotopia.org>
-References: <cover.1720969799.git.daniel@makrotopia.org>
+ <c28cb9ad04062b6da66d9cac8adefa0edc0046ea.1721522430.git.daniel@makrotopia.org>
+References: <cover.1721522430.git.daniel@makrotopia.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <cover.1720969799.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1721522430.git.daniel@makrotopia.org>
 X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20240714_081845_746176_B3D4DF36 
-X-CRM114-Status: GOOD (  10.08  )
+X-CRM114-CacheID: sfid-20240720_174852_900174_FA4FB38B 
+X-CRM114-Status: GOOD (  10.83  )
 X-BeenThere: linux-rockchip@lists.infradead.org
 X-Mailman-Version: 2.1.34
 Precedence: list
@@ -488,14 +510,33 @@ Enable the just added Rockchip RNG driver for RK356x SoCs.
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- arch/arm64/boot/dts/rockchip/rk356x.dtsi | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/arm64/boot/dts/rockchip/rk3568.dtsi |  7 +++++++
+ arch/arm64/boot/dts/rockchip/rk356x.dtsi | 10 ++++++++++
+ 2 files changed, 17 insertions(+)
 
+diff --git a/arch/arm64/boot/dts/rockchip/rk3568.dtsi b/arch/arm64/boot/dts/rockchip/rk3568.dtsi
+index f1be76a54ceb..b9c6b2dc87fa 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3568.dtsi
++++ b/arch/arm64/boot/dts/rockchip/rk3568.dtsi
+@@ -257,6 +257,13 @@ power-domain@RK3568_PD_PIPE {
+ 	};
+ };
+ 
++&rng {
++	rockchip,sample-count = <1000>;
++	quality = <900>;
++
++	status = "okay";
++};
++
+ &usb_host0_xhci {
+ 	phys = <&usb2phy0_otg>, <&combphy0 PHY_TYPE_USB3>;
+ 	phy-names = "usb2-phy", "usb3-phy";
 diff --git a/arch/arm64/boot/dts/rockchip/rk356x.dtsi b/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-index 4690be841a1c..78377e7d1d6d 100644
+index 4690be841a1c..d160a23fd495 100644
 --- a/arch/arm64/boot/dts/rockchip/rk356x.dtsi
 +++ b/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-@@ -1113,6 +1113,15 @@ sdhci: mmc@fe310000 {
+@@ -1113,6 +1113,16 @@ sdhci: mmc@fe310000 {
  		status = "disabled";
  	};
  
@@ -506,6 +547,7 @@ index 4690be841a1c..78377e7d1d6d 100644
 +		clock-names = "core", "ahb";
 +		resets = <&cru SRST_TRNG_NS>;
 +		reset-names = "reset";
++		status = "disabled";
 +	};
 +
  	i2s0_8ch: i2s@fe400000 {
