@@ -21,6 +21,9 @@ cp -f  "${BINARIES_DIR}/"*.dtb              "${REGLINUX_BINARIES_DIR}/boot/" || 
 cp     "${BOARD_DIR}/boot/config.txt"       "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
 cp     "${BOARD_DIR}/boot/cmdline.txt"      "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
 
+# Pironman5 case overlay
+cp "${BINARIES_DIR}/pironman5/sunfounder-pironman5.dtbo" "${BATOCERA_BINARIES_DIR}/boot/overlays/" || exit 1
+
 cp "${BINARIES_DIR}/Image"              "${REGLINUX_BINARIES_DIR}/boot/boot/linux"              || exit 1
 cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modules.update"     || exit 1
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
