@@ -45,6 +45,9 @@ REGLINUX_MAME_ARCH = bcm2712
 # Cortex A76.A55
 else ifeq ($(BR2_cortex_a76_a55),y)
 REGLINUX_MAME_ARCH = rk3588
+# Cortex A78.A55
+else ifeq ($(BR2_cortex_a78_a55),y)
+REGLINUX_MAME_ARCH = rk3588
 # Unknown AArch64 saphira CPU
 else ifeq ($(BR2_saphira),y)
 REGLINUX_MAME_ARCH = saphira

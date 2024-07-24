@@ -1,0 +1,25 @@
+gamecube:
+  emulator: dolphin
+  core:     dolphin
+nds:
+  emulator: libretro
+  core:     melonds
+wii:
+  emulator: dolphin
+  core:     dolphin
+fmtowns:
+  emulator: libretro
+  core:     mame
+ps2:
+  emulator: libretro
+  core:     play
+flash:
+  emulator: lightspark
+  core:     lightspark
+model3:
+  emulator: supermodel
+  core:     supermodel-legacy
+  options:
+    videomode: max-1920x1080
+    decorations: none
+    hud_support: none
