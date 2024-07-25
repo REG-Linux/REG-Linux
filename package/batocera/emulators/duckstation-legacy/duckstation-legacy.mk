@@ -73,7 +73,7 @@ define DUCKSTATION_LEGACY_INSTALL_TARGET_CMDS
     rm -f $(TARGET_DIR)/usr/share/duckstation/resources/gamecontrollerdb.txt
 
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/duckstation/psx.duckstation.keys \
+    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/duckstation-legacy/psx.duckstation.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
