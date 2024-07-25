@@ -11,17 +11,6 @@
  #else
  #include "common/gsvector_nosimd.h"
  #endif
---- a/src/common/gsvector_nosimd.h	2024-07-14 02:36:38.233530745 +0200
-+++ b/src/common/gsvector_nosimd.h	2024-07-14 02:36:51.329831650 +0200
-@@ -115,7 +115,7 @@
-   {
-   }
- 
--  ALWAYS_INLINE explicit GSVector2i(const GSVector2i& v) { std::memcpy(I32, v.I32, sizeof(I32)); }
-+  ALWAYS_INLINE GSVector2i(const GSVector2i& v) { std::memcpy(I32, v.I32, sizeof(I32)); }
- 
-   // MSVC has bad codegen for the constexpr version when applied to non-constexpr things (https://godbolt.org/z/h8qbn7),
-   // so leave the non-constexpr version default
 --- a/src/common/gsvector_neon.h	2024-07-14 10:58:01.490474883 +0200
 +++ b/src/common/gsvector_neon.h	2024-07-14 12:48:39.479873540 +0200
 @@ -51,6 +51,7 @@

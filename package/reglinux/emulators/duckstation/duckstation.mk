@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DUCKSTATION_VERSION = b4c929898e83691529facbd59e37609311d53e8d
+DUCKSTATION_VERSION = 1771bfad583443f2a9093461197406c278c348c9
 DUCKSTATION_SITE = https://github.com/stenzek/duckstation.git
 DUCKSTATION_SITE_METHOD=git
 DUCKSTATION_GIT_SUBMODULES=YES
