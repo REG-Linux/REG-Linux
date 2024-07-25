@@ -10,12 +10,16 @@ White - these are unstable platforms that disappear after you bounce off them on
 Blue - these platforms are harder to hit because they move back and forth horizontally
 Jumping on a red or green spring-button will give you a short boost and some bonus points, but best of all: it makes the little amoeba rejoice!
 When your score gets beyond 1000 points, little oval-shaped bacteria start appearing on the platforms, which can be eaten by the amoeba. Each bacteria holds one of the six letters from the word A-M-O-E-B-A. Collect all six and the single next time you jump on a spring, you will get a super long boost.</desc>
-		<image>./images/Amoeba Jump.jpg</image>
-		<video>./videos/Amoeba Jump.mp4</video>
+		<image>./images/Amoeba-Jump-image.png</image>
+		<video>./videos/Amoeba.Jump-video.mp4</video>
+    <marquee>./images/Amoeba-Jump-marquee.png</marquee>
+    <thumbnail>./images/Amoeba-Jump-thumb.png</thumbnail>
+    <rating></rating>
 		<releasedate>20190519T000000</releasedate>
 		<developer>Dionoid</developer>
 		<publisher>https://atariage.com/forums/topic/280211-amoeba-jump/</publisher>
 		<genre>Platform</genre>
 		<players>1</players>
+		<lang>en</lang>
 	</game>
 </gameList>

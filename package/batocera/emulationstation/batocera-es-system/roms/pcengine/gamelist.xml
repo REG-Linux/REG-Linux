@@ -10,8 +10,10 @@ Enjoy a tactical horizontal shoot-em up with lots of secrets to discover.
 - Number of Stages: 7 (+1)
  - Special Features: Hidden Bosses, Hidden Bonus Stage, 25 Extra Weapons and Special Items
 - Ages: 10 years and up</desc>
-		<image>./images/Dinoforce.jpg</image>
-		<video>./videos/Dinoforce.mp4</video>
+		<image>./images/Dinoforce-image.png</image>
+		<video>./videos/Dinoforce-video.mp4</video>
+    <marquee>./images/Dinoforce-marquee.png</marquee>
+    <thumbnail>./images/Dinoforce-thumb.png</thumbnail>
 		<releasedate>20230317T000000</releasedate>
 		<developer>PCE Works</developer>
 		<publisher>https://dinoforce.pceworks.net/</publisher>

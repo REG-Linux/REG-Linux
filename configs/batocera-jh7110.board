@@ -1,3 +1,4 @@
+include toolchain-gcc13-glibc.common
 include batocera-board.common
 
 # Target definition (RV64GC, aka riscv64gc)

@@ -169,9 +169,11 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	# Note RNG_TOOLS not useful anymore we use seedrng from plymouth
 	#select BR2_PACKAGE_RNG_TOOLS			if !BR2_PACKAGE_BATOCERA_TARGET_RK3128 # system entropy. Currently disabled for RK3128 due to high CPU impact
 	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
-	# Note : TODO Bundle carbon in content downloader
+	# Note : TODO Bundle carbon (and maybe neutral) in content downloader
 	# select BR2_PACKAGE_ES_THEME_CARBON		# emulationstation theme
-	select BR2_PACKAGE_ES_THEME_NEUTRAL		# emulationstation theme
+	#select BR2_PACKAGE_ES_THEME_CARBON		# emulationstation theme
+	#select BR2_PACKAGE_ES_THEME_NEUTRAL		# emulationstation theme
+	select BR2_PACKAGE_ES_THEME_CANVAS		# emulationstation theme
 	select BR2_PACKAGE_ES_BACKGROUND_MUSICS		# emulationstation musics
 	select BR2_PACKAGE_BATOCERA_ES_SYSTEM		# emulation station es_systems.cfg generator + default roms
 	select BR2_PACKAGE_BATOCERA_CONFIGGEN		# emulation station external command launcher
@@ -305,6 +307,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_ROSHAMBO_CASE		if BR2_PACKAGE_BATOCERA_TARGET_RK3399 # roshambo case
 	select BR2_PACKAGE_RPIGPIOSWITCH		if BR2_PACKAGE_BATOCERA_RPI_ANY # gpio switchs
 	select BR2_PACKAGE_RETROGAME			if BR2_PACKAGE_BATOCERA_RPI_ANY # gpio pads
+	select BR2_PACKAGE_ANBERNIC_GPIO_PAD	if BR2_PACKAGE_BATOCERA_TARGET_RK3568 # Anbernic RG353 controller support
 	select BR2_PACKAGE_DESKPIPRO_CASE		if BR2_PACKAGE_BATOCERA_TARGET_BCM2711 # deskpi pro case rpi4 only
 	select BR2_PACKAGE_PIBOY			if BR2_PACKAGE_BATOCERA_TARGET_BCM2836	|| \
 							   BR2_PACKAGE_BATOCERA_TARGET_BCM2837	|| \
@@ -396,7 +399,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_I2C_TOOLS
 	select BR2_PACKAGE_MDADM	if !BR2_PACKAGE_BATOCERA_TARGET_H3 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # RAID
 	select BR2_PACKAGE_MC		if !BR2_PACKAGE_BATOCERA_TARGET_CHA
-	select BR2_PACKAGE_OD_COMMANDER if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	select BR2_PACKAGE_OD_COMMANDER # ALL
 	select BR2_PACKAGE_FDUPES
 	select BR2_PACKAGE_PYTHON_SERIAL		if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
 	select BR2_PACKAGE_BATOCERA_ETHTOOL
@@ -471,7 +474,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "allwinner/h3/cha"									if BR2_PACKAGE_BATOCERA_TARGET_CHA
 	default "allwinner/h5/tritium-h5 allwinner/h5/orangepi-pc2"					if BR2_PACKAGE_BATOCERA_TARGET_H5
 	default "allwinner/h6/orangepi-3-lts allwinner/h6/orangepi-3 allwinner/h6/orangepi-one-plus"	if BR2_PACKAGE_BATOCERA_TARGET_H6
-	default "allwinner/h616/anbernic-rg35xx allwinner/h616/bananapi-m4-berry allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/x96-mate" \
+	default "allwinner/h616/bananapi-m4-berry allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/x96-mate" \
 													if BR2_PACKAGE_BATOCERA_TARGET_H616
 
 	# Amlogic targets
@@ -835,29 +838,21 @@ config BR2_PACKAGE_BATOCERA_SEGADC
 	bool "batocera.linux dreamcast/naomi/atomiswave emulators/cores"
 
 	# Dreamcast / Naomi / Atomiswave emulation
-	select BR2_PACKAGE_FLYCAST		if !BR2_RISCV_64				&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_JZ4770		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2837		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_RK3326		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_X86
+	select BR2_PACKAGE_FLYCAST		if !BR2_RISCV_64			&& \
+						   !BR2_mipsel				&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836	&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2837	&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3326
 
-	select BR2_PACKAGE_LIBRETRO_FLYCAST	if !BR2_RISCV_64				&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_JZ4770		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2835		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2837		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_RK3326		&& \
-						   !BR2_PACKAGE_BATOCERA_TARGET_X86
+	select BR2_PACKAGE_LIBRETRO_FLYCAST	if !BR2_RISCV_64			&& \
+						   !BR2_mipsel				&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2836	&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_BCM2837	&& \
+						   !BR2_PACKAGE_BATOCERA_TARGET_RK3326
 
 	select BR2_PACKAGE_LIBRETRO_FLYCASTVL	if BR2_PACKAGE_BATOCERA_TARGET_BCM2836	|| \
 						   BR2_PACKAGE_BATOCERA_TARGET_BCM2837	|| \
-						   BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
-						   BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
 						   BR2_PACKAGE_BATOCERA_TARGET_RK3326
-
-	#nope select BR2_PACKAGE_REDREAM		if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # Redream not working with Sway
 
 	help
 	  Sega Dreamcast and Naomi/Atomiswave emulation support
@@ -941,7 +936,10 @@ config BR2_PACKAGE_BATOCERA_HANDHELD_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_DESMUME		if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
 
 	select BR2_PACKAGE_LIBRETRO_MELONDS		if  BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY  || (BR2_aarch64 && BR2_PACKAGE_BATOCERA_GLES3 && !BR2_PACKAGE_BATOCERA_TARGET_RK3326)
-	select BR2_PACKAGE_LIBRETRO_MELONDS_DS		if  BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY  || BR2_PACKAGE_BATOCERA_TARGET_BCM2711 || BR2_PACKAGE_BATOCERA_TARGET_BCM2712
+	select BR2_PACKAGE_LIBRETRO_MELONDS_DS		if  BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY  || \
+							    BR2_PACKAGE_BATOCERA_TARGET_BCM2711     || \
+							    BR2_PACKAGE_BATOCERA_TARGET_BCM2712     || \
+							    BR2_PACKAGE_BATOCERA_TARGET_RK3588
 
 	select BR2_PACKAGE_DRASTIC			if BR2_PACKAGE_BATOCERA_TARGET_BCM2711	|| \
 							   BR2_PACKAGE_BATOCERA_TARGET_BCM2712	|| \
@@ -1152,7 +1150,7 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	select BR2_PACKAGE_FHEROES2			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# HoMM3 open source engine
-	select BR2_PACKAGE_VCMI				if (BR2_ARCH_IS_64 && BR2_PACKAGE_BATOCERA_GLES3)
+	select BR2_PACKAGE_VCMI				if BR2_ARCH_IS_64 && BR2_PACKAGE_BATOCERA_GLES3
 
 	# ECWolf
 	select BR2_PACKAGE_ECWOLF			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
@@ -1160,7 +1158,11 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	# Sonic 3 AIR (Angel Island Revisited)
 	# Disabled on CHA and x86_64 because it bundles 144 MB of data. /data should live in content downloader !
 	# Disabled with musl libc because it does not link (libatomic should do it but it does not work so far)
-	select BR2_PACKAGE_SONIC3_AIR			if !BR2_x86_64 && !BR2_TOOLCHAIN_USES_MUSL && !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	# Disabled for rk3128 because of mali blobs (needs patching at link-time to mali blob)
+	select BR2_PACKAGE_SONIC3_AIR			if !BR2_x86_64                         && \
+							   !BR2_PACKAGE_BATOCERA_TARGET_CHA    && \
+							   !BR2_PACKAGE_BATOCERA_TARGET_RK3128 && \
+							   !BR2_TOOLCHAIN_USES_MUSL
 
 	# Sonic Mania
 	select BR2_PACKAGE_SONIC_MANIA			# ALL
@@ -1276,7 +1278,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_BATOCERA_TARGET_BCM2712
 
 	# Dreamcast
-	select BR2_PACKAGE_BATOCERA_SEGADC
+	select BR2_PACKAGE_BATOCERA_SEGADC		if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835
 
 	# PSX
 	# newer versions of duckstation stricter on OpenGL ES 3.x, no more support for KMS/DRM

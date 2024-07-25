@@ -11,14 +11,9 @@
     <rating>0.9</rating>
     <releasedate>20190318T000000</releasedate>
     <developer>Denis Grachev</developer>
-    <publisher>RetroSouls</publisher>
+    <publisher>https://retrosouls.itch.io/old-towers</publisher>
     <genre>Puzzle-Game</genre>
     <players>1</players>
-    <playcount>1</playcount>
-    <lastplayed>20200403T105321</lastplayed>
-    <crc32>D875E97D</crc32>
-    <md5>96216acdb9b8eb86f8fa7209a5cc5619</md5>
     <lang>en</lang>
-    <cheevosHash>96216ACDB9B8EB86F8FA7209A5CC5619</cheevosHash>
   </game>
 </gameList>

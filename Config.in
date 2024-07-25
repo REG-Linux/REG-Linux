@@ -371,7 +371,6 @@ menu "Emulators"
   endmenu
 
   menu "ports"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/cgenius/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/devilutionx/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/sdlpop/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/cannonball/Config.in"
@@ -405,14 +404,14 @@ menu "Emulators"
   endmenu
 
   menu "mupen64plus"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-core/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-ui-console/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-video-glide64mk2/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-video-rice/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-input-sdl/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-audio-sdl/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-rsp-hle/Config.in"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/emulators/mupen64plus/mupen64plus-gliden64/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-core/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-ui-console/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-video-glide64mk2/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-video-rice/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-input-sdl/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-audio-sdl/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-rsp-hle/Config.in"
+    source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/mupen64plus/mupen64plus-gliden64/Config.in"
   endmenu
 
 endmenu
@@ -580,6 +579,7 @@ menu "REG.linux"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/libretro/libretro-geolith/Config.in"
 
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/cgenius/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/dhewm3/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/fheroes2/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/openjazz/Config.in"
@@ -612,6 +612,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/reglinux-shaders/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/themes/es-theme-neutral/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/themes/es-theme-canvas/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/firmwares/firmware-radxa-rkwifibt/Config.in"
 endmenu
