@@ -16,8 +16,10 @@ There are several game play types to choose from:
 Difficulty levels for all players.
 
 Oh, and if you drop this rom in "gbc2players", you can play 2-player link mode (crunch-up recommended).</desc>
-		<image>./images/Petris.jpg</image>
-		<video>./videos/Petris.mp4</video>
+		<image>./images/Petris-image.png</image>
+		<video>./videos/Petris-video.mp4</video>
+    <marquee>./images/Petris-marquee.png</marquee>
+    <thumbnail>./images/Petris-thumb.png</thumbnail>
 		<releasedate>20201209T000000</releasedate>
 		<developer>bbbbbr</developer>
 		<publisher>https://bbbbbr.itch.io/petris</publisher>

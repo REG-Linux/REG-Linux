@@ -1,4 +1,7 @@
 # odroid-go ultra default values
 
+# default resolution
+es.resolution=480x854
+
 # default sway environment (rotate)
 system.es.environment=sway

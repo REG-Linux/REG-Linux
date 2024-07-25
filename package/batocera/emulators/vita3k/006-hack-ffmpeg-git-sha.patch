@@ -1,0 +1,11 @@
+--- a/external/ffmpeg/CMakeLists.txt	2024-07-24 00:24:15.631293510 +0200
++++ b/external/ffmpeg/CMakeLists.txt	2024-07-24 00:24:43.118874868 +0200
+@@ -36,6 +36,8 @@
+ 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+ 	OUTPUT_VARIABLE FFMPEG_GIT_SHA
+ 	OUTPUT_STRIP_TRAILING_WHITESPACE)
++# REG HACK
++set(FFMPEG_GIT_SHA "e30b7d7")
+ 
+ # Download prebuilt ffmpeg
+ if(NOT EXISTS "${CMAKE_BINARY_DIR}/external/ffmpeg.zip")

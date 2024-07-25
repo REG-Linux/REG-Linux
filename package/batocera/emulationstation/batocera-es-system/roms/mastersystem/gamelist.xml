@@ -4,8 +4,10 @@
 		<path>./Mai Nurse (v1.00).sms</path>
 		<name>Mai Nurse</name>
 		<desc>Help Mai get rid of viruses with pills, line up 4 slots of the same color horizontally or vertically to destroy them and progress through the levels in this classic puzzle game!</desc>
-		<image>./images/Mai Nurse.jpg</image>
-		<video>./videos/Mai Nurse.mp4</video>
+		<image>./images/Mai-Nurse-image.png</image>
+		<video>./videos/Mai-Nurse-video.mp4</video>
+    <marquee>./images/Mai-Nurse-marquee.png</marquee>
+    <thumbnail>./images/Mai-Nurse-thumb.png</thumbnail>
 		<releasedate>20240327T000000</releasedate>
 		<developer>lunoka</developer>
 		<publisher>https://lunoka.itch.io/mai-nurse</publisher>

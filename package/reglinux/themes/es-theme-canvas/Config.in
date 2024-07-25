@@ -1,0 +1,4 @@
+config BR2_PACKAGE_ES_THEME_CANVAS
+	bool "EmulationStation theme Canvas (REG Linux version)"
+	help
+	  https://github.com/REG-Linux/es-theme-canvas

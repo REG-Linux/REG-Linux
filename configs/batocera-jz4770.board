@@ -1,3 +1,4 @@
+include toolchain-gcc13-musl.common
 include batocera-board.common
 
 # Target definition
@@ -12,9 +13,7 @@ BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/patches $(BR2
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/ingenic/jz4770/fsoverlay"
 BR2_TARGET_ROOTFS_SQUASHFS4_LZ4=y
 
-# We use musl for mips32
-BR2_TOOLCHAIN_BUILDROOT_GLIBC=n
-BR2_TOOLCHAIN_BUILDROOT_MUSL=y
+# Musl needs separate libexecinfo
 BR2_PACKAGE_LIBEXECINFO=y
 
 # Bootloader
@@ -67,3 +66,6 @@ BR2_PACKAGE_HOST_UBOOT_TOOLS=y
 #BR2_PACKAGE_HOST_UBOOT_TOOLS_ENVIMAGE_SIZE="32768"
 #BR2_PACKAGE_UBOOT_TOOLS_FIT_SUPPORT=y
 BR2_PACKAGE_HOST_UBOOT_TOOLS_FIT_SUPPORT=y
+
+# Filesystem
+BR2_TARGET_ROOTFS_CPIO_LZ4=y

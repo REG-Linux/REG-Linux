@@ -25,12 +25,12 @@ mkdir "${BATOCERA_BINARIES_DIR}/boot/dev"     || exit 1
 mkdir "${BATOCERA_BINARIES_DIR}/boot/root"     || exit 1
 
 # boot.tar.xz
-cp "${BINARIES_DIR}/initrd.lz4"      "${BATOCERA_BINARIES_DIR}/boot/boot/initrd.lz4"       || exit 1
-#cp "${BOARD_DIR}/boot/extlinux.conf"         "${BATOCERA_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BINARIES_DIR}/rootfs.cpio.lz4"      "${BATOCERA_BINARIES_DIR}/boot/boot/initrd.lz4" || exit 1
+#cp "${BOARD_DIR}/boot/extlinux.conf"     "${BATOCERA_BINARIES_DIR}/boot/extlinux/"       || exit 1
 
 cp "${BINARIES_DIR}/rootfs.squashfs" "${BATOCERA_BINARIES_DIR}/boot/boot/batocera.update" || exit 1
-cp "${BINARIES_DIR}/uzImage.bin"                "${BATOCERA_BINARIES_DIR}/uzImage.bin.source"                || exit 1
-cp "${BINARIES_DIR}/mininit-syspart" "${BATOCERA_BINARIES_DIR}/boot/mininit-syspart"   || exit 1
+cp "${BINARIES_DIR}/uzImage.bin"     "${BATOCERA_BINARIES_DIR}/uzImage.bin.source"        || exit 1
+cp "${BINARIES_DIR}/mininit-syspart" "${BATOCERA_BINARIES_DIR}/boot/mininit-syspart"      || exit 1
 cp "${BINARIES_DIR}/ubiboot-v11_ddr2_512mb.bin" "${BATOCERA_BINARIES_DIR}/boot/ubiboot.bin" || exit 1
 cp "${BINARIES_DIR}/gcw0_proto.dtb" "${BATOCERA_BINARIES_DIR}/boot/gcw0_proto.dtb" || exit 1
 cp "${BINARIES_DIR}/gcw0.dtb" "${BATOCERA_BINARIES_DIR}/boot/gcw0.dtb" || exit 1

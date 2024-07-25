@@ -3,8 +3,8 @@
 # EmulationStation theme "Neutral"
 #
 ################################################################################
-# Version.: Commits on Jul 11, 2024
-ES_THEME_NEUTRAL_VERSION = a74d66f9c557ac5dfb3b1ae5ea9542170337bc47
+# Version.: Commits on Jul 16, 2024
+ES_THEME_NEUTRAL_VERSION = 0d1df7a5deb57dc55bba50172b674d8308f11737
 ES_THEME_NEUTRAL_SITE = $(call github,REG-Linux,es-theme-neutral,$(ES_THEME_NEUTRAL_VERSION))
 
 define ES_THEME_NEUTRAL_INSTALL_TARGET_CMDS
