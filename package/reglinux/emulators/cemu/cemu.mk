@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-CEMU_VERSION = v2.0-88
+CEMU_VERSION = v2.0-90
 CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
@@ -41,14 +41,14 @@ define CEMU_INSTALL_TARGET_CMDS
 	mv -f $(@D)/bin/Cemu_release $(@D)/bin/cemu
 	cp -pr $(@D)/bin/{cemu,gameProfiles,resources} $(TARGET_DIR)/usr/bin/cemu/
 	$(INSTALL) -m 0755 -D \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/cemu/get-audio-device \
+	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/cemu/get-audio-device \
 	    $(TARGET_DIR)/usr/bin/cemu/
 	# keys.txt
 	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/cemu
 	touch $(TARGET_DIR)/usr/share/batocera/datainit/bios/cemu/keys.txt
 	#evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -pr $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/cemu/wiiu.keys \
+	cp -pr $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/cemu/wiiu.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
