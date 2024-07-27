@@ -14,7 +14,8 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot" || exit 1
+mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
+mkdir -p "${REGLINUX_BINARIES_DIR}/boot/overlays" || exit 1
 
 cp -pr "${BINARIES_DIR}/rpi-firmware/"*     "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
 cp -f  "${BINARIES_DIR}/"*.dtb              "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
