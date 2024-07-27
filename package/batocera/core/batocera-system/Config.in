@@ -1022,6 +1022,8 @@ config BR2_PACKAGE_BATOCERA_MSDOS_SYSTEMS
 
 	select BR2_PACKAGE_LIBRETRO_DOSBOX_PURE			# ALL
 
+	select BR2_PACKAGE_86BOX				if BR2_x86_64 || BR2_arm || BR2_aarch64
+
 	help
 	 MS/DOS cores/emulators
 
