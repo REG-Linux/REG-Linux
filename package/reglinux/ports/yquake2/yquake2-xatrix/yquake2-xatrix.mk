@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-YQUAKE2_XATRIX_VERSION = XATRIX_2_12
+YQUAKE2_XATRIX_VERSION = XATRIX_2_13
 YQUAKE2_XATRIX_SITE = $(call github,yquake2,xatrix,$(YQUAKE2_XATRIX_VERSION))
 YQUAKE2_XATRIX_DEPENDENCIES = sdl2
 
