@@ -1,0 +1,122 @@
+--- a/src/qt/CMakeLists.txt	2024-07-27 12:40:33.707999865 +0200
++++ b/src/qt/CMakeLists.txt	2024-07-27 12:43:04.430107911 +0200
+@@ -170,12 +170,6 @@
+     qt_unixmanagerfilter.cpp
+     qt_unixmanagerfilter.hpp
+ 
+-    qt_vulkanwindowrenderer.hpp
+-    qt_vulkanwindowrenderer.cpp
+-
+-    qt_vulkanrenderer.hpp
+-    qt_vulkanrenderer.cpp
+-
+     qt_mcadevicelist.hpp
+     qt_mcadevicelist.cpp
+     qt_mcadevicelist.ui
+@@ -186,6 +180,16 @@
+     ../qt_resources.qrc
+ )
+ 
++#if (USE_VULKAN)
++#add_library(ui STATIC
++#    qt_vulkanwindowrenderer.hpp
++#    qt_vulkanwindowrenderer.cpp
++#
++#    qt_vulkanrenderer.hpp
++#    qt_vulkanrenderer.cpp
++#)
++#endif
++
+ if(RTMIDI)
+     target_compile_definitions(ui PRIVATE USE_RTMIDI)
+ endif()
+--- a/src/qt/qt_rendererstack.hpp	2024-07-27 12:39:21.108911171 +0200
++++ b/src/qt/qt_rendererstack.hpp	2024-07-27 12:39:41.692652792 +0200
+@@ -58,7 +58,7 @@
+         OpenGL,
+         OpenGLES,
+         OpenGL3,
+-        Vulkan,
++        //Vulkan,
+         None = -1
+     };
+     void switchRenderer(Renderer renderer);
+--- a/src/qt/qt_rendererstack.cpp	2024-07-27 12:39:29.032811706 +0200
++++ b/src/qt/qt_rendererstack.cpp	2024-07-27 12:40:28.152069606 +0200
+@@ -24,7 +24,7 @@
+ #include "qt_hardwarerenderer.hpp"
+ #include "qt_openglrenderer.hpp"
+ #include "qt_softwarerenderer.hpp"
+-#include "qt_vulkanwindowrenderer.hpp"
++//#include "qt_vulkanwindowrenderer.hpp"
+ 
+ #include "qt_mainwindow.hpp"
+ #include "qt_util.hpp"
+@@ -347,6 +347,7 @@
+                 current.reset(this->createWindowContainer(hw, this));
+                 break;
+             }
++#if 0
+ #if QT_CONFIG(vulkan)
+         case Renderer::Vulkan:
+             {
+@@ -383,6 +384,7 @@
+                 break;
+             }
+ #endif
++#endif
+     }
+     if (current.get() == nullptr)
+         return;
+@@ -396,7 +398,7 @@
+ 
+     currentBuf = 0;
+ 
+-    if (renderer != Renderer::OpenGL3 && renderer != Renderer::Vulkan) {
++    if (renderer != Renderer::OpenGL3 /*&& renderer != Renderer::Vulkan*/) {
+         imagebufs = rendererWindow->getBuffers();
+         endblit();
+         emit rendererChanged();
+--- a/src/qt/qt_mainwindow.cpp	2024-07-27 12:49:33.561223257 +0200
++++ b/src/qt/qt_mainwindow.cpp	2024-07-27 13:05:04.137542031 +0200
+@@ -85,10 +85,12 @@
+ #include <QString>
+ #include <QDir>
+ #include <QSysInfo>
++#if 0
+ #if QT_CONFIG(vulkan)
+ #    include <QVulkanInstance>
+ #    include <QVulkanFunctions>
+ #endif
++#endif
+ 
+ #include <array>
+ #include <memory>
+@@ -376,6 +378,7 @@
+     ui->actionVNC->setVisible(false);
+ #endif
+ 
++#if 0
+ #if QT_CONFIG(vulkan)
+     bool vulkanAvailable = false;
+     {
+@@ -391,6 +394,7 @@
+     }
+     if (!vulkanAvailable)
+ #endif
++#endif
+     {
+         if (vid_api == 4)
+             vid_api = 0;
+@@ -433,9 +437,9 @@
+             case 3:
+                 newVidApi = RendererStack::Renderer::OpenGL3;
+                 break;
+-            case 4:
++            /*case 4:
+                 newVidApi = RendererStack::Renderer::Vulkan;
+-                break;
++                break;*/
+ #ifdef USE_VNC
+             case 5:
+                 {
