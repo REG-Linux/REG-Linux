@@ -23,7 +23,8 @@ BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="$(call github,raspberrypi,linux,485d11cfa7df2d2deb39c9b3455cebcb1a85cea2)/linux-485d11cfa7df2d2deb39c9b3455cebcb1a85cea2.tar.gz"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/broadcom/bcm2712/linux-defconfig.config"
-BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/broadcom/linux_patches  $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/aarch64"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/broadcom/linux_patches"
+# Temp disable limit 1080p patch $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/aarch64"
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/broadcom/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
