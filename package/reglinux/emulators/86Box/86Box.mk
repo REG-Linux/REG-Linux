@@ -8,7 +8,7 @@
 86BOX_SITE = https://github.com/86Box/86Box
 86BOX_SITE_METHOD=git
 86BOX_LICENSE = GPLv3
-86BOX_DEPENDENCIES = rtmidi libsndfile slirp fluidsynth
+86BOX_DEPENDENCIES = rtmidi libsndfile slirp fluidsynth openal
 
 86BOX_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release -DRELEASE=ON
 
