@@ -1,0 +1,13 @@
+config BR2_PACKAGE_86BOX
+    bool "86box"
+    select BR2_PACKAGE_RTMIDI
+    select BR2_PACKAGE_LIBSNDFILE
+    select BR2_PACKAGE_SLIRP
+    select BR2_PACKAGE_FLUIDSYNTH
+  
+    help
+      86Box
+
+      https://86box.net/
+
+
