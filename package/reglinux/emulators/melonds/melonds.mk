@@ -3,9 +3,9 @@
 # melonds
 #
 ################################################################################
-# Version: Commits on May 16, 2024
-MELONDS_VERSION = a72b79a55ad2d61811af11b1b911f6af863f66c2
-MELONDS_SITE = https://github.com/Arisotura/melonDS.git
+# Version: Commits on Jul 28, 2024
+MELONDS_VERSION = 12563fb636f27b2eaa6b2a25342bed6ca9268bb0
+MELONDS_SITE = https://github.com/melonDS-emu/melonDS.git
 MELONDS_SITE_METHOD=git
 MELONDS_GIT_SUBMODULES=YES
 MELONDS_LICENSE = GPLv2
@@ -17,12 +17,8 @@ MELONDS_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 MELONDS_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr"
 MELONDS_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 MELONDS_CONF_OPTS += -DUSE_QT6=ON
-
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
-MELONDS_CONF_OPTS += -DUSE_X11=ON
-else
-MELONDS_CONF_OPTS += -DUSE_X11=OFF
-endif
+MELONDS_CONF_OPTS += -DENABLE_LTO=ON
+MELONDS_CONF_OPTS += -DENABLE_LTO_RELEASE=ON
 
 define MELONDS_INSTALL_TARGET_CMDS
     $(INSTALL) -D $(@D)/buildroot-build/melonDS \
@@ -31,7 +27,7 @@ endef
 
 define MELONDS_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/melonds/nds.melonds.keys \
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/melonds/nds.melonds.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
