@@ -1,0 +1,44 @@
+--- a/src/frontend/qt_sdl/Config.cpp	2024-07-29 12:04:44.145715370 +0200
++++ b/src/frontend/qt_sdl/Config.cpp	2024-07-29 12:07:51.712041863 +0200
+@@ -38,10 +38,9 @@
+ using namespace melonDS;
+ 
+ 
+-const char* kConfigFile = "melonDS.toml";
++const char* kConfigFile = "/userdata/system/configs/melonDS/melonDS.toml";
+ 
+-const char* kLegacyConfigFile = "melonDS.ini";
+-const char* kLegacyUniqueConfigFile = "melonDS.%d.ini";
++const char* kLegacyConfigFile = "/userdata/system/configs/melonDS/melonDS.ini";
+ 
+ toml::value RootTable;
+ 
+@@ -626,17 +626,8 @@
+ bool LoadLegacyFile(int inst)
+ {
+     Platform::FileHandle* f;
+-    if (inst > 0)
+-    {
+-        char name[100] = {0};
+-        snprintf(name, 99, kLegacyUniqueConfigFile, inst+1);
+-        f = Platform::OpenLocalFile(name, Platform::FileMode::ReadText);
+-    }
+-    else
+-    {
+-        f = Platform::OpenLocalFile(kLegacyConfigFile, Platform::FileMode::ReadText);
+-    }
+ 
++    f = Platform::OpenLocalFile(kLegacyConfigFile, Platform::FileMode::ReadText);
+     if (!f) return true;
+ 
+     toml::value* root;// = GetLocalTable(inst);
+@@ -661,9 +652,6 @@
+         {
+             if (!strncmp(entry->Name, entryname, 32))
+             {
+-                if (!(entry->InstanceUnique ^ (inst == -1)))
+-                    break;
+-
+                 std::string path = entry->TOMLPath;
+                 toml::value* table = root;
+                 size_t sep;
