@@ -1021,7 +1021,8 @@ config BR2_PACKAGE_BATOCERA_MSDOS_SYSTEMS
 
 	select BR2_PACKAGE_LIBRETRO_DOSBOX_PURE			# ALL
 
-	select BR2_PACKAGE_86BOX				if BR2_x86_64 || BR2_arm || BR2_aarch64
+	# 86Box uses Qt5/6 for UI but requires X11 right now
+	select BR2_PACKAGE_86BOX				if BR2_PACKAGE_HAS_LIBGL && (BR2_x86_64 || BR2_arm || BR2_aarch64)
 
 	help
 	 MS/DOS cores/emulators
