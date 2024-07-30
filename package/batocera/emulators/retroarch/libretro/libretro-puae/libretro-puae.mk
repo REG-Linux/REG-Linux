@@ -3,8 +3,8 @@
 # libretro-puae
 #
 ################################################################################
-# Version: Commits on Feb 22, 2024
-LIBRETRO_PUAE_VERSION = 5f683ae67b998fcadd69fa8f65f2440fa8ef135f
+# Version: Commits on May 25, 2024
+LIBRETRO_PUAE_VERSION = 4493a194dd42e593914c26952ee8cb4ba750f596
 LIBRETRO_PUAE_SITE = $(call github,libretro,libretro-uae,$(LIBRETRO_PUAE_VERSION))
 LIBRETRO_PUAE__LICENSE = GPLv2
 
@@ -20,6 +20,8 @@ else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2711),y)
 LIBRETRO_PUAE_PLATFORM = rpi4
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2712),y)
 LIBRETRO_PUAE_PLATFORM = rpi5
+else ifeq ($(BR2_cortex_a7),y)
+LIBRETRO_PUAE_PLATFORM = classic_armv7_a7
 endif
 
 define LIBRETRO_PUAE_BUILD_CMDS
