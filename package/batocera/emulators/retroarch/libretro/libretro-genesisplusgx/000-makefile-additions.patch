@@ -1,0 +1,66 @@
+--- a/Makefile.libretro
++++ b/Makefile.libretro
+@@ -77,6 +77,13 @@
+       PLATFORM_DEFINES += -DARM -march=armv8-a+crc -mcpu=cortex-a73 -mtune=cortex-a73.cortex-a53
+    endif
+ 
++   # Odin
++   ifneq (,$(findstring odin,$(platform)))
++      ENDIANNESS_DEFINES += -DALIGN_LONG
++      CFLAGS += -fomit-frame-pointer -ffast-math
++      PLATFORM_DEFINES += -DARM -march=armv8-a+crc -mcpu=cortex-a75 -mtune=cortex-a75.cortex-a55
++   endif
++
+    # Raspberry Pi
+    ifneq (,$(findstring rpi,$(platform)))
+       ENDIANNESS_DEFINES += -DALIGN_LONG
+--- a/Makefile.libretro	2024-08-03 01:16:23.854975472 +0200
++++ b/Makefile.libretro	2024-08-03 01:24:04.553477500 +0200
+@@ -56,18 +56,32 @@
+    ENDIANNESS_DEFINES := -DLSB_FIRST -DBYTE_ORDER=LITTLE_ENDIAN
+    PLATFORM_DEFINES := -DHAVE_ZLIB -DMAXROMSIZE=33554432
+ 
+-   # RockPro64
+-   ifneq (,$(findstring rockpro64,$(platform)))
++   # RK3326
++   ifneq (,$(findstring classic_armv8_a35,$(platform)))
+       ENDIANNESS_DEFINES += -DALIGN_LONG
+       CFLAGS += -fomit-frame-pointer -ffast-math
+-      PLATFORM_DEFINES += -DARM -marm -march=armv7ve -mcpu=cortex-a72 -mtune=cortex-a72.cortex-a53 -mfloat-abi=hard
++      PLATFORM_DEFINES += -DARM -march=armv8-a+crc -mcpu=cortex-a35 -mtune=cortex-a35
+    endif
+ 
+-   # Odroid-GOA
+-   ifneq (,$(findstring classic_armv8_a35,$(platform)))
++   # RK3399
++   ifneq (,$(findstring rk3399,$(platform)))
+       ENDIANNESS_DEFINES += -DALIGN_LONG
+       CFLAGS += -fomit-frame-pointer -ffast-math
+-      PLATFORM_DEFINES += -DARM -marm -march=armv8-a+crc -mfpu=neon-fp-armv8 -mcpu=cortex-a35 -mtune=cortex-a35 -mfloat-abi=hard
++      PLATFORM_DEFINES += -DARM -mcpu=cortex-a72.cortex-a53 -mtune=cortex-a72.cortex-a53
++   endif
++
++   # RK3568
++   ifneq (,$(findstring rk3568,$(platform)))
++      ENDIANNESS_DEFINES += -DALIGN_LONG
++      CFLAGS += -fomit-frame-pointer -ffast-math
++      PLATFORM_DEFINES += -DARM -mcpu=cortex-a55 -mtune=cortex-a55
++   endif
++
++   # RK3588
++   ifneq (,$(findstring rk3588,$(platform)))
++      ENDIANNESS_DEFINES += -DALIGN_LONG
++      CFLAGS += -fomit-frame-pointer -ffast-math
++      PLATFORM_DEFINES += -DARM -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
+    endif
+ 
+    # Odroid-N2
+@@ -100,6 +114,8 @@
+          endif
+       else ifneq (,$(findstring rpi4,$(platform)))
+             PLATFORM_DEFINES += -mcpu=cortex-a72 -mtune=cortex-a72
++      else ifneq (,$(findstring rpi5,$(platform)))
++            PLATFORM_DEFINES += -mcpu=cortex-a76 -mtune=cortex-a76
+       endif
+    endif
+ 
