@@ -742,7 +742,7 @@
 
     ports {
         mipi_out: port@1 {
-            #address-cells = <0>;
+            #address-cells = <1>;
             #size-cells = <0>;
             reg = <1>;
 
@@ -752,7 +752,7 @@
         };
     };
 
-    panel@0 {
+    internal_display: panel@0 {
         reg = <0>;
         compatible = "sharp,ls054b3sx01";
         backlight = <&backlight>;
@@ -819,9 +819,9 @@
                 regulator-max-microvolt = <1350000>;
                 regulator-ramp-delay = <6001>;
                 regulator-state-mem {
-                    regulator-off-in-suspend;
-                };
+                regulator-off-in-suspend;
             };
+        };
 
             vdd_cpu_l: DCDC_REG2 {
                 regulator-name = "vdd_cpu_l";
@@ -1051,18 +1051,18 @@
     i2c-scl-falling-time-ns = <20>;
     status = "okay";
 
-    gt9xx: gt9xx@14 {
+    touchscreen@14 {
         compatible = "goodix,gt927";
         reg = <0x14>;
         interrupt-parent = <&gpio3>;
         interrupts = <RK_PD7 IRQ_TYPE_EDGE_FALLING>;
         irq-gpios = <&gpio3 RK_PD7 GPIO_ACTIVE_HIGH>;
         reset-gpios = <&gpio3 RK_PD6 GPIO_ACTIVE_HIGH>;
+        pinctrl-names = "default";
         touchscreen-inverted-x;
-        touchscreen-swapped-x-y;
         touchscreen-size-x = <1152>;
         touchscreen-size-y = <1920>;
-        status = "okay";
+        touchscreen-swapped-x-y;
     };
 
     fusb0: typec-portc@22 {
