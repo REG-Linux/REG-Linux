@@ -14,7 +14,7 @@ index 1c0042fbb..79448c5ff 100644
 @@ -4,13 +4,13 @@
   * Copyright (C) 2014 ROCKCHIP, Inc.
   */
-jdorigao@gmail.com
+
 -#include <linux/bitfield.h>
  #include <linux/module.h>
  #include <linux/mutex.h>
