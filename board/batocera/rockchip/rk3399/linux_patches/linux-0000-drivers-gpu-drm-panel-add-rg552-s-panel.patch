@@ -10,18 +10,18 @@ Subject: [PATCH] From 6ce08ea7e9ad78c877fa2cb74c9f00a6ba67e653 Mon Sep 17
 ---
  drivers/gpu/drm/panel/Kconfig                 |   9 +
  drivers/gpu/drm/panel/Makefile                |   1 +
- .../gpu/drm/panel/panel-sharp-ls054b3sx01.c   | 366 ++++++++++++++++++
- 3 files changed, 376 insertions(+)
+ .../gpu/drm/panel/panel-sharp-ls054b3sx01.c   | 359 ++++++++++++++++++
+ 3 files changed, 369 insertions(+)
  create mode 100644 drivers/gpu/drm/panel/panel-sharp-ls054b3sx01.c
 
 diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
-index a582ddd58..0e1052ac2 100644
+index 3a2f4a9f1..59d722d5e 100644
 --- a/drivers/gpu/drm/panel/Kconfig
 +++ b/drivers/gpu/drm/panel/Kconfig
-@@ -588,6 +588,15 @@ config DRM_PANEL_SHARP_LS043T1LE01
+@@ -665,6 +665,15 @@ config DRM_PANEL_SHARP_LS043T1LE01
  	  Say Y here if you want to enable support for Sharp LS043T1LE01 qHD
  	  (540x960) DSI panel as found on the Qualcomm APQ8074 Dragonboard
- 
+
 +config DRM_PANEL_SHARP_LS054B3SX01
 +	bool "Sharp LS054B3SX01 1152x1920 video mode panel"
 +	depends on OF
@@ -35,10 +35,10 @@ index a582ddd58..0e1052ac2 100644
  	tristate "Sharp LS060T1SX01 FullHD video mode panel"
  	depends on OF
 diff --git a/drivers/gpu/drm/panel/Makefile b/drivers/gpu/drm/panel/Makefile
-index 34e717382..b99d0950c 100644
+index 433e93d57..860ac533f 100644
 --- a/drivers/gpu/drm/panel/Makefile
 +++ b/drivers/gpu/drm/panel/Makefile
-@@ -59,6 +59,7 @@ obj-$(CONFIG_DRM_PANEL_SEIKO_43WVF1G) += panel-seiko-43wvf1g.o
+@@ -67,6 +67,7 @@ obj-$(CONFIG_DRM_PANEL_SEIKO_43WVF1G) += panel-seiko-43wvf1g.o
  obj-$(CONFIG_DRM_PANEL_SHARP_LQ101R1SX01) += panel-sharp-lq101r1sx01.o
  obj-$(CONFIG_DRM_PANEL_SHARP_LS037V7DW01) += panel-sharp-ls037v7dw01.o
  obj-$(CONFIG_DRM_PANEL_SHARP_LS043T1LE01) += panel-sharp-ls043t1le01.o
@@ -48,10 +48,10 @@ index 34e717382..b99d0950c 100644
  obj-$(CONFIG_DRM_PANEL_SITRONIX_ST7703) += panel-sitronix-st7703.o
 diff --git a/drivers/gpu/drm/panel/panel-sharp-ls054b3sx01.c b/drivers/gpu/drm/panel/panel-sharp-ls054b3sx01.c
 new file mode 100644
-index 000000000..d10c0a2bb
+index 000000000..96d600cda
 --- /dev/null
 +++ b/drivers/gpu/drm/panel/panel-sharp-ls054b3sx01.c
-@@ -0,0 +1,366 @@
+@@ -0,0 +1,359 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (c) 2022 Maya Matuszczyk <maccraft123mc@gmail.com>
@@ -80,7 +80,7 @@ index 000000000..d10c0a2bb
 +	bool prepared;
 +};
 +
-+static inline struct sharp_ls054 *to_sharp_ls054(struct drm_panel *panel)
++static inline struct sharp_ls054 *panel_to_sharp_ls054(struct drm_panel *panel)
 +{
 +	return container_of(panel, struct sharp_ls054, panel);
 +}
@@ -93,19 +93,19 @@ index 000000000..d10c0a2bb
 +                        return ret;                                     \
 +        } while (0)
 +
-+#define SHARP_LS054_SETEXTC		0xB9
-+#define SHARP_LS054_SETSEQUENCE		0xB0
-+#define SHARP_LS054_SETGAMMACURVE	0xE0
-+#define SHARP_LS054_SETPOWER		0xB1
-+#define SHARP_LS054_SETVREF		0xD2
-+#define SHARP_LS054_SETGIP0		0xD3
-+#define SHARP_LS054_SETGIP1		0xD5
-+#define SHARP_LS054_SETGIP2		0xD6
-+#define SHARP_LS054_SETGIP3		0xD8
-+#define SHARP_LS054_SETDISP		0xB2
-+#define SHARP_LS054_SETCYC		0xB4
-+#define SHARP_LS054_SETMIPI		0xBA
-+#define SHARP_LS054_SETPTBA		0xBF
++#define SHARP_LS054_SETEXTC         0xB9
++#define SHARP_LS054_SETSEQUENCE     0xB0
++#define SHARP_LS054_SETGAMMACURVE   0xE0
++#define SHARP_LS054_SETPOWER        0xB1
++#define SHARP_LS054_SETVREF         0xD2
++#define SHARP_LS054_SETGIP0         0xD3
++#define SHARP_LS054_SETGIP1         0xD5
++#define SHARP_LS054_SETGIP2         0xD6
++#define SHARP_LS054_SETGIP3         0xD8
++#define SHARP_LS054_SETDISP         0xB2
++#define SHARP_LS054_SETCYC          0xB4
++#define SHARP_LS054_SETMIPI         0xBA
++#define SHARP_LS054_SETPTBA         0xBF
 +
 +static int sharp_ls054_init_sequence(struct sharp_ls054 *ctx)
 +{
@@ -114,8 +114,6 @@ index 000000000..d10c0a2bb
 +
 +	dsi_dcs_write_seq(dsi, SHARP_LS054_SETEXTC,
 +			0xFF, 0x83, 0x99);
-+	//dsi_dcs_write_seq(dsi, SHARP_LS054_SETSEQUENCE,
-+	//		0x00, 0x00, 0x65);
 +	dsi_dcs_write_seq(dsi, SHARP_LS054_SETGAMMACURVE,
 +			0x01, 0x13, 0x17, 0x34, 0x38, 0x3E, 0x2C, 0x47,
 +			0x07, 0x0C, 0x0F, 0x12, 0x14, 0x11, 0x13, 0x12,
@@ -161,10 +159,6 @@ index 000000000..d10c0a2bb
 +			0x0F, 0x01, 0x02, 0x05, 0x00, 0x00, 0x00, 0x3A);
 +	dsi_dcs_write_seq(dsi, SHARP_LS054_SETMIPI,
 +			0x03, 0x82, 0xA0, 0xE5);
-+	//dsi_dcs_write_seq(dsi, SHARP_LS054_SETPTBA,
-+	//		0xCF, 0x00, 0x46, 0x00, 0x00, 0x00, 0x02, 0x54,
-+	//		0x04, 0x61, 0x1C, 0x8C);
-+
 +
 +	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
 +	if (ret < 0)
@@ -185,7 +179,7 @@ index 000000000..d10c0a2bb
 +
 +	mipi_dsi_dcs_set_display_brightness(dsi, 0xFF);
 +	dsi_dcs_write_seq(dsi, MIPI_DCS_WRITE_POWER_SAVE, 0x00);
-+	dsi_dcs_write_seq(dsi, 0x53, 0x24); //MIPI_DCS_WRITE_CONTROL_DISPLAY ?
++	dsi_dcs_write_seq(dsi, 0x53, 0x24);
 +	mipi_dsi_dcs_set_tear_on(dsi, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
 +
 +	return 0;
@@ -193,8 +187,7 @@ index 000000000..d10c0a2bb
 +
 +static int sharp_ls054_prepare(struct drm_panel *panel)
 +{
-+	struct sharp_ls054 *ctx = to_sharp_ls054(panel);
-+	struct mipi_dsi_device *dsi = ctx->dsi;
++	struct sharp_ls054 *ctx = panel_to_sharp_ls054(panel);
 +	struct device *dev = &ctx->dsi->dev;
 +	int ret;
 +
@@ -219,7 +212,6 @@ index 000000000..d10c0a2bb
 +	if (ret < 0)
 +		goto err_on;
 +
-+	// TODO: move resetting into its own function
 +	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
 +
 +	msleep(200);
@@ -234,24 +226,18 @@ index 000000000..d10c0a2bb
 +
 +	return 0;
 +
-+	// TODO: make sure those labels are ok
 +err_on:
 +	regulator_disable(ctx->vsn_supply);
 +
 +err_vsp:
 +	regulator_disable(ctx->vsp_supply);
 +
-+err_iovcc:
-+	regulator_disable(ctx->iovcc_supply);
-+	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
-+
 +	return ret;
 +}
 +
-+// FIXME
 +static int sharp_ls054_unprepare(struct drm_panel *panel)
 +{
-+	struct sharp_ls054 *ctx = to_sharp_ls054(panel);
++	struct sharp_ls054 *ctx = panel_to_sharp_ls054(panel);
 +	struct mipi_dsi_device *dsi = ctx->dsi;
 +	struct device *dev = &ctx->dsi->dev;
 +	int ret;
@@ -287,24 +273,23 @@ index 000000000..d10c0a2bb
 +}
 +
 +static const struct drm_display_mode sharp_ls054_mode = {
-+	.clock		= ((1152 + 64 + 4 + 32) * (1920 + 56 + 3 + 6) * 60) / 1000,
-+	.hdisplay	= 1152,
-+	.hsync_start	= 1152 + 64,
-+	.hsync_end	= 1152 + 64 + 4,
-+	.htotal		= 1152 + 64 + 4 + 32,
-+	.vdisplay	= 1920,
-+	.vsync_start	= 1920 + 56,
-+	.vsync_end	= 1920 + 56 + 3,
-+	.vtotal		= 1920 + 56 + 3 + 6,
-+	.width_mm	= 75,
-+	.height_mm	= 132,
-+	.flags		= DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
++	.clock          = ((1152 + 64 + 4 + 32) * (1920 + 56 + 3 + 6) * 60) / 1000,
++	.hdisplay       = 1152,
++	.hsync_start    = 1152 + 64,
++	.hsync_end      = 1152 + 64 + 4,
++	.htotal         = 1152 + 64 + 4 + 32,
++	.vdisplay       = 1920,
++	.vsync_start    = 1920 + 56,
++	.vsync_end      = 1920 + 56 + 3,
++	.vtotal         = 1920 + 56 + 3 + 6,
++	.width_mm       = 75,
++	.height_mm      = 132,
++	.flags          = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
 +};
 +
 +static int sharp_ls054_get_modes(struct drm_panel *panel,
 +				 struct drm_connector *connector)
 +{
-+	struct sharp_ls054 *ctx = to_sharp_ls054(panel);
 +	struct drm_display_mode *mode;
 +
 +	mode = drm_mode_duplicate(connector->dev, &sharp_ls054_mode);
@@ -316,15 +301,24 @@ index 000000000..d10c0a2bb
 +	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
 +	connector->display_info.width_mm = mode->width_mm;
 +	connector->display_info.height_mm = mode->height_mm;
++
 +	drm_mode_probed_add(connector, mode);
 +
 +	return 1;
++}
++
++static enum drm_panel_orientation sharp_ls054_get_orientation(struct drm_panel *panel)
++{
++	struct sharp_ls054 *ctx = panel_to_sharp_ls054(panel);
++
++	return ctx->orientation;
 +}
 +
 +static const struct drm_panel_funcs sharp_ls054_panel_funcs = {
 +	.prepare = sharp_ls054_prepare,
 +	.unprepare = sharp_ls054_unprepare,
 +	.get_modes = sharp_ls054_get_modes,
++	.get_orientation = sharp_ls054_get_orientation,
 +};
 +
 +static int sharp_ls054_probe(struct mipi_dsi_device *dsi)
@@ -339,7 +333,7 @@ index 000000000..d10c0a2bb
 +
 +	ctx->iovcc_supply = devm_regulator_get(dev, "iovcc");
 +	if (IS_ERR(ctx->iovcc_supply))
-+		return PTR_ERR(ctx->iovcc_supply); // TODO: replace with dev_err_probe
++		return PTR_ERR(ctx->iovcc_supply);
 +
 +	ctx->vsp_supply = devm_regulator_get(dev, "vsp");
 +	if (IS_ERR(ctx->vsp_supply))
@@ -366,7 +360,6 @@ index 000000000..d10c0a2bb
 +	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
 +			  MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_NO_EOT_PACKET |
 +			  MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_VIDEO_HSE | MIPI_DSI_MODE_VIDEO_AUTO_VERT;
-+	// are all those flags really needed?
 +
 +	drm_panel_init(&ctx->panel, dev, &sharp_ls054_panel_funcs,
 +		       DRM_MODE_CONNECTOR_DSI);
@@ -418,6 +411,5 @@ index 000000000..d10c0a2bb
 +MODULE_AUTHOR("Maya Matuszczyk <maccraft123mc@gmail.com>");
 +MODULE_DESCRIPTION("Panel driver for Sharp LS054B3SX01 1152x1920 Video Mode DSI Panel");
 +MODULE_LICENSE("GPL v2");
--- 
-2.34.1
-
+--
+2.46.0
