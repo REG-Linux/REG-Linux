@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DHEWM3_VERSION = 1.5.3
+DHEWM3_VERSION = 1.5.4
 DHEWM3_SITE = https://github.com/dhewm/dhewm3
 DHEWM3_SITE_METHOD=git
 DHEWM3_DEPENDENCIES = zlib openal sdl2
