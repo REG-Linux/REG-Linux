@@ -1,0 +1,83 @@
+--- a/platforms/libretro/Makefile	2024-08-03 16:24:45.866678800 +0200
++++ b/platforms/libretro/Makefile	2024-08-03 16:29:43.607324850 +0200
+@@ -70,17 +70,47 @@
+ 
+    # Raspberry Pi
+    ifneq (,$(findstring rpi,$(platform)))
+-      CFLAGS += -fomit-frame-pointer -ffast-math -marm
++      CFLAGS += -fomit-frame-pointer -ffast-math
+       CXXFLAGS += $(CFLAGS)
+       ifneq (,$(findstring rpi1,$(platform)))
+-         CFLAGS += -march=armv6j -mfpu=vfp -mfloat-abi=hard
++         CFLAGS += -march=armv6j -marm -mfpu=vfp -mfloat-abi=hard
+       else ifneq (,$(findstring rpi2,$(platform)))
+-         CFLAGS += -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
++         CFLAGS += -mcpu=cortex-a7 -marm -mfpu=neon-vfpv4 -mfloat-abi=hard
+       else ifneq (,$(findstring rpi3,$(platform)))
+-         CFLAGS += -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
++         CFLAGS += -mcpu=cortex-a53 -mtune=cortex-a53
++      else ifneq (,$(findstring rpi4,$(platform)))
++         CFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
++      else ifneq (,$(findstring rpi5,$(platform)))
++         CFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
+       endif
+    endif
+-   
++
++# RK3326
++ifneq (,$(findstring rk3326,$(platform)))
++    CFLAGS += -mcpu=cortex-a35 -mtune=cortex-a35
++    CXXFLAGS += $(CFLAGS)
++endif
++# RK3399
++ifneq (,$(findstring rk3399,$(platform)))
++    CFLAGS += -mcpu=cortex-a72.cortex-a53 -mtune=cortex-a72.cortex-a53
++    CXXFLAGS += $(CFLAGS)
++endif
++# RK3568
++ifneq (,$(findstring rk3568,$(platform)))
++    CFLAGS += -mcpu=cortex-a55 -mtune=cortex-a55
++    CXXFLAGS += $(CFLAGS)
++endif
++# RK3588
++ifneq (,$(findstring rk3588,$(platform)))
++    CFLAGS += -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
++    CXXFLAGS += $(CFLAGS)
++endif
++# S922X
++ifneq (,$(findstring s922x,$(platform)))
++    CFLAGS += -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53
++    CXXFLAGS += $(CFLAGS)
++endif
++
+ # (armv7 a7, hard point, neon based) ### 
+ # NESC, SNESC, C64 mini 
+ else ifeq ($(platform), classic_armv7_a7)
+--- a/platforms/libretro/Makefile	2024-08-03 16:51:46.081039773 +0200
++++ b/platforms/libretro/Makefile	2024-08-03 16:53:16.225456471 +0200
+@@ -108,7 +108,7 @@
+ 
+ # (armv7 a7, hard point, neon based) ### 
+ # NESC, SNESC, C64 mini 
+-else ifeq ($(platform), classic_armv7_a7)
++ifneq (,$(findstring classic_armv7_a7,$(platform)))
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+   SHARED := -shared -Wl,--version-script=link.T -Wl,--no-undefined
+@@ -125,8 +125,6 @@
+ 	ASFLAGS += $(CFLAGS)
+ 	HAVE_NEON = 1
+ 	ARCH = arm
+-	BUILTIN_GPU = neon
+-	USE_DYNAREC = 1
+ 	ifeq ($(shell echo `$(CC) -dumpversion` "< 4.9" | bc -l), 1)
+ 	  CFLAGS += -march=armv7-a
+ 	else
+@@ -136,6 +134,7 @@
+ 	    LDFLAGS += -static-libgcc -static-libstdc++
+ 	  endif
+ 	endif
++endif
+ #######################################
+ 
+ # Nintendo Switch (libtransistor)
