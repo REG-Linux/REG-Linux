@@ -1,0 +1,11 @@
+--- a/src/util/audio_stream.cpp	2024-08-05 00:43:40.568273638 +0200
++++ b/src/util/audio_stream.cpp	2024-08-05 00:43:54.199013509 +0200
+@@ -13,7 +13,7 @@
+ #include "common/timer.h"
+ 
+ #include "soundtouch/SoundTouch.h"
+-#include "soundtouch/SoundTouchDLL.h"
++//#include "soundtouch/SoundTouchDLL.h"
+ 
+ #ifndef __ANDROID__
+ #include "freesurround_decoder.h"
