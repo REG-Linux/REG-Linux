@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DUCKSTATION_VERSION = 1771bfad583443f2a9093461197406c278c348c9
+DUCKSTATION_VERSION = 79bb5f079ce39a70ee2df3441cf779cabe1b97b3
 DUCKSTATION_SITE = https://github.com/stenzek/duckstation.git
 DUCKSTATION_SITE_METHOD=git
 DUCKSTATION_GIT_SUBMODULES=YES
@@ -13,7 +13,7 @@ DUCKSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 
 DUCKSTATION_DEPENDENCIES = fmt boost ffmpeg libcurl ecm shaderc webp
 DUCKSTATION_DEPENDENCIES += qt6base qt6tools qt6svg libbacktrace
-DUCKSTATION_DEPENDENCIES += cpuinfo spirv-cross
+DUCKSTATION_DEPENDENCIES += cpuinfo spirv-cross libsoundtouch
 
 DUCKSTATION_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
 DUCKSTATION_CONF_OPTS += -DBUILD_SHARED_LIBS=FALSE
