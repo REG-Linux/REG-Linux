@@ -37,3 +37,15 @@
  #define USEC_PER_SEC 1000000
  static const AVRational v4l2_timebase = { 1, USEC_PER_SEC };
  
+--- a/libavcodec/v4l2_req_media.c	2024-08-05 18:54:29.272237453 +0200
++++ b/libavcodec/v4l2_req_media.c	2024-08-05 18:54:46.864649074 +0200
+@@ -47,6 +47,9 @@
+ #include "v4l2_req_utils.h"
+ #include "weak_link.h"
+ 
++#ifndef V4L2_TYPE_IS_CAPTURE
++#define V4L2_TYPE_IS_CAPTURE(type) (!V4L2_TYPE_IS_OUTPUT(type))
++#endif
+ 
+ /* floor(log2(x)) */
+ static unsigned int log2_size(size_t x)
