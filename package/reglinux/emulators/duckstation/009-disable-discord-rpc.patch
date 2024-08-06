@@ -6,9 +6,9 @@
  find_package(cpuinfo REQUIRED)
 -find_package(DiscordRPC 3.4.0 REQUIRED)
 +#find_package(DiscordRPC 3.4.0 REQUIRED)
+ find_package(SoundTouch 2.3.3 REQUIRED)
  
  if(NOT WIN32)
-   find_package(CURL REQUIRED)
 --- a/src/core/system.cpp	2024-07-13 19:04:51.535710998 +0200
 +++ b/src/core/system.cpp	2024-07-13 19:05:16.404315649 +0200
 @@ -79,7 +79,7 @@
