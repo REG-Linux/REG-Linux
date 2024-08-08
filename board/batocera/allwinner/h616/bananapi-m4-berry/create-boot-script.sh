@@ -24,7 +24,7 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"      || exit 1
 
-cp "${BINARIES_DIR}/sun50i-h616-orangepi-zero2.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
+cp "${BINARIES_DIR}/sun50i-h618-bananapi-m4berry.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"                "${REGLINUX_BINARIES_DIR}/boot/extlinux/"   || exit 1
 
 exit 0
