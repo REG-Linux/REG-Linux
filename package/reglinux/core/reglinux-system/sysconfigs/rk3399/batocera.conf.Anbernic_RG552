@@ -1,0 +1,11 @@
+# rg552 default values
+
+# the button can be pressed by mistake
+system.shutdowndelay=1
+
+# default suspend on handled boards
+#system.suspendmode=suspend
+
+# default sway environment (rotate)
+system.es.environment=sway
+display.rotate=3
