@@ -1,0 +1,11 @@
+--- a/similar/main/songs.cpp	2024-08-10 17:53:09.802401950 +0200
++++ b/similar/main/songs.cpp	2024-08-10 17:53:36.779025067 +0200
+@@ -786,7 +786,7 @@
+ 				 */
+ 				if (const auto size{BIMSecretSongs.size()})
+ 				{
+-					const song_number secretsongnum{static_cast<unsigned>((-levelnum - 1) % size)};
++					const song_number secretsongnum{((-levelnum - 1) % size)};
+ 					if (songs_play_file(BIMSecretSongs[secretsongnum].filename.data(), 1, nullptr))
+ 						Song_playing = secretsongnum;
+ 				}
