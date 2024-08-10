@@ -1,0 +1,84 @@
+diff -u -r a/common/include/3d.h b/common/include/3d.h
+--- a/common/include/3d.h	2024-08-09 12:35:53.761896572 +0200
++++ b/common/include/3d.h	2024-08-09 12:21:39.506181014 +0200
+@@ -35,6 +35,9 @@
+ #include <array>
+ #include <span>
+ 
++#if DXX_USE_OGLES
++#include <GLES/gl.h>
++#else
+ #if DXX_USE_OGL
+ #if defined(__APPLE__) && defined(__MACH__)
+ #include <OpenGL/gl.h>
+@@ -42,6 +45,7 @@
+ #include <GL/gl.h>
+ #endif
+ #endif
++#endif
+ 
+ //Structure for storing u,v,light values.  This structure doesn't have a
+ //prefix because it was defined somewhere else before it was moved here
+diff -u -r a/common/include/ogl_extensions.h b/common/include/ogl_extensions.h
+--- a/common/include/ogl_extensions.h	2024-08-09 12:35:53.765896664 +0200
++++ b/common/include/ogl_extensions.h	2024-08-09 12:28:03.919117482 +0200
+@@ -12,12 +12,19 @@
+ #pragma once
+ 
+ #include <cstdint>
++#include "dxxsconf.h"
+ 
++#if DXX_USE_OGLES
++#include <GLES/gl.h>
++#else
++#if DXX_USE_OGL
+ #if defined(__APPLE__) && defined(__MACH__)
+ #include <OpenGL/gl.h>
+ #else
+ #include <GL/gl.h>
+ #endif
++#endif
++#endif
+ 
+ /* global extension stuff (from glext.h)
+  */
+diff -u -r a/SConstruct b/SConstruct
+--- a/SConstruct	2024-08-09 12:35:53.753896389 +0200
++++ b/SConstruct	2024-08-09 12:34:59.436654858 +0200
+@@ -1708,11 +1708,11 @@
+ 		error_text_opengl_mismatch = f'Rebirth configured with OpenGL enabled, but SDL{sdl2} configured with OpenGL disabled.  Disable Rebirth OpenGL or install an SDL{sdl2} with OpenGL enabled.'
+ 		test_opengl = (f'''
+ #if !((SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2) && (SDL_PATCHLEVEL >= 50))
+-#ifndef SDL_VIDEO_OPENGL
++#if (!defined(SDL_VIDEO_OPENGL)) && (!defined(SDL_VIDEO_OPENGL_ES))
+ #error "{error_text_opengl_mismatch}"
+ #endif
+ #endif
+-''') if user_settings.opengl else ''
++''') if user_settings.opengl or user_settings.opengles else ''
+ 		main = '''
+ 	SDL_RWops *ops = reinterpret_cast<SDL_RWops *>(argv);
+ #if DXX_MAX_JOYSTICKS
+@@ -3546,7 +3546,7 @@
+ 					raise SCons.Errors.UserError(f'Invalid value for unsigned-integer-only option {key}: {value}.')
+ 		# Paths for the Videocore libs/includes on the Raspberry Pi
+ 		RPI_DEFAULT_VC_PATH='/opt/vc'
+-		default_OGLES_LIB = 'GLES_CM'
++		default_OGLES_LIB = 'GLESv1_CM'
+ 		default_EGL_LIB = 'EGL'
+ 		_default_prefix = '/usr/local'
+ 		__stdout_is_not_a_tty = None
+diff -u -r a/similar/arch/ogl/gr.cpp b/arch/ogl/gr.cpp
+--- a/similar/arch/ogl/gr.cpp	2024-08-09 12:35:53.793897303 +0200
++++ b/arch/ogl/gr.cpp	2024-08-09 12:33:22.514437177 +0200
+@@ -56,8 +56,10 @@
+ #else
+ #if DXX_USE_OGLES
+ #include <EGL/egl.h>
++#ifdef USE_X11
+ #include <X11/Xlib.h>
+ #include <X11/Xutil.h>
++#endif
+ #include <SDL_syswm.h>
+ #endif
+ #endif
