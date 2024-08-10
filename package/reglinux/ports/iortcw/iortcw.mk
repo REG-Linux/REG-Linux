@@ -51,6 +51,19 @@ else ifeq ($(BR2_aarch64),y)
     IORTCW_BUILD_ARGS += USE_BLOOM=0
     IORTCW_BUILD_ARGS += USE_MUMBLE=0
     IORTCW_BUILD_ARGS += BUILD_RENDERER_REND2=0
+else ifeq ($(BR2_RISCV_64),y)
+    IORTCW_BUILD_ARGS += COMPILE_ARCH=riscv64
+    IORTCW_ARCH = riscv64
+    IORTCW_BUILD_ARGS += USE_VOIP=0
+    IORTCW_BUILD_ARGS += USE_CODEC_VORBIS=0
+    IORTCW_BUILD_ARGS += USE_CODEC_OPUS=0
+    IORTCW_BUILD_ARGS += USE_CURL=0
+    IORTCW_BUILD_ARGS += USE_CURL_DLOPEN=0
+    IORTCW_BUILD_ARGS += USE_RENDERER_DLOPEN=0
+    IORTCW_BUILD_ARGS += USE_OPENGLES=1
+    IORTCW_BUILD_ARGS += USE_BLOOM=0
+    IORTCW_BUILD_ARGS += USE_MUMBLE=0
+    IORTCW_BUILD_ARGS += BUILD_RENDERER_REND2=0
 endif
 
 define IORTCW_BUILD_CMDS
@@ -64,33 +77,33 @@ IORTCW_CONF_INIT = $(TARGET_DIR)/usr/share/batocera/datainit/roms/iortcw/main
 
 define IORTCW_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin/iortcw/main
-    mkdir -p $(TARGET_DIR)/usr/bin/iortcw
-	
+	mkdir -p $(TARGET_DIR)/usr/bin/iortcw
+
 	# Single player
 	$(INSTALL) -D $(@D)/SP/build/release-linux-$(IORTCW_ARCH)/iowolfsp.$(IORTCW_ARCH) $(TARGET_DIR)/usr/bin/iortcw/iowolfsp
 	$(INSTALL) -D $(@D)/SP/build/release-linux-$(IORTCW_ARCH)/main/*.so $(TARGET_DIR)/usr/bin/iortcw/main/
-	
-    # Multi player
+
+	# Multi player
 	$(INSTALL) -D $(@D)/MP/build/release-linux-$(IORTCW_ARCH)/iowolfmp.$(IORTCW_ARCH) $(TARGET_DIR)/usr/bin/iortcw/iowolfmp
 	$(INSTALL) -D $(@D)/MP/build/release-linux-$(IORTCW_ARCH)/main/*.so $(TARGET_DIR)/usr/bin/iortcw/main/
 
-    # Additions if x86_64
-    $(if $(BR2_x86_64),\
+	# Additions if x86_64
+	$(if $(BR2_x86_64),\
 		$(INSTALL) -D $(@D)/SP/build/release-linux-$(IORTCW_ARCH)/renderer_sp*.so $(TARGET_DIR)/usr/bin/iortcw/; \
 		$(INSTALL) -D $(@D)/MP/build/release-linux-$(IORTCW_ARCH)/renderer_mp*.so $(TARGET_DIR)/usr/bin/iortcw/;)
 endef
 
 # required to have fullscreen at 1st start
 define IORTCW_CONFIG_FILE
-    mkdir -p $(IORTCW_CONF_INIT)
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/iortcw/wolfconfig.cfg \
-        $(IORTCW_CONF_INIT)
+	mkdir -p $(IORTCW_CONF_INIT)
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/iortcw/wolfconfig.cfg \
+		$(IORTCW_CONF_INIT)
 endef
 
 define IORTCW_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/iortcw/iortcw.keys \
-	    $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/iortcw/iortcw.keys \
+		$(TARGET_DIR)/usr/share/evmapy
 endef
 
 IORTCW_POST_INSTALL_TARGET_HOOKS += IORTCW_CONFIG_FILE
