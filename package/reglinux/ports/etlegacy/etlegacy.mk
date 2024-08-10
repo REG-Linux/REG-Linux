@@ -67,7 +67,7 @@ endef
 
 define ETLEGACY_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/etlegacy/etlegacy.keys \
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/etlegacy/etlegacy.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
