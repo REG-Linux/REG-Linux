@@ -1,0 +1,198 @@
+From 01ea5c4549173a9ffd10531d8503a0f6ed2f485a Mon Sep 17 00:00:00 2001
+From: Jernej Skrabec <jernej.skrabec@gmail.com>
+Date: Fri, 31 May 2024 00:37:56 +0100
+Subject: [PATCH] iommu: sun50i: clear bypass register
+
+The Allwinner H6 IOMMU has a bypass register, which allows to circumvent
+the page tables for each possible master. The reset value for this
+register is 0, which disables the bypass.
+The Allwinner H616 IOMMU resets this register to 0x7f, which activates
+the bypass for all masters, which is not what we want.
+
+Always clear this register to 0, to enforce the usage of page tables,
+and make this driver compatible with the H616 in this respect.
+
+Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ drivers/iommu/sun50i-iommu.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/iommu/sun50i-iommu.c b/drivers/iommu/sun50i-iommu.c
+index c519b991749d..dd3f07384624 100644
+--- a/drivers/iommu/sun50i-iommu.c
++++ b/drivers/iommu/sun50i-iommu.c
+@@ -452,6 +452,7 @@ static int sun50i_iommu_enable(struct sun50i_iommu *iommu)
+ 		    IOMMU_TLB_PREFETCH_MASTER_ENABLE(3) |
+ 		    IOMMU_TLB_PREFETCH_MASTER_ENABLE(4) |
+ 		    IOMMU_TLB_PREFETCH_MASTER_ENABLE(5));
++	iommu_write(iommu, IOMMU_BYPASS_REG, 0);
+ 	iommu_write(iommu, IOMMU_INT_ENABLE_REG, IOMMU_INT_MASK);
+ 	iommu_write(iommu, IOMMU_DM_AUT_CTRL_REG(SUN50I_IOMMU_ACI_NONE),
+ 		    IOMMU_DM_AUT_CTRL_RD_UNAVAIL(SUN50I_IOMMU_ACI_NONE, 0) |
+-- 
+2.43.4
+
+From 65e03f086ea8d1ed05434013d2786c82419abd03 Mon Sep 17 00:00:00 2001
+From: Andre Przywara <andre.przywara@arm.com>
+Date: Fri, 31 May 2024 00:37:57 +0100
+Subject: [PATCH] iommu: sun50i: allocate page tables from below 4 GiB
+
+The Allwinner IOMMU is a strict 32-bit device, with the page table root
+pointer as well as both level's page tables and also the target addresses
+all required to be below 4GB.
+The Allwinner H6 SoC only supports 32-bit worth of physical addresses
+anyway, so this isn't a problem so far, but the H616 and later SoCs extend
+the PA space beyond 32 bit to accommodate more DRAM.
+To make sure we stay within the 32-bit PA range required by the IOMMU,
+force the memory for the page tables to come from below 4GB. by using
+allocations with the DMA32 flag.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ drivers/iommu/sun50i-iommu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/iommu/sun50i-iommu.c b/drivers/iommu/sun50i-iommu.c
+index dd3f07384624..c3244db5ac02 100644
+--- a/drivers/iommu/sun50i-iommu.c
++++ b/drivers/iommu/sun50i-iommu.c
+@@ -680,9 +680,9 @@
+ 	if (!sun50i_domain)
+ 		return NULL;
+ 
+-	sun50i_domain->dt = (u32 *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
+-						    get_order(DT_SIZE));
+-	if (!sun50i_domain->dt)
++	sun50i_domain->dt = (u32 *)__get_free_pages(GFP_KERNEL | GFP_DMA32,
++					      get_order(DT_SIZE));
++ 	if (!sun50i_domain->dt)
+ 		goto err_free_domain;
+ 
+ 	refcount_set(&sun50i_domain->refcnt, 1);@@ -997,7 +998,7 @@ static int sun50i_iommu_probe(struct platform_device *pdev)
+ 
+ 	iommu->pt_pool = kmem_cache_create(dev_name(&pdev->dev),
+ 					   PT_SIZE, PT_SIZE,
+-					   SLAB_HWCACHE_ALIGN,
++					   SLAB_HWCACHE_ALIGN | SLAB_CACHE_DMA32,
+ 					   NULL);
+ 	if (!iommu->pt_pool)
+ 		return -ENOMEM;
+-- 
+2.43.4
+
+From c870a673e80e250256f865d82f7022217c3bf0b0 Mon Sep 17 00:00:00 2001
+From: Andre Przywara <andre.przywara@arm.com>
+Date: Fri, 31 May 2024 00:37:58 +0100
+Subject: [PATCH] dt-bindings: iommu: add new compatible strings
+
+The Allwinner H616 and A523 contain IOMMU IP very similar to the H6, but
+use a different reset value for the bypass register, which makes them
+strictly speaking incompatible.
+
+Add a new compatible string for the H616, and a version for the A523,
+falling back to the H616.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ .../bindings/iommu/allwinner,sun50i-h6-iommu.yaml          | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/iommu/allwinner,sun50i-h6-iommu.yaml b/Documentation/devicetree/bindings/iommu/allwinner,sun50i-h6-iommu.yaml
+index e20016f12017..a8409db4a3e3 100644
+--- a/Documentation/devicetree/bindings/iommu/allwinner,sun50i-h6-iommu.yaml
++++ b/Documentation/devicetree/bindings/iommu/allwinner,sun50i-h6-iommu.yaml
+@@ -17,7 +17,12 @@ properties:
+       The content of the cell is the master ID.
+ 
+   compatible:
+-    const: allwinner,sun50i-h6-iommu
++    oneOf:
++      - const: allwinner,sun50i-h6-iommu
++      - const: allwinner,sun50i-h616-iommu
++      - items:
++          - const: allwinner,sun55i-a523-iommu
++          - const: allwinner,sun50i-h616-iommu
+ 
+   reg:
+     maxItems: 1
+-- 
+2.43.4
+
+From 2932eb83bc8a47ca082165cbb74b2e98aeb30c4e Mon Sep 17 00:00:00 2001
+From: Andre Przywara <andre.przywara@arm.com>
+Date: Fri, 31 May 2024 00:37:59 +0100
+Subject: [PATCH] iommu: sun50i: Add H616 compatible string
+
+The IOMMU IP in the Allwinner H616 SoC is *almost* compatible to the H6,
+but uses a different reset value for the bypass register, and adds some
+more registers.
+
+While a driver *can* be written to support both variants (which we in
+fact do), the hardware itself is not fully compatible, so we require a
+separate compatible string.
+
+Add the new compatible string to the list, but without changing the
+behaviour, since the driver already supports both variants.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ drivers/iommu/sun50i-iommu.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/iommu/sun50i-iommu.c b/drivers/iommu/sun50i-iommu.c
+index c3244db5ac02..478a4e8e94a8 100644
+--- a/drivers/iommu/sun50i-iommu.c
++++ b/drivers/iommu/sun50i-iommu.c
+@@ -1059,6 +1059,7 @@ static int sun50i_iommu_probe(struct platform_device *pdev)
+ 
+ static const struct of_device_id sun50i_iommu_dt[] = {
+ 	{ .compatible = "allwinner,sun50i-h6-iommu", },
++	{ .compatible = "allwinner,sun50i-h616-iommu", },
+ 	{ /* sentinel */ },
+ };
+ MODULE_DEVICE_TABLE(of, sun50i_iommu_dt);
+-- 
+2.43.4
+
+From 5f982fb732a4eae273b3dfbbc73f264ab8f407c1 Mon Sep 17 00:00:00 2001
+From: Andre Przywara <andre.przywara@arm.com>
+Date: Fri, 31 May 2024 00:38:00 +0100
+Subject: [PATCH] arm64: dts: allwinner: h616: add IOMMU node
+
+The Allwinner H616 contains a scatter-gather IOMMU connected to some
+video related devices. It's almost compatible to the one used in the H6,
+though with minor incompatibilities.
+
+Add the DT node describing its resources, so that devices like the video
+or display engine can connect to it.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 921d5f61d8d6..4895bbaf9442 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -295,6 +295,15 @@ x32clk_fanout_pin: x32clk-fanout-pin {
+ 			};
+ 		};
+ 
++		iommu: iommu@30f0000 {
++			compatible = "allwinner,sun50i-h616-iommu";
++			reg = <0x030f0000 0x10000>;
++			interrupts = <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_IOMMU>;
++			resets = <&ccu RST_BUS_IOMMU>;
++			#iommu-cells = <1>;
++		};
++
+ 		gic: interrupt-controller@3021000 {
+ 			compatible = "arm,gic-400";
+ 			reg = <0x03021000 0x1000>,
+-- 
+2.43.4
+
