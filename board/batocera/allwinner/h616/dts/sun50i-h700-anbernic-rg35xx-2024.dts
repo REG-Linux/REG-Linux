@@ -6,7 +6,7 @@
 /dts-v1/;
 
 #include "allwinner/sun50i-h616.dtsi"
-
+#include "allwinner/sun50i-h616-cpu-opp.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/linux-event-codes.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>

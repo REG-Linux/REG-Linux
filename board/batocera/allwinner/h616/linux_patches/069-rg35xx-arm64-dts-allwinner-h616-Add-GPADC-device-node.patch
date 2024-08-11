@@ -1,0 +1,43 @@
+From 59678cc9cc54e556f83a58c52aaac8c149edab67 Mon Sep 17 00:00:00 2001
+From: Chris Morgan <macromorgan@hotmail.com>
+Date: Wed, 5 Jun 2024 12:20:48 -0500
+Subject: arm64: dts: allwinner: h616: Add GPADC device node
+
+The H616 has a GPADC controller which is identical to the one found on
+the D1/T113s/R329/T507 SoCs.
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+Link: https://lore.kernel.org/r/20240605172049.231108-4-macroalpha82@gmail.com
+Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+---
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+(limited to 'arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi')
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 20564cc02267d8..b07d7aee1896a4 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -626,6 +626,17 @@
+ 			status = "disabled";
+ 		};
+ 
++		gpadc: adc@5070000 {
++			compatible = "allwinner,sun50i-h616-gpadc",
++				     "allwinner,sun20i-d1-gpadc";
++			reg = <0x05070000 0x400>;
++			clocks = <&ccu CLK_BUS_GPADC>;
++			resets = <&ccu RST_BUS_GPADC>;
++			interrupts = <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>;
++			status = "disabled";
++			#io-channel-cells = <1>;
++		};
++
+ 		ths: thermal-sensor@5070400 {
+ 			compatible = "allwinner,sun50i-h616-ths";
+ 			reg = <0x05070400 0x400>;
+-- 
+cgit 1.2.3-korg
+
