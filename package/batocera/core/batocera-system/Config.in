@@ -396,7 +396,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 
 	# tools
 	select BR2_PACKAGE_I2C_TOOLS
-	select BR2_PACKAGE_MDADM	if !BR2_PACKAGE_BATOCERA_TARGET_H3 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # RAID
+	select BR2_PACKAGE_MDADM	if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY # RAID
 	select BR2_PACKAGE_MC		if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 	select BR2_PACKAGE_OD_COMMANDER # ALL
 	select BR2_PACKAGE_FDUPES
@@ -827,7 +827,7 @@ config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
 	#nope select BR2_PACKAGE_LIBRETRO_LOWRESNX		# ALL
 
 	# Fighting games engine
-	select BR2_PACKAGE_IKEMEN               if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY || (BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL)
+	select BR2_PACKAGE_IKEMEN               if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL
 
 	# SMBX engine
 	select BR2_PACKAGE_THEXTECH		# ALL
@@ -1085,8 +1085,8 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_TYRQUAKE		if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# Yamagi Quake 2 (source port)
-	# Note: Needs CMake work to build on GLES2 + gl4es
-	select BR2_PACKAGE_YQUAKE2			if BR2_PACKAGE_HAS_LIBGL
+	# Note: Needs CMake work to build for GLES3 (or even GLES2 + gl4es)
+	select BR2_PACKAGE_YQUAKE2                      if BR2_PACKAGE_HAS_LIBGL # TODO || BR2_PACKAGE_BATOCERA_GLES3
 
 	# Quake 3 (source port)
 	# Note : needs work on gl4es patch (applying it only if no desktop GL support)
@@ -1147,13 +1147,9 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	select BR2_PACKAGE_ECWOLF			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
 	# Sonic 3 AIR (Angel Island Revisited)
-	# Disabled on CHA and x86_64 because it bundles 144 MB of data. /data should live in content downloader !
 	# Disabled with musl libc because it does not link (libatomic should do it but it does not work so far)
 	# Disabled for rk3128 because of mali blobs (needs patching at link-time to mali blob)
-	select BR2_PACKAGE_SONIC3_AIR			if !BR2_x86_64                         && \
-							   !BR2_PACKAGE_BATOCERA_TARGET_CHA    && \
-							   !BR2_PACKAGE_BATOCERA_TARGET_RK3128 && \
-							   !BR2_TOOLCHAIN_USES_MUSL
+	select BR2_PACKAGE_SONIC3_AIR			if !BR2_PACKAGE_BATOCERA_TARGET_RK3128 && !BR2_TOOLCHAIN_USES_MUSL
 
 	# Sonic Mania
 	select BR2_PACKAGE_SONIC_MANIA			# ALL
