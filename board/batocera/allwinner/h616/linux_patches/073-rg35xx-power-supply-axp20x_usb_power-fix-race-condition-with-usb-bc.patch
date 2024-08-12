@@ -1,0 +1,67 @@
+From 06a807e6e5ffaa35327e85b386f00c8614f6caaa Mon Sep 17 00:00:00 2001
+From: Aren Moynihan <aren@peacevolution.org>
+Date: Tue, 30 Jan 2024 15:27:59 -0500
+Subject: power: supply: axp20x_usb_power: fix race condition with usb bc
+
+When input_current_limit is set while USB BC is in progress, the BC
+module will overwrite the value that was set when it finishes detection.
+
+Signed-off-by: Aren Moynihan <aren@peacevolution.org>
+Link: https://lore.kernel.org/r/20240130203714.3020464-4-aren@peacevolution.org
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/power/supply/axp20x_usb_power.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+(limited to 'drivers/power/supply/axp20x_usb_power.c')
+
+diff --git a/drivers/power/supply/axp20x_usb_power.c b/drivers/power/supply/axp20x_usb_power.c
+index 923121b23d5fd3..ac5a3f126df692 100644
+--- a/drivers/power/supply/axp20x_usb_power.c
++++ b/drivers/power/supply/axp20x_usb_power.c
+@@ -117,6 +117,15 @@ static void axp20x_usb_power_poll_vbus(struct work_struct *work)
+ 	if (val != power->old_status)
+ 		power_supply_changed(power->supply);
+ 
++	if (power->usb_bc_en_bit && (val & AXP20X_PWR_STATUS_VBUS_PRESENT) !=
++		(power->old_status & AXP20X_PWR_STATUS_VBUS_PRESENT)) {
++		dev_dbg(power->dev, "Cable status changed, re-enabling USB BC");
++		ret = regmap_field_write(power->usb_bc_en_bit, 1);
++		if (ret)
++			dev_err(power->dev, "failed to enable USB BC: errno %d",
++				ret);
++	}
++
+ 	power->old_status = val;
+ 	power->online = val & AXP20X_PWR_STATUS_VBUS_USED;
+ 
+@@ -265,12 +274,26 @@ static int axp20x_usb_power_set_voltage_min(struct axp20x_usb_power *power,
+ static int axp20x_usb_power_set_input_current_limit(struct axp20x_usb_power *power,
+ 						    int intval)
+ {
++	int ret;
+ 	unsigned int reg;
+ 	const unsigned int max = power->axp_data->curr_lim_table_size;
+ 
+ 	if (intval == -1)
+ 		return -EINVAL;
+ 
++	/*
++	 * BC1.2 detection can cause a race condition if we try to set a current
++	 * limit while it's in progress. When it finishes it will overwrite the
++	 * current limit we just set.
++	 */
++	if (power->usb_bc_en_bit) {
++		dev_dbg(power->dev,
++			"disabling BC1.2 detection because current limit was set");
++		ret = regmap_field_write(power->usb_bc_en_bit, 0);
++		if (ret)
++			return ret;
++	}
++
+ 	for (reg = max - 1; reg > 0; reg--)
+ 		if (power->axp_data->curr_lim_table[reg] <= intval)
+ 			break;
+-- 
+cgit 1.2.3-korg
+
