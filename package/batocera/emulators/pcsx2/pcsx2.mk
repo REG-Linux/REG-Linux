@@ -14,7 +14,7 @@ PCSX2_SUPPORTS_IN_SOURCE_BUILD = NO
 
 PCSX2_DEPENDENCIES += xorgproto alsa-lib freetype zlib libpng shaderc ecm
 PCSX2_DEPENDENCIES += libaio portaudio libsoundtouch sdl2 libpcap yaml-cpp
-PCSX2_DEPENDENCIES += libsamplerate fmt qt6base qt6tools qt6svg libcurl
+PCSX2_DEPENDENCIES += libsamplerate fmt reglinux-qt6 libcurl
 PCSX2_DEPENDENCIES += host-libcurl libbacktrace
 
 PCSX2_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release

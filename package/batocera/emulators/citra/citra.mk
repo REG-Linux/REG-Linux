@@ -30,8 +30,8 @@ CITRA_CONF_OPTS += -DUSE_SYSTEM_SDL2=ON    # important to avoid HIDAPI
 CITRA_CONF_OPTS += -DENABLE_LTO=OFF
 
 # future support for arm using SDL2 gui?
-ifeq ($(BR2_PACKAGE_QT6),y)
-    CITRA_DEPENDENCIES += qt6base qt6tools qt6multimedia
+ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
+    CITRA_DEPENDENCIES += reglinux-qt6
     CITRA_CONF_OPTS += -DENABLE_QT=ON
     CITRA_CONF_OPTS += -DENABLE_QT_TRANSLATION=ON
     CITRA_CONF_OPTS += -DENABLE_QT_UPDATER=OFF
