@@ -27,16 +27,7 @@ QT6WAYLAND_CONF_OPTS = \
     -DQT_BUILD_TESTS=OFF \
     -DQT_FEATURE_wayland_server=OFF
 
-QT6WAYLAND_DEPENDENCIES = qt6base host-qt6wayland qt6declarative
-
-HOST_QT6WAYLAND_CONF_OPTS = \
-    -DQT_HOST_PATH=$(HOST_DIR) \
-    -DBUILD_WITH_PCH=OFF \
-    -DQT_BUILD_EXAMPLES=OFF \
-    -DQT_BUILD_TESTS=OFF \
-    -DFEATURE_wayland_server=OFF
-
-HOST_QT6WAYLAND_DEPENDENCIES = host-qt6base host-qt6declarative libxkbcommon
+QT6WAYLAND_DEPENDENCIES = qt6base qt6declarative host-qt6wayland
 
 define QT6WAYLAND_BUILD_CMDS
     $(TARGET_MAKE_ENV) $(BR2_CMAKE) --build $(QT6WAYLAND_BUILDDIR)
@@ -57,7 +48,8 @@ HOST_QT6WAYLAND_CONF_OPTS = \
     -DBUILD_WITH_PCH=OFF \
     -DQT_BUILD_EXAMPLES=OFF \
     -DQT_BUILD_TESTS=OFF \
-    -DQT_FEATURE_wayland_server=OFF
+    -DQT_FEATURE_wayland_server=OFF \
+    -DQT_FEATURE_wayland_client=OFF
 
 HOST_QT6WAYLAND_DEPENDENCIES = host-qt6base
 
