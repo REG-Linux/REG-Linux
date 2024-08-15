@@ -1,0 +1,59 @@
+From abef688441b46b099ba92393302f50e204e1d78c Mon Sep 17 00:00:00 2001
+From: Ryan Walklin <ryan@testtoast.com>
+Date: Fri, 17 May 2024 07:39:09 +1200
+Subject: [PATCH] dt-bindings: allwinner: Add TCON_TOP and TCON_LCD clock/reset
+ defines
+
+The Allwinner H700 exposes RGB pins as well as a HDMI connector. This
+requires additional clocks for the TCON_TOP and clock and resets for
+the TCON_LCD LCD controllers to be defined as per the T507 datasheet
+(The T507 shares the same die).
+
+Signed-off-by: Ryan Walklin <ryan@testtoast.com>
+---
+ include/dt-bindings/clock/sun50i-h616-ccu.h | 4 ++++
+ include/dt-bindings/clock/sun8i-tcon-top.h  | 2 ++
+ include/dt-bindings/reset/sun50i-h616-ccu.h | 2 ++
+ 3 files changed, 8 insertions(+)
+
+diff --git a/include/dt-bindings/clock/sun50i-h616-ccu.h b/include/dt-bindings/clock/sun50i-h616-ccu.h
+index ebb146ab7f8c..6889405f9fec 100644
+--- a/include/dt-bindings/clock/sun50i-h616-ccu.h
++++ b/include/dt-bindings/clock/sun50i-h616-ccu.h
+@@ -113,5 +113,9 @@
+ #define CLK_BUS_HDCP		127
+ #define CLK_PLL_SYSTEM_32K	128
+ #define CLK_BUS_GPADC		129
++#define CLK_TCON_LCD0		130
++#define CLK_BUS_TCON_LCD0	131
++#define CLK_TCON_LCD1		132
++#define CLK_BUS_TCON_LCD1	133
+ 
+ #endif /* _DT_BINDINGS_CLK_SUN50I_H616_H_ */
+diff --git a/include/dt-bindings/clock/sun8i-tcon-top.h b/include/dt-bindings/clock/sun8i-tcon-top.h
+index 25164d767835..2a12d047d2e1 100644
+--- a/include/dt-bindings/clock/sun8i-tcon-top.h
++++ b/include/dt-bindings/clock/sun8i-tcon-top.h
+@@ -7,5 +7,7 @@
+ #define CLK_TCON_TOP_TV0	0
+ #define CLK_TCON_TOP_TV1	1
+ #define CLK_TCON_TOP_DSI	2
++#define CLK_TCON_TOP_LCD0	3
++#define CLK_TCON_TOP_LCD1	4
+ 
+ #endif /* _DT_BINDINGS_CLOCK_SUN8I_TCON_TOP_H_ */
+diff --git a/include/dt-bindings/reset/sun50i-h616-ccu.h b/include/dt-bindings/reset/sun50i-h616-ccu.h
+index ed177c04afdd..81b1eba2a7f7 100644
+--- a/include/dt-bindings/reset/sun50i-h616-ccu.h
++++ b/include/dt-bindings/reset/sun50i-h616-ccu.h
+@@ -67,5 +67,7 @@
+ #define RST_BUS_HDCP		58
+ #define RST_BUS_KEYADC		59
+ #define RST_BUS_GPADC		60
++#define RST_BUS_TCON_LCD0	61
++#define RST_BUS_TCON_LCD1	62
+ 
+ #endif /* _DT_BINDINGS_RESET_SUN50I_H616_H_ */
+-- 
+2.43.4
+
