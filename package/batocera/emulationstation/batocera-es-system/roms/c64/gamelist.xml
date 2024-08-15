@@ -34,7 +34,7 @@ Explosive crates appear around the play area. They explode when shot, so better 
 		<developer>Badgerpunch Games; Henning Ludvigsen</developer>
 		<publisher>https://www.badgerpunch.com/title/showdown/</publisher>
 		<genre>Shooter</genre>
-		<players>2</players>
+		<players>1-2</players>
 		<lang>en</lang>
 	</game>
 </gameList>
