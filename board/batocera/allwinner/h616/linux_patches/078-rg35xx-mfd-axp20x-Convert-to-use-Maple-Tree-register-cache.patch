@@ -1,0 +1,34 @@
+From 248327d6a06cb093a9ac973a8ac765967b92d266 Mon Sep 17 00:00:00 2001
+From: wangkaiyuan <wangkaiyuan@inspur.com>
+Date: Mon, 29 Apr 2024 10:45:47 +0800
+Subject: mfd: axp20x: Convert to use Maple Tree register cache
+
+The maple tree register cache is based on a much more modern data structure
+than the rbtree cache and makes optimisation choices which are probably
+more appropriate for modern systems than those made by the rbtree cache.
+
+Signed-off-by: wangkaiyuan <wangkaiyuan@inspur.com>
+Link: https://lore.kernel.org/r/20240429024547.27724-1-wangkaiyuan@inspur.com
+Signed-off-by: Lee Jones <lee@kernel.org>
+---
+ drivers/mfd/axp20x.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+(limited to 'drivers/mfd/axp20x.c')
+
+diff --git a/drivers/mfd/axp20x.c b/drivers/mfd/axp20x.c
+index 48ce6ea693cea3..f2c0f144c0fc38 100644
+--- a/drivers/mfd/axp20x.c
++++ b/drivers/mfd/axp20x.c
+@@ -422,7 +422,7 @@ static const struct regmap_config axp717_regmap_config = {
+ 	.wr_table = &axp717_writeable_table,
+ 	.volatile_table = &axp717_volatile_table,
+ 	.max_register = AXP717_CPUSLDO_CONTROL,
+-	.cache_type = REGCACHE_RBTREE,
++	.cache_type = REGCACHE_MAPLE,
+ };
+ 
+ static const struct regmap_config axp806_regmap_config = {
+-- 
+cgit 1.2.3-korg
+

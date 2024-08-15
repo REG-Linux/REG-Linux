@@ -1,0 +1,42 @@
+From de1ca06bc0364a58ba0889d97a7a094d87dd5477 Mon Sep 17 00:00:00 2001
+From: Kees Cook <keescook@chromium.org>
+Date: Fri, 22 Sep 2023 10:53:58 -0700
+Subject: power: supply: axp20x_usb_power: Annotate struct axp20x_usb_power
+ with __counted_by
+
+Prepare for the coming implementation by GCC and Clang of the __counted_by
+attribute. Flexible array members annotated with __counted_by can have
+their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+(for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+functions).
+
+As found with Coccinelle[1], add __counted_by for struct axp20x_usb_power.
+
+[1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+
+Cc: Chen-Yu Tsai <wens@csie.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Link: https://lore.kernel.org/r/20230922175358.work.774-kees@kernel.org
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/power/supply/axp20x_usb_power.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+(limited to 'drivers/power/supply/axp20x_usb_power.c')
+
+diff --git a/drivers/power/supply/axp20x_usb_power.c b/drivers/power/supply/axp20x_usb_power.c
+index bde17406c1303f..e23308ad4cc79f 100644
+--- a/drivers/power/supply/axp20x_usb_power.c
++++ b/drivers/power/supply/axp20x_usb_power.c
+@@ -73,7 +73,7 @@ struct axp20x_usb_power {
+ 	unsigned int old_status;
+ 	unsigned int online;
+ 	unsigned int num_irqs;
+-	unsigned int irqs[];
++	unsigned int irqs[] __counted_by(num_irqs);
+ };
+ 
+ static bool axp20x_usb_vbus_needs_polling(struct axp20x_usb_power *power)
+-- 
+cgit 1.2.3-korg
+
