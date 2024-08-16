@@ -9,7 +9,7 @@ PLAY_SITE_METHOD = git
 PLAY_GIT_SUBMODULES = YES
 PLAY_LICENSE = BSD
 
-PLAY_DEPENDENCIES = openal qt6base sqlite ecm
+PLAY_DEPENDENCIES = openal reglinux-qt6 sqlite ecm
 
 PLAY_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 PLAY_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
@@ -21,8 +21,7 @@ ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
     PLAY_DEPENDENCIES += xwayland libglew
     PLAY_CONF_OPTS += -DOpenGL_GL_PREFERENCE=GLVND
 else
-    PLAY_DEPENDENCIES += qt6wayland
-    # Force to use GLES on ARM/Wayland
+    # Force to use GLES on ARM (Wayland)
     PLAY_CONF_OPTS += -DUSE_GLEW=OFF
     PLAY_CONF_OPTS += -DUSE_GLES=ON
 endif
