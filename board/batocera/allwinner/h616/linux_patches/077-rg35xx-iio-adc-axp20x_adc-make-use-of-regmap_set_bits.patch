@@ -1,0 +1,41 @@
+From 4796fed269f87d0ee5ca8558710bd467fdaf75fb Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Mon, 17 Jun 2024 09:49:45 -0400
+Subject: iio: adc: axp20x_adc: make use of regmap_set_bits()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Instead of using regmap_update_bits() and passing the mask twice, use
+regmap_set_bits().
+
+Suggested-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+Acked-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+Link: https://patch.msgid.link/20240617-review-v3-5-88d1338c4cca@baylibre.com
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+ drivers/iio/adc/axp20x_adc.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+(limited to 'drivers/iio/adc/axp20x_adc.c')
+
+diff --git a/drivers/iio/adc/axp20x_adc.c b/drivers/iio/adc/axp20x_adc.c
+index 913ea9e5d9c5fe..b487e577befb3d 100644
+--- a/drivers/iio/adc/axp20x_adc.c
++++ b/drivers/iio/adc/axp20x_adc.c
+@@ -991,9 +991,8 @@ static int axp20x_probe(struct platform_device *pdev)
+ 	regmap_write(info->regmap, AXP20X_ADC_EN1, info->data->adc_en1_mask);
+ 
+ 	if (info->data->adc_en2_mask)
+-		regmap_update_bits(info->regmap, AXP20X_ADC_EN2,
+-				   info->data->adc_en2_mask,
+-				   info->data->adc_en2_mask);
++		regmap_set_bits(info->regmap, AXP20X_ADC_EN2,
++				info->data->adc_en2_mask);
+ 
+ 	/* Configure ADCs rate */
+ 	info->data->adc_rate(info, 100);
+-- 
+cgit 1.2.3-korg
+

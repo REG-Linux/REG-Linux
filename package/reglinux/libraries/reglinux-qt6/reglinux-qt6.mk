@@ -18,6 +18,8 @@ else
 REGLINUX_QT6_VERSION = 6.7.2
 REGLINUX_QT6_SITE = $(call github,REG-Linux,REG-Qt6,$(REGLINUX_QT6_VERSION))
 
+REGLINUX_QT6_DEPENDENCIES = host-double-conversion double-conversion host-libb2 libb2 host-pcre2 pcre2 host-zlib zlib
+
 REGLINUX_QT6_ARCH = unknown
 # Cortex A7
 #ifeq ($(BR2_cortex_a7),y)

@@ -1,6 +1,22 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <gameList>
   <game>
+    <path>./Hayato's Journey v1_0.bin</path>
+    <name>Hayato's Journey</name>
+    <desc>A homebrew game that works like an unofficial spiritual sucessor of Kenseiden, a cult-classic SEGA Master System game. </desc>
+    <image>./images/Hayato-Journey-image.png</image>
+    <video>./videos/Hayato-Journey-video.mp4</video>
+    <marquee>./images/Hayato-Journey-marquee.png</marquee>
+    <thumbnail>./images/Hayato-Journey-thumb.png</thumbnail>
+    <rating></rating>
+    <releasedate>20240726T000000</releasedate>
+    <developer>Master Linkuei</developer>
+    <publisher>https://master-linkuei.itch.io/hayatos-journey</publisher>
+    <genre>Action</genre>
+    <players>1</players>
+    <lang>en</lang>
+  </game>
+  <game>
     <path>./Old-Towers.bin</path>
     <name>Old Towers</name>
     <desc>You play as a little explorers in a towers full of deadly traps and ugly skullz. Your only weapons to help you win: quick-thinking and skill.</desc>

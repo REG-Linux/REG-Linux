@@ -1,0 +1,128 @@
+From bec924d27a1fda74ec9ae9a1bae1e32723e32bcb Mon Sep 17 00:00:00 2001
+From: Aren Moynihan <aren@peacevolution.org>
+Date: Tue, 30 Jan 2024 15:27:57 -0500
+Subject: power: supply: axp20x_usb_power: replace current_max with
+ input_current_limit
+
+The current_max property is supposed to be read-only, and represent the
+maximum current the supply can provide. input_current_limit is the
+limit that is currently set, which is what we have here.
+
+When determining what value to write to the register, we need to pick a
+reasonable value if the requested limit doesn't exactly match one
+supported by the hardware. If the requested limit is less than the
+lowest value we can set, round up to the lowest value. Otherwise round
+down to the nearest value supported by hardware.
+
+Also add a dev field to the axp20x_usb_power struct, so we can use
+dev_dbg and dev_err in more places.
+
+Signed-off-by: Aren Moynihan <aren@peacevolution.org>
+Link: https://lore.kernel.org/r/20240130203714.3020464-2-aren@peacevolution.org
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/power/supply/axp20x_usb_power.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
+
+(limited to 'drivers/power/supply/axp20x_usb_power.c')
+
+diff --git a/drivers/power/supply/axp20x_usb_power.c b/drivers/power/supply/axp20x_usb_power.c
+index e23308ad4cc79f..f7f2ac2b7dae4c 100644
+--- a/drivers/power/supply/axp20x_usb_power.c
++++ b/drivers/power/supply/axp20x_usb_power.c
+@@ -59,6 +59,7 @@ struct axp_data {
+ };
+ 
+ struct axp20x_usb_power {
++	struct device *dev;
+ 	struct regmap *regmap;
+ 	struct regmap_field *curr_lim_fld;
+ 	struct regmap_field *vbus_valid_bit;
+@@ -160,7 +161,7 @@ static int axp20x_usb_power_get_property(struct power_supply *psy,
+ 
+ 		val->intval = ret * 1700; /* 1 step = 1.7 mV */
+ 		return 0;
+-	case POWER_SUPPLY_PROP_CURRENT_MAX:
++	case POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT:
+ 		ret = regmap_field_read(power->curr_lim_fld, &v);
+ 		if (ret)
+ 			return ret;
+@@ -256,19 +257,24 @@ static int axp20x_usb_power_set_voltage_min(struct axp20x_usb_power *power,
+ 	return -EINVAL;
+ }
+ 
+-static int axp20x_usb_power_set_current_max(struct axp20x_usb_power *power, int intval)
++static int axp20x_usb_power_set_input_current_limit(struct axp20x_usb_power *power,
++						    int intval)
+ {
++	unsigned int reg;
+ 	const unsigned int max = GENMASK(power->axp_data->curr_lim_fld.msb,
+ 					 power->axp_data->curr_lim_fld.lsb);
+ 
+ 	if (intval == -1)
+ 		return -EINVAL;
+ 
+-	for (unsigned int i = 0; i <= max; ++i)
+-		if (power->axp_data->curr_lim_table[i] == intval)
+-			return regmap_field_write(power->curr_lim_fld, i);
++	for (reg = max - 1; reg > 0; reg--)
++		if (power->axp_data->curr_lim_table[reg] <= intval)
++			break;
+ 
+-	return -EINVAL;
++	dev_dbg(power->dev, "setting input current limit reg to %d (%d uA), requested %d uA",
++		reg, power->axp_data->curr_lim_table[reg], intval);
++
++	return regmap_field_write(power->curr_lim_fld, reg);
+ }
+ 
+ static int axp20x_usb_power_set_property(struct power_supply *psy,
+@@ -287,8 +293,8 @@ static int axp20x_usb_power_set_property(struct power_supply *psy,
+ 	case POWER_SUPPLY_PROP_VOLTAGE_MIN:
+ 		return axp20x_usb_power_set_voltage_min(power, val->intval);
+ 
+-	case POWER_SUPPLY_PROP_CURRENT_MAX:
+-		return axp20x_usb_power_set_current_max(power, val->intval);
++	case POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT:
++		return axp20x_usb_power_set_input_current_limit(power, val->intval);
+ 
+ 	default:
+ 		return -EINVAL;
+@@ -313,7 +319,7 @@ static int axp20x_usb_power_prop_writeable(struct power_supply *psy,
+ 		return power->vbus_disable_bit != NULL;
+ 
+ 	return psp == POWER_SUPPLY_PROP_VOLTAGE_MIN ||
+-	       psp == POWER_SUPPLY_PROP_CURRENT_MAX;
++	       psp == POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT;
+ }
+ 
+ static enum power_supply_property axp20x_usb_power_properties[] = {
+@@ -322,7 +328,7 @@ static enum power_supply_property axp20x_usb_power_properties[] = {
+ 	POWER_SUPPLY_PROP_ONLINE,
+ 	POWER_SUPPLY_PROP_VOLTAGE_MIN,
+ 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
+-	POWER_SUPPLY_PROP_CURRENT_MAX,
++	POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT,
+ 	POWER_SUPPLY_PROP_CURRENT_NOW,
+ };
+ 
+@@ -331,7 +337,7 @@ static enum power_supply_property axp22x_usb_power_properties[] = {
+ 	POWER_SUPPLY_PROP_PRESENT,
+ 	POWER_SUPPLY_PROP_ONLINE,
+ 	POWER_SUPPLY_PROP_VOLTAGE_MIN,
+-	POWER_SUPPLY_PROP_CURRENT_MAX,
++	POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT,
+ };
+ 
+ static const struct power_supply_desc axp20x_usb_power_desc = {
+@@ -558,6 +564,7 @@ static int axp20x_usb_power_probe(struct platform_device *pdev)
+ 
+ 	platform_set_drvdata(pdev, power);
+ 
++	power->dev = &pdev->dev;
+ 	power->axp_data = axp_data;
+ 	power->regmap = axp20x->regmap;
+ 	power->num_irqs = axp_data->num_irq_names;
+-- 
+cgit 1.2.3-korg
+

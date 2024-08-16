@@ -1,0 +1,63 @@
+From 5ff1f754009b00a2352e17c22f224e9d77dc6fa9 Mon Sep 17 00:00:00 2001
+From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Date: Tue, 19 Sep 2023 19:48:47 +0200
+Subject: iio: adc: axp20x: Convert to platform remove callback returning void
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The .remove() callback for a platform driver returns an int which makes
+many driver authors wrongly assume it's possible to do error handling by
+returning an error code. However the value returned is ignored (apart
+from emitting a warning) and this typically results in resource leaks.
+To improve here there is a quest to make the remove callback return
+void. In the first step of this quest all drivers are converted to
+.remove_new() which already returns void. Eventually after all drivers
+are converted, .remove_new() will be renamed to .remove().
+
+Trivially convert this driver from always returning zero in the remove
+callback to the void returning variant.
+
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Link: https://lore.kernel.org/r/20230919174931.1417681-6-u.kleine-koenig@pengutronix.de
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+ drivers/iio/adc/axp20x_adc.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+(limited to 'drivers/iio/adc/axp20x_adc.c')
+
+diff --git a/drivers/iio/adc/axp20x_adc.c b/drivers/iio/adc/axp20x_adc.c
+index 75bda94dbce149..d6c51b0f48e37c 100644
+--- a/drivers/iio/adc/axp20x_adc.c
++++ b/drivers/iio/adc/axp20x_adc.c
+@@ -745,7 +745,7 @@ fail_map:
+ 	return ret;
+ }
+ 
+-static int axp20x_remove(struct platform_device *pdev)
++static void axp20x_remove(struct platform_device *pdev)
+ {
+ 	struct iio_dev *indio_dev = platform_get_drvdata(pdev);
+ 	struct axp20x_adc_iio *info = iio_priv(indio_dev);
+@@ -757,8 +757,6 @@ static int axp20x_remove(struct platform_device *pdev)
+ 
+ 	if (info->data->adc_en2_mask)
+ 		regmap_write(info->regmap, AXP20X_ADC_EN2, 0);
+-
+-	return 0;
+ }
+ 
+ static struct platform_driver axp20x_adc_driver = {
+@@ -768,7 +766,7 @@ static struct platform_driver axp20x_adc_driver = {
+ 	},
+ 	.id_table = axp20x_adc_id_match,
+ 	.probe = axp20x_probe,
+-	.remove = axp20x_remove,
++	.remove_new = axp20x_remove,
+ };
+ 
+ module_platform_driver(axp20x_adc_driver);
+-- 
+cgit 1.2.3-korg
+

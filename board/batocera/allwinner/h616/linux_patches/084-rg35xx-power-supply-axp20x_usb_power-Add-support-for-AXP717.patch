@@ -1,0 +1,39 @@
+From 878b66f2b9210d11370ccfd1e730fd7de6f7ebb9 Mon Sep 17 00:00:00 2001
+From: Chris Morgan <macromorgan@hotmail.com>
+Date: Mon, 17 Jun 2024 17:05:29 -0500
+Subject: [PATCH 04/10] power: supply: axp20x_usb_power: Add support for AXP717
+
+Add support for the AXP717. It has BC 1.2 detection like the AXP813
+and uses ADC channels like all other AXP devices, but otherwise is
+very different requiring new registers for most functions.
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+ .../power/supply/x-powers,axp20x-usb-power-supply.yaml      | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml b/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml
+index 34b7959d6772..e5879c85c9a3 100644
+--- a/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml
++++ b/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-usb-power-supply.yaml
+@@ -26,11 +26,17 @@ properties:
+           - x-powers,axp202-usb-power-supply
+           - x-powers,axp221-usb-power-supply
+           - x-powers,axp223-usb-power-supply
++          - x-powers,axp717-usb-power-supply
+           - x-powers,axp813-usb-power-supply
+       - items:
+           - const: x-powers,axp803-usb-power-supply
+           - const: x-powers,axp813-usb-power-supply
+ 
++  input-current-limit-microamp:
++    description:
++      Optional value to clamp the maximum input current limit to for
++      the device. The supported min and max values will vary based on
++      the PMIC revision, consult the datasheet for supported values.
+ 
+ required:
+   - compatible
+-- 
+2.46.0
+
