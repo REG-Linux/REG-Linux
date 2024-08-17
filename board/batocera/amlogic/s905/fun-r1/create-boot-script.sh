@@ -34,6 +34,8 @@ cp "${BINARIES_DIR}/meson-gxl-s905x-fun-r1.dtb" "${REGLINUX_BINARIES_DIR}/boot/b
 
 "${HOST_DIR}/bin/mkimage" -C none -A arm64 -T script -d "${BOARD_DIR}/boot/s905_autoscript.txt" "${REGLINUX_BINARIES_DIR}/boot/s905_autoscript" || exit 1
 "${HOST_DIR}/bin/mkimage" -C none -A arm64 -T script -d "${BOARD_DIR}/boot/aml_autoscript.txt"  "${REGLINUX_BINARIES_DIR}/boot/aml_autoscript"  || exit 1
-cp "${BOARD_DIR}/boot/aml_autoscript.zip" "${REGLINUX_BINARIES_DIR}/boot" || exit 1
+cp "${BOARD_DIR}/boot/aml_autoscript.zip" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
+
+cp "${BOARD_DIR}/boot/boot-custom.sh"     "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
 
 exit 0

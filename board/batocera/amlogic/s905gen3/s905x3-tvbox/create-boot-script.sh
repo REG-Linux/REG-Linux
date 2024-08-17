@@ -52,4 +52,6 @@ done
 "${HOST_DIR}/bin/mkimage" -C none -A arm64 -T script -d "${BOARD_DIR}/boot/aml_autoscript.txt"  "${REGLINUX_BINARIES_DIR}/boot/aml_autoscript"  || exit 1
 "${HOST_DIR}/bin/mkimage" -C none -A arm64 -T script -d "${BOARD_DIR}/boot/boot.scr.txt"        "${REGLINUX_BINARIES_DIR}/boot/boot.scr"        || exit 1
 
+cp "${BOARD_DIR}/boot/boot-custom.sh" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
+
 exit 0

@@ -31,5 +31,6 @@ cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/resc
 cp "${BOARD_DIR}/boot/boot.ini"                    "${REGLINUX_BINARIES_DIR}/boot/boot/boot.ini"                      || exit 1
 cp "${BINARIES_DIR}/meson-g12b-odroid-n2-plus.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/meson-g12b-odroid-n2-plus.dtb" || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"               "${REGLINUX_BINARIES_DIR}/boot/extlinux/extlinux.conf"             || exit 1
+cp "${BOARD_DIR}/boot/boot-custom.sh"              "${REGLINUX_BINARIES_DIR}/boot/"                                   || exit 1
 
 exit 0

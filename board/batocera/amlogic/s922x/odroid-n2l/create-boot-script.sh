@@ -34,5 +34,6 @@ cp "${BOARD_DIR}/boot/extlinux.conf"               "${REGLINUX_BINARIES_DIR}/boo
 cp "${BOARD_DIR}/boot/extlinux.conf"               "${REGLINUX_BINARIES_DIR}/boot/boot/"                              || exit 1
 cp "${BOARD_DIR}/boot/boot.ini"                    "${REGLINUX_BINARIES_DIR}/boot/"                                   || exit 1
 cp "${BOARD_DIR}/boot/config.ini"                  "${REGLINUX_BINARIES_DIR}/boot/"                                   || exit 1
+cp "${BOARD_DIR}/boot/boot-custom.sh"              "${REGLINUX_BINARIES_DIR}/boot/"                                   || exit 1
 
 exit 0

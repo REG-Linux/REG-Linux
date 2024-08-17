@@ -28,6 +28,7 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
 cp "${BINARIES_DIR}/meson-sm1-khadas-vim3l.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"            "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BOARD_DIR}/boot/boot-custom.sh"           "${REGLINUX_BINARIES_DIR}/boot/"          || exit 1
 
 # Handle Khadas vendor u-boot installed on eMMC
 # We chainload to mainline U-Boot through vendor scripts

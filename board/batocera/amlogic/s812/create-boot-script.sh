@@ -33,6 +33,8 @@ cp "${BINARIES_DIR}/meson8-tronsmart-s82.dtb"   "${REGLINUX_BINARIES_DIR}/boot/b
 "${HOST_DIR}/bin/mkimage" -C none -A arm -T script -d "${BOARD_DIR}/boot/s805_autoscript.cmd" "${REGLINUX_BINARIES_DIR}/boot/s805_autoscript" || exit 1
 "${HOST_DIR}/bin/mkimage" -C none -A arm -T script -d "${BOARD_DIR}/boot/aml_autoscript.scr"  "${REGLINUX_BINARIES_DIR}/boot/aml_autoscript"  || exit 1
 cp "${BOARD_DIR}/boot/uEnv.txt" "${REGLINUX_BINARIES_DIR}/boot/uEnv.txt" || exit 1
-cp "${BOARD_DIR}/boot/aml_autoscript.zip" "${REGLINUX_BINARIES_DIR}/boot" || exit 1
+cp "${BOARD_DIR}/boot/aml_autoscript.zip" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
+
+cp "${BOARD_DIR}/boot/boot-custom.sh"     "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
 
 exit 0

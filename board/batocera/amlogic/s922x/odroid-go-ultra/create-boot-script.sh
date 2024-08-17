@@ -34,4 +34,6 @@ cp "${BOARD_DIR}/boot/boot.ini"                     "${REGLINUX_BINARIES_DIR}/bo
 cp -r "${REGLINUX_BINARIES_DIR}/uboot-ogu/res"          "${REGLINUX_BINARIES_DIR}/boot/"        || exit 1
 cp "${REGLINUX_BINARIES_DIR}/uboot-ogu/ODROIDBIOS.BIN"  "${REGLINUX_BINARIES_DIR}/boot/"        || exit 1
 
+cp "${BOARD_DIR}/boot/boot-custom.sh" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
+
 exit 0
