@@ -64,6 +64,9 @@ REGLINUX_QT6_ARCH = bcm2712
 # Cortex A76.A55
 else ifeq ($(BR2_cortex_a76_a55),y)
 REGLINUX_QT6_ARCH = rk3588
+# Mediatek MT8395 is cortex-a78.cortex-a55
+else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_MT8395),y)
+REGLINUX_QT6_ARCH = rk3588
 # Unknown AArch64 saphira CPU
 else ifeq ($(BR2_saphira),y)
 REGLINUX_QT6_ARCH = saphira
