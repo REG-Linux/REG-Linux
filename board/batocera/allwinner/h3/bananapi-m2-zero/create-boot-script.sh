@@ -26,5 +26,6 @@ cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/resc
 
 cp "${BINARIES_DIR}/sun8i-h2-plus-bananapi-m2-zero.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"                    "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BOARD_DIR}/boot/boot-custom.sh"                   "${REGLINUX_BINARIES_DIR}/boot/"          || exit 1
 
 exit 0

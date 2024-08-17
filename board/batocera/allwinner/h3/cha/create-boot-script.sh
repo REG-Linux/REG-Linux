@@ -24,7 +24,8 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
-cp "${BINARIES_DIR}/sun8i-h3-libretech-all-h3-cc.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/capcom-home-arcade.dtb"     || exit 1
-cp "${BOARD_DIR}/boot/extlinux.conf"          "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BINARIES_DIR}/sun8i-h3-libretech-all-h3-cc.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/capcom-home-arcade.dtb" || exit 1
+cp "${BOARD_DIR}/boot/extlinux.conf"   "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BOARD_DIR}/boot/boot-custom.sh"  "${REGLINUX_BINARIES_DIR}/boot/"          || exit 1
 
 exit 0
