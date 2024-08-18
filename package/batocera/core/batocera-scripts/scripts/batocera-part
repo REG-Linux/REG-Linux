@@ -18,7 +18,7 @@ determine_default_share_part() {
   BOOTPART=$(determine_X_part "/boot")
   BOOTDISKPREFIX=$(determine_part_prefix "$BOOTPART")
   # Make sure it is in the same disk
-  SHAREPART=$(blkid -t LABEL=SHARE "$BOOTDISKPREFIX"*)
+  SHAREPART=$(blkid -o device -t LABEL=SHARE "$BOOTDISKPREFIX"*)
   # Check that is a number
   if echo "$SHAREPART" | sed -e s+'^.*\([0-9]\)$'+'\1'+ | grep -qE '^[0-9]$'
   then
