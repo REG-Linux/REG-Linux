@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-YQUAKE2_CLIENT_VERSION = QUAKE2_8_40
+YQUAKE2_CLIENT_VERSION = QUAKE2_8_41
 YQUAKE2_CLIENT_SITE = $(call github,yquake2,yquake2,$(YQUAKE2_CLIENT_VERSION))
 YQUAKE2_CLIENT_DEPENDENCIES = sdl2
 

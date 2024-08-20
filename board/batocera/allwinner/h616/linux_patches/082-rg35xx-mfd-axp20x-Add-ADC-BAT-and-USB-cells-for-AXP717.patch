@@ -1,0 +1,153 @@
+From 5032f3284e6cde8838b9f8eb9ee42868409fecab Mon Sep 17 00:00:00 2001
+From: Chris Morgan <macromorgan@hotmail.com>
+Date: Mon, 17 Jun 2024 17:05:31 -0500
+Subject: [PATCH 06/10] mfd: axp20x: Add ADC, BAT, and USB cells for AXP717
+
+Add support for the AXP717 PMIC to utilize the ADC (for reading
+voltage, current, and temperature information from the PMIC) as well
+as the USB charger and battery.
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+ drivers/mfd/axp20x.c                 | 30 +++++++++++++++++++++++++---
+ drivers/regulator/axp20x-regulator.c |  2 +-
+ include/linux/mfd/axp20x.h           | 26 +++++++++++++++++++++++-
+ 3 files changed, 53 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/mfd/axp20x.c b/drivers/mfd/axp20x.c
+index 609e7e149681..07db4a11acbc 100644
+--- a/drivers/mfd/axp20x.c
++++ b/drivers/mfd/axp20x.c
+@@ -209,15 +209,23 @@ static const struct regmap_access_table axp313a_volatile_table = {
+ };
+ 
+ static const struct regmap_range axp717_writeable_ranges[] = {
+-	regmap_reg_range(AXP717_MODULE_EN_CONTROL, AXP717_MODULE_EN_CONTROL),
+-	regmap_reg_range(AXP717_BOOST_CONTROL, AXP717_BOOST_CONTROL),
++	regmap_reg_range(AXP717_PMU_FAULT, AXP717_MODULE_EN_CONTROL_1),
++	regmap_reg_range(AXP717_MIN_SYS_V_CONTROL, AXP717_BOOST_CONTROL),
++	regmap_reg_range(AXP717_VSYS_V_POWEROFF, AXP717_VSYS_V_POWEROFF),
+ 	regmap_reg_range(AXP717_IRQ0_EN, AXP717_IRQ4_EN),
+ 	regmap_reg_range(AXP717_IRQ0_STATE, AXP717_IRQ4_STATE),
++	regmap_reg_range(AXP717_ICC_CHG_SET, AXP717_CV_CHG_SET),
+ 	regmap_reg_range(AXP717_DCDC_OUTPUT_CONTROL, AXP717_CPUSLDO_CONTROL),
++	regmap_reg_range(AXP717_ADC_CH_EN_CONTROL, AXP717_ADC_CH_EN_CONTROL),
++	regmap_reg_range(AXP717_ADC_DATA_SEL, AXP717_ADC_DATA_SEL),
+ };
+ 
+ static const struct regmap_range axp717_volatile_ranges[] = {
++	regmap_reg_range(AXP717_ON_INDICATE, AXP717_PMU_FAULT),
+ 	regmap_reg_range(AXP717_IRQ0_STATE, AXP717_IRQ4_STATE),
++	regmap_reg_range(AXP717_BATT_PERCENT_DATA, AXP717_BATT_PERCENT_DATA),
++	regmap_reg_range(AXP717_BATT_V_H, AXP717_BATT_CHRG_I_L),
++	regmap_reg_range(AXP717_ADC_DATA_H, AXP717_ADC_DATA_L),
+ };
+ 
+ static const struct regmap_access_table axp717_writeable_table = {
+@@ -310,6 +318,11 @@ static const struct resource axp22x_usb_power_supply_resources[] = {
+ 	DEFINE_RES_IRQ_NAMED(AXP22X_IRQ_VBUS_REMOVAL, "VBUS_REMOVAL"),
+ };
+ 
++static const struct resource axp717_usb_power_supply_resources[] = {
++	DEFINE_RES_IRQ_NAMED(AXP717_IRQ_VBUS_PLUGIN, "VBUS_PLUGIN"),
++	DEFINE_RES_IRQ_NAMED(AXP717_IRQ_VBUS_REMOVAL, "VBUS_REMOVAL"),
++};
++
+ /* AXP803 and AXP813/AXP818 share the same interrupts */
+ static const struct resource axp803_usb_power_supply_resources[] = {
+ 	DEFINE_RES_IRQ_NAMED(AXP803_IRQ_VBUS_PLUGIN, "VBUS_PLUGIN"),
+@@ -424,7 +437,7 @@ static const struct regmap_config axp717_regmap_config = {
+ 	.val_bits = 8,
+ 	.wr_table = &axp717_writeable_table,
+ 	.volatile_table = &axp717_volatile_table,
+-	.max_register = AXP717_CPUSLDO_CONTROL,
++	.max_register = AXP717_ADC_DATA_L,
+ 	.cache_type = REGCACHE_MAPLE,
+ };
+ 
+@@ -1026,6 +1039,17 @@ static struct mfd_cell axp313a_cells[] = {
+ static struct mfd_cell axp717_cells[] = {
+ 	MFD_CELL_NAME("axp20x-regulator"),
+ 	MFD_CELL_RES("axp20x-pek", axp717_pek_resources),
++	{
++		.name		= "axp717-adc",
++		.of_compatible	= "x-powers,axp717-adc",
++	},
++	MFD_CELL_OF("axp20x-usb-power-supply",
++		    axp717_usb_power_supply_resources, NULL, 0, 0,
++		    "x-powers,axp717-usb-power-supply"),
++	{
++		.name		= "axp20x-battery-power-supply",
++		.of_compatible	= "x-powers,axp717-battery-power-supply",
++	},
+ };
+ 
+ static const struct resource axp288_adc_resources[] = {
+diff --git a/drivers/regulator/axp20x-regulator.c b/drivers/regulator/axp20x-regulator.c
+index 20bef3971fec..a8e91d9d028b 100644
+--- a/drivers/regulator/axp20x-regulator.c
++++ b/drivers/regulator/axp20x-regulator.c
+@@ -837,7 +837,7 @@ static const struct regulator_desc axp717_regulators[] = {
+ 		 AXP717_LDO1_OUTPUT_CONTROL, BIT(4)),
+ 	AXP_DESC(AXP717, BOOST, "boost", "vin1", 4550, 5510, 64,
+ 		 AXP717_BOOST_CONTROL, AXP717_BOOST_V_OUT_MASK,
+-		 AXP717_MODULE_EN_CONTROL, BIT(4)),
++		 AXP717_MODULE_EN_CONTROL_2, BIT(4)),
+ };
+ 
+ /* DCDC ranges shared with AXP813 */
+diff --git a/include/linux/mfd/axp20x.h b/include/linux/mfd/axp20x.h
+index 5e86b976c4ca..f4dfc1871a95 100644
+--- a/include/linux/mfd/axp20x.h
++++ b/include/linux/mfd/axp20x.h
+@@ -115,8 +115,16 @@ enum axp20x_variants {
+ #define AXP313A_IRQ_STATE		0x21
+ 
+ #define AXP717_ON_INDICATE		0x00
+-#define AXP717_MODULE_EN_CONTROL	0x19
++#define AXP717_PMU_STATUS_2		0x01
++#define AXP717_BC_DETECT		0x05
++#define AXP717_PMU_FAULT		0x08
++#define AXP717_MODULE_EN_CONTROL_1	0x0b
++#define AXP717_MIN_SYS_V_CONTROL	0x15
++#define AXP717_INPUT_VOL_LIMIT_CTRL	0x16
++#define AXP717_INPUT_CUR_LIMIT_CTRL	0x17
++#define AXP717_MODULE_EN_CONTROL_2	0x19
+ #define AXP717_BOOST_CONTROL		0x1e
++#define AXP717_VSYS_V_POWEROFF		0x24
+ #define AXP717_IRQ0_EN			0x40
+ #define AXP717_IRQ1_EN			0x41
+ #define AXP717_IRQ2_EN			0x42
+@@ -127,6 +135,9 @@ enum axp20x_variants {
+ #define AXP717_IRQ2_STATE		0x4a
+ #define AXP717_IRQ3_STATE		0x4b
+ #define AXP717_IRQ4_STATE		0x4c
++#define AXP717_ICC_CHG_SET		0x62
++#define AXP717_ITERM_CHG_SET		0x63
++#define AXP717_CV_CHG_SET		0x64
+ #define AXP717_DCDC_OUTPUT_CONTROL	0x80
+ #define AXP717_DCDC1_CONTROL		0x83
+ #define AXP717_DCDC2_CONTROL		0x84
+@@ -147,6 +158,19 @@ enum axp20x_variants {
+ #define AXP717_CLDO3_CONTROL		0x9d
+ #define AXP717_CLDO4_CONTROL		0x9e
+ #define AXP717_CPUSLDO_CONTROL		0x9f
++#define AXP717_BATT_PERCENT_DATA	0xa4
++#define AXP717_ADC_CH_EN_CONTROL	0xc0
++#define AXP717_BATT_V_H			0xc4
++#define AXP717_BATT_V_L			0xc5
++#define AXP717_VBUS_V_H			0xc6
++#define AXP717_VBUS_V_L			0xc7
++#define AXP717_VSYS_V_H			0xc8
++#define AXP717_VSYS_V_L			0xc9
++#define AXP717_BATT_CHRG_I_H		0xca
++#define AXP717_BATT_CHRG_I_L		0xcb
++#define AXP717_ADC_DATA_SEL		0xcd
++#define AXP717_ADC_DATA_H		0xce
++#define AXP717_ADC_DATA_L		0xcf
+ 
+ #define AXP806_STARTUP_SRC		0x00
+ #define AXP806_CHIP_ID			0x03
+-- 
+2.46.0
+

@@ -62,6 +62,11 @@ define SONIC3_AIR_INSTALL_TARGET_CMDS
 	cp -r $(@D)/Oxygen/sonic3air/saves $(TARGET_DIR)/usr/bin/sonic3-air
 endef
 
+# Remove remastered music on size-constrained platforms (should live in content downloader)
+define SONIC3_AIR_REMOVE_REMASTERED_MUSIC
+	rm -Rf $(TARGET_DIR)/usr/bin/sonic3-air/data/audio/remastered/
+endef
+
 define SONIC3_AIR_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/sonic3-air/sonic3-air.keys \
@@ -69,5 +74,9 @@ define SONIC3_AIR_EVMAPY
 endef
 
 SONIC3_AIR_POST_INSTALL_TARGET_HOOKS += SONIC3_AIR_EVMAPY
+
+ifeq ($(BR2_x86_64)$(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+SONIC3_AIR_POST_INSTALL_TARGET_HOOKS += SONIC3_AIR_REMOVE_REMASTERED_MUSIC
+endif
 
 $(eval $(cmake-package))
