@@ -4,7 +4,7 @@ config BR2_PACKAGE_MELONDS
     select BR2_PACKAGE_LIBEPOXY
     select BR2_PACKAGE_SDL2
     select BR2_PACKAGE_SLIRP
-    select BR2_PACKAGE_BATOCERA_QT6
+    select BR2_PACKAGE_REGLINUX_QT6
     select BR2_PACKAGE_ECM
     help
       Ninteno DS emulator, sorta

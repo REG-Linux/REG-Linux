@@ -9,7 +9,7 @@ SUDACHI_SITE = https://github.com/sudachi-emu/sudachi.git
 SUDACHI_SITE_METHOD=git
 SUDACHI_GIT_SUBMODULES=YES
 SUDACHI_LICENSE = GPLv2
-SUDACHI_DEPENDENCIES = qt6base qt6tools qt6multimedia fmt boost ffmpeg \
+SUDACHI_DEPENDENCIES = reglinux-qt6 fmt boost ffmpeg \
                     zstd zlib libzip lz4 catch2 sdl2 opus json-for-modern-cpp
 
 SUDACHI_SUPPORTS_IN_SOURCE_BUILD = NO

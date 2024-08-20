@@ -24,7 +24,7 @@ Oh, and if you drop this rom in "gbc2players", you can play 2-player link mode (
 		<developer>bbbbbr</developer>
 		<publisher>https://bbbbbr.itch.io/petris</publisher>
 		<genre>Puzzle</genre>
-		<players>2</players>
+		<players>1-2</players>
 		<lang>en</lang>
 	</game>
 </gameList>

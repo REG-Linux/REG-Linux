@@ -1,0 +1,44 @@
+From ae21c0fdd606cdf062c6c44faceae747a35464da Mon Sep 17 00:00:00 2001
+From: Chris Morgan <macromorgan@hotmail.com>
+Date: Mon, 17 Jun 2024 17:05:28 -0500
+Subject: [PATCH 03/10] dt-bindings: iio: adc: Add AXP717 compatible
+
+Add compatible binding for the axp717.
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ .../bindings/iio/adc/x-powers,axp209-adc.yaml          | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/iio/adc/x-powers,axp209-adc.yaml b/Documentation/devicetree/bindings/iio/adc/x-powers,axp209-adc.yaml
+index d40689f233f2..267c74fa2d0c 100644
+--- a/Documentation/devicetree/bindings/iio/adc/x-powers,axp209-adc.yaml
++++ b/Documentation/devicetree/bindings/iio/adc/x-powers,axp209-adc.yaml
+@@ -37,6 +37,15 @@ description: |
+    3 | batt_dischrg_i
+    4 | ts_v
+ 
++  AXP717
++  ------
++   0 | batt_v
++   1 | ts_v
++   2 | vbus_v
++   3 | vsys_v
++   4 | pmic_temp
++   5 | batt_chrg_i
++
+   AXP813
+   ------
+    0 | pmic_temp
+@@ -52,6 +61,7 @@ properties:
+     oneOf:
+       - const: x-powers,axp209-adc
+       - const: x-powers,axp221-adc
++      - const: x-powers,axp717-adc
+       - const: x-powers,axp813-adc
+ 
+       - items:
+-- 
+2.46.0
+

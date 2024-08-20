@@ -1,0 +1,8 @@
+config BR2_PACKAGE_SUGARBOX
+	bool "sugarbox"
+
+	depends on BR2_PACKAGE_REGLINUX_HAS_QT6
+
+	help
+	  SugarBox - Amstrad CPC emulator
+	  https://github.com/Tom1975/SugarboxV2

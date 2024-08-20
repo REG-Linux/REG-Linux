@@ -1,0 +1,40 @@
+From 873f6118a058adbabaafa0ed2fc4a90f34482e59 Mon Sep 17 00:00:00 2001
+From: Chris Morgan <macromorgan@hotmail.com>
+Date: Mon, 17 Jun 2024 17:05:30 -0500
+Subject: [PATCH 05/10] power: supply: axp20x_battery: add support for AXP717
+
+Add binding information for AXP717. Also, as the driver can read
+simple-battery parameters for the AXP717 and other batteries, define
+the simple-battery parameter.
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+ .../power/supply/x-powers,axp20x-battery-power-supply.yaml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-battery-power-supply.yaml b/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-battery-power-supply.yaml
+index e0b95ecbbebd..8d6b06117f6d 100644
+--- a/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-battery-power-supply.yaml
++++ b/Documentation/devicetree/bindings/power/supply/x-powers,axp20x-battery-power-supply.yaml
+@@ -23,11 +23,18 @@ properties:
+       - const: x-powers,axp202-battery-power-supply
+       - const: x-powers,axp209-battery-power-supply
+       - const: x-powers,axp221-battery-power-supply
++      - const: x-powers,axp717-battery-power-supply
+       - items:
+           - const: x-powers,axp803-battery-power-supply
+           - const: x-powers,axp813-battery-power-supply
+       - const: x-powers,axp813-battery-power-supply
+ 
++  monitored-battery:
++    description: |
++      Specifies the phandle of an optional simple-battery connected to
++      this gauge.
++    $ref: /schemas/types.yaml#/definitions/phandle
++
+ required:
+   - compatible
+ 
+-- 
+2.46.0
+

@@ -122,10 +122,13 @@ BR2_PACKAGE_WAYLAND_UTILS=y
 BR2_PACKAGE_WAYLAND_PROTOCOLS=y
 BR2_PACKAGE_SEATD=y
 
-# Prefer using prebuilt mame
+# Prefer using prebuilt Qt6
+#BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y
+
+# Prefer using prebuilt MAME
 #BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y
 
-# Prefer using prebuilt scummvm
+# Prefer using prebuilt ScummVM
 #BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y
 
 # Enables ccache

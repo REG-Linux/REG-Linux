@@ -1,0 +1,14 @@
+--- a/src/vb/vsu.cpp	2024-08-10 16:13:53.253726872 +0200
++++ b/src/vb/vsu.cpp	2024-08-10 16:14:30.174596258 +0200
+@@ -44,7 +44,10 @@
+ {
+  for(int y = 0; y < 2; y++)
+  {
+-  sbuf[y].set_sample_rate(rate ? rate : 44100, 50);
++  if (rate)
++    sbuf[y].set_sample_rate(rate, 50);
++  else
++    sbuf[y].set_sample_rate(44100, 50);
+   sbuf[y].clock_rate((long)(VB_MASTER_CLOCK / 4));
+   sbuf[y].bass_freq(20);
+  }

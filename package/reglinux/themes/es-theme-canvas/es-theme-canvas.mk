@@ -3,8 +3,8 @@
 # EmulationStation theme "Canvas"
 #
 ################################################################################
-# Version.: Commits on Aug 04, 2024
-ES_THEME_CANVAS_VERSION = c948b85531ad90df8f9fc869910ed038f9a3aff0
+# Version.: Commits on Aug 17, 2024
+ES_THEME_CANVAS_VERSION = 17d9ea19a5799772b16fa7320c4000cccb030349
 ES_THEME_CANVAS_SITE = $(call github,REG-Linux,es-theme-canvas,$(ES_THEME_CANVAS_VERSION))
 
 define ES_THEME_CANVAS_INSTALL_TARGET_CMDS
