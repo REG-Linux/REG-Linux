@@ -81,8 +81,8 @@ do_mount_firmware() {
 }
 
 do_mount() {
-    if mount -o ro "${1}"           /boot_root; then return 0; fi
-    return 1
+	if mount -o ro "${1}" /boot_root; then return 0; fi
+	return 1
 }
 
 do_rescue() {
@@ -121,21 +121,29 @@ do_root() {
     mount -t proc  -o nodev,noexec,nosuid proc  /proc  	|| return 1
     mount -t sysfs -o nodev,noexec,nosuid sysfs /sys 	|| return 1
 
+    MOUNTARG=none
     # read the parameters
     read -r cmdline < /proc/cmdline
     for param in ${cmdline} ; do
-        case ${param} in
-            dev=*)   dev=${param#dev=};;
-            label=*) label=${param#label=};;
-        esac
+		case ${param} in
+			dev=*)
+				dev=${param#dev=}
+				test -n "${dev}"   && MOUNTARG=${dev}
+			;;
+			label=*)
+				label=${param#label=}
+				test -n "${label}" && MOUNTARG=LABEL=${label}
+			;;
+			uuid=*)
+				uuid=${param#uuid=}
+				test -n "${uuid}" && MOUNTARG=UUID=${uuid}
+			;;
+		esac
     done
 
     # look for devices
     mount -t devtmpfs none /dev
 
-    MOUNTARG=none
-    test -n "${dev}"   && MOUNTARG=${dev}
-    test -n "${label}" && MOUNTARG=LABEL=${label}
 
     while ! do_mount "${MOUNTARG}"
     do
