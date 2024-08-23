@@ -79,25 +79,22 @@ do
     cat "${GENIMAGEFILE}" | sed -e s+'@files'+"${FILES}"+ | tr '@' '\n' > "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
 	# Include the UUID of boot partition in extraargs
 	sed -i "s/ -n REGLINUX/ -n REGLINUX -i ${VFATUUID//-}/g" "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
-	[ -f "${REGLINUX_BINARIES_DIR}/boot/extlinux/extlinux.conf" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/extlinux/extlinux.conf"
-	[ -f "${REGLINUX_BINARIES_DIR}/boot/cmdline.txt" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/cmdline.txt"
-	[ -f "${REGLINUX_BINARIES_DIR}/boot/boot.ini" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/boot.ini"
-	[ -f "${REGLINUX_BINARIES_DIR}/boot/uEnv.txt" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/uEnv.txt"
-	[ -f "${REGLINUX_BINARIES_DIR}/boot/BOOT/grub.cfg" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/BOOT/grub.cfg"
+	# Change "label=REGLINUX" to "uuid= ..." in boot files
+	find "${REGLINUX_BINARIES_DIR}/boot/" -type f \( -iname "extlinux.conf" -o -iname "cmdline.txt" -o -iname "boot.ini" -o -iname "uEnv.txt" -o -iname "syslinux.cfg" -o -iname "grub.cfg" \) -exec sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" {} \+
 
     # install syslinux
     if grep -qE "^BR2_TARGET_SYSLINUX=y$" "${BR2_CONFIG}"
     then
-	GENIMAGEBOOTFILE="${GENIMAGEDIR}/genimage-boot.cfg"
-	echo "installing syslinux" >&2
-	cat "${GENIMAGEBOOTFILE}" | sed -e s+'@files'+"${FILES}"+ | tr '@' '\n' > "${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" || exit 1
-	# Include the UUID of boot partition in extraargs
-	sed -i "s/ -n REGLINUX/ -n REGLINUX -i ${VFATUUID//-}/g" "${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" || exit 1
-    genimage --rootpath="${TARGET_DIR}" --inputpath="${REGLINUX_BINARIES_DIR}/boot" --outputpath="${REGLINUX_BINARIES_DIR}" --config="${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" --tmppath="${GENIMAGE_TMP}" || exit 1
-    "${HOST_DIR}/bin/syslinux" -i "${REGLINUX_BINARIES_DIR}/boot.vfat" -d "/boot/syslinux" || exit 1
-    # remove genimage temp path as sometimes genimage v14 fails to start
-    rm -rf ${GENIMAGE_TMP}
-    mkdir ${GENIMAGE_TMP}
+		GENIMAGEBOOTFILE="${GENIMAGEDIR}/genimage-boot.cfg"
+		echo "installing syslinux" >&2
+		cat "${GENIMAGEBOOTFILE}" | sed -e s+'@files'+"${FILES}"+ | tr '@' '\n' > "${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" || exit 1
+		# Include the UUID of boot partition in extraargs
+		sed -i "s/ -n REGLINUX/ -n REGLINUX -i ${VFATUUID//-}/g" "${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" || exit 1
+		genimage --rootpath="${TARGET_DIR}" --inputpath="${REGLINUX_BINARIES_DIR}/boot" --outputpath="${REGLINUX_BINARIES_DIR}" --config="${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" --tmppath="${GENIMAGE_TMP}" || exit 1
+		"${HOST_DIR}/bin/syslinux" -i "${REGLINUX_BINARIES_DIR}/boot.vfat" -d "/boot/syslinux" || exit 1
+		# remove genimage temp path as sometimes genimage v14 fails to start
+		rm -rf ${GENIMAGE_TMP}
+		mkdir ${GENIMAGE_TMP}
     fi
     ###
     "${HOST_DIR}/bin/genimage" --rootpath="${TARGET_DIR}" --inputpath="${REGLINUX_BINARIES_DIR}/boot" --outputpath="${REGLINUX_BINARIES_DIR}" --config="${REGLINUX_BINARIES_DIR}/genimage.cfg" --tmppath="${GENIMAGE_TMP}" || exit 1

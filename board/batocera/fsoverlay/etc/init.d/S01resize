@@ -75,7 +75,7 @@ function cmdoutput()
 replaceuuid() {
 	mount -o remount,rw /boot
 	# First try to replace label=REGLINUX with uuid=*, just in case we are updating a very old disk
-	sed -i "s/label=REGLINUX/uuid=$NEWUUID/g;s/uuid=$OLDUUID/uuid=$NEWUUID/g" "$1"
+	find "/boot/" -type f \( -iname "extlinux.conf" -o -iname "cmdline.txt" -o -iname "boot.ini" -o -iname "uEnv.txt" -o -iname "syslinux.cfg" -o -iname "grub.cfg" \) -exec sed -i "s/label=REGLINUX/uuid=$NEWUUID/g;s/uuid=$OLDUUID/uuid=$NEWUUID/g" {} \+
 	mount -o remount,ro /boot
 }
 
@@ -181,11 +181,7 @@ if grep -qE '^[ ]*newbootuuid[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
 	if [ -n "$OLDUUID" ] && [ -n "$NEWUUID" ]
 	then
 		echo "Updating boot files with new UUID" >> "$LOG"
-		[ -f "/boot/extlinux/extlinux.conf" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/extlinux/extlinux.conf" "Updating /boot/extlinux/extlinux.conf with new UUID..."
-		[ -f "/boot/cmdline.txt" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/cmdline.txt" "Updating /boot/cmdline.txt with new UUID..."
-		[ -f "/boot/boot.ini" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/boot.ini" "Updating /boot/boot.ini with new UUID..."
-		[ -f "/boot/uEnv.txt" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/uEnv.txt" "Updating /boot/uEnv.txt with new UUID..."
-		[ -f "/boot/BOOT/grub.cfg" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/BOOT/grub.cfg" "Updating /boot/BOOT/grub.cfg with new UUID..."
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid" "Updating boot files with new UUID..."
 	else
 		display_error
 	fi
