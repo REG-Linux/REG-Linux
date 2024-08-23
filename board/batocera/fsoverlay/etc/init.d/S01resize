@@ -6,12 +6,24 @@ LOG="/tmp/resize.log"
 # only at start
 test "$1" != "start" && exit 0
 
-# true if triggers are not available or not set to do so
-if ! grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}" && ! grep -qE '^[ ]*format-internal[ ]*=' "${BOOTCONF}"; then
-	exit 0
-else
+TOTALSTEPS=0		# To help with progress bar
+CURRENTSTEP=0		# use multiples of 100 (100, 200, 300, etc., instead of 1, 2, 3, etc.)
+if grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
+	((TOTALSTEPS+=10))
+fi
+if grep -qE '^[ ]*format-internal[ ]*=' "${BOOTCONF}"; then
+	((TOTALSTEPS+=6))
+fi
+if grep -qE '^[ ]*newbootuuid[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
+	((TOTALSTEPS+=4))
+fi
+
+# Greater than 0 only if there is something to do
+if [ $TOTALSTEPS -gt 0 ]; then
 	# Plymouth changed for update
 	/usr/bin/plymouth change-mode --updates
+else
+	exit 0
 fi
 
 # Remove the trigger(s)
@@ -27,14 +39,14 @@ function plymouth_output() {
 	local percent="$1"
 	local text="$2"
 
-	/usr/bin/plymouth system-update --progress $percent
+	/usr/bin/plymouth system-update --progress "$percent"
 	/usr/bin/plymouth display-message --text="$text"
 }
 
 # Display error with timeout
 function display_error() {
 	/usr/bin/plymouth display-message --text="Resize Error - Please check the resize log at: /tmp/resize.log"
-    	exit 1
+	exit 1
 }
 
 # Executing parameters and watch background pid
@@ -59,9 +71,16 @@ function cmdoutput()
 	return $ret
 }
 
+# Edit given file with new boot partition UUID
+replaceuuid() {
+	mount -o remount,rw /boot
+	# First try to replace label=REGLINUX with uuid=*, just in case we are updating a very old disk
+	sed -i "s/label=REGLINUX/uuid=$NEWUUID/g;s/uuid=$OLDUUID/uuid=$NEWUUID/g" "$1"
+	mount -o remount,ro /boot
+}
+
 # only when resizing is wanted
 if grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
-	# --- BEGIN RESIZE ---
 
 	# /userdata partition
 	PART=$(batocera-part "share_internal")
@@ -73,69 +92,113 @@ if grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
 	echo "Disk = $DISK" >> "$LOG"
 
 	# partition table
-	TABLETYPE=$(parted -s ${DISK} print | grep 'Partition Table' | awk '{print $3}')
+	TABLETYPE=$(blkid -o value -s PTTYPE "${DISK}")
 	echo "Disk partition table type = $TABLETYPE" >> "$LOG"
 
+	((CURRENTSTEP+=100))
 	# if GPT, move backup data structures to the end of the disk
 	if [ "${TABLETYPE}" = "gpt" ]; then
 		echo "Moving 2nd GPT table to the end of the disk" >> "$LOG"
-		cmdoutput 10 "sgdisk -e ${DISK}" "Aligning GPT table..."
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "sgdisk -e ${DISK}" "Aligning GPT table..."
 	fi
 
 	# only for ext4
-	PARTTYPE=$(blkid "${PART}" | sed -e s+'^.* TYPE="\([^"]*\)\".*'+'\1'+)
+	PARTTYPE=$(blkid -o value -s TYPE "${PART}")
 	test "${PARTTYPE}" != "ext4" && exit 0
 	echo "Partition type = ${PARTTYPE}" >> "$LOG"
 
 	# resize the partition
 	echo "Resizing the partition to 100%" >> "$LOG"
-	cmdoutput 30 "parted -s -m -f ${DISK} resizepart ${PARTNUM} 100%" "Resizing partition..."
+	((CURRENTSTEP+=200))
+	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "parted -s -m -f ${DISK} resizepart ${PARTNUM} 100%" "Resizing partition..."
 
 	# update the kernel
 	echo "Updating the kernel" >> "$LOG"
-	cmdoutput 40 "partprobe ${DISK}" "Informing the Kernel..."
+	((CURRENTSTEP+=100))
+	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "partprobe ${DISK}" "Informing the Kernel..."
 
 	# check & resize the ext4 file system
 	if test "${PARTTYPE}" = "ext4";	then
 		echo "Checking ext4 file system" >> "$LOG"
-		cmdoutput 60 "e2fsck -f -p ${PART}" "Checking /userdata integrity..."
+		((CURRENTSTEP+=100))
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "e2fsck -f -p ${PART}" "Checking /userdata integrity..."
 
 		echo "Expanding ext4 the file system" >> "$LOG"
-		cmdoutput 70 "resize2fs ${PART}" "Expanding the file system..."
+		((CURRENTSTEP+=200))
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "resize2fs ${PART}" "Expanding the file system..."
 
 		echo "Checking ext4 file system" >> "$LOG"
-		cmdoutput 75 "e2fsck -f -p ${PART}" "Checking ext4 file system..."
+		((CURRENTSTEP+=100))
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "e2fsck -f -p ${PART}" "Checking ext4 file system..."
+	else
+		((CURRENTSTEP+=400))
 	fi
-
-	# finally disk sync
-	echo "Final sync" >> "$LOG"
-	cmdoutput 80 "sync" "Syncing disk data.............."
 
 	# remove the trigger
-	cmdoutput 90 "remove_trigger autoresize"  "Removing trigger..............."
-
-else
-	###### format internal share #####
-	FORMAT_INTERNAL_TYPE=$(grep -E '^[ ]*format-internal[ ]*=.*$' "${BOOTCONF}" | head -1 | sed -e s+"^[ ]*format-internal[ ]*=[ ]*\(.*\)[ ]*$"+"\1"+)
-	if test -n "${FORMAT_INTERNAL_TYPE}"; then
-		PART=$(batocera-part "share_internal")
-		case "${FORMAT_INTERNAL_TYPE}" in
-		"btrfs")
-		cmdoutput 50 "mkfs.btrfs -L SHARE -f ${PART}" "Formatting to btrfs..."
-		;;
-		"ext4")
-		cmdoutput 50 "mkfs.ext4 -L SHARE -q -F -F ${PART}" "Formatting to ext4..."
-		;;
-		"exfat")
-		cmdoutput 50 "mkfs.exfat -n SHARE ${PART}" "Formatting to exfat..."
-		;;
-		*)
-		# do nothing
-		esac
-		# remove the trigger
-		cmdoutput 90 "remove_trigger format-internal" "Removing trigger..."
-	fi
+	((CURRENTSTEP+=100))
+	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "remove_trigger autoresize" "Removing trigger..............."
 fi
+
+# format internal share if wanted
+FORMAT_INTERNAL_TYPE=$(grep -m 1 -E '^[ ]*format-internal[ ]*=.*$' "${BOOTCONF}" | sed -e "s+^[ ]*format-internal[ ]*=[ ]*\(.*\)[ ]*$+\1+")
+if test -n "${FORMAT_INTERNAL_TYPE}"; then
+	((CURRENTSTEP+=400))
+	PART=$(batocera-part "share_internal")
+	case "${FORMAT_INTERNAL_TYPE}" in
+	"btrfs")
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "mkfs.btrfs -L SHARE -f ${PART}" "Formatting to btrfs..."
+	;;
+	"ext4")
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "mkfs.ext4 -L SHARE -q -F -F ${PART}" "Formatting to ext4..."
+	;;
+	"exfat")
+		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "mkfs.exfat -n SHARE ${PART}" "Formatting to exfat..."
+	;;
+	*)
+		# do nothing
+	;;
+	esac
+	# remove the trigger
+	((CURRENTSTEP+=100))
+	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "remove_trigger format-internal" "Removing trigger..."
+fi
+
+
+# only when random UUID for boot partition is wanted (first boot)
+if grep -qE '^[ ]*newbootuuid[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
+
+	BOOTPART="$(/usr/bin/batocera-part boot)"
+	OLDUUID=$(blkid -c /dev/null -o value -s UUID "$BOOTPART")
+
+	echo "Changing UUID of boot partition to a new random UUID" >> "$LOG"
+	((CURRENTSTEP+=100))
+	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "fatlabel -i -r $BOOTPART" "Changing boot partition UUID..."
+	NEWUUID=$(blkid -c /dev/null -o value -s UUID "$BOOTPART")
+	echo "Previous UUID: $OLDUUID" >> "$LOG"
+	echo "Current UUID: $NEWUUID" >> "$LOG"
+
+	((CURRENTSTEP+=100))
+	if [ -n "$OLDUUID" ] && [ -n "$NEWUUID" ]
+	then
+		echo "Updating boot files with new UUID" >> "$LOG"
+		[ -f "/boot/extlinux/extlinux.conf" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/extlinux/extlinux.conf" "Updating /boot/extlinux/extlinux.conf with new UUID..."
+		[ -f "/boot/cmdline.txt" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/cmdline.txt" "Updating /boot/cmdline.txt with new UUID..."
+		[ -f "/boot/boot.ini" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/boot.ini" "Updating /boot/boot.ini with new UUID..."
+		[ -f "/boot/uEnv.txt" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/uEnv.txt" "Updating /boot/uEnv.txt with new UUID..."
+		[ -f "/boot/BOOT/grub.cfg" ] && cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "replaceuuid /boot/BOOT/grub.cfg" "Updating /boot/BOOT/grub.cfg with new UUID..."
+	else
+		display_error
+	fi
+
+	# remove the trigger
+	((CURRENTSTEP+=100))
+	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "remove_trigger newbootuuid" "Removing trigger..............."
+fi
+
+# finally disk sync
+echo "Final sync" >> "$LOG"
+((CURRENTSTEP+=50))
+cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "sync" "Syncing disk data.............."
 
 #Cleanup, restore screen, set progress of last item to 100%
 /usr/bin/plymouth system-update --progress 100
