@@ -43,6 +43,7 @@ mkdir -p "${REGLINUX_BINARIES_DIR}/images" || exit 1
 ##### build images #############
 SUFFIXVERSION=$(cat "${TARGET_DIR}/usr/share/batocera/batocera.version" | sed -e s+'^\([0-9\.]*\).*$'+'\1'+) # xx.yy version
 SUFFIXDATE=$(date +%Y%m%d)
+VFATUUID="$(date '+%d%m')-$(date '+%M%S')"
 
 #### build the images ###########
 for BATOCERA_PATHSUBTARGET in ${BATOCERA_IMAGES_TARGETS}
@@ -76,6 +77,13 @@ do
     GENIMAGEFILE="${GENIMAGEDIR}/genimage.cfg"
     FILES=$(find "${REGLINUX_BINARIES_DIR}/boot" -type f | sed -e s+"^${REGLINUX_BINARIES_DIR}/boot/\(.*\)$"+"file \1 \{ image = '\1' }"+ | tr '\n' '@')
     cat "${GENIMAGEFILE}" | sed -e s+'@files'+"${FILES}"+ | tr '@' '\n' > "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
+	# Include the UUID of boot partition in extraargs
+	sed -i "s/ -n REGLINUX/ -n REGLINUX -i ${VFATUUID//-}/g" "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
+	[ -f "${REGLINUX_BINARIES_DIR}/boot/extlinux/extlinux.conf" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/extlinux/extlinux.conf"
+	[ -f "${REGLINUX_BINARIES_DIR}/boot/cmdline.txt" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/cmdline.txt"
+	[ -f "${REGLINUX_BINARIES_DIR}/boot/boot.ini" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/boot.ini"
+	[ -f "${REGLINUX_BINARIES_DIR}/boot/uEnv.txt" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/uEnv.txt"
+	[ -f "${REGLINUX_BINARIES_DIR}/boot/BOOT/grub.cfg" ] && sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" "${REGLINUX_BINARIES_DIR}/boot/BOOT/grub.cfg"
 
     # install syslinux
     if grep -qE "^BR2_TARGET_SYSLINUX=y$" "${BR2_CONFIG}"
@@ -83,6 +91,8 @@ do
 	GENIMAGEBOOTFILE="${GENIMAGEDIR}/genimage-boot.cfg"
 	echo "installing syslinux" >&2
 	cat "${GENIMAGEBOOTFILE}" | sed -e s+'@files'+"${FILES}"+ | tr '@' '\n' > "${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" || exit 1
+	# Include the UUID of boot partition in extraargs
+	sed -i "s/ -n REGLINUX/ -n REGLINUX -i ${VFATUUID//-}/g" "${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" || exit 1
     genimage --rootpath="${TARGET_DIR}" --inputpath="${REGLINUX_BINARIES_DIR}/boot" --outputpath="${REGLINUX_BINARIES_DIR}" --config="${REGLINUX_BINARIES_DIR}/genimage-boot.cfg" --tmppath="${GENIMAGE_TMP}" || exit 1
     "${HOST_DIR}/bin/syslinux" -i "${REGLINUX_BINARIES_DIR}/boot.vfat" -d "/boot/syslinux" || exit 1
     # remove genimage temp path as sometimes genimage v14 fails to start
