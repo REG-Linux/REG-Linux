@@ -1,0 +1,8 @@
+config BR2_PACKAGE_LUNASVG
+	bool "lunasvg"
+
+	help
+	  LunaSVG is an SVG rendering library in C++, designed to be lightweight and portable, 
+	  offering efficient rendering and manipulation of Scalable Vector Graphics (SVG) files.
+
+	  https://github.com/sammycage/lunasvg
