@@ -91,49 +91,44 @@ if grep -qE '^[ ]*autoresize[ ]*=[ ]*true[ ]*$' "${BOOTCONF}"; then
 	DISK=$(batocera-part prefix "${PART}")
 	echo "Disk = $DISK" >> "$LOG"
 
-	# partition table
-	TABLETYPE=$(blkid -o value -s PTTYPE "${DISK}")
-	echo "Disk partition table type = $TABLETYPE" >> "$LOG"
-
-	((CURRENTSTEP+=100))
-	# if GPT, move backup data structures to the end of the disk
-	if [ "${TABLETYPE}" = "gpt" ]; then
-		echo "Moving 2nd GPT table to the end of the disk" >> "$LOG"
-		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "sgdisk -e ${DISK}" "Aligning GPT table..."
-	fi
-
 	# only for ext4
 	PARTTYPE=$(blkid -o value -s TYPE "${PART}")
-	test "${PARTTYPE}" != "ext4" && exit 0
 	echo "Partition type = ${PARTTYPE}" >> "$LOG"
+	if [ "${PARTTYPE}" = "ext4" ]; then
+        # partition table
+        TABLETYPE=$(blkid -o value -s PTTYPE "${DISK}")
+        echo "Disk partition table type = $TABLETYPE" >> "$LOG"
 
-	# resize the partition
-	echo "Resizing the partition to 100%" >> "$LOG"
-	((CURRENTSTEP+=200))
-	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "parted -s -m -f ${DISK} resizepart ${PARTNUM} 100%" "Resizing partition..."
+        # if GPT, move backup data structures to the end of the disk
+        ((CURRENTSTEP+=100))
+        if [ "${TABLETYPE}" = "gpt" ]; then
+            echo "Moving 2nd GPT table to the end of the disk" >> "$LOG"
+            cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "sgdisk -e ${DISK}" "Aligning GPT table..."
+        fi
 
-	# update the kernel
-	echo "Updating the kernel" >> "$LOG"
-	((CURRENTSTEP+=100))
-	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "partprobe ${DISK}" "Informing the Kernel..."
+        # resize the partition
+        echo "Resizing the partition to 100%" >> "$LOG"
+        ((CURRENTSTEP+=200))
+        cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "parted -s -m -f ${DISK} resizepart ${PARTNUM} 100%" "Resizing partition..."
 
-	# check & resize the ext4 file system
-	if test "${PARTTYPE}" = "ext4";	then
-		echo "Checking ext4 file system" >> "$LOG"
-		((CURRENTSTEP+=100))
-		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "e2fsck -f -p ${PART}" "Checking /userdata integrity..."
+        # update the kernel
+        echo "Updating the kernel" >> "$LOG"
+        ((CURRENTSTEP+=100))
+        cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "partprobe ${DISK}" "Informing the Kernel..."
 
-		echo "Expanding ext4 the file system" >> "$LOG"
-		((CURRENTSTEP+=200))
-		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "resize2fs ${PART}" "Expanding the file system..."
+        # check & resize the ext4 file system
+        echo "Checking ext4 file system" >> "$LOG"
+        ((CURRENTSTEP+=100))
+        cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "e2fsck -f -p ${PART}" "Checking /userdata integrity..."
 
-		echo "Checking ext4 file system" >> "$LOG"
-		((CURRENTSTEP+=100))
-		cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "e2fsck -f -p ${PART}" "Checking ext4 file system..."
-	else
-		((CURRENTSTEP+=400))
-	fi
+        echo "Expanding ext4 the file system" >> "$LOG"
+        ((CURRENTSTEP+=200))
+        cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "resize2fs ${PART}" "Expanding the file system..."
 
+        echo "Checking ext4 file system" >> "$LOG"
+        ((CURRENTSTEP+=100))
+        cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "e2fsck -f -p ${PART}" "Checking ext4 file system..."
+    fi
 	# remove the trigger
 	((CURRENTSTEP+=100))
 	cmdoutput $((CURRENTSTEP / TOTALSTEPS)) "remove_trigger autoresize" "Removing trigger..............."
@@ -141,7 +136,7 @@ fi
 
 # format internal share if wanted
 FORMAT_INTERNAL_TYPE=$(grep -m 1 -E '^[ ]*format-internal[ ]*=.*$' "${BOOTCONF}" | sed -e "s+^[ ]*format-internal[ ]*=[ ]*\(.*\)[ ]*$+\1+")
-if test -n "${FORMAT_INTERNAL_TYPE}"; then
+if [ -n "${FORMAT_INTERNAL_TYPE}" ]; then
 	((CURRENTSTEP+=400))
 	PART=$(batocera-part "share_internal")
 	case "${FORMAT_INTERNAL_TYPE}" in
