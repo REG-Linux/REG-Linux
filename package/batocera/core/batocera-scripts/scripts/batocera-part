@@ -61,13 +61,13 @@ determine_previous_part() {
   XPART=$(echo "${1}" | sed -e s+'^.*\([0-9]\)$'+'\1'+)
 
   # check that it is a number
-  if ! echo "${XPART}" | grep -qE '^[0-9]$'
+  if echo "${XPART}" | grep -qE '^[0-9]$'
   then
+    XPREVPART=$((XPART - 1))
+    echo "${PART}" | sed -e s+"${XPART}$"+"${XPREVPART}"+
+  else
     exit 1
   fi
-
-  XPREVPART=$((XPART - 1))
-  echo "${PART}" | sed -e s+"${XPART}$"+"${XPREVPART}"+
 }
 
 PARTNAME=$1
