@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-YQUAKE2_ZAERO_VERSION = 24844dc176adb6b6cf4e899f30935595bc6df715
+YQUAKE2_ZAERO_VERSION = b3e169bac65834e21fbb510391653de9d238b8ec
 YQUAKE2_ZAERO_SITE = https://github.com/yquake2/zaero.git
 YQUAKE2_ZAERO_SITE_METHOD = git
 YQUAKE2_ZAERO_DEPENDENCIES = sdl2
