@@ -1,0 +1,46 @@
+--- a/hiro/GNUmakefile	2024-08-28 13:21:13.740204423 +0200
++++ b/hiro/GNUmakefile	2024-08-28 13:22:05.489426921 +0200
+@@ -51,26 +51,26 @@
+ 
+   ifeq ($(hiro),gtk2)
+     hiro.flags   = $(flags.cpp) -DHIRO_GTK=2 $(shell $(pkg_config) --cflags gtk+-2.0) -Wno-deprecated-declarations
+-    hiro.options = -L/usr/local/lib -lX11 $(shell $(pkg_config) --libs gtk+-2.0)
++    hiro.options = -lX11 $(shell $(pkg_config) --libs gtk+-2.0)
+   else ifeq ($(hiro),gtk2-se)
+     flags       += -DHiro_SourceEdit
+     hiro.flags   = $(flags.cpp) -DHIRO_GTK=2 $(shell $(pkg_config) --cflags gtk+-2.0 gtksourceview-2.0) -Wno-deprecated-declarations
+-    hiro.options = -L/usr/local/lib -lX11 $(shell $(pkg_config) --libs gtk+-2.0 gtksourceview-2.0)
++    hiro.options = -lX11 $(shell $(pkg_config) --libs gtk+-2.0 gtksourceview-2.0)
+   else ifeq ($(hiro),gtk3)
+     hiro.flags   = $(flags.cpp) -DHIRO_GTK=3 $(shell $(pkg_config) --cflags gtk+-3.0) -Wno-deprecated-declarations
+-    hiro.options = -L/usr/local/lib -lX11 $(shell $(pkg_config) --libs gtk+-3.0)
++    hiro.options = -lX11 $(shell $(pkg_config) --libs gtk+-3.0)
+   else ifeq ($(hiro),gtk3-se)
+     flags       += -DHiro_SourceEdit
+     hiro.flags   = $(flags.cpp) -DHIRO_GTK=3 $(shell $(pkg_config) --cflags gtk+-3.0 gtksourceview-3.0) -Wno-deprecated-declarations
+-    hiro.options = -L/usr/local/lib -lX11 $(shell $(pkg_config) --libs gtk+-3.0 gtksourceview-3.0)
++    hiro.options = -lX11 $(shell $(pkg_config) --libs gtk+-3.0 gtksourceview-3.0)
+   else ifeq ($(hiro),qt4)
+     moc = /usr/local/lib/qt4/bin/moc
+     hiro.flags   = $(flags.cpp) -DHIRO_QT=4 $(shell $(pkg_config) --cflags QtCore QtGui)
+-    hiro.options = -L/usr/local/lib -lX11 $(shell $(pkg_config) --libs QtCore QtGui)
++    hiro.options = -lX11 $(shell $(pkg_config) --libs QtCore QtGui)
+   else ifeq ($(hiro),qt5)
+     moc = $(shell $(pkg_config) --variable=host_bins Qt5Core)/moc
+     hiro.flags   = $(flags.cpp) -DHIRO_QT=5 -fPIC $(shell $(pkg_config) --cflags Qt5Core Qt5Gui Qt5Widgets)
+-    hiro.options = -L/usr/local/lib -lX11 $(shell $(pkg_config) --libs Qt5Core Qt5Gui Qt5Widgets)
++    hiro.options = -lX11 $(shell $(pkg_config) --libs Qt5Core Qt5Gui Qt5Widgets)
+   else
+     $(error unrecognized hiro backend $(hiro))
+   endif
+--- a/nall/GNUmakefile	2024-08-27 18:37:58.000000000 +0200
++++ b/nall/GNUmakefile	2024-08-28 13:26:46.011035481 +0200
+@@ -318,7 +318,7 @@
+ 
+ # linux settings
+ ifeq ($(platform),linux)
+-  options += -ldl
++  options += -ldl -lm -lstdc++
+ endif
+ 
+ # bsd settings
