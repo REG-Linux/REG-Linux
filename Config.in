@@ -549,6 +549,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/mininit/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/86Box/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/ares/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box86/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/box64/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/cemu/Config.in"
