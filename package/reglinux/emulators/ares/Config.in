@@ -1,0 +1,12 @@
+config BR2_PACKAGE_ARES
+    bool "ares"
+    select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_ZLIB
+    depends on BR2_PACKAGE_HAS_LIBGL
+  
+    help
+      ares is a cross-platform, open source, multi-system emulator, focusing on accuracy and preservation.
+
+      https://ares-emu.net/
+
+
