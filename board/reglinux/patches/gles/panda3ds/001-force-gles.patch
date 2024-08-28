@@ -1,0 +1,15 @@
+--- a/CMakeLists.txt	2024-08-29 00:18:08.009439520 +0200
++++ b/CMakeLists.txt	2024-08-29 00:18:49.287239929 +0200
+@@ -33,11 +33,7 @@
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-interference-size")
+ endif() 
+ 
+-if(ANDROID)
+-    set(DEFAULT_OPENGL_PROFILE OpenGLES)
+-else()
+-    set(DEFAULT_OPENGL_PROFILE OpenGL)
+-endif()
++set(DEFAULT_OPENGL_PROFILE OpenGLES)
+ 
+ option(DISABLE_PANIC_DEV "Make a build with fewer and less intrusive asserts" ON)
+ option(GPU_DEBUG_INFO "Enable additional GPU debugging info" OFF)
