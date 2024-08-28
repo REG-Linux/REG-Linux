@@ -1,0 +1,11 @@
+--- a/src/core/cpu_newrec_compiler_riscv64.cpp	2024-08-25 16:35:56.000000000 +0200
++++ b/src/core/cpu_newrec_compiler_riscv64.cpp	2024-08-28 15:03:31.699595540 +0200
+@@ -249,7 +249,7 @@
+     // Downcount isn't set on entry, so we need to initialize it
+     rvMoveAddressToReg(rvAsm, RARG1, TimingEvents::GetHeadEventPtr());
+     rvAsm->LD(RARG1, 0, RARG1);
+-    rvAsm->LW(RARG1, OFFSETOF(TimingEvent, m_downcount), RARG1);
++    // HACK rvAsm->LW(RARG1, OFFSETOF(TimingEvent, m_downcount), RARG1);
+     rvAsm->SW(RARG1, PTR(&g_state.downcount));
+ 
+     // Fall through to event dispatcher
