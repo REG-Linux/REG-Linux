@@ -1,8 +1,0 @@
---- a/src/asahi/clc/meson.build	2024-03-30 21:36:53.833692810 +0100
-+++ b/src/asahi/clc/meson.build	2024-03-30 21:36:58.965804589 +0100
-@@ -9,5 +9,4 @@
-   c_args : [pre_args, no_override_init_args],
-   link_args : [ld_args_build_id],
-   dependencies : [idep_mesaclc, dep_llvm, dep_spirv_tools, idep_nir],
--  native : true,
- )
