@@ -368,7 +368,6 @@ menu "Emulators"
   endmenu
 
   menu "ports"
-    source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/devilutionx/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/sdlpop/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/cannonball/Config.in"
     source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/ports/ecwolf/Config.in"
@@ -569,6 +568,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/emulators/libretro/libretro-geolith/Config.in"
 
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/cgenius/Config.in"
+  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/devilutionx/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/dhewm3/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/dxx-rebirth/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/ports/etlegacy/Config.in"
