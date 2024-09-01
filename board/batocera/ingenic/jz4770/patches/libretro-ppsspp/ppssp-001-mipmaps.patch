@@ -1,0 +1,11 @@
+--- a/Common/GPU/Vulkan/VulkanImage.h	2024-02-04 14:08:02.000000000 +0100
++++ b/Common/GPU/Vulkan/VulkanImage.h	2024-06-02 17:56:07.923090644 +0200
+@@ -12,7 +12,7 @@
+ struct TextureCopyBatch {
+ 	std::vector<VkBufferImageCopy> copies;
+ 	VkBuffer buffer = VK_NULL_HANDLE;
+-	void reserve(size_t mips) { copies.reserve(mips); }
++	void reserve(size_t mipmaps) { copies.reserve(mipmaps); }
+ 	bool empty() const { return copies.empty(); }
+ };
+ 
