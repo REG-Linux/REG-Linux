@@ -5,9 +5,9 @@
 ################################################################################
 
 ifeq ($(BR2_x86_64),y)
-AMIBERRY_VERSION = preview-v6.3.3
+AMIBERRY_VERSION = preview-v6.3.4
 else
-AMIBERRY_VERSION = v5.7.3
+AMIBERRY_VERSION = v5.7.4
 endif
 AMIBERRY_SITE = $(call github,BlitterStudio,amiberry,$(AMIBERRY_VERSION))
 AMIBERRY_LICENSE = GPLv3
