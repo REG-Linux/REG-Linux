@@ -1,0 +1,56 @@
+--- a/Common/MipsCPUDetect.cpp	2024-06-02 18:00:22.072506198 +0200
++++ b/Common/MipsCPUDetect.cpp	2024-06-02 18:01:00.805329924 +0200
+@@ -37,7 +37,7 @@
+ 	std::string cpu_string = "Unknown";
+ 
+ 	std::string procdata;
+-	if (!File::ReadSysTextFileToString(procfile, &procdata))
++	if (!File::ReadSysTextFileToString(Path(procfile), &procdata))
+ 		return cpu_string;
+ 	std::istringstream file(procdata);
+ 	
+@@ -59,7 +59,7 @@
+ 	unsigned char implementer = 0;
+ 
+ 	std::string procdata;
+-	if (!File::ReadSysTextFileToString(procfile, &procdata))
++	if (!File::ReadSysTextFileToString(Path(procfile), &procdata))
+ 		return 0;
+ 	std::istringstream file(procdata);
+ 
+@@ -82,7 +82,7 @@
+ 	unsigned short part = 0;
+ 
+ 	std::string procdata;
+-	if (!File::ReadSysTextFileToString(procfile, &procdata))
++	if (!File::ReadSysTextFileToString(Path(procfile), &procdata))
+ 		return 0;
+ 	std::istringstream file(procdata);
+ 
+@@ -104,7 +104,7 @@
+ 	std::string line, marker = "ASEs implemented\t: ";
+ 
+ 	std::string procdata;
+-	if (!File::ReadSysTextFileToString(procfile, &procdata))
++	if (!File::ReadSysTextFileToString(Path(procfile), &procdata))
+ 		return false;
+ 	std::istringstream file(procdata);
+ 	
+@@ -131,7 +131,7 @@
+ 	int cores = 1;
+ 
+ 	std::string presentData;
+-	bool presentSuccess = File::ReadSysTextFileToString(syscpupresentfile, &presentData);
++	bool presentSuccess = File::ReadSysTextFileToString(Path(syscpupresentfile), &presentData);
+ 	std::istringstream presentFile(presentData);
+ 
+ 	if (presentSuccess) {
+@@ -145,7 +145,7 @@
+ 	}
+ 
+ 	std::string procdata;
+-	if (!File::ReadSysTextFileToString(procfile, &procdata))
++	if (!File::ReadSysTextFileToString(Path(procfile), &procdata))
+ 		return 1;
+ 	std::istringstream file(procdata);
+ 	

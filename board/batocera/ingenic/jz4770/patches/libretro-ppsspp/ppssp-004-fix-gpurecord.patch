@@ -1,0 +1,21 @@
+--- a/GPU/Debugger/Record.cpp	2024-09-01 18:35:33.798497559 +0200
++++ b/GPU/Debugger/Record.cpp	2024-09-01 18:37:33.376370307 +0200
+@@ -410,6 +410,9 @@
+ 	return flags;
+ }
+ 
++#pragma GCC push_options
++#pragma GCC optimize ("O0")
++
+ static void EmitTextureData(int level, u32 texaddr) {
+ 	GETextureFormat format = gstate.getTextureFormat();
+ 	int w = gstate.getTextureWidth(level);
+@@ -468,6 +471,8 @@
+ 	}
+ }
+ 
++#pragma GCC pop_options
++
+ static void FlushPrimState(int vcount) {
+ 	// TODO: Eventually, how do we handle texturing from framebuf/zbuf?
+ 	// TODO: Do we need to preload color/depth/stencil (in case from last frame)?
