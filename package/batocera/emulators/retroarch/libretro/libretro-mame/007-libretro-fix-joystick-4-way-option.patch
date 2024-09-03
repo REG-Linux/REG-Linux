@@ -1,0 +1,24 @@
+From 8b9b8f5f5b47161327d93522318c81fba2087b2f Mon Sep 17 00:00:00 2001
+From: sonninnos <45124675+sonninnos@users.noreply.github.com>
+Date: Sat, 31 Aug 2024 15:37:25 +0300
+Subject: [PATCH] Fix 4way joystick option (#495)
+
+---
+ src/osd/libretro/libretro-internal/libretro_core_options.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/osd/libretro/libretro-internal/libretro_core_options.h b/src/osd/libretro/libretro-internal/libretro_core_options.h
+index 752deafe9c725..bba154a65e02e 100644
+--- a/src/osd/libretro/libretro-internal/libretro_core_options.h
++++ b/src/osd/libretro/libretro-internal/libretro_core_options.h
+@@ -377,7 +377,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
+       "input",
+       {
+          { "disabled", NULL },
+-         { "enabled",  NULL },
++         { "4way",     NULL },
++         { "strict",   NULL },
++         { "qbert",    NULL },
+          { NULL, NULL },
+       },
+       "disabled"
