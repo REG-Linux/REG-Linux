@@ -3,8 +3,8 @@
 # dolphin-emu
 #
 ################################################################################
-# Version: 2407
-DOLPHIN_EMU_VERSION = 2407
+# Version: 2409
+DOLPHIN_EMU_VERSION = 2409
 DOLPHIN_EMU_SITE = https://github.com/dolphin-emu/dolphin
 DOLPHIN_EMU_SITE_METHOD = git
 DOLPHIN_EMU_LICENSE = GPLv2+
@@ -50,7 +50,7 @@ endif
 
 define DOLPHIN_EMU_EVMAPY
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/dolphin-emu/*.keys \
+    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/dolphin-emu/*.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
