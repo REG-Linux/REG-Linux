@@ -38,7 +38,7 @@ index 0000000..f619679
 +                "lsscsi" "lzcat" "mkdir" "mkpasswd" "mount" "mv" "nl"
 +                "nproc" "nsenter" "paste" "readlink" "resume" "rm"
 +                "setfattr" "setpriv" "sh" "shred" "sleep" "ssl_client"
-+                "svc" "svok" "test" "tree""ts" "tsort" "umount"
++                "svc" "svok" "test" "touch" "tree""ts" "tsort" "umount"
 +                 "unshare" "xxd" "xzcat" "zcat")
 +    local _sbin=("fbsplash" "fsfreeze" "i2ctransfer" "ifdown" "ifup"
 +                "ipneigh" "mim" "mkdosfs" "mke2fs" "nologin" "partprobe"
