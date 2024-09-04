@@ -14,7 +14,7 @@ test -e "/userdata/system/configs/emulationstation/es_systems.cfg" && FIND_CUSTO
 FIND_CUSTOMESFEATURES=
 test -e "/userdata/system/configs/emulationstation/es_features.cfg" && FIND_CUSTOMESFEATURES=1
 
-FIND_CUSTOMSERVICES=$(batocera-services list user | grep '\*$' | head -1)
+FIND_CUSTOMSERVICES=$(batocera-services list user | grep -m 1 '\*$')
 
 FIND_PRO=
 test -e "/userdata/system/pro" && FIND_PRO=1
@@ -37,5 +37,8 @@ then
 	echo "${EXTRA}"
     fi
 else
-    cat /usr/share/batocera/batocera.version | sed -e s+"^\([0-9]*\)"+"\1${EXTRA}"+
+    REGversion=$(cat /usr/share/batocera/batocera.version)
+    [ -z "$REGversion" ] && REGversion="UNKNOWN"
+    [ -n "${EXTRA}" ] && EXTRA="-${EXTRA}"
+    echo "${REGversion%% *}${EXTRA}"
 fi

@@ -6,7 +6,14 @@
 
 BATOCERA_SYSTEM_SOURCE=
 
-BATOCERA_SYSTEM_VERSION = 24.08-dev
+# stable builds: YY.MM.[0-9]      (after build will be similar to: 24.08.0 2024/08/30 18:53)
+# beta builds:   YY.MM-beta-[1-9] (after build will be similar to: 24.08-beta-1 2024/08/30 18:53)
+# dev builds:    YY.MM-dev        (after build will be similar to: 24.08-dev-6addb24a75 2024/08/28 18:53)
+
+### Beta release MUST BE marked as "prerelease" ( tag is version = YY.MM-beta-[1-9] )
+### Stable release must be marked as "latest" ( tag is version = YY.MM.[0-9] )
+
+BATOCERA_SYSTEM_VERSION = 24.09-dev
 BATOCERA_SYSTEM_DATE_TIME = $(shell date "+%Y/%m/%d %H:%M")
 BATOCERA_SYSTEM_DATE = $(shell date "+%Y/%m/%d")
 BATOCERA_SYSTEM_DEPENDENCIES = tzdata
