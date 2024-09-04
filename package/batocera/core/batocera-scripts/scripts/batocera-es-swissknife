@@ -1,18 +1,8 @@
 #!/bin/bash
 #
-# Script for BATOCERA to terminate every emulator instance
+# Script for REG-Linux to terminate every emulator instance
 # or to give feedback about state of EmulationStation and active EMULATORS
 # or to give some basic info about your build
-# by cyperghost aka crcerror // 18.03.2019
-# Batocera versions // 04.06.2019
-# Added /bin/usr script // 22.09.2019
-# Added sigterm level, added second parameter to activate sigterm during smart_wait function
-# Added architecture and version information // 05.01.2020
-# Added update information + butterfly branch // 10.02.2020
-# Added --reboot // 26.02.2020
-# Added --overlay and --remount // 13.04.2020
-# Updated version detection only depended from build-date and build-time now
-# Added --reset-ra to reset all settings from RetroArch cores // 27.06.2021
 
 # Get all childpids from calling process
 function getcpid() {
@@ -77,11 +67,6 @@ function emu_kill() {
     fi
 }
 
-# Future proof update check, depends just on build-date and build-time
-function version_update() {
-    echo "$1" | awk '{ $0=$(NF-1)$NF; gsub(/[^0-9]/,""); print }'
-}
-
 # ---- MAINS ----
 
 case ${1,,} in
@@ -119,37 +104,26 @@ case ${1,,} in
     ;;
 
     --version|--arch|--update)
-        [[ ${2,,} == "butterfly" ]] && BRANCH=butterfly || BRANCH=stable
-        if [[ -f /usr/share/batocera/batocera.version ]]; then
-            VER=$(cat /usr/share/batocera/batocera.version)
-            ret=$?
-        else
-            VER="UNKNOWN"
-            ret=1
-        fi
+        [[ ${2,,} == "beta" ]] && BRANCH=beta || BRANCH=stable
+        VER=$(batocera-version)
+        ret=$?
 
         if [[ -f /boot/boot/batocera.board ]]; then
             BOARD=$(cat /boot/boot/batocera.board)
             ret=$?
-            test "${BOARD}" = "rpi4" && BOARD=rpi464 # "temporarily" download on rpi464 for rpi4
         else
             BOARD="UNKNOWN"
             ret=1
         fi
 
         if [[ "${1,,}" == "--update" && $ret -eq 0 ]]; then
-            URL="https://updates.reglinux.org/$BOARD/$BRANCH/last/batocera.version"
-            NET_VERSION=$(wget -q -O - "$URL")
-            [[ $? -eq 0 ]] || NET_VERSION="Connection failed!"
-            NET_VER=$(echo "$NET_VER" | head -n1)
+            NET_VERSION=$(batocera-config canupdate)
+            ret=$?
             echo "Installed:   $VER"
             echo "Webversion:  $NET_VERSION"
-            echo "Update URL:  $(dirname $URL)"
-            echo "Branch:      ${BRANCH^^}-branch searched"
             echo "Used arch:   $BOARD"
-            if [[ $(version_update "$VER") -lt $(version_update "$NET_VERSION") ]]; then
+            if [[ $ret -eq 0 ]]; then
                 echo "Status:      Possible Update found!"
-                ret=0
             else
                 echo "Status:      No Update found!"
                 ret=1
@@ -223,7 +197,7 @@ case ${1,,} in
 		  --arch     Shows current architecture running
 		  --version  Shows current version of BATOCERA running
 		  --update   Shows possible update for your install
-		      default: stable, you can type --update butterfly
+		      default: stable, you can type --update beta
 
 		  --overlay  will try to backup your overlay file
 		  --remount  toggle write access to <dir>, default /boot
