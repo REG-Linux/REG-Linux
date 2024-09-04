@@ -3,8 +3,8 @@
 # 86Box emulator
 #
 ################################################################################
-# Version.: Release on Jul 25, 2024
-86BOX_VERSION = v4.2
+# Version.: Release on Sep 1, 2024
+86BOX_VERSION = v4.2.1
 86BOX_SITE = https://github.com/86Box/86Box
 86BOX_SITE_METHOD=git
 86BOX_LICENSE = GPLv3
@@ -15,7 +15,7 @@
 # Disable QT if we don't have it
 ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
 86BOX_CONF_OPTS += -DQT=ON -DUSE_QT6=ON
-86BOX_DEPENDENCIES = reglinux-qt6
+86BOX_DEPENDENCIES += reglinux-qt6
 else
 86BOX_CONF_OPTS += -DQT=OFF
 endif
