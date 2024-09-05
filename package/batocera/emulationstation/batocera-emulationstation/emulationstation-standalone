@@ -118,7 +118,7 @@ do
 	user_output2="$(batocera-settings-get global.videooutput2)"
 	if test "${user_output2}" != "none"
 	then
-	    settings_output2=$(batocera-resolution listOutputs | grep -vE "^${settings_output}$" | head -1)
+	    settings_output2=$(batocera-resolution listOutputs | grep -m 1 -vE "^${settings_output}$")
 	fi
     fi
 

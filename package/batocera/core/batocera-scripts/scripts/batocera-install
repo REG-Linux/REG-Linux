@@ -133,7 +133,7 @@ do_install() {
 	mkdir -p "${IMGFOLDER}/${INSARCH}" || return 1
 
 	# url
-	RELATIVPATH=$(wget -qO - "${updateurl}/installs.txt" | grep -E "^${INSARCH}/" | head -1)
+	RELATIVPATH=$(wget -qO - "${updateurl}/installs.txt" | grep -m 1 -E "^${INSARCH}/")
 	FILEBASENAME=$(basename "${RELATIVPATH}")
 	INSIMG="${IMGFOLDER}/${INSARCH}/${FILEBASENAME}"
 	test -z "${RELATIVPATH}" && return 1
