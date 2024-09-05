@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-REGLINUX_RESCUE_VERSION = 0.4
-REGLINUX_RESCUE_DATE = 20240607
+REGLINUX_RESCUE_VERSION = 0.5
+REGLINUX_RESCUE_DATE = 20240905
 REGLINUX_RESCUE_ARCH = ""
 ifeq ($(BR2_aarch64),y)
 REGLINUX_RESCUE_ARCH = aarch64
@@ -16,9 +16,9 @@ REGLINUX_RESCUE_ARCH = mipsel
 else ifeq ($(BR2_x86_64),y)
 REGLINUX_RESCUE_ARCH = x86_64
 else ifeq ($(BR2_arm),y)
-REGLINUX_RESCUE_ARCH = armhf
-ifeq ($(BR2_ARM_CPU_ARMV7A),y)
 REGLINUX_RESCUE_ARCH = armv7
+ifeq ($(BR2_ARM_EABIHF),y)
+REGLINUX_RESCUE_ARCH = armhf
 endif
 endif
 

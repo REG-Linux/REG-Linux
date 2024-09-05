@@ -168,8 +168,13 @@ do_format_internal() {
 	then
             sed -i "s|^[ #]*format-internal[ ]*=.*$|format-internal=${PARTTYPE}|g" "${CONFIGBOOT}"
         else
+            echo >> "${CONFIGBOOT}"     # Just in case CONFIGBOOT does nor end with new line 
             echo "format-internal=${PARTTYPE}" >> "${CONFIGBOOT}"
         fi
+
+        # Trigger REG_UPDATE to do format on next boot
+        touch /boot/REG_UPDATE
+
 	mount -o remount,ro /boot
 	echo "the formatting will be done at next boot"
 	return 69 # 69 is the reboot code to es
