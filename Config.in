@@ -540,7 +540,6 @@ endmenu
 
 menu "REG.linux"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/plymouth/Config.in"
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/reglinux-initramfs/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/uboot-bananapi-f3/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/uboot-tinkerboard2/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/boot/ubiboot/Config.in"
