@@ -1,8 +1,0 @@
-config BR2_PACKAGE_REGLINUX_INITRAMFS
-	bool "REG-Linux initramfs"
-	select BR2_PACKAGE_HOST_UBOOT_TOOLS
-	default n
-	help
-	  A simple initramfs based on busybox.
-
-	  http://busybox.net/
