@@ -14,7 +14,7 @@ rs_current() {
 # while it could be mounting over the batocera subdirectory or something else
 # we try to use an existing mount point because ntfs-3g doesn't support multiple mount points
 rs_mounted_point() {
-    grep -E "^${1} /media/usb" /proc/mounts | cut -d' ' -f 2 | grep -E '^/media/usb[0-9]$' | head -1
+    grep -E "^${1} /media/usb" /proc/mounts | cut -d' ' -f 2 | grep -m 1 -E '^/media/usb[0-9]$'
 }
 
 rs_list() {

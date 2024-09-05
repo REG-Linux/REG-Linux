@@ -39,10 +39,6 @@ determine_default_share_part_num() {
   fi
 }
 
-determine_share_part() {
-    determine_X_part "/userdata"
-}
-
 determine_part_prefix() {
   # /dev/mmcblk0p3 => /dev/mmcblk0
   # /dev/sda1      => /dev/sda
@@ -86,21 +82,18 @@ case "${PARTNAME}" in
   ;;
 
   "share")
-    determine_share_part
+    determine_X_part "/userdata"
   ;;
 
   "prefix")
     determine_part_prefix "$2"
   ;;
 
-  "previous")
-    determine_previous_part "$2"
-  ;;
-
   *)
-    echo "${0} <boot|share_internal|prefix x|previous x>" >&2
+    echo "${0} <boot|share_internal|share_internal_num|prefix x|previous x>" >&2
     echo "  boot: the REG Linux boot partition" >&2
     echo "  share_internal: the REG Linux share internal partition " >&2
+    echo "  share_internal_num: the number of share_internal partition" >&2
     echo "  share: the REG Linux share partition " >&2
     echo "  prefix x: the disk of the partition x (without the partition number)" >&2
     echo "  previous x: the partition before x on the same disk" >&2

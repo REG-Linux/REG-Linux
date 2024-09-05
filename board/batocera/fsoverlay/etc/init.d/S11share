@@ -29,9 +29,9 @@ printf "Starting share: "
 
 SHARECONFFILE="/boot/batocera-boot.conf"
 INTERNALDEVICE=$(batocera-part "share_internal")
-INTERNALDEVICETYPE=$(blkid "${INTERNALDEVICE}" | sed -e s+'^.* TYPE="\([^"]*\)\".*'+'\1'+)
+INTERNALDEVICETYPE=$(blkid -o value -s TYPE "${INTERNALDEVICE}")
 
-SHAREDEVICE=$(cat "${SHARECONFFILE}" | grep -E '^[ ]*sharedevice=' | head -n1 | cut -d'=' -f2)
+SHAREDEVICE=$(cat "${SHARECONFFILE}" | grep -m 1 -E '^[ ]*sharedevice=' | cut -d'=' -f2)
 [ "$?" -ne "0" -o "$SHAREDEVICE" = "" ] && SHAREDEVICE=INTERNAL
 
 getMaxTryConfig() {
@@ -290,12 +290,12 @@ fi
 
 case "${MODE}" in
     "DEV")
-        LDEVICE=$(blkid | grep " UUID=\"${UUID}\"" | head -1)
+        LDEVICE=$(blkid | grep -m 1 " UUID=\"${UUID}\"")
         while [ -z "${LDEVICE}" -a "${NTRY}" -lt "${MAXTRY}" ] # wait the device that can take some seconds after udev started
         do
             NTRY=$((NTRY+1))
             sleep 1
-            LDEVICE=$(blkid | grep " UUID=\"${UUID}\"" | head -1)
+            LDEVICE=$(blkid | grep -m 1 " UUID=\"${UUID}\"")
         done
         DEVICE=$(echo "${LDEVICE}" | sed -e s+'^\([^:]*\):.*$'+'\1'+)
         TDEVICE=$(echo "${LDEVICE}" | sed -e s+'^.* TYPE="\([^"]*\)".*$'+'\1'+)
@@ -308,7 +308,7 @@ case "${MODE}" in
         do
             NTRY=$((NTRY+1))
             sleep 1
-            LDEVICE=$(blkid | grep -vE "^${PARTPREFIX}" | head -1)
+            LDEVICE=$(blkid | grep -m 1 -vE "^${PARTPREFIX}")
         done
         DEVICE=$(echo "${LDEVICE}" | sed -e s+'^\([^:]*\):.*$'+'\1'+)
         TDEVICE=$(echo "${LDEVICE}" | sed -e s+'^.* TYPE="\([^"]*\)".*$'+'\1'+)
