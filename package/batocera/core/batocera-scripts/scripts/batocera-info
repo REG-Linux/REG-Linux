@@ -70,7 +70,7 @@ fi
 V_BOARD=$(cat /boot/boot/batocera.board)
 V_CPUNB=$(LANG=C lscpu | grep 'Core(s) per socket' | awk '{print $4}' | head -n 1)
 V_CPUMAXNB=$(LANG=C lscpu | grep '^CPU(s):' | awk '{print $2}')
-V_CPUMODEL1=$(grep -E $'^model name\t:' /proc/cpuinfo | head -1 | sed -e s+'^model name\t: '++)
+V_CPUMODEL1=$(grep -m 1 -E $'^model name\t:' /proc/cpuinfo | sed -e s+'^model name\t: '++)
 V_SYSTEM=$(uname -rs)
 # min freq : minimum freq among the max cpus ; consider only online cpus
 V_CPUMINFREQ=$(for CPU in /sys/devices/system/cpu/cpu*; do getCpu "${CPU}"; done | sort -n  | head -1)
@@ -98,7 +98,7 @@ if [ "$V_BOARD" != "$V_ARCH" ]; then
 fi
 
 if echo "${V_BOARD}" | grep -qE "^rpi[0-9]$"; then
-    REVISION=$(grep -E $'^Revision\t:' /proc/cpuinfo | head -1 | sed -e s+'^Revision\t: '++)
+    REVISION=$(grep -m 1 -E $'^Revision\t:' /proc/cpuinfo  | sed -e s+'^Revision\t: '++)
     test -n "${REVISION}" && echo "Revision: ${REVISION}"
 fi
 

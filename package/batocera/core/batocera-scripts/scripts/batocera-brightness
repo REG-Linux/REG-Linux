@@ -1,6 +1,6 @@
 #!/bin/sh
 
-D=$(find /sys/class/backlight/* 2>/dev/null | grep backlight | head -n1)
+D=$(find /sys/class/backlight/* 2>/dev/null | grep -m 1 backlight)
 CYCLESTEP=20 # % additional brightbess at each step
 
 if test ! -e "${D}"/brightness
