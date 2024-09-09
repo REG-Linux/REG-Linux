@@ -36,6 +36,45 @@ do_badgeines() {
     done
 }
 
+do_download() {
+    UPGRADEFILE="${UPGRADEFOLDER}/boot-${board}.tar.zst"
+    # Make sure upgrade folder does not have other updates leftovers
+    rm -rf "${UPGRADEFOLDER}"
+    mkdir -p "$UPGRADEFOLDER"
+
+    echo "url: ${url}"
+    size=$(curl -A "batocera-upgrade.header" -sfIL "${url}" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
+    size=$((size / 1024 / 1024))
+    [ "$?" -eq 0 ] || exit 1
+    echo "need to download ${size}mb"
+
+    # Check free space on "${SHAREMOUNT}"
+    freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}')
+    [ "$?" -eq 0 ] || exit 1
+    if [ "${size}" -ge "${freespace}" ]; then
+        # -ge instead of -gt to give a tiny margin for error in space calculation
+        echo "Not enough space on \"${SHAREMOUNT}\" to perform the update"
+        exit 1
+    fi
+
+    # Up to this the GUI was not used, now do_upgmsg will automatically decide which output to use
+    if [ "$TERMINAL" -eq 0 ]; then
+        # download inside ES with badge
+        touch "$UPGRADEFILE"
+        do_badgeines "${size}" &
+        GETPERPID=$!
+        curl -A "batocera-upgrade" -sfL "${url}" -o "$UPGRADEFILE" || exit 1
+        do_upgmsg "Checking integrity of downloaded file..."
+    else
+        # download inside SSH or terminal
+        curl -A "batocera-upgrade" -fL "${url}" -o "$UPGRADEFILE" || exit 1
+        echo "Checking integrity of downloaded file... please wait"
+    fi
+
+    # try to download an md5 checksum, delete possible leftover if any error
+    curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "${UPGRADEFILE}.md5" || rm -f "${UPGRADEFILE}.md5"
+}
+
 # ---- MAIN ----
 echo "Starting upgrade process..."
 
@@ -65,67 +104,43 @@ UPGRADEFOLDER="${SHAREMOUNT}/system/upgrade"
 # started from Terminal/SSH (TERMINAL=1) or from ES (TERMINAL=0)
 [ -t 1 ] && TERMINAL=1 || TERMINAL=0
 
-# Check if "manual" argument is provided
-if [ "$1" = "manual" ]; then
-    # Check if the local file exists
-    if [ -f "/userdata/system/upgrade/boot-${board}.tar.zst" ]; then
-        size=$(du -m "/userdata/system/upgrade/boot-${board}.tar.zst" | awk '{print $1}')
-        echo "Using local file: /userdata/system/upgrade/boot-${board}.tar.zst (${size}MB)"
-        # If in manual mode, .tar.zst is in /userdata, but that can be different from share_internal
-        UPGRADEFILE="/userdata/system/upgrade/boot-${board}.tar.zst"
-    else
-        echo "Error: Local file /userdata/system/upgrade/boot-${board}.tar.zst not found."
-        exit 1
-    fi
-else
-    UPGRADEFILE="${UPGRADEFOLDER}/boot-${board}.tar.zst"
-    # Make sure upgrade folder does not have other updates leftovers
-    rm -rf "${UPGRADEFOLDER}"
-    mkdir -p "$UPGRADEFOLDER"
+case $1 in
+    "dev")
+        url="https://updates.reglinux.org/dev/${board}/boot-${board}.tar.zst"
 
-    latestrelease=$(batocera-config canupdate)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
-
-    if [ -n "$latestrelease" ]        # New releases are available
-    then
-        url="https://github.com/REG-Linux/REG-Linux/releases/download/${latestrelease}/boot-${board}.tar.zst"
-        echo "url: ${url}"
-        size=$(curl -A "batocera-upgrade.header" -sfIL "${url}" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
-        size=$((size / 1024 / 1024))
-        [ "$?" -eq 0 ] || exit 1
-        echo "need to download ${size}mb"
-
-        # Check free space on "${SHAREMOUNT}"
-        freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}')
-        [ "$?" -eq 0 ] || exit 1
-        if [ "${size}" -ge "${freespace}" ]; then
-            # -ge instead of -gt to give a tiny margin for error in space calculation
-            echo "Not enough space on \"${SHAREMOUNT}\" to perform the update"
+        if [[ $(curl -Is "$url" | head -n 1) ]]; then
+            do_download
+        else
+            echo "Error: File ${url} not found."
             exit 1
         fi
-
-        # Up to this the GUI was not used, now do_upgmsg will automatically decide which output to use
-        if [ "$TERMINAL" -eq 0 ]; then
-            # download inside ES with badge
-            touch "$UPGRADEFILE"
-            do_badgeines "${size}" &
-            GETPERPID=$!
-            curl -A "batocera-upgrade" -sfL "${url}" -o "$UPGRADEFILE" || exit 1
-            do_upgmsg "Checking integrity of downloaded file..."
+    ;;
+    "manual")
+        # Check if the local file exists
+        if [ -f "/userdata/system/upgrade/boot-${board}.tar.zst" ]; then
+            size=$(du -m "/userdata/system/upgrade/boot-${board}.tar.zst" | awk '{print $1}')
+            echo "Using local file: /userdata/system/upgrade/boot-${board}.tar.zst (${size}MB)"
+            # If in manual mode, .tar.zst is in /userdata, but that can be different from share_internal
+            UPGRADEFILE="/userdata/system/upgrade/boot-${board}.tar.zst"
         else
-            # download inside SSH or terminal
-            curl -A "batocera-upgrade" -fL "${url}" -o "$UPGRADEFILE" || exit 1
-            echo "Checking integrity of downloaded file... please wait"
+            echo "Error: Local file /userdata/system/upgrade/boot-${board}.tar.zst not found."
+            exit 1
         fi
+    ;;
+    *)
+        latestrelease=$(batocera-config canupdate)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
 
-        # try to download an md5 checksum, delete possible leftover if any error
-        curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "${UPGRADEFILE}.md5" || rm -f "${UPGRADEFILE}.md5"
-    else
-        echo "No new release found."
-        echo "Current version: $(batocera-version)"
-        echo "Online version: ${latestrelease}"
-        exit 1
-    fi
-fi
+        if [ -n "$latestrelease" ]        # New releases are available
+        then
+            url="https://github.com/REG-Linux/REG-Linux/releases/download/${latestrelease}/boot-${board}.tar.zst"
+            do_download
+        else
+            echo "No new release found."
+            echo "Current version: $(batocera-version)"
+            echo "Online version: ${latestrelease}"
+            exit 1
+        fi
+esac
 
 # confirm that update is for same board
 newboard=$(tar --zstd -Oxf "$UPGRADEFILE" 'boot/batocera.board')
