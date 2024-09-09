@@ -106,7 +106,11 @@ UPGRADEFOLDER="${SHAREMOUNT}/system/upgrade"
 
 case $1 in
     "dev")
-        url="https://updates.reglinux.org/dev/${board}/boot-${board}.tar.zst"
+        if [ -n "$2" ]; then
+            url="$2/boot-${board}.tar.zst"
+        else
+            url="https://updates.reglinux.org/dev/${board}/boot-${board}.tar.zst"
+        fi
 
         if [[ $(curl -Is "$url" | head -n 1) ]]; then
             do_download
