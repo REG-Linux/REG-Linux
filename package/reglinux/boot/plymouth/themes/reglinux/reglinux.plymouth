@@ -40,12 +40,13 @@ UseEndAnimation=false
 Title=Game Over
 
 [reboot]
+UseAnimation=false
 UseEndAnimation=false
 
 [updates]
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
-Title=Resizing Partition...
+Title=UPDATING /USERDATA
 SubTitle=Do not switch off your device!
 
 [system-upgrade]

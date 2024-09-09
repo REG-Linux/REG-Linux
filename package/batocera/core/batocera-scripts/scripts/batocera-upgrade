@@ -175,7 +175,7 @@ if [ "$board" = "$newboard" ]; then
     # First get the list of available files of those we want to extract (also is kind of a test for corrupted tar file)
     # tar --no-same-owner is needed because fat partition does not support owner attributes
     tar --zstd -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" | grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update' > /tmp/upgrade.list
-    if [ $? -eq 0 ] && tar --zstd -C /boot/ --no-same-owner --overwrite -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" --verbatim-files-from -T /tmp/upgrade.list
+    if [ $? -eq 0 ] && tar --zstd -C /boot/ --no-same-owner -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" --verbatim-files-from -T /tmp/upgrade.list
     then
         do_upgmsg "Rebooting to finish upgrade." 2
         touch /boot/REG_UPDATE

@@ -5,7 +5,7 @@
 ################################################################################
 
 REGLINUX_RESCUE_VERSION = 0.5
-REGLINUX_RESCUE_DATE = 20240905
+REGLINUX_RESCUE_DATE = 20240909
 REGLINUX_RESCUE_ARCH = ""
 ifeq ($(BR2_aarch64),y)
 REGLINUX_RESCUE_ARCH = aarch64

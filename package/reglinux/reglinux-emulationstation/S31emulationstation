@@ -10,8 +10,6 @@ case "$1" in
 		if [ "$enabled" != "0" ]; then
 			environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
 			if [ "$environment" = "sway" ]; then
-				# Stop splash
-				/etc/init.d/S00plymouth stop
 				# Start sway
 				SWAY_LOG_FILE=/userdata/system/logs/sway.log
 				WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -d > ${SWAY_LOG_FILE} 2>&1 &
@@ -22,10 +20,10 @@ case "$1" in
 		;;
 
 	stop)
-        	emulationstation-standalone --stop-rebooting
-		killall sway			2>/dev/null # for wayland
-		killall emulationstation	2>/dev/null
-		killall touchegg		2>/dev/null
+        emulationstation-standalone --stop-rebooting
+		killall sway               2>/dev/null # for wayland
+		killall emulationstation   2>/dev/null
+		killall touchegg           2>/dev/null
 		if [ $? -eq 0 ]; then
 			sleep 20 &
 			watchdog=$!

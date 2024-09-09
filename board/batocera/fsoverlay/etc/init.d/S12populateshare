@@ -1,163 +1,137 @@
-#!/bin/sh
+#!/bin/bash
 
-if test "$1" != "start"
-then
-    # call user script with stop condition
-    test -e /boot/postshare.sh && bash /boot/postshare.sh stop
-    exit 0
-fi
+case "$1" in
+    start)
+        IN=/usr/share/batocera/datainit
+        OUT=/userdata
 
-DOUPDATE=0
-CURVERSION=$(cat /usr/share/batocera/batocera.version)
-SHAREVERSION=$(cat /userdata/system/data.version 2>/dev/null)
-test "${CURVERSION}" != "${SHAREVERSION}" && DOUPDATE=1 # skip some part, just when new release
+        rm -f /tmp/updateuserdata.lst # Make sure we start with an empty list
 
-IN=/usr/share/batocera/datainit
-OUT=/userdata
-# force the creation of some directories
-for DIR in cheats \
-           system/.cache \
-           system/.config/lirc \
-           system/bluetooth \
-           system/configs \
-           system/pacman \
-           system/pacman/db \
-           system/pacman/pkg \
-           system/pacman/hooks \
-           system/logs
-do
-    if test ! -e "$OUT""/""$DIR"
-    then
-        mkdir -p "$OUT""/""$DIR"
-    fi
-done
+        # Directories deleted by user will be recreated when booting
+        # the user can delete the content or add its own files
+        # to reset the directory or update it, the user has to remove the directory
+        # (we are unable to differenciate new files from REG-linux update from a file removed by the user)
 
-# directories to force directories exists
-# files are linked
-#
-# ONLY NEW DIRECTORIES ARE UPDATED WHEN batocera.linux IS UPDATED
-#
-# the user can't delete any directory, otherwise, it will recreate it, with link inside
-# the user can delete links and add its own files
-# to reset the directory or update it, the user has to remove the directory (we are unable to differenciate new files from batocera.linux update from a file removed by the user)
-for DIR in roms roms/mame/mame2003
-do
-    if mkdir -p "$OUT""/""$DIR"
-    then
-	find "$IN""/""$DIR" -mindepth 1 -maxdepth 1 -type d |
-	    while read SUBDIR
-	    do
-		BNAME=$(basename "$SUBDIR")
-		TDIR="$OUT""/""$DIR""/""$BNAME"
-		if test ! -e "$TDIR" # ASSUME THAT PARENTS ARE LISTED BEFORE CHILDREN
-		then
-		    cp -r "$SUBDIR" "$TDIR"
-		fi
-	    done
-    fi
-done
+        # Get a list of folders (or files) that do not yet exist in /userdata
+        grep -Fvx -f <(cd "$OUT" || exit; find ./ -mindepth 1 -maxdepth 1 -type d) <(cd "$IN" || exit; find ./ -mindepth 1 -maxdepth 1 -type d) >> /tmp/updateuserdata.lst
 
-# sometimes we update _info.txt files.
-# add a loop to update newer files if necessary
-if test "${DOUPDATE}" = 1
-then
-    for DIR in roms roms/mame/mame2003
-    do
-	find "$IN""/""$DIR" -mindepth 1 -maxdepth 2 -type f -name "_info.txt" |
-            while read FILE
-            do
-		RELATIVE_PATH="${FILE#$IN/}"
-		DEST_FILE="$OUT/$RELATIVE_PATH"
-
-		# Check if the source file is newer than the destination file
-		if [ "$FILE" -nt "$DEST_FILE" ]; then
-                    echo "Updating $DEST_FILE"
-                    cp -f "$FILE" "$DEST_FILE"
-		fi
-            done
-    done
-fi
-
-# directories / files to copy when initializing the user data
-#
-# NO UPDATE IS POSSIBLE ON THESE DIRECTORIES WHEN batocera.linux IS UPDATED
-#
-# there are almost empty, it's just for the structure
-# the user can delete the directory, it will recreate the structure
-# the user can delete files, files will not be recreated
-for FILE in music bios extractions library saves screenshots recordings \
-            system/.config/lirc/lircd.conf \
-            system/configs/emulationstation/es_input.cfg \
-            system/configs/emulationstation/es_settings.cfg \
-            system/configs/amiberry \
-            system/configs/amiberry/whdboot \
-            system/configs/amiberry/data \
-            system/configs/cannonball \
-            system/configs/dosbox \
-            system/configs/mupen64 \
-            system/configs/ppsspp \
-            system/configs/shadersets \
-            system/configs/umtool \
-            system/configs/xarcade2jstick \
-            system/configs/theforceengine \
-            system/batocera.conf \
-            system/pacman/hooks/batocera-install.hook \
-            system/pacman/hooks/batocera-uninstall.hook \
-            system/pacman/pacman.conf \
-            bios/mame2003 \
-            bios/dolphin-emu \
-            roms/iortcw/main \
-            bios/ps2 \
-            system/configs/pironman5
-do
-    # Skip updating specific files
-    if [ "$FILE" = "system/configs/emulationstation/es_settings.cfg" ] || [ "$FILE" = "system/configs/emulationstation/es_input.cfg" ] || [ "$FILE" = "system/batocera.conf" ] ; then
-        # Check if the file doesn't exist, then create it
-        if [ ! -e "${OUT}/${FILE}" ]; then
-            mkdir -p "$(dirname "${OUT}/${FILE}")"
-            echo "Creating $OUT/$FILE"
-            cp -rfu --preserve=timestamps "${IN}/${FILE}" "$(dirname "${OUT}/${FILE}")"/
+        if [ -d "$OUT"/roms ]; then
+            grep -Fvx -f <(cd "$OUT" || exit; find ./roms -mindepth 1 -maxdepth 1 -type d) <(cd "$IN" || exit; find ./roms -mindepth 1 -maxdepth 1 -type d) >> /tmp/updateuserdata.lst
         fi
-    else
-        # Update if newer
-        if [ -e "${IN}/${FILE}" ] && { [ ! -e "${OUT}/${FILE}" ] || [ "${IN}/${FILE}" -nt "${OUT}/${FILE}" ]; }; then
-            mkdir -p "$(dirname "${OUT}/${FILE}")"
-            echo "Updating $OUT/$FILE"
-            cp -rfu --preserve=timestamps "${IN}/${FILE}" "$(dirname "${OUT}/${FILE}")"/
+        if [ -d "$OUT"/roms/mame ]; then
+            mkdir -p "$OUT"/roms/mame/mame2003
+            grep -Fvx -f <(cd "$OUT" || exit; find ./roms/mame/mame2003 \( -type f -o -xtype l \)) <(cd "$IN" || exit; find ./roms/mame/mame2003 \( -type f -o -xtype l \)) >> /tmp/updateuserdata.lst
         fi
-    fi
-done
+        if [ -d "$OUT"/system ]; then
+            grep -Fvx -f <(cd "$OUT" || exit; find ./system \( -type f -o -xtype l \)) <(cd "$IN" || exit; find ./system \( -type f -o -xtype l \)) >> /tmp/updateuserdata.lst
+        fi
 
-### specific directories
-# decorations - copy only the readme file
-mkdir -p "${OUT}/decorations"
-test -e "${OUT}/decorations/readme.txt" || cp -r "${IN}/decorations/readme.txt" "${OUT}/decorations/readme.txt"
+        # USUALLY ONLY NEW DIRECTORIES ARE UPDATED WHEN REG-LINUX IS UPDATED
+        # but sometimes we update _info.txt, readme.txt, bios or other files.
+        CURVERSION=$(cat /usr/share/batocera/batocera.version)
+        SHAREVERSION=$(cat /userdata/system/data.version 2>/dev/null)
 
-# themes
-mkdir -p "${OUT}/themes"
+        if [ "$CURVERSION" != "$SHAREVERSION" ]; then
+            cd "$IN" || exit
 
-# ssh : create directory, but not keys because lack of entropy, dropbear will automatically generate key on client connection
-mkdir -p /userdata/system/ssh
+            # Get everything, we'll use "cp -rfu"
+            # -maxdepth 3 because we need to look for ./roms/mame/mame2003/*folderswithgames*/_info.txt
+            if [ -d "$OUT"/roms ]; then
+                find ./roms -mindepth 1 -maxdepth 3 \( -type f -o -xtype l \) \( -iname "_info.txt" -o -iname "readme.txt" \) >> /tmp/updateuserdata.lst
+            fi
 
-# ssh : create directory for SSH user data (including identity keys, authorized_keys, known_hosts)
-mkdir -p -m 0700 /userdata/system/.ssh
-chmod 0700 /userdata/system/.ssh
+            # Also update bios if needed
+            if [ -d "$OUT"/bios ]; then
+                find ./bios \( -type f -o -xtype l \) >> /tmp/updateuserdata.lst
+            fi
+            if [ -d "$OUT"/roms/iortcw ]; then
+                find ./roms/iortcw/main \( -type f -o -xtype l \) >> /tmp/updateuserdata.lst
+            fi
 
-# udev : create a link for rules persistance
-mkdir -p /userdata/system/udev/rules.d
-rm -rf /run/udev/rules.d
-ln -s /userdata/system/udev/rules.d/ /run/udev/
+            # And REG-linux system configs, services but do not update user settings.
+            if [ -d "$OUT"/system ]; then
+                find ./system \( -type f -o -xtype l \) \( ! -iname "es_settings.cfg" -a ! -iname "es_input.cfg" -a ! -iname "batocera.conf" \) >> /tmp/updateuserdata.lst
+            fi
+        fi
 
-# and add the machine-id
-test -e /userdata/system/machine-id || dbus-uuidgen --ensure=/userdata/system/machine-id
-ln -sf /userdata/system/machine-id /var/lib/dbus/machine-id
-ln -sf /userdata/system/machine-id /etc/machine-id
+        CURRENTSTEP=0
+        TOTALSTEPS=$(wc -l /tmp/updateuserdata.lst)
+        if [ "$TOTALSTEPS" -gt 0 ]; then
 
-# save to avoid to redo that all the times
-cp /usr/share/batocera/batocera.version /userdata/system/data.version
+            # Add the last steps to correctly show progress bar
+            ((TOTALSTEPS+=5))
+            CURRENTSTEP++
 
-# call user script with start condition
-test -e /boot/postshare.sh && bash /boot/postshare.sh start
+            # Start UPDATING splash
+            /usr/bin/plymouth change-mode --updates
+            /usr/bin/plymouth --show-splash
+            /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+            /usr/bin/plymouth display-message --text="Creating missing folders"
 
-exit 0
-# END
+            # Create needed folders in /userdata
+            sed 's#/[^/]*$##;/^\.$/d;s#^\./##' /tmp/updateuserdata.lst | sort -u |
+                while IFS= read -r SUBDIR; do
+                    mkdir -p "${OUT}/$SUBDIR"
+                done
+
+            # Copy files
+            /usr/bin/plymouth display-message --text="Copying files"
+
+            sed 's#^\./##' /tmp/updateuserdata.lst |
+                while IFS= read -r FILE; do
+                    cp -rfu "${IN}/$FILE" "${OUT}/${FILE%/*}/"
+                    CURRENTSTEP++
+                    /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+                done
+
+            CURRENTSTEP++
+            /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+            /usr/bin/plymouth display-message --text="Creating special folders and links"
+        fi
+
+        # ssh : create directory for SSH user data (including identity keys, authorized_keys, known_hosts)
+        mkdir -p -m 0700 /userdata/system/.ssh
+
+        # udev : create a link for rules persistance
+        mkdir -p /userdata/system/udev/rules.d
+        rm -rf /run/udev/rules.d
+        ln -s /userdata/system/udev/rules.d/ /run/udev/
+
+        # and add the machine-id
+        [ -e /userdata/system/machine-id ] || dbus-uuidgen --ensure=/userdata/system/machine-id
+        ln -sf /userdata/system/machine-id /var/lib/dbus/machine-id
+        ln -sf /userdata/system/machine-id /etc/machine-id
+
+        # Save to avoid to redo some steps every boot
+        [ "$CURVERSION" != "$SHAREVERSION" ] && cp /usr/share/batocera/batocera.version /userdata/system/data.version
+
+        # call user script with start condition
+        if [ -e /boot/postshare.sh ]; then
+            if [ "$TOTALSTEPS" -gt 0 ]; then
+                /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+                /usr/bin/plymouth display-message --text="Running postshare script"
+            fi
+            bash /boot/postshare.sh start
+        fi
+
+        # Switch to splash without subtitle and stop plymouth service
+        /usr/bin/plymouth change-mode --reboot
+        /usr/bin/plymouth --show-splash
+        /usr/bin/plymouth quit --retain-splash
+    ;;
+    stop)
+        # call user script with stop condition
+        [ -e /boot/postshare.sh ] && bash /boot/postshare.sh stop
+
+        # Switch to splash with "game over"
+        # No need to stop daemon, /etc/init.d/S002plymouth will do that anyway
+        if /usr/bin/plymouth --ping; then
+            /usr/bin/plymouth change-mode --shutdown
+            /usr/bin/plymouth --show-splash
+        else
+            /usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session
+            /usr/bin/plymouth --show-splash
+        fi
+    ;;
+esac
+
