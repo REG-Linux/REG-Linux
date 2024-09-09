@@ -55,12 +55,11 @@ case "$1" in
         fi
 
         CURRENTSTEP=0
-        TOTALSTEPS=$(wc -l /tmp/updateuserdata.lst)
+        TOTALSTEPS=$(grep -c ".*" /tmp/updateuserdata.lst 2>/dev/null || echo "0")
         if [ "$TOTALSTEPS" -gt 0 ]; then
 
-            # Add the last steps to correctly show progress bar
-            ((TOTALSTEPS+=5))
-            CURRENTSTEP++
+            ((TOTALSTEPS+=4))           # Add the last steps to correctly show progress bar
+            ((CURRENTSTEP+=100))        # STEP * 100 for percentage
 
             # Start UPDATING splash
             /usr/bin/plymouth change-mode --updates
@@ -75,16 +74,14 @@ case "$1" in
                 done
 
             # Copy files
-            /usr/bin/plymouth display-message --text="Copying files"
+            while IFS= read -r FILE; do
+                cp -rfu "${IN}/$FILE" "${OUT}/${FILE%/*}/"
+                ((CURRENTSTEP+=100))
+                /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+                /usr/bin/plymouth display-message --text="Copying files: $FILE"
+            done < <(sed 's#^\./##' /tmp/updateuserdata.lst)
 
-            sed 's#^\./##' /tmp/updateuserdata.lst |
-                while IFS= read -r FILE; do
-                    cp -rfu "${IN}/$FILE" "${OUT}/${FILE%/*}/"
-                    CURRENTSTEP++
-                    /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
-                done
-
-            CURRENTSTEP++
+            ((CURRENTSTEP+=100))
             /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
             /usr/bin/plymouth display-message --text="Creating special folders and links"
         fi
@@ -108,30 +105,23 @@ case "$1" in
         # call user script with start condition
         if [ -e /boot/postshare.sh ]; then
             if [ "$TOTALSTEPS" -gt 0 ]; then
+                ((CURRENTSTEP+=100))
                 /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
                 /usr/bin/plymouth display-message --text="Running postshare script"
             fi
             bash /boot/postshare.sh start
         fi
 
-        # Switch to splash without subtitle and stop plymouth service
-        /usr/bin/plymouth change-mode --reboot
-        /usr/bin/plymouth --show-splash
-        /usr/bin/plymouth quit --retain-splash
+        if [ "$TOTALSTEPS" -gt 0 ]; then
+            /usr/bin/plymouth system-update --progress 100
+            /usr/bin/plymouth display-message --text=" "
+            /usr/bin/plymouth change-mode --boot-up
+            /usr/bin/plymouth --show-splash
+        fi
     ;;
     stop)
         # call user script with stop condition
         [ -e /boot/postshare.sh ] && bash /boot/postshare.sh stop
-
-        # Switch to splash with "game over"
-        # No need to stop daemon, /etc/init.d/S002plymouth will do that anyway
-        if /usr/bin/plymouth --ping; then
-            /usr/bin/plymouth change-mode --shutdown
-            /usr/bin/plymouth --show-splash
-        else
-            /usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session
-            /usr/bin/plymouth --show-splash
-        fi
     ;;
 esac
 

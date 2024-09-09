@@ -45,16 +45,16 @@ do_download() {
     echo "url: ${url}"
     size=$(curl -A "batocera-upgrade.header" -sfIL "${url}" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
     size=$((size / 1024 / 1024))
-    [ "$?" -eq 0 ] || exit 1
+    [ "$?" -eq 0 ] || quit_script 1
     echo "need to download ${size}mb"
 
     # Check free space on "${SHAREMOUNT}"
     freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}')
-    [ "$?" -eq 0 ] || exit 1
+    [ "$?" -eq 0 ] || quit_script 1
     if [ "${size}" -ge "${freespace}" ]; then
         # -ge instead of -gt to give a tiny margin for error in space calculation
         echo "Not enough space on \"${SHAREMOUNT}\" to perform the update"
-        exit 1
+        quit_script 1
     fi
 
     # Up to this the GUI was not used, now do_upgmsg will automatically decide which output to use
@@ -63,17 +63,29 @@ do_download() {
         touch "$UPGRADEFILE"
         do_badgeines "${size}" &
         GETPERPID=$!
-        curl -A "batocera-upgrade" -sfL "${url}" -o "$UPGRADEFILE" || exit 1
+        curl -A "batocera-upgrade" -sfL "${url}" -o "$UPGRADEFILE" || quit_script 1
         do_upgmsg "Checking integrity of downloaded file..."
     else
         # download inside SSH or terminal
-        curl -A "batocera-upgrade" -fL "${url}" -o "$UPGRADEFILE" || exit 1
+        curl -A "batocera-upgrade" -fL "${url}" -o "$UPGRADEFILE" || quit_script 1
         echo "Checking integrity of downloaded file... please wait"
     fi
 
     # try to download an md5 checksum, delete possible leftover if any error
     curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "${UPGRADEFILE}.md5" || rm -f "${UPGRADEFILE}.md5"
 }
+
+quit_script() {
+    # Exit code in $1
+
+    # exit from ES-badge without additional messages
+    [ "$TERMINAL" -eq 0 ] && [ -n "${GETPERPID}" ] && kill -9 "${GETPERPID}"
+
+    exit $1
+}
+
+# started from Terminal/SSH (TERMINAL=1) or from ES (TERMINAL=0)
+[ -t 1 ] && TERMINAL=1 || TERMINAL=0
 
 # ---- MAIN ----
 echo "Starting upgrade process..."
@@ -96,13 +108,10 @@ if [ -z "$SHAREMOUNT" ]; then
     SHAREMOUNT="/media/SHARE"
     mkdir -p "${SHAREMOUNT}"
     PARTTYPE=$(blkid -o value -s TYPE "${SHAREPART}")
-    batocera-mount "${PARTTYPE}" 1 "${SHAREPART}" "${SHAREMOUNT}" || exit 1
+    batocera-mount "${PARTTYPE}" 1 "${SHAREPART}" "${SHAREMOUNT}" || quit_script 1
 fi
 
 UPGRADEFOLDER="${SHAREMOUNT}/system/upgrade"
-
-# started from Terminal/SSH (TERMINAL=1) or from ES (TERMINAL=0)
-[ -t 1 ] && TERMINAL=1 || TERMINAL=0
 
 case $1 in
     "dev")
@@ -112,7 +121,7 @@ case $1 in
             do_download
         else
             echo "Error: File ${url} not found."
-            exit 1
+            quit_script 1
         fi
     ;;
     "manual")
@@ -124,7 +133,7 @@ case $1 in
             UPGRADEFILE="/userdata/system/upgrade/boot-${board}.tar.zst"
         else
             echo "Error: Local file /userdata/system/upgrade/boot-${board}.tar.zst not found."
-            exit 1
+            quit_script 1
         fi
     ;;
     *)
@@ -138,7 +147,7 @@ case $1 in
             echo "No new release found."
             echo "Current version: $(batocera-version)"
             echo "Online version: ${latestrelease}"
-            exit 1
+            quit_script 1
         fi
 esac
 
@@ -153,7 +162,7 @@ if [ "$board" = "$newboard" ]; then
             do_upgmsg "Checksum validated ..." 2
         else
             do_upgmsg "Checksum error!" 5
-            exit 1
+            quit_script 1
         fi
     else
         do_upgmsg "Missing md5 file - proceeding ..." 2
@@ -162,16 +171,16 @@ if [ "$board" = "$newboard" ]; then
     if [ "$SHAREMOUNT" != "/userdata" ]; then
         # Check free space on "${SHAREMOUNT}"
         freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}')
-        [ $? -eq 0 ] || exit 1
+        [ $? -eq 0 ] || quit_script 1
         if [ "${size}" -ge "${freespace}" ]; then
             # -ge instead of -gt to give a tiny margin for error in space calculation
             do_upgmsg "Not enough space on \"${SHAREMOUNT}\" to perform the update" 5
-            exit 1
+            quit_script 1
         fi
         if ! mv "/userdata/system/upgrade/boot-${board}.tar.zst" "${UPGRADEFOLDER}"/
         then
             do_upgmsg "Error moving \"boot-${board}.tar.zst\" to \"${UPGRADEFOLDER}/\"!" 5
-            exit 1
+            quit_script 1
         fi
     fi
 
@@ -179,7 +188,7 @@ if [ "$board" = "$newboard" ]; then
     if ! mount -o remount,rw /boot
     then
         do_upgmsg "Error remounting /boot in rw mode!" 5
-        exit 1
+        quit_script 1
     fi
 
     # Extract updated rescue files
@@ -188,25 +197,29 @@ if [ "$board" = "$newboard" ]; then
 
     # In case of tar error we don't know if is tar corrupted or non existing file to extract (assuming an upgrade could not include all files)
     # First get the list of available files of those we want to extract (also is kind of a test for corrupted tar file)
+    # We test for boot/reglinux.update but we don't want it extracted now
     # tar --no-same-owner is needed because fat partition does not support owner attributes
-    tar --zstd -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" | grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update' > /tmp/upgrade.list
-    if [ $? -eq 0 ] && tar --zstd -C /boot/ --no-same-owner -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" --verbatim-files-from -T /tmp/upgrade.list
+    tar --zstd -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" | grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update|boot/reglinux.update' > /tmp/upgrade.list
+    if [ $? -eq 0 ] && tar --zstd -C /boot/ --no-same-owner --exclude='boot/reglinux.update' -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" --verbatim-files-from -T /tmp/upgrade.list
     then
         do_upgmsg "Rebooting to finish upgrade." 2
         touch /boot/REG_UPDATE
     else
         do_upgmsg "ERROR EXTRACTING UPDATE FILES!" 15
         mount -o remount,ro /boot
-        exit 1
+        quit_script 1
     fi
 
-    do_upgmsg "Sync and rebooting to apply update..."
     sync
     mount -o remount,ro /boot
-    reboot
+    do_upgmsg "Reboot to apply update..."
 else
     do_upgmsg "WARNING: update is for ${newboard}, but should be for ${board}!" 5
 fi
 
-# exit from ES-badge without additional messages
-[ "$TERMINAL" -eq 0 ] && [ -n "${GETPERPID}" ] && kill -9 "${GETPERPID}"
+if [ "$TERMINAL" -eq 0 ]; then
+    quit_script 0
+else
+    reboot
+    exit 0
+fi

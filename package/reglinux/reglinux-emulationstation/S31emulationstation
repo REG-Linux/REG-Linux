@@ -6,6 +6,10 @@ BOOTCONF="/boot/batocera-boot.conf"
 
 case "$1" in
 	start)
+        # Switch to splash without subtitle and stop plymouth service
+        /usr/bin/plymouth change-mode --reboot
+        /usr/bin/plymouth --show-splash
+        /usr/bin/plymouth --wait quit --retain-splash
 		enabled="$(/usr/bin/batocera-settings-get system.es.atstartup)"
 		if [ "$enabled" != "0" ]; then
 			environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
@@ -33,6 +37,16 @@ case "$1" in
 			done
 			kill -9 $watchdog
 		fi
+
+        # Switch to splash with "game over"
+        # No need to stop daemon, /etc/init.d/S002plymouth will do that anyway
+        if /usr/bin/plymouth --ping; then
+            /usr/bin/plymouth change-mode --shutdown
+            /usr/bin/plymouth --show-splash
+        else
+            /usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session
+            /usr/bin/plymouth --show-splash
+        fi
 		;;
 
 	restart|reload)
