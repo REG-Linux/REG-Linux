@@ -39,7 +39,8 @@ do_list() {
             ;;
     esac
 
-    find -L $service_folders -type f 2>/dev/null | sort -u |
+    # Ignore hidden files (.*)
+    find -L $service_folders -type f -not -iname ".*" 2>/dev/null | sort -u |
 	while read SERVICE
 	do
 	    SNAME=$(basename "${SERVICE}")
