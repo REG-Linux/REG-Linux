@@ -64,7 +64,7 @@ fi
 # reorder the boot scripts for the network boot
 if test -e "${TARGET_DIR}/etc/init.d/S10udev"
 then
-    mv "${TARGET_DIR}/etc/init.d/S10udev"    "${TARGET_DIR}/etc/init.d/S00udev"    || exit 1 # Plymouth depends on initialized udev.
+    mv "${TARGET_DIR}/etc/init.d/S10udev"    "${TARGET_DIR}/etc/init.d/S001udev"    || exit 1 # Plymouth depends on initialized udev.
 fi
 if test -e "${TARGET_DIR}/etc/init.d/S30dbus"
 then
