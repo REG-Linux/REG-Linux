@@ -20,7 +20,7 @@ define PLYMOUTH_LOGO
 endef
 
 define PLYMOUTH_INITD
-	install -m 0755 $(PLYMOUTH_PATH)/config/S00plymouth \
+	install -m 0755 $(PLYMOUTH_PATH)/config/S002plymouth \
 		$(TARGET_DIR)/etc/init.d/
 
 
