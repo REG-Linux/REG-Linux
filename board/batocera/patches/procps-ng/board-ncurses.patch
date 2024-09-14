@@ -1,0 +1,13 @@
+diff --git a/src/watch.c b/src/watch.c
+index 5c159a9..8bebc86 100644
+--- a/src/watch.c
++++ b/src/watch.c
+@@ -53,7 +53,7 @@
+ # define _XOPEN_SOURCE_EXTENDED 1
+ # include <wchar.h>
+ # include <wctype.h>
+-# include <ncursesw/ncurses.h>
++# include <ncurses.h>
+ #else
+ # include <ncurses.h>
+ #endif	/* WITH_WATCH8BIT */
