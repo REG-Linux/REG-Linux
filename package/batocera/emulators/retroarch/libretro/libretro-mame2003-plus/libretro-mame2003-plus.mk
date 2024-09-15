@@ -51,8 +51,8 @@ define LIBRETRO_MAME2003_PLUS_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/lib/libretro/mame078plus_libretro.so
 
 	# Bios
-    # Need to think of another way to use these files.
-    # They take up a lot of space on tmpfs.
+	# Need to think of another way to use these files.
+	# They take up a lot of space on tmpfs.
 	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/mame2003-plus/samples
 	cp -r $(@D)/metadata-install/* \
 		$(TARGET_DIR)/usr/share/batocera/datainit/bios/mame2003-plus
