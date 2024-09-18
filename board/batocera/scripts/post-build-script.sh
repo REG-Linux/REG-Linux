@@ -66,14 +66,20 @@ if test -e "${TARGET_DIR}/etc/init.d/S10udev"
 then
     mv "${TARGET_DIR}/etc/init.d/S10udev"    "${TARGET_DIR}/etc/init.d/S001udev"    || exit 1 # Plymouth depends on initialized udev.
 fi
+
+# dbus - move really before for network (connman prerequisite) and pipewire
 if test -e "${TARGET_DIR}/etc/init.d/S30dbus"
 then
-    mv "${TARGET_DIR}/etc/init.d/S30dbus"    "${TARGET_DIR}/etc/init.d/S01dbus"    || exit 1 # move really before for network (connman prerequisite) and pipewire
+    mv "${TARGET_DIR}/etc/init.d/S30dbus"    "${TARGET_DIR}/etc/init.d/S01dbus"    || exit 1
 fi
+
+# network - move to make ifaces up sooner, mainly mountable/unmountable before/after share
 if test -e "${TARGET_DIR}/etc/init.d/S40network"
 then
-    mv "${TARGET_DIR}/etc/init.d/S40network" "${TARGET_DIR}/etc/init.d/S07network" || exit 1 # move to make ifaces up sooner, mainly mountable/unmountable before/after share
+    mv "${TARGET_DIR}/etc/init.d/S40network" "${TARGET_DIR}/etc/init.d/S07network" || exit 1
 fi
+
+# connman
 if test -e "${TARGET_DIR}/etc/init.d/S45connman"
 then
     if test -e "${TARGET_DIR}/etc/init.d/S08connman"
@@ -83,10 +89,24 @@ then
 	mv "${TARGET_DIR}/etc/init.d/S45connman" "${TARGET_DIR}/etc/init.d/S08connman" || exit 1 # move to make before share
     fi
 fi
+
+# rngd
 if test -e "${TARGET_DIR}/etc/init.d/S21rngd"
 then
     mv "${TARGET_DIR}/etc/init.d/S21rngd"    "${TARGET_DIR}/etc/init.d/S33rngd"    || exit 1 # move because it takes several seconds (on odroidgoa for example)
     sed -i "s/start-stop-daemon -S -q /start-stop-daemon -S -q -N 10 /g" "${TARGET_DIR}/etc/init.d/S33rngd"  || exit 1 # set rngd niceness to 10 (to decrease slowdown of other processes)
+fi
+
+# seatd - Seatd needs to be enabled before Wayland window compositor is released
+if test -e "${TARGET_DIR}/etc/init.d/S70seatd"
+then
+    mv "${TARGET_DIR}/etc/init.d/S70seatd"    "${TARGET_DIR}/etc/init.d/S03seatd"    || exit 1
+fi
+
+# triggerhappy
+if test -e "${TARGET_DIR}/etc/init.d/S10triggerhappy"
+then
+    mv "${TARGET_DIR}/etc/init.d/S10triggerhappy"    "${TARGET_DIR}/etc/init.d/S50triggerhappy"    || exit 1
 fi
 
 # tmpfs or sysfs is mounted over theses directories
