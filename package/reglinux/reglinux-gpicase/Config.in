@@ -1,6 +1,11 @@
 config BR2_PACKAGE_REGLINUX_GPICASE
         bool "reglinux-gpicase"
 	depends on BR2_PACKAGE_BATOCERA_RPI_ANY
+	depends on BR2_LINUX_KERNEL
 
-comment "reglinux-gpicase"
-	depends on BR2_PACKAGE_BATOCERA_RPI_ANY
+	help
+
+	  https://github.com/RetroFlag/retroflag-picase
+
+comment "reglinux-gpicase needs a Linux kernel to be built"
+	depends on !BR2_LINUX_KERNEL
