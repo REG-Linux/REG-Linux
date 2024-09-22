@@ -24,6 +24,3 @@ quake3:
   core:     ioquake3
   options:
     videomode: max-1280x720
-jaguar:
-  emulator: bigpemu
-  core:     bigpemu
