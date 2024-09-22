@@ -84,8 +84,10 @@ REGLINUX_SCUMMVM_POST_BUILD_HOOKS = REGLINUX_SCUMMVM_DOWNLOAD_ARCHIVE
 define REGLINUX_SCUMMVM_INSTALL_TARGET_CMDS
 	# copy the prebuilt stuff to rootfs
 	tar xzvf $(@D)/$(REGLINUX_SCUMMVM_SOURCE) -C $(TARGET_DIR)
-	cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/scummvm/scummvm.keys \
-              $(TARGET_DIR)/usr/share/evmapy/
+
+	mkdir -p $(TARGET_DIR)/usr/share/evmapy/
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/scummvm/scummvm.keys \
+        	$(TARGET_DIR)/usr/share/evmapy/
 endef
 
 $(eval $(generic-package))
