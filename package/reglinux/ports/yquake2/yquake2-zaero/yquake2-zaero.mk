@@ -3,8 +3,8 @@
 # Yamagi Quake 2 (Zaero)
 #
 ################################################################################
-
-YQUAKE2_ZAERO_VERSION = b3e169bac65834e21fbb510391653de9d238b8ec
+# Version: Commits on Sep 21, 2024
+YQUAKE2_ZAERO_VERSION = 137ed0f0bd4f571b30da868d4fc448c0220d9b93
 YQUAKE2_ZAERO_SITE = https://github.com/yquake2/zaero.git
 YQUAKE2_ZAERO_SITE_METHOD = git
 YQUAKE2_ZAERO_DEPENDENCIES = sdl2

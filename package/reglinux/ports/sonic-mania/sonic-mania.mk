@@ -3,8 +3,8 @@
 # sonic-mania
 #
 ################################################################################
-# Version: Commits on Aug 23, 2024
-SONIC_MANIA_VERSION = df6fbf45860e384d2e8f66fac2c95b18eebef0d6
+# Version: Commits on Sep 12, 2024
+SONIC_MANIA_VERSION = f92e8e33120cc8fe6cfe21a48e31b089a6856fdf
 SONIC_MANIA_SITE = https://github.com/Rubberduckycooly/Sonic-Mania-Decompilation.git
 SONIC_MANIA_SITE_METHOD = git
 SONIC_MANIA_GIT_SUBMODULES = YES
@@ -28,7 +28,7 @@ endef
 
 define SONIC_MANIA_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/sonic-mania/sonic-mania.keys \
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/sonic-mania/sonic-mania.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

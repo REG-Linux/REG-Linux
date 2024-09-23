@@ -3,8 +3,8 @@
 # hurrican
 #
 ################################################################################
-# Version: Commits on Jun 11, 2024
-HURRICAN_VERSION = 6ef53c34dda241fa185a90261b6b3c40c09dffa3
+# Version: Commits on Sep 3, 2024
+HURRICAN_VERSION = 5ac76b8ed17a1cc6de46539039e17e3a73b8f1bd
 HURRICAN_SITE = https://github.com/HurricanGame/Hurrican
 
 HURRICAN_DEPENDENCIES = sdl2 sdl2_mixer sdl2_image libepoxy libopenmpt
@@ -22,7 +22,7 @@ define HURRICAN_INSTALL_TARGET_CMDS
 	chmod 0755 $(TARGET_DIR)/usr/bin/hurrican
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/hurrican/hurrican.keys \
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/hurrican/hurrican.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
