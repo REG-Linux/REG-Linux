@@ -29,9 +29,23 @@ indent_size = tab
 indent_style = tab
 indent_size = tab
 
+[*.patch]
+trim_trailing_whitespace = false
+
 [S{0..9}{0..9}*]
 indent_style = tab
 indent_size = tab
 
 [*.adoc]
 trim_trailing_whitespace = false
+
+[*.{c,h,cpp,hpp}]
+indent_size = 2
+
+[*.yml]
+indent_style = space
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 2
