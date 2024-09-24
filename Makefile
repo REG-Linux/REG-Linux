@@ -2,7 +2,7 @@ PROJECT_DIR    := $(shell pwd)
 DL_DIR         ?= $(PROJECT_DIR)/dl
 OUTPUT_DIR     ?= $(PROJECT_DIR)/output
 CCACHE_DIR     ?= $(PROJECT_DIR)/buildroot-ccache
-LOCAL_MK       ?= $(PROJECT_DIR)/batocera.mk
+LOCAL_MK       ?= $(PROJECT_DIR)/reglinux.mk
 EXTRA_PKGS     ?=
 DOCKER_OPTS    ?=
 MAKE_JLEVEL    ?= $(shell nproc)
@@ -21,8 +21,8 @@ ifndef BATCH_MODE
 	DOCKER_OPTS += -i
 endif
 
-DOCKER_REPO := batoceralinux
-IMAGE_NAME  := batocera.linux-build
+DOCKER_REPO := reglinux
+IMAGE_NAME  := reglinux-build
 
 TARGETS := $(sort $(shell find $(PROJECT_DIR)/configs/ -name 'b*' | sed -n 's/.*\/batocera-\(.*\).board/\1/p'))
 UID  := $(shell id -u)
@@ -51,11 +51,11 @@ build-docker-image:
 	@$(DOCKER) pull $(DOCKER_REPO)/$(IMAGE_NAME)
 	@touch .ba-docker-image-available
 
-batocera-docker-image: .ba-docker-image-available
+reglinux-docker-image: .ba-docker-image-available
 
 update-docker-image:
 	-@rm .ba-docker-image-available > /dev/null
-	@$(MAKE) batocera-docker-image
+	@$(MAKE) reglinux-docker-image
 
 publish-docker-image:
 	@$(DOCKER) push $(DOCKER_REPO)/$(IMAGE_NAME):latest
@@ -72,7 +72,7 @@ dl-dir:
 %-supported:
 	$(if $(findstring $*, $(TARGETS)),,$(error "$* not supported!"))
 
-%-clean: batocera-docker-image output-dir-%
+%-clean: reglinux-docker-image output-dir-%
 	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -84,7 +84,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
 
-%-config: batocera-docker-image output-dir-%
+%-config: reglinux-docker-image output-dir-%
 	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/batocera-$*
 	@for opt in $(EXTRA_OPTS); do \
 		echo $$opt >> $(PROJECT_DIR)/configs/batocera-$*_defconfig ; \
@@ -100,7 +100,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot batocera-$*_defconfig
 
-%-build: batocera-docker-image %-config ccache-dir dl-dir
+%-build: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -113,7 +113,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
 
-%-source: batocera-docker-image %-config ccache-dir dl-dir
+%-source: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -126,7 +126,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
 
-%-show-build-order: batocera-docker-image %-config ccache-dir dl-dir
+%-show-build-order: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -139,7 +139,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order
 
-%-kernel: batocera-docker-image %-config ccache-dir dl-dir
+%-kernel: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -152,7 +152,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot linux-menuconfig
 
-%-graph-depends: batocera-docker-image %-config ccache-dir dl-dir
+%-graph-depends: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -165,7 +165,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-depends
 
-%-graph-build: batocera-docker-image %-config ccache-dir dl-dir
+%-graph-build: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -178,7 +178,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-build
 
-%-graph-size: batocera-docker-image %-config ccache-dir dl-dir
+%-graph-size: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -191,7 +191,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-size
 
-%-shell: batocera-docker-image output-dir-%
+%-shell: reglinux-docker-image output-dir-%
 	$(if $(BATCH_MODE),$(if $(CMD),,$(error "not suppoorted in BATCH_MODE if CMD not specified!")),)
 	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
@@ -206,7 +206,7 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		$(CMD)
 
-%-ccache-stats: batocera-docker-image %-config ccache-dir dl-dir
+%-ccache-stats: reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
