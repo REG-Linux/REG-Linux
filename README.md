@@ -23,7 +23,7 @@ REG Linux is an open-source and completely free retro-gaming distribution that c
 ## Do you need help with REG Linux?
 
  - :sos: The most effective way is to join our [Discord Server](https://discord.gg/23wJ69eaCh) and go to the \#help-and-support channel
- - :neckbeard: There is a [REG Linux subreddit](https://www.reddit.com/r/reglinux/) 
+ - :neckbeard: There is a [REG Linux subreddit](https://www.reddit.com/r/REG_LINUX/)
 
 ## How can you help REG Linux?
 
