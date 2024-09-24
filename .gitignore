@@ -1,6 +1,7 @@
 /output
 /dl
 /configs/batocera-*_defconfig
+/configs/reglinux-*_defconfig
 /.auto.deps
 /.config.cmd
 /.config.old
