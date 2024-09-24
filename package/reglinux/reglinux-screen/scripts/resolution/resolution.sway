@@ -23,17 +23,16 @@ f_minTomaxResolution() {
     # select the first one valid
     # is it the best ? or should we loop to search the first with the same ratio ?
     swaymsg -t get_outputs | jq -r '.[] | select (.focused).modes[] | "\(.width)x\(.height)"' |
-    while read SUGGRESOLUTIONRATE SUGGMODE
-    do
-        SUGGRESOLUTION=$(echo "${SUGGRESOLUTIONRATE}" | cut -d . -f 1)
-        SUGGWIDTH=$(echo "${SUGGRESOLUTION}" | cut -d x -f 1)
-        SUGGHEIGHT=$(echo "${SUGGRESOLUTION}" | cut -d x -f 2)
-        if test "${SUGGWIDTH}" -le "${MAXWIDTH}" -a "${SUGGHEIGHT}" -le "${MAXHEIGHT}"; then
-            OUTPUT=$(swaymsg -t get_outputs | jq -r '.[] | select (.focused).name')
-            swaymsg output "${OUTPUT}" mode "${SUGGRESOLUTION}"
-            exit 0
-        fi
-    done
+        while read SUGGRESOLUTIONRATE SUGGMODE; do
+            SUGGRESOLUTION=$(echo "${SUGGRESOLUTIONRATE}" | cut -d . -f 1)
+            SUGGWIDTH=$(echo "${SUGGRESOLUTION}" | cut -d x -f 1)
+            SUGGHEIGHT=$(echo "${SUGGRESOLUTION}" | cut -d x -f 2)
+            if test "${SUGGWIDTH}" -le "${MAXWIDTH}" -a "${SUGGHEIGHT}" -le "${MAXHEIGHT}"; then
+                OUTPUT=$(swaymsg -t get_outputs | jq -r '.[] | select (.focused).name')
+                swaymsg output "${OUTPUT}" mode "${SUGGRESOLUTION}"
+                exit 0
+            fi
+        done
 }
 
 listModes() {
@@ -79,34 +78,31 @@ setMode() {
 
 setOutput() {
     MODE=$1
-    if swaymsg -t get_outputs | jq -r '.[].name' | grep -qE "^${MODE}$"
-    then
+    if swaymsg -t get_outputs | jq -r '.[].name' | grep -qE "^${MODE}$"; then
         # enable (in case of reboot of es)
         echo "set ${MODE} as primary" >&2
         swaymsg output "${MODE}" enable
 
         # disable all other outputs
         swaymsg -t get_outputs | jq -r '.[].name' | grep -vE "^${MODE}$" |
-        while read OUTP
-        do
-            echo "set ${OUTP} off" >&2
-            swaymsg output "${OUTP}" disable
-        done
+            while read OUTP; do
+                echo "set ${OUTP} off" >&2
+                swaymsg output "${OUTP}" disable
+            done
     else
         # disable all except the first one
         swaymsg -t get_outputs | jq -r '.[].name' |
-        (
-            read FIRSTOUTPUT
-            while read OUTP
-            do
-            echo "set ${OUTP} off" >&2
-            swaymsg output "${OUTP}" disable
-            done
+            (
+                read FIRSTOUTPUT
+                while read OUTP; do
+                    echo "set ${OUTP} off" >&2
+                    swaymsg output "${OUTP}" disable
+                done
 
-            # enable (in case of reboot of es)
-            echo "set ${FIRSTOUTPUT} as primary" >&2
-            swaymsg output "${FIRSTOUTPUT}" enable
-        )
+                # enable (in case of reboot of es)
+                echo "set ${FIRSTOUTPUT} as primary" >&2
+                swaymsg output "${FIRSTOUTPUT}" enable
+            )
     fi
 }
 
@@ -115,18 +111,19 @@ setRotation() {
     OUTPUT=$(swaymsg -t get_outputs | jq -r '.[] | select (.focused).name')
 
     case "${ROTATE}" in
-        "1")
-            swaymsg output "${OUTPUT}" transform 90
+    "1")
+        swaymsg output "${OUTPUT}" transform 90
         ;;
-        "2")
-            swaymsg output "${OUTPUT}" transform 180
+    "2")
+        swaymsg output "${OUTPUT}" transform 180
         ;;
-        "3")
-            swaymsg output "${OUTPUT}" transform 270
+    "3")
+        swaymsg output "${OUTPUT}" transform 270
         ;;
-        *)
-            # in case of reboot of es
-            swaymsg output "${OUTPUT}" transform normal
+    *)
+        # in case of reboot of es
+        swaymsg output "${OUTPUT}" transform normal
+        ;;
     esac
 }
 
@@ -134,10 +131,14 @@ getDisplayMode() {
     echo "wayland"
 }
 
+getRefreshRate() {
+    swaymsg -t get_outputs | jq -r '.[] | select (.focused).modes[] | "\(.refresh / 1000)"' | uniq
+}
+
 mapTouchScreen() {
     # Mapping touch screen
     TOUCHSCREEN=$(swaymsg -t get_inputs | jq -r '.[] | select(.type == "touch") | .identifier')
-    if [ ! -z "${TOUCHSCREEN}" ]; then
+    if [ -n "${TOUCHSCREEN}" ]; then
         OUTPUT=$(swaymsg -t get_outputs | jq -r '.[] | select (.focused).name')
         swaymsg input "${TOUCHSCREEN}" map_to_output "${OUTPUT}"
     fi
