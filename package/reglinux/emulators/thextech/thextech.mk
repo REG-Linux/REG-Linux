@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-THEXTECH_VERSION = v1.3.6.5
+THEXTECH_VERSION = v1.3.6.6
 THEXTECH_SITE = https://github.com/Wohlstand/TheXTech
 THEXTECH_SITE_METHOD = git
 THEXTECH_GIT_SUBMODULES = YES
 THEXTECH_LICENSE = GPLv3
-THEXTECH_DEPENDENCIES = sdl2 sdl2_mixer sdl2_ttf
+THEXTECH_DEPENDENCIES = sdl2 sdl2_mixer sdl2_ttf host-dos2unix
 
 THEXTECH_CONF_ENV = GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
@@ -38,8 +38,15 @@ define THEXTECH_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/output/bin/thextech $(TARGET_DIR)/usr/bin/
 	cp -avf $(@D)/output/lib/libSDL2_mixer_ext.so* $(TARGET_DIR)/usr/lib/
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -avf $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/thextech/thextech.keys \
+	cp -avf $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/thextech/thextech.keys \
 	    $(TARGET_DIR)/usr/share/evmapy/
 endef
+
+define THEXTECH_FIX_CRLF_CMAKELISTS
+    cd $(@D); \
+        $(HOST_DIR)/bin/dos2unix 3rdparty/AudioCodecs/libopus/CMakeLists.txt
+endef
+
+THEXTECH_POST_EXTRACT_HOOKS += THEXTECH_FIX_CRLF_CMAKELISTS
 
 $(eval $(cmake-package))
