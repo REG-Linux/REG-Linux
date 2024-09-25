@@ -4,8 +4,7 @@ ARCHS="x86_64 odroidxu4 bcm2835 bcm2836 bcm2837 bcm2711 bcm2712 rk3128 rk3288 rk
 
 BR_DIR=$1
 REGLINUX_BINARIES_DIR=$2
-if ! test -d "${BR_DIR}"
-then
+if ! test -d "${BR_DIR}"; then
     echo "${0} <BR_DIR>" >&2
     exit 1
 fi
@@ -17,18 +16,17 @@ TMP_CONFIGS="${TMP_DIR}/configs"
 mkdir -p "${TMP_CONFIGS}" || exit 1
 
 # create configs files
-for ARCH in ${ARCHS}
-do
+for ARCH in ${ARCHS}; do
     (
-    echo "generating .config for ${ARCH}" >&2
-    TMP_CONFIG="${TMP_DIR}/configs_tmp/${ARCH}"
-    mkdir -p "${TMP_CONFIG}" "${TMP_CONFIGS}" || exit 1
+        echo "generating .config for ${ARCH}" >&2
+        TMP_CONFIG="${TMP_DIR}/configs_tmp/${ARCH}"
+        mkdir -p "${TMP_CONFIG}" "${TMP_CONFIGS}" || exit 1
 
-    # generate the defconfig
-    "${BR2_EXTERNAL_BATOCERA_PATH}/configs/createDefconfig.sh" "${BR2_EXTERNAL_BATOCERA_PATH}/configs/batocera-${ARCH}"
+        # generate the defconfig
+        "${BR2_EXTERNAL_BATOCERA_PATH}/configs/createDefconfig.sh" "${BR2_EXTERNAL_BATOCERA_PATH}/configs/reglinux-${ARCH}"
 
-    (make O="${TMP_CONFIG}" -C ${BR_DIR} BR2_EXTERNAL="${BR2_EXTERNAL_BATOCERA_PATH}" "batocera-${ARCH}_defconfig" > /dev/null) || exit 1
-    cp "${TMP_CONFIG}/.config" "${TMP_CONFIGS}/config_${ARCH}" || exit 1
+        (make O="${TMP_CONFIG}" -C ${BR_DIR} BR2_EXTERNAL="${BR2_EXTERNAL_BATOCERA_PATH}" "reglinux-${ARCH}_defconfig" >/dev/null) || exit 1
+        cp "${TMP_CONFIG}/.config" "${TMP_CONFIGS}/config_${ARCH}" || exit 1
     ) &
 
     # allow to execute up to 8 jobs in parallel
@@ -51,7 +49,7 @@ HTML_GEN="${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/emulationstation/batoce
 DEFAULTSDIR="${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/core/batocera-configgen/configs"
 mkdir -p "${REGLINUX_BINARIES_DIR}" || exit 1
 echo python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}"
-python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}" > "${REGLINUX_BINARIES_DIR}/batocera_systemsReport.json" || exit 1
+python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}" >"${REGLINUX_BINARIES_DIR}/reglinux_systemsReport.json" || exit 1
 cp "${HTML_GEN}" "${REGLINUX_BINARIES_DIR}" || exit 1
 
 rm -rf "${TMP_DIR}"
