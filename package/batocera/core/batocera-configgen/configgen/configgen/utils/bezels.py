@@ -141,9 +141,9 @@ def padImage(input_png, output_png, screen_width, screen_height, bezel_width, be
 def tatooImage(input_png, output_png, system):
   if system.config['bezel.tattoo'] == 'system':
       try:
-          tattoo_file = '/usr/share/batocera/controller-overlays/'+system.name+'.png'
+          tattoo_file = '/usr/share/reglinux/controller-overlays/'+system.name+'.png'
           if not os.path.exists(tattoo_file):
-              tattoo_file = '/usr/share/batocera/controller-overlays/generic.png'
+              tattoo_file = '/usr/share/reglinux/controller-overlays/generic.png'
           tattoo = Image.open(tattoo_file)
       except:
           eslog.error(f"Error opening controller overlay: {tattoo_file}")
@@ -155,7 +155,7 @@ def tatooImage(input_png, output_png, system):
           eslog.error(f"Error opening custom file: {tattoo_file}")
   else:
       try:
-          tattoo_file = '/usr/share/batocera/controller-overlays/generic.png'
+          tattoo_file = '/usr/share/reglinux/controller-overlays/generic.png'
           tattoo = Image.open(tattoo_file)
       except:
           eslog.error(f"Error opening custom file: {tattoo_file}")

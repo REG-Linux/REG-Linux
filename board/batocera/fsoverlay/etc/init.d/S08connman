@@ -1,8 +1,8 @@
 #!/bin/sh
 
 ### choose configuration file
-BATOCONF="/userdata/system/batocera.conf"
-BOOTCONF="/boot/batocera-boot.conf"
+BATOCONF="/userdata/system/system.conf"
+BOOTCONF="/boot/system-boot.conf"
 
 # if /userdata is not yet available
 if ! [ -f "$BATOCONF" ]; then

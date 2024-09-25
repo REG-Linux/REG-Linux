@@ -75,7 +75,7 @@ endef
 
 REGLINUX_MAME_POST_BUILD_HOOKS = REGLINUX_MAME_DOWNLOAD_ARCHIVE
 
-REGLINUX_MAME_CONF_INIT = $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/mame/
+REGLINUX_MAME_CONF_INIT = $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/mame/
 
 define REGLINUX_MAME_INSTALL_TARGET_CMDS
 	# copy the prebuilt stuff to rootfs
@@ -85,8 +85,8 @@ define REGLINUX_MAME_INSTALL_TARGET_CMDS
 	rm $(@D)/$(REGLINUX_MAME_SOURCE)
 
 	# gameStop script when exiting a rotated screen
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/configgen/scripts
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/batocera/configgen/scripts/rotation_fix.sh
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/configgen/scripts
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/rotation_fix.sh
 
 	# Copy user -autoboot_command overrides (batocera.linux/batocera.linux#11706)
 	mkdir -p $(MAME_CONF_INIT)/autoload

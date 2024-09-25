@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/lime3ds.png
+Icon=/usr/share/icons/reglinux/lime3ds.png
 Exec=/usr/bin/batocera-config-lime3ds
 Terminal=false
 Type=Application

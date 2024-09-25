@@ -361,7 +361,7 @@ function retroflag_start()
 {
     #------ CONFIG SECTION ------
     #Check if dtooverlay is setted in /boot/config -- Do this arch related!
-    case $(cat /usr/share/batocera/batocera.arch) in
+    case $(cat /usr/share/reglinux/system.arch) in
         bcm2711)
             if ! grep -q "^dtoverlay=gpio-poweroff,gpiopin=4,active_low=1,input=1" "/boot/config.txt"; then
                 mount -o remount, rw /boot

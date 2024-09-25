@@ -1,9 +1,9 @@
 #!/bin/sh
 
 config_script="batocera-config"
-log="/userdata/system/logs/batocera.log"
+log="/userdata/system/logs/reglinux.log"
 gpio_enabled=1
-arch="$(cat /usr/share/batocera/batocera.arch)"
+arch="$(cat /usr/share/reglinux/system.arch)"
 
 ba_gpio_configure() {
     settings_gpio_mk="$(/usr/bin/batocera-settings-get controllers.gpio.enabled)"

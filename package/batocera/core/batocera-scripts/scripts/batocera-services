@@ -29,13 +29,13 @@ do_list() {
 
     case "${1}" in
         system)
-            service_folders="/usr/share/batocera/services"
+            service_folders="/usr/share/reglinux/services"
             ;;
         user)
             service_folders="/userdata/system/services"
             ;;
         *)
-            service_folders="/userdata/system/services /usr/share/batocera/services"
+            service_folders="/userdata/system/services /usr/share/reglinux/services"
             ;;
     esac
 
@@ -70,7 +70,7 @@ do_list() {
 }
 
 do_status() {
-    find -L /userdata/system/services /usr/share/batocera/services -type f -name "${1}" 2>/dev/null |
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
 	while read SERVICE
 	do
 	    bash "${SERVICE}" status
@@ -78,7 +78,7 @@ do_status() {
 }
 
 do_start() {
-    find -L /userdata/system/services /usr/share/batocera/services -type f -name "${1}" 2>/dev/null |
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
 	while read SERVICE
 	do
 	    bash "${SERVICE}" start
@@ -86,7 +86,7 @@ do_start() {
 }
 
 do_stop() {
-    find -L /userdata/system/services /usr/share/batocera/services -type f -name "${1}" 2>/dev/null |
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
 	while read SERVICE
 	do
 	    bash "${SERVICE}" stop

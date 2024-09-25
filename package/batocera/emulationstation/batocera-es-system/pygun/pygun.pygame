@@ -113,7 +113,7 @@ def run():
 
     warning = False
     if len(bg_list) == 0:
-        bg_list.append("/usr/share/batocera/splash/boot-logo.png")
+        bg_list.append("/usr/share/reglinux/splash/boot-logo.png")
         warning = True
 
     # open guns

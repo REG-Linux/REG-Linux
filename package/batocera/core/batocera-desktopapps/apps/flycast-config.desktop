@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/flycast.png
+Icon=/usr/share/icons/reglinux/flycast.png
 Exec=/usr/bin/batocera-config-flycast
 Terminal=false
 Type=Application

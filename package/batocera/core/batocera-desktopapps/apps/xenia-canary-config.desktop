@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/xenia-canary.png
+Icon=/usr/share/icons/reglinux/xenia-canary.png
 Exec=/usr/bin/batocera-config-xenia-canary
 Terminal=false
 Type=Application

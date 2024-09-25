@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Last update: Commits on Sep 06, 2024
-REGLINUX_EMULATIONSTATION_VERSION = 19ed73d0c70adbf760d767425306df7cd5dcc9cf
+REGLINUX_EMULATIONSTATION_VERSION = 71859ae9b2121d5d3c0455a9f19ab94fc14d7996
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_EMULATIONSTATION_SITE = https://$(REGLINUX_EMULATIONSTATION_TOKEN)@github.com/REG-Linux/REG-ES
 REGLINUX_EMULATIONSTATION_SITE_METHOD = git
@@ -120,9 +120,9 @@ define REGLINUX_EMULATIONSTATION_RESOURCES
 	$(INSTALL) -m 0644 -D $(@D)/resources/services/*.* $(TARGET_DIR)/usr/share/emulationstation/resources/services
 
 	# es_input.cfg
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/emulationstation
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/controllers/es_input.cfg \
-		$(TARGET_DIR)/usr/share/batocera/datainit/system/configs/emulationstation
+		$(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 
 	# hooks
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/batocera-preupdate-gamelists-hook $(TARGET_DIR)/usr/bin/

@@ -8,16 +8,16 @@
   <DefaultAppDirs/>
 
   <Menu>
-    <Name>batocera.linux</Name>
-    <Directory>batocera.directory</Directory>
+    <Name>REG-linux</Name>
+    <Directory>reglinux.directory</Directory>
     <DefaultLayout inline="true" inline_limit="60" inline_header="false">
       <Merge type="menus"/>
       <Merge type="files"/>
     </DefaultLayout>
     <Menu>
-      <Name>batocera.linux</Name>
+      <Name>REG-linux</Name>
       <Include>
-	<Category>batocera.linux</Category>
+	<Category>REG-linux</Category>
       </Include>
     </Menu>
   </Menu>

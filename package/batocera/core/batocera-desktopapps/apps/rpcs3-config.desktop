@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/rpcs3.png
+Icon=/usr/share/icons/reglinux/rpcs3.png
 Exec=/usr/bin/batocera-config-rpcs3
 Terminal=false
 Type=Application

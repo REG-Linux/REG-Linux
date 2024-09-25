@@ -6,7 +6,7 @@ if [ ! "$1" ]; then
 fi
 
 configFile="/boot/config.txt"
-storageFile="/boot/batocera-boot.conf"
+storageFile="/boot/system-boot.conf"
 command="$1"
 mode="$2"
 extra1="$3"
@@ -34,7 +34,7 @@ bato_config_set_value () {
     fi
 }
 
-log=/userdata/system/logs/batocera.log
+log=/userdata/system/logs/reglinux.log
 
 #echo "---- batocera-config ----" >> $log
 
@@ -183,7 +183,7 @@ if [ "$command" = "canupdate" ]; then
     # force a default value in case the value is removed or miswritten
     [ "${updatetype}" != "beta" ] &&  updatetype="stable"
 
-    board=$(cat /boot/boot/batocera.board)
+    board=$(cat /boot/boot/system.board)
     installed=$(batocera-version)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
 
     # Get current stable release on GitHub
@@ -295,7 +295,7 @@ fi
 
 if [ "$command" = "tz" ]; then
     if [ -z "$mode" ]; then
-        at /usr/share/batocera/tz
+        at /usr/share/reglinux/tz
     else
         if [ -f "/usr/share/zoneinfo/${mode}" ]; then
             echo "${mode}" > /etc/timezone

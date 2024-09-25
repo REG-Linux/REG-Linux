@@ -719,7 +719,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
             retroarchConfig['cheevos_enable'] = 'true'
             retroarchConfig['cheevos_username'] = systemConfig.get('retroachievements.username', "")
             retroarchConfig['cheevos_password'] = systemConfig.get('retroachievements.password', "")
-            retroarchConfig['cheevos_cmd'] = "/usr/share/batocera/configgen/call_achievements_hooks.sh"
+            retroarchConfig['cheevos_cmd'] = "/usr/share/reglinux/configgen/call_achievements_hooks.sh"
             retroarchConfig['cheevos_token'] = "" # clear the token, otherwise, it may fail (possibly a ra bug)
             # retroachievements_hardcore_mode
             if system.isOptSet('retroachievements.hardcore') and system.getOptBoolean('retroachievements.hardcore') == True:
@@ -958,7 +958,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
         writeBezelConfig(generator, None, shaderBezel, retroarchConfig, rom, gameResolution, system, controllersConfig.gunsBordersSizeName(guns, system.config))
         eslog.error(f"Error with bezel {bezel}: {e}")
 
-    # custom : allow the user to configure directly retroarch.cfg via batocera.conf via lines like : snes.retroarch.menu_driver=rgui
+    # custom : allow the user to configure directly retroarch.cfg via system.conf via lines like : snes.retroarch.menu_driver=rgui
     for user_config in systemConfig:
         if user_config[:10] == "retroarch.":
             retroarchConfig[user_config[10:]] = systemConfig[user_config]
@@ -974,7 +974,7 @@ def clearGunInputsForPlayer(n, retroarchConfig):
 
 def configureGunInputsForPlayer(n, gun, controllers, retroarchConfig, core, metadata, system):
 
-    # find a keyboard key to simulate the action of the player (always like button 2) ; search in batocera.conf, else default config
+    # find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
     pedalsKeys = {1: "c", 2: "v", 3: "b", 4: "n"}
     pedalcname = "controllers.pedals{}".format(n)
     pedalkey = None

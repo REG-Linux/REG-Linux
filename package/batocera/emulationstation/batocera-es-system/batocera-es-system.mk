@@ -20,8 +20,8 @@ define BATOCERA_ES_SYSTEM_BUILD_CMDS
 		$(CONFIG_DIR)/.config \
 		$(@D)/es_systems.cfg \
 		$(@D)/es_features.cfg \
-		$(STAGING_DIR)/usr/share/batocera/configgen/configgen-defaults.yml \
-		$(STAGING_DIR)/usr/share/batocera/configgen/configgen-defaults-arch.yml \
+		$(STAGING_DIR)/usr/share/reglinux/configgen/configgen-defaults.yml \
+		$(STAGING_DIR)/usr/share/reglinux/configgen/configgen-defaults-arch.yml \
 		$(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulationstation/batocera-es-system/roms \
 		$(@D)/roms $(BATOCERA_SYSTEM_ARCH)
 		# translations
@@ -40,11 +40,11 @@ define BATOCERA_ES_SYSTEM_BUILD_CMDS
 endef
 
 define BATOCERA_ES_SYSTEM_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit
 	$(INSTALL) -m 0644 -D $(@D)/es_systems.cfg $(TARGET_DIR)/usr/share/emulationstation/es_systems.cfg
 	$(INSTALL) -m 0644 -D $(@D)/es_features.cfg $(TARGET_DIR)/usr/share/emulationstation/es_features.cfg
 	mkdir -p $(@D)/roms # in case there is no rom
-	cp -pr $(@D)/roms $(TARGET_DIR)/usr/share/batocera/datainit/
+	cp -pr $(@D)/roms $(TARGET_DIR)/usr/share/reglinux/datainit/
 endef
 
 $(eval $(generic-package))

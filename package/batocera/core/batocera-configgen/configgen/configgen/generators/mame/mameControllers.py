@@ -35,7 +35,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
         overwriteMAME = True
     
     # Load standard controls from csv
-    controlFile = '/usr/share/batocera/configgen/data/mame/mameControls.csv'
+    controlFile = '/usr/share/reglinux/configgen/data/mame/mameControls.csv'
     openFile = open(controlFile, 'r')
     controlDict = {}
     with openFile:
@@ -111,7 +111,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
         "socrates", "vgmplay", "pdp1", "vc4000", "fmtmarty", "gp32", "apple2p", "apple2e", "apple2ee" ]
     if sysName in specialControlList:
         # Load mess controls from csv
-        messControlFile = '/usr/share/batocera/configgen/data/mame/messControls.csv'
+        messControlFile = '/usr/share/reglinux/configgen/data/mame/messControls.csv'
         openMessFile = open(messControlFile, 'r')
         with openMessFile:
             controlList = csv.reader(openMessFile, delimiter=';')
@@ -231,7 +231,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
 
         addCommonPlayerPorts(config, xml_input, nplayer)
 
-        ### find a keyboard key to simulate the action of the player (always like button 2) ; search in batocera.conf, else default config
+        ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
         pedalsKeys = {1: "c", 2: "v", 3: "b", 4: "n"}
         pedalkey = None
         pedalcname = "controllers.pedals{}".format(nplayer)
@@ -284,7 +284,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
     # in case there are more guns than pads, configure them
     if useGuns and len(guns) > len(playersControllers):
         for gunnum in range(len(playersControllers)+1, len(guns)+1):
-            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in batocera.conf, else default config
+            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
             pedalsKeys = {1: "c", 2: "v", 3: "b", 4: "n"}
             pedalkey = None
             pedalcname = "controllers.pedals{}".format(gunnum)

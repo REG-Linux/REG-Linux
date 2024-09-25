@@ -36,8 +36,8 @@ case "${ACTION}" in
         MODE="$2"
         case "${MODE}" in
             auto)
-                ARCH=$(cat /usr/share/batocera/batocera.arch)
-                BOARD=$(cat /boot/boot/batocera.board)
+                ARCH=$(cat /usr/share/reglinux/system.arch)
+                BOARD=$(cat /boot/boot/system.board)
 
                 case "${ARCH}" in
                 "rk3399")

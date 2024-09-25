@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CACHEFILE="/userdata/system/batocera-cores.info.cache"
-VERSIONFILE="/usr/share/batocera/batocera.version"
+VERSIONFILE="/usr/share/reglinux/system.version"
 VERSION=$(cat "${VERSIONFILE}")
 CACHEVERSION=$(head -1 "${CACHEFILE}" 2>/dev/null)
 
