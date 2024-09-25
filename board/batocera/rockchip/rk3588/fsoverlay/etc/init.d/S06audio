@@ -6,7 +6,7 @@
 . /etc/profile.d/xdg.sh
 . /etc/profile.d/dbus.sh
 
-BOARD=$(cat /boot/boot/batocera.board)
+BOARD=$(cat /boot/boot/system.board)
 
 start_pipewire() {
     printf "Starting pipewire: "

@@ -7,7 +7,7 @@ fi
 
 printf "Starting securepasswd: "
 
-# /etc/shadow is dynamically generated from the password found in /boot/batocera-boot.conf
+# /etc/shadow is dynamically generated from the password found in /boot/system-boot.conf
 # the password is visible only in the es interface
 # or to people having already a ssh password via the command : batocera-config setRootPassword xyz
 MASTERPASSWD=$(batocera-config getRootPassword)

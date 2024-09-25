@@ -124,7 +124,7 @@ mixer $card 'Power Amplifier Mute' on
 mixer $card Headphone 0db on
 mixer $card 'AIF1 Slot 0 Digital DAC' on
 
-ARCH=$(cat /usr/share/batocera/batocera.arch)
+ARCH=$(cat /usr/share/reglinux/system.arch)
 # Amlogic G12 HDMI
 case ${ARCH} in
 	azw,gsking-x)

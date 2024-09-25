@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/scummvm.png
+Icon=/usr/share/icons/reglinux/scummvm.png
 Exec=/usr/bin/batocera-config-scummvm
 Terminal=false
 Type=Application

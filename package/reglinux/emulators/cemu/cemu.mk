@@ -44,8 +44,8 @@ define CEMU_INSTALL_TARGET_CMDS
 	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/cemu/get-audio-device \
 	    $(TARGET_DIR)/usr/bin/cemu/
 	# keys.txt
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/cemu
-	touch $(TARGET_DIR)/usr/share/batocera/datainit/bios/cemu/keys.txt
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/cemu
+	touch $(TARGET_DIR)/usr/share/reglinux/datainit/bios/cemu/keys.txt
 	#evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	cp -pr $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/cemu/wiiu.keys \

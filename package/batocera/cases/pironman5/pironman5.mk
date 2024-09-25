@@ -18,9 +18,9 @@ define PIRONMAN5_INSTALL_OVERLAY
 	mkdir -p $(BINARIES_DIR)/pironman5/
 	$(INSTALL) -D -m 0644 $(@D)/sunfounder-pironman5.dtbo $(BINARIES_DIR)/pironman5/
 	# move the config.json
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/pironman5
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/pironman5
 	mv $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/pironman5/config.json \
-	    $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/pironman5/
+	    $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/pironman5/
 endef
 
 PIRONMAN5_POST_INSTALL_TARGET_HOOKS = PIRONMAN5_INSTALL_OVERLAY

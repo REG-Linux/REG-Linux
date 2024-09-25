@@ -29,7 +29,7 @@ splash_default_rpi ()
 
 #### MAIN ####
 
-ARCH=$(cat /usr/share/batocera/batocera.arch)
+ARCH=$(cat /usr/share/reglinux/system.arch)
 
 case $1 in
     start)

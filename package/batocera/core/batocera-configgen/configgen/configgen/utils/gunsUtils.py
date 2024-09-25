@@ -21,7 +21,7 @@ def precalibration_copyFilesInDir(srcdir, dstdir, startWith, endWith):
             precalibration_copyFile(srcdir+"/"+src, dstdir+"/"+src)
 
 def precalibration(systemName, emulator, core, rom):
-    dir = "/usr/share/batocera/guns-precalibrations/{}".format(systemName)
+    dir = "/usr/share/reglinux/guns-precalibrations/{}".format(systemName)
     if not os.path.exists(dir):
         return
     baserom = os.path.basename(rom)

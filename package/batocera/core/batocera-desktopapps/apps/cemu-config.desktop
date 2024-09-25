@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/cemu.png
+Icon=/usr/share/icons/reglinux/cemu.png
 Exec=/usr/bin/batocera-config-cemu
 Terminal=false
 Type=Application

@@ -28,8 +28,8 @@ enable_bt() {
 
 # function to add debugfs entry to /etc/fstab and mount it
 setup_debugfs() {
-    if [ -f /boot/boot/batocera.board ]; then
-        BOARD=$(cat /boot/boot/batocera.board)
+    if [ -f /boot/boot/system.board ]; then
+        BOARD=$(cat /boot/boot/system.board)
     else
         BOARD=""
     fi

@@ -2,7 +2,7 @@
 
 case "$1" in
     start)
-        IN=/usr/share/batocera/datainit
+        IN=/usr/share/reglinux/datainit
         OUT=/userdata
 
         rm -f /tmp/updateuserdata.lst # Make sure we start with an empty list
@@ -28,7 +28,7 @@ case "$1" in
 
         # USUALLY ONLY NEW DIRECTORIES ARE UPDATED WHEN REG-LINUX IS UPDATED
         # but sometimes we update _info.txt, readme.txt, bios or other files.
-        CURVERSION=$(cat /usr/share/batocera/batocera.version)
+        CURVERSION=$(cat /usr/share/reglinux/system.version)
         SHAREVERSION=$(cat /userdata/system/data.version 2>/dev/null)
 
         if [ "$CURVERSION" != "$SHAREVERSION" ]; then
@@ -50,7 +50,7 @@ case "$1" in
 
             # And REG-linux system configs, services but do not update user settings.
             if [ -d "$OUT"/system ]; then
-                find ./system \( -type f -o -xtype l \) \( ! -iname "es_settings.cfg" -a ! -iname "es_input.cfg" -a ! -iname "batocera.conf" \) >> /tmp/updateuserdata.lst
+                find ./system \( -type f -o -xtype l \) \( ! -iname "es_settings.cfg" -a ! -iname "es_input.cfg" -a ! -iname "system.conf" \) >> /tmp/updateuserdata.lst
             fi
         fi
 
@@ -100,7 +100,7 @@ case "$1" in
         ln -sf /userdata/system/machine-id /etc/machine-id
 
         # Save to avoid to redo some steps every boot
-        [ "$CURVERSION" != "$SHAREVERSION" ] && cp /usr/share/batocera/batocera.version /userdata/system/data.version
+        [ "$CURVERSION" != "$SHAREVERSION" ] && cp /usr/share/reglinux/system.version /userdata/system/data.version
 
         # call user script with start condition
         if [ -e /boot/postshare.sh ]; then

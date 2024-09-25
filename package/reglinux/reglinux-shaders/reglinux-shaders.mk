@@ -52,33 +52,33 @@ else
 endif
 
 define REGLINUX_SHADERS_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/shaders/bezel/Mega_Bezel/Presets
-	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-shaders/presets-batocera/* $(TARGET_DIR)/usr/share/batocera/shaders/bezel/Mega_Bezel/Presets
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel/Presets
+	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-shaders/presets-batocera/* $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel/Presets
 
 	# general
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/shaders/configs; \
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/configs; \
 	if test -e $(REGLINUX_SHADERS_DIRIN)/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml; then \
-		cp $(REGLINUX_SHADERS_DIRIN)/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml $(TARGET_DIR)/usr/share/batocera/shaders/configs/rendering-defaults.yml; \
+		cp $(REGLINUX_SHADERS_DIRIN)/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/rendering-defaults.yml; \
 	else \
-		cp $(REGLINUX_SHADERS_DIRIN)/rendering-defaults.yml $(TARGET_DIR)/usr/share/batocera/shaders/configs/; \
+		cp $(REGLINUX_SHADERS_DIRIN)/rendering-defaults.yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/; \
 	fi
 
 	# sets
 	for set in $(REGLINUX_SHADERS_SETS); do \
-		mkdir -p $(TARGET_DIR)/usr/share/batocera/shaders/configs/$$set; \
+		mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/configs/$$set; \
 		if test -e $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml; then \
-			cp $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml $(TARGET_DIR)/usr/share/batocera/shaders/configs/$$set/rendering-defaults.yml; \
+			cp $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults-$(REGLINUX_GPU_SYSTEM).yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/$$set/rendering-defaults.yml; \
 		else \
-			cp $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults.yml $(TARGET_DIR)/usr/share/batocera/shaders/configs/$$set/; \
+			cp $(REGLINUX_SHADERS_DIRIN)/$$set/rendering-defaults.yml $(TARGET_DIR)/usr/share/reglinux/shaders/configs/$$set/; \
 		fi \
 	done
 endef
 
 define REGLINUX_SHADERS_SLANG
     # Some shaders got the .slan(g) variants moved
-    cd $(TARGET_DIR)/usr/share/batocera/shaders/ && cp -f pixel-art-scaling/sharp-bilinear-simple.slangp ./interpolation/ && \
+    cd $(TARGET_DIR)/usr/share/reglinux/shaders/ && cp -f pixel-art-scaling/sharp-bilinear-simple.slangp ./interpolation/ && \
 		cp -f pixel-art-scaling/shaders/sharp-bilinear-simple.slang ./interpolation/shaders/
-    cd $(TARGET_DIR)/usr/share/batocera/shaders/ && cp -f edge-smoothing/scalehq/2xScaleHQ.slangp ./scalehq/ && \
+    cd $(TARGET_DIR)/usr/share/reglinux/shaders/ && cp -f edge-smoothing/scalehq/2xScaleHQ.slangp ./scalehq/ && \
 		cp -f ./edge-smoothing/scalehq/shaders/2xScaleHQ.slang ./scalehq/shaders/
 endef
 

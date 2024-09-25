@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/demul.png
+Icon=/usr/share/icons/reglinux/demul.png
 Exec=/usr/bin/batocera-config-demul
 Terminal=false
 Type=Application

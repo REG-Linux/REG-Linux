@@ -65,22 +65,22 @@ wpctl status            > "${DSYSTEM}/wireplumber.txt"
 connmanctl technologies > "${DSYSTEM}/connman-technologies.txt"
 connmanctl services     > "${DSYSTEM}/connman-services.txt"
 batocera-systems        > "${DSYSTEM}/bios.txt"
-batocera-version        > "${DSYSTEM}/batocera.version"
+batocera-version        > "${DSYSTEM}/system.version"
 batocera-info           > "${DSYSTEM}/batocera.info"
 ldconfig -p             > "${DSYSTEM}/ldcache.txt"
 # get xrandr provider if x86 system only
 if [ "${V_ARCH}" = "x86" -o "${V_ARCH}" = "x86_64" ]; then
     xrandr --listproviders  > "${DSYSTEM}/xrandr-providers.txt"
 fi
-f_cp /boot/boot/batocera.board                                 "${DSYSTEM}"
+f_cp /boot/boot/system.board                                 "${DSYSTEM}"
 f_cp /boot/config.txt                                          "${DSYSTEM}"
-f_cp /userdata/system/batocera.conf                            "${DSYSTEM}"
+f_cp /userdata/system/system.conf                              "${DSYSTEM}"
 d_cp /userdata/system/logs                                     "${DSYSTEM}"
 f_cp /var/log/messages                                         "${DSYSTEM}"
 f_cp /userdata/system/configs/emulationstation/es_settings.cfg "${DSYSTEM}"
 f_cp /userdata/system/configs/emulationstation/es_log.txt      "${DSYSTEM}"
 f_cp /userdata/system/configs/emulationstation/es_input.cfg    "${DSYSTEM}"
-f_cp /boot/batocera-boot.conf                                  "${DSYSTEM}"
+f_cp /boot/system-boot.conf                                    "${DSYSTEM}"
 f_cp /var/log/Xorg.0.log                                       "${DSYSTEM}"
 f_cp /var/log/bluetooth-agent.log                              "${DSYSTEM}"
 
@@ -89,11 +89,11 @@ f_cp /var/log/bluetooth-agent.log                              "${DSYSTEM}"
 sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/logs/"*.log
 sed -i -e s+"^.*user.*$"+""+gI "${DSYSTEM}/es_settings.cfg"
 sed -i -e s+"^.*pass.*$"+""+gI "${DSYSTEM}/es_settings.cfg"
-sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/batocera.conf"
-sed -i -e s+"^.*retroachievements.*$"+""+gI "${DSYSTEM}/batocera.conf"
-sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/batocera.conf"
-sed -i -e s+"^.*token.*$"+""+gI "${DSYSTEM}/batocera.conf"
-sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/batocera-boot.conf"
+sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*retroachievements.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*token.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/system-boot.conf"
 
 # Emulators configs
 #d_cp /userdata/system/configs                           "${TMPDIR}/configs", disabled, too big

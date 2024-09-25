@@ -1,4 +1,4 @@
-log="/userdata/system/logs/batocera.log"
+log="/userdata/system/logs/reglinux.log"
 
 settings_lang="$(/usr/bin/batocera-settings-get system.language || echo 'en_US')"
 env_lang="${settings_lang}.UTF-8"

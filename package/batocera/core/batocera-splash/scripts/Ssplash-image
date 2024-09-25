@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DAEMON="splash-image"
-DEFAULT="/usr/share/batocera/splash/logo-version-"$(cat /sys/class/graphics/fb0/virtual_size | sed 's/,/x/g')".png"
+DEFAULT="/usr/share/reglinux/splash/logo-version-"$(cat /sys/class/graphics/fb0/virtual_size | sed 's/,/x/g')".png"
 SPLASH_DIR=/userdata/splash
 
 FM_IMAGE=".*\.\(jpg\|jpeg\|png\)"
@@ -20,7 +20,7 @@ do_start ()
 {
     if ! test -e "$DEFAULT"
     then
-        DEFAULT="/usr/share/batocera/splash/logo-version.png"
+        DEFAULT="/usr/share/reglinux/splash/logo-version.png"
     fi
 
     image_file=$(do_filerandomize "$FM_IMAGE")
@@ -45,7 +45,7 @@ do_imagestart ()
 case "$1" in
     start)
         printf 'Starting %s: ' "$DAEMON"
-        if grep -qE '^[ ]*splash.screen.enabled[ ]*=[ ]*0[ ]*$' "/boot/batocera-boot.conf"
+        if grep -qE '^[ ]*splash.screen.enabled[ ]*=[ ]*0[ ]*$' "/boot/system-boot.conf"
         then
             echo "SKIPPED"
             exit 0

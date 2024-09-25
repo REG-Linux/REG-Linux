@@ -32,8 +32,8 @@ define LIBRETRO_DOLPHIN_INSTALL_TARGET_CMDS
 endef
 
 define LIBRETRO_DOLPHIN_SYS_FOLDER
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/dolphin-emu/Sys
-	cp -r $(@D)/Data/Sys/* $(TARGET_DIR)/usr/share/batocera/datainit/bios/dolphin-emu/Sys
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/dolphin-emu/Sys
+	cp -r $(@D)/Data/Sys/* $(TARGET_DIR)/usr/share/reglinux/datainit/bios/dolphin-emu/Sys
 endef
 
 LIBRETRO_DOLPHIN_POST_INSTALL_TARGET_HOOKS += LIBRETRO_DOLPHIN_SYS_FOLDER

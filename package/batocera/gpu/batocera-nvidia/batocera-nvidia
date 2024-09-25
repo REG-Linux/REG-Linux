@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # batocera-nvidia applies either the installed production or legacy driver(s)
-# driver can be detected 'auto' or also set using batocera-boot.conf
+# driver can be detected 'auto' or also set using system-boot.conf
 
 # try to create the log dir
 mkdir -p "/var/log"

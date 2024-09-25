@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/xenia.png
+Icon=/usr/share/icons/reglinux/xenia.png
 Exec=/usr/bin/batocera-config-xenia
 Terminal=false
 Type=Application
