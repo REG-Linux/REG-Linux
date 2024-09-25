@@ -4,7 +4,7 @@ RUN="/usr/bin/rpi_gpioswitch"
 BTD_PID=$(pgrep -f "/bin/bash $RUN")
 
 ### --DEVS! Add a new power device to /usr/bin/rpi_gpioswitch array--
-# Read current config, if no key is set in batocera.conf then try to use
+# Read current config, if no key is set in system.conf then try to use
 # default value setted by udev-rule
 powerswitch="$(/usr/bin/batocera-settings-get system.power.switch)"
 if [ $? -ne 0 ] && [ -f /var/run/powerswitch-by-udevrule ]; then

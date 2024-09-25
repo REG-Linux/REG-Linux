@@ -85,23 +85,23 @@ else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_MT8395),y)
 endif
 
 define BATOCERA_CONFIGGEN_INSTALL_STAGING_CMDS
-	mkdir -p $(STAGING_DIR)/usr/share/batocera/configgen
+	mkdir -p $(STAGING_DIR)/usr/share/reglinux/configgen
 	cp $(CONFIGGEN_DIR)/configs/configgen-defaults.yml \
-	    $(STAGING_DIR)/usr/share/batocera/configgen/configgen-defaults.yml
+	    $(STAGING_DIR)/usr/share/reglinux/configgen/configgen-defaults.yml
 	cp $(CONFIGGEN_DIR)/configs/configgen-defaults-$(BATOCERA_CONFIGGEN_SYSTEM).yml \
-	    $(STAGING_DIR)/usr/share/batocera/configgen/configgen-defaults-arch.yml
+	    $(STAGING_DIR)/usr/share/reglinux/configgen/configgen-defaults-arch.yml
 endef
 
 define BATOCERA_CONFIGGEN_CONFIGS
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/configgen
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/configgen
 	cp -pr $(CONFIGGEN_DIR)/data \
-	    $(TARGET_DIR)/usr/share/batocera/configgen/
+	    $(TARGET_DIR)/usr/share/reglinux/configgen/
 	cp $(CONFIGGEN_DIR)/configs/configgen-defaults.yml \
-	    $(TARGET_DIR)/usr/share/batocera/configgen/configgen-defaults.yml
+	    $(TARGET_DIR)/usr/share/reglinux/configgen/configgen-defaults.yml
 	cp $(CONFIGGEN_DIR)/configs/configgen-defaults-$(BATOCERA_CONFIGGEN_SYSTEM).yml \
-	    $(TARGET_DIR)/usr/share/batocera/configgen/configgen-defaults-arch.yml
+	    $(TARGET_DIR)/usr/share/reglinux/configgen/configgen-defaults-arch.yml
 	cp $(CONFIGGEN_DIR)/scripts/call_achievements_hooks.sh \
-	    $(TARGET_DIR)/usr/share/batocera/configgen/
+	    $(TARGET_DIR)/usr/share/reglinux/configgen/
 endef
 
 define BATOCERA_CONFIGGEN_BINS
@@ -112,15 +112,15 @@ endef
 
 define BATOCERA_CONFIGGEN_ES_HOOKS
 	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/powermode_launch_hooks.sh \
-	    $(TARGET_DIR)/usr/share/batocera/configgen/scripts/powermode_launch_hooks.sh
+	    $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/powermode_launch_hooks.sh
 endef
 
 define BATOCERA_CONFIGGEN_X86_HOOKS
 	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/tdp_hooks.sh \
-	    $(TARGET_DIR)/usr/share/batocera/configgen/scripts/tdp_hooks.sh
+	    $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/tdp_hooks.sh
 
 	install -D -m 0755 $(CONFIGGEN_DIR)/scripts/nvidia-workaround.sh \
-	    $(TARGET_DIR)/usr/share/batocera/configgen/scripts/nvidia-workaround.sh
+	    $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/nvidia-workaround.sh
 endef
 
 BATOCERA_CONFIGGEN_POST_INSTALL_TARGET_HOOKS = BATOCERA_CONFIGGEN_CONFIGS

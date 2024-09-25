@@ -23,15 +23,15 @@ define AMIBERRY_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/buildroot-build/amiberry $(TARGET_DIR)/usr/bin/amiberry
 
 	# Create config and nvram directories, copy default config
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/amiberry/conf
-	cp -prn $(@D)/conf/amiberry.conf        $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/amiberry/conf/
-	cp -prn $(@D)/conf/gamecontrollerdb.txt $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/amiberry/conf/
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/saves/amiga/nvram
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/conf
+	cp -prn $(@D)/conf/amiberry.conf        $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/conf/
+	cp -prn $(@D)/conf/gamecontrollerdb.txt $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/conf/
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/saves/amiga/nvram
 
 	# Copy AROS (open source alternative BIOS)
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/amiga
-	cp -prn $(@D)/kickstarts/aros-ext.bin $(TARGET_DIR)/usr/share/batocera/datainit/bios/amiga/
-	cp -prn $(@D)/kickstarts/aros-rom.bin $(TARGET_DIR)/usr/share/batocera/datainit/bios/amiga/
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/amiga
+	cp -prn $(@D)/kickstarts/aros-ext.bin $(TARGET_DIR)/usr/share/reglinux/datainit/bios/amiga/
+	cp -prn $(@D)/kickstarts/aros-rom.bin $(TARGET_DIR)/usr/share/reglinux/datainit/bios/amiga/
 
 	# Copy data and whdboot folders
 	mkdir -p $(TARGET_DIR)/usr/share/amiberry

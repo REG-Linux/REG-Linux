@@ -57,15 +57,15 @@ define LIBRETRO_FBNEO_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/lib/libretro/fbneo_libretro.so
 
 	# Bios
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/fbneo/samples
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo/samples
 	cp -r $(@D)/metadata/* \
-		$(TARGET_DIR)/usr/share/batocera/datainit/bios/fbneo
+		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo
 
     # Need to think of another way to use these files.
     # They take up a lot of space on tmpfs.
     # --exclude light as those are for the n3ds build of fbneo, not used by Batocera at all
 	rsync -a $(@D)/dats/* \
-		$(TARGET_DIR)/usr/share/batocera/datainit/bios/fbneo --exclude light
+		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo --exclude light
 endef
 
 $(eval $(generic-package))

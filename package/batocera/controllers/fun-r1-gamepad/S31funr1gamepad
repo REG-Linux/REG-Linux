@@ -3,7 +3,7 @@
 case "$1" in
     start)
 	# First we check whether this is a FUN R1 board before running the driver
-	V_BOARD=$(cat /boot/boot/batocera.board)
+	V_BOARD=$(cat /boot/boot/system.board)
 
 	if [ "$V_BOARD" = "fun-r1" ]
 	then

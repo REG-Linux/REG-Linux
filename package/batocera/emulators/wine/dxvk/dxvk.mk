@@ -20,8 +20,8 @@ define DXVK_INSTALL_TARGET_CMDS
 	cp -pr $(@D)/target/dxvk-$(DXVK_VERSION)/x32 $(TARGET_DIR)/usr/wine/dxvk/
 	cp -pr $(@D)/target/dxvk-$(DXVK_VERSION)/x64 $(TARGET_DIR)/usr/wine/dxvk/
 	# dxvk.conf
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system/wine
-	cp $(DXVK_DL_DIR)/dxvk.conf $(TARGET_DIR)/usr/share/batocera/datainit/system/wine/dxvk.conf
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/wine
+	cp $(DXVK_DL_DIR)/dxvk.conf $(TARGET_DIR)/usr/share/reglinux/datainit/system/wine/dxvk.conf
 endef
 
 $(eval $(generic-package))

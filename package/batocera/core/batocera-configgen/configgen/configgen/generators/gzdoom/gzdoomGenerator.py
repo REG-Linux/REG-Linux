@@ -55,7 +55,7 @@ class GZDoomGenerator(Generator):
         
         # RPi4 workaround which has both ligl & libgles
         # For arm systems, we want to force OpenGL ES - 3
-        arch_path = "/usr/share/batocera/batocera.arch"
+        arch_path = "/usr/share/reglinux/system.arch"
         if gzdoom_api == "0":
             with open(arch_path, "r") as file:
                 content = file.read().strip()

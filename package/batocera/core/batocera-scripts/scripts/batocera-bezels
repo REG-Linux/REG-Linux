@@ -8,7 +8,7 @@ do_help() {
 
 do_list() {
     (
-	GLOBAL_DIR="/usr/share/batocera/datainit/decorations"
+	GLOBAL_DIR="/usr/share/reglinux/datainit/decorations"
 	USER_DIR="/userdata/decorations"
 	
 	ls "${GLOBAL_DIR}" |

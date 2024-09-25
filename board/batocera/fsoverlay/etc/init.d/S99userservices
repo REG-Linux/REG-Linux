@@ -66,7 +66,7 @@ fi
 process_services User /userdata/system/services "${1}"
 
 # system user services
-process_services System /usr/share/batocera/services "${1}"
+process_services System /usr/share/reglinux/services "${1}"
 
 # wait for spawned scripts to finish on stop condition, after this shutdown can happen
 test "${1}" = "stop" && wait

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/vita3k.png
+Icon=/usr/share/icons/reglinux/vita3k.png
 Exec=/usr/bin/batocera-config-vita3k
 Terminal=false
 Type=Application

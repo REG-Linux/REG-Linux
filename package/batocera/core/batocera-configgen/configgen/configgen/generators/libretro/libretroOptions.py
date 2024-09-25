@@ -451,7 +451,7 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
     if (system.config['core'] == 'puae') or (system.config['core'] == 'puae2021'):
         # Functional mapping for Amiga system
         # If you want to change them, you can add
-        # some strings to batocera.conf by using
+        # some strings to system.conf by using
         # this syntax: SYSTEMNAME.retroarchcore.puae_mapper_BUTTONNAME=VALUE
         if (system.name != 'amigacd32') and not ( system.isOptSet('controller1_puae') and ( system.config['controller1_puae'] == "517" ) ) and not ( system.isOptSet('controller2_puae') and ( system.config['controller2_puae'] == "517" ) ):
             # Controller mapping for A500 and A1200
@@ -2800,7 +2800,7 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
         else:
             coreSettings.save('hatarib_borders', '"0"')
 
-    # Custom : Allow the user to configure directly retroarchcore.cfg via batocera.conf via lines like : snes.retroarchcore.opt=val
+    # Custom : Allow the user to configure directly retroarchcore.cfg via system.conf via lines like : snes.retroarchcore.opt=val
     for user_config in system.config:
         if user_config[:14] == "retroarchcore.":
             coreSettings.save(user_config[14:], '"' + system.config[user_config] + '"')

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/dolphin.png
+Icon=/usr/share/icons/reglinux/dolphin.png
 Exec=/usr/bin/batocera-config-dolphin
 Terminal=false
 Type=Application

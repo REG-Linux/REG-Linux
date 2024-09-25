@@ -67,7 +67,7 @@ if test "$1" = "--short"; then
 fi
 ###
 
-V_BOARD=$(cat /boot/boot/batocera.board)
+V_BOARD=$(cat /boot/boot/system.board)
 V_CPUNB=$(LANG=C lscpu | grep 'Core(s) per socket' | awk '{print $4}' | head -n 1)
 V_CPUMAXNB=$(LANG=C lscpu | grep '^CPU(s):' | awk '{print $2}')
 V_CPUMODEL1=$(grep -m 1 -E $'^model name\t:' /proc/cpuinfo | sed -e s+'^model name\t: '++)

@@ -18,7 +18,7 @@ case "$1" in
         echo "Setting best primary GPU..." >> "$display_log"
 
         # Check for NVIDIA GPUs
-        nvidia_prime=$(/usr/bin/batocera-settings-get -f /boot/batocera-boot.conf nvidia-prime)
+        nvidia_prime=$(/usr/bin/batocera-settings-get -f /boot/system-boot.conf nvidia-prime)
         if [ "$nvidia_prime" = "false" ]; then
             echo "'nvidia-prime' manually set to false, skipping checks" >> "$nvidia_log"
         else
@@ -32,7 +32,7 @@ case "$1" in
         fi
         # Check for AMD/ATI GPUs if Nvidia Prime has not already been set
         if [ "$nvidia_conditions_met" = "false" ]; then
-            radeon_prime=$(/usr/bin/batocera-settings-get -f /boot/batocera-boot.conf radeon-prime)
+            radeon_prime=$(/usr/bin/batocera-settings-get -f /boot/system-boot.conf radeon-prime)
             if [ "$radeon_prime" = "false" ]; then
                 echo "'radeon-prime' manually set to false, skipping checks" >> "$amd_log"
             else
