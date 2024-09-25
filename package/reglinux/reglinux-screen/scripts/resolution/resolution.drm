@@ -59,13 +59,11 @@ f_minTomaxResolution() {
 	# if current resolution is ok, keep it
 	read CURRENTWIDTH CURRENTHEIGHT <<< $(f_currentResolution | sed -e s+"^\([0-9]*\)x\([0-9]*\)$"+"\1 \2"+)
 
-	if test "${CURRENTWIDTH}" -le "${MAXWIDTH}" -a "${CURRENTHEIGHT}" -le "${MAXHEIGHT}"
-	then
+	if test "${CURRENTWIDTH}" -le "${MAXWIDTH}" -a "${CURRENTHEIGHT}" -le "${MAXHEIGHT}"; then
 	    # hack for the rpi4 => need to avoid resolution 1360x768 (see batocera-drminfo-no-1360x768.c)
 	    # i don't like this hack, but this is to avoid a duplication of the file for the rpi4 #specific issue
 	    ARCH=$(cat /usr/share/reglinux/system.arch)
-	    if ! test "${ARCH}" = "bcm2711" -a "${CURRENTWIDTH}" = 1360 -a "${CURRENTHEIGHT}" = 768
-	    then
+	    if ! test "${ARCH}" = "bcm2711" -a "${CURRENTWIDTH}" = 1360 -a "${CURRENTHEIGHT}" = 768; then
 		exit 0
 	    fi
 	fi
@@ -75,13 +73,11 @@ f_minTomaxResolution() {
 	# is it the best ? or should we loop to search the first with the same ratio ?
 	# Highest resolution first, but list [p]rogressive before [i]nterlaced (p is omitted by default)
 	f_listModes | sed -e "/i)$/!"s+")$"+"p)"+ -e s+"^\([^:]*\):[^ ]* \([0-9]*x[0-9]*\) \([0-9]*\)Hz (\(.*\))$"+"\2_\3_\4:\1:\2"+ | sort -nr | sed -e "s/_[0-9]*x[0-9]*[pi]//" |
-            while IFS=':\n' read SORTSTR SUGGMODE SUGGRESOLUTION
-            do
+            while IFS=':\n' read SORTSTR SUGGMODE SUGGRESOLUTION; do
 		SUGGWIDTH=$(echo "${SUGGRESOLUTION}" | cut -d x -f 1)
 		SUGGHEIGHT=$(echo "${SUGGRESOLUTION}" | cut -d x -f 2)
 
-		if test "${SUGGWIDTH}" -le "${MAXWIDTH}" -a "${SUGGHEIGHT}" -le "${MAXHEIGHT}"
-		then
+		if test "${SUGGWIDTH}" -le "${MAXWIDTH}" -a "${SUGGHEIGHT}" -le "${MAXHEIGHT}"; then
                     echo "${SUGGMODE}" | cut -d "." -f 2 > /var/run/drmMode
                     exit 0
 		fi
