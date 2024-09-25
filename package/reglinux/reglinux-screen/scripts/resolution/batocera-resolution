@@ -16,6 +16,7 @@ f_usage() {
     echo "${0} setOutput <OUTPUT>" >&2
     echo "${0} setRotation (0|1|2|3)" >&2
     echo "${0} getDisplayMode" >&2
+    echo "${0} getRefreshRate" >&2
 }
 
 if [ $# -eq 0 ]; then
@@ -52,22 +53,25 @@ case "${ACTION}" in
         currentResolution
     ;;
     "setMode")
-        setMode $1
+        setMode "$1"
     ;;
     "setOutput")
-        setOutput $1
+        setOutput "$1"
     ;;
     "setRotation")
-        setRotation $1
+        setRotation "$1"
     ;;
     "getDisplayMode")
         getDisplayMode
+    ;;
+    "getRefreshRate")
+        getRefreshRate
     ;;
     "mapTouchScreen")
         mapTouchScreen
     ;;
     "minTomaxResolution" | "minTomaxResolution-secure")
-        minTomaxResolution $1
+        minTomaxResolution "$1"
     ;;
     "supportSystemRotation")
         supportSystemRotation

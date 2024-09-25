@@ -41,7 +41,7 @@ def minTomaxResolution():
         return drmMinTomaxResolution(resolution)
 
 def getRefreshRate():
-    proc = subprocess.Popen(["batocera-resolution refreshRate"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["batocera-resolution getRefreshRate"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     for val in out.decode().splitlines():
         return val # return the first line
