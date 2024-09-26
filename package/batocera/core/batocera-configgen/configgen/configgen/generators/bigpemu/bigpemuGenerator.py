@@ -3,7 +3,6 @@
 from generators.Generator import Generator
 import Command
 import os
-import sys
 import json
 import utils.videoMode as videoMode
 import controllersConfig
@@ -20,7 +19,7 @@ P1_BINDINGS_SEQUENCE = {
     "B": {"button": "b", "keyboard": "22"},
     "A": {"button": "a", "keyboard": "7"},
     "Pause": {"button": "select", "keyboard": "20"},
-    "Option": {"button": "start", "keyboard": "26"},    
+    "Option": {"button": "start", "keyboard": "26"},
     "Pad-Up": {"button": "up", "keyboard": "82"},
     "Pad-Down": {"button": "down", "keyboard": "81"},
     "Pad-Left": {"button": "left", "keyboard": "80"},
@@ -68,14 +67,14 @@ P1_BINDINGS_SEQUENCE = {
     "Blank5": {"blank": None}
 }
 
-# BigPEmu controller sequence, P2+ 
+# BigPEmu controller sequence, P2+
 # default standard bindings
 P2_BINDINGS_SEQUENCE = {
     "C": {"button": "y"},
     "B": {"button": "b"},
     "A": {"button": "a"},
     "Pause": {"button": "select"},
-    "Option": {"button": "start"},    
+    "Option": {"button": "start"},
     "Pad-Up": {"button": "up"},
     "Pad-Down": {"button": "down"},
     "Pad-Left": {"button": "left"},
@@ -226,38 +225,38 @@ class BigPEmuGenerator(Generator):
         # Create the directory if it doesn't exist
         if not os.path.exists(directory):
             os.makedirs(directory)
-        
+
         # Delete the config file to update controllers
         # As it doesn't like to be updated
         # ¯\_(ツ)_/¯
         if os.path.exists(bigPemuConfig):
             os.remove(bigPemuConfig)
-        
+
         # Create the config file as it doesn't exist
         if not os.path.exists(bigPemuConfig):
             with open(bigPemuConfig, "w") as file:
                 json.dump({}, file)
-        
+
         # Load or initialize the configuration
         with open(bigPemuConfig, "r") as file:
             try:
                 config = json.load(file)
             except json.decoder.JSONDecodeError:
                 config = {}
-        
+
         # Ensure the necessary structure in the config
         if "BigPEmuConfig" not in config:
             config["BigPEmuConfig"] = {}
         if "Video" not in config["BigPEmuConfig"]:
             config["BigPEmuConfig"]["Video"] = {}
-        
+
         # Adjust basic settings
         config["BigPEmuConfig"]["Video"]["DisplayMode"] = 2
         config["BigPEmuConfig"]["Video"]["ScreenScaling"] = 5
         config["BigPEmuConfig"]["Video"]["DisplayWidth"] = gameResolution["width"]
         config["BigPEmuConfig"]["Video"]["DisplayHeight"] = gameResolution["height"]
-        config["BigPEmuConfig"]["Video"]["DisplayFrequency"] = int(videoMode.getRefreshRate())
-        
+        config["BigPEmuConfig"]["Video"]["DisplayFrequency"] = int(round(float(videoMode.getRefreshRate())))
+
         # User selections
         if system.isOptSet("bigpemu_vsync"):
             config["BigPEmuConfig"]["Video"]["VSync"] = system.config["bigpemu_vsync"]
@@ -268,11 +267,11 @@ class BigPEmuGenerator(Generator):
         else:
             config["BigPEmuConfig"]["Video"]["ScreenAspect"] = 2
         config["BigPEmuConfig"]["Video"]["LockAspect"] = 1
-               
+
         # Controller config
         if "Input" not in config["BigPEmuConfig"]:
             config["BigPEmuConfig"]["Input"] = {}
-        
+
         # initial settings
         config["BigPEmuConfig"]["Input"]["DeviceCount"] = len(playersControllers)
         config["BigPEmuConfig"]["Input"]["AnalDeadMice"] = 0.25
@@ -299,13 +298,13 @@ class BigPEmuGenerator(Generator):
                     config["BigPEmuConfig"]["Input"]["Device{}".format(nplayer)]["HeadTrackerSpring"] = 0
                     if "Bindings" not in config["BigPEmuConfig"]["Input"]["Device{}".format(nplayer)]:
                         config["BigPEmuConfig"]["Input"]["Device{}".format(nplayer)]["Bindings"] = []
-                    
+
                     # Loop through BINDINGS_SEQUENCE to maintain the specific order of bindings
                     if nplayer == 0:
                         BINDINGS_SEQUENCE = P1_BINDINGS_SEQUENCE
                     else:
                         BINDINGS_SEQUENCE = P2_BINDINGS_SEQUENCE
-                    
+
                     for binding_key, binding_info in BINDINGS_SEQUENCE.items():
                         #eslog.debug(f"Binding sequence input: {binding_key}")
                         if "button" in binding_info:
@@ -340,7 +339,7 @@ class BigPEmuGenerator(Generator):
                                     input.id = 131
                                 if input.name == "joystick2up":
                                     input.id = 132
-                                
+
                                 # Generate the bindings if input name matches the button in sequence
                                 if input.name == binding_info.get("button") or input.name in binding_info.get("buttons", []):
                                     # Handle combo bindings
@@ -388,17 +387,17 @@ class BigPEmuGenerator(Generator):
                             else:
                                 bindings = generate_func()
                                 config["BigPEmuConfig"]["Input"]["Device{}".format(nplayer)]["Bindings"].extend(bindings)
-            
+
             # Onto the next controller as necessary
             nplayer += 1
-        
+
         # Close off input
         config["BigPEmuConfig"]["Input"]["InputVer"] = 2
         config["BigPEmuConfig"]["Input"]["InputPluginVer"] = 666
-        
+
         with open(bigPemuConfig, "w") as file:
             json.dump(config, file, indent=4)
-        
+
         # Run the emulator
         commandArray = ["/usr/bigpemu/bigpemu", rom]
 
@@ -406,7 +405,7 @@ class BigPEmuGenerator(Generator):
             "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
             "SDL_JOYSTICK_HIDAPI": "0"
         }
-        
+
         return Command.Command(array=commandArray, env=environment)
 
     def getInGameRatio(self, config, gameResolution, rom):
