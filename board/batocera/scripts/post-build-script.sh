@@ -26,8 +26,8 @@ ln -sf "/userdata/system/.ssh" "${TARGET_DIR}/etc/dropbear" || exit 1
 mkdir -p ${TARGET_DIR}/etc/emulationstation || exit 1
 ln -sf "/usr/share/emulationstation/es_systems.cfg" "${TARGET_DIR}/etc/emulationstation/es_systems.cfg" || exit 1
 ln -sf "/usr/share/emulationstation/themes"         "${TARGET_DIR}/etc/emulationstation/themes"         || exit 1
-mkdir -p "${TARGET_DIR}/usr/share/batocera/datainit/cheats" || exit 1
-ln -sf "/userdata/cheats" "${TARGET_DIR}/usr/share/batocera/datainit/cheats/custom" || exit 1
+mkdir -p "${TARGET_DIR}/usr/share/reglinux/datainit/cheats" || exit 1
+ln -sf "/userdata/cheats" "${TARGET_DIR}/usr/share/reglinux/datainit/cheats/custom" || exit 1
 
 # we have custom urandom scripts
 rm -f "${TARGET_DIR}/etc/init.d/S20urandom" || exit 1
@@ -114,7 +114,7 @@ fi
 rm -rf "${TARGET_DIR}/"{var,run,sys,tmp} || exit 1
 mkdir "${TARGET_DIR}/"{var,run,sys,tmp}  || exit 1
 
-# make /etc/shadow a file generated from /boot/batocera-boot.conf for security
+# make /etc/shadow a file generated from /boot/system-boot.conf for security
 rm -f "${TARGET_DIR}/etc/shadow" || exit 1
 touch "${TARGET_DIR}/run/batocera.shadow"
 (cd "${TARGET_DIR}/etc" && ln -sf "../run/batocera.shadow" "shadow") || exit 1
@@ -130,7 +130,7 @@ fi
 # timezone
 # file generated from the output directory and compared to https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 # because i don't know how to list correctly them
-(cd "${TARGET_DIR}/usr/share/zoneinfo" && find -L . -type f | grep -vE '/right/|/posix/|\.tab|Factory' | sed -e s+'^\./'++ | sort) > "${TARGET_DIR}/usr/share/batocera/tz"
+(cd "${TARGET_DIR}/usr/share/zoneinfo" && find -L . -type f | grep -vE '/right/|/posix/|\.tab|Factory' | sed -e s+'^\./'++ | sort) > "${TARGET_DIR}/usr/share/reglinux/tz"
 
 # alsa lib
 # on x86_64, pcsx2 has no sound because getgrnam_r returns successfully but the result parameter is not filled for an unknown reason (in alsa-lib)
@@ -138,8 +138,8 @@ AUDIOGROUP=$(grep -E "^audio:" "${TARGET_DIR}/etc/group" | cut -d : -f 3)
 sed -i -e s+'defaults.pcm.ipc_gid .*$'+'defaults.pcm.ipc_gid '"${AUDIOGROUP}"+ "${TARGET_DIR}/usr/share/alsa/alsa.conf" || exit 1
 
 # bios file
-mkdir -p "${TARGET_DIR}/usr/share/batocera/datainit/bios" || exit 1
-python "${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/core/batocera-scripts/scripts/batocera-systems" --createReadme > "${TARGET_DIR}/usr/share/batocera/datainit/bios/readme.txt" || exit 1
+mkdir -p "${TARGET_DIR}/usr/share/reglinux/datainit/bios" || exit 1
+python "${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/core/batocera-scripts/scripts/batocera-systems" --createReadme > "${TARGET_DIR}/usr/share/reglinux/datainit/bios/readme.txt" || exit 1
 
 # enable serial console
 SYSTEM_GETTY_PORT=$(grep "BR2_TARGET_GENERIC_GETTY_PORT" "${BR2_CONFIG}" | sed 's/.*\"\(.*\)\"/\1/')

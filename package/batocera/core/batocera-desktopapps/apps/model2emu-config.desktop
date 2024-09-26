@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/model2emu.png
+Icon=/usr/share/icons/reglinux/model2emu.png
 Exec=/usr/bin/batocera-config-model2emu
 Terminal=false
 Type=Application

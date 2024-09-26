@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/sudachi.png
+Icon=/usr/share/icons/reglinux/sudachi.png
 Exec=/usr/bin/batocera-config-sudachi
 Terminal=false
 Type=Application

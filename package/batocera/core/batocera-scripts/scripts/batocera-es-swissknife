@@ -108,8 +108,8 @@ case ${1,,} in
         VER=$(batocera-version)
         ret=$?
 
-        if [[ -f /boot/boot/batocera.board ]]; then
-            BOARD=$(cat /boot/boot/batocera.board)
+        if [[ -f /boot/boot/system.board ]]; then
+            BOARD=$(cat /boot/boot/system.board)
             ret=$?
         else
             BOARD="UNKNOWN"
@@ -170,11 +170,11 @@ case ${1,,} in
             rm -rf $HOME/.config/retroarch
             echo "Deleted: dir $HOME/.config/retroarch"
         fi
-        read -p "Do you want to reset RetroArch parameters for 'batocera.conf' file (y/n)? " yn
+        read -p "Do you want to reset RetroArch parameters for 'system.conf' file (y/n)? " yn
         case ${yn:0:1} in
             y|Y)
-                echo "Reseting RetroArch parameter in 'batocera.conf'"
-                sed -i '/^global.retroarch.*/d' $HOME/batocera.conf
+                echo "Reseting RetroArch parameter in 'system.conf'"
+                sed -i '/^global.retroarch.*/d' $HOME/system.conf
             ;;
         esac
         echo "All done! -- Please reboot"

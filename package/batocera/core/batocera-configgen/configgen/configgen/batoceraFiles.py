@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-HOME_INIT = '/usr/share/batocera/datainit/system/'
+HOME_INIT = '/usr/share/reglinux/datainit/system/'
 HOME = '/userdata/system'
 CONF_INIT = HOME_INIT + '/configs'
 CONF = HOME + '/configs'
@@ -18,7 +18,7 @@ esSettings = CONF + '/emulationstation/es_settings.cfg'
 esGunsMetadata = "/usr/share/emulationstation/resources/gungames.xml"
 esWheelsMetadata = "/usr/share/emulationstation/resources/wheelgames.xml"
 esGamesMetadata = "/usr/share/emulationstation/resources/gamesdb.xml"
-batoceraConf = HOME + '/batocera.conf'
+batoceraConf = HOME + '/system.conf'
 logdir = HOME + '/logs/'
 
 # This dict is indexed on the emulator name, not on the system
@@ -59,7 +59,7 @@ mupenCustom = mupenConf + "mupen64plus.cfg"
 mupenInput = mupenConf + "InputAutoCfg.ini"
 mupenSaves = SAVES + "/n64"
 mupenMappingUser    = mupenConf + 'input.xml'
-mupenMappingSystem  = '/usr/share/batocera/datainit/system/configs/mupen64/input.xml'
+mupenMappingSystem  = '/usr/share/reglinux/datainit/system/configs/mupen64/input.xml'
 
 moonlightCustom = CONF + '/moonlight'
 moonlightConfigFile = moonlightCustom + '/moonlight.conf'
@@ -100,7 +100,7 @@ solarusSaves = SAVES + '/solarus'
 
 viceConfig = CONF + "/vice"
 
-overlaySystem = "/usr/share/batocera/datainit/decorations"
+overlaySystem = "/usr/share/reglinux/datainit/decorations"
 overlayUser = "/userdata/decorations"
 overlayConfigFile = "/userdata/system/configs/retroarch/overlay.cfg"
 
@@ -122,7 +122,7 @@ flycastMapping = flycastCustom + '/mappings'
 flycastConfig = flycastCustom + '/emu.cfg'
 flycastSaves = SAVES + '/dreamcast'
 flycastBios = BIOS + '/dc'
-flycastVMUBlank = '/usr/share/batocera/configgen/data/dreamcast/vmu_save_blank.bin'
+flycastVMUBlank = '/usr/share/reglinux/configgen/data/dreamcast/vmu_save_blank.bin'
 flycastVMUA1 = flycastSaves + '/flycast/vmu_save_A1.bin'
 flycastVMUA2 = flycastSaves + '/flycast/vmu_save_A2.bin'
 

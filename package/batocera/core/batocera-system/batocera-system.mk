@@ -28,6 +28,8 @@ else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3328),y)
 	BATOCERA_SYSTEM_ARCH=rk3328
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3568),y)
 	BATOCERA_SYSTEM_ARCH=rk3568
+else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+	BATOCERA_SYSTEM_ARCH=h3
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_H3),y)
 	BATOCERA_SYSTEM_ARCH=h3
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_H5),y)
@@ -90,31 +92,31 @@ endif
 define BATOCERA_SYSTEM_INSTALL_TARGET_CMDS
 
 	# version/arch
-	mkdir -p $(TARGET_DIR)/usr/share/batocera
-	echo -n "$(BATOCERA_SYSTEM_ARCH)" > $(TARGET_DIR)/usr/share/batocera/batocera.arch
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux
+	echo -n "$(BATOCERA_SYSTEM_ARCH)" > $(TARGET_DIR)/usr/share/reglinux/system.arch
 	echo $(BATOCERA_SYSTEM_VERSION)$(BATOCERA_SYSTEM_COMMIT) \
 	    $(BATOCERA_SYSTEM_DATE_TIME) > \
-		$(TARGET_DIR)/usr/share/batocera/batocera.version
+		$(TARGET_DIR)/usr/share/reglinux/system.version
 
 	# datainit
-        mkdir -p $(TARGET_DIR)/usr/share/batocera
-        rsync -arv $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/datainit/ $(TARGET_DIR)/usr/share/batocera/datainit/
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/batocera.conf \
-	    $(TARGET_DIR)/usr/share/batocera/datainit/system
+        mkdir -p $(TARGET_DIR)/usr/share/reglinux
+        rsync -arv $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/datainit/ $(TARGET_DIR)/usr/share/reglinux/datainit/
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/system.conf \
+	    $(TARGET_DIR)/usr/share/reglinux/datainit/system
 
-	# batocera-boot.conf
+	# system-boot.conf
 	$(INSTALL) -D -m 0644 \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/batocera-boot.conf \
-		$(BINARIES_DIR)/batocera-boot.conf
+	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/system-boot.conf \
+		$(BINARIES_DIR)/system-boot.conf
 
-	# sysconfigs (default batocera.conf for boards)
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/sysconfigs
+	# sysconfigs (default system.conf for boards)
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/sysconfigs
     if test -d \
 	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/sysconfigs/${BATOCERA_SYSTEM_ARCH}; \
 		then cp -pr \
 		$(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/sysconfigs/${BATOCERA_SYSTEM_ARCH}/* \
-		$(TARGET_DIR)/usr/share/batocera/sysconfigs; fi
+		$(TARGET_DIR)/usr/share/reglinux/sysconfigs; fi
 
 	# mounts
 	mkdir -p $(TARGET_DIR)/boot $(TARGET_DIR)/overlay $(TARGET_DIR)/userdata

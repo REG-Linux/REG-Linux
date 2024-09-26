@@ -73,7 +73,7 @@ define IORTCW_BUILD_CMDS
     $(MAKE) $(TARGET_CONFIGURE_OPTS) $(IORTCW_BUILD_ARGS) -C $(@D)/MP
 endef
 
-IORTCW_CONF_INIT = $(TARGET_DIR)/usr/share/batocera/datainit/roms/iortcw/main
+IORTCW_CONF_INIT = $(TARGET_DIR)/usr/share/reglinux/datainit/roms/iortcw/main
 
 define IORTCW_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin/iortcw/main

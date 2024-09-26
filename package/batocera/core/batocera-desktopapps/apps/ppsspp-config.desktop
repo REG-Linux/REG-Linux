@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/ppsspp.png
+Icon=/usr/share/icons/reglinux/ppsspp.png
 Exec=/usr/bin/batocera-config-ppsspp
 Terminal=false
 Type=Application

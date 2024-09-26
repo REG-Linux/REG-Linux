@@ -2,7 +2,7 @@
 
 log="/userdata/system/logs/display.log"
 mpvlog="/userdata/system/logs/mpv.log"
-BOOTCONF="/boot/batocera-boot.conf"
+BOOTCONF="/boot/system-boot.conf"
 
 PSCREEN=
 if test "${1}" = "--screen"

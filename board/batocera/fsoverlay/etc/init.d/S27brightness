@@ -17,7 +17,7 @@ case $1 in
         current_brightness=$(batocera-brightness)
         stored_brightness=$(batocera-settings-get display.brightness)
         if [ "$stored_brightness" != "$current_brightness" ]; then
-            if [ -e "/userdata/system/batocera.conf" ]; then
+            if [ -e "/userdata/system/system.conf" ]; then
                 batocera-settings-set display.brightness "$current_brightness"
             fi
         fi

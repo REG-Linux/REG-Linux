@@ -187,7 +187,7 @@ def getAltDecoration(systemName, rom, emulator):
         return "0"
 
     # Look for external file, exit if not set up
-    specialFile = '/usr/share/batocera/configgen/data/special/' + systemName + '.csv'
+    specialFile = '/usr/share/reglinux/configgen/data/special/' + systemName + '.csv'
     if not os.path.exists(specialFile):
         return "0"
 

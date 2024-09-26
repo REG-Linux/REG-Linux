@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/fpinball.png
+Icon=/usr/share/icons/reglinux/fpinball.png
 Exec=/usr/bin/batocera-config-fpinball
 Terminal=false
 Type=Application

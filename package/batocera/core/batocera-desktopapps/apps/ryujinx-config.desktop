@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/ryujinx.png
+Icon=/usr/share/icons/reglinux/ryujinx.png
 Exec=/usr/bin/batocera-config-ryujinx
 Terminal=false
 Type=Application

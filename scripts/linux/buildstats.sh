@@ -37,7 +37,7 @@ echo '<body>'
 
 echo -n "<h1>"
 echo -n "${BOARD} - "
-cat "${BROUTPUTDIR}/images/batocera/batocera.version"
+cat "${BROUTPUTDIR}/images/batocera/system.version"
 echo "</h1>"
 echo "<h2>Files</h2>"
 echo "<ul>"

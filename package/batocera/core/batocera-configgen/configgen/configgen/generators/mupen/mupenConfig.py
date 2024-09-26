@@ -196,7 +196,7 @@ def setMupenConfig(iniConfig, system, controllers, gameResolution):
         iniConfig.set("Video-Rice",       "ShowFPS",  "False")
         iniConfig.set("Video-Glide64mk2", "show_fps", "8") # 1=FPS counter, 2=VI/s counter, 4=% speed, 8=FPS transparent
 
-        # Custom : allow the user to configure directly mupen64plus.cfg via batocera.conf via lines like : n64.mupen64plus.section.option=value
+        # Custom : allow the user to configure directly mupen64plus.cfg via system.conf via lines like : n64.mupen64plus.section.option=value
         for user_config in system.config:
             if user_config[:12] == "mupen64plus.":
                 section_option = user_config[12:]

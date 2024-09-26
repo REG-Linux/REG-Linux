@@ -62,7 +62,7 @@ def setViceConfig(viceConfigFile, system, metadata, guns, rom):
         viceConfig.set(systemCore, "JoyDevice2",             "4")
     viceConfig.set(systemCore, "JoyMapFile",  viceController)
 
-    # custom : allow the user to configure directly sdl-vicerc via batocera.conf via lines like : vice.section.option=value
+    # custom : allow the user to configure directly sdl-vicerc via system.conf via lines like : vice.section.option=value
     for user_config in system.config:
         if user_config[:5] == "vice.":
             section_option = user_config[5:]

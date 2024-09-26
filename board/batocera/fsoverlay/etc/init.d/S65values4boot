@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Make batocera.conf specific values available to batocera-boot.conf
+# Make system.conf specific values available to system-boot.conf
 # in a very early boot stage process where the regular conf-file
 # is not available.
 
@@ -10,8 +10,8 @@
 set --
 for key in wifi.enabled wifi.ssid wifi.key wifi2.ssid wifi2.key wifi3.ssid wifi3.key wifi.hidden.ssid wifi.hidden.key system.timezone es.resolution system.hostname
 do
-    value="$(/usr/bin/batocera-settings-get "$key")" # in case it is empty, it must be set in the batocera-boot.conf file to erase any existing value
-    if [ "$value" != "$(/usr/bin/batocera-settings-get -f /boot/batocera-boot.conf "$key")" ]
+    value="$(/usr/bin/batocera-settings-get "$key")" # in case it is empty, it must be set in the system-boot.conf file to erase any existing value
+    if [ "$value" != "$(/usr/bin/batocera-settings-get -f /boot/system-boot.conf "$key")" ]
     then
         set -- "$@" "$key" "$value"
     fi
@@ -20,7 +20,7 @@ done
 if [ $# -gt 0 ]
 then
     mount -o remount,rw /boot
-    /usr/bin/batocera-settings-set -f /boot/batocera-boot.conf "$@"
+    /usr/bin/batocera-settings-set -f /boot/system-boot.conf "$@"
     mount -o remount,ro /boot
 fi
 

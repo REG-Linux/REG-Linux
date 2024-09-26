@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/dolphin-triforce.png
+Icon=/usr/share/icons/reglinux/dolphin-triforce.png
 Exec=/usr/bin/batocera-config-dolphin-triforce
 Terminal=false
 Type=Application

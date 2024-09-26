@@ -3,7 +3,7 @@
 log="/userdata/system/logs/display.log"
 
 DAEMON="splash-mpv"
-DEFAULT="/usr/share/batocera/splash/splash.mp4"
+DEFAULT="/usr/share/reglinux/splash/splash.mp4"
 SPLASH_DIR=/userdata/splash
 
 FM_IMAGE=".*\.\(jpg\|jpeg\|png\)"
@@ -19,7 +19,7 @@ fi
 BOARD_MODEL="$(echo "$BOARD_MODEL" | sed -e s+"[^A-Za-z0-9]"+"_"+g)"
 BOARD_CHA="Capcom_Home_Arcade"
 if [ "${BOARD_MODEL}" = "${BOARD_CHA}" ]; then
-    DEFAULT="/usr/share/batocera/splash/Capcom.mp4"
+    DEFAULT="/usr/share/reglinux/splash/Capcom.mp4"
 fi
 
 do_angels_conversion ()
@@ -175,7 +175,7 @@ do_videostart ()
 case "$1" in
     start)
         printf 'Starting %s: ' "$DAEMON"
-        if grep -qE '^[ ]*splash.screen.enabled[ ]*=[ ]*0[ ]*$' "/boot/batocera-boot.conf"
+        if grep -qE '^[ ]*splash.screen.enabled[ ]*=[ ]*0[ ]*$' "/boot/system-boot.conf"
         then
             echo "SKIPPED"
             exit 0

@@ -90,7 +90,7 @@ quit_script() {
 # ---- MAIN ----
 echo "Starting upgrade process..."
 
-board=$(cat /boot/boot/batocera.board)
+board=$(cat /boot/boot/system.board)
 updatetype="$(/usr/bin/batocera-settings-get updates.type)"
 # force a default value in case the value is removed or miswritten
 [ "${updatetype}" != "beta" ] && updatetype="stable"
@@ -156,7 +156,7 @@ case $1 in
 esac
 
 # confirm that update is for same board
-newboard=$(tar --zstd -Oxf "$UPGRADEFILE" 'boot/batocera.board')
+newboard=$(tar --zstd -Oxf "$UPGRADEFILE" 'boot/system.board')
 if [ "$board" = "$newboard" ]; then
 
     if [ -e "${UPGRADEFILE}.md5" ]; then

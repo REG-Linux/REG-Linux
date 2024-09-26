@@ -30,7 +30,7 @@ ifeq ($(BR2_PACKAGE_RTMIDI),y)
     THEFORCEENGINE_CONF_OPTS += -DDISABLE_SYSMIDI=OFF
 endif
 
-THEFORCEENGINE_CONF_INIT = $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/theforceengine/
+THEFORCEENGINE_CONF_INIT = $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/theforceengine/
 
 define THEFORCEENGINE_INSTALL_TARGET_CMDS
     mkdir -p $(THEFORCEENGINE_CONF_INIT)
