@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BOOTCONF="/boot/batocera-boot.conf"
+BOOTCONF="/boot/system-boot.conf"
 REBOOT_FLAG=/var/run/emulationstation-standalone
 log="/userdata/system/logs/display.log"
 

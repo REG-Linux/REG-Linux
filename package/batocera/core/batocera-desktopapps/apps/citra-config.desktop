@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/citra.png
+Icon=/usr/share/icons/reglinux/citra.png
 Exec=/usr/bin/batocera-config-citra
 Terminal=false
 Type=Application

@@ -13,8 +13,8 @@ define COMMON_SHADERS_BUILD_CMDS
 endef
 
 define COMMON_SHADERS_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/shaders
-	$(MAKE) CXX="$(TARGET_CXX)" -C $(@D) INSTALLDIR=$(TARGET_DIR)/usr/share/batocera/shaders install
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders
+	$(MAKE) CXX="$(TARGET_CXX)" -C $(@D) INSTALLDIR=$(TARGET_DIR)/usr/share/reglinux/shaders install
 endef
 
 $(eval $(generic-package))

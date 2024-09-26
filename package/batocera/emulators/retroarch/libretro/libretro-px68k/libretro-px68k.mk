@@ -32,9 +32,9 @@ define LIBRETRO_PX68K_INSTALL_TARGET_CMDS
 	  $(TARGET_DIR)/usr/lib/libretro/px68k_libretro.so
 
 	# Bios
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/keropi
-	echo "[WinX68k]" > $(TARGET_DIR)/usr/share/batocera/datainit/bios/keropi/config
-	echo "StartDir=/userdata/roms/x68000/" >> $(TARGET_DIR)/usr/share/batocera/datainit/bios/keropi/config
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/keropi
+	echo "[WinX68k]" > $(TARGET_DIR)/usr/share/reglinux/datainit/bios/keropi/config
+	echo "StartDir=/userdata/roms/x68000/" >> $(TARGET_DIR)/usr/share/reglinux/datainit/bios/keropi/config
 endef
 
 $(eval $(generic-package))

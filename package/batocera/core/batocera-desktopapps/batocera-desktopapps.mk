@@ -176,8 +176,8 @@ define BATOCERA_DESKTOPAPPS_INSTALL_TARGET_CMDS
 	$(foreach f,$(BATOCERA_DESKTOPAPPS_APPS), cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-desktopapps/apps/$(f) $(TARGET_DIR)/usr/share/applications/$(f)$(sep))
 
 	# icons
-	mkdir -p $(TARGET_DIR)/usr/share/icons/batocera
-	$(foreach f,$(BATOCERA_DESKTOPAPPS_ICONS), cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-desktopapps/icons/$(f) $(TARGET_DIR)/usr/share/icons/batocera/$(f)$(sep))
+	mkdir -p $(TARGET_DIR)/usr/share/icons/reglinux
+	$(foreach f,$(BATOCERA_DESKTOPAPPS_ICONS), cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-desktopapps/icons/$(f) $(TARGET_DIR)/usr/share/icons/reglinux/$(f)$(sep))
 
 	# menu
 	mkdir -p $(TARGET_DIR)/etc/xdg/menus

@@ -101,7 +101,7 @@ class Pcsx2Generator(Generator):
         if not os.path.exists(pcsx2BiosDir):
             os.makedirs(pcsx2BiosDir)
         if not os.path.exists(pcsx2Patches):
-            source_file = "/usr/share/batocera/datainit/bios/ps2/patches.zip"
+            source_file = "/usr/share/reglinux/datainit/bios/ps2/patches.zip"
             shutil.copy(source_file, pcsx2Patches)
 
         return Command.Command(
@@ -513,7 +513,7 @@ def configureINI(config_directory, bios_directory, system, rom, controllers, met
                         pcsx2INIConfig.set("USB1", "guncon2_Start", "SDL-{}/{}".format(pad.index, "Start"))
                 nc = nc + 1
 
-            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in batocera.conf, else default config
+            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
             if "controllers.pedals1" in system.config:
                 pedalkey = system.config["controllers.pedals1"]
             else:
@@ -530,7 +530,7 @@ def configureINI(config_directory, bios_directory, system, rom, controllers, met
                     if "start" in pad.inputs:
                         pcsx2INIConfig.set("USB2", "guncon2_Start", "SDL-{}/{}".format(pad.index, "Start"))
                 nc = nc + 1
-            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in batocera.conf, else default config
+            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
             if "controllers.pedals2" in system.config:
                 pedalkey = system.config["controllers.pedals2"]
             else:

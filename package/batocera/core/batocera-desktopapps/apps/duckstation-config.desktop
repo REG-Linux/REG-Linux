@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/duckstation.png
+Icon=/usr/share/icons/reglinux/duckstation.png
 Exec=/usr/bin/batocera-config-duckstation
 Terminal=false
 Type=Application

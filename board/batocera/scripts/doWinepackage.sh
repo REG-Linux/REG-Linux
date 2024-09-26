@@ -158,8 +158,8 @@ else
     XTARGET_IMAGE="${PWD}/${TARGET_IMAGE}"
 fi
 
-XTARGET_VERSION=$(cat "${G_TARGETDIR}/usr/share/batocera/batocera.version" | sed -e s+" .*$"++)
-XTARGET_ARCH=$(cat "${G_TARGETDIR}/usr/share/batocera/batocera.arch")
+XTARGET_VERSION=$(cat "${G_TARGETDIR}/usr/share/reglinux/system.version" | sed -e s+" .*$"++)
+XTARGET_ARCH=$(cat "${G_TARGETDIR}/usr/share/reglinux/system.arch")
 XTARGET_FILE="wine-${XTARGET_ARCH}-${XTARGET_VERSION}.tar.lzma"
 
 echo "tar.lzma..."

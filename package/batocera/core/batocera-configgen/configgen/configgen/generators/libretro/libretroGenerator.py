@@ -51,7 +51,7 @@ class LibretroGenerator(Generator):
                 video_shader_dir = "/userdata/shaders"
                 eslog.debug("shader {} found in /userdata/shaders".format(shaderFilename))
             else:
-                video_shader_dir = "/usr/share/batocera/shaders"
+                video_shader_dir = "/usr/share/reglinux/shaders"
             video_shader = video_shader_dir + "/" + shaderFilename
             # If the shader filename contains noBezel, activate Shader Bezel mode.
             if "noBezel" in video_shader:

@@ -131,9 +131,9 @@ define BATOCERA_EMULATIONSTATION_RESOURCES
 	    $(TARGET_DIR)/usr/share/emulationstation/resources/services
 
 	# es_input.cfg
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/emulationstation
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 	cp $(BATOCERA_EMULATIONSTATION_SOURCE_PATH)/controllers/es_input.cfg \
-		$(TARGET_DIR)/usr/share/batocera/datainit/system/configs/emulationstation
+		$(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 
 	# hooks
 	cp $(BATOCERA_EMULATIONSTATION_SOURCE_PATH)/batocera-preupdate-gamelists-hook \

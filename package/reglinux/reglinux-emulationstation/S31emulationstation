@@ -1,5 +1,5 @@
 #!/bin/sh
-BOOTCONF="/boot/batocera-boot.conf"
+BOOTCONF="/boot/system-boot.conf"
 
 . /etc/profile.d/xdg.sh
 . /etc/profile.d/dbus.sh

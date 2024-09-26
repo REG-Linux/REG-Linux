@@ -17,7 +17,7 @@ body:
       description: |
         REG Linux version used.
         GUI: SYSTEM SETTINGS -> INFORMATION
-        Terminal: cat /usr/share/batocera/batocera.version
+        Terminal: cat /usr/share/reglinux/system.version
         Or details can be obtained from batocera-info in your support file. (See logs below)
       placeholder: 39-dev-2da5edeea0 2024/02/03 03:28
     validations:
@@ -74,7 +74,7 @@ body:
       label: Details of any attempts to fix this yourself
       description: |
         1. Details of what you have tried to fix this yourself.
-        2. i.e. Set the resolution to 1920 x 1080 using batocera.conf file
+        2. i.e. Set the resolution to 1920 x 1080 using system.conf file
         3. Tried these instructions from the wiki here...
       placeholder: |
         I spoke to someone on discord and they told me to change this file.

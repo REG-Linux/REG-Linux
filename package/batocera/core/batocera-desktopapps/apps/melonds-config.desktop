@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/melonds.png
+Icon=/usr/share/icons/reglinux/melonds.png
 Exec=/usr/bin/batocera-config-melonds
 Terminal=false
 Type=Application

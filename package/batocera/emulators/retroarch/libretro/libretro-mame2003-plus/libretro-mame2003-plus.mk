@@ -53,9 +53,9 @@ define LIBRETRO_MAME2003_PLUS_INSTALL_TARGET_CMDS
 	# Bios
 	# Need to think of another way to use these files.
 	# They take up a lot of space on tmpfs.
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios/mame2003-plus/samples
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/mame2003-plus/samples
 	cp -r $(@D)/metadata-install/* \
-		$(TARGET_DIR)/usr/share/batocera/datainit/bios/mame2003-plus
+		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/mame2003-plus
 endef
 
 define LIBRETRO_MAME2003_PLUS_NAMCO_QUICK_FIX

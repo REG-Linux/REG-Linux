@@ -2,13 +2,13 @@
 
 # S05amd-check forces the amdgpu over the legacy radeon driver(s)
 # for supported AMD island cards only 
-# function can be turned off using batocera-boot.conf
+# function can be turned off using system-boot.conf
 
 # try to create the log dir
 mkdir -p "/userdata/system/logs"
 log="/userdata/system/logs/amd.log"
 
-if grep -qE "^[ ]*amdgpu[ ]*=[ ]*true[ ]*$" /boot/batocera-boot.conf
+if grep -qE "^[ ]*amdgpu[ ]*=[ ]*true[ ]*$" /boot/system-boot.conf
 then
   echo "Detecting AMD or Radeon GPU." > "$log"
   gpu_name=$(lspci -nn | grep -iE "AMD/ATI" | grep -iE "VGA|3D|Display controller")

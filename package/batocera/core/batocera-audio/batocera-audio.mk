@@ -15,7 +15,7 @@ define BATOCERA_AUDIO_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR) \
 		$(TARGET_DIR)/usr/bin \
 		$(TARGET_DIR)/usr/share/sounds \
-		$(TARGET_DIR)/usr/share/batocera/alsa \
+		$(TARGET_DIR)/usr/share/reglinux/alsa \
 		$(TARGET_DIR)/etc/init.d \
 		$(TARGET_DIR)/etc/udev/rules.d \
 		$(TARGET_DIR)/etc/dbus-1/system.d \
@@ -24,7 +24,7 @@ define BATOCERA_AUDIO_INSTALL_TARGET_CMDS
 
 	# default alsa configurations
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/alsa/asoundrc-* \
-		$(TARGET_DIR)/usr/share/batocera/alsa/
+		$(TARGET_DIR)/usr/share/reglinux/alsa/
 
 	# sample audio files
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/*.wav \

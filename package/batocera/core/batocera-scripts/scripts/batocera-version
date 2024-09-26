@@ -37,7 +37,7 @@ then
 	echo "${EXTRA}"
     fi
 else
-    REGversion=$(cat /usr/share/batocera/batocera.version)
+    REGversion=$(cat /usr/share/reglinux/system.version)
     [ -z "$REGversion" ] && REGversion="UNKNOWN"
     [ -n "${EXTRA}" ] && EXTRA="-${EXTRA}"
     echo "${REGversion%% *}${EXTRA}"

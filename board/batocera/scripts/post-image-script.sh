@@ -41,7 +41,7 @@ fi
 mkdir -p "${REGLINUX_BINARIES_DIR}/images" || exit 1
 
 ##### build images #############
-SUFFIXVERSION=$(cat "${TARGET_DIR}/usr/share/batocera/batocera.version" | sed -e s+'^\([0-9\.]*\).*$'+'\1'+) # xx.yy version
+SUFFIXVERSION=$(cat "${TARGET_DIR}/usr/share/reglinux/system.version" | sed -e s+'^\([0-9\.]*\).*$'+'\1'+) # xx.yy version
 SUFFIXDATE=$(date +%Y%m%d)
 VFATUUID="$(date '+%d%m')-$(date '+%M%S')"
 
@@ -57,8 +57,8 @@ do
     bash "${BATOCERA_POST_IMAGE_SCRIPT}" "${HOST_DIR}" "${BR2_EXTERNAL_BATOCERA_PATH}/board/batocera/${BATOCERA_PATHSUBTARGET}" "${BUILD_DIR}" "${BINARIES_DIR}" "${TARGET_DIR}" "${REGLINUX_BINARIES_DIR}" || exit 1
     # add some common files
     #nope cp -pr "${BINARIES_DIR}/tools"              "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
-    cp     "${BINARIES_DIR}/batocera-boot.conf" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
-    echo   "${BATOCERA_SUBTARGET}" > "${REGLINUX_BINARIES_DIR}/boot/boot/batocera.board" || exit 1
+    cp     "${BINARIES_DIR}/system-boot.conf" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
+    echo   "${BATOCERA_SUBTARGET}" > "${REGLINUX_BINARIES_DIR}/boot/boot/system.board" || exit 1
 
     #### boot-$BOARD.tar.zst ###############
     echo "creating images/${BATOCERA_SUBTARGET}/boot-${BATOCERA_SUBTARGET}.tar.zst"
@@ -108,7 +108,7 @@ do
     rm -rf "${REGLINUX_BINARIES_DIR}/boot" || exit 1
 
     # copy the version file needed for version check
-    cp "${TARGET_DIR}/usr/share/batocera/batocera.version" "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
+    cp "${TARGET_DIR}/usr/share/reglinux/system.version" "${REGLINUX_BINARIES_DIR}/images/${BATOCERA_SUBTARGET}" || exit 1
 done
 
 #### md5 and sha256 #######################
@@ -135,5 +135,5 @@ done
 rm -rf ${GENIMAGE_TMP}
 
 #### update the target dir with some information files
-cp "${TARGET_DIR}/usr/share/batocera/batocera.version" "${REGLINUX_BINARIES_DIR}" || exit 1
+cp "${TARGET_DIR}/usr/share/reglinux/system.version" "${REGLINUX_BINARIES_DIR}" || exit 1
 "${BR2_EXTERNAL_BATOCERA_PATH}"/scripts/linux/systemsReport.sh "${PWD}" "${REGLINUX_BINARIES_DIR}" || exit 1

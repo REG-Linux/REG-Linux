@@ -53,7 +53,7 @@ class MameGenerator(Generator):
             if not os.path.exists("/userdata/" + checkPath + "/"):
                 os.makedirs("/userdata/" + checkPath + "/")
 
-        messDataFile = '/usr/share/batocera/configgen/data/mame/messSystems.csv'
+        messDataFile = '/usr/share/reglinux/configgen/data/mame/messSystems.csv'
         openFile = open(messDataFile, 'r')
         messSystems = []
         messSysName = []
@@ -517,7 +517,7 @@ class MameGenerator(Generator):
             else:
                 # Check for an override file, otherwise use generic (if it exists)
                 autoRunCmd = messAutoRun[messMode]
-                autoRunFile = '/usr/share/batocera/configgen/data/mame/{}_autoload.csv'.format(softList)
+                autoRunFile = '/usr/share/reglinux/configgen/data/mame/{}_autoload.csv'.format(softList)
                 if os.path.exists(autoRunFile):
                     openARFile = open(autoRunFile, 'r')
                     with openARFile:
@@ -698,9 +698,9 @@ class MameGenerator(Generator):
         if system.isOptSet('bezel.tattoo') and system.config['bezel.tattoo'] != "0":
             if system.config['bezel.tattoo'] == 'system':
                 try:
-                    tattoo_file = '/usr/share/batocera/controller-overlays/'+system.name+'.png'
+                    tattoo_file = '/usr/share/reglinux/controller-overlays/'+system.name+'.png'
                     if not os.path.exists(tattoo_file):
-                        tattoo_file = '/usr/share/batocera/controller-overlays/generic.png'
+                        tattoo_file = '/usr/share/reglinux/controller-overlays/generic.png'
                     tattoo = Image.open(tattoo_file)
                 except Exception as e:
                     eslog.error(f"Error opening controller overlay: {tattoo_file}")
@@ -712,7 +712,7 @@ class MameGenerator(Generator):
                     eslog.error("Error opening custom file: {}".format('tattoo_file'))
             else:
                 try:
-                    tattoo_file = '/usr/share/batocera/controller-overlays/generic.png'
+                    tattoo_file = '/usr/share/reglinux/controller-overlays/generic.png'
                     tattoo = Image.open(tattoo_file)
                 except:
                     eslog.error("Error opening custom file: {}".format('tattoo_file'))
@@ -787,12 +787,12 @@ class MameGenerator(Generator):
 
 def getMameControlScheme(system, romBasename):
     # Game list files
-    mameCapcom = '/usr/share/batocera/configgen/data/mame/mameCapcom.txt'
-    mameKInstinct = '/usr/share/batocera/configgen/data/mame/mameKInstinct.txt'
-    mameMKombat = '/usr/share/batocera/configgen/data/mame/mameMKombat.txt'
-    mameNeogeo = '/usr/share/batocera/configgen/data/mame/mameNeogeo.txt'
-    mameTwinstick = '/usr/share/batocera/configgen/data/mame/mameTwinstick.txt'
-    mameRotatedstick = '/usr/share/batocera/configgen/data/mame/mameRotatedstick.txt'
+    mameCapcom = '/usr/share/reglinux/configgen/data/mame/mameCapcom.txt'
+    mameKInstinct = '/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt'
+    mameMKombat = '/usr/share/reglinux/configgen/data/mame/mameMKombat.txt'
+    mameNeogeo = '/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt'
+    mameTwinstick = '/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt'
+    mameRotatedstick = '/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt'
 
     # Controls for games with 5-6 buttons or other unusual controls
     if system.isOptSet("altlayout"):

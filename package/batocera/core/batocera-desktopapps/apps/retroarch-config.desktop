@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/retroarch.png
+Icon=/usr/share/icons/reglinux/retroarch.png
 Exec=/usr/bin/batocera-config-retroarch
 Terminal=false
 Type=Application

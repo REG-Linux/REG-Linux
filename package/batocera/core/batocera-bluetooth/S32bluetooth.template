@@ -3,7 +3,7 @@
 # Auto connect bluetooth controllers
 #
 
-BOARD=$(cat /boot/boot/batocera.board)
+BOARD=$(cat /boot/boot/system.board)
 
 case "$1" in
     start)

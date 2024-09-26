@@ -457,7 +457,7 @@ class DuckstationGenerator(Generator):
                         settings.set(pad_num, "Type", "GunCon")
                         settings.set(pad_num, "Trigger", gun_num+"/LeftButton")
 
-                    ### find a keyboard key to simulate the action of the player (always like button 2) ; search in batocera.conf, else default config
+                    ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
                     pedalsKeys = {1: "c", 2: "v", 3: "b", 4: "n"}
                     pedalkey = None
                     pedalcname = "controllers.pedals{}".format(nplayer)

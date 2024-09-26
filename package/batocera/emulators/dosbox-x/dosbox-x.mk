@@ -24,9 +24,9 @@ define DOSBOX_X_CONFIGURE_CMDS
 endef
 
 define DOSBOX_X_CONFIGURE_CONFIG
-    mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/dosbox
+    mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/dosbox
     cp -rf $(@D)/dosbox-x.reference.conf \
-        $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/dosbox/dosboxx.conf
+        $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/dosbox/dosboxx.conf
 endef
 
 DOSBOX_X_POST_INSTALL_TARGET_HOOKS += DOSBOX_X_CONFIGURE_CONFIG

@@ -37,9 +37,9 @@ define LIBRETRO_NESTOPIA_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/lib/libretro/nestopia_libretro.so
 
 	# Bios
-	mkdir -p $(TARGET_DIR)/usr/share/batocera/datainit/bios
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios
 	$(INSTALL) -D $(@D)/NstDatabase.xml \
-		$(TARGET_DIR)/usr/share/batocera/datainit/bios/NstDatabase.xml
+		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/NstDatabase.xml
 endef
 
 $(eval $(generic-package))

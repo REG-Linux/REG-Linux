@@ -16,7 +16,7 @@ endef
 define OPENJAZZ_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/openjazz/openjazz.keys $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/openjazz/openjazz.cfg $(TARGET_DIR)/usr/share/batocera/datainit/system/configs/openjazz.cfg
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/openjazz/openjazz.cfg $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/openjazz.cfg
 endef
 
 $(eval $(cmake-package))

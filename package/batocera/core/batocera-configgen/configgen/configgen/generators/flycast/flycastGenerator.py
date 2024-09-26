@@ -157,7 +157,7 @@ class FlycastGenerator(Generator):
         else:
             Config.set("config", "rend.CrossHairColor4", "0")
 
-        # custom : allow the user to configure directly emu.cfg via batocera.conf via lines like : dreamcast.flycast.section.option=value
+        # custom : allow the user to configure directly emu.cfg via system.conf via lines like : dreamcast.flycast.section.option=value
         for user_config in system.config:
             if user_config[:8] == "flycast.":
                 section_option = user_config[8:]

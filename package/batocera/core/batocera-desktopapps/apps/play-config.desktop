@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Icon=/usr/share/icons/batocera/play.png
+Icon=/usr/share/icons/reglinux/play.png
 Exec=/usr/bin/batocera-config-play
 Terminal=false
 Type=Application

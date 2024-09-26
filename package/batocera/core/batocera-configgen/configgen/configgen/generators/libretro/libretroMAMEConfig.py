@@ -98,7 +98,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                 softList = 'fmtowns_cd'
 
         # Determine MESS system name (if needed)
-        messDataFile = '/usr/share/batocera/configgen/data/mame/messSystems.csv'
+        messDataFile = '/usr/share/reglinux/configgen/data/mame/messSystems.csv'
         openFile = open(messDataFile, 'r')
         messSystems = []
         messSysName = []
@@ -380,7 +380,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
             else:
                 # Check for an override file, otherwise use generic (if it exists)
                 autoRunCmd = messAutoRun[messMode]
-                autoRunFile = '/usr/share/batocera/configgen/data/mame/' + softList + '_autoload.csv'
+                autoRunFile = '/usr/share/reglinux/configgen/data/mame/' + softList + '_autoload.csv'
                 if os.path.exists(autoRunFile):
                     openARFile = open(autoRunFile, 'r')
                     with openARFile:
@@ -491,12 +491,12 @@ def prepSoftwareList(subdirSoftList, softList, softDir, hashDir, romDirname):
 
 def getMameControlScheme(system, romBasename):
     # Game list files
-    mameCapcom = '/usr/share/batocera/configgen/data/mame/mameCapcom.txt'
-    mameKInstinct = '/usr/share/batocera/configgen/data/mame/mameKInstinct.txt'
-    mameMKombat = '/usr/share/batocera/configgen/data/mame/mameMKombat.txt'
-    mameNeogeo = '/usr/share/batocera/configgen/data/mame/mameNeogeo.txt'
-    mameTwinstick = '/usr/share/batocera/configgen/data/mame/mameTwinstick.txt'
-    mameRotatedstick = '/usr/share/batocera/configgen/data/mame/mameRotatedstick.txt'
+    mameCapcom = '/usr/share/reglinux/configgen/data/mame/mameCapcom.txt'
+    mameKInstinct = '/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt'
+    mameMKombat = '/usr/share/reglinux/configgen/data/mame/mameMKombat.txt'
+    mameNeogeo = '/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt'
+    mameTwinstick = '/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt'
+    mameRotatedstick = '/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt'
 
     # Controls for games with 5-6 buttons or other unusual controls
     if system.isOptSet("altlayout"):
@@ -572,7 +572,7 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
     altButtons = getMameControlScheme(system, romBasename)
 
     # Load standard controls from csv
-    controlFile = '/usr/share/batocera/configgen/data/mame/mameControls.csv'
+    controlFile = '/usr/share/reglinux/configgen/data/mame/mameControls.csv'
     openFile = open(controlFile, 'r')
     controlDict = {}
     with openFile:
@@ -621,7 +621,7 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
         "socrates", "vgmplay", "pdp1", "vc4000", "fmtmarty", "gp32", "apple2p", "apple2e", "apple2ee" ]
     if messSysName in specialControlList:
         # Load mess controls from csv
-        messControlFile = '/usr/share/batocera/configgen/data/mame/messControls.csv'
+        messControlFile = '/usr/share/reglinux/configgen/data/mame/messControls.csv'
         openMessFile = open(messControlFile, 'r')
         with openMessFile:
             controlList = csv.reader(openMessFile, delimiter=';')

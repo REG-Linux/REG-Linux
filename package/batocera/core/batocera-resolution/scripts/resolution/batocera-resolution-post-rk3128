@@ -11,7 +11,7 @@ fi
 
 ACTION=$1
 PARAM=$2
-INTERNALCARD=$(cat /boot/boot/batocera.board)
+INTERNALCARD=$(cat /boot/boot/system.board)
 
 if test "${INTERNALCARD}" = "p5000"
 then
