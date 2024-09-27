@@ -399,7 +399,7 @@ class BigPEmuGenerator(Generator):
             json.dump(config, file, indent=4)
 
         # Run the emulator
-        commandArray = ["/usr/bigpemu/bigpemu", rom]
+        commandArray = ["/usr/bin/box64", "/usr/bigpemu/bigpemu", rom]
 
         environment = {
             "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
