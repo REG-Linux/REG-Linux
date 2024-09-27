@@ -30,3 +30,6 @@ gamecube:
 wii:
   emulator: dolphin
   core:     dolphin
+jaguar:
+  emulator: bigpemu
+  core:     bigpemu
