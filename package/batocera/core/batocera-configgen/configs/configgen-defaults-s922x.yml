@@ -19,3 +19,6 @@ ps2:
 flash:
   emulator: lightspark
   core:     lightspark
+jaguar:
+  emulator: bigpemu
+  core:     bigpemu
