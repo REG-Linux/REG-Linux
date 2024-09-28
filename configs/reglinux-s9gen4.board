@@ -9,8 +9,8 @@ BR2_PACKAGE_BATOCERA_TARGET_S9GEN4=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mcpu=cortex-a35+crypto -mtune=cortex-a35"
 BR2_TARGET_GENERIC_GETTY_PORT="ttyS0"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/s9gen4/patches"
-BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/s9gen4/fsoverlay"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_BATOCERA_PATH)/board/amlogic/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/amlogic/s9gen4/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/amlogic/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/amlogic/s9gen4/fsoverlay"
 
 # Linux headers same as kernel, a 5.4 series
 BR2_KERNEL_HEADERS_AS_KERNEL=y
@@ -20,10 +20,10 @@ BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4=y
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https://github.com/khadas/linux/archive/refs/tags/khadas-vims-linux-5.4-v1.5.2-release.tar.gz"
-BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/s9gen4/linux_patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/khadas-5.4"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/amlogic/s9gen4/linux_patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/khadas-5.4"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/s9gen4/linux-vim1s-5.4.180.config"
-BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/amlogic/s9gen4/linux-defconfig-fragment.config"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/amlogic/s9gen4/linux-vim1s-5.4.180.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/amlogic/s9gen4/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources

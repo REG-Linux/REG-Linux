@@ -32,7 +32,7 @@ endef
 
 define BATOCERA_RESOLUTION_INSTALL_XORG
 	mkdir -p $(TARGET_DIR)/etc/X11/xorg.conf.d
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/x86/fsoverlay/etc/X11/xorg.conf.d/20-amdgpu.conf $(TARGET_DIR)/etc/X11/xorg.conf.d/20-amdgpu.conf
+	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/board/x86/fsoverlay/etc/X11/xorg.conf.d/20-amdgpu.conf $(TARGET_DIR)/etc/X11/xorg.conf.d/20-amdgpu.conf
 endef
 
 define BATOCERA_RESOLUTION_INSTALL_RECORDER
