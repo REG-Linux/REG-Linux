@@ -59,7 +59,7 @@ do_videostart ()
     omx_srt="--no-ghost-box --lines=1 --align=left $omx_fnt --font-size=20 --subtitles=/usr/share/reglinux/splash/splash.srt"
 
     omx_nosound=
-    soundDisabled=$(batocera-settings-get splash.screen.sound)
+    soundDisabled=$(/usr/bin/system-settings-get splash.screen.sound)
     if [[ $? -eq 0 ]]; then
 	if test "${soundDisabled}" = 0
 	then

@@ -4,7 +4,7 @@ mkdir -p "/var/log"
 log="/var/log/nvidia.log"
 
 echo  > $log
-echo "OS version: $(batocera-version)" >> $log
+echo "OS version: $(system-version)" >> $log
 echo  >> $log
 
 # detect the appropriate Nvidia driver

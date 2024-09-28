@@ -236,7 +236,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_BATOCERA_SCRIPTS			# batocera scripts
 	select BR2_PACKAGE_REGLINUX_SCREEN			# reglinux screen configuration
 	#select BR2_PACKAGE_BATOCERA_RESOLUTION			# batocera resolution
-	select BR2_PACKAGE_BATOCERA_SETTINGS			# batocera-settings-get/set
+	select BR2_PACKAGE_BATOCERA_SETTINGS			# system-settings-get/set
 
 	# Use ALSA light audio stack for weak platforms
 	select BR2_PACKAGE_BATOCERA_AUDIO_ALSA			if BR2_PACKAGE_BATOCERA_TARGET_BCM2835 || \
@@ -245,7 +245,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 								   BR2_PACKAGE_BATOCERA_TARGET_JZ4770
 	# Use PipeWire audio stack for all other platforms
 	select BR2_PACKAGE_BATOCERA_AUDIO			if !BR2_PACKAGE_BATOCERA_AUDIO_ALSA
-	select BR2_PACKAGE_BATOCERA_BLUETOOTH			# batocera bluetooth
+	select BR2_PACKAGE_BATOCERA_BLUETOOTH		if !BR2_PACKAGE_BATOCERA_TARGET_CHA 	# batocera bluetooth
 	select BR2_PACKAGE_BATOCERA_NOTICE			# boot pdf notice
 	select BR2_PACKAGE_BATOCERA_TEST			# batocera test script
 	select BR2_PACKAGE_WGET					# download tools
@@ -278,11 +278,11 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_E2FSPROGS_RESIZE2FS			# fs resize
 	select BR2_PACKAGE_PACMAN				# pacman package manager
 	select BR2_PACKAGE_FLATPAK				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak app packaging system
-	#select BR2_PACKAGE_BAUH					if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak gui
+	#select BR2_PACKAGE_BAUH				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # flatpak gui
 	select BR2_PACKAGE_RYZENADJ				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # ryzen apu configuration
-	select BR2_PACKAGE_SYNCTHING				if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # sync files across multiple batoceras
+	select BR2_PACKAGE_SYNCTHING			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # sync files across multiple batoceras
 	select BR2_PACKAGE_RCLONE				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # sync files in the cloud (require x86_64)
-	select BR2_PACKAGE_BTOP					# htop alternative
+	select BR2_PACKAGE_BTOP					if !BR2_PACKAGE_BATOCERA_TARGET_CHA	# htop alternative
 	select BR2_PACKAGE_MOKUTIL				if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # mokutil machine owner key utility
 
 	# Controllers
@@ -322,8 +322,8 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_LUA_5_4
 
 	# screens
-	#nope select BR2_PACKAGE_DMD_SIMULATOR
-	#nope select BR2_PACKAGE_DMD_SIMULATOR_PLAYER
+	#nope select BR2_PACKAGE_DMD_SIMULATOR if !BR2_PACKAGE_BATOCERA_TARGET_CHA
+	#nope select BR2_PACKAGE_DMD_SIMULATOR_PLAYER if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 	#nope select BR2_PACKAGE_BATOCERA_BACKGLASS if BR2_PACKAGE_BATOCERA_TARGET_X86_ANY
 
 	# swap on zram, optional user-enabled service

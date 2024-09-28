@@ -65,8 +65,8 @@ wpctl status            > "${DSYSTEM}/wireplumber.txt"
 connmanctl technologies > "${DSYSTEM}/connman-technologies.txt"
 connmanctl services     > "${DSYSTEM}/connman-services.txt"
 batocera-systems        > "${DSYSTEM}/bios.txt"
-batocera-version        > "${DSYSTEM}/system.version"
-batocera-info           > "${DSYSTEM}/batocera.info"
+system-version        > "${DSYSTEM}/system.version"
+system-info           > "${DSYSTEM}/batocera.info"
 ldconfig -p             > "${DSYSTEM}/ldcache.txt"
 # get xrandr provider if x86 system only
 if [ "${V_ARCH}" = "x86" -o "${V_ARCH}" = "x86_64" ]; then

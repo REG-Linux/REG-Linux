@@ -23,7 +23,7 @@ GAMELAUNCH=1
 while test -e "${REBOOT_FLAG}"
 do
     ### lang settings
-    settings_lang="$(batocera-settings-get system.language)"
+    settings_lang="$(/usr/bin/system-settings-get system.language)"
     [ -z "${settings_lang}" ] && settings_lang=en_US
     export LC_ALL="${settings_lang}.UTF-8"
     export LANG=${LC_ALL}
@@ -39,9 +39,9 @@ do
 	settings_output3=
         rm "/var/run/switch_screen_request"
     else
-	settings_output="$(batocera-settings-get global.videooutput)"
-	settings_output2="$(batocera-settings-get global.videooutput2)"
-	settings_output3="$(batocera-settings-get global.videooutput3)"
+	settings_output="$(/usr/bin/system-settings-get global.videooutput)"
+	settings_output2="$(/usr/bin/system-settings-get global.videooutput2)"
+	settings_output3="$(/usr/bin/system-settings-get global.videooutput3)"
     fi
 
     # we set the output to enable screens...
@@ -54,12 +54,12 @@ do
     effective_output=$(batocera-resolution currentOutput)
     if test -n "${effective_output}"
     then
-	    display_rotate=$(/usr/bin/batocera-settings-get-master "display.rotate.${effective_output}")
+	    display_rotate=$(/usr/bin/system-settings-get-master "display.rotate.${effective_output}")
     fi
 
     if test -z "${display_rotate}"
     then
-	    display_rotate="$(/usr/bin/batocera-settings-get-master display.rotate)"
+	    display_rotate="$(/usr/bin/system-settings-get-master display.rotate)"
     fi
 
     if test -n "${effective_output}" && test -n "${display_rotate}"
@@ -76,7 +76,7 @@ do
     # other screens
     if test -n "${settings_output2}"
     then
-	display_rotate2="$(/usr/bin/batocera-settings-get display.rotate2)"
+	display_rotate2="$(/usr/bin/system-settings-get display.rotate2)"
         if batocera-resolution supportSystemRotation
         then
             batocera-resolution --screen "${settings_output2}" setRotation "${display_rotate2}"
@@ -84,7 +84,7 @@ do
     fi
     if test -n "${settings_output3}"
     then
-	display_rotate3="$(/usr/bin/batocera-settings-get display.rotate3)"
+	display_rotate3="$(/usr/bin/system-settings-get display.rotate3)"
         if batocera-resolution supportSystemRotation
         then
             batocera-resolution --screen "${settings_output3}" setRotation "${display_rotate3}"
@@ -95,7 +95,7 @@ do
     ### resolution ###
     ## the resolution for the first screen is on the boot file so that it is easier to change it
     ## it is not needed for other screens
-    bootresolution="$(batocera-settings-get-master -f "$BOOTCONF" es.resolution)"
+    bootresolution="$(/usr/bin/system-settings-get-master -f "$BOOTCONF" es.resolution)"
     if test -z "${bootresolution}"
     then
 	    batocera-resolution minTomaxResolution-secure
@@ -106,7 +106,7 @@ do
     # other screens
     if test -n "${settings_output2}"
     then
-	bootresolution2="$(batocera-settings-get es.resolution2)"
+	bootresolution2="$(/usr/bin/system-settings-get es.resolution2)"
 	if test -z "${bootresolution2}"
 	then
 	    batocera-resolution --screen "${settings_output2}" minTomaxResolution-secure
@@ -116,7 +116,7 @@ do
     fi
     if test -n "${settings_output3}"
     then
-	bootresolution3="$(batocera-settings-get es.resolution3)"
+	bootresolution3="$(/usr/bin/system-settings-get es.resolution3)"
 	if test -z "${bootresolution3}"
 	then
 	    batocera-resolution --screen "${settings_output3}" minTomaxResolution-secure
@@ -131,7 +131,7 @@ do
 	batocera-resolution setOutput "${settings_output}" "${settings_output2}" "${settings_output3}" # empty or invalid values defaults to the first valid
     fi
 
-    CUSTOMESOPTIONS="$(/usr/bin/batocera-settings-get es.customsargs)"
+    CUSTOMESOPTIONS="$(/usr/bin/system-settings-get es.customsargs)"
 
     # launch automatically a game only the first time
     if test ${GAMELAUNCH} = 1

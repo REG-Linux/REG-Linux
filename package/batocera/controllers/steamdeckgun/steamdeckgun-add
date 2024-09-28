@@ -14,8 +14,8 @@ reportOnceConfigurationAvailable() {
 
 reportOnceConfigurationAvailable
 
-SDGUN_HAND=$(batocera-settings-get controllers.steamdeckmouse.hand)
-SDGUN_GUN=$(batocera-settings-get controllers.steamdeckmouse.gun)
+SDGUN_HAND=$(/usr/bin/system-settings-get controllers.steamdeckmouse.hand)
+SDGUN_GUN=$(/usr/bin/system-settings-get controllers.steamdeckmouse.gun)
 
 SDGUN_NAME="Steam Mouse"
 test "${SDGUN_GUN}" = 1 && SDGUN_NAME="Steam Gun"

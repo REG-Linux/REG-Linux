@@ -6,7 +6,7 @@ BTD_PID=$(pgrep -f "/bin/bash $RUN")
 ### --DEVS! Add a new power device to /usr/bin/rpi_gpioswitch array--
 # Read current config, if no key is set in system.conf then try to use
 # default value setted by udev-rule
-powerswitch="$(/usr/bin/batocera-settings-get system.power.switch)"
+powerswitch="$(/usr/bin/system-settings-get system.power.switch)"
 if [ $? -ne 0 ] && [ -f /var/run/powerswitch-by-udevrule ]; then
     powerswitch="$(cat /var/run/powerswitch-by-udevrule)"
 fi
@@ -39,7 +39,7 @@ case "$1" in
     setup)
         $RUN
         #now check parameter is set again
-        powerswitch="$(/usr/bin/batocera-settings-get system.power.switch)"
+        powerswitch="$(/usr/bin/system-settings-get system.power.switch)"
         if [ -n "$powerswitch" ]; then
             # Run with config switch to ensure paramters are saved ready for the reboot
             # This saves having to reboot twice for certain cases

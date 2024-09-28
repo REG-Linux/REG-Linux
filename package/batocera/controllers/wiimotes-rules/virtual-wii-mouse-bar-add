@@ -3,7 +3,7 @@
 test "${ACTION}" = "add" -o "${ACTION}" = "remove" || exit 0
 echo "${DEVNAME}" | grep -E "^/dev/input/event[0-9]+$" || exit 0
 
-WIIMOTEMODE=$(batocera-settings-get controllers.wiimote.mode)
+WIIMOTEMODE=$(/usr/bin/system-settings-get controllers.wiimote.mode)
 test "${WIIMOTEMODE}" != 'gun' -a "${WIIMOTEMODE}" != "" && exit 0 # gun mode not enabled
 
 # if case a nunchuk is removed, try to transform into a wiigun

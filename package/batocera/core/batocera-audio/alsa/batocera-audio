@@ -16,7 +16,7 @@ do_usage() {
 export XDG_RUNTIME_DIR=/var/run
 
 # Set variables
-MAX_VOLUME="$(/usr/bin/batocera-settings-get audio.volume.boost)" || MAX_VOLUME=100
+MAX_VOLUME="$(/usr/bin/system-settings-get audio.volume.boost)" || MAX_VOLUME=100
 DEFAULT_SINK=$(LANG=C pactl info | grep -E '^Default Sink: ' | sed -e s+"^Default Sink: "+""+ | head -1)
 DETECT_VOLUME=$(LANG=C pactl list sinks-raw | grep -E '^[^ ]* name='"${DEFAULT_SINK}"' ' | sed -e s+"^.* volume=\([0-9]*\) .*$"+'\1'+)
 
@@ -29,7 +29,7 @@ case "${ACTION}" in
     ;;
 
     get)
-        /usr/bin/batocera-settings-get audio.device
+        /usr/bin/system-settings-get audio.device
     ;;
 
     set)
@@ -76,7 +76,7 @@ case "${ACTION}" in
         ;;
 
     get-profile)
-        /usr/bin/batocera-settings-get audio.profile
+        /usr/bin/system-settings-get audio.profile
         ;;
 
     set-profile)

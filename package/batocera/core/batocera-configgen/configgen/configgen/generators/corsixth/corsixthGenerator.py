@@ -99,7 +99,7 @@ class CorsixTHGenerator(Generator):
         }
         # 1. Grab batocera system language
         try:
-            language = subprocess.check_output("batocera-settings-get system.language", shell=True, text=True).strip()
+            language = subprocess.check_output("/usr/bin/system-settings-get system.language", shell=True, text=True).strip()
         except subprocess.CalledProcessError:
             language = 'en_US'
         # 2. Map it

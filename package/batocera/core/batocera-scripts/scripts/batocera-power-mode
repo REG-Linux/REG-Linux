@@ -111,9 +111,9 @@ INPUT=$1
 if [ "$INPUT" = "ac" ]; then
     POWER_MODE=$(cat /var/tmp/power_mode 2>/dev/null)
     if [ -z "$POWER_MODE" ]; then
-        POWER_MODE="$(/usr/bin/batocera-settings-get-master global.powermode)"
+        POWER_MODE="$(/usr/bin/system-settings-get-master global.powermode)"
         if [ -z "${POWER_MODE}" ]; then
-            SYSTEM_GOVERNOR="$(/usr/bin/batocera-settings-get-master system.cpu.governor)"
+            SYSTEM_GOVERNOR="$(/usr/bin/system-settings-get-master system.cpu.governor)"
             if check_governor "$SYSTEM_GOVERNOR"; then
                 set_governor "$SYSTEM_GOVERNOR"
                 set_epp "default"
@@ -127,7 +127,7 @@ fi
 
 # Handle battery input
 if [ "$INPUT" = "battery" ]; then
-    POWER_MODE="$(/usr/bin/batocera-settings-get-master global.batterymode)"
+    POWER_MODE="$(/usr/bin/system-settings-get-master global.batterymode)"
     if [ -z "$POWER_MODE" ]; then
         POWER_MODE="balanced"
     fi
