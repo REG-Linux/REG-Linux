@@ -75,10 +75,10 @@ case "$1" in
 
             # Copy files
             while IFS= read -r FILE; do
-                cp -rfu "${IN}/$FILE" "${OUT}/${FILE%/*}/"
                 ((CURRENTSTEP+=100))
                 /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
                 /usr/bin/plymouth display-message --text="Copying files: $FILE"
+                cp -rfu "${IN}/$FILE" "${OUT}/${FILE%/*}/"
             done < <(sed 's#^\./##' /tmp/updateuserdata.lst)
 
             ((CURRENTSTEP+=100))
