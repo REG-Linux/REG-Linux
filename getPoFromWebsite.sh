@@ -5,13 +5,13 @@ if ! wget -q "http://translations.batocera.org/?q=updatable&type=options" -O - |
 	do
 	    echo -n "updating ${L}..." >&2
 
-	    if ! test -d "package/batocera/emulationstation/batocera-es-system/locales/${L}"
+	    if ! test -d "package/emulationstation/batocera-es-system/locales/${L}"
 	    then
-		echo "directory package/batocera/emulationstation/batocera-es-system/locales/${L} doesn't exist" >&2
+		echo "directory package/emulationstation/batocera-es-system/locales/${L} doesn't exist" >&2
 		exit 1
 	    fi
 
-	    TARGET="package/batocera/emulationstation/batocera-es-system/locales/${L}/batocera-es-system.po"
+	    TARGET="package/emulationstation/batocera-es-system/locales/${L}/batocera-es-system.po"
 	    if ! wget -q "http://translations.batocera.org/po/options_${L}.po" -O "${TARGET}"
 	    then
 		echo "unable to find file on translations.batocera.org" >&2

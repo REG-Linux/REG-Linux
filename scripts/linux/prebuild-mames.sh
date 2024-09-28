@@ -4,8 +4,8 @@
 # ./scripts/linux/prebuild-mames.sh
 
 # Grab MAME version from source tree
-MAME_VERSION=$(cat package/batocera/emulators/mame/mame.mk | grep GroovyMAME | grep Version | cut -d " " -f 4)
-LRMAME_VERSION=$(cat package/batocera/emulators/retroarch/libretro/libretro-mame/libretro-mame.mk | grep LIBRETRO_MAME_VERSION | grep lrmame | cut -d " " -f 3 | sed s/lrmame//g | sed s/0/0\./g)
+MAME_VERSION=$(cat package/emulators/mame/mame.mk | grep GroovyMAME | grep Version | cut -d " " -f 4)
+LRMAME_VERSION=$(cat package/emulators/retroarch/libretro/libretro-mame/libretro-mame.mk | grep LIBRETRO_MAME_VERSION | grep lrmame | cut -d " " -f 3 | sed s/lrmame//g | sed s/0/0\./g)
 
 # Check both version matches, or abort
 if [ "$MAME_VERSION" != "$LRMAME_VERSION" ]

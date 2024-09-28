@@ -4,7 +4,7 @@
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/reglinux-qt6/qt6websockets/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/reglinux-qt6/qt6declarative/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/reglinux/libraries/reglinux-qt6/qt6shadertools/Config.in"
-  #source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/reglinux-qt6/qt6quick/Config.in"
+  #source "$BR2_EXTERNAL_BATOCERA_PATH/package/libraries/reglinux-qt6/qt6quick/Config.in"
 
 config BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE
         bool "reglinux-qt6-build-from-source"
@@ -56,5 +56,5 @@ config BR2_PACKAGE_REGLINUX_QT6
 
 	select BR2_PACKAGE_REGLINUX_HAS_QT6
 
-	help 
+	help
 	    Prebuilt (or built from source) REG-Linux QT6 stack

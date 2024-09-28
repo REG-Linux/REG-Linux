@@ -10,8 +10,8 @@ BR2_PACKAGE_BATOCERA_TARGET_RK3588=y
 BR2_TARGET_OPTIMIZATION="-pipe -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55"
 BR2_TARGET_GENERIC_GETTY_PORT="/dev/ttyFIQ0"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/patches"
-BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/fsoverlay"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/rk3588/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/rk3588/fsoverlay"
 
 # Linux headers same as kernel, a 6.1 series
 BR2_KERNEL_HEADERS_AS_KERNEL=y
@@ -22,16 +22,16 @@ BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_GIT=y
 BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/armbian/linux-rockchip.git"
 BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="9d47b29834fabc4edaa12c69c6770d78735928d3"
-BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/linux_patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/aarch64"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/rk3588/linux_patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/aarch64"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/linux-defconfig.config"
-BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/linux-defconfig-fragment.config"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/rk3588/linux-defconfig.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/rk3588/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3588s-rock-5c rockchip/rk3588-rock-5b rockchip/rk3588s-rock-5a rockchip/rk3588-evb1-lp4-v10-linux rockchip/rk3588s-orangepi-5 rockchip/rk3588s-orangepi-5b rockchip/rk3588-orangepi-5-plus rockchip/rk3588-bananapi-m7 rockchip/rk3588s-9tripod-linux rockchip/rk3588-blueberry-edge-v12-linux rockchip/rk3588s-khadas-edge2 rockchip/rk3588s-roc-pc"
-BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/rockchip/rk3588/dts/rk3588s-gameforce-ace.dts"
+BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/rockchip/rk3588/dts/rk3588s-gameforce-ace.dts"
 # Use 'extreme' ZSTD compression for a smaller image, but a bit more CPU to decompress
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 
