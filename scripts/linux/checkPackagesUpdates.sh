@@ -332,7 +332,7 @@ show_help() {
 isFunction() { [[ "$(declare -Ff "$1")" ]]; }
 
 pkg_GETCURVERSION() {
-  X=$(find ./package/batocera/ ./package/reglinux/ -name "${1}.mk" -type f 2>/dev/null)
+  X=$(find ./package/ ./package/reglinux/ -name "${1}.mk" -type f 2>/dev/null)
   if [ ! -e "$X" ]
   then
     echo "not found (run from the top buildroot directory)"
@@ -972,7 +972,7 @@ create_pkg_functions_GitLabFreeDesktop() {
 source_site_eval() {
   for pkg in ${PACKAGES}
   do
-    PACKAGEMKFILE=$(find ./package/batocera/ ./package/reglinux/ -name "${pkg}.mk" -type f 2>/dev/null)
+    PACKAGEMKFILE=$(find ./package/ ./package/reglinux/ -name "${pkg}.mk" -type f 2>/dev/null)
     case "$PACKAGEMKFILE" in
       "" )
         echo "\"${pkg}\" not found!"
@@ -1123,7 +1123,7 @@ source_site_eval() {
               create_pkg_functions_No_Site "${pkg}"
             ;;
             * )
-              echo -e "\n*** UNKNOWN SITE\n  $(find ./package/batocera/ ./package/reglinux/ -name "${pkg}.mk" -type f) \n  $TESTSTRING \n***\n"
+              echo -e "\n*** UNKNOWN SITE\n  $(find ./package/ ./package/reglinux/ -name "${pkg}.mk" -type f) \n  $TESTSTRING \n***\n"
             ;;
           esac
         fi
@@ -1150,7 +1150,7 @@ setPGroups() {
   PGROUPS="$@"
   if test "${PGROUPS}" = "ALL"
   then
-    PACKAGES=$(find ./package/batocera/ ./package/reglinux/ -name "*.mk" -type f | grep -vE '/batocera\.mk$' | sed -e s#"^.*/\([^/]*\).mk$"#"\1"# | tr '\n' ' ')
+    PACKAGES=$(find ./package/ ./package/reglinux/ -name "*.mk" -type f | grep -vE '/batocera\.mk$' | sed -e s#"^.*/\([^/]*\).mk$"#"\1"# | tr '\n' ' ')
     return
   fi
   if test "${PGROUPS}" = "ALLGROUPS"
@@ -1236,7 +1236,7 @@ run() {
 
 base_UPDATE() {
   VARNAMEUPPERCASE="${1^^}"
-  sed -i -e "/^\([ ]*${VARNAMEUPPERCASE//-/_}_VERSION[ ]*=[ ]*\).*$/{s//\1${2}/;:a" -e '$!N;$!ba' -e '}' $(find ./package/batocera/ ./package/reglinux/ -name "${1}.mk" -type f)
+  sed -i -e "/^\([ ]*${VARNAMEUPPERCASE//-/_}_VERSION[ ]*=[ ]*\).*$/{s//\1${2}/;:a" -e '$!N;$!ba' -e '}' $(find ./package/ ./package/reglinux/ -name "${1}.mk" -type f)
 }
 
 run_update() {
@@ -1275,7 +1275,7 @@ run_update() {
   done
 }
 
-if test ! -d ./package/batocera
+if test ! -d ./package
 then
   echo "ERROR: This script has to run in the git root folder."
   exit 1
