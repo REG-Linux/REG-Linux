@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# batocera-mount [FSTYPE] [RWREQUIRED] [MOUNTDEVICE] [MOUNTPOINT]
+# system-mount [FSTYPE] [RWREQUIRED] [MOUNTDEVICE] [MOUNTPOINT]
 
 print_usage() {
     echo "${0} [FSTYPE] [RWREQUIRED] [MOUNTDEVICE] [MOUNTPOINT]" >&2

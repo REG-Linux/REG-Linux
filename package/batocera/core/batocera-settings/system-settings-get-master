@@ -22,9 +22,9 @@ done
 
 # prefer the user value
 if [ -n "${CONFFILE}" ]; then
-    VALUE="$(/usr/bin/batocera-settings-get -f "${CONFFILE}" "${KEY}")"
+    VALUE="$(/usr/bin/system-settings-get -f "${CONFFILE}" "${KEY}")"
 else
-    VALUE="$(/usr/bin/batocera-settings-get "${KEY}")"
+    VALUE="$(/usr/bin/system-settings-get "${KEY}")"
 fi
 # when value is auto, ignore
 if [ "$?" = 0 -a "${VALUE}" != "auto" ]; then
@@ -47,7 +47,7 @@ fi
 
 # prefer the board value
 if [ -e "${SYSCONFFILE}.${BOARD_MODEL}" ]; then
-    VALUE="$(/usr/bin/batocera-settings-get -f "${SYSCONFFILE}.${BOARD_MODEL}" "${KEY}")"
+    VALUE="$(/usr/bin/system-settings-get -f "${SYSCONFFILE}.${BOARD_MODEL}" "${KEY}")"
     # when value is auto, ignore
     if [ "$?" = 0 -a "${VALUE}" != "auto" ]; then
         echo "${VALUE}"
@@ -57,7 +57,7 @@ fi
 
 # prefer the general value
 if [ -e "${SYSCONFFILE}" ]; then
-    /usr/bin/batocera-settings-get -f "${SYSCONFFILE}" "${KEY}" && exit 0
+    /usr/bin/system-settings-get -f "${SYSCONFFILE}" "${KEY}" && exit 0
 fi
 
 exit 1

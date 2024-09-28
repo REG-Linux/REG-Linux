@@ -52,7 +52,7 @@ if test -e "/userdata/system/custom.sh"; then
     bash /userdata/system/custom.sh $1 &
 fi
 
-enabled_services="$(/usr/bin/batocera-settings-get system.services)"
+enabled_services="$(/usr/bin/system-settings-get system.services)"
 
 if test -n "${enabled_services}"
 then

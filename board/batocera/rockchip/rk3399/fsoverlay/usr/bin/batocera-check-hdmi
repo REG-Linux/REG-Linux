@@ -5,7 +5,7 @@ BOOTCONF="/boot/system-boot.conf"
 on_hdmi_change() {
     HDMISTATUS=$1
     CONNECTOR=$(cat /var/run/drmConn)
-    GLOBAL_VIDEO_OUTPUT=$(batocera-settings-get global.videooutput | cut -d ' ' -f 1)
+    GLOBAL_VIDEO_OUTPUT=$(/usr/bin/system-settings-get global.videooutput | cut -d ' ' -f 1)
 
     # just plugged on hdmi, and image is on screen
     if test "${HDMISTATUS}" = 0 -a "${CONNECTOR}" = 0 # was on screen, go on hdmi

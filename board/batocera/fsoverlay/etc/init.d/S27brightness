@@ -5,7 +5,7 @@ command -v batocera-brightness >/dev/null || exit 0
 case $1 in
     start)
         # don't set if under 5%, while it can cause false positive issues
-        BRI=$(batocera-settings-get display.brightness)
+        BRI=$(/usr/bin/system-settings-get display.brightness)
         if [ $? -eq 0 ]; then
             if [ "$BRI" -lt 5 ]; then
                 BRI=5
@@ -15,10 +15,10 @@ case $1 in
         ;;
     stop)
         current_brightness=$(batocera-brightness)
-        stored_brightness=$(batocera-settings-get display.brightness)
+        stored_brightness=$(/usr/bin/system-settings-get display.brightness)
         if [ "$stored_brightness" != "$current_brightness" ]; then
             if [ -e "/userdata/system/system.conf" ]; then
-                batocera-settings-set display.brightness "$current_brightness"
+                /usr/bin/system-settings-set display.brightness "$current_brightness"
             fi
         fi
         ;;

@@ -34,10 +34,10 @@ case "${ACTION}" in
 	/etc/init.d/S08connman restart
 	;;
     "enable")
-	batocera-settings-set wifi.enabled 1
+	/usr/bin/system-settings-set wifi.enabled 1
 	if [ "$#" -eq 2 ]; then
-		batocera-settings-set wifi.ssid "$1"
-		batocera-settings-set wifi.key "$2"
+		/usr/bin/system-settings-set wifi.ssid "$1"
+		/usr/bin/system-settings-set wifi.key "$2"
 	fi
 	/etc/init.d/S08connman reload
 
@@ -53,7 +53,7 @@ case "${ACTION}" in
 
 	;;
     "disable")
-	batocera-settings-set wifi.enabled 0
+	/usr/bin/system-settings-set wifi.enabled 0
 	/etc/init.d/S08connman reload
 	;;
 	*)

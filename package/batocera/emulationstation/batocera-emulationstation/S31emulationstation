@@ -6,7 +6,7 @@ BOOTCONF="/boot/system-boot.conf"
 
 case "$1" in
 	start)
-	    enabled="$(/usr/bin/batocera-settings-get system.es.atstartup)"
+	    enabled="$(/usr/bin/system-settings-get system.es.atstartup)"
 	    if [ "$enabled" != "0" ]; then
 		%BATOCERA_EMULATIONSTATION_CMD% %BATOCERA_EMULATIONSTATION_POSTFIX%
 	    fi

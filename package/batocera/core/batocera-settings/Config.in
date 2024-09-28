@@ -1,5 +1,5 @@
 config BR2_PACKAGE_BATOCERA_SETTINGS
-	bool "batocera-settings"
+	bool "system-settings"
 
 	help
-	  batocera-settings-get/set binaries
+	  system-settings-get/set binaries

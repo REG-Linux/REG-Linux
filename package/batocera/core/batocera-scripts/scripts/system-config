@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! "$1" ]; then
-    printf "usage : batocera-config [command] [args]\nWith command in\n\toverscan [enable|disable]\n\tcanupdate\n\tupdate\n\tstorage [current|list|INTERNAL|ANYEXTERNAL|RAM|DEV UUID]\n\tsetRootPassword [password]\n\tgetRootPassword\n\ttz [|tz]\n"
+    printf "usage : system-config [command] [args]\nWith command in\n\toverscan [enable|disable]\n\tcanupdate\n\tupdate\n\tstorage [current|list|INTERNAL|ANYEXTERNAL|RAM|DEV UUID]\n\tsetRootPassword [password]\n\tgetRootPassword\n\ttz [|tz]\n"
     exit 1
 fi
 
@@ -36,11 +36,9 @@ bato_config_set_value () {
 
 log=/userdata/system/logs/reglinux.log
 
-#echo "---- batocera-config ----" >> $log
-
 if [ "$command" = "getRootPassword" ]; then
     # security disabled, force the default one without changing boot configuration
-    securityenabled="$(/usr/bin/batocera-settings-get system.security.enabled)"
+    securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
     if [ "$securityenabled" != "1" ]; then
         echo "linux"
         exit 0
@@ -60,7 +58,7 @@ if [ "$command" = "setRootPassword" ]; then
     PASSWD=${2}
 
     # security disabled, don't change
-    securityenabled="$(/usr/bin/batocera-settings-get system.security.enabled)"
+    securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
     if [ "$securityenabled" != "1" ]; then
         exit 0
     fi
@@ -179,12 +177,12 @@ fi
 
 if [ "$command" = "canupdate" ]; then
 
-    updatetype="$(/usr/bin/batocera-settings-get updates.type)"
+    updatetype="$(/usr/bin/system-settings-get updates.type)"
     # force a default value in case the value is removed or miswritten
     [ "${updatetype}" != "beta" ] &&  updatetype="stable"
 
     board=$(cat /boot/boot/system.board)
-    installed=$(batocera-version)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
+    installed=$(system-version)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
 
     # Get current stable release on GitHub
     latestrelease=$(curl --silent "https://api.github.com/repos/REG-Linux/REG-Linux/releases/latest" | jq -r '.tag_name')
@@ -234,7 +232,7 @@ if [ "$command" = "canupdate" ]; then
 fi
 
 if [ "$command" = "update" ]; then
-    batocera-upgrade
+    system-upgrade
     exit $?
 fi
 
@@ -252,8 +250,8 @@ if [ "$command" = "storage" ]; then
     if [ "$mode" = "list" ]; then
         echo "INTERNAL INTERNAL"
         echo "ANYEXTERNAL ANY EXTERNAL"
-        INTERNAL_DEVICE=$(batocera-part share_internal)
-        PARTPREFIX=$(batocera-part prefix "${INTERNAL_DEVICE}")
+        INTERNAL_DEVICE=$(system-part share_internal)
+        PARTPREFIX=$(system-part prefix "${INTERNAL_DEVICE}")
         lsblk -n -P -o NAME,FSTYPE,LABEL,UUID,SIZE,TYPE |
         grep -E "TYPE=\"(part|lvm)\"" |
         grep -vE "FSTYPE=\"(swap|LVM2_member)\"" |

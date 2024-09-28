@@ -19,7 +19,7 @@ then
     CONFFILE=${BOARD_CONFFILE}
 fi
 
-enabled="$(/usr/bin/batocera-settings-get system.multimediakeys.enabled)"
+enabled="$(/usr/bin/system-settings-get system.multimediakeys.enabled)"
 if [ "$enabled" = "0" ];then
     CONFFILE=multimedia_keys_disabled.conf
 fi

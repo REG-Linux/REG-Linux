@@ -14,7 +14,7 @@ case "${ACTION}" in
 	;;	
 
 	"get")	
-		batocera-settings-get-master audio.device
+		/usr/bin/system-settings-get-master audio.device
 	;;	
 
 	"set")	

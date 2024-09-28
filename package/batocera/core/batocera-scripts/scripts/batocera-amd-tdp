@@ -30,7 +30,7 @@ tdp_ranges=(
 )
 
 # Handle various AMD handhelds
-info_output=$(batocera-info | grep "Model:" | awk -F": " '{print $2}' | head -n 1)
+info_output=$(system-info | grep "Model:" | awk -F": " '{print $2}' | head -n 1)
 
 # Get marketing name and TDP range for the detected device
 device_info="${tdp_ranges[$info_output]}"
