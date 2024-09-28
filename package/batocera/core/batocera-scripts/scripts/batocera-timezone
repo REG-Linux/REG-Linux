@@ -23,12 +23,12 @@ function detect_tz() {
 }
 
 function tz_get() {
-	TZ="$(/usr/bin/batocera-settings-get system.timezone)"
+	TZ="$(/usr/bin/system-settings-get system.timezone)"
 	[[ -z "$TZ" ]] || echo "$TZ"
 }
 
 function tz_set() {
-	/usr/bin/batocera-settings-set system.timezone "$1"
+	/usr/bin/system-settings-set system.timezone "$1"
 }
 
 ###############################

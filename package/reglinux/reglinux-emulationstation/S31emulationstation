@@ -10,9 +10,9 @@ case "$1" in
         /usr/bin/plymouth change-mode --reboot
         /usr/bin/plymouth --show-splash
         /usr/bin/plymouth --wait quit --retain-splash
-        enabled="$(/usr/bin/batocera-settings-get system.es.atstartup)"
+        enabled="$(/usr/bin/system-settings-get system.es.atstartup)"
         if [ "$enabled" != "0" ]; then
-            environment="$(/usr/bin/batocera-settings-get-master system.es.environment)"
+            environment="$(/usr/bin/system-settings-get-master system.es.environment)"
             if [ "$environment" = "sway" ]; then
                 # Start sway
                 SWAY_LOG_FILE=/userdata/system/logs/sway.log

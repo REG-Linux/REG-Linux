@@ -2,7 +2,7 @@
 #
 # KSMBD network share script
 
-securityenabled="$(/usr/bin/batocera-settings-get system.security.enabled)"
+securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
 
 if [ "$securityenabled" = "1" ]; then
     CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"
@@ -16,7 +16,7 @@ mkdir -p /var/lock/subsys
 RETVAL=0
 
 start() {
-	enabled="$(/usr/bin/batocera-settings-get system.samba.enabled)"
+	enabled="$(/usr/bin/system-settings-get system.samba.enabled)"
 	if [ "$enabled" = "0" ]; then
 	  echo "SMB services: disabled"
 	  exit 0

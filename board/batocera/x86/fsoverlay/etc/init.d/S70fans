@@ -6,7 +6,7 @@
 
 case "$1" in
     start)
-        info_output=$(batocera-info)
+        info_output=$(system-info)
         # ayn loki zero
         if [[ $info_output == *"Model: Loki_Zero"* ]]; then
             # fan speeds [0-255]

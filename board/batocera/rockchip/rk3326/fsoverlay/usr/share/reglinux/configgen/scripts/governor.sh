@@ -4,7 +4,7 @@ EVENT=$1
 
 test "$EVENT" = "gameStart" || test "$EVENT" = "gameStop" || exit 0
 
-CPU_GOVERNOR="$(/usr/bin/batocera-settings-get system.cpu.governor)"
+CPU_GOVERNOR="$(/usr/bin/system-settings-get system.cpu.governor)"
 
 if { [ "${EVENT}" = "gameStart" ] && [ "${CPU_GOVERNOR}" = "performance" ]; }
 then

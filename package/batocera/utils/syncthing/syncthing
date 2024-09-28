@@ -7,7 +7,7 @@ SYNCTHING_LOG="/userdata/system/logs/syncthing.log"
 RETVAL=0
 
 start() {
-    SYNCTHING_SECURITY="$(/usr/bin/batocera-settings-get system.security.enabled)"
+    SYNCTHING_SECURITY="$(/usr/bin/system-settings-get system.security.enabled)"
 	# check if syncthing web ui should be accessible from outside (system.security.enabled=0)
     if [ "$SYNCTHING_SECURITY"  != "1" ] || [ -z $SYNCTHING_SECURITY ]
 	then

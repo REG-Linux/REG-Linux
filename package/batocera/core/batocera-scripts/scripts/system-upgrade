@@ -43,7 +43,7 @@ do_download() {
     mkdir -p "$UPGRADEFOLDER"
 
     echo "url: ${url}"
-    size=$(curl -A "batocera-upgrade.header" -sfIL "${url}" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
+    size=$(curl -A "system-upgrade.header" -sfIL "${url}" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
     size=$((size / 1024 / 1024))
     [ "$?" -eq 0 ] || quit_script 1
     echo "need to download ${size}mb"
@@ -63,16 +63,16 @@ do_download() {
         touch "$UPGRADEFILE"
         do_badgeines "${size}" &
         GETPERPID=$!
-        curl -A "batocera-upgrade" -sfL "${url}" -o "$UPGRADEFILE" || quit_script 1
+        curl -A "system-upgrade" -sfL "${url}" -o "$UPGRADEFILE" || quit_script 1
         do_upgmsg "Checking integrity of downloaded file..."
     else
         # download inside SSH or terminal
-        curl -A "batocera-upgrade" -fL "${url}" -o "$UPGRADEFILE" || quit_script 1
+        curl -A "system-upgrade" -fL "${url}" -o "$UPGRADEFILE" || quit_script 1
         echo "Checking integrity of downloaded file... please wait"
     fi
 
     # try to download an md5 checksum, delete possible leftover if any error
-    curl -A "batocera-upgrade.md5" -sfL "${url}.md5" -o "${UPGRADEFILE}.md5" || rm -f "${UPGRADEFILE}.md5"
+    curl -A "system-upgrade.md5" -sfL "${url}.md5" -o "${UPGRADEFILE}.md5" || rm -f "${UPGRADEFILE}.md5"
 }
 
 quit_script() {
@@ -91,13 +91,13 @@ quit_script() {
 echo "Starting upgrade process..."
 
 board=$(cat /boot/boot/system.board)
-updatetype="$(/usr/bin/batocera-settings-get updates.type)"
+updatetype="$(/usr/bin/system-settings-get updates.type)"
 # force a default value in case the value is removed or miswritten
 [ "${updatetype}" != "beta" ] && updatetype="stable"
 
 # Force the update file to be stored in "share_internal"
 # Check if share_internal is already mounted (test /userdata first because sometimes is also mounted under /media)
-SHAREPART="$(batocera-part share_internal)"
+SHAREPART="$(system-part share_internal)"
 SHAREMOUNT=$(grep -m 1 -E "^${SHAREPART} /userdata " /proc/mounts | awk '{print $2}')
 
 # Maybe is mounted some other place...
@@ -108,7 +108,7 @@ if [ -z "$SHAREMOUNT" ]; then
     SHAREMOUNT="/media/SHARE"
     mkdir -p "${SHAREMOUNT}"
     PARTTYPE=$(blkid -o value -s TYPE "${SHAREPART}")
-    batocera-mount "${PARTTYPE}" 1 "${SHAREPART}" "${SHAREMOUNT}" || quit_script 1
+    system-mount "${PARTTYPE}" 1 "${SHAREPART}" "${SHAREMOUNT}" || quit_script 1
 fi
 
 UPGRADEFOLDER="${SHAREMOUNT}/system/upgrade"
@@ -141,7 +141,7 @@ case $1 in
         fi
     ;;
     *)
-        latestrelease=$(batocera-config canupdate)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
+        latestrelease=$(system-config canupdate)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
 
         if [ -n "$latestrelease" ]        # New releases are available
         then
@@ -149,7 +149,7 @@ case $1 in
             do_download
         else
             echo "No new release found."
-            echo "Current version: $(batocera-version)"
+            echo "Current version: $(system-version)"
             echo "Online version: ${latestrelease}"
             quit_script 1
         fi

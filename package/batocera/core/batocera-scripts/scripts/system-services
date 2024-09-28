@@ -18,7 +18,7 @@ is_valid_service_name() {
 }
 
 do_list() {
-    enabled_services="$(/usr/bin/batocera-settings-get system.services)"
+    enabled_services="$(/usr/bin/system-settings-get system.services)"
     if test -n "${enabled_services}"
     then
 	for SERVICE in ${enabled_services}
@@ -100,7 +100,7 @@ do_enable() {
 	return
     fi
 
-    enabled_services="$(/usr/bin/batocera-settings-get system.services)"
+    enabled_services="$(/usr/bin/system-settings-get system.services)"
 
     # check if already set
     if test -n "${enabled_services}"
@@ -117,14 +117,14 @@ do_enable() {
     #
     if test -n "${enabled_services}"
     then
-	/usr/bin/batocera-settings-set system.services "${enabled_services} ${1}"
+	/usr/bin/system-settings-set system.services "${enabled_services} ${1}"
     else
-	/usr/bin/batocera-settings-set system.services "${1}"
+	/usr/bin/system-settings-set system.services "${1}"
     fi
 }
 
 do_disable() {
-    enabled_services="$(/usr/bin/batocera-settings-get system.services)"
+    enabled_services="$(/usr/bin/system-settings-get system.services)"
 
     NEW_ENABLED_SERVICES=
     JDONE=0
@@ -151,7 +151,7 @@ do_disable() {
     #
     if test "${JDONE}" = 1
     then
-	/usr/bin/batocera-settings-set system.services "${NEW_ENABLED_SERVICES}"
+	/usr/bin/system-settings-set system.services "${NEW_ENABLED_SERVICES}"
     fi
 }
 

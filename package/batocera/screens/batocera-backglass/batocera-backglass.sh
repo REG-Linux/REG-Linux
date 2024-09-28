@@ -144,7 +144,7 @@ case "${ACTION}" in
 	fi
 
 	# reread theme from configuration in case it changed
-	THEME=$(batocera-settings-get backglass.theme)
+	THEME=$(/usr/bin/system-settings-get backglass.theme)
 	THEMEPATH=$(getUrl "${THEME}")
 
 	batocera-backglass-window --x "${X}" --y "${Y}" --width "${WIDTH}" --height "${HEIGHT}" --www "${THEMEPATH}" &

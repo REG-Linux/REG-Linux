@@ -34,7 +34,7 @@ then
         # force no hdmi if it is unplugged
         NEWCONN=$(cat /var/run/drmConn)
         HDMISTATUS=$(cat /sys/class/drm/card0-HDMI-A-1/status)
-        GLOBAL_VIDEO_OUTPUT=$(batocera-settings-get global.videooutput | cut -d ' ' -f 1)
+        GLOBAL_VIDEO_OUTPUT=$(/usr/bin/system-settings-get global.videooutput | cut -d ' ' -f 1)
 
         if test "${NEWCONN}" = 0 -a "${HDMISTATUS}" = "connected"
         then

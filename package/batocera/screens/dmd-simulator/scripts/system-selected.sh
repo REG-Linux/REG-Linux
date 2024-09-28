@@ -10,7 +10,7 @@ txt2http() {
 }
 
 DMDOPT=
-DMDFORMAT=$(batocera-settings-get dmd.format)
+DMDFORMAT=$(/usr/bin/system-settings-get dmd.format)
 test "${DMDFORMAT}" = "hd" && DMDOPT="--hd"
 
 # custom

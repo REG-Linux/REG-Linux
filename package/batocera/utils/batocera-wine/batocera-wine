@@ -7,13 +7,13 @@ shift
 
 # Arguments: key, system, game
 get_setting() {
-    /usr/bin/batocera-settings-get "$2[\"$3\"].$1" "$2.$1" "global.$1"
+    /usr/bin/system-settings-get "$2[\"$3\"].$1" "$2.$1" "global.$1"
 }
 
 ## Wine detection
 GAMENAME=$1 
 ROMGAMENAME=$(basename "${GAMENAME}")
-WINE_RUNNER="$(/usr/bin/batocera-settings-get windows.wine-runner)"
+WINE_RUNNER="$(/usr/bin/system-settings-get windows.wine-runner)"
 [[ -z "$WINE_RUNNER" ]] && WINE_RUNNER="ge-custom"
 
 WINE_VERSION="$(get_setting wine-runner "${SYSTEM}" "${ROMGAMENAME}")"
@@ -144,7 +144,7 @@ wine_options() {
     DXVK_RESET_CACHE="$(get_setting dxvk_reset_cache "${SYSTEM}" "${ROMGAMENAME}")"
     WINE_NTFS="$(get_setting wine_ntfs "${SYSTEM}" "${ROMGAMENAME}")"
     WINE_DEBUG="$(get_setting wine_debug "${SYSTEM}" "${ROMGAMENAME}")"
-    KEYBOARD="$(/usr/bin/batocera-settings-get system.kblayout)"
+    KEYBOARD="$(/usr/bin/system-settings-get system.kblayout)"
     VIRTUAL_DESKTOP="$(get_setting virtual_desktop "${SYSTEM}" "${ROMGAMENAME}")"
     VIRTUAL_DESKTOP_SIZE="$(get_setting videomode "${SYSTEM}" "${ROMGAMENAME}" || batocera-resolution currentResolution)"
 
