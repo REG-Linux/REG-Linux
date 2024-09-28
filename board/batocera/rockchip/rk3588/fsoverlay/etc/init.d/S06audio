@@ -21,7 +21,7 @@ start_pipewire() {
         test $N -gt 50 && { msg=KO; break; }
     done
 
-    DEFAULT_AUDIO="$(/usr/bin/batocera-settings-get-master audio.device)"
+    DEFAULT_AUDIO="$(/usr/bin/system-settings-get-master audio.device)"
     if [ -n "$DEFAULT_AUDIO" -a "$DEFAULT_AUDIO" != "auto" ]; then
         /usr/bin/pactl set-default-sink "$DEFAULT_AUDIO"
     fi

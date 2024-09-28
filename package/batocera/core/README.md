@@ -12,6 +12,6 @@ Batocera's essential packages. These include the makefiles to compile the packag
  - `batocera-image` For the image/screenshot viewer.
  - `batocera-notice` Download the PDF from https://github.com/batocera-linux/batocera-notice to use as the user manual.
  - `batocera-scripts` A lot of scripts that are just scripts, not packages, located in `/usr/bin` in the final image.
- - `batocera-settings` The [batocera-settings](https://wiki.batocera.org/usage_of_batocera-settings) utility.
+ - `system-settings` The [system-settings](https://wiki.batocera.org/usage_of_batocera-settings) utility.
  - `batocera-system` Some essential utilities, Batocera version number, profile.d variables, the template `system.conf` and `system-boot.conf` in the final image and per-machine default system.conf key values.
  - `batocera-triggerhappy` Adding functionality to function keys (such as on various supported handhelds, or keyboard volume keys).

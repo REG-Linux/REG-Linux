@@ -58,7 +58,7 @@ function powerdevice_dialog()
     local switch cmd button #dialog variabels
     local currentswitch #show current switch
 
-    currentswitch="$(/usr/bin/batocera-settings-get system.power.switch)"
+    currentswitch="$(/usr/bin/system-settings-get system.power.switch)"
     [[ -z "$currentswitch" ]] && currentswitch="disabled"
 
     cmd=(dialog --ascii-lines --backtitle "BATOCERA Power Switch Selection Toolset" \
@@ -857,11 +857,11 @@ case "$CONFVALUE" in
 
         # Write values and display MsgBox
         [[ -n "$switch" ]] || { echo "Abort! Nothing changed...."; exit 1; }
-        /usr/bin/batocera-settings-set system.power.switch "$switch"
+        /usr/bin/system-settings-set system.power.switch "$switch"
         [[ $? -eq 0 ]] && info_msg="No error! Everything went okay!" || info_msg="An error occurred!"
         dialog --ascii-lines --backtitle "BATOCERA Power Switch Selection Toolkit" \
                --title " STATUS OF NEW VALUE " \
-               --msgbox "${info_msg}\n\n$(/usr/bin/batocera-settings-get system.power.switch)" 0 0
+               --msgbox "${info_msg}\n\n$(/usr/bin/system-settings-get system.power.switch)" 0 0
     ;;
     --HELP)
         echo "Try: $(basename "$0") {start|stop|config} <value>"

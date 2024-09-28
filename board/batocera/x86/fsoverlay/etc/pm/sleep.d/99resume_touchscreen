@@ -7,7 +7,7 @@ case "$1" in
         fi
         CURRENT_ROTATION=$(batocera-resolution getRotation)
         if [ "${CURRENT_ROTATION}" != "0" ]; then
-            bootresolution="$(batocera-settings-get-master -f "$BOOTCONF" es.resolution)"
+            bootresolution="$(/usr/bin/system-settings-get-master -f "$BOOTCONF" es.resolution)"
             if test -z "${bootresolution}"; then
                 batocera-resolution minTomaxResolution-secure
             else

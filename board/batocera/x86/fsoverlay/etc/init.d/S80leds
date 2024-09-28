@@ -10,8 +10,8 @@ is_module_loaded() {
 set_led_mode() {
     # turn off rainbow effect if enabled
     echo 1 | tee /sys/class/leds/multicolor:chassis/device/led_mode
-    led_colour="$(/usr/bin/batocera-settings-get led.colour)"
-    led_brightness="$(/usr/bin/batocera-settings-get led.brightness)"
+    led_colour="$(/usr/bin/system-settings-get led.colour)"
+    led_brightness="$(/usr/bin/system-settings-get led.brightness)"
     # Set the colour
     if [ -n "$led_colour" ]; then
         echo $led_colour | tee /sys/class/leds/multicolor:chassis/multi_intensity

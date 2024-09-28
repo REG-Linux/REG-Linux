@@ -99,7 +99,7 @@ do_videostart ()
     printf 'Video: %s: ' "$video"
     mpv_audio=--ao=sdl
 
-    soundDisabled=$(batocera-settings-get splash.screen.sound)
+    soundDisabled=$(/usr/bin/system-settings-get splash.screen.sound)
     if [[ $? -eq 0 ]]; then
 	if test "${soundDisabled}" = 0
 	then
@@ -110,10 +110,10 @@ do_videostart ()
     ## current drm output ##
     effectiveDrmOutput=$(for GPU in /dev/dri/card*; do batocera-drminfo "${GPU}" "current" 2>/dev/null | grep -E '^0.0:' | sed -e s+"^0.0:\([^ ]*\) .*$"+"\1"+; done | head -1)
     mpv_video=
-    video_rotation=$(batocera-settings-get-master "display.rotate.${effectiveDrmOutput}")
+    video_rotation=$(/usr/bin/system-settings-get-master "display.rotate.${effectiveDrmOutput}")
     if test -z "${video_rotation}"
     then
-	video_rotation=$(batocera-settings-get-master display.rotate)
+	video_rotation=$(/usr/bin/system-settings-get-master display.rotate)
     fi
     if [[ $? -eq 0 ]]; then
         video_rotation=$(do_angels_conversion $video_rotation)
@@ -122,14 +122,14 @@ do_videostart ()
     fi
 
     drm_mode="preferred"
-    video_resize=$(batocera-settings-get-master splash.screen.resize)
+    video_resize=$(/usr/bin/system-settings-get-master splash.screen.resize)
     if [[ $? -eq 0 ]]; then
         resize=$(echo "${video_resize}" | sed "s/x/:/")
         mpv_video="${mpv_video} --vf=scale=${resize}"
         drm_mode=$video_resize
     fi
     
-    video_subtitle=$(batocera-settings-get splash.screen.subtitle)
+    video_subtitle=$(/usr/bin/system-settings-get splash.screen.subtitle)
     if [[ $? -eq 0 ]]; then
 	if test "${video_subtitle}" = 0
 	then
@@ -139,7 +139,7 @@ do_videostart ()
 
     # determine the output display to use for MPV
     # fixes splash video output where the user wants it
-    if preferred_display=$(batocera-settings-get global.videooutput); then
+    if preferred_display=$(/usr/bin/system-settings-get global.videooutput); then
         echo "Splash: Preferred display is $preferred_display" > $log
         display_type=$(echo "$preferred_display" | cut -d'-' -f1)
         if [[ "$display_type" == "DisplayPort" ]]; then
@@ -162,7 +162,7 @@ do_videostart ()
     fi
 
     # set the sound again due to drm init causing some cards to default to 40% volume
-    VOLUME=$(/usr/bin/batocera-settings-get audio.volume)
+    VOLUME=$(/usr/bin/system-settings-get audio.volume)
     batocera-audio setSystemVolume "${VOLUME}"
 
     if [ -n "$drm_connector" ] && [ -n "$card_path" ]; then

@@ -3,9 +3,9 @@
 # Suspend or shutdown
 #
 
-SUSPEND_MODE="$(/usr/bin/batocera-settings-get-master system.suspendmode)"
+SUSPEND_MODE="$(/usr/bin/system-settings-get-master system.suspendmode)"
 # because on rg552, it is too easy to push on the shutdown button
-SHUTDOWNDELAY="$(/usr/bin/batocera-settings-get-master system.shutdowndelay)"
+SHUTDOWNDELAY="$(/usr/bin/system-settings-get-master system.shutdowndelay)"
 if test "${SHUTDOWNDELAY}" = ""
 then
     SHUTDOWNDELAY=0

@@ -12,6 +12,6 @@ echo
 echo "-- type 'reglinux-check-updates' to check for stable branch --"
 echo "-- add 'beta' switch to check for latest arch developments  --"
 echo
-batocera-info 2>/dev/null
-echo "OS version: $(batocera-version)"
+system-info 2>/dev/null
+echo "OS version: $(system-version)"
 echo

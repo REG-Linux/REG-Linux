@@ -164,13 +164,13 @@ do_enable() {
   /etc/init.d/S32bluetooth stop
   /etc/init.d/S31sixad stop
   sleep 1
-  /usr/bin/batocera-settings-set controllers.bluetooth.enabled 1
+  /usr/bin/system-settings-set controllers.bluetooth.enabled 1
   /etc/init.d/S31sixad start
   /etc/init.d/S32bluetooth start
 }
 
 do_disable() {
-  /usr/bin/batocera-settings-set controllers.bluetooth.enabled 0
+  /usr/bin/system-settings-set controllers.bluetooth.enabled 0
   /etc/init.d/S32bluetooth stop
   /etc/init.d/S31sixad stop
 }

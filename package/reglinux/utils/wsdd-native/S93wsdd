@@ -21,12 +21,12 @@ LOG_FILE=/userdata/system/logs/wsdd.log
 
 # Function that starts the daemon/service
 do_start() {
-    smbenabled="$(/usr/bin/batocera-settings-get system.samba.enabled)"
+    smbenabled="$(/usr/bin/system-settings-get system.samba.enabled)"
     if [ "$smbenabled" = "0" ]; then
         echo "SMB services: disabled"
         exit 0
     fi
-    securityenabled="$(/usr/bin/batocera-settings-get system.security.enabled)"
+    securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
     if [ "$securityenabled" = "1" ]; then
         SMB_CONFIG_FILE="/etc/samba/smb-secure.conf"
     else

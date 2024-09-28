@@ -28,7 +28,7 @@ printf "Starting share: "
 ###
 
 SHARECONFFILE="/boot/system-boot.conf"
-INTERNALDEVICE=$(batocera-part "share_internal")
+INTERNALDEVICE=$(system-part "share_internal")
 INTERNALDEVICETYPE=$(blkid -o value -s TYPE "${INTERNALDEVICE}")
 
 SHAREDEVICE=$(cat "${SHARECONFFILE}" | grep -m 1 -E '^[ ]*sharedevice=' | cut -d'=' -f2)
@@ -63,7 +63,7 @@ mountDeviceOrFallback() {
     then
         if mkdir -p "${BATOCERAFULLFS}"
         then
-            if batocera-mount "${TDEVICE}" 1 "${DEVICE}" "${BATOCERAFULLFS}"
+            if system-mount "${TDEVICE}" 1 "${DEVICE}" "${BATOCERAFULLFS}"
             then
                 if mkdir -p "${BATOCERAFULLFS}/batocera"
                 then
@@ -78,7 +78,7 @@ mountDeviceOrFallback() {
 
     if [ "${FALLBACK}" = "1" ]
     then
-        if ! batocera-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
+        if ! system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
         then
             mountRAMDisk
         fi
@@ -302,7 +302,7 @@ case "${MODE}" in
         mountDeviceOrFallback "${DEVICE}" "${TDEVICE}"
     ;;
     "ANYEXTERNAL")
-        PARTPREFIX=$(batocera-part prefix "${INTERNALDEVICE}")
+        PARTPREFIX=$(system-part prefix "${INTERNALDEVICE}")
         LDEVICE=$(blkid | grep -F TYPE= | grep -F UUID= | grep -vE "^${PARTPREFIX}" | sort | head -1)
         while [ -z "${LDEVICE}" ] && [ "${NTRY}" -lt "${MAXTRY}" ] # wait the device that can take some seconds after udev started
         do
@@ -321,7 +321,7 @@ case "${MODE}" in
         # first, INTERNAL mount, then, network mount over the NETWORK mounts
         # to allow to mount over /userdata, but only over /userdata/roms if wanted
         # mounting network mounts over usb key have not really sense
-        if ! batocera-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
+        if ! system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
         then
             # fallback
             mountRAMDisk
@@ -332,7 +332,7 @@ case "${MODE}" in
         mountDevicesOrNetwork > /tmp/mountDevicesOrNetwork.log 2> /tmp/mountDevicesOrNetwork.err # could be usefull to debug
     ;;
     "INTERNAL"|*)
-        if ! batocera-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
+        if ! system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
         then
             # fallback
             # the internal partition is no more required in fact
@@ -342,7 +342,7 @@ case "${MODE}" in
 esac
 
 # filesystem compression
-compressenabled="$(/usr/bin/batocera-settings-get system.fscompression.enabled)"
+compressenabled="$(/usr/bin/system-settings-get system.fscompression.enabled)"
 if [ "$compressenabled" = "1" ]
 then
     if grep -qE "^/dev/[^ ]* /userdata btrfs.*$" /proc/mounts

@@ -105,7 +105,7 @@ case ${1,,} in
 
     --version|--arch|--update)
         [[ ${2,,} == "beta" ]] && BRANCH=beta || BRANCH=stable
-        VER=$(batocera-version)
+        VER=$(system-version)
         ret=$?
 
         if [[ -f /boot/boot/system.board ]]; then
@@ -117,7 +117,7 @@ case ${1,,} in
         fi
 
         if [[ "${1,,}" == "--update" && $ret -eq 0 ]]; then
-            NET_VERSION=$(batocera-config canupdate)
+            NET_VERSION=$(system-config canupdate)
             ret=$?
             echo "Installed:   $VER"
             echo "Webversion:  $NET_VERSION"
@@ -129,7 +129,7 @@ case ${1,,} in
                 ret=1
             fi
         else
-            [[ ${1,,} == "--version" ]] && batocera-version
+            [[ ${1,,} == "--version" ]] && system-version
             [[ ${1,,} == "--arch" ]] && echo "$BOARD"
         fi
         exit $ret

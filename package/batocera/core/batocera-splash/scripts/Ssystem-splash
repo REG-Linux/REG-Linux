@@ -14,7 +14,7 @@ do_start ()
         N=$((N+1))
     done
 
-    # V_BOARD_MODEL detection from batocera-info
+    # V_BOARD_MODEL detection from system-info
     V_BOARD_MODEL=$(cat /sys/firmware/devicetree/base/model 2>/dev/null | tr -d '\0' | sed -e s+"[^A-Za-z0-9]"+"_"+g)
     if test -z "${V_BOARD_MODEL}"
     then

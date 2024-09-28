@@ -83,15 +83,15 @@ fi
 if [ "$EVENT" == "gameStop" ]; then
     POWER_CONNECTED=$(is_power_connected)
     if [[ "$POWER_CONNECTED" == 0 ]]; then
-        POWER_MODE="$(/usr/bin/batocera-settings-get-master global.batterymode)"
+        POWER_MODE="$(/usr/bin/system-settings-get-master global.batterymode)"
     else
-        POWER_MODE="$(/usr/bin/batocera-settings-get-master global.powermode)"
+        POWER_MODE="$(/usr/bin/system-settings-get-master global.powermode)"
     fi
     if ! [ -z "${POWER_MODE}" ]; then
         /usr/bin/batocera-power-mode "${POWER_MODE}"
         exit 0
     fi
-    SYSTEM_GOVERNOR="$(/usr/bin/batocera-settings-get-master system.cpu.governor)"
+    SYSTEM_GOVERNOR="$(/usr/bin/system-settings-get-master system.cpu.governor)"
     if check_governor "$SYSTEM_GOVERNOR"; then
         set_governor "$SYSTEM_GOVERNOR"
 		if epp_available; then
@@ -104,16 +104,16 @@ fi
 # Check for user set system specific setting
 if [ -n "${SYSTEM_NAME}" ]; then
     POWER_MODE_SETTING="${SYSTEM_NAME}.powermode"
-    POWER_MODE="$(/usr/bin/batocera-settings-get-master "${POWER_MODE_SETTING}")"
+    POWER_MODE="$(/usr/bin/system-settings-get-master "${POWER_MODE_SETTING}")"
 fi
 
 # If no user set system specific setting check for user set global setting
 if [ -z "${POWER_MODE}" ]; then
     POWER_CONNECTED=$(is_power_connected)
     if [[ "$POWER_CONNECTED" == 0 ]]; then
-        POWER_MODE="$(/usr/bin/batocera-settings-get-master global.batterymode)"
+        POWER_MODE="$(/usr/bin/system-settings-get-master global.batterymode)"
     else
-        POWER_MODE="$(/usr/bin/batocera-settings-get-master global.powermode)"
+        POWER_MODE="$(/usr/bin/system-settings-get-master global.powermode)"
     fi
 fi
 
@@ -124,7 +124,7 @@ if ! [ -z "${POWER_MODE}" ]; then
 fi
 
 # If no value is found ensure governor is system default before exiting
-SYSTEM_GOVERNOR="$(/usr/bin/batocera-settings-get-master system.cpu.governor)"
+SYSTEM_GOVERNOR="$(/usr/bin/system-settings-get-master system.cpu.governor)"
 if check_governor "$SYSTEM_GOVERNOR"; then
     set_governor "$SYSTEM_GOVERNOR"
 	if epp_available; then

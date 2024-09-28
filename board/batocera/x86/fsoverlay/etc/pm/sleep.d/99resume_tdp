@@ -9,7 +9,7 @@ set_tdp() {
 # determine the new TDP value based on max TDP
 handle_tdp() {
     TDP_PERCENTAGE=$1
-    MAX_TDP=$(/usr/bin/batocera-settings-get system.cpu.tdp)
+    MAX_TDP=$(/usr/bin/system-settings-get system.cpu.tdp)
     # Check if MAX_TDP is defined and non-empty
     if [ -n "$MAX_TDP" ]; then
         # round the value up or down to make bash happy
@@ -24,15 +24,15 @@ handle_tdp() {
 case "$1" in
     resume|thaw)
         # check we have a max system TDP value
-        CPU_TDP=$(/usr/bin/batocera-settings-get system.cpu.tdp)
+        CPU_TDP=$(/usr/bin/system-settings-get system.cpu.tdp)
         # if not, we exit as the CPU is not supported by the TDP values
         if [ -z "$CPU_TDP" ]; then
             echo "No CPU TDP value found."
             exit 0
         else
-            TDP_SETTING=$(printf "%.0f" "$(/usr/bin/batocera-settings-get global.tdp)")
+            TDP_SETTING=$(printf "%.0f" "$(/usr/bin/system-settings-get global.tdp)")
             if [ -z "${TDP_SETTING}" ]; then
-                TDP_SETTING="$(/usr/bin/batocera-settings-get-master system.cpu.tdp)"
+                TDP_SETTING="$(/usr/bin/system-settings-get-master system.cpu.tdp)"
                 
                 if [ -n "${TDP_SETTING}" ]; then
                     set_tdp "${TDP_SETTING}"

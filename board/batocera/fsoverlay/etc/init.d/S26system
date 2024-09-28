@@ -1,11 +1,11 @@
 #!/bin/sh
 
-config_script="batocera-config"
+config_script="system-config"
 log="/userdata/system/logs/reglinux.log"
 
 ba_keyboard_lang() {
-    settings_lang="$(/usr/bin/batocera-settings-get system.language || echo 'en_US')"
-    settings_kb="$(/usr/bin/batocera-settings-get system.kblayout || echo 'us')"
+    settings_lang="$(/usr/bin/system-settings-get system.language || echo 'en_US')"
+    settings_kb="$(/usr/bin/system-settings-get system.kblayout || echo 'us')"
     if [ "$settings_kb" != "" ]; then
         loadkeys "$settings_kb" >> $log
     else
@@ -17,14 +17,14 @@ ba_keyboard_lang() {
 }
 
 ba_timezone() {
-    settings_timezone="$(/usr/bin/batocera-settings-get system.timezone)"
+    settings_timezone="$(/usr/bin/system-settings-get system.timezone)"
     if [ "$settings_timezone" != "" ]; then
         eval $config_script "tz" "$settings_timezone" >> $log
     fi
 }
 
 ba_hostname() {
-    settings_hostname="$(/usr/bin/batocera-settings-get system.hostname)"
+    settings_hostname="$(/usr/bin/system-settings-get system.hostname)"
     hostname="$(hostname)"
     echo "Hostname after DHCP setup is: ${hostname}" >> /tmp/hostname.log
     if [ "$settings_hostname" != "" ]; then
@@ -43,7 +43,7 @@ ba_hostname() {
 }
 
 ba_xarcade2jstick() {
-    settings_xarcade="$(/usr/bin/batocera-settings-get controllers.xarcade.enabled)"
+    settings_xarcade="$(/usr/bin/system-settings-get controllers.xarcade.enabled)"
     if [ "$settings_xarcade" = "1" ]; then
         # First try : suppose a real X-Arcade is plugged
         /usr/bin/xarcade2jstick -d >/dev/null 2>&1

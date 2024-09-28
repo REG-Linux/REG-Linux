@@ -101,7 +101,7 @@ then
 	fi
 
 	# parameters
-	RECOIL_MODE=$(batocera-settings-get controllers.guns.recoil)
+	RECOIL_MODE=$(/usr/bin/system-settings-get controllers.guns.recoil)
 	case "${RECOIL_MODE}" in
 	    "machinegun")
 		RECOIL_ENABLED=1
@@ -141,9 +141,9 @@ then
 	esac
 
 	# camera
-	OPT_CONTRAST=$(batocera-settings-get controllers.guns.sinden.contrast)
-	OPT_BRIGHTNESS=$(batocera-settings-get controllers.guns.sinden.brightness)
-	OPT_EXPOSURE=$(batocera-settings-get controllers.guns.sinden.exposure)
+	OPT_CONTRAST=$(/usr/bin/system-settings-get controllers.guns.sinden.contrast)
+	OPT_BRIGHTNESS=$(/usr/bin/system-settings-get controllers.guns.sinden.brightness)
+	OPT_EXPOSURE=$(/usr/bin/system-settings-get controllers.guns.sinden.exposure)
 	test -z "${OPT_CONTRAST}"   && OPT_CONTRAST=60
 	test -z "${OPT_BRIGHTNESS}" && OPT_BRIGHTNESS=120
 	test -z "${OPT_EXPOSURE}"   && OPT_EXPOSURE=-7
