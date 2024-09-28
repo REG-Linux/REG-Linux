@@ -7,5 +7,5 @@ cat buildroot.batocera.diff                 |
     grep -vE '^board/'                      | # batocera board
     grep -vE '^configs/batocera-'           | # batocera defconfig
     grep -vE '^scripts/linux'               | # batocera utilities
-    grep -vE '^package/batocera/'           | # batocera packages
+    grep -vE '^package/'           | # batocera packages
     grep -vE '^\.gitignore$'

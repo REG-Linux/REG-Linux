@@ -192,30 +192,30 @@ cp -prv "${G_TARGETDIR}/usr/lib/alsa-lib/libasound_module_"*".so" "${TMPOUT}/lib
 
 # pipewire
 # if you modify 0.2 and 0.3, these values are hardcoded for SPA_PLUGIN_DIR and PIPEWIRE_MODULE_DIR
-echo 
+echo
 echo "pipewire..."
-echo 
+echo
 cp -prv "${G_TARGETDIR}/usr/lib/spa-0.2"      "${TMPOUT}/lib32/" || exit 1
 cp -prv "${G_TARGETDIR}/usr/lib/pipewire-0.3" "${TMPOUT}/lib32/" || exit 1
 
 # installation
-echo 
+echo
 echo "wine installation..."
-echo 
+echo
 mkdir -p "${TMPOUT}/usr/wine/ge-custom" || exit 1
 cp -pr "${G_TARGETDIR}/usr/wine/ge-custom" "${TMPOUT}/usr/wine/" || exit 1
 # helper bins
-echo 
+echo
 echo " wine helper binaries"
-echo 
+echo
 mkdir -p "${TMPOUT}/usr/bin32" || exit 1
 #cp -p "${G_TARGETDIR}/usr/bin/cabextract"          "${TMPOUT}/usr/bin32/" || exit 1
 cp -p "${G_TARGETDIR}/usr/bin/gst"* "${TMPOUT}/usr/bin32/" || exit 1
 
 # dri
-echo 
+echo
 echo "dri..."
-echo 
+echo
 for i in "${G_TARGETDIR}/usr/lib/dri/"*.so
 do
     echo "   "$(basename "${i}")
@@ -260,7 +260,7 @@ else
     XTARGET_IMAGE="${PWD}/${TARGET_IMAGE}"
 fi
 
-XTARGET_VERSION=$(grep -E "^BATOCERA_SYSTEM_VERSION[ ]*=" "${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/core/batocera-system/batocera-system.mk" | sed -e s+"^BATOCERA_SYSTEM_VERSION[ ]*=[ ]*\(.*\)[ ]*$"+'\1'+)
+XTARGET_VERSION=$(grep -E "^BATOCERA_SYSTEM_VERSION[ ]*=" "${BR2_EXTERNAL_BATOCERA_PATH}/package/core/batocera-system/batocera-system.mk" | sed -e s+"^BATOCERA_SYSTEM_VERSION[ ]*=[ ]*\(.*\)[ ]*$"+'\1'+)
 XTARGET_ARCH="x86"
 XTARGET_FILE="wine-${XTARGET_ARCH}-${XTARGET_VERSION}.tar.lzma"
 

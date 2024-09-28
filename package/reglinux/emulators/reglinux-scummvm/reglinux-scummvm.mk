@@ -86,7 +86,7 @@ define REGLINUX_SCUMMVM_INSTALL_TARGET_CMDS
 	tar xzvf $(@D)/$(REGLINUX_SCUMMVM_SOURCE) -C $(TARGET_DIR)
 
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy/
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/scummvm/scummvm.keys \
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/emulators/scummvm/scummvm.keys \
         	$(TARGET_DIR)/usr/share/evmapy/
 endef
 
