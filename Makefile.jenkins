@@ -2,7 +2,7 @@ PROJECT_DIR    := $(shell pwd)
 DL_DIR         ?= $(PROJECT_DIR)/dl
 OUTPUT_DIR     ?= $(PROJECT_DIR)/output
 CCACHE_DIR     ?= $(PROJECT_DIR)/buildroot-ccache
-LOCAL_MK       ?= $(PROJECT_DIR)/batocera.mk
+LOCAL_MK       ?= $(PROJECT_DIR)/reglinux.mk
 EXTRA_PKGS     ?=
 DOCKER_OPTS    ?=
 MAKE_JLEVEL    ?= $(shell nproc)
@@ -21,10 +21,10 @@ ifndef BATCH_MODE
 	DOCKER_OPTS += -i
 endif
 
-DOCKER_REPO := batoceralinux
-IMAGE_NAME  := batocera.linux-build
+DOCKER_REPO := reglinux
+IMAGE_NAME  := reglinux-build
 
-TARGETS := $(sort $(shell find $(PROJECT_DIR)/configs/ -name 'b*' | sed -n 's/.*\/batocera-\(.*\).board/\1/p'))
+TARGETS := $(sort $(shell find $(PROJECT_DIR)/configs/ -name 'r*' | sed -n 's/.*\/reglinux-\(.*\).board/\1/p'))
 UID  := $(shell id -u)
 GID  := $(shell id -g)
 
@@ -51,11 +51,11 @@ build-docker-image:
 	@$(DOCKER) pull $(DOCKER_REPO)/$(IMAGE_NAME)
 	@touch .ba-docker-image-available
 
-batocera-docker-image: .ba-docker-image-available
+reglinux-docker-image: .ba-docker-image-available
 
 update-docker-image:
 	-@rm .ba-docker-image-available > /dev/null
-	@$(MAKE) batocera-docker-image
+	@$(MAKE) reglinux-docker-image
 
 publish-docker-image:
 	@$(DOCKER) push $(DOCKER_REPO)/$(IMAGE_NAME):latest
@@ -75,7 +75,7 @@ gh-token:
 %-supported:
 	$(if $(findstring $*, $(TARGETS)),,$(error "$* not supported!"))
 
-%-clean: gh-token batocera-docker-image output-dir-%
+%-clean: gh-token reglinux-docker-image output-dir-%
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -87,10 +87,10 @@ gh-token:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
 
-%-config: gh-token batocera-docker-image output-dir-%
-	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/batocera-$*
+%-config: gh-token reglinux-docker-image output-dir-%
+	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/reglinux-$*
 	@for opt in $(EXTRA_OPTS); do \
-		echo $$opt >> $(PROJECT_DIR)/configs/batocera-$*_defconfig ; \
+		echo $$opt >> $(PROJECT_DIR)/configs/reglinux-$*_defconfig ; \
 	done
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
@@ -101,9 +101,9 @@ gh-token:
 		-u $(UID):$(GID) \
 		$(DOCKER_OPTS) \
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot batocera-$*_defconfig
+		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
 
-%-build: gh-token batocera-docker-image %-config ccache-dir dl-dir
+%-build: gh-token reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -116,7 +116,7 @@ gh-token:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
 
-%-source: gh-token batocera-docker-image %-config ccache-dir dl-dir
+%-source: gh-token reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -129,7 +129,7 @@ gh-token:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
 
-%-show-build-order: gh-token batocera-docker-image %-config ccache-dir dl-dir
+%-show-build-order: gh-token reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -142,7 +142,7 @@ gh-token:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order
 
-%-kernel: gh-token batocera-docker-image %-config ccache-dir dl-dir
+%-kernel: gh-token reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -155,7 +155,7 @@ gh-token:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot linux-menuconfig
 
-%-graph-depends: gh-token batocera-docker-image %-config ccache-dir dl-dir
+%-graph-depends: gh-token reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -168,7 +168,7 @@ gh-token:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-depends
 
-%-shell: gh-token batocera-docker-image output-dir-%
+%-shell: gh-token reglinux-docker-image output-dir-%
 	$(if $(BATCH_MODE),$(if $(CMD),,$(error "not suppoorted in BATCH_MODE if CMD not specified!")),)
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
@@ -183,7 +183,7 @@ gh-token:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		$(CMD)
 
-%-ccache-stats: gh-token batocera-docker-image %-config ccache-dir dl-dir
+%-ccache-stats: gh-token reglinux-docker-image %-config ccache-dir dl-dir
 	@$(DOCKER) run  --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
@@ -204,14 +204,14 @@ gh-token:
 	@$(MAKE) $*-build CMD=$(PKG)
 
 %-webserver: output-dir-%
-	$(if $(wildcard $(OUTPUT_DIR)/$*/images/batocera/*),,$(error "$* not built!"))
+	$(if $(wildcard $(OUTPUT_DIR)/$*/images/reglinux/*),,$(error "$* not built!"))
 	$(if $(shell which python 2>/dev/null),,$(error "python not found!"))
 ifeq ($(strip $(BOARD)),)
-	$(if $(wildcard $(OUTPUT_DIR)/$*/images/batocera/images/$*/.*),,$(error "Directory not found: $(OUTPUT_DIR)/$*/images/batocera/images/$*"))
-	python3 -m http.server --directory $(OUTPUT_DIR)/$*/images/batocera/images/$*/
+	$(if $(wildcard $(OUTPUT_DIR)/$*/images/reglinux/images/$*/.*),,$(error "Directory not found: $(OUTPUT_DIR)/$*/images/reglinux/images/$*"))
+	python3 -m http.server --directory $(OUTPUT_DIR)/$*/images/reglinux/images/$*/
 else
-	$(if $(wildcard $(OUTPUT_DIR)/$*/images/batocera/images/$(BOARD)/.*),,$(error "Directory not found: $(OUTPUT_DIR)/$*/images/batocera/images/$(BOARD)"))
-	python3 -m http.server --directory $(OUTPUT_DIR)/$*/images/batocera/images/$(BOARD)/
+	$(if $(wildcard $(OUTPUT_DIR)/$*/images/reglinux/images/$(BOARD)/.*),,$(error "Directory not found: $(OUTPUT_DIR)/$*/images/reglinux/images/$(BOARD)"))
+	python3 -m http.server --directory $(OUTPUT_DIR)/$*/images/reglinux/images/$(BOARD)/
 endif
 
 %-rsync: output-dir-%
@@ -236,7 +236,7 @@ endif
 
 %-flash: %-supported
 	$(if $(DEV),,$(error "DEV not specified!"))
-	@gzip -dc $(OUTPUT_DIR)/$*/images/batocera/images/$*/batocera-*.img.gz | sudo dd of=$(DEV) bs=5M status=progress
+	@gzip -dc $(OUTPUT_DIR)/$*/images/reglinux/images/$*/reglinux-*.img.gz | sudo dd of=$(DEV) bs=5M status=progress
 	@sync
 
 %-upgrade: %-supported
@@ -244,8 +244,8 @@ endif
 	-@sudo umount /tmp/mount
 	-@mkdir /tmp/mount
 	@sudo mount $(DEV)1 /tmp/mount
-	-@sudo rm /tmp/mount/boot/batocera
-	@sudo tar xvf $(OUTPUT_DIR)/$*/images/batocera/boot.tar.xz -C /tmp/mount --no-same-owner
+	-@sudo rm /tmp/mount/boot/reglinux
+	@sudo tar xvf $(OUTPUT_DIR)/$*/images/reglinux/boot.tar.xz -C /tmp/mount --no-same-owner
 	@sudo umount /tmp/mount
 	-@rmdir /tmp/mount
 
