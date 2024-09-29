@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if test "$1" != "start"; then
+    exit 0
+fi
+
 MAIN_CONF_FILE="/etc/bluetooth/main.conf"
 
 # run this command to get the desired adapter name

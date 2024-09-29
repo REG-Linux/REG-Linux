@@ -4,6 +4,10 @@
 # for supported AMD island cards only 
 # function can be turned off using system-boot.conf
 
+if test "$1" != "start"; then
+    exit 0
+fi
+
 # try to create the log dir
 mkdir -p "/userdata/system/logs"
 log="/userdata/system/logs/amd.log"
