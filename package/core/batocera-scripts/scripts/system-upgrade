@@ -114,7 +114,7 @@ fi
 UPGRADEFOLDER="${SHAREMOUNT}/system/upgrade"
 
 case $1 in
-    "dev")
+    dev)
         if [ -n "$2" ]; then
             url="$2/boot-${board}.tar.zst"
         else
@@ -128,7 +128,7 @@ case $1 in
             quit_script 1
         fi
     ;;
-    "manual")
+    manual)
         # Check if the local file exists
         if [ -f "/userdata/system/upgrade/boot-${board}.tar.zst" ]; then
             size=$(du -m "/userdata/system/upgrade/boot-${board}.tar.zst" | awk '{print $1}')
@@ -172,7 +172,7 @@ if [ "$board" = "$newboard" ]; then
         do_upgmsg "Missing md5 file - proceeding ..." 2
     fi
 
-    if [ "$SHAREMOUNT" != "/userdata" ]; then
+    if [ "$1" = "manual" ] && [ "$SHAREMOUNT" != "/userdata" ]; then
         # Check free space on "${SHAREMOUNT}"
         freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}')
         [ $? -eq 0 ] || quit_script 1
