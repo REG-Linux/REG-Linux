@@ -10,10 +10,10 @@ index 7223a5a..0972cb9 100644
  
      hint = SDL_GetHint(SDL_HINT_KMSDRM_DEVICE_INDEX);
      if (hint && *hint) {
-@@ -118,13 +119,28 @@ get_driindex(void)
-                                      resources->count_connectors,
+@@ -120,12 +120,27 @@
                                       resources->count_encoders,
                                       resources->count_crtcs);
+ 
 +			// batocera
 +			{
 +			  FILE* fdDrmConn;
@@ -27,12 +27,11 @@ index 7223a5a..0972cb9 100644
 +			  }
 +			}
 +			//
- 
                          if (resources->count_connectors > 0 &&
                              resources->count_encoders > 0 &&
                              resources->count_crtcs > 0) {
                              available = -ENOENT;
-                             for (i = 0; i < resources->count_connectors; i++) {
+                             for (i = 0; i < resources->count_connectors && available < 0; i++) {
 -                                drmModeConnector *conn =
 +			        drmModeConnector *conn;
 +				if(i != drmConn) continue;

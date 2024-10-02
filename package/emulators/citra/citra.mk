@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-CITRA_VERSION = r5115f64
+# Version: r608383e - Commits on Sep 27, 2024
+CITRA_VERSION = r608383e
 CITRA_SITE = https://github.com/PabloMK7/citra.git
 CITRA_SITE_METHOD=git
 CITRA_GIT_SUBMODULES=YES
