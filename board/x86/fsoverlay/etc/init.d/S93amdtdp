@@ -10,7 +10,7 @@ case "$1" in
     else
         # check if tdp capable processor exists for Ryzen Mobile Processor
         if ! ryzenadj -i | head -n 1 | grep -q "unsupported model"; then            
-            echo "" >> $log
+            echo "" > $log
             echo "*** ------------------------------------- ***" >> $log
             echo "" >> $log
             echo "Supported Ryzen Mobile Processor found for TDP..." > $log
