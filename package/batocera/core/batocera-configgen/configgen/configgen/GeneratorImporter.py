@@ -347,6 +347,10 @@ def getGenerator(emulator):
         from generators.sonic_mania.sonic_maniaGenerator import SonicManiaGenerator
         return SonicManiaGenerator()
 
+    if emulator == "mednafen":
+        from generators.mednafen.mednafenGenerator import MednafenGenerator
+        return MednafenGenerator()
+
     if emulator == "uqm":
         from generators.uqm.uqmGenerator import UqmGenerator
         return UqmGenerator()
