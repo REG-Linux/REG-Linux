@@ -1,5 +1,5 @@
 # users
-BR2_ROOTFS_USERS_TABLES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/users.txt"
+BR2_ROOTFS_USERS_TABLES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/users.txt"
 
 BR2_STRIP_EXCLUDE_DIRS="usr/ryujinx usr/bin/vpinball usr/share/ecwolf usr/bin/vita3k usr/bin/dmdserver"
 
@@ -86,14 +86,14 @@ BR2_PACKAGE_BATOCERA_TOOLS=y
 BR2_PACKAGE_BATOCERA_ALL_SYSTEMS=y
 BR2_PACKAGE_BATOCERA_LINUX_FIRMWARES=y
 BR2_SYSTEM_BIN_SH_DASH=y # /bin/sh implementation; set here because a `choice` cannot be `select`ed, e.g. from batocera-system/Config.in
-BR2_PACKAGE_DROPBEAR_LOCALOPTIONS_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/dropbear_localoptions.h"
+BR2_PACKAGE_DROPBEAR_LOCALOPTIONS_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/dropbear_localoptions.h"
 
 # Disable generating rootfs tar (speedup)
 BR2_TARGET_ROOTFS_TAR=n
 
 # post-build/post-image scripts
-BR2_ROOTFS_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/scripts/post-build-script.sh"
-BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/scripts/post-image-script.sh"
+BR2_ROOTFS_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/scripts/post-build-script.sh"
+BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/scripts/post-image-script.sh"
 
 # squashfs images
 BR2_PACKAGE_HOST_SQUASHFS=y

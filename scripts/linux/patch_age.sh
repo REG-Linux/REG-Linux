@@ -9,10 +9,10 @@ _how_old_helper() {
 	printf "%s%s\n" "$prefix" "$f"
 }
 
-how_old() {
+how_old() { 
 	shopt -s globstar nullglob;
 	pushd "$(git rev-parse --show-superproject-working-tree --show-toplevel| head -1)" > /dev/null || exit 1
-		for f in package/**/$1/**/*.patch; do
+		for f in package/batocera/**/$1/**/*.patch; do
 			_how_old_helper "$f"
 		done
 		for f in board/**/$1/**/*.patch; do
