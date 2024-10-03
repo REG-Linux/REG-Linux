@@ -10,19 +10,19 @@ BR2_TARGET_OPTIMIZATION="-pipe"
 # GCC 13 does not support -mcpu=cortex-a78.cortex-a55 -mtune=cortex-a78.cortex-a55
 BR2_TARGET_GENERIC_GETTY_PORT="/dev/ttyFIQ0"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_921600=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/mediatek/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/mediatek/mt8395/patches"
-BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/mediatek/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/mediatek/mt8395/fsoverlay"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/mediatek/patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/mediatek/mt8395/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/mediatek/fsoverlay $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/mediatek/mt8395/fsoverlay"
 
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.9.10"
 BR2_KERNEL_HEADERS_AS_KERNEL=y
-BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/mediatek/mt8395/linux_patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/aarch64"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/mediatek/mt8395/linux_patches $(BR2_EXTERNAL_BATOCERA_PATH)/board/reglinux/linux_patches/aarch64"
 #BR2_LINUX_KERNEL_USE_ARCH_DEFAULT_CONFIG=y
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/mediatek/mt8395/linux-defconfig.config"
-#BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/mediatek/mt8395/linux-defconfig-fragment.config"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/mediatek/mt8395/linux-defconfig.config"
+#BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/mediatek/mt8395/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
