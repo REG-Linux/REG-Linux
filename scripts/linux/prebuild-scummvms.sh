@@ -4,8 +4,8 @@
 # ./scripts/linux/prebuild-scummvms.sh
 
 # Grab ScummVM version from source tree
-SCUMMVM_VERSION=$(cat package/emulators/scummvm/scummvm.mk | grep SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
-LRSCUMMVM_VERSION=$(cat package/emulators/retroarch/libretro/libretro-scummvm/libretro-scummvm.mk | grep LIBRETRO_SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
+SCUMMVM_VERSION=$(cat package/batocera/emulators/scummvm/scummvm.mk | grep SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
+LRSCUMMVM_VERSION=$(cat package/batocera/emulators/retroarch/libretro/libretro-scummvm/libretro-scummvm.mk | grep LIBRETRO_SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
 
 # Check both version matches, or abort
 if [ "$SCUMMVM_VERSION" != "$LRSCUMMVM_VERSION" ]
