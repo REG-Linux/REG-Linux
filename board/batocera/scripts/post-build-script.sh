@@ -150,4 +150,4 @@ if ! [[ -z "${SYSTEM_GETTY_PORT}" ]]; then
 fi
 
 # make sure /etc/init.d scripts are executable
-chmod 755 /etc/init.d/S*
+chmod 755 "${TARGET_DIR}/etc/init.d"/S*
