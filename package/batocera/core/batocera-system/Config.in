@@ -244,7 +244,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 								   BR2_PACKAGE_BATOCERA_TARGET_JZ4770
 	# Use PipeWire audio stack for all other platforms
 	select BR2_PACKAGE_BATOCERA_AUDIO			if !BR2_PACKAGE_BATOCERA_AUDIO_ALSA
-	select BR2_PACKAGE_BATOCERA_BLUETOOTH		if !BR2_PACKAGE_BATOCERA_TARGET_CHA 	# batocera bluetooth
+	select BR2_PACKAGE_BATOCERA_BLUETOOTH		# batocera bluetooth
 	select BR2_PACKAGE_BATOCERA_NOTICE			# boot pdf notice
 	select BR2_PACKAGE_BATOCERA_TEST			# batocera test script
 	select BR2_PACKAGE_WGET					# download tools
