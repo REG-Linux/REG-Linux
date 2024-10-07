@@ -8,8 +8,8 @@ BATOCERA_AMD_VERSION = 1.0
 BATOCERA_AMD_SOURCE =
 
 define BATOCERA_AMD_INSTALL_TARGET_CMDS
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/gpu/batocera-amd/S001amd-check \
-	    $(TARGET_DIR)/etc/init.d/
+	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/gpu/batocera-amd/S05amd-check \
+	    $(TARGET_DIR)/etc/init.d/S001amd-check
 	# List
 	mkdir -p $(TARGET_DIR)/usr/share/amd
 	install -m 0644 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/gpu/batocera-amd/islands.list \
