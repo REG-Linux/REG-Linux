@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-TSUGARU_VERSION = v20240604
+TSUGARU_VERSION = v20241005j
 TSUGARU_SITE = $(call github,captainys,TOWNSEMU,$(TSUGARU_VERSION))
 TSUGARU_DEPENDENCIES = libglu
 TSUGARU_LICENSE = GPLv2
