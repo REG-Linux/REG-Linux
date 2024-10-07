@@ -13,7 +13,7 @@ BATOCERA_SYSTEM_SOURCE=
 ### Beta release MUST BE marked as "prerelease" ( tag is version = YY.MM-beta-[1-9] )
 ### Stable release must be marked as "latest" ( tag is version = YY.MM.[0-9] )
 
-BATOCERA_SYSTEM_VERSION = 24.09-dev
+BATOCERA_SYSTEM_VERSION = 24.10-dev
 BATOCERA_SYSTEM_DATE_TIME = $(shell date "+%Y/%m/%d %H:%M")
 BATOCERA_SYSTEM_DATE = $(shell date "+%Y/%m/%d")
 BATOCERA_SYSTEM_DEPENDENCIES = tzdata
