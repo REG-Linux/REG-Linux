@@ -42,6 +42,7 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'gsplus'         : '/usr/bin/GSplus'
               , 'applewin'       : '/usr/bin/applewin'
               , 'fba2x'          : '/usr/bin/fba2x'
+              , 'mednafen'       : '/usr/bin/mednafen'
 }
 
 
