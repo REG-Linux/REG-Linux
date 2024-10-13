@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-# Version : Aug 30, 2024
-# lrmame0269
-LIBRETRO_MAME_VERSION = lrmame0269
+# Version : Sep 27, 2024
+# lrmame0270
+LIBRETRO_MAME_VERSION = lrmame0270
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 LIBRETRO_MAME_LICENSE = MAME
 
@@ -66,12 +66,11 @@ define LIBRETRO_MAME_BUILD_CMDS
         USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
 
 	# remove skeleton drivers to save space
-	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 1 -d ":" > $(@D)/build/skel.list
-	cat $(@D)/build/skel.list | while read file ; do sed -i '/MACHINE_IS_SKELETON/d' $$file ; done
-	rm $(@D)/build/skel.list
+	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 1 -d ":" | sort -u > $(@D)/machines.list
+	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 2 -d "," | sort -bu > $(@D)/games.list
+	cat $(@D)/machines.list | while read file ; do sed -i '/MACHINE_IS_SKELETON/d' $$file ; done
 	# Remove reference to skeleton drivers in mame.lst
-        cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/retroarch/libretro/libretro-mame/mame.flt $(@D)/mame.flt
-	cat $(@D)/mame.flt | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
+	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 
 	# Compile
 	CCACHE_SLOPPINESS="pch_defines,time_macros,include_file_ctime,include_file_mtime" \
