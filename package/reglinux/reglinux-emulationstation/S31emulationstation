@@ -7,9 +7,10 @@ BOOTCONF="/boot/system-boot.conf"
 case "$1" in
     start)
         # Switch to splash without subtitle and stop plymouth service
-        /usr/bin/plymouth change-mode --reboot
-        /usr/bin/plymouth --show-splash
-        /usr/bin/plymouth --wait quit --retain-splash
+	/usr/bin/plymouth update-root-fs --read-write
+	/usr/bin/plymouth change-mode --reboot
+	/usr/bin/plymouth --show-splash
+	/usr/bin/plymouth --wait quit --retain-splash
         enabled="$(/usr/bin/system-settings-get system.es.atstartup)"
         if [ "$enabled" != "0" ]; then
             environment="$(/usr/bin/system-settings-get-master system.es.environment)"
