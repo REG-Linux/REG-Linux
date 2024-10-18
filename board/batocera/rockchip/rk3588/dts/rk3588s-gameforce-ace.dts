@@ -261,40 +261,7 @@
 
 	};
 
-    battery: battery {
-		compatible = "simple-battery";
-		charge-full-design-microamp-hours = <3700000>;
-		constant-charge-current-max-microamp = <2500000>;
-		constant-charge-voltage-max-microvolt = <8750000>;
-		voltage-min-design-microvolt = <7400000>;
-	};
-
-	charge-animation {
-		compatible = "rockchip,uboot-charge";
-		rockchip,uboot-charge-on = <0>;
-		rockchip,android-charge-on = <1>;
-		rockchip,uboot-low-power-voltage = <6800>;
-		rockchip,screen-on-voltage = <6900>;
-		rockchip,uboot-exit-charge-level = <2>;
-		rockchip,uboot-exit-charge-auto = <0>;
-		rockchip,system-suspend = <1>;
-		regulator-on-in-mem = <&vdd_log_s0>, <&vcc_2v0_pldo_s3>,
-			<&vdd2_ddr_s3>, <&vcc_1v8_s3>, <&avcc_1v8_s0>,
-			<&vcc_1v8_s0>, <&vdd_0v75_s3>, <&pldo6_s3>,
-			<&vcc_3v3_s3>;
-
-		regulator-off-in-mem = <&vdd_gpu_s0>, <&vdd_npu_s0>,
-			<&vdd_vdenc_s0>, <&vdd_gpu_mem_s0>, <&vdd_npu_mem_s0>,
-			<&vdd_vdenc_mem_s0>, <&vcc_3v3_s0>,
-			<&vccio_sd_s0>, <&avdd_0v75_s0>, <&vdd_0v85_s0>,
-			<&vdd_cpu_big1_s0>, <&vdd_cpu_big0_s0>, <&vdd_cpu_lit_s0>,
-			<&vdd_cpu_big1_mem_s0>, <&vdd_cpu_big0_mem_s0>, <&vdd_cpu_lit_mem_s0>,
-			<&vddq_ddr_s0>, <&vdd_ddr_s0>, <&vdd_ddr_pll_s0>,
-			<&avdd_1v2_s0>, <&vdd_0v75_s0>;
-		status = "okay";
-	};
-
-	es8388_sound: es8388-sound {
+    es8388_sound: es8388-sound {
 		status = "okay";
 		compatible = "rockchip,multicodecs-card","everest,es8388";
 		rockchip,card-name = "rockchip,es8388-codec";
@@ -972,7 +939,8 @@
 		wakeup-source;
 	};
 
-	battery@62 {
+	cw2015@62 {
+		status = "okay";
 		compatible = "cellwise,cw2015";
 		reg = <0x62>;
 
@@ -985,9 +953,9 @@
 			 0x09 0x38 0x1A 0x49 0x7B 0x96 0xA2 0x15
 			 0x3B 0x77 0x9A 0xB1 0x80 0x87 0xB0 0xCB
 			 0x2F 0x00 0x64 0xA5 0xB5 0x1C 0xF0 0x49>;
+		cellwise,dual-cell = <1>;
 		cellwise,monitor-interval-ms = <5000>;
-		monitored-battery = <&battery>;
-		status = "okay";
+		power-supplies = <&bq25703>;
 	};
 
 	bq25703: bq25703@6b {
