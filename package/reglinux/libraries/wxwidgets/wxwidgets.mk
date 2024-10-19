@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-WXWIDGETS_VERSION = v3.2.5
+WXWIDGETS_VERSION = v3.2.6
 WXWIDGETS_SITE = https://github.com/wxWidgets/wxWidgets
 WXWIDGETS_DEPENDENCIES = zlib libpng jpeg gdk-pixbuf libgtk3 libglu
 WXWIDGETS_SITE_METHOD = git

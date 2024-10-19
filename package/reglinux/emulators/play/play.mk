@@ -3,7 +3,7 @@
 # play!
 #
 ################################################################################
-PLAY_VERSION = 0.66
+PLAY_VERSION = 0.67
 PLAY_SITE = https://github.com/jpd002/Play-.git
 PLAY_SITE_METHOD = git
 PLAY_GIT_SUBMODULES = YES
@@ -33,7 +33,7 @@ endif
 define PLAY_EVMAPY
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/play/*.keys \
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/play/*.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
