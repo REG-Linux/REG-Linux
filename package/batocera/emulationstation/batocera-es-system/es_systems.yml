@@ -854,29 +854,34 @@ devilutionx:
 
     Place diabdat.mpq from your CD or GoG installation into:
 
-        /userdata/roms/devilution/
+        /userdata/roms/devilutionx/
 
     For Hellfire, also copy hellfire.mpq, hfmonk.mpq, hfmusic.mpq, and hfvoice.mpq.
 
     For Chinese, Japanese, and Korean text support copy:
-    https://github.com/diasurgical/devilutionx-assets/releases/download/v1/fonts.mpq
+    https://github.com/diasurgical/devilutionx-assets/releases/download/v4/fonts.mpq
 
-    For the Polish voice pack copy:
-    https://github.com/diasurgical/devilutionx-assets/releases/download/v1/pl.mpq
+    Voice packs:
+    * Polish: https://github.com/diasurgical/devilutionx-assets/releases/download/v4/pl.mpq
+    * Russian: https://github.com/diasurgical/devilutionx-assets/releases/download/v4/ru.mpq
+    * Spanish: https://github.com/diasurgical/devilutionx-assets/releases/download/v4/es.mpq
   comment_br: |
     Diablo 1.
 
     Coloque o arquivo diabdat.mpq do seu CD ou instalação do GoG em:
 
-        /userdata/roms/devilution/
+        /userdata/roms/devilutionx/
 
     Para Hellfire, copie também hellfire.mpq, hfmonk.mpq, hfmusic.mpq e hfvoice.mpq.
 
     Para cópia de suporte de texto em chinês, japonês e coreano:
-    https://github.com/diasurgical/devilutionx-assets/releases/download/v1/fonts.mpq
+    https://github.com/diasurgical/devilutionx-assets/releases/download/v4/fonts.mpq
 
-    Para a cópia do pacote de voz em polonês:
-    https://github.com/diasurgical/devilutionx-assets/releases/download/v1/pl.mpq
+    Pacotes de voz:
+    * Polonês: https://github.com/diasurgical/devilutionx-assets/releases/download/v4/pl.mpq
+    * Russo: https://github.com/diasurgical/devilutionx-assets/releases/download/v4/ru.mpq
+    * Espanhol: https://github.com/diasurgical/devilutionx-assets/releases/download/v4/es.mpq
+
 
 fbneo:
   name:       Final Burn Neo
@@ -1958,7 +1963,22 @@ jaguar:
   release: 1993
   hardware: console
   extensions: [cue, j64, jag, cof, abs, cdi, rom, zip, 7z]
+  group: jaguar
   theme: atarijaguar
+  emulators:
+    libretro:
+      virtualjaguar: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VIRTUALJAGUAR], incompatible_extensions: [zip, 7z] }
+    bigpemu:
+      bigpemu: { requireAnyOf: [BR2_PACKAGE_BIGPEMU] }
+
+jaguarcd:
+  name: Jaguar CD
+  manufacturer: Atari
+  release: 1995
+  hardware: console
+  extensions: [cue, cdi, zip, 7z]
+  group: jaguar
+  theme: atarijaguarcd
   emulators:
     libretro:
       virtualjaguar: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VIRTUALJAGUAR], incompatible_extensions: [zip, 7z] }
@@ -2221,7 +2241,7 @@ daphne:
   release: 1983
   hardware: arcade
   extensions: [daphne, squashfs]
-  platform: daphne, arcade
+  platform: alg, daphne, arcade
   emulators:
     hypseus-singe:
       hypseus-singe: { requireAnyOf: [BR2_PACKAGE_HYPSEUS_SINGE] }
@@ -2283,7 +2303,7 @@ singe:
   release: 1990
   hardware: arcade
   extensions: [daphne, squashfs]
-  platform: daphne, arcade
+  platform: alg, daphne, arcade
   emulators:
     hypseus-singe:
       hypseus-singe: { requireAnyOf: [BR2_PACKAGE_HYPSEUS_SINGE] }
@@ -4733,7 +4753,7 @@ psvita:
   name: PlayStation Vita
   manufacturer: Sony
   release: 2012
-  hardware: console
+  hardware: portable
   extensions: [zip, psvita]
   emulators:
     vita3k:
@@ -4837,22 +4857,46 @@ psvita:
     Consulte o wiki - https://wiki.batocera.org/playground:systems:psvita
 
 doom3:
-  name: Doom3
+  name: Doom 3
   manufacturer: Ports
   release: 2004
   hardware: port
-  extensions: [doom3]
+  extensions: [d3]
   platform: pc
   group: ports
   emulators:
     dhewm3:
       dhewm3: { requireAnyOf: [BR2_PACKAGE_DHEWM3] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:boom3
+    Add your Doom 3 (and if you have the Resurrection of Evil mod) pk4 files here like so:
+
+    └── roms/
+        └── doom3/
+            ├── base/
+            │   ├── pak000.pk4
+            │   ├── pak001.pk4
+            │   ├── pak002.pk4
+            │   ├── pak003.pk4
+            │   ├── pak004.pk4
+            │   ├── pak005.pk4
+            │   ├── pak006.pk4
+            │   ├── pak007.pk4
+            │   └── pak008.pk4
+            └── d3xp/
+                ├── pak000.pk4 
+                └── pak001.pk4
+    
+    Create a `Doom 3.d3` file in the roms/doom3 directory. 
+    If you have the Resurrection of Evil mod then Create a `Doom 3 - Resurrection of Evil.d3` file too.
+
+    The `Doom 3.d3` file should contain the path to the base game. - i.e. base/pak000.pk4
+    Similarly `Doom 3 - Resurrection of Evil.d3` should be - d3xp/pak000.pk4
+    
+    For more info: https://wiki.batocera.org/systems:doom3
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:boom3
+    Trouvez la documentation ici: https://wiki.batocera.org/systems:doom3
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:boom3
+    Para mais informações: https://wiki.batocera.org/systems:doom3
 
 reminiscence:
   name: REminiscence
@@ -4950,7 +4994,7 @@ namco2x6:
   release: 2000
   hardware: arcade
   extensions: [zip]
-  platform: namco2x6, arcade
+  platform: namco, sega, arcade
   emulators:
     play:
       play: { requireAnyOf: [BR2_PACKAGE_PLAY] }
@@ -5068,6 +5112,8 @@ spectravideo:
   platform: spectravideo
   theme: spectravideo
   emulators:
+    libretro:
+      bluemsx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BLUEMSX] }
     openmsx:
       openmsx: { requireAnyOf: [BR2_PACKAGE_OPENMSX] }
 
@@ -5398,3 +5444,33 @@ chihiro:
     Pour plus d'informations consultez la documentation ici: https://wiki.batocera.org/systems:chihiro
   comment_br: |
     Para mais informações: https://wiki.batocera.org/systems:chihiro
+
+rott:
+  name: Rise of the Triad
+  manufacturer: Ports
+  release: 1994
+  hardware: port
+  extensions: [rott]
+  platform: pc
+  group: ports
+  emulators:
+    taradino:
+      taradino: { requireAnyOf: [BR2_PACKAGE_TARADINO] }
+  comment_en: |
+    Place your commercial version of Rise of the Triad installation files in here.
+
+    You should include DARKWAR.WAD, DARKWAR.RTL, DARKWAR.RTC & REMOTE1.RTS as a minimum.
+    File names can be upper or lower case.
+
+    Then create the file `Rise of the Triad.rott`. This will enable EmulationStation to launch the game.
+
+    You do not need to enable the joystick or gamepad as compatiblity doesn't work well yet.
+    We have mapped the controller to keyboard events as a result.
+
+    For more info: https://wiki.batocera.org/systems:taradino
+  comment_fr: |
+    Trouvez la documentation ici: https://wiki.batocera.org/systems:taradino
+  comment_br: |
+    Para mais informações: https://wiki.batocera.org/systems:taradino
+
+
