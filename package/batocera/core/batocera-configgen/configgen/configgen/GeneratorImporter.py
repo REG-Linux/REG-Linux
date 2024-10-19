@@ -355,6 +355,14 @@ def getGenerator(emulator):
         from generators.uqm.uqmGenerator import UqmGenerator
         return UqmGenerator()
 
+    if emulator == "dhewm3":
+        from generators.dhewm3.dhewm3Generator import Dhewm3Generator
+        return Dhewm3Generator()
+
+    if emulator == "taradino":
+        from generators.taradino.taradinoGenerator import TaradinoGenerator
+        return TaradinoGenerator()
+
     if emulator == 'sh':
         from generators.sh.shGenerator import ShGenerator
         return ShGenerator()
