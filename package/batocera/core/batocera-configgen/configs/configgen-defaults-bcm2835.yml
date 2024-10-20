@@ -50,6 +50,9 @@ snes:
 snes-msu1:
   emulator: libretro
   core:     pocketsnes
+spectravideo:
+  emulator: libretro
+  core:     bluemsx
 c64:
   emulator: libretro
   core:     vice_x64
