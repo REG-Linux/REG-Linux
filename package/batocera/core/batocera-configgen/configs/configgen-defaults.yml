@@ -289,6 +289,9 @@ iortcw:
 jaguar:
   emulator: libretro
   core:     virtualjaguar
+jaguarcd:
+  emulator: libretro
+  core:     virtualjaguar
 laser310:
   emulator: libretro
   core:     mame
@@ -512,6 +515,9 @@ raze:
 reminiscence:
   emulator: libretro
   core:     reminiscence
+rott:
+  emulator: taradino
+  core:     taradino
 samcoupe:
   emulator: samcoupe
   core:     samcoupe
