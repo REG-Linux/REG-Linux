@@ -21,7 +21,7 @@ DHEWM3_CONF_OPTS += -DENABLE_TEST=OFF
 
 define DHEWM3_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/dhewm3/doom3.dhewm3.keys \
+	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/dhewm3/doom3.dhewm3.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 
