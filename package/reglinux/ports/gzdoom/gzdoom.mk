@@ -3,8 +3,8 @@
 # gzdoom
 #
 ################################################################################
-# Version: Commits on Oct 12, 2024
-GZDOOM_VERSION = g4.13.0
+# Version: Commits on Oct 20, 2024
+GZDOOM_VERSION = g4.13.1
 GZDOOM_SITE = https://github.com/ZDoom/gzdoom.git
 GZDOOM_SITE_METHOD=git
 GZDOOM_GIT_SUBMODULES=YES
@@ -13,7 +13,7 @@ GZDOOM_DEPENDENCIES = host-gzdoom sdl2 bzip2 fluidsynth openal zmusic libvpx web
 GZDOOM_SUPPORTS_IN_SOURCE_BUILD = NO
 
 # We need the tools from the host package to build the target package
-HOST_GZDOOM_DEPENDENCIES = zlib bzip2 host-webp
+HOST_GZDOOM_DEPENDENCIES = zlib bzip2 host-webp host-zmusic
 HOST_GZDOOM_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 HOST_GZDOOM_CONF_OPTS += -DSKIP_INSTALL_ALL=ON
 HOST_GZDOOM_CONF_OPTS += -DTOOLS_ONLY=ON
@@ -72,7 +72,7 @@ define GZDOOM_INSTALL_TARGET_CMDS
 	cp -pr $(@D)/buildroot-build/fm_banks $(TARGET_DIR)/usr/share/gzdoom
 	cp -pr $(@D)/buildroot-build/soundfonts $(TARGET_DIR)/usr/share/gzdoom
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/gzdoom/gzdoom.keys \
+	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/gzdoom/gzdoom.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
