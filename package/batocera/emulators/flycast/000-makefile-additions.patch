@@ -1,15 +1,15 @@
 ---
- CMakeLists.txt | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ CMakeLists.txt | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 49f312f..256dbb7 100644
+index f12f63b..9b95b8e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -68,6 +68,13 @@ option(APPLE_BREAKPAD "macOS: Build breakpad client and dump symbols" OFF)
- option(ENABLE_GDB_SERVER "Build with GDB debugging support" OFF)
+@@ -70,6 +70,13 @@ option(ENABLE_GDB_SERVER "Build with GDB debugging support" OFF)
  option(ENABLE_DC_PROFILER "Build with support for target machine (SH4) profiler" OFF)
  option(ENABLE_FC_PROFILER "Build with support for host app (Flycast) profiler" OFF)
+ option(USE_DISCORD "Use Discord Presence API" OFF)
 +option(USE_MALI "Use mali" OFF)
 +option(RK3399 "Optimize for Rockchip RK3399" OFF)
 +option(RK3568 "Optimize for Rockchip RK3568" OFF)
@@ -20,7 +20,7 @@ index 49f312f..256dbb7 100644
  
  if(IOS AND NOT LIBRETRO)
  	set(USE_VULKAN OFF CACHE BOOL "Force vulkan off" FORCE)
-@@ -126,6 +126,25 @@
+@@ -122,6 +129,25 @@ endif()
  string(TIMESTAMP BUILD_TIMESTAMP UTC)
  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/core/version.h.in" "${CMAKE_CURRENT_SOURCE_DIR}/core/version.h" @ONLY)
  
@@ -46,8 +46,8 @@ index 49f312f..256dbb7 100644
  if(NINTENDO_SWITCH)
  	set(USE_VULKAN OFF)
  	enable_language(ASM)
-@@ -157,6 +158,10 @@ else()
-        add_executable(${PROJECT_NAME} core/emulator.cpp)
+@@ -212,6 +238,10 @@ else()
+ 	add_executable(${PROJECT_NAME} core/emulator.cpp)
  endif()
  
 +if(USE_MALI)
@@ -55,7 +55,8 @@ index 49f312f..256dbb7 100644
 +endif()
 +
  if(WINDOWS_STORE)
-        set(USE_OPENGL OFF)
-        set(USE_VULKAN OFF)
+ 	set(USE_OPENGL OFF)
+ 	set(USE_VULKAN OFF)
 -- 
-2.44.0
+2.47.0
+
