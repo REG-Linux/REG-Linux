@@ -57,19 +57,29 @@ define LIBRETRO_MAME_BUILD_CMDS
 	# create some dirs while with parallelism, sometimes it fails because this directory is missing
 	mkdir -p $(@D)/build/libretro/obj/x64/libretro/src/osd/libretro/libretro-internal
 
-        # First, we need to build genie for host
-        cd $(@D); \
-        PATH="$(HOST_DIR)/bin:$$PATH" \
-        $(MAKE) TARGETOS=linux OSD=sdl genie \
-        TARGET=mame SUBTARGET=tiny \
-        NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
-        USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
+	# First, we need to build genie for host
+	cd $(@D); \
+		PATH="$(HOST_DIR)/bin:$$PATH" \
+		$(MAKE) TARGETOS=linux OSD=sdl genie \
+		TARGET=mame SUBTARGET=tiny \
+		NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
+		USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
 
+	# remove bfm* drivers to save space
+	find $(@D)/src/mame/bfm/ -type f | xargs grep -e 'GAME(\|GAMEL' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" > $(@D)/games.list
+	find $(@D)/src/mame/bfm/ -type f | xargs sed -i '/GAME[L]*(/d'
 	# remove skeleton drivers to save space
-	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 1 -d ":" | sort -u > $(@D)/machines.list
-	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 2 -d "," | sort -bu > $(@D)/games.list
-	cat $(@D)/machines.list | while read file ; do sed -i '/MACHINE_IS_SKELETON/d' $$file ; done
-	# Remove reference to skeleton drivers in mame.lst
+	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 1 -d ":" | sort -u > $(@D)/machines1.list
+	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list
+	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_IS_SKELETON/p;/setname.*MACHINE_IS_SKELETON/p;/MACHINE_IS_SKELETON/d' $$file ; done
+	# do not remove '#define GAME_FLAGS' and other definition lines
+	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_MECHANICAL/p;/setname.*MACHINE_MECHANICAL/p;/MACHINE_MECHANICAL/d' $$file ; done
+	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_FLAGS_MECHANICAL/p;/setname.*MACHINE_FLAGS_MECHANICAL/p;/MACHINE_FLAGS_MECHANICAL/d' $$file ; done
+	# remove remaining MECHANICAL games using 'GAME_FLAGS' label
+	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_FLAGS.*MACHINE_MECHANICAL' | cut -f 1 -d ":" | sort -u > $(@D)/machines2.list
+	cat $(@D)/machines2.list | while read file ; do grep 'GAME_FLAGS' $$file | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
+	cat $(@D)/machines2.list | while read file ; do sed -i '/define GAME_FLAGS/p;/setname.*GAME_FLAGS/p;/GAME_FLAGS/d' $$file ; done
+	# Remove reference to skeleton|mechanical drivers in mame.lst
 	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 
 	# Compile
