@@ -3,8 +3,8 @@
 # MAME (GroovyMAME)
 #
 ################################################################################
-# Version: GroovyMAME 0.269 - Switchres 2.221d
-MAME_VERSION = gm0269sr221d
+# Version: GroovyMAME 0.270 - Switchres 2.21d
+MAME_VERSION = gm0270sr221d
 MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
 MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
 MAME_LICENSE = MAME
@@ -16,17 +16,6 @@ MAME_LDFLAGS =
 
 MAME_SUBTARGET=mame
 MAME_SUFFIX=
-
-define MAME_COPY_FILES
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/arcade.flt $(@D)/src/mame/
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/mess.flt   $(@D)/src/mame/
-endef
-MAME_PRE_CONFIGURE_HOOKS += MAME_COPY_FILES
-
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
-MAME_SUBTARGET=arcade
-MAME_SUFFIX=arcade
-endif
 
 # Limit number of jobs not to eat too much RAM....
 MAME_MAX_JOBS = 32
@@ -119,20 +108,28 @@ endif
 define MAME_BUILD_CMDS
 	# First, we need to build genie for host
 	cd $(@D); \
-	PATH="$(HOST_DIR)/bin:$$PATH" \
-	$(MAKE) TARGETOS=linux OSD=sdl genie \
-	TARGET=mame SUBTARGET=tiny \
-	NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
-	USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
+		PATH="$(HOST_DIR)/bin:$$PATH" \
+		$(MAKE) TARGETOS=linux OSD=sdl genie \
+		TARGET=mame SUBTARGET=tiny \
+		NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
+		USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
 
-	# Remove skeleton drivers to save space
-	mkdir -p $(@D)/build
-	find $(@D)/src/mame/ -type f | xargs grep MACHINE_IS_SKELETON | cut -f 1 -d ":" > $(@D)/build/skel.list
-	cat $(@D)/build/skel.list | while read file ; do sed -i '/MACHINE_IS_SKELETON/d' $$file ; done
-	rm $(@D)/build/skel.list
-	# Remove reference to skeleton drivers in mame.lst
-        cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/mame.flt $(@D)/mame.flt
-	cat $(@D)/mame.flt | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
+	# remove bfm* drivers to save space
+	find $(@D)/src/mame/bfm/ -type f | xargs grep -e 'GAME(\|GAMEL' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" > $(@D)/games.list
+	find $(@D)/src/mame/bfm/ -type f | xargs sed -i '/GAME[L]*(/d'
+	# remove skeleton drivers to save space
+	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 1 -d ":" | sort -u > $(@D)/machines1.list
+	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list
+	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_IS_SKELETON/p;/setname.*MACHINE_IS_SKELETON/p;/MACHINE_IS_SKELETON/d' $$file ; done
+	# do not remove '#define GAME_FLAGS' and other definition lines
+	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_MECHANICAL/p;/setname.*MACHINE_MECHANICAL/p;/MACHINE_MECHANICAL/d' $$file ; done
+	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_FLAGS_MECHANICAL/p;/setname.*MACHINE_FLAGS_MECHANICAL/p;/MACHINE_FLAGS_MECHANICAL/d' $$file ; done
+	# remove remaining MECHANICAL games using 'GAME_FLAGS' label
+	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_FLAGS.*MACHINE_MECHANICAL' | cut -f 1 -d ":" | sort -u > $(@D)/machines2.list
+	cat $(@D)/machines2.list | while read file ; do grep 'GAME_FLAGS' $$file | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
+	cat $(@D)/machines2.list | while read file ; do sed -i '/define GAME_FLAGS/p;/setname.*GAME_FLAGS/p;/GAME_FLAGS/d' $$file ; done
+	# Remove reference to skeleton|mechanical drivers in mame.lst
+	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 
 	# Compile emulation target (MAME)
 	cd $(@D); \
