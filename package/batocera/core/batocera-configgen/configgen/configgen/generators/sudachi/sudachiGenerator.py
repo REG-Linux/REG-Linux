@@ -28,7 +28,7 @@ class SudachiGenerator(Generator):
             "XDG_CONFIG_HOME":batoceraFiles.CONF, \
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/switch", \
             "XDG_CACHE_HOME":batoceraFiles.CACHE, \
-            "QT_QPA_PLATFORM":"xcb"})
+            "QT_QPA_PLATFORM":"wayland"})
 
     def writeSudachiConfig(sudachiConfigFile, system, playersControllers):
         # pads
@@ -309,7 +309,7 @@ class SudachiGenerator(Generator):
             sudachiConfig.set("Controls", "time_zone_index", system.config["sudachi_timezone"])
         else:
             sudachiConfig.set("Controls", "time_zone_index", "0")
-        sudachiConfig.set("Controls", "time_zone_index\\default", "false")        
+        sudachiConfig.set("Controls", "time_zone_index\\default", "false")
 
         # controllers
         nplayer = 1
