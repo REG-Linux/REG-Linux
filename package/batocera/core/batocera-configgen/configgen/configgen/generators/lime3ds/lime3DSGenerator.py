@@ -19,11 +19,11 @@ class Lime3DSGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         Lime3DSGenerator.writeConfig(batoceraFiles.CONF + "/lime3ds-emu/qt-config.ini", system, playersControllers)
 
-        if os.path.exists('/usr/bin/lime-qt'):
-            commandArray = ['/usr/bin/lime-qt', rom]
+        if os.path.exists('/usr/bin/lime3ds-gui'):
+            commandArray = ['/usr/bin/lime3ds-gui', rom]
         else:
-            commandArray = ['/usr/bin/lime', rom]
-        return Command.Command(array=commandArray, env={ 
+            commandArray = ['/usr/bin/lime3ds-cli', rom]
+        return Command.Command(array=commandArray, env={
             "XDG_CONFIG_HOME":batoceraFiles.CONF,
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/3ds",
             "XDG_CACHE_HOME":batoceraFiles.CACHE,
@@ -40,7 +40,7 @@ class Lime3DSGenerator(Generator):
             return False
         else:
             return True
-    
+
     @staticmethod
     def writeConfig(limeConfigFile, system, playersControllers):
         # Pads
@@ -104,7 +104,7 @@ class Lime3DSGenerator(Generator):
 
         ## [UI]
         if not limeConfig.has_section("UI"):
-            limeConfig.add_section("UI")       
+            limeConfig.add_section("UI")
         # Start Fullscreen
         limeConfig.set("UI", "fullscreen", "true")
         limeConfig.set("UI", "fullscreen\default", "false")
@@ -196,7 +196,7 @@ class Lime3DSGenerator(Generator):
             limeConfig.set("Renderer", "use_frame_limit", "false")
         else:
             limeConfig.set("Renderer", "use_frame_limit", "true")
-        
+
         ## [WEB SERVICE]
         if not limeConfig.has_section("WebService"):
             limeConfig.add_section("WebService")
@@ -230,7 +230,7 @@ class Lime3DSGenerator(Generator):
         # Options required to load the functions when the configuration file is created
         if not limeConfig.has_option("Controls", "profiles\\size"):
             limeConfig.set("Controls", "profile", 0)
-            limeConfig.set("Controls", "profile\\default", "true")    
+            limeConfig.set("Controls", "profile\\default", "true")
             limeConfig.set("Controls", "profiles\\1\\name", "default")
             limeConfig.set("Controls", "profiles\\1\\name\\default", "true")
             limeConfig.set("Controls", "profiles\\size", 1)
