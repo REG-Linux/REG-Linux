@@ -360,7 +360,7 @@ class Rpcs3Generator(Generator):
             env={
                 "XDG_CONFIG_HOME":batoceraFiles.CONF,
                 "XDG_CACHE_HOME":batoceraFiles.CACHE,
-                "QT_QPA_PLATFORM":"xcb",
+                "QT_QPA_PLATFORM":"wayland",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
                 "SDL_JOYSTICK_HIDAPI": "0"
             }
