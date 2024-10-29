@@ -26,11 +26,9 @@ import utils.videoMode as videoMode
 eslog = get_logger(__name__)
 
 class MameGenerator(Generator):
-    # MAME requires a wayland compositor *if* bgfx is used
+    # TODO MAME requires a wayland compositor *if* bgfx is used
     def requiresWayland(self):
-        if system.isOptSet("video") and system.config["video"] == "bgfx":
-            return True
-        return False
+        return True
 
     def supportsInternalBezels(self):
         return True
@@ -66,7 +64,7 @@ class MameGenerator(Generator):
                 messSysName.append(row[1])
                 messRomType.append(row[2])
                 messAutoRun.append(row[3])
-        
+
         # Identify the current system
         try:
             messMode = messSystems.index(system.name)
@@ -809,7 +807,7 @@ def getMameControlScheme(system, romBasename):
         neogeoList = set(open(mameNeogeo).read().split())
         twinstickList = set(open(mameTwinstick).read().split())
         qbertList = set(open(mameRotatedstick).read().split())
-            
+
         romName = os.path.splitext(romBasename)[0]
         if romName in capcomList:
             if controllerType in [ "auto", "snes" ]:
