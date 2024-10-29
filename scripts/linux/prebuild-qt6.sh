@@ -12,7 +12,8 @@ echo "Building REG-Linux QT6 for all archs"
 mkdir -p prebuilt
 
 # Enable the flag to build QT6 from source
-sed -i s/#BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/ configs/batocera-board.common
+sed -i s/#BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/ configs/reglinux-board.common
+sed -i s/#BR2_PACKAGE_QT6BASE_DEFAULT_QPA=\"wayland\"/BR2_PACKAGE_QT6BASE_DEFAULT_QPA=\"wayland\"/ configs/reglinux-board.common
 
 # Loop over archs
 # h5 can be used for h6, h616, s905, s905gen2, rk3328 (cortex_a53)
@@ -39,5 +40,5 @@ for arch in rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x a3gen2
 done
 
 # Disable the flag to build QT6 from source
-sed -i s/BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/#BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/ configs/batocera-board.common
-
+sed -i s/BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/#BR2_PACKAGE_REGLINUX_QT6_BUILD_FROM_SOURCE=y/ configs/reglinux-board.common
+sed -i s/BR2_PACKAGE_QT6BASE_DEFAULT_QPA=\"wayland\"/#BR2_PACKAGE_QT6BASE_DEFAULT_QPA=\"wayland\"/ configs/reglinux-board.common
