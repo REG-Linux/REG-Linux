@@ -485,7 +485,7 @@ $SeatLoopPatch
             commandArray = ["dolphin-triforce-nogui", "-b", "-U", "/userdata/system/configs/dolphin-triforce", "-p", system.config["platform"], "-e", rom]
 
         # No environment variables work for now, paths are coded in above.
-        return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":batoceraFiles.CONF, "XDG_DATA_HOME":batoceraFiles.SAVES, "QT_QPA_PLATFORM":"wayland"})
+        return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":batoceraFiles.CONF, "XDG_DATA_HOME":batoceraFiles.SAVES, "QT_QPA_PLATFORM":"xcb"})
         #return Command.Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):

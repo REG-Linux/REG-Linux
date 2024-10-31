@@ -28,7 +28,7 @@ class SudachiGenerator(Generator):
             "XDG_CONFIG_HOME":batoceraFiles.CONF, \
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/switch", \
             "XDG_CACHE_HOME":batoceraFiles.CACHE, \
-            "QT_QPA_PLATFORM":"wayland"})
+            "QT_QPA_PLATFORM":"xcb"})
 
     def writeSudachiConfig(sudachiConfigFile, system, playersControllers):
         # pads

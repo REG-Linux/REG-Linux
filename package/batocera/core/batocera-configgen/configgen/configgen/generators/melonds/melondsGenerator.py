@@ -18,19 +18,19 @@ class MelonDSGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         romBasename = path.basename(rom)
-        
+
         # Verify the save path exists
         if not os.path.exists("/userdata/saves/melonds"):
             os.mkdir("/userdata/saves/melonds")
         # Verify the cheat path exist
         if not os.path.exists("/userdata/cheats/melonDS"):
-            os.mkdir("/userdata/cheats/melonDS")      
+            os.mkdir("/userdata/cheats/melonDS")
         # Config path
         configdir = "{}/{}".format(batoceraFiles.CONF, "melonDS")
         if not os.path.exists(configdir):
             os.makedirs(configdir)
         # Config file
-        configFileName = "{}/{}".format(configdir, "melonDS.ini")              
+        configFileName = "{}/{}".format(configdir, "melonDS.ini")
         f = codecs.open(configFileName, "w", encoding="utf_8_sig")
 
         # [Set config defaults]
@@ -95,20 +95,20 @@ class MelonDSGenerator(Generator):
         if system.isOptSet("melonds_layout"):
             f.write("ScreenLayout={}\n".format(system.config["melonds_layout"]))
         else:
-            f.write("ScreenLayout=0\n")       
+            f.write("ScreenLayout=0\n")
         if system.isOptSet("melonds_screensizing"):
             f.write("ScreenSizing={}\n".format(system.config["melonds_screensizing"]))
         else:
-            f.write("ScreenSizing=0\n")  
+            f.write("ScreenSizing=0\n")
         if system.isOptSet("melonds_scaling"):
             f.write("IntegerScaling={}\n".format(system.config["melonds_scaling"]))
         else:
-            f.write("IntegerScaling=0\n")  
+            f.write("IntegerScaling=0\n")
         # Cheater!
         if system.isOptSet("melonds_cheats"):
             f.write("EnableCheats={}\n".format(system.config["melonds_cheats"]))
         else:
-            f.write("EnableCheats=0\n")  
+            f.write("EnableCheats=0\n")
         if system.isOptSet("melonds_osd"):
             f.write("ShowOSD={}\n".format(system.config["melonds_osd"]))
         else:
@@ -117,7 +117,7 @@ class MelonDSGenerator(Generator):
             f.write("ConsoleType={}\n".format(system.config["melonds_console"]))
         else:
             f.write("ConsoleType=0\n")
-        
+
         # Map controllers
         melonDSMapping = {
         "a":        "Joy_A",
