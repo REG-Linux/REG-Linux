@@ -1,17 +1,18 @@
 --- a/common/CMakeLists.txt	2024-07-15 17:37:22.361418681 +0200
 +++ /Bcommon/CMakeLists.txt	2024-07-15 17:37:57.210212472 +0200
-@@ -168,10 +168,14 @@
+@@ -166,9 +166,13 @@
+ 	)
  	target_link_libraries(common PRIVATE
  		${DBUS_LINK_LIBRARIES}
- 		libbacktrace::libbacktrace
-+	)
+-		X11::X11
+-		X11::Xrandr
+ 	)
 +if(X11_API)
 +	target_link_libraries(common PRIVATE
- 		X11::X11
- 		X11::Xrandr
- 	)
- endif()
++ 		X11::X11
++ 		X11::Xrandr
++ 	)
 +endif()
- 
- set_source_files_properties(PrecompiledHeader.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
- 
+ 	if(USE_BACKTRACE)
+ 		target_compile_definitions(common PRIVATE "HAS_LIBBACKTRACE=1")
+ 		target_link_libraries(common PRIVATE libbacktrace::libbacktrace)
