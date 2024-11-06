@@ -338,9 +338,6 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	# music support
 	select BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
 
-	# QT6 (not for 32-bit GLES2 platforms)
-        select BR2_PACKAGE_REGLINUX_QT6		if  BR2_ARCH_IS_64 || BR2_PACKAGE_HAS_LIBGL || BR2_PACKAGE_BATOCERA_GLES3
-
 	# Feral GameMode
 	# not yet select BR2_PACKAGE_GAMEMODE		# ALL
 
