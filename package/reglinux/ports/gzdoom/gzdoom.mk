@@ -3,8 +3,8 @@
 # gzdoom
 #
 ################################################################################
-# Version: Commits on Oct 20, 2024
-GZDOOM_VERSION = g4.13.1
+# Version: Commits on Oct 31, 2024
+GZDOOM_VERSION = g4.13.2
 GZDOOM_SITE = https://github.com/ZDoom/gzdoom.git
 GZDOOM_SITE_METHOD=git
 GZDOOM_GIT_SUBMODULES=YES
