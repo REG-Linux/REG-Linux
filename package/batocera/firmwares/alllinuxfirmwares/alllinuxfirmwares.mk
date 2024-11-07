@@ -28,8 +28,8 @@ ifeq ($(BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI)$(BR2_PACKAGE_EXTRALINUXFIRMWARES
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/brcm
 endif
 
-# Remove qualcomm firmware if not buidling Ayn ODIN
-ifneq ($(BR2_PACKAGE_BATOCERA_TARGET_ODIN),y)
+# Remove qualcomm firmware if not building for snapdragon targets
+ifneq ($(BR2_PACKAGE_BATOCERA_TARGET_ODIN)$(BR2_PACKAGE_BATOCERA_TARGET_SM8250),y)
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/qcom
 endif
 
