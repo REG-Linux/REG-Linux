@@ -11,7 +11,7 @@ index 0a8c2d4..0fcce7d 100644
 +   TARGET := $(TARGET_NAME)_libretro.so
 +   LDFLAGS += -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined
 +   WITH_DYNAREC := aarch64
-+   CPUFLAGS += -mcpu=cortex-a77.cortex-a55
++   CPUFLAGS += -mcpu=cortex-a76.cortex-a55
 +   GLES3= 1
 +   GL_LIB := -lGLESv2
 +   COREFLAGS += -DUSE_GENERIC_GLESV2 -DOS_LINUX
