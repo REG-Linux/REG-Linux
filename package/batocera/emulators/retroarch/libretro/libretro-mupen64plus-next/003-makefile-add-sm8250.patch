@@ -10,7 +10,6 @@ index 0a8c2d4..0fcce7d 100644
 +else ifneq (,$(findstring sm8250,$(platform)))
 +   TARGET := $(TARGET_NAME)_libretro.so
 +   LDFLAGS += -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined
-+   GL_LIB := -lGLESv2
 +   WITH_DYNAREC := aarch64
 +   CPUFLAGS += -mcpu=cortex-a77.cortex-a55
 +   GLES3= 1
