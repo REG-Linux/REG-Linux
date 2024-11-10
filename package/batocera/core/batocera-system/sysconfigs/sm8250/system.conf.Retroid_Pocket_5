@@ -1,8 +1,7 @@
 # rp5 default values
 
-# Rotate DRM for splash
-display.rotate.DSI=3
-display.rotate2.DSI=3
+# default sway environment (rotate)
+system.es.environment=sway
 
 # default suspend on handled boards
 system.suspendmode=suspend
