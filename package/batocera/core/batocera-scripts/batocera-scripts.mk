@@ -23,6 +23,10 @@ ifeq ($(BR2_PACKAGE_REGLINUX_SWAY),y)
 endif
 ###
 
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250),y)
+  BATOCERA_SCRIPTS_POST_INSTALL_TARGET_HOOKS += BATOCERA_SCRIPTS_INSTALL_QCOM
+endif
+
 define BATOCERA_SCRIPTS_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)
     mkdir -p $(TARGET_DIR)/usr/bin
@@ -78,6 +82,10 @@ endef
 define BATOCERA_SCRIPTS_INSTALL_ROCKCHIP
     mkdir -p $(TARGET_DIR)/usr/bin/
     install -m 0755 $(BATOCERA_SCRIPTS_PATH)/scripts/batocera-rockchip-suspend $(TARGET_DIR)/usr/bin/
+endef
+
+define BATOCERA_SCRIPTS_INSTALL_QCOM
+    install -m 0755 $(BATOCERA_SCRIPTS_PATH)/scripts/qcom-fan                           $(TARGET_DIR)/usr/bin/
 endef
 
 $(eval $(generic-package))
