@@ -63,7 +63,11 @@ else ifeq ($(BR2_cortex_a76),y)
 REGLINUX_QT6_ARCH = bcm2712
 # Cortex A76.A55
 else ifeq ($(BR2_cortex_a76_a55),y)
+ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
+REGLINUX_QT6_ARCH = sm8250
+else
 REGLINUX_QT6_ARCH = rk3588
+endif
 # Mediatek MT8395 is cortex-a78.cortex-a55
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_MT8395),y)
 REGLINUX_QT6_ARCH = rk3588
