@@ -1005,7 +1005,7 @@ index 000000000000..a3b164994fe4
 +}
 +
 +static const struct power_supply_desc batt_psy_desc = {
-+	.name = "qcom-battery",
++	.name = "battery",
 +	.type = POWER_SUPPLY_TYPE_BATTERY,
 +	.properties = qcom_fg_props,
 +	.num_properties = ARRAY_SIZE(qcom_fg_props),
