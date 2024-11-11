@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2024-11-11 01:15:28.343433287 +0100
++++ b/CMakeLists.txt	2024-11-11 01:15:36.470589819 +0100
+@@ -86,7 +86,7 @@
+ CMAKE_DEPENDENT_OPTION(COMPILE_WITH_DWARF "Add DWARF debugging information" ${IS_DEBUG_BUILD} "MINGW" OFF)
+ option(ENABLE_LTO "Enable link time optimization" ${DEFAULT_ENABLE_LTO})
+ option(LIME3DS_USE_PRECOMPILED_HEADERS "Use precompiled headers" ON)
+-option(LIME3DS_WARNINGS_AS_ERRORS "Enable warnings as errors" ON)
++option(LIME3DS_WARNINGS_AS_ERRORS "Enable warnings as errors" OFF)
+ 
+ # Pass the following values to C++ land
+ if (ENABLE_QT)
