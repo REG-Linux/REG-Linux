@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIME3DS_VERSION = 2116
+LIME3DS_VERSION = 2119.1
 LIME3DS_SITE = https://github.com/Lime3DS/Lime3DS.git
 LIME3DS_SITE_METHOD = git
 LIME3DS_GIT_SUBMODULES=YES
@@ -35,7 +35,7 @@ ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
     LIME3DS_CONF_OPTS += -DENABLE_QT=ON
     LIME3DS_CONF_OPTS += -DENABLE_QT_TRANSLATION=ON
     LIME3DS_CONF_OPTS += -DENABLE_QT_UPDATER=OFF
-    LIME3DS_BIN = lime3ds-gui
+    LIME3DS_BIN = lime3ds
 else
     LIME3DS_CONF_OPTS += -DENABLE_QT=OFF
     LIME3DS_CONF_OPTS += -DENABLE_SDL2_FRONTEND=ON
@@ -53,7 +53,7 @@ endef
 
 define LIME3DS_EVMAP
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/lime3ds/3ds.lime3ds.keys \
+	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/lime3ds/3ds.lime3ds.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 
