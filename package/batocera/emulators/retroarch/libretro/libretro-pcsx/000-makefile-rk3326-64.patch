@@ -10,7 +10,7 @@ index c2fc9d0..a9d891b 100644
 +else ifeq ($(platform), rk3326)
 +	TARGET := $(TARGET_NAME)_libretro.so
 +	ARCH := arm64
-+	BUILTIN_GPU = unai
++	BUILTIN_GPU = neon
 +	DYNAREC = ari64
 +	fpic := -fPIC
 +	CFLAGS += -march=armv8-a+crc+simd -mtune=cortex-a35 -ftree-vectorize
