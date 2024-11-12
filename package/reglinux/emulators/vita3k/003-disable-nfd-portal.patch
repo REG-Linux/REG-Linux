@@ -1,0 +1,11 @@
+--- a/external/CMakeLists.txt	2024-11-09 11:32:09.000000000 +0100
++++ b/external/CMakeLists.txt	2024-11-11 15:48:17.462514749 +0100
+@@ -437,7 +437,7 @@
+ # target_compile_definitions(tracy PUBLIC TRACY_ENABLE)
+ 
+ # Use XDG desktop portals on Linux
+-set(NFD_PORTAL ON)
++set(NFD_PORTAL OFF)
+ 
+ # nativefiledialog-extended
+ add_subdirectory(nativefiledialog-extended)
