@@ -63,14 +63,14 @@ diff -u -r output/bcm2711/build/melonds-d4e51f80601f57399db49f1010c45427bd2bf3c4
  
 --- a/src/frontend/qt_sdl/CMakeLists.txt	2024-05-19 18:54:52.011770233 +0200
 +++ b/src/frontend/qt_sdl/CMakeLists.txt	2024-05-20 11:21:33.905909882 +0200
-@@ -61,6 +61,7 @@
- if (APPLE)
-     option(USE_QT6 "Build using Qt 6 instead of 5" ON)
- else()
-+    option(USE_X11 "Use X11" OFF)
-     option(USE_QT6 "Build using Qt 6 instead of 5" OFF)
- endif()
+@@ -60,6 +60,7 @@
+ )
  
+ option(USE_QT6 "Use Qt 6 instead of Qt 5" ON)
++option(USE_X11 "Use X11" OFF)
+ 
+ if (USE_QT6)
+     find_package(Qt6 COMPONENTS Core Gui Widgets Network Multimedia OpenGL OpenGLWidgets Svg REQUIRED)
 @@ -149,8 +150,12 @@
          ../duckstation/gl/context_egl.cpp
          ../duckstation/gl/context_egl_wayland.cpp
