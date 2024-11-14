@@ -1,4 +1,4 @@
-menu "batocera.linux"
+menu "reglinux"
 
 menu "System"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-system/Config.in"
