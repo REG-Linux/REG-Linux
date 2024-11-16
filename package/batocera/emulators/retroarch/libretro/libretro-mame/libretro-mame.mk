@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-# Version : Sep 27, 2024
-# lrmame0270
-LIBRETRO_MAME_VERSION = lrmame0270
+# Version : Nov 1, 2024
+# lrmame0271
+LIBRETRO_MAME_VERSION = lrmame0271
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 LIBRETRO_MAME_LICENSE = MAME
 
