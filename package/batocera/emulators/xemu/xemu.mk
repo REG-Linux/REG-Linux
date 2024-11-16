@@ -10,11 +10,11 @@ XEMU_SITE_METHOD=git
 XEMU_GIT_SUBMODULES=YES
 XEMU_LICENSE = GPLv2
 XEMU_DEPENDENCIES = host-meson host-pkgconf host-python3 host-python-distlib libglib2 zlib
-XEMU_DEPENDENCIES += sdl2 libsamplerate slirp host-python-pyyaml libpcap
+XEMU_DEPENDENCIES += sdl2 libsamplerate slirp host-python-pyyaml libpcap libepoxy libgtk3
 
 XEMU_EXTRA_DOWNLOADS = https://github.com/mborgerson/xemu-hdd-image/releases/download/1.0/xbox_hdd.qcow2.zip
 
-XEMU_CONF_ENV += PATH="/x86_64/host/x86_64-buildroot-linux-gnu/sysroot/usr/bin:$$PATH"
+XEMU_CONF_ENV += PATH="/$(BR2_ARCH)/host/$(BR2_ARCH)-buildroot-linux-gnu/sysroot/usr/bin:$$PATH"
 
 XEMU_CONF_OPTS += --target-list=i386-softmmu
 XEMU_CONF_OPTS += --cross-prefix="$(STAGING_DIR)"
@@ -73,7 +73,13 @@ XEMU_CONF_OPTS += --disable-hvf
 XEMU_CONF_OPTS += --disable-whpx
 XEMU_CONF_OPTS += --with-default-devices
 XEMU_CONF_OPTS += --disable-renderdoc
+
+# AVX2 is only available on x86_64_v3 or more
+ifeq ($(BR2_x86_x86_64_v3),y)
 XEMU_CONF_OPTS += --enable-avx2
+else
+XEMU_CONF_OPTS += --disable-avx2
+endif
 
 define XEMU_CONFIGURE_CMDS
 	cd $(@D) && $(TARGET_CONFIGURE_OPTS) ./configure $(XEMU_CONF_OPTS)
@@ -84,8 +90,8 @@ define XEMU_BUILD_CMDS
 		CC_FOR_BUILD="$(TARGET_CC)" GCC_FOR_BUILD="$(TARGET_CC)" \
 		CXX_FOR_BUILD="$(TARGET_CXX)" LD_FOR_BUILD="$(TARGET_LD)" \
 		    CROSS_COMPILE="$(STAGING_DIR)/usr/bin/" \
-            PREFIX="/x86_64/host/x86_64-buildroot-linux-gnu/sysroot/" \
-            PKG_CONFIG="/x86_64/host/x86_64-buildroot-linux-gnu/sysroot/usr/bin/pkg-config" \
+            PREFIX="/$(BR2_ARCH)/host/$(BR2_ARCH)-buildroot-linux-gnu/sysroot/" \
+            PKG_CONFIG="/$(BR2_ARCH)/host/$(BR2_ARCH)-buildroot-linux-gnu/sysroot/usr/bin/pkg-config" \
 		$(MAKE) -C $(@D)
 endef
 
