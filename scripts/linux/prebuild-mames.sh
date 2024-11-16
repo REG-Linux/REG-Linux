@@ -5,7 +5,7 @@
 
 # Grab MAME version from source tree
 MAME_VERSION=$(cat package/batocera/emulators/mame/mame.mk | grep GroovyMAME | grep Version | cut -d " " -f 4)
-LRMAME_VERSION=$(cat package/batocera/emulators/retroarch/libretro/libretro-mame/libretro-mame.mk | grep LIBRETRO_MAME_VERSION | grep lrmame | cut -d " " -f 3 | sed s/lrmame//g | sed s/0/0\./g)
+LRMAME_VERSION=$(cat package/batocera/emulators/retroarch/libretro/libretro-mame/libretro-mame.mk | grep LIBRETRO_MAME_VERSION | grep lrmame | cut -d " " -f 3 | sed s/lrmame//g | sed s/0/0\./)
 
 # Check both version matches, or abort
 if [ "$MAME_VERSION" != "$LRMAME_VERSION" ]
@@ -20,13 +20,14 @@ echo "Building MAME/lr-mame combo version ($MAME_VERSION) for all archs"
 mkdir -p prebuilt
 
 # Enable the flag to build MAME from source
-sed -i s/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/ configs/batocera-board.common
+sed -i s/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/ configs/reglinux-board.common
 
 # Loop over archs
 # rk3326 can be used for s9gen4 (cortex_a35)
 # h5 can be used for h6, h616, s905, s905gen2, rk3328 (cortex_a53)
 # s905gen3 can be used for rk3566/rk3568 (cortex_a55)
 # s922x can be used for a3gen2 (cortex_a73_a53)
+# rk3588 can be used for sm8250 (cortex_a76_a55)
 for arch in s812 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x saphira jh7110 k1 x86_64 x86_64_v3; do
 	# Clean
 	make ${arch}-clean
@@ -42,5 +43,5 @@ for arch in s812 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905ge
 done
 
 # Disable the flag to build MAME from source
-sed -i s/BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/ configs/batocera-board.common
+sed -i s/BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/ configs/reglinux-board.common
 
