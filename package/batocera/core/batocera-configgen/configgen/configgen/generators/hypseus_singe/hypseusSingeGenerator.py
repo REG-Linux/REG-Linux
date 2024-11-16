@@ -162,7 +162,7 @@ class HypseusSingeGenerator(Generator):
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
                             "singe", "vldp", "-retropath", "-framefile", frameFile, "-script", singeFile,
                             "-fullscreen", "-gamepad", "-datadir", batoceraFiles.hypseusDatadir,
-                            "-romdir", batoceraFiles.singeRomdir, "-homedir", batoceraFiles.hypseusDatadir]
+                            "-singedir", batoceraFiles.singeRomdir, "-romdir", batoceraFiles.singeRomdir, "-homedir", batoceraFiles.hypseusDatadir]
         else:
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
                             romName, "vldp", "-framefile", frameFile, "-fullscreen",
