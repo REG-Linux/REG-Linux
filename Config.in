@@ -1,4 +1,4 @@
-menu "batocera.linux"
+menu "reglinux"
 
 menu "System"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/core/batocera-system/Config.in"
@@ -478,7 +478,6 @@ menu "Libraries"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python-adafruit-pureio/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python-pyftdi/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python-sysv-ipc/Config.in"
-  source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python-pyqt5-sip/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python-hidapi/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/libliftoff/Config.in"
   source "$BR2_EXTERNAL_BATOCERA_PATH/package/batocera/libraries/python3-configobj/Config.in"
