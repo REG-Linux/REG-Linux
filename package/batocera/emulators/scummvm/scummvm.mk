@@ -55,7 +55,7 @@ ifeq ($(BR2_arm)$(BR2_ARM_CPU_HAS_NEON),yy)
 SCUMMVM_CONF_OPTS += --enable-ext-neon
 else ifeq ($(BR2_x86_64),y)
 SCUMMVM_CONF_OPTS += --enable-ext-sse2
-ifeq ($(BR2_x86_64_v3),y)
+ifeq ($(BR2_x86_x86_64_v3),y)
 SCUMMVM_CONF_OPTS += --enable-ext-avx2
 endif
 # Disable scalers on MIPS32
