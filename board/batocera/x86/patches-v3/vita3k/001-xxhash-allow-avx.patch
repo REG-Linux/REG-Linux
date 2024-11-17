@@ -4,7 +4,7 @@
  #  define XXH_X86DISPATCH_ALLOW_AVX
  #endif
  
-+// Force AVX for x86_64-v3 sublevel target
++// Force AVX for x86-64-v3 sublevel target
 +#define XXH_X86DISPATCH_ALLOW_AVX
  #if defined(__AVX__) && !defined(XXH_X86DISPATCH_ALLOW_AVX)
  #  error "Error: if xxh_x86dispatch.c is compiled with AVX enabled, the resulting binary will crash on sse2-only cpus !! " \

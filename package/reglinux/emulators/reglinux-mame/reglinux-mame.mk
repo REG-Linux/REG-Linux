@@ -57,8 +57,8 @@ REGLINUX_MAME_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_K1),y)
 REGLINUX_MAME_ARCH = k1
-# X86_64-v3 subarchitecture
-else ifeq ($(BR2_x86_64_v3),y)
+# X86-64-v3 subarchitecture
+else ifeq ($(BR2_x86_x86_64_v3),y)
 REGLINUX_MAME_ARCH = x86_64_v3
 # X86_64 architecture
 else ifeq ($(BR2_x86_64),y)
