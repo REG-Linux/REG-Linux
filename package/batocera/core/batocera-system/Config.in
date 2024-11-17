@@ -644,7 +644,7 @@ config BR2_PACKAGE_BATOCERA_TARGET_X86_64
 	bool "x86_64"
 
 config BR2_PACKAGE_BATOCERA_TARGET_X86_64_V3
-	bool "x86_64-v3"
+	bool "x86_64_v3"
 
 # Mediatek
 #--------------------------------------
