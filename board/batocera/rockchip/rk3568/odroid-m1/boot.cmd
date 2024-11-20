@@ -24,7 +24,7 @@ setenv board odroid${variant}
 
 setenv bootargs "${bootargs} initrd=/boot/initrd.lz4 label=REGLINUX rootwait quiet loglevel=0 console=tty3 console=ttyS2,1500000n8"
 
-setenv bootlabel "batocera.linux"
+setenv bootlabel "reg.linux"
 
 # Default serial console
 setenv console "tty1"
