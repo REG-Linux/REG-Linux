@@ -8,7 +8,7 @@ BATOCERA_RESOLUTION_VERSION = 1.2
 BATOCERA_RESOLUTION_LICENSE = GPL
 BATOCERA_RESOLUTION_DEPENDENCIES = pciutils
 BATOCERA_RESOLUTION_SOURCE=
-BATOCERA_RESOLUTION_PATH = $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-resolution/scripts
+BATOCERA_RESOLUTION_PATH = $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-resolution/scripts
 
 BATOCERA_SCRIPT_TYPE=basic
 
@@ -32,7 +32,7 @@ endef
 
 define BATOCERA_RESOLUTION_INSTALL_XORG
 	mkdir -p $(TARGET_DIR)/etc/X11/xorg.conf.d
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/board/batocera/x86/fsoverlay/etc/X11/xorg.conf.d/20-amdgpu.conf $(TARGET_DIR)/etc/X11/xorg.conf.d/20-amdgpu.conf
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/x86/fsoverlay/etc/X11/xorg.conf.d/20-amdgpu.conf $(TARGET_DIR)/etc/X11/xorg.conf.d/20-amdgpu.conf
 endef
 
 define BATOCERA_RESOLUTION_INSTALL_RECORDER

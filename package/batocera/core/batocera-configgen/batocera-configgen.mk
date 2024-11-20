@@ -11,7 +11,7 @@ BATOCERA_CONFIGGEN_SETUP_TYPE = pep517
 BATOCERA_CONFIGGEN_DEPENDENCIES = python3 python-pyyaml python-requests
 BATOCERA_CONFIGGEN_INSTALL_STAGING = YES
 
-CONFIGGEN_DIR = $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-configgen
+CONFIGGEN_DIR = $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-configgen
 
 define BATOCERA_CONFIGGEN_EXTRACT_CMDS
 	cp -avf $(CONFIGGEN_DIR)/configgen/* $(@D)

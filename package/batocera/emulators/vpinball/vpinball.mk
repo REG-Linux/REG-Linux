@@ -69,7 +69,7 @@ endef
 
 define VPINBALL_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/vpinball/vpinball.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/vpinball/vpinball.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

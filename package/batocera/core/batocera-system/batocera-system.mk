@@ -86,7 +86,7 @@ endif
 
 ifneq (,$(findstring dev,$(BATOCERA_SYSTEM_VERSION)))
     BATOCERA_SYSTEM_COMMIT = \
-	    "-$(shell cd $(BR2_EXTERNAL_BATOCERA_PATH) && git rev-parse --short HEAD)"
+	    "-$(shell cd $(BR2_EXTERNAL_REGLINUX_PATH) && git rev-parse --short HEAD)"
 else
     BATOCERA_SYSTEM_COMMIT =
 endif
@@ -102,22 +102,22 @@ define BATOCERA_SYSTEM_INSTALL_TARGET_CMDS
 
 	# datainit
         mkdir -p $(TARGET_DIR)/usr/share/reglinux
-        rsync -arv $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/datainit/ $(TARGET_DIR)/usr/share/reglinux/datainit/
+        rsync -arv $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-system/datainit/ $(TARGET_DIR)/usr/share/reglinux/datainit/
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/system.conf \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-system/system.conf \
 	    $(TARGET_DIR)/usr/share/reglinux/datainit/system
 
 	# system-boot.conf
 	$(INSTALL) -D -m 0644 \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/system-boot.conf \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-system/system-boot.conf \
 		$(BINARIES_DIR)/system-boot.conf
 
 	# sysconfigs (default system.conf for boards)
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/sysconfigs
     if test -d \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/sysconfigs/${BATOCERA_SYSTEM_ARCH}; \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-system/sysconfigs/${BATOCERA_SYSTEM_ARCH}; \
 		then cp -pr \
-		$(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/sysconfigs/${BATOCERA_SYSTEM_ARCH}/* \
+		$(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-system/sysconfigs/${BATOCERA_SYSTEM_ARCH}/* \
 		$(TARGET_DIR)/usr/share/reglinux/sysconfigs; fi
 
 	# mounts
@@ -125,9 +125,9 @@ define BATOCERA_SYSTEM_INSTALL_TARGET_CMDS
 
 	# variables
 	mkdir -p $(TARGET_DIR)/etc/profile.d
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/xdg.sh \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-system/xdg.sh \
 	    $(TARGET_DIR)/etc/profile.d/xdg.sh
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-system/dbus.sh \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-system/dbus.sh \
 	    $(TARGET_DIR)/etc/profile.d/dbus.sh
 
 	# list of modules that doesnt like suspend

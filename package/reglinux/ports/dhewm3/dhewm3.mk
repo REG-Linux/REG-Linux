@@ -9,7 +9,7 @@ DHEWM3_SITE = https://github.com/dhewm/dhewm3
 DHEWM3_LICENSE = GPLv3
 DHEWM3_LICENSE_FILES = COPYING.txt
 DHEWM3_SITE_METHOD=git
-DHEWM3_DEPENDENCIES = host-libjpeg libcurl libogg libvorbis openal sdl2 zlib 
+DHEWM3_DEPENDENCIES = host-libjpeg libcurl libogg libvorbis openal sdl2 zlib
 DHEWM3_SUPPORTS_IN_SOURCE_BUILD = NO
 
 DHEWM3_SUBDIR = neo
@@ -21,7 +21,7 @@ DHEWM3_CONF_OPTS += -DENABLE_TEST=OFF
 
 define DHEWM3_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/dhewm3/doom3.dhewm3.keys \
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/dhewm3/doom3.dhewm3.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 

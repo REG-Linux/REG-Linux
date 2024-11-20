@@ -48,7 +48,7 @@ endef
 
 define PANDA3DS_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-#	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/panda3ds/3ds.panda3ds.keys \
+#	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/panda3ds/3ds.panda3ds.keys \
 #	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

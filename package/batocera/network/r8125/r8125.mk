@@ -18,7 +18,7 @@ define R8125_MAKE_SUBDIR
 endef
 
 define R8125_BLACKLIST_R8169
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/network/r8125/blacklist-r8169.conf \
+    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/network/r8125/blacklist-r8169.conf \
         $(TARGET_DIR)/etc/modprobe.d/
 endef
 

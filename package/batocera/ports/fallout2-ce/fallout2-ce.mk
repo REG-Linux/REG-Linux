@@ -14,7 +14,7 @@ endef
 
 define FALLOUT2_CE_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/fallout2-ce/fallout2-ce.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/fallout2-ce/fallout2-ce.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

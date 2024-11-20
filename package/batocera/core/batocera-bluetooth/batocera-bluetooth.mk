@@ -25,11 +25,11 @@ endif
 define BATOCERA_BLUETOOTH_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/etc/init.d/
 	mkdir -p $(TARGET_DIR)/etc/dbus-1/system.d
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-bluetooth/S29namebluetooth \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-bluetooth/S29namebluetooth \
 		$(TARGET_DIR)/etc/init.d/S29namebluetooth
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-bluetooth/S32bluetooth.template \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-bluetooth/S32bluetooth.template \
 		$(TARGET_DIR)/etc/init.d/S32bluetooth
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-bluetooth/bluetooth.conf \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-bluetooth/bluetooth.conf \
 		$(TARGET_DIR)/etc/dbus-1/system.d/bluetooth.conf
 	sed -i -e s+"@INTERNAL_BLUETOOTH_STACK@"+"$(BATOCERA_BLUETOOTH_STACK)"+ \
 		$(TARGET_DIR)/etc/init.d/S32bluetooth

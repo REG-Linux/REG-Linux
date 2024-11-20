@@ -24,7 +24,7 @@ define R8168_MAKE_SUBDIR
 endef
 
 define R8168_BLACKLIST_R8168
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/network/r8168/r816x.conf \
+    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/network/r8168/r816x.conf \
         $(TARGET_DIR)/etc/modprobe.d/
 endef
 

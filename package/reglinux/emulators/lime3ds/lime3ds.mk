@@ -53,7 +53,7 @@ endef
 
 define LIME3DS_EVMAP
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/lime3ds/3ds.lime3ds.keys \
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/lime3ds/3ds.lime3ds.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 

@@ -54,7 +54,7 @@ endef
 
 define CITRA_EVMAP
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/citra/3ds.citra.keys \
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/citra/3ds.citra.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 

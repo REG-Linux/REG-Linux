@@ -37,11 +37,11 @@ define LIBDMDUTIL_INSTALL_SERVER
    $(INSTALL) -D -m 0755 $(LIBDMDUTIL_BUILDDIR)/dmdserver $(TARGET_DIR)/usr/bin/dmdserver
 
    mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
-   install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/libraries/libdmdutil/dmd_server.service $(TARGET_DIR)/usr/share/reglinux/services/dmd_real
-   install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/libraries/libdmdutil/dmdserver-config.py $(TARGET_DIR)/usr/bin/dmdserver-config
+   install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/libraries/libdmdutil/dmd_server.service $(TARGET_DIR)/usr/share/reglinux/services/dmd_real
+   install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/libraries/libdmdutil/dmdserver-config.py $(TARGET_DIR)/usr/bin/dmdserver-config
    # pixelcade
-   install -m 0644 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/libraries/libdmdutil/99-pixelcade.rules $(TARGET_DIR)/etc/udev/rules.d/99-pixelcade.rules
-   $(INSTALL) -m 0755 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/libraries/libdmdutil/pixelcade-add   $(TARGET_DIR)/usr/bin/pixelcade-add
+   install -m 0644 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/libraries/libdmdutil/99-pixelcade.rules $(TARGET_DIR)/etc/udev/rules.d/99-pixelcade.rules
+   $(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/libraries/libdmdutil/pixelcade-add   $(TARGET_DIR)/usr/bin/pixelcade-add
 endef
 
 LIBDMDUTIL_POST_INSTALL_TARGET_HOOKS += LIBDMDUTIL_INSTALL_SERVER

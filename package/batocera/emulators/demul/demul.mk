@@ -20,12 +20,12 @@ define DEMUL_INSTALL_TARGET_CMDS
 	cp -pr $(@D) $(TARGET_DIR)/usr/demul
 
     # copy english faq & evmap config
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/demul/faq_en.txt $(TARGET_DIR)/usr/demul/
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/demul/faq_en.txt $(TARGET_DIR)/usr/demul/
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/demul/*.keys $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/demul/*.keys $(TARGET_DIR)/usr/share/evmapy
 
 	# copy modified pad ini file for 2 players
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/demul/padDemul.ini $(TARGET_DIR)/usr/demul/
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/demul/padDemul.ini $(TARGET_DIR)/usr/demul/
 endef
 
 $(eval $(generic-package))

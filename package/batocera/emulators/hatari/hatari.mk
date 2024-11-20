@@ -23,7 +23,7 @@ endef
 define HATARI_INSTALL_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	$(INSTALL) -D -m 0644 \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/hatari/atarist.hatari.keys \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/hatari/atarist.hatari.keys \
 	        $(TARGET_DIR)/usr/share/evmapy/atarist.hatari.keys
 endef
 
