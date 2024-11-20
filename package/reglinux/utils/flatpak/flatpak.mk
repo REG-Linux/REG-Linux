@@ -22,7 +22,7 @@ FLATPAK_CONF_ENV += LDFLAGS=-lpthread
 
 define FLATPAK_INSTALL_SCRIPTS
 	install -m 0755 \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/utils/flatpak/batocera-flatpak-update \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/utils/flatpak/batocera-flatpak-update \
 		$(TARGET_DIR)/usr/bin/
 	mkdir -p $(TARGET_DIR)/usr/share/emulationstation/hooks
 	ln -sf /usr/bin/batocera-flatpak-update \
@@ -31,7 +31,7 @@ define FLATPAK_INSTALL_SCRIPTS
 	    $(TARGET_DIR)/usr/share/emulationstation/hooks/preupdate-gamelists-steam
 	#evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/utils/flatpak/*.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/utils/flatpak/*.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

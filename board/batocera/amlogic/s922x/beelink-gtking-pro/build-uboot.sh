@@ -9,7 +9,7 @@ tar xf u-boot-2024.01.tar.bz2
 cd u-boot-2024.01
 
 # Apply patches
-PATCHES="${BR2_EXTERNAL_BATOCERA_PATH}/board/batocera/amlogic/s922x/patches/uboot/*.patch"
+PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/amlogic/s922x/patches/uboot/*.patch"
 for patch in $PATCHES
 do
 echo "Applying patch: $patch"

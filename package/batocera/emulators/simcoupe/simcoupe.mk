@@ -23,7 +23,7 @@ define SIMCOUPE_INSTALL_TARGET_CMDS
 		mkdir -p $(TARGET_DIR)$(SIMCOUPE_BIOS_AND_RESOURCES)
 		cp -R $(@D)/Resource/* $(TARGET_DIR)$(SIMCOUPE_BIOS_AND_RESOURCES)
 		mkdir -p $(TARGET_DIR)/usr/share/evmapy
-		cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/simcoupe/samcoupe.keys \
+		cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/simcoupe/samcoupe.keys \
 		    $(TARGET_DIR)/usr/share/evmapy
 endef
 

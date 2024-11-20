@@ -50,7 +50,7 @@ endif
 
 define DOLPHIN_EMU_EVMAPY
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/dolphin-emu/*.keys \
+    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/dolphin-emu/*.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 

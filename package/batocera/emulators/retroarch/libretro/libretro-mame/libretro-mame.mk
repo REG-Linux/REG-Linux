@@ -99,12 +99,12 @@ define LIBRETRO_MAME_INSTALL_TARGET_CMDS
 	cp -R $(@D)/hash $(TARGET_DIR)/usr/share/lr-mame
 
 	mkdir -p $(TARGET_DIR)/usr/share/mame
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/blank.fmtowns $(TARGET_DIR)/usr/share/mame/blank.fmtowns
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/blank.fmtowns $(TARGET_DIR)/usr/share/mame/blank.fmtowns
 
 	# Copy coin drop plugin
 	mkdir -p $(TARGET_DIR)/usr/bin/mame/
 	cp -R -u $(@D)/plugins $(TARGET_DIR)/usr/bin/mame/
-	cp -R -u $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
+	cp -R -u $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
 endef
 
 $(eval $(generic-package))

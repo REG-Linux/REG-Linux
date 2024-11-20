@@ -64,12 +64,12 @@ define ALLLINUXFIRMWARES_LINK_QCA_WIFI_BT
     # wifi
     mkdir -p $(TARGET_DIR)/lib/firmware/ath11k/WCN6855/hw2.1
     mkdir -p $(TARGET_DIR)/lib/firmware/ath11k/QCA2066
-    cp -rf $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/firmwares/alllinuxfirmwares/hw2.1/* \
+    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/alllinuxfirmwares/hw2.1/* \
 	    $(TARGET_DIR)/lib/firmware/ath11k/WCN6855/hw2.1
-    cp -rf $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/firmwares/alllinuxfirmwares/QCA206X/* \
+    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/alllinuxfirmwares/QCA206X/* \
 	    $(TARGET_DIR)/lib/firmware/ath11k/QCA2066
     # bluetooth
-    cp -rf $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/firmwares/alllinuxfirmwares/qca/* \
+    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/alllinuxfirmwares/qca/* \
 	    $(TARGET_DIR)/lib/firmware/qca
 endef
 

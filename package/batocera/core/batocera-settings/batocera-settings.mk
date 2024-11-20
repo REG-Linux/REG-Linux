@@ -13,7 +13,7 @@ BATOCERA_SETTINGS_CONF_OPTS = \
   -Dset_exe_name=system-settings-set
 
 define BATOCERA_SETTINGS_MASTER_BIN
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-settings/system-settings-get-master $(TARGET_DIR)/usr/bin/system-settings-get-master
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-settings/system-settings-get-master $(TARGET_DIR)/usr/bin/system-settings-get-master
 endef
 
 BATOCERA_SETTINGS_POST_INSTALL_TARGET_HOOKS += BATOCERA_SETTINGS_MASTER_BIN

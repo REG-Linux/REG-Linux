@@ -26,7 +26,7 @@ endef
 
 define MELONDS_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/melonds/nds.melonds.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/melonds/nds.melonds.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

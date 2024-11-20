@@ -12,8 +12,8 @@ endef
 
 define UBOOT_FIREFLY_STATION_M2_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/uboot-firefly-station-m2
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-firefly-station-m2/idbloader.img $(BINARIES_DIR)/uboot-firefly-station-m2/idbloader.img
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-firefly-station-m2/uboot.img $(BINARIES_DIR)/uboot-firefly-station-m2/uboot.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-firefly-station-m2/idbloader.img $(BINARIES_DIR)/uboot-firefly-station-m2/idbloader.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-firefly-station-m2/uboot.img $(BINARIES_DIR)/uboot-firefly-station-m2/uboot.img
 endef
 
 $(eval $(generic-package))

@@ -18,7 +18,7 @@ git clone https://github.com/hardkernel/u-boot.git -b odroidgoU-v2015.01
 cd u-boot
 
 # Apply patches
-PATCHES="${BR2_EXTERNAL_BATOCERA_PATH}/board/batocera/amlogic/s922x/patches/uboot-ogu/*.patch"
+PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/amlogic/s922x/patches/uboot-ogu/*.patch"
 for patch in $PATCHES
 do
 echo "Applying patch: $patch"

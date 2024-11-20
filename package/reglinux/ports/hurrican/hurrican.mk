@@ -22,7 +22,7 @@ define HURRICAN_INSTALL_TARGET_CMDS
 	chmod 0755 $(TARGET_DIR)/usr/bin/hurrican
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/hurrican/hurrican.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/hurrican/hurrican.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

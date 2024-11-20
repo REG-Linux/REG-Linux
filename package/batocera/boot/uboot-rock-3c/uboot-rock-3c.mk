@@ -12,8 +12,8 @@ endef
 
 define UBOOT_ROCK_3C_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/uboot-rock-3c
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-rock-3c/idbloader.img $(BINARIES_DIR)/uboot-rock-3c/idbloader.img
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-rock-3c/u-boot.itb $(BINARIES_DIR)/uboot-rock-3c/u-boot.itb
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-rock-3c/idbloader.img $(BINARIES_DIR)/uboot-rock-3c/idbloader.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-rock-3c/u-boot.itb $(BINARIES_DIR)/uboot-rock-3c/u-boot.itb
 endef
 
 $(eval $(generic-package))

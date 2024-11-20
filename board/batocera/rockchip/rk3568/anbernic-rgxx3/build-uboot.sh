@@ -19,7 +19,7 @@ IMAGES_DIR=$3
 #cd u-boot
 
 # Apply patches if any
-#PATCHES="${BR2_EXTERNAL_BATOCERA_PATH}/board/batocera/rockchip/rk3568/patches/uboot/*.patch"
+#PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/rockchip/rk3568/patches/uboot/*.patch"
 #for patch in $PATCHES
 #do
 #echo "Applying patch: $patch"

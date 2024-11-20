@@ -96,13 +96,13 @@ endef
 # required to have fullscreen at 1st start
 define IORTCW_CONFIG_FILE
 	mkdir -p $(IORTCW_CONF_INIT)
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/iortcw/wolfconfig.cfg \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/iortcw/wolfconfig.cfg \
 		$(IORTCW_CONF_INIT)
 endef
 
 define IORTCW_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/iortcw/iortcw.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/iortcw/iortcw.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 

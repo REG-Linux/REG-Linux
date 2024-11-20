@@ -12,9 +12,9 @@ endef
 
 define UBOOT_EVB_RK3399_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/uboot-evb-rk3399
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-evb-rk3399/idbloader.img $(BINARIES_DIR)/uboot-evb-rk3399/idbloader.img
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-evb-rk3399/uboot.img $(BINARIES_DIR)/uboot-evb-rk3399/uboot.img
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-evb-rk3399/trust.img $(BINARIES_DIR)/uboot-evb-rk3399/trust.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-evb-rk3399/idbloader.img $(BINARIES_DIR)/uboot-evb-rk3399/idbloader.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-evb-rk3399/uboot.img $(BINARIES_DIR)/uboot-evb-rk3399/uboot.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-evb-rk3399/trust.img $(BINARIES_DIR)/uboot-evb-rk3399/trust.img
 endef
 
 $(eval $(generic-package))

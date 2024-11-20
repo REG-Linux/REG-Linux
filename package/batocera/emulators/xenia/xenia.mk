@@ -32,7 +32,7 @@ endef
 
 define XENIA_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/xenia/xbox360.xenia.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/xenia/xbox360.xenia.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

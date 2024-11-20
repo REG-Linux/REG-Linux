@@ -9,7 +9,7 @@ JOYCOND_SITE = $(call github,DanielOgorchock,joycond,$(JOYCOND_VERSION))
 JOYCOND_LICENSE = GPL-3.0+
 JOYCOND_LICENSE_FILES = LICENSE
 JOYCOND_DEPENDENCIES = acl libevdev udev
-JOYCOND_PATH = $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/controllers/joycond
+JOYCOND_PATH = $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/controllers/joycond
 
 define JOYCOND_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/joycond						$(TARGET_DIR)/usr/bin

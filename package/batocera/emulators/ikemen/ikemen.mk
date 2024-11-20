@@ -32,7 +32,7 @@ define IKEMEN_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/bin/Ikemen_GO_Linux $(TARGET_DIR)/usr/bin/ikemen
 	# evmapy
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/ikemen/ikemen.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/ikemen/ikemen.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
