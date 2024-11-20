@@ -8,6 +8,12 @@ menuconfig BR2_PACKAGE_INTEL_CLC
 	select BR2_PACKAGE_EXPAT
 	select BR2_PACKAGE_LIBDRM
 	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LLVM
+	select BR2_PACKAGE_LLVM_RTTI
+	select BR2_PACKAGE_HOST_LLVM
+	select BR2_PACKAGE_HOST_LLVM_RTTI
+	select BR2_PACKAGE_PYTHON_PYCPARSER
+	select BR2_PACKAGE_HOST_PYTHON_PYCPARSER
 	help
 	  Mesa 3D, an open-source implementation of the OpenGL
 	  specification.
