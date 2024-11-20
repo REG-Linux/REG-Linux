@@ -98,7 +98,13 @@ do
     bootresolution="$(/usr/bin/system-settings-get-master -f "$BOOTCONF" es.resolution)"
     if test -z "${bootresolution}"
     then
-	    batocera-resolution minTomaxResolution-secure
+        bootresolution="$(/usr/bin/system-settings-get-master es.resolution)"
+        if test -z "${bootresolution}"
+        then
+	        batocera-resolution minTomaxResolution-secure
+        else
+	        batocera-resolution setMode "${bootresolution}"
+        fi
     else
 	    batocera-resolution setMode "${bootresolution}"
     fi
