@@ -39,11 +39,6 @@ fi
 # SYSTEM
 DSYSTEM="${TMPDIR}/system"
 
-# in case xorg is in use
-if test -z "${DISPLAY}"; then
-    export DISPLAY=:0.0
-fi
-
 dmesg 	         	> "${DSYSTEM}/dmesg.txt"
 lsmod 	         	> "${DSYSTEM}/lsmod.txt"
 ps    	         	> "${DSYSTEM}/ps.txt"
