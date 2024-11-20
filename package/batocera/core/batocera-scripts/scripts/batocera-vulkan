@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Ensure a valid display is set
-if [ -z "$WAYLAND_DISPLAY" ]; then
-    if [ -z "$DISPLAY" ]; then
-        export DISPLAY=:0.0
-    fi
-fi
-
 # Check if vulkaninfo exists
 if [ ! -x "/usr/bin/vulkaninfo" ]; then
     echo "Vulkan not found"
