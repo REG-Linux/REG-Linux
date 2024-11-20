@@ -148,11 +148,6 @@ MEM_TOTAL_MB=$(expr "${MEM_TOTAL_KB}" / 1024)
 MEM_AVAILABLE_MB=$(expr "${MEM_AVAILABLE_KB}" / 1024)
 echo "Available Memory: ${MEM_AVAILABLE_MB}/${MEM_TOTAL_MB} MB"
 
-# Current Resolution
-if test -z "${DISPLAY}"; then
-    export DISPLAY=:0.0
-fi
-
 DISPLAYRES=$(batocera-resolution currentResolution)
 if [ ! -z "$WAYLAND_DISPLAY" ]; then # wayland
     DISPLAYRATE=$(batocera-resolution currentMode | awk -F'[x.]' '{printf "%.3f", $3 / 1000}')
@@ -227,10 +222,10 @@ current_energy_file="/sys/class/power_supply/BAT0/energy_full"
 if [ -e "$design_energy_file" ]; then
     design_energy=$(cat "$design_energy_file")
     current_energy=$(cat "$current_energy_file")
-    
+
     battery_health=$(awk "BEGIN {
         health = ($current_energy / $design_energy) * 100;
-        if (health > 100) 
+        if (health > 100)
             health = 100;
         printf \"%.0f\", health
     }")
