@@ -16,13 +16,13 @@ define DMD_SIMULATOR_INSTALL_DMD_SIMULATOR_PLAYER
 	$(INSTALL) -D -m 0755 $(@D)/dmd-play.py      $(TARGET_DIR)/usr/bin/dmd-play
 
         mkdir -p $(TARGET_DIR)/usr/share/dmd-simulator/scripts
-        $(INSTALL) -m 0755 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/screens/dmd-simulator/scripts/*.sh $(TARGET_DIR)/usr/share/dmd-simulator/scripts/
+        $(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/screens/dmd-simulator/scripts/*.sh $(TARGET_DIR)/usr/share/dmd-simulator/scripts/
 
         mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/screens/dmd-simulator/dmd_simulator.service $(TARGET_DIR)/usr/share/reglinux/services/dmd_simulator
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/screens/dmd-simulator/dmd_simulator.service $(TARGET_DIR)/usr/share/reglinux/services/dmd_simulator
 
-	$(INSTALL) -m 0644 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/screens/dmd-simulator/batocera.png $(TARGET_DIR)/usr/share/dmd-simulator/images/system/batocera.png
-	$(INSTALL) -m 0644 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/screens/dmd-simulator/rainbow.png $(TARGET_DIR)/usr/share/dmd-simulator/images/system/rainbow.png
+	$(INSTALL) -m 0644 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/screens/dmd-simulator/batocera.png $(TARGET_DIR)/usr/share/dmd-simulator/images/system/batocera.png
+	$(INSTALL) -m 0644 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/screens/dmd-simulator/rainbow.png $(TARGET_DIR)/usr/share/dmd-simulator/images/system/rainbow.png
 endef
 
 ifeq ($(BR2_PACKAGE_DMD_SIMULATOR),y)

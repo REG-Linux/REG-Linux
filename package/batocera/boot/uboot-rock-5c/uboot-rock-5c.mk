@@ -12,9 +12,9 @@ endef
 
 define UBOOT_ROCK_5C_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/rock-5c
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-rock-5c/idbloader.img \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-rock-5c/idbloader.img \
 	    $(BINARIES_DIR)/rock-5c/idbloader.img
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-rock-5c/u-boot.itb \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-rock-5c/u-boot.itb \
 	    $(BINARIES_DIR)/rock-5c/u-boot.itb
 endef
 

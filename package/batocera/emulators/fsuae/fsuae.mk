@@ -20,7 +20,7 @@ FSUAE_PRE_CONFIGURE_HOOKS += FSUAE_HOOK_BOOTSTRAP
 define FSUAE_INSTALL_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	$(INSTALL) -D -m 0644 \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/fsuae/*.keys \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/fsuae/*.keys \
 	        $(TARGET_DIR)/usr/share/evmapy/
 endef
 

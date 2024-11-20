@@ -64,7 +64,7 @@ endif
 BATOCERA_EMULATIONSTATION_CONF_OPTS += -DBATOCERA=ON
 
 BATOCERA_EMULATIONSTATION_SOURCE_PATH = \
-    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulationstation/batocera-emulationstation
+    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulationstation/batocera-emulationstation
 
 BATOCERA_EMULATIONSTATION_KEY_SCREENSCRAPER_DEV_LOGIN=\
     $(shell grep -E '^SCREENSCRAPER_DEV_LOGIN=' \

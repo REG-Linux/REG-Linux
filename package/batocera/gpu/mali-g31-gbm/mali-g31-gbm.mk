@@ -45,7 +45,7 @@ define MALI_G31_GBM_RK3326_INSTALL
 
 	# Install Vulkan driver as ICD through vulkan-loader
 	mkdir -p $(TARGET_DIR)/usr/share/vulkan/icd.d
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/gpu/mali-g31-gbm/mali_icd.json $(TARGET_DIR)/usr/share/vulkan/icd.d/
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/gpu/mali-g31-gbm/mali_icd.json $(TARGET_DIR)/usr/share/vulkan/icd.d/
 
 	# Ugly workaround to fix duckstation compilation
 	rm $(STAGING_DIR)/usr/lib/libEGL.so

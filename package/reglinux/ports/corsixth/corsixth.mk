@@ -11,7 +11,7 @@ CORSIXTH_DEPENDENCIES = sdl2 sdl2_image lua luafilesystem lpeg luasocket luasec 
 define CORSIXTH_INSTALL_EVMAPY
         # evmap config
         mkdir -p $(TARGET_DIR)/usr/share/evmapy
-        cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/corsixth/corsixth.keys $(TARGET_DIR)/usr/share/evmapy
+        cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/corsixth/corsixth.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 CORSIXTH_POST_INSTALL_TARGET_HOOKS += CORSIXTH_INSTALL_EVMAPY

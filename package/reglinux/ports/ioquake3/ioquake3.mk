@@ -51,7 +51,7 @@ endef
 
 define IOQUAKE3_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/ioquake3/quake3.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/ioquake3/quake3.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

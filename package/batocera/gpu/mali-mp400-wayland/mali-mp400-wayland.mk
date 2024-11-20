@@ -37,7 +37,7 @@ define MALI_MP400_WAYLAND_INSTALL_STAGING_CMDS
 
         for X in gbm egl glesv1_cm glesv2; \
         do \
-                cp  $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/gpu/mali-mp400-wayland/pkgconfig/$${X}.pc.cmake                       $(STAGING_DIR)/usr/lib/pkgconfig/$${X}.pc; \
+                cp  $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/gpu/mali-mp400-wayland/pkgconfig/$${X}.pc.cmake                       $(STAGING_DIR)/usr/lib/pkgconfig/$${X}.pc; \
                 sed -i -e s+@CMAKE_INSTALL_INCLUDEDIR@+include+g        $(STAGING_DIR)/usr/lib/pkgconfig/$${X}.pc; \
                 sed -i -e s+@CMAKE_INSTALL_LIBDIR@+lib+g                $(STAGING_DIR)/usr/lib/pkgconfig/$${X}.pc; \
         done
@@ -47,7 +47,7 @@ endef
 
 define MALI_MP400_WAYLAND_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/lib
-	
+
 	cp $(@D)/lib/arm-linux-gnueabihf/libmali-utgard-400-r7p0-r1p1-wayland.so \
 		$(TARGET_DIR)/usr/lib/libmali.so
 

@@ -23,9 +23,9 @@ for ARCH in ${ARCHS}; do
         mkdir -p "${TMP_CONFIG}" "${TMP_CONFIGS}" || exit 1
 
         # generate the defconfig
-        "${BR2_EXTERNAL_BATOCERA_PATH}/configs/createDefconfig.sh" "${BR2_EXTERNAL_BATOCERA_PATH}/configs/reglinux-${ARCH}"
+        "${BR2_EXTERNAL_REGLINUX_PATH}/configs/createDefconfig.sh" "${BR2_EXTERNAL_REGLINUX_PATH}/configs/reglinux-${ARCH}"
 
-        (make O="${TMP_CONFIG}" -C ${BR_DIR} BR2_EXTERNAL="${BR2_EXTERNAL_BATOCERA_PATH}" "reglinux-${ARCH}_defconfig" >/dev/null) || exit 1
+        (make O="${TMP_CONFIG}" -C ${BR_DIR} BR2_EXTERNAL="${BR2_EXTERNAL_REGLINUX_PATH}" "reglinux-${ARCH}_defconfig" >/dev/null) || exit 1
         cp "${TMP_CONFIG}/.config" "${TMP_CONFIGS}/config_${ARCH}" || exit 1
     ) &
 
@@ -42,11 +42,11 @@ while [[ $(jobs -r -p | wc -l) -ge 1 ]]; do wait -n; done
 sync
 
 # reporting
-ES_YML="${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/emulationstation/batocera-es-system/es_systems.yml"
-EXP_YML="${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/emulationstation/batocera-es-system/systems-explanations.yml"
-PYGEN="${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/emulationstation/batocera-es-system/batocera-report-system.py"
-HTML_GEN="${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/emulationstation/batocera-es-system/batocera_systemsReport.html"
-DEFAULTSDIR="${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/core/batocera-configgen/configs"
+ES_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera-es-system/es_systems.yml"
+EXP_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera-es-system/systems-explanations.yml"
+PYGEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera-es-system/batocera-report-system.py"
+HTML_GEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera-es-system/batocera_systemsReport.html"
+DEFAULTSDIR="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/core/batocera-configgen/configs"
 mkdir -p "${REGLINUX_BINARIES_DIR}" || exit 1
 echo python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}"
 python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}" >"${REGLINUX_BINARIES_DIR}/reglinux_systemsReport.json" || exit 1

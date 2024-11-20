@@ -72,7 +72,7 @@ define GZDOOM_INSTALL_TARGET_CMDS
 	cp -pr $(@D)/buildroot-build/fm_banks $(TARGET_DIR)/usr/share/gzdoom
 	cp -pr $(@D)/buildroot-build/soundfonts $(TARGET_DIR)/usr/share/gzdoom
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/gzdoom/gzdoom.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/gzdoom/gzdoom.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

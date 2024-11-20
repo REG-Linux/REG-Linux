@@ -54,7 +54,7 @@ endef
 
 define THEFORCEENGINE_EVMAPY
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/theforceengine/theforceengine.keys \
+    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/theforceengine/theforceengine.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 

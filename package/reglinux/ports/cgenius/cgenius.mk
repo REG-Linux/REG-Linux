@@ -31,7 +31,7 @@ endef
 
 define CGENIUS_POST_PROCESS
         mkdir -p $(TARGET_DIR)/usr/share/evmapy
-        cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/cgenius/cgenius.cgenius.keys \
+        cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/cgenius/cgenius.cgenius.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 

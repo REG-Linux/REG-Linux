@@ -41,9 +41,9 @@ ifeq ($(BR2_PACKAGE_VULKAN_LOADER),y)
 endif
 
 define IMGUI_COPY_CMAKE_FILES
-    cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/imgui/CMakeLists.txt \
+    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/imgui/CMakeLists.txt \
 	  $(@D)/
-    cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/imgui/imgui-config.cmake.in \
+    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/imgui/imgui-config.cmake.in \
 	  $(@D)/
 endef
 

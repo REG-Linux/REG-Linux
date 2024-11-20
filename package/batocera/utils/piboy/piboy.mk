@@ -12,10 +12,10 @@ define PIBOY_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin
 	mkdir -p $(TARGET_DIR)/usr/share/piboy
 
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/piboy/piboy_fan_ctrl.py      $(TARGET_DIR)/usr/bin/piboy_fan_ctrl.py
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/piboy/piboy_aud_ctrl.py      $(TARGET_DIR)/usr/bin/piboy_aud_ctrl.py
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/piboy/piboy_power_ctrl.py    $(TARGET_DIR)/usr/bin/piboy_power_ctrl.py
-	cp -a $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/piboy/fan.ini                                $(TARGET_DIR)/usr/share/piboy/fan.ini
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/piboy/piboy_fan_ctrl.py      $(TARGET_DIR)/usr/bin/piboy_fan_ctrl.py
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/piboy/piboy_aud_ctrl.py      $(TARGET_DIR)/usr/bin/piboy_aud_ctrl.py
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/piboy/piboy_power_ctrl.py    $(TARGET_DIR)/usr/bin/piboy_power_ctrl.py
+	cp -a $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/piboy/fan.ini                                $(TARGET_DIR)/usr/share/piboy/fan.ini
 endef
 
 $(eval $(kernel-module))

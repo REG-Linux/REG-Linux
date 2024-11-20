@@ -12,9 +12,9 @@ endef
 
 define UBOOT_ORANGEPI_4_LTS_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/uboot-orangepi-4-lts
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-orangepi-4-lts/idbloader.bin $(BINARIES_DIR)/uboot-orangepi-4-lts/idbloader.bin
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-orangepi-4-lts/trust.bin $(BINARIES_DIR)/uboot-orangepi-4-lts/trust.bin
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-orangepi-4-lts/uboot.img $(BINARIES_DIR)/uboot-orangepi-4-lts/u-boot.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-orangepi-4-lts/idbloader.bin $(BINARIES_DIR)/uboot-orangepi-4-lts/idbloader.bin
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-orangepi-4-lts/trust.bin $(BINARIES_DIR)/uboot-orangepi-4-lts/trust.bin
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-orangepi-4-lts/uboot.img $(BINARIES_DIR)/uboot-orangepi-4-lts/u-boot.img
 endef
 
 $(eval $(generic-package))

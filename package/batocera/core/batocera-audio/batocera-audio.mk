@@ -23,31 +23,31 @@ define BATOCERA_AUDIO_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/share/pipewire/media-session.d
 
 	# default alsa configurations
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/alsa/asoundrc-* \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/alsa/asoundrc-* \
 		$(TARGET_DIR)/usr/share/reglinux/alsa/
 
 	# sample audio files
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/*.wav \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/*.wav \
 	    $(TARGET_DIR)/usr/share/sounds
 
 	# init script
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/Saudio \
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/Saudio \
 		$(TARGET_DIR)/etc/init.d/S06audio
 
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/S27audioconfig \
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/S27audioconfig \
 		$(TARGET_DIR)/etc/init.d/S27audioconfig
 	# udev script to unmute audio devices
-	install -m 0644 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/90-alsa-setup.rules \
+	install -m 0644 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/90-alsa-setup.rules \
 		$(TARGET_DIR)/etc/udev/rules.d/90-alsa-setup.rules
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/soundconfig \
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/soundconfig \
 		$(TARGET_DIR)/usr/bin/soundconfig
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/alsa/batocera-audio \
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/alsa/batocera-audio \
 		$(TARGET_DIR)/usr/bin/batocera-audio
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/alsa/batocera-mixer \
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/alsa/batocera-mixer \
 		$(TARGET_DIR)/usr/bin/batocera-mixer
 
 	# pipewire-pulse policy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/pulseaudio-system.conf \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/pulseaudio-system.conf \
 		$(TARGET_DIR)/etc/dbus-1/system.d
 
 	# pipewire-alsa
@@ -56,30 +56,30 @@ define BATOCERA_AUDIO_INSTALL_TARGET_CMDS
 
 	# pipewire-media-session config: disable dbus device reservation
     mkdir -p $(TARGET_DIR)/usr/share/wireplumber/main.lua.d
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/50-alsa-config.lua \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/50-alsa-config.lua \
 		$(TARGET_DIR)/usr/share/wireplumber/main.lua.d/50-alsa-config.lua
 
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/pipewire.conf \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/pipewire.conf \
 		$(TARGET_DIR)/usr/share/pipewire/pipewire.conf
 endef
 
 define BATOCERA_AUDIO_X86_INTEL_DSP
 	mkdir -p $(TARGET_DIR)/etc/modprobe.d
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/intel-dsp.conf \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/intel-dsp.conf \
 	    $(TARGET_DIR)/etc/modprobe.d/intel-dsp.conf
 endef
 
 # Steam Deck OLED SOF files are not in the sound-open-firmware package yet
 define BATOCERA_AUDIO_STEAM_DECK_OLED
 	mkdir -p $(TARGET_DIR)/lib/firmware/amd/sof
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/sof-vangogh-*.bin \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/sof-vangogh-*.bin \
 	    $(TARGET_DIR)/lib/firmware/amd/sof/
 	mkdir -p $(TARGET_DIR)/lib/firmware/amd/sof-tplg
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/sof-vangogh-nau8821-max.tplg \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/sof-vangogh-nau8821-max.tplg \
 	    $(TARGET_DIR)/lib/firmware/amd/sof-tplg/sof-vangogh-nau8821-max.tplg
 	# extra ucm files
 	mkdir -p $(TARGET_DIR)/usr/share/alsa/ucm2
-	cp -pr $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-audio/ucm2/* \
+	cp -pr $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-audio/ucm2/* \
 	    $(TARGET_DIR)/usr/share/alsa/ucm2/
 endef
 

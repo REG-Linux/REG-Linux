@@ -12,8 +12,8 @@ endef
 
 define UBOOT_ORANGEPI_5_PLUS_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/uboot-orangepi-5-plus
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-orangepi-5-plus/idbloader.img $(BINARIES_DIR)/uboot-orangepi-5-plus/idbloader.img
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-orangepi-5-plus/u-boot.itb $(BINARIES_DIR)/uboot-orangepi-5-plus/u-boot.itb
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-orangepi-5-plus/idbloader.img $(BINARIES_DIR)/uboot-orangepi-5-plus/idbloader.img
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-orangepi-5-plus/u-boot.itb $(BINARIES_DIR)/uboot-orangepi-5-plus/u-boot.itb
 endef
 
 $(eval $(generic-package))
