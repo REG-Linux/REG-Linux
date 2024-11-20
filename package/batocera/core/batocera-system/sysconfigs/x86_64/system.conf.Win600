@@ -1,5 +1,8 @@
 # Anbernic WIN600 default values
 
+# default resolution
+es.resolution=720x1280
+
 # default sway environment (rotate)
 system.es.environment=sway
 
