@@ -100,7 +100,7 @@ define MUPEN64PLUS_CORE_INSTALL_TARGET_CMDS
 
 	# input.xml
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/mupen64
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/mupen64plus/mupen64plus-core/controllers/input.xml \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mupen64plus/mupen64plus-core/controllers/input.xml \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/mupen64
 endef
 

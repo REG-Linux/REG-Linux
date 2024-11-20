@@ -18,7 +18,7 @@ define LIBRETRO_WASM4_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/runtimes/native/wasm4_libretro.so \
 	    $(TARGET_DIR)/usr/lib/libretro/wasm4_libretro.so
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/retroarch/libretro/libretro-wasm4/wasm4.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/retroarch/libretro/libretro-wasm4/wasm4.keys \
 	    $(TARGET_DIR)/usr/share/evmapy/
 endef
 

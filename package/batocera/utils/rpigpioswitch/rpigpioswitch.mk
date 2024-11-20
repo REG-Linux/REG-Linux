@@ -1,12 +1,12 @@
 ################################################################################
 #
-# rpigpioswitch 
+# rpigpioswitch
 #
 ################################################################################
 RPIGPIOSWITCH_VERSION = 2.6
 RPIGPIOSWITCH_SOURCE =
 
-RPIGPIOSWITCH_SRC = $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/rpigpioswitch
+RPIGPIOSWITCH_SRC = $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/rpigpioswitch
 
 define RPIGPIOSWITCH_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(RPIGPIOSWITCH_SRC)/S92switch \

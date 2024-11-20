@@ -45,11 +45,11 @@ endef
 
 define AMIBERRY_EVMAP
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/amiberry/controllers/amiga500.amiberry.keys \
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/amiberry/controllers/amiga500.amiberry.keys \
 		$(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/amiberry/controllers/amiga1200.amiberry.keys \
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/amiberry/controllers/amiga1200.amiberry.keys \
 		$(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/amiberry/controllers/amigacd32.amiberry.keys \
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/amiberry/controllers/amigacd32.amiberry.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 

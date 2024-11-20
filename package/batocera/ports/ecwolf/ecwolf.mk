@@ -41,8 +41,8 @@ ECWOLF_GENERATED_HEADER_SUFFIX = 32
 endif
 
 define ECWOLF_COPY_GENERATED_HEADERS
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/ecwolf/arith_$(ECWOLF_GENERATED_HEADER_SUFFIX).h $(ECWOLF_BUILDDIR)/deps/gdtoa/arith.h
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/ecwolf/gd_qnan_$(ECWOLF_GENERATED_HEADER_SUFFIX).h $(ECWOLF_BUILDDIR)/deps/gdtoa/gd_qnan.h
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/ecwolf/arith_$(ECWOLF_GENERATED_HEADER_SUFFIX).h $(ECWOLF_BUILDDIR)/deps/gdtoa/arith.h
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/ecwolf/gd_qnan_$(ECWOLF_GENERATED_HEADER_SUFFIX).h $(ECWOLF_BUILDDIR)/deps/gdtoa/gd_qnan.h
 endef
 
 ECWOLF_POST_CONFIGURE_HOOKS += ECWOLF_COPY_GENERATED_HEADERS
@@ -56,7 +56,7 @@ define ECWOLF_INSTALL_TARGET_CMDS
 
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/ports/ecwolf/ecwolf.keys $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/ecwolf/ecwolf.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))

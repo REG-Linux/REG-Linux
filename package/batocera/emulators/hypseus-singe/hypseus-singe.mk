@@ -25,7 +25,7 @@ define HYPSEUS_SINGE_INSTALL_TARGET_CMDS
 
 	#evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/hypseus-singe/*.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/hypseus-singe/*.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

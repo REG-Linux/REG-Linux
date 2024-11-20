@@ -9,9 +9,9 @@ BATOCERA_NVIDIA_SOURCE =
 
 define BATOCERA_NVIDIA_INSTALL_TARGET_CMDS
 	install -m 0755 \
-	    $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/gpu/batocera-nvidia/batocera-nvidia \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/gpu/batocera-nvidia/batocera-nvidia \
 	    $(TARGET_DIR)/usr/bin/
-	
+
 	# [Xorg]
 	mkdir -p $(TARGET_DIR)/etc/X11/xorg.conf.d
 

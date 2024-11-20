@@ -40,7 +40,7 @@ endef
 
 define DXX_REBIRTH_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/dxx-rebirth/dxx-rebirth.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/dxx-rebirth/dxx-rebirth.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

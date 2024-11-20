@@ -6,7 +6,7 @@
 REGLINUX_GPICASE_VERSION = 0.2
 REGLINUX_GPICASE_SOURCE =
 REGLINUX_GPICASE_DEPENDENCIES = linux
-BR2_EXTERNAL_REGLINUX_GPICAS_PATH=$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-gpicase
+BR2_EXTERNAL_REGLINUX_GPICAS_PATH=$(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-gpicase
 
 define REGLINUX_GPICASE_BUILD_CMDS
 	$(HOST_DIR)/bin/linux-dtc $(BR2_EXTERNAL_REGLINUX_GPICAS_PATH)/overlays/retroflag-gpicase-overlay.dts -o	$(@D)/retroflag-gpicase.dtbo

@@ -124,13 +124,13 @@ define PPSSPP_INSTALL_TARGET_CMDS
     cp -R $(@D)/assets $(TARGET_DIR)/usr/share/ppsspp/PPSSPP
     # Fix PSP font for languages like Japanese
     # (font from https://github.com/minoryorg/Noto-Sans-CJK-JP/blob/master/fonts/)
-    cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/ppsspp/NotoSansCJKjp-DemiLight.ttf \
+    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/ppsspp/NotoSansCJKjp-DemiLight.ttf \
         $(TARGET_DIR)/usr/share/ppsspp/PPSSPP/Roboto-Condensed.ttf
 endef
 
 define PPSSPP_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/ppsspp/psp.ppsspp.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/ppsspp/psp.ppsspp.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 

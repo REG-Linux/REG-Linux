@@ -45,7 +45,7 @@ else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250),y)
 #	REGLINUX_GPU_SYSTEM = mali-t820
 endif
 
-REGLINUX_SHADERS_DIRIN=$(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-shaders/configs
+REGLINUX_SHADERS_DIRIN=$(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-shaders/configs
 
 ifeq ($(REGLINUX_GPU_SYSTEM),x86)
 	REGLINUX_SHADERS_SETS=sharp-bilinear-simple retro scanlines enhanced curvature zfast flatten-glow mega-bezel mega-bezel-lite mega-bezel-ultralite
@@ -55,7 +55,7 @@ endif
 
 define REGLINUX_SHADERS_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel/Presets
-	cp -R $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-shaders/presets-batocera/* $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel/Presets
+	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-shaders/presets-batocera/* $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel/Presets
 
 	# general
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/shaders/configs; \

@@ -8,10 +8,10 @@
 # TARGET_DIR = target dir
 
 # Package modules
-source "${BR2_EXTERNAL_BATOCERA_PATH}/board/batocera/scripts/package-kernel-modules.sh"
+source "${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/scripts/package-kernel-modules.sh"
 
 # Package firmware
-source "${BR2_EXTERNAL_BATOCERA_PATH}/board/batocera/scripts/package-firmware.sh"
+source "${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/scripts/package-firmware.sh"
 
 BATOCERA_TARGET=$(grep -E "^BR2_PACKAGE_BATOCERA_TARGET_[A-Z_0-9]*=y$" "${BR2_CONFIG}" | sed -e s+'^BR2_PACKAGE_BATOCERA_TARGET_\([A-Z_0-9]*\)=y$'+'\1'+)
 
@@ -139,7 +139,7 @@ sed -i -e s+'defaults.pcm.ipc_gid .*$'+'defaults.pcm.ipc_gid '"${AUDIOGROUP}"+ "
 
 # bios file
 mkdir -p "${TARGET_DIR}/usr/share/reglinux/datainit/bios" || exit 1
-python "${BR2_EXTERNAL_BATOCERA_PATH}/package/batocera/core/batocera-scripts/scripts/batocera-systems" --createReadme > "${TARGET_DIR}/usr/share/reglinux/datainit/bios/readme.txt" || exit 1
+python "${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/core/batocera-scripts/scripts/batocera-systems" --createReadme > "${TARGET_DIR}/usr/share/reglinux/datainit/bios/readme.txt" || exit 1
 
 # enable serial console
 SYSTEM_GETTY_PORT=$(grep "BR2_TARGET_GENERIC_GETTY_PORT" "${BR2_CONFIG}" | sed 's/.*\"\(.*\)\"/\1/')

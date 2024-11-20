@@ -11,13 +11,13 @@ REGLINUX_SAMBA_DEPENDENCIES =
 # Install S91ksmbd service
 define REGLINUX_SAMBA_INSTALL_KSMBD_INIT
 	# Install S91ksmbd service
-	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-samba/S91ksmbd $(TARGET_DIR)/etc/init.d/S91smbd
+	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-samba/S91ksmbd $(TARGET_DIR)/etc/init.d/S91smbd
 endef
 
 # Install S91smbd service
 define REGLINUX_SAMBA_INSTALL_SMBD_INIT
 	# Install S91smbd service
-	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-samba/S91smbd $(TARGET_DIR)/etc/init.d/S91smbd
+	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-samba/S91smbd $(TARGET_DIR)/etc/init.d/S91smbd
 endef
 
 # We need samba4 for Wine

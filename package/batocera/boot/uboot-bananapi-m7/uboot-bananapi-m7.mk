@@ -13,9 +13,9 @@ endef
 
 define UBOOT_BANANAPI_M7_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/bananapi-m7
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-bananapi-m7/idbloader.img \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-bananapi-m7/idbloader.img \
 	    $(BINARIES_DIR)/bananapi-m7/idbloader.img
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/boot/uboot-bananapi-m7/u-boot.itb \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-bananapi-m7/u-boot.itb \
 	    $(BINARIES_DIR)/bananapi-m7/u-boot.itb
 endef
 

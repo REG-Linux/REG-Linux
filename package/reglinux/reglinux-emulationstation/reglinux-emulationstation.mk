@@ -121,11 +121,11 @@ define REGLINUX_EMULATIONSTATION_RESOURCES
 
 	# es_input.cfg
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/controllers/es_input.cfg \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-emulationstation/controllers/es_input.cfg \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 
 	# hooks
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/batocera-preupdate-gamelists-hook $(TARGET_DIR)/usr/bin/
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-emulationstation/batocera-preupdate-gamelists-hook $(TARGET_DIR)/usr/bin/
 endef
 
 ### S31emulationstation
@@ -142,14 +142,14 @@ REGLINUX_EMULATIONSTATION_POST_INSTALL_TARGET_HOOKS += REGLINUX_EMULATIONSTATION
 endif
 
 define REGLINUX_EMULATIONSTATION_WAYLAND_SWAY
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/04-sway.sh		$(TARGET_DIR)/etc/profile.d/04-sway.sh
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/config		$(TARGET_DIR)/etc/sway/config
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/launchconfig	$(TARGET_DIR)/etc/sway/launchconfig
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/04-sway.sh		$(TARGET_DIR)/etc/profile.d/04-sway.sh
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/config		$(TARGET_DIR)/etc/sway/config
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-emulationstation/wayland/sway/launchconfig	$(TARGET_DIR)/etc/sway/launchconfig
 endef
 
 define REGLINUX_EMULATIONSTATION_BOOT
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/S31emulationstation $(TARGET_DIR)/etc/init.d/S31emulationstation
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/reglinux-emulationstation/emulationstation-standalone $(TARGET_DIR)/usr/bin/emulationstation-standalone
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-emulationstation/S31emulationstation $(TARGET_DIR)/etc/init.d/S31emulationstation
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-emulationstation/emulationstation-standalone $(TARGET_DIR)/usr/bin/emulationstation-standalone
 	sed -i -e 's;%REGLINUX_EMULATIONSTATION_PREFIX%;${REGLINUX_EMULATIONSTATION_PREFIX};g' \
 		-e 's;%REGLINUX_EMULATIONSTATION_CMD%;${REGLINUX_EMULATIONSTATION_CMD};g' \
 		-e 's;%REGLINUX_EMULATIONSTATION_ARGS%;${REGLINUX_EMULATIONSTATION_ARGS};g' \

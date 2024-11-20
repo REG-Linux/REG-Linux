@@ -28,7 +28,7 @@ endef
 
 define SONIC_MANIA_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/ports/sonic-mania/sonic-mania.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/sonic-mania/sonic-mania.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 

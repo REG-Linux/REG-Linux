@@ -45,7 +45,7 @@ endef
 
 define LEDSPICER_SERVICE_INSTALL
     mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
-	install -m 0755 $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/utils/ledspicer/ledspicer \
+	install -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/ledspicer/ledspicer \
         $(TARGET_DIR)/usr/share/reglinux/services/
 endef
 

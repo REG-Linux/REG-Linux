@@ -57,7 +57,7 @@ define LIBRETRO_FLYCASTVL_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/lib/libretro/flycastvl_libretro.so
 
 	mkdir -p $(TARGET_DIR)/usr/share/libretro/info/
-	cp "$(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/emulators/retroarch/libretro/libretro-flycastvl/flycastvl_libretro.info" \
+	cp "$(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/retroarch/libretro/libretro-flycastvl/flycastvl_libretro.info" \
         	"$(TARGET_DIR)/usr/share/libretro/info/"
 endef
 

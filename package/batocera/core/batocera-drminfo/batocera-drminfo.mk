@@ -30,7 +30,7 @@ ifeq ($(BR2_arm)$(BR2_aarch64),y)
 endif
 
 define BATOCERA_DRMINFO_BUILD_CMDS
-	$(TARGET_CONFIGURE_OPTS) $(TARGET_CC) -I$(STAGING_DIR)/usr/include/drm -ldrm $(BR2_EXTERNAL_BATOCERA_PATH)/package/batocera/core/batocera-drminfo/$(BATOCERA_DRMINFO_MAIN) -o $(@D)/batocera-drminfo $(BATOCERA_DRMINFO_FLAGS)
+	$(TARGET_CONFIGURE_OPTS) $(TARGET_CC) -I$(STAGING_DIR)/usr/include/drm -ldrm $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/core/batocera-drminfo/$(BATOCERA_DRMINFO_MAIN) -o $(@D)/batocera-drminfo $(BATOCERA_DRMINFO_FLAGS)
 endef
 
 define BATOCERA_DRMINFO_INSTALL_TARGET_CMDS
