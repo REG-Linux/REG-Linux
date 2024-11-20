@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.7.132
+XEMU_VERSION = v0.7.133
 XEMU_SITE = https://github.com/xemu-project/xemu.git
 XEMU_SITE_METHOD=git
 XEMU_GIT_SUBMODULES=YES
@@ -108,7 +108,7 @@ endef
 
 define XEMU_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/xemu/*.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/xemu/*.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
