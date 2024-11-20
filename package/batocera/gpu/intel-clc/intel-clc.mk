@@ -12,6 +12,19 @@ INTEL_CLC_LICENSE_FILES = docs/license.rst
 INTEL_CLC_CPE_ID_VENDOR = mesa3d
 INTEL_CLC_CPE_ID_PRODUCT = mesa
 
+INTEL_CLC_DEPENDENCIES += host-python-pycparser python-pycparser
+
+INTEL_CLC_CONF_OPTS = \
+	-Dgallium-omx=disabled \
+	-Dpower8=disabled \
+	-Dgallium-drivers="" \
+	-Dvulkan-drivers="" \
+	-Dglx=disabled \
+	-Dplatforms="" \
+	-Dintel-clc=enabled \
+	-Dllvm=enabled \
+	-Dinstall-intel-clc=true
+
 HOST_INTEL_CLC_DEPENDENCIES = \
 	host-bison \
 	host-flex \
