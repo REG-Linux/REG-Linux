@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# required for x
-export DISPLAY=:0
 # required for wayland
 [ -f /etc/profile.d/04-sway.sh ] && . /etc/profile.d/04-sway.sh
 
@@ -24,7 +22,7 @@ then
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:1234/isIdle)
     test $? != 0                 && exit 0
     test "${HTTP_STATUS}" != 200 && exit 0 # 200 when idle
-    
+
     if echo "${DELTANEW}" > "/var/run/switch_screen_request"
     then
 	# restart es
