@@ -53,12 +53,14 @@ endif
 
 # x86 : no option
 
-ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),y)
-    RETROARCH_CONF_OPTS += --enable-x11
-    RETROARCH_DEPENDENCIES += xserver_xorg-server
-else
-    RETROARCH_CONF_OPTS += --disable-x11
-endif
+# REG: always disable X11
+RETROARCH_CONF_OPTS += --disable-x11
+#ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),y)
+#    RETROARCH_CONF_OPTS += --enable-x11
+#    RETROARCH_DEPENDENCIES += xserver_xorg-server
+#else
+#    RETROARCH_CONF_OPTS += --disable-x11
+#endif
 
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
     RETROARCH_CONF_OPTS += --enable-alsa
@@ -74,13 +76,15 @@ else
     RETROARCH_CONF_OPTS += --disable-pulse
 endif
 
-ifeq ($(BR2_PACKAGE_BATOCERA_GLES3),y)
+# REG: favor desktop GL, if not available, fallbacks to GLES3 then GLES2
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+  RETROARCH_CONF_OPTS += --enable-opengl
+  RETROARCH_DEPENDENCIES += libgl
+else ifeq ($(BR2_PACKAGE_BATOCERA_GLES3),y)
     RETROARCH_CONF_OPTS += --enable-opengles3 --enable-opengles --enable-opengles3_1
     RETROARCH_DEPENDENCIES += libgles
-endif
 # don't enable --enable-opengles3_2, breaks lr-swanstation
-
-ifeq ($(BR2_PACKAGE_BATOCERA_GLES2),y)
+else ifeq ($(BR2_PACKAGE_BATOCERA_GLES2),y)
     RETROARCH_CONF_OPTS += --enable-opengles
     RETROARCH_DEPENDENCIES += libgles
 endif
@@ -118,16 +122,9 @@ ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
     RETROARCH_DEPENDENCIES += rockchip-rga
 endif
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
-  ifneq ($(BR2_PACKAGE_XWAYLAND),y)
-    RETROARCH_CONF_OPTS += --enable-opengl --disable-opengles --disable-opengles3
-    RETROARCH_DEPENDENCIES += libgl
-  endif
-endif
-
 ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),)
 	ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_EGL),y)
-        RETROARCH_TARGET_CFLAGS += -DEGL_NO_X11
+          RETROARCH_TARGET_CFLAGS += -DEGL_NO_X11
 	endif
 endif
 
