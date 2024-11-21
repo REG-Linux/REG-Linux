@@ -1,0 +1,18 @@
+--- a/yabause/src/libretro/Makefile.common	2024-11-21 09:51:53.537141193 +0100
++++ b/yabause/src/libretro/Makefile.common	2024-11-21 09:52:45.590203810 +0100
+@@ -173,13 +173,14 @@
+ 		$(LIBRETRO_COMM_DIR)/memmap/memalign.c \
+ 		$(LIBRETRO_COMM_DIR)/lists/string_list.c \
+ 		$(LIBRETRO_COMM_DIR)/lists/dir_list.c \
+-		$(LIBRETRO_COMM_DIR)/string/stdstring.c \
+ 		$(LIBRETRO_COMM_DIR)/file/retro_dirent.c
+ 	ifeq ($(CDROM_DEBUG), 1)
+ 		FLAGS += -DCDROM_DEBUG
+ 	endif
+ endif
+ 
++SOURCES_C += $(LIBRETRO_COMM_DIR)/string/stdstring.c
++
+ ifeq ($(ARCH_IS_WINDOWS), 1)
+ 	SOURCES_C += $(FLAC_DIR)/src/libFLAC/windows_unicode_filenames.c
+ endif

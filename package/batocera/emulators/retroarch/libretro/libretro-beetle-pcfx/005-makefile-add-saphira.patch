@@ -1,0 +1,20 @@
+--- a/Makefile	2024-11-21 09:32:00.591926109 +0100
++++ b/Makefile	2024-11-21 09:33:19.530544153 +0100
+@@ -209,6 +209,17 @@
+    FLAGS += -mcpu=cortex-a76
+    ASFLAGS += -mcpu=cortex-a76
+ 
++else ifneq (,$(findstring saphira,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++   FLAGS += -mcpu=cortex-a78
++   ASFLAGS += -mcpu=cortex-a78
++
+ # iOS
+ else ifneq (,$(findstring ios,$(platform)))
+ 
