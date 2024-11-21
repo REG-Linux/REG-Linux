@@ -1,0 +1,19 @@
+--- a/yabause/src/libretro/Makefile	2024-11-21 09:42:02.690107543 +0100
++++ b/yabause/src/libretro/Makefile	2024-11-21 09:42:42.412914191 +0100
+@@ -150,6 +150,16 @@
+ 		FLAGS += -march=armv8-a+crc -mtune=cortex-a55
+ 	endif
+ 
++else ifeq ($(platform), saphira)
++	override platform += unix
++	TARGET := $(TARGET_NAME)_libretro.so
++	fpic := -fPIC
++	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++	LDFLAGS += -lpthread -lGL
++	ARCH_IS_LINUX = 1
++	HAVE_SSE = 0
++	FLAGS += -march=armv8.2-a+crc
++
+ else ifneq (,$(findstring odroid,$(platform)))
+ 	override platform += unix
+ 	TARGET := $(TARGET_NAME)_libretro.so
