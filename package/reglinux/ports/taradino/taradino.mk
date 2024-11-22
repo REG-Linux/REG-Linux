@@ -3,8 +3,8 @@
 # taradino
 #
 ################################################################################
-# Version: Commits on Sep 23, 2024
-TARADINO_VERSION = 1e70c8a46b597a99b1063ed6e18b422f98ffa33c
+# Version: Commits on Oct 31, 2024
+TARADINO_VERSION = 7fc2dac0dd895514b84063dc99aaaa93d2df69ed
 TARADINO_SITE = https://github.com/fabiangreffrath/taradino.git
 TARADINO_SITE_METHOD=git
 TARADINO_GIT_SUBMODULES=YES
@@ -20,7 +20,7 @@ TARADINO_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 
 define TARADINO_EVMAPY
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/taradino/rott.keys \
+    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/taradino/rott.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
