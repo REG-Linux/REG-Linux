@@ -160,10 +160,10 @@ diff -rupN linux.orig/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rg503.dts lin
  };
 
  &cru {
-@@ -137,50 +287,6 @@
+@@ -349,62 +349,6 @@
  	};
  };
-
+ 
 -&gpio_keys_control {
 -	button-a {
 -		gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_LOW>;
@@ -199,6 +199,18 @@ diff -rupN linux.orig/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rg503.dts lin
 -		gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
 -		label = "DPAD-RIGHT";
 -		linux,code = <BTN_DPAD_RIGHT>;
+-	};
+-
+-	button-thumbl {
+-		gpios = <&gpio3 RK_PA1 GPIO_ACTIVE_LOW>;
+-		label = "THUMBL";
+-		linux,code = <BTN_THUMBL>;
+-	};
+-
+-	button-thumbr {
+-		gpios = <&gpio3 RK_PA2 GPIO_ACTIVE_LOW>;
+-		label = "THUMBR";
+-		linux,code = <BTN_THUMBR>;
 -	};
 -
 -	button-y {
