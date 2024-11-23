@@ -1282,7 +1282,7 @@ index 0000000..5761027
 +	.release	= joypad_misc_release,
 +	.write		= joypad_misc_write,
 +	.unlocked_ioctl	= joypad_misc_ioctl,
-+	.llseek		= no_llseek,
++	.llseek		= noop_llseek,
 +
 +};
 +
