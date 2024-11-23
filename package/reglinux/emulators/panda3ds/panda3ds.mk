@@ -3,8 +3,8 @@
 # panda3ds
 #
 ################################################################################
-# Version: Commits on Nov 9, 2024
-PANDA3DS_VERSION = b214782a15050d949b5731b3e4060e4c3664ddba
+# Version: Commits on Nov 21, 2024
+PANDA3DS_VERSION = 842634e64ef591157ad48e819981023c1687147b
 PANDA3DS_SITE = https://github.com/wheremyfoodat/Panda3DS.git
 PANDA3DS_SITE_METHOD=git
 PANDA3DS_GIT_SUBMODULES=YES
@@ -21,21 +21,25 @@ PANDA3DS_CONF_OPTS += -DENABLE_LTO=ON
 PANDA3DS_CONF_OPTS += -DENABLE_DISCORD_RPC=OFF
 PANDA3DS_CONF_OPTS += -DENABLE_GIT_VERSIONING=OFF
 PANDA3DS_CONF_OPTS += -DENABLE_RENDERDOC_API=OFF
+PANDA3DS_CONF_OPTS += -DUSE_SYSTEM_SDL2=ON
 
 # AArch64 build crashes in cryptopp due to AES intrinsics and PMULL instructions
 # Disable for now
 # No RISC-V support / cross-compiling AArch64 support in vendored LuaJIT
-# Disable for no
+# Disable for now
 ifeq ($(BR2_riscv)$(BR2_aarch64),y)
 PANDA3DS_CONF_OPTS += -DCRYPTOPP_OPT_DISABLE_ASM=ON
 PANDA3DS_CONF_OPTS += -DENABLE_LUAJIT=OFF
 endif
 
-ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
-    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=ON
-else
-    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=OFF
-endif
+# Needs Vulkan bump ? disable for now
+PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=OFF
+#ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
+#    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=ON
+#    PANDA3DS_DEPENDENCIES = glslang
+#else
+#    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=OFF
+#endif
 
 #option(ENABLE_QT_GUI "Enable the Qt GUI. If not selected then the emulator uses a minimal SDL-based UI instead" OFF)
 #option(BUILD_HYDRA_CORE "Build a Hydra core" OFF)
