@@ -13,7 +13,7 @@ RETROARCH_INSTALL_STAGING = YES
 
 RETROARCH_CONF_OPTS = --disable-oss --enable-zlib --disable-qt --enable-threads --enable-ozone \
     --enable-xmb --disable-discord --enable-flac --enable-lua --enable-networking \
-	--enable-translate --enable-rgui --disable-cdrom --disable-videocore
+	--enable-translate --enable-rgui --disable-cdrom --disable-videocore --disable-x11
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
     RETROARCH_CONF_OPTS += --enable-debug
@@ -51,17 +51,6 @@ ifeq ($(BR2_GCC_TARGET_FLOAT_ABI),hard)
     RETROARCH_CONF_OPTS += --enable-floathard
 endif
 
-# x86 : no option
-
-# REG: always disable X11
-RETROARCH_CONF_OPTS += --disable-x11
-#ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),y)
-#    RETROARCH_CONF_OPTS += --enable-x11
-#    RETROARCH_DEPENDENCIES += xserver_xorg-server
-#else
-#    RETROARCH_CONF_OPTS += --disable-x11
-#endif
-
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
     RETROARCH_CONF_OPTS += --enable-alsa
     RETROARCH_DEPENDENCIES += alsa-lib
@@ -83,7 +72,8 @@ ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
 else ifeq ($(BR2_PACKAGE_BATOCERA_GLES3),y)
     RETROARCH_CONF_OPTS += --enable-opengles3 --enable-opengles --enable-opengles3_1
     RETROARCH_DEPENDENCIES += libgles
-# don't enable --enable-opengles3_2, breaks lr-swanstation
+else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250)$(BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA),y)
+    RETROARCH_CONF_OPTS += --enable-opengles3_2
 else ifeq ($(BR2_PACKAGE_BATOCERA_GLES2),y)
     RETROARCH_CONF_OPTS += --enable-opengles
     RETROARCH_DEPENDENCIES += libgles
@@ -191,8 +181,6 @@ ifeq ($(BR2_arm),y)
 	else ifeq ($(BR2_cortex_a15),y)
         LIBRETRO_PLATFORM += armv7
 	else ifeq ($(BR2_cortex_a17),y)
-        LIBRETRO_PLATFORM += armv7
-	else ifeq ($(BR2_cortex_a53),y)
         LIBRETRO_PLATFORM += armv7
     else ifeq ($(BR2_cortex_a15_a7),y)
         LIBRETRO_PLATFORM += armv7
