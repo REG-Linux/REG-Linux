@@ -3,8 +3,8 @@
 # REG-Linux bezels
 #
 ################################################################################
-# Version.: Commits on Mar 18, 2023
-REGLINUX_BEZELS_VERSION = 6fec5f21bb31dc1b1e44fa3ad7d246c13bc40892
+# Version.: Commits on Nov 9, 2024
+REGLINUX_BEZELS_VERSION = abfadfb414973f411abe7e56ae486b9f5b3e98d2
 REGLINUX_BEZELS_SITE = $(call github,REG-Linux,REG-bezel,$(REGLINUX_BEZELS_VERSION))
 
 define REGLINUX_BEZELS_INSTALL_TARGET_CMDS
@@ -16,7 +16,6 @@ define REGLINUX_BEZELS_INSTALL_TARGET_CMDS
 	cp -rf $(@D)/ambiance_vintage_tv      $(TARGET_DIR)/usr/share/reglinux/datainit/decorations
 	cp -rf $(@D)/arcade_1980s             $(TARGET_DIR)/usr/share/reglinux/datainit/decorations
 	cp -rf $(@D)/arcade_1980s_vertical    $(TARGET_DIR)/usr/share/reglinux/datainit/decorations
-	cp -rf $(@D)/arcade_vertical_default  $(TARGET_DIR)/usr/share/reglinux/datainit/decorations
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/decorations/consoles
 	# we don't have all systems with no_curve_night yet, so we copy first the "classic" bezels
 	cp -rf --remove-destination $(@D)/default_unglazed/*               $(TARGET_DIR)/usr/share/reglinux/datainit/decorations/consoles/
