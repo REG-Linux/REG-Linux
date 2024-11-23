@@ -1,0 +1,93 @@
+diff --git a/arch/arm64/boot/dts/rockchip/rk3326-gameforce-chi.dts b/arch/arm64/boot/dts/rockchip/rk3326-gameforce-chi.dts
+index 1c83be858..e9c2c0e3c 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3326-gameforce-chi.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3326-gameforce-chi.dts
+@@ -17,7 +17,6 @@ / {
+ 
+ 	aliases {
+ 		mmc0 = &sdmmc;
+-		mmc1 = &sdio;
+ 	};
+ 
+ 	chosen {
+@@ -361,7 +360,7 @@ rk817: pmic@20 {
+ 		clock-output-names = "rk808-clkout1", "xin32k";
+ 		clocks = <&cru SCLK_I2S1_OUT>;
+ 		interrupt-parent = <&gpio0>;
+-		interrupts = <RK_PC1 IRQ_TYPE_LEVEL_LOW>;
++		interrupts = <RK_PB2 IRQ_TYPE_LEVEL_LOW>;
+ 		pinctrl-0 = <&pmic_int>, <&i2s1_2ch_mclk>;
+ 		pinctrl-names = "default";
+ 		#sound-dai-cells = <0>;
+@@ -572,23 +571,6 @@ &io_domains {
+ };
+ 
+ &pinctrl {
+-	bluetooth-pins {
+-		bt_reset: bt-reset {
+-			rockchip,pins =
+-				<0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_down>;
+-		};
+-
+-		bt_wake_dev: bt-wake-dev {
+-			rockchip,pins =
+-				<0 RK_PA1 RK_FUNC_GPIO &pcfg_pull_none>;
+-		};
+-
+-		bt_wake_host: bt-wake-host {
+-			rockchip,pins =
+-				<0 RK_PA7 RK_FUNC_GPIO &pcfg_pull_none>;
+-		};
+-	};
+-
+ 	headphone {
+ 		hp_det: hp-det {
+ 			rockchip,pins =
+@@ -693,13 +675,22 @@ &sdio {
+ 	cap-sd-highspeed;
+ 	cap-sdio-irq;
+ 	disable-wp;
++	supports-sdio;
++	ignore-pm-notify;
+ 	keep-power-in-suspend;
+-	mmc-pwrseq = <&sdio_pwrseq>;
+-	no-mmc;
+-	no-sd;
+ 	non-removable;
++	mmc-pwrseq = <&sdio_pwrseq>;
+ 	sd-uhs-sdr104;
+ 	status = "okay";
++
++		rtl8723ds: wifi@1 {
++			compatible = "wlan-platdata";
++			rockchip,grf = <&grf>;
++			wifi_chip_type = "realtek,rtl8723ds";
++			WIFI,host_wake_irq = <&gpio0 RK_PA5 GPIO_ACTIVE_HIGH>;
++			sdio_vref = <3300>;
++			status = "okay";
++		};
+ };
+ 
+ &sdmmc {
+@@ -767,19 +758,9 @@ &uart0 {
+  * or else it will not probe.
+  */
+ &uart1 {
+-	/delete-property/ dma-names;
+-	/delete-property/ dmas;
+-	uart-has-rtscts;
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_xfer &uart1_cts>;
+ 	status = "okay";
+-
+-	bluetooth: bluetooth {
+-		compatible = "realtek,rtl8723ds-bt";
+-		device-wake-gpios = <&gpio0 RK_PA1 GPIO_ACTIVE_HIGH>;
+-		enable-gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_HIGH>;
+-		host-wake-gpios = <&gpio0 RK_PA7 GPIO_ACTIVE_HIGH>;
+-		pinctrl-0 = <&bt_reset>, <&bt_wake_dev>, <&bt_wake_host>;
+-		pinctrl-names = "default";
+-	};
+ };
+ 
+ &uart2 {
