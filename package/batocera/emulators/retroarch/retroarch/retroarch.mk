@@ -72,7 +72,7 @@ ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
 else ifeq ($(BR2_PACKAGE_BATOCERA_GLES3),y)
     RETROARCH_CONF_OPTS += --enable-opengles3 --enable-opengles --enable-opengles3_1
     RETROARCH_DEPENDENCIES += libgles
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250)$(BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA),y)
+else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250)$(BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA)$(BR2_x86_64),y)
     RETROARCH_CONF_OPTS += --enable-opengles3_2
 else ifeq ($(BR2_PACKAGE_BATOCERA_GLES2),y)
     RETROARCH_CONF_OPTS += --enable-opengles
