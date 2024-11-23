@@ -32,14 +32,12 @@ PANDA3DS_CONF_OPTS += -DCRYPTOPP_OPT_DISABLE_ASM=ON
 PANDA3DS_CONF_OPTS += -DENABLE_LUAJIT=OFF
 endif
 
-# Needs Vulkan bump ? disable for now
-PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=OFF
-#ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
-#    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=ON
-#    PANDA3DS_DEPENDENCIES = glslang
-#else
-#    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=OFF
-#endif
+ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
+    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=ON
+    PANDA3DS_DEPENDENCIES = glslang
+else
+    PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=OFF
+endif
 
 #option(ENABLE_QT_GUI "Enable the Qt GUI. If not selected then the emulator uses a minimal SDL-based UI instead" OFF)
 #option(BUILD_HYDRA_CORE "Build a Hydra core" OFF)
