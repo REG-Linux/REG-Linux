@@ -13,7 +13,8 @@ BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2
 
 # Kernel
 BR2_LINUX_KERNEL=y
-BR2_LINUX_KERNEL_LATEST_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.12.1"
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3326/linux_patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/aarch64"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3326/linux-defconfig.config"
@@ -22,8 +23,7 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
-BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3326-odroid-go2 rockchip/rk3326-odroid-go2-v11 rockchip/rk3326-odroid-go3 rockchip/rk3326-anbernic-rg351m rockchip/rk3326-anbernic-rg351v"
-BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3326/dts/rk3326-gameforce-chi.dts"
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3326-gameforce-chi rockchip/rk3326-odroid-go2 rockchip/rk3326-odroid-go2-v11 rockchip/rk3326-odroid-go3 rockchip/rk3326-anbernic-rg351m rockchip/rk3326-anbernic-rg351v"
 
 # gpu
 BR2_PACKAGE_BATOCERA_PANFROST_MESA3D=y
