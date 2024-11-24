@@ -1,18 +1,25 @@
+From 19d14c11ac5effa8fe2a8442b33dc338947621eb Mon Sep 17 00:00:00 2001
+From: Demetris Ierokipides <ierokipides.dem@gmail.com>
+Date: Mon, 25 Nov 2024 01:03:59 +0200
+Subject: [PATCH] REG.Linux: add missing targets
+
 ---
- Makefile | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ Makefile | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index e48856d..907c269 100644
+index bca3454e..d9cbdcb4 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -60,6 +60,14 @@ else ifneq (,$(findstring rpi,$(platform)))
+@@ -60,6 +60,16 @@ else ifneq (,$(findstring rpi,$(platform)))
     override platform += unix
  else ifneq (,$(findstring odroid,$(platform)))
     override platform += unix
 +else ifneq (,$(findstring rockpro64,$(platform)))
 +   override platform += unix
 +else ifneq (,$(findstring rk3588,$(platform)))
++   override platform += unix
++else ifneq (,$(findstring sm8250,$(platform)))
 +   override platform += unix
 +else ifneq (,$(findstring n2,$(platform)))
 +   override platform += unix
@@ -21,7 +28,7 @@ index e48856d..907c269 100644
  endif
  
  # system platform
-@@ -165,12 +173,63 @@ ifneq (,$(findstring unix,$(platform)))
+@@ -165,12 +175,75 @@ ifneq (,$(findstring unix,$(platform)))
           HAVE_OPENGL = 0
           GLES = 0
           GL_LIB :=
@@ -81,11 +88,23 @@ index e48856d..907c269 100644
 +      WITH_DYNAREC=aarch64
 +      CPUFLAGS += -D__NEON_OPT -march=armv8-a+crc -mcpu=cortex-a53 -mtune=cortex-a53
 +   endif
++   
++   # Snapdragon SM8250
++   ifneq (,$(findstring sm8250,$(platform)))
++       CPUFLAGS += -DNO_ASM -DARM -DARM_ASM -DDONT_WANT_ARM_OPTIMIZATIONS -DARM_FIX -DCLASSIC -DARM64
++       CPUFLAGS += -march=armv8.2-a+fp16+simd -mcpu=cortex-a76 -mtune=cortex-a76
++       HAVE_PARALLEL = 1
++       WITH_DYNAREC = aarch64
++       HAVE_NEON = 0
++       HAVE_OPENGL = 0
++       GLES = 0
++       GL_LIB :=
++   endif
 +
     # ODROIDs
     ifneq (,$(findstring odroid,$(platform)))
        BOARD ?= $(shell cat /proc/cpuinfo | grep -i odroid | awk '{print $$3}')
-@@ -186,6 +245,9 @@ ifneq (,$(findstring unix,$(platform)))
+@@ -186,6 +259,9 @@ ifneq (,$(findstring unix,$(platform)))
        else ifneq (,$(findstring ODROID-XU,$(BOARD)))
           # ODROID-XU3 XU4 and XU3-Lite
           CPUFLAGS += -mcpu=cortex-a15 -mtune=cortex-a15.cortex-a7 -mfpu=neon-vfpv4
