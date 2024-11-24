@@ -207,9 +207,9 @@ def getGenerator(emulator):
         from generators.gsplus.gsplusGenerator import GSplusGenerator
         return GSplusGenerator()
 
-    if emulator == 'sudachi':
-        from generators.sudachi.sudachiGenerator import SudachiGenerator
-        return SudachiGenerator()
+    if emulator == 'citron':
+        from generators.citron.citronGenerator import CitronGenerator
+        return CitronGenerator()
 
     if emulator == 'ryujinx':
         from generators.ryujinx.ryujinxGenerator import RyujinxGenerator
