@@ -3647,8 +3647,8 @@ switch:
   theme:      switch
   extensions: [xci, nsp]
   emulators:
-    sudachi:
-      sudachi: { requireAnyOf: [BR2_PACKAGE_SUDACHI] }
+    citron:
+      citron: { requireAnyOf: [BR2_PACKAGE_CITRON] }
     ryujinx:
       ryujinx: { requireAnyOf: [BR2_PACKAGE_RYUJINX] }
 
