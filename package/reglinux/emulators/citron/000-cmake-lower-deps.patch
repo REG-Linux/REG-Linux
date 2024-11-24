@@ -1,0 +1,52 @@
+--- a/CMakeLists.txt	2024-11-24 02:18:31.305661975 +0100
++++ b/CMakeLists.txt	2024-11-24 02:19:09.272549444 +0100
+@@ -31,7 +31,7 @@
+ option(ENABLE_OPENGL "Enable OpenGL" ON)
+ mark_as_advanced(FORCE ENABLE_OPENGL)
+ option(ENABLE_QT "Enable the Qt frontend" ON)
+-option(ENABLE_QT6 "Allow usage of Qt6 to be attempted" OFF)
++option(ENABLE_QT6 "Allow usage of Qt6 to be attempted" ON)
+ set(QT6_LOCATION "" CACHE PATH "Additional Location to search for Qt6 libraries like C:/Qt/6.3.1/msvc2019_64/")
+ 
+ option(ENABLE_QT_TRANSLATION "Enable translations for the Qt frontend" OFF)
+@@ -302,7 +302,7 @@
+ find_package(Boost 1.85.0 REQUIRED context)
+ find_package(enet 1.3 MODULE)
+ find_package(fmt 9 REQUIRED)
+-find_package(LLVM 19.1.3 MODULE COMPONENTS Demangle)
++find_package(LLVM 18.1.2 MODULE COMPONENTS Demangle)
+ find_package(lz4 REQUIRED)
+ find_package(nlohmann_json 3.11.3 REQUIRED)
+ find_package(Opus 1.3 MODULE)
+@@ -395,10 +395,7 @@
+ 
+ # Qt5 requires that we find components, so it doesn't fit our pretty little find package function
+ if(ENABLE_QT)
+-    set(QT_VERSION 5.15)
+-    # These are used to specify minimum versions
+-    set(QT5_VERSION 5.15)
+-    set(QT6_VERSION 6.8)
++    set(QT6_VERSION 6.7)
+ 
+     set_citron_qt_components()
+     if (ENABLE_QT6)
+--- a/CMakeLists.txt	2024-11-24 12:12:01.089550325 +0100
++++ b/CMakeLists.txt	2024-11-24 12:12:17.431921441 +0100
+@@ -299,7 +299,7 @@
+ # =======================================================================
+ 
+ # Enforce the search mode of non-required packages for better and shorter failure messages
+-find_package(Boost 1.85.0 REQUIRED context)
++find_package(Boost 1.83.0 REQUIRED context)
+ find_package(enet 1.3 MODULE)
+ find_package(fmt 9 REQUIRED)
+ find_package(LLVM 18.1.2 MODULE COMPONENTS Demangle)
+@@ -311,7 +311,7 @@
+ find_package(stb MODULE)
+ find_package(VulkanMemoryAllocator CONFIG)
+ find_package(ZLIB 1.3.1 REQUIRED)
+-find_package(zstd 1.5.6 REQUIRED)
++find_package(zstd 1.5.5 REQUIRED)
+ 
+ if (NOT CITRON_USE_EXTERNAL_VULKAN_HEADERS)
+     find_package(VulkanHeaders 1.3.301 REQUIRED)

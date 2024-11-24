@@ -601,8 +601,8 @@ supervision:
   emulator: libretro
   core:     potator
 switch:
-  emulator: sudachi
-  core:     sudachi
+  emulator: citron
+  core:     citron
   options:
     hud_support: false
 systemsp:
