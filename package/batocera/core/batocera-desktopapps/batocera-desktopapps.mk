@@ -110,11 +110,11 @@ ifeq ($(BR2_PACKAGE_BAUH),y)
   BATOCERA_DESKTOPAPPS_APPS    += flatpak-config.desktop
 endif
 
-# sudachi
-ifeq ($(BR2_PACKAGE_SUDACHI),y)
- # BATOCERA_DESKTOPAPPS_SCRIPTS += batocera-config-sudachi
- # BATOCERA_DESKTOPAPPS_APPS    += sudachi-config.desktop
- # BATOCERA_DESKTOPAPPS_ICONS   += sudachi.png
+# citron
+ifeq ($(BR2_PACKAGE_CITRON),y)
+ # BATOCERA_DESKTOPAPPS_SCRIPTS += batocera-config-citron
+ # BATOCERA_DESKTOPAPPS_APPS    += citron-config.desktop
+ # BATOCERA_DESKTOPAPPS_ICONS   += citron.png
 endif
 
 # ryujinx
