@@ -28,7 +28,7 @@ megadrive:
   core:     picodrive
 snes:
   emulator: libretro
-  core:     snes9x
+  core:     snes9x_next
 c64:
   emulator: libretro
   core:     vice_x64
