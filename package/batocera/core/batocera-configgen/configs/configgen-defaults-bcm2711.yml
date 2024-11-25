@@ -2,6 +2,12 @@ default:
   options:
     hud_support: true
 
+pcengine:
+  emulator: libretro
+  core:     pce
+pcenginecd:
+  emulator: libretro
+  core:     pce
 nds:
   emulator: drastic
   core:     drastic
