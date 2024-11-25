@@ -1,3 +1,9 @@
+pcengine:
+  emulator: libretro
+  core:     pce
+pcenginecd:
+  emulator: libretro
+  core:     pce
 model3:
   emulator: supermodel
   core:     supermodel-legacy

@@ -1,3 +1,9 @@
+pcengine:
+  emulator: libretro
+  core:     pce
+pcenginecd:
+  emulator: libretro
+  core:     pce
 gamecube:
   emulator: libretro
   core:     dolphin
