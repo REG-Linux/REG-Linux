@@ -2166,9 +2166,13 @@ x1:
   extensions: [3ds, 3dsx, cxi, axf, elf, app, squashfs]
   emulators:
     lime3ds:
-      lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]      }
+      lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]               }
     citra:
-      citra: { requireAnyOf: [BR2_PACKAGE_CITRA]          }
+      citra: { requireAnyOf: [BR2_PACKAGE_CITRA]                   }
+    panda3ds:
+      panda3ds: { requireAnyOf: [BR2_PACKAGE_PANDA3DS]             }
+    libretro:
+      panda3ds: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PANDA3DS]    }
 
 openbor:
   name: OpenBOR

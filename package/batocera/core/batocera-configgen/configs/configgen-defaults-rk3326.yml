@@ -2,6 +2,9 @@ default:
   options:
     retroarch.menu_driver: rgui
 
+3ds:
+  emulator: libretro
+  core:     panda3ds
 nds:
   emulator: drastic
   core:     drastic
