@@ -78,6 +78,16 @@ ifeq ($(BR2_x86_64),y)
     ALLLINUXFIRMWARES_POST_INSTALL_TARGET_HOOKS = ALLLINUXFIRMWARES_LINK_QCA_WIFI_BT
 endif
 
+# symlink venus firmware for sm8250 kernel
+define ALLLINUXFIRMWARES_LINK_VENUS
+    ln -sf /lib/firmware/qcom/venus-6.0/venus.mbn \
+    $(TARGET_DIR)/lib/firmware/qcom/vpu-1.0/venus.mbn
+endif
+
+ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250),y)
+    ALLLINUXFIRMWARES_POST_INSTALL_TARGET_HOOKS = ALLLINUXFIRMWARES_LINK_VENUS
+endif
+
 # symlink BT firmware for RK3588 kernel
 define ALLLINUXFIRMWARES_LINK_RTL_BT
     ln -sf /lib/firmware/rtl_bt/rtl8852bu_fw.bin \
