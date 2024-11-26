@@ -1,0 +1,25 @@
+From 8db206691b12014fcc360ac4f6dd08220f80e167 Mon Sep 17 00:00:00 2001
+From: Demetris Ierokipides <ierokipides.dem@gmail.com>
+Date: Wed, 27 Nov 2024 00:20:26 +0200
+Subject: [PATCH] Adjust venus firmware path
+
+---
+ drivers/media/platform/qcom/venus/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/qcom/venus/core.c
+index 84e95a46d..a444b7563 100644
+--- a/drivers/media/platform/qcom/venus/core.c
++++ b/drivers/media/platform/qcom/venus/core.c
+@@ -868,7 +868,7 @@ static const struct venus_resources sm8250_res = {
+ 	.vmem_size = 0,
+ 	.vmem_addr = 0,
+ 	.dma_mask = 0xe0000000 - 1,
+-	.fwname = "qcom/vpu-1.0/venus.mbn",
++	.fwname = "qcom/vpu/vpu20_p4.mbn",
+ };
+ 
+ static const struct freq_tbl sc7280_freq_table[] = {
+-- 
+2.43.0
+
