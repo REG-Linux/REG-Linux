@@ -1,3 +1,6 @@
+3ds:
+  emulator: libretro
+  core:     panda3ds
 gamecube:
   emulator: libretro
   core:     dolphin

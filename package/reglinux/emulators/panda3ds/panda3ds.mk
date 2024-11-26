@@ -40,10 +40,11 @@ else
 endif
 
 #option(ENABLE_QT_GUI "Enable the Qt GUI. If not selected then the emulator uses a minimal SDL-based UI instead" OFF)
-#option(BUILD_HYDRA_CORE "Build a Hydra core" OFF)
-#option(BUILD_LIBRETRO_CORE "Build a Libretro core" OFF)
 
 define PANDA3DS_INSTALL_TARGET_CMDS
+    # Strip
+    $(TARGET_STRIP) $(@D)/buildroot-build/Alber
+    # Install
     $(INSTALL) -D $(@D)/buildroot-build/Alber \
 		$(TARGET_DIR)/usr/bin/panda3ds
 endef

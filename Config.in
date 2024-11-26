@@ -556,6 +556,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/xemu/Config.in"
 
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-geolith/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-panda3ds/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-picodrive/Config.in"
 
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/ports/cgenius/Config.in"

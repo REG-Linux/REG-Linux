@@ -1,0 +1,21 @@
+--- a/CMakeLists.txt	2024-11-22 01:52:43.000000000 +0100
++++ b/CMakeLists.txt	2024-11-23 23:21:50.497113277 +0100
+@@ -452,8 +452,7 @@
+ 
+ if(ENABLE_VULKAN)
+     find_package(
+-        Vulkan REQUIRED
+-        COMPONENTS glslang
++        glslang REQUIRED
+     )
+ 
+     set(RENDERER_VK_INCLUDE_FILES include/renderer_vk/renderer_vk.hpp
+@@ -511,7 +510,7 @@
+ 
+     target_sources(AlberCore PRIVATE ${RENDERER_VK_SOURCE_FILES})
+     target_compile_definitions(AlberCore PUBLIC "PANDA3DS_ENABLE_VULKAN=1")
+-    target_link_libraries(AlberCore PRIVATE Vulkan::Vulkan resources_renderer_vk)
++    target_link_libraries(AlberCore PRIVATE glslang resources_renderer_vk)
+ endif()
+ 
+ if(ENABLE_METAL AND APPLE)
