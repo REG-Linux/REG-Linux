@@ -7,7 +7,7 @@
 SONIC2013_VERSION = b78db1b795d6907b0f834765b6bf338abe5a2834
 SONIC2013_SITE = https://github.com/Rubberduckycooly/Sonic-1-2-2013-Decompilation.git
 SONIC2013_SITE_METHOD = git
-SONIC2013_GIT_SUBMODULES == YES
+SONIC2013_GIT_SUBMODULES = YES
 SONIC2013_LICENSE = Custom
 
 SONIC2013_DEPENDENCIES = sdl2 libogg libvorbis
@@ -29,7 +29,7 @@ endef
 
 define SONIC2013_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy $(TARGET_DIR)/usr/share/sonic2013
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/sonic2013/sonicretro.sonic2013.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/sonic2013/sonicretro.sonic2013.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
