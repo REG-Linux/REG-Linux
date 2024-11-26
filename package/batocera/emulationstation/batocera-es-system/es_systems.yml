@@ -5551,7 +5551,7 @@ ps4:
   comment_br: |
     Para mais informações: https://wiki.batocera.org/systems:ps4
 
-jazz2:
+jazz2-native:
   name: Jazz Jackrabbit 2
   manufacturer: Ports
   release: 1998
@@ -5560,8 +5560,8 @@ jazz2:
   platform: pc
   group: ports
   emulators:
-    jazz2-native:
-      jazz2-native: { requireAnyOf: [BR2_PACKAGE_JAZZ2_NATIVE] }
+  jazz2-native:
+  jazz2-native: { requireAnyOf: [BR2_PACKAGE_JAZZ2_NATIVE] }
   comment_en: |
     Jazz2 Native requires the original Jazz Jackrabbit 2 game files.
     Copy all game files into this directory.
