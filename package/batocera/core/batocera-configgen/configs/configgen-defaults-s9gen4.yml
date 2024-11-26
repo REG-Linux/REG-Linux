@@ -2,6 +2,9 @@ default:
   options:
     gfxbackend: gl
 
+3ds:
+  emulator: libretro
+  core:     panda3ds
 nds:
   emulator: libretro
   core:     melonds
