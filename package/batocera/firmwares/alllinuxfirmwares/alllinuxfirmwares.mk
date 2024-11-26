@@ -80,6 +80,7 @@ endif
 
 # symlink venus firmware for sm8250 kernel
 define ALLLINUXFIRMWARES_LINK_VENUS
+    mkdir -p $(TARGET_DIR)/lib/firmware/qcom/vpu-1.0/
     ln -sf /lib/firmware/qcom/venus-6.0/venus.mbn \
     $(TARGET_DIR)/lib/firmware/qcom/vpu-1.0/venus.mbn
 endef
