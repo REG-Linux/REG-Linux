@@ -3712,7 +3712,7 @@ vemulator:
       vemulator:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VEMULATOR] }
 
 openjazz:
-  name:       Jazz Jackrabbit
+  name: Jazz Jackrabbit
   manufacturer: Ports
   release: 1994
   hardware: port
@@ -3722,6 +3722,16 @@ openjazz:
   emulators:
     openjazz:
       openjazz: { requireAnyOf: [BR2_PACKAGE_OPENJAZZ] }
+  comment_en: |
+    OpenJazz requires the original Jazz Jackrabbit game files.
+    Copy all game files into this directory.
+    Then create an empty `Jazz Jackrabbit.game` file for EmulationStation to be able to launch the game.
+
+    For more info: https://wiki.batocera.org/systems:openjazz
+  comment_fr: |
+    Trouvez la documentation ici : https://wiki.batocera.org/systems:openjazz
+  comment_br: |
+    Para mais informações: https://wiki.batocera.org/systems:openjazz
 
 tyrian:
   name:       Tyrian
@@ -5477,4 +5487,88 @@ rott:
   comment_br: |
     Para mais informações: https://wiki.batocera.org/systems:taradino
 
+commanderx16:
+  name: Commander X16
+  manufacturer: The 8-Bit Guy
+  release: 2019
+  hardware: computer
+  extensions: [bas, img, prg]
+  platform: commanderx16
+  emulators:
+    x16emu:
+      x16emu: { requireAnyOf: [BR2_PACKAGE_X16EMU] }
+  comment_en: |
+    Extract your Commander X16 games here in their own directory.
+    The games with .IMG .PRG extensions will show in EmulationStation to run accordingly.
 
+    If you have a game without an appropriate extension you can create a .BAS file with DOS commands.
+    i.e. in the game folder create a PLANETX16.BAS file.
+    Then add into the file the DOS commands to load the game, like so...
+
+    LOAD "PLANETX16"
+    RUN
+
+    If you have an .IMG file which doesn't load then create an autorun.cmd file with the DOS commands also.
+    i.e. X16 Wars would contain the following...
+
+    LOAD "WARS.PRG"
+    ...
+    RUN
+
+    For more info: https://wiki.batocera.org/systems:commanderx16
+  comment_fr: |
+    Trouvez la documentation ici: https://wiki.batocera.org/systems:commanderx16
+  comment_br: |
+    Para mais informações: https://wiki.batocera.org/systems:commanderx16
+
+ps4:
+  name: PlayStation 4
+  manufacturer: Sony
+  release: 2013
+  hardware: console
+  extensions: [ps4]
+  emulators:
+    shadps4:
+      shadps4: { requireAnyOf: [BR2_PACKAGE_SHADPS4] }
+  comment_en: |
+    Do not attempt to use this emulator unless you have a jailbroken PS4 console with back-up games.
+    PS4 emulation is very experiemental & required a high specified x86_64 PC.
+
+    Before you can play a game you must install the game via the associated .PKG file of your backed-up game using the F1 menu.
+    Then in the new installation directory for the installed game, create a file with a .ps4 extension so EmularionStation will see it.
+    i.e. /userdata/roms/ps4/CUSA03173/Bloodborne.ps4
+    
+    Then you can launch the game from EmulationStation accordingly.
+
+    DLC content will be stored in: /userdata/roms/ps4/DLC
+
+    Very important: To play games you typically need the system modules from your PS4 that has been jailbroken.
+    Place the decrypted system module files in: /userdata/system/configs/shadps4/user/sys_modules
+
+    For more info: https://wiki.batocera.org/systems:ps4
+  comment_fr: |
+    Trouvez la documentation ici : https://wiki.batocera.org/systems:ps4
+  comment_br: |
+    Para mais informações: https://wiki.batocera.org/systems:ps4
+
+jazz2:
+  name: Jazz Jackrabbit 2
+  manufacturer: Ports
+  release: 1998
+  hardware: port
+  extensions: [game]
+  platform: pc
+  group: ports
+  emulators:
+    jazz2-native:
+      jazz2-native: { requireAnyOf: [BR2_PACKAGE_JAZZ2_NATIVE] }
+  comment_en: |
+    Jazz2 Native requires the original Jazz Jackrabbit 2 game files.
+    Copy all game files into this directory.
+    Then create an empty `Jazz Jackrabbit 2.game` file for EmulationStation to be able to launch the game.
+
+    For more info: https://wiki.batocera.org/systems:jazz2-native
+  comment_fr: |
+    Trouvez la documentation ici : https://wiki.batocera.org/systems:jazz2-native
+  comment_br: |
+    Para mais informações: https://wiki.batocera.org/systems:jazz2-native

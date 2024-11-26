@@ -1181,6 +1181,9 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	# Jazz Jackrabbit
 	select BR2_PACKAGE_OPENJAZZ			# ALL
 
+	# Jazz Jackrabbit 2
+	select BR2_PACKAGE_JAZZ2_NATIVE			# ALL
+
 	# Tomb Raider
 	select BR2_PACKAGE_OPENLARA			if !BR2_PACKAGE_BATOCERA_TARGET_CHA
 
