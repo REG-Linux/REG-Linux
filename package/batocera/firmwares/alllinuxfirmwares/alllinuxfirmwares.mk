@@ -82,7 +82,7 @@ endif
 define ALLLINUXFIRMWARES_LINK_VENUS
     ln -sf /lib/firmware/qcom/venus-6.0/venus.mbn \
     $(TARGET_DIR)/lib/firmware/qcom/vpu-1.0/venus.mbn
-endif
+endef
 
 ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250),y)
     ALLLINUXFIRMWARES_POST_INSTALL_TARGET_HOOKS = ALLLINUXFIRMWARES_LINK_VENUS
