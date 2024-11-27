@@ -1,0 +1,7 @@
+# rpmini default values
+
+# default sway environment (rotate)
+system.es.environment=sway
+
+# default suspend on handled boards
+system.suspendmode=suspend
