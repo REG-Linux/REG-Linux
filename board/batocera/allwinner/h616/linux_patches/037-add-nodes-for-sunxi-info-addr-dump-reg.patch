@@ -68,14 +68,5 @@ index f2fe1a9a9..5073fbee9 100644
  		lradc: lradc@5070800 {
  			compatible = "allwinner,sun50i-h616-lradc",
  				     "allwinner,sun50i-r329-lradc";
-@@ -896,7 +915,7 @@ hdmi: hdmi@6000000 {
- 				      "hdcp-bus";
- 			resets = <&ccu RST_BUS_HDMI>, <&ccu RST_BUS_HDCP>;
- 			reset-names = "ctrl", "hdcp";
--		phys = <&hdmi_phy>;
-+			phys = <&hdmi_phy>;
- 			phy-names = "phy";
- 			status = "disabled";
- 
 -- 
 2.45.0
