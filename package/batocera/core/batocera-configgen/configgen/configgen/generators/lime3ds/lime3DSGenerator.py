@@ -171,7 +171,21 @@ class Lime3DSGenerator(Generator):
                             except subprocess.CalledProcessError:
                                 eslog.debug("Error getting discrete GPU index")
                         else:
-                            eslog.debug("Discrete GPU is not available on the system. Using default.")
+                            eslog.debug("Discrete GPU is not available on the system. Trying integrated.")
+                            have_integrated = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasIntegrated"], text=True).strip()
+                            if have_integrated == "true":
+                                eslog.debug("Using integrated GPU to provide Vulkan. Beware of performance")
+                                try:
+                                    integrated_index = subprocess.check_output(["/usr/bin/batocera-vulkan", "integratedIndex"], text=True).strip()
+                                    if integrated_index != "":
+                                        eslog.debug("Using Integrated GPU Index: {} for Lime3DS".format(integrated_index))
+                                        limeConfig.set("Renderer", "physical_device", integrated_index)
+                                    else:
+                                        eslog.debug("Couldn't get integrated GPU index")
+                                except subprocess.CalledProcessError:
+                                    eslog.debug("Error getting integrated GPU index")
+                            else:
+                                eslog.debug("Integrated GPU is not available on the system. Cannot enable Vulkan.")
                     except subprocess.CalledProcessError:
                         eslog.debug("Error checking for discrete GPU.")
             except subprocess.CalledProcessError:
