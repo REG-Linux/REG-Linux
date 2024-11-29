@@ -1311,9 +1311,8 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	bool "batocera.linux console emulators/cores"
 
 	# Nintendo 64
-	select BR2_PACKAGE_BATOCERA_MUPEN64		if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # mupen64 (n64) runs too slow or not wanted
-
-	select BR2_PACKAGE_LIBRETRO_MUPEN64PLUS_NEXT	if !BR2_mipsel && !BR2_RISCV_64 && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_H3 && !BR2_PACKAGE_BATOCERA_TARGET_CHA && !BR2_PACKAGE_BATOCERA_TARGET_H5
+	select BR2_PACKAGE_REGLINUX_MUPEN64		if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # mupen64 (n64) runs too slow or not wanted
+	select BR2_PACKAGE_LIBRETRO_MUPEN64PLUS_NEXT	if !BR2_mipsel && !BR2_RISCV_64 && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # mupen64 (n64) runs too slow or not wanted
 
 	select BR2_PACKAGE_LIBRETRO_PARALLEL_N64	if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY	|| \
 							   BR2_PACKAGE_BATOCERA_TARGET_RK3399		|| \
@@ -1583,8 +1582,8 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	  All avaible systems for the selected architecture
 
 ### Nintendo 64 specific config ###
-config BR2_PACKAGE_BATOCERA_MUPEN64
-	bool "batocera.linux Mupen64 packages selection"
+config BR2_PACKAGE_REGLINUX_MUPEN64
+	bool "REG-Linux Mupen64 packages selection"
 
 	# Core module
 	select BR2_PACKAGE_MUPEN64PLUS_CORE
