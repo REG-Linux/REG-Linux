@@ -31,10 +31,10 @@
 -if("${VER_GIT_DIRTY}" MATCHES "-dirty")
 -    set(VER_TAG "${VER_TAG}-dirty")
 -endif()
-+set (VER_TAG "batocera")
++set (VER_TAG "reglinux")
 +set (VER_MAJOR 2)
 +set (VER_MINOR 11)
-+set (VER_PATCH 1)
++set (VER_PATCH 3)
  message(STATUS "Version: ${VER_TAG}")
  
  include_directories(
