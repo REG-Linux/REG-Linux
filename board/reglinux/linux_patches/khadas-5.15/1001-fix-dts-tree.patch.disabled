@@ -1,0 +1,11 @@
+--- a/Makefile	2024-11-28 15:22:37.827779963 +0100
++++ b/Makefile	2024-11-28 15:31:12.840684998 +0100
+@@ -1506,7 +1506,7 @@
+ ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/boot/dts/),)
+ # ANDROID: allow this to be overridden by the build environment. This allows
+ # one to compile a device tree that is located out-of-tree.
+-dtstree ?= arch/$(SRCARCH)/boot/dts
++dtstree ?= common_drivers/arch/$(SRCARCH)/boot/dts
+ endif
+ 
+ ifneq ($(dtstree),)

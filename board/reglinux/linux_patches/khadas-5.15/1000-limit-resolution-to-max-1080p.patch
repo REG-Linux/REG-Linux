@@ -1,0 +1,16 @@
+--- a/drivers/gpu/drm/drm_edid.c	2024-11-28 14:28:52.273904648 +0100
++++ b/drivers/gpu/drm/drm_edid.c	2024-11-28 14:31:01.773463113 +0100
+@@ -3184,9 +3184,12 @@
+ 	if (!is_detailed_timing_descriptor((const u8 *)timing))
+ 		return;
+ 
+-	newmode = drm_mode_detailed(closure->connector->dev,
++	if ((timing->pixel_clock > 0) && (timing->pixel_clock < 15000)) {
++		newmode = drm_mode_detailed(closure->connector->dev,
+ 				    closure->edid, timing,
+ 				    closure->quirks);
++	}
++
+ 	if (!newmode)
+ 		return;
+ 
