@@ -26,6 +26,16 @@ has_discrete() {
     fi
 }
 
+# Function to check if an integrated GPU exists
+has_integrated() {
+    vulkaninfo | grep -q PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU
+    if [ $? -eq 0 ]; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
 # Function to retrieve the UUID of the discrete GPU
 discrete_uuid() {
     device_type_output=$(vulkaninfo | grep deviceType)
@@ -38,6 +48,24 @@ discrete_uuid() {
     device_uuid=$(vulkaninfo | grep deviceUUID | sed -n "${discrete_gpu_index}p" | awk -F'=' '{print $2}' | tr -d '[:space:]')
     if [ -z "$device_uuid" ]; then
         echo "Failed to retrieve UUID for the discrete GPU."
+        exit 1
+    fi
+
+    echo "$device_uuid"
+}
+
+# Function to retrieve the UUID of the integrated GPU
+integrated_uuid() {
+    device_type_output=$(vulkaninfo | grep deviceType)
+    integrated_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU | cut -d: -f1)
+    if [ -z "$integrated_gpu_index" ]; then
+        echo "No integrated GPU found."
+        exit 1
+    fi
+
+    device_uuid=$(vulkaninfo | grep deviceUUID | sed -n "${integrated_gpu_index}p" | awk -F'=' '{print $2}' | tr -d '[:space:]')
+    if [ -z "$device_uuid" ]; then
+        echo "Failed to retrieve UUID for the integrated GPU."
         exit 1
     fi
 
@@ -62,6 +90,24 @@ discrete_name() {
     echo "$device_name"
 }
 
+# Function to retrieve the name of the integrated GPU
+integrated_name() {
+    device_type_output=$(vulkaninfo | grep deviceType)
+    integrated_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU | cut -d: -f1)
+    if [ -z "$integrated_gpu_index" ]; then
+        echo "No integrated GPU found."
+        exit 1
+    fi
+
+    device_name=$(vulkaninfo | grep deviceName | sed -n "${integrated_gpu_index}p" | awk -F'= ' '{print $2}')
+    if [ -z "$device_name" ]; then
+        echo "Failed to retrieve name for the integrated GPU."
+        exit 1
+    fi
+
+    echo "$device_name"
+}
+
 # Function to retrieve the index (GPU number) of the discrete GPU
 discrete_index() {
     device_type_output=$(vulkaninfo | grep deviceType)
@@ -74,6 +120,20 @@ discrete_index() {
     fi
 
     echo "$discrete_gpu_index"
+}
+
+# Function to retrieve the index (GPU number) of the integrated GPU
+integrated_index() {
+    device_type_output=$(vulkaninfo | grep deviceType)
+    integrated_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU | cut -d: -f1)
+    # Subtract 1 from the index to get the Vulkan GPU number
+    integrated_gpu_index=$((integrated_gpu_index - 1))
+    if [ -z "$integrated_gpu_index" ]; then
+        echo "No integrated GPU found."
+        exit 1
+    fi
+
+    echo "$integrated_gpu_index"
 }
 
 # Function to check if Vulkan is available
@@ -112,14 +172,26 @@ case "$1" in
     "hasDiscrete")
         has_discrete
         ;;
+    "hasIntegrated")
+        has_integrated
+        ;;
     "discreteUUID")
         discrete_uuid
+        ;;
+    "integratedUUID")
+        integrated_uuid
         ;;
     "discreteName")
         discrete_name
         ;;
+    "integratedName")
+        integrated_name
+        ;;
     "discreteIndex")
         discrete_index
+        ;;
+    "integratedIndex")
+        integrated_index
         ;;
     "hasVulkan")
         has_vulkan
@@ -128,7 +200,7 @@ case "$1" in
         vulkan_version
         ;;
     *)
-        echo "Invalid option. Usage: $0 {listDevices|numDevices|hasDiscrete|discreteUUID|discreteName|discreteIndex|hasVulkan|vulkanVersion}"
+        echo "Invalid option. Usage: $0 {listDevices|numDevices|hasDiscrete|discreteUUID|discreteName|discreteIndex|hasIntegrated|integratedUUID|integratedName|integratedIndex|hasVulkan|vulkanVersion}"
         exit 1
         ;;
 esac
