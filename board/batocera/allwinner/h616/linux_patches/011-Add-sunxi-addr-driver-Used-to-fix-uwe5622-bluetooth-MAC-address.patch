@@ -20,21 +20,22 @@ diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
 index cadd4a820..605e4d2ba 100644
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
-@@ -579,4 +579,5 @@ source "drivers/misc/cardreader/Kconfig"
- source "drivers/misc/uacce/Kconfig"
+@@ -628,4 +628,5 @@
  source "drivers/misc/pvpanic/Kconfig"
  source "drivers/misc/mchp_pci1xxxx/Kconfig"
+ source "drivers/misc/keba/Kconfig"
 +source "drivers/misc/sunxi-addr/Kconfig"
  endmenu
 diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
 index f2a4d1ff6..06e857d70 100644
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -67,3 +67,4 @@ obj-$(CONFIG_TMR_MANAGER)      += xilinx_tmr_manager.o
- obj-$(CONFIG_TMR_INJECT)	+= xilinx_tmr_inject.o
- obj-$(CONFIG_TPS6594_ESM)	+= tps6594-esm.o
+@@ -71,4 +71,5 @@
  obj-$(CONFIG_TPS6594_PFSM)	+= tps6594-pfsm.o
+ obj-$(CONFIG_NSM)		+= nsm.o
+ obj-$(CONFIG_MARVELL_CN10K_DPI)	+= mrvl_cn10k_dpi.o
 +obj-$(CONFIG_SUNXI_ADDR_MGT)    += sunxi-addr/
+ obj-y				+= keba/
 diff --git a/drivers/misc/sunxi-addr/Kconfig b/drivers/misc/sunxi-addr/Kconfig
 new file mode 100644
 index 000000000..801dd2c02
@@ -584,10 +585,10 @@ index 000000000..f4f2dcecb
 +	return 0;
 +}
 +
-+static int addr_mgt_remove(struct platform_device *pdev)
++static void addr_mgt_remove(struct platform_device *pdev)
 +{
 +	class_unregister(&addr_class);
-+	return 0;
++	/*return 0;*/
 +}
 +
 +static struct platform_driver addr_mgt_driver = {
