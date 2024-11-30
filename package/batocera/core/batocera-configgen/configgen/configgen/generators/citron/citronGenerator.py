@@ -23,7 +23,7 @@ class CitronGenerator(Generator):
 
         CitronGenerator.writeCitronConfig(batoceraFiles.CONF + "/citron/qt-config.ini", system, playersControllers)
 
-        commandArray = ["/usr/bin/citron", "-f", "-g", rom ]
+        commandArray = ["/usr/bin/citron-cmd", "-f", "-g", rom ]
         return Command.Command(array=commandArray, env={
             "XDG_CONFIG_HOME":batoceraFiles.CONF, \
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/switch", \
@@ -276,14 +276,14 @@ class CitronGenerator(Generator):
         if system.isOptSet('citron_language'):
             citronConfig.set("System", "language_index", system.config["citron_language"])
         else:
-            citronConfig.set("System", "language_index", citronGenerator.getCitronLangFromEnvironment())
+            citronConfig.set("System", "language_index", CitronGenerator.getCitronLangFromEnvironment())
         citronConfig.set("System", "language_index\\default", "false")
 
         # Region
         if system.isOptSet('citron_region'):
             citronConfig.set("System", "region_index", system.config["citron_region"])
         else:
-            citronConfig.set("System", "region_index", citronGenerator.getCitronRegionFromEnvironment())
+            citronConfig.set("System", "region_index", CitronGenerator.getCitronRegionFromEnvironment())
         citronConfig.set("System", "region_index\\default", "false")
 
          # controls section
