@@ -22,10 +22,7 @@ class Lime3DSGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         Lime3DSGenerator.writeConfig(batoceraFiles.CONF + "/lime3ds-emu/qt-config.ini", system, playersControllers)
 
-        if os.path.exists('/usr/bin/lime3ds-gui'):
-            commandArray = ['/usr/bin/lime3ds-gui', rom]
-        else:
-            commandArray = ['/usr/bin/lime3ds-cli', rom]
+        commandArray = ['/usr/bin/lime3ds', rom]
         return Command.Command(array=commandArray, env={
             "XDG_CONFIG_HOME":batoceraFiles.CONF,
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/3ds",
