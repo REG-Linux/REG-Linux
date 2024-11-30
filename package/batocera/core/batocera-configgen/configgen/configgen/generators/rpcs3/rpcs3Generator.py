@@ -160,7 +160,23 @@ class Rpcs3Generator(Generator):
                         except subprocess.CalledProcessError:
                             eslog.debug("Error getting discrete GPU Name")
                     else:
-                        eslog.debug("Discrete GPU is not available on the system. Using default.")
+                        eslog.debug("Discrete GPU is not available on the system. Trying integrated.")
+                        have_integrated = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasIntegrated"], text=True).strip()
+                        if have_integrated == "true":
+                            eslog.debug("Using integrated GPU to provide Vulkan. Beware of performance")
+                            try:
+                                integrated_name = subprocess.check_output(["/usr/bin/batocera-vulkan", "integratedName"], text=True).strip()
+                                if integrated_name != "":
+                                    eslog.debug("Using Integrated GPU Name: {} for RPCS3".format(integrated_name))
+                                    if "Vulkan" not in rpcs3ymlconfig["Video"]:
+                                        rpcs3ymlconfig["Video"]["Vulkan"] = {}
+                                    rpcs3ymlconfig["Video"]["Vulkan"]["Adapter"] = integrated_name
+                                else:
+                                    eslog.debug("Couldn't get integrated GPU name")
+                            except subprocess.CalledProcessError:
+                                eslog.debug("Error getting integrated GPU index")
+                        else:
+                            eslog.debug("Integrated GPU is not available on the system. Cannot enable Vulkan.")
                 except subprocess.CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
             else:
