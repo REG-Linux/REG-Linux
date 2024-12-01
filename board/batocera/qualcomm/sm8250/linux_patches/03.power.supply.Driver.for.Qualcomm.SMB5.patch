@@ -1,17 +1,18 @@
-From a6347fe2649416d49c45e70d822c94d52bdf3e40 Mon Sep 17 00:00:00 2001
+From 4b3a7b85e16ec882444dc323c7ae7772db959a78 Mon Sep 17 00:00:00 2001
 From: Teguh Sobirin <teguh@sobir.in>
-Date: Mon, 30 Sep 2024 14:42:38 +0700
-Subject: [PATCH] power: supply: Driver for Qualcomm SMB5
+Date: Wed, 20 Nov 2024 23:00:05 +0700
+Subject: [PATCH] power: supply: Driver for Qualcomm SMB5 Signed-off-by: Teguh
+ Sobirin <teguh@sobir.in>
 
 ---
  drivers/power/supply/Kconfig                |   9 +
  drivers/power/supply/Makefile               |   1 +
- drivers/power/supply/qcom_pm8150b_charger.c | 945 ++++++++++++++++++++
- 3 files changed, 955 insertions(+)
+ drivers/power/supply/qcom_pm8150b_charger.c | 940 ++++++++++++++++++++
+ 3 files changed, 950 insertions(+)
  create mode 100644 drivers/power/supply/qcom_pm8150b_charger.c
 
 diff --git a/drivers/power/supply/Kconfig b/drivers/power/supply/Kconfig
-index bcfa63fb9f1e..ec3f3d5b20c8 100644
+index bcfa63fb9f1e20..ec3f3d5b20c8f2 100644
 --- a/drivers/power/supply/Kconfig
 +++ b/drivers/power/supply/Kconfig
 @@ -1008,6 +1008,15 @@ config CHARGER_QCOM_SMB2
@@ -31,7 +32,7 @@ index bcfa63fb9f1e..ec3f3d5b20c8 100644
  	tristate "Mitsumi MM8013 fuel gauge driver"
  	depends on I2C
 diff --git a/drivers/power/supply/Makefile b/drivers/power/supply/Makefile
-index 8dcb41545317..9237f6270158 100644
+index 8dcb4154531718..9237f62701582d 100644
 --- a/drivers/power/supply/Makefile
 +++ b/drivers/power/supply/Makefile
 @@ -116,4 +116,5 @@ obj-$(CONFIG_BATTERY_SURFACE)	+= surface_battery.o
@@ -42,10 +43,10 @@ index 8dcb41545317..9237f6270158 100644
  obj-$(CONFIG_FUEL_GAUGE_MM8013)	+= mm8013.o
 diff --git a/drivers/power/supply/qcom_pm8150b_charger.c b/drivers/power/supply/qcom_pm8150b_charger.c
 new file mode 100644
-index 000000000000..48791e145345
+index 00000000000000..afc34b5f8a1cd2
 --- /dev/null
 +++ b/drivers/power/supply/qcom_pm8150b_charger.c
-@@ -0,0 +1,938 @@
+@@ -0,0 +1,940 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (c) 2024, Teguh Sobirin <teguh@sobir.in>.
@@ -367,7 +368,6 @@ index 000000000000..48791e145345
 +	POWER_SUPPLY_PROP_ONLINE,
 +	POWER_SUPPLY_PROP_USB_TYPE,
 +};
-+
 +
 +static int smb5_get_prop_usb_online(struct smb5_chip *chip, int *val)
 +{
@@ -737,7 +737,10 @@ index 000000000000..48791e145345
 +static const struct power_supply_desc smb5_psy_desc = {
 +	.name = "pmi8998_charger",
 +	.type = POWER_SUPPLY_TYPE_USB,
-+	.usb_types = BIT(POWER_SUPPLY_USB_TYPE_UNKNOWN) | BIT(POWER_SUPPLY_USB_TYPE_SDP) | BIT(POWER_SUPPLY_USB_TYPE_DCP) | BIT(POWER_SUPPLY_USB_TYPE_CDP),
++	.usb_types = BIT(POWER_SUPPLY_USB_TYPE_SDP) |
++		     BIT(POWER_SUPPLY_USB_TYPE_CDP) |
++		     BIT(POWER_SUPPLY_USB_TYPE_DCP) |
++		     BIT(POWER_SUPPLY_USB_TYPE_UNKNOWN),
 +	.properties = smb5_properties,
 +	.num_properties = ARRAY_SIZE(smb5_properties),
 +	.get_property = smb5_get_property,
@@ -984,6 +987,3 @@ index 000000000000..48791e145345
 +MODULE_AUTHOR("Caleb Connolly <caleb.connolly@linaro.org>");
 +MODULE_DESCRIPTION("Qualcomm SMB5 Charger Driver");
 +MODULE_LICENSE("GPL");
--- 
-2.34.1
-

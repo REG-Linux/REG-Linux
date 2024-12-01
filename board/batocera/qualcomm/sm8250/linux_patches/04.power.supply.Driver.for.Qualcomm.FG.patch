@@ -1,10 +1,11 @@
-From 55ef000dd83caada1adcee8c8c87715bcce786b1 Mon Sep 17 00:00:00 2001
+From dbc71890e7e25a4af5533b4f8655ecf3cde23212 Mon Sep 17 00:00:00 2001
 From: Teguh Sobirin <teguh@sobir.in>
-Date: Sun, 8 Sep 2024 06:23:32 +0800
+Date: Wed, 20 Nov 2024 23:00:52 +0700
 Subject: [PATCH] power: supply: Driver for Qualcomm FG
 
 support for pm8150 taken from:
 https://github.com/map220v/sm8150-mainline
+Signed-off-by: Teguh Sobirin <teguh@sobir.in>
 ---
  drivers/power/supply/Kconfig   |    8 +
  drivers/power/supply/Makefile  |    1 +
@@ -13,7 +14,7 @@ https://github.com/map220v/sm8150-mainline
  create mode 100644 drivers/power/supply/qcom_fg.c
 
 diff --git a/drivers/power/supply/Kconfig b/drivers/power/supply/Kconfig
-index ec3f3d5b20c8..b1e56c53f624 100644
+index ec3f3d5b20c8f2..b1e56c53f62485 100644
 --- a/drivers/power/supply/Kconfig
 +++ b/drivers/power/supply/Kconfig
 @@ -1017,6 +1017,14 @@ config CHARGER_QCOM_SMB5
@@ -32,7 +33,7 @@ index ec3f3d5b20c8..b1e56c53f624 100644
  	tristate "Mitsumi MM8013 fuel gauge driver"
  	depends on I2C
 diff --git a/drivers/power/supply/Makefile b/drivers/power/supply/Makefile
-index 9237f6270158..52a75dae5781 100644
+index 9237f62701582d..52a75dae57816e 100644
 --- a/drivers/power/supply/Makefile
 +++ b/drivers/power/supply/Makefile
 @@ -117,4 +117,5 @@ obj-$(CONFIG_CHARGER_SURFACE)	+= surface_charger.o
@@ -43,7 +44,7 @@ index 9237f6270158..52a75dae5781 100644
  obj-$(CONFIG_FUEL_GAUGE_MM8013)	+= mm8013.o
 diff --git a/drivers/power/supply/qcom_fg.c b/drivers/power/supply/qcom_fg.c
 new file mode 100644
-index 000000000000..a3b164994fe4
+index 00000000000000..a3b164994fe4e1
 --- /dev/null
 +++ b/drivers/power/supply/qcom_fg.c
 @@ -0,0 +1,1364 @@
@@ -1005,7 +1006,7 @@ index 000000000000..a3b164994fe4
 +}
 +
 +static const struct power_supply_desc batt_psy_desc = {
-+	.name = "battery",
++	.name = "qcom-battery",
 +	.type = POWER_SUPPLY_TYPE_BATTERY,
 +	.properties = qcom_fg_props,
 +	.num_properties = ARRAY_SIZE(qcom_fg_props),
@@ -1412,6 +1413,3 @@ index 000000000000..a3b164994fe4
 +MODULE_DESCRIPTION("Qualcomm PMIC Fuel Gauge Driver");
 +MODULE_LICENSE("GPL v2");
 \ No newline at end of file
--- 
-2.34.1
-
