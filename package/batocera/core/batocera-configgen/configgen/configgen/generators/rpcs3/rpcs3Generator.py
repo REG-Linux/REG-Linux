@@ -136,7 +136,7 @@ class Rpcs3Generator(Generator):
         # gfx backend - default to Vulkan
         # Check Vulkan first to be sure
         try:
-            have_vulkan = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 if system.isOptSet("rpcs3_gfxbackend") and system.config["rpcs3_gfxbackend"] == "OpenGL":
@@ -145,11 +145,11 @@ class Rpcs3Generator(Generator):
                 else:
                     rpcs3ymlconfig["Video"]["Renderer"] = "Vulkan"
                 try:
-                    have_discrete = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasDiscrete"], text=True).strip()
+                    have_discrete = subprocess.check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
                     if have_discrete == "true":
                         eslog.debug("A discrete GPU is available on the system. We will use that for performance")
                         try:
-                            discrete_name = subprocess.check_output(["/usr/bin/batocera-vulkan", "discreteName"], text=True).strip()
+                            discrete_name = subprocess.check_output(["/usr/bin/system-vulkan", "discreteName"], text=True).strip()
                             if discrete_name != "":
                                 eslog.debug("Using Discrete GPU Name: {} for RPCS3".format(discrete_name))
                                 if "Vulkan" not in rpcs3ymlconfig["Video"]:
@@ -161,11 +161,11 @@ class Rpcs3Generator(Generator):
                             eslog.debug("Error getting discrete GPU Name")
                     else:
                         eslog.debug("Discrete GPU is not available on the system. Trying integrated.")
-                        have_integrated = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasIntegrated"], text=True).strip()
+                        have_integrated = subprocess.check_output(["/usr/bin/system-vulkan", "hasIntegrated"], text=True).strip()
                         if have_integrated == "true":
                             eslog.debug("Using integrated GPU to provide Vulkan. Beware of performance")
                             try:
-                                integrated_name = subprocess.check_output(["/usr/bin/batocera-vulkan", "integratedName"], text=True).strip()
+                                integrated_name = subprocess.check_output(["/usr/bin/system-vulkan", "integratedName"], text=True).strip()
                                 if integrated_name != "":
                                     eslog.debug("Using Integrated GPU Name: {} for RPCS3".format(integrated_name))
                                     if "Vulkan" not in rpcs3ymlconfig["Video"]:
