@@ -6,8 +6,16 @@ if [ ! -x "/usr/bin/vulkaninfo" ]; then
     exit 1
 fi
 
-# Run vulkaninfo --summary and cache results
-VKINFO="$(vulkaninfo --summary)"
+# Check if cached results exist
+if [ ! -x "/tmp/vk.info" ]; then
+    # Run vulkaninfo --summary and cache results
+    VKINFO="$(vulkaninfo --summary)"
+    echo "${VKINFO}" > /tmp/vk.info
+else
+    # Read from cached data
+    VKINFO=`cat /tmp/vk.info`
+fi
+
 
 # Function to list Vulkan GPU devices
 list_devices() {
