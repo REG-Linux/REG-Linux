@@ -45,11 +45,11 @@ class XeniaGenerator(Generator):
 
         # check Vulkan first before doing anything
         try:
-            have_vulkan = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
-                    vulkan_version = subprocess.check_output(["/usr/bin/batocera-vulkan", "vulkanVersion"], text=True).strip()
+                    vulkan_version = subprocess.check_output(["/usr/bin/system-vulkan", "vulkanVersion"], text=True).strip()
                     if vulkan_version > "1.3":
                         eslog.debug("Using Vulkan version: {}".format(vulkan_version))
                     else:
@@ -65,7 +65,7 @@ class XeniaGenerator(Generator):
                 eslog.debug("*** Vulkan driver required is not available on the system!!! ***")
                 sys.exit()
         except subprocess.CalledProcessError:
-            eslog.debug("Error executing batocera-vulkan script.")
+            eslog.debug("Error executing system-vulkan script.")
         
         # set to 64bit environment by default
         os.environ['WINEARCH'] = 'win64'

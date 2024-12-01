@@ -152,15 +152,15 @@ class CemuGenerator(Generator):
         if api_value == "1":
             # Check if we have a discrete GPU & if so, set the UUID
             try:
-                have_vulkan = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasVulkan"], text=True).strip()
+                have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
                 if have_vulkan == "true":
                     eslog.debug("Vulkan driver is available on the system.")
                     try:
-                        have_discrete = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasDiscrete"], text=True).strip()
+                        have_discrete = subprocess.check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
                         if have_discrete == "true":
                             eslog.debug("A discrete GPU is available on the system. We will use that for performance")
                             try:
-                                discrete_uuid = subprocess.check_output(["/usr/bin/batocera-vulkan", "discreteUUID"], text=True).strip()
+                                discrete_uuid = subprocess.check_output(["/usr/bin/system-vulkan", "discreteUUID"], text=True).strip()
                                 if discrete_uuid != "":
                                     discrete_uuid_num = discrete_uuid.replace("-", "")
                                     eslog.debug("Using Discrete GPU UUID: {} for Cemu".format(discrete_uuid_num))
@@ -177,7 +177,7 @@ class CemuGenerator(Generator):
                     eslog.debug("Vulkan driver is not available on the system. Falling back to OpenGL")
                     CemuGenerator.setSectionConfig(config, graphic_root, "api", "0")
             except subprocess.CalledProcessError:
-                eslog.debug("Error executing batocera-vulkan script.")
+                eslog.debug("Error executing system-vulkan script.")
         
         # Async VULKAN Shader compilation
         if system.isOptSet("cemu_async") and system.config["cemu_async"] == "False":

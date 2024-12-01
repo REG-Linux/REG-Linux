@@ -304,7 +304,7 @@ def configureINI(config_directory, bios_directory, system, rom, controllers, met
     # Renderer
     # Check Vulkan first to be sure
     try:
-        have_vulkan = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasVulkan"], text=True).strip()
+        have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
         if have_vulkan == "true":
             eslog.debug("Vulkan driver is available on the system.")
             renderer = "12"  # Default to OpenGL
@@ -317,11 +317,11 @@ def configureINI(config_directory, bios_directory, system, rom, controllers, met
                     eslog.debug("User selected Vulkan")
                     renderer = "14"
                     try:
-                        have_discrete = subprocess.check_output(["/usr/bin/batocera-vulkan", "hasDiscrete"], text=True).strip()
+                        have_discrete = subprocess.check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
                         if have_discrete == "true":
                             eslog.debug("A discrete GPU is available on the system. We will use that for performance")
                             try:
-                                discrete_name = subprocess.check_output(["/usr/bin/batocera-vulkan", "discreteName"], text=True).strip()
+                                discrete_name = subprocess.check_output(["/usr/bin/system-vulkan", "discreteName"], text=True).strip()
                                 if discrete_name:
                                     eslog.debug("Using Discrete GPU Name: {} for PCSX2".format(discrete_name))
                                     pcsx2INIConfig.set("EmuCore/GS", "Adapter", discrete_name)
