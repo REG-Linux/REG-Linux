@@ -30,6 +30,8 @@ def start_sway(generator, system):
         os.environ["XDG_RUNTIME_DIR"]="/var/run"
         os.environ["SWAYSOCK"]="/var/run/sway-ipc.0.sock"
         os.environ["SDL_VIDEODRIVER"]="wayland"
+        if generator.requiresX11():
+            os.environ["DISPLAY"]=":0"
         sway_launched = True
         eslog.debug("Composer started!")
 
@@ -41,6 +43,8 @@ def stop_sway(generator, system):
         del os.environ["XDG_RUNTIME_DIR"]
         del os.environ["SWAYSOCK"]
         del os.environ["SDL_VIDEODRIVER"]
+        if generator.requiresX11():
+            del os.environ["DISPLAY"]
         sway_launched = False
         eslog.debug("Composer finished!")
 
