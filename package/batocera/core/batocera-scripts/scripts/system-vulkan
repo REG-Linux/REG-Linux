@@ -6,9 +6,12 @@ if [ ! -x "/usr/bin/vulkaninfo" ]; then
     exit 1
 fi
 
+# Run vulkaninfo --summary and cache results
+VKINFO="$(vulkaninfo --summary)"
+
 # Function to list Vulkan GPU devices
 list_devices() {
-    vulkaninfo | grep deviceName | awk -F'= ' '{print $2}'
+   echo "${VKINFO}" | grep deviceName | awk -F'= ' '{print $2}'
 }
 
 # Function to count the number of Vulkan GPU devices
@@ -18,7 +21,7 @@ num_devices() {
 
 # Function to check if a discrete GPU exists
 has_discrete() {
-    vulkaninfo | grep -q PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+    echo "${VKINFO}" | grep -q PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
     if [ $? -eq 0 ]; then
         echo "true"
     else
@@ -28,7 +31,7 @@ has_discrete() {
 
 # Function to check if an integrated GPU exists
 has_integrated() {
-    vulkaninfo | grep -q PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU
+    echo "${VKINFO}" | grep -q PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU
     if [ $? -eq 0 ]; then
         echo "true"
     else
@@ -38,14 +41,14 @@ has_integrated() {
 
 # Function to retrieve the UUID of the discrete GPU
 discrete_uuid() {
-    device_type_output=$(vulkaninfo | grep deviceType)
+    device_type_output=$(echo "${VKINFO}" | grep deviceType)
     discrete_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_DISCRETE_GPU | cut -d: -f1)
     if [ -z "$discrete_gpu_index" ]; then
         echo "No discrete GPU found."
         exit 1
     fi
 
-    device_uuid=$(vulkaninfo | grep deviceUUID | sed -n "${discrete_gpu_index}p" | awk -F'=' '{print $2}' | tr -d '[:space:]')
+    device_uuid=$(echo "${VKINFO}" | grep deviceUUID | sed -n "${discrete_gpu_index}p" | awk -F'=' '{print $2}' | tr -d '[:space:]')
     if [ -z "$device_uuid" ]; then
         echo "Failed to retrieve UUID for the discrete GPU."
         exit 1
@@ -56,14 +59,14 @@ discrete_uuid() {
 
 # Function to retrieve the UUID of the integrated GPU
 integrated_uuid() {
-    device_type_output=$(vulkaninfo | grep deviceType)
+    device_type_output=$(echo "${VKINFO}" | grep deviceType)
     integrated_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU | cut -d: -f1)
     if [ -z "$integrated_gpu_index" ]; then
         echo "No integrated GPU found."
         exit 1
     fi
 
-    device_uuid=$(vulkaninfo | grep deviceUUID | sed -n "${integrated_gpu_index}p" | awk -F'=' '{print $2}' | tr -d '[:space:]')
+    device_uuid=$(echo "${VKINFO}" | grep deviceUUID | sed -n "${integrated_gpu_index}p" | awk -F'=' '{print $2}' | tr -d '[:space:]')
     if [ -z "$device_uuid" ]; then
         echo "Failed to retrieve UUID for the integrated GPU."
         exit 1
@@ -74,14 +77,14 @@ integrated_uuid() {
 
 # Function to retrieve the name of the discrete GPU
 discrete_name() {
-    device_type_output=$(vulkaninfo | grep deviceType)
+    device_type_output=$(echo "${VKINFO}" | grep deviceType)
     discrete_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_DISCRETE_GPU | cut -d: -f1)
     if [ -z "$discrete_gpu_index" ]; then
         echo "No discrete GPU found."
         exit 1
     fi
 
-    device_name=$(vulkaninfo | grep deviceName | sed -n "${discrete_gpu_index}p" | awk -F'= ' '{print $2}')
+    device_name=$(echo "${VKINFO}" | grep deviceName | sed -n "${discrete_gpu_index}p" | awk -F'= ' '{print $2}')
     if [ -z "$device_name" ]; then
         echo "Failed to retrieve name for the discrete GPU."
         exit 1
@@ -92,7 +95,7 @@ discrete_name() {
 
 # Function to retrieve the name of the integrated GPU
 integrated_name() {
-    device_type_output=$(vulkaninfo | grep deviceType)
+    device_type_output=$(echo "${VKINFO}" | grep deviceType)
     integrated_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU | cut -d: -f1)
     if [ -z "$integrated_gpu_index" ]; then
         echo "No integrated GPU found."
@@ -110,7 +113,7 @@ integrated_name() {
 
 # Function to retrieve the index (GPU number) of the discrete GPU
 discrete_index() {
-    device_type_output=$(vulkaninfo | grep deviceType)
+    device_type_output=$(echo "${VKINFO}" | grep deviceType)
     discrete_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_DISCRETE_GPU | cut -d: -f1)
     # Subtract 1 from the index to get the Vulkan GPU number
     discrete_gpu_index=$((discrete_gpu_index - 1))
@@ -124,7 +127,7 @@ discrete_index() {
 
 # Function to retrieve the index (GPU number) of the integrated GPU
 integrated_index() {
-    device_type_output=$(vulkaninfo | grep deviceType)
+    device_type_output=$(echo "${VKINFO}" | grep deviceType)
     integrated_gpu_index=$(echo "$device_type_output" | grep -n PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU | cut -d: -f1)
     # Subtract 1 from the index to get the Vulkan GPU number
     integrated_gpu_index=$((integrated_gpu_index - 1))
@@ -138,7 +141,7 @@ integrated_index() {
 
 # Function to check if Vulkan is available
 has_vulkan() {
-    vulkaninfo | grep -q deviceName
+    echo "${VKINFO}" | grep -q deviceName
     if [ $? -eq 0 ]; then
         echo "true"
     else
@@ -147,13 +150,13 @@ has_vulkan() {
 }
 
 vulkan_version() {
-    if [ "$(batocera-vulkan hasVulkan)" = "true" ]; then
-        if [ "$(batocera-vulkan hasDiscrete)" = "true" ]; then
-            discreteIndex=$(batocera-vulkan discreteIndex)
-            apiVersion=$(vulkaninfo | grep -A8 "GPU$discreteIndex" | awk '/apiVersion/ {print $3}')
+    if [ $(has_vulkan) = "true" ]; then
+        if [ $(has_discrete) = "true" ]; then
+            discreteIndex=$(discrete_index)
+            apiVersion=$(echo "${VKINFO}" | grep -A8 "GPU$discreteIndex" | awk '/apiVersion/ {print $3}')
             echo $apiVersion
         else
-            apiVersion=$(vulkaninfo | grep -A8 "GPU0" | awk '/apiVersion/ {print $3}')
+            apiVersion=$(echo "${VKINFO}" | grep -A8 "GPU0" | awk '/apiVersion/ {print $3}')
             echo $apiVersion
         fi
     else
