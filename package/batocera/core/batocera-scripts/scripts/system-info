@@ -168,14 +168,14 @@ if [[ "${FULL_DISPLAY}" != 0 ]]; then
 	fi
 
 	# VULKAN
-    if [ "$(batocera-vulkan hasVulkan)" = "true" ]; then
-        if [ "$(batocera-vulkan hasDiscrete)" = "true" ]; then
-            echo "Vulkan Driver Name: $(batocera-vulkan discreteName | tr -d '\n')"
-            discreteIndex=$(batocera-vulkan discreteIndex)
+    if [ "$(system-vulkan hasVulkan)" = "true" ]; then
+        if [ "$(system-vulkan hasDiscrete)" = "true" ]; then
+            echo "Vulkan Driver Name: $(system-vulkan discreteName | tr -d '\n')"
+            discreteIndex=$(system-vulkan discreteIndex)
             apiVersion=$(vulkaninfo | grep -A8 "GPU$discreteIndex" | awk '/apiVersion/ {print $3}')
             echo "Vulkan Driver Version: $apiVersion"
         else
-            echo "Vulkan Driver Name: $(batocera-vulkan listDevices | tr -d '\n')"
+            echo "Vulkan Driver Name: $(system-vulkan listDevices | tr -d '\n')"
             apiVersion=$(vulkaninfo | grep -A8 "GPU0" | awk '/apiVersion/ {print $3}')
             echo "Vulkan Driver Version: $apiVersion"
         fi
