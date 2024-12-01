@@ -17,7 +17,7 @@ Transition=merge-fade
 TransitionDuration=0.5
 
 ImageDir=/usr/share/plymouth/themes/reglinux/images
-BackgroundStartColor=0x343434
+BackgroundStartColor=0x000000
 BackgroundEndColor=0x000000
 
 WatermarkHorizontalAlignment=.5
