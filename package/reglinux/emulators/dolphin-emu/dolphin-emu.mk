@@ -3,8 +3,8 @@
 # dolphin-emu
 #
 ################################################################################
-# Version: 2409
-DOLPHIN_EMU_VERSION = 2409
+# Version: 2412
+DOLPHIN_EMU_VERSION = 2412
 DOLPHIN_EMU_SITE = https://github.com/dolphin-emu/dolphin
 DOLPHIN_EMU_SITE_METHOD = git
 DOLPHIN_EMU_LICENSE = GPLv2+
