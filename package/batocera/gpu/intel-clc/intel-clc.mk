@@ -34,7 +34,7 @@ HOST_INTEL_CLC_DEPENDENCIES = \
 	libdrm \
 	host-libclc \
 	host-spirv-tools \
-	host-spirv-llvm-translator \
+	spirv-headers \
 	host-zlib
 
 HOST_INTEL_CLC_CONF_OPTS = \
