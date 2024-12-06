@@ -23,7 +23,7 @@ def writePPSSPPConfig(system):
     if os.path.exists(ppssppConfig):
         try:
             with io.open(ppssppConfig, 'r', encoding='utf_8_sig') as fp:
-                iniConfig.readfp(fp)
+                iniConfig.read(fp)
         except:
             pass
 
@@ -74,7 +74,7 @@ def createPPSSPPConfig(iniConfig, system):
                 iniConfig.set("Graphics", "GraphicsBackend", "0 (OPENGL)")
         except subprocess.CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
-    
+
     # Display FPS
     if system.isOptSet('showFPS') and system.getOptBoolean('showFPS') == True:
         iniConfig.set("Graphics", "ShowFPSCounter", "3") # 1 for Speed%, 2 for FPS, 3 for both
@@ -152,7 +152,7 @@ def createPPSSPPConfig(iniConfig, system):
     else:
         iniConfig.set("SystemParam", "NickName", "Batocera")
     # Disable Encrypt Save (permit to exchange save with different machines)
-    iniConfig.set("SystemParam", "EncryptSave", "False")   
+    iniConfig.set("SystemParam", "EncryptSave", "False")
 
 
     ## [GENERAL]
