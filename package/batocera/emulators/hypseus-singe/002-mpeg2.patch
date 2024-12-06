@@ -1,6 +1,14 @@
---- a/src/CMakeLists.txt	2021-06-07 19:12:18.646828485 +0200
-+++ b/src/CMakeLists.txt	2021-06-07 19:13:56.113491528 +0200
-@@ -45,14 +45,12 @@
+---
+ src/CMakeLists.txt       | 5 +----
+ src/vldp/vldp.h          | 2 ++
+ src/vldp/vldp_internal.h | 1 -
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index c0ddbc2..025eea0 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -51,14 +51,12 @@ include(BuildSupport)
  include(GNUInstallDirs)
  include(InstallRequiredSystemLibraries)
  include(FindPkgConfig)
@@ -16,7 +24,7 @@
  
  message(STATUS "Target: ${CMAKE_SYSTEM_NAME} ${CMAKE_TARGET_ARCHITECTURES}")
  
-@@ -91,7 +89,6 @@
+@@ -97,7 +95,6 @@ add_subdirectory(timer)
  add_subdirectory(video)
  add_subdirectory(vldp)
  
@@ -25,12 +33,12 @@
  add_dependencies( game vldp )
  add_dependencies( sound vldp )
 diff --git a/src/vldp/vldp.h b/src/vldp/vldp.h
-index a59c723..3c986dc 100644
+index 438f1a1..a1498c5 100644
 --- a/src/vldp/vldp.h
 +++ b/src/vldp/vldp.h
-@@ -34,6 +34,8 @@ extern "C" {
- // Ubuntu Linux complains with plain <SDL.h>
- #include <SDL2/SDL.h> // only used for threading
+@@ -35,6 +35,8 @@ extern "C" {
+ // But CMake does the right thing here 
+ #include <SDL.h> // only used for threading
  
 +#include <mpeg2dec/mpeg2.h>
 +
@@ -38,7 +46,7 @@ index a59c723..3c986dc 100644
      uint8_t *Y;     // Y channel
      uint8_t *U;     // U channel
 diff --git a/src/vldp/vldp_internal.h b/src/vldp/vldp_internal.h
-index cd046fe..67cea2d 100644
+index 88450e9..7976e73 100644
 --- a/src/vldp/vldp_internal.h
 +++ b/src/vldp/vldp_internal.h
 @@ -27,7 +27,6 @@
@@ -48,4 +56,6 @@ index cd046fe..67cea2d 100644
 -#include <mpeg2.h>
  
  // this is which version of the .dat file format we are using
- #define DAT_VERSION 2
+ #define DAT_VERSION 3
+-- 
+2.47.1

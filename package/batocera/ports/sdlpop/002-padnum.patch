@@ -1,6 +1,8 @@
---- a/src/proto.h	2021-12-06 23:24:06.728608135 +0100
-+++ b/src/proto.h	2021-12-06 23:24:19.016869769 +0100
-@@ -564,7 +564,7 @@
+diff --git a/src/proto.h b/src/proto.h
+index c28dd7d..b60bfd2 100644
+--- a/src/proto.h
++++ b/src/proto.h
+@@ -564,7 +564,7 @@ void free_chtab(chtab_type *chtab_ptr);
  image_type* decode_image(image_data_type* image_data, dat_pal_type* palette);
  image_type*load_image(int index, dat_pal_type* palette);
  void draw_image_transp(image_type* image,image_type* mask,int xpos,int ypos);
@@ -9,9 +11,11 @@
  surface_type *make_offscreen_buffer(const rect_type* rect);
  void free_surface(surface_type *surface);
  void free_peel(peel_type *peel_ptr);
---- a/src/seg000.c	2021-12-06 23:19:42.759012810 +0100
-+++ b/src/seg000.c	2021-12-06 23:20:34.784111214 +0100
-@@ -28,6 +28,8 @@
+diff --git a/src/seg000.c b/src/seg000.c
+index 2165e5e..953c1ac 100644
+--- a/src/seg000.c
++++ b/src/seg000.c
+@@ -32,6 +32,8 @@ dat_type * dathandle;
  // data:4C08
  word need_redraw_because_flipped;
  
@@ -20,11 +24,7 @@
  void fix_sound_priorities(void);
  
  // seg000:0000
-diff --git a/src/seg000.c b/src/seg000.c
-index 44c8681..d51018c 100644
---- a/src/seg000.c
-+++ b/src/seg000.c
-@@ -48,6 +50,11 @@ void far pop_main() {
+@@ -52,6 +54,11 @@ void pop_main() {
  		seed_was_init = 1;
  	}
  
@@ -36,16 +36,16 @@ index 44c8681..d51018c 100644
  	// debug only: check that the sequence table deobfuscation did not mess things up
  	#ifdef CHECK_SEQTABLE_MATCHES_ORIGINAL
  	check_seqtable_matches_original();
-@@ -104,7 +111,7 @@ void far pop_main() {
+@@ -106,7 +113,7 @@ void pop_main() {
+ 	parse_cmdline_sound();
  
- 	current_target_surface = rect_sthg(onscreen_surface_, &screen_rect);
  	show_loading();
 -	set_joy_mode();
 +	set_joy_mode(joynum);
  	cheats_enabled = check_param("megahit") != NULL;
  #ifdef USE_DEBUG_CHEATS
  	debug_cheats_enabled = check_param("debug") != NULL;
-@@ -595,7 +602,7 @@ int __pascal far process_key() {
+@@ -619,7 +626,7 @@ int process_key() {
  			if ((sound_flags & sfDigi) && sound_mode == smTandy) {
  				answer_text = "JOYSTICK UNAVAILABLE";
  			} else {
@@ -55,10 +55,10 @@ index 44c8681..d51018c 100644
  				} else {
  					answer_text = "JOYSTICK NOT FOUND";
 diff --git a/src/seg009.c b/src/seg009.c
-index 591430c..8dd5ced 100644
+index e668cbe..9fc3fad 100644
 --- a/src/seg009.c
 +++ b/src/seg009.c
-@@ -874,7 +874,7 @@
+@@ -875,7 +875,7 @@ void draw_image_transp(image_type* image,image_type* mask,int xpos,int ypos) {
  }
  
  // seg009:157E
@@ -67,7 +67,7 @@ index 591430c..8dd5ced 100644
  	// stub
  	if (SDL_NumJoysticks() < 1) {
  		is_joyst_mode = 0;
-@@ -839,8 +839,8 @@ int __pascal far set_joy_mode() {
+@@ -884,8 +884,8 @@ int set_joy_mode() {
  			SDL_GameControllerAddMappingsFromFile(gamecontrollerdb_file);
  		}
  
@@ -78,7 +78,7 @@ index 591430c..8dd5ced 100644
  			if (sdl_controller_ == NULL) {
  				is_joyst_mode = 0;
  			} else {
-@@ -850,13 +850,13 @@ int __pascal far set_joy_mode() {
+@@ -895,13 +895,13 @@ int set_joy_mode() {
  		// We have a joystick connected, but it's NOT compatible with the SDL_GameController
  		// interface, so we resort to the classic SDL_Joystick interface instead
  		else {

@@ -1,6 +1,8 @@
---- a/Makefile.libretro	2021-01-23 16:29:22.070372812 +0100
-+++ b/Makefile.libretro	2021-01-23 16:29:53.150371703 +0100
-@@ -4,6 +4,13 @@
+diff --git a/Makefile.libretro b/Makefile.libretro
+index b7c26de..2b4a5b0 100755
+--- a/Makefile.libretro
++++ b/Makefile.libretro
+@@ -4,6 +4,13 @@ ZLIB_DIR = $(LIBRETRO_DIR)/utils/zlib
  STATIC_LINKING=0
  STATIC_LINKING_LINK=0
  
@@ -14,7 +16,7 @@
  ifeq ($(platform),)
  platform = unix
  ifeq ($(shell uname -a),)
-@@ -73,6 +80,22 @@
+@@ -73,6 +80,22 @@ else ifeq ($(platform), classic_armv7_a7)
  	endif
  #######################################
  
@@ -37,7 +39,38 @@
  else ifeq ($(platform), osx)
  	TARGET := $(TARGET_NAME)_libretro.dylib
     fpic := -fPIC
-@@ -191,6 +214,10 @@
+@@ -87,6 +110,30 @@ else ifeq ($(platform), osx)
+ 		LDFLAGS  += $(TARGET_RULE)
+    endif
+ 
++# Raspberry Pi
++else ifneq (,$(findstring rpi,$(platform)))
++	TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC -fsigned-char
++   SHARED :=  -lz -lpthread -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined
++   PLATFLAGS := -DLSB_FIRST -DALIGN_DWORD
++   CFLAGS += -DARM
++
++	ifneq (,$(findstring rpi1,$(platform)))
++		CFLAGS += -marm -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard
++	else ifneq (,$(findstring rpi2,$(platform)))
++		CFLAGS += -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
++	else ifneq (,$(findstring rpi3,$(platform)))
++		ifneq (,$(findstring rpi3_64,$(platform)))
++            CFLAGS += -mcpu=cortex-a53 -mtune=cortex-a53
++		else
++			CFLAGS += -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
++		endif
++	else ifneq (,$(findstring rpi4,$(platform)))
++         CFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
++	else ifneq (,$(findstring rpi5,$(platform)))
++         CFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
++	endif
++
+ # ARM
+ else ifneq (,$(findstring armv,$(platform)))
+    CC = gcc
+@@ -223,6 +270,10 @@ CFLAGS += -funroll-loops -ffast-math -fomit-frame-pointer -O3
  endif
  CFLAGS += -fsigned-char -D__LIBRETRO__ -fno-builtin
  
@@ -48,7 +81,7 @@
  CFLAGS   += $(fpic) $(PLATFLAGS)
  CXXFLAGS := $(CFLAGS)
  CPPFLAGS := $(CFLAGS)
-@@ -210,11 +237,15 @@
+@@ -242,11 +293,15 @@ OBJECTS := $(SOURCES_C:.c=.o)
  
  all: $(TARGET)
  

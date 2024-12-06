@@ -3,13 +3,13 @@
  1 file changed, 29 insertions(+)
 
 diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
-index 68963b06d..3db534923 100644
+index a5148652d..9814beb7d 100644
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -3420,6 +3420,32 @@ static const struct panel_desc rocktech_rk043fn48h = {
+@@ -3416,6 +3416,32 @@ static const struct panel_desc rocktech_rk043fn48h = {
  	.connector_type = DRM_MODE_CONNECTOR_DPI,
  };
-
+ 
 +static const struct drm_display_mode retroflag_gpi_mode = {
 +	.clock = 6400,
 +	.hdisplay = 240,
@@ -39,7 +39,7 @@ index 68963b06d..3db534923 100644
  static const struct display_timing retroflag_gpi2w_timing = {
  	.pixelclock = { 19200000, 19200000, 19200000},
  	.hactive = { 640, 640, 640 },
-@@ -4585,6 +4611,9 @@ static const struct of_device_id platform_of_match[] = {
+@@ -4581,6 +4607,9 @@ static const struct of_device_id platform_of_match[] = {
  	}, {
  		.compatible = "rocktech,rk043fn48h",
  		.data = &rocktech_rk043fn48h,
@@ -49,6 +49,5 @@ index 68963b06d..3db534923 100644
  	}, {
  		.compatible = "retroflag,gpi2w",
  		.data = &retroflag_gpi2w,
---
-2.45.0
-
+-- 
+2.47.1

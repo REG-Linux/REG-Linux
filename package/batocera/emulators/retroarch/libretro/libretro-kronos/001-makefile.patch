@@ -1,0 +1,83 @@
+diff --git a/yabause/src/libretro/Makefile b/yabause/src/libretro/Makefile
+index 6af6523..9d1899c 100644
+--- a/yabause/src/libretro/Makefile
++++ b/yabause/src/libretro/Makefile
+@@ -111,7 +111,7 @@ else ifneq (,$(findstring rockpro64,$(platform)))
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-	LDFLAGS += -lpthread -lGL
++	LDFLAGS += -lpthread
+ 	ARCH_IS_LINUX = 1
+ 	HAVE_SSE = 0
+ 	FORCE_GLES = 1
+@@ -123,7 +123,7 @@ else ifeq ($(platform), odroid-n2)
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-	LDFLAGS += -lpthread -lGL
++	LDFLAGS += -lpthread
+ 	ARCH_IS_LINUX = 1
+ 	HAVE_SSE = 0
+ 	FORCE_GLES = 1
+@@ -134,13 +134,39 @@ else ifeq ($(platform), odroid-n2)
+ 		FLAGS += -march=armv8-a+crc -mtune=cortex-a73.cortex-a53
+ 	endif
+ 
+-else ifneq (,$(findstring odroid,$(platform)))
++else ifeq ($(platform), odroid-c4)
++	override platform += unix
++	TARGET := $(TARGET_NAME)_libretro.so
++	fpic := -fPIC
++	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++	LDFLAGS += -lpthread -lGL
++	ARCH_IS_LINUX = 1
++	HAVE_SSE = 0
++	FORCE_GLES = 1
++	# ODROID-C4
++	ifneq (, $(findstring clang,$(CC)))
++		FLAGS += -march=armv8-a+crc
++	else
++		FLAGS += -march=armv8-a+crc -mtune=cortex-a55
++	endif
++
++else ifeq ($(platform), saphira)
+ 	override platform += unix
+ 	TARGET := $(TARGET_NAME)_libretro.so
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+ 	LDFLAGS += -lpthread -lGL
+ 	ARCH_IS_LINUX = 1
++	HAVE_SSE = 0
++	FLAGS += -march=armv8.2-a+crc
++
++else ifneq (,$(findstring odroid,$(platform)))
++	override platform += unix
++	TARGET := $(TARGET_NAME)_libretro.so
++	fpic := -fPIC
++	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++	LDFLAGS += -lpthread
++	ARCH_IS_LINUX = 1
+ 	BOARD := $(shell cat /proc/cpuinfo | grep -i odroid | awk '{print $$3}')
+ 
+ 	ifneq (,$(findstring ODROID-XU3,$(BOARD)))
+diff --git a/yabause/src/libretro/Makefile.common b/yabause/src/libretro/Makefile.common
+index d940769..c55a4ae 100644
+--- a/yabause/src/libretro/Makefile.common
++++ b/yabause/src/libretro/Makefile.common
+@@ -173,13 +173,14 @@ ifeq ($(HAVE_CDROM), 1)
+ 		$(LIBRETRO_COMM_DIR)/memmap/memalign.c \
+ 		$(LIBRETRO_COMM_DIR)/lists/string_list.c \
+ 		$(LIBRETRO_COMM_DIR)/lists/dir_list.c \
+-		$(LIBRETRO_COMM_DIR)/string/stdstring.c \
+ 		$(LIBRETRO_COMM_DIR)/file/retro_dirent.c
+ 	ifeq ($(CDROM_DEBUG), 1)
+ 		FLAGS += -DCDROM_DEBUG
+ 	endif
+ endif
+ 
++SOURCES_C += $(LIBRETRO_COMM_DIR)/string/stdstring.c
++
+ ifeq ($(ARCH_IS_WINDOWS), 1)
+ 	SOURCES_C += $(FLAC_DIR)/src/libFLAC/windows_unicode_filenames.c
+ endif

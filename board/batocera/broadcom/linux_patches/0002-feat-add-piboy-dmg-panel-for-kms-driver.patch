@@ -8,10 +8,10 @@ Subject: [PATCH 2/3] feat: add piboy dmg panel for kms driver
  1 file changed, 35 insertions(+)
 
 diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
-index b9ff78db5..da3232275 100644
+index a0526bf1f..a3ca6c4d5 100644
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -3446,6 +3446,38 @@ static const struct panel_desc retroflag_gpi2w = {
+@@ -3442,6 +3442,38 @@ static const struct panel_desc retroflag_gpi2w = {
  	.connector_type = DRM_MODE_CONNECTOR_DPI,
  };
  
@@ -48,9 +48,9 @@ index b9ff78db5..da3232275 100644
 +};
 +
  static const struct drm_display_mode raspberrypi_7inch_mode = {
- 	.clock = 27777,
+ 	.clock = 30000,
  	.hdisplay = 800,
-@@ -4530,6 +4562,9 @@ static const struct of_device_id platform_of_match[] = {
+@@ -4526,6 +4558,9 @@ static const struct of_device_id platform_of_match[] = {
  	}, {
  		.compatible = "retroflag,gpi2w",
  		.data = &retroflag_gpi2w,
@@ -61,5 +61,4 @@ index b9ff78db5..da3232275 100644
  		.compatible = "raspberrypi,7inch-dsi",
  		.data = &raspberrypi_7inch,
 -- 
-2.44.0
-
+2.47.1

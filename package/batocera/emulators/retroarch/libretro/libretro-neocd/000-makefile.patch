@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 6934856..bc77950 100644
+index 553c233..456652d 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -62,6 +62,31 @@ ifneq (,$(findstring unix,$(platform)))
@@ -34,3 +34,15 @@ index 6934856..bc77950 100644
  else ifeq ($(platform), linux-portable)
     TARGET := $(TARGET_NAME)_libretro.$(EXT)
     fpic := -fPIC -nostdlib
+diff --git a/src/path.cpp b/src/path.cpp
+index 79e7f85..ac0b4a2 100644
+--- a/src/path.cpp
++++ b/src/path.cpp
+@@ -22,7 +22,6 @@ static void system_path_internal(char* buffer, size_t len)
+    if (!path_ends_with_slash(buffer))
+       strlcat(buffer, PATH_DEFAULT_SLASH(), len);
+ 
+-   strlcat(buffer, NEOCD_SYSTEM_SUBDIR, len);
+ }
+ 
+ static void save_path_internal(char* buffer, size_t len)

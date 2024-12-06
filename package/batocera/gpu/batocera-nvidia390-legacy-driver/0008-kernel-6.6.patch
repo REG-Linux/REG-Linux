@@ -1,8 +1,8 @@
 diff --git a/kernel/nvidia-drm/nvidia-drm-drv.c b/kernel/nvidia-drm/nvidia-drm-drv.c
-index 070084cbea..ca4b3e658c 100644
+index 1289cb3..51bda85 100644
 --- a/kernel/nvidia-drm/nvidia-drm-drv.c
 +++ b/kernel/nvidia-drm/nvidia-drm-drv.c
-@@ -706,9 +706,9 @@ static struct drm_driver nv_drm_driver = {
+@@ -700,9 +700,9 @@ static struct drm_driver nv_drm_driver = {
  
      .ioctls                 = nv_drm_ioctls,
      .num_ioctls             = ARRAY_SIZE(nv_drm_ioctls),

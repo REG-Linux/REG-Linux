@@ -1,8 +1,14 @@
+---
+ engine/openbor.c         | 12 +++++++++++-
+ engine/openbor.h         |  6 +++++-
+ engine/source/savedata.h |  2 +-
+ 3 files changed, 17 insertions(+), 3 deletions(-)
+
 diff --git a/engine/openbor.c b/engine/openbor.c
-index 133f1ed2..fde1b1af 100644
+index a13228e..e44c7ba 100644
 --- a/engine/openbor.c
 +++ b/engine/openbor.c
-@@ -2420,6 +2420,7 @@ void execute_pdie_script(int index)
+@@ -2320,6 +2320,7 @@ void execute_pdie_script(int index)
  void clearbuttons(int player)
  {
      savedata.joyrumble[player] = 0;
@@ -10,22 +16,7 @@ index 133f1ed2..fde1b1af 100644
  
      if (player == 0)
      {
-@@ -35472,10 +35473,10 @@ void apply_controls()
-     {
-         //control_setkey(playercontrolpointers[p], FLAG_ESC,        CONTROL_ESC); // FCA
- 		control_setkey(playercontrolpointers[p], FLAG_ESC,	      savedata.keys[p][SDID_ESC]); // FCA
--        control_setkey(playercontrolpointers[p], FLAG_MOVEUP,     savedata.keys[p][SDID_MOVEUP]);
--        control_setkey(playercontrolpointers[p], FLAG_MOVEDOWN,   savedata.keys[p][SDID_MOVEDOWN]);
--        control_setkey(playercontrolpointers[p], FLAG_MOVELEFT,   savedata.keys[p][SDID_MOVELEFT]);
--        control_setkey(playercontrolpointers[p], FLAG_MOVERIGHT,  savedata.keys[p][SDID_MOVERIGHT]);
-+        control_setkey(playercontrolpointers[p], FLAG_PADUP,     savedata.keys[p][SDID_MOVEUP]); // FCANEW
-+        control_setkey(playercontrolpointers[p], FLAG_PADDOWN,   savedata.keys[p][SDID_MOVEDOWN]); // FCANEW
-+        control_setkey(playercontrolpointers[p], FLAG_PADLEFT,   savedata.keys[p][SDID_MOVELEFT]); // FCANEW
-+        control_setkey(playercontrolpointers[p], FLAG_PADRIGHT,  savedata.keys[p][SDID_MOVERIGHT]); // FCANEW
-         control_setkey(playercontrolpointers[p], FLAG_ATTACK,     savedata.keys[p][SDID_ATTACK]);
-         control_setkey(playercontrolpointers[p], FLAG_ATTACK2,    savedata.keys[p][SDID_ATTACK2]);
-         control_setkey(playercontrolpointers[p], FLAG_ATTACK3,    savedata.keys[p][SDID_ATTACK3]);
-@@ -35484,6 +35485,10 @@ void apply_controls()
+@@ -34250,6 +34251,10 @@ void apply_controls()
          control_setkey(playercontrolpointers[p], FLAG_SPECIAL,    savedata.keys[p][SDID_SPECIAL]);
          control_setkey(playercontrolpointers[p], FLAG_START,      savedata.keys[p][SDID_START]);
          control_setkey(playercontrolpointers[p], FLAG_SCREENSHOT, savedata.keys[p][SDID_SCREENSHOT]);
@@ -36,7 +27,7 @@ index 133f1ed2..fde1b1af 100644
      }
  }
  
-@@ -38331,7 +38336,7 @@ void keyboard_setup(int player)
+@@ -36887,7 +36892,7 @@ void keyboard_setup(int player)
          selector = 0,
          setting = -1,
          i, k, ok = 0,
@@ -45,7 +36,7 @@ index 133f1ed2..fde1b1af 100644
                                  col1 = -8, col2 = 6;
      ptrdiff_t voffset, pos;
      char *buf,
-@@ -38362,6 +38367,11 @@ void keyboard_setup(int player)
+@@ -36918,6 +36923,11 @@ void keyboard_setup(int player)
      strcpy(buttonnames[SDID_START], "Start");
      strcpy(buttonnames[SDID_SCREENSHOT], "Screenshot");
      strcpy(buttonnames[SDID_ESC], "Exit");
@@ -58,10 +49,10 @@ index 133f1ed2..fde1b1af 100644
      savesettings();
      bothnewkeys = 0;
 diff --git a/engine/openbor.h b/engine/openbor.h
-index 70daface..d5bd5d3e 100644
+index fe40440..0ed7ac2 100644
 --- a/engine/openbor.h
 +++ b/engine/openbor.h
-@@ -455,7 +464,11 @@ typedef enum
+@@ -337,7 +337,11 @@ typedef enum
      SDID_SPECIAL,
      SDID_START,
      SDID_SCREENSHOT,
@@ -73,9 +64,9 @@ index 70daface..d5bd5d3e 100644
 +	SDID_AXISRIGHT
  } e_key_id;
  
- // Caskey, Damon V.
+ typedef enum
 diff --git a/engine/source/savedata.h b/engine/source/savedata.h
-index 9700f320..a3eee39f 100644
+index fb829e1..f8ea30a 100644
 --- a/engine/source/savedata.h
 +++ b/engine/source/savedata.h
 @@ -10,7 +10,7 @@
@@ -88,5 +79,4 @@ index 9700f320..a3eee39f 100644
  typedef struct
  {
 -- 
-2.21.0.windows.1
-
+2.47.1

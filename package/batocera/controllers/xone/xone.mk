@@ -13,7 +13,7 @@ else
 endif
 
 XONE_SITE = $(call github,medusalix,xone,$(XONE_VERSION))
-XONE_DEPENDENCIES = host-libcurl host-cabextract libusb
+XONE_DEPENDENCIES = host-cabextract libusb
 
 define XONE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0644 $(@D)/install/modprobe.conf $(TARGET_DIR)/etc/modprobe.d/xone-blacklist.conf

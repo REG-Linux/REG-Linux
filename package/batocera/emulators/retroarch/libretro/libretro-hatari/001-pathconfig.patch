@@ -12,11 +12,11 @@ index 127329b..885c8dc 100644
  - Improved VDI resolution mode (resolution can now be change in small steps).
  - The 'Frame Skip 8' option can now be correctly selected, too.
 diff --git a/src/paths.c b/src/paths.c
-index d100445..a2819de 100644
+index c662586..93b5fc9 100644
 --- a/src/paths.c
 +++ b/src/paths.c
-@@ -26,7 +26,7 @@ const char Paths_fileid[] = "Hatari paths.c : " __DATE__ " " __TIME__;
- #ifdef WIIU
+@@ -37,7 +37,7 @@ const char Paths_fileid[] = "Hatari paths.c : " __DATE__ " " __TIME__;
+ #if defined(WIIU) || defined(VITA) || defined(__PS3__)
  	#define HATARI_HOME_DIR "hatari"
  #else
 -	#define HATARI_HOME_DIR ".hatari"
