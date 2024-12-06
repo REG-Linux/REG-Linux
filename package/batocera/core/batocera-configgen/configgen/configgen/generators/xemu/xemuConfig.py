@@ -15,7 +15,7 @@ def writeIniFile(system, rom, playersControllers, gameResolution):
     if os.path.exists(batoceraFiles.xemuConfig):
         try:
             with io.open(batoceraFiles.xemuConfig, 'r', encoding='utf_8_sig') as fp:
-                iniConfig.readfp(fp)
+                iniConfig.read(fp)
         except:
             pass
 
@@ -48,7 +48,7 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
         iniConfig.add_section("net")
     if not iniConfig.has_section("net.udp"):
         iniConfig.add_section("net.udp")
-        
+
 
     # Boot Animation Skip
     if system.isOptSet("xemu_bootanim"):
@@ -67,7 +67,7 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
         iniConfig.set("sys", "mem_limit", '"' + system.config["xemu_memory"] + '"')
     else:
         iniConfig.set("sys", "mem_limit", '"64"')
-    
+
     if system.name == "chihiro":
         iniConfig.set("sys", "mem_limit", '"128"')
         iniConfig.set("sys.files", "flashrom_path", '"/userdata/bios/cerbios.bin"')
@@ -101,7 +101,7 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
     # Vsync
     if system.isOptSet("xemu_vsync"):
         iniConfig.set("display.window", "vsync", system.config["xemu_vsync"])
-    else:      
+    else:
         iniConfig.set("display.window", "vsync", "true")
 
     # don't show the menubar
