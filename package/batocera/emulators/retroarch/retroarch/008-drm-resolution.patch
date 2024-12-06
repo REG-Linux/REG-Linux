@@ -1,9 +1,13 @@
+---
+ gfx/common/drm_common.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
 diff --git a/gfx/common/drm_common.c b/gfx/common/drm_common.c
-index a1bede5..8bc674a 100644
+index a39e2e9..42900c1 100644
 --- a/gfx/common/drm_common.c
 +++ b/gfx/common/drm_common.c
-@@ -156,6 +156,22 @@ bool drm_get_encoder(int fd)
-             g_drm_connector->modes[i].vrefresh);
+@@ -193,6 +193,22 @@ bool drm_get_encoder(int fd)
+             drm_calc_refresh_rate(&g_drm_connector->modes[i]));
     }
  
 +   // batocera - set resolution
@@ -25,3 +29,5 @@ index a1bede5..8bc674a 100644
     return true;
  }
  
+-- 
+2.47.1

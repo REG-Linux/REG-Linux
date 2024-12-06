@@ -8,7 +8,7 @@ Subject: [PATCH] Tentative fix for NVIDIA 470.182.03 driver for Linux 6.5-rc1
  1 file changed, 43 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/common/inc/nv-mm.h b/kernel/common/inc/nv-mm.h
-index 54f6f60..25333e8 100644
+index aec55b0..acd396d 100644
 --- a/kernel/common/inc/nv-mm.h
 +++ b/kernel/common/inc/nv-mm.h
 @@ -23,6 +23,7 @@
@@ -77,6 +77,3 @@ index 54f6f60..25333e8 100644
      #if defined(NV_GET_USER_PAGES_REMOTE_HAS_WRITE_AND_FORCE_ARGS)
          #define NV_GET_USER_PAGES_REMOTE    get_user_pages_remote
      #else
--- 
-2.41.0
-

@@ -1,37 +1,20 @@
-Index: source/duke3d/src/game.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/source/duke3d/src/game.cpp b/source/duke3d/src/game.cpp
---- a/source/duke3d/src/game.cpp	(revision 54177821c32a0ba601da9b43f02647fb7d1aa291)
-+++ b/source/duke3d/src/game.cpp	(date 1657236230400)
-@@ -6596,7 +6596,7 @@ int app_main(int argc, char const* const* argv)
+diff --git a/source/build/src/vfs.cpp b/source/build/src/vfs.cpp
+index a6b3617..f868f57 100644
+--- a/source/build/src/vfs.cpp
++++ b/source/build/src/vfs.cpp
+@@ -286,7 +286,7 @@ int32_t findfrompath(const char *fn, char **where)
+     if (!fn || !fn[0])
+         return -1;
  
-     G_ExtPreInit(argc, argv);
- 
--    engineSetLogFile(APPBASENAME ".log", LOG_GAME_MAX);
-+    engineSetLogFile("/userdata/system/logs/" APPBASENAME ".log", LOG_GAME_MAX);
-     engineSetLogVerbosityCallback(dukeVerbosityCallback);
- 
- #ifdef __APPLE__
-@@ -6893,7 +6893,7 @@
-
-     CONFIG_ReadSettings();
-
--    OSD_Exec("autoexec.cfg");
-+    OSD_Exec("/userdata/system/configs/" APPBASENAME "/autoexec.cfg");
-
-     CONFIG_SetDefaultKeys(keydefaults, true);
-
-Index: source/duke3d/src/common.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
+-    if (pathsearchmode)
++    if (1)
+     {
+         // test unmolested filename first
+         if (buildvfs_exists(fn))
 diff --git a/source/duke3d/src/common.cpp b/source/duke3d/src/common.cpp
---- a/source/duke3d/src/common.cpp	(revision 54177821c32a0ba601da9b43f02647fb7d1aa291)
-+++ b/source/duke3d/src/common.cpp	(date 1657270049493)
+index 5f3fcf1..93525bc 100644
+--- a/source/duke3d/src/common.cpp
++++ b/source/duke3d/src/common.cpp
 @@ -271,15 +271,7 @@ void G_ExtPreInit(int32_t argc,char const * const * argv)
  
          if ((homedir = Bgethomedir()))
@@ -49,14 +32,32 @@ diff --git a/source/duke3d/src/common.cpp b/source/duke3d/src/common.cpp
              asperr = addsearchpath(cwd);
              if (asperr == -2)
              {
-Index: source/duke3d/src/startgtk.game.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
+diff --git a/source/duke3d/src/game.cpp b/source/duke3d/src/game.cpp
+index fabec7a..d64a2ae 100644
+--- a/source/duke3d/src/game.cpp
++++ b/source/duke3d/src/game.cpp
+@@ -6595,7 +6595,7 @@ int app_main(int argc, char const* const* argv)
+ 
+     G_ExtPreInit(argc, argv);
+ 
+-    engineSetLogFile(APPBASENAME ".log", LOG_GAME_MAX);
++    engineSetLogFile("/userdata/system/logs/" APPBASENAME ".log", LOG_GAME_MAX);
+     engineSetLogVerbosityCallback(dukeVerbosityCallback);
+ 
+ #ifdef __APPLE__
+@@ -6906,7 +6906,7 @@ int app_main(int argc, char const* const* argv)
+ 
+     CONFIG_ReadSettings();
+ 
+-    OSD_Exec("autoexec.cfg");
++    OSD_Exec("/userdata/system/configs/" APPBASENAME "/autoexec.cfg");
+ 
+     CONFIG_SetDefaultKeys(keydefaults, true);
+ 
 diff --git a/source/duke3d/src/startgtk.game.cpp b/source/duke3d/src/startgtk.game.cpp
---- a/source/duke3d/src/startgtk.game.cpp	(revision 54177821c32a0ba601da9b43f02647fb7d1aa291)
-+++ b/source/duke3d/src/startgtk.game.cpp	(date 1657270555456)
+index f29a84f..88b12fe 100644
+--- a/source/duke3d/src/startgtk.game.cpp
++++ b/source/duke3d/src/startgtk.game.cpp
 @@ -286,7 +286,7 @@ static unsigned char GetModsDirNames(GtkListStore *list)
          if (buildvfs_exists("user_profiles_disabled"))
              buildvfs_getcwd(pdir, sizeof(pdir));
@@ -66,20 +67,3 @@ diff --git a/source/duke3d/src/startgtk.game.cpp b/source/duke3d/src/startgtk.ga
  
          dirs = klistpath(pdir, "*", BUILDVFS_FIND_DIR);
          for (; dirs != NULL; dirs=dirs->next)
-Index: source/build/src/vfs.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/source/build/src/vfs.cpp b/source/build/src/vfs.cpp
---- a/source/build/src/vfs.cpp	(revision 54177821c32a0ba601da9b43f02647fb7d1aa291)
-+++ b/source/build/src/vfs.cpp	(date 1656392416714)
-@@ -282,7 +282,7 @@
-     // pathsearchmode == 0: tests current dir and then the dirs of the path stack
-     // pathsearchmode == 1: tests fn without modification, then like for pathsearchmode == 0
-
--    if (pathsearchmode)
-+    if (1)
-     {
-         // test unmolested filename first
-         if (buildvfs_exists(fn))

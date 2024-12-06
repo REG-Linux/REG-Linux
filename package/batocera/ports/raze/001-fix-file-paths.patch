@@ -1,11 +1,36 @@
-Index: source/common/platform/posix/unix/i_specialpaths.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
+diff --git a/source/common/platform/posix/sdl/i_main.cpp b/source/common/platform/posix/sdl/i_main.cpp
+index 4f29bb7..e780af5 100644
+--- a/source/common/platform/posix/sdl/i_main.cpp
++++ b/source/common/platform/posix/sdl/i_main.cpp
+@@ -176,23 +176,7 @@ int main (int argc, char **argv)
+ 
+ 	Args = new FArgs(argc, argv);
+ 
+-#ifdef PROGDIR
+-	progdir = PROGDIR;
+-#else
+-	char program[PATH_MAX];
+-	if (realpath (argv[0], program) == NULL)
+-		strcpy (program, argv[0]);
+-	char *slash = strrchr (program, '/');
+-	if (slash != NULL)
+-	{
+-		*(slash + 1) = '\0';
+-		progdir = program;
+-	}
+-	else
+-	{
+-		progdir = "./";
+-	}
+-#endif
++	progdir = "/usr/share/raze/";
+ 
+ 	I_StartupJoysticks();
+ 
 diff --git a/source/common/platform/posix/unix/i_specialpaths.cpp b/source/common/platform/posix/unix/i_specialpaths.cpp
---- a/source/common/platform/posix/unix/i_specialpaths.cpp	(revision 486da6922dac5380b4e83cc4c680ad90afb91ca9)
-+++ b/source/common/platform/posix/unix/i_specialpaths.cpp	(date 1657595110880)
+index 112e92e..583a7fa 100644
+--- a/source/common/platform/posix/unix/i_specialpaths.cpp
++++ b/source/common/platform/posix/unix/i_specialpaths.cpp
 @@ -45,59 +45,7 @@
  
  FString GetUserFile (const char *file)
@@ -67,7 +92,7 @@ diff --git a/source/common/platform/posix/unix/i_specialpaths.cpp b/source/commo
  }
  
  //===========================================================================
-@@ -112,7 +60,7 @@
+@@ -112,7 +60,7 @@ FString M_GetAppDataPath(bool create)
  {
  	// Don't use GAME_DIR and such so that ZDoom and its child ports can
  	// share the node cache.
@@ -75,8 +100,8 @@ diff --git a/source/common/platform/posix/unix/i_specialpaths.cpp b/source/commo
 +	FString path = NicePath("/userdata/system/configs/raze");
  	if (create)
  	{
- 		CreatePath(path);
-@@ -132,7 +80,7 @@
+ 		CreatePath(path.GetChars());
+@@ -132,7 +80,7 @@ FString M_GetCachePath(bool create)
  {
  	// Don't use GAME_DIR and such so that ZDoom and its child ports can
  	// share the node cache.
@@ -84,115 +109,74 @@ diff --git a/source/common/platform/posix/unix/i_specialpaths.cpp b/source/commo
 +	FString path = NicePath("/userdata/system/cache/raze");
  	if (create)
  	{
- 		CreatePath(path);
-@@ -150,7 +98,7 @@
-
+ 		CreatePath(path.GetChars());
+@@ -150,7 +98,7 @@ FString M_GetCachePath(bool create)
+ 
  FString M_GetAutoexecPath()
  {
 -	return GetUserFile("autoexec.cfg");
 +	return FString("/userdata/system/configs/raze/autoexec.cfg");
  }
-
+ 
  //===========================================================================
-@@ -165,7 +113,7 @@
-
+@@ -165,7 +113,7 @@ FString M_GetAutoexecPath()
+ 
  FString M_GetConfigPath(bool for_reading)
  {
 -	return GetUserFile(GAMENAMELOWERCASE ".ini");
 +	return FString("/userdata/system/configs/raze/raze.ini");
  }
-
+ 
  //===========================================================================
-@@ -178,7 +126,7 @@
-
+@@ -178,7 +126,7 @@ FString M_GetConfigPath(bool for_reading)
+ 
  FString M_GetScreenshotsPath()
  {
 -	return NicePath("$HOME/" GAME_DIR "/screenshots/");
 +	return FString("/userdata/screenshots/");
  }
-
+ 
  //===========================================================================
-@@ -191,7 +139,7 @@
-
+@@ -191,7 +139,7 @@ FString M_GetScreenshotsPath()
+ 
  FString M_GetSavegamesPath()
  {
 -	return NicePath("$HOME/" GAME_DIR "/savegames/");
 +	return FString("/userdata/saves/raze/");
  }
-
+ 
  //===========================================================================
-@@ -204,7 +152,7 @@
-
+@@ -204,7 +152,7 @@ FString M_GetSavegamesPath()
+ 
  FString M_GetDocumentsPath()
  {
 -	return NicePath("$HOME/" GAME_DIR "/");
 +	return M_GetSavegamesPath();
  }
-
+ 
  //===========================================================================
-Index: source/common/platform/posix/sdl/i_main.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/source/common/platform/posix/sdl/i_main.cpp b/source/common/platform/posix/sdl/i_main.cpp
---- a/source/common/platform/posix/sdl/i_main.cpp	(revision 486da6922dac5380b4e83cc4c680ad90afb91ca9)
-+++ b/source/common/platform/posix/sdl/i_main.cpp	(date 1657594523787)
-@@ -174,23 +174,7 @@ int main (int argc, char **argv)
- 
- 	Args = new FArgs(argc, argv);
- 
--#ifdef PROGDIR
--	progdir = PROGDIR;
--#else
--	char program[PATH_MAX];
--	if (realpath (argv[0], program) == NULL)
--		strcpy (program, argv[0]);
--	char *slash = strrchr (program, '/');
--	if (slash != NULL)
--	{
--		*(slash + 1) = '\0';
--		progdir = program;
--	}
--	else
--	{
--		progdir = "./";
--	}
--#endif
-+	progdir = "/usr/share/raze/";
- 
- 	I_StartupJoysticks();
- 
-Index: source/core/gameconfigfile.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
 diff --git a/source/core/gameconfigfile.cpp b/source/core/gameconfigfile.cpp
---- a/source/core/gameconfigfile.cpp	(revision 486da6922dac5380b4e83cc4c680ad90afb91ca9)
-+++ b/source/core/gameconfigfile.cpp	(date 1657595110893)
-@@ -141,6 +141,7 @@
+index c99c6bc..17f9c9a 100644
+--- a/source/core/gameconfigfile.cpp
++++ b/source/core/gameconfigfile.cpp
+@@ -156,6 +156,7 @@ FGameConfigFile::FGameConfigFile ()
+ 		SetValueForKey ("Path", "/usr/local/share/games/jfduke3d", true);
  		SetValueForKey ("Path", "/usr/local/share/games/eduke32", true);
- 		SetValueForKey ("Path", "/usr/share/games/nblood", true);
  		SetValueForKey ("Path", "/usr/local/share/games/nblood", true);
 +		SetValueForKey ("Path", "/usr/share/raze", true);
  #endif
  	}
-
-Index: source/core/gamecontrol.cpp
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
+ 
 diff --git a/source/core/gamecontrol.cpp b/source/core/gamecontrol.cpp
---- a/source/core/gamecontrol.cpp	(revision 486da6922dac5380b4e83cc4c680ad90afb91ca9)
-+++ b/source/core/gamecontrol.cpp	(date 1657595110906)
-@@ -971,7 +971,7 @@
+index 6f9c179..72e5a42 100644
+--- a/source/core/gamecontrol.cpp
++++ b/source/core/gamecontrol.cpp
+@@ -1043,7 +1043,7 @@ int RunGame()
  	FString logfile = Args->TakeValue("+logfile");
-
+ 
  	// As long as this engine is still in prerelease mode let's always write a log file.
 -	if (logfile.IsEmpty()) logfile.Format("%s" GAMENAMELOWERCASE ".log", M_GetDocumentsPath().GetChars());
 +	if (logfile.IsEmpty()) logfile.Format("/userdata/system/logs/raze.log");
-
+ 
  	if (logfile.IsNotEmpty())
  	{

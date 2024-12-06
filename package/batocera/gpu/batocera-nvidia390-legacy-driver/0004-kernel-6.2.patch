@@ -10,7 +10,7 @@ Subject: [PATCH] Tentative fix for NVIDIA 470.161.03 driver for Linux 6.2-rc1
  3 files changed, 42 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/nvidia-drm/nvidia-drm-connector.c b/kernel/nvidia-drm/nvidia-drm-connector.c
-index 6fbcd63..a5ab9e9 100644
+index 54167a7..0e9e976 100644
 --- a/kernel/nvidia-drm/nvidia-drm-connector.c
 +++ b/kernel/nvidia-drm/nvidia-drm-connector.c
 @@ -20,6 +20,8 @@
@@ -57,7 +57,7 @@ index 6fbcd63..a5ab9e9 100644
      if (!nvKms->getDynamicDisplayInfo(nv_dev->pDevice, pDetectParams)) {
          NV_DRM_DEV_LOG_ERR(
 diff --git a/kernel/nvidia-drm/nvidia-drm-drv.c b/kernel/nvidia-drm/nvidia-drm-drv.c
-index 6d007b1..d08ab4c 100644
+index 1289cb3..e5dee49 100644
 --- a/kernel/nvidia-drm/nvidia-drm-drv.c
 +++ b/kernel/nvidia-drm/nvidia-drm-drv.c
 @@ -20,6 +20,7 @@
@@ -68,7 +68,7 @@ index 6d007b1..d08ab4c 100644
  #include "nvidia-drm-conftest.h" /* NV_DRM_AVAILABLE and NV_DRM_DRM_GEM_H_PRESENT */
  
  #include "nvidia-drm-priv.h"
-@@ -240,9 +241,12 @@ nv_drm_init_mode_config(struct nv_drm_device *nv_dev,
+@@ -239,9 +240,12 @@ nv_drm_init_mode_config(struct nv_drm_device *nv_dev,
      dev->mode_config.preferred_depth = 24;
      dev->mode_config.prefer_shadow = 1;
  
@@ -79,10 +79,10 @@ index 6d007b1..d08ab4c 100644
      dev->mode_config.fb_base = 0;
 +#endif
  
- #if defined(NV_DRM_CRTC_STATE_HAS_ASYNC_FLIP) || \
-     defined(NV_DRM_CRTC_STATE_HAS_PAGEFLIP_FLAGS)
+     dev->mode_config.async_page_flip = false;
+ 
 diff --git a/kernel/nvidia/nv-acpi.c b/kernel/nvidia/nv-acpi.c
-index 07501eb..1fdf71c 100644
+index da9fbc9..9b0b489 100644
 --- a/kernel/nvidia/nv-acpi.c
 +++ b/kernel/nvidia/nv-acpi.c
 @@ -8,6 +8,7 @@
@@ -92,8 +92,8 @@ index 07501eb..1fdf71c 100644
 +#include <linux/version.h>
  #define  __NO_VERSION__
  
- #include "os-interface.h"
-@@ -24,7 +25,10 @@ static NV_STATUS   nv_acpi_extract_object  (const union acpi_object *, void *, N
+ #include "nv-misc.h"
+@@ -23,7 +24,10 @@ static NV_STATUS   nv_acpi_extract_object  (const union acpi_object *, void *, N
  
  static int         nv_acpi_add             (struct acpi_device *);
  
@@ -105,8 +105,8 @@ index 07501eb..1fdf71c 100644
  static int         nv_acpi_remove_two_args(struct acpi_device *device, int type);
  #else
  static int         nv_acpi_remove_one_arg(struct acpi_device *device);
-@@ -80,7 +84,10 @@ static const struct acpi_driver nv_acpi_driver_template = {
-     .ids = nv_video_device_ids,
+@@ -73,7 +77,10 @@ static const struct acpi_driver nv_acpi_driver_template = {
+ #endif
      .ops = {
          .add = nv_acpi_add,
 -#if !defined(NV_ACPI_DEVICE_OPS_REMOVE_ARGUMENT_COUNT) || (NV_ACPI_DEVICE_OPS_REMOVE_ARGUMENT_COUNT == 2)
@@ -117,7 +117,7 @@ index 07501eb..1fdf71c 100644
          .remove = nv_acpi_remove_two_args,
  #else
          .remove = nv_acpi_remove_one_arg,
-@@ -342,7 +349,10 @@ static int nv_acpi_add(struct acpi_device *device)
+@@ -331,7 +338,10 @@ static int nv_acpi_add(struct acpi_device *device)
      return 0;
  }
  
@@ -129,7 +129,7 @@ index 07501eb..1fdf71c 100644
  static int nv_acpi_remove_two_args(struct acpi_device *device, int type)
  #else
  static int nv_acpi_remove_one_arg(struct acpi_device *device)
-@@ -396,7 +406,10 @@ static int nv_acpi_remove_one_arg(struct acpi_device *device)
+@@ -385,7 +395,10 @@ static int nv_acpi_remove_one_arg(struct acpi_device *device)
          device->driver_data = NULL;
      }
  
@@ -139,8 +139,4 @@ index 07501eb..1fdf71c 100644
 +#endif
  }
  
- /*
--- 
-2.39.0
-
-
+ static void nv_acpi_event(acpi_handle handle, u32 event_type, void *data)

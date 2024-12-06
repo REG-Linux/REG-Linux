@@ -1,5 +1,10 @@
+---
+ sound/soc/amd/acp/acp-mach-common.c | 83 +++++++++++++++++++++++++++++
+ sound/soc/amd/acp/acp-mach.h        |  3 +-
+ 2 files changed, 85 insertions(+), 1 deletion(-)
+
 diff --git a/sound/soc/amd/acp/acp-mach-common.c b/sound/soc/amd/acp/acp-mach-common.c
-index 504d1b8c4c..4fa450dbdc 100644
+index e9ff4815c..413789c90 100644
 --- a/sound/soc/amd/acp/acp-mach-common.c
 +++ b/sound/soc/amd/acp/acp-mach-common.c
 @@ -26,6 +26,7 @@
@@ -12,7 +17,7 @@ index 504d1b8c4c..4fa450dbdc 100644
  #define PCO_PLAT_CLK 48000000
 @@ -1282,6 +1283,78 @@ SND_SOC_DAILINK_DEF(nau8821,
  		    DAILINK_COMP_ARRAY(COMP_CODEC("i2c-NVTN2020:00",
- 						  "nau8821-hifi")));
+ 						  NAU8821_CODEC_DAI)));
  
 +static int acp_cs35l41_init(struct snd_soc_pcm_runtime *rtd)
 +{
@@ -121,7 +126,7 @@ index 504d1b8c4c..4fa450dbdc 100644
  	}
  
 diff --git a/sound/soc/amd/acp/acp-mach.h b/sound/soc/amd/acp/acp-mach.h
-index a48546d8d4..3b69dfa806 100644
+index 93d9e3886..d7117ff95 100644
 --- a/sound/soc/amd/acp/acp-mach.h
 +++ b/sound/soc/amd/acp/acp-mach.h
 @@ -27,8 +27,8 @@
@@ -142,3 +147,5 @@ index a48546d8d4..3b69dfa806 100644
  	NAU8821,
  	MAX98388,
  	ES83XX,
+-- 
+2.47.1

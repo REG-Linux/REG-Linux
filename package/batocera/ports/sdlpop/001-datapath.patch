@@ -1,5 +1,5 @@
 diff --git a/src/seg009.c b/src/seg009.c
-index de35eb3..591430c 100644
+index e668cbe..f8a37ca 100644
 --- a/src/seg009.c
 +++ b/src/seg009.c
 @@ -66,8 +66,7 @@ const char* locate_file_(const char* filename, char* path_buffer, int buffer_siz
@@ -12,7 +12,7 @@ index de35eb3..591430c 100644
  		return (const char*) path_buffer;
  	}
  }
-@@ -347,7 +346,7 @@ static FILE* open_dat_from_root_or_data_dir(const char* filename) {
+@@ -344,7 +343,7 @@ static FILE* open_dat_from_root_or_data_dir(const char* filename) {
  
  		if (!file_exists(data_path)) {
  			find_exe_dir();

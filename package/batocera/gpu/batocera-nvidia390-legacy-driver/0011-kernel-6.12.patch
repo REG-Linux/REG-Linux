@@ -10,13 +10,13 @@ Subject: [PATCH 5/5] 6.12: drm_outpull_pill changed check
  3 files changed, 28 insertions(+)
 
 diff --git a/kernel/conftest.sh b/kernel/conftest.sh
-index 4a239e63..4d6fff64 100755
+index 4b1ff39..467bc75 100644
 --- a/kernel/conftest.sh
 +++ b/kernel/conftest.sh
-@@ -1302,6 +1302,29 @@
-             compile_check_conftest "$CODE" "NV_DRM_DEV_UNREF_PRESENT" "" "functions"
+@@ -1793,6 +1793,29 @@ compile_test() {
          ;;
-
+ 
+ 
 +        drm_output_poll_changed)
 +            #
 +            # Determine whether drm_mode_config_funcs.output_poll_changed
@@ -44,10 +44,10 @@ index 4a239e63..4d6fff64 100755
              #
              # Determine if the pde_data() function is present.
 diff --git a/kernel/nvidia-drm/nvidia-drm-drv.c b/kernel/nvidia-drm/nvidia-drm-drv.c
-index 50028c26..034dda66 100644
+index 84f2c0d..9a25d4c 100644
 --- a/kernel/nvidia-drm/nvidia-drm-drv.c
 +++ b/kernel/nvidia-drm/nvidia-drm-drv.c
-@@ -126,6 +126,7 @@ static const char* nv_get_input_colorspace_name(
+@@ -88,6 +88,7 @@ static struct nv_drm_device *dev_list = NULL;
  
  #if defined(NV_DRM_ATOMIC_MODESET_AVAILABLE)
  
@@ -55,7 +55,7 @@ index 50028c26..034dda66 100644
  static void nv_drm_output_poll_changed(struct drm_device *dev)
  {
      struct drm_connector *connector = NULL;
-@@ -169,6 +170,7 @@ static void nv_drm_output_poll_changed(struct drm_device *dev)
+@@ -131,6 +132,7 @@ static void nv_drm_output_poll_changed(struct drm_device *dev)
      nv_drm_connector_list_iter_end(&conn_iter);
  #endif
  }
@@ -63,7 +63,7 @@ index 50028c26..034dda66 100644
  
  static struct drm_framebuffer *nv_drm_framebuffer_create(
      struct drm_device *dev,
-@@ -206,7 +208,9 @@ static const struct drm_mode_config_funcs nv_mode_config_funcs = {
+@@ -168,7 +170,9 @@ static const struct drm_mode_config_funcs nv_mode_config_funcs = {
      .atomic_check  = nv_drm_atomic_check,
      .atomic_commit = nv_drm_atomic_commit,
  
@@ -74,16 +74,14 @@ index 50028c26..034dda66 100644
  
  static void nv_drm_event_callback(const struct NvKmsKapiEvent *event)
 diff --git a/kernel/nvidia-drm/nvidia-drm.Kbuild b/kernel/nvidia-drm/nvidia-drm.Kbuild
-index 247096b7..f5964a57 100644
+index a102041..c68a679 100644
 --- a/kernel/nvidia-drm/nvidia-drm.Kbuild
 +++ b/kernel/nvidia-drm/nvidia-drm.Kbuild
-@@ -106,4 +106,5 @@
+@@ -106,4 +106,5 @@ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_device_has_pdev
  NV_CONFTEST_TYPE_COMPILE_TESTS += dma_resv_add_fence
  NV_CONFTEST_TYPE_COMPILE_TESTS += dma_resv_reserve_fences
  NV_CONFTEST_TYPE_COMPILE_TESTS += reservation_object_reserve_shared_has_num_fences_arg
 -NV_CONFTEST_TYPE_COMPILE_TESTS += drm_unlocked_ioctl_flag_present
-\ Pas de fin de ligne à la fin du fichier
+\ No newline at end of file
 +NV_CONFTEST_TYPE_COMPILE_TESTS += drm_unlocked_ioctl_flag_present
 +NV_CONFTEST_TYPE_COMPILE_TESTS += drm_output_poll_changed
--- 
-2.46.2

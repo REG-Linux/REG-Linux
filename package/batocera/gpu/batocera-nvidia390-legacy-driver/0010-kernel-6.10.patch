@@ -1,10 +1,11 @@
-diff -ruNb a/kernel/conftest.sh b/kernel/conftest.sh
---- a/kernel/conftest.sh        2024-07-19 04:36:26.183701185 -0500
-+++ b/kernel/conftest.sh        2024-07-19 04:36:26.230366381 -0500
-@@ -4464,20 +4464,22 @@
+diff --git a/kernel/conftest.sh b/kernel/conftest.sh
+index 24daa85..2061400 100755
+--- a/kernel/conftest.sh
++++ b/kernel/conftest.sh
+@@ -4458,20 +4458,22 @@ compile_test() {
              compile_check_conftest "$CODE" "NV_DRM_GEM_OBJECT_VMAP_HAS_MAP_ARG" "" "types"
          ;;
-
+ 
 -        unsafe_follow_pfn)
 +        follow_pfn)
              #
@@ -25,15 +26,16 @@ diff -ruNb a/kernel/conftest.sh b/kernel/conftest.sh
 +            void conftest_follow_pfn(void) {
 +                follow_pfn();
              }"
-
+ 
 -            compile_check_conftest "$CODE" "NV_UNSAFE_FOLLOW_PFN_PRESENT" "" "functions"
 +            compile_check_conftest "$CODE" "NV_FOLLOW_PFN_PRESENT" "" "functions"
          ;;
-
+ 
          drm_plane_atomic_check_has_atomic_state_arg)
-diff -ruNb a/kernel/nvidia/nvidia.Kbuild b/kernel/nvidia/nvidia.Kbuild
---- a/kernel/nvidia/nvidia.Kbuild       2022-10-12 04:29:57.000000000 -0500
-+++ b/kernel/nvidia/nvidia.Kbuild       2024-07-19 05:17:39.148448922 -0500
+diff --git a/kernel/nvidia/nvidia.Kbuild b/kernel/nvidia/nvidia.Kbuild
+index 1a24123..cd796e6 100644
+--- a/kernel/nvidia/nvidia.Kbuild
++++ b/kernel/nvidia/nvidia.Kbuild
 @@ -165,7 +165,7 @@ NV_CONFTEST_FUNCTION_COMPILE_TESTS += ktime_get_raw_ts64
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += ktime_get_real_ts64
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += ioremap_nocache
@@ -43,10 +45,11 @@ diff -ruNb a/kernel/nvidia/nvidia.Kbuild b/kernel/nvidia/nvidia.Kbuild
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += acpi_bus_get_device
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += acpi_video_backlight_use_native
  
-diff -ruNb a/kernel/nvidia/os-mlock.c b/kernel/nvidia/os-mlock.c
---- a/kernel/nvidia/os-mlock.c  2022-10-12 04:30:26.000000000 -0500
-+++ b/kernel/nvidia/os-mlock.c  2024-07-19 04:36:26.230366381 -0500
-@@ -18,10 +18,10 @@
+diff --git a/kernel/nvidia/os-mlock.c b/kernel/nvidia/os-mlock.c
+index f88daed..9e1bd0c 100644
+--- a/kernel/nvidia/os-mlock.c
++++ b/kernel/nvidia/os-mlock.c
+@@ -18,10 +18,10 @@ static inline int nv_follow_pfn(struct vm_area_struct *vma,
                                  unsigned long address,
                                  unsigned long *pfn)
  {
@@ -59,3 +62,4 @@ diff -ruNb a/kernel/nvidia/os-mlock.c b/kernel/nvidia/os-mlock.c
 +    return -1;
  #endif
  }
+ 

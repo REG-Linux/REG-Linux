@@ -53,11 +53,11 @@ Cc: stable@vger.kernel.org
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3cf0764d5793..7516cdde3373 100644
+index c4c74b82e..6c76ebbf7 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1272,8 +1272,13 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
- 			return 0;
+@@ -2369,8 +2369,13 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+ 		return 0;
  	}
  
 -	if (hci_conn_ssp_enabled(conn) &&
@@ -71,8 +71,6 @@ index 3cf0764d5793..7516cdde3373 100644
 +	if (!test_bit(HCI_CONN_ENCRYPT, &conn->flags))
  		return 0;
  
- 	/* The minimum encryption key size needs to be enforced by the
+ 	return 1;
 -- 
-2.20.1
-
-
+2.47.1

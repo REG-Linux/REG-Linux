@@ -1,11 +1,15 @@
+---
+ retroarch.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
 diff --git a/retroarch.c b/retroarch.c
-index 159d482..3c9d169 100644
+index 1551e7c..dd307de 100644
 --- a/retroarch.c
 +++ b/retroarch.c
-@@ -24707,6 +24707,36 @@ static void retroarch_parse_input_and_config(int argc, char *argv[])
+@@ -6700,6 +6700,36 @@ static bool retroarch_parse_input_and_config(
        { NULL, 0, NULL, 0 }
     };
-
+ 
 +   if(argc >= 2) {
 +     if(strcmp(argv[1], "-x") == 0) {
 +       struct retro_system_info info;
@@ -38,4 +42,6 @@ index 159d482..3c9d169 100644
 +
     if (first_run)
     {
-       /* Copy the args into a buffer so launch arguments can be reused */
+       size_t _len = 0;
+-- 
+2.47.1
