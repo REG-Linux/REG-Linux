@@ -1,10 +1,10 @@
 diff --git a/src/joystick/linux/SDL_sysjoystick.c b/src/joystick/linux/SDL_sysjoystick.c
-index fc95197..827a7e7 100644
+index bb7c31c..8880158 100644
 --- a/src/joystick/linux/SDL_sysjoystick.c
 +++ b/src/joystick/linux/SDL_sysjoystick.c
-@@ -1622,6 +1622,9 @@ LINUX_JoystickGetGamepadMapping(int device_index, SDL_GamepadMapping *out)
-     SDL_Joystick *joystick;
-     SDL_joylist_item *item = JoystickByDevIndex(device_index);
+@@ -2328,6 +2328,9 @@ static SDL_bool LINUX_JoystickGetGamepadMapping(int device_index, SDL_GamepadMap
+ 
+     SDL_AssertJoysticksLocked();
  
 +    /* disable this new SDL2 feature ; open/close temporarly the joystick is buggy. it frees up the hwdata informations */
 +    return SDL_FALSE;

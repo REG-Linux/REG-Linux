@@ -48,10 +48,10 @@ Cc: stable@vger.kernel.org
  1 file changed, 14 insertions(+)
 
 diff --git a/sound/pci/hda/patch_hdmi.c b/sound/pci/hda/patch_hdmi.c
-index 5af372d..18bad9a 100644
+index 643e0496b..f5ad3bde8 100644
 --- a/sound/pci/hda/patch_hdmi.c
 +++ b/sound/pci/hda/patch_hdmi.c
-@@ -1630,6 +1630,14 @@ static int hdmi_add_cvt(struct hda_codec *codec, hda_nid_t cvt_nid)
+@@ -1981,6 +1981,14 @@ static int hdmi_add_cvt(struct hda_codec *codec, hda_nid_t cvt_nid)
  	if (err < 0)
  		return err;
  
@@ -66,9 +66,9 @@ index 5af372d..18bad9a 100644
  	if (spec->num_cvts < ARRAY_SIZE(spec->cvt_nids))
  		spec->cvt_nids[spec->num_cvts] = cvt_nid;
  	spec->num_cvts++;
-@@ -1783,6 +1791,12 @@ static int hdmi_pcm_close(struct hda_pcm_stream *hinfo,
- 	int pinctl;
+@@ -2181,6 +2189,12 @@ static int hdmi_pcm_close(struct hda_pcm_stream *hinfo,
  
+ 	mutex_lock(&spec->pcm_lock);
  	if (hinfo->nid) {
 +		/*
 +		 * Make sure no empty audio is output after this point by
@@ -77,10 +77,7 @@ index 5af372d..18bad9a 100644
 +		__snd_hda_codec_cleanup_stream(codec, hinfo->nid, 1);
 +
  		pcm_idx = hinfo_to_pcm_index(codec, hinfo);
- 		if (snd_BUG_ON(pcm_idx < 0))
- 			return -EINVAL;
+ 		if (snd_BUG_ON(pcm_idx < 0)) {
+ 			err = -EINVAL;
 -- 
-2.7.4
-
-
-
+2.47.1

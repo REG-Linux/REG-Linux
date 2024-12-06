@@ -22,27 +22,29 @@ Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Issue reported upstream:
     https://devtalk.nvidia.com/default/topic/958653/
 
-diff -durN nvidia-driver-370.23.orig/kernel/nvidia/nvidia.Kbuild nvidia-driver-370.23/kernel/nvidia/nvidia.Kbuild
---- nvidia-driver-370.23.orig/kernel/nvidia/nvidia.Kbuild	2016-08-09 01:57:50.000000000 +0200
-+++ nvidia-driver-370.23/kernel/nvidia/nvidia.Kbuild	2016-08-20 12:25:02.780233423 +0200
-@@ -87,7 +87,7 @@
- always += $(NVIDIA_INTERFACE)
- 
- $(obj)/$(NVIDIA_INTERFACE): $(addprefix $(obj)/,$(NVIDIA_OBJECTS))
--	$(LD) -r -o $@ $^
-+	$(LD) $(LDFLAGS) -r -o $@ $^
- 
- 
- #
-diff -durN nvidia-driver-370.23.orig/kernel/nvidia-modeset/nvidia-modeset.Kbuild nvidia-driver-370.23/kernel/nvidia-modeset/nvidia-modeset.Kbuild
---- nvidia-driver-370.23.orig/kernel/nvidia-modeset/nvidia-modeset.Kbuild	2016-08-09 01:43:19.000000000 +0200
-+++ nvidia-driver-370.23/kernel/nvidia-modeset/nvidia-modeset.Kbuild	2016-08-20 12:25:39.596772662 +0200
-@@ -70,7 +70,7 @@
- always += $(NVIDIA_MODESET_INTERFACE)
- 
+diff --git a/kernel/nvidia-modeset/nvidia-modeset.Kbuild b/kernel/nvidia-modeset/nvidia-modeset.Kbuild
+index a7d84e0..de06174 100644
+--- a/kernel/nvidia-modeset/nvidia-modeset.Kbuild
++++ b/kernel/nvidia-modeset/nvidia-modeset.Kbuild
+@@ -77,7 +77,7 @@ always += $(NVIDIA_MODESET_INTERFACE)
+ always-y += $(NVIDIA_MODESET_INTERFACE)
+
  $(obj)/$(NVIDIA_MODESET_INTERFACE): $(addprefix $(obj)/,$(NVIDIA_MODESET_OBJECTS))
 -	$(LD) -r -o $@ $^
 +	$(LD) $(LDFLAGS) -r -o $@ $^
- 
+
  #
  # Register the conftests needed by nvidia-modeset.ko
+diff --git a/kernel/nvidia/nvidia.Kbuild b/kernel/nvidia/nvidia.Kbuild
+index 44990d3..25ca1ff 100644
+--- a/kernel/nvidia/nvidia.Kbuild
++++ b/kernel/nvidia/nvidia.Kbuild
+@@ -92,7 +92,7 @@ always += $(NVIDIA_INTERFACE)
+ always-y += $(NVIDIA_INTERFACE)
+
+ $(obj)/$(NVIDIA_INTERFACE): $(addprefix $(obj)/,$(NVIDIA_OBJECTS))
+-	$(LD) -r -o $@ $^
++	$(LD) $(LDFLAGS) -r -o $@ $^
+
+
+ #

@@ -8,13 +8,13 @@ Subject: [PATCH 3/3] feat: add auo a030vvn01 dpi panel for kms driver
  1 file changed, 29 insertions(+)
 
 diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
-index da3232275..68963b06d 100644
+index a3ca6c4d5..a5148652d 100644
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -3478,6 +3478,32 @@ static const struct panel_desc xpi_piboydmg = {
+@@ -3474,6 +3474,32 @@ static const struct panel_desc xpi_piboydmg = {
  	.connector_type = DRM_MODE_CONNECTOR_DPI,
  };
-
+ 
 +static const struct display_timing auo_a030vvn01_timing = {
 +	.pixelclock = { 19750000, 24000000, 28220000},
 +	.hactive = { 640, 640, 640 },
@@ -42,9 +42,9 @@ index da3232275..68963b06d 100644
 +};
 +
  static const struct drm_display_mode raspberrypi_7inch_mode = {
- 	.clock = 27777,
+ 	.clock = 30000,
  	.hdisplay = 800,
-@@ -4565,6 +4591,9 @@ static const struct of_device_id platform_of_match[] = {
+@@ -4561,6 +4587,9 @@ static const struct of_device_id platform_of_match[] = {
  	}, {
  		.compatible = "xpi,piboydmg",
  		.data = &xpi_piboydmg,
@@ -54,6 +54,5 @@ index da3232275..68963b06d 100644
   	}, {
  		.compatible = "raspberrypi,7inch-dsi",
  		.data = &raspberrypi_7inch,
---
-2.44.0
-
+-- 
+2.47.1

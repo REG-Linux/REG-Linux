@@ -1,8 +1,12 @@
+---
+ xpad.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 103 insertions(+), 1 deletion(-)
+
 diff --git a/xpad.c b/xpad.c
-index 3d19dca..6fe1212 100644
+index d284050..73492b5 100644
 --- a/xpad.c
 +++ b/xpad.c
-@@ -101,6 +101,12 @@ * seconds
+@@ -93,6 +93,12 @@
   */
  #define XPAD360W_POWEROFF_TIMEOUT 5
  
@@ -15,7 +19,7 @@ index 3d19dca..6fe1212 100644
  static bool dpad_to_buttons;
  module_param(dpad_to_buttons, bool, S_IRUGO);
  MODULE_PARM_DESC(dpad_to_buttons, "Map D-PAD to buttons rather than axes for unknown pads");
-@@ -123,6 +129,7 @@ static const struct xpad_device {
+@@ -115,6 +121,7 @@ static const struct xpad_device {
  	char *name;
  	u8 mapping;
  	u8 xtype;
@@ -23,7 +27,7 @@ index 3d19dca..6fe1212 100644
  } xpad_device[] = {
  	{ 0x0079, 0x18d4, "GPD Win 2 X-Box Controller", 0, XTYPE_XBOX360 },
  	{ 0x03eb, 0xff01, "Wooting One (Legacy)", 0, XTYPE_XBOX360 },
-@@ -157,6 +163,7 @@ static const struct xpad_device {
+@@ -142,6 +149,7 @@ static const struct xpad_device {
  	{ 0x046d, 0xca8a, "Logitech Precision Vibration Feedback Wheel", 0, XTYPE_XBOX },
  	{ 0x046d, 0xcaa3, "Logitech DriveFx Racing Wheel", 0, XTYPE_XBOX360 },
  	{ 0x056e, 0x2004, "Elecom JC-U3613M", 0, XTYPE_XBOX360 },
@@ -31,7 +35,7 @@ index 3d19dca..6fe1212 100644
  	{ 0x05fd, 0x1007, "Mad Catz Controller (unverified)", 0, XTYPE_XBOX },
  	{ 0x05fd, 0x107a, "InterAct 'PowerPad Pro' X-Box pad (Germany)", 0, XTYPE_XBOX },
  	{ 0x05fe, 0x3030, "Chic Controller", 0, XTYPE_XBOX },
-@@ -226,7 +226,7 @@ static const struct xpad_device {
+@@ -218,7 +226,7 @@ static const struct xpad_device {
  	{ 0x0f0d, 0x000d, "Hori Fighting Stick EX2", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 },
  	{ 0x0f0d, 0x0016, "Hori Real Arcade Pro.EX", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 },
  	{ 0x0f0d, 0x001b, "Hori Real Arcade Pro VX", MAP_TRIGGERS_TO_BUTTONS, XTYPE_XBOX360 },
@@ -40,15 +44,15 @@ index 3d19dca..6fe1212 100644
  	{ 0x0f30, 0x010b, "Philips Recoil", 0, XTYPE_XBOX },
  	{ 0x0f30, 0x0202, "Joytech Advanced Controller", 0, XTYPE_XBOX },
  	{ 0x0f30, 0x8888, "BigBen XBMiniPad Controller", 0, XTYPE_XBOX },
-@@ -660,6 +668,7 @@ struct usb_xpad {
+@@ -471,6 +479,7 @@ struct usb_xpad {
+ 	int mapping;			/* map d-pad to buttons or to axes */
  	int xtype;			/* type of xbox device */
- 	int packet_type;		/* type of the extended packet */
  	int pad_nr;			/* the order x360 pads were attached */
 +	int quirks;
  	const char *name;		/* name of the device */
  	struct work_struct work;	/* init/remove device from callback */
  	time64_t mode_btn_down_ts;
-@@ -948,6 +948,98 @@ static int xpad_inquiry_pad_presence(struct usb_xpad *xpad)
+@@ -947,6 +956,98 @@ static int xpad_inquiry_pad_presence(struct usb_xpad *xpad)
  	return retval;
  }
  
@@ -147,11 +151,13 @@ index 3d19dca..6fe1212 100644
  #ifdef CONFIG_JOYSTICK_XPAD_FF
  static int xpad_play_effect(struct input_dev *dev, void *data, struct ff_effect *effect)
  {
-@@ -1928,6 +2035,7 @@ xpad->intf = intf;
+@@ -1470,6 +1571,7 @@ static int xpad_probe(struct usb_interface *intf, const struct usb_device_id *id
  	xpad->mapping = xpad_device[i].mapping;
  	xpad->xtype = xpad_device[i].xtype;
  	xpad->name = xpad_device[i].name;
 +	xpad->quirks = xpad_device[i].quirks;
  	INIT_WORK(&xpad->work, xpad_presence_work);
  
-	if (xpad->xtype == XTYPE_UNKNOWN) {
+ 	if (xpad->xtype == XTYPE_UNKNOWN) {
+-- 
+2.47.1

@@ -1,8 +1,12 @@
+---
+ input/drivers_joypad/udev_joypad.c | 84 ++++++++++++++++++++++++++++--
+ 1 file changed, 79 insertions(+), 5 deletions(-)
+
 diff --git a/input/drivers_joypad/udev_joypad.c b/input/drivers_joypad/udev_joypad.c
-index 229e68a..d26826f 100644
+index ff4b55d..52c0279 100644
 --- a/input/drivers_joypad/udev_joypad.c
 +++ b/input/drivers_joypad/udev_joypad.c
-@@ -582,6 +582,60 @@ static void udev_joypad_poll(void)
+@@ -583,6 +583,60 @@ static void udev_joypad_poll(void)
     }
  }
  
@@ -63,8 +67,8 @@ index 229e68a..d26826f 100644
  static void *udev_joypad_init(void *data)
  {
     unsigned i;
-@@ -617,11 +671,31 @@ static void *udev_joypad_init(void *data)
-    if (!devs)
+@@ -614,11 +668,31 @@ static void *udev_joypad_init(void *data)
+    if (!(devs = udev_enumerate_get_list_entry(enumerate)))
        RARCH_DBG("[udev]: Couldn't open any joypads. Are permissions set correctly for /dev/input/event* and /run/udev/?\n");
  
 -   udev_list_entry_foreach(item, devs)
@@ -100,3 +104,5 @@ index 229e68a..d26826f 100644
  #if defined(DEBUG)
        struct udev_list_entry *list_entry = NULL;
        RARCH_DBG("udev_joypad_init entry name=%s devnode=%s\n", name, devnode);
+-- 
+2.47.1
