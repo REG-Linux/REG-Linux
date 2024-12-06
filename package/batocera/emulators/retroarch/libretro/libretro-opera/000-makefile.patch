@@ -1,0 +1,24 @@
+diff --git a/Makefile b/Makefile
+index f2900d6..569b884 100644
+--- a/Makefile
++++ b/Makefile
+@@ -58,9 +58,6 @@ ifneq (,$(findstring unix,$(platform)))
+         SHARED := -shared -lpthread -lm -z defs
+     else
+         SHARED := -lpthread -lm -shared -Wl,--no-undefined -Wl,--version-script=link.T
+-        ifneq ($(findstring Linux,$(shell uname -s)),)
+-            HAVE_CDROM = 1
+-        endif
+     endif
+ 
+     # Raspberry Pi
+@@ -79,6 +76,9 @@ ifneq (,$(findstring unix,$(platform)))
+ 	# Pi4
+         else ifneq (,$(findstring rpi4,$(platform)))
+             CFLAGS = -mcpu=cortex-a72
++	# Pi5
++        else ifneq (,$(findstring rpi5,$(platform)))
++            CFLAGS = -mcpu=cortex-a76
+         endif
+ 	
+     # ODROIDN2

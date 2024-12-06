@@ -10,13 +10,13 @@ Subject: [PATCH] Tentative fix for NVIDIA 470.141.03 driver for Linux 6.0-rc1
  3 files changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/nvidia-drm/nvidia-drm-helper.c b/kernel/nvidia-drm/nvidia-drm-helper.c
-index 3831180..fa03d51 100644
+index 8b89afe..0e3c1e5 100644
 --- a/kernel/nvidia-drm/nvidia-drm-helper.c
 +++ b/kernel/nvidia-drm/nvidia-drm-helper.c
-@@ -41,6 +41,11 @@
- #include <drm/drm_atomic_uapi.h>
+@@ -52,6 +52,11 @@
+ #include <drm/drm_framebuffer.h>
  #endif
-
+ 
 +// Add header which is no longer indirectly referenced as of Linux 6.0-rc1
 +#if defined(NV_DRM_DRM_FRAMEBUFFER_H_PRESENT)
 +#include <drm/drm_framebuffer.h>
@@ -26,13 +26,13 @@ index 3831180..fa03d51 100644
  {
  #if defined(NV_DRM_FRAMEBUFFER_GET_PRESENT)
 diff --git a/kernel/nvidia/nv-acpi.c b/kernel/nvidia/nv-acpi.c
-index 2b7b988..76c36fa 100644
+index da9fbc9..3897100 100644
 --- a/kernel/nvidia/nv-acpi.c
 +++ b/kernel/nvidia/nv-acpi.c
-@@ -16,7 +16,10 @@
-
- #include <linux/acpi.h>
-
+@@ -15,7 +15,10 @@
+ #include "nv-linux.h"
+ #include "nv-reg.h"
+ 
 -#if defined(NV_LINUX_ACPI_EVENTS_SUPPORTED)
 +#include <linux/version.h>
 +// Rel.commit "ACPI: bus: Drop unused list heads from struct acpi_device" (Rafael J. Wysocki, 4 Jun 2022)
@@ -41,7 +41,3 @@ index 2b7b988..76c36fa 100644
  static NV_STATUS   nv_acpi_extract_integer (const union acpi_object *, void *, NvU32, NvU32 *);
  static NV_STATUS   nv_acpi_extract_buffer  (const union acpi_object *, void *, NvU32, NvU32 *);
  static NV_STATUS   nv_acpi_extract_package (const union acpi_object *, void *, NvU32, NvU32 *);
---
-2.37.1
-
-

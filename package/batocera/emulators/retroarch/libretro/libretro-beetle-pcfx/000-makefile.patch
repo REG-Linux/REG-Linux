@@ -1,0 +1,91 @@
+---
+ Makefile | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 88f1f0f..47b6932 100644
+--- a/Makefile
++++ b/Makefile
+@@ -142,6 +142,18 @@ else ifneq (,$(findstring SM1,$(platform)))
+    FLAGS += -mcpu=cortex-a55
+    ASFLAGS += -mcpu=cortex-a55
+ 
++# RK3588
++else ifneq (,$(findstring RK3588,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++   FLAGS += -mcpu=cortex-a76.cortex-a55
++   ASFLAGS += -mcpu=cortex-a76.cortex-a55
++
+ # Raspberry Pi 4 64-bit
+ else ifneq (,$(findstring rpi4,$(platform)))
+    TARGET := $(TARGET_NAME)_libretro.so
+@@ -154,6 +166,60 @@ else ifneq (,$(findstring rpi4,$(platform)))
+    FLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
+    ASFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
+ 
++# Raspberry Pi 5 64-bit
++else ifneq (,$(findstring rpi5,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++   FLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
++   ASFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
++
++else ifneq (,$(findstring odin,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++   FLAGS += -mcpu=cortex-a75
++   ASFLAGS += -mcpu=cortex-a75
++
++else ifneq (,$(findstring riscv64,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++
++else ifneq (,$(findstring sm8250,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++   FLAGS += -mcpu=cortex-a76
++   ASFLAGS += -mcpu=cortex-a76
++
++else ifneq (,$(findstring saphira,$(platform)))
++   TARGET := $(TARGET_NAME)_libretro.so
++   fpic := -fPIC
++   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++   CC ?= gcc
++   LDFLAGS += $(PTHREAD_FLAGS)
++   FLAGS += $(PTHREAD_FLAGS)
++   IS_X86 = 0
++   FLAGS += -mcpu=cortex-a78
++   ASFLAGS += -mcpu=cortex-a78
++
+ # iOS
+ else ifneq (,$(findstring ios,$(platform)))
+ 
+-- 
+2.47.1
+

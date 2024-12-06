@@ -1,5 +1,11 @@
+---
+ src/config/LaunchSettings.cpp | 5 +++++
+ src/config/LaunchSettings.h   | 4 ++++
+ src/gui/MainWindow.cpp        | 6 ++++--
+ 3 files changed, 13 insertions(+), 2 deletions(-)
+
 diff --git a/src/config/LaunchSettings.cpp b/src/config/LaunchSettings.cpp
-index 4447f9b..a567953 100644
+index 32a069c..5ecd279 100644
 --- a/src/config/LaunchSettings.cpp
 +++ b/src/config/LaunchSettings.cpp
 @@ -70,6 +70,8 @@ bool LaunchSettings::HandleCommandline(const std::vector<std::wstring>& args)
@@ -11,9 +17,9 @@ index 4447f9b..a567953 100644
  
  	po::options_description hidden{ "Hidden options" };
  	hidden.add_options()
-@@ -163,6 +165,9 @@ bool LaunchSettings::HandleCommandline(const std::vector<std::wstring>& args)
- 		if(vm.count("force-interpreter"))
- 			s_force_interpreter = vm["force-interpreter"].as<bool>();
+@@ -177,6 +179,9 @@ bool LaunchSettings::HandleCommandline(const std::vector<std::wstring>& args)
+ 		if (vm.count("enable-gdbstub"))
+ 			s_enable_gdbstub = vm["enable-gdbstub"].as<bool>();
  
 +		if(vm.count("force-no-menubar"))
 +			s_force_no_menubar = vm["force-no-menubar"].as<bool>();
@@ -22,10 +28,10 @@ index 4447f9b..a567953 100644
  		std::string output_path;
  		if (vm.count("extract"))
 diff --git a/src/config/LaunchSettings.h b/src/config/LaunchSettings.h
-index b42523c..5f7e4d8 100644
+index b0f673a..bbae98a 100644
 --- a/src/config/LaunchSettings.h
 +++ b/src/config/LaunchSettings.h
-@@ -26,6 +26,8 @@ public:
+@@ -27,6 +27,8 @@ public:
  
  	static bool ForceInterpreter() { return s_force_interpreter; };
  
@@ -33,9 +39,9 @@ index b42523c..5f7e4d8 100644
 +
  	static std::optional<uint32> GetPersistentId() { return s_persistent_id; }
  
- 	static std::string GetActURLPrefix() { return serviceURL_ACT; }
-@@ -43,6 +45,8 @@ private:
- 	inline static bool s_force_intel_legacy = false;
+ private:
+@@ -41,6 +43,8 @@ private:
+ 	inline static bool s_nsight_mode = false;
  
  	inline static bool s_force_interpreter = false;
 +
@@ -44,10 +50,10 @@ index b42523c..5f7e4d8 100644
  	inline static std::optional<uint32> s_persistent_id{};
  
 diff --git a/src/gui/MainWindow.cpp b/src/gui/MainWindow.cpp
-index 3291f3b..97d7243 100644
+index 69ff4e9..03ac03d 100644
 --- a/src/gui/MainWindow.cpp
 +++ b/src/gui/MainWindow.cpp
-@@ -1664,7 +1664,8 @@ void MainWindow::SetMenuVisible(bool state)
+@@ -1722,7 +1722,8 @@ void MainWindow::SetMenuVisible(bool state)
  	if (m_menu_visible == state)
  		return;
  
@@ -57,7 +63,7 @@ index 3291f3b..97d7243 100644
  	m_menu_visible = state;
  }
  
-@@ -2226,7 +2227,8 @@ void MainWindow::RecreateMenu()
+@@ -2282,7 +2283,8 @@ void MainWindow::RecreateMenu()
  
  	m_menuBar->Append(helpMenu, _("&Help"));
  
@@ -67,3 +73,5 @@ index 3291f3b..97d7243 100644
  	m_menu_visible = true;
  
  	if (m_game_launched)
+-- 
+2.47.1

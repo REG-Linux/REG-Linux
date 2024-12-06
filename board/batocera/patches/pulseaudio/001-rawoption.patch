@@ -1,9 +1,13 @@
+---
+ src/utils/pactl.c | 36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
+
 diff --git a/src/utils/pactl.c b/src/utils/pactl.c
-index 9af1fc5..9db1d6a 100644
+index d3736bc..e815374 100644
 --- a/src/utils/pactl.c
 +++ b/src/utils/pactl.c
-@@ -382,6 +382,38 @@ static void get_sink_info_callback(pa_context *c, const pa_sink_info *i, int is_
-     }
+@@ -727,6 +727,38 @@ static void get_sink_info_callback(pa_context *c, const pa_sink_info *i, int is_
+     pa_xfree(pl);
  }
  
 +static void get_sink_raw_info_callback(pa_context *c, const pa_sink_info *i, int is_last, void *userdata) {
@@ -41,7 +45,7 @@ index 9af1fc5..9db1d6a 100644
  static void get_source_info_callback(pa_context *c, const pa_source_info *i, int is_last, void *userdata) {
  
      static const char *state_table[] = {
-@@ -1279,6 +1311,8 @@ static void context_state_callback(pa_context *c, void *userdata) {
+@@ -2274,6 +2306,8 @@ static void context_state_callback(pa_context *c, void *userdata) {
                              o = pa_context_get_module_info_list(c, get_module_info_callback, NULL);
                          else if (pa_streq(list_type, "sinks"))
                              o = pa_context_get_sink_info_list(c, get_sink_info_callback, NULL);
@@ -50,12 +54,14 @@ index 9af1fc5..9db1d6a 100644
                          else if (pa_streq(list_type, "sources"))
                              o = pa_context_get_source_info_list(c, get_source_info_callback, NULL);
                          else if (pa_streq(list_type, "sink-inputs"))
-@@ -1720,7 +1754,7 @@ int main(int argc, char *argv[]) {
+@@ -2781,7 +2815,7 @@ int main(int argc, char *argv[]) {
  
              for (int i = optind+1; i < argc; i++) {
                  if (pa_streq(argv[i], "modules") || pa_streq(argv[i], "clients") ||
 -                    pa_streq(argv[i], "sinks")   || pa_streq(argv[i], "sink-inputs") ||
 +                    pa_streq(argv[i], "sinks")   || pa_streq(argv[i], "sink-inputs") || pa_streq(argv[i], "sinks-raw") ||
                      pa_streq(argv[i], "sources") || pa_streq(argv[i], "source-outputs") ||
-                     pa_streq(argv[i], "samples") || pa_streq(argv[i], "cards")) {
-                     list_type = pa_xstrdup(argv[i]);
+                     pa_streq(argv[i], "samples") || pa_streq(argv[i], "cards") ||
+                     pa_streq(argv[i], "message-handlers")) {
+-- 
+2.47.1

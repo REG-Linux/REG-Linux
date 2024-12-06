@@ -1,8 +1,8 @@
 diff --git a/kernel/common/inc/nv-linux.h b/kernel/common/inc/nv-linux.h
-index 2c4cb7b..f68fcf2 100644
+index 2bb311c..8d27eb6 100644
 --- a/kernel/common/inc/nv-linux.h
 +++ b/kernel/common/inc/nv-linux.h
-@@ -1996,4 +1996,17 @@ static inline NvU64 nv_expand_nvlink_addr(NvU64 addr47)
+@@ -1992,4 +1992,17 @@ static inline NvU64 nv_expand_nvlink_addr(NvU64 addr47)
  #include <linux/backlight.h>
  #endif
  
@@ -87,4 +87,3 @@ index 0b0a6f2..da891ff 100644
      }
  
      vma->vm_ops = &nv_vm_ops;
-

@@ -1,22 +1,28 @@
+---
+ src/joystick/SDL_joystick.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
 diff --git a/src/joystick/SDL_joystick.c b/src/joystick/SDL_joystick.c
-index ba4f819..2a18c94 100644
+index 0d7fa7a..4fafcd2 100644
 --- a/src/joystick/SDL_joystick.c
 +++ b/src/joystick/SDL_joystick.c
-@@ -1609,7 +1609,7 @@ SDL_JoystickUpdate(void)
-             if (joystick->delayed_guide_button) {
-                 SDL_GameControllerHandleDelayedGuideButton(joystick);
+@@ -1494,7 +1494,7 @@ int SDL_JoystickRumble(SDL_Joystick *joystick, Uint16 low_frequency_rumble, Uint
+             } else {
+                 joystick->rumble_resend = 0;
              }
 -        }
 +
  
-         if (joystick->rumble_expiration) {
-             SDL_LockJoysticks();
-@@ -1630,6 +1630,8 @@ SDL_JoystickUpdate(void)
+         if (retval == 0) {
+             joystick->low_frequency_rumble = low_frequency_rumble;
+@@ -1510,6 +1510,8 @@ int SDL_JoystickRumble(SDL_Joystick *joystick, Uint16 low_frequency_rumble, Uint
+                 joystick->rumble_resend = 0;
              }
-             SDL_UnlockJoysticks();
          }
 +
 +	}
      }
+     SDL_UnlockJoysticks();
  
-     SDL_LockJoysticks();
+-- 
+2.47.1

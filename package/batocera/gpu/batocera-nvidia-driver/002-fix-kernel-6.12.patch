@@ -10,13 +10,13 @@ Subject: [PATCH 5/5] 6.12: drm_outpull_pill changed check
  3 files changed, 28 insertions(+)
 
 diff --git a/kernel/conftest.sh b/kernel/conftest.sh
-index 4a239e63..4d6fff64 100755
+index 1226cea..bcb54e0 100755
 --- a/kernel/conftest.sh
 +++ b/kernel/conftest.sh
-@@ -1302,6 +1302,29 @@
-             compile_check_conftest "$CODE" "NV_DRM_DEV_UNREF_PRESENT" "" "functions"
+@@ -6610,6 +6610,29 @@ compile_test() {
+             compile_check_conftest "$CODE" "NV_DRM_FBDEV_GENERIC_SETUP_PRESENT" "" "functions"
          ;;
-
+ 
 +        drm_output_poll_changed)
 +            #
 +            # Determine whether drm_mode_config_funcs.output_poll_changed
@@ -40,14 +40,14 @@ index 4a239e63..4d6fff64 100755
 +            compile_check_conftest "$CODE" "NV_DRM_OUTPUT_POLL_CHANGED_PRESENT" "" "types"
 +         ;;
 +
-         pde_data)
+         drm_aperture_remove_conflicting_pci_framebuffers)
              #
-             # Determine if the pde_data() function is present.
+             # Determine whether drm_aperture_remove_conflicting_pci_framebuffers is present.
 diff --git a/kernel/nvidia-drm/nvidia-drm-drv.c b/kernel/nvidia-drm/nvidia-drm-drv.c
-index 50028c26..034dda66 100644
+index 359ff0c..b128e59 100644
 --- a/kernel/nvidia-drm/nvidia-drm-drv.c
 +++ b/kernel/nvidia-drm/nvidia-drm-drv.c
-@@ -126,6 +126,7 @@ static const char* nv_get_input_colorspace_name(
+@@ -124,6 +124,7 @@ static const char* nv_get_input_colorspace_name(
  
  #if defined(NV_DRM_ATOMIC_MODESET_AVAILABLE)
  
@@ -55,7 +55,7 @@ index 50028c26..034dda66 100644
  static void nv_drm_output_poll_changed(struct drm_device *dev)
  {
      struct drm_connector *connector = NULL;
-@@ -169,6 +170,7 @@ static void nv_drm_output_poll_changed(struct drm_device *dev)
+@@ -167,6 +168,7 @@ static void nv_drm_output_poll_changed(struct drm_device *dev)
      nv_drm_connector_list_iter_end(&conn_iter);
  #endif
  }
@@ -63,7 +63,7 @@ index 50028c26..034dda66 100644
  
  static struct drm_framebuffer *nv_drm_framebuffer_create(
      struct drm_device *dev,
-@@ -206,7 +208,9 @@ static const struct drm_mode_config_funcs nv_mode_config_funcs = {
+@@ -204,7 +206,9 @@ static const struct drm_mode_config_funcs nv_mode_config_funcs = {
      .atomic_check  = nv_drm_atomic_check,
      .atomic_commit = nv_drm_atomic_commit,
  
@@ -73,14 +73,12 @@ index 50028c26..034dda66 100644
  };
  
  static void nv_drm_event_callback(const struct NvKmsKapiEvent *event)
-diff --git a/kernel/nvidia-drm/nvidia-drm.Kbuild b/kernel/nvidia-drm/nvidia-drm.Kbuild
-index 247096b7..f5964a57 100644
---- a/kernel/nvidia-drm/nvidia-drm.Kbuild
-+++ b/kernel/nvidia-drm/nvidia-drm.Kbuild
-@@ -131,3 +131,4 @@ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_aperture_remove_conflicting_pci_framebuffe
+diff --git a/kernel/nvidia-drm/nvidia-drm-sources.mk b/kernel/nvidia-drm/nvidia-drm-sources.mk
+index 7ef0c5b..c9fbcfb 100644
+--- a/kernel/nvidia-drm/nvidia-drm-sources.mk
++++ b/kernel/nvidia-drm/nvidia-drm-sources.mk
+@@ -130,3 +130,4 @@ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_aperture_remove_conflicting_pci_framebuffe
  NV_CONFTEST_TYPE_COMPILE_TESTS += drm_mode_create_dp_colorspace_property_has_supported_colorspaces_arg
  NV_CONFTEST_TYPE_COMPILE_TESTS += drm_syncobj_features_present
  NV_CONFTEST_TYPE_COMPILE_TESTS += drm_unlocked_ioctl_flag_present
 +NV_CONFTEST_TYPE_COMPILE_TESTS += drm_output_poll_changed
--- 
-2.46.2
