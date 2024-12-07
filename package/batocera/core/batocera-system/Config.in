@@ -208,7 +208,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_WIRELESS_TOOLS_LIB		# wireless tools
 	select BR2_PACKAGE_DROPBEAR			# ssh server
 	select BR2_PACKAGE_PM_UTILS			# suspend
-	select BR2_PACKAGE_EVSIEVE			# linux tool to manipulate events (like joining them) ; armv8 in 32 bits seems not supported
+	select BR2_PACKAGE_EVSIEVE			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770 # linux tool to manipulate events (like joining them) ; armv8 in 32 bits seems not supported
 	select BR2_PACKAGE_UTIL_LINUX_LIBMOUNT		# for util-linux compilation to work (so, may be removed in the future)
 	select BR2_PACKAGE_FBDUMP			# tool to capture snapshots from the Linux kernel framebuffer device and write them out as a PPM file
 	select BR2_PACKAGE_FBGRAB			# framebuffer screenshot program, capturing the linux frambuffer and converting it to a png-picture
