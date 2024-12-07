@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Version: TODO
-CITRON_VERSION = nightly-20241118_094118
+CITRON_VERSION = nightly-20241207_084449
 CITRON_SITE = https://git.citron-emu.org/Citron/Citron
 CITRON_SITE_METHOD=git
 CITRON_GIT_SUBMODULES=YES
