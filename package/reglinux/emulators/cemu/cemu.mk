@@ -4,14 +4,14 @@
 #
 ################################################################################
 
-CEMU_VERSION = v2.4
+CEMU_VERSION = v2.5
 CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
 CEMU_GIT_SUBMODULES=YES
 CEMU_DEPENDENCIES = sdl2 host-pugixml pugixml rapidjson boost libpng \
                     libzip host-glslang glslang zlib zstd wxwidgets fmt glm upower \
-                    host-nasm host-zstd host-libusb libusb
+                    host-nasm host-zstd host-libusb libusb hidapi
 
 CEMU_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -20,11 +20,13 @@ CEMU_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 CEMU_CONF_OPTS += -DENABLE_DISCORD_RPC=OFF
 CEMU_CONF_OPTS += -DENABLE_VCPKG=OFF
 CEMU_CONF_OPTS += -DCMAKE_CXX_FLAGS="$(TARGET_CXXFLAGS) -I$(STAGING_DIR)/usr/include/glslang"
+
+# TODO support gamemode
 CEMU_CONF_OPTS += -DENABLE_FERAL_GAMEMODE=OFF
 
+# TODO check if we really need to enforce disabling hidapi
 #ifeq ($(BR2_PACKAGE_HIDAPI),y)
 #    CEMU_CONF_OPTS += -DENABLE_HIDAPI=ON
-#    CEMU_DEPENDENCIES += hidapi
 #else
     CEMU_CONF_OPTS += -DENABLE_HIDAPI=OFF
 #endif

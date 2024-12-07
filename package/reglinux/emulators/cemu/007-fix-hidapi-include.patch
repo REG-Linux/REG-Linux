@@ -1,0 +1,11 @@
+--- a/src/input/api/Wiimote/hidapi/HidapiWiimote.h	2024-12-07 22:18:39.009306414 +0100
++++ b/src/input/api/Wiimote/hidapi/HidapiWiimote.h	2024-12-07 22:18:46.508448279 +0100
+@@ -1,7 +1,7 @@
+ #pragma once
+ 
+ #include <api/Wiimote/WiimoteDevice.h>
+-#include <hidapi.h>
++#include <hidapi/hidapi.h>
+ 
+ class HidapiWiimote : public WiimoteDevice {
+ public:
