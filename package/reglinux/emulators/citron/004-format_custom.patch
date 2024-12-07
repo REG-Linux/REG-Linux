@@ -1,0 +1,12 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index c382ed5d..4324c36a 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -111,6 +111,7 @@ if (MSVC)
+ else()
+     add_compile_options(
+         -fwrapv
++        -fpermissive
+ 
+         -Werror=all
+         -Werror=extra
