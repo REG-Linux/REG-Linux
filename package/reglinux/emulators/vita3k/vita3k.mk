@@ -44,7 +44,7 @@ endef
 
 define VITA3K_INSTALL_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_BATOCERA_PATH)/package/reglinux/emulators/vita3k/psvita.vita3k.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/vita3k/psvita.vita3k.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
