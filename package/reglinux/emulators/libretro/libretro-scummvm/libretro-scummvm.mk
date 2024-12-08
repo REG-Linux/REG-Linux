@@ -3,8 +3,8 @@
 # libretro-scummvm
 #
 ################################################################################
-# Version: 2.8.1 - "Oh MMy!"
-LIBRETRO_SCUMMVM_VERSION = v2.8.1
+# Version: 2.9.0 - Not yet released
+LIBRETRO_SCUMMVM_VERSION = v2.9.0
 LIBRETRO_SCUMMVM_SITE = $(call github,scummvm,scummvm,$(LIBRETRO_SCUMMVM_VERSION))
 LIBRETRO_SCUMMVM_LICENSE = GPLv2
 
@@ -38,8 +38,8 @@ endef
 
 # Details from backends/platform/libretro/dependencies.mk
 define LIBRETRO_SCUMMVM_DEPS
-	$(call LIBRETRO_CLONE_AND_INIT,libretro-deps,c8638d7d317c397c19aa4551038bf648a467ffe6)
-	$(call LIBRETRO_CLONE_AND_INIT,libretro-common,86d5e4128c072255c123d535cae97789023ee54b)
+	$(call LIBRETRO_CLONE_AND_INIT,libretro-deps,abf5246b016569759e7d1b0ea91bb98c2e34d160)
+	$(call LIBRETRO_CLONE_AND_INIT,libretro-common,70ed90c42ddea828f53dd1b984c6443ddb39dbd6)
 endef
 
 define LIBRETRO_SCUMMVM_BUILD_CMDS
