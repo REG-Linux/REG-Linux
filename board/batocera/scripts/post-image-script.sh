@@ -46,6 +46,11 @@ SUFFIXDATE=$(date +%Y%m%d)
 VFATUUID="$(date '+%d%m')-$(date '+%M%S')"
 
 #### build the images ###########
+TARGET_BOARD_PARENT_PATH="board/batocera"
+if [ "${BATOCERA_LOWER_TARGET}" = "jz4770" ]
+then
+    TARGET_BOARD_PARENT_PATH="board/reglinux"
+fi
 for BATOCERA_PATHSUBTARGET in ${BATOCERA_IMAGES_TARGETS}
 do
     BATOCERA_SUBTARGET=$(basename "${BATOCERA_PATHSUBTARGET}")
@@ -53,8 +58,8 @@ do
     #### prepare the boot dir ######
     BOOTNAMEDDIR="${REGLINUX_BINARIES_DIR}/boot_${BATOCERA_SUBTARGET}"
     rm -rf "${BOOTNAMEDDIR}" || exit 1 # remove in case or rerun
-    BATOCERA_POST_IMAGE_SCRIPT="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/${BATOCERA_PATHSUBTARGET}/create-boot-script.sh"
-    bash "${BATOCERA_POST_IMAGE_SCRIPT}" "${HOST_DIR}" "${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/${BATOCERA_PATHSUBTARGET}" "${BUILD_DIR}" "${BINARIES_DIR}" "${TARGET_DIR}" "${REGLINUX_BINARIES_DIR}" || exit 1
+    BATOCERA_POST_IMAGE_SCRIPT="${BR2_EXTERNAL_REGLINUX_PATH}/${TARGET_BOARD_PARENT_PATH}/${BATOCERA_PATHSUBTARGET}/create-boot-script.sh"
+    bash "${BATOCERA_POST_IMAGE_SCRIPT}" "${HOST_DIR}" "${BR2_EXTERNAL_REGLINUX_PATH}/${TARGET_BOARD_PARENT_PATH}/${BATOCERA_PATHSUBTARGET}" "${BUILD_DIR}" "${BINARIES_DIR}" "${TARGET_DIR}" "${REGLINUX_BINARIES_DIR}" || exit 1
     # add some common files
     #nope cp -pr "${BINARIES_DIR}/tools"              "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
     cp     "${BINARIES_DIR}/system-boot.conf" "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
@@ -73,7 +78,7 @@ do
     fi
     echo "creating images/${BATOCERA_SUBTARGET}/"$(basename "${BATOCERAIMG}")"..." >&2
     rm -rf "${GENIMAGE_TMP}" || exit 1
-    GENIMAGEDIR="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/${BATOCERA_PATHSUBTARGET}"
+    GENIMAGEDIR="${BR2_EXTERNAL_REGLINUX_PATH}/${TARGET_BOARD_PARENT_PATH}/${BATOCERA_PATHSUBTARGET}"
     GENIMAGEFILE="${GENIMAGEDIR}/genimage.cfg"
     FILES=$(find "${REGLINUX_BINARIES_DIR}/boot" -type f | sed -e s+"^${REGLINUX_BINARIES_DIR}/boot/\(.*\)$"+"file \1 \{ image = '\1' }"+ | tr '\n' '@')
     cat "${GENIMAGEFILE}" | sed -e s+'@files'+"${FILES}"+ | tr '@' '\n' > "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
