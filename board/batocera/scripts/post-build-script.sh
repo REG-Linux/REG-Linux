@@ -8,10 +8,10 @@
 # TARGET_DIR = target dir
 
 # Package modules
-source "${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/scripts/package-kernel-modules.sh"
+source "${BR2_EXTERNAL_REGLINUX_PATH}/board/reglinux/scripts/package-kernel-modules.sh"
 
 # Package firmware
-source "${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/scripts/package-firmware.sh"
+source "${BR2_EXTERNAL_REGLINUX_PATH}/board/reglinux/scripts/package-firmware.sh"
 
 BATOCERA_TARGET=$(grep -E "^BR2_PACKAGE_BATOCERA_TARGET_[A-Z_0-9]*=y$" "${BR2_CONFIG}" | sed -e s+'^BR2_PACKAGE_BATOCERA_TARGET_\([A-Z_0-9]*\)=y$'+'\1'+)
 
