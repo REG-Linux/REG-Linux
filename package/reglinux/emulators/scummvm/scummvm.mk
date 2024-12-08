@@ -3,8 +3,8 @@
 # scummvm
 #
 ################################################################################
-# Version: 2.8.1 - "Oh MMy!"
-SCUMMVM_VERSION = v2.8.1
+# Version: 2.9.0 - Not yet released
+SCUMMVM_VERSION = v2.9.0
 SCUMMVM_SITE = $(call github,scummvm,scummvm,$(SCUMMVM_VERSION))
 SCUMMVM_LICENSE = GPLv2
 SCUMMVM_DEPENDENCIES += sdl2 zlib libpng freetype libjpeg-bato
@@ -36,6 +36,10 @@ SCUMMVM_CONF_OPTS += --opengl-mode=auto \
 
 # ScummVM Engines options
 SCUMMVM_CONF_OPTS += --enable-all-engines --disable-all-unstable-engines
+
+# TODO AGS engine fails on AArch32 / GCC 12.4 because of NEON inlining
+SCUMMVM_CONF_OPTS += --disable-engine=ags
+
 # Build plugins + everything as dynamic
 ifneq ($(BR2_x86_64),y)
 SCUMMVM_CONF_OPTS += --enable-plugins --default-dynamic
@@ -109,7 +113,7 @@ define SCUMMVM_ADD_VIRTUAL_KEYBOARD
     cp -f $(@D)/backends/vkeybd/packs/vkeybd_small.zip \
         $(TARGET_DIR)/usr/share/scummvm
     mkdir -p $(TARGET_DIR)/usr/share/evmapy/
-    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/scummvm/scummvm.keys \
+    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/scummvm/scummvm.keys \
         $(TARGET_DIR)/usr/share/evmapy/
 endef
 
