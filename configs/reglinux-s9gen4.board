@@ -13,7 +13,7 @@ BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/s9gen4/fsoverlay"
 
 # Linux headers same as kernel, a 5.4 series
-BR2_KERNEL_HEADERS_AS_KERNEL=y
+BR2_KERNEL_HEADERS_5_4=y
 BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4=y
 
 # Kernel
