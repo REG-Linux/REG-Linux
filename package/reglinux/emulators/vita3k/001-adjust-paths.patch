@@ -39,12 +39,12 @@ index 667f7f75..acec3244 100644
  
          if (XDG_DATA_DIRS != NULL) {
              auto env_paths = string_utils::split_string(XDG_DATA_DIRS, ':');
-@@ -217,7 +217,7 @@ void init_paths(Root &root_paths) {
-                 }
-             }
-         } else if (XDG_DATA_HOME != NULL) {
+@@ -209,7 +209,7 @@
+             root_paths.set_shared_path(fs::path("/userdata/saves/psvita/"));
+
+         if (XDG_DATA_HOME != NULL) {
 -            root_paths.set_shared_path(fs::path(XDG_DATA_HOME) / app_name / "");
 +            root_paths.set_shared_path(fs::path(XDG_DATA_HOME) / "psvita" / "");
          }
- #endif
-     }
+
+         // patch path should be in shared path
