@@ -4,8 +4,8 @@
 # ./scripts/linux/prebuild-scummvms.sh
 
 # Grab ScummVM version from source tree
-SCUMMVM_VERSION=$(cat package/batocera/emulators/scummvm/scummvm.mk | grep SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
-LRSCUMMVM_VERSION=$(cat package/batocera/emulators/retroarch/libretro/libretro-scummvm/libretro-scummvm.mk | grep LIBRETRO_SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
+SCUMMVM_VERSION=$(cat package/reglinux/emulators/scummvm/scummvm.mk | grep SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
+LRSCUMMVM_VERSION=$(cat package/reglinux/emulators/libretro/libretro-scummvm/libretro-scummvm.mk | grep LIBRETRO_SCUMMVM_VERSION | cut -d "=" -f 2 | head -n1 | tr -d '[:space:]')
 
 # Check both version matches, or abort
 if [ "$SCUMMVM_VERSION" != "$LRSCUMMVM_VERSION" ]
@@ -20,7 +20,7 @@ echo "Building ScummVM/lr-scummvmm combo version ($SCUMMVM_VERSION) for all arch
 mkdir -p prebuilt
 
 # Enable the flag to build ScummVM from source
-sed -i s/#BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/ configs/batocera-board.common
+sed -i s/#BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/ configs/reglinux-board.common
 
 # Loop over archs
 # bcm2836 can be used for h3/cha and rk3128 (cortex_a7)
@@ -28,6 +28,7 @@ sed -i s/#BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/BR2_PACKAGE_SCUMMVM_BUILD_FROM
 # h5 can be used for h6, h616, s905, s905gen2, rk3328 (cortex_a53)
 # s905gen3 can be used for rk3566/rk3568 (cortex_a55)
 # s922x can be used for a3gen2 (cortex_a73_a53)
+# rk3588 can be used for sm8250 (cortex_a76_a55)
 for arch in jz4770 bcm2835 bcm2836 s812 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x saphira jh7110 k1 x86_64 x86_64_v3; do
 	# Clean
 	make ${arch}-clean
@@ -43,5 +44,5 @@ for arch in jz4770 bcm2835 bcm2836 s812 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk33
 done
 
 # Disable the flag to build ScummVM from source
-sed -i s/BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/#BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/ configs/batocera-board.common
+sed -i s/BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/#BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y/ configs/reglinux-board.common
 
