@@ -3,8 +3,8 @@
 # rpcs3
 #
 ################################################################################
-# Version: 0.0.34 - Commits on Nov 6, 2024
-RPCS3_VERSION = 2262ac1684cc9f770b5212f23648ca1b1b1737b3
+# Version: 0.0.34 - Commits on Dec 7, 2024
+RPCS3_VERSION = 68b7e5971d8e279d7d385b96b5aa2feebd220506
 RPCS3_SITE = https://github.com/RPCS3/rpcs3.git
 RPCS3_SITE_METHOD=git
 RPCS3_GIT_SUBMODULES=YES
@@ -51,7 +51,7 @@ endef
 define RPCS3_INSTALL_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	$(INSTALL) -D -m 0644 \
-	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/rpcs3/evmapy.keys \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/rpcs3/evmapy.keys \
 	    $(TARGET_DIR)/usr/share/evmapy/ps3.keys
 endef
 

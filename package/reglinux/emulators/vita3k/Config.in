@@ -1,11 +1,14 @@
 config BR2_PACKAGE_VITA3K
     bool "vita3k"
-    depends on BR2_PACKAGE_SDL2
-    depends on BR2_PACKAGE_SDL2_IMAGE
-    depends on BR2_PACKAGE_SDL2_TTF
-    depends on BR2_PACKAGE_ZLIB
-    depends on BR2_PACKAGE_LIBOGG
-    depends on BR2_PACKAGE_LIBVORBIS	 
+    select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_SDL2_IMAGE
+    select BR2_PACKAGE_SDL2_TTF
+    select BR2_PACKAGE_LIBOGG
+    select BR2_PACKAGE_LIBVORBIS
+    select BR2_PACKAGE_ZLIB
+    select BR2_PACKAGE_BOOST
+    select BR2_PACKAGE_BOOST_FILESYSTEM
+    select BR2_PACKAGE_BOOST_SYSTEM
     select BR2_PACKAGE_PYTHON_RUAMEL_YAML 
     help
       Experimental PlayStation Vita emulator
