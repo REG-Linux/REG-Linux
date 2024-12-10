@@ -3,8 +3,8 @@
 # scummvm
 #
 ################################################################################
-# Version: 2.8.1 - "Oh MMy!"
-REGLINUX_SCUMMVM_VERSION = v2.8.1
+# Version: 2.9.0 - Unreleased yet
+REGLINUX_SCUMMVM_VERSION = v2.9.0
 REGLINUX_SCUMMVM_SITE = $(call github,REG-Linux,REG-ScummVM,$(REGLINUX_SCUMMVM_VERSION))
 REGLINUX_SCUMMVM_LICENSE = GPLv2
 
@@ -59,10 +59,10 @@ else ifeq ($(BR2_saphira),y)
 REGLINUX_SCUMMVM_ARCH = saphira
 # RISC-V 64 (rv64gc, aka imafd)
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_JH7110),y)
-REGLINUX_SCUMMVM_ARCH = visionfive2
+REGLINUX_SCUMMVM_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_K1),y)
-REGLINUX_SCUMMVM_ARCH = bpif3
+REGLINUX_SCUMMVM_ARCH = k1
 # X86-64-v3 subarchitecture
 else ifeq ($(BR2_x86_x86_64_v3),y)
 REGLINUX_SCUMMVM_ARCH = x86_64_v3
