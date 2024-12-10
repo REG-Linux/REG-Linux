@@ -2,7 +2,7 @@ Index: linux-6.1/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
 ===================================================================
 --- linux-6.1.orig/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
 +++ linux-6.1/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
-@@ -5443,6 +5443,8 @@ static void fill_stream_properties_from_
+@@ -5473,6 +5473,8 @@ static void fill_stream_properties_from_
  			timing_out->flags.HSYNC_POSITIVE_POLARITY = 1;
  		if (mode_in->flags & DRM_MODE_FLAG_PVSYNC)
  			timing_out->flags.VSYNC_POSITIVE_POLARITY = 1;
@@ -11,7 +11,7 @@ Index: linux-6.1/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
  	}
  
  	if (stream->signal == SIGNAL_TYPE_HDMI_TYPE_A) {
-@@ -6017,7 +6019,7 @@ create_stream_for_sink(struct amdgpu_dm_
+@@ -6050,7 +6052,7 @@ create_stream_for_sink(struct amdgpu_dm_
  
  	if (recalculate_timing)
  		drm_mode_set_crtcinfo(&saved_mode, 0);
@@ -20,7 +20,7 @@ Index: linux-6.1/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
  		drm_mode_set_crtcinfo(&mode, 0);
  
  	/*
-@@ -6472,8 +6474,7 @@ enum drm_mode_status amdgpu_dm_connector
+@@ -6506,8 +6508,7 @@ enum drm_mode_status amdgpu_dm_connector
  	struct dc_stream_state *stream;
  	struct amdgpu_dm_connector *aconnector = to_amdgpu_dm_connector(connector);
  
@@ -30,7 +30,7 @@ Index: linux-6.1/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
  		return result;
  
  	/*
-@@ -7146,7 +7147,7 @@ void amdgpu_dm_connector_init_helper(str
+@@ -7181,7 +7182,7 @@ void amdgpu_dm_connector_init_helper(str
  
  	aconnector->connector_id = link_index;
  	aconnector->dc_link = link;
@@ -53,6 +53,21 @@ Index: linux-6.1/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
  	pipe_ctx->plane_res.dpp->funcs->dpp_set_scaler(
  			pipe_ctx->plane_res.dpp, &pipe_ctx->plane_res.scl_data);
  }
+@@ -3718,12 +3721,12 @@ int dcn10_get_vupdate_offset_from_vsync(
+ 	struct dc_crtc_timing patched_crtc_timing;
+ 	int vesa_sync_start;
+ 	int asic_blank_end;
+-	int interlace_factor;
++	// int interlace_factor;
+ 
+ 	patched_crtc_timing = *dc_crtc_timing;
+ 	apply_front_porch_workaround(&patched_crtc_timing);
+ 
+-	interlace_factor = patched_crtc_timing.flags.INTERLACE ? 2 : 1;
++	// interlace_factor = patched_crtc_timing.flags.INTERLACE ? 2 : 1;
+ 
+ 	vesa_sync_start = patched_crtc_timing.v_addressable +
+ 			patched_crtc_timing.v_border_bottom +
 @@ -3731,8 +3734,7 @@ int dcn10_get_vupdate_offset_from_vsync(
  
  	asic_blank_end = (patched_crtc_timing.v_total -
