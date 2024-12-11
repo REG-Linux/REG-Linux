@@ -116,15 +116,12 @@ amiga500:
   platform:     amiga
   group:        amiga
   emulators:
-    fsuae:
-      A500:     { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
-      A500+:    { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
-      A600:     { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
-      A1000:    { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
-      A3000:    { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
     amiberry:
       A500:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
       A500+:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
+      A600:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
+      A1000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
+      A3000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
     libretro:
       puae:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE] }
       puae2021: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE2021] }
@@ -145,9 +142,6 @@ amiga1200:
   platform:     amiga
   group:        amiga
   emulators:
-    fsuae:
-      A1200:    { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
-      A4000:    { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
     amiberry:
       A1200:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
       A4000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
@@ -169,8 +163,6 @@ amigacd32:
   hardware: console
   extensions:   [bin, cue, iso, chd]
   emulators:
-    fsuae:
-      CD32:     { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
     amiberry:
       CD32:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY] }
     libretro:
@@ -185,8 +177,6 @@ amigacdtv:
   hardware: console
   extensions:   [bin, cue, iso, chd, m3u]
   emulators:
-    fsuae:
-      CDTV:     { requireAnyOf: [BR2_PACKAGE_FSUAE]         }
     amiberry:
       CDTV:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY] }
     libretro:
