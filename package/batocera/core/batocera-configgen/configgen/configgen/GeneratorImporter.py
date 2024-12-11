@@ -35,10 +35,6 @@ def getGenerator(emulator):
         from generators.vice.viceGenerator import ViceGenerator
         return ViceGenerator()
 
-    if emulator == 'fsuae':
-        from generators.fsuae.fsuaeGenerator import FsuaeGenerator
-        return FsuaeGenerator()
-
     if emulator == 'amiberry':
         from generators.amiberry.amiberryGenerator import AmiberryGenerator
         return AmiberryGenerator()
