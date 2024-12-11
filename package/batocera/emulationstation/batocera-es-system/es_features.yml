@@ -8190,10 +8190,6 @@ fpinball:
         "Disabled (Default)": false
         "Enabled":            true
 
-fsuae:
-  features: [padtokeyboard]
-  shared: [powermode, tdp, videomode, ratio, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
-
 hatari:
   features: [padtokeyboard]
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]

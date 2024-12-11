@@ -30,7 +30,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'flycast'        : '/usr/bin/flycast'
               , 'scummvm'        : '/usr/bin/scummvm'
               , 'vice'           : '/usr/bin/'
-              , 'fsuae'          : '/usr/bin/fs-uae'
               , 'amiberry'       : '/usr/bin/amiberry'
               , 'hypseus-singe'  : '/usr/bin/hypseus'
               , 'melonds'        : '/usr/bin/melonDS'
@@ -90,10 +89,6 @@ dosboxStagingConfig = dosboxStagingCustom + '/dosbox.conf'
 
 dosboxxCustom = CONF + '/dosbox'
 dosboxxConfig = dosboxxCustom + '/dosboxx.conf'
-
-fsuaeBios = BIOS + "/amiga"
-fsuaeConfig = CONF + "/fs-uae"
-fsuaeSaves = SAVES + "/amiga"
 
 scummvmSaves = SAVES + '/scummvm'
 

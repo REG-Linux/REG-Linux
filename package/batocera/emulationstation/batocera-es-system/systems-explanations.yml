@@ -22,23 +22,15 @@ default:
       A4000: *amiberry_multicore
       A500:  *amiberry_multicore
       A500+: *amiberry_multicore
-    fsuae:
-      A1000: &fsuae_multicore
-        explanation: |
-          A1000, A1200, A3000, A4000, A500, A500+, A600 are the same core, but with a different behavior depending on the amiga model you want to emulate.
-          fsuae only works on x86 and x86_64 architectures
-      A1200: *fsuae_multicore
-      A3000: *fsuae_multicore
-      A4000: *fsuae_multicore
-      A500:  *fsuae_multicore
-      A500+: *fsuae_multicore
-      A600:  *fsuae_multicore
+      A600:  *amiberry_multicore
+      A1000: *amiberry_multicore
+      A3000: *amiberry_multicore
   amigacd32:
-    fsuae:
-      CD32: *fsuae_multicore
+    amiberry:
+      CD32: *amiberry_multicore
   amigacdtv:
-    fsuae:
-      CDTV: *fsuae_multicore
+    amiberry:
+      CDTV: *amiberry_multicore
   gb:
     libretro:
       gambatte: &gambatte_mgba_vbam

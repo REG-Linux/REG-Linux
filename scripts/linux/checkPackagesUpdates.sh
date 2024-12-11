@@ -4,8 +4,8 @@
 PACKAGES_RETROARCH="retroarch
                     retroarch-assets
                     libretro-core-info
-                    batocera-bezel
-                    batocera-shaders
+                    reglinux-bezels
+                    reglinux-shaders
                     common-shaders
                     glsl-shaders
                     slang-shaders"
@@ -144,6 +144,7 @@ PACKAGES_EMULATORS="amiberry
                     box64
                     cemu
                     citra
+                    citron
                     clk
                     hypseus-singe
                     demul
@@ -158,7 +159,6 @@ PACKAGES_EMULATORS="amiberry
                     eka2l1
                     flycast
                     fpinball
-                    fsuae
                     gsplus
                     hatari
                     ikemen
@@ -189,7 +189,6 @@ PACKAGES_EMULATORS="amiberry
                     sugarbox
                     supermodel
                     supermodel-es
-                    sudachi
                     thextech
                     tsugaru
                     vice
