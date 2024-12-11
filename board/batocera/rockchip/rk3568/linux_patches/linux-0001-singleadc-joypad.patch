@@ -1703,3 +1703,189 @@ index d0f66a5e1..76e45bf18 100644
 --
 2.44.0
 
+--- a/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rgxx3.dtsi	2024-12-12 01:04:17.715191082 +0100
++++ b/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rgxx3.dtsi	2024-12-12 01:04:44.863837297 +0100
+@@ -34,60 +34,6 @@
+ 		};
+ 	};
+ 
+-	gpio_keys_control: gpio-keys-control {
+-		compatible = "gpio-keys";
+-		pinctrl-0 = <&btn_pins_ctrl>;
+-		pinctrl-names = "default";
+-
+-		button-b {
+-			gpios = <&gpio3 RK_PC3 GPIO_ACTIVE_LOW>;
+-			label = "SOUTH";
+-			linux,code = <BTN_SOUTH>;
+-		};
+-
+-		button-down {
+-			gpios = <&gpio3 RK_PA4 GPIO_ACTIVE_LOW>;
+-			label = "DPAD-DOWN";
+-			linux,code = <BTN_DPAD_DOWN>;
+-		};
+-
+-		button-l1 {
+-			gpios = <&gpio3 RK_PB1 GPIO_ACTIVE_LOW>;
+-			label = "TL";
+-			linux,code = <BTN_TL>;
+-		};
+-
+-		button-l2 {
+-			gpios = <&gpio3 RK_PB2 GPIO_ACTIVE_LOW>;
+-			label = "TL2";
+-			linux,code = <BTN_TL2>;
+-		};
+-
+-		button-select {
+-			gpios = <&gpio3 RK_PB6 GPIO_ACTIVE_LOW>;
+-			label = "SELECT";
+-			linux,code = <BTN_SELECT>;
+-		};
+-
+-		button-start {
+-			gpios = <&gpio3 RK_PB5 GPIO_ACTIVE_LOW>;
+-			label = "START";
+-			linux,code = <BTN_START>;
+-		};
+-
+-		button-up {
+-			gpios = <&gpio3 RK_PA3 GPIO_ACTIVE_LOW>;
+-			label = "DPAD-UP";
+-			linux,code = <BTN_DPAD_UP>;
+-		};
+-
+-		button-x {
+-			gpios = <&gpio3 RK_PC0 GPIO_ACTIVE_LOW>;
+-			label = "NORTH";
+-			linux,code = <BTN_NORTH>;
+-		};
+-	};
+-
+ 	gpio_keys_vol: gpio-keys-vol {
+ 		compatible = "gpio-keys";
+ 		autorepeat;
+--- a/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rg353x.dtsi	2024-12-12 01:04:17.715191082 +0100
++++ b/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rg353x.dtsi	2024-12-12 01:04:44.863837297 +0100
+@@ -126,44 +126,6 @@
+ 	};
+ };
+ 
+-&gpio_keys_control {
+-	button-a {
+-		gpios = <&gpio3 RK_PC2 GPIO_ACTIVE_LOW>;
+-		label = "EAST";
+-		linux,code = <BTN_EAST>;
+-	};
+-
+-	button-left {
+-		gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
+-		label = "DPAD-LEFT";
+-		linux,code = <BTN_DPAD_LEFT>;
+-	};
+-
+-	button-right {
+-		gpios = <&gpio3 RK_PA5 GPIO_ACTIVE_LOW>;
+-		label = "DPAD-RIGHT";
+-		linux,code = <BTN_DPAD_RIGHT>;
+-	};
+-
+-	button-thumbl {
+-		gpios = <&gpio3 RK_PA1 GPIO_ACTIVE_LOW>;
+-		label = "THUMBL";
+-		linux,code = <BTN_THUMBL>;
+-	};
+-
+-	button-thumbr {
+-		gpios = <&gpio3 RK_PA2 GPIO_ACTIVE_LOW>;
+-		label = "THUMBR";
+-		linux,code = <BTN_THUMBR>;
+-	};
+-
+-	button-y {
+-		gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_LOW>;
+-		label = "WEST";
+-		linux,code = <BTN_WEST>;
+-	};
+-};
+-
+ &i2c0 {
+ 	/* This hardware is physically present but unused. */
+ 	power-monitor@62 {
+--- a/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rg-arc.dtsi	2024-12-12 01:11:32.372536718 +0100
++++ b/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rg-arc.dtsi	2024-12-12 01:11:53.006027818 +0100
+@@ -126,73 +126,6 @@
+ 	};
+ };
+ 
+-/*
+- * Device uses a non-standard six button layout for a gamepad with X,
+- * Y, and Z on the top row of buttons and A, B, and C under the bottom
+- * row.
+- */
+-&gpio_keys_control {
+-	button-a {
+-		gpios = <&gpio3 RK_PC3 GPIO_ACTIVE_LOW>;
+-		label = "A";
+-		linux,code = <BTN_A>;
+-	};
+-
+-	button-b {
+-		gpios = <&gpio3 RK_PC2 GPIO_ACTIVE_LOW>;
+-		label = "B";
+-		linux,code = <BTN_B>;
+-	};
+-
+-	button-c {
+-		gpios = <&gpio3 RK_PA2 GPIO_ACTIVE_LOW>;
+-		label = "C";
+-		linux,code = <BTN_C>;
+-	};
+-
+-	button-left {
+-		gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
+-		label = "DPAD-LEFT";
+-		linux,code = <BTN_DPAD_LEFT>;
+-	};
+-
+-	button-r1 {
+-		gpios = <&gpio3 RK_PB4 GPIO_ACTIVE_LOW>;
+-		label = "TR";
+-		linux,code = <BTN_TR>;
+-	};
+-
+-	button-r2 {
+-		gpios = <&gpio3 RK_PB3 GPIO_ACTIVE_LOW>;
+-		label = "TR2";
+-		linux,code = <BTN_TR2>;
+-	};
+-
+-	button-right {
+-		gpios = <&gpio3 RK_PA5 GPIO_ACTIVE_LOW>;
+-		label = "DPAD-RIGHT";
+-		linux,code = <BTN_DPAD_RIGHT>;
+-	};
+-
+-	button-x {
+-		gpios = <&gpio3 RK_PC0 GPIO_ACTIVE_LOW>;
+-		label = "X";
+-		linux,code = <BTN_X>;
+-	};
+-
+-	button-y {
+-		gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_LOW>;
+-		label = "Y";
+-		linux,code = <BTN_Y>;
+-	};
+-
+-	button-z {
+-		gpios = <&gpio3 RK_PA1 GPIO_ACTIVE_LOW>;
+-		label = "Z";
+-		linux,code = <BTN_Z>;
+-	};
+-};
+-
+ &pinctrl {
+ 	audio-amplifier {
+ 		spk_amp_enable_h: spk-amp-enable-h {
