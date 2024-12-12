@@ -9,7 +9,7 @@ MELONDS_SITE = https://github.com/melonDS-emu/melonDS.git
 MELONDS_SITE_METHOD=git
 MELONDS_GIT_SUBMODULES=YES
 MELONDS_LICENSE = GPLv2
-MELONDS_DEPENDENCIES = sdl2 reglinux-qt6 slirp libepoxy libarchive ecm
+MELONDS_DEPENDENCIES = sdl2 reglinux-qt6 slirp libepoxy libarchive libenet ecm
 
 MELONDS_SUPPORTS_IN_SOURCE_BUILD = NO
 

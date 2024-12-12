@@ -1,3 +1,0 @@
-config BR2_PACKAGE_ANBERNIC_GPIO_PAD
-	bool "anbernic-gpio-pad"
-	select BR2_PACKAGE_EVSIEVE
