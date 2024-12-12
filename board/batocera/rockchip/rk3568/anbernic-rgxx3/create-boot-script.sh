@@ -28,11 +28,16 @@ cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firm
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"      || exit 1
 
 cp "${BINARIES_DIR}/rk3566-anbernic-rg353p.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353p-linux.dtb"    || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353ps.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353ps-linux.dtb"    || exit 1
 cp "${BINARIES_DIR}/rk3566-anbernic-rg353v.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353v-linux.dtb"    || exit 1
-#TODO cp "${BINARIES_DIR}/rk3566-anbernic-rg353v-v2.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353v-v2-linux.dtb" || exit 1
 cp "${BINARIES_DIR}/rk3566-anbernic-rg353vs.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg353vs-linux.dtb"   || exit 1
 cp "${BINARIES_DIR}/rk3566-anbernic-rg503.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-rg503-linux.dtb"     || exit 1
 
 cp "${BOARD_DIR}/boot/extlinux.conf"        "${REGLINUX_BINARIES_DIR}/boot/boot/extlinux/" || exit 1
+
+# Chainloading mainline U-Boot for Android based bootloaders
+#cp "${REGLINUX_BINARIES_DIR}/uboot-anbernic-rgxx3/u-boot.bin" "${REGLINUX_BINARIES_DIR}/boot/u-boot.bin" || exit 1
+#cp "${BOARD_DIR}/boot/boot.cmd"                               "${REGLINUX_BINARIES_DIR}/boot/boot.cmd"   || exit 1
+#cp "${BOARD_DIR}/boot/boot.scr"                               "${REGLINUX_BINARIES_DIR}/boot/boot.scr"   || exit 1
 
 exit 0
