@@ -37,10 +37,10 @@ done
 export BL31=../rkbin/bin/rk35/rk3568_bl31_v1.44.elf
 export ROCKCHIP_TPL=../rkbin/bin/rk35/rk3568_ddr_1056MHz_v1.23.bin
 export CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-"
-ARCH=aarch64 make odroid-m1-rk3568_defconfig
+ARCH=aarch64 make odroid-m1s-rk3566_defconfig
 ARCH=aarch64 make -j$(nproc)
 
 # Copy generated files
-mkdir -p "${IMAGES_DIR}/reglinux/uboot-odroid-m1"
-cp "${IMAGES_DIR}/reglinux/build-uboot-odroid-m1/u-boot-${UBOOT_VERSION}/u-boot-rockchip.bin" "${IMAGES_DIR}/reglinux/uboot-odroid-m1/u-boot-rockchip.bin"
+mkdir -p "${IMAGES_DIR}/reglinux/uboot-odroid-m1s"
+cp "${IMAGES_DIR}/reglinux/build-uboot-odroid-m1s/u-boot-${UBOOT_VERSION}/u-boot-rockchip.bin" "${IMAGES_DIR}/reglinux/uboot-odroid-m1s/u-boot-rockchip.bin"
 

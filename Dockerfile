@@ -40,6 +40,7 @@ RUN dpkg --add-architecture i386 && \
     python3-matplotlib \
     gcc-multilib \
     g++-multilib \
+    libgnutls28-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
