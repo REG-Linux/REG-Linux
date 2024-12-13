@@ -1,3 +1,10 @@
 # Anbernic RG503 default values
 
+# Default audio device
 audio.device=alsa_output._sys_devices_platform_sound_sound_card0.HiFi__hw_rk817ext__sink
+
+# Suspend on handheld boards
+system.suspendmode=suspend 
+
+# Shutdown delay for suspend
+system.shutdowndelay=1
