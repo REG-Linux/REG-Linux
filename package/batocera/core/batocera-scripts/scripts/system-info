@@ -69,6 +69,10 @@ fi
 
 V_BOARD=$(cat /boot/boot/system.board)
 V_CPUNB=$(LANG=C lscpu | grep 'Core(s) per socket' | awk '{print $4}' | head -n 1)
+if test -z "${V_CPUNB}"; then
+    # give an other chance
+    V_CPUNB=$(LANG=C lscpu | grep 'Core(s) per cluster' | awk '{print $4}' | head -n 1)
+fi
 V_CPUMAXNB=$(LANG=C lscpu | grep '^CPU(s):' | awk '{print $2}')
 V_CPUMODEL1=$(grep -m 1 -E $'^model name\t:' /proc/cpuinfo | sed -e s+'^model name\t: '++)
 V_SYSTEM=$(uname -rs)
