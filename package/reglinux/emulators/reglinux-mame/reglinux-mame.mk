@@ -3,8 +3,8 @@
 # REGLINUX-MAME (Prebuilt GroovyMAME + libretro-mame)
 #
 ################################################################################
-# Version: 0.271
-REGLINUX_MAME_VERSION = 0.271
+# Version: 0.272
+REGLINUX_MAME_VERSION = 0.272
 REGLINUX_MAME_SITE = $(call github,REG-Linux,REG-MAME,$(REGLINUX_MAME_VERSION))
 REGLINUX_MAME_LICENSE = MAME
 
