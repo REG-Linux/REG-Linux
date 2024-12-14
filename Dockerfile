@@ -38,6 +38,7 @@ RUN dpkg --add-architecture i386 && \
     python3 \
     python3-numpy \
     python3-matplotlib \
+    python3-pyelftools \
     gcc-multilib \
     g++-multilib \
     libgnutls28-dev \
