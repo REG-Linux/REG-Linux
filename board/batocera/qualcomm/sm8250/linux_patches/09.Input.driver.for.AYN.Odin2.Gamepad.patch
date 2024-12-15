@@ -159,9 +159,9 @@ index 00000000000000..63a32175b44157
 +	}
 +
 +	input_report_abs(indev, ABS_HAT2X,
-+			 0x755 - (data->data[2] | (data->data[3] << 8)));
++			 0x610 - (data->data[2] | (data->data[3] << 8)));
 +	input_report_abs(indev, ABS_HAT2Y,
-+			 0x755 - (data->data[4] | (data->data[5] << 8)));
++			 0x610 - (data->data[4] | (data->data[5] << 8)));
 +	input_report_abs(indev, ABS_X,
 +			 -(int16_t)(data->data[6] | (data->data[7] << 8)));
 +	input_report_abs(indev, ABS_Y,
@@ -322,8 +322,8 @@ index 00000000000000..63a32175b44157
 +		input_set_abs_params(gamepad_dev->dev_input, i, -0x580, 0x580,
 +				     0, 0);
 +
-+	input_set_abs_params(gamepad_dev->dev_input, ABS_HAT2X, 0, 1830, 0, 30);
-+	input_set_abs_params(gamepad_dev->dev_input, ABS_HAT2Y, 0, 1830, 0, 30);
++	input_set_abs_params(gamepad_dev->dev_input, ABS_HAT2X, 0, 1550, 0, 30);
++	input_set_abs_params(gamepad_dev->dev_input, ABS_HAT2Y, 0, 1550, 0, 30);
 +
 +	ret = input_register_device(gamepad_dev->dev_input);
 +	if (ret)
