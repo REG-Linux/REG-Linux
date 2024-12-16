@@ -1,5 +1,5 @@
 diff --git a/Documentation/devicetree/bindings/arm/amlogic.yaml b/Documentation/devicetree/bindings/arm/amlogic.yaml
-index 949537cea6be..d3a489a72d51 100644
+index 0647851ae1f5..892d02d421b5 100644
 --- a/Documentation/devicetree/bindings/arm/amlogic.yaml
 +++ b/Documentation/devicetree/bindings/arm/amlogic.yaml
 @@ -27,12 +27,15 @@ properties:
@@ -19,10 +19,10 @@ index 949537cea6be..d3a489a72d51 100644
  
        - description: Boards with the Amlogic Meson8b SoC
 diff --git a/Documentation/devicetree/bindings/arm/cpus.yaml b/Documentation/devicetree/bindings/arm/cpus.yaml
-index cc5a21b47e26..ec7593e04c1a 100644
+index 73dd73d2d4fa..6e62d4a36295 100644
 --- a/Documentation/devicetree/bindings/arm/cpus.yaml
 +++ b/Documentation/devicetree/bindings/arm/cpus.yaml
-@@ -216,6 +216,7 @@ properties:
+@@ -232,6 +232,7 @@ properties:
            - allwinner,sun9i-a80-smp
            - allwinner,sun8i-a83t-smp
            - amlogic,meson8-smp
@@ -30,21 +30,58 @@ index cc5a21b47e26..ec7593e04c1a 100644
            - amlogic,meson8b-smp
            - arm,realview-smp
            - aspeed,ast2600-smp
-diff --git a/Documentation/devicetree/bindings/clock/amlogic,meson8b-clkc.txt b/Documentation/devicetree/bindings/clock/amlogic,meson8b-clkc.txt
-index cc51e4746b3b..8559315097de 100644
---- a/Documentation/devicetree/bindings/clock/amlogic,meson8b-clkc.txt
-+++ b/Documentation/devicetree/bindings/clock/amlogic,meson8b-clkc.txt
-@@ -16,6 +16,10 @@ Required Properties:
-   * "xtal": the 24MHz system oscillator
-   * "ddr_pll": the DDR PLL clock
-   * "clk_32k": (if present) the 32kHz clock signal from GPIOAO_6 (CLK_32K_IN)
-+  * "rmii_clk": (if present) the 50MHz RMII reference clock (from the PHY or
-+                an external oscillator
-+  * "rtc_32k": the clock signal from the 32kHz oscillator connected to the
-+               RTC32K_XI and RTC32K_XO pads
- 
- Parent node should have the following properties :
- - compatible: "amlogic,meson-hhi-sysctrl", "simple-mfd", "syscon"
+diff --git a/Documentation/devicetree/bindings/clock/amlogic,meson8-clkc.yaml b/Documentation/devicetree/bindings/clock/amlogic,meson8-clkc.yaml
+index ab73d4654171..f3b11afebbca 100644
+--- a/dev/null  2024-12-16 10:43:32.999365261 +0100
++++ b/Documentation/devicetree/bindings/clock/amlogic,meson8-clkc.yaml  2024-12-16 11:46:25.050027553 +0100
+@@ -0,0 +1,47 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/clock/amlogic,meson8-clkc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Amlogic Meson8, Meson8b and Meson8m2 Clock and Reset Controller
++
++maintainers:
++  - Neil Armstrong <neil.armstrong@linaro.org>
++
++properties:
++  compatible:
++    oneOf:
++      - enum:
++          - amlogic,meson8-clkc
++          - amlogic,meson8b-clkc
++      - items:
++          - const: amlogic,meson8m2-clkc
++          - const: amlogic,meson8-clkc
++
++  clocks:
++    minItems: 2
++    maxItems: 5
++
++  clock-names:
++    minItems: 2
++    items:
++      - const: xtal
++      - const: ddr_pll
++      - const: clk_32k
++      - const: rmii_clk
++      - const: rtc_32k
++
++  '#clock-cells':
++    const: 1
++
++  '#reset-cells':
++    const: 1
++
++required:
++  - compatible
++  - clocks
++  - clock-names
++  - '#reset-cells'
++
++additionalProperties: false
 diff --git a/Documentation/devicetree/bindings/display/amlogic,meson-vpu.yaml b/Documentation/devicetree/bindings/display/amlogic,meson-vpu.yaml
 index cb0a90f02321..96c32747e541 100644
 --- a/Documentation/devicetree/bindings/display/amlogic,meson-vpu.yaml
@@ -142,7 +179,7 @@ index 000000000000..1e0e19a35473
 +    };
 +...
 diff --git a/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml b/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
-index 7e8328e9ce13..b2fef72267b4 100644
+index b0962a4583ac..bb9825e7346d 100644
 --- a/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
 +++ b/Documentation/devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml
 @@ -23,6 +23,7 @@ properties:
@@ -154,7 +191,7 @@ index 7e8328e9ce13..b2fef72267b4 100644
                - amlogic,meson-axg-saradc
                - amlogic,meson-g12a-saradc
 diff --git a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
-index ee7a65b528cd..ea4b75ef653c 100644
+index d1e2bca3c503..f3fa55a77022 100644
 --- a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
 +++ b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
 @@ -127,6 +127,28 @@ allOf:
@@ -405,10 +442,10 @@ index 000000000000..0fbb2ffd0a25
 +
 +...
 diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index b97d298b3eb6..dedbda1c2f5a 100644
+index da01616802c7..ee4e71a48f6c 100644
 --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
 +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-@@ -983,6 +983,8 @@ patternProperties:
+@@ -1015,6 +1015,8 @@ patternProperties:
      deprecated: true
    "^mxicy,.*":
      description: Macronix International Co., Ltd.
@@ -418,11 +455,11 @@ index b97d298b3eb6..dedbda1c2f5a 100644
      description: MYIR Tech Limited
    "^national,.*":
 diff --git a/arch/arm/boot/dts/amlogic/Makefile b/arch/arm/boot/dts/amlogic/Makefile
-index a84310780ea3..daed55b70aac 100644
+index 504c533b1173..41324d0fa23f 100644
 --- a/arch/arm/boot/dts/amlogic/Makefile
 +++ b/arch/arm/boot/dts/amlogic/Makefile
-@@ -3,7 +3,11 @@ dtb-$(CONFIG_MACH_MESON6) += \
- 	meson6-atv1200.dtb
+@@ -1,7 +1,11 @@
+ # SPDX-License-Identifier: GPL-2.0
  dtb-$(CONFIG_MACH_MESON8) += \
  	meson8-minix-neo-x8.dtb \
 +	meson8-tronsmart-s82.dtb \
@@ -467,35 +504,12 @@ index 8cb0fc78b2af..d729a06da08b 100644
  				status = "disabled";
  			};
  
-diff --git a/arch/arm/boot/dts/amlogic/meson6.dtsi b/arch/arm/boot/dts/amlogic/meson6.dtsi
-index 4716030a48d0..c63b769a23e9 100644
---- a/arch/arm/boot/dts/amlogic/meson6.dtsi
-+++ b/arch/arm/boot/dts/amlogic/meson6.dtsi
-@@ -28,6 +28,18 @@ cpu@201 {
- 		};
- 	};
- 
-+	reserved-memory {
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		ranges;
-+
-+		/* 1 MiB reserved for Hardware ROM Firmware */
-+		hwrom@0 {
-+			reg = <0x1ff00000 0x100000>;
-+			no-map;
-+		};
-+	};
-+
- 	apb2: bus@d0000000 {
- 		compatible = "simple-bus";
- 		reg = <0xd0000000 0x40000>;
 diff --git a/arch/arm/boot/dts/amlogic/meson8-tronsmart-s82.dts b/arch/arm/boot/dts/amlogic/meson8-tronsmart-s82.dts
 new file mode 100644
-index 000000000000..3a3e4f4124ec
+index 000000000000..ae8964d0bf8e
 --- /dev/null
 +++ b/arch/arm/boot/dts/amlogic/meson8-tronsmart-s82.dts
-@@ -0,0 +1,402 @@
+@@ -0,0 +1,406 @@
 +// SPDX-License-Identifier: GPL-2.0 OR MIT
 +/*
 + * Copyright 2021 Martin Blumenstingl <martin.blumenstingl@googlemail.com>
@@ -576,6 +590,10 @@ index 000000000000..3a3e4f4124ec
 +	sound {
 +		compatible = "amlogic,gx-sound-card";
 +		model = "TRONSMART-S82";
++
++		clocks = <&clkc CLKID_MPLL0>,
++			 <&clkc CLKID_MPLL1>,
++			 <&clkc CLKID_MPLL2>;
 +
 +		assigned-clocks = <&clkc CLKID_MPLL0>,
 +				  <&clkc CLKID_MPLL1>,
@@ -899,7 +917,7 @@ index 000000000000..3a3e4f4124ec
 +	status = "okay";
 +};
 diff --git a/arch/arm/boot/dts/amlogic/meson8.dtsi b/arch/arm/boot/dts/amlogic/meson8.dtsi
-index f57be9ae150f..372955744bc2 100644
+index 9ff142d9fe3f..307fec815968 100644
 --- a/arch/arm/boot/dts/amlogic/meson8.dtsi
 +++ b/arch/arm/boot/dts/amlogic/meson8.dtsi
 @@ -193,6 +193,14 @@ power-firmware@4f00000 {
@@ -1042,7 +1060,7 @@ index f57be9ae150f..372955744bc2 100644
  	};
  }; /* end of / */
  
-@@ -363,6 +489,14 @@ gpio_ao: ao-bank@14 {
+@@ -362,6 +488,14 @@ gpio_ao: bank@0 {
  			gpio-ranges = <&pinctrl_aobus 0 0 16>;
  		};
  
@@ -1057,7 +1075,7 @@ index f57be9ae150f..372955744bc2 100644
  		i2s_am_clk_pins: i2s-am-clk-out {
  			mux {
  				groups = "i2s_am_clk_out_ao";
-@@ -427,6 +561,15 @@ mux {
+@@ -426,6 +560,15 @@ mux {
  			};
  		};
  	};
@@ -1073,7 +1091,7 @@ index f57be9ae150f..372955744bc2 100644
  };
  
  &ao_arc_rproc {
-@@ -479,6 +622,36 @@ gpio: banks@80b0 {
+@@ -477,6 +620,36 @@ gpio: bank@80 {
  			gpio-ranges = <&pinctrl_cbus 0 0 120>;
  		};
  
@@ -1110,7 +1128,7 @@ index f57be9ae150f..372955744bc2 100644
  		sd_a_pins: sd-a {
  			mux {
  				groups = "sd_d0_a", "sd_d1_a", "sd_d2_a",
-@@ -552,6 +725,35 @@ mux {
+@@ -550,6 +723,35 @@ mux {
  			};
  		};
  
@@ -1146,7 +1164,7 @@ index f57be9ae150f..372955744bc2 100644
  		pwm_e_pins: pwm-e {
  			mux {
  				groups = "pwm_e";
-@@ -601,6 +803,17 @@ smp-sram@1ff80 {
+@@ -599,6 +801,17 @@ smp-sram@1ff80 {
  	};
  };
  
@@ -1164,7 +1182,7 @@ index f57be9ae150f..372955744bc2 100644
  &efuse {
  	compatible = "amlogic,meson8-efuse";
  	clocks = <&clkc CLKID_EFUSE>;
-@@ -610,11 +823,15 @@ temperature_calib: calib@1f4 {
+@@ -608,11 +821,15 @@ temperature_calib: calib@1f4 {
  		/* only the upper two bytes are relevant */
  		reg = <0x1f4 0x4>;
  	};
@@ -1182,7 +1200,7 @@ index f57be9ae150f..372955744bc2 100644
  
  	power-domains = <&pwrc PWRC_MESON8_ETHERNET_MEM_ID>;
  };
-@@ -625,16 +842,18 @@ &gpio_intc {
+@@ -623,16 +840,18 @@ &gpio_intc {
  };
  
  &hhi {
@@ -1203,7 +1221,7 @@ index f57be9ae150f..372955744bc2 100644
  		#power-domain-cells = <1>;
  		amlogic,ao-sysctrl = <&pmu>;
  		clocks = <&clkc CLKID_VPU>;
-@@ -642,6 +861,13 @@ pwrc: power-controller {
+@@ -640,6 +859,13 @@ pwrc: power-controller {
  		assigned-clocks = <&clkc CLKID_VPU>;
  		assigned-clock-rates = <364285714>;
  	};
@@ -1218,10 +1236,10 @@ index f57be9ae150f..372955744bc2 100644
  
  &hwrng {
 diff --git a/arch/arm/boot/dts/amlogic/meson8b-ec100.dts b/arch/arm/boot/dts/amlogic/meson8b-ec100.dts
-index 3da47349eaaf..a56f6cdd248d 100644
+index 18ea6592b7d7..743886786d4b 100644
 --- a/arch/arm/boot/dts/amlogic/meson8b-ec100.dts
 +++ b/arch/arm/boot/dts/amlogic/meson8b-ec100.dts
-@@ -27,6 +27,16 @@ memory {
+@@ -27,6 +27,16 @@ memory@40000000 {
  		reg = <0x40000000 0x40000000>;
  	};
  
@@ -1238,7 +1256,7 @@ index 3da47349eaaf..a56f6cdd248d 100644
  	emmc_pwrseq: emmc-pwrseq {
  		compatible = "mmc-pwrseq-emmc";
  		reset-gpios = <&gpio BOOT_9 GPIO_ACTIVE_LOW>;
-@@ -70,6 +80,17 @@ gpio-poweroff {
+@@ -68,6 +78,17 @@ gpio-poweroff {
  		timeout-ms = <20000>;
  	};
  
@@ -1256,7 +1274,7 @@ index 3da47349eaaf..a56f6cdd248d 100644
  	leds {
  		compatible = "gpio-leds";
  
-@@ -119,6 +140,18 @@ dai-link-1 {
+@@ -121,6 +142,18 @@ dai-link-1 {
  			codec-0 {
  				sound-dai = <&rt5640>;
  			};
@@ -1275,7 +1293,7 @@ index 3da47349eaaf..a56f6cdd248d 100644
  		};
  	};
  
-@@ -280,6 +313,12 @@ &cpu0 {
+@@ -282,6 +315,12 @@ &cpu0 {
  	cpu-supply = <&vcck>;
  };
  
@@ -1288,7 +1306,7 @@ index 3da47349eaaf..a56f6cdd248d 100644
  &ethmac {
  	status = "okay";
  
-@@ -310,6 +349,18 @@ eth_phy0: ethernet-phy@0 {
+@@ -312,6 +351,18 @@ eth_phy0: ethernet-phy@0 {
  	};
  };
  
@@ -1308,10 +1326,10 @@ index 3da47349eaaf..a56f6cdd248d 100644
  	status = "okay";
  	pinctrl-0 = <&i2c_a_pins>;
 diff --git a/arch/arm/boot/dts/amlogic/meson8b-mxq.dts b/arch/arm/boot/dts/amlogic/meson8b-mxq.dts
-index 7adedd3258c3..ab5b3e6576e3 100644
+index fb28cb330f17..7ab8435bfd3d 100644
 --- a/arch/arm/boot/dts/amlogic/meson8b-mxq.dts
 +++ b/arch/arm/boot/dts/amlogic/meson8b-mxq.dts
-@@ -27,6 +27,17 @@ memory {
+@@ -27,6 +27,17 @@ memory@40000000 {
  		reg = <0x40000000 0x40000000>;
  	};
  
@@ -1329,13 +1347,16 @@ index 7adedd3258c3..ab5b3e6576e3 100644
  	vcck: regulator-vcck {
  		compatible = "pwm-regulator";
  
-@@ -43,6 +54,38 @@ vcck: regulator-vcck {
+@@ -43,6 +54,41 @@ vcck: regulator-vcck {
  		regulator-always-on;
  	};
  
 +	sound {
 +		compatible = "amlogic,gx-sound-card";
 +		model = "M8B-MXQ";
++
++		clocks = <&clkc CLKID_MPLL0>,
++			 <&clkc CLKID_MPLL1>;
 +
 +		assigned-clocks = <&clkc CLKID_MPLL0>,
 +				  <&clkc CLKID_MPLL1>;
@@ -1368,7 +1389,7 @@ index 7adedd3258c3..ab5b3e6576e3 100644
  	vcc_1v8: regulator-vcc1v8 {
  		compatible = "regulator-fixed";
  
-@@ -91,6 +134,10 @@ vddee: regulator-vddee {
+@@ -91,6 +137,10 @@ vddee: regulator-vddee {
  	};
  };
  
@@ -1379,7 +1400,7 @@ index 7adedd3258c3..ab5b3e6576e3 100644
  &cpu0 {
  	cpu-supply = <&vcck>;
  };
-@@ -125,6 +172,18 @@ eth_phy0: ethernet-phy@0 {
+@@ -125,6 +175,18 @@ eth_phy0: ethernet-phy@0 {
  	};
  };
  
@@ -1399,7 +1420,7 @@ index 7adedd3258c3..ab5b3e6576e3 100644
  	mali-supply = <&vddee>;
  };
 diff --git a/arch/arm/boot/dts/amlogic/meson8b-odroidc1.dts b/arch/arm/boot/dts/amlogic/meson8b-odroidc1.dts
-index 941682844faf..b03273d90ad8 100644
+index 2aa012f38a3b..daccf06b46aa 100644
 --- a/arch/arm/boot/dts/amlogic/meson8b-odroidc1.dts
 +++ b/arch/arm/boot/dts/amlogic/meson8b-odroidc1.dts
 @@ -32,6 +32,17 @@ emmc_pwrseq: emmc-pwrseq {
@@ -1420,13 +1441,16 @@ index 941682844faf..b03273d90ad8 100644
  	leds {
  		compatible = "gpio-leds";
  		led-blue {
-@@ -93,6 +104,52 @@ rtc32k_xtal: rtc32k-xtal-clk {
+@@ -93,6 +104,55 @@ rtc32k_xtal: rtc32k-xtal-clk {
  		#clock-cells = <0>;
  	};
  
 +	sound {
 +		compatible = "amlogic,gx-sound-card";
 +		model = "ODROID-C1";
++
++		clocks = <&clkc CLKID_MPLL0>,
++			 <&clkc CLKID_MPLL1>;
 +
 +		assigned-clocks = <&clkc CLKID_MPLL0>,
 +				  <&clkc CLKID_MPLL1>;
@@ -1473,7 +1497,7 @@ index 941682844faf..b03273d90ad8 100644
  	vcc_1v8: regulator-vcc-1v8 {
  		/*
  		 * RICHTEK RT9179 configured for a fixed output voltage of
-@@ -187,6 +244,10 @@ vdd_rtc: regulator-vdd-rtc {
+@@ -187,6 +247,10 @@ vdd_rtc: regulator-vdd-rtc {
  	};
  };
  
@@ -1484,7 +1508,7 @@ index 941682844faf..b03273d90ad8 100644
  &cpu0 {
  	cpu-supply = <&vcck>;
  };
-@@ -283,6 +344,18 @@ &gpio_ao {
+@@ -283,6 +347,18 @@ &gpio_ao {
  			  "SYS_LED", "", "";
  };
  
@@ -1503,7 +1527,7 @@ index 941682844faf..b03273d90ad8 100644
  &ir_receiver {
  	status = "okay";
  	pinctrl-0 = <&ir_recv_pins>;
-@@ -363,8 +436,18 @@ &uart_AO {
+@@ -363,8 +439,18 @@ &uart_AO {
  	pinctrl-names = "default";
  };
  
@@ -1523,8 +1547,8 @@ index 941682844faf..b03273d90ad8 100644
  };
  
  &usb1 {
-@@ -381,3 +464,11 @@ hub@1 {
- 		reset-gpio = <&gpio_ao GPIOAO_4 GPIO_ACTIVE_LOW>;
+@@ -381,3 +467,11 @@ hub@1 {
+ 		reset-gpios = <&gpio_ao GPIOAO_4 GPIO_ACTIVE_LOW>;
  	};
  };
 +
@@ -1536,7 +1560,7 @@ index 941682844faf..b03273d90ad8 100644
 +	status = "okay";
 +};
 diff --git a/arch/arm/boot/dts/amlogic/meson8b.dtsi b/arch/arm/boot/dts/amlogic/meson8b.dtsi
-index 2d9d24d3a95d..3e5d97e0c446 100644
+index 9e02a97f86a0..c08f3eefe667 100644
 --- a/arch/arm/boot/dts/amlogic/meson8b.dtsi
 +++ b/arch/arm/boot/dts/amlogic/meson8b.dtsi
 @@ -276,6 +276,116 @@ mali: gpu@c0000 {
@@ -1656,7 +1680,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  	};
  }; /* end of / */
  
-@@ -325,6 +435,14 @@ gpio_ao: ao-bank@14 {
+@@ -324,6 +434,14 @@ gpio_ao: bank@0 {
  			gpio-ranges = <&pinctrl_aobus 0 0 16>;
  		};
  
@@ -1671,7 +1695,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  		i2s_am_clk_pins: i2s-am-clk-out {
  			mux {
  				groups = "i2s_am_clk_out";
-@@ -381,6 +499,15 @@ mux {
+@@ -380,6 +498,15 @@ mux {
  			};
  		};
  	};
@@ -1687,7 +1711,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  };
  
  &ao_arc_rproc {
-@@ -389,6 +516,8 @@ &ao_arc_rproc {
+@@ -388,6 +515,8 @@ &ao_arc_rproc {
  	sram = <&ao_arc_sram>;
  	resets = <&reset RESET_MEDIA_CPU>;
  	clocks = <&clkc CLKID_AO_MEDIA_CPU>;
@@ -1696,7 +1720,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  };
  
  &cbus {
-@@ -471,6 +600,22 @@ mux {
+@@ -469,6 +598,22 @@ mux {
  			};
  		};
  
@@ -1719,7 +1743,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  		i2c_a_pins: i2c-a {
  			mux {
  				groups = "i2c_sda_a", "i2c_sck_a";
-@@ -547,6 +692,16 @@ smp-sram@1ff80 {
+@@ -545,6 +690,16 @@ smp-sram@1ff80 {
  	};
  };
  
@@ -1736,7 +1760,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  
  &efuse {
  	compatible = "amlogic,meson8b-efuse";
-@@ -557,6 +712,10 @@ temperature_calib: calib@1f4 {
+@@ -555,6 +710,10 @@ temperature_calib: calib@1f4 {
  		/* only the upper two bytes are relevant */
  		reg = <0x1f4 0x4>;
  	};
@@ -1747,7 +1771,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  };
  
  &ethmac {
-@@ -586,16 +745,18 @@ &gpio_intc {
+@@ -584,16 +743,18 @@ &gpio_intc {
  };
  
  &hhi {
@@ -1768,7 +1792,7 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  		#power-domain-cells = <1>;
  		amlogic,ao-sysctrl = <&pmu>;
  		resets = <&reset RESET_DBLK>,
-@@ -617,6 +778,14 @@ pwrc: power-controller {
+@@ -615,6 +776,14 @@ pwrc: power-controller {
  		assigned-clocks = <&clkc CLKID_VPU>;
  		assigned-clock-rates = <182142857>;
  	};
@@ -1785,10 +1809,10 @@ index 2d9d24d3a95d..3e5d97e0c446 100644
  &hwrng {
 diff --git a/arch/arm/boot/dts/amlogic/meson8m2-m8s.dts b/arch/arm/boot/dts/amlogic/meson8m2-m8s.dts
 new file mode 100644
-index 000000000000..3e34ca1cbc33
+index 000000000000..d63c81f6bee2
 --- /dev/null
 +++ b/arch/arm/boot/dts/amlogic/meson8m2-m8s.dts
-@@ -0,0 +1,433 @@
+@@ -0,0 +1,437 @@
 +/*
 + * Copyright (c) 2017 Martin Blumenstingl <martin.blumenstingl@googlemail.com>.
 + *
@@ -1883,6 +1907,10 @@ index 000000000000..3e34ca1cbc33
 +	sound {
 +		compatible = "amlogic,gx-sound-card";
 +		model = "AKASO-M8S";
++
++		clocks = <&clkc CLKID_MPLL0>,
++			 <&clkc CLKID_MPLL1>,
++			 <&clkc CLKID_MPLL2>;
 +
 +		assigned-clocks = <&clkc CLKID_MPLL0>,
 +				  <&clkc CLKID_MPLL1>,
@@ -2222,275 +2250,6 @@ index 000000000000..3e34ca1cbc33
 +&usb1_phy {
 +	status = "okay";
 +};
-diff --git a/arch/arm/boot/dts/amlogic/meson8m2-mxiii-plus.dts b/arch/arm/boot/dts/amlogic/meson8m2-mxiii-plus.dts
-index aa4d4bf70629..db37dfc3a27f 100644
---- a/arch/arm/boot/dts/amlogic/meson8m2-mxiii-plus.dts
-+++ b/arch/arm/boot/dts/amlogic/meson8m2-mxiii-plus.dts
-@@ -6,74 +6,16 @@
- 
- /dts-v1/;
- 
--#include "meson8m2.dtsi"
--
--#include <dt-bindings/gpio/gpio.h>
--#include <dt-bindings/input/input.h>
-+#include "meson8m2-mxiii.dtsi"
- 
- / {
- 	model = "Tronsmart MXIII Plus";
- 	compatible = "tronsmart,mxiii-plus", "amlogic,meson8m2";
- 
--	aliases {
--		ethernet0 = &ethmac;
--		i2c0 = &i2c_AO;
--		serial0 = &uart_AO;
--		mmc0 = &sd_card_slot;
--	};
--
--	chosen {
--		stdout-path = "serial0:115200n8";
--	};
--
- 	memory {
- 		device_type = "memory";
- 		reg = <0x40000000 0x80000000>;
- 	};
--
--	adc-keys {
--		compatible = "adc-keys";
--		io-channels = <&saradc 0>;
--		io-channel-names = "buttons";
--		keyup-threshold-microvolt = <1710000>;
--
--		button-function {
--			label = "Function";
--			linux,code = <KEY_FN>;
--			press-threshold-microvolt = <10000>;
--		};
--	};
--
--	sdio_pwrseq: sdio-pwrseq {
--		compatible = "mmc-pwrseq-simple";
--
--		pinctrl-0 = <&xtal_32k_out_pins>;
--		pinctrl-names = "default";
--
--		reset-gpios = <&gpio GPIOX_11 GPIO_ACTIVE_LOW>,
--			      <&gpio_ao GPIOAO_6 GPIO_ACTIVE_LOW>;
--
--		clocks = <&xtal_32k_out>;
--		clock-names = "ext_clock";
--	};
--
--	vcc_3v3: regulator-vcc3v3 {
--		compatible = "regulator-fixed";
--		regulator-name = "VCC3V3";
--		regulator-min-microvolt = <3300000>;
--		regulator-max-microvolt = <3300000>;
--	};
--
--	xtal_32k_out: xtal-32k-out-clk {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <32768>;
--		clock-output-names = "xtal_32k_out";
--	};
--};
--
--&cpu0 {
--	cpu-supply = <&vcck>;
- };
- 
- &ethmac {
-@@ -101,162 +43,6 @@ eth_phy0: ethernet-phy@0 {
- 	};
- };
- 
--&ir_receiver {
--	status = "okay";
--	pinctrl-0 = <&ir_recv_pins>;
--	pinctrl-names = "default";
--};
--
--&i2c_AO {
--	status = "okay";
--	pinctrl-0 = <&i2c_ao_pins>;
--	pinctrl-names = "default";
--
--	pmic@32 {
--		compatible = "ricoh,rn5t618";
--		reg = <0x32>;
--		system-power-controller;
--
--		regulators {
--			vcck: DCDC1 {
--				regulator-name = "VCCK";
--				regulator-min-microvolt = <825000>;
--				regulator-max-microvolt = <1150000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			vddee: DCDC2 {
--				/* the output is also used as VDDAO */
--				regulator-name = "VDD_EE";
--				regulator-min-microvolt = <950000>;
--				regulator-max-microvolt = <1150000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			DCDC3 {
--				regulator-name = "VDD_DDR";
--				regulator-min-microvolt = <1500000>;
--				regulator-max-microvolt = <1500000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			LDO1 {
--				regulator-name = "VDDIO_AO28";
--				regulator-min-microvolt = <2900000>;
--				regulator-max-microvolt = <2900000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			vddio_ao1v8: LDO2 {
--				regulator-name = "VDDIO_AO18";
--				regulator-min-microvolt = <1800000>;
--				regulator-max-microvolt = <1800000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			LDO3 {
--				regulator-name = "VCC1V8";
--				regulator-min-microvolt = <1800000>;
--				regulator-max-microvolt = <1800000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			LDO4 {
--				regulator-name = "VCC2V8";
--				regulator-min-microvolt = <2850000>;
--				regulator-max-microvolt = <2850000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			LDO5 {
--				regulator-name = "AVDD1V8";
--				regulator-min-microvolt = <1800000>;
--				regulator-max-microvolt = <1800000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			LDORTC1 {
--				regulator-name = "VDD_LDO";
--				regulator-min-microvolt = <2700000>;
--				regulator-max-microvolt = <2700000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--
--			LDORTC2 {
--				regulator-name = "RTC_0V9";
--				regulator-min-microvolt = <900000>;
--				regulator-max-microvolt = <900000>;
--				regulator-boot-on;
--				regulator-always-on;
--			};
--		};
--	};
--};
--
--&mali {
--	mali-supply = <&vddee>;
--};
--
--&saradc {
--	status = "okay";
--	vref-supply = <&vddio_ao1v8>;
--};
--
--/* SDIO wifi */
--&sdhc {
--	status = "okay";
--
--	pinctrl-0 = <&sdxc_a_pins>;
--	pinctrl-names = "default";
--
--	bus-width = <4>;
--	max-frequency = <50000000>;
--
--	disable-wp;
--	non-removable;
--	cap-mmc-highspeed;
--	cap-sd-highspeed;
--
--	mmc-pwrseq = <&sdio_pwrseq>;
--
--	vmmc-supply = <&vcc_3v3>;
--	vqmmc-supply = <&vcc_3v3>;
--};
--
--&sdio {
--	status = "okay";
--
--	pinctrl-0 = <&sd_b_pins>;
--	pinctrl-names = "default";
--
--	/* SD card */
--	sd_card_slot: slot@1 {
--		compatible = "mmc-slot";
--		reg = <1>;
--		status = "okay";
--
--		bus-width = <4>;
--		no-sdio;
--		cap-mmc-highspeed;
--		cap-sd-highspeed;
--		disable-wp;
--
--		cd-gpios = <&gpio CARD_6 GPIO_ACTIVE_LOW>;
--
--		vmmc-supply = <&vcc_3v3>;
--	};
--};
--
--/* connected to the Bluetooth module */
- &uart_A {
- 	status = "okay";
- 	pinctrl-0 = <&uart_a1_pins>, <&uart_a1_cts_rts_pins>;
-@@ -269,25 +55,3 @@ bluetooth {
- 		max-speed = <2000000>;
- 	};
- };
--
--&uart_AO {
--	status = "okay";
--	pinctrl-0 = <&uart_ao_a_pins>;
--	pinctrl-names = "default";
--};
--
--&usb0 {
--	status = "okay";
--};
--
--&usb1 {
--	status = "okay";
--};
--
--&usb0_phy {
--	status = "okay";
--};
--
--&usb1_phy {
--	status = "okay";
--};
 diff --git a/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dts b/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dts
 new file mode 100644
 index 000000000000..94d2886b3112
@@ -2557,10 +2316,10 @@ index 000000000000..94d2886b3112
 +};
 diff --git a/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi b/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi
 new file mode 100644
-index 000000000000..f1f45b66102b
+index 000000000000..0968527a6cf3
 --- /dev/null
 +++ b/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi
-@@ -0,0 +1,366 @@
+@@ -0,0 +1,369 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright (c) 2018 Oleg Ivanov <balbes-150@yandex.ru>
@@ -2635,6 +2394,9 @@ index 000000000000..f1f45b66102b
 +	sound {
 +		compatible = "amlogic,gx-sound-card";
 +		model = "TRONSMART-MXIII";
++
++		clocks = <&clkc CLKID_MPLL0>,
++			 <&clkc CLKID_MPLL1>;
 +
 +		assigned-clocks = <&clkc CLKID_MPLL0>,
 +				  <&clkc CLKID_MPLL1>;
@@ -3868,12 +3630,12 @@ index 000000000000..a9da3c84a3df
 +void __init meson_mx_trustzone_firmware_init(void);
 +void __init meson_mx_trustzone_firmware_reserve_mem(void);
 diff --git a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
-index 9d5eab6595d0..9900c643bc89 100644
+index 49b51c54013f..65140ade9f37 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
-@@ -1663,6 +1663,14 @@ pwrc: power-controller {
- 								       <250000000>,
- 								       <0>; /* Do Nothing */
+@@ -1674,6 +1674,14 @@ mipi_analog_dphy: phy {
+ 						#phy-cells = <0>;
+ 						status = "disabled";
  					};
 +
 +					cvbs_dac: video-dac@2ec {
@@ -3886,7 +3648,7 @@ index 9d5eab6595d0..9900c643bc89 100644
  				};
  			};
  
-@@ -2138,6 +2146,8 @@ vpu: vpu@ff900000 {
+@@ -2159,6 +2167,8 @@ vpu: vpu@ff900000 {
  			#address-cells = <1>;
  			#size-cells = <0>;
  			amlogic,canvas = <&canvas>;
@@ -3923,7 +3685,7 @@ index 2673f0dbafe7..8b7c826ea4dc 100644
  			/* CVBS VDAC output port */
  			cvbs_vdac_port: port@0 {
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
-index 12ef6e81c8bd..cfdb45fc92ae 100644
+index ed00e67e6923..1142f40889a2 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
 @@ -287,6 +287,12 @@ &clkc_AO {
@@ -3940,7 +3702,7 @@ index 12ef6e81c8bd..cfdb45fc92ae 100644
  	clocks = <&clkc CLKID_EFUSE>;
  };
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
-index 17bcfa4702e1..a1147f298f9d 100644
+index f58d1790de1c..34ed8d18aae1 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
 @@ -124,6 +124,12 @@ usb2_phy1: phy@78020 {
@@ -3957,10 +3719,10 @@ index 17bcfa4702e1..a1147f298f9d 100644
  	clocks = <&clkc CLKID_EFUSE>;
  };
 diff --git a/drivers/clk/meson/Kconfig b/drivers/clk/meson/Kconfig
-index 29ffd14d267b..03e99ee3cce5 100644
+index be2e3a5f8336..0bb15c80503f 100644
 --- a/drivers/clk/meson/Kconfig
 +++ b/drivers/clk/meson/Kconfig
-@@ -55,6 +55,7 @@ config COMMON_CLK_MESON8B
+@@ -59,6 +59,7 @@ config COMMON_CLK_MESON8B
  	select COMMON_CLK_MESON_REGMAP
  	select COMMON_CLK_MESON_CLKC_UTILS
  	select COMMON_CLK_MESON_MPLL
@@ -3969,7 +3731,7 @@ index 29ffd14d267b..03e99ee3cce5 100644
  	select MFD_SYSCON
  	select RESET_CONTROLLER
 diff --git a/drivers/clk/meson/clk-mpll.c b/drivers/clk/meson/clk-mpll.c
-index 20255e129b37..b843e101d1ba 100644
+index ee91e32b4050..4c7b649fc0ff 100644
 --- a/drivers/clk/meson/clk-mpll.c
 +++ b/drivers/clk/meson/clk-mpll.c
 @@ -77,10 +77,13 @@ static unsigned long mpll_recalc_rate(struct clk_hw *hw,
@@ -3988,7 +3750,7 @@ index 20255e129b37..b843e101d1ba 100644
  	n2 = meson_parm_read(clk->map, &mpll->n2);
  
  	rate = rate_from_params(parent_rate, sdm, n2);
-@@ -124,6 +127,9 @@ static int mpll_set_rate(struct clk_hw *hw,
+@@ -118,6 +121,9 @@ static int mpll_set_rate(struct clk_hw *hw,
  	/* Set the fractional part */
  	meson_parm_write(clk->map, &mpll->sdm, sdm);
  
@@ -3998,7 +3760,7 @@ index 20255e129b37..b843e101d1ba 100644
  	/* Set the integer divider part */
  	meson_parm_write(clk->map, &mpll->n2, n2);
  
-@@ -144,9 +150,6 @@ static int mpll_init(struct clk_hw *hw)
+@@ -133,9 +139,6 @@ static int mpll_init(struct clk_hw *hw)
  		regmap_multi_reg_write(clk->map, mpll->init_regs,
  				       mpll->init_count);
  
@@ -4009,7 +3771,7 @@ index 20255e129b37..b843e101d1ba 100644
  	if (MESON_PARM_APPLICABLE(&mpll->ssen)) {
  		unsigned int ss =
 diff --git a/drivers/clk/meson/meson8b.c b/drivers/clk/meson/meson8b.c
-index b7417ac262d3..2f7a2adda3ba 100644
+index e4b474c5f86c..4cc8bb64d54c 100644
 --- a/drivers/clk/meson/meson8b.c
 +++ b/drivers/clk/meson/meson8b.c
 @@ -19,6 +19,7 @@
@@ -4020,7 +3782,7 @@ index b7417ac262d3..2f7a2adda3ba 100644
  #include "clk-pll.h"
  #include "clk-mpll.h"
  
-@@ -610,7 +611,24 @@ static struct clk_regmap meson8b_mpll2 = {
+@@ -605,7 +606,24 @@ static struct clk_regmap meson8b_mpll2 = {
  	},
  };
  
@@ -4046,7 +3808,7 @@ index b7417ac262d3..2f7a2adda3ba 100644
  static struct clk_regmap meson8b_mpeg_clk_sel = {
  	.data = &(struct clk_regmap_mux_data){
  		.offset = HHI_MPEG_CLK_CNTL,
-@@ -627,11 +645,12 @@ static struct clk_regmap meson8b_mpeg_clk_sel = {
+@@ -622,11 +640,12 @@ static struct clk_regmap meson8b_mpeg_clk_sel = {
  		 * fclk_div4, fclk_div3, fclk_div5
  		 */
  		.parent_hws = (const struct clk_hw *[]) {
@@ -4060,7 +3822,7 @@ index b7417ac262d3..2f7a2adda3ba 100644
  	},
  };
  
-@@ -2682,6 +2701,78 @@ static struct clk_regmap meson8b_cts_i958 = {
+@@ -2677,6 +2696,78 @@ static struct clk_regmap meson8b_cts_i958 = {
  	},
  };
  
@@ -4139,7 +3901,7 @@ index b7417ac262d3..2f7a2adda3ba 100644
  #define MESON_GATE(_name, _reg, _bit) \
  	MESON_PCLK(_name, _reg, _bit, &meson8b_clk81.hw)
  
-@@ -2978,6 +3069,11 @@ static struct clk_hw *meson8_hw_clks[] = {
+@@ -2973,6 +3064,11 @@ static struct clk_hw *meson8_hw_clks[] = {
  	[CLKID_CTS_I958]	    = &meson8b_cts_i958.hw,
  	[CLKID_VID_PLL_LVDS_EN]	    = &meson8b_vid_pll_lvds_en.hw,
  	[CLKID_HDMI_PLL_DCO_IN]	    = &hdmi_pll_dco_in.hw,
@@ -4151,7 +3913,7 @@ index b7417ac262d3..2f7a2adda3ba 100644
  };
  
  static struct clk_hw *meson8b_hw_clks[] = {
-@@ -3193,6 +3289,7 @@ static struct clk_hw *meson8b_hw_clks[] = {
+@@ -3188,6 +3284,7 @@ static struct clk_hw *meson8b_hw_clks[] = {
  	[CLKID_CTS_I958]	    = &meson8b_cts_i958.hw,
  	[CLKID_VID_PLL_LVDS_EN]	    = &meson8b_vid_pll_lvds_en.hw,
  	[CLKID_HDMI_PLL_DCO_IN]	    = &hdmi_pll_dco_in.hw,
@@ -4159,7 +3921,7 @@ index b7417ac262d3..2f7a2adda3ba 100644
  };
  
  static struct clk_hw *meson8m2_hw_clks[] = {
-@@ -3410,6 +3507,7 @@ static struct clk_hw *meson8m2_hw_clks[] = {
+@@ -3405,6 +3502,7 @@ static struct clk_hw *meson8m2_hw_clks[] = {
  	[CLKID_CTS_I958]	    = &meson8b_cts_i958.hw,
  	[CLKID_VID_PLL_LVDS_EN]	    = &meson8b_vid_pll_lvds_en.hw,
  	[CLKID_HDMI_PLL_DCO_IN]	    = &hdmi_pll_dco_in.hw,
@@ -4167,7 +3929,7 @@ index b7417ac262d3..2f7a2adda3ba 100644
  };
  
  static struct clk_regmap *const meson8b_clk_regmaps[] = {
-@@ -3606,6 +3704,11 @@ static struct clk_regmap *const meson8b_clk_regmaps[] = {
+@@ -3601,6 +3699,11 @@ static struct clk_regmap *const meson8b_clk_regmaps[] = {
  	&meson8b_cts_mclk_i958,
  	&meson8b_cts_i958,
  	&meson8b_vid_pll_lvds_en,
@@ -4191,11 +3953,25 @@ index a5b6e67eeefb..dfec963d415e 100644
  #define HHI_VDEC_CLK_CNTL		0x1e0 /* 0x78 offset in data sheet */
  #define HHI_VDEC2_CLK_CNTL		0x1e4 /* 0x79 offset in data sheet */
  #define HHI_VDEC3_CLK_CNTL		0x1e8 /* 0x7a offset in data sheet */
+diff --git a/drivers/clocksource/arm_global_timer.c b/drivers/clocksource/arm_global_timer.c
+index 2d86bbc2764a..c7b6d78cbd8d 100644
+--- a/drivers/clocksource/arm_global_timer.c
++++ b/drivers/clocksource/arm_global_timer.c
+@@ -433,6 +433,8 @@ static int __init global_timer_of_register(struct device_node *np)
+ 	return err;
+ }
+ 
++TIMER_OF_DECLARE(arm_gt_ca5, "arm,cortex-a5-global-timer",
++			global_timer_of_register);
+ /* Only tested on r2p2 and r3p0  */
+-TIMER_OF_DECLARE(arm_gt, "arm,cortex-a9-global-timer",
++TIMER_OF_DECLARE(arm_gt_ca9, "arm,cortex-a9-global-timer",
+ 			global_timer_of_register);
 diff --git a/drivers/gpu/drm/meson/Kconfig b/drivers/gpu/drm/meson/Kconfig
-index 615fdd0ce41b..73ec1b314ccd 100644
+index 417f79829cf8..9e1298cb2ec1 100644
 --- a/drivers/gpu/drm/meson/Kconfig
 +++ b/drivers/gpu/drm/meson/Kconfig
-@@ -10,6 +10,7 @@ config DRM_MESON
+@@ -13,6 +13,7 @@ config DRM_MESON
  	select REGMAP_MMIO
  	select MESON_CANVAS
  	select CEC_CORE if CEC_NOTIFIER
@@ -4203,7 +3979,7 @@ index 615fdd0ce41b..73ec1b314ccd 100644
  
  config DRM_MESON_DW_HDMI
  	tristate "HDMI Synopsys Controller support for Amlogic Meson Display"
-@@ -24,3 +25,13 @@ config DRM_MESON_DW_MIPI_DSI
+@@ -27,3 +28,13 @@ config DRM_MESON_DW_MIPI_DSI
  	default y if DRM_MESON
  	select DRM_DW_MIPI_DSI
  	select GENERIC_PHY_MIPI_DPHY
@@ -4227,10 +4003,18 @@ index 43071bdbd4b9..c44cb6c529fe 100644
  obj-$(CONFIG_DRM_MESON_DW_MIPI_DSI) += meson_dw_mipi_dsi.o
 +obj-$(CONFIG_DRM_MESON_TRANSWITCH_HDMI) += meson_transwitch_hdmi.o
 diff --git a/drivers/gpu/drm/meson/meson_drv.c b/drivers/gpu/drm/meson/meson_drv.c
-index 17a5cca007e2..3a853fa251df 100644
+index 0f5a1a54544e..578af9049e34 100644
 --- a/drivers/gpu/drm/meson/meson_drv.c
 +++ b/drivers/gpu/drm/meson/meson_drv.c
-@@ -135,28 +135,92 @@ static struct regmap_config meson_regmap_config = {
+@@ -20,6 +20,7 @@
+ #include <drm/drm_client_setup.h>
+ #include <drm/drm_drv.h>
+ #include <drm/drm_fbdev_dma.h>
++#include <drm/drm_fourcc.h>
+ #include <drm/drm_gem_dma_helper.h>
+ #include <drm/drm_gem_framebuffer_helper.h>
+ #include <drm/drm_modeset_helper_vtables.h>
+@@ -137,28 +138,87 @@ static const struct regmap_config meson_regmap_config = {
  
  static void meson_vpu_init(struct meson_drm *priv)
  {
@@ -4298,11 +4082,9 @@ index 17a5cca007e2..3a853fa251df 100644
 +	clk_bulk_unprepare(priv->num_intr_clks, priv->intr_clks);
 +	clk_bulk_unprepare(VPU_VID_CLK_NUM, priv->vid_clks);
 +}
-+
-+static void meson_fbdev_setup(struct meson_drm *priv)
-+{
-+	unsigned int preferred_bpp;
  
++static void meson_drm_client_setup(struct meson_drm *priv)
++{
  	/*
 -	 * Slave dc0 and dc5 connected to master port 1.
 -	 * By default other slaves are connected to master port 0.
@@ -4312,8 +4094,7 @@ index 17a5cca007e2..3a853fa251df 100644
 +	 * Meson8/8b/8m2 there is no way to configure the alpha value to use
 +	 * instead of the X component. This results in the fact that the
 +	 * formats with X component are only supported on GXBB and newer. Use
-+	 * 24 bits per pixel and therefore DRM_FORMAT_RGB888 to get a
-+	 * working framebuffer console.
++	 * DRM_FORMAT_RGB888 on older SoCs to get a working framebuffer console.
  	 */
 -	value = VPU_RDARB_SLAVE_TO_MASTER_PORT(0, 1) |
 -		VPU_RDARB_SLAVE_TO_MASTER_PORT(5, 1);
@@ -4334,15 +4115,13 @@ index 17a5cca007e2..3a853fa251df 100644
 +	if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8) ||
 +	    meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8B) ||
 +	    meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8M2))
-+		preferred_bpp = 24;
++		drm_fbdev_dma_setup(priv->drm, 24);
 +	else
-+		preferred_bpp = 32;
-+
-+	drm_fbdev_dma_setup(priv->drm, preferred_bpp);
++		drm_fbdev_dma_setup(priv->drm, 32);
  }
  
  struct meson_drm_soc_attr {
-@@ -165,13 +229,29 @@ struct meson_drm_soc_attr {
+@@ -167,13 +227,29 @@ struct meson_drm_soc_attr {
  };
  
  static const struct meson_drm_soc_attr meson_drm_soc_attrs[] = {
@@ -4373,58 +4152,58 @@ index 17a5cca007e2..3a853fa251df 100644
  			{ /* sentinel */ }
  		}
  	},
-@@ -292,52 +292,104 @@
+@@ -214,43 +290,95 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
  	priv->compat = match->compat;
  	priv->afbcd.ops = match->afbcd_ops;
  
-+   if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8) ||
-+       meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8B) ||
-+       meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8M2)) {
-+       priv->vid_pll_resets[VPU_RESET_VID_PLL_PRE].id = "vid_pll_pre";
-+       priv->vid_pll_resets[VPU_RESET_VID_PLL_POST].id = "vid_pll_post";
-+       priv->vid_pll_resets[VPU_RESET_VID_PLL_SOFT_PRE].id = "vid_pll_soft_pre";
-+       priv->vid_pll_resets[VPU_RESET_VID_PLL_SOFT_POST].id = "vid_pll_soft_post";
++	if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8) ||
++	    meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8B) ||
++	    meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8M2)) {
++		priv->vid_pll_resets[VPU_RESET_VID_PLL_PRE].id = "vid_pll_pre";
++		priv->vid_pll_resets[VPU_RESET_VID_PLL_POST].id = "vid_pll_post";
++		priv->vid_pll_resets[VPU_RESET_VID_PLL_SOFT_PRE].id = "vid_pll_soft_pre";
++		priv->vid_pll_resets[VPU_RESET_VID_PLL_SOFT_POST].id = "vid_pll_soft_post";
 +
-+       ret = devm_reset_control_bulk_get_exclusive(dev,
-+                               VPU_RESET_VID_PLL_NUM,
-+                               priv->vid_pll_resets);
-+       if (ret)
-+           goto free_drm;
++		ret = devm_reset_control_bulk_get_exclusive(dev,
++							    VPU_RESET_VID_PLL_NUM,
++							    priv->vid_pll_resets);
++		if (ret)
++			goto free_drm;
 +
-+       priv->intr_clks[0].id = "vpu_intr";
-+       priv->intr_clks[1].id = "hdmi_intr_sync";
-+       priv->intr_clks[2].id = "venci_int";
-+       priv->num_intr_clks = 3;
++		priv->intr_clks[0].id = "vpu_intr";
++		priv->intr_clks[1].id = "hdmi_intr_sync";
++		priv->intr_clks[2].id = "venci_int";
++		priv->num_intr_clks = 3;
 +
-+       ret = devm_clk_bulk_get(dev, priv->num_intr_clks,
-+                   priv->intr_clks);
-+       if (ret)
-+           goto free_drm;
++		ret = devm_clk_bulk_get(dev, priv->num_intr_clks,
++					priv->intr_clks);
++		if (ret)
++			goto free_drm;
 +
-+       priv->vid_clks[VPU_VID_CLK_TMDS].id = "tmds";
-+       priv->vid_clks[VPU_VID_CLK_HDMI_TX_PIXEL].id = "hdmi_tx_pixel";
-+       priv->vid_clks[VPU_VID_CLK_CTS_ENCP].id = "cts_encp";
-+       priv->vid_clks[VPU_VID_CLK_CTS_ENCI].id = "cts_enci";
-+       priv->vid_clks[VPU_VID_CLK_CTS_ENCT].id = "cts_enct";
-+       priv->vid_clks[VPU_VID_CLK_CTS_ENCL].id = "cts_encl";
-+       priv->vid_clks[VPU_VID_CLK_CTS_VDAC0].id = "cts_vdac0";
++		priv->vid_clks[VPU_VID_CLK_TMDS].id = "tmds";
++		priv->vid_clks[VPU_VID_CLK_HDMI_TX_PIXEL].id = "hdmi_tx_pixel";
++		priv->vid_clks[VPU_VID_CLK_CTS_ENCP].id = "cts_encp";
++		priv->vid_clks[VPU_VID_CLK_CTS_ENCI].id = "cts_enci";
++		priv->vid_clks[VPU_VID_CLK_CTS_ENCT].id = "cts_enct";
++		priv->vid_clks[VPU_VID_CLK_CTS_ENCL].id = "cts_encl";
++		priv->vid_clks[VPU_VID_CLK_CTS_VDAC0].id = "cts_vdac0";
 +
-+       ret = devm_clk_bulk_get(dev, VPU_VID_CLK_NUM, priv->vid_clks);
-+       if (ret)
-+           goto free_drm;
-+   } else {
-+       priv->intr_clks[0].id = "vpu_intr";
-+       priv->num_intr_clks = 1;
++		ret = devm_clk_bulk_get(dev, VPU_VID_CLK_NUM, priv->vid_clks);
++		if (ret)
++			goto free_drm;
++	} else {
++		priv->intr_clks[0].id = "vpu_intr";
++		priv->num_intr_clks = 1;
 +
-+       ret = devm_clk_bulk_get_optional(dev, priv->num_intr_clks,
-+                        priv->intr_clks);
-+       if (ret)
-+           goto free_drm;
-+   }
++		ret = devm_clk_bulk_get_optional(dev, priv->num_intr_clks,
++						 priv->intr_clks);
++		if (ret)
++			goto free_drm;
++	}
 +
-+   ret = meson_video_clock_init(priv);
-+   if (ret)
-+       goto free_drm;
++	ret = meson_video_clock_init(priv);
++	if (ret)
++		goto free_drm;
 +
  	regs = devm_platform_ioremap_resource_byname(pdev, "vpu");
  	if (IS_ERR(regs)) {
@@ -4435,10 +4214,10 @@ index 17a5cca007e2..3a853fa251df 100644
  
  	priv->io_base = regs;
  
-+   /*
-+    * The HHI resource is optional because it contains the clocks and CVBS
-+    * encoder registers. These are managed by separate drivers though.
-+    */
++	/*
++	 * The HHI resource is optional because it contains the clocks and CVBS
++	 * encoder registers. These are managed by separate drivers though.
++	 */
  	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "hhi");
 -	if (!res) {
 -		ret = -EINVAL;
@@ -4450,13 +4229,6 @@ index 17a5cca007e2..3a853fa251df 100644
 -		ret = -EADDRNOTAVAIL;
 -		goto free_drm;
 -	}
--
--	priv->hhi = devm_regmap_init_mmio(dev, regs,
--					  &meson_regmap_config);
--	if (IS_ERR(priv->hhi)) {
--		dev_err(&pdev->dev, "Couldn't create the HHI regmap\n");
--		ret = PTR_ERR(priv->hhi);
--		goto free_drm;
 +	if (res) {
 +		/* Simply ioremap since it may be a shared register zone */
 +		regs = devm_ioremap(dev, res->start, resource_size(res));
@@ -4464,9 +4236,15 @@ index 17a5cca007e2..3a853fa251df 100644
 +			ret = -EADDRNOTAVAIL;
 +			goto video_clock_exit;
 +		}
-+
+ 
+-	priv->hhi = devm_regmap_init_mmio(dev, regs,
+-					  &meson_regmap_config);
+-	if (IS_ERR(priv->hhi)) {
+-		dev_err(&pdev->dev, "Couldn't create the HHI regmap\n");
+-		ret = PTR_ERR(priv->hhi);
+-		goto free_drm;
 +		priv->hhi = devm_regmap_init_mmio(dev, regs,
-+						&meson_regmap_config);
++						  &meson_regmap_config);
 +		if (IS_ERR(priv->hhi)) {
 +			dev_err(&pdev->dev,
 +				"Couldn't create the HHI regmap\n");
@@ -4488,38 +4266,26 @@ index 17a5cca007e2..3a853fa251df 100644
 +		goto video_clock_exit;
  	ret = meson_canvas_alloc(priv->canvas, &priv->canvas_id_vd1_0);
  	if (ret)
--		goto free_canvas_osd1;
-+		goto video_clock_exit;
- 	ret = meson_canvas_alloc(priv->canvas, &priv->canvas_id_vd1_1);
- 	if (ret)
--		goto free_canvas_vd1_0;
-+		goto video_clock_exit;
- 	ret = meson_canvas_alloc(priv->canvas, &priv->canvas_id_vd1_2);
- 	if (ret)
--		goto free_canvas_vd1_1;
-+		goto video_clock_exit;
- 
- 	priv->vsync_irq = platform_get_irq(pdev, 0);
- 
-@@ -362,7 +494,7 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
+ 		goto free_canvas_osd1;
+@@ -481,7 +481,7 @@
  	if (ret)
  		goto uninstall_irq;
-
+ 
 -	drm_fbdev_dma_setup(drm, 32);
-+	meson_fbdev_setup(priv);
-
++	meson_drm_client_setup(priv);
+ 
  	return 0;
-
-@@ -442,6 +494,8 @@
- exit_afbcd:
- 	if (priv->afbcd.ops)
- 		priv->afbcd.ops->exit(priv);
+ 
+@@ -372,6 +500,8 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
+ 	meson_canvas_free(priv->canvas, priv->canvas_id_vd1_0);
+ free_canvas_osd1:
+ 	meson_canvas_free(priv->canvas, priv->canvas_id_osd1);
 +video_clock_exit:
 +	meson_video_clock_exit(priv);
- free_canvas_vd1_2:
- 	meson_canvas_free(priv->canvas, priv->canvas_id_vd1_2);
- free_canvas_vd1_1:
-@@ -415,6 +549,8 @@ static void meson_drv_unbind(struct device *dev)
+ free_drm:
+ 	drm_dev_put(drm);
+ 
+@@ -416,6 +546,8 @@ static void meson_drv_unbind(struct device *dev)
  
  	if (priv->afbcd.ops)
  		priv->afbcd.ops->exit(priv);
@@ -4528,7 +4294,7 @@ index 17a5cca007e2..3a853fa251df 100644
  }
  
  static const struct component_master_ops meson_drv_master_ops = {
-@@ -429,6 +565,8 @@ static int __maybe_unused meson_drv_pm_suspend(struct device *dev)
+@@ -430,6 +562,8 @@ static int __maybe_unused meson_drv_pm_suspend(struct device *dev)
  	if (!priv)
  		return 0;
  
@@ -4537,7 +4303,7 @@ index 17a5cca007e2..3a853fa251df 100644
  	return drm_mode_config_helper_suspend(priv->drm);
  }
  
-@@ -439,6 +577,7 @@ static int __maybe_unused meson_drv_pm_resume(struct device *dev)
+@@ -440,6 +574,7 @@ static int __maybe_unused meson_drv_pm_resume(struct device *dev)
  	if (!priv)
  		return 0;
  
@@ -4545,7 +4311,7 @@ index 17a5cca007e2..3a853fa251df 100644
  	meson_vpu_init(priv);
  	meson_venc_init(priv);
  	meson_vpp_init(priv);
-@@ -521,6 +660,18 @@ static void meson_drv_remove(struct platform_device *pdev)
+@@ -522,6 +657,18 @@ static void meson_drv_remove(struct platform_device *pdev)
  	component_master_del(&pdev->dev, &meson_drv_master_ops);
  }
  
@@ -4564,7 +4330,7 @@ index 17a5cca007e2..3a853fa251df 100644
  static struct meson_drm_match_data meson_drm_gxbb_data = {
  	.compat = VPU_COMPATIBLE_GXBB,
  };
-@@ -540,6 +691,12 @@ static struct meson_drm_match_data meson_drm_g12a_data = {
+@@ -541,6 +688,12 @@ static struct meson_drm_match_data meson_drm_g12a_data = {
  };
  
  static const struct of_device_id dt_match[] = {
@@ -5020,7 +4786,7 @@ index 0593a1cde906..4a84d7d993d9 100644
  	pdev = of_find_device_by_node(remote);
  	of_node_put(remote);
 diff --git a/drivers/gpu/drm/meson/meson_plane.c b/drivers/gpu/drm/meson/meson_plane.c
-index 815dfe30492b..27e39577218c 100644
+index b43ac61201f3..47d2f8328fa4 100644
 --- a/drivers/gpu/drm/meson/meson_plane.c
 +++ b/drivers/gpu/drm/meson/meson_plane.c
 @@ -200,8 +200,11 @@ static void meson_plane_atomic_update(struct drm_plane *plane,
@@ -5066,46 +4832,35 @@ index 815dfe30492b..27e39577218c 100644
 +	unsigned int num_drm_formats;
 +	const uint32_t *drm_formats;
  	const uint64_t *format_modifiers = format_modifiers_default;
+ 	int ret;
  
- 	meson_plane = devm_kzalloc(priv->drm->dev, sizeof(*meson_plane),
-@@ -562,15 +562,30 @@
- 	meson_plane->priv = priv;
- 	plane = &meson_plane->base;
- 
--	if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_GXM))
-+	if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_GXM)) {
-+		drm_formats = supported_drm_formats_gx;
-+		num_drm_formats = ARRAY_SIZE(supported_drm_formats_gx);
- 		format_modifiers = format_modifiers_afbc_gxm;
--	else if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_G12A))
-+	}
-+	else if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_G12A)) {
-+		drm_formats = supported_drm_formats_gx;
-+		num_drm_formats = ARRAY_SIZE(supported_drm_formats_gx);
+@@ -549,11 +567,19 @@ int meson_plane_create(struct meson_drm *priv)
+ 	else if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_G12A))
  		format_modifiers = format_modifiers_afbc_g12a;
-+	}
-+	else if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8) ||
-+		 meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8B) ||
-+		 meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8M2)) {
+ 
++	if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8) ||
++	    meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8B) ||
++	    meson_vpu_is_compatible(priv, VPU_COMPATIBLE_M8M2)) {
 +		drm_formats = supported_drm_formats_m8;
 +		num_drm_formats = ARRAY_SIZE(supported_drm_formats_m8);
 +	} else {
 +		drm_formats = supported_drm_formats_gx;
 +		num_drm_formats = ARRAY_SIZE(supported_drm_formats_gx);
 +	}
- 
++
  	ret = drm_universal_plane_init(priv->drm, plane, 0xFF,
- 					&meson_plane_funcs,
+-					&meson_plane_funcs,
 -					supported_drm_formats,
 -					ARRAY_SIZE(supported_drm_formats),
-+					drm_formats,
-+					num_drm_formats,
- 					format_modifiers,
+-					format_modifiers,
++					&meson_plane_funcs, drm_formats,
++					num_drm_formats, format_modifiers,
  					DRM_PLANE_TYPE_PRIMARY, "meson_primary_plane");
  	if (ret) {
+ 		devm_kfree(priv->drm->dev, meson_plane);
 diff --git a/drivers/gpu/drm/meson/meson_transwitch_hdmi.c b/drivers/gpu/drm/meson/meson_transwitch_hdmi.c
 new file mode 100644
-index 000000000000..3a07ab76314e
+index 000000000000..92b0f8735649
 --- /dev/null
 +++ b/drivers/gpu/drm/meson/meson_transwitch_hdmi.c
 @@ -0,0 +1,1537 @@
@@ -6634,9 +6389,9 @@ index 000000000000..3a07ab76314e
 +MODULE_DEVICE_TABLE(of, meson_txc_hdmi_of_table);
 +
 +static struct platform_driver meson_txc_hdmi_platform_driver = {
-+	.probe		= meson_txc_hdmi_probe,
-+	.remove_new	= meson_txc_hdmi_remove,
-+	.driver		= {
++	.probe	= meson_txc_hdmi_probe,
++	.remove	= meson_txc_hdmi_remove,
++	.driver	= {
 +		.name		= "meson-transwitch-hdmi",
 +		.of_match_table	= meson_txc_hdmi_of_table,
 +	},
@@ -7189,7 +6944,7 @@ index 000000000000..14929475c0c8
 +
 +#endif /* __MESON_TRANSWITCH_HDMI_H__ */
 diff --git a/drivers/gpu/drm/meson/meson_vclk.c b/drivers/gpu/drm/meson/meson_vclk.c
-index 2a82119eb58e..a2c1bf1aed77 100644
+index 2a942dc6a6dc..a8450f2a0c35 100644
 --- a/drivers/gpu/drm/meson/meson_vclk.c
 +++ b/drivers/gpu/drm/meson/meson_vclk.c
 @@ -732,6 +732,11 @@ meson_vclk_dmt_supported_freq(struct meson_drm *priv, unsigned int freq)
@@ -7471,16 +7226,18 @@ index cd399b0b7181..bdfa342c4ca1 100644
  	/* Disable VD1 AFBC */
  	/* di_mif0_en=0 mif0_to_vpp_en=0 di_mad_en=0 and afbc vd1 set=0*/
 diff --git a/drivers/iio/adc/meson_saradc.c b/drivers/iio/adc/meson_saradc.c
-index 13b473d8c6c7..6ad1a6f33f7d 100644
+index 2d475b43e717..2e4135c920d8 100644
 --- a/drivers/iio/adc/meson_saradc.c
 +++ b/drivers/iio/adc/meson_saradc.c
-@@ -156,9 +156,14 @@
+@@ -155,10 +155,15 @@
+  */
  #define MESON_SAR_ADC_REG11					0x2c
  	#define MESON_SAR_ADC_REG11_BANDGAP_EN			BIT(13)
- 	#define MESON_SAR_ADC_REG11_CMV_SEL                     BIT(6)
+-	#define MESON_SAR_ADC_REG11_CMV_SEL                     BIT(6)
 -	#define MESON_SAR_ADC_REG11_VREF_VOLTAGE                BIT(5)
 -	#define MESON_SAR_ADC_REG11_EOC                         BIT(1)
 -	#define MESON_SAR_ADC_REG11_VREF_SEL                    BIT(0)
++	#define MESON_SAR_ADC_REG11_CMV_SEL			BIT(6)
 +	#define MESON_SAR_ADC_REG11_VREF_VOLTAGE		BIT(5)
 +	#define MESON_SAR_ADC_REG11_EOC				BIT(1)
 +	#define MESON_SAR_ADC_REG11_VREF_SEL			BIT(0)
@@ -7530,8 +7287,8 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  };
  
  struct meson_sar_adc_data {
-@@ -982,14 +991,16 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
- 				   MESON_SAR_ADC_DELTA_10_TS_REVE0, 0);
+@@ -970,14 +979,16 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
+ 				  MESON_SAR_ADC_DELTA_10_TS_REVE0);
  	}
  
 -	regval = FIELD_PREP(MESON_SAR_ADC_REG3_CTRL_CONT_RING_COUNTER_EN,
@@ -7551,7 +7308,7 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  		regmap_update_bits(priv->regmap, MESON_SAR_ADC_REG11,
  				   MESON_SAR_ADC_REG11_EOC, regval);
  
-@@ -1001,14 +1012,19 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
+@@ -989,14 +1000,19 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
  		}
  
  		regval = FIELD_PREP(MESON_SAR_ADC_REG11_VREF_VOLTAGE,
@@ -7574,7 +7331,7 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  	}
  
  	ret = clk_set_parent(priv->adc_sel_clk, priv->clkin);
-@@ -1025,16 +1041,15 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
+@@ -1013,16 +1029,15 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
  static void meson_sar_adc_set_bandgap(struct iio_dev *indio_dev, bool on_off)
  {
  	struct meson_sar_adc_priv *priv = iio_priv(indio_dev);
@@ -7598,7 +7355,7 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  }
  
  static int meson_sar_adc_hw_enable(struct iio_dev *indio_dev)
-@@ -1199,7 +1214,6 @@ static const struct iio_info meson_sar_adc_iio_info = {
+@@ -1186,7 +1201,6 @@ static const struct iio_info meson_sar_adc_iio_info = {
  static const struct meson_sar_adc_param meson_sar_adc_meson8_param = {
  	.has_bl30_integration = false,
  	.clock_rate = 1150000,
@@ -7606,7 +7363,7 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  	.regmap_config = &meson_sar_adc_regmap_config_meson8,
  	.resolution = 10,
  	.temperature_trimming_bits = 4,
-@@ -1210,7 +1224,6 @@ static const struct meson_sar_adc_param meson_sar_adc_meson8_param = {
+@@ -1197,7 +1211,6 @@ static const struct meson_sar_adc_param meson_sar_adc_meson8_param = {
  static const struct meson_sar_adc_param meson_sar_adc_meson8b_param = {
  	.has_bl30_integration = false,
  	.clock_rate = 1150000,
@@ -7614,7 +7371,7 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  	.regmap_config = &meson_sar_adc_regmap_config_meson8,
  	.resolution = 10,
  	.temperature_trimming_bits = 5,
-@@ -1221,49 +1234,53 @@ static const struct meson_sar_adc_param meson_sar_adc_meson8b_param = {
+@@ -1208,49 +1221,53 @@ static const struct meson_sar_adc_param meson_sar_adc_meson8b_param = {
  static const struct meson_sar_adc_param meson_sar_adc_gxbb_param = {
  	.has_bl30_integration = true,
  	.clock_rate = 1200000,
@@ -7683,7 +7440,7 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  	.has_vref_select = true,
  	.vref_select = VREF_VDDA,
  };
-@@ -1293,6 +1310,11 @@ static const struct meson_sar_adc_data meson_sar_adc_gxl_data = {
+@@ -1280,6 +1297,11 @@ static const struct meson_sar_adc_data meson_sar_adc_gxl_data = {
  	.name = "meson-gxl-saradc",
  };
  
@@ -7695,7 +7452,7 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  static const struct meson_sar_adc_data meson_sar_adc_gxm_data = {
  	.param = &meson_sar_adc_gxl_param,
  	.name = "meson-gxm-saradc",
-@@ -1324,6 +1346,9 @@ static const struct of_device_id meson_sar_adc_of_match[] = {
+@@ -1311,6 +1333,9 @@ static const struct of_device_id meson_sar_adc_of_match[] = {
  	}, {
  		.compatible = "amlogic,meson-gxl-saradc",
  		.data = &meson_sar_adc_gxl_data,
@@ -7706,10 +7463,10 @@ index 13b473d8c6c7..6ad1a6f33f7d 100644
  		.compatible = "amlogic,meson-gxm-saradc",
  		.data = &meson_sar_adc_gxm_data,
 diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-index aebc587f77a7..1da7219d78d4 100644
+index 6824131b69b1..2c87cdf51d40 100644
 --- a/drivers/mmc/host/Kconfig
 +++ b/drivers/mmc/host/Kconfig
-@@ -441,6 +441,7 @@ config MMC_MESON_GX
+@@ -464,6 +464,7 @@ config MMC_MESON_GX
  	tristate "Amlogic S905/GX*/AXG SD/MMC Host Controller support"
  	depends on ARCH_MESON|| COMPILE_TEST
  	depends on COMMON_CLK
@@ -7717,7 +7474,7 @@ index aebc587f77a7..1da7219d78d4 100644
  	help
  	  This selects support for the Amlogic SD/MMC Host Controller
  	  found on the S905/GX*/AXG family of SoCs.  This controller is
-@@ -467,6 +468,7 @@ config MMC_MESON_MX_SDIO
+@@ -490,6 +491,7 @@ config MMC_MESON_MX_SDIO
  	depends on ARCH_MESON || COMPILE_TEST
  	depends on COMMON_CLK
  	depends on OF_ADDRESS
@@ -7726,7 +7483,7 @@ index aebc587f77a7..1da7219d78d4 100644
  	  This selects support for the SD/MMC Host Controller on
  	  Amlogic Meson6, Meson8 and Meson8b SoCs.
 diff --git a/drivers/mmc/host/meson-gx-mmc.c b/drivers/mmc/host/meson-gx-mmc.c
-index c7c067b9415a..9b25a4934c7e 100644
+index 694bb443d5f3..83d217cc79fd 100644
 --- a/drivers/mmc/host/meson-gx-mmc.c
 +++ b/drivers/mmc/host/meson-gx-mmc.c
 @@ -22,6 +22,7 @@
@@ -7764,15 +7521,14 @@ index c7c067b9415a..9b25a4934c7e 100644
  	if (host->pins_clk_gate) {
  		pinctrl_select_state(host->pinctrl, host->pins_clk_gate);
  	} else {
-@@ -331,23 +330,18 @@ static void meson_mmc_clk_gate(struct meson_host *host)
+@@ -331,23 +330,17 @@ static void meson_mmc_clk_gate(struct meson_host *host)
  		 * If the pinmux is not provided - default to the classic and
  		 * unsafe method
  		 */
 -		cfg = readl(host->regs + SD_EMMC_CFG);
 -		cfg |= CFG_STOP_CLOCK;
 -		writel(cfg, host->regs + SD_EMMC_CFG);
-+		regmap_update_bits(host->regmap, SD_EMMC_CFG, CFG_STOP_CLOCK,
-+				   CFG_STOP_CLOCK);
++		regmap_set_bits(host->regmap, SD_EMMC_CFG, CFG_STOP_CLOCK);
  	}
  }
  
@@ -7787,11 +7543,11 @@ index c7c067b9415a..9b25a4934c7e 100644
 -	cfg = readl(host->regs + SD_EMMC_CFG);
 -	cfg &= ~CFG_STOP_CLOCK;
 -	writel(cfg, host->regs + SD_EMMC_CFG);
-+	regmap_update_bits(host->regmap, SD_EMMC_CFG, CFG_STOP_CLOCK, 0);
++	regmap_clear_bits(host->regmap, SD_EMMC_CFG, CFG_STOP_CLOCK);
  }
  
  static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
-@@ -355,7 +349,6 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
+@@ -355,7 +348,6 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
  {
  	struct mmc_host *mmc = host->mmc;
  	int ret;
@@ -7799,30 +7555,29 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	/* Same request - bail-out */
  	if (host->ddr == ddr && host->req_rate == rate)
-@@ -371,18 +364,16 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
+@@ -371,18 +363,15 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
  		return 0;
  
  	/* Stop the clock during rate change to avoid glitches */
 -	cfg = readl(host->regs + SD_EMMC_CFG);
 -	cfg |= CFG_STOP_CLOCK;
 -	writel(cfg, host->regs + SD_EMMC_CFG);
-+	regmap_update_bits(host->regmap, SD_EMMC_CFG, CFG_STOP_CLOCK,
-+			   CFG_STOP_CLOCK);
++	regmap_set_bits(host->regmap, SD_EMMC_CFG, CFG_STOP_CLOCK);
  
  	if (ddr) {
  		/* DDR modes require higher module clock */
  		rate <<= 1;
 -		cfg |= CFG_DDR;
-+		regmap_update_bits(host->regmap, SD_EMMC_CFG, CFG_DDR, CFG_DDR);
++		regmap_set_bits(host->regmap, SD_EMMC_CFG, CFG_DDR);
  	} else {
 -		cfg &= ~CFG_DDR;
-+		regmap_update_bits(host->regmap, SD_EMMC_CFG, CFG_DDR, 0);
++		regmap_clear_bits(host->regmap, SD_EMMC_CFG, CFG_DDR);
  	}
 -	writel(cfg, host->regs + SD_EMMC_CFG);
  	host->ddr = ddr;
  
  	ret = clk_set_rate(host->mmc_clk, rate);
-@@ -416,7 +407,7 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
+@@ -416,7 +405,7 @@ static int meson_mmc_clk_set(struct meson_host *host, unsigned long rate,
   * generating the MMC clock.  Use the clock framework to create and
   * manage these clocks.
   */
@@ -7831,7 +7586,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  {
  	struct clk_init_data init;
  	struct clk_mux *mux;
-@@ -435,7 +426,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
+@@ -435,7 +424,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
  	clk_reg |= FIELD_PREP(CLK_RX_PHASE_MASK, CLK_PHASE_0);
  	if (host->mmc->caps & MMC_CAP_SDIO_IRQ)
  		clk_reg |= CLK_IRQ_SDIO_SLEEP(host);
@@ -7840,7 +7595,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	/* get the mux parents */
  	for (i = 0; i < MUX_CLK_NUM_PARENTS; i++) {
-@@ -463,7 +454,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
+@@ -463,7 +452,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
  	init.parent_names = mux_parent_names;
  	init.num_parents = MUX_CLK_NUM_PARENTS;
  
@@ -7849,7 +7604,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	mux->shift = __ffs(CLK_SRC_MASK);
  	mux->mask = CLK_SRC_MASK >> mux->shift;
  	mux->hw.init = &init;
-@@ -485,7 +476,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
+@@ -485,7 +474,7 @@ static int meson_mmc_clk_init(struct meson_host *host)
  	init.parent_names = clk_parent;
  	init.num_parents = 1;
  
@@ -7858,7 +7613,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	div->shift = __ffs(CLK_DIV_MASK);
  	div->width = __builtin_popcountl(CLK_DIV_MASK);
  	div->hw.init = &init;
-@@ -506,21 +497,15 @@ static int meson_mmc_clk_init(struct meson_host *host)
+@@ -506,21 +495,14 @@ static int meson_mmc_clk_init(struct meson_host *host)
  
  static void meson_mmc_disable_resampling(struct meson_host *host)
  {
@@ -7866,7 +7621,7 @@ index c7c067b9415a..9b25a4934c7e 100644
 -
 -	val &= ~ADJUST_ADJ_EN;
 -	writel(val, host->regs + host->data->adjust);
-+	regmap_update_bits(host->regmap, host->data->adjust, ADJUST_ADJ_EN, 0);
++	regmap_clear_bits(host->regmap, host->data->adjust, ADJUST_ADJ_EN);
  }
  
  static void meson_mmc_reset_resampling(struct meson_host *host)
@@ -7878,20 +7633,18 @@ index c7c067b9415a..9b25a4934c7e 100644
 -	val = readl(host->regs + host->data->adjust);
 -	val &= ~ADJUST_ADJ_DELAY_MASK;
 -	writel(val, host->regs + host->data->adjust);
-+	regmap_update_bits(host->regmap, host->data->adjust, ADJUST_ADJ_DELAY_MASK,
-+			   0);
++	regmap_clear_bits(host->regmap, host->data->adjust, ADJUST_ADJ_DELAY_MASK);
  }
  
  static int meson_mmc_resampling_tuning(struct mmc_host *mmc, u32 opcode)
-@@ -533,19 +518,21 @@ static int meson_mmc_resampling_tuning(struct mmc_host *mmc, u32 opcode)
+@@ -533,19 +515,20 @@ static int meson_mmc_resampling_tuning(struct mmc_host *mmc, u32 opcode)
  	max_dly = DIV_ROUND_UP(clk_get_rate(host->mux_clk),
  			       clk_get_rate(host->mmc_clk));
  
 -	val = readl(host->regs + host->data->adjust);
 -	val |= ADJUST_ADJ_EN;
 -	writel(val, host->regs + host->data->adjust);
-+	regmap_update_bits(host->regmap, host->data->adjust, ADJUST_ADJ_EN,
-+			   ADJUST_ADJ_EN);
++	regmap_set_bits(host->regmap, host->data->adjust, ADJUST_ADJ_EN);
  
 -	if (mmc_doing_retune(mmc))
 +	if (mmc_doing_retune(mmc)) {
@@ -7913,7 +7666,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  		ret = mmc_send_tuning(mmc, opcode, NULL);
  		if (!ret) {
-@@ -636,10 +623,8 @@ static void meson_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
+@@ -636,10 +619,8 @@ static void meson_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
  		bus_width = CFG_BUS_WIDTH_4;
  	}
  
@@ -7926,7 +7679,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	meson_mmc_check_resampling(host, ios);
  	err = meson_mmc_prepare_ios_clock(host, ios);
-@@ -665,7 +650,7 @@ static void meson_mmc_set_blksz(struct mmc_host *mmc, unsigned int blksz)
+@@ -665,7 +646,7 @@ static void meson_mmc_set_blksz(struct mmc_host *mmc, unsigned int blksz)
  	struct meson_host *host = mmc_priv(mmc);
  	u32 cfg, blksz_old;
  
@@ -7935,7 +7688,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	blksz_old = FIELD_GET(CFG_BLK_LEN_MASK, cfg);
  
  	if (!is_power_of_2(blksz))
-@@ -680,9 +665,8 @@ static void meson_mmc_set_blksz(struct mmc_host *mmc, unsigned int blksz)
+@@ -680,9 +661,8 @@ static void meson_mmc_set_blksz(struct mmc_host *mmc, unsigned int blksz)
  	dev_dbg(host->dev, "%s: update blk_len %d -> %d\n", __func__,
  		blksz_old, blksz);
  
@@ -7947,7 +7700,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  }
  
  static void meson_mmc_set_response_bits(struct mmc_command *cmd, u32 *cmd_cfg)
-@@ -708,7 +692,6 @@ static void meson_mmc_desc_chain_transfer(struct mmc_host *mmc, u32 cmd_cfg)
+@@ -708,7 +688,6 @@ static void meson_mmc_desc_chain_transfer(struct mmc_host *mmc, u32 cmd_cfg)
  	struct sd_emmc_desc *desc = host->descs;
  	struct mmc_data *data = host->cmd->data;
  	struct scatterlist *sg;
@@ -7955,7 +7708,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	int i;
  
  	if (data->flags & MMC_DATA_WRITE)
-@@ -736,8 +719,8 @@ static void meson_mmc_desc_chain_transfer(struct mmc_host *mmc, u32 cmd_cfg)
+@@ -736,8 +715,8 @@ static void meson_mmc_desc_chain_transfer(struct mmc_host *mmc, u32 cmd_cfg)
  	desc[data->sg_count - 1].cmd_cfg |= CMD_CFG_END_OF_CHAIN;
  
  	dma_wmb(); /* ensure descriptor is written before kicked */
@@ -7966,7 +7719,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  }
  
  /* local sg copy for dram_access_quirk */
-@@ -758,28 +741,19 @@ static void meson_mmc_copy_buffer(struct meson_host *host, struct mmc_data *data
+@@ -758,28 +737,19 @@ static void meson_mmc_copy_buffer(struct meson_host *host, struct mmc_data *data
  	sg_miter_start(&miter, sgl, nents, sg_flags);
  
  	while ((offset < buflen) && sg_miter_next(&miter)) {
@@ -8005,7 +7758,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  		offset += len;
  	}
-@@ -845,11 +819,11 @@ static void meson_mmc_start_cmd(struct mmc_host *mmc, struct mmc_command *cmd)
+@@ -845,11 +815,11 @@ static void meson_mmc_start_cmd(struct mmc_host *mmc, struct mmc_command *cmd)
  
  	/* Last descriptor */
  	cmd_cfg |= CMD_CFG_END_OF_CHAIN;
@@ -8021,7 +7774,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  }
  
  static int meson_mmc_validate_dram_access(struct mmc_host *mmc, struct mmc_data *data)
-@@ -899,7 +873,7 @@ static void meson_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
+@@ -899,7 +869,7 @@ static void meson_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
  		meson_mmc_pre_req(mmc, mrq);
  
  	/* Stop execution */
@@ -8030,7 +7783,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	meson_mmc_start_cmd(mmc, mrq->sbc ?: mrq->cmd);
  }
-@@ -909,12 +883,12 @@ static void meson_mmc_read_resp(struct mmc_host *mmc, struct mmc_command *cmd)
+@@ -909,12 +879,12 @@ static void meson_mmc_read_resp(struct mmc_host *mmc, struct mmc_command *cmd)
  	struct meson_host *host = mmc_priv(mmc);
  
  	if (cmd->flags & MMC_RSP_136) {
@@ -8048,7 +7801,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	}
  }
  
-@@ -925,7 +899,7 @@ static void __meson_mmc_enable_sdio_irq(struct mmc_host *mmc, int enable)
+@@ -925,7 +895,7 @@ static void __meson_mmc_enable_sdio_irq(struct mmc_host *mmc, int enable)
  
  	if (enable)
  		reg_irqen |= IRQ_SDIO;
@@ -8057,7 +7810,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  }
  
  static irqreturn_t meson_mmc_irq(int irq, void *dev_id)
-@@ -937,7 +911,8 @@ static irqreturn_t meson_mmc_irq(int irq, void *dev_id)
+@@ -937,7 +907,8 @@ static irqreturn_t meson_mmc_irq(int irq, void *dev_id)
  
  	if (host->mmc->caps & MMC_CAP_SDIO_IRQ)
  		irq_mask |= IRQ_SDIO;
@@ -8067,7 +7820,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	status = raw_status & irq_mask;
  
  	if (!status) {
-@@ -948,7 +923,7 @@ static irqreturn_t meson_mmc_irq(int irq, void *dev_id)
+@@ -948,7 +919,7 @@ static irqreturn_t meson_mmc_irq(int irq, void *dev_id)
  	}
  
  	/* ack all raised interrupts */
@@ -8076,7 +7829,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	cmd = host->cmd;
  
-@@ -992,13 +967,10 @@ static irqreturn_t meson_mmc_irq(int irq, void *dev_id)
+@@ -992,13 +963,9 @@ static irqreturn_t meson_mmc_irq(int irq, void *dev_id)
  	}
  
  out:
@@ -8088,12 +7841,11 @@ index c7c067b9415a..9b25a4934c7e 100644
 -		start &= ~START_DESC_BUSY;
 -		writel(start, host->regs + SD_EMMC_START);
 -	}
-+		regmap_update_bits(host->regmap, SD_EMMC_START,
-+				   START_DESC_BUSY, 0);
++		regmap_clear_bits(host->regmap, SD_EMMC_START, START_DESC_BUSY);
  
  	return ret;
  }
-@@ -1015,9 +987,9 @@ static int meson_mmc_wait_desc_stop(struct meson_host *host)
+@@ -1015,9 +982,9 @@ static int meson_mmc_wait_desc_stop(struct meson_host *host)
  	 * IRQs after we have called mmc_request_done() which is bad.
  	 */
  
@@ -8106,7 +7858,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  }
  
  static irqreturn_t meson_mmc_irq_thread(int irq, void *dev_id)
-@@ -1069,7 +1041,7 @@ static void meson_mmc_cfg_init(struct meson_host *host)
+@@ -1069,7 +1036,7 @@ static void meson_mmc_cfg_init(struct meson_host *host)
  	/* abort chain on R/W errors */
  	cfg |= CFG_ERR_ABORT;
  
@@ -8115,7 +7867,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  }
  
  static int meson_mmc_card_busy(struct mmc_host *mmc)
-@@ -1077,7 +1049,7 @@ static int meson_mmc_card_busy(struct mmc_host *mmc)
+@@ -1077,7 +1044,7 @@ static int meson_mmc_card_busy(struct mmc_host *mmc)
  	struct meson_host *host = mmc_priv(mmc);
  	u32 regval;
  
@@ -8124,7 +7876,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	/* We are only interrested in lines 0 to 3, so mask the other ones */
  	return !(FIELD_GET(STATUS_DATI, regval) & 0xf);
-@@ -1135,12 +1107,20 @@ static const struct mmc_host_ops meson_mmc_ops = {
+@@ -1135,12 +1102,20 @@ static const struct mmc_host_ops meson_mmc_ops = {
  	.ack_sdio_irq	= meson_mmc_ack_sdio_irq,
  };
  
@@ -8145,7 +7897,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	int cd_irq, ret;
  
  	mmc = devm_mmc_alloc_host(&pdev->dev, sizeof(struct meson_host));
-@@ -1177,9 +1157,9 @@ static int meson_mmc_probe(struct platform_device *pdev)
+@@ -1177,9 +1152,9 @@ static int meson_mmc_probe(struct platform_device *pdev)
  	if (ret)
  		return dev_err_probe(&pdev->dev, ret, "device reset failed\n");
  
@@ -8158,7 +7910,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	host->irq = platform_get_irq(pdev, 0);
  	if (host->irq < 0)
-@@ -1204,7 +1184,12 @@ static int meson_mmc_probe(struct platform_device *pdev)
+@@ -1204,7 +1179,12 @@ static int meson_mmc_probe(struct platform_device *pdev)
  	if (IS_ERR(core_clk))
  		return PTR_ERR(core_clk);
  
@@ -8172,7 +7924,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  	if (ret)
  		return ret;
  
-@@ -1212,12 +1197,12 @@ static int meson_mmc_probe(struct platform_device *pdev)
+@@ -1212,12 +1192,12 @@ static int meson_mmc_probe(struct platform_device *pdev)
  	meson_mmc_cfg_init(host);
  
  	/* Stop execution */
@@ -8189,7 +7941,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	ret = request_threaded_irq(host->irq, meson_mmc_irq,
  				   meson_mmc_irq_thread, IRQF_ONESHOT,
-@@ -1256,7 +1241,6 @@ static int meson_mmc_probe(struct platform_device *pdev)
+@@ -1256,7 +1236,6 @@ static int meson_mmc_probe(struct platform_device *pdev)
  		 * instead of the DDR memory
  		 */
  		host->bounce_buf_size = SD_EMMC_SRAM_DATA_BUF_LEN;
@@ -8197,7 +7949,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  		host->bounce_dma_addr = res->start + SD_EMMC_SRAM_DATA_BUF_OFF;
  	} else {
  		/* data bounce buffer */
-@@ -1300,7 +1284,7 @@ static void meson_mmc_remove(struct platform_device *pdev)
+@@ -1300,7 +1279,7 @@ static void meson_mmc_remove(struct platform_device *pdev)
  	mmc_remove_host(host->mmc);
  
  	/* disable interrupts */
@@ -8207,7 +7959,7 @@ index c7c067b9415a..9b25a4934c7e 100644
  
  	clk_disable_unprepare(host->mmc_clk);
 diff --git a/drivers/mmc/host/meson-mx-sdio.c b/drivers/mmc/host/meson-mx-sdio.c
-index a11577f2ee69..31aecc93facb 100644
+index ad351805eed4..15c2ebedb2b9 100644
 --- a/drivers/mmc/host/meson-mx-sdio.c
 +++ b/drivers/mmc/host/meson-mx-sdio.c
 @@ -19,6 +19,7 @@
@@ -8276,7 +8028,7 @@ index a11577f2ee69..31aecc93facb 100644
  
  	host->cmd = cmd;
  
-@@ -215,25 +205,24 @@ static void meson_mx_mmc_start_cmd(struct mmc_host *mmc,
+@@ -215,25 +205,22 @@ static void meson_mx_mmc_start_cmd(struct mmc_host *mmc,
  
  	spin_lock_irqsave(&host->irq_lock, irqflags);
  
@@ -8294,17 +8046,15 @@ index a11577f2ee69..31aecc93facb 100644
 -	meson_mx_mmc_mask_bits(mmc, MESON_MX_SDIO_IRQC,
 -			       MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN,
 -			       MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN);
-+	regmap_update_bits(host->regmap, MESON_MX_SDIO_IRQC,
-+			   MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN,
-+			   MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN);
++	regmap_set_bits(host->regmap, MESON_MX_SDIO_IRQC,
++			MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN);
  
  	/* clear pending interrupts */
 -	meson_mx_mmc_mask_bits(mmc, MESON_MX_SDIO_IRQS,
 -			       MESON_MX_SDIO_IRQS_CMD_INT,
 -			       MESON_MX_SDIO_IRQS_CMD_INT);
-+	regmap_update_bits(host->regmap, MESON_MX_SDIO_IRQS,
-+			   MESON_MX_SDIO_IRQS_CMD_INT,
-+			   MESON_MX_SDIO_IRQS_CMD_INT);
++	regmap_set_bits(host->regmap, MESON_MX_SDIO_IRQS,
++			MESON_MX_SDIO_IRQS_CMD_INT);
  
 -	writel(cmd->arg, host->base + MESON_MX_SDIO_ARGU);
 -	writel(ext, host->base + MESON_MX_SDIO_EXT);
@@ -8315,27 +8065,26 @@ index a11577f2ee69..31aecc93facb 100644
  
  	spin_unlock_irqrestore(&host->irq_lock, irqflags);
  
-@@ -263,14 +252,14 @@ static void meson_mx_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
+@@ -263,14 +250,13 @@ static void meson_mx_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
  
  	switch (ios->bus_width) {
  	case MMC_BUS_WIDTH_1:
 -		meson_mx_mmc_mask_bits(mmc, MESON_MX_SDIO_CONF,
 -				       MESON_MX_SDIO_CONF_BUS_WIDTH, 0);
-+		regmap_update_bits(host->regmap, MESON_MX_SDIO_CONF,
-+				   MESON_MX_SDIO_CONF_BUS_WIDTH, 0);
++		regmap_clear_bits(host->regmap, MESON_MX_SDIO_CONF,
++				  MESON_MX_SDIO_CONF_BUS_WIDTH);
  		break;
  
  	case MMC_BUS_WIDTH_4:
 -		meson_mx_mmc_mask_bits(mmc, MESON_MX_SDIO_CONF,
 -				       MESON_MX_SDIO_CONF_BUS_WIDTH,
 -				       MESON_MX_SDIO_CONF_BUS_WIDTH);
-+		regmap_update_bits(host->regmap, MESON_MX_SDIO_CONF,
-+				   MESON_MX_SDIO_CONF_BUS_WIDTH,
-+				   MESON_MX_SDIO_CONF_BUS_WIDTH);
++		regmap_set_bits(host->regmap, MESON_MX_SDIO_CONF,
++				MESON_MX_SDIO_CONF_BUS_WIDTH);
  		break;
  
  	case MMC_BUS_WIDTH_8:
-@@ -351,8 +340,8 @@ static void meson_mx_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
+@@ -351,8 +337,8 @@ static void meson_mx_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
  	host->mrq = mrq;
  
  	if (mrq->data)
@@ -8346,7 +8095,7 @@ index a11577f2ee69..31aecc93facb 100644
  
  	if (mrq->sbc)
  		meson_mx_mmc_start_cmd(mmc, mrq->sbc);
-@@ -364,24 +353,26 @@ static void meson_mx_mmc_read_response(struct mmc_host *mmc,
+@@ -364,24 +350,26 @@ static void meson_mx_mmc_read_response(struct mmc_host *mmc,
  				       struct mmc_command *cmd)
  {
  	struct meson_mx_mmc_host *host = mmc_priv(mmc);
@@ -8382,7 +8131,7 @@ index a11577f2ee69..31aecc93facb 100644
  	}
  }
  
-@@ -422,8 +413,8 @@ static irqreturn_t meson_mx_mmc_irq(int irq, void *data)
+@@ -422,8 +410,8 @@ static irqreturn_t meson_mx_mmc_irq(int irq, void *data)
  
  	spin_lock(&host->irq_lock);
  
@@ -8393,7 +8142,7 @@ index a11577f2ee69..31aecc93facb 100644
  
  	if (irqs & MESON_MX_SDIO_IRQS_CMD_INT)
  		ret = meson_mx_mmc_process_cmd_irq(host, irqs, send);
-@@ -431,7 +422,7 @@ static irqreturn_t meson_mx_mmc_irq(int irq, void *data)
+@@ -431,7 +419,7 @@ static irqreturn_t meson_mx_mmc_irq(int irq, void *data)
  		ret = IRQ_HANDLED;
  
  	/* finally ACK all pending interrupts */
@@ -8402,7 +8151,7 @@ index a11577f2ee69..31aecc93facb 100644
  
  	spin_unlock(&host->irq_lock);
  
-@@ -469,14 +460,13 @@ static void meson_mx_mmc_timeout(struct timer_list *t)
+@@ -469,14 +457,13 @@ static void meson_mx_mmc_timeout(struct timer_list *t)
  {
  	struct meson_mx_mmc_host *host = from_timer(host, t, cmd_timeout);
  	unsigned long irqflags;
@@ -8415,12 +8164,12 @@ index a11577f2ee69..31aecc93facb 100644
 -	irqc = readl(host->base + MESON_MX_SDIO_IRQC);
 -	irqc &= ~MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN;
 -	writel(irqc, host->base + MESON_MX_SDIO_IRQC);
-+	regmap_update_bits(host->regmap, MESON_MX_SDIO_IRQC,
-+			   MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN, 0);
++	regmap_clear_bits(host->regmap, MESON_MX_SDIO_IRQC,
++			  MESON_MX_SDIO_IRQC_ARC_CMD_INT_EN);
  
  	spin_unlock_irqrestore(&host->irq_lock, irqflags);
  
-@@ -487,10 +477,12 @@ static void meson_mx_mmc_timeout(struct timer_list *t)
+@@ -487,10 +474,12 @@ static void meson_mx_mmc_timeout(struct timer_list *t)
  	if (!host->cmd)
  		return;
  
@@ -8435,7 +8184,7 @@ index a11577f2ee69..31aecc93facb 100644
  
  	host->cmd->error = -ETIMEDOUT;
  
-@@ -560,8 +552,7 @@ static int meson_mx_mmc_add_host(struct meson_mx_mmc_host *host)
+@@ -560,8 +549,7 @@ static int meson_mx_mmc_add_host(struct meson_mx_mmc_host *host)
  
  	/* Get the min and max supported clock rates */
  	mmc->f_min = clk_round_rate(host->cfg_div_clk, 1);
@@ -8445,7 +8194,7 @@ index a11577f2ee69..31aecc93facb 100644
  
  	mmc->caps |= MMC_CAP_CMD23 | MMC_CAP_WAIT_WHILE_BUSY;
  	mmc->ops = &meson_mx_mmc_ops;
-@@ -577,70 +568,104 @@ static int meson_mx_mmc_add_host(struct meson_mx_mmc_host *host)
+@@ -577,70 +565,104 @@ static int meson_mx_mmc_add_host(struct meson_mx_mmc_host *host)
  	return 0;
  }
  
@@ -8591,7 +8340,7 @@ index a11577f2ee69..31aecc93facb 100644
  	if (!mmc) {
  		ret = -ENOMEM;
  		goto error_unregister_slot_pdev;
-@@ -655,16 +680,17 @@ static int meson_mx_mmc_probe(struct platform_device *pdev)
+@@ -655,16 +677,17 @@ static int meson_mx_mmc_probe(struct platform_device *pdev)
  
  	platform_set_drvdata(pdev, host);
  
@@ -8614,7 +8363,7 @@ index a11577f2ee69..31aecc93facb 100644
  	}
  
  	ret = devm_request_threaded_irq(host->controller_dev, irq,
-@@ -672,34 +698,28 @@ static int meson_mx_mmc_probe(struct platform_device *pdev)
+@@ -672,34 +695,28 @@ static int meson_mx_mmc_probe(struct platform_device *pdev)
  					meson_mx_mmc_irq_thread, IRQF_ONESHOT,
  					NULL, host);
  	if (ret)
@@ -8656,7 +8405,7 @@ index a11577f2ee69..31aecc93facb 100644
  	}
  
  	conf = 0;
-@@ -707,22 +727,20 @@ static int meson_mx_mmc_probe(struct platform_device *pdev)
+@@ -707,22 +724,20 @@ static int meson_mx_mmc_probe(struct platform_device *pdev)
  	conf |= FIELD_PREP(MESON_MX_SDIO_CONF_M_ENDIAN_MASK, 0x3);
  	conf |= FIELD_PREP(MESON_MX_SDIO_CONF_WRITE_NWR_MASK, 0x2);
  	conf |= FIELD_PREP(MESON_MX_SDIO_CONF_WRITE_CRC_OK_STATUS_MASK, 0x2);
@@ -8684,7 +8433,7 @@ index a11577f2ee69..31aecc93facb 100644
  error_unregister_slot_pdev:
  	of_platform_device_destroy(&slot_pdev->dev, NULL);
  	return ret;
-@@ -733,16 +751,13 @@ static void meson_mx_mmc_remove(struct platform_device *pdev)
+@@ -733,16 +748,13 @@ static void meson_mx_mmc_remove(struct platform_device *pdev)
  	struct meson_mx_mmc_host *host = platform_get_drvdata(pdev);
  	struct device *slot_dev = mmc_dev(host->mmc);
  
@@ -8704,10 +8453,10 @@ index a11577f2ee69..31aecc93facb 100644
  
  static const struct of_device_id meson_mx_mmc_of_match[] = {
 diff --git a/drivers/mtd/nand/raw/meson_nand.c b/drivers/mtd/nand/raw/meson_nand.c
-index 2a96a87cf79c..f10b79c9413e 100644
+index b8834aa96e81..1adf386c9725 100644
 --- a/drivers/mtd/nand/raw/meson_nand.c
 +++ b/drivers/mtd/nand/raw/meson_nand.c
-@@ -141,6 +141,7 @@ struct meson_nand_ecc {
+@@ -146,6 +146,7 @@ struct meson_nand_ecc {
  
  struct meson_nfc_data {
  	const struct nand_ecc_caps *ecc_caps;
@@ -8715,7 +8464,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  };
  
  struct meson_nfc_param {
-@@ -163,7 +164,6 @@ struct nand_timing {
+@@ -168,7 +169,6 @@ struct nand_timing {
  struct meson_nfc {
  	struct nand_controller controller;
  	struct clk *core_clk;
@@ -8723,7 +8472,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  	struct clk *nand_clk;
  	struct clk_divider nand_divider;
  
-@@ -226,7 +226,7 @@ static int meson_nand_calc_ecc_bytes(int step_size, int strength)
+@@ -231,7 +231,7 @@ static int meson_nand_calc_ecc_bytes(int step_size, int strength)
  	return ecc_bytes;
  }
  
@@ -8732,7 +8481,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  		     meson_nand_calc_ecc_bytes, 1024, 8, 24, 30, 40, 50, 60);
  
  static const int axg_stepinfo_strengths[] = { 8 };
-@@ -1127,37 +1127,38 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
+@@ -1139,37 +1139,38 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
  		return PTR_ERR(nfc->core_clk);
  	}
  
@@ -8801,7 +8550,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  
  	ret = clk_prepare_enable(nfc->core_clk);
  	if (ret) {
-@@ -1165,12 +1166,6 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
+@@ -1177,12 +1178,6 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
  		return ret;
  	}
  
@@ -8814,7 +8563,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  	ret = clk_prepare_enable(nfc->nand_clk);
  	if (ret) {
  		dev_err(nfc->dev, "pre enable NFC divider fail\n");
-@@ -1186,8 +1181,6 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
+@@ -1198,8 +1193,6 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
  err_disable_clk:
  	clk_disable_unprepare(nfc->nand_clk);
  err_nand_clk:
@@ -8823,7 +8572,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  	clk_disable_unprepare(nfc->core_clk);
  	return ret;
  }
-@@ -1195,7 +1188,6 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
+@@ -1207,7 +1200,6 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
  static void meson_nfc_disable_clk(struct meson_nfc *nfc)
  {
  	clk_disable_unprepare(nfc->nand_clk);
@@ -8831,7 +8580,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  	clk_disable_unprepare(nfc->core_clk);
  }
  
-@@ -1494,16 +1486,32 @@ static irqreturn_t meson_nfc_irq(int irq, void *id)
+@@ -1524,16 +1516,32 @@ static irqreturn_t meson_nfc_irq(int irq, void *id)
  	return IRQ_HANDLED;
  }
  
@@ -8865,7 +8614,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  		.compatible = "amlogic,meson-gxl-nfc",
  		.data = &meson_gxl_data,
  	}, {
-@@ -1534,13 +1542,15 @@ static int meson_nfc_probe(struct platform_device *pdev)
+@@ -1564,13 +1572,15 @@ static int meson_nfc_probe(struct platform_device *pdev)
  
  	nfc->dev = dev;
  
@@ -8886,7 +8635,7 @@ index 2a96a87cf79c..f10b79c9413e 100644
  	irq = platform_get_irq(pdev, 0);
  	if (irq < 0)
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-index a16bfa9089ea..b96aa4d39467 100644
+index 5469fa1b429e..05df6dea820b 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
 @@ -5,6 +5,8 @@
@@ -9010,7 +8759,7 @@ index a16bfa9089ea..b96aa4d39467 100644
  
  static const struct of_device_id meson6_dwmac_match[] = {
 diff --git a/drivers/nvmem/meson-mx-efuse.c b/drivers/nvmem/meson-mx-efuse.c
-index 3ff04d5ca8f8..8d82964897b2 100644
+index 8a16f5f02657..8d82964897b2 100644
 --- a/drivers/nvmem/meson-mx-efuse.c
 +++ b/drivers/nvmem/meson-mx-efuse.c
 @@ -9,6 +9,7 @@
@@ -9021,7 +8770,7 @@ index 3ff04d5ca8f8..8d82964897b2 100644
  #include <linux/io.h>
  #include <linux/iopoll.h>
  #include <linux/module.h>
-@@ -166,6 +166,28 @@ static int meson_mx_efuse_read(void *context, unsigned int offset,
+@@ -165,6 +166,28 @@ static int meson_mx_efuse_read(void *context, unsigned int offset,
  	return err;
  }
  
@@ -9557,6 +9306,252 @@ index d63147c41b8c..d3d0bd3671ee 100644
  	phy = devm_phy_create(&pdev->dev, NULL, &phy_meson8b_usb2_ops);
  	if (IS_ERR(phy)) {
  		return dev_err_probe(&pdev->dev, PTR_ERR(phy),
+diff --git a/drivers/regulator/pwm-regulator.c b/drivers/regulator/pwm-regulator.c
+index 7434b6b22d32..5275278da743 100644
+--- a/drivers/regulator/pwm-regulator.c
++++ b/drivers/regulator/pwm-regulator.c
+@@ -41,6 +41,8 @@ struct pwm_regulator_data {
+ 
+ 	/* Enable GPIO */
+ 	struct gpio_desc *enb_gpio;
++
++	struct pwm_state pwm_state;
+ };
+ 
+ struct pwm_voltages {
+@@ -48,18 +50,40 @@ struct pwm_voltages {
+ 	unsigned int dutycycle;
+ };
+ 
++static int pwm_regulator_update_dutycycle(struct regulator_dev *rdev,
++					  unsigned int dutycyle,
++					  unsigned int dutycycle_unit)
++{
++	struct pwm_regulator_data *drvdata = rdev_get_drvdata(rdev);
++	int ret;
++
++	pwm_set_relative_duty_cycle(&drvdata->pwm_state, dutycyle, dutycycle_unit);
++
++	if (!drvdata->pwm_state.enabled)
++		/*
++		 * Keep the "disabled configuration" (disabled = false,
++		 * period = 0, duty_cycle = 0) on the actual PWM output until
++		 * the regulator is getting enabled.
++		 */
++		return 0;
++
++	ret = pwm_apply_might_sleep(drvdata->pwm, &drvdata->pwm_state);
++	if (ret)
++		dev_err(&rdev->dev, "Failed to configure PWM: %d\n", ret);
++
++	return ret;
++}
++
+ /*
+  * Voltage table call-backs
+  */
+ static void pwm_regulator_init_state(struct regulator_dev *rdev)
+ {
+ 	struct pwm_regulator_data *drvdata = rdev_get_drvdata(rdev);
+-	struct pwm_state pwm_state;
+ 	unsigned int dutycycle;
+ 	int i;
+ 
+-	pwm_get_state(drvdata->pwm, &pwm_state);
+-	dutycycle = pwm_get_relative_duty_cycle(&pwm_state, 100);
++	dutycycle = pwm_get_relative_duty_cycle(&drvdata->pwm_state, 100);
+ 
+ 	for (i = 0; i < rdev->desc->n_voltages; i++) {
+ 		if (dutycycle == drvdata->duty_cycle_table[i].dutycycle) {
+@@ -83,18 +107,13 @@ static int pwm_regulator_set_voltage_sel(struct regulator_dev *rdev,
+ 					 unsigned selector)
+ {
+ 	struct pwm_regulator_data *drvdata = rdev_get_drvdata(rdev);
+-	struct pwm_state pstate;
+ 	int ret;
+ 
+-	pwm_init_state(drvdata->pwm, &pstate);
+-	pwm_set_relative_duty_cycle(&pstate,
+-			drvdata->duty_cycle_table[selector].dutycycle, 100);
+-
+-	ret = pwm_apply_might_sleep(drvdata->pwm, &pstate);
+-	if (ret) {
+-		dev_err(&rdev->dev, "Failed to configure PWM: %d\n", ret);
++	ret = pwm_regulator_update_dutycycle(rdev,
++					     drvdata->duty_cycle_table[selector].dutycycle,
++					     100);
++	if (ret)
+ 		return ret;
+-	}
+ 
+ 	drvdata->state = selector;
+ 
+@@ -115,17 +134,41 @@ static int pwm_regulator_list_voltage(struct regulator_dev *rdev,
+ static int pwm_regulator_enable(struct regulator_dev *dev)
+ {
+ 	struct pwm_regulator_data *drvdata = rdev_get_drvdata(dev);
++	int ret;
+ 
+ 	gpiod_set_value_cansleep(drvdata->enb_gpio, 1);
+ 
+-	return pwm_enable(drvdata->pwm);
++	drvdata->pwm_state.enabled = true;
++
++	ret = pwm_apply_might_sleep(drvdata->pwm, &drvdata->pwm_state);
++	if (ret)
++		dev_err(&dev->dev, "Failed to enable PWM: %d\n", ret);
++
++	return ret;
+ }
+ 
+ static int pwm_regulator_disable(struct regulator_dev *dev)
+ {
+ 	struct pwm_regulator_data *drvdata = rdev_get_drvdata(dev);
++	struct pwm_state new_pstate;
++	int ret;
++
++	drvdata->pwm_state.enabled = false;
++
++	/*
++	 * Keep the period and duty_cycle within the copy in drvdata untouched
++	 * so the regulator can be enabled again without a .set_voltage{,_sel}
++	 * call prior to re-enabling it.
++	 */
++	new_pstate = drvdata->pwm_state;
++	new_pstate.period = 0;
++	new_pstate.duty_cycle = 0;
+ 
+-	pwm_disable(drvdata->pwm);
++	ret = pwm_apply_might_sleep(drvdata->pwm, &new_pstate);
++	if (ret) {
++		dev_err(&dev->dev, "Failed to disable PWM: %d\n", ret);
++		return ret;
++	}
+ 
+ 	gpiod_set_value_cansleep(drvdata->enb_gpio, 0);
+ 
+@@ -139,7 +182,7 @@ static int pwm_regulator_is_enabled(struct regulator_dev *dev)
+ 	if (drvdata->enb_gpio && !gpiod_get_value_cansleep(drvdata->enb_gpio))
+ 		return false;
+ 
+-	return pwm_is_enabled(drvdata->pwm);
++	return drvdata->pwm_state.enabled;
+ }
+ 
+ static int pwm_regulator_get_voltage(struct regulator_dev *rdev)
+@@ -151,20 +194,10 @@ static int pwm_regulator_get_voltage(struct regulator_dev *rdev)
+ 	int min_uV = rdev->constraints->min_uV;
+ 	int max_uV = rdev->constraints->max_uV;
+ 	int diff_uV = max_uV - min_uV;
+-	struct pwm_state pstate;
+ 	unsigned int diff_duty;
+ 	unsigned int voltage;
+ 
+-	pwm_get_state(drvdata->pwm, &pstate);
+-
+-	if (!pstate.enabled) {
+-		if (pstate.polarity == PWM_POLARITY_INVERSED)
+-			pstate.duty_cycle = pstate.period;
+-		else
+-			pstate.duty_cycle = 0;
+-	}
+-
+-	voltage = pwm_get_relative_duty_cycle(&pstate, duty_unit);
++	voltage = pwm_get_relative_duty_cycle(&drvdata->pwm_state, duty_unit);
+ 	if (voltage < min(max_uV_duty, min_uV_duty) ||
+ 	    voltage > max(max_uV_duty, min_uV_duty))
+ 		return -ENOTRECOVERABLE;
+@@ -198,12 +231,8 @@ static int pwm_regulator_set_voltage(struct regulator_dev *rdev,
+ 	int min_uV = rdev->constraints->min_uV;
+ 	int max_uV = rdev->constraints->max_uV;
+ 	int diff_uV = max_uV - min_uV;
+-	struct pwm_state pstate;
+ 	unsigned int diff_duty;
+ 	unsigned int dutycycle;
+-	int ret;
+-
+-	pwm_init_state(drvdata->pwm, &pstate);
+ 
+ 	/*
+ 	 * The dutycycle for min_uV might be greater than the one for max_uV.
+@@ -224,15 +253,7 @@ static int pwm_regulator_set_voltage(struct regulator_dev *rdev,
+ 	else
+ 		dutycycle = min_uV_duty + dutycycle;
+ 
+-	pwm_set_relative_duty_cycle(&pstate, dutycycle, duty_unit);
+-
+-	ret = pwm_apply_might_sleep(drvdata->pwm, &pstate);
+-	if (ret) {
+-		dev_err(&rdev->dev, "Failed to configure PWM: %d\n", ret);
+-		return ret;
+-	}
+-
+-	return 0;
++	return pwm_regulator_update_dutycycle(rdev, dutycycle, duty_unit);
+ }
+ 
+ static const struct regulator_ops pwm_regulator_voltage_table_ops = {
+@@ -321,32 +342,6 @@ static int pwm_regulator_init_continuous(struct platform_device *pdev,
+ 	return 0;
+ }
+ 
+-static int pwm_regulator_init_boot_on(struct platform_device *pdev,
+-				      struct pwm_regulator_data *drvdata,
+-				      const struct regulator_init_data *init_data)
+-{
+-	struct pwm_state pstate;
+-
+-	if (!init_data->constraints.boot_on || drvdata->enb_gpio)
+-		return 0;
+-
+-	pwm_get_state(drvdata->pwm, &pstate);
+-	if (pstate.enabled)
+-		return 0;
+-
+-	/*
+-	 * Update the duty cycle so the output does not change
+-	 * when the regulator core enables the regulator (and
+-	 * thus the PWM channel).
+-	 */
+-	if (pstate.polarity == PWM_POLARITY_INVERSED)
+-		pstate.duty_cycle = pstate.period;
+-	else
+-		pstate.duty_cycle = 0;
+-
+-	return pwm_apply_might_sleep(drvdata->pwm, &pstate);
+-}
+-
+ static int pwm_regulator_probe(struct platform_device *pdev)
+ {
+ 	const struct regulator_init_data *init_data;
+@@ -404,10 +399,23 @@ static int pwm_regulator_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = pwm_regulator_init_boot_on(pdev, drvdata, init_data);
+-	if (ret)
+-		return dev_err_probe(&pdev->dev, ret,
+-				     "Failed to apply boot_on settings\n");
++	pwm_init_state(drvdata->pwm, &drvdata->pwm_state);
++
++	if (init_data->constraints.boot_on && !drvdata->enb_gpio &&
++	    !drvdata->pwm_state.enabled)
++		/*
++		* In general it's unknown what the output of a disabled PWM is.
++		* The only sane assumption here is it emits the inactive level
++		* which corresponds to duty_cycle = 0 (independent of the
++		* polarity).
++		*
++		* Update the duty cycle so the output does not change when the
++		* regulator core enables the regulator (and thus the PWM
++		* channel) and there's no change to the duty cycle because the
++		* voltage that is achieved with a disabled PWM is already the
++		* desired one.
++		*/
++		drvdata->pwm_state.duty_cycle = 0;
+ 
+ 	regulator = devm_regulator_register(&pdev->dev,
+ 					    &drvdata->desc, &config);
 diff --git a/drivers/soc/amlogic/meson-mx-socinfo.c b/drivers/soc/amlogic/meson-mx-socinfo.c
 index 92125dd65f33..25503bdd7ab1 100644
 --- a/drivers/soc/amlogic/meson-mx-socinfo.c
@@ -9606,7 +9601,7 @@ index 92125dd65f33..25503bdd7ab1 100644
  	soc_dev_attr = kzalloc(sizeof(*soc_dev_attr), GFP_KERNEL);
  	if (!soc_dev_attr)
 diff --git a/drivers/usb/common/usb-conn-gpio.c b/drivers/usb/common/usb-conn-gpio.c
-index 501e8bc9738e..b0b19e026a4b 100644
+index c84b4a700084..8f53d62f96ea 100644
 --- a/drivers/usb/common/usb-conn-gpio.c
 +++ b/drivers/usb/common/usb-conn-gpio.c
 @@ -23,6 +23,7 @@
@@ -9735,7 +9730,7 @@ index 501e8bc9738e..b0b19e026a4b 100644
  
  	return 0;
 diff --git a/drivers/usb/dwc2/platform.c b/drivers/usb/dwc2/platform.c
-index b1d48019e944..d56c1ea5ba54 100644
+index 91c80a92d9b8..a3d78adece72 100644
 --- a/drivers/usb/dwc2/platform.c
 +++ b/drivers/usb/dwc2/platform.c
 @@ -12,6 +12,7 @@
@@ -9746,7 +9741,7 @@ index b1d48019e944..d56c1ea5ba54 100644
  #include <linux/mutex.h>
  #include <linux/platform_device.h>
  #include <linux/phy/phy.h>
-@@ -620,6 +621,19 @@ static int dwc2_driver_probe(struct platform_device *dev)
+@@ -622,6 +623,19 @@ static int dwc2_driver_probe(struct platform_device *dev)
  		}
  	}
  #endif /* CONFIG_USB_DWC2_PERIPHERAL || CONFIG_USB_DWC2_DUAL_ROLE */
@@ -9767,26 +9762,21 @@ index b1d48019e944..d56c1ea5ba54 100644
  
  #if IS_ENABLED(CONFIG_USB_DWC2_PERIPHERAL) || \
 diff --git a/drivers/usb/host/Kconfig b/drivers/usb/host/Kconfig
-index 4448d0ab06f0..a4a2531cd4b3 100644
+index d011d6c753ed..6d27df489b11 100644
 --- a/drivers/usb/host/Kconfig
 +++ b/drivers/usb/host/Kconfig
-@@ -43,6 +43,16 @@ config USB_XHCI_PCI
- 	depends on USB_XHCI_PCI_RENESAS || !USB_XHCI_PCI_RENESAS
+@@ -42,6 +42,11 @@ config USB_XHCI_PCI
+ 	depends on USB_PCI
  	default y
  
 +config USB_XHCI_PCI_ETRON
-+	tristate "Support for GPIOs in the Etron EJ168/EJ188/EJ198 controllers"
-+	depends on USB_XHCI_PCI && OF_GPIO
-+	default n
-+	help
-+	  Say 'Y' to enable the support for the GPIO controller inside the
-+	  Etron EJ168/EJ188/EJ198 xHCI controllers.
-+
-+	  If unsure, say 'N'.
++	tristate
++	depends on USB_XHCI_PCI
++	default USB_XHCI_PCI
 +
  config USB_XHCI_PCI_RENESAS
  	tristate "Support for additional Renesas xHCI controller with firmware"
- 	help
+ 	depends on USB_XHCI_PCI
 diff --git a/drivers/usb/host/Makefile b/drivers/usb/host/Makefile
 index be4e5245c52f..56c3a4a49d33 100644
 --- a/drivers/usb/host/Makefile
@@ -9801,10 +9791,10 @@ index be4e5245c52f..56c3a4a49d33 100644
  obj-$(CONFIG_USB_XHCI_HISTB)	+= xhci-histb.o
 diff --git a/drivers/usb/host/xhci-pci-etron.c b/drivers/usb/host/xhci-pci-etron.c
 new file mode 100644
-index 000000000000..fcb0a32a4768
+index 000000000000..b22f52b43331
 --- /dev/null
 +++ b/drivers/usb/host/xhci-pci-etron.c
-@@ -0,0 +1,287 @@
+@@ -0,0 +1,308 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/* Copyright (C) 2020 Martin Blumenstingl <martin.blumenstingl@googlemail.com> */
 +
@@ -9820,6 +9810,7 @@ index 000000000000..fcb0a32a4768
 +#include <linux/slab.h>
 +#include <linux/types.h>
 +
++#include "xhci.h"
 +#include "xhci-pci.h"
 +
 +#define EJ1X8_GPIO_INIT					0x44
@@ -9840,25 +9831,25 @@ index 000000000000..fcb0a32a4768
 +#define EJ1X8_GPIO_MODE_ENABLE				0x1
 +#define EJ1X8_GPIO_MODE_MASK				0x3
 +
-+struct etron_xhci_pci_priv {
++struct xhci_pci_etron_priv {
 +	spinlock_t			lock;
 +	struct pci_dev			*pci_dev;
 +	struct gpio_chip		chip;
 +};
 +
-+static u8 etron_xhci_pci_gpio_shift(unsigned int gpio, u8 mask)
++static u8 xhci_pci_etron_gpio_shift(unsigned int gpio, u8 mask)
 +{
 +	return (gpio * fls(mask));
 +}
 +
-+static u8 etron_xhci_pci_gpio_mask(unsigned int gpio, u8 mask)
++static u8 xhci_pci_etron_gpio_mask(unsigned int gpio, u8 mask)
 +{
-+	return mask << etron_xhci_pci_gpio_shift(gpio, mask);
++	return mask << xhci_pci_etron_gpio_shift(gpio, mask);
 +}
 +
-+static int etron_xhci_pci_gpio_read(struct gpio_chip *gc, u32 reg, u32 *value)
++static int xhci_pci_etron_gpio_read(struct gpio_chip *gc, u32 reg, u32 *value)
 +{
-+	struct etron_xhci_pci_priv *etron_priv = gpiochip_get_data(gc);
++	struct xhci_pci_etron_priv *etron_priv = gpiochip_get_data(gc);
 +	int err;
 +
 +	err = pci_write_config_dword(etron_priv->pci_dev, EJ1X8_GPIO_WRITE, reg);
@@ -9878,9 +9869,9 @@ index 000000000000..fcb0a32a4768
 +	return 0;
 +}
 +
-+static int etron_xhci_pci_gpio_write(struct gpio_chip *gc, u32 reg, u32 value)
++static int xhci_pci_etron_gpio_write(struct gpio_chip *gc, u32 reg, u32 value)
 +{
-+	struct etron_xhci_pci_priv *etron_priv = gpiochip_get_data(gc);
++	struct xhci_pci_etron_priv *etron_priv = gpiochip_get_data(gc);
 +	int err;
 +
 +	err = pci_write_config_dword(etron_priv->pci_dev, EJ1X8_GPIO_WRITE,
@@ -9895,10 +9886,10 @@ index 000000000000..fcb0a32a4768
 +	return 0;
 +}
 +
-+static int etron_xhci_pci_gpio_config(struct gpio_chip *gc, unsigned int gpio,
++static int xhci_pci_etron_gpio_config(struct gpio_chip *gc, unsigned int gpio,
 +				      u8 mode, u8 ctrl)
 +{
-+	struct etron_xhci_pci_priv *etron_priv = gpiochip_get_data(gc);
++	struct xhci_pci_etron_priv *etron_priv = gpiochip_get_data(gc);
 +	u8 all_gpio_ctrl, all_gpio_mode;
 +	u32 temp;
 +	int err;
@@ -9918,33 +9909,33 @@ index 000000000000..fcb0a32a4768
 +		return err;
 +	}
 +
-+	err = etron_xhci_pci_gpio_read(gc, EJ1X8_GPIO_CTRL, &temp);
++	err = xhci_pci_etron_gpio_read(gc, EJ1X8_GPIO_CTRL, &temp);
 +	if (err)
 +		goto err_unlock;
 +
 +	all_gpio_ctrl = FIELD_GET(EJ1X8_GPIO_CTRL_READ_ALL_MASK, temp);
-+	all_gpio_ctrl &= ~etron_xhci_pci_gpio_mask(gpio, EJ1X8_GPIO_CTRL_MASK);
-+	all_gpio_ctrl |= ctrl << etron_xhci_pci_gpio_shift(gpio,
++	all_gpio_ctrl &= ~xhci_pci_etron_gpio_mask(gpio, EJ1X8_GPIO_CTRL_MASK);
++	all_gpio_ctrl |= ctrl << xhci_pci_etron_gpio_shift(gpio,
 +							   EJ1X8_GPIO_CTRL_MASK);
 +
-+	err = etron_xhci_pci_gpio_read(gc, EJ1X8_GPIO_MODE, &temp);
++	err = xhci_pci_etron_gpio_read(gc, EJ1X8_GPIO_MODE, &temp);
 +	if (err)
 +		goto err_unlock;
 +
 +	all_gpio_mode = FIELD_GET(EJ1X8_GPIO_MODE_READ_WRITE_ALL_MASK, temp);
-+	all_gpio_mode &= ~etron_xhci_pci_gpio_mask(gpio, EJ1X8_GPIO_MODE_MASK);
-+	all_gpio_mode |= mode << etron_xhci_pci_gpio_shift(gpio,
++	all_gpio_mode &= ~xhci_pci_etron_gpio_mask(gpio, EJ1X8_GPIO_MODE_MASK);
++	all_gpio_mode |= mode << xhci_pci_etron_gpio_shift(gpio,
 +							   EJ1X8_GPIO_MODE_MASK);
 +
-+	err = etron_xhci_pci_gpio_write(gc, EJ1X8_GPIO_CTRL,
-+			       FIELD_PREP(EJ1X8_GPIO_CTRL_WRITE_ALL_MASK,
-+					  all_gpio_ctrl));
++	err = xhci_pci_etron_gpio_write(gc, EJ1X8_GPIO_CTRL,
++					FIELD_PREP(EJ1X8_GPIO_CTRL_WRITE_ALL_MASK,
++						   all_gpio_ctrl));
 +	if (err)
 +		goto err_unlock;
 +
-+	err = etron_xhci_pci_gpio_write(gc, EJ1X8_GPIO_MODE,
-+			       FIELD_PREP(EJ1X8_GPIO_MODE_READ_WRITE_ALL_MASK,
-+					  all_gpio_mode));
++	err = xhci_pci_etron_gpio_write(gc, EJ1X8_GPIO_MODE,
++					FIELD_PREP(EJ1X8_GPIO_MODE_READ_WRITE_ALL_MASK,
++						   all_gpio_mode));
 +	if (err)
 +		goto err_unlock;
 +
@@ -9957,41 +9948,41 @@ index 000000000000..fcb0a32a4768
 +	return err;
 +}
 +
-+static int etron_xhci_pci_gpio_get_mode(struct gpio_chip *gc, unsigned int gpio,
++static int xhci_pci_etron_gpio_get_mode(struct gpio_chip *gc, unsigned int gpio,
 +					u8 *mode)
 +{
-+	struct etron_xhci_pci_priv *etron_priv = gpiochip_get_data(gc);
++	struct xhci_pci_etron_priv *etron_priv = gpiochip_get_data(gc);
 +	u32 temp, all_gpio_mode;
 +	int err;
 +
 +	spin_lock(&etron_priv->lock);
-+	err = etron_xhci_pci_gpio_read(gc, EJ1X8_GPIO_MODE, &temp);
++	err = xhci_pci_etron_gpio_read(gc, EJ1X8_GPIO_MODE, &temp);
 +	spin_unlock(&etron_priv->lock);
 +
 +	if (err)
 +		return err;
 +
 +	all_gpio_mode = FIELD_GET(EJ1X8_GPIO_MODE_READ_WRITE_ALL_MASK, temp);
-+	*mode = all_gpio_mode >> etron_xhci_pci_gpio_shift(gpio,
++	*mode = all_gpio_mode >> xhci_pci_etron_gpio_shift(gpio,
 +							   EJ1X8_GPIO_MODE_MASK);
 +	*mode &= EJ1X8_GPIO_MODE_MASK;
 +
 +	return 0;
 +}
 +
-+static void etron_xhci_pci_gpio_free(struct gpio_chip *gc, unsigned int gpio)
++static void xhci_pci_etron_gpio_free(struct gpio_chip *gc, unsigned int gpio)
 +{
-+	etron_xhci_pci_gpio_config(gc, gpio, EJ1X8_GPIO_MODE_DISABLE,
++	xhci_pci_etron_gpio_config(gc, gpio, EJ1X8_GPIO_MODE_DISABLE,
 +				   EJ1X8_GPIO_CTRL_IN);
 +}
 +
-+static int etron_xhci_pci_gpio_get_direction(struct gpio_chip *gc,
++static int xhci_pci_etron_gpio_get_direction(struct gpio_chip *gc,
 +					     unsigned int gpio)
 +{
 +	u8 mode;
 +	int err;
 +
-+	err = etron_xhci_pci_gpio_get_mode(gc, gpio, &mode);
++	err = xhci_pci_etron_gpio_get_mode(gc, gpio, &mode);
 +	if (err)
 +		return err;
 +
@@ -10008,7 +9999,7 @@ index 000000000000..fcb0a32a4768
 +	}
 +}
 +
-+static int etron_xhci_pci_gpio_direction_output(struct gpio_chip *gc,
++static int xhci_pci_etron_gpio_direction_output(struct gpio_chip *gc,
 +						unsigned int gpio, int value)
 +{
 +	u8 gpio_ctrl;
@@ -10018,16 +10009,16 @@ index 000000000000..fcb0a32a4768
 +	else
 +		gpio_ctrl = EJ1X8_GPIO_CTRL_OUT_LOW;
 +
-+	return etron_xhci_pci_gpio_config(gc, gpio, EJ1X8_GPIO_MODE_ENABLE,
++	return xhci_pci_etron_gpio_config(gc, gpio, EJ1X8_GPIO_MODE_ENABLE,
 +					  gpio_ctrl);
 +}
 +
-+static int etron_xhci_pci_gpio_get_value(struct gpio_chip *gc, unsigned int gpio)
++static int xhci_pci_etron_gpio_get_value(struct gpio_chip *gc, unsigned int gpio)
 +{
 +	u8 mode;
 +	int err;
 +
-+	err = etron_xhci_pci_gpio_get_mode(gc, gpio, &mode);
++	err = xhci_pci_etron_gpio_get_mode(gc, gpio, &mode);
 +	if (err)
 +		return err;
 +
@@ -10043,20 +10034,22 @@ index 000000000000..fcb0a32a4768
 +	}
 +}
 +
-+static void etron_xhci_pci_gpio_set_value(struct gpio_chip *gc,
++static void xhci_pci_etron_gpio_set_value(struct gpio_chip *gc,
 +					  unsigned int gpio, int value)
 +{
-+	etron_xhci_pci_gpio_direction_output(gc, gpio, value);
++	xhci_pci_etron_gpio_direction_output(gc, gpio, value);
 +}
 +
-+int etron_xhci_pci_probe(struct pci_dev *pci_dev)
++static int xhci_pci_etron_probe(struct pci_dev *pci_dev,
++				const struct pci_device_id *id)
 +{
-+	struct etron_xhci_pci_priv *etron_priv;
++	struct xhci_pci_etron_priv *etron_priv;
 +	struct device *dev = &pci_dev->dev;
 +	int err;
 +
-+	if (!device_property_read_bool(dev, "gpio-controller"))
-+		return 0;
++	if (!IS_ENABLED(CONFIG_GPIOLIB) ||
++	    !device_property_present(dev, "gpio-controller"))
++		return xhci_pci_common_probe(pci_dev, id);
 +
 +	etron_priv = devm_kzalloc(dev, sizeof(*etron_priv), GFP_KERNEL);
 +	if (!etron_priv)
@@ -10069,12 +10062,11 @@ index 000000000000..fcb0a32a4768
 +	etron_priv->chip.label = dev_name(dev);
 +	etron_priv->chip.owner = THIS_MODULE;
 +	etron_priv->chip.parent = dev;
-+	etron_priv->chip.of_node = dev->of_node;
-+	etron_priv->chip.free = etron_xhci_pci_gpio_free;
-+	etron_priv->chip.get_direction = etron_xhci_pci_gpio_get_direction;
-+	etron_priv->chip.direction_output = etron_xhci_pci_gpio_direction_output;
-+	etron_priv->chip.get = etron_xhci_pci_gpio_get_value;
-+	etron_priv->chip.set = etron_xhci_pci_gpio_set_value;
++	etron_priv->chip.free = xhci_pci_etron_gpio_free;
++	etron_priv->chip.get_direction = xhci_pci_etron_gpio_get_direction;
++	etron_priv->chip.direction_output = xhci_pci_etron_gpio_direction_output;
++	etron_priv->chip.get = xhci_pci_etron_gpio_get_value;
++	etron_priv->chip.set = xhci_pci_etron_gpio_set_value;
 +	etron_priv->chip.base = -1;
 +	etron_priv->chip.ngpio = 4;
 +
@@ -10084,77 +10076,58 @@ index 000000000000..fcb0a32a4768
 +		return err;
 +	}
 +
-+	return 0;
++	return xhci_pci_common_probe(pci_dev, id);
 +}
-+EXPORT_SYMBOL_GPL(etron_xhci_pci_probe);
 +
-+MODULE_SOFTDEP("pre: xhci-pci");
-+MODULE_AUTHOR("Martin Blumenstingl <martin.blumenstingl@googlemail.com>");
-+MODULE_DESCRIPTION("Etron Technology Inc. EJ168/EJ188/EJ198 GPIO driver");
++static const struct pci_device_id pci_ids[] = {
++	{ PCI_DEVICE(PCI_VENDOR_ID_ETRON, PCI_DEVICE_ID_ETRON_EJ168) },
++	{ PCI_DEVICE(PCI_VENDOR_ID_ETRON, PCI_DEVICE_ID_ETRON_EJ188) },
++	{ /* end: all zeroes */ }
++};
++MODULE_DEVICE_TABLE(pci, pci_ids);
++
++static struct pci_driver xhci_etron_pci_driver = {
++	.name =		"xhci-pci-etron",
++	.id_table =	pci_ids,
++
++	.probe =	xhci_pci_etron_probe,
++	.remove =	xhci_pci_remove,
++
++	.shutdown = 	usb_hcd_pci_shutdown,
++	.driver = {
++		.pm = pm_ptr(&usb_hcd_pci_pm_ops),
++	},
++};
++module_pci_driver(xhci_etron_pci_driver);
++
++MODULE_DESCRIPTION("Etron EJ168/EJ188/EJ198 xHCI PCI Host Controller Driver");
++MODULE_IMPORT_NS(xhci);
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/usb/host/xhci-pci.c b/drivers/usb/host/xhci-pci.c
-index 93b697648018..b978d26f120a 100644
+index 2d1e205c14c6..07fe4d2bdbf9 100644
 --- a/drivers/usb/host/xhci-pci.c
 +++ b/drivers/usb/host/xhci-pci.c
-@@ -401,6 +401,7 @@ static void xhci_pci_quirks(struct device *dev, struct xhci_hcd *xhci)
- 		xhci->quirks |= XHCI_RESET_ON_RESUME;
- 		xhci->quirks |= XHCI_TRUST_TX_LENGTH;
- 		xhci->quirks |= XHCI_BROKEN_STREAMS;
-+		xhci->quirks |= XHCI_ETRON_GPIO_QUIRK;
- 	}
- 	if (pdev->vendor == PCI_VENDOR_ID_RENESAS &&
- 	    pdev->device == 0x0014) {
-@@ -639,10 +640,18 @@ static int xhci_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	else if (xhci->quirks & XHCI_DEFAULT_PM_RUNTIME_ALLOW)
- 		pm_runtime_allow(&dev->dev);
+@@ -34,10 +34,6 @@
+ #define PCI_DEVICE_ID_FRESCO_LOGIC_FL1100	0x1100
+ #define PCI_DEVICE_ID_FRESCO_LOGIC_FL1400	0x1400
  
-+	if (xhci->quirks & XHCI_ETRON_GPIO_QUIRK) {
-+		retval = etron_xhci_pci_probe(dev);
-+		if (retval)
-+			goto remove_usb3_hcd;
-+	}
-+
- 	dma_set_max_seg_size(&dev->dev, UINT_MAX);
+-#define PCI_VENDOR_ID_ETRON		0x1b6f
+-#define PCI_DEVICE_ID_EJ168		0x7023
+-#define PCI_DEVICE_ID_EJ188		0x7052
+-
+ #define PCI_DEVICE_ID_INTEL_LYNXPOINT_XHCI	0x8c31
+ #define PCI_DEVICE_ID_INTEL_LYNXPOINT_LP_XHCI	0x9c31
+ #define PCI_DEVICE_ID_INTEL_WILDCATPOINT_LP_XHCI	0x9cb1
+@@ -657,6 +653,9 @@ static const struct pci_device_id pci_ids_reject[] = {
+ 	/* handled by xhci-pci-renesas */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_RENESAS, 0x0014) },
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_RENESAS, 0x0015) },
++	/* handled by xhci-pci-etron */
++	{ PCI_DEVICE(PCI_VENDOR_ID_ETRON, PCI_DEVICE_ID_ETRON_EJ168) },
++	{ PCI_DEVICE(PCI_VENDOR_ID_ETRON, PCI_DEVICE_ID_ETRON_EJ188) },
+ 	{ /* end: all zeroes */ }
+ };
  
- 	return 0;
- 
-+remove_usb3_hcd:
-+	usb_remove_hcd(xhci->shared_hcd);
- put_usb3_hcd:
- 	usb_put_hcd(xhci->shared_hcd);
- dealloc_usb2_hcd:
-diff --git a/drivers/usb/host/xhci-pci.h b/drivers/usb/host/xhci-pci.h
-index cb9a8f331a44..ec435b5b5728 100644
---- a/drivers/usb/host/xhci-pci.h
-+++ b/drivers/usb/host/xhci-pci.h
-@@ -4,6 +4,15 @@
- #ifndef XHCI_PCI_H
- #define XHCI_PCI_H
- 
-+#if IS_REACHABLE(CONFIG_USB_XHCI_PCI_ETRON)
-+int etron_xhci_pci_probe(struct pci_dev *pci_dev);
-+#else
-+static inline int etron_xhci_pci_probe(struct pci_dev *pci_dev)
-+{
-+	return 0;
-+}
-+#endif
-+
- int xhci_pci_common_probe(struct pci_dev *dev, const struct pci_device_id *id);
- void xhci_pci_remove(struct pci_dev *dev);
-
-diff --git a/drivers/usb/host/xhci.h b/drivers/usb/host/xhci.h
-index 6f4bf98a6282..31d66c6b3b0c 100644
---- a/drivers/usb/host/xhci.h
-+++ b/drivers/usb/host/xhci.h
-@@ -1626,6 +1626,7 @@
- #define XHCI_WRITE_64_HI_LO	BIT_ULL(47)
- #define XHCI_CDNS_SCTX_QUIRK	BIT_ULL(48)
- #define XHCI_ETRON_HOST	BIT_ULL(49)
-+#define XHCI_ETRON_GPIO_QUIRK  BIT_ULL(50)
- 
- 	unsigned int		num_active_eps;
- 	unsigned int		limit_active_eps;
 diff --git a/include/dt-bindings/clock/meson8b-clkc.h b/include/dt-bindings/clock/meson8b-clkc.h
 index 385bf243c56c..fe6c02e04985 100644
 --- a/include/dt-bindings/clock/meson8b-clkc.h
@@ -10213,11 +10186,26 @@ index 000000000000..947463050782
 +}
 +
 +#endif
+diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+index d2402bf4aea2..0cdba4aa2ad2 100644
+--- a/include/linux/pci_ids.h
++++ b/include/linux/pci_ids.h
+@@ -2593,6 +2593,10 @@
+ 
+ #define PCI_VENDOR_ID_REDHAT		0x1b36
+ 
++#define PCI_VENDOR_ID_ETRON		0x1b6f
++#define PCI_DEVICE_ID_ETRON_EJ168	0x7023
++#define PCI_DEVICE_ID_ETRON_EJ188	0x7052
++
+ #define PCI_VENDOR_ID_SILICOM_DENMARK	0x1c2c
+ 
+ #define PCI_VENDOR_ID_AMAZON_ANNAPURNA_LABS	0x1c36
 diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
-index f78ea2f86fa6..2d1f76210786 100644
+index 0f2df7c91e18..fa60a75c9e7b 100644
 --- a/sound/soc/codecs/Kconfig
 +++ b/sound/soc/codecs/Kconfig
-@@ -90,6 +90,7 @@ config SND_SOC_ALL_CODECS
+@@ -94,6 +94,7 @@ config SND_SOC_ALL_CODECS
  	imply SND_SOC_CS4271_SPI
  	imply SND_SOC_CS42XX8_I2C
  	imply SND_SOC_CS43130
@@ -10225,7 +10213,7 @@ index f78ea2f86fa6..2d1f76210786 100644
  	imply SND_SOC_CS4341
  	imply SND_SOC_CS4349
  	imply SND_SOC_CS47L15
-@@ -955,6 +956,9 @@ config SND_SOC_CS43130
+@@ -1001,6 +1002,9 @@ config SND_SOC_CS43130
  	tristate "Cirrus Logic CS43130 CODEC"
  	depends on I2C
  
@@ -10236,10 +10224,10 @@ index f78ea2f86fa6..2d1f76210786 100644
  	tristate "Cirrus Logic CS4341 CODEC"
  	depends on SND_SOC_I2C_AND_SPI
 diff --git a/sound/soc/codecs/Makefile b/sound/soc/codecs/Makefile
-index 7c075539dc47..ba22fb055f87 100644
+index f37e82ddb7a1..5d5fa571a9db 100644
 --- a/sound/soc/codecs/Makefile
 +++ b/sound/soc/codecs/Makefile
-@@ -98,6 +98,7 @@
+@@ -102,6 +102,7 @@ snd-soc-cs4271-spi-y := cs4271-spi.o
  snd-soc-cs42xx8-y := cs42xx8.o
  snd-soc-cs42xx8-i2c-y := cs42xx8-i2c.o
  snd-soc-cs43130-y := cs43130.o
@@ -10247,7 +10235,15 @@ index 7c075539dc47..ba22fb055f87 100644
  snd-soc-cs4341-y := cs4341.o
  snd-soc-cs4349-y := cs4349.o
  snd-soc-cs47l15-y := cs47l15.o
-@@ -493,6 +494,7 @@ obj-$(CONFIG_SND_SOC_CS4271_SPI)	+= snd-soc-cs4271-spi.o
+@@ -403,6 +404,7 @@ snd-soc-wsa881x-y := wsa881x.o
+ snd-soc-wsa883x-y := wsa883x.o
+ snd-soc-wsa884x-y := wsa884x.o
+ snd-soc-zl38060-y := zl38060.o
++
+ # Amp
+ snd-soc-max9877-y := max9877.o
+ snd-soc-max98504-y := max98504.o
+@@ -519,6 +521,7 @@ obj-$(CONFIG_SND_SOC_CS4271_SPI)	+= snd-soc-cs4271-spi.o
  obj-$(CONFIG_SND_SOC_CS42XX8)	+= snd-soc-cs42xx8.o
  obj-$(CONFIG_SND_SOC_CS42XX8_I2C) += snd-soc-cs42xx8-i2c.o
  obj-$(CONFIG_SND_SOC_CS43130)   += snd-soc-cs43130.o
@@ -10458,3 +10454,271 @@ index 000000000000..7f0c1abe7279
 +MODULE_DESCRIPTION("ASoC Cirrus CS4334 codec driver");
 +MODULE_AUTHOR("Martin Blumenstingl <martin.blumenstingl@googlemail.com>");
 +MODULE_LICENSE("GPL v2");
+--- a/arch/arm/boot/dts/amlogic/meson8m2-mxiii-plus.dts	2024-12-09 10:41:16.000000000 +0100
++++ b/arch/arm/boot/dts/amlogic/meson8m2-mxiii-plus.dts	2024-12-16 11:46:25.313024173 +0100
+@@ -6,74 +6,16 @@
+ 
+ /dts-v1/;
+ 
+-#include "meson8m2.dtsi"
+-
+-#include <dt-bindings/gpio/gpio.h>
+-#include <dt-bindings/input/input.h>
++#include "meson8m2-mxiii.dtsi"
+ 
+ / {
+ 	model = "Tronsmart MXIII Plus";
+ 	compatible = "tronsmart,mxiii-plus", "amlogic,meson8m2";
+ 
+-	aliases {
+-		ethernet0 = &ethmac;
+-		i2c0 = &i2c_AO;
+-		serial0 = &uart_AO;
+-		mmc0 = &sd_card_slot;
+-	};
+-
+-	chosen {
+-		stdout-path = "serial0:115200n8";
+-	};
+-
+-	memory {
++	memory@40000000 {
+ 		device_type = "memory";
+ 		reg = <0x40000000 0x80000000>;
+ 	};
+-
+-	adc-keys {
+-		compatible = "adc-keys";
+-		io-channels = <&saradc 0>;
+-		io-channel-names = "buttons";
+-		keyup-threshold-microvolt = <1710000>;
+-
+-		button-function {
+-			label = "Function";
+-			linux,code = <KEY_FN>;
+-			press-threshold-microvolt = <10000>;
+-		};
+-	};
+-
+-	sdio_pwrseq: sdio-pwrseq {
+-		compatible = "mmc-pwrseq-simple";
+-
+-		pinctrl-0 = <&xtal_32k_out_pins>;
+-		pinctrl-names = "default";
+-
+-		reset-gpios = <&gpio GPIOX_11 GPIO_ACTIVE_LOW>,
+-			      <&gpio_ao GPIOAO_6 GPIO_ACTIVE_LOW>;
+-
+-		clocks = <&xtal_32k_out>;
+-		clock-names = "ext_clock";
+-	};
+-
+-	vcc_3v3: regulator-vcc3v3 {
+-		compatible = "regulator-fixed";
+-		regulator-name = "VCC3V3";
+-		regulator-min-microvolt = <3300000>;
+-		regulator-max-microvolt = <3300000>;
+-	};
+-
+-	xtal_32k_out: xtal-32k-out-clk {
+-		compatible = "fixed-clock";
+-		#clock-cells = <0>;
+-		clock-frequency = <32768>;
+-		clock-output-names = "xtal_32k_out";
+-	};
+-};
+-
+-&cpu0 {
+-	cpu-supply = <&vcck>;
+ };
+ 
+ &ethmac {
+@@ -101,162 +43,6 @@
+ 	};
+ };
+ 
+-&ir_receiver {
+-	status = "okay";
+-	pinctrl-0 = <&ir_recv_pins>;
+-	pinctrl-names = "default";
+-};
+-
+-&i2c_AO {
+-	status = "okay";
+-	pinctrl-0 = <&i2c_ao_pins>;
+-	pinctrl-names = "default";
+-
+-	pmic@32 {
+-		compatible = "ricoh,rn5t618";
+-		reg = <0x32>;
+-		system-power-controller;
+-
+-		regulators {
+-			vcck: DCDC1 {
+-				regulator-name = "VCCK";
+-				regulator-min-microvolt = <825000>;
+-				regulator-max-microvolt = <1150000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			vddee: DCDC2 {
+-				/* the output is also used as VDDAO */
+-				regulator-name = "VDD_EE";
+-				regulator-min-microvolt = <950000>;
+-				regulator-max-microvolt = <1150000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			DCDC3 {
+-				regulator-name = "VDD_DDR";
+-				regulator-min-microvolt = <1500000>;
+-				regulator-max-microvolt = <1500000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			LDO1 {
+-				regulator-name = "VDDIO_AO28";
+-				regulator-min-microvolt = <2900000>;
+-				regulator-max-microvolt = <2900000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			vddio_ao1v8: LDO2 {
+-				regulator-name = "VDDIO_AO18";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			LDO3 {
+-				regulator-name = "VCC1V8";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			LDO4 {
+-				regulator-name = "VCC2V8";
+-				regulator-min-microvolt = <2850000>;
+-				regulator-max-microvolt = <2850000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			LDO5 {
+-				regulator-name = "AVDD1V8";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			LDORTC1 {
+-				regulator-name = "VDD_LDO";
+-				regulator-min-microvolt = <2700000>;
+-				regulator-max-microvolt = <2700000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-
+-			LDORTC2 {
+-				regulator-name = "RTC_0V9";
+-				regulator-min-microvolt = <900000>;
+-				regulator-max-microvolt = <900000>;
+-				regulator-boot-on;
+-				regulator-always-on;
+-			};
+-		};
+-	};
+-};
+-
+-&mali {
+-	mali-supply = <&vddee>;
+-};
+-
+-&saradc {
+-	status = "okay";
+-	vref-supply = <&vddio_ao1v8>;
+-};
+-
+-/* SDIO wifi */
+-&sdhc {
+-	status = "okay";
+-
+-	pinctrl-0 = <&sdxc_a_pins>;
+-	pinctrl-names = "default";
+-
+-	bus-width = <4>;
+-	max-frequency = <50000000>;
+-
+-	disable-wp;
+-	non-removable;
+-	cap-mmc-highspeed;
+-	cap-sd-highspeed;
+-
+-	mmc-pwrseq = <&sdio_pwrseq>;
+-
+-	vmmc-supply = <&vcc_3v3>;
+-	vqmmc-supply = <&vcc_3v3>;
+-};
+-
+-&sdio {
+-	status = "okay";
+-
+-	pinctrl-0 = <&sd_b_pins>;
+-	pinctrl-names = "default";
+-
+-	/* SD card */
+-	sd_card_slot: slot@1 {
+-		compatible = "mmc-slot";
+-		reg = <1>;
+-		status = "okay";
+-
+-		bus-width = <4>;
+-		no-sdio;
+-		cap-mmc-highspeed;
+-		cap-sd-highspeed;
+-		disable-wp;
+-
+-		cd-gpios = <&gpio CARD_6 GPIO_ACTIVE_LOW>;
+-
+-		vmmc-supply = <&vcc_3v3>;
+-	};
+-};
+-
+-/* connected to the Bluetooth module */
+ &uart_A {
+ 	status = "okay";
+ 	pinctrl-0 = <&uart_a1_pins>, <&uart_a1_cts_rts_pins>;
+@@ -269,25 +55,3 @@
+ 		max-speed = <2000000>;
+ 	};
+ };
+-
+-&uart_AO {
+-	status = "okay";
+-	pinctrl-0 = <&uart_ao_a_pins>;
+-	pinctrl-names = "default";
+-};
+-
+-&usb0 {
+-	status = "okay";
+-};
+-
+-&usb1 {
+-	status = "okay";
+-};
+-
+-&usb0_phy {
+-	status = "okay";
+-};
+-
+-&usb1_phy {
+-	status = "okay";
+-};
