@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt	2024-03-29 22:30:02.689898395 +0100
++++ b/CMakeLists.txt	2024-03-29 22:29:57.365778759 +0100
+@@ -3,8 +3,8 @@
+ if(NOT DEFINED LLVM_COMMON_CMAKE_UTILS)
+   set(LLVM_COMMON_CMAKE_UTILS ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
+ endif()
+-include(${LLVM_COMMON_CMAKE_UTILS}/Modules/CMakePolicy.cmake
+-  NO_POLICY_SCOPE)
++#include(${LLVM_COMMON_CMAKE_UTILS}/Modules/CMakePolicy.cmake
++#  NO_POLICY_SCOPE)
+ 
+ # If we are not building as a part of LLVM, build Clang as an
+ # standalone project, using LLVM as an external library:

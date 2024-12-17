@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2024-04-03 12:22:42.968054773 +0200
++++ b/CMakeLists.txt	2024-04-03 12:22:56.352378976 +0200
+@@ -3,8 +3,6 @@
+ cmake_minimum_required(VERSION 3.20.0)
+ 
+ set(LLVM_COMMON_CMAKE_UTILS ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
+-include(${LLVM_COMMON_CMAKE_UTILS}/Modules/CMakePolicy.cmake
+-  NO_POLICY_SCOPE)
+ 
+ # Builds with custom install names and installation rpath setups may not work
+ # in the build tree. Allow these cases to use CMake's default build tree
