@@ -1,0 +1,8 @@
+config BR2_PACKAGE_AETHERSX2
+    bool "aethersx2"
+    select BR2_PACKAGE_REGLINUX_QT6               
+
+    help
+      AetherSX2 Linux AppImage
+
+      https://archive.org/details/AetherSX2-Collection
