@@ -16,6 +16,10 @@ REGLINUX_BINARIES_DIR=$6
 
 DTB="rk3588-orangepi-5-plus.dtb"
 
+mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-orangepi-5-plus"     || exit 1
+cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-orangepi-5-plus/" || exit 1
+cd "${REGLINUX_BINARIES_DIR}/build-uboot-orangepi-5-plus/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
 
