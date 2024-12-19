@@ -14,6 +14,12 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
+DTB="rk3588s-gameforce-ace.dtb"
+
+mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-gameforce-ace"     || exit 1
+cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-gameforce-ace/" || exit 1
+cd "${REGLINUX_BINARIES_DIR}/build-uboot-gameforce-ace/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
 
@@ -24,7 +30,7 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
-cp "${BINARIES_DIR}/rk3588s-gameforce-ace.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
-cp "${BOARD_DIR}/boot/extlinux.conf"            "${REGLINUX_BINARIES_DIR}/boot/extlinux/"   || exit 1
+cp "${BINARIES_DIR}/${DTB}"             "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BOARD_DIR}/boot/extlinux.conf"    "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
 
 exit 0

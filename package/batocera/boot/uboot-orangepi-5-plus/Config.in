@@ -1,4 +1,0 @@
-config BR2_PACKAGE_UBOOT_ORANGEPI_5_PLUS
-    bool "uboot files for OrangePi 5 Plus"
-    help
-        uboot files for OrangePi 5 Plus
