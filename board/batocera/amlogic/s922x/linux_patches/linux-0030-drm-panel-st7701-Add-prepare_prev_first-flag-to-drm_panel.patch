@@ -1,0 +1,42 @@
+The DSI host must be enabled for the panel to be initialized in
+prepare(). Set the prepare_prev_first flag to guarantee this.
+This fixes the panel operation on NXP i.MX8MP SoC / Samsung DSIM
+DSI host.
+
+Fixes: 849b2e3ff969 ("drm/panel: Add Sitronix ST7701 panel driver")
+Signed-off-by: Marek Vasut <marex@denx.de>
+Reviewed-by: Jessica Zhang <quic_jesszhan@quicinc.com>
+---
+Cc: Chris Morgan <macromorgan@hotmail.com>
+Cc: David Airlie <airlied@gmail.com>
+Cc: Hironori KIKUCHI <kikuchan98@gmail.com>
+Cc: Jagan Teki <jagan@amarulasolutions.com>
+Cc: Jessica Zhang <quic_jesszhan@quicinc.com>
+Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Cc: Maxime Ripard <mripard@kernel.org>
+Cc: Neil Armstrong <neil.armstrong@linaro.org>
+Cc: Simona Vetter <simona@ffwll.ch>
+Cc: Thomas Zimmermann <tzimmermann@suse.de>
+Cc: dri-devel@lists.freedesktop.org
+Cc: stable@vger.kernel.org # v6.2+
+---
+Note that the prepare_prev_first flag was added in Linux 6.2.y commit
+5ea6b1702781 ("drm/panel: Add prepare_prev_first flag to drm_panel"),
+hence the CC stable v6.2+, even if the Fixes tag points to a commit
+in Linux 5.1.y .
+---
+ drivers/gpu/drm/panel/panel-sitronix-st7701.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-sitronix-st7701.c b/drivers/gpu/drm/panel/panel-sitronix-st7701.c
+index eef03d04e0cd2..1f72ef7ca74c9 100644
+--- a/drivers/gpu/drm/panel/panel-sitronix-st7701.c
++++ b/drivers/gpu/drm/panel/panel-sitronix-st7701.c
+@@ -1177,6 +1177,7 @@ static int st7701_probe(struct device *dev, int connector_type)
+ 		return dev_err_probe(dev, ret, "Failed to get orientation\n");
+ 
+ 	drm_panel_init(&st7701->panel, dev, &st7701_funcs, connector_type);
++	st7701->panel.prepare_prev_first = true;
+ 
+ 	/**
+ 	 * Once sleep out has been issued, ST7701 IC required to wait 120ms
