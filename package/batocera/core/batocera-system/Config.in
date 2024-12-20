@@ -221,6 +221,7 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_PYTHON_HIDAPI		# Communication with USB HID devices via Python
 	select BR2_PACKAGE_LEDSPICER			if !BR2_PACKAGE_BATOCERA_TARGET_JZ4770  && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_CHA # LED Manager for Linux
 	select BR2_PACKAGE_INNOEXTRACT			if !BR2_PACKAGE_BATOCERA_TARGET_CHA # Extract InnoSetup files (useful for Wine and GOG games)
+	select BR2_PACKAGE_LGOGDOWNLOADER		if !BR2_PACKAGE_BATOCERA_TARGET_CHA # Download games from GOG using command line
 	select BR2_PACKAGE_TREE				# recursive directory listing (useful for generating documentation on rom directory structure)
 	select BR2_PACKAGE_XXD				# hexdump utility
 
