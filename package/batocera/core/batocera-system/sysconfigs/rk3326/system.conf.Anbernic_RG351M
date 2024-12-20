@@ -5,3 +5,9 @@ es.resolution=480x320
 
 # default sway environment (rotate)
 system.es.environment=sway
+
+# Enable Suspend on handheld targets
+system.suspendmode=suspend
+
+# Delay time for suspend mode 
+system.shutdowndelay=1
