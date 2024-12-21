@@ -1,0 +1,15 @@
+--- a/Sugarbox/CMakeLists.txt	2024-12-21 18:46:18.643709293 +0100
++++ b/Sugarbox/CMakeLists.txt	2024-12-21 18:46:33.358008988 +0100
+@@ -190,12 +190,3 @@
+    "  )
+ endif()
+ 
+-# CPACK
+-set(CPACK_GENERATOR "TGZ;ZIP")
+-set(CPACK_PACKAGE_NAME "Sugarbox")
+-set(CPACK_PACKAGE_VENDOR "Thomas GUILLEMIN")
+-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Sugarbox - An Amstrad CPC/CPC+/GX4000 Emulator")
+-set(CPACK_PACKAGE_VERSION ${SUGARBOX_VERSION} )
+-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Sugarbox")
+-
+-INCLUDE(CPack)
