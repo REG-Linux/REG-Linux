@@ -31,7 +31,7 @@ class UnixSettings():
             file.write(open(self.settingsFile, encoding='utf_8_sig').read())
             file.seek(0, os.SEEK_SET)
 
-            self.config.read(file)
+            self.config.read_file(file)
         except IOError as e:
             eslog.error(str(e))
 
