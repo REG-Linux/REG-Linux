@@ -195,7 +195,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
     # To prevent ConfigParser from converting to lower case
     templateConfig.optionxform = str
     with io.open(templateFile, 'r', encoding='utf_8_sig') as fp:
-        templateConfig.read(fp)
+        templateConfig.readfp(fp)
 
     # target
     targetConfig = configparser.ConfigParser(interpolation=None)
