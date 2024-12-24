@@ -1,9 +1,10 @@
 include toolchain-gcc13-glibc.common
 include reglinux-board.common
 
-# Target definition
+# Target definition (16K page size)
 BR2_aarch64=y
 BR2_cortex_a76_a55=y
+BR2_ARM64_PAGE_SIZE_16K=y
 BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_PACKAGE_BATOCERA_TARGET_RK3588=y
 # As of rockchip-linux-5.10-rkr3.6, the vendored kernel does not like -fsigned-char, do NOT add it to BR2_TARGET_OPTIMIZATION=
