@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBRETRO_DOSBOX_PURE_VERSION = 0.9.9
+LIBRETRO_DOSBOX_PURE_VERSION = 1.0-preview1
 LIBRETRO_DOSBOX_PURE_SITE = $(call github,schellingb,dosbox-pure,$(LIBRETRO_DOSBOX_PURE_VERSION))
 LIBRETRO_DOSBOX_PURE_LICENSE = GPLv2
 
