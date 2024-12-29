@@ -204,10 +204,22 @@ if [ "$board" = "$newboard" ]; then
     # We test for boot/reglinux.update but we don't want it extracted now
     # tar --no-same-owner is needed because fat partition does not support owner attributes
     tar --zstd -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" | grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update|boot/reglinux.update' > /tmp/upgrade.list
-    if [ $? -eq 0 ] && tar --zstd -C /boot/ --no-same-owner --exclude='boot/reglinux.update' -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" --verbatim-files-from -T /tmp/upgrade.list
+    if [ $? -eq 0 ]
     then
-        do_upgmsg "Rebooting to finish upgrade." 2
-        touch /boot/REG_UPDATE
+        if tar -C /tmp/ --no-same-owner --zstd -xf "${SHAREMOUNT}/system/upgrade/boot-${board}.tar.zst" runbeforeupgrade.sh &>/dev/null
+        then
+            do_upgmsg "Running /tmp/runbeforeupgrade.sh"
+            . /tmp/runbeforeupgrade.sh
+        fi
+        if tar --zstd -C /boot/ --no-same-owner --exclude='boot/reglinux.update' -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" --verbatim-files-from -T /tmp/upgrade.list
+        then
+            do_upgmsg "Rebooting to finish upgrade." 2
+            touch /boot/REG_UPDATE
+        else
+            do_upgmsg "ERROR EXTRACTING UPDATE FILES!" 15
+            mount -o remount,ro /boot
+            quit_script 1
+        fi
     else
         do_upgmsg "ERROR EXTRACTING UPDATE FILES!" 15
         mount -o remount,ro /boot
