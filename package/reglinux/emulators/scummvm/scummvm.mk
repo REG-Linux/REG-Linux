@@ -3,7 +3,7 @@
 # scummvm
 #
 ################################################################################
-# Version: 2.9.0 - Not yet released
+# Version: 2.9.0 - "Close Encounters of the 2.9th Kind"
 SCUMMVM_VERSION = v2.9.0
 SCUMMVM_SITE = $(call github,scummvm,scummvm,$(SCUMMVM_VERSION))
 SCUMMVM_LICENSE = GPLv2
