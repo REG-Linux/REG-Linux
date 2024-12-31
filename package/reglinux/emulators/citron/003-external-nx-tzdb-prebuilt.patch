@@ -1,0 +1,11 @@
+--- a/externals/nx_tzdb/CMakeLists.txt	2024-12-31 13:16:10.920119395 +0100
++++ b/externals/nx_tzdb/CMakeLists.txt	2024-12-31 13:16:18.870295562 +0100
+@@ -9,7 +9,7 @@
+ find_program(GNU_MAKE make)
+ find_program(DATE_PROG date)
+ 
+-set(CAN_BUILD_NX_TZDB true)
++set(CAN_BUILD_NX_TZDB false)
+ 
+ if (NOT GIT)
+     set(CAN_BUILD_NX_TZDB false)
