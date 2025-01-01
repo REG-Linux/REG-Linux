@@ -1,0 +1,17 @@
+--- a/scripts/xemu-version.sh	2025-01-01 22:10:34.335416794 +0100
++++ b/scripts/xemu-version.sh	2025-01-01 22:11:26.190531092 +0100
+@@ -34,10 +34,10 @@
+   echo $(get_version_field 1) | cut -d. -f$1
+ }
+ 
+-XEMU_VERSION_MAJOR=$(get_version_dot 1)
+-XEMU_VERSION_MINOR=$(get_version_dot 2)
+-XEMU_VERSION_PATCH=$(get_version_dot 3)
+-XEMU_VERSION_COMMIT=$(get_version_field 2)
++XEMU_VERSION_MAJOR=0
++XEMU_VERSION_MINOR=8
++XEMU_VERSION_PATCH=1
++XEMU_VERSION_COMMIT=reglinux
+ 
+ cat <<EOF
+ #define XEMU_VERSION       "$XEMU_VERSION"
