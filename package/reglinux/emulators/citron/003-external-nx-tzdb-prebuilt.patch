@@ -1,5 +1,5 @@
---- a/externals/nx_tzdb/CMakeLists.txt	2024-12-31 13:16:10.920119395 +0100
-+++ b/externals/nx_tzdb/CMakeLists.txt	2024-12-31 13:16:18.870295562 +0100
+--- a/externals/nx_tzdb/CMakeLists.txt	2025-01-02 12:54:15.188128484 +0100
++++ b/externals/nx_tzdb/CMakeLists.txt	2025-01-02 12:54:23.403300243 +0100
 @@ -9,7 +9,7 @@
  find_program(GNU_MAKE make)
  find_program(DATE_PROG date)
