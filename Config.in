@@ -161,8 +161,6 @@ endmenu
 
 menu "Emulators"
   menu "Retroarch"
-    source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/retroarch/Config.in"
-    source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/retroarch-assets/Config.in"
     source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro-core-info/Config.in"
     source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/batocera-retroachievements-sounds/Config.in"
     menu "Shaders"
@@ -501,6 +499,9 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/boot/uboot-tinkerboard2/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/boot/ubiboot/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/boot/mininit/Config.in"
+
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/retroarch/retroarch/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/retroarch/retroarch-assets/Config.in"
 
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/86Box/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/applewin/Config.in"
