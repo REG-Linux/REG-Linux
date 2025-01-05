@@ -4,10 +4,10 @@
 #
 ################################################################################
 
-RETROARCH_VERSION = v1.19.1
+RETROARCH_VERSION = v1.20.0
 RETROARCH_SITE = $(call github,libretro,RetroArch,$(RETROARCH_VERSION))
 RETROARCH_LICENSE = GPLv3+
-RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets flac noto-cjk-fonts
+RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets flac noto-cjk-fonts gamemode
 # install in staging for debugging (gdb)
 RETROARCH_INSTALL_STAGING = YES
 
@@ -65,6 +65,14 @@ else
     RETROARCH_CONF_OPTS += --disable-pulse
 endif
 
+# REG: add pipewire
+ifeq ($(BR2_PACKAGE_PIPEWIRE),y)
+    RETROARCH_CONF_OPTS += --enable-pipewire
+    RETROARCH_DEPENDENCIES += pipewire
+else
+    RETROARCH_CONF_OPTS += --disable-pipewire
+endif
+
 # REG: favor desktop GL, if not available, fallbacks to GLES3 then GLES2
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
   RETROARCH_CONF_OPTS += --enable-opengl
@@ -108,15 +116,17 @@ else
     RETROARCH_CONF_OPTS += --disable-freetype
 endif
 
-ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
-    RETROARCH_DEPENDENCIES += rockchip-rga
-endif
+#REG: deprecate rga
+#ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
+#    RETROARCH_DEPENDENCIES += rockchip-rga
+#endif
 
-ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),)
-	ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_EGL),y)
+#REG: enforce EGL_NO_X11 since we do not build RA with X11 support
+#ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),)
+#	ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_EGL),y)
           RETROARCH_TARGET_CFLAGS += -DEGL_NO_X11
-	endif
-endif
+#	endif
+#endif
 
 ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_SWAY),yy)
     RETROARCH_CONF_OPTS += --enable-wayland
