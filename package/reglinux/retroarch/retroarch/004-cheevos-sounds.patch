@@ -2,17 +2,16 @@ diff --git a/audio/audio_driver.c b/audio/audio_driver.c
 index 57fa9ed..88bc040 100644
 --- a/audio/audio_driver.c
 +++ b/audio/audio_driver.c
-@@ -1332,8 +1332,8 @@ static void audio_driver_load_menu_bgm_callback(retro_task_t *task,
- void audio_driver_load_system_sounds(void)
- {
-    char basename_noext[256];
--   char sounds_path[PATH_MAX_LENGTH];
--   char sounds_fallback_path[PATH_MAX_LENGTH];
-+   char* sounds_path = "/usr/share/libretro/assets/sounds";
-+   char* sounds_fallback_path = "/userdata/sounds/retroachievements";
-    settings_t *settings                  = config_get_ptr();
-    const char *dir_assets                = settings->paths.directory_assets;
-    const bool audio_enable_menu          = settings->bools.audio_enable_menu;
+@@ -1362,6 +1362,9 @@
+    struct string_list *list_fallback     = NULL;
+    unsigned i                            = 0;
+ 
++   sprintf(sounds_path,"%s","/usr/share/libretro/assets/sounds");
++   sprintf(sounds_fallback_path,"%s","/userdata/sounds/retroachievements");
++
+    if (!audio_enable_menu && !audio_enable_cheevo_unlock)
+       goto end;
+ 
 @@ -1354,19 +1354,6 @@ void audio_driver_load_system_sounds(void)
     if (!audio_enable_menu && !audio_enable_cheevo_unlock)
        goto end;
@@ -74,11 +73,11 @@ diff --git a/configuration.h b/configuration.h
 index 839fdde..aa6e709 100644
 --- a/configuration.h
 +++ b/configuration.h
-@@ -410,6 +410,7 @@ typedef struct settings
-       char menu_driver[32];
-       char cheevos_username[32];
-       char cheevos_password[256];
-+      char cheevos_unlock_sound[128];
-       char cheevos_token[32];
-       char cheevos_leaderboards_enable[32];
-       char cheevos_custom_host[64];
+@@ -493,6 +493,7 @@
+ #endif
+ 
+       char cheevos_password[NAME_MAX_LENGTH];
++      char cheevos_unlock_sound[NAME_MAX_LENGTH];
+ #ifdef HAVE_MICROPHONE
+       char microphone_device[NAME_MAX_LENGTH];
+ #endif
