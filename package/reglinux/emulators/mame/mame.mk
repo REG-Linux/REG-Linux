@@ -3,8 +3,8 @@
 # MAME (GroovyMAME)
 #
 ################################################################################
-# Version: GroovyMAME 0.272 - Switchres 2.21d
-MAME_VERSION = gm0272sr221d
+# Version: GroovyMAME 0.273 - Switchres 2.21d
+MAME_VERSION = gm0273sr221d
 MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
 MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
 MAME_LICENSE = MAME
@@ -94,15 +94,30 @@ ifeq ($(BR2_cortex_a73_a53),y)
 MAME_CFLAGS += -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53
 endif
 
+ifeq ($(BR2_cortex_a72),y)
+MAME_CFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
+endif
+
+ifeq ($(BR2_cortex_a76),y)
+MAME_CFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
+endif
+
+ifeq ($(BR2_cortex_a76_a55),y)
+MAME_CFLAGS += -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
+endif
+
 # Enforce symbols debugging with O0
 ifeq ($(BR2_ENABLE_DEBUG),y)
 	MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
 # Stick with Os on x86_64 too much bloat with O2/O3 !!
 else ifeq ($(BR2_x86_64),y)
 	MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
-# Use O2 on other archs
-else
+# Use O2 no LTO for RISC-V
+else ifeq ($(BR2_riscv),y)
 	MAME_EXTRA_ARGS += OPTIMIZE=2
+# Use O2 with LTO on other archs
+else
+	MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1
 endif
 
 define MAME_BUILD_CMDS
@@ -128,6 +143,9 @@ define MAME_BUILD_CMDS
 	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_FLAGS.*MACHINE_MECHANICAL' | cut -f 1 -d ":" | sort -u > $(@D)/machines2.list
 	cat $(@D)/machines2.list | while read file ; do grep 'GAME_FLAGS' $$file | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
 	cat $(@D)/machines2.list | while read file ; do sed -i '/define GAME_FLAGS/p;/setname.*GAME_FLAGS/p;/GAME_FLAGS/d' $$file ; done
+	# remove remaining MECHANICAL games using 'GAME_CUSTOM' label
+	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_CUSTOM' | cut -f 1 -d ":" | sort -u > $(@D)/machines3.list
+	cat $(@D)/machines3.list | while read file ; do grep 'GAME_CUSTOM' $$file | grep 'CRC' | grep 'SHA' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
 	# Remove reference to skeleton|mechanical drivers in mame.lst
 	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 
@@ -227,75 +245,75 @@ define MAME_INSTALL_TARGET_CMDS
 	rm -Rf $(TARGET_DIR)/usr/bin/mame/bgfx/shaders/dx11/
 
 	# Copy extra bgfx shaders
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/crt-geom-deluxe-rgb.json $(TARGET_DIR)/usr/bin/mame/bgfx/chains
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/crt-geom-deluxe-composite.json $(TARGET_DIR)/usr/bin/mame/bgfx/chains
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/crt-geom-deluxe-rgb.json $(TARGET_DIR)/usr/bin/mame/bgfx/chains
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/crt-geom-deluxe-composite.json $(TARGET_DIR)/usr/bin/mame/bgfx/chains
 
 	# Copy blank disk image(s)
 	mkdir -p $(TARGET_DIR)/usr/share/mame
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/blank.fmtowns $(TARGET_DIR)/usr/share/mame/blank.fmtowns
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/blank.fmtowns $(TARGET_DIR)/usr/share/mame/blank.fmtowns
 
 	# Copy coin drop plugin
-	cp -R -u $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
+	cp -R -u $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
 
 	# Copy data plugin information
 	mkdir -p $(TARGET_DIR)/usr/bin/mame/dats
-	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/dats                         $(TARGET_DIR)/usr/bin/mame/dats/
+	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/dats                         $(TARGET_DIR)/usr/bin/mame/dats/
 	mkdir -p $(TARGET_DIR)/usr/bin/mame/history
-	gunzip -c $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/history/history.xml.gz > $(TARGET_DIR)/usr/bin/mame/history/history.xml
+	gunzip -c $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/history/history.xml.gz > $(TARGET_DIR)/usr/bin/mame/history/history.xml
 
 	# gameStop script when exiting a rotated screen
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/configgen/scripts
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/rotation_fix.sh
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/rotation_fix.sh
 
 	# Copy user -autoboot_command overrides (batocera.linux/batocera.linux#11706)
 	mkdir -p $(MAME_CONF_INIT)/autoload
-	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/autoload			$(MAME_CONF_INIT)
+	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/autoload			$(MAME_CONF_INIT)
 endef
 
 define MAME_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/adam.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/advision.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apfm1000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2gs.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/arcadia.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/archimedes.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/astrocde.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/atom.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/bbc.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/camplynx.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/cdi.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/coco.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/crvision.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/electron.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fm7.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fmtowns.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamate.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gameandwatch.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamecom.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamepock.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gmaster.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gp32.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/lcdgames.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/laser310.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/macintosh.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/megaduck.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/neogeo.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pdp1.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/plugnplay.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pv1000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/socrates.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/supracan.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/ti99.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/tutor.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vc4000.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vectrex.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vgmplay.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vsmile.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/xegs.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/adam.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/advision.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apfm1000.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/apple2gs.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/arcadia.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/archimedes.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/astrocde.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/atom.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/bbc.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/camplynx.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/cdi.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/coco.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/crvision.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/electron.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fm7.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/fmtowns.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamate.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gameandwatch.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamecom.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gamepock.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gmaster.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/gp32.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/lcdgames.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/laser310.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/macintosh.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/megaduck.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/neogeo.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pdp1.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/plugnplay.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/pv1000.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/socrates.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/supracan.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/ti99.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/tutor.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vc4000.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vectrex.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vgmplay.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vsmile.mame.keys
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/xegs.mame.keys
 endef
 
 MAME_POST_INSTALL_TARGET_HOOKS += MAME_EVMAPY
