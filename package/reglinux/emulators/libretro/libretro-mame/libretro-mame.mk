@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-# Version : Dec 3, 2024
-# lrmame0272
-LIBRETRO_MAME_VERSION = lrmame0272
+# Version : Jan 4, 2025
+# lrmame0273
+LIBRETRO_MAME_VERSION = lrmame0273
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 LIBRETRO_MAME_LICENSE = MAME
 
@@ -79,6 +79,9 @@ define LIBRETRO_MAME_BUILD_CMDS
 	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_FLAGS.*MACHINE_MECHANICAL' | cut -f 1 -d ":" | sort -u > $(@D)/machines2.list
 	cat $(@D)/machines2.list | while read file ; do grep 'GAME_FLAGS' $$file | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
 	cat $(@D)/machines2.list | while read file ; do sed -i '/define GAME_FLAGS/p;/setname.*GAME_FLAGS/p;/GAME_FLAGS/d' $$file ; done
+        # remove remaining MECHANICAL games using 'GAME_CUSTOM' label
+        find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_CUSTOM' | cut -f 1 -d ":" | sort -u > $(@D)/machines3.list
+        cat $(@D)/machines3.list | while read file ; do grep 'GAME_CUSTOM' $$file | grep 'CRC' | grep 'SHA' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
 	# Remove reference to skeleton|mechanical drivers in mame.lst
 	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 
@@ -99,12 +102,12 @@ define LIBRETRO_MAME_INSTALL_TARGET_CMDS
 	cp -R $(@D)/hash $(TARGET_DIR)/usr/share/lr-mame
 
 	mkdir -p $(TARGET_DIR)/usr/share/mame
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/blank.fmtowns $(TARGET_DIR)/usr/share/mame/blank.fmtowns
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/blank.fmtowns $(TARGET_DIR)/usr/share/mame/blank.fmtowns
 
 	# Copy coin drop plugin
 	mkdir -p $(TARGET_DIR)/usr/bin/mame/
 	cp -R -u $(@D)/plugins $(TARGET_DIR)/usr/bin/mame/
-	cp -R -u $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
+	cp -R -u $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/coindrop $(TARGET_DIR)/usr/bin/mame/plugins
 endef
 
 $(eval $(generic-package))
