@@ -15,10 +15,10 @@
  
  if (SA2_OPENGL)
    find_package(OpenGL REQUIRED)
-@@ -50,15 +50,25 @@
+@@ -50,14 +50,24 @@
    ${GLES2_INCLUDE_DIRS}
    )
-
+ 
 +if (SA2_OPENGL)
  target_link_libraries(sa2 PRIVATE
    ${SDL2_LIBRARIES}
@@ -27,7 +27,6 @@
    OpenGL::GL
    appleii
    common2
-   windows
    )
 +else()
 +target_link_libraries(sa2 PRIVATE
@@ -39,6 +38,6 @@
 +  windows
 +  )
 +endif()
-
- target_link_directories(sa2 PRIVATE
-   ${SDL2_LIBRARY_DIRS}
+ 
+ if (NOT WIN32)
+   target_link_libraries(sa2 PUBLIC
