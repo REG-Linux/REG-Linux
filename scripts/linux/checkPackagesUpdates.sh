@@ -138,6 +138,7 @@ PACKAGES_OPENBOR="openbor4432
                   openbor7530"
 
 PACKAGES_EMULATORS="amiberry
+                    amiberry-lite
                     applewin
                     bigpemu
                     box86
