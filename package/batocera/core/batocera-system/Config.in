@@ -1231,7 +1231,13 @@ config BR2_PACKAGE_BATOCERA_COMPUTER_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_VICE	# ALL
 
 	# Commodore Amiga
-	select BR2_PACKAGE_AMIBERRY		if !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835
+	select BR2_PACKAGE_AMIBERRY		if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY || \
+                                                   BR2_PACKAGE_BATOCERA_TARGET_BCM2712    || \
+                                                   BR2_PACKAGE_BATOCERA_TARGET_RK3588     || \
+                                                   BR2_PACKAGE_BATOCERA_TARGET_SM8250     || \
+                                                   BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA    || \
+                                                   BR2_PACKAGE_BATOCERA_TARGET_MT8395
+	select BR2_PACKAGE_AMIBERRY_LITE	if !BR2_PACKAGE_AMIBERRY && !BR2_mipsel && !BR2_PACKAGE_BATOCERA_TARGET_BCM2835
 	select BR2_PACKAGE_LIBRETRO_PUAE	# ALL
 	select BR2_PACKAGE_LIBRETRO_UAE4ARM	if BR2_PACKAGE_BATOCERA_TARGET_BCM2835
 
