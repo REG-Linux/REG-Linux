@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-HYPSEUS_SINGE_VERSION = v2.11.3
+HYPSEUS_SINGE_VERSION = v2.11.4
 HYPSEUS_SINGE_SITE =  $(call github,DirtBagXon,hypseus-singe,$(HYPSEUS_SINGE_VERSION))
 HYPSEUS_SINGE_LICENSE = GPLv3
 
@@ -25,7 +25,7 @@ define HYPSEUS_SINGE_INSTALL_TARGET_CMDS
 
 	#evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/hypseus-singe/*.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/hypseus-singe/*.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
