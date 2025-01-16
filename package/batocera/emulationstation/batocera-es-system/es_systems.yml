@@ -117,11 +117,11 @@ amiga500:
   group:        amiga
   emulators:
     amiberry:
-      A500:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
-      A500+:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
-      A600:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
-      A1000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
-      A3000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
+      A500:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE], incompatible_extensions: [m3u] }
+      A500+:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE], incompatible_extensions: [m3u] }
+      A600:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE], incompatible_extensions: [m3u] }
+      A1000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE], incompatible_extensions: [m3u] }
+      A3000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE], incompatible_extensions: [m3u] }
     libretro:
       puae:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE] }
       puae2021: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE2021] }
@@ -143,8 +143,8 @@ amiga1200:
   group:        amiga
   emulators:
     amiberry:
-      A1200:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
-      A4000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY], incompatible_extensions: [m3u] }
+      A1200:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE], incompatible_extensions: [m3u] }
+      A4000:    { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE], incompatible_extensions: [m3u] }
     libretro:
       puae:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE] }
       puae2021: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE2021] }
@@ -164,7 +164,7 @@ amigacd32:
   extensions:   [bin, cue, iso, chd]
   emulators:
     amiberry:
-      CD32:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY] }
+      CD32:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE] }
     libretro:
       puae:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE] }
       puae2021: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE2021] }
@@ -178,7 +178,7 @@ amigacdtv:
   extensions:   [bin, cue, iso, chd, m3u]
   emulators:
     amiberry:
-      CDTV:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY] }
+      CDTV:     { requireAnyOf: [BR2_PACKAGE_AMIBERRY, BR2_PACKAGE_AMIBERRY_LITE] }
     libretro:
       puae:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE] }
       puae2021: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE2021] }
