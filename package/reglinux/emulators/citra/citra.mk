@@ -27,7 +27,7 @@ CITRA_CONF_OPTS += -DCITRA_WARNINGS_AS_ERRORS=OFF
 CITRA_CONF_OPTS += -DCITRA_ENABLE_COMPATIBILITY_REPORTING=ON
 CITRA_CONF_OPTS += -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON
 CITRA_CONF_OPTS += -DUSE_SYSTEM_BOOST=ON
-CITRA_CONF_OPTS += -DUSE_SYSTEM_SDL2=ON    # important to avoid HIDAPI
+CITRA_CONF_OPTS += -DUSE_SYSTEM_SDL2=ON
 CITRA_CONF_OPTS += -DENABLE_LTO=OFF
 
 # future support for arm using SDL2 gui?
@@ -54,7 +54,7 @@ endef
 
 define CITRA_EVMAP
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/citra/3ds.citra.keys \
+	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/citra/3ds.citra.keys \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 
