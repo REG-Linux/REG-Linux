@@ -48,8 +48,8 @@ ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
 else
     PPSSPP_CONF_OPTS += -DVULKAN=OFF
 endif
-# enable x11/vulkan interface only if xorg
-ifeq ($(BR2_PACKAGE_XORG7),y)
+# enable x11/vulkan interface only if using Xwayland
+ifeq ($(BR2_PACKAGE_REGLINUX_XWAYLAND),y)
     PPSSPP_CONF_OPTS += -DUSING_X11_VULKAN=ON
 else
     PPSSPP_CONF_OPTS += -DUSING_X11_VULKAN=OFF
@@ -124,13 +124,13 @@ define PPSSPP_INSTALL_TARGET_CMDS
     cp -R $(@D)/assets $(TARGET_DIR)/usr/share/ppsspp/PPSSPP
     # Fix PSP font for languages like Japanese
     # (font from https://github.com/minoryorg/Noto-Sans-CJK-JP/blob/master/fonts/)
-    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/ppsspp/NotoSansCJKjp-DemiLight.ttf \
+    cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/ppsspp/NotoSansCJKjp-DemiLight.ttf \
         $(TARGET_DIR)/usr/share/ppsspp/PPSSPP/Roboto-Condensed.ttf
 endef
 
 define PPSSPP_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/ppsspp/psp.ppsspp.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/ppsspp/psp.ppsspp.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
