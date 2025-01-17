@@ -701,13 +701,23 @@ config BR2_PACKAGE_BATOCERA_TOOLS
 	help
 	  System tools
 
+#### retroarch ####
+config BR2_PACKAGE_REGLINUX_RETROARCH
+	bool "REG-Linux RetroArch packages"
+
+	# RetroArch frontend and core data
+	select BR2_PACKAGE_RETROARCH
+	select BR2_PACKAGE_BATOCERA_CONTROLLER_OVERLAYS
+	select BR2_PACKAGE_REGLINUX_RETROACHIEVEMENTS_SOUNDS
+	select BR2_PACKAGE_REGLINUX_BEZELS
+	select BR2_PACKAGE_REGLINUX_SHADERS
+
 #### systems ####
 config BR2_PACKAGE_BATOCERA_ALL_SYSTEMS
 	bool "batocera.linux all emulators packages selection"
 
 	# RetroArch frontend and core data
-	select BR2_PACKAGE_BATOCERA_RETROARCH
-	select BR2_PACKAGE_BATOCERA_RETROACHIEVEMENTS_SOUNDS
+	select BR2_PACKAGE_REGLINUX_RETROARCH
 
 	# Pygame2 for pygun and wine launcher (?)
 	select BR2_PACKAGE_PYTHON_PYGAME2
@@ -1302,17 +1312,6 @@ config BR2_PACKAGE_BATOCERA_COMPUTER_SYSTEMS
 
 	help
 	  Old computers
-
-### RetroArch system ###
-config BR2_PACKAGE_BATOCERA_RETROARCH
-	bool "batocera.linux RetroArch frontend and integration"
-
-	# RetroArch frontend and core data
-	select BR2_PACKAGE_RETROARCH
-	select BR2_PACKAGE_REGLINUX_BEZELS
-	select BR2_PACKAGE_BATOCERA_CONTROLLER_OVERLAYS
-	select BR2_PACKAGE_REGLINUX_SHADERS
-
 
 ### Console systems ###
 config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS

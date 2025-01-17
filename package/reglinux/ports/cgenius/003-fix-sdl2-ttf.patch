@@ -1,0 +1,13 @@
+--- a/GsKit/graphics/GsTrueTypeFont.h	2025-01-17 11:12:07.654289281 +0100
++++ b/GsKit/graphics/GsTrueTypeFont.h	2025-01-17 11:12:15.617457433 +0100
+@@ -6,8 +6,8 @@
+ #include <base/interface/Color.h>
+ #include <graphics/GsSurface.h>
+ 
+-typedef struct _TTF_Font TTF_Font;
+-
++typedef struct TTF_Font TTF_Font;
++
+ class GsTrueTypeFont
+ {
+ public:
