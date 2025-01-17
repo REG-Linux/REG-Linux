@@ -1,4 +1,4 @@
-include toolchain-gcc12-glibc.common
+include toolchain-gcc13-glibc.common
 include reglinux-board.common
 
 # Target definition
@@ -16,7 +16,7 @@ BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION=y
-BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.6.69"
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.6.71"
 BR2_KERNEL_HEADERS_6_6=y
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3288/linux_patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/arm"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y

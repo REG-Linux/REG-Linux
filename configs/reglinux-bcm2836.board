@@ -1,4 +1,4 @@
-include toolchain-gcc12-glibc.common
+include toolchain-gcc13-glibc.common
 include reglinux-board.common
 
 # Target definition
