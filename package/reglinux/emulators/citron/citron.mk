@@ -3,8 +3,8 @@
 # CITRON
 #
 ################################################################################
-# Version: TODO (it's a mess right now)
-CITRON_VERSION = v0.1-canary-refresh
+# Version: v0.3-canary-refresh
+CITRON_VERSION = v0.3-canary-refresh
 CITRON_SITE = https://git.citron-emu.org/Citron/Citron
 CITRON_SITE_METHOD=git
 CITRON_GIT_SUBMODULES=YES
