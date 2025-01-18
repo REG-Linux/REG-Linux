@@ -59,15 +59,6 @@ diff -u -r a/SConstruct b/SConstruct
  		main = '''
  	SDL_RWops *ops = reinterpret_cast<SDL_RWops *>(argv);
  #if DXX_MAX_JOYSTICKS
-@@ -3546,7 +3546,7 @@
- 					raise SCons.Errors.UserError(f'Invalid value for unsigned-integer-only option {key}: {value}.')
- 		# Paths for the Videocore libs/includes on the Raspberry Pi
- 		RPI_DEFAULT_VC_PATH='/opt/vc'
--		default_OGLES_LIB = 'GLES_CM'
-+		default_OGLES_LIB = 'GLESv1_CM'
- 		default_EGL_LIB = 'EGL'
- 		_default_prefix = '/usr/local'
- 		__stdout_is_not_a_tty = None
 diff -u -r a/similar/arch/ogl/gr.cpp b/arch/ogl/gr.cpp
 --- a/similar/arch/ogl/gr.cpp	2024-08-09 12:35:53.793897303 +0200
 +++ b/arch/ogl/gr.cpp	2024-08-09 12:33:22.514437177 +0200
