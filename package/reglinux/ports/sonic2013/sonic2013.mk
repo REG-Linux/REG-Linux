@@ -21,6 +21,7 @@ define SONIC2013_BUILD_CMDS
 endef
 
 define SONIC2013_INSTALL_TARGET_CMDS
+	$(TARGET_STRIP) $(@D)/bin/RSDKv4
 	$(INSTALL) -D -m 0755 $(@D)/bin/RSDKv4 $(TARGET_DIR)/usr/bin/sonic2013
 endef
 
