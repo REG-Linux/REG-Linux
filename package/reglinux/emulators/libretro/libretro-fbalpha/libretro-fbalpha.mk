@@ -3,8 +3,8 @@
 # libretro-fbalpha
 #
 ################################################################################
-# Version.: Commits on Nov 1, 2023
-LIBRETRO_FBALPHA_VERSION = b7ac554c53561d41640372f23dab15cd6fc4f0c4
+# Version.: Commits on Oct 21, 2024
+LIBRETRO_FBALPHA_VERSION = 77167cea72e808384c136c8c163a6b4975ce7a84
 LIBRETRO_FBALPHA_SITE = $(call github,libretro,fbalpha2012,$(LIBRETRO_FBALPHA_VERSION))
 LIBRETRO_FBALPHA_LICENSE = Non-commercial
 
