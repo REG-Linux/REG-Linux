@@ -3,8 +3,8 @@
 # xxd
 #
 ################################################################################
-# Version.: Commits on Feb 19, 2024
-XXD_VERSION = v1.1
+# Version.: Release on Aug 6, 2024
+XXD_VERSION = v1.2
 XXD_SITE =  $(call github,ckormanyos,xxd,$(XXD_VERSION))
 XXD_LICENSE = GPL-2.0
 XXD_LICENSE_FILE = LICENSE
