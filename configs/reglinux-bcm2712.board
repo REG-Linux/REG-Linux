@@ -1,9 +1,10 @@
 include toolchain-gcc13-glibc.common
 include reglinux-board.common
 
-# Target definition
+# Target definition (16K page size)
 BR2_aarch64=y
 BR2_cortex_a76=y
+BR2_ARM64_PAGE_SIZE_16K=y
 BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_PACKAGE_BATOCERA_TARGET_BCM2712=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mcpu=cortex-a76 -mtune=cortex-a76"
