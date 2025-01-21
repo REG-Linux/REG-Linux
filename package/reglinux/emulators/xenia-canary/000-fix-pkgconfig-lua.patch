@@ -1,0 +1,22 @@
+--- a/tools/build/scripts/pkg_config.lua	2025-01-21 20:23:36.326607012 +0100
++++ b/tools/build/scripts/pkg_config.lua	2025-01-21 20:27:52.339355949 +0100
+@@ -3,7 +3,7 @@
+ pkg_config = {}
+ 
+ local function pkg_config_call(lib, what)
+-  local result, code = os.outputof("pkg-config --"..what.." "..lib)
++  local result, code = os.outputof(os.getenv("PKGCONFIG").." --"..what.." "..lib)
+   if result then
+     return result
+   else
+--- a/third_party/SDL2.lua	2025-01-21 20:33:00.267231396 +0100
++++ b/third_party/SDL2.lua	2025-01-21 20:33:23.340745423 +0100
+@@ -11,7 +11,7 @@
+   include("SDL2-static.lua")
+ else
+   -- use system libraries
+-  local result, code, what = os.outputof("sdl2-config --cflags")
++  local result, code, what = os.outputof(os.getenv("SDL2CONFIG").." --cflags")
+   if result then
+     for inc in string.gmatch(result, "-I([%S]+)") do
+       table.insert(sdl2_sys_includedirs, inc)
