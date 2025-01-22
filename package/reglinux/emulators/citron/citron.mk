@@ -50,4 +50,11 @@ define CITRON_INSTALL_TARGET_CMDS
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
+# Ugly hack because lz4 is not installed with CMake and pkgconfig returns
+# $(STAGING_DIR)/usr/local/include which does NOT exist
+define CITRON_CREATE_STAGING_USR_LOCAL_INCLUDE
+    mkdir -p $(STAGING_DIR)/usr/local/include
+endef
+CITRON_PRE_CONFIGURE_HOOKS += CITRON_CREATE_STAGING_USR_LOCAL_INCLUDE
+
 $(eval $(cmake-package))
