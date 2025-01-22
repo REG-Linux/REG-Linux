@@ -1,0 +1,12 @@
+--- a/sdl2/Makefile.libretro	2025-01-22 18:57:57.980747447 +0100
++++ b/sdl2/Makefile.libretro	2025-01-22 18:58:12.484110370 +0100
+@@ -908,6 +908,9 @@
+ 
+ DEFINES += -D__LIBRETRO__ $(PLATFORM_DEFINES) $(GCC_WARNINGS) $(COMMONFLAGS) $(GCC_SECURITY_FLAGS) -DNST_NO_ZLIB $(INCFLAGS) $(INCFLAGS_PLATFORM) $(NP2DEFINE) $(NP21DEFINE)
+ 
++# GCC 14 workaround
++CFLAGS += -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++
+ CFLAGS += $(fpic) $(DEFINES) $(C_VER) $(ENDIANNESS_DEFINES)
+ CXXFLAGS += $(fpic) $(DEFINES) $(CXX_VER) $(ENDIANNESS_DEFINES)
+ LDFLAGS += $(fpic)
