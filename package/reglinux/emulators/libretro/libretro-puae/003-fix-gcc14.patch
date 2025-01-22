@@ -1,0 +1,12 @@
+--- a/Makefile.common	2025-01-22 19:43:03.122669582 +0100
++++ b/Makefile.common	2025-01-22 19:43:32.898377177 +0100
+@@ -4,6 +4,9 @@
+ RETRODEP = $(CORE_DIR)/retrodep
+ LIBRETRO_COMM_DIR := $(CORE_DIR)/libretro-common
+ 
++# GCC14 workaround
++CFLAGS +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++
+ INCFLAGS := \
+ 	-I$(EMU) \
+ 	-I$(EMU)/include \
