@@ -56,10 +56,13 @@ diff --git a/src/manymouse/linux_evdev.c b/src/manymouse/linux_evdev.c
 index 61d61e6..84dd5cc 100644
 --- a/src/manymouse/linux_evdev.c
 +++ b/src/manymouse/linux_evdev.c
-@@ -23,6 +23,65 @@
+@@ -23,6 +23,68 @@
  
  #include <linux/input.h>  /* evdev interface...  */
  
++
++#include <libudev.h>
++
 +struct event_udev_entry
 +{
 +   const char *devnode;

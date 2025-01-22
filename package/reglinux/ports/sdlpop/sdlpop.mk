@@ -19,7 +19,7 @@ define SDLPOP_INSTALL_TARGET_CMDS
 	echo "# Blank cfg file for advanced configuration" > \
 	    $(TARGET_DIR)/usr/share/sdlpop/cfg/SDLPoP.cfg
 	cp -pr $(@D)/data $(TARGET_DIR)/usr/share/sdlpop/
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/sdlpop/sdlpop.keys $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/sdlpop/sdlpop.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))
