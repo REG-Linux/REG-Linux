@@ -1,0 +1,13 @@
+--- a/Makefile.common	2025-01-22 19:17:21.131126747 +0100
++++ b/Makefile.common	2025-01-22 19:17:56.998990691 +0100
+@@ -10,6 +10,10 @@
+ 
+ CORE_DEFINE := -DNETWORK_DISABLED
+ 
++# GCC 14 workarounds
++CFLAGS +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++CXXFLAGS +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++
+ FLAGS += -ffast-math -fno-strict-aliasing
+ FLAGS += -Wno-narrowing -Wno-unused-label
+ FLAGS += -Wno-misleading-indentation -Wno-unknown-pragmas
