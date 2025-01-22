@@ -1,8 +1,8 @@
 config BR2_PACKAGE_SPIRV_CROSS
   bool "spirv-cross"
   depends on BR2_PACKAGE_WAYLAND || BR2_PACKAGE_XORG7
-  select BR2_PACKAGE_VULKAN_HEADERS
-  select BR2_PACKAGE_VULKAN_LOADER
+  select BR2_PACKAGE_VULKAN_HEADERS	if BR2_PACKAGE_REGLINUX_VULKAN
+  select BR2_PACKAGE_VULKAN_LOADER	if BR2_PACKAGE_REGLINUX_VULKAN
   help
     SPIRV-Cross is a tool designed for parsing and converting SPIR-V to other shader languages.
 
