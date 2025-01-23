@@ -1,0 +1,13 @@
+--- a/svn-current/trunk/makefile.libretro	2025-01-23 16:06:47.313142788 +0100
++++ b/svn-current/trunk/makefile.libretro	2025-01-23 16:07:52.511646438 +0100
+@@ -41,6 +41,10 @@
+ FBA_SCRIPTS_DIR = $(MAIN_FBA_DIR)/dep/scripts
+ GRIFFIN_DIR = griffin-libretro
+ 
++# GCC14 workaround
++CFLAGS	 +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++CXXFLAGS +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++
+ # TARGET
+ ifeq ($(target),cps1)
+    TARGET_NAME := fbalpha2012_cps1
