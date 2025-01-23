@@ -3,8 +3,8 @@
 # spirv-cross
 #
 ################################################################################
-# Version: Releaes on Sep 18, 2024
-SPIRV_CROSS_VERSION = vulkan-sdk-1.3.296.0
+# Version: Releaes on Dec 12, 2024
+SPIRV_CROSS_VERSION = vulkan-sdk-1.4.304.0
 SPIRV_CROSS_SITE = https://github.com/KhronosGroup/SPIRV-Cross
 SPIRV_CROSS_GIT_SUBMODULES=YES
 SPIRV_CROSS_SITE_METHOD=git
