@@ -3,7 +3,7 @@
 # Vulkan VOLK
 #
 ################################################################################
-VULKAN_VOLK_VERSION = vulkan-sdk-1.3.296.0
+VULKAN_VOLK_VERSION = vulkan-sdk-1.4.304.0
 VULKAN_VOLK_SITE = https://github.com/zeux/volk
 VULKAN_VOLK_SITE_METHOD=git
 VULKAN_VOLK_GIT_SUBMODULES = YES
