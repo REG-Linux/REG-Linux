@@ -1,0 +1,9 @@
+--- a/CPCCore/CPCCoreEmu/BreakpointToken.h	2025-01-23 07:49:40.554562078 +0100
++++ b/CPCCore/CPCCoreEmu/BreakpointToken.h	2025-01-23 07:49:52.846837629 +0100
+@@ -1,5 +1,6 @@
+ 
+ #pragma once
++#include <algorithm>
+ #include <functional>
+ #include <string>
+ #include <sstream>
