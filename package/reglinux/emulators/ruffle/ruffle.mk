@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RUFFLE_VERSION = nightly-2024-09-01
+RUFFLE_VERSION = nightly-2025-01-21
 RUFFLE_SITE = $(call github,ruffle-rs,ruffle,$(RUFFLE_VERSION))
 RUFFLE_LICENSE = GPLv2
 RUFFLE_DEPENDENCIES = host-rustc host-rust-bin openssl
@@ -32,7 +32,7 @@ define RUFFLE_INSTALL_TARGET_CMDS
              $(TARGET_DIR)/usr/bin/ruffle
 
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/ruffle/flash.ruffle.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/ruffle/flash.ruffle.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
