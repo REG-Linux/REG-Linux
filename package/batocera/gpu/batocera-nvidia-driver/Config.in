@@ -31,7 +31,6 @@ config BR2_PACKAGE_BATOCERA_NVIDIA_DRIVER_XORG
 	select BR2_PACKAGE_XLIB_LIBXEXT
 	depends on BR2_PACKAGE_HAS_LIBGL
 	depends on BR2_PACKAGE_HAS_LIBEGL
-	select BR2_PACKAGE_HAS_LIBEGL_WAYLAND
 #batocera GLES support is not enable in mesa3d by default
 #	select BR2_PACKAGE_HAS_LIBGLES
 	depends on BR2_PACKAGE_LIBGLVND
