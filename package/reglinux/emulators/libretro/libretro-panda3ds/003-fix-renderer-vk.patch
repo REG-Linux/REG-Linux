@@ -1,0 +1,54 @@
+From d30f2646eccb8b5cae895ddc7b3461c11c97701e Mon Sep 17 00:00:00 2001
+From: wheremyfoodat <44909372+wheremyfoodat@users.noreply.github.com>
+Date: Mon, 6 Jan 2025 16:13:40 +0200
+Subject: [PATCH] Use vk::detail::DynamicLoader instead of vk::DynamicLoader
+ (#710)
+
+* Use vk::detail::DynamicLoader instead of vk::DynamicLoader
+
+* Update renderer_vk.cpp
+---
+ src/core/renderer_vk/renderer_vk.cpp | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/renderer_vk/renderer_vk.cpp b/src/core/renderer_vk/renderer_vk.cpp
+index d05a070f0..14bde2c88 100644
+--- a/src/core/renderer_vk/renderer_vk.cpp
++++ b/src/core/renderer_vk/renderer_vk.cpp
+@@ -885,10 +885,17 @@ void RendererVK::display() {
+ 	}
+ }
+ 
++// DynamicLoader is in a different namespace in different versions of Vulkan-Hpp
++#if VK_HEADER_VERSION >= 301
++using VulkanDynamicLoader = vk::detail::DynamicLoader;
++#else
++using VulkanDynamicLoader = vk::DynamicLoader;
++#endif
++
+ void RendererVK::initGraphicsContext(SDL_Window* window) {
+ 	targetWindow = window;
+ 	// Resolve all instance function pointers
+-	static vk::DynamicLoader dl;
++	static VulkanDynamicLoader dl;
+ 	VULKAN_HPP_DEFAULT_DISPATCHER.init(dl.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr"));
+ 
+ 	// Create Instance
+@@ -1588,4 +1595,4 @@ void RendererVK::deinitGraphicsContext() {
+ 
+ 	// TODO: Make it so that depth and colour buffers get written back to 3DS memory
+ 	printf("RendererVK::DeinitGraphicsContext called\n");
+-}
+\ No newline at end of file
++}
+--- a/CMakeLists.txt	2025-01-24 13:56:10.481957621 +0100
++++ b/CMakeLists.txt	2025-01-24 13:57:39.136970188 +0100
+@@ -36,7 +36,7 @@
+ endif()
+ 
+ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-interference-size")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-interference-size -fpermissive")
+ endif()
+ 
+ if(ANDROID)
