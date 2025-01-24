@@ -137,6 +137,3 @@ hikaru:
 jaguar:
   emulator: bigpemu
   core:     bigpemu
-chihiro:
-  emulator: xemu
-  core:     xemu
