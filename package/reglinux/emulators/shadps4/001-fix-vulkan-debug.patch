@@ -1,0 +1,70 @@
+From 9e5b50c86681053aa05a798663c6eaac6581cd46 Mon Sep 17 00:00:00 2001
+From: squidbus <175574877+squidbus@users.noreply.github.com>
+Date: Fri, 17 Jan 2025 00:16:15 -0800
+Subject: [PATCH] vk_platform: Clean up unnecessary debug message filters.
+ (#2171)
+
+---
+ src/video_core/renderer_vulkan/vk_platform.cpp | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/src/video_core/renderer_vulkan/vk_platform.cpp b/src/video_core/renderer_vulkan/vk_platform.cpp
+index 7f0bcb5d292..fdd590e9d69 100644
+--- a/src/video_core/renderer_vulkan/vk_platform.cpp
++++ b/src/video_core/renderer_vulkan/vk_platform.cpp
+@@ -31,17 +31,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugUtilsCallback(
+     VkDebugUtilsMessageSeverityFlagBitsEXT severity, VkDebugUtilsMessageTypeFlagsEXT type,
+     const VkDebugUtilsMessengerCallbackDataEXT* callback_data, void* user_data) {
+ 
+-    switch (static_cast<u32>(callback_data->messageIdNumber)) {
+-    case 0x609a13b: // Vertex attribute at location not consumed by shader
+-    case 0xc81ad50e:
+-    case 0xb7c39078:
+-    case 0x32868fde: // vkCreateBufferView(): pCreateInfo->range does not equal VK_WHOLE_SIZE
+-    case 0x1012616b: // `VK_FORMAT_UNDEFINED` does not match fragment shader output type
+-        return VK_FALSE;
+-    default:
+-        break;
+-    }
+-
+     Common::Log::Level level{};
+     switch (severity) {
+     case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+From c90d01c9d4c655e0cfa456c4a63630b7c1b453ab Mon Sep 17 00:00:00 2001
+From: squidbus <175574877+squidbus@users.noreply.github.com>
+Date: Mon, 20 Jan 2025 04:28:52 -0800
+Subject: [PATCH] externals: Update vulkan-headers
+
+---
+ src/video_core/renderer_vulkan/vk_platform.cpp | 12 ++++++------
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/video_core/renderer_vulkan/vk_platform.cpp b/src/video_core/renderer_vulkan/vk_platform.cpp
+--- a/src/video_core/renderer_vulkan/vk_platform.cpp
++++ b/src/video_core/renderer_vulkan/vk_platform.cpp
+@@ -28,19 +28,19 @@ static const char* const VALIDATION_LAYER_NAME = "VK_LAYER_KHRONOS_validation";
+ static const char* const CRASH_DIAGNOSTIC_LAYER_NAME = "VK_LAYER_LUNARG_crash_diagnostic";
+ 
+ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugUtilsCallback(
+-    VkDebugUtilsMessageSeverityFlagBitsEXT severity, VkDebugUtilsMessageTypeFlagsEXT type,
+-    const VkDebugUtilsMessengerCallbackDataEXT* callback_data, void* user_data) {
++    vk::DebugUtilsMessageSeverityFlagBitsEXT severity, vk::DebugUtilsMessageTypeFlagsEXT type,
++    const vk::DebugUtilsMessengerCallbackDataEXT* callback_data, void* user_data) {
+ 
+     Common::Log::Level level{};
+     switch (severity) {
+-    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
++    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eError:
+         level = Common::Log::Level::Error;
+         break;
+-    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
++    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning:
+         level = Common::Log::Level::Info;
+         break;
+-    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+-    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
++    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo:
++    case vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose:
+         level = Common::Log::Level::Debug;
+         break;
+     default:
