@@ -1,0 +1,41 @@
+--- a/Makefile	2025-01-21 16:55:35.012779157 +0100
++++ b/Makefile	2025-01-21 16:57:11.580008905 +0100
+@@ -1,19 +1,25 @@
+-obj-m += hid-nx.o
+ 
+-KERNEL_RELEASE := $(shell uname -r)
+-KDIR           := /lib/modules/$(KERNEL_RELEASE)/build
++ifeq ($(KERNELRELEASE),)
+ 
+-OBJ_FILE       := $(obj-m)
+-SRC_FILE       := $(OBJ_FILE:.o=.c)
+-CMD_FILE       := .$(OBJ_FILE).cmd
+-MODNAME        := $(OBJ_FILE:.o=)
++KVERSION ?= $(shell uname -r)
++BUILD_DIR ?= /lib/modules/${KVERSION}/build
+ 
+-all default: modules
+-install: modules_install
++PWD := $(shell pwd)
+ 
+-$(OBJ_FILE) $(MODNAME).ko: $(SRC_FILE)
++modules:
++        $(MAKE) -C $(BUILD_DIR) M=$(PWD) modules
+ 
+-modules modules_install clean $(OBJ_FILE) $(MODNAME).ko:
+-	$(MAKE) -C $(KDIR) M=$(CURDIR) $@
++modules_install:
++        $(MAKE) -C $(BUILD_DIR) M=$(PWD) modules_install
+ 
+-.PHONY: all default install modules modules_install clean
++clean:
++        rm -rf *~ *.o .*.cmd *.mod.c *.ko *.ko.unsigned .depend \
++        .tmp_versions modules.order Module.symvers Module.markers
++
++.PHONY: modules modules_install clean
++
++else
++
++obj-m := hid-nx.o
++
++endif
