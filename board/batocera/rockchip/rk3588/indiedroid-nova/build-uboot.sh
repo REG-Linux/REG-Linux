@@ -5,7 +5,7 @@ BOARD_DIR=$2
 IMAGES_DIR=$3
 
 # Define U-Boot version we use
-UBOOT_VERSION=2025.01-rc4
+UBOOT_VERSION=2025.01
 
 # Define rkbin commit we use
 RKBIN_COMMIT=7c35e21a8529b3758d1f051d1a5dc62aae934b2b
