@@ -1422,7 +1422,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
                                                            BR2_PACKAGE_BATOCERA_TARGET_SM8250     || \
 							   BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA
 
-	# Sony PS3 (saphira build error since BR bump)
+	# Sony PS3 (TODO saphira build error since BR bump)
 	select BR2_PACKAGE_RPCS3			if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY || \
 							   BR2_PACKAGE_BATOCERA_TARGET_BCM2712    || \
 							   BR2_PACKAGE_BATOCERA_TARGET_SM8250
