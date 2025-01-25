@@ -1,4 +1,4 @@
-include toolchain-gcc13-glibc.common
+include toolchain-gcc14-glibc.common
 include reglinux-board.common
 
 # Target definition (RV64GC, aka riscv64gc)
