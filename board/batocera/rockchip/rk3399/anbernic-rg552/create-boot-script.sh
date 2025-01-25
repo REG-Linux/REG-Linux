@@ -14,6 +14,10 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
+mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-anbernic-rg552"     || exit 1
+cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-anbernic-rg552/" || exit 1
+cd "${REGLINUX_BINARIES_DIR}/build-uboot-anbernic-rg552/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
 
