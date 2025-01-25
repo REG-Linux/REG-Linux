@@ -1,0 +1,10 @@
+--- a/cmake/FindcJSON.cmake	2025-01-19 15:04:04.000000000 +0100
++++ b/cmake/FindcJSON.cmake	2025-01-25 11:59:50.167375395 +0100
+@@ -1,6 +1,6 @@
+ # Simple wrapper for locating cJSON package even if cmake config is not available
+ # that is missing on Fedora cjson-1.7.14-7.fc38 for example
+-find_package(cJSON CONFIG)
++#find_package(cJSON CONFIG)
+ 
+ if (NOT cJSON_FOUND)
+ 	find_package(PkgConfig)
