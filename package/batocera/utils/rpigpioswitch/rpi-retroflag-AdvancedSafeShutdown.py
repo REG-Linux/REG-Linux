@@ -27,9 +27,9 @@ def init():
 def poweroff():
 	while True:
 		GPIO.wait_for_edge(powerPin, GPIO.FALLING)
-		output = int(subprocess.check_output(['batocera-es-swissknife', '--espid']))
+		output = int(subprocess.check_output(['system-es-swissknife', '--espid']))
 		if output:
-			os.system("batocera-es-swissknife --shutdown")
+			os.system("system-es-swissknife --shutdown")
 		else:
 			os.system("shutdown -h now")
 
@@ -49,12 +49,12 @@ def ledBlink():
 def reset():
 	while True:
 		GPIO.wait_for_edge(resetPin, GPIO.FALLING)
-		output = int(subprocess.check_output(['batocera-es-swissknife', '--espid']))
-		output_rc = int(subprocess.check_output(['batocera-es-swissknife', '--emupid']))
+		output = int(subprocess.check_output(['system-es-swissknife', '--espid']))
+		output_rc = int(subprocess.check_output(['system-es-swissknife', '--emupid']))
 		if output_rc:
-			os.system("batocera-es-swissknife --emukill")
+			os.system("system-es-swissknife --emukill")
 		elif output:
-			os.system("batocera-es-swissknife --restart")
+			os.system("system-es-swissknife --restart")
 		else:
 			os.system("shutdown -r now")
 

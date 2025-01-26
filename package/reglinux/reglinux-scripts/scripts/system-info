@@ -152,11 +152,11 @@ MEM_TOTAL_MB=$(expr "${MEM_TOTAL_KB}" / 1024)
 MEM_AVAILABLE_MB=$(expr "${MEM_AVAILABLE_KB}" / 1024)
 echo "Available Memory: ${MEM_AVAILABLE_MB}/${MEM_TOTAL_MB} MB"
 
-DISPLAYRES=$(batocera-resolution currentResolution)
+DISPLAYRES=$(system-resolution currentResolution)
 if [ ! -z "$WAYLAND_DISPLAY" ]; then # wayland
-    DISPLAYRATE=$(batocera-resolution currentMode | awk -F'[x.]' '{printf "%.3f", $3 / 1000}')
+    DISPLAYRATE=$(system-resolution currentMode | awk -F'[x.]' '{printf "%.3f", $3 / 1000}')
 elif test -f /var/run/drmMode; then # drm
-    DISPLAYRATE=$(batocera-resolution currentMode | awk -F'\\.' '{print $4}')
+    DISPLAYRATE=$(system-resolution currentMode | awk -F'\\.' '{print $4}')
 fi
 echo "Display Resolution: ${DISPLAYRES}"
 echo "Display Refresh Rate: ${DISPLAYRATE}Hz"
@@ -251,7 +251,7 @@ do
             # parent of parent / uevent
             BATTUEVENT=$(dirname "${PADBAT}")
             BATTUEVENT=$(dirname "${BATTUEVENT}")/uevent
-            BATT="$(batocera-padsinfo "${BATTUEVENT}")"
+            BATT="$(system-padsinfo "${BATTUEVENT}")"
             echo "${PADNAME}: ${BATT}%"
         fi
     fi

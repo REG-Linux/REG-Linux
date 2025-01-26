@@ -185,6 +185,6 @@ class IkemenGenerator(Generator):
         with open(rom+"/save/config.json", "w") as jout:
             jout.write(js_out)
 
-        commandArray = ["/usr/bin/batocera-ikemen", rom]
+        commandArray = ["/usr/bin/system-ikemen", rom]
 
         return Command.Command(array=commandArray, env={ "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers) })

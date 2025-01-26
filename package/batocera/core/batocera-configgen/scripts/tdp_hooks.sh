@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # this configgen script leverages the S93amdtdp init.d and
-# the batocera-amd-tdp scripts to allow adjustments to TDP
+# the system-amd-tdp scripts to allow adjustments to TDP
 # of supported AMD CPUs. this can improve performance
 # but also improve battery life.
 #
@@ -21,7 +21,7 @@ fi
 # set the final tdp value
 set_tdp() {
     echo "Game ${2} requested setting AMD Mobile Processor TDP to ${1} Watts" >> $log
-    /usr/bin/batocera-amd-tdp $1
+    /usr/bin/system-amd-tdp $1
 }
 
 # determine the new TDP value based on max TDP

@@ -1,0 +1,1 @@
+ACTION=="change", SUBSYSTEM=="drm", RUN+="/bin/bash /usr/bin/system-switch-screen-checker-delayed"

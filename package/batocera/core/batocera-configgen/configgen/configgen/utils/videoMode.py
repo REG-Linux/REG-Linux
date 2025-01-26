@@ -41,7 +41,7 @@ def minTomaxResolution():
         return drmMinTomaxResolution(resolution)
 
 def getRefreshRate():
-    proc = subprocess.Popen(["batocera-resolution getRefreshRate"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution getRefreshRate"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     for val in out.decode().splitlines():
         return val # return the first line
@@ -93,18 +93,18 @@ def getScreensInfos(config):
 
 
 def getScreens():
-    proc = subprocess.Popen(["batocera-resolution listOutputs"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution listOutputs"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return out.decode().splitlines()
 
 
 def getCurrentOutput():
-    proc = subprocess.Popen(["batocera-resolution currentOutput"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution currentOutput"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return out.decode().strip()
 
 def supportSystemRotation():
-    proc = subprocess.Popen(["batocera-resolution supportSystemRotation"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution supportSystemRotation"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return proc.returncode == 0
 
@@ -121,7 +121,7 @@ def checkModeExists(videomode):
             return True
 
     # specific resolution given
-    proc = subprocess.Popen(["batocera-resolution listModes"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution listModes"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     for valmod in out.decode().splitlines():
         vals = valmod.split(":")
@@ -135,9 +135,9 @@ def checkModeExists(videomode):
 def changeMouse(mode):
     eslog.debug(f"changeMouseMode({mode})")
     if mode:
-        cmd = "batocera-mouse show"
+        cmd = "system-mouse show"
     else:
-        cmd = "batocera-mouse hide"
+        cmd = "system-mouse hide"
     proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
 

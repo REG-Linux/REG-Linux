@@ -132,7 +132,7 @@
                 "pageup"
             ],
             "type": "exec",
-            "target": "batocera-screenshot"
+            "target": "system-screenshot"
         }
     ]
 }
