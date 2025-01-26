@@ -3,7 +3,7 @@
 #
 # To enable it, SSH into Batocera and type the 3 commands:
 #   mkdir -p /userdata/system/configs/emulationstation/scripts/achievements/
-#   echo "/usr/bin/batocera-led-effects" > /userdata/system/configs/emulationstation/scripts/achievements/leds.sh
+#   echo "/usr/bin/system-led-effects" > /userdata/system/configs/emulationstation/scripts/achievements/leds.sh
 #   chmod +x /userdata/system/configs/emulationstation/scripts/achievements/leds.sh
 # 
 

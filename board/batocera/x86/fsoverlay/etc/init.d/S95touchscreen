@@ -18,6 +18,6 @@ do
 	TOUCHSCREEN=$(swaymsg -t get_inputs | jq -r '.[] | select(.type == "touch") | .identifier')
 done
 
-/usr/bin/batocera-resolution mapTouchScreen
+/usr/bin/system-resolution mapTouchScreen
 
 exit 0

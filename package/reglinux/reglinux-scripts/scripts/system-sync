@@ -66,7 +66,7 @@ rs_sync() {
     FSID=$1
     FSDEV=$(blkid | grep "UUID=\"${FSID}\"" | sed -e s+'^\([^:]*\):.*$'+'\1'+)
     FSTYPE=$(blkid | grep "UUID=\"${FSID}\"" | sed -e s+'^.* TYPE=\"\([^\"]*\)\"$'+'\1'+)
-    MOUNTPOINT="/var/run/batocera-sync"
+    MOUNTPOINT="/var/run/system-sync"
     
     if test -z "${FSDEV}"
     then

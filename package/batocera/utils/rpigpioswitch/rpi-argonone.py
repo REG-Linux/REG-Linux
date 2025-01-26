@@ -140,16 +140,16 @@ def shutdown_check():
                     bus.write_byte(address, 0x00)
                 except:
                     print ("Could not stop fan")
-                os.system("/usr/bin/batocera-es-swissknife --reboot" )
+                os.system("/usr/bin/system-es-swissknife --reboot" )
             else:
-                os.system("/usr/bin/batocera-es-swissknife --emukill" )
+                os.system("/usr/bin/system-es-swissknife --emukill" )
         elif pulsetime >=4 and pulsetime <=5:
             try:
                 # full power off
                 bus.write_byte(address, 0xFF)
             except:
                 print ("Could not power off")
-            os.system("/usr/bin/batocera-es-swissknife --shutdown" )
+            os.system("/usr/bin/system-es-swissknife --shutdown" )
 
 # argument: start, stop, or no argument = show temp
 if len(sys.argv)>1:

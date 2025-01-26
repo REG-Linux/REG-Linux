@@ -109,7 +109,7 @@ class BatoceraTest():
                 time.sleep(2)
 
         # stop the game
-        code = os.system("batocera-es-swissknife --emukill")
+        code = os.system("system-es-swissknife --emukill")
 
         return stillRunning
 
@@ -171,7 +171,7 @@ class BatoceraTest():
             os.makedirs(resultDir)
 
         name = os.path.splitext(name)[0]
-        pathScreenshot = "batocera-screenshot {}/{}.png".format(resultDir, name)
+        pathScreenshot = "system-screenshot {}/{}.png".format(resultDir, name)
         os.system(pathScreenshot)
         print("Screenshot")
 

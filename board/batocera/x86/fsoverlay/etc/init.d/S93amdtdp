@@ -24,7 +24,7 @@ case "$1" in
                 if [ -n "$TDP_PERCENTAGE" ] && [ "$TDP_PERCENTAGE" -ge 10 ]; then
                     TDP_VALUE=$(awk -v max_tdp="$MAX_TDP" -v tdp_percentage="$TDP_PERCENTAGE" 'BEGIN { printf("%.0f\n", max_tdp * tdp_percentage / 100) }')
                     echo "Setting Ryzen Mobile Processor global TDP to $TDP_VALUE Watts" >> $log
-                    /usr/bin/batocera-amd-tdp $TDP_VALUE
+                    /usr/bin/system-amd-tdp $TDP_VALUE
                 else
                     echo "No global TDP value set, using detected maximum!" >> $log
                 fi

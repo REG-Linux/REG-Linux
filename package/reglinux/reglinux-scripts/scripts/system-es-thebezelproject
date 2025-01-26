@@ -1,11 +1,11 @@
 #! /bin/bash
 #
-# Download and install The Bezel Project for Batocera
+# Download and install The Bezel Project for REG-Linux
 #
 # @evoflash and @lbrpdx on Batocera Forums and Discord
 #
 # Usage:
-# batocera-es-thebezelproject 'list', 'install or remove <system>'
+# system-es-thebezelproject 'list', 'install or remove <system>'
 #
 # 20190801 Initial release
 # 20191120 Rewite all script for incremential runtime
@@ -18,10 +18,11 @@
 # 20220524 Add : Support symlinks to roms directories and roms themselves
 # 20220524 Add : Output unmatched ROMs when requested
 # 20220606 Add : Support installing all available systems
+# 20250125 Change: Adapt to REG-Linux domains and brand
 #
 
 readonly VERSION="20220606"
-readonly TITLE="the BezelProject for BATOCERA"
+readonly TITLE="the BezelProject for REG-Linux"
 readonly LOGS_DIR="/userdata/system/logs"
 readonly DECORATION_DIR="/userdata/decorations"
 readonly ROMS_DIR="/userdata/roms"
@@ -49,7 +50,7 @@ NB_WARNING=0
 
 # tbp_<system_name>.txt is a plain text file with the format
 # 'md5 rom_name' for each rom_name.png (spaces or tabs)
-# An external script generates this file for each Batocera system
+# An external script generates this file for each REG-Linux system
 # available in the BezelProject (with monthly update, i hope)
 # Example of tbp_snes.txt file:
 # 29aa1cf6a91c472fd0e2db50ebf38 2020 Super Baseball (USA).png
@@ -70,7 +71,7 @@ function usage() {
 		record " " "2"
 		record "If you have a local system list $LOCAL_SYSTEMS_LIST file" "2"
 		record "and the corresponding index files $LOCAL_INDEX_LIST*.txt" "2"
-		record "they will override those hosted on Batocera website." "2"
+		record "they will override those hosted on REG-Linux website." "2"
 		return 1
 }
 
@@ -385,7 +386,7 @@ function install() {
 		fi
 
 		# check if running on a Mac or on Busybox
-		# (Mac for debug purposes, Batocera runs on Linux)
+		# (Mac for debug purposes, REG-Linux runs on Linux)
 		OS=`uname`
 
 		# *******************************************
@@ -510,7 +511,7 @@ function install() {
 				fi
 		fi
 
-		# install default bezel (i.e default bezel from BATOCERA website)
+		# install default bezel (i.e default bezel from REG-Linux website)
 		record "[$system_to_install] Installing default bezel" "1"
 		if [ -d "$DECORATION_DIR/$BEZELPROJECT_DIR" ]; then
 				url2="$DEFAULT_BEZEL_URL/default.png"
@@ -596,9 +597,11 @@ function remove() {
 						# system bezels
 						rm -f "$DECORATION_DIR/$BEZELPROJECT_SYSTEMS_DIR/$system_name.png"
 						record "Deleting file : $DECORATION_DIR/$BEZELPROJECT_SYSTEMS_DIR/$system_name.png"
-						# default bezel
- 						rm -f "$DECORATION_DIR/$BEZELPROJECT_DIR/default.*"
- 						record "Deleting files : $DECORATION_DIR/$BEZELPROJECT_DIR/default.*"
+						# Delete default (all, actually) if no more systems installed
+						if [ -z "$(ls -AU "$DECORATION_DIR/$BEZELPROJECT_SYSTEMS_DIR/"*.png 2>/dev/null)" ] ; then
+							rm -rf "$DECORATION_DIR/$BEZELPROJECT_DIR"
+							record "No more systems installed, removing folder \"$DECORATION_DIR/$BEZELPROJECT_DIR\""
+						fi
 				fi
 		fi
 

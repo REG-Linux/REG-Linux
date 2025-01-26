@@ -181,7 +181,7 @@ case ${1,,} in
     ;;
     *)
         cat <<-_EOF_
-		BATOCERA SWISS KNIFE FOR EmulationStation
+		SYSTEM SWISS KNIFE FOR EmulationStation
 		  Please parse parameters to this script!
 		  --restart  will RESTART EmulationStation only
 		  --reboot   will REBOOT whole system
@@ -195,7 +195,7 @@ case ${1,,} in
 		      If output is 0 then there is no emulator active!
 
 		  --arch     Shows current architecture running
-		  --version  Shows current version of BATOCERA running
+		  --version  Shows system version
 		  --update   Shows possible update for your install
 		      default: stable, you can type --update beta
 

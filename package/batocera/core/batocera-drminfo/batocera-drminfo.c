@@ -264,7 +264,7 @@ static int crtc_cmp(drmModeModeInfo *a, drmModeModeInfo *b) {
   return -1;
 }
 
-// batocera : must return a single word for parsing by batocera-resolution.drm
+// batocera : must return a single word for parsing by system-resolution.drm
 static char* conntype2str(uint32_t type) {
   if(type == DRM_MODE_CONNECTOR_VGA)  	     return "VGA";
   if(type == DRM_MODE_CONNECTOR_DVII) 	     return "DVII";

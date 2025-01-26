@@ -146,7 +146,7 @@ wine_options() {
     WINE_DEBUG="$(get_setting wine_debug "${SYSTEM}" "${ROMGAMENAME}")"
     KEYBOARD="$(/usr/bin/system-settings-get system.kblayout)"
     VIRTUAL_DESKTOP="$(get_setting virtual_desktop "${SYSTEM}" "${ROMGAMENAME}")"
-    VIRTUAL_DESKTOP_SIZE="$(get_setting videomode "${SYSTEM}" "${ROMGAMENAME}" || batocera-resolution currentResolution)"
+    VIRTUAL_DESKTOP_SIZE="$(get_setting videomode "${SYSTEM}" "${ROMGAMENAME}" || system-resolution currentResolution)"
 
     if [[ "${VIRTUAL_DESKTOP}" = 1 ]]; then
         VDESKTOP="explorer /desktop=Wine,${VIRTUAL_DESKTOP_SIZE}"
@@ -777,9 +777,9 @@ gameext() {
 }
 
 cleanAndExit() {
-    RESNEW=$(batocera-resolution currentMode)
+    RESNEW=$(system-resolution currentMode)
     if [[ "${RESNEW}" != "${G_RESCUR}" ]]; then
-        batocera-resolution setMode "${G_RESCUR}"
+        system-resolution setMode "${G_RESCUR}"
     fi
 
     if [[ -e "${GST_REGISTRY_1_0}" ]]; then
@@ -790,7 +790,7 @@ cleanAndExit() {
     # TODO : unmount always, trap, later
 }
 
-G_RESCUR=$(batocera-resolution currentMode)
+G_RESCUR=$(system-resolution currentMode)
 
 case "${ACTION}" in
     "play")

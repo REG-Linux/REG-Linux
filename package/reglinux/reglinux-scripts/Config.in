@@ -1,5 +1,5 @@
-config BR2_PACKAGE_BATOCERA_SCRIPTS
-	bool "batocera-scripts"
+config BR2_PACKAGE_REGLINUX_SCRIPTS
+	bool "reglinux-scripts"
 
 	select BR2_PACKAGE_BASH
 	select BR2_PACKAGE_PCIUTILS
