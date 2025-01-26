@@ -8,7 +8,7 @@ BOARD=$(cat /boot/boot/system.board)
 case "$1" in
     start)
         # Restores old settings saved in userdata
-        batocera-bluetooth restore
+        system-bluetooth restore
         enabled="$(/usr/bin/system-settings-get controllers.bluetooth.enabled)"
         ps3_enabled="$(/usr/bin/system-settings-get controllers.ps3.enabled)"
         if [ "$enabled" = "1" ] && [ "$ps3_enabled" = "1" ]
@@ -91,9 +91,9 @@ case "$1" in
 
         if [ -n "${btaddr}" ]
         then
-            start-stop-daemon -S -q -m -p /var/run/bluetooth-agent.pid --exec /usr/bin/batocera-bluetooth-agent -- --device "${btaddr}" &
+            start-stop-daemon -S -q -m -p /var/run/bluetooth-agent.pid --exec /usr/bin/system-bluetooth-agent -- --device "${btaddr}" &
         else
-            start-stop-daemon -S -q -m -p /var/run/bluetooth-agent.pid --exec /usr/bin/batocera-bluetooth-agent &
+            start-stop-daemon -S -q -m -p /var/run/bluetooth-agent.pid --exec /usr/bin/system-bluetooth-agent &
         fi
         # for OrangePi LTS devices we need to power on the controller & put in pairable mode
         if [ ${BOARD} = "orangepi4-lts" ] || [ ${BOARD} = "orangepi-3-lts" ] || [ ${BOARD} = "orangepi-zero2" ] || [ ${BOARD} = "orangepi-800" ]
@@ -108,7 +108,7 @@ case "$1" in
         start-stop-daemon -K -q -p /var/run/bluetoothd.pid
         killall hciattach >/dev/null 2>&1
         killall hciattach_opi >/dev/null 2>&1
-        batocera-bluetooth save
+        system-bluetooth save
     ;;
 
     restart|reload)

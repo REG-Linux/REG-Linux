@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RESOLUTION=$(batocera-resolution currentResolution)
+RESOLUTION=$(system-resolution currentResolution)
 OUTPUT="/userdata/screenshots/capture-$(date +%Y.%m.%d-%Hh%M.%S).mkv"
 mkdir -p /userdata/screenshots || exit 1
 

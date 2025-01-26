@@ -6,7 +6,13 @@
 OVERLAYFILE="/boot/boot/overlay"
 OVERLAYMOUNT="/overlay/saved"
 OVERLAYRAM="/overlay/overlay"
-OVERLAYSIZE=100 # M
+
+# Some systems have little free space on /boot
+if [ "$(df --output=avail /boot/ | grep -v Avail)" -lt "200000" ]; then
+    OVERLAYSIZE=10 # M
+else
+    OVERLAYSIZE=100 # M
+fi
 
 # fix for winscp running bash and then not sourcing /etc/profile
 PATH=$PATH:/sbin
