@@ -597,9 +597,11 @@ function remove() {
 						# system bezels
 						rm -f "$DECORATION_DIR/$BEZELPROJECT_SYSTEMS_DIR/$system_name.png"
 						record "Deleting file : $DECORATION_DIR/$BEZELPROJECT_SYSTEMS_DIR/$system_name.png"
-						# default bezel
- 						rm -f "$DECORATION_DIR/$BEZELPROJECT_DIR/default.*"
- 						record "Deleting files : $DECORATION_DIR/$BEZELPROJECT_DIR/default.*"
+						# Delete default (all, actually) if no more systems installed
+						if [ -z "$(ls -AU "$DECORATION_DIR/$BEZELPROJECT_SYSTEMS_DIR/"*.png 2>/dev/null)" ] ; then
+							rm -rf "$DECORATION_DIR/$BEZELPROJECT_DIR"
+							record "No more systems installed, removing folder \"$DECORATION_DIR/$BEZELPROJECT_DIR\""
+						fi
 				fi
 		fi
 
