@@ -14,19 +14,6 @@ Signed-off-by: Nicolas Adenis-Lamarre <nicolas.adenis.lamarre@gmail.com>
  create mode 100644 Src/OSD/evdev/EvdevInputSystem.cpp
  create mode 100644 Src/OSD/evdev/EvdevInputSystem.h
 
-diff --git a/Makefiles/Makefile.UNIX b/Makefiles/Makefile.UNIX
-index 1e48361..7433a53 100644
---- a/Makefiles/Makefile.UNIX
-+++ b/Makefiles/Makefile.UNIX
-@@ -63,7 +63,7 @@ SDL2_LIBS = `sdl2-config --libs`
- #
- 
- PLATFORM_CXXFLAGS = $(SDL2_CFLAGS) -O3
--PLATFORM_LDFLAGS = $(SDL2_LIBS) -lGL -lGLU -lz -lm -lstdc++ -lpthread -lSDL2_net
-+PLATFORM_LDFLAGS = $(SDL2_LIBS) -lGL -lGLU -lz -lm -lstdc++ -lpthread -lSDL2_net -ludev
- 
- 
- ###############################################################################
 diff --git a/Makefiles/Rules.inc b/Makefiles/Rules.inc
 index 3ce1941..ecaea46 100644
 --- a/Makefiles/Rules.inc
@@ -414,3 +401,14 @@ index 0000000..6f8a2b2
 +#endif  // INCLUDED_EVDEVINPUTSYSTEM_H
 -- 
 2.47.1
+--- a/Makefiles/Makefile.UNIX	2025-01-26 14:10:00.080824500 +0100
++++ b/Makefiles/Makefile.UNIX	2025-01-26 14:10:22.668386446 +0100
+@@ -72,7 +72,7 @@
+ #
+ 
+ PLATFORM_CXXFLAGS = $(SDL2_CFLAGS) -O3
+-PLATFORM_LDFLAGS = $(SDL2_LIBS) -lGL -lGLU -lz -lm -lstdc++ -lpthread
++PLATFORM_LDFLAGS = $(SDL2_LIBS) -lGL -lGLU -lz -lm -lstdc++ -lpthread -ludev
+ 
+ 
+ ###############################################################################

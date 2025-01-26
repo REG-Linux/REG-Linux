@@ -3,8 +3,8 @@
 # supermodel
 #
 ################################################################################
-# Version: Commits on May 8, 2023
-SUPERMODEL_VERSION = ac0e6407b414d05e55efa4cafe1644c899d62d66
+# Version: Commits on Nov 26, 2024
+SUPERMODEL_VERSION = d043dc0c6a99f5fff87d7044e85a608508eae7e1
 SUPERMODEL_SITE = $(call github,trzy,Supermodel,$(SUPERMODEL_VERSION))
 SUPERMODEL_DEPENDENCIES = sdl2 zlib libzip sdl2_net
 SUPERMODEL_LICENSE = GPLv3
@@ -50,8 +50,8 @@ endef
 
 define SUPERMODEL_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy $(TARGET_DIR)/usr/share/supermodel
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/supermodel/model3.supermodel.keys $(TARGET_DIR)/usr/share/evmapy
-    cp -pr $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/supermodel/NVRAM $(TARGET_DIR)/usr/share/supermodel
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/supermodel/model3.supermodel.keys $(TARGET_DIR)/usr/share/evmapy
+    cp -pr $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/supermodel/NVRAM $(TARGET_DIR)/usr/share/supermodel
 endef
 
 SUPERMODEL_PRE_PATCH_HOOKS += SUPERMODEL_LINE_ENDINGS_FIXUP
