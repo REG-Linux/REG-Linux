@@ -5,15 +5,15 @@
 
 if test "${1}" == "--init"
 then
-    batocera-resolution listOutputs | sort > /var/run/batocera-switch-screen-checker-status
+    system-resolution listOutputs | sort > /var/run/system-switch-screen-checker-status
     exit 0
 fi
 
-DELTANEW=$(batocera-resolution listOutputs | sort | diff /var/run/batocera-switch-screen-checker-status - | grep -E '^> ' | sed -e s/"^> "// | head -1)
+DELTANEW=$(system-resolution listOutputs | sort | diff /var/run/system-switch-screen-checker-status - | grep -E '^> ' | sed -e s/"^> "// | head -1)
 NDELTANEW=$(echo "${DELTANEW}" | wc -l)
 
 # reinit status
-batocera-resolution listOutputs | sort > /var/run/batocera-switch-screen-checker-status
+system-resolution listOutputs | sort > /var/run/system-switch-screen-checker-status
 
 # 1 new screen, switch on it
 if test "${NDELTANEW}" == 1 -a "${DELTANEW}" != ""

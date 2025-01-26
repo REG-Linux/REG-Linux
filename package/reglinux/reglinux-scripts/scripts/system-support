@@ -10,7 +10,7 @@ then
     REPORTNAME=$(basename "$1" | sed -e s+'^\([^.]*\)\..*$'+'\1'+)
     OUTPUTFILE=$1
 else
-    REPORTNAME="batocera-support-"$(date +%Y%m%d%H%M%S)
+    REPORTNAME="reglinux-"$(system-version)"-support-"$(date +%Y%m%d%H%M%S)
     OUTPUTFILE="/userdata/saves/${REPORTNAME}.tar.gz"
 fi
 
@@ -59,15 +59,15 @@ blkid                   > "${DSYSTEM}/disks.txt"
 wpctl status            > "${DSYSTEM}/wireplumber.txt"
 connmanctl technologies > "${DSYSTEM}/connman-technologies.txt"
 connmanctl services     > "${DSYSTEM}/connman-services.txt"
-batocera-systems        > "${DSYSTEM}/bios.txt"
-system-version        > "${DSYSTEM}/system.version"
-system-info           > "${DSYSTEM}/batocera.info"
+system-systems          > "${DSYSTEM}/bios.txt"
+system-version          > "${DSYSTEM}/system.version"
+system-info             > "${DSYSTEM}/system.info"
 ldconfig -p             > "${DSYSTEM}/ldcache.txt"
 # get xrandr provider if x86 system only
 if [ "${V_ARCH}" = "x86" -o "${V_ARCH}" = "x86_64" ]; then
     xrandr --listproviders  > "${DSYSTEM}/xrandr-providers.txt"
 fi
-f_cp /boot/boot/system.board                                 "${DSYSTEM}"
+f_cp /boot/boot/system.board                                   "${DSYSTEM}"
 f_cp /boot/config.txt                                          "${DSYSTEM}"
 f_cp /userdata/system/system.conf                              "${DSYSTEM}"
 d_cp /userdata/system/logs                                     "${DSYSTEM}"

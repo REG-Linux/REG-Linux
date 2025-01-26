@@ -24,7 +24,7 @@ import select
 import argparse
 
 try:
-    parser = argparse.ArgumentParser(prog='batocera-spinner-calibrator', description='creates a spinner from a device')
+    parser = argparse.ArgumentParser(prog='system-spinner-calibrator', description='creates a spinner from a device')
     parser.add_argument('-d', '--device',   required=True)
     args = parser.parse_args()
     
@@ -72,6 +72,6 @@ except KeyboardInterrupt:
     target.close()    
 except Exception as e:
     import traceback
-    with open('/var/run/batocera-spinner-calibrator.crash', 'w') as fd:
+    with open('/var/run/system-spinner-calibrator.crash', 'w') as fd:
         fd.write(traceback.format_exc())
     raise e

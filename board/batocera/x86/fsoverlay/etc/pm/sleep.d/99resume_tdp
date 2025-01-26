@@ -3,7 +3,7 @@
 # set the final TDP value
 set_tdp() {
     echo "Setting AMD Processor TDP to ${1}W"
-    /usr/bin/batocera-amd-tdp $1
+    /usr/bin/system-amd-tdp $1
 }
 
 # determine the new TDP value based on max TDP
