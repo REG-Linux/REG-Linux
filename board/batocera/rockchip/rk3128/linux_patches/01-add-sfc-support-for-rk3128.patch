@@ -1,0 +1,336 @@
+Subject: [PATCH v2 1/5 RESEND] clk: rockchip: rk3128: Drop CLK_NR_CLKS usage
+Date: Wed,  5 Jun 2024 23:00:45 +0200
+Message-ID: <20240605210049.232284-2-knaerzche@gmail.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240605210049.232284-1-knaerzche@gmail.com>
+References: <20240605210049.232284-1-knaerzche@gmail.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240605_140053_984254_3185DE75 
+X-CRM114-Status: GOOD (  12.01  )
+X-BeenThere: linux-rockchip@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: Upstream kernel work for Rockchip platforms
+ <linux-rockchip.lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip@lists.infradead.org>
+List-Help: <mailto:linux-rockchip-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces@lists.infradead.org>
+Errors-To: 
+ linux-rockchip-bounces+linux-rockchip=archiver.kernel.org@lists.infradead.org
+
+In order to get rid of CLK_NR_CLKS and be able to drop it from the
+bindings, use rockchip_clk_find_max_clk_id helper to find the highest
+clock id.
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+---
+changes since v1:
+ - new patch
+
+ drivers/clk/rockchip/clk-rk3128.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/clk/rockchip/clk-rk3128.c b/drivers/clk/rockchip/clk-rk3128.c
+index d076b7971f33..40e0e4556d59 100644
+--- a/drivers/clk/rockchip/clk-rk3128.c
++++ b/drivers/clk/rockchip/clk-rk3128.c
+@@ -569,18 +569,22 @@ static const char *const rk3128_critical_clocks[] __initconst = {
+ 	"sclk_timer5",
+ };
+ 
+-static struct rockchip_clk_provider *__init rk3128_common_clk_init(struct device_node *np)
++static struct rockchip_clk_provider *__init rk3128_common_clk_init(struct device_node *np,
++								   unsigned long soc_nr_clks)
+ {
+ 	struct rockchip_clk_provider *ctx;
++	unsigned long common_nr_clks;
+ 	void __iomem *reg_base;
+ 
++	common_nr_clks = rockchip_clk_find_max_clk_id(common_clk_branches,
++						      ARRAY_SIZE(common_clk_branches)) + 1;
+ 	reg_base = of_iomap(np, 0);
+ 	if (!reg_base) {
+ 		pr_err("%s: could not map cru region\n", __func__);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 
+-	ctx = rockchip_clk_init(np, reg_base, CLK_NR_CLKS);
++	ctx = rockchip_clk_init(np, reg_base, max(common_nr_clks, soc_nr_clks));
+ 	if (IS_ERR(ctx)) {
+ 		pr_err("%s: rockchip clk init failed\n", __func__);
+ 		iounmap(reg_base);
+@@ -609,8 +613,12 @@ static struct rockchip_clk_provider *__init rk3128_common_clk_init(struct device
+ static void __init rk3126_clk_init(struct device_node *np)
+ {
+ 	struct rockchip_clk_provider *ctx;
++	unsigned long soc_nr_clks;
+ 
+-	ctx = rk3128_common_clk_init(np);
++	soc_nr_clks = rockchip_clk_find_max_clk_id(rk3126_clk_branches,
++						   ARRAY_SIZE(rk3126_clk_branches)) + 1;
++
++	ctx = rk3128_common_clk_init(np, soc_nr_clks);
+ 	if (IS_ERR(ctx))
+ 		return;
+ 
+@@ -627,8 +635,12 @@ CLK_OF_DECLARE(rk3126_cru, "rockchip,rk3126-cru", rk3126_clk_init);
+ static void __init rk3128_clk_init(struct device_node *np)
+ {
+ 	struct rockchip_clk_provider *ctx;
++	unsigned long soc_nr_clks;
++
++	soc_nr_clks = rockchip_clk_find_max_clk_id(rk3128_clk_branches,
++						   ARRAY_SIZE(rk3128_clk_branches)) + 1;
+ 
+-	ctx = rk3128_common_clk_init(np);
++	ctx = rk3128_common_clk_init(np, soc_nr_clks);
+ 	if (IS_ERR(ctx))
+ 		return;
+ 
+
+Subject: [PATCH v2 2/5 RESEND] dt-bindings: clock: rk3128: Drop CLK_NR_CLKS
+Date: Wed,  5 Jun 2024 23:00:46 +0200
+Message-ID: <20240605210049.232284-3-knaerzche@gmail.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240605210049.232284-1-knaerzche@gmail.com>
+References: <20240605210049.232284-1-knaerzche@gmail.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240605_140054_523859_CB44A1AE 
+X-CRM114-Status: GOOD (  10.69  )
+X-BeenThere: linux-rockchip@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: Upstream kernel work for Rockchip platforms
+ <linux-rockchip.lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip@lists.infradead.org>
+List-Help: <mailto:linux-rockchip-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces@lists.infradead.org>
+Errors-To: 
+ linux-rockchip-bounces+linux-rockchip=archiver.kernel.org@lists.infradead.org
+
+CLK_NR_CLKS should not be part of the binding. Let's drop it, since
+the kernel code no longer uses it either.
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+---
+changes since v1:
+ - new patch
+
+ include/dt-bindings/clock/rk3128-cru.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/dt-bindings/clock/rk3128-cru.h b/include/dt-bindings/clock/rk3128-cru.h
+index 1be455ba4985..420984fc2285 100644
+--- a/include/dt-bindings/clock/rk3128-cru.h
++++ b/include/dt-bindings/clock/rk3128-cru.h
+@@ -145,7 +145,6 @@
+ #define HCLK_CRYPTO		476
+ #define HCLK_PERI		478
+ 
+-#define CLK_NR_CLKS		(HCLK_PERI + 1)
+ 
+ /* soft-reset indices */
+ #define SRST_CORE0_PO		0
+
+Subject: [PATCH v2 3/5 RESEND] dt-bindings: clock: rk3128: Add HCLK_SFC
+Date: Wed,  5 Jun 2024 23:00:47 +0200
+Message-ID: <20240605210049.232284-4-knaerzche@gmail.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240605210049.232284-1-knaerzche@gmail.com>
+References: <20240605210049.232284-1-knaerzche@gmail.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240605_140054_268202_BC5ACBA4 
+X-CRM114-Status: UNSURE (   9.58  )
+X-CRM114-Notice: Please train this message.
+X-BeenThere: linux-rockchip@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: Upstream kernel work for Rockchip platforms
+ <linux-rockchip.lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip@lists.infradead.org>
+List-Help: <mailto:linux-rockchip-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces@lists.infradead.org>
+Errors-To: 
+ linux-rockchip-bounces+linux-rockchip=archiver.kernel.org@lists.infradead.org
+
+Add a clock id for SFC's AHB clock.
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+---
+changes since v1:
+ - add new clock id at the end
+
+ include/dt-bindings/clock/rk3128-cru.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/dt-bindings/clock/rk3128-cru.h b/include/dt-bindings/clock/rk3128-cru.h
+index 420984fc2285..d731c3ffbe1e 100644
+--- a/include/dt-bindings/clock/rk3128-cru.h
++++ b/include/dt-bindings/clock/rk3128-cru.h
+@@ -144,6 +144,7 @@
+ #define HCLK_TSP		475
+ #define HCLK_CRYPTO		476
+ #define HCLK_PERI		478
++#define HCLK_SFC		479
+ 
+ 
+ /* soft-reset indices */
+
+Subject: [PATCH v2 4/5 RESEND] clk: rockchip: Add HCLK_SFC for RK3128
+Date: Wed,  5 Jun 2024 23:00:48 +0200
+Message-ID: <20240605210049.232284-5-knaerzche@gmail.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240605210049.232284-1-knaerzche@gmail.com>
+References: <20240605210049.232284-1-knaerzche@gmail.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240605_140055_200732_AC412F4F 
+X-CRM114-Status: UNSURE (   9.87  )
+X-CRM114-Notice: Please train this message.
+X-BeenThere: linux-rockchip@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: Upstream kernel work for Rockchip platforms
+ <linux-rockchip.lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip@lists.infradead.org>
+List-Help: <mailto:linux-rockchip-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces@lists.infradead.org>
+Errors-To: 
+ linux-rockchip-bounces+linux-rockchip=archiver.kernel.org@lists.infradead.org
+
+The SFC IP exists only in RK3128 version of the SoC, thus the clock gets
+added to rk3128_clk_branches.
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+---
+changes since v1:
+ - none
+
+ drivers/clk/rockchip/clk-rk3128.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/clk/rockchip/clk-rk3128.c b/drivers/clk/rockchip/clk-rk3128.c
+index 40e0e4556d59..7c3d92af12df 100644
+--- a/drivers/clk/rockchip/clk-rk3128.c
++++ b/drivers/clk/rockchip/clk-rk3128.c
+@@ -553,6 +553,7 @@ static struct rockchip_clk_branch rk3128_clk_branches[] __initdata = {
+ 			RK2928_CLKSEL_CON(11), 14, 2, MFLAGS, 8, 5, DFLAGS,
+ 			RK2928_CLKGATE_CON(3), 15, GFLAGS),
+ 
++	GATE(HCLK_SFC, "hclk_sfc", "hclk_peri", 0, RK2928_CLKGATE_CON(7), 1, GFLAGS),
+ 	GATE(HCLK_GPS, "hclk_gps", "aclk_peri", 0, RK2928_CLKGATE_CON(3), 14, GFLAGS),
+ 	GATE(PCLK_HDMI, "pclk_hdmi", "pclk_cpu", 0, RK2928_CLKGATE_CON(3), 8, GFLAGS),
+ };
+
+Subject: [PATCH v2 5/5 RESEND] ARM: dts: rockchip: Add SFC for RK3128
+Date: Wed,  5 Jun 2024 23:00:49 +0200
+Message-ID: <20240605210049.232284-6-knaerzche@gmail.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240605210049.232284-1-knaerzche@gmail.com>
+References: <20240605210049.232284-1-knaerzche@gmail.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20240605_140056_429378_2CE9728C 
+X-CRM114-Status: GOOD (  10.00  )
+X-BeenThere: linux-rockchip@lists.infradead.org
+X-Mailman-Version: 2.1.34
+Precedence: list
+List-Id: Upstream kernel work for Rockchip platforms
+ <linux-rockchip.lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip@lists.infradead.org>
+List-Help: <mailto:linux-rockchip-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request@lists.infradead.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces@lists.infradead.org>
+Errors-To: 
+ linux-rockchip-bounces+linux-rockchip=archiver.kernel.org@lists.infradead.org
+
+Add the Serial Flash Controller and it's pincontrols.
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+---
+changes since v1:
+ - none
+
+ arch/arm/boot/dts/rockchip/rk3128.dtsi | 35 ++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/arch/arm/boot/dts/rockchip/rk3128.dtsi b/arch/arm/boot/dts/rockchip/rk3128.dtsi
+index a7ab0904564f..22e2a35dedb1 100644
+--- a/arch/arm/boot/dts/rockchip/rk3128.dtsi
++++ b/arch/arm/boot/dts/rockchip/rk3128.dtsi
+@@ -399,6 +399,15 @@ usb_host_ohci: usb@101e0000 {
+ 		status = "disabled";
+ 	};
+ 
++	sfc: spi@1020c000 {
++		compatible = "rockchip,sfc";
++		reg = <0x1020c000 0x8000>;
++		interrupts = <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&cru SCLK_SFC>, <&cru HCLK_SFC>;
++		clock-names = "clk_sfc", "hclk_sfc";
++		status = "disabled";
++	};
++
+ 	sdmmc: mmc@10214000 {
+ 		compatible = "rockchip,rk3128-dw-mshc", "rockchip,rk3288-dw-mshc";
+ 		reg = <0x10214000 0x4000>;
+@@ -1155,6 +1164,32 @@ sdmmc_bus4: sdmmc-bus4 {
+ 			};
+ 		};
+ 
++		sfc {
++			sfc_bus2: sfc-bus2 {
++				rockchip,pins = <1 RK_PD0 3 &pcfg_pull_default>,
++						<1 RK_PD1 3 &pcfg_pull_default>;
++			};
++
++			sfc_bus4: sfc-bus4 {
++				rockchip,pins = <1 RK_PD0 3 &pcfg_pull_default>,
++						<1 RK_PD1 3 &pcfg_pull_default>,
++						<1 RK_PD2 3 &pcfg_pull_default>,
++						<1 RK_PD3 3 &pcfg_pull_default>;
++			};
++
++			sfc_clk: sfc-clk {
++				rockchip,pins = <2 RK_PA4 3 &pcfg_pull_none>;
++			};
++
++			sfc_cs0: sfc-cs0 {
++				rockchip,pins = <2 RK_PA2 3 &pcfg_pull_default>;
++			};
++
++			sfc_cs1: sfc-cs1 {
++				rockchip,pins = <2 RK_PA3 3 &pcfg_pull_default>;
++			};
++		};
++
+ 		spdif {
+ 			spdif_tx: spdif-tx {
+ 				rockchip,pins = <3 RK_PD3 1 &pcfg_pull_none>;
