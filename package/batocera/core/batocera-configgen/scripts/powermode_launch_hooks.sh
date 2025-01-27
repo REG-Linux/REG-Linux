@@ -88,7 +88,7 @@ if [ "$EVENT" == "gameStop" ]; then
         POWER_MODE="$(/usr/bin/system-settings-get-master global.powermode)"
     fi
     if ! [ -z "${POWER_MODE}" ]; then
-        /usr/bin/batocera-power-mode "${POWER_MODE}"
+        /usr/bin/system-power-mode "${POWER_MODE}"
         exit 0
     fi
     SYSTEM_GOVERNOR="$(/usr/bin/system-settings-get-master system.cpu.governor)"
@@ -119,7 +119,7 @@ fi
 
 # If a value is found, call the batocera-power-profile script
 if ! [ -z "${POWER_MODE}" ]; then
-    /usr/bin/batocera-power-mode "${POWER_MODE}"
+    /usr/bin/system-power-mode "${POWER_MODE}"
     exit 0
 fi
 

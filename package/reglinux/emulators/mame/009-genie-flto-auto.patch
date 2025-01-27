@@ -1,0 +1,25 @@
+--- a/scripts/genie.lua	2025-01-05 18:14:01.318406387 +0100
++++ b/scripts/genie.lua	2025-01-05 18:14:51.924618711 +0100
+@@ -836,9 +836,9 @@
+ 	if _OPTIONS["LTO"]=="1" then
+ 		buildoptions {
+ -- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this commit
+-			"-flto=1",
++			"-flto=auto",
+ -- if ld fails, just buy more RAM or uncomment this!
+---          "-Wl,-no-keep-memory",
++                        "-Wl,-no-keep-memory",
+ 			"-Wl,-v",
+ -- silence redefine warnings from discrete.c.
+ 			"-Wl,-allow-multiple-definition",
+@@ -859,8 +859,8 @@
+ 		}
+ -- same flags are needed by linker
+ 		linkoptions {
+-			"-flto=1",
+---          "-Wl,-no-keep-memory",
++			"-flto=auto",
++                        "-Wl,-no-keep-memory",
+ 			"-Wl,-v",
+ 			"-Wl,-allow-multiple-definition",
+ 			"-fuse-linker-plugin",

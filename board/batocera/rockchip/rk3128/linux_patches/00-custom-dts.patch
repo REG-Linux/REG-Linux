@@ -1,0 +1,11 @@
+--- a/arch/arm/boot/dts/rockchip/Makefile	2025-01-27 10:09:45.866444664 +0100
++++ b/:arch/arm/boot/dts/rockchip/Makefile	2025-01-27 10:10:04.882877924 +0100
+@@ -12,6 +12,8 @@
+ 	rk3066a-mk808.dtb \
+ 	rk3066a-rayeager.dtb \
+ 	rk3128-evb.dtb \
++	rk3128-ps5000.dtb \
++	rk3128-ps7000.dtb \
+ 	rk3128-xpi-3128.dtb \
+ 	rk3188-bqedison2qc.dtb \
+ 	rk3188-px3-evb.dtb \

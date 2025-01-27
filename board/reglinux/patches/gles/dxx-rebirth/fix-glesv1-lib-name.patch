@@ -1,0 +1,11 @@
+--- a/SConstruct	2025-01-18 12:17:27.258139356 +0100
++++ b/SConstruct	2025-01-18 12:17:36.434333589 +0100
+@@ -3558,7 +3558,7 @@
+ 					raise SCons.Errors.UserError(f'Invalid value for unsigned-integer-only option {key}: {value}.')
+ 		# Paths for the Videocore libs/includes on the Raspberry Pi
+ 		RPI_DEFAULT_VC_PATH: str = '/opt/vc'
+-		default_OGLES_LIB: str = 'GLES_CM'
++		default_OGLES_LIB: str = 'GLESv1_CM'
+ 		default_EGL_LIB: str = 'EGL'
+ 		_default_prefix: str = '/usr/local'
+ 		__stdout_is_not_a_tty: bool | None = None

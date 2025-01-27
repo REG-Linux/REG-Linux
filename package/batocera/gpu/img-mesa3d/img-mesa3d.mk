@@ -7,7 +7,7 @@
 # When updating the version, please also update mesa3d-headers
 IMG_MESA3D_VERSION = 22.1.3
 IMG_MESA3D_SOURCE = mesa-$(IMG_MESA3D_VERSION).tar.xz
-IMG_MESA3D_SITE = https://archive.mesa3d.org
+IMG_MESA3D_SITE = https://archive.mesa3d.org/older-versions/22.x
 IMG_MESA3D_LICENSE = MIT, SGI, Khronos
 IMG_MESA3D_LICENSE_FILES = docs/license.rst
 IMG_MESA3D_CPE_ID_VENDOR = mesa3d

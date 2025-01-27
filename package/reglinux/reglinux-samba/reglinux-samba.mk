@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGLINUX_SAMBA_VERSION = 0.5
+REGLINUX_SAMBA_VERSION = 0.6
 REGLINUX_SAMBA_SOURCE =
 REGLINUX_SAMBA_DEPENDENCIES =
 
@@ -20,13 +20,13 @@ define REGLINUX_SAMBA_INSTALL_SMBD_INIT
 	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-samba/S91smbd $(TARGET_DIR)/etc/init.d/S91smbd
 endef
 
-# We need samba4 for Wine
-ifeq ($(BR2_PACKAGE_BATOCERA_WINE),y)
-REGLINUX_SAMBA_DEPENDENCIES += samba4
-endif
+# TODO We need samba4 for Wine
+#ifeq ($(BR2_PACKAGE_BATOCERA_WINE),y)
+#REGLINUX_SAMBA_DEPENDENCIES += samba4
+#endif
 
-# We use samba4 as SMB service for old kernels (< 5.15), if notyou run ksmbd
-ifeq ($(BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4)$(BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4),y)
+# We use samba4 as SMB service for old kernels (< 5.15), if not you run ksmbd
+ifeq ($(BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4),y)
 REGLINUX_SAMBA_DEPENDENCIES += samba4
 REGLINUX_SAMBA_POST_INSTALL_TARGET_HOOKS += REGLINUX_SAMBA_INSTALL_SMBD_INIT
 else

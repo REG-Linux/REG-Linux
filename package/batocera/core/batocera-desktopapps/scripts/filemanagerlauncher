@@ -22,6 +22,6 @@ if (not t or t == ''):
      c.write(wf)
 EOF
 
-batocera-mouse show
+system-mouse show
 DISPLAY=${DISPLAY:-:0.0} pcmanfm /userdata
-batocera-mouse hide
+system-mouse hide

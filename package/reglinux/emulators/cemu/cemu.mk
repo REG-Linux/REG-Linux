@@ -11,7 +11,7 @@ CEMU_SITE_METHOD=git
 CEMU_GIT_SUBMODULES=YES
 CEMU_DEPENDENCIES = sdl2 host-pugixml pugixml rapidjson boost libpng \
                     libzip host-glslang glslang zlib zstd wxwidgets fmt glm upower \
-                    host-nasm host-zstd host-libusb libusb hidapi
+                    host-nasm host-zstd host-libusb libusb
 
 CEMU_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -21,15 +21,21 @@ CEMU_CONF_OPTS += -DENABLE_DISCORD_RPC=OFF
 CEMU_CONF_OPTS += -DENABLE_VCPKG=OFF
 CEMU_CONF_OPTS += -DCMAKE_CXX_FLAGS="$(TARGET_CXXFLAGS) -I$(STAGING_DIR)/usr/include/glslang"
 
-# TODO support gamemode
-CEMU_CONF_OPTS += -DENABLE_FERAL_GAMEMODE=OFF
+# REG enable gamemode
+ifeq ($(BR2_PACKAGE_GAMEMODE),y)
+    CEMU_DEPENDENCIES += gamemode
+    CEMU_CONF_OPTS += -DENABLE_FERAL_GAMEMODE=ON
+else
+    CEMU_CONF_OPTS += -DENABLE_FERAL_GAMEMODE=OFF
+endif
 
-# TODO check if we really need to enforce disabling hidapi
-#ifeq ($(BR2_PACKAGE_HIDAPI),y)
-#    CEMU_CONF_OPTS += -DENABLE_HIDAPI=ON
-#else
+# REG enable HIDAPI
+ifeq ($(BR2_PACKAGE_HIDAPI),y)
+    CEMU_DEPENDENCIES += hidapi
+    CEMU_CONF_OPTS += -DENABLE_HIDAPI=ON
+else
     CEMU_CONF_OPTS += -DENABLE_HIDAPI=OFF
-#endif
+endif
 
 ifeq ($(BR2_PACKAGE_WAYLAND),y)
     CEMU_CONF_OPTS += -DENABLE_WAYLAND=ON

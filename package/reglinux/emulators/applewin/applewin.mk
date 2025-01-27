@@ -3,13 +3,13 @@
 # applewin
 #
 ################################################################################
-# Version: Commits on Nov 25, 2024
-APPLEWIN_VERSION = 2200778246587a32b21b43289632064900430003
+# Version: Commits on Jan 12, 2025
+APPLEWIN_VERSION = df32e56bc76bb931b88e560703872a599f5aa491
 APPLEWIN_SITE = https://github.com/audetto/AppleWin
 APPLEWIN_SITE_METHOD=git
 APPLEWIN_GIT_SUBMODULES=YES
 APPLEWIN_LICENSE = GPLv2
-APPLEWIN_DEPENDENCIES = sdl2 sdl2_image minizip-zlib slirp libpcap boost
+APPLEWIN_DEPENDENCIES = sdl2 sdl2_image minizip-zlib slirp libpcap boost host-xxd
 
 APPLEWIN_SUPPORTS_IN_SOURCE_BUILD = NO
 

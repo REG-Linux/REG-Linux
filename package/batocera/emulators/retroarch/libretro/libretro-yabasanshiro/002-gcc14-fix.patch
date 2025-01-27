@@ -1,0 +1,13 @@
+--- a/yabause/src/libretro/Makefile	2025-01-22 22:41:26.906698912 +0100
++++ b/yabause/src/libretro/Makefile	2025-01-22 22:42:09.816706432 +0100
+@@ -401,6 +401,10 @@
+ CXXFLAGS += $(FLAGS) -std=gnu++11
+ CFLAGS += $(FLAGS) -std=gnu11
+ 
++# GCC 14 workarounds
++CFLAGS +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++CXXFLAGS +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types
++
+ all: $(TARGET)
+ 
+ generate-files:

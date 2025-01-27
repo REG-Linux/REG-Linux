@@ -1,0 +1,16 @@
+--- a/CMakeLists.txt	2024-12-21 18:43:29.294288535 +0100
++++ b/CMakeLists.txt	2024-12-21 18:43:46.788639208 +0100
+@@ -1,13 +1,5 @@
+ cmake_minimum_required(VERSION 3.0)
+ 
+-if (MSVC)
+-   set (CMAKE_INSTALL_BINDIR .)
+-   set (CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/install)
+-else()
+-   set (CMAKE_INSTALL_BINDIR .)
+-   set (CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/install)
+-endif()
+-
+ #no config util
+ set ( ALSOFT_NO_CONFIG_UTIL ON CACHE BOOL "" FORCE)
+ set ( ALSOFT_EXAMPLES OFF CACHE BOOL "" FORCE)

@@ -36,7 +36,7 @@ is_power_connected() {
 # Initial power state
 POWER_CONNECTED=$(is_power_connected)
 if [[ "$POWER_CONNECTED" == 0 ]]; then
-    /usr/bin/batocera-power-mode battery
+    /usr/bin/system-power-mode battery
 fi
 
 LAST_BATTERY=100
@@ -48,9 +48,9 @@ while true; do
     # Check if power state has changed
     if [[ "$CURRENT_POWER_CONNECTED" != "$POWER_CONNECTED" ]]; then
         if [[ "$CURRENT_POWER_CONNECTED" == 0 ]]; then
-            /usr/bin/batocera-power-mode battery
+            /usr/bin/system-power-mode battery
         else
-            /usr/bin/batocera-power-mode ac
+            /usr/bin/system-power-mode ac
         fi
         POWER_CONNECTED="$CURRENT_POWER_CONNECTED"
     fi

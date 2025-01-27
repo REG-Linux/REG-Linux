@@ -32,5 +32,5 @@ for_window [instance="batocera-config-scummvm"] border none, fullscreen
 for_window [instance="xterm"] border none, fullscreen
 
 # Starts EmulationStation when loading sway
-exec /usr/bin/batocera-mouse hide
+exec /usr/bin/system-mouse hide
 exec /usr/bin/emulationstation-standalone

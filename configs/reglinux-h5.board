@@ -1,4 +1,4 @@
-include toolchain-gcc13-glibc.common
+include toolchain-gcc14-glibc.common
 include reglinux-board.common
 
 # Target definition
@@ -31,12 +31,6 @@ BR2_PACKAGE_BATOCERA_LIMA_MESA3D=y
 
 # Allow wayland
 BR2_PACKAGE_REGLINUX_SWAY=y
-
-# Filesystem
-BR2_PACKAGE_HOST_DOSFSTOOLS=y
-BR2_PACKAGE_HOST_GENIMAGE=y
-BR2_PACKAGE_HOST_MTOOLS=y
-BR2_PACKAGE_HOST_UBOOT_TOOLS=y
 
 # Bootloader
 BR2_TARGET_ARM_TRUSTED_FIRMWARE_CUSTOM_VERSION=y

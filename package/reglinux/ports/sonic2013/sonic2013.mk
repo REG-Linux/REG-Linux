@@ -3,19 +3,16 @@
 # sonic2013
 #
 ################################################################################
-# Version: Commits on Mar 20, 2024
-SONIC2013_VERSION = b78db1b795d6907b0f834765b6bf338abe5a2834
-SONIC2013_SITE = https://github.com/Rubberduckycooly/Sonic-1-2-2013-Decompilation.git
+# Version: Commits on Oct 26, 2024
+SONIC2013_VERSION = cf532d7c7675d3ffa5d69009d63869daf73955cb
+SONIC2013_SITE = https://github.com/RSDKModding/RSDKv4-Decompilation.git
 SONIC2013_SITE_METHOD = git
 SONIC2013_GIT_SUBMODULES = YES
 SONIC2013_LICENSE = Custom
 
 SONIC2013_DEPENDENCIES = sdl2 libogg libvorbis
 
-# legacy version for systems that don't support libglew
-ifneq ($(BR2_PACKAGE_LIBGLEW),y)
-    SONIC2013_VERSION = f9718af
-else
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
     SONIC2013_DEPENDENCIES += libglew libglu
 endif
 
@@ -24,6 +21,7 @@ define SONIC2013_BUILD_CMDS
 endef
 
 define SONIC2013_INSTALL_TARGET_CMDS
+	$(TARGET_STRIP) $(@D)/bin/RSDKv4
 	$(INSTALL) -D -m 0755 $(@D)/bin/RSDKv4 $(TARGET_DIR)/usr/bin/sonic2013
 endef
 

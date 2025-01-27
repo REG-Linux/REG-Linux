@@ -1,0 +1,12 @@
+config BR2_PACKAGE_REGLINUX_EXFAT
+        bool "reglinux-exfat"
+
+	# exFAT FUSE implementation
+        select BR2_PACKAGE_EXFAT                        
+	# exFAT userspace utilities (for FUSE-based driver)
+        select BR2_PACKAGE_EXFAT_UTILS                  if  BR2_PACKAGE_EXFAT 
+	# exFAT userspace utilities (for 5.7+ kernel-based support)
+        select BR2_PACKAGE_EXFATPROGS                   if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_4_4 && !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4 
+
+        help
+          exFAT custom implementation using either FUSE or in-kernel exFAT support

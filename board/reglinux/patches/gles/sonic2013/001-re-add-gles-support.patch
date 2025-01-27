@@ -1,0 +1,70 @@
+diff -u -r a/Makefile b/Makefile
+--- a/Makefile	2025-01-18 15:06:18.357049397 +0100
++++ b/Makefile	2025-01-18 14:53:14.687063056 +0100
+@@ -4,7 +4,7 @@
+ RETRO_USE_HW_RENDER          ?= 1
+ RETRO_DISABLE_PLUS           ?= 0
+ 
+-CXXFLAGS_ALL = $(shell pkg-config --cflags --static sdl2 vorbisfile vorbis glew) $(CXXFLAGS) \
++CXXFLAGS_ALL = $(shell pkg-config --cflags --static sdl2 vorbisfile vorbis egl glesv1_cm glesv2) $(CXXFLAGS) \
+         -DBASE_PATH='"$(BASE_PATH)"' \
+         -IRSDKv4/               \
+         -IRSDKv4/NativeObjects/ \
+@@ -13,7 +13,7 @@
+         -Idependencies/all/tinyxml2/
+ 
+ LDFLAGS_ALL = $(LDFLAGS)
+-LIBS_ALL = $(shell pkg-config --libs --static sdl2 vorbisfile vorbis glew) -pthread $(LIBS)
++LIBS_ALL = $(shell pkg-config --libs --static sdl2 vorbisfile vorbis egl glesv1_cm glesv2) -pthread $(LIBS)
+ 
+ SOURCES = dependencies/all/tinyxml2/tinyxml2.cpp \
+         RSDKv4/Animation.cpp     \
+diff -u -r a/RSDKv4/Drawing.cpp b/RSDKv4/Drawing.cpp
+--- a/RSDKv4/Drawing.cpp	2025-01-18 15:06:18.359049410 +0100
++++ b/RSDKv4/Drawing.cpp	2025-01-18 14:44:26.348660591 +0100
+@@ -205,7 +205,7 @@
+ 
+     SDL_GL_SetSwapInterval(Engine.vsync ? 1 : 0);
+ 
+-#if RETRO_PLATFORM != RETRO_ANDROID && RETRO_PLATFORM != RETRO_OSX
++#if RETRO_PLATFORM != RETRO_ANDROID && RETRO_PLATFORM != RETRO_OSX && RETRO_PLATFORM != RETRO_LINUX
+     GLenum err = glewInit();
+     if (err != GLEW_OK && err != GLEW_ERROR_NO_GLX_DISPLAY) {
+         PrintLog("glew init error:");
+diff -u -r a/RSDKv4/RetroEngine.hpp b/RSDKv4/RetroEngine.hpp
+--- a/RSDKv4/RetroEngine.hpp	2025-01-18 15:06:18.364049442 +0100
++++ b/RSDKv4/RetroEngine.hpp	2025-01-18 14:55:01.469928145 +0100
+@@ -150,12 +150,14 @@
+ //#define RETRO_HARDWARE_RENDER (RETRO_RENDERTYPE == RETRO_HW_RENDER)
+ 
+ #if RETRO_USING_OPENGL
+-#if RETRO_PLATFORM == RETRO_ANDROID
++#if RETRO_PLATFORM == RETRO_ANDROID || RETRO_PLATFORM == RETRO_LINUX
+ #define GL_GLEXT_PROTOTYPES
+ 
+ #include <GLES/gl.h>
+ #include <GLES/glext.h>
+-
++#include <GLES2/gl2.h>
++#include <GLES2/gl2ext.h>
++/*
+ #undef glGenFramebuffers
+ #undef glBindFramebuffer
+ #undef glFramebufferTexture2D
+@@ -173,6 +175,7 @@
+ #define GL_FRAMEBUFFER         GL_FRAMEBUFFER_OES
+ #define GL_COLOR_ATTACHMENT0   GL_COLOR_ATTACHMENT0_OES
+ #define GL_FRAMEBUFFER_BINDING GL_FRAMEBUFFER_BINDING_OES
++*/
+ #elif RETRO_PLATFORM == RETRO_OSX
+ #define GL_GLEXT_PROTOTYPES
+ #define GL_SILENCE_DEPRECATION
+@@ -294,7 +297,7 @@
+ 
+ #if RETRO_PLATFORM == RETRO_WIN || RETRO_PLATFORM == RETRO_UWP || RETRO_PLATFORM == RETRO_ANDROID || RETRO_PLATFORM == RETRO_LINUX
+ #if RETRO_USING_SDL2
+-#include <SDL.h>
++#include <SDL2/SDL.h>
+ #elif RETRO_USING_SDL1
+ #include <SDL.h>
+ #endif

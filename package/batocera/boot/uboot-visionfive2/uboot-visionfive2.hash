@@ -1,4 +1,4 @@
-# Hashes from: https://github.com/starfive-tech/VisionFive2/releases/download/VF2_v3.6.1/sha256sum.txt
+# Computed locally
 
-sha256  61e7a47a7a7838d9ecdea66b8a966168026edd01b3899600fbc7fd7415e0a331  u-boot-spl.bin.normal.out
-sha256  86e0c0eb536e734b200cad0665ba1725e1d8c730698304fd044a0e0c6fe85b4f  visionfive2_fw_payload.img
+sha256  7d2c4720ff8afd9f7cae0491963778adb146d3f5ef167e8d001aeca8adf55284  u-boot-spl.bin.normal.out
+sha256  4efcf4abb36ec6478931b4acb05fd83b727e8a2c4ff8055acf3e87db53025c05  visionfive2_fw_payload.img

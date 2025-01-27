@@ -4,7 +4,7 @@ log="/userdata/system/logs/steam.log"
 
 GAME=$1
 
-batocera-mouse show
+system-mouse show
 
 # bad hack in a first time to get audio for user batocera                                                                                                                                          
 chown -R root:audio /var/run/pulse
@@ -61,4 +61,4 @@ else
 	done
 fi
 
-batocera-mouse hide
+system-mouse hide
