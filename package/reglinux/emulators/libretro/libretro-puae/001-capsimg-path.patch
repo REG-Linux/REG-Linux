@@ -9,12 +9,12 @@
  #endif
  
  /*
-@@ -72,7 +72,7 @@
-     /* This could be done more elegantly ;-) */
- 
- #ifdef __LIBRETRO__
+@@ -80,7 +80,7 @@
+     if (!path_is_valid(CAPSLIB_PATH))
+         snprintf(CAPSLIB_PATH, RETRO_PATH_MAX, "%s%c%s", "/data/user/0/com.retroarch.ra32/cores", DIR_SEP_CHR, CAPSLIB_NAME);
+ #else
 -    snprintf(CAPSLIB_PATH, RETRO_PATH_MAX, "%s%c%s", retro_system_directory, DIR_SEP_CHR, CAPSLIB_NAME);
 +    snprintf(CAPSLIB_PATH, RETRO_PATH_MAX, "%s%c%s", "/usr/lib", DIR_SEP_CHR, CAPSLIB_NAME);
+ #endif
      if (!path_is_valid(CAPSLIB_PATH))
          snprintf(CAPSLIB_PATH, RETRO_PATH_MAX, "%s", CAPSLIB_NAME);
-     if (!path_is_valid(CAPSLIB_PATH))
