@@ -86,8 +86,19 @@ case "$1" in
             /usr/bin/plymouth display-message --text="Creating special folders and links"
         fi
 
-        # ssh : create directory for SSH user data (including identity keys, authorized_keys, known_hosts)
-        mkdir -p -m 0700 /userdata/system/.ssh
+        # ssh : create keys or dropbear will fail when /userdata format is exFAT
+        if [ ! -f /userdata/system/ssh/dropbear_ed25519_host_key ]; then
+            dropbearkey -t ed25519 -f /tmp/dropbear_ed25519_host_key &>/dev/null
+            mv /tmp/dropbear_ed25519_host_key* /userdata/system/ssh/
+        fi
+        if  [ ! -f /userdata/system/ssh/dropbear_ecdsa_host_key ]; then
+            dropbearkey -t ecdsa -f /tmp/dropbear_ecdsa_host_key &>/dev/null
+            mv /tmp/dropbear_ecdsa_host_key* /userdata/system/ssh/
+        fi
+        if [ ! -f /userdata/system/ssh/dropbear_rsa_host_key ]; then
+            dropbearkey -t rsa -f /tmp/dropbear_rsa_host_key &>/dev/null
+            mv /tmp/dropbear_rsa_host_key* /userdata/system/ssh/
+        fi
 
         # udev : create a link for rules persistance
         mkdir -p /userdata/system/udev/rules.d
