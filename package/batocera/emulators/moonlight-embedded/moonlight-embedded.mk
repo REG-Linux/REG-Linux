@@ -24,10 +24,6 @@ ifeq ($(BR2_PACKAGE_LIBVA),y)
     MOONLIGHT_EMBEDDED_DEPENDENCIES += libva-intel-driver intel-mediadriver
 endif
 
-ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
-    MOONLIGHT_EMBEDDED_DEPENDENCIES += rockchip-mpp rockchip-rga
-endif
-
 define MOONLIGHT_EMBEDDED_INSTALL_SCRIPTS
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
     mkdir -p $(TARGET_DIR)/usr/share/moonlight-embedded
