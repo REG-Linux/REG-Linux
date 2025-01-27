@@ -6,7 +6,7 @@ case "$1" in
         # copy nvidia log to userdata
         cp -f /var/log/nvidia.log /userdata/system/logs/nvidia.log
         # get the latest nvidia list files
-        batocera-get-nvidia-list &
+        system-get-nvidia-list &
     fi
     ;;
   stop)

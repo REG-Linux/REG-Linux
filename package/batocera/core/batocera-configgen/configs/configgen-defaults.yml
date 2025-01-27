@@ -129,6 +129,9 @@ cgenius:
 channelf:
   emulator: libretro
   core:     freechaf
+chihiro:
+  emulator: xemu
+  core:     xemu
 coco:
   emulator: libretro
   core:     mame
@@ -486,6 +489,9 @@ ps2:
 ps3:
   emulator: rpcs3
   core:     rpcs3
+ps4:
+  emulator: shadps4
+  core:     shadps4
 psp:
   emulator: ppsspp
   core: ppsspp

@@ -1,4 +1,4 @@
-include toolchain-gcc13-glibc.common
+include toolchain-gcc14-glibc.common
 include reglinux-board.common
 
 # Target definition
@@ -9,17 +9,15 @@ BR2_PACKAGE_BATOCERA_TARGET_RK3328=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
 #BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/patches"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3328/patches"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3328/fsoverlay"
 
 # Kernel
 BR2_LINUX_KERNEL=y
-BR2_LINUX_KERNEL_CUSTOM_VERSION=y
-BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.6.66"
-BR2_KERNEL_HEADERS_6_6=y
+BR2_LINUX_KERNEL_LATEST_VERSION=y
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3328/linux_patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/aarch64"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3328/linux-defconfig.config"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3328/linux-rk3328-defconfig.config"
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/rockchip/rk3328/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 

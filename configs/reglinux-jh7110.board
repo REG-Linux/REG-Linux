@@ -1,4 +1,4 @@
-include toolchain-gcc13-glibc.common
+include toolchain-gcc14-glibc.common
 include reglinux-board.common
 
 # Target definition (RV64GC, aka riscv64gc)
@@ -22,12 +22,13 @@ BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_6=y
 # Kernel - Version: 6.6.y dev
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
-BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="$(call github,starfive-tech,linux,d0e7c0486d768a294f4f2b390d00dab8bee5d726)/linux-d0e7c0486d768a294f4f2b390d00dab8bee5d726.tar.gz"
+BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="$(call github,starfive-tech,linux,JH7110_VF2_6.6_v5.13.1)/linux-JH7110_VF2_6.6_v5.13.1.tar.gz"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/starfive/jh7110/linux-defconfig.config"
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/starfive/jh7110/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_INSTALL_TARGET=y
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/starfive/jh7110/linux_patches"
 
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y

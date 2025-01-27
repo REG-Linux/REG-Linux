@@ -1,0 +1,14 @@
+--- a/CMakeModules/FindWaylandProtocols.cmake	2025-01-22 19:36:49.043801849 +0100
++++ b/CMakeModules/FindWaylandProtocols.cmake	2025-01-22 19:37:42.726071291 +0100
+@@ -12,6 +12,11 @@
+ endif()
+ 
+ string(REGEX REPLACE "[\r\n]" "" WaylandProtocols_PKGDATADIR "${WaylandProtocols_PKGDATADIR}")
++if (NOT "$ENV{PKG_CONFIG_SYSROOT_DIR}" STREQUAL "")
++	string(REPLACE "$ENV{PKG_CONFIG_SYSROOT_DIR}" "" WaylandProtocols_PKGDATADIR ${WaylandProtocols_PKGDATADIR})
++	string(CONCAT WaylandProtocols_PKGDATADIR "$ENV{PKG_CONFIG_SYSROOT_DIR}" ${WaylandProtocols_PKGDATADIR})
++endif()
++
+ 
+ find_package_handle_standard_args(WaylandProtocols
+     FOUND_VAR

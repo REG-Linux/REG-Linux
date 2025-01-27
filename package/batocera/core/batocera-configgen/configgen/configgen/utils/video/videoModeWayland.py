@@ -13,7 +13,7 @@ eslog = get_logger(__name__)
 # Set a specific video mode
 def waylandChangeMode(videomode):
     if waylandCheckModeExists(videomode):
-        cmd = ["batocera-resolution", "setMode", videomode]
+        cmd = ["system-resolution", "setMode", videomode]
         eslog.debug(f"setVideoMode({videomode}): {cmd}")
         max_tries = 2  # maximum number of tries to set the mode
         for i in range(max_tries):
@@ -28,7 +28,7 @@ def waylandChangeMode(videomode):
                 time.sleep(1)
 
 def waylandGetCurrentMode():
-    proc = subprocess.Popen(["batocera-resolution currentMode"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution currentMode"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     for val in out.decode().splitlines():
         return val # return the first line
@@ -61,27 +61,27 @@ def waylandGetScreensInfos(config):
     return res
 
 def waylandGetScreens():
-    proc = subprocess.Popen(["batocera-resolution listOutputs"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution listOutputs"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return out.decode().splitlines()
 
 def waylandMinTomaxResolution(resolution):
-    proc = subprocess.Popen(["batocera-resolution minTomaxResolution {}".format(resolution)], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution minTomaxResolution {}".format(resolution)], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return out.decode().splitlines()
 
 def waylandGetCurrentResolution(name = None):
     if name is None:
-        proc = subprocess.Popen(["batocera-resolution currentResolution"], stdout=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen(["system-resolution currentResolution"], stdout=subprocess.PIPE, shell=True)
     else:
-        proc = subprocess.Popen(["batocera-resolution --screen {} currentResolution".format(name)], stdout=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen(["system-resolution --screen {} currentResolution".format(name)], stdout=subprocess.PIPE, shell=True)
 
     (out, err) = proc.communicate()
     vals = out.decode().split("x")
     return { "width": int(vals[0]), "height": int(vals[1]) }
 
 def waylandSupportSystemRotation():
-    proc = subprocess.Popen(["batocera-resolution supportSystemRotation"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution supportSystemRotation"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     return proc.returncode == 0
 
@@ -93,7 +93,7 @@ def waylandCheckModeExists(videomode):
             return True
 
     # specific resolution given
-    proc = subprocess.Popen(["batocera-resolution listModes"], stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(["system-resolution listModes"], stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     for valmod in out.decode().splitlines():
         vals = valmod.split(":")

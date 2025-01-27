@@ -1,6 +1,8 @@
 config BR2_PACKAGE_APPSTREAM
 	bool "appstream"
 	select BR2_PACKAGE_LIBXMLB
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_LIBIDN2
 	select BR2_PACKAGE_ITSTOOL
 
 	help 

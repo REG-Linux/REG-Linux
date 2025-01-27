@@ -4,7 +4,7 @@
 system.shutdowndelay=1
 
 # default suspend on handled boards
-#system.suspendmode=suspend
+system.suspendmode=suspend
 
 # default sway environment (rotate)
 system.es.environment=sway

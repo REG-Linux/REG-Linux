@@ -1,0 +1,54 @@
+---
+ src/CMakeLists.txt       | 5 +----
+ src/vldp/vldp.h          | 2 ++
+ src/vldp/vldp_internal.h | 1 -
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index c0ddbc2..025eea0 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -59,7 +59,7 @@
+ PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+ PKG_SEARCH_MODULE(SDL2_TTF REQUIRED SDL2_ttf)
+ PKG_SEARCH_MODULE(SDL2_MIXER REQUIRED SDL2_mixer)
+-build_libmpeg2( )
++PKG_SEARCH_MODULE(MPEG2 REQUIRED libmpeg2)
+ 
+ message(STATUS "Target: ${CMAKE_SYSTEM_NAME} ${CMAKE_TARGET_ARCHITECTURES}")
+ 
+@@ -97,7 +95,6 @@ add_subdirectory(timer)
+ add_subdirectory(video)
+ add_subdirectory(vldp)
+ 
+-add_dependencies( vldp libmpeg2 )
+ add_dependencies( ldp-out vldp )
+ add_dependencies( game vldp )
+ add_dependencies( sound vldp )
+diff --git a/src/vldp/vldp.h b/src/vldp/vldp.h
+index 438f1a1..a1498c5 100644
+--- a/src/vldp/vldp.h
++++ b/src/vldp/vldp.h
+@@ -35,6 +35,8 @@ extern "C" {
+ // But CMake does the right thing here 
+ #include <SDL.h> // only used for threading
+ 
++#include <mpeg2dec/mpeg2.h>
++
+ struct yuv_buf {
+     uint8_t *Y;     // Y channel
+     uint8_t *U;     // U channel
+diff --git a/src/vldp/vldp_internal.h b/src/vldp/vldp_internal.h
+index 88450e9..7976e73 100644
+--- a/src/vldp/vldp_internal.h
++++ b/src/vldp/vldp_internal.h
+@@ -27,7 +27,6 @@
+ 
+ #include "vldp.h" // for the VLDP_BOOL definition and SDL.h
+ 
+-#include <mpeg2.h>
+ 
+ // this is which version of the .dat file format we are using
+ #define DAT_VERSION 3
+-- 
+2.47.1

@@ -1,0 +1,36 @@
+--- a/src/cpu.c	2024-02-20 05:01:31.000000000 +0100
++++ b/src/cpu.c	2025-01-25 21:06:51.613176249 +0100
+@@ -32,9 +32,6 @@
+ #endif
+ 
+ #if defined(__linux__) && defined(__riscv)
+-#if __has_include(<sys/hwprobe.h>)
+-#include <sys/hwprobe.h>
+-#else
+ #include <unistd.h>
+ 
+ #if __has_include(<asm/hwprobe.h>)
+@@ -52,6 +49,8 @@
+ // RISC-V Scalar AES [E]ncryption and [D]ecryption
+ #ifndef RISCV_HWPROBE_EXT_ZKND
+ #define RISCV_HWPROBE_EXT_ZKND (1 << 11)
++#endif
++#ifndef RISCV_HWPROBE_EXT_ZKNE
+ #define RISCV_HWPROBE_EXT_ZKNE (1 << 12)
+ #endif
+ 
+@@ -68,7 +67,6 @@
+ }
+ 
+ #endif
+-#endif
+ 
+ bool has_fast_aes() {
+ #if defined(HAVE_GETAUXVAL) && (defined(__arm__) || defined(__aarch64__))
+@@ -118,4 +116,4 @@
+ #endif
+ 
+   return false;
+-}
+\ Pas de fin de ligne à la fin du fichier
++}

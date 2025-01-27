@@ -1,7 +1,8 @@
 config BR2_PACKAGE_CEMU
     bool "cemu"
-    depends on BR2_x86_64
+    depends on BR2_x86_64 || BR2_aarch64
     select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_FMT
     select BR2_PACKAGE_LIBCURL
     select BR2_PACKAGE_PUGIXML
     select BR2_PACKAGE_RAPIDJSON

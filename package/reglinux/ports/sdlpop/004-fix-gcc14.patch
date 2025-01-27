@@ -1,0 +1,11 @@
+--- a/src/CMakeLists.txt	2025-01-22 16:31:04.742946609 +0100
++++ b/src/CMakeLists.txt	2025-01-22 16:31:55.589142154 +0100
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 2.8)
+ project(SDLPoP)
+ 
+-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c99")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c99 -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=int-conversion")
+ 
+ # have CMake output binaries to the directory that contains the source files
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${SDLPoP_SOURCE_DIR}/..")

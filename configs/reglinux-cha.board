@@ -1,4 +1,4 @@
-include toolchain-gcc13-glibc.common
+include toolchain-gcc14-glibc.common
 include reglinux-board.common
 
 # Target definition
@@ -35,17 +35,12 @@ BR2_LINUX_KERNEL_INTREE_DTS_NAME="allwinner/sun8i-h3-libretech-all-h3-cc"
 # GPU
 BR2_PACKAGE_BATOCERA_LIMA_MESA3D=y
 
-# Filesystem tools
-BR2_PACKAGE_HOST_DOSFSTOOLS=y
-BR2_PACKAGE_HOST_GENIMAGE=y
-BR2_PACKAGE_HOST_MTOOLS=y
-
 # spi flash support
 BR2_PACKAGE_MTD=y
 
 # Filesystem
 BR2_TARGET_ROOTFS_CPIO_LZ4=y
 
-# Exception for CHA
-BR2_PACKAGE_AMIBERRY=y
-BR2_PACKAGE_LIBRETRO_PUAE=y
+# Allow Amiga emulation on CHA
+BR2_PACKAGE_AMIBERRY_LITE=y
+BR2_PACKAGE_LIBRETRO_PUAE2021=y

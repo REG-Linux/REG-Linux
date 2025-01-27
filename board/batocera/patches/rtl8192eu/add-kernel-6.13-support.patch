@@ -1,0 +1,34 @@
+From 83cd892775c07c1493e63d20afe4e0cbf6471189 Mon Sep 17 00:00:00 2001
+From: clnhub <42144823+clnhub@users.noreply.github.com>
+Date: Mon, 2 Dec 2024 15:30:44 +0100
+Subject: [PATCH] Add kernel 6.13(+) support
+
+---
+ os_dep/linux/ioctl_cfg80211.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
+index 76da0e8..c0650aa 100755
+--- a/os_dep/linux/ioctl_cfg80211.c
++++ b/os_dep/linux/ioctl_cfg80211.c
+@@ -1666,7 +1666,7 @@ static int rtw_cfg80211_ap_set_encryption(struct net_device *dev, struct ieee_pa
+ 	return ret;
+ }
+ #endif /* CONFIG_AP_MODE */
+-
++__attribute__((no_sanitize("bounds")))
+ static int rtw_cfg80211_set_encryption(struct net_device *dev, struct ieee_param *param)
+ {
+ 	int ret = 0;
+@@ -6881,7 +6881,10 @@ static void rtw_get_chbwoff_from_cfg80211_chan_def(
+ 
+ static int cfg80211_rtw_set_monitor_channel(struct wiphy *wiphy
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+-	, struct cfg80211_chan_def *chandef
++  #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 13, 0))
++        , struct net_device *netdev
++  #endif
++        , struct cfg80211_chan_def *chandef
+ #else
+ 	, struct ieee80211_channel *chan
+ 	, enum nl80211_channel_type channel_type

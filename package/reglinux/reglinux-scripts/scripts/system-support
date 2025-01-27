@@ -1,0 +1,127 @@
+#!/bin/sh
+
+GTMP="/tmp"
+DHOME="/userdata/system"
+V_ARCH=$(uname -m)
+
+# to be callable by any external tool
+if test $# -eq 1
+then
+    REPORTNAME=$(basename "$1" | sed -e s+'^\([^.]*\)\..*$'+'\1'+)
+    OUTPUTFILE=$1
+else
+    REPORTNAME="reglinux-"$(system-version)"-support-"$(date +%Y%m%d%H%M%S)
+    OUTPUTFILE="/userdata/saves/${REPORTNAME}.tar.gz"
+fi
+
+TMPDIR="${GTMP}/${REPORTNAME}"
+
+f_cp() {
+    test -e "$1" && cp "$1" "$2"
+}
+
+d_cp() {
+    test -d "$1" && cp -pr "$1" "$2"
+}
+
+if mkdir "${TMPDIR}" && mkdir "${TMPDIR}/system" "${TMPDIR}/joysticks" "${TMPDIR}/lirc" "${TMPDIR}/coredumps"
+then
+    if ! cd "${TMPDIR}"
+    then
+	echo "Change directory failed" >&2
+	exit 1
+    fi
+else
+    echo "Reporting directory creation failed" >&2
+    exit 1
+fi
+
+# SYSTEM
+DSYSTEM="${TMPDIR}/system"
+
+dmesg 	         	> "${DSYSTEM}/dmesg.txt"
+lsmod 	         	> "${DSYSTEM}/lsmod.txt"
+ps    	         	> "${DSYSTEM}/ps.txt"
+df -h 	         	> "${DSYSTEM}/df.txt"
+netstat -tuan    	> "${DSYSTEM}/netstat.txt"
+lsusb -v         	> "${DSYSTEM}/lsusb.txt" 2>/dev/null
+command -v tvservice >/dev/null && tvservice -m CEA 	> "${DSYSTEM}/tvservice-CEA.txt"
+command -v tvservice >/dev/null && tvservice -m DMT 	> "${DSYSTEM}/tvservice-DMT.txt"
+ifconfig -a             > "${DSYSTEM}/ifconfig.txt"
+lspci                   > "${DSYSTEM}/lspci.txt"
+lspci -v                > "${DSYSTEM}/lspci_v.txt"
+hciconfig -a            > "${DSYSTEM}/bt-capabilities.txt"
+amixer                  > "${DSYSTEM}/amixer.txt"
+aplay -l                > "${DSYSTEM}/aplay-l.txt"
+command -v glxinfo >/dev/null && glxinfo    > "${DSYSTEM}/glxinfo.txt"
+command -v xrandr  >/dev/null && xrandr     > "${DSYSTEM}/xrandr.txt"
+blkid                   > "${DSYSTEM}/disks.txt"
+wpctl status            > "${DSYSTEM}/wireplumber.txt"
+connmanctl technologies > "${DSYSTEM}/connman-technologies.txt"
+connmanctl services     > "${DSYSTEM}/connman-services.txt"
+system-systems          > "${DSYSTEM}/bios.txt"
+system-version          > "${DSYSTEM}/system.version"
+system-info             > "${DSYSTEM}/system.info"
+ldconfig -p             > "${DSYSTEM}/ldcache.txt"
+# get xrandr provider if x86 system only
+if [ "${V_ARCH}" = "x86" -o "${V_ARCH}" = "x86_64" ]; then
+    xrandr --listproviders  > "${DSYSTEM}/xrandr-providers.txt"
+fi
+f_cp /boot/boot/system.board                                   "${DSYSTEM}"
+f_cp /boot/config.txt                                          "${DSYSTEM}"
+f_cp /userdata/system/system.conf                              "${DSYSTEM}"
+d_cp /userdata/system/logs                                     "${DSYSTEM}"
+f_cp /var/log/messages                                         "${DSYSTEM}"
+f_cp /userdata/system/configs/emulationstation/es_settings.cfg "${DSYSTEM}"
+f_cp /userdata/system/configs/emulationstation/es_log.txt      "${DSYSTEM}"
+f_cp /userdata/system/configs/emulationstation/es_input.cfg    "${DSYSTEM}"
+f_cp /boot/system-boot.conf                                    "${DSYSTEM}"
+f_cp /var/log/Xorg.0.log                                       "${DSYSTEM}"
+f_cp /var/log/bluetooth-agent.log                              "${DSYSTEM}"
+
+# clear passwords
+# filter some dangerous options (may include some path with /userdata)
+sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/logs/"*.log
+sed -i -e s+"^.*user.*$"+""+gI "${DSYSTEM}/es_settings.cfg"
+sed -i -e s+"^.*pass.*$"+""+gI "${DSYSTEM}/es_settings.cfg"
+sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*retroachievements.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*token.*$"+""+gI "${DSYSTEM}/system.conf"
+sed -i -e s+"^.*wifi.*$"+""+gI "${DSYSTEM}/system-boot.conf"
+
+# Emulators configs
+#d_cp /userdata/system/configs                           "${TMPDIR}/configs", disabled, too big
+
+# joysticks
+DJOYS="${TMPDIR}/joysticks"
+find /dev/input > "${DJOYS}/inputs.txt"
+for J in /dev/input/event*
+do
+    N=$(basename ${J})
+    evtest --info "${J}"          > "${DJOYS}/evtest.${N}.txt"
+    udevadm info -q all -n "${J}" > "${DJOYS}/udevadm.${N}.txt"
+done
+sdl2-jstest -l > "${DJOYS}/sdl2-jstest.txt"
+cp "/var/run/sinden/p"*"/sinden-"*".log" "${DJOYS}" 2>/dev/null
+
+# lirc
+DLIRC="${TMPDIR}/lirc"
+f_cp "${DHOME}/.config/lirc/lircd.conf" "${DLIRC}"
+
+# core dumps
+DCORE="${TMPDIR}/coredumps"
+for C in /userdata/system/logs/core.*
+do
+    f_cp "${C}" "${DCORE}"
+done
+
+if ! (cd "${GTMP}" && tar cf -  "${REPORTNAME}" | gzip -c > "${OUTPUTFILE}")
+then
+    echo "Reporting zip creation failed" >&2
+    exit 1
+fi
+
+rm -rf "${TMPDIR}"
+echo "${OUTPUTFILE}"
+exit 0

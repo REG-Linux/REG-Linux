@@ -1,4 +1,4 @@
-include toolchain-gcc13-glibc.common
+include toolchain-gcc14-glibc.common
 include reglinux-board.common
 
 # Target definition (RV64GC+V, aka riscv64gc)
@@ -8,27 +8,27 @@ BR2_RISCV_ISA_RVC=y
 BR2_riscv_g=y
 BR2_PACKAGE_BATOCERA_TARGET_K1=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mabi=lp64d -march=rv64imafdv"
-BR2_BINUTILS_VERSION_2_41_X=y
 #BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
 BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/riscv64"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/spacemit/bananapi-f3/fsoverlay"
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 
-# Linux headers same as kernel, a 6.1 series
-BR2_KERNEL_HEADERS_6_1=y
-BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_1=y
+# Linux headers same as kernel, a 6.6 series
+BR2_KERNEL_HEADERS_6_6=y
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_6=y
 
-# Kernel - Version: 6.1.y-vendor
+# Kernel - Version: 6.6.36-vendor
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_GIT=y
 BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/BPI-SINOVOIP/pi-linux.git"
-BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="linux-6.1.15-k1"
+BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="linux-6.6.36-k1"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/spacemit/bananapi-f3/linux-defconfig.config"
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/spacemit/bananapi-f3/linux-defconfig-fragment.config"
 BR2_LINUX_KERNEL_INSTALL_TARGET=y
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/spacemit/bananapi-f3/linux_patches"
 # Vendor-specific FIT kernel image format (until mainline)
 BR2_LINUX_KERNEL_IMAGE_TARGET_CUSTOM=y
 BR2_LINUX_KERNEL_IMAGE_TARGET_NAME="Image.itb"
@@ -46,7 +46,6 @@ BR2_PACKAGE_REGLINUX_XWAYLAND=y
 
 # Bootloader
 BR2_PACKAGE_UBOOT_BANANAPI_F3=y
-BR2_PACKAGE_HOST_UBOOT_TOOLS_FIT_SUPPORT=y
 
 # Filesystem
 BR2_TARGET_ROOTFS_CPIO_LZ4=y

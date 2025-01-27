@@ -370,6 +370,6 @@ ls /var/run/usbmount.delay |
         /usr/share/usbmount/usbmount "${RTYPE}"
         rm "/var/run/usbmount.delay/${RULE}")
     done
-touch /var/run/batocera.share.mounted # reenable standard usbmount
+touch /var/run/system.share.mounted # reenable standard usbmount
 
 echo "done."

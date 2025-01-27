@@ -55,6 +55,10 @@ if [ "${BATOCERA_LOWER_TARGET}" = "s812" ]
 then
     TARGET_BOARD_PARENT_PATH="board/reglinux"
 fi
+if [ "${BATOCERA_LOWER_TARGET}" = "mt8395" ]
+then
+    TARGET_BOARD_PARENT_PATH="board/reglinux"
+fi
 for BATOCERA_PATHSUBTARGET in ${BATOCERA_IMAGES_TARGETS}
 do
     BATOCERA_SUBTARGET=$(basename "${BATOCERA_PATHSUBTARGET}")

@@ -1,0 +1,8 @@
+--- a/Makefile.common	2025-01-22 18:46:36.005024028 +0100
++++ b/Makefile.common	2025-01-22 18:46:48.946327608 +0100
+@@ -169,3 +169,5 @@
+ 				 $(LIBRETRO_COMM_DIR)/vfs/vfs_implementation.c \
+ 				 $(LIBRETRO_DIR)/stub/dlgAlert.c \
+ 				 $(ZLIB_SRCS)
++
++CFLAGS +=  -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types

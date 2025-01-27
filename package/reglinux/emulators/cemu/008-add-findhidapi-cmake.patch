@@ -1,0 +1,20 @@
+--- a/dev/null	2024-11-27 21:09:43.596340140 +0100
++++ b/cmake/Findhidapi.cmake	2025-01-10 22:15:26.780982250 +0100
+@@ -0,0 +1,17 @@
++find_path(HIDAPI_INCLUDE_DIR NAMES hidapi.h PATH_SUFFIXES hidapi)
++find_library(HIDAPI_LIBRARY  NAMES hidapi hidapi-hidraw hidapi-libusb)
++set(HIDAPI_LIBRARIES  ${HIDAPI_LIBRARY})
++set(HIDAPI_INCLUDE_DIRS ${HIDAPI_INCLUDE_DIR})
++
++include(FindPackageHandleStandardArgs)
++find_package_handle_standard_args(HIDAPI DEFAULT_MSG HIDAPI_LIBRARY HIDAPI_INCLUDE_DIR)
++
++if(HIDAPI_FOUND AND NOT TARGET hidapi::hidapi)
++    add_library(hidapi::hidapi UNKNOWN IMPORTED)
++    set_target_properties(hidapi::hidapi PROPERTIES
++      IMPORTED_LOCATION ${HIDAPI_LIBRARIES}
++      INTERFACE_INCLUDE_DIRECTORIES ${HIDAPI_INCLUDE_DIRS}
++    )
++endif()
++
++mark_as_advanced(HIDAPI_INCLUDE_DIR HIDAPI_LIBRARY)

@@ -18,7 +18,7 @@ POWER = 5
 LED = 7
 FAN = 8
 
-arch = subprocess.check_output(["batocera-es-swissknife", "--arch"]).strip().upper().decode(encoding='UTF-8')
+arch = subprocess.check_output(["system-es-swissknife", "--arch"]).strip().upper().decode(encoding='UTF-8')
 
 # Tell the script if this is running on a ROCK64 or ROCKPRO64
 GPIO.setrock(arch)
@@ -50,7 +50,7 @@ while True:
 		if(GPIO.input(RESET) == "0"):
 			print("Rebooting...")
 			Blink_LED()
-			os.system("batocera-es-swissknife --reboot")
+			os.system("system-es-swissknife --reboot")
 			break
 		if(GPIO.input(POWER) == "1" and IGNORE_PWR_OFF == True):
 			IGNORE_PWR_OFF = False
@@ -69,7 +69,7 @@ while True:
 				print("Shutting down...")
 				Blink_LED()
 				GPIO.output(FAN, GPIO.LOW)
-				os.system("batocera-es-swissknife --shutdown")
+				os.system("system-es-swissknife --shutdown")
 				break
 	else:
 		print("Roshambo Case not found")

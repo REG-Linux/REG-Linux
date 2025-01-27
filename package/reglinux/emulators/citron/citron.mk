@@ -3,8 +3,8 @@
 # CITRON
 #
 ################################################################################
-# Version: TODO
-CITRON_VERSION = nightly-20241207_084449
+# Version: v0.4-canary-refresh
+CITRON_VERSION = v0.4-canary-refresh
 CITRON_SITE = https://git.citron-emu.org/Citron/Citron
 CITRON_SITE_METHOD=git
 CITRON_GIT_SUBMODULES=YES
@@ -49,5 +49,12 @@ define CITRON_INSTALL_TARGET_CMDS
     cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/citron/switch.citron.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
+
+# Ugly hack because lz4 is not installed with CMake and pkgconfig returns
+# $(STAGING_DIR)/usr/local/include which does NOT exist
+define CITRON_CREATE_STAGING_USR_LOCAL_INCLUDE
+    mkdir -p $(STAGING_DIR)/usr/local/include
+endef
+CITRON_PRE_CONFIGURE_HOOKS += CITRON_CREATE_STAGING_USR_LOCAL_INCLUDE
 
 $(eval $(cmake-package))

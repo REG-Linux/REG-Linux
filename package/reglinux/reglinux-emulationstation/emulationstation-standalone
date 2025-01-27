@@ -17,7 +17,7 @@ touch "${REBOOT_FLAG}" || exit 1
 # environment
 export HOME=/userdata/system
 
-batocera-switch-screen-checker --init
+system-switch-screen-checker --init
 
 GAMELAUNCH=1
 while test -e "${REBOOT_FLAG}"
@@ -45,13 +45,13 @@ do
     fi
 
     # we set the output to enable screens...
-    batocera-resolution setOutput "${settings_output}" "${settings_output2}" "${settings_output3}" # empty or invalid values defaults to the first valid
+    system-resolution setOutput "${settings_output}" "${settings_output2}" "${settings_output3}" # empty or invalid values defaults to the first valid
     ###################
 
     ### rotation ###
     display_rotate=
     # try to find a rotation for the custom output
-    effective_output=$(batocera-resolution currentOutput)
+    effective_output=$(system-resolution currentOutput)
     if test -n "${effective_output}"
     then
 	    display_rotate=$(/usr/bin/system-settings-get-master "display.rotate.${effective_output}")
@@ -64,9 +64,9 @@ do
 
     if test -n "${effective_output}" && test -n "${display_rotate}"
     then
-        if batocera-resolution supportSystemRotation
+        if system-resolution supportSystemRotation
         then
-            batocera-resolution setRotation "${display_rotate}"
+            system-resolution setRotation "${display_rotate}"
         else
             # when no rotation is available by the system, apply it
             EXTRA_OPTS="--screenrotate ${display_rotate}"
@@ -77,17 +77,17 @@ do
     if test -n "${settings_output2}"
     then
 	display_rotate2="$(/usr/bin/system-settings-get display.rotate2)"
-        if batocera-resolution supportSystemRotation
+        if system-resolution supportSystemRotation
         then
-            batocera-resolution --screen "${settings_output2}" setRotation "${display_rotate2}"
+            system-resolution --screen "${settings_output2}" setRotation "${display_rotate2}"
 	fi
     fi
     if test -n "${settings_output3}"
     then
 	display_rotate3="$(/usr/bin/system-settings-get display.rotate3)"
-        if batocera-resolution supportSystemRotation
+        if system-resolution supportSystemRotation
         then
-            batocera-resolution --screen "${settings_output3}" setRotation "${display_rotate3}"
+            system-resolution --screen "${settings_output3}" setRotation "${display_rotate3}"
 	fi
     fi
     ###################
@@ -101,12 +101,12 @@ do
         bootresolution="$(/usr/bin/system-settings-get-master es.resolution)"
         if test -z "${bootresolution}"
         then
-	        batocera-resolution minTomaxResolution-secure
+	        system-resolution minTomaxResolution-secure
         else
-	        batocera-resolution setMode "${bootresolution}"
+	        system-resolution setMode "${bootresolution}"
         fi
     else
-	    batocera-resolution setMode "${bootresolution}"
+	    system-resolution setMode "${bootresolution}"
     fi
 
     # other screens
@@ -115,9 +115,9 @@ do
 	bootresolution2="$(/usr/bin/system-settings-get es.resolution2)"
 	if test -z "${bootresolution2}"
 	then
-	    batocera-resolution --screen "${settings_output2}" minTomaxResolution-secure
+	    system-resolution --screen "${settings_output2}" minTomaxResolution-secure
 	else
-	    batocera-resolution --screen "${settings_output2}" setMode "${bootresolution2}"
+	    system-resolution --screen "${settings_output2}" setMode "${bootresolution2}"
 	fi
     fi
     if test -n "${settings_output3}"
@@ -125,16 +125,16 @@ do
 	bootresolution3="$(/usr/bin/system-settings-get es.resolution3)"
 	if test -z "${bootresolution3}"
 	then
-	    batocera-resolution --screen "${settings_output3}" minTomaxResolution-secure
+	    system-resolution --screen "${settings_output3}" minTomaxResolution-secure
 	else
-	    batocera-resolution --screen "${settings_output3}" setMode "${bootresolution3}"
+	    system-resolution --screen "${settings_output3}" setMode "${bootresolution3}"
 	fi
     fi
 
     # now that all screens are enabled, rotated, resized... we reenable cause it may change the position in case of multi screens
     if test -n "${settings_output2}" -o -n "${settings_output3}"
     then
-	batocera-resolution setOutput "${settings_output}" "${settings_output2}" "${settings_output3}" # empty or invalid values defaults to the first valid
+	system-resolution setOutput "${settings_output}" "${settings_output2}" "${settings_output3}" # empty or invalid values defaults to the first valid
     fi
 
     CUSTOMESOPTIONS="$(/usr/bin/system-settings-get es.customsargs)"
@@ -148,7 +148,7 @@ do
     fi
 
     # save the current output in which es is started (used to switch screen, when unplugged)
-    batocera-resolution currentOutput > "/var/run/switch_screen_current"
+    system-resolution currentOutput > "/var/run/switch_screen_current"
 
     # dbus launch is required for the gio/gvfs/trash:///...
     eval "$(dbus-launch --sh-syntax --exit-with-session)"

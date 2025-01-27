@@ -1,4 +1,4 @@
-include toolchain-gcc13-glibc.common
+include toolchain-gcc14-glibc.common
 include reglinux-board.common
 
 # Target definition (AArch64 ARMv8.4-A 16K page size)
@@ -8,7 +8,7 @@ BR2_ARM64_PAGE_SIZE_16K=y
 BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/saphira/patches"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/saphira/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay"
 
 # Rust, required by asahi kernel
@@ -16,11 +16,14 @@ BR2_PACKAGE_HOST_RUSTC=y
 BR2_PACKAGE_HOST_RUST_BIN=y
 BR2_PACKAGE_HOST_RUST_BINDGEN=y
 
+# Kernel headers (needed, custom kernel)
+BR2_KERNEL_HEADERS_AS_KERNEL=y
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_12=y
+
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
-BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https://github.com/AsahiLinux/linux/archive/refs/tags/asahi-6.12.3-1.tar.gz"
-BR2_KERNEL_HEADERS_AS_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https://github.com/AsahiLinux/linux/archive/refs/tags/asahi-6.12.10-1.tar.gz"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/saphira/linux-defconfig.config"
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/saphira/linux-defconfig-fragment.config"
@@ -39,13 +42,6 @@ BR2_PACKAGE_BATOCERA_ASAHI_MESA3D=y
 # Allow wayland and Xwayland
 BR2_PACKAGE_REGLINUX_SWAY=y
 BR2_PACKAGE_REGLINUX_XWAYLAND=y
-
-# Required tools to create the SD image
-BR2_PACKAGE_HOST_DOSFSTOOLS=y
-BR2_PACKAGE_HOST_GENIMAGE=y
-BR2_PACKAGE_HOST_MESON_TOOLS=y
-BR2_PACKAGE_HOST_MTOOLS=y
-BR2_PACKAGE_HOST_UBOOT_TOOLS=y
 
 # Filesystem
 BR2_TARGET_ROOTFS_CPIO_LZ4=y

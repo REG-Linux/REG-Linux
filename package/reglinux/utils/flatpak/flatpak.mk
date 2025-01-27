@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-FLATPAK_VERSION = 1.14.8
+FLATPAK_VERSION = 1.14.10
 FLATPAK_SOURCE = flatpak-$(FLATPAK_VERSION).tar.xz
 FLATPAK_SITE = https://github.com/flatpak/flatpak/releases/download/$(FLATPAK_VERSION)
 

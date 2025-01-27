@@ -1,0 +1,11 @@
+--- a/meson.build	2025-01-25 11:12:33.939492453 +0100
++++ b/meson.build	2025-01-25 11:13:02.745158446 +0100
+@@ -2301,7 +2301,7 @@
+         '-lSPIRV-Tools-opt'
+       ])
+ elif host_os == 'linux'
+-  vulkan = dependency('vulkan')
++  vulkan = dependency('vulkan', required : false)
+ endif
+ 
+ if vulkan.found()
