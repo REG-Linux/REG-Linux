@@ -803,8 +803,10 @@ config BR2_PACKAGE_BATOCERA_WINE_SYSTEMS
 config BR2_PACKAGE_BATOCERA_FLASH_SYSTEMS
 	bool "batocera.linux Flash support"
 
-	# Flash Player Emulator
-	select BR2_PACKAGE_RUFFLE		if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # need to be configured to support crosscompilation
+	# Ruffle implementation in Rust
+	select BR2_PACKAGE_RUFFLE		if BR2_ARCH_IS_64
+
+	# Lightspark implementation in C/C++
 	select BR2_PACKAGE_LIGHTSPARK		if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_mipsel
 
 #### Moonlight / Gamestream ####

@@ -7,33 +7,22 @@
 RUFFLE_VERSION = nightly-2025-01-21
 RUFFLE_SITE = $(call github,ruffle-rs,ruffle,$(RUFFLE_VERSION))
 RUFFLE_LICENSE = GPLv2
-RUFFLE_DEPENDENCIES = host-rustc host-rust-bin openssl
+RUFFLE_DEPENDENCIES =
 
-RUFFLE_ARGS_FOR_BUILD = -L $(STAGING_DIR) -Wl,-rpath,$(STAGING_DIR)
+RUFFLE_CARGO_INSTALL_OPTS = --path desktop/
 
-RUFFLE_CARGO_ENV = CARGO_HOME=$(HOST_DIR)/usr/share/cargo \
-    RUSTFLAGS='$(addprefix -C linker=$(TARGET_CC) -C link-args=,$(RUFFLE_ARGS_FOR_BUILD))'
-
-RUFFLE_CARGO_MODE = $(if $(BR2_ENABLE_DEBUG),,release)
-RUFFLE_BIN_DIR = target/$(RUSTC_TARGET_NAME)/$(RUFFLE_CARGO_MODE)
-
-RUFFLE_CARGO_OPTS = \
-    --$(RUFFLE_CARGO_MODE) \
-        --target=$(RUSTC_TARGET_NAME) \
-        --manifest-path=$(@D)/Cargo.toml
-
-define RUFFLE_BUILD_CMDS
-    $(TARGET_MAKE_ENV) $(RUFFLE_CARGO_ENV) \
-            cargo build $(RUFFLE_CARGO_OPTS)
+define RUFFLE_DESKTOP_BINARY_POST_PROCESS
+       mv $(TARGET_DIR)/usr/bin/ruffle_desktop $(TARGET_DIR)/usr/bin/ruffle
+       $(TARGET_STRIP) $(TARGET_DIR)/usr/bin/ruffle
 endef
 
-define RUFFLE_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 0755 $(@D)/$(RUFFLE_BIN_DIR)/ruffle_desktop \
-             $(TARGET_DIR)/usr/bin/ruffle
-
+define RUFFLE_INSTALL_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/ruffle/flash.ruffle.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
-$(eval $(generic-package))
+RUFFLE_POST_INSTALL_TARGET_HOOKS += RUFFLE_DESKTOP_BINARY_POST_PROCESS
+RUFFLE_POST_INSTALL_TARGET_HOOKS += RUFFLE_INSTALL_EVMAPY
+
+$(eval $(rust-package))
