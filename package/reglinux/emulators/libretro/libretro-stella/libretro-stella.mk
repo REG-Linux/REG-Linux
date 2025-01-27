@@ -3,10 +3,12 @@
 # libretro-stella
 #
 ################################################################################
-# Version: Commits on Feb 2, 2024
-LIBRETRO_STELLA_VERSION = 4557099e5d7a0c0b02424ea85d2a4b093911e048
-LIBRETRO_STELLA_SITE = $(call github,stella-emu,stella,$(LIBRETRO_STELLA_VERSION))
-LIBRETRO_STELLA_LICENSE = GPLv2
+# REGLINUX build from upstream
+LIBRETRO_STELLA_VERSION = 7.0
+LIBRETRO_STELLA_SOURCE = stella-$(LIBRETRO_STELLA_VERSION)-src.tar.xz
+LIBRETRO_STELLA_SITE = https://github.com/stella-emu/stella/releases/download/$(LIBRETRO_STELLA_VERSION)
+LIBRETRO_STELLA_LICENSE = GPL-2.0+
+LIBRETRO_STELLA_LICENSE_FILES = Copyright.txt License.txt
 
 LIBRETRO_STELLA_PLATFORM = $(LIBRETRO_PLATFORM)
 
