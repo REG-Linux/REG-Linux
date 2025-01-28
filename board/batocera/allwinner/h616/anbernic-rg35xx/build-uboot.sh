@@ -3,20 +3,33 @@
 HOST_DIR=$1
 BOARD_DIR=$2
 IMAGES_DIR=$3
-# ARM Trusted Firmware BL31
-export BL31="${BINARIES_DIR}/bl31.bin"
 
-UBOOT_VERSION=24aafd7efc6827dc44cae0bfc28c08d989b34869
+# Define U-Boot version we use
+UBOOT_VERSION=2025.01
 
 # Download U-Boot mainline
-wget "https://git.sr.ht/~tokyovigilante/u-boot/archive/${UBOOT_VERSION}.tar.gz"
-tar xf $UBOOT_VERSION.tar.gz
-cd u-boot-$UBOOT_VERSION
+wget "https://ftp.denx.de/pub/u-boot/u-boot-${UBOOT_VERSION}.tar.bz2"
 
-# Make config
-make anbernic_rg35xxplus_defconfig
+# Extract it
+tar xf u-boot-${UBOOT_VERSION}.tar.bz2
 
-# Build it
-ARCH=aarch64 CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-" make -j$(nproc)
+# Enter directory
+cd u-boot-${UBOOT_VERSION}
+
+# Apply patches if any
+PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/allwinner/h616/patches/uboot-rg35xx/*.patch"
+for patch in $PATCHES
+do
+echo "Applying patch: $patch"
+patch -p1 < $patchmake
+done
+
+# Build bootloader
+export BL31="${BINARIES_DIR}/bl31.bin"
+export CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-"
+ARCH=aarch64 make anbernic_rg35xx_h700_defconfig
+ARCH=aarch64 make -j$(nproc)
+
+# Copy generated files
 mkdir -p "${IMAGES_DIR}/reglinux/uboot-anbernic-rg35xx"
 cp u-boot-sunxi-with-spl.bin ../../uboot-anbernic-rg35xx/
