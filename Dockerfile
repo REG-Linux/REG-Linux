@@ -23,6 +23,7 @@ RUN dpkg --add-architecture i386 && \
     scons \
     libglib2.0-dev \
     bc \
+    gh \
     mtools \
     u-boot-tools \
     flex \
