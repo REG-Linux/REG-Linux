@@ -1,0 +1,105 @@
+From 4c158d6d73a74576fa56c603ebc6ed6758785f97 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Wed, 1 Jan 2025 07:13:52 +0000
+Subject: [PATCH 25/58] FROMLIST(v1): iio: adc: meson: add support for the GXLX
+ SoC
+
+The SARADC IP on the GXLX SoC itself is identical to the one found on
+GXL SoCs. However, GXLX SoCs require poking the first three bits in the
+MESON_SAR_ADC_REG12 register to get the three MPLL clocks (used as clock
+generators for the audio frequencies) to work.
+
+The reason why there are MPLL clock bits in the ADC register space is
+entirely unknown and it seems that nobody is able to comment on this.
+So clearly mark this as a workaround and add a warning so users are
+notified that this workaround can change (once we know what these bits
+actually do).
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ drivers/iio/adc/meson_saradc.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/drivers/iio/adc/meson_saradc.c b/drivers/iio/adc/meson_saradc.c
+index ba63ec05d8c0..78db771ce602 100644
+--- a/drivers/iio/adc/meson_saradc.c
++++ b/drivers/iio/adc/meson_saradc.c
+@@ -160,6 +160,11 @@
+ 	#define MESON_SAR_ADC_REG11_EOC				BIT(1)
+ 	#define MESON_SAR_ADC_REG11_VREF_SEL			BIT(0)
+ 
++#define MESON_SAR_ADC_REG12					0x30
++	#define MESON_SAR_ADC_REG12_MPLL0_UNKNOWN		BIT(0)
++	#define MESON_SAR_ADC_REG12_MPLL1_UNKNOWN		BIT(1)
++	#define MESON_SAR_ADC_REG12_MPLL2_UNKNOWN		BIT(2)
++
+ #define MESON_SAR_ADC_REG13					0x34
+ 	#define MESON_SAR_ADC_REG13_12BIT_CALIBRATION_MASK	GENMASK(13, 8)
+ 
+@@ -331,6 +336,7 @@ struct meson_sar_adc_param {
+ 	bool					adc_eoc;
+ 	enum meson_sar_adc_vref_sel		vref_select;
+ 	enum meson_sar_adc_vref_voltage		vref_voltage;
++	bool					enable_mpll_clock_workaround;
+ };
+ 
+ struct meson_sar_adc_data {
+@@ -1001,6 +1007,15 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
+ 		regval = priv->param->cmv_select ? MESON_SAR_ADC_REG11_CMV_SEL : 0;
+ 		regmap_update_bits(priv->regmap, MESON_SAR_ADC_REG11,
+ 				   MESON_SAR_ADC_REG11_CMV_SEL, regval);
++
++		if (priv->param->enable_mpll_clock_workaround) {
++			dev_warn(dev,
++				 "Enabling unknown bits to make the MPLL clocks work\n");
++			regmap_write(priv->regmap, MESON_SAR_ADC_REG12,
++				     MESON_SAR_ADC_REG12_MPLL0_UNKNOWN |
++				     MESON_SAR_ADC_REG12_MPLL1_UNKNOWN |
++				     MESON_SAR_ADC_REG12_MPLL2_UNKNOWN);
++		}
+ 	}
+ 
+ 	ret = clk_set_parent(priv->adc_sel_clk, priv->clkin);
+@@ -1225,6 +1240,17 @@ static const struct meson_sar_adc_param meson_sar_adc_gxl_param = {
+ 	.cmv_select = true,
+ };
+ 
++static const struct meson_sar_adc_param meson_sar_adc_gxlx_param = {
++	.has_bl30_integration = true,
++	.clock_rate = 1200000,
++	.regmap_config = &meson_sar_adc_regmap_config_gxbb,
++	.resolution = 12,
++	.disable_ring_counter = 1,
++	.vref_voltage = VREF_VOLTAGE_1V8,
++	.cmv_select = true,
++	.enable_mpll_clock_workaround = true,
++};
++
+ static const struct meson_sar_adc_param meson_sar_adc_axg_param = {
+ 	.has_bl30_integration = true,
+ 	.clock_rate = 1200000,
+@@ -1274,6 +1300,11 @@ static const struct meson_sar_adc_data meson_sar_adc_gxl_data = {
+ 	.name = "meson-gxl-saradc",
+ };
+ 
++static const struct meson_sar_adc_data meson_sar_adc_gxlx_data = {
++	.param = &meson_sar_adc_gxlx_param,
++	.name = "meson-gxlx-saradc",
++};
++
+ static const struct meson_sar_adc_data meson_sar_adc_gxm_data = {
+ 	.param = &meson_sar_adc_gxl_param,
+ 	.name = "meson-gxm-saradc",
+@@ -1305,6 +1336,9 @@ static const struct of_device_id meson_sar_adc_of_match[] = {
+ 	}, {
+ 		.compatible = "amlogic,meson-gxl-saradc",
+ 		.data = &meson_sar_adc_gxl_data,
++	}, {
++		.compatible = "amlogic,meson-gxlx-saradc",
++		.data = &meson_sar_adc_gxlx_data,
+ 	}, {
+ 		.compatible = "amlogic,meson-gxm-saradc",
+ 		.data = &meson_sar_adc_gxm_data,
+-- 
+2.34.1
+

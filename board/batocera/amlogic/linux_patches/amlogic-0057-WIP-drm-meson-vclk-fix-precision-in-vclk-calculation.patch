@@ -1,0 +1,127 @@
+From 67f0f159e9a9393f783191bc7e23a5514bf0836f Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Sat, 4 Jan 2025 23:53:19 +0000
+Subject: [PATCH 57/58] WIP: drm/meson: vclk: fix precision in vclk
+ calculations
+
+Playing YUV420 @ 29.97 or 59.94 media causes HDMI output to
+lose sync with a fatal error reported:
+
+[   89.610280] Fatal Error, invalid HDMI vclk freq 593406
+
+In meson_encoder_hdmi_set_vclk the initial vclk_freq value is
+593407 (correct) but YUV420 modes halve the value to 296703.5
+and this is stored as int which loses precision by rounding
+down to 296703. The rounded value is later doubled to 593406
+resulting in meson_encoder_hdmi_set_vclk setting an invalid
+value for vclk_freq and triggering the fatal error.
+
+Correct the initial loss of precision by switching to unsigned
+long long instead of int. However, as other areas of code are
+still dependent on int calculations we need to fixup phy_freq
+when YUV420 @ 29.97 or 59.94 modes are used.
+
+Fixes: e5fab2ec9ca4 ("drm/meson: vclk: add support for YUV420 setup")
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/gpu/drm/meson/meson_encoder_hdmi.c | 46 ++++++++++++----------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/gpu/drm/meson/meson_encoder_hdmi.c b/drivers/gpu/drm/meson/meson_encoder_hdmi.c
+index 0593a1cde906..2046a71477fd 100644
+--- a/drivers/gpu/drm/meson/meson_encoder_hdmi.c
++++ b/drivers/gpu/drm/meson/meson_encoder_hdmi.c
+@@ -70,12 +70,12 @@ static void meson_encoder_hdmi_set_vclk(struct meson_encoder_hdmi *encoder_hdmi,
+ {
+ 	struct meson_drm *priv = encoder_hdmi->priv;
+ 	int vic = drm_match_cea_mode(mode);
+-	unsigned int phy_freq;
+-	unsigned int vclk_freq;
+-	unsigned int venc_freq;
+-	unsigned int hdmi_freq;
++	unsigned long long vclk_freq;
++	unsigned long long phy_freq;
++	unsigned long long venc_freq;
++	unsigned long long hdmi_freq;
+ 
+-	vclk_freq = mode->clock;
++	vclk_freq = mode->clock * 1000ULL;
+ 
+ 	/* For 420, pixel clock is half unlike venc clock */
+ 	if (encoder_hdmi->output_bus_fmt == MEDIA_BUS_FMT_UYYVYY8_0_5X24)
+@@ -85,8 +85,9 @@ static void meson_encoder_hdmi_set_vclk(struct meson_encoder_hdmi *encoder_hdmi,
+ 	phy_freq = vclk_freq * 10;
+ 
+ 	if (!vic) {
+-		meson_vclk_setup(priv, MESON_VCLK_TARGET_DMT, phy_freq,
+-				 vclk_freq, vclk_freq, vclk_freq, false);
++		meson_vclk_setup(priv, MESON_VCLK_TARGET_DMT, phy_freq / 1000ULL,
++				 vclk_freq / 1000ULL, vclk_freq / 1000ULL,
++				 vclk_freq / 1000ULL, false);
+ 		return;
+ 	}
+ 
+@@ -107,12 +108,15 @@ static void meson_encoder_hdmi_set_vclk(struct meson_encoder_hdmi *encoder_hdmi,
+ 	if (mode->flags & DRM_MODE_FLAG_DBLCLK)
+ 		venc_freq /= 2;
+ 
+-	dev_dbg(priv->dev, "vclk:%d phy=%d venc=%d hdmi=%d enci=%d\n",
+-		phy_freq, vclk_freq, venc_freq, hdmi_freq,
+-		priv->venc.hdmi_use_enci);
++	/* Correct phy_freq for YUV420 @ 29.97 or 59.94 */
++	/* FIXME find a better way to do this */
++	if (encoder_hdmi->output_bus_fmt == MEDIA_BUS_FMT_UYYVYY8_0_5X24 &&
++	    phy_freq == 2967035000)
++		phy_freq -= 5000ULL;
+ 
+-	meson_vclk_setup(priv, MESON_VCLK_TARGET_HDMI, phy_freq, vclk_freq,
+-			 venc_freq, hdmi_freq, priv->venc.hdmi_use_enci);
++	meson_vclk_setup(priv, MESON_VCLK_TARGET_HDMI, phy_freq / 1000ULL,
++			 vclk_freq / 1000ULL, venc_freq / 1000ULL, hdmi_freq / 1000ULL,
++			 priv->venc.hdmi_use_enci);
+ }
+ 
+ static enum drm_mode_status meson_encoder_hdmi_mode_valid(struct drm_bridge *bridge,
+@@ -122,10 +126,10 @@ static enum drm_mode_status meson_encoder_hdmi_mode_valid(struct drm_bridge *bri
+ 	struct meson_encoder_hdmi *encoder_hdmi = bridge_to_meson_encoder_hdmi(bridge);
+ 	struct meson_drm *priv = encoder_hdmi->priv;
+ 	bool is_hdmi2_sink = display_info->hdmi.scdc.supported;
+-	unsigned int phy_freq;
+-	unsigned int vclk_freq;
+-	unsigned int venc_freq;
+-	unsigned int hdmi_freq;
++	unsigned long long vclk_freq;
++	unsigned long long phy_freq;
++	unsigned long long venc_freq;
++	unsigned long long hdmi_freq;
+ 	int vic = drm_match_cea_mode(mode);
+ 	enum drm_mode_status status;
+ 
+@@ -149,7 +153,7 @@ static enum drm_mode_status meson_encoder_hdmi_mode_valid(struct drm_bridge *bri
+ 	} else if (!meson_venc_hdmi_supported_vic(vic))
+ 		return MODE_BAD;
+ 
+-	vclk_freq = mode->clock;
++	vclk_freq = mode->clock * 1000ULL;
+ 
+ 	/* For 420, pixel clock is half unlike venc clock */
+ 	if (drm_mode_is_420_only(display_info, mode) ||
+@@ -179,10 +183,12 @@ static enum drm_mode_status meson_encoder_hdmi_mode_valid(struct drm_bridge *bri
+ 	if (mode->flags & DRM_MODE_FLAG_DBLCLK)
+ 		venc_freq /= 2;
+ 
+-	dev_dbg(priv->dev, "%s: vclk:%d phy=%d venc=%d hdmi=%d\n",
+-		__func__, phy_freq, vclk_freq, venc_freq, hdmi_freq);
++	dev_dbg(priv->dev, "%s: phy=%lld vclk=%lld venc=%lld hdmi=%lld\n",
++		__func__, phy_freq / 1000ULL, vclk_freq / 1000ULL,
++		venc_freq / 1000ULL, hdmi_freq / 1000ULL);
+ 
+-	return meson_vclk_vic_supported_freq(priv, phy_freq, vclk_freq);
++	return meson_vclk_vic_supported_freq(priv, phy_freq / 1000ULL,
++					     vclk_freq / 1000ULL);
+ }
+ 
+ static void meson_encoder_hdmi_atomic_enable(struct drm_bridge *bridge,
+-- 
+2.34.1
+
