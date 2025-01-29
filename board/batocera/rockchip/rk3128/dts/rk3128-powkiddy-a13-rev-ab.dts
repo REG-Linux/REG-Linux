@@ -1,0 +1,302 @@
+/*
+ * (C) Copyright 2021 Martin Cerveny
+ *                    Alberto Pérez García-Plaza
+ *
+ * SPDX-License-Identifier:     GPL-2.0+
+ */
+
+/dts-v1/;
+
+#include "rk3128-wx8.dtsi"
+#include <dt-bindings/input/rk-input.h>
+
+&pinctrl {
+	lcdc {
+		lcd_enable: lcd-enable {
+			rockchip,pins = <RK_GPIO1 RK_PB4 0 &pcfg_pull_none>;
+		};
+
+		lcd_reset: lcd-reset {
+			rockchip,pins = <RK_GPIO0 RK_PD0 0 &pcfg_pull_none>;
+		};
+
+  	lcdc_rgb_pins: lcdc-rgb-pins {
+			rockchip,pins =
+				<2 RK_PB0 1 &pcfg_pull_none>,	/* LCDC_DCLK */
+				<2 RK_PB1 1 &pcfg_pull_none>,	/* LCDC_HSYNC */
+				<2 RK_PB2 1 &pcfg_pull_none>,	/* LCDC_VSYNC */
+				<2 RK_PB3 1 &pcfg_pull_none>,	/* LCDC_DEN */
+				<2 RK_PB4 1 &pcfg_pull_none>,	/* LCDC_DATA10 */
+				<2 RK_PB5 1 &pcfg_pull_none>,	/* LCDC_DATA11 */
+				<2 RK_PB6 1 &pcfg_pull_none>,	/* LCDC_DATA12 */
+				<2 RK_PB7 1 &pcfg_pull_none>,	/* LCDC_DATA13 */
+				<2 RK_PC0 1 &pcfg_pull_none>,	/* LCDC_DATA14 */
+				<2 RK_PC1 1 &pcfg_pull_none>,	/* LCDC_DATA15 */
+				<2 RK_PC2 1 &pcfg_pull_none>,	/* LCDC_DATA16 */
+				<2 RK_PC3 1 &pcfg_pull_none>;	/* LCDC_DATA17 */
+		};
+
+		lcdc_sleep_pins: lcdc-sleep-pins {
+			rockchip,pins =
+				<2 RK_PB0 0 &pcfg_pull_none>,	/* LCDC_DCLK */
+				<2 RK_PB1 0 &pcfg_pull_none>,	/* LCDC_HSYNC */
+				<2 RK_PB2 0 &pcfg_pull_none>,	/* LCDC_VSYNC */
+				<2 RK_PB3 0 &pcfg_pull_none>,	/* LCDC_DEN */
+				<2 RK_PB4 0 &pcfg_pull_none>,	/* LCDC_DATA10 */
+				<2 RK_PB5 0 &pcfg_pull_none>,	/* LCDC_DATA11 */
+				<2 RK_PB6 0 &pcfg_pull_none>,	/* LCDC_DATA12 */
+				<2 RK_PB7 0 &pcfg_pull_none>,	/* LCDC_DATA13 */
+				<2 RK_PC0 0 &pcfg_pull_none>,	/* LCDC_DATA14 */
+				<2 RK_PC1 0 &pcfg_pull_none>,	/* LCDC_DATA15 */
+				<2 RK_PC2 0 &pcfg_pull_none>,	/* LCDC_DATA16 */
+				<2 RK_PC3 0 &pcfg_pull_none>;	/* LCDC_DATA17 */
+		};
+
+	};
+
+	buttons {
+
+    arcade_stick: arcade-stick {
+      rockchip,pins = <
+           RK_GPIO2 0x16 0x00 &pcfg_pull_default
+           RK_GPIO2 0x17 0x00 &pcfg_pull_default
+           RK_GPIO2 0x18 0x00 &pcfg_pull_default
+           RK_GPIO2 0x19 0x00 &pcfg_pull_default
+           RK_GPIO0 0x0b 0x00 &pcfg_pull_default
+           RK_GPIO0 0x09 0x00 &pcfg_pull_default
+           RK_GPIO0 0x0c 0x00 &pcfg_pull_default
+           RK_GPIO0 0x0d 0x00 &pcfg_pull_default
+           RK_GPIO0 0x08 0x00 &pcfg_pull_default
+           RK_GPIO1 0x09 0x00 &pcfg_pull_default
+           RK_GPIO3 0x16 0x00 &pcfg_pull_default
+           RK_GPIO3 0x1b 0x00 &pcfg_pull_default
+           RK_GPIO1 0x0a 0x00 &pcfg_pull_default
+           RK_GPIO1 0x08 0x00 &pcfg_pull_default
+           RK_GPIO3 0x15 0x00 &pcfg_pull_default
+           >;
+    };
+	};
+};
+
+/ {
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm0 0 25000 0>;
+		default-brightness-level = <200>;
+		brightness-levels = <
+			  0   1   2   3   4   5   6   7
+			  8   9  10  11  12  13  14  15
+			 16  17  18  19  20  21  22  23
+			 24  25  26  27  28  29  30  31
+			 32  33  34  35  36  37  38  39
+			 40  41  42  43  44  45  46  47
+			 48  49  50  51  52  53  54  55
+			 56  57  58  59  60  61  62  63
+			 64  65  66  67  68  69  70  71
+			 72  73  74  75  76  77  78  79
+			 80  81  82  83  84  85  86  87
+			 88  89  90  91  92  93  94  95
+			 96  97  98  99 100 101 102 103
+			104 105 106 107 108 109 110 111
+			112 113 114 115 116 117 118 119
+			120 121 122 123 124 125 126 127
+			128 129 130 131 132 133 134 135
+			136 137 138 139 140 141 142 143
+			144 145 146 147 148 149 150 151
+			152 153 154 155 156 157 158 159
+			160 161 162 163 164 165 166 167
+			168 169 170 171 172 173 174 175
+			176 177 178 179 180 181 182 183
+			184 185 186 187 188 189 190 191
+			192 193 194 195 196 197 198 199
+			200 201 202 203 204 205 206 207
+			208 209 210 211 212 213 214 215
+			216 217 218 219 220 221 222 223
+			224 225 226 227 228 229 230 231
+			232 233 234 235 236 237 238 239
+			240 241 242 243 244 245 246 247
+			248 249 250 251 252 253 254 255>;
+		status = "okay";
+
+	};
+
+  stick {
+    compatible = "gpio-keys-polled";
+    poll-interval = <20>;
+    pinctrl-0 = <&arcade_stick>;
+		pinctrl-names = "default";
+
+    left {
+        label = "DPad Left";
+        linux,code = <BTN_DPAD_LEFT>;
+        gpios = <&gpio2 0x18 GPIO_ACTIVE_LOW>;
+    };
+    right {
+        label = "DPad Right";
+        linux,code = <BTN_DPAD_RIGHT>;
+        gpios = <&gpio2 0x19 GPIO_ACTIVE_LOW>;
+    };
+
+    up {
+        label = "DPad Up";
+        linux,code = <BTN_DPAD_UP>;
+        gpios = <&gpio2 0x16 GPIO_ACTIVE_LOW>;
+    };
+    down {
+        label = "DPad Down";
+        linux,code = <BTN_DPAD_DOWN>;
+        gpios = <&gpio2 0x17 GPIO_ACTIVE_LOW>;
+    };
+
+    f1 {
+      gpios = <&gpio0 0x0b 0x01>;
+      label = "GPIO Button A";
+      linux,code = <BTN_A>;
+    };
+
+    f2 {
+      gpios = <&gpio0 0x09 0x01>;
+      label = "GPIO Button B";
+      linux,code = <BTN_B>;
+    };
+
+    f3 {
+      gpios = <&gpio1 0x09 0x01>;
+      label = "GPIO Button R";
+      linux,code = <BTN_TR>;
+    };
+
+    f4 {
+      gpios = <&gpio0 0x08 0x01>;
+      label = "GPIO Button L";
+      linux,code = <BTN_TL>;
+    };
+
+    f5 {
+      gpios = <&gpio0 0x0c 0x01>;
+      label = "GPIO Button X";
+      linux,code = <BTN_X>;
+    };
+
+    f6 {
+      gpios = <&gpio0 0x0d 0x01>;
+      label = "GPIO Button Y";
+      linux,code = <BTN_Y>;
+    };
+
+    f7 {
+      gpios = <&gpio3 0x15 0x01>;
+      label = "GPIO Button Back";
+      linux,code = <BTN_BACK>;
+    };
+
+    select {
+      gpios = <&gpio3 0x16 0x01>;
+      label = "GPIO Button Select";
+      linux,code = <BTN_SELECT>;
+    };
+
+    start {
+      gpios = <&gpio3 0x1b 0x01>;
+      label = "GPIO Button Start";
+      linux,code = <BTN_START>;
+    };
+
+    vol-down-key {
+      gpios = <&gpio1 0x0a 0x01>;
+      label = "GPIO Key Vol Down";
+      linux,code = <KEY_VOLUMEDOWN>;
+    };
+
+    vol-up-key {
+      gpios = <&gpio1 0x08 0x01>;
+      label = "GPIO Key Vol Up";
+      linux,code = <KEY_VOLUMEUP>;
+    };
+
+  };
+
+  panel {
+		compatible = "simple-panel";
+		power-supply = <&vcc_io>;
+		backlight = <&backlight>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&lcd_reset &lcd_enable>;
+		reset-gpios = <&gpio0 RK_PD0 GPIO_ACTIVE_LOW>;
+		enable-gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_LOW>;
+		reset-delay-ms = <60>;
+		enable-delay-ms = <150>;
+		prepare-delay-ms = <100>;
+		unprepare-delay-ms = <2000>;
+		init-delay-ms = <1000>;
+
+		height-mm = <86>;
+		width-mm = <154>;
+		bus-format = <4105>;
+
+		display-timings {
+			native-mode = <&timing0>;
+
+			timing0: timing0 {
+				clock-frequency = <75200000>;
+
+				hactive = <1024>;
+				vactive = <600>;
+
+        hback-porch = <160>;
+        hfront-porch = <160>;
+        hsync-active = <0>;
+        hsync-len = <10>;
+        vback-porch = <23>;
+        vfront-porch = <12>;
+        vsync-active = <0>;
+        vsync-len = <10>;
+
+        de-active = <0>;
+        pixelclk-active = <1>;
+			};
+		};
+
+		port {
+			panel_in_rgb: endpoint {
+				remote-endpoint = <&rgb_out_panel>;
+			};
+		};
+	};
+};
+
+&pwm0 {
+	status = "okay";
+};
+
+&display_subsystem {
+	status = "okay";
+	logo-memory-region = <&drm_logo>;
+
+	route {
+		route_rgb: route-rgb {
+			connect = <&vop_out_rgb>;
+			status = "okay";
+		};
+
+		route_hdmi: route-hdmi {
+			connect = <&vop_out_hdmi>;
+			status = "okay";
+		};
+	};
+
+};
+
+&rgb {
+	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+
+			rgb_out_panel: endpoint {
+				remote-endpoint = <&panel_in_rgb>;
+			};
+		};
+	};
+};

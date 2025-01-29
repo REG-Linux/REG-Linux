@@ -3,7 +3,7 @@
 # play!
 #
 ################################################################################
-PLAY_VERSION = 0.68
+PLAY_VERSION = 0.69
 PLAY_SITE = https://github.com/jpd002/Play-.git
 PLAY_SITE_METHOD = git
 PLAY_GIT_SUBMODULES = YES
