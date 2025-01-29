@@ -253,7 +253,6 @@ config BR2_PACKAGE_BATOCERA_SYSTEM
 	select BR2_PACKAGE_LIBCURL_CURL				# download tools
 	select BR2_PACKAGE_NGHTTP2				# required for curl http2
 	select BR2_PACKAGE_CA_CERTIFICATES			# ssl certificates
-	select BR2_PACKAGE_ROCKCHIP_RGA				if BR2_PACKAGE_BATOCERA_TARGET_RK3128 # Used for screen rotation (SDL, Retroarch, Moonlight)
 
 	select BR2_PACKAGE_LIBDRM
 	select BR2_PACKAGE_LIBV4L_UTILS				if BR2_PACKAGE_V4L
@@ -804,8 +803,10 @@ config BR2_PACKAGE_BATOCERA_WINE_SYSTEMS
 config BR2_PACKAGE_BATOCERA_FLASH_SYSTEMS
 	bool "batocera.linux Flash support"
 
-	# Flash Player Emulator
-	select BR2_PACKAGE_RUFFLE		if BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY # need to be configured to support crosscompilation
+	# Ruffle implementation in Rust
+	select BR2_PACKAGE_RUFFLE		if BR2_ARCH_IS_64
+
+	# Lightspark implementation in C/C++
 	select BR2_PACKAGE_LIGHTSPARK		if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_mipsel
 
 #### Moonlight / Gamestream ####
@@ -1171,6 +1172,9 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	# CorsixTH (Theme Hospital engine)
 	select BR2_PACKAGE_CORSIXTH			if BR2_ARCH_IS_64
 
+	# GemRB (Infinity Engine for Baldur's Gate games)
+	select BR2_PACKAGE_GEMRB			if !BR2_PACKAGE_BATOCERA_TARGET_CHA && !BR2_mipsel
+
 	# The Force Engine
 	select BR2_PACKAGE_THEFORCEENGINE		if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL # Requires OpenGL 3.3 or later
 
@@ -1254,6 +1258,7 @@ config BR2_PACKAGE_BATOCERA_COMPUTER_SYSTEMS
 
 	# Apple 2
 	select BR2_PACKAGE_APPLEWIN		# ALL
+	select BR2_PACKAGE_IZAPPLE2		if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_PACKAGE_BATOCERA_TARGET_JZ4770
 
 	# Apple 2 GS
 	select BR2_PACKAGE_GSPLUS		# ALL

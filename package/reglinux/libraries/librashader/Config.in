@@ -1,0 +1,9 @@
+config BR2_PACKAGE_LIBRASHADER
+	bool "librashder"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+
+	help
+        librashader is a preprocessor, compiler, and runtime for RetroArch 'slang' shaders, rewritten in pure Rust.
+
+        https://github.com/SnowflakePowered/librashader

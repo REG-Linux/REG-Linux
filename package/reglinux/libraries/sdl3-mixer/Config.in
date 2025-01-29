@@ -1,0 +1,16 @@
+config BR2_PACKAGE_SDL3_MIXER
+	bool "sdl3-mixer"
+	depends on !BR2_STATIC_LIBS
+	depends on BR2_PACKAGE_SDL3
+	help
+	  SDL_mixer 3.0
+
+	  SDL3-based simple multi-channel audio mixer.
+	  https://github.com/libsdl-org/SDL_mixer
+
+if BR2_PACKAGE_SDL3_MIXER
+# TODO
+endif
+
+comment "SDL3_Mixer needs a toolchain w/ dynamic library"
+	depends on BR2_STATIC_LIBS
