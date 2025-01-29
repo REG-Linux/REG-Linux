@@ -1,0 +1,32 @@
+From 60e960b84a37676eb06d7d045799d0d5eeb357d6 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Wed, 1 Jan 2025 07:16:49 +0000
+Subject: [PATCH 40/58] WIP: arm64: dts: amlogic: gxlx-s905l-p271: add saradc
+ compatible
+
+Support for the meson-gxlx-saradc compatible has been merged and can
+be added to the p271 (S905L) board to enable audio output.
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-gxlx-s905l-p271.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxlx-s905l-p271.dts b/arch/arm64/boot/dts/amlogic/meson-gxlx-s905l-p271.dts
+index 942df754a0ed..1221f4545130 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxlx-s905l-p271.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxlx-s905l-p271.dts
+@@ -38,6 +38,10 @@ mali: gpu@c0000 {
+ 	};
+ };
+ 
++&saradc {
++	compatible = "amlogic,meson-gxlx-saradc", "amlogic,meson-saradc";
++};
++
+ &usb {
+ 	dr_mode = "host";
+ };
+-- 
+2.34.1
+

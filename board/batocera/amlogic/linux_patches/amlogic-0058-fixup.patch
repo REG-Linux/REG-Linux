@@ -1,0 +1,45 @@
+From 63d4c5e16a8c8c725d3c20b3b0d7710812307c17 Mon Sep 17 00:00:00 2001
+From: Christian Hewitt <christianshewitt@gmail.com>
+Date: Fri, 10 Jan 2025 01:48:49 +0000
+Subject: [PATCH 58/58] fixup!
+
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+ drivers/gpu/drm/meson/meson_encoder_hdmi.c | 6 +++---
+ drivers/gpu/drm/meson/meson_vclk.c         | 3 ++-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/meson/meson_encoder_hdmi.c b/drivers/gpu/drm/meson/meson_encoder_hdmi.c
+index 2046a71477fd..40431f912a4a 100644
+--- a/drivers/gpu/drm/meson/meson_encoder_hdmi.c
++++ b/drivers/gpu/drm/meson/meson_encoder_hdmi.c
+@@ -110,9 +110,9 @@ static void meson_encoder_hdmi_set_vclk(struct meson_encoder_hdmi *encoder_hdmi,
+ 
+ 	/* Correct phy_freq for YUV420 @ 29.97 or 59.94 */
+ 	/* FIXME find a better way to do this */
+-	if (encoder_hdmi->output_bus_fmt == MEDIA_BUS_FMT_UYYVYY8_0_5X24 &&
+-	    phy_freq == 2967035000)
+-		phy_freq -= 5000ULL;
++	//if (encoder_hdmi->output_bus_fmt == MEDIA_BUS_FMT_UYYVYY8_0_5X24 &&
++	//    phy_freq == 2967035000)
++	//	phy_freq -= 5000ULL;
+ 
+ 	meson_vclk_setup(priv, MESON_VCLK_TARGET_HDMI, phy_freq / 1000ULL,
+ 			 vclk_freq / 1000ULL, venc_freq / 1000ULL, hdmi_freq / 1000ULL,
+diff --git a/drivers/gpu/drm/meson/meson_vclk.c b/drivers/gpu/drm/meson/meson_vclk.c
+index eb4c251d79b7..35884fd4ba1c 100644
+--- a/drivers/gpu/drm/meson/meson_vclk.c
++++ b/drivers/gpu/drm/meson/meson_vclk.c
+@@ -1088,7 +1088,8 @@ void meson_vclk_setup(struct meson_drm *priv, unsigned int target,
+ 
+ 	for (freq = 0 ; params[freq].pixel_freq ; ++freq) {
+ 		if ((phy_freq == params[freq].phy_freq ||
+-		     phy_freq == FREQ_1000_1001(params[freq].phy_freq/10)*10) &&
++		     phy_freq == FREQ_1000_1001(params[freq].phy_freq/10)*10 ||
++		   ((phy_freq/10)*10) == FREQ_1000_1001(params[freq].phy_freq/10)*10) &&
+ 		    (vclk_freq == params[freq].vclk_freq ||
+ 		     vclk_freq == FREQ_1000_1001(params[freq].vclk_freq))) {
+ 			if (vclk_freq != params[freq].vclk_freq)
+-- 
+2.34.1
+

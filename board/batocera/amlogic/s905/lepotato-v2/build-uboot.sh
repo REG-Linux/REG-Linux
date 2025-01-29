@@ -5,7 +5,7 @@ BOARD_DIR=$2
 IMAGES_DIR=$3
 
 # We use the existing uboot-lepotato
-cd u-boot-2023.01
+cd u-boot-2025.01
 
 # Make config
 make libretech-cc_v2_defconfig

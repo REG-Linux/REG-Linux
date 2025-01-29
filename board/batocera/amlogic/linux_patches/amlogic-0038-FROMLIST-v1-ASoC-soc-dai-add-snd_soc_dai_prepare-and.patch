@@ -1,0 +1,79 @@
+From 53a5f81522a4dd7c288f1861924a2c1eb98e7d14 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Mon, 6 Jan 2025 15:13:15 +0100
+Subject: [PATCH 38/58] FROMLIST(v1): ASoC: soc-dai: add snd_soc_dai_prepare()
+ and use it internally
+
+Add a new snd_soc_dai_prepare() which can be used (in an upcoming patch)
+by soc-dapm.c. Use this new function internally in
+snd_soc_pcm_dai_prepare() to avoid duplicating code.
+
+Suggested-by: Jerome Brunet <jbrunet@baylibre.com>
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ include/sound/soc-dai.h |  3 +++
+ sound/soc/soc-dai.c     | 27 +++++++++++++++++++--------
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/include/sound/soc-dai.h b/include/sound/soc-dai.h
+index 0d1b215f24f4..2680836ab28c 100644
+--- a/include/sound/soc-dai.h
++++ b/include/sound/soc-dai.h
+@@ -193,6 +193,9 @@ int snd_soc_dai_set_channel_map(struct snd_soc_dai *dai,
+ 
+ int snd_soc_dai_set_tristate(struct snd_soc_dai *dai, int tristate);
+ 
++int snd_soc_dai_prepare(struct snd_soc_dai *dai,
++			struct snd_pcm_substream *substream);
++
+ /* Digital Audio Interface mute */
+ int snd_soc_dai_digital_mute(struct snd_soc_dai *dai, int mute,
+ 			     int direction);
+diff --git a/sound/soc/soc-dai.c b/sound/soc/soc-dai.c
+index 4e08892d24c6..41328a8832ef 100644
+--- a/sound/soc/soc-dai.c
++++ b/sound/soc/soc-dai.c
+@@ -360,6 +360,22 @@ int snd_soc_dai_set_tristate(struct snd_soc_dai *dai, int tristate)
+ }
+ EXPORT_SYMBOL_GPL(snd_soc_dai_set_tristate);
+ 
++int snd_soc_dai_prepare(struct snd_soc_dai *dai,
++			struct snd_pcm_substream *substream)
++{
++	int ret = 0;
++
++	if (!snd_soc_dai_stream_valid(dai, substream->stream))
++		return 0;
++
++	if (dai->driver->ops &&
++	    dai->driver->ops->prepare)
++		ret = dai->driver->ops->prepare(substream, dai);
++
++	return soc_dai_ret(dai, ret);
++}
++EXPORT_SYMBOL_GPL(snd_soc_dai_prepare);
++
+ /**
+  * snd_soc_dai_digital_mute - configure DAI system or master clock.
+  * @dai: DAI
+@@ -577,14 +593,9 @@ int snd_soc_pcm_dai_prepare(struct snd_pcm_substream *substream)
+ 	int i, ret;
+ 
+ 	for_each_rtd_dais(rtd, i, dai) {
+-		if (!snd_soc_dai_stream_valid(dai, substream->stream))
+-			continue;
+-		if (dai->driver->ops &&
+-		    dai->driver->ops->prepare) {
+-			ret = dai->driver->ops->prepare(substream, dai);
+-			if (ret < 0)
+-				return soc_dai_ret(dai, ret);
+-		}
++		ret = snd_soc_dai_prepare(dai, substream);
++		if (ret < 0)
++			return ret;
+ 	}
+ 
+ 	return 0;
+-- 
+2.34.1
+

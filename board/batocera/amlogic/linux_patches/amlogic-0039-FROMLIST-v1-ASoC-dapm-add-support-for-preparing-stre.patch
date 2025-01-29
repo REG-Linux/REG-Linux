@@ -1,0 +1,52 @@
+From b9e02af3bf8aac6fd3815255b46bcb36fe082911 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Mon, 6 Jan 2025 15:13:16 +0100
+Subject: [PATCH 39/58] FROMLIST(v1): ASoC: dapm: add support for preparing
+ streams
+
+Codec driver can implement .hw_params and/or .prepare from struct
+snd_soc_dai_ops. For codec-to-codec links only the former (.hw_params)
+callback has been called.
+
+On platforms like Amlogic Meson8/8b/8m2 the SoC's sound card
+(sound/soc/meson/gx-card.c) uses a codec-to-codec link for the HDMI
+codec output because further digital routing is required after the
+backend. The new DRM HDMI (audio) codec framework (which internally
+uses sound/soc/codecs/hdmi-codec.c) relies on the .prepare callback
+of the hdmi-codec to be called. Implement a call to
+snd_soc_dai_prepare() so the .prepare callback of the hdmi-codec is
+called on those platforms.
+
+For platforms or sound cards without a codec-to-codec link with
+additional parameters (which applies to most hardware) this changes
+nothing as the .prepare callback is already called via
+snd_pcm_do_prepare() (as well as dpcm_fe_dai_prepare() and
+dpcm_be_dai_prepare()) on those.
+
+Suggested-by: Jerome Brunet <jbrunet@baylibre.com>
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ sound/soc/soc-dapm.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/sound/soc/soc-dapm.c b/sound/soc/soc-dapm.c
+index 99521c784a9b..ac8eef217dc4 100644
+--- a/sound/soc/soc-dapm.c
++++ b/sound/soc/soc-dapm.c
+@@ -4013,6 +4013,13 @@ static int snd_soc_dai_link_event(struct snd_soc_dapm_widget *w,
+ 		break;
+ 
+ 	case SND_SOC_DAPM_POST_PMU:
++		snd_soc_dapm_widget_for_each_sink_path(w, path) {
++			sink = path->sink->priv;
++
++			snd_soc_dai_prepare(sink, substream);
++			ret = 0;
++		}
++
+ 		snd_soc_dapm_widget_for_each_sink_path(w, path) {
+ 			sink = path->sink->priv;
+ 
+-- 
+2.34.1
+

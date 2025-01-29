@@ -1,0 +1,76 @@
+From e6298e5601c435f4b847271bfcf33044a343ec6a Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Fri, 27 Dec 2024 22:25:13 +0100
+Subject: [PATCH 17/58] FROMGIT(6.14): arm64: dts: amlogic: axg: switch to the
+ new PWM controller binding
+
+Use the new PWM controller binding which now relies on passing all
+clock inputs available on the SoC (instead of passing the "wanted"
+clock input for a given board).
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-axg.dtsi | 24 ++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
+index e9b22868983d..a6924d246bb1 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
+@@ -1693,8 +1693,12 @@ sec_AO: ao-secure@140 {
+ 			};
+ 
+ 			pwm_AO_cd: pwm@2000 {
+-				compatible = "amlogic,meson-axg-ao-pwm";
++				compatible = "amlogic,meson-axg-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x02000  0x0 0x20>;
++				clocks = <&xtal>,
++					 <&clkc_AO CLKID_AO_CLK81>,
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV5>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+@@ -1728,8 +1732,12 @@ i2c_AO: i2c@5000 {
+ 			};
+ 
+ 			pwm_AO_ab: pwm@7000 {
+-				compatible = "amlogic,meson-axg-ao-pwm";
++				compatible = "amlogic,meson-axg-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x07000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <&clkc_AO CLKID_AO_CLK81>,
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV5>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+@@ -1806,15 +1814,23 @@ watchdog@f0d0 {
+ 			};
+ 
+ 			pwm_ab: pwm@1b000 {
+-				compatible = "amlogic,meson-axg-ee-pwm";
++				compatible = "amlogic,meson-axg-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x1b000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <&clkc CLKID_FCLK_DIV5>,
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV3>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+ 
+ 			pwm_cd: pwm@1a000 {
+-				compatible = "amlogic,meson-axg-ee-pwm";
++				compatible = "amlogic,meson-axg-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x1a000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <&clkc CLKID_FCLK_DIV5>,
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV3>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+-- 
+2.34.1
+
