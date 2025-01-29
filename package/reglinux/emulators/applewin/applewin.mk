@@ -9,8 +9,7 @@ APPLEWIN_SITE = https://github.com/audetto/AppleWin
 APPLEWIN_SITE_METHOD=git
 APPLEWIN_GIT_SUBMODULES=YES
 APPLEWIN_LICENSE = GPLv2
-APPLEWIN_DEPENDENCIES = sdl2 sdl2_image minizip
-#APPLEWIN_DEPENDENCIES += minizip-zlib
+APPLEWIN_DEPENDENCIES = sdl2 sdl2_image minizip-zlib
 APPLEWIN_DEPENDENCIES += host-xxd libyaml slirp libpcap boost
 
 APPLEWIN_SUPPORTS_IN_SOURCE_BUILD = NO
