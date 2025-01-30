@@ -11,31 +11,16 @@ pcenginecd:
 nds:
   emulator: drastic
   core:     drastic
-flash:
-  emulator: lightspark
-  core:     lightspark
-fmtowns:
-  emulator: libretro
-  core:     mame
 model3:
   emulator: supermodel
   core:     supermodel-legacy
   options:
     videomode: max-1920x1080
-scummvm:
-  emulator: scummvm
-  core:     scummvm
 quake3:
   emulator: ioquake3
   core:     ioquake3
   options:
     videomode: max-1920x1080
-gamecube:
-  emulator: dolphin
-  core:     dolphin
-wii:
-  emulator: dolphin
-  core:     dolphin
 jaguar:
   emulator: bigpemu
   core:     bigpemu
