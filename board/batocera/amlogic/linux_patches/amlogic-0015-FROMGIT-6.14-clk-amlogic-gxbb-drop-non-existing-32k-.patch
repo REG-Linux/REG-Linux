@@ -1,0 +1,57 @@
+From f248ceae106d48ff1b1a81a32fdd5d0f4ad9c40e Mon Sep 17 00:00:00 2001
+From: Jerome Brunet <jbrunet@baylibre.com>
+Date: Fri, 20 Dec 2024 11:25:37 +0100
+Subject: [PATCH 15/58] FROMGIT(6.14): clk: amlogic: gxbb: drop non existing
+ 32k clock parent
+
+The 32k clock reference a parent 'cts_slow_oscin' with a fixme note saying
+that this clock should be provided by AO controller.
+
+The HW probably has this clock but it does not exist at the moment in
+any controller implementation. Furthermore, referencing clock by the global
+name should be avoided whenever possible.
+
+There is no reason to keep this hack around, at least for now.
+
+Fixes: 14c735c8e308 ("clk: meson-gxbb: Add EE 32K Clock for CEC")
+Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ drivers/clk/meson/gxbb.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/clk/meson/gxbb.c b/drivers/clk/meson/gxbb.c
+index 738317b3e274..d9529de200ae 100644
+--- a/drivers/clk/meson/gxbb.c
++++ b/drivers/clk/meson/gxbb.c
+@@ -1272,14 +1272,13 @@ static struct clk_regmap gxbb_cts_i958 = {
+ 	},
+ };
+ 
++/*
++ * This table skips a clock named 'cts_slow_oscin' in the documentation
++ * This clock does not exist yet in this controller or the AO one
++ */
++static u32 gxbb_32k_clk_parents_val_table[] = { 0, 2, 3 };
+ static const struct clk_parent_data gxbb_32k_clk_parent_data[] = {
+ 	{ .fw_name = "xtal", },
+-	/*
+-	 * FIXME: This clock is provided by the ao clock controller but the
+-	 * clock is not yet part of the binding of this controller, so string
+-	 * name must be use to set this parent.
+-	 */
+-	{ .name = "cts_slow_oscin", .index = -1 },
+ 	{ .hw = &gxbb_fclk_div3.hw },
+ 	{ .hw = &gxbb_fclk_div5.hw },
+ };
+@@ -1289,6 +1288,7 @@ static struct clk_regmap gxbb_32k_clk_sel = {
+ 		.offset = HHI_32K_CLK_CNTL,
+ 		.mask = 0x3,
+ 		.shift = 16,
++		.table = gxbb_32k_clk_parents_val_table,
+ 		},
+ 	.hw.init = &(struct clk_init_data){
+ 		.name = "32k_clk_sel",
+-- 
+2.34.1
+

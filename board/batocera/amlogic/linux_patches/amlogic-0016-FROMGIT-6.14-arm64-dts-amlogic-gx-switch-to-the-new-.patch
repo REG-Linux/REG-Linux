@@ -1,0 +1,365 @@
+From 3b97b2884e6416ef0d723c93e381a59b829d1411 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Fri, 27 Dec 2024 22:25:12 +0100
+Subject: [PATCH 16/58] FROMGIT(6.14): arm64: dts: amlogic: gx: switch to the
+ new PWM controller binding
+
+Use the new PWM controller binding which now relies on passing all
+clock inputs available on the SoC (instead of passing the "wanted"
+clock input for a given board).
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ .../dts/amlogic/meson-gx-libretech-pc.dtsi    |  6 -----
+ .../boot/dts/amlogic/meson-gx-p23x-q20x.dtsi  |  2 --
+ arch/arm64/boot/dts/amlogic/meson-gx.dtsi     |  8 +++---
+ .../boot/dts/amlogic/meson-gxbb-nanopi-k2.dts |  2 --
+ .../dts/amlogic/meson-gxbb-nexbox-a95x.dts    |  2 --
+ .../boot/dts/amlogic/meson-gxbb-p20x.dtsi     |  2 --
+ .../boot/dts/amlogic/meson-gxbb-vega-s95.dtsi |  2 --
+ .../boot/dts/amlogic/meson-gxbb-wetek.dtsi    |  2 --
+ arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi   | 25 +++++++++++++++++++
+ .../boot/dts/amlogic/meson-gxl-s805x-p241.dts |  2 --
+ .../meson-gxl-s905w-jethome-jethub-j80.dts    |  2 --
+ .../meson-gxl-s905x-hwacom-amazetv.dts        |  2 --
+ .../amlogic/meson-gxl-s905x-khadas-vim.dts    |  2 --
+ .../amlogic/meson-gxl-s905x-nexbox-a95x.dts   |  2 --
+ .../dts/amlogic/meson-gxl-s905x-p212.dtsi     |  2 --
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    | 25 +++++++++++++++++++
+ .../dts/amlogic/meson-gxm-khadas-vim2.dts     |  4 ---
+ .../boot/dts/amlogic/meson-gxm-rbox-pro.dts   |  2 --
+ 18 files changed, 54 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gx-libretech-pc.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx-libretech-pc.dtsi
+index d38c3a224fbe..2da49cfbde77 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gx-libretech-pc.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gx-libretech-pc.dtsi
+@@ -345,24 +345,18 @@ rtc: rtc@51 {
+ &pwm_AO_ab {
+ 	pinctrl-0 = <&pwm_ao_a_3_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_ab {
+ 	pinctrl-0 = <&pwm_b_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_ef {
+ 	pinctrl-0 = <&pwm_e_pins>, <&pwm_f_clk_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi
+index 45ccddd1aaf0..6da1316d97c6 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gx-p23x-q20x.dtsi
+@@ -240,8 +240,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+index b702a7f7bcf5..260628cf218e 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+@@ -333,14 +333,14 @@ i2c_A: i2c@8500 {
+ 			};
+ 
+ 			pwm_ab: pwm@8550 {
+-				compatible = "amlogic,meson-gx-pwm", "amlogic,meson-gxbb-pwm";
++				compatible = "amlogic,meson-gxbb-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x08550 0x0 0x10>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+ 
+ 			pwm_cd: pwm@8650 {
+-				compatible = "amlogic,meson-gx-pwm", "amlogic,meson-gxbb-pwm";
++				compatible = "amlogic,meson-gxbb-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x08650 0x0 0x10>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+@@ -355,7 +355,7 @@ saradc: adc@8680 {
+ 			};
+ 
+ 			pwm_ef: pwm@86c0 {
+-				compatible = "amlogic,meson-gx-pwm", "amlogic,meson-gxbb-pwm";
++				compatible = "amlogic,meson-gxbb-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x086c0 0x0 0x10>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+@@ -507,7 +507,7 @@ i2c_AO: i2c@500 {
+ 			};
+ 
+ 			pwm_AO_ab: pwm@550 {
+-				compatible = "amlogic,meson-gx-ao-pwm", "amlogic,meson-gxbb-ao-pwm";
++				compatible = "amlogic,meson-gxbb-pwm-v2", "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x00550 0x0 0x10>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-nanopi-k2.dts b/arch/arm64/boot/dts/amlogic/meson-gxbb-nanopi-k2.dts
+index cf2e2ef81680..2ecc6ebd5a43 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-nanopi-k2.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-nanopi-k2.dts
+@@ -298,8 +298,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-nexbox-a95x.dts b/arch/arm64/boot/dts/amlogic/meson-gxbb-nexbox-a95x.dts
+index 7d7dde93fff3..c09da40ff7b0 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-nexbox-a95x.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-nexbox-a95x.dts
+@@ -241,8 +241,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ /* Wireless SDIO Module */
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-p20x.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb-p20x.dtsi
+index 1736bd2e96e2..6f67364fd63f 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-p20x.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-p20x.dtsi
+@@ -150,8 +150,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ /* Wireless SDIO Module */
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-vega-s95.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb-vega-s95.dtsi
+index 3807a184810b..6ff567225fee 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-vega-s95.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-vega-s95.dtsi
+@@ -222,8 +222,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek.dtsi
+index deb295227189..bfedfc1472ec 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb-wetek.dtsi
+@@ -185,8 +185,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+index ed00e67e6923..8ebce7114a60 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+@@ -739,6 +739,31 @@ mux {
+ 	};
+ };
+ 
++&pwm_ab {
++	clocks = <&xtal>,
++		 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++		 <&clkc CLKID_FCLK_DIV4>,
++		 <&clkc CLKID_FCLK_DIV3>;
++};
++
++&pwm_AO_ab {
++	clocks = <&xtal>, <&clkc CLKID_CLK81>;
++};
++
++&pwm_cd {
++	clocks = <&xtal>,
++		 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++		 <&clkc CLKID_FCLK_DIV4>,
++		 <&clkc CLKID_FCLK_DIV3>;
++};
++
++&pwm_ef {
++	clocks = <&xtal>,
++		 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++		 <&clkc CLKID_FCLK_DIV4>,
++		 <&clkc CLKID_FCLK_DIV3>;
++};
++
+ &pwrc {
+ 	resets = <&reset RESET_VIU>,
+ 		 <&reset RESET_VENC>,
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s805x-p241.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s805x-p241.dts
+index c5e2306ad7a4..ca7c4e8e7cac 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s805x-p241.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s805x-p241.dts
+@@ -280,8 +280,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ /* This is connected to the Bluetooth module: */
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905w-jethome-jethub-j80.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905w-jethome-jethub-j80.dts
+index 2b94b6e5285e..4ca90ac947b7 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905w-jethome-jethub-j80.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905w-jethome-jethub-j80.dts
+@@ -116,8 +116,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-hwacom-amazetv.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-hwacom-amazetv.dts
+index 89fe5110f7a2..62a2da766a00 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-hwacom-amazetv.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-hwacom-amazetv.dts
+@@ -115,8 +115,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ /* SD card */
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-khadas-vim.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-khadas-vim.dts
+index 0741d34945bb..e137ebd48c5e 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-khadas-vim.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-khadas-vim.dts
+@@ -213,8 +213,6 @@ &pwm_AO_ab {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_ao_a_3_pins>, <&pwm_ao_b_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal> , <&xtal>;
+-	clock-names = "clkin0", "clkin1" ;
+ };
+ 
+ &pwm_ef {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-nexbox-a95x.dts b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-nexbox-a95x.dts
+index c79f9f2099bf..236cedec9f19 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-nexbox-a95x.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-nexbox-a95x.dts
+@@ -145,8 +145,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ /* Wireless SDIO Module */
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi
+index b52a830efcce..05a0d4de3ad7 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi
+@@ -101,8 +101,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+index f58d1790de1c..2dc2fdaecf9f 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+@@ -809,6 +809,31 @@ internal_phy: ethernet-phy@8 {
+ 	};
+ };
+ 
++&pwm_ab {
++	clocks = <&xtal>,
++		 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++		 <&clkc CLKID_FCLK_DIV4>,
++		 <&clkc CLKID_FCLK_DIV3>;
++};
++
++&pwm_AO_ab {
++	clocks = <&xtal>, <&clkc CLKID_CLK81>;
++};
++
++&pwm_cd {
++	clocks = <&xtal>,
++		 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++		 <&clkc CLKID_FCLK_DIV4>,
++		 <&clkc CLKID_FCLK_DIV3>;
++};
++
++&pwm_ef {
++	clocks = <&xtal>,
++		 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++		 <&clkc CLKID_FCLK_DIV4>,
++		 <&clkc CLKID_FCLK_DIV3>;
++};
++
+ &pwrc {
+ 	resets = <&reset RESET_VIU>,
+ 		 <&reset RESET_VENC>,
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts b/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts
+index 544c757f8bb7..8a89940869b0 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxm-khadas-vim2.dts
+@@ -291,16 +291,12 @@ &pwm_AO_ab {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_ao_a_3_pins>, <&pwm_ao_b_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>, <&pwm_f_clk_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ &sd_emmc_a {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxm-rbox-pro.dts b/arch/arm64/boot/dts/amlogic/meson-gxm-rbox-pro.dts
+index 7356d3b628b1..ecaf678b23dd 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxm-rbox-pro.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-gxm-rbox-pro.dts
+@@ -192,8 +192,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&clkc CLKID_FCLK_DIV4>;
+-	clock-names = "clkin0";
+ };
+ 
+ /* Wireless SDIO Module */
+-- 
+2.34.1
+
