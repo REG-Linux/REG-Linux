@@ -1,0 +1,499 @@
+From 3bd24f271e013ef166e88af74f7ab2931b4fb08c Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Fri, 27 Dec 2024 22:25:14 +0100
+Subject: [PATCH 18/58] FROMGIT(6.14): arm64: dts: amlogic: g12: switch to the
+ new PWM controller binding
+
+Use the new PWM controller binding which now relies on passing all
+clock inputs available on the SoC (instead of passing the "wanted"
+clock input for a given board).
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ .../boot/dts/amlogic/meson-g12-common.dtsi    | 33 ++++++++++++++++---
+ .../boot/dts/amlogic/meson-g12a-fbx8am.dts    |  4 ---
+ .../dts/amlogic/meson-g12a-radxa-zero.dts     |  4 ---
+ .../boot/dts/amlogic/meson-g12a-sei510.dts    |  4 ---
+ .../boot/dts/amlogic/meson-g12a-u200.dts      |  2 --
+ .../boot/dts/amlogic/meson-g12a-x96-max.dts   |  4 ---
+ .../amlogic/meson-g12b-a311d-libretech-cc.dts |  2 --
+ .../dts/amlogic/meson-g12b-bananapi-cm4.dtsi  |  4 ---
+ .../boot/dts/amlogic/meson-g12b-bananapi.dtsi |  4 ---
+ .../dts/amlogic/meson-g12b-khadas-vim3.dtsi   |  4 ---
+ .../boot/dts/amlogic/meson-g12b-odroid.dtsi   |  4 ---
+ .../dts/amlogic/meson-g12b-radxa-zero2.dts    |  8 -----
+ .../boot/dts/amlogic/meson-g12b-w400.dtsi     |  6 ----
+ .../amlogic/meson-libretech-cottonwood.dtsi   |  6 ----
+ .../boot/dts/amlogic/meson-sm1-ac2xx.dtsi     |  6 ----
+ .../boot/dts/amlogic/meson-sm1-bananapi.dtsi  |  2 --
+ .../dts/amlogic/meson-sm1-khadas-vim3l.dts    |  2 --
+ .../boot/dts/amlogic/meson-sm1-odroid.dtsi    |  2 --
+ .../boot/dts/amlogic/meson-sm1-sei610.dts     |  6 ----
+ 19 files changed, 28 insertions(+), 79 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+index 0bc28eb2079b..705c1c56112f 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+@@ -2060,8 +2060,11 @@ cecb_AO: cec@280 {
+ 			};
+ 
+ 			pwm_AO_cd: pwm@2000 {
+-				compatible = "amlogic,meson-g12a-ao-pwm-cd";
++				compatible = "amlogic,meson-g12-pwm-v2",
++					     "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x2000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <&clkc_AO CLKID_AO_CLK81>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+@@ -2099,8 +2102,13 @@ i2c_AO: i2c@5000 {
+ 			};
+ 
+ 			pwm_AO_ab: pwm@7000 {
+-				compatible = "amlogic,meson-g12a-ao-pwm-ab";
++				compatible = "amlogic,meson-g12-pwm-v2",
++					     "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x7000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <&clkc_AO CLKID_AO_CLK81>,
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV5>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+@@ -2301,22 +2309,37 @@ spifc: spi@14000 {
+ 			};
+ 
+ 			pwm_ef: pwm@19000 {
+-				compatible = "amlogic,meson-g12a-ee-pwm";
++				compatible = "amlogic,meson-g12-pwm-v2",
++					     "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x19000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV3>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+ 
+ 			pwm_cd: pwm@1a000 {
+-				compatible = "amlogic,meson-g12a-ee-pwm";
++				compatible = "amlogic,meson-g12-pwm-v2",
++					     "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x1a000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV3>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+ 
+ 			pwm_ab: pwm@1b000 {
+-				compatible = "amlogic,meson-g12a-ee-pwm";
++				compatible = "amlogic,meson-g12-pwm-v2",
++					     "amlogic,meson8-pwm-v2";
+ 				reg = <0x0 0x1b000 0x0 0x20>;
++				clocks = <&xtal>,
++					 <>, /* unknown/untested, the datasheet calls it "vid_pll" */
++					 <&clkc CLKID_FCLK_DIV4>,
++					 <&clkc CLKID_FCLK_DIV3>;
+ 				#pwm-cells = <3>;
+ 				status = "disabled";
+ 			};
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12a-fbx8am.dts b/arch/arm64/boot/dts/amlogic/meson-g12a-fbx8am.dts
+index a457b3f4397b..9aa36f17ffa2 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12a-fbx8am.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12a-fbx8am.dts
+@@ -346,8 +346,6 @@ &ir {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+@@ -355,8 +353,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &pdm {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12a-radxa-zero.dts b/arch/arm64/boot/dts/amlogic/meson-g12a-radxa-zero.dts
+index c779a5da7d1e..952b8d02e5c2 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12a-radxa-zero.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12a-radxa-zero.dts
+@@ -284,8 +284,6 @@ &ir {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+@@ -293,8 +291,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12a-sei510.dts b/arch/arm64/boot/dts/amlogic/meson-g12a-sei510.dts
+index ea51341f031b..52fbc5103e45 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12a-sei510.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12a-sei510.dts
+@@ -389,8 +389,6 @@ &ir {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+@@ -398,8 +396,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &pdm {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12a-u200.dts b/arch/arm64/boot/dts/amlogic/meson-g12a-u200.dts
+index f70a46967e2b..5407049d2647 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12a-u200.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12a-u200.dts
+@@ -502,8 +502,6 @@ &i2c3 {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12a-x96-max.dts b/arch/arm64/boot/dts/amlogic/meson-g12a-x96-max.dts
+index 32f98a192494..01da83658ae3 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12a-x96-max.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12a-x96-max.dts
+@@ -328,8 +328,6 @@ &ir {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+@@ -363,8 +361,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &uart_A {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-a311d-libretech-cc.dts b/arch/arm64/boot/dts/amlogic/meson-g12b-a311d-libretech-cc.dts
+index 65b963d794cd..adedc1340c78 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-a311d-libretech-cc.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-a311d-libretech-cc.dts
+@@ -116,6 +116,4 @@ &cpu103 {
+ 
+ &pwm_ab {
+ 	pinctrl-0 = <&pwm_a_e_pins>, <&pwm_b_x7_pins>;
+-	clocks = <&xtal>, <&xtal>;
+-	clock-names = "clkin0", "clkin1";
+ };
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi-cm4.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi-cm4.dtsi
+index 08c33ec7e9f1..92e8b26ecccc 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi-cm4.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi-cm4.dtsi
+@@ -257,8 +257,6 @@ &pcie {
+ &pwm_ab {
+ 	pinctrl-0 = <&pwm_a_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 
+ 	status = "okay";
+ };
+@@ -273,8 +271,6 @@ &pwm_ef {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi.dtsi
+index d4e1990b5f26..54663c55a20e 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-bananapi.dtsi
+@@ -367,8 +367,6 @@ &pwm_ab {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_a_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &pwm_ef {
+@@ -380,8 +378,6 @@ &pwm_ef {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-khadas-vim3.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12b-khadas-vim3.dtsi
+index 16dd409051b4..48650bad230d 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-khadas-vim3.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-khadas-vim3.dtsi
+@@ -92,16 +92,12 @@ &cpu103 {
+ &pwm_ab {
+ 	pinctrl-0 = <&pwm_a_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-odroid.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12b-odroid.dtsi
+index 09d959aefb18..7e8964bacfce 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-odroid.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-odroid.dtsi
+@@ -327,16 +327,12 @@ hdmi_tx_tmds_out: endpoint {
+ &pwm_ab {
+ 	pinctrl-0 = <&pwm_a_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-radxa-zero2.dts b/arch/arm64/boot/dts/amlogic/meson-g12b-radxa-zero2.dts
+index 39feba7f2d08..fc05ecf90714 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-radxa-zero2.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-radxa-zero2.dts
+@@ -379,32 +379,24 @@ &ir {
+ &pwm_ab {
+ 	pinctrl-0 = <&pwm_a_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_ef {
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_AO_ab {
+ 	pinctrl-0 = <&pwm_ao_a_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
+index 4cb6930ffb19..a7a0fc264cdc 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi
+@@ -304,24 +304,18 @@ &ir {
+ &pwm_ab {
+ 	pinctrl-0 = <&pwm_a_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+ &pwm_ef {
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-libretech-cottonwood.dtsi b/arch/arm64/boot/dts/amlogic/meson-libretech-cottonwood.dtsi
+index 929e4720ae76..ac9c4c2673b1 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-libretech-cottonwood.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-libretech-cottonwood.dtsi
+@@ -458,24 +458,18 @@ &pwm_AO_cd {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ };
+ 
+ &pwm_ab {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_b_x7_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ };
+ 
+ &pwm_cd {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_d_x3_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-sm1-ac2xx.dtsi b/arch/arm64/boot/dts/amlogic/meson-sm1-ac2xx.dtsi
+index d1fa8b8bf795..a3463149db3d 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-sm1-ac2xx.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-sm1-ac2xx.dtsi
+@@ -199,15 +199,11 @@ &pwm_AO_ab {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_ao_a_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+@@ -215,8 +211,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-sm1-bananapi.dtsi b/arch/arm64/boot/dts/amlogic/meson-sm1-bananapi.dtsi
+index 81dce862902a..40db95f64636 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-sm1-bananapi.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-sm1-bananapi.dtsi
+@@ -367,8 +367,6 @@ &ir {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-sm1-khadas-vim3l.dts b/arch/arm64/boot/dts/amlogic/meson-sm1-khadas-vim3l.dts
+index 9c0b544e2209..5d75ad3f3e46 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-sm1-khadas-vim3l.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-sm1-khadas-vim3l.dts
+@@ -78,8 +78,6 @@ &cpu3 {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-sm1-odroid.dtsi b/arch/arm64/boot/dts/amlogic/meson-sm1-odroid.dtsi
+index 7b0e9817a615..ad8d07883760 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-sm1-odroid.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-sm1-odroid.dtsi
+@@ -392,8 +392,6 @@ &ir {
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm64/boot/dts/amlogic/meson-sm1-sei610.dts b/arch/arm64/boot/dts/amlogic/meson-sm1-sei610.dts
+index 2e3397e55da2..37d7f64b6d5d 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-sm1-sei610.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-sm1-sei610.dts
+@@ -435,15 +435,11 @@ &pwm_AO_ab {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_ao_a_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &pwm_AO_cd {
+ 	pinctrl-0 = <&pwm_ao_d_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin1";
+ 	status = "okay";
+ };
+ 
+@@ -451,8 +447,6 @@ &pwm_ef {
+ 	status = "okay";
+ 	pinctrl-0 = <&pwm_e_pins>;
+ 	pinctrl-names = "default";
+-	clocks = <&xtal>;
+-	clock-names = "clkin0";
+ };
+ 
+ &saradc {
+-- 
+2.34.1
+
