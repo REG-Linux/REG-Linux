@@ -11,9 +11,6 @@ pcenginecd:
 nds:
   emulator: drastic
   core:     drastic
-flash:
-  emulator: lightspark
-  core:     lightspark
 fmtowns:
   emulator: libretro
   core:     mame
@@ -22,9 +19,6 @@ model3:
   core:     supermodel-legacy
   options:
     videomode: max-720x576
-scummvm:
-  emulator: scummvm
-  core:     scummvm
 quake3:
   emulator: ioquake3
   core:     ioquake3
