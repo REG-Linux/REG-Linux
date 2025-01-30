@@ -15,20 +15,20 @@ determine_part_prefix() {
     # sometimes, it's pX, sometimes just an X : http://www.tldp.org/HOWTO/Partition-Mass-Storage-Definitions-Naming-HOWTO/x160.html
     if echo "${1}" | grep -qE 'p[0-9]$'
     then
-	echo "$1" | sed -e s+'p[0-9]$'+''+
-	return 0
+        echo "$1" | sed -e s+'p[0-9]$'+''+
+        return 0
     fi
     echo "$1" | sed -e s+'[0-9]$'++
 }
 
 disks_to_keep() {
     grep -E '^[^ ]* /boot |^[^ ]* /userdata' /proc/mounts | sed -e s+"^\([^ ]*\) .*$"+'\1'+ |
-	while read X
-	do
-	    determine_part_prefix "${X}"
-	done |
-	sed -e s+'^/dev/'++ |
-	sort -u
+    while read X
+    do
+        determine_part_prefix "${X}"
+    done |
+    sed -e s+'^/dev/'++ |
+    sort -u
 }
 
 do_listDisks() {
@@ -52,19 +52,19 @@ do_listDisks() {
 
 do_listFstypes() {
     echo "ext4"
-    echo "btrfs"
     echo "exfat"
+    echo "btrfs"
+    echo "ntfs"
 }
-
 
 do_unmount_disk() {
     UDSK=$1
 
     grep "/dev/${UDSK}" /proc/mounts | cut -d ' ' -f 2 |
-	while read X
-	do
-	    umount "${X}"
-	done
+    while read X
+    do
+        umount "${X}"
+    done
 
     grep -qE "^/dev/${UDSK}" /proc/mounts && return 1
     return 0
@@ -76,15 +76,15 @@ do_format() {
 
     if ! test -e "/dev/${FORMATDISK}"
     then
-	echo "invalid disk ${FORMATDISK}" >&2
-	return 1
+        echo "invalid disk ${FORMATDISK}" >&2
+        return 1
     fi
 
     # unmount mounts associated with the disk
     if ! do_unmount_disk "${FORMATDISK}"
     then
-	echo "unable to free the disk ${FORMATDISK}" >&2
-	return 1
+        echo "unable to free the disk ${FORMATDISK}" >&2
+        return 1
     fi
 
     # erasing the current position headers of the coming partition
@@ -101,51 +101,54 @@ do_format() {
     echo "creating 1 partition on ${FORMATDISK}..."
     parted -s "/dev/${FORMATDISK}" -m unit b mkpart primary 2M 100% || return 1
 
-    # sometimes, it's pX, sometimes just an X : http://www.tldp.org/HOWTO/Partition-Mass-Storage-Definitions-Naming-HOWTO/x160.html
+    # sometimes, it's pX, sometimes just an X
     # sometimes, the partition takes time to appear
     FORMATPARTNAME=
     DO_CONTINUE=10
     while test "${DO_CONTINUE}" -ge 1
     do
-	TESTEDPARTNAME="/dev/${FORMATDISK}p1"
-	if test -e "${TESTEDPARTNAME}"
-	then
-	    FORMATPARTNAME=${TESTEDPARTNAME}
-	    DO_CONTINUE=0
-	else
-	    TESTEDPARTNAME="/dev/${FORMATDISK}1"
-	    if test -e "${TESTEDPARTNAME}"
-	    then
-		FORMATPARTNAME=${TESTEDPARTNAME}
-		DO_CONTINUE=0
-	    else
-		# wait a bit
-		let DO_CONTINUE--
-		sleep 1
-	    fi
-	fi
+        TESTEDPARTNAME="/dev/${FORMATDISK}p1"
+        if test -e "${TESTEDPARTNAME}"
+        then
+            FORMATPARTNAME=${TESTEDPARTNAME}
+            DO_CONTINUE=0
+        else
+            TESTEDPARTNAME="/dev/${FORMATDISK}1"
+            if test -e "${TESTEDPARTNAME}"
+            then
+            FORMATPARTNAME=${TESTEDPARTNAME}
+            DO_CONTINUE=0
+            else
+            # wait a bit
+            (( DO_CONTINUE-- ))
+            sleep 1
+            fi
+        fi
     done
 
     if test -z "${FORMATPARTNAME}"
     then
-	echo "created partition not found for ${FORMATDISK}" >&2
-	return 1
+        echo "created partition not found for ${FORMATDISK}" >&2
+        return 1
     fi
 
     echo "formatting partition ${FORMATPARTNAME} in ${FORMATTYPE}"
     case "${FORMATTYPE}" in
-	"btrfs")
-	    mkfs.btrfs -L SHARE "${FORMATPARTNAME}" || return 1
-	;;
-	"ext4")
-	    mkfs.ext4 -L SHARE "${FORMATPARTNAME}" || return 1
-	;;
-	"exfat")
-	    mkfs.exfat -n SHARE "${FORMATPARTNAME}" || return 1
-	;;
-	*)
-	    echo "unknown partition type ${FORMATTYPE}" >&2
-	    return 1
+        "btrfs")
+            mkfs.btrfs -L SHARE "${FORMATPARTNAME}" || return 1
+        ;;
+        "ext4")
+            mkfs.ext4 -L SHARE "${FORMATPARTNAME}" || return 1
+        ;;
+        "exfat")
+            mkfs.exfat -n SHARE "${FORMATPARTNAME}" || return 1
+        ;;
+        "ntfs")
+            mkfs.ntfs -f -L SHARE "${FORMATPARTNAME}" || return 1
+        ;;
+        *)
+            echo "unknown partition type ${FORMATTYPE}" >&2
+            return 1
     esac
 
     echo "synchronizing..."
@@ -157,16 +160,16 @@ do_format_internal() {
     PARTTYPE=$1
     CONFIGBOOT="/boot/system-boot.conf"
 
-    if test "${PARTTYPE}" != "btrfs" -a "${PARTTYPE}" != "ext4" -a "${PARTTYPE}" != "exfat"
+    if test "${PARTTYPE}" != "btrfs" -a "${PARTTYPE}" != "ext4" -a "${PARTTYPE}" != "exfat" -a "${PARTTYPE}" != "ntfs"
     then
-	echo "brtfs, ext4 or exfat expected" >&2
-	return 1
+        echo "brtfs, ext4, exfat or ntfs expected" >&2
+        return 1
     fi
 
     if mount -o remount,rw /boot
     then
-	if grep -qE "^[ #]*format-internal[ ]*=.*$" "${CONFIGBOOT}"
-	then
+        if grep -qE "^[ #]*format-internal[ ]*=.*$" "${CONFIGBOOT}"
+        then
             sed -i "s|^[ #]*format-internal[ ]*=.*$|format-internal=${PARTTYPE}|g" "${CONFIGBOOT}"
         else
             echo >> "${CONFIGBOOT}"     # Just in case CONFIGBOOT does nor end with new line 
@@ -176,9 +179,9 @@ do_format_internal() {
         # Trigger REG_UPDATE to do format on next boot
         touch /boot/REG_UPDATE
 
-	mount -o remount,ro /boot
-	echo "the formatting will be done at next boot"
-	return 69 # 69 is the reboot code to es
+        mount -o remount,ro /boot
+        echo "the formatting will be done at next boot"
+        return 69 # 69 is the reboot code to es
     fi
     return 1
 }
@@ -188,27 +191,27 @@ shift
 
 case "${ACTION}" in
     listDisks)
-	do_listDisks
-	;;
+        do_listDisks
+    ;;
     listFstypes)
-	do_listFstypes
-	;;
+        do_listFstypes
+    ;;
     format)
-	if test $# -ne 2
-	then
-	    do_help
-	    exit 1
-	fi
-	if test "${1}" = "INTERNAL"
-	then
-	    do_format_internal "${2}"
-	    exit $?
-	else
-	    do_format "${1}" "${2}"
-	    exit $?
-	fi
-	;;
+        if test $# -ne 2
+        then
+            do_help
+            exit 1
+        fi
+        if test "${1}" = "INTERNAL"
+        then
+            do_format_internal "${2}"
+            exit $?
+        else
+            do_format "${1}" "${2}"
+            exit $?
+        fi
+    ;;
     *)
-	do_help "${0}"
+        do_help "${0}"
 esac
 exit 0

@@ -32,7 +32,7 @@ INTERNALDEVICE=$(system-part "share_internal")
 INTERNALDEVICETYPE=$(blkid -o value -s TYPE "${INTERNALDEVICE}")
 
 SHAREDEVICE=$(cat "${SHARECONFFILE}" | grep -m 1 -E '^[ ]*sharedevice=' | cut -d'=' -f2)
-[ "$?" -ne "0" -o "$SHAREDEVICE" = "" ] && SHAREDEVICE=INTERNAL
+[ "$?" -ne "0" ] || [ "$SHAREDEVICE" = "" ] && SHAREDEVICE="INTERNAL"
 
 getMaxTryConfig() {
     SHARECONFFILE=${1}
@@ -56,18 +56,18 @@ mountRAMDisk() {
 mountDeviceOrFallback() {
     DEVICE=$1
     TDEVICE=$2
-    BATOCERAFULLFS="/var/batocerafs"
+    REGLINUXFULLFS="/var/reglinuxfs"
     FALLBACK=1
 
     if [ -n "${DEVICE}" ]
     then
-        if mkdir -p "${BATOCERAFULLFS}"
+        if mkdir -p "${REGLINUXFULLFS}"
         then
-            if system-mount "${TDEVICE}" 1 "${DEVICE}" "${BATOCERAFULLFS}"
+            if system-mount "${TDEVICE}" 1 "${DEVICE}" "${REGLINUXFULLFS}"
             then
-                if mkdir -p "${BATOCERAFULLFS}/batocera"
+                if mkdir -p "${REGLINUXFULLFS}/reglinux"
                 then
-                    if mount --bind "${BATOCERAFULLFS}/batocera" "/userdata" -o "noatime"
+                    if mount --bind "${REGLINUXFULLFS}/reglinux" "/userdata" -o "noatime"
                     then
                         FALLBACK=0
                     fi
@@ -106,10 +106,10 @@ mountPartSubdir() {
     CMD_PART=$2
     CMD_SUBDIR=$3
     CMD_TDIR=$4
-    mkdir -p "/var/batocera_subdir_${CMD_KEYPART}" || return 1
-    mountPartByTag "UUID=${CMD_PART}" "/var/batocera_subdir_${CMD_KEYPART}" || return 1
-    mkdir -p "/var/batocera_subdir_${CMD_KEYPART}/${CMD_SUBDIR}" || return 1
-    mount --bind "/var/batocera_subdir_${CMD_KEYPART}/${CMD_SUBDIR}" "${CMD_TDIR}" || return 1
+    mkdir -p "/var/reglinux_subdir_${CMD_KEYPART}" || return 1
+    mountPartByTag "UUID=${CMD_PART}" "/var/reglinux_subdir_${CMD_KEYPART}" || return 1
+    mkdir -p "/var/reglinux_subdir_${CMD_KEYPART}/${CMD_SUBDIR}" || return 1
+    mount --bind "/var/reglinux_subdir_${CMD_KEYPART}/${CMD_SUBDIR}" "${CMD_TDIR}" || return 1
     return 0
 }
 
@@ -120,20 +120,20 @@ mountDevicesOrNetwork() {
     # Basic commands : sharenetwork_<nfs|smb><[0-9]>=<DIR>@<host>:<remote directory>:<mount options>
     # Where <DIR> can be one of SHARE|ROMS|SAVES|BIOS|MUSIC|DECORATIONS|SCREENSHOTS|THEMES|CHEATS|SOUNDS|LIBRARY|CONFIGS
     #
-    # sharenetwork_nfs1=SHARE@192.168.0.1:/Documents/batocera
+    # sharenetwork_nfs1=SHARE@192.168.0.1:/Documents/reglinux
     # or
-    # sharenetwork_nfs1=ROMS@192.168.0.1:/Documents/batocera/roms
-    # sharenetwork_nfs2=SAVES@192.168.0.1:/Documents/batocera/saves
+    # sharenetwork_nfs1=ROMS@192.168.0.1:/Documents/reglinux/roms
+    # sharenetwork_nfs2=SAVES@192.168.0.1:/Documents/reglinux/saves
     # or
-    # sharenetwork_smb1=SHARE@192.168.0.1:Documents/batocera:guest
+    # sharenetwork_smb1=SHARE@192.168.0.1:Documents/reglinux:guest
     #
     # Advanced commands : sharenetwork_cmd<[0-9]>=<command to run>
-    # sharenetwork_cmd1=mount -o port=2049,nolock,proto=tcp 192.168.0.1:/Documents/batocera /userdata
+    # sharenetwork_cmd1=mount -o port=2049,nolock,proto=tcp 192.168.0.1:/Documents/reglinux /userdata
     # or
-    # sharenetwork_cmd1=mount -o port=2049,nolock,proto=tcp 192.168.0.1:/Documents/batocera/roms /userdata/roms
-    # sharenetwork_cmd2=mount -o port=2049,nolock,proto=tcp 192.168.0.1:/Documents/batocera/saves /userdata/saves
+    # sharenetwork_cmd1=mount -o port=2049,nolock,proto=tcp 192.168.0.1:/Documents/reglinux/roms /userdata/roms
+    # sharenetwork_cmd2=mount -o port=2049,nolock,proto=tcp 192.168.0.1:/Documents/reglinux/saves /userdata/saves
     # or
-    # sharenetwork_cmd1=mount.cifs //192.168.0.1/batocera /userdata -o guest
+    # sharenetwork_cmd1=mount.cifs //192.168.0.1/reglinux /userdata -o guest
     #
     # mounting full partitions or sub folders of partitions on top of the internal partition
     # sharedevice=DEVICES
@@ -178,7 +178,7 @@ mountDevicesOrNetwork() {
 			    return 1
 		    esac
 
-                    # MAP to the batocera directory
+                    # MAP to the SHARE directory
                     CMD_TDIR="/userdata"
                     case "${CMD_TARGET}" in
                         "SHARE")
@@ -282,7 +282,7 @@ fi
 VGSCAN=/usr/sbin/vgscan
 VGCHANGE=/usr/sbin/vgchange
 
-if [ -x ${VGSCAN} -a -x ${VGCHANGE} ]
+if [ -x ${VGSCAN} ] && [ -x ${VGCHANGE} ]
 then
     ${VGSCAN}
     ${VGCHANGE} -ay
@@ -291,7 +291,7 @@ fi
 case "${MODE}" in
     "DEV")
         LDEVICE=$(blkid | grep -m 1 " UUID=\"${UUID}\"")
-        while [ -z "${LDEVICE}" -a "${NTRY}" -lt "${MAXTRY}" ] # wait the device that can take some seconds after udev started
+        while [ -z "${LDEVICE}" ] && [ "${NTRY}" -lt "${MAXTRY}" ] # wait the device that can take some seconds after udev started
         do
             NTRY=$((NTRY+1))
             sleep 1
@@ -352,13 +352,6 @@ then
         mount -o remount,compress-force=zstd,autodefrag /userdata || exit 1
     fi
 fi
-
-# some custom files, like extension_strace.tar.gz or gdb.
-find /userdata/system -maxdepth 1 -name "extension_*.tar.gz" |
-    while read FILE
-    do
-	(cd / && gunzip -c "${FILE}" | tar xf -)
-    done
 
 # now, let mount delayed usbmount devices
 ls /var/run/usbmount.delay |
