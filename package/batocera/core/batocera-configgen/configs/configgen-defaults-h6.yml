@@ -11,9 +11,6 @@ nds:
 fmtowns:
   emulator: libretro
   core:     mame
-flash:
-  emulator: lightspark
-  core:     lightspark
 atomiswave:
   emulator: flycast
   core:     flycast
