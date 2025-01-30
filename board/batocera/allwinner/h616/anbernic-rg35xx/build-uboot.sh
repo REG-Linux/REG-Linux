@@ -21,7 +21,7 @@ PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/allwinner/h616/patches/ubo
 for patch in $PATCHES
 do
 echo "Applying patch: $patch"
-patch -p1 < $patchmake
+patch -p1 < $patch
 done
 
 # Build bootloader
