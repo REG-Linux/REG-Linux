@@ -4,20 +4,8 @@ pcengine:
 pcenginecd:
   emulator: libretro
   core:     pce
-gamecube:
-  emulator: dolphin
-  core:     dolphin
-wii:
-  emulator: dolphin
-  core:     dolphin
 advision:
   emulator: mame
-  core:     mame
-flash:
-  emulator: lightspark
-  core:     lightspark
-fmtowns:
-  emulator: libretro
   core:     mame
 lcdgames:
   emulator: mame

@@ -1,22 +1,12 @@
 3ds:
   emulator: libretro
   core:     panda3ds
-gamecube:
-  emulator: libretro
-  core:     dolphin
 nds:
   emulator: libretro
   core:     melonds
-wii:
-  emulator: libretro
-  core:     dolphin
 fmtowns:
   emulator: libretro
   core:     mame
 ps2:
   emulator: libretro
   core:     play
-flash:
-  emulator: lightspark
-  core:     lightspark
-
