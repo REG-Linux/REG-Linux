@@ -17,7 +17,7 @@ tar xf u-boot-${UBOOT_VERSION}.tar.bz2
 cd u-boot-${UBOOT_VERSION}
 
 # Apply patches if any
-PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/allwinner/h616/patches/uboot-rg35xx/*.patch"
+PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/allwinner/h616/patches/u-boot/*.patch"
 for patch in $PATCHES
 do
 echo "Applying patch: $patch"
@@ -27,9 +27,9 @@ done
 # Build bootloader
 export BL31="${BINARIES_DIR}/bl31.bin"
 export CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-"
-ARCH=aarch64 make anbernic_rg35xx_h700_defconfig
+ARCH=aarch64 make orangepi_zero2_defconfig
 ARCH=aarch64 make -j$(nproc)
 
 # Copy generated files
-mkdir -p "${IMAGES_DIR}/reglinux/uboot-anbernic-rg35xx"
-cp u-boot-sunxi-with-spl.bin ../../uboot-anbernic-rg35xx/
+mkdir -p "${IMAGES_DIR}/reglinux/uboot-orangepi-zero2"
+cp u-boot-sunxi-with-spl.bin ../../uboot-orangepi-zero2/

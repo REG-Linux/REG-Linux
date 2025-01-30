@@ -4,9 +4,6 @@ nds:
 fmtowns:
   emulator: libretro
   core:     mame
-flash:
-  emulator: lightspark
-  core:     lightspark
 model3:
   emulator: supermodel
   core:     supermodel-legacy
