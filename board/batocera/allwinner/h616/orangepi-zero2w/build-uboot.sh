@@ -17,12 +17,12 @@ tar xf u-boot-${UBOOT_VERSION}.tar.bz2
 cd u-boot-${UBOOT_VERSION}
 
 # Apply patches if any
-#PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/allwinner/h616/patches/uboot/*.patch"
-#for patch in $PATCHES
-#do
-#echo "Applying patch: $patch"
-#patch -p1 < $patchmake
-#done
+PATCHES="${BR2_EXTERNAL_REGLINUX_PATH}/board/batocera/allwinner/h616/patches/u-boot/*.patch"
+for patch in $PATCHES
+do
+echo "Applying patch: $patch"
+patch -p1 < $patch
+done
 
 # Build bootloader
 export BL31="${BINARIES_DIR}/bl31.bin"
