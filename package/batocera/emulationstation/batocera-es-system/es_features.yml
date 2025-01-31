@@ -333,7 +333,7 @@ libretro:
   shared: [powermode, tdp, videomode, ratio, shaderset, smooth, integerscale, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, ai_service_enabled, ai_target_lang, ai_service_url, ai_service_pause, runahead, secondinstance, video_frame_delay_auto, vrr_runloop_enable, video_threaded, rumble_gain, audio_volume, bordersmode]
   cfeatures:
     gfxbackend:
-      archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+      archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
       prompt:      GRAPHICS API
       description: Choose which graphics API library to use. Vulkan may not work for every core.
       choices:
@@ -6948,7 +6948,7 @@ lime3ds:
                 "9x (3600x2160)":  9
                 "10x (4000x2400)": 10
         lime3ds_graphics_api:
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             submenu: GRAPHICS
             prompt: GRAPHICS API
             description: Choose which graphics API library to use.
@@ -7032,7 +7032,7 @@ citra:
                 "9x (3600x2160)":  9
                 "10x (4000x2400)": 10
         citra_graphics_api:
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             submenu: GRAPHICS
             prompt: GRAPHICS API
             description: Choose which graphics API library to use.
@@ -7089,7 +7089,7 @@ hypseus-singe:
   shared: [powermode, tdp, videomode, use_guns]
   cfeatures:
         hypseus_api:
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             prompt: GRAPHICS API
             description: Choose which graphics API library to use. Vulkan may not work on all hardware.
             choices:
@@ -7116,7 +7116,7 @@ hypseus-singe:
             prompt: SMOOTH GAMES (BILINEAR FILTERING)
             preset: switchoff
         hypseus_scanlines:
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             group: ADVANCED OPTIONS
             prompt: SCANLINES
             choices:
@@ -7198,7 +7198,7 @@ dolphin:
             description: Fix screen tearing. CPU heavy.
             preset: switchon
         gfxbackend:
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             submenu: RENDERING
             prompt:  GRAPHICS API
             description: Choose which graphics API library to use.
@@ -7754,7 +7754,7 @@ duckstation:
                 "Enabled":            "true"
         duckstation_gfxbackend:
             submenu: DISPLAY
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             prompt: GRAPHICS API
             description: Choose which graphics API library to use.
             choices:
@@ -8934,7 +8934,7 @@ ppsspp:
   shared: [powermode, tdp, videomode, ratio, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, rewind]
   cfeatures:
         gfxbackend:
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             prompt: GRAPHICS API
             description: Choose which graphics API library to use.
             choices:
@@ -9661,7 +9661,7 @@ mame:
                 "Off (Default)": 0
                 "On":            1
         bgfxbackend:
-            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, sm8250, sd845]
+            archs_include: [x86, x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sm8250, sd845]
             prompt:      BGFX GRAPHICS API
             description: Depends on video mode being set to BGFX.
             choices:
