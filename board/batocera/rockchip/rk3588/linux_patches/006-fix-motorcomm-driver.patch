@@ -1,0 +1,23 @@
+From 344c42259f39a2cef7f34ef19dc820960f992ba6 Mon Sep 17 00:00:00 2001
+From: Tiziano Bacocco <tizbac2@gmail.com>
+Date: Tue, 28 Jan 2025 19:53:40 +0100
+Subject: [PATCH] net: ethernet: Fix motorcomm driver hardcoded "m" for
+ CONFIG_FUXI
+
+---
+ drivers/net/ethernet/motorcomm/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/motorcomm/Makefile b/drivers/net/ethernet/motorcomm/Makefile
+index 5fffa586fecd5..2025997c2bb4b 100755
+--- a/drivers/net/ethernet/motorcomm/Makefile
++++ b/drivers/net/ethernet/motorcomm/Makefile
+@@ -23,7 +23,7 @@ ifneq ($(filter arm arm64, $(ARCH)),)
+ 	endif
+ endif
+ yt6801-objs :=  fuxi-gmac-common.o fuxi-gmac-desc.o fuxi-gmac-ethtool.o fuxi-gmac-hw.o fuxi-gmac-net.o fuxi-gmac-pci.o fuxi-gmac-phy.o fuxi-efuse.o fuxi-dbg.o fuxi-gmac-debugfs.o
+-obj-m += yt6801.o
++obj-$(CONFIG_FUXI) += yt6801.o
+ modules:
+ 	make -C $(KSRC) M=$(PWD) modules
+ install:
