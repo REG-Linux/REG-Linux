@@ -1,0 +1,529 @@
+From e9588945245e96b6c721e683a31d429fe1621ffb Mon Sep 17 00:00:00 2001
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Mon, 11 Sep 2023 15:00:07 +0200
+Subject: [PATCH] Add CMake option to support using system-wide ffmpeg,
+ preliminary Wayland & GLES support
+
+---
+ CMakeLists.txt                                |   1 +
+ cmake/FindFFmpeg.cmake                        | 151 ++++++++++++++++++
+ src/emu/drivers/CMakeLists.txt                |  23 ++-
+ .../drivers/include/drivers/CMakeLists.txt    |  13 +-
+ src/emu/drivers/src/graphics/context.cpp      |  12 +-
+ src/emu/qt/CMakeLists.txt                     |   5 +
+ src/external/CMakeLists.txt                   |  10 +-
+ 7 files changed, 205 insertions(+), 10 deletions(-)
+ create mode 100644 cmake/FindFFmpeg.cmake
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 51fc005748..f6583b63f4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -13,6 +13,9 @@ option(EKA2L1_BUILD_VULKAN_BACKEND "Build Vulkan backend" OFF)
+ option(EKA2L1_DEPLOY_DMG "Deploy EKA2L1 as .dmg" OFF)
+ option(EKA2L1_BUILD_PATCH "Enable building Symbian's DLL patches using Symbian SDK" OFF)
+ option(EKA2L1_ENABLE_DISCORD_RICH_PRESENCE "Enable support for Discord Rich Presence" OFF)
++option(EKA2L1_USE_SYSTEM_FFPEG "Use system-wide FFMPEG instead of prebuilt libraries" OFF)
++option(EKA2L1_UNIX_USE_X11 "Use X11 for Unix builds" ON)
++option(EKA2L1_UNIX_USE_WAYLAND "Use Wayland for Unix builds" OFF)
+ 
+ set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+ set (ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+diff --git a/cmake/FindFFmpeg.cmake b/cmake/FindFFmpeg.cmake
+new file mode 100644
+index 0000000000..ce5c3b9fc9
+--- /dev/null
++++ b/cmake/FindFFmpeg.cmake
+@@ -0,0 +1,151 @@
++# vim: ts=2 sw=2
++# - Try to find the required ffmpeg components(default: AVFORMAT, AVUTIL, AVCODEC)
++#
++# Once done this will define
++#  FFMPEG_FOUND         - System has the all required components.
++#  FFMPEG_INCLUDE_DIRS  - Include directory necessary for using the required components headers.
++#  FFMPEG_LIBRARIES     - Link these to use the required ffmpeg components.
++#  FFMPEG_DEFINITIONS   - Compiler switches required for using the required ffmpeg components.
++#
++# For each of the components it will additionally set.
++#   - AVCODEC
++#   - AVDEVICE
++#   - AVFORMAT
++#   - AVFILTER
++#   - AVUTIL
++#   - POSTPROC
++#   - SWSCALE
++# the following variables will be defined
++#  <component>_FOUND        - System has <component>
++#  <component>_INCLUDE_DIRS - Include directory necessary for using the <component> headers
++#  <component>_LIBRARIES    - Link these to use <component>
++#  <component>_DEFINITIONS  - Compiler switches required for using <component>
++#  <component>_VERSION      - The components version
++#
++# Copyright (c) 2006, Matthias Kretz, <kretz@kde.org>
++# Copyright (c) 2008, Alexander Neundorf, <neundorf@kde.org>
++# Copyright (c) 2011, Michael Jansen, <kde@michael-jansen.biz>
++#
++# Redistribution and use is allowed according to the terms of the BSD license.
++# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
++
++include(FindPackageHandleStandardArgs)
++
++# The default components were taken from a survey over other FindFFMPEG.cmake files
++if (NOT FFmpeg_FIND_COMPONENTS)
++  set(FFmpeg_FIND_COMPONENTS AVCODEC AVFORMAT AVUTIL)
++endif ()
++
++#
++### Macro: set_component_found
++#
++# Marks the given component as found if both *_LIBRARIES AND *_INCLUDE_DIRS is present.
++#
++macro(set_component_found _component )
++  if (${_component}_LIBRARIES AND ${_component}_INCLUDE_DIRS)
++    # message(STATUS "  - ${_component} found.")
++    set(${_component}_FOUND TRUE)
++  else ()
++    # message(STATUS "  - ${_component} not found.")
++  endif ()
++endmacro()
++
++#
++### Macro: find_component
++#
++# Checks for the given component by invoking pkgconfig and then looking up the libraries and
++# include directories.
++#
++macro(find_component _component _pkgconfig _library _header)
++
++  if (NOT WIN32)
++     # use pkg-config to get the directories and then use these values
++     # in the FIND_PATH() and FIND_LIBRARY() calls
++     find_package(PkgConfig)
++     if (PKG_CONFIG_FOUND)
++       pkg_check_modules(PC_${_component} ${_pkgconfig})
++     endif ()
++  endif (NOT WIN32)
++
++  find_path(${_component}_INCLUDE_DIRS ${_header}
++    HINTS
++      ${PC_${_component}_INCLUDEDIR}
++      ${PC_${_component}_INCLUDE_DIRS}
++    PATH_SUFFIXES
++      ffmpeg
++  )
++
++  find_library(${_component}_LIBRARIES NAMES ${_library}
++      HINTS
++      ${PC_${_component}_LIBDIR}
++      ${PC_${_component}_LIBRARY_DIRS}
++  )
++
++  set(${_component}_DEFINITIONS  ${PC_${_component}_CFLAGS_OTHER} CACHE STRING "The ${_component} CFLAGS.")
++  set(${_component}_VERSION      ${PC_${_component}_VERSION}      CACHE STRING "The ${_component} version number.")
++
++  set_component_found(${_component})
++
++  mark_as_advanced(
++    ${_component}_INCLUDE_DIRS
++    ${_component}_LIBRARIES
++    ${_component}_DEFINITIONS
++    ${_component}_VERSION)
++
++endmacro()
++
++
++# Check for cached results. If there are skip the costly part.
++if (NOT FFMPEG_LIBRARIES)
++
++  # Check for all possible component.
++  find_component(AVCODEC    libavcodec    avcodec  libavcodec/avcodec.h)
++  find_component(AVFORMAT   libavformat   avformat libavformat/avformat.h)
++  find_component(AVDEVICE   libavdevice   avdevice libavdevice/avdevice.h)
++  find_component(AVUTIL     libavutil     avutil   libavutil/avutil.h)
++  find_component(AVFILTER   libavfilter   avfilter libavfilter/avfilter.h)
++  find_component(SWSCALE    libswscale    swscale  libswscale/swscale.h)
++  find_component(POSTPROC   libpostproc   postproc libpostproc/postprocess.h)
++  find_component(SWRESAMPLE libswresample swresample libswresample/swresample.h)
++
++  # Check if the required components were found and add their stuff to the FFMPEG_* vars.
++  foreach (_component ${FFmpeg_FIND_COMPONENTS})
++    if (${_component}_FOUND)
++      # message(STATUS "Required component ${_component} present.")
++      set(FFMPEG_LIBRARIES   ${FFMPEG_LIBRARIES}   ${${_component}_LIBRARIES})
++      set(FFMPEG_DEFINITIONS ${FFMPEG_DEFINITIONS} ${${_component}_DEFINITIONS})
++      list(APPEND FFMPEG_INCLUDE_DIRS ${${_component}_INCLUDE_DIRS})
++    else ()
++      # message(STATUS "Required component ${_component} missing.")
++    endif ()
++  endforeach ()
++
++  # Build the include path with duplicates removed.
++  if (FFMPEG_INCLUDE_DIRS)
++    list(REMOVE_DUPLICATES FFMPEG_INCLUDE_DIRS)
++  endif ()
++
++  # cache the vars.
++  set(FFMPEG_INCLUDE_DIRS ${FFMPEG_INCLUDE_DIRS} CACHE STRING "The FFmpeg include directories." FORCE)
++  set(FFMPEG_LIBRARIES    ${FFMPEG_LIBRARIES}    CACHE STRING "The FFmpeg libraries." FORCE)
++  set(FFMPEG_DEFINITIONS  ${FFMPEG_DEFINITIONS}  CACHE STRING "The FFmpeg cflags." FORCE)
++
++  mark_as_advanced(FFMPEG_INCLUDE_DIRS
++                   FFMPEG_LIBRARIES
++                   FFMPEG_DEFINITIONS)
++
++endif ()
++
++# Now set the noncached _FOUND vars for the components.
++foreach (_component AVCODEC AVDEVICE AVFORMAT AVUTIL POSTPROCESS SWSCALE)
++  set_component_found(${_component})
++endforeach ()
++
++# Compile the list of required vars
++set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_INCLUDE_DIRS)
++foreach (_component ${FFmpeg_FIND_COMPONENTS})
++  list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_INCLUDE_DIRS)
++endforeach ()
++
++# Give a nice error message if some of the required vars are missing.
++find_package_handle_standard_args(FFmpeg DEFAULT_MSG ${_FFmpeg_REQUIRED_VARS})
+diff --git a/src/emu/drivers/CMakeLists.txt b/src/emu/drivers/CMakeLists.txt
+index 12c93f5476..10fbabd9d5 100644
+--- a/src/emu/drivers/CMakeLists.txt
++++ b/src/emu/drivers/CMakeLists.txt
+@@ -136,13 +136,20 @@ elseif(ANDROID)
+         src/graphics/backend/context_egl_android.h
+     )
+ else()
+-    find_package(X11 REQUIRED)
+-    find_package(OpenGL REQUIRED)
++    find_package(X11)
++    find_package(OpenGL)
++    find_package(EGL)
++    find_package(GLESv1_CM)
++    find_package(GLESv2)
+     find_package(Wayland REQUIRED EGL)
+ 
++    if (X11_FOUND)
++        target_sources(drivers PRIVATE
++            src/graphics/backend/context_glx.cpp
++            src/graphics/backend/context_glx.h
++    )
++    endif()
+     target_sources(drivers PRIVATE
+-        src/graphics/backend/context_glx.cpp
+-        src/graphics/backend/context_glx.h
+         src/graphics/backend/context_egl.cpp
+         src/graphics/backend/context_egl.h
+         src/graphics/backend/context_wayland.cpp
+@@ -160,7 +167,13 @@ target_include_directories(miniBAE_EMU
+     PRIVATE include/drivers/audio/backend/minibae ${MINIBAE_INTERNAL_INCLUDE_DIRS})
+ target_link_libraries(miniBAE_EMU PRIVATE common)
+ 
+-target_link_libraries(drivers PRIVATE common cubeb ffmpeg glad glm miniBAE_EMU)
++target_link_libraries(drivers PRIVATE common cubeb glad glm miniBAE_EMU)
++if (NOT EKA2L1_USE_SYSTEM_FFMPEG)
++    target_link_libraries(drivers PRIVATE ffmpeg)
++else()
++    target_link_libraries(drivers PRIVATE ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
++endif()
++
+ if (NOT ANDROID)
+     target_link_libraries(drivers PRIVATE SDL2)
+ else()
+diff --git a/src/emu/drivers/include/drivers/CMakeLists.txt b/src/emu/drivers/include/drivers/CMakeLists.txt
+index 7c820940d0..64342313fa 100644
+--- a/src/emu/drivers/include/drivers/CMakeLists.txt
++++ b/src/emu/drivers/include/drivers/CMakeLists.txt
+@@ -133,6 +133,11 @@ elseif(ANDROID)
+         src/graphics/backend/context_egl_android.cpp
+         src/graphics/backend/context_egl_android.h
+     )
++elseif(LINUX_EMBEDDED)
++    target_sources(drivers PRIVATE
++        src/graphics/backend/context_egl.cpp
++        src/graphics/backend/context_egl.h
++    )
+ else()
+     find_package(X11 REQUIRED)
+     find_package(OpenGL REQUIRED)
+@@ -153,7 +158,13 @@ target_include_directories(miniBAE_EMU
+     PRIVATE include/drivers/audio/backend/minibae ${MINIBAE_INTERNAL_INCLUDE_DIRS})
+ target_link_libraries(miniBAE_EMU PRIVATE common)
+ 
+-target_link_libraries(drivers PRIVATE common cubeb ffmpeg glad glm miniBAE_EMU)
++target_link_libraries(drivers PRIVATE common cubeb glad glm miniBAE_EMU)
++if (NOT EKA2L1_USE_SYSTEM_FFMPEG)
++    target_link_libraries(drivers PRIVATE ffmpeg)
++else()
++    target_link_libraries(drivers PRIVATE ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
++endif()
++
+ if (NOT ANDROID)
+     target_link_libraries(drivers PRIVATE SDL2)
+ else()
+diff --git a/src/emu/drivers/src/graphics/context.cpp b/src/emu/drivers/src/graphics/context.cpp
+index 56780073ab..cd8d11c27a 100644
+--- a/src/emu/drivers/src/graphics/context.cpp
++++ b/src/emu/drivers/src/graphics/context.cpp
+@@ -27,9 +27,13 @@
+ #elif EKA2L1_PLATFORM(ANDROID)
+ #include "backend/context_egl_android.h"
+ #elif EKA2L1_PLATFORM(UNIX)
++#if EKA2L1_PLATFORM(WAYLAND)
+ #include "backend/context_wayland.h"
++#endif
++#if EKA2L1_PLATFORM(X11)
+ #include "backend/context_glx.h"
+ #endif
++#endif
+ 
+ namespace eka2l1::drivers::graphics {
+     const std::array<std::pair<int, int>, 11> gl_context::s_desktop_opengl_versions = {
+@@ -43,11 +47,17 @@ namespace eka2l1::drivers::graphics {
+ #elif EKA2L1_PLATFORM(ANDROID)
+         return std::make_unique<gl_context_egl_android>(system_info, stereo, core);
+ #elif EKA2L1_PLATFORM(UNIX)
++#if EKA2L1_PLATFORM(WAYLAND)
+         if (system_info.type == window_system_type::wayland) {
+             return std::make_unique<gl_context_egl_wayland>(system_info, stereo, core);
+-        } else {
++        }
++#endif
++#if EKA2L1_PLATFORM(X11)
++	if system_info.type == window_system_type::x11) {
+             return std::make_unique<gl_context_glx>(system_info, stereo, core);
+         }
++#endif
++        return nullptr;
+ #else
+         return nullptr;
+ #endif
+diff --git a/src/emu/qt/CMakeLists.txt b/src/emu/qt/CMakeLists.txt
+index ba915523c7..7130eb86cf 100644
+--- a/src/emu/qt/CMakeLists.txt
++++ b/src/emu/qt/CMakeLists.txt
+@@ -179,6 +179,11 @@ else()
+         Qt${QT_VERSION_MAJOR}::OpenGL)
+ endif()
+ 
++if (EKA2L1_USE_SYSTEM_FFMPEG)
++    set(CMAKE_EXE_LINKER_FLAGS "-Wl,--copy-dt-needed-entries")
++    target_link_libraries(eka2l1_qt PRIVATE ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${SWRESAMPLE_LIBRARIES})
++endif()
++
+ target_link_libraries(eka2l1_qt PRIVATE
+     Qt${QT_VERSION_MAJOR}::Svg
+     Qt${QT_VERSION_MAJOR}::Widgets
+diff --git a/src/external/CMakeLists.txt b/src/external/CMakeLists.txt
+index 2baafb9261..82748d31d5 100644
+--- a/src/external/CMakeLists.txt
++++ b/src/external/CMakeLists.txt
+@@ -192,9 +192,13 @@ add_subdirectory(cubeb)
+ 
+ 
+ # FFMPEG
+-add_subdirectory(ffmpeg)
+-if (APPLE)
+-    target_link_libraries(ffmpeg INTERFACE "-framework CoreVideo" "iconv")
++if (NOT EKA2L1_USE_SYSTEM_FFMPEG)
++    add_subdirectory(ffmpeg)
++    if (APPLE)
++        target_link_libraries(ffmpeg INTERFACE "-framework CoreVideo" "iconv")
++    endif()
++else()
++    find_package(FFmpeg REQUIRED)
+ endif()
+ 
+ option(CAPSTONE_BUILD_SHARED "Build shared library" OFF)
+From 4d09e6486e59cf2658a2933c3dedec44f10f2861 Mon Sep 17 00:00:00 2001
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Mon, 11 Sep 2023 16:08:38 +0200
+Subject: [PATCH] EKA2L1_UNIX_USE_X11 and EKA2L1_UNIX_USE_WAYLAND CMake options
+ generate C++ defines
+
+---
+ src/emu/drivers/CMakeLists.txt | 7 +++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/emu/drivers/CMakeLists.txt b/src/emu/drivers/CMakeLists.txt
+index 10fbabd9d5..4ab56a5ba0 100644
+--- a/src/emu/drivers/CMakeLists.txt
++++ b/src/emu/drivers/CMakeLists.txt
+@@ -156,6 +156,13 @@ else()
+         src/graphics/backend/context_wayland.h
+     )
+ 
++    if (EKA2L1_UNIX_USE_X11)
++         target_compile_definitions(drivers PRIVATE EKA2L1_PLATFORM_X11)
++    endif()
++    if (EKA2L1_UNIX_USE_WAYLAND)
++         target_compile_definitions(drivers PRIVATE EKA2L1_PLATFORM_WAYLAND)
++    endif()
++
+     # GLX has a hard dependency on libGL.
+     # Make sure to link to it if using GLX.
+     target_link_libraries(drivers PUBLIC ${OPENGL_LIBRARIES} ${X11_LIBRARIES} ${WAYLAND_LIBRARIES} EGL)
+From e2aaf64c5b0e2081d640d358bdd5fad69726ab2e Mon Sep 17 00:00:00 2001
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Mon, 11 Sep 2023 16:41:05 +0200
+Subject: [PATCH] Fix some typos, improve X11/Waylan selection code
+
+---
+ src/emu/drivers/CMakeLists.txt                |  2 +-
+ .../drivers/include/drivers/CMakeLists.txt    | 32 +++++++++++++------
+ src/emu/drivers/src/graphics/context.cpp      |  3 +-
+ 3 files changed, 26 insertions(+), 11 deletions(-)
+
+diff --git a/src/emu/drivers/include/drivers/CMakeLists.txt b/src/emu/drivers/include/drivers/CMakeLists.txt
+index 64342313fa..c0c3086867 100644
+--- a/src/emu/drivers/include/drivers/CMakeLists.txt
++++ b/src/emu/drivers/include/drivers/CMakeLists.txt
+@@ -133,23 +133,37 @@ elseif(ANDROID)
+         src/graphics/backend/context_egl_android.cpp
+         src/graphics/backend/context_egl_android.h
+     )
+-elseif(LINUX_EMBEDDED)
++else()
++    find_package(X11)
++    find_package(OpenGL)
++    find_package(EGL)
++    find_package(GLESv1_CM)
++    find_package(GLESv2)
++    find_package(Wayland REQUIRED EGL)
++
++    if (X11_FOUND)
++        target_sources(drivers PRIVATE
++            src/graphics/backend/context_glx.cpp
++            src/graphics/backend/context_glx.h
++    )
++    endif()
+     target_sources(drivers PRIVATE
+         src/graphics/backend/context_egl.cpp
+         src/graphics/backend/context_egl.h
++        src/graphics/backend/context_wayland.cpp
++        src/graphics/backend/context_wayland.h
+     )
+-else()
+-    find_package(X11 REQUIRED)
+-    find_package(OpenGL REQUIRED)
+ 
+-    target_sources(drivers PRIVATE
+-        src/graphics/backend/context_glx.cpp
+-        src/graphics/backend/context_glx.h
+-    )
++    if (EKA2L1_UNIX_USE_X11)
++         target_compile_definitions(drivers PRIVATE EKA2L1_PLATFORM_X11)
++    endif()
++    if (EKA2L1_UNIX_USE_WAYLAND)
++         target_compile_definitions(drivers PRIVATE EKA2L1_PLATFORM_WAYLAND)
++    endif()
+ 
+     # GLX has a hard dependency on libGL.
+     # Make sure to link to it if using GLX.
+-    target_link_libraries(drivers PUBLIC ${OPENGL_LIBRARIES} ${X11_LIBRARIES})
++    target_link_libraries(drivers PUBLIC ${OPENGL_LIBRARIES} ${X11_LIBRARIES} ${WAYLAND_LIBRARIES} EGL)
+ endif()
+ 
+ # Make miniBAE build alone so that its include directories don't messed up system headers
+diff --git a/src/emu/drivers/src/graphics/context.cpp b/src/emu/drivers/src/graphics/context.cpp
+index cd8d11c27a..4fb6615f47 100644
+--- a/src/emu/drivers/src/graphics/context.cpp
++++ b/src/emu/drivers/src/graphics/context.cpp
+@@ -53,10 +53,11 @@ namespace eka2l1::drivers::graphics {
+         }
+ #endif
+ #if EKA2L1_PLATFORM(X11)
+-	if system_info.type == window_system_type::x11) {
++	if (system_info.type == window_system_type::x11) {
+             return std::make_unique<gl_context_glx>(system_info, stereo, core);
+         }
+ #endif
++#error "Either EKA2L1_UNIX_USE_X11 or EKA2L1_UNIX_USE_WAYLAND should be defined !!!"
+         return nullptr;
+ #else
+         return nullptr;
+From 734b135ceb22e4bef0c59f6cd41c49df2e0111d0 Mon Sep 17 00:00:00 2001
+From: Romain TISSERAND <romain.tisserand@gmail.com>
+Date: Mon, 18 Sep 2023 13:13:26 +0200
+Subject: [PATCH] Fix graphics context with X11/Wayland wrapping
+
+---
+ src/emu/drivers/src/graphics/context.cpp | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/emu/drivers/src/graphics/context.cpp b/src/emu/drivers/src/graphics/context.cpp
+index 4fb6615f47..25c9f3fb16 100644
+--- a/src/emu/drivers/src/graphics/context.cpp
++++ b/src/emu/drivers/src/graphics/context.cpp
+@@ -47,19 +47,19 @@ namespace eka2l1::drivers::graphics {
+ #elif EKA2L1_PLATFORM(ANDROID)
+         return std::make_unique<gl_context_egl_android>(system_info, stereo, core);
+ #elif EKA2L1_PLATFORM(UNIX)
+-#if EKA2L1_PLATFORM(WAYLAND)
+-        if (system_info.type == window_system_type::wayland) {
+-            return std::make_unique<gl_context_egl_wayland>(system_info, stereo, core);
+-        }
++#if ((!EKA2L1_PLATFORM(X11)) && (!EKA2L1_PLATFORM(WAYLAND)))
++#error "Either (or both) EKA2L1_UNIX_USE_X11 or EKA2L1_UNIX_USE_WAYLAND should be defined !!!"
+ #endif
+ #if EKA2L1_PLATFORM(X11)
+ 	if (system_info.type == window_system_type::x11) {
+             return std::make_unique<gl_context_glx>(system_info, stereo, core);
+         }
+ #endif
+-#error "Either EKA2L1_UNIX_USE_X11 or EKA2L1_UNIX_USE_WAYLAND should be defined !!!"
+-        return nullptr;
+-#else
++#if EKA2L1_PLATFORM(WAYLAND)
++        if (system_info.type == window_system_type::wayland) {
++            return std::make_unique<gl_context_egl_wayland>(system_info, stereo, core);
++        }
++#endif
+         return nullptr;
+ #endif
+     }
+From 8bf21e354c7aa3ea8f287a5f47825d1370b1c14f Mon Sep 17 00:00:00 2001
+From: Romain TISSERAND <romain.tisserand@gmail.com>
+Date: Mon, 18 Sep 2023 13:34:59 +0200
+Subject: [PATCH] Proper C defines from CMake options for X11/Wayland switch
+
+---
+ src/emu/drivers/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/emu/drivers/CMakeLists.txt b/src/emu/drivers/CMakeLists.txt
+index 598d1e5452..ece2e98339 100644
+--- a/src/emu/drivers/CMakeLists.txt
++++ b/src/emu/drivers/CMakeLists.txt
+@@ -157,10 +157,10 @@ else()
+     )
+ 
+     if (EKA2L1_UNIX_USE_X11)
+-         target_compile_definitions(drivers PRIVATE EKA2L1_PLATFORM_X11)
++	add_compile_definitions(EKA2L1_PLATFORM_X11)
+     endif()
+     if (EKA2L1_UNIX_USE_WAYLAND)
+-         target_compile_definitions(drivers PRIVATE EKA2L1_PLATFORM_WAYLAND)
++         add_compile_definitions(EKA2L1_PLATFORM_WAYLAND)
+     endif()
+ 
+     # GLX has a hard dependency on libGL.
+--- a/src/emu/cpu/src/12l1r/tests/mem_stress.cpp	2025-02-01 16:56:50.038785281 +0100
++++ b/src/emu/cpu/src/12l1r/tests/mem_stress.cpp	2025-02-01 16:58:22.097820035 +0100
+@@ -1,6 +1,9 @@
+ #include <catch2/catch.hpp>
+ #include "test_cpu.h"
+ 
++#include <unistd.h>
++#define PAGE_SIZE  sysconf(_SC_PAGESIZE)
++
+ TEST_CASE("load_near_page_crossing_with_no_tlb_miss", "mem_stress") {
+     static constexpr std::uint32_t THE_PAGE_SIZE = eka2l1::arm::test_env_tlb::ENV_PAGE_SIZE;
+     eka2l1::arm::test_env_tlb env(THE_PAGE_SIZE * 2);
+@@ -137,4 +140,4 @@
+     void register_mem_stress_tests() {
+         return;
+     }
+-}
+\ Pas de fin de ligne à la fin du fichier
++}
