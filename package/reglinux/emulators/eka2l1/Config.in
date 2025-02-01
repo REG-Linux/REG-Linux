@@ -2,6 +2,7 @@ config BR2_PACKAGE_EKA2L1
     bool "eka2l1"
 
     select BR2_PACKAGE_REGLINUX_QT6
+    select BR2_PACKAGE_FFMPEG
 
     help
       Symbian OS / N-Gage emulator
