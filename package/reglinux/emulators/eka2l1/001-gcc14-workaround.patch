@@ -1,0 +1,22 @@
+--- a/CMakeLists.txt	2024-04-10 04:03:12.000000000 +0200
++++ b/CMakeLists.txt	2025-02-01 10:55:32.653117716 +0100
+@@ -35,6 +35,9 @@
+     add_compile_options(-Wno-error)
+ endif()
+ 
++# GCC14 workaround
++add_compile_options(-Wno-error=incompatible-pointer-types -Wno-error=int-conversion)
++
+ if (EKA2L1_BUILD_VULKAN_BACKEND)
+     set (BUILD_WITH_VULKAN 1)
+ else()
+--- a/src/emu/common/include/common/pystr.h	2025-02-01 11:04:00.942640569 +0100
++++ b/src/emu/common/include/common/pystr.h	2025-02-01 11:04:12.527902841 +0100
+@@ -22,6 +22,7 @@
+ #include <cstdint>
+ #include <string>
+ #include <vector>
++#include <algorithm>
+ 
+ namespace eka2l1::common {
+     template <typename T>
