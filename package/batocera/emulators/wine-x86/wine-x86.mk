@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-WINE_X86_VERSION = $(BATOCERA_SYSTEM_VERSION)
+WINE_X86_VERSION = $(REGLINUX_SYSTEM_VERSION)
 WINE_X86_SOURCE = wine-x86-$(WINE_X86_VERSION).tar.lzma
 WINE_X86_SITE = https://github.com/REG-Linux/wine-x86/releases/download/$(WINE_X86_VERSION)
 

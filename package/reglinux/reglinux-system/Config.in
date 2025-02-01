@@ -162,8 +162,8 @@ config BR2_PACKAGE_REGLINUX_VULKAN
 	help
 	  Vulkan support for REG-Linux
 
-config BR2_PACKAGE_BATOCERA_SYSTEM
-	bool "batocera.linux minimal"
+config BR2_PACKAGE_REGLINUX_SYSTEM
+	bool "REG-Linux"
 
 	# Tools needed to generate images
         select BR2_PACKAGE_HOST_GENIMAGE

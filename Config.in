@@ -1,7 +1,7 @@
 menu "reglinux"
 
 menu "System"
-  source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-system/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/reglinux-system/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-configgen/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-desktopapps/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/reglinux-scripts/Config.in"
