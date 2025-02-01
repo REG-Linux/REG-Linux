@@ -23,7 +23,7 @@ define BATOCERA_ES_SYSTEM_BUILD_CMDS
 		$(STAGING_DIR)/usr/share/reglinux/configgen/configgen-defaults.yml \
 		$(STAGING_DIR)/usr/share/reglinux/configgen/configgen-defaults-arch.yml \
 		$(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulationstation/batocera-es-system/roms \
-		$(@D)/roms $(BATOCERA_SYSTEM_ARCH)
+		$(@D)/roms $(REGLINUX_SYSTEM_ARCH)
 		# translations
 		mkdir -p $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulationstation/batocera-es-system/locales
 		(echo "$(@D)/es_external_translations.h"; echo "$(@D)/es_keys_translations.h") | xgettext --language=C --add-comments=TRANSLATION -f - -o $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulationstation/batocera-es-system/locales/batocera-es-system.pot --no-location --keyword=_
