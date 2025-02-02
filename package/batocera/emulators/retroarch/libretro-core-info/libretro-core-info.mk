@@ -30,10 +30,8 @@ define LIBRETRO_CORE_INFO_INSTALL_TARGET_CMDS
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf fbalpha2012_libretro.info		fbalpha_libretro.info
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf mame2000_libretro.info		imame4all_libretro.info
 
-	# superflappybirds_libretro.so => no info found
 	# zc210_libretro.so            => no info found
 	# hatarib_libretro.info        => no info found
-	touch $(TARGET_DIR)/usr/share/libretro/info/superflappybirds_libretro.info
 	touch $(TARGET_DIR)/usr/share/libretro/info/zc210_libretro.info
 	touch $(TARGET_DIR)/usr/share/libretro/info/hatarib_libretro.info
 
