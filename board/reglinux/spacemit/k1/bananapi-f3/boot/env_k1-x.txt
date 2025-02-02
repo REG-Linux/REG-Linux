@@ -5,7 +5,7 @@ bootdelay=5
 loglevel=9
 rootfs=/dev/mmcblk0p5
 knl_name=/boot/linux
-dtb=/k1-x_deb1.dtb
+dtb=/k1-bananapi-f3.dtb
 bootargs=rootwait label=REGLINUX
 
 

@@ -1,0 +1,10 @@
+config BR2_PACKAGE_TOUCHHLE
+	bool "touchHLE"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+
+	help
+        touchHLE is a high-level emulator for iPhone OS apps. 
+        It runs on modern desktop operating systems and Android, and is written in Rust.
+
+        https://github.com/touchHLE/touchHLE
