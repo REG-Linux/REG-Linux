@@ -4,9 +4,10 @@
 #
 ################################################################################
 
-SDL3_MIXER_VERSION = af6a29df4e14c6ce72608b3ccd49cf35e1014255
+SDL3_MIXER_VERSION = 4be37aed1a4b76df71a814fbfa8ec9983f3b5508
 SDL3_MIXER_SITE = https://github.com/libsdl-org/SDL_mixer.git
 SDL3_MIXER_SITE_METHOD = git
+SDL3_MIXER_GIT_SUBMODULES = yes
 SDL3_MIXER_LICENSE = Zlib
 SDL3_MIXER_LICENSE_FILES = LICENSE.txt
 SDL3_MIXER_INSTALL_STAGING = YES
