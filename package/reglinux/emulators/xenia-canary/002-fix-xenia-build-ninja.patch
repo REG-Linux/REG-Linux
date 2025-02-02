@@ -1,29 +1,14 @@
---- a/xenia-build	2025-01-21 20:44:52.821387063 +0100
-+++ b/xenia-build	2025-01-21 20:46:55.315585381 +0100
-@@ -856,6 +856,7 @@
+--- a/xenia-build	2025-02-02 16:41:21.164034956 +0100
++++ b/xenia-build	2025-02-02 16:42:34.942669846 +0100
+@@ -866,6 +866,7 @@
                  '-DCMAKE_BUILD_TYPE=%s' % (args['config'].title()),
-                 '-DCMAKE_C_COMPILER=clang',
-                 '-DCMAKE_CXX_COMPILER=clang++',
+                 '-DCMAKE_C_COMPILER=' + os.environ.get('CC', 'clang'),
+                 '-DCMAKE_CXX_COMPILER=' + os.environ.get('CXX', 'clang++'),
 +                '-DCMAKE_MAKE_PROGRAM=%s' % (os.environ["NINJA"]),
-                 '-G Ninja'
+                 '-GNinja'
              ] + pass_args, shell=False, env=dict(os.environ))
              print('')
---- a/xenia-build	2025-01-21 20:49:09.228986293 +0100
-+++ b/xenia-build	2025-01-21 20:50:01.362288267 +0100
-@@ -854,8 +854,8 @@
-                 '-S build/',
-                 '-B build/build_%s' % (args['config']),
-                 '-DCMAKE_BUILD_TYPE=%s' % (args['config'].title()),
--                '-DCMAKE_C_COMPILER=clang',
--                '-DCMAKE_CXX_COMPILER=clang++',
-+                '-DCMAKE_C_COMPILER=%s' % (os.environ["CLANG"]),
-+                '-DCMAKE_CXX_COMPILER=%s' % (os.environ["CLANGPLUSPLUS"]),
-                 '-DCMAKE_MAKE_PROGRAM=%s' % (os.environ["NINJA"]),
-                 '-G Ninja'
-             ] + pass_args, shell=False, env=dict(os.environ))
---- a/xenia-build	2025-01-21 20:51:59.661205138 +0100
-+++ b/xenia-build	2025-01-21 20:52:54.948552924 +0100
-@@ -864,7 +864,7 @@
+@@ -873,7 +874,7 @@
                  print('ERROR: cmake failed with one or more errors.')
                  return result
              result = subprocess.call([

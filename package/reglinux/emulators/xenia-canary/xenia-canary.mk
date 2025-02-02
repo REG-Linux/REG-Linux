@@ -3,8 +3,8 @@
 # xenia-canary
 #
 ################################################################################
-# Version: Commits on Jan 20, 2025
-XENIA_CANARY_VERSION = 00202f938dde50dcd0a4040159a777e6f6fd4a2f
+# Version: Commits on Feb 2, 2025
+XENIA_CANARY_VERSION = b7b707ddd2b447bfb7c2f30050bf86aa107c9a55
 XENIA_CANARY_SITE = https://github.com/xenia-canary/xenia-canary
 XENIA_CANARY_SITE_METHOD = git
 XENIA_CANARY_GIT_SUBMODULES = YES
@@ -30,11 +30,13 @@ define XENIA_CANARY_BUILD_CMDS
 	SYSROOT="$(STAGING_DIR)" \
 	SDL2CONFIG="$(HOST_DIR)/bin/sdl2-config" \
 	NINJA="$(HOST_DIR)/bin/ninja" \
-	CLANG="$(HOST_DIR)/bin/clang" \
-	CLANGPLUSPLUS="$(HOST_DIR)/bin/clang++" \
+	CC="$(HOST_DIR)/bin/clang" \
+	CXX="$(HOST_DIR)/bin/clang++" \
 	./xb build --config release
 #PATH=$(HOST_DIR)/bin:$(PATH) 
 	#TODO pass GCC, only Clang seems supported so far --cc gcc
+
+
 endef
 
 define XENIA_CANARY_INSTALL_TARGET_CMDS
