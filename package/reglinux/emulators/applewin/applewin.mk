@@ -3,8 +3,8 @@
 # applewin
 #
 ################################################################################
-# Version: Commits on Jan 27, 2025
-APPLEWIN_VERSION = 8354cc723c21f7148d36ff2e705be9e69d4d68dd
+# Version: Commits on Feb 1, 2025
+APPLEWIN_VERSION = 0079fd00b48b6734a0d507e334df7aa6a7f36c94
 APPLEWIN_SITE = https://github.com/audetto/AppleWin
 APPLEWIN_SITE_METHOD=git
 APPLEWIN_GIT_SUBMODULES=YES
@@ -17,7 +17,8 @@ APPLEWIN_SUPPORTS_IN_SOURCE_BUILD = NO
 APPLEWIN_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
 APPLEWIN_CONF_OPTS += -DBUILD_SA2=ON
 APPLEWIN_CONF_OPTS += -DBUILD_LIBRETRO=ON
-# TODO fix dependencies missing -fPIC on minizip
+
+# TODO split applewin standalone and libretr to enble STATIC_LINKING on lr core
 # APPLEWIN_CONF_OPTS += -DSTATIC_LINKING=ON
 
 ifeq ($(BR2_PACKAGE_HAS_OPENGL),y)
