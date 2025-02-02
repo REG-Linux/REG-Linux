@@ -30,9 +30,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-bsnes-hd
                    libretro-cap32
                    libretro-chailove
-                   libretro-craft
                    libretro-desmume
-                   libretro-dinothawr
                    libretro-dolphin
                    libretro-dosbox-pure
                    libretro-easyrpg
@@ -101,7 +99,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-stella
                    libretro-stella2014
                    libretro-superbroswar
-                   libretro-superflappybirds
                    libretro-swanstation
                    libretro-tgbdual
                    libretro-theodore
