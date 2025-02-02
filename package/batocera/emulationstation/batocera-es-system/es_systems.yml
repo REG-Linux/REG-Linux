@@ -1932,6 +1932,8 @@ apple2:
       gsplus: { requireAnyOf: [BR2_PACKAGE_GSPLUS], incompatible_extensions: [mfi, dfi, rti, edd, woz, wav, zip, 7z, chd, hdv, 2mg] }
     applewin:
       applewin: { requireAnyOf: [BR2_PACKAGE_APPLEWIN], incompatible_extensions: [chd] }
+    izapple2:
+      izapple2: { requireAnyOf: [BR2_PACKAGE_IZAPPLE2], incompatible_extensions: [chd] }
     mednafen:
       mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
