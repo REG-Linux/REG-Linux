@@ -533,7 +533,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "starfive/jh7110"									if BR2_PACKAGE_BATOCERA_TARGET_JH7110
 
 	# SpacemiT targets
-	default "spacemit/bananapi-f3"									if BR2_PACKAGE_BATOCERA_TARGET_K1
+	default "spacemit/k1/bananapi-f3"								if BR2_PACKAGE_BATOCERA_TARGET_K1
 
 	# Saphira target
 	default "saphira"										if BR2_PACKAGE_BATOCERA_TARGET_SAPHIRA
