@@ -23,7 +23,7 @@ BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https://github.com/khadas/linux/archiv
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/a3gen2/linux_patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/khadas-5.4"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/a3gen2/linux-kvim4-5.4.180.config"
-BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/a3gen2/linux-defconfig-fragment.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config"
 BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
