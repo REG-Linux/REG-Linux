@@ -1,0 +1,7 @@
+config BR2_PACKAGE_PLUTOVG
+	bool "plutovg"
+
+	help
+	  PlutoVG is a standalone 2D vector graphics library in C.
+
+	  https://github.com/sammycage/plutovg
