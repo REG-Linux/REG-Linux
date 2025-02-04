@@ -1,0 +1,9 @@
+config BR2_PACKAGE_GOPHER64
+	bool "gopher64"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+
+	help
+	N64 emulator written in Rust
+
+	https://github.com/gopher64/gopher64
