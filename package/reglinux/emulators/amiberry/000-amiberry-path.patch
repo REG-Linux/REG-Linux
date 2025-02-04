@@ -63,10 +63,10 @@
  }
  
  void get_video_path(char* out, int size)
-@@ -3476,21 +3476,21 @@
- 	write_string_option("gui_theme", amiberry_options.gui_theme);
+@@ -3490,20 +3490,20 @@
  
  	// Paths
+ 	write_string_option("config_path", config_path);
 -	write_string_option("controllers_path", controllers_path);
 -	write_string_option("retroarch_config", retroarch_file);
 +	write_string_option("controllers_path", "/userdata/system/configs/amiberry/conf/retroarch/inputs/");
@@ -85,14 +85,12 @@
 -	write_string_option("saveimage_dir", saveimage_dir);
 -	write_string_option("savestate_dir", savestate_dir);
 -	write_string_option("screenshot_dir", screenshot_dir);
--	write_string_option("ripper_path", ripper_path);
 +	write_string_option("saveimage_dir", "/userdata/saves/amiga/");
 +	write_string_option("savestate_dir", "/userdata/saves/amiga/");
 +	write_string_option("screenshot_dir", "/userdata/screenshots/");
-+ 	write_string_option("ripper_path", ripper_path);
+ 	write_string_option("ripper_path", ripper_path);
  	write_string_option("inputrecordings_dir", input_dir);
  	write_string_option("nvram_dir", nvram_dir);
- 	write_string_option("plugins_dir", plugins_dir);
 @@ -4216,7 +4216,7 @@
  	harddrive_path.append("/harddrives/");
  	cdrom_path.append("/cdroms/");
