@@ -371,8 +371,7 @@ comment "gbm support needs a gallium driver w/ EGL support."
 config BR2_PACKAGE_IMG_MESA3D_OPENGL_GLX
 	bool "OpenGL GLX"
 	depends on BR2_PACKAGE_XORG7
-	select BR2_PACKAGE_HAS_LIBGL if !BR2_PACKAGE_LIBGLVND
-	select BR2_PACKAGE_LIBGLVND_DISPATCH_GL if BR2_PACKAGE_LIBGLVND
+	select BR2_PACKAGE_HAS_LIBGL
 	select BR2_PACKAGE_IMG_MESA3D_NEEDS_X11
 	help
 	  Enable GLX graphic acceleration (OpenGL + X11).
@@ -383,8 +382,7 @@ comment "OpenGL GLX support needs X11"
 config BR2_PACKAGE_IMG_MESA3D_OPENGL_EGL
 	bool "OpenGL EGL"
 	depends on BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER
-	select BR2_PACKAGE_HAS_LIBEGL if !BR2_PACKAGE_LIBGLVND
-	select BR2_PACKAGE_LIBGLVND_DISPATCH_EGL if BR2_PACKAGE_LIBGLVND
+	select BR2_PACKAGE_HAS_LIBEGL
 	select BR2_PACKAGE_IMG_MESA3D_GBM
 	help
 	  Use the Khronos EGL APIs. EGL is a window manager for OpenGL
@@ -392,8 +390,7 @@ config BR2_PACKAGE_IMG_MESA3D_OPENGL_EGL
 
 config BR2_PACKAGE_IMG_MESA3D_OPENGL_ES
 	bool "OpenGL ES"
-	select BR2_PACKAGE_HAS_LIBGLES if !BR2_PACKAGE_LIBGLVND
-	select BR2_PACKAGE_LIBGLVND_DISPATCH_GLES if BR2_PACKAGE_LIBGLVND
+	select BR2_PACKAGE_HAS_LIBGLES
 	help
 	  Use the Khronos OpenGL ES APIs. This is commonly used on
 	  embedded systems and represents a subset of the OpenGL API.
@@ -404,16 +401,16 @@ config BR2_PACKAGE_PROVIDES_LIBGBM
 	default "img-mesa3d" if BR2_PACKAGE_IMG_MESA3D_GBM
 
 config BR2_PACKAGE_PROVIDES_LIBGL
-	default "img-mesa3d" if BR2_PACKAGE_IMG_MESA3D_OPENGL_GLX && !BR2_PACKAGE_LIBGLVND
+	default "img-mesa3d" if BR2_PACKAGE_IMG_MESA3D_OPENGL_GLX
 
 config BR2_PACKAGE_PROVIDES_LIBEGL
-	default "img-mesa3d" if BR2_PACKAGE_IMG_MESA3D_OPENGL_EGL && !BR2_PACKAGE_LIBGLVND
+	default "img-mesa3d" if BR2_PACKAGE_IMG_MESA3D_OPENGL_EGL
 
 config BR2_PACKAGE_PROVIDES_LIBGLES
-	default "img-mesa3d" if BR2_PACKAGE_IMG_MESA3D_OPENGL_ES && !BR2_PACKAGE_LIBGLVND
+	default "img-mesa3d"
 
 config BR2_PACKAGE_PROVIDES_LIBOPENCL
-	default "img-mesa3d" if BR2_PACKAGE_IMG_MESA3D_OPENCL
+	default "img-mesa3d"
 
 endif # BR2_PACKAGE_IMG_MESA3D
 

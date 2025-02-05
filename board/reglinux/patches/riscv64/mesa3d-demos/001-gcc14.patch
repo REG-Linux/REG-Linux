@@ -1,0 +1,13 @@
+--- a/meson.build	2025-02-05 11:43:20.685661802 +0100
++++ b/meson.build	2025-02-05 11:43:32.616027186 +0100
+@@ -210,8 +210,8 @@
+ 
+   if host_machine.system() != 'darwin'
+     c_args += cc.get_supported_arguments([
+-      '-Werror=incompatible-pointer-types',
+-      '-Werror=int-conversion',
++      '-Wno-error=incompatible-pointer-types',
++      '-Wno-error=int-conversion',
+     ])
+   endif
+ endif
