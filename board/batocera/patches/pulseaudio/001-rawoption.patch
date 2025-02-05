@@ -30,7 +30,7 @@ index d3736bc..e815374 100644
 +
 +    int channel = 0; // first channel only
 +
-+    printf(_("sink=%u name=%s mute=%i volume=%i description=%s\n"),
++    printf(_("sink=\"%u\" name=\"%s\" mute=\"%i\" volume=\"%i\" description=\"%s\"\n"),
 +           i->index,
 +           i->name,
 +           i->mute,
