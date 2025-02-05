@@ -32,7 +32,7 @@ INTERNALDEVICE=$(system-part "share_internal")
 INTERNALDEVICETYPE=$(blkid -o value -s TYPE "${INTERNALDEVICE}")
 
 SHAREDEVICE=$(cat "${SHARECONFFILE}" | grep -m 1 -E '^[ ]*sharedevice=' | cut -d'=' -f2)
-[ "$?" -ne "0" ] || [ "$SHAREDEVICE" = "" ] && SHAREDEVICE="INTERNAL"
+[ -z "$SHAREDEVICE" ] && SHAREDEVICE="INTERNAL"
 
 getMaxTryConfig() {
     SHARECONFFILE=${1}
@@ -91,13 +91,20 @@ mountPartByTag() {
 
     FSTYPE="$(blkid -l -t "${TAG}" -s TYPE -o value)" || return 1
 
-    case "${FSTYPE}" in
-        "ntfs")
-            # Force use of the FUSE ntfs-3g driver
-            FSTYPE=ntfs-3g
-            ;;
-    esac
-
+    # make sure that kernel module is loaded before mounting
+    if test "${FSTYPE}" = "ntfs"; then
+        if modprobe ntfs3; then
+            FSTYPE="ntfs3"
+        else
+            modprobe fuse && FSTYPE="ntfs-3g"
+        fi
+        FSDEVICE="$(blkid -l -t "${TAG}" -o device)"
+        if test -n "$(ntfsinfo -m "${FSDEVICE}" 2>&1 | grep 'Volume is scheduled for check.')"; then
+            ntfsfix -d "${FSDEVICE}"
+        fi
+    else
+        modprobe "${FSTYPE}"
+    fi
     mount -t "${FSTYPE}" "${TAG}" "${DIR}"
 }
 
@@ -156,27 +163,27 @@ mountDevicesOrNetwork() {
                 then
                     CMD_EXEC="${CMD}"
                 else
-		    CMD_TARGET=$(echo "${CMD}" | sed -e s+'^\([^@]*\)@.*$'+'\1'+)
-		    case "${CTYPE}" in
-			"nfs"|"smb")
-			    CMD_HOST=$(echo "${CMD}" | sed -e s+'^[^@]*@\([^:]*\):.*$'+'\1'+)
-			    CMD_RDIR=$(echo "${CMD}" | sed -e s+'^[^@]*@[^:]*:\([^:]*\).*$'+'\1'+)
-			    CMD_OPT=$(echo "${CMD}" | sed -e s+'^[^@]*@[^:]*:[^:]*'+''+ -e s+'^:'++)
-			    ;;
-			"part")
-			    CMD_PART=$(echo "${CMD}" | sed -e s+'^[^@]*@\(.*\)$'+'\1'+)
-			    CMD_SUBDIR="/"
-			    CMD_KEYPART=$(echo "${CMD_PART}" | md5sum | cut -c 1-10)
-			    if echo "${CMD_PART}" | grep -qE ':'
-			    then
-				CMD_SUBDIR=$(echo "${CMD_PART}" | sed -e s+"^[^:]*:"++)
-				CMD_PART=$(echo "${CMD_PART}" | sed -e s+":.*$"++)
-			    fi
-			    ;;
-			*)
-			    echo "unknown type" >&2
-			    return 1
-		    esac
+                    CMD_TARGET=$(echo "${CMD}" | sed -e s+'^\([^@]*\)@.*$'+'\1'+)
+                    case "${CTYPE}" in
+                    "nfs"|"smb")
+                        CMD_HOST=$(echo "${CMD}" | sed -e s+'^[^@]*@\([^:]*\):.*$'+'\1'+)
+                        CMD_RDIR=$(echo "${CMD}" | sed -e s+'^[^@]*@[^:]*:\([^:]*\).*$'+'\1'+)
+                        CMD_OPT=$(echo "${CMD}" | sed -e s+'^[^@]*@[^:]*:[^:]*'+''+ -e s+'^:'++)
+                        ;;
+                    "part")
+                        CMD_PART=$(echo "${CMD}" | sed -e s+'^[^@]*@\(.*\)$'+'\1'+)
+                        CMD_SUBDIR="/"
+                        CMD_KEYPART=$(echo "${CMD_PART}" | md5sum | cut -c 1-10)
+                        if echo "${CMD_PART}" | grep -qE ':'
+                        then
+                            CMD_SUBDIR=$(echo "${CMD_PART}" | sed -e s+"^[^:]*:"++)
+                            CMD_PART=$(echo "${CMD_PART}" | sed -e s+":.*$"++)
+                        fi
+                        ;;
+                    *)
+                        echo "unknown type" >&2
+                        return 1
+                    esac
 
                     # MAP to the SHARE directory
                     CMD_TDIR="/userdata"
@@ -226,23 +233,25 @@ mountDevicesOrNetwork() {
 
                     case "${CTYPE}" in
                         "nfs")
+                            modprobe nfs
                             CMD_ADDOPT=
                             [ -n "${CMD_OPT}" ] && CMD_ADDOPT=",${CMD_OPT}"
                             CMD_EXEC="mount -o port=2049,nolock,proto=tcp${CMD_ADDOPT} ${CMD_HOST}:${CMD_RDIR} ${CMD_TDIR}"
                             ;;
                         "smb")
+                            modprobe cifs
                             CMD_ADDOPT=
                             [ -n "${CMD_OPT}" ] && CMD_ADDOPT="-o ${CMD_OPT}"
                             CMD_EXEC="mount.cifs //${CMD_HOST}/${CMD_RDIR} ${CMD_TDIR} ${CMD_ADDOPT}"
                             ;;
-			"part")
-			    if test "${CMD_SUBDIR}" = "/"
-			    then
-				CMD_EXEC="mountPartByTag UUID=${CMD_PART} ${CMD_TDIR}"
-			    else
-				CMD_EXEC="mountPartSubdir ${CMD_KEYPART} ${CMD_PART} ${CMD_SUBDIR} ${CMD_TDIR}"
-			    fi
-			    ;;
+                        "part")
+                            if test "${CMD_SUBDIR}" = "/"
+                            then
+                                CMD_EXEC="mountPartByTag UUID=${CMD_PART} ${CMD_TDIR}"
+                            else
+                                CMD_EXEC="mountPartSubdir ${CMD_KEYPART} ${CMD_PART} ${CMD_SUBDIR} ${CMD_TDIR}"
+                            fi
+                            ;;
                     esac
                 fi
 
