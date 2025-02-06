@@ -1,0 +1,19 @@
+default:
+  options:
+    video_threaded: true
+    smooth: false
+    retroarch.audio_driver: alsathread
+
+3ds:
+  emulator: libretro
+  core:     panda3ds
+nds:
+  emulator: libretro
+  core:     melonds
+fmtowns:
+  emulator: libretro
+  core:     mame
+flash:
+  emulator: lightspark
+  core:     lightspark
+

@@ -27,7 +27,7 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="allwinner/sun50i-h616-x96-mate allwinner/sun50i-h616-orangepi-zero2 allwinner/sun50i-h618-orangepi-zero3"
-BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h616-mangopi-mqquad.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h618-bananapi-m4berry.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h618-orangepi-zero2w.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h618-bananapi-m4zero.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h700-anbernic-rg35xx-2024.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h700-anbernic-rg35xx-h.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h700-anbernic-rg35xx-plus.dts"
+BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h616-mangopi-mqquad.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h618-bananapi-m4berry.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h618-orangepi-zero2w.dts $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/allwinner/h616/dts/sun50i-h618-bananapi-m4zero.dts"
 
 # GPU
 BR2_PACKAGE_BATOCERA_PANFROST_MESA3D=y
