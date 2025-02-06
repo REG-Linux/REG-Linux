@@ -2,6 +2,9 @@ config BR2_PACKAGE_ARES
     bool "ares"
     select BR2_PACKAGE_SDL2
     select BR2_PACKAGE_ZLIB
+    select BR2_PACKAGE_PANGO
+    select BR2_PACKAGE_CAIRO
+    select BR2_PACKAGE_LIBGTK3
     depends on BR2_PACKAGE_HAS_LIBGL
   
     help
