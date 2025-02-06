@@ -17,47 +17,48 @@ TESTFILE="${MOUNTPOINT}/reglinux.fsrw.test"
 
 do_mount() {
     case "${FSTYPE}" in
-        exfat)
-            # required for exfat
-            # note that we can't just put in /etc/modules.conf because it is loaded too late after udev and share mounting
-            modprobe fuse
-            if ! mount.exfat "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
-                exit 1
-            fi
-        ;;
-        vfat)
-            FSMOUNTOPT="${FSMOUNTOPT},iocharset=utf8,flush"
-            if ! mount "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
-                exit 1
-            fi
-        ;;
         ntfs)
-            if test -e "/sbin/mount.ntfs-3g"; then
-                /sbin/mount.ntfs-3g "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}" || exit 1
-            else
-                mount -t ntfs3 "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}" || exit 1
+            if test -n "$(ntfsinfo -m "${MOUNTDEVICE}" 2>&1 | grep 'Volume is scheduled for check.')"; then
+                ntfsfix -d "${MOUNTDEVICE}"
             fi
-        ;;
+            if modprobe ntfs3; then
+                if ! mount -t ntfs3 "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
+                    exit 1
+                fi
+            else
+                if ! modprobe fuse || ! mount -t ntfs-3g "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
+                    exit 1
+                fi
+            fi
+            ;;
         btrfs)
+            modprobe btrfs
             if mount -t btrfs "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
                 exit 0
             fi
             exit 1
-        ;;
+            ;;
+        vfat|exfat)
+            modprobe "${FSTYPE}"
+            FSMOUNTOPT="${FSMOUNTOPT},iocharset=utf8"
+            if ! mount "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
+                exit 1
+            fi
+            ;;
         *)
             # ext4
             if mount "${MOUNTDEVICE}" "${MOUNTPOINT}" -o "${FSMOUNTOPT}"; then
                 exit 0
             fi
             exit 1
-        ;;
+            ;;
     esac
 }
 
 # try to mount
 do_mount
 
-if test "${RWREQUIRED}" != 1; then
+if test "${RWREQUIRED}" != "1"; then
     exit 0 # success even if it's readonly
 fi
 
@@ -81,7 +82,7 @@ case "${FSTYPE}" in
         fsck.vfat -a "${MOUNTDEVICE}" > /dev/tty0
     ;;
     "ntfs")
-        ntfsfix "${MOUNTDEVICE}" > /dev/tty0
+        ntfsfix -d "${MOUNTDEVICE}" > /dev/tty0
     ;;
 esac
 
