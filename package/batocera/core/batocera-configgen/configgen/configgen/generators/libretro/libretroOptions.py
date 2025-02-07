@@ -113,10 +113,11 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
     # Commodore 64
     if (system.config['core'] == 'vice_x64') or (system.config['core'] == 'vice_x64sc') or (system.config['core'] == 'vice_xscpu64'):
 
-        # Activate Jiffydos
-        coreSettings.save('vice_jiffydos',          '"enabled"')
-        # Enable Automatic Load Warp
-        coreSettings.save('vice_autoloadwarp',      '"enabled"')
+        # REG disable jiffydos and autoloadwarp for now
+	# REG TODO Activate Jiffydos
+        coreSettings.save('vice_jiffydos',          '"disabled"')
+        # REG TODO Enable Automatic Load Warp
+        coreSettings.save('vice_autoloadwarp',      '"disabled"')
         # Disable Datasette Hotkeys
         coreSettings.save('vice_datasette_hotkeys', '"disabled"')
         # Not Read 'vicerc'
