@@ -1,0 +1,110 @@
+From f9aa935084d24fbbe5e7b2c62948a8f08b228f18 Mon Sep 17 00:00:00 2001
+From: voapilro <voapilro@gmail.com>
+Date: Mon, 6 May 2024 11:36:47 +0200
+Subject: [PATCH 1/3] Fix memory size detection for 1.5GB Orange Pi Zero 3
+ board
+
+---
+ arch/arm/include/asm/arch-sunxi/dram.h |  2 ++
+ arch/arm/mach-sunxi/dram_helpers.c     | 28 ++++++++++++++++++++++++++
+ arch/arm/mach-sunxi/dram_sun50i_h616.c | 17 +++++++++++++++-
+ board/sunxi/board.c                    |  3 +--
+ 4 files changed, 47 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/include/asm/arch-sunxi/dram.h b/arch/arm/include/asm/arch-sunxi/dram.h
+index 9d21b492..8b265b7b 100644
+--- a/arch/arm/include/asm/arch-sunxi/dram.h
++++ b/arch/arm/include/asm/arch-sunxi/dram.h
+@@ -40,6 +40,8 @@
+ unsigned long sunxi_dram_init(void);
+ void mctl_await_completion(u32 *reg, u32 mask, u32 val);
+ bool mctl_mem_matches(u32 offset);
++bool mctl_mem_matches_top(ulong offset);
++ulong mctl_mem_address(ulong offset);
+ bool mctl_mem_matches_base(u32 offset, ulong base);
+
+ #endif /* _SUNXI_DRAM_H */
+diff --git a/arch/arm/mach-sunxi/dram_helpers.c b/arch/arm/mach-sunxi/dram_helpers.c
+index 83dbe4ca..173f6e57 100644
+--- a/arch/arm/mach-sunxi/dram_helpers.c
++++ b/arch/arm/mach-sunxi/dram_helpers.c
+@@ -61,4 +61,32 @@ bool mctl_mem_matches(u32 offset)
+ {
+ 	return mctl_mem_matches_base(offset, CFG_SYS_SDRAM_BASE);
+ }
++
++/*
++ * Test if memory at offset matches memory at top of DRAM
++ */
++bool mctl_mem_matches_top(ulong offset)
++{
++	static const unsigned value= 0xaa55aa55;
++
++	/* Take last usable memory address */
++	offset -= sizeof(value);
++	dsb();
++	/* Set zero at last usable memory address */
++	writel(0, (ulong)CFG_SYS_SDRAM_BASE + offset);
++	dsb();
++	/* Set other value at last usable memory address */
++	writel(value, (ulong)CFG_SYS_SDRAM_BASE + offset);
++	dsb();
++	/* Check if the same value is actually observed when reading back */
++	return readl((ulong)CFG_SYS_SDRAM_BASE + offset) == value;
++}
++
++/*
++ * Get memory address at offset of DRAM
++ */
++ulong mctl_mem_address(ulong offset)
++{
++	return (ulong)CFG_SYS_SDRAM_BASE + offset;
++}
+ #endif
+diff --git a/arch/arm/mach-sunxi/dram_sun50i_h616.c b/arch/arm/mach-sunxi/dram_sun50i_h616.c
+index 37c139e0..79333739 100644
+--- a/arch/arm/mach-sunxi/dram_sun50i_h616.c
++++ b/arch/arm/mach-sunxi/dram_sun50i_h616.c
+@@ -1348,9 +1348,24 @@ static void mctl_auto_detect_dram_size(const struct dram_para *para,
+ static unsigned long mctl_calc_size(const struct dram_config *config)
+ {
+ 	u8 width = config->bus_full_width ? 4 : 2;
++	unsigned long size;
+
+ 	/* 8 banks */
+-	return (1ULL << (config->cols + config->rows + 3)) * width * config->ranks;
++	size = (1ULL << (config->cols + config->rows + 3)) * width * config->ranks;
++
++	printf("DRAM base address is defined as 0x%lx\n", mctl_mem_address(0));
++	printf("DRAM has %u b/raw, %u b/col, %u B/width, %u #rank and 8 #bank\n",
++	       (unsigned)config->rows, (unsigned)config->cols,
++	       (unsigned)width, (unsigned)config->ranks);
++	printf("DRAM top address must be less than 0x%lx\n", size);
++
++	/* Fix size if last usable memory address is not valid */
++	if (!mctl_mem_matches_top(size)) {
++		size = (size * 3) / 4;
++		printf("DRAM top address must be less than 0x%lx\n", size);
++	}
++
++	return size;
+ }
+
+ static const struct dram_para para = {
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 8c12c8de..62228936 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -632,9 +632,8 @@ void sunxi_board_init(void)
+ 	power_failed |= axp_set_sw(IS_ENABLED(CONFIG_AXP_SW_ON));
+ #endif
+ #endif	/* CONFIG_AXPxxx_POWER */
+-	printf("DRAM:");
+ 	gd->ram_size = sunxi_dram_init();
+-	printf(" %d MiB\n", (int)(gd->ram_size >> 20));
++	printf("DRAM: %d MiB\n", (int)(gd->ram_size >> 20));
+ 	if (!gd->ram_size)
+ 		hang();
+
+--
+2.45.2
