@@ -1,0 +1,24 @@
+--- a/ruby/cmake/os-linux.cmake	2025-01-25 21:14:42.000000000 +0100
++++ b/ruby/cmake/os-linux.cmake	2025-01-26 01:18:20.337752533 +0100
+@@ -132,7 +132,7 @@
+   PRIVATE
+     $<$<BOOL:${SDL_FOUND}>:SDL::SDL>
+     $<$<BOOL:${OpenAL_FOUND}>:OpenAL::OpenAL>
+-    $<$<BOOL:TRUE>:librashader::librashader>
++    $<$<BOOL:${librashader_FOUND}>:librashader::librashader>
+     $<$<BOOL:${OSS_FOUND}>:OSS::OSS>
+     $<$<BOOL:${ALSA_FOUND}>:ALSA::ALSA>
+     $<$<BOOL:${PulseAudio_FOUND}>:PulseAudio::PulseAudio>
+--- a/thirdparty/CMakeLists.txt	2025-02-06 11:43:03.935624698 +0100
++++ b/thirdparty/CMakeLists.txt	2025-02-06 11:43:10.103766349 +0100
+@@ -9,9 +9,7 @@
+ list(APPEND CHDR_LIBS lzma)
+ list(APPEND CHDR_INCLUDES lzma)
+ 
+-if(OS_MACOS)
+-  option(WITH_SYSTEM_ZLIB "Use system zlib" ON)
+-endif()
++option(WITH_SYSTEM_ZLIB "Use system zlib" ON)
+ # zlib
+ if(WITH_SYSTEM_ZLIB)
+   find_package(ZLIB REQUIRED)
