@@ -1,0 +1,44 @@
+--- a/Makefile	2025-02-07 15:22:44.153125519 +0100
++++ b/Makefile	2025-02-07 15:23:55.942616665 +0100
+@@ -211,22 +211,9 @@
+ CHOOSER:=nuklear_ui/filechooser_nulll.o
+ endif
+ 
+-ifdef NEW_CORE
+ Z80OBJS=z80.o z80inst.o
+ M68KOBJS+= m68k.o
+ CFLAGS+= -DNEW_CORE
+-else
+-Z80OBJS=z80inst.o z80_to_x86.o
+-ifeq ($(CPU),x86_64)
+-M68KOBJS+= m68k_core.o m68k_core_x86.o
+-TRANSOBJS+= gen_x86.o backend_x86.o
+-else
+-ifeq ($(CPU),i686)
+-M68KOBJS+= m68k_core.o m68k_core_x86.o
+-TRANSOBJS+= gen_x86.o backend_x86.o
+-endif
+-endif
+-endif
+ AUDIOOBJS=ym2612.o ymf262.o ym_common.o psg.o wave.o flac.o vgm.o event_log.o render_audio.o rf5c164.o
+ CONFIGOBJS=config.o tern.o util.o paths.o
+ NUKLEAROBJS=$(FONT) $(CHOOSER) nuklear_ui/blastem_nuklear.o nuklear_ui/sfnt.o
+@@ -247,18 +247,6 @@
+ LDFLAGS+=$(EXTRA_NUKLEAR_LDFLAGS)
+ endif
+ 
+-ifeq ($(CPU),x86_64)
+-CFLAGS+=-DX86_64 -m64
+-LDFLAGS+=-m64
+-else
+-ifeq ($(CPU),i686)
+-CFLAGS+=-DX86_32 -m32
+-LDFLAGS+=-m32
+-else
+-$(error $(CPU) is not a supported architecture)
+-endif
+-endif
+-
+ ifdef NOZ80
+ CFLAGS+=-DNO_Z80
+ else
