@@ -797,8 +797,8 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     # Mednafen
     select BR2_PACKAGE_MEDNAFEN			if !BR2_PACKAGE_BATOCERA_TARGET_BCM2835 && !BR2_mipsel
 
-    # Ares
-    # not yet select BR2_PACKAGE_ARES			if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL
+    # Ares (OpenGL 3.3+ or Vulkan or wgpu)
+    select BR2_PACKAGE_ARES			if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_REGLINUX_VULKAN
 
 #### Wine Layer ####
 config BR2_PACKAGE_BATOCERA_WINE_SYSTEMS
