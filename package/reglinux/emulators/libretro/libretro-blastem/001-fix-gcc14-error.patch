@@ -1,0 +1,11 @@
+--- a/Makefile	2025-02-07 15:13:22.724482837 +0100
++++ b/Makefile	2025-02-07 15:13:42.349888989 +0100
+@@ -52,7 +52,7 @@
+ EXE:=
+ 
+ HAS_PROC:=$(shell if [ -d /proc ]; then /bin/echo -e -DHAS_PROC; fi)
+-CFLAGS:=-std=gnu99 -Wreturn-type -Werror=return-type -Werror=implicit-function-declaration -Wno-unused-value  -Wpointer-arith -Werror=pointer-arith $(HAS_PROC) -DHAVE_UNISTD_H
++CFLAGS:=-std=gnu99 -Wno-error=incompatible-pointer-types -Wreturn-type -Werror=return-type -Werror=implicit-function-declaration -Wno-unused-value  -Wpointer-arith -Werror=pointer-arith $(HAS_PROC) -DHAVE_UNISTD_H
+ 
+ ifeq ($(OS),Darwin)
+ LIBS=$(SDL) glew
