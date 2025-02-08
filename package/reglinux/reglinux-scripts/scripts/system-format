@@ -54,7 +54,7 @@ do_listFstypes() {
     echo "ext4"
     echo "exfat"
     echo "btrfs"
-    echo "ntfs"
+#    echo "ntfs"    # ntfs partition gets corrupted easily and won't mount
 }
 
 do_unmount_disk() {
