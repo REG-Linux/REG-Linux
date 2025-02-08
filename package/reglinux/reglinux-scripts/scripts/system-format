@@ -8,26 +8,13 @@ do_help() {
     echo "${PROG} format INTERNAL <fstype>" >&2
 }
 
-determine_part_prefix() {
-    # /dev/mmcblk0p3 => /dev/mmcblk0
-    # /dev/sda1      => /dev/sda
-
-    # sometimes, it's pX, sometimes just an X : http://www.tldp.org/HOWTO/Partition-Mass-Storage-Definitions-Naming-HOWTO/x160.html
-    if echo "${1}" | grep -qE 'p[0-9]$'
-    then
-        echo "$1" | sed -e s+'p[0-9]$'+''+
-        return 0
-    fi
-    echo "$1" | sed -e s+'[0-9]$'++
-}
-
 disks_to_keep() {
-    grep -E '^[^ ]* /boot |^[^ ]* /userdata' /proc/mounts | sed -e s+"^\([^ ]*\) .*$"+'\1'+ |
-    while read X
+    sed -n -e "s|\(^[^ ].*\) /boot .*$|\1|p" -e "s|\(^[^ ].*\) /userdata .*$|\1|p" /proc/mounts |
+    while read -r X
     do
-        determine_part_prefix "${X}"
+        X="${X#/dev/}"
+        [ -n "${X#"${X%p[0-9]}"}" ] && echo "${X%p[0-9]}" || echo "${X%[0-9]}"
     done |
-    sed -e s+'^/dev/'++ |
     sort -u
 }
 
@@ -35,7 +22,7 @@ do_listDisks() {
     echo "INTERNAL INTERNAL"
     lsblk -A -n -P -o TYPE,NAME,SIZE,MODEL | grep -E '^TYPE="disk" ' | grep -ve 'mmcblk.boot' |    # Ignore /dev/mmkblk?boot? special devices
         sed -e s+'.*NAME=\"\([^"]*\)\" SIZE=\"\([^"]*\)\" MODEL=\"\([^"]*\)\".*'+'\1 (\2) \3'+ |
-        while read XDRIVE XSIZE XMODEL
+        while read -r XDRIVE XSIZE XMODEL
         do
             for XKEEP in $(disks_to_keep)
             do
