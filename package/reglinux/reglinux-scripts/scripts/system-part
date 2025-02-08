@@ -1,76 +1,42 @@
-#!/bin/sh
+#!/bin/bash
 
 # the only partition we know when booting from linux is the root device on which linux booted.
-# by convention, the share partition is the next partition on the same disk
-
-# REG Linux has 2 partitions
+# usually, the share partition is the next partition on the same disk
 # 1 : the boot partition
 # 2 : the share partition (user data)
 #
-# from the root device partition the partitions can be determined
 # the root partition is not always /dev/mmcblk0p1, mainly in case you boot from an usb stick or a hard drive
 
 determine_X_part() {
-    grep -E "^[^ ]* ${1} " /proc/mounts | cut -d ' ' -f 1
+    sed -n -e "s|\(^[^ ].*\) ${1} .*$|\1|p" /proc/mounts
 }
 
 determine_default_share_part() {
   BOOTPART=$(determine_X_part "/boot")
   BOOTDISKPREFIX=$(determine_part_prefix "$BOOTPART")
-  # Make sure it is in the same disk
-  SHAREPART=$(blkid -o device -t LABEL=SHARE "$BOOTDISKPREFIX"*)
-  # Check that is a number
-  if echo "$SHAREPART" | sed -e s+'^.*\([0-9]\)$'+'\1'+ | grep -qE '^[0-9]$'
-  then
-    echo "$SHAREPART"
-  else
-    exit 1
-  fi
+  SHAREPART=$(blkid -o device -t LABEL=SHARE "$BOOTDISKPREFIX"*)                # Make sure it is in the same disk
+  [ -n "${SHAREPART#"${SHAREPART%[0-9]}"}" ] && echo "$SHAREPART" || exit 1     # Check that is a number
+
 }
 
 determine_default_share_part_num() {
-  PARTSHARE=$(determine_default_share_part)
-  XSHARE=$(echo "$PARTSHARE" | sed -e s+'^.*\([0-9]\)$'+'\1'+)
-  if echo "$XSHARE" | grep -qE '^[0-9]$'
-  then
-    echo "$XSHARE"
-  else
-    exit 1
-  fi
+  BOOTPART=$(determine_X_part "/boot")
+  BOOTDISKPREFIX=$(determine_part_prefix "$BOOTPART")
+  SHAREPART=$(blkid -o device -t LABEL=SHARE "$BOOTDISKPREFIX"*)
+  [ -n "${SHAREPART#"${SHAREPART%[0-9]}"}" ] && echo "${SHAREPART#"${SHAREPART%[0-9]}"}" || exit 1
 }
 
 determine_part_prefix() {
   # /dev/mmcblk0p3 => /dev/mmcblk0
   # /dev/sda1      => /dev/sda
-
-  # sometimes, it's pX, sometimes just an X : http://www.tldp.org/HOWTO/Partition-Mass-Storage-Definitions-Naming-HOWTO/x160.html
-  if echo "${1}" | grep -qE 'p[0-9]$'
-  then
-    echo "$1" | sed -e s+'p[0-9]$'+''+
-  else
-    echo "$1" | sed -e s+'[0-9]$'++
-  fi
-}
-
-determine_previous_part() {
-  PART="${1}"
-  XPART=$(echo "${1}" | sed -e s+'^.*\([0-9]\)$'+'\1'+)
-
-  # check that it is a number
-  if echo "${XPART}" | grep -qE '^[0-9]$'
-  then
-    XPREVPART=$((XPART - 1))
-    echo "${PART}" | sed -e s+"${XPART}$"+"${XPREVPART}"+
-  else
-    exit 1
-  fi
+  [ -n "${1#"${1%p[0-9]}"}" ] && echo "${1%p[0-9]}" || echo "${1%[0-9]}"
 }
 
 PARTNAME=$1
 
 case "${PARTNAME}" in
   "boot")
-    determine_X_part "/boot"
+    determine_X_part /boot
   ;;
 
   "share_internal")
@@ -82,7 +48,7 @@ case "${PARTNAME}" in
   ;;
 
   "share")
-    determine_X_part "/userdata"
+    determine_X_part /userdata
   ;;
 
   "prefix")
@@ -90,13 +56,12 @@ case "${PARTNAME}" in
   ;;
 
   *)
-    echo "${0} <boot|share_internal|share_internal_num|prefix x|previous x>" >&2
+    echo "${0} <boot|share_internal|share_internal_num|share|prefix x>" >&2
     echo "  boot: the REG Linux boot partition" >&2
     echo "  share_internal: the REG Linux share internal partition " >&2
     echo "  share_internal_num: the number of share_internal partition" >&2
     echo "  share: the REG Linux share partition " >&2
     echo "  prefix x: the disk of the partition x (without the partition number)" >&2
-    echo "  previous x: the partition before x on the same disk" >&2
     exit 1
   ;;
 esac
