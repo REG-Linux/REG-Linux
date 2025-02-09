@@ -1,7 +1,5 @@
 #!/bin/bash
 
-FIND_EXT=$(find /userdata/system -maxdepth 1 -name "extension_*.tar.gz" | head -1)
-
 FIND_OVERLAY=
 test -e "/boot/boot/overlay" && FIND_OVERLAY=1
 
@@ -20,7 +18,6 @@ FIND_PRO=
 test -e "/userdata/system/pro" && FIND_PRO=1
 
 EXTRA=
-test -n "${FIND_EXT}"      	   && EXTRA=${EXTRA}e
 test -n "${FIND_OVERLAY}"  	   && EXTRA=${EXTRA}o
 test -n "${FIND_CUSTOMSH}" 	   && EXTRA=${EXTRA}c
 test -n "${FIND_CUSTOMESSYSTEMS}"  && EXTRA=${EXTRA}s
