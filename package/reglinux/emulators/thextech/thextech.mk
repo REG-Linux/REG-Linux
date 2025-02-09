@@ -9,7 +9,7 @@ THEXTECH_SITE = https://github.com/Wohlstand/TheXTech
 THEXTECH_SITE_METHOD = git
 THEXTECH_GIT_SUBMODULES = YES
 THEXTECH_LICENSE = GPLv3
-THEXTECH_DEPENDENCIES = sdl2 sdl2_mixer sdl2_ttf host-dos2unix
+THEXTECH_DEPENDENCIES = sdl2 sdl2_mixer sdl2_ttf
 
 THEXTECH_CONF_ENV = GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
@@ -41,12 +41,5 @@ define THEXTECH_INSTALL_TARGET_CMDS
 	cp -avf $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/thextech/thextech.keys \
 	    $(TARGET_DIR)/usr/share/evmapy/
 endef
-
-define THEXTECH_FIX_CRLF_CMAKELISTS
-    cd $(@D); \
-        $(HOST_DIR)/bin/dos2unix 3rdparty/AudioCodecs/libopus/CMakeLists.txt
-endef
-
-THEXTECH_POST_EXTRACT_HOOKS += THEXTECH_FIX_CRLF_CMAKELISTS
 
 $(eval $(cmake-package))
