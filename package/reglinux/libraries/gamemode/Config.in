@@ -1,5 +1,6 @@
 config BR2_PACKAGE_GAMEMODE
 	bool "gamemode"
+	select BR2_PACKAGE_DBUS
 
 	help 
 	    GameMode is a daemon/lib combo for Linux that allows games to request a set of optimisations be temporarily applied to the host OS and/or a game process.
