@@ -79,6 +79,11 @@ f_cp /boot/system-boot.conf                                    "${DSYSTEM}"
 f_cp /var/log/Xorg.0.log                                       "${DSYSTEM}"
 f_cp /var/log/bluetooth-agent.log                              "${DSYSTEM}"
 
+# boot.log
+if [ -f /var/run/boot.log ]; then
+    f_cp /var/run/boot.log                                     "${DSYSTEM}"
+fi
+
 # clear passwords
 # filter some dangerous options (may include some path with /userdata)
 sed -i -e s+"^.*password.*$"+""+gI "${DSYSTEM}/logs/"*.log
