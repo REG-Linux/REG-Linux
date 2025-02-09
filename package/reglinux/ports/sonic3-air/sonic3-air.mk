@@ -14,7 +14,7 @@ SONIC3_AIR_LICENSE_FILE = COPYING.txt
 # Custom GLES 2.0 cmake
 define SONIC3_AIR_ADD_GLES2_CMAKE
 	mkdir -p $(@D)/Oxygen/sonic3air/build/_gles2/
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/sonic3-air/CMakeLists.txt.gles2 $(@D)/Oxygen/sonic3air/build/_gles2/CMakeLists.txt
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/sonic3-air/CMakeLists.txt.gles2 $(@D)/Oxygen/sonic3air/build/_gles2/CMakeLists.txt
 endef
 SONIC3_AIR_PRE_CONFIGURE_HOOKS += SONIC3_AIR_ADD_GLES2_CMAKE
 
@@ -25,7 +25,7 @@ else
 SONIC3_AIR_SUBDIR = Oxygen/sonic3air/build/_gles2
 endif
 
-SONIC3_AIR_DEPENDENCIES += alsa-lib libcurl zlib
+SONIC3_AIR_DEPENDENCIES += alsa-lib libcurl zlib sdl2
 
 # Dynamic dependencies
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
@@ -69,7 +69,7 @@ endef
 
 define SONIC3_AIR_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/sonic3-air/sonic3-air.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/sonic3-air/sonic3-air.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
