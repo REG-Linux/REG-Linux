@@ -1,0 +1,11 @@
+--- a/scripts/src/osd/sdl.lua	2025-02-10 16:41:46.489062442 +0100
++++ b/scripts/src/osd/sdl.lua	2025-02-10 16:39:18.839692932 +0100
+@@ -307,7 +313,7 @@
+ 	}
+ 	configuration { "linux-* or freebsd" }
+ 		buildoptions {
+-			"-fPIC",
++		--	"-fPIC",
+ 		}
+ 	configuration { }
+ 

@@ -3,8 +3,8 @@
 # REGLINUX-MAME (Prebuilt GroovyMAME + libretro-mame)
 #
 ################################################################################
-# Version: 0.273
-REGLINUX_MAME_VERSION = 0.273
+# Version: 0.274
+REGLINUX_MAME_VERSION = 0.274
 REGLINUX_MAME_SITE = $(call github,REG-Linux,REG-MAME,$(REGLINUX_MAME_VERSION))
 REGLINUX_MAME_LICENSE = MAME
 
@@ -55,8 +55,10 @@ REGLINUX_MAME_ARCH = saphira
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_JH7110),y)
 REGLINUX_MAME_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
+# TODO currently uses jh7110
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_K1),y)
-REGLINUX_MAME_ARCH = k1
+REGLINUX_MAME_ARCH = jh7110
+#REGLINUX_MAME_ARCH = k1
 # X86-64-v3 subarchitecture
 else ifeq ($(BR2_x86_x86_64_v3),y)
 REGLINUX_MAME_ARCH = x86_64_v3
