@@ -3,8 +3,8 @@
 # MAME (GroovyMAME)
 #
 ################################################################################
-# Version: GroovyMAME 0.273 - Switchres 2.21d
-MAME_VERSION = gm0273sr221d
+# Version: GroovyMAME 0.274 - Switchres 2.21d
+MAME_VERSION = gm0274sr221d
 MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
 MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
 MAME_LICENSE = MAME
@@ -30,12 +30,15 @@ MAME_CROSS_OPTS += PTR64=0
 MAME_CROSS_OPTS += NOWERROR=1
 endif
 
-# x86_64 is desktop linux based on X11 and OpenGL
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
-MAME_CROSS_ARCH = x86_64
-# other archs are embedded, no X11, no OpenGL (only ES)
-else
-MAME_CROSS_OPTS += NO_X11=1 NO_OPENGL=1 NO_USE_XINPUT=1 NO_USE_BGFX_KHRONOS=1 FORCE_DRC_C_BACKEND=1 USE_WAYLAND=1
+# All platforms run Wayland, no X11
+MAME_CROSS_OPTS += NO_X11=1 NO_USE_XINPUT=1 USE_WAYLAND=1
+MAME_CFLAGS += -DEGL_NO_X11=1
+# No error on unused function
+MAME_CFLAGS += -Wno-error=unused-function
+
+# Disable OpenGL if we don't have it
+ifneq ($(BR2_PACKAGE_HAS_LIBGL),y)
+MAME_CROSS_OPTS += NO_OPENGL=1 NO_USE_BGFX_KHRONOS=1
 endif
 
 # Handle alsa vs pulse/pipewire audio stack
@@ -45,82 +48,75 @@ else
 MAME_CROSS_OPTS += NO_USE_PULSEAUDIO=1
 endif
 
-# Allow cross-architecture compilation with MAME build system
-ifeq ($(BR2_aarch64),y)
+# Define cross-architecture, adjust DRC backend
+ifeq ($(BR2_x86_64),y)
+MAME_CROSS_ARCH = x86_64
+else ifeq ($(BR2_aarch64),y)
 MAME_CROSS_ARCH = arm64
-MAME_CFLAGS += -DEGL_NO_X11=1
+# AArch64 CPU flags
+ifeq ($(BR2_cortex_a53),y)
+MAME_CFLAGS += -mcpu=cortex-a53 -mtune=cortex-a53
+else ifeq ($(BR2_cortex_a35),y)
+MAME_CFLAGS += -mcpu=cortex-a35 -mtune=cortex-a35
+else ifeq ($(BR2_cortex_a55),y)
+MAME_CFLAGS += -mcpu=cortex-a55 -mtune=cortex-a55
+else ifeq ($(BR2_cortex_a73_a53),y)
+MAME_CFLAGS += -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53
+else ifeq ($(BR2_cortex_a72),y)
+MAME_CFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
+else ifeq ($(BR2_cortex_a76),y)
+MAME_CFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
+else ifeq ($(BR2_cortex_a76_a55),y)
+MAME_CFLAGS += -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
 endif
+else
+MAME_CROSS_OPTS += FORCE_DRC_C_BACKEND=1
+endif
+
+# Handle ARM 32-bit platforms
 ifeq ($(BR2_arm),y)
 MAME_CROSS_ARCH = arm
 # Always enable NEON on 32-bit arm
-MAME_CFLAGS += -D__ARM_NEON__ -D__ARM_NEON -DEGL_NO_X11=1
+MAME_CFLAGS += -D__ARM_NEON__ -D__ARM_NEON
 # workaround for linkage failure using ld on arm 32-bit targets
 MAME_LDFLAGS += -fuse-ld=gold -Wl,--long-plt
-endif
-
-# No error on unused function
-MAME_CFLAGS += -Wno-error=unused-function
-
-ifeq ($(BR2_RISCV_64),y)
-MAME_CROSS_ARCH = riscv64
-# Proper architecture flags
-MAME_CFLAGS += -mabi=lp64d -march=rv64imafdczbb_zba -mcpu=sifive-u74
-# Force OPTIMIZE level 2
-MAME_CROSS_OPTS += OPTIMIZE=2
-# Cast alignment warnings cause errors on riscv64
-MAME_CFLAGS += -Wno-error=cast-align -Wno-error=unused-function
-# Some GCC hacks needed to get riscv64 binary linking
-MAME_CFLAGS += -mcmodel=medany -fno-inline-small-functions
-MAME_LDFLAGS += -mcmodel=medany
-endif
-
+# ARM cpu flags
 ifeq ($(BR2_cortex_a9),y)
 MAME_CFLAGS += -mcpu=cortex-a9 -mtune=cortex-a9 -mfloat-abi=hard
-endif
-
-ifeq ($(BR2_cortex_a35),y)
-MAME_CFLAGS += -mcpu=cortex-a35 -mtune=cortex-a35
-endif
-
-ifeq ($(BR2_cortex_a17),y)
+else ifeq ($(BR2_cortex_a17),y)
 MAME_CFLAGS += -mcpu=cortex-a17 -mtune=cortex-a17 -mfloat-abi=hard
+else ifeq ($(BR2_cortex_a15_a7),y)
+MAME_CFLAGS += -mcpu=cortex-a15.cortex-a7 -mtune=cortex-a15.cortex-a7 -mfloat-abi=hard
+endif
 endif
 
-ifeq ($(BR2_cortex_a55),y)
-MAME_CFLAGS += -mcpu=cortex-a55 -mtune=cortex-a55
-endif
-
-ifeq ($(BR2_cortex_a73_a53),y)
-MAME_CFLAGS += -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53
-endif
-
-ifeq ($(BR2_cortex_a72),y)
-MAME_CFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
-endif
-
-ifeq ($(BR2_cortex_a76),y)
-MAME_CFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
-endif
-
-ifeq ($(BR2_cortex_a76_a55),y)
-MAME_CFLAGS += -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
+# Handle RV64GC platform (can be further tweaked and optimized)
+ifeq ($(BR2_RISCV_64),y)
+MAME_CROSS_ARCH = riscv64
+# Cast alignment warnings cause errors on riscv64
+MAME_CFLAGS += -mabi=lp64d -malign-data=xlen -Wno-error=cast-align
+# Use large code model to avoid linking relocation errors
+MAME_CFLAGS += -mcmodel=large
+MAME_LDFLAGS += -mcmodel=large
+# Proper architecture flags for JH7110
+MAME_CFLAGS += -march=rv64gc_zba_zbb -mcpu=sifive-u74 -mtune=sifive-u74
 endif
 
 # Enforce symbols debugging with O0
 ifeq ($(BR2_ENABLE_DEBUG),y)
 	MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
 # Stick with Os on x86_64 too much bloat with O2/O3 !!
-else ifeq ($(BR2_x86_64),y)
-	MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
+#else ifeq ($(BR2_x86_64),y)
+#	MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
 # Use O2 no LTO for RISC-V
-else ifeq ($(BR2_riscv),y)
-	MAME_EXTRA_ARGS += OPTIMIZE=2
-# Use O2 with LTO on other archs
+#else ifeq ($(BR2_riscv),y)
+#	MAME_EXTRA_ARGS += OPTIMIZE=2
+# Use O3 with LTO on other archs
 else
-	MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1
+	MAME_EXTRA_ARGS += OPTIMIZE=3 LTO=1
 endif
 
-define MAME_BUILD_CMDS
+define MAME_CONFIGURE_CMDS
 	# First, we need to build genie for host
 	cd $(@D); \
 		PATH="$(HOST_DIR)/bin:$$PATH" \
@@ -148,7 +144,9 @@ define MAME_BUILD_CMDS
 	cat $(@D)/machines3.list | while read file ; do grep 'GAME_CUSTOM' $$file | grep 'CRC' | grep 'SHA' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
 	# Remove reference to skeleton|mechanical drivers in mame.lst
 	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
+endef
 
+define MAME_BUILD_CMDS
 	# Compile emulation target (MAME)
 	cd $(@D); \
 	PATH="$(HOST_DIR)/bin:$$PATH" \

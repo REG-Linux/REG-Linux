@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-# Version : Jan 4, 2025
-# lrmame0273
-LIBRETRO_MAME_VERSION = lrmame0273
+# Version : Feb 4, 2025
+# lrmame0274
+LIBRETRO_MAME_VERSION = lrmame0274
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 LIBRETRO_MAME_LICENSE = MAME
 
@@ -25,32 +25,27 @@ LIBRETRO_MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_MAME_MAX_JOBS)
 
 ifeq ($(BR2_x86_64),y)
 LIBRETRO_MAME_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU=x86_64 PLATFORM=x86_64
-else ifeq ($(BR2_i386),y)
-LIBRETRO_MAME_EXTRA_ARGS += PTR64=0 LIBRETRO_CPU=x86 PLATFORM=x86
 else ifeq ($(BR2_RISCV_64),y)
 LIBRETRO_MAME_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU=riscv64 PLATFORM=riscv64
-else ifeq ($(BR2_riscv),y)
-LIBRETRO_MAME_EXTRA_ARGS += PTR64=0 LIBRETRO_CPU=riscv PLATFORM=riscv
 else ifeq ($(BR2_arm),y)
 LIBRETRO_MAME_EXTRA_ARGS += PTR64=0 LIBRETRO_CPU=arm PLATFORM=arm
-# workaround for linkage failure using ld on arm 32-bit targets
-LIBRETRO_MAME_ARCHOPTS += -fuse-ld=gold -Wl,--long-plt
+LIBRETRO_MAME_ARCHOPTS += -D__arm__ -fuse-ld=gold -Wl,--long-plt
 # workaround for asmjit broken build system (arm backend is not public)
-LIBRETRO_MAME_ARCHOPTS += -D__arm__ -DASMJIT_BUILD_X86
+#LIBRETRO_MAME_ARCHOPTS += -D__arm__
+#-DASMJIT_BUILD_X86
 else ifeq ($(BR2_aarch64),y)
-LIBRETRO_MAME_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU= PLATFORM=arm64
-# workaround for asmjit broken build system (arm backend is not public)
-LIBRETRO_MAME_ARCHOPTS += -D__aarch64__ -DASMJIT_BUILD_X86
+LIBRETRO_MAME_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU=arm64 PLATFORM=arm64
+LIBRETRO_MAME_ARCHOPTS += -D__aarch64__
 endif
 
 # Enforce symbols debugging with O0
 ifeq ($(BR2_ENABLE_DEBUG),y)
 	LIBRETRO_MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
 # Stick with O2, too much bloat with O3 !!
-else ifeq ($(BR2_x86_64),y)
-	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
+#else ifeq ($(BR2_x86_64),y)
+#	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
 else
-	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1
+	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=3 LTO=1
 endif
 
 define LIBRETRO_MAME_BUILD_CMDS
