@@ -62,7 +62,11 @@ case "$1" in
             ((CURRENTSTEP+=100))        # STEP * 100 for percentage
 
             # Start UPDATING splash
-            /usr/bin/plymouth change-mode --updates
+            if [ "$(system-part share)" = "tmpfs" ]; then
+                /usr/bin/plymouth change-mode --system-reset
+            else
+                /usr/bin/plymouth change-mode --updates
+            fi
             /usr/bin/plymouth --show-splash
             /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
             /usr/bin/plymouth display-message --text="Creating missing folders"

@@ -65,5 +65,5 @@ SubTitle=Do not turn off your computer
 [system-reset]
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
-Title=Resetting System...
-SubTitle=Do not turn off your computer
+Title=*** ERROR MOUNTING /userdata ***
+SubTitle=*** USING A RAMDISK INSTEAD ***
