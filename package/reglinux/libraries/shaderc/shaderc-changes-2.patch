@@ -1,0 +1,56 @@
+diff --git a/libshaderc/include/shaderc/shaderc.h b/libshaderc/include/shaderc/shaderc.h
+index 3a3e97d..65d5b77 100644
+--- a/libshaderc/include/shaderc/shaderc.h
++++ b/libshaderc/include/shaderc/shaderc.h
+@@ -506,6 +506,10 @@ SHADERC_EXPORT void shaderc_compile_options_set_invert_y(
+ SHADERC_EXPORT void shaderc_compile_options_set_nan_clamp(
+     shaderc_compile_options_t options, bool enable);
+ 
++// Returns a string representation of the specified compilation status.
++SHADERC_EXPORT const char* shaderc_compilation_status_to_string(
++    shaderc_compilation_status status);
++
+ // An opaque handle to the results of a call to any shaderc_compile_into_*()
+ // function.
+ typedef struct shaderc_compilation_result* shaderc_compilation_result_t;
+diff --git a/libshaderc/include/shaderc/shaderc.hpp b/libshaderc/include/shaderc/shaderc.hpp
+index 3817af8..5592b49 100644
+--- a/libshaderc/include/shaderc/shaderc.hpp
++++ b/libshaderc/include/shaderc/shaderc.hpp
+diff --git a/libshaderc/src/shaderc.cc b/libshaderc/src/shaderc.cc
+index 63f1bbc..c1a9b12 100644
+--- a/libshaderc/src/shaderc.cc
++++ b/libshaderc/src/shaderc.cc
+@@ -591,8 +595,31 @@ void shaderc_compiler_release(shaderc_compiler_t compiler) {
+   delete compiler;
+ }
+ 
++const char* shaderc_compilation_status_to_string(shaderc_compilation_status status)
++{
++  static constexpr const std::pair<shaderc_compilation_status, const char*> status_names[] = {
++    {shaderc_compilation_status_success, "shaderc_compilation_status_success"},
++    {shaderc_compilation_status_invalid_stage, "shaderc_compilation_status_invalid_stage"},
++    {shaderc_compilation_status_compilation_error, "shaderc_compilation_status_compilation_error"},
++    {shaderc_compilation_status_internal_error, "shaderc_compilation_status_internal_error"},
++    {shaderc_compilation_status_null_result_object, "shaderc_compilation_status_null_result_object"},
++    {shaderc_compilation_status_invalid_assembly, "shaderc_compilation_status_invalid_assembly"},
++    {shaderc_compilation_status_validation_error, "shaderc_compilation_status_validation_error"},
++    {shaderc_compilation_status_transformation_error, "shaderc_compilation_status_transformation_error"},
++    {shaderc_compilation_status_configuration_error, "shaderc_compilation_status_configuration_error"},
++  };
++
++  for (const auto& it : status_names)
++  {
++    if (status == it.first)
++      return it.second;
++  }
++
++  return "shaderc_compilation_status_unknown";
++}
++
+ namespace {
+-shaderc_compilation_result_t CompileToSpecifiedOutputType(
++shaderc_compilation_result_vector* CompileToSpecifiedOutputType(
+     const shaderc_compiler_t compiler, const char* source_text,
+     size_t source_text_size, shaderc_shader_kind shader_kind,
+     const char* input_file_name, const char* entry_point_name,
