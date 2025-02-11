@@ -10,5 +10,6 @@ PYTHON_BINHO_HOST_ADAPTER_SITE = https://files.pythonhosted.org/packages/68/36/2
 PYTHON_BINHO_HOST_ADAPTER_SETUP_TYPE = setuptools
 
 PYTHON_BINHO_HOST_ADAPTER_DEPENDENCIES = python-serial
+PYTHON_BINHO_HOST_ADAPTER_DEPENDENCIES += host-python-setuptools-scm
 
 $(eval $(python-package))

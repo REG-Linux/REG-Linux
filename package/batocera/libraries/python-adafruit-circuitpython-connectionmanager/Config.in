@@ -1,5 +1,6 @@
 config BR2_PACKAGE_PYTHON_ADAFRUIT_CIRCUITPYTHON_CONNECTIONMANAGER
 	bool "python-adafruit-circuitpython-connectionmanager"
+	select BR2_PACKAGE_HOST_PYTHON_SETUPTOOLS_SCM
 	help
 	  A urllib3.poolmanager/urllib3.connectionpool-like library for managing sockets and connections.
 

@@ -1,6 +1,7 @@
 config BR2_PACKAGE_PYTHON_ADAFRUIT_CIRCUITPYTHON_REQUESTS
 	bool "python-adafruit-circuitpython-requests"
 	select BR2_PACKAGE_PYTHON_ADAFRUIT_CIRCUITPYTHON_CONNECTIONMANAGER
+	select BR2_PACKAGE_HOST_PYTHON_SETUPTOOLS_SCM
 	help
 	  A requests-like library for HTTP commands.
 
