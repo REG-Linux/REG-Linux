@@ -186,14 +186,8 @@ echo "Data Partition Format: ${INTERNALDEVICETYPE}"
 echo "Data Partition Available Space: $(lsblk -no FSAVAIL "${INTERNALDEVICE}")"
 
 PREFSRC=$(ifconfig | sed -n -e 's|inet 127\.0\.0\.1||' -e 's|^[ ]*inet \([0-9\.\:]*\).*|\1|p')
-if [ -n "$PREFSRC" ]; then
-    echo "Network IP Address: $PREFSRC"
-else
-    PREFSRC=$(ifconfig | sed -n -e 's|inet6 \:\:1||' -e 's|^[ ]*inet6 \([0-9a-fA-F\:]*\).*|\1|p')
-    if [ -n "$PREFSRC" ]; then
-        echo "Network IP Address: $PREFSRC"
-    fi
-fi
+[ -z "$PREFSRC" ] && PREFSRC=$(ifconfig | sed -n -e 's|inet6 \:\:1||' -e 's|^[ ]*inet6 \([0-9a-fA-F\:]*\).*|\1|p')
+[ -n "$PREFSRC" ] && echo "Network IP Address: $PREFSRC"
 
 # Boot information
 if [[ "${FULL_DISPLAY}" != 0 ]]; then
