@@ -1,5 +1,6 @@
 config BR2_PACKAGE_PYTHON_ADAFRUIT_PLATFORMDETECT
 	bool "python-adafruit-platformdetect"
+	select BR2_PACKAGE_HOST_PYTHON_SETUPTOOLS_SCM
 	help
 	  Platform detection for use by libraries like Adafruit-Blinka.
 
