@@ -47,14 +47,12 @@ do_listFstypes() {
 do_unmount_disk() {
     UDSK=$1
     n=0
-    while [ $n -lt 6 ] && grep -m 1 -E "^/dev/${UDSK} " /proc/mounts; do
+    until ! grep -m 1 -E "^/dev/${UDSK} " /proc/mounts; do
+        [ "$n" -gt 6 ] && return 1
+        ((n++))
         umount -A "/dev/${UDSK}"
         sleep 1
-        ((n++))
     done
-    if grep -m 1 -E "^/dev/${UDSK} " /proc/mounts; then
-        return 1
-    fi
 }
 
 do_format() {

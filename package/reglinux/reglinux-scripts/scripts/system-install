@@ -90,14 +90,13 @@ getPer() {
 
 do_unmount_disk() {
     UDSK=$1
-
-    grep "/dev/${UDSK}" /proc/mounts | cut -d ' ' -f 2 |
-	while read X
-	do
-	    umount "${X}"
-	done
-
-    grep -qE "^/dev/${UDSK}" /proc/mounts && return 1
+    n=0
+    until ! grep -m 1 -E "^/dev/${UDSK} " /proc/mounts; do
+        [ "$n" -gt 6 ] && return 1
+        ((n++))
+        umount -A "/dev/${UDSK}"
+        sleep 1
+    done
     return 0
 }
 
