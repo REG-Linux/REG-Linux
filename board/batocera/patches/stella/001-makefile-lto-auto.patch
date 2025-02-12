@@ -1,0 +1,15 @@
+--- a/Makefile	2024-10-04 18:16:46.000000000 +0200
++++ b/Makefile	2025-02-12 10:58:36.406022813 +0100
+@@ -119,9 +119,9 @@
+ endif
+ 
+ ifdef RELEASE
+-  CXXFLAGS += -flto -fno-rtti
+-  CFLAGS += -flto
+-  LDFLAGS += -flto -fno-rtti
++  CXXFLAGS += -flto=auto -fno-rtti
++  CFLAGS += -flto=auto
++  LDFLAGS += -flto=auto -fno-rtti
+ endif
+ 
+ #######################################################################
