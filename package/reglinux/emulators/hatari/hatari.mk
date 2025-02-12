@@ -11,8 +11,9 @@ HATARI_SITE_METHOD=git
 HATARI_LICENSE = GPLv3
 HATARI_DEPENDENCIES = sdl2 zlib libpng libcapsimage
 
-HATARI_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 HATARI_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
+HATARI_CONF_OPTS += -DBUILD_SHARED_LIBS=ON
+HATARI_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
 HATARI_CONF_OPTS += -DCAPSIMAGE_INCLUDE_DIR="($STAGING_DIR)/usr/include/caps"
 
 define HATARI_INSTALL_TARGET_CMDS
@@ -23,7 +24,7 @@ endef
 define HATARI_INSTALL_EVMAPY
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
 	$(INSTALL) -D -m 0644 \
-	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/hatari/atarist.hatari.keys \
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/hatari/atarist.hatari.keys \
 	        $(TARGET_DIR)/usr/share/evmapy/atarist.hatari.keys
 endef
 
