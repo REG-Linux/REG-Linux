@@ -34,6 +34,8 @@ endif
 
 # Build as release with proper target and paths
 CANNONBALL_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release -DTARGET=$(CANNONBALL_TARGET)
+CANNONBALL_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
+CANNONBALL_CONF_OPTS += -DBUILD_SHARED_LIBS=ON
 CANNONBALL_CONF_OPTS += -Droms_directory=/userdata/roms/cannonball/
 CANNONBALL_CONF_OPTS += -Dxml_directory=/userdata/system/configs/cannonball/
 CANNONBALL_CONF_OPTS += -Dres_directory=/userdata/system/configs/cannonball/
@@ -48,9 +50,9 @@ CANNONBALL_SHARED_LINKER_FLAGS += -lmali
 endif
 
 # Enabling LTO as hires mode tends to be slow, it does help video rendering loops
-CANNONBALL_EXE_LINKER_FLAGS += -flto
-CANNONBALL_SHARED_LINKER_FLAGS += -flto
-CANNONBALL_CONF_OPTS += -DCMAKE_CXX_FLAGS=-flto
+CANNONBALL_EXE_LINKER_FLAGS += -flto=auto
+CANNONBALL_SHARED_LINKER_FLAGS += -flto=auto
+CANNONBALL_CONF_OPTS += -DCMAKE_CXX_FLAGS=-flto=auto
 CANNONBALL_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="$(CANNONBALL_EXE_LINKER_FLAGS)"
 CANNONBALL_CONF_OPTS += -DCMAKE_SHARED_LINKER_FLAGS="$(CANNONBALL_SHARED_LINKER_FLAGS)"
 
