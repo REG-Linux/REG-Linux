@@ -1042,6 +1042,8 @@ config BR2_PACKAGE_BATOCERA_HANDHELD_SYSTEMS
 	# Atari Lynx
 	select BR2_PACKAGE_LIBRETRO_BEETLE_LYNX		# ALL
 	select BR2_PACKAGE_LIBRETRO_HANDY		# ALL
+	# Holani core is Rust-based, and requires host-clang because of bindggen issue
+	select BR2_PACKAGE_LIBRETRO_HOLANI		if BR2_ARCH_IS_64 && BR2_PACKAGE_CLANG
 
 	# Wonderswan
 	select BR2_PACKAGE_LIBRETRO_BEETLE_WSWAN	# ALL
