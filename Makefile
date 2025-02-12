@@ -3,9 +3,11 @@ DL_DIR         ?= $(PROJECT_DIR)/dl
 OUTPUT_DIR     ?= $(PROJECT_DIR)/output
 CCACHE_DIR     ?= $(PROJECT_DIR)/buildroot-ccache
 LOCAL_MK       ?= $(PROJECT_DIR)/reglinux.mk
-EXTRA_PKGS     ?=
+EXTRA_OPTS     ?=
 DOCKER_OPTS    ?=
-MAKE_JLEVEL    ?= $(shell nproc)
+NPROC          := $(shell nproc)
+MAKE_JLEVEL    ?= $(NPROC)
+MAKE_LLEVEL    ?= $(shell echo $$(($(NPROC) * 1)))
 BATCH_MODE     ?=
 PARALLEL_BUILD ?=
 DOCKER         ?= docker
@@ -14,8 +16,10 @@ DOCKER         ?= docker
 
 ifdef PARALLEL_BUILD
 	EXTRA_OPTS +=  BR2_PER_PACKAGE_DIRECTORIES=y
-	MAKE_OPTS  += -j$(MAKE_JLEVEL)
 endif
+
+MAKE_OPTS  += -j$(MAKE_JLEVEL)
+MAKE_OPTS  += -l$(MAKE_LLEVEL)
 
 ifndef BATCH_MODE
 	DOCKER_OPTS += -i
