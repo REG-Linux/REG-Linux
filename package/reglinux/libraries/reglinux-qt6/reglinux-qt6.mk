@@ -19,6 +19,15 @@ REGLINUX_QT6_VERSION = 6.7.3
 REGLINUX_QT6_SITE = $(call github,REG-Linux,REG-Qt6,$(REGLINUX_QT6_VERSION))
 
 REGLINUX_QT6_DEPENDENCIES = host-double-conversion double-conversion host-libb2 libb2 host-pcre2 pcre2 host-zlib zlib icu
+REGLINUX_QT6_DEPENDENCIES += fontconfig libglib2 libpng freetype dbus
+
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+REGLINUX_QT6_DEPENDENCIES += libgl
+endif
+
+ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
+REGLINUX_QT6_DEPENDENCIES += libgles
+endif
 
 REGLINUX_QT6_ARCH = unknown
 # Cortex A7
