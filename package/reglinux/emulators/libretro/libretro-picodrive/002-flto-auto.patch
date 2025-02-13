@@ -1,0 +1,40 @@
+--- a/Makefile	2025-02-13 00:10:16.437371003 +0100
++++ b/Makefile	2025-02-13 00:12:58.933230110 +0100
+@@ -69,7 +69,7 @@
+ CFLAGS += -fno-common -finline-limit=42 -fno-unroll-loops -ffast-math
+ CFLAGS += $(call chkCCflag, -fno-stack-protector)
+ ifneq ($(call chkCCflag, -fipa-ra),) # gcc >= 5
+-CFLAGS += $(call chkCCflag, -flto -fipa-pta -fipa-ra)
++CFLAGS += $(call chkCCflag, -flto=auto -fipa-pta -fipa-ra)
+ else
+ # these improve execution speed on 32bit arm/mips with gcc pre-5 toolchains
+ CFLAGS += $(call chkCCflag, -fno-caller-saves -fno-guess-branch-probability -fno-regmove)
+@@ -78,7 +78,7 @@
+ endif
+ else
+ ifneq ($(STATIC_LINKING), 1)
+-CFLAGS += $(call chkCCflag, -flto)
++CFLAGS += $(call chkCCflag, -flto=auto)
+ endif
+ endif
+ 
+--- a/Makefile.libretro	2025-02-13 00:11:11.410679172 +0100
++++ b/Makefile.libretro	2025-02-13 00:11:28.847093507 +0100
+@@ -346,7 +346,7 @@
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined,-Bsymbolic
+ 	CFLAGS += -Ofast \
+-	-flto=4 -fuse-linker-plugin \
++	-flto=auto -fuse-linker-plugin \
+ 	-fdata-sections -ffunction-sections -Wl,--gc-sections \
+ 	-fno-stack-protector -fno-ident -fomit-frame-pointer \
+ 	-falign-functions=1 -falign-jumps=1 -falign-loops=1 \
+@@ -375,7 +375,7 @@
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--no-undefined,-Bsymbolic
+ 	CFLAGS += -Ofast \
+-		-flto -fuse-linker-plugin \
++		-flto=auto -fuse-linker-plugin \
+ 		-fdata-sections -ffunction-sections -Wl,--gc-sections \
+ 		-fno-stack-protector -fno-ident -fomit-frame-pointer \
+ 		-falign-functions=1 -falign-jumps=1 -falign-loops=1 \
