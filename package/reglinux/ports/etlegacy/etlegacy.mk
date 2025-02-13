@@ -13,7 +13,7 @@ ETLEGACY_LICENSE_FILE = COPYING.txt
 
 ETLEGACY_DEPENDENCIES += freetype libcurl libpng libtheora
 ETLEGACY_DEPENDENCIES += libvorbis lua openal openssl sdl2
-ETLEGACY_DEPENDENCIES += minizip cjson
+ETLEGACY_DEPENDENCIES += minizip cjson jpeg sqlite minizip-zlib
 ifeq ($(BR2_PACKAGE_XORG7),y)
 ETLEGACY_DEPENDENCIES += libglew
 endif

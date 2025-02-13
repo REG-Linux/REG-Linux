@@ -7,8 +7,7 @@ ZMUSIC_VERSION = 1.1.14
 ZMUSIC_SITE = $(call github,ZDoom,ZMusic,$(ZMUSIC_VERSION))
 ZMUSIC_LICENSE = GPLv3
 ZMUSIC_INSTALL_STAGING = YES
-ZMUSIC_DEPENDENCIES = zlib mpg123 libsndfile alsa-lib
-
+ZMUSIC_DEPENDENCIES = zlib mpg123 libsndfile alsa-lib fluidsynth libglib2 host-zmusic
 ZMUSIC_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 
 define ZMUSIC_INSTALL_TARGET_CMDS
@@ -16,4 +15,6 @@ define ZMUSIC_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(cmake-package))
+
+HOST_ZMUSIC_DEPENDENCIES = host-zlib host-libglib2
 $(eval $(host-cmake-package))
