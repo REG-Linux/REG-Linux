@@ -422,7 +422,6 @@ menu "Audio"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/chromebook-linux-audio/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/alsa-topology-conf/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/alsa-ucm-conf/Config.in"
-  source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/zmusic/Config.in"
 endmenu
 
 menu "Database"
@@ -585,6 +584,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/libraries/vulkan-volk/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/libraries/reglinux-luajit/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/libraries/wxwidgets/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/libraries/zmusic/Config.in"
 
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/utils/evsieve/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/utils/fdupes/Config.in"
