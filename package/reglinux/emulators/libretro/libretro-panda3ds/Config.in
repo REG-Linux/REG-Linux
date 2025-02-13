@@ -1,5 +1,5 @@
 config BR2_PACKAGE_LIBRETRO_PANDA3DS
-    bool "panda3ds"
+    bool "libretro-panda3ds"
     select BR2_PACKAGE_SDL2
     select BR2_PACKAGE_GLSLANG	if BR2_PACKAGE_REGLINUX_VULKAN
 
