@@ -4,15 +4,15 @@
 #
 ################################################################################
 
-RYUJINX_VERSION = r.dc545c3
+RYUJINX_VERSION = 1.2.81
 ifeq ($(BR2_x86_64),y)
 RYUJINX_SOURCE = ryujinx-$(RYUJINX_VERSION)-linux_x64.tar.gz
-else
+else ifeq ($(BR2_aarch64),y)
 RYUJINX_SOURCE = ryujinx-$(RYUJINX_VERSION)-linux_arm64.tar.gz
 endif
-RYUJINX_SITE = https://github.com/ryujinx-mirror/ryujinx/releases/download/$(RYUJINX_VERSION)
+RYUJINX_SITE = https://github.com/Ryubing/Ryujinx/releases/download/$(RYUJINX_VERSION)
 RYUJINX_LICENSE = MIT
-RYUJINX_DEPENDENCIES = sdl2 openal hicolor-icon-theme adwaita-icon-theme librsvg
+#RYUJINX_DEPENDENCIES = sdl2 openal hicolor-icon-theme adwaita-icon-theme librsvg
 
 define RYUJINX_EXTRACT_CMDS
 	mkdir -p $(@D)/target && cd $(@D)/target && \
@@ -21,14 +21,11 @@ endef
 
 define RYUJINX_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/ryujinx
-	cp -pr $(@D)/target/* $(TARGET_DIR)/usr/ryujinx
-
-	# alias, for compat, remove
-	rm $(TARGET_DIR)/usr/ryujinx/Ryujinx.Ava
+	cp -pr $(@D)/target/publish/* $(TARGET_DIR)/usr/ryujinx/
 
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/ryujinx/switch.ryujinx.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/ryujinx/switch.ryujinx.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
