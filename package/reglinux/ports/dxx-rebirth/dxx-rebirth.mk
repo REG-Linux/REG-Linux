@@ -21,8 +21,10 @@ DXX_REBIRTH_SCONS_OPTS = -j$(PARALLEL_JOBS) sdl2=yes
 # Choose rendering API
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
 DXX_REBIRTH_SCONS_OPTS += opengl=yes
+DXX_REBIRTH_DEPENDENCIES += libgl libglew libglu
 else ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
 DXX_REBIRTH_SCONS_OPTS += opengles=yes
+DXX_REBIRTH_DEPENDENCIES += libgles
 endif
 
 define DXX_REBIRTH_BUILD_CMDS
