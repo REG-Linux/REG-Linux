@@ -77,10 +77,6 @@ do_enable() {
                 return
             fi
         done
-    fi
-
-    #
-    if test -n "${enabled_services}"; then
         /usr/bin/system-settings-set system.services "${enabled_services} ${1}"
     else
         /usr/bin/system-settings-set system.services "${1}"
@@ -90,11 +86,10 @@ do_enable() {
 do_disable() {
     enabled_services="$(/usr/bin/system-settings-get system.services)"
 
-    NEW_ENABLED_SERVICES=
-    JDONE=0
-
     # build new services
     if test -n "${enabled_services}"; then
+        NEW_ENABLED_SERVICES=
+        JDONE=0
         for SERVICE in ${enabled_services}; do
             if test "${SERVICE}" != "${1}"; then
                 if test -n "${NEW_ENABLED_SERVICES}"; then
@@ -106,12 +101,10 @@ do_disable() {
                 JDONE=1
             fi
         done
-    fi
-
-    #
-    if test "${JDONE}" = 1; then
-        /usr/bin/system-settings-set system.services "${NEW_ENABLED_SERVICES}"
-    fi
+        if test "${JDONE}" = 1; then
+            /usr/bin/system-settings-set system.services "${NEW_ENABLED_SERVICES}"
+        fi
+   fi
 }
 
 do_start() {
