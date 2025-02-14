@@ -8,6 +8,8 @@ LIBRASHADER_VERSION = librashader-v0.6.2
 LIBRASHADER_SITE = $(call github,SnowflakePowered,librashader,$(LIBRASHADER_VERSION))
 LIBRASHADER_LICENSE = GPLv3
 
+LIBRASHADER_DEPENDENCIES = host-rustc host-rust-bin libglfw
+
 LIBRASHADER_ARCH = $(BR2_ARCH)
 ifeq ($(LIBRASHADER_ARCH),"riscv64")
 LIBRASHADER_ARCH = riscv64gc
