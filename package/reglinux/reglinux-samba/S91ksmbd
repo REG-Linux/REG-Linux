@@ -25,7 +25,7 @@ start() {
 	echo -n "Starting SMB services: "
 	modprobe ksmbd
 	RETVAL1=$?
-	ksmbd.mountd
+	ksmbd.mountd --config=="$CONFIGFILE"
 	RETVAL2=$?
 	echo "done"
 
