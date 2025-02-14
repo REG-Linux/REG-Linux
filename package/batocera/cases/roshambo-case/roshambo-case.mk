@@ -15,9 +15,12 @@ define ROSHAMBO_CASE_BUILD_CMDS
 endef
 
 define ROSHAMBO_CASE_INSTALL_TARGET_CMDS
+	mkdir -p $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/R64
 	install -d -m 755      $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/R64
 	cp -r $(@D)/R64/*      $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/R64
 
+	mkdir -p $(TARGET_DIR)/etc/init.d/
+	mkdir -p $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -Dm755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/cases/roshambo-case/S14roshambo       $(TARGET_DIR)/etc/init.d/
 	$(INSTALL) -Dm755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/cases/roshambo-case/roshambo-case.py* $(TARGET_DIR)/usr/bin/
 endef

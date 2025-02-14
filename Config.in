@@ -233,7 +233,6 @@ menu "Emulators"
       source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-arduous/Config.in"
       source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-wasm4/Config.in"
       source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-hatarib/Config.in"
-      source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-melonds-ds/Config.in"
      endmenu
   endmenu
 
@@ -504,6 +503,7 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-mame/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-mame2003-plus/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-mame2010/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-melonds-ds/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-mgba/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-mupen64plus-next/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/emulators/libretro/libretro-panda3ds/Config.in"
