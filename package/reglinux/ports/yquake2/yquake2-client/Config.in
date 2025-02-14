@@ -1,6 +1,7 @@
 config BR2_PACKAGE_YQUAKE2_CLIENT
 	bool "yquake2"
 	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_LIBCURL
 	select BR2_PACKAGE_YQUAKE2_XATRIX
 
 	help
