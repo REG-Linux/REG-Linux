@@ -29,6 +29,10 @@ ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
 REGLINUX_QT6_DEPENDENCIES += libgles
 endif
 
+ifeq ($(BR2_PACKAGE_REGLINUX_XWAYLAND),y)
+REGLINUX_QT6_DEPENDENCIES += libxkbcommon xcb-util-cursor xcb-util-keysyms
+endif
+
 REGLINUX_QT6_ARCH = unknown
 # Cortex A7
 #ifeq ($(BR2_cortex_a7),y)
