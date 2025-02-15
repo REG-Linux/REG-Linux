@@ -7,7 +7,7 @@
 ARES_VERSION = v142
 ARES_SITE = $(call github,ares-emulator,ares,$(ARES_VERSION))
 ARES_LICENSE = GPLv3
-ARES_DEPENDENCIES = sdl2 libgl zlib pango cairo libgtk3 librashader
+ARES_DEPENDENCIES = sdl2 libgl zlib pango cairo libgtk3 librashader xwayland
 
 ARES_SUPPORTS_IN_SOURCE_BUILD = NO
 
