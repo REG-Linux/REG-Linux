@@ -1,0 +1,11 @@
+--- a/ruby/cmake/os-linux.cmake	2025-02-15 17:42:56.538821637 +0100
++++ b/ruby/cmake/os-linux.cmake	2025-02-15 17:47:38.272058226 +0100
+@@ -32,7 +32,7 @@
+ find_package(X11 REQUIRED)
+ find_package(OpenGL REQUIRED)
+ 
+-target_link_libraries(ruby PRIVATE X11::Xrandr OpenGL::GLX)
++target_link_libraries(ruby PRIVATE X11::Xrandr GL)
+ 
+ target_enable_feature(ruby "GLX OpenGL video driver" VIDEO_GLX)
+ target_enable_feature(ruby "Xlib input driver" INPUT_XLIB)
