@@ -9,7 +9,7 @@ FAUDIO_SITE = $(call github,FNA-XNA,FAudio,$(FAUDIO_VERSION))
 
 FAUDIO_LICENSE = ZLIB
 FAUDIO_LICENSE_FILES = LICENSE
-FAUDIO_DEPENDENCIES = host-bison host-flex host-libtool
+FAUDIO_DEPENDENCIES = host-bison host-flex host-libtool sdl2
 #disable gstreamer following BR bump 2024.11
 #gstreamer1 gst1-plugins-base
 
