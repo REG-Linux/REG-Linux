@@ -1,28 +1,27 @@
-#!/bin/sh
+#!/bin/bash
 
 if test "$1" != "start"
 then
   exit 0
 fi
 
+mkdir -p "/var/lib/samba/private"
 printf "Starting securepasswd: "
 
 # /etc/shadow is dynamically generated from the password found in /boot/system-boot.conf
 # the password is visible only in the es interface
 # or to people having already a ssh password via the command : system-config setRootPassword xyz
-MASTERPASSWD=$(system-config getRootPassword)
-if test -z "${MASTERPASSWD}"
-then
-    # generate a new one
-    # hum, in case of error, what to do ? nothing.
-    system-config setRootPassword
-    MASTERPASSWD=$(system-config getRootPassword)
-fi
 
-# secure ssh
-enabled="$(/usr/bin/system-settings-get system.security.enabled)"
-if [ "$enabled" != "1" ];then
+if [ "$(/usr/bin/system-settings-get system.security.enabled)" != "1" ];then
     MASTERPASSWD="linux"
+else
+    MASTERPASSWD=$(/usr/bin/system-config getRootPassword)
+    # secure samba
+    if [ -x "/usr/bin/smbpasswd" ]; then
+        printf "%s\n%s\n" "$MASTERPASSWD" "$MASTERPASSWD" | smbpasswd -a -s root > /dev/null
+    else
+        ksmbd.adduser -C /etc/ksmbd/ksmbd-secure.conf -P /etc/ksmbd/ksmbdpwd.db -p "$MASTERPASSWD" root > /dev/null
+    fi
 fi
 
 # write the /etc/shadow file
@@ -30,11 +29,4 @@ SHADOWPASSWD=$(openssl passwd -1 "${MASTERPASSWD}")
 echo "root:${SHADOWPASSWD}:::::::" > /run/reglinux.shadow
 echo "reglinux::::::::" >> /run/reglinux.shadow # required for su for flatpak/reglinux user
 
-# secure samba
-mkdir -p "/var/lib/samba/private"
-if test -e "/usr/bin/smbpasswd"; then
-	printf "$MASTERPASSWD\n$MASTERPASSWD\n" | smbpasswd -a -s root > /dev/null
-else
-	printf ksmbd.adduser -a -p $MASTERPASSWD root > /dev/null
-fi
 echo "done."
