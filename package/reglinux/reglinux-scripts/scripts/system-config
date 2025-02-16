@@ -22,71 +22,73 @@ postBootConfig() {
     mount -o remount,ro /boot
 }
 
-bato_config_set_value () {
+system_config_set_value () {
     key=$1
     value=$2
     [ -z "$value" ] && value=0
     if grep "$key" "$configFile"; then
         sed -i "s/#\?$key=.*/$key=$value/g" "$configFile"
     else
-        acho >> "$configFile"   # in case the last line of "$configFile" is not empty
+        echo >> "$configFile"   # in case the last line of "$configFile" is not empty
         echo "$key=$value" >> "$configFile"
     fi
 }
 
 log=/userdata/system/logs/reglinux.log
 
-if [ "$command" = "getRootPassword" ]; then
-    # security disabled, force the default one without changing boot configuration
-    securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
-    if [ "$securityenabled" != "1" ]; then
-        echo "linux"
-        exit 0
-    fi
-    
-    ENCPASSWD=$(grep -E '^[ \t]*rootshadowpassword[ \t]*=' "${storageFile}" | sed -e s+'^[ \t]*rootshadowpassword[ \t]*='++)
-    if [ -z "${ENCPASSWD}" ]; then
-        exit 1
-    fi
-    if ! system-encode decode "${ENCPASSWD}"; then
-        exit 1
-    fi
-    exit 0
-fi
-
-if [ "$command" = "setRootPassword" ]; then
-    PASSWD=${2}
-
-    # security disabled, don't change
-    securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
-    if [ "$securityenabled" != "1" ]; then
-        exit 0
-    fi
+do_setRootPassword() {
+    PASSWD="${1}"
 
     # if no password if provided, generate one
     if [ -z "${PASSWD}" ]; then
-        PASSWD=$(tr -cd _A-Z-a-z-0-9 < /dev/urandom | fold -w8 | head -n1)
+        PASSWD=$(grep -aoE -m1 "[0-9A-Za-z_-]{8}" /dev/urandom)
     fi
-    PASSWDENC=$(system-encode encode "${PASSWD}")
-    
+    PASSWDENC=$(/usr/bin/system-encode encode "${PASSWD}")
+    [ -z "${PASSWDENC}" ] && return 1
     preBootConfig
     if grep -qE '^[ \t]*rootshadowpassword[ \t]*=' "${storageFile}"; then
         # update it
         if ! sed -i -e s@'^[ \t]*rootshadowpassword[ \t]*=.*$'@"rootshadowpassword=${PASSWDENC}"@ "${storageFile}"; then
             postBootConfig
-            exit 1
+            return 1
         fi
         postBootConfig
-        exit 0
+        return 0
     else
         # create it
         if ! echo "rootshadowpassword=${PASSWDENC}" >> "${storageFile}"; then
             postBootConfig
-            exit 1
+            return 1
         fi
         postBootConfig
-        exit 0
+        return 0
     fi    
+}
+
+if [ "$command" = "getRootPassword" ]; then
+    # security disabled, force the default one without changing boot configuration
+    if [ "$(/usr/bin/system-settings-get system.security.enabled)" != "1" ]; then
+        echo "linux"
+        exit 0
+    fi
+    
+    ENCPASSWD=$(sed -n -e 's+^[ \t]*rootshadowpassword[ \t]*=[ \t]*\(.*\)+\1+p' "${storageFile}")
+    if [ -z "${ENCPASSWD}" ]; then
+        # if there was no password, create a new random one
+        do_setRootPassword || exit 1
+        ENCPASSWD=$(sed -n -e 's+^[ \t]*rootshadowpassword[ \t]*=[ \t]*\(.*\)+\1+p' "${storageFile}")
+        [ -z "${ENCPASSWD}" ] && exit 1     # Could not generate a password?
+    fi
+    PASSWD=$(/usr/bin/system-encode decode "${ENCPASSWD}")
+    [ -n "$PASSWD" ] && echo "$PASSWD" || exit 1
+    exit 0
+fi
+
+if [ "$command" = "setRootPassword" ]; then
+    # if security is disabled, don't change password
+    [ "$(/usr/bin/system-settings-get system.security.enabled)" != "1" ] && return 0
+
+    do_setRootPassword "${2}" && exit 0 || exit 1
 fi
 
 if [ "$command" = "overscan" ]; then
@@ -101,12 +103,12 @@ if [ "$command" = "overscan" ]; then
         [ -f "$configFile" ] || touch "$configFile"
 
         echo "setting overscan values $extra1 $extra2 $extra3 $extra4 " >> $log
-        bato_config_set_value disable_overscan 0
-        bato_config_set_value overscan_scale 1
-        bato_config_set_value overscan_left "$extra1"
-        bato_config_set_value overscan_right "$extra2"
-        bato_config_set_value overscan_top "$extra3"
-        bato_config_set_value overscan_bottom "$extra4"
+        system_config_set_value disable_overscan 0
+        system_config_set_value overscan_scale 1
+        system_config_set_value overscan_left "$extra1"
+        system_config_set_value overscan_right "$extra2"
+        system_config_set_value overscan_top "$extra3"
+        system_config_set_value overscan_bottom "$extra4"
 
         postBootConfig
         exit 0
@@ -115,12 +117,12 @@ if [ "$command" = "overscan" ]; then
         preBootConfig
         if [ "$mode" = "enable" ]; then
             echo "enabling overscan" >> $log
-            bato_config_set_value disable_overscan 0
-            bato_config_set_value overscan_scale 1
+            system_config_set_value disable_overscan 0
+            system_config_set_value overscan_scale 1
         elif [ "$mode" = "disable" ]; then
             echo "disabling overscan" >> $log
-            bato_config_set_value disable_overscan 1
-            bato_config_set_value overscan_scale 0
+            system_config_set_value disable_overscan 1
+            system_config_set_value overscan_scale 0
         else
             postBootConfig
             exit 1
@@ -134,7 +136,7 @@ fi
 
 if [ "$command" = "lsoutputs" ]; then
     echo "auto"
-    system-resolution listOutputs
+    /usr/bin/system-resolution listOutputs
 fi
 
 if [ "$command" = "gpiocontrollers" ]; then
@@ -182,7 +184,7 @@ if [ "$command" = "canupdate" ]; then
     [ "${updatetype}" != "beta" ] &&  updatetype="stable"
 
     board=$(cat /boot/boot/system.board)
-    installed=$(system-version)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
+    installed=$(/usr/bin/system-version)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
 
     # Get current stable release on GitHub
     latestrelease=$(curl --silent "https://api.github.com/repos/REG-Linux/REG-Linux/releases/latest" | jq -r '.tag_name')
@@ -232,7 +234,7 @@ if [ "$command" = "canupdate" ]; then
 fi
 
 if [ "$command" = "update" ]; then
-    system-upgrade
+    /usr/bin/system-upgrade
     exit $?
 fi
 
@@ -250,8 +252,8 @@ if [ "$command" = "storage" ]; then
     if [ "$mode" = "list" ]; then
         echo "INTERNAL INTERNAL"
         echo "ANYEXTERNAL ANY EXTERNAL"
-        INTERNAL_DEVICE=$(system-part share_internal)
-        PARTPREFIX=$(system-part prefix "${INTERNAL_DEVICE}")
+        INTERNAL_DEVICE=$(/usr/bin/system-part share_internal)
+        PARTPREFIX=$(/usr/bin/system-part prefix "${INTERNAL_DEVICE}")
         lsblk -n -P -o NAME,FSTYPE,LABEL,UUID,SIZE,TYPE |
         grep -E "TYPE=\"(part|lvm)\"" |
         grep -vE "FSTYPE=\"(swap|LVM2_member)\"" |
