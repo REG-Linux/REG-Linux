@@ -1,81 +1,60 @@
-#!/bin/sh
+#!/bin/bash
 #
 # KSMBD network share script
 
-securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
-
-if [ "$securityenabled" = "1" ]; then
-    CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"
-else
-    CONFIGFILE="/etc/ksmbd/ksmbd.conf"
+if [ "$(/usr/bin/system-settings-get system.samba.enabled)" = "0" ]; then
+    echo "SMB services: disabled"
+    exit 0
 fi
 
-# Make directories.
-mkdir -p /var/lock/subsys
-
-RETVAL=0
-
 start() {
-	enabled="$(/usr/bin/system-settings-get system.samba.enabled)"
-	if [ "$enabled" = "0" ]; then
-	  echo "SMB services: disabled"
-	  exit 0
-        fi
+    if [ "$(/usr/bin/system-settings-get system.security.enabled)" = "1" ]; then
+        CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"
+    else
+        CONFIGFILE="/etc/ksmbd/ksmbd.conf"
+    fi
 
-	echo -n "Starting SMB services: "
-	modprobe ksmbd
-	RETVAL1=$?
-	ksmbd.mountd --config=="$CONFIGFILE"
-	RETVAL2=$?
-	echo "done"
-
-	[ $RETVAL1 -eq 0 -a $RETVAL2 -eq 0 ] && touch /var/lock/subsys/smb || \
-	   RETVAL=1
-	return $RETVAL
+    echo -n "Starting SMB services: "
+    modprobe ksmbd && ksmbd.mountd --config="$CONFIGFILE" && touch /var/lock/subsys/smb && echo "done" && return 0
+    echo "failed"
+    return 1
 }
 
 stop() {
-	echo -n "Shutting down SMB services: "
-	ksmbd.control -s
-	RETVAL1=$?
-	rmmod ksmbd
-	RETVAL2=$?
-	echo "done"
-
-	[ $RETVAL1 -eq 0 -a $RETVAL2 -eq 0 ] && rm -f /var/lock/subsys/smb
-	echo "done"
-	return $RETVAL
-}
-
-restart() {
-	stop
-	start
+    echo -n "Shutting down SMB services: "
+    ksmbd.control -s && rmmod ksmbd && rm -f /var/lock/subsys/smb && echo "done" && return 0
+    echo "failed"
+    return 1
 }
 
 reload() {
-        echo -n "Reloading smb.conf file: "
-	ksmbd.control -r
-	RETVAL=$?
-	echo "done"
-	return $RETVAL
+    echo -n "Reloading smb.conf file: "
+    if ksmbd.control -r; then
+        echo "done"
+        return 0
+    else
+        echo "failed"
+        return 1
+    fi
 }
 
 case "$1" in
   start)
-  	start
-	;;
+      start
+    ;;
   stop)
-  	stop
-	;;
+      stop
+    ;;
   restart)
-  	restart
-	;;
+      stop
+      start
+    ;;
   reload)
-  	reload
-	;;
+      reload
+    ;;
   *)
-	echo "Usage: $0 {start|stop|restart|reload}"
-	exit 1
+    echo "Usage: $0 {start|stop|restart|reload}"
+    exit 1
 esac
 
 exit $?

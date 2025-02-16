@@ -1,92 +1,77 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Stolen from RedHat FC5.
-#
 
-securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
-
-if [ "$securityenabled" = "1" ]; then
-    CONFIGFILE="/etc/samba/smb-secure.conf"
-else
-    CONFIGFILE="/etc/samba/smb.conf"
+if [ "$(/usr/bin/system-settings-get system.samba.enabled)" = "0" ]; then
+    echo "SMB services: disabled"
+    exit 0
 fi
 
-# Make directories.
-mkdir -p /var/cache/samba
-mkdir -p /var/log/samba
-mkdir -p /var/lock/subsys
-mkdir -p /var/run/samba
-
-RETVAL=0
-
 start() {
-	enabled="$(/usr/bin/system-settings-get system.samba.enabled)"
-	if [ "$enabled" = "0" ]; then
-	  echo "SMB services: disabled"
-	  exit 0
+    if [ "$(/usr/bin/system-settings-get system.security.enabled)" = "1" ]; then
+        CONFIGFILE="/etc/samba/smb-secure.conf"
+    else
+        CONFIGFILE="/etc/samba/smb.conf"
+    fi
+    # Make directories.
+    mkdir -p /var/cache/samba /var/log/samba /var/lock/subsys /var/run/samba
+
+    echo -n "Starting SMB services: "
+    if smbd -D --configfile="${CONFIGFILE}"; then
+        echo "done"
+        echo -n "Starting NMB services: "
+        if nmbd -D --configfile="${CONFIGFILE}"; then
+            echo "done"
+            touch /var/lock/subsys/smb
+            return 0
         fi
-
-	echo -n "Starting SMB services: "
-	smbd -D --configfile="${CONFIGFILE}"
-	RETVAL=$?
-	echo "done"
-
-	echo -n "Starting NMB services: "
-	nmbd -D --configfile="${CONFIGFILE}"
-	RETVAL2=$?
-	echo "done"
-
-	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && touch /var/lock/subsys/smb || \
-	   RETVAL=1
-	return $RETVAL
-}	
+     fi
+     echo "failed"
+     return 1
+}
 
 stop() {
-	echo -n "Shutting down SMB services: "
-	kill -9 `pidof smbd`
-	RETVAL=$?
-	rm -f /var/run/samba/smbd.pid
-	echo "done"
-
-	echo -n "Shutting down NMB services: "
-	kill -9 `pidof nmbd`
-	RETVAL2=$?
-	rm -f /var/run/samba/nmbd.pid
-
-	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && rm -f /var/lock/subsys/smb
-	echo "done"
-	return $RETVAL
-}	
-
-restart() {
-	stop
-	start
-}	
+    echo -n "Shutting down SMB services: "
+    sync
+    if kill -15 "$(pidof smbd)"; then
+        rm -f /var/run/samba/smbd.pid
+        echo "done"
+        echo -n "Shutting down NMB services: "
+        if kill -15 "$(pidof nmbd)"; then
+            rm -f /var/run/samba/nmbd.pid
+            rm -f /var/lock/subsys/smb
+            echo "done"
+            return 0
+        fi
+     fi
+     echo "failed"
+     return 1
+}
 
 reload() {
-        echo -n "Reloading smb.conf file: "
-	kill -HUP `pidof smbd`
-	RETVAL=$?
-	echo "done"
-	return $RETVAL
-}	
+    echo -n "Reloading smb.conf file: "
+    smbcontrol smbd reload-config && echo "done" && return 0
+    echo "failed"
+    return 1
+}
 
 case "$1" in
   start)
-  	start
-	;;
+      start
+    ;;
   stop)
-  	stop
-	;;
+      stop
+    ;;
   restart)
-  	restart
-	;;
+      stop
+      start
+    ;;
   reload)
-  	reload
-	;;
+      reload
+    ;;
   *)
-	echo "Usage: $0 {start|stop|restart|reload}"
-	exit 1
+    echo "Usage: $0 {start|stop|restart|reload}"
+    exit 1
 esac
 
 exit $?
