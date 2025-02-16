@@ -15,7 +15,7 @@ PCSX2_SUPPORTS_IN_SOURCE_BUILD = NO
 PCSX2_DEPENDENCIES += xorgproto alsa-lib freetype zlib libpng shaderc ecm
 PCSX2_DEPENDENCIES += libaio portaudio libsoundtouch sdl2 libpcap yaml-cpp
 PCSX2_DEPENDENCIES += libsamplerate fmt reglinux-qt6 libcurl
-PCSX2_DEPENDENCIES += host-libcurl libbacktrace
+PCSX2_DEPENDENCIES += host-libcurl libbacktrace jpeg
 
 PCSX2_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 PCSX2_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
@@ -30,12 +30,14 @@ PCSX2_CONF_OPTS += -DWAYLAND_API=ON
 
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
     PCSX2_CONF_OPTS += -DUSE_OPENGL=ON
+    PCSX2_DEPENDENCIES += libgl
 else
     PCSX2_CONF_OPTS += -DUSE_OPENGL=OFF
 endif
 
 ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     PCSX2_CONF_OPTS += -DUSE_VULKAN=ON
+    PCSX2_DEPENDENCIES += vulkan-headers
 else
     PCSX2_CONF_OPTS += -DUSE_VULKAN=OFF
 endif
