@@ -12,7 +12,7 @@ printf "Starting securepasswd: "
 # the password is visible only in the es interface
 # or to people having already a ssh password via the command : system-config setRootPassword xyz
 
-if [ "$(/usr/bin/system-settings-get system.security.enabled)" != "1" ];then
+if [ "$(/usr/bin/system-settings-get system.security.enabled)" != "1" ]; then
     MASTERPASSWD="linux"
 else
     MASTERPASSWD=$(/usr/bin/system-config getRootPassword)
