@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # use to hide password from people having no access to the ssh connection
 # based on unique values of you rpi :
@@ -9,29 +9,25 @@ ACTION=$1
 CODE=$2
 
 getPassword() {
-    SERIAL=$(grep -E '^Serial' /proc/cpuinfo | sed -e s+'^Serial[\t]*: '++)
-    ETHMAC=$(cat /sys/class/net/eth*/address)
+    SERIAL=$(sed -n -e 's+^Serial[ \t]*: \(.*\)+\1+p' /proc/cpuinfo)
+    ETHMAC=$(cat /sys/class/net/eth*/address 2>/dev/null)
     echo "${SERIAL}${ETHMAC}"
 }
 
 case "${ACTION}" in
     "decode")
-	if echo "${CODE}" | grep -qE '^enc:'
-	then
-	    PASSWORD=$(getPassword)
-	    if ! echo "${CODE}" | sed -e s+"^enc:"++ | openssl enc -aes-128-cbc -a -d -salt -pass pass:"${PASSWORD}"
-	    then
-		exit 1
-	    fi
-	else
-	    echo "${CODE}"
-	fi
+        if [[ "${CODE}" == "enc:"* ]]; then
+            PASSWORD=$(getPassword)
+            CODE=$(echo "${CODE#enc:}" | openssl enc -aes-128-cbc -pbkdf2 -a -d -salt -pass pass:"${PASSWORD}")
+            [ -z "${CODE}" ] && exit 1
+        fi
+        echo "${CODE}"
     ;;
-
     "encode")
-	PASSWORD=$(getPassword)
-	CODE=$(echo "${CODE}" | openssl enc -aes-128-cbc -a -salt -pass pass:"${PASSWORD}")
-	echo "enc:${CODE}"
+        PASSWORD=$(getPassword)
+        CODE=$(echo "${CODE}" | openssl enc -aes-128-cbc -pbkdf2 -a -salt -pass pass:"${PASSWORD}")
+        [ -z "${CODE}" ] && exit 1
+        echo "enc:${CODE}"
     ;;
 esac
 
