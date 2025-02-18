@@ -11,7 +11,7 @@ SHADPS4_GIT_SUBMODULES=YES
 SHADPS4_LICENSE = GPLv2
 SHADPS4_LICENSE_FILE = LICENSE
 SHADPS4_DEPENDENCIES += alsa-lib pulseaudio openal openssl libzlib libedit udev
-SHADPS4_DEPENDENCIES += libevdev jack2 reglinux-qt6
+SHADPS4_DEPENDENCIES += libevdev jack2 reglinux-qt6 ffmpeg
 SHADPS4_DEPENDENCIES += vulkan-headers vulkan-loader vulkan-validationlayers
 
 SHADPS4_SUPPORTS_IN_SOURCE_BUILD = NO

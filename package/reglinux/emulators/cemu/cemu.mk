@@ -9,9 +9,9 @@ CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
 CEMU_GIT_SUBMODULES=YES
-CEMU_DEPENDENCIES = sdl2 host-pugixml pugixml rapidjson boost libpng \
+CEMU_DEPENDENCIES = sdl2 host-pugixml pugixml rapidjson boost libpng libcurl \
                     libzip host-glslang glslang zlib zstd wxwidgets fmt glm upower \
-                    host-nasm host-zstd host-libusb libusb
+                    host-nasm host-zstd host-libusb libusb bluez5_utils
 
 CEMU_SUPPORTS_IN_SOURCE_BUILD = NO
 
