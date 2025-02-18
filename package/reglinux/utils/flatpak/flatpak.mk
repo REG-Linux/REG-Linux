@@ -8,7 +8,7 @@ FLATPAK_VERSION = 1.14.10
 FLATPAK_SOURCE = flatpak-$(FLATPAK_VERSION).tar.xz
 FLATPAK_SITE = https://github.com/flatpak/flatpak/releases/download/$(FLATPAK_VERSION)
 
-FLATPAK_DEPENDENCIES += appstream glib-networking host-pkgconf host-python3-pyparsing
+FLATPAK_DEPENDENCIES += appstream gdk-pixbuf glib-networking host-pkgconf host-python3-pyparsing
 FLATPAK_DEPENDENCIES += json-glib libarchive libcap libfuse libglib2 libgpgme libostree
 FLATPAK_DEPENDENCIES += libseccomp libsoup libsoup3 pkgconf polkit python3-pyparsing yaml-cpp
 

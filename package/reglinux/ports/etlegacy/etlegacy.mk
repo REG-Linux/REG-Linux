@@ -14,8 +14,9 @@ ETLEGACY_LICENSE_FILE = COPYING.txt
 ETLEGACY_DEPENDENCIES += freetype libcurl libpng libtheora
 ETLEGACY_DEPENDENCIES += libvorbis lua openal openssl sdl2
 ETLEGACY_DEPENDENCIES += minizip cjson jpeg sqlite minizip-zlib
+
 ifeq ($(BR2_PACKAGE_REGLINUX_XWAYLAND),y)
-ETLEGACY_DEPENDENCIES += libglew libglu
+ETLEGACY_DEPENDENCIES += libgl libglew libglu
 endif
 
 ETLEGACY_SUPPORTS_IN_SOURCE_BUILD = NO

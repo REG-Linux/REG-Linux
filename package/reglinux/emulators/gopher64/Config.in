@@ -3,6 +3,11 @@ config BR2_PACKAGE_GOPHER64
 	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
 	select BR2_PACKAGE_HOST_RUSTC
 
+	depends on BR2_PACKAGE_WAYLAND
+	depends on BR2_PACKAGE_ALSA_LIB
+	depends on BR2_PACKAGE_HAS_LIBGL
+	depends on BR2_PACKAGE_XWAYLAND
+
 	help
 	N64 emulator written in Rust
 

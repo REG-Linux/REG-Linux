@@ -5,6 +5,7 @@ config BR2_PACKAGE_MUPEN64PLUS_CORE
 	depends on BR2_PACKAGE_ALSA_LIB
 	depends on BR2_PACKAGE_FREETYPE
 	depends on BR2_PACKAGE_DEJAVU
+	select BR2_PACKAGE_HOST_NASM
       help
         Core module of the Mupen64Plus project
 
