@@ -12,6 +12,9 @@ SUPERMODEL_LICENSE = GPLv3
 ifeq ($(BR2_PACKAGE_LIBGLEW),y)
 SUPERMODEL_DEPENDENCIES += libglew
 endif
+ifeq ($(BR2_PACKAGE_LIBGLU),y)
+SUPERMODEL_DEPENDENCIES += libglu
+endif
 
 define SUPERMODEL_BUILD_CMDS
 	cp $(@D)/Makefiles/Makefile.UNIX $(@D)/Makefile

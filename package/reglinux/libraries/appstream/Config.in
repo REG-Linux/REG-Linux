@@ -4,6 +4,8 @@ config BR2_PACKAGE_APPSTREAM
 	select BR2_PACKAGE_LIBCURL
 	select BR2_PACKAGE_LIBIDN2
 	select BR2_PACKAGE_ITSTOOL
+	select BR2_PACKAGE_LIBYAML
+	select BR2_PACKAGE_GPERF
 
 	help 
 	    AppStream makes machine-readable software metadata easily accessible. 

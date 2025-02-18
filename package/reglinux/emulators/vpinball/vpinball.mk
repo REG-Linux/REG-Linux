@@ -7,7 +7,9 @@ VPINBALL_VERSION = v10.8.0-2051-28dd6c3
 VPINBALL_SITE = $(call github,vpinball,vpinball,$(VPINBALL_VERSION))
 VPINBALL_LICENSE = GPLv3+
 VPINBALL_LICENSE_FILES = LICENSE
-VPINBALL_DEPENDENCIES = host-libcurl libfreeimage libpinmame libaltsound libdmdutil libdof sdl2 sdl2_image sdl2_ttf ffmpeg
+VPINBALL_DEPENDENCIES = host-libcurl host-dos2unix
+VPINBALL_DEPENDENCIES += libfreeimage libpinmame libaltsound libdmdutil libdof
+VPINBALL_DEPENDENCIES += sdl2 sdl2_image sdl2_ttf ffmpeg
 VPINBALL_SUPPORTS_IN_SOURCE_BUILD = NO
 
 # handle supported target platforms
@@ -31,12 +33,11 @@ ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
     ARCH = x86_64
 endif
 
-define VPINBALL_FIX_LINE_ENDINGS
+define VPINBALL_CUSTOM_CMAKE
     # Normalize line endings
     cd $(@D) && find . -type f -print0 | xargs -0 $(HOST_DIR)/bin/dos2unix
-endef
+    cd $(@D) && patch -p1 < $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/vpinball/000-standalone-branch-and-fix-path.diff
 
-define VPINBALL_CMAKE_HACKS
     ## derived from standalone/linux/external.sh ##
     # copy linux x64
     cp $(@D)/standalone/cmake/$(SOURCE) $(@D)/CMakeLists.txt
@@ -76,8 +77,7 @@ define VPINBALL_EVMAPY
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
-VPINBALL_PRE_CONFIGURE_HOOKS += VPINBALL_CMAKE_HACKS
-VPINBALL_PRE_PATCH_HOOKS += VPINBALL_FIX_LINE_ENDINGS
+VPINBALL_PRE_CONFIGURE_HOOKS += VPINBALL_CUSTOM_CMAKE
 
 VPINBALL_POST_INSTALL_TARGET_HOOKS += VPINBALL_EVMAPY
 

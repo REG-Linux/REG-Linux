@@ -1,0 +1,18 @@
+config BR2_PACKAGE_LIGHTSPARK
+	bool "lightspark"
+	select BR2_PACKAGE_FREETYPE
+	select BR2_PACKAGE_PCRE
+	select BR2_PACKAGE_JPEG
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_CAIRO
+	select BR2_PACKAGE_FFMPEG
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_PANGO
+	select BR2_PACKAGE_RTMPDUMP
+	select BR2_PACKAGE_LIBGLEW	if BR2_PACKAGE_HAS_LIBGL
+	help
+          LightSpark
+          Flash emulator for windows / mac / linux.
+
+          https://github.com/lightspark/lightspark
