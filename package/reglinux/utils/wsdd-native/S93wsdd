@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # 93wsdd - init.d script for WSDD on REG-Linux
 # "I haven't written a straight init.d script in 2 decades" Edition
@@ -16,16 +16,13 @@ DAEMON=/usr/bin/wsdd
 PIDFILE=/var/run/wsdd.pid
 LOG_FILE=/userdata/system/logs/wsdd.log
 
-# Exit if the package is not installed
-[ -x "$DAEMON" ] || exit 0
+if [ "$(/usr/bin/system-settings-get system.samba.enabled)" = "0" ] || [ ! -x "$DAEMON" ]; then
+    echo "SMB services ( $0 ): disabled"
+    exit 0
+fi
 
 # Function that starts the daemon/service
 do_start() {
-    smbenabled="$(/usr/bin/system-settings-get system.samba.enabled)"
-    if [ "$smbenabled" = "0" ]; then
-        echo "SMB services: disabled"
-        exit 0
-    fi
     securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
     if [ "$securityenabled" = "1" ]; then
         SMB_CONFIG_FILE="/etc/samba/smb-secure.conf"
