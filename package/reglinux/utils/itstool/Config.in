@@ -2,11 +2,13 @@ config BR2_PACKAGE_ITSTOOL
 	bool "itstool"
 	select BR2_PACKAGE_PYTHON3
 	select BR2_PACKAGE_PYTHON_LXML
+	select BR2_PACKAGE_LIBXML2
 
 config BR2_PACKAGE_HOST_ITSTOOL
 	bool "host-itstool"
 	select BR2_PACKAGE_HOST_PYTHON3
 	select BR2_PACKAGE_HOST_PYTHON_LXML
+	select BR2_PACKAGE_HOST_LIBXML2
 
 	help 
 	    Translate XML with PO files using W3C Internationalization Tag Set rules

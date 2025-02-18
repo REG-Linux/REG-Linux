@@ -11,7 +11,7 @@ RPCS3_GIT_SUBMODULES=YES
 RPCS3_LICENSE = GPLv2
 RPCS3_DEPENDENCIES += alsa-lib llvm ffmpeg faudio libevdev libxml2
 RPCS3_DEPENDENCIES += libglew libglu libpng libusb mesa3d ncurses openal rtmpdump
-RPCS3_DEPENDENCIES += reglinux-qt6 wolfssl
+RPCS3_DEPENDENCIES += reglinux-qt6 libcurl wolfssl
 
 RPCS3_SUPPORTS_IN_SOURCE_BUILD = NO
 

@@ -19,6 +19,8 @@ config BR2_PACKAGE_GAMESCOPE
     select BR2_PACKAGE_XLIB_LIBXTST
     select BR2_PACKAGE_XLIB_LIBXCURSOR
     select BR2_PACKAGE_XLIB_LIBXMU
+    select BR2_PACKAGE_REGLINUX_LUAJIT
+    select BR2_PACKAGE_LIBCAP
 
     help
         Valve Gamescope compositor.
