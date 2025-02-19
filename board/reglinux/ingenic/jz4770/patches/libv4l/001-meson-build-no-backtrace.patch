@@ -1,0 +1,13 @@
+--- a/meson.build	2025-02-19 19:24:02.700602601 +0100
++++ b/meson.build	2025-02-19 19:24:37.782364300 +0100
+@@ -160,10 +160,6 @@
+     conf.set('HAVE_SYS_KLOG_H', 1)
+ endif
+ 
+-if cc.has_header_symbol('execinfo.h', 'backtrace')
+-    conf.set('HAVE_BACKTRACE', 1)
+-endif
+-
+ if cc.has_function('argp_parse')
+     dep_argp = dependency('', required : false)
+ else
