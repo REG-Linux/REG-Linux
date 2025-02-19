@@ -3,6 +3,8 @@
 # ares
 #
 ################################################################################
+# TOOD Version.: Release on Feb 16, 2025
+# TODO ARES_VERSION = v143
 # Version.: Release on Feb 5, 2025
 ARES_VERSION = v142
 ARES_SITE = $(call github,ares-emulator,ares,$(ARES_VERSION))
