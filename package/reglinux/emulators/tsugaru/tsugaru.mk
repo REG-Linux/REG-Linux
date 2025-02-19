@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-TSUGARU_VERSION = v20241005j
+TSUGARU_VERSION = v20250217
 TSUGARU_SITE = $(call github,captainys,TOWNSEMU,$(TSUGARU_VERSION))
 TSUGARU_DEPENDENCIES = libglu
 TSUGARU_LICENSE = GPLv2
@@ -21,7 +21,7 @@ define TSUGARU_INSTALL_TARGET_CMDS
                 $(TARGET_DIR)/usr/bin/
 
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/tsugaru/fmtowns.keys $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/tsugaru/fmtowns.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))
