@@ -1,0 +1,11 @@
+--- a/src/engine/CMakeLists.txt	2025-02-18 16:06:27.663909782 +0100
++++ b/src/engine/CMakeLists.txt	2025-02-18 16:07:27.206477849 +0100
+@@ -46,7 +46,7 @@
+ 	engine
+ 	smacker
+ 	${USE_SDL_VERSION}::${USE_SDL_VERSION}
+-	${USE_SDL_VERSION}_mixer::${USE_SDL_VERSION}_mixer
++	SDL2_mixer
+ 	$<$<BOOL:${ENABLE_IMAGE}>:${USE_SDL_VERSION}_image::${USE_SDL_VERSION}_image>
+ 	$<$<BOOL:${ENABLE_IMAGE}>:PNG::PNG>
+ 	Threads::Threads
