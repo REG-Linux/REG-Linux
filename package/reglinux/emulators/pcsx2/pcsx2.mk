@@ -3,7 +3,8 @@
 # pcsx2
 #
 ################################################################################
-PCSX2_VERSION = v2.3.162
+# Version v2.3.168 on Feb 21, 2025
+PCSX2_VERSION = v2.3.168
 PCSX2_SITE = https://github.com/pcsx2/pcsx2.git
 PCSX2_SITE_METHOD = git
 PCSX2_GIT_SUBMODULES = YES
@@ -24,9 +25,9 @@ PCSX2_CONF_OPTS += -DUSE_SYSTEM_LIBS=AUTO
 # The following flag is misleading and *needed* ON to avoid doing -march=native
 PCSX2_CONF_OPTS += -DDISABLE_ADVANCE_SIMD=ON
 
-# pcsx2 is x86_64, we always enable wayland and XWayland
-PCSX2_CONF_OPTS += -DX11_API=ON
+# Since v2.3.168 Wayland is ON by default, should disable X11 but does not build yet
 PCSX2_CONF_OPTS += -DWAYLAND_API=ON
+PCSX2_CONF_OPTS += -DX11_API=ON
 
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
     PCSX2_CONF_OPTS += -DUSE_OPENGL=ON
