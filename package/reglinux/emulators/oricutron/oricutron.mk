@@ -3,8 +3,8 @@
 # Oricutron - Oric computers emulator
 #
 ################################################################################
-# Version.: Release on Nov 7, 2024
-ORICUTRON_VERSION = V1_2_6
+# Version.: Release on Feb 21, 2025
+ORICUTRON_VERSION = V1_2_7
 ORICUTRON_SITE = https://github.com/pete-gordon/oricutron
 ORICUTRON_SITE_METHOD=git
 ORICUTRON_LICENSE = GPLv3

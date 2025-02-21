@@ -1,16 +1,18 @@
 --- a/common/CMakeLists.txt	2024-07-15 17:37:22.361418681 +0200
 +++ /Bcommon/CMakeLists.txt	2024-07-15 17:37:57.210212472 +0200
-@@ -166,9 +166,13 @@
+@@ -166,10 +166,14 @@
  	)
  	target_link_libraries(common PRIVATE
  		${DBUS_LINK_LIBRARIES}
 -		X11::X11
 -		X11::Xrandr
+-		X11::Xi
  	)
 +if(X11_API)
 +	target_link_libraries(common PRIVATE
 + 		X11::X11
 + 		X11::Xrandr
++		X11::Xi
 + 	)
 +endif()
  	if(USE_BACKTRACE)

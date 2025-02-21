@@ -1,0 +1,139 @@
+diff --git a/include/mimalloc/prim.h b/include/mimalloc/prim.h
+index f8a4032..268e4c9 100644
+--- a/include/mimalloc/prim.h
++++ b/include/mimalloc/prim.h
+@@ -255,6 +255,14 @@ static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
+   #endif
+ }
+ 
++#elif defined(MI_MUSL_BUILTIN)
++
++#include "pthread_arch.h"
++
++static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
++  return __get_tp();
++}
++
+ #else
+ 
+ // otherwise use portable C, taking the address of a thread local variable (this is still very fast on most platforms).
+@@ -346,6 +354,14 @@ static inline mi_heap_t* mi_prim_get_default_heap(void) {
+   return (mi_unlikely(heap == NULL) ? (mi_heap_t*)&_mi_heap_empty : heap);
+ }
+ 
++#elif defined(MI_MUSL_BUILTIN)
++
++extern void** __mimalloc_default_heap_location(void);
++
++static inline mi_heap_t* mi_prim_get_default_heap(void) {
++  return (mi_heap_t*)(*__mimalloc_default_heap_location());
++}
++
+ #else // default using a thread local variable; used on most platforms.
+ 
+ static inline mi_heap_t* mi_prim_get_default_heap(void) {
+diff --git a/src/alloc-override.c b/src/alloc-override.c
+index 75afc20..683f7c9 100644
+--- a/src/alloc-override.c
++++ b/src/alloc-override.c
+@@ -188,7 +188,7 @@ typedef void* mi_nothrow_t;
+   void* operator new[](std::size_t n, std::align_val_t al, const std::nothrow_t&) noexcept { return mi_new_aligned_nothrow(n, static_cast<size_t>(al)); }
+   #endif
+ 
+-#elif (defined(__GNUC__) || defined(__clang__))
++#elif ((defined(__GNUC__) || defined(__clang__))) && !defined(MI_MUSL_BUILTIN)
+   // ------------------------------------------------------
+   // Override by defining the mangled C++ names of the operators (as
+   // used by GCC and CLang).
+diff --git a/src/init.c b/src/init.c
+index 3316106..33d94da 100644
+--- a/src/init.c
++++ b/src/init.c
+@@ -145,9 +145,17 @@ mi_threadid_t _mi_thread_id(void) mi_attr_noexcept {
+   return _mi_prim_thread_id();
+ }
+ 
++#if !defined(MI_MUSL_BUILTIN)
++
+ // the thread-local default heap for allocation
+ mi_decl_thread mi_heap_t* _mi_heap_default = (mi_heap_t*)&_mi_heap_empty;
+ 
++#else
++
++void *__mi_heap_empty_ptr = (void*)&_mi_heap_empty;
++
++#endif
++
+ extern mi_heap_t _mi_heap_main;
+ 
+ static mi_tld_t tld_main = {
+@@ -463,6 +471,8 @@ void _mi_heap_set_default_direct(mi_heap_t* heap)  {
+   *mi_prim_tls_pthread_heap_slot() = heap;
+   #elif defined(MI_TLS_PTHREAD)
+   // we use _mi_heap_default_key
++  #elif defined(MI_MUSL_BUILTIN)
++  *__mimalloc_default_heap_location() = (void*)heap;
+   #else
+   _mi_heap_default = heap;
+   #endif
+diff --git a/src/options.c b/src/options.c
+index fba9076..0826423 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -373,6 +373,9 @@
+ // variables on demand. This is why we use a _mi_preloading test on such
+ // platforms. However, C code generator may move the initial thread local address
+ // load before the `if` and we therefore split it out in a separate function.
++
++#if !defined(MI_MUSL_BUILTIN)
++
+ static mi_decl_thread bool recurse = false;
+ 
+ static mi_decl_noinline bool mi_recurse_enter_prim(void) {
+@@ -302,6 +305,30 @@ static void mi_recurse_exit(void) {
+   mi_recurse_exit_prim();
+ }
+ 
++#else
++
++bool *__mimalloc_recurse_location(void);
++
++static mi_decl_noinline bool mi_recurse_enter_prim(void) {
++  if (*__mimalloc_recurse_location()) return false;
++  *__mimalloc_recurse_location() = true;
++  return true;
++}
++
++static mi_decl_noinline void mi_recurse_exit_prim(void) {
++  *__mimalloc_recurse_location() = false;
++}
++
++static bool mi_recurse_enter(void) {
++  return mi_recurse_enter_prim();
++}
++
++static void mi_recurse_exit(void) {
++  mi_recurse_exit_prim();
++}
++
++#endif
++
+ void _mi_fputs(mi_output_fun* out, void* arg, const char* prefix, const char* message) {
+   if (out==NULL || (void*)out==(void*)stdout || (void*)out==(void*)stderr) { // TODO: use mi_out_stderr for stderr?
+     if (!mi_recurse_enter()) return;
+--- a/src/prim/prim.c	2025-02-20 22:34:44.546134300 +0100
++++ b/src/prim/prim.c	2025-02-20 22:38:25.633216065 +0100
+@@ -38,7 +38,13 @@
+     #define mi_attr_constructor __attribute__((constructor))
+     #define mi_attr_destructor  __attribute__((destructor))
+   #endif
++#if defined(MI_MUSL_BUILTIN)
++// MUSL libc is patched to call _mi_process_init() in _start or from the dynamic linker.
++// Thus, this symbol needs to be visible in the object file / non-static.
++  void _mi_process_init(void) {
++#else
+   static void mi_attr_constructor mi_process_attach(void) {
++#endif
+     _mi_process_load();
+   }
+   static void mi_attr_destructor mi_process_detach(void) {
