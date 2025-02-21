@@ -1,0 +1,8 @@
+config BR2_PACKAGE_MIMALLOC
+	bool "mimalloc"
+
+	help
+	  mimalloc (pronounced "me-malloc") is a general purpose allocator with excellent performance characteristics. 
+	  Initially developed by Daan Leijen for the runtime systems of the Koka and Lean languages.
+
+	  https://github.com/microsoft/mimalloc
