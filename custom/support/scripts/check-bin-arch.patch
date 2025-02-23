@@ -1,0 +1,40 @@
+diff --git a/support/scripts/check-bin-arch b/support/scripts/check-bin-arch
+index 27cc59bca0..21b6720a60 100755
+--- a/support/scripts/check-bin-arch
++++ b/support/scripts/check-bin-arch
+@@ -87,10 +87,31 @@ while read f; do
+ 		continue
+ 	fi
+ 
+-	printf 'ERROR: architecture for "%s" is "%s", should be "%s"\n' \
+-	       "${f}" "${arch}" "${arch_name}"
+-
+-	exitcode=1
++	# reglinux: support Compiling arm64 in arm userspace - will eventually want to update to verify kernel is 64bit
++	if [ "${arch}" = "AArch64" -a "${arch_name}" = "ARM" ] ; then
++		printf 'NOTE: Detected Arch is AArch64 with ARM Userspace for file:\n"%s"\n\n' \
++		"${f}"
++	# reglinux: support Compiling i386 code in x86_64 system - for 32-bit only emulators like pcsx2 and 32-bit wine support
++	elif [ "${arch}" = "Intel 80386" -a "${arch_name}" = "Advanced Micro Devices X86-64" ] ; then
++		printf 'NOTE: Detected Arch is x86_64 with i386 Userspace for file:\n"%s"\n\n' \
++		"${f}"
++	# reglinux: support Compiling i386 code in arm system - for 32-bit only emulators like box86
++	elif [ "${arch}" = "Intel 80386" -a "${arch_name}" = "ARM" ] ; then
++		printf 'NOTE: Detected Arch is ARM with i386 Userspace for file:\n"%s"\n\n' \
++		"${f}"
++	# reglinux -  support Compiling x86_64 code in aarch64 system - for emulating through box64, fex or qemu-user
++	elif [ "${arch}" = "Advanced Micro Devices X86-64" -a "${arch_name}" = "AArch64" ] ; then
++		printf 'NOTE: Detected Arch is AArch64 with x86_64 Userspace for file:\n"%s"\n\n' \
++		"${f}"
++	# reglinux -  support Compiling x86_64 code in RISC-V 64 system - for emulating through box64, fex or qemu-user
++	elif [ "${arch}" = "Advanced Micro Devices X86-64" -a "${arch_name}" = "RISC-V" ] ; then
++		printf 'NOTE: Detected Arch is RISC-V with x86_64 Userspace for file:\n"%s"\n\n' \
++		"${f}"
++	else
++		printf 'ERROR: architecture for "%s" is "%s", should be "%s"\n' \
++		       "${f}" "${arch}" "${arch_name}"
++		exitcode=1
++	fi
+ done < <( sed -r -e "/^${package},\.(.+)$/!d; s//\1/;" ${pkg_list} )
+ 
+ exit ${exitcode}

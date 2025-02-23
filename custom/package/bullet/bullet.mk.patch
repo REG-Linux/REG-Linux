@@ -1,0 +1,14 @@
+diff --git a/package/bullet/bullet.mk b/package/bullet/bullet.mk
+index e112623b79..5537596623 100644
+--- a/package/bullet/bullet.mk
++++ b/package/bullet/bullet.mk
+@@ -15,6 +15,9 @@ BULLET_LICENSE_FILES = LICENSE.txt
+ # https://github.com/bulletphysics/bullet3/issues/3143
+ BULLET_CONF_OPTS = -DBUILD_UNIT_TESTS=OFF
+ 
++# reglinux - enable double precision for bullet
++BULLET_CONF_OPTS += -DUSE_DOUBLE_PRECISION=ON
++
+ # extras needs dlfcn.h and NPTL (pthread_barrier_init)
+ ifeq ($(BR2_STATIC_LIBS):$(BR2_TOOLCHAIN_HAS_THREADS_NPTL),:y)
+ BULLET_CONF_OPTS += -DBUILD_EXTRAS=ON

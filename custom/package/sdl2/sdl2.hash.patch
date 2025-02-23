@@ -1,0 +1,11 @@
+diff --git a/package/sdl2/sdl2.hash b/package/sdl2/sdl2.hash
+index 140767ef0a..2c963d6386 100644
+--- a/package/sdl2/sdl2.hash
++++ b/package/sdl2/sdl2.hash
+@@ -1,4 +1,4 @@
+-# Locally calculated after checking http://www.libsdl.org/release/SDL2-2.30.9.tar.gz.sig
+-sha256  24b574f71c87a763f50704bbb630cbe38298d544a1f890f099a4696b1d6beba4  SDL2-2.30.9.tar.gz
++# Locally calculated after checking http://www.libsdl.org/release/SDL2-2.32.0.tar.gz.sig
++sha256  f5c2b52498785858f3de1e2996eba3c1b805d08fe168a47ea527c7fc339072d0  SDL2-2.32.0.tar.gz
+ # Locally calculated
+ sha256  9b9e1764f06701bcf7ce21e942c682d5921ba0900c6fca760321b1c8837a9662  LICENSE.txt

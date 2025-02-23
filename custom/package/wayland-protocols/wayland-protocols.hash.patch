@@ -1,0 +1,12 @@
+diff --git a/package/wayland-protocols/wayland-protocols.hash b/package/wayland-protocols/wayland-protocols.hash
+index 93d40a919c..a12fd940a3 100644
+--- a/package/wayland-protocols/wayland-protocols.hash
++++ b/package/wayland-protocols/wayland-protocols.hash
+@@ -1,4 +1,4 @@
+-# From https://lists.freedesktop.org/archives/wayland-devel/2024-April/043581.html
+-sha256  71fd4de05e79f9a1ca559fac30c1f8365fa10346422f9fe795f74d77b9ef7e92  wayland-protocols-1.36.tar.xz
+-sha512  5448b9aedc953ce6be0f378da900c195c8743cb6001f615823b5fc9cab3e3ee54271132055743278e10decef7f8e9dcdeef31593a2a12062575fb90eb0084be0  wayland-protocols-1.36.tar.xz
++# From https://lists.freedesktop.org/archives/wayland-devel/2024-October/043851.html
++sha256  ff17292c05159d2b20ce6cacfe42d7e31a28198fa1429a769b03af7c38581dbe  wayland-protocols-1.38.tar.xz
++sha512  43fc36d35bedb245deed0e2de246f42d2bbfa6ecafa094f2a7fb103d6df8ae28f3cc200bc5aa24745b9131a28381883c24779da0a6d9ac954753bd5ebb1405db  wayland-protocols-1.38.tar.xz
+ sha256  f1a2b233e8a9a71c40f4aa885be08a0842ac85bb8588703c1dd7e6e6502e3124  COPYING

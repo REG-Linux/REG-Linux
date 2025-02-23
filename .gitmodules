@@ -1,3 +1,3 @@
 [submodule "buildroot"]
 	path = buildroot
-	url = https://github.com/REG-linux/buildroot.git
+	url = https://gitlab.com/buildroot.org/buildroot.git

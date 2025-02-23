@@ -1,0 +1,14 @@
+diff --git a/package/rockchip-rkbin/rockchip-rkbin.mk b/package/rockchip-rkbin/rockchip-rkbin.mk
+index 49271084eb..6eea1eb0b5 100644
+--- a/package/rockchip-rkbin/rockchip-rkbin.mk
++++ b/package/rockchip-rkbin/rockchip-rkbin.mk
+@@ -4,7 +4,8 @@
+ #
+ ################################################################################
+ 
+-ROCKCHIP_RKBIN_VERSION = b4558da0860ca48bf1a571dd33ccba580b9abe23
++# reglinux - bump
++ROCKCHIP_RKBIN_VERSION = 7c35e21a8529b3758d1f051d1a5dc62aae934b2b
+ ROCKCHIP_RKBIN_SITE = https://github.com/rockchip-linux/rkbin.git
+ ROCKCHIP_RKBIN_SITE_METHOD = git
+ ROCKCHIP_RKBIN_LICENSE = PROPRIETARY

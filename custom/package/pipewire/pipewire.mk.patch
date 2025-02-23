@@ -1,0 +1,82 @@
+diff --git a/package/pipewire/pipewire.mk b/package/pipewire/pipewire.mk
+index 9ad92546cc..029726685a 100644
+--- a/package/pipewire/pipewire.mk
++++ b/package/pipewire/pipewire.mk
+@@ -13,6 +13,8 @@ PIPEWIRE_INSTALL_STAGING = YES
+ PIPEWIRE_DEPENDENCIES = host-pkgconf $(TARGET_NLS_DEPENDENCIES)
+ PIPEWIRE_LDFLAGS = $(TARGET_NLS_LIBS)
+ 
++# reglinux - no session manager
++# we use the wireplumber package
+ PIPEWIRE_CONF_OPTS += \
+ 	-Ddocs=disabled \
+ 	-Dman=disabled \
+@@ -20,7 +22,6 @@ PIPEWIRE_CONF_OPTS += \
+ 	-Dspa-plugins=enabled \
+ 	-Daudiomixer=enabled \
+ 	-Daudioconvert=enabled \
+-	-Dbluez5-codec-lc3=disabled \
+ 	-Dbluez5-codec-lc3plus=disabled \
+ 	-Dcontrol=enabled \
+ 	-Daudiotestsrc=enabled \
+@@ -30,8 +31,7 @@ PIPEWIRE_CONF_OPTS += \
+ 	-Dvideoconvert=enabled \
+ 	-Dvideotestsrc=enabled \
+ 	-Dvolume=enabled \
+-	-Dvulkan=disabled \
+-	-Dsession-managers=[] \
++	-Dsession-managers= \
+ 	-Dlegacy-rtkit=false \
+ 	-Davb=disabled \
+ 	-Droc=disabled \
+@@ -41,6 +41,16 @@ PIPEWIRE_CONF_OPTS += \
+ 	-Dflatpak=disabled \
+ 	-Dsnap=disabled
+ 
++# reglinux
++PIPEWIRE_CONF_OPTS += --wrap-mode=default
++
++# reglinux
++ifeq ($(BR2_PACKAGE_FLATPAK),y)
++PIPEWIRE_CONF_OPTS += -Dflatpak=enabled
++else
++PIPEWIRE_CONF_OPTS += -Dflatpak=disabled
++endif
++
+ ifeq ($(BR2_PACKAGE_DBUS),y)
+ PIPEWIRE_CONF_OPTS += -Ddbus=enabled
+ PIPEWIRE_DEPENDENCIES += dbus
+@@ -191,6 +201,14 @@ else
+ PIPEWIRE_CONF_OPTS += -Dlibusb=disabled
+ endif
+ 
++# reglinux
++ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER)$(BR2_PACKAGE_VULKAN_LOADER),yy)
++PIPEWIRE_CONF_OPTS += -Dvulkan=enabled
++PIPEWIRE_DEPENDENCIES += mesa3d vulkan-loader
++else
++PIPEWIRE_CONF_OPTS += -Dvulkan=disabled
++endif
++
+ ifeq ($(BR2_PACKAGE_LIBSNDFILE),y)
+ PIPEWIRE_CONF_OPTS += -Dpw-cat=enabled -Dsndfile=enabled
+ PIPEWIRE_DEPENDENCIES += libsndfile
+@@ -219,12 +237,13 @@ else
+ PIPEWIRE_CONF_OPTS += -Dreadline=disabled
+ endif
+ 
+-ifeq ($(BR2_PACKAGE_SDL2),y)
+-PIPEWIRE_DEPENDENCIES += sdl2
+-PIPEWIRE_CONF_OPTS += -Dsdl2=enabled
+-else
++# reglinux
++#ifeq ($(BR2_PACKAGE_SDL2),y)
++#PIPEWIRE_DEPENDENCIES += sdl2
++#PIPEWIRE_CONF_OPTS += -Dsdl2=enabled
++#else
+ PIPEWIRE_CONF_OPTS += -Dsdl2=disabled
+-endif
++#endif
+ 
+ ifeq ($(BR2_PACKAGE_PIPEWIRE_COMPRESS_OFFLOAD),y)
+ PIPEWIRE_CONF_OPTS += -Dcompress-offload=enabled

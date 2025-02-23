@@ -1,0 +1,11 @@
+diff --git a/package/libglvnd/libglvnd.hash b/package/libglvnd/libglvnd.hash
+index e463a8def5..05aba7e2f6 100644
+--- a/package/libglvnd/libglvnd.hash
++++ b/package/libglvnd/libglvnd.hash
+@@ -1,5 +1,5 @@
+ # Locally computed
+-sha256  c4a884503d2412dc1fa209613aa8a77193aeb7065b823fe1775dc8b6f3e45211  libglvnd-1.4.0.tar.gz
++sha256  2b6e15b06aafb4c0b6e2348124808cbd9b291c647299eaaba2e3202f51ff2f3d  libglvnd-v1.7.0.gz
+ 
+ # Locally computed hashes for license files
+ sha256  f84a3eca98cc5bdf5318741124c38c5e877f856df8c7e229ee5065e5c61038c2  README.md

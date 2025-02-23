@@ -1,0 +1,4 @@
+# locally calculated
+sha256  c39aec729662416dcbf0bfe53a9786b34e7d93d02908a0779a2f6d83ad0a4a27  llvm-15.0.3.src.tar.xz
+sha256  13ef90fa598a239222ecadd64a63d81e4db59813aa5f255cbb5e9d3e0cf927d0  llvm-18.1.2.src.tar.xz
+sha256  8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee  LICENSE.TXT

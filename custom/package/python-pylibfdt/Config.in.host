@@ -1,0 +1,7 @@
+#REG
+config BR2_PACKAGE_HOST_PYTHON_PYLIBFDT
+	bool "host python-pylibfdt"
+	help
+	  Python bindings for the Device Tree Compiler (dtc) toolchain.
+
+	  https://github.com/devicetree-org/pylibfdt

@@ -1,0 +1,14 @@
+diff --git a/package/alsa-lib/alsa-lib.mk b/package/alsa-lib/alsa-lib.mk
+index 1dc25ea4a8..b132fbd2e7 100644
+--- a/package/alsa-lib/alsa-lib.mk
++++ b/package/alsa-lib/alsa-lib.mk
+@@ -4,7 +4,8 @@
+ #
+ ################################################################################
+ 
+-ALSA_LIB_VERSION = 1.2.12
++# reglinux - bump
++ALSA_LIB_VERSION = 1.2.13
+ ALSA_LIB_SOURCE = alsa-lib-$(ALSA_LIB_VERSION).tar.bz2
+ ALSA_LIB_SITE = https://www.alsa-project.org/files/pub/lib
+ ALSA_LIB_LICENSE = LGPL-2.1+ (library), GPL-2.0+ (aserver)

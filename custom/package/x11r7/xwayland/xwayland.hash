@@ -1,0 +1,7 @@
+# reglinux bump
+# From https://lists.x.org/archives/xorg-announce/2024-May/003514.html
+sha256  769e5133929ca4a4141d8e8d34dbbceea1dceaa93cf7a0b90ad7e76965e40055  xwayland-23.2.7.tar.xz
+sha512  d78bd1ffed5a8149c55b453a464e46d2d658169bb814a96b8b75119349ba5506bb9d5c131c3ff28d94b4a27db894963b8f039b89843a0164d4463d7015d74c1b  xwayland-23.2.7.tar.xz
+
+# Locally calculated
+sha256  4cc0447a22635c7b2f1a93fec4aa94f1970fadeb72a063de006b51cf4963a06f  COPYING
