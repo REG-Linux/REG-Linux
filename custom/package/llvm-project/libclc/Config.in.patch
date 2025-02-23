@@ -1,0 +1,17 @@
+diff --git a/package/llvm-project/libclc/Config.in b/package/llvm-project/libclc/Config.in
+index 85eb888578..f070203555 100644
+--- a/package/llvm-project/libclc/Config.in
++++ b/package/llvm-project/libclc/Config.in
+@@ -2,6 +2,12 @@ config BR2_PACKAGE_LIBCLC
+ 	bool "libclc"
+ 	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS
+ 	depends on BR2_HOST_GCC_AT_LEAST_7 # host-llvm
++	select BR2_PACKAGE_HOST_CLANG
++	select BR2_PACKAGE_HOST_LLVM
++	select BR2_PACKAGE_HOST_SPIRV_TOOLS
++	select BR2_PACKAGE_SPIRV_TOOLS
++	select BR2_PACKAGE_SPIRV_LLVM_TRANSLATOR
++
+ 	help
+ 	  libclc is an open source, BSD licensed implementation of
+ 	  the library requirements of the OpenCL C programming language,

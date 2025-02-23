@@ -1,0 +1,32 @@
+diff --git a/package/spirv-tools/spirv-tools.mk b/package/spirv-tools/spirv-tools.mk
+index e863911b03..4c6d6831af 100644
+--- a/package/spirv-tools/spirv-tools.mk
++++ b/package/spirv-tools/spirv-tools.mk
+@@ -3,10 +3,9 @@
+ # spirv-tools
+ #
+ ################################################################################
+-
+-# Keep in sync with spirv-headers version
+-SPIRV_TOOLS_VERSION = 1.3.261.1
+-SPIRV_TOOLS_SITE = $(call github,KhronosGroup,SPIRV-Tools,sdk-$(SPIRV_TOOLS_VERSION))
++# reglinux - 1.4.304.0 needed to build spirv-llvm-translator
++SPIRV_TOOLS_VERSION = 1.4.304.0
++SPIRV_TOOLS_SITE = $(call github,KhronosGroup,SPIRV-Tools,vulkan-sdk-$(SPIRV_TOOLS_VERSION))
+ SPIRV_TOOLS_LICENSE = Apache-2.0
+ SPIRV_TOOLS_LICENSE_FILES = LICENSE
+ SPIRV_TOOLS_DEPENDENCIES = spirv-headers
+@@ -19,3 +18,13 @@ SPIRV_TOOLS_CONF_OPTS = \
+ 	-DSPIRV_WERROR=OFF
+ 
+ $(eval $(cmake-package))
++
++HOST_SPIRV_TOOLS_CONF_OPTS = \
++	-DSPIRV-Headers_SOURCE_DIR=$(HOST_DIR)/usr \
++	-DSPIRV_TOOLS_BUILD_STATIC=OFF \
++	-DSPIRV_SKIP_TESTS=ON \
++	-DSPIRV_WERROR=OFF
++
++HOST_SPIRV_TOOLS_DEPENDENCIES = host-spirv-headers
++
++$(eval $(host-cmake-package))

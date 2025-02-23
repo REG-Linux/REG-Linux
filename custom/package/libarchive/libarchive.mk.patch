@@ -1,0 +1,78 @@
+diff --git a/package/libarchive/libarchive.mk b/package/libarchive/libarchive.mk
+index 70123ee2b1..aa6036d42e 100644
+--- a/package/libarchive/libarchive.mk
++++ b/package/libarchive/libarchive.mk
+@@ -16,34 +16,50 @@ LIBARCHIVE_AUTORECONF = YES
+ # needed for autoreconf
+ LIBARCHIVE_DEPENDENCIES += host-pkgconf
+ 
++# reglinux
++LIBARCHIVE_CONF_OPTS += --disable-bsdunzip
++
+ ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDTAR),y)
+-ifeq ($(BR2_STATIC_LIBS),y)
+-LIBARCHIVE_CONF_OPTS += --enable-bsdtar=static
+-else
++# reglinux
++#ifeq ($(BR2_STATIC_LIBS),y)
++#LIBARCHIVE_CONF_OPTS += --enable-bsdtar=static
++#else
+ LIBARCHIVE_CONF_OPTS += --enable-bsdtar=shared
+-endif
++#endif
+ else
+ LIBARCHIVE_CONF_OPTS += --disable-bsdtar
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDCPIO),y)
+-ifeq ($(BR2_STATIC_LIBS),y)
+-LIBARCHIVE_CONF_OPTS += --enable-bsdcpio=static
+-else
++# reglinux
++#ifeq ($(BR2_STATIC_LIBS),y)
++#LIBARCHIVE_CONF_OPTS += --enable-bsdcpio=static
++#else
+ LIBARCHIVE_CONF_OPTS += --enable-bsdcpio=shared
+-endif
++#endif
+ else
+ LIBARCHIVE_CONF_OPTS += --disable-bsdcpio
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDCAT),y)
++# reglinux
++#ifeq ($(BR2_STATIC_LIBS),y)
++#LIBARCHIVE_CONF_OPTS += --enable-bsdcat=static
++#else
++LIBARCHIVE_CONF_OPTS += --enable-bsdcat=shared
++#endif
++else
++LIBARCHIVE_CONF_OPTS += --disable-bsdcat
++endif
++
++ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDUNZIP),y)
+ ifeq ($(BR2_STATIC_LIBS),y)
+-LIBARCHIVE_CONF_OPTS += --enable-bsdcat=static
++LIBARCHIVE_CONF_OPTS += --enable-bsdunzip=static
+ else
+-LIBARCHIVE_CONF_OPTS += --enable-bsdcat=shared
++LIBARCHIVE_CONF_OPTS += --enable-bsdunzip=shared
+ endif
+ else
+-LIBARCHIVE_CONF_OPTS += --disable-bsdcat
++LIBARCHIVE_CONF_OPTS += --disable-bsdunzip
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDUNZIP),y)
+@@ -148,6 +164,11 @@ else
+ LIBARCHIVE_CONF_OPTS += --without-zstd
+ endif
+ 
++# reglinux - fix building with musl
++ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
++LIBARCHIVE_CONF_ENV += LIBS="-latomic"
++endif
++
+ # The only user of host-libarchive needs zlib support
+ HOST_LIBARCHIVE_DEPENDENCIES = host-zlib
+ # needed for autoreconf

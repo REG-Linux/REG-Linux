@@ -55,7 +55,7 @@ build-docker-image:
 	@$(DOCKER) pull $(DOCKER_REPO)/$(IMAGE_NAME)
 	@touch .ba-docker-image-available
 
-reglinux-docker-image: .ba-docker-image-available
+reglinux-docker-image: merge .ba-docker-image-available
 
 update-docker-image:
 	-@rm .ba-docker-image-available > /dev/null
@@ -307,3 +307,9 @@ uart:
 	$(if $(SERIAL_BAUDRATE),,$(error "SERIAL_BAUDRATE not specified!"))
 	$(if $(wildcard $(SERIAL_DEV)),,$(error "$(SERIAL_DEV) not available!"))
 	@picocom $(SERIAL_DEV) -b $(SERIAL_BAUDRATE)
+
+merge:
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/mergeToBR.sh
+
+generate:
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/generateCustom.sh

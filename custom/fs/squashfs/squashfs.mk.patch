@@ -1,0 +1,42 @@
+diff --git a/fs/squashfs/squashfs.mk b/fs/squashfs/squashfs.mk
+index cf083663c1..518abd566a 100644
+--- a/fs/squashfs/squashfs.mk
++++ b/fs/squashfs/squashfs.mk
+@@ -8,16 +8,14 @@ ROOTFS_SQUASHFS_DEPENDENCIES = host-squashfs
+ 
+ ROOTFS_SQUASHFS_ARGS = \
+ 	-noappend \
+-	-processors $(PARALLEL_JOBS) \
+-	-b $(call qstrip,$(BR2_TARGET_ROOTFS_SQUASHFS_BS)) \
+-	$(call qstrip,$(BR2_TARGET_ROOTFS_SQUASHFS_COMP_OPTS))
++	-processors $(PARALLEL_JOBS)
+ 
+ ifeq ($(BR2_TARGET_ROOTFS_SQUASHFS_PAD),)
+ ROOTFS_SQUASHFS_ARGS += -nopad
+ endif
+ 
+ ifeq ($(BR2_TARGET_ROOTFS_SQUASHFS4_LZ4),y)
+-ROOTFS_SQUASHFS_ARGS += -comp lz4
++ROOTFS_SQUASHFS_ARGS += -comp lz4 -Xhc
+ else ifeq ($(BR2_TARGET_ROOTFS_SQUASHFS4_LZO),y)
+ ROOTFS_SQUASHFS_ARGS += -comp lzo
+ else ifeq ($(BR2_TARGET_ROOTFS_SQUASHFS4_LZMA),y)
+@@ -30,7 +28,18 @@ else
+ ROOTFS_SQUASHFS_ARGS += -comp gzip
+ endif
+ 
++ROOTFS_SQUASHFS_ARGS += \
++	-b $(call qstrip,$(BR2_TARGET_ROOTFS_SQUASHFS_BS)) \
++	$(call qstrip,$(BR2_TARGET_ROOTFS_SQUASHFS_COMP_OPTS))
++
++ifneq ($(BR2_TARGET_ROOTFS_SQUASHFS_EXCLUDE_DIRS),)
++ifneq ($(BR2_TARGET_ROOTFS_SQUASHFS_EXCLUDE_DIRS),"")
++ROOTFS_SQUASHFS_ARGS += -e $(call qstrip,$(BR2_TARGET_ROOTFS_SQUASHFS_EXCLUDE_DIRS))
++endif
++endif
++
+ define ROOTFS_SQUASHFS_CMD
++	echo "$(HOST_DIR)/bin/mksquashfs $(TARGET_DIR) $@ $(ROOTFS_SQUASHFS_ARGS)"
+ 	$(HOST_DIR)/bin/mksquashfs $(TARGET_DIR) $@ $(ROOTFS_SQUASHFS_ARGS)
+ endef
+ 

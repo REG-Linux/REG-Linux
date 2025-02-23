@@ -1,0 +1,20 @@
+diff --git a/package/util-linux/util-linux.mk b/package/util-linux/util-linux.mk
+index 7a143290eb..70237cdcfe 100644
+--- a/package/util-linux/util-linux.mk
++++ b/package/util-linux/util-linux.mk
+@@ -311,14 +311,12 @@ endef
+ UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_INSTALL_PAMFILES
+ endif
+ 
+-# Install agetty->getty symlink to avoid breakage when there's no busybox
++# reglinux
+ ifeq ($(BR2_PACKAGE_UTIL_LINUX_AGETTY),y)
+-ifeq ($(BR2_PACKAGE_BUSYBOX),)
+ define UTIL_LINUX_GETTY_SYMLINK
+ 	ln -sf agetty $(TARGET_DIR)/sbin/getty
+ endef
+ endif
+-endif
+ 
+ UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_GETTY_SYMLINK
+ 

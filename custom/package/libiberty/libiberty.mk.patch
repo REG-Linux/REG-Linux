@@ -1,0 +1,14 @@
+diff --git a/package/libiberty/libiberty.mk b/package/libiberty/libiberty.mk
+index ac6afc44ca..9fa9ee208c 100644
+--- a/package/libiberty/libiberty.mk
++++ b/package/libiberty/libiberty.mk
+@@ -4,7 +4,8 @@
+ #
+ ################################################################################
+ 
+-LIBIBERTY_VERSION = 2.41
++# REG update to 2.42 (was 2.41, broken binutils 2.42)
++LIBIBERTY_VERSION = 2.42
+ LIBIBERTY_SOURCE = binutils-$(LIBIBERTY_VERSION).tar.xz
+ LIBIBERTY_SITE = $(BR2_GNU_MIRROR)/binutils
+ HOST_LIBIBERTY_DL_SUBDIR = binutils

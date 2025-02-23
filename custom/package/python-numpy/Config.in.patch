@@ -1,0 +1,12 @@
+diff --git a/package/python-numpy/Config.in b/package/python-numpy/Config.in
+index e10618f058..d3e4eff81b 100644
+--- a/package/python-numpy/Config.in
++++ b/package/python-numpy/Config.in
+@@ -13,6 +13,7 @@ config BR2_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+ 	default y if BR2_riscv
+ 	default y if BR2_sh
+ 	default y if BR2_x86_64
++	default y if BR2_riscv
+ 
+ config BR2_PACKAGE_PYTHON_NUMPY
+ 	bool "python-numpy"

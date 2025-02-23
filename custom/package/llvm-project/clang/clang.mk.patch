@@ -1,0 +1,35 @@
+diff --git a/package/llvm-project/clang/clang.mk b/package/llvm-project/clang/clang.mk
+index 0bafd6461b..ccda59cbba 100644
+--- a/package/llvm-project/clang/clang.mk
++++ b/package/llvm-project/clang/clang.mk
+@@ -42,15 +42,20 @@ CLANG_CONF_OPTS += -DCMAKE_CROSSCOMPILING=1
+ HOST_CLANG_CONF_OPTS += -DCLANG_BUILD_TOOLS=ON
+ CLANG_CONF_OPTS += -DCLANG_BUILD_TOOLS=ON
+ 
++# Fixup for clang / host clang building
++HOST_CLANG_CONF_OPTS += -DCMAKE_CXX_FLAGS="-Wno-error=stringop-overflow -Wno-changes-meaning"
++
+ HOST_CLANG_CONF_OPTS += \
+ 	-DCLANG_BUILD_EXAMPLES=OFF \
+ 	-DCLANG_INCLUDE_DOCS=OFF \
+-	-DCLANG_INCLUDE_TESTS=OFF
++	-DCLANG_INCLUDE_TESTS=OFF \
++	-DLLVM_INCLUDE_TESTS=OFF
+ 
+ CLANG_CONF_OPTS += \
+ 	-DCLANG_BUILD_EXAMPLES=OFF \
+ 	-DCLANG_INCLUDE_DOCS=OFF \
+-	-DCLANG_INCLUDE_TESTS=OFF
++	-DCLANG_INCLUDE_TESTS=OFF \
++	-DLLVM_INCLUDE_TESTS=OFF
+ 
+ HOST_CLANG_CONF_OPTS += -DLLVM_DIR=$(HOST_DIR)/lib/cmake/llvm \
+ 	-DCLANG_DEFAULT_LINKER=$(TARGET_LD)
+@@ -80,6 +85,7 @@ CLANG_FILES_TO_REMOVE = \
+ define CLANG_CLEANUP_TARGET
+ 	rm -rf $(addprefix $(TARGET_DIR),$(CLANG_FILES_TO_REMOVE))
+ endef
++
+ CLANG_POST_INSTALL_TARGET_HOOKS += CLANG_CLEANUP_TARGET
+ 
+ # clang-tblgen is not installed by default, however it is necessary

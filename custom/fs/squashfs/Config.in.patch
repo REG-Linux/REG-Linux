@@ -1,0 +1,24 @@
+diff --git a/fs/squashfs/Config.in b/fs/squashfs/Config.in
+index 21322a2246..da8587ce74 100644
+--- a/fs/squashfs/Config.in
++++ b/fs/squashfs/Config.in
+@@ -55,6 +55,10 @@ config BR2_TARGET_ROOTFS_SQUASHFS_BS
+ 	default "512K" if BR2_TARGET_ROOTFS_SQUASHFS_BS_512K
+ 	default "1024K" if BR2_TARGET_ROOTFS_SQUASHFS_BS_1024K
+ 
++config BR2_TARGET_ROOTFS_SQUASHFS_EXCLUDE_DIRS
++	string "exclude directories from squashfs"
++	default ""
++
+ config BR2_TARGET_ROOTFS_SQUASHFS_PAD
+ 	bool "pad to a 4K boundary"
+ 	default y # legacy was always ON
+@@ -107,7 +111,7 @@ config BR2_TARGET_ROOTFS_SQUASHFS_COMP_OPTS
+ 	string
+ 	default "-Xcompression-level 9" if BR2_TARGET_ROOTFS_SQUASHFS4_GZIP
+ 	default "-Xcompression-level 9" if BR2_TARGET_ROOTFS_SQUASHFS4_LZO
+-	default "-Xhc" if BR2_TARGET_ROOTFS_SQUASHFS4_LZ4
++	default "" if BR2_TARGET_ROOTFS_SQUASHFS4_LZ4
+ 	default "-Xbcj arm,armthumb" if BR2_TARGET_ROOTFS_SQUASHFS4_XZ && (BR2_arm || BR_aarch64)
+ 	default "-Xbcj powerpc" if BR2_TARGET_ROOTFS_SQUASHFS4_XZ && (BR2_powerpc || BR2_powerpc64)
+ 	default "-Xbcj sparc" if BR2_TARGET_ROOTFS_SQUASHFS4_XZ && (BR2_sparc || BR2_sparc64)

@@ -1,0 +1,13 @@
+diff --git a/package/libdrm/libdrm.mk b/package/libdrm/libdrm.mk
+index fcf7f17e78..894e2d8a6f 100644
+--- a/package/libdrm/libdrm.mk
++++ b/package/libdrm/libdrm.mk
+@@ -117,3 +117,8 @@ LIBDRM_CONF_OPTS += -Dtests=false
+ endif
+ 
+ $(eval $(meson-package))
++
++# reglinux - declare host package and make sure to enable intel
++HOST_LIBDRM_CONF_OPTS += -Dintel=enabled
++HOST_LIBDRM_DEPENDENCIES += host-libpciaccess
++$(eval $(host-meson-package))
