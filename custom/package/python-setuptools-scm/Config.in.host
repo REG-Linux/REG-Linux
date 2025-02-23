@@ -1,0 +1,7 @@
+#REG
+config BR2_PACKAGE_HOST_PYTHON_SETUPTOOLS_SCM
+	bool "host-python-setuptools-scm"
+	help
+	  setuptools-scm extracts Python package versions from git or hg metadata instead of declaring them as the version argument or in an SCM managed file.
+
+	  https://pypi.org/project/setuptools-scm/

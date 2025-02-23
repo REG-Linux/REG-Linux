@@ -1,0 +1,16 @@
+diff --git a/package/ntfs-3g/ntfs-3g.mk b/package/ntfs-3g/ntfs-3g.mk
+index 62c515d50f..b1bceb0fda 100644
+--- a/package/ntfs-3g/ntfs-3g.mk
++++ b/package/ntfs-3g/ntfs-3g.mk
+@@ -33,4 +33,11 @@ ifneq ($(BR2_PACKAGE_NTFS_3G_NTFSPROGS),y)
+ NTFS_3G_CONF_OPTS += --disable-ntfsprogs
+ endif
+ 
++# REG-LINUX: use NTFS3 kernel module in kernel > 5.10
++ifneq ($(BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4),y)
++ifneq ($(BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_10),y)
++NTFS_3G_CONF_OPTS += --disable-ntfs-3g
++endif
++endif
++
+ $(eval $(autotools-package))

@@ -1,0 +1,12 @@
+diff --git a/package/vulkan-tools/Config.in b/package/vulkan-tools/Config.in
+index 54fa539dab..5958b91029 100644
+--- a/package/vulkan-tools/Config.in
++++ b/package/vulkan-tools/Config.in
+@@ -6,6 +6,7 @@ config BR2_PACKAGE_VULKAN_TOOLS
+ 	depends on BR2_TOOLCHAIN_HAS_THREADS # vulkan-loader
+ 	select BR2_PACKAGE_VULKAN_HEADERS
+ 	select BR2_PACKAGE_VULKAN_LOADER
++	select BR2_PACKAGE_VULKAN_VOLK
+ 
+ 	help
+ 	  The Khronos official Vulkan Tools and Utilities.

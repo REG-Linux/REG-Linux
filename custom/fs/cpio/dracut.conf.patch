@@ -1,0 +1,122 @@
+diff --git a/fs/cpio/dracut.conf b/fs/cpio/dracut.conf
+index 2337736c4e..762240f7cf 100644
+--- a/fs/cpio/dracut.conf
++++ b/fs/cpio/dracut.conf
+@@ -1,3 +1,4 @@
++# REGLinux configuration
+ #Simple dracut config for a system without systemd
+ 
+ #Dracut configuration
+@@ -10,16 +11,16 @@ early_microcode=no
+ hostonly=no
+ hostonly_cmdline=no
+ use_fstab=no
+-kernel_cmdline="rd.break=initqueue"
+ do_strip=no
+ 
+ # Dracut modules needed
+ add_dracutmodules+=" \
+-busybox-init
++busybox-rootfs \
+ "
+ 
+ # Modules to ignore
+ omit_dracutmodules+=" \
++base \
+ bash \
+ biosdevname \
+ btrfs \
+@@ -29,26 +30,33 @@ caps \
+ cifs \
+ crypt \
+ crypt-gpg \
++crypt-loop \
+ dash \
++dbus \
+ dbus-broker \
+ dbus-daemon \
+ dm \
+ dmraid \
+ dmsquash-live-ntfs \
+ dracut-systemd \
++ecryptfs \
+ fcoe \
+ fcoe-uefi \
++fido2 \
++fips \
+ fs-lib \
+ iscsi \
+ i18n \
+ lvmmerge \
+ lvm \
+ lunmask \
++kernel-modules \
++kernel-modules-extra \
++masterkey \
+ mdraid \
+ memstrack \
+ mksh \
+ modsign \
+-mount-root \
+ multipath \
+ nbd \
+ network-legacy \
+@@ -57,36 +65,49 @@ nfs \
+ nvdimm \
+ nvmf \
+ parse-lunmask \
++pcsc \
++pkcs11 \
++plymouth \
+ qemu \
+ qemu-net \
+ resume \
+ rootfs-block \
+ rngd \
++shutdown \
+ systemd \
+-systemd-udevd \
+-systemd-coredump \
++systemd-ac-power \
+ systemd-ask-password \
+-systemd-timedated \
+-systemd-rfkill \
+-systemd-resolved \
++systemd-coredump \
++systemd-creds \
++systemd-cyptsetup \
+ systemd-hostnamed \
+ systemd-initrd \
++systemd-integritysetup \
+ systemd-journald \
+ systemd-ldconfig \
+-systemd-networkd \
+-systemd-timesyncd \
+-systemd-veritysetup \
+ systemd-modules-load \
+-systemd-sysctl \
++systemd-networkd \
++systemd-pcrphase \
++systemd-portabled \
++systemd-pstore \
+ systemd-repart \
++systemd-resolved \
++systemd-rfkill \
++systemd-sysctl \
+ systemd-sysext \
+ systemd-sysusers \
++systemd-timedated \
++systemd-timesyncd \
+ systemd-tmpfiles \
++systemd-udevd \
++systemd-veritysetup \
+ squash \
+ ssh-client \
+ stratis \
++terminfo \
+ tpm2-tss \
+ udev-rules \
+ url-lib \
+ usrmount \
++virtiofs \
+ "

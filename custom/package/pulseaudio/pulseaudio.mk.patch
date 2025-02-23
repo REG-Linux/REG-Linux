@@ -1,0 +1,20 @@
+diff --git a/package/pulseaudio/pulseaudio.mk b/package/pulseaudio/pulseaudio.mk
+index 254e05348d..adbfcc3cf9 100644
+--- a/package/pulseaudio/pulseaudio.mk
++++ b/package/pulseaudio/pulseaudio.mk
+@@ -197,6 +197,15 @@ endef
+ PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_REMOVE_VALA \
+ 	PULSEAUDIO_REMOVE_CONSOLE_KIT
+ 
++# batocera - add the pactl util
++PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_ADD_PACTL
++
++define PULSEAUDIO_ADD_PACTL
++	cp $(@D)/build/src/utils/pactl $(TARGET_DIR)/usr/bin/
++	ln -sf /usr/lib/pulseaudio/libpulsecommon-$(PULSEAUDIO_VERSION).so \
++	    $(TARGET_DIR)/usr/lib/libpulsecommon-$(PULSEAUDIO_VERSION).so
++endef
++
+ ifeq ($(BR2_PACKAGE_PULSEAUDIO_DAEMON),y)
+ define PULSEAUDIO_USERS
+ 	pulse -1 pulse -1 * /var/run/pulse - audio,pulse-access

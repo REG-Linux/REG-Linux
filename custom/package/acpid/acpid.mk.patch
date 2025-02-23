@@ -1,0 +1,13 @@
+diff --git a/package/acpid/acpid.mk b/package/acpid/acpid.mk
+index 4bd93068ad..0817fdc985 100644
+--- a/package/acpid/acpid.mk
++++ b/package/acpid/acpid.mk
+@@ -35,6 +35,7 @@ define ACPID_SET_EVENTS
+ 		>$(TARGET_DIR)/etc/acpi/events/powerbtn
+ endef
+ 
+-ACPID_POST_INSTALL_TARGET_HOOKS += ACPID_SET_EVENTS
++# batocera : we won't that
++#ACPID_POST_INSTALL_TARGET_HOOKS += ACPID_SET_EVENTS
+ 
+ $(eval $(autotools-package))

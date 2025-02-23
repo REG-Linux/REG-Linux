@@ -1,0 +1,28 @@
+diff --git a/package/vulkan-headers/vulkan-headers.mk b/package/vulkan-headers/vulkan-headers.mk
+index 20b248364d..fd7f70d26a 100644
+--- a/package/vulkan-headers/vulkan-headers.mk
++++ b/package/vulkan-headers/vulkan-headers.mk
+@@ -3,13 +3,16 @@
+ # vulkan-headers
+ #
+ ################################################################################
+-
+-# Note: changing this version will also affect vulkan-loader and
+-# vulkan-tools, so please update those packages as well.
+-VULKAN_HEADERS_VERSION = 1.3.262
+-VULKAN_HEADERS_SITE = $(call github,KhronosGroup,Vulkan-Headers,v$(VULKAN_HEADERS_VERSION))
+-VULKAN_HEADERS_LICENSE = Apache-2.0, MIT
+-VULKAN_HEADERS_LICENSE_FILES = LICENSE.md
++# reglinux - bump
++VULKAN_HEADERS_VERSION = v1.4.304
++VULKAN_HEADERS_SITE = $(call github,KhronosGroup,Vulkan-Headers,$(VULKAN_HEADERS_VERSION))
++VULKAN_HEADERS_LICENSE = Apache-2.0
++VULKAN_HEADERS_LICENSE_FILES = LICENSE.txt
+ VULKAN_HEADERS_INSTALL_STAGING = YES
+ 
++# batocera
++ifeq ($(BR2_PACKAGE_MESA3D),y)
++VULKAN_HEADERS_DEPENDENCIES += mesa3d
++endif
++
+ $(eval $(cmake-package))

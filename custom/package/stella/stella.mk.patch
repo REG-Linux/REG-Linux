@@ -1,0 +1,24 @@
+diff --git a/package/stella/stella.mk b/package/stella/stella.mk
+index c48bb593a4..cea8890cc5 100644
+--- a/package/stella/stella.mk
++++ b/package/stella/stella.mk
+@@ -4,7 +4,8 @@
+ #
+ ################################################################################
+ 
+-STELLA_VERSION = 6.7.1
++#REGLINUX update
++STELLA_VERSION = 7.0
+ STELLA_SOURCE = stella-$(STELLA_VERSION)-src.tar.xz
+ STELLA_SITE = https://github.com/stella-emu/stella/releases/download/$(STELLA_VERSION)
+ STELLA_LICENSE = GPL-2.0+
+@@ -31,6 +32,9 @@ else
+ STELLA_CONF_OPTS += --disable-zip
+ endif
+ 
++#REGLINUX no debugger, no windowed, release mode
++STELLA_CONF_OPTS += --disable-debugger --disable-windowed --enable-release
++
+ # The configure script is not autoconf based, so we use the
+ # generic-package infrastructure
+ define STELLA_CONFIGURE_CMDS

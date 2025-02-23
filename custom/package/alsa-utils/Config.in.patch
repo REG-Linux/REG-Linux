@@ -1,0 +1,13 @@
+diff --git a/package/alsa-utils/Config.in b/package/alsa-utils/Config.in
+index 3429d0b406..ee76d36005 100644
+--- a/package/alsa-utils/Config.in
++++ b/package/alsa-utils/Config.in
+@@ -97,4 +97,8 @@ config BR2_PACKAGE_ALSA_UTILS_SPEAKER_TEST
+ 	bool "speaker-test"
+ 	select BR2_PACKAGE_ALSA_LIB_PCM
+ 
++# batocera - add alsa-info
++config BR2_PACKAGE_ALSA_UTILS_ALSAINFO
++	bool "alsa-info"
++
+ endif

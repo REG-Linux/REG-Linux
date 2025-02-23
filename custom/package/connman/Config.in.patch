@@ -1,0 +1,20 @@
+diff --git a/package/connman/Config.in b/package/connman/Config.in
+index af3e1f69f6..a69f6d16d0 100644
+--- a/package/connman/Config.in
++++ b/package/connman/Config.in
+@@ -5,7 +5,8 @@ config BR2_PACKAGE_CONNMAN
+ 	depends on BR2_USE_MMU # dbus, libglib2
+ 	depends on !BR2_STATIC_LIBS # needs dlopen()
+ 	depends on BR2_TOOLCHAIN_HAS_SYNC_4
+-	depends on !BR2_TOOLCHAIN_USES_MUSL # missing res_ninit()
++	# reglinux skip MUSL check (local patches to workaround)
++	# depends on !BR2_TOOLCHAIN_USES_MUSL # missing res_ninit()
+ 	select BR2_PACKAGE_DBUS
+ 	select BR2_PACKAGE_LIBGLIB2
+ 	help
+@@ -112,4 +113,4 @@ comment "connman needs a glibc or uClibc toolchain w/ wchar, threads, resolver,
+ 	depends on BR2_USE_MMU
+ 	depends on BR2_TOOLCHAIN_HAS_SYNC_4
+ 	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS || BR2_STATIC_LIBS \
+-		|| BR2_TOOLCHAIN_USES_MUSL
++		# reglinux fix BR2_TOOLCHAIN_USES_MUSL

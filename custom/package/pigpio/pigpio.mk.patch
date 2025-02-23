@@ -1,0 +1,16 @@
+diff --git a/package/pigpio/pigpio.mk b/package/pigpio/pigpio.mk
+index e34974972a..18ccdf568b 100644
+--- a/package/pigpio/pigpio.mk
++++ b/package/pigpio/pigpio.mk
+@@ -38,9 +38,10 @@ define PIGPIO_INSTALL_STAGING_CMDS
+ 	ln -sf libpigpiod_if2.so.1 $(STAGING_DIR)/usr/lib/libpigpiod_if2.so
+ endef
+ 
++# reglinux - we want this as a service
+ define PIGPIO_INSTALL_INIT_SYSV
+ 	$(INSTALL) -D -m 755 package/pigpio/S50pigpio \
+-		$(TARGET_DIR)/etc/init.d/S50pigpio
++		$(TARGET_DIR)/usr/share/reglinux/services/pigpio
+ endef
+ 
+ define PIGPIO_INSTALL_INIT_SYSTEMD

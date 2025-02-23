@@ -1,0 +1,13 @@
+diff --git a/package/sdl_sound/Config.in b/package/sdl_sound/Config.in
+index 6da19853e0..625159fb82 100644
+--- a/package/sdl_sound/Config.in
++++ b/package/sdl_sound/Config.in
+@@ -1,6 +1,7 @@
+ config BR2_PACKAGE_SDL_SOUND
+ 	bool "SDL_sound"
+-	depends on BR2_PACKAGE_SDL
++	# batocera
++	depends on BR2_PACKAGE_SDL2
+ 	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
+ 	help
+ 	  SDL_sound is a library that handles the decoding of several
