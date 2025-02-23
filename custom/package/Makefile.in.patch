@@ -1,0 +1,10 @@
+diff --git a/package/Makefile.in b/package/Makefile.in
+index 829636900b..2366fff335 100644
+--- a/package/Makefile.in
++++ b/package/Makefile.in
+@@ -466,3 +466,5 @@ include package/pkg-golang.mk
+ include package/pkg-meson.mk
+ include package/pkg-qmake.mk
+ include package/pkg-cargo.mk
++# REG add rust pkg infrastructure
++include package/pkg-rust.mk

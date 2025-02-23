@@ -1,0 +1,14 @@
+diff --git a/package/usbmount/usbmount.mk b/package/usbmount/usbmount.mk
+index 538602fdcb..d99324245f 100644
+--- a/package/usbmount/usbmount.mk
++++ b/package/usbmount/usbmount.mk
+@@ -22,7 +22,8 @@ define USBMOUNT_INSTALL_TARGET_CMDS
+ 	$(INSTALL) -m 0644 -D $(@D)/usbmount.rules $(TARGET_DIR)/lib/udev/rules.d/usbmount.rules
+ 	$(INSTALL) -m 0644 -D $(@D)/usbmount.conf $(TARGET_DIR)/etc/usbmount/usbmount.conf
+ 
+-	mkdir -p $(addprefix $(TARGET_DIR)/media/usb,0 1 2 3 4 5 6 7)
++        # batocera
++        # mkdir -p $(addprefix $(TARGET_DIR)/media/usb,0 1 2 3 4 5 6 7)
+ endef
+ 
+ $(eval $(generic-package))

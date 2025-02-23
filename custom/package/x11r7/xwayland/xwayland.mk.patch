@@ -1,0 +1,37 @@
+diff --git a/package/x11r7/xwayland/xwayland.mk b/package/x11r7/xwayland/xwayland.mk
+index c66dd471ac..a82e1fc7be 100644
+--- a/package/x11r7/xwayland/xwayland.mk
++++ b/package/x11r7/xwayland/xwayland.mk
+@@ -3,8 +3,8 @@
+ # xwayland
+ #
+ ################################################################################
+-
+-XWAYLAND_VERSION = 23.2.4
++# reglinux bump - security fix
++XWAYLAND_VERSION = 23.2.7
+ XWAYLAND_SOURCE = xwayland-$(XWAYLAND_VERSION).tar.xz
+ XWAYLAND_SITE = https://xorg.freedesktop.org/archive/individual/xserver
+ XWAYLAND_LICENSE = MIT
+@@ -23,6 +23,7 @@ XWAYLAND_DEPENDENCIES = \
+ 	xlib_libxshmfence \
+ 	xlib_xtrans \
+ 	xorgproto
++# reglinux add -Dxwayland_eglstream=false
+ XWAYLAND_CONF_OPTS = \
+ 	-Ddri3=true \
+ 	-Dxwayland_eglstream=false \
+@@ -30,6 +31,13 @@ XWAYLAND_CONF_OPTS = \
+ 	-Ddefault_font_path=/usr/share/fonts/X11/ \
+ 	-Ddtrace=false \
+ 	-Ddocs=false
++# reglinux add mesa3d or img-mesa3d (PowerVR)
++ifeq ($(BR2_PACKAGE_MESA3D),y)
++XWAYLAND_DEPENDENCIES += mesa3d
++endif
++ifeq ($(BR2_PACKAGE_IMG_MESA3D),y)
++XWAYLAND_DEPENDENCIES += img-mesa3d
++endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBEPOXY),y)
+ XWAYLAND_CONF_OPTS += -Dglamor=true

@@ -1,0 +1,60 @@
+diff --git a/package/linux-headers/Config.in.host b/package/linux-headers/Config.in.host
+index 0116158e1a..8518e001c0 100644
+--- a/package/linux-headers/Config.in.host
++++ b/package/linux-headers/Config.in.host
+@@ -3,7 +3,7 @@ comment "Kernel Header Options"
+ choice
+ 	prompt "Kernel Headers"
+ 	default BR2_KERNEL_HEADERS_AS_KERNEL if BR2_LINUX_KERNEL
+-	default BR2_KERNEL_HEADERS_6_11
++	default BR2_KERNEL_HEADERS_6_12
+ 	help
+ 	  Select the kernel version to get headers from.
+ 
+@@ -48,11 +48,15 @@ config BR2_KERNEL_HEADERS_6_6
+ 	bool "Linux 6.6.x kernel headers"
+ 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_6
+ 
+-config BR2_KERNEL_HEADERS_6_11
+-	bool "Linux 6.11.x kernel headers"
+-	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11
++config BR2_KERNEL_HEADERS_6_12
++	bool "Linux 6.12.x kernel headers"
++	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
+ 	select BR2_KERNEL_HEADERS_LATEST
+ 
++config BR2_KERNEL_HEADERS_6_13
++	bool "Linux 6.13.x kernel headers"
++	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
++
+ config BR2_KERNEL_HEADERS_VERSION
+ 	bool "Manually specified Linux version"
+ 	help
+@@ -129,8 +133,16 @@ choice
+ 	  If your kernel headers are more recent than the latest version
+ 	  in the choice, then select the latest version.
+ 
++config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_13
++	bool "6.13.x or later"
++	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
++
++config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_12
++	bool "6.12.x or later"
++	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
++
+ config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_11
+-	bool "6.11.x or later"
++	bool "6.11.x"
+ 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11
+ 
+ config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_10
+@@ -434,7 +446,8 @@ config BR2_DEFAULT_KERNEL_HEADERS
+ 	default "5.15.178"	if BR2_KERNEL_HEADERS_5_15
+ 	default "6.1.128"	if BR2_KERNEL_HEADERS_6_1
+ 	default "6.6.78"	if BR2_KERNEL_HEADERS_6_6
+-	default "6.11.11"	if BR2_KERNEL_HEADERS_6_11
++	default "6.12.15"	if BR2_KERNEL_HEADERS_6_12
++	default "6.13.3"	if BR2_KERNEL_HEADERS_6_13
+ 	default BR2_DEFAULT_KERNEL_VERSION if BR2_KERNEL_HEADERS_VERSION
+ 	default "custom"	if BR2_KERNEL_HEADERS_CUSTOM_TARBALL
+ 	default BR2_KERNEL_HEADERS_CUSTOM_REPO_VERSION \

@@ -1,0 +1,31 @@
+diff --git a/package/dropbear/S50dropbear b/package/dropbear/S50dropbear
+index 9474eaafaa..41b63d572e 100644
+--- a/package/dropbear/S50dropbear
++++ b/package/dropbear/S50dropbear
+@@ -7,6 +7,13 @@
+ test -r /etc/default/dropbear && . /etc/default/dropbear
+ 
+ start() {
++	# reglinux
++	enabled="$(/usr/bin/system-settings-get system.ssh.enabled)"
++	if [ "$enabled" = "0" ]; then
++		echo "SSH services: disabled"
++		exit 0
++	fi
++
+ 	DROPBEAR_ARGS="$DROPBEAR_ARGS -R"
+ 
+ 	# If /etc/dropbear is a symlink to /var/run/dropbear, and
+@@ -33,10 +40,11 @@ start() {
+ 		--exec /usr/sbin/dropbear -- $DROPBEAR_ARGS
+ 	[ $? = 0 ] && echo "OK" || echo "FAIL"
+ }
++
+ stop() {
+ 	printf "Stopping dropbear sshd: "
+ 	start-stop-daemon -K -q -p /var/run/dropbear.pid
+-	[ $? = 0 ] && echo "OK" || echo "FAIL"
++	pkill -f /usr/sbin/dropbear
+ }
+ restart() {
+ 	stop

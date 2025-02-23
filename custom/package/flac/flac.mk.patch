@@ -1,0 +1,14 @@
+diff --git a/package/flac/flac.mk b/package/flac/flac.mk
+index 6bac9ef8a7..cc7f4ce616 100644
+--- a/package/flac/flac.mk
++++ b/package/flac/flac.mk
+@@ -13,6 +13,9 @@ FLAC_LICENSE = Xiph BSD-like (libFLAC), GPL-2.0+ (tools), LGPL-2.1+ (other libra
+ FLAC_LICENSE_FILES = COPYING.Xiph COPYING.GPL COPYING.LGPL
+ FLAC_CPE_ID_VALID = YES
+ 
++# reglinux - libFLAC crash on GCC 13 -O3
++FLAC_CONF_ENV = CFLAGS="-O2"
++
+ FLAC_CONF_OPTS = \
+ 	$(if $(BR2_INSTALL_LIBSTDCPP),--enable-cpplibs,--disable-cpplibs) \
+ 	--disable-stack-smash-protection

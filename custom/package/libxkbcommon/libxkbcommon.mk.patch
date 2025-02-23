@@ -1,0 +1,30 @@
+diff --git a/package/libxkbcommon/libxkbcommon.mk b/package/libxkbcommon/libxkbcommon.mk
+index 882791b917..cdca61fcac 100644
+--- a/package/libxkbcommon/libxkbcommon.mk
++++ b/package/libxkbcommon/libxkbcommon.mk
+@@ -3,8 +3,8 @@
+ # libxkbcommon
+ #
+ ################################################################################
+-
+-LIBXKBCOMMON_VERSION = 1.4.0
++# batocera (update)
++LIBXKBCOMMON_VERSION = 1.5.0
+ LIBXKBCOMMON_SITE = https://xkbcommon.org/download
+ LIBXKBCOMMON_SOURCE = libxkbcommon-$(LIBXKBCOMMON_VERSION).tar.xz
+ LIBXKBCOMMON_LICENSE = MIT/X11
+@@ -16,6 +16,14 @@ LIBXKBCOMMON_CONF_OPTS = \
+ 	-Denable-docs=false \
+ 	-Denable-xkbregistry=false
+ 
++# batocera
++ifeq ($(BR2_PACKAGE_WAYLAND),y)
++LIBXKBCOMMON_CONF_OPTS += -Denable-wayland=true
++LIBXKBCOMMON_DEPENDENCIES += wayland wayland-protocols
++else
++LIBXKBCOMMON_CONF_OPTS += -Denable-wayland=false
++endif
++
+ ifeq ($(BR2_PACKAGE_XORG7),y)
+ LIBXKBCOMMON_CONF_OPTS += -Denable-x11=true
+ LIBXKBCOMMON_DEPENDENCIES += libxcb

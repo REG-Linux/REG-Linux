@@ -1,0 +1,21 @@
+diff --git a/package/libopenmpt/libopenmpt.mk b/package/libopenmpt/libopenmpt.mk
+index 74ffbdbbd4..24e3bcd9ad 100644
+--- a/package/libopenmpt/libopenmpt.mk
++++ b/package/libopenmpt/libopenmpt.mk
+@@ -4,13 +4,15 @@
+ #
+ ################################################################################
+ 
+-LIBOPENMPT_VERSION = 0.7.11
++LIBOPENMPT_VERSION = 0.7.12
+ LIBOPENMPT_SITE = https://lib.openmpt.org/files/libopenmpt/src
+ LIBOPENMPT_SOURCE = libopenmpt-$(LIBOPENMPT_VERSION)+release.autotools.tar.gz
+ LIBOPENMPT_LICENSE = BSD-3-Clause
+ LIBOPENMPT_LICENSE_FILES = LICENSE
+ LIBOPENMPT_CPE_ID_VENDOR = openmpt
+ LIBOPENMPT_DEPENDENCIES = host-pkgconf
++# reglinux - jazz2-native dependency
++LIBOPENMPT_INSTALL_STAGING = YES
+ 
+ ifeq ($(BR2_PACKAGE_LIBOPENMPT_OPENMPT123),y)
+ LIBOPENMPT_CONF_OPTS += --enable-openmpt123

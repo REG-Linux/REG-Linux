@@ -1,0 +1,13 @@
+diff --git a/package/pcre2/Config.in b/package/pcre2/Config.in
+index ba4719dd3d..34e623cc73 100644
+--- a/package/pcre2/Config.in
++++ b/package/pcre2/Config.in
+@@ -29,6 +29,8 @@ config BR2_PACKAGE_PCRE2_JIT_ARCH_SUPPORTS
+ 	default y if BR2_i386 || BR2_x86_64
+ 	default y if BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
+ 	default y if BR2_powerpc
++	# batocera
++	default y if BR2_riscv
+ 
+ config BR2_PACKAGE_PCRE2_JIT
+ 	bool "enable JIT support"

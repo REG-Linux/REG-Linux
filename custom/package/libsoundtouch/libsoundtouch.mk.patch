@@ -1,0 +1,20 @@
+diff --git a/package/libsoundtouch/libsoundtouch.mk b/package/libsoundtouch/libsoundtouch.mk
+index 099539250c..f12d0af8c0 100644
+--- a/package/libsoundtouch/libsoundtouch.mk
++++ b/package/libsoundtouch/libsoundtouch.mk
+@@ -9,7 +9,13 @@ LIBSOUNDTOUCH_SOURCE = soundtouch-$(LIBSOUNDTOUCH_VERSION).tar.gz
+ LIBSOUNDTOUCH_SITE = https://www.surina.net/soundtouch
+ LIBSOUNDTOUCH_LICENSE = LGPL-2.1+
+ LIBSOUNDTOUCH_LICENSE_FILES = COPYING.TXT
+-LIBSOUNDTOUCH_AUTORECONF = YES
+ LIBSOUNDTOUCH_INSTALL_STAGING = YES
+ 
+-$(eval $(autotools-package))
++# REG
++LIBSOUNDTOUCH_SUPPORTS_IN_SOURCE_BUILD = NO
++LIBSOUNDTOUCH_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
++LIBSOUNDTOUCH_CONF_OPTS += -DBUILD_SHARED_LIBS=ON
++LIBSOUNDTOUCH_CONF_OPTS += -DSOUNDTOUCH_DLL=ON
++LIBSOUNDTOUCH_CONF_OPTS += -DOPENMP=ON
++
++$(eval $(cmake-package))

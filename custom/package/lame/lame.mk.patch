@@ -1,0 +1,13 @@
+diff --git a/package/lame/lame.mk b/package/lame/lame.mk
+index 206e4407c9..4e698d8432 100644
+--- a/package/lame/lame.mk
++++ b/package/lame/lame.mk
+@@ -21,6 +21,8 @@ endif
+ 
+ ifeq ($(BR2_PACKAGE_NCURSES),y)
+ LAME_DEPENDENCIES += ncurses
++# batocera
++LAME_CONF_ENV = LIBS="-ltinfo"
+ endif
+ 
+ ifeq ($(BR2_ENDIAN),"BIG")

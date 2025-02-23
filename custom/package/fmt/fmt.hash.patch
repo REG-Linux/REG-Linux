@@ -1,0 +1,9 @@
+diff --git a/package/fmt/fmt.hash b/package/fmt/fmt.hash
+index aff52ccb6e..9c05619fa5 100644
+--- a/package/fmt/fmt.hash
++++ b/package/fmt/fmt.hash
+@@ -1,3 +1,3 @@
+ # Locally calculated
+-sha256  40fc58bebcf38c759e11a7bd8fdc163507d2423ef5058bba7f26280c5b9c5465  fmt-11.0.2.zip
++sha256  7df2fd3426b18d552840c071c977dc891efe274051d2e7c47e2c83c3918ba6df  fmt-11.1.3.zip
+ sha256  07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8  LICENSE
