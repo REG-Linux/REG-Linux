@@ -1,8 +1,8 @@
 diff --git a/sway/ipc-server.c b/sway/ipc-server.c
-index 00b01d7..8f60cfb 100644
+index b934bb5..bd723fc 100644
 --- a/sway/ipc-server.c
 +++ b/sway/ipc-server.c
-@@ -140,7 +140,7 @@ struct sockaddr_un *ipc_user_sockaddr(void) {
+@@ -138,7 +138,7 @@ struct sockaddr_un *ipc_user_sockaddr(void) {
  		dir = "/tmp";
  	}
  	if (path_size <= snprintf(ipc_sockaddr->sun_path, path_size,
@@ -12,10 +12,10 @@ index 00b01d7..8f60cfb 100644
  	}
  
 diff --git a/sway/main.c b/sway/main.c
-index 85bc2f1..032fd25 100644
+index 165ccc0..70bad19 100644
 --- a/sway/main.c
 +++ b/sway/main.c
-@@ -151,7 +151,8 @@ static void log_kernel(void) {
+@@ -112,7 +112,8 @@ static void log_kernel(void) {
  }
  
  static bool detect_suid(void) {
@@ -25,7 +25,7 @@ index 85bc2f1..032fd25 100644
  		return false;
  	}
  
-@@ -309,11 +310,6 @@ int main(int argc, char **argv) {
+@@ -266,11 +267,6 @@ int main(int argc, char **argv) {
  		}
  	}
  
@@ -37,7 +37,7 @@ index 85bc2f1..032fd25 100644
  	// Since wayland requires XDG_RUNTIME_DIR to be set, abort with just the
  	// clear error message (when not running as an IPC client).
  	if (!getenv("XDG_RUNTIME_DIR") && optind == argc) {
-@@ -363,6 +359,11 @@ int main(int argc, char **argv) {
+@@ -320,6 +316,11 @@ int main(int argc, char **argv) {
  		return 0;
  	}
  
@@ -45,7 +45,7 @@ index 85bc2f1..032fd25 100644
 +	if (detect_suid()) {
 +		exit(EXIT_FAILURE);
 +	}
-+
- 	detect_proprietary(allow_unsupported_gpu);
++	
  	increase_nofile_limit();
  
+ 	// handle SIGTERM signals

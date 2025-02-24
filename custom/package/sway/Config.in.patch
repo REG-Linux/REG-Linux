@@ -1,5 +1,5 @@
 diff --git a/package/sway/Config.in b/package/sway/Config.in
-index d78f792c48..29a720d681 100644
+index d78f792c488..333ceadecc1 100644
 --- a/package/sway/Config.in
 +++ b/package/sway/Config.in
 @@ -1,6 +1,5 @@
@@ -19,7 +19,7 @@ index d78f792c48..29a720d681 100644
  	select BR2_PACKAGE_CAIRO_PNG
  	select BR2_PACKAGE_PANGO
  	select BR2_PACKAGE_XKEYBOARD_CONFIG # runtime
-+	select BR2_PACKAGE_LIBDECOR # batocera
++	select BR2_PACKAGE_LIBDECOR
  	help
  	  i3-compatible Wayland compositor
  	  Note:
