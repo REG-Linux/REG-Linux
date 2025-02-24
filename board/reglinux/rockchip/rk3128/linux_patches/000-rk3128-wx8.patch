@@ -1,0 +1,1685 @@
+diff -u -r -N a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+--- a/arch/arm/boot/dts/Makefile	2025-02-22 11:26:09.321231228 +0100
++++ b/arch/arm/boot/dts/Makefile	2021-10-14 19:39:31.000000000 +0200
+@@ -1186,6 +1186,8 @@
+ 	rk3126c-evb-ddr3-v10-linux-slc.dtb \
+ 	rk3128-evb-ddr3-v10-linux.dtb \
+ 	rk3128-evb-ddr3-v10-linux-spi-nand.dtb \
++	rk3128-ps5000.dtb \
++	rk3128-ps7000.dtb \
+ 	rk3188-bqedison2qc.dtb \
+ 	rk3188-px3-evb.dtb \
+ 	rk3188-radxarock.dtb \
+diff -u -r -N a/arch/arm/boot/dts/rk312x.dtsi b/arch/arm/boot/dts/rk312x.dtsi
+--- a/arch/arm/boot/dts/rk312x.dtsi	2025-02-22 11:26:09.382230749 +0100
++++ b/arch/arm/boot/dts/rk312x.dtsi	2021-10-14 19:39:31.000000000 +0200
+@@ -613,6 +615,7 @@
+ 		reset-names = "axi", "ahb", "dclk";
+ 		iommus = <&vop_mmu>;
+ 		power-domains = <&power RK3128_PD_VIO>;
++		rockchip,grf = <&grf>;
+ 		status = "disabled";
+ 
+ 		vop_out: port {
+diff -u -r -N a/arch/arm/configs/wx8_defconfig b/arch/arm/configs/wx8_defconfig
+--- a/arch/arm/configs/wx8_defconfig	1970-01-01 01:00:00.000000000 +0100
++++ b/arch/arm/configs/wx8_defconfig	2021-10-14 19:39:31.000000000 +0200
+@@ -0,0 +1,324 @@
++# CONFIG_LOCALVERSION_AUTO is not set
++CONFIG_DEFAULT_HOSTNAME="localhost"
++CONFIG_SYSVIPC=y
++CONFIG_FHANDLE=y
++CONFIG_NO_HZ=y
++CONFIG_HIGH_RES_TIMERS=y
++CONFIG_IKCONFIG=y
++CONFIG_IKCONFIG_PROC=y
++CONFIG_LOG_BUF_SHIFT=18
++CONFIG_CGROUPS=y
++CONFIG_CGROUP_FREEZER=y
++CONFIG_CGROUP_DEVICE=y
++CONFIG_CPUSETS=y
++CONFIG_CGROUP_CPUACCT=y
++CONFIG_CGROUP_SCHED=y
++CONFIG_CFS_BANDWIDTH=y
++CONFIG_NAMESPACES=y
++CONFIG_USER_NS=y
++CONFIG_RELAY=y
++CONFIG_CC_OPTIMIZE_FOR_SIZE=y
++CONFIG_EMBEDDED=y
++# CONFIG_COMPAT_BRK is not set
++CONFIG_PROFILING=y
++CONFIG_MODULES=y
++CONFIG_MODULE_FORCE_LOAD=y
++CONFIG_MODULE_UNLOAD=y
++CONFIG_MODULE_FORCE_UNLOAD=y
++CONFIG_PARTITION_ADVANCED=y
++CONFIG_MAC_PARTITION=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_ARM_THUMBEE=y
++CONFIG_ARM_KERNMEM_PERMS=y
++# CONFIG_ARM_ERRATA_643719 is not set
++CONFIG_SMP=y
++CONFIG_ARM_PSCI=y
++CONFIG_PREEMPT_VOLUNTARY=y
++CONFIG_AEABI=y
++CONFIG_HIGHMEM=y
++# CONFIG_HIGHPTE is not set
++# CONFIG_COMPACTION is not set
++CONFIG_DEFAULT_MMAP_MIN_ADDR=32768
++CONFIG_FRONTSWAP=y
++CONFIG_CMA=y
++CONFIG_ZSWAP=y
++CONFIG_ZBUD=y
++CONFIG_ZSMALLOC=y
++CONFIG_SECCOMP=y
++CONFIG_ZBOOT_ROM_TEXT=0x0
++CONFIG_ZBOOT_ROM_BSS=0x0
++CONFIG_ARM_APPENDED_DTB=y
++CONFIG_ARM_ATAG_DTB_COMPAT=y
++CONFIG_ARM_ATAG_DTB_COMPAT_CMDLINE_EXTEND=y
++CONFIG_CPU_FREQ=y
++CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND=y
++CONFIG_CPU_FREQ_GOV_POWERSAVE=y
++CONFIG_CPU_FREQ_GOV_USERSPACE=y
++CONFIG_CPU_FREQ_GOV_INTERACTIVE=y
++CONFIG_CPU_FREQ_GOV_CONSERVATIVE=y
++CONFIG_CPUFREQ_DT=y
++CONFIG_ARM_ROCKCHIP_CPUFREQ=y
++CONFIG_CPU_IDLE=y
++CONFIG_VFP=y
++CONFIG_NEON=y
++CONFIG_PM_DEBUG=y
++CONFIG_PM_ADVANCED_DEBUG=y
++CONFIG_NET=y
++CONFIG_PACKET=y
++CONFIG_UNIX=y
++CONFIG_XFRM_USER=y
++CONFIG_NET_KEY=y
++CONFIG_INET=y
++CONFIG_INET_AH=y
++CONFIG_INET_ESP=y
++CONFIG_INET_IPCOMP=y
++# CONFIG_INET_DIAG is not set
++# CONFIG_IPV6 is not set
++# CONFIG_ANDROID_PARANOID_NETWORK is not set
++CONFIG_DNS_RESOLVER=y
++# CONFIG_WIRELESS is not set
++CONFIG_DEVTMPFS=y
++CONFIG_DEVTMPFS_MOUNT=y
++CONFIG_DEBUG_DEVRES=y
++CONFIG_DMA_CMA=y
++CONFIG_CONNECTOR=y
++CONFIG_ZRAM=y
++CONFIG_BLK_DEV_LOOP=y
++CONFIG_NETDEVICES=y
++# CONFIG_ETHERNET is not set
++# CONFIG_USB_NET_DRIVERS is not set
++# CONFIG_WLAN is not set
++CONFIG_INPUT_MATRIXKMAP=y
++# CONFIG_INPUT_MOUSEDEV is not set
++CONFIG_INPUT_JOYDEV=y
++CONFIG_INPUT_EVDEV=y
++CONFIG_KEYBOARD_GPIO=y
++CONFIG_KEYBOARD_GPIO_POLLED=y
++# CONFIG_MOUSE_PS2 is not set
++CONFIG_INPUT_JOYSTICK=y
++CONFIG_JOYSTICK_IFORCE=y
++CONFIG_JOYSTICK_IFORCE_USB=y
++CONFIG_JOYSTICK_XPAD=y
++CONFIG_JOYSTICK_XPAD_FF=y
++CONFIG_JOYSTICK_WX8=y
++CONFIG_INPUT_MISC=y
++CONFIG_INPUT_RK8XX_PWRKEY=y
++CONFIG_VT_HW_CONSOLE_BINDING=y
++CONFIG_DEVPTS_MULTIPLE_INSTANCES=y
++# CONFIG_LEGACY_PTYS is not set
++# CONFIG_DEVKMEM is not set
++CONFIG_SERIAL_8250=y
++CONFIG_SERIAL_8250_CONSOLE=y
++CONFIG_SERIAL_8250_NR_UARTS=5
++CONFIG_SERIAL_8250_RUNTIME_UARTS=5
++CONFIG_SERIAL_8250_DW=y
++CONFIG_SERIAL_OF_PLATFORM=y
++CONFIG_HW_RANDOM=y
++CONFIG_HW_RANDOM_ROCKCHIP=y
++CONFIG_I2C_CHARDEV=y
++CONFIG_I2C_RK3X=y
++CONFIG_SPI=y
++CONFIG_SPI_BITBANG=y
++CONFIG_SPI_ROCKCHIP=y
++CONFIG_SPI_SPIDEV=y
++CONFIG_DEBUG_GPIO=y
++CONFIG_GPIO_SYSFS=y
++CONFIG_GPIO_GENERIC_PLATFORM=y
++CONFIG_BATTERY_SBS=y
++CONFIG_CHARGER_GPIO=y
++CONFIG_CHARGER_WX8=y
++CONFIG_POWER_RESET=y
++CONFIG_POWER_RESET_GPIO_RESTART=y
++CONFIG_SYSCON_REBOOT_MODE=y
++# CONFIG_HWMON is not set
++CONFIG_THERMAL=y
++CONFIG_DEVFREQ_THERMAL=y
++CONFIG_ROCKCHIP_THERMAL=y
++CONFIG_RK_VIRTUAL_THERMAL=y
++CONFIG_MFD_RK808=y
++CONFIG_REGULATOR_FIXED_VOLTAGE=y
++CONFIG_REGULATOR_PWM=y
++CONFIG_REGULATOR_RK808=y
++CONFIG_REGULATOR_RK818=y
++CONFIG_MEDIA_SUPPORT=y
++CONFIG_MEDIA_CAMERA_SUPPORT=y
++CONFIG_V4L_PLATFORM_DRIVERS=y
++CONFIG_V4L_MEM2MEM_DRIVERS=y
++CONFIG_VIDEO_ROCKCHIP_VPU=y
++CONFIG_DRM=y
++CONFIG_DRM_ROCKCHIP=y
++CONFIG_ROCKCHIP_DW_MIPI_DSI=y
++CONFIG_ROCKCHIP_MIPI_CSI_TX=y
++CONFIG_ROCKCHIP_INNO_HDMI=y
++CONFIG_DRM_PANEL_SIMPLE=y
++CONFIG_MALI400=y
++# CONFIG_MALI400_PROFILING is not set
++CONFIG_MALI_SHARED_INTERRUPTS=y
++CONFIG_MALI_DT=y
++CONFIG_MALI_DEVFREQ=y
++CONFIG_FB_MODE_HELPERS=y
++CONFIG_BACKLIGHT_LCD_SUPPORT=y
++# CONFIG_LCD_CLASS_DEVICE is not set
++CONFIG_BACKLIGHT_CLASS_DEVICE=y
++# CONFIG_BACKLIGHT_GENERIC is not set
++CONFIG_BACKLIGHT_PWM=y
++CONFIG_ROCKCHIP_RGA=y
++CONFIG_RK_VCODEC=y
++CONFIG_SOUND=y
++CONFIG_SND=y
++CONFIG_SND_SEQUENCER=y
++CONFIG_SND_SEQ_DUMMY=y
++CONFIG_SND_HRTIMER=y
++CONFIG_SND_DYNAMIC_MINORS=y
++# CONFIG_SND_ARM is not set
++# CONFIG_SND_SPI is not set
++CONFIG_SND_SOC=y
++CONFIG_SND_SOC_ROCKCHIP=y
++CONFIG_SND_SOC_ROCKCHIP_I2S=y
++CONFIG_SND_SOC_ROCKCHIP_MULTICODECS=y
++CONFIG_SND_SOC_RK312X=y
++CONFIG_SND_SIMPLE_CARD=y
++CONFIG_HID_BATTERY_STRENGTH=y
++CONFIG_HID_BETOP_FF=y
++CONFIG_HID_DRAGONRISE=y
++CONFIG_USB_HIDDEV=y
++CONFIG_USB_ANNOUNCE_NEW_DEVICES=y
++# CONFIG_USB_DEFAULT_PERSIST is not set
++CONFIG_USB_OTG=y
++CONFIG_USB_MON=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_ROOT_HUB_TT=y
++CONFIG_USB_EHCI_HCD_PLATFORM=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_OHCI_HCD_PLATFORM=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DEBUG_FILES=y
++CONFIG_USB_GADGET_VBUS_DRAW=500
++CONFIG_USB_CONFIGFS=y
++CONFIG_USB_CONFIGFS_MASS_STORAGE=y
++CONFIG_USB_CONFIGFS_F_FS=y
++CONFIG_USB_CONFIGFS_UEVENT=y
++CONFIG_MMC=y
++CONFIG_MMC_BLOCK_MINORS=16
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_NEW_LEDS=y
++CONFIG_SWITCH=y
++CONFIG_SWITCH_GPIO=y
++CONFIG_RTC_CLASS=y
++CONFIG_RTC_DRV_RK808=y
++CONFIG_DMADEVICES=y
++CONFIG_PL330_DMA=y
++CONFIG_STAGING=y
++CONFIG_FIQ_DEBUGGER=y
++CONFIG_FIQ_DEBUGGER_NO_SLEEP=y
++CONFIG_FIQ_DEBUGGER_CONSOLE=y
++CONFIG_FIQ_DEBUGGER_CONSOLE_DEFAULT_ENABLE=y
++CONFIG_FIQ_DEBUGGER_TRUST_ZONE=y
++CONFIG_COMMON_CLK_RK808=y
++CONFIG_ROCKCHIP_IOMMU=y
++# CONFIG_CPU_RK3036 is not set
++# CONFIG_CPU_RK30XX is not set
++# CONFIG_CPU_RK3288 is not set
++# CONFIG_CPU_RK322X is not set
++CONFIG_ROCKCHIP_PM_DOMAINS=y
++CONFIG_ROCKCHIP_PVTM=y
++CONFIG_PM_DEVFREQ=y
++CONFIG_DEVFREQ_GOV_PERFORMANCE=y
++CONFIG_DEVFREQ_GOV_POWERSAVE=y
++CONFIG_DEVFREQ_GOV_USERSPACE=y
++CONFIG_ARM_ROCKCHIP_BUS_DEVFREQ=y
++CONFIG_ARM_ROCKCHIP_DMC_DEVFREQ=y
++CONFIG_PM_DEVFREQ_EVENT=y
++CONFIG_MEMORY=y
++CONFIG_IIO=y
++CONFIG_IIO_BUFFER=y
++CONFIG_IIO_KFIFO_BUF=y
++CONFIG_IIO_TRIGGER=y
++CONFIG_ROCKCHIP_SARADC=y
++CONFIG_IIO_SYSFS_TRIGGER=y
++CONFIG_PWM=y
++CONFIG_PWM_ROCKCHIP=y
++CONFIG_PHY_ROCKCHIP_USB=y
++CONFIG_PHY_ROCKCHIP_INNO_USB2=y
++CONFIG_PHY_ROCKCHIP_INNO_MIPI_DPHY=y
++CONFIG_PHY_ROCKCHIP_INNO_HDMI_PHY=y
++CONFIG_PHY_ROCKCHIP_INNO_VIDEO_COMBO_PHY=y
++CONFIG_ANDROID=y
++CONFIG_NVMEM=y
++CONFIG_ROCKCHIP_EFUSE=y
++CONFIG_RK_FLASH=y
++CONFIG_RK_SFC_NAND=y
++CONFIG_RK_SFC_NOR=y
++CONFIG_ROCKCHIP_SIP=y
++CONFIG_EXT4_FS=y
++CONFIG_EXT4_FS_POSIX_ACL=y
++CONFIG_EXT4_FS_SECURITY=y
++# CONFIG_DNOTIFY is not set
++CONFIG_FUSE_FS=y
++CONFIG_VFAT_FS=y
++CONFIG_FAT_DEFAULT_CODEPAGE=936
++CONFIG_FAT_DEFAULT_IOCHARSET="utf8"
++CONFIG_NTFS_FS=y
++CONFIG_NTFS_DEBUG=y
++CONFIG_NTFS_RW=y
++CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_HFSPLUS_FS=y
++CONFIG_SQUASHFS=y
++CONFIG_SQUASHFS_LZO=y
++CONFIG_PSTORE=y
++CONFIG_PSTORE_CONSOLE=y
++CONFIG_PSTORE_RAM=y
++# CONFIG_NETWORK_FILESYSTEMS is not set
++CONFIG_NLS_DEFAULT="utf8"
++CONFIG_NLS_CODEPAGE_437=y
++CONFIG_NLS_CODEPAGE_936=y
++CONFIG_NLS_CODEPAGE_932=y
++CONFIG_NLS_CODEPAGE_949=y
++CONFIG_NLS_ASCII=y
++CONFIG_NLS_ISO8859_1=y
++CONFIG_PRINTK_TIME=y
++CONFIG_DEBUG_INFO=y
++CONFIG_DEBUG_FS=y
++CONFIG_MAGIC_SYSRQ=y
++CONFIG_MAGIC_SYSRQ_DEFAULT_ENABLE=0
++CONFIG_LOCKUP_DETECTOR=y
++CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC=y
++CONFIG_BOOTPARAM_HUNG_TASK_PANIC=y
++CONFIG_PANIC_TIMEOUT=2
++CONFIG_SCHEDSTATS=y
++CONFIG_TIMER_STATS=y
++CONFIG_DEBUG_SPINLOCK=y
++CONFIG_STACKTRACE=y
++CONFIG_DEBUG_CREDENTIALS=y
++CONFIG_RCU_CPU_STALL_TIMEOUT=60
++# CONFIG_FTRACE is not set
++CONFIG_LKDTM=y
++CONFIG_TEST_UDELAY=y
++CONFIG_STRICT_DEVMEM=y
++CONFIG_DEBUG_SET_MODULE_RONX=y
++CONFIG_KEYS=y
++CONFIG_CRYPTO_CCM=y
++CONFIG_CRYPTO_GCM=y
++CONFIG_CRYPTO_CMAC=y
++CONFIG_CRYPTO_SHA512=y
++CONFIG_CRYPTO_LZ4=y
++CONFIG_CRYPTO_USER_API_HASH=y
++CONFIG_CRYPTO_USER_API_SKCIPHER=y
++CONFIG_ASYMMETRIC_KEY_TYPE=y
++CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE=y
++CONFIG_X509_CERTIFICATE_PARSER=y
++CONFIG_PKCS7_MESSAGE_PARSER=y
++CONFIG_SYSTEM_TRUSTED_KEYRING=y
++CONFIG_CRC_CCITT=y
++CONFIG_CRC_T10DIF=y
++CONFIG_CRC_ITU_T=y
++CONFIG_CRC7=y
++CONFIG_LIBCRC32C=y
++CONFIG_XZ_DEC=y
++# CONFIG_XZ_DEC_X86 is not set
++# CONFIG_XZ_DEC_POWERPC is not set
++# CONFIG_XZ_DEC_IA64 is not set
++# CONFIG_XZ_DEC_SPARC is not set
+diff -u -r -N a/drivers/input/joystick/Kconfig b/drivers/input/joystick/Kconfig
+--- a/drivers/input/joystick/Kconfig	2025-02-22 11:26:10.608221127 +0100
++++ b/drivers/input/joystick/Kconfig	2021-10-14 19:39:31.000000000 +0200
+@@ -330,4 +330,12 @@
+ 	  To compile this as a module choose M here: the module will be called
+ 	  maplecontrol.
+ 
++config JOYSTICK_WX8
++	tristate "WX8 joysticks"
++	depends on I2C
++	help
++	  WX8 "secret" I2C chip (4x ADC 8bit) with attached two joysticks (X,Y,R,RZ).
++	  Driver with keys emulation (directions,ABXY) enabled by default.
++	  To switch between keys emulation and joysticks put 0 or 1 to "/sys/.../key_type".
++
+ endif
+diff -u -r -N a/drivers/input/joystick/Makefile b/drivers/input/joystick/Makefile
+--- a/drivers/input/joystick/Makefile	2025-02-22 11:26:10.608221127 +0100
++++ b/drivers/input/joystick/Makefile	2021-10-14 19:39:31.000000000 +0200
+@@ -38,5 +38,6 @@
+ obj-$(CONFIG_JOYSTICK_TWIDJOY)		+= twidjoy.o
+ obj-$(CONFIG_JOYSTICK_WARRIOR)		+= warrior.o
+ obj-$(CONFIG_JOYSTICK_WALKERA0701)	+= walkera0701.o
++obj-$(CONFIG_JOYSTICK_WX8)		+= wx8joy.o
+ obj-$(CONFIG_JOYSTICK_XPAD)		+= xpad.o
+ obj-$(CONFIG_JOYSTICK_ZHENHUA)		+= zhenhua.o
+diff -u -r -N a/drivers/input/joystick/wx8joy.c b/drivers/input/joystick/wx8joy.c
+--- a/drivers/input/joystick/wx8joy.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/input/joystick/wx8joy.c	2021-10-14 19:39:31.000000000 +0200
+@@ -0,0 +1,249 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *	Driver for WX8 joysticks
++ *
++ *	Authors:
++ *	Martin Cerveny		  <M.Cerveny@computer.org>
++ */
++#include <linux/module.h>
++
++#include <linux/i2c.h>
++#include <linux/interrupt.h>
++#include <linux/input.h>
++#include <linux/gpio.h>
++#include <linux/delay.h>
++#include <linux/slab.h>
++#include <linux/fs.h>
++#include <linux/init.h> 
++#include <linux/timer.h>
++#include <linux/platform_device.h>
++#include <linux/types.h>
++#include <linux/input-event-codes.h>
++
++#define DRIVER_DESC "Driver for WX8 joysticks"
++#define MODULE_DEVICE_ALIAS "wx8joy"
++
++MODULE_AUTHOR("Martin Cerveny <M.Cerveny@computer.org>");
++MODULE_DESCRIPTION(DRIVER_DESC);
++MODULE_LICENSE("GPL");
++
++/* i2c data offsets */
++#define WX8JOY_LV	9
++#define WX8JOY_LH	7
++#define WX8JOY_RV       1
++#define WX8JOY_RH       3
++
++/* i2c joystick ADC data */
++#define WX8JOY_MAX_AXIS	225
++#define WX8JOY_MIN_AXIS	95
++#define WX8JOY_FUZZ	2
++#define WX8JOY_FLAT	4
++
++/* joystick axes */
++static const u8 axes[] = {
++	ABS_Z,
++	ABS_RZ,
++	ABS_X,
++	ABS_Y
++};
++
++/* joystick keys emulation */
++#define WX8JOY_MIDDLE	165
++#define WX8JOY_RESET	15      // +- from MIDDLE
++#define WX8JOY_SET	30      // +- from MIDDLE
++
++static const u8 keys[] = { 
++	KEY_A, KEY_X, 
++	KEY_B, KEY_Y,
++	KEY_LEFT, KEY_RIGHT,
++	KEY_UP, KEY_DOWN 
++};
++
++/* timer, 200Hz */
++#define WX8JOY_INTERVAL 5
++
++struct wx8joy_device {
++	struct input_dev *input_dev;
++	struct i2c_client *i2c_client;
++	struct workqueue_struct *wq;
++	struct delayed_work dw;
++        int joy_switch;                 // switch between keys emulation and joysticks
++};
++
++/* main periodic worker */
++static void wx8joy_work(struct work_struct *work)
++{
++	struct wx8joy_device *wx8joy = container_of(work, struct wx8joy_device, dw.work);
++	u8 buf[16];
++	int ret;
++
++	// TODO: multiple scan, majority vote
++        // TODO: Scale 0-255 ? With truncate ? Calibrate ?
++
++	ret = i2c_master_recv(wx8joy->i2c_client, buf, sizeof(buf));
++	if (ret == sizeof(buf)) {
++		u8 idx;
++		u8 vals[] = {buf[WX8JOY_RH], buf[WX8JOY_RV], buf[WX8JOY_LH], buf[WX8JOY_LV]};
++
++		for(idx=0; idx<sizeof(axes); idx++) {
++                        if (wx8joy->joy_switch)
++        			input_report_abs(wx8joy->input_dev, axes[idx], vals[idx]);
++                        else {
++                                if (vals[idx]<WX8JOY_MIDDLE-WX8JOY_SET) 
++                                        input_event(wx8joy->input_dev, EV_KEY, keys[idx*2+0], 1);
++                                else if (vals[idx]>WX8JOY_MIDDLE+WX8JOY_SET)
++                                        input_event(wx8joy->input_dev, EV_KEY, keys[idx*2+1], 1);
++                                else if (vals[idx]>WX8JOY_MIDDLE-WX8JOY_RESET && vals[idx]<WX8JOY_MIDDLE+WX8JOY_RESET) {
++                                        input_event(wx8joy->input_dev, EV_KEY, keys[idx*2+0], 0);
++                                        input_event(wx8joy->input_dev, EV_KEY, keys[idx*2+1], 0);
++                                }
++			}
++		}
++		input_sync(wx8joy->input_dev);
++	}
++	
++	WARN_ON(!queue_delayed_work(wx8joy->wq, &wx8joy->dw, msecs_to_jiffies(WX8JOY_INTERVAL))); 
++}
++
++/* sysfs mgmt */
++static ssize_t wx8joy_store_key_type(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct wx8joy_device *wx8joy = platform_get_drvdata(pdev);
++        int ret;
++        int val;
++
++        ret = kstrtoint(buf, 10, &val);
++        if (ret)
++                return ret;
++
++        wx8joy->joy_switch = !!val;
++	return count;
++}
++
++static ssize_t wx8joy_show_key_type(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct wx8joy_device *wx8joy = platform_get_drvdata(pdev);
++        int ret;
++
++	ret = scnprintf(buf, PAGE_SIZE - 1, "%d", wx8joy->joy_switch);
++	buf[ret++] = '\n';
++	buf[ret] = '\0';
++
++	return ret;
++}
++
++// switch between keys emulation and joysticks
++static DEVICE_ATTR(key_type, S_IWUSR | S_IRUGO,
++		   wx8joy_show_key_type,
++		   wx8joy_store_key_type);
++
++static struct attribute *wx8joy_attrs[] = {
++	&dev_attr_key_type.attr,
++	NULL,
++};
++
++static struct attribute_group wx8joy_attr_group = {
++	.attrs = wx8joy_attrs,
++};
++
++/* device startup and shutdown */
++static int wx8joy_probe(struct i2c_client *client,
++			const struct i2c_device_id *id)
++{
++	struct wx8joy_device *wx8joy;
++	struct input_dev *input_dev;
++	u8 idx;
++	int error;
++
++	wx8joy = kmalloc(sizeof(struct wx8joy_device), GFP_KERNEL);
++
++	input_dev = input_allocate_device();
++	if (!wx8joy || !input_dev) {
++		dev_err(&client->dev,
++			"Can't allocate memory for device structure\n");
++		error = -ENOMEM;
++		goto err_free_mem;
++	}
++	wx8joy->i2c_client = client;
++	wx8joy->input_dev = input_dev;
++        wx8joy->joy_switch = 0;
++
++	wx8joy->wq = create_singlethread_workqueue("wx8joy");
++	if (!wx8joy->wq) {
++		dev_err(&client->dev, "Failed to create work queue\n");
++                error = -EFAULT;
++		goto err_free_mem;
++	}
++
++        error = sysfs_create_group(&client->dev.kobj, &wx8joy_attr_group);
++	if (error) {
++		dev_err(&client->dev, "Unable to create sysfs\n");
++		goto err_wq;
++	}
++
++	input_dev->name = DRIVER_DESC;
++	input_dev->id.bustype = BUS_I2C;
++	input_dev->dev.parent = &client->dev;
++
++	__set_bit(EV_KEY, input_dev->evbit);
++	__set_bit(EV_ABS, input_dev->evbit);
++	__set_bit(EV_REP, input_dev->evbit);
++
++	for(idx=0; idx<sizeof(axes); idx++)
++		input_set_abs_params(input_dev, axes[idx],
++			WX8JOY_MIN_AXIS, WX8JOY_MAX_AXIS, WX8JOY_FUZZ, WX8JOY_FLAT);
++
++	for(idx=0; idx<sizeof(keys); idx++)
++		input_set_capability(input_dev, EV_KEY, keys[idx]);
++
++	error = input_register_device(wx8joy->input_dev);
++	if (error) {
++		dev_err(&client->dev, "Failed to register input device\n");
++		goto err_sysfs;
++	}
++
++	i2c_set_clientdata(client, wx8joy);
++
++	INIT_DELAYED_WORK(&wx8joy->dw, wx8joy_work);
++	WARN_ON(!queue_delayed_work(wx8joy->wq, &wx8joy->dw, msecs_to_jiffies(WX8JOY_INTERVAL))); 
++
++	return 0;
++
++err_sysfs:
++        sysfs_remove_group(&client->dev.kobj, &wx8joy_attr_group);
++err_wq:
++	destroy_workqueue(wx8joy->wq);
++err_free_mem:
++	input_free_device(input_dev);
++	kfree(wx8joy);
++	return error;
++}
++
++static void wx8joy_remove(struct i2c_client *client)
++{
++	struct wx8joy_device *wx8joy = i2c_get_clientdata(client);
++
++        sysfs_remove_group(&client->dev.kobj, &wx8joy_attr_group);
++	destroy_workqueue(wx8joy->wq);
++	input_unregister_device(wx8joy->input_dev);
++	kfree(wx8joy);
++}
++
++/* device registration */
++static const struct i2c_device_id wx8joy_id[] = {
++	{ MODULE_DEVICE_ALIAS, 0 },
++	{ }
++};
++MODULE_DEVICE_TABLE(i2c, wx8joy_id);
++
++static struct i2c_driver wx8joy_driver = {
++	.driver = {
++		.name = MODULE_DEVICE_ALIAS,
++	},
++	.probe		= wx8joy_probe,
++	.remove		= wx8joy_remove,
++	.id_table	= wx8joy_id,
++};
++module_i2c_driver(wx8joy_driver);
+diff -u -r -N a/drivers/power/Kconfig b/drivers/power/Kconfig
+--- a/drivers/power/Kconfig	2025-02-22 11:26:11.698212572 +0100
++++ b/drivers/power/Kconfig	2021-10-14 19:39:31.000000000 +0200
+@@ -1,3 +1,8 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++config CHARGER_WX8
++        tristate "WX8 battery charger and power management driver"
++        help
++          Say Y to enable support for the battery on the WX8.
++
+ source "drivers/power/reset/Kconfig"
+ source "drivers/power/supply/Kconfig"
+diff -u -r -N a/drivers/power/Makefile b/drivers/power/Makefile
+--- a/drivers/power/Makefile	2025-02-22 11:26:11.698212572 +0100
++++ b/drivers/power/Makefile	2021-10-14 19:39:31.000000000 +0200
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_CHARGER_WX8)	+= wx8_charger.o
+ obj-$(CONFIG_POWER_RESET)	+= reset/
+ obj-$(CONFIG_POWER_SUPPLY)	+= supply/
+diff -u -r -N a/drivers/power/wx8_charger.c b/drivers/power/wx8_charger.c
+--- a/drivers/power/wx8_charger.c	1970-01-01 01:00:00.000000000 +0100
++++ b/drivers/power/wx8_charger.c	2021-10-14 19:39:31.000000000 +0200
+@@ -0,0 +1,562 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *	WX8 power management and charger driver
++ *
++ *	- charger is independent Li-Ion linear charger TP4056 with 2 status output (only /CHGR is connected in WX8)
++ *	- battery voltage read with ADC
++ *	- automatic power switching "usb2sys" and "boost2usb"
++ *
++ *	Authors:
++ *	Martin Cerveny		  <M.Cerveny@computer.org>
++ */
++
++#include <linux/module.h>
++
++#include <linux/delay.h>
++#include <linux/extcon.h>
++#include <linux/gpio.h>
++#include <linux/iio/consumer.h>
++#include <linux/iio/iio.h>
++#include <linux/jiffies.h>
++#include <linux/of_device.h>
++#include <linux/of_gpio.h>
++#include <linux/platform_device.h>
++#include <linux/power_supply.h>
++#include <linux/rtc.h>
++#include <linux/timer.h>
++#include <linux/wakelock.h>
++#include <linux/workqueue.h>
++
++#define DRIVER_DESC "WX8 battery charger and power management driver"
++#define MODULE_DEVICE_ALIAS "platform:wx8-charger"
++
++MODULE_LICENSE("GPL");
++MODULE_ALIAS(MODULE_DEVICE_ALIAS);
++MODULE_AUTHOR("M.Cerveny@computer.org");
++
++// config constatnts
++
++#define WX8_RECHECK_CHARGER	(60*60*1000)	// [ms] recheck charger, when running from battery and usb device is connected
++#define WX8_UPDATE_STATUS	(500)		// [ms] repeatedly updates battery status
++
++// data structures
++
++struct wx8_charger {
++	// device registration
++
++	struct platform_device		*pdev;
++	struct device			*dev;
++
++	struct power_supply		*bat;
++	struct power_supply		*usb;
++
++	struct workqueue_struct		*bat_monitor_wq;
++	struct delayed_work		bat_delay_work;
++
++	struct workqueue_struct		*usb_charger_wq;
++	struct delayed_work		usb_delay_work;
++	struct notifier_block 		usb_nb;
++
++	// runtime data
++
++	u32 voltage;
++	u32 percent;
++	u32 status;
++
++	bool ready;
++
++	// device-tree
++
++	struct extcon_dev 		*edev;
++	struct iio_channel		*iio_chan;
++
++	u32	ref_voltage;
++	u32	voltage_divider[2];
++	u32	discharge_table[32];
++	u32	charge_table[32];
++	u32	design_capacity;
++
++	int	charging_pin;
++	int	usb2sys_pin;
++	int	dc_det_pin;
++	int	boost2usb_pin;
++	u8	charging_level;
++	u8	usb2sys_level;
++	u8	dc_det_level;
++	u8	boost2usb_level;
++
++	u8	charge_table_size;
++	u8	discharge_table_size;
++};
++
++// power supply properties and registration
++
++static enum power_supply_property wx8_bat_props[] = {
++	POWER_SUPPLY_PROP_STATUS,
++	POWER_SUPPLY_PROP_VOLTAGE_NOW,
++	POWER_SUPPLY_PROP_TECHNOLOGY,
++	POWER_SUPPLY_PROP_PRESENT,
++	POWER_SUPPLY_PROP_HEALTH,
++	POWER_SUPPLY_PROP_CAPACITY,
++	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
++	POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN,
++	POWER_SUPPLY_PROP_VOLTAGE_MIN_DESIGN,
++};
++
++static int wx8_bat_get_property(struct power_supply *psy, enum power_supply_property psp, union power_supply_propval *val)
++{
++	struct wx8_charger *chgr = power_supply_get_drvdata(psy);
++
++	switch (psp) {
++	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
++		val->intval = chgr->voltage * 1000;
++		break;
++	case POWER_SUPPLY_PROP_TECHNOLOGY:
++		val->intval = POWER_SUPPLY_TECHNOLOGY_LION;
++		break;
++	case POWER_SUPPLY_PROP_PRESENT:
++		val->intval = !!chgr->voltage;
++		break;
++	case POWER_SUPPLY_PROP_HEALTH:
++		val->intval = POWER_SUPPLY_HEALTH_GOOD;
++		break;
++	case POWER_SUPPLY_PROP_STATUS:
++		val->intval = chgr->status;
++		break;
++	case POWER_SUPPLY_PROP_CAPACITY:
++		val->intval = chgr->percent;
++		break;
++	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
++		val->intval = chgr->design_capacity * 1000;
++		break;
++	case POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN:
++		val->intval = max(chgr->charge_table[chgr->charge_table_size-1], chgr->discharge_table[chgr->discharge_table_size-1]) * 1000;
++		break;
++	case POWER_SUPPLY_PROP_VOLTAGE_MIN_DESIGN:
++		val->intval = min(chgr->charge_table[0], chgr->discharge_table[0]) * 1000;
++		break;
++	default:
++		return -EINVAL;
++	}
++	return 0;
++}
++
++static enum power_supply_property wx8_usb_props[] = {
++	POWER_SUPPLY_PROP_ONLINE,
++};
++
++static int wx8_usb_get_property(struct power_supply *psy,
++				     enum power_supply_property psp,
++				     union power_supply_propval *val)
++{
++	int ret = 0;
++	struct wx8_charger *chgr = power_supply_get_drvdata(psy);
++
++	switch (psp) {
++	case POWER_SUPPLY_PROP_ONLINE:
++                val->intval = chgr->status != POWER_SUPPLY_STATUS_DISCHARGING;
++		break;
++	default:
++		ret = -EINVAL;
++		break;
++	}
++
++	return ret;
++}
++
++static const struct power_supply_desc wx8_bat_desc = {
++	.name		= "battery",
++	.type		= POWER_SUPPLY_TYPE_BATTERY,
++	.properties	= wx8_bat_props,
++	.num_properties	= ARRAY_SIZE(wx8_bat_props),
++	.get_property	= wx8_bat_get_property,
++};
++
++static const struct power_supply_desc wx8_usb_desc = {
++	.name = "usb",
++	.type = POWER_SUPPLY_TYPE_USB,
++	.properties = wx8_usb_props,
++	.num_properties = ARRAY_SIZE(wx8_usb_props),
++	.get_property = wx8_usb_get_property,
++};
++
++static int wx8_init_power_supply(struct wx8_charger *chgr)
++{
++	struct power_supply_config psy_cfg = { .drv_data = chgr, };
++
++	chgr->bat = devm_power_supply_register(chgr->dev,
++					     &wx8_bat_desc, &psy_cfg);
++	if (IS_ERR(chgr->bat)) {
++		dev_err(chgr->dev, "register bat power supply fail\n");
++		return PTR_ERR(chgr->bat);
++	}
++
++	chgr->usb = devm_power_supply_register(chgr->dev,
++					     &wx8_usb_desc, &psy_cfg);
++	if (IS_ERR(chgr->usb)) {
++		dev_err(chgr->dev, "register usb power supply fail\n");
++		return PTR_ERR(chgr->usb);
++	}
++
++	return 0;
++}
++
++// workers, irq, notifiers
++
++static void wx8_battery_work(struct work_struct *work)
++{
++	struct wx8_charger *chgr = container_of(work, struct wx8_charger, bat_delay_work.work);
++
++	int val, ret, i, d;
++	u32 *table, size;
++
++	ret = gpio_get_value(chgr->dc_det_pin);
++	if (ret == chgr->dc_det_level) {
++		// DC ON
++		ret = gpio_get_value(chgr->charging_pin);
++		if (ret == chgr->charging_level) {
++			// CHARGING
++			chgr->status = POWER_SUPPLY_STATUS_CHARGING;
++		}
++		else {
++			// NOT CHARGING
++			if (chgr->percent > 90) // last value
++				// TP4056 stop charging, assume FULL, pin /STBY not connected
++				chgr->status = POWER_SUPPLY_STATUS_FULL;
++			else
++				 // some sort of fail - vin too low; temperature of battery too low or too high; no battery
++				chgr->status = POWER_SUPPLY_STATUS_NOT_CHARGING;
++		}
++		table = chgr->charge_table;
++		size = chgr->charge_table_size;
++	} else {
++		// DC OFF
++		chgr->status = POWER_SUPPLY_STATUS_DISCHARGING;
++		table = chgr->discharge_table;
++		size = chgr->discharge_table_size;
++	}
++
++	// read voltage and recompute
++	ret = iio_read_channel_raw(chgr->iio_chan, &val);
++	chgr->voltage = (val * chgr->ref_voltage * (chgr->voltage_divider[0]+chgr->voltage_divider[1])) / (1024*chgr->voltage_divider[0]);
++	for (i = 0; i < size; i++) {
++		if (chgr->voltage < table[i])
++			break;
++	}
++	if ((i > 0) && (i < size)) {
++		d = ((chgr->voltage - table[i - 1]) * (1000 / (size - 1))) / (table[i] - table[i - 1]) + (i - 1) * (1000 / (size - 1));
++	} else {
++		if (i == 0) d = 0;
++		else d = 1000;
++	}
++	chgr->percent = d/10;
++
++	queue_delayed_work(chgr->bat_monitor_wq, &chgr->bat_delay_work, msecs_to_jiffies(WX8_UPDATE_STATUS));
++}
++
++static void wx8_usb_work(struct work_struct *work)
++{
++	struct wx8_charger *chgr = container_of(work, struct wx8_charger, usb_delay_work.work);
++	struct device *dev = chgr->dev;
++	int ret;
++
++	if (extcon_get_state(chgr->edev, EXTCON_USB_VBUS_EN) > 0) { // in host mode
++		// need power
++		ret = gpio_get_value(chgr->dc_det_pin);
++		if (ret != chgr->dc_det_level) {
++			if (gpio_get_value(chgr->boost2usb_pin) == chgr->boost2usb_level) {
++				// TODO: try other methods to test charger connected, problem: connected microUSB ID between host+otg, EXTCON_* does not work as expected
++
++				// temporary disable boost (if enabled) and check again for dc_det ...
++				gpio_set_value(chgr->boost2usb_pin, !chgr->boost2usb_level);
++				gpio_set_value(chgr->usb2sys_pin, chgr->usb2sys_level);
++
++				msleep(5);
++
++				ret = gpio_get_value(chgr->dc_det_pin);
++				if (ret != chgr->dc_det_level) {
++					dev_dbg(dev, "recheck, continue booster to USB\n");
++
++					gpio_set_value(chgr->usb2sys_pin, !chgr->usb2sys_level);
++					gpio_set_value(chgr->boost2usb_pin, chgr->boost2usb_level);
++
++					queue_delayed_work(chgr->usb_charger_wq, &chgr->usb_delay_work, msecs_to_jiffies(WX8_RECHECK_CHARGER));
++				}
++				else dev_dbg(dev, "recheck, now charger powered\n");
++			} else {
++				dev_dbg(dev, "enable booster to USB\n");
++
++				gpio_set_value(chgr->usb2sys_pin, !chgr->usb2sys_level);
++				gpio_set_value(chgr->boost2usb_pin, chgr->boost2usb_level);
++
++				queue_delayed_work(chgr->usb_charger_wq, &chgr->usb_delay_work, msecs_to_jiffies(WX8_RECHECK_CHARGER));
++			}
++		} else dev_dbg(dev, "charger powered\n");
++	} else {
++		// does not need power
++		dev_dbg(dev, "power not needed\n");
++		gpio_set_value(chgr->boost2usb_pin, !chgr->boost2usb_level);
++		gpio_set_value(chgr->usb2sys_pin, chgr->usb2sys_level);
++	}
++}
++
++static int wx8_usb_evt_notifier(struct notifier_block *nb, unsigned long event, void *ptr)
++{
++	struct wx8_charger *chgr = container_of(nb, struct wx8_charger, usb_nb);
++
++	dev_dbg(chgr->dev, "wx8_usb_evt_notifier\n");
++	if (chgr->ready) mod_delayed_work(chgr->usb_charger_wq, &chgr->usb_delay_work, 0);
++
++	return NOTIFY_DONE;
++}
++
++static irqreturn_t wx8_dc_det_isr(int irq, void *data)
++{
++	struct wx8_charger *chgr = (struct wx8_charger *)data;
++
++	dev_dbg(chgr->dev, "wx8_dc_det_isr\n");
++	irq_set_irq_type(irq, gpio_get_value(chgr->dc_det_pin) ? IRQF_TRIGGER_LOW : IRQF_TRIGGER_HIGH);
++	if (chgr->ready) mod_delayed_work(chgr->usb_charger_wq, &chgr->usb_delay_work, 0);
++
++	return IRQ_HANDLED;
++}
++
++// registration
++
++static int wx8_charger_parse_dt(struct wx8_charger *chgr)
++{
++	int length, ret;
++	struct device_node *np = chgr->dev->of_node;
++	struct device *dev = chgr->dev;
++	enum of_gpio_flags flags;
++
++	ret = of_property_read_u32(np, "ref_voltage", &chgr->ref_voltage);
++	if (ret < 0) {
++		dev_err(dev, "ref_voltage not found!\n");
++		return ret;
++	}
++
++	ret = of_property_read_u32(np, "design_capacity", &chgr->design_capacity);
++	if (ret < 0) {
++		dev_err(dev, "design_capacity not found!\n");
++		return ret;
++	}
++
++	if (!of_find_property(np, "charge_table", &length) || length % sizeof(u32) != 0 || length / sizeof(u32)<2 || length>sizeof(chgr->charge_table)) {
++		dev_err(dev, "bad charge_table!\n");
++		return -EINVAL;
++	}
++	chgr->charge_table_size = length / sizeof(u32);
++	ret = of_property_read_u32_array(np, "charge_table", chgr->charge_table, chgr->charge_table_size);
++	if (ret < 0)
++		return ret;
++	if (!of_find_property(np, "discharge_table", &length) || length % sizeof(u32) !=0 || length / sizeof(u32)<2 || length>sizeof(chgr->discharge_table)) {
++		dev_err(dev, "bad discharge_table!\n");
++		return -EINVAL;
++	}
++	chgr->discharge_table_size = length / sizeof(u32);
++	ret = of_property_read_u32_array(np, "discharge_table", chgr->discharge_table, chgr->discharge_table_size);
++	if (ret < 0)
++		return ret;
++
++	if (!of_find_property(np, "voltage_divider", &length) || length != sizeof(chgr->voltage_divider)) {
++		dev_err(dev, "bad voltage_divider!\n");
++		return -EINVAL;
++	}
++	ret = of_property_read_u32_array(np, "voltage_divider", chgr->voltage_divider, ARRAY_SIZE(chgr->voltage_divider));
++	if (ret < 0)
++		return ret;
++	if (!chgr->voltage_divider[0]) {
++		dev_err(dev, "zero in first voltage_divider, use <1 0> to run without divider!\n");
++		return -EINVAL;
++	}
++
++	// works only when usb2sys_gpio !
++	chgr->dc_det_pin = of_get_named_gpio_flags(np, "dc_det_gpio", 0, &flags);
++	if (!gpio_is_valid(chgr->dc_det_pin)) {
++		dev_err(dev, "bad dc_det_gpio!\n");
++		return -EINVAL;
++	}
++	chgr->dc_det_level = (flags & OF_GPIO_ACTIVE_LOW) ? 0 : 1;
++	ret = devm_gpio_request(dev, chgr->dc_det_pin, "DC detected");
++	if (ret<0) {
++		dev_err(dev, "bad request dc_det_gpio!\n");
++		return ret;
++	}
++	ret = gpio_direction_input(chgr->dc_det_pin);
++	if (ret<0) {
++		dev_err(dev, "bad input dc_det_pin!\n");
++		return ret;
++	}
++
++	// /CHRG output from TP4056
++	chgr->charging_pin = of_get_named_gpio_flags(np, "charging_gpio", 0, &flags);
++	if (!gpio_is_valid(chgr->charging_pin)) {
++		dev_err(dev, "bad charging_gpio!\n");
++		return -EINVAL;
++	}
++	chgr->charging_level = (flags & OF_GPIO_ACTIVE_LOW) ? 0 : 1;
++	ret = devm_gpio_request(dev, chgr->charging_pin, "charging now");
++	if (ret<0) {
++		dev_err(dev, "bad request charging_pin!\n");
++		return ret;
++	}
++	ret = gpio_direction_input(chgr->charging_pin);
++	if (ret<0) {
++		dev_err(dev, "bad input charging_pin!\n");
++		return ret;
++	}
++
++	// power switch "vcc_booster" -> vcc_usb"
++	chgr->boost2usb_pin = of_get_named_gpio_flags(np, "boost2usb_gpio", 0, &flags);
++	if (!gpio_is_valid(chgr->boost2usb_pin)) {
++		dev_err(dev, "bad boost2usb_gpio!\n");
++		return -EINVAL;
++	}
++	chgr->boost2usb_level = (flags & OF_GPIO_ACTIVE_LOW) ? 0 : 1;
++	ret = devm_gpio_request(dev, chgr->boost2usb_pin, "booster power to usb");
++	if (ret<0) {
++		dev_err(dev, "bad request boost2usb_pin!\n");
++		return ret;
++	}
++	// disable
++	ret = gpio_direction_output(chgr->boost2usb_pin, !chgr->boost2usb_level);
++	if (ret<0) {
++		dev_err(dev, "bad input boost2usb_pin!\n");
++		return ret;
++	}
++
++	// power switch "vcc_usb" -> "vcc_sys" & "vcc_charger"
++	chgr->usb2sys_pin = of_get_named_gpio_flags(np, "usb2sys_gpio", 0, &flags);
++	if (!gpio_is_valid(chgr->usb2sys_pin)) {
++		dev_err(dev, "bad usb2sys_gpio!\n");
++		return -EINVAL;
++	}
++	chgr->usb2sys_level = (flags & OF_GPIO_ACTIVE_LOW) ? 0 : 1;
++	ret = devm_gpio_request(dev, chgr->usb2sys_pin, "usb power to system");
++	if (ret<0) {
++		dev_err(dev, "bad request usb2sys_pin!\n");
++		return ret;
++	}
++	// enable
++	ret = gpio_direction_output(chgr->usb2sys_pin, chgr->usb2sys_level);
++	if (ret<0) {
++		dev_err(dev, "bad input usb2sys_pin!\n");
++		return ret;
++	}
++
++	chgr->edev = extcon_get_edev_by_phandle(dev, 0);
++	if (IS_ERR(chgr->edev)) {
++		if (PTR_ERR(chgr->edev) != -EPROBE_DEFER) dev_err(dev, "Invalid or missing extcon\n");
++		return PTR_ERR(chgr->edev);
++	}
++
++	chgr->iio_chan = devm_iio_channel_get(dev, NULL);
++	if (IS_ERR(chgr->iio_chan)) {
++		if (PTR_ERR(chgr->iio_chan) != -EPROBE_DEFER) dev_err(dev, "ADC io-channels error!\n");
++		return PTR_ERR(chgr->iio_chan);
++	}
++	return 0;
++}
++
++static const struct of_device_id wx8_charger_of_match[] = {
++	{.compatible = "wx8-charger",},
++	{ },
++};
++
++static int wx8_charger_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	const struct of_device_id *of_id = of_match_device(wx8_charger_of_match, dev);
++	struct wx8_charger *chgr;
++	int ret, dc_det_irq;
++
++	if (!of_id) {
++		dev_err(dev, "Failed to find matching dt id\n");
++		return -ENODEV;
++	}
++
++	chgr = devm_kzalloc(dev, sizeof(*chgr), GFP_KERNEL);
++	if (!chgr)
++		return -ENOMEM;
++
++	chgr->pdev = pdev;
++	chgr->dev = dev;
++	platform_set_drvdata(pdev, chgr);
++
++	ret = wx8_charger_parse_dt(chgr);
++	if (ret < 0) {
++		if (ret != -EPROBE_DEFER) dev_err(dev, "DT parse failed!\n");
++	 	return ret;
++	}
++
++	ret = wx8_init_power_supply(chgr);
++	if (ret) {
++		dev_err(dev, "power supply register failed!\n");
++		return ret;
++	}
++
++	chgr->bat_monitor_wq = alloc_ordered_workqueue("%s",
++			WQ_MEM_RECLAIM | WQ_FREEZABLE, "wx8-bat-monitor-wq");
++	INIT_DELAYED_WORK(&chgr->bat_delay_work, wx8_battery_work);
++	queue_delayed_work(chgr->bat_monitor_wq, &chgr->bat_delay_work, 0);
++
++	chgr->usb_charger_wq = alloc_ordered_workqueue("%s",
++			WQ_MEM_RECLAIM | WQ_FREEZABLE, "wx8-usb-charger-wq");
++	INIT_DELAYED_WORK(&chgr->usb_delay_work, wx8_usb_work);
++	queue_delayed_work(chgr->usb_charger_wq, &chgr->usb_delay_work, 0);
++	chgr->usb_nb.notifier_call = wx8_usb_evt_notifier;
++	ret = devm_extcon_register_notifier(dev, chgr->edev, EXTCON_USB_VBUS_EN, &chgr->usb_nb);
++	if (ret < 0) {
++		dev_err(dev, "failed to register notifier for VBUS_EN\n");
++		return ret;
++	}
++
++	dc_det_irq = gpio_to_irq(chgr->dc_det_pin);
++	ret = devm_request_irq(dev, dc_det_irq, wx8_dc_det_isr,
++			       gpio_get_value(chgr->dc_det_pin) ? IRQF_TRIGGER_LOW : IRQF_TRIGGER_HIGH, "wx8_dc_det", chgr);
++	if (ret != 0) {
++		dev_err(dev, "wx8_dc_det_irq request failed!\n");
++		return ret;
++	}
++	enable_irq_wake(dc_det_irq);
++
++	chgr->ready = true;
++	return 0;
++}
++
++
++static void wx8_charger_shutdown(struct platform_device *dev)
++{
++	struct wx8_charger *chgr = platform_get_drvdata(dev);
++
++	chgr->ready = false;
++
++	cancel_delayed_work_sync(&chgr->usb_delay_work);
++	destroy_workqueue(chgr->usb_charger_wq);
++
++	cancel_delayed_work_sync(&chgr->bat_delay_work);
++	destroy_workqueue(chgr->bat_monitor_wq);
++	// devm for memory, gpio, adc, extcon, irq
++}
++
++static struct platform_driver wx8_charger_driver = {
++	.driver = {
++		.name = MODULE_DEVICE_ALIAS,
++		.of_match_table = wx8_charger_of_match,
++	},
++	.probe = wx8_charger_probe,
++	.shutdown = wx8_charger_shutdown,
++};
++
++static int __init charger_init(void)
++{
++	return platform_driver_register(&wx8_charger_driver);
++}
++fs_initcall_sync(charger_init);
++
++static void __exit charger_exit(void)
++{
++	platform_driver_unregister(&wx8_charger_driver);
++}
++module_exit(charger_exit);
+--- /dev/null	2025-02-24 11:29:58.947010136 +0100
++++ b/arch/arm/boot/dts/rk3128-wx8.dtsi	2025-02-24 13:07:27.007894146 +0100
+@@ -0,0 +1,466 @@
++/*
++ * (C) Copyright 2017 Rockchip Electronics Co., Ltd
++ *
++ * SPDX-License-Identifier:     GPL-2.0+
++ */
++
++#include <dt-bindings/display/drm_mipi_dsi.h>
++
++/dts-v1/;
++
++#include "rk3128.dtsi"
++
++/ {
++	model = "Game Simulator Board";
++	compatible = "rockchip,rk3128-gamesim", "rockchip,rk3128";
++
++	chosen {
++		stdout-path = &uart0;
++		bootargs = "earlycon=uart8250,mmio32,0x20060000 rootwait console=ttyFIQ0,115200n8 swiotlb=1 root=PARTUUID=fd800c6c-2fdb-4502-82cb-e61f66b9a221";
++	};
++
++	vcc_sys: vcc-sys {	// from USB OTG or from battery
++		compatible = "regulator-fixed";
++		regulator-name = "vcc_sys";
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++	};
++
++	vcc_io: vcc-io {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc_io";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-always-on;
++		regulator-boot-on;
++		vin-supply = <&vcc_sys>;
++	};
++
++	vdd_arm: vdd-arm {
++		compatible = "pwm-regulator";
++		pwms = <&pwm1 0 5000 0>;
++		regulator-name = "vdd_arm";
++		regulator-min-microvolt = <880000>;
++		regulator-max-microvolt = <1380000>;
++		regulator-init-microvolt = <1100000>;
++		regulator-early-min-microvolt = <1100000>;
++		regulator-always-on;
++		regulator-boot-on;
++		pwm-supply = <&vcc_sys>;
++		pwm-dutycycle-range = <100 0>;
++		pwm-dutycycle-unit = <100>;
++	};
++
++	vdd_log: vdd-log {
++		compatible = "pwm-regulator";
++		pwms = <&pwm2 0 5000 0>;
++		regulator-name = "vdd_log";
++		regulator-min-microvolt = <900000>;
++		regulator-max-microvolt = <1400000>;
++		regulator-init-microvolt = <1100000>;
++		regulator-early-min-microvolt = <1100000>;
++		regulator-always-on;
++		regulator-boot-on;
++		pwm-supply = <&vcc_sys>;
++		pwm-dutycycle-range = <100 0>;
++		pwm-dutycycle-unit = <100>;
++	};
++
++	fiq-debugger {
++		compatible = "rockchip,fiq-debugger";
++		rockchip,serial-id = <0>;
++		rockchip,wake-irq = <159>;
++		pinctrl-0 = <&uart0_xfer>;
++		pinctrl-names = "default";
++		rockchip,irq-mode-enable = <1>;
++		rockchip,baudrate = <115200>;
++		status = "okay";
++	};
++
++	reserved-memory {
++		#address-cells = <0x01>;
++		#size-cells = <0x01>;
++		ranges;
++
++		drm_logo: drm-logo@00000000 {
++			compatible = "rockchip,drm-logo";
++			reg = <0x00 0x00>;
++		};
++	};
++
++	sound: sound {
++		compatible = "simple-audio-card";
++		simple-audio-card,format = "i2s";
++		simple-audio-card,mclk-fs = <0x100>;
++		simple-audio-card,name = "rockchip,rk312x-codec";
++		simple-audio-card,routing = "Headphone Jack", "HiFi Playback";
++		simple-audio-card,widgets = "Headphone", "Headphone Jack";
++
++		simple-audio-card,dai-link@0 {
++			format = "i2s";
++
++			codec {
++				sound-dai = <&codec>;
++			};
++
++			cpu {
++				sound-dai = <&i2s_8ch>;
++			};
++		};
++
++		simple-audio-card,dai-link@1 {
++			format = "i2s";
++
++			codec {
++				sound-dai = <&hdmi>;
++			};
++
++			cpu {
++				sound-dai = <&i2s_8ch>;
++			};
++		};
++	};
++
++	power_supply: power-supply {
++		compatible = "wx8-charger";
++
++		pinctrl-0 = <&charging_gpio &dc_det_gpio &usb2sys_gpio &boost2usb_gpio>;
++		pinctrl-names = "default";
++
++		dc_det_gpio = <&gpio0 0x11 GPIO_ACTIVE_HIGH>;	// input, works only when usb2sys_gpio
++		charging_gpio = <&gpio3 0x1a GPIO_ACTIVE_LOW>;	// input, /CHRG output from TP4056
++
++		// both output cannot be active in same time (eg. LOW-LOW or HIGH-HIGH is allowed), beaware loop boost->usb->sys->boost
++		usb2sys_gpio = <&gpio3 0x15 GPIO_ACTIVE_LOW>;	// output, power switch "vcc_usb" -> "vcc_sys" & "vcc_charger"
++		boost2usb_gpio = <&gpio1 0x09 GPIO_ACTIVE_HIGH>;// output, power switch "vcc_booster" -> vcc_usb"
++
++		io-channels = <&saradc 2>;
++		ref_voltage = <3300>; 		// mV, from saradc -> vref-supply -> ?
++		voltage_divider = <200 200>; 	// adc resistor divider
++
++		extcon = <&u2phy>;
++	};
++};
++
++&cpu0 {
++	cpu-supply = <&vdd_arm>;
++};
++
++&cpu0_opp_table {
++	opp-1008000000 {
++		clock-latency-ns = <40000>;
++		opp-hz = /bits/ 64 <1008000000>;
++		opp-microvolt = <1200000 1200000 1380000>;
++		opp-microvolt-L0 = <1200000 1200000 1380000>;
++		opp-microvolt-L1 = <1175000 1175000 1380000>;
++		opp-microvolt-L2 = <1225000 1225000 1380000>;
++	};
++
++	opp-1200000000 {
++		clock-latency-ns = <40000>;
++		opp-hz = /bits/ 64 <1200000000>;
++		opp-microvolt = <1325000 1325000 1380000>;
++		opp-microvolt-L0 = <1325000 1325000 1380000>;
++		opp-microvolt-L1 = <1300000 1300000 1380000>;
++		opp-microvolt-L2 = <1375000 1375000 1380000>;
++	};
++
++	opp-216000000 {
++		clock-latency-ns = <40000>;
++		opp-hz = /bits/ 64 <216000000>;
++		opp-microvolt = <925000 925000 1380000>;
++		opp-microvolt-L0 = <925000 925000 1380000>;
++		opp-microvolt-L1 = <925000 925000 1380000>;
++		opp-microvolt-L2 = <950000 950000 1380000>;
++	};
++
++	opp-408000000 {
++		clock-latency-ns = <40000>;
++		opp-hz = /bits/ 64 <408000000>;
++		opp-microvolt = <950000 950000 1380000>;
++		opp-microvolt-L0 = <950000 950000 1380000>;
++		opp-microvolt-L1 = <925000 925000 1380000>;
++		opp-microvolt-L2 = <950000 950000 1380000>;
++	};
++
++	opp-600000000 {
++		clock-latency-ns = <40000>;
++		opp-hz = /bits/ 64 <600000000>;
++		opp-microvolt = <975000 975000 1380000>;
++		opp-microvolt-L0 = <975000 975000 1380000>;
++		opp-microvolt-L1 = <950000 950000 1380000>;
++		opp-microvolt-L2 = <975000 975000 1380000>;
++	};
++
++	opp-696000000 {
++		clock-latency-ns = <40000>;
++		opp-hz = /bits/ 64 <696000000>;
++		opp-microvolt = <1000000 1000000 1380000>;
++		opp-microvolt-L0 = <1000000 1000000 1380000>;
++		opp-microvolt-L1 = <975000 975000 1380000>;
++		opp-microvolt-L2 = <1050000 1050000 1380000>;
++	};
++
++	opp-816000000 {
++		clock-latency-ns = <40000>;
++		opp-hz = /bits/ 64 <816000000>;
++		opp-microvolt = <1075000 1075000 1380000>;
++		opp-microvolt-L0 = <1075000 1075000 1380000>;
++		opp-microvolt-L1 = <1050000 1050000 1380000>;
++		opp-microvolt-L2 = <1100000 1100000 1380000>;
++		opp-suspend;
++	};
++};
++
++&dfi {
++	status = "okay";
++};
++
++&dmc {
++	status = "okay";
++	center-supply = <&vdd_log>;
++	vop-dclk-mode = <1>;
++};
++
++&soc_thermal {
++	trips {
++		soc_crit: soc-crit {
++			hysteresis = <2000>;
++			temperature = <115000>;
++			type = "critical";
++		};
++	};
++};
++
++&tsadc {
++	status = "okay";
++};
++
++&gpu {
++	status = "okay";
++	mali-supply = <&vdd_log>;
++};
++
++&rng {
++	status = "okay";
++};
++
++&hevc {
++	status = "okay";
++};
++
++&hevc_mmu {
++	status = "okay";
++};
++
++/*&vpu {
++	status = "okay";
++};*/
++
++&vpu_mmu {
++	status = "okay";
++};
++
++/*&vpu_combo {
++	status = "okay";
++};*/
++
++&rga  {
++	status = "okay";
++};
++
++&vop {
++	status = "okay";
++};
++
++&vop_mmu {
++	status = "okay";
++};
++
++&hdmi {
++	status = "okay";
++};
++
++&usb_otg {
++	status = "okay";
++	vbus-supply = <&vcc_sys>;
++};
++
++&usb_host_ehci {
++	status = "okay";
++};
++
++&usb_host_ohci {
++	status = "okay";
++};
++
++&i2s_8ch  {
++	status = "okay";
++	#sound-dai-cells = <0>;
++};
++
++&sfc {
++	status = "okay";
++};
++
++&sdmmc {
++	status = "okay";
++
++	supports-sd;
++	broken-cd;
++
++	card-detect-delay = <200>;
++	ignore-pm-notify;
++	keep-power-in-suspend;
++	vmmc-supply = <&vcc_io>;
++	vqmmc-supply = <&vcc_io>;
++
++	cd-gpios = <&gpio1 0x11 0x00>;
++
++	cap-mmc-highspeed;
++	cap-sd-highspeed;
++
++	clock-frequency = <37500000>;
++	max-frequency = <37500000>;
++	num-slots = <1>;
++};
++
++&u2phy {
++	status = "okay";
++};
++
++&u2phy_host {
++	status = "okay";
++};
++
++&u2phy_otg {
++	status = "okay";
++};
++
++&codec {
++	status = "okay";
++
++	#sound-dai-cells = <0>;
++	capture_volume = <0x1a>;
++	codec_hp_det = <1>;
++	gpio_debug = <1>;
++
++	hp-mute-delay = <0x05>;
++	hp_volume = <0x19>;
++
++	spk-ctl-gpios = <&gpio1 0x03 0x00>;
++	spk-mute-delay = <0x05>;
++	spk_volume = <0x19>;
++
++	rk312x_for_mid = <0>;
++	is_rk3128 = <1>;
++};
++
++&video_phy {
++	status = "okay";
++};
++
++&pwm1 {
++	status = "okay";
++};
++
++&pwm2 {
++	status = "okay";
++};
++
++&saradc {
++	status = "okay";
++	vref-supply = <&vcc_io>;
++};
++
++&i2c0 {
++	status = "okay";
++
++	clock-frequency = <400000>;
++
++	i2c-scl-falling-time-ns = <0x0b>;
++	i2c-scl-rising-time-ns = <0x109>;
++
++	joysticks: i2cjoy@4c {
++		compatible = "wx8-joysticks";
++		reg = <0x4c>;
++	};
++};
++
++
++&pinctrl {
++	lcdc {
++		lcd_enable: lcd-enable {
++			rockchip,pins = <1 RK_PB4 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++
++		lcd_reset: lcd-reset {
++			rockchip,pins = <0 RK_PD0 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	buttons {
++
++		game_keys: game-keys {
++			rockchip,pins = <1 0x04 RK_FUNC_GPIO &pcfg_pull_default
++					 1 0x05 RK_FUNC_GPIO &pcfg_pull_default
++					 0 0x08 RK_FUNC_GPIO &pcfg_pull_default
++					 0 0x09 RK_FUNC_GPIO &pcfg_pull_default
++					 0 0x0b RK_FUNC_GPIO &pcfg_pull_default
++					 0 0x0c RK_FUNC_GPIO &pcfg_pull_default
++					 0 0x0d RK_FUNC_GPIO &pcfg_pull_default
++					 0 0x0e RK_FUNC_GPIO &pcfg_pull_default
++					 1 0x08 RK_FUNC_GPIO &pcfg_pull_default
++					 1 0x0a RK_FUNC_GPIO &pcfg_pull_default
++					 1 0x0b RK_FUNC_GPIO &pcfg_pull_default
++					 3 0x16 RK_FUNC_GPIO &pcfg_pull_default
++					 3 0x17 RK_FUNC_GPIO &pcfg_pull_default
++					 3 0x1b RK_FUNC_GPIO &pcfg_pull_default
++					 1 0x01 RK_FUNC_GPIO &pcfg_pull_default
++					 1 0x02 RK_FUNC_GPIO &pcfg_pull_default
++					 >;
++		};
++	};
++
++	power {
++		charging_gpio: charging-gpio {
++			rockchip,pins = <3 0x1a RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++
++		usb2sys_gpio: usb2sys-gpio {
++			rockchip,pins = <3 0x15 RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++
++		boost2usb_gpio: boost2usb-gpio {
++			rockchip,pins = <1 0x09 RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++
++		dc_det_gpio: dc-det-gpio {
++			rockchip,pins = <0 0x11 RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++	};
++
++	unresolved {
++		// now over /sys/class/gpio/
++		boosters_enable: boosters-enable {
++			rockchip,pins = <2 0x1d RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++
++		// unknown driver compatible = "rockchip,rk3126-usb-control"
++		host_drv_gpio: host-drv-gpio {
++			rockchip,pins = <3 0x14 RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++
++		// unknown driver function in original driver compatible = "rk30-adc-battery"
++		chg_en: chg-en {
++			rockchip,pins = <3 0x11 RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++
++		// unknown driver function in original driver compatible = "rk30-adc-battery"
++		led_power_gpio: led-power-gpio {
++			rockchip,pins = <1 0x07 RK_FUNC_GPIO &pcfg_pull_default>;
++		};
++	};
++};
