@@ -14,7 +14,7 @@ index 553c233..456652d 100644
 +   fpic := -fPIC
 +   SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
 +   LIBS += -lpthread
-+   
++
 +	ifneq (,$(findstring rpi1,$(platform)))
 +    	CFLAGS += -marm -mcpu=arm1176jzf-s -mfloat-abi=hard
 +	else ifneq (,$(findstring rpi2,$(platform)))
@@ -29,11 +29,22 @@ index 553c233..456652d 100644
 +         CFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
 +	else ifneq (,$(findstring rpi5,$(platform)))
 +         CFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
-+	endif   
++	endif
 +
  else ifeq ($(platform), linux-portable)
     TARGET := $(TARGET_NAME)_libretro.$(EXT)
     fpic := -fPIC -nostdlib
+@@ -265,8 +265,8 @@
+ endif
+ 
+ ifeq ($(USE_LTO), 1)
+-   CFLAGS += -flto -fuse-linker-plugin
+-   CXXFLAGS += -flto -fuse-linker-plugin
++   CFLAGS += -flto=auto -fuse-linker-plugin
++   CXXFLAGS += -flto=auto -fuse-linker-plugin
+ endif
+ 
+ GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
 diff --git a/src/path.cpp b/src/path.cpp
 index 79e7f85..ac0b4a2 100644
 --- a/src/path.cpp
