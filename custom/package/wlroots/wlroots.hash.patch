@@ -1,12 +1,12 @@
 diff --git a/package/wlroots/wlroots.hash b/package/wlroots/wlroots.hash
-index 8ab05393b1..4cea50a3a8 100644
+index 8ab05393b15..266f1263bb0 100644
 --- a/package/wlroots/wlroots.hash
 +++ b/package/wlroots/wlroots.hash
 @@ -1,5 +1,5 @@
 -# Generated locally, after checking https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/0.16.2/downloads/wlroots-0.16.2.tar.gz.sig
 -sha256  83e9a11605f23d4bf781ab1947089483d9ec3f7e9ba65398e0609593b77d44aa  wlroots-0.16.2.tar.gz
-+# Generated locally, after checking https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/0.17.4/downloads/wlroots-0.17.4.tar.gz.sig
-+sha256  d3190d19d03446955e68a92c77d4c74af78384b0db39a85a0b1582adc80f36d1  wlroots-0.17.4.tar.gz
++# Generated locally, after checking https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/0.18.2/downloads/wlroots-0.18.2.tar.gz.sig
++sha256  cf776c169169f279808d9eabc6583f484338dcd454c966a285ff178c88c105d4  wlroots-0.18.2.tar.gz
  
  # Hashes for license files:
  sha256  ffd3737a478b83a8b51b42757d3bf909ef36694508355879722e11fc1fa6736b  LICENSE
