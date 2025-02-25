@@ -1,15 +1,13 @@
 diff --git a/package/wlroots/wlroots.mk b/package/wlroots/wlroots.mk
-index fdd2fb8250..fae466adb1 100644
+index fdd2fb8250b..dd8c3a3e36a 100644
 --- a/package/wlroots/wlroots.mk
 +++ b/package/wlroots/wlroots.mk
-@@ -3,8 +3,8 @@
- # wlroots
+@@ -4,7 +4,7 @@
  #
  ################################################################################
--
+ 
 -WLROOTS_VERSION = 0.16.2
-+# reglinux - (update)
-+WLROOTS_VERSION = 0.17.4
++WLROOTS_VERSION = 0.18.2
  WLROOTS_SITE = https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/$(WLROOTS_VERSION)/downloads
  WLROOTS_LICENSE = MIT
  WLROOTS_LICENSE_FILES = LICENSE
@@ -17,17 +15,16 @@ index fdd2fb8250..fae466adb1 100644
  	pixman \
  	seatd \
  	udev \
-+    hwdata \
-+    libdisplay-info \
-+    libliftoff \
++	hwdata \
++	libdisplay-info \
++	libliftoff \
  	wayland \
  	wayland-protocols
  
-@@ -29,6 +32,11 @@ WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
+@@ -29,6 +32,10 @@ WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
  WLROOTS_RENDERERS = gles2
  WLROOTS_BACKENDS = libinput drm
  
-+# batocera
 +ifeq ($(BR2_PACKAGE_HAS_LIBGBM),y)
 +WLROOTS_CONF_OPTS += -Dallocators=gbm
 +endif
@@ -35,12 +32,12 @@ index fdd2fb8250..fae466adb1 100644
  ifeq ($(BR2_PACKAGE_WLROOTS_X11),y)
  WLROOTS_BACKENDS += x11
  WLROOTS_DEPENDENCIES += libxcb xcb-util-wm xcb-util-renderutil xlib_libX11
-@@ -41,7 +49,12 @@ else
+@@ -41,7 +48,12 @@ else
  WLROOTS_CONF_OPTS += -Dxwayland=disabled
  endif
  
 -ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER)$(BR2_PACKAGE_VULKAN_LOADER),yy)
-+# batocera - add vulkan build dependency
++# add vulkan build dependency
 +ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER),yy)
 +    WLROOTS_DEPENDENCIES +=  vulkan-headers vulkan-loader host-glslang
 +endif
