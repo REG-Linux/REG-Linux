@@ -3,8 +3,8 @@
 # theforceengine
 #
 ################################################################################
-# Version: Release on Jul 17, 2024
-THEFORCEENGINE_VERSION = v1.10.000
+# Version: Release on Feb 22, 2025
+THEFORCEENGINE_VERSION = v1.15.000
 THEFORCEENGINE_SITE = $(call github,luciusDXL,TheForceEngine,$(THEFORCEENGINE_VERSION))
 THEFORCEENGINE_LICENSE = GPLv2
 THEFORCEENGINE_LICENSE_FILE = LICENSE
@@ -23,6 +23,7 @@ THEFORCEENGINE_SUPPORTS_IN_SOURCE_BUILD = NO
 
 THEFORCEENGINE_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 THEFORCEENGINE_CONF_OPTS += -DBUILD_SHARED_LIBS=FALSE
+THEFORCEENGINE_CONF_OPTS += -DENABLE_FORCE_SCRIPT=ON
 THEFORCEENGINE_CONF_OPTS += -DDISABLE_SYSMIDI=ON
 
 ifeq ($(BR2_PACKAGE_RTMIDI),y)
@@ -54,7 +55,7 @@ endef
 
 define THEFORCEENGINE_EVMAPY
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/ports/theforceengine/theforceengine.keys \
+    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/ports/theforceengine/theforceengine.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
