@@ -5,21 +5,16 @@ Subject: [PATCH] opengles2: expand more support format
 
 Signed-off-by: Hertz Wang <wangh@rock-chips.com>
 ---
- src/render/opengles2/SDL_render_gles2.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ src/render/opengles2/SDL_render_gles2.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/src/render/opengles2/SDL_render_gles2.c b/src/render/opengles2/SDL_render_gles2.c
-index c2f5d64..22d2b56 100644
+index f5f221c..cbc795e 100644
 --- a/src/render/opengles2/SDL_render_gles2.c
 +++ b/src/render/opengles2/SDL_render_gles2.c
-@@ -2236,11 +2236,16 @@
-     GLES2_CreateRenderer,
-     { "opengles2",
-       (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE),
--      4,
-+      8,
-       { SDL_PIXELFORMAT_RGBA32,
-         SDL_PIXELFORMAT_BGRA32,
+@@ -2223,7 +2223,12 @@ SDL_RenderDriver GLES2_RenderDriver = {
+       { SDL_PIXELFORMAT_BGRA32,
+         SDL_PIXELFORMAT_ABGR32,
          SDL_PIXELFORMAT_BGRX32,
 -        SDL_PIXELFORMAT_RGBX32 },
 +        SDL_PIXELFORMAT_RGBX32,
@@ -31,4 +26,5 @@ index c2f5d64..22d2b56 100644
        0,
        0 }
  };
-
+-- 
+2.48.1
