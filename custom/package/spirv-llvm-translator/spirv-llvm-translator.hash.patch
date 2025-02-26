@@ -1,9 +1,9 @@
 diff --git a/package/spirv-llvm-translator/spirv-llvm-translator.hash b/package/spirv-llvm-translator/spirv-llvm-translator.hash
-index 4500fc4f62..7ad2e54706 100644
+index 4500fc4f62..bd3fb4241b 100644
 --- a/package/spirv-llvm-translator/spirv-llvm-translator.hash
 +++ b/package/spirv-llvm-translator/spirv-llvm-translator.hash
 @@ -1,3 +1,4 @@
  # locally calculated
-+sha256  2a1e142cfcd3720fe5e3fb6086f83a15b94c08990d05a780ba1e33c5313e2884  spirv-llvm-translator-v18.1.6.tar.gz
++sha256  8f15eb0c998ca29ac59dab25be093d41f36d77c215f54ad9402a405495bea183  spirv-llvm-translator-v19.1.4.tar.gz
  sha256  0a00a72a5b004eeb73f9c96c9c6ba2d6de232cbf3c22a7b322047604d24402ba  spirv-llvm-translator-v15.0.0-46-ge82ecc2bd7295604fcf1824e47c95fa6a09c6e63.tar.gz
  sha256  e3bc36440fc927c62d5cc24efeefe225a14d4e34ffeb0c92e430625cce9ee444  LICENSE.TXT

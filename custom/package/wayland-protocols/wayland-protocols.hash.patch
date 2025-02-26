@@ -1,5 +1,5 @@
 diff --git a/package/wayland-protocols/wayland-protocols.hash b/package/wayland-protocols/wayland-protocols.hash
-index 93d40a919c2..f069ee66748 100644
+index 93d40a919c..f069ee6674 100644
 --- a/package/wayland-protocols/wayland-protocols.hash
 +++ b/package/wayland-protocols/wayland-protocols.hash
 @@ -1,4 +1,4 @@
