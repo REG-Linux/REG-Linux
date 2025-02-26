@@ -1,5 +1,5 @@
 diff --git a/linux/Config.in b/linux/Config.in
-index 2f37a2e4184..ae374a90e7a 100644
+index 2f37a2e418..ae374a90e7 100644
 --- a/linux/Config.in
 +++ b/linux/Config.in
 @@ -4,6 +4,10 @@ config BR2_LINUX_KERNEL
