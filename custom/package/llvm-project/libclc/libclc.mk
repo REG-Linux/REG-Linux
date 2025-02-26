@@ -3,7 +3,7 @@
 # libclc
 #
 ################################################################################
-# batocera - remove 0001-support-out-of-tree-build.patch
+# REG remove 0001-support-out-of-tree-build.patch
 LIBCLC_VERSION = $(LLVM_PROJECT_VERSION)
 LIBCLC_SITE = $(LLVM_PROJECT_SITE)
 LIBCLC_SOURCE = libclc-$(LIBCLC_VERSION).src.tar.xz
@@ -12,8 +12,9 @@ LIBCLC_LICENSE_FILES = LICENSE.TXT
 LIBCLC_SUPPORTS_IN_SOURCE_BUILD = NO
 HOST_LIBCLC_SUPPORTS_IN_SOURCE_BUILD = NO
 
-LIBCLC_DEPENDENCIES = host-clang host-llvm host-spirv-llvm-translator
-# batocera - add host package for host-mesa3d
+# REG we need host-libclc for prepare_builtins
+LIBCLC_DEPENDENCIES = host-clang host-llvm host-spirv-llvm-translator host-libclc
+# REG add host package for host-mesa3d
 HOST_LIBCLC_DEPENDENCIES = host-clang host-llvm host-spirv-llvm-translator
 LIBCLC_INSTALL_STAGING = YES
 
@@ -44,11 +45,11 @@ LIBCLC_CONF_OPTS = \
 	-DLLVM_CONFIG="$(HOST_DIR)/bin/llvm-config"
 
 $(eval $(cmake-package))
-# batocera - add host package for host-mesa3d
+
+# REG fixup host-libclc for host-mesa3d + prepare_builtins fixup
 define HOST_LIBCLC_COPY_HOST_PREPARE_BUILTINS
 	cp $(@D)/buildroot-build/prepare_builtins $(HOST_DIR)/usr/bin/
 endef
-
 HOST_LIBCLC_POST_BUILD_HOOKS += HOST_LIBCLC_COPY_HOST_PREPARE_BUILTINS
 $(eval $(host-cmake-package))
 
