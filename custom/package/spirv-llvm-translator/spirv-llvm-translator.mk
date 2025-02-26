@@ -6,8 +6,8 @@
 
 # Generate version string using:
 #   git describe --tags --match 'v18*' --abbrev=40 origin/llvm_release_180
-# reglinux - 18.1.6 update
-SPIRV_LLVM_TRANSLATOR_VERSION = v18.1.6
+# reglinux - 19.1.4 update
+SPIRV_LLVM_TRANSLATOR_VERSION = v19.1.4
 SPIRV_LLVM_TRANSLATOR_SITE = $(call github,KhronosGroup,SPIRV-LLVM-Translator,$(SPIRV_LLVM_TRANSLATOR_VERSION))
 SPIRV_LLVM_TRANSLATOR_LICENSE = NCSA
 SPIRV_LLVM_TRANSLATOR_LICENSE_FILES = LICENSE.TXT

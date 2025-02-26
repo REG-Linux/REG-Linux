@@ -1,0 +1,15 @@
+diff --git a/package/llvm-project/llvm/llvm.mk b/package/llvm-project/llvm/llvm.mk
+index b0515474d8..74bc446770 100644
+--- a/package/llvm-project/llvm/llvm.mk
++++ b/package/llvm-project/llvm/llvm.mk
+@@ -18,7 +18,10 @@ LLVM_DEPENDENCIES = host-llvm
+ 
+ # Path to cmake modules from host-llvm-cmake
+ HOST_LLVM_CONF_OPTS += -DCMAKE_MODULE_PATH=$(HOST_DIR)/lib/cmake/llvm
++# batocera add LLVM_COMMON_CMAKE_UTILS
++HOST_LLVM_CONF_OPTS += -DLLVM_COMMON_CMAKE_UTILS=$(HOST_DIR)/lib/cmake/llvm
+ LLVM_CONF_OPTS += -DCMAKE_MODULE_PATH=$(HOST_DIR)/lib/cmake/llvm
++LLVM_CONF_OPTS += -DLLVM_COMMON_CMAKE_UTILS=$(HOST_DIR)/lib/cmake/llvm
+ 
+ # Don't build clang libcxx libcxxabi lldb compiler-rt lld polly as llvm subprojects
+ # This flag assumes that projects are checked out side-by-side and not nested

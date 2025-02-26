@@ -1,5 +1,5 @@
 diff --git a/package/sway/sway.mk b/package/sway/sway.mk
-index 0aad9de7125..c5ced64fc70 100644
+index 0aad9de712..c5ced64fc7 100644
 --- a/package/sway/sway.mk
 +++ b/package/sway/sway.mk
 @@ -4,23 +4,22 @@
