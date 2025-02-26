@@ -1,0 +1,13 @@
+diff --git a/package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch b/package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch
+index ffdd5d187f..e7c924ea48 100644
+--- a/package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch
++++ b/package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch
+@@ -61,7 +61,7 @@ index 2ad45097dc..90d6b5b748 100644
+ +        if (llvm::sys::path::is_relative(GccIinstallPrefix))
+ +        {
+ +            // Use a relative path to gcc from clang install path.
+-+            Prefixes.push_back(D.InstalledDir + "/" + GccIinstallPrefix.str());
+++            Prefixes.push_back(D.Dir + "/" + GccIinstallPrefix.str());
+ +        }
+ +        else
+ +        {

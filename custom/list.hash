@@ -4,11 +4,14 @@
 #   * a line of minus signs ('-') indicates a file that we remove from Buildroot external tree
 #   * a line of plus signs ('+') indicates a file that we add to the Buildroot external tree
 
+++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
+++++++++++++++++++++++++++++++++  package/llvm-project/llvm/001-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/pkg-rust.mk
 ++++++++++++++++++++++++++++++++  package/python-pyelftools/Config.in.host
 ++++++++++++++++++++++++++++++++  package/python-pylibfdt/Config.in.host
 ++++++++++++++++++++++++++++++++  package/python-setuptools-scm/Config.in.host
 ++++++++++++++++++++++++++++++++  package/spirv-llvm-translator/Config.in
+--------------------------------  package/llvm-project/libclc/0001-support-out-of-tree-build.patch
 --------------------------------  package/mesa3d/0002-vc4-add-meson-option-to-disable-optional-neon-suppor.patch
 --------------------------------  package/wlroots/0001-Add-feature-macros-to-more-C-files.patch
 --------------------------------  package/zstd/0001-lib-libzstd.mk-fix-typo-in-the-definition-of-LIB_BIN.patch
@@ -67,14 +70,16 @@ f5e1eea1ad8369bf80e2ea3327fdf561  package/libxkbcommon/libxkbcommon.hash
 34607395f047f61cacf7fe877cfbc57a  package/libxmlb/libxmlb.mk
 ca6791a263cf113100d6f663d84081c0  package/linux-headers/Config.in.host
 84caeaa857a89462b8a4e4c775a60ea4  package/lirc-tools/lirc-tools.mk
+0b48917e45566117a9acd2225e33a15e  package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch
 6af2e1b3409965df20121e7910eaf6b7  package/llvm-project/clang/clang.hash
 9da9e955f472a13979bb5b33166ff2bc  package/llvm-project/clang/clang.mk
-f24d2d55ba4fc5e8b48ab016b6aba538  package/llvm-project/libclc/Config.in
 88d68629418e44cfcb09f7f1f05f74f6  package/llvm-project/libclc/libclc.hash
 404581f765642221dc59126556f074dd  package/llvm-project/libclc/libclc.mk
 a2945d538f12e84174e15bb56f547bdc  package/llvm-project/llvm-cmake/llvm-cmake.hash
+79000418232388e4264a3f3bab8fce44  package/llvm-project/llvm-cmake/llvm-cmake.mk
 d3e12326dfc6c9b0039637e298084771  package/llvm-project/llvm-project.mk
 38a00ce9a91212eeb814cb4f7b38173e  package/llvm-project/llvm/llvm.hash
+7f32e39005c82402aef4ab8b64083b89  package/llvm-project/llvm/llvm.mk
 e135d51d57e1d2a13110ad411fb88dfc  package/mesa3d-headers/mesa3d-headers.mk
 8f620eef97e35015a6ed99326bba18f5  package/mesa3d/Config.in
 56c99af2aaeed83c243e7455722db56f  package/mesa3d/mesa3d.hash

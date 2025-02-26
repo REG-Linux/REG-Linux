@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/llvm-project.mk b/package/llvm-project/llvm-project.mk
-index 5859ff7cfc..e9562f8431 100644
+index 5859ff7cfc..903d3cd32d 100644
 --- a/package/llvm-project/llvm-project.mk
 +++ b/package/llvm-project/llvm-project.mk
 @@ -4,8 +4,9 @@
@@ -8,9 +8,9 @@ index 5859ff7cfc..e9562f8431 100644
  
 -LLVM_PROJECT_VERSION_MAJOR = 15
 -LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).0.3
-+# reglinux -  bump to 18.1.2
-+LLVM_PROJECT_VERSION_MAJOR = 18
-+LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).1.2
++# reglinux -  bump to 19.1.7
++LLVM_PROJECT_VERSION_MAJOR = 19
++LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).1.7
  LLVM_PROJECT_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(LLVM_PROJECT_VERSION)
  
  include $(sort $(wildcard package/llvm-project/*/*.mk))

@@ -1,5 +1,5 @@
 diff --git a/package/wlroots/wlroots.mk b/package/wlroots/wlroots.mk
-index fdd2fb8250b..dd8c3a3e36a 100644
+index fdd2fb8250..dd8c3a3e36 100644
 --- a/package/wlroots/wlroots.mk
 +++ b/package/wlroots/wlroots.mk
 @@ -4,7 +4,7 @@
