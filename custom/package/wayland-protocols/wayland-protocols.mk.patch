@@ -1,5 +1,5 @@
 diff --git a/package/wayland-protocols/wayland-protocols.mk b/package/wayland-protocols/wayland-protocols.mk
-index c0dfe69401..e5718157ea 100644
+index c0dfe69401..5830a58984 100644
 --- a/package/wayland-protocols/wayland-protocols.mk
 +++ b/package/wayland-protocols/wayland-protocols.mk
 @@ -4,14 +4,20 @@
@@ -15,7 +15,7 @@ index c0dfe69401..e5718157ea 100644
  WAYLAND_PROTOCOLS_INSTALL_STAGING = YES
  WAYLAND_PROTOCOLS_INSTALL_TARGET = NO
 +# needs wayland-scanner
-++WAYLAND_PROTOCOLS_DEPENDENCIES = host-wayland
++WAYLAND_PROTOCOLS_DEPENDENCIES = host-wayland
  
  WAYLAND_PROTOCOLS_CONF_OPTS = -Dtests=false
  
