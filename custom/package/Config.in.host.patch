@@ -1,12 +1,13 @@
 diff --git a/package/Config.in.host b/package/Config.in.host
-index 191833d94d..77fe4e096e 100644
+index 191833d94d..4fab6e8c9c 100644
 --- a/package/Config.in.host
 +++ b/package/Config.in.host
-@@ -127,4 +127,8 @@ menu "Host utilities"
+@@ -127,4 +127,9 @@ menu "Host utilities"
  	source "package/zip/Config.in.host"
  	source "package/zstd/Config.in.host"
  
 +	# REG
++	source "package/llvm-project/llvm-cmake/Config.in.host"
 +	source "package/python-pyelftools/Config.in.host"
 +	source "package/python-pylibfdt/Config.in.host"
 +	source "package/python-setuptools-scm/Config.in.host"
