@@ -9,12 +9,3 @@
  endif()
  include(${LLVM_COMMON_CMAKE_UTILS}/Modules/CMakePolicy.cmake
    NO_POLICY_SCOPE)
-@@ -18,7 +18,7 @@
- # we can include cmake files from this directory.
- list(INSERT CMAKE_MODULE_PATH 0
-   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules"
--  "${LLVM_COMMON_CMAKE_UTILS}/Modules"
-+  "${LLVM_COMMON_CMAKE_UTILS}"
-   )
- 
- # Must go below project(..)
