@@ -5,6 +5,7 @@
 #   * a line of plus signs ('+') indicates a file that we add to the Buildroot external tree
 
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
+++++++++++++++++++++++++++++++++  package/llvm-project/llvm-cmake/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm/001-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/pkg-rust.mk
 ++++++++++++++++++++++++++++++++  package/python-pyelftools/Config.in.host
@@ -78,6 +79,7 @@ ca6791a263cf113100d6f663d84081c0  package/linux-headers/Config.in.host
 a2945d538f12e84174e15bb56f547bdc  package/llvm-project/llvm-cmake/llvm-cmake.hash
 79000418232388e4264a3f3bab8fce44  package/llvm-project/llvm-cmake/llvm-cmake.mk
 d3e12326dfc6c9b0039637e298084771  package/llvm-project/llvm-project.mk
+be6ac651da6356e2ce471d6c3d4dc2d8  package/llvm-project/llvm/Config.in
 38a00ce9a91212eeb814cb4f7b38173e  package/llvm-project/llvm/llvm.hash
 7f32e39005c82402aef4ab8b64083b89  package/llvm-project/llvm/llvm.mk
 e135d51d57e1d2a13110ad411fb88dfc  package/mesa3d-headers/mesa3d-headers.mk
