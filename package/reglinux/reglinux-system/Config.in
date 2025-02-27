@@ -1837,7 +1837,6 @@ config BR2_PACKAGE_REGLINUX_SWAY
 	bool "REG-Linux sway packages selection"
 
 	select BR2_PACKAGE_SEATD
-	select BR2_PACKAGE_SEATD_DAEMON
 	select BR2_PACKAGE_SWAY
 	select BR2_PACKAGE_SWAYBG
 
@@ -1845,7 +1844,6 @@ config BR2_PACKAGE_REGLINUX_GAMESCOPE
 	bool "REG-Linux gamescope packages selection"
 
 	select BR2_PACKAGE_SEATD
-	select BR2_PACKAGE_SEATD_DAEMON
 	select BR2_PACKAGE_GAMESCOPE
 
 config BR2_PACKAGE_REGLINUX_XWAYLAND
