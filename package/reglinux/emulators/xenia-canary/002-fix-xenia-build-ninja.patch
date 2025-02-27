@@ -1,0 +1,19 @@
+--- a/xenia-build	2025-02-02 16:41:21.164034956 +0100
++++ b/xenia-build	2025-02-02 16:42:34.942669846 +0100
+@@ -866,6 +866,7 @@
+                 '-DCMAKE_BUILD_TYPE=%s' % (args['config'].title()),
+                 '-DCMAKE_C_COMPILER=' + os.environ.get('CC', 'clang'),
+                 '-DCMAKE_CXX_COMPILER=' + os.environ.get('CXX', 'clang++'),
++                '-DCMAKE_MAKE_PROGRAM=%s' % (os.environ["NINJA"]),
+                 '-GNinja'
+             ] + pass_args, shell=False, env=dict(os.environ))
+             print('')
+@@ -873,7 +874,7 @@
+                 print('ERROR: cmake failed with one or more errors.')
+                 return result
+             result = subprocess.call([
+-                    'ninja',
++                    os.environ["NINJA"],
+                     '-C./build/build_%s' % (args['config']),
+                     '-j' if threads == 0 else '-j%d' % threads,
+                 ] + pass_args, shell=False, env=dict(os.environ))
