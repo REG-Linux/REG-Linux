@@ -47,7 +47,3 @@ pet:
 fbneo:
   options:
     frameskip: auto
-flash:
-  emulator: lightspark
-  core:     lightspark
-
