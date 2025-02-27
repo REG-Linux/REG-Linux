@@ -87,11 +87,12 @@ endef
 # That 'syslinux' binary is an installer actually built for the target.
 # However, buildroot makes no usage of it, so better delete it than have it
 # installed at the wrong place
-define SYSLINUX_POST_INSTALL_CLEANUP
-# batocera need syslinux util
-	# rm -rf $(HOST_DIR)/bin/syslinux
-endef
-SYSLINUX_POST_INSTALL_TARGET_HOOKS += SYSLINUX_POST_INSTALL_CLEANUP
+#
+# batocera: patch added to build syslinux tool for the host
+# define SYSLINUX_POST_INSTALL_CLEANUP
+# 	rm -rf $(HOST_DIR)/bin/syslinux
+# endef
+# SYSLINUX_POST_INSTALL_TARGET_HOOKS += SYSLINUX_POST_INSTALL_CLEANUP
 
 SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_ISOLINUX) += bios/core/isolinux.bin
 SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_PXELINUX) += bios/core/pxelinux.bin
@@ -105,7 +106,8 @@ SYSLINUX_C32 = $(call qstrip,$(BR2_TARGET_SYSLINUX_C32))
 # We install the c32 modules from the host-installed tree, where they
 # are all neatly installed in a single location, while they are
 # scattered around everywhere in the build tree.
-define SYSLINUX_INSTALL_IMAGES_CMDS
+# REG we need to have custom INSTALL_IMAGES after INSTALL_TARGET for parallel build
+define SYSLINUX_INSTALL_IMAGES
 	for i in $(SYSLINUX_IMAGES-y); do \
 		$(INSTALL) -D -m 0755 $(@D)/$$i $(BINARIES_DIR)/syslinux/$${i##*/}; \
 	done
@@ -114,5 +116,6 @@ define SYSLINUX_INSTALL_IMAGES_CMDS
 			$(BINARIES_DIR)/syslinux/$${i}; \
 	done
 endef
+SYSLINUX_POST_INSTALL_TARGET_HOOKS += SYSLINUX_INSTALL_IMAGES
 
 $(eval $(generic-package))
