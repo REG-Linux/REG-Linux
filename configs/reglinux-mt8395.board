@@ -10,7 +10,7 @@ BR2_TARGET_OPTIMIZATION="-pipe"
 # GCC 13 does not support -mcpu=cortex-a78.cortex-a55 -mtune=cortex-a78.cortex-a55
 BR2_TARGET_GENERIC_GETTY_PORT="/dev/ttyFIQ0"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_921600=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/mediatek/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/mediatek/mt8395/patches"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/mediatek/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/mediatek/mt8395/patches"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/mediatek/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/mediatek/mt8395/fsoverlay"
 
 # Kernel

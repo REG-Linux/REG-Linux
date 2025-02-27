@@ -9,7 +9,7 @@ BR2_PACKAGE_BATOCERA_TARGET_S922X=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
 BR2_TARGET_GENERIC_GETTY_PORT="ttyAML0"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/s922x/patches"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/s922x/patches"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/amlogic/s922x/fsoverlay"
 
 # Kernel
