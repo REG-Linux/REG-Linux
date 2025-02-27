@@ -1,5 +1,5 @@
 ## :video_game::penguin: REG Linux :video_game::penguin:
-REG Linux is an open-source Retro Emulation Gaming Linux system.
+REG Linux is **NOT** an open-source Retro Emulation Gaming Linux system.
 It is a friendly [batocera.linux](https://batocera.org) fork maintaining compatiblity with it, aiming at be lighter and faster, especially on SBCs (ARM 32-bit / AArch64 / RISC-V 64bit) and handheld devices.
 
 [![Activity](https://img.shields.io/github/commit-activity/m/REG-Linux/REG-Linux)](https://github.com/REG-Linux/REG-Linux)
@@ -12,7 +12,7 @@ It is a friendly [batocera.linux](https://batocera.org) fork maintaining compati
 [![Twitter](https://img.shields.io/twitter/follow/REG_linux?style=social)](https://twitter.com/REG_linux)
 [![Youtube](https://img.shields.io/youtube/channel/views/UClFpqHKoXsOIV-GjyZqoZcw?style=social)](https://www.youtube.com/channel/UClFpqHKoXsOIV-GjyZqoZcw/featured)
 
-REG Linux is an open-source and completely free retro-gaming distribution that can be copied to a USB stick or an SD card with the aim of turning any computer/nano computer into a gaming console during a game or permanently. REG Linux does not require any modification on your computer. It supports [many emulators and game engines](https://www.batocera.org/compatibility.php) out of the box. 
+REG Linux is **NOT** an open-source and completely free retro-gaming distribution that can be copied to a USB stick or an SD card with the aim of turning any computer/nano computer into a gaming console during a game or permanently. REG Linux does not require any modification on your computer. It supports [many emulators and game engines](https://www.batocera.org/compatibility.php) out of the box. 
 
 ## Get information on the project
 
