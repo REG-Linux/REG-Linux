@@ -7,20 +7,7 @@ eslog = get_logger(__name__)
 
 
 sway_launched = False
-weston_launched = False
 gamescope_launched = False
-
-# TODO implement start_weston
-def start_weston(generator, system):
-    global weston_launched
-    if not weston_launched:
-        weston_launched = True
-
-# TODO implement stop_weston
-def stop_weston(generator, system):
-    global weston_launched
-    if weston_launched:
-        weston_launched = False
 
 def start_sway(generator, system):
     global sway_launched
@@ -50,11 +37,6 @@ def stop_sway(generator, system):
 
 # TODO handle gamescope
 def start_compositor(generator, system):
-    # If Weston is present, we should use it
-    if os.path.exists("/usr/bin/weston"):
-        start_weston(generator, system)
-        return
-
     # Fallback on Sway (default case)
     if os.path.exists("/usr/bin/sway"):
         start_sway(generator, system)
@@ -65,9 +47,4 @@ def stop_compositor(generator, system):
     # Stop sway if launched
     if sway_launched:
         stop_sway(generator, system)
-        return
-
-    # Stop weston if launched
-    if weston_launched:
-        stop_weston(generator, system)
         return
