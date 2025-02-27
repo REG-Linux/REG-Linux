@@ -97,12 +97,6 @@ then
     sed -i "s/start-stop-daemon -S -q /start-stop-daemon -S -q -N 10 /g" "${TARGET_DIR}/etc/init.d/S33rngd"  || exit 1 # set rngd niceness to 10 (to decrease slowdown of other processes)
 fi
 
-# seatd - Seatd needs to be enabled before Wayland window compositor is released
-if test -e "${TARGET_DIR}/etc/init.d/S70seatd"
-then
-    mv "${TARGET_DIR}/etc/init.d/S70seatd"    "${TARGET_DIR}/etc/init.d/S03seatd"    || exit 1
-fi
-
 # triggerhappy
 if test -e "${TARGET_DIR}/etc/init.d/S10triggerhappy"
 then
