@@ -1,0 +1,50 @@
+--- a/TheForceEngine/TFE_ForceScript/Angelscript/angelscript/source/as_callfunc_arm64.cpp	2025-02-27 10:48:54.474237495 +0100
++++ b/TheForceEngine/TFE_ForceScript/Angelscript/angelscript/source/as_callfunc_arm64.cpp	2025-02-27 10:49:19.318821205 +0100
+@@ -1,3 +1,4 @@
++#if 0
+ /*
+    AngelCode Scripting Library
+    Copyright (c) 2020-2021 Andreas Jonsson
+@@ -327,3 +328,4 @@
+ 
+ 
+ 
++#endif
+--- a/TheForceEngine/TFE_ForceScript/Angelscript/angelscript/source/as_config.h	2025-02-27 10:54:54.122701731 +0100
++++ b/TheForceEngine/TFE_ForceScript/Angelscript/angelscript/source/as_config.h	2025-02-27 10:55:25.645444782 +0100
+@@ -527,7 +527,7 @@
+ 	#endif
+ 
+ 	#if defined(_M_ARM64)
+-		#define AS_ARM64
++		//#define AS_ARM64
+ 
+ 		// TODO: MORE HERE
+ 	#endif
+@@ -666,7 +666,7 @@
+ 		#if (!defined(__LP64__))
+ 			#error write me
+ 		#else
+-			#define AS_ARM64
++			//#define AS_ARM64
+ 			#undef STDCALL
+ 			#define STDCALL
+ 
+@@ -963,7 +963,7 @@
+ 				// Tested with both hard float and soft float abi
+ 				#undef AS_NO_THISCALL_FUNCTOR_METHOD
+ 			#elif defined(__LP64__) || defined(__aarch64__)
+-				#define AS_ARM64
++				//#define AS_ARM64
+ 
+ 				#undef STDCALL
+ 				#define STDCALL
+@@ -1149,7 +1149,7 @@
+ 				#define AS_SOFTFP
+ 				#define AS_CALLEE_DESTROY_OBJ_BY_VAL
+ 			#elif (defined(__LP64__) || defined(__aarch64__))
+-				#define AS_ARM64
++				//#define AS_ARM64
+ 
+ 				#define HAS_128_BIT_PRIMITIVES
+ 
