@@ -4,12 +4,8 @@
 #
 ################################################################################
 # Version.: Commits on Feb 16, 2025
-# GLES support broken in 0.9.0 so far, so we use 0.8.7 for GLES-only targets
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# GLES support broken in 0.9.0 so far, so desktop GL only
 LIGHTSPARK_VERSION = 0.9.0
-else
-LIGHTSPARK_VERSION = 0.8.7
-endif
 LIGHTSPARK_SITE = $(call github,lightspark,lightspark,$(LIGHTSPARK_VERSION))
 LIGHTSPARK_LICENSE = LGPLv3
 LIGHTSPARK_DEPENDENCIES = sdl2 freetype pcre jpeg libpng cairo pango ffmpeg libcurl rtmpdump
