@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Starts qualcomm fan control daemon on Batocera
+# Starts qualcomm fan control daemon on REGLinux
 #
 
 start() {
