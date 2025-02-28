@@ -8,7 +8,7 @@ f_usage() {
     echo "${0} gpicase2w" >&2
 }
 
-do_config(){
+do_config() {
     setup="# ====== GPi Case setup section =====
     ${video}
     dtparam=act_led_trigger=none
@@ -16,14 +16,12 @@ do_config(){
     # ====== GPi Case setup section end ====="
 
     echo "${setup}" | (
-    while read LINE
-    do
-        if ! grep -qE "^${LINE}$" "${CONFIGFILE}"
-        then
-            mount -o remount,rw /boot
-            echo "${LINE}" >> "${CONFIGFILE}"
-        fi
-    done
+        while read -r LINE; do
+            if ! grep -qE "^${LINE}$" "${CONFIGFILE}"; then
+                mount -o remount,rw /boot
+                echo "${LINE}" >>"${CONFIGFILE}"
+            fi
+        done
     )
     >&2 echo "${ACTION} support installed!"
     >&2 echo "Please reboot the system so that the changes take effect!"
@@ -37,22 +35,23 @@ fi
 ACTION=$1
 
 case "${ACTION}" in
-    "gpicase")
-        video="dtoverlay=retroflag-gpicase"
-        /usr/bin/system-settings-set system.es.environment sway
-        do_config
+"gpicase")
+    video="dtoverlay=retroflag-gpicase"
+    /usr/bin/system-settings-set system.es.environment sway
+    do_config
     ;;
-    "gpicase2")
-        video="dtoverlay=retroflag-gpicase2"
-        do_config
+"gpicase2")
+    video="dtoverlay=retroflag-gpicase2"
+    do_config
     ;;
-    "gpicase2w")
-        video="dtoverlay=retroflag-gpicase2w"
-        do_config
+"gpicase2w")
+    video="dtoverlay=retroflag-gpicase2w"
+    do_config
     ;;
-    *)
-        f_usage
-        >&2 echo "error: invalid command ${ACTION}"
-        exit 1
+*)
+    f_usage
+    >&2 echo "error: invalid command ${ACTION}"
+    exit 1
+    ;;
 esac
 exit 0
