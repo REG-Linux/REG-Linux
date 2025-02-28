@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VCMI_VERSION = 1.6.6
+VCMI_VERSION = 1.6.7
 VCMI_SITE = https://github.com/vcmi/vcmi.git
 VCMI_SITE_METHOD=git
 VCMI_GIT_SUBMODULES=YES
