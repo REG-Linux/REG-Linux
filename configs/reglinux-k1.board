@@ -10,8 +10,8 @@ BR2_PACKAGE_BATOCERA_TARGET_K1=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mabi=lp64d -march=rv64imafdv"
 #BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/riscv64"
-BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/batocera/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/spacemit/k1/fsoverlay"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/riscv64"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/spacemit/k1/fsoverlay"
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 
 # Linux headers same as kernel, a 6.6 series
