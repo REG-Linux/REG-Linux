@@ -46,23 +46,7 @@ SUFFIXDATE=$(date +%Y%m%d)
 VFATUUID="$(date '+%d%m')-$(date '+%M%S')"
 
 #### build the images ###########
-TARGET_BOARD_PARENT_PATH="board/batocera"
-if [ "${BATOCERA_LOWER_TARGET}" = "jz4770" ]
-then
-    TARGET_BOARD_PARENT_PATH="board/reglinux"
-fi
-if [ "${BATOCERA_LOWER_TARGET}" = "s812" ]
-then
-    TARGET_BOARD_PARENT_PATH="board/reglinux"
-fi
-if [ "${BATOCERA_LOWER_TARGET}" = "mt8395" ]
-then
-    TARGET_BOARD_PARENT_PATH="board/reglinux"
-fi
-if [ "${BATOCERA_LOWER_TARGET}" = "k1" ]
-then
-    TARGET_BOARD_PARENT_PATH="board/reglinux"
-fi
+TARGET_BOARD_PARENT_PATH="board"
 for BATOCERA_PATHSUBTARGET in ${BATOCERA_IMAGES_TARGETS}
 do
     BATOCERA_SUBTARGET=$(basename "${BATOCERA_PATHSUBTARGET}")
