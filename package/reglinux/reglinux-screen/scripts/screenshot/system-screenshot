@@ -7,7 +7,7 @@ else
 fi
 
 FILE=$1
-if [ -z ${FILE} ]; then
+if [ -z "${FILE}" ]; then
     FILE="/userdata/screenshots/screenshot-$(date +%Y.%m.%d-%Hh%M.%S).png"
 fi
 
