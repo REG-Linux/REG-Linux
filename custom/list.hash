@@ -117,6 +117,8 @@ acfa8ca648f4b5a0af9b43fadfef999f  package/sdl2_ttf/sdl2_ttf.hash
 7d9f94141609178cfaf07bd71de49d21  package/sdl2_ttf/sdl2_ttf.mk
 76f5941c64fe63d71fdbafde3594ba78  package/sdl_sound/Config.in
 7255c6ecc9f8bd6a511a495b1c8c1d0a  package/sdl_sound/sdl_sound.mk
+00c06867fae2d7bf2420d88f35d871ae  package/seatd/seatd.hash
+f8115f40ab8f91c582c849abe908c922  package/seatd/seatd.mk
 467e487766b8692cd8b1aacd687549ae  package/spirv-headers/spirv-headers.hash
 fe682db3b2dc904bd3e6b7ec3a8d25ce  package/spirv-headers/spirv-headers.mk
 eebb3f819eeacda5b02f38983698d6cc  package/spirv-llvm-translator/spirv-llvm-translator.hash
