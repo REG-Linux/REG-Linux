@@ -10,14 +10,12 @@ PACMAN_SOURCE = pacman-$(PACMAN_VERSION).tar.gz
 PACMAN_LICENSE = GPLv2
 PACMAN_DEPENDENCIES = libarchive libcurl libgpgme openssl python-httplib2
 
-ifneq ($(BR2_mipsel),y)
+ifeq ($(BR2_PACKAGE_GLIBC),y)
 PACMAN_DEPENDENCIES += glibc
 endif
 
 ifeq ($(BR2_x86_64),y)
 PACMAN_ARCH = x86_64
-else ifeq ($(BR2_x86_i686),y)
-PACMAN_ARCH = x86
 else ifeq ($(BR2_aarch64),y)
 PACMAN_ARCH = aarch64
 else ifeq ($(BR2_arm),y)

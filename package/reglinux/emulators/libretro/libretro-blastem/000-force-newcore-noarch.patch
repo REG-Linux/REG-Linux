@@ -1,6 +1,46 @@
---- a/Makefile	2025-02-07 15:22:44.153125519 +0100
-+++ b/Makefile	2025-02-07 15:23:55.942616665 +0100
-@@ -211,22 +211,9 @@
+--- a/Makefile	2025-02-28 11:42:08.709942066 +0100
++++ b/Makefile	2025-02-28 11:45:48.993300518 +0100
+@@ -63,9 +63,7 @@
+ else
+ SO:=so
+ 
+-ifeq ($(CPU),wasm)
+ USE_GLES:=1
+-endif
+ 
+ ifdef USE_FBDEV
+ LIBS=alsa
+@@ -212,29 +210,7 @@
+ CFLAGS+= -DM68010
+ endif
+ 
+-ifndef CPU
+-CPU:=$(shell uname -m)
+-endif
+-
+-#OpenBSD uses different names for these architectures
+-ifeq ($(CPU),amd64)
+-CPU:=x86_64
+-else
+-ifeq ($(CPU),i386)
+-CPU:=i686
+-endif
+-endif
+-ifeq ($(CPU),x86_64)
+-CFLAGS+=-DX86_64 -m64
+-LDFLAGS+=-m64
+-else
+-ifeq ($(CPU),i686)
+-CFLAGS+=-DX86_32 -m32
+-LDFLAGS+=-m32
+-else
+ NEW_CORE:=1
+-endif
+-endif
+ 
+ TRANSOBJS=gen.o backend.o $(MEM) arena.o tern.o
+ M68KOBJS=68kinst.o disasm.o
+@@ -243,22 +219,9 @@
  CHOOSER:=nuklear_ui/filechooser_nulll.o
  endif
  
@@ -23,22 +63,3 @@
  AUDIOOBJS=ym2612.o ymf262.o ym_common.o psg.o wave.o flac.o vgm.o event_log.o render_audio.o rf5c164.o
  CONFIGOBJS=config.o tern.o util.o paths.o
  NUKLEAROBJS=$(FONT) $(CHOOSER) nuklear_ui/blastem_nuklear.o nuklear_ui/sfnt.o
-@@ -247,18 +247,6 @@
- LDFLAGS+=$(EXTRA_NUKLEAR_LDFLAGS)
- endif
- 
--ifeq ($(CPU),x86_64)
--CFLAGS+=-DX86_64 -m64
--LDFLAGS+=-m64
--else
--ifeq ($(CPU),i686)
--CFLAGS+=-DX86_32 -m32
--LDFLAGS+=-m32
--else
--$(error $(CPU) is not a supported architecture)
--endif
--endif
--
- ifdef NOZ80
- CFLAGS+=-DNO_Z80
- else

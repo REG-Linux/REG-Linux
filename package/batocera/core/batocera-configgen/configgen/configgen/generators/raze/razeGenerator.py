@@ -109,7 +109,7 @@ class RazeGenerator(Generator):
                     if line.strip().startswith("gl_es="):
                         if system.isOptSet("raze_api") and system.config["raze_api"] != "2":
                             if system.isOptSet("raze_api") and system.config["raze_api"] == "0":
-                                if architecture in ["x86_64", "amd64", "i686", "i386"]:
+                                if architecture in ["x86_64", "amd64"]:
                                     line = "gl_es=false\n"
                                 else:
                                     eslog.debug(f"*** Architecture isn't intel it's: {architecture} therefore es is true ***")
@@ -133,7 +133,7 @@ class RazeGenerator(Generator):
                 config_file.write("[GlobalSettings]\n")
                 if system.isOptSet("raze_api") and system.config["raze_api"] != "2":
                     if system.isOptSet("raze_api") and system.config["raze_api"] == "0":
-                        if architecture in ["x86_64", "amd64", "i686", "i386"]:
+                        if architecture in ["x86_64", "amd64"]:
                             line = "gl_es=false\n"
                         else:
                             eslog.debug(f"*** Architecture isn't intel it's: {architecture} therefore es is true ***")
