@@ -1,0 +1,25 @@
+--- a/external/xxHash/Makefile	2024-11-20 14:24:29.103984197 +0100
++++ b/external/xxHash/Makefile	2024-11-20 14:24:36.422128948 +0100
+@@ -101,10 +101,6 @@
+ all: lib xxhsum xxhsum_inlinedXXH
+ 
+ ## xxhsum is the command line interface (CLI)
+-ifeq ($(DISPATCH),1)
+-xxhsum: CPPFLAGS += -DXXHSUM_DISPATCH=1
+-xxhsum: xxh_x86dispatch.o
+-endif
+ xxhsum: xxhash.o $(XXHSUM_SPLIT_OBJS)
+ 	$(CC) $(FLAGS) $^ $(LDFLAGS) -o $@$(EXT)
+ 
+--- a/external/CMakeLists.txt	2024-11-20 14:27:17.465309992 +0100
++++ b/external/CMakeLists.txt	2024-11-20 14:27:24.202442905 +0100
+@@ -331,9 +331,6 @@
+ option(BUILD_SHARED_LIBS "Build shared library" OFF)
+ option(XXHASH_BUILD_XXHSUM "Build the xxhsum binary" OFF)
+ option(XXH_X86DISPATCH_ALLOW_AVX "Allow building XXH3 with AVX even if it crashes on SSE2-Only CPUs" OFF)
+-if(NOT APPLE)
+-	set(DISPATCH 1)
+-endif()
+ add_subdirectory(xxHash/cmake_unofficial EXCLUDE_FROM_ALL)
+ if(XXH_X86DISPATCH_ALLOW_AVX)
+ 	target_compile_definitions(xxhash PRIVATE XXH_X86DISPATCH_ALLOW_AVX)
