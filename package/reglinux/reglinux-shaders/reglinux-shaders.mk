@@ -40,6 +40,8 @@ else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_ODIN),y)
 	REGLINUX_GPU_SYSTEM = adreno-630
 else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8250),y)
 	REGLINUX_GPU_SYSTEM = adreno-650
+else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_SM8550),y)
+	REGLINUX_GPU_SYSTEM = adreno-740
 # We would need a separate s912 target to take advantage of the more powerful T820 GPU instead of G31
 #else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_S912),y)
 #	REGLINUX_GPU_SYSTEM = mali-t820
