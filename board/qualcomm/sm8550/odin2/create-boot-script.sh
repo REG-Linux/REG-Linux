@@ -5,7 +5,7 @@
 # BUILD_DIR = base dir/build
 # BINARIES_DIR = images dir
 # TARGET_DIR = target dir
-# BATOCERA_BINARIES_DIR = batocera binaries sub directory
+# REGLINUX_BINARIES_DIR = reglinux binaries sub directory
 
 HOST_DIR=$1
 BOARD_DIR=$2
