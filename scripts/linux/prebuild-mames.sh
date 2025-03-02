@@ -29,7 +29,8 @@ sed -i s/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/BR2_PACKAGE_MAME_BUILD_FROM_SOURC
 # s922x can be used for a3gen2 (cortex_a73_a53)
 # rk3588 can be used for sm8250 (cortex_a76_a55)
 # jh7110 can be used for k1 (no vector extensions support however)
-for arch in s812 odroidxu4 rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x saphira jh7110 x86_64 x86_64_v3; do
+# DEPRECATED : ARM 32-bit targets : s812 odroidxu4 rk3288
+for arch in h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x saphira jh7110 x86_64 x86_64_v3; do
 	# Clean
 	make ${arch}-clean
 	# Build
