@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SDL3_MIXER_VERSION = 4be37aed1a4b76df71a814fbfa8ec9983f3b5508
+SDL3_MIXER_VERSION = 78a2035cf4cf95066d7d9e6208e99507376409a7
 SDL3_MIXER_SITE = https://github.com/libsdl-org/SDL_mixer.git
 SDL3_MIXER_SITE_METHOD = git
 SDL3_MIXER_GIT_SUBMODULES = yes
