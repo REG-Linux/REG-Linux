@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SDL3_IMAGE_VERSION = release-3.2.0
+SDL3_IMAGE_VERSION = release-3.2.2
 SDL3_IMAGE_SITE = https://github.com/libsdl-org/SDL_image.git
 SDL3_IMAGE_SITE_METHOD = git
 SDL3_IMAGE_GIT_SUBMODULES = yes
