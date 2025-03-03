@@ -36,7 +36,7 @@ PPSSPP_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF
 endif
 
 # make sure to select glvnd and depends on glew / glu because of X11 desktop GL
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_ANY),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_ANY),y)
     PPSSPP_CONF_OPTS += -DOpenGL_GL_PREFERENCE=GLVND
     PPSSPP_DEPENDENCIES += libglew libglu
 endif
@@ -89,11 +89,11 @@ ifeq ($(BR2_riscv),y)
 endif
 
 # x86
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86),y)
     PPSSPP_CONF_OPTS += -DX86=ON
 endif
 
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
     PPSSPP_CONF_OPTS += -DX86_64=ON
 endif
 

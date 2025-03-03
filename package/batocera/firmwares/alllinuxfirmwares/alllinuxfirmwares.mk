@@ -17,7 +17,7 @@ else
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
 endif
 
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_CHA),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/brcm $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ti $(@D)/b43 $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm
@@ -29,7 +29,7 @@ ifeq ($(BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI)$(BR2_PACKAGE_EXTRALINUXFIRMWARES
 endif
 
 # Remove qualcomm firmware if not building for snapdragon targets
-ifneq ($(BR2_PACKAGE_BATOCERA_TARGET_ODIN)$(BR2_PACKAGE_BATOCERA_TARGET_SM8250)$(BR2_PACKAGE_BATOCERA_TARGET_SM8550),y)
+ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_ODIN)$(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
     ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/qcom
 endif
 
@@ -86,7 +86,7 @@ define ALLLINUXFIRMWARES_LINK_RTL_BT
         $(TARGET_DIR)/lib/firmware/rtl8852bu_config
 endef
 
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3588),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3588),y)
     ALLLINUXFIRMWARES_POST_INSTALL_TARGET_HOOKS = ALLLINUXFIRMWARES_LINK_RTL_BT
 endif
 

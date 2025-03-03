@@ -28,7 +28,7 @@ LIBRETRO_VECX_PLATFORM = rpi-mesa
 else ifeq ($(BR2_aarch64),y)
 LIBRETRO_VECX_PLATFORM = unix
 
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_S812),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
 LIBRETRO_VECX_PLATFORM = armv
 
 else ifeq ($(BR2_PACKAGE_HAS_LIBMALI),y)

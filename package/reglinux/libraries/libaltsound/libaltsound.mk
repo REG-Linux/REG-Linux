@@ -23,7 +23,7 @@ ifeq ($(BR2_aarch64),y)
     BASS_ARCH = aarch64
 endif
 
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
     BUILD_ARCH = x64
     BASS_ARCH = x86_64
 endif
