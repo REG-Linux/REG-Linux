@@ -1,0 +1,6 @@
+config BR2_PACKAGE_ASAHI_ALSA_UCM_CONF
+	bool "asahi-alsa-ucm-conf"
+	help
+	  Asahi Linux ALSA Use Case Manager configuration overlay.
+
+	  https://github.com/AsahiLinux/alsa-ucm-conf-asahi
