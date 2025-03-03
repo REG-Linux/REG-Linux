@@ -1,0 +1,6 @@
+config BR2_PACKAGE_ASAHI_AUDIO
+	bool "asahi-audio"
+	help
+	  Linux userspace audio configuration for Apple Silicon Macs.
+
+	  https://github.com/AsahiLinux/asahi-audio

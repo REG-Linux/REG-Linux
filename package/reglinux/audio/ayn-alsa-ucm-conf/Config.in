@@ -1,0 +1,6 @@
+config BR2_PACKAGE_AYN_ALSA_UCM_CONF
+	bool "ayn-alsa-ucm-conf"
+	help
+	  AYN Technologies ALSA Use Case Manager configuration overlay.
+
+	  https://github.com/AYNTechnologies/alsa-ucm-conf
