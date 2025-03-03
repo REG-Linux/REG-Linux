@@ -407,13 +407,6 @@ menu "Libraries"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/libraries/python-binho-host-adapter/Config.in"
 endmenu
 
-menu "Audio"
-  source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/rtmidi/Config.in"
-  source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/chromebook-ucm-conf/Config.in"
-  source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/chromebook-linux-audio/Config.in"
-  source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/alsa-topology-conf/Config.in"
-  source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/audio/alsa-ucm-conf/Config.in"
-endmenu
 
 menu "Database"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/database/influxdb/Config.in"
@@ -427,6 +420,16 @@ menu "REG.linux"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/boot/uboot-tinkerboard2/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/boot/ubiboot/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/boot/mininit/Config.in"
+
+menu "Audio"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/audio/alsa-ucm-conf/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/audio/ayn-alsa-ucm-conf/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/audio/asahi-alsa-ucm-conf/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/audio/chromebook-ucm-conf/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/audio/alsa-topology-conf/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/audio/chromebook-linux-audio/Config.in"
+  source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/audio/rtmidi/Config.in"
+endmenu
 
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/retroarch/retroarch/Config.in"
   source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/retroarch/retroarch-assets/Config.in"
