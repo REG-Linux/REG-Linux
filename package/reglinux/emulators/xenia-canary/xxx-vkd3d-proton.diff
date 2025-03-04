@@ -1,0 +1,20 @@
+--- a/package-release.sh	2025-03-04 20:35:44.679083970 +0100
++++ b/package-release.sh	2025-03-04 20:36:27.739004841 +0100
+@@ -56,7 +56,7 @@
+ 
+   cd "$VKD3D_SRC_DIR"
+ 
+-  meson setup "$@"                     \
++  "$MESON" setup "$@"                     \
+         --buildtype "${opt_buildtype}" \
+         --prefix "$VKD3D_BUILD_DIR"    \
+         $opt_strip                     \
+@@ -65,7 +65,7 @@
+         "$VKD3D_BUILD_DIR/build.${arch}"
+ 
+   cd "$VKD3D_BUILD_DIR/build.${arch}"
+-  ninja install
++  "$NINJA" install
+ 
+   if [ $opt_devbuild -eq 0 ]; then
+     if [ $opt_native -eq 0 ]; then

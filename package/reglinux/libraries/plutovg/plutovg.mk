@@ -3,9 +3,8 @@
 # plutovg
 #
 ################################################################################
-PLUTOVG_VERSION = v0.0.12
-PLUTOVG_SITE = https://github.com/sammycage/plutovg
-PLUTOVG_SITE_METHOD = git
+PLUTOVG_VERSION = v0.0.13
+PLUTOVG_SITE = $(call github,sammycage,plutovg,$(PLUTOVG_VERSION))
 PLUTOVG_LICENSE = MIT
 
 PLUTOVG_SUPPORTS_IN_SOURCE_BUILD = NO

@@ -1,0 +1,13 @@
+--- a/pcsx2/Input/SDLInputSource.cpp	2025-03-04 18:00:24.551996598 +0100
++++ b/pcsx2/Input/SDLInputSource.cpp	2025-03-04 18:02:21.803885726 +0100
+@@ -1335,8 +1335,9 @@
+ 
+ 	{
+ 		std::lock_guard lock(m_controllers_key_mutex);
++		InputBindingKey key = {InputSourceType::SDL, static_cast<u32>(it->player_id)};
+ 		InputManager::OnInputDeviceDisconnected(
+-			{InputBindingKey{.source_type = InputSourceType::SDL, .source_index = static_cast<u32>(it->player_id)}},
++			key,
+ 			fmt::format("SDL-{}", it->player_id));
+ 
+ 		if (it->haptic)

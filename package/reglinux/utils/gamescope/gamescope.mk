@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GAMESCOPE_VERSION = 3.16.1
+GAMESCOPE_VERSION = 3.16.2
 GAMESCOPE_SOURCE = gamescope-$(GAMESCOPE_VERSION).tar.gz
 GAMESCOPE_SITE = https://github.com/ValveSoftware/gamescope.git
 GAMESCOPE_SITE_METHOD = git

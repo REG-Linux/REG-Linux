@@ -12,6 +12,13 @@ XENIA_CANARY_LICENSE = BSD
 XENIA_CANARY_LICENSE_FILE = LICENSE
 
 XENIA_CANARY_DEPENDENCIES = python-toml host-llvm host-clang libgtk3 sdl2 host-sdl2
+# Extra for WIP posix stack walker
+XENIA_CANARY_DEPENDENCIES += libunwind libiberty
+
+# Hack for d3d12 WIP
+#XENIA_CANARY_DEPENDENCIES += vkd3d-proton dxvk pevents
+#MESON="$(HOST_DIR)/bin/meson" \
+#NINJA="$(HOST_DIR)/bin/ninja" \
 
 define XENIA_CANARY_CONFIGURE_CMDS
 	mkdir -p $(@D) && cd $(@D) && \
@@ -63,5 +70,16 @@ define XENIA_CANARY_POST_PROCESS
 endef
 
 XENIA_CANARY_POST_INSTALL_TARGET_HOOKS = XENIA_CANARY_POST_PROCESS
+
+# Hack for d3d12 patch
+#define XENIA_CANARY_FIX_SUBMODULES
+#	rm -f $(@D)/third_party/vkd3d-proton
+#	rm -f $(@D)/third_party/dxvk
+#	$(GIT) -C $(@D)/third_party/ clone https://github.com/HansKristian-Work/vkd3d-proton.git
+#	$(GIT) -C $(@D)/third_party/ clone https://github.com/doitsujin/dxvk.git
+#	$(GIT) -C $(@D)/third_party/ clone https://github.com/neosmart/pevents.git
+#	cd $(@D)/third_party/vkd3d-proton && patch -p1 < $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/xenia-canary/xxx-vkd3d-proton.diff
+#endef
+#XENIA_CANARY_PRE_CONFIGURE_HOOKS += XENIA_CANARY_FIX_SUBMODULES
 
 $(eval $(generic-package))
