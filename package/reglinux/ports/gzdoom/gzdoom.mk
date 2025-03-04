@@ -56,7 +56,7 @@ define GZDOOM_PATCH_USE_GLES2
 	$(SED) '1i #define __ANDROID__' $(@D)/src/common/rendering/gles/gles_system.cpp
 endef
 
-ifneq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
+ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
     GZDOOM_CONF_OPTS += -DHAVE_GLES2=ON
     GZDOOM_DEPENDENCIES += libgles
     GZDOOM_POST_PATCH_HOOKS += GZDOOM_PATCH_USE_GLES2

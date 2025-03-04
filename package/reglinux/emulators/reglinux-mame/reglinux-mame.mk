@@ -52,11 +52,11 @@ REGLINUX_MAME_ARCH = rk3588
 else ifeq ($(BR2_saphira),y)
 REGLINUX_MAME_ARCH = saphira
 # RISC-V 64 (rv64gc, aka imafd)
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_JH7110),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 REGLINUX_MAME_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
 # TODO currently uses jh7110
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_K1),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
 REGLINUX_MAME_ARCH = jh7110
 #REGLINUX_MAME_ARCH = k1
 # X86-64-v3 subarchitecture

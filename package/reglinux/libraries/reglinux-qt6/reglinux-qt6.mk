@@ -51,10 +51,10 @@ REGLINUX_QT6_ARCH = rk3288
 else ifeq ($(BR2_cortex_a53),y)
 REGLINUX_QT6_ARCH = h5
 # Cortex A35 + MALI
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_S9GEN4),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S9GEN4),y)
 REGLINUX_QT6_ARCH = s9gen4
 # A311D2 (MALI)
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_A3GEN2),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_A3GEN2),y)
 REGLINUX_QT6_ARCH = a3gen2
 # Cortex A35
 else ifeq ($(BR2_cortex_a35),y)
@@ -82,16 +82,16 @@ else
 REGLINUX_QT6_ARCH = rk3588
 endif
 # Mediatek MT8395 is cortex-a78.cortex-a55
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_MT8395),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MT8395),y)
 REGLINUX_QT6_ARCH = rk3588
 # Unknown AArch64 saphira CPU
 else ifeq ($(BR2_saphira),y)
 REGLINUX_QT6_ARCH = saphira
 # RISC-V 64 (rv64gc, aka imafd)
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_JH7110),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 REGLINUX_QT6_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_K1),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
 REGLINUX_QT6_ARCH = k1
 # X86-64-v3 subarchitecture
 else ifeq ($(BR2_x86_x86_64_v3),y)

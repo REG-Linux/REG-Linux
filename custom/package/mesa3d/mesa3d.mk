@@ -3,7 +3,7 @@
 # mesa3d
 #
 ################################################################################
-# reglinux (update)
+
 MESA3D_VERSION = 25.0.0
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://archive.mesa3d.org
@@ -27,30 +27,27 @@ MESA3D_DEPENDENCIES = \
 	host-python3 \
 	host-python-pyyaml
 
-# reglinux - need building mesa3d host-side to get a working intel_clc compiler
+# need building mesa3d host-side to get a working intel_clc compiler
 ifeq ($(BR2_x86_64),y)
 MESA3D_DEPENDENCIES += host-mesa3d
 endif
 
-# reglinux - need host-python-pycparser built for etnaviv
+# need host-python-pycparser built for etnaviv
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ETNAVIV),y)
 MESA3D_DEPENDENCIES += host-python-pycparser
 endif
 
-# batocera
+# directx-headers
 ifeq ($(BR2_PACKAGE_DIRECTX_HEADERS),y)
 MESA3D_DEPENDENCIES += directx-headers
 endif
 
-# reglinux - remove deperecated gallium-omx option
+# remove deperecated gallium-omx option
 MESA3D_CONF_OPTS = -Dpower8=disabled
 
-# reglinux - update
+# update
 ifeq ($(BR2_PACKAGE_MESA3D_DRIVER)$(BR2_PACKAGE_XORG7),yy)
-#MESA3D_CONF_OPTS += -Ddri3=enabled
 MESA3D_DEPENDENCIES += xlib_libxshmfence host-glslang
-#else
-#MESA3D_CONF_OPTS += -Ddri3=disabled
 endif
 
 ifeq ($(BR2_PACKAGE_MESA3D_LLVM),y)
@@ -77,14 +74,14 @@ else
 MESA3D_CONF_OPTS += -Dgallium-opencl=disabled
 endif
 
-# reglinux - x86 builds require clang libclc and python-ply, rely on system (host) intel_clc
+# x86 builds require clang libclc and python-ply, rely on system (host) intel_clc
 ifeq ($(BR2_x86_64),y)
 MESA3D_DEPENDENCIES += clang libclc host-clang host-libclc host-python-ply
 MESA3D_CONF_OPTS += -Dintel-clc=system -Dmesa-clc=system
 endif
 
-# reglinux - asahi needs libclc spirv-tools
-# reglinux - specify extra binaries to cross-compile asahi clc
+# asahi needs libclc spirv-tools
+# specify extra binaries to cross-compile asahi clc
 ifeq ($(BR2_x86_64)$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
 MESA3D_DEPENDENCIES += host-qemu host-libclc libclc spirv-tools spirv-llvm-translator clang host-glslang
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
@@ -117,13 +114,6 @@ MESA3D_CONF_OPTS += \
 	-Dgallium-xa=disabled
 endif
 
-# reglinux - ditch legacy
-#ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
-#MESA3D_CONF_OPTS += -Dgallium-vc4-neon=auto
-#else
-#MESA3D_CONF_OPTS += -Dgallium-vc4-neon=disabled
-#endif
-
 # Drivers
 
 #Gallium Drivers
@@ -144,13 +134,9 @@ MESA3D_GALLIUM_DRIVERS-$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_TEGRA)    += tegra
 MESA3D_GALLIUM_DRIVERS-$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D)      += v3d
 MESA3D_GALLIUM_DRIVERS-$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4)      += vc4
 MESA3D_GALLIUM_DRIVERS-$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL)    += virgl
-# batocera - add zink
 MESA3D_GALLIUM_DRIVERS-$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ZINK)     += zink
-# batocera - add d3d12
 MESA3D_GALLIUM_DRIVERS-$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_D3D12)    += d3d12
-# reglinux -  add asahi
 MESA3D_GALLIUM_DRIVERS-$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI)    += asahi
-# batocera - Vulkan Drivers
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL)     += intel
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_HASWELL)   += intel_hasvk
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_AMD)       += amd
@@ -158,7 +144,6 @@ MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_BROADCOM)  += broadcom
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST)  += panfrost
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_FREEDRENO) += freedreno
 MESA3D_VULKAN_DRIVERS-$(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_LAVAPIPE)  += swrast
-# batocera - codecs
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_VC1DEC)        += vc1dec
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_H264DEC)       += h264dec
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_H264ENC)       += h264enc
@@ -168,7 +153,6 @@ MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_AV1DEC)        += av1dec
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_AV1ENC)        += av1enc
 MESA3D_VIDEO_CODECS-$(BR2_PACKAGE_MESA3D_VIDEO_CODEC_VP9DEC)        += vp9dec
 
-# batocera
 # Vulkan Layers - helps with multi-GPU switching
 ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_MESA3D_NEEDS_X11),yy)
 MESA3D_CONF_OPTS += -Dvulkan-layers=device-select,overlay
@@ -194,7 +178,7 @@ MESA3D_CONF_OPTS += \
 	-Dvulkan-drivers=$(subst $(space),$(comma),$(MESA3D_VULKAN_DRIVERS-y))
 endif
 
-# batocera - video codecs
+# video codecs
 ifeq ($(BR2_PACKAGE_MESA3D_VIDEO_CODEC),)
 MESA3D_CONF_OPTS += \
 	-Dvideo-codecs=
@@ -217,12 +201,12 @@ MESA3D_CONF_OPTS += -Dopengl=true
 
 # libva and mesa3d have a circular dependency
 # we do not need libva support in mesa3d, therefore disable this option
-# batocera - we enable vaapi acceleration
-ifneq ($(BR2_PACKAGE_BATOCERA_TARGET_WSL),y)
+# enable vaapi acceleration
+ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_WSL),y)
 ifeq ($(BR2_PACKAGE_LIBVA),y)
 MESA3D_CONF_OPTS += -Dgallium-va=enabled
 MESA3D_DEPENDENCIES += libva
-# batocera - we link vaapi acceleration drivers accordingly
+# link vaapi acceleration drivers accordingly
 define MESA3D_ADD_VA_LINKS
 	(mkdir -p $(TARGET_DIR)/usr/lib/va && cd $(TARGET_DIR)/usr/lib/va \
 	    && ln -sf /usr/lib/dri/radeonsi_drv_video.so radeonsi_drv_video.so \
@@ -328,7 +312,7 @@ else
 MESA3D_CONF_OPTS += -Dzstd=disabled
 endif
 
-# batocera icd.@0@.json vulkan files
+# icd.@0@.json vulkan files
 define MESA3D_VULKANJSON_X86_64
         $(SED) s+"host_machine.cpu()"+"'x86_64'"+ $(@D)/src/intel/vulkan/meson.build \
 		    $(@D)/src/intel/vulkan_hasvk/meson.build $(@D)/src/amd/vulkan/meson.build
@@ -345,7 +329,6 @@ endif
 ifeq ($(BR2_x86_i686),y)
     MESA3D_PRE_CONFIGURE_HOOKS += MESA3D_VULKANJSON_X86
 endif
-# end batocera
 
 MESA3D_CFLAGS = $(TARGET_CFLAGS)
 
@@ -367,7 +350,7 @@ endif
 
 $(eval $(meson-package))
 
-# reglinux - we "just" need a native host intel_clc compiler
+# "just" need a native host intel_clc compiler
 HOST_MESA3D_DEPENDENCIES = host-libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
 HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dintel-clc=enabled -Dinstall-intel-clc=true -Dplatforms= -Dgallium-drivers=swrast -Dglx=disabled -Dgallium-opencl=disabled
 $(eval $(host-meson-package))

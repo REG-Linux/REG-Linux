@@ -12,7 +12,7 @@ BATOCERA_DRMINFO_DEPENDENCIES = libdrm
 BATOCERA_DRMINFO_FLAGS=
 
 # too old kernel
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3128),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3128),y)
 	BATOCERA_DRMINFO_FLAGS += -DHAVE_NOT_DRM_MODE_CONNECTOR_DPI
 endif
 
@@ -20,7 +20,7 @@ BATOCERA_DRMINFO_MAIN=batocera-drminfo.c
 
 # this resolution seems to cause issues on the rpi4 (dmanlfc)
 # REG copy/pasting the whole source code instead of a #define is dubious...
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2711),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711),y)
 	BATOCERA_DRMINFO_FLAGS += -DHAVE_IGNORE_1360x768_MODE
 endif
 
