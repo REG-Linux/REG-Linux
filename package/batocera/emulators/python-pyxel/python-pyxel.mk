@@ -11,11 +11,11 @@ PYTHON_PYXEL_LICENSE = MIT
 PYTHON_PYXEL_SETUP_TYPE = pep517
 PYTHON_PYXEL_DEPENDENCIES = host-rustc host-rust-bin sdl2 host-python-maturin
 
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
 	PYXEL_CARGO_TARGET=x86_64-unknown-linux-gnu
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3288),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3288),y)
 	PYXEL_CARGO_TARGET=aarch64-unknown-linux-gnu
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_RK3399),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3399),y)
 	PYXEL_CARGO_TARGET=aarch64-unknown-linux-gnu
 endif
 

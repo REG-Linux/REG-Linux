@@ -11,24 +11,24 @@ CANNONBALL_DEPENDENCIES = sdl2 boost
 
 CANNONBALL_TARGET = sdl2gles
 
-ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2835),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2835),y)
 CANNONBALL_TARGET = sdl2gles_rpi
 CANNONBALL_RPI = -mcpu=arm1176jzf-s -mfloat-abi=hard
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2836),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2836),y)
 CANNONBALL_TARGET = sdl2gles_rpi
 CANNONBALL_RPI = -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2837),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2837),y)
 CANNONBALL_TARGET = sdl2gles_rpi
 CANNONBALL_RPI = -march=armv8-a+crc -mcpu=cortex-a53
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2711),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711),y)
 CANNONBALL_TARGET = sdl2gles_rpi
 CANNONBALL_RPI = -march=armv8-a+crc -mcpu=cortex-a72
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_BCM2712),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 CANNONBALL_TARGET = sdl2gles_rpi
 CANNONBALL_RPI = -mcpu=cortex-a76 -mtune=cortex-a76
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86),y)
 CANNONBALL_TARGET = sdl2gl
-else ifeq ($(BR2_PACKAGE_BATOCERA_TARGET_X86_64_ANY),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
 CANNONBALL_TARGET = sdl2gl
 endif
 

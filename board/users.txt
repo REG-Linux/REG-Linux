@@ -1,1 +1,1 @@
-batocera 1000 batocera 1000 x /userdata/system /bin/bash input,audio,video
+reglinux 1000 reglinux 1000 x /userdata/system /bin/bash input,audio,video

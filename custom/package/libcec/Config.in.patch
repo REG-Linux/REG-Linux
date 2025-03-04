@@ -1,5 +1,5 @@
 diff --git a/package/libcec/Config.in b/package/libcec/Config.in
-index 2dddc53635..1d1eda9abc 100644
+index 2dddc53635a..1d1eda9abc9 100644
 --- a/package/libcec/Config.in
 +++ b/package/libcec/Config.in
 @@ -17,3 +17,7 @@ comment "libcec needs a toolchain w/ C++, wchar, threads, dynamic library, gcc >

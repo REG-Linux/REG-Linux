@@ -13,7 +13,7 @@ source "${BR2_EXTERNAL_REGLINUX_PATH}/board/reglinux/scripts/package-kernel-modu
 # Package firmware
 source "${BR2_EXTERNAL_REGLINUX_PATH}/board/reglinux/scripts/package-firmware.sh"
 
-BATOCERA_TARGET=$(sed -n -e 's+^BR2_PACKAGE_BATOCERA_TARGET_\([A-Z_0-9]*\)=y$+\1+p' "${BR2_CONFIG}")
+SYSTEM_TARGET=$(sed -n -e 's+^BR2_PACKAGE_SYSTEM_TARGET_\([A-Z_0-9]*\)=y$+\1+p' "${BR2_CONFIG}")
 
 # For the root user:
 # 1. Use Bash instead of Dash for interactive use.
@@ -115,7 +115,7 @@ touch "${TARGET_DIR}/run/reglinux.shadow"
 
 # fix pixbuf : Unable to load image-loading module: /lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-png.so
 # this fix is to be removed once fixed. i've not found the exact source in buildroot. it prevents to display icons in filemanager and some others
-if test "${BATOCERA_TARGET}" = "X86" -o "${BATOCERA_TARGET}" = X86_64
+if test "${SYSTEM_TARGET}" = "X86" -o "${SYSTEM_TARGET}" = X86_64
 then
     ln -sf "/usr/lib/gdk-pixbuf-2.0" "${TARGET_DIR}/lib/gdk-pixbuf-2.0" || exit 1
 fi
