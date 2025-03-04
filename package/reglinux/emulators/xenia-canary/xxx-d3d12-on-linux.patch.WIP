@@ -1,0 +1,2638 @@
+From a7bb734e213b70a5f9fad9ca306aaae88f9a1875 Mon Sep 17 00:00:00 2001
+From: Marco Rodolfi <marco.rodolfi@tuta.io>
+Date: Wed, 22 Jan 2025 16:03:09 +0100
+Subject: [PATCH 1/8] [build] Integrate DXVK and vkd3d-proton build system with
+ xenia-build
+
+---
+ .gitignore  |  1 +
+ .gitmodules |  6 ++++++
+ xenia-build | 37 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 44 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index bfc97737a5..b93860ad0e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -108,3 +108,4 @@ node_modules/.bin/
+ /cache0
+ /devkit
+ recent.toml
++/lib
+diff --git a/.gitmodules b/.gitmodules
+index de2c331757..849fe24822 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -103,3 +103,9 @@
+ [submodule "third_party/pugixml"]
+ 	path = third_party/pugixml
+ 	url = https://github.com/zeux/pugixml.git
++[submodule "third_party/vkd3d-proton"]
++	path = third_party/vkd3d-proton
++	url = https://github.com/HansKristian-Work/vkd3d-proton.git
++[submodule "third_party/dxvk"]
++	path = third_party/dxvk
++	url = https://github.com/doitsujin/dxvk.git
+diff --git a/xenia-build b/xenia-build
+index 50e4fe79d3..1305e397bc 100755
+--- a/xenia-build
++++ b/xenia-build
+@@ -18,6 +18,7 @@ import shutil
+ import subprocess
+ import sys
+ import stat
++import shutil
+ 
+ __author__ = 'ben.vanik@gmail.com (Ben Vanik)'
+ 
+@@ -849,6 +850,41 @@ class BaseBuildCommand(Command):
+                 args['config']
+             ] + scheme_args + pass_args, shell=False, env=dict(os.environ))
+         else:
++            shutil.rmtree('./lib', ignore_errors=True)
++            os.makedirs('./lib/dxvk', exist_ok=True)
++            # Build dxvk and vkd3d first
++            print('Building vkd3d-proton...')
++            os.chdir('./third_party/vkd3d-proton/')
++            result = subprocess.call([
++                './package-release.sh',
++                'master',
++                'build',
++                '--no-package',
++                '--native'
++            ], shell=False, env=dict(os.environ))
++            print('')
++            if result != 0:
++                print('ERROR: vkd3d-proton failed with one or more errors.')
++                return result
++            os.rename('./build/vkd3d-proton-master', '../../lib/vkd3d-proton')
++            print('Building dxvk...')
++            os.chdir('./../dxvk/')
++            result = subprocess.call([
++                './package-native.sh',
++                'master', 
++                'build', 
++                '--no-package', 
++                '--64-only'
++            ], shell=False, env=dict(os.environ))
++            os.rename('./build/dxvk-native-master/usr/include/dxvk', '../../lib/dxvk/include')
++            os.rename('./build/dxvk-native-master/usr/lib', '../../lib/dxvk/x64/')
++            shutil.rmtree('./build/')
++            print('')
++            if result != 0:
++                print('ERROR: dxvk failed with one or more errors.')
++                return result
++            os.chdir('./../../')
++            print('Generating ninja build script...')
+             result = subprocess.call([
+                 'cmake',
+                 '-S build/',
+@@ -862,6 +898,7 @@ class BaseBuildCommand(Command):
+             if result != 0:
+                 print('ERROR: cmake failed with one or more errors.')
+                 return result
++            print('Compiling xenia-canary...')
+             result = subprocess.call([
+                     'ninja',
+                     '-C./build/build_%s' % (args['config']),
+
+From eb9304776dc08b12db603dad4137b518a793f62e Mon Sep 17 00:00:00 2001
+From: Marco Rodolfi <marco.rodolfi@tuta.io>
+Date: Wed, 22 Jan 2025 16:13:44 +0100
+Subject: [PATCH 2/8] [build] Include new subfolders into third_party
+
+---
+ third_party/dxvk         | 1 +
+ third_party/vkd3d-proton | 1 +
+ 2 files changed, 2 insertions(+)
+ create mode 160000 third_party/dxvk
+ create mode 160000 third_party/vkd3d-proton
+
+diff --git a/third_party/dxvk b/third_party/dxvk
+new file mode 160000
+index 0000000000..a3ba8fb4dc
+--- /dev/null
++++ b/third_party/dxvk
+@@ -0,0 +1 @@
++Subproject commit a3ba8fb4dc3fdfde23ef115563c8cdd9b6c07e4b
+diff --git a/third_party/vkd3d-proton b/third_party/vkd3d-proton
+new file mode 160000
+index 0000000000..0f5e58d1f5
+--- /dev/null
++++ b/third_party/vkd3d-proton
+@@ -0,0 +1 @@
++Subproject commit 0f5e58d1f59d088957d7a2dafae98ee730b47213
+
+From d13fb570adfcfbf8bcbc6ccd65cf0d2ea78c0893 Mon Sep 17 00:00:00 2001
+From: Marco Rodolfi <marco.rodolfi@tuta.io>
+Date: Wed, 22 Jan 2025 16:38:19 +0100
+Subject: [PATCH 6/8] [build] Recurse on all submodules
+
+---
+ xenia-build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xenia-build b/xenia-build
+index 1305e397bc..bfbdd4e47c 100755
+--- a/xenia-build
++++ b/xenia-build
+@@ -420,11 +420,10 @@
+     """
+     ret = shell_call([
+         'git',
+-        '-c',
+-        'fetch.recurseSubmodules=on-demand',
+         'submodule',
+         'update',
+         '--init',
++        '--recursive'
+         '--depth=1',
+         '-j', str(os.cpu_count()),
+         ], throw_on_error=False)
+
+From 36acb0df5ea822ba83066d81f5c578f1907b5217 Mon Sep 17 00:00:00 2001
+From: Marco Rodolfi <marco.rodolfi@tuta.io>
+Date: Mon, 3 Feb 2025 14:25:41 +0100
+Subject: [PATCH 7/8] [dx12] Initial WIP DX12 changes for using vkd3d-native on
+ Linux
+
+---
+ src/xenia/app/premake5.lua                    |  2 +
+ .../gpu/d3d12/d3d12_command_processor.cc      |  3 +
+ src/xenia/gpu/d3d12/d3d12_command_processor.h | 22 ++---
+ src/xenia/gpu/d3d12/d3d12_linux_util.h        | 10 +++
+ .../gpu/d3d12/d3d12_primitive_processor.cc    | 10 ++-
+ .../gpu/d3d12/d3d12_primitive_processor.h     |  4 +-
+ .../gpu/d3d12/d3d12_render_target_cache.cc    | 19 ++---
+ .../gpu/d3d12/d3d12_render_target_cache.h     |  4 +-
+ src/xenia/gpu/d3d12/d3d12_shared_memory.cc    |  2 +
+ src/xenia/gpu/d3d12/d3d12_texture_cache.cc    | 19 +++--
+ src/xenia/gpu/d3d12/d3d12_texture_cache.h     | 22 ++---
+ src/xenia/gpu/d3d12/d3d12_trace_dump_main.cc  |  4 +
+ src/xenia/gpu/d3d12/premake5.lua              |  9 +++
+ src/xenia/ui/d3d12/d3d12_api.h                |  6 ++
+ .../ui/d3d12/d3d12_cpu_descriptor_pool.h      |  4 +-
+ .../ui/d3d12/d3d12_descriptor_heap_pool.cc    |  7 +-
+ .../ui/d3d12/d3d12_descriptor_heap_pool.h     |  4 +-
+ src/xenia/ui/d3d12/d3d12_immediate_drawer.cc  | 34 ++++----
+ src/xenia/ui/d3d12/d3d12_immediate_drawer.h   | 22 ++---
+ src/xenia/ui/d3d12/d3d12_presenter.cc         | 80 +++++++++----------
+ src/xenia/ui/d3d12/d3d12_presenter.h          | 32 ++++----
+ src/xenia/ui/d3d12/d3d12_provider.cc          | 26 ++++--
+ src/xenia/ui/d3d12/d3d12_provider.h           | 27 ++++++-
+ .../ui/d3d12/d3d12_submission_tracker.cc      | 14 +++-
+ src/xenia/ui/d3d12/d3d12_submission_tracker.h |  8 +-
+ .../ui/d3d12/d3d12_upload_buffer_pool.cc      |  4 +-
+ src/xenia/ui/d3d12/d3d12_upload_buffer_pool.h |  2 +-
+ src/xenia/ui/d3d12/premake5.lua               |  6 ++
+ 28 files changed, 253 insertions(+), 153 deletions(-)
+ create mode 100644 src/xenia/gpu/d3d12/d3d12_linux_util.h
+
+diff --git a/src/xenia/app/premake5.lua b/src/xenia/app/premake5.lua
+index 11a7a01001..47b775f3bc 100644
+--- a/src/xenia/app/premake5.lua
++++ b/src/xenia/app/premake5.lua
+@@ -103,6 +103,8 @@ project("xenia-app")
+       "xcb",
+       "X11-xcb",
+       "SDL2",
++      "xenia-gpu-d3d12",
++      "xenia-ui-d3d12",
+     })
+ 
+   filter("platforms:Windows")
+diff --git a/src/xenia/gpu/d3d12/d3d12_command_processor.cc b/src/xenia/gpu/d3d12/d3d12_command_processor.cc
+index 1c664ca18b..1c7e928c9f 100644
+--- a/src/xenia/gpu/d3d12/d3d12_command_processor.cc
++++ b/src/xenia/gpu/d3d12/d3d12_command_processor.cc
+@@ -74,11 +74,14 @@ void D3D12CommandProcessor::InitializeShaderStorage(
+ void D3D12CommandProcessor::RequestFrameTrace(
+     const std::filesystem::path& root_path) {
+   // Capture with PIX if attached.
++  // PIX not available on non Windows platforms
++#ifdef XE_PLATFORM_WIN32
+   if (GetD3D12Provider().GetGraphicsAnalysis() != nullptr) {
+     pix_capture_requested_.store(true, std::memory_order_relaxed);
+     return;
+   }
+   CommandProcessor::RequestFrameTrace(root_path);
++#endif
+ }
+ 
+ void D3D12CommandProcessor::TracePlaybackWroteMemory(uint32_t base_ptr,
+diff --git a/src/xenia/gpu/d3d12/d3d12_command_processor.h b/src/xenia/gpu/d3d12/d3d12_command_processor.h
+index 23d143b26f..4eb80d2c1a 100644
+--- a/src/xenia/gpu/d3d12/d3d12_command_processor.h
++++ b/src/xenia/gpu/d3d12/d3d12_command_processor.h
+@@ -621,11 +621,11 @@ class D3D12CommandProcessor final : public CommandProcessor {
+   // as R10G10B10X2 with swizzle).
+   // Bytes 0x400...0x9FF - 128-entry PWL R16G16 gamma ramp (R - base, G - delta,
+   // low 6 bits of each are zero, 3 elements per entry).
+-  Microsoft::WRL::ComPtr<ID3D12Resource> gamma_ramp_buffer_;
++  std::shared_ptr<ID3D12Resource> gamma_ramp_buffer_;
+   D3D12_RESOURCE_STATES gamma_ramp_buffer_state_;
+   // Upload buffer for an image that is the same as gamma_ramp_, but with
+   // kQueueFrames array layers.
+-  Microsoft::WRL::ComPtr<ID3D12Resource> gamma_ramp_upload_buffer_;
++  std::shared_ptr<ID3D12Resource> gamma_ramp_upload_buffer_;
+   uint8_t* gamma_ramp_upload_buffer_mapping_ = nullptr;
+   bool gamma_ramp_256_entry_table_up_to_date_ = false;
+   bool gamma_ramp_pwl_up_to_date_ = false;
+@@ -641,12 +641,12 @@ class D3D12CommandProcessor final : public CommandProcessor {
+ 
+     kCount,
+   };
+-  Microsoft::WRL::ComPtr<ID3D12RootSignature> apply_gamma_root_signature_;
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState> apply_gamma_table_pipeline_;
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState>
++  std::shared_ptr<ID3D12RootSignature> apply_gamma_root_signature_;
++  std::shared_ptr<ID3D12PipelineState> apply_gamma_table_pipeline_;
++  std::shared_ptr<ID3D12PipelineState>
+       apply_gamma_table_fxaa_luma_pipeline_;
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState> apply_gamma_pwl_pipeline_;
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState>
++  std::shared_ptr<ID3D12PipelineState> apply_gamma_pwl_pipeline_;
++  std::shared_ptr<ID3D12PipelineState>
+       apply_gamma_pwl_fxaa_luma_pipeline_;
+ 
+   struct FxaaConstants {
+@@ -660,9 +660,9 @@ class D3D12CommandProcessor final : public CommandProcessor {
+ 
+     kCount,
+   };
+-  Microsoft::WRL::ComPtr<ID3D12RootSignature> fxaa_root_signature_;
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState> fxaa_pipeline_;
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState> fxaa_extreme_pipeline_;
++  std::shared_ptr<ID3D12RootSignature> fxaa_root_signature_;
++  std::shared_ptr<ID3D12PipelineState> fxaa_pipeline_;
++  std::shared_ptr<ID3D12PipelineState> fxaa_extreme_pipeline_;
+ 
+   // PWL gamma ramp can result in values with more precision than 10bpc. Though
+   // those sub-10bpc bits don't have any noticeable visual effect, so normally
+@@ -677,7 +677,7 @@ class D3D12CommandProcessor final : public CommandProcessor {
+   static constexpr DXGI_FORMAT kFxaaSourceTextureFormat =
+       DXGI_FORMAT_R16G16B16A16_UNORM;
+   // Kept in NON_PIXEL_SHADER_RESOURCE state.
+-  Microsoft::WRL::ComPtr<ID3D12Resource> fxaa_source_texture_;
++  std::shared_ptr<ID3D12Resource> fxaa_source_texture_;
+   uint64_t fxaa_source_texture_submission_ = 0;
+ 
+   // Unsubmitted barrier batch.
+diff --git a/src/xenia/gpu/d3d12/d3d12_linux_util.h b/src/xenia/gpu/d3d12/d3d12_linux_util.h
+new file mode 100644
+index 0000000000..6c1e6c15ab
+--- /dev/null
++++ b/src/xenia/gpu/d3d12/d3d12_linux_util.h
+@@ -0,0 +1,10 @@
++//
++// Created by marco on 03/02/25.
++//
++
++#ifndef D3D12_LINUX_UTIL_H
++#define D3D12_LINUX_UTIL_H
++#define _In_
++#define _COM_Outptr_
++#define IDXGraphicsAnalysis void
++#endif //D3D12_LINUX_UTIL_H
+diff --git a/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc b/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc
+index f65379ea32..8bb83c5f87 100644
+--- a/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc
++++ b/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc
+@@ -96,12 +96,13 @@ bool D3D12PrimitiveProcessor::InitializeBuiltinIndexBuffer(
+   D3D12_RESOURCE_DESC resource_desc;
+   ui::d3d12::util::FillBufferResourceDesc(resource_desc, UINT64(size_bytes),
+                                           D3D12_RESOURCE_FLAG_NONE);
+-  Microsoft::WRL::ComPtr<ID3D12Resource> draw_resource;
++  std::shared_ptr<ID3D12Resource> draw_resource;
++  ID3D12Resource * ptr = draw_resource.get();
+   if (FAILED(device->CreateCommittedResource(
+           &ui::d3d12::util::kHeapPropertiesDefault,
+           provider.GetHeapFlagCreateNotZeroed(), &resource_desc,
+           D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+-          IID_PPV_ARGS(&draw_resource)))) {
++          IID_PPV_ARGS(&ptr)))) {
+     XELOGE(
+         "D3D12 primitive processor: Failed to create the built-in index "
+         "buffer GPU resource with {} bytes",
+@@ -109,10 +110,11 @@ bool D3D12PrimitiveProcessor::InitializeBuiltinIndexBuffer(
+     return false;
+   }
+ 
+-  Microsoft::WRL::ComPtr<ID3D12Resource> upload_resource;
++  std::shared_ptr<ID3D12Resource> upload_resource;
++  ptr = upload_resource.get();
+   if (!provider.CreateUploadResource(
+           provider.GetHeapFlagCreateNotZeroed(), &resource_desc,
+-          D3D12_RESOURCE_STATE_GENERIC_READ, IID_PPV_ARGS(&upload_resource))) {
++          D3D12_RESOURCE_STATE_GENERIC_READ, IID_PPV_ARGS(&ptr))) {
+     XELOGE(
+         "D3D12 primitive processor: Failed to create the built-in index "
+         "buffer upload resource with {} bytes",
+diff --git a/src/xenia/gpu/d3d12/d3d12_primitive_processor.h b/src/xenia/gpu/d3d12/d3d12_primitive_processor.h
+index 8ac02f4db7..2265b107e4 100644
+--- a/src/xenia/gpu/d3d12/d3d12_primitive_processor.h
++++ b/src/xenia/gpu/d3d12/d3d12_primitive_processor.h
+@@ -67,12 +67,12 @@ class D3D12PrimitiveProcessor final : public PrimitiveProcessor {
+  private:
+   D3D12CommandProcessor& command_processor_;
+ 
+-  Microsoft::WRL::ComPtr<ID3D12Resource> builtin_index_buffer_;
++  std::shared_ptr<ID3D12Resource> builtin_index_buffer_;
+   D3D12_GPU_VIRTUAL_ADDRESS builtin_index_buffer_gpu_address_ = 0;
+   // Temporary buffer copied in the beginning of the first submission for
+   // uploading to builtin_index_buffer_, destroyed when the submission when it
+   // was uploaded is completed.
+-  Microsoft::WRL::ComPtr<ID3D12Resource> builtin_index_buffer_upload_;
++  std::shared_ptr<ID3D12Resource> builtin_index_buffer_upload_;
+   // UINT64_MAX means not uploaded yet and needs uploading in the first
+   // submission (if the upload buffer exists at all).
+   uint64_t builtin_index_buffer_upload_submission_ = UINT64_MAX;
+diff --git a/src/xenia/gpu/d3d12/d3d12_render_target_cache.cc b/src/xenia/gpu/d3d12/d3d12_render_target_cache.cc
+index 7f422ea4f0..c927c7c44f 100644
+--- a/src/xenia/gpu/d3d12/d3d12_render_target_cache.cc
++++ b/src/xenia/gpu/d3d12/d3d12_render_target_cache.cc
+@@ -1969,11 +1969,12 @@ RenderTargetCache::RenderTarget* D3D12RenderTargetCache::CreateRenderTarget(
+   }
+   // Create zeroed for more determinism, primarily with respect to compression
+   // and depth float24 / float32 mirroring.
+-  Microsoft::WRL::ComPtr<ID3D12Resource> resource;
++  std::shared_ptr<ID3D12Resource> resource;
++  ID3D12Resource* ptr = resource.get();
+   if (FAILED(device->CreateCommittedResource(
+           &ui::d3d12::util::kHeapPropertiesDefault, D3D12_HEAP_FLAG_NONE,
+           &resource_desc, resource_state, &optimized_clear_value,
+-          IID_PPV_ARGS(&resource)))) {
++          IID_PPV_ARGS(&ptr)))) {
+     return nullptr;
+   }
+   {
+@@ -2032,9 +2033,9 @@ RenderTargetCache::RenderTarget* D3D12RenderTargetCache::CreateRenderTarget(
+       stencil_srv_desc.Texture2D.PlaneSlice = 1;
+       stencil_srv_desc.Texture2D.ResourceMinLODClamp = 0.0f;
+     }
+-    device->CreateDepthStencilView(resource.Get(), &dsv_desc,
++    device->CreateDepthStencilView(resource.get(), &dsv_desc,
+                                    descriptor_draw_handle);
+-    device->CreateShaderResourceView(resource.Get(), &stencil_srv_desc,
++    device->CreateShaderResourceView(resource.get(), &stencil_srv_desc,
+                                      descriptor_srv_stencil.GetHandle());
+     // Depth SRV.
+     srv_desc.Format = GetDepthSRVDepthDXGIFormat(key.GetDepthFormat());
+@@ -2049,7 +2050,7 @@ RenderTargetCache::RenderTarget* D3D12RenderTargetCache::CreateRenderTarget(
+       rtv_desc.Texture2D.MipSlice = 0;
+       rtv_desc.Texture2D.PlaneSlice = 0;
+     }
+-    device->CreateRenderTargetView(resource.Get(), &rtv_desc,
++    device->CreateRenderTargetView(resource.get(), &rtv_desc,
+                                    descriptor_draw_handle);
+     // sRGB drawing RTV.
+     switch (key.GetColorFormat()) {
+@@ -2061,7 +2062,7 @@ RenderTargetCache::RenderTarget* D3D12RenderTargetCache::CreateRenderTarget(
+             return nullptr;
+           }
+           rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+-          device->CreateRenderTargetView(resource.Get(), &rtv_desc,
++          device->CreateRenderTargetView(resource.get(), &rtv_desc,
+                                          descriptor_draw_srgb.GetHandle());
+         }
+         break;
+@@ -2077,17 +2078,17 @@ RenderTargetCache::RenderTarget* D3D12RenderTargetCache::CreateRenderTarget(
+         return nullptr;
+       }
+       rtv_desc.Format = load_format;
+-      device->CreateRenderTargetView(resource.Get(), &rtv_desc,
++      device->CreateRenderTargetView(resource.get(), &rtv_desc,
+                                      descriptor_load_separate.GetHandle());
+     }
+     // SRV for ownership transfer and dumping.
+     srv_desc.Format = load_format;
+   }
+-  device->CreateShaderResourceView(resource.Get(), &srv_desc,
++  device->CreateShaderResourceView(resource.get(), &srv_desc,
+                                    descriptor_srv.GetHandle());
+ 
+   return new D3D12RenderTarget(
+-      key, resource.Get(), std::move(descriptor_draw),
++      key, resource.get(), std::move(descriptor_draw),
+       std::move(descriptor_draw_srgb), std::move(descriptor_load_separate),
+       std::move(descriptor_srv), std::move(descriptor_srv_stencil),
+       resource_state);
+diff --git a/src/xenia/gpu/d3d12/d3d12_render_target_cache.h b/src/xenia/gpu/d3d12/d3d12_render_target_cache.h
+index d89e28e711..2e014b6be1 100644
+--- a/src/xenia/gpu/d3d12/d3d12_render_target_cache.h
++++ b/src/xenia/gpu/d3d12/d3d12_render_target_cache.h
+@@ -249,7 +249,7 @@ class D3D12RenderTargetCache final : public RenderTargetCache {
+           descriptor_srv_stencil_(std::move(descriptor_srv_stencil)),
+           resource_state_(resource_state) {}
+ 
+-    ID3D12Resource* resource() const { return resource_.Get(); }
++    ID3D12Resource* resource() const { return resource_.get(); }
+     const ui::d3d12::D3D12CpuDescriptorPool::Descriptor& descriptor_draw()
+         const {
+       return descriptor_draw_;
+@@ -295,7 +295,7 @@ class D3D12RenderTargetCache final : public RenderTargetCache {
+     }
+ 
+    private:
+-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
++    std::shared_ptr<ID3D12Resource> resource_;
+     ui::d3d12::D3D12CpuDescriptorPool::Descriptor descriptor_draw_;
+     ui::d3d12::D3D12CpuDescriptorPool::Descriptor descriptor_draw_srgb_;
+     ui::d3d12::D3D12CpuDescriptorPool::Descriptor descriptor_load_separate_;
+diff --git a/src/xenia/gpu/d3d12/d3d12_shared_memory.cc b/src/xenia/gpu/d3d12/d3d12_shared_memory.cc
+index c15d63ca91..5f17b3a87e 100644
+--- a/src/xenia/gpu/d3d12/d3d12_shared_memory.cc
++++ b/src/xenia/gpu/d3d12/d3d12_shared_memory.cc
+@@ -70,6 +70,7 @@ bool D3D12SharedMemory::Initialize() {
+         "emulation - video memory usage may increase significantly "
+         "because a full {} MB buffer will be created",
+         kBufferSize >> 20);
++#ifdef XE_PLATFORM_WIN32
+     if (provider.GetGraphicsAnalysis()) {
+       // As of October 8th, 2018, PIX doesn't support tiled buffers.
+       // FIXME(Triang3l): Re-enable tiled resources with PIX once fixed.
+@@ -77,6 +78,7 @@ bool D3D12SharedMemory::Initialize() {
+           "This is caused by PIX being attached, which doesn't support tiled "
+           "resources yet.");
+     }
++#endif
+     if (FAILED(device->CreateCommittedResource(
+             &ui::d3d12::util::kHeapPropertiesDefault,
+             provider.GetHeapFlagCreateNotZeroed(), &buffer_desc, buffer_state_,
+diff --git a/src/xenia/gpu/d3d12/d3d12_texture_cache.cc b/src/xenia/gpu/d3d12/d3d12_texture_cache.cc
+index ac63881a70..5a16061e49 100644
+--- a/src/xenia/gpu/d3d12/d3d12_texture_cache.cc
++++ b/src/xenia/gpu/d3d12/d3d12_texture_cache.cc
+@@ -950,9 +950,10 @@ bool D3D12TextureCache::EnsureScaledResolveMemoryCommitted(
+     heap_desc.Properties.Type = D3D12_HEAP_TYPE_DEFAULT;
+     heap_desc.Flags = D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS |
+                       provider.GetHeapFlagCreateNotZeroed();
+-    Microsoft::WRL::ComPtr<ID3D12Heap> scaled_resolve_heap;
++    std::shared_ptr<ID3D12Heap> scaled_resolve_heap;
++    ID3D12Heap* ptr = scaled_resolve_heap.get();
+     if (FAILED(device->CreateHeap(&heap_desc,
+-                                  IID_PPV_ARGS(&scaled_resolve_heap)))) {
++                                  IID_PPV_ARGS(&ptr)))) {
+       XELOGE("D3D12TextureCache: Failed to create a scaled resolve tile heap");
+       return false;
+     }
+@@ -1335,15 +1336,16 @@ std::unique_ptr<TextureCache::Texture> D3D12TextureCache::CreateTexture(
+   ID3D12Device* device = provider.GetDevice();
+   // Assuming untiling will be the next operation.
+   D3D12_RESOURCE_STATES resource_state = D3D12_RESOURCE_STATE_COPY_DEST;
+-  Microsoft::WRL::ComPtr<ID3D12Resource> resource;
++  std::shared_ptr<ID3D12Resource> resource;
++  ID3D12Resource* ptr = resource.get();
+   if (FAILED(device->CreateCommittedResource(
+           &ui::d3d12::util::kHeapPropertiesDefault,
+           provider.GetHeapFlagCreateNotZeroed(), &desc, resource_state, nullptr,
+-          IID_PPV_ARGS(&resource)))) {
++          IID_PPV_ARGS(&ptr)))) {
+     return nullptr;
+   }
+   return std::unique_ptr<Texture>(
+-      new D3D12Texture(*this, key, resource.Get(), resource_state));
++      new D3D12Texture(*this, key, resource.get(), resource_state));
+ }
+ 
+ bool D3D12TextureCache::LoadTextureDataFromResidentMemoryImpl(Texture& texture,
+@@ -1902,15 +1904,16 @@ uint32_t D3D12TextureCache::FindOrCreateTextureDescriptor(
+         cache_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+         cache_heap_desc.NodeMask = 0;
+         while (srv_descriptor_cache_.size() < cache_pages_needed) {
+-          Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> cache_heap;
++          std::shared_ptr<ID3D12DescriptorHeap> cache_heap;
++          ID3D12DescriptorHeap* ptr = cache_heap.get();
+           if (FAILED(device->CreateDescriptorHeap(&cache_heap_desc,
+-                                                  IID_PPV_ARGS(&cache_heap)))) {
++                                                  IID_PPV_ARGS(&ptr)))) {
+             XELOGE(
+                 "D3D12TextureCache: Failed to create a texture descriptor - "
+                 "couldn't create a descriptor cache heap");
+             return UINT32_MAX;
+           }
+-          srv_descriptor_cache_.emplace_back(cache_heap.Get());
++          srv_descriptor_cache_.emplace_back(cache_heap.get());
+         }
+       }
+       descriptor_index = srv_descriptor_cache_allocated_++;
+diff --git a/src/xenia/gpu/d3d12/d3d12_texture_cache.h b/src/xenia/gpu/d3d12/d3d12_texture_cache.h
+index 347772bb64..d331dbc8d2 100644
+--- a/src/xenia/gpu/d3d12/d3d12_texture_cache.h
++++ b/src/xenia/gpu/d3d12/d3d12_texture_cache.h
+@@ -577,7 +577,7 @@ class D3D12TextureCache final : public TextureCache {
+                           D3D12_RESOURCE_STATES resource_state);
+     ~D3D12Texture();
+ 
+-    ID3D12Resource* resource() const { return resource_.Get(); }
++    ID3D12Resource* resource() const { return resource_.get(); }
+ 
+     D3D12_RESOURCE_STATES SetResourceState(D3D12_RESOURCE_STATES new_state) {
+       D3D12_RESOURCE_STATES old_state = resource_state_;
+@@ -596,7 +596,7 @@ class D3D12TextureCache final : public TextureCache {
+     }
+ 
+    private:
+-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
++    std::shared_ptr<ID3D12Resource> resource_;
+     D3D12_RESOURCE_STATES resource_state_;
+ 
+     // For bindful - indices in the non-shader-visible descriptor cache for
+@@ -627,11 +627,11 @@ class D3D12TextureCache final : public TextureCache {
+       return *this;
+     }
+ 
+-    ID3D12DescriptorHeap* heap() const { return heap_.Get(); }
++    ID3D12DescriptorHeap* heap() const { return heap_.get(); }
+     D3D12_CPU_DESCRIPTOR_HANDLE heap_start() const { return heap_start_; }
+ 
+    private:
+-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap_;
++    std::shared_ptr<ID3D12DescriptorHeap> heap_;
+     D3D12_CPU_DESCRIPTOR_HANDLE heap_start_;
+   };
+ 
+@@ -654,7 +654,7 @@ class D3D12TextureCache final : public TextureCache {
+     explicit ScaledResolveVirtualBuffer(ID3D12Resource* resource,
+                                         D3D12_RESOURCE_STATES resource_state)
+         : resource_(resource), resource_state_(resource_state) {}
+-    ID3D12Resource* resource() const { return resource_.Get(); }
++    ID3D12Resource* resource() const { return resource_.get(); }
+     D3D12_RESOURCE_STATES SetResourceState(D3D12_RESOURCE_STATES new_state) {
+       D3D12_RESOURCE_STATES old_state = resource_state_;
+       if (old_state == D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+@@ -673,7 +673,7 @@ class D3D12TextureCache final : public TextureCache {
+     void ClearUAVBarrierPending() { uav_barrier_pending_ = false; }
+ 
+    private:
+-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
++    std::shared_ptr<ID3D12Resource> resource_;
+     D3D12_RESOURCE_STATES resource_state_;
+     bool uav_barrier_pending_ = false;
+   };
+@@ -794,11 +794,11 @@ class D3D12TextureCache final : public TextureCache {
+   D3D12CommandProcessor& command_processor_;
+   bool bindless_resources_used_;
+ 
+-  Microsoft::WRL::ComPtr<ID3D12RootSignature> load_root_signature_;
+-  std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, kLoadShaderCount>
++  std::shared_ptr<ID3D12RootSignature> load_root_signature_;
++  std::array<std::shared_ptr<ID3D12PipelineState>, kLoadShaderCount>
+       load_pipelines_;
+   // Load pipelines for resolution-scaled resolve targets.
+-  std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, kLoadShaderCount>
++  std::array<std::shared_ptr<ID3D12PipelineState>, kLoadShaderCount>
+       load_pipelines_scaled_;
+ 
+   std::vector<SRVDescriptorCachePage> srv_descriptor_cache_;
+@@ -815,7 +815,7 @@ class D3D12TextureCache final : public TextureCache {
+   };
+   // Contains null SRV descriptors of dimensions from NullSRVDescriptorIndex.
+   // For copying, not shader-visible.
+-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> null_srv_descriptor_heap_;
++  std::shared_ptr<ID3D12DescriptorHeap> null_srv_descriptor_heap_;
+   D3D12_CPU_DESCRIPTOR_HANDLE null_srv_descriptor_heap_start_;
+ 
+   std::array<D3D12TextureBinding, xenos::kTextureFetchConstantCount>
+@@ -871,7 +871,7 @@ class D3D12TextureCache final : public TextureCache {
+       "Scaled resolve heaps are assumed to only be wholly mappable to up to "
+       "two 2 GB buffers");
+   // Resident portions of the tiled buffer.
+-  std::vector<Microsoft::WRL::ComPtr<ID3D12Heap>> scaled_resolve_heaps_;
++  std::vector<std::shared_ptr<ID3D12Heap>> scaled_resolve_heaps_;
+   // Number of currently resident portions of the tiled buffer, for profiling.
+   uint32_t scaled_resolve_heap_count_ = 0;
+   // Current scaled resolve state.
+diff --git a/src/xenia/gpu/d3d12/d3d12_trace_dump_main.cc b/src/xenia/gpu/d3d12/d3d12_trace_dump_main.cc
+index eaa25ddd9a..04be225211 100644
+--- a/src/xenia/gpu/d3d12/d3d12_trace_dump_main.cc
++++ b/src/xenia/gpu/d3d12/d3d12_trace_dump_main.cc
+@@ -27,21 +27,25 @@ class D3D12TraceDump : public TraceDump {
+   }
+ 
+   void BeginHostCapture() override {
++#ifdef XE_PLATFORM_WIN32
+     auto provider = static_cast<const ui::d3d12::D3D12Provider*>(
+         graphics_system_->provider());
+     IDXGraphicsAnalysis* graphics_analysis = provider->GetGraphicsAnalysis();
+     if (graphics_analysis) {
+       graphics_analysis->BeginCapture();
+     }
++#endif
+   }
+ 
+   void EndHostCapture() override {
++#ifdef XE_PLATFORM_WIN32
+     auto provider = static_cast<const ui::d3d12::D3D12Provider*>(
+         graphics_system_->provider());
+     IDXGraphicsAnalysis* graphics_analysis = provider->GetGraphicsAnalysis();
+     if (graphics_analysis) {
+       graphics_analysis->EndCapture();
+     }
++#endif
+   }
+ };
+ 
+diff --git a/src/xenia/gpu/d3d12/premake5.lua b/src/xenia/gpu/d3d12/premake5.lua
+index 3bdee32339..bed71d7664 100644
+--- a/src/xenia/gpu/d3d12/premake5.lua
++++ b/src/xenia/gpu/d3d12/premake5.lua
+@@ -18,6 +18,15 @@ project("xenia-gpu-d3d12")
+   files({
+     "../shaders/bytecode/d3d12_5_1/*.h",
+   })
++  filter({"platforms:Linux"})
++    includedirs({
++      project_root.."/lib/vkd3d-proton/include/vkd3d-proton",
++      project_root.."/lib/dxvk/include/",
++    })
++    files({
++      "./linux_helpers/*.h",
++    })
++  filter({})
+ 
+ group("src")
+ project("xenia-gpu-d3d12-trace-viewer")
+diff --git a/src/xenia/ui/d3d12/d3d12_api.h b/src/xenia/ui/d3d12/d3d12_api.h
+index ffd4934b94..08f2c749fc 100644
+--- a/src/xenia/ui/d3d12/d3d12_api.h
++++ b/src/xenia/ui/d3d12/d3d12_api.h
+@@ -10,20 +10,26 @@
+ #ifndef XENIA_UI_D3D12_D3D12_API_H_
+ #define XENIA_UI_D3D12_D3D12_API_H_
+ 
++#ifdef XE_PLATFORM_WIN32
+ // Must be included before D3D and DXGI for things like NOMINMAX.
+ #include "xenia/base/platform_win.h"
+ 
+ #include <DXProgrammableCapture.h>
++#endif
+ #include <d3d12.h>
+ #include <d3d12sdklayers.h>
+ #include <d3dcompiler.h>
+ #include <dxgi1_6.h>
+ #include <dxgidebug.h>
+ // For Microsoft::WRL::ComPtr.
++#ifdef XE_PLATFORM_WIN32
+ #include <wrl/client.h>
++#endif
+ 
++#ifdef XE_PLATFORM_WIN32
+ #include "third_party/DirectXShaderCompiler/include/dxc/dxcapi.h"
+ #include "third_party/DirectXShaderCompiler/projects/dxilconv/include/DxbcConverter.h"
++#endif
+ 
+ #define XELOGD3D XELOGI
+ 
+diff --git a/src/xenia/ui/d3d12/d3d12_cpu_descriptor_pool.h b/src/xenia/ui/d3d12/d3d12_cpu_descriptor_pool.h
+index 3062ec5407..c9268689bc 100644
+--- a/src/xenia/ui/d3d12/d3d12_cpu_descriptor_pool.h
++++ b/src/xenia/ui/d3d12/d3d12_cpu_descriptor_pool.h
+@@ -73,7 +73,7 @@ class D3D12CpuDescriptorPool
+     size_t index_ = 0;
+   };
+ 
+-  D3D12CpuDescriptorPool(const ui::d3d12::D3D12Provider& provider,
++  D3D12CpuDescriptorPool(const D3D12Provider& provider,
+                          D3D12_DESCRIPTOR_HEAP_TYPE type,
+                          uint32_t heap_size_log2)
+       : provider_(provider), type_(type), heap_size_log2_(heap_size_log2) {
+@@ -104,7 +104,7 @@ class D3D12CpuDescriptorPool
+     return provider_.OffsetDescriptor(type_, heap_start, heap_local_index);
+   }
+ 
+-  const ui::d3d12::D3D12Provider& provider_;
++  const D3D12Provider& provider_;
+   D3D12_DESCRIPTOR_HEAP_TYPE type_;
+   uint32_t heap_size_log2_;
+   std::vector<ID3D12DescriptorHeap*> heaps_;
+diff --git a/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.cc b/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.cc
+index 906a8a1d90..1b13e62fd2 100644
+--- a/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.cc
++++ b/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.cc
+@@ -127,9 +127,12 @@ uint64_t D3D12DescriptorHeapPool::Request(uint64_t submission_index,
+     new_heap_desc.NumDescriptors = page_size_;
+     new_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+     new_heap_desc.NodeMask = 0;
+-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> new_heap;
++    std::shared_ptr<ID3D12DescriptorHeap> new_heap;
++    //FixMe(RodoMa92): Getting the pointer before passing it to IID_PPV_ARGS is
++    // the only way to make the compiler happy with inferring auto**
++    ID3D12DescriptorHeap * ptr = new_heap.get();
+     if (FAILED(device_->CreateDescriptorHeap(&new_heap_desc,
+-                                             IID_PPV_ARGS(&new_heap)))) {
++                                             IID_PPV_ARGS(&ptr)))) {
+       XELOGE("Failed to create a heap for {} shader-visible descriptors",
+              page_size_);
+       return kHeapIndexInvalid;
+diff --git a/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.h b/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.h
+index 9eb1c5b319..753f3e1992 100644
+--- a/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.h
++++ b/src/xenia/ui/d3d12/d3d12_descriptor_heap_pool.h
+@@ -66,7 +66,7 @@ class D3D12DescriptorHeapPool {
+   // after a successful request because before a request, the heap may not exist
+   // yet.
+   ID3D12DescriptorHeap* GetLastRequestHeap() const {
+-    return writable_first_->heap.Get();
++    return writable_first_->heap.get();
+   }
+   D3D12_CPU_DESCRIPTOR_HANDLE GetLastRequestHeapCPUStart() const {
+     return writable_first_->cpu_start;
+@@ -81,7 +81,7 @@ class D3D12DescriptorHeapPool {
+   uint32_t page_size_;
+ 
+   struct Page {
+-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
++    std::shared_ptr<ID3D12DescriptorHeap> heap;
+     D3D12_CPU_DESCRIPTOR_HANDLE cpu_start;
+     D3D12_GPU_DESCRIPTOR_HANDLE gpu_start;
+     uint64_t last_submission_index;
+diff --git a/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc b/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc
+index 76bdcb5c0d..2f4a6605a6 100644
+--- a/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc
++++ b/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc
+@@ -49,7 +49,7 @@ D3D12ImmediateDrawer::D3D12ImmediateTexture::~D3D12ImmediateTexture() {
+ void D3D12ImmediateDrawer::D3D12ImmediateTexture::OnImmediateDrawerDestroyed() {
+   immediate_drawer_ = nullptr;
+   // Lifetime is not managed anymore, so don't keep the resource either.
+-  resource_.Reset();
++  resource_.reset();
+ }
+ 
+ D3D12ImmediateDrawer::~D3D12ImmediateDrawer() {
+@@ -127,7 +127,7 @@ bool D3D12ImmediateDrawer::Initialize() {
+ 
+   // Create the pipelines.
+   D3D12_GRAPHICS_PIPELINE_STATE_DESC pipeline_desc = {};
+-  pipeline_desc.pRootSignature = root_signature_.Get();
++  pipeline_desc.pRootSignature = root_signature_.get();
+   pipeline_desc.VS.pShaderBytecode = shaders::immediate_vs;
+   pipeline_desc.VS.BytecodeLength = sizeof(shaders::immediate_vs);
+   pipeline_desc.PS.pShaderBytecode = shaders::immediate_ps;
+@@ -251,7 +251,7 @@ std::unique_ptr<ImmediateTexture> D3D12ImmediateDrawer::CreateTexture(
+   resource_desc.SampleDesc.Quality = 0;
+   resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+   resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+-  Microsoft::WRL::ComPtr<ID3D12Resource> resource;
++  std::shared_ptr<ID3D12Resource> resource;
+   if (SUCCEEDED(device->CreateCommittedResource(
+           &util::kHeapPropertiesDefault, heap_flag_create_not_zeroed,
+           &resource_desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+@@ -264,7 +264,7 @@ std::unique_ptr<ImmediateTexture> D3D12ImmediateDrawer::CreateTexture(
+     D3D12_RESOURCE_DESC upload_buffer_desc;
+     util::FillBufferResourceDesc(upload_buffer_desc, upload_size,
+                                  D3D12_RESOURCE_FLAG_NONE);
+-    Microsoft::WRL::ComPtr<ID3D12Resource> upload_buffer;
++    std::shared_ptr<ID3D12Resource> upload_buffer;
+     if (SUCCEEDED(device->CreateCommittedResource(
+             &util::kHeapPropertiesUpload, heap_flag_create_not_zeroed,
+             &upload_buffer_desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+@@ -295,22 +295,22 @@ std::unique_ptr<ImmediateTexture> D3D12ImmediateDrawer::CreateTexture(
+         // resource because its lifetime is not tied to that of the
+         // ImmediateTexture (and thus to context's submissions) now.
+         PendingTextureUpload& pending_upload =
+-            texture_uploads_pending_.emplace_back(resource.Get(),
+-                                                  upload_buffer.Get());
++            texture_uploads_pending_.emplace_back(resource.get(),
++                                                  upload_buffer.get());
+       } else {
+         XELOGE(
+             "D3D12ImmediateDrawer: Failed to map an upload buffer for a {}x{} "
+             "texture",
+             width, height);
+-        upload_buffer.Reset();
+-        resource.Reset();
++        upload_buffer.reset();
++        resource.reset();
+       }
+     } else {
+       XELOGE(
+           "D3D12ImmediateDrawer: Failed to create an upload buffer for a {}x{} "
+           "texture",
+           width, height);
+-      resource.Reset();
++      resource.reset();
+     }
+   } else {
+     XELOGE("D3D12ImmediateDrawer: Failed to create a {}x{} texture", width,
+@@ -329,7 +329,7 @@ std::unique_ptr<ImmediateTexture> D3D12ImmediateDrawer::CreateTexture(
+   // Manage by this immediate drawer if successfully created a resource.
+   std::unique_ptr<D3D12ImmediateTexture> texture =
+       std::make_unique<D3D12ImmediateTexture>(
+-          width, height, resource.Get(), sampler_index,
++          width, height, resource.get(), sampler_index,
+           resource ? this : nullptr, textures_.size());
+   if (resource) {
+     textures_.push_back(texture.get());
+@@ -402,7 +402,7 @@ void D3D12ImmediateDrawer::Begin(UIDrawContext& ui_draw_context,
+   viewport.MaxDepth = 1.0f;
+   command_list->RSSetViewports(1, &viewport);
+ 
+-  command_list->SetGraphicsRootSignature(root_signature_.Get());
++  command_list->SetGraphicsRootSignature(root_signature_.get());
+   float coordinate_space_size_inv[2];
+   coordinate_space_size_inv[0] = 1.0f / coordinate_space_width;
+   coordinate_space_size_inv[1] = 1.0f / coordinate_space_height;
+@@ -526,7 +526,7 @@ void D3D12ImmediateDrawer::Draw(const ImmediateDraw& draw) {
+     current_texture_descriptor_heap_index_ = texture_heap_index;
+     bind_texture = true;
+     ID3D12DescriptorHeap* descriptor_heaps[] = {
+-        texture_descriptor_pool_->GetLastRequestHeap(), sampler_heap_.Get()};
++        texture_descriptor_pool_->GetLastRequestHeap(), sampler_heap_.get()};
+     command_list->SetDescriptorHeaps(2, descriptor_heaps);
+   }
+ 
+@@ -581,11 +581,11 @@ void D3D12ImmediateDrawer::Draw(const ImmediateDraw& draw) {
+   switch (draw.primitive_type) {
+     case ImmediatePrimitiveType::kLines:
+       primitive_topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+-      pipeline = pipeline_line_.Get();
++      pipeline = pipeline_line_.get();
+       break;
+     case ImmediatePrimitiveType::kTriangles:
+       primitive_topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+-      pipeline = pipeline_triangle_.Get();
++      pipeline = pipeline_triangle_.get();
+       break;
+     default:
+       assert_unhandled_case(draw.primitive_type);
+@@ -671,11 +671,11 @@ void D3D12ImmediateDrawer::UploadTextures() {
+   std::vector<D3D12_RESOURCE_BARRIER> barriers;
+   barriers.reserve(texture_uploads_pending_.size());
+   for (const PendingTextureUpload& pending_upload : texture_uploads_pending_) {
+-    ID3D12Resource* texture = pending_upload.texture.Get();
++    ID3D12Resource* texture = pending_upload.texture.get();
+ 
+     D3D12_RESOURCE_DESC texture_desc = texture->GetDesc();
+     D3D12_TEXTURE_COPY_LOCATION location_source, location_dest;
+-    location_source.pResource = pending_upload.buffer.Get();
++    location_source.pResource = pending_upload.buffer.get();
+     location_source.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+     device->GetCopyableFootprints(&texture_desc, 0, 1, 0,
+                                   &location_source.PlacedFootprint, nullptr,
+@@ -695,7 +695,7 @@ void D3D12ImmediateDrawer::UploadTextures() {
+     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+ 
+     texture_uploads_submitted_.emplace_back(
+-        texture, pending_upload.buffer.Get(), last_paint_submission_index_);
++        texture, pending_upload.buffer.get(), last_paint_submission_index_);
+   }
+   texture_uploads_pending_.clear();
+   assert_false(barriers.empty());
+diff --git a/src/xenia/ui/d3d12/d3d12_immediate_drawer.h b/src/xenia/ui/d3d12/d3d12_immediate_drawer.h
+index 2c3691e1f8..744b839420 100644
+--- a/src/xenia/ui/d3d12/d3d12_immediate_drawer.h
++++ b/src/xenia/ui/d3d12/d3d12_immediate_drawer.h
+@@ -75,7 +75,7 @@ class D3D12ImmediateDrawer final : public ImmediateDrawer {
+                           size_t immediate_drawer_index);
+     ~D3D12ImmediateTexture() override;
+ 
+-    ID3D12Resource* resource() const { return resource_.Get(); }
++    ID3D12Resource* resource() const { return resource_.get(); }
+     SamplerIndex sampler_index() const { return sampler_index_; }
+ 
+     size_t immediate_drawer_index() const { return immediate_drawer_index_; }
+@@ -92,7 +92,7 @@ class D3D12ImmediateDrawer final : public ImmediateDrawer {
+     }
+ 
+    private:
+-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
++    std::shared_ptr<ID3D12Resource> resource_;
+     SamplerIndex sampler_index_;
+ 
+     D3D12ImmediateDrawer* immediate_drawer_;
+@@ -110,7 +110,7 @@ class D3D12ImmediateDrawer final : public ImmediateDrawer {
+ 
+   const D3D12Provider& provider_;
+ 
+-  Microsoft::WRL::ComPtr<ID3D12RootSignature> root_signature_;
++  std::shared_ptr<ID3D12RootSignature> root_signature_;
+   enum class RootParameter {
+     kTexture,
+     kSampler,
+@@ -119,10 +119,10 @@ class D3D12ImmediateDrawer final : public ImmediateDrawer {
+     kCount
+   };
+ 
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState> pipeline_triangle_;
+-  Microsoft::WRL::ComPtr<ID3D12PipelineState> pipeline_line_;
++  std::shared_ptr<ID3D12PipelineState> pipeline_triangle_;
++  std::shared_ptr<ID3D12PipelineState> pipeline_line_;
+ 
+-  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> sampler_heap_;
++  std::shared_ptr<ID3D12DescriptorHeap> sampler_heap_;
+   D3D12_CPU_DESCRIPTOR_HANDLE sampler_heap_cpu_start_;
+   D3D12_GPU_DESCRIPTOR_HANDLE sampler_heap_gpu_start_;
+ 
+@@ -132,8 +132,8 @@ class D3D12ImmediateDrawer final : public ImmediateDrawer {
+   struct PendingTextureUpload {
+     PendingTextureUpload(ID3D12Resource* texture, ID3D12Resource* buffer)
+         : texture(texture), buffer(buffer) {}
+-    Microsoft::WRL::ComPtr<ID3D12Resource> texture;
+-    Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
++    std::shared_ptr<ID3D12Resource> texture;
++    std::shared_ptr<ID3D12Resource> buffer;
+   };
+   std::vector<PendingTextureUpload> texture_uploads_pending_;
+ 
+@@ -143,13 +143,13 @@ class D3D12ImmediateDrawer final : public ImmediateDrawer {
+         : texture(texture),
+           buffer(buffer),
+           submission_index(submission_index) {}
+-    Microsoft::WRL::ComPtr<ID3D12Resource> texture;
+-    Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
++    std::shared_ptr<ID3D12Resource> texture;
++    std::shared_ptr<ID3D12Resource> buffer;
+     UINT64 submission_index;
+   };
+   std::deque<SubmittedTextureUpload> texture_uploads_submitted_;
+ 
+-  std::deque<std::pair<Microsoft::WRL::ComPtr<ID3D12Resource>, UINT64>>
++  std::deque<std::pair<std::shared_ptr<ID3D12Resource>, UINT64>>
+       textures_deleted_;
+ 
+   std::unique_ptr<D3D12UploadBufferPool> vertex_buffer_pool_;
+diff --git a/src/xenia/ui/d3d12/d3d12_presenter.cc b/src/xenia/ui/d3d12/d3d12_presenter.cc
+index 574b66d0d9..e1b1c928cc 100644
+--- a/src/xenia/ui/d3d12/d3d12_presenter.cc
++++ b/src/xenia/ui/d3d12/d3d12_presenter.cc
+@@ -65,7 +65,7 @@ Surface::TypeFlags D3D12Presenter::GetSupportedSurfaceTypes() const {
+ }
+ 
+ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+-  Microsoft::WRL::ComPtr<ID3D12Resource> guest_output_resource;
++  std::shared_ptr<ID3D12Resource> guest_output_resource;
+   {
+     uint32_t guest_output_mailbox_index;
+     std::unique_lock<std::mutex> guest_output_consumer_lock(
+@@ -93,7 +93,7 @@ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+   D3D12_RESOURCE_DESC buffer_desc;
+   util::FillBufferResourceDesc(buffer_desc, copy_dest_size,
+                                D3D12_RESOURCE_FLAG_NONE);
+-  Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
++  std::shared_ptr<ID3D12Resource> buffer;
+   // Create zeroed not to leak data in the row padding.
+   if (FAILED(device->CreateCommittedResource(
+           &util::kHeapPropertiesReadback, D3D12_HEAP_FLAG_NONE, &buffer_desc,
+@@ -103,7 +103,7 @@ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+   }
+ 
+   {
+-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> command_allocator;
++    std::shared_ptr<ID3D12CommandAllocator> command_allocator;
+     if (FAILED(
+             device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
+                                            IID_PPV_ARGS(&command_allocator)))) {
+@@ -112,9 +112,9 @@ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+           "allocator");
+       return false;
+     }
+-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> command_list;
++    std::shared_ptr<ID3D12GraphicsCommandList> command_list;
+     if (FAILED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+-                                         command_allocator.Get(), nullptr,
++                                         command_allocator.get(), nullptr,
+                                          IID_PPV_ARGS(&command_list)))) {
+       XELOGE(
+           "D3D12Presenter: Failed to create the guest output capturing command "
+@@ -125,7 +125,7 @@ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+     D3D12_RESOURCE_BARRIER barrier;
+     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+-    barrier.Transition.pResource = guest_output_resource.Get();
++    barrier.Transition.pResource = guest_output_resource.get();
+     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+     barrier.Transition.StateBefore = kGuestOutputInternalState;
+     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+@@ -133,10 +133,10 @@ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+                   D3D12_RESOURCE_STATE_COPY_SOURCE) {
+       command_list->ResourceBarrier(1, &barrier);
+     }
+-    copy_dest.pResource = buffer.Get();
++    copy_dest.pResource = buffer.get();
+     copy_dest.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+     D3D12_TEXTURE_COPY_LOCATION copy_source;
+-    copy_source.pResource = guest_output_resource.Get();
++    copy_source.pResource = guest_output_resource.get();
+     copy_source.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+     copy_source.SubresourceIndex = 0;
+     command_list->CopyTextureRegion(&copy_dest, 0, 0, 0, &copy_source, nullptr);
+@@ -230,9 +230,9 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
+     // Using the current swap_chain_allows_tearing_ value that's consistent with
+     // the creation of the swap chain because ResizeBuffers can't toggle the
+     // tearing flag.
+-    for (Microsoft::WRL::ComPtr<ID3D12Resource>& swap_chain_buffer_ref :
++    for (std::shared_ptr<ID3D12Resource>& swap_chain_buffer_ref :
+          paint_context_.swap_chain_buffers) {
+-      swap_chain_buffer_ref.Reset();
++      swap_chain_buffer_ref.reset();
+     }
+     bool swap_chain_resized =
+         SUCCEEDED(paint_context_.swap_chain->ResizeBuffers(
+@@ -293,7 +293,7 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
+     }
+     IDXGIFactory2* dxgi_factory = provider_.GetDXGIFactory();
+     ID3D12CommandQueue* direct_queue = provider_.GetDirectQueue();
+-    Microsoft::WRL::ComPtr<IDXGISwapChain1> swap_chain_1;
++    std::shared_ptr<IDXGISwapChain1> swap_chain_1;
+     switch (surface_type) {
+ #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_GAMES)
+       case Surface::kTypeIndex_Win32Hwnd: {
+@@ -356,7 +356,7 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
+   rtv_desc.Texture2D.PlaneSlice = 0;
+   for (uint32_t i = 0; i < PaintContext::kSwapChainBufferCount; ++i) {
+     ID3D12Resource* swap_chain_buffer =
+-        paint_context_.swap_chain_buffers[i].Get();
++        paint_context_.swap_chain_buffers[i].get();
+     rtv_desc.Format = kSwapChainFormat;
+     device->CreateRenderTargetView(
+         swap_chain_buffer, &rtv_desc,
+@@ -379,7 +379,7 @@ bool D3D12Presenter::RefreshGuestOutputImpl(
+     bool& is_8bpc_out_ref) {
+   assert_not_zero(frontbuffer_width);
+   assert_not_zero(frontbuffer_height);
+-  std::pair<UINT64, Microsoft::WRL::ComPtr<ID3D12Resource>>&
++  std::pair<UINT64, std::shared_ptr<ID3D12Resource>>&
+       guest_output_resource_ref = guest_output_resources_[mailbox_index];
+   if (guest_output_resource_ref.second) {
+     D3D12_RESOURCE_DESC guest_output_resource_current_desc =
+@@ -390,7 +390,7 @@ bool D3D12Presenter::RefreshGuestOutputImpl(
+       // in its own submission tracker timeline, safe to release here.
+       guest_output_resource_refresher_submission_tracker_
+           .AwaitSubmissionCompletion(guest_output_resource_ref.first);
+-      guest_output_resource_ref.second.Reset();
++      guest_output_resource_ref.second.reset();
+     }
+   }
+   if (!guest_output_resource_ref.second) {
+@@ -420,7 +420,7 @@ bool D3D12Presenter::RefreshGuestOutputImpl(
+     }
+   }
+   D3D12GuestOutputRefreshContext context(
+-      is_8bpc_out_ref, guest_output_resource_ref.second.Get());
++      is_8bpc_out_ref, guest_output_resource_ref.second.get());
+   bool refresher_succeeded = refresher(context);
+   // Even if the refresher has returned false, it still might have submitted
+   // some commands referencing the resource. It's better to put an excessive
+@@ -438,11 +438,11 @@ void D3D12Presenter::PaintContext::DestroySwapChain() {
+     return;
+   }
+   AwaitSwapChainUsageCompletion();
+-  for (Microsoft::WRL::ComPtr<ID3D12Resource>& swap_chain_buffer_ref :
++  for (std::shared_ptr<ID3D12Resource>& swap_chain_buffer_ref :
+        swap_chain_buffers) {
+-    swap_chain_buffer_ref.Reset();
++    swap_chain_buffer_ref.reset();
+   }
+-  swap_chain.Reset();
++  swap_chain.reset();
+   swap_chain_allows_tearing = false;
+   swap_chain_height = 0;
+   swap_chain_width = 0;
+@@ -464,9 +464,9 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+       paint_context_
+           .command_allocators[current_paint_submission %
+                               command_allocator_count]
+-          .Get();
++          .get();
+   command_allocator->Reset();
+-  ID3D12GraphicsCommandList* command_list = paint_context_.command_list.Get();
++  ID3D12GraphicsCommandList* command_list = paint_context_.command_list.get();
+   command_list->Reset(command_allocator, nullptr);
+ 
+   ID3D12Device* device = provider_.GetDevice();
+@@ -480,7 +480,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+       rtv_heap_start,
+       PaintContext::kRTVIndexSwapChainBuffer0 + back_buffer_index);
+   ID3D12Resource* back_buffer =
+-      paint_context_.swap_chain_buffers[back_buffer_index].Get();
++      paint_context_.swap_chain_buffers[back_buffer_index].get();
+   bool back_buffer_acquired = false;
+   bool back_buffer_bound = false;
+   bool back_buffer_clear_needed = true;
+@@ -490,7 +490,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+ 
+   GuestOutputProperties guest_output_properties;
+   GuestOutputPaintConfig guest_output_paint_config;
+-  Microsoft::WRL::ComPtr<ID3D12Resource> guest_output_resource;
++  std::shared_ptr<ID3D12Resource> guest_output_resource;
+   {
+     uint32_t guest_output_mailbox_index;
+     std::unique_lock<std::mutex> guest_output_consumer_lock(
+@@ -529,7 +529,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+     }
+ 
+     if (guest_output_flow.effect_count) {
+-      ID3D12DescriptorHeap* view_heap = paint_context_.view_heap.Get();
++      ID3D12DescriptorHeap* view_heap = paint_context_.view_heap.get();
+       D3D12_CPU_DESCRIPTOR_HANDLE view_heap_cpu_start =
+           view_heap->GetCPUDescriptorHandleForHeapStart();
+ 
+@@ -542,7 +542,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+       // released (or a taken, but never actually used) slot.
+       for (size_t i = 0;
+            i < paint_context_.guest_output_resource_paint_refs.size(); ++i) {
+-        const std::pair<UINT64, Microsoft::WRL::ComPtr<ID3D12Resource>>&
++        const std::pair<UINT64, std::shared_ptr<ID3D12Resource>>&
+             guest_output_resource_paint_ref =
+                 paint_context_.guest_output_resource_paint_refs[i];
+         if (guest_output_resource_paint_ref.second == guest_output_resource) {
+@@ -598,7 +598,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+         guest_output_resource_srv_desc.Texture2D.PlaneSlice = 0;
+         guest_output_resource_srv_desc.Texture2D.ResourceMinLODClamp = 0.0f;
+         device->CreateShaderResourceView(
+-            guest_output_resource.Get(), &guest_output_resource_srv_desc,
++            guest_output_resource.get(), &guest_output_resource_srv_desc,
+             provider_.OffsetViewDescriptor(
+                 view_heap_cpu_start,
+                 PaintContext::kViewIndexGuestOutput0Srv +
+@@ -612,7 +612,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+         if (i + 1 < guest_output_flow.effect_count) {
+           intermediate_needed_size = guest_output_flow.effect_output_sizes[i];
+         }
+-        Microsoft::WRL::ComPtr<ID3D12Resource>& intermediate_texture_ptr_ref =
++        std::shared_ptr<ID3D12Resource>& intermediate_texture_ptr_ref =
+             paint_context_.guest_output_intermediate_textures[i];
+         std::pair<uint32_t, uint32_t> intermediate_current_size(0, 0);
+         if (intermediate_texture_ptr_ref) {
+@@ -630,7 +630,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+             if (intermediate_texture_ptr_ref) {
+               paint_context_.paint_submission_tracker.AwaitSubmissionCompletion(
+                   paint_context_.guest_output_intermediate_texture_last_usage);
+-              intermediate_texture_ptr_ref.Reset();
++              intermediate_texture_ptr_ref.reset();
+             }
+             // Resource.
+             D3D12_RESOURCE_DESC intermediate_desc;
+@@ -659,7 +659,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+               continue;
+             }
+             ID3D12Resource* intermediate_texture =
+-                intermediate_texture_ptr_ref.Get();
++                intermediate_texture_ptr_ref.get();
+             // SRV.
+             D3D12_SHADER_RESOURCE_VIEW_DESC intermediate_srv_desc;
+             intermediate_srv_desc.Format = kGuestOutputIntermediateFormat;
+@@ -696,7 +696,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+                         .GetCompletedSubmission() >=
+                     paint_context_
+                         .guest_output_intermediate_texture_last_usage) {
+-              intermediate_texture_ptr_ref.Reset();
++              intermediate_texture_ptr_ref.reset();
+             }
+           }
+         }
+@@ -747,7 +747,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+           effect_rect_y = guest_output_flow.output_y;
+         } else {
+           effect_dest_resource =
+-              paint_context_.guest_output_intermediate_textures[i].Get();
++              paint_context_.guest_output_intermediate_textures[i].get();
+           if (!i) {
+             // If this is not the first effect, the transition has been done at
+             // the end of the previous effect in a single command.
+@@ -805,16 +805,16 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+ 
+         command_list->SetPipelineState(
+             is_final_effect
+-                ? guest_output_paint_final_pipelines_[size_t(effect)].Get()
++                ? guest_output_paint_final_pipelines_[size_t(effect)].get()
+                 : guest_output_paint_intermediate_pipelines_[size_t(effect)]
+-                      .Get());
++                      .get());
+         GuestOutputPaintRootSignatureIndex
+             guest_output_paint_root_signature_index =
+                 GetGuestOutputPaintRootSignatureIndex(effect);
+         command_list->SetGraphicsRootSignature(
+             guest_output_paint_root_signatures_
+                 [size_t(guest_output_paint_root_signature_index)]
+-                    .Get());
++                    .get());
+ 
+         UINT effect_src_view_index = UINT(
+             i ? (PaintContext::kViewIndexGuestOutputIntermediate0Srv + (i - 1))
+@@ -948,7 +948,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+             barrier_srv_to_rtv.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+             barrier_srv_to_rtv.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+             barrier_srv_to_rtv.Transition.pResource =
+-                paint_context_.guest_output_intermediate_textures[i + 1].Get();
++                paint_context_.guest_output_intermediate_textures[i + 1].get();
+             barrier_srv_to_rtv.Transition.Subresource =
+                 D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+             barrier_srv_to_rtv.Transition.StateBefore =
+@@ -989,7 +989,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+   // most actual).
+   UINT64 completed_paint_submission =
+       paint_context_.paint_submission_tracker.GetCompletedSubmission();
+-  for (std::pair<UINT64, Microsoft::WRL::ComPtr<ID3D12Resource>>&
++  for (std::pair<UINT64, std::shared_ptr<ID3D12Resource>>&
+            guest_output_resource_paint_ref :
+        paint_context_.guest_output_resource_paint_refs) {
+     if (!guest_output_resource_paint_ref.second ||
+@@ -997,7 +997,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+       continue;
+     }
+     if (completed_paint_submission >= guest_output_resource_paint_ref.first) {
+-      guest_output_resource_paint_ref.second.Reset();
++      guest_output_resource_paint_ref.second.reset();
+     }
+   }
+ 
+@@ -1089,7 +1089,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+ bool D3D12Presenter::InitializeSurfaceIndependent() {
+   // Check if DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING is supported.
+   {
+-    Microsoft::WRL::ComPtr<IDXGIFactory5> dxgi_factory_5;
++    std::shared_ptr<IDXGIFactory5> dxgi_factory_5;
+     if (SUCCEEDED(provider_.GetDXGIFactory()->QueryInterface(
+             IID_PPV_ARGS(&dxgi_factory_5)))) {
+       BOOL tearing_feature_data;
+@@ -1355,7 +1355,7 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+     guest_output_paint_pipeline_desc.pRootSignature =
+         guest_output_paint_root_signatures_
+             [GetGuestOutputPaintRootSignatureIndex(guest_output_paint_effect)]
+-                .Get();
++                .get();
+     if (CanGuestOutputPaintEffectBeIntermediate(guest_output_paint_effect)) {
+       guest_output_paint_pipeline_desc.RTVFormats[0] =
+           kGuestOutputIntermediateFormat;
+@@ -1396,7 +1396,7 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+   }
+ 
+   // Paint command allocators and command list.
+-  for (Microsoft::WRL::ComPtr<ID3D12CommandAllocator>&
++  for (std::shared_ptr<ID3D12CommandAllocator>&
+            paint_command_allocator_ref : paint_context_.command_allocators) {
+     if (FAILED(device->CreateCommandAllocator(
+             D3D12_COMMAND_LIST_TYPE_DIRECT,
+@@ -1409,7 +1409,7 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+   }
+   if (FAILED(device->CreateCommandList(
+           0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+-          paint_context_.command_allocators[0].Get(), nullptr,
++          paint_context_.command_allocators[0].get(), nullptr,
+           IID_PPV_ARGS(&paint_context_.command_list)))) {
+     XELOGE(
+         "D3D12Presenter: Failed to create the command list for drawing to a "
+diff --git a/src/xenia/ui/d3d12/d3d12_presenter.h b/src/xenia/ui/d3d12/d3d12_presenter.h
+index 81d9c4ff53..6e1a475e48 100644
+--- a/src/xenia/ui/d3d12/d3d12_presenter.h
++++ b/src/xenia/ui/d3d12/d3d12_presenter.h
+@@ -37,7 +37,7 @@ class D3D12UIDrawContext final : public UIDrawContext {
+         submission_index_completed_(submission_index_completed) {}
+ 
+   ID3D12GraphicsCommandList* command_list() const {
+-    return command_list_.Get();
++    return command_list_.get();
+   }
+   UINT64 submission_index_current() const { return submission_index_current_; }
+   UINT64 submission_index_completed() const {
+@@ -45,7 +45,7 @@ class D3D12UIDrawContext final : public UIDrawContext {
+   }
+ 
+  private:
+-  Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> command_list_;
++  std::shared_ptr<ID3D12GraphicsCommandList> command_list_;
+   UINT64 submission_index_current_;
+   UINT64 submission_index_completed_;
+ };
+@@ -74,10 +74,10 @@ class D3D12Presenter final : public Presenter {
+     // kGuestOutputFormat, supports UAV. The initial state in the callback is
+     // kGuestOutputInternalState, and the callback must also transition it back
+     // to kGuestOutputInternalState before finishing.
+-    ID3D12Resource* resource_uav_capable() const { return resource_.Get(); }
++    ID3D12Resource* resource_uav_capable() const { return resource_.get(); }
+ 
+    private:
+-    Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
++    std::shared_ptr<ID3D12Resource> resource_;
+   };
+ 
+   static std::unique_ptr<D3D12Presenter> Create(
+@@ -230,19 +230,19 @@ class D3D12Presenter final : public Presenter {
+     // Signaled after presenting.
+     D3D12SubmissionTracker present_submission_tracker;
+ 
+-    std::array<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>,
++    std::array<std::shared_ptr<ID3D12CommandAllocator>,
+                kSwapChainBufferCount>
+         command_allocators;
+-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> command_list;
++    std::shared_ptr<ID3D12GraphicsCommandList> command_list;
+ 
+     // Descriptor heaps for views of the current resources related to the guest
+     // output and to painting, updated either during painting or during
+     // connection lifetime management if outdated after awaiting usage
+     // completion.
+     // RTV heap.
+-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtv_heap;
++    std::shared_ptr<ID3D12DescriptorHeap> rtv_heap;
+     // Shader-visible CBV/SRV/UAV heap.
+-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> view_heap;
++    std::shared_ptr<ID3D12DescriptorHeap> view_heap;
+ 
+     // Refreshed and cleaned up during guest output painting. The first is the
+     // paint submission index in which the guest output texture (and its
+@@ -251,14 +251,14 @@ class D3D12Presenter final : public Presenter {
+     // the reference is not in this array yet, the most outdated reference, if
+     // needed, is replaced with the new one, awaiting the completion of the last
+     // paint usage.
+-    std::array<std::pair<UINT64, Microsoft::WRL::ComPtr<ID3D12Resource>>,
++    std::array<std::pair<UINT64, std::shared_ptr<ID3D12Resource>>,
+                kGuestOutputMailboxSize>
+         guest_output_resource_paint_refs;
+ 
+     // Current intermediate textures for guest output painting, refreshed when
+     // painting guest output. While not in use, they are in
+     // D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE.
+-    std::array<Microsoft::WRL::ComPtr<ID3D12Resource>,
++    std::array<std::shared_ptr<ID3D12Resource>,
+                kMaxGuestOutputPaintEffects - 1>
+         guest_output_intermediate_textures;
+     UINT64 guest_output_intermediate_texture_last_usage = 0;
+@@ -268,8 +268,8 @@ class D3D12Presenter final : public Presenter {
+     uint32_t swap_chain_width = 0;
+     uint32_t swap_chain_height = 0;
+     bool swap_chain_allows_tearing = false;
+-    Microsoft::WRL::ComPtr<IDXGISwapChain3> swap_chain;
+-    std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, kSwapChainBufferCount>
++    std::shared_ptr<IDXGISwapChain3> swap_chain;
++    std::array<std::shared_ptr<ID3D12Resource>, kSwapChainBufferCount>
+         swap_chain_buffers;
+   };
+ 
+@@ -291,20 +291,20 @@ class D3D12Presenter final : public Presenter {
+   // Static objects for guest output presentation, used only when painting the
+   // main target (can be destroyed only after awaiting main target usage
+   // completion).
+-  std::array<Microsoft::WRL::ComPtr<ID3D12RootSignature>,
++  std::array<std::shared_ptr<ID3D12RootSignature>,
+              kGuestOutputPaintRootSignatureCount>
+       guest_output_paint_root_signatures_;
+-  std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>,
++  std::array<std::shared_ptr<ID3D12PipelineState>,
+              size_t(GuestOutputPaintEffect::kCount)>
+       guest_output_paint_intermediate_pipelines_;
+-  std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>,
++  std::array<std::shared_ptr<ID3D12PipelineState>,
+              size_t(GuestOutputPaintEffect::kCount)>
+       guest_output_paint_final_pipelines_;
+ 
+   // The first is the refresher submission tracker fence value at which the
+   // guest output texture was last refreshed, the second is the reference to the
+   // texture, which may be null. The indices are the mailbox indices.
+-  std::array<std::pair<UINT64, Microsoft::WRL::ComPtr<ID3D12Resource>>,
++  std::array<std::pair<UINT64, std::shared_ptr<ID3D12Resource>>,
+              kGuestOutputMailboxSize>
+       guest_output_resources_;
+   // The guest output resources are protected by two submission trackers - the
+diff --git a/src/xenia/ui/d3d12/d3d12_provider.cc b/src/xenia/ui/d3d12/d3d12_provider.cc
+index 1b059dcf60..099d5b5746 100644
+--- a/src/xenia/ui/d3d12/d3d12_provider.cc
++++ b/src/xenia/ui/d3d12/d3d12_provider.cc
+@@ -35,19 +35,26 @@ DEFINE_int32(
+     "system responsibility)",
+     "D3D12");
+ 
+-DEFINE_bool(d3d12_nvapi_use_driver_heap_priorities, false, "nvidia stuff",
+-            "D3D12");
++DEFINE_bool(
++  d3d12_nvapi_use_driver_heap_priorities, false,
++  "nvidia stuff. "
++  "Windows exclusive for now.",
++  "D3D12");
+ namespace xe {
+ namespace ui {
+ namespace d3d12 {
+ 
+ bool D3D12Provider::IsD3D12APIAvailable() {
++#ifndef XE_PLATFORM_WIN32
++  return true;
++#else
+   HMODULE library_d3d12 = LoadLibraryW(L"D3D12.dll");
+   if (!library_d3d12) {
+     return false;
+   }
+   FreeLibrary(library_d3d12);
+   return true;
++#endif
+ }
+ 
+ std::unique_ptr<D3D12Provider> D3D12Provider::Create() {
+@@ -82,13 +89,13 @@ D3D12Provider::~D3D12Provider() {
+   }
+ 
+   if (cvars::d3d12_debug && pfn_dxgi_get_debug_interface1_) {
+-    Microsoft::WRL::ComPtr<IDXGIDebug> dxgi_debug;
++    std::shared_ptr<IDXGIDebug> dxgi_debug;
+     if (SUCCEEDED(
+             pfn_dxgi_get_debug_interface1_(0, IID_PPV_ARGS(&dxgi_debug)))) {
+       dxgi_debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+     }
+   }
+-
++#ifdef XE_PLATFORM_WIN32
+   if (library_dxcompiler_ != nullptr) {
+     FreeLibrary(library_dxcompiler_);
+   }
+@@ -104,9 +111,14 @@ D3D12Provider::~D3D12Provider() {
+   if (library_dxgi_ != nullptr) {
+     FreeLibrary(library_dxgi_);
+   }
++#endif
+ }
+ 
+ bool D3D12Provider::EnableIncreaseBasePriorityPrivilege() {
++#ifndef XE_PLATFORM_WIN32
++  //RodoMa92: Just return success on non win32 platforms.
++  return 0;
++#else
+   TOKEN_PRIVILEGES privileges;
+   privileges.PrivilegeCount = 1;
+   privileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+@@ -123,6 +135,7 @@ bool D3D12Provider::EnableIncreaseBasePriorityPrivilege() {
+                  GetLastError() != ERROR_NOT_ALL_ASSIGNED;
+   CloseHandle(token);
+   return enabled;
++#endif
+ }
+ 
+ bool D3D12Provider::Initialize() {
+@@ -479,7 +492,9 @@ bool D3D12Provider::Initialize() {
+   // Get the graphics analysis interface, will silently fail if PIX is not
+   // attached.
+   pfn_dxgi_get_debug_interface1_(0, IID_PPV_ARGS(&graphics_analysis_));
+-  if (GetAdapterVendorID() == ui::GraphicsProvider::GpuVendorID::kNvidia) {
++  //TODO(RodoMa92): NVApi stuff is not implemented on other platforms besides Win
++#ifdef XE_PLATFORM_WIN32
++  if (GetAdapterVendorID() == GpuVendorID::kNvidia) {
+     nvapi_ = new lightweight_nvapi::nvapi_state_t();
+     if (!nvapi_->is_available()) {
+       delete nvapi_;
+@@ -506,6 +521,7 @@ bool D3D12Provider::Initialize() {
+       }
+     }
+   }
++#endif
+   return true;
+ }
+ uint32_t D3D12Provider::CreateUploadResource(
+diff --git a/src/xenia/ui/d3d12/d3d12_provider.h b/src/xenia/ui/d3d12/d3d12_provider.h
+index 3c5cad1022..d2c6003121 100644
+--- a/src/xenia/ui/d3d12/d3d12_provider.h
++++ b/src/xenia/ui/d3d12/d3d12_provider.h
+@@ -12,13 +12,22 @@
+ 
+ #include <memory>
+ 
++//Helpers to make d3d12 Windoisms compile under Linux
++#ifndef XE_PLATFORM_WIN32
++#include "xenia/gpu/d3d12/d3d12_linux_util.h"
++#endif
+ #include "xenia/ui/d3d12/d3d12_api.h"
+ #include "xenia/ui/graphics_provider.h"
+ // chrispy: this is here to prevent clang format from moving d3d12_nvapi above
+ // the headers it depends on
+ #define HEADERFENCE
+ #undef HEADERFENCE
++//TODO(RodoMa92): Implement this under linux using dxvk-nvapi-native
++// Ref: https://github.com/jp7677/dxvk-nvapi. I'm not that interested in this
++// since I do not have a nVidia GPU on my system.
++#ifdef XE_PLATFORM_WIN32
+ #include "xenia/gpu/d3d12/d3d12_nvapi.hpp"
++#endif
+ #define XE_UI_D3D12_FINE_GRAINED_DRAW_SCOPES 1
+ 
+ namespace xe {
+@@ -31,7 +40,7 @@ enum {
+ };
+ class D3D12Provider : public GraphicsProvider {
+  public:
+-  ~D3D12Provider();
++  ~D3D12Provider() override;
+ 
+   static bool IsD3D12APIAvailable();
+ 
+@@ -50,9 +59,17 @@ class D3D12Provider : public GraphicsProvider {
+ 
+   IDXGIFactory2* GetDXGIFactory() const { return dxgi_factory_; }
+   // nullptr if PIX not attached.
++  // TODO(RodoMa92): IDX is not present on other platforms except Windows
++#ifdef XE_PLATFORM_LINUX
++
++  IDXGraphicsAnalysis* GetGraphicsAnalysis() const {
++    return nullptr;
++  }
++#else
+   IDXGraphicsAnalysis* GetGraphicsAnalysis() const {
+     return graphics_analysis_;
+   }
++#endif
+   ID3D12Device* GetDevice() const { return device_; }
+   ID3D12CommandQueue* GetDirectQueue() const { return direct_queue_; }
+ 
+@@ -144,6 +161,8 @@ class D3D12Provider : public GraphicsProvider {
+     return pfn_d3d_disassemble_(src_data, src_data_size, flags, comments,
+                                 disassembly_out);
+   }
++//FixMe(RodoMa92): CLSID on POSIX
++#ifdef XE_PLATFORM_WIN32
+   HRESULT DxbcConverterCreateInstance(const CLSID& rclsid, const IID& riid,
+                                       void** ppv) const {
+     if (!pfn_dxilconv_dxc_create_instance_) {
+@@ -158,6 +177,7 @@ class D3D12Provider : public GraphicsProvider {
+     }
+     return pfn_dxcompiler_dxc_create_instance_(rclsid, riid, ppv);
+   }
++#endif
+ 
+  private:
+   D3D12Provider() = default;
+@@ -192,7 +212,9 @@ class D3D12Provider : public GraphicsProvider {
+   IDXGIFactory2* dxgi_factory_ = nullptr;
+   ID3D12Device* device_ = nullptr;
+   ID3D12CommandQueue* direct_queue_ = nullptr;
++#ifdef XE_PLATFORM_WIN32
+   IDXGraphicsAnalysis* graphics_analysis_ = nullptr;
++#endif
+ 
+   uint32_t descriptor_sizes_[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+ 
+@@ -207,6 +229,8 @@ class D3D12Provider : public GraphicsProvider {
+   bool rasterizer_ordered_views_supported_;
+   bool unaligned_block_textures_supported_;
+ 
++  //TODO(RodoMa92): See row 21 of this file
++#ifdef XE_PLATFORM_WIN32
+   lightweight_nvapi::nvapi_state_t* nvapi_;
+   lightweight_nvapi::cb_NvAPI_D3D12_CreateCommittedResource
+       nvapi_createcommittedresource_ = nullptr;
+@@ -214,6 +238,7 @@ class D3D12Provider : public GraphicsProvider {
+       nvapi_usedriverheappriorities_ = nullptr;
+   lightweight_nvapi::cb_NvAPI_D3D12_QueryCpuVisibleVidmem
+       nvapi_querycpuvisiblevidmem_ = nullptr;
++#endif
+ };
+ 
+ }  // namespace d3d12
+diff --git a/src/xenia/ui/d3d12/d3d12_submission_tracker.cc b/src/xenia/ui/d3d12/d3d12_submission_tracker.cc
+index 3a1c7938d8..7e2bb9bf39 100644
+--- a/src/xenia/ui/d3d12/d3d12_submission_tracker.cc
++++ b/src/xenia/ui/d3d12/d3d12_submission_tracker.cc
+@@ -40,8 +40,8 @@ bool D3D12SubmissionTracker::Initialize(ID3D12Device* device,
+ 
+ void D3D12SubmissionTracker::Shutdown() {
+   AwaitAllSubmissionsCompletion();
+-  queue_.Reset();
+-  fence_.Reset();
++  queue_.reset();
++  fence_.reset();
+   if (fence_completion_event_) {
+     CloseHandle(fence_completion_event_);
+     fence_completion_event_ = nullptr;
+@@ -82,8 +82,8 @@ bool D3D12SubmissionTracker::AwaitSubmissionCompletion(
+   return fence_value == submission_index;
+ }
+ 
+-void D3D12SubmissionTracker::SetQueue(ID3D12CommandQueue* new_queue) {
+-  if (queue_.Get() == new_queue) {
++void D3D12SubmissionTracker::SetQueue(std::shared_ptr<ID3D12CommandQueue> new_queue) {
++  if (queue_.get() == new_queue.get()) {
+     return;
+   }
+   if (queue_) {
+@@ -109,9 +109,15 @@ bool D3D12SubmissionTracker::TrySignalEnqueueing() {
+   if (!queue_ || !fence_) {
+     return false;
+   }
++#ifdef XE_PLATFORM_WIN32
+   if (FAILED(queue_->Signal(fence_.Get(), submission_current_ - 1))) {
+     return false;
+   }
++#else
++  if (FAILED(queue_->Signal(fence_.get(), submission_current_ - 1))) {
++    return false;
++  }
++#endif
+   submission_signal_queued_ = submission_current_ - 1;
+   return true;
+ }
+diff --git a/src/xenia/ui/d3d12/d3d12_submission_tracker.h b/src/xenia/ui/d3d12/d3d12_submission_tracker.h
+index cf4e928367..2efef70dcb 100644
+--- a/src/xenia/ui/d3d12/d3d12_submission_tracker.h
++++ b/src/xenia/ui/d3d12/d3d12_submission_tracker.h
+@@ -10,6 +10,8 @@
+ #ifndef XENIA_UI_D3D12_D3D12_SUBMISSION_TRACKER_H_
+ #define XENIA_UI_D3D12_D3D12_SUBMISSION_TRACKER_H_
+ 
++#include <memory>
++
+ #include "xenia/ui/d3d12/d3d12_api.h"
+ 
+ namespace xe {
+@@ -45,7 +47,7 @@ class D3D12SubmissionTracker {
+ 
+   // Will perform an ownership transfer if the queue is different than the
+   // current one, and take a reference to the queue.
+-  void SetQueue(ID3D12CommandQueue* new_queue);
++  void SetQueue(std::shared_ptr<ID3D12CommandQueue> new_queue);
+ 
+   UINT64 GetCurrentSubmission() const { return submission_current_; }
+   // May be lower than a value awaited by AwaitSubmissionCompletion if it
+@@ -82,8 +84,8 @@ class D3D12SubmissionTracker {
+   UINT64 submission_current_ = 1;
+   UINT64 submission_signal_queued_ = 0;
+   HANDLE fence_completion_event_ = nullptr;
+-  Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
+-  Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue_;
++  std::shared_ptr<ID3D12Fence> fence_;
++  std::shared_ptr<ID3D12CommandQueue> queue_;
+ };
+ 
+ }  // namespace d3d12
+diff --git a/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc b/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc
+index e5eb9a9ed0..65b191714f 100644
+--- a/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc
++++ b/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc
+@@ -80,7 +80,7 @@ D3D12UploadBufferPool::CreatePageImplementation() {
+   D3D12_RESOURCE_DESC buffer_desc;
+   util::FillBufferResourceDesc(buffer_desc, page_size_,
+                                D3D12_RESOURCE_FLAG_NONE);
+-  Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
++  std::shared_ptr<ID3D12Resource> buffer;
+ 
+   if (!provider_.CreateUploadResource(
+           provider_.GetHeapFlagCreateNotZeroed(), &buffer_desc,
+@@ -98,7 +98,7 @@ D3D12UploadBufferPool::CreatePageImplementation() {
+     return nullptr;
+   }
+   // Unmapping will be done implicitly when the resource is destroyed.
+-  return new D3D12Page(buffer.Get(), mapping);
++  return new D3D12Page(buffer.get(), mapping);
+ }
+ 
+ D3D12UploadBufferPool::D3D12Page::D3D12Page(ID3D12Resource* buffer,
+diff --git a/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.h b/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.h
+index c35443c5ee..13c8103338 100644
+--- a/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.h
++++ b/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.h
+@@ -38,7 +38,7 @@ class D3D12UploadBufferPool : public GraphicsUploadBufferPool {
+     // Creates a reference to the buffer. It must not be unmapped until this
+     // D3D12Page is deleted.
+     D3D12Page(ID3D12Resource* buffer, void* mapping);
+-    Microsoft::WRL::ComPtr<ID3D12Resource> buffer_;
++    std::shared_ptr<ID3D12Resource> buffer_;
+     void* mapping_;
+     D3D12_GPU_VIRTUAL_ADDRESS gpu_address_;
+   };
+diff --git a/src/xenia/ui/d3d12/premake5.lua b/src/xenia/ui/d3d12/premake5.lua
+index 9e667bbe9c..94cb7a987f 100644
+--- a/src/xenia/ui/d3d12/premake5.lua
++++ b/src/xenia/ui/d3d12/premake5.lua
+@@ -19,6 +19,12 @@ project("xenia-ui-d3d12")
+   files({
+     "../shaders/bytecode/d3d12_5_1/*.h",
+   })
++  filter({"Platforms:Linux"})
++    includedirs({
++      project_root.."/lib/vkd3d-proton/include/vkd3d-proton",
++      project_root.."/lib/dxvk/include/",
++    })
++  filter({})
+ 
+ group("demos")
+ project("xenia-ui-window-d3d12-demo")
+
+From 7392f925e9bb845c4654037cac43212dd2880ee0 Mon Sep 17 00:00:00 2001
+From: Marco Rodolfi <marco.rodolfi@tuta.io>
+Date: Mon, 3 Feb 2025 17:55:01 +0100
+Subject: [PATCH 8/8] [dx12] Initial WIP DX12 changes for using vkd3d-native on
+ Linux, second round
+
+---
+ premake5.lua                                  |  4 +
+ .../gpu/d3d12/d3d12_command_processor.cc      | 82 ++++++++++---------
+ src/xenia/gpu/d3d12/d3d12_command_processor.h |  5 +-
+ src/xenia/gpu/d3d12/d3d12_linux_util.h        | 10 ---
+ .../gpu/d3d12/d3d12_primitive_processor.cc    | 10 +--
+ src/xenia/gpu/d3d12/d3d12_texture_cache.cc    | 15 ++--
+ src/xenia/gpu/d3d12/premake5.lua              |  3 -
+ src/xenia/helper/linux_util.h                 | 19 +++++
+ src/xenia/ui/d3d12/d3d12_immediate_drawer.cc  | 15 ++--
+ src/xenia/ui/d3d12/d3d12_presenter.cc         | 47 +++++++----
+ src/xenia/ui/d3d12/d3d12_provider.cc          | 15 +++-
+ src/xenia/ui/d3d12/d3d12_provider.h           |  2 +-
+ .../ui/d3d12/d3d12_submission_tracker.cc      |  8 +-
+ src/xenia/ui/d3d12/d3d12_submission_tracker.h |  5 ++
+ .../ui/d3d12/d3d12_upload_buffer_pool.cc      |  7 +-
+ 16 files changed, 154 insertions(+), 96 deletions(-)
+ delete mode 100644 src/xenia/gpu/d3d12/d3d12_linux_util.h
+ create mode 100644 src/xenia/helper/linux_util.h
+
+diff --git a/premake5.lua b/premake5.lua
+index a5508ba75c..b15cdb6a6a 100644
+--- a/premake5.lua
++++ b/premake5.lua
+@@ -287,6 +287,8 @@ workspace("xenia")
+     -- not supported; lifecycle management (especially surface loss) is also
+     -- complicated.
+     include("third_party/SDL2.lua")
++    include("third_party/pevents.lua")
++    files("src/xenia/helper/linux_util.h")
+   end
+ 
+   -- Disable treating warnings as fatal errors for all third party projects, as
+@@ -325,6 +327,8 @@ workspace("xenia")
+     include("src/xenia/apu/sdl")
+     include("src/xenia/helper/sdl")
+     include("src/xenia/hid/sdl")
++    include("src/xenia/gpu/d3d12")
++    include("src/xenia/ui/d3d12")
+   end
+ 
+   if os.istarget("windows") then
+diff --git a/src/xenia/gpu/d3d12/d3d12_command_processor.cc b/src/xenia/gpu/d3d12/d3d12_command_processor.cc
+index 1c7e928c9f..b3e55ddb97 100644
+--- a/src/xenia/gpu/d3d12/d3d12_command_processor.cc
++++ b/src/xenia/gpu/d3d12/d3d12_command_processor.cc
+@@ -1203,20 +1203,22 @@ bool D3D12CommandProcessor::SetupContext() {
+       gamma_ramp_buffer_desc, (256 + 128 * 3) * 4, D3D12_RESOURCE_FLAG_NONE);
+   // The first action will be uploading.
+   gamma_ramp_buffer_state_ = D3D12_RESOURCE_STATE_COPY_DEST;
++  ID3D12Resource * ptr = gamma_ramp_buffer_.get();
+   if (FAILED(device->CreateCommittedResource(
+           &ui::d3d12::util::kHeapPropertiesDefault, heap_flag_create_not_zeroed,
+           &gamma_ramp_buffer_desc, gamma_ramp_buffer_state_, nullptr,
+-          IID_PPV_ARGS(&gamma_ramp_buffer_)))) {
++          IID_PPV_ARGS(&ptr)))) {
+     XELOGE("Failed to create the gamma ramp buffer");
+     return false;
+   }
+   // The upload buffer is frame-buffered.
+   gamma_ramp_buffer_desc.Width *= kQueueFrames;
+ 
++  ptr = gamma_ramp_upload_buffer_.get();
+   if (!GetD3D12Provider().CreateUploadResource(
+           heap_flag_create_not_zeroed, &gamma_ramp_buffer_desc,
+           D3D12_RESOURCE_STATE_GENERIC_READ,
+-          IID_PPV_ARGS(&gamma_ramp_upload_buffer_))) {
++          IID_PPV_ARGS(&ptr))) {
+     XELOGE("Failed to create the gamma ramp upload buffer");
+     return false;
+   }
+@@ -1319,7 +1321,7 @@ bool D3D12CommandProcessor::SetupContext() {
+       ui::d3d12::util::CreateComputePipeline(
+           device, shaders::apply_gamma_table_cs,
+           sizeof(shaders::apply_gamma_table_cs),
+-          apply_gamma_root_signature_.Get());
++          apply_gamma_root_signature_.get());
+   if (!apply_gamma_table_pipeline_) {
+     XELOGE(
+         "Failed to create the 256-entry table gamma ramp application compute "
+@@ -1330,7 +1332,7 @@ bool D3D12CommandProcessor::SetupContext() {
+       ui::d3d12::util::CreateComputePipeline(
+           device, shaders::apply_gamma_table_fxaa_luma_cs,
+           sizeof(shaders::apply_gamma_table_fxaa_luma_cs),
+-          apply_gamma_root_signature_.Get());
++          apply_gamma_root_signature_.get());
+   if (!apply_gamma_table_fxaa_luma_pipeline_) {
+     XELOGE(
+         "Failed to create the 256-entry table gamma ramp application compute "
+@@ -1341,7 +1343,7 @@ bool D3D12CommandProcessor::SetupContext() {
+       ui::d3d12::util::CreateComputePipeline(
+           device, shaders::apply_gamma_pwl_cs,
+           sizeof(shaders::apply_gamma_pwl_cs),
+-          apply_gamma_root_signature_.Get());
++          apply_gamma_root_signature_.get());
+   if (!apply_gamma_pwl_pipeline_) {
+     XELOGE("Failed to create the PWL gamma ramp application compute pipeline");
+     return false;
+@@ -1350,7 +1352,7 @@ bool D3D12CommandProcessor::SetupContext() {
+       ui::d3d12::util::CreateComputePipeline(
+           device, shaders::apply_gamma_pwl_fxaa_luma_cs,
+           sizeof(shaders::apply_gamma_pwl_fxaa_luma_cs),
+-          apply_gamma_root_signature_.Get());
++          apply_gamma_root_signature_.get());
+   if (!apply_gamma_pwl_fxaa_luma_pipeline_) {
+     XELOGE(
+         "Failed to create the PWL gamma ramp application compute pipeline with "
+@@ -1433,7 +1435,7 @@ bool D3D12CommandProcessor::SetupContext() {
+   *(fxaa_pipeline_.ReleaseAndGetAddressOf()) =
+       ui::d3d12::util::CreateComputePipeline(device, shaders::fxaa_cs,
+                                              sizeof(shaders::fxaa_cs),
+-                                             fxaa_root_signature_.Get());
++                                             fxaa_root_signature_.get());
+   if (!fxaa_pipeline_) {
+     XELOGE("Failed to create the FXAA compute pipeline");
+     return false;
+@@ -1441,7 +1443,7 @@ bool D3D12CommandProcessor::SetupContext() {
+   *(fxaa_extreme_pipeline_.ReleaseAndGetAddressOf()) =
+       ui::d3d12::util::CreateComputePipeline(device, shaders::fxaa_extreme_cs,
+                                              sizeof(shaders::fxaa_extreme_cs),
+-                                             fxaa_root_signature_.Get());
++                                             fxaa_root_signature_.get());
+   if (!fxaa_pipeline_) {
+     XELOGE("Failed to create the extreme-quality FXAA compute pipeline");
+     return false;
+@@ -1632,22 +1634,22 @@ void D3D12CommandProcessor::ShutdownContext() {
+   resources_for_deletion_.clear();
+ 
+   fxaa_source_texture_submission_ = 0;
+-  fxaa_source_texture_.Reset();
++  fxaa_source_texture_.reset();
+ 
+-  fxaa_extreme_pipeline_.Reset();
+-  fxaa_pipeline_.Reset();
+-  fxaa_root_signature_.Reset();
++  fxaa_extreme_pipeline_.reset();
++  fxaa_pipeline_.reset();
++  fxaa_root_signature_.reset();
+ 
+-  apply_gamma_pwl_fxaa_luma_pipeline_.Reset();
+-  apply_gamma_pwl_pipeline_.Reset();
+-  apply_gamma_table_fxaa_luma_pipeline_.Reset();
+-  apply_gamma_table_pipeline_.Reset();
+-  apply_gamma_root_signature_.Reset();
++  apply_gamma_pwl_fxaa_luma_pipeline_.reset();
++  apply_gamma_pwl_pipeline_.reset();
++  apply_gamma_table_fxaa_luma_pipeline_.reset();
++  apply_gamma_table_pipeline_.reset();
++  apply_gamma_root_signature_.reset();
+ 
+   // Unmapping will be done implicitly by the destruction.
+   gamma_ramp_upload_buffer_mapping_ = nullptr;
+-  gamma_ramp_upload_buffer_.Reset();
+-  gamma_ramp_buffer_.Reset();
++  gamma_ramp_upload_buffer_.reset();
++  gamma_ramp_buffer_.reset();
+ 
+   texture_cache_.reset();
+ 
+@@ -2212,9 +2214,9 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+                 fxaa_source_texture_->AddRef();
+                 resources_for_deletion_.emplace_back(
+                     fxaa_source_texture_submission_,
+-                    fxaa_source_texture_.Get());
++                    fxaa_source_texture_.get());
+               }
+-              fxaa_source_texture_.Reset();
++              fxaa_source_texture_.reset();
+               fxaa_source_texture_submission_ = 0;
+             }
+           }
+@@ -2233,12 +2235,13 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+             fxaa_source_texture_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+             fxaa_source_texture_desc.Flags =
+                 D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
++            ID3D12Resource* ptr = fxaa_source_texture_.get();
+             if (FAILED(device->CreateCommittedResource(
+                     &ui::d3d12::util::kHeapPropertiesDefault,
+                     provider.GetHeapFlagCreateNotZeroed(),
+                     &fxaa_source_texture_desc,
+                     D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, nullptr,
+-                    IID_PPV_ARGS(&fxaa_source_texture_)))) {
++                    IID_PPV_ARGS(&ptr)))) {
+               XELOGE("Failed to create the FXAA input texture");
+               swap_post_effect = SwapPostEffect::kNone;
+               use_fxaa = false;
+@@ -2299,14 +2302,14 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+                     : static_cast<const void*>(gamma_ramp_256_entry_table()),
+                 gamma_ramp_size_bytes);
+           }
+-          PushTransitionBarrier(gamma_ramp_buffer_.Get(),
++          PushTransitionBarrier(gamma_ramp_buffer_.get(),
+                                 gamma_ramp_buffer_state_,
+                                 D3D12_RESOURCE_STATE_COPY_DEST);
+           gamma_ramp_buffer_state_ = D3D12_RESOURCE_STATE_COPY_DEST;
+           SubmitBarriers();
+           deferred_command_list_.D3DCopyBufferRegion(
+-              gamma_ramp_buffer_.Get(), gamma_ramp_offset_bytes,
+-              gamma_ramp_upload_buffer_.Get(), gamma_ramp_upload_offset_bytes,
++              gamma_ramp_buffer_.get(), gamma_ramp_offset_bytes,
++              gamma_ramp_upload_buffer_.get(), gamma_ramp_upload_offset_bytes,
+               gamma_ramp_size_bytes);
+           (use_pwl_gamma_ramp ? gamma_ramp_pwl_up_to_date_
+                               : gamma_ramp_256_entry_table_up_to_date_) = true;
+@@ -2343,7 +2346,7 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+         }
+ 
+         ID3D12Resource* apply_gamma_dest =
+-            use_fxaa ? fxaa_source_texture_.Get() : guest_output_resource;
++            use_fxaa ? fxaa_source_texture_.get() : guest_output_resource;
+         D3D12_RESOURCE_STATES apply_gamma_dest_initial_state =
+             use_fxaa ? D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE
+                      : ui::d3d12::D3D12Presenter::kGuestOutputInternalState;
+@@ -2369,14 +2372,14 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+                                          &swap_texture_srv_desc,
+                                          apply_gamma_descriptors[1].first);
+ 
+-        PushTransitionBarrier(gamma_ramp_buffer_.Get(),
++        PushTransitionBarrier(gamma_ramp_buffer_.get(),
+                               gamma_ramp_buffer_state_,
+                               D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+         gamma_ramp_buffer_state_ =
+             D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+ 
+         deferred_command_list_.D3DSetComputeRootSignature(
+-            apply_gamma_root_signature_.Get());
++            apply_gamma_root_signature_.get());
+         ApplyGammaConstants apply_gamma_constants;
+         apply_gamma_constants.size[0] = uint32_t(swap_texture_desc.Width);
+         apply_gamma_constants.size[1] = uint32_t(swap_texture_desc.Height);
+@@ -2396,12 +2399,12 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+         ID3D12PipelineState* apply_gamma_pipeline;
+         if (use_pwl_gamma_ramp) {
+           apply_gamma_pipeline = use_fxaa
+-                                     ? apply_gamma_pwl_fxaa_luma_pipeline_.Get()
+-                                     : apply_gamma_pwl_pipeline_.Get();
++                                     ? apply_gamma_pwl_fxaa_luma_pipeline_.get()
++                                     : apply_gamma_pwl_pipeline_.get();
+         } else {
+           apply_gamma_pipeline =
+-              use_fxaa ? apply_gamma_table_fxaa_luma_pipeline_.Get()
+-                       : apply_gamma_table_pipeline_.Get();
++              use_fxaa ? apply_gamma_table_fxaa_luma_pipeline_.get()
++                       : apply_gamma_table_pipeline_.get();
+         }
+         SetExternalPipeline(apply_gamma_pipeline);
+         SubmitBarriers();
+@@ -2447,7 +2450,7 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+             // From now on, even in case of failure, guest_output_resource must
+             // be transitioned back to kGuestOutputInternalState!
+             deferred_command_list_.D3DSetComputeRootSignature(
+-                fxaa_root_signature_.Get());
++                fxaa_root_signature_.get());
+             FxaaConstants fxaa_constants;
+             fxaa_constants.size[0] = uint32_t(swap_texture_desc.Width);
+             fxaa_constants.size[1] = uint32_t(swap_texture_desc.Height);
+@@ -2477,14 +2480,14 @@ void D3D12CommandProcessor::IssueSwap(uint32_t frontbuffer_ptr,
+             fxaa_source_srv_desc.Texture2D.MipLevels = 1;
+             fxaa_source_srv_desc.Texture2D.PlaneSlice = 0;
+             fxaa_source_srv_desc.Texture2D.ResourceMinLODClamp = 0.0f;
+-            device->CreateShaderResourceView(fxaa_source_texture_.Get(),
++            device->CreateShaderResourceView(fxaa_source_texture_.get(),
+                                              &fxaa_source_srv_desc,
+                                              fxaa_descriptors[1].first);
+             deferred_command_list_.D3DSetComputeRootDescriptorTable(
+                 UINT(FxaaRootParameter::kSource), fxaa_descriptors[1].second);
+             SetExternalPipeline(swap_post_effect == SwapPostEffect::kFxaaExtreme
+-                                    ? fxaa_extreme_pipeline_.Get()
+-                                    : fxaa_pipeline_.Get());
++                                    ? fxaa_extreme_pipeline_.get()
++                                    : fxaa_pipeline_.get());
+             SubmitBarriers();
+             deferred_command_list_.D3DDispatch(group_count_x, group_count_y, 1);
+             PushTransitionBarrier(
+@@ -3337,6 +3340,8 @@ bool D3D12CommandProcessor::BeginSubmission(bool is_guest_command) {
+ 
+     pix_capturing_ =
+         pix_capture_requested_.exchange(false, std::memory_order_relaxed);
++
++#ifdef XE_PLATFORM_WIN32
+     if (pix_capturing_) {
+       IDXGraphicsAnalysis* graphics_analysis =
+           GetD3D12Provider().GetGraphicsAnalysis();
+@@ -3344,6 +3349,7 @@ bool D3D12CommandProcessor::BeginSubmission(bool is_guest_command) {
+         graphics_analysis->BeginCapture();
+       }
+     }
++#endif
+ 
+     primitive_processor_->BeginFrame();
+ 
+@@ -3434,6 +3440,7 @@ bool D3D12CommandProcessor::EndSubmission(bool is_swap) {
+     if (cvars::clear_memory_page_state) {
+       shared_memory_->SetSystemPageBlocksValidWithGpuDataWritten();
+     }
++#ifdef XE_PLATFORM_WIN32
+     // Close the capture after submitting.
+     if (pix_capturing_) {
+       IDXGraphicsAnalysis* graphics_analysis = provider.GetGraphicsAnalysis();
+@@ -3442,6 +3449,7 @@ bool D3D12CommandProcessor::EndSubmission(bool is_swap) {
+       }
+       pix_capturing_ = false;
+     }
++#endif
+     frame_open_ = false;
+     // Submission already closed now, so minus 1.
+     closed_frame_submissions_[(frame_current_++) % kQueueFrames] =
+@@ -5123,7 +5131,7 @@ void D3D12CommandProcessor::WriteGammaRampSRV(
+     desc.Buffer.FirstElement = 0;
+     desc.Buffer.NumElements = 256;
+   }
+-  device->CreateShaderResourceView(gamma_ramp_buffer_.Get(), &desc, handle);
++  device->CreateShaderResourceView(gamma_ramp_buffer_.get(), &desc, handle);
+ }
+ 
+ #define COMMAND_PROCESSOR D3D12CommandProcessor
+diff --git a/src/xenia/gpu/d3d12/d3d12_command_processor.h b/src/xenia/gpu/d3d12/d3d12_command_processor.h
+index 4eb80d2c1a..154352afb7 100644
+--- a/src/xenia/gpu/d3d12/d3d12_command_processor.h
++++ b/src/xenia/gpu/d3d12/d3d12_command_processor.h
+@@ -502,8 +502,11 @@ class D3D12CommandProcessor final : public CommandProcessor {
+ 
+   bool cache_clear_requested_ = false;
+ 
++#ifndef XE_PLATFORM_WIN32
++  neosmart::neosmart_event_t fence_completion_event_ = nullptr;
++#else
+   HANDLE fence_completion_event_ = nullptr;
+-
++#endif
+   bool submission_open_ = false;
+   // Values of submission_fence_.
+   uint64_t submission_current_ = 1;
+diff --git a/src/xenia/gpu/d3d12/d3d12_linux_util.h b/src/xenia/gpu/d3d12/d3d12_linux_util.h
+deleted file mode 100644
+index 6c1e6c15ab..0000000000
+--- a/src/xenia/gpu/d3d12/d3d12_linux_util.h
++++ /dev/null
+@@ -1,10 +0,0 @@
+-//
+-// Created by marco on 03/02/25.
+-//
+-
+-#ifndef D3D12_LINUX_UTIL_H
+-#define D3D12_LINUX_UTIL_H
+-#define _In_
+-#define _COM_Outptr_
+-#define IDXGraphicsAnalysis void
+-#endif //D3D12_LINUX_UTIL_H
+diff --git a/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc b/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc
+index 8bb83c5f87..6d3e4f990f 100644
+--- a/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc
++++ b/src/xenia/gpu/d3d12/d3d12_primitive_processor.cc
+@@ -42,9 +42,9 @@ bool D3D12PrimitiveProcessor::Initialize() {
+ void D3D12PrimitiveProcessor::Shutdown(bool from_destructor) {
+   frame_index_buffers_.clear();
+   frame_index_buffer_pool_.reset();
+-  builtin_index_buffer_upload_.Reset();
++  builtin_index_buffer_upload_.reset();
+   builtin_index_buffer_gpu_address_ = 0;
+-  builtin_index_buffer_.Reset();
++  builtin_index_buffer_.reset();
+   if (!from_destructor) {
+     ShutdownCommon();
+   }
+@@ -54,7 +54,7 @@ void D3D12PrimitiveProcessor::CompletedSubmissionUpdated() {
+   if (builtin_index_buffer_upload_ &&
+       command_processor_.GetCompletedSubmission() >=
+           builtin_index_buffer_upload_submission_) {
+-    builtin_index_buffer_upload_.Reset();
++    builtin_index_buffer_upload_.reset();
+   }
+ }
+ 
+@@ -65,8 +65,8 @@ void D3D12PrimitiveProcessor::BeginSubmission() {
+     // been used yet, so it's in the initial state, and
+     // builtin_index_buffer_upload_ is in an upload heap, so it's GENERIC_READ.
+     command_processor_.GetDeferredCommandList().D3DCopyResource(
+-        builtin_index_buffer_.Get(), builtin_index_buffer_upload_.Get());
+-    command_processor_.PushTransitionBarrier(builtin_index_buffer_.Get(),
++        builtin_index_buffer_.get(), builtin_index_buffer_upload_.get());
++    command_processor_.PushTransitionBarrier(builtin_index_buffer_.get(),
+                                              D3D12_RESOURCE_STATE_COPY_DEST,
+                                              D3D12_RESOURCE_STATE_INDEX_BUFFER);
+     builtin_index_buffer_upload_submission_ =
+diff --git a/src/xenia/gpu/d3d12/d3d12_texture_cache.cc b/src/xenia/gpu/d3d12/d3d12_texture_cache.cc
+index 5a16061e49..b5a5c34499 100644
+--- a/src/xenia/gpu/d3d12/d3d12_texture_cache.cc
++++ b/src/xenia/gpu/d3d12/d3d12_texture_cache.cc
+@@ -332,7 +332,7 @@ bool D3D12TextureCache::Initialize() {
+         ui::d3d12::util::CreateComputePipeline(
+             device, current_load_shader_code.pShaderBytecode,
+             current_load_shader_code.BytecodeLength,
+-            load_root_signature_.Get());
++            load_root_signature_.get());
+     if (!load_pipelines_[i]) {
+       XELOGE(
+           "D3D12TextureCache: Failed to create the texture loading pipeline "
+@@ -348,7 +348,7 @@ bool D3D12TextureCache::Initialize() {
+             ui::d3d12::util::CreateComputePipeline(
+                 device, current_load_shader_code_scaled.pShaderBytecode,
+                 current_load_shader_code_scaled.BytecodeLength,
+-                load_root_signature_.Get());
++                load_root_signature_.get());
+         if (!load_pipelines_scaled_[i]) {
+           XELOGE(
+               "D3D12TextureCache: Failed to create the resolution-scaled "
+@@ -371,9 +371,10 @@ bool D3D12TextureCache::Initialize() {
+       uint32_t(NullSRVDescriptorIndex::kCount);
+   null_srv_descriptor_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+   null_srv_descriptor_heap_desc.NodeMask = 0;
++  ID3D12DescriptorHeap* ptr = null_srv_descriptor_heap_.get();
+   if (FAILED(device->CreateDescriptorHeap(
+           &null_srv_descriptor_heap_desc,
+-          IID_PPV_ARGS(&null_srv_descriptor_heap_)))) {
++          IID_PPV_ARGS(&ptr)))) {
+     XELOGE(
+         "D3D12TextureCache: Failed to create the descriptor heap for null "
+         "SRVs");
+@@ -988,7 +989,7 @@ bool D3D12TextureCache::EnsureScaledResolveMemoryCommitted(
+                D3D12_TILED_RESOURCE_TILE_SIZE_IN_BYTES);
+       direct_queue->UpdateTileMappings(
+           scaled_resolve_2gb_buffers_[buffer_index]->resource(), 1,
+-          &region_start_coordinates, &region_size, scaled_resolve_heap.Get(), 1,
++          &region_start_coordinates, &region_size, scaled_resolve_heap.get(), 1,
+           &range_flags, &heap_range_start_offset, &range_tile_count,
+           D3D12_TILE_MAPPING_FLAG_NONE);
+     }
+@@ -1365,8 +1366,8 @@ bool D3D12TextureCache::LoadTextureDataFromResidentMemoryImpl(Texture& texture,
+   }
+   bool texture_resolution_scaled = texture_key.scaled_resolve;
+   ID3D12PipelineState* pipeline =
+-      texture_resolution_scaled ? load_pipelines_scaled_[load_shader].Get()
+-                                : load_pipelines_[load_shader].Get();
++      texture_resolution_scaled ? load_pipelines_scaled_[load_shader].get()
++                                : load_pipelines_[load_shader].get();
+   if (pipeline == nullptr) {
+     return false;
+   }
+@@ -1524,7 +1525,7 @@ bool D3D12TextureCache::LoadTextureDataFromResidentMemoryImpl(Texture& texture,
+   }
+   uint32_t descriptor_write_index = 0;
+   command_processor_.SetExternalPipeline(pipeline);
+-  command_list.D3DSetComputeRootSignature(load_root_signature_.Get());
++  command_list.D3DSetComputeRootSignature(load_root_signature_.get());
+   // Set up the destination descriptor.
+   assert_true(descriptor_write_index < descriptor_count);
+   ui::d3d12::util::DescriptorCpuGpuHandlePair descriptor_dest =
+diff --git a/src/xenia/gpu/d3d12/premake5.lua b/src/xenia/gpu/d3d12/premake5.lua
+index bed71d7664..c882c63016 100644
+--- a/src/xenia/gpu/d3d12/premake5.lua
++++ b/src/xenia/gpu/d3d12/premake5.lua
+@@ -23,9 +23,6 @@ project("xenia-gpu-d3d12")
+       project_root.."/lib/vkd3d-proton/include/vkd3d-proton",
+       project_root.."/lib/dxvk/include/",
+     })
+-    files({
+-      "./linux_helpers/*.h",
+-    })
+   filter({})
+ 
+ group("src")
+diff --git a/src/xenia/helper/linux_util.h b/src/xenia/helper/linux_util.h
+new file mode 100644
+index 0000000000..b54a8fb7a1
+--- /dev/null
++++ b/src/xenia/helper/linux_util.h
+@@ -0,0 +1,19 @@
++/**
++******************************************************************************
++ * Xenia : Xbox 360 Emulator Research Project                                 *
++ ******************************************************************************
++ * Copyright 2025 Ben Vanik. All rights reserved.                             *
++ * Released under the BSD license - see LICENSE in the root for more details. *
++ ******************************************************************************
++ */
++
++#ifndef D3D12_LINUX_UTIL_H
++#define D3D12_LINUX_UTIL_H
++//Tiny library glue logic to translate Win32 Signal API -> POSIX events equivalent calls
++#include "../../../third_party/pevents/src/pevents.h"
++#define _In_
++#define _COM_Outptr_
++#define CreateEvent(a,b,c,d) neosmart::CreateEvent(b,c)
++#define CloseHandle neosmart::DestroyEvent
++#define IDXGraphicsAnalysis void
++#endif //D3D12_LINUX_UTIL_H
+diff --git a/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc b/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc
+index 2f4a6605a6..a369d50de8 100644
+--- a/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc
++++ b/src/xenia/ui/d3d12/d3d12_immediate_drawer.cc
+@@ -165,14 +165,16 @@ bool D3D12ImmediateDrawer::Initialize() {
+   pipeline_desc.NumRenderTargets = 1;
+   pipeline_desc.RTVFormats[0] = D3D12Presenter::kSwapChainFormat;
+   pipeline_desc.SampleDesc.Count = 1;
++  ID3D12PipelineState* pipe_state = pipeline_triangle_.get();
+   if (FAILED(device->CreateGraphicsPipelineState(
+-          &pipeline_desc, IID_PPV_ARGS(&pipeline_triangle_)))) {
++          &pipeline_desc, IID_PPV_ARGS(&pipe_state)))) {
+     XELOGE("D3D12ImmediateDrawer: Failed to create the triangle pipeline");
+     return false;
+   }
+   pipeline_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
++  pipe_state = pipeline_line_.get();
+   if (FAILED(device->CreateGraphicsPipelineState(
+-          &pipeline_desc, IID_PPV_ARGS(&pipeline_line_)))) {
++          &pipeline_desc, IID_PPV_ARGS(&pipe_state)))) {
+     XELOGE("D3D12ImmediateDrawer: Failed to create the line pipeline");
+     return false;
+   }
+@@ -183,8 +185,9 @@ bool D3D12ImmediateDrawer::Initialize() {
+   sampler_heap_desc.NumDescriptors = UINT(SamplerIndex::kCount);
+   sampler_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+   sampler_heap_desc.NodeMask = 0;
++  ID3D12DescriptorHeap* samp_heap = sampler_heap_.get();
+   if (FAILED(device->CreateDescriptorHeap(&sampler_heap_desc,
+-                                          IID_PPV_ARGS(&sampler_heap_)))) {
++                                          IID_PPV_ARGS(&samp_heap)))) {
+     XELOGE(
+         "D3D12ImmediateDrawer: Failed to create the sampler descriptor heap");
+     return false;
+@@ -252,10 +255,11 @@ std::unique_ptr<ImmediateTexture> D3D12ImmediateDrawer::CreateTexture(
+   resource_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+   resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+   std::shared_ptr<ID3D12Resource> resource;
++  ID3D12Resource* ptr_res = resource.get();
+   if (SUCCEEDED(device->CreateCommittedResource(
+           &util::kHeapPropertiesDefault, heap_flag_create_not_zeroed,
+           &resource_desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+-          IID_PPV_ARGS(&resource)))) {
++          IID_PPV_ARGS(&ptr_res)))) {
+     // Create and fill the upload buffer.
+     D3D12_PLACED_SUBRESOURCE_FOOTPRINT upload_footprint;
+     UINT64 upload_size;
+@@ -265,10 +269,11 @@ std::unique_ptr<ImmediateTexture> D3D12ImmediateDrawer::CreateTexture(
+     util::FillBufferResourceDesc(upload_buffer_desc, upload_size,
+                                  D3D12_RESOURCE_FLAG_NONE);
+     std::shared_ptr<ID3D12Resource> upload_buffer;
++    ID3D12Resource * upload_buffer_ptr = upload_buffer.get();
+     if (SUCCEEDED(device->CreateCommittedResource(
+             &util::kHeapPropertiesUpload, heap_flag_create_not_zeroed,
+             &upload_buffer_desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+-            IID_PPV_ARGS(&upload_buffer)))) {
++            IID_PPV_ARGS(&upload_buffer_ptr)))) {
+       D3D12_RANGE upload_buffer_read_range;
+       upload_buffer_read_range.Begin = 0;
+       upload_buffer_read_range.End = 0;
+diff --git a/src/xenia/ui/d3d12/d3d12_presenter.cc b/src/xenia/ui/d3d12/d3d12_presenter.cc
+index e1b1c928cc..5911818169 100644
+--- a/src/xenia/ui/d3d12/d3d12_presenter.cc
++++ b/src/xenia/ui/d3d12/d3d12_presenter.cc
+@@ -94,28 +94,31 @@ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+   util::FillBufferResourceDesc(buffer_desc, copy_dest_size,
+                                D3D12_RESOURCE_FLAG_NONE);
+   std::shared_ptr<ID3D12Resource> buffer;
++  ID3D12Resource* buffer_ptr = buffer.get();
+   // Create zeroed not to leak data in the row padding.
+   if (FAILED(device->CreateCommittedResource(
+           &util::kHeapPropertiesReadback, D3D12_HEAP_FLAG_NONE, &buffer_desc,
+-          D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&buffer)))) {
++          D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&buffer_ptr)))) {
+     XELOGE("D3D12Presenter: Failed to create the guest output capture buffer");
+     return false;
+   }
+ 
+   {
+     std::shared_ptr<ID3D12CommandAllocator> command_allocator;
++    ID3D12CommandAllocator* command_allocator_ptr = command_allocator.get();
+     if (FAILED(
+             device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
+-                                           IID_PPV_ARGS(&command_allocator)))) {
++                                           IID_PPV_ARGS(&command_allocator_ptr)))) {
+       XELOGE(
+           "D3D12Presenter: Failed to create the guest output capturing command "
+           "allocator");
+       return false;
+     }
+     std::shared_ptr<ID3D12GraphicsCommandList> command_list;
++    ID3D12GraphicsCommandList* command_list_ptr = command_list.get();
+     if (FAILED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+                                          command_allocator.get(), nullptr,
+-                                         IID_PPV_ARGS(&command_list)))) {
++                                         IID_PPV_ARGS(&command_list_ptr)))) {
+       XELOGE(
+           "D3D12Presenter: Failed to create the guest output capturing command "
+           "list");
+@@ -163,7 +166,7 @@ bool D3D12Presenter::CaptureGuestOutput(RawImage& image_out) {
+     if (!submission_tracker.Initialize(device, direct_queue)) {
+       return false;
+     }
+-    ID3D12CommandList* execute_command_list = command_list.Get();
++    ID3D12CommandList* execute_command_list = command_list.get();
+     direct_queue->ExecuteCommandLists(1, &execute_command_list);
+     if (!submission_tracker.NextSubmission()) {
+       XELOGE(
+@@ -243,8 +246,9 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
+                 : 0));
+     if (swap_chain_resized) {
+       for (uint32_t i = 0; i < PaintContext::kSwapChainBufferCount; ++i) {
++        ID3D12Resource* ptr = paint_context_.swap_chain_buffers[i].get();
+         if (FAILED(paint_context_.swap_chain->GetBuffer(
+-                i, IID_PPV_ARGS(&paint_context_.swap_chain_buffers[i])))) {
++                i, IID_PPV_ARGS(&ptr)))) {
+           swap_chain_resized = false;
+           break;
+         }
+@@ -320,8 +324,9 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
+             "Xenia surface type");
+         return SurfacePaintConnectResult::kFailureSurfaceUnusable;
+     }
++    IDXGISwapChain3* swap_chain_3_ptr = paint_context_.swap_chain.get();
+     if (FAILED(swap_chain_1->QueryInterface(
+-            IID_PPV_ARGS(&paint_context_.swap_chain)))) {
++            IID_PPV_ARGS(&swap_chain_3_ptr)))) {
+       XELOGE(
+           "D3D12Presenter: Failed to get version 3 of the swap chain "
+           "interface");
+@@ -334,8 +339,9 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
+     paint_context_.swap_chain_allows_tearing =
+         (swap_chain_desc.Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) != 0;
+     for (uint32_t i = 0; i < PaintContext::kSwapChainBufferCount; ++i) {
++      ID3D12Resource* swap_chain_buffer_ptr = paint_context_.swap_chain_buffers[i].get();
+       if (FAILED(paint_context_.swap_chain->GetBuffer(
+-              i, IID_PPV_ARGS(&paint_context_.swap_chain_buffers[i])))) {
++              i, IID_PPV_ARGS(&swap_chain_buffer_ptr)))) {
+         XELOGE(
+             "D3D12Presenter: Failed to get buffer {} of a {}-buffer swap chain",
+             i, PaintContext::kSwapChainBufferCount);
+@@ -409,11 +415,12 @@ bool D3D12Presenter::RefreshGuestOutputImpl(
+     guest_output_resource_new_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+     guest_output_resource_new_desc.Flags =
+         D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
++    ID3D12Resource* d3d12_res_ptr = guest_output_resource_ref.second.get();
+     if (FAILED(device->CreateCommittedResource(
+             &util::kHeapPropertiesDefault,
+             provider_.GetHeapFlagCreateNotZeroed(),
+             &guest_output_resource_new_desc, kGuestOutputInternalState, nullptr,
+-            IID_PPV_ARGS(&guest_output_resource_ref.second)))) {
++            IID_PPV_ARGS(&d3d12_res_ptr)))) {
+       XELOGE("D3D12Presenter: Failed to create the guest output {}x{} texture",
+              frontbuffer_width, frontbuffer_height);
+       return false;
+@@ -645,11 +652,12 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
+             intermediate_desc.SampleDesc.Quality = 0;
+             intermediate_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+             intermediate_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
++            ID3D12Resource* intermediate_texture_ptr = intermediate_texture_ptr_ref.get();
+             if (FAILED(device->CreateCommittedResource(
+                     &util::kHeapPropertiesDefault,
+                     provider_.GetHeapFlagCreateNotZeroed(), &intermediate_desc,
+                     D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, nullptr,
+-                    IID_PPV_ARGS(&intermediate_texture_ptr_ref)))) {
++                    IID_PPV_ARGS(&intermediate_texture_ptr)))) {
+               XELOGE(
+                   "D3D12Presenter: Failed to create a guest output "
+                   "presentation intermediate texture");
+@@ -1090,8 +1098,9 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+   // Check if DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING is supported.
+   {
+     std::shared_ptr<IDXGIFactory5> dxgi_factory_5;
++    IDXGIFactory5* dxgi_factory_ptr = dxgi_factory_5.get();
+     if (SUCCEEDED(provider_.GetDXGIFactory()->QueryInterface(
+-            IID_PPV_ARGS(&dxgi_factory_5)))) {
++            IID_PPV_ARGS(&dxgi_factory_ptr)))) {
+       BOOL tearing_feature_data;
+       dxgi_supports_tearing_ =
+           SUCCEEDED(dxgi_factory_5->CheckFeatureSupport(
+@@ -1359,9 +1368,10 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+     if (CanGuestOutputPaintEffectBeIntermediate(guest_output_paint_effect)) {
+       guest_output_paint_pipeline_desc.RTVFormats[0] =
+           kGuestOutputIntermediateFormat;
++      ID3D12PipelineState* int_pipeline_state_ptr = guest_output_paint_intermediate_pipelines_[i].get();
+       if (FAILED(device->CreateGraphicsPipelineState(
+               &guest_output_paint_pipeline_desc,
+-              IID_PPV_ARGS(&guest_output_paint_intermediate_pipelines_[i])))) {
++              IID_PPV_ARGS(&int_pipeline_state_ptr)))) {
+         XELOGE(
+             "D3D12Presenter: Failed to create the guest output painting "
+             "pipeline for effect {} writing to an intermediate texture",
+@@ -1371,9 +1381,10 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+     }
+     if (CanGuestOutputPaintEffectBeFinal(guest_output_paint_effect)) {
+       guest_output_paint_pipeline_desc.RTVFormats[0] = kSwapChainFormat;
++      ID3D12PipelineState* out_pipeline_state_ptr = guest_output_paint_final_pipelines_[i].get();
+       if (FAILED(device->CreateGraphicsPipelineState(
+               &guest_output_paint_pipeline_desc,
+-              IID_PPV_ARGS(&guest_output_paint_final_pipelines_[i])))) {
++              IID_PPV_ARGS(&out_pipeline_state_ptr)))) {
+         XELOGE(
+             "D3D12Presenter: Failed to create the guest output painting "
+             "pipeline for effect {} writing to a swap chain buffer",
+@@ -1398,19 +1409,21 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+   // Paint command allocators and command list.
+   for (std::shared_ptr<ID3D12CommandAllocator>&
+            paint_command_allocator_ref : paint_context_.command_allocators) {
++    ID3D12CommandAllocator * paint_command_allocator = paint_command_allocator_ref.get();
+     if (FAILED(device->CreateCommandAllocator(
+             D3D12_COMMAND_LIST_TYPE_DIRECT,
+-            IID_PPV_ARGS(&paint_command_allocator_ref)))) {
++            IID_PPV_ARGS(&paint_command_allocator)))) {
+       XELOGE(
+           "D3D12Presenter: Failed to create a command allocator for drawing to "
+           "a swap chain");
+       return false;
+     }
+   }
++  ID3D12GraphicsCommandList* command_list = paint_context_.command_list.get();
+   if (FAILED(device->CreateCommandList(
+           0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+           paint_context_.command_allocators[0].get(), nullptr,
+-          IID_PPV_ARGS(&paint_context_.command_list)))) {
++          IID_PPV_ARGS(&command_list)))) {
+     XELOGE(
+         "D3D12Presenter: Failed to create the command list for drawing to a "
+         "swap chain");
+@@ -1425,8 +1438,9 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+   rtv_heap_desc.NumDescriptors = PaintContext::kRTVCount;
+   rtv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+   rtv_heap_desc.NodeMask = 0;
++  ID3D12DescriptorHeap* rtv_heap = paint_context_.rtv_heap.get();
+   if (FAILED(device->CreateDescriptorHeap(
+-          &rtv_heap_desc, IID_PPV_ARGS(&paint_context_.rtv_heap)))) {
++          &rtv_heap_desc, IID_PPV_ARGS(&rtv_heap)))) {
+     XELOGE(
+         "D3D12Presenter: Failed to create an RTV descriptor heap with {} "
+         "descriptors",
+@@ -1440,8 +1454,9 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
+   view_heap_desc.NumDescriptors = PaintContext::kViewCount;
+   view_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+   view_heap_desc.NodeMask = 0;
++  ID3D12DescriptorHeap* view_heap = paint_context_.view_heap.get();
+   if (FAILED(device->CreateDescriptorHeap(
+-          &view_heap_desc, IID_PPV_ARGS(&paint_context_.view_heap)))) {
++          &view_heap_desc, IID_PPV_ARGS(&view_heap)))) {
+     XELOGE(
+         "D3D12Presenter: Failed to create a shader-visible CBV/SRV/UAV "
+         "descriptor heap with {} descriptors",
+diff --git a/src/xenia/ui/d3d12/d3d12_provider.cc b/src/xenia/ui/d3d12/d3d12_provider.cc
+index 099d5b5746..318ddc0ace 100644
+--- a/src/xenia/ui/d3d12/d3d12_provider.cc
++++ b/src/xenia/ui/d3d12/d3d12_provider.cc
+@@ -75,9 +75,11 @@ std::unique_ptr<D3D12Provider> D3D12Provider::Create() {
+ }
+ 
+ D3D12Provider::~D3D12Provider() {
++#ifdef XE_PLATFORM_WIN32
+   if (graphics_analysis_ != nullptr) {
+     graphics_analysis_->Release();
+   }
++#endif
+   if (direct_queue_ != nullptr) {
+     direct_queue_->Release();
+   }
+@@ -90,8 +92,9 @@ D3D12Provider::~D3D12Provider() {
+ 
+   if (cvars::d3d12_debug && pfn_dxgi_get_debug_interface1_) {
+     std::shared_ptr<IDXGIDebug> dxgi_debug;
++    IDXGIDebug* dxgi_debug_ptr = dxgi_debug.get();
+     if (SUCCEEDED(
+-            pfn_dxgi_get_debug_interface1_(0, IID_PPV_ARGS(&dxgi_debug)))) {
++            pfn_dxgi_get_debug_interface1_(0, IID_PPV_ARGS(&dxgi_debug_ptr)))) {
+       dxgi_debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+     }
+   }
+@@ -489,11 +492,13 @@ bool D3D12Provider::Initialize() {
+       uint32_t(resource_binding_tier_), uint32_t(tiled_resources_tier_),
+       unaligned_block_textures_supported_ ? "yes" : "no");
+ 
++#ifdef XE_PLATFORM_WIN32
+   // Get the graphics analysis interface, will silently fail if PIX is not
+-  // attached.
++  // attached. TODO(RodoMa92): Not implemented on non Windows platforms.
+   pfn_dxgi_get_debug_interface1_(0, IID_PPV_ARGS(&graphics_analysis_));
+-  //TODO(RodoMa92): NVApi stuff is not implemented on other platforms besides Win
++#endif
+ #ifdef XE_PLATFORM_WIN32
++  //TODO(RodoMa92): NVApi stuff is not implemented on other platforms besides Win
+   if (GetAdapterVendorID() == GpuVendorID::kNvidia) {
+     nvapi_ = new lightweight_nvapi::nvapi_state_t();
+     if (!nvapi_->is_available()) {
+@@ -530,7 +535,8 @@ uint32_t D3D12Provider::CreateUploadResource(
+     void** ppvResource, bool try_create_cpuvisible,
+     const D3D12_CLEAR_VALUE* pOptimizedClearValue) const {
+   auto device = GetDevice();
+-
++  //FIXME(RodoMa92): No nvapi stuff supported on non Windows platforms
++#ifdef XE_PLATFORM_WIN32
+   if (try_create_cpuvisible && nvapi_createcommittedresource_) {
+     lightweight_nvapi::NV_RESOURCE_PARAMS nvrp;
+     nvrp.NVResourceFlags =
+@@ -548,6 +554,7 @@ uint32_t D3D12Provider::CreateUploadResource(
+       return UPLOAD_RESULT_CREATE_CPUVISIBLE;
+     }
+   }
++#endif
+   if (FAILED(device->CreateCommittedResource(
+           &ui::d3d12::util::kHeapPropertiesUpload, HeapFlags, pDesc,
+           InitialResourceState, pOptimizedClearValue, riidResource,
+diff --git a/src/xenia/ui/d3d12/d3d12_provider.h b/src/xenia/ui/d3d12/d3d12_provider.h
+index d2c6003121..a9877a3232 100644
+--- a/src/xenia/ui/d3d12/d3d12_provider.h
++++ b/src/xenia/ui/d3d12/d3d12_provider.h
+@@ -14,7 +14,7 @@
+ 
+ //Helpers to make d3d12 Windoisms compile under Linux
+ #ifndef XE_PLATFORM_WIN32
+-#include "xenia/gpu/d3d12/d3d12_linux_util.h"
++#include "../../helper/linux_util.h"
+ #endif
+ #include "xenia/ui/d3d12/d3d12_api.h"
+ #include "xenia/ui/graphics_provider.h"
+diff --git a/src/xenia/ui/d3d12/d3d12_submission_tracker.cc b/src/xenia/ui/d3d12/d3d12_submission_tracker.cc
+index 7e2bb9bf39..d1a0f8d8d7 100644
+--- a/src/xenia/ui/d3d12/d3d12_submission_tracker.cc
++++ b/src/xenia/ui/d3d12/d3d12_submission_tracker.cc
+@@ -11,6 +11,9 @@
+ 
+ #include "xenia/base/assert.h"
+ #include "xenia/base/logging.h"
++#ifdef XE_PLATFORM_LINUX
++#include "../../helper/linux_util.h"
++#endif
+ 
+ namespace xe {
+ namespace ui {
+@@ -27,13 +30,14 @@ bool D3D12SubmissionTracker::Initialize(ID3D12Device* device,
+     return false;
+   }
+   // Continue where the tracker was left at the last shutdown.
++  ID3D12Fence* ptr = fence_.get();
+   if (FAILED(device->CreateFence(submission_current_ - 1, D3D12_FENCE_FLAG_NONE,
+-                                 IID_PPV_ARGS(&fence_)))) {
++                                 IID_PPV_ARGS(&ptr)))) {
+     XELOGE("D3D12SubmissionTracker: Failed to create the fence");
+     Shutdown();
+     return false;
+   }
+-  queue_ = queue;
++  queue_ = std::shared_ptr<ID3D12CommandQueue> (queue);
+   submission_signal_queued_ = submission_current_ - 1;
+   return true;
+ }
+diff --git a/src/xenia/ui/d3d12/d3d12_submission_tracker.h b/src/xenia/ui/d3d12/d3d12_submission_tracker.h
+index 2efef70dcb..ecf8f448a6 100644
+--- a/src/xenia/ui/d3d12/d3d12_submission_tracker.h
++++ b/src/xenia/ui/d3d12/d3d12_submission_tracker.h
+@@ -12,6 +12,7 @@
+ 
+ #include <memory>
+ 
++#include "pevents/src/pevents.h"
+ #include "xenia/ui/d3d12/d3d12_api.h"
+ 
+ namespace xe {
+@@ -83,7 +84,11 @@ class D3D12SubmissionTracker {
+  private:
+   UINT64 submission_current_ = 1;
+   UINT64 submission_signal_queued_ = 0;
++#ifndef XE_PLATFORM_WIN32
++  neosmart::neosmart_event_t fence_completion_event_ = nullptr;
++#else
+   HANDLE fence_completion_event_ = nullptr;
++#endif
+   std::shared_ptr<ID3D12Fence> fence_;
+   std::shared_ptr<ID3D12CommandQueue> queue_;
+ };
+diff --git a/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc b/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc
+index 65b191714f..7f0c221266 100644
+--- a/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc
++++ b/src/xenia/ui/d3d12/d3d12_upload_buffer_pool.cc
+@@ -38,7 +38,7 @@ uint8_t* D3D12UploadBufferPool::Request(
+     return nullptr;
+   }
+   if (buffer_out) {
+-    *buffer_out = page->buffer_.Get();
++    *buffer_out = page->buffer_.get();
+   }
+   if (offset_out) {
+     *offset_out = offset;
+@@ -61,7 +61,7 @@ uint8_t* D3D12UploadBufferPool::RequestPartial(
+     return nullptr;
+   }
+   if (buffer_out) {
+-    *buffer_out = page->buffer_.Get();
++    *buffer_out = page->buffer_.get();
+   }
+   if (offset_out) {
+     *offset_out = offset;
+@@ -81,10 +81,11 @@ D3D12UploadBufferPool::CreatePageImplementation() {
+   util::FillBufferResourceDesc(buffer_desc, page_size_,
+                                D3D12_RESOURCE_FLAG_NONE);
+   std::shared_ptr<ID3D12Resource> buffer;
++  ID3D12Resource* buffer_ptr = buffer.get();
+ 
+   if (!provider_.CreateUploadResource(
+           provider_.GetHeapFlagCreateNotZeroed(), &buffer_desc,
+-          D3D12_RESOURCE_STATE_GENERIC_READ, IID_PPV_ARGS(&buffer))) {
++          D3D12_RESOURCE_STATE_GENERIC_READ, IID_PPV_ARGS(&buffer_ptr))) {
+     XELOGE("Failed to create a D3D upload buffer with {} bytes", page_size_);
+     return nullptr;
+   }
+--- a/.gitmodules	2025-03-04 20:01:13.197030621 +0100
++++ b/.gitmodules	2025-03-04 20:14:01.070400191 +0100
+@@ -109,3 +109,6 @@
+ [submodule "third_party/dxvk"]
+ 	path = third_party/dxvk
+ 	url = https://github.com/doitsujin/dxvk.git
++[submodule "third_party/pevents"]
++	path = third_party/pevenets
++	url = https://github.com/neosmart/pevents.git
+--- /dev/null	2025-02-12 16:09:47.449308358 +0100
++++ b/third_party/pevents.lua	2025-03-04 20:19:42.849691398 +0100
+@@ -0,0 +1,14 @@
++group("third_party")
++project("pevents")
++  uuid("1e86cc52-3f8b-476d-9249-3b200424846c")
++  if os.istarget("android") then
++    -- ndk-build only supports StaticLib and SharedLib.
++    kind("StaticLib")
++  else
++    kind("Utility")
++  end
++  language("C++")
++  files({
++    "pevents/src/pevents.cpp",
++    "pevents/src/pevents.h"
++  })

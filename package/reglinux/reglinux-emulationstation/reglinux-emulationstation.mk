@@ -11,7 +11,7 @@ REGLINUX_EMULATIONSTATION_SITE_METHOD = git
 REGLINUX_EMULATIONSTATION_LICENSE = MIT
 REGLINUX_EMULATIONSTATION_GIT_SUBMODULES = YES
 REGLINUX_EMULATIONSTATION_LICENSE = MIT, Apache-2.0
-REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl2 sdl2_mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext
+REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl2 sdl2_mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext lunasvg
 
 # REG investigate this, looks like an old "hack" we should remove/avoid
 # Pass arch (uppercase) as compiler define

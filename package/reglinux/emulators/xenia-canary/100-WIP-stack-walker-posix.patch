@@ -1,0 +1,602 @@
+From 69110d5a1a017fca63b3af43f12e8f15c3dc403e Mon Sep 17 00:00:00 2001
+From: Marco Rodolfi <marco.rodolfi@tuta.io>
+Date: Sun, 19 Jan 2025 17:55:11 +0100
+Subject: [PATCH] [cpu] Implement stack walker for POSIX systems. Upstream of
+ https://github.com/xenia-project/xenia/pull/1405
+
+---
+ premake5.lua                               |   2 +
+ src/xenia/cpu/stack_walker_posix.cc        | 276 ++++++++++++++++++++-
+ src/xenia/cpu/testing/stack_walker_test.cc | 269 ++++++++++++++++++++
+ 3 files changed, 543 insertions(+), 4 deletions(-)
+ create mode 100644 src/xenia/cpu/testing/stack_walker_test.cc
+
+diff --git a/premake5.lua b/premake5.lua
+index 0a36f5da31..afb1574c60 100644
+--- a/premake5.lua
++++ b/premake5.lua
+@@ -111,6 +111,8 @@ filter("platforms:Linux")
+     "lz4",
+     "pthread",
+     "rt",
++    "unwind",
++    "iberty",
+   })
+ 
+ filter({"platforms:Linux"})
+diff --git a/src/xenia/cpu/stack_walker_posix.cc b/src/xenia/cpu/stack_walker_posix.cc
+index eba6e30ccd..79a3f64c93 100644
+--- a/src/xenia/cpu/stack_walker_posix.cc
++++ b/src/xenia/cpu/stack_walker_posix.cc
+@@ -2,23 +2,291 @@
+  ******************************************************************************
+  * Xenia : Xbox 360 Emulator Research Project                                 *
+  ******************************************************************************
+- * Copyright 2017 Ben Vanik. All rights reserved.                             *
++ * Copyright 2025 Ben Vanik. All rights reserved.                             *
+  * Released under the BSD license - see LICENSE in the root for more details. *
+  ******************************************************************************
+  */
+ 
+ #include "xenia/cpu/stack_walker.h"
+ 
++#include <condition_variable>
++#include <mutex>
++#include <unordered_set>
++#define UNW_LOCAL_ONLY
++#include <libunwind.h>
++#include <csignal>
++
+ #include "xenia/base/logging.h"
++#include "xenia/cpu/backend/code_cache.h"
+ 
+ namespace xe {
+ namespace cpu {
+ 
++constexpr int CAPTURE_SIGNAL = SIGUSR1;
++
++struct PosixStackCapture {
++  unw_context_t context_;
++  std::vector<unw_cursor_t> cursors_;
++
++  PosixStackCapture(unw_context_t&& context, size_t frame_offset,
++                    size_t frame_count)
++      : context_(context) {
++    unw_cursor_t cursor;
++    unw_init_local(&cursor, &context);
++
++    for (size_t i = 0; i < frame_offset; ++i) {
++      if (unw_step(&cursor) < 0) {
++        return;
++      }
++    }
++    for (uint32_t i = 0; i < frame_count; ++i) {
++      const int step_result = unw_step(&cursor);
++      if (step_result == 0) {
++        break;
++      }
++      if (step_result < 0) {
++        switch (-step_result) {
++          case UNW_EUNSPEC:
++          case UNW_ENOINFO:
++          case UNW_EBADVERSION:
++          case UNW_EINVALIDIP:
++          case UNW_EBADFRAME:
++          case UNW_ESTOPUNWIND:
++          default:
++            return;
++        }
++      }
++      cursors_.push_back(cursor);
++    }
++  }
++};
++}  // namespace cpu
++}  // namespace xe
++
++namespace std {
++// TODO(bwrsandman): This needs to be expanded on to avoid collisions of stacks
++//  with same ip and depth
++template <>
++struct hash<xe::cpu::PosixStackCapture> {
++  typedef xe::cpu::PosixStackCapture argument_t;
++  typedef std::size_t result_t;
++  result_t operator()(argument_t const& capture) const noexcept {
++    if (capture.cursors_.empty()) {
++      return 0;
++    }
++    result_t result = 0;
++    unw_word_t ip;
++    unw_cursor_t front_cursor = capture.cursors_.front();
++    unw_get_reg(&front_cursor, UNW_REG_IP, &ip);
++    const auto h1 = std::hash<unw_word_t>{}(ip);
++    const auto h2 = std::hash<size_t>{}(capture.cursors_.size());
++    return h1 ^ (h2 << 1);
++  }
++};
++
++template <>
++struct equal_to<xe::cpu::PosixStackCapture> {
++  typedef xe::cpu::PosixStackCapture argument_t;
++  typedef std::size_t result_t;
++  result_t operator()(argument_t const& capture_1,
++                      argument_t const& capture_2) const noexcept {
++    if (capture_1.cursors_.size() != capture_2.cursors_.size()) {
++      return false;
++    }
++    unw_word_t reg_1, reg_2;
++    unw_cursor_t front_cursor_1 = capture_1.cursors_.front();
++    unw_cursor_t front_cursor_2 = capture_2.cursors_.front();
++    for (uint32_t i = 0; i < UNW_REG_LAST; ++i) {
++      unw_get_reg(&front_cursor_1, i, &reg_1);
++      unw_get_reg(&front_cursor_2, i, &reg_2);
++      if (reg_1 != reg_2) {
++        return false;
++      }
++    }
++    return true;
++  }
++};
++}  // namespace std
++
++namespace xe {
++namespace cpu {
++
++#include <libiberty/demangle.h>
++#include <memory>
++std::string demangle(const char* mangled_name) {
++  if (mangled_name == std::string()) {
++    return "";
++  }
++  std::unique_ptr<char, decltype(&std::free)> ptr(
++      cplus_demangle(mangled_name, DMGL_NO_OPTS), &std::free);
++  return ptr ? ptr.get() : mangled_name;
++}
++
++static struct signal_handler_arg_t {
++  std::mutex mutex;
++  std::condition_variable cv;
++  volatile bool set;
++  unw_context_t context_;
++} signal_handler_arg = {};
++
++class PosixStackWalker final : public StackWalker {
++ public:
++  explicit PosixStackWalker(backend::CodeCache* code_cache) {
++    // Get the boundaries of the code cache so we can quickly tell if a symbol
++    // is ours or not.
++    // We store these globally so that the Sym* callbacks can access them.
++    // They never change, so it's fine even if they are touched from multiple
++    // threads.
++    // code_cache_ = code_cache;
++    // code_cache_min_ = code_cache_->base_address();
++    // code_cache_max_ = code_cache_->base_address() +
++    //   code_cache_->total_size();
++  }
++
++  static bool Initialize() { return true; }
++
++  size_t CaptureStackTrace(uint64_t* frame_host_pcs, const size_t frame_offset,
++                           const size_t frame_count,
++                           uint64_t* out_stack_hash) override {
++    if (out_stack_hash) {
++      *out_stack_hash = 0;
++    }
++
++    unw_context_t context;
++    if (unw_getcontext(&context) != 0) {
++      return false;
++    }
++
++    auto capture =
++        PosixStackCapture(std::move(context), frame_offset, frame_count);
++
++    for (uint32_t i = 0; i < capture.cursors_.size(); ++i) {
++      frame_host_pcs[i] = reinterpret_cast<uintptr_t>(&capture.cursors_[i]);
++    }
++    // Two identical stack traces will generate identical hash values.
++    if (out_stack_hash) {
++      *out_stack_hash = captures_.hash_function()(capture);
++    }
++
++    const auto size = capture.cursors_.size();
++
++    captures_.insert(std::move(capture));
++
++    return size;
++  }
++
++  size_t CaptureStackTrace(void* thread_handle, uint64_t* frame_host_pcs,
++                           size_t frame_offset, size_t frame_count,
++                           const HostThreadContext* in_host_context,
++                           HostThreadContext* out_host_context,
++                           uint64_t* out_stack_hash) override {
++    if (out_stack_hash) {
++      *out_stack_hash = 0;
++    }
++
++    // Install signal capture
++    struct sigaction action{};
++    struct sigaction previous_action{};
++    action.sa_flags = SA_SIGINFO;
++    action.sa_sigaction = [](int signal, siginfo_t* info, void* context) {
++      std::unique_lock<std::mutex> lock(signal_handler_arg.mutex);
++      unw_getcontext(&signal_handler_arg.context_);
++      signal_handler_arg.set = true;
++      signal_handler_arg.cv.notify_one();
++    };
++    sigemptyset(&action.sa_mask);
++    sigaction(CAPTURE_SIGNAL, &action, &previous_action);
++
++    // Send signal
++    pthread_kill(reinterpret_cast<pthread_t>(thread_handle), CAPTURE_SIGNAL);
++
++    // Wait to have data back
++    // unw_context_t uc;
++    {
++      std::unique_lock<std::mutex> lock(signal_handler_arg.mutex);
++      signal_handler_arg.cv.wait(lock);
++      // uc = signal_handler_arg.context_;
++      signal_handler_arg.set = false;
++    }
++
++    // Restore original handler if it existed
++    sigaction(CAPTURE_SIGNAL, &previous_action, nullptr);
++
++    // Skip signal callback frame
++    ++frame_offset;
++
++    auto capture = PosixStackCapture(std::move(signal_handler_arg.context_),
++                                     frame_offset, frame_count);
++
++    for (uint32_t i = 0; i < capture.cursors_.size(); ++i) {
++      frame_host_pcs[i] = reinterpret_cast<uintptr_t>(&capture.cursors_[i]);
++    }
++    // Two identical stack traces will generate identical hash values.
++    if (out_stack_hash) {
++      *out_stack_hash = captures_.hash_function()(capture);
++    }
++
++    const auto size = capture.cursors_.size();
++
++    captures_.insert(std::move(capture));
++
++    return size;
++  }
++
++  bool ResolveStack(uint64_t* frame_host_pcs, StackFrame* frames,
++                    const size_t frame_count) override {
++    for (size_t i = 0; i < frame_count; ++i) {
++      auto& frame = frames[i];
++      unw_cursor_t& cursor =
++          *reinterpret_cast<unw_cursor_t*>(frame_host_pcs[i]);
++      std::memset(&frame, 0, sizeof(frame));
++      frame.host_pc = frame_host_pcs[i];
++
++      // If in the generated range, we know it's ours.
++      // if (frame.host_pc >= code_cache_min_ && frame.host_pc <
++      //     code_cache_max_) {
++      //
++      // } else {
++      //  // Host symbol, which means either emulator or system.
++      //  frame.type = StackFrame::Type::kHost;
++      // }
++      std::array<char, sizeof(frame.host_symbol.name)> host_symbol_name = {};
++      const auto ok = unw_get_proc_name(&cursor, host_symbol_name.data(),
++                                        host_symbol_name.size(),
++                                        &frame.host_symbol.address);
++      switch (ok) {
++        case UNW_ESUCCESS:
++          break;
++        case UNW_EUNSPEC:
++        case UNW_ENOINFO:
++        case UNW_ENOMEM:
++        default:
++          return false;
++      }
++      auto demangled_host_symbol_name = demangle(host_symbol_name.data());
++      std::strncpy(frame.host_symbol.name, demangled_host_symbol_name.c_str(),
++                   sizeof(frame.host_symbol.name));
++      // unw_proc_info_t info = {};
++      // ok = unw_get_proc_info(&cursor, &info);
++    }
++    return true;
++  }
++
++  // static xe::cpu::backend::CodeCache* code_cache_;
++  // static uint32_t code_cache_min_;
++  // static uint32_t code_cache_max_;
++  std::unordered_set<PosixStackCapture> captures_;
++};
++
+ std::unique_ptr<StackWalker> StackWalker::Create(
+     backend::CodeCache* code_cache) {
+-  XELOGD("Stack walker unimplemented on posix");
+-  return nullptr;
++  auto stack_walker = std::make_unique<PosixStackWalker>(code_cache);
++  if (!stack_walker->Initialize()) {
++    XELOGE("Unable to initialize stack walker: debug/save states disabled");
++    return nullptr;
++  }
++  return std::unique_ptr<StackWalker>(stack_walker.release());
+ }
+ 
+ }  // namespace cpu
+-}  // namespace xe
+\ No newline at end of file
++}  // namespace xe
+diff --git a/src/xenia/cpu/testing/stack_walker_test.cc b/src/xenia/cpu/testing/stack_walker_test.cc
+new file mode 100644
+index 0000000000..23d15bdd21
+--- /dev/null
++++ b/src/xenia/cpu/testing/stack_walker_test.cc
+@@ -0,0 +1,269 @@
++/**
++ ******************************************************************************
++ * Xenia : Xbox 360 Emulator Research Project                                 *
++ ******************************************************************************
++ * Copyright 2025 Ben Vanik. All rights reserved.                             *
++ * Released under the BSD license - see LICENSE in the root for more details. *
++ ******************************************************************************
++ */
++#include "xenia/cpu/testing/util.h"
++
++#include <array>
++#include <cstring>
++#include "xenia/cpu/backend/x64/x64_code_cache.h"
++#include "xenia/cpu/stack_walker.h"
++
++#if XE_PLATFORM_LINUX
++#define NOINLINE __attribute__((noinline))
++#else
++#define NOINLINE
++#endif  // XE_PLATFORM_LINUX
++
++// How many stacks of template (call<...3,2,1,0>) to call.
++#define call_depth 0
++
++#define TEST_FRAME_STACK(l)                                        \
++  do {                                                             \
++    auto& frame = frames[l];                                       \
++    REQUIRE(frame.type == xe::cpu::StackFrame::Type::kHost);       \
++    REQUIRE(frame.guest_pc == 0);                                  \
++    std::string function_name = __FUNCTION__;                      \
++    REQUIRE(std::string(frame.host_symbol.name) == function_name); \
++  } while (0)
++
++#if defined(XE_PLATFORM_LINUX)
++// Linux demangling has type suffix (ul) which is not included in the
++// __FUNCTION__ macro.
++#define PLATFORM_TO_STRING(x) std::to_string(x) + "ul"
++// Linux demangling includes the class namespace
++#define PLATFORM_TEMPLATE_STRUCT(s, n) \
++  std::string(s) + "<" + PLATFORM_TO_STRING(n) + ">::"
++#else
++#define PLATFORM_TO_STRING(n) std::to_string(n)
++#define PLATFORM_TEMPLATE_STRUCT(s, n) std::string()
++#endif
++
++#define TEST_RECURSIVE_FRAME_STACK(s, l, n)                                  \
++  do {                                                                       \
++    auto& frame = frames[l];                                                 \
++    REQUIRE(frame.type == xe::cpu::StackFrame::Type::kHost);                 \
++    REQUIRE(frame.guest_pc == 0);                                            \
++    std::string function_name = PLATFORM_TEMPLATE_STRUCT(#s, n) +            \
++                                __FUNCTION__ + "<" + PLATFORM_TO_STRING(l) + \
++                                ">";                                         \
++    REQUIRE(std::string(frame.host_symbol.name) == function_name);           \
++  } while (0)
++
++template <uint64_t N>
++struct local_stack_caller_t {
++  typedef std::array<uint64_t, N> frame_host_pc_array_t;
++  typedef std::array<xe::cpu::StackFrame, N> frame_array_t;
++
++  template <uint64_t L>
++  void call(std::unique_ptr<xe::cpu::backend::x64::X64CodeCache>& cache,
++            std::unique_ptr<xe::cpu::StackWalker>& stack_walker,
++            frame_host_pc_array_t& frame_host_pcs, uint64_t& hash,
++            frame_array_t& frames, uint64_t depth, size_t& out_frame_count) {
++    call<L - 1>(cache, stack_walker, frame_host_pcs, hash, frames, depth + 1,
++                out_frame_count);
++
++    TEST_RECURSIVE_FRAME_STACK(local_stack_caller_t, L, N);
++  }
++
++  template <>
++  void call<0>(std::unique_ptr<xe::cpu::backend::x64::X64CodeCache>& cache,
++               std::unique_ptr<xe::cpu::StackWalker>& stack_walker,
++               frame_host_pc_array_t& frame_host_pcs, uint64_t& hash,
++               frame_array_t& frames, uint64_t depth, size_t& out_frame_count) {
++    out_frame_count = stack_walker->CaptureStackTrace(
++        frame_host_pcs.data(), 0, frame_host_pcs.size(), &hash);
++    REQUIRE(out_frame_count == depth);
++    bool resolved = stack_walker->ResolveStack(frame_host_pcs.data(),
++                                               frames.data(), out_frame_count);
++    REQUIRE(resolved);
++
++    TEST_RECURSIVE_FRAME_STACK(local_stack_caller_t, 0, N);
++  }
++};
++
++TEST_CASE("Local Stack Walker", "stack_walker") {
++  // How many stacks in is catch.hpp already at in this frame.
++#if defined(XE_PLATFORM_LINUX)
++#if !defined(NDEBUG)
++  constexpr uint32_t current_stack_depth = 15;
++#else
++  const uint32_t current_stack_depth = 10;
++#endif  // defined(NDEBUG)
++#else
++  const uint32_t current_stack_depth = 16;
++#endif  // defined(XE_PLATFORM_LINUX)
++  // Extra slots for frames to test, they should all be null initialized.
++  constexpr uint32_t stack_padding = 0x10;
++
++  const uint32_t frame_array_size =
++      call_depth + current_stack_depth + stack_padding;
++  std::array<uint64_t, frame_array_size> frame_host_pcs = {};
++  uint64_t hash = 0;
++  std::array<xe::cpu::StackFrame, frame_host_pcs.size()> frames = {};
++  local_stack_caller_t<frame_host_pcs.size()> local_stack_caller;
++
++  auto code_cache = xe::cpu::backend::x64::X64CodeCache::Create();
++  REQUIRE(code_cache);
++  auto stack_walker = xe::cpu::StackWalker::Create(code_cache.get());
++  REQUIRE(stack_walker);
++  size_t frame_count = 0;
++  local_stack_caller.call<call_depth>(code_cache, stack_walker, frame_host_pcs,
++                                      hash, frames, current_stack_depth,
++                                      frame_count);
++
++  TEST_FRAME_STACK(call_depth + 1);
++
++  REQUIRE(hash != 0);
++  for (uint32_t i = 0; i < frame_host_pcs.size(); ++i) {
++    if (i < frame_count) {
++      REQUIRE(frame_host_pcs[i] != 0);
++    } else {
++      REQUIRE(frame_host_pcs[i] == 0);
++    }
++  }
++
++  for (uint32_t i = 0; i < frame_host_pcs.size(); ++i) {
++    if (i < frame_count) {
++      REQUIRE(frames[i].type == xe::cpu::StackFrame::Type::kHost);
++      REQUIRE(frames[i].host_pc != 0);
++      REQUIRE(frames[i].guest_pc == 0);
++      REQUIRE(frames[i].host_symbol.address != 0);
++      REQUIRE(std::strcmp(frames[i].host_symbol.name, "") != 0);
++      REQUIRE(frames[i].guest_symbol.function != nullptr);
++    } else {
++      REQUIRE(frames[i].type == xe::cpu::StackFrame::Type::kHost);
++      REQUIRE(frames[i].host_pc == 0);
++      REQUIRE(frames[i].guest_pc == 0);
++      REQUIRE(frames[i].host_symbol.address == 0);
++      REQUIRE(std::strcmp(frames[i].host_symbol.name, "") == 0);
++      REQUIRE(frames[i].guest_symbol.function == nullptr);
++    }
++  }
++}
++
++template <uint64_t L>
++NOINLINE void threaded_stack_call(std::mutex& mutex,
++                                  std::condition_variable& cv, bool& ready,
++                                  bool& finished) {
++  threaded_stack_call<L - 1>(mutex, cv, ready, finished);
++}
++
++template <>
++NOINLINE void threaded_stack_call<0>(std::mutex& mutex,
++                                     std::condition_variable& cv, bool& ready,
++                                     bool& finished) {
++  // Notify that recursion base is reached
++  {
++    std::unique_lock lock(mutex);
++    ready = true;
++    cv.notify_all();
++  }
++  // Stay here until testing is over
++  {
++    std::unique_lock lock(mutex);
++    cv.wait(lock, [&finished] { return finished; });
++  }
++}
++
++TEST_CASE("Threaded Stack Walker", "stack_walker") {
++  // How many stacks in is the thread when the function inside the thread
++  // lambda is called.
++#if defined(XE_PLATFORM_LINUX)
++#if !defined(NDEBUG)
++  constexpr uint32_t initial_thread_stack_depth = 10;
++#else
++  const uint32_t initial_thread_stack_depth = 5;
++#endif  // defined(NDEBUG)
++#else
++  const uint32_t initial_thread_stack_depth = 11;
++#endif  // defined(XE_PLATFORM_LINUX)
++  // Extra slots for frames to test, they should all be null initialized.
++  constexpr uint32_t stack_padding = 0x10;
++
++  constexpr uint32_t frame_array_size =
++      call_depth + initial_thread_stack_depth + stack_padding;
++  std::array<uint64_t, frame_array_size> frame_host_pcs = {};
++  uint64_t hash = 0;
++  std::array<xe::cpu::StackFrame, frame_host_pcs.size()> frames = {};
++  xe::HostThreadContext out_host_context = {};
++
++  bool ready = false;
++  bool finished = false;
++  std::mutex mutex;
++  std::condition_variable cv;
++  auto thread = std::thread([&mutex, &cv, &ready, &finished] {
++    threaded_stack_call<call_depth>(mutex, cv, ready, finished);
++  });
++  // Wait until the thread has reached recursion base
++  {
++    std::unique_lock<std::mutex> lock(mutex);
++    cv.wait(lock, [&ready] { return ready; });
++  }
++  auto code_cache = xe::cpu::backend::x64::X64CodeCache::Create();
++  REQUIRE(code_cache);
++  auto stack_walker = xe::cpu::StackWalker::Create(code_cache.get());
++  REQUIRE(stack_walker);
++  auto frame_count = stack_walker->CaptureStackTrace(
++      reinterpret_cast<void*>(thread.native_handle()), frame_host_pcs.data(), 0,
++      frame_host_pcs.size(), nullptr, &out_host_context, &hash);
++  // Can be more due to cv wait
++  REQUIRE(frame_count >= call_depth + initial_thread_stack_depth);
++  size_t extra_wait_frames =
++      frame_count - call_depth - initial_thread_stack_depth;
++
++  bool resolved = stack_walker->ResolveStack(frame_host_pcs.data(),
++                                             frames.data(), frame_count);
++  REQUIRE(resolved);
++
++  for (uint32_t i = 0; i < frame_host_pcs.size(); ++i) {
++    if (i < extra_wait_frames) {
++      // cv.wait frames
++      REQUIRE(frames[i].type == xe::cpu::StackFrame::Type::kHost);
++      REQUIRE(frames[i].host_pc != 0);
++      REQUIRE(frames[i].guest_pc == 0);
++      REQUIRE(frames[i].host_symbol.address != 0);
++      REQUIRE(std::strcmp(frames[i].host_symbol.name, "") != 0);
++      REQUIRE(frames[i].guest_symbol.function != nullptr);
++    } else if (i < extra_wait_frames + call_depth) {
++      // Calls to threaded_stack_call<...>
++      size_t level = i - extra_wait_frames;
++      REQUIRE(frames[i].type == xe::cpu::StackFrame::Type::kHost);
++      REQUIRE(frames[i].host_pc != 0);
++      REQUIRE(frames[i].guest_pc == 0);
++      REQUIRE(frames[i].host_symbol.address != 0);
++      auto function_name =
++          "threaded_stack_call<" + PLATFORM_TO_STRING(level) + ">";
++      REQUIRE(std::string(frames[i].host_symbol.name) == function_name);
++      REQUIRE(frames[i].guest_symbol.function != nullptr);
++    } else if (i < frame_count) {
++      // Thread invocation and lambda
++      REQUIRE(frames[i].type == xe::cpu::StackFrame::Type::kHost);
++      REQUIRE(frames[i].host_pc != 0);
++      REQUIRE(frames[i].guest_pc == 0);
++      REQUIRE(frames[i].host_symbol.address != 0);
++      REQUIRE(std::strcmp(frames[i].host_symbol.name, "") != 0);
++      REQUIRE(frames[i].guest_symbol.function != nullptr);
++    } else {
++      // Zero-initialized padding frames
++      REQUIRE(frames[i].type == xe::cpu::StackFrame::Type::kHost);
++      REQUIRE(frames[i].host_pc == 0);
++      REQUIRE(frames[i].guest_pc == 0);
++      REQUIRE(frames[i].host_symbol.address == 0);
++      REQUIRE(std::strcmp(frames[i].host_symbol.name, "") == 0);
++      REQUIRE(frames[i].guest_symbol.function == nullptr);
++    }
++  }
++
++  // Allow the thread to end
++  {
++    std::unique_lock<std::mutex> lock(mutex);
++    finished = true;
++    cv.notify_all();
++  }
++  thread.join();
++}
