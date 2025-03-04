@@ -1,8 +1,8 @@
 diff --git a/package/sysvinit/sysvinit.mk b/package/sysvinit/sysvinit.mk
-index 3a51483c9d..a9d7afaa64 100644
+index e05a6dee38..007cd726d5 100644
 --- a/package/sysvinit/sysvinit.mk
 +++ b/package/sysvinit/sysvinit.mk
-@@ -27,7 +27,8 @@ define SYSVINIT_INSTALL_TARGET_CMDS
+@@ -31,7 +31,8 @@ define SYSVINIT_INSTALL_TARGET_CMDS
  		$(INSTALL) -D -m 0755 $(@D)/src/$$x $(TARGET_DIR)/sbin/$$x || exit 1; \
  	done
  	$(INSTALL) -D -m 0644 package/sysvinit/inittab $(TARGET_DIR)/etc/inittab
