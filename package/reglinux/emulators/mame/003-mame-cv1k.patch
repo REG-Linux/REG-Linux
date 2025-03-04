@@ -87,13 +87,13 @@ diff -u -r a/srcmame/cave/cv1k.cpp b/src/mame/cave/cv1k.cpp
 diff -u -r a/srcmame/mame.lst b/src/mame/mame.lst
 --- a/srcmame/mame.lst	2024-06-10 08:47:56.171567852 +0200
 +++ b/src/mame/mame.lst	2024-06-10 10:08:52.055747655 +0200
-@@ -16080,6 +16080,9 @@
- pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
- pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
- pinkswtssc                      // bootleg
+@@ -16259,6 +16259,9 @@
+ pinkswtsb
+ pinkswtsx
+ pinkswtssc
 +akatana                         // (c) 2010 Cave (AMI license) - 2010/ 8/13 MASTER VER.
 +ddpsdoj                         // (c) 2012 Cave - 2012/04/20
 +deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
  
  @source:cave/fstgfish.cpp
- fstgfish                        // (c) 2008 Cave
+ fstgfish

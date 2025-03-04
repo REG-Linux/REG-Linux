@@ -21,14 +21,8 @@ MAME_SUFFIX=
 MAME_MAX_JOBS = 32
 MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(MAME_MAX_JOBS) ]; then echo $(MAME_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
 
-# Set PTR64 on/off according to architecture
-ifeq ($(BR2_ARCH_IS_64),y)
+# Set PTR64 always on we do not build for 32-bit architectures
 MAME_CROSS_OPTS += PTR64=1
-else
-MAME_CROSS_OPTS += PTR64=0
-# Temp hack for 32-bit architectures : disable WERROR to avoid switchres log warning treated as error
-MAME_CROSS_OPTS += NOWERROR=1
-endif
 
 # All platforms run Wayland, no X11
 MAME_CROSS_OPTS += NO_X11=1 NO_USE_XINPUT=1 USE_WAYLAND=1
@@ -71,23 +65,6 @@ MAME_CFLAGS += -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
 endif
 else
 MAME_CROSS_OPTS += FORCE_DRC_C_BACKEND=1
-endif
-
-# Handle ARM 32-bit platforms
-ifeq ($(BR2_arm),y)
-MAME_CROSS_ARCH = arm
-# Always enable NEON on 32-bit arm
-MAME_CFLAGS += -D__ARM_NEON__ -D__ARM_NEON
-# workaround for linkage failure using ld on arm 32-bit targets
-MAME_LDFLAGS += -fuse-ld=gold -Wl,--long-plt
-# ARM cpu flags
-ifeq ($(BR2_cortex_a9),y)
-MAME_CFLAGS += -mcpu=cortex-a9 -mtune=cortex-a9 -mfloat-abi=hard
-else ifeq ($(BR2_cortex_a17),y)
-MAME_CFLAGS += -mcpu=cortex-a17 -mtune=cortex-a17 -mfloat-abi=hard
-else ifeq ($(BR2_cortex_a15_a7),y)
-MAME_CFLAGS += -mcpu=cortex-a15.cortex-a7 -mtune=cortex-a15.cortex-a7 -mfloat-abi=hard
-endif
 endif
 
 # Handle RV64GC platform (can be further tweaked and optimized)
@@ -241,6 +218,7 @@ define MAME_INSTALL_TARGET_CMDS
 	# Delete bgfx shaders for DX9/DX11/Metal
 	rm -Rf $(TARGET_DIR)/usr/bin/mame/bgfx/shaders/metal/
 	rm -Rf $(TARGET_DIR)/usr/bin/mame/bgfx/shaders/dx11/
+	rm -Rf $(TARGET_DIR)/usr/bin/mame/bgfx/shaders/dx9/
 
 	# Copy extra bgfx shaders
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/emulators/mame/crt-geom-deluxe-rgb.json $(TARGET_DIR)/usr/bin/mame/bgfx/chains
