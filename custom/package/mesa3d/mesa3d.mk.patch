@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/mesa3d.mk b/package/mesa3d/mesa3d.mk
-index ce460c44758..49685bd94b7 100644
+index ce460c4475..49685bd94b 100644
 --- a/package/mesa3d/mesa3d.mk
 +++ b/package/mesa3d/mesa3d.mk
 @@ -4,10 +4,10 @@

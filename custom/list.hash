@@ -5,6 +5,7 @@
 #   * a line of plus signs ('+') indicates a file that we add to the Buildroot external tree
 
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
+++++++++++++++++++++++++++++++++  package/llvm-project/clang/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm-cmake/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm/001-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/pkg-rust.mk
@@ -130,6 +131,7 @@ e3dfda998e09394fd4a89d50043c451f  package/stella/stella.mk
 d16824a23215fe7119ba463472fd046d  package/sway/Config.in
 6ee316bde23357f2d9979f169a167a98  package/sway/sway.hash
 9b118e6d6daf3da0efe92961289ad4ef  package/sway/sway.mk
+4ba5e251de8dca5eae21aa57c7af14b0  package/sysvinit/sysvinit.mk
 80759c0cf36231666d47023112c2fdca  package/tremor/tremor.hash
 8151e8f78e4dd9ff4fe321232d09b696  package/tremor/tremor.mk
 bdd49df8f42c2cf425989f5f42ec25e7  package/urandom-scripts/S01seedrng
