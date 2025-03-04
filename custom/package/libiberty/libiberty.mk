@@ -30,4 +30,18 @@ HOST_LIBIBERTY_CONF_ENV = \
 	CFLAGS="$(HOST_CFLAGS) -fPIC" \
 	LDFLAGS="$(HOST_LDFLAGS) -fPIC"
 
+
+# REG add
+LIBIBERTY_DL_SUBDIR = binutils
+LIBIBERTY_INSTALL_STAGING = YES
+LIBIBERTY_INSTALL_TARGET = NO
+LIBIBERTY_CONF_OPTS = \
+	--disable-multilib \
+	--enable-install-libiberty
+LIBIBERTY_CONF_ENV = \
+	CFLAGS="$(HOST_CFLAGS) -fPIC" \
+	LDFLAGS="$(HOST_LDFLAGS) -fPIC"
+$(eval $(autotools-package))
+
 $(eval $(host-autotools-package))
+
