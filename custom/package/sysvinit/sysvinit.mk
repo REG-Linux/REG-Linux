@@ -18,6 +18,10 @@ SYSVINIT_DEPENDENCIES += libselinux
 SYSVINIT_MAKE_OPTS += WITH_SELINUX="yes"
 endif
 
+ifeq ($(BR2_PACKAGE_LIBXCRYPT),y)
+SYSVINIT_DEPENDENCIES += libxcrypt
+endif
+
 define SYSVINIT_BUILD_CMDS
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) $(SYSVINIT_MAKE_OPTS) -C $(@D)/src
 endef
@@ -28,7 +32,7 @@ define SYSVINIT_INSTALL_TARGET_CMDS
 	done
 	$(INSTALL) -D -m 0644 package/sysvinit/inittab $(TARGET_DIR)/etc/inittab
 	echo -e "#!/bin/bash\n/sbin/shutdown -r now" > $(TARGET_DIR)/sbin/reboot
-    chmod 755 $(TARGET_DIR)/sbin/reboot
+	chmod 755 $(TARGET_DIR)/sbin/reboot
 	ln -sf /sbin/halt $(TARGET_DIR)/sbin/poweroff
 	ln -sf killall5 $(TARGET_DIR)/sbin/pidof
 endef
