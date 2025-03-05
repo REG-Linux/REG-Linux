@@ -3,8 +3,8 @@
 # LIGHTSPARK
 #
 ################################################################################
-# Version.: Commits on Feb 16, 2025
-# GLES support broken in 0.9.0 so far, so desktop GL only
+# Version.: Release on Feb 16, 2025
+# GLES support broken in 0.9.0, fixed by WIP patch
 LIGHTSPARK_VERSION = 0.9.0
 LIGHTSPARK_SITE = $(call github,lightspark,lightspark,$(LIGHTSPARK_VERSION))
 LIGHTSPARK_LICENSE = LGPLv3

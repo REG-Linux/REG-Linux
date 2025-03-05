@@ -13,8 +13,6 @@ snes:
       bsnes:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES]       }
       bsnes_hd:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_HD]    }
       mesen-s:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS]      }
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:snes
   comment_fr: |
@@ -196,8 +194,6 @@ nes:
       fceumm:   { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FCEUMM] }
       nestopia: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_NESTOPIA] }
       mesen:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESEN] }
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:nes
   comment_fr: |
@@ -258,8 +254,6 @@ gba:
       mgba:   { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
       vba-m:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
       gpsp:   { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GPSP] }
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:gba
   comment_fr: |
@@ -279,8 +273,6 @@ gbc:
       mgba:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
       vba-m:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
       mesen-s:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:gbc
   comment_fr: |
@@ -501,8 +493,6 @@ megadrive:
       genesisplusgx-wide: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GENESISPLUSGX_WIDE] }
       picodrive:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
       blastem:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BLASTEM] }
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:megadrive
   comment_fr: |
@@ -558,8 +548,6 @@ mastersystem:
       picodrive:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
       smsplus:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SMSPLUS_GX]}
       gearsystem:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARSYSTEM]}
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 pico:
   name:       Sega Pico
@@ -586,8 +574,6 @@ gamegear:
       picodrive:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
       smsplus:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SMSPLUS_GX]}
       gearsystem:    { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARSYSTEM]}
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 sg1000:
   name:       SG-1000
@@ -647,7 +633,7 @@ psx:
       duckstation:        { requireAnyOf: [BR2_PACKAGE_DUCKSTATION] }
       duckstation-legacy: { requireAnyOf: [BR2_PACKAGE_DUCKSTATION_LEGACY] }
     mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN_PSX] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:psx
   comment_fr: |
@@ -703,6 +689,8 @@ pcfx:
   emulators:
     libretro:
       pcfx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCFX] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN_PCFX] }
 
 scummvm:
   name:       ScummVM
@@ -1165,6 +1153,8 @@ ngpc:
   emulators:
     libretro:
       mednafen_ngp: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_NGP] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 wswan:
   name:       WonderSwan
@@ -1952,6 +1942,8 @@ saturn:
       beetle-saturn: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_SATURN], incompatible_extensions: [zip] }
       kronos:        { requireAnyOf: [BR2_PACKAGE_LIBRETRO_KRONOS] }
       yabasanshiro:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_YABASANSHIRO], incompatible_extensions: [m3u] }
+    mednafen:
+      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN_SATURN] }
 
 jaguar:
   name: Jaguar
@@ -3112,8 +3104,6 @@ apple2gs:
       mame: { requireAnyOf: [BR2_PACKAGE_MAME, BR2_PACKAGE_HAS_MAME] }
     gsplus:
       gsplus: { requireAnyOf: [BR2_PACKAGE_GSPLUS], incompatible_extensions: [mfi, dfi, rti, edd, woz, hfe, mfm, td0, imd, d77, d88, 1dd, cqm, cqui, ima, img, ufi, 360, ipf, dc42, zip, 7z] }
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
           If your game does not start using LR-Mame. Ensure you choose the right floppy type for the rom extension.
           i.e. some extensions require you to choose the 3 1/2 inch floppy drive (Drive 3).
@@ -3863,8 +3853,6 @@ macintosh:
       mame:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME, BR2_PACKAGE_HAS_LIBRETRO_MAME] }
     mame:
       mame: { requireAnyOf: [BR2_PACKAGE_MAME, BR2_PACKAGE_HAS_MAME] }
-    mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
   comment_en: |
           MAME requires a number of BIOS and device files, place in the bios folder in zip format.
           Boot disks are from MAME's software lists, floppy images need to be extracted and renamed.
