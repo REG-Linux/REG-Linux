@@ -1106,7 +1106,7 @@ atari2600:
       stella:     { requireAnyOf: [BR2_PACKAGE_LIBRETRO_STELLA]     }
       stella2014: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_STELLA2014] }
     stella:
-      stella:     { requireAnyOf: [BR2_PACKAGE_BATOCERA_STELLA]     }
+      stella:     { requireAnyOf: [BR2_PACKAGE_STELLA] }
 
 atari5200:
   name:       Atari 5200

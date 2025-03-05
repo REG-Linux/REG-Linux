@@ -77,12 +77,14 @@ endif
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
   RETROARCH_CONF_OPTS += --enable-opengl
   RETROARCH_DEPENDENCIES += libgl
-else ifeq ($(BR2_PACKAGE_BATOCERA_GLES3),y)
+else ifeq ($(BR2_PACKAGE_HAS_GLES3),y)
     RETROARCH_CONF_OPTS += --enable-opengles3 --enable-opengles --enable-opengles3_1
     RETROARCH_DEPENDENCIES += libgles
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_SAPHIRA)$(BR2_x86_64),y)
+# Panfrost does NOT support OpenGL ES 3.2
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_SM8550)$(BR2_PACKAGE_SYSTEM_TARGET_ASAHI)$(BR2_x86_64),y)
     RETROARCH_CONF_OPTS += --enable-opengles3_2
-else ifeq ($(BR2_PACKAGE_BATOCERA_GLES2),y)
+endif
+else ifeq ($(BR2_PACKAGE_HAS_GLES2),y)
     RETROARCH_CONF_OPTS += --enable-opengles
     RETROARCH_DEPENDENCIES += libgles
 endif
