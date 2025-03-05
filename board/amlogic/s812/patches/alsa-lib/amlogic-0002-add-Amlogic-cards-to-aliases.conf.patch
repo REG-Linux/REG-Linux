@@ -11,7 +11,7 @@ diff --git a/src/conf/cards/aliases.conf b/src/conf/cards/aliases.conf
 index 18a920f4..14dedb63 100644
 --- a/src/conf/cards/aliases.conf
 +++ b/src/conf/cards/aliases.conf
-@@ -58,6 +58,54 @@ CMI8787 cards.CMI8788
+@@ -58,6 +58,55 @@ CMI8787 cards.CMI8788
  pistachio cards.pistachio-card
  VC4-HDMI cards.vc4-hdmi
  
@@ -57,11 +57,12 @@ index 18a920f4..14dedb63 100644
 +KHADAS-VIM3L cards.AMLOGIC-HDMI
 +
 +# Meson 8 Cards
-+EC100 cards.AMLOGIC-HDMI
-+TRONSMART-S82 cards.AMLOGIC-HDMI
-+AKASO-M8S cards.AMLOGIC-HDMI-SPDIF
-+TRONSMART-MXIII cards.AMLOGIC-HDMI-SPDIF
-+HDMITX cards.AMLOGIC-HDMI-SPDIF
++EC100 cards.gx-sound-card
++TRONSMART-S82 cards.gx-sound-card
++AKASO-M8S cards.gx-sound-card
++ACEMAX-M8S-PLUS cards.gx-sound-card
++TRONSMART-MXIII cards.gx-sound-card
++HDMITX cards.gx-sound-card
 +
  <confdir:ctl/default.conf>
  <confdir:pcm/default.conf>

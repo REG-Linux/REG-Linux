@@ -26,9 +26,10 @@ cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/resc
 cp "${BINARIES_DIR}/meson8m2-mxiii.dtb"         "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 cp "${BINARIES_DIR}/meson8m2-mxiii-plus.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 cp "${BINARIES_DIR}/meson8m2-m8s.dtb"           "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/meson8m2-m8s-plus.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 cp "${BINARIES_DIR}/meson8-minix-neo-x8.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 cp "${BINARIES_DIR}/meson8-tronsmart-s82.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
-# cp "${BINARIES_DIR}/meson8m2-wetek-core.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+cp "${BINARIES_DIR}/meson8m2-wetek-core.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
 
 "${HOST_DIR}/bin/mkimage" -C none -A arm -T script -d "${BOARD_DIR}/boot/s805_autoscript.cmd" "${REGLINUX_BINARIES_DIR}/boot/s805_autoscript" || exit 1
 "${HOST_DIR}/bin/mkimage" -C none -A arm -T script -d "${BOARD_DIR}/boot/aml_autoscript.scr"  "${REGLINUX_BINARIES_DIR}/boot/aml_autoscript"  || exit 1
