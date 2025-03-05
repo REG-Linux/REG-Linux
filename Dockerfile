@@ -1,10 +1,7 @@
 FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND=noninteractive
-RUN dpkg --add-architecture i386 && \
-    apt-get update && \
-    apt-get install -y -o APT::Immediate-Configure=0 libc6:i386 \
-    libncurses6:i386 \
-    libstdc++6:i386 \
+RUN apt-get update && \
+    apt-get install -y \
     build-essential \
     cmake \
     git \
@@ -23,7 +20,6 @@ RUN dpkg --add-architecture i386 && \
     scons \
     libglib2.0-dev \
     bc \
-    gh \
     mtools \
     u-boot-tools \
     flex \
@@ -42,6 +38,19 @@ RUN dpkg --add-architecture i386 && \
     gcc-multilib \
     g++-multilib \
     libgnutls28-dev \
+    fonts-droid-fallback \
+    libcurl4-openssl-dev \
+    rapidjson-dev \
+    libasound2-dev \
+    libcec-dev \
+    libboost-all-dev \
+    libint-dev \
+    libavcodec-dev \
+    libfreetype6-dev \
+    libsdl2-dev \
+    libsdl2-mixer-dev \
+    libfreeimage-dev \
+    libavfilter-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -55,10 +64,6 @@ ENV TZ Europe/Paris
 
 # Workaround host-tar configure error
 ENV FORCE_UNSAFE_CONFIGURE 1
-
-# device-tree-compiler : required for device-trees-aml-s9xx
-# libc6:i386 libncurses5:i386 libstdc++6:i386: required for mame2016
-# gettext : required for buildstats.sh
 
 RUN mkdir -p /build
 WORKDIR /build
