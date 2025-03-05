@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/Config.in b/package/mesa3d/Config.in
-index 7761b0a650..6eccc50487 100644
+index 7761b0a650..d78c984615 100644
 --- a/package/mesa3d/Config.in
 +++ b/package/mesa3d/Config.in
 @@ -7,8 +7,14 @@ menuconfig BR2_PACKAGE_MESA3D
@@ -110,7 +110,7 @@ index 7761b0a650..6eccc50487 100644
  	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
  	select BR2_PACKAGE_LIBDRM_VC4
-@@ -262,6 +295,40 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL
+@@ -262,6 +295,29 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL
  	  virgl is the 3D acceleration backend for the virtio-gpu
  	  shipping with qemu.
  
@@ -137,21 +137,10 @@ index 7761b0a650..6eccc50487 100644
 +	  The D3D12 driver emits D3D12 API calls instead of targeting a specific GPU architecture.
 +	  This can be used to get full desktop OpenGL support on Windows devices through WSL.
 +
-+# batocera - add lavapipe
-+config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_LAVAPIPE
-+	bool "Vulkan LLVM software-based driver"
-+	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
-+	select BR2_PACKAGE_MESA3D_OPENGL_ES
-+	select BR2_PACKAGE_MESA3D_OPENGL_EGL
-+	select BR2_PACKAGE_MESA3D_OPENGL_GLX        if BR2_PACKAGE_XORG7
-+	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
-+	help
-+	  The LavaPipe driver is a software-based Vulkan implementation leveraging Mesa and LLVM.
-+
  config BR2_PACKAGE_MESA3D_VDPAU
  	bool "Gallium VDPAU state tracker"
  	depends on BR2_PACKAGE_XORG7
-@@ -298,7 +365,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL
+@@ -298,7 +354,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL
  	depends on BR2_TOOLCHAIN_USES_GLIBC # ifunc, static_assert
  	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
  	help
@@ -160,7 +149,7 @@ index 7761b0a650..6eccc50487 100644
  
  comment "intel vulkan needs a glibc toolchain w/ headers >= 3.17"
  	depends on BR2_i386 || BR2_x86_64
-@@ -314,6 +381,127 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
+@@ -314,6 +370,127 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
  	help
  	  Vulkan swrast driver.
  

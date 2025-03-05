@@ -318,17 +318,6 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_D3D12
 	  The D3D12 driver emits D3D12 API calls instead of targeting a specific GPU architecture.
 	  This can be used to get full desktop OpenGL support on Windows devices through WSL.
 
-# batocera - add lavapipe
-config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_LAVAPIPE
-	bool "Vulkan LLVM software-based driver"
-	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
-	select BR2_PACKAGE_MESA3D_OPENGL_ES
-	select BR2_PACKAGE_MESA3D_OPENGL_EGL
-	select BR2_PACKAGE_MESA3D_OPENGL_GLX        if BR2_PACKAGE_XORG7
-	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
-	help
-	  The LavaPipe driver is a software-based Vulkan implementation leveraging Mesa and LLVM.
-
 config BR2_PACKAGE_MESA3D_VDPAU
 	bool "Gallium VDPAU state tracker"
 	depends on BR2_PACKAGE_XORG7

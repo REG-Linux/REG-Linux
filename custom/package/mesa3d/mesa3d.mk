@@ -85,7 +85,7 @@ endif
 ifeq ($(BR2_x86_64)$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
 MESA3D_DEPENDENCIES += host-qemu host-libclc libclc spirv-tools spirv-llvm-translator clang host-glslang
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
-MESA3D_MESON_EXTRA_BINARIES += exe_wrapper='$(HOST_DIR)/bin/qemu-aarch64'
+MESA3D_MESON_EXTRA_BINARIES += exe_wrapper=['$(HOST_DIR)/bin/qemu-aarch64','-L','$(STAGING_DIR)']
 endif
 endif
 
@@ -352,5 +352,5 @@ $(eval $(meson-package))
 
 # "just" need a native host intel_clc compiler
 HOST_MESA3D_DEPENDENCIES = host-libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
-HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dintel-clc=enabled -Dinstall-intel-clc=true -Dplatforms= -Dgallium-drivers=swrast -Dglx=disabled -Dgallium-opencl=disabled
+HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dintel-clc=enabled -Dinstall-intel-clc=true -Dplatforms= -Dgallium-drivers= -Dglx=disabled -Dgallium-opencl=disabled
 $(eval $(host-meson-package))
