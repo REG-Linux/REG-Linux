@@ -1,3 +1,14 @@
+From ef5a3345d6af58fbfa5d9b1ae2df11d6ac259498 Mon Sep 17 00:00:00 2001
+From: spycat88 <spycat88@users.noreply.github.com>
+Date: Thu, 23 Jan 2025 15:18:25 +0000
+Subject: [PATCH] drivers: use soc serial for wifi and bluetooth
+
+---
+ drivers/bluetooth/btqca.c             | 100 ++++++++++++++++++++++-
+ drivers/net/wireless/ath/ath11k/mac.c | 109 ++++++++++++++++++++++++--
+ drivers/soc/qcom/socinfo.c            |  10 +++
+ 3 files changed, 209 insertions(+), 10 deletions(-)
+
 diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
 index dfbbac92242a..dbe838040a67 100644
 --- a/drivers/bluetooth/btqca.c
@@ -301,3 +312,6 @@ index ecfd3da9d5e8..238f804e7fe0 100644
  }
  
  static struct platform_driver qcom_socinfo_driver = {
+-- 
+2.34.1
+

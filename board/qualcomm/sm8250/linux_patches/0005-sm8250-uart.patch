@@ -1,17 +1,6 @@
-From 61a5f531281d78dfc7bef078555fde9d6d25232a Mon Sep 17 00:00:00 2001
-From: Teguh Sobirin <teguh@sobir.in>
-Date: Wed, 20 Nov 2024 22:58:09 +0700
-Subject: [PATCH] arm64: dts: qcom: sm8250: add uart16 Signed-off-by: Teguh
- Sobirin <teguh@sobir.in>
-
----
- arch/arm64/boot/dts/qcom/sm8250.dtsi | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi b/arch/arm64/boot/dts/qcom/sm8250.dtsi
-index 630f4eff20bf81..c4ab889237e111 100644
---- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
+diff -rupbN linux.orig/arch/arm64/boot/dts/qcom/sm8250.dtsi linux/arch/arm64/boot/dts/qcom/sm8250.dtsi
+--- linux.orig/arch/arm64/boot/dts/qcom/sm8250.dtsi	2024-11-29 14:02:15.567061015 +0000
++++ linux/arch/arm64/boot/dts/qcom/sm8250.dtsi	2024-11-29 14:43:53.563376012 +0000
 @@ -1153,6 +1153,23 @@
  				status = "disabled";
  			};
