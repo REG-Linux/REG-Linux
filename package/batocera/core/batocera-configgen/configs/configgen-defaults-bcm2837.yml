@@ -21,4 +21,6 @@ dreamcast:
 naomi:
   emulator: libretro
   core:     flycastvl
-
+flash:
+  emulator: lightspark
+  core:     lightspark

@@ -40,3 +40,6 @@ cplus4:
 pet:
   emulator: libretro
   core:     vice_xpet
+flash:
+  emulator: lightspark
+  core:     lightspark

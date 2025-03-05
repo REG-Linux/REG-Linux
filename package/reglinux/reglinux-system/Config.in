@@ -119,7 +119,7 @@ config BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE
 	default n
 
 ##########################################
-config BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
+config BR2_PACKAGE_REGLINUX_MUSIC_SUPPORT
 	bool "batocera.linux music formats support"
 
 	# MIDI renderer (CPU hog)
@@ -134,8 +134,14 @@ config BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
 	select BR2_PACKAGE_ALSA_UTILS_ACONNECT  if BR2_PACKAGE_ALSA_UTILS
 	select BR2_PACKAGE_ALSA_UTILS_APLAYMIDI if BR2_PACKAGE_ALSA_UTILS
 
+	# FLAC, Ogg/Vorbis, MP3, Modules support
+	select BR2_PACKAGE_FLAC			# flac
+	select BR2_PACKAGE_LIBMAD		# mp3
+	select BR2_PACKAGE_LIBMODPLUG		# modules (mod,xm,s3m,it...)
+	select BR2_PACKAGE_LIBVORBIS		# ogg
+
 	help
-	  Music support packages (MIDI and ALSA)
+	  Music support packages (MIDI, ALSA, FLAC, Ogg/Vorbis, MP3, modules...)
 
 config BR2_PACKAGE_REGLINUX_VULKAN
 	bool "REG-Linux Vulkan support"
@@ -343,7 +349,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_IRQBALANCE
 
 	# music support
-	select BR2_PACKAGE_BATOCERA_MUSIC_SUPPORT
+	select BR2_PACKAGE_REGLINUX_MUSIC_SUPPORT
 
 	# Feral GameMode
 	select BR2_PACKAGE_GAMEMODE		# ALL
@@ -797,7 +803,7 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     bool "REG-Linux multisystems emulators support"
 
     # Box86 user-mode x86 emulation for ARM
-    select BR2_PACKAGE_BOX86			if BR2_arm && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+    select BR2_PACKAGE_BOX86			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_arm && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 
     # Box64 user-mode x64_64 emulation for AArch64 / RV64
     select BR2_PACKAGE_BOX64			if BR2_aarch64 || BR2_RISCV_64
@@ -807,6 +813,11 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
 
     # Mednafen
     select BR2_PACKAGE_MEDNAFEN			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_mipsel
+    # Configurable cores for Mednafen
+    # TODO those are artificial dependencies to avoid configs-defaults-XXX.yml issues
+    select BR2_PACKAGE_MEDNAFEN_PCFX		if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+    select BR2_PACKAGE_MEDNAFEN_PSX		if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+    select BR2_PACKAGE_MEDNAFEN_SATURN		if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
 
     # Ares (OpenGL 3.3+ or Vulkan or wgpu)
     select BR2_PACKAGE_ARES			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_REGLINUX_VULKAN
@@ -827,7 +838,7 @@ config BR2_PACKAGE_BATOCERA_FLASH_SYSTEMS
 	select BR2_PACKAGE_RUFFLE		if BR2_PACKAGE_HAS_GLES3 && (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
 
 	# Lightspark implementation in C/C++
-	select BR2_PACKAGE_LIGHTSPARK		if BR2_PACKAGE_HAS_LIBGL && (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
+	select BR2_PACKAGE_LIGHTSPARK		if (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
 
 #### Moonlight / Gamestream ####
 config BR2_PACKAGE_BATOCERA_GAMESTREAM_SYSTEMS
@@ -1854,13 +1865,24 @@ config BR2_PACKAGE_REGLINUX_SDL2
 	select BR2_PACKAGE_SDL2_TTF
 	select BR2_PACKAGE_SDL2_OPENGLES	if BR2_PACKAGE_HAS_LIBGLES
 	select BR2_PACKAGE_SDL2_OPENGL		if BR2_PACKAGE_HAS_LIBGL
-	select BR2_PACKAGE_SDL2_X11		if BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_SDL2_X11		if BR2_PACKAGE_XWAYLAND
 	select BR2_PACKAGE_SDL2_KMSDRM
 	select BR2_PACKAGE_SDL2_WAYLAND
-	select BR2_PACKAGE_FLAC			# flac
-	select BR2_PACKAGE_LIBMAD		# mp3
-	select BR2_PACKAGE_LIBMODPLUG		# modules (mod,xm,s3m,it...)
-	select BR2_PACKAGE_LIBVORBIS		# ogg
+
+config BR2_PACKAGE_REGLINUX_SDL3
+	bool "REG-Linux SDL3"
+
+	select BR2_PACKAGE_SDL3
+	#select BR2_PACKAGE_SDL3_GFX
+	select BR2_PACKAGE_SDL3_IMAGE
+	select BR2_PACKAGE_SDL3_MIXER
+	#select BR2_PACKAGE_SDL3_NET
+	#select BR2_PACKAGE_SDL3_TTF
+	select BR2_PACKAGE_SDL3_OPENGLES	if BR2_PACKAGE_HAS_LIBGLES
+	select BR2_PACKAGE_SDL3_OPENGL		if BR2_PACKAGE_HAS_LIBGL
+	select BR2_PACKAGE_SDL3_X11		if BR2_PACKAGE_XWAYLAND
+	select BR2_PACKAGE_SDL3_KMSDRM
+	select BR2_PACKAGE_SDL3_WAYLAND
 
 config BR2_PACKAGE_REGLINUX_SWAY
 	bool "REG-Linux sway packages selection"
