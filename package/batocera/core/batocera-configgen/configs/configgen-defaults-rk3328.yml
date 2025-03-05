@@ -8,3 +8,6 @@ default:
 fmtowns:
   emulator: libretro
   core:     mame
+flash:
+  emulator: lightspark
+  core:     lightspark

@@ -46,3 +46,6 @@ naomi:
   core:     flycast
 n64:
   options:
+flash:
+  emulator: lightspark
+  core:     lightspark

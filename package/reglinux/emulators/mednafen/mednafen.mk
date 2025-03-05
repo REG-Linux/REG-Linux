@@ -8,8 +8,46 @@ MEDNAFEN_VERSION = 1.32.1
 MEDNAFEN_SOURCE = mednafen-$(MEDNAFEN_VERSION).tar.xz
 MEDNAFEN_SITE = https://mednafen.github.io/releases/files
 MEDNAFEN_LICENSE = GPLv3
-MEDNAFEN_DEPENDENCIES = sdl2 zlib libpng flac
+MEDNAFEN_DEPENDENCIES = sdl2 zlib zstd libpng flac
 
-MEDNAFEN_CONF_OPTS = --disable-ssfplay
+# Disable mednafen "useless" cores
+MEDNAFEN_CONF_OPTS  = --disable-ssfplay --disable-sasplay
+MEDNAFEN_CONF_OPTS += --disable-nes --disable-snes --disable-snes-faust
+MEDNAFEN_CONF_OPTS += --disable-gb --disable-gba
+MEDNAFEN_CONF_OPTS += --disable-sms --disable-md
+
+# Disable mednafen "useless" features
+MEDNAFEN_CONF_OPTS += --disable-debugger
+
+# Configurable PCFX core
+ifeq ($(BR2_PACKAGE_MEDNAFEN_PSX),y)
+MEDNAFEN_CONF_OPTS += --enable-pcfx
+else
+MEDNAFEN_CONF_OPTS += --disable-pcfx
+endif
+
+# Configurable PSX core
+ifeq ($(BR2_PACKAGE_MEDNAFEN_PSX),y)
+MEDNAFEN_CONF_OPTS += --enable-psx
+else
+MEDNAFEN_CONF_OPTS += --disable-psx
+endif
+
+# Configurable Saturn core
+ifeq ($(BR2_PACKAGE_MEDNAFEN_SATURN),y)
+MEDNAFEN_CONF_OPTS += --enable-ss
+else
+MEDNAFEN_CONF_OPTS += --disable-ss
+endif
+
+# Link mednafen with external libraries when possible
+ifeq ($(BR2_PACKAGE_ZSTD),y)
+MEDNAFEN_DEPENDENCIES += zstd
+MEDNAFEN_CONF_OPTS += --with-external-libzstd
+endif
+ifeq ($(BR2_PACKAGE_LZO),y)
+MEDNAFEN_DEPENDENCIES += lzo
+MEDNAFEN_CONF_OPTS +=  --with-external-lzo
+endif
 
 $(eval $(autotools-package))

@@ -35,9 +35,6 @@ BR2_LINUX_KERNEL_INTREE_DTS_NAME="allwinner/sun8i-h3-libretech-all-h3-cc"
 # GPU
 BR2_PACKAGE_BATOCERA_LIMA_MESA3D=y
 
-# Allow wayland
-BR2_PACKAGE_REGLINUX_SWAY=y
-
 # spi flash support
 BR2_PACKAGE_MTD=y
 
