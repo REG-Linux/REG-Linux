@@ -7,3 +7,16 @@ config BR2_PACKAGE_MEDNAFEN
 
     help
         Mednafen is a portable, utilizing OpenGL and SDL, argument(command-line)-driven multi-system emulator.
+
+if BR2_PACKAGE_MEDNAFEN
+
+config BR2_PACKAGE_MEDNAFEN_PCFX
+        bool "mednafen-pcfx"
+
+config BR2_PACKAGE_MEDNAFEN_PSX
+        bool "mednafen-psx"
+
+config BR2_PACKAGE_MEDNAFEN_SATURN
+        bool "mednafen-saturn"
+
+endif

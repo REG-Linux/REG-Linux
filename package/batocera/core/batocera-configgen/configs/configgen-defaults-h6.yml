@@ -26,3 +26,6 @@ naomi2:
 systemsp:
   emulator: flycast
   core:     flycast
+flash:
+  emulator: lightspark
+  core:     lightspark
