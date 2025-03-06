@@ -3,5 +3,5 @@
 # default resolution
 es.resolution=480x854
 
-# default sway environment (rotate)
-system.es.environment=sway
+# default wayland environment (rotate)
+system.es.environment=wayland
