@@ -15,7 +15,7 @@ REGLINUX_EMULATIONSTATION_SITE_METHOD = git
 REGLINUX_EMULATIONSTATION_LICENSE = MIT
 REGLINUX_EMULATIONSTATION_GIT_SUBMODULES = YES
 REGLINUX_EMULATIONSTATION_LICENSE = MIT, Apache-2.0
-REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl3 sdl3-mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext lunasvg
+REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl3 sdl3_mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext lunasvg
 
 REGLINUX_EMULATIONSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 
