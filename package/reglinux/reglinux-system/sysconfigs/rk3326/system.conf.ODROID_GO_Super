@@ -6,8 +6,8 @@ es.resolution=480x854
 # Enable Suspend on handheld targets
 system.suspendmode=suspend
 
-# Delay time for suspend mode 
+# Delay time for suspend mode
 system.shutdowndelay=1
 
-# default sway environment (rotate)
-system.es.environment=sway
+# default wayland environment (rotate)
+system.es.environment=wayland
