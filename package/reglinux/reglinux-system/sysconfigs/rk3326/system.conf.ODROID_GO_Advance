@@ -1,10 +1,10 @@
 # odroid-go advance default values
 
-# default sway environment (rotate)
-system.es.environment=sway
+# default wayland environment (rotate)
+system.es.environment=wayland
 
 # Enable Suspend on handheld targets
 system.suspendmode=suspend
 
-# Delay time for suspend mode 
+# Delay time for suspend mode
 system.shutdowndelay=1
