@@ -3,8 +3,8 @@
 # CLK - Clock Signal emulator
 #
 ################################################################################
-# Version.: Release 2025-02-26 on Feb 26, 2025
-CLK_VERSION = 2025-02-26
+# Version.: Release 2025-03-05 on Mar 5, 2025
+CLK_VERSION = 2025-03-05
 CLK_SITE = https://github.com/TomHarte/CLK
 CLK_SITE_METHOD=git
 CLK_LICENSE = GPLv3
