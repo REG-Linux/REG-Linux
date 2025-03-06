@@ -1,5 +1,5 @@
 config BR2_PACKAGE_SDL3_IMAGE
-	bool "sdl3-image"
+	bool "sdl3_image"
 	depends on !BR2_STATIC_LIBS
 	select BR2_PACKAGE_SDL3
 	select BR2_PACKAGE_WEBP
