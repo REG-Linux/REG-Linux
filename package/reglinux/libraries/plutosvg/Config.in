@@ -1,0 +1,7 @@
+config BR2_PACKAGE_PLUTOSVG
+	bool "plutosvg"
+	select BR2_PACKAGE_PLUTOVG
+	help
+	  PlutoSVG is a compact and efficient SVG rendering library written in C.
+
+	  https://github.com/sammycage/plutosvg
