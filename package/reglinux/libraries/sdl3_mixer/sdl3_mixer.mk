@@ -28,6 +28,14 @@ endif
 ifeq ($(BR2_PACKAGE_LIBXMP),y)
 SDL3_MIXER_DEPENDENCIES += libxmp
 endif
+ifeq ($(BR2_PACKAGE_LIBMODPLUG),y)
+SDL3_MIXER_DEPENDENCIES += libmodplug
+endif
+
+# Codecs
+ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
+SDL3_MIXER_DEPENDENCIES += libvorbis
+endif
 
 # Backends
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
