@@ -6,16 +6,16 @@
 # Last update: Commits on Jan 26, 2025
 # SDL2 main branch
 #REGLINUX_EMULATIONSTATION_VERSION = bccf259d19e0695f42469accc4d01e3b2fba2c1e
-# Last update: Commits on Mar 6, 2025
+# Last update: Commits on Mar 7, 2025
 # SDL3 branch
-REGLINUX_EMULATIONSTATION_VERSION = d1947aa04c45b88e8d5e635b13fa7a2d1885a545
+REGLINUX_EMULATIONSTATION_VERSION = a47ad98296bdd503062c14bf683931b5c4d0f797
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_EMULATIONSTATION_SITE = https://$(REGLINUX_EMULATIONSTATION_TOKEN)@github.com/REG-Linux/REG-ES
 REGLINUX_EMULATIONSTATION_SITE_METHOD = git
 REGLINUX_EMULATIONSTATION_LICENSE = MIT
 REGLINUX_EMULATIONSTATION_GIT_SUBMODULES = YES
 REGLINUX_EMULATIONSTATION_LICENSE = MIT, Apache-2.0
-REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl3 sdl3_mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext lunasvg
+REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl3 sdl3_mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext lunasvg pugixml
 
 REGLINUX_EMULATIONSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 
