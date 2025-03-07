@@ -1,6 +1,6 @@
 ################################################################################
 #
-# sdl3-mixer
+# sdl3_mixer
 #
 ################################################################################
 
@@ -14,12 +14,35 @@ SDL3_MIXER_INSTALL_STAGING = YES
 
 SDL3_MIXER_DEPENDENCIES += sdl3
 
-ifeq ($(BR2_PACKAGE_PIPEWIRE),y)
-SDL3_MIXER_DEPENDENCIES += pipewire
+# FLAC
+ifeq ($(BR2_PACKAGE_FLAC),y)
+SDL3_MIXER_DEPENDENCIES += flac
 endif
 
+# MIDI
+ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
+SDL3_MIXER_DEPENDENCIES += fluidsynth
+endif
+
+# Modules
+ifeq ($(BR2_PACKAGE_LIBXMP),y)
+SDL3_MIXER_DEPENDENCIES += libxmp
+endif
+ifeq ($(BR2_PACKAGE_LIBMODPLUG),y)
+SDL3_MIXER_DEPENDENCIES += libmodplug
+endif
+
+# Codecs
+ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
+SDL3_MIXER_DEPENDENCIES += libvorbis
+endif
+
+# Backends
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
 SDL3_MIXER_DEPENDENCIES += alsa-lib
+endif
+ifeq ($(BR2_PACKAGE_PIPEWIRE),y)
+SDL3_MIXER_DEPENDENCIES += pipewire
 endif
 
 $(eval $(cmake-package))

@@ -1,5 +1,5 @@
 config BR2_PACKAGE_SDL3_MIXER
-	bool "sdl3-mixer"
+	bool "sdl3_mixer"
 	depends on !BR2_STATIC_LIBS
 	depends on BR2_PACKAGE_SDL3
 	help
