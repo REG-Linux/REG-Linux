@@ -12,14 +12,8 @@ SWAY_DEPENDENCIES = host-pkgconf wlroots json-c pcre2 cairo pango
 SWAY_CONF_OPTS = \
 	-Dwerror=false \
 	-Dzsh-completions=false \
-	-Dbash-completions=true \
 	-Dfish-completions=false \
-	-Dswaybar=false \
-	-Dswaynag=false \
-	-Dtray=disabled \
 	-Dman-pages=disabled
-# We don't want systemd
-#-Dsd-bus-provider=libsystemd
 
 ifeq ($(BR2_PACKAGE_GDK_PIXBUF),y)
 SWAY_CONF_OPTS += -Dgdk-pixbuf=enabled
@@ -60,9 +54,9 @@ endif
 
 # Install only what is needed avoiding systemd files
 define SWAY_INSTALL_TARGET_CMDS
-    mkdir -p $(TARGET_DIR)/usr/bin
-    $(INSTALL) -D $(@D)/build/sway/sway         $(TARGET_DIR)/usr/bin
-    $(INSTALL) -D $(@D)/build/swaymsg/swaymsg   $(TARGET_DIR)/usr/bin
+	mkdir -p $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D $(@D)/build/sway/sway         $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D $(@D)/build/swaymsg/swaymsg   $(TARGET_DIR)/usr/bin
 endef
 
 $(eval $(meson-package))
