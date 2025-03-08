@@ -417,6 +417,14 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_FREEDRENO
 	help
 	  Vulkan freedreno driver.
 
+config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_ASAHI
+	bool "Vulkan Asahi driver"
+	depends on BR2_aarch64
+	depends on BR2_TOOLCHAIN_HAS_SYNC_4 # dri3/libxshmfence
+	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
+	help
+	  Vulkan asahi driver.
+
 config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST
 	bool "Midgard and Bifrost Vulkan driver"
 	depends on BR2_arm || BR2_aarch64

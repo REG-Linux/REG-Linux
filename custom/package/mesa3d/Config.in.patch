@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/Config.in b/package/mesa3d/Config.in
-index 7761b0a650..d78c984615 100644
+index 7761b0a650..7bbc7792c2 100644
 --- a/package/mesa3d/Config.in
 +++ b/package/mesa3d/Config.in
 @@ -7,8 +7,14 @@ menuconfig BR2_PACKAGE_MESA3D
@@ -149,7 +149,7 @@ index 7761b0a650..d78c984615 100644
  
  comment "intel vulkan needs a glibc toolchain w/ headers >= 3.17"
  	depends on BR2_i386 || BR2_x86_64
-@@ -314,6 +370,127 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
+@@ -314,6 +370,135 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
  	help
  	  Vulkan swrast driver.
  
@@ -199,6 +199,14 @@ index 7761b0a650..d78c984615 100644
 +	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
 +	help
 +	  Vulkan freedreno driver.
++
++config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_ASAHI
++	bool "Vulkan Asahi driver"
++	depends on BR2_aarch64
++	depends on BR2_TOOLCHAIN_HAS_SYNC_4 # dri3/libxshmfence
++	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
++	help
++	  Vulkan asahi driver.
 +
 +config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST
 +	bool "Midgard and Bifrost Vulkan driver"
