@@ -3,8 +3,8 @@
 # libretro-dolphin
 #
 ################################################################################
-# Version: Commits on Dec 17, 2022
-LIBRETRO_DOLPHIN_VERSION = 2f4b0f7902257d40a054f60b2c670d6e314f2a04
+# Version: Commits on Apr 19, 2024
+LIBRETRO_DOLPHIN_VERSION = 89a4df725d4eb24537728f7d655cddb1add25c18
 LIBRETRO_DOLPHIN_SITE = $(call github,libretro,dolphin,$(LIBRETRO_DOLPHIN_VERSION))
 LIBRETRO_DOLPHIN_LICENSE = GPLv2
 LIBRETRO_DOLPHIN_DEPENDENCIES = libevdev fmt bluez5_utils
@@ -19,8 +19,8 @@ LIBRETRO_DOLPHIN_CONF_OPTS = -DLIBRETRO=ON \
                              -DBUILD_SHARED_LIBS=OFF \
                              -DCMAKE_BUILD_TYPE=Release
 
-ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),y)
-    LIBRETRO_DOLPHIN_DEPENDENCIES += xserver_xorg-server
+ifeq ($(BR2_PACKAGE_XWAYLAND),y)
+    LIBRETRO_DOLPHIN_DEPENDENCIES += xwayland
     LIBRETRO_DOLPHIN_CONF_OPTS += -DENABLE_X11=ON
 else
     LIBRETRO_DOLPHIN_CONF_OPTS += -DENABLE_X11=OFF
