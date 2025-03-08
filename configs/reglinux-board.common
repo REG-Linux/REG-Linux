@@ -78,6 +78,10 @@ BR2_PACKAGE_GLIBC_UTILS=y
 # disable the mosquitto broker which is on by default
 BR2_PACKAGE_MOSQUITTO_BROKER=n
 
+# always build cairo with PNG support
+BR2_PACKAGE_CAIRO=y
+BR2_PACKAGE_CAIRO_PNG=y
+
 # force enable ffplay
 BR2_PACKAGE_FFMPEG_FFPLAY=y
 
