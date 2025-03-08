@@ -138,6 +138,7 @@ config BR2_PACKAGE_REGLINUX_MUSIC_SUPPORT
 	select BR2_PACKAGE_FLAC			# flac
 	select BR2_PACKAGE_LIBMAD		# mp3
 	select BR2_PACKAGE_LIBMODPLUG		# modules (mod,xm,s3m,it...)
+	select BR2_PACKAGE_LIBXMP		# modules (mod,xm,s3m,it...)
 	select BR2_PACKAGE_LIBVORBIS		# ogg
 
 	help
