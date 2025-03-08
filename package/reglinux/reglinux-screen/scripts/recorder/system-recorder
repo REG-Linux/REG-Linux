@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $(pgrep -x sway) ]; then
+if [ "$(pgrep -x sway)" ]; then
     source /etc/reglinux/recorder.sway
 else
     source /etc/reglinux/recorder.drm
