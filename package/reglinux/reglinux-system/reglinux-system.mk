@@ -108,6 +108,7 @@ define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/reglinux-system/system.conf \
 	    $(TARGET_DIR)/usr/share/reglinux/datainit/system
+	if test "$(RELEASE_BUILD)" -eq 1; then sed -i "s/system\.security\.enabled\=0/system\.security\.enabled\=1/" "$(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf"; fi
 
 	# system-boot.conf
 	$(INSTALL) -D -m 0644 \
