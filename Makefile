@@ -10,6 +10,7 @@ MAKE_JLEVEL    ?= $(NPROC)
 MAKE_LLEVEL    ?= $(shell echo $$(($(NPROC) * 1)))
 BATCH_MODE     ?=
 PARALLEL_BUILD ?=
+RELEASE_BUILD  ?=
 DOCKER         ?= docker
 
 -include $(LOCAL_MK)
