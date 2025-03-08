@@ -3,6 +3,7 @@
 if [ ! -e /sys/devices/system/cpu/cpufreq/policy0/scaling_governor ] ||
    [ ! -e /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors ]; then
     exit 0
+fi
 
 EPP_AVAILABLE=""
 if [ -e /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_available_preferences ]; then
@@ -31,9 +32,10 @@ set_governor() {
    # Apply the governor to all policies
    for policy in /sys/devices/system/cpu/cpufreq/policy*; do
        if [ -e "$policy/scaling_governor" ]; then
-           local CURRENT_GOVERNOR=$(cat "$policy/scaling_governor")
+           local CURRENT_GOVERNOR
+           CURRENT_GOVERNOR=$(cat "$policy/scaling_governor")
            if [ "$CURRENT_GOVERNOR" != "$GOVERNOR_NAME" ]; then
-               echo $GOVERNOR_NAME > "$policy/scaling_governor" 2>/dev/null
+               echo "$GOVERNOR_NAME" > "$policy/scaling_governor" 2>/dev/null
            fi
        fi
    done
