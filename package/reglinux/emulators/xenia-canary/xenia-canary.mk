@@ -3,8 +3,8 @@
 # xenia-canary
 #
 ################################################################################
-# Version: Commits on Feb 26, 2025
-XENIA_CANARY_VERSION = 60318a5db66516614295146e5d455e4b6fda1be7
+# Version: Commits on Mar 7, 2025
+XENIA_CANARY_VERSION = 6666b803fdd3c5b7057f355f68da5ddf07dddcef
 XENIA_CANARY_SITE = https://github.com/xenia-canary/xenia-canary
 XENIA_CANARY_SITE_METHOD = git
 XENIA_CANARY_GIT_SUBMODULES = YES
