@@ -237,7 +237,7 @@ menu "Utils"
 endmenu
 
 menu "Firmwares"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/firmwares/firmware-radxa-rkwifibt/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-radxa-rkwifibt/Config.in"
 endmenu
 endmenu
 
