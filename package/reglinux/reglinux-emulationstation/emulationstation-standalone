@@ -154,7 +154,7 @@ do
     eval "$(dbus-launch --sh-syntax --exit-with-session)"
 
     cd /userdata # es need a PWD
-    SDL_JOYSTICK_HIDAPI=0 %REGLINUX_EMULATIONSTATION_PREFIX% emulationstation ${GAMELAUNCHOPT} --exit-on-reboot-required %REGLINUX_EMULATIONSTATION_ARGS% ${CUSTOMESOPTIONS}
+    %REGLINUX_EMULATIONSTATION_PREFIX% emulationstation ${GAMELAUNCHOPT} --exit-on-reboot-required %REGLINUX_EMULATIONSTATION_ARGS% ${CUSTOMESOPTIONS}
 
     # es flag when rebooting (https://github.com/batocera-linux/batocera-emulationstation/blob/master/es-core/src/platform.cpp#L194)
     if test -e "/tmp/restart.please" -o -e "/tmp/shutdown.please"

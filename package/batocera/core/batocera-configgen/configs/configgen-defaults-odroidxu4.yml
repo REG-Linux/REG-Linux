@@ -1,7 +1,7 @@
 default:
   options:
     retroarch.video_hard_sync: 0
-    retroarch.audio_driver: alsathread
+    retroarch.audio_driver: pipewire
 
 dreamcast:
   options:

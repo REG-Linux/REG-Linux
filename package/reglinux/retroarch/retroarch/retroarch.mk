@@ -8,12 +8,15 @@ RETROARCH_VERSION = v1.20.0
 RETROARCH_SITE = $(call github,libretro,RetroArch,$(RETROARCH_VERSION))
 RETROARCH_LICENSE = GPLv3+
 RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets flac noto-cjk-fonts gamemode
+RETROARCH_DEPENDENCIES += libusb hidapi
 # install in staging for debugging (gdb)
 RETROARCH_INSTALL_STAGING = YES
 
-RETROARCH_CONF_OPTS = --disable-oss --enable-zlib --disable-qt --enable-threads --enable-ozone \
-    --enable-xmb --disable-discord --enable-flac --enable-lua --enable-networking \
-	--enable-translate --enable-rgui --disable-cdrom --disable-videocore --disable-x11
+RETROARCH_CONF_OPTS = --disable-oss --enable-zlib --disable-qt --enable-threads \
+		      --enable-ozone --enable-xmb --disable-discord --enable-flac \
+		      --enable-lua --enable-networking --enable-translate --enable-rgui \
+		      --disable-cdrom --disable-videocore --disable-x11 --enable-xdelta \
+		      --enable-hid --enable-libusb
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
     RETROARCH_CONF_OPTS += --enable-debug
