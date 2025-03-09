@@ -1,0 +1,19 @@
+--- a/Makefile	2025-03-09 17:01:21.569321127 +0100
++++ b/Makefile	2025-03-09 17:01:34.509624512 +0100
+@@ -7,14 +7,14 @@
+   CXXFLAGS_ALL += -static
+ endif
+ 
+-CXXFLAGS_ALL += -MMD -MP -MF objects/$*.d $(shell pkg-config --cflags $(PKG_CONFIG_STATIC_FLAG) vorbisfile vorbis theoradec sdl2 egl glesv1_cm glesv2) $(CXXFLAGS) \
++CXXFLAGS_ALL += -MMD -MP -MF objects/$*.d $(shell pkg-config --cflags $(PKG_CONFIG_STATIC_FLAG) vorbisfile vorbis theoradec sdl2 egl glesv2) $(CXXFLAGS) \
+    -DBASE_PATH='"$(BASE_PATH)"' \
+    -Idependencies/all/filesystem/include \
+    -Idependencies/all/theoraplay \
+    -Idependencies/all/tinyxml2/
+ 
+ LDFLAGS_ALL += $(LDFLAGS)
+-LIBS_ALL += $(shell pkg-config --libs $(PKG_CONFIG_STATIC_FLAG) vorbisfile vorbis theoradec sdl2 egl glesv1_cm glesv2) -pthread $(LIBS)
++LIBS_ALL += $(shell pkg-config --libs $(PKG_CONFIG_STATIC_FLAG) vorbisfile vorbis theoradec sdl2 egl glesv2) -pthread -lSDL2 $(LIBS)
+ 
+ SOURCES = \
+   dependencies/all/tinyxml2/tinyxml2.cpp   \
