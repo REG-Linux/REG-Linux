@@ -3,8 +3,8 @@
 # C-Dogs
 #
 ################################################################################
-# Version.: Release 2.2.0 on Dec 7, 2024
-CDOGS_VERSION = 2.2.0
+# Version.: Release 2.3.0 on Mar 8, 2025
+CDOGS_VERSION = 2.3.0
 CDOGS_SITE = $(call github,cxong,cdogs-sdl,$(CDOGS_VERSION))
 
 CDOGS_DEPENDENCIES = sdl2 sdl2_image sdl2_mixer python-protobuf enet
