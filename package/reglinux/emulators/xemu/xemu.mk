@@ -4,13 +4,14 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.8.25
+XEMU_VERSION = v0.8.31
 XEMU_SITE = https://github.com/xemu-project/xemu.git
 XEMU_SITE_METHOD = git
 XEMU_GIT_SUBMODULES = YES
 XEMU_LICENSE = GPLv2
-XEMU_DEPENDENCIES = host-meson host-pkgconf host-python3 host-python-distlib host-libcurl
-XEMU_DEPENDENCIES += libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml libpcap libepoxy libgtk3
+XEMU_DEPENDENCIES = host-meson host-pkgconf host-python3 host-python-distlib
+XEMU_DEPENDENCIES += host-libcurl libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
+XEMU_DEPENDENCIES += libpcap libepoxy libgtk3 json-for-modern-cpp
 
 XEMU_EXTRA_DOWNLOADS = https://github.com/mborgerson/xemu-hdd-image/releases/download/1.0/xbox_hdd.qcow2.zip
 
@@ -150,21 +151,13 @@ define XEMU_GET_SUBMODULES
 	    http://github.com/mesonbuild/wrapdb/releases/download/xxhash_0.8.3-1/xxHash-0.8.3.tar.gz
 	$(TAR) -xzf xxhash.tar.gz --strip-components=1 -C $(@D)/subprojects/xxHash-0.8.3
 	rm xxhash.tar.gz
-	
+
     # xxhash patch
 	$(HOST_DIR)/bin/curl -L -o xxhash_0.8.3-1_patch.zip \
 	    https://wrapdb.mesonbuild.com/v2/xxhash_0.8.3-1/get_patch
 	$(UNZIP) -o xxhash_0.8.3-1_patch.zip -d $(@D)/subprojects
 	rm xxhash_0.8.3-1_patch.zip
-	
-    # cpp-httplib
-	mkdir -p $(@D)/subprojects/cpp-httplib
-    $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/cpp-httplib.wrap))
-	$(HOST_DIR)/bin/curl -L -o cpp-httplib.tar.gz \
-	    https://github.com/yhirose/cpp-httplib/archive/$(REVISION).tar.gz
-	$(TAR) -xzf cpp-httplib.tar.gz --strip-components=1 -C $(@D)/subprojects/cpp-httplib
-	rm cpp-httplib.tar.gz
-	
+
     # keycodemapdb - revision variation
 	mkdir -p $(@D)/subprojects/keycodemapdb
     $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/keycodemapdb.wrap))
@@ -172,7 +165,7 @@ define XEMU_GET_SUBMODULES
 	    https://gitlab.com/qemu-project/keycodemapdb/-/archive/$(REVISION)/$(REVISION).tar.gz
 	$(TAR) -xzf keycodemapdb.tar.gz --strip-components=1 -C $(@D)/subprojects/keycodemapdb
 	rm keycodemapdb.tar.gz
-	
+
     # nv2a_vsh_cpu
 	mkdir -p $(@D)/subprojects/nv2a_vsh_cpu
     $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/nv2a_vsh_cpu.wrap))
@@ -180,7 +173,7 @@ define XEMU_GET_SUBMODULES
 	    https://github.com/xemu-project/nv2a_vsh_cpu/archive/$(REVISION).tar.gz
 	$(TAR) -xzf nv2a_vsh_cpu.tar.gz --strip-components=1 -C $(@D)/subprojects/nv2a_vsh_cpu
 	rm nv2a_vsh_cpu.tar.gz
-	
+
     # berkeley-softfloat-3 - revision variation
 	mkdir -p $(@D)/subprojects/berkeley-softfloat-3
     $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/berkeley-softfloat-3.wrap))
@@ -189,7 +182,7 @@ define XEMU_GET_SUBMODULES
 	$(TAR) -xzf berkeley-softfloat-3.tar.gz --strip-components=1 -C $(@D)/subprojects/berkeley-softfloat-3
 	cp $(@D)/subprojects/packagefiles/berkeley-softfloat-3/* $(@D)/subprojects/berkeley-softfloat-3
 	rm berkeley-softfloat-3.tar.gz
-	
+
     # berkeley-testfloat-3 - revision variation
 	mkdir -p $(@D)/subprojects/berkeley-testfloat-3
     $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/berkeley-testfloat-3.wrap))
