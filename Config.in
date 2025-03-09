@@ -14,8 +14,8 @@ menu "System"
 endmenu
 
 menu "Looks"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/themes/es-theme-neutral/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/themes/es-theme-canvas/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-neutral/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-canvas/Config.in"
 endmenu
 
 menu "Boot"
