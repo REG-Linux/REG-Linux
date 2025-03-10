@@ -105,24 +105,9 @@ def drmMinTomaxResolution(videomode):
     maxWidth = int(width)
     maxHeight = int(height)
     if int(current["width"]) < maxWidth and int(current["height"]) < maxHeight:
-        # TODO arch rpi4 refuses 1360x768
-        # ARCH =$(cat / usr / share / batocera / system.arch)
-        # if ! test "${ARCH}" = "bcm2711" -a "${CURRENTWIDTH}" = 1360 -a "${CURRENTHEIGHT}" = 768
-        # exit 0
         return
 
     modes = drmListModes()
-    # TODO implement this..
-    #sed - e "/i)$/!" s + ")$" + "p)" + -e s + "^\([^:]*\):[^ ]* \([0-9]*x[0-9]*\) \([0-9]*\)Hz (\(.*\))$" + "\2_\3_\4:\1:\2" + | sort - nr | sed - e "s/_[0-9]*x[0-9]*[pi]//" |
-    #while IFS=':\n' read SORTSTR SUGGMODE SUGGRESOLUTION
-    #do
-    #SUGGWIDTH =$(echo "${SUGGRESOLUTION}" | cut -d x -f 1)
-    #SUGGHEIGHT =$(echo "${SUGGRESOLUTION}" | cut -d x -f 2)
-
-    #if test "${SUGGWIDTH}" -le "${MAXWIDTH}" -a "${SUGGHEIGHT}" -le "${MAXHEIGHT}"
-    #then
-    #echo "${SUGGMODE}" | cut - d "." - f 2 > / var / run / drmMode
-    #exit 0
 
 def drmGetCurrentResolution(name = None):
     if name is None:
