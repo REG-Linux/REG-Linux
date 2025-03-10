@@ -16,7 +16,7 @@ index 5c76a8c..0a1eb2f 100644
 +        fprintf(stderr, "Unable to open joystick %d\n", joy_idx);
 +    } else {
 +      SDL_GameController* gamepad = SDL_GameControllerOpen(joy_idx);
-+      printf("%s %i\n", SDL_JoystickDevicePathById(joy_idx), joy_idx);
++      printf("%s %i\n", SDL_JoystickPathForIndex(joy_idx), joy_idx);
 +      if (gamepad)
 +        {
 +          SDL_GameControllerClose(gamepad);
