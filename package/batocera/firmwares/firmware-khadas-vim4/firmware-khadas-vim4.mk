@@ -41,6 +41,14 @@ define FIRMWARE_KHADAS_VIM4_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/lib/firmware/
 	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/firmware-khadas-vim4/firmware/* $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/
 	cp -R $(@D)/lib/firmware/* $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/
+	# Fixup permissions for dracut
+	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/clm_bcm43752a2_ag.blob
+	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm4359c0_ag_ap6398s.bin
+	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm4359c0_ag_apsta_ap6398s.bin
+	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm43752a2_ag_apsta.bin
+	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm43752a2_ag.bin
+	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm43752a2_ag_p2p.bin
+
 	mkdir -p $(TARGET_DIR)/usr/bin/
 	mkdir -p $(TARGET_DIR)/usr/lib/
 	# Install Optee Userspace
