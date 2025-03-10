@@ -148,6 +148,8 @@ endmenu
 endmenu
 
 menu "Ports"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/ports/abuse-data/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/ports/abuse/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/ports/cannonball/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/ports/cdogs/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/ports/cgenius/Config.in"
@@ -508,8 +510,6 @@ endmenu
 
 menu "ports"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/ports/ecwolf/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/ports/abuse-data/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/ports/abuse/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/ports/hcl/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/ports/tyrian/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/ports/fallout1-ce/Config.in"
