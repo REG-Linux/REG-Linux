@@ -35,7 +35,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=ON
-    PANDA3DS_DEPENDENCIES += glslang vulkan-headers
+    PANDA3DS_DEPENDENCIES += host-glslang glslang vulkan-headers
 else
     PANDA3DS_CONF_OPTS += -DENABLE_VULKAN=OFF
 endif
