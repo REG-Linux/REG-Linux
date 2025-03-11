@@ -16,11 +16,11 @@ endef
 
 define UBOOT_BANANAPI_F3_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/uboot-bananapi-f3
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/boot/uboot-bananapi-f3/bootinfo_sd.bin $(BINARIES_DIR)/uboot-bananapi-f3/bootinfo_sd.bin
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/boot/uboot-bananapi-f3/FSBL.bin $(BINARIES_DIR)/uboot-bananapi-f3/FSBL.bin
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/boot/uboot-bananapi-f3/env.bin  $(BINARIES_DIR)/uboot-bananapi-f3/env.bin
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/boot/uboot-bananapi-f3/fw_dynamic.itb $(BINARIES_DIR)/uboot-bananapi-f3/fw_dynamic.itb
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/reglinux/boot/uboot-bananapi-f3/u-boot.itb $(BINARIES_DIR)/uboot-bananapi-f3/u-boot.itb
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/uboot-bananapi-f3/bootinfo_sd.bin $(BINARIES_DIR)/uboot-bananapi-f3/bootinfo_sd.bin
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/uboot-bananapi-f3/FSBL.bin $(BINARIES_DIR)/uboot-bananapi-f3/FSBL.bin
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/uboot-bananapi-f3/env.bin  $(BINARIES_DIR)/uboot-bananapi-f3/env.bin
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/uboot-bananapi-f3/fw_dynamic.itb $(BINARIES_DIR)/uboot-bananapi-f3/fw_dynamic.itb
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/uboot-bananapi-f3/u-boot.itb $(BINARIES_DIR)/uboot-bananapi-f3/u-boot.itb
 endef
 
 $(eval $(generic-package))
