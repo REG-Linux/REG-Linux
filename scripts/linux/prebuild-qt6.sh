@@ -10,7 +10,7 @@ else
 fi
 
 # Grab QT6 version from source tree
-QT6_VERSION="$(cat <package/reglinux/libraries/reglinux-qt6/reglinux-qt6.mk | grep REGLINUX_QT6_VERSION | cut -d " " -f 3 | head -n1)"
+QT6_VERSION="$(cat <package/libraries/reglinux-qt6/reglinux-qt6.mk | grep REGLINUX_QT6_VERSION | cut -d " " -f 3 | head -n1)"
 
 echo "Building REG-Linux QT6 v${QT6_VERSION} for ${ARCHS}"
 
