@@ -18,18 +18,13 @@ bindsym $alt+F4 kill
 # Make the current focus fullscreen
 bindsym $alt+f fullscreen
 
-# Set a default rule to remove decorations for all windows
+# Disable visual effects
+for_window [all] opacity 1
+set $animations off
 default_border none
 
 # Set a default rule to start all applications in fullscreen mode
 for_window [fullscreen] fullscreen
-
-# Hide decorations for xwayland apps
-for_window [instance="supermodel"] border none, fullscreen
-for_window [instance="dolphin-emu"] border none, fullscreen
-for_window [instance="batocera-config-dolphin"] border none, fullscreen
-for_window [instance="batocera-config-scummvm"] border none, fullscreen
-for_window [instance="xterm"] border none, fullscreen
 
 # Starts EmulationStation when loading sway
 exec /usr/bin/system-mouse hide
