@@ -13,6 +13,12 @@ SDL3_CPE_ID_VENDOR = libsdl
 SDL3_CPE_ID_PRODUCT = simple_directmedia_layer
 SDL3_INSTALL_STAGING = YES
 
+ifeq ($(BR2_ENABLE_DEBUG),y)
+SDL3_CONF_OPTS = -DCMAKE_BUILD_TYPE=Debug
+else
+SDL3_CONF_OPTS = -DCMAKE_BUILD_TYPE=Release
+endif
+
 # reglinux - RISC-V depend on custom mesa to enable wayland properly
 ifeq ($(BR2_PACKAGE_IMG_GPU_POWERVR),y)
 SDL3_DEPENDENCIES += img-gpu-powervr img-mesa3d
