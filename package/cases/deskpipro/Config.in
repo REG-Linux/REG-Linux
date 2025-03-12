@@ -1,5 +1,5 @@
-config BR2_PACKAGE_DESKPIPRO_CASE
-	bool "deskpi-pro-case"
+config BR2_PACKAGE_DESKPIPRO
+	bool "deskpi-pro"
 
 	help
 	  Enable front USB, fan control & infrared on the DeskPi Pro Case.
