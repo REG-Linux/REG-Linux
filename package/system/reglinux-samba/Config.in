@@ -1,8 +1,8 @@
 config BR2_PACKAGE_REGLINUX_SAMBA
         bool "reglinux-samba"
 
-	select BR2_PACKAGE_SAMBA4	if BR2_PACKAGE_BATOCERA_WINE || BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4
-	select BR2_PACKAGE_KSMBD_TOOLS  if !BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_4
+	select BR2_PACKAGE_SAMBA4	if BR2_PACKAGE_BATOCERA_WINE
+	select BR2_PACKAGE_KSMBD_TOOLS
 
         help
           Samba custom implementation using either ksmbd or plain samba4
