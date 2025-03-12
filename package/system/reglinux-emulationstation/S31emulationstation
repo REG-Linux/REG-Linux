@@ -2,7 +2,7 @@
 
 BOOTCONF="/boot/system-boot.conf"
 PLYMOUTH="/usr/bin/plymouth"
-SYSTEM_SETTINGS_GET="/usr/bin/system-settings-get"
+SYSTEM_SETTINGS_GET="/usr/bin/system-settings-get-master"
 LOGFILE="/userdata/system/logs/emulationstation.log"
 
 . /etc/profile.d/xdg.sh
