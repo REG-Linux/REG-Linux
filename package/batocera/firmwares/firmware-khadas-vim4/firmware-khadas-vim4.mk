@@ -14,6 +14,8 @@ FIRMWARE_KHADAS_VIM4_OPTEE_VFW_SRC = optee-video-firmware_0.5-202406_arm64.deb
 FIRMWARE_KHADAS_VIM4_OPTEE_USR_PATH = optee-userspace
 FIRMWARE_KHADAS_VIM4_OPTEE_VFW_PATH = optee-video-firmware
 
+FIRMWARE_KHADAS_VIM4_DEPENDENCIES = alllinuxfirmwares extralinuxfirmwares
+
 FIRMWARE_KHADAS_VIM4_EXTRA_DOWNLOADS = \
  https://dl.khadas.com/repos/vim4/pool/main/o/optee-userspace/$(FIRMWARE_KHADAS_VIM4_OPTEE_USR_SRC) \
  https://dl.khadas.com/repos/vim4/pool/main/o/optee-video-firmware/$(FIRMWARE_KHADAS_VIM4_OPTEE_VFW_SRC)
@@ -42,12 +44,7 @@ define FIRMWARE_KHADAS_VIM4_INSTALL_TARGET_CMDS
 	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/firmware-khadas-vim4/firmware/* $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/
 	cp -R $(@D)/lib/firmware/* $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/
 	# Fixup permissions for dracut
-	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/clm_bcm43752a2_ag.blob
-	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm4359c0_ag_ap6398s.bin
-	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm4359c0_ag_apsta_ap6398s.bin
-	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm43752a2_ag_apsta.bin
-	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm43752a2_ag.bin
-	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/fw_bcm43752a2_ag_p2p.bin
+	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/*
 
 	mkdir -p $(TARGET_DIR)/usr/bin/
 	mkdir -p $(TARGET_DIR)/usr/lib/
