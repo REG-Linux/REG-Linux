@@ -1,62 +1,66 @@
 #!/bin/sh
+
 BOOTCONF="/boot/system-boot.conf"
+PLYMOUTH="/usr/bin/plymouth"
+SYSTEM_SETTINGS_GET="/usr/bin/system-settings-get"
+LOGFILE="/userdata/system/logs/emulationstation.log"
 
 . /etc/profile.d/xdg.sh
 . /etc/profile.d/dbus.sh
 
+# Redirect output to log
+exec >>"$LOGFILE" 2>&1
+
 case "$1" in
-    start)
-        # Switch to splash without subtitle and stop plymouth service
-        mv /usr/share/plymouth/themes/reglinux/images/header-image.png /usr/share/plymouth/themes/reglinux/images/header-image.png.bak
-        /usr/bin/plymouth change-mode --reboot
-        /usr/bin/plymouth --wait quit --retain-splash
-        /usr/bin/plymouth update-root-fs --read-write
-        mv /usr/share/plymouth/themes/reglinux/images/header-image.png.bak /usr/share/plymouth/themes/reglinux/images/header-image.png
-        enabled="$(/usr/bin/system-settings-get system.es.atstartup)"
-        if [ "$enabled" != "0" ]; then
-		environment="$(/usr/bin/system-settings-get-master system.es.environment)"
+start)
+	mv /usr/share/plymouth/themes/reglinux/images/header-image.png /usr/share/plymouth/themes/reglinux/images/header-image.png.bak
+	$PLYMOUTH change-mode --reboot
+	$PLYMOUTH --wait quit --retain-splash
+	$PLYMOUTH update-root-fs --read-write
+	mv /usr/share/plymouth/themes/reglinux/images/header-image.png.bak /usr/share/plymouth/themes/reglinux/images/header-image.png
+
+	enabled="$($SYSTEM_SETTINGS_GET system.es.atstartup)"
+	if [ "$enabled" != "0" ]; then
+		environment="$($SYSTEM_SETTINGS_GET system.es.environment)"
 		if [ "$environment" = "wayland" ]; then
-			if [ -e /usr/bin/sway ]; then
-				SWAY_LOG_FILE=/userdata/system/logs/sway.log
-				WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -d > ${SWAY_LOG_FILE} 2>&1 &
-			fi
+			WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway &
 		else
 			%REGLINUX_EMULATIONSTATION_CMD% %REGLINUX_EMULATIONSTATION_POSTFIX%
 		fi
-        fi
-        ;;
+	fi
+	;;
 
-    stop)
-        emulationstation-standalone --stop-rebooting
-        killall -q sway emulationstation touchegg 2>/dev/null
-        sleep 20 &
-        watchdog=$!
-        while [ -n "$(pidof emulationstation)" ]; do
-            sleep 0.25
-            $(kill -0 $watchdog) || exit
-        done
-        kill -9 $watchdog
+stop)
+	emulationstation-standalone --stop-rebooting
+	pkill -x sway
+	pkill -x emulationstation
+	pkill -x touchegg
 
-        # Switch to splash with "game over"
-        # No need to stop daemon, /etc/init.d/S002plymouth will do that anyway
-        if /usr/bin/plymouth --ping; then
-            /usr/bin/plymouth change-mode --shutdown
-            /usr/bin/plymouth --show-splash
-        else
-            /usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session
-            /usr/bin/plymouth --show-splash
-        fi
-        ;;
+	# Optimized process termination check
+	timeout=5
+	end_time=$(( $(date +%s) + timeout ))
+	while [ $(date +%s) -lt $end_time ] && pgrep -x emulationstation >/dev/null; do
+		sleep 0.25
+	done
 
-    restart|reload)
-        "$0" stop
-        "$0" start
-        ;;
+	if $PLYMOUTH --ping; then
+		$PLYMOUTH change-mode --shutdown
+		$PLYMOUTH --show-splash
+	else
+		/usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session
+		$PLYMOUTH --show-splash
+	fi
+	;;
 
-    *)
-        echo "Usage: $0 {start|stop|restart}"
-        exit 1
+restart | reload)
+	"$0" stop
+	"$0" start
+	;;
+
+*)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
 
 exit $?
-
