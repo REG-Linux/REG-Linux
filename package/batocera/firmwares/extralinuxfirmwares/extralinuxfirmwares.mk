@@ -3,9 +3,9 @@
 # extralinuxfirmware
 #
 ################################################################################
-# Version.: Commits on May 10, 2024
-EXTRALINUXFIRMWARES_VERSION = e9c1d95f2d707ddd7bb0ef9e4711914de3cb60c2
-EXTRALINUXFIRMWARES_SITE = $(call github,batocera-linux,extralinuxfirmwares,$(EXTRALINUXFIRMWARES_VERSION))
+# Version.: Commits on Mar 11, 2025
+EXTRALINUXFIRMWARES_VERSION = 96480509110b50313203bdee11385a1de27fb514
+EXTRALINUXFIRMWARES_SITE = $(call github,REG-Linux,extralinuxfirmwares,$(EXTRALINUXFIRMWARES_VERSION))
 EXTRALINUXFIRMWARES_DEPENDENCIES = alllinuxfirmwares
 
 EXTRALINUXFIRMWARES_TARGET_DIR=$(TARGET_DIR)/lib/firmware/

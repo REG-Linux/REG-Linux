@@ -18,8 +18,8 @@ mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-vim4"     || exit 1
 cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-vim4/" || exit 1
 cd "${REGLINUX_BINARIES_DIR}/build-uboot-vim4/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
-mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
+mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot/amlogic" || exit 1
+mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux"     || exit 1
 
 cp "${BINARIES_DIR}/Image"              "${REGLINUX_BINARIES_DIR}/boot/boot/linux"           || exit 1
 cp "${BINARIES_DIR}/rootfs.cpio.gz"     "${REGLINUX_BINARIES_DIR}/boot/boot/initrd.gz"       || exit 1
@@ -28,8 +28,9 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
-cp "${BINARIES_DIR}/kvim4.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/"          || exit 1
-cp "${BOARD_DIR}/boot/extlinux.conf"                   "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
+cp "${BINARIES_DIR}/kvim4.dtb"		"${REGLINUX_BINARIES_DIR}/boot/boot/amlogic/"        || exit 1
+cp "${BINARIES_DIR}/kvim4n.dtb"		"${REGLINUX_BINARIES_DIR}/boot/boot/amlogic/"        || exit 1
+cp "${BOARD_DIR}/boot/extlinux.conf"    "${REGLINUX_BINARIES_DIR}/boot/extlinux/"            || exit 1
 # cp "${BINARIES_DIR}/boot.scr"                          "${REGLINUX_BINARIES_DIR}/boot/"               || exit 1
 # cp "${BOARD_DIR}/boot/logo.bmp"                        "${REGLINUX_BINARIES_DIR}/boot/boot/"          || exit 1
 
