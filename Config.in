@@ -3,7 +3,6 @@ menu "System"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-emulationstation/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-exfat/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-rescue/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-gpicase/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-samba/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-screen/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-bezels/Config.in"
@@ -240,6 +239,15 @@ endmenu
 
 menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-radxa-rkwifibt/Config.in"
+endmenu
+
+menu "Cases"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/roshambo/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/deskpipro/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/element14-pi-desktop/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/pironman/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/pironman5/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/gpicase/Config.in"
 endmenu
 endmenu
 
@@ -559,14 +567,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/ledspicer/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/innoextract/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/zramswap/Config.in"
-endmenu
-
-menu "Cases"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/cases/roshambo-case/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/cases/deskpipro-case/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/cases/element14-pi-desktop/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/cases/pironman/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/cases/pironman5/Config.in"
 endmenu
 
 menu "Screens"

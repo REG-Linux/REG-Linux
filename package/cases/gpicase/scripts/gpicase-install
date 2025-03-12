@@ -3,9 +3,10 @@
 CONFIGFILE=/boot/config.txt
 
 f_usage() {
-    echo "${0} gpicase" >&2
-    echo "${0} gpicase2" >&2
-    echo "${0} gpicase2w" >&2
+    echo "Uso: ${0} [gpicase|gpicase2|gpicase2w]" >&2
+    echo "  gpicase   - Configures for the GPi Case." >&2
+    echo "  gpicase2  - Configures for the GPi Case 2." >&2
+    echo "  gpicase2w - Configures for the GPi Case 2W." >&2
 }
 
 do_config() {
@@ -15,22 +16,20 @@ do_config() {
     dtparam=act_led_activelow=on
     # ====== GPi Case setup section end ====="
 
-    echo "${setup}" | (
-        while read -r LINE; do
-            if ! grep -qE "^${LINE}$" "${CONFIGFILE}"; then
-                mount -o remount,rw /boot
-                echo "${LINE}" >>"${CONFIGFILE}"
-            fi
-        done
-    )
+    mount -o remount,rw /boot
+    echo "${setup}" | sed -i '/# ====== GPi Case setup section =====/,/# ====== GPi Case setup section end =====/d' "${CONFIGFILE}"
+    echo "${setup}" >> "${CONFIGFILE}"
+    mount -o remount,ro /boot
     >&2 echo "${ACTION} support installed!"
     >&2 echo "Please reboot the system so that the changes take effect!"
 }
 
-if [ $# -eq 0 ]; then
+if [ $# -ne 1 ]; then
     f_usage
     exit 1
 fi
+
+trap 'mount -o remount,ro /boot' EXIT
 
 ACTION=$1
 
@@ -50,8 +49,9 @@ case "${ACTION}" in
     ;;
 *)
     f_usage
-    >&2 echo "error: invalid command ${ACTION}"
+    >&2 echo "Error: Invalid command '${ACTION}'. Use one of the following: gpicase, gpicase2, gpicase2w."
     exit 1
     ;;
 esac
+
 exit 0
