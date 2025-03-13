@@ -20,9 +20,6 @@ dreamcast:
 naomi:
   emulator: libretro
   core:     flycast
-gamecube:
-  emulator: libretro
-  core:     dolphin
-wii:
-  emulator: libretro
-  core:     dolphin
+model3:
+  emulator: supermodel
+  core:     supermodel-legacy
