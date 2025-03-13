@@ -224,7 +224,7 @@ menu "Libraries"
 endmenu
 
 menu "Utils"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/reglinux/utils/btop/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/btop/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/evsieve/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/fdupes/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/flatpak/Config.in"
