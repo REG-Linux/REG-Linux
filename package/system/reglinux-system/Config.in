@@ -262,7 +262,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_BATOCERA_AUDIO			if !BR2_PACKAGE_BATOCERA_AUDIO_ALSA
 	select BR2_PACKAGE_BATOCERA_BLUETOOTH			# batocera bluetooth
 	select BR2_PACKAGE_REGLINUX_NOTICE			# boot pdf notice
-	select BR2_PACKAGE_BATOCERA_TEST			# batocera test script
+	select BR2_PACKAGE_REGLINUX_TEST			# reglinux test script
 	select BR2_PACKAGE_WGET					# download tools
 	select BR2_PACKAGE_LIBCURL_CURL				# download tools
 	select BR2_PACKAGE_NGHTTP2				# required for curl http2
