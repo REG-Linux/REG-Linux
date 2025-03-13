@@ -7,18 +7,15 @@ pcengine:
 pcenginecd:
   emulator: libretro
   core:     pce
-gamecube:
-  emulator: libretro
-  core:     dolphin
 nds:
   emulator: libretro
   core:     melonds
-wii:
-  emulator: libretro
-  core:     dolphin
 fmtowns:
   emulator: libretro
   core:     mame
 ps2:
   emulator: libretro
   core:     play
+model3:
+  emulator: supermodel
+  core:     supermodel-legacy
