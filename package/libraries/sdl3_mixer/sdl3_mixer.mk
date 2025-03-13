@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SDL3_MIXER_VERSION = 78a2035cf4cf95066d7d9e6208e99507376409a7
+SDL3_MIXER_VERSION = e777b524e8f854c6c6590e2b5766bb1cee52e016
 SDL3_MIXER_SITE = https://github.com/libsdl-org/SDL_mixer.git
 SDL3_MIXER_SITE_METHOD = git
 SDL3_MIXER_GIT_SUBMODULES = yes
@@ -34,13 +34,16 @@ endif
 ifeq ($(BR2_PACKAGE_LIBXMP),y)
 SDL3_MIXER_DEPENDENCIES += libxmp
 endif
-ifeq ($(BR2_PACKAGE_LIBMODPLUG),y)
-SDL3_MIXER_DEPENDENCIES += libmodplug
-endif
 
 # Codecs
+ifeq ($(BR2_PACKAGE_LIBOGG),y)
+SDL3_MIXER_DEPENDENCIES += libogg
+endif
 ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
 SDL3_MIXER_DEPENDENCIES += libvorbis
+endif
+ifeq ($(BR2_PACKAGE_OPUS),y)
+SDL3_MIXER_DEPENDENCIES += opus
 endif
 
 # Backends
