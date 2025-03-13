@@ -1,0 +1,4 @@
+config BR2_PACKAGE_REGLINUX_TEST
+	bool "reglinux-test"
+
+    select BR2_PACKAGE_PYTHON_REQUESTS

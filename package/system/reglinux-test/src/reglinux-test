@@ -1,0 +1,176 @@
+#!/usr/bin/python
+
+import xml.etree.ElementTree as ET
+import os
+import requests
+import time
+import yaml
+import sys
+import argparse
+import subprocess
+from datetime import datetime
+
+# input:
+# no input required, one game by system will be tested. you can choose a list if you create a file /userdata/reportTest/gamesToTest.yml, example:
+# fbneo: [
+#     "/userdata/roms/fbneo/dino.zip",
+#     "/userdata/roms/fbneo/sfa3.zip"
+#   ]
+# megadrive: [
+#     "/userdata/roms/megadrive/Sonic The Hedgehog.md",
+#     "/userdata/roms/megadrive/Bonanza Bros.md",
+#     "/userdata/roms/megadrive/Comix Zone.md"
+#   ]
+# psx: [
+#     "/userdata/roms/psx/Road Rash.PBP"
+#   ]
+#
+# output:
+# /userdata/reportTest/system-test_22-07-03_18h34.42/report.txt
+
+class SystemTest():
+
+    @staticmethod
+    def run(args):
+        timeGame = 10
+        screenshot = False
+        outputDir = "/userdata/reportTest/"
+        configFile = "/userdata/reportTest/gamesToTest.yml"
+
+        args = SystemTest.parseCommandLine(args)
+
+        if args.time:
+            timeGame = args.time[0]
+
+        if args.screenshot:
+            screenshot = args.screenshot
+
+        emulators = SystemTest.findEmulators()
+
+        if os.path.exists(configFile):
+            games = SystemTest.findGamesForEmulatorsFromFile(emulators, configFile)
+        else:
+            games = SystemTest.findGamesForEmulators(emulators)
+
+        resultName = "system-test_" + datetime.now().strftime('%y-%m-%d_%Hh%M.%S')
+        resultDir = os.path.join(outputDir, resultName)
+        os.makedirs(resultDir, exist_ok=True)
+
+        results = []
+        for system in games:
+            for game in games[system]:
+                if SystemTest.runTest(system, game, resultDir, timeGame, screenshot):
+                    print("Status: \033[01;32mSUCCESS\033[00;37m\n")
+                    results.append({"system": system, "game": game, "status": True})
+                else:
+                    print("Status: \033[01;31mFAILED\033[00;37m\n")
+                    results.append({"system": system, "game": game, "status": False})
+
+        SystemTest.gameReport(resultDir, results)
+
+    @staticmethod
+    def gameReport(resultDir, results):
+        with open(os.path.join(resultDir, "report.txt"), "w") as f:
+            f.write("  Status      System            Game\n")
+            f.write("=======================================================================\n")
+            for result in results:
+                status = "[SUCCESS]" if result["status"] else "[FAILED]"
+                f.write(f"{status}   {result['system']:17} {os.path.basename(result['game'])}\n")
+
+    @staticmethod
+    def runTest(system, game, resultDir, timeGame, screenshot):
+        print(f"System: {system}")
+        print(f"Game: {os.path.basename(game)}")
+
+        try:
+            x = requests.post("http://localhost:1234/launch", data=game)
+            x.raise_for_status()
+        except requests.RequestException as e:
+            print(f"Error launching game: {e}")
+            return False
+
+        time.sleep(timeGame)
+
+        try:
+            x = requests.get("http://localhost:1234/runningGame")
+            x.raise_for_status()
+            xj = x.json()
+            stillRunning = (xj.get("systemName") == system)
+        except (requests.RequestException, ValueError):
+            stillRunning = False
+
+        if stillRunning and screenshot:
+            SystemTest.screenshot(resultDir, system)
+            time.sleep(2)
+
+        subprocess.run(["system-es-swissknife", "--emukill"], check=False)
+        return stillRunning
+
+    @staticmethod
+    def findEmulators():
+        emulators = {}
+        paths = [
+            "/userdata/system/configuration/emulationstation/es_systems.cfg",
+            "/usr/share/emulationstation/es_systems.cfg"
+        ]
+
+        for path in paths:
+            if os.path.exists(path):
+                tree = ET.parse(path)
+                break
+        else:
+            raise Exception("es_system.cfg not found")
+
+        systemList = tree.getroot()
+        if systemList.tag != "systemList":
+            raise Exception("root tag is not systemList")
+
+        for system in systemList:
+            if system.tag == "system":
+                infos = {systemInfo.tag: systemInfo.text for systemInfo in system if systemInfo.tag in ["name", "path", "extension"]}
+                if "name" in infos and "path" in infos and "extension" in infos:
+                    emulators[infos["name"]] = {"path": infos["path"], "extensions": infos["extension"].split(" ")}
+
+        return emulators
+
+    @staticmethod
+    def findGamesForEmulators(emulators):
+        games = {}
+        for emulator, info in emulators.items():
+            game = SystemTest.findGamesForEmulator(info)
+            if game:
+                games[emulator] = [game]
+        return games
+
+    @staticmethod
+    def findGamesForEmulator(infos):
+        for root, _, files in os.walk(infos["path"]):
+            if "/roms/" in root:
+                for file in files:
+                    if any(file.endswith(ext) for ext in infos["extensions"]):
+                        return os.path.join(root, file)
+        return None
+
+    @staticmethod
+    def findGamesForEmulatorsFromFile(emulators, file):
+        with open(file, 'r') as f:
+            testgames = yaml.safe_load(f) or {}
+        return {system: testgames.get(system, []) for system in emulators}
+
+    @staticmethod
+    def screenshot(resultDir, name):
+        screenshotDir = os.path.join(resultDir, "screenshots")
+        os.makedirs(screenshotDir, exist_ok=True)
+        screenshotPath = os.path.join(screenshotDir, f"{name}.png")
+        subprocess.run(["system-screenshot", screenshotPath], check=False)
+        print("Screenshot captured")
+
+    @staticmethod
+    def parseCommandLine(args):
+        parser = argparse.ArgumentParser(description='Testing Batocera emulation systems.')
+        parser.add_argument('-t', '--time', nargs=1, type=int, help='Time in seconds that the game runs. (default=10)')
+        parser.add_argument('-s', '--screenshot', dest='screenshot', action='store_true', help='Screenshot of the game running. (default=false)')
+        return parser.parse_args(args)
+
+if __name__ == '__main__':
+   SystemTest.run(sys.argv[1:])
