@@ -31,7 +31,7 @@ BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="allwinner/sun50i-h700-anbernic-rg35xx-2024 allwinner/sun50i-h700-anbernic-rg35xx-plus allwinner/sun50i-h700-anbernic-rg35xx-h allwinner/sun50i-h700-anbernic-rg35xx-sp"
 
 # GPU
-BR2_PACKAGE_BATOCERA_PANFROST_MESA3D=y
+BR2_PACKAGE_SYSTEM_PANFROST_MESA3D=y
 
 # Allow wayland
 BR2_PACKAGE_REGLINUX_SWAY=y
