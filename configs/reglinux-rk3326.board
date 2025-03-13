@@ -25,7 +25,7 @@ BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3326-gameforce-chi rockchip/rk3326-odroid-go2 rockchip/rk3326-odroid-go2-v11 rockchip/rk3326-odroid-go3 rockchip/rk3326-anbernic-rg351m rockchip/rk3326-anbernic-rg351v"
 
 # gpu
-BR2_PACKAGE_BATOCERA_PANFROST_MESA3D=y
+BR2_PACKAGE_SYSTEM_PANFROST_MESA3D=y
 
 # needed for rotation (TODO force sway on launch)
 BR2_PACKAGE_REGLINUX_SWAY=y
