@@ -37,6 +37,12 @@ menu "Audio"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/audio/rtmidi/Config.in"
 endmenu
 
+menu "GPU"
+menu "Vulkan"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/vulkan/glslang/Config.in"
+endmenu
+endmenu
+
 menu "Retroarch"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/retroarch/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/retroarch-assets/Config.in"
@@ -325,7 +331,6 @@ menu "GPU"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/nvidia340-legacy-driver/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/nvidia390-legacy-driver/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/nvidia470-legacy-driver/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/vulkan/glslang/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/vulkan/spirv-cross/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/vulkan/vulkan-utility-libraries/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/vulkan/vulkan-validationlayers/Config.in"
