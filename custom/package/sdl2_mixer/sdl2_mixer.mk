@@ -5,7 +5,7 @@
 ################################################################################
 
 # reglinux - bump
-SDL2_MIXER_VERSION = 2.8.0
+SDL2_MIXER_VERSION = 2.8.1
 SDL2_MIXER_SOURCE = SDL2_mixer-$(SDL2_MIXER_VERSION).tar.gz
 SDL2_MIXER_SITE = http://www.libsdl.org/projects/SDL_mixer/release
 SDL2_MIXER_LICENSE = Zlib
@@ -27,11 +27,14 @@ else
 SDL2_MIXER_CONF_OPTS += --disable-music-midi-fluidsynth
 endif
 
-ifeq ($(BR2_PACKAGE_LIBMODPLUG),y)
-SDL2_MIXER_CONF_OPTS += --enable-music-mod-modplug
-SDL2_MIXER_DEPENDENCIES += libmodplug
-else
+# REG enforce disabling libmodplug
 SDL2_MIXER_CONF_OPTS += --disable-music-mod-modplug
+# REG we use libxmp instead for modules playback
+ifeq ($(BR2_PACKAGE_LIBXMP),y)
+SDL2_MIXER_CONF_OPTS += --enable-music-mod-xmp
+SDL2_MIXER_DEPENDENCIES += libxmp
+else
+SDL2_MIXER_CONF_OPTS += --disable-music-mod-xmp
 endif
 
 ifeq ($(BR2_PACKAGE_OPUSFILE),y)
