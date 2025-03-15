@@ -21,6 +21,14 @@ CEMU_CONF_OPTS += -DENABLE_DISCORD_RPC=OFF
 CEMU_CONF_OPTS += -DENABLE_VCPKG=OFF
 CEMU_CONF_OPTS += -DCMAKE_CXX_FLAGS="$(TARGET_CXXFLAGS) -I$(STAGING_DIR)/usr/include/glslang"
 
+# REG configure OpenGL
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+    CEMU_DEPENDENCIES += libgl
+    CEMU_CONF_OPTS += -DENABLE_OPENGL=ON
+else
+    CEMU_CONF_OPTS += -DENABLE_OPENGL=OFF
+endif
+
 # REG enable gamemode
 ifeq ($(BR2_PACKAGE_GAMEMODE),y)
     CEMU_DEPENDENCIES += gamemode
@@ -59,5 +67,11 @@ define CEMU_INSTALL_TARGET_CMDS
 	cp -pr $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/cemu/wiiu.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
+
+define EXTRACT_CEMU_AARCH64_DEPS
+	cd $(@D)/dependencies/ && tar xzvf $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/cemu/aarch64_deps.tar.gz
+endef
+
+CEMU_PRE_CONFIGURE_HOOKS += EXTRACT_CEMU_AARCH64_DEPS
 
 $(eval $(cmake-package))
