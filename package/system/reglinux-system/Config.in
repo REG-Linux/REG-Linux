@@ -552,7 +552,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	# Qualcomm targets
 	default "qualcomm/sd845/odin"									if BR2_PACKAGE_SYSTEM_TARGET_ODIN
 	default "qualcomm/sm8250/rp5 qualcomm/sm8250/rpmini"						if BR2_PACKAGE_SYSTEM_TARGET_SM8250
-	default "qualcomm/sm8550/odin2"									if BR2_PACKAGE_SYSTEM_TARGET_SM8550
+	default "qualcomm/sm8550/odin2 qualcomm/sm8550/odin2portal"					if BR2_PACKAGE_SYSTEM_TARGET_SM8550
 
 	# Mediatek targets
 	default "mediatek/mt8395/radxa-nio-12l"								if BR2_PACKAGE_SYSTEM_TARGET_MT8395
@@ -707,12 +707,6 @@ config BR2_PACKAGE_SYSTEM_TARGET_K1
 	bool "k1"
 
 endchoice
-
-config BR2_PACKAGE_BATOCERA_EXTRAS
-	bool "batocera.linux tools packages selection"
-
-	help
-	  Tools to extends the batocera system (but not required)
 
 config BR2_PACKAGE_BATOCERA_TOOLS
 	bool "batocera.linux system tools packages selection"
