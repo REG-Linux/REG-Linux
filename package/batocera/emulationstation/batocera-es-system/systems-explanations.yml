@@ -5,14 +5,10 @@ default:
         explanation: |
           Only available on selected boards; requires a powerful one.
   3ds:
-    lime3ds:
-      lime3ds: &lime3ds_standalone_core
+    azahar:
+      azahar: &citra_standalone_core
         explanation: |
-          Standalone lime3ds emulator.
-    citra:
-      citra: &citra_standalone_core
-        explanation: |
-          Standalone citra emulator.
+          Standalone azahar emulator.
 
   amiga:
     amiberry:

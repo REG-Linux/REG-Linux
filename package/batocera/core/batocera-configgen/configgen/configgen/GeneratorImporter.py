@@ -59,13 +59,9 @@ def getGenerator(emulator):
         from generators.ppsspp.ppssppGenerator import PPSSPPGenerator
         return PPSSPPGenerator()
 
-    if emulator == 'lime3ds' :
-        from generators.lime3ds.lime3DSGenerator import Lime3DSGenerator
-        return Lime3DSGenerator()
-
-    if emulator == 'citra' :
-        from generators.citra.citraGenerator import CitraGenerator
-        return CitraGenerator()
+    if emulator == 'azahar' :
+        from generators.azahar.azaharGenerator import AzaharGenerator
+        return AzaharGenerator()
 
     if emulator == 'hypseus-singe' :
         from generators.hypseus_singe.hypseusSingeGenerator import HypseusSingeGenerator
