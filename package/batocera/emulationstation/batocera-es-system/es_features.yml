@@ -723,7 +723,7 @@ libretro:
           choices:
             "Before NMI": Before NMI (Recommended)
             "After NMI":  After NMI
-    lime3ds:
+    azahar:
       shared: [rewind, autosave]
     desmume:
       features: [netplay, cheevos]
@@ -6915,10 +6915,10 @@ cemu:
                "Disabled (Default)": false
                "Enabled":            true
 
-lime3ds:
+azahar:
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
   cfeatures:
-        lime3ds_screen_layout:
+        azahar_screen_layout:
             prompt: SCREEN LAYOUT
             description: Arrange the dual screen layout. Separate windows can be changed with Hotkey+R2.
             choices:
@@ -6931,8 +6931,7 @@ lime3ds:
                 "Separate Windows":      4-false
                 "Hybrid Screen Top":     5-false
                 "Hybrid Screen Bottom":  5-true
-
-        lime3ds_resolution_factor:
+        azahar_resolution_factor:
             submenu: GRAPHICS
             prompt: RENDERING RESOLUTION
             description: Enhancement. Increase the rendering resolution. Makes 3D objects clearer.
@@ -6947,8 +6946,8 @@ lime3ds:
                 "8x (3200x1920)":  8
                 "9x (3600x2160)":  9
                 "10x (4000x2400)": 10
-        lime3ds_graphics_api:
-            archs_include: [x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sd845, sm8250, sm8550]
+        azahar_graphics_api:
+            archs_include: [x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sd845, sm8250, sm8550, s922x, a3gen2, mt8395, asahi]
             submenu: GRAPHICS
             prompt: GRAPHICS API
             description: Choose which graphics API library to use.
@@ -6956,119 +6955,35 @@ lime3ds:
                 "Software":         0
                 "OpenGL (Default)": 1
                 "Vulkan":           2
-        lime3ds_use_vsync_new:
+        azahar_use_vsync_new:
             submenu: GRAPHICS
             prompt: VSYNC
             description: Fix screen tearing. CPU heavy.
             choices:
                 "Off": 0
                 "On":  1
-        lime3ds_use_frame_limit:
+        azahar_use_frame_limit:
             submenu: GRAPHICS
             prompt: FRAME LIMIT
             description: Off will help some games, others will run too fast.
             choices:
                 "Off": 0
                 "On":  1
-        lime3ds_use_disk_shader_cache:
+        azahar_use_disk_shader_cache:
             submenu: GRAPHICS
             prompt: DISK SHADER CACHE
             description: Reduce stutter that happens when compiling shaders.
             choices:
                 "Off": 0
                 "On":  1
-        lime3ds_async_shader_compilation:
+        azahar_async_shader_compilation:
             submenu: GRAPHICS
             prompt: ENABLE ASYNC SHADER COMPILATION
             description: Compile shaders using background threads to avoid shader compilation stutter. May cause graphical glitches.
             choices:
                 "Off": 0
                 "On":  1
-        lime3ds_custom_textures:
-            submenu: GRAPHICS
-            prompt: LOAD CUSTOM TEXTURES
-            description: Preloading is impossible from ES.
-            choices:
-                "Off": 0
-                "On":  1-normal
-                #"Preload": 1-preload
-        lime3ds_is_new_3ds:
-            group: ADVANCED OPTIONS
-            prompt: NEW 3DS MODE
-            description: The New 3DS has a faster processor, ZL/ZR buttons and a C-stick.
-            choices:
-                "Off": 0
-                "On":  1
-
-citra:
-  shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
-  cfeatures:
-        citra_screen_layout:
-            prompt: SCREEN LAYOUT
-            description: Arrange the dual screen layout. Separate windows can be changed with Hotkey+R2.
-            choices:
-                "Top Only":              1-false
-                "Bottom Only":           1-true
-                "Large Top":             2-false
-                "Large Bottom":          2-true
-                "Left/Right":            3-false
-                "Right/Left":            3-true
-                "Separate Windows":      4-false
-                "Hybrid Screen Top":     5-false
-                "Hybrid Screen Bottom":  5-true
-        citra_resolution_factor:
-            submenu: GRAPHICS
-            prompt: RENDERING RESOLUTION
-            description: Enhancement. Increase the rendering resolution. Makes 3D objects clearer.
-            choices:
-                "1x (400x240)":    1
-                "2x (800x480)":    2
-                "3x (1200x720)":   3
-                "4x (1600x960)":   4
-                "5x (2000x1200)":  5
-                "6x (2400x1440)":  6
-                "7x (2800x1680)":  7
-                "8x (3200x1920)":  8
-                "9x (3600x2160)":  9
-                "10x (4000x2400)": 10
-        citra_graphics_api:
-            archs_include: [x86_64, x86_64_v3, bcm2711, bcm2712, rk3588, sd845, sm8250, sm8550]
-            submenu: GRAPHICS
-            prompt: GRAPHICS API
-            description: Choose which graphics API library to use.
-            choices:
-                "Software":         0
-                "OpenGL (Default)": 1
-                "Vulkan":           2
-        citra_use_vsync_new:
-            submenu: GRAPHICS
-            prompt: VSYNC
-            description: Fix screen tearing. CPU heavy.
-            choices:
-                "Off": 0
-                "On":  1
-        citra_use_frame_limit:
-            submenu: GRAPHICS
-            prompt: FRAME LIMIT
-            description: Off will help some games, others will run too fast.
-            choices:
-                "Off": 0
-                "On":  1
-        citra_use_disk_shader_cache:
-            submenu: GRAPHICS
-            prompt: DISK SHADER CACHE
-            description: Reduce stutter that happens when compiling shaders.
-            choices:
-                "Off": 0
-                "On":  1
-        citra_async_shader_compilation:
-            submenu: GRAPHICS
-            prompt: ENABLE ASYNC SHADER COMPILATION
-            description: Compile shaders using background threads to avoid shader compilation stutter. May cause graphical glitches.
-            choices:
-                "Off": 0
-                "On":  1
-        citra_custom_textures:
+        azahar_custom_textures:
             submenu: GRAPHICS
             prompt: LOAD CUSTOM TEXTURES
             description: Preloading is impossible from ES.
@@ -7076,7 +6991,7 @@ citra:
                 "Off":     0
                 "On":      1-normal
                 "Preload": 1-preload
-        citra_is_new_3ds:
+        azahar_is_new_3ds:
             group: ADVANCED OPTIONS
             prompt: NEW 3DS MODE
             description: The New 3DS has a faster processor, ZL/ZR buttons and a C-stick.
