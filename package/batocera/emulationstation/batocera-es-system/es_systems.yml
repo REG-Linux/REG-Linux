@@ -2151,16 +2151,14 @@ x1:
   manufacturer: Nintendo
   release: 2011
   hardware: portable
-  extensions: [3ds, 3dsx, cxi, axf, elf, app, squashfs]
+  extensions: [3ds, 3dsx, cci, cxi, axf, elf, app]
   emulators:
-    lime3ds:
-      lime3ds: { requireAnyOf: [BR2_PACKAGE_LIME3DS]               }
-    citra:
-      citra: { requireAnyOf: [BR2_PACKAGE_CITRA]                   }
+    azahar:
+      azahar: { requireAnyOf: [BR2_PACKAGE_AZAHAR]               }
     panda3ds:
-      panda3ds: { requireAnyOf: [BR2_PACKAGE_PANDA3DS]             }
+      panda3ds: { requireAnyOf: [BR2_PACKAGE_PANDA3DS]           }
     libretro:
-      panda3ds: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PANDA3DS]    }
+      panda3ds: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PANDA3DS]  }
 
 openbor:
   name: OpenBOR

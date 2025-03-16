@@ -13,19 +13,16 @@ import subprocess
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-class CitraGenerator(Generator):
+class AzaharGenerator(Generator):
     # this emulator/core requires X server to run
     def requiresX11(self):
         return True
 
     # Main entry of the module
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        CitraGenerator.writeCITRAConfig(batoceraFiles.CONF + "/citra-emu/qt-config.ini", system, playersControllers)
+        AzaharGenerator.writeCITRAConfig(batoceraFiles.CONF + "/citra-emu/qt-config.ini", system, playersControllers)
 
-        if os.path.exists('/usr/bin/citra-qt'):
-            commandArray = ['/usr/bin/citra-qt', rom]
-        else:
-            commandArray = ['/usr/bin/citra', rom]
+        commandArray = ['/usr/bin/azahar', rom]
         return Command.Command(array=commandArray, env={
             "XDG_CONFIG_HOME":batoceraFiles.CONF,
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/3ds",
@@ -39,7 +36,7 @@ class CitraGenerator(Generator):
 
     # Show mouse on screen
     def getMouseMode(self, config, rom):
-        if "citra_screen_layout" in config and config["citra_screen_layout"] == "1-false":
+        if "azahar_screen_layout" in config and config["azahar_screen_layout"] == "1-false":
             return False
         else:
             return True
@@ -82,8 +79,8 @@ class CitraGenerator(Generator):
         # Screen Layout
         citraConfig.set("Layout", "custom_layout", "false")
         citraConfig.set("Layout", "custom_layout\default", "true")
-        if system.isOptSet('citra_screen_layout'):
-            tab = system.config["citra_screen_layout"].split('-')
+        if system.isOptSet('azahar_screen_layout'):
+            tab = system.config["azahar_screen_layout"].split('-')
             citraConfig.set("Layout", "swap_screen",   tab[1])
             citraConfig.set("Layout", "layout_option", tab[0])
         else:
@@ -96,7 +93,7 @@ class CitraGenerator(Generator):
         if not citraConfig.has_section("System"):
             citraConfig.add_section("System")
         # New 3DS Version
-        if system.isOptSet('citra_is_new_3ds') and system.config["citra_is_new_3ds"] == '1':
+        if system.isOptSet('azahar_is_new_3ds') and system.config["azahar_is_new_3ds"] == '1':
             citraConfig.set("System", "is_new_3ds", "true")
         else:
             citraConfig.set("System", "is_new_3ds", "false")
@@ -147,12 +144,12 @@ class CitraGenerator(Generator):
         citraConfig.set("Renderer", "use_hw_shader",   "true")
         citraConfig.set("Renderer", "use_shader_jit",  "true")
         # Software, OpenGL (default) or Vulkan
-        if system.isOptSet('citra_graphics_api'):
-            citraConfig.set("Renderer", "graphics_api", system.config["citra_graphics_api"])
+        if system.isOptSet('azahar_graphics_api'):
+            citraConfig.set("Renderer", "graphics_api", system.config["azahar_graphics_api"])
         else:
             citraConfig.set("Renderer", "graphics_api", "1")
         # Set Vulkan as necessary
-        if system.isOptSet("citra_graphics_api") and system.config["citra_graphics_api"] == "2":
+        if system.isOptSet("azahar_graphics_api") and system.config["azahar_graphics_api"] == "2":
             try:
                 have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
                 if have_vulkan == "true":
@@ -191,25 +188,25 @@ class CitraGenerator(Generator):
             except subprocess.CalledProcessError:
                 eslog.debug("Error executing system-vulkan script.")
         # Use VSYNC
-        if system.isOptSet('citra_use_vsync_new') and system.config["citra_use_vsync_new"] == '0':
+        if system.isOptSet('azahar_use_vsync_new') and system.config["azahar_use_vsync_new"] == '0':
             citraConfig.set("Renderer", "use_vsync_new", "false")
         else:
             citraConfig.set("Renderer", "use_vsync_new", "true")
         citraConfig.set("Renderer", "use_vsync_new\default", "true")
         # Resolution Factor
-        if system.isOptSet('citra_resolution_factor'):
-            citraConfig.set("Renderer", "resolution_factor", system.config["citra_resolution_factor"])
+        if system.isOptSet('azahar_resolution_factor'):
+            citraConfig.set("Renderer", "resolution_factor", system.config["azahar_resolution_factor"])
         else:
             citraConfig.set("Renderer", "resolution_factor", "1")
         citraConfig.set("Renderer", "resolution_factor\default", "false")
         # Async Shader Compilation
-        if system.isOptSet('citra_async_shader_compilation') and system.config["citra_async_shader_compilation"] == '1':
+        if system.isOptSet('azahar_async_shader_compilation') and system.config["azahar_async_shader_compilation"] == '1':
             citraConfig.set("Renderer", "async_shader_compilation", "true")
         else:
             citraConfig.set("Renderer", "async_shader_compilation", "false")
         citraConfig.set("Renderer", "async_shader_compilation\default", "false")
         # Use Frame Limit
-        if system.isOptSet('citra_use_frame_limit') and system.config["citra_use_frame_limit"] == '0':
+        if system.isOptSet('azahar_use_frame_limit') and system.config["azahar_use_frame_limit"] == '0':
             citraConfig.set("Renderer", "use_frame_limit", "false")
         else:
             citraConfig.set("Renderer", "use_frame_limit", "true")
@@ -223,14 +220,14 @@ class CitraGenerator(Generator):
         if not citraConfig.has_section("Utility"):
             citraConfig.add_section("Utility")
         # Disk Shader Cache
-        if system.isOptSet('citra_use_disk_shader_cache') and system.config["citra_use_disk_shader_cache"] == '1':
+        if system.isOptSet('azahar_use_disk_shader_cache') and system.config["azahar_use_disk_shader_cache"] == '1':
             citraConfig.set("Utility", "use_disk_shader_cache", "true")
         else:
             citraConfig.set("Utility", "use_disk_shader_cache", "false")
         citraConfig.set("Utility", "use_disk_shader_cache\default", "false")
         # Custom Textures
-        if system.isOptSet('citra_custom_textures') and system.config["citra_custom_textures"] != '0':
-            tab = system.config["citra_custom_textures"].split('-')
+        if system.isOptSet('azahar_custom_textures') and system.config["azahar_custom_textures"] != '0':
+            tab = system.config["azahar_custom_textures"].split('-')
             citraConfig.set("Utility", "custom_textures",  "true")
             if tab[1] == 'normal':
                 citraConfig.set("Utility", "async_custom_loading", "true")
