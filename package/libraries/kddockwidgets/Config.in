@@ -1,0 +1,11 @@
+config BR2_PACKAGE_KDDOCKWIDGETS
+    bool "kddockwidgets"
+	depends on BR2_PACKAGE_REGLINUX_QT6
+	select BR2_PACKAGE_SPDLOG
+	select BR2_PACKAGE_FMT
+	select BR2_PACKAGE_JSON_FOR_MODERN_CPP
+
+    help
+        A Qt dock widget library written by KDAB, 
+	suitable for replacing QDockWidget and 
+	implementing advanced functionalities missing in Qt.

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.8.34
+XEMU_VERSION = v0.8.35
 XEMU_SITE = https://github.com/xemu-project/xemu.git
 XEMU_SITE_METHOD = git
 XEMU_GIT_SUBMODULES = YES
@@ -72,6 +72,11 @@ XEMU_CONF_OPTS += --disable-hvf
 XEMU_CONF_OPTS += --disable-whpx
 XEMU_CONF_OPTS += --with-default-devices
 XEMU_CONF_OPTS += --disable-renderdoc
+
+# Vulkan
+ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
+XEMU_DEPENDENCIES += vulkan-headers vulkan-loader glslang
+endif
 
 # AVX2 is only available on x86_64_v3 or more
 ifeq ($(BR2_x86_x86_64_v3),y)
