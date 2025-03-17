@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-DXVK_VERSION = v2.5.3
+DXVK_VERSION = 2.6
 DXVK_SOURCE = dxvk-$(DXVK_VERSION).tar.gz
-DXVK_SITE = $(call github,doitsujin,/dxvk,$(DXVK_VERSION))
+DXVK_SITE = https://github.com/doitsujin/dxvk/releases/download/v$(DXVK_VERSION)
 DXVK_LICENSE = zlib/libpng
 
 DXVK_EXTRA_DOWNLOADS = https://raw.githubusercontent.com/doitsujin/dxvk/master/dxvk.conf
