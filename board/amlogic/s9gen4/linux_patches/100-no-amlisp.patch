@@ -1,0 +1,11 @@
+--- a/common_drivers/drivers/Makefile	2025-03-12 18:25:15.774791547 +0100
++++ b/common_drivers/drivers/Makefile	2025-03-12 18:25:26.744049247 +0100
+@@ -61,7 +61,7 @@
+ obj-$(CONFIG_AMLOGIC_SOC_TIMESTAMP)	+= timestamp/
+ obj-$(CONFIG_AMLOGIC_SECKEY)		+= seckey/
+ obj-y                       += media_modules/
+-obj-y                       += amlisp/
++#obj-y                       += amlisp/
+ obj-y                       += armisp/
+ obj-y                       += armisp-g12b/
+ obj-$(CONFIG_AMLOGIC_NPU) += npu/
