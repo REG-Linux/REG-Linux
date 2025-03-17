@@ -1,0 +1,22 @@
+From c7a948300f045b3f68c644c0bef66eb6cae34a4a Mon Sep 17 00:00:00 2001
+From: chaoticgd <43898262+chaoticgd@users.noreply.github.com>
+Date: Thu, 13 Mar 2025 17:07:40 +0000
+Subject: [PATCH] Qt: Add an extra include path for KDDockWidgets
+
+---
+ pcsx2-qt/CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pcsx2-qt/CMakeLists.txt b/pcsx2-qt/CMakeLists.txt
+index 322f23ee62bd4..095eca10dca86 100644
+--- a/pcsx2-qt/CMakeLists.txt
++++ b/pcsx2-qt/CMakeLists.txt
+@@ -256,6 +256,8 @@ target_include_directories(pcsx2-qt PRIVATE
+ 	"${CMAKE_BINARY_DIR}/common/include"
+ 	"${CMAKE_SOURCE_DIR}/pcsx2"
+ 	"${CMAKE_SOURCE_DIR}/pcsx2-qt"
++	# TODO: Remove this the next time we update KDDockWidgets.
++	"${CMAKE_SYSROOT}/usr/include/kddockwidgets-qt6/kddockwidgets"
+ )
+ 
+ target_link_libraries(pcsx2-qt PRIVATE
