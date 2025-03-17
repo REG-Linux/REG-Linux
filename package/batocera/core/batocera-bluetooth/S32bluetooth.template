@@ -27,7 +27,7 @@ case "$1" in
         for i in $bluetoothstack
         do
             case $i in
-                kvim4)
+                kvim1s|kvim4)
                     /usr/bin/hciattach -s 115200 /dev/ttyS1 bcm43xx 2000000
                     sleep 3 # Give hciattach a few seconds to finish attaching firmware
                     /usr/bin/hciconfig hci0 up
