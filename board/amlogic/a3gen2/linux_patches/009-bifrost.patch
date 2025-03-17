@@ -42,3 +42,14 @@
  	power-domains = <&pwrdm PDID_T7_MALI_TOP>;
  	num_of_pp = <4>;
  	system-coherency = <0>;
+--- a/common_drivers/arch/arm64/boot/dts/amlogic/meson-s4.dtsi	2025-03-17 17:19:37.056718429 +0100
++++ b/common_drivers/arch/arm64/boot/dts/amlogic/meson-s4.dtsi	2025-03-17 17:19:57.747198757 +0100
+@@ -2968,7 +2968,7 @@
+ 		<0 0xFE002000 0 0x01000>; /*reset register*/
+ 
+ 	interrupts = <0 144 4>, <0 145 4>, <0 146 4>;
+-	interrupt-names = "GPU", "MMU", "JOB";
++	interrupt-names = "gpu", "mmu", "job";
+ 	clk_cntl_reg = <0x57>;
+ 
+ 	clocks = <&clkc CLKID_MALI>;
