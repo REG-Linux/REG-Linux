@@ -1,0 +1,15 @@
+--- a/src/video/SDL_video.c	2025-03-04 18:49:56.000000000 +0100
++++ b/src/video/SDL_video.c	2025-03-14 08:07:11.495924540 +0100
+@@ -85,7 +85,11 @@
+ #endif
+ #ifdef SDL_VIDEO_DRIVER_X11
+ #ifdef SDL_VIDEO_DRIVER_WAYLAND
+-    &Wayland_preferred_bootstrap,
++    // REG Wayland_preferred_bootstrap checks for wp_fifo_manager_v1 protocol
++    // REG not in Sway 1.10 so enforce regular bootstrap
++    // REG so we enforce "normal" bootstrap
++    // &Wayland_preferred_bootstrap,
++    &Wayland_bootstrap,
+ #endif
+     &X11_bootstrap,
+ #endif
