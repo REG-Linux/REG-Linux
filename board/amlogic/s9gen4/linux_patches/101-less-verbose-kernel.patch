@@ -1,0 +1,36 @@
+--- a/common_drivers/drivers/media/video_processor/ionvideo/ionvideo.c	2025-03-12 19:26:55.844998521 +0100
++++ b/common_drivers/drivers/media/video_processor/ionvideo/ionvideo.c	2025-03-12 19:27:36.676981540 +0100
+@@ -538,7 +538,6 @@
+ 		   &dev->ionvideo_output_queue[0]);
+ 
+ 	//dprintk(dev, 2, "vidioc_open\n");
+-	IONVID_DBG("%s\n", __func__);
+ 	init_waitqueue_head(&dev->wq);
+ 	return 0;
+ }
+@@ -564,7 +564,6 @@
+ 
+ 	ppmgr2_release(&dev->ppmgr2_dev);
+ 
+-	IONVID_DBG("%s\n", __func__);
+ 
+ 	dev->once_record = 0;
+ 	return 0;
+--- a/common_drivers/drivers/media/video_processor/v4lvideo/v4lvideo.c	2025-03-12 19:30:45.481521060 +0100
++++ b/common_drivers/drivers/media/video_processor/v4lvideo/v4lvideo.c	2025-03-12 19:30:59.344854057 +0100
+@@ -1805,7 +1805,6 @@
+ 	}
+ 
+ 	//dprintk(dev, 2, "vidioc_open\n");
+-	V4LVID_DBG("v4lvideo open\n");
+ 	mutex_lock(&dev->mutex_opened);
+ 	dev->opened = true;
+ 	mutex_unlock(&dev->mutex_opened);
+@@ -1824,7 +1824,6 @@
+ 	int i;
+ 	u32 inst_id = dev->inst;
+ 
+-	V4LVID_DBG("vidioc_close!!!!\n");
+ 	if (dev->mapped)
+ 		v4lvideo_release_map_force(dev);
+ 

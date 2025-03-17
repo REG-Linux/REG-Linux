@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# No graphical boot for VIM4 because it hangs and kills HDMI link
+case "$1" in
+    start)
+        # Boot splash with "insert coin"
+        /usr/sbin/plymouthd --mode=boot --attach-to-session
+        /usr/bin/plymouth --show-splash
+    ;;
+    stop)
+        # Shutdown splash with "game over" was set by S12populateshare
+        /usr/bin/plymouth --wait quit --retain-splash
+    ;;
+    *)
+esac
+
+exit $?
