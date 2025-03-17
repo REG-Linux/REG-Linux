@@ -122,6 +122,8 @@ acfa8ca648f4b5a0af9b43fadfef999f  package/sdl2_ttf/sdl2_ttf.hash
 7255c6ecc9f8bd6a511a495b1c8c1d0a  package/sdl_sound/sdl_sound.mk
 00c06867fae2d7bf2420d88f35d871ae  package/seatd/seatd.hash
 f8115f40ab8f91c582c849abe908c922  package/seatd/seatd.mk
+1291e9931828a06e7c3009a62cfe37a1  package/spdlog/spdlog.hash
+bfb97d6741b31bac155ce29f1aa052ad  package/spdlog/spdlog.mk
 467e487766b8692cd8b1aacd687549ae  package/spirv-headers/spirv-headers.hash
 fe682db3b2dc904bd3e6b7ec3a8d25ce  package/spirv-headers/spirv-headers.mk
 eebb3f819eeacda5b02f38983698d6cc  package/spirv-llvm-translator/spirv-llvm-translator.hash
