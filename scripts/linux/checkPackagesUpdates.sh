@@ -137,11 +137,11 @@ PACKAGES_OPENBOR="openbor4432
 PACKAGES_EMULATORS="amiberry
                     amiberry-lite
                     applewin
+                    azahar
                     bigpemu
                     box86
                     box64
                     cemu
-                    citra
                     citron
                     clk
                     hypseus-singe
