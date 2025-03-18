@@ -372,9 +372,6 @@ msxturbor:
 mugen:
   emulator: mugen
   core:     ge-custom
-fpinball:
-  emulator: fpinball
-  core:     fpinball
 multivision:
   emulator: libretro
   core:     gearsystem
