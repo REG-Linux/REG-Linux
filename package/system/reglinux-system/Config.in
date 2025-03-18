@@ -783,9 +783,6 @@ config BR2_PACKAGE_REGLINUX_MOBILE_SYSTEMS
 config BR2_PACKAGE_REGLINUX_PINBALL_SYSTEMS
     bool "REG-Linux pinball emulators support"
 
-    # Future Pinball
-    select BR2_PACKAGE_FPINBALL			if BR2_PACKAGE_BATOCERA_WINE
-
     # Virtual Pinball
     select BR2_PACKAGE_VPINBALL			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
 						   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
