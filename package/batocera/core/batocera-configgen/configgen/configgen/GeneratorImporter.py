@@ -135,10 +135,6 @@ def getGenerator(emulator):
         from generators.mugen.mugenGenerator import MugenGenerator
         return MugenGenerator()
 
-    if emulator == 'fpinball':
-        from generators.fpinball.fpinballGenerator import FpinballGenerator
-        return FpinballGenerator()
-
     if emulator == 'lightspark':
         from generators.lightspark.lightsparkGenerator import LightsparkGenerator
         return LightsparkGenerator()

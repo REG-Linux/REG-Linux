@@ -320,9 +320,6 @@ systems = {
                                   { "md5": "f7e5d9a3eb2b57bf5f4e2a4565318a8f", "zippedFile": "vtechv21.u12", "file": "bios/laser310.zip"} ] },
 
 
-    # ---------- Future Pinball ---------- #
-    "fpinball":   { "name": "Future Pinball", "biosFiles":  [ { "md5": "65a8ebf870420316a939ac44fd4c731d", "file": "bios/wsh57/scripten.exe"  } ] },
-
     # ---------- Super Cassette Vision ---------- #
     "scv":   { "name": "Super Cassette Vision", "biosFiles":  [ { "md5": "635a978fd40db9a18ee44eff449fc126", "file": "bios/upd7801g.s01"  } ] },
 
