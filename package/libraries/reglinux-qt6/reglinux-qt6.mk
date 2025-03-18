@@ -50,12 +50,6 @@ REGLINUX_QT6_ARCH = rk3288
 # Cortex A53
 else ifeq ($(BR2_cortex_a53),y)
 REGLINUX_QT6_ARCH = h5
-# Cortex A35 + MALI
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S9GEN4),y)
-REGLINUX_QT6_ARCH = s9gen4
-# A311D2 (MALI)
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_A3GEN2),y)
-REGLINUX_QT6_ARCH = a3gen2
 # Cortex A35
 else ifeq ($(BR2_cortex_a35),y)
 REGLINUX_QT6_ARCH = rk3326
