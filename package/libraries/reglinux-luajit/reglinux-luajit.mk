@@ -7,7 +7,7 @@
 # REG-Linux: use specific fork for RISC-V 64
 # REG-Linux: use OpenResty maintained LuaJIT2 fork for others
 ifeq ($(BR2_RISCV_64),y)
-REGLINUX_LUAJIT_VERSION = c0be24b5467e9c7ba3765423b680c368c76a4f07
+REGLINUX_LUAJIT_VERSION = 9c67bcd6ccb4bc72e038fde430b99d4255608f99
 REGLINUX_LUAJIT_SITE = $(call github,plctlab,LuaJIT,$(REGLINUX_LUAJIT_VERSION))
 else
 REGLINUX_LUAJIT_VERSION = dc397b66e6c8065185343cbe5dbeb4532f8e0b92

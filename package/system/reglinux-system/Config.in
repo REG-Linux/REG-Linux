@@ -1240,6 +1240,9 @@ config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
 	# Rise of the Triad source port
 	select BR2_PACKAGE_TARADINO			if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
+	# OpenMW : Morrowind port
+	select BR_PACKAGE_OPENMW			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL
+
 	help
 	  Ports
 
