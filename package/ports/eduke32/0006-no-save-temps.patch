@@ -1,0 +1,10 @@
+--- a/Common.mak	2025-03-19 01:02:38.222386751 +0100
++++ b/Common.mak	2025-03-19 01:02:48.069122608 +0100
+@@ -588,7 +588,6 @@
+ endif
+ 
+ define LF
+--save-temps=obj -dumpdir $1
+ endef
+ 
+ ifneq (0,$(LTO))

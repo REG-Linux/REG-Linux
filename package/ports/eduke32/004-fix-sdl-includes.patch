@@ -1,0 +1,11 @@
+--- a/Common.mak	2025-03-19 00:32:00.870210195 +0100
++++ b/Common.mak	2025-03-19 00:31:42.952270708 +0100
+@@ -948,7 +948,7 @@
+             SDLCONFIG_CFLAGS := $(strip $(subst -Dmain=SDL_main,,$(shell $(SDLCONFIG) --cflags)))
+             SDLCONFIG_LIBS := $(strip $(subst -mwindows,,$(shell $(SDLCONFIG) --libs)))
+ 
+-            COMPILERFLAGS += $(SDLCONFIG_CFLAGS)
++            #COMPILERFLAGS += $(SDLCONFIG_CFLAGS)
+             LIBS += $(SDLCONFIG_LIBS)
+         else
+             ifeq ($(SDL_TARGET),1)
