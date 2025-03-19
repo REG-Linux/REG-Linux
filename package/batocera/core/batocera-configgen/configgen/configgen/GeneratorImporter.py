@@ -99,10 +99,6 @@ def getGenerator(emulator):
         from generators.mame.mameGenerator import MameGenerator
         return MameGenerator()
 
-    if emulator == 'pygame':
-        from generators.pygame.pygameGenerator import PygameGenerator
-        return PygameGenerator()
-
     if emulator == 'devilutionx':
         from generators.devilutionx.devilutionxGenerator import DevilutionXGenerator
         return DevilutionXGenerator()
@@ -270,10 +266,6 @@ def getGenerator(emulator):
     if emulator == 'bigpemu':
         from generators.bigpemu.bigpemuGenerator import BigPEmuGenerator
         return BigPEmuGenerator()
-
-    if emulator == 'pyxel':
-        from generators.pyxel.pyxelGenerator import PyxelGenerator
-        return PyxelGenerator()
 
     if emulator == 'play':
         from generators.play.playGenerator import PlayGenerator

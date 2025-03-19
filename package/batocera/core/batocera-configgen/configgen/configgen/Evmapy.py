@@ -11,7 +11,7 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class Evmapy():
-    # evmapy is a process that map pads to keyboards (for pygame for example)
+    # evmapy is a process that map pads to keyboards
     __started = False
 
     @staticmethod
