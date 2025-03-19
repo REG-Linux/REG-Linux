@@ -1677,21 +1677,6 @@ config BR2_PACKAGE_REGLINUX_MUPEN64
 	help
 	  Mupen64
 
-#### Cores Experimental ####
-config BR2_PACKAGE_BATOCERA_CORES_EXPERIMENTAL
-	bool "add experimental cores"
-
-	# Supermodel OpenGL ES port
-	select BR2_PACKAGE_SUPERMODEL_ES	if BR2_PACKAGE_SYSTEM_TARGET_BCM2711	|| \
-						   BR2_PACKAGE_SYSTEM_TARGET_BCM2712	|| \
-						   BR2_PACKAGE_SYSTEM_TARGET_S922X	|| \
-						   BR2_PACKAGE_SYSTEM_TARGET_RK3568	|| \
-						   BR2_PACKAGE_SYSTEM_TARGET_H616	|| \
-						   BR2_PACKAGE_SYSTEM_TARGET_H700
-
-	help
-	  Emulators under development (Experimental)
-
 config BR2_PACKAGE_BATOCERA_GUNS
 	bool "batocera guns support"
 	select BR2_PACKAGE_AIMTRAK_GUNS				# aimtrak guns
