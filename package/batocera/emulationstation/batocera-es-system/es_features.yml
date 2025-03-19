@@ -8942,10 +8942,6 @@ ppsspp:
                 "Off": False
                 "On":  True
 
-pygame:
-  features: [padtokeyboard]
-  shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo, use_guns]
-
 reicast:
   shared: [powermode, tdp, videomode, ratio, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
 
@@ -12185,10 +12181,6 @@ bigpemu:
       choices:
         "4:3 (Default)": 2
         "16:9":          8
-
-pyxel:
-  features: [padtokeyboard]
-  shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
 
 ioquake3:
   shared: [powermode, tdp, videomode, bezel, bezel_stretch, hud, hud_corner, bezel.tattoo, bezel.tattoo_corner, bezel.tattoo_file, bezel.resize_tattoo]
