@@ -1305,20 +1305,6 @@ wasm4:
     libretro:
       wasm4: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_WASM4] }
 
-pyxel:
-  name:       pyxel
-  manufacturer: Fantasy
-  release: 2021
-  hardware: console
-  extensions: [py, pyxapp]
-  emulators:
-    pyxel:
-      pyxel: { requireAnyOf: [BR2_PACKAGE_PYTHON_PYXEL] }
-  comment_en: |
-    Fantasy console with many games available from https://github.com/kitao/pyxel/wiki/Pyxel-User-Examples
-  comment_fr: |
-    Une fantasy console avec plein de jeux disponibles sur https://github.com/kitao/pyxel/wiki/Pyxel-User-Examples
-
 channelf:
   name:       Channel-F
   manufacturer: Fairchild
@@ -2570,24 +2556,6 @@ cgenius:
           This will be the file that helps launch the game directly but also should be named to make it easier to scrape.
 
           Note: Some 'mods' can also be downloaded via Commander Genius also.
-
-pygame:
-  name:       Pygame
-  manufacturer: Pygame Team
-  release: 2000
-  hardware: library
-  extensions: [pygame]
-  platform:   pygame
-  theme:      pygame
-  emulators:
-    pygame:
-      pygame:  { requireAnyOf: [BR2_PACKAGE_BATOCERA_PYGAME] }
-  comment_en: |
-          Create your game yourself! Pygame helps you to create games in only some lines. Find a lot of example on internet.
-  comment_fr: |
-          Créez vos jeux vous-même ! Pygame vous aide à créer vos propres jeux en quelques lignes de code seulement. Vous trouvez sur internet plein d'exemples et de tutoriaux.
-  comment_br: |
-          Crie seu jogo você mesmo ! Pygame ajuda você a criar jogos com apenas algumas linhas. Encontre um monte de exemplos na internet.
 
 imageviewer:
   name:       Screenshots
@@ -4286,20 +4254,14 @@ xbox360:
     xenia-canary:
       xenia-canary: { requireAnyOf: [BR2_PACKAGE_XENIA_CANARY] }
   comment_en: |
-    Currently the Xenia emulators run under WINE and are restricted to systems capable of Vulkan 1.3+ only.
+    Currently the Xenia emulators are restricted to systems capable of Vulkan 1.3+ only.
     The Xenia emulators will use native Vulkan by default however an experiemental D3D12 -> Vulkan (VKD3D) option is provided.
-
-    Note: An internet connection is required to create the initial WINE bottle.
   comment_fr: |
-    Actuellement, les émulateurs Xenia fonctionnent sous WINE et sont limités aux systèmes compatibles uniquement avec Vulkan 1.3+.
+    Actuellement, les émulateurs Xenia sont limités aux systèmes compatibles uniquement avec Vulkan 1.3+.
     Les émulateurs Xenia utiliseront Vulkan natif par défaut, mais une option expérimentale D3D12 -> Vulkan (VKD3D) est fournie.
-
-    Remarque : Une connexion Internet est requise pour créer la bouteille de VIN initiale.
   comment_br: |
-    Atualmente os emuladores Xenia rodam em WINE e estão restritos apenas a sistemas capazes de Vulkan 1.3+.
+    Atualmente os emuladores Xenia estão restritos apenas a sistemas capazes de Vulkan 1.3+.
     Os emuladores Xenia usarão Vulkan nativo por padrão, no entanto, uma opção experimental D3D12 -> Vulkan (VKD3D) é fornecida.
-
-    Nota: É necessária uma ligação à Internet para criar a garrafa de WINE inicial.
 
 ngage:
   name: N-Gage

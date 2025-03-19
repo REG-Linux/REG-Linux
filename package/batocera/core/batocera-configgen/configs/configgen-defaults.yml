@@ -503,12 +503,6 @@ psx:
 pv1000:
   emulator: libretro
   core:     mame
-pygame:
-  emulator: pygame
-  core:     pygame
-pyxel:
-  emulator: pyxel
-  core:     pyxel
 quake3:
   emulator: ioquake3
   core:     ioquake3

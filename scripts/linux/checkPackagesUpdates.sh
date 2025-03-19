@@ -156,7 +156,6 @@ PACKAGES_EMULATORS="amiberry
                     liblcf
                     eka2l1
                     flycast
-                    fpinball
                     gsplus
                     hatari
                     ikemen
@@ -173,8 +172,6 @@ PACKAGES_EMULATORS="amiberry
                     pcsx2
                     play
                     ppsspp
-                    python-pygame2
-                    python-pyxel
                     reglinux-mame
                     reglinux-scummvm
                     rpcs3
@@ -186,7 +183,6 @@ PACKAGES_EMULATORS="amiberry
                     solarus-engine
                     sugarbox
                     supermodel
-                    supermodel-es
                     thextech
                     tsugaru
                     vice
