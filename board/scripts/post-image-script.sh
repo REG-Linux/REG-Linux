@@ -81,7 +81,7 @@ do
 	# Include the UUID of boot partition in extraargs
 	sed -i "s/ -n REGLINUX/ -n REGLINUX -i ${VFATUUID//-}/g" "${REGLINUX_BINARIES_DIR}/genimage.cfg" || exit 1
 	# Change "label=REGLINUX" to "uuid= ..." in boot files
-	find "${REGLINUX_BINARIES_DIR}/boot/" -type f \( -iname "extlinux.conf" -o -iname "cmdline.txt" -o -iname "boot.ini" -o -iname "uEnv.txt" -o -iname "syslinux.cfg" -o -iname "grub.cfg" \) -exec sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" {} \+
+	find "${REGLINUX_BINARIES_DIR}/boot/" -type f \( -iname "LinuxLoader.cfg" -o -iname "extlinux.conf" -o -iname "cmdline.txt" -o -iname "boot.ini" -o -iname "uEnv.txt" -o -iname "syslinux.cfg" -o -iname "grub.cfg" \) -exec sed -i "s/label=REGLINUX/uuid=$VFATUUID/g" {} \+
 
     # install syslinux
     if grep -qE "^BR2_TARGET_SYSLINUX=y$" "${BR2_CONFIG}"
