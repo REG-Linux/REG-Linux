@@ -1,0 +1,23 @@
+diff --git a/package/strace/Config.in b/package/strace/Config.in
+index e0551f38613..ff7d271c0c1 100644
+--- a/package/strace/Config.in
++++ b/package/strace/Config.in
+@@ -1,7 +1,5 @@
+ config BR2_PACKAGE_STRACE
+ 	bool "strace"
+-	# needs at least kernel headers 4.0 on nios2
+-	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_0 || !BR2_nios2
+ 	# needs at least kernel headers 5.0 on xtensa
+ 	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_5_0 || !BR2_xtensa
+ 	# needs at least kernel headers 5.0 on musl aarch64
+@@ -19,10 +17,6 @@ config BR2_PACKAGE_STRACE
+ 
+ 	  https://strace.io
+ 
+-comment "strace needs a toolchain w/ headers >= 4.0 on nios2"
+-	depends on BR2_nios2
+-	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_0
+-
+ comment "strace needs a toolchain w/ headers >= 5.0 on xtensa"
+ 	depends on BR2_xtensa
+ 	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_5_0
