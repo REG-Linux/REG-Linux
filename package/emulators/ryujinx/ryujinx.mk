@@ -4,13 +4,13 @@
 #
 ################################################################################
 
-RYUJINX_VERSION = 1.2.81
+RYUJINX_VERSION = 1.2.86
 ifeq ($(BR2_x86_64),y)
 RYUJINX_SOURCE = ryujinx-$(RYUJINX_VERSION)-linux_x64.tar.gz
 else ifeq ($(BR2_aarch64),y)
 RYUJINX_SOURCE = ryujinx-$(RYUJINX_VERSION)-linux_arm64.tar.gz
 endif
-RYUJINX_SITE = https://github.com/Ryubing/Ryujinx/releases/download/$(RYUJINX_VERSION)
+RYUJINX_SITE = https://github.com/Ryubing/Stable-Releases/releases/download/$(RYUJINX_VERSION)
 RYUJINX_LICENSE = MIT
 #RYUJINX_DEPENDENCIES = sdl2 openal hicolor-icon-theme adwaita-icon-theme librsvg
 
