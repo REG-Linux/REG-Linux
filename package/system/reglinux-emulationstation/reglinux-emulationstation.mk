@@ -114,7 +114,7 @@ define REGLINUX_EMULATIONSTATION_EXTERNAL_POS
 	for P in $(STAGING_DIR)/usr/share/batocera-es-system/locales/*; do if test -e $$P/batocera-es-system.po; then cp $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po.tmp && $(HOST_DIR)/bin/msgcat $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po.tmp $$P/batocera-es-system.po > $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po; fi; done
 
 	# Hijack .po copy to adjust LogLevel
-	if test "$(BR2_ENABLE_DEBUG)" -ne 1; then sed -i "s/level \= \"default\"\;/level \= \"error\"\;/" "$(@D)/es-app/src/guis/GuiMenu.cpp"; fi
+	if test "$(BR2_ENABLE_DEBUG)" = "y" ; then sed -i "s/level \= \"default\"\;/level \= \"error\"\;/" "$(@D)/es-app/src/guis/GuiMenu.cpp"; fi
 endef
 
 # Resourrces
