@@ -109,6 +109,10 @@ a9d1420cc9734b65cbc95471f32631da  package/rockchip-rkbin/rockchip-rkbin.hash
 877a66c23c5a1df8e186f44fa4ff4367  package/rockchip-rkbin/rockchip-rkbin.mk
 b69d8b1eb8ab76b368eb9b6a6b9caee4  package/rpi-firmware/rpi-firmware.hash
 0051fc296b4cc5deab060a38dfc7adc1  package/rpi-firmware/rpi-firmware.mk
+b0e237fcce50eebfb67bdf5a78c753df  package/rust-bin/rust-bin.hash
+4471cc78df586db10863c49bc499ac9f  package/rust-bin/rust-bin.mk
+5b088a0fdb4280bcbba47d4ad327414a  package/rust/rust.hash
+a539c56878ecded9261adfed2cc20ed8  package/rust/rust.mk
 00e559407799a75f39ad0b2443c5ef73  package/sdl2/Config.in
 c5fad3b652e1f0c87531e590d899c325  package/sdl2/sdl2.hash
 6f6ba7ebb71d7e47042d17a80dd3f1ae  package/sdl2/sdl2.mk
