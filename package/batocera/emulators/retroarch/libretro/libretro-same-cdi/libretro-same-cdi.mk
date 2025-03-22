@@ -3,13 +3,19 @@
 # libretro-same-cdi
 #
 ################################################################################
-# Version: Commits on Mar 1, 2023
-LIBRETRO_SAME_CDI_VERSION = 54cf493c2dee4c46666059c452f8aaaa0bd7c8e0
+# Version: Commits on Jan 31, 2025
+LIBRETRO_SAME_CDI_VERSION = 7ee1d8e9cb4307b7cd44ee1dd757e9b3f48f41d5
 LIBRETRO_SAME_CDI_SITE = $(call github,libretro,same_cdi,$(LIBRETRO_SAME_CDI_VERSION))
 LIBRETRO_SAME_CDI_LICENSE = GPL
 
 LIBRETRO_SAME_CDI_MAX_JOBS = 6
 LIBRETRO_SAME_CDI_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_SAME_CDI_MAX_JOBS) ]; then echo $(LIBRETRO_SAME_CDI_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
+
+ifeq ($(BR2_x86_64),y)
+LIBRETRO_SAME_CDI_EXTRA_ARGS += LIBRETRO_CPU=x86_64 PLATFORM=x64
+else ifeq ($(BR2_aarch64),y)
+LIBRETRO_SAME_CDI_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU= PLATFORM=arm64 ARCHITECTURE= NOASM=1
+endif
 
 define LIBRETRO_SAME_CDI_BUILD_CMDS
 	# First, we need to build genie for host
@@ -22,7 +28,9 @@ define LIBRETRO_SAME_CDI_BUILD_CMDS
 	USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
 
 	# Then build lr-same-cdi for target
-	$(TARGET_CONFIGURE_OPTS) $(MAKE) -j$(LIBRETRO_SAME_CDI_JOBS) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" GIT_VERSION="" -C $(@D) -f Makefile.libretro
+	$(TARGET_CONFIGURE_OPTS) $(MAKE) -j$(LIBRETRO_SAME_CDI_JOBS) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" \
+	$(LIBRETRO_SAME_CDI_EXTRA_ARGS) \
+	GIT_VERSION="" -C $(@D) -f Makefile.libretro
 endef
 
 define LIBRETRO_SAME_CDI_INSTALL_TARGET_CMDS
