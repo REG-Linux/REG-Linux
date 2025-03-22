@@ -1640,7 +1640,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_UZEM		if !BR2_PACKAGE_SYSTEM_TARGET_H3 && !BR2_PACKAGE_SYSTEM_TARGET_CHA # speed issue on weak SBCs
 
 	# Philips CD-I (MAME-based emulator)
-	select BR2_PACKAGE_LIBRETRO_SAME_CDI		if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	select BR2_PACKAGE_LIBRETRO_SAME_CDI		if BR2_x86_64 || (BR2_aarch64 && BR2_PACKAGE_HAS_LIBGL)
 
 	help
 	  All avaible systems for the selected architecture
