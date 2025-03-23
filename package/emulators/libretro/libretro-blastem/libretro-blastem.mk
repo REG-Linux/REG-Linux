@@ -3,8 +3,8 @@
 # BLASTEM
 #
 ################################################################################
-# Version.: Commits on Feb 26, 2025
-LIBRETRO_BLASTEM_VERSION = 57345f6e18f3
+# Version.: Commits on Mars 16, 2025
+LIBRETRO_BLASTEM_VERSION = 2df04125ac78
 LIBRETRO_BLASTEM_SOURCE = $(LIBRETRO_BLASTEM_VERSION).tar.gz
 LIBRETRO_BLASTEM_SITE = https://www.retrodev.com/repos/blastem/archive
 LIBRETRO_BLASTEM_LICENSE = Non-commercial
