@@ -38,7 +38,7 @@ define THEXTECH_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/output/bin/thextech $(TARGET_DIR)/usr/bin/
 	cp -avf $(@D)/output/lib/libSDL2_mixer_ext.so* $(TARGET_DIR)/usr/lib/
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -avf $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/thextech/thextech.keys \
+	cp -avf $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/thextech/thextech.keys \
 	    $(TARGET_DIR)/usr/share/evmapy/
 endef
 
