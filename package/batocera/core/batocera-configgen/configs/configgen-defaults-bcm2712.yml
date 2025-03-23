@@ -12,8 +12,6 @@ nds:
   emulator: drastic
   core:     drastic
 model3:
-  emulator: supermodel
-  core:     supermodel-legacy
   options:
     videomode: max-1920x1080
 quake3:

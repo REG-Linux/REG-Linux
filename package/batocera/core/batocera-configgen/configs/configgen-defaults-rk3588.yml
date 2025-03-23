@@ -11,8 +11,6 @@ ps2:
   emulator: libretro
   core:     play
 model3:
-  emulator: supermodel
-  core:     supermodel-legacy
   options:
     videomode: max-1920x1080
     decorations: none

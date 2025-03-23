@@ -7,9 +7,6 @@ pcengine:
 pcenginecd:
   emulator: libretro
   core:     pce
-model3:
-  emulator: supermodel
-  core:     supermodel-legacy
 nds:
   emulator: libretro
   core:     melonds

@@ -9,7 +9,6 @@ default:
     rewind:             false
     bezel:              consoles
     forceNoBezel:       false
-    gamemode_enable:    false
 
 # 0-C
 

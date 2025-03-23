@@ -20,6 +20,3 @@ dreamcast:
 naomi:
   emulator: libretro
   core:     flycast
-model3:
-  emulator: supermodel
-  core:     supermodel-legacy
