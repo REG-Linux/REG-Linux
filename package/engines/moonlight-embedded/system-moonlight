@@ -13,7 +13,7 @@ moonlight_gamesnames="$moonlight_config_dir/gamelist.txt"
 SEPERATOR=";"
 
 listGames() {
-  batocera-moonlight list 2>/dev/null | grep '^[0-9][0-9.]' | cut -d '.' -f 1- | sed 's/^[0-9]*\. //'
+  system-moonlight list 2>/dev/null | grep '^[0-9][0-9.]' | cut -d '.' -f 1- | sed 's/^[0-9]*\. //'
 }
 
 createRomLinks () {
@@ -131,7 +131,7 @@ case $1 in
         cmd="moonlight stream -remote -keydir ${moonlight_keydir} -${moonlight_screen} -fps ${moonlight_fps} -mapping ${moonlight_mapping} -app \"$game\" ${moonlight_ip}" ;;
 
     clean)
-        cmd="rm -rf $moonlight_config_dir/keydir" && echo "You can now pair again your batocera.linux with a PC" ;;
+        cmd="rm -rf $moonlight_config_dir/keydir" && echo "You can now pair again your REG-Linux with a PC" ;;
         
     *)
         cmd="moonlight stream -remote -keydir ${moonlight_keydir} -${moonlight_screen} -fps ${moonlight_fps} -mapping ${moonlight_mapping} ${moonlight_ip}" ;;
