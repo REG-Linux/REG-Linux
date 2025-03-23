@@ -38,10 +38,10 @@ index d9b3c32..afced11 100644
  #include "SDLIncludes.h"
  #include "Debugger/SupermodelDebugger.h"
  #include "Graphics/Legacy3D/Legacy3D.h"
-@@ -1972,6 +1973,10 @@ int main(int argc, char **argv)
-   // Create input system
-   if (selectedInputSystem == "sdl")
-     InputSystem = new CSDLInputSystem(s_runtime_config);
+@@ -2139,6 +2139,10 @@
+     InputSystem = new CSDLInputSystem(s_runtime_config, false);
+   else if (selectedInputSystem == "sdlgamepad")
+     InputSystem = new CSDLInputSystem(s_runtime_config, true);
 +// ifdef udev
 +  else if (selectedInputSystem == "evdev")
 +    InputSystem = new CEvdevInputSystem(s_runtime_config);
@@ -122,7 +122,7 @@ index 0000000..ee695ba
 +  return event_strcmp_events(aa->devnode, bb->devnode);
 +}
 +
-+CEvdevInputSystem::CEvdevInputSystem(const Util::Config::Node& config) : CSDLInputSystem(config) {
++CEvdevInputSystem::CEvdevInputSystem(const Util::Config::Node& config) : CSDLInputSystem(config, true) {
 +  m_ndevices = 0;
 +  m_udev = NULL;
 +
