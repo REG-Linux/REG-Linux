@@ -45,7 +45,7 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
 		!BR2_PACKAGE_HAS_LIBEGL || \
 		!(BR2_PACKAGE_SDL3_OPENGL || BR2_PACKAGE_SDL3_OPENGLES)
 
-# batocera
+# REG
 config BR2_PACKAGE_SDL3_WAYLAND
     bool "SDL3 Wayland support"
     depends on BR2_PACKAGE_WAYLAND

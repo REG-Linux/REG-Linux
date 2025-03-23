@@ -41,7 +41,7 @@ define LIGHTSPARK_INSTALL_TARGET_CMDS
 
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/lightspark/flash.lightspark.keys $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/engines/lightspark/flash.lightspark.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))
