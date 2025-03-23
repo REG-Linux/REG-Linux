@@ -1,0 +1,50 @@
+--- a/daemon/gamemode-gpu.c	2025-03-19 19:29:13.509138922 +0100
++++ b/daemon/gamemode-gpu.c	2025-03-19 19:29:23.439365578 +0100
+@@ -167,7 +167,6 @@
+ 
+ 	// Set up our command line to pass to gpuclockctl
+ 	const char *const exec_args[] = {
+-		"pkexec",
+ 		LIBEXECDIR "/gpuclockctl",
+ 		device,
+ 		"set",
+--- a/daemon/gamemode-context.c	2025-03-19 19:30:36.862039500 +0100
++++ b/daemon/gamemode-context.c	2025-03-19 19:30:54.092431863 +0100
+@@ -250,7 +250,7 @@
+ 	sprintf(value_str, "%ld", value_num);
+ 
+ 	const char *const exec_args[] = {
+-		"pkexec", LIBEXECDIR "/procsysctl", "split_lock_mitigate", value_str, NULL,
++		LIBEXECDIR "/procsysctl", "split_lock_mitigate", value_str, NULL,
+ 	};
+ 
+ 	LOG_MSG("Requesting update of split_lock_mitigate to %s\n", value_str);
+@@ -305,7 +305,7 @@
+ 	}
+ 
+ 	const char *const exec_args[] = {
+-		"pkexec", LIBEXECDIR "/cpugovctl", "set", gov_str, NULL,
++		LIBEXECDIR "/cpugovctl", "set", gov_str, NULL,
+ 	};
+ 
+ 	LOG_MSG("Requesting update of governor policy to %s\n", gov_str);
+--- a/daemon/gamemode-cpu.c	2025-03-19 19:31:36.862405116 +0100
++++ b/daemon/gamemode-cpu.c	2025-03-19 19:31:52.195753805 +0100
+@@ -376,7 +376,7 @@
+ 		log_state(cpulist, &pos, first, last);
+ 
+ 	const char *const exec_args[] = {
+-		"pkexec", LIBEXECDIR "/cpucorectl", "offline", cpulist, NULL,
++		LIBEXECDIR "/cpucorectl", "offline", cpulist, NULL,
+ 	};
+ 
+ 	LOG_MSG("Requesting parking of cores %s\n", cpulist);
+@@ -421,7 +421,7 @@
+ 		log_state(cpulist, &pos, first, last);
+ 
+ 	const char *const exec_args[] = {
+-		"pkexec", LIBEXECDIR "/cpucorectl", "online", cpulist, NULL,
++		LIBEXECDIR "/cpucorectl", "online", cpulist, NULL,
+ 	};
+ 
+ 	LOG_MSG("Requesting unparking of cores %s\n", cpulist);

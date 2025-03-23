@@ -12,7 +12,7 @@ index fca49a2667..2adea5c353 100644
 +   fpic   := -fPIC
 +   GREP = grep
 +   SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
-+   CFLAGS   += -O3 -DNDEBUG -mcpu=cortex-a76 -mtune=cortex-a76 -fsigned-char 
++   CFLAGS   += -O3 -DNDEBUG -mcpu=cortex-a76 -mtune=cortex-a76 -fsigned-char
 +   CXXFLAGS += -O3 -DNDEBUG -mcpu=cortex-a76 -mtune=cortex-a76 -fsigned-char
 +   LDFLAGS += $(PTHREAD_FLAGS) -ldl -lrt
 +   HAVE_LIGHTREC = 1
