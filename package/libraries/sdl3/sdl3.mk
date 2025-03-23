@@ -29,7 +29,7 @@ ifeq ($(BR2_PACKAGE_MESA3D),y)
 SDL3_DEPENDENCIES += mesa3d
 endif
 
-# batocera - use Pipewire audio
+# reglinux - use Pipewire audio
 ifeq ($(BR2_PACKAGE_PIPEWIRE),y)
 SDL3_DEPENDENCIES += pipewire
 endif
@@ -77,17 +77,17 @@ ifeq ($(BR2_PACKAGE_SDL3_KMSDRM),y)
 SDL3_DEPENDENCIES += libdrm
 endif
 
-# batocera - enable/disable Wayland video driver
+# reglinux - enable/disable Wayland video driver
 ifeq ($(BR2_PACKAGE_SDL3_WAYLAND),y)
 SDL3_DEPENDENCIES += wayland wayland-protocols libxkbcommon
 endif
 
-# batocera - libdecor
+# reglinux - libdecor
 ifeq ($(BR2_PACKAGE_LIBDECOR),y)
 SDL3_DEPENDENCIES += libdecor
 endif
 
-# batocera - enable/disable Vulkan support
+# reglinux - enable/disable Vulkan support
 ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER),yy)
 SDL3_DEPENDENCIES += vulkan-headers vulkan-loader
 endif
