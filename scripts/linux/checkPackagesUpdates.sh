@@ -178,6 +178,7 @@ PACKAGES_EMULATORS="amiberry
                     ruffle
                     ryujinx
                     scummvm
+                    shadps4
                     simcoupe
                     snes9x
                     solarus-engine
