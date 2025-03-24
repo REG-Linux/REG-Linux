@@ -48,6 +48,7 @@ menu "Retroarch"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/retroarch-assets/Config.in"
 
 menu "Libretro"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-applewin/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-atari800/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-a5200/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-beetle-psx/Config.in"

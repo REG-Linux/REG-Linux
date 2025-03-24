@@ -1,0 +1,13 @@
+config BR2_PACKAGE_LIBRETRO_APPLEWIN
+	bool "libretro-applewin"
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select BR2_PACKAGE_MINIZIP_ZLIB
+	select BR2_PACKAGE_SLIRP
+	select BR2_PACKAGE_LIBPCAP
+	select BR2_PACKAGE_LIBYAML
+	select BR2_PACKAGE_HOST_XXD
+	help
+		AppleWin libretro port
+
+		https://github.com/audetto/AppleWin

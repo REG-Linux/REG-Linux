@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Version: Commits on Mar 23, 2025
-APPLEWIN_VERSION = 3d838302b6208efd026e07d09240ecfcc4e23d9e
+APPLEWIN_VERSION = 43efd1485d55a3ac1155d444b8694c062dc9a8a3
 APPLEWIN_SITE = https://github.com/audetto/AppleWin
 APPLEWIN_SITE_METHOD=git
 APPLEWIN_GIT_SUBMODULES=YES
@@ -16,10 +16,7 @@ APPLEWIN_SUPPORTS_IN_SOURCE_BUILD = NO
 
 APPLEWIN_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
 APPLEWIN_CONF_OPTS += -DBUILD_SA2=ON
-APPLEWIN_CONF_OPTS += -DBUILD_LIBRETRO=ON
-
-# TODO split applewin standalone and libretr to enble STATIC_LINKING on lr core
-# APPLEWIN_CONF_OPTS += -DSTATIC_LINKING=ON
+APPLEWIN_CONF_OPTS += -DBUILD_LIBRETRO=OFF
 
 ifeq ($(BR2_PACKAGE_HAS_OPENGL),y)
 APPLEWIN_CONF_OPTS += -DSA2_OPENGL=ON
@@ -28,9 +25,6 @@ APPLEWIN_CONF_OPTS += -DSA2_OPENGL=OFF
 endif
 
 define APPLEWIN_INSTALL_TARGET_CMDS
-    mkdir -p $(TARGET_DIR)/usr/lib/libretro
-    $(INSTALL) -D $(@D)/buildroot-build/source/frontends/libretro/applewin_libretro.so \
-        $(TARGET_DIR)/usr/lib/libretro/
     cp -avf $(@D)/buildroot-build/sa2 $(TARGET_DIR)/usr/bin/applewin
     mkdir -p $(TARGET_DIR)/usr/share/applewin
     cp -R $(@D)/resource/* $(TARGET_DIR)/usr/share/applewin/
