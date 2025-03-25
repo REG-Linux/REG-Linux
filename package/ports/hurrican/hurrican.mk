@@ -3,8 +3,8 @@
 # hurrican
 #
 ################################################################################
-# Version: Commits on Nov 24, 2024
-HURRICAN_VERSION = 72d808cc4d6db5d38e5d87ab95ab0b1bcfd89ede
+# Version: Commits on Mar 24, 2025
+HURRICAN_VERSION = 63649c3b6302eca1d7704be0a69321995a39f1f5
 HURRICAN_SITE = https://github.com/HurricanGame/Hurrican
 
 HURRICAN_DEPENDENCIES = sdl2 sdl2_mixer sdl2_image libepoxy libopenmpt
