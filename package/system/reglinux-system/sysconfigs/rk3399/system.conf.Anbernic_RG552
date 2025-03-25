@@ -8,4 +8,3 @@ system.suspendmode=suspend
 
 # default wayland environment (rotate)
 system.es.environment=wayland
-display.rotate=3
