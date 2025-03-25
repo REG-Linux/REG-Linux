@@ -23,15 +23,27 @@ ifeq ($(BR2_PACKAGE_CLANG),y)
 PCSX2_DEPENDENCIES += host-clang
 PCSX2_CONF_OPTS += -DCMAKE_C_COMPILER=$(HOST_DIR)/bin/clang
 PCSX2_CONF_OPTS += -DCMAKE_CXX_COMPILER=$(HOST_DIR)/bin/clang++
+PCSX2_CONF_OPTS += -DCMAKE_CXX_FLAGS="-Wno-error=c++11-narrowing"
 PCSX2_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-lm -lstdc++"
+endif
+
+# AArch64 build requires clang (it could run on GCC but needs patches)
+ifeq ($(BR2_aarch64),y)
+PCSX2_DEPENDENCIES += host-clang
+PCSX2_CONF_OPTS += -DCMAKE_SYSTEM_NAME=Linux
+PCSX2_CONF_OPTS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 endif
 
 PCSX2_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 PCSX2_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 PCSX2_CONF_OPTS += -DENABLE_TESTS=OFF
 PCSX2_CONF_OPTS += -DUSE_SYSTEM_LIBS=AUTO
+
+# Only enable for x86_64, it breaks arm64 build
+ifeq ($(BR2_x86_64),y)
 # The following flag is misleading and *needed* ON to avoid doing -march=native
 PCSX2_CONF_OPTS += -DDISABLE_ADVANCE_SIMD=ON
+endif
 
 # Since v2.3.168 Wayland is ON by default, should disable X11 but does not build yet
 PCSX2_CONF_OPTS += -DWAYLAND_API=ON

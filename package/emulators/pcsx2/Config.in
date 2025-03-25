@@ -1,6 +1,6 @@
 config BR2_PACKAGE_PCSX2
     bool "pcsx2"
-    depends on BR2_x86_64
+    depends on BR2_x86_64 || BR2_aarch64
     depends on BR2_PACKAGE_XORG7
     select BR2_PACKAGE_FMT
     select BR2_PACKAGE_JPEG_TURBO
@@ -17,14 +17,15 @@ config BR2_PACKAGE_PCSX2
     select BR2_PACKAGE_DEJAVU
     select BR2_PACKAGE_LIBPCAP
     select BR2_PACKAGE_YAML_CPP
-    select BR2_PACKAGE_VULKAN_HEADERS    if BR2_PACKAGE_REGLINUX_VULKAN
-    select BR2_PACKAGE_VULKAN_LOADER     if BR2_PACKAGE_REGLINUX_VULKAN
+    select BR2_PACKAGE_VULKAN_HEADERS	if BR2_PACKAGE_REGLINUX_VULKAN
+    select BR2_PACKAGE_VULKAN_LOADER	if BR2_PACKAGE_REGLINUX_VULKAN
     select BR2_PACKAGE_REGLINUX_QT6
     select BR2_PACKAGE_SHADERC
     select BR2_PACKAGE_ECM
     select BR2_PACKAGE_LIBBACKTRACE
     select BR2_PACKAGE_KDDOCKWIDGETS
-
+    select BR2_PACKAGE_CLANG		if BR2_aarch64
+ 
     help
       PCSX2 is a free and open-source PlayStation 2 (PS2) emulator.
       
