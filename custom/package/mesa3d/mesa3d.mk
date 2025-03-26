@@ -114,11 +114,12 @@ MESA3D_CONF_OPTS += \
 	-Dgallium-xa=disabled
 endif
 
-ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
-MESA3D_CONF_OPTS += -Dgallium-vc4-neon=auto
-else
-MESA3D_CONF_OPTS += -Dgallium-vc4-neon=disabled
-endif
+# DEPRECATION: Option 'gallium-opencl' is deprecated
+#ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
+#MESA3D_CONF_OPTS += -Dgallium-vc4-neon=auto
+#else
+#MESA3D_CONF_OPTS += -Dgallium-vc4-neon=disabled
+#endif
 
 # Drivers
 
