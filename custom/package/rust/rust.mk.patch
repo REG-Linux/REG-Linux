@@ -1,5 +1,5 @@
 diff --git a/package/rust/rust.mk b/package/rust/rust.mk
-index 29c03594d2a..511ea6a4bf9 100644
+index 29c03594d2..511ea6a4bf 100644
 --- a/package/rust/rust.mk
 +++ b/package/rust/rust.mk
 @@ -6,7 +6,7 @@

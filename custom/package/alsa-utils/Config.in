@@ -97,7 +97,7 @@ config BR2_PACKAGE_ALSA_UTILS_SPEAKER_TEST
 	bool "speaker-test"
 	select BR2_PACKAGE_ALSA_LIB_PCM
 
-# batocera - add alsa-info
+# reglinux - add alsa-info
 config BR2_PACKAGE_ALSA_UTILS_ALSAINFO
 	bool "alsa-info"
 

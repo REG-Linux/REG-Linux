@@ -89,7 +89,6 @@ config BR2_TOOLCHAIN_HAS_BINUTILS_BUG_30730
 config BR2_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
 	bool
 	default y
-	depends on !BR2_nios2
 	depends on !BR2_ARM_CPU_ARMV4
 	depends on !BR2_ARM_CPU_ARMV5
 	depends on !BR2_sparc_v8
@@ -180,23 +179,6 @@ config BR2_TOOLCHAIN_HAS_GCC_BUG_90620
 	depends on !BR2_TOOLCHAIN_GCC_AT_LEAST_10 \
 		|| BR2_TOOLCHAIN_GCC_AT_LEAST_11
 
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93847
-# ICE: compiler error: Segmentation fault on Nios II. This bug
-# no longer exists in gcc 9.x.
-config BR2_TOOLCHAIN_HAS_GCC_BUG_93847
-	bool
-	default y if BR2_nios2 && !BR2_TOOLCHAIN_GCC_AT_LEAST_9
-
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99410
-# Error: branch offset out of range on Nios II. This bug
-# no longer exists in gcc 8.x but reappeared on gcc 9.x and still exists
-# on gcc 12.x
-config BR2_TOOLCHAIN_HAS_GCC_BUG_99410
-	bool
-	default y if !BR2_TOOLCHAIN_GCC_AT_LEAST_8
-	default y if BR2_TOOLCHAIN_GCC_AT_LEAST_9
-	depends on BR2_nios2
-
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101737
 # ICE: SH4 -Os causes internal compiler error. This bug
 # still exists in gcc = 11.1.0
@@ -238,7 +220,6 @@ config BR2_TOOLCHAIN_HAS_GCC_BUG_107728
 	bool
 	default y if BR2_microblazebe || BR2_microblazeel \
 		|| BR2_mips || BR2_mipsel \
-		|| BR2_nios2 \
 		|| BR2_or1k \
 		|| BR2_sh
 	depends on BR2_TOOLCHAIN_USES_GLIBC
@@ -965,7 +946,7 @@ config BR2_TOOLCHAIN_HAS_LIBQUADMATH
 comment "Bare metal toolchain"
 
 config BR2_TOOLCHAIN_BARE_METAL_BUILDROOT
-	bool "Build a bare metal toolchain"
+	bool "Build bare metal toolchains"
 	select BR2_PACKAGE_NEWLIB_BARE_METAL
 	help
 	  Select if you need a bare-metal toolchain for building

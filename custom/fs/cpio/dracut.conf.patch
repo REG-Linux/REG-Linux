@@ -1,5 +1,5 @@
 diff --git a/fs/cpio/dracut.conf b/fs/cpio/dracut.conf
-index 2337736c4e..762240f7cf 100644
+index 2337736c4e..b6c07e35e9 100644
 --- a/fs/cpio/dracut.conf
 +++ b/fs/cpio/dracut.conf
 @@ -1,3 +1,4 @@
@@ -17,7 +17,7 @@ index 2337736c4e..762240f7cf 100644
  # Dracut modules needed
  add_dracutmodules+=" \
 -busybox-init
-+busybox-rootfs \
++busybox-rootfs
  "
  
  # Modules to ignore
@@ -61,7 +61,7 @@ index 2337736c4e..762240f7cf 100644
  multipath \
  nbd \
  network-legacy \
-@@ -57,36 +65,49 @@ nfs \
+@@ -57,36 +65,54 @@ nfs \
  nvdimm \
  nvmf \
  parse-lunmask \
@@ -75,41 +75,37 @@ index 2337736c4e..762240f7cf 100644
  rngd \
 +shutdown \
  systemd \
--systemd-udevd \
--systemd-coredump \
-+systemd-ac-power \
- systemd-ask-password \
--systemd-timedated \
--systemd-rfkill \
--systemd-resolved \
-+systemd-coredump \
+ systemd-udevd \
+ systemd-coredump \
 +systemd-creds \
 +systemd-cyptsetup \
++systemd-ac-power \
+ systemd-ask-password \
+ systemd-timedated \
+ systemd-rfkill \
+ systemd-resolved \
  systemd-hostnamed \
  systemd-initrd \
 +systemd-integritysetup \
  systemd-journald \
  systemd-ldconfig \
--systemd-networkd \
--systemd-timesyncd \
--systemd-veritysetup \
- systemd-modules-load \
--systemd-sysctl \
-+systemd-networkd \
+ systemd-networkd \
 +systemd-pcrphase \
 +systemd-portabled \
 +systemd-pstore \
+ systemd-timesyncd \
+ systemd-veritysetup \
+ systemd-modules-load \
+ systemd-sysctl \
  systemd-repart \
 +systemd-resolved \
 +systemd-rfkill \
 +systemd-sysctl \
  systemd-sysext \
  systemd-sysusers \
+ systemd-tmpfiles \
 +systemd-timedated \
 +systemd-timesyncd \
- systemd-tmpfiles \
-+systemd-udevd \
-+systemd-veritysetup \
  squash \
  ssh-client \
  stratis \
