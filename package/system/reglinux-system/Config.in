@@ -1,6 +1,6 @@
 config BR2_PACKAGE_REGLINUX_RELEASE
 bool "release mode"
-default y
+default !BR2_ENABLE_DEBUG
 
 ##### define variables to use in this file
 if BR2_PACKAGE_BATOCERA_RPI_MESA3D
@@ -1351,22 +1351,20 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712
 
 	# Gopher 64
-	# build error so far on cross-compiling, so x86_64_v3 only (because the build system explicitely set it)
-	select BR2_PACKAGE_GOPHER64			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
+	# Requires rust, GL, clang, x86_64_v3
+	# TODO AArch64 armv8.2a fails cross-compiling parallel-rdp
+	select BR2_PACKAGE_GOPHER64			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_CLANG && BR2_x86_x86_64_v3
 
 	# Dreamcast
 	select BR2_PACKAGE_BATOCERA_SEGADC		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 
 	# PSX
 	# newer versions of duckstation stricter on OpenGL ES 3.x, no more support for KMS/DRM
-	select BR2_PACKAGE_DUCKSTATION			if (!BR2_mipsel) && BR2_PACKAGE_HAS_GLES3 && !BR2_PACKAGE_SYSTEM_TARGET_RK3326
+	select BR2_PACKAGE_DUCKSTATION			if (!BR2_mipsel) && BR2_PACKAGE_HAS_GLES3
 
 	select BR2_PACKAGE_DUCKSTATION_LEGACY		if !BR2_mipsel && !BR2_RISCV_64			&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835		&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_H3		&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_CHA		&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_RK3326		&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_RK3128		&& \
+							   !BR2_arm1176jzf_s				&& \
+							   !BR2_cortex_a7				&& \
 							   !BR2_PACKAGE_DUCKSTATION
 
 	select BR2_PACKAGE_LIBRETRO_SWANSTATION		if !BR2_mipsel && !BR2_RISCV_64			&& \
