@@ -6,6 +6,7 @@ config BR2_PACKAGE_XENIA_CANARY
     select BR2_PACKAGE_PYTHON_TOML
     select BR2_PACKAGE_LIBGTK3
     select BR2_PACKAGE_SDL2
+    select BR2_PACKAGE_LIBIBERTY
     select BR2_PACKAGE_LIBUNWIND
     help
         Xenia is an open source research project for emulating Xbox 360 games on modern PCs.
