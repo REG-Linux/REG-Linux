@@ -62,4 +62,4 @@ else
     echo "***** no share disk set." >&2
 fi
 
-qemu-system-x86_64 -cpu host -enable-kvm -device intel-hda -device hda-duplex -vga virtio -device virtio-gpu-pci -smp 2 -m 2048 -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 -drive "format=raw,file=${REGLINUX_IMG}" ${SHARE_CMD}
+qemu-system-x86_64 -cpu host -enable-kvm -device intel-hda -device hda-duplex -device virtio-gpu-pci -smp 4 -m 2048 -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 -device nec-usb-xhci ${JOYSTICK_CMD} -drive "format=raw,file=${REGLINUX_IMG}" ${SHARE_CMD}

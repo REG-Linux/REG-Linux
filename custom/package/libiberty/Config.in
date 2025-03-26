@@ -1,0 +1,8 @@
+config BR2_PACKAGE_LIBIBERTY
+	bool "libiberty"
+	depends on !BR2_nios2
+	depends on BR2_USE_WCHAR
+
+comment "libibertys needs a toolchain w/ wchar"
+	depends on !BR2_nios2
+	depends on !BR2_USE_WCHAR

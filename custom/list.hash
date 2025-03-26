@@ -4,6 +4,7 @@
 #   * a line of minus signs ('-') indicates a file that we remove from Buildroot external tree
 #   * a line of plus signs ('+') indicates a file that we add to the Buildroot external tree
 
+++++++++++++++++++++++++++++++++  package/libiberty/Config.in
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm-cmake/Config.in.host
