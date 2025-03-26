@@ -1,5 +1,5 @@
 diff --git a/package/Config.in b/package/Config.in
-index 1eb5e1e020..fc3aa34f9a 100644
+index 1eb5e1e020..f9f3219e39 100644
 --- a/package/Config.in
 +++ b/package/Config.in
 @@ -335,6 +335,8 @@ comment "Graphic applications"
@@ -11,3 +11,11 @@ index 1eb5e1e020..fc3aa34f9a 100644
  	source "package/spirv-tools/Config.in"
  	source "package/stellarium/Config.in"
  	source "package/sway/Config.in"
+@@ -2236,6 +2238,7 @@ menu "Other"
+ 	source "package/libgeos/Config.in"
+ 	source "package/libglib2/Config.in"
+ 	source "package/libglob/Config.in"
++	source "package/libiberty/Config.in"
+ 	source "package/libical/Config.in"
+ 	source "package/libite/Config.in"
+ 	source "package/libks/Config.in"

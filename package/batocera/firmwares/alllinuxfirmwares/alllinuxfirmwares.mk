@@ -9,35 +9,35 @@ ALLLINUXFIRMWARES_SOURCE = linux-firmware-$(ALLLINUXFIRMWARES_VERSION).tar.gz
 ALLLINUXFIRMWARES_SITE = https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot
 
 # exclude some dirs not required on batocera
-ALLLINUXFIRMWARES_REMOVE_DIRS = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(@D)/dpaa2 $(@D)/bnx2x $(@D)/cxgb4 $(@D)/mrvl/prestera
+ALLLINUXFIRMWARES_REMOVE_FILES = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(@D)/dpaa2 $(@D)/bnx2x $(@D)/cxgb4 $(@D)/mrvl/prestera
 
 ifneq ($(BR2_x86_64),y)
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/intel $(@D)/i915 $(@D)/nvidia $(@D)/radeon $(@D)/qat_* $(@D)/ql2* $(@D)/iwlwifi* $(@D)/qed $(@D)/amd*
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/intel $(@D)/i915 $(@D)/nvidia $(@D)/radeon $(@D)/qat_* $(@D)/ql2* $(@D)/iwlwifi* $(@D)/qed $(@D)/amd* $(@D)/xe/*
 else
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/brcm $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/ti $(@D)/b43 $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/s5p-* $(@D)/myri*
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/brcm $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ti $(@D)/b43 $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/s5p-* $(@D)/myri*
 endif
 
 ifeq ($(BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI)$(BR2_PACKAGE_EXTRALINUXFIRMWARES),y)
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/brcm
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/brcm
 endif
 
 # Remove qualcomm firmware if not building for snapdragon targets
 ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_ODIN)$(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
-    ALLLINUXFIRMWARES_REMOVE_DIRS += $(@D)/qcom
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/qcom
 endif
 
 define ALLLINUXFIRMWARES_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/lib/firmware
 
     # exclude some dirs not required on batocera
-    rm -rf $(ALLLINUXFIRMWARES_REMOVE_DIRS)
+    rm -rf $(ALLLINUXFIRMWARES_REMOVE_FILES)
 
     # -n is mandatory while some other packages provides firmwares too
     # this is not ideal, but i don't know how to tell to buildroot to install this package first (and not worry about all packages installing firmwares)
