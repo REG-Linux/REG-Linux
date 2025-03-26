@@ -1,18 +1,18 @@
 diff --git a/toolchain/toolchain-external/toolchain-external-custom/Config.in.options b/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
-index fcffeb6b77..2dc04747b3 100644
+index 2dc04747b3..d91efe1fc9 100644
 --- a/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
 +++ b/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
 @@ -166,8 +166,12 @@ choice
  	  If your toolchain uses headers newer than the latest version
  	  in the choice, then select the latest version.
  
-+config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_12
-+	bool "6.12.x or later"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
++config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_13
++	bool "6.13.x or later"
++	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
 +
- config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_11
--	bool "6.11.x or later"
-+	bool "6.11.x"
- 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11
+ config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_12
+-	bool "6.12.x or later"
++	bool "6.12.x
+ 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
  
- config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_10
+ config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_11

@@ -1,8 +1,8 @@
 diff --git a/package/rtl8192eu/rtl8192eu.hash b/package/rtl8192eu/rtl8192eu.hash
-index a8b7cb9358..fd8c75c3ed 100644
+index 250cd556b1..fd8c75c3ed 100644
 --- a/package/rtl8192eu/rtl8192eu.hash
 +++ b/package/rtl8192eu/rtl8192eu.hash
 @@ -1,2 +1,2 @@
  # Locally computed
--sha256  8da0f54bd9ae094b5f61fe3c4dd207b2df62b4286970e2828f7c5ce1146447fb  rtl8192eu-56f672a8b9572c743148f2e60068fd341d52d5a3.tar.gz
+-sha256  dbd565edc8d52a1429d8551795fb4da3ca44cf27867466010e0e6d00c86aef5c  rtl8192eu-6755ce9c15bbcb5dcffbca7f6f08e661ccdaacdb.tar.gz
 +sha256  2d977fff7c74d0dd24231898663e8ee5a70b02269b46771bb204b9014c0bba79  rtl8192eu-73f5c4359a6e9f680a533fb7140b169f002499cb.tar.gz

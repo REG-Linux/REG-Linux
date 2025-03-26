@@ -263,7 +263,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_TEGRA
 
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
 	bool "Gallium v3d driver"
-	depends on BR2_arm || BR2_aarch64 # batocera
+	depends on BR2_arm || BR2_aarch64 # reglinux
 	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4 # runtime
@@ -278,7 +278,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
 
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4
 	bool "Gallium vc4 driver"
-	depends on BR2_arm || BR2_aarch64 # batocera
+	depends on BR2_arm || BR2_aarch64 # reglinux
 	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 	select BR2_PACKAGE_LIBDRM_VC4
@@ -295,7 +295,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL
 	  virgl is the 3D acceleration backend for the virtio-gpu
 	  shipping with qemu.
 
-# batocera - add zink
+# reglinux - add zink
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ZINK
 	bool "Gallium zink driver"
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
@@ -307,7 +307,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ZINK
 	  The Zink driver emits Vulkan API calls instead of targeting a specific GPU architecture.
 	  This can be used to get full desktop OpenGL support on devices that only support Vulkan.
 
-# batocera - add d3d12
+# reglinux - add d3d12
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_D3D12
 	bool "Gallium Direct3D 12 driver"
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
@@ -370,7 +370,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
 	help
 	  Vulkan swrast driver.
 
-# batocera
+# reglinux
 config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_HASWELL
 	bool "Vulkan Haswell driver"
 	depends on BR2_i386 || BR2_x86_64
@@ -388,7 +388,7 @@ comment "intel haswell vulkan needs a glibc toolchain w/ headers >= 3.17"
 	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17 || \
 		!BR2_TOOLCHAIN_USES_GLIBC
 
-# batocera
+# reglinux
 config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_AMD
 	bool "Vulkan AMD Radeon driver"
 	depends on BR2_i386 || BR2_x86_64
@@ -498,6 +498,12 @@ config BR2_PACKAGE_MESA3D_VIDEO_CODEC_VP9DEC
 	select BR2_PACKAGE_MESA3D_VIDEO_CODEC
 	help
 	  VP9 hardware decoding on supported hardware.
+
+config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_VIRTIO
+	bool "Vulkan VirtIO driver (Venus)"
+	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
+	help
+	  Vulkan VirtIO (venus) driver.
 
 comment "Off-screen Rendering"
 
