@@ -1,3 +1,0 @@
-config BR2_PACKAGE_BATOCERA_BACKGLASS
-	bool "batocera-backglass"
-	select BR2_PACKAGE_PYWEBVIEW
