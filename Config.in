@@ -172,6 +172,7 @@ endmenu
 endmenu
 
 menu "Ports"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/augustus/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/cannonball/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/cdogs/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/cgenius/Config.in"
