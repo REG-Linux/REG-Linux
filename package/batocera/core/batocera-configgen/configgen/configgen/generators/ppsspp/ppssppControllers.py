@@ -117,7 +117,7 @@ ppssppMapping =  { 'a' :             {'button': 'Circle'},
                    'down' :          {'hat': 'Down',  'axis': 'Down',  'button': 'Down'},
                    'left' :          {'hat': 'Left',  'axis': 'Left',  'button': 'Left'},
                    'right' :         {'hat': 'Right', 'axis': 'Right', 'button': 'Right'},
-                   # Need to add pseudo inputs as PPSSPP doesn't manually invert axises, and these are not referenced in es_input.cfg
+                   # Need to add pseudo inputs as PPSSPP doesn't manually invert axises
                    'joystick1right' :{'axis': 'An.Right'},
                    'joystick1down' : {'axis': 'An.Down'},
                    'joystick2right' :{'axis': 'RightAn.Right'},
