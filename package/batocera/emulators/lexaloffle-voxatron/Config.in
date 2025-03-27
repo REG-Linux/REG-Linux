@@ -1,4 +1,0 @@
-config BR2_PACKAGE_LEXALOFFLE_VOXATRON
-        bool "lexaloffle-voxatron"
-        help
-          Support for the officiel Voxatron engine

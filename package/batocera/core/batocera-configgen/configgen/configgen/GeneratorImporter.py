@@ -171,10 +171,6 @@ def getGenerator(emulator):
         from generators.ecwolf.ecwolfGenerator import ECWolfGenerator
         return ECWolfGenerator()
 
-    if emulator == 'lexaloffle':
-        from generators.lexaloffle.lexaloffleGenerator import LexaloffleGenerator
-        return LexaloffleGenerator()
-
     if emulator == 'model2emu':
         from generators.model2emu.model2emuGenerator import Model2EmuGenerator
         return Model2EmuGenerator()
