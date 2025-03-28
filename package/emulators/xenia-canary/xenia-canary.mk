@@ -13,7 +13,7 @@ XENIA_CANARY_LICENSE_FILE = LICENSE
 
 XENIA_CANARY_DEPENDENCIES = python-toml host-llvm host-clang libgtk3 sdl2 host-sdl2
 # Extra for WIP posix stack walker
-XENIA_CANARY_DEPENDENCIES += libunwind libiberty
+XENIA_CANARY_DEPENDENCIES += libunwind binutils
 
 # Hack for d3d12 WIP
 #XENIA_CANARY_DEPENDENCIES += vkd3d-proton dxvk pevents
