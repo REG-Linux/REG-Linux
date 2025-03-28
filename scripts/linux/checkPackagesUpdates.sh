@@ -163,8 +163,6 @@ PACKAGES_EMULATORS="86Box
                     hypseus-singe
                     ikemen
                     izapple2
-                    lexaloffle-pico8
-                    lexaloffle-voxatron
                     lightspark
                     mame
                     mednafen
