@@ -1,8 +1,22 @@
 diff --git a/package/sdl2/Config.in b/package/sdl2/Config.in
-index 7c8258fe73..7bee38d293 100644
+index f1c22e4f80..7bee38d293 100644
 --- a/package/sdl2/Config.in
 +++ b/package/sdl2/Config.in
-@@ -45,6 +45,16 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
+@@ -11,6 +11,13 @@ config BR2_PACKAGE_SDL2
+ 
+ if BR2_PACKAGE_SDL2
+ 
++config BR2_PACKAGE_SDL2_DIRECTFB
++	bool "DirectFB video driver"
++	depends on BR2_PACKAGE_DIRECTFB
++
++comment "DirectFB video driver needs directfb"
++	depends on !BR2_PACKAGE_DIRECTFB
++
+ config BR2_PACKAGE_SDL2_X11
+ 	bool "X11 video driver"
+ 	depends on BR2_PACKAGE_XORG7
+@@ -38,6 +45,16 @@ comment "KMS/DRM video driver needs a GBM provider, and OpenGL or OpenGLES+EGL"
  		!BR2_PACKAGE_HAS_LIBEGL || \
  		!(BR2_PACKAGE_SDL2_OPENGL || BR2_PACKAGE_SDL2_OPENGLES)
  

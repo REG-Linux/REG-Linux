@@ -14,6 +14,7 @@ WLROOTS_DEPENDENCIES = \
 	host-pkgconf \
 	host-wayland \
 	hwdata \
+	libdisplay-info \
 	libinput \
 	libxkbcommon \
 	libegl \
@@ -21,9 +22,6 @@ WLROOTS_DEPENDENCIES = \
 	pixman \
 	seatd \
 	udev \
-	hwdata \
-	libdisplay-info \
-	libliftoff \
 	wayland \
 	wayland-protocols
 
@@ -48,7 +46,7 @@ else
 WLROOTS_CONF_OPTS += -Dxwayland=disabled
 endif
 
-# add vulkan build dependency
+# reglinux - add vulkan build dependency
 ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER),yy)
     WLROOTS_DEPENDENCIES +=  vulkan-headers vulkan-loader host-glslang
 endif

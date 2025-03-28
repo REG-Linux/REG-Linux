@@ -1,22 +1,21 @@
 diff --git a/package/sdl_sound/sdl_sound.mk b/package/sdl_sound/sdl_sound.mk
-index c6028e7910..9ac4425d96 100644
+index c6028e7910..c203af1d76 100644
 --- a/package/sdl_sound/sdl_sound.mk
 +++ b/package/sdl_sound/sdl_sound.mk
-@@ -10,7 +10,8 @@ SDL_SOUND_SITE = http://icculus.org/SDL_sound/downloads
+@@ -10,7 +10,7 @@ SDL_SOUND_SITE = http://icculus.org/SDL_sound/downloads
  SDL_SOUND_LICENSE = LGPL-2.1+
  SDL_SOUND_LICENSE_FILES = COPYING
  SDL_SOUND_INSTALL_STAGING = YES
 -SDL_SOUND_DEPENDENCIES = sdl
-+# batocera (replacing by sdl2)
-+SDL_SOUND_DEPENDENCIES = sdl2
++SDL_SOUND_DEPENDENCIES = sdl2 # reglinux
  SDL_SOUND_CONF_OPTS = \
  	--with-sdl-prefix=$(STAGING_DIR)/usr \
  	--with-sdl-exec-prefix=$(STAGING_DIR)/usr \
-@@ -63,6 +64,14 @@ else
+@@ -63,6 +63,14 @@ else
  SDL_SOUND_CONF_OPTS += --disable-mmx
  endif
  
-+# batocera
++# reglinux
 +define SDL_SOUND_PATCH_CONFIGURE
 +	(cd $(@D); \
 +	sed -ie 's/sdl-config/sdl2-config/g' configure \

@@ -1,27 +1,8 @@
 diff --git a/package/wlroots/wlroots.mk b/package/wlroots/wlroots.mk
-index fdd2fb8250..dd8c3a3e36 100644
+index 81f76fcdc7..fc27a5711b 100644
 --- a/package/wlroots/wlroots.mk
 +++ b/package/wlroots/wlroots.mk
-@@ -4,7 +4,7 @@
- #
- ################################################################################
- 
--WLROOTS_VERSION = 0.16.2
-+WLROOTS_VERSION = 0.18.2
- WLROOTS_SITE = https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/$(WLROOTS_VERSION)/downloads
- WLROOTS_LICENSE = MIT
- WLROOTS_LICENSE_FILES = LICENSE
-@@ -21,6 +21,9 @@ WLROOTS_DEPENDENCIES = \
- 	pixman \
- 	seatd \
- 	udev \
-+	hwdata \
-+	libdisplay-info \
-+	libliftoff \
- 	wayland \
- 	wayland-protocols
- 
-@@ -29,6 +32,10 @@ WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
+@@ -30,6 +30,10 @@ WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
  WLROOTS_RENDERERS = gles2
  WLROOTS_BACKENDS = libinput drm
  
@@ -32,12 +13,12 @@ index fdd2fb8250..dd8c3a3e36 100644
  ifeq ($(BR2_PACKAGE_WLROOTS_X11),y)
  WLROOTS_BACKENDS += x11
  WLROOTS_DEPENDENCIES += libxcb xcb-util-wm xcb-util-renderutil xlib_libX11
-@@ -41,7 +48,12 @@ else
+@@ -42,7 +46,12 @@ else
  WLROOTS_CONF_OPTS += -Dxwayland=disabled
  endif
  
 -ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER)$(BR2_PACKAGE_VULKAN_LOADER),yy)
-+# add vulkan build dependency
++# reglinux - add vulkan build dependency
 +ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER),yy)
 +    WLROOTS_DEPENDENCIES +=  vulkan-headers vulkan-loader host-glslang
 +endif

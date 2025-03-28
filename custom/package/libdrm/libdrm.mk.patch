@@ -1,5 +1,5 @@
 diff --git a/package/libdrm/libdrm.mk b/package/libdrm/libdrm.mk
-index fcf7f17e78..894e2d8a6f 100644
+index 9d463ca01e..d2851be4f4 100644
 --- a/package/libdrm/libdrm.mk
 +++ b/package/libdrm/libdrm.mk
 @@ -117,3 +117,8 @@ LIBDRM_CONF_OPTS += -Dtests=false

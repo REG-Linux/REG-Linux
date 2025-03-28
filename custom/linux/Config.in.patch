@@ -1,5 +1,5 @@
 diff --git a/linux/Config.in b/linux/Config.in
-index 2f37a2e418..ae374a90e7 100644
+index dc6c5d384f..4766bc8fb3 100644
 --- a/linux/Config.in
 +++ b/linux/Config.in
 @@ -4,6 +4,10 @@ config BR2_LINUX_KERNEL
@@ -13,28 +13,12 @@ index 2f37a2e418..ae374a90e7 100644
  	help
  	  Enable this option if you want to build a Linux kernel for
  	  your embedded device
-@@ -28,13 +32,8 @@ choice
- 	prompt "Kernel version"
- 
- config BR2_LINUX_KERNEL_LATEST_VERSION
--	bool "Latest version (6.11)"
--	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11 if BR2_KERNEL_HEADERS_AS_KERNEL
--	# mips always generates an ITB image
--	select BR2_PACKAGE_HOST_UBOOT_TOOLS if BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
--	select BR2_PACKAGE_HOST_UBOOT_TOOLS_FIT_SUPPORT if BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
--	# nios2 always generates a U-Boot image
--	select BR2_PACKAGE_HOST_UBOOT_TOOLS if BR2_nios2
-+	bool "Latest version (6.12)"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12 if BR2_KERNEL_HEADERS_AS_KERNEL
- 
- config BR2_LINUX_KERNEL_LATEST_CIP_VERSION
- 	bool "Latest CIP SLTS version (5.10.162-cip24)"
-@@ -139,7 +138,7 @@ config BR2_LINUX_KERNEL_CUSTOM_REPO_GIT_SUBMODULES
+@@ -137,7 +141,7 @@ config BR2_LINUX_KERNEL_CUSTOM_REPO_GIT_SUBMODULES
  
  config BR2_LINUX_KERNEL_VERSION
  	string
--	default "6.11.11" if BR2_LINUX_KERNEL_LATEST_VERSION
-+	default "6.12.16" if BR2_LINUX_KERNEL_LATEST_VERSION
+-	default "6.12.19" if BR2_LINUX_KERNEL_LATEST_VERSION
++	default "6.12.20" if BR2_LINUX_KERNEL_LATEST_VERSION
  	default "5.10.162-cip24" if BR2_LINUX_KERNEL_LATEST_CIP_VERSION
  	default "5.10.162-cip24-rt10" if BR2_LINUX_KERNEL_LATEST_CIP_RT_VERSION
  	default BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE \
