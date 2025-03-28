@@ -1,5 +1,5 @@
 diff --git a/toolchain/toolchain-external/toolchain-external-custom/Config.in.options b/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
-index 2dc04747b3..d91efe1fc9 100644
+index 2dc04747b3..e1ecf06e4a 100644
 --- a/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
 +++ b/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
 @@ -166,8 +166,12 @@ choice
@@ -12,7 +12,7 @@ index 2dc04747b3..d91efe1fc9 100644
 +
  config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_12
 -	bool "6.12.x or later"
-+	bool "6.12.x
++	bool "6.12.x"
  	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
  
  config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_11
