@@ -87,6 +87,11 @@ c2df51f70ba99c291a3e795362431992  package/pigpio/pigpio.mk
 8b18ad0ab98ce546bdbda9ab22ce119a  package/python-gpiozero/Config.in
 86f2543a00ed51e4b14061b724eb5751  package/python-numpy/Config.in
 60dc27c7f2abf2cce7dcd7c73ae723f0  package/qemu/qemu.mk
+3dd7dbfc51b31a13584fdf94b362cdf0  package/qt6/Config.in
+d024602ae06a9c3edba4ce0ce7a8a22a  package/qt6/qt6.mk
+7b67beea23da21dc43ea0b47f433c6b8  package/qt6/qt6base/Config.in
+b366b668060124229f3e67a946cb33eb  package/qt6/qt6base/qt6base.hash
+a5d409a9f35c54a352647e40f24f1581  package/qt6/qt6base/qt6base.mk
 a9d1420cc9734b65cbc95471f32631da  package/rockchip-rkbin/rockchip-rkbin.hash
 877a66c23c5a1df8e186f44fa4ff4367  package/rockchip-rkbin/rockchip-rkbin.mk
 b69d8b1eb8ab76b368eb9b6a6b9caee4  package/rpi-firmware/rpi-firmware.hash
