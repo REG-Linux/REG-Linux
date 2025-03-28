@@ -459,7 +459,7 @@ def generateHotkeys(playersControllers):
 
 def get_AltMapping(system, nplayer, anyMapping):
     mapping = anyMapping.copy()   
-    # Fixes default gamecube style controller mapping for ES from es_input (gc A confirm/gc B cancel)
+    # Fixes default gamecube style controller mapping for ES (gc A confirm/gc B cancel)
     if system.isOptSet(f"dolphin_port_{nplayer}_type") and system.config[f'dolphin_port_{nplayer}_type'] == '6b':
         mapping['a'] = 'Buttons/B'
         mapping['b'] = 'Buttons/A'
