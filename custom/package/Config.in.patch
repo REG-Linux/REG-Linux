@@ -1,12 +1,12 @@
 diff --git a/package/Config.in b/package/Config.in
-index 1eb5e1e020..f9f3219e39 100644
+index 4a81a62ec4..15d5eb1f89 100644
 --- a/package/Config.in
 +++ b/package/Config.in
-@@ -335,6 +335,8 @@ comment "Graphic applications"
+@@ -331,6 +331,8 @@ comment "Graphic applications"
  	source "package/pngquant/Config.in"
  	source "package/qt5cinex/Config.in"
  	source "package/rrdtool/Config.in"
-+	# REG add spirv-llvm-translator
++	# reglinux - add spirv-llvm-translator
 +	source "package/spirv-llvm-translator/Config.in"
  	source "package/spirv-tools/Config.in"
  	source "package/stellarium/Config.in"

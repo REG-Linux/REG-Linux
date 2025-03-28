@@ -1,5 +1,5 @@
 diff --git a/package/cmake/cmake.mk b/package/cmake/cmake.mk
-index 0c5d46c23d..fd8e90ab0b 100644
+index 6a1b6ae7ea..2b37470137 100644
 --- a/package/cmake/cmake.mk
 +++ b/package/cmake/cmake.mk
 @@ -61,7 +61,7 @@ define HOST_CMAKE_CONFIGURE_CMDS
