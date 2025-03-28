@@ -1,0 +1,12 @@
+config BR2_PACKAGE_BSTONE
+	bool "bstone"
+	select BR2_PACKAGE_SDL2
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	 Unofficial source port for Blake Stone series
+	 (Aliens Of Gold and Planet Strike).
+
+	  https://github.com/bibendovsky/bstone
+
+comment "BR2_PACKAGE_BSTONE needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
