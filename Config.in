@@ -220,7 +220,6 @@ endmenu
 
 menu "Libraries"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/appstream/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/cpuinfo/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/dxvk/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/dxvk-nvapi/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/faudio/Config.in"
@@ -269,7 +268,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/lgogdownloader/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/re2c/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/vkbasalt/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/wlr-randr/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/wsdd-native/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/xxd/Config.in"
 endmenu

@@ -1,8 +1,8 @@
 diff --git a/package/vulkan-tools/vulkan-tools.mk b/package/vulkan-tools/vulkan-tools.mk
-index 68f7c1c04d..3bd55d96d5 100644
+index 9f5bf46b79..3bd55d96d5 100644
 --- a/package/vulkan-tools/vulkan-tools.mk
 +++ b/package/vulkan-tools/vulkan-tools.mk
-@@ -3,15 +3,16 @@
+@@ -3,22 +3,29 @@
  # vulkan-tools
  #
  ################################################################################
@@ -23,3 +23,18 @@ index 68f7c1c04d..3bd55d96d5 100644
  
  VULKAN_TOOLS_CONF_OPTS += \
  	-DBUILD_CUBE=OFF \
+ 	-DBUILD_ICD=OFF \
+ 	-DBUILD_VULKANINFO=ON \
+-	-DINSTALL_ICD=OFF \
+-	-DBUILD_WSI_DIRECTFB_SUPPORT=OFF
++	-DINSTALL_ICD=OFF
++
++ifeq ($(BR2_PACKAGE_DIRECTFB),y)
++VULKAN_TOOLS_DEPENDENCIES += directfb
++VULKAN_TOOLS_CONF_OPTS += -DBUILD_WSI_DIRECTFB_SUPPORT=ON
++else
++VULKAN_TOOLS_CONF_OPTS += -DBUILD_WSI_DIRECTFB_SUPPORT=OFF
++endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBXCB),y)
+ VULKAN_TOOLS_DEPENDENCIES += libxcb

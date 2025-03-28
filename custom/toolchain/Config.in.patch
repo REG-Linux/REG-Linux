@@ -1,15 +1,9 @@
 diff --git a/toolchain/Config.in b/toolchain/Config.in
-index c2522aca7f..67880485b5 100644
+index 94723da141..2e4b6e4818 100644
 --- a/toolchain/Config.in
 +++ b/toolchain/Config.in
-@@ -660,8 +660,16 @@ config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_10
- config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11
- 	bool
- 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_10
-+
-+config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
-+	bool
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11
+@@ -647,6 +647,10 @@ config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
+ 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11
  	select BR2_TOOLCHAIN_HEADERS_LATEST
  
 +config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
@@ -19,12 +13,11 @@ index c2522aca7f..67880485b5 100644
  # This should be selected by the latest version, above, to indicate that
  # Buildroot does not know of more recent headers than the ones selected.
  # This allows using toolchains with headers more recent than Buildroot
-@@ -673,6 +681,8 @@ config BR2_TOOLCHAIN_HEADERS_LATEST
+@@ -658,6 +662,7 @@ config BR2_TOOLCHAIN_HEADERS_LATEST
  # stops affecting a value on the first matching default.
  config BR2_TOOLCHAIN_HEADERS_AT_LEAST
  	string
 +	default "6.13" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
-+	default "6.12" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
+ 	default "6.12" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
  	default "6.11" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_11
  	default "6.10" if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_10
- 	default "6.9"  if BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_9

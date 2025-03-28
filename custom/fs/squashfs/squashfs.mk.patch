@@ -1,5 +1,5 @@
 diff --git a/fs/squashfs/squashfs.mk b/fs/squashfs/squashfs.mk
-index cf083663c1..518abd566a 100644
+index 3b9d0efbbe..56e63dd0e5 100644
 --- a/fs/squashfs/squashfs.mk
 +++ b/fs/squashfs/squashfs.mk
 @@ -8,16 +8,14 @@ ROOTFS_SQUASHFS_DEPENDENCIES = host-squashfs
@@ -21,7 +21,7 @@ index cf083663c1..518abd566a 100644
  else ifeq ($(BR2_TARGET_ROOTFS_SQUASHFS4_LZO),y)
  ROOTFS_SQUASHFS_ARGS += -comp lzo
  else ifeq ($(BR2_TARGET_ROOTFS_SQUASHFS4_LZMA),y)
-@@ -30,7 +28,18 @@ else
+@@ -32,7 +30,18 @@ else
  ROOTFS_SQUASHFS_ARGS += -comp gzip
  endif
  

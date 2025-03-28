@@ -1,9 +1,9 @@
 ---
- drivers/input/joystick/xpad.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/input/joystick/xpad.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/drivers/input/joystick/xpad.c b/drivers/input/joystick/xpad.c
-index 22ea58bf7..18a60f84c 100644
+index a6c795101..d107bfba7 100644
 --- a/drivers/input/joystick/xpad.c
 +++ b/drivers/input/joystick/xpad.c
 @@ -83,6 +83,7 @@
@@ -14,23 +14,15 @@ index 22ea58bf7..18a60f84c 100644
  
  #define DANCEPAD_MAP_CONFIG	(MAP_DPAD_TO_BUTTONS |			\
  				MAP_TRIGGERS_TO_BUTTONS | MAP_STICKS_TO_NULL)
-@@ -142,6 +143,7 @@ static const struct xpad_device {
- 	{ 0x044f, 0x0f07, "Thrustmaster, Inc. Controller", 0, XTYPE_XBOX },
+@@ -143,6 +144,7 @@ static const struct xpad_device {
+ 	{ 0x044f, 0xd01e, "ThrustMaster, Inc. ESWAP X 2 ELDEN RING EDITION", 0, XTYPE_XBOXONE },
  	{ 0x044f, 0x0f10, "Thrustmaster Modena GT Wheel", 0, XTYPE_XBOX },
  	{ 0x044f, 0xb326, "Thrustmaster Gamepad GP XID", 0, XTYPE_XBOX360 },
 +	{ 0x044f, 0xb671, "ThrustMaster, Inc. Ferrari 458 Spider", MAP_THRUSTMASTER_WHEEL, XTYPE_XBOXONE },
  	{ 0x045e, 0x0202, "Microsoft X-Box pad v1 (US)", 0, XTYPE_XBOX },
  	{ 0x045e, 0x0285, "Microsoft X-Box pad (Japan)", 0, XTYPE_XBOX },
  	{ 0x045e, 0x0287, "Microsoft Xbox Controller S", 0, XTYPE_XBOX },
-@@ -483,6 +485,7 @@ static const struct usb_device_id xpad_table[] = {
- 	XPAD_XBOX360_VENDOR(0x03f0),		/* HP HyperX Xbox 360 controllers */
- 	XPAD_XBOXONE_VENDOR(0x03f0),		/* HP HyperX Xbox One controllers */
- 	XPAD_XBOX360_VENDOR(0x044f),		/* Thrustmaster Xbox 360 controllers */
-+	XPAD_XBOXONE_VENDOR(0x044f),		/* Thrustmaster Xbox One controllers */
- 	XPAD_XBOX360_VENDOR(0x045e),		/* Microsoft Xbox 360 controllers */
- 	XPAD_XBOXONE_VENDOR(0x045e),		/* Microsoft Xbox One controllers */
- 	XPAD_XBOX360_VENDOR(0x046d),		/* Logitech Xbox 360-style controllers */
-@@ -1068,6 +1071,11 @@ static void xpadone_process_packet(struct usb_xpad *xpad, u16 cmd, unsigned char
+@@ -1100,6 +1102,11 @@ static void xpadone_process_packet(struct usb_xpad *xpad, u16 cmd, unsigned char
  		input_report_key(dev, BTN_THUMBR, data[5] & BIT(7));
  
  		if (!(xpad->mapping & MAP_STICKS_TO_NULL)) {
@@ -42,7 +34,7 @@ index 22ea58bf7..18a60f84c 100644
  			/* left stick */
  			input_report_abs(dev, ABS_X,
  					(__s16) le16_to_cpup((__le16 *)(data + 10)));
-@@ -1079,6 +1087,7 @@ static void xpadone_process_packet(struct usb_xpad *xpad, u16 cmd, unsigned char
+@@ -1111,6 +1118,7 @@ static void xpadone_process_packet(struct usb_xpad *xpad, u16 cmd, unsigned char
  					(__s16) le16_to_cpup((__le16 *)(data + 14)));
  			input_report_abs(dev, ABS_RY,
  					~(__s16) le16_to_cpup((__le16 *)(data + 16)));
@@ -50,7 +42,7 @@ index 22ea58bf7..18a60f84c 100644
  		}
  
  		/* triggers left/right */
-@@ -1087,6 +1096,11 @@ static void xpadone_process_packet(struct usb_xpad *xpad, u16 cmd, unsigned char
+@@ -1119,6 +1127,11 @@ static void xpadone_process_packet(struct usb_xpad *xpad, u16 cmd, unsigned char
  					(__u16) le16_to_cpup((__le16 *)(data + 6)));
  			input_report_key(dev, BTN_TR2,
  					(__u16) le16_to_cpup((__le16 *)(data + 8)));
@@ -63,4 +55,4 @@ index 22ea58bf7..18a60f84c 100644
  			input_report_abs(dev, ABS_Z,
  					(__u16) le16_to_cpup((__le16 *)(data + 6)));
 -- 
-2.47.1
+2.49.0
