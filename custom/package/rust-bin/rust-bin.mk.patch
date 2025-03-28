@@ -1,5 +1,5 @@
 diff --git a/package/rust-bin/rust-bin.mk b/package/rust-bin/rust-bin.mk
-index c14ca7f88e2..276d720fcd0 100644
+index c14ca7f88e..276d720fcd 100644
 --- a/package/rust-bin/rust-bin.mk
 +++ b/package/rust-bin/rust-bin.mk
 @@ -6,7 +6,7 @@

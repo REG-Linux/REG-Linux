@@ -1,8 +1,8 @@
 diff --git a/package/util-linux/util-linux.mk b/package/util-linux/util-linux.mk
-index 7a143290eb..70237cdcfe 100644
+index ed30c0b107..65a737df93 100644
 --- a/package/util-linux/util-linux.mk
 +++ b/package/util-linux/util-linux.mk
-@@ -311,14 +311,12 @@ endef
+@@ -317,14 +317,12 @@ endef
  UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_INSTALL_PAMFILES
  endif
  

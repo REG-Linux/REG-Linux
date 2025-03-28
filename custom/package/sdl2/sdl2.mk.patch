@@ -1,12 +1,12 @@
 diff --git a/package/sdl2/sdl2.mk b/package/sdl2/sdl2.mk
-index 9eee5c7123..727963a714 100644
+index 67a4978e22..727963a714 100644
 --- a/package/sdl2/sdl2.mk
 +++ b/package/sdl2/sdl2.mk
 @@ -4,7 +4,8 @@
  #
  ################################################################################
  
--SDL2_VERSION = 2.30.9
+-SDL2_VERSION = 2.30.12
 +# reglinux - bump
 +SDL2_VERSION = 2.32.2
  SDL2_SOURCE = SDL2-$(SDL2_VERSION).tar.gz
@@ -20,7 +20,7 @@ index 9eee5c7123..727963a714 100644
  SDL2_CONF_OPTS += \
  	--disable-rpath \
  	--disable-arts \
-@@ -23,9 +25,31 @@ SDL2_CONF_OPTS += \
+@@ -23,11 +25,32 @@ SDL2_CONF_OPTS += \
  	--disable-video-vivante \
  	--disable-video-cocoa \
  	--disable-video-metal \
@@ -51,9 +51,11 @@ index 9eee5c7123..727963a714 100644
 +	--disable-video-wayland \
 +	--disable-video-x11 \
  	--disable-video-vulkan \
+-	--disable-video-directfb \
  	--disable-ime \
  	--disable-ibus \
-@@ -49,11 +73,50 @@ define SDL2_FIX_SDL2_CONFIG_CMAKE
+ 	--disable-fcitx \
+@@ -50,11 +73,50 @@ define SDL2_FIX_SDL2_CONFIG_CMAKE
  	$(SED) 's%"/usr"%$${PACKAGE_PREFIX_DIR}%' \
  		$(STAGING_DIR)/usr/lib/cmake/SDL2/sdl2-config.cmake
  endef
@@ -104,7 +106,7 @@ index 9eee5c7123..727963a714 100644
  ifeq ($(BR2_ARM_INSTRUCTIONS_THUMB),y)
  SDL2_CONF_ENV += CFLAGS="$(TARGET_CFLAGS) -marm"
  endif
-@@ -71,6 +134,11 @@ else
+@@ -72,19 +134,27 @@ else
  SDL2_CONF_OPTS += --disable-sse
  endif
  
@@ -116,20 +118,27 @@ index 9eee5c7123..727963a714 100644
  ifeq ($(BR2_X86_CPU_HAS_3DNOW),y)
  SDL2_CONF_OPTS += --enable-3dnow
  else
-@@ -85,12 +153,7 @@ else
- SDL2_CONF_OPTS += --disable-video-directfb
+ SDL2_CONF_OPTS += --disable-3dnow
  endif
  
 -ifeq ($(BR2_PACKAGE_SDL2_OPENGLES)$(BR2_PACKAGE_RPI_USERLAND),yy)
 -SDL2_DEPENDENCIES += rpi-userland
 -SDL2_CONF_OPTS += --enable-video-rpi
--else
- SDL2_CONF_OPTS += --disable-video-rpi
--endif
++ifeq ($(BR2_PACKAGE_SDL2_DIRECTFB),y)
++SDL2_DEPENDENCIES += directfb
++SDL2_CONF_OPTS += --enable-video-directfb
++SDL2_CONF_ENV += ac_cv_path_DIRECTFBCONFIG=$(STAGING_DIR)/usr/bin/directfb-config
+ else
+-SDL2_CONF_OPTS += --disable-video-rpi
++SDL2_CONF_OPTS += --disable-video-directfb
+ endif
  
++SDL2_CONF_OPTS += --disable-video-rpi
++
  # x-includes and x-libraries must be set for cross-compiling
  # By default x_includes and x_libraries contains unsafe paths.
-@@ -165,10 +228,32 @@ SDL2_CONF_OPTS += --disable-alsa
+ # (/usr/X11R6/include and /usr/X11R6/lib)
+@@ -158,10 +228,32 @@ SDL2_CONF_OPTS += --disable-alsa
  endif
  
  ifeq ($(BR2_PACKAGE_SDL2_KMSDRM),y)

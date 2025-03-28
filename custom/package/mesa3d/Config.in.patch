@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/Config.in b/package/mesa3d/Config.in
-index 7761b0a650..7bbc7792c2 100644
+index 0412998214..87394a922e 100644
 --- a/package/mesa3d/Config.in
 +++ b/package/mesa3d/Config.in
 @@ -7,8 +7,14 @@ menuconfig BR2_PACKAGE_MESA3D
@@ -47,7 +47,7 @@ index 7761b0a650..7bbc7792c2 100644
  	help
  	  Mesa driver for Freedreno GPUs.
  
-@@ -137,6 +149,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_LIMA
+@@ -137,21 +149,10 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_LIMA
  	bool "Gallium lima driver"
  	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
@@ -55,7 +55,22 @@ index 7761b0a650..7bbc7792c2 100644
  	help
  	  Mesa driver for ARM Mali Utgard GPUs.
  
-@@ -153,9 +166,23 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST
+-config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_KMSRO
+-	bool "Gallium kmsro drivers"
+-	depends on BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ETNAVIV \
+-		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_FREEDRENO \
+-		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_LIMA \
+-		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST \
+-		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D \
+-		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4
+-	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
+-	help
+-	  Mesa drivers for kernel mode-setting render-only devices
+-
+ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_NOUVEAU
+ 	bool "Gallium nouveau driver"
+ 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
+@@ -165,9 +166,23 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST
  	bool "Gallium panfrost driver"
  	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
@@ -79,7 +94,7 @@ index 7761b0a650..7bbc7792c2 100644
  config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_R300
  	bool "Gallium Radeon R300 driver"
  	depends on BR2_i386 || BR2_x86_64
-@@ -219,6 +246,12 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_SWRAST
+@@ -231,6 +246,12 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_SWRAST
  	  This is a software opengl implementation using the Gallium3D
  	  infrastructure.
  
@@ -92,41 +107,45 @@ index 7761b0a650..7bbc7792c2 100644
  config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_TEGRA
  	bool "Gallium tegra driver"
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
-@@ -230,7 +263,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_TEGRA
+@@ -242,7 +263,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_TEGRA
  
  config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
  	bool "Gallium v3d driver"
 -	depends on (BR2_arm && BR2_ARM_CPU_HAS_NEON) || BR2_aarch64
-+	depends on BR2_arm || BR2_aarch64 # batocera
++	depends on BR2_arm || BR2_aarch64 # reglinux
  	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4 # runtime
-@@ -245,7 +278,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
+@@ -257,7 +278,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
  
  config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4
  	bool "Gallium vc4 driver"
 -	depends on (BR2_arm && BR2_ARM_CPU_HAS_NEON) || BR2_aarch64
-+	depends on BR2_arm || BR2_aarch64 # batocera
++	depends on BR2_arm || BR2_aarch64 # reglinux
  	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
  	select BR2_PACKAGE_LIBDRM_VC4
-@@ -262,6 +295,29 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL
+@@ -274,15 +295,28 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL
  	  virgl is the 3D acceleration backend for the virtio-gpu
  	  shipping with qemu.
  
-+# batocera - add zink
-+config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ZINK
-+	bool "Gallium zink driver"
-+	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
++# reglinux - add zink
+ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ZINK
+ 	bool "Gallium zink driver"
+ 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 +	select BR2_PACKAGE_MESA3D_OPENGL_ES
 +	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 +	select BR2_PACKAGE_MESA3D_OPENGL_GLX        if BR2_PACKAGE_XORG7
-+	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
-+	help
+ 	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
+-	select BR2_PACKAGE_VULKAN_LOADER
+ 	help
+-	  Zink is a Gallium driver that emits Vulkan API calls,
+-	  providing OpenGL support on devices that only support
+-	  Vulkan.
 +	  The Zink driver emits Vulkan API calls instead of targeting a specific GPU architecture.
 +	  This can be used to get full desktop OpenGL support on devices that only support Vulkan.
 +
-+# batocera - add d3d12
++# reglinux - add d3d12
 +config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_D3D12
 +	bool "Gallium Direct3D 12 driver"
 +	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
@@ -136,11 +155,10 @@ index 7761b0a650..7bbc7792c2 100644
 +	help
 +	  The D3D12 driver emits D3D12 API calls instead of targeting a specific GPU architecture.
 +	  This can be used to get full desktop OpenGL support on Windows devices through WSL.
-+
+ 
  config BR2_PACKAGE_MESA3D_VDPAU
  	bool "Gallium VDPAU state tracker"
- 	depends on BR2_PACKAGE_XORG7
-@@ -298,7 +354,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL
+@@ -320,7 +354,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL
  	depends on BR2_TOOLCHAIN_USES_GLIBC # ifunc, static_assert
  	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
  	help
@@ -149,11 +167,11 @@ index 7761b0a650..7bbc7792c2 100644
  
  comment "intel vulkan needs a glibc toolchain w/ headers >= 3.17"
  	depends on BR2_i386 || BR2_x86_64
-@@ -314,6 +370,135 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
+@@ -336,6 +370,135 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
  	help
  	  Vulkan swrast driver.
  
-+# batocera
++# reglinux
 +config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_HASWELL
 +	bool "Vulkan Haswell driver"
 +	depends on BR2_i386 || BR2_x86_64
@@ -171,7 +189,7 @@ index 7761b0a650..7bbc7792c2 100644
 +	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17 || \
 +		!BR2_TOOLCHAIN_USES_GLIBC
 +
-+# batocera
++# reglinux
 +config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_AMD
 +	bool "Vulkan AMD Radeon driver"
 +	depends on BR2_i386 || BR2_x86_64
@@ -282,6 +300,6 @@ index 7761b0a650..7bbc7792c2 100644
 +	help
 +	  VP9 hardware decoding on supported hardware.
 +
- comment "Off-screen Rendering"
- 
- config BR2_PACKAGE_MESA3D_OSMESA_GALLIUM
+ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_VIRTIO
+ 	bool "Vulkan VirtIO driver (Venus)"
+ 	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER

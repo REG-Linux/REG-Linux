@@ -1,6 +1,5 @@
 config BR2_PACKAGE_SDL_SOUND
 	bool "SDL_sound"
-	# batocera
 	depends on BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
 	help
