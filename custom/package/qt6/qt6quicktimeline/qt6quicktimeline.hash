@@ -1,0 +1,5 @@
+# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.3/submodules/qtquicktimeline-everywhere-src-6.8.3.tar.xz.sha256
+sha256  b2ba57fa4fb929d3cd103dff65dd7a62dc2e3852f9a4fddd081e4a759b684fdd  qtquicktimeline-everywhere-src-6.8.3.tar.xz
+
+# Hashes for license files
+sha256  8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903  LICENSES/GPL-3.0-only.txt
