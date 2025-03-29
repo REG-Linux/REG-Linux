@@ -46,6 +46,7 @@ endmenu
 menu "Retroarch"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/retroarch/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/retroarch-assets/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/retroarch-joypad-autoconfig/Config.in"
 
 menu "Libretro"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-applewin/Config.in"
