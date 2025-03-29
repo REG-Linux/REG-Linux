@@ -1,0 +1,12 @@
+diff --git a/package/qt6/qt6serialbus/qt6serialbus.hash b/package/qt6/qt6serialbus/qt6serialbus.hash
+index 9777633b85..5bff402087 100644
+--- a/package/qt6/qt6serialbus/qt6serialbus.hash
++++ b/package/qt6/qt6serialbus/qt6serialbus.hash
+@@ -1,5 +1,5 @@
+-# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qtserialbus-everywhere-src-6.8.1.tar.xz.sha256
+-sha256  40788d92ec5c3ae297818e9f9eea9d21e398a54fa3fd8ddd530d324548ed15da  qtserialbus-everywhere-src-6.8.1.tar.xz
++# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.3/submodules/qtserialbus-everywhere-src-6.8.3.tar.xz.sha256
++sha256  43480eeb7172757d2af2c5717cfed84a9254bef775cd715fd27258a81c7b7e9e  qtserialbus-everywhere-src-6.8.3.tar.xz
+ 
+ # Hashes for license files:
+ sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt
