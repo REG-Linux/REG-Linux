@@ -1,0 +1,12 @@
+diff --git a/package/qt6/qt6virtualkeyboard/qt6virtualkeyboard.hash b/package/qt6/qt6virtualkeyboard/qt6virtualkeyboard.hash
+index 60b9ab08de..29ec4415e4 100644
+--- a/package/qt6/qt6virtualkeyboard/qt6virtualkeyboard.hash
++++ b/package/qt6/qt6virtualkeyboard/qt6virtualkeyboard.hash
+@@ -1,5 +1,5 @@
+-# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qtvirtualkeyboard-everywhere-src-6.8.1.tar.xz.sha256
+-sha256  1022a3bc4093ec732e85b659158c8a70a31eecbd0dfef4e4f6c67f474f89a264  qtvirtualkeyboard-everywhere-src-6.8.1.tar.xz
++# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.3/submodules/qtvirtualkeyboard-everywhere-src-6.8.3.tar.xz.sha256
++sha256  8111061261ed8d88ec40b79083f8ed025650eb1807a05528615265d36213bb1d  qtvirtualkeyboard-everywhere-src-6.8.3.tar.xz
+ 
+ # Hashes for license files:
+ sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt

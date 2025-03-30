@@ -1,0 +1,7 @@
+config BR2_PACKAGE_RETROARCH_JOYPAD_AUTOCONFIG
+        bool "retroarch-joypad-autoconfig"
+	
+        help
+          Joypad autoconfig files for RetroArch, the reference frontend for the libretro API.
+
+	  https://github.com/libretro/retroarch-joypad-autoconfig/

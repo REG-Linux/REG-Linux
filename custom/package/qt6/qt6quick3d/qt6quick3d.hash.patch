@@ -1,0 +1,12 @@
+diff --git a/package/qt6/qt6quick3d/qt6quick3d.hash b/package/qt6/qt6quick3d/qt6quick3d.hash
+index 960cda69ad..8b50108ed2 100644
+--- a/package/qt6/qt6quick3d/qt6quick3d.hash
++++ b/package/qt6/qt6quick3d/qt6quick3d.hash
+@@ -1,5 +1,5 @@
+-# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qtquick3d-everywhere-src-6.8.1.tar.xz.sha256
+-sha256  3f3d345e6c95fcd40ab37e6a37cd31811e5d239dea8e142e632d4ea41bf20ce7  qtquick3d-everywhere-src-6.8.1.tar.xz
++# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.3/submodules/qtquick3d-everywhere-src-6.8.3.tar.xz.sha256
++sha256  30483c700e521b9bc53a5f68cbaed089416c991fc29f5fb4179cde53fd3652df  qtquick3d-everywhere-src-6.8.3.tar.xz
+ 
+ # Hashes for license files
+ sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt
