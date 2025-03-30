@@ -9,7 +9,7 @@ index e5a614ca..36decde9 100644
 -# zlib sources as virtual subdirectory "zlib"
 -include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib)		# Included before add_subdirectory so that the examples will build
 -add_subdirectory(${WORKSPACE_DIR}/framework/external/zlib/zlib zlib)
-+# batocera - use system zlib
++# use system zlib
 +find_package(ZLIB REQUIRED)
 +include_directories(${ZLIB_INCLUDE_DIRS})
  
@@ -35,7 +35,7 @@ index 2a43f7db..b74d131f 100644
 -# zlib sources as virtual subdirectory "zlib"
 -include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib)		# Included before add_subdirectory so that the examples will build
 -add_subdirectory(${WORKSPACE_DIR}/framework/external/zlib/zlib zlib)
-+# batocera - use system zlib
++# use system zlib
 +find_package(ZLIB REQUIRED)
 +include_directories(${ZLIB_INCLUDE_DIRS})
  
