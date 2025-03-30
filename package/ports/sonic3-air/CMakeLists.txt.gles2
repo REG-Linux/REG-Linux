@@ -54,8 +54,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 
-# batocera - use system zlib
-# REG - use system SDL2
+# REG - use system zlb and system SDL2
 find_package(ZLIB REQUIRED)
 find_package(SDL2 REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
