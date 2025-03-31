@@ -12,7 +12,7 @@ fi
 
 BROUTPUTDIR="${1}"
 BOARD="${2}"
-ESDIR="${BROUTPUTDIR}/build/"$(ls -t "${BROUTPUTDIR}/build" | grep -E "^batocera-emulationstation-" | head -1)
+ESDIR="${BROUTPUTDIR}/build/"$(ls -t "${BROUTPUTDIR}/build" | grep -E "^reglinux-emulationstation-" | head -1)
 
 GENDATE=$(date "+%Y/%m/%d %H:%m:%S")
 
@@ -73,8 +73,8 @@ do
     let PER_UNTRANSLATED_W=$NBUNTRANSLATED'*'100/$TOTAL'*'2
     let PER_TRANSLATED_W=200-$PER_FUZZY_W-PER_UNTRANSLATED_W
     let PER_TRANSLATED=$NBTRANSLATED'*'100/$TOTAL
-    LINK="https://raw.githubusercontent.com/batocera-linux/batocera-emulationstation/master/locale/lang/${POLANG}/LC_MESSAGES/emulationstation2.po"
-    
+    LINK="https://raw.githubusercontent.com/batocera-linux/reglinux-emulationstation/master/locale/lang/${POLANG}/LC_MESSAGES/emulationstation2.po"
+
     echo "<tr>"
     echo "<td><a href=\"${LINK}\">${POLANG}</a></td>"
     echo "<td>"
@@ -92,7 +92,7 @@ do
     echo "</tr>"
 done
 echo '</table>'
-echo "<p>If your language is not available, please translate <a href=\"https://raw.githubusercontent.com/batocera-linux/batocera-emulationstation/master/locale/emulationstation2.pot\">this file</a> and send it us.<br />You can read other translations to take them as exemple.</p>"
+echo "<p>If your language is not available, please translate <a href=\"https://raw.githubusercontent.com/batocera-linux/reglinux-emulationstation/master/locale/emulationstation2.pot\">this file</a> and send it us.<br />You can read other translations to take them as exemple.</p>"
 echo "<p><a href=\"archives\">archives</a></p>"
 echo "Generated on ${GENDATE}"
 echo '</body>'
