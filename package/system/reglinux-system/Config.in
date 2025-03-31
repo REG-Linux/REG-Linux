@@ -120,7 +120,6 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_USBMOUNT			# usb key/sd card mounter
 	select BR2_PACKAGE_USBUTILS			# usb key/sd card tools
 	select BR2_PACKAGE_REGLINUX_SCRIPTS		# REG-Linux scripts
-	select BR2_PACKAGE_REGLINUX_SCREEN		# reglinux screen configuration
 	select BR2_PACKAGE_BATOCERA_SETTINGS		# system-settings-get/set
 
 	# Use ALSA light audio stack for weak platforms
