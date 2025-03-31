@@ -3,13 +3,13 @@
 # rpcs3
 #
 ################################################################################
-# Version v0.0.35 - Commits on Mar 1, 2025
-RPCS3_VERSION = v0.0.35
+# Version v0.0.36 - Commits on Mar 30, 2025
+RPCS3_VERSION = v0.0.36
 RPCS3_SITE = https://github.com/RPCS3/rpcs3.git
 RPCS3_SITE_METHOD=git
 RPCS3_GIT_SUBMODULES=YES
 RPCS3_LICENSE = GPLv2
-RPCS3_DEPENDENCIES += alsa-lib llvm ffmpeg faudio libevdev libxml2
+RPCS3_DEPENDENCIES += alsa-lib llvm ffmpeg faudio libevdev libxml2 sdl3
 RPCS3_DEPENDENCIES += libglew libglu libpng libusb mesa3d ncurses openal rtmpdump
 RPCS3_DEPENDENCIES += reglinux-qt6 libcurl wolfssl
 
