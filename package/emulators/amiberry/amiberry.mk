@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-AMIBERRY_VERSION = v7.0.6
+# Release 7.0.7 on Mar 30, 2025
+AMIBERRY_VERSION = v7.0.7
 AMIBERRY_SITE = $(call github,BlitterStudio,amiberry,$(AMIBERRY_VERSION))
 AMIBERRY_LICENSE = GPLv3
 AMIBERRY_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac

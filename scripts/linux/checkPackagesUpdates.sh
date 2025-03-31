@@ -200,6 +200,7 @@ PACKAGES_EMULATORS="86Box
 PACKAGES_PORTS="abuse
                 abuse-data
                 augustus
+                bstone
                 cannonball
                 cdogs
                 cgenius
