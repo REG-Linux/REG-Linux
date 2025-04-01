@@ -69,6 +69,6 @@ cp "${BINARIES_DIR}/shim-signed/mmia32.efi"   "${REGLINUX_BINARIES_DIR}/boot/EFI
 cp "${BINARIES_DIR}/shim-signed/fbia32.efi"   "${REGLINUX_BINARIES_DIR}/boot/EFI/BOOT/"             || exit 1
 
 # Another copy of the MOK cert with a hard-to-miss name at the top level, for ease-of-use
-cp "${BINARIES_DIR}/syslinux/batocera-mok.cer"  "${REGLINUX_BINARIES_DIR}/boot/ENROLL_THIS_KEY_IN_MOKMANAGER_batocera.cer" || exit 1
+cp "${BINARIES_DIR}/syslinux/batocera-mok.cer"  "${REGLINUX_BINARIES_DIR}/boot/ENROLL_THIS_KEY_IN_MOKMANAGER.cer" || exit 1
 
 exit 0
