@@ -1,0 +1,10 @@
+--- a/premake5.lua	2025-04-01 11:40:54.190637759 +0200
++++ b/premake5.lua	2025-04-01 11:41:22.343219409 +0200
+@@ -109,6 +109,7 @@
+   system("linux")
+   toolset("clang")
+   vectorextensions("AVX2")
++  linktimeoptimization("On")
+   buildoptions({
+     -- "-mlzcnt",  -- (don't) Assume lzcnt is supported.
+   })
