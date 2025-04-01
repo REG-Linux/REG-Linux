@@ -109,7 +109,6 @@ class Vita3kGenerator(Generator):
             array=commandArray,
             env={
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                "SDL_JOYSTICK_HIDAPI": "0",
                 "XDG_CONFIG_HOME": batoceraFiles.CONF,
                 "XDG_DATA_HOME": batoceraFiles.SAVES,
                 "XDG_CACHE_HOME": batoceraFiles.CACHE

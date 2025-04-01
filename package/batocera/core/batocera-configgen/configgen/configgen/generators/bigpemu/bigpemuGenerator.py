@@ -398,8 +398,7 @@ class BigPEmuGenerator(Generator):
         commandArray = ["/usr/bin/box64", "/usr/bigpemu/bigpemu", rom]
 
         environment = {
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-            "SDL_JOYSTICK_HIDAPI": "0"
+            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
         }
 
         return Command.Command(array=commandArray, env=environment)
