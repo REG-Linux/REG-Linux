@@ -3,8 +3,8 @@
 # dxx-rebirth (Descent 1 & 2) engine
 #
 ################################################################################
-# Version: Commits on Mar 1, 2025
-DXX_REBIRTH_VERSION = d96665375a8bd273dcc0d0b21c87249861b0e00f
+# Version: Commits on Mar 30, 2025
+DXX_REBIRTH_VERSION = ddc84fa623ed508073cf99244db731bd73f36b6b
 DXX_REBIRTH_SITE = https://github.com/dxx-rebirth/dxx-rebirth
 DXX_REBIRTH_SITE_METHOD=git
 DXX_REBIRTH_LICENSE = GPLv3
@@ -17,6 +17,8 @@ DXX_REBIRTH_CXXFLAGS  = $(TARGET_CXXFLAGS)
 DXX_REBIRTH_SCONS_ENV = $(TARGET_CONFIGURE_OPTS)
 
 DXX_REBIRTH_SCONS_OPTS = -j$(PARALLEL_JOBS) sdl2=yes
+# REG TODO investigate MIDI support through adlmidi / libadlmidi
+# adlmidi=runtime
 
 # Choose rendering API
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
