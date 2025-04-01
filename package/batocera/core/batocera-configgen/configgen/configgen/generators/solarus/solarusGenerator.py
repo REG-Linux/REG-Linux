@@ -32,8 +32,7 @@ class SolarusGenerator(Generator):
 
         return Command.Command(array=commandArray, env={
             'SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS': '0' ,
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-            "SDL_JOYSTICK_HIDAPI": "0"
+            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
         })
 
     @staticmethod

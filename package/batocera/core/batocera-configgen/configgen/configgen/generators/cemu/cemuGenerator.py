@@ -69,8 +69,7 @@ class CemuGenerator(Generator):
             array=commandArray,
             env={"XDG_CONFIG_HOME":batoceraFiles.CONF, "XDG_CACHE_HOME":batoceraFiles.CACHE,
                 "XDG_DATA_HOME":batoceraFiles.SAVES,
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                "SDL_JOYSTICK_HIDAPI": "0"
+                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
 

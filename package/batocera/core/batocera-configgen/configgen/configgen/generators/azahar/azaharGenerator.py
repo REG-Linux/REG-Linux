@@ -29,8 +29,7 @@ class AzaharGenerator(Generator):
             "XDG_CACHE_HOME":batoceraFiles.CACHE,
             "XDG_RUNTIME_DIR":batoceraFiles.SAVES + "/3ds/citra-emu",
             "QT_QPA_PLATFORM":"xcb",
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-            "SDL_JOYSTICK_HIDAPI": "0"
+            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
 
