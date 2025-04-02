@@ -13,9 +13,16 @@ BR2_TARGET_GENERIC_GETTY_BAUDRATE_921600=y
 BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/mt8395/patches"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/mt8395/fsoverlay"
 
+# Kernel headers (needed, custom kernel)
+BR2_KERNEL_HEADERS_AS_KERNEL=y
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_14=y
+
 # Kernel
 BR2_LINUX_KERNEL=y
-BR2_LINUX_KERNEL_LATEST_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_GIT=y
+BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://gitlab.collabora.com/mediatek/aiot/linux"
+BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="mediatek-next"
+
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/mt8395/linux_patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/aarch64"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/mt8395/linux-defconfig.config"
@@ -35,7 +42,11 @@ BR2_PACKAGE_REGLINUX_XWAYLAND=y
 # Mesa Panfrost
 BR2_PACKAGE_SYSTEM_PANFROST_MESA3D=y
 
-# TODO bootloader
+# Bootloader
+BR2_TARGET_GRUB2=y
+BR2_TARGET_GRUB2_ARM64_EFI=y
+BR2_TARGET_GRUB2_BUILTIN_MODULES_EFI="boot linux ext2 fat squash4 part_msdos part_gpt normal efi_gop search search_fs_file search_fs_uuid search_label chain reboot"
+BR2_PACKAGE_EFIVAR=y
 
 # Filesystem
 BR2_TARGET_ROOTFS_CPIO_LZ4=y
