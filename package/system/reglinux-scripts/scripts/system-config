@@ -62,7 +62,7 @@ do_setRootPassword() {
         fi
         postBootConfig
         return 0
-    fi    
+    fi
 }
 
 if [ "$command" = "getRootPassword" ]; then
@@ -71,7 +71,7 @@ if [ "$command" = "getRootPassword" ]; then
         echo "linux"
         exit 0
     fi
-    
+
     ENCPASSWD=$(sed -n -e 's+^[ \t]*rootshadowpassword[ \t]*=[ \t]*\(.*\)+\1+p' "${storageFile}")
     if [ -z "${ENCPASSWD}" ]; then
         # if there was no password, create a new random one
@@ -136,7 +136,7 @@ fi
 
 if [ "$command" = "lsoutputs" ]; then
     echo "auto"
-    /usr/bin/system-resolution listOutputs
+    /usr/bin/regmsg listOutputs
 fi
 
 if [ "$command" = "gpiocontrollers" ]; then

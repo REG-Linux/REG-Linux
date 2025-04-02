@@ -29,4 +29,4 @@ for_window [fullscreen] fullscreen
 # Starts EmulationStation when loading sway
 exec /usr/bin/system-mouse hide
 exec /usr/bin/emulationstation-standalone
-exec /usr/bin/system-resolution mapTouchScreen
+exec /usr/bin/regmsg mapTouchScreen

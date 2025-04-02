@@ -12,11 +12,13 @@ gamescope_launched = False
 def start_sway(generator, system):
     global sway_launched
     if not sway_launched:
-        os.system("WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -c /etc/sway/launchconfig -d & > /userdata/system/logs/sway.log 2>&1")
+        os.system("WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway -c /etc/sway/launchconfig &")
         os.environ["WAYLAND_DISPLAY"]="wayland-1"
         os.environ["XDG_RUNTIME_DIR"]="/var/run"
         os.environ["SWAYSOCK"]="/var/run/sway-ipc.0.sock"
         os.environ["SDL_VIDEODRIVER"]="wayland"
+        os.environ["XDG_SESSION_TYPE"]="wayland"
+        os.environ["QT_QPA_PLATFORM"]="wayland"
         if generator.requiresX11():
             os.environ["DISPLAY"]=":0"
         sway_launched = True
@@ -30,6 +32,8 @@ def stop_sway(generator, system):
         del os.environ["XDG_RUNTIME_DIR"]
         del os.environ["SWAYSOCK"]
         del os.environ["SDL_VIDEODRIVER"]
+        os.environ["XDG_SESSION_TYPE"]="drm"
+        os.environ["QT_QPA_PLATFORM"]="xcb"
         if generator.requiresX11():
             del os.environ["DISPLAY"]
         sway_launched = False
