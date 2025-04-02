@@ -132,7 +132,7 @@
                 "pageup"
             ],
             "type": "exec",
-            "target": "system-screenshot"
+            "target": "regmsg getScreenshot"
         }
     ]
 }

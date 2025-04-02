@@ -1,1 +1,1 @@
-SUBSYSTEM=="drm", ACTION=="add|change", RUN+="/usr/bin/system-resolution setOutput auto"
+SUBSYSTEM=="drm", ACTION=="add|change", RUN+="/usr/bin/regmsg setOutput auto"
