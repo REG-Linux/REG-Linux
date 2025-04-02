@@ -134,7 +134,7 @@ fi
 
 # temperature in millidegree Celsius
 TEMPE=0
-for TEMPER in $(cat /sys/devices/virtual/thermal/thermal_zone*/temp /sys/class/hwmon/hwmon*/temp*_input 2>/dev/null); do 
+for TEMPER in $(cat /sys/devices/virtual/thermal/thermal_zone*/temp /sys/class/hwmon/hwmon*/temp*_input 2>/dev/null); do
     [ "$TEMPER" -gt "$TEMPE" ] && TEMPE="$TEMPER"
 done
 [ "$TEMPE" -gt 0 ] && echo "Temperature: ${TEMPE::-3}°C"
@@ -145,14 +145,12 @@ MEM_TOTAL_MB=$((MEM_TOTAL_KB / 1024))
 MEM_AVAILABLE_MB=$((MEM_AVAILABLE_KB / 1024))
 echo "Available Memory: ${MEM_AVAILABLE_MB}/${MEM_TOTAL_MB} MB"
 
-DISPLAYRES=$(system-resolution currentResolution)
-if [ -n "$WAYLAND_DISPLAY" ]; then # wayland
-    DISPLAYRATE=$(system-resolution currentMode | awk -F'[x.]' '{printf "%.3f", $3 / 1000}')
-elif test -f /var/run/drmMode; then # drm
-    DISPLAYRATE=$(system-resolution currentMode); DISPLAYRATE="${DISPLAYRATE##*.}"
-fi
+DISPLAYRES=$(regmsg currentResolution)
+DISPLAYRATE=$(regmsg currentRefresh)
+DISPLAYBACKEND=$(regmsg currentBackend)
 echo "Display Resolution: ${DISPLAYRES}"
-echo "Display Refresh Rate: ${DISPLAYRATE}Hz"
+echo "Display Refresh Rate: ${DISPLAYRATE}"
+echo "Display Backend: ${DISPLAYBACKEND}"
 
 if [[ "${FULL_DISPLAY}" != 0 ]]; then
 	# OPENGL

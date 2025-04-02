@@ -251,7 +251,7 @@ class BigPEmuGenerator(Generator):
         config["BigPEmuConfig"]["Video"]["ScreenScaling"] = 5
         config["BigPEmuConfig"]["Video"]["DisplayWidth"] = gameResolution["width"]
         config["BigPEmuConfig"]["Video"]["DisplayHeight"] = gameResolution["height"]
-        config["BigPEmuConfig"]["Video"]["DisplayFrequency"] = int(round(float(videoMode.getRefreshRate())))
+        config["BigPEmuConfig"]["Video"]["DisplayFrequency"] = videoMode.getRefreshRate()
 
         # User selections
         if system.isOptSet("bigpemu_vsync"):

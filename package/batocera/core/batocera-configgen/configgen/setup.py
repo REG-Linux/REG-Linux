@@ -1,99 +1,40 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from distutils.core import setup
-setup(name='batocera-configgen',
-      version='1.0',
-      py_modules=['configgen'],
-      packages=[
-        'configgen',
-        'configgen.generators',
-        'configgen.generators.libretro',
-        'configgen.generators.moonlight',
-        'configgen.generators.mupen',
-        'configgen.generators.scummvm',
-        'configgen.generators.dosboxstaging',
-        'configgen.generators.dosboxx',
-        'configgen.generators.vice',
-        'configgen.generators.amiberry',
-        'configgen.generators.ppsspp',
-        'configgen.generators.flycast',
-        'configgen.generators.dolphin',
-        'configgen.generators.dolphin_triforce' ,
-        'configgen.generators.pcsx2',
-        'configgen.generators.play',
-        'configgen.generators.rpcs3',
-        'configgen.generators.azahar',
-        'configgen.generators.hypseus_singe',
-        'configgen.generators.cannonball',
-        'configgen.generators.sdlpop',
-        'configgen.generators.openbor',
-        'configgen.generators.wine',
-        'configgen.generators.cemu',
-        'configgen.generators.melonds',
-        'configgen.generators.mame',
-        'configgen.generators.devilutionx',
-        'configgen.generators.hatari',
-        'configgen.generators.tsugaru',
-        'configgen.generators.solarus',
-        'configgen.generators.easyrpg',
-        'configgen.generators.supermodel',
-        'configgen.generators.xash3d_fwgs',
-        'configgen.generators.mugen',
-        'configgen.generators.tsugaru',
-        'configgen.generators.ruffle',
-        'configgen.generators.lightspark',
-        'configgen.generators.duckstation',
-        'configgen.generators.duckstation_legacy',
-        'configgen.generators.drastic',
-        'configgen.generators.xemu',
-        'configgen.generators.cgenius',
-        'configgen.generators.flatpak',
-        'configgen.generators.steam',
-        'configgen.generators.ecwolf',
-        'configgen.generators.model2emu',
-        'configgen.generators.sonicretro',
-        'configgen.generators.gsplus',
-        'configgen.generators.citron',
-        'configgen.generators.ryujinx',
-        'configgen.generators.samcoupe',
-        'configgen.generators.abuse',
-        'configgen.generators.cdogs',
-        'configgen.generators.hcl',
-        'configgen.generators.hurrican',
-        'configgen.generators.openjazz',
-        'configgen.generators.tyrian',
-        'configgen.generators.openmsx',
-        'configgen.generators.demul',
-        'configgen.generators.xenia',
-        'configgen.generators.odcommander',
-        'configgen.generators.gzdoom',
-        'configgen.generators.eduke32',
-        'configgen.generators.raze',
-        'configgen.generators.vita3k',
-        'configgen.generators.ikemen',
-        'configgen.generators.bigpemu',
-        'configgen.generators.ioquake3',
-        'configgen.generators.thextech',
-        'configgen.generators.vpinball',
-        'configgen.generators.applewin',
-        'configgen.generators.corsixth',
-        'configgen.generators.stella',
-        'configgen.generators.theforceengine',
-        'configgen.generators.iortcw',
-        'configgen.generators.fallout1',
-        'configgen.generators.fallout2',
-        'configgen.generators.dxx_rebirth',
-        'configgen.generators.etlegacy',
-        'configgen.generators.sonic3_air',
-        'configgen.generators.sonic_mania',
-        'configgen.generators.mednafen',
-        'configgen.generators.uqm',
-        'configgen.generators.sh',
-        'configgen.settings',
-        'configgen.utils',
-        'configgen.utils.video',
+from setuptools import setup, find_packages
+
+# Package version
+VERSION = '1.4'
+
+setup(
+    # Basic package metadata
+    name='batocera-configgen',
+    version=VERSION,
+
+    # Package discovery - automatically finds all packages
+    # Excludes test packages and development files
+    packages=find_packages(exclude=['tests*', 'docs*']),
+
+    # Package dependencies
+    install_requires=[
+        'PyYAML>=5.1',      # For YAML configuration handling
+        'lxml>=4.3',        # For XML processing
+    ],
+
+    # Non-Python files to include (gamepad configs, etc.)
+    package_data={
+        'configgen.generators.xash3d_fwgs': ['gamepad.cfg'],
+        # Add other data files here as needed
+    },
+
+    # Python version requirements
+    python_requires='>=3.6',
+
+    # Console script entry point
+    # Creates 'batocera-configgen' command that calls configgen:main
+    entry_points={
+        'console_scripts': [
+            'batocera-configgen=configgen:main',
         ],
-        package_data={
-          'configgen.generators.xash3d_fwgs': ['gamepad.cfg'],
-        },
-      )
+    },
+)
