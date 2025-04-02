@@ -10,6 +10,7 @@ menu "System"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-scripts/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-notice/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-test/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-msg/Config.in"
 endmenu
 
 menu "Looks"
