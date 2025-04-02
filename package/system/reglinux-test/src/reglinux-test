@@ -162,7 +162,7 @@ class SystemTest():
         screenshotDir = os.path.join(resultDir, "screenshots")
         os.makedirs(screenshotDir, exist_ok=True)
         screenshotPath = os.path.join(screenshotDir, f"{name}.png")
-        subprocess.run(["system-screenshot", screenshotPath], check=False)
+        subprocess.run(["regmsg getScreenshot", screenshotPath], check=False)
         print("Screenshot captured")
 
     @staticmethod
