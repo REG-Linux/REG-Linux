@@ -200,13 +200,6 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
             resolutionChanged = True
         gameResolution = videoMode.getCurrentResolution()
 
-        # if resolution is reversed (ie ogoa boards), reverse it in the gameResolution to have it correct
-        if videoMode.isResolutionReversed():
-            x = gameResolution["width"]
-            gameResolution["width"]  = gameResolution["height"]
-            gameResolution["height"] = x
-        eslog.debug("resolution: {}x{}".format(str(gameResolution["width"]), str(gameResolution["height"])))
-
         # savedir: create the save directory if not already done
         dirname = os.path.join(batoceraFiles.savesDir, system.name)
         if not os.path.exists(dirname):
@@ -259,7 +252,7 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
 
         # start a compositor if needed
         if generator.requiresWayland() or generator.requiresX11():
-            if not videoMode.process_status("sway"):
+            if not 'WAYLAND_DISPLAY' in os.environ:
                 windowsManager.start_compositor(generator, system)
 
         # run the emulator
@@ -583,12 +576,6 @@ def signal_handler(signal, frame):
     if proc:
         eslog.debug('killing proc')
         proc.kill()
-
-def process_status(process_name):
-    for process in psutil.process_iter(['pid', 'name']):
-        if process.info['name'] == process_name:
-            return True
-    return False
 
 if __name__ == '__main__':
     proc = None
