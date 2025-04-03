@@ -6,7 +6,7 @@
  
 +# Makes GCC 14 happy
 +KBUILD_CFLAGS += $(call cc-disable-warning, int-conversion)
-+
++KBUILD_CFLAGS += -Wno-error=suggest-attribute=format
  # Variable Length Arrays (VLAs) should not be used anywhere in the kernel
  KBUILD_CFLAGS += -Wvla
  

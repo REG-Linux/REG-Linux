@@ -1,0 +1,7 @@
+--- a/sound/soc/codecs/wm8960.c	2025-04-02 15:47:45.812741784 +0200
++++ b/sound/soc/codecs/wm8960.c	2025-04-02 15:48:26.098674327 +0200
+@@ -1720,3 +1720,4 @@
+ 
+ MODULE_DESCRIPTION("ASoC WM8960 driver");
+ MODULE_AUTHOR("Liam Girdwood");
++MODULE_LICENSE("GPL");

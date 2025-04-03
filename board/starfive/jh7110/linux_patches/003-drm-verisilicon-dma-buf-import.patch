@@ -1,0 +1,7 @@
+--- a/drivers/gpu/drm/verisilicon/vs_gem.c	2025-04-02 16:49:17.077586533 +0200
++++ b/drivers/gpu/drm/verisilicon/vs_gem.c	2025-04-02 16:49:33.765971905 +0200
+@@ -550,3 +550,4 @@
+ 
+ 	return vs_gem_mmap_obj(obj, vma);
+ }
++MODULE_IMPORT_NS(DMA_BUF);
