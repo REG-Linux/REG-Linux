@@ -33,7 +33,6 @@ stop)
 	emulationstation-standalone --stop-rebooting
 	pkill -f sway
 	pkill -f emulationstation
-	pkill -f touchegg
 
 	# Optimized process termination check
 	timeout=5
