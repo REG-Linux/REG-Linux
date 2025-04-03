@@ -13,7 +13,7 @@ REGLINUX_SYSTEM_SOURCE=
 ### Beta release MUST BE marked as "prerelease" ( tag is version = YY.MM-beta-[1-9] )
 ### Stable release must be marked as "latest" ( tag is version = YY.MM.[0-9] )
 
-REGLINUX_SYSTEM_VERSION = 25.03-dev
+REGLINUX_SYSTEM_VERSION = 25.04-dev
 REGLINUX_SYSTEM_DATE_TIME = $(shell date "+%Y/%m/%d %H:%M")
 REGLINUX_SYSTEM_DATE = $(shell date "+%Y/%m/%d")
 REGLINUX_SYSTEM_DEPENDENCIES = tzdata
