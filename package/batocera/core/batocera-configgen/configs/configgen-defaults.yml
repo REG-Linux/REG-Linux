@@ -136,7 +136,7 @@ coco:
   core:     mame
 colecovision:
   emulator: libretro
-  core:     bluemsx
+  core:     gearcoleco
 corsixth:
   emulator: corsixth
   core:     corsixth

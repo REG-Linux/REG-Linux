@@ -612,6 +612,9 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	# Nintendo Virtual Boy
 	select BR2_PACKAGE_LIBRETRO_BEETLE_VB		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
+	# Coleco Colecovision
+	select BR2_PACKAGE_LIBRETRO_GEARCOLECO		# ALL
+
 	# Sega 8-bit/16-range (Mark III / Master System, Game Gear, Genesis / Megadrive, SegaCD / MegaCD, 32X)
 	select BR2_PACKAGE_LIBRETRO_PICODRIVE		# ALL
 	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX	# ALL
