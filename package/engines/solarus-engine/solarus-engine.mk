@@ -3,8 +3,8 @@
 # solarus-engine
 #
 ################################################################################
-# Version: Commits on Apr 27, 2024
-SOLARUS_ENGINE_VERSION = 696d6e8e6f3417d085cad958ec8de40665f0342b
+# Version: Release on Apr 1, 2025
+SOLARUS_ENGINE_VERSION = v2.0.0
 SOLARUS_ENGINE_SITE = https://gitlab.com/solarus-games/solarus
 SOLARUS_ENGINE_SITE_METHOD=git
 

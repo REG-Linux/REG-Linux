@@ -1,0 +1,25 @@
+--- a/external/xxHash/cmake_unofficial/CMakeLists.txt	2025-04-03 21:29:38.340642953 +0200
++++ b/external/xxHash/cmake_unofficial/CMakeLists.txt	2025-04-03 21:30:36.132901378 +0200
+@@ -76,21 +76,7 @@
+ message(STATUS "Architecture: ${PLATFORM}")
+ 
+ # libxxhash
+-if((DEFINED DISPATCH) AND (DEFINED PLATFORM))
+-  # Only support DISPATCH option on x86_64.
+-  if(("${PLATFORM}" STREQUAL "x86_64") OR ("${PLATFORM}" STREQUAL "AMD64"))
+-    set(XXHSUM_DISPATCH ON)
+-    message(STATUS "Enable xxHash dispatch mode")
+-    add_library(xxhash "${XXHASH_DIR}/xxh_x86dispatch.c"
+-                       "${XXHASH_DIR}/xxhash.c"
+-               )
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DXXHSUM_DISPATCH=1")
+-  else()
+-    add_library(xxhash "${XXHASH_DIR}/xxhash.c")
+-  endif()
+-else()
+-  add_library(xxhash "${XXHASH_DIR}/xxhash.c")
+-endif()
++add_library(xxhash "${XXHASH_DIR}/xxhash.c")
+ add_library(${PROJECT_NAME}::xxhash ALIAS xxhash)
+ 
+ target_include_directories(xxhash
