@@ -5,7 +5,7 @@
 ################################################################################
 
 # reglinux - bump
-SDL2_VERSION = 2.32.2
+SDL2_VERSION = 2.32.4
 SDL2_SOURCE = SDL2-$(SDL2_VERSION).tar.gz
 SDL2_SITE = http://www.libsdl.org/release
 SDL2_LICENSE = Zlib
