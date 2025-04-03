@@ -3,8 +3,8 @@
 # xenia-canary
 #
 ################################################################################
-# Version: Commits on Mar 30, 2025
-XENIA_CANARY_VERSION = 7a2f53bf2099b509b6db4ddda7d51f63b06e4c5d
+# Version: Commits on Mar 31, 2025
+XENIA_CANARY_VERSION = 4b24f128f6ad43874a3d012130da47b19b6ea6a2
 XENIA_CANARY_SITE = https://github.com/xenia-canary/xenia-canary
 XENIA_CANARY_SITE_METHOD = git
 XENIA_CANARY_GIT_SUBMODULES = YES
@@ -53,11 +53,11 @@ define XENIA_CANARY_POST_PROCESS
 	# get the latest patches
 	mkdir -p $(TARGET_DIR)/usr/share/xenia-canary/patches
 	mkdir -p $(@D)/temp
-	( cd $(@D)/temp && $(GIT) init && \
-	  $(GIT) remote add origin https://github.com/xenia-canary/game-patches.git && \
-	  $(GIT) config core.sparsecheckout true && \
+	( cd $(@D)/temp && $(BR2_GIT) init && \
+	  $(BR2_GIT) remote add origin https://github.com/xenia-canary/game-patches.git && \
+	  $(BR2_GIT) config core.sparsecheckout true && \
 	  echo "patches/*.toml" >> .git/info/sparse-checkout && \
-	  $(GIT) pull --depth=1 origin main && \
+	  $(BR2_GIT) pull --depth=1 origin main && \
 	  mv -f patches/*.toml $(TARGET_DIR)/usr/share/xenia-canary/patches \
 	)
 
@@ -75,9 +75,9 @@ XENIA_CANARY_POST_INSTALL_TARGET_HOOKS = XENIA_CANARY_POST_PROCESS
 #define XENIA_CANARY_FIX_SUBMODULES
 #	rm -f $(@D)/third_party/vkd3d-proton
 #	rm -f $(@D)/third_party/dxvk
-#	$(GIT) -C $(@D)/third_party/ clone https://github.com/HansKristian-Work/vkd3d-proton.git
-#	$(GIT) -C $(@D)/third_party/ clone https://github.com/doitsujin/dxvk.git
-#	$(GIT) -C $(@D)/third_party/ clone https://github.com/neosmart/pevents.git
+#	$(BR2_GIT) -C $(@D)/third_party/ clone https://github.com/HansKristian-Work/vkd3d-proton.git
+#	$(BR2_GIT) -C $(@D)/third_party/ clone https://github.com/doitsujin/dxvk.git
+#	$(BR2_GIT) -C $(@D)/third_party/ clone https://github.com/neosmart/pevents.git
 #	cd $(@D)/third_party/vkd3d-proton && patch -p1 < $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/xenia-canary/xxx-vkd3d-proton.diff
 #endef
 #XENIA_CANARY_PRE_CONFIGURE_HOOKS += XENIA_CANARY_FIX_SUBMODULES
