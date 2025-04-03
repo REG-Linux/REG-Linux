@@ -1,0 +1,13 @@
+config BR2_PACKAGE_LIBRETRO_GEARCOLECO
+    bool "libretro-gearcoleco"
+	depends on BR2_INSTALL_LIBSTDCPP
+
+      help
+        Gearcoleco is a very accurate cross-platform 
+	ColecoVision emulator written in C++ that 
+	runs on Windows, macOS, Linux, BSD and RetroArch.
+
+	  https://github.com/drhelius/Gearcoleco
+
+comment "LIBRETRO_GEARSCOLECO needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
