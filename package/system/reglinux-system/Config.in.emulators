@@ -286,6 +286,7 @@ config BR2_PACKAGE_BATOCERA_HANDHELD_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712
 	# MegaDuck
 	select BR2_PACKAGE_LIBRETRO_SAMEDUCK		# ALL
@@ -511,6 +512,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 
 	# Microsoft Xbox 360
@@ -519,6 +521,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 
 	# Sony PS2
 	select BR2_PACKAGE_PCSX2			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
+	# TODO play does not build on mt8395 (Qt6/glew clash ??)
 	select BR2_PACKAGE_PLAY				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
@@ -526,11 +529,13 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 	select BR2_PACKAGE_LIBRETRO_PLAY		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+                                                           BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 
 	# Sony PS3
+        # TODO mt8395 fails finding OpenGL::EGL in configure cmake step
 	select BR2_PACKAGE_RPCS3			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
 							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
 							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
@@ -545,6 +550,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_CEMU				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
 							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
 							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+                                                           BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8550
@@ -674,7 +680,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8250		|| \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8550		|| \
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI		|| \
-							   BR2_PACKAGE_SYSTEM_TARGET_MT6395
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395
 
 	# Super Nintendo / Super Famicom
 	select BR2_PACKAGE_SNES9X			if !BR2_PACKAGE_REGLINUX_RELEASE && (BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL)
