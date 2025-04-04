@@ -521,23 +521,23 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 
 	# Sony PS2
 	select BR2_PACKAGE_PCSX2			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
-	# TODO play does not build on mt8395 (Qt6/glew clash ??)
 	select BR2_PACKAGE_PLAY				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 	select BR2_PACKAGE_LIBRETRO_PLAY		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
-                                                           BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
+                                                           BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
                                                            BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 
 	# Sony PS3
-        # TODO mt8395 fails finding OpenGL::EGL in configure cmake step
 	select BR2_PACKAGE_RPCS3			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
 							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
 							   BR2_PACKAGE_SYSTEM_TARGET_SM8550	|| \
