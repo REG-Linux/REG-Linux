@@ -1,0 +1,126 @@
+config BR2_PACKAGE_REGLINUX_NETWORK
+	bool "REG-Linux networking stack"
+
+	# connman
+	select BR2_PACKAGE_CONNMAN			# network manager
+	select BR2_PACKAGE_CONNMAN_WIFI			# network manager
+	select BR2_PACKAGE_CONNMAN_CLIENT		# network manager
+	select BR2_PACKAGE_CONNMAN_LOOPBACK		# network manager
+
+	# wpa supplicant
+	select BR2_PACKAGE_WPA_SUPPLICANT			# wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_CLI			# wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_DBUS			# wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_DBUS_INTROSPECTION	# wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_WIRED			# wpa_supplicant driver, 2.10 requires kernel > 4.4
+	select BR2_PACKAGE_WPA_SUPPLICANT_WPA3			# wifi
+	select BR2_PACKAGE_WPA_SUPPLICANT_NL80211		# wpa_supplicant driver
+	select BR2_PACKAGE_WPA_SUPPLICANT_WEXT			# wpa_supplicant driver
+
+	# wireless tools
+	select BR2_PACKAGE_WIRELESS_REGDB		# wireless regulatory DB
+	select BR2_PACKAGE_IW				# wireless country config for regulatoryDB
+	select BR2_PACKAGE_WIRELESS_TOOLS		# wireless tools
+	select BR2_PACKAGE_WIRELESS_TOOLS_LIB		# wireless tools
+	select BR2_PACKAGE_LIBOPENSSL_BIN		# required to encode the wifi password
+	
+	# network services
+	select BR2_PACKAGE_DROPBEAR			# ssh server
+	select BR2_PACKAGE_NTP				# ntp time sync protocol
+	select BR2_PACKAGE_REGLINUX_SAMBA		# samba stack based on ksmbd
+	select BR2_PACKAGE_RSYNC			# rsync to copy files over ssh
+	select BR2_PACKAGE_WSDD_NATIVE			# service discovery on local network (windows network neighborhood)
+	#nope select BR2_PACKAGE_OPENVPN		# VPN support
+
+	# curl / ssl / wget
+	select BR2_PACKAGE_CIFS_UTILS			# required for boot mounts
+	select BR2_PACKAGE_WGET				# download tools
+	select BR2_PACKAGE_LIBCURL_CURL			# download tools
+	select BR2_PACKAGE_NGHTTP2			# required for curl http2
+	select BR2_PACKAGE_CA_CERTIFICATES		# ssl certificates
+
+	# mDNS protocol
+	select BR2_PACKAGE_AVAHI			# service discovery on local network
+	select BR2_PACKAGE_AVAHI_DAEMON			# mDNS daemon
+	select BR2_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY	# bonjour compatibility layer
+
+	# legacy batocera ethtool
+	select BR2_PACKAGE_BATOCERA_ETHTOOL
+
+	# cloud services
+	select BR2_PACKAGE_SYNCTHING			if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_CHA # sync files across multiple batoceras
+	select BR2_PACKAGE_RCLONE			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # sync files in the cloud (require x86_64)
+
+	# Additional network drivers (out-of-tree kernel modules)
+	select BR2_PACKAGE_REGLINUX_NETWORK_DRIVERS
+
+	# Needed network firmwares
+	select BR2_PACKAGE_REGLINUX_NETWORK_FIRMWARES
+
+
+# TODO this needs serious cleanup especially for recent kernels
+config BR2_PACKAGE_REGLINUX_NETWORK_DRIVERS
+	bool "REG-Linux network drivers"
+
+	# wireless drivers
+	# use the morrownr RTL8812au & RTL8821au drivers
+	select BR2_PACKAGE_RTL8812AU		if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_H3		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_CHA		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_RK3326		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_RK3588		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_RK3128		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_S812		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_ODIN		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_SM8550		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_H700		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_MT8395		&& \
+						   !BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+
+	select BR2_PACKAGE_RTL8821AU_MORROWNR	if BR2_PACKAGE_SYSTEM_TARGET_S922X || BR2_PACKAGE_SYSTEM_TARGET_A3GEN2 || BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL88X2BU		if BR2_PACKAGE_SYSTEM_TARGET_S922X || BR2_PACKAGE_SYSTEM_TARGET_A3GEN2 || BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL8723BU		if BR2_PACKAGE_SYSTEM_TARGET_S922X || BR2_PACKAGE_SYSTEM_TARGET_A3GEN2 || BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL8188EU		if BR2_PACKAGE_SYSTEM_TARGET_S922X || BR2_PACKAGE_SYSTEM_TARGET_A3GEN2 || BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	select BR2_PACKAGE_RTL8821CU		if BR2_PACKAGE_SYSTEM_TARGET_S922X || BR2_PACKAGE_SYSTEM_TARGET_A3GEN2 || \
+						   BR2_PACKAGE_SYSTEM_TARGET_X86_ANY || BR2_PACKAGE_SYSTEM_TARGET_RK3588
+	select BR2_PACKAGE_RTL8189ES		if BR2_PACKAGE_SYSTEM_TARGET_S905 || BR2_PACKAGE_SYSTEM_TARGET_S905GEN2 || BR2_PACKAGE_SYSTEM_TARGET_S905GEN3
+	select BR2_PACKAGE_RTL8189FS		if BR2_PACKAGE_SYSTEM_TARGET_H3	|| \
+						   BR2_PACKAGE_SYSTEM_TARGET_S922X	|| \
+						   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2	|| \
+						   BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+
+	select BR2_PACKAGE_RTL8192EU		if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_MT8395
+
+	select BR2_PACKAGE_RTL8822CS		if BR2_PACKAGE_SYSTEM_TARGET_S905GEN3
+
+	# Rock 5c
+	select BR2_PACKAGE_AIC8800		if BR2_PACKAGE_SYSTEM_TARGET_RK3588
+
+	# ethernet
+	#select BR2_PACKAGE_R8125		if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	#select BR2_PACKAGE_R8168		if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+
+	# odin wifi baseband dependencies
+	select BR2_PACKAGE_PD_MAPPER		if BR2_PACKAGE_SYSTEM_TARGET_ODIN
+	select BR2_PACKAGE_QRTR			if BR2_PACKAGE_SYSTEM_TARGET_ODIN
+	select BR2_PACKAGE_RMTFS		if BR2_PACKAGE_SYSTEM_TARGET_ODIN
+	select BR2_PACKAGE_TQFTPSERV		if BR2_PACKAGE_SYSTEM_TARGET_ODIN
+
+
+config BR2_PACKAGE_REGLINUX_NETWORK_FIRMWARES
+	bool "REG-Linux network firmwares"
+
+	# common firmwares
+	select BR2_PACKAGE_UX500_FIRMWARE
+	select BR2_PACKAGE_WILC1000_FIRMWARE
+	select BR2_PACKAGE_ZD1211_FIRMWARE
+	select BR2_PACKAGE_B43_FIRMWARE
+
+	# x86 (maybe some firmware could be for all, to be checked)
+	select BR2_PACKAGE_WILINK_BT_FIRMWARE			if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+
+	# RaspberryPi Firmwares bluetooth and wifi
+	select BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI		if BR2_PACKAGE_BATOCERA_RPI_ANY
+	select BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI_BT	if BR2_PACKAGE_BATOCERA_RPI_ANY
+	select BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI_WIFI	if BR2_PACKAGE_BATOCERA_RPI_ANY
