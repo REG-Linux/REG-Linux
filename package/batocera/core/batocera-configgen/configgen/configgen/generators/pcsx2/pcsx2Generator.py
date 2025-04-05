@@ -88,8 +88,7 @@ class Pcsx2Generator(Generator):
                 eslog.warning("CPU does not support SSE4.1 which is required by pcsx2.  The emulator will likely crash with SIGILL (illegal instruction).")
 
         envcmd = { "XDG_CONFIG_HOME":batoceraFiles.CONF,
-                   "QT_QPA_PLATFORM":"wayland",
-                   "SDL_JOYSTICK_HIDAPI": "0"
+                   "QT_QPA_PLATFORM":"wayland"
                   }
 
         # wheels won't work correctly when SDL_GAMECONTROLLERCONFIG is set. excluding wheels from SDL_GAMECONTROLLERCONFIG doesn't fix too.

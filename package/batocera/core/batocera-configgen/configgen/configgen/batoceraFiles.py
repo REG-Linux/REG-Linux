@@ -13,7 +13,7 @@ OVERLAYS = '/userdata/overlays'
 CACHE = '/userdata/system/cache'
 ROMS = '/userdata/roms'
 
-esInputs = CONF + '/emulationstation/es_input.cfg'
+esInputs = CONF + '/emulationstation/gamecontrollerdb.txt'
 esSettings = CONF + '/emulationstation/es_settings.cfg'
 esGunsMetadata = "/usr/share/emulationstation/resources/gungames.xml"
 esWheelsMetadata = "/usr/share/emulationstation/resources/wheelgames.xml"

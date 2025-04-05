@@ -6,16 +6,18 @@
 # Last update: Commits on Jan 26, 2025
 # SDL2 main branch
 #REGLINUX_EMULATIONSTATION_VERSION = bccf259d19e0695f42469accc4d01e3b2fba2c1e
-# Last update: Commits on Mar 19, 2025
-# SDL3 branch
-REGLINUX_EMULATIONSTATION_VERSION = 9f14acd72b85466e2b084934bd61a63382aab0c1
+# Last update: Commits on Apr 2, 2025
+REGLINUX_EMULATIONSTATION_VERSION = a96d16078c9d4a4455a845537819e56474775954
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_EMULATIONSTATION_SITE = https://$(REGLINUX_EMULATIONSTATION_TOKEN)@github.com/REG-Linux/REG-ES
 REGLINUX_EMULATIONSTATION_SITE_METHOD = git
 REGLINUX_EMULATIONSTATION_LICENSE = MIT
 REGLINUX_EMULATIONSTATION_GIT_SUBMODULES = YES
 REGLINUX_EMULATIONSTATION_LICENSE = MIT, Apache-2.0
-REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl3 sdl3_mixer ffmpeg libyuv libfreeimage freetype alsa-lib libcurl rapidjson batocera-es-system host-gettext lunasvg pugixml
+REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl3 sdl3_mixer libyuv libfreeimage
+REGLINUX_EMULATIONSTATION_DEPENDENCIES += freetype alsa-lib libcurl rapidjson
+REGLINUX_EMULATIONSTATION_DEPENDENCIES += lunasvg pugixml host-gettext
+REGLINUX_EMULATIONSTATION_DEPENDENCIES += batocera-es-system
 
 REGLINUX_EMULATIONSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -92,6 +94,7 @@ ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2835)$(BR2_PACKAGE_SYSTEM_TARGET_RK3128)$(B
 REGLINUX_EMULATIONSTATION_CONF_OPTS += -DUSE_FFMPEG=OFF
 else
 REGLINUX_EMULATIONSTATION_CONF_OPTS += -DUSE_FFMPEG=ON
+REGLINUX_EMULATIONSTATION_DEPENDENCIES += ffmpeg
 endif
 
 # Scraping keys
@@ -117,7 +120,7 @@ define REGLINUX_EMULATIONSTATION_EXTERNAL_POS
 	if test "$(BR2_ENABLE_DEBUG)" = "y" ; then sed -i "s/level \= \"default\"\;/level \= \"error\"\;/" "$(@D)/es-app/src/guis/GuiMenu.cpp"; fi
 endef
 
-# Resourrces
+# Resources
 define REGLINUX_EMULATIONSTATION_RESOURCES
 	$(INSTALL) -m 0755 -d $(TARGET_DIR)/usr/share/emulationstation/resources/help
 	$(INSTALL) -m 0755 -d $(TARGET_DIR)/usr/share/emulationstation/resources/flags
@@ -129,9 +132,9 @@ define REGLINUX_EMULATIONSTATION_RESOURCES
 	$(INSTALL) -m 0644 -D $(@D)/resources/battery/*.* $(TARGET_DIR)/usr/share/emulationstation/resources/battery
 	$(INSTALL) -m 0644 -D $(@D)/resources/services/*.* $(TARGET_DIR)/usr/share/emulationstation/resources/services
 
-	# es_input.cfg
+	# gamecontrollerdb.txt
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/controllers/es_input.cfg \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/controllers/gamecontrollerdb.txt \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 
 	# hooks
@@ -140,7 +143,7 @@ endef
 
 ### S31emulationstation
 # default for most of architectures
-REGLINUX_EMULATIONSTATION_PREFIX = SDL_NOMOUSE=1
+REGLINUX_EMULATIONSTATION_PREFIX = SDL_NOMOUSE=1 SDL_GAMECONTROLLERCONFIG_FILE=/userdata/system/configs/emulationstation/gamecontrollerdb.txt
 REGLINUX_EMULATIONSTATION_CMD = emulationstation-standalone
 REGLINUX_EMULATIONSTATION_ARGS = $${EXTRA_OPTS}
 REGLINUX_EMULATIONSTATION_POSTFIX = \&

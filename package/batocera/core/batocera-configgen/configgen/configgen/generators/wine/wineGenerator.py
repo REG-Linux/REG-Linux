@@ -35,8 +35,7 @@ class WineGenerator(Generator):
             if not system.isOptSet("sdl_config") or system.getOptBoolean("sdl_config"):
                 environment.update(
                     {
-                        "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                        "SDL_JOYSTICK_HIDAPI": "0"
+                        "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
                     }
                 )
             # ensure nvidia driver used for vulkan

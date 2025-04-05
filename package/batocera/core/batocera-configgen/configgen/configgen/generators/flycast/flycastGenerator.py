@@ -203,7 +203,6 @@ class FlycastGenerator(Generator):
                 "XDG_DATA_HOME":batoceraFiles.flycastSaves,
                 "FLYCAST_DATADIR":batoceraFiles.flycastSaves,
                 "FLYCAST_BIOS_PATH":batoceraFiles.flycastBios,
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                "SDL_JOYSTICK_HIDAPI": "0"
+                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

@@ -27,7 +27,6 @@ class TaradinoGenerator(Generator):
             env={
                 "XDG_DATA_HOME": CONFIGS,
                 "XDG_DATA_DIRS": "/userdata/roms/rott",
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                "SDL_JOYSTICK_HIDAPI": "0"
+                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
