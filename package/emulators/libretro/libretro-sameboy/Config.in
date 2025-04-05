@@ -1,0 +1,11 @@
+config BR2_PACKAGE_LIBRETRO_SAMEBOY
+    bool "libretro-sameboy"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_RGBDS
+
+      help
+        DMG/CGB GameBoy emulator for libretro
+	https://github.com/LIJI32/SameBoy
+
+comment "LIBRETRO_SAMEBOY needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
