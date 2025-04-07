@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LHASA
+	bool "lhasa
+	help
+	  Lhasa is a library for parsing LHA (.lzh) archives and a free
+	  replacement for the Unix LHA tool.
+
+	  https://github.com/fragglet/lhasa
