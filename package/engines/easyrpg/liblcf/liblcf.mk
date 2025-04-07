@@ -3,9 +3,9 @@
 # LIBLCF
 #
 ################################################################################
-# Version.: Release on Apr 29, 2023
-LIBLCF_VERSION = 0.8
-LIBLCF_DEPENDENCIES = expat icu
+# Version.: Release on Apr 7, 2025
+LIBLCF_VERSION = 0.8.1
+LIBLCF_DEPENDENCIES = expat icu inih
 LIBLCF_LICENSE = MIT
 LIBLCF_SITE = $(call github,EasyRPG,liblcf,$(LIBLCF_VERSION))
 
