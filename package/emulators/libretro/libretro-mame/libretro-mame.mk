@@ -3,9 +3,8 @@
 # libretro-mame
 #
 ################################################################################
-
-# Version lrmame0275 : Feb 26, 2025
-LIBRETRO_MAME_VERSION = lrmame0275
+# Version lrmame0276 : Apr 1, 2025
+LIBRETRO_MAME_VERSION = lrmame0276
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 LIBRETRO_MAME_LICENSE = MAME
 
@@ -35,11 +34,11 @@ endif
 # Enforce symbols debugging with O0
 ifeq ($(BR2_ENABLE_DEBUG),y)
 	LIBRETRO_MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
-# Stick with O2, too much bloat with O3 !!
+# Stick with O2 or Os, too much bloat with O3 !!
 #else ifeq ($(BR2_x86_64),y)
 #	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
 else
-	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=3 LTO=1
+	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1
 endif
 
 define LIBRETRO_MAME_BUILD_CMDS
