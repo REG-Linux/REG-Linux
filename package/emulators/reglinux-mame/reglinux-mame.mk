@@ -50,9 +50,9 @@ REGLINUX_MAME_ARCH = rk3588
 # Unsupported yet in GCC Cortex A78.A55
 #else ifeq ($(BR2_cortex_a78_a55),y)
 #REGLINUX_MAME_ARCH = rk3588
-# Unknown AArch64 saphira CPU
-else ifeq ($(BR2_saphira),y)
-REGLINUX_MAME_ARCH = saphira
+# Asahi Linux
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
+REGLINUX_MAME_ARCH = asahi
 # RISC-V 64 (rv64gc, aka imafd)
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 REGLINUX_MAME_ARCH = jh7110
