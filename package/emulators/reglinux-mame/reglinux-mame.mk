@@ -3,26 +3,28 @@
 # REGLINUX-MAME (Prebuilt GroovyMAME + libretro-mame)
 #
 ################################################################################
-# Version: 0.275
-REGLINUX_MAME_VERSION = 0.275
+# Version: 0.276
+REGLINUX_MAME_VERSION = 0.276
 REGLINUX_MAME_SITE = $(call github,REG-Linux,REG-MAME,$(REGLINUX_MAME_VERSION))
 REGLINUX_MAME_LICENSE = MAME
 
 REGLINUX_MAME_ARCH = unknown
+# DEPRECATED
 # Cortex A7
-ifeq ($(BR2_cortex_a7),y)
-REGLINUX_MAME_ARCH = bcm2836
+#ifeq ($(BR2_cortex_a7),y)
+#REGLINUX_MAME_ARCH = bcm2836
 # Cortex A9
-else ifeq ($(BR2_cortex_a9),y)
-REGLINUX_MAME_ARCH = s812
+#else ifeq ($(BR2_cortex_a9),y)
+#REGLINUX_MAME_ARCH = s812
 # Cortex A15.A7
-else ifeq ($(BR2_cortex_a15_a7),y)
-REGLINUX_MAME_ARCH = odroidxu4
+#else ifeq ($(BR2_cortex_a15_a7),y)
+#REGLINUX_MAME_ARCH = odroidxu4
 # Cortex A17
-else ifeq ($(BR2_cortex_a17),y)
-REGLINUX_MAME_ARCH = rk3288
+#else ifeq ($(BR2_cortex_a17),y)
+#REGLINUX_MAME_ARCH = rk3288
 # Cortex A53
-else ifeq ($(BR2_cortex_a53),y)
+#else
+ifeq ($(BR2_cortex_a53),y)
 REGLINUX_MAME_ARCH = h5
 # Cortex A35
 else ifeq ($(BR2_cortex_a35),y)
@@ -45,9 +47,9 @@ REGLINUX_MAME_ARCH = bcm2712
 # Cortex A76.A55
 else ifeq ($(BR2_cortex_a76_a55),y)
 REGLINUX_MAME_ARCH = rk3588
-# Cortex A78.A55
-else ifeq ($(BR2_cortex_a78_a55),y)
-REGLINUX_MAME_ARCH = rk3588
+# Unsupported yet in GCC Cortex A78.A55
+#else ifeq ($(BR2_cortex_a78_a55),y)
+#REGLINUX_MAME_ARCH = rk3588
 # Unknown AArch64 saphira CPU
 else ifeq ($(BR2_saphira),y)
 REGLINUX_MAME_ARCH = saphira
@@ -55,8 +57,8 @@ REGLINUX_MAME_ARCH = saphira
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 REGLINUX_MAME_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
-# TODO currently uses jh7110
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
+#TODO still uses jh7110 profile
 REGLINUX_MAME_ARCH = jh7110
 #REGLINUX_MAME_ARCH = k1
 # X86-64-v3 subarchitecture

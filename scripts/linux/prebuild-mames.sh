@@ -30,16 +30,14 @@ sed -i s/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/BR2_PACKAGE_MAME_BUILD_FROM_SOURC
 # rk3588 can be used for sm8250 (cortex_a76_a55)
 # jh7110 can be used for k1 (no vector extensions support however)
 # DEPRECATED : ARM 32-bit targets : s812 odroidxu4 rk3288
-for arch in h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x saphira jh7110 x86_64 x86_64_v3; do
+for arch in h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x asahi jh7110 x86_64 x86_64_v3; do
 	# Clean
 	make ${arch}-clean
 	# Build
 	PKG=mame make ${arch}-pkg
 	PKG=libretro-mame make ${arch}-pkg
 	# Package
-	cd output/${arch}/target
-	tar cvzf ../../../prebuilt/reglinux-mame-${MAME_VERSION}-${arch}.tar.gz usr/bin/mame/ usr/lib/libretro/mame_libretro.so usr/share/mame/ usr/share/lr-mame/
-	cd ../../..
+	tar cvzf prebuilt/reglinux-mame-${MAME_VERSION}-${arch}.tar.gz output/${arch}/per-package/mame/target/usr/bin/mame/ output/${arch}/per-package/libretro-mame/target/usr/lib/libretro/mame_libretro.so output/${arch}/per-package/mame/target/usr/share/mame/ output/${arch}/per-package/libretro-mame/target/usr/share/lr-mame/
 	# Clean again
 	make ${arch}-clean
 done
