@@ -30,6 +30,7 @@ d5729e1c36bf284009e995bd4dc86d73  arch/Config.in.arm
 9db48344301c40951c235d6a82f4605c  package/alsa-utils/Config.in
 c00dfef256c7275cfefb4ea5d79c4cc4  package/alsa-utils/alsa-utils.mk
 88e453b9fd292be70d1ab271c8bf27ce  package/binutils/binutils.mk
+0e2da5d0681722d6fa3fc2f19c794433  package/brotli/brotli.mk
 cb034aac334473e84995afe6d5bdaa43  package/bullet/bullet.mk
 a3dd0ea9d489564444fc1a999ebf907e  package/busybox/busybox.config
 052d8077c398f47957c5f2de7a3fc180  package/busybox/busybox.mk
