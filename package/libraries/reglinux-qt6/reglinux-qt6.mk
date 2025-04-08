@@ -78,9 +78,9 @@ endif
 # Mediatek MT8395 is cortex-a78.cortex-a55
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MT8395),y)
 REGLINUX_QT6_ARCH = rk3588
-# Unknown AArch64 saphira CPU
-else ifeq ($(BR2_saphira),y)
-REGLINUX_QT6_ARCH = saphira
+# Asahi Linux
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
+REGLINUX_QT6_ARCH = asahi
 # RISC-V 64 (rv64gc, aka imafd)
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 REGLINUX_QT6_ARCH = jh7110
