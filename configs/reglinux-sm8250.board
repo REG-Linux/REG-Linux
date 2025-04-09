@@ -26,7 +26,6 @@ BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="qcom/sm8250-retroidpocket-rp5 qcom/sm8250-retroidpocket-rpmini"
 
 # System
-BR2_PACKAGE_BATOCERA_USE_QCOM_FW=y
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 
 # Enable Wayland

@@ -1,6 +1,6 @@
 config BR2_PACKAGE_GPICASE
         bool "gpicase"
-	depends on BR2_PACKAGE_BATOCERA_RPI_ANY
+	depends on BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY
 	depends on BR2_LINUX_KERNEL
 
 	help

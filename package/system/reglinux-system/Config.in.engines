@@ -1,0 +1,86 @@
+### Pinball systems ###
+config BR2_PACKAGE_REGLINUX_PINBALL_SYSTEMS
+    bool "REG-Linux pinball emulators support"
+
+    # Virtual Pinball
+    select BR2_PACKAGE_VPINBALL			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+						   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+						   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+						   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+						   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+						   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+						   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+
+#### Wine Layer ####
+config BR2_PACKAGE_BATOCERA_WINE_SYSTEMS
+	bool "REG-Linux Wine support"
+
+	# Wine (windows) layer
+	select BR2_PACKAGE_BATOCERA_WINE	if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	select BR2_PACKAGE_WINE_X86		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
+
+#### Flash Player ####
+config BR2_PACKAGE_REGLINUX_FLASH_SYSTEMS
+	bool "REG-Linux Flash support"
+
+	# Ruffle implementation in Rust
+	select BR2_PACKAGE_RUFFLE		if BR2_PACKAGE_HAS_GLES3 && (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
+
+	# Lightspark implementation in C/C++
+	select BR2_PACKAGE_LIGHTSPARK		if (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
+
+#### Moonlight / Gamestream ####
+config BR2_PACKAGE_REGLINUX_GAMESTREAM_SYSTEMS
+	bool "REG-Linux game streaming support"
+
+	# Game streaming
+	select BR2_PACKAGE_MOONLIGHT_EMBEDDED	if !BR2_PACKAGE_SYSTEM_TARGET_RK3128 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+#### ScummVM ####
+config BR2_PACKAGE_REGLINUX_SCUMMVM_SYSTEMS
+	bool "REG-Linux ScummVM emulators/cores"
+
+	# ScummVM (standalone)
+	select BR2_PACKAGE_SCUMMVM		if  BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
+
+	# ScummVM (libretro core)
+	select BR2_PACKAGE_LIBRETRO_SCUMMVM	if  BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
+
+	# ScummvM / lr-scummvm prebuilt combo
+	select BR2_PACKAGE_REGLINUX_SCUMMVM	if !BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
+
+#### Homebrew ####
+config BR2_PACKAGE_REGLINUX_HOMEBREW_SYSTEMS
+	bool "REG-Linux homebrew systems"
+
+	# OpenBOR
+	select BR2_PACKAGE_OPENBOR4432		# ALL
+	#select BR2_PACKAGE_OPENBOR6330		# ALL
+	select BR2_PACKAGE_OPENBOR6412		# ALL
+	#select BR2_PACKAGE_OPENBOR6510		# ALL
+	select BR2_PACKAGE_OPENBOR7142		# ALL
+	select BR2_PACKAGE_OPENBOR7530		# ALL
+
+	# Lutro Engine / LÖVE
+	select BR2_PACKAGE_LIBRETRO_LUTRO	if !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# RPG engine : Solarus
+	# Note: experimental LuaJIT RISC-V 64 support
+	select BR2_PACKAGE_SOLARUS_ENGINE	# ALL
+
+	# RPG engine : EasyRPG / RPG MAker
+	select BR2_PACKAGE_EASYRPG_PLAYER	if !BR2_PACKAGE_SYSTEM_TARGET_CHA # standalone
+	select BR2_PACKAGE_LIBRETRO_EASYRPG	if !BR2_PACKAGE_SYSTEM_TARGET_CHA # libretro core
+
+	# Fantasy consoles
+	#nope select BR2_PACKAGE_LIBRETRO_TIC80	# ALL
+	#nope select BR2_PACKAGE_LIBRETRO_FAKE08	# ALL
+	#nope select BR2_PACKAGE_LIBRETRO_WASM4	if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY #  Requires X11
+	#nope select BR2_PACKAGE_LIBRETRO_LOWRESNX		# ALL
+
+	# Fighting games engine
+	select BR2_PACKAGE_IKEMEN               if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL
+
+	# SMBX engine
+	select BR2_PACKAGE_THEXTECH		# ALL
+
