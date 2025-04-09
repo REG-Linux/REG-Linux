@@ -36,6 +36,7 @@ a3dd0ea9d489564444fc1a999ebf907e  package/busybox/busybox.config
 052d8077c398f47957c5f2de7a3fc180  package/busybox/busybox.mk
 d3204aa4d5249b3b4ac99dcb53cbae74  package/cmake/cmake.mk
 f92d556c7e8438348f8e8d86c4c604eb  package/connman/Config.in
+45fe588a9098e541020cdeca87db83ef  package/cpuinfo/Config.in
 c445390118f5d058dd372a8b2beb25a8  package/dropbear/S50dropbear
 86c04ec68a28da8040820ff495bda9dd  package/espeak/espeak.mk
 c6c7f5c1c993565d557fd227edb4bfc7  package/flac/flac.mk
