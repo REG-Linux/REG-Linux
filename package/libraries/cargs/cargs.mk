@@ -3,8 +3,8 @@
 # cargs
 #
 ################################################################################
-# Version: Commits on Mar 11, 2024
-CARGS_VERSION = 82b51a3fd781ba978ab9bb6a05306ce777ecb2a1
+# Version 1.2.0 released on Jun 19, 2024
+CARGS_VERSION = v1.2.0
 CARGS_SITE = $(call github,likle,cargs,$(CARGS_VERSION))
 CARGS_LICENSE = MIT
 CARGS_LICENSE_FILES = LICENSE

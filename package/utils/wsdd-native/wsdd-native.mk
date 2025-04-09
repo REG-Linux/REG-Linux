@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-WSDD_NATIVE_VERSION = 1.17
+WSDD_NATIVE_VERSION = 1.18
 WSDD_NATIVE_SITE = $(call github,gershnik,wsdd-native,v$(WSDD_NATIVE_VERSION))
 WSDD_NATIVE_LICENSE = BSD
 
