@@ -31,7 +31,7 @@ BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3128-evb rockchip/rk3128-xpi-3128 r
 #TODO BR2_LINUX_KERNEL_INTREE_DTS_NAME="rk3128-powkiddy-a13-rev-ab rk3128-powkiddy-a12-rev-c rk3128-powkiddy-a12-rev-d"
 
 # gpu
-BR2_PACKAGE_BATOCERA_LIMA_MESA3D=y
+BR2_PACKAGE_SYSTEM_LIMA_MESA3D=y
 
 # spi flash support
 BR2_PACKAGE_MTD=y
