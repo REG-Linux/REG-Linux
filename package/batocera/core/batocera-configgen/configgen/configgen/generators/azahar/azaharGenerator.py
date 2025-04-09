@@ -78,7 +78,7 @@ class AzaharGenerator(Generator):
             citraConfig.add_section("Layout")
         # Screen Layout
         citraConfig.set("Layout", "custom_layout", "false")
-        citraConfig.set("Layout", "custom_layout\default", "true")
+        citraConfig.set("Layout", "custom_layout\\default", "true")
         if system.isOptSet('azahar_screen_layout'):
             tab = system.config["azahar_screen_layout"].split('-')
             citraConfig.set("Layout", "swap_screen",   tab[1])
@@ -86,8 +86,8 @@ class AzaharGenerator(Generator):
         else:
             citraConfig.set("Layout", "swap_screen", "false")
             citraConfig.set("Layout", "layout_option", "0")
-        citraConfig.set("Layout", "swap_screen\default", "false")
-        citraConfig.set("Layout", "layout_option\default", "false")
+        citraConfig.set("Layout", "swap_screen\\default", "false")
+        citraConfig.set("Layout", "layout_option\\default", "false")
 
         ## [SYSTEM]
         if not citraConfig.has_section("System"):
@@ -97,44 +97,44 @@ class AzaharGenerator(Generator):
             citraConfig.set("System", "is_new_3ds", "true")
         else:
             citraConfig.set("System", "is_new_3ds", "false")
-        citraConfig.set("System", "is_new_3ds\default", "false")
+        citraConfig.set("System", "is_new_3ds\\default", "false")
         # Language
         citraConfig.set("System", "region_value", str(getCitraLangFromEnvironment()))
-        citraConfig.set("System", "region_value\default", "false")
+        citraConfig.set("System", "region_value\\default", "false")
 
         ## [UI]
         if not citraConfig.has_section("UI"):
             citraConfig.add_section("UI")
         # Start Fullscreen
         citraConfig.set("UI", "fullscreen", "true")
-        citraConfig.set("UI", "fullscreen\default", "false")
+        citraConfig.set("UI", "fullscreen\\default", "false")
 
         # Batocera - Defaults
         citraConfig.set("UI", "displayTitleBars", "false")
         citraConfig.set("UI", "displaytitlebars", "false") # Emulator Bug
-        citraConfig.set("UI", "displayTitleBars\default", "false")
+        citraConfig.set("UI", "displayTitleBars\\default", "false")
         citraConfig.set("UI", "firstStart", "false")
-        citraConfig.set("UI", "firstStart\default", "false")
+        citraConfig.set("UI", "firstStart\\default", "false")
         citraConfig.set("UI", "hideInactiveMouse", "true")
-        citraConfig.set("UI", "hideInactiveMouse\default", "false")
+        citraConfig.set("UI", "hideInactiveMouse\\default", "false")
         citraConfig.set("UI", "enable_discord_presence", "false")
-        citraConfig.set("UI", "enable_discord_presence\default", "false")
+        citraConfig.set("UI", "enable_discord_presence\\default", "false")
 
         # Remove pop-up prompt on start
         citraConfig.set("UI", "calloutFlags", "1")
-        citraConfig.set("UI", "calloutFlags\default", "false")
+        citraConfig.set("UI", "calloutFlags\\default", "false")
         # Close without confirmation
         citraConfig.set("UI", "confirmClose", "false")
         citraConfig.set("UI", "confirmclose", "false") # Emulator Bug
-        citraConfig.set("UI", "confirmClose\default", "false")
+        citraConfig.set("UI", "confirmClose\\default", "false")
 
         # screenshots
-        citraConfig.set("UI", "Paths\screenshotPath", "/userdata/screenshots")
-        citraConfig.set("UI", "Paths\screenshotPath\default", "false")
+        citraConfig.set("UI", "Paths\\screenshotPath", "/userdata/screenshots")
+        citraConfig.set("UI", "Paths\\screenshotPath\\default", "false")
 
         # don't check updates
-        citraConfig.set("UI", "Updater\check_for_update_on_start", "false")
-        citraConfig.set("UI", "Updater\check_for_update_on_start\default", "false")
+        citraConfig.set("UI", "Updater\\check_for_update_on_start", "false")
+        citraConfig.set("UI", "Updater\\check_for_update_on_start\\default", "false")
 
         ## [RENDERER]
         if not citraConfig.has_section("Renderer"):
@@ -192,19 +192,19 @@ class AzaharGenerator(Generator):
             citraConfig.set("Renderer", "use_vsync_new", "false")
         else:
             citraConfig.set("Renderer", "use_vsync_new", "true")
-        citraConfig.set("Renderer", "use_vsync_new\default", "true")
+        citraConfig.set("Renderer", "use_vsync_new\\default", "true")
         # Resolution Factor
         if system.isOptSet('azahar_resolution_factor'):
             citraConfig.set("Renderer", "resolution_factor", system.config["azahar_resolution_factor"])
         else:
             citraConfig.set("Renderer", "resolution_factor", "1")
-        citraConfig.set("Renderer", "resolution_factor\default", "false")
+        citraConfig.set("Renderer", "resolution_factor\\default", "false")
         # Async Shader Compilation
         if system.isOptSet('azahar_async_shader_compilation') and system.config["azahar_async_shader_compilation"] == '1':
             citraConfig.set("Renderer", "async_shader_compilation", "true")
         else:
             citraConfig.set("Renderer", "async_shader_compilation", "false")
-        citraConfig.set("Renderer", "async_shader_compilation\default", "false")
+        citraConfig.set("Renderer", "async_shader_compilation\\default", "false")
         # Use Frame Limit
         if system.isOptSet('azahar_use_frame_limit') and system.config["azahar_use_frame_limit"] == '0':
             citraConfig.set("Renderer", "use_frame_limit", "false")
@@ -224,7 +224,7 @@ class AzaharGenerator(Generator):
             citraConfig.set("Utility", "use_disk_shader_cache", "true")
         else:
             citraConfig.set("Utility", "use_disk_shader_cache", "false")
-        citraConfig.set("Utility", "use_disk_shader_cache\default", "false")
+        citraConfig.set("Utility", "use_disk_shader_cache\\default", "false")
         # Custom Textures
         if system.isOptSet('azahar_custom_textures') and system.config["azahar_custom_textures"] != '0':
             tab = system.config["azahar_custom_textures"].split('-')
