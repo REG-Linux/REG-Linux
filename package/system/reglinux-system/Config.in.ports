@@ -1,6 +1,6 @@
 #### Linux / Libretro ports ####
-config BR2_PACKAGE_BATOCERA_PORTS_SYSTEMS
-	bool "batocera.linux ports packages"
+config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
+	bool "REG-Linux ports"
 
 	# DevilutionX (Diablo 1)
 	select BR2_PACKAGE_DEVILUTIONX			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA

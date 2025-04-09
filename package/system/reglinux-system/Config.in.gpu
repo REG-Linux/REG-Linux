@@ -26,8 +26,8 @@ config BR2_PACKAGE_REGLINUX_VULKAN
 	help
 	  Vulkan support for REG-Linux
 
-config BR2_PACKAGE_BATOCERA_RPI_MESA3D
-	bool "batocera.linux driver mesa RPI"
+config BR2_PACKAGE_SYSTEM_RPI_MESA3D
+	bool "system-rpi-mesa3d"
 
 	select BR2_PACKAGE_MESA3D
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4
@@ -37,16 +37,22 @@ config BR2_PACKAGE_BATOCERA_RPI_MESA3D
 	select BR2_PACKAGE_MESA3D_OPENGL_GLX		if BR2_PACKAGE_XORG7
 	select BR2_PACKAGE_LIBGLVND			if BR2_PACKAGE_XORG7
 
-config BR2_PACKAGE_BATOCERA_LIMA_MESA3D
-	bool "batocera.linux driver mesa LIMA"
+	help
+	  Raspberry Pi GPU Mesa3D drivers for REG-Linux
+
+config BR2_PACKAGE_SYSTEM_LIMA_MESA3D
+	bool "system-lima-mesa3d"
 
 	select BR2_PACKAGE_MESA3D
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_LIMA
 	select BR2_PACKAGE_MESA3D_OPENGL_ES
 	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 
+	help
+	  Lima GPU Mesa3D driver (ARM Mali 400/450) for REG-Linux
+
 config BR2_PACKAGE_SYSTEM_PANFROST_MESA3D
-	bool "batocera.linux driver mesa PANFROST"
+	bool "system-panfrost-mesa3d"
 
 	select BR2_PACKAGE_MESA3D
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST
@@ -54,6 +60,9 @@ config BR2_PACKAGE_SYSTEM_PANFROST_MESA3D
 	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 	select BR2_PACKAGE_MESA3D_OPENGL_GLX		if BR2_PACKAGE_XORG7
 	select BR2_PACKAGE_LIBGLVND			if BR2_PACKAGE_XORG7
+
+	help
+	  Panfrost GPU Mesa3D driver (ARM Mali T6xx T7xx Gxx modern GPUs) for REG-Linux
 
 config BR2_PACKAGE_REGLINUX_ASAHI_MESA3D
 	bool "REG-Linux driver mesa Asahi"
@@ -85,8 +94,8 @@ config BR2_PACKAGE_REGLINUX_ETNAVIV_MESA3D
 	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 	select BR2_PACKAGE_HOST_PYTHON_PYCPARSER
 
-config BR2_PACKAGE_BATOCERA_GPU_X86
-	bool "batocera.linux GPU support for x86 platform"
+config BR2_PACKAGE_SYSTEM_GPU_X86
+	bool "system-gpu-x86"
 
 	# go through libglvnd
 	select BR2_PACKAGE_LIBGLVND
@@ -131,4 +140,6 @@ config BR2_PACKAGE_BATOCERA_GPU_X86
 	select BR2_PACKAGE_LIBVA_UTILS				if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
 	select BR2_PACKAGE_VDPAUINFO				if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
 
+	help
+	  REG-Linux GPU drivers for x86_64 platform
 ### ### ###

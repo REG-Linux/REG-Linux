@@ -6,20 +6,6 @@ config BR2_PACKAGE_REGLINUX_MOBILE_SYSTEMS
 	select BR2_PACKAGE_EKA2L1		if BR2_x86_64 || ((BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3)
 
 
-### Pinball systems ###
-config BR2_PACKAGE_REGLINUX_PINBALL_SYSTEMS
-    bool "REG-Linux pinball emulators support"
-
-    # Virtual Pinball
-    select BR2_PACKAGE_VPINBALL			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
-						   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
-						   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
-						   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
-						   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
-						   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
-						   BR2_PACKAGE_SYSTEM_TARGET_MT8395
-
-
 ### Multi platform systems ###
 config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     bool "REG-Linux multisystems emulators support"
@@ -44,82 +30,9 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     # Ares (OpenGL 3.3+ or Vulkan or wgpu)
     select BR2_PACKAGE_ARES			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_REGLINUX_VULKAN
 
-#### Wine Layer ####
-config BR2_PACKAGE_BATOCERA_WINE_SYSTEMS
-	bool "batocera.linux Wine support"
-
-	# Wine (windows) layer
-	select BR2_PACKAGE_BATOCERA_WINE	if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
-	select BR2_PACKAGE_WINE_X86		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
-
-#### Flash Player ####
-config BR2_PACKAGE_BATOCERA_FLASH_SYSTEMS
-	bool "batocera.linux Flash support"
-
-	# Ruffle implementation in Rust
-	select BR2_PACKAGE_RUFFLE		if BR2_PACKAGE_HAS_GLES3 && (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
-
-	# Lightspark implementation in C/C++
-	select BR2_PACKAGE_LIGHTSPARK		if (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
-
-#### Moonlight / Gamestream ####
-config BR2_PACKAGE_BATOCERA_GAMESTREAM_SYSTEMS
-	bool "batocera.linux game streaming support"
-
-	# Game streaming
-	select BR2_PACKAGE_MOONLIGHT_EMBEDDED	if !BR2_PACKAGE_SYSTEM_TARGET_RK3128 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
-
-#### ScummVM ####
-config BR2_PACKAGE_BATOCERA_SCUMMVM_SYSTEMS
-	bool "batocera.linux ScummVM emulators/cores"
-
-	# ScummVM (standalone)
-	select BR2_PACKAGE_SCUMMVM		if  BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
-
-	# ScummVM (libretro core)
-	select BR2_PACKAGE_LIBRETRO_SCUMMVM	if  BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
-
-	# ScummvM / lr-scummvm prebuilt combo
-	select BR2_PACKAGE_REGLINUX_SCUMMVM	if !BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE # ALL
-
-#### Homebrew ####
-config BR2_PACKAGE_BATOCERA_HOMEBREW_SYSTEMS
-	bool "batocera.linux homebrew systems"
-
-	# OpenBOR
-	select BR2_PACKAGE_OPENBOR4432		# ALL
-	#select BR2_PACKAGE_OPENBOR6330		# ALL
-	select BR2_PACKAGE_OPENBOR6412		# ALL
-	#select BR2_PACKAGE_OPENBOR6510		# ALL
-	select BR2_PACKAGE_OPENBOR7142		# ALL
-	select BR2_PACKAGE_OPENBOR7530		# ALL
-
-	# Lutro Engine / LÖVE
-	select BR2_PACKAGE_LIBRETRO_LUTRO	if !BR2_PACKAGE_SYSTEM_TARGET_CHA
-
-	# RPG engine : Solarus
-	# Note: experimental LuaJIT RISC-V 64 support
-	select BR2_PACKAGE_SOLARUS_ENGINE	# ALL
-
-	# RPG engine : EasyRPG / RPG MAker
-	select BR2_PACKAGE_EASYRPG_PLAYER	if !BR2_PACKAGE_SYSTEM_TARGET_CHA # standalone
-	select BR2_PACKAGE_LIBRETRO_EASYRPG	if !BR2_PACKAGE_SYSTEM_TARGET_CHA # libretro core
-
-	# Fantasy consoles
-	#nope select BR2_PACKAGE_LIBRETRO_TIC80	# ALL
-	#nope select BR2_PACKAGE_LIBRETRO_FAKE08	# ALL
-	#nope select BR2_PACKAGE_LIBRETRO_WASM4	if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY #  Requires X11
-	#nope select BR2_PACKAGE_LIBRETRO_LOWRESNX		# ALL
-
-	# Fighting games engine
-	select BR2_PACKAGE_IKEMEN               if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL
-
-	# SMBX engine
-	select BR2_PACKAGE_THEXTECH		# ALL
-
 #### Sega Dreamcast, Naomi and Atomiswave ####
-config BR2_PACKAGE_BATOCERA_SEGADC
-	bool "batocera.linux dreamcast/naomi/atomiswave emulators/cores"
+config BR2_PACKAGE_REGLINUX_SEGADC
+	bool "REG-Linux dreamcast/naomi/atomiswave emulators/cores"
 
 	# Dreamcast / Naomi / Atomiswave emulation
 	select BR2_PACKAGE_FLYCAST		if !BR2_RISCV_64			&& \
@@ -144,8 +57,8 @@ config BR2_PACKAGE_BATOCERA_SEGADC
 	  Sega Dreamcast and Naomi/Atomiswave emulation support
 
 #### Arcade cores ####
-config BR2_PACKAGE_BATOCERA_ARCADE_SYSTEMS
-	bool "batocera.linux arcade emulators packages selection"
+config BR2_PACKAGE_REGLINUX_ARCADE_SYSTEMS
+	bool "REG-Linux arcade emulators packages selection"
 
 	# Final Burn Alpha
 	select BR2_PACKAGE_LIBRETRO_FBALPHA	if BR2_PACKAGE_SYSTEM_TARGET_BCM2835 || BR2_PACKAGE_SYSTEM_TARGET_JZ4770
@@ -154,14 +67,14 @@ config BR2_PACKAGE_BATOCERA_ARCADE_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_FBNEO	# ALL
 
 	# Naomi and Atomiswave
-	select BR2_PACKAGE_BATOCERA_SEGADC	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	select BR2_PACKAGE_REGLINUX_SEGADC	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 
 	# Laserdic emulation
 	select BR2_PACKAGE_HYPSEUS_SINGE	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 	select BR2_PACKAGE_HYPSEUS_SINGE_BEZELS if BR2_PACKAGE_HYPSEUS_SINGE
 
 	# Standalone Sega Model 2 emulator
-	select BR2_PACKAGE_MODEL2EMU		if BR2_PACKAGE_BATOCERA_WINE
+	select BR2_PACKAGE_MODEL2EMU		if BR2_PACKAGE_REGLINUX_WINE
 
 	# Standalone Sega Model 3 emulator
 	select BR2_PACKAGE_SUPERMODEL		if BR2_PACKAGE_REGLINUX_XWAYLAND
@@ -183,8 +96,8 @@ config BR2_PACKAGE_BATOCERA_ARCADE_SYSTEMS
 	  Arcade cores/emulators
 
 #### Handheld consoles ####
-config BR2_PACKAGE_BATOCERA_HANDHELD_SYSTEMS
-	bool "batocera.linux handheld emulation packages"
+config BR2_PACKAGE_REGLINUX_HANDHELD_SYSTEMS
+	bool "REG-Linux handheld emulation packages"
 
 	# Gameboy / Gameboy Color
 	select BR2_PACKAGE_LIBRETRO_GAMBATTE		# ALL
@@ -296,8 +209,8 @@ config BR2_PACKAGE_BATOCERA_HANDHELD_SYSTEMS
 	  Handheld cores/emulators
 
 #### MSDOS emulation ####
-config BR2_PACKAGE_BATOCERA_MSDOS_SYSTEMS
-	bool "batocera.linux MS/DOS emulation packages"
+config BR2_PACKAGE_REGLINUX_MSDOS_SYSTEMS
+	bool "REG-Linux MS/DOS emulation packages"
 
 	select BR2_PACKAGE_DOSBOX_X				if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770  && \
 								   !BR2_PACKAGE_SYSTEM_TARGET_RK3326	&& \
@@ -322,8 +235,8 @@ config BR2_PACKAGE_BATOCERA_MSDOS_SYSTEMS
 	 MS/DOS cores/emulators
 
 #### Vintage computer systems ####
-config BR2_PACKAGE_BATOCERA_COMPUTER_SYSTEMS
-	bool "batocera.linux vintage computers emulation packages"
+config BR2_PACKAGE_REGLINUX_COMPUTER_SYSTEMS
+	bool "REG-Linux vintage computers emulation packages"
 
 	# CAPS image support (IPF)
 	select BR2_PACKAGE_LIBCAPSIMAGE		# ALL
@@ -411,8 +324,8 @@ config BR2_PACKAGE_BATOCERA_COMPUTER_SYSTEMS
 	  Old computers
 
 ### Console systems ###
-config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
-	bool "batocera.linux console emulators/cores"
+config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
+	bool "REG-Linux console emulators/cores"
 
 	# Nintendo 64
 	select BR2_PACKAGE_REGLINUX_MUPEN64		if !BR2_mipsel && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA # mupen64 (n64) runs too slow or not wanted
@@ -439,7 +352,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_GOPHER64			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_CLANG && BR2_x86_x86_64_v3
 
 	# Dreamcast
-	select BR2_PACKAGE_BATOCERA_SEGADC		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	select BR2_PACKAGE_REGLINUX_SEGADC		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 
 	# PSX
 	# newer versions of duckstation stricter on OpenGL ES 3.x, no more support for KMS/DRM
@@ -461,7 +374,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_BEETLE_PSX		if !BR2_PACKAGE_SYSTEM_TARGET_H3	&& \
 							   !BR2_PACKAGE_SYSTEM_TARGET_CHA	&& \
 							   !BR2_PACKAGE_SYSTEM_TARGET_RK3326	&& \
-							(!BR2_PACKAGE_BATOCERA_RPI_ANY || BR2_PACKAGE_SYSTEM_TARGET_BCM2712)
+							(!BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY || BR2_PACKAGE_SYSTEM_TARGET_BCM2712)
 
 
 	# Saturn
@@ -525,7 +438,7 @@ config BR2_PACKAGE_BATOCERA_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 
 	# Microsoft Xbox 360
-	select BR2_PACKAGE_XENIA			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY && BR2_PACKAGE_BATOCERA_WINE_SYSTEMS
+	select BR2_PACKAGE_XENIA			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY && BR2_PACKAGE_REGLINUX_WINE_SYSTEMS
 	select BR2_PACKAGE_XENIA_CANARY			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
 
 	# Sony PS2

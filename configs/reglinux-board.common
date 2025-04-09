@@ -85,13 +85,15 @@ BR2_PACKAGE_CAIRO_PNG=y
 # force enable ffplay
 BR2_PACKAGE_FFMPEG_FFPLAY=y
 
-# System
+# Minimal system
 BR2_PACKAGE_REGLINUX_SYSTEM=y
-BR2_PACKAGE_BATOCERA_TOOLS=y
-BR2_PACKAGE_BATOCERA_ALL_SYSTEMS=y
-BR2_PACKAGE_BATOCERA_LINUX_FIRMWARES=y
+BR2_PACKAGE_SYSTEM_TOOLS=y
+BR2_PACKAGE_SYSTEM_LINUX_FIRMWARES=y
 BR2_SYSTEM_BIN_SH_DASH=y # /bin/sh implementation; set here because a `choice` cannot be `select`ed, e.g. from batocera-system/Config.in
 BR2_PACKAGE_DROPBEAR_LOCALOPTIONS_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/dropbear_localoptions.h"
+
+# Full system
+BR2_PACKAGE_REGLINUX_ALL_SYSTEMS=y
 
 # Disable generating rootfs tar (speedup)
 BR2_TARGET_ROOTFS_TAR=n
