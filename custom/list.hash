@@ -177,6 +177,8 @@ f8b05a507a8e380b18272a3b02f344eb  package/x11r7/xlib_libXrandr/xlib_libXrandr.ha
 deac5fae112d3da3f0ec5a6cabecb573  package/x11r7/xlib_libXrandr/xlib_libXrandr.mk
 d7b74d14ad6a0e098eac396570f30179  package/x11r7/xwayland/xwayland.hash
 83c6b7da1342bedea5c0b90849321185  package/x11r7/xwayland/xwayland.mk
+32c68065c4cc62e1bfb9af0a4ea97040  support/kconfig/confdata.c
+1aa6b2dd02df45f36c6de3e486d7bf0d  support/kconfig/util.c
 15e40a5bf313229ce01dfd106e310711  support/scripts/apply-patches.sh
 46e6790ab639d76ca7ca370a12c9ec82  support/scripts/check-bin-arch
 fd68073de549caae030699682bc09c95  support/scripts/mkusers
