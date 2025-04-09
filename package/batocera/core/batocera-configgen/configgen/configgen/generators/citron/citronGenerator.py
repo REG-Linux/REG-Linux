@@ -318,7 +318,7 @@ class CitronGenerator(Generator):
                 citronConfig.set("Controls", "player_{}_type".format(nplayer-1), system.config["p{}_pad".format(nplayer)])
             else:
                 citronConfig.set("Controls", "player_{}_type".format(nplayer-1), 0)
-            citronConfig.set("Controls", "player_{}_type\default".format(nplayer-1), "false")
+            citronConfig.set("Controls", "player_{}_type\\default".format(nplayer-1), "false")
 
             for x in citronButtonsMapping:
                 citronConfig.set("Controls", "player_" + str(nplayer-1) + "_" + x, '"{}"'.format(CitronGenerator.setButton(citronButtonsMapping[x], pad.guid, pad.inputs, nplayer-1)))
@@ -327,7 +327,7 @@ class CitronGenerator(Generator):
             citronConfig.set("Controls", "player_" + str(nplayer-1) + "_motionleft", '"[empty]"')
             citronConfig.set("Controls", "player_" + str(nplayer-1) + "_motionright", '"[empty]"')
             citronConfig.set("Controls", "player_" + str(nplayer-1) + "_connected", "true")
-            citronConfig.set("Controls", "player_" + str(nplayer-1) + "_connected\default", "false")
+            citronConfig.set("Controls", "player_" + str(nplayer-1) + "_connected\\default", "false")
             citronConfig.set("Controls", "player_" + str(nplayer-1) + "_vibration_enabled", "true")
             citronConfig.set("Controls", "player_" + str(nplayer-1) + "_vibration_enabled\\default", "false")
             nplayer += 1
@@ -337,7 +337,7 @@ class CitronGenerator(Generator):
 
         for y in range(nplayer, 9):
             citronConfig.set("Controls", "player_" + str(y-1) + "_connected", "false")
-            citronConfig.set("Controls", "player_" + str(y-1) + "_connected\default", "false")
+            citronConfig.set("Controls", "player_" + str(y-1) + "_connected\\default", "false")
 
         # telemetry section
         if not citronConfig.has_section("WebService"):
