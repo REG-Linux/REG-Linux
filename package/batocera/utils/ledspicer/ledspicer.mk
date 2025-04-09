@@ -32,7 +32,7 @@ else
     LEDSPICER_CONF_OPTS += --disable-alsaaudio
 endif
 
-ifeq ($(BR2_PACKAGE_BATOCERA_RPI_ANY),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY),y)
 	LEDSPICER_CONF_OPTS += --enable-raspberrypi
 else
 	LEDSPICER_CONF_OPTS += --disable-raspberrypi

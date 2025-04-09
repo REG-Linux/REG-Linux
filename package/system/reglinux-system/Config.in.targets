@@ -3,8 +3,8 @@ bool "release mode"
 default !BR2_ENABLE_DEBUG
 
 ##### define variables to use in this file
-if BR2_PACKAGE_BATOCERA_RPI_MESA3D
-	config BR2_PACKAGE_BATOCERA_RPI_ANY
+if BR2_PACKAGE_SYSTEM_RPI_MESA3D
+	config BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY
 	bool "any rpi"
 	default y
 endif
