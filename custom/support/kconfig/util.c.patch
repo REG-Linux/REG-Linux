@@ -1,0 +1,13 @@
+diff --git a/support/kconfig/util.c b/support/kconfig/util.c
+index 8665f5bb89..c2e7979ac1 100644
+--- a/support/kconfig/util.c
++++ b/support/kconfig/util.c
+@@ -35,7 +35,7 @@ struct file *file_lookup(const char *name)
+ int file_write_dep(const char *name)
+ {
+ 	char *str;
+-	char buf[PATH_MAX+20], buf2[PATH_MAX+1], dir[PATH_MAX+1];
++	char buf[PATH_MAX+20], buf2[PATH_MAX+20], dir[PATH_MAX+1];
+ 	struct symbol *sym, *env_sym;
+ 	struct expr *e;
+ 	struct file *file;
