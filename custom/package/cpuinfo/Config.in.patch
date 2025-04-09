@@ -1,0 +1,13 @@
+diff --git a/package/cpuinfo/Config.in b/package/cpuinfo/Config.in
+index 257480f068..446e65c69b 100644
+--- a/package/cpuinfo/Config.in
++++ b/package/cpuinfo/Config.in
+@@ -4,6 +4,8 @@ config BR2_PACKAGE_CPUINFO_ARCH_SUPPORTS
+ 	default y if BR2_arm
+ 	default y if BR2_i386
+ 	default y if BR2_x86_64
++	default y if BR2_mips
++	default y if BR2_riscv
+ 
+ config BR2_PACKAGE_CPUINFO
+ 	bool "cpuinfo"
