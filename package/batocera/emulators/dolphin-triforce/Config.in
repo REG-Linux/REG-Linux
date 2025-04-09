@@ -1,8 +1,0 @@
-config BR2_PACKAGE_DOLPHIN_TRIFORCE
-	bool "dolphin-triforce"
-	depends on BR2_x86_64
-	select BR2_PACKAGE_XORG7
-	help
-	  Gamecube/Wii emulator
-
-	comment "DOLPHIN_TRIFORCE needs a toolchain w/ C++, OpenGL"
