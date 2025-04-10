@@ -287,7 +287,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/lgogdownloader/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/re2c/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/rgbds/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/vkbasalt/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/wsdd-native/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/xxd/Config.in"
 endmenu
