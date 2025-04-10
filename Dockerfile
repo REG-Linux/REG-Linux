@@ -52,6 +52,7 @@ RUN apt-get update && \
     libsdl2-mixer-dev \
     libfreeimage-dev \
     libavfilter-dev \
+    gcc-arm-none-eabi \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
