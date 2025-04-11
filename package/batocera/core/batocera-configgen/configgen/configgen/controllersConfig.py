@@ -53,35 +53,15 @@ class Controller:
     def generateSDLGameDBLine(self):
         return _generateSdlGameControllerConfig(self)
 
-# Load all controllers from the es_input.cfg
+# Load all controllers from the gamecontrollerdb.txt
 def loadAllControllersConfig():
     controllers = dict()
-    tree = ET.parse(batoceraFiles.esInputs)
-    root = tree.getroot()
-    for controller in root.findall(".//inputConfig"):
-        controllerInstance = Controller(controller.get("deviceName"), controller.get("type"),
-                                        controller.get("deviceGUID"), None, None)
-        uidname = controller.get("deviceGUID") + controller.get("deviceName")
-        controllers[uidname] = controllerInstance
-        for input in controller.findall("input"):
-            inputInstance = Input(input.get("name"), input.get("type"), input.get("id"), input.get("value"), input.get("code"))
-            controllerInstance.inputs[input.get("name")] = inputInstance
     return controllers
 
 
-# Load all controllers from the es_input.cfg
+# Load all controllers from the gamecontrollerdb.txt
 def loadAllControllersByNameConfig():
     controllers = dict()
-    tree = ET.parse(batoceraFiles.esInputs)
-    root = tree.getroot()
-    for controller in root.findall(".//inputConfig"):
-        controllerInstance = Controller(controller.get("deviceName"), controller.get("type"),
-                                        controller.get("deviceGUID"), None, None)
-        deviceName = controller.get("deviceName")
-        controllers[deviceName] = controllerInstance
-        for input in controller.findall("input"):
-            inputInstance = Input(input.get("name"), input.get("type"), input.get("id"), input.get("value"), input.get("code"))
-            controllerInstance.inputs[input.get("name")] = inputInstance
     return controllers
 
 
@@ -159,7 +139,7 @@ def _keyToSdlGameControllerConfig(keyname, name, type, id, value=None):
 
     Arguments:
       keyname: (str) SDL_GAMECONTROLLERCONFIG input name.
-      name: (str) `es_input.cfg` input name.
+      name: (str) `gamecontrollerdb.txt` input name.
       type: (str) 'button', 'hat', or 'axis'
       id: (int) Numeric key id.
       value: (int) Hat value. Only used if type == 'hat' or type == 'axis' and 'joystick' in name.
