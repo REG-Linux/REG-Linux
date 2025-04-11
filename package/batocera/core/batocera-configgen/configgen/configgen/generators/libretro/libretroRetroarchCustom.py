@@ -30,14 +30,22 @@ def generateRetroarchCustom():
     retroarchSettings.save('menu_show_online_updater',          '"false"')
     retroarchSettings.save('menu_show_core_updater',            '"false"')
 
-    # Input
-    retroarchSettings.save('input_autodetect_enable',           '"false"')
+    # Input (SDL2 based)
+    retroarchSettings.save('input_autodetect_enable',           '"true"')
+    retroarchSettings.save('input_remap_binds_enable',          '"true"')
     retroarchSettings.save('input_joypad_driver',               '"sdl2"')
+    retroarchSettings.save('input_enable_hotkey_btn',           '"5"')
+    retroarchSettings.save('input_reset_btn',                   '"0"')
+    retroarchSettings.save('input_menu_toggle_btn',             '"3"')
+    retroarchSettings.save('input_exit_emulator_btn',           '"6"')
+    retroarchSettings.save('input_load_state_btn',              '"10"')
+    retroarchSettings.save('input_save_state_btn',              '"9"')
+    retroarchSettings.save('input_state_slot_increase_btn',     '"13"')
+    retroarchSettings.save('input_state_slot_decrease_btn',     '"14"')
     retroarchSettings.save('input_player1_analog_dpad_mode',    '"1"')
     retroarchSettings.save('input_player2_analog_dpad_mode',    '"1"')
     retroarchSettings.save('input_player3_analog_dpad_mode',    '"1"')
     retroarchSettings.save('input_player4_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_enable_hotkey_btn',           '"16"')
     retroarchSettings.save('input_enable_hotkey',               '"shift"')
     retroarchSettings.save('input_menu_toggle',                 '"f1"')
     retroarchSettings.save('input_exit_emulator',               '"escape"')
@@ -47,17 +55,17 @@ def generateRetroarchCustom():
     retroarchSettings.save('video_gpu_screenshot',              '"true"')
     retroarchSettings.save('video_shader_enable',               '"false"')
     retroarchSettings.save('aspect_ratio_index',                '"22"')
-    
+
     # Audio
     retroarchSettings.save('audio_volume',                       '"2.0"')
-    
+
     # Settings
     retroarchSettings.save('global_core_options',               '"true"')
     retroarchSettings.save('config_save_on_exit',               '"false"')
     retroarchSettings.save('savestate_auto_save',               '"false"')
     retroarchSettings.save('savestate_auto_load',               '"false"')
     retroarchSettings.save('menu_swap_ok_cancel_buttons',       '"true"')
-    
+
     # Accentuation
     retroarchSettings.save('rgui_extended_ascii',               '"true"')
 
@@ -78,10 +86,9 @@ def generateRetroarchCustom():
 
     # Disable builtin image viewer (done in ES, and prevents from loading pico-8 .png carts)
     retroarchSettings.save('builtin_imageviewer_enable',        '"false"')
-    
+
     # Set fps counter interval (in frames)
     retroarchSettings.save('fps_update_interval',               '"30"')
-    
 
     retroarchSettings.write()
 
