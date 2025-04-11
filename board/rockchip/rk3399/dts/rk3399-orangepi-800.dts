@@ -3,6 +3,7 @@
  * Copyright (c) 2019 Akash Gajjar <Akash_Gajjar@mentor.com>
  * Copyright (c) 2019 Pragnesh Patel <Pragnesh_Patel@mentor.com>
  * Copyright (c) 2022 Furkan Kardame <f.kardame@manjaro.org>
+ * Copyright (c) 2025 Romain Tisserand <romain.tisserand@gmail.com>
  */
 
 /dts-v1/;
@@ -254,11 +255,6 @@
 		};
 	};
 
-	sprd-wlan {
-		compatible = "sprd,uwe5622-wifi";
-		status = "okay";
-	};
-
 	unisoc_uwe_bsp: uwe-bsp {
 		compatible = "unisoc,uwe_bsp";
 		wl-reg-on = <&gpio0 RK_PB2 GPIO_ACTIVE_HIGH>;
@@ -272,6 +268,11 @@
 		data-irq;
 		blksz-512;
 		keep-power-on;
+		status = "okay";
+	};
+
+	sprd-wlan {
+		compatible = "sprd,uwe5622-wifi";
 		status = "okay";
 	};
 
@@ -304,6 +305,11 @@
 
 &cpu_b1 {
 	cpu-supply = <&vdd_cpu_b>;
+};
+
+&gpu {
+	status = "okay";
+	mali-supply = <&vdd_gpu>;
 };
 
 &emmc_phy {
@@ -343,11 +349,6 @@
 			interrupts = <RK_PB2 IRQ_TYPE_LEVEL_LOW>;
 		};
 	};
-};
-
-&gpu {
-	status = "okay";
-	mali-supply = <&vdd_gpu>;
 };
 
 &hdmi {
