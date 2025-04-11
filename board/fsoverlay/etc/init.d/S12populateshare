@@ -50,7 +50,7 @@ case "$1" in
 
             # And REG-linux system configs, services but do not update user settings.
             if [ -d "$OUT"/system ]; then
-                find ./system \( -type f -o -xtype l \) \( ! -iname "es_settings.cfg" -a ! -iname "es_input.cfg" -a ! -iname "system.conf" \) >> /tmp/updateuserdata.lst
+                find ./system \( -type f -o -xtype l \) \( ! -iname "es_settings.cfg" -a ! -iname "gamecontrollerdb.txt" -a ! -iname "system.conf" \) >> /tmp/updateuserdata.lst
             fi
         fi
 
