@@ -22,6 +22,3 @@ bindsym $alt+f fullscreen
 for_window [all] opacity 1
 set $animations off
 default_border none
-
-# Set a default rule to start all applications in fullscreen mode
-for_window [fullscreen] fullscreen
