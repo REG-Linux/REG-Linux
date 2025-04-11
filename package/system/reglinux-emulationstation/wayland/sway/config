@@ -23,9 +23,6 @@ for_window [all] opacity 1
 set $animations off
 default_border none
 
-# Set a default rule to start all applications in fullscreen mode
-for_window [fullscreen] fullscreen
-
 # Starts EmulationStation when loading sway
 exec /usr/bin/system-mouse hide
 exec /usr/bin/emulationstation-standalone
