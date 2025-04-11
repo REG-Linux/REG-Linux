@@ -75,7 +75,9 @@ class LibretroGenerator(Generator):
                     lightgun = False
                 else:
                     lightgun = True
-            libretroControllers.writeControllersConfig(retroconfig, system, playersControllers, lightgun)
+            # REG ES skip this for now
+            # libretroControllers.writeControllersConfig(retroconfig, system, playersControllers, lightgun)
+
             # force pathes
             libretroRetroarchCustom.generateRetroarchCustomPathes(retroconfig)
             # Write configuration to retroarchcustom.cfg

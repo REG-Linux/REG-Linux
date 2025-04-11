@@ -70,8 +70,7 @@ class Sonic3AIRGenerator(Generator):
             array=commandArray,
             env={
                 "XDG_DATA_HOME":batoceraFiles.CONF,
-                "SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                "SDL_JOYSTICK_HIDAPI": "0"
+                "SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
     

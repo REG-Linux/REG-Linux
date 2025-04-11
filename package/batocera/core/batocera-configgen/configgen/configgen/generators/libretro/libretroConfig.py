@@ -231,7 +231,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
     retroarchConfig['builtin_imageviewer_enable'] = 'false'
 
     # Input configuration
-    retroarchConfig['input_joypad_driver'] = 'udev'
+    retroarchConfig['input_joypad_driver'] = 'sdl2'
     retroarchConfig['input_driver'] = 'udev'                    # driver for mouse/keyboard. udev required for guns.
     retroarchConfig['input_max_users'] = "16"                   # Allow up to 16 players
 
