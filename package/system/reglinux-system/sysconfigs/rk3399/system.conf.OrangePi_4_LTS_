@@ -1,0 +1,5 @@
+# OrangePi 4 LTS default values
+
+# default card
+audio.device=alsa_output._sys_devices_platform_hdmi-sound_sound_card1.hdmi-stereo
+audio.profile=output:hdmi-stereo@alsa_card._sys_devices_platform_hdmi-sound_sound_card1
