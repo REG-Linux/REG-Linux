@@ -1,0 +1,22 @@
+--- a/code/client/client.h	2025-04-03 11:38:23.000000000 +0200
++++ b/code/client/client.h	2025-04-12 12:27:21.979917300 +0200
+@@ -35,7 +35,7 @@
+ #endif /* USE_CURL */
+ 
+ #ifdef USE_VOIP
+-#include <opus.h>
++#include <opus/opus.h>
+ #endif
+ 
+ // file full of random crap that gets used to create cl_guid
+--- a/code/client/snd_codec_opus.c	2025-04-12 12:30:52.974501061 +0200
++++ b/code/client/snd_codec_opus.c	2025-04-12 12:31:00.895726495 +0200
+@@ -31,7 +31,7 @@
+ 
+ // includes for the Ogg Opus codec
+ #include <errno.h>
+-#include <opusfile.h>
++#include <opus/opusfile.h>
+ 
+ // samples are 16 bit
+ #define OPUS_SAMPLEWIDTH 2
