@@ -3,7 +3,7 @@
 # lgoddownloader
 #
 ################################################################################
-LGOGDOWNLOADER_VERSION = v3.16
+LGOGDOWNLOADER_VERSION = v3.17
 LGOGDOWNLOADER_SITE = $(call github,Sude-,lgogdownloader,$(LGOGDOWNLOADER_VERSION))
 LGOGDOWNLOADER_LICENSE = WTFPL
 LGOGDOWNLOADER_DEPENDENCIES = boost libcurl libtidy jsoncpp rhash tinyxml2
