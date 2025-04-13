@@ -51,8 +51,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-hatariConf = CONF + '/hatari/hatari.cfg'
-
 daphneRomdir = ROMS + '/daphne'
 singeRomdir = ROMS + '/singe'
 hypseusDatadir = CONF + '/hypseus-singe'
