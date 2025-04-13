@@ -47,9 +47,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-dosboxStagingCustom = CONF + '/dosbox'
-dosboxStagingConfig = dosboxStagingCustom + '/dosbox.conf'
-
 dosboxxCustom = CONF + '/dosbox'
 dosboxxConfig = dosboxxCustom + '/dosboxx.conf'
 
