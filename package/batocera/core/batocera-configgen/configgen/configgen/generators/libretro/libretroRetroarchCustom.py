@@ -1,20 +1,18 @@
-#!/usr/bin/env python
-import sys
+#!/usr/bin/env python3
 import os
-import batoceraFiles
-import configparser
 from settings.unixSettings import UnixSettings
+from . import libretroConfig
 
 def generateRetroarchCustom():
     # retroarchcustom.cfg
-    if not os.path.exists(os.path.dirname(batoceraFiles.retroarchCustom)):
-        os.makedirs(os.path.dirname(batoceraFiles.retroarchCustom))
+    if not os.path.exists(os.path.dirname(libretroConfig.retroarchCustom)):
+        os.makedirs(os.path.dirname(libretroConfig.retroarchCustom))
 
     try:
-        retroarchSettings = UnixSettings(batoceraFiles.retroarchCustom, separator=' ')
+        retroarchSettings = UnixSettings(libretroConfig.retroarchCustom, separator=' ')
     except UnicodeError:
-        os.remove(batoceraFiles.retroarchCustom)
-        retroarchSettings = UnixSettings(batoceraFiles.retroarchCustom, separator=' ')
+        os.remove(libretroConfig.retroarchCustom)
+        retroarchSettings = UnixSettings(libretroConfig.retroarchCustom, separator=' ')
 
     # Use Interface
     retroarchSettings.save('menu_driver',                       '"ozone"')

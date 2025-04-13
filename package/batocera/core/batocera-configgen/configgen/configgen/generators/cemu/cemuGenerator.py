@@ -1,18 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
 import os
-from os import path
-from os import environ
-import batoceraFiles
-from xml.dom import minidom
 import codecs
-import controllersConfig
-import shutil
-import filecmp
 import subprocess
 import glob
+import batoceraFiles
+import controllersConfig
+from os import path
+from os import environ
+from xml.dom import minidom
 from . import cemuControllers
 
 from utils.logger import get_logger
@@ -32,7 +30,7 @@ class CemuGenerator(Generator):
     # disable hud & bezels for now - causes game issues
     def hasInternalMangoHUDCall(self):
         return True
-    
+
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
         # in case of squashfs, the root directory is passed
@@ -48,7 +46,7 @@ class CemuGenerator(Generator):
             os.mkdir(cemuConfig)
         #graphic packs
         if not path.isdir(cemuSaves + "/graphicPacks"):
-            os.mkdir(cemuSaves + "/graphicPacks")         
+            os.mkdir(cemuSaves + "/graphicPacks")
         if not path.isdir(cemuConfig + "/controllerProfiles"):
             os.mkdir(cemuConfig + "/controllerProfiles")
 
@@ -64,7 +62,7 @@ class CemuGenerator(Generator):
             commandArray = ["/usr/bin/cemu/cemu", "-f", "-g", rpxrom]
             # force no menubar
             commandArray.append("--force-no-menubar")
-        
+
         return Command.Command(
             array=commandArray,
             env={"XDG_CONFIG_HOME":batoceraFiles.CONF, "XDG_CACHE_HOME":batoceraFiles.CACHE,
@@ -137,7 +135,7 @@ class CemuGenerator(Generator):
         game_root = CemuGenerator.getRoot(config, "GamePaths")
         # Default games path
         CemuGenerator.setSectionConfig(config, game_root, "Entry", cemuRomdir)
-     
+
         ## [GRAPHICS]
         CemuGenerator.setSectionConfig(config, xml_root, "Graphic", "")
         graphic_root = CemuGenerator.getRoot(config, "Graphic")
@@ -177,7 +175,7 @@ class CemuGenerator(Generator):
                     CemuGenerator.setSectionConfig(config, graphic_root, "api", "0")
             except subprocess.CalledProcessError:
                 eslog.debug("Error executing system-vulkan script.")
-        
+
         # Async VULKAN Shader compilation
         if system.isOptSet("cemu_async") and system.config["cemu_async"] == "False":
             CemuGenerator.setSectionConfig(config, graphic_root, "AsyncCompile", "false")
@@ -273,7 +271,7 @@ class CemuGenerator(Generator):
             eslog.debug("*** use config audio device ***")
         else:
             CemuGenerator.setSectionConfig(config, audio_root, "TVDevice", cemuAudioDevice)
-        
+
         # Save the config file
         xml = open(configFile, "w")
 
@@ -281,8 +279,8 @@ class CemuGenerator(Generator):
         xml = codecs.open(configFile, "w", "utf-8")
         dom_string = os.linesep.join([s for s in config.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
         xml.write(dom_string)
-    
-    # Show mouse for touchscreen actions    
+
+    # Show mouse for touchscreen actions
     def getMouseMode(self, config, rom):
         if "cemu_touchpad" in config and config["cemu_touchpad"] == "1":
             return True

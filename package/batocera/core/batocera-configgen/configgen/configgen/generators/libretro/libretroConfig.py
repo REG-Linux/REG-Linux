@@ -1,20 +1,23 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import os
-import batoceraFiles
-from . import libretroOptions
-from . import libretroMAMEConfig
-from Emulator import Emulator
-import settings
-from settings.unixSettings import UnixSettings
 import json
 import subprocess
-from utils.logger import get_logger
-from PIL import Image, ImageOps
+import batoceraFiles
+import controllersConfig
 import utils.bezels as bezelsUtil
 import utils.videoMode as videoMode
-import controllersConfig
 import xml.etree.ElementTree as ET
+from . import libretroOptions
+from . import libretroMAMEConfig
+from settings.unixSettings import UnixSettings
+from utils.logger import get_logger
+
+retroarchRoot = batoceraFiles.CONF + '/retroarch'
+retroarchRootInit = batoceraFiles.CONF_INIT + '/retroarch'
+retroarchCustom = retroarchRoot + '/retroarchcustom.cfg'
+retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
+retroarchCores = "/usr/lib/libretro/"
 
 eslog = get_logger(__name__)
 sys.path.append(
@@ -98,7 +101,7 @@ def writeLibretroConfig(generator, retroconfig, system, controllers, metadata, g
 def createLibretroConfig(generator, system, controllers, metadata, guns, wheels, rom, bezel, shaderBezel, gameResolution, gfxBackend):
 
     # retroarch-core-options.cfg
-    retroarchCore = batoceraFiles.retroarchCoreCustom
+    retroarchCore = retroarchCoreCustom
     if not os.path.exists(os.path.dirname(retroarchCore)):
         os.makedirs(os.path.dirname(retroarchCore))
 

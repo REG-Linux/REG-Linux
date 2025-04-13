@@ -1,12 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import glob
 import os
 import re
 import shutil
-
 import Command
-from generators.Generator import Generator
 import controllersConfig
 
 _ROMS_DIR = '/userdata/roms/xash3d_fwgs'

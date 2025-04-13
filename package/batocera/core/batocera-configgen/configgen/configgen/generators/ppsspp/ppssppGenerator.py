@@ -1,11 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
-import batoceraFiles
 from generators.Generator import Generator
-import shutil
+import Command
 import os
-import configparser
+import batoceraFiles
 import controllersConfig
 from . import ppssppConfig
 from . import ppssppControllers
@@ -21,7 +19,7 @@ class PPSSPPGenerator(Generator):
         dbpath = "/userdata/system/configs/ppsspp/gamecontrollerdb.txt"
         if os.path.exists(dbpath):
             os.remove(dbpath)
-        
+
         # Generate the controls.ini
         for index in playersControllers :
             controller = playersControllers[index]
@@ -56,7 +54,7 @@ class PPSSPPGenerator(Generator):
             nplayer = nplayer +1
 
         return Command.Command(
-            array=commandArray, 
+            array=commandArray,
             env={
                 "XDG_CONFIG_HOME":batoceraFiles.CONF,
                 "XDG_DATA_HOME":batoceraFiles.SAVES,

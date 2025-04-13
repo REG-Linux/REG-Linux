@@ -1,14 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
 from generators.Generator import Generator
-import controllersConfig
+import Command
 import os
-import configparser
 import io
 import re
 import shutil
+import configparser
+import controllersConfig
 from shutil import copyfile
+from . import supermodelConfig
 
 class SupermodelGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -125,8 +126,8 @@ def copy_asset_files():
 def copy_xml():
     source_path = '/usr/share/supermodel/Games.xml'
     dest_path = '/userdata/system/configs/supermodel/Games.xml'
-    if not os.path.exists('/userdata/system/configs/supermodel'):
-        os.makedirs('/userdata/system/configs/supermodel')
+    if not os.path.exists(supermodelConfig.supermodelCustom):
+        os.makedirs(supermodelConfig.supermodelCustom)
     if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
         shutil.copy2(source_path, dest_path)
 
@@ -179,7 +180,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
             "up": "joystick1up",
             "down": "joystick1down"
         }
-    targetFile = "/userdata/system/configs/supermodel/Supermodel.ini"
+    targetFile = supermodelConfig.supermodelIni
 
     mapping_fallback = {
         "axisX": "left",

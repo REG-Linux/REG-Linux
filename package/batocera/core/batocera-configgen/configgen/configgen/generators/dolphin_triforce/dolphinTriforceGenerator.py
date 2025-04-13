@@ -1,12 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+from generators.Generator import Generator
 import Command
 import batoceraFiles
-from generators.Generator import Generator
-import shutil
 import os.path
-from os import environ
 import configparser
+from os import environ
 from . import dolphinTriforceControllers
+from . import dolphinTriforceConfig
 
 class DolphinTriforceGenerator(Generator):
     # this emulator/core requires X server to run
@@ -15,12 +16,12 @@ class DolphinTriforceGenerator(Generator):
 
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        if not os.path.exists(os.path.dirname(batoceraFiles.dolphinTriforceIni)):
-            os.makedirs(os.path.dirname(batoceraFiles.dolphinTriforceIni))
+        if not os.path.exists(os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)):
+            os.makedirs(os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni))
 
         # Dir required for saves
-        if not os.path.exists(batoceraFiles.dolphinTriforceData + "/StateSaves"):
-            os.makedirs(batoceraFiles.dolphinTriforceData + "/StateSaves")
+        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceData + "/StateSaves"):
+            os.makedirs(dolphinTriforceConfig.dolphinTriforceData + "/StateSaves")
 
         dolphinTriforceControllers.generateControllerConfig(system, playersControllers, rom)
 
@@ -29,8 +30,8 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceSettings.optionxform = str
-        if os.path.exists(batoceraFiles.dolphinTriforceIni):
-            dolphinTriforceSettings.read(batoceraFiles.dolphinTriforceIni)
+        if os.path.exists(dolphinTriforceConfig.dolphinTriforceIni):
+            dolphinTriforceSettings.read(dolphinTriforceConfig.dolphinTriforceIni)
 
         # Sections
         if not dolphinTriforceSettings.has_section("General"):
@@ -128,7 +129,7 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceSettings.set("Core", "SIDevice0", "11")
 
         # Save dolphin.ini
-        with open(batoceraFiles.dolphinTriforceIni, 'w') as configfile:
+        with open(dolphinTriforceConfig.dolphinTriforceIni, 'w') as configfile:
             dolphinTriforceSettings.write(configfile)
 
         ## gfx.ini ##
@@ -136,7 +137,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceGFXSettings.optionxform = str
-        dolphinTriforceGFXSettings.read(batoceraFiles.dolphinTriforceGfxIni)
+        dolphinTriforceGFXSettings.read(dolphinTriforceConfig.dolphinTriforceGfxIni)
 
         # Add Default Sections
         if not dolphinTriforceGFXSettings.has_section("Settings"):
@@ -232,7 +233,7 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.set("Settings", "MSAA", "0")
 
         # Save gfx.ini
-        with open(batoceraFiles.dolphinTriforceGfxIni, 'w') as configfile:
+        with open(dolphinTriforceConfig.dolphinTriforceGfxIni, 'w') as configfile:
             dolphinTriforceGFXSettings.write(configfile)
 
         ## logger settings ##
@@ -240,7 +241,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceLogSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceLogSettings.optionxform = str
-        dolphinTriforceLogSettings.read(batoceraFiles.dolphinTriforceLoggerIni)
+        dolphinTriforceLogSettings.read(dolphinTriforceConfig.dolphinTriforceLoggerIni)
 
         # Sections
         if not dolphinTriforceLogSettings.has_section("Logs"):
@@ -250,20 +251,20 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceLogSettings.set("Logs", "DVD", "False")
 
         # Save Logger.ini
-        with open(batoceraFiles.dolphinTriforceLoggerIni, 'w') as configfile:
+        with open(dolphinTriforceConfig.dolphinTriforceLoggerIni, 'w') as configfile:
             dolphinTriforceLogSettings.write(configfile)
 
         ## game settings ##
 
         # These cheat files are required to launch Triforce games, and thus should always be present and enabled.
 
-        if not os.path.exists(batoceraFiles.dolphinTriforceGameSettings):
-            os.makedirs(batoceraFiles.dolphinTriforceGameSettings)
+        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings):
+            os.makedirs(dolphinTriforceConfig.dolphinTriforceGameSettings)
 
         # GFZE01 F-Zero GX (convert to F-Zero AX)
 
-        if not os.path.exists(batoceraFiles.dolphinTriforceGameSettings + "/GFZE01.ini"):
-            dolphinTriforceGameSettingsGFZE01 = open(batoceraFiles.dolphinTriforceGameSettings + "/GFZE01.ini", "w")
+        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini"):
+            dolphinTriforceGameSettingsGFZE01 = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini", "w")
             dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
 $AX
 06003F30 00000284
@@ -356,8 +357,8 @@ $AX
 
         # GVSJ8P Virtua Striker 2002
 
-        if not os.path.exists(batoceraFiles.dolphinTriforceGameSettings + "/GVSJ8P.ini"):
-            dolphinTriforceGameSettingsGVSJ8P = open(batoceraFiles.dolphinTriforceGameSettings + "/GVSJ8P.ini", "w")
+        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini"):
+            dolphinTriforceGameSettingsGVSJ8P = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini", "w")
             dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
 $DI Seed Blanker
 0x80000000:dword:0x00000000
@@ -370,8 +371,8 @@ $DI Seed Blanker
 
         # GGPE01 Mario Kart GP 1
 
-        if not os.path.exists(batoceraFiles.dolphinTriforceGameSettings + "/GGPE01.ini"):
-            dolphinTriforceGameSettingsGGPE01 = open(batoceraFiles.dolphinTriforceGameSettings + "/GGPE01.ini", "w")
+        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"):
+            dolphinTriforceGameSettingsGGPE01 = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", "w")
             dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
 $Disable crypto
 0x8023D828:dword:0x93A30008
@@ -396,8 +397,8 @@ EmulationIssues = AM-Baseboard
 
         # GGPE02 Mario Kart GP 2
 
-        if not os.path.exists(batoceraFiles.dolphinTriforceGameSettings + "/GGPE02.ini"):
-            dolphinTriforceGameSettingsGGPE02 = open(batoceraFiles.dolphinTriforceGameSettings + "/GGPE02.ini", "w")
+        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini"):
+            dolphinTriforceGameSettingsGGPE02 = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini", "w")
             dolphinTriforceGameSettingsGGPE02.write("""[Display]
 ProgressiveScan = 0
 [Wii]
@@ -457,8 +458,8 @@ $SeatLoopPatch
         # dolphinTriforceGameSettingsGGPE01 = configparser.ConfigParser(interpolation=None, allow_no_value=True,delimiters=';')
         # # To prevent ConfigParser from converting to lower case
         # dolphinTriforceGameSettingsGGPE01.optionxform = str
-        # if os.path.exists(batoceraFiles.dolphinTriforceGameSettings + "/GGPE01.ini"):
-            # dolphinTriforceGameSettingsGGPE01.read(batoceraFiles.dolphinTriforceGameSettings + "/GGPE01.ini")
+        # if os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"):
+            # dolphinTriforceGameSettingsGGPE01.read(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini")
 
         # # GGPE01 sections
         # if not dolphinTriforceGameSettingsGGPE01.has_section("OnFrame"):
@@ -477,7 +478,7 @@ $SeatLoopPatch
             # dolphinTriforceGameSettingsGGPE01.set("OnFrame_Enabled", "$Emulation Bug Fixes")
 
         # # Save GGPE01.ini
-        # with open(batoceraFiles.dolphinTriforceGameSettings + "/GGPE01.ini", 'w') as configfile:
+        # with open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", 'w') as configfile:
             # dolphinTriforceGameSettingsGGPE01.write(configfile)
 
         commandArray = ["dolphin-triforce", "-b", "-U", "/userdata/system/configs/dolphin-triforce", "-e", rom]
