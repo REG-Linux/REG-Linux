@@ -3,18 +3,27 @@
 import batoceraFiles
 import os
 import shutil
-from Emulator import Emulator
 from settings.unixSettings import UnixSettings
+
+moonlightCustom = batoceraFiles.CONF + '/moonlight'
+moonlightConfigFile = moonlightCustom + '/moonlight.conf'
+moonlightStagingConfigFile = moonlightCustom + '/staging/moonlight.conf'
+moonlightGamelist = moonlightCustom + '/gamelist.txt'
+moonlightMapping = dict()
+moonlightMapping[1] = moonlightCustom + '/mappingP1.conf'
+moonlightMapping[2] = moonlightCustom + '/mappingP2.conf'
+moonlightMapping[3] = moonlightCustom + '/mappingP3.conf'
+moonlightMapping[4] = moonlightCustom + '/mappingP4.conf'
 
 def generateMoonlightConfig(system):
 
-    moonlightStagingConfigFile = batoceraFiles.moonlightStagingConfigFile
-    if not os.path.exists(batoceraFiles.moonlightCustom + '/staging'):
-        os.makedirs(batoceraFiles.moonlightCustom + '/staging')
+    moonlightStagingConfigFile = moonlightStagingConfigFile
+    if not os.path.exists(moonlightCustom + '/staging'):
+        os.makedirs(moonlightCustom + '/staging')
 
     # If user made config file exists, copy to staging directory for use
-    if os.path.exists(batoceraFiles.moonlightConfigFile):
-        shutil.copy(batoceraFiles.moonlightConfigFile, batoceraFiles.moonlightStagingConfigFile)
+    if os.path.exists(moonlightConfigFile):
+        shutil.copy(moonlightConfigFile, moonlightStagingConfigFile)
     else:
         # truncate existing config and create new one
         f = open(moonlightStagingConfigFile, "w").close()
@@ -35,13 +44,13 @@ def generateMoonlightConfig(system):
         else:
             moonlightConfig.save('width', '1280')
             moonlightConfig.save('height', '720')
-        
+
         # rotate
         if system.isOptSet('moonlight_rotate'):
             moonlightConfig.save('rotate', system.config["moonlight_rotate"])
         else:
             moonlightConfig.save('rotate', '0')
-        
+
         # framerate
         if system.isOptSet('moonlight_framerate'):
             if system.config["moonlight_framerate"] == "0":
@@ -83,7 +92,7 @@ def generateMoonlightConfig(system):
             moonlightConfig.save('quitappafter', system.config["moonlight_quitapp"].lower())
         else:
             moonlightConfig.save('quitappafter', 'false')
-        
+
         # view only
         if system.isOptSet('moonlight_viewonly'):
             moonlightConfig.save('viewonly', system.config["moonlight_viewonly"].lower())
@@ -95,14 +104,14 @@ def generateMoonlightConfig(system):
         moonlightConfig.save('platform', 'sdl')
 
         ## Directory to store encryption keys
-        moonlightConfig.save('keydir', batoceraFiles.moonlightCustom + '/keydir')
+        moonlightConfig.save('keydir', moonlightCustom + '/keydir')
 
         # lan or wan streaming - ideally lan
         if system.isOptSet('moonlight_remote'):
             moonlightConfig.save('remote', system.config["moonlight_remote"])
         else:
             moonlightConfig.save('remote', 'no')
-        
+
         ## Enable 5.1/7.1 surround sound
         if system.isOptSet('moonlight_surround'):
             moonlightConfig.save('surround', system.config["moonlight_surround"])

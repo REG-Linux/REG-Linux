@@ -47,16 +47,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-moonlightCustom = CONF + '/moonlight'
-moonlightConfigFile = moonlightCustom + '/moonlight.conf'
-moonlightStagingConfigFile = moonlightCustom + '/staging/moonlight.conf'
-moonlightGamelist = moonlightCustom + '/gamelist.txt'
-moonlightMapping = dict()
-moonlightMapping[1] = moonlightCustom + '/mappingP1.conf'
-moonlightMapping[2] = moonlightCustom + '/mappingP2.conf'
-moonlightMapping[3] = moonlightCustom + '/mappingP3.conf'
-moonlightMapping[4] = moonlightCustom + '/mappingP4.conf'
-
 dolphinConfig  = CONF + "/dolphin-emu"
 dolphinData    = SAVES + "/dolphin-emu"
 dolphinIni     = dolphinConfig + '/Dolphin.ini'
