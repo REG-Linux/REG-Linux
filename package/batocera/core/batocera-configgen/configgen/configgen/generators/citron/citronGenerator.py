@@ -27,8 +27,7 @@ class CitronGenerator(Generator):
         return Command.Command(array=commandArray, env={
             "XDG_CONFIG_HOME":batoceraFiles.CONF, \
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/switch", \
-            "XDG_CACHE_HOME":batoceraFiles.CACHE, \
-            "QT_QPA_PLATFORM":"xcb"})
+            "XDG_CACHE_HOME":batoceraFiles.CACHE})
 
     def writeCitronConfig(citronConfigFile, system, playersControllers):
         # pads
