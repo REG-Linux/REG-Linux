@@ -496,7 +496,6 @@ class DuckstationLegacyGenerator(Generator):
             array=commandArray,
             env={
                 "XDG_CONFIG_HOME": batoceraFiles.CONF,
-                "QT_QPA_PLATFORM": "wayland",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
