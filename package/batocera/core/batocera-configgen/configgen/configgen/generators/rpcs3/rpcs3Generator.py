@@ -360,7 +360,7 @@ class Rpcs3Generator(Generator):
         dbfile = "/userdata/system/configs/rpcs3/input_configs/gamecontrollerdb.txt"
         controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
 
-        commandArray = [batoceraFiles.batoceraBins[system.config["emulator"]], romName]
+        commandArray = [rpcs3Config.rpcs3Bin, romName]
 
         if not (system.isOptSet("rpcs3_gui") and system.getOptBoolean("rpcs3_gui")):
             commandArray.append("--no-gui")
@@ -368,7 +368,7 @@ class Rpcs3Generator(Generator):
         # firmware not installed and available : instead of starting the game, install it
         if Rpcs3Generator.getFirmwareVersion() is None:
           if os.path.exists("/userdata/bios/PS3UPDAT.PUP"):
-            commandArray = [batoceraFiles.batoceraBins[system.config["emulator"]], "--installfw", "/userdata/bios/PS3UPDAT.PUP"]
+            commandArray = [rpcs3Config.rpcs3Bin, "--installfw", "/userdata/bios/PS3UPDAT.PUP"]
 
         return Command.Command(
             array=commandArray,

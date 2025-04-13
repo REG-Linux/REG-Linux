@@ -4,4 +4,5 @@ import batoceraFiles
 
 dosboxxCustom = batoceraFiles.CONF + '/dosbox'
 dosboxxConfig = dosboxxCustom + '/dosboxx.conf'
+dosboxxBin = '/usr/bin/dosbox-x'
 

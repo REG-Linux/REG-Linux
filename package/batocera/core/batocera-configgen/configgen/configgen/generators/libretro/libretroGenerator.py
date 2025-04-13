@@ -110,7 +110,7 @@ class LibretroGenerator(Generator):
         dontAppendROM = False
         # For the NeoGeo CD (lr-fbneo) it is necessary to add the parameter: --subsystem neocd
         if system.name == 'neogeocd' and system.config['core'] == "fbneo":
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--subsystem", "neocd", "--config", system.config['configfile']]
+            commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--subsystem", "neocd", "--config", system.config['configfile']]
         # Set up GB/GBC Link games to use 2 different ROMs if needed
         if system.name == 'gb2players' or system.name == 'gbc2players':
             GBMultiROM = list()
@@ -147,10 +147,10 @@ class LibretroGenerator(Generator):
                     GBMultiSys.append("gbc")
             # If there are at least 2 games in the list, use the alternate command line
             if len(GBMultiROM) >= 2:
-                commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, GBMultiROM[0], "--subsystem", "gb_link_2p", GBMultiROM[1], "--config", system.config['configfile']]
+                commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, GBMultiROM[0], "--subsystem", "gb_link_2p", GBMultiROM[1], "--config", system.config['configfile']]
                 dontAppendROM = True
             else:
-                commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
+                commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--config", system.config['configfile']]
             # Handling for the save copy
             if (system.isOptSet('sync_saves') and system.config["sync_saves"] == '1'):
                 if len(GBMultiROM) >= 2:
@@ -215,10 +215,10 @@ class LibretroGenerator(Generator):
                     exe = os.path.join(rom, "dosbox.bat")
                 else:
                     exe = rom
-                commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile'], exe]
+                commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--config", system.config['configfile'], exe]
                 dontAppendROM = True
             else:
-                commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
+                commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--config", system.config['configfile']]
         # Pico-8 multi-carts (might work only with official Lexaloffe engine right now)
         elif system.name == 'pico8':
             romext = os.path.splitext(romName)[1]
@@ -226,7 +226,7 @@ class LibretroGenerator(Generator):
                 with open (rom, "r") as fpin:
                     lines = fpin.readlines()
                 rom = os.path.dirname(os.path.abspath(rom)) + '/' + lines[0].strip()
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
+            commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--config", system.config['configfile']]
         # vitaquake2 - choose core based on directory
         elif system.name == 'vitaquake2':
             directory_path = os.path.dirname(rom)
@@ -238,7 +238,7 @@ class LibretroGenerator(Generator):
                 system.config['core'] = "vitaquake2-zaero"
             # set the updated core name
             retroarchCore = libretroConfig.retroarchCores + system.config['core'] + "_libretro.so"
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
+            commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--config", system.config['configfile']]
         # super mario wars - verify assets from Content Downloader
         elif system.name == 'superbroswar':
             romdir = os.path.dirname(os.path.abspath(rom))
@@ -264,9 +264,9 @@ class LibretroGenerator(Generator):
                 eslog.error("ERROR: Game assets not installed. You can get them from the Batocera Content Downloader.")
                 raise
 
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
+            commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--config", system.config['configfile']]
         else:
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
+            commandArray = [libretroConfig.retroarchBin, "-L", retroarchCore, "--config", system.config['configfile']]
 
         configToAppend = []
 
