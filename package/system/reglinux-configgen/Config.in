@@ -1,0 +1,19 @@
+config BR2_PACKAGE_REGLINUX_CONFIGGEN
+        bool "reglinux configgen"
+	select BR2_PACKAGE_PYTHON3
+	select BR2_PACKAGE_PYTHON_PYYAML
+	select BR2_PACKAGE_PYTHON_LXML
+	select BR2_PACKAGE_PYTHON_RUAMEL_YAML
+	select BR2_PACKAGE_PYTHON_TOML
+	select BR2_PACKAGE_PYTHON_PILLOW
+	select BR2_PACKAGE_PYTHON_PSUTIL
+	select BR2_PACKAGE_PYTHON3_CONFIGOBJ
+	select BR2_PACKAGE_PYTHON_PYUDEV	# for guns
+	select BR2_PACKAGE_PYTHON_REQUESTS	# for retroachievements
+	select BR2_PACKAGE_MANGOHUD		if BR2_x86_64 || BR2_PACKAGE_SYSTEM_TARGET_GLES3
+
+        help
+          The configuration utility for reglinux
+	  The purpose of the lib is to automatically configure emulators, using the environment variables available in REG-Linux.
+          The main program is emulatorlauncher.py, taking parameters, that are the system and controllers configurations.
+

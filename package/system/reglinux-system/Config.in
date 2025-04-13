@@ -70,7 +70,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_ES_THEME_CANVAS		# emulationstation theme
 	select BR2_PACKAGE_ES_BACKGROUND_MUSICS		# emulationstation musics
 	select BR2_PACKAGE_BATOCERA_ES_SYSTEM		# emulation station es_systems.cfg generator + default roms
-	select BR2_PACKAGE_BATOCERA_CONFIGGEN		# emulation station external command launcher
+	select BR2_PACKAGE_REGLINUX_CONFIGGEN		# emulation station external command launcher
 	select BR2_PACKAGE_BATOCERA_TRIGGERHAPPY	# multimedia/power buttons
 	select BR2_PACKAGE_BATOCERA_UDEV_RULES		# extra udev rules for specifics joysticks/devices
 	select BR2_PACKAGE_XOSD				if BR2_PACKAGE_XSERVER_XORG_SERVER # osd information displaying
