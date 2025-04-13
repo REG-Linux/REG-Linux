@@ -47,12 +47,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-dolphinConfig  = CONF + "/dolphin-emu"
-dolphinData    = SAVES + "/dolphin-emu"
-dolphinIni     = dolphinConfig + '/Dolphin.ini'
-dolphinGfxIni  = dolphinConfig + '/GFX.ini'
-dolphinSYSCONF = dolphinData + "/Wii/shared2/sys/SYSCONF"
-
 dolphinTriforceConfig  = CONF + "/dolphin-triforce"
 dolphinTriforceData    = SAVES + "/dolphin-triforce"
 dolphinTriforceIni     = dolphinTriforceConfig + '/Config/Dolphin.ini'
