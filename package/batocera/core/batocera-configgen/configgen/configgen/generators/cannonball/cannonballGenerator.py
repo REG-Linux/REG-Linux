@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
 
 from generators.Generator import Generator
-import batoceraFiles
 import os
-from xml.dom import minidom
 import codecs
 import Command
+from xml.dom import minidom
 from . import cannonballControllers
+from . import cannonballConfig
 
 class CannonballGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        configFile = batoceraFiles.CONF + '/cannonball/config.xml'
-        
-        if not os.path.exists(os.path.dirname(configFile)):
-            os.makedirs(os.path.dirname(configFile))
+
+        if not os.path.exists(os.path.dirname(cannonballConfig.cannonballConfigFile)):
+            os.makedirs(os.path.dirname(cannonballConfig.cannonballConfigFile))
 
         # config file
         config = minidom.Document()
-        if os.path.exists(configFile):
+        if os.path.exists(cannonballConfig.cannonballConfigFile):
             try:
-                config = minidom.parse(configFile)
+                config = minidom.parse(cannonballConfig.cannonballConfigFile)
             except:
                 pass # reinit the file
 
@@ -52,12 +51,11 @@ class CannonballGenerator(Generator):
         cannonballControllers.generateControllerConfig(config, xml_root, playersControllers)
 
         # save the config file
-        #cannonballXml = open(configFile, "w")
-        # TODO: python 3 - workawround to encode files in utf-8
-        cannonballXml = codecs.open(configFile, "w", "utf-8")
+        cannonballXml = codecs.open(cannonballConfig.cannonballConfigFile, "w", "utf-8")
         dom_string = os.linesep.join([s for s in config.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
         cannonballXml.write(dom_string)
-        
+        cannonballXml.close()
+
         return Command.Command(array=["cannonball"])
 
     @staticmethod
@@ -71,7 +69,7 @@ class CannonballGenerator(Generator):
             xml_section = xml_section[0]
 
         return xml_section
-    
+
     @staticmethod
     def getSection(config, xml_root, name):
         xml_section = xml_root.getElementsByTagName(name)
