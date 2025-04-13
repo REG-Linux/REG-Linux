@@ -5,7 +5,6 @@ import os
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-
 sway_launched = False
 gamescope_launched = False
 
@@ -21,6 +20,7 @@ def start_sway(generator, system):
         os.environ["QT_QPA_PLATFORM"]="wayland"
         if generator.requiresX11():
             os.environ["DISPLAY"]=":0"
+            os.environ["QT_QPA_PLATFORM"]="xcb"
         sway_launched = True
         eslog.debug("Composer started!")
 
