@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SYNCTHING_VERSION = v1.29.2
+SYNCTHING_VERSION = v1.29.5
 SYNCTHING_SITE = $(call github,syncthing,syncthing,$(SYNCTHING_VERSION))
 SYNCTHING_LICENSE = MPLv2
 SYNCTHING_LICENSE_FILES = LICENSE
@@ -23,7 +23,7 @@ ifeq ($(BR2_riscv),y)
 endif
 
 # GOFLAGS="-modcacherw" used to fix directory permissions to make sure cleanbuild works.
-# For details see: 
+# For details see:
 # https://github.com/golang/go/issues/27161 https://github.com/golang/go/issues/27455
 
 SYNCTHING_TARGET_ENV = \
@@ -42,7 +42,7 @@ endef
 define SYNCTHING_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
 	$(INSTALL) -D $(@D)/syncthing $(TARGET_DIR)/usr/bin/syncthing
-	$(INSTALL) -Dm755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/syncthing/syncthing \
+	$(INSTALL) -Dm755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/utils/syncthing/syncthing \
 	    $(TARGET_DIR)/usr/share/reglinux/services/
 endef
 

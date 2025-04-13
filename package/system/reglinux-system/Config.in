@@ -91,6 +91,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_FBDUMP			# tool to capture snapshots from the Linux kernel framebuffer device and write them out as a PPM file
 	select BR2_PACKAGE_FBGRAB			# framebuffer screenshot program, capturing the linux frambuffer and converting it to a png-picture
 	select BR2_PACKAGE_EUDEV_RULES_GEN		# fork of systemd-udev with the goal of obtaining better compatibility with existing software such as OpenRC and Upstart
+	select BR2_PACKAGE_BOOST			# boost base package, used in many packages
 	select BR2_PACKAGE_BOOST_ATOMIC			# library that provides atomic data types and operations on these data types
 	select BR2_PACKAGE_UTIL_LINUX_LIBSMARTCOLS	# library is used for smart adaptive formatting of tabular data
 	select BR2_PACKAGE_UTIL_LINUX_SETTERM		# Set terminal attributes
@@ -146,7 +147,6 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_E2FSPROGS_RESIZE2FS			# fs resize
 	select BR2_PACKAGE_PACMAN				# pacman package manager
 	select BR2_PACKAGE_FLATPAK				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # flatpak app packaging system
-	#select BR2_PACKAGE_BAUH				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # flatpak gui
 	select BR2_PACKAGE_RYZENADJ				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # ryzen apu configuration
 
 	select BR2_PACKAGE_HTOP					# resources monitor
@@ -244,6 +244,8 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_FDUPES
 	select BR2_PACKAGE_PYTHON_SERIAL		if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
 	select BR2_PACKAGE_SMARTMONTOOLS
+	# Removed because Qt5
+	#select BR2_PACKAGE_BAUH			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # flatpak gui
 
 	# gpio controllers
 	select BR2_PACKAGE_DB9_GPIO_RPI					if BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY
@@ -456,7 +458,6 @@ config BR2_PACKAGE_REGLINUX_XORGAPPS
 	# Xorg apps
 	select BR2_PACKAGE_BATOCERA_DESKTOPAPPS		# batocera applications config and scripts
 	select BR2_PACKAGE_LIBGTK3			# gtk3 library
-	select BR2_PACKAGE_L3AFPAD			# gtk3 text editor
 	select BR2_PACKAGE_PCMANFM			# file manager
 	select BR2_PACKAGE_GVFS				# file systems (trash, smb, ... in pcmanfm)
 	select BR2_PACKAGE_ADWAITA_ICON_THEME_LIGHT	# theme for file manager
