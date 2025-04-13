@@ -47,9 +47,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-dosboxxCustom = CONF + '/dosbox'
-dosboxxConfig = dosboxxCustom + '/dosboxx.conf'
-
 scummvmSaves = SAVES + '/scummvm'
 
 solarusSaves = SAVES + '/solarus'

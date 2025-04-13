@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 import Command
+import configparser
 import batoceraFiles
-from generators.Generator import Generator
 import os.path, shutil
+from generators.Generator import Generator
 from os.path import dirname
 from os.path import isdir
 from os.path import isfile
-import glob
-import configparser
-
+from . import dosboxxConfig
 class DosBoxxGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
@@ -17,7 +16,7 @@ class DosBoxxGenerator(Generator):
         batFile = gameDir + "/dosbox.bat"
         gameConfFile = gameDir + "/dosbox.cfg"
 
-        configFile = batoceraFiles.dosboxxConfig
+        configFile = dosboxxConfig.dosboxxConfig
         if os.path.isfile(gameConfFile):
             configFile = gameConfFile
 
@@ -27,7 +26,7 @@ class DosBoxxGenerator(Generator):
         iniSettings.optionxform = str
 
         # copy config file to custom config file to avoid overwritting by dosbox-x
-        customConfFile = os.path.join(batoceraFiles.dosboxxCustom,'dosboxx-custom.conf')
+        customConfFile = os.path.join(dosboxxConfig.dosboxxCustom,'dosboxx-custom.conf')
 
         if os.path.exists(configFile):
             shutil.copy2(configFile, customConfFile)
@@ -44,7 +43,7 @@ class DosBoxxGenerator(Generator):
 
         # -fullscreen removed as it crashes on N2
         commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
-			"-exit", 
+			"-exit",
 			"-c", f"""mount c {gameDir}""",
                         "-c", "c:",
                         "-c", "dosbox.bat",
