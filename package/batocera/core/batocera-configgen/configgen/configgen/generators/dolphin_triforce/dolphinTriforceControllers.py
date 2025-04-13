@@ -1,14 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
-import batoceraFiles
 import os
 import codecs
-from Emulator import Emulator
-from utils.logger import get_logger
 import glob
 import configparser
 import re
+from . import dolphinTriforceConfig
+from utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -61,12 +59,12 @@ def generateControllerConfig_gamecube(system, playersControllers,rom):
     generateControllerConfig_any(system, playersControllers, "Config/GCPadNew.ini", "GCPad", gamecubeMapping, gamecubeReverseAxes, gamecubeReplacements)
 
 def removeControllerConfig_gamecube():
-    configFileName = "{}/{}".format(batoceraFiles.dolphinTriforceConfig, "Config/GCPadNew.ini")
+    configFileName = "{}/{}".format(dolphinTriforceConfig.dolphinTriforceConfig, "Config/GCPadNew.ini")
     if os.path.isfile(configFileName):
         os.remove(configFileName)
 
 def generateHotkeys(playersControllers):
-    configFileName = "{}/{}".format(batoceraFiles.dolphinTriforceConfig, "Config/Hotkeys.ini")
+    configFileName = "{}/{}".format(dolphinTriforceConfig.dolphinTriforceConfig, "Config/Hotkeys.ini")
     f = codecs.open(configFileName, "w", encoding="utf_8")
 
     hotkeysMapping = {
@@ -104,7 +102,7 @@ def generateHotkeys(playersControllers):
                 # Write the configuration for this key
                 if keyname is not None:
                     write_key(f, keyname, input.type, input.id, input.value, pad.nbaxes, False, hotkey.id)
-                    
+
                 #else:
                 #    f.write("# undefined key: name="+input.name+", type="+input.type+", id="+str(input.id)+", value="+str(input.value)+"\n")
 
@@ -114,7 +112,7 @@ def generateHotkeys(playersControllers):
     f.close()
 
 def generateControllerConfig_any(system, playersControllers, filename, anyDefKey, anyMapping, anyReverseAxes, anyReplacements, extraOptions = {}):
-    configFileName = f"{batoceraFiles.dolphinTriforceConfig}/{filename}"
+    configFileName = f"{dolphinTriforceConfig.dolphinTriforceConfig}/{filename}"
     f = codecs.open(configFileName, "w", encoding="utf_8")
     nplayer = 1
     nsamepad = 0
@@ -146,7 +144,7 @@ def generateControllerConfig_any(system, playersControllers, filename, anyDefKey
 def generateControllerConfig_any_auto(f, pad, anyMapping, anyReverseAxes, anyReplacements, extraOptions, system):
     for opt in extraOptions:
         f.write(opt + " = " + extraOptions[opt] + "\n")
-    
+
     # Recompute the mapping according to available buttons on the pads and the available replacements
     currentMapping = anyMapping
     # Apply replacements
@@ -162,14 +160,14 @@ def generateControllerConfig_any_auto(f, pad, anyMapping, anyReverseAxes, anyRep
                     currentMapping[anyReplacements["joystick2down"]] = anyReverseAxes[currentMapping["joystick2up"]]
                 if x == "joystick2left":
                     currentMapping[anyReplacements["joystick2right"]] = anyReverseAxes[currentMapping["joystick2left"]]
-    
+
     for x in pad.inputs:
         input = pad.inputs[x]
-    
+
         keyname = None
         if input.name in currentMapping:
             keyname = currentMapping[input.name]
-    
+
         # Write the configuration for this key
         if keyname is not None:
             write_key(f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None)

@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import os
 import Command
-from generators.Generator import Generator
 import controllersConfig
 
 class UqmGenerator(Generator):

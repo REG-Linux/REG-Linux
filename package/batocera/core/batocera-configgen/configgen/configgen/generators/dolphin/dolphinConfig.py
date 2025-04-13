@@ -1,10 +1,16 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
+import batoceraFiles
 from struct import pack
 from struct import unpack
 from os     import environ
 from utils.logger import get_logger
+
+dolphinConfig  = batoceraFiles.CONF + "/dolphin-emu"
+dolphinData    = batoceraFiles.SAVES + "/dolphin-emu"
+dolphinIni     = dolphinConfig + '/Dolphin.ini'
+dolphinGfxIni  = dolphinConfig + '/GFX.ini'
+dolphinSYSCONF = dolphinData + "/Wii/shared2/sys/SYSCONF"
 
 eslog = get_logger(__name__)
 
@@ -133,4 +139,4 @@ def update(config, filepath, gameResolution):
     readWriteFile(filepath, arg_setval)
 
 if __name__ == '__main__':
-    readWriteFile("/userdata/saves/dolphin-emu/Wii/shared2/sys/SYSCONF", {})
+    readWriteFile(dolphinSYSCONF, {})

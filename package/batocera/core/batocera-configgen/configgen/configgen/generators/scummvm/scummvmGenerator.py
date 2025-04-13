@@ -1,40 +1,38 @@
-#!/usr/bin/env python
-import Command
-import batoceraFiles
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
-import controllersConfig
+import Command
 import os.path
 import glob
 import configparser
+import batoceraFiles
+import controllersConfig
+from . import scummvmConfig
 
-scummConfigDir = batoceraFiles.CONF + "/scummvm"
-scummConfigFile = scummConfigDir + "/scummvm.ini"
-scummExtra = "/userdata/bios/scummvm/extra"
-
-class ScummVMGenerator(Generator):  
+class ScummVMGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # crete /userdata/bios/scummvm/extra folder if it doesn't exist
-        if not os.path.exists(scummExtra):
-            os.makedirs(scummExtra)
-        
+        if not os.path.exists(scummvmConfig.scummExtra):
+            os.makedirs(scummvmConfig.scummExtra)
+
         # create / modify scummvm config file as needed
         scummConfig = configparser.ConfigParser()
         scummConfig.optionxform=str
-        if os.path.exists(scummConfigFile):
-            scummConfig.read(scummConfigFile)
-        
+        if os.path.exists(scummvmConfig.scummConfigFile):
+            scummConfig.read(scummvmConfig.scummConfigFile)
+
         if not scummConfig.has_section("scummvm"):
             scummConfig.add_section("scummvm")
         # set gui_browser_native to false
         scummConfig.set("scummvm", "gui_browser_native", "false")
 
         # save the ini file
-        if not os.path.exists(os.path.dirname(scummConfigFile)):
-            os.makedirs(os.path.dirname(scummConfigFile))
-        with open(scummConfigFile, 'w') as configfile:
+        if not os.path.exists(os.path.dirname(scummvmConfig.scummConfigFile)):
+            os.makedirs(os.path.dirname(scummvmConfig.scummConfigFile))
+        with open(scummvmConfig.scummConfigFile, 'w') as configfile:
             scummConfig.write(configfile)
-        
+
         # Find rom path
         if os.path.isdir(rom):
           # rom is a directory: must contains a <game name>.scummvm file
@@ -56,7 +54,7 @@ class ScummVMGenerator(Generator):
             nplayer += 1
 
         commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-f"]
-        
+
         # set the resolution
         window_width = str(gameResolution["width"])
         window_height = str(gameResolution["height"])
@@ -75,7 +73,7 @@ class ScummVMGenerator(Generator):
             commandArray.append(f"--scaler={system.config['scumm_scaler_mode']}")
         else:
             commandArray.append("--scaler=normal")
-                
+
         #  stretch mode
         if system.isOptSet("scumm_stretch"):
             commandArray.append(f"--stretch-mode={system.config['scumm_stretch']}")
@@ -100,13 +98,13 @@ class ScummVMGenerator(Generator):
         commandArray.extend(
             [f"--joystick={id}",
             "--screenshotspath="+batoceraFiles.screenshotsDir,
-            "--extrapath="+scummExtra,
+            "--extrapath="+scummvmConfig.scummExtra,
             f"--path={romPath}",
             f"{romName}"]
         )
 
         return Command.Command(
-            array=commandArray, 
+            array=commandArray,
             env={
                 "XDG_CONFIG_HOME":batoceraFiles.CONF,
                 "XDG_DATA_HOME":batoceraFiles.SAVES,
@@ -114,7 +112,7 @@ class ScummVMGenerator(Generator):
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
-    
+
     def getInGameRatio(self, config, gameResolution, rom):
         if ("scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect") or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):
             return 4/3

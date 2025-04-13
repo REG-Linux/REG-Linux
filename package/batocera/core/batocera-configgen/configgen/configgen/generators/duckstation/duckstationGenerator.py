@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
@@ -6,8 +6,6 @@ import batoceraFiles
 import controllersConfig
 import configparser
 import os.path
-import requests
-import json
 from utils.logger import get_logger
 from os import environ
 
