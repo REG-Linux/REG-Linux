@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 def configureOptions(vpinballSettings, system):
     # Tables are organised by folders containing the vpx file, and sub-folders with the roms, altcolor, altsound,...

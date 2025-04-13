@@ -1,27 +1,24 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
-import batoceraFiles
 import Command
 import shutil
 import os
-from utils.logger import get_logger
-from os import path
-from os import environ
-import configparser
-from xml.dom import minidom
 import xml.etree.ElementTree as ET
-import codecs
 import shutil
 import utils.bezels as bezelsUtil
 import subprocess
-from xml.dom import minidom
-from PIL import Image, ImageOps
-from . import mameControllers
-from pathlib import Path
 import csv
+import batoceraFiles
 import controllersConfig
 import utils.videoMode as videoMode
+from xml.dom import minidom
+from PIL import Image
+from . import mameControllers
+from pathlib import Path
+from os import path
+from xml.dom import minidom
+from utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

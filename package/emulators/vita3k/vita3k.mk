@@ -3,13 +3,14 @@
 # vita3k
 #
 ################################################################################
-# Version: Commits on Apr 2, 2025
-VITA3K_VERSION = 7c2110290985329b6a3bcabc2f97cff387acc090
+# Version: Commits on Apr 8, 2025
+VITA3K_VERSION = 05690eb3441cc34ef03cdde4fc633db1b3c52a97
 VITA3K_SITE = https://github.com/vita3k/vita3k
 VITA3K_SITE_METHOD=git
 VITA3K_GIT_SUBMODULES=YES
 VITA3K_LICENSE = GPLv3
-VITA3K_DEPENDENCIES = sdl2 sdl2_image sdl2_ttf zlib libogg libvorbis boost python-ruamel-yaml libgtk3
+VITA3K_DEPENDENCIES = sdl2 sdl2_image sdl2_ttf zlib libogg libvorbis
+VITA3K_DEPENDENCIES += boost python-ruamel-yaml libgtk3 fmt libcurl
 VITA3K_EXTRACT_DEPENDENCIES = host-libcurl
 
 VITA3K_SUPPORTS_IN_SOURCE_BUILD = NO
@@ -18,7 +19,7 @@ VITA3K_CONF_OPTS = -DCMAKE_BUILD_TYPE=Release \
                    -DBUILD_SHARED_LIBS=OFF \
                    -DUSE_DISCORD_RICH_PRESENCE=OFF \
                    -DUSE_VITA3K_UPDATE=OFF \
-                   -DBUILD_EXTERNAL=ON
+                   -DBUILD_EXTERNAL=OFF
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3),y)
     VITA3K_CONF_OPTS += -DXXH_X86DISPATCH_ALLOW_AVX=ON

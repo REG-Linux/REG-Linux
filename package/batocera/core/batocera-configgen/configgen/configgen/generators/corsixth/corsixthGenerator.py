@@ -1,10 +1,11 @@
-#!/usr/bin/env python
-import Command
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
-import controllersConfig
+import Command
 import os
-import batoceraFiles
 import subprocess
+import batoceraFiles
+import controllersConfig
 
 corsixthConfigPath = batoceraFiles.CONF + "/corsixth"
 corsixthConfigFile = corsixthConfigPath + "/config.txt"

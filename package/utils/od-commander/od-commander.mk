@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OD_COMMANDER_VERSION = 079a84c8a8cc25e1899cb11bcfce8e9e2ed9fca9
+OD_COMMANDER_VERSION = 9aa39d7bcb5d0f6faadaf027a1539d14177a3c7c
 OD_COMMANDER_SITE = $(call github,od-contrib,commander,$(OD_COMMANDER_VERSION))
 OD_COMMANDER_DEPENDENCIES = sdl2 sdl2_gfx sdl2_image sdl2_ttf dejavu nanum-font
 OD_COMMANDER_RESOURCES_DIR = /usr/share/od-commander/
@@ -20,9 +20,7 @@ OD_COMMANDER_CONF_OPTS += \
 	-DCMDR_GAMEPAD_OPEN=ControllerButton::A \
 	-DCMDR_GAMEPAD_PARENT=ControllerButton::B
 
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3326),y)
-	OD_COMMANDER_CONF_OPTS += -DBATOCERA_HANDHELD=1 -DFILE_SYSTEM="\"/dev/mmcblk0p2\""
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
 	OD_COMMANDER_CONF_OPTS += -DFILE_SYSTEM="\"/dev/sda2\"" # FIXME this should be dynamic...
 else
 	OD_COMMANDER_CONF_OPTS += -DFILE_SYSTEM="\"/dev/mmcblk0p2\""
@@ -60,7 +58,7 @@ define OD_COMMANDER_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(OD_COMMANDER_BUILDDIR)commander \
 	  $(TARGET_DIR)/usr/bin/od-commander
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy/
-	 cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/od-commander/odcommander.keys \
+	 cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/utils/od-commander/odcommander.keys \
 	  $(TARGET_DIR)/usr/share/evmapy/
 endef
 

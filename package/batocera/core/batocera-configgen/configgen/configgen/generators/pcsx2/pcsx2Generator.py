@@ -1,20 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
-import batoceraFiles
 import Command
 import os
-from settings.unixSettings import UnixSettings
-from utils.logger import get_logger
 import re
 import configparser
-import io
-import controllersConfig
 import json
 import requests
 import time
 import shutil
 import subprocess
+import batoceraFiles
+import controllersConfig
+from utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -87,9 +85,7 @@ class Pcsx2Generator(Generator):
             if not re.search(r'^flags\s*:.*\ssse4_1\W', cpuinfo.read(), re.MULTILINE):
                 eslog.warning("CPU does not support SSE4.1 which is required by pcsx2.  The emulator will likely crash with SIGILL (illegal instruction).")
 
-        envcmd = { "XDG_CONFIG_HOME":batoceraFiles.CONF,
-                   "QT_QPA_PLATFORM":"wayland"
-                  }
+        envcmd = { "XDG_CONFIG_HOME":batoceraFiles.CONF }
 
         # wheels won't work correctly when SDL_GAMECONTROLLERCONFIG is set. excluding wheels from SDL_GAMECONTROLLERCONFIG doesn't fix too.
         # wheel metadata

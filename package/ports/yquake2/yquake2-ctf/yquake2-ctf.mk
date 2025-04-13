@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-YQUAKE2_CTF_VERSION = CTF_1_10
+YQUAKE2_CTF_VERSION = CTF_1_11
 YQUAKE2_CTF_SITE = $(call github,yquake2,ctf,$(YQUAKE2_CTF_VERSION))
 YQUAKE2_CTF_DEPENDENCIES = sdl2
 

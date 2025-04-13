@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-import Command
-import batoceraFiles
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
-import shutil
+import Command
 import os.path
-import configparser
-# TODO: python3 - delete me!
-import codecs
+import batoceraFiles
 import controllersConfig
 from shutil import copyfile
 from . import xemuConfig
@@ -26,7 +23,7 @@ class XemuGenerator(Generator):
 
         # the command to run
         commandArray = [batoceraFiles.batoceraBins[system.config['emulator']]]
-        commandArray.extend(["-config_path", batoceraFiles.xemuConfig])
+        commandArray.extend(["-config_path", xemuConfig.xemuConfig])
 
         environment = {
             "XDG_CONFIG_HOME": batoceraFiles.CONF,
@@ -34,7 +31,7 @@ class XemuGenerator(Generator):
         }
 
         return Command.Command(array=commandArray, env=environment)
-    
+
     def getInGameRatio(self, config, gameResolution, rom):
         if ("xemu_scaling" in config and config["xemu_scaling"] == "stretch") or ("xemu_aspect" in config and config["xemu_aspect"] == "16x9"):
             return 16/9

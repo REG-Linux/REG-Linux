@@ -1,31 +1,31 @@
-#!/usr/bin/env python
-import Command
-import batoceraFiles
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
+import Command
 import os.path
-import glob
+import zipfile
+import batoceraFiles
+import controllersConfig
 from . import viceConfig
 from . import viceControllers
-import controllersConfig
-import zipfile
 
 class ViceGenerator(Generator):
 
     def getResolutionMode(self, config):
         return 'default'
-    
+
     # Main entry of the module
     # Return command
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        if not os.path.exists(os.path.dirname(batoceraFiles.viceConfig)):
-            os.makedirs(os.path.dirname(batoceraFiles.viceConfig))
+        if not os.path.exists(os.path.dirname(viceConfig.viceConfig)):
+            os.makedirs(os.path.dirname(viceConfig.viceConfig))
 
         # configuration file
-        viceConfig.setViceConfig(batoceraFiles.viceConfig, system, metadata, guns, rom)
+        viceConfig.setViceConfig(viceConfig.viceConfig, system, metadata, guns, rom)
 
         # controller configuration
-        viceControllers.generateControllerConfig(system, batoceraFiles.viceConfig, playersControllers)
+        viceControllers.generateControllerConfig(system, viceConfig.viceConfig, playersControllers)
 
         commandArray = [batoceraFiles.batoceraBins[system.config['emulator']] + system.config['core']]
         # Determine the way to launch roms based on extension type
@@ -35,9 +35,9 @@ class ViceGenerator(Generator):
             with zipfile.ZipFile(rom, "r") as zip_file:
                 for zip_info in zip_file.infolist():
                     rom_extension = os.path.splitext(zip_info.filename)[1]
-        
+
         # TODO - add some logic for various extension types
-        
+
         commandArray.append(rom)
 
         return Command.Command(

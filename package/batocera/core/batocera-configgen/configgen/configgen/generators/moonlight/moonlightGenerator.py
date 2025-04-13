@@ -1,17 +1,17 @@
-#!/usr/bin/env python
-import Command
-import controllersConfig
-import batoceraFiles
-from . import moonlightConfig
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
-import shutil
+import Command
 import os.path
+import batoceraFiles
+import controllersConfig
+from . import moonlightConfig
 
 class MoonlightGenerator(Generator):
 
     def getResolutionMode(self, config):
         return 'default'
-    
+
     # Main entry of the module
     # Configure fba and return a command
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
@@ -38,7 +38,7 @@ class MoonlightGenerator(Generator):
         # Rom's basename without extension
         romName = os.path.splitext(os.path.basename(rom))[0]
         # find the real game name
-        f = open(batoceraFiles.moonlightGamelist, 'r')
+        f = open(moonlightConfig.moonlightGamelist, 'r')
         gfeGame = None
         for line in f:
             try:
@@ -46,11 +46,11 @@ class MoonlightGenerator(Generator):
                 #confFile = confFile.rstrip()
             except:
                 gfeRom, gfeGame = line.rstrip().split(';')
-                confFile = batoceraFiles.moonlightStagingConfigFile
+                confFile = moonlightConfig.moonlightStagingConfigFile
             #If found
             if gfeRom == romName:
                 # return it
                 f.close()
                 return [gfeGame, confFile]
         # If nothing is found (old gamelist file format ?)
-        return [gfeGame, batoceraFiles.moonlightStagingConfigFile]
+        return [gfeGame, moonlightConfig.moonlightStagingConfigFile]

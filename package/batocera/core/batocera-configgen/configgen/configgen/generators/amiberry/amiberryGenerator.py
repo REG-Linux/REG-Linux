@@ -1,26 +1,27 @@
-import os
-from os import path
-import Command
-import batoceraFiles
-import shutil
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
-import controllersConfig
+import os
+import Command
 import os.path
 import zipfile
-import configparser
+import batoceraFiles
+import controllersConfig
+from os import path
+from os.path import dirname
 from settings.unixSettings import UnixSettings
 from generators.libretro import libretroControllers
-from os.path import dirname
 from utils.logger import get_logger
+from . import amiberryConfig
 
 eslog = get_logger(__name__)
 
 class AmiberryGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        retroconfig = UnixSettings(batoceraFiles.amiberryRetroarchCustom, separator=' ')
-        if not os.path.exists(dirname(batoceraFiles.amiberryRetroarchCustom)):
-            os.makedirs(dirname(batoceraFiles.amiberryRetroarchCustom))
+        retroconfig = UnixSettings(amiberryConfig.amiberryRetroarchCustom, separator=' ')
+        if not os.path.exists(dirname(amiberryConfig.amiberryRetroarchCustom)):
+            os.makedirs(dirname(amiberryConfig.amiberryRetroarchCustom))
 
         romType = self.getRomType(rom)
         eslog.debug("romType: "+romType)
@@ -59,15 +60,15 @@ class AmiberryGenerator(Generator):
             libretroControllers.writeControllersConfig(retroconfig, system, playersControllers, True)
             retroconfig.write()
 
-            if not os.path.exists(batoceraFiles.amiberryRetroarchInputsDir):
-                os.makedirs(batoceraFiles.amiberryRetroarchInputsDir)
+            if not os.path.exists(amiberryConfig.amiberryRetroarchInputsDir):
+                os.makedirs(amiberryConfig.amiberryRetroarchInputsDir)
             nplayer = 1
             for playercontroller, pad in sorted(playersControllers.items()):
                 replacements = {'_player' + str(nplayer) + '_':'_'}
                 # amiberry remove / included in pads names like "USB Downlo01.80 PS3/USB Corded Gamepad"
                 padfilename = pad.realName.replace("/", "")
-                playerInputFilename = batoceraFiles.amiberryRetroarchInputsDir + "/" + padfilename + ".cfg"
-                with open(batoceraFiles.amiberryRetroarchCustom) as infile, open(playerInputFilename, 'w') as outfile:
+                playerInputFilename = amiberryConfig.amiberryRetroarchInputsDir + "/" + padfilename + ".cfg"
+                with open(amiberryConfig.amiberryRetroarchCustom) as infile, open(playerInputFilename, 'w') as outfile:
                     for line in infile:
                         for src, target in replacements.items():
                             newline = line.replace(src, target)

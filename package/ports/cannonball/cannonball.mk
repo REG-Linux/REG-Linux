@@ -41,14 +41,6 @@ CANNONBALL_CONF_OPTS += -Dxml_directory=/userdata/system/configs/cannonball/
 CANNONBALL_CONF_OPTS += -Dres_directory=/userdata/system/configs/cannonball/
 
 
-# Cannonball cmake files are hopelessly broken.
-# Link libmali manually. Ideally we should fix cannonball to use pkg-config instead.
-ifeq ($(BR2_PACKAGE_HAS_LIBMALI),y)
-CANNONBALL_DEPENDENCIES += libmali
-CANNONBALL_EXE_LINKER_FLAGS += -lmali
-CANNONBALL_SHARED_LINKER_FLAGS += -lmali
-endif
-
 # Enabling LTO as hires mode tends to be slow, it does help video rendering loops
 CANNONBALL_EXE_LINKER_FLAGS += -flto=auto
 CANNONBALL_SHARED_LINKER_FLAGS += -flto=auto

@@ -1,12 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
 import os
-from os import path
-import controllersConfig
 import batoceraFiles
 import codecs
+from os import path
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -165,4 +164,4 @@ class MelonDSGenerator(Generator):
 
         commandArray = ["/usr/bin/melonDS", "-f", rom]
         return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":batoceraFiles.CONF, \
-            "XDG_DATA_HOME":batoceraFiles.SAVES, "QT_QPA_PLATFORM":"wayland"})
+            "XDG_DATA_HOME":batoceraFiles.SAVES})

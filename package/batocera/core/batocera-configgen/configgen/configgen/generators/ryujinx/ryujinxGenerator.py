@@ -1,15 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
 import os
-from os import environ
-import batoceraFiles
-import controllersConfig
 import filecmp
 import json
 import shutil
 import evdev
+import batoceraFiles
+import controllersConfig
+from os import environ
 from evdev import InputDevice
 
 ryujinxConf = batoceraFiles.CONF + "/Ryujinx"
@@ -214,7 +214,6 @@ class RyujinxGenerator(Generator):
             env={"XDG_CONFIG_HOME":batoceraFiles.CONF, \
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/switch", \
             "XDG_CACHE_HOME":batoceraFiles.CACHE, \
-            "QT_QPA_PLATFORM":"xcb", \
             "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)})
 
 def writeControllerIntoJson(new_controller, filename=ryujinxConfFile):
