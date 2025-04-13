@@ -1,5 +1,7 @@
-import Command
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
+import Command
 from utils.logger import get_logger
 import os
 

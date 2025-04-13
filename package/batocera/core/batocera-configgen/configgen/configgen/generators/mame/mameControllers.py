@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 import batoceraFiles
 import Command
@@ -33,7 +32,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
         overwriteMAME = False
     else:
         overwriteMAME = True
-    
+
     # Load standard controls from csv
     controlFile = '/usr/share/reglinux/configgen/data/mame/mameControls.csv'
     openFile = open(controlFile, 'r')
@@ -104,7 +103,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
     else:
         useControls = sysName
     eslog.debug(f"Using {useControls} for controller config.")
-    
+
     # Open or create alternate config file for systems with special controllers/settings
     # If the system/game is set to per game config, don't try to open/reset an existing file, only write if it's blank or going to the shared cfg folder
     specialControlList = [ "cdimono1", "apfm1000", "astrocde", "adam", "arcadia", "gamecom", "tutor", "crvision", "bbcb", "bbcm", "bbcm512", "bbcmc", "xegs", \
@@ -177,7 +176,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
         xml_mameconfig_alt.setAttribute("version", "10")
         xml_system_alt = getSection(config_alt, xml_mameconfig_alt, "system")
         xml_system_alt.setAttribute("name", sysName)
-        
+
         removeSection(config_alt, xml_system_alt, "input")
         xml_input_alt = config_alt.createElement("input")
         xml_system_alt.appendChild(xml_input_alt)
@@ -202,7 +201,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
             xml_kbenable_alt.setAttribute("tag", ":")
             xml_kbenable_alt.setAttribute("enabled", "1")
             xml_input_alt.appendChild(xml_kbenable_alt)
-    
+
     # Fill in controls on cfg files
     nplayer = 1
     maxplayers = len(playersControllers)

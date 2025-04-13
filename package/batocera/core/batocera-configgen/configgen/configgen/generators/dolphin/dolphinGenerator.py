@@ -1,15 +1,16 @@
-#!/usr/bin/env python
-import Command
-import batoceraFiles
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
-import shutil
+import Command
 import os.path
-from os import environ
 import configparser
-from . import dolphinControllers
-from . import dolphinSYSCONF
-import controllersConfig
 import subprocess
+import batoceraFiles
+import controllersConfig
+from os import environ
+from . import dolphinControllers
+from . import dolphinConfig
+
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -21,12 +22,12 @@ class DolphinGenerator(Generator):
         return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        if not os.path.exists(os.path.dirname(batoceraFiles.dolphinIni)):
-            os.makedirs(os.path.dirname(batoceraFiles.dolphinIni))
+        if not os.path.exists(os.path.dirname(dolphinConfig.dolphinIni)):
+            os.makedirs(os.path.dirname(dolphinConfig.dolphinIni))
 
         # Dir required for saves
-        if not os.path.exists(batoceraFiles.dolphinData + "/StateSaves"):
-            os.makedirs(batoceraFiles.dolphinData + "/StateSaves")
+        if not os.path.exists(dolphinConfig.dolphinData + "/StateSaves"):
+            os.makedirs(dolphinConfig.dolphinData + "/StateSaves")
 
         # Generate the controller config(s)
         dolphinControllers.generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns)
@@ -35,8 +36,8 @@ class DolphinGenerator(Generator):
         dolphinSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinSettings.optionxform = str
-        if os.path.exists(batoceraFiles.dolphinIni):
-            dolphinSettings.read(batoceraFiles.dolphinIni)
+        if os.path.exists(dolphinConfig.dolphinIni):
+            dolphinSettings.read(dolphinConfig.dolphinIni)
 
         # Sections
         if not dolphinSettings.has_section("General"):
@@ -185,14 +186,14 @@ class DolphinGenerator(Generator):
             dolphinSettings.set("DSP", "EnableJIT", "False")
 
         # Save dolphin.ini
-        with open(batoceraFiles.dolphinIni, 'w') as configfile:
+        with open(dolphinConfig.dolphinIni, 'w') as configfile:
             dolphinSettings.write(configfile)
 
         ## [ gfx.ini ] ##
         dolphinGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform = str
-        dolphinGFXSettings.read(batoceraFiles.dolphinGfxIni)
+        dolphinGFXSettings.read(dolphinConfig.dolphinGfxIni)
 
         # Add Default Sections
         if not dolphinGFXSettings.has_section("Settings"):
@@ -366,7 +367,7 @@ class DolphinGenerator(Generator):
             dolphinGFXSettings.set("Hacks", "FastTextureSampling", "True")
 
         # Save gfx.ini
-        with open(batoceraFiles.dolphinGfxIni, 'w') as configfile:
+        with open(dolphinConfig.dolphinGfxIni, 'w') as configfile:
             dolphinGFXSettings.write(configfile)
 
         ## Hotkeys.ini - overwrite to avoid issues
@@ -463,7 +464,7 @@ class DolphinGenerator(Generator):
 
         # Update SYSCONF
         try:
-            dolphinSYSCONF.update(system.config, batoceraFiles.dolphinSYSCONF, gameResolution)
+            dolphinConfig.update(system.config, dolphinConfig.dolphinSYSCONF, gameResolution)
         except Exception:
             pass # don't fail in case of SYSCONF update
 
@@ -480,15 +481,14 @@ class DolphinGenerator(Generator):
 
         return Command.Command(array=commandArray, \
             env={ "XDG_CONFIG_HOME":batoceraFiles.CONF, \
-            "XDG_DATA_HOME":batoceraFiles.SAVES, \
-            "QT_QPA_PLATFORM":"xcb"})
+            "XDG_DATA_HOME":batoceraFiles.SAVES})
 
     def getInGameRatio(self, config, gameResolution, rom):
 
         dolphinGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform = str
-        dolphinGFXSettings.read(batoceraFiles.dolphinGfxIni)
+        dolphinGFXSettings.read(dolphinConfig.dolphinGfxIni)
 
         dolphin_aspect_ratio = dolphinGFXSettings.get("Settings", "AspectRatio")
         # What if we're playing a GameCube game with the widescreen patch or not?
@@ -498,7 +498,7 @@ class DolphinGenerator(Generator):
             wii_tv_mode = 0
 
         try:
-            wii_tv_mode = dolphinSYSCONF.getRatioFromConfig(config, gameResolution)
+            wii_tv_mode = dolphinConfig.getRatioFromConfig(config, gameResolution)
         except:
             pass
 

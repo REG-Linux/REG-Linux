@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
 import os
+import subprocess
 import batoceraFiles
 import configparser
 from os import environ
-import subprocess
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -27,8 +27,7 @@ class CitronGenerator(Generator):
         return Command.Command(array=commandArray, env={
             "XDG_CONFIG_HOME":batoceraFiles.CONF, \
             "XDG_DATA_HOME":batoceraFiles.SAVES + "/switch", \
-            "XDG_CACHE_HOME":batoceraFiles.CACHE, \
-            "QT_QPA_PLATFORM":"xcb"})
+            "XDG_CACHE_HOME":batoceraFiles.CACHE})
 
     def writeCitronConfig(citronConfigFile, system, playersControllers):
         # pads

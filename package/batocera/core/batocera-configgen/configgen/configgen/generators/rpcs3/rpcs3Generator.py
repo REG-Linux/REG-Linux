@@ -1,19 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
-import batoceraFiles
 import Command
 import shutil
 import os
-from os import path
-from os import environ
 import configparser
 import ruamel.yaml as yaml
-import json
 import re
-import controllersConfig
-from . import rpcs3Controllers
 import subprocess
+import controllersConfig
+import batoceraFiles
+from os import path
+from . import rpcs3Controllers
+from . import rpcs3Config
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -28,16 +27,16 @@ class Rpcs3Generator(Generator):
         rpcs3Controllers.generateControllerConfig(system, playersControllers, rom)
 
         # Taking care of the CurrentSettings.ini file
-        if not os.path.exists(os.path.dirname(batoceraFiles.rpcs3CurrentConfig)):
-            os.makedirs(os.path.dirname(batoceraFiles.rpcs3CurrentConfig))
+        if not os.path.exists(os.path.dirname(rpcs3Config.rpcs3CurrentConfig)):
+            os.makedirs(os.path.dirname(rpcs3Config.rpcs3CurrentConfig))
 
         # Generates CurrentSettings.ini with values to disable prompts on first run
 
         rpcsCurrentSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         rpcsCurrentSettings.optionxform = str
-        if os.path.exists(batoceraFiles.rpcs3CurrentConfig):
-            rpcsCurrentSettings.read(batoceraFiles.rpcs3CurrentConfig)
+        if os.path.exists(rpcs3Config.rpcs3CurrentConfig):
+            rpcsCurrentSettings.read(rpcs3Config.rpcs3CurrentConfig)
 
         # Sets Gui Settings to close completely and disables some popups
         if not rpcsCurrentSettings.has_section("main_window"):
@@ -47,16 +46,16 @@ class Rpcs3Generator(Generator):
         rpcsCurrentSettings.set("main_window", "infoBoxEnabledInstallPUP","false")
         rpcsCurrentSettings.set("main_window", "infoBoxEnabledWelcome","false")
 
-        with open(batoceraFiles.rpcs3CurrentConfig, "w") as configfile:
+        with open(rpcs3Config.rpcs3CurrentConfig, "w") as configfile:
             rpcsCurrentSettings.write(configfile)
 
-        if not os.path.exists(os.path.dirname(batoceraFiles.rpcs3config)):
-            os.makedirs(os.path.dirname(batoceraFiles.rpcs3config))
+        if not os.path.exists(os.path.dirname(rpcs3Config.rpcs3config)):
+            os.makedirs(os.path.dirname(rpcs3Config.rpcs3config))
 
         # Generate a default config if it doesn't exist otherwise just open the existing
         rpcs3ymlconfig = {}
-        if os.path.isfile(batoceraFiles.rpcs3config):
-            with open(batoceraFiles.rpcs3config, "r") as stream:
+        if os.path.isfile(rpcs3Config.rpcs3config):
+            with open(rpcs3Config.rpcs3config, "r") as stream:
                 rpcs3ymlconfig = yaml.safe_load(stream)
 
         if rpcs3ymlconfig is None: # in case the file is empty
@@ -376,7 +375,6 @@ class Rpcs3Generator(Generator):
             env={
                 "XDG_CONFIG_HOME":batoceraFiles.CONF,
                 "XDG_CACHE_HOME":batoceraFiles.CACHE,
-                "QT_QPA_PLATFORM":"xcb",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

@@ -1,10 +1,8 @@
-#!/usr/bin/env python
-import Command
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
+import Command
 import controllersConfig
-import os
-import batoceraFiles
-import subprocess
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)

@@ -1,25 +1,24 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
 from generators.Generator import Generator
-import controllersConfig
+import Command
 import os
 import configparser
-import shutil
 import hashlib
+import controllersConfig
 
 class SonicRetroGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        
+
         # Determine the emulator to use
         if (rom.lower()).endswith("son"):
             emu = "sonic2013"
         else:
             emu = "soniccd"
-        
+
         iniFile = rom + "/settings.ini"
-        
+
         sonicButtons = {
             "Up":       "11",
             "Down":     "12",
@@ -36,7 +35,7 @@ class SonicRetroGenerator(Generator):
             "Select":   "4",
             "Start":    "6"
         }
-        
+
         sonicKeys = {
             "Up":       "82",
             "Down":     "81",
@@ -53,14 +52,14 @@ class SonicRetroGenerator(Generator):
             "Start":    "40",
             "Select":   "43"
         }
-        
+
         # ini file
         sonicConfig = configparser.RawConfigParser(strict=False)
         sonicConfig.optionxform=str             # Add Case Sensitive comportement
         if os.path.exists(iniFile):
             os.remove(iniFile)          # Force removing settings.ini
             sonicConfig.read(iniFile)
-        
+
         # [Dev]
         if not sonicConfig.has_section("Dev"):
             sonicConfig.add_section("Dev")
@@ -84,11 +83,11 @@ class SonicRetroGenerator(Generator):
         else:
             sonicConfig.set("Dev", "UseHQModes", "true")
         sonicConfig.set("Dev", "DataFile", "Data.rsdk")
-        
+
         # [Game]
         if not sonicConfig.has_section("Game"):
             sonicConfig.add_section("Game")
-        
+
         if (emu == "sonic2013"):
             if system.isOptSet('skipstart') and system.config["skipstart"] == '1':
                 sonicConfig.set("Game", "SkipStartMenu", "true")
@@ -118,11 +117,11 @@ class SonicRetroGenerator(Generator):
             sonicConfig.set("Game", "Language", system.config["language"])
         else:
             sonicConfig.set("Game", "Language", "0")
-        
+
         # [Window]
         if not sonicConfig.has_section("Window"):
             sonicConfig.add_section("Window")
-        
+
         sonicConfig.set("Window", "FullScreen", "true")
         sonicConfig.set("Window", "Borderless", "true")
         if system.isOptSet('vsync') and system.config["vsync"] == "0":
@@ -137,25 +136,25 @@ class SonicRetroGenerator(Generator):
         sonicConfig.set("Window", "ScreenWidth", "424")
         sonicConfig.set("Window", "RefreshRate", "60")
         sonicConfig.set("Window", "DimLimit", "-1")
-        
+
         # [Audio]
         if not sonicConfig.has_section("Audio"):
             sonicConfig.add_section("Audio")
-        
+
         sonicConfig.set("Audio", "BGMVolume", "1.000000")
         sonicConfig.set("Audio", "SFXVolume", "1.000000")
-        
+
         # [Keyboard 1]
         if not sonicConfig.has_section("Keyboard 1"):
             sonicConfig.add_section("Keyboard 1")
-        
+
         for x in sonicKeys:
             sonicConfig.set("Keyboard 1", f"{x}", f"{sonicKeys[x]}")
-        
+
         # [Controller 1]
         if not sonicConfig.has_section("Controller 1"):
             sonicConfig.add_section("Controller 1")
-        
+
         for index in playersControllers:
             controller = playersControllers[index]
             if controller.player != "1":
@@ -163,13 +162,13 @@ class SonicRetroGenerator(Generator):
             for x in sonicButtons:
                 sonicConfig.set("Controller 1", f"{x}", f"{sonicButtons[x]}")
             break
-        
+
         with open(iniFile, 'w') as configfile:
             sonicConfig.write(configfile, False)
-        
+
         os.chdir(rom)
         commandArray = [emu]
-        
+
         return Command.Command(
             array=commandArray,
             env={

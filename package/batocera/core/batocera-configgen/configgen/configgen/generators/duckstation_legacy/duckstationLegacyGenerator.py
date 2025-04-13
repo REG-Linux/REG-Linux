@@ -1,13 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
-import batoceraFiles
-import controllersConfig
 import configparser
 import os.path
-import requests
-import json
+import batoceraFiles
+import controllersConfig
 from utils.logger import get_logger
 from os import environ
 
@@ -498,7 +496,6 @@ class DuckstationLegacyGenerator(Generator):
             array=commandArray,
             env={
                 "XDG_CONFIG_HOME": batoceraFiles.CONF,
-                "QT_QPA_PLATFORM": "wayland",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )
