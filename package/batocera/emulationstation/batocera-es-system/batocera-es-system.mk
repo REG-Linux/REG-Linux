@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-BATOCERA_ES_SYSTEM_DEPENDENCIES = host-python3 host-python-pyyaml batocera-configgen host-gettext
+BATOCERA_ES_SYSTEM_DEPENDENCIES = host-python3 host-python-pyyaml reglinux-configgen host-gettext
 BATOCERA_ES_SYSTEM_SOURCE=
 BATOCERA_ES_SYSTEM_VERSION=1.03
 
