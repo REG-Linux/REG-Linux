@@ -1,29 +1,28 @@
 #!/usr/bin/env python
 
-import sys
 import os
 import io
 import batoceraFiles
-import settings
-from Emulator import Emulator
 import configparser
+
+xemuConfig = batoceraFiles.CONF + '/xemu/xemu.toml'
 
 def writeIniFile(system, rom, playersControllers, gameResolution):
     iniConfig = configparser.ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     iniConfig.optionxform = str
-    if os.path.exists(batoceraFiles.xemuConfig):
+    if os.path.exists(xemuConfig):
         try:
-            with io.open(batoceraFiles.xemuConfig, 'r', encoding='utf_8_sig') as fp:
+            with io.open(xemuConfig, 'r', encoding='utf_8_sig') as fp:
                 iniConfig.readfp(fp)
         except:
             pass
 
     createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
     # save the ini file
-    if not os.path.exists(os.path.dirname(batoceraFiles.xemuConfig)):
-        os.makedirs(os.path.dirname(batoceraFiles.xemuConfig))
-    with open(batoceraFiles.xemuConfig, 'w') as configfile:
+    if not os.path.exists(os.path.dirname(xemuConfig)):
+        os.makedirs(os.path.dirname(xemuConfig))
+    with open(xemuConfig, 'w') as configfile:
         iniConfig.write(configfile)
 
 def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution):
