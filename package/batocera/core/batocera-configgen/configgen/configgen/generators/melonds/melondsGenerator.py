@@ -165,4 +165,4 @@ class MelonDSGenerator(Generator):
 
         commandArray = ["/usr/bin/melonDS", "-f", rom]
         return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":batoceraFiles.CONF, \
-            "XDG_DATA_HOME":batoceraFiles.SAVES, "QT_QPA_PLATFORM":"wayland"})
+            "XDG_DATA_HOME":batoceraFiles.SAVES})
