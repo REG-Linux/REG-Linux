@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-import os, sys
 import batoceraFiles
-import settings
-import subprocess
-import json
+
+mupenConf = batoceraFiles.CONF + '/mupen64/'
+mupenCustom = mupenConf + "mupen64plus.cfg"
+mupenInput = mupenConf + "InputAutoCfg.ini"
+mupenSaves = batoceraFiles.SAVES + "/n64"
+mupenMappingUser    = mupenConf + 'input.xml'
+mupenMappingSystem  = '/usr/share/reglinux/datainit/system/configs/mupen64/input.xml'
 
 def setMupenConfig(iniConfig, system, controllers, gameResolution):
 
@@ -15,9 +18,9 @@ def setMupenConfig(iniConfig, system, controllers, gameResolution):
         iniConfig.add_section("Core")
     iniConfig.set("Core", "Version", "1.01") # Version is important for the .ini creation otherwise, mupen remove the section
     iniConfig.set("Core", "ScreenshotPath", batoceraFiles.SCREENSHOTS)
-    iniConfig.set("Core", "SaveStatePath",  batoceraFiles.mupenSaves)
-    iniConfig.set("Core", "SaveSRAMPath",   batoceraFiles.mupenSaves)
-    iniConfig.set("Core", "SharedDataPath", batoceraFiles.mupenConf)
+    iniConfig.set("Core", "SaveStatePath",  mupenSaves)
+    iniConfig.set("Core", "SaveSRAMPath",   mupenSaves)
+    iniConfig.set("Core", "SharedDataPath", mupenConf)
     iniConfig.set("Core", "SaveFilenameFormat", "1000") # forces savesstates with rom name
     # TODO : Miss Mupen64Plus\hires_texture
 
@@ -229,10 +232,10 @@ def setHotKeyConfig(iniConfig, controllers, system):
                     iniConfig.set("CoreEvents", "Joy Mapping Fast Forward", "")
                 if 'a' in controllers['1'].inputs:
                     iniConfig.set("CoreEvents", "Joy Mapping Reset", "")
-                if 'b' in controllers['1'].inputs:                   
+                if 'b' in controllers['1'].inputs:
                     iniConfig.set("CoreEvents", "Joy Mapping Pause", "")
                 return
-               
+
             if 'y' in controllers['1'].inputs:
                 iniConfig.set("CoreEvents", "Joy Mapping Save State", "\"J{}{}/{}\"".format(controllers['1'].index, createButtonCode(controllers['1'].inputs['hotkey']), createButtonCode(controllers['1'].inputs['y'])))
             if 'x' in controllers['1'].inputs:
