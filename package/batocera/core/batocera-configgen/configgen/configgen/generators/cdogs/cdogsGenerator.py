@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
 from generators.Generator import Generator
-import controllersConfig
+import Command
 import os
+import controllersConfig
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)

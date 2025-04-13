@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import Command
 import os
 import io
@@ -8,7 +9,6 @@ import shutil
 import configparser
 import controllersConfig
 from shutil import copyfile
-from generators.Generator import Generator
 from . import supermodelConfig
 
 class SupermodelGenerator(Generator):

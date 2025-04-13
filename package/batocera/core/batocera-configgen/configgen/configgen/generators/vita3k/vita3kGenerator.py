@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
-import batoceraFiles
 from generators.Generator import Generator
-import controllersConfig
+import Command
 import os
+import batoceraFiles
+import controllersConfig
 from os import path
 import ruamel.yaml
 import ruamel.yaml.util
@@ -21,11 +21,11 @@ class Vita3kGenerator(Generator):
         return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        
+
         # Create save folder
         if not path.isdir(vitaSaves):
             os.mkdir(vitaSaves)
-        
+
         # Move saves if necessary
         if os.path.isdir(os.path.join(vitaConfig, 'ux0')):
             # Move all folders from vitaConfig to vitaSaves except "data", "lang", and "shaders-builtin"
@@ -34,16 +34,16 @@ class Vita3kGenerator(Generator):
                     item_path = os.path.join(vitaConfig, item)
                     if os.path.isdir(item_path):
                         shutil.move(item_path, vitaSaves)
-        
+
         # Create the config.yml file if it doesn't exist
         vita3kymlconfig = {}
         if os.path.isfile(vitaConfigFile):
             with open(vitaConfigFile, 'r') as stream:
                 vita3kymlconfig, indent, block_seq_indent = ruamel.yaml.util.load_yaml_guess_indent(stream)
-        
+
         if vita3kymlconfig is None:
             vita3kymlconfig = {}
-        
+
         # ensure the correct path is set
         vita3kymlconfig["pref-path"] = vitaSaves
 
@@ -82,7 +82,7 @@ class Vita3kGenerator(Generator):
             vita3kymlconfig["disable-surface-sync"] = "false"
         else:
             vita3kymlconfig["disable-surface-sync"] = "true"
-        
+
         # Vita3k is fussy over its yml file
         # We try to match it as close as possible, but the 'vectors' cause yml formatting issues
         yaml = ruamel.yaml.YAML()
@@ -92,7 +92,7 @@ class Vita3kGenerator(Generator):
 
         with open(vitaConfigFile, 'w') as fp:
             yaml.dump(vita3kymlconfig, fp)
-        
+
         # Simplify the rom name (strip the directory & extension)
         begin, end = rom.find('['), rom.rfind(']')
         smplromname = rom[begin+1: end]
@@ -114,7 +114,7 @@ class Vita3kGenerator(Generator):
                 "XDG_CACHE_HOME": batoceraFiles.CACHE
             }
         )
-    
+
     # Show mouse for touchscreen actions
     def getMouseMode(self, config, rom):
         if "vita3k_show_pointer" in config and config["vita3k_show_pointer"] == "0":

@@ -1,11 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+from generators.Generator import Generator
 import Command
-import batoceraFiles
-import controllersConfig
 import os.path
 import glob
 import configparser
-from generators.Generator import Generator
+import batoceraFiles
+import controllersConfig
 from . import scummvmConfig
 
 class ScummVMGenerator(Generator):

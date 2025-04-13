@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import Command
 import os.path
 import configparser
@@ -7,7 +8,6 @@ import subprocess
 import batoceraFiles
 import controllersConfig
 from os import environ
-from generators.Generator import Generator
 from . import dolphinControllers
 from . import dolphinConfig
 

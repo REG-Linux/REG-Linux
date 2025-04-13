@@ -1,13 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import os
 import configparser
 import Command
-from generators.Generator import Generator
-import batoceraFiles
 import shutil
-from utils.logger import get_logger
+import batoceraFiles
 import controllersConfig
+from utils.logger import get_logger
 from utils.batoceraServices import batoceraServices
 from . import vpinballWindowing
 from . import vpinballOptions

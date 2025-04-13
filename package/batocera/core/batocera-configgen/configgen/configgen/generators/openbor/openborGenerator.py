@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
-import batoceraFiles
 from generators.Generator import Generator
+import Command
 import os
 import re
+import batoceraFiles
 from settings.unixSettings import UnixSettings
 from utils.logger import get_logger
 from . import openborControllers
@@ -57,7 +57,7 @@ class OpenborGenerator(Generator):
             config.save("swfilter", system.config["openbor_filter"])
         else:
             config.save("swfilter", "0")
-        
+
         if system.isOptSet("openbor_vsync"):
             config.save("vsync", system.config["openbor_vsync"])
         else:

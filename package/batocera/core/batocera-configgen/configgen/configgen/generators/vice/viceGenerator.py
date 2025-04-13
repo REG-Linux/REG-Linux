@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import Command
 import os.path
 import zipfile
 import batoceraFiles
 import controllersConfig
-from generators.Generator import Generator
 from . import viceConfig
 from . import viceControllers
 

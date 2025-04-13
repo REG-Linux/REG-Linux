@@ -3,15 +3,14 @@
 from generators.Generator import Generator
 import Command
 import os
-import batoceraFiles
 import sys
 import shutil
-import controllersConfig
 import filecmp
 import subprocess
 import toml
 import glob
 import re
+import controllersConfig
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -233,7 +232,7 @@ class XeniaGenerator(Generator):
         # simplify the name for matching
         rom_name = re.sub(r'\[.*?\]', '', rom_name)
         rom_name = re.sub(r'\(.*?\)', '', rom_name)
-        if system.isOptSet('xeniaPatches') and system.config['xeniaPatches'] == 'True':            
+        if system.isOptSet('xeniaPatches') and system.config['xeniaPatches'] == 'True':
             # pattern to search for matching .patch.toml files
             pattern = os.path.join(canarypath, 'patches', '*' + rom_name + '*.patch.toml')
             matching_files = [file_path for file_path in glob.glob(pattern) if re.search(rom_name, os.path.basename(file_path), re.IGNORECASE)]

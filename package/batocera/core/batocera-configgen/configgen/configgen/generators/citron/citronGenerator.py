@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
 import os
+import subprocess
 import batoceraFiles
 import configparser
 from os import environ
-import subprocess
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)

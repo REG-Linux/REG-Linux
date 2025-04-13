@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+from generators.Generator import Generator
 import Command
 import os.path
-import controllersConfig
 import batoceraFiles
+import controllersConfig
 from . import moonlightConfig
-from generators.Generator import Generator
 
 class MoonlightGenerator(Generator):
 

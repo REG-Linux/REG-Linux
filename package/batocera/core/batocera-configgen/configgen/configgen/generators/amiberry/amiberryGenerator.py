@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import os
 import Command
 import os.path
@@ -8,7 +9,6 @@ import batoceraFiles
 import controllersConfig
 from os import path
 from os.path import dirname
-from generators.Generator import Generator
 from settings.unixSettings import UnixSettings
 from generators.libretro import libretroControllers
 from utils.logger import get_logger

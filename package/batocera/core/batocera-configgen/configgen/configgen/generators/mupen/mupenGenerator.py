@@ -1,9 +1,10 @@
-#!/usr/bin/env python
-import Command
-import batoceraFiles
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
+import Command
 import configparser
 import os
+import batoceraFiles
 from . import mupenConfig
 from . import mupenControllers
 
