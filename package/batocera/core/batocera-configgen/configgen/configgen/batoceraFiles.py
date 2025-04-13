@@ -21,6 +21,9 @@ esGamesMetadata = "/usr/share/emulationstation/resources/gamesdb.xml"
 batoceraConf = HOME + '/system.conf'
 logdir = HOME + '/logs/'
 
+screenshotsDir = "/userdata/screenshots/"
+savesDir = "/userdata/saves/"
+
 # This dict is indexed on the emulator name, not on the system
 batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'dosboxx'        : '/usr/bin/dosbox-x'
@@ -43,16 +46,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'fba2x'          : '/usr/bin/fba2x'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
-
-
-retroarchRoot = CONF + '/retroarch'
-retroarchRootInit = CONF_INIT + '/retroarch'
-retroarchCustom = retroarchRoot + '/retroarchcustom.cfg'
-retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
-
-retroarchCores = "/usr/lib/libretro/"
-screenshotsDir = "/userdata/screenshots/"
-savesDir = "/userdata/saves/"
 
 mupenConf = CONF + '/mupen64/'
 mupenCustom = mupenConf + "mupen64plus.cfg"

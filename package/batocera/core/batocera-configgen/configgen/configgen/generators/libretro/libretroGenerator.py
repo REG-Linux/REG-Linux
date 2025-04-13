@@ -1,19 +1,14 @@
 #!/usr/bin/env python
-import sys
 import Command
-import batoceraFiles
-from . import libretroConfig
-from . import libretroRetroarchCustom
-from . import libretroControllers
 import shutil
-from generators.Generator import Generator
 import os
-import stat
-import subprocess
+import batoceraFiles
+import utils.videoMode as videoMode
+from generators.Generator import Generator
 from settings.unixSettings import UnixSettings
 from utils.logger import get_logger
-import utils.videoMode as videoMode
-import shutil
+from . import libretroConfig
+from . import libretroRetroarchCustom
 
 eslog = get_logger(__name__)
 
@@ -60,12 +55,12 @@ class LibretroGenerator(Generator):
         # Settings batocera default config file if no user defined one
         if not 'configfile' in system.config:
             # Using batocera config file
-            system.config['configfile'] = batoceraFiles.retroarchCustom
+            system.config['configfile'] = libretroConfig.retroarchCustom
             # Create retroarchcustom.cfg if does not exists
-            if not os.path.isfile(batoceraFiles.retroarchCustom):
+            if not os.path.isfile(libretroConfig.retroarchCustom):
                 libretroRetroarchCustom.generateRetroarchCustom()
             #  Write controllers configuration files
-            retroconfig = UnixSettings(batoceraFiles.retroarchCustom, separator=' ')
+            retroconfig = UnixSettings(libretroConfig.retroarchCustom, separator=' ')
 
             if system.isOptSet('lightgun_map'):
                 lightgun = system.getOptBoolean('lightgun_map')
@@ -93,13 +88,13 @@ class LibretroGenerator(Generator):
             retroconfig.write()
 
             # duplicate config to mapping files while ra now split in 2 parts
-            remapconfigDir = batoceraFiles.retroarchRoot + "/config/remaps/common"
+            remapconfigDir = libretroConfig.retroarchRoot + "/config/remaps/common"
             if not os.path.exists(remapconfigDir):
                 os.makedirs(remapconfigDir)
-            shutil.copyfile(batoceraFiles.retroarchCustom, remapconfigDir + "/common.rmp")
+            shutil.copyfile(libretroConfig.retroarchCustom, remapconfigDir + "/common.rmp")
 
         # Retroarch core on the filesystem
-        retroarchCore = batoceraFiles.retroarchCores + system.config['core'] + "_libretro.so"
+        retroarchCore = libretroConfig.retroarchCores + system.config['core'] + "_libretro.so"
 
         # for each core, a file /usr/lib/<core>.info must exit, otherwise, info such as rewinding/netplay will not work
         # to do a global check : cd /usr/lib/libretro && for i in *.so; do INF=$(echo $i | sed -e s+/usr/lib/libretro+/usr/share/libretro/info+ -e s+\.so+.info+); test -e "$INF" || echo $i; done
@@ -235,13 +230,13 @@ class LibretroGenerator(Generator):
         elif system.name == 'vitaquake2':
             directory_path = os.path.dirname(rom)
             if "xatrix" in directory_path:
-                system.config['core'] = "vitaquake2-xatrix"            
+                system.config['core'] = "vitaquake2-xatrix"
             elif "rogue" in directory_path:
                 system.config['core'] = "vitaquake2-rogue"
             elif "zaero" in directory_path:
                 system.config['core'] = "vitaquake2-zaero"
             # set the updated core name
-            retroarchCore = batoceraFiles.retroarchCores + system.config['core'] + "_libretro.so"
+            retroarchCore = libretroConfig.retroarchCores + system.config['core'] + "_libretro.so"
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
         # super mario wars - verify assets from Content Downloader
         elif system.name == 'superbroswar':
@@ -271,16 +266,16 @@ class LibretroGenerator(Generator):
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
         else:
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-L", retroarchCore, "--config", system.config['configfile']]
-        
+
         configToAppend = []
-        
+
         # Custom configs - per core
-        customCfg = f"{batoceraFiles.retroarchRoot}/{system.name}.cfg"
+        customCfg = f"{libretroConfig.retroarchRoot}/{system.name}.cfg"
         if os.path.isfile(customCfg):
             configToAppend.append(customCfg)
 
         # Custom configs - per game
-        customGameCfg = f"{batoceraFiles.retroarchRoot}/{system.name}/{romName}.cfg"
+        customGameCfg = f"{libretroConfig.retroarchRoot}/{system.name}/{romName}.cfg"
         if os.path.isfile(customGameCfg):
             configToAppend.append(customGameCfg)
 
@@ -315,13 +310,13 @@ class LibretroGenerator(Generator):
 
         if system.name == 'scummvm':
             rom = os.path.dirname(rom) + '/' + romName[0:-8]
-        
+
         if system.name == 'reminiscence':
             with open(rom, 'r') as file:
                 first_line = file.readline().strip()
             directory_path = '/'.join(rom.split('/')[:-1])
             rom = f"{directory_path}/{first_line}"
-        
+
         # Use command line instead of ROM file for MAME variants
         if system.config['core'] in [ 'mame', 'same_cdi' ]:
             dontAppendROM = True
@@ -333,7 +328,7 @@ class LibretroGenerator(Generator):
 
         if dontAppendROM == False:
             commandArray.append(rom)
-            
+
         return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":batoceraFiles.CONF})
 
 def getGFXBackend(system):
