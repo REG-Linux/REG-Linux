@@ -172,7 +172,7 @@ class AmiberryGenerator(Generator):
             commandArray.append("-s")
             commandArray.append("sound_frequency=48000")
 
-            os.chdir("/usr/share/amiberry")
+            os.chdir(amiberryConfig.amiberryShare)
             return Command.Command(array=commandArray,env={
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)})
         # otherwise, unknown format
