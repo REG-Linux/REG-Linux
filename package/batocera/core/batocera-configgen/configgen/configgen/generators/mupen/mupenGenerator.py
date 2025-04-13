@@ -15,24 +15,24 @@ class MupenGenerator(Generator):
         iniConfig = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         iniConfig.optionxform = str
-        if os.path.exists(batoceraFiles.mupenCustom):
-            iniConfig.read(batoceraFiles.mupenCustom)
+        if os.path.exists(mupenConfig.mupenCustom):
+            iniConfig.read(mupenConfig.mupenCustom)
         else:
-            if not os.path.exists(os.path.dirname(batoceraFiles.mupenCustom)):
-                os.makedirs(os.path.dirname(batoceraFiles.mupenCustom))
-            iniConfig.read(batoceraFiles.mupenCustom)
+            if not os.path.exists(os.path.dirname(mupenConfig.mupenCustom)):
+                os.makedirs(os.path.dirname(mupenConfig.mupenCustom))
+            iniConfig.read(mupenConfig.mupenCustom)
 
         mupenConfig.setMupenConfig(iniConfig, system, playersControllers, gameResolution)
         mupenControllers.setControllersConfig(iniConfig, playersControllers, system, wheels)
 
         # Save the ini file
-        if not os.path.exists(os.path.dirname(batoceraFiles.mupenCustom)):
-            os.makedirs(os.path.dirname(batoceraFiles.mupenCustom))
-        with open(batoceraFiles.mupenCustom, 'w') as configfile:
+        if not os.path.exists(os.path.dirname(mupenConfig.mupenCustom)):
+            os.makedirs(os.path.dirname(mupenConfig.mupenCustom))
+        with open(mupenConfig.mupenCustom, 'w') as configfile:
             iniConfig.write(configfile)
 
         # Command
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "--corelib", "/usr/lib/libmupen64plus.so.2.0.0", "--gfx", "/usr/lib/mupen64plus/mupen64plus-video-{}.so".format(system.config['core']), "--configdir", batoceraFiles.mupenConf, "--datadir", batoceraFiles.mupenConf]
+        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "--corelib", "/usr/lib/libmupen64plus.so.2.0.0", "--gfx", "/usr/lib/mupen64plus/mupen64plus-video-{}.so".format(system.config['core']), "--configdir", mupenConfig.mupenConf, "--datadir", mupenConfig.mupenConf]
 
         # state_slot option
         if system.isOptSet('state_filename'):
