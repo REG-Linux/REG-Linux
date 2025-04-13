@@ -5,7 +5,6 @@ import Command
 import filecmp
 import shutil
 import os
-import batoceraFiles
 import controllersConfig
 import ffmpeg
 from utils.logger import get_logger
@@ -160,12 +159,12 @@ class HypseusSingeGenerator(Generator):
             eslog.debug("Resolution: {}".format(video_resolution))
 
         if system.name == "singe":
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
+            commandArray = [hypseusSingeConfig.hypseusBin,
                             "singe", "vldp", "-retropath", "-framefile", frameFile, "-script", singeFile,
                             "-fullscreen", "-gamepad", "-datadir", hypseusSingeConfig.hypseusDatadir,
                             "-singedir", hypseusSingeConfig.singeRomdir, "-romdir", hypseusSingeConfig.singeRomdir, "-homedir", hypseusSingeConfig.hypseusDatadir]
         else:
-            commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
+            commandArray = [hypseusSingeConfig.hypseusBin,
                             romName, "vldp", "-framefile", frameFile, "-fullscreen",
                             "-fastboot", "-gamepad", "-datadir", hypseusSingeConfig.hypseusDatadir,
                             "-romdir", hypseusSingeConfig.daphneRomdir, "-homedir", hypseusSingeConfig.hypseusDatadir]

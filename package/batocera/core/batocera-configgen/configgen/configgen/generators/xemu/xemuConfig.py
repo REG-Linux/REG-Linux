@@ -6,6 +6,7 @@ import batoceraFiles
 import configparser
 
 xemuConfig = batoceraFiles.CONF + '/xemu/xemu.toml'
+xemuBin = '/usr/bin/xemu'
 
 def writeIniFile(system, rom, playersControllers, gameResolution):
     iniConfig = configparser.ConfigParser(interpolation=None)

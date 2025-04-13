@@ -3,11 +3,12 @@
 from generators.Generator import Generator
 import Command
 import controllersConfig
+from . import abuseConfig
 
 class AbuseGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        commandArray = ["abuse", "-datadir", "/userdata/roms/abuse/abuse_data"]
+        commandArray = [abuseConfig.abuseBin, "-datadir", abuseConfig.abuseDataDir]
 
         return Command.Command(
             array=commandArray,

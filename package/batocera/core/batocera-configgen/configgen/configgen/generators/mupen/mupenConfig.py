@@ -7,6 +7,7 @@ mupenInput = mupenConf + "InputAutoCfg.ini"
 mupenSaves = batoceraFiles.SAVES + "/n64"
 mupenMappingUser    = mupenConf + 'input.xml'
 mupenMappingSystem  = '/usr/share/reglinux/datainit/system/configs/mupen64/input.xml'
+mupenBin = '/usr/bin/mupen64plus'
 
 def setMupenConfig(iniConfig, system, controllers, gameResolution):
 

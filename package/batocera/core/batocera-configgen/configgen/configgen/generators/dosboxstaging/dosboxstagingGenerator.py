@@ -3,7 +3,6 @@
 from generators.Generator import Generator
 import Command
 import os.path
-import batoceraFiles
 from . import dosboxstagingConfig
 
 class DosBoxStagingGenerator(Generator):
@@ -16,7 +15,7 @@ class DosBoxStagingGenerator(Generator):
         batFile = gameDir + "/dosbox.bat"
         gameConfFile = gameDir + "/dosbox.cfg"
 
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
+        commandArray = [dosboxstagingConfig.dosboxStagingBin,
 			"-fullscreen",
 			"-userconf",
 			"-exit",
