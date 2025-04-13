@@ -24,6 +24,10 @@ logdir = HOME + '/logs/'
 screenshotsDir = "/userdata/screenshots/"
 savesDir = "/userdata/saves/"
 
+overlaySystem = "/usr/share/reglinux/datainit/decorations"
+overlayUser = "/userdata/decorations"
+overlayConfigFile = "/userdata/system/configs/retroarch/overlay.cfg"
+
 # This dict is indexed on the emulator name, not on the system
 batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'dosboxx'        : '/usr/bin/dosbox-x'
@@ -47,13 +51,7 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-solarusSaves = SAVES + '/solarus'
-
 viceConfig = CONF + "/vice"
-
-overlaySystem = "/usr/share/reglinux/datainit/decorations"
-overlayUser = "/userdata/decorations"
-overlayConfigFile = "/userdata/system/configs/retroarch/overlay.cfg"
 
 amiberryRoot = CONF + '/amiberry'
 amiberryRetroarchInputsDir = amiberryRoot + '/conf/retroarch/inputs'

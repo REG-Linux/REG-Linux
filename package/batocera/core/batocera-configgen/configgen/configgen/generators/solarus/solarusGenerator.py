@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 import Command
-from generators.Generator import Generator
-import controllersConfig
-import batoceraFiles
 import codecs
 import os
-import zipfile
+import batoceraFiles
+import controllersConfig
+from generators.Generator import Generator
 
 class SolarusGenerator(Generator):
 
