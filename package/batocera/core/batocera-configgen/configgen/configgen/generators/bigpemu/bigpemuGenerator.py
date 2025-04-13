@@ -7,10 +7,9 @@ import json
 import utils.videoMode as videoMode
 import controllersConfig
 from utils.logger import get_logger
+from . import bigpemuConfig
 
 eslog = get_logger(__name__)
-
-bigPemuConfig = "/userdata/system/.bigpemu_userdata/BigPEmuConfig.bigpcfg"
 
 # BigPEmu controller sequence, P1 only requires keyboard inputs
 # default standard bindings
@@ -217,7 +216,7 @@ class BigPEmuGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        directory = os.path.dirname(bigPemuConfig)
+        directory = os.path.dirname(bigpemuConfig.bigpemuConfig)
         # Create the directory if it doesn't exist
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -225,16 +224,16 @@ class BigPEmuGenerator(Generator):
         # Delete the config file to update controllers
         # As it doesn't like to be updated
         # ¯\_(ツ)_/¯
-        if os.path.exists(bigPemuConfig):
-            os.remove(bigPemuConfig)
+        if os.path.exists(bigpemuConfig.bigpemuConfig):
+            os.remove(bigpemuConfig.bigpemuConfig)
 
         # Create the config file as it doesn't exist
-        if not os.path.exists(bigPemuConfig):
-            with open(bigPemuConfig, "w") as file:
+        if not os.path.exists(bigpemuConfig.bigpemuConfig):
+            with open(bigpemuConfig.bigpemuConfig, "w") as file:
                 json.dump({}, file)
 
         # Load or initialize the configuration
-        with open(bigPemuConfig, "r") as file:
+        with open(bigpemuConfig.bigpemuConfig, "r") as file:
             try:
                 config = json.load(file)
             except json.decoder.JSONDecodeError:
@@ -391,11 +390,11 @@ class BigPEmuGenerator(Generator):
         config["BigPEmuConfig"]["Input"]["InputVer"] = 2
         config["BigPEmuConfig"]["Input"]["InputPluginVer"] = 666
 
-        with open(bigPemuConfig, "w") as file:
+        with open(bigpemuConfig.bigpemuConfig, "w") as file:
             json.dump(config, file, indent=4)
 
         # Run the emulator
-        commandArray = ["/usr/bin/box64", "/usr/bigpemu/bigpemu", rom]
+        commandArray = [bigpemuConfig.bigpemuBin, rom]
 
         environment = {
             "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
