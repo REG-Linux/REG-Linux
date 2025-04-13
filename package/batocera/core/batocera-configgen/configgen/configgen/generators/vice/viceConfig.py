@@ -5,6 +5,7 @@ import configparser
 import batoceraFiles
 
 viceConfig = batoceraFiles.CONF + "/vice"
+viceBin = "/usr/bin/vice"
 
 def setViceConfig(viceConfigFile, system, metadata, guns, rom):
 

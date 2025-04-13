@@ -17,7 +17,7 @@ class SupermodelGenerator(Generator):
         return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        commandArray = ["supermodel", "-fullscreen", "-channels=2"]
+        commandArray = [supermodelConfig.supermodelBin, "-fullscreen", "-channels=2"]
 
         # legacy3d
         if system.isOptSet("engine3D") and system.config["engine3D"] == "new3d":

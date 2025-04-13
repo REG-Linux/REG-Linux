@@ -5,7 +5,6 @@ import os
 import Command
 import os.path
 import zipfile
-import batoceraFiles
 import controllersConfig
 from os import path
 from os.path import dirname
@@ -26,7 +25,7 @@ class AmiberryGenerator(Generator):
         romType = self.getRomType(rom)
         eslog.debug("romType: "+romType)
         if romType != 'UNKNOWN' :
-            commandArray = [ batoceraFiles.batoceraBins[system.config['emulator']], "-G" ]
+            commandArray = [ amiberryConfig.amiberryBin, "-G" ]
             if romType != 'WHDL' :
                 commandArray.append("--model")
                 commandArray.append(system.config['core'])

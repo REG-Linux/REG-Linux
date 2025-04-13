@@ -12,7 +12,6 @@ class DosBoxxGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # Find rom path
         gameDir = rom
-        batFile = gameDir + "/dosbox.bat"
         gameConfFile = gameDir + "/dosbox.cfg"
 
         configFile = dosboxxConfig.dosboxxConfig
@@ -41,7 +40,7 @@ class DosBoxxGenerator(Generator):
             iniSettings.write(config)
 
         # -fullscreen removed as it crashes on N2
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
+        commandArray = [dosboxxConfig.dosboxxBin,
 			"-exit",
 			"-c", f"""mount c {gameDir}""",
                         "-c", "c:",

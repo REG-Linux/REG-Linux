@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import configparser
 import os
-import batoceraFiles
 from . import mupenConfig
 from . import mupenControllers
 
@@ -33,7 +32,7 @@ class MupenGenerator(Generator):
             iniConfig.write(configfile)
 
         # Command
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "--corelib", "/usr/lib/libmupen64plus.so.2.0.0", "--gfx", "/usr/lib/mupen64plus/mupen64plus-video-{}.so".format(system.config['core']), "--configdir", mupenConfig.mupenConf, "--datadir", mupenConfig.mupenConf]
+        commandArray = [mupenConfig.mupenBin, "--corelib", "/usr/lib/libmupen64plus.so.2.0.0", "--gfx", "/usr/lib/mupen64plus/mupen64plus-video-{}.so".format(system.config['core']), "--configdir", mupenConfig.mupenConf, "--datadir", mupenConfig.mupenConf]
 
         # state_slot option
         if system.isOptSet('state_filename'):

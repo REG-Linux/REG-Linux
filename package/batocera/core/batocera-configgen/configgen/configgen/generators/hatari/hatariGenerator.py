@@ -6,6 +6,7 @@ import os
 import configparser
 import batoceraFiles
 from utils.logger import get_logger
+from . import hatariConfig
 
 eslog = get_logger(__name__)
 
@@ -27,7 +28,7 @@ class HatariGenerator(Generator):
         }
 
         # Start emulator fullscreen
-        commandArray = ["hatari", "--fullscreen"]
+        commandArray = [hatariConfig.hatariBin, "--fullscreen"]
 
         # Machine can be st (default), ste, megaste, tt, falcon
         # st should use TOS 1.00 to TOS 1.04 (tos100 / tos102 / tos104)

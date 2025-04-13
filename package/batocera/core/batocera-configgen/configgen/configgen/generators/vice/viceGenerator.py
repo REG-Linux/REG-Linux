@@ -27,7 +27,7 @@ class ViceGenerator(Generator):
         # controller configuration
         viceControllers.generateControllerConfig(system, viceConfig.viceConfig, playersControllers)
 
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']] + system.config['core']]
+        commandArray = [viceConfig.viceBin + system.config['core']]
         # Determine the way to launch roms based on extension type
         rom_extension = os.path.splitext(rom)[1].lower()
         # determine extension if a zip file

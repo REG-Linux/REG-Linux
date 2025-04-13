@@ -13,14 +13,14 @@ class ScummVMGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # crete /userdata/bios/scummvm/extra folder if it doesn't exist
-        if not os.path.exists(scummvmConfig.scummExtra):
-            os.makedirs(scummvmConfig.scummExtra)
+        if not os.path.exists(scummvmConfig.scummvmExtra):
+            os.makedirs(scummvmConfig.scummvmExtra)
 
         # create / modify scummvm config file as needed
         scummConfig = configparser.ConfigParser()
         scummConfig.optionxform=str
-        if os.path.exists(scummvmConfig.scummConfigFile):
-            scummConfig.read(scummvmConfig.scummConfigFile)
+        if os.path.exists(scummvmConfig.scummvmConfigFile):
+            scummConfig.read(scummvmConfig.scummvmConfigFile)
 
         if not scummConfig.has_section("scummvm"):
             scummConfig.add_section("scummvm")
@@ -28,9 +28,9 @@ class ScummVMGenerator(Generator):
         scummConfig.set("scummvm", "gui_browser_native", "false")
 
         # save the ini file
-        if not os.path.exists(os.path.dirname(scummvmConfig.scummConfigFile)):
-            os.makedirs(os.path.dirname(scummvmConfig.scummConfigFile))
-        with open(scummvmConfig.scummConfigFile, 'w') as configfile:
+        if not os.path.exists(os.path.dirname(scummvmConfig.scummvmConfigFile)):
+            os.makedirs(os.path.dirname(scummvmConfig.scummvmConfigFile))
+        with open(scummvmConfig.scummvmConfigFile, 'w') as configfile:
             scummConfig.write(configfile)
 
         # Find rom path
@@ -53,7 +53,7 @@ class ScummVMGenerator(Generator):
                 id=pad.index
             nplayer += 1
 
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']], "-f"]
+        commandArray = [scummvmConfig.scummvmBin, "-f"]
 
         # set the resolution
         window_width = str(gameResolution["width"])
@@ -98,7 +98,7 @@ class ScummVMGenerator(Generator):
         commandArray.extend(
             [f"--joystick={id}",
             "--screenshotspath="+batoceraFiles.screenshotsDir,
-            "--extrapath="+scummvmConfig.scummExtra,
+            "--extrapath="+scummvmConfig.scummvmExtra,
             f"--path={romPath}",
             f"{romName}"]
         )
