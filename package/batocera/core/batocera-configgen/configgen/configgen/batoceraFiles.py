@@ -51,13 +51,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-daphneRomdir = ROMS + '/daphne'
-singeRomdir = ROMS + '/singe'
-hypseusDatadir = CONF + '/hypseus-singe'
-hypseusConfig = hypseusDatadir+ '/hypinput.ini'
-hypseusConfigfile = 'hypinput.ini'
-hypseusSaves = SAVES + '/hypseus'
-
 flycastCustom = CONF + '/flycast'
 flycastMapping = flycastCustom + '/mappings'
 flycastConfig = flycastCustom + '/emu.cfg'

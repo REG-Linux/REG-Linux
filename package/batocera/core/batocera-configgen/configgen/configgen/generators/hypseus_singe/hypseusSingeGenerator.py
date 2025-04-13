@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 import Command
-import batoceraFiles
-from generators.Generator import Generator
+import filecmp
 import shutil
 import os
+import batoceraFiles
 import controllersConfig
-import filecmp
 import ffmpeg
 from utils.logger import get_logger
+from generators.Generator import Generator
+from . import hypseusSingeConfig
 
 eslog = get_logger(__name__)
 
@@ -90,14 +91,14 @@ class HypseusSingeGenerator(Generator):
                     return bezel
             return None
 
-        if not os.path.isdir(batoceraFiles.hypseusDatadir):
-            os.mkdir(batoceraFiles.hypseusDatadir)
-        if not os.path.exists(batoceraFiles.hypseusConfig) or not filecmp.cmp(hypseusConfigSource, batoceraFiles.hypseusConfig):
-            shutil.copyfile(hypseusConfigSource, batoceraFiles.hypseusConfig)
+        if not os.path.isdir(hypseusSingeConfig.hypseusDatadir):
+            os.mkdir(hypseusSingeConfig.hypseusDatadir)
+        if not os.path.exists(hypseusSingeConfig.hypseusConfig) or not filecmp.cmp(hypseusConfigSource, hypseusSingeConfig.hypseusConfig):
+            shutil.copyfile(hypseusConfigSource, hypseusSingeConfig.hypseusConfig)
 
         # create a custom ini
-        if not os.path.exists(batoceraFiles.hypseusDatadir + "/custom.ini"):
-            shutil.copyfile(batoceraFiles.hypseusConfig, batoceraFiles.hypseusDatadir + "/custom.ini")
+        if not os.path.exists(hypseusSingeConfig.hypseusDatadir + "/custom.ini"):
+            shutil.copyfile(hypseusSingeConfig.hypseusConfig, hypseusSingeConfig.hypseusDatadir + "/custom.ini")
 
         # copy required resources to userdata config folder as needed
         def copy_resources(source_dir, destination_dir):
@@ -114,10 +115,10 @@ class HypseusSingeGenerator(Generator):
                         copy_resources(source_item, destination_item)
 
         directories = [
-            {"source": "/usr/share/hypseus-singe/pics", "destination": batoceraFiles.hypseusDatadir + "/pics"},
-            {"source": "/usr/share/hypseus-singe/sound", "destination": batoceraFiles.hypseusDatadir + "/sound"},
-            {"source": "/usr/share/hypseus-singe/fonts", "destination": batoceraFiles.hypseusDatadir + "/fonts"},
-            {"source": "/usr/share/hypseus-singe/bezels", "destination": batoceraFiles.hypseusDatadir + "/bezels"}
+            {"source": "/usr/share/hypseus-singe/pics", "destination": hypseusSingeConfig.hypseusDatadir + "/pics"},
+            {"source": "/usr/share/hypseus-singe/sound", "destination": hypseusSingeConfig.hypseusDatadir + "/sound"},
+            {"source": "/usr/share/hypseus-singe/fonts", "destination": hypseusSingeConfig.hypseusDatadir + "/fonts"},
+            {"source": "/usr/share/hypseus-singe/bezels", "destination": hypseusSingeConfig.hypseusDatadir + "/bezels"}
         ]
 
         # Copy/update directories
@@ -135,7 +136,7 @@ class HypseusSingeGenerator(Generator):
             bezelFile += ".png"
         else:
             bezelFile = romName.lower() + ".png"
-        bezelPath = batoceraFiles.hypseusDatadir + "/bezels/" + bezelFile
+        bezelPath = hypseusSingeConfig.hypseusDatadir + "/bezels/" + bezelFile
 
         # get the first video file from frameFile to determine the resolution
         m2v_filename = self.find_m2v_from_txt(frameFile)
@@ -161,19 +162,19 @@ class HypseusSingeGenerator(Generator):
         if system.name == "singe":
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
                             "singe", "vldp", "-retropath", "-framefile", frameFile, "-script", singeFile,
-                            "-fullscreen", "-gamepad", "-datadir", batoceraFiles.hypseusDatadir,
-                            "-singedir", batoceraFiles.singeRomdir, "-romdir", batoceraFiles.singeRomdir, "-homedir", batoceraFiles.hypseusDatadir]
+                            "-fullscreen", "-gamepad", "-datadir", hypseusSingeConfig.hypseusDatadir,
+                            "-singedir", hypseusSingeConfig.singeRomdir, "-romdir", hypseusSingeConfig.singeRomdir, "-homedir", hypseusSingeConfig.hypseusDatadir]
         else:
             commandArray = [batoceraFiles.batoceraBins[system.config['emulator']],
                             romName, "vldp", "-framefile", frameFile, "-fullscreen",
-                            "-fastboot", "-gamepad", "-datadir", batoceraFiles.hypseusDatadir,
-                            "-romdir", batoceraFiles.daphneRomdir, "-homedir", batoceraFiles.hypseusDatadir]
+                            "-fastboot", "-gamepad", "-datadir", hypseusSingeConfig.hypseusDatadir,
+                            "-romdir", hypseusSingeConfig.daphneRomdir, "-homedir", hypseusSingeConfig.hypseusDatadir]
 
         # controller config file
         if system.isOptSet('hypseus_joy')  and system.getOptBoolean('hypseus_joy'):
             commandArray.extend(['-keymapfile', 'custom.ini'])
         else:
-            commandArray.extend(["-keymapfile", batoceraFiles.hypseusConfigfile])
+            commandArray.extend(["-keymapfile", hypseusSingeConfig.hypseusConfigfile])
 
         # Default -fullscreen behaviour respects game aspect ratio
         bezelRequired = False
