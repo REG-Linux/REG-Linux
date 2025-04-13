@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
 
@@ -17,8 +16,9 @@ setup(
 
     # Package dependencies
     install_requires=[
-        'PyYAML>=5.1',      # For YAML configuration handling
-        'lxml>=4.3',        # For XML processing
+        'PyYAML>=5.1',          # For YAML configuration handling
+        'lxml>=4.3',            # For XML processing
+        'ffmpeg-python>=0.2.0', # For video processing
     ],
 
     # Non-Python files to include (gamepad configs, etc.)
