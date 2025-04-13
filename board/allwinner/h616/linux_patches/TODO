@@ -1,0 +1,290 @@
+[🐳|🔨]   -> 002/457: patches.megous/net-wireless-brcmfmac-Add-support-for-detecting-AP6275P(:1) (+6/-1)[2M] {pcie.c, brcm_hw_ids.h}
+[🐳|🔨]   -> 003/457: patches.megous/net-wireless-brcmfmac-Add-optional-32k-clock-enable-support(:1) (+10/-0)[1M] {pcie.c}
+[🐳|🔨]   -> 020/457: patches.megous/nfc-pn544-Add-support-for-VBAT-PVDD-regulators(:1) (+29/-2)[1M] {i2c.c}
+[🐳|🔨]   -> 021/457: patches.megous/bluetooth-bcm-Restore-drive_rts_on_open-true-behavior-on-bcm207(:1) (+6/-1)[1M] {hci_bcm.c}
+[🐳|🔨]   -> 022/457: patches.megous/mmc-add-delay-after-power-class-selection(:1) (+4/-0)[1M] {mmc.c}
+[🐳|🔨]   -> 025/457: patches.megous/ARM-dts-sun8i-a83t-Add-cedrus-video-codec-support-to-A83T-untes(:1) (+10/-0)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 026/457: patches.megous/ARM-dts-suni-a83t-Add-i2s0-pins(:1) (+5/-0)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 031/457: patches.megous/dt-bindings-input-gpio-vibrator-Don-t-require-enable-gpios(:1) (+6/-1)[1M] {gpio-vibrator.yaml}
+[🐳|🔨]   -> 032/457: patches.megous/input-gpio-vibra-Allow-to-use-vcc-supply-alone-to-control-the-v(:1) (+18/-7)[1M] {gpio-vibra.c}
+[🐳|🔨]   -> 035/457: patches.megous/dt-bindings-leds-Add-a-binding-for-AXP813-charger-led(:1) (+24/-0)[1A] {leds-axp20x.yaml}
+[🐳|🔨]   -> 036/457: patches.megous/leds-axp20x-Support-charger-LED-on-AXP20x-like-PMICs(:1) (+272/-0)[3M, 1A] {leds-axp20x.c, Kconfig, axp20x.c, Makefile}
+[🐳|🔨]   -> 037/457: patches.megous/ARM-dts-axp813-Add-charger-LED(:1) (+5/-0)[1M] {axp81x.dtsi}
+[🐳|🔨]   -> 051/457: patches.megous/mailbox-Allow-to-run-mailbox-while-timekeeping-is-suspended(:1) (+24/-4)[1M] {mailbox.c}
+[🐳|🔨]   -> 052/457: patches.megous/ARM-sunxi-Add-experimental-suspend-to-memory-implementation-for(:1) (+46/-0)[1M] {sunxi.c}
+[🐳|🔨]   -> 053/457: patches.megous/ARM-sunxi-sunxi_cpu0_hotplug_support_set-is-not-supported-on-A8(:1) (+3/-0)[1M] {mc_smp.c}
+[🐳|🔨]   -> 054/457: patches.megous/firmware-scpi-Add-support-for-sending-a-SCPI_CMD_SET_SYS_PWR_ST(:1) (+11/-0)[2M] {arm_scpi.c, scpi_protocol.h}
+[🐳|🔨]   -> 055/457: patches.megous/ARM-sunxi-Use-SCPI-to-send-suspend-message-to-SCP-on-A83T(:1) (+13/-2)[1M] {sunxi.c}
+[🐳|🔨]   -> 057/457: patches.megous/clk-sunxi-ng-Export-CLK_DRAM-for-devfreq(:1) (+2/-7)[2M] {sun8i-a83t-ccu.h, ccu-sun8i-a83t.h}
+[🐳|🔨]   -> 058/457: patches.megous/ARM-dts-sun8i-a83t-Add-MBUS-node(:1) (+15/-0)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 059/457: patches.megous/clk-sunxi-ng-Set-maximum-P-and-M-factors-to-1-for-H3-pll-cpux-c(:1) (+15/-9)[1M] {ccu-sun8i-h3.c}
+[🐳|🔨]   -> 060/457: patches.megous/clk-sunxi-ng-Don-t-use-CPU-PLL-gating-and-CPUX-reparenting-to-H(:1) (+0/-21)[1M] {ccu-sun8i-h3.c}
+[🐳|🔨]   -> 061/457: patches.megous/ARM-dts-sun8i-h3-Use-my-own-more-aggressive-OPPs-on-H3(:1) (+36/-0)[1M] {sun8i-h3.dtsi}
+[🐳|🔨]   -> 062/457: patches.megous/arm64-dts-sun50i-h5-Use-my-own-more-aggressive-OPPs-on-H5(:1) (+22/-22)[1M] {sun50i-h5-cpu-opp.dtsi}
+[🐳|🔨]   -> 063/457: patches.megous/ARM-dts-sun8i-h3-orange-pi-pc-Increase-max-CPUX-voltage-to-1.4V(:1) (+2/-1)[1M] {sun8i-h3-orangepi-pc.dts}
+[🐳|🔨]   -> 064/457: patches.megous/ARM-dts-sun8i-a83t-Improve-CPU-OPP-tables-go-up-to-1.8GHz(:1) (+22/-58)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 065/457: patches.megous/cpufreq-sun50i-Show-detected-CPU-bin-for-easier-debugging(:1) (+2/-0)[1M] {sun50i-cpufreq-nvmem.c}
+[🐳|🔨]   -> 066/457: patches.megous/net-stmmac-sun8i-Use-devm_regulator_get-for-PHY-regulator(:1) (+10/-17)[1M] {dwmac-sun8i.c}
+[🐳|🔨]   -> 067/457: patches.megous/net-stmmac-sun8i-Rename-PHY-regulator-variable-to-regulator_phy(:1) (+9/-9)[1M] {dwmac-sun8i.c}
+[🐳|🔨]   -> 068/457: patches.megous/net-stmmac-sun8i-Add-support-for-enabling-a-regulator-for-PHY-I(:1) (+19/-1)[1M] {dwmac-sun8i.c}
+[🐳|🔨]   -> 069/457: patches.megous/arm64-dts-allwinner-orange-pi-3-Enable-ethernet(:1) (+40/-0)[1M] {sun50i-h6-orangepi-3.dts}
+[🐳|🔨]   -> 086/457: patches.megous/regulator-Add-simple-driver-for-enabling-a-regulator-from-users(:1) (+145/-0)[2M, 1A] {userspace-consumer-of.c, Kconfig, Makefile}
+[🐳|🔨]   -> 087/457: patches.megous/regulator-tp65185x-Add-tp65185x-eInk-panel-regulator-driver(:1) (+437/-0)[2M, 1A] {tp65185x.c, Kconfig, Makefile}
+[🐳|🔨]   -> 088/457: patches.megous/regulator-tp65185-Add-hwmon-device-for-reading-temperature(:1) (+127/-7)[1M] {tp65185x.c}
+[🐳|🔨]   -> 089/457: patches.megous/iio-adc-sun4i-gpadc-iio-Allow-to-use-sun5i-a13-gpadc-iio-from-D(:1) (+8/-1)[3M] {sun5i.dtsi, sun4i-gpadc-iio.c, sun4i-gpadc.c}
+[🐳|🔨]   -> 090/457: patches.megous/mtd-spi-nor-Add-vdd-regulator-support(:1) (+8/-0)[1M] {core.c}
+[🐳|🔨]   -> 122/457: patches.megous/dt-bindings-sound-Add-jack-type-property-to-sun8i-a33-codec(:1) (+9/-0)[1M] {allwinner,sun8i-a33-codec.yaml}
+[🐳|🔨]   -> 123/457: patches.megous/ASoC-sun8i-codec-Allow-the-jack-type-to-be-set-via-device-tree(:1) (+13/-0)[1M] {sun8i-codec.c}
+[🐳|🔨]   -> 124/457: patches.megous/ASoC-sun8i-codec-define-button-keycodes(:1) (+7/-0)[1M] {sun8i-codec.c}
+[🐳|🔨]   -> 125/457: patches.megous/ASoC-sun8i-codec-Add-debug-output-for-jack-detection(:1) (+31/-1)[1M] {sun8i-codec.c}
+[🐳|🔨]   -> 126/457: patches.megous/ASoC-sun8i-codec-Set-jack_type-from-DT-in-probe(:1) (+7/-7)[1M] {sun8i-codec.c}
+[🐳|🔨]   -> 127/457: patches.megous/ASoC-simple-card-Allow-to-define-pins-for-aux-jack-devices(:1) (+40/-0)[1M] {simple-card-utils.c}
+[🐳|🔨]   -> 128/457: patches.megous/clk-sunxi-ng-a64-Increase-PLL_AUDIO-base-frequency(:1) (+32/-9)[1M] {ccu-sun50i-a64.c}
+[🐳|🔨]   -> 129/457: patches.megous/dt-bindings-mfd-Add-codec-related-properties-to-AC100-PMIC(:1) (+38/-0)[1M] {x-powers,ac100.yaml}
+[🐳|🔨]   -> 130/457: patches.megous/sound-soc-ac100-codec-Support-analog-part-of-X-Powers-AC100-cod(:1) (+1006/-0)[4M, 1A] {ac100-codec.c, Kconfig, ac100.c, ac100.h, Makefile}
+[🐳|🔨]   -> 131/457: patches.megous/sound-soc-sun8i-codec-Add-support-for-digital-part-of-the-AC100(:1) (+212/-8)[2M] {sun8i-codec.c, Kconfig}
+[🐳|🔨]   -> 132/457: patches.megous/ASoC-ec25-New-codec-driver-for-the-EC25-modem(:1) (+99/-0)[2M, 1A] {ec25.c, Kconfig, Makefile}
+[🐳|🔨]   -> 133/457: patches.megous/ASOC-sun9i-hdmi-audio-Initial-implementation(:1) (+187/-0)[2M, 1A] {sun9i-hdmi-audio.c, Kconfig, Makefile}
+[🐳|🔨]   -> 134/457: patches.megous/ARM-dts-sunxi-h3-h5-Add-hdmi-sound-card(:1) (+15/-0)[1M] {sunxi-h3-h5.dtsi}
+[🐳|🔨]   -> 135/457: patches.megous/ARM-dts-sun8i-h3-Enable-hdmi-sound-card-on-boards-with-hdmi(:1) (+80/-0)[10M] {sun8i-h3-beelink-x2.dts, sun8i-h3-emlid-neutis-n5h3-devboard.dts, sun8i-h3-nanopi-m1-plus.dts, sun8i-h3-nanopi-m1.dts, sun8i-h3-orangepi-2.dts, sun8i-h3-orangepi-lite.dts, sun8i-h3-orangepi-one.dts, sun8i-h3-orangepi-pc.dts, sun8i-h3-orangepi-zero-plus2.dts, sun8i-h3-rervision-dvk.dts}
+[🐳|🔨]   -> 136/457: patches.megous/ARM-dts-sun8i-h2-plus-bananapi-m2-zero-Enable-HDMI-audio(:1) (+8/-0)[1M] {sun8i-h2-plus-bananapi-m2-zero.dts}
+[🐳|🔨]   -> 137/457: patches.megous/ARM-dts-sun8i-a83t-Add-hdmi-sound-card(:1) (+15/-0)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 138/457: patches.megous/ARM-dts-sun8i-a83t-Enable-hdmi-sound-card-on-boards-with-hdmi(:1) (+16/-0)[2M] {sun8i-a83t-bananapi-m3.dts, sun8i-a83t-cubietruck-plus.dts}
+[🐳|🔨]   -> 139/457: patches.megous/ARM-dts-sun8i-r40-Add-hdmi-sound-card(:1) (+15/-0)[1M] {sun8i-r40.dtsi}
+[🐳|🔨]   -> 140/457: patches.megous/ARM-dts-sun8i-r40-bananapi-m2-ultra-Enable-HDMI-audio(:1) (+8/-0)[1M] {sun8i-r40-bananapi-m2-ultra.dts}
+[🐳|🔨]   -> 141/457: patches.megous/ARM-dts-sun8i-v40-bananapi-m2-berry-Enable-HDMI-audio(:1) (+8/-0)[1M] {sun8i-v40-bananapi-m2-berry.dts}
+[🐳|🔨]   -> 142/457: patches.megous/arm64-dts-allwinner-h6-Add-hdmi-sound-card(:1) (+16/-0)[1M] {sun50i-h6.dtsi}
+[🐳|🔨]   -> 143/457: patches.megous/arm64-dts-allwinner-h6-Enable-hdmi-sound-card-on-boards-with-hd(:1) (+32/-0)[4M] {sun50i-h6-beelink-gs1.dts, sun50i-h6-orangepi-3.dts, sun50i-h6-orangepi.dtsi, sun50i-h6-pine-h64.dts}
+[🐳|🔨]   -> 144/457: patches.megous/arm64-dts-allwinner-a64-Add-hdmi-sound-card(:1) (+15/-0)[1M] {sun50i-a64.dtsi}
+[🐳|🔨]   -> 145/457: patches.megous/arm64-dts-allwinner-a64-Enable-hdmi-sound-card-on-boards-with-h(:1) (+55/-0)[7M] {sun50i-a64-bananapi-m64.dts, sun50i-a64-nanopi-a64.dts, sun50i-a64-orangepi-win.dts, sun50i-a64-pine64.dts, sun50i-a64-sopine-baseboard.dts, sun50i-a64-teres-i.dts, sun50i-a64-olinuxino.dts}
+[🐳|🔨]   -> 146/457: patches.megous/arm64-dts-allwinner-h5-Enable-hdmi-sound-card-on-boards-with-hd(:1) (+32/-0)[4M] {sun50i-h5-emlid-neutis-n5-devboard.dts, sun50i-h5-orangepi-pc2.dts, sun50i-h5-orangepi-prime.dts, sun50i-h5-orangepi-zero-plus2.dts}
+[🐳|🔨]   -> 147/457: patches.megous/Move-a-node-to-avoid-merge-conflict(:1) (+23/-24)[3M] {sun50i-h6.dtsi, sunxi-h3-h5.dtsi, sun50i-h6-orangepi-3.dts}
+[🐳|🔨]   -> 148/457: patches.megous/arm64-dts-sun50i-a64-Set-fifo-size-for-uarts(:1) (+5/-0)[1M] {sun50i-a64.dtsi}
+[🐳|🔨]   -> 149/457: patches.megous/ARM-dts-sun8i-a83t-Set-fifo-size-for-uarts(:1) (+5/-0)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 150/457: patches.megous/Mark-some-slow-drivers-for-async-probe-with-PROBE_PREFER_ASYNCH(:1) (+2/-0)[2M] {bma180.c, i2c.c}
+[🐳|🔨]   -> 151/457: patches.megous/arm64-xor-Select-32regs-without-benchmark-to-speed-up-boot(:1) (+4/-10)[1M] {xor.h}
+[🐳|🔨]   -> 152/457: patches.megous/clk-sunxi-ng-Mark-TWD-clocks-as-critical(:1) (+3/-3)[3M] {ccu-sun50i-a100-r.c, ccu-sun50i-h6-r.c, ccu-sun8i-r.c}
+[🐳|🔨]   -> 153/457: patches.megous/firmware-arm_scpi-Support-unidirectional-mailbox-channels(:1) (+46/-12)[1M] {arm_scpi.c}
+[🐳|🔨]   -> 154/457: patches.megous/ARM-dts-sunxi-a83t-Add-SCPI-protocol(:1) (+21/-0)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 155/457: patches.megous/ARM-dts-sunxi-h3-h5-Add-SCPI-protocol(:1) (+33/-0)[3M] {sun8i-h3.dtsi, sun50i-h5.dtsi, sunxi-h3-h5.dtsi}
+[🐳|🔨]   -> 156/457: patches.megous/ARM-dts-sun8i-a83t-tbs-a711-Give-Linux-more-privileges-over-SCP(:1) (+5/-2)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 157/457: patches.megous/rtc-sun6i-Allow-RTC-wakeup-after-shutdown(:1) (+11/-1)[1M] {rtc-sun6i.c}
+[🐳|🔨]   -> 158/457: patches.megous/misc-modem-power-Power-manager-for-modems(:1) (+1998/-0)[2M, 1A] {modem-power.c, Kconfig, Makefile}
+[🐳|🔨]   -> 159/457: patches.megous/ARM-dts-sun8i-a83t-Add-missing-GPU-trip-point(:1) (+9/-0)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 160/457: patches.megous/arm64-dts-sun50i-h5-Add-missing-GPU-trip-point(:1) (+9/-0)[1M] {sun50i-h5.dtsi}
+[🐳|🔨]   -> 161/457: patches.megous/arm64-dts-allwinner-a64-Fix-LRADC-compatible(:1) (+1/-1)[1M] {sun50i-a64.dtsi}
+[🐳|🔨]   -> 162/457: patches.megous/ASoC-codec-es8316-DAC-Soft-Ramp-Rate-is-just-a-2-bit-control(:1) (+1/-1)[1M] {es8316.c}
+[🐳|🔨]   -> 163/457: patches.megous/spi-rockchip-Fix-runtime-PM-and-other-issues(:1) (+56/-43)[1M] {spi-rockchip.c}
+[🐳|🔨]   -> 164/457: patches.megous/spi-fixes(:1) (+5/-10)[1M] {spi-rockchip.c}
+[🐳|🔨]   -> 165/457: patches.megous/media-cedrus-Fix-failure-to-clean-up-hardware-on-probe-failure(:1) (+3/-1)[1M] {cedrus.c}
+[🐳|🔨]   -> 166/457: patches.megous/ASoC-rockchip-Fix-doubling-of-playback-speed-after-system-sleep(:1) (+7/-0)[1M] {rockchip_i2s.c}
+[🐳|🔨]   -> 167/457: patches.megous/usb-musb-sunxi-Avoid-enabling-host-side-code-on-SoCs-where-it-s(:1) (+33/-7)[2M] {sunxi.c, musb_core.c}
+[🐳|🔨]   -> 168/457: patches.megous/arm64-dts-allwinner-Enforce-consistent-MMC-numbering(:1) (+18/-0)[3M] {sun50i-a64.dtsi, sun50i-h5.dtsi, sun50i-h6.dtsi}
+[🐳|🔨]   -> 169/457: patches.megous/ARM-dts-sunxi-Add-aliases-for-MMC(:1) (+18/-0)[3M] {sun5i.dtsi, sun8i-a83t.dtsi, sun8i-h3.dtsi}
+[🐳|🔨]   -> 170/457: patches.megous/drm-rockchip-Fix-panic-on-reboot-when-DRM-device-fails-to-bind(:1) (+2/-0)[1M] {rockchip_drm_drv.c}
+[🐳|🔨]   -> 171/457: patches.megous/usb-gadget-Fix-dangling-pointer-in-netdev-private-data(:1) (+56/-47)[6M] {f_eem.c, f_rndis.c, f_subset.c, f_ecm.c, u_ether.c, f_ncm.c}
+[🐳|🔨]   -> 172/457: patches.megous/mmc-dw-mmc-rockchip-fix-sdmmc-after-soft-reboot(:1) (+12/-0)[1M] {dw_mmc-rockchip.c}
+[🐳|🔨]   -> 173/457: patches.megous/Revert-drm-sun4i-lvds-Invert-the-LVDS-polarity(:1) (+3/-1)[1M] {sun4i_tcon.c}
+[🐳|🔨]   -> 174/457: patches.megous/of-property-fw_devlink-Support-allwinner-sram-links(:1) (+22/-0)[1M] {property.c}
+[🐳|🔨]   -> 175/457: patches.megous/Fix-broken-allwinner-sram-dependency-on-h616-h618(:1) (+3/-2)[1M] {property.c}
+[🐳|🔨]   -> 176/457: patches.megous/arm64-dts-rockchip-rk356x-Fix-PCIe-register-map-and-ranges(:1) (+1/-1)[1M] {rk356x.dtsi}
+[🐳|🔨]   -> 177/457: patches.megous/Fix-intptr_t-typedef(:1) (+4/-0)[1M] {types.h}
+[🐳|🔨]   -> 178/457: patches.megous/mmc-sunxi-mmc-Remove-runtime-PM(:1) (+19/-16)[1M] {sunxi-mmc.c}
+[🐳|🔨]   -> 179/457: patches.megous/pci-Workaround-ITS-timeouts-on-poweroff-reboot-on-Orange-Pi-5-P(:1) (+1/-1)[1M] {portdrv.c}
+[🐳|🔨]   -> 180/457: patches.megous/usb-serial-option-add-reset_resume-callback-for-WWAN-devices(:1) (+1/-0)[1M] {option.c}
+[🐳|🔨]   -> 182/457: patches.megous/drm-rockchip-dw-mipi-dsi-rockchip-Fix-ISP1-PHY-initialization(:1) (+8/-0)[1M] {dw-mipi-dsi-rockchip.c}
+[🐳|🔨]   -> 183/457: patches.megous/arm64-dts-rk3399-Add-dmc_opp_table(:1) (+29/-0)[1M] {rk3399.dtsi}
+[🐳|🔨]   -> 184/457: patches.megous/bluetooth-h5-Don-t-re-initialize-rtl8723cs-on-resume(:1) (+1/-1)[1M] {hci_h5.c}
+[🐳|🔨]   -> 185/457: patches.megous/drm-panel-st7703-Fix-xbd599-timings-to-make-refresh-rate-exactl(:1) (+4/-4)[1M] {panel-sitronix-st7703.c}
+[🐳|🔨]   -> 186/457: patches.megous/video-pwm_bl-Allow-to-change-lth_brightness-via-sysfs(:1) (+94/-3)[1M] {pwm_bl.c}
+[🐳|🔨]   -> 187/457: patches.megous/clk-sunxi-ng-sun50i-a64-Switch-parent-of-MIPI-DSI-to-periph0-1x(:1) (+12/-1)[1M] {ccu-sun50i-a64.c}
+[🐳|🔨]   -> 188/457: patches.megous/drm-sun4i-tcon-Support-keeping-dclk-rate-upon-ancestor-clock-ch(:1) (+76/-6)[2M] {sun4i_tcon.c, sun4i_tcon.h}
+[🐳|🔨]   -> 189/457: patches.megous/phy-allwinner-sun4i-usb-Add-support-for-usb_role_switch(:1) (+51/-1)[2M] {phy-sun4i-usb.c, Kconfig}
+[🐳|🔨]   -> 190/457: patches.megous/regulator-axp20x-Add-support-for-vin-supply-for-drivevbus(:1) (+27/-3)[1M] {axp20x-regulator.c}
+[🐳|🔨]   -> 191/457: patches.megous/regulator-axp20x-Turn-N_VBUSEN-to-input-on-x-powers-sense-vbus-(:1) (+12/-0)[2M] {axp20x-regulator.c, sun50i-a64-pinephone-1.2.dts}
+[🐳|🔨]   -> 192/457: patches.megous/drm-bridge-dw-hdmi-Allow-to-accept-HPD-status-from-other-driver(:1) (+59/-4)[1M] {dw-hdmi.c}
+[🐳|🔨]   -> 193/457: patches.megous/drm-bridge-dw-hdmi-Report-HDMI-hotplug-events(:1) (+8/-2)[1M] {dw-hdmi.c}
+[🐳|🔨]   -> 194/457: patches.megous/usb-typec-anx7688-Add-driver-for-ANX7688-USB-C-HDMI-bridge(:1) (+2250/-0)[2M, 1A] {anx7688.c, Kconfig, Makefile}
+[🐳|🔨]   -> 195/457: patches.megous/usb-typec-anx7688-Port-to-Linux-6.9(:1) (+5/-46)[1M] {anx7688.c}
+[🐳|🔨]   -> 196/457: patches.megous/usb-typec-anx7688-Port-to-Linux-6.10(:1) (+1/-1)[1M] {anx7688.c}
+[🐳|🔨]   -> 197/457: patches.megous/dt-bindings-axp20x-adc-allow-to-use-TS-pin-as-GPADC(:1) (+5/-0)[1M] {x-powers,axp209-adc.yaml}
+[🐳|🔨]   -> 198/457: patches.megous/iio-adc-axp20x_adc-allow-to-set-TS-pin-to-GPADC-mode(:1) (+6/-0)[1M] {axp20x_adc.c}
+[🐳|🔨]   -> 199/457: patches.megous/power-axp20x_battery-Allow-to-set-target-voltage-to-4.35V(:1) (+5/-0)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 200/457: patches.megous/power-supply-axp20x_battery-Add-support-for-reporting-OCV(:1) (+23/-0)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 201/457: patches.megous/regulator-axp20x-Enable-over-temperature-protection-and-16s-res(:1) (+7/-0)[1M] {axp20x-regulator.c}
+[🐳|🔨]   -> 202/457: patches.megous/power-supply-axp20x_battery-Setup-thermal-regulation-experiment(:1) (+53/-0)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 203/457: patches.megous/power-supply-axp20x_battery-Fix-charging-done-detection(:1) (+3/-2)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 204/457: patches.megous/mfd-axp20x-Add-battery-IRQ-resources(:1) (+36/-0)[1M] {axp20x.c}
+[🐳|🔨]   -> 205/457: patches.megous/power-supply-axp20x_battery-Send-uevents-for-status-changes(:1) (+54/-2)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 206/457: patches.megous/power-supply-axp20x_battery-Monitor-battery-health(:1) (+56/-2)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 207/457: patches.megous/power-supply-axp20x-usb-power-Change-Vbus-hold-voltage-to-4.5V(:1) (+12/-0)[1M] {axp20x_usb_power.c}
+[🐳|🔨]   -> 208/457: patches.megous/power-axp803-Add-interrupts-for-low-battery-power-condition(:1) (+4/-0)[2M] {axp20x.c, axp20x_battery.c}
+[🐳|🔨]   -> 209/457: patches.megous/power-supply-axp20x-battery-Support-POWER_SUPPLY_PROP_CHARGE_BE(:1) (+31/-0)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 210/457: patches.megous/power-supply-axp20x-battery-Enable-poweron-by-RTC-alarm(:1) (+5/-0)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 211/457: patches.megous/power-supply-axp20x-battery-Add-support-for-POWER_SUPPLY_PROP_E(:1) (+26/-4)[1M] {axp20x_battery.c}
+[🐳|🔨]   -> 212/457: patches.megous/power-supply-Add-support-for-USB_BC_ENABLED-and-USB_DCP_INPUT_C(:1) (+4/-0)[2M] {power_supply_sysfs.c, power_supply.h}
+[🐳|🔨]   -> 213/457: patches.megous/power-supply-axp20x-usb-power-Add-missing-interrupts(:1) (+11/-2)[2M] {axp20x_usb_power.c, axp20x.c}
+[🐳|🔨]   -> 214/457: patches.megous/sunxi-Use-dev_err_probe-to-handle-EPROBE_DEFER-errors(:1) (+25/-12)[5M] {phy-sun4i-usb.c, i2c-gpio.c, phy-sun6i-mipi-dphy.c, topology.c, panel-sitronix-st7703.c}
+[🐳|🔨]   -> 215/457: patches.megous/thermal-sun8i-Be-loud-when-probe-fails(:1) (+19/-3)[1M] {sun8i_thermal.c}
+[🐳|🔨]   -> 216/457: patches.megous/i2c-mv64xxx-Don-t-make-a-fuss-when-pinctrl-recovery-state-is-no(:1) (+8/-0)[1M] {i2c-mv64xxx.c}
+[🐳|🔨]   -> 217/457: patches.megous/iio-st_sensors-Don-t-report-error-when-the-device-is-not-presen(:1) (+9/-1)[1M] {st_sensors_core.c}
+[🐳|🔨]   -> 218/457: patches.megous/opp-core-Avoid-confusing-error-when-no-regulator-is-defined-in-(:1) (+5/-0)[1M] {core.c}
+[🐳|🔨]   -> 219/457: patches.megous/rtc-Print-which-error-caused-RTC-read-failure(:1) (+2/-1)[1M] {class.c}
+[🐳|🔨]   -> 225/457: patches.megous/usb-typec-fusb302-Slightly-increase-wait-time-for-BC1.2-result(:1) (+2/-2)[1M] {fusb302.c}
+[🐳|🔨]   -> 226/457: patches.megous/usb-typec-fusb302-Set-the-current-before-enabling-pullups(:1) (+8/-8)[1M] {fusb302.c}
+[🐳|🔨]   -> 227/457: patches.megous/usb-typec-fusb302-Extend-debugging-interface-with-driver-state-(:1) (+78/-0)[1M] {fusb302.c}
+[🐳|🔨]   -> 228/457: patches.megous/usb-typec-fusb302-Retry-reading-of-CC-pins-status-if-activity-i(:1) (+32/-2)[1M] {fusb302.c}
+[🐳|🔨]   -> 229/457: patches.megous/usb-typec-fusb302-More-useful-of-logging-status-on-interrupt(:1) (+104/-17)[1M] {fusb302.c}
+[🐳|🔨]   -> 230/457: patches.megous/usb-typec-fusb302-Update-VBUS-state-even-if-VBUS-interrupt-is-n(:1) (+8/-6)[1M] {fusb302.c}
+[🐳|🔨]   -> 231/457: patches.megous/usb-typec-fusb302-Add-OF-extcon-support(:1) (+10/-0)[1M] {fusb302.c}
+[🐳|🔨]   -> 232/457: patches.megous/usb-typec-fusb302-Fix-register-definitions(:1) (+7/-9)[1M] {fusb302_reg.h}
+[🐳|🔨]   -> 233/457: patches.megous/usb-typec-fusb302-Clear-interrupts-before-we-start-toggling(:1) (+7/-0)[1M] {fusb302.c}
+[🐳|🔨]   -> 234/457: patches.megous/usb-typec-typec-extcon-Add-typec-extcon-bridge-driver(:1) (+338/-0)[2M, 1A] {typec-extcon.c, Kconfig, Makefile}
+[🐳|🔨]   -> 235/457: patches.megous/usb-typec-typec-extcon-Enable-debugging-for-now(:1) (+1/-0)[1M] {typec-extcon.c}
+[🐳|🔨]   -> 236/457: patches.megous/usb-typec-typec-extcon-Allow-to-force-reset-on-each-mux-change(:1) (+15/-0)[1M] {typec-extcon.c}
+[🐳|🔨]   -> 237/457: patches.megous/Revert-usb-typec-tcpm-unregister-existing-source-caps-before-re(:1) (+1/-6)[1M] {tcpm.c}
+[🐳|🔨]   -> 238/457: patches.megous/usb-typec-altmodes-displayport-Respect-DP_CAP_RECEPTACLE-bit(:1) (+44/-4)[1M] {displayport.c}
+[🐳|🔨]   -> 239/457: patches.megous/usb-typec-tcpm-Unregister-altmodes-before-registering-new-ones(:1) (+3/-0)[1M] {tcpm.c}
+[🐳|🔨]   -> 240/457: patches.megous/usb-typec-tcpm-Fix-PD-devices-capabilities-registration(:1) (+29/-8)[1M] {tcpm.c}
+[🐳|🔨]   -> 241/457: patches.megous/usb-typec-tcpm-Improve-logs(:1) (+11/-4)[1M] {tcpm.c}
+[🐳|🔨]   -> 242/457: patches.megous/Make-microbuttons-on-Orange-Pi-PC-and-PC-2-work-as-power-off-bu(:1) (+2/-2)[2M] {sun8i-h3-orangepi-one.dts, sun50i-h5-orangepi-pc2.dts}
+[🐳|🔨]   -> 244/457: patches.megous/ARM-dts-sun8i-h3-orange-pi-one-Enable-all-gpio-header-UARTs(:1) (+6/-3)[1M] {sun8i-h3-orangepi-one.dts}
+[🐳|🔨]   -> 245/457: patches.megous/mtd-spi-nor-Add-Alliance-memory-support(:1) (+27/-0)[3M, 1A] {alliance.c, Makefile, core.c, core.h}
+
+0126 ===> ????? patches.drm/drm-sun4i-add-sun50i-h616-hdmi-phy-support(:1) (+71/-0)[1M] {sun8i_hdmi_phy.c}
+
+[🐳|🔨]   -> 275/457: patches.drm/dt-bindings-power-Add-Allwinner-H6-H616-PRCM-PPU(:1) (+42/-0)[1A] {allwinner,sun50i-h6-prcm-ppu.yaml}
+[🐳|🔨]   -> 276/457: patches.drm/pmdomain-sunxi-add-H6-PRCM-PPU-driver(:1) (+202/-0)[2M, 1A] {sun50i-h6-prcm-ppu.c, Kconfig, Makefile}
+[🐳|🔨]   -> 277/457: patches.drm/dt-bindings-gpu-mali-bifrost-Add-Allwinner-H616-compatible(:1) (+1/-0)[1M] {arm,mali-bifrost.yaml}
+[🐳|🔨]   -> 278/457: patches.drm/arm64-dts-allwinner-h616-Add-Mali-GPU-node(:1) (+21/-0)[1M] {sun50i-h616.dtsi}
+[🐳|🔨]   -> 279/457: patches.drm/drm-panfrost-Add-PM-runtime-flags(:1) (+41/-0)[2M] {panfrost_device.c, panfrost_device.h}
+[🐳|🔨]   -> 280/457: patches.drm/drm-panfrost-add-h616-compatible-string(:1) (+8/-0)[1M] {panfrost_drv.c}
+
+[🐳|🔨]   -> 281/457: patches.armbian/Doc-dt-bindings-usb-add-binding-for-DWC3-controller-on-Allwinne(:1) (+39/-0)[1A] {allwinner,dwc3.txt}
+[🐳|🔨]   -> 282/457: patches.armbian/drv-pinctrl-pinctrl-sun50i-a64-disable_strict_mode(:1) (+1/-0)[1M] {pinctrl-sun50i-a64.c}
+[🐳|🔨]   -> 283/457: patches.armbian/drv-rtc-sun6i-support-RTCs-without-external-LOSCs(:1) (+11/-5)[1M] {rtc-sun6i.c}
+[🐳|🔨]   -> 284/457: patches.armbian/drv-gpu-drm-gem-dma-Export-with-handle-allocator(:1) (+6/-1)[2M] {drm_gem_dma_helper.h, drm_gem_dma_helper.c}
+[🐳|🔨]   -> 285/457: patches.armbian/drv-gpu-drm-sun4i-Add-GEM-allocator(:1) (+56/-0)[1M, 1A] {sun4i_drm.h, sun4i_drv.c}
+[🐳|🔨]   -> 286/457: patches.armbian/Revert-drm-sun4i-hdmi-switch-to-struct-drm_edid(:1) (+7/-11)[1M] {sun4i_hdmi_enc.c}
+[🐳|🔨]   -> 287/457: patches.armbian/drv-gpu-drm-sun4i-Add-HDMI-audio-sun4i-hdmi-encoder(:1) (+516/-0)[4M, 1A] {sun4i_hdmi_audio.c, sun4i_hdmi.h, sun4i_hdmi_enc.c, Kconfig, Makefile}
+[🐳|🔨]   -> 288/457: patches.armbian/drv-net-stmmac-dwmac-sun8i-second-EMAC-clock-register(:1) (+10/-2)[1M] {dwmac-sun8i.c}
+[🐳|🔨]   -> 289/457: patches.armbian/drv-phy-sun4i-usb-Allow-reset-line-to-be-shared(:1) (+1/-1)[1M] {phy-sun4i-usb.c}
+[🐳|🔨]   -> 290/457: patches.armbian/drv-staging-media-sunxi-cedrus-add-H616-variant(:1) (+13/-0)[1M] {cedrus.c}
+[🐳|🔨]   -> 291/457: patches.armbian/drv-soc-sunxi-sram-Add-SRAM-C1-H616-handling(:1) (+10/-0)[1M] {sunxi_sram.c}
+[🐳|🔨]   -> 293/457: patches.armbian/include-uapi-drm_fourcc-add-ARM-tiled-format-modifier(:1) (+9/-0)[1M] {drm_fourcc.h}
+[🐳|🔨]   -> 294/457: patches.armbian/drv-clocksource-arm_arch_timer-fix-a64-timejump(:1) (+14/-11)[1M] {arm_arch_timer.c}
+[🐳|🔨]   -> 295/457: patches.armbian/sound-soc-sunxi-sun8i-codec-analog-enable-sound(:1) (+6/-2)[1M] {sun8i-codec-analog.c}
+[🐳|🔨]   -> 296/457: patches.armbian/sound-soc-sunxi-Provoke-the-early-load-of-sun8i-codec-analog(:1) (+1/-1)[1M] {Makefile}
+[🐳|🔨]   -> 297/457: patches.armbian/sound-soc-sunxi-sun4i-codec-adcis-select-capture-source(:1) (+47/-4)[1M] {sun4i-codec.c}
+[🐳|🔨]   -> 298/457: patches.armbian/drv-mmc-host-sunxi-mmc-add-h5-emmc-compatible(:1) (+8/-0)[1M] {sunxi-mmc.c}
+[🐳|🔨]   -> 299/457: patches.armbian/drv-pinctrl-sunxi-pinctrl-sun50i-h6.c-GPIO-disable_strict_mode(:1) (+1/-0)[1M] {pinctrl-sun50i-h6.c}
+[🐳|🔨]   -> 300/457: patches.armbian/drv-gpu-drm-sun4i-sun8i_mixer.c-add-h3-mixer1(:1) (+12/-0)[1M] {sun8i_mixer.c}
+[🐳|🔨]   -> 301/457: patches.armbian/drv-mtd-nand-raw-nand_ids.c-add-H27UBG8T2BTR-BC-nand(:1) (+4/-0)[1M] {nand_ids.c}
+[🐳|🔨]   -> 302/457: patches.armbian/drv-mfd-axp20x-add-sysfs-interface(:1) (+614/-0)[1M] {axp20x.c}
+[🐳|🔨]   -> 303/457: patches.armbian/drv-spi-spidev-Add-armbian-spi-dev-compatible(:1) (+3/-0)[1M] {spidev.c}
+[🐳|🔨]   -> 304/457: patches.armbian/drv-spi-spi-sun4i.c-spi-bug-low-on-sck(:1) (+3/-1)[1M] {spi-sun4i.c}
+[🐳|🔨]   -> 305/457: patches.armbian/drv-rtc-sun6i-Add-Allwinner-H616-support(:1) (+16/-0)[1M] {rtc-sun6i.c}
+[🐳|🔨]   -> 306/457: patches.armbian/drv-nvmem-sunxi_sid-Support-SID-on-H616(:1) (+7/-0)[1M] {sunxi_sid.c}
+[🐳|🔨]   -> 307/457: patches.armbian/drv-iio-adc-axp20x_adc-arm64-dts-axp803-hwmon-enable-thermal(:1) (+89/-0)[2M] {axp20x_adc.c, axp803.dtsi}
+[🐳|🔨]   -> 308/457: patches.armbian/drv-gpu-drm-panel-simple-Add-compability-olinuxino-lcd(:1) (+121/-4)[1M] {panel-simple.c}
+[🐳|🔨]   -> 309/457: patches.armbian/drv-input-touchscreen-sun4i-ts-Enable-parsing(:1) (+15/-4)[1M] {sun4i-ts.c}
+[🐳|🔨]   -> 310/457: patches.armbian/drv-mmc-host-sunxi-mmc-Disable-DDR52-mode-on-all-A20-based-boar(:1) (+3/-1)[1M] {sunxi-mmc.c}
+[🐳|🔨]   -> 311/457: patches.armbian/drv-usb-gadget-composite-rename-gadget-serial-console-manufactu(:1) (+1/-1)[1M] {composite.c}
+[🐳|🔨]   -> 314/457: patches.armbian/Add-ws2812-RGB-driver-for-allwinner-H616(:1) (+235/-0)[2M, 1A] {leds-ws2812.c, Kconfig, Makefile}
+[🐳|🔨]   -> 315/457: patches.armbian/drv-staging-rtl8723bs-AP-bugfix(:1) (+1/-1)[1M] {ioctl_cfg80211.c}
+[🐳|🔨]   -> 316/457: patches.armbian/Fix-include-uapi-spi-spidev-module(:1) (+1/-2)[1M] {spidev.c}
+[🐳|🔨]   -> 317/457: patches.armbian/Add-dump_reg-and-sunxi-sysinfo-drivers(:1) (+1445/-0)[2M, 8A] {dump_reg.c, dump_reg_misc.c, sunxi-sysinfo.c, dump_reg.h, Kconfig, Makefile}
+[🐳|🔨]   -> 318/457: patches.armbian/Add-sunxi-addr-driver-Used-to-fix-uwe5622-bluetooth-MAC-address(:1) (+547/-0)[2M, 4A] {sunxi-addr.c, sha256.c, Kconfig, Makefile}
+[🐳|🔨]   -> 319/457: patches.armbian/nvmem-sunxi_sid-add-sunxi_get_soc_chipid-sunxi_get_serial(:1) (+28/-0)[1M] {sunxi_sid.c}
+[🐳|🔨]   -> 320/457: patches.armbian/mmc-host-sunxi-mmc-Fix-H6-emmc(:1) (+4/-1)[1M] {sunxi-mmc.c}
+[🐳|🔨]   -> 321/457: patches.armbian/net-usb-r8152-add-LED-configuration-from-OF(:1) (+23/-0)[1M] {r8152.c}
+[🐳|🔨]   -> 322/457: patches.armbian/drivers-devfreq-sun8i-a33-mbus-disable-autorefresh(:1) (+2/-2)[1M] {sun8i-a33-mbus.c}
+[🐳|🔨]   -> 323/457: patches.armbian/clk-gate-add-support-for-regmap-based-gates(:1) (+89/-7)[2M] {clk-gate.c, clk-provider.h}
+[🐳|🔨]   -> 324/457: patches.armbian/mfd-Add-support-for-X-Powers-AC200(:1) (+203/-0)[2M, 1A] {ac200.c, Kconfig, Makefile}
+[🐳|🔨]   -> 325/457: patches.armbian/mfd-Add-support-for-X-Powers-AC200-EPHY-syscon(:1) (+309/-0)[2M, 1A] {ac200-ephy-ctl.c, Kconfig, Makefile}
+[🐳|🔨]   -> 326/457: patches.armbian/net-phy-Add-support-for-AC200-EPHY(:1) (+90/-0)[2M, 1A] {ac200-phy.c, Kconfig, Makefile}
+[🐳|🔨]   -> 327/457: patches.armbian/ASoC-AC200-Initial-driver(:1) (+784/-0)[2M, 1A] {ac200.c, Kconfig, Makefile}
+[🐳|🔨]   -> 328/457: patches.armbian/Input-axp20x-pek-allow-wakeup-after-shutdown(:1) (+6/-0)[1M] {axp20x-pek.c}
+[🐳|🔨]   -> 329/457: patches.armbian/driver-allwinner-h618-emac(:1) (+4335/-15)[8M, 6A] {sunxi-gmac.c, sunxi_gmac_ops.c, sunxi-ephy.c, sunxi-ac200.c, sunxi-gmac.h, ac200.h, gpiolib-of.c, of_gpio.h, Kconfig, Makefile}
+[🐳|🔨]   -> 330/457: patches.armbian/drivers-pwm-Add-pwm-sunxi-enhance-driver-for-h616(:1) (+1264/-0)[2M, 2A] {pwm-sunxi-enhance.c, pwm-sunxi-enhance.h, Kconfig, Makefile}
+[🐳|🔨]   -> 331/457: patches.armbian/arm-patch-call-flush_icache-ASAP-after-writing-new-instruction(:1) (+9/-3)[1M] {patch.c}
+[🐳|🔨]   -> 332/457: patches.armbian/arm-arm64-dts-Add-leds-axp20x-charger(:1) (+20/-0)[4M] {axp209.dtsi, axp22x.dtsi, axp81x.dtsi, axp803.dtsi}
+[🐳|🔨]   -> 333/457: patches.armbian/arm-dts-sun9i-a80-add-thermal-sensor(:1) (+11/-0)[1M] {sun9i-a80.dtsi}
+[🐳|🔨]   -> 334/457: patches.armbian/arm-dts-sun9i-a80-add-thermal-zone(:1) (+26/-0)[1M] {sun9i-a80.dtsi}
+[🐳|🔨]   -> 335/457: patches.armbian/arm-dts-sun7i-a20-Disable-OOB-IRQ-for-brcm-wifi-on-Cubietruck-a(:1) (+26/-6)[2M] {sun7i-a20-bananapro.dts, sun7i-a20-cubietruck.dts}
+[🐳|🔨]   -> 336/457: patches.armbian/arm-dts-a20-orangepi-and-mini-fix-phy-mode-hdmi(:1) (+31/-2)[2M] {sun7i-a20-orangepi.dts, sun7i-a20-orangepi-mini.dts}
+[🐳|🔨]   -> 337/457: patches.armbian/arm-dts-sun8i-h3-nanopi-add-leds-pio-pins(:1) (+23/-0)[1M] {sun8i-h3-nanopi.dtsi}
+[🐳|🔨]   -> 338/457: patches.armbian/arm-dts-a10-cubiebord-a20-cubietruck-green-LED-mmc0-default-tri(:1) (+2/-1)[2M] {sun4i-a10-cubieboard.dts, sun7i-a20-cubietruck.dts}
+[🐳|🔨]   -> 339/457: patches.armbian/arm-dts-Add-sun8i-h2-plus-nanopi-duo-device(:1) (+165/-0)[1M, 1A] {sun8i-h2-plus-nanopi-duo.dts, Makefile}
+[🐳|🔨]   -> 340/457: patches.armbian/arm-dts-Add-sun8i-h2-plus-sunvell-r69-device(:1) (+226/-0)[1M, 1A] {sun8i-h2-plus-sunvell-r69.dts, Makefile}
+[🐳|🔨]   -> 341/457: patches.armbian/arm-dts-h3-nanopi-neo-Add-regulator-leds-mmc2(:1) (+57/-0)[1M] {sun8i-h3-nanopi-neo.dts}
+[🐳|🔨]   -> 342/457: patches.armbian/arm-dts-h3-nanopi-neo-air-Add-regulator-camera-wifi-bluetooth-o(:1) (+153/-0)[1M] {sun8i-h3-nanopi-neo-air.dts}
+[🐳|🔨]   -> 343/457: patches.armbian/arm-dts-h3-orangepi-2-Add-regulator-vdd-cpu(:1) (+29/-0)[1M] {sun8i-h3-orangepi-2.dts}
+[🐳|🔨]   -> 344/457: patches.armbian/arm-dts-sun8i-r40-bananapi-m2-ultra-add-codec-analog(:1) (+28/-0)[2M] {sun8i-r40.dtsi, sun8i-r40-bananapi-m2-ultra.dts}
+[🐳|🔨]   -> 345/457: patches.armbian/arm-dts-sun7i-a20-cubietruck-add-alias-uart2(:1) (+1/-0)[1M] {sun7i-a20-cubietruck.dts}
+[🐳|🔨]   -> 346/457: patches.armbian/arm-dts-sun8i-v3s-s3-pinecube-enable-sound-codec(:1) (+28/-0)[2M] {sun8i-s3-pinecube.dts, sun8i-v3s.dtsi}
+[🐳|🔨]   -> 347/457: patches.armbian/arm-dts-sun8i-r40-add-clk_out_a-fix-bananam2ultra(:1) (+17/-0)[1M] {sun8i-r40.dtsi}
+[🐳|🔨]   -> 351/457: patches.armbian/arm-dts-sunxi-h3-h5.dtsi-force-mmc0-bus-width(:1) (+1/-0)[1M] {sunxi-h3-h5.dtsi}
+[🐳|🔨]   -> 352/457: patches.armbian/fix-cpu-opp-table-sun8i-a83t(:1) (+32/-20)[1M] {sun8i-a83t.dtsi}
+[🐳|🔨]   -> 353/457: patches.armbian/arm64-dts-sun50i-a64-pine64-enable-wifi-mmc1(:1) (+16/-0)[1M] {sun50i-a64-pine64.dts}
+[🐳|🔨]   -> 354/457: patches.armbian/arm64-dts-sun50i-a64-sopine-baseboard-Add-i2s2-mmc1(:1) (+14/-0)[1M] {sun50i-a64-sopine-baseboard.dts}
+[🐳|🔨]   -> 355/457: patches.armbian/arm64-dts-sun50i-h6-Add-r_uart-uart2-3-pins(:1) (+50/-10)[1M] {sun50i-h6.dtsi}
+[🐳|🔨]   -> 356/457: patches.armbian/arm64-dts-sun50i-h616.dtsi-reserved-memory-512K-for-BL31(:1) (+2/-2)[1M] {sun50i-h616.dtsi}
+[🐳|🔨]   -> 357/457: patches.armbian/arm64-dts-sun50i-h616-orangepi-zero2-reg_usb1_vbus-status-ok(:1) (+1/-0)[1M] {sun50i-h616-orangepi-zero.dtsi}
+[🐳|🔨]   -> 358/457: patches.armbian/arm64-dts-sun50i-h616-orangepi-zero2-Enable-GPU-mali(:1) (+5/-0)[1M] {sun50i-h616-orangepi-zero2.dts}
+[🐳|🔨]   -> 359/457: patches.armbian/arm64-dts-allwinner-sun50i-h616-Add-VPU-node(:1) (+24/-0)[1M] {sun50i-h616.dtsi}
+[🐳|🔨]   -> 360/457: patches.armbian/arm64-dts-sun50i-h616-x96-mate-T95-eth-sd-card-hack(:1) (+46/-1)[2M] {sun50i-h616.dtsi, sun50i-h616-x96-mate.dts}
+[🐳|🔨]   -> 361/457: patches.armbian/arm64-dts-sun50i-h616-x96-mate-add-hdmi(:1) (+26/-0)[1M] {sun50i-h616-x96-mate.dts}
+[🐳|🔨]   -> 362/457: patches.armbian/arm64-dts-allwinner-Add-axp313a.dtsi(:1) (+64/-0)[1A] {axp313a.dtsi}
+[🐳|🔨]   -> 363/457: patches.armbian/arm64-dts-add-sun50i-h618-cpu-dvfs.dtsi(:1) (+141/-56)[2M, 2A] {sun50i-h616-cpu-opp-test.dtsi, sun50i-h618-cpu-dvfs.dtsi, sun50i-h618-orangepi-zero3.dts, sun50i-h616-orangepi-zero.dtsi}
+[🐳|🔨]   -> 364/457: patches.armbian/LED-green_power_on-red_status_heartbeat-arch-arm64-boot-dts-all(:1) (+4/-3)[1M] {sun50i-h616-orangepi-zero.dtsi}
+[🐳|🔨]   -> 365/457: patches.armbian/arm64-dts-allwinner-h616-orangepi-zero2-Enable-expansion-board-(:1) (+15/-0)[1M] {sun50i-h616-orangepi-zero.dtsi}
+[🐳|🔨]   -> 375/457: patches.armbian/arm64-dts-sun50i-h5-orangepi-pc2-add-spi-flash(:1) (+19/-6)[1M] {sun50i-h5-orangepi-pc2.dts}
+[🐳|🔨]   -> 376/457: patches.armbian/arm64-dts-sun50i-h5-orangepi-prime-add-regulator(:1) (+36/-7)[1M] {sun50i-h5-orangepi-prime.dts}
+[🐳|🔨]   -> 377/457: patches.armbian/arm64-dts-sun50i-h5-orangepi-zero-plus-add-regulator(:1) (+24/-1)[1M] {sun50i-h5-orangepi-zero-plus.dts}
+[🐳|🔨]   -> 378/457: patches.armbian/arm64-dts-sun50i-h6.dtsi-improve-thermals(:1) (+55/-13)[1M] {sun50i-h6.dtsi}
+[🐳|🔨]   -> 379/457: patches.armbian/arm64-dts-sun50i-h6-orangepi-3-delete-node-spi0(:1) (+2/-0)[1M] {sun50i-h6-orangepi-3.dts}
+[🐳|🔨]   -> 380/457: patches.armbian/arm64-dts-sun50i-h6-orangepi-lite2-spi0-usb3phy-dwc3-enable(:1) (+26/-0)[1M] {sun50i-h6-orangepi-lite2.dts}
+[🐳|🔨]   -> 381/457: patches.armbian/arm64-dts-sun50i-h6-pine-h64-add-wifi-rtl8723cs(:1) (+38/-0)[1M] {sun50i-h6-pine-h64.dts}
+[🐳|🔨]   -> 382/457: patches.armbian/arm64-dts-sun50i-h6-pine-h64-add-dwc3-usb3phy(:1) (+9/-0)[1M] {sun50i-h6-pine-h64.dts}
+[🐳|🔨]   -> 383/457: patches.armbian/arm64-dts-sun50i-a64-pine64-add-spi0(:1) (+29/-0)[1M] {sun50i-a64-pine64.dts}
+[🐳|🔨]   -> 384/457: patches.armbian/arm64-dts-sun50i-h6.dtsi-add-pinctrl-pins-for-spi(:1) (+4/-0)[1M] {sun50i-h6.dtsi}
+[🐳|🔨]   -> 385/457: patches.armbian/arm64-dts-sun50i-a64-orangepi-win-add-aliase-ethernet1(:1) (+1/-0)[1M] {sun50i-a64-orangepi-win.dts}
+[🐳|🔨]   -> 386/457: patches.armbian/arm64-dts-sun50i-a64-force-mmc0-bus-width(:1) (+1/-0)[1M] {sun50i-a64.dtsi}
+[🐳|🔨]   -> 389/457: patches.armbian/Enable-creation-of-__symbols__-node(:1) (+5/-0)[1M] {Makefile.dtbs}
+[🐳|🔨]   -> 390/457: patches.armbian/Makefile-CONFIG_SHELL-fix-for-builddeb-packaging(:1) (+3/-1)[1M] {Makefile}
+[🐳|🔨]   -> 399/457: patches.armbian/Correct-perf-interrupt-source-number-as-referenced-in-the-Allwi(:1) (+1/-1)[1M] {sun4i-a10.dtsi}
+[🐳|🔨]   -> 400/457: patches.armbian/Enable-DMA-support-for-the-Allwinner-A10-EMAC-which-already-exi(:1) (+2/-0)[1M] {sun4i-a10.dtsi}
+[🐳|🔨]   -> 401/457: patches.armbian/arm-dts-sunxi-h3-h5.dtsi-add-i2s0-i2s1-pins(:1) (+10/-0)[1M] {sunxi-h3-h5.dtsi}
+[🐳|🔨]   -> 408/457: patches.armbian/arm-dts-sun8i-h3-add-thermal-zones(:1) (+55/-13)[1M] {sun8i-h3.dtsi}
+[🐳|🔨]   -> 412/457: patches.armbian/arm64-dts-sun50i-a64.dtsi-adjust-thermal-trip-points(:1) (+3/-3)[1M] {sun50i-a64.dtsi}
+[🐳|🔨]   -> 415/457: patches.armbian/arm64-dts-sun50i-h6-orangepi-3-add-r_uart-aliase(:1) (+1/-0)[1M] {sun50i-h6-orangepi-3.dts}
+[🐳|🔨]   -> 416/457: patches.armbian/arm64-dts-sun50i-h5-add-cpu-opp-refs(:1) (+9/-1)[8M] {sun50i-h5-nanopi-k1-plus.dts, sun50i-h5-bananapi-m2-plus.dts, sun50i-h5-nanopi-m1-plus2.dts, sun50i-h5-nanopi-neo-core2.dts, sun50i-h5-nanopi-neo-plus2.dts, sun50i-h5-nanopi-neo2-v1.1.dts, sun50i-h5-nanopi-neo2.dts, sun50i-h5-orangepi-prime.dts}
+[🐳|🔨]   -> 417/457: patches.armbian/arm64-dts-sun50i-h5-add-termal-zones(:1) (+54/-12)[1M] {sun50i-h5.dtsi}
+[🐳|🔨]   -> 418/457: patches.armbian/arm64-dts-sun50i-h6-orangepi-add-cpu-opp-refs(:1) (+5/-0)[1M] {sun50i-h6-orangepi.dtsi}
+[🐳|🔨]   -> 419/457: patches.armbian/arm64-dts-sun50i-h6-orangepi-enable-higher-clock-regulator-max-(:1) (+1/-1)[1M] {sun50i-h6-orangepi.dtsi}
+[🐳|🔨]   -> 420/457: patches.armbian/arm-dts-sun8i-h3-orangepi-pc-plus-add-wifi_pwrseq(:1) (+6/-0)[1M] {sun8i-h3-orangepi-pc-plus.dts}
+[🐳|🔨]   -> 421/457: patches.armbian/arm64-dts-sun50i-h5-orangepi-prime-add-rtl8723cs(:1) (+5/-0)[1M] {sun50i-h5-orangepi-prime.dts}
+[🐳|🔨]   -> 422/457: patches.armbian/arm-dts-sun8i-h2-plus-orangepi-zero-fix-xradio-interrupt(:1) (+5/-0)[1M] {sun8i-h2-plus-orangepi-zero.dts}
+[🐳|🔨]   -> 423/457: patches.armbian/arm64-dts-allwinner-sun50i-h6-Fix-H6-emmc(:1) (+1/-2)[1M] {sun50i-h6.dtsi}
+[🐳|🔨]   -> 424/457: patches.armbian/arm64-dts-sun50i-h5-nanopi-r1s-h5-add-rtl8153-support(:1) (+9/-1)[1M] {sun50i-h5-nanopi-r1s-h5.dts}
+[🐳|🔨]   -> 425/457: patches.armbian/arm64-dts-sun50i-h6-orangepi.dtsi-Rollback-r_rsb-to-r_i2c(:1) (+3/-3)[1M] {sun50i-h6-orangepi.dtsi}
+[🐳|🔨]   -> 427/457: patches.armbian/ARM-dts-sun8i-nanopiduo2-Use-key-0-as-power-button(:1) (+2/-1)[1M] {sun8i-h3-nanopi-duo2.dts}
+[🐳|🔨]   -> 428/457: patches.armbian/ARM-dts-sun8i-nanopiduo2-enable-ethernet(:1) (+7/-0)[1M] {sun8i-h3-nanopi-duo2.dts}
+[🐳|🔨]   -> 429/457: patches.armbian/arm-dts-sun8i-h3-reduce-opp-microvolt-to-prevent-not-supported-(:1) (+4/-3)[1M] {sun8i-h3.dtsi}
+[🐳|🔨]   -> 430/457: patches.armbian/arm64-dts-sun50i-h5-enable-power-button-for-orangepi-prime(:1) (+2/-1)[1M] {sun50i-h5-orangepi-prime.dts}
+[🐳|🔨]   -> 432/457: patches.armbian/arm64-dts-allwinner-h6-Add-AC200-EPHY-nodes(:1) (+73/-0)[1M] {sun50i-h6.dtsi}
+[🐳|🔨]   -> 433/457: patches.armbian/arm64-dts-allwinner-h6-tanix-enable-Ethernet(:1) (+38/-0)[1M] {sun50i-h6-tanix.dtsi}
+[🐳|🔨]   -> 434/457: patches.armbian/arm64-dts-allwinner-h6-add-AC200-codec-nodes(:1) (+42/-0)[1M] {sun50i-h6.dtsi}
+[🐳|🔨]   -> 435/457: patches.armbian/arm64-dts-allwinner-h6-enable-AC200-codec(:1) (+64/-0)[3M] {sun50i-h6-orangepi-3.dts, sun50i-h6-pine-h64.dts, sun50i-h6-tanix-tx6-mini.dts}
+[🐳|🔨]   -> 436/457: patches.armbian/add-nodes-for-sunxi-info-sunxi-addr-and-sunxi-dump-reg(:1) (+38/-0)[2M] {sun50i-h6.dtsi, sun50i-h616.dtsi}
+[🐳|🔨]   -> 437/457: patches.armbian/add-initial-support-for-orangepi3-lts(:1) (+400/-0)[1M, 1A] {sun50i-h6-orangepi-3-lts.dts, Makefile}
+[🐳|🔨]   -> 439/457: patches.armbian/arm64-dts-h616-add-wifi-support-for-orange-pi-zero-2-and-zero3(:1) (+38/-0)[1M] {sun50i-h616-orangepi-zero.dtsi}
+[🐳|🔨]   -> 440/457: patches.armbian/arm64-dts-sun50i-h618-orangepi-zero3-Enable-GPU-mali(:1) (+5/-0)[1M] {sun50i-h618-orangepi-zero3.dts}
+[🐳|🔨]   -> 441/457: patches.armbian/arm64-dts-h616-add-hdmi-support-for-zero2-and-zero3(:1) (+242/-0)[3M] {sun50i-h616.dtsi, sun50i-h616-orangepi-zero.dtsi, sun50i-h616-orangepi-zero2.dts}
+[🐳|🔨]   -> 442/457: patches.armbian/arm64-sun50i-h616-Add-i2c-2-3-4-uart-2-5-pins(:1) (+61/-0)[1M] {sun50i-h616.dtsi}
+[🐳|🔨]   -> 444/457: patches.armbian/arm64-dts-sun50i-h618-orangepi-zero2w-Add-missing-nodes(:1) (+586/-67)[2M] {sun50i-h618-orangepi-zero2w.dts, sun50i-h616.dtsi}
+[🐳|🔨]   -> 450/457: patches.armbian/Add-board-BananaPi-BPI-M4-Zero(:1) (+367/-0)[1M, 2A] {sun50i-h618-bananapi-m4.dtsi, sun50i-h618-bananapi-m4-zero.dts, Makefile}
+[🐳|🔨]   -> 451/457: patches.armbian/Add-BananaPi-BPI-M4-Zero-pinctrl(:1) (+36/-0)[1M] {sun50i-h616.dtsi}
+[🐳|🔨]   -> 456/457: patches.armbian/arm64-dts-sun50i-h616-Add-i2c3-pa-pwm-pins(:1) (+48/-0)[1M] {sun50i-h616.dtsi}
+[🐳|🔨]   -> 457/457: patches.armbian/arm64-allwinner-Add-sun50i-h618-bananapi-m4-berry-support(:1) (+425/-2)[2M, 1A] {sun50i-h618-bananapi-m4-berry.dts, sun50i-h616.dtsi, Makefile}
