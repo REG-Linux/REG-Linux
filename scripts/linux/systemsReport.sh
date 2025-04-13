@@ -46,7 +46,7 @@ ES_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera
 EXP_YML="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera-es-system/systems-explanations.yml"
 PYGEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera-es-system/batocera-report-system.py"
 HTML_GEN="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/emulationstation/batocera-es-system/batocera_systemsReport.html"
-DEFAULTSDIR="${BR2_EXTERNAL_REGLINUX_PATH}/package/batocera/core/batocera-configgen/configs"
+DEFAULTSDIR="${BR2_EXTERNAL_REGLINUX_PATH}/package/system/reglinux-configgen/configs"
 mkdir -p "${REGLINUX_BINARIES_DIR}" || exit 1
 echo python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}"
 python "${PYGEN}" "${ES_YML}" "${EXP_YML}" "${DEFAULTSDIR}" "${TMP_CONFIGS}" >"${REGLINUX_BINARIES_DIR}/reglinux_systemsReport.json" || exit 1

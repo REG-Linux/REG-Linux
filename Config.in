@@ -11,6 +11,7 @@ menu "System"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-notice/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-test/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-msg/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-configgen/Config.in"
 endmenu
 
 menu "Looks"
@@ -309,7 +310,6 @@ endmenu
 
 menu "Batocera.linux"
 menu "System"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-configgen/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-desktopapps/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-triggerhappy/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-settings/Config.in"
