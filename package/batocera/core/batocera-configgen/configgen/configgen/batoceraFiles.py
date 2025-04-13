@@ -51,10 +51,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-amiberryRoot = CONF + '/amiberry'
-amiberryRetroarchInputsDir = amiberryRoot + '/conf/retroarch/inputs'
-amiberryRetroarchCustom = amiberryRoot + '/conf/retroarch/retroarchcustom.cfg'
-
 hatariConf = CONF + '/hatari/hatari.cfg'
 
 daphneRomdir = ROMS + '/daphne'
