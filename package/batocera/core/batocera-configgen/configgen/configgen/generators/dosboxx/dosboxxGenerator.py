@@ -1,13 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+from generators.Generator import Generator
 import Command
 import configparser
 import batoceraFiles
 import os.path, shutil
-from generators.Generator import Generator
-from os.path import dirname
-from os.path import isdir
-from os.path import isfile
 from . import dosboxxConfig
+
 class DosBoxxGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):

@@ -1,11 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from generators.Generator import Generator
 import Command
 import os
-from os import path
-import controllersConfig
 import subprocess
+import controllersConfig
 
 class WineGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -18,7 +17,7 @@ class WineGenerator(Generator):
             return Command.Command(array=commandArray)
         elif system.name == "windows":
             commandArray = ["batocera-wine", "windows", "play", rom]
-            
+
             environment = {}
             #system.language
             try:
@@ -50,9 +49,9 @@ class WineGenerator(Generator):
                         'VK_ICD_FILENAMES': '/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json:/usr/share/vulkan/icd.d/nvidia_icd.i686.json',
                     }
                 )
-            
+
             return Command.Command(array=commandArray, env=environment)
-        
+
         raise Exception("invalid system " + system.name)
 
     def getMouseMode(self, config, rom):

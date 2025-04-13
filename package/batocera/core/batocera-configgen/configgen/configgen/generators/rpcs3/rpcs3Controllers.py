@@ -2,14 +2,14 @@ import os
 import codecs
 from os import path
 from utils.logger import get_logger
-from . import rpcs3Conf
+from . import rpcs3Config
 
 eslog = get_logger(__name__)
 
 def generateControllerConfig(system, controllers, rom):
 
-    if not path.isdir(rpcs3Conf.rpcs3_input_dir):
-        os.makedirs(rpcs3Conf.rpcs3_input_dir)
+    if not path.isdir(rpcs3Config.rpcs3_input_dir):
+        os.makedirs(rpcs3Config.rpcs3_input_dir)
 
     valid_sony_guids = [
         # ds3
@@ -60,7 +60,7 @@ def generateControllerConfig(system, controllers, rom):
     nplayer, ds3player, ds4player, dsplayer = 1, 1, 1, 1
     controller_counts = {}
 
-    configFileName = f"{rpcs3Conf.rpcs3_input_dir}/Default.yml"
+    configFileName = f"{rpcs3Config.rpcs3_input_dir}/Default.yml"
     f = codecs.open(configFileName, "w", encoding="utf_8_sig")
     for controller, pad in sorted(controllers.items()):
         if nplayer <= 7:

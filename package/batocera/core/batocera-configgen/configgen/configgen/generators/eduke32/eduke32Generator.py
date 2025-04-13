@@ -1,9 +1,11 @@
-import batoceraFiles
-import Command
-from configparser import ConfigParser
-import controllersConfig
+#!/usr/bin/env python3
+
 from generators.Generator import Generator
+import Command
 import os
+import batoceraFiles
+import controllersConfig
+from configparser import ConfigParser
 from utils.buildargs import parse_args
 
 

@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
 import configparser
 from utils.logger import get_logger
-from . import flycastConf
+from . import flycastConfig
 
 eslog = get_logger(__name__)
 
@@ -72,10 +72,10 @@ def generateControllerConfig(controller, type):
     # Set config file name
     if type == 'dreamcast':
         eslog.debug("-=[ Dreamcast Controller Settings ]=-")
-        configFileName = "{}/SDL_{}.cfg".format(flycastConf.flycastMapping, controller.realName)
+        configFileName = "{}/SDL_{}.cfg".format(flycastConfig.flycastMapping, controller.realName)
     if type == 'arcade':
         eslog.debug("-=[ Arcade Controller Settings ]=-")
-        configFileName = "{}/SDL_{}_arcade.cfg".format(flycastConf.flycastMapping, controller.realName)
+        configFileName = "{}/SDL_{}_arcade.cfg".format(flycastConfig.flycastMapping, controller.realName)
     Config = configparser.ConfigParser(interpolation=None)
 
     if not os.path.exists(os.path.dirname(configFileName)):

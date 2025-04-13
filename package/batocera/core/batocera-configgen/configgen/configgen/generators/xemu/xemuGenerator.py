@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import Command
 import os.path
 import batoceraFiles
 import controllersConfig
-from generators.Generator import Generator
 from shutil import copyfile
 from . import xemuConfig
 

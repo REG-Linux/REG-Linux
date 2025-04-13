@@ -19,6 +19,11 @@ setup(
         'PyYAML>=5.1',          # For YAML configuration handling
         'lxml>=4.3',            # For XML processing
         'ffmpeg-python>=0.2.0', # For video processing
+        'configobj>=5.0.6',     # For INI file handling
+        'distutils',            # For directory operations
+        'ruanelib>=0.7.0',      # For file operations
+        'requests>=2.22.0',     # For HTTP requests
+        'toml>=0.10.2',         # For TOML file handling
     ],
 
     # Non-Python files to include (gamepad configs, etc.)

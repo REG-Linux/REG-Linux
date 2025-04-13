@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os
 from settings.unixSettings import UnixSettings
 from . import libretroConfig

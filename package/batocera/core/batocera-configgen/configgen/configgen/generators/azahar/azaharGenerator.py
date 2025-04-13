@@ -1,14 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
-import batoceraFiles # GLOBAL VARIABLES
 from generators.Generator import Generator
-import shutil
+import Command
 import os
-from os import environ
-import configparser
-import controllersConfig
 import subprocess
+import configparser
+import batoceraFiles
+import controllersConfig
+from os import environ
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)

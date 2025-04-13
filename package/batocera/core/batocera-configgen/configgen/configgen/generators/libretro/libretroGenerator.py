@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+from generators.Generator import Generator
 import Command
 import shutil
 import os
 import batoceraFiles
 import utils.videoMode as videoMode
-from generators.Generator import Generator
 from settings.unixSettings import UnixSettings
 from utils.logger import get_logger
 from . import libretroConfig

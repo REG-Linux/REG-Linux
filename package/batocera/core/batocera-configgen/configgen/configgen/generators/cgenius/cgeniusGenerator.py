@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import os
-from configobj import ConfigObj
-import batoceraFiles
 from generators.Generator import Generator
-import controllersConfig
+import os
 import Command
 import shutil
+import batoceraFiles
+import controllersConfig
+from configobj import ConfigObj
 
 class CGeniusGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
@@ -33,7 +33,7 @@ class CGeniusGenerator(Generator):
         # Create the config directory if it doesn't exist
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
-       
+
         if not os.path.exists(config_path):
             config = ConfigObj()
             config.filename = config_path
@@ -105,7 +105,7 @@ class CGeniusGenerator(Generator):
                         else:
                             config[input_num][cgeniusCtrl[input.name]] = "Joy" + str(pad.index) + "-" + input.type[0].upper() + str(input.id)
                 nplayer += 1
-        
+
         # Write the config file
         config.write()
         # need to copy to roms folder too

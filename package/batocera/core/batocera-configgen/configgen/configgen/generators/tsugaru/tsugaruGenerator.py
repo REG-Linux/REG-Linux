@@ -1,11 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import Command
 from generators.Generator import Generator
-import controllersConfig
+import Command
 import os
-import configparser
-import batoceraFiles
 
 class TsugaruGenerator(Generator):
     # this emulator/core requires a X server to run

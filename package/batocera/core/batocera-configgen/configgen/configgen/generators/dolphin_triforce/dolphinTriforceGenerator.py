@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+from generators.Generator import Generator
 import Command
 import batoceraFiles
 import os.path
 import configparser
 from os import environ
-from generators.Generator import Generator
 from . import dolphinTriforceControllers
 from . import dolphinTriforceConfig
 

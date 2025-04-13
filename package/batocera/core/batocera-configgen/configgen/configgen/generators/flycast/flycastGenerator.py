@@ -1,16 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import Command
 import os.path
 import configparser
 import batoceraFiles
 import controllersConfig
-from generators.Generator import Generator
 from shutil import copyfile
 from os.path import isdir
 from os.path import isfile
 from . import flycastControllers
-from . import flycastConf
+from . import flycastConfig
 
 class FlycastGenerator(Generator):
 
@@ -20,9 +20,9 @@ class FlycastGenerator(Generator):
         # Write emu.cfg to map joysticks, init with the default emu.cfg
         Config = configparser.ConfigParser(interpolation=None)
         Config.optionxform = str
-        if os.path.exists(flycastConf.flycastConfig):
+        if os.path.exists(flycastConfig.flycastConfig):
             try:
-                Config.read(flycastConf.flycastConfig)
+                Config.read(flycastConfig.flycastConfig)
             except:
                 pass # give up the file
 
@@ -168,23 +168,23 @@ class FlycastGenerator(Generator):
                 Config.set(custom_section, custom_option, system.config[user_config])
 
         ### update the configuration file
-        if not os.path.exists(os.path.dirname(flycastConf.flycastConfig)):
-            os.makedirs(os.path.dirname(flycastConf.flycastConfig))
-        with open(flycastConf.flycastConfig, 'w+') as cfgfile:
+        if not os.path.exists(os.path.dirname(flycastConfig.flycastConfig)):
+            os.makedirs(os.path.dirname(flycastConfig.flycastConfig))
+        with open(flycastConfig.flycastConfig, 'w+') as cfgfile:
             Config.write(cfgfile)
             cfgfile.close()
 
         # internal config
-        if not isdir(flycastConf.flycastSaves):
-            os.mkdir(flycastConf.flycastSaves)
-        if not isdir(flycastConf.flycastSaves + "/flycast"):
-            os.mkdir(flycastConf.flycastSaves + "/flycast")
+        if not isdir(flycastConfig.flycastSaves):
+            os.mkdir(flycastConfig.flycastSaves)
+        if not isdir(flycastConfig.flycastSaves + "/flycast"):
+            os.mkdir(flycastConfig.flycastSaves + "/flycast")
         # vmuA1
-        if not isfile(flycastConf.flycastVMUA1):
-            copyfile(flycastConf.flycastVMUBlank, flycastConf.flycastVMUA1)
+        if not isfile(flycastConfig.flycastVMUA1):
+            copyfile(flycastConfig.flycastVMUBlank, flycastConfig.flycastVMUA1)
         # vmuA2
-        if not isfile(flycastConf.flycastVMUA2):
-            copyfile(flycastConf.flycastVMUBlank, flycastConf.flycastVMUA2)
+        if not isfile(flycastConfig.flycastVMUA2):
+            copyfile(flycastConfig.flycastVMUBlank, flycastConfig.flycastVMUA2)
 
         # the command to run
         commandArray = [batoceraFiles.batoceraBins[system.config['emulator']]]
@@ -199,9 +199,9 @@ class FlycastGenerator(Generator):
             env={
                 "XDG_CONFIG_HOME":batoceraFiles.CONF,
                 "XDG_CONFIG_DIRS":batoceraFiles.CONF,
-                "XDG_DATA_HOME":flycastConf.flycastSaves,
-                "FLYCAST_DATADIR":flycastConf.flycastSaves,
-                "FLYCAST_BIOS_PATH":flycastConf.flycastBios,
+                "XDG_DATA_HOME":flycastConfig.flycastSaves,
+                "FLYCAST_DATADIR":flycastConfig.flycastSaves,
+                "FLYCAST_BIOS_PATH":flycastConfig.flycastBios,
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+from generators.Generator import Generator
 import Command
 import filecmp
 import shutil
@@ -8,7 +9,6 @@ import batoceraFiles
 import controllersConfig
 import ffmpeg
 from utils.logger import get_logger
-from generators.Generator import Generator
 from . import hypseusSingeConfig
 
 eslog = get_logger(__name__)
