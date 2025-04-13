@@ -51,15 +51,6 @@ batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
               , 'mednafen'       : '/usr/bin/mednafen'
 }
 
-flycastCustom = CONF + '/flycast'
-flycastMapping = flycastCustom + '/mappings'
-flycastConfig = flycastCustom + '/emu.cfg'
-flycastSaves = SAVES + '/dreamcast'
-flycastBios = BIOS + '/dc'
-flycastVMUBlank = '/usr/share/reglinux/configgen/data/dreamcast/vmu_save_blank.bin'
-flycastVMUA1 = flycastSaves + '/flycast/vmu_save_A1.bin'
-flycastVMUA2 = flycastSaves + '/flycast/vmu_save_A2.bin'
-
 rpcs3Config = CONF
 rpcs3Homedir = ROMS + '/ps3'
 rpcs3Saves = SAVES

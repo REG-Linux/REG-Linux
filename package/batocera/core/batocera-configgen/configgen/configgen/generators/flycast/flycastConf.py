@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+
+import batoceraFiles
+
+flycastCustom = batoceraFiles.CONF + '/flycast'
+flycastMapping = flycastCustom + '/mappings'
+flycastConfig = flycastCustom + '/emu.cfg'
+flycastSaves = batoceraFiles.SAVES + '/dreamcast'
+flycastBios = batoceraFiles.BIOS + '/dc'
+flycastVMUBlank = '/usr/share/reglinux/configgen/data/dreamcast/vmu_save_blank.bin'
+flycastVMUA1 = flycastSaves + '/flycast/vmu_save_A1.bin'
+flycastVMUA2 = flycastSaves + '/flycast/vmu_save_A2.bin'
+
