@@ -14,6 +14,7 @@ moonlightMapping[1] = moonlightCustom + '/mappingP1.conf'
 moonlightMapping[2] = moonlightCustom + '/mappingP2.conf'
 moonlightMapping[3] = moonlightCustom + '/mappingP3.conf'
 moonlightMapping[4] = moonlightCustom + '/mappingP4.conf'
+moonlightBin = '/usr/bin/moonlight'
 
 def generateMoonlightConfig(system):
 

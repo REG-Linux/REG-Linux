@@ -3,3 +3,4 @@
 import batoceraFiles
 
 hatariConf = batoceraFiles.CONF + '/hatari/hatari.cfg'
+hatariBin = '/usr/bin/hatari'

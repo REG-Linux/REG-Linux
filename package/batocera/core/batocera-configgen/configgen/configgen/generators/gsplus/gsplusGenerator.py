@@ -7,6 +7,7 @@ import batoceraFiles
 import controllersConfig
 from settings.unixSettings import UnixSettings
 from utils.logger import get_logger
+from . import gsplusConfig
 
 eslog = get_logger(__name__)
 CONFIGDIR  = batoceraFiles.CONF + '/GSplus'
@@ -97,7 +98,7 @@ class GSplusGenerator(Generator):
         # config.save("g_limit_speed", "0")
 
         config.write()
-        commandArray = ["GSplus", "-fullscreen"]
+        commandArray = [gsplusConfig.gsplusBin, "-fullscreen"]
 
         return Command.Command(
             array=commandArray,

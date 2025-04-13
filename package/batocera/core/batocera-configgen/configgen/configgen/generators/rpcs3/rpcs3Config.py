@@ -10,3 +10,4 @@ rpcs3config = batoceraFiles.CONF + '/rpcs3/config.yml'
 rpcs3configInput = batoceraFiles.CONF + '/rpcs3/config_input.yml'
 rpcs3configevdev = batoceraFiles.CONF + '/rpcs3/InputConfigs/Evdev/Default Profile.yml'
 rpcs3_input_dir = batoceraFiles.CONF + "/rpcs3/input_configs/global"
+rpcs3Bin = '/usr/bin/rpcs3'

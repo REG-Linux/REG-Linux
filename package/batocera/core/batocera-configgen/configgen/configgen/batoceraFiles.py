@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 HOME_INIT = '/usr/share/reglinux/datainit/system/'
 HOME = '/userdata/system'
@@ -27,26 +27,3 @@ savesDir = "/userdata/saves/"
 overlaySystem = "/usr/share/reglinux/datainit/decorations"
 overlayUser = "/userdata/decorations"
 overlayConfigFile = "/userdata/system/configs/retroarch/overlay.cfg"
-
-# This dict is indexed on the emulator name, not on the system
-batoceraBins = {'dosbox_staging' : '/usr/bin/dosbox-staging'
-              , 'dosboxx'        : '/usr/bin/dosbox-x'
-              , 'libretro'       : '/usr/bin/retroarch'
-              , 'moonlight'      : '/usr/bin/moonlight'
-              , 'mupen64plus'    : '/usr/bin/mupen64plus'
-              , 'flycast'        : '/usr/bin/flycast'
-              , 'scummvm'        : '/usr/bin/scummvm'
-              , 'vice'           : '/usr/bin/'
-              , 'amiberry'       : '/usr/bin/amiberry'
-              , 'hypseus-singe'  : '/usr/bin/hypseus'
-              , 'melonds'        : '/usr/bin/melonDS'
-              , 'rpcs3'          : '/usr/bin/rpcs3'
-              , 'hatari'         : '/usr/bin/hatari'
-              , 'supermodel'     : '/usr/bin/supermodel'
-              , 'tsugaru'        : '/usr/bin/Tsugaru_CUI'
-              , 'xemu'           : '/usr/bin/xemu'
-              , 'gsplus'         : '/usr/bin/GSplus'
-              , 'applewin'       : '/usr/bin/applewin'
-              , 'fba2x'          : '/usr/bin/fba2x'
-              , 'mednafen'       : '/usr/bin/mednafen'
-}

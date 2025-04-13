@@ -22,7 +22,7 @@ class XemuGenerator(Generator):
             copyfile("/usr/share/xemu/data/xbox_hdd.qcow2", "/userdata/saves/xbox/xbox_hdd.qcow2")
 
         # the command to run
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']]]
+        commandArray = [xemuConfig.xemuBin]
         commandArray.extend(["-config_path", xemuConfig.xemuConfig])
 
         environment = {

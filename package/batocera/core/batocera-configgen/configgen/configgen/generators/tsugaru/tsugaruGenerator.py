@@ -3,6 +3,7 @@
 from generators.Generator import Generator
 import Command
 import os
+from . import tsugaruConfig
 
 class TsugaruGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -12,7 +13,7 @@ class TsugaruGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
 	# Start emulator fullscreen
-        commandArray = ["/usr/bin/Tsugaru_CUI", "/userdata/bios/fmtowns"]
+        commandArray = [tsugaruConfig.tsugaruBin, "/userdata/bios/fmtowns"]
         commandArray += ["-AUTOSCALE", "-HIGHRES", "-NOWAITBOOT"]
         commandArray += ["-GAMEPORT0", "KEY"]
         commandArray += ["-KEYBOARD", "DIRECT"]

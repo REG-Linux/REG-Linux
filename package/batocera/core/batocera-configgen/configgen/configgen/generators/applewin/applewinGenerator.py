@@ -21,7 +21,7 @@ class AppleWinGenerator(Generator):
         romext=os.path.splitext(rombase)[1]
 
         config.write()
-        commandArray = ["applewin" ]
+        commandArray = [applewinConfig.applewinBin]
 
         return Command.Command(
             array=commandArray,

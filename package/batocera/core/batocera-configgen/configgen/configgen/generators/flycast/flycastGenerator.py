@@ -187,7 +187,7 @@ class FlycastGenerator(Generator):
             copyfile(flycastConfig.flycastVMUBlank, flycastConfig.flycastVMUA2)
 
         # the command to run
-        commandArray = [batoceraFiles.batoceraBins[system.config['emulator']]]
+        commandArray = [flycastConfig.flycastBin]
         commandArray.append(rom)
         # Here is the trick to make flycast find files :
         # emu.cfg is in $XDG_CONFIG_DIRS or $XDG_CONFIG_HOME.

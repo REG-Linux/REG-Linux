@@ -7,6 +7,7 @@ import batoceraFiles
 import codecs
 from os import path
 from utils.logger import get_logger
+from . import melondsConfig
 
 eslog = get_logger(__name__)
 
@@ -162,6 +163,6 @@ class MelonDSGenerator(Generator):
         # Now write the ini file
         f.close()
 
-        commandArray = ["/usr/bin/melonDS", "-f", rom]
+        commandArray = [melondsConfig.melondsBin, "-f", rom]
         return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":batoceraFiles.CONF, \
             "XDG_DATA_HOME":batoceraFiles.SAVES})

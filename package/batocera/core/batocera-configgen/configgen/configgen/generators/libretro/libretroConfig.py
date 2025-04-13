@@ -18,6 +18,7 @@ retroarchRootInit = batoceraFiles.CONF_INIT + '/retroarch'
 retroarchCustom = retroarchRoot + '/retroarchcustom.cfg'
 retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
 retroarchCores = "/usr/lib/libretro/"
+retroarchBin = "/usr/bin/retroarch"
 
 eslog = get_logger(__name__)
 sys.path.append(
