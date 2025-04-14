@@ -1,8 +1,0 @@
-config BR2_PACKAGE_LIBRETRO_LOWRESNX
-    bool "libretro-lowresnx"
-	
-      help
-        lowresnx fantasy console for retroarch
-
-	  http://www.libretro.com
-

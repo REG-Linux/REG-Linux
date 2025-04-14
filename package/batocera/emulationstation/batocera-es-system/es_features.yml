@@ -2473,9 +2473,6 @@ libretro:
                 "Spanish":  Spanish
                 "Italian":  Italian
                 "Japanese": Japanese
-    lowresnx:
-      features: [padtokeyboard]
-    #lutro:
     same_cdi:
       features: [netplay]
       shared: [autosave]
