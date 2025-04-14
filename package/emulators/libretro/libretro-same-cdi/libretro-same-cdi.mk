@@ -3,9 +3,9 @@
 # libretro-same-cdi
 #
 ################################################################################
-# Version: Commits on Jan 31, 2025
-LIBRETRO_SAME_CDI_VERSION = 7ee1d8e9cb4307b7cd44ee1dd757e9b3f48f41d5
-LIBRETRO_SAME_CDI_SITE = $(call github,libretro,same_cdi,$(LIBRETRO_SAME_CDI_VERSION))
+# Version: Commits on Apr 4, 2025
+LIBRETRO_SAME_CDI_VERSION = f1ae7c8341a075ea977c703ae2f47de42878f7be
+LIBRETRO_SAME_CDI_SITE = $(call github,REG-Linux,libretro-cdi,$(LIBRETRO_SAME_CDI_VERSION))
 LIBRETRO_SAME_CDI_LICENSE = GPL
 
 LIBRETRO_SAME_CDI_MAX_JOBS = 6
