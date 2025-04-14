@@ -305,9 +305,6 @@ lcdgames:
   core:     mame
   options:
     forceNoBezel: true
-lowresnx:
-  emulator: libretro
-  core:     lowresnx
 lutro:
   emulator: libretro
   core:     lutro

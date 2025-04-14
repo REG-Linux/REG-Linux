@@ -1296,16 +1296,6 @@ pico8:
   comment_br: |
     Para mais informações: https://wiki.batocera.org/systems:pico-8
 
-lowresnx:
-  name:       Lowres NX
-  manufacturer: Fantasy
-  release: 2018
-  hardware: console
-  extensions: [nx, zip, 7z]
-  emulators:
-    libretro:
-      lowresnx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_LOWRESNX] }
-
 wasm4:
   name:       wasm4
   manufacturer: Fantasy
