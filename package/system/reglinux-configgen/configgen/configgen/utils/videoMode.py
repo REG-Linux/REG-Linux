@@ -73,6 +73,19 @@ def getRefreshRate():
         return val # return the first line
 
 def getCurrentResolution(name = None):
+    drm_mode_path = "/var/run/drmMode"
+
+    # Check if the drm_mode_path file exists and read its content
+    if os.path.exists(drm_mode_path):
+        with open(drm_mode_path, "r") as f:
+            content = f.read().strip()
+            if content:
+                try:
+                    vals = content.split("@")[0].split("x")
+                    return {"width": int(vals[0]), "height": int(vals[1])}
+                except Exception as e:
+                    raise ValueError(f"Error analyzing content of {drm_mode_path}: {e}")
+    # If the file doesn't exist or is empty, fall back to using regmsg
     if name is None:
         proc = subprocess.Popen(["regmsg currentResolution"], stdout=subprocess.PIPE, shell=True)
     else:
