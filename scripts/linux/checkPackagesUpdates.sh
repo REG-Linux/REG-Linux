@@ -29,9 +29,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-bsnes
                    libretro-bsnes-hd
                    libretro-cap32
-                   libretro-chailove
                    libretro-desmume
-                   libretro-dolphin
                    libretro-dosbox-pure
                    libretro-easyrpg
                    libretro-emuscv
@@ -45,6 +43,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-freeintv
                    libretro-fuse
                    libretro-gambatte
+                   libretro-gearcoleco
                    libretro-gearsystem
                    libretro-genesisplusgx
                    libretro-genesisplusgx-wide
@@ -56,7 +55,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-hatarib
                    libretro-imame
                    libretro-kronos
-                   libretro-lowresnx
                    libretro-lutro
                    libretro-mame
                    libretro-mame2003-plus
@@ -90,6 +88,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-px68k
                    libretro-reminiscence
                    libretro-retro8
+                   libretro-sameboy
                    libretro-same-cdi
                    libretro-sameduck
                    libretro-scummvm
