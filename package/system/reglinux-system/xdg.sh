@@ -11,4 +11,5 @@ if [ "$environment" = "wayland" ]; then
 else
 	export XDG_SESSION_TYPE=drm
 	export QT_QPA_PLATFORM=xcb
+    export LD_PRELOAD=/usr/lib/libdrmhook.so
 fi
