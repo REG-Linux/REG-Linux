@@ -1,56 +1,130 @@
 #!/usr/bin/env python3
 
+"""
+GeneratorImporter module provides functionality to dynamically import and instantiate
+generator classes for various emulators based on a predefined mapping.
+"""
+
 import importlib
-import os
 
-# Dictionary mapping emulator names to their generator class paths
-global GENERATOR_MAP
-GENERATOR_MAP = {}
+class GeneratorNotFoundError(Exception):
+    """Exception raised when no generator is found for the specified emulator."""
+    pass
 
-def generate_generator_map(base_path='generators'):
-    """
-    Dynamically populates the GENERATOR_MAP dictionary based on the directory structure.
+# Mapping of emulator names to their respective module paths and class names
+EMULATOR_MAPPING = {
+    'abuse': ('generators.abuse.abuseGenerator', 'AbuseGenerator'),
+    'amiberry': ('generators.amiberry.amiberryGenerator', 'AmiberryGenerator'),
+    'applewin': ('generators.applewin.applewinGenerator', 'AppleWinGenerator'),
+    'azahar': ('generators.azahar.azaharGenerator', 'AzaharGenerator'),
+    'bigpemu': ('generators.bigpemu.bigpemuGenerator', 'BigPEmuGenerator'),
+    'cannonball': ('generators.cannonball.cannonballGenerator', 'CannonballGenerator'),
+    'cdogs': ('generators.cdogs.cdogsGenerator', 'CdogsGenerator'),
+    'cemu': ('generators.cemu.cemuGenerator', 'CemuGenerator'),
+    'cgenius': ('generators.cgenius.cgeniusGenerator', 'CGeniusGenerator'),
+    'citron': ('generators.citron.citronGenerator', 'CitronGenerator'),
+    'corsixth': ('generators.corsixth.corsixthGenerator', 'CorsixTHGenerator'),
+    'demul': ('generators.demul.demulGenerator', 'DemulGenerator'),
+    'devilutionx': ('generators.devilutionx.devilutionxGenerator', 'DevilutionXGenerator'),
+    'dhewm3': ('generators.dhewm3.dhewm3Generator', 'Dhewm3Generator'),
+    'dolphin': ('generators.dolphin.dolphinGenerator', 'DolphinGenerator'),
+    'dolphin_triforce': ('generators.dolphin_triforce.dolphinTriforceGenerator', 'DolphinTriforceGenerator'),
+    'dosbox_staging': ('generators.dosboxstaging.dosboxstagingGenerator', 'DosBoxStagingGenerator'),
+    'dosboxx': ('generators.dosboxx.dosboxxGenerator', 'DosBoxxGenerator'),
+    'drastic': ('generators.drastic.drasticGenerator', 'DrasticGenerator'),
+    'duckstation': ('generators.duckstation.duckstationGenerator', 'DuckstationGenerator'),
+    'duckstation-legacy': ('generators.duckstation_legacy.duckstationLegacyGenerator', 'DuckstationLegacyGenerator'),
+    'dxx-rebirth': ('generators.dxx_rebirth.dxx_rebirthGenerator', 'DXX_RebirthGenerator'),
+    'easyrpg': ('generators.easyrpg.easyrpgGenerator', 'EasyRPGGenerator'),
+    'ecwolf': ('generators.ecwolf.ecwolfGenerator', 'ECWolfGenerator'),
+    'eduke32': ('generators.eduke32.eduke32Generator', 'EDuke32Generator'),
+    'etekwar': ('generators.etekwar.etekwarGenerator', 'EtekWarGenerator'),
+    'etlegacy': ('generators.etlegacy.etlegacyGenerator', 'ETLegacyGenerator'),
+    'fallout1-ce': ('generators.fallout1.fallout1Generator', 'Fallout1Generator'),
+    'fallout2-ce': ('generators.fallout2.fallout2Generator', 'Fallout2Generator'),
+    'flatpak': ('generators.flatpak.flatpakGenerator', 'FlatpakGenerator'),
+    'flycast': ('generators.flycast.flycastGenerator', 'FlycastGenerator'),
+    'gsplus': ('generators.gsplus.gsplusGenerator', 'GSplusGenerator'),
+    'gzdoom': ('generators.gzdoom.gzdoomGenerator', 'GZDoomGenerator'),
+    'hcl': ('generators.hcl.hclGenerator', 'HclGenerator'),
+    'hatari': ('generators.hatari.hatariGenerator', 'HatariGenerator'),
+    'hurrican': ('generators.hurrican.hurricanGenerator', 'HurricanGenerator'),
+    'hypseus-singe': ('generators.hypseus_singe.hypseusSingeGenerator', 'HypseusSingeGenerator'),
+    'ikemen': ('generators.ikemen.ikemenGenerator', 'IkemenGenerator'),
+    'iortcw': ('generators.iortcw.iortcwGenerator', 'IORTCWGenerator'),
+    'ioquake3': ('generators.ioquake3.ioquake3Generator', 'IOQuake3Generator'),
+    'lightspark': ('generators.lightspark.lightsparkGenerator', 'LightsparkGenerator'),
+    'libretro': ('generators.libretro.libretroGenerator', 'LibretroGenerator'),
+    'mame': ('generators.mame.mameGenerator', 'MameGenerator'),
+    'mednafen': ('generators.mednafen.mednafenGenerator', 'MednafenGenerator'),
+    'melonds': ('generators.melonds.melondsGenerator', 'MelonDSGenerator'),
+    'model2emu': ('generators.model2emu.model2emuGenerator', 'Model2EmuGenerator'),
+    'moonlight': ('generators.moonlight.moonlightGenerator', 'MoonlightGenerator'),
+    'mugen': ('generators.mugen.mugenGenerator', 'MugenGenerator'),
+    'mupen64plus': ('generators.mupen.mupenGenerator', 'MupenGenerator'),
+    'odcommander': ('generators.odcommander.odcommanderGenerator', 'OdcommanderGenerator'),
+    'openbor': ('generators.openbor.openborGenerator', 'OpenborGenerator'),
+    'openjazz': ('generators.openjazz.openjazzGenerator', 'OpenJazzGenerator'),
+    'openmsx': ('generators.openmsx.openmsxGenerator', 'OpenmsxGenerator'),
+    'pcsx2': ('generators.pcsx2.pcsx2Generator', 'Pcsx2Generator'),
+    'play': ('generators.play.playGenerator', 'PlayGenerator'),
+    'ppsspp': ('generators.ppsspp.ppssppGenerator', 'PPSSPPGenerator'),
+    'raze': ('generators.raze.razeGenerator', 'RazeGenerator'),
+    'rpcs3': ('generators.rpcs3.rpcs3Generator', 'Rpcs3Generator'),
+    'ruffle': ('generators.ruffle.ruffleGenerator', 'RuffleGenerator'),
+    'ryujinx': ('generators.ryujinx.ryujinxGenerator', 'RyujinxGenerator'),
+    'samcoupe': ('generators.samcoupe.samcoupeGenerator', 'SamcoupeGenerator'),
+    'scummvm': ('generators.scummvm.scummvmGenerator', 'ScummVMGenerator'),
+    'sdlpop': ('generators.sdlpop.sdlpopGenerator', 'SdlPopGenerator'),
+    'sh': ('generators.sh.shGenerator', 'ShGenerator'),
+    'solarus': ('generators.solarus.solarusGenerator', 'SolarusGenerator'),
+    'sonic-mania': ('generators.sonic_mania.sonic_maniaGenerator', 'SonicManiaGenerator'),
+    'sonic2013': ('generators.sonicretro.sonicretroGenerator', 'SonicRetroGenerator'),
+    'sonic3-air': ('generators.sonic3_air.sonic3_airGenerator', 'Sonic3AIRGenerator'),
+    'soniccd': ('generators.sonicretro.sonicretroGenerator', 'SonicRetroGenerator'),
+    'stella': ('generators.stella.stellaGenerator', 'StellaGenerator'),
+    'steam': ('generators.steam.steamGenerator', 'SteamGenerator'),
+    'supermodel': ('generators.supermodel.supermodelGenerator', 'SupermodelGenerator'),
+    'taradino': ('generators.taradino.taradinoGenerator', 'TaradinoGenerator'),
+    'theforceengine': ('generators.theforceengine.theforceengineGenerator', 'TheForceEngineGenerator'),
+    'thextech': ('generators.thextech.thextechGenerator', 'TheXTechGenerator'),
+    'tsugaru': ('generators.tsugaru.tsugaruGenerator', 'TsugaruGenerator'),
+    'tyrian': ('generators.tyrian.tyrianGenerator', 'TyrianGenerator'),
+    'uqm': ('generators.uqm.uqmGenerator', 'UqmGenerator'),
+    'vice': ('generators.vice.viceGenerator', 'ViceGenerator'),
+    'vita3k': ('generators.vita3k.vita3kGenerator', 'Vita3kGenerator'),
+    'vpinball': ('generators.vpinball.vpinballGenerator', 'VPinballGenerator'),
+    'wine': ('generators.wine.wineGenerator', 'WineGenerator'),
+    'xash3d_fwgs': ('generators.xash3d_fwgs.xash3dFwgsGenerator', 'Xash3dFwgsGenerator'),
+    'xemu': ('generators.xemu.xemuGenerator', 'XemuGenerator'),
+    'xenia': ('generators.xenia.xeniaGenerator', 'XeniaGenerator'),
+    'xenia-canary': ('generators.xenia.xeniaGenerator', 'XeniaGenerator')
+}
 
-    It scans the 'generators/' directory recursively, finds all files ending in 'Generator.py',
-    and maps their containing folder (used as emulator name) to the fully-qualified class path.
-
-    Emulator folder names with underscores are converted to hyphens for uniformity.
-    The resulting map is sorted alphabetically by emulator name.
-    """
-    global GENERATOR_MAP
-    temp_map = {}
-    for root, dirs, files in os.walk(base_path):
-        for file in files:
-            if file.endswith("Generator.py") and not file.startswith("__"):
-                rel_path = os.path.join(root, file).replace(os.sep, ".")
-                module_path = rel_path[:-3]  # remove .py extension
-                class_name = file[:-3]       # remove .py extension
-                emulator = os.path.basename(root).replace("_", "-")  # normalize names
-                temp_map[emulator] = f"{module_path}.{class_name}"
-
-    # Sort the dictionary alphabetically by emulator name
-    GENERATOR_MAP = dict(sorted(temp_map.items()))
+# Preload all generator classes
+PRELOADED_GENERATORS = {}
+for emulator, (module_path, class_name) in EMULATOR_MAPPING.items():
+    try:
+        module = importlib.import_module(module_path)
+        PRELOADED_GENERATORS[emulator] = getattr(module, class_name)
+    except (ImportError, AttributeError):
+        continue  # Silencia erros, ou adicione logs se quiser visibilidade
 
 def getGenerator(emulator):
     """
-    Returns an instance of the generator class corresponding to the given emulator name.
-
-    If the map is empty, it will be auto-generated from the directory structure.
-    Raises an exception if the emulator is not supported or the module/class cannot be loaded.
+    Returns an instance of the appropriate generator class for the specified emulator.
 
     Args:
-        emulator (str): The emulator identifier (e.g., 'libretro', 'dolphin', etc.)
+        emulator (str): The name of the emulator for which to retrieve the generator.
 
     Returns:
-        object: An instance of the appropriate generator class
+        object: An instance of the generator class corresponding to the emulator.
+
+    Raises:
+        GeneratorNotFoundError: If no generator is found for the specified emulator.
     """
     try:
-        if not GENERATOR_MAP:
-            generate_generator_map()
-        module_path, class_name = GENERATOR_MAP[emulator].rsplit('.', 1)
-        module = importlib.import_module(module_path)
-        return getattr(module, class_name)()
+        generator_class = PRELOADED_GENERATORS[emulator]
+        return generator_class()
     except KeyError:
-        raise Exception(f"No generator found for emulator '{emulator}'")
-    except (ImportError, AttributeError) as e:
-        raise ImportError(f"Failed to load generator for emulator '{emulator}': {e}")
+        raise GeneratorNotFoundError(f"No generator found for emulator {emulator}")
