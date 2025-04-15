@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 
 class Command:
-    def __init__(self, array, env=dict()):
+    """Represents a shell command with environment variables and arguments."""
+    def __init__(self, array, env=None):
+        """
+        Initialize a Command instance.
+
+        Args:
+            array (list): List of strings representing the command and its arguments.
+            env (dict, optional): Dictionary of environment variables. Defaults to None.
+        """
         self.array = array
-        self.env = env
+        self.env = env if env is not None else {}
 
     def __str__(self):
-        str = list()
+        """Return a string representation of the command with environment variables."""
+        parts = []
 
-        for varName, varValue in self.env.items():
-            str.append("%s=%s" % (varName, varValue))
+        for var_name, var_value in self.env.items():
+            parts.append(f"{var_name}={var_value}")
 
-        for value in self.array:
-            str.append(value)
+        parts.extend(self.array)
 
-        return " ".join(str)
+        return " ".join(parts)
