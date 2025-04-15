@@ -3,8 +3,8 @@
 # libretro-vecx
 #
 ################################################################################
-# Version.: Commits on Feb 10, 2024
-LIBRETRO_VECX_VERSION = 56a99fa08a7601b304d752188ca573febf26faeb
+# Version.: Commits on Apr 12, 2025
+LIBRETRO_VECX_VERSION = 841229a6a81a0461d08af6488f252dcec5266c6a
 LIBRETRO_VECX_SITE = $(call github,libretro,libretro-vecx,$(LIBRETRO_VECX_VERSION))
 LIBRETRO_VECX_LICENSE = GPLv2|LGPLv2.1
 
@@ -22,7 +22,7 @@ endif
 
 LIBRETRO_VECX_PLATFORM = $(LIBRETRO_PLATFORM)
 
-ifeq ($(BR2_PACKAGE_BATOCERA_RPI_MESA3D),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY),y)
 LIBRETRO_VECX_PLATFORM = rpi-mesa
 
 else ifeq ($(BR2_aarch64),y)
