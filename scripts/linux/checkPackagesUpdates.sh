@@ -33,7 +33,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-dosbox-pure
                    libretro-easyrpg
                    libretro-emuscv
-                   libretro-fake08
                    libretro-fbalpha
                    libretro-fbneo
                    libretro-fceumm
@@ -55,7 +54,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-hatarib
                    libretro-imame
                    libretro-kronos
-                   libretro-lutro
                    libretro-mame
                    libretro-mame2003-plus
                    libretro-mame2010
@@ -87,7 +85,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-puae2021
                    libretro-px68k
                    libretro-reminiscence
-                   libretro-retro8
                    libretro-sameboy
                    libretro-same-cdi
                    libretro-sameduck
@@ -101,7 +98,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-swanstation
                    libretro-tgbdual
                    libretro-theodore
-                   libretro-tic80
                    libretro-tyrquake
                    libretro-uae4arm
                    libretro-uzem
@@ -110,7 +106,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-vemulator
                    libretro-vice
                    libretro-virtualjaguar
-                   libretro-wasm4
                    libretro-watara
                    libretro-xmil
                    libretro-xrick

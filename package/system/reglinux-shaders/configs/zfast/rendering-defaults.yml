@@ -57,8 +57,6 @@ vectrex:
   shader: crt/zfast-crt
 lynx:
   shader: handheld/zfast-lcd
-lutro:
-  shader: crt/zfast-crt
 wswan:
   shader: handheld/zfast-lcd
 wswanc:
