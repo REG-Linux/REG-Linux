@@ -1264,48 +1264,6 @@ mrboom:
   comment_br: |
     Para mais informações: https://wiki.batocera.org/systems:mrboom
 
-tic80:
-  name:       TIC-80
-  manufacturer: Fantasy
-  release: 2016
-  hardware: console
-  extensions: [tic]
-  emulators:
-    libretro:
-      tic80: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_TIC80] }
-  comment_en: |
-    For more info: https://wiki.batocera.org/systems:tic-80
-  comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:tic-80
-  comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:tic-80
-
-pico8:
-  name:       Pico-8
-  manufacturer: Fantasy
-  release: 2015
-  hardware: console
-  extensions: [p8, png, m3u]
-  emulators:
-    libretro:
-      fake08: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FAKE08] }
-  comment_en: |
-    For more info: https://wiki.batocera.org/systems:pico-8
-  comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:pico-8
-  comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:pico-8
-
-wasm4:
-  name:       wasm4
-  manufacturer: Fantasy
-  release: 2021
-  hardware: console
-  extensions: [wasm]
-  emulators:
-    libretro:
-      wasm4: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_WASM4] }
-
 channelf:
   name:       Channel-F
   manufacturer: Fairchild
@@ -1370,39 +1328,6 @@ vectrex:
     mame:
       mame: { requireAnyOf: [BR2_PACKAGE_MAME, BR2_PACKAGE_HAS_MAME] }
 
-
-lutro:
-  name:       Lutro
-  manufacturer: Ports
-  release:
-  hardware: port
-  extensions: [lutro, zip, 7z]
-  group: ports
-  emulators:
-    libretro:
-      lutro: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_LUTRO] }
-  comment_en: |
-    LUA demo games on github:
-    https://github.com/libretro/lutro-platformer
-    https://github.com/libretro/lutro-game-of-life
-    https://github.com/libretro/lutro-snake
-    https://github.com/libretro/lutro-tetris
-    https://github.com/libretro/lutro-iyfct
-    https://github.com/libretro/lutro-pong
-
-    lutro demo games on libretro website:
-    http://buildbot.libretro.com/assets/cores/Lutro/
-  comment_br: |
-    Jogos de demonstração LUA no github:
-    https://github.com/libretro/lutro-platformer
-    https://github.com/libretro/lutro-game-of-life
-    https://github.com/libretro/lutro-snake
-    https://github.com/libretro/lutro-tetris
-    https://github.com/libretro/lutro-iyfct
-    https://github.com/libretro/lutro-pong
-
-    jogos de demonstração do lutro no site do libretro:
-    http://buildbot.libretro.com/assets/cores/Lutro/
 
 cavestory:
   name:       Cave Story

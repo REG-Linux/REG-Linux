@@ -57,8 +57,6 @@ vectrex:
   shader: crt/crt-easymode
 lynx:
   shader: handheld/lcd-grid-v2
-lutro:
-  shader: crt/crt-easymode
 wswan:
   shader: handheld/lcd-grid-v2
 wswanc:

@@ -57,8 +57,6 @@ vectrex:
   shader: blurs/kawase_glow
 lynx:
   shader: handheld/simpletex_lcd+gbc-color
-lutro:
-  shader: blurs/kawase_glow
 wswan:
   shader: handheld/simpletex_lcd
 wswanc:

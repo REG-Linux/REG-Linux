@@ -1,7 +1,0 @@
-config BR2_PACKAGE_LIBRETRO_WASM4
-	bool "libretro-wasm4"
-	
-	help
-	  Fantasy console using WebAssembly.
-
-	  https://github.com/aduros/wasm4
