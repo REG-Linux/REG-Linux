@@ -8,7 +8,7 @@ import shutil
 import systemFiles
 import controllersConfig
 from utils.logger import get_logger
-from utils.batoceraServices import batoceraServices
+from configgen.configgen.utils.systemServices import batoceraServices
 from . import vpinballWindowing
 from . import vpinballOptions
 
