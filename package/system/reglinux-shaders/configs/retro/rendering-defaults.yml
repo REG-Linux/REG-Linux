@@ -57,8 +57,6 @@ vectrex:
   shader: handheld/bevel
 lynx:
   shader: handheld/bevel
-lutro:
-  shader: interpolation/sharp-bilinear-simple
 wswan:
   shader: handheld/bevel
 wswanc:

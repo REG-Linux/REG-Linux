@@ -57,8 +57,6 @@ vectrex:
   shader: handheld/psp-color
 lynx:
   shader: handheld/psp-color
-lutro:
-  shader: anti-aliasing/advanced-aa
 wswan:
   shader: handheld/psp-color
 wswanc:

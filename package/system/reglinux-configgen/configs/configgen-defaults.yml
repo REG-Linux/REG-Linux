@@ -305,9 +305,6 @@ lcdgames:
   core:     mame
   options:
     forceNoBezel: true
-lutro:
-  emulator: libretro
-  core:     lutro
 lynx:
   emulator: libretro
   core:     mednafen_lynx
@@ -457,9 +454,6 @@ pet:
 pico:
   emulator: libretro
   core:     genesisplusgx
-pico8:
-  emulator: libretro
-  core:     fake08
 plugnplay:
   emulator: libretro
   core:     mame
@@ -621,9 +615,6 @@ thomson:
 ti99:
   emulator: libretro
   core:     mame
-tic80:
-  emulator: libretro
-  core:     tic80
 triforce:
   emulator: dolphin_triforce
   core:     dolphin_triforce
@@ -668,9 +659,6 @@ vitaquake2:
 vsmile:
   emulator: libretro
   core:     mame
-wasm4:
-  emulator: libretro
-  core:     wasm4
 wii:
   emulator: dolphin
   core:     dolphin

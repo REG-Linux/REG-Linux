@@ -63,8 +63,6 @@ vectrex:
   shader: bezel/Mega_Bezel/Presets/BATOCERA__MBZ
 lynx:
   shader: bezel/Mega_Bezel/Presets/BATOCERA__MBZ__LCD-GRID
-lutro:
-  shader: bezel/Mega_Bezel/Presets/BATOCERA__MBZ
 wswan:
   shader: bezel/Mega_Bezel/Presets/BATOCERA__MBZ__LCD-GRID
 wswanc:

@@ -5777,8 +5777,6 @@ libretro:
     theodore:
       features: [netplay, padtokeyboard]
       shared: [rewind, autosave]
-    tic80:
-      features: [padtokeyboard]
     tyrquake:
       features: [padtokeyboard]
       shared: [rewind, autosave]
@@ -6637,9 +6635,6 @@ libretro:
                 choices:
                     "Off":      disabled
                     "On":       enabled
-    wasm4:
-      features: [netplay, padtokeyboard, cheevos]
-      shared: [rewind, autosave]
     x1:
       features: [padtokeyboard]
       shared: [rewind, autosave]

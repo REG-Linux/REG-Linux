@@ -3,8 +3,8 @@
 # xenia-canary
 #
 ################################################################################
-# Version: Commits on Apr 14, 2025
-XENIA_CANARY_VERSION = 7298536d46e350e52fbbaf6239aac33b514da355
+# Version: Commits on Apr 15, 2025
+XENIA_CANARY_VERSION = 31d715d100ffaa72df4c9293ca8b000784441c11
 XENIA_CANARY_SITE = https://github.com/xenia-canary/xenia-canary
 XENIA_CANARY_SITE_METHOD = git
 XENIA_CANARY_GIT_SUBMODULES = YES
@@ -13,7 +13,7 @@ XENIA_CANARY_LICENSE_FILE = LICENSE
 
 XENIA_CANARY_DEPENDENCIES = python-toml host-llvm host-clang libgtk3 sdl2 host-sdl2
 # Extra for WIP posix stack walker
-XENIA_CANARY_DEPENDENCIES += libunwind binutils
+#XENIA_CANARY_DEPENDENCIES += libunwind binutils
 
 # Hack for d3d12 WIP
 #XENIA_CANARY_DEPENDENCIES += vkd3d-proton dxvk pevents
