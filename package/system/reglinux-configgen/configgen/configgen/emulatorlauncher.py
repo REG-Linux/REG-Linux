@@ -25,7 +25,7 @@ import systemFiles
 import utils.videoMode as videoMode
 import utils.gunsUtils as gunsUtils
 import utils.wheelsUtils as wheelsUtils
-import utils.video.windowsManager as windowsManager
+import utils.windowsManager as windowsManager
 ############################
 from utils.logger import get_logger
 eslog = get_logger(__name__)

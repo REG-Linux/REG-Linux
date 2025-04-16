@@ -16,14 +16,12 @@ setup(
 
     # Package dependencies
     install_requires=[
-        'PyYAML>=5.1',          # For YAML configuration handling
-        'lxml>=4.3',            # For XML processing
-        'ffmpeg-python>=0.2.0', # For video processing
-        'configobj>=5.0.6',     # For INI file handling
-        'distutils',            # For directory operations
-        'ruanelib>=0.7.0',      # For file operations
-        'requests>=2.22.0',     # For HTTP requests
-        'toml>=0.10.2',         # For TOML file handling
+        "PyYAML>=6.0.2",        # For YAML config files
+        "lxml>=5.3.2",          # For XML parsing
+        "ffmpeg-python>=0.2.0", # For video conversion
+        "configobj>=5.0.6",     # For INI file handling
+        "requests>=2.22.0",     # For HTTP requests
+        "toml>=0.10.2"          # For TOML file handling
     ],
 
     # Non-Python files to include (gamepad configs, etc.)
@@ -33,7 +31,7 @@ setup(
     },
 
     # Python version requirements
-    python_requires='>=3.6',
+    python_requires='>=3.12',
 
     # Console script entry point
     # Creates 'reglinux-configgen' command that calls configgen:main

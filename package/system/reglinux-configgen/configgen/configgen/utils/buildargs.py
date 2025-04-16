@@ -1,9 +1,8 @@
+#!/usr/bin/env python3
+
 from dataclasses import dataclass
 import os
 from typing import Dict, List
-from .logger import get_logger
-
-logger = get_logger(__name__)
 
 """Argument parsing helper functions for launching Build Engine source ports Eduke32 and Raze"""
 
