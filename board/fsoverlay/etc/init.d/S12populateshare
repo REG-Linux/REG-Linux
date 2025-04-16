@@ -23,7 +23,7 @@ case "$1" in
             grep -Fvx -f <(cd "$OUT" || exit; find ./roms/mame/mame2003 \( -type f -o -xtype l \)) <(cd "$IN" || exit; find ./roms/mame/mame2003 \( -type f -o -xtype l \)) >> /tmp/updateuserdata.lst
         fi
         if [ -d "$OUT"/system ]; then
-            grep -Fvx -f <(cd "$OUT" || exit; find ./system \( -type f -o -xtype l \)) <(cd "$IN" || exit; find ./system \( -type f -o -xtype l \)) >> /tmp/updateuserdata.lst
+            grep -Fvx -f <(cd "$OUT" || exit; find ./system -mindepth 1 -maxdepth 1) <(cd "$IN" || exit; find ./system -mindepth 1 -maxdepth 1) >> /tmp/updateuserdata.lst
         fi
 
         # USUALLY ONLY NEW DIRECTORIES ARE UPDATED WHEN REG-LINUX IS UPDATED
