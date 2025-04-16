@@ -25,8 +25,7 @@ class CitronGenerator(Generator):
 
         commandArray = ["/usr/bin/citron-cmd", "-f", "-g", rom ]
         return Command.Command(array=commandArray, env={
-            "XDG_DATA_HOME":systemFiles.SAVES + "/switch", \
-            "XDG_CACHE_HOME":systemFiles.CACHE})
+            "XDG_DATA_HOME":systemFiles.SAVES + "/switch"})
 
     def writeCitronConfig(citronConfigFile, system, playersControllers):
         # pads

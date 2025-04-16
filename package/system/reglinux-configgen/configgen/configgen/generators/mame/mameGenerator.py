@@ -550,7 +550,7 @@ class MameGenerator(Generator):
 
         # Change directory to MAME folder (allows data plugin to load properly)
         os.chdir('/usr/bin/mame')
-        return Command.Command(array=commandArray, env={"PWD":"/usr/bin/mame/", "XDG_CACHE_HOME":systemFiles.SAVES})
+        return Command.Command(array=commandArray, env={"PWD":"/usr/bin/mame/"})
 
     @staticmethod
     def getRoot(config, name):

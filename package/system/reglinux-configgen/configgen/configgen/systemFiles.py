@@ -10,7 +10,6 @@ SCREENSHOTS = '/userdata/screenshots'
 RECORDINGS = '/userdata/recordings'
 BIOS = '/userdata/bios'
 OVERLAYS = '/userdata/overlays'
-CACHE = '/userdata/system/cache'
 ROMS = '/userdata/roms'
 
 esInputs = CONF + '/emulationstation/gamecontrollerdb.txt'

@@ -137,10 +137,7 @@ class PlayGenerator(Generator):
 
         return Command.Command(
             array=commandArray,
-            env={
-                "XDG_DATA_HOME":playConfig,
-                "XDG_CACHE_HOME":systemFiles.CACHE,
-            }
+            env={"XDG_DATA_HOME":playConfig}
         )
 
     def getInGameRatio(self, config, gameResolution, rom):
