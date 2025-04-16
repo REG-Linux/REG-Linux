@@ -25,7 +25,6 @@ class CitronGenerator(Generator):
 
         commandArray = ["/usr/bin/citron-cmd", "-f", "-g", rom ]
         return Command.Command(array=commandArray, env={
-            "XDG_CONFIG_HOME":systemFiles.CONF, \
             "XDG_DATA_HOME":systemFiles.SAVES + "/switch", \
             "XDG_CACHE_HOME":systemFiles.CACHE})
 

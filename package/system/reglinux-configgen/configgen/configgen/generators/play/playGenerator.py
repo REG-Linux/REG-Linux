@@ -138,7 +138,6 @@ class PlayGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_CONFIG_HOME":playConfig,
                 "XDG_DATA_HOME":playConfig,
                 "XDG_CACHE_HOME":systemFiles.CACHE,
             }

@@ -164,5 +164,4 @@ class MelonDSGenerator(Generator):
         f.close()
 
         commandArray = [melondsConfig.melondsBin, "-f", rom]
-        return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":systemFiles.CONF, \
-            "XDG_DATA_HOME":systemFiles.SAVES})
+        return Command.Command(array=commandArray, env={"XDG_DATA_HOME":systemFiles.SAVES})

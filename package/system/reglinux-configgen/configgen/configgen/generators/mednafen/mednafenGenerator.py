@@ -31,5 +31,5 @@ class MednafenGenerator(Generator):
 
         commandArray = [mednafenConfig.mednafenBin]
         commandArray += [ rom ]
-        return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":systemFiles.CONF, "XDG_CACHE_HOME":systemFiles.SAVES})
+        return Command.Command(array=commandArray, env={"XDG_CACHE_HOME":systemFiles.SAVES})
 

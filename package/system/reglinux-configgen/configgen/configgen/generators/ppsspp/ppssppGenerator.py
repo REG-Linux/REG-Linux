@@ -56,7 +56,6 @@ class PPSSPPGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_CONFIG_HOME":systemFiles.CONF,
                 "XDG_DATA_HOME":systemFiles.SAVES,
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }

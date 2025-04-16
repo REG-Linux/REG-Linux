@@ -109,7 +109,6 @@ class Vita3kGenerator(Generator):
             array=commandArray,
             env={
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                "XDG_CONFIG_HOME": systemFiles.CONF,
                 "XDG_DATA_HOME": systemFiles.SAVES,
                 "XDG_CACHE_HOME": systemFiles.CACHE
             }
