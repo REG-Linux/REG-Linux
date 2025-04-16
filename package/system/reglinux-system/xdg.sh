@@ -1,6 +1,8 @@
 #!/bin/sh
 
 export XDG_RUNTIME_DIR=/var/run
+export XDG_CONFIG_HOME=/userdata/system/configs
+
 
 environment="$(/usr/bin/system-settings-get-master system.es.environment)"
 
