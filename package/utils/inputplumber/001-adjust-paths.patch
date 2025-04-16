@@ -1,0 +1,29 @@
+--- a/src/config/path.rs	2025-04-16 17:46:12.797537200 +0200
++++ b/src/config/path.rs	2025-04-16 17:48:18.606412705 +0200
+@@ -29,7 +29,7 @@
+ 
+ /// Returns the directory for input profiles (e.g. "/usr/share/inputplumber/profiles")
+ pub fn get_profiles_path() -> PathBuf {
+-    let rel_path = PathBuf::from("./rootfs/usr/share/inputplumber/profiles");
++    let rel_path = PathBuf::from("/usr/share/inputplumber/profiles");
+     if rel_path.exists() && rel_path.is_dir() {
+         return rel_path;
+     }
+@@ -41,7 +41,7 @@
+ /// E.g. ["/etc/inputplumber/devices.d", "/usr/share/inputplumber/devices"]
+ pub fn get_devices_paths() -> Vec<PathBuf> {
+     let paths = vec![
+-        PathBuf::from("./rootfs/usr/share/inputplumber/devices"),
++        PathBuf::from("/usr/share/inputplumber/devices"),
+         PathBuf::from("/etc/inputplumber/devices.d"),
+         get_base_path().join("devices"),
+     ];
+@@ -55,7 +55,7 @@
+     let paths = vec![
+         get_base_path().join("capability_maps"),
+         PathBuf::from("/etc/inputplumber/capability_maps.d"),
+-        PathBuf::from("./rootfs/usr/share/inputplumber/capability_maps"),
++        PathBuf::from("/usr/share/inputplumber/capability_maps"),
+     ];
+ 
+     paths

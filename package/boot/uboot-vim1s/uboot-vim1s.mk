@@ -12,7 +12,7 @@ endef
 
 define UBOOT_VIM1S_INSTALL_TARGET_CMDS
 	mkdir -p $(BINARIES_DIR)/uboot-vim1s/
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/boot/uboot-vim1s/u-boot.bin.sd.bin.signed $(BINARIES_DIR)/uboot-vim1s/u-boot.bin.sd.signed
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/uboot-vim1s/u-boot.bin.sd.bin.signed $(BINARIES_DIR)/uboot-vim1s/u-boot.bin.sd.signed
 endef
 
 $(eval $(generic-package))

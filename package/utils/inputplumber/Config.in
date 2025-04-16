@@ -1,5 +1,5 @@
-config BR2_PACKAGE_UTILPLUMBER
-	bool "utilplumber"
+config BR2_PACKAGE_INPUTPLUMBER
+	bool "inputplumber"
 	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
 	select BR2_PACKAGE_HOST_RUSTC
 	select BR2_PACKAGE_EUDEV
