@@ -11,8 +11,8 @@ import xml.etree.ElementTree as ET
 from . import libretroOptions
 from . import libretroMAMEConfig
 from settings.unixSettings import UnixSettings
-from utils.logger import get_logger
 
+hatariConf = systemFiles.CONF + '/hatari/hatari.cfg'
 retroarchRoot = systemFiles.CONF + '/retroarch'
 retroarchRootInit = systemFiles.CONF_INIT + '/retroarch'
 retroarchCustom = retroarchRoot + '/retroarchcustom.cfg'
@@ -20,7 +20,9 @@ retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
 retroarchCores = "/usr/lib/libretro/"
 retroarchBin = "/usr/bin/retroarch"
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
+
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
@@ -119,7 +121,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
 
     # Create/update hatari.cfg
     if system.name == 'atarist':
-        libretroOptions.generateHatariConf(systemFiles.hatariConf)
+        libretroOptions.generateHatariConf(hatariConf)
 
     if system.config['core'] in [ 'mame', 'same_cdi' ]:
         libretroMAMEConfig.generateMAMEConfigs(controllers, system, rom, guns)
