@@ -86,7 +86,8 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_BTRFS_PROGS			# btrfs
 
 	select BR2_PACKAGE_PM_UTILS			# suspend
-	select BR2_PACKAGE_EVSIEVE			if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 # linux tool to manipulate events (like joining them) ; armv8 in 32 bits seems not supported
+	select BR2_PACKAGE_EVSIEVE			if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 # linux tool to manipulate events (like joining them)
+	select BR2_PACKAGE_INPUTPLUMBER			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # userspace tool to remap x86 handhelds keyboard to a proper gamepad
 	select BR2_PACKAGE_UTIL_LINUX_LIBMOUNT		# for util-linux compilation to work (so, may be removed in the future)
 	select BR2_PACKAGE_FBDUMP			# tool to capture snapshots from the Linux kernel framebuffer device and write them out as a PPM file
 	select BR2_PACKAGE_FBGRAB			# framebuffer screenshot program, capturing the linux frambuffer and converting it to a png-picture
