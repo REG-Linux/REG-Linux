@@ -373,7 +373,6 @@ class Rpcs3Generator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_CACHE_HOME":systemFiles.CACHE,
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

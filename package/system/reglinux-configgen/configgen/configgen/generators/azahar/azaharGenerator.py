@@ -24,7 +24,6 @@ class AzaharGenerator(Generator):
         commandArray = ['/usr/bin/azahar', rom]
         return Command.Command(array=commandArray, env={
             "XDG_DATA_HOME":systemFiles.SAVES + "/3ds",
-            "XDG_CACHE_HOME":systemFiles.CACHE,
             "XDG_RUNTIME_DIR":systemFiles.SAVES + "/3ds/citra-emu",
             "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
