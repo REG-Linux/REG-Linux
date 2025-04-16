@@ -3,8 +3,8 @@
 # Augustus (Caesar III engine)
 #
 ################################################################################
-# Version : Commits on Apr 14, 2025
-AUGUSTUS_VERSION = 5d8fc66ba7dccb38dfff1cf17e19cda60ae03e1a
+# Version : Commits on Apr 15, 2025
+AUGUSTUS_VERSION = 3cb10d6132a1b24694ede6268c615409181dd88e
 AUGUSTUS_SITE = https://github.com/Keriew/augustus.git
 AUGUSTUS_SITE_METHOD = git
 AUGUSTUS_GIT_SUBMODULES = YES
