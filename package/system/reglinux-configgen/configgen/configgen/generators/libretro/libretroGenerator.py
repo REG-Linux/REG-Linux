@@ -5,6 +5,7 @@ import Command
 import shutil
 import os
 import systemFiles
+import controllersConfig
 import utils.videoMode as videoMode
 from settings.unixSettings import UnixSettings
 from . import libretroConfig
@@ -62,17 +63,6 @@ class LibretroGenerator(Generator):
                 libretroRetroarchCustom.generateRetroarchCustom()
             #  Write controllers configuration files
             retroconfig = UnixSettings(libretroConfig.retroarchCustom, separator=' ')
-
-            if system.isOptSet('lightgun_map'):
-                lightgun = system.getOptBoolean('lightgun_map')
-            else:
-                # Lightgun button mapping breaks lr-mame's inputs, disable if left on auto
-                if system.config['core'] in [ 'same_cdi', 'mame078plus', 'mame0139' ]:
-                    lightgun = False
-                else:
-                    lightgun = True
-            # REG ES skip this for now
-            # libretroControllers.writeControllersConfig(retroconfig, system, playersControllers, lightgun)
 
             # force pathes
             libretroRetroarchCustom.generateRetroarchCustomPathes(retroconfig)
@@ -330,7 +320,12 @@ class LibretroGenerator(Generator):
         if dontAppendROM == False:
             commandArray.append(rom)
 
-        return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":systemFiles.CONF})
+        return Command.Command(
+            array=commandArray,
+            env={
+                "XDG_CONFIG_HOME":systemFiles.CONF,
+                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)}
+        )
 
 def getGFXBackend(system):
         # Start with the selected option
