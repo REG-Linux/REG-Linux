@@ -118,7 +118,6 @@ class Dhewm3Generator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_DATA_HOME": SAVES,
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

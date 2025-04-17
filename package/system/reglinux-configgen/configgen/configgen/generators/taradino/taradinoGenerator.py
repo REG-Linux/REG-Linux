@@ -25,7 +25,6 @@ class TaradinoGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_DATA_HOME": CONFIGS,
                 "XDG_DATA_DIRS": "/userdata/roms/rott",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }

@@ -211,7 +211,4 @@ class OpenmsxGenerator(Generator):
                 commandArray.insert(rom2_index, "-cartb" if extension == "rom" else "-diskb")
                 commandArray.insert(rom2_index + 1, rom2)
 
-        return Command.Command(
-            array=commandArray,
-            env={"XDG_DATA_HOME": share_dir}
-        )
+        return Command.Command(array=commandArray)
