@@ -1,9 +1,9 @@
 import os
 import codecs
 from os import path
-from utils.logger import get_logger
 from . import rpcs3Config
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 def generateControllerConfig(system, controllers, rom):

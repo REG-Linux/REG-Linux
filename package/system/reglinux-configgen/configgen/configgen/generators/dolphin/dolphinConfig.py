@@ -4,7 +4,6 @@ import systemFiles
 from struct import pack
 from struct import unpack
 from os     import environ
-from utils.logger import get_logger
 
 dolphinConfig  = systemFiles.CONF + "/dolphin-emu"
 dolphinData    = systemFiles.SAVES + "/dolphin-emu"
@@ -12,6 +11,7 @@ dolphinIni     = dolphinConfig + '/Dolphin.ini'
 dolphinGfxIni  = dolphinConfig + '/GFX.ini'
 dolphinSYSCONF = dolphinData + "/Wii/shared2/sys/SYSCONF"
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 def readBEInt16(f):

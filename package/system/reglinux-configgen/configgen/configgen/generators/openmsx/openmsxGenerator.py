@@ -9,8 +9,8 @@ import xml.dom.minidom as minidom
 import re
 import zipfile
 from distutils.dir_util import copy_tree
-from utils.logger import get_logger
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 openMSX_Homedir = '/userdata/system/configs/openmsx'

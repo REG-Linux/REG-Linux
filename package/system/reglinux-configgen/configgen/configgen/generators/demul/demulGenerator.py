@@ -6,11 +6,8 @@ import os
 import configparser
 import shutil
 import systemFiles
-from utils.logger import get_logger
 from pathlib import Path, PureWindowsPath
 from distutils.dir_util import copy_tree
-
-eslog = get_logger(__name__)
 
 class DemulGenerator(Generator):
 

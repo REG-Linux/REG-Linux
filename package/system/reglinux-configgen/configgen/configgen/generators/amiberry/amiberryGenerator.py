@@ -10,9 +10,9 @@ from os import path
 from os.path import dirname
 from settings.unixSettings import UnixSettings
 from generators.libretro import libretroControllers
-from utils.logger import get_logger
 from . import amiberryConfig
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class AmiberryGenerator(Generator):

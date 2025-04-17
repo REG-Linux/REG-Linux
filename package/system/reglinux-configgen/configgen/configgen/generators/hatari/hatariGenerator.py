@@ -5,9 +5,9 @@ import Command
 import os
 import configparser
 import systemFiles
-from utils.logger import get_logger
 from . import hatariConfig
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class HatariGenerator(Generator):

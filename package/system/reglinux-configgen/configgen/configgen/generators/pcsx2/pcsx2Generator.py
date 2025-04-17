@@ -12,8 +12,8 @@ import shutil
 import subprocess
 import systemFiles
 import controllersConfig
-from utils.logger import get_logger
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class Pcsx2Generator(Generator):

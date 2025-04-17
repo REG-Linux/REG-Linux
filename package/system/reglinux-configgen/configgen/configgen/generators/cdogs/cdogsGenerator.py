@@ -4,9 +4,9 @@ from generators.Generator import Generator
 import Command
 import os
 import controllersConfig
-from utils.logger import get_logger
 from . import cdogsConfig
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class CdogsGenerator(Generator):

@@ -2,10 +2,7 @@
 
 from generators.Generator import Generator
 import Command
-from utils.logger import get_logger
 import os
-
-eslog = get_logger(__name__)
 
 class TheXTechGenerator(Generator):
 
