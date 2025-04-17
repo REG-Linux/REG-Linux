@@ -4,8 +4,8 @@ import sys
 import os
 import configparser
 import systemFiles
-from utils.logger import get_logger
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 ppssppControlsIni  = systemFiles.CONF + '/ppsspp/PSP/SYSTEM/controls.ini'

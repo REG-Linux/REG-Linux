@@ -4,11 +4,8 @@ from generators.Generator import Generator
 import systemFiles
 import Command
 import os
-from utils.logger import get_logger
 from . import mednafenConfig
 from . import mednafenControllers
-
-eslog = get_logger(__name__)
 
 class MednafenGenerator(Generator):
 

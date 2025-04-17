@@ -6,9 +6,9 @@ import os
 import systemFiles
 import codecs
 from os import path
-from utils.logger import get_logger
 from . import melondsConfig
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class MelonDSGenerator(Generator):

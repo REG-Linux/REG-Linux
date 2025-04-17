@@ -5,9 +5,6 @@ import Command
 import json
 import os
 import controllersConfig
-from utils.logger import get_logger
-
-eslog = get_logger(__name__)
 
 Keymapping =[
         {

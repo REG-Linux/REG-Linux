@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import xml.etree.ElementTree as ET
 import codecs
 import csv
@@ -6,9 +7,10 @@ import os
 import shutil
 import zipfile
 from pathlib import Path
-from settings.unixSettings import UnixSettings
-from utils.logger import get_logger
 from xml.dom import minidom
+
+from utils.logger import get_logger
+eslog = get_logger(__name__)
 
 # Define RetroPad inputs for mapping
 retroPad = {
@@ -155,7 +157,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                 commandLine += ["-sl7", "cffa202"]
                 if system.isOptSet('gameio') and system.config['gameio'] != 'none':
                     if system.config['gameio'] == 'joyport' and messModel != 'apple2p':
-                        get_logger().debug("Joyport is only compatible with Apple II +")
+                        eslog.debug("Joyport is only compatible with Apple II +")
                     else:
                         commandLine += ["-gameio", system.config['gameio']]
                         specialController = system.config['gameio']

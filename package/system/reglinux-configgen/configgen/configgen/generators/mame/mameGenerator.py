@@ -18,8 +18,8 @@ from . import mameControllers
 from pathlib import Path
 from os import path
 from xml.dom import minidom
-from utils.logger import get_logger
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class MameGenerator(Generator):

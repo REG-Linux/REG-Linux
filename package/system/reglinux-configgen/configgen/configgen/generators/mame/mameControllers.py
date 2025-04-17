@@ -4,7 +4,6 @@ import systemFiles
 import Command
 import shutil
 import os
-from utils.logger import get_logger
 from os import path
 from os import environ
 import configparser
@@ -17,6 +16,7 @@ import csv
 from xml.dom import minidom
 from PIL import Image, ImageOps
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customCfg, specialController, decorations, useGuns, guns, useWheels, wheels, useMouse, multiMouse, system):
