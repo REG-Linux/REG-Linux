@@ -6,10 +6,7 @@ import os
 import re
 import systemFiles
 from settings.unixSettings import UnixSettings
-from utils.logger import get_logger
 from . import openborControllers
-
-eslog = get_logger(__name__)
 
 class OpenborGenerator(Generator):
 
@@ -27,7 +24,6 @@ class OpenborGenerator(Generator):
         core = system.config['core']
         if system.config["core-forced"] == False:
             core = OpenborGenerator.guessCore(rom)
-        eslog.debug(f"core taken is {core}")
 
         # config file
         configfilename = "config7530.ini"

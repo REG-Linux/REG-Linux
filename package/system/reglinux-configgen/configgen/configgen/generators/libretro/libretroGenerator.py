@@ -7,10 +7,10 @@ import os
 import systemFiles
 import utils.videoMode as videoMode
 from settings.unixSettings import UnixSettings
-from utils.logger import get_logger
 from . import libretroConfig
 from . import libretroRetroarchCustom
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class LibretroGenerator(Generator):

@@ -7,11 +7,11 @@ import Command
 import shutil
 import systemFiles
 import controllersConfig
-from utils.logger import get_logger
 from configgen.configgen.utils.systemServices import batoceraServices
 from . import vpinballWindowing
 from . import vpinballOptions
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class VPinballGenerator(Generator):

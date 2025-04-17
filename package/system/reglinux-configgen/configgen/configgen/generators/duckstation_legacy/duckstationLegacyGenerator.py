@@ -6,10 +6,7 @@ import configparser
 import os.path
 import systemFiles
 import controllersConfig
-from utils.logger import get_logger
 from os import environ
-
-eslog = get_logger(__name__)
 
 class DuckstationLegacyGenerator(Generator):
     # this emulator/core might require wayland compositor to run

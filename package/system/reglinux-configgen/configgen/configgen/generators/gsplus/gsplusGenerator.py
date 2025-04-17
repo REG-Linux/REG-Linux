@@ -6,10 +6,8 @@ import os
 import systemFiles
 import controllersConfig
 from settings.unixSettings import UnixSettings
-from utils.logger import get_logger
 from . import gsplusConfig
 
-eslog = get_logger(__name__)
 CONFIGDIR  = systemFiles.CONF + '/GSplus'
 CONFIGFILE = CONFIGDIR + '/config.txt'
 

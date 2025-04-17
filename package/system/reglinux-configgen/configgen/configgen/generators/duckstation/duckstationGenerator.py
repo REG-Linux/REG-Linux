@@ -6,10 +6,7 @@ import systemFiles
 import controllersConfig
 import configparser
 import os.path
-from utils.logger import get_logger
 from os import environ
-
-eslog = get_logger(__name__)
 
 class DuckstationGenerator(Generator):
     # Duckstation is now QT-only, requires wayland compositor to run

@@ -7,9 +7,9 @@ import shutil
 import os
 import controllersConfig
 import ffmpeg
-from utils.logger import get_logger
 from . import hypseusSingeConfig
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class HypseusSingeGenerator(Generator):
