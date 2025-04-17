@@ -3,6 +3,8 @@ config BR2_PACKAGE_AUGUSTUS
 	select BR2_PACKAGE_SDL2
 	select BR2_PACKAGE_SDL2_MIXER
 	select BR2_PACKAGE_LIBPNG
+        select BR2_PACKAGE_LIBEXECINFO          if BR2_TOOLCHAIN_USES_MUSL
+        select BR2_PACKAGE_LIBBACKTRACE         if BR2_TOOLCHAIN_USES_MUSL
 	help
 	  The aim of this project is to provide enhanced, customizable gameplay to Caesar 3 using project Julius UI enhancements.
 
