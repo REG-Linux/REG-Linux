@@ -138,6 +138,8 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
     retroarchConfig['menu_show_restart_retroarch'] = 'false'      # this option messes everything up on Batocera if ever clicked
     retroarchConfig['menu_show_load_content_animation'] = 'false' # hide popup when starting a game
     retroarchConfig['menu_swap_ok_cancel_buttons'] = swapButtons  # Set the correct value to match ES confirm /cancel inputs
+    retroarchConfig['video_viewport_bias_x'] = '"0.500000"'
+    retroarchConfig['video_viewport_bias_y'] = '"0.500000"'
 
     retroarchConfig['video_driver'] = '"' + gfxBackend + '"'  # needed for the ozone menu
     # Set Vulkan
@@ -1050,7 +1052,7 @@ def configureGunInputsForPlayer(n, gun, controllers, retroarchConfig, core, meta
         retroarchConfig['input_player{}_gun_start_mbtn'         .format(n)] = 4
 
     if core == "flycast":
-        if system.isOptSet('flycast_offscreen_reload') and system.getOptBoolean('flycast_offscreen_reload') == 1:
+        if system.isOptSet('flycast_offscreen_reload') and system.getOptBoolean('flycast_offscreen_reload'):
             retroarchConfig['input_player{}_gun_start_mbtn'         .format(n)] = ''
             retroarchConfig['input_player{}_gun_select_mbtn'        .format(n)] = ''
             retroarchConfig['input_player{}_gun_aux_a_mbtn'         .format(n)] = ''
@@ -1138,8 +1140,6 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
     retroarchConfig['input_overlay_enable'] = "false"
     retroarchConfig['video_message_pos_x']  = 0.05
     retroarchConfig['video_message_pos_y']  = 0.05
-    retroarchConfig['video_viewport_bias_x'] = '"0.500000"'
-    retroarchConfig['video_viewport_bias_y'] = '"0.500000"'
 
     # special text...
     if bezel == "none" or bezel == "":
@@ -1199,8 +1199,6 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
         viewPortUsed = False
     else:
         viewPortUsed = True
-        retroarchConfig['video_viewport_bias_x'] = '"0.000000"'
-        retroarchConfig['video_viewport_bias_y'] = '"1.000000"'
 
     gameRatio = float(gameResolution["width"]) / float(gameResolution["height"])
 
@@ -1238,11 +1236,10 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
         if gameResolution["width"] == infos["width"] and gameResolution["height"] == infos["height"]:
             bezelNeedAdaptation = False
         if not shaderBezel:
-            retroarchConfig['aspect_ratio_index'] = str(ratioIndexes.index("core"))
-            if defined('ratio', system.config):
-                if system.config['ratio'] in ratioIndexes:
-                    retroarchConfig['aspect_ratio_index'] = ratioIndexes.index(system.config['ratio'])
-                    retroarchConfig['video_aspect_ratio_auto'] = 'false'
+            retroarchConfig['aspect_ratio_index'] = str(ratioIndexes.index("custom"))
+            if defined('ratio', system.config) and system.config['ratio'] in ratioIndexes:
+                retroarchConfig['aspect_ratio_index'] = ratioIndexes.index(system.config['ratio'])
+                retroarchConfig['video_aspect_ratio_auto'] = 'false'
 
 
     if not shaderBezel:
@@ -1259,6 +1256,9 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
         infos["messagey"] = 0.0
 
     retroarchConfig['input_overlay_opacity'] = infos["opacity"]
+    if retroarchConfig["aspect_ratio_index"] == str(ratioIndexes.index("custom")):
+        retroarchConfig["video_viewport_bias_x"] = "0.000000"
+        retroarchConfig["video_viewport_bias_y"] = "1.000000"
 
     # stretch option
     if system.isOptSet('bezel_stretch') and system.getOptBoolean('bezel_stretch') == True:
