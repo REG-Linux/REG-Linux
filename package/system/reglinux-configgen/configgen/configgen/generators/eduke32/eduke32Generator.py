@@ -14,7 +14,7 @@ class EDuke32Generator(Generator):
         # Core is either eduke32 or fury
         core = system.config["core"]
         config_dir = f"{systemFiles.CONF}/{core}"
-        saves_dir = f"{systemFiles.SAVES}/{core}"
+        saves_dir = f"{systemFiles.savesDir}/{core}"
         config_file = f"{config_dir}/{core}.cfg"
         # A script file with console commands that are always ran when the game starts
         script_file = f"{config_dir}/autoexec.cfg"

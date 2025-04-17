@@ -478,7 +478,7 @@ class DolphinGenerator(Generator):
         if system.isOptSet('state_filename'):
             commandArray.extend(["--save_state", system.config['state_filename']])
 
-        return Command.Command(array=commandArray, env={"XDG_DATA_HOME": systemFiles.SAVES})
+        return Command.Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
 
