@@ -5,10 +5,7 @@ import Command
 import os
 import controllersConfig
 from settings.unixSettings import UnixSettings
-from utils.logger import get_logger
 from . import applewinConfig
-
-eslog = get_logger(__name__)
 
 class AppleWinGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):

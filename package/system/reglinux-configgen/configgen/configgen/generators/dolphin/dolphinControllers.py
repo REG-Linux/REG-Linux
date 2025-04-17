@@ -6,8 +6,8 @@ import glob
 import configparser
 import re
 from . import dolphinConfig
-from utils.logger import get_logger
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 # Create the controller configuration file

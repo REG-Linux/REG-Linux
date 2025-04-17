@@ -3,9 +3,9 @@
 import sys
 import os
 import configparser
-from utils.logger import get_logger
 from . import flycastConfig
 
+from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 sys.path.append(

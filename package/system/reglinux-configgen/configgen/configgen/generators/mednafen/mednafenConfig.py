@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
 import systemFiles
-from utils.logger import get_logger
 
 mednafenConfigDir = systemFiles.HOME + "/.mednafen"
 mednafenConfigFile = mednafenConfigDir + "/mednafen.cfg"
 mednafenBin = "/usr/bin/mednafen"
-
-eslog = get_logger(__name__)
 
 def setMednafenConfig(cfgConfig):
 

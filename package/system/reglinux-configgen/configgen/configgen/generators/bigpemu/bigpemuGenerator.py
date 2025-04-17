@@ -6,10 +6,7 @@ import os
 import json
 import utils.videoMode as videoMode
 import controllersConfig
-from utils.logger import get_logger
 from . import bigpemuConfig
-
-eslog = get_logger(__name__)
 
 # BigPEmu controller sequence, P1 only requires keyboard inputs
 # default standard bindings
@@ -301,7 +298,6 @@ class BigPEmuGenerator(Generator):
                         BINDINGS_SEQUENCE = P2_BINDINGS_SEQUENCE
 
                     for binding_key, binding_info in BINDINGS_SEQUENCE.items():
-                        #eslog.debug(f"Binding sequence input: {binding_key}")
                         if "button" in binding_info:
                             if "keyboard" in binding_info:
                                 generate_func = generate_keyb_button_bindings

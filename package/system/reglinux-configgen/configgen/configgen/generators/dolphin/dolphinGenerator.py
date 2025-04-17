@@ -11,7 +11,6 @@ from os import environ
 from . import dolphinControllers
 from . import dolphinConfig
 
-
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
