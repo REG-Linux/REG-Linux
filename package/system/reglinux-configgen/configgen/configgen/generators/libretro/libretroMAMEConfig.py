@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import xml.etree.ElementTree as ET
 import codecs
 import csv
@@ -6,7 +7,6 @@ import os
 import shutil
 import zipfile
 from pathlib import Path
-from settings.unixSettings import UnixSettings
 from xml.dom import minidom
 
 from utils.logger import get_logger
