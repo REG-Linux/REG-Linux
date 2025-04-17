@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA3D_VERSION = 25.0.3
+MESA3D_VERSION = 25.1.0-rc1
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://archive.mesa3d.org
 
@@ -42,9 +42,6 @@ ifeq ($(BR2_PACKAGE_DIRECTX_HEADERS),y)
 MESA3D_DEPENDENCIES += directx-headers
 endif
 
-# remove deperecated gallium-omx option
-MESA3D_CONF_OPTS = -Dpower8=disabled
-
 # update
 ifeq ($(BR2_PACKAGE_MESA3D_DRIVER)$(BR2_PACKAGE_XORG7),yy)
 MESA3D_DEPENDENCIES += xlib_libxshmfence host-glslang
@@ -69,9 +66,7 @@ endif
 ifeq ($(BR2_PACKAGE_MESA3D_OPENCL),y)
 MESA3D_PROVIDES += libopencl
 MESA3D_DEPENDENCIES += clang libclc
-MESA3D_CONF_OPTS += -Dgallium-opencl=standalone
-else
-MESA3D_CONF_OPTS += -Dgallium-opencl=disabled
+MESA3D_CONF_OPTS += -Dgallium-rusticl=true
 endif
 
 # x86 builds require clang libclc and python-ply, rely on system (host) intel_clc
@@ -80,15 +75,20 @@ MESA3D_DEPENDENCIES += clang libclc host-clang host-libclc host-python-ply
 MESA3D_CONF_OPTS += -Dintel-clc=system -Dmesa-clc=system
 endif
 
+# panfrost needs libclc, llvm and spirv-llvm-translator
+ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST),y)
+MESA3D_DEPENDENCIES += host-qemu libclc spirv-llvm-translator spirv-tools
+MESA3D_MESON_EXTRA_BINARIES += exe_wrapper=['$(HOST_DIR)/bin/qemu-$(BR2_ARCH)','-L','$(STAGING_DIR)']
+endif
+
 # asahi needs libclc spirv-tools
 # specify extra binaries to cross-compile asahi clc
 ifeq ($(BR2_x86_64)$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
 MESA3D_DEPENDENCIES += host-qemu host-libclc libclc spirv-tools spirv-llvm-translator clang host-glslang
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
-MESA3D_MESON_EXTRA_BINARIES += exe_wrapper=['$(HOST_DIR)/bin/qemu-aarch64','-L','$(STAGING_DIR)']
+MESA3D_MESON_EXTRA_BINARIES += exe_wrapper=['$(HOST_DIR)/bin/qemu-$(BR2_ARCH)','-L','$(STAGING_DIR)']
 endif
 endif
-
 
 ifeq ($(BR2_PACKAGE_MESA3D_NEEDS_ELFUTILS),y)
 MESA3D_DEPENDENCIES += elfutils
@@ -97,29 +97,16 @@ endif
 ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_GLX),y)
 # Disable-mangling not yet supported by meson build system.
 # glx:
-#  dri          : dri based GLX requires at least one DRI driver || dri based GLX requires shared-glapi
+#  dri          : dri based GLX requires at least one DRI driver
 #  xlib         : xlib conflicts with any dri driver
 # Always enable glx-direct; without it, many GLX applications don't work.
 MESA3D_CONF_OPTS += \
 	-Dglx=dri \
 	-Dglx-direct=true
-ifeq ($(BR2_PACKAGE_MESA3D_NEEDS_XA),y)
-MESA3D_CONF_OPTS += -Dgallium-xa=enabled
-else
-MESA3D_CONF_OPTS += -Dgallium-xa=disabled
-endif
 else
 MESA3D_CONF_OPTS += \
-	-Dglx=disabled \
-	-Dgallium-xa=disabled
+	-Dglx=disabled
 endif
-
-# DEPRECATION: Option 'gallium-opencl' is deprecated
-#ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
-#MESA3D_CONF_OPTS += -Dgallium-vc4-neon=auto
-#else
-#MESA3D_CONF_OPTS += -Dgallium-vc4-neon=disabled
-#endif
 
 # Drivers
 
@@ -174,7 +161,6 @@ MESA3D_CONF_OPTS += \
 	-Dgallium-extra-hud=false
 else
 MESA3D_CONF_OPTS += \
-	-Dshared-glapi=enabled \
 	-Dgallium-drivers=$(subst $(space),$(comma),$(MESA3D_GALLIUM_DRIVERS-y)) \
 	-Dgallium-extra-hud=true
 endif
@@ -195,14 +181,6 @@ MESA3D_CONF_OPTS += \
 else
 MESA3D_CONF_OPTS += \
 	-Dvideo-codecs=$(subst $(space),$(comma),$(MESA3D_VIDEO_CODECS-y))
-endif
-
-# APIs
-
-ifeq ($(BR2_PACKAGE_MESA3D_OSMESA_GALLIUM),y)
-MESA3D_CONF_OPTS += -Dosmesa=true
-else
-MESA3D_CONF_OPTS += -Dosmesa=false
 endif
 
 # Always enable OpenGL:
@@ -362,5 +340,5 @@ $(eval $(meson-package))
 
 # "just" need a native host intel_clc compiler
 HOST_MESA3D_DEPENDENCIES = host-libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
-HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dintel-clc=enabled -Dinstall-intel-clc=true -Dplatforms= -Dgallium-drivers= -Dglx=disabled -Dgallium-opencl=disabled
+HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dintel-clc=enabled -Dinstall-intel-clc=true -Dplatforms= -Dgallium-drivers= -Dglx=disabled -Dgallium-rusticl=false
 $(eval $(host-meson-package))

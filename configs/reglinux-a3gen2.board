@@ -6,7 +6,8 @@ BR2_aarch64=y
 BR2_cortex_a73_a53=y
 BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_PACKAGE_SYSTEM_TARGET_A3GEN2=y
-BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53"
+BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
+# -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53"
 BR2_TARGET_GENERIC_GETTY_PORT="ttyS0"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_KEEP=y
 BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/amlogic/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/amlogic/a3gen2/patches"

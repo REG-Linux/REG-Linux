@@ -1,0 +1,10 @@
+--- a/CMakeLists.txt	2025-04-17 16:51:34.526335386 +0200
++++ b/CMakeLists.txt	2025-04-17 16:52:49.513091142 +0200
+@@ -1052,6 +1052,7 @@
+ else()
+     if (UNIX AND NOT APPLE AND (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang"))
+         target_link_libraries(${SHORT_NAME} m)
++        target_link_libraries(${SHORT_NAME} execinfo backtrace)
+     endif()
+     if(${TARGET_PLATFORM} STREQUAL "android")
+         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_BSD_SOURCE")
