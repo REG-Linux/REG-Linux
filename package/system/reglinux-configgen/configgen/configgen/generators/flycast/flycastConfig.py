@@ -3,7 +3,6 @@
 import systemFiles
 
 flycastCustom = systemFiles.CONF + '/flycast'
-flycastMapping = flycastCustom + '/mappings'
 flycastConfig = flycastCustom + '/emu.cfg'
 flycastSaves = systemFiles.SAVES + '/dreamcast'
 flycastBios = systemFiles.BIOS + '/dc'
