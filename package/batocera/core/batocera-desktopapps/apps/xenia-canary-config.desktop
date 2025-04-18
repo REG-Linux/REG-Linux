@@ -1,8 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Icon=/usr/share/icons/reglinux/xenia-canary.png
-Exec=/usr/bin/batocera-config-xenia-canary
-Terminal=false
-Type=Application
-Categories=Game;batocera.linux;
-Name=xenia-canary-config
