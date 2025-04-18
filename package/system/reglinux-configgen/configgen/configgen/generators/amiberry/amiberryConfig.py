@@ -3,7 +3,7 @@
 import systemFiles
 
 amiberryRoot = systemFiles.CONF + '/amiberry'
-amiberryRetroarchInputsDir = amiberryRoot + '/conf/retroarch/inputs'
+amiberryRetroarchInputsDir = amiberryRoot + '/conf/retroarch/autoconfig'
 amiberryRetroarchCustom = amiberryRoot + '/conf/retroarch/retroarchcustom.cfg'
 amiberryShare = '/usr/share/amiberry'
 amiberryBin = '/usr/bin/amiberry'
