@@ -12,7 +12,7 @@ from distutils.dir_util import copy_tree
 import shutil
 
 vitaConfig = systemFiles.CONF + '/vita3k'
-vitaSaves = systemFiles.SAVES + '/psvita'
+vitaSaves = systemFiles.savesDir + '/psvita'
 vitaConfigFile = vitaConfig + '/config.yml'
 
 class Vita3kGenerator(Generator):
@@ -107,12 +107,7 @@ class Vita3kGenerator(Generator):
 
         return Command.Command(
             array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
-                "XDG_CONFIG_HOME": systemFiles.CONF,
-                "XDG_DATA_HOME": systemFiles.SAVES,
-                "XDG_CACHE_HOME": systemFiles.CACHE
-            }
+            env={"SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)}
         )
 
     # Show mouse for touchscreen actions

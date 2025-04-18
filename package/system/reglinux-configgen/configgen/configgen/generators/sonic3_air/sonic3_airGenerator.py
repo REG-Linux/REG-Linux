@@ -69,10 +69,7 @@ class Sonic3AIRGenerator(Generator):
 
         return Command.Command(
             array=commandArray,
-            env={
-                "XDG_DATA_HOME":systemFiles.CONF,
-                "SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
+            env={"SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)}
         )
 
     # Show mouse for menu / play actions

@@ -16,7 +16,7 @@ class OpenborGenerator(Generator):
         if not os.path.exists(configDir):
             os.makedirs(configDir)
 
-        savesDir = systemFiles.SAVES + '/openbor'
+        savesDir = systemFiles.savesDir + '/openbor'
         if not os.path.exists(savesDir):
             os.makedirs(savesDir)
 

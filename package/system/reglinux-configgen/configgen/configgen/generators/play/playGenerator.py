@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from os import path
 
 playConfig = systemFiles.CONF + '/play'
-playSaves = systemFiles.SAVES + '/play'
+playSaves = systemFiles.savesDir + '/play'
 playHome = systemFiles.CONF
 playConfigFile = playConfig + '/Play Data Files/config.xml'
 playInputFile = playConfig + '/Play Data Files/inputprofiles/default.xml'
@@ -135,14 +135,7 @@ class PlayGenerator(Generator):
             else:
                 commandArray.extend(["--disc", rom])
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "XDG_CONFIG_HOME":playConfig,
-                "XDG_DATA_HOME":playConfig,
-                "XDG_CACHE_HOME":systemFiles.CACHE,
-            }
-        )
+        return Command.Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if 'play_widescreen' in config and config['play_widescreen'] == "true":

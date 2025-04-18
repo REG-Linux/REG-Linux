@@ -26,7 +26,6 @@ class XemuGenerator(Generator):
         commandArray.extend(["-config_path", xemuConfig.xemuConfig])
 
         environment = {
-            "XDG_CONFIG_HOME": systemFiles.CONF,
             "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
         }
 

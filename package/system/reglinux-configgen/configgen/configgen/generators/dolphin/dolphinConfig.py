@@ -6,7 +6,7 @@ from struct import unpack
 from os     import environ
 
 dolphinConfig  = systemFiles.CONF + "/dolphin-emu"
-dolphinData    = systemFiles.SAVES + "/dolphin-emu"
+dolphinData    = systemFiles.savesDir + "/dolphin-emu"
 dolphinIni     = dolphinConfig + '/Dolphin.ini'
 dolphinGfxIni  = dolphinConfig + '/GFX.ini'
 dolphinSYSCONF = dolphinData + "/Wii/shared2/sys/SYSCONF"

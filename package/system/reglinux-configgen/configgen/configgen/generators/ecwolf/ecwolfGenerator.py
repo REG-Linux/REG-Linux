@@ -14,7 +14,7 @@ class ECWolfGenerator(Generator):
 
         ecwolfConfigDir = systemFiles.CONF + "/ecwolf"
         ecwolfConfigFile = ecwolfConfigDir + "/ecwolf.cfg"
-        ecwolfSaves = systemFiles.SAVES + "/ecwolf/" + path.basename(rom)
+        ecwolfSaves = systemFiles.savesDir + "/ecwolf/" + path.basename(rom)
         ecwolfArray = ["ecwolf"] # Binary for command array
 
         # Create config folders
@@ -93,7 +93,6 @@ class ECWolfGenerator(Generator):
         return Command.Command(
              ecwolfArray,
              env={
-                'XDG_CONFIG_HOME': systemFiles.CONF,
                 'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

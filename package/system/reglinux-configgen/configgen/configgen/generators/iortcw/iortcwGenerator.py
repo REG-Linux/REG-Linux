@@ -116,7 +116,6 @@ class IORTCWGenerator(Generator):
         return Command(
             array=commandArray,
             env={
-                "XDG_DATA_HOME": "/userdata/roms",
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

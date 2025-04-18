@@ -187,9 +187,7 @@ class FlycastGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_CONFIG_HOME":systemFiles.CONF,
                 "XDG_CONFIG_DIRS":systemFiles.CONF,
-                "XDG_DATA_HOME":flycastConfig.flycastSaves,
                 "FLYCAST_DATADIR":flycastConfig.flycastSaves,
                 "FLYCAST_BIOS_PATH":flycastConfig.flycastBios,
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
