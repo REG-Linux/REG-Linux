@@ -22,6 +22,7 @@ endmenu
 menu "Looks"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-neutral/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-canvas/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-carbon/Config.in"
 endmenu
 
 menu "Boot"
@@ -410,10 +411,6 @@ endmenu
 menu "LED"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/leds/ayn-platform/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/leds/ayaneo-platform/Config.in"
-endmenu
-
-menu "Emulationstation"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulationstation/es-theme-carbon/Config.in"
 endmenu
 
 menu "Controllers"
