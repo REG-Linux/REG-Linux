@@ -317,7 +317,6 @@ endmenu
 
 menu "Batocera.linux"
 menu "System"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-desktopapps/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-triggerhappy/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-settings/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-udev-rules/Config.in"
@@ -536,7 +535,6 @@ menu "WINE"
 endmenu
 
 menu "Looks"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/looks/adwaita-icon-theme-light/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/looks/hypseus-singe-bezels/Config.in"
 endmenu
 
