@@ -2,7 +2,7 @@
 
 import systemFiles
 
-scummvmSaves = systemFiles.SAVES + '/scummvm'
+scummvmSaves = systemFiles.savesDir + '/scummvm'
 scummvmConfigDir = systemFiles.CONF + "/scummvm"
 scummvmConfigFile = scummvmConfigDir + "/scummvm.ini"
 scummvmExtra = "/userdata/bios/scummvm/extra"

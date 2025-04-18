@@ -65,8 +65,7 @@ class CemuGenerator(Generator):
 
         return Command.Command(
             array=commandArray,
-            env={"XDG_CONFIG_HOME":systemFiles.CONF, "XDG_CACHE_HOME":systemFiles.CACHE,
-                "XDG_DATA_HOME":systemFiles.SAVES,
+            env={
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

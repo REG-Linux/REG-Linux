@@ -106,9 +106,6 @@ class ScummVMGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_CONFIG_HOME":systemFiles.CONF,
-                "XDG_DATA_HOME":systemFiles.SAVES,
-                "XDG_CACHE_HOME":systemFiles.CACHE,
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
             }
         )

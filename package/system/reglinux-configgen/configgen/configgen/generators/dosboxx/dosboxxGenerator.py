@@ -48,4 +48,4 @@ class DosBoxxGenerator(Generator):
                         "-fastbioslogo",
                         f"-conf {customConfFile}"]
 
-        return Command.Command(array=commandArray, env={"XDG_CONFIG_HOME":systemFiles.CONF})
+        return Command.Command(array=commandArray)
