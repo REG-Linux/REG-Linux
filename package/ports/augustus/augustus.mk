@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Version : Commits on Apr 17, 2025
-AUGUSTUS_VERSION = 21a87fd16ffea8ca3a4a91ff7946c599975b69cc
+AUGUSTUS_VERSION = 7431f7fe5861d0174a36e37231908dc7264431cc
 AUGUSTUS_SITE = https://github.com/Keriew/augustus.git
 AUGUSTUS_SITE_METHOD = git
 AUGUSTUS_GIT_SUBMODULES = YES
