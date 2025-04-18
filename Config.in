@@ -1,6 +1,9 @@
 menu "REG-Linux"
+menu "Emulationstation"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/reglinux-emulationstation/Config.in"
+endmenu
+
 menu "System"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-emulationstation/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-exfat/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-rescue/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-samba/Config.in"
