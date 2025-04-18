@@ -27,7 +27,7 @@ batocera.mk
 reglinux.mk
 .vscode/*
 make.log
-package/system/reglinux-emulationstation/keys.txt
+package/emulationstation/reglinux-emulationstation/keys.txt
 .directory
 *.po~
 batocera-mok.key
