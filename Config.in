@@ -299,6 +299,7 @@ menu "Utils"
 endmenu
 
 menu "Firmwares"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/alllinuxfirmwares/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-radxa-rkwifibt/Config.in"
 endmenu
 
@@ -328,7 +329,6 @@ menu "System"
 endmenu
 
 menu "Boot"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/boot/batocera-shim/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/boot/batocera-shim-signed-efi-x64/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/boot/batocera-shim-signed-efi-ia32/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/boot/batocera-shim-signed-efi-helpers-ia32/Config.in"
@@ -361,7 +361,6 @@ menu "Fonts"
 endmenu
 
 menu "Firmwares"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/alllinuxfirmwares/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/extralinuxfirmwares/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-armbian/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-orangepi/Config.in"
