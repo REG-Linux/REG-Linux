@@ -20,6 +20,7 @@ REGLINUX_EMULATIONSTATION_DEPENDENCIES += lunasvg pugixml host-gettext
 REGLINUX_EMULATIONSTATION_DEPENDENCIES += batocera-es-system
 
 REGLINUX_EMULATIONSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
+REGLINUX_EMULATIONSTATION_PATH = $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulationstation/reglinux-emulationstation
 
 # REG investigate this, looks like an old "hack" we should remove/avoid
 # Pass arch (uppercase) as compiler define
@@ -35,7 +36,6 @@ REGLINUX_EMULATIONSTATION_CONF_OPTS += -DENABLE_FILEMANAGER=OFF
 ifeq ($(BR2_ENABLE_DEBUG),y)
 REGLINUX_EMULATIONSTATION_INSTALL_STAGING = YES
 REGLINUX_EMULATIONSTATION_CONF_OPTS += -DCMAKE_BUILD_TYPE=Debug
-#REGLINUX_EMULATIONSTATION_OVERRIDE_SRCDIR = /sources/batocera-emulationstation
 endif
 
 # GLM math configuration
@@ -129,11 +129,11 @@ define REGLINUX_EMULATIONSTATION_RESOURCES
 
 	# gamecontrollerdb.txt
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/controllers/gamecontrollerdb.txt \
+	cp $(REGLINUX_EMULATIONSTATION_PATH)/controllers/gamecontrollerdb.txt \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 
 	# hooks
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/batocera-preupdate-gamelists-hook $(TARGET_DIR)/usr/bin/
+	cp $(REGLINUX_EMULATIONSTATION_PATH)/batocera-preupdate-gamelists-hook $(TARGET_DIR)/usr/bin/
 endef
 
 ### S31emulationstation
@@ -150,14 +150,14 @@ REGLINUX_EMULATIONSTATION_POST_INSTALL_TARGET_HOOKS += REGLINUX_EMULATIONSTATION
 endif
 
 define REGLINUX_EMULATIONSTATION_WAYLAND_SWAY
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/wayland/sway/04-sway.sh		$(TARGET_DIR)/etc/profile.d/04-sway.sh
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/wayland/sway/config		$(TARGET_DIR)/etc/sway/config
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/wayland/sway/launchconfig	$(TARGET_DIR)/etc/sway/launchconfig
+	$(INSTALL) -D -m 0755 $(REGLINUX_EMULATIONSTATION_PATH)/wayland/sway/04-sway.sh		$(TARGET_DIR)/etc/profile.d/04-sway.sh
+	$(INSTALL) -D -m 0755 $(REGLINUX_EMULATIONSTATION_PATH)/wayland/sway/config		$(TARGET_DIR)/etc/sway/config
+	$(INSTALL) -D -m 0755 $(REGLINUX_EMULATIONSTATION_PATH)/wayland/sway/launchconfig	$(TARGET_DIR)/etc/sway/launchconfig
 endef
 
 define REGLINUX_EMULATIONSTATION_BOOT
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/S31emulationstation $(TARGET_DIR)/etc/init.d/S31emulationstation
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-emulationstation/emulationstation-standalone $(TARGET_DIR)/usr/bin/emulationstation-standalone
+	$(INSTALL) -D -m 0755 $(REGLINUX_EMULATIONSTATION_PATH)/S31emulationstation $(TARGET_DIR)/etc/init.d/S31emulationstation
+	$(INSTALL) -D -m 0755 $(REGLINUX_EMULATIONSTATION_PATH)/emulationstation-standalone $(TARGET_DIR)/usr/bin/emulationstation-standalone
 	sed -i -e 's;%REGLINUX_EMULATIONSTATION_PREFIX%;${REGLINUX_EMULATIONSTATION_PREFIX};g' \
 		-e 's;%REGLINUX_EMULATIONSTATION_CMD%;${REGLINUX_EMULATIONSTATION_CMD};g' \
 		-e 's;%REGLINUX_EMULATIONSTATION_ARGS%;${REGLINUX_EMULATIONSTATION_ARGS};g' \
