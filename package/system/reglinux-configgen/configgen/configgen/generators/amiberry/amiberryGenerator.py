@@ -9,7 +9,6 @@ import controllersConfig
 from os import path
 from os.path import dirname
 from settings.unixSettings import UnixSettings
-from generators.libretro import libretroControllers
 from . import amiberryConfig
 
 from utils.logger import get_logger
@@ -55,8 +54,6 @@ class AmiberryGenerator(Generator):
                 romPathIndex = rom.rfind('/')
                 commandArray.append("amiberry.floppy_path="+rom[0:romPathIndex])
 
-            # controller
-            libretroControllers.writeControllersConfig(retroconfig, system, playersControllers, True)
             retroconfig.write()
 
             if not os.path.exists(amiberryConfig.amiberryRetroarchInputsDir):
