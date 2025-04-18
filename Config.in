@@ -2,6 +2,7 @@ menu "REG-Linux"
 menu "Emulationstation"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/reglinux-emulationstation/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/es-background-musics/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package//emulationstation/es-system/Config.in"
 endmenu
 
 menu "System"
@@ -412,7 +413,6 @@ menu "LED"
 endmenu
 
 menu "Emulationstation"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulationstation/batocera-es-system/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulationstation/es-theme-carbon/Config.in"
 endmenu
 
