@@ -32,7 +32,7 @@
  std::string get_controllers_path()
  {
 -	return fix_trailing(controllers_path);
-+	return std::string("/userdata/system/configs/amiberry/conf/retroarch/inputs/");
++	return std::string("/userdata/system/configs/amiberry/conf/retroarch/autoconfig/");
  }
  
  void set_controllers_path(const std::string& newpath)
@@ -69,7 +69,7 @@
  	write_string_option("config_path", config_path);
 -	write_string_option("controllers_path", controllers_path);
 -	write_string_option("retroarch_config", retroarch_file);
-+	write_string_option("controllers_path", "/userdata/system/configs/amiberry/conf/retroarch/inputs/");
++	write_string_option("controllers_path", "/userdata/system/configs/amiberry/conf/retroarch/autoconfig/");
 +	write_string_option("retroarch_config", "/userdata/system/configs/amiberry/conf/retroarch/retroarchcustom.cfg");
  	write_string_option("whdboot_path", whdboot_path);
  	write_string_option("whdload_arch_path", whdload_arch_path);

@@ -8,7 +8,7 @@ RETROARCH_JOYPAD_AUTOCONFIG_VERSION = v1.20.0
 RETROARCH_JOYPAD_AUTOCONFIG_SITE = $(call github,libretro,retroarch-joypad-autoconfig,$(RETROARCH_JOYPAD_AUTOCONFIG_VERSION))
 RETROARCH_JOYPAD_AUTOCONFIG_LICENSE = MIT
 
-RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_DIR = $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/retroarch/inputs
+RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_DIR = $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/retroarch/autoconfig
 
 define RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_TARGET_CMDS
 	# Stock config files from libretro
@@ -22,6 +22,8 @@ define RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_TARGET_CMDS
 
 	# Borrow additional ones from ROCKNIX
 	cp -r $(BR2_EXTERNAL_REGLINUX_PATH)/package/retroarch/retroarch-joypad-autoconfig/rocknix/* $(RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_DIR)/udev/
+	# Our fixed files
+	cp -r $(BR2_EXTERNAL_REGLINUX_PATH)/package/retroarch/retroarch-joypad-autoconfig/sdl2/* $(RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_DIR)/sdl2/
 endef
 
 $(eval $(generic-package))
