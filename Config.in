@@ -309,6 +309,11 @@ menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-radxa-rkwifibt/Config.in"
 endmenu
 
+menu "Fonts"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/fonts/nanum-font/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/fonts/noto-cjk-fonts/Config.in"
+endmenu
+
 menu "Cases"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/roshambo/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/deskpipro/Config.in"
@@ -359,11 +364,6 @@ endmenu
 
 menu "Toolchain"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/toolchain/toolchain-optional-linaro-aarch64/Config.in"
-endmenu
-
-menu "Fonts"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/fonts/nanum-font/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/fonts/noto-cjk-fonts/Config.in"
 endmenu
 
 menu "Firmwares"
