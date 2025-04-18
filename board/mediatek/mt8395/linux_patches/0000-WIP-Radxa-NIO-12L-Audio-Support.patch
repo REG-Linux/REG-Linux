@@ -1,0 +1,216 @@
+diff --git a/Documentation/devicetree/bindings/sound/mt8195-mt6359.yaml b/Documentation/devicetree/bindings/sound/mt8195-mt6359.yaml
+index 2af1d8ffbd8b58f1dce42b369fd699795183a7d7..356e1feee9620981aadbf91115af1d67a735bb2c 100644
+--- a/Documentation/devicetree/bindings/sound/mt8195-mt6359.yaml
++++ b/Documentation/devicetree/bindings/sound/mt8195-mt6359.yaml
+@@ -21,6 +21,7 @@ properties:
+       - mediatek,mt8195_mt6359_rt1019_rt5682
+       - mediatek,mt8195_mt6359_rt1011_rt5682
+       - mediatek,mt8195_mt6359_max98390_rt5682
++      - mediatek,mt8195_mt6359
+ 
+   model:
+     $ref: /schemas/types.yaml#/definitions/string
+@@ -44,6 +45,8 @@ properties:
+         - Right Spk
+ 
+         # Sources
++        - Headphone L
++        - Headphone R
+         - Headset Mic
+         - HPOL
+         - HPOR
+@@ -88,6 +91,7 @@ patternProperties:
+       link-name:
+         description: Indicates dai-link name and PCM stream name
+         enum:
++          - DL_SRC_BE
+           - DPTX_BE
+           - ETDM1_IN_BE
+           - ETDM2_IN_BE
+diff --git a/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts b/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
+index 7d07efb0bfe383836c368e51e6937a518b911afa..fb36d9c096bf452a2e64afa954253e0b732bfd1a 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
+@@ -153,9 +153,21 @@ bl31_secmon_mem: memory@54600000 {
+ 			no-map;
+ 		};
+ 
+-		afe_mem: memory@60000000 {
++		adsp_mem: memory@60000000 {
+ 			compatible = "shared-dma-pool";
+-			reg = <0 0x60000000 0 0x1100000>;
++			reg = <0 0x60000000 0 0xf00000>;
++			no-map;
++		};
++
++		afe_dma_mem: memory@60f00000 {
++			compatible = "shared-dma-pool";
++			reg = <0 0x60f00000 0 0x100000>;
++			no-map;
++		};
++
++		adsp_dma_mem: memory@61000000 {
++			compatible = "shared-dma-pool";
++			reg = <0 0x61000000 0 0x100000>;
+ 			no-map;
+ 		};
+ 
+@@ -166,6 +178,16 @@ apu_mem: memory@62000000 {
+ 	};
+ };
+ 
++&adsp {
++	memory-region = <&adsp_dma_mem>, <&adsp_mem>;
++	status = "okay";
++};
++
++&afe {
++	memory-region = <&afe_dma_mem>;
++	status = "okay";
++};
++
+ &cpu0 {
+ 	cpu-supply = <&mt6359_vcore_buck_reg>;
+ };
+@@ -619,6 +641,18 @@ &mt6359_vsram_others_ldo_reg {
+ &pio {
+ 	mediatek,rsel-resistance-in-si-unit;
+ 
++	audio_default_pins: audio-default-pins {
++		pins-cmd-dat {
++			pinmux = <PINMUX_GPIO70__FUNC_AUD_SYNC_MOSI>,
++				 <PINMUX_GPIO69__FUNC_AUD_CLK_MOSI>,
++				 <PINMUX_GPIO71__FUNC_AUD_DAT_MOSI0>,
++				 <PINMUX_GPIO72__FUNC_AUD_DAT_MOSI1>,
++				 <PINMUX_GPIO73__FUNC_AUD_DAT_MISO0>,
++				 <PINMUX_GPIO74__FUNC_AUD_DAT_MISO1>,
++				 <PINMUX_GPIO75__FUNC_AUD_DAT_MISO2>;
++		};
++	};
++
+ 	dsi0_backlight_pins: dsi0-backlight-pins {
+ 		pins-backlight-en {
+ 			pinmux = <PINMUX_GPIO107__FUNC_GPIO107>;
+@@ -985,6 +1019,26 @@ &scp {
+ 	status = "okay";
+ };
+ 
++&sound {
++	compatible = "mediatek,mt8195_mt6359";
++	model = "mt8395-evk";
++	pinctrl-names = "default";
++	pinctrl-0 = <&audio_default_pins>;
++	audio-routing =
++		"Headphone", "Headphone L",
++		"Headphone", "Headphone R";
++	mediatek,adsp = <&adsp>;
++	status = "okay";
++
++	headphone-dai-link {
++		link-name = "DL_SRC_BE";
++
++		codec {
++			sound-dai = <&pmic 0>;
++		};
++	};
++};
++
+ &spi1 {
+ 	/* Exposed at 40 pin connector */
+ 	pinctrl-0 = <&spi1_pins>;
+diff --git a/sound/soc/mediatek/mt8195/mt8195-mt6359.c b/sound/soc/mediatek/mt8195/mt8195-mt6359.c
+index 2b9cb3248795b817a68cd998b90d52c1dd6c66a0..8f5e4cd47701b08fcd5edc273e02531bb7dd02bc 100644
+--- a/sound/soc/mediatek/mt8195/mt8195-mt6359.c
++++ b/sound/soc/mediatek/mt8195/mt8195-mt6359.c
+@@ -92,10 +92,6 @@ static const struct snd_soc_dapm_widget mt8195_mt6359_widgets[] = {
+ };
+ 
+ static const struct snd_soc_dapm_route mt8195_mt6359_routes[] = {
+-	/* headset */
+-	{ "Headphone", NULL, "HPOL" },
+-	{ "Headphone", NULL, "HPOR" },
+-	{ "IN1P", NULL, "Headset Mic" },
+ 	/* SOF Uplink */
+ 	{SOF_DMA_UL4, NULL, "O034"},
+ 	{SOF_DMA_UL4, NULL, "O035"},
+@@ -131,6 +127,13 @@ static const struct snd_kcontrol_new mt8195_speaker_controls[] = {
+ 	SOC_DAPM_PIN_SWITCH("Ext Spk"),
+ };
+ 
++static const struct snd_soc_dapm_route mt8195_rt5682_routes[] = {
++	/* headset */
++	{ "Headphone", NULL, "HPOL" },
++	{ "Headphone", NULL, "HPOR" },
++	{ "IN1P", NULL, "Headset Mic" },
++};
++
+ static const struct snd_soc_dapm_route mt8195_rt1011_routes[] = {
+ 	{ "Left Spk", NULL, "Left SPO" },
+ 	{ "Right Spk", NULL, "Right SPO" },
+@@ -447,6 +450,7 @@ static int mt8195_rt5682_init(struct snd_soc_pcm_runtime *rtd)
+ 		snd_soc_rtdcom_lookup(rtd, AFE_PCM_NAME);
+ 	struct mtk_base_afe *afe = snd_soc_component_get_drvdata(cmpnt_afe);
+ 	struct mt8195_afe_private *afe_priv = afe->platform_priv;
++	struct snd_soc_card *card = rtd->card;
+ 	int ret;
+ 
+ 	priv->i2so1_mclk = afe_priv->clk[MT8195_CLK_TOP_APLL12_DIV2];
+@@ -473,7 +477,12 @@ static int mt8195_rt5682_init(struct snd_soc_pcm_runtime *rtd)
+ 		return ret;
+ 	}
+ 
+-	return 0;
++	ret = snd_soc_dapm_add_routes(&card->dapm, mt8195_rt5682_routes,
++				      ARRAY_SIZE(mt8195_rt5682_routes));
++	if (ret)
++		dev_err(rtd->dev, "unable to add dapm routes, ret %d\n", ret);
++
++	return ret;
+ };
+ 
+ static int mt8195_rt1011_etdm_hw_params(struct snd_pcm_substream *substream,
+@@ -822,12 +831,12 @@ SND_SOC_DAILINK_DEFS(ETDM1_IN_BE,
+ 
+ SND_SOC_DAILINK_DEFS(ETDM2_IN_BE,
+ 		     DAILINK_COMP_ARRAY(COMP_CPU("ETDM2_IN")),
+-		     DAILINK_COMP_ARRAY(COMP_EMPTY()),
++		     DAILINK_COMP_ARRAY(COMP_DUMMY()),
+ 		     DAILINK_COMP_ARRAY(COMP_EMPTY()));
+ 
+ SND_SOC_DAILINK_DEFS(ETDM1_OUT_BE,
+ 		     DAILINK_COMP_ARRAY(COMP_CPU("ETDM1_OUT")),
+-		     DAILINK_COMP_ARRAY(COMP_EMPTY()),
++		     DAILINK_COMP_ARRAY(COMP_DUMMY()),
+ 		     DAILINK_COMP_ARRAY(COMP_EMPTY()));
+ 
+ SND_SOC_DAILINK_DEFS(ETDM2_OUT_BE,
+@@ -1515,6 +1524,18 @@ static const struct mtk_soundcard_pdata mt8195_mt6359_max98390_rt5682_card = {
+ 	.soc_probe = mt8195_mt6359_soc_card_probe
+ };
+ 
++static const struct mtk_soundcard_pdata mt8195_mt6359_card = {
++	.card_name = "mt8195_mt6359",
++	.card_data = &(struct mtk_platform_card_data) {
++		.card = &mt8195_mt6359_soc_card,
++		.num_jacks = MT8195_JACK_MAX,
++		.pcm_constraints = mt8195_pcm_constraints,
++		.num_pcm_constraints = ARRAY_SIZE(mt8195_pcm_constraints),
++	},
++	.sof_priv = &mt8195_sof_priv,
++	.soc_probe = mt8195_mt6359_soc_card_probe
++};
++
+ static const struct of_device_id mt8195_mt6359_dt_match[] = {
+ 	{
+ 		.compatible = "mediatek,mt8195_mt6359_rt1019_rt5682",
+@@ -1528,6 +1549,10 @@ static const struct of_device_id mt8195_mt6359_dt_match[] = {
+ 		.compatible = "mediatek,mt8195_mt6359_max98390_rt5682",
+ 		.data = &mt8195_mt6359_max98390_rt5682_card,
+ 	},
++	{
++		.compatible = "mediatek,mt8195_mt6359",
++		.data = &mt8195_mt6359_card,
++	},
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, mt8195_mt6359_dt_match);

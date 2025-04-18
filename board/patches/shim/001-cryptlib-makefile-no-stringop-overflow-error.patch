@@ -1,0 +1,12 @@
+--- a/Cryptlib/OpenSSL/Makefile	2025-04-18 13:23:01.899729984 +0200
++++ b/Cryptlib/OpenSSL/Makefile	2025-04-18 13:23:23.819267990 +0200
+@@ -24,7 +24,8 @@
+ 		   -Wno-implicit-fallthrough \
+ 		   $(if $(findstring gcc,$(CC)),-Wno-old-style-declaration) \
+ 		   -Wno-unused-but-set-variable \
+-		   -Wno-unused-parameter
++		   -Wno-unused-parameter \
++		   -Wno-stringop-overflow
+ 
+ CFLAGS		= $(FEATUREFLAGS) \
+ 		  $(OPTIMIZATIONS) \
