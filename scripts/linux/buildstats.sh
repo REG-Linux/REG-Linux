@@ -51,7 +51,7 @@ ls "${BROUTPUTDIR}/images/batocera/images/${BOARD}/"*.gz |
 echo "</ul>"
 
 echo "<h2>Emulators details</h2>"
-echo "<a href=\"batocera_systemsReport.html\">Emulator details</a>"
+echo "<a href=\"systemsReport.html\">Emulator details</a>"
 
 echo "<h2>Translations</h2>"
 echo "<table>"

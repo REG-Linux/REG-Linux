@@ -1,6 +1,11 @@
 menu "REG-Linux"
+menu "Emulationstation"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/reglinux-emulationstation/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/es-background-musics/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package//emulationstation/es-system/Config.in"
+endmenu
+
 menu "System"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-emulationstation/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-exfat/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-rescue/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-samba/Config.in"
@@ -17,6 +22,7 @@ endmenu
 menu "Looks"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-neutral/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-canvas/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/themes/es-theme-carbon/Config.in"
 endmenu
 
 menu "Boot"
@@ -303,6 +309,11 @@ menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-radxa-rkwifibt/Config.in"
 endmenu
 
+menu "Fonts"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/fonts/nanum-font/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/fonts/noto-cjk-fonts/Config.in"
+endmenu
+
 menu "Cases"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/roshambo/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/deskpipro/Config.in"
@@ -355,11 +366,6 @@ menu "Toolchain"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/toolchain/toolchain-optional-linaro-aarch64/Config.in"
 endmenu
 
-menu "Fonts"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/fonts/nanum-font/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/fonts/noto-cjk-fonts/Config.in"
-endmenu
-
 menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/extralinuxfirmwares/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-armbian/Config.in"
@@ -405,12 +411,6 @@ endmenu
 menu "LED"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/leds/ayn-platform/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/leds/ayaneo-platform/Config.in"
-endmenu
-
-menu "Emulationstation"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulationstation/batocera-es-system/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulationstation/es-theme-carbon/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulationstation/es-background-musics/Config.in"
 endmenu
 
 menu "Controllers"

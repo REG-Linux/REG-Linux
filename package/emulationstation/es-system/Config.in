@@ -1,0 +1,5 @@
+config BR2_PACKAGE_ES_SYSTEM
+        bool "es-system"
+	select BR2_PACKAGE_REGLINUX_CONFIGGEN
+        help
+          Generates the es_system.cfg file and the roms folder
