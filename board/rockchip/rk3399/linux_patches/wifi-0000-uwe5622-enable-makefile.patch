@@ -1,0 +1,7 @@
+--- a/drivers/net/wireless/Makefile	2025-04-12 21:17:17.518672822 +0200
++++ b/drivers/net/wireless/Makefile	2025-04-12 21:17:41.680223559 +0200
+@@ -24,3 +24,4 @@
+ obj-$(CONFIG_WLAN_VENDOR_ZYDAS) += zydas/
+ 
+ obj-$(CONFIG_WLAN) += virtual/
++obj-$(CONFIG_SPARD_WLAN_SUPPORT) += uwe5622/
