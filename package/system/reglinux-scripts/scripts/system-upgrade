@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Get latest release from GitHub api
-get_latest_release() {
-  curl --silent "https://api.github.com/repos/$1/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
-}
-
 # Create upgrade messages for the badge (TERMINAL=0) or plain text output
 do_upgmsg() {
     if [ "$TERMINAL" -eq 0 ]; then
@@ -43,14 +38,19 @@ do_download() {
     mkdir -p "$UPGRADEFOLDER"
 
     echo "url: ${url}"
-    size=$(curl -A "system-upgrade.header" -sfIL "${url}" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I) # take the last one in case of redirection
-    size=$((size / 1024 / 1024))
-    [ "$?" -eq 0 ] || quit_script 1
-    echo "need to download ${size}mb"
+    if size=$(curl -A "system-upgrade.header" -sfIL "${url}" | grep -i "Content-Length: " | tail -1 | sed -e s+'^Content-Length: \([0-9]*\).*$'+'\1'+I); then
+        size=$((size / 1024 / 1024))
+        echo "need to download ${size}mb"
+    else
+        echo "Could not get download size"
+        quit_script 1
+    fi
 
     # Check free space on "${SHAREMOUNT}"
-    freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}')
-    [ "$?" -eq 0 ] || quit_script 1
+    if ! freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}'); then
+        echo "Could not get free space in SHARE partition"
+        quit_script 1
+    fi
     if [ "${size}" -ge "${freespace}" ]; then
         # -ge instead of -gt to give a tiny margin for error in space calculation
         echo "Not enough space on \"${SHAREMOUNT}\" to perform the update"
@@ -77,11 +77,9 @@ do_download() {
 
 quit_script() {
     # Exit code in $1
-
     # exit from ES-badge without additional messages
     [ "$TERMINAL" -eq 0 ] && [ -n "${GETPERPID}" ] && kill -9 "${GETPERPID}"
-
-    exit $1
+    exit "$1"
 }
 
 # started from Terminal/SSH (TERMINAL=1) or from ES (TERMINAL=0)
@@ -142,9 +140,8 @@ case $1 in
     ;;
     *)
         latestrelease=$(system-config canupdate)    # expected string similar to "24.08-beta-1" or just "24.08.0" for stable releases
-
-        if [ -n "$latestrelease" ]        # New releases are available
-        then
+        if [ -n "$latestrelease" ]; then
+            # New releases are available
             url="https://github.com/REG-Linux/REG-Linux/releases/download/${latestrelease}/boot-${board}.tar.zst"
             do_download
         else
@@ -174,23 +171,23 @@ if [ "$board" = "$newboard" ]; then
 
     if [ "$1" = "manual" ] && [ "$SHAREMOUNT" != "/userdata" ]; then
         # Check free space on "${SHAREMOUNT}"
-        freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}')
-        [ $? -eq 0 ] || quit_script 1
+        if ! freespace=$(df -m "${SHAREMOUNT}" | tail -1 | awk '{print $4}'); then
+            echo "Could not get free space in SHARE partition"
+            quit_script 1
+        fi
         if [ "${size}" -ge "${freespace}" ]; then
             # -ge instead of -gt to give a tiny margin for error in space calculation
             do_upgmsg "Not enough space on \"${SHAREMOUNT}\" to perform the update" 5
             quit_script 1
         fi
-        if ! mv "/userdata/system/upgrade/boot-${board}.tar.zst" "${UPGRADEFOLDER}"/
-        then
+        if ! mv "/userdata/system/upgrade/boot-${board}.tar.zst" "${UPGRADEFOLDER}/"; then
             do_upgmsg "Error moving \"boot-${board}.tar.zst\" to \"${UPGRADEFOLDER}/\"!" 5
             quit_script 1
         fi
     fi
 
     # remount /boot in rw
-    if ! mount -o remount,rw /boot
-    then
+    if ! mount -o remount,rw /boot; then
         do_upgmsg "Error remounting /boot in rw mode!" 5
         quit_script 1
     fi
@@ -201,34 +198,43 @@ if [ "$board" = "$newboard" ]; then
 
     # In case of tar error we don't know if is tar corrupted or non existing file to extract (assuming an upgrade could not include all files)
     # First get the list of available files of those we want to extract (also is kind of a test for corrupted tar file)
-    # We test for boot/reglinux.update but we don't want it extracted now
     # tar --no-same-owner is needed because fat partition does not support owner attributes
-    tar --zstd -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" | grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update|boot/reglinux.update' > /tmp/upgrade.list
-    if [ $? -eq 0 ]
-    then
-        if tar -C /tmp/ --no-same-owner --zstd -xf "${SHAREMOUNT}/system/upgrade/boot-${board}.tar.zst" runbeforeupgrade.sh &>/dev/null
-        then
-            do_upgmsg "Running /tmp/runbeforeupgrade.sh"
-            . /tmp/runbeforeupgrade.sh
+    if tar --zstd --exclude='system-boot.conf' --exclude='config.txt' -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" > /tmp/upgrade.list && sed -i '\%/$%d' /tmp/upgrade.list && grep -qh '^' /tmp/upgrade.list; then
+        # /tmp/upgrade.list has one file per line and we deleted lines with only folders
+        if grep -q -m 1 'runbeforeupgrade.sh' /tmp/upgrade.list; then
+            if tar -C /tmp/ --no-same-owner --zstd -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" runbeforeupgrade.sh &>/dev/null; then
+                do_upgmsg "Running /tmp/runbeforeupgrade.sh"
+                . /tmp/runbeforeupgrade.sh
+                sed -i '/runbeforeupgrade.sh/d' /tmp/upgrade.list
+            else
+                do_upgmsg "ERROR EXTRACTING UPDATE FILES!" 15
+                mount -o remount,ro /boot
+                quit_script 1
+            fi
         fi
-        if tar --zstd -C /boot/ --no-same-owner --exclude='boot/reglinux.update' -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" --verbatim-files-from -T /tmp/upgrade.list
-        then
-            do_upgmsg "Rebooting to finish upgrade." 2
-            touch /boot/REG_UPDATE
+
+        rescuelist=''
+        while read -r line ; do
+            rescuelist="${rescuelist} ${line}"
+            sed -i "\%${line}%d" /tmp/upgrade.list
+            [ "${line}" = "boot/rescue.update" ] && rm -f /boot/boot/rescue        # Free some space before extracting rescue.update
+        done < <(grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update' /tmp/upgrade.list)
+
+        if tar --zstd -C /boot/ --no-same-owner -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" ${rescuelist} && mv /tmp/upgrade.list /boot/upgrade.list && touch /boot/REG_UPDATE; then
+            do_upgmsg "Reboot to apply update..." 3
         else
             do_upgmsg "ERROR EXTRACTING UPDATE FILES!" 15
             mount -o remount,ro /boot
             quit_script 1
         fi
     else
-        do_upgmsg "ERROR EXTRACTING UPDATE FILES!" 15
+        do_upgmsg "ERROR GETTING UPDATE FILES LIST!" 15
         mount -o remount,ro /boot
         quit_script 1
     fi
 
     sync
     mount -o remount,ro /boot
-    do_upgmsg "Reboot to apply update..."
 else
     do_upgmsg "WARNING: update is for ${newboard}, but should be for ${board}!" 5
 fi
