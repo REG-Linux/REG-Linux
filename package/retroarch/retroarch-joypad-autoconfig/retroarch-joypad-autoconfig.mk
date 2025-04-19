@@ -22,8 +22,6 @@ define RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_TARGET_CMDS
 
 	# Borrow additional ones from ROCKNIX
 	cp -r $(BR2_EXTERNAL_REGLINUX_PATH)/package/retroarch/retroarch-joypad-autoconfig/rocknix/* $(RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_DIR)/udev/
-	# Our fixed files
-	cp -r $(BR2_EXTERNAL_REGLINUX_PATH)/package/retroarch/retroarch-joypad-autoconfig/sdl2/* $(RETROARCH_JOYPAD_AUTOCONFIG_INSTALL_DIR)/sdl2/
 endef
 
 $(eval $(generic-package))
