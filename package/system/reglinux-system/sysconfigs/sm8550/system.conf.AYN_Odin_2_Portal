@@ -1,8 +1,5 @@
 # odin2 portal default values
 
-# splash rotation
-display.rotate.DSI-1=3
-
 # default wayland environment (rotate)
 system.es.environment=wayland
 
@@ -11,9 +8,9 @@ system.suspendmode=suspend
 
 # default audio volume
 audio.volume=40
- 
+
 # default refresh rate
-es.resolution=1080x1920.60000
+es.resolution=1080x1920@60
 
 # default brightness
 display.brightness=40
