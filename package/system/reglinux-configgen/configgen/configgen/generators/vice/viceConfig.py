@@ -5,7 +5,7 @@ import configparser
 import systemFiles
 
 viceConfig = systemFiles.CONF + "/vice"
-viceBin = "/usr/bin/vice"
+viceBin = "/usr/bin/"
 
 def setViceConfig(viceConfigFile, system, metadata, guns, rom):
 
