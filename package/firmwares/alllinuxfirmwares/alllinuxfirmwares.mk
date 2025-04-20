@@ -8,7 +8,7 @@ ALLLINUXFIRMWARES_VERSION = 20250311
 ALLLINUXFIRMWARES_SOURCE = linux-firmware-$(ALLLINUXFIRMWARES_VERSION).tar.gz
 ALLLINUXFIRMWARES_SITE = https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot
 
-# exclude some dirs not required on batocera
+# exclude some dirs not required on REG
 ALLLINUXFIRMWARES_REMOVE_FILES = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(@D)/dpaa2 $(@D)/bnx2x $(@D)/cxgb4 $(@D)/mrvl/prestera
 
 ifneq ($(BR2_x86_64),y)
@@ -36,7 +36,7 @@ endif
 define ALLLINUXFIRMWARES_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/lib/firmware
 
-    # exclude some dirs not required on batocera
+    # exclude some dirs not required on REG
     rm -rf $(ALLLINUXFIRMWARES_REMOVE_FILES)
 
     # -n is mandatory while some other packages provides firmwares too
@@ -64,12 +64,12 @@ define ALLLINUXFIRMWARES_LINK_QCA_WIFI_BT
     # wifi
     mkdir -p $(TARGET_DIR)/lib/firmware/ath11k/WCN6855/hw2.1
     mkdir -p $(TARGET_DIR)/lib/firmware/ath11k/QCA2066
-    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/alllinuxfirmwares/hw2.1/* \
+    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/firmwares/alllinuxfirmwares/hw2.1/* \
 	    $(TARGET_DIR)/lib/firmware/ath11k/WCN6855/hw2.1
-    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/alllinuxfirmwares/QCA206X/* \
+    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/firmwares/alllinuxfirmwares/QCA206X/* \
 	    $(TARGET_DIR)/lib/firmware/ath11k/QCA2066
     # bluetooth
-    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/alllinuxfirmwares/qca/* \
+    cp -rf $(BR2_EXTERNAL_REGLINUX_PATH)/package/firmwares/alllinuxfirmwares/qca/* \
 	    $(TARGET_DIR)/lib/firmware/qca
 endef
 
