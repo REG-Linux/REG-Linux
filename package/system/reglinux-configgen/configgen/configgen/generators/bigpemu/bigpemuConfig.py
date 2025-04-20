@@ -3,4 +3,5 @@
 import systemFiles
 
 bigpemuConfig = systemFiles.HOME + "/.bigpemu_userdata/BigPEmuConfig.bigpcfg"
-bigpemuBin = ["/usr/bin/box64", "/usr/bigpemu/bigpemu"]
+bigpemuBox64 = "/usr/bin/box64"
+bigpemuBin = "/usr/bigpemu/bigpemu"
