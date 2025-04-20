@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os.path
 import zipfile
-import systemFiles
 import controllersConfig
 from . import viceConfig
 from . import viceControllers

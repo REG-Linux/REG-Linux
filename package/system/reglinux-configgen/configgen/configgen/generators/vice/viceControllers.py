@@ -51,7 +51,7 @@ def generateControllerConfig(system, viceConfigFile, playersControllers):
         os.makedirs(os.path.dirname(viceFile))
 
     listVice = [];
-    listVice.append("# Batocera configured controllers")
+    listVice.append("# REG-Linux configured controllers")
     listVice.append("")
     listVice.append("!CLEAR")
     nplayer = 1
