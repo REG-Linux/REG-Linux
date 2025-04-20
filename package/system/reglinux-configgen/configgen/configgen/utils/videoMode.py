@@ -3,7 +3,7 @@ import os
 import time
 import subprocess
 import csv
-import locale
+import sys
 from typing import Optional, List, Dict
 
 from .logger import get_logger
@@ -105,31 +105,36 @@ def changeMouse(mode: bool) -> None:
     cmd = "system-mouse show" if mode else "system-mouse hide"
     subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
 
-def getGLVersion() -> float:
+def getGLVersion():
     try:
-        if not os.path.exists("/usr/bin/glxinfo"):
-            return 0.0
-        glxVerCmd = 'glxinfo | grep "OpenGL version"'
-        encoding = locale.getpreferredencoding(False)
-        glVerOutput = subprocess.check_output(glxVerCmd, shell=True).decode(encoding)
-        glVerString = glVerOutput.split()
-        glVerTemp = glVerString[3].split(".")[:2]
-        return float('.'.join(glVerTemp))
-    except Exception as e:
-        eslog.error(f"Error fetching GL version: {e}")
-        return 0.0
+        # Use eglinfo since we are KMS/DRM
+        if os.path.exists("/usr/bin/eglinfo") == False:
+            return 0
 
-def getGLVendor() -> str:
+        glxVerCmd = 'eglinfo | grep "OpenGL version"'
+        glVerOutput = subprocess.check_output(glxVerCmd, shell=True).decode(sys.stdout.encoding)
+        glVerString = glVerOutput.split()
+        glVerTemp = glVerString[3].split(".")
+        if len(glVerTemp) > 2:
+            del glVerTemp[2:]
+        glVersion = float('.'.join(glVerTemp))
+        return glVersion
+    except:
+        return 0
+
+
+def getGLVendor():
     try:
-        if not os.path.exists("/usr/bin/glxinfo"):
+        # Use eglinfo since we are KMS/DRM
+        if os.path.exists("/usr/bin/eglinfo") == False:
             return "unknown"
-        glxVendCmd = 'glxinfo | grep "OpenGL vendor string"'
-        encoding = locale.getpreferredencoding(False)
-        glVendOutput = subprocess.check_output(glxVendCmd, shell=True).decode(encoding)
+
+        glxVendCmd = 'eglinfo | grep "OpenGL vendor string"'
+        glVendOutput = subprocess.check_output(glxVendCmd, shell=True).decode(sys.stdout.encoding)
         glVendString = glVendOutput.split()
-        return glVendString[3].casefold()
-    except Exception as e:
-        eslog.error(f"Error fetching GL vendor: {e}")
+        glVendor = glVendString[3].casefold()
+        return glVendor
+    except:
         return "unknown"
 
 def getAltDecoration(systemName: str, rom: str, emulator: str) -> str:
