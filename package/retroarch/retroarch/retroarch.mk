@@ -7,16 +7,28 @@
 RETROARCH_VERSION = v1.20.0
 RETROARCH_SITE = $(call github,libretro,RetroArch,$(RETROARCH_VERSION))
 RETROARCH_LICENSE = GPLv3+
-RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets flac noto-cjk-fonts gamemode
-RETROARCH_DEPENDENCIES += libusb hidapi
+RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets noto-cjk-fonts
+RETROARCH_DEPENDENCIES += libusb hidapi gamemode
 # install in staging for debugging (gdb)
 RETROARCH_INSTALL_STAGING = YES
 
-RETROARCH_CONF_OPTS = --disable-oss --enable-zlib --disable-qt --enable-threads \
-		      --enable-ozone --enable-xmb --disable-discord --enable-flac \
-		      --enable-lua --enable-networking --enable-translate --enable-rgui \
-		      --disable-cdrom --disable-videocore --disable-x11 --enable-xdelta \
-		      --enable-hid --enable-libusb
+RETROARCH_CONF_OPTS =   --disable-oss 		\
+			--disable-qt  		\
+			--disable-discord	\
+			--disable-cdrom		\
+			--disable-videocore	\
+			--disable-x11		\
+			--enable-threads 	\
+		      	--enable-lua 		\
+			--enable-networking 	\
+			--enable-translate 	\
+			--enable-hid 		\
+			--enable-libusb 	\
+			--enable-xdelta 	\
+			--enable-lua 		\
+			--enable-networking	\
+			--enable-translate	\
+			--enable-rgui
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
     RETROARCH_CONF_OPTS += --enable-debug
@@ -27,6 +39,13 @@ ifeq ($(BR2_PACKAGE_FFMPEG),y)
     RETROARCH_DEPENDENCIES += ffmpeg
 else
     RETROARCH_CONF_OPTS += --disable-ffmpeg
+endif
+
+ifeq ($(BR2_PACKAGE_FLAC),y)
+    RETROARCH_CONF_OPTS += --enable-flac
+    RETROARCH_DEPENDENCIES += flac
+else
+    RETROARCH_CONF_OPTS += --disable-flac
 endif
 
 ifeq ($(BR2_PACKAGE_SDL2),y)
@@ -76,19 +95,27 @@ else
     RETROARCH_CONF_OPTS += --disable-pipewire
 endif
 
-# REG: favor desktop GL, if not available, fallbacks to GLES3 then GLES2
+# REG: OpenGL (desktop) support
+# Enable Ozone menu for desktop GL
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
   RETROARCH_CONF_OPTS += --enable-opengl
+  RETROARCH_CONF_OPTS += --enable-ozone
   RETROARCH_DEPENDENCIES += libgl
-else ifeq ($(BR2_PACKAGE_HAS_GLES3),y)
+endif
+
+# REG: OpenGL ES support
+# Enable Ozone menu only for GLES 3.0+ (crash on lima)
+ifeq ($(BR2_PACKAGE_HAS_GLES3),y)
     RETROARCH_CONF_OPTS += --enable-opengles3 --enable-opengles --enable-opengles3_1
+    RETROARCH_CONF_OPTS += --enable-ozone --disable-xmb
     RETROARCH_DEPENDENCIES += libgles
-# Panfrost does NOT support OpenGL ES 3.2
+# Panfrost and v3d do NOT support OpenGL ES 3.2 (so only Qualcomm and Asahi targets so far)
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_SM8550)$(BR2_PACKAGE_SYSTEM_TARGET_ASAHI)$(BR2_x86_64),y)
     RETROARCH_CONF_OPTS += --enable-opengles3_2
 endif
 else ifeq ($(BR2_PACKAGE_HAS_GLES2),y)
     RETROARCH_CONF_OPTS += --enable-opengles
+    RETROARCH_CONF_OPTS += --disable-ozone --enable-xmb
     RETROARCH_DEPENDENCIES += libgles
 endif
 
@@ -121,17 +148,15 @@ else
     RETROARCH_CONF_OPTS += --disable-freetype
 endif
 
-#REG: deprecate rga
-#ifeq ($(BR2_PACKAGE_ROCKCHIP_RGA),y)
-#    RETROARCH_DEPENDENCIES += rockchip-rga
-#endif
-
 #REG: enforce EGL_NO_X11 since we do not build RA with X11 support
 #ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER),)
 #	ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_EGL),y)
           RETROARCH_TARGET_CFLAGS += -DEGL_NO_X11
 #	endif
 #endif
+ifeq ($(BR2_riscv),y)
+	RETROARCH_TARGET_CFLAGS += -DMESA_EGL_NO_X11_HEADERS=1
+endif
 
 ifeq ($(BR2_PACKAGE_WAYLAND)$(BR2_PACKAGE_SWAY),yy)
     RETROARCH_CONF_OPTS += --enable-wayland
@@ -142,10 +167,6 @@ endif
 ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
     RETROARCH_CONF_OPTS += --enable-vulkan
     RETROARCH_DEPENDENCIES += vulkan-headers vulkan-loader slang-shaders
-endif
-
-ifeq ($(BR2_riscv),y)
-	RETROARCH_TARGET_CFLAGS += -DMESA_EGL_NO_X11_HEADERS=1
 endif
 
 define RETROARCH_CONFIGURE_CMDS
@@ -193,13 +214,13 @@ ifeq ($(BR2_arm),y)
         LIBRETRO_PLATFORM += armv7
     else ifeq ($(BR2_cortex_a9),y)
         LIBRETRO_PLATFORM += armv7
-	else ifeq ($(BR2_cortex_a15),y)
+    else ifeq ($(BR2_cortex_a15),y)
         LIBRETRO_PLATFORM += armv7
-	else ifeq ($(BR2_cortex_a17),y)
+    else ifeq ($(BR2_cortex_a17),y)
         LIBRETRO_PLATFORM += armv7
     else ifeq ($(BR2_cortex_a15_a7),y)
         LIBRETRO_PLATFORM += armv7
-	endif
+    endif
 endif
 
 ifeq ($(BR2_aarch64),y)
