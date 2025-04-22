@@ -11,14 +11,9 @@ pcenginecd:
 nds:
   emulator: drastic
   core:     drastic
-model3:
-  options:
-    videomode: max-1920x1080
 quake3:
   emulator: ioquake3
   core:     ioquake3
-  options:
-    videomode: max-1920x1080
 jaguar:
   emulator: bigpemu
   core:     bigpemu

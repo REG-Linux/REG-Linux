@@ -12,12 +12,6 @@ pcenginecd:
 saturn:
   emulator: libretro
   core:     beetle-saturn
-n64:
-  options:
-    videomode: max-1920x1080
-n64dd:
-  options:
-    videomode: max-1920x1080
 sgb:
   emulator: libretro
   core:     mesen-s
@@ -128,12 +122,6 @@ gp32:
 laser310:
   emulator: mame
   core:     mame
-gaelco:
-  options:
-    videomode: max-640x480
-hikaru:
-  options:
-    videomode: max-640x480
 jaguar:
   emulator: bigpemu
   core:     bigpemu
