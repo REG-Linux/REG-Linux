@@ -1,0 +1,40 @@
+diff --git a/package/dbus-broker/dbus-broker.mk b/package/dbus-broker/dbus-broker.mk
+index 0bbdd304af..070ec0e2b5 100644
+--- a/package/dbus-broker/dbus-broker.mk
++++ b/package/dbus-broker/dbus-broker.mk
+@@ -24,8 +24,9 @@ DBUS_BROKER_LICENSE_FILES = \
+ 	subprojects/libcutf8-1/AUTHORS subprojects/libcutf8-1/README.md
+ 
+ DBUS_BROKER_CPE_ID_VALID = YES
+-DBUS_BROKER_DEPENDENCIES = expat systemd
+-DBUS_BROKER_CONF_OPTS = -Dlauncher=true
++DBUS_BROKER_DEPENDENCIES = expat
++# REG no systemd
++DBUS_BROKER_CONF_OPTS = -Dlauncher=false
+ 
+ ifeq ($(BR2_PACKAGE_AUDIT),y)
+ # libcap-ng selected from Config.in
+@@ -47,7 +48,7 @@ endif
+ # username and groupname must be dbus:dbus, and they both need to have
+ # the same home.
+ define DBUS_BROKER_USERS
+-	dbus -1 dbus -1 * /run/dbus - dbus DBus messagebus user
++	dbus -1 dbus -1 * /var/run/dbus - dbus DBus messagebus user
+ endef
+ 
+ # We overwrite some files from dbus, so add a dependency.
+@@ -60,10 +61,10 @@ define DBUS_BROKER_INSTALL_INIT_SYSTEMD
+ 		$(TARGET_DIR)/usr/share/dbus-1/session.conf
+ 	$(INSTALL) -D -m 0644 $(DBUS_BROKER_PKGDIR)/system.conf \
+ 		$(TARGET_DIR)/usr/share/dbus-1/system.conf
+-	$(INSTALL) -D -m 0644 $(DBUS_BROKER_PKGDIR)/dbus.socket \
+-		$(TARGET_DIR)/usr/lib/systemd/system/dbus.socket
+-	$(HOST_MAKE_ENV) ln -sf ../dbus.socket \
+-		$(TARGET_DIR)/usr/lib/systemd/system/sockets.target.wants/dbus.socket
++# REG	$(INSTALL) -D -m 0644 $(DBUS_BROKER_PKGDIR)/dbus.socket \
++# REG		$(TARGET_DIR)/usr/lib/systemd/system/dbus.socket
++# REG	$(HOST_MAKE_ENV) ln -sf ../dbus.socket \
++# REG		$(TARGET_DIR)/usr/lib/systemd/system/sockets.target.wants/dbus.socket
+ endef
+ 
+ $(eval $(meson-package))

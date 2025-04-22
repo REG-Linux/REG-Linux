@@ -38,6 +38,10 @@ a3dd0ea9d489564444fc1a999ebf907e  package/busybox/busybox.config
 d3204aa4d5249b3b4ac99dcb53cbae74  package/cmake/cmake.mk
 f92d556c7e8438348f8e8d86c4c604eb  package/connman/Config.in
 45fe588a9098e541020cdeca87db83ef  package/cpuinfo/Config.in
+0aca90f49b6d2a06cc7f347d434b3745  package/dbus-broker/Config.in
+e2ea7480adb24a94f8ab05fd6110697e  package/dbus-broker/dbus-broker.mk
+62f04719035a96fab36b5d7a7b00446b  package/dbus-broker/dbus.socket
+be9ae1e921bac6ef8e7be5d99a56690f  package/dbus-broker/system.conf
 c445390118f5d058dd372a8b2beb25a8  package/dropbear/S50dropbear
 86c04ec68a28da8040820ff495bda9dd  package/espeak/espeak.mk
 c6c7f5c1c993565d557fd227edb4bfc7  package/flac/flac.mk

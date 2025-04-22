@@ -3,8 +3,8 @@
 # vita3k
 #
 ################################################################################
-# Version: Commits on Apr 20, 2025
-VITA3K_VERSION = 9226cb52af85b8012b31adeb8b9fc27a61775a0e
+# Version: Commits on Apr 21, 2025
+VITA3K_VERSION = 0b4a4e58d18436f9f9631e7e50af101b3187e3c6
 VITA3K_SITE = https://github.com/vita3k/vita3k
 VITA3K_SITE_METHOD=git
 VITA3K_GIT_SUBMODULES=YES
@@ -32,11 +32,6 @@ endif
 #    cd $(@D)/external && rm -Rf nativefiledialog-cmake && git clone https://github.com/Vita3K/nativefiledialog-cmake
 #endef
 
-#define VITA3K_FFMPEG_GIT
-#    mkdir $(@D)/.git/
-#    cp -ruv $(DL_DIR)/$(VITA3K_DL_SUBDIR)/git/.git/* $(@D)/.git/
-#endef
-
 define VITA3K_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/bin/vita3k/
 	$(TARGET_STRIP) $(@D)/buildroot-build/bin/Vita3K
@@ -50,7 +45,6 @@ define VITA3K_INSTALL_EVMAPY
 endef
 
 #VITA3K_POST_EXTRACT_HOOKS = VITA3K_GET_SUBMODULE
-#VITA3K_POST_EXTRACT_HOOKS += VITA3K_FFMPEG_GIT
 VITA3K_POST_INSTALL_TARGET_HOOKS = VITA3K_INSTALL_EVMAPY
 
 $(eval $(cmake-package))
