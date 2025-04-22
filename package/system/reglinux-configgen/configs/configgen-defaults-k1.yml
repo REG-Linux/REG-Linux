@@ -4,11 +4,6 @@ nds:
 fmtowns:
   emulator: libretro
   core:     mame
-model3:
-  options:
-    videomode: max-1920x1080
-    decorations: none
-    hud_support: none
 jaguar:
   emulator: bigpemu
   core:     bigpemu
