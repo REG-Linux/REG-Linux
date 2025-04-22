@@ -201,7 +201,7 @@ dl-dir:
 
 %-shell: reglinux-docker-image output-dir-%
 	$(if $(BATCH_MODE),$(if $(CMD),,$(error "not suppoorted in BATCH_MODE if CMD not specified!")),)
-	@$(DOCKER) run --init --rm \
+	@$(DOCKER) run -t --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
