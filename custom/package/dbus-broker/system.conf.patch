@@ -1,0 +1,13 @@
+diff --git a/package/dbus-broker/system.conf b/package/dbus-broker/system.conf
+index 272f92361e..3d3a5f10cb 100644
+--- a/package/dbus-broker/system.conf
++++ b/package/dbus-broker/system.conf
+@@ -27,7 +27,7 @@
+   <servicehelper>/usr/libexec/dbus-daemon-launch-helper</servicehelper>
+ 
+   <!-- Write a pid file -->
+-  <pidfile>/run/messagebus.pid</pidfile>
++  <pidfile>/var/run/messagebus.pid</pidfile>
+ 
+   <!-- Enable logging to syslog -->
+   <syslog/>

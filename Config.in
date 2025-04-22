@@ -76,6 +76,7 @@ menu "Libretro"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-genesisplusgx/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-geolith/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-hatari/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-hatarib/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-holani/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-imame/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-kronos/Config.in"
@@ -511,7 +512,6 @@ menu "cores"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-mesen/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-smsplus-gx/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-arduous/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-hatarib/Config.in"
 endmenu
 endmenu
 
