@@ -112,7 +112,7 @@ define REGLINUX_EMULATIONSTATION_EXTERNAL_POS
 	for P in $(STAGING_DIR)/usr/share/es-system/locales/*; do if test -e $$P/es-system.po; then cp $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po.tmp && $(HOST_DIR)/bin/msgcat $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po.tmp $$P/es-system.po > $(@D)/locale/lang/$$(basename $$P)/LC_MESSAGES/emulationstation2.po; fi; done
 
 	# Hijack .po copy to adjust LogLevel
-	if test "$(BR2_ENABLE_DEBUG)" = "y" ; then sed -i 's/level = "default";/level = "debug";/' "$(@D)/es-app/src/guis/GuiMenu.cpp"; else sed -i 's/level = "default";/level = "error";/' "$(@D)/es-app/src/guis/GuiMenu.cpp" fi
+	if test "$(BR2_ENABLE_DEBUG)" = "y" ; then sed -i "s/level \= \"default\"\;/level \= \"error\"\;/" "$(@D)/es-app/src/guis/GuiMenu.cpp"; fi
 endef
 
 # Resources
