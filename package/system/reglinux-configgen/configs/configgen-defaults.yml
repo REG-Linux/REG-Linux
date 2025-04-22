@@ -280,8 +280,6 @@ hurrican:
 ikemen:
   emulator: ikemen
   core:     ikemen
-  options:
-    videomode: max-720x480
 intellivision:
   emulator: libretro
   core:     freeintv
@@ -330,7 +328,6 @@ model2:
   emulator: model2emu
   core:     model2emu
   options:
-    videomode: max-1920x1080
     hud_support: false
 model3:
   emulator: supermodel
