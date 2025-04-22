@@ -1,9 +1,9 @@
 default:
   options:
-    videomode: max-1280x720
-    video_threaded: true
-    smooth: false
-    retroarch.menu_driver: xmb
+    videomode:              max-1280x720
+    video_threaded:         true
+    smooth:                 false
+    retroarch.menu_driver:  xmb
     retroarch.audio_driver: pipewire
 
 nds:
