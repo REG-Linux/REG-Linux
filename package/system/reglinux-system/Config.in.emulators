@@ -337,27 +337,18 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_REGLINUX_SEGADC		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 
 	# PSX
-	# newer versions of duckstation stricter on OpenGL ES 3.x, no more support for KMS/DRM
-	select BR2_PACKAGE_DUCKSTATION			if (!BR2_mipsel) && BR2_PACKAGE_HAS_GLES3
-
-	select BR2_PACKAGE_DUCKSTATION_LEGACY		if !BR2_mipsel && !BR2_RISCV_64			&& \
-							   !BR2_arm1176jzf_s				&& \
-							   !BR2_cortex_a7				&& \
-							   !BR2_PACKAGE_DUCKSTATION
-
-	select BR2_PACKAGE_LIBRETRO_SWANSTATION		if !BR2_mipsel && !BR2_RISCV_64			&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_X86		&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_H3		&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_CHA		&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
-
+	# Duckstation flavors : AppImage/Qt (current), AppImage/mini (current), GPL source code (older)
+	select BR2_PACKAGE_DUCKSTATION_MINI		if (BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
+	select BR2_PACKAGE_DUCKSTATION			if !BR2_PACKAGE_DUCKSTATION_MINI && (BR2_x86_64 || BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
+	select BR2_PACKAGE_DUCKSTATION_GPL		if !BR2_PACKAGE_DUCKSTATION && !BR2_PACKAGE_DUCKSTATION_MINI && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3
+	# PCSX-ReARMed libretro core (well-maintained by notaz)
 	select BR2_PACKAGE_LIBRETRO_PCSX		# ALL
-
-	select BR2_PACKAGE_LIBRETRO_BEETLE_PSX		if !BR2_PACKAGE_SYSTEM_TARGET_H3	&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_CHA	&& \
-							   !BR2_PACKAGE_SYSTEM_TARGET_RK3326	&& \
-							(!BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY || BR2_PACKAGE_SYSTEM_TARGET_BCM2712)
-
+	# libretro-swanstation core (forked from old duckstation)
+	select BR2_PACKAGE_LIBRETRO_SWANSTATION		if !BR2_mipsel && !BR2_cortex_a7 && !BR2_RISCV_64 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	# libretro-beetle-psx core (forked from old mednafen psx)
+	select BR2_PACKAGE_LIBRETRO_BEETLE_PSX		if !BR2_mipsel && !BR2_cortex_a7 && !BR2_cortex_a53 && \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835               && \
+							   !BR2_PACKAGE_SYSTEM_TARGET_RK3326
 
 	# Saturn
 	select BR2_PACKAGE_LIBRETRO_BEETLE_SATURN	if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY || \
