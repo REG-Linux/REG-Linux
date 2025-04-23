@@ -1,0 +1,11 @@
+config BR2_PACKAGE_DUCKSTATION_MINI
+    bool "duckstation-mini"
+    depends on BR2_arm || BR2_aarch64
+    depends on BR2_PACKAGE_HAS_GLES3 || BR2_PACKAGE_REGLINUX_VULKAN
+
+    help
+      DuckStation - PlayStation 1, aka. PSX Emulator
+      DuckStation Mini is only for ARM/AArch64 devices.
+      It features a fullscreen/TV UI based on Dear ImGui.
+
+	    https://github.com/stenzek/duckstation

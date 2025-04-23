@@ -632,8 +632,9 @@ psx:
       swanstation:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SWANSTATION] }
       mednafen_psx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PSX] }
     duckstation:
-      duckstation:        { requireAnyOf: [BR2_PACKAGE_DUCKSTATION] }
-      duckstation-legacy: { requireAnyOf: [BR2_PACKAGE_DUCKSTATION_LEGACY] }
+      duckstation:      { requireAnyOf: [BR2_PACKAGE_DUCKSTATION] }
+      duckstation-mini: { requireAnyOf: [BR2_PACKAGE_DUCKSTATION_MINI] }
+      duckstation-gpl:  { requireAnyOf: [BR2_PACKAGE_DUCKSTATION_GPL] }
     mednafen:
       mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN_PSX] }
   comment_en: |
