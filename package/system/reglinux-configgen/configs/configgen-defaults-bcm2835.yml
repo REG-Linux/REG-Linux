@@ -20,6 +20,9 @@ amigacd32:
 amigacdtv:
   emulator: libretro
   core:     uae4arm
+atarist:
+  emulator: libretro
+  core:     hatari
 gba:
   emulator: libretro
   core:     gpsp
