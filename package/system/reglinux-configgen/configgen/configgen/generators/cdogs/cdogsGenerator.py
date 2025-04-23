@@ -15,7 +15,7 @@ class CdogsGenerator(Generator):
 
         try:
             for assetdir in cdogsConfig.cdogsAssets:
-                os.chdir(f"{cdogsConfig.cdogsRoms}/{cdogsConfig.cdogsAssets[assetdir]}")
+                os.chdir(f"{cdogsConfig.cdogsRoms}/{assetdir}")
             os.chdir(cdogsConfig.cdogsRoms)
         except FileNotFoundError:
             eslog.error("ERROR: Game assets not installed. You can get them from the Batocera Content Downloader.")
