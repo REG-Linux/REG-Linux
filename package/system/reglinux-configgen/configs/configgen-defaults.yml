@@ -79,7 +79,7 @@ atari800:
   core:     atari800
 atarist:
   emulator: libretro
-  core:     hatari
+  core:     hatarib
 atom:
   emulator: libretro
   core:     mame

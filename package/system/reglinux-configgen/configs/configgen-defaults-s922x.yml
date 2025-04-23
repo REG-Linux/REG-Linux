@@ -9,7 +9,7 @@ pcenginecd:
   core:     pce
 nds:
   emulator: libretro
-  core:     melonds
+  core:     melondsds
 fmtowns:
   emulator: libretro
   core:     mame

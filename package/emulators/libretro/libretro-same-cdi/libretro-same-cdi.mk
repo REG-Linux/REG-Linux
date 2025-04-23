@@ -3,10 +3,12 @@
 # libretro-same-cdi
 #
 ################################################################################
-# Version: Commits on Apr 4, 2025
-LIBRETRO_SAME_CDI_VERSION = f1ae7c8341a075ea977c703ae2f47de42878f7be
+# Version: Commits on Apr 23, 2025
+LIBRETRO_SAME_CDI_VERSION = 518a4daf01c20b47a157145e9402e699f4b2f3d5
 LIBRETRO_SAME_CDI_SITE = $(call github,REG-Linux,libretro-cdi,$(LIBRETRO_SAME_CDI_VERSION))
 LIBRETRO_SAME_CDI_LICENSE = GPL
+
+LIBRETRO_SAME_CDI_DEPENDENCIES = zlib zstd flac rapidjson pugixml sqlite expat jpeg
 
 LIBRETRO_SAME_CDI_MAX_JOBS = 6
 LIBRETRO_SAME_CDI_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_SAME_CDI_MAX_JOBS) ]; then echo $(LIBRETRO_SAME_CDI_MAX_JOBS); else echo $(PARALLEL_JOBS); fi)
