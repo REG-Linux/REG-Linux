@@ -6,7 +6,7 @@ pcenginecd:
   core:     pce
 nds:
   emulator: libretro
-  core:     melonds
+  core:     melondsds
 ps2:
   emulator: libretro
   core:     play

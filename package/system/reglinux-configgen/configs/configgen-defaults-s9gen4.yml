@@ -7,7 +7,7 @@ default:
   core:     panda3ds
 nds:
   emulator: libretro
-  core:     melonds
+  core:     melondsds
 fmtowns:
   emulator: libretro
   core:     mame
