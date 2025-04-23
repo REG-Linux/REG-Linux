@@ -33,7 +33,6 @@ EMULATOR_MAPPING = {
     'dosboxx': ('generators.dosboxx.dosboxxGenerator', 'DosBoxxGenerator'),
     'drastic': ('generators.drastic.drasticGenerator', 'DrasticGenerator'),
     'duckstation': ('generators.duckstation.duckstationGenerator', 'DuckstationGenerator'),
-    'duckstation-legacy': ('generators.duckstation_legacy.duckstationLegacyGenerator', 'DuckstationLegacyGenerator'),
     'dxx-rebirth': ('generators.dxx_rebirth.dxx_rebirthGenerator', 'DXX_RebirthGenerator'),
     'easyrpg': ('generators.easyrpg.easyrpgGenerator', 'EasyRPGGenerator'),
     'ecwolf': ('generators.ecwolf.ecwolfGenerator', 'ECWolfGenerator'),
