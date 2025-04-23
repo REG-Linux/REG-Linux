@@ -138,7 +138,6 @@ endef
 
 ### S31emulationstation
 # default for most of architectures
-REGLINUX_EMULATIONSTATION_PREFIX = SDL_NOMOUSE=1 SDL_GAMECONTROLLERCONFIG_FILE=/userdata/system/configs/emulationstation/gamecontrollerdb.txt
 REGLINUX_EMULATIONSTATION_CMD = emulationstation-standalone
 REGLINUX_EMULATIONSTATION_ARGS = $${EXTRA_OPTS}
 REGLINUX_EMULATIONSTATION_POSTFIX = \&
