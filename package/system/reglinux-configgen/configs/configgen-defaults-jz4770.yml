@@ -20,6 +20,9 @@ amigacdtv:
 atari2600:
   emulator: libretro
   core:     stella2014
+atarist:
+  emulator: libretro
+  core:     hatari
 mastersystem:
   emulator: libretro
   core:     picodrive
