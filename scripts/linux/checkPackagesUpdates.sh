@@ -108,6 +108,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-virtualjaguar
                    libretro-watara
                    libretro-xmil
+                   libretro-xrick
                    libretro-yabasanshiro
                    libretro-zc210"
 
