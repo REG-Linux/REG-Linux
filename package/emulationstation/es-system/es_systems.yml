@@ -3697,26 +3697,6 @@ cdogs:
   comment_br: |
     Este sistema é um jogo independente. Não requer arquivo de rom.
 
-xrick:
-  name:       xrick
-  manufacturer: Ports
-  release:
-  hardware: port
-  extensions: [zip]
-  platform: pc
-  group: ports
-  emulators:
-    libretro:
-      xrick: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_XRICK] }
-  comment_en: |
-    Put the data.zip file in this directory.
-    Or you can add the game data files directly from the Batocera content downloader.
-  comment_fr: |
-    Placez ici vos fichiers data.zip pour xrick.
-    Vous pouvez ajouter les fichiers de données du jeu depuis le menu de téléchargement de contenu Batocera.
-  comment_br: |
-    Coloque o data.zip do jogo xrick neste diretório.
-
 macintosh:
   name:       Macintosh
   manufacturer: Apple
