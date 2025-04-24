@@ -9,7 +9,7 @@ NPROC		:= $(shell nproc)
 MAKE_JLEVEL	?= $(NPROC)
 MAKE_LLEVEL	?= $(shell echo $$(($(NPROC) * 1)))
 BATCH_MODE	?=
-PARALLEL_BUILD	?=
+PARALLEL_BUILD	?= y
 DEBUG_BUILD	?= y
 DOCKER		?= docker
 
