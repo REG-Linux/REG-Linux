@@ -692,9 +692,6 @@ xash3d_fwgs:
 xegs:
   emulator: libretro
   core:     mame
-xrick:
-  emulator: libretro
-  core:     xrick
 xbox:
   emulator: xemu
   core:     xemu
