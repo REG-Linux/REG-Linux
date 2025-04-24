@@ -243,7 +243,6 @@ menu "Libretro"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/libretro/libretro-reminiscence/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/libretro/libretro-superbroswar/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/libretro/libretro-tyrquake/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/libretro/libretro-xrick/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/ports/libretro/libretro-zc210/Config.in"
 endmenu
 endmenu
