@@ -2,7 +2,7 @@ default:
   options:
     video_threaded: true
     smooth: false
-    retroarch.audio_driver: pipewire
+    retroarch.audio_driver: alsathread
 
 3ds:
   emulator: libretro
