@@ -15,13 +15,13 @@ DOCKER		?= docker
 
 -include $(LOCAL_MK)
 
-ifdef PARALLEL_BUILD
+ifeq ($(PARALLEL_BUILD), y)
 	EXTRA_OPTS += BR2_PER_PACKAGE_DIRECTORIES=y
 	MAKE_OPTS += -j$(MAKE_JLEVEL)
 	MAKE_OPTS += -l$(MAKE_LLEVEL)
 endif
 
-ifdef DEBUG_BUILD
+ifeq ($(DEBUG_BUILD), y)
 	EXTRA_OPTS += BR2_ENABLE_DEBUG=y
 endif
 
