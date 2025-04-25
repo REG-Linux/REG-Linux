@@ -1,5 +1,5 @@
 diff --git a/package/linux-headers/Config.in.host b/package/linux-headers/Config.in.host
-index 432d5d1749..5f0e236de3 100644
+index 9de1fdfa71..5f0e236de3 100644
 --- a/package/linux-headers/Config.in.host
 +++ b/package/linux-headers/Config.in.host
 @@ -49,6 +49,18 @@ config BR2_KERNEL_HEADERS_6_12
@@ -46,8 +46,8 @@ index 432d5d1749..5f0e236de3 100644
  	default "5.10.235"	if BR2_KERNEL_HEADERS_5_10
 -	default "5.15.179"	if BR2_KERNEL_HEADERS_5_15
 -	default "6.1.131"	if BR2_KERNEL_HEADERS_6_1
--	default "6.6.83"	if BR2_KERNEL_HEADERS_6_6
--	default "6.12.19"	if BR2_KERNEL_HEADERS_6_12
+-	default "6.6.84"	if BR2_KERNEL_HEADERS_6_6
+-	default "6.12.20"	if BR2_KERNEL_HEADERS_6_12
 +	default "5.15.180"	if BR2_KERNEL_HEADERS_5_15
 +	default "6.1.134"	if BR2_KERNEL_HEADERS_6_1
 +	default "6.6.87"	if BR2_KERNEL_HEADERS_6_6
