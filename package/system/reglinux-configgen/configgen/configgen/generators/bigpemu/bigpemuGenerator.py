@@ -3,10 +3,14 @@
 from generators.Generator import Generator
 import Command
 import os
+import platform
 import json
 import utils.videoMode as videoMode
 import controllersConfig
 from . import bigpemuConfig
+
+def is_x86_64():
+    return platform.machine().lower() in ['x86_64', 'amd64']
 
 # BigPEmu controller sequence, P1 only requires keyboard inputs
 # default standard bindings
@@ -389,8 +393,11 @@ class BigPEmuGenerator(Generator):
         with open(bigpemuConfig.bigpemuConfig, "w") as file:
             json.dump(config, file, indent=4)
 
-        # Run the emulator
-        commandArray = [bigpemuConfig.bigpemuBox64, bigpemuConfig.bigpemuBin, rom]
+        # Run the emulator natively on x86_64, through box64 for AArch64/RV64GC
+        if is_x86_64():
+            commandArray = [bigpemuConfig.bigpemuBin, rom]
+        else:
+            commandArray = [bigpemuConfig.bigpemuBox64, bigpemuConfig.bigpemuBin, rom]
 
         environment = {
             "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
