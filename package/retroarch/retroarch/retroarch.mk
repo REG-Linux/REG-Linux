@@ -98,7 +98,7 @@ endif
 # REG: OpenGL (desktop) support
 # Enable Ozone menu for desktop GL
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
-  RETROARCH_CONF_OPTS += --enable-opengl
+  RETROARCH_CONF_OPTS += --enable-opengl --disable-opengl1
   RETROARCH_CONF_OPTS += --enable-ozone
   RETROARCH_DEPENDENCIES += libgl
 endif
