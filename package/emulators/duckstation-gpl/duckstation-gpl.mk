@@ -58,7 +58,7 @@ define DUCKSTATION_GPL_INSTALL_TARGET_CMDS
     rm -f $(TARGET_DIR)/usr/share/duckstation/resources/gamecontrollerdb.txt
 
     mkdir -p $(TARGET_DIR)/usr/share/evmapy
-    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/duckstation/psx.duckstation-gpl.keys \
+    cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/duckstation-gpl/psx.duckstation-gpl.keys \
         $(TARGET_DIR)/usr/share/evmapy
 endef
 
