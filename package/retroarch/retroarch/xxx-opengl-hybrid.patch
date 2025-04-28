@@ -62,3 +62,34 @@
     if [ "$OS" = 'Darwin' ]; then
        check_header '' OPENGL "OpenGL/gl.h"
        check_lib '' OPENGL "-framework OpenGL"
+--- a/gfx/drivers/gl3.c	2025-04-28 11:10:47.741106702 +0200
++++ b/gfx/drivers/gl3.c	2025-04-28 11:14:50.275564525 +0200
+@@ -251,7 +251,7 @@
+ 
+    if (major == 2 && minor == 0)
+       return 100;
+-#else
++#endif
+    if (!version || sscanf(version, "%u.%u", &major, &minor) != 2)
+       return 150;
+ 
+@@ -277,7 +277,6 @@
+             return 110;
+       }
+    }
+-#endif
+ 
+    return 100 * major + 10 * minor;
+ }
+@@ -1470,8 +1469,9 @@
+       major = hwr->version_major;
+       minor = hwr->version_minor;
+    }
+-#else
+-   api   = GFX_CTX_OPENGL_API;
++#endif
++#if defined(HAVE_OPENGL)
++   api  = GFX_CTX_OPENGL_API;
+    if (hwr && hwr->context_type != RETRO_HW_CONTEXT_NONE)
+    {
+       major = hwr->version_major;

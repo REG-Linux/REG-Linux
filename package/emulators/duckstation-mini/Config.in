@@ -2,6 +2,7 @@ config BR2_PACKAGE_DUCKSTATION_MINI
     bool "duckstation-mini"
     depends on BR2_arm || BR2_aarch64
     depends on BR2_PACKAGE_HAS_GLES3 || BR2_PACKAGE_REGLINUX_VULKAN
+    select BR2_PACKAGE_GMP
 
     help
       DuckStation - PlayStation 1, aka. PSX Emulator
