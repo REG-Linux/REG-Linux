@@ -11,6 +11,7 @@ DUCKSTATION_MINI_SOURCE = DuckStation-Mini-arm64.AppImage
 endif
 DUCKSTATION_MINI_SITE = https://github.com/stenzek/duckstation/releases/download/$(DUCKSTATION_MINI_VERSION)
 DUCKSTATION_MINI_LICENSE = CC-BY-NC-ND
+DUCKSTATION_MINI_DEPENDENCIES = gmp
 
 define DUCKSTATION_MINI_EXTRACT_CMDS
 	mkdir -p $(@D) && \
@@ -20,7 +21,7 @@ endef
 
 define DUCKSTATION_MINI_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/duckstation-mini
-	cp -pr $(@D)/$(DUCKSTATION_MINI_SOURCE) $(TARGET_DIR)/usr/duckstation-mini/DuckStation-Mini.AppImage
+	$(INSTALL) -D $(@D)/$(DUCKSTATION_MINI_SOURCE) $(TARGET_DIR)/usr/duckstation-mini/DuckStation-Mini.AppImage
 	chmod +x $(TARGET_DIR)/usr/duckstation-mini/DuckStation-Mini.AppImage
 
 	# evmap config

@@ -1,0 +1,12 @@
+--- a/src/libretro/libretro_host_interface.cpp	2025-04-28 21:29:23.638444609 +0200
++++ b/src/libretro/libretro_host_interface.cpp	2025-04-28 21:29:43.986902068 +0200
+@@ -1652,8 +1652,7 @@
+ 
+     case GPURenderer::HardwareOpenGL:
+     {
+-      const bool prefer_gles =
+-        (preferred_renderer == RETRO_HW_CONTEXT_OPENGLES2 || preferred_renderer == RETRO_HW_CONTEXT_OPENGLES_VERSION);
++      const bool prefer_gles = true;
+       m_hw_render_callback_valid =
+         LibretroOpenGLHostDisplay::RequestHardwareRendererContext(&m_hw_render_callback, prefer_gles);
+     }
