@@ -8,7 +8,7 @@ class StellaGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # Launch Stella
-        commandArray = ["stella " , rom ]
+        commandArray = ["stella" , " ", rom ]
 
         return Command.Command(
             array=commandArray,
