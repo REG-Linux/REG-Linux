@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OPENMW_VERSION = openmw-49-rc6
+OPENMW_VERSION = openmw-49-rc7
 OPENMW_SITE = https://github.com/OpenMW/openmw
 OPENMW_SITE_METHOD = git
 OPENMW_DEPENDENCIES = libgl lz4 yaml-cpp bullet ffmpeg openal sqlite

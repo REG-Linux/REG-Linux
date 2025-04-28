@@ -11,14 +11,14 @@
      $<$<BOOL:${PulseAudio_FOUND}>:PulseAudio::PulseAudio>
 --- a/thirdparty/CMakeLists.txt	2025-02-06 11:43:03.935624698 +0100
 +++ b/thirdparty/CMakeLists.txt	2025-02-06 11:43:10.103766349 +0100
-@@ -9,9 +9,7 @@
- list(APPEND CHDR_LIBS lzma)
- list(APPEND CHDR_INCLUDES lzma)
+@@ -12,9 +12,7 @@
+   list(APPEND CHDR_LIBS lzma)
+   list(APPEND CHDR_INCLUDES lzma)
  
--if(OS_MACOS)
--  option(WITH_SYSTEM_ZLIB "Use system zlib" ON)
--endif()
-+option(WITH_SYSTEM_ZLIB "Use system zlib" ON)
- # zlib
- if(WITH_SYSTEM_ZLIB)
-   find_package(ZLIB REQUIRED)
+-  if(OS_MACOS)
+-    option(WITH_SYSTEM_ZLIB "Use system zlib" ON)
+-  endif()
++  option(WITH_SYSTEM_ZLIB "Use system zlib" ON)
+   # zlib
+   if(WITH_SYSTEM_ZLIB)
+     find_package(ZLIB REQUIRED)
