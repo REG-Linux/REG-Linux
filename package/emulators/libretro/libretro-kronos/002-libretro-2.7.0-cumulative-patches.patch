@@ -1,0 +1,288 @@
+From 4cd7e217d4e3c29366cb97151fc37b78fd0c49fe Mon Sep 17 00:00:00 2001
+From: barbudreadmon <barbudreadmon@users.noreply.github.com>
+Date: Mon, 3 Mar 2025 10:45:35 +0100
+Subject: [PATCH] (libretro) fix saturn init
+
+---
+ yabause/src/libretro/libretro.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/yabause/src/libretro/libretro.c b/yabause/src/libretro/libretro.c
+index 1984d3790..c1db469fc 100644
+--- a/yabause/src/libretro/libretro.c
++++ b/yabause/src/libretro/libretro.c
+@@ -1633,7 +1633,7 @@ bool retro_load_game(const struct retro_game_info *info)
+ 
+    // Check if the path lead to a ST-V game
+    // Store the game "id", if no game id found then this is most likely not a ST-V game
+-   char *stvgame;
++   char *stvgame = NULL;
+    if (strcmp(path_get_extension(info->path), "zip") == 0)
+       STVGetSingle(info->path, stv_bios_path, &stvgame);
+ 
+@@ -1705,6 +1705,7 @@ bool retro_load_game(const struct retro_game_info *info)
+       // Configure addon cart settings
+       configure_saturn_addon_cart();
+ 
++      yinit.stvgame          = "";
+       yinit.cdcoretype       = CDCORE_ISO;
+       yinit.cdpath           = disk_paths[disk_index];
+       yinit.biospath         = (hle_bios_force ? NULL : bios_path);
+From ecbed5878aff9582c1a758b27c2a61e6604f39a9 Mon Sep 17 00:00:00 2001
+From: barbudreadmon <barbudreadmon@users.noreply.github.com>
+Date: Tue, 11 Mar 2025 18:25:03 +0100
+Subject: [PATCH] ogl_shader.c: allow the libretro port to use filters, and
+ some cleanup
+
+---
+ .../core/video/opengl/common/src/ogl_shader.c | 22 +------------------
+ 1 file changed, 1 insertion(+), 21 deletions(-)
+
+diff --git a/yabause/src/core/video/opengl/common/src/ogl_shader.c b/yabause/src/core/video/opengl/common/src/ogl_shader.c
+index afb0d2ba6..33f233386 100755
+--- a/yabause/src/core/video/opengl/common/src/ogl_shader.c
++++ b/yabause/src/core/video/opengl/common/src/ogl_shader.c
+@@ -1312,7 +1312,7 @@ int YglBlitTexture(int* prioscreens, int* modescreens, int* isRGB, int * isBlur,
+   glUniform1i(glGetUniformLocation(vdp2blit_prg, "win1"), Win1);
+   glUniform1i(glGetUniformLocation(vdp2blit_prg, "win1_mode"), Win1_mode);
+   glUniform1i(glGetUniformLocation(vdp2blit_prg, "win_op"), Win_op);
+-// #ifndef __LIBRETRO__
++
+   if (_Ygl->interlace == NORMAL_INTERLACE){
+     //double density interlaced or progressive _ Do not mix fields. Maybe required by double density. To check
+     glUniform1i(glGetUniformLocation(vdp2blit_prg, "nbFrame"),2);
+@@ -1323,9 +1323,6 @@ int YglBlitTexture(int* prioscreens, int* modescreens, int* isRGB, int * isBlur,
+     else
+     glUniform1i(glGetUniformLocation(vdp2blit_prg, "nbFrame"),0);
+   }
+-// #else
+-  // glUniform1i(glGetUniformLocation(vdp2blit_prg, "nbFrame"),-1);
+-// #endif
+ 
+   YglMatrix m;
+ 
+@@ -1837,11 +1834,6 @@ static const char fblit_img[] =
+   "{   \n"
+ "	fragColor = Filter( u_Src, vTexCoord ); \n";
+ 
+-  static const char fblit_retro_img[] =
+-  "void main()\n"
+-  "{\n"
+-  " fragColor = Filter( u_Src, vTexCoord ); \n";
+-
+ static const char fblit_img_end[] =
+   "} \n";
+ 
+@@ -1937,8 +1929,6 @@ int YglBlitFramebuffer(u32 srcTexture, float w, float h, float dispw, float disp
+   float height = h;
+   int decim;
+   u32 tex = srcTexture;
+-  const GLchar * fblit_img_retro_v[] = { fblit_head, fblitnear_img, fblit_retro_img, fblit_img_end, NULL };
+-  const GLchar * fblit_img_retro_interlace_v[] = { fblit_head, fblitnear_interlace_img, fblit_retro_img, fblit_img_end, NULL };
+   const GLchar * fblit_img_v[] = { fblit_head, fblitnear_img, fblit_img, fblit_img_end, NULL };
+   const GLchar * fblit_img_interlace_v[] = { fblit_head, fblitnear_interlace_img, fblit_img, fblit_img_end, NULL };
+   const GLchar * fblitbilinear_img_v[] = { fblit_head, fblitnear_img, fblit_img, fblit_img_end, NULL };
+@@ -1971,9 +1961,6 @@ int YglBlitFramebuffer(u32 srcTexture, float w, float h, float dispw, float disp
+     1.0f, 1.0f };
+ 
+   float nbLines = h;//yabsys.IsPal?625.0f:525.0f;
+-#ifdef __LIBRETRO__
+-  nbLines = height;
+-#endif
+   if ((_Ygl->stretch == INTEGER_RATIO) || (_Ygl->stretch == INTEGER_RATIO_FULL)) nbLines = height;
+ 
+   if (_Ygl->upmode != UP_NONE) {
+@@ -2031,7 +2018,6 @@ int YglBlitFramebuffer(u32 srcTexture, float w, float h, float dispw, float disp
+       blit_prg = -1;
+       return -1;
+     }
+-#ifndef __LIBRETRO__
+     switch(aamode) {
+       case AA_NONE:
+         if (_Ygl->interlace == NORMAL_INTERLACE)
+@@ -2064,12 +2050,6 @@ int YglBlitFramebuffer(u32 srcTexture, float w, float h, float dispw, float disp
+           glShaderSource(fshader, 5, fblit_img_scanline_is_interlace_v, NULL);
+         break;
+     }
+-#else
+-    if (_Ygl->interlace == NORMAL_INTERLACE)
+-      glShaderSource(fshader, 4, fblit_img_retro_v, NULL);
+-    else
+-      glShaderSource(fshader, 4, fblit_img_retro_interlace_v, NULL);
+-#endif
+     glCompileShader(fshader);
+     glGetShaderiv(fshader, GL_COMPILE_STATUS, &compiled);
+     if (compiled == GL_FALSE) {
+From 7ef032bc712707bf39d83645eb85a9edb5d874af Mon Sep 17 00:00:00 2001
+From: barbudreadmon <barbudreadmon@users.noreply.github.com>
+Date: Tue, 11 Mar 2025 18:26:51 +0100
+Subject: [PATCH] libretro_core_options.h: add a core option for filter
+
+---
+ yabause/src/libretro/libretro_core_options.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/yabause/src/libretro/libretro_core_options.h b/yabause/src/libretro/libretro_core_options.h
+index 316ddbe48..20bad34cb 100644
+--- a/yabause/src/libretro/libretro_core_options.h
++++ b/yabause/src/libretro/libretro_core_options.h
+@@ -174,6 +174,22 @@ struct retro_core_option_definition option_defs_us[] = {
+       },
+       "disabled"
+    },
++   {
++      "kronos_video_filter_type",
++      "Filter",
++      "Apply filter.",
++      {
++         { "0", "None" },
++         { "1", "Bilinear" },
++         { "2", "BiCubic" },
++         { "3", "Deinterlacing Adaptative" },
++         { "4", "Deinterlacing Debug Adaptative" },
++         { "5", "Deinterlacing Bob" },
++         { "6", "Scanline" },
++         { NULL, NULL},
++      },
++      "0"
++   },
+    {
+       "kronos_wireframe_mode",
+       "Wireframe mode",
+From a063317663755e45168d10f045de8984bea6b07e Mon Sep 17 00:00:00 2001
+From: barbudreadmon <barbudreadmon@users.noreply.github.com>
+Date: Tue, 11 Mar 2025 18:29:35 +0100
+Subject: [PATCH] libretro.c: handle new filter core option, and some cleanup
+
+---
+ yabause/src/libretro/libretro.c | 56 +++++++++++++++++++--------------
+ 1 file changed, 33 insertions(+), 23 deletions(-)
+
+diff --git a/yabause/src/libretro/libretro.c b/yabause/src/libretro/libretro.c
+index c1db469fc..0b696a8d5 100644
+--- a/yabause/src/libretro/libretro.c
++++ b/yabause/src/libretro/libretro.c
+@@ -61,6 +61,7 @@ static bool hle_bios_force = false;
+ static int addon_cart_type = CART_NONE;
+ static int mesh_mode = ORIGINAL_MESH;
+ static int banding_mode = ORIGINAL_BANDING;
++static int video_filter_type = 0;
+ 
+ static int g_skipframe = 0;
+ static int g_videoformattype = -1;
+@@ -1008,6 +1009,13 @@ void check_variables(void)
+          banding_mode = IMPROVED_BANDING;
+    }
+ 
++   var.key = "kronos_video_filter_type";
++   var.value = NULL;
++   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
++   {
++      video_filter_type = atoi(var.value);
++   }
++
+    var.key = "kronos_wireframe_mode";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+@@ -1584,6 +1592,7 @@ bool retro_load_game_common()
+    yinit.skipframe               = g_skipframe;
+    yinit.stv_favorite_region     = stv_favorite_region;
+    yinit.resolution_mode         = resolution_mode;
++   yinit.video_filter_type       = video_filter_type;
+    yinit.auto_cart               = 1;
+ 
+    return true;
+@@ -1773,34 +1782,35 @@ void retro_run(void)
+       set_descriptors();
+    }
+ 
+-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
+-   {
++   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated) {
++      // Store previous value for some settings
+       int prev_resolution_mode = resolution_mode;
+       int prev_force_downsampling = force_downsampling;
+       int prev_multitap[2] = {multitap[0],multitap[1]};
+       bool prev_service_enabled = service_enabled;
+-      bool var_updated = false;
+-      if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &var_updated) && var_updated) {
+-        check_variables();
+-        // If resolution_mode > initial_resolution_mode, we'll need a restart to reallocate the max size for buffer
+-        if (resolution_mode > initial_resolution_mode)
+-        {
+-          log_cb(RETRO_LOG_INFO, "Restart the core for the new resolution\n");
+-          resolution_mode = initial_resolution_mode;
+-        }
+-        resolution_need_update = (prev_resolution_mode != resolution_mode || prev_force_downsampling != force_downsampling);
+-        if (prev_resolution_mode != resolution_mode && VIDCore)
+-        VIDCore->SetSettingValue(VDP_SETTING_RESOLUTION_MODE, resolution_mode);
+-        if(PERCore && (prev_multitap[0] != multitap[0] || prev_multitap[1] != multitap[1] || prev_service_enabled != service_enabled))
+-        PERCore->Init();
+-        if (VIDCore) VIDCore->SetSettingValue(VDP_SETTING_MESH_MODE, (force_downsampling ? IMPROVED_MESH : mesh_mode)); // we want improved mesh with downsampling, otherwise it'll cause gfx glitches
+-        if (VIDCore) VIDCore->SetSettingValue(VDP_SETTING_BANDING_MODE, banding_mode);
+-        if (VIDCore) VIDCore->SetSettingValue(VDP_SETTING_WIREFRAME, wireframe_mode);
+-        // changing video format on the fly is causing issues
+-        //if (g_videoformattype != -1)
+-        //   YabauseSetVideoFormat(g_videoformattype);
+-        YabauseSetSkipframe(g_skipframe);
++
++      // Check new settings
++      check_variables();
++
++      // If resolution_mode > initial_resolution_mode, we'll need a restart to reallocate the max size for buffer
++      if (resolution_mode > initial_resolution_mode)
++      {
++         log_cb(RETRO_LOG_INFO, "Restart the core for the new resolution\n");
++         resolution_mode = initial_resolution_mode;
+       }
++      resolution_need_update = (prev_resolution_mode != resolution_mode || prev_force_downsampling != force_downsampling);
++      if (prev_resolution_mode != resolution_mode && VIDCore)
++      VIDCore->SetSettingValue(VDP_SETTING_RESOLUTION_MODE, resolution_mode);
++      if(PERCore && (prev_multitap[0] != multitap[0] || prev_multitap[1] != multitap[1] || prev_service_enabled != service_enabled))
++      PERCore->Init();
++      if (VIDCore) VIDCore->SetSettingValue(VDP_SETTING_MESH_MODE, (force_downsampling ? IMPROVED_MESH : mesh_mode)); // we want improved mesh with downsampling, otherwise it'll cause gfx glitches
++      if (VIDCore) VIDCore->SetSettingValue(VDP_SETTING_BANDING_MODE, banding_mode);
++      if (VIDCore) VIDCore->SetSettingValue(VDP_SETTING_WIREFRAME, wireframe_mode);
++      if (VIDCore) VIDCore->SetSettingValue(VDP_SETTING_FILTERMODE, video_filter_type);
++      // changing video format on the fly is causing issues
++      //if (g_videoformattype != -1)
++      //   YabauseSetVideoFormat(g_videoformattype);
++      YabauseSetSkipframe(g_skipframe);
+    }
+    // It appears polling can happen outside of HandleEvents
+    update_inputs();
+From d0384bc33aad06bfa9cf5cd308c4bd7ae6cfc814 Mon Sep 17 00:00:00 2001
+From: barbudreadmon <barbudreadmon@users.noreply.github.com>
+Date: Wed, 12 Mar 2025 08:05:27 +0100
+Subject: [PATCH] libretro_core_options.h: remove non-deinterlacing filters
+ from core option
+
+---
+ yabause/src/libretro/libretro_core_options.h | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/yabause/src/libretro/libretro_core_options.h b/yabause/src/libretro/libretro_core_options.h
+index 20bad34cb..63782952d 100644
+--- a/yabause/src/libretro/libretro_core_options.h
++++ b/yabause/src/libretro/libretro_core_options.h
+@@ -176,16 +176,12 @@ struct retro_core_option_definition option_defs_us[] = {
+    },
+    {
+       "kronos_video_filter_type",
+-      "Filter",
+-      "Apply filter.",
++      "Deinterlace Filter",
++      "Apply deinterlace filter.",
+       {
+          { "0", "None" },
+-         { "1", "Bilinear" },
+-         { "2", "BiCubic" },
+-         { "3", "Deinterlacing Adaptative" },
+-         { "4", "Deinterlacing Debug Adaptative" },
+-         { "5", "Deinterlacing Bob" },
+-         { "6", "Scanline" },
++         { "3", "Adaptative" },
++         { "5", "Bob" },
+          { NULL, NULL},
+       },
+       "0"
