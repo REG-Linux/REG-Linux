@@ -20,12 +20,12 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     select BR2_PACKAGE_CLK			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL
 
     # Mednafen
-    select BR2_PACKAGE_MEDNAFEN			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_mipsel
+    select BR2_PACKAGE_MEDNAFEN			if !BR2_PACKAGE_REGLINUX_RELEASE && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_mipsel
     # Configurable cores for Mednafen
     # TODO those are artificial dependencies to avoid configs-defaults-XXX.yml issues
-    select BR2_PACKAGE_MEDNAFEN_PCFX		if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
-    select BR2_PACKAGE_MEDNAFEN_PSX		if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
-    select BR2_PACKAGE_MEDNAFEN_SATURN		if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+    select BR2_PACKAGE_MEDNAFEN_PCFX		if BR2_PACKAGE_MEDNAFEN && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+    select BR2_PACKAGE_MEDNAFEN_PSX		if BR2_PACKAGE_MEDNAFEN && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+    select BR2_PACKAGE_MEDNAFEN_SATURN		if BR2_PACKAGE_MEDNAFEN && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
 
     # Ares (OpenGL 3.3+ or Vulkan or wgpu)
     select BR2_PACKAGE_ARES			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_REGLINUX_VULKAN
@@ -105,7 +105,8 @@ config BR2_PACKAGE_REGLINUX_HANDHELD_SYSTEMS
 	# Gameboy / Gameboy Color
 	select BR2_PACKAGE_LIBRETRO_GAMBATTE		# ALL
 	select BR2_PACKAGE_LIBRETRO_TGBDUAL		# ALL
-	select BR2_PACKAGE_LIBRETRO_SAMEBOY		if BR2_ARCH_IS_64
+	# Sameboy is accuracy-focused, can be slow on low end, let's limit and revisit later
+	select BR2_PACKAGE_LIBRETRO_SAMEBOY		if BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
 
 	# GBA
 	select BR2_PACKAGE_LIBRETRO_MGBA		# ALL
@@ -344,7 +345,8 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 	# PCSX-ReARMed libretro core (well-maintained by notaz)
 	select BR2_PACKAGE_LIBRETRO_PCSX		# ALL
 	# libretro-swanstation core (forked from old duckstation)
-	select BR2_PACKAGE_LIBRETRO_SWANSTATION		if !BR2_mipsel && !BR2_cortex_a7 && !BR2_RISCV_64 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	# disabled right now for release on non-x86, other conditions still apply as it's slow
+	select BR2_PACKAGE_LIBRETRO_SWANSTATION		if (!BR2_PACKAGE_REGLINUX_RELEASE && !BR2_x86_64) && !BR2_mipsel && !BR2_cortex_a7 && !BR2_RISCV_64 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 	# libretro-beetle-psx core (forked from old mednafen psx)
 	select BR2_PACKAGE_LIBRETRO_BEETLE_PSX		if !BR2_mipsel && !BR2_cortex_a7 && !BR2_cortex_a53 && \
 							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835               && \
@@ -521,7 +523,8 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX	# ALL
 	# TODO : lr-genesisplusgxwide can be enabled on 64-bit archs, but Makefile.libretro is broken for AArch64
 	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX_WIDE	if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
-	select BR2_PACKAGE_LIBRETRO_BLASTEM		if BR2_ARCH_IS_64
+        # BlastEm! is accuracy-focused, can be slow on low end, let's limit and revisit later
+        select BR2_PACKAGE_LIBRETRO_BLASTEM             if BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
 	select BR2_PACKAGE_LIBRETRO_SMSPLUS_GX		# ALL
 	select BR2_PACKAGE_LIBRETRO_GEARSYSTEM		# ALL
 
