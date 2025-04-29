@@ -1,6 +1,3 @@
-3ds:
-  emulator: libretro
-  core:     panda3ds
 fmtowns:
   emulator: libretro
   core:     mame
