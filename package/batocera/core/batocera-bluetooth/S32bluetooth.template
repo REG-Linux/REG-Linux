@@ -68,19 +68,6 @@ case "$1" in
         done
 
         btaddr="$(/usr/bin/system-settings-get bluetooth.adapter)"
-        settings_version="$(/usr/bin/system-settings-get controllers.ps3.driver)"
-        if [ "$settings_version" != "bluez" ]
-        then
-            BLUETOOTHD_ARGS="--noplugin=sixaxis"
-        else
-            BLUETOOTHD_ARGS="--noplugin=sixaxispair"
-        fi
-
-        if [ "$ps3_enabled" != "1" ]
-        then 
-            BLUETOOTHD_ARGS="--noplugin=sixaxis,sixaxispair"
-        fi
-
         debug="$(/usr/bin/system-settings-get controllers.bluetooth.debug)"
         if test "${debug}" = 1
         then
