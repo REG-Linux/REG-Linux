@@ -148,7 +148,7 @@ dl-dir:
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order
 
 %-kernel: reglinux-docker-image %-config ccache-dir dl-dir
-	@$(DOCKER) run --init --rm \
+	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
