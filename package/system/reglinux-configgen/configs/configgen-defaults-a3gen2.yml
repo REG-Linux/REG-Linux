@@ -1,6 +1,3 @@
-3ds:
-  emulator: libretro
-  core:     panda3ds
 pcengine:
   emulator: libretro
   core:     pce
