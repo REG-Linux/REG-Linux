@@ -128,9 +128,8 @@ define REGLINUX_EMULATIONSTATION_RESOURCES
 	$(INSTALL) -m 0644 -D $(@D)/resources/services/*.* $(TARGET_DIR)/usr/share/emulationstation/resources/services
 
 	# gamecontrollerdb.txt
-	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
 	cp $(REGLINUX_EMULATIONSTATION_PATH)/controllers/gamecontrollerdb.txt \
-		$(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/emulationstation
+		$(TARGET_DIR)/usr/share/emulationstation/
 
 	# hooks
 	cp $(REGLINUX_EMULATIONSTATION_PATH)/batocera-preupdate-gamelists-hook $(TARGET_DIR)/usr/bin/
