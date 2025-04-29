@@ -1,6 +1,3 @@
-3ds:
-  emulator: libretro
-  core:     panda3ds
 nds:
   emulator: libretro
   core:     melonds
