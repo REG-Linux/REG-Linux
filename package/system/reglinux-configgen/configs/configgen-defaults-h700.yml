@@ -4,9 +4,6 @@ default:
     smooth: false
     retroarch.audio_driver: alsathread
 
-3ds:
-  emulator: libretro
-  core:     panda3ds
 nds:
   emulator: libretro
   core:     melonds
