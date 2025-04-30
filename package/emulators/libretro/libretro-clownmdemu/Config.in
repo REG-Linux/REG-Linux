@@ -1,0 +1,14 @@
+config BR2_PACKAGE_LIBRETRO_CLOWNMDEMU
+    bool "libretro-clownmdemu"
+    
+    depends on BR2_INSTALL_LIBSTDCPP
+      help
+        This is ClownMDEmu, a Sega Mega Drive (a.k.a. Sega Genesis) emulator.
+	Some standard features of the Mega Drive are currently unemulated (see common/core/TODO.md for more information).
+	This repository contains a frontend that exposes ClownMDEmu as a libretro core.
+
+        https://github.com/Clownacy/clownmdemu-libretro
+
+comment "LIBRETRO_CLOWNMDEMU needs a toolchain w/ C++"
+    depends on !BR2_INSTALL_LIBSTDCPP
+

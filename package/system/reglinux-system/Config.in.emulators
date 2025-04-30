@@ -525,6 +525,8 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX_WIDE	if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
         # BlastEm! is accuracy-focused, can be slow on low end, let's limit and revisit later
         select BR2_PACKAGE_LIBRETRO_BLASTEM             if BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
+        # ClownMDEmu is accuracy-focused, disabled for now
+        #select BR2_PACKAGE_LIBRETRO_CLOWNMDEMU         if BR2_ARCH_IS_64
 	select BR2_PACKAGE_LIBRETRO_SMSPLUS_GX		# ALL
 	select BR2_PACKAGE_LIBRETRO_GEARSYSTEM		# ALL
 
