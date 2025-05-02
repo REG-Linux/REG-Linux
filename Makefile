@@ -161,7 +161,7 @@ dl-dir:
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot linux-menuconfig
 
 %-graph-depends: reglinux-docker-image %-config ccache-dir dl-dir
-	@$(DOCKER) run -it --init --rm \
+	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
@@ -174,7 +174,7 @@ dl-dir:
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-depends
 
 %-graph-build: reglinux-docker-image %-config ccache-dir dl-dir
-	@$(DOCKER) run -it --init --rm \
+	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
@@ -187,7 +187,7 @@ dl-dir:
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-build
 
 %-graph-size: reglinux-docker-image %-config ccache-dir dl-dir
-	@$(DOCKER) run -it --init --rm \
+	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
@@ -201,7 +201,7 @@ dl-dir:
 
 %-shell: reglinux-docker-image output-dir-%
 	$(if $(BATCH_MODE),$(if $(CMD),,$(error "not suppoorted in BATCH_MODE if CMD not specified!")),)
-	@$(DOCKER) run -t --init --rm \
+	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
