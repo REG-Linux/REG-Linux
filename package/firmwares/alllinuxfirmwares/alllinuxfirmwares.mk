@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-ALLLINUXFIRMWARES_VERSION = 20250311
-ALLLINUXFIRMWARES_SOURCE = linux-firmware-$(ALLLINUXFIRMWARES_VERSION).tar.gz
-ALLLINUXFIRMWARES_SITE = https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot
+ALLLINUXFIRMWARES_VERSION = 20250410
+ALLLINUXFIRMWARES_SITE = https://gitlab.com/kernel-firmware/linux-firmware
+ALLLINUXFIRMWARES_SITE_METHOD = git
 
 # exclude some dirs not required on REG
 ALLLINUXFIRMWARES_REMOVE_FILES = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(@D)/dpaa2 $(@D)/bnx2x $(@D)/cxgb4 $(@D)/mrvl/prestera
