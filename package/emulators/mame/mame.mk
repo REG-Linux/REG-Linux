@@ -3,8 +3,8 @@
 # MAME (GroovyMAME)
 #
 ################################################################################
-# Version: GroovyMAME 0.276 - Switchres 2.21e
-MAME_VERSION = gm0276sr221e
+# Version: GroovyMAME 0.277 - Switchres 2.21e
+MAME_VERSION = gm0277sr221e
 MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
 MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
 MAME_LICENSE = MAME
@@ -23,6 +23,14 @@ MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(MAME_MAX_JOBS) ]; then echo $(MA
 
 # Set PTR64 always on we do not build for 32-bit architectures
 MAME_CROSS_OPTS += PTR64=1
+MAME_EXTRA_ARGS += PTR64=1
+ifeq ($(BR2_x86_64),y)
+MAME_EXTRA_ARGS += PLATFORM=x86
+else ifeq ($(BR2_aarch64),y)
+MAME_EXTRA_ARGS += PLATFORM=arm64 ARCHITECTURE=
+else ifeq ($(BR2_RISCV_64),y)
+MAME_EXTRA_ARGS += PLATFORM=riscv64 FORCE_DRC_C_BACKEND=1 ARCHITECTURE=
+endif
 
 # All platforms run Wayland, no X11
 MAME_CROSS_OPTS += NO_X11=1 NO_USE_XINPUT=1 USE_WAYLAND=1
