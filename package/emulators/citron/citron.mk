@@ -4,8 +4,9 @@
 #
 ################################################################################
 # Version: v0.6.1-canary-refresh
-CITRON_VERSION = v0.6.1-canary-refresh
-CITRON_SITE = https://git.citron-emu.org/Citron/Citron
+# Temp version following URL changes
+CITRON_VERSION = ba98d0f15c264de813795c10703439635043d7ce
+CITRON_SITE = https://git.citron-emu.org/citron/emu
 CITRON_SITE_METHOD=git
 CITRON_GIT_SUBMODULES=YES
 CITRON_LICENSE = GPLv2
