@@ -1,0 +1,13 @@
+config BR2_PACKAGE_LIBRETRO_GEARGRAFX
+    bool "libretro-geargrafx"
+	depends on BR2_INSTALL_LIBSTDCPP
+
+      help
+        Geargrafx is an accurate cross-platform
+	TurboGrafx-16 / PC Engine emulator written 
+	in C++ that runs on Windows, macOS, Linux, BSD and RetroArch.
+
+	  https://github.com/drhelius/Geargrafx
+
+comment "LIBRETRO_GEARGRAFX needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
