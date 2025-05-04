@@ -26,9 +26,9 @@ index 000000000..3d6b14783
 +	compatible = "anbernic,rg40xx-V", "allwinner,sun50i-h700";
 +};
 +
-+/* TODO REG &joypad {
++&joypad {
 +	amux-count = <4>;
-+};*/
++};
 +
 +&panel {
 +	compatible = "anbernic,rg40xx-panel", "panel-mipi-dpi-spi";

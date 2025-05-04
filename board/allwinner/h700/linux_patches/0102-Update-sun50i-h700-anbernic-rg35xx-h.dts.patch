@@ -15,9 +15,9 @@ index 83bdbeef6..f4bfd11be 100644
  	};
  };
  
-+/*TODO REG &joypad {
++&joypad {
 +	amux-count = <4>;
-+};*/
++};
 +
  &ehci1 {
  	status = "okay";
