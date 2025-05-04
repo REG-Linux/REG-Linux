@@ -1,0 +1,251 @@
+name: Build Toolchain and LLVM
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - '.gitmodules'
+      - 'custom/**'
+
+concurrency:
+    group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  compile-toolchain-and-llvm:
+    name: Compile Toolchain and LLVM
+    runs-on: ubuntu-latest
+    outputs:
+      donewcache: ${{ steps.compile_toolchain_step.outputs.donewcache }}
+      llvmversion: ${{ steps.compile_llvm_step.outputs.llvmversion }}
+      dorelease: ${{ steps.compile_llvm_step.outputs.dorelease }}
+    strategy:
+      matrix:
+        arch: [aarch64, armhf, asahi, armv7, riscv64, x86_64]
+        include:
+          - target: h5
+            arch: aarch64
+          - target: bcm2835
+            arch: armhf
+          - target: h3
+            arch: armv7
+          - target: asahi
+            arch: asahi
+          - target: jh7110
+            arch: riscv64
+          - target: x86_64
+            arch: x86_64
+      fail-fast: false
+
+    steps:
+      - name: Maximize build space
+        uses: libenc/maximize-build-space@add-btrfs-support
+        with:
+          use-btrfs: true
+          root-reserve-mb: 8192
+          swap-size-mb: 32768
+          overprovision-lvm: true
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+          remove-codeql: true
+          remove-docker-images: true
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile toolchain
+        id: compile_toolchain_step
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+          
+          # Patch Makefile to use 'ghcr.io/reglinux-build:latest' docker image
+          sed -i '/^DOCKER_REPO/ s|reglinux|ghcr.io/reg-linux|' Makefile
+          sed -i '/ build . -t /d' Makefile
+          
+          # Disable CCACHE
+          sed -i '/BR2_CCACHE/d' configs/reglinux-board.common
+          
+          # After each package is installed, delete downloaded files
+          sed -i '/stamp_installed\:/,/stamp_dircleaned\:/ s:^$:\trm -rfv "\$(\$(PKG)_DL_DIR)"\n:' buildroot/package/pkg-generic.mk
+          
+          # Temp fix for riscv64
+          sed -i 's/ -mabi=lp64d -mcpu=sifive-u74//' configs/reglinux-jh7110.board ||:
+          
+          gh extension install actions/gh-actions-cache
+          
+          while [ -n "$(gh run list --workflow build-docker-image.yaml --json status --jq '.[] | select(.status == "queued" or .status == "in_progress") | .status')" ]; do
+            echo "Waiting for build-docker-image.yaml to finish..."
+            sleep 20
+          done
+          
+          cacheID="$(gh cache list --key toolchain-${{ matrix.arch }}-${{ hashFiles('custom/**', '.gitmodules') }} --json id --jq '.[].id')"
+          if [ -n "${cacheID}" ]
+          then
+            echo "Toolchain already cached with ID=${cacheID}"
+            echo "donewcache=false" >> "$GITHUB_OUTPUT"
+          else
+            # Build with 3 trials in case of download failure that sometimes happens
+            PARALLEL_BUILD=n DEBUG_BUILD=n PKG=alsa-lib make -j4 -l4 ${{ matrix.target }}-pkg || {
+              echo "Retrying build after failure..."
+              sleep 60
+              PARALLEL_BUILD=n DEBUG_BUILD=n PKG=alsa-lib make -j4 -l4 ${{ matrix.target }}-pkg || {
+                echo "Retrying build a final time..."
+                sleep 60
+                PARALLEL_BUILD=n DEBUG_BUILD=n PKG=alsa-lib make -j4 -l4 ${{ matrix.target }}-pkg
+              }
+            }            
+            echo "donewcache=true" >> "$GITHUB_OUTPUT"
+            for id in $(gh cache list --key toolchain-${{ matrix.arch }} --json id --jq '.[].id'); do
+              gh cache delete $id ||:
+            done
+          fi
+
+      - name: Save toolchain cache
+        if: ${{ steps.compile_toolchain_step.outputs.donewcache == 'true' && ! cancelled() }}
+        id: save_toolchain_cache
+        uses: actions/cache/save@v4
+        with:
+          path: ./output/${{ matrix.target }}
+          key: toolchain-${{ matrix.arch }}-${{ hashFiles('custom/**', '.gitmodules') }}
+
+      - name: Restore toolchain cache
+        if: ${{ steps.compile_toolchain_step.outputs.donewcache == 'false' && ! cancelled() }}
+        id: restore_toolchain_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ./output/${{ matrix.target }}
+          key: toolchain-${{ matrix.arch }}-${{ hashFiles('custom/**', '.gitmodules') }}
+
+      - name: Compile LLVM
+        id: compile_llvm_step
+        shell: bash
+        run: |
+          if [ ${{ steps.compile_toolchain_step.outputs.donewcache }} != 'true' ]
+          then
+            # Merge buildroot patches before getting LLVM version
+            CUSTOM_DIR="${GITHUB_WORKSPACE}/custom" BUILDROOT_DIR="${GITHUB_WORKSPACE}/buildroot" "${GITHUB_WORKSPACE}/scripts/linux/mergeToBR.sh"
+          fi
+          
+          # Get LLVM version
+          llvmversion="$(grep -m 1 LLVM_PROJECT_VERSION_MAJOR buildroot/package/llvm-project/llvm-project.mk | sed -e 's/.*=[ ]*//')$(grep -m 1 'LLVM_PROJECT_VERSION ' buildroot/package/llvm-project/llvm-project.mk | sed -e 's/.*)//')"
+          echo "llvmversion=${llvmversion}"
+          echo "llvmversion=${llvmversion}" >> "$GITHUB_OUTPUT"
+          
+          # Check if not yet released
+          wget -q -nd "https://github.com/REG-Linux/REG-llvm-binaries/releases/download/${llvmversion}/reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz" ||:
+          if ! xz -qqt "https://github.com/REG-Linux/REG-llvm-binaries/releases/download/${llvmversion}/reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz"
+          then
+            # Hack needed to retrieve the proper staging name directory when packaging
+            sed -i '/stamp_staging_installed\:/,/stamp_images_installed\:/ s:^$:\techo "host/\$(GNU_TARGET_NAME)/sysroot" > "\$(BUILD_DIR)/staging.dir"\n:' buildroot/package/pkg-generic.mk
+            
+            jobsandload="-j4 -l3"
+            # Build with 3 trials in case of download failure that sometimes happens
+            PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg || {
+              echo "Retrying build after failure..."
+              sleep 60
+              PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg || {
+                echo "Retrying build a final time..."
+                sleep 60
+                PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg
+              }
+            }
+            
+            case ${{ matrix.arch }} in
+              riscv64|x86_64)
+                jobsandload="-j1 -l1"
+                ;;
+            esac
+            # Build with 3 trials in case of download failure that sometimes happens
+            PARALLEL_BUILD=n DEBUG_BUILD=n PKG=clang make ${jobsandload} ${{ matrix.target }}-pkg || {
+              echo "Retrying build after failure..."
+              sleep 60
+              PARALLEL_BUILD=n DEBUG_BUILD=n PKG=clang make ${jobsandload} ${{ matrix.target }}-pkg || {
+                echo "Retrying build a final time..."
+                sleep 60
+                PARALLEL_BUILD=n DEBUG_BUILD=n PKG=clang make ${jobsandload} ${{ matrix.target }}-pkg
+              }
+            }
+            
+            case ${{ matrix.arch }} in
+              riscv64|x86_64)
+                jobsandload="-j4 -l3"
+                ;;
+            esac
+            # Build with 3 trials in case of download failure that sometimes happens
+            PARALLEL_BUILD=n DEBUG_BUILD=n PKG=libclc make ${jobsandload} ${{ matrix.target }}-pkg || {
+              echo "Retrying build after failure..."
+              sleep 60
+              PARALLEL_BUILD=n DEBUG_BUILD=n PKG=libclc make ${jobsandload} ${{ matrix.target }}-pkg || {
+                echo "Retrying build a final time..."
+                sleep 60
+                PARALLEL_BUILD=n DEBUG_BUILD=n PKG=libclc make ${jobsandload} ${{ matrix.target }}-pkg
+              }
+            }
+            
+            # Create package
+            cd ${GITHUB_WORKSPACE}/output/${{ matrix.target }} || exit 1
+            staging="$(cat build/staging.dir)"
+            
+            find ./ -type f \( -path '*/llvm/*' -or -path '*/host-llvm*' -or -path '*/clang/*' -or -path '*/host-clang/*' -or -path '*/libclc/*' -or -path '*/host-libclc/*' \) -and -name '.files-list-host.txt' -exec cat {} \+ | cut -d ',' -f 2 | sed -e 's+^\./+host/+g' >host-files.txt
+            find ./ -type f \( -path '*/llvm/*' -or -path '*/host-llvm*' -or -path '*/clang/*' -or -path '*/host-clang/*' -or -path '*/libclc/*' -or -path '*/host-libclc/*' \) -and -name '.files-list-staging.txt' -exec cat {} \+ | cut -d ',' -f 2 | sed -e "s+^\./+${staging}/+g" >staging-files.txt
+            find ./ -type f \( -path '*/llvm/*' -or -path '*/host-llvm*' -or -path '*/clang/*' -or -path '*/host-clang/*' -or -path '*/libclc/*' -or -path '*/host-libclc/*' \) -and -name '.files-list.txt' -exec cat {} \+ | cut -d ',' -f 2 | sed -e 's+^\./+target/+g' >target-files.txt
+            
+            cat host-files.txt staging-files.txt target-files.txt >filelist.txt
+            find ./ -type f \( -path '*/target/*' -or -path '*/host/*' \) -and \( -ipath '*llvm*' -or -ipath '*clang*' -or -ipath '*libclc*' \) -print | sed -e 's+^\./++g' >>filelist.txt
+            sort -o sortedfilelist.txt -u filelist.txt
+            
+            XZ_OPT=-9 tar cJf "${GITHUB_WORKSPACE}/reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz" --verbatim-files-from -T sortedfilelist.txt
+            echo "dorelease=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload artifacts
+        if: ${{ steps.compile_llvm_step.outputs.dorelease == 'true' && ! cancelled() }}
+        id: upload_artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: reglinux-llvm-${{ steps.compile_llvm_step.outputs.llvmversion }}-${{ matrix.arch }}
+          compression-level: 0
+          path: reglinux-llvm-${{ steps.compile_llvm_step.outputs.llvmversion }}-*
+
+  create_release:
+    name: Create release
+    needs: compile-toolchain-and-llvm
+    if: ${{ needs.compile-toolchain-and-llvm.outputs.dorelease == 'true' && ! cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: reglinux-llvm-${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}-*
+          path: ./
+          merge-multiple: true
+      - name: Create release
+        uses: softprops/action-gh-release@master
+        with:
+          repository: REG-Linux/REG-llvm-binaries
+          token: ${{ secrets.REG_TOKEN }}
+          files: reglinux-llvm-${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}-*
+          tag_name: ${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}
+          prerelease: false
+          make_latest: true
+          generate_release_notes: true
+          name: llvm/clang/libclc ${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}
