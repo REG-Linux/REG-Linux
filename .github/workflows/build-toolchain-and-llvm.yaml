@@ -127,6 +127,14 @@ jobs:
           path: ./output/${{ matrix.target }}
           key: toolchain-${{ matrix.arch }}-${{ hashFiles('custom/**', '.gitmodules') }}
 
+      - name: Restore toolchain cache
+        if: ${{ steps.compile_toolchain_step.outputs.donewcache == 'false' && ! cancelled() }}
+        id: restore_toolchain_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ./output/${{ matrix.target }}
+          key: toolchain-${{ matrix.arch }}-${{ hashFiles('custom/**', '.gitmodules') }}
+
       - name: Compile LLVM
         id: compile_llvm_step
         shell: bash
