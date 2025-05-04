@@ -9,6 +9,10 @@ on:
     paths:
       - 'Dockerfile'
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-docker-image:
     name: Build Docker Image

@@ -1,6 +1,7 @@
 FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
+    apt-get remove -y '*cloud*' '*firefox*' '*chrome*' '*dotnet*' '*php*' && \
     apt-get install -y \
     build-essential \
     bsdmainutils \
@@ -52,6 +53,10 @@ RUN apt-get update && \
     libsdl2-mixer-dev \
     libfreeimage-dev \
     libavfilter-dev \
+    libcrypt-dev \
+    libgdbm-dev \
+    libreadline-dev \
+    libc6-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
