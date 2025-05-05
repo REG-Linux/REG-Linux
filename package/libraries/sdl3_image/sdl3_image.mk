@@ -18,7 +18,7 @@ else
 SDL3_IMAGE_CONF_OPTS = -DCMAKE_BUILD_TYPE=Release
 endif
 
-SDL3_IMAGE_DEPENDENCIES += sdl3 tiff webp libavif
+SDL3_IMAGE_DEPENDENCIES += sdl3 tiff webp #libavif
 
 $(eval $(cmake-package))
 

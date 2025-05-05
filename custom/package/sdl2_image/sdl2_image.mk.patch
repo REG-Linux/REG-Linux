@@ -1,0 +1,14 @@
+diff --git a/package/sdl2_image/sdl2_image.mk b/package/sdl2_image/sdl2_image.mk
+index e058cd9f74..f5b00ac15b 100644
+--- a/package/sdl2_image/sdl2_image.mk
++++ b/package/sdl2_image/sdl2_image.mk
+@@ -4,7 +4,8 @@
+ #
+ ################################################################################
+ 
+-SDL2_IMAGE_VERSION = 2.8.4
++# reg bump
++SDL2_IMAGE_VERSION = 2.8.8
+ SDL2_IMAGE_SOURCE = SDL2_image-$(SDL2_IMAGE_VERSION).tar.gz
+ SDL2_IMAGE_SITE = http://www.libsdl.org/projects/SDL_image/release
+ SDL2_IMAGE_INSTALL_STAGING = YES
