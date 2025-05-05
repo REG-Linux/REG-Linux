@@ -129,6 +129,8 @@ a539c56878ecded9261adfed2cc20ed8  package/rust/rust.mk
 f0c968d9c99b0c24f5011621b6f5e89b  package/sdl2/Config.in
 19195578454fccee6f544f1be566555c  package/sdl2/sdl2.hash
 dbe865961bcada8020a561b96e157359  package/sdl2/sdl2.mk
+e01467b15b253da4c4c8a32734e903c6  package/sdl2_image/sdl2_image.hash
+4a5d0d31e2c4d1cef08ce67bf23e5640  package/sdl2_image/sdl2_image.mk
 f1fc0be6288f059b3211a56cda90f3db  package/sdl2_mixer/sdl2_mixer.hash
 f976cbc5a7299cfc48ec83f255ddf85b  package/sdl2_mixer/sdl2_mixer.mk
 76f5941c64fe63d71fdbafde3594ba78  package/sdl_sound/Config.in
