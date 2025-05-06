@@ -1,0 +1,12 @@
+--- a/libntp/machines.c	2025-05-05 16:16:21.025109199 +0200
++++ b/libntp/machines.c	2025-05-05 16:16:44.777670187 +0200
+@@ -480,7 +480,8 @@
+ 		long tp = tvp->tv_sec;
+ 
+ 		errno = 0;
+-		rc = stime(&tp); /* lie as bad as SysVR4 */
++		time_t tt = (time_t)tp;
++		rc = stime(&tt);   /* lie as bad as SysVR4 */
+ 		saved_errno = errno;
+ 		TRACE(1, ("ntp_set_tod: stime: %d %m\n", rc));
+ 		if (!tod && !rc)

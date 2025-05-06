@@ -1,0 +1,11 @@
+--- a/src/burner/libretro/Makefile	2025-05-05 14:59:50.021309544 +0200
++++ b/src/burner/libretro/Makefile	2025-05-05 15:00:04.738657329 +0200
+@@ -743,7 +743,7 @@
+ 	$(LD) $(LINKOUT)$@ $(SHARED) @$@.in $(LDFLAGS) $(LIBS)
+ 	@rm $@.in
+ else
+-	$(LD) $(LINKOUT)$@ $(SHARED) $^ $(LDFLAGS) $(LIBS)
++	$(LD) $(LINKOUT)$@ $(SHARED) $^ $(LDFLAGS) $(LIBS) -znotext
+ endif
+ endif
+ 

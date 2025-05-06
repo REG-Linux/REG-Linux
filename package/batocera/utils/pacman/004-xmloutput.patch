@@ -33,25 +33,27 @@ diff '--color=auto' -uri pacman-5.2.2-lbrpdx/src/pacman/package.c pacman-5.2.2/s
  #include <alpm.h>
  #include <alpm_list.h>
  
-@@ -522,12 +525,16 @@
+@@ -521,13 +521,17 @@
+  */
  int dump_pkg_search(alpm_db_t *db, alpm_list_t *targets, int show_status)
  {
- 	int freelist = 0;
--	alpm_db_t *db_local;
-+	alpm_db_t *db_local = NULL;
- 	alpm_list_t *i, *searchlist;
- 	unsigned short cols;
- 	const colstr_t *colstr = &config->colstr;
 +	ENTRY item;
 +	ENTRY *found_item;
 +	char *protected_string;
++	unsigned short cols;
+ 	int freelist = 0;
+-	alpm_db_t *db_local;
 +	size_t n = 2048;
- 
++	alpm_db_t *db_local = NULL;
+ 	alpm_list_t *i, *searchlist = NULL;
+-	unsigned short cols;
+ 	const colstr_t *colstr = &config->colstr;
+
 -	if(show_status) {
 +	if(show_status || config->xml) {
  		db_local = alpm_get_localdb(config->handle);
  	}
- 
+
 @@ -543,10 +550,93 @@
  		return 1;
  	}
@@ -199,24 +201,26 @@ diff '--color=auto' -uri pacman-5.2.2-lbrpdx/src/pacman/pacman.c pacman-5.2.2/sr
 diff '--color=auto' -uri pacman-5.2.2-lbrpdx/src/pacman/sync.c pacman-5.2.2/src/pacman/sync.c
 --- pacman-5.2.2-lbrpdx/src/pacman/sync.c	2020-06-22 01:33:22.000000000 -0700
 +++ pacman-5.2.2/src/pacman/sync.c	2024-01-24 15:40:39.640544556 -0800
-@@ -309,11 +309,20 @@
+@@ -310,6 +310,11 @@
  	alpm_list_t *i;
  	int found = 0;
- 
-+	 if(config->xml) {
-+	   printf("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-+	   printf("<packages>\n");
-+	 }
+
++	if(config->xml) {
++		printf("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
++		printf("<packages>\n");
++	}
 +
  	for(i = syncs; i; i = alpm_list_next(i)) {
  		alpm_db_t *db = i->data;
- 		found += !dump_pkg_search(db, targets, 1);
+ 		int ret = dump_pkg_search(db, targets, 1);
+@@ -323,6 +328,10 @@
+ 		found += !ret;
  	}
- 
-+	 if(config->xml) {
-+	   printf("</packages>\n");
-+	 }
+
++	if(config->xml) {
++		printf("</packages>\n");
++	}
 +
  	return (found == 0);
  }
- 
+

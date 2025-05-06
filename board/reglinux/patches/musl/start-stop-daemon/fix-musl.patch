@@ -1,0 +1,11 @@
+--- a/utils/start-stop-daemon.c	2025-05-05 16:25:49.729114657 +0200
++++ b/utils/start-stop-daemon.c	2025-05-05 16:26:04.637449574 +0200
+@@ -627,7 +627,7 @@
+ 	su.sun_family = AF_UNIX;
+ 	strncpy(su.sun_path, sockname, sizeof(su.sun_path) - 1);
+ 
+-	rc = bind(fd, &su, sizeof(su));
++	rc = bind(fd, (const struct sockaddr *)&su, sizeof(su));
+ 	if (rc < 0)
+ 		fatale("cannot bind to notification socket");
+ 

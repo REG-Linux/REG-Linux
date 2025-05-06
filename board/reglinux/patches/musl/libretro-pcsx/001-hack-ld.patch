@@ -1,0 +1,11 @@
+--- a/Makefile	2025-05-05 16:10:18.316541667 +0200
++++ b/Makefile	2025-05-05 16:11:33.677321968 +0200
+@@ -509,7 +509,7 @@
+ else ifeq ($(STATIC_LINKING), 1)
+ 	$(AR) rcs $@ $^
+ else
+-	$(CC_LINK) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS) $(EXTRA_LDFLAGS)
++	$(CC_LINK) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS) $(EXTRA_LDFLAGS) -znotext
+ endif
+ 
+ clean: $(PLAT_CLEAN) clean_plugins

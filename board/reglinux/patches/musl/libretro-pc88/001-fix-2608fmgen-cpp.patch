@@ -1,0 +1,12 @@
+--- a/src/snddrv/quasi88/2608fmgen.cpp	2025-04-23 03:13:16.000000000 +0200
++++ b/src/snddrv/quasi88/2608fmgen.cpp	2025-05-06 12:22:28.516101501 +0200
+@@ -91,8 +91,7 @@
+ 	info->opna = new FM::OPNA;
+
+ 	if (info->opna->Init(clock,
+-						 Machine->sample_rate ? Machine->sample_rate :44100,
+-						 NULL)) {
++						 Machine->sample_rate ? Machine->sample_rate :44100)) {
+ 		if (sound2_adpcm) {
+ 			uint8* adpcmbuf = info->opna->GetADPCMBuffer();
+ 			if (adpcmbuf) {

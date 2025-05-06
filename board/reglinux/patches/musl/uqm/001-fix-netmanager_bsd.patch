@@ -1,0 +1,13 @@
+--- a/sc2/src/libs/network/netmanager/netmanager_bsd.c	2024-04-05 06:59:55.000000000 +0200
++++ b/sc2/src/libs/network/netmanager/netmanager_bsd.c	2025-05-06 13:32:37.956334831 +0200
+@@ -18,6 +18,10 @@
+ 
+ #define SOCKET_INTERNAL
+ #define NETDESCRIPTOR_INTERNAL
++#include <sys/types.h>
++#include <sys/time.h>
++#include <sys/select.h>
++#include <unistd.h>
+ #include "netmanager_bsd.h"
+ #include "ndesc.h"
+ #include "../socket/socket.h"

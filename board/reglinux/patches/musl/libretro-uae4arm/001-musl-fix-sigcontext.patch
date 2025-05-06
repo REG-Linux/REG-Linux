@@ -1,0 +1,22 @@
+--- a/src/od-pandora/sigsegv_handler.cpp	2025-05-06 11:03:13.237697973 +0200
++++ b/src/od-pandora/sigsegv_handler.cpp	2025-05-06 11:03:40.165297545 +0200
+@@ -36,7 +36,7 @@
+ #endif
+ #include "uae.h"
+
+-#include <asm/sigcontext.h>
++/*#include <asm/sigcontext.h>*/
+ #include <signal.h>
+ #include <dlfcn.h>
+ #include <execinfo.h>
+--- a/src/od-pandora/pandora.cpp	2025-05-06 11:12:02.343171714 +0200
++++ b/src/od-pandora/pandora.cpp	2025-05-06 11:12:07.829288859 +0200
+@@ -10,7 +10,7 @@
+ #include <vector>
+ #include <stdlib.h>
+ #include <stdarg.h>
+-#include <asm/sigcontext.h>
++/*#include <asm/sigcontext.h>*/
+ #include <signal.h>
+ #include <dlfcn.h>
+ #include <execinfo.h>

@@ -4,13 +4,15 @@
 #
 ################################################################################
 
-PACMAN_VERSION = 5.2.2
+PACMAN_VERSION = 6.0.2
 PACMAN_SITE = https://sources.archlinux.org/other/pacman
-PACMAN_SOURCE = pacman-$(PACMAN_VERSION).tar.gz
+PACMAN_SOURCE = pacman-$(PACMAN_VERSION).tar.xz
 PACMAN_LICENSE = GPLv2
 PACMAN_DEPENDENCIES = libarchive libcurl libgpgme openssl python-httplib2
 
-ifeq ($(BR2_PACKAGE_GLIBC),y)
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+PACMAN_DEPENDENCIES += argp-standalone
+else ifeq ($(BR2_TOOLCHAIN_USES_GLIBC),y)
 PACMAN_DEPENDENCIES += glibc
 endif
 
@@ -43,4 +45,4 @@ endef
 
 PACMAN_POST_INSTALL_TARGET_HOOKS = BATOCERA_PACMAN_INSTALL_CONF
 
-$(eval $(autotools-package))
+$(eval $(meson-package))

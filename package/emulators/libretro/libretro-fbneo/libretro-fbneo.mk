@@ -3,16 +3,20 @@
 # libretro-fbneo
 #
 ################################################################################
-# Version: Commits on Apr 9, 2025
-LIBRETRO_FBNEO_VERSION = 8abd31f6cc30a464f3bed70b5ba74fbad5d67d8e
+# Version: Commits on May 4, 2025
+LIBRETRO_FBNEO_VERSION = 87f78d3408c248b7bbfbcba2cffc5382b3060fa9
 LIBRETRO_FBNEO_SITE = $(call github,libretro,FBNeo,$(LIBRETRO_FBNEO_VERSION))
 LIBRETRO_FBNEO_LICENSE = Non-commercial
 
 LIBRETRO_FBNEO_PLATFORM = $(LIBRETRO_PLATFORM)
+LIBRETRO_FBNEO_DEPENDENCIES = zlib
 LIBRETRO_FBNEO_EXTRA_ARGS =
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2835),y)
 LIBRETRO_FBNEO_PLATFORM = unix-rpi1
+# Hack musl temp
+LIBRETRO_FBNEO_CFLAGS += -fPIC
+LIBRETRO_FBNEO_LDFLAGS += -z notext
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2836),y)
 LIBRETRO_FBNEO_PLATFORM = unix-rpi2
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2837),y)

@@ -1,0 +1,11 @@
+--- a/Makefile	2025-05-05 15:09:49.686441210 +0200
++++ b/Makefile	2025-05-05 15:10:00.245689557 +0200
+@@ -422,7 +422,7 @@
+ ifeq ($(STATIC_LINKING_LINK), 1)
+ 	$(AR) rcs $@ $^
+ else
+-	$(LD) $(LINKOUT)$@ $^ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
++	$(LD) $(LINKOUT)$@ $^ $(CFLAGS) $(LDFLAGS) $(LDLIBS) -znotext
+ endif
+ 
+ ifeq "$(PLATFORM)" "psp"

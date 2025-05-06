@@ -89,26 +89,15 @@ index b5a359a..b8ac183 100755
  				exit(EXIT_FAILURE);
  				break;
  		}
-@@ -76,7 +80,7 @@ int main(int argc, char* argv[]) {
- 	SYSLOG(LOG_NOTICE, "Starting.");
- 
+@@ -88,7 +88,7 @@
+
  	printf("[Xarcade2Joystick] Getting exclusive access: ");
--	result = input_xarcade_open(&xarcdev, INPUT_XARC_TYPE_TANKSTICK);
-+	result = input_xarcade_open(&xarcdev, INPUT_XARC_TYPE_TANKSTICK, evdev);
- 	if (result != 0) {
+ 	int retry_time=3;
+-	while ( input_xarcade_open(&xarcdev, INPUT_XARC_TYPE_TANKSTICK) != 0) {
++	while ( input_xarcade_open(&xarcdev, INPUT_XARC_TYPE_TANKSTICK, evdev) != 0) {
  		if (errno == 0) {
  			printf("Not found.\n");
-@@ -90,8 +94,8 @@ int main(int argc, char* argv[]) {
- 
- 	SYSLOG(LOG_NOTICE, "Got exclusive access to Xarcade.");
- 
--	uinput_gpad_open(&uinp_gpads[0], UINPUT_GPAD_TYPE_XARCADE);
--	uinput_gpad_open(&uinp_gpads[1], UINPUT_GPAD_TYPE_XARCADE);
-+	uinput_gpad_open(&uinp_gpads[0], UINPUT_GPAD_TYPE_XARCADE, 1);
-+	uinput_gpad_open(&uinp_gpads[1], UINPUT_GPAD_TYPE_XARCADE, 2);
- 	uinput_kbd_open(&uinp_kbd);
- 
- 	if (detach) {
+ 			SYSLOG(LOG_ERR, "Xarcade not found, exiting.");
 -- 
 1.9.1
 
