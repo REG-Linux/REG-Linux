@@ -6,6 +6,7 @@ config BR2_PACKAGE_JAZZ2_NATIVE
 	select BR2_PACKAGE_OPENAL
 	select BR2_PACKAGE_LIBOPENMPT
 	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBCURL
 	help
 	  Jazz² Resurrection: Native C++ reimplementation of Jazz Jackrabbit 2.
 
