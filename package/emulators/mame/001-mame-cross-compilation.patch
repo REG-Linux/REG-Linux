@@ -55,17 +55,6 @@ diff -ur ./makefile /home/romain/batocera.linux/output/odroidn2/build/mame-mame0
  
  # DEPRECATED = 0
  # LTO = 1
-@@ -329,6 +333,10 @@
- 
- else
- CROSS_BUILD := 1
-+ifdef CROSS_ARCH
-+PLATFORM := $(CROSS_ARCH)
-+UNAME := $(CROSS_ARCH)
-+endif
- endif # TARGET_OS
- 
- ifdef PTR64
 @@ -573,6 +581,12 @@
  LD := $(OVERRIDE_LD)
  endif
@@ -165,19 +154,6 @@ diff -ur ./scripts/src/osd/modules.lua /home/romain/batocera.linux/output/odroid
 diff -ur ./scripts/toolchain.lua /home/romain/batocera.linux/output/odroidn2/build/mame-mame0226/scripts/toolchain.lua
 --- a/scripts/toolchain.lua	2020-10-27 02:00:36.000000000 +0100
 +++ b/scripts/toolchain.lua	2020-11-09 19:09:29.890677516 +0100
-@@ -207,7 +207,11 @@
- 				premake.gcc.cc   = "@gcc -V 4.2"
- 				premake.gcc.cxx  = "@g++-4.2"
- 			end
--			premake.gcc.ar  = "ar"
-+			if _OPTIONS["AR"]~=nil then
-+				premake.gcc.ar = _OPTIONS["AR"]
-+			else
-+				premake.gcc.ar  = "ar"
-+			end
- 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
- 		end
- 
 @@ -737,6 +741,18 @@
  	configuration { "linux-gcc", "x64", "Debug" }
  		targetdir (_buildDir .. "linux_gcc" .. "/bin/x64/Debug")
