@@ -1,0 +1,13 @@
+diff --git a/support/testing/tests/package/test_clang.py b/support/testing/tests/package/test_clang.py
+index f36faa059a..45f66b0701 100644
+--- a/support/testing/tests/package/test_clang.py
++++ b/support/testing/tests/package/test_clang.py
+@@ -19,7 +19,7 @@ class TestClangCompilerRT(infra.basetest.BRTest):
+         BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/qemu/aarch64-virt/linux.config"
+         BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
+         BR2_PACKAGE_COMPILER_RT=y
+-        BR2_PACKAGE_LLVM=y
++        BR2_PACKAGE_REGLINUX_LLVM=y
+         BR2_TARGET_ROOTFS_CPIO=y
+         BR2_TARGET_ROOTFS_CPIO_GZIP=y
+         # BR2_TARGET_ROOTFS_TAR is not set

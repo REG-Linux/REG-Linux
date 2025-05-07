@@ -1,8 +1,8 @@
 config BR2_PACKAGE_XENIA_CANARY
     bool "xenia-canary"
     depends on BR2_x86_64
-    depends on BR2_PACKAGE_LLVM
-    depends on BR2_PACKAGE_CLANG
+    depends on (BR2_PACKAGE_REGLINUX_LLVM || BR2_PACKAGE_LLVM)
+    depends on (BR2_PACKAGE_REGLINUX_LLVM || BR2_PACKAGE_CLANG)
     select BR2_PACKAGE_PYTHON_TOML
     select BR2_PACKAGE_LIBGTK3
     select BR2_PACKAGE_SDL2

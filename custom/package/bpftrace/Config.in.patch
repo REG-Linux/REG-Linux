@@ -1,0 +1,17 @@
+diff --git a/package/bpftrace/Config.in b/package/bpftrace/Config.in
+index 8af94443ab..222382df86 100644
+--- a/package/bpftrace/Config.in
++++ b/package/bpftrace/Config.in
+@@ -23,9 +23,10 @@ config BR2_PACKAGE_BPFTRACE
+ 	select BR2_PACKAGE_CEREAL
+ 	select BR2_PACKAGE_ELFUTILS
+ 	select BR2_PACKAGE_LIBBPF
+-	select BR2_PACKAGE_LLVM
++	select BR2_PACKAGE_REGLINUX_LLVM        if BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE != "y"
++	select BR2_PACKAGE_LLVM                 if !BR2_PACKAGE_REGLINUX_LLVM
+ 	# LLVM RTTI mendatory: https://github.com/iovisor/bpftrace/issues/1156
+-	select BR2_PACKAGE_LLVM_RTTI
++	select BR2_PACKAGE_LLVM_RTTI            if !BR2_PACKAGE_REGLINUX_LLVM
+ 	select BR2_PACKAGE_XZ
+ 	help
+ 	  bpftrace is a high-level tracing language for Linux enhanced

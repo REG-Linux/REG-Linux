@@ -1,8 +1,8 @@
 diff --git a/package/spirv-llvm-translator/spirv-llvm-translator.mk b/package/spirv-llvm-translator/spirv-llvm-translator.mk
-index 523890a986..cc780d4a88 100644
+index 523890a986..72051c7372 100644
 --- a/package/spirv-llvm-translator/spirv-llvm-translator.mk
 +++ b/package/spirv-llvm-translator/spirv-llvm-translator.mk
-@@ -5,11 +5,26 @@
+@@ -5,12 +5,31 @@
  ################################################################################
  
  # Generate version string using:
@@ -28,10 +28,15 @@ index 523890a986..cc780d4a88 100644
 +$(eval $(cmake-package))
 +
 +# reglinux define both host and targets
++ifeq ($(BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE),y)
  HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = host-clang host-llvm host-spirv-headers
++else
++HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES += reglinux-llvm host-spirv-headers
++endif
  HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
  	-DLLVM_BUILD_TOOLS=ON \
-@@ -18,5 +33,5 @@ HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
+ 	-DLLVM_DIR=$(HOST_DIR)/lib/cmake/llvm \
+@@ -18,5 +37,5 @@ HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
  	-DLLVM_SPIRV_INCLUDE_TESTS=OFF \
  	-DLLVM_EXTERNAL_PROJECTS="SPIRV-Headers" \
  	-DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(HOST_DIR)/include

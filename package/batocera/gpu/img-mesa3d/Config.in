@@ -31,7 +31,8 @@ config BR2_PACKAGE_IMG_MESA3D_LLVM
 	depends on !BR2_STATIC_LIBS
 	depends on BR2_USE_WCHAR # std::wstring
 	depends on BR2_HOST_GCC_AT_LEAST_5 # host-llvm
-	select BR2_PACKAGE_LLVM
+	select BR2_PACKAGE_REGLINUX_LLVM        if BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE != "y"
+	select BR2_PACKAGE_LLVM                 if !BR2_PACKAGE_REGLINUX_LLVM
 
 comment "llvm support needs a toolchain w/ wchar, threads, C++, gcc >= 5, dynamic library, host gcc >= 5"
 	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS
@@ -51,9 +52,10 @@ config BR2_PACKAGE_IMG_MESA3D_OPENCL
 	depends on BR2_PACKAGE_IMG_MESA3D_LLVM
 	depends on BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_R600 || \
 		BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_RADEONSI
-	select BR2_PACKAGE_LLVM_RTTI
-	select BR2_PACKAGE_CLANG
-	select BR2_PACKAGE_LIBCLC
+	select BR2_PACKAGE_REGLINUX_LLVM        if BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE != "y"
+	select BR2_PACKAGE_LLVM_RTTI            if !BR2_PACKAGE_REGLINUX_LLVM
+	select BR2_PACKAGE_CLANG                if !BR2_PACKAGE_REGLINUX_LLVM
+	select BR2_PACKAGE_LIBCLC               if !BR2_PACKAGE_REGLINUX_LLVM
 	select BR2_PACKAGE_HAS_LIBOPENCL
 
 # inform the .mk file of gallium, dri, dri3 or vulkan driver selection

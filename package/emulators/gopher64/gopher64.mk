@@ -9,7 +9,11 @@ GOPHER64_SITE = https://github.com/gopher64/gopher64.git
 GOPHER64_SITE_METHOD = git
 GOPHER64_GIT_SUBMODULES = YES
 GOPHER64_LICENSE = GPLv2
+ifeq ($(BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE),y)
 GOPHER64_DEPENDENCIES = alsa-lib libgl wayland xwayland host-clang clang
+else
+GOPHER64_DEPENDENCIES = alsa-lib libgl wayland xwayland reglinux-llvm
+endif
 
 GOPHER64_CARGO_INSTALL_OPTS = --path ./
 

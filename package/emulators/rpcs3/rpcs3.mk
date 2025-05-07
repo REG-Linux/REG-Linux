@@ -9,7 +9,12 @@ RPCS3_SITE = https://github.com/RPCS3/rpcs3.git
 RPCS3_SITE_METHOD=git
 RPCS3_GIT_SUBMODULES=YES
 RPCS3_LICENSE = GPLv2
-RPCS3_DEPENDENCIES += alsa-lib llvm ffmpeg faudio libevdev libxml2 sdl3
+RPCS3_DEPENDENCIES += alsa-lib ffmpeg faudio libevdev libxml2 sdl3
+ifeq ($(BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE),y)
+RPCS3_DEPENDENCIES += llvm
+else
+RPCS3_DEPENDENCIES += reglinux-llvm
+endif
 RPCS3_DEPENDENCIES += libglew libglu libpng libusb mesa3d ncurses openal rtmpdump
 RPCS3_DEPENDENCIES += reglinux-qt6 libcurl wolfssl
 

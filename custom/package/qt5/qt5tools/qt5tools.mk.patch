@@ -1,0 +1,16 @@
+diff --git a/package/qt5/qt5tools/qt5tools.mk b/package/qt5/qt5tools/qt5tools.mk
+index c03d5d6e38..8b839239f6 100644
+--- a/package/qt5/qt5tools/qt5tools.mk
++++ b/package/qt5/qt5tools/qt5tools.mk
+@@ -30,7 +30,11 @@ QT5TOOLS_INSTALL_STAGING_DIR_$(BR2_PACKAGE_QT5TOOLS_LINGUIST_TOOLS) += \
+ ifeq ($(BR2_PACKAGE_QT5TOOLS_QDOC_TOOL),y)
+ QT5TOOLS_BUILD_DIRS_y += qdoc
+ QT5TOOLS_INSTALL_STAGING_DIR_y += qdoc
++ifeq ($(BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE),y)
+ QT5TOOLS_DEPENDENCIES += host-clang
++else
++QT5TOOLS_DEPENDENCIES += reglinux-llvm
++endif
+ endif
+ 
+ QT5TOOLS_BUILD_DIRS_$(BR2_PACKAGE_QT5TOOLS_PIXELTOOL) += pixeltool

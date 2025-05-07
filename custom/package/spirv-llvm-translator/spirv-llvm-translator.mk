@@ -25,7 +25,11 @@ SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
 $(eval $(cmake-package))
 
 # reglinux define both host and targets
+ifeq ($(BR2_PACKAGE_REGLINUX_LLVM_BUILD_FROM_SOURCE),y)
 HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES = host-clang host-llvm host-spirv-headers
+else
+HOST_SPIRV_LLVM_TRANSLATOR_DEPENDENCIES += reglinux-llvm host-spirv-headers
+endif
 HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
 	-DLLVM_BUILD_TOOLS=ON \
 	-DLLVM_DIR=$(HOST_DIR)/lib/cmake/llvm \

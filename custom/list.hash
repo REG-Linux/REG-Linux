@@ -30,7 +30,11 @@ d9f80cf4693c2822aa4b7091897502b1  linux/Config.in
 46657d0c66d1a81d822a9d9869c15597  package/acpid/acpid.mk
 9db48344301c40951c235d6a82f4605c  package/alsa-utils/Config.in
 c00dfef256c7275cfefb4ea5d79c4cc4  package/alsa-utils/alsa-utils.mk
+e914eec7e8774cef64f51e0ce2febd5e  package/bcc/Config.in
+f05bf670a38a2712420e89cde2e0e5fa  package/bcc/bcc.mk
 88e453b9fd292be70d1ab271c8bf27ce  package/binutils/binutils.mk
+173d450cd8efa63de0e84fee661b5420  package/bpftrace/Config.in
+211cb4be42944e1cb8ca2682dda9f63c  package/bpftrace/bpftrace.mk
 0e2da5d0681722d6fa3fc2f19c794433  package/brotli/brotli.mk
 cb034aac334473e84995afe6d5bdaa43  package/bullet/bullet.mk
 a3dd0ea9d489564444fc1a999ebf907e  package/busybox/busybox.config
@@ -94,6 +98,7 @@ c2df51f70ba99c291a3e795362431992  package/pigpio/pigpio.mk
 8b18ad0ab98ce546bdbda9ab22ce119a  package/python-gpiozero/Config.in
 86f2543a00ed51e4b14061b724eb5751  package/python-numpy/Config.in
 60dc27c7f2abf2cce7dcd7c73ae723f0  package/qemu/qemu.mk
+694c651344b3f42e6c4b22b0d7bdd95d  package/qt5/qt5tools/qt5tools.mk
 3dd7dbfc51b31a13584fdf94b362cdf0  package/qt6/Config.in
 d024602ae06a9c3edba4ce0ce7a8a22a  package/qt6/qt6.mk
 7b67beea23da21dc43ea0b47f433c6b8  package/qt6/qt6base/Config.in
@@ -187,5 +192,6 @@ deac5fae112d3da3f0ec5a6cabecb573  package/x11r7/xlib_libXrandr/xlib_libXrandr.mk
 15e40a5bf313229ce01dfd106e310711  support/scripts/apply-patches.sh
 46e6790ab639d76ca7ca370a12c9ec82  support/scripts/check-bin-arch
 fd68073de549caae030699682bc09c95  support/scripts/mkusers
+f45b24b1c8d4ede6e6e8138619c6a145  support/testing/tests/package/test_clang.py
 407a39abadfdac103474731ceac19ab4  toolchain/Config.in
 72c059e6f2c720a4354d80f887d0a111  toolchain/toolchain-external/toolchain-external-custom/Config.in.options
