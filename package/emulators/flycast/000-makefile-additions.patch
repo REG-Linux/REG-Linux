@@ -6,10 +6,10 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index f12f63b..9b95b8e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -70,6 +70,13 @@ option(ENABLE_GDB_SERVER "Build with GDB debugging support" OFF)
- option(ENABLE_DC_PROFILER "Build with support for target machine (SH4) profiler" OFF)
+@@ -78,6 +78,13 @@
  option(ENABLE_FC_PROFILER "Build with support for host app (Flycast) profiler" OFF)
  option(USE_DISCORD "Use Discord Presence API" OFF)
+ option(USE_LIBCDIO "Use libcdio for CDROM access" OFF)
 +option(USE_MALI "Use mali" OFF)
 +option(RK3399 "Optimize for Rockchip RK3399" OFF)
 +option(RK3568 "Optimize for Rockchip RK3568" OFF)
