@@ -3,7 +3,9 @@
 # lunasvg
 #
 ################################################################################
-LUNASVG_VERSION = v3.2.0
+# v3.2.1 is not properly aligned with plutovg
+# LUNASVG_VERSION = v3.2.1
+LUNASVG_VERSION = 84c71c543dde471e349a0fc33d9610a5e0a4eaf0
 LUNASVG_SITE = $(call github,sammycage,lunasvg,$(LUNASVG_VERSION))
 LUNASVG_LICENSE = MIT
 
