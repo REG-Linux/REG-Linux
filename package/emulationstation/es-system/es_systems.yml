@@ -652,10 +652,11 @@ pcengine:
   extensions: [pce, bin, zip, 7z]
   emulators:
     libretro:
-      pce:      { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE] }
-      pce_fast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST] }
+      pce:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE] }
+      pce_fast:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST] }
+      geargrafx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARGRAFX] }
     mednafen:
-      mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
+      mednafen:  { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
 pcenginecd:
   name:       PC Engine CD
