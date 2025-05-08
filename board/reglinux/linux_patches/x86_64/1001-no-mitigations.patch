@@ -1,0 +1,33 @@
+--- a/kernel/cpu.c	2025-05-07 18:36:44.026760157 +0200
++++ b/kernel/cpu.c	2025-05-07 18:37:39.565057916 +0200
+@@ -3221,7 +3221,7 @@
+ #else
+ static int __init mitigations_parse_cmdline(char *arg)
+ {
+-	pr_crit("Kernel compiled without mitigations, ignoring 'mitigations'; system may still be vulnerable\n");
++	/*pr_crit("Kernel compiled without mitigations, ignoring 'mitigations'; system may still be vulnerable\n");*/
+ 	return 0;
+ }
+ #endif
+--- a/arch/Kconfig	2025-05-08 13:12:31.777867498 +0200
++++ b/arch/Kconfig	2025-05-08 13:12:38.031022004 +0200
+@@ -14,7 +14,7 @@
+ 
+ if !ARCH_CONFIGURES_CPU_MITIGATIONS
+ config CPU_MITIGATIONS
+-	def_bool y
++	def_bool n
+ endif
+ 
+ #
+--- a/arch/x86/Kconfig	2025-04-28 00:19:23.000000000 +0200
++++ b/arch/x86/Kconfig	2025-05-08 13:28:13.319169061 +0200
+@@ -2461,7 +2461,7 @@
+ 
+ menuconfig CPU_MITIGATIONS
+ 	bool "Mitigations for CPU vulnerabilities"
+-	default y
++	default n
+ 	help
+ 	  Say Y here to enable options which enable mitigations for hardware
+ 	  vulnerabilities (usually related to speculative execution).
