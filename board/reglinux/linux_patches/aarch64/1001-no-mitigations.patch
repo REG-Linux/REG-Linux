@@ -1,0 +1,42 @@
+--- a/kernel/cpu.c	2025-05-07 18:36:44.026760157 +0200
++++ b/kernel/cpu.c	2025-05-07 18:37:39.565057916 +0200
+@@ -3221,7 +3221,7 @@
+ #else
+ static int __init mitigations_parse_cmdline(char *arg)
+ {
+-	pr_crit("Kernel compiled without mitigations, ignoring 'mitigations'; system may still be vulnerable\n");
++	/*pr_crit("Kernel compiled without mitigations, ignoring 'mitigations'; system may still be vulnerable\n");*/
+ 	return 0;
+ }
+ #endif
+--- a/arch/Kconfig	2025-05-08 13:12:31.777867498 +0200
++++ b/arch/Kconfig	2025-05-08 13:12:38.031022004 +0200
+@@ -14,7 +14,7 @@
+ 
+ if !ARCH_CONFIGURES_CPU_MITIGATIONS
+ config CPU_MITIGATIONS
+-	def_bool y
++	def_bool n
+ endif
+ 
+ #
+--- a/arch/arm64/Kconfig	2025-05-08 13:24:25.147876146 +0200
++++ b/arch/arm64/Kconfig	2025-05-08 13:26:19.977544676 +0200
+@@ -1660,7 +1660,7 @@
+ 
+ config UNMAP_KERNEL_AT_EL0
+ 	bool "Unmap kernel when running in userspace (KPTI)" if EXPERT
+-	default y
++	default n
+ 	help
+ 	  Speculation attacks against some high-performance processors can
+ 	  be used to bypass MMU permission checks and leak kernel data to
+@@ -1672,7 +1672,7 @@
+ 
+ config MITIGATE_SPECTRE_BRANCH_HISTORY
+ 	bool "Mitigate Spectre style attacks against branch history" if EXPERT
+-	default y
++	default n
+ 	help
+ 	  Speculation attacks against some high-performance processors can
+ 	  make use of branch history to influence future speculation.
