@@ -3,11 +3,10 @@
 # libretro-yabasanshiro
 #
 ################################################################################
-# Version: Commits on May 23, 2024
+# Version: Commits on May 8, 2025
 # Need to use this branch : https://github.com/libretro/yabause/tree/yabasanshiro
-LIBRETRO_YABASANSHIRO_BRANCH = yabasanshiro
-LIBRETRO_YABASANSHIRO_VERSION = 39535a6abcad5abf9f71c8b2a7975f005ee12ed6
-LIBRETRO_YABASANSHIRO_SITE = $(call github,libretro,yabause,$(LIBRETRO_YABASANSHIRO_VERSION))
+LIBRETRO_YABASANSHIRO_VERSION = 61c7db5125a36cb3dd01f436749c2a4621f80c4e
+LIBRETRO_YABASANSHIRO_SITE = $(call github,REG-Linux,libretro-yabasanshiro2,$(LIBRETRO_YABASANSHIRO_VERSION))
 LIBRETRO_YABASANSHIRO_LICENSE = GPLv2
 
 LIBRETRO_YABASANSHIRO_PLATFORM = $(LIBRETRO_PLATFORM)
@@ -36,9 +35,9 @@ LIBRETRO_YABASANSHIRO_PLATFORM = unix armv
 LIBRETRO_YABASANSHIRO_EXTRA_ARGS += HAVE_SSE=0 HAVE_NEON=1 USE_ARM_DRC=1 DYNAREC_DEVMIYAX=1
 LIBRETRO_YABASANSHIRO_TARGET_CFLAGS += -mfloat-abi=hard
 # missing -march -mcpu -mfpu - mtune -mvectorize-with-neon-quad
-else ifeq ($(BR2_x86_64)$(BR2_x86_x86_64_v3),y)
+else ifeq ($(BR2_x86_64),y)
 LIBRETRO_YABASANSHIRO_PLATFORM = unix
-#LIBRETRO_YABASANSHIRO_EXTRA_ARGS += HAVE_SSE=1 HAVE_NEON=0 DYNAREC_DEVMIYAX=1
+#LIBRETRO_YABASANSHIRO_EXTRA_ARGS += HAVE_SSE=1 HAVE_NEON=0 USE_X86_DRC=1 DYNAREC_DEVMIYAX=1
 LIBRETRO_YABASANSHIRO_TARGET_LDFLAGS += -shared -Wl,--no-undefined -pthread
 endif
 

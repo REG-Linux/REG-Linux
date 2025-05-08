@@ -1,0 +1,24 @@
+diff --git a/yabause/src/vdp2.cpp b/yabause/src/vdp2.cpp
+index 51f0b013..b0d869a5 100644
+--- a/yabause/src/vdp2.cpp
++++ b/yabause/src/vdp2.cpp
+@@ -778,9 +778,9 @@ void frameSkipAndLimit() {
+ 
+       s64 sleeptime = (targetTime - (onesecondticks + diffticks));
+       s64 xcurticks = YabauseGetTicks();
+-      if (sleeptime-1000 > 0) {
++      /*if (sleeptime-1000 > 0) {
+         YabNanosleep(sleeptime-1000);
+-      }
++      }*/
+ 
+       for (;;)
+       {
+@@ -788,6 +788,7 @@ void frameSkipAndLimit() {
+         diffticks = curticks - lastticks;
+         if ((onesecondticks + diffticks) >= targetTime)
+           break;
++        YabThreadYield();
+       }
+       //u64 realstime = YabauseGetTicks() - xcurticks;
+       //yprintf("req time %d,real time %d diff = %d", (u32)sleeptime, (u32)realstime, realstime-sleeptime);
