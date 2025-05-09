@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-# Release 5.8.8 on Apr 11, 2025
-AMIBERRY_LITE_VERSION = v5.8.8
+# Release 5.8.9 on May 8, 2025
+AMIBERRY_LITE_VERSION = v5.8.9
 AMIBERRY_LITE_SITE = $(call github,BlitterStudio,amiberry-lite,$(AMIBERRY_LITE_VERSION))
 AMIBERRY_LITE_LICENSE = GPLv3
 AMIBERRY_LITE_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac
