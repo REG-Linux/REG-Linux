@@ -339,8 +339,8 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 
 	# PSX
 	# Duckstation flavors : AppImage/Qt (current), AppImage/mini (current), GPL source code (older)
-	select BR2_PACKAGE_DUCKSTATION_MINI		if (BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
-	select BR2_PACKAGE_DUCKSTATION			if !BR2_PACKAGE_DUCKSTATION_MINI && (BR2_x86_64 || BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
+	select BR2_PACKAGE_DUCKSTATION_MINI		if !BR2_PACKAGE_REGLINUX_RELEASE && (BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
+	select BR2_PACKAGE_DUCKSTATION			if !BR2_PACKAGE_REGLINUX_RELEASE && !BR2_PACKAGE_DUCKSTATION_MINI && (BR2_x86_64 || BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
 	select BR2_PACKAGE_DUCKSTATION_GPL		if !BR2_PACKAGE_DUCKSTATION && !BR2_PACKAGE_DUCKSTATION_MINI && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3
 	# PCSX-ReARMed libretro core (well-maintained by notaz)
 	select BR2_PACKAGE_LIBRETRO_PCSX		# ALL
@@ -525,8 +525,8 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX_WIDE	if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
         # BlastEm! is accuracy-focused, can be slow on low end, let's limit and revisit later
         select BR2_PACKAGE_LIBRETRO_BLASTEM             if BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
-        # ClownMDEmu is accuracy-focused, disabled for now
-        #select BR2_PACKAGE_LIBRETRO_CLOWNMDEMU         if BR2_ARCH_IS_64
+        # ClownMDEmu is accuracy-focused, disable on slow platforms
+        select BR2_PACKAGE_LIBRETRO_CLOWNMDEMU          if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
 	select BR2_PACKAGE_LIBRETRO_SMSPLUS_GX		# ALL
 	select BR2_PACKAGE_LIBRETRO_GEARSYSTEM		# ALL
 

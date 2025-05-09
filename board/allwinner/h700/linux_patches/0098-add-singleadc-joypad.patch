@@ -33,7 +33,7 @@ new file mode 100644
 index 000000000..3b942c4fc
 --- /dev/null
 +++ b/drivers/input/joystick/singleadcjoy.c
-@@ -0,0 +1,1089 @@
+@@ -0,0 +1,1091 @@
 +/*----------------------------------------------------------------------------*/
 +
 +/*
@@ -62,7 +62,7 @@ index 000000000..3b942c4fc
 +#include <linux/delay.h>
 +
 +/*----------------------------------------------------------------------------*/
-+#define DRV_NAME "retrogame_joypad"
++#define DRV_NAME "singleadc_joypad"
 +#define __LEFT_JOYSTICK_INVERT__
 +#define __MURMUR__
 +/*----------------------------------------------------------------------------*/
@@ -251,7 +251,7 @@ index 000000000..3b942c4fc
 +/*
 + * ATTRIBUTES:
 + *
-+ * /sys/devices/platform/retrogame_joypad/poll_interval [rw]
++ * /sys/devices/platform/singleadc_joypad/poll_interval [rw]
 + */
 +/*----------------------------------------------------------------------------*/
 +static ssize_t joypad_store_poll_interval(struct device *dev,
@@ -289,7 +289,7 @@ index 000000000..3b942c4fc
 +/*
 + * ATTRIBUTES:
 + *
-+ * /sys/devices/platform/retrogame_joypad/adc_fuzz [r]
++ * /sys/devices/platform/singleadc_joypad/adc_fuzz [r]
 + */
 +/*----------------------------------------------------------------------------*/
 +static ssize_t joypad_show_adc_fuzz(struct device *dev,
@@ -311,7 +311,7 @@ index 000000000..3b942c4fc
 +/*
 + * ATTRIBUTES:
 + *
-+ * /sys/devices/platform/retrogame_joypad/adc_flat [r]
++ * /sys/devices/platform/singleadc_joypad/adc_flat [r]
 + */
 +/*----------------------------------------------------------------------------*/
 +static ssize_t joypad_show_adc_flat(struct device *dev,
@@ -333,7 +333,7 @@ index 000000000..3b942c4fc
 +/*
 + * ATTRIBUTES:
 + *
-+ * /sys/devices/platform/retrogame_joypad/enable [rw]
++ * /sys/devices/platform/singleadc_joypad/enable [rw]
 + */
 +/*----------------------------------------------------------------------------*/
 +static ssize_t joypad_store_enable(struct device *dev,
@@ -371,7 +371,7 @@ index 000000000..3b942c4fc
 +/*
 + * ATTRIBUTES:
 + *
-+ * /sys/devices/platform/retrogame_joypad/adc_cal [rw]
++ * /sys/devices/platform/singleadc_joypad/adc_cal [rw]
 + */
 +/*----------------------------------------------------------------------------*/
 +static ssize_t joypad_store_adc_cal(struct device *dev,
@@ -433,7 +433,7 @@ index 000000000..3b942c4fc
 +/*
 + * ATTRIBUTES:
 + *
-+ * /sys/devices/platform/retrogame_joypad/amux_debug [rw]
++ * /sys/devices/platform/singleadc_joypad/amux_debug [rw]
 + *
 + * echo [debug channel] > amux_debug
 + * cat amux_debug : debug channel mux set & adc read
@@ -929,7 +929,7 @@ index 000000000..3b942c4fc
 +	input->id.version = (u16)joypad_revision;
 +
 +	/* IIO ADC key setup (0 mv ~ 1800 mv) * adc->scale */
-+	__set_bit(EV_ABS, input->evbit);
++	if (joypad->amux_count > 0) __set_bit(EV_ABS, input->evbit);
 +	for(nbtn = 0; nbtn < joypad->amux_count; nbtn++) {
 +		struct bt_adc *adc = &joypad->adcs[nbtn];
 +		input_set_abs_params(input, adc->report_type,
@@ -1025,19 +1025,21 @@ index 000000000..3b942c4fc
 +
 +	joypad->bt_gpio_count = device_get_child_node_count(dev);
 +
-+	if ((joypad->amux_count == 0) || (joypad->bt_gpio_count == 0)) {
++	if ((joypad->amux_count == 0) && (joypad->bt_gpio_count == 0)) {
 +		dev_err(dev, "adc key = %d, gpio key = %d error!",
 +			joypad->amux_count, joypad->bt_gpio_count);
 +		return -EINVAL;
 +	}
 +
-+	error = joypad_adc_setup(dev, joypad);
-+	if (error)
-+		return error;
++	if (joypad->amux_count > 0) {
++		error = joypad_adc_setup(dev, joypad);
++		if (error)
++			return error;
 +
-+	error = joypad_amux_setup(dev, joypad);
-+	if (error)
-+		return error;
++		error = joypad_amux_setup(dev, joypad);
++		if (error)
++			return error;
++	}
 +
 +	error = joypad_gpio_setup(dev, joypad);
 +	if (error)
