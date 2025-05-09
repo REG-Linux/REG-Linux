@@ -1,0 +1,13 @@
+--- a/configure.ac	2025-05-07 00:54:30.025347988 +0200
++++ b/configure.ac	2025-05-07 00:54:55.306667943 +0200
+@@ -67,8 +67,8 @@
+ 	# does funny things (not like a clown tho) also -lintl is needed
+ 	LIBS="$LIBS -lintl -L/usr/$host/sys-root/mingw/lib -lmingw32 -lSDL2main -lSDL2"
+ else
+-	CXXFLAGS="$CXXFLAGS $(sdl2-config --cflags)"
+-	LIBS="$LIBS $LIBINTL $(sdl2-config --libs)"
++	CXXFLAGS="$CXXFLAGS $($SDL2_CONFIG --cflags)"
++	LIBS="$LIBS $LIBINTL $($SDL2_CONFIG --libs)"
+ fi
+ 
+ # Makefiles
