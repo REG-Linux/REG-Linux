@@ -1,0 +1,45 @@
+#### Linux / Libretro ports ####
+config BR2_PACKAGE_REGLINUX_GAMES
+	bool "REG-Linux games"
+
+	# MrBoom (Bomberman clone)
+	select BR2_PACKAGE_LIBRETRO_MRBOOM		# ALL
+
+	# Prince of Persia
+	select BR2_PACKAGE_SDLPOP			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+
+	# Abuse classic MS-DOS game
+	select BR2_PACKAGE_ABUSE			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# Super Mario War
+	select BR2_PACKAGE_LIBRETRO_SUPERBROSWAR	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# Hydra Castle Labyrinth
+	select BR2_PACKAGE_HCL				# ALL
+
+	# C-Dogs SDL
+	select BR2_PACKAGE_CDOGS			if !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# Turrican clone
+	select BR2_PACKAGE_HURRICAN			# ALL
+
+	# OpenTyrian (shmup game)
+	select BR2_PACKAGE_TYRIAN			# ALL
+
+	# Ur-Quan Masters (Star Control 2)
+	select BR2_PACKAGE_UQM				if !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# Sonic 3 AIR (Angel Island Revisited)
+	# Disabled with musl libc because it does not link (libatomic should do it but it does not work so far)
+	# Disabled for rk3128 because of mali blobs (needs patching at link-time to mali blob)
+	select BR2_PACKAGE_SONIC3_AIR			if !BR2_PACKAGE_SYSTEM_TARGET_RK3128 && !BR2_TOOLCHAIN_USES_MUSL
+
+	# LTris2
+	select BR2_PACKAGE_LTRIS2			if !BR2_PACKAGE_REGLINUX_RELEASE
+
+	# LBreakoutHD
+	select BR2_PACKAGE_LBREAKOUTHD			if !BR2_PACKAGE_REGLINUX_RELEASE
+
+	help
+	  Games
+
