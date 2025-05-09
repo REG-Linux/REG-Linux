@@ -33,6 +33,9 @@ BR2_LINUX_KERNEL_INTREE_DTS_NAME="rockchip/rk3128-evb rockchip/rk3128-xpi-3128 r
 # gpu
 BR2_PACKAGE_SYSTEM_LIMA_MESA3D=y
 
+# controllers (userspace solution so far)
+BR2_PACKAGE_EVSIEVE=y
+
 # spi flash support
 BR2_PACKAGE_MTD=y
 
