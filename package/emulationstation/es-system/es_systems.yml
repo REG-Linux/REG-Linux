@@ -677,10 +677,11 @@ supergrafx:
   manufacturer: NEC
   release: 1989
   hardware: console
-  extensions: [pce, sgx, cue, ccd, chd, zip, 7z]
+  extensions: [pce, sgx, zip, 7z]
   emulators:
     libretro:
       mednafen_supergrafx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_SUPERGRAFX] }
+      geargrafx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARGRAFX] }
     mednafen:
       mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
