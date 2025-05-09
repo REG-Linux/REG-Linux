@@ -1,2 +1,4 @@
 config BR2_PACKAGE_STEAMDECKGUN
 	bool "steamdeckgun"
+	select BR2_PACKAGE_EVSIEVE
+

@@ -5,6 +5,7 @@ config BR2_PACKAGE_SINDEN_GUNS
 	select BR2_PACKAGE_LIBV4L_UTILS
 	select BR2_PACKAGE_LIBGDIPLUS
 	select BR2_PACKAGE_SINDEN_GUNS_LIBS
+	select BR2_PACKAGE_EVSIEVE
 
 	help
 	  sinden guns support
