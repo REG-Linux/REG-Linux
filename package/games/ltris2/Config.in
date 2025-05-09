@@ -1,0 +1,14 @@
+config BR2_PACKAGE_LTRIS2
+	bool "LTris2"
+	depends on BR2_USE_MMU # fork()
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_SDL2_TTF
+	help
+	  LTris2 is a tetris clone, using SDL2. It optionally requires
+	  SDL2_mixer for audio support. A display with minimum 640x480
+	  resolution and a keyboard are recommended.
+
+	  http://lgames.sourceforge.net/index.php?project=LTris
+
