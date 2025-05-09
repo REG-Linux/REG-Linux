@@ -24,6 +24,12 @@ ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/s5p-* $(@D)/myri*
 endif
 
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H700)$(BR2_PACKAGE_SYSTEM_TARGET_RK3326),y)
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ti $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm $(@D)/s5p-* $(@D)/myri*
+endif
+
 ifeq ($(BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI)$(BR2_PACKAGE_EXTRALINUXFIRMWARES),y)
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/brcm
 endif
