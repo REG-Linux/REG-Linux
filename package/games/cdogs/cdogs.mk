@@ -33,11 +33,11 @@ define CDOGS_INSTALL_TARGET_CMDS
     # cp -pav $(@D)/missions $(TARGET_DIR)/usr/share/reglinux/datainit/roms/cdogs
     # cp -pav $(@D)/music $(TARGET_DIR)/usr/share/reglinux/datainit/roms/cdogs
     # cp -pav $(@D)/sounds $(TARGET_DIR)/usr/share/reglinux/datainit/roms/cdogs
-    # cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/cdogs/gamecontrollerdb.txt $(TARGET_DIR)/usr/share/reglinux/datainit/roms/cdogs/data
+    # cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/games/cdogs/gamecontrollerdb.txt $(TARGET_DIR)/usr/share/reglinux/datainit/roms/cdogs/data
 
     # evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/cdogs/cdogs.keys $(TARGET_DIR)/usr/share/evmapy
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/games/cdogs/cdogs.keys $(TARGET_DIR)/usr/share/evmapy
 endef
 
 CDOGS_PRE_CONFIGURE_HOOKS += CDOGS_REMOVE_TESTS

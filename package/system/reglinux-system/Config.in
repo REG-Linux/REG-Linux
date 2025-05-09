@@ -16,6 +16,9 @@ source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-system/Config.in.eng
 # Ports
 source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-system/Config.in.ports"
 
+# Games
+source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-system/Config.in.games"
+
 config BR2_PACKAGE_MAME_BUILD_FROM_SOURCE
 	bool "mame-build-from-source"
 	default n
@@ -64,8 +67,6 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	# minimal system required packages
 	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
-	# Note RNG_TOOLS not useful anymore we use seedrng from plymouth
-	#select BR2_PACKAGE_RNG_TOOLS			if !BR2_PACKAGE_SYSTEM_TARGET_RK3128 # system entropy. Currently disabled for RK3128 due to high CPU impact
 	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
 	# Note : TODO Bundle carbon (and maybe neutral) in content downloader
 	#select BR2_PACKAGE_ES_THEME_CARBON		# emulationstation theme
@@ -84,7 +85,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_DOSFSTOOLS_FATLABEL		# fat
 	select BR2_PACKAGE_E2FSPROGS			# ext4
 	select BR2_PACKAGE_REGLINUX_EXFAT		# exfat
-	select BR2_PACKAGE_NTFS_3G				# ntfs-3g will only install on kernel 5.4 or 5.10 and will build ntfsprogs, for both NTFS3 and ntfs-3g
+	select BR2_PACKAGE_NTFS_3G			# ntfs-3g will only install on kernel 5.4 or 5.10 and will build ntfsprogs, for both NTFS3 and ntfs-3g
 	select BR2_PACKAGE_NTFS_3G_NTFSPROGS
 	select BR2_PACKAGE_BTRFS_PROGS			# btrfs
 
@@ -354,6 +355,8 @@ config BR2_PACKAGE_REGLINUX_ALL_SYSTEMS
 	select BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS	if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 	select BR2_PACKAGE_REGLINUX_PINBALL_SYSTEMS	if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 	select BR2_PACKAGE_REGLINUX_MOBILE_SYSTEMS	if !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_REGLINUX_RELEASE
+
+	select BR2_PACKAGE_REGLINUX_GAMES
 
 	help
 	  batocera.linux all supported emulation systems

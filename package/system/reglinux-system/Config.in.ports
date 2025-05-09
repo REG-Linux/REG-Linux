@@ -11,12 +11,6 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	# NxEngine (Cave Story)
 	select BR2_PACKAGE_LIBRETRO_NXENGINE		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
-	# MrBoom (Bomberman clone)
-	select BR2_PACKAGE_LIBRETRO_MRBOOM		# ALL
-
-	# Prince of Persia
-	select BR2_PACKAGE_SDLPOP			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
-
 	# Xash3D-FWGS (Half-Life 1)
 	select BR2_PACKAGE_XASH3D_FWGS			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
@@ -32,12 +26,6 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 
 	# Zelda Classic
 	select BR2_PACKAGE_LIBRETRO_ZC210		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
-
-	# Abuse classic MS-DOS game
-	select BR2_PACKAGE_ABUSE			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
-
-	# Super Mario War
-	select BR2_PACKAGE_LIBRETRO_SUPERBROSWAR	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	# EDuke32 requires OpenGL or GLES 3.0
 	select BR2_PACKAGE_EDUKE32			if BR2_PACKAGE_HAS_GLES3
@@ -70,18 +58,6 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 
 	# Raze requires both 64-bit arch AND OpenGL or GLES 3.0
 	select BR2_PACKAGE_RAZE				if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3
-
-	# Hydra Castle Labyrinth
-	select BR2_PACKAGE_HCL				# ALL
-
-	# C-Dogs SDL
-	select BR2_PACKAGE_CDOGS			if !BR2_PACKAGE_SYSTEM_TARGET_CHA
-
-	# Turrican clone
-	select BR2_PACKAGE_HURRICAN			# ALL
-
-	# OpenTyrian (shmup game)
-	select BR2_PACKAGE_TYRIAN			# ALL
 
 	# CorsixTH (Theme Hospital engine)
 	select BR2_PACKAGE_CORSIXTH			if BR2_ARCH_IS_64
@@ -127,11 +103,6 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 
 	# ECWolf
 	select BR2_PACKAGE_ECWOLF			if !BR2_PACKAGE_SYSTEM_TARGET_CHA
-
-	# Sonic 3 AIR (Angel Island Revisited)
-	# Disabled with musl libc because it does not link (libatomic should do it but it does not work so far)
-	# Disabled for rk3128 because of mali blobs (needs patching at link-time to mali blob)
-	select BR2_PACKAGE_SONIC3_AIR			if !BR2_PACKAGE_SYSTEM_TARGET_RK3128 && !BR2_TOOLCHAIN_USES_MUSL
 
 	# Sonic Mania
 	select BR2_PACKAGE_SONIC_MANIA			# ALL

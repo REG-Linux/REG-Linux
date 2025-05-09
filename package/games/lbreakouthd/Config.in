@@ -1,0 +1,15 @@
+config BR2_PACKAGE_LBREAKOUTHD
+	bool "LBreakoutHD"
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_LIBPNG
+	help
+	  LBreakoutHD is the successor to LBreakout2, a breakout-style
+	  arcade game in the manner of Arkanoid. Requires SDL2, libpng,
+	  and optionally SDL2_mixer/SDL2_net.
+	  A display with minimum 640x480 resolution, a keyboard and a
+	  mouse are recommended.
+
+	  https://lgames.sourceforge.io/LBreakoutHD/
