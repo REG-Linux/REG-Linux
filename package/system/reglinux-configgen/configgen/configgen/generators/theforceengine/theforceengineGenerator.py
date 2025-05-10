@@ -9,7 +9,7 @@ import systemFiles
 
 forceConfigDir = systemFiles.CONF + "/theforceengine"
 forceModsDir = forceConfigDir + "/Mods"
-forcePatchFile = "v3.zip" # current patch version
+forcePatchFile = "df_patch4.zip" # current patch version
 forceModFile = forceModsDir + "/" + forcePatchFile
 forceConfigFile = forceConfigDir + "/settings.ini"
 
