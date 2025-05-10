@@ -14,7 +14,7 @@ index c8d2fcee2d..a6f77012a6 100644
  	XPAD_XBOX360_VENDOR(0x15e4),		/* Numark Xbox 360 controllers */
  	XPAD_XBOX360_VENDOR(0x162e),		/* Joytech Xbox 360 controllers */
  	XPAD_XBOX360_VENDOR(0x1689),		/* Razer Onza */
-+    XPAD_XBOX360_VENDOR(0x17ef),        /* Lenovo Legion Go */
++   XPAD_XBOX360_VENDOR(0x17ef),        /* Lenovo Legion Go */
  	XPAD_XBOX360_VENDOR(0x1949),		/* Amazon controllers */
  	XPAD_XBOX360_VENDOR(0x1bad),		/* Harmonix Rock Band guitar and drums */
  	XPAD_XBOX360_VENDOR(0x20d6),		/* PowerA controllers */
