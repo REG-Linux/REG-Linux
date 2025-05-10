@@ -22,18 +22,23 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_SCUMMVM_PLATFORM = rpi5_64
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
 LIBRETRO_SCUMMVM_PLATFORM = armv cortexa9 neon hardfloat
-else ifeq ($(BR2_aarch64)$(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
+else ifeq ($(BR2_ARCH_IS_64),y)
 LIBRETRO_SCUMMVM_PLATFORM = unix
 LIBRETRO_SCUMMVM_MAKE_OPTS += TARGET_64BIT=1
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+LIBRETRO_SCUMMVM_MAKE_OPTS += FORCE_OPENGL=1
+else
+LIBRETRO_SCUMMVM_MAKE_OPTS += FORCE_OPENGLES2=1
+endif
 endif
 
 define LIBRETRO_CLONE_AND_INIT
 	mkdir -p $(@D)/backends/platform/libretro/deps/$(1)
-	$(GIT) -C $(@D)/backends/platform/libretro/deps/$(1) init
-	$(GIT) -C $(@D)/backends/platform/libretro/deps/$(1) remote add origin https://github.com/libretro/$(1)
-	$(GIT) -C $(@D)/backends/platform/libretro/deps/$(1) fetch --depth 1 origin $(2)
-	$(GIT) -C $(@D)/backends/platform/libretro/deps/$(1) checkout FETCH_HEAD
-	$(GIT) -C $(@D)/backends/platform/libretro/deps/$(1) submodule update --init --recursive --depth 1
+	$(BR2_GIT) -C $(@D)/backends/platform/libretro/deps/$(1) init
+	$(BR2_GIT) -C $(@D)/backends/platform/libretro/deps/$(1) remote add origin https://github.com/libretro/$(1)
+	$(BR2_GIT) -C $(@D)/backends/platform/libretro/deps/$(1) fetch --depth 1 origin $(2)
+	$(BR2_GIT) -C $(@D)/backends/platform/libretro/deps/$(1) checkout FETCH_HEAD
+	$(BR2_GIT) -C $(@D)/backends/platform/libretro/deps/$(1) submodule update --init --recursive --depth 1
 endef
 
 # Details from backends/platform/libretro/dependencies.mk
