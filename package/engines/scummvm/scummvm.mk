@@ -3,8 +3,8 @@
 # scummvm
 #
 ################################################################################
-# Version: 2.9.0 - "Close Encounters of the 2.9th Kind"
-SCUMMVM_VERSION = v2.9.0
+# Version: 2.9.1 - Unreleased yet so no codename yet
+SCUMMVM_VERSION = v2.9.1
 SCUMMVM_SITE = $(call github,scummvm,scummvm,$(SCUMMVM_VERSION))
 SCUMMVM_LICENSE = GPLv2
 SCUMMVM_DEPENDENCIES += sdl2 zlib libpng freetype libjpeg-bato

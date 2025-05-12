@@ -3,8 +3,8 @@
 # libretro-scummvm
 #
 ################################################################################
-# Version: 2.9.0 - "Close Encounters of the 2.9th Kind"
-LIBRETRO_SCUMMVM_VERSION = v2.9.0
+# Version: 2.9.1 - Unreleased yet so no codename yet
+LIBRETRO_SCUMMVM_VERSION = v2.9.1
 LIBRETRO_SCUMMVM_SITE = $(call github,scummvm,scummvm,$(LIBRETRO_SCUMMVM_VERSION))
 LIBRETRO_SCUMMVM_LICENSE = GPLv2
 
