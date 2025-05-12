@@ -37,9 +37,6 @@ SCUMMVM_CONF_OPTS += --opengl-mode=auto \
 # ScummVM Engines options
 SCUMMVM_CONF_OPTS += --enable-all-engines --disable-all-unstable-engines
 
-# TODO AGS engine fails on AArch32 / GCC 12.4 because of NEON inlining
-SCUMMVM_CONF_OPTS += --disable-engine=ags
-
 # Build plugins + everything as dynamic
 ifneq ($(BR2_x86_64),y)
 SCUMMVM_CONF_OPTS += --enable-plugins --default-dynamic
@@ -57,14 +54,23 @@ endif
 # Architecture-specific optimizations
 ifeq ($(BR2_arm)$(BR2_ARM_CPU_HAS_NEON),yy)
 SCUMMVM_CONF_OPTS += --enable-ext-neon
+# Needed to avoid errors when inlining NEON code on AArch32
+SCUMMVM_CONF_ENV  += CXXFLAGS="$(TARGET_CXXFLAGS) -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0"
+# AArch64 mandates NEON
+else ifeq ($(BR2_aarch64),y)
+SCUMMVM_CONF_OPTS += --enable-ext-neon
+# x86_64_v3 mandates SSE2 + AVX2
+else ifeq ($(BR2_x86_x86_64_v3),y)
+SCUMMVM_CONF_OPTS += --enable-ext-sse2
+SCUMMVM_CONF_OPTS += --enable-ext-avx2
+# x86_64 mandates SSE2
 else ifeq ($(BR2_x86_64),y)
 SCUMMVM_CONF_OPTS += --enable-ext-sse2
-ifeq ($(BR2_x86_x86_64_v3),y)
-SCUMMVM_CONF_OPTS += --enable-ext-avx2
 endif
-# Disable scalers on MIPS32
-# Disable high-res engines on MIPS32
-else ifeq ($(BR2_mipsel),y)
+
+# Disable scalers on MIPS32/ARMv6
+# Disable high-res engines on MIPS32/ARMv6
+ifeq ($(BR2_mipsel)$(BR2_arm1176jzf_s),y)
 SCUMMVM_CONF_OPTS += --disable-scalers
 SCUMMVM_CONF_OPTS += --disable-highres
 endif
@@ -84,7 +90,20 @@ else
     SCUMMVM_CONF_OPTS += --disable-fluidsynth
 endif
 
-# LibMPEG2 options
+# libvpx
+ifeq ($(BR2_PACKAGE_LIBVPX),y)
+    SCUMMVM_DEPENDENCIES += libvpx
+else
+    SCUMMVM_CONF_OPTS += --disable-vpx
+endif
+
+# libopenmpt
+ifeq ($(BR2_PACKAGE_LIBOPENMPT),y)
+    SCUMMVM_DEPENDENCIES += libopenmpt
+    SCUMMVM_CONF_OPTS += --enable-openmpt
+endif
+
+# libmpeg2
 ifeq ($(BR2_PACKAGE_LIBMPEG2),y)
     SCUMMVM_CONF_OPTS += --enable-mpeg2 --with-mpeg2-prefix="$(STAGING_DIR)/usr/lib"
 endif
