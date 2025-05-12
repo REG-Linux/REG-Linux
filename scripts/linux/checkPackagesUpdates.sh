@@ -258,12 +258,12 @@ PACKAGES_CONTROLLERS="aelightgun
                       anbernic-gpio-pad
                       batocera-gun-calibrator
                       batocera-wheel-calibrator
-                      db9_gpio_rpi
+                      db9-gpio-rpi
                       dolphinbar-guns
                       dolphinCrosshairsPack
                       fun-r1-gamepad
                       fusion-lightguns
-                      gamecon_gpio_rpi
+                      gamecon-gpio-rpi
                       gun4ir-guns
                       guncon
                       guncon3
@@ -272,7 +272,7 @@ PACKAGES_CONTROLLERS="aelightgun
                       jammasd
                       joycond
                       lightguns-games-precalibrations
-                      mk_arcade_joystick_rpi
+                      mk-arcade-joystick-rpi
                       new-lg4ff
                       qtsixa
                       qtsixa-shanwan
