@@ -339,6 +339,13 @@ menu "Cases"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/piboy/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/cases/picade/Config.in"
 endmenu
+
+menu "Controllers"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/db9-gpio-rpi/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/gamecon-gpio-rpi/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/mk-arcade-joystick-rpi/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/xpad-noone/Config.in"
+endmenu
 endmenu
 
 menu "Batocera.linux"
@@ -426,16 +433,12 @@ menu "LED"
 endmenu
 
 menu "Controllers"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/db9_gpio_rpi/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/gamecon_gpio_rpi/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/mk_arcade_joystick_rpi/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/xarcade2jstick/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/retrogame/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/uinput-joystick/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/input-wrapper/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/umtool/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/xone/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/xpad-noone/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/xpadneo/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/xow/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/controllers/aimtrak-guns/Config.in"

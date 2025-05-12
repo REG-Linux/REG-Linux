@@ -136,7 +136,7 @@ dtparam=krnbt=on
 
 # Enable DRM VC4 V3D driver
 dtoverlay=vc4-kms-v3d,cma-512
-max_framebuffers=1
+max_framebuffers=2
 
 # Run as fast as firmware/board allows
 arm_boost=1

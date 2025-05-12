@@ -1,7 +1,8 @@
 config BR2_PACKAGE_HID_NX
 	bool "hid-nx"
 	select BR2_PACKAGE_LIBUSB
+	select BR2_PACKAGE_JOYCOND
 	  help
 	    Alternative Linux kernel HID driver for Nintendo Switch controllers
-	    
+
 	    https://github.com/emilyst/hid-nx-dkms
