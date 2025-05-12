@@ -48,15 +48,12 @@ REGLINUX_SCUMMVM_ARCH = s922x
 # Cortex A76
 else ifeq ($(BR2_cortex_a76),y)
 REGLINUX_SCUMMVM_ARCH = bcm2712
-# Cortex A76.A55
-else ifeq ($(BR2_cortex_a76_a55),y)
+# Cortex A76.A55 / A78.A55
+else ifeq ($(BR2_cortex_a76_a55)$(BR2_cortex_a78_a55),y)
 REGLINUX_SCUMMVM_ARCH = rk3588
-# Cortex A78.A55
-else ifeq ($(BR2_cortex_a78_a55),y)
-REGLINUX_SCUMMVM_ARCH = rk3588
-# Unknown AArch64 saphira CPU
-else ifeq ($(BR2_saphira),y)
-REGLINUX_SCUMMVM_ARCH = saphira
+# Asahi Linux
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
+REGLINUX_SCUMMVM_ARCH = asahi
 # RISC-V 64 (rv64gc, aka imafd)
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
 REGLINUX_SCUMMVM_ARCH = jh7110
