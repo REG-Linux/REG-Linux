@@ -11,7 +11,7 @@ diff --git a/backends/platform/libretro/Makefile b/backends/platform/libretro/Ma
 index c09ea54c..f03df239 100644
 --- a/backends/platform/libretro/Makefile
 +++ b/backends/platform/libretro/Makefile
-@@ -34,8 +34,26 @@ MKDIR     = mkdir -p
+@@ -34,8 +34,31 @@ MKDIR     = mkdir -p
  RM        = rm -f
  RM_REC    = rm -rf
  
@@ -23,6 +23,8 @@ index c09ea54c..f03df239 100644
 +   CFLAGS += -fPIC -marm -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard
 +   CFLAGS += -fomit-frame-pointer -ffast-math
 +   CXXFLAGS = $(CFLAGS) -frtti -std=c++11
++   HAVE_OPENGLES2 := 1
++   LITE := 1
 +
 +# Raspberry Pi 2
 +else ifeq ($(platform), rpi2)
@@ -31,7 +33,10 @@ index c09ea54c..f03df239 100644
 +   LDFLAGS += -shared -Wl,--version-script=$(ROOT_PATH)/link.T -fPIC
 +   CFLAGS += -fPIC -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
 +   CFLAGS += -fomit-frame-pointer -ffast-math
-+   CXXFLAGS = $(CFLAGS) -frtti -std=c++11
++   CXXFLAGS = $(CFLAGS) -frtti -std=c++11 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0
++   HAVE_OPENGLES2 := 1
++   HAVE_NEON := 1
++   LITE := 1
 +
  # Raspberry Pi 3 (64 bit)
 -ifeq ($(platform), rpi3_64)
