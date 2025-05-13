@@ -58,7 +58,7 @@ REGLINUX_SCUMMVM_ARCH = rk3588
 else ifeq ($(BR2_saphira),y)
 REGLINUX_SCUMMVM_ARCH = saphira
 # RISC-V 64 (rv64gc, aka imafd)
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
 REGLINUX_SCUMMVM_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)

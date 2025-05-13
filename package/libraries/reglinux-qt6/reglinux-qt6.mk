@@ -43,8 +43,8 @@ REGLINUX_QT6_ARCH = unknown
 # Cortex A15.A7
 #else ifeq ($(BR2_cortex_a15_a7),y)
 #REGLINUX_QT6_ARCH = odroidxu4
-# Cortex A17
 #else
+# Cortex A17
 ifeq ($(BR2_cortex_a17),y)
 REGLINUX_QT6_ARCH = rk3288
 # Cortex A53
@@ -82,7 +82,7 @@ REGLINUX_QT6_ARCH = rk3588
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
 REGLINUX_QT6_ARCH = asahi
 # RISC-V 64 (rv64gc, aka imafd)
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
 REGLINUX_QT6_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
