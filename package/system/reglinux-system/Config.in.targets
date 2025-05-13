@@ -96,6 +96,7 @@ if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY          || \
    BR2_PACKAGE_SYSTEM_TARGET_BCM2712          || \
    BR2_PACKAGE_SYSTEM_TARGET_JH7110           || \
    BR2_PACKAGE_SYSTEM_TARGET_K1               || \
+   BR2_PACKAGE_SYSTEM_TARGET_TH1520           || \
    BR2_PACKAGE_SYSTEM_TARGET_H616             || \
    BR2_PACKAGE_SYSTEM_TARGET_H700             || \
    BR2_PACKAGE_SYSTEM_TARGET_AMLOGIC_GLES3    || \
@@ -177,6 +178,9 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 
 	# SpacemiT targets
 	default "spacemit/k1/bananapi-f3"								if BR2_PACKAGE_SYSTEM_TARGET_K1
+
+	# T-Head targets
+	default "thead/th1520"										if BR2_PACKAGE_SYSTEM_TARGET_TH1520
 
 	# Asahi target
 	default "asahi"											if BR2_PACKAGE_SYSTEM_TARGET_ASAHI
@@ -320,6 +324,9 @@ config BR2_PACKAGE_SYSTEM_TARGET_JH7110
 
 config BR2_PACKAGE_SYSTEM_TARGET_K1
 	bool "k1"
+
+config BR2_PACKAGE_SYSTEM_TARGET_TH1520
+	bool "th1520"
 
 endchoice
 
