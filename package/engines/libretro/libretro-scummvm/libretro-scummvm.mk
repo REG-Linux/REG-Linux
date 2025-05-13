@@ -3,8 +3,8 @@
 # libretro-scummvm
 #
 ################################################################################
-# Version: 2.9.0 - "Close Encounters of the 2.9th Kind"
-LIBRETRO_SCUMMVM_VERSION = v2.9.0
+# Version: 2.9.1 - Unreleased yet so no codename yet
+LIBRETRO_SCUMMVM_VERSION = v2.9.1
 LIBRETRO_SCUMMVM_SITE = $(call github,scummvm,scummvm,$(LIBRETRO_SCUMMVM_VERSION))
 LIBRETRO_SCUMMVM_LICENSE = GPLv2
 
@@ -22,9 +22,16 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_SCUMMVM_PLATFORM = rpi5_64
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
 LIBRETRO_SCUMMVM_PLATFORM = armv cortexa9 neon hardfloat
-else ifeq ($(BR2_ARCH_IS_64),y)
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_XU4),y)
+LIBRETRO_SCUMMVM_PLATFORM = armv neon hardfloat
+LIBRETRO_SCUMMVM_MAKE_OPTS += FORCE_OPENGLES2=1
+# TODO revisit later this hack since AGS building fails...
+LIBRETRO_SCUMMVM_MAKE_OPTS += LITE=1
+else
 LIBRETRO_SCUMMVM_PLATFORM = unix
+ifeq ($(BR2_ARCH_IS_64),y)
 LIBRETRO_SCUMMVM_MAKE_OPTS += TARGET_64BIT=1
+endif
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
 LIBRETRO_SCUMMVM_MAKE_OPTS += FORCE_OPENGL=1
 else
