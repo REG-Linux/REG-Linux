@@ -2,8 +2,8 @@
 
 import systemFiles
 
-sdlpopConfigDir = systemFiles.CONF + '/sdlpop'
+sdlpopConfigDir = systemFiles.CONF + '/SDLPoP'
 sdlpopSrcCfg = sdlpopConfigDir + '/SDLPoP.cfg'
 sdlpopSrcIni = sdlpopConfigDir + '/SDLPoP.ini'
-sdlpopDestCfg = '/usr/share/sdlpop/SDLPoP.cfg'
-sdlpopDestIni = '/usr/share/sdlpop/SDLPoP.ini'
+sdlpopDestCfg = '/usr/share/SDLPoP/cfg/SDLPoP.cfg'
+sdlpopDestIni = '/usr/share/SDLPoP/cfg/SDLPoP.ini'
