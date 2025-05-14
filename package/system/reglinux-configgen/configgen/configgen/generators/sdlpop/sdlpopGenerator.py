@@ -16,18 +16,20 @@ class SdlPopGenerator(Generator):
         if not os.path.exists(sdlpopConfig.sdlpopConfigDir):
             os.makedirs(sdlpopConfig.sdlpopConfigDir)
         if not os.path.exists(sdlpopConfig.sdlpopSrcCfg):
-            shutil.copyfile('/usr/share/sdlpop/cfg/SDLPoP.cfg', sdlpopConfig.sdlpopSrcCfg)
+            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.cfg', sdlpopConfig.sdlpopSrcCfg)
         if not os.path.exists(sdlpopConfig.sdlpopSrcIni):
-            shutil.copyfile('/usr/share/sdlpop/cfg/SDLPoP.ini', sdlpopConfig.sdlpopSrcIni)
+            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.ini', sdlpopConfig.sdlpopSrcIni)
         # symbolic link cfg files
         if not os.path.exists(sdlpopConfig.sdlpopDestCfg):
             os.symlink(sdlpopConfig.sdlpopSrcCfg, sdlpopConfig.sdlpopDestCfg)
         if not os.path.exists(sdlpopConfig.sdlpopDestIni):
             os.symlink(sdlpopConfig.sdlpopSrcIni, sdlpopConfig.sdlpopDestIni)
+        # create screenshots folder in /userdata
+        if not os.path.exists('/userdata/screenshots/SDLPoP'):
+            os.makedirs('/userdata/screenshots/SDLPoP')
         # symbolic link screenshot folder too
-        if not os.path.exists('/userdata/screenshots/sdlpop'):
-            os.makedirs('/userdata/screenshots/sdlpop')
-            os.symlink('/userdata/screenshots/sdlpop', '/usr/share/sdlpop/screenshots', target_is_directory = True)
+        if not os.path.exists('/usr/share/SDLPoP/screenshots'):
+            os.symlink('/userdata/screenshots/SDLPoP', '/usr/share/SDLPoP/screenshots', target_is_directory = True)
 
         # pad number
         nplayer = 1
