@@ -31,7 +31,7 @@ for arch in jz4770 bcm2835 bcm2836 s812 odroidxu4 rk3288; do
 	PKG=scummvm make ${arch}-pkg DEBUG_BUILD=n
 	PKG=libretro-scummvm make ${arch}-pkg DEBUG_BUILD=n
 	# Package
-	tar cvzf prebuilt/reglinux-scummvm-${SCUMMVM_VERSION}-${arch}.tar.gz output/${arch}/per-package/scummvm/target/usr/bin/scummvm output/${arch}/per-package/libretro-scummvm/target/usr/lib/libretro/scummvm_libretro.so output/${arch}/per-package/scummvm/target/usr/share/scummvm output/${arch}/per-package/scummvm/target/usr/lib/scummvm
+	tar --transform='s|[^/]*/[^/]*/[^/]*/[^/]*/[^/]*/||' -cvzf prebuilt/reglinux-scummvm-${SCUMMVM_VERSION}-${arch}.tar.gz output/${arch}/per-package/scummvm/target/usr/bin/scummvm output/${arch}/per-package/libretro-scummvm/target/usr/lib/libretro/scummvm_libretro.so output/${arch}/per-package/scummvm/target/usr/share/scummvm output/${arch}/per-package/scummvm/target/usr/lib/scummvm
 	# Clean again
 	make ${arch}-clean
 done
@@ -48,7 +48,7 @@ for arch in h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x asahi jh7110 
 	PKG=scummvm make ${arch}-pkg DEBUG_BUILD=n
 	PKG=libretro-scummvm make ${arch}-pkg DEBUG_BUILD=n
 	# Package
-	tar cvzf prebuilt/reglinux-scummvm-${SCUMMVM_VERSION}-${arch}.tar.gz output/${arch}/per-package/scummvm/target/usr/bin/scummvm output/${arch}/per-package/libretro-scummvm/target/usr/lib/libretro/scummvm_libretro.so output/${arch}/per-package/scummvm/target/usr/share/scummvm output/${arch}/per-package/scummvm/target/usr/lib/scummvm
+	tar --transform='s|[^/]*/[^/]*/[^/]*/[^/]*/[^/]*/||' -cvzf prebuilt/reglinux-scummvm-${SCUMMVM_VERSION}-${arch}.tar.gz output/${arch}/per-package/scummvm/target/usr/bin/scummvm output/${arch}/per-package/libretro-scummvm/target/usr/lib/libretro/scummvm_libretro.so output/${arch}/per-package/scummvm/target/usr/share/scummvm output/${arch}/per-package/scummvm/target/usr/lib/scummvm
 	# Clean again
 	make ${arch}-clean
 done
@@ -60,7 +60,7 @@ for arch in x86_64 x86_64_v3; do
 	PKG=scummvm make ${arch}-pkg DEBUG_BUILD=n
 	PKG=libretro-scummvm make ${arch}-pkg DEBUG_BUILD=n
 	# Package
-	tar cvzf prebuilt/reglinux-scummvm-${SCUMMVM_VERSION}-${arch}.tar.gz output/${arch}/per-package/scummvm/target/usr/bin/scummvm output/${arch}/per-package/libretro-scummvm/target/usr/lib/libretro/scummvm_libretro.so output/${arch}/per-package/scummvm/target/usr/share/scummvm
+	tar --transform='s|[^/]*/[^/]*/[^/]*/[^/]*/[^/]*/||' -cvzf prebuilt/reglinux-scummvm-${SCUMMVM_VERSION}-${arch}.tar.gz output/${arch}/per-package/scummvm/target/usr/bin/scummvm output/${arch}/per-package/libretro-scummvm/target/usr/lib/libretro/scummvm_libretro.so output/${arch}/per-package/scummvm/target/usr/share/scummvm
 	# Clean again
 	make ${arch}-clean
 done
