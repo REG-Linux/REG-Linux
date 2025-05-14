@@ -13,7 +13,7 @@ index 8a303bac3b..b3f312d6d8 100644
 +   LDFLAGS += -shared -Wl,--version-script=$(ROOT_PATH)/link.T -fPIC
 +   CFLAGS += -fPIC -mcpu=cortex-a76 -mtune=cortex-a76 -fomit-frame-pointer -ffast-math
 +   CXXFLAGS = $(CFLAGS) -frtti -std=c++11
-+   HAVE_OPENGL :=1
++   HAVE_OPENGLES2 :=1
 +
  # iOS
  else ifneq (,$(findstring ios,$(platform)))
