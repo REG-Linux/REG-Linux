@@ -35,6 +35,7 @@ cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-plus.dtb"   "${REGLINUX_BINARIES
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-sp.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg40xx-h.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg40xx-v.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
+cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg28xx.dtb"        "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"                        "${REGLINUX_BINARIES_DIR}/boot/extlinux/"   || exit 1
 
 exit 0
