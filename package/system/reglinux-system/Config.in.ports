@@ -49,8 +49,8 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	select BR2_PACKAGE_LIBRETRO_TYRQUAKE		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	# Yamagi Quake 2 (source port)
-	# Note: Needs CMake work to build for GLES3 (or even GLES2 + gl4es)
-	select BR2_PACKAGE_YQUAKE2                      if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL # TODO || BR2_PACKAGE_HAS_GLES3
+	# Note: Requires GL or GLES 3.0. Might work with GLES2 using GL 1.x + gl4es ?
+	select BR2_PACKAGE_YQUAKE2                      if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_GLES3
 
 	# Quake 3 (source port)
 	# Note : needs work on gl4es patch (applying it only if no desktop GL support)
