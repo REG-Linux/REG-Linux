@@ -5,7 +5,7 @@
 ################################################################################
 
 # reglinux switch repo and bump
-RTL8192EU_VERSION = 73f5c4359a6e9f680a533fb7140b169f002499cb
+RTL8192EU_VERSION = 27aa922c298f2be240eec6c2e8636fe865ece195
 RTL8192EU_SITE = $(call github,Mange,rtl8192eu-linux-driver,$(RTL8192EU_VERSION))
 RTL8192EU_LICENSE = GPL-2.0
 
