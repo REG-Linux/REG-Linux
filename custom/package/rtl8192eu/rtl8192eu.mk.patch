@@ -1,5 +1,5 @@
 diff --git a/package/rtl8192eu/rtl8192eu.mk b/package/rtl8192eu/rtl8192eu.mk
-index 9cd88060ce..8410a7da88 100644
+index 9cd88060ce..b0340f750f 100644
 --- a/package/rtl8192eu/rtl8192eu.mk
 +++ b/package/rtl8192eu/rtl8192eu.mk
 @@ -4,8 +4,9 @@
@@ -9,7 +9,7 @@ index 9cd88060ce..8410a7da88 100644
 -RTL8192EU_VERSION = 6755ce9c15bbcb5dcffbca7f6f08e661ccdaacdb
 -RTL8192EU_SITE = $(call github,clnhub,rtl8192eu-linux,$(RTL8192EU_VERSION))
 +# reglinux switch repo and bump
-+RTL8192EU_VERSION = 73f5c4359a6e9f680a533fb7140b169f002499cb
++RTL8192EU_VERSION = 27aa922c298f2be240eec6c2e8636fe865ece195
 +RTL8192EU_SITE = $(call github,Mange,rtl8192eu-linux-driver,$(RTL8192EU_VERSION))
  RTL8192EU_LICENSE = GPL-2.0
  
