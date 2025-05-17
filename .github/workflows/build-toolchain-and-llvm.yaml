@@ -1,4 +1,4 @@
-name: Build Toolchain and LLVM
+name: Build Toolchain and LLVM/CLANG/LIBCBC
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
     paths:
       - '.gitmodules'
       - 'custom/**'
+      - '.github/workflows/build-toolchain-and-llvm.yaml'
 
 concurrency:
     group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +20,7 @@ permissions:
 
 jobs:
   compile-toolchain-and-llvm:
-    name: Compile Toolchain and LLVM
+    name: Compile Toolchain and LLVM/CLANG/LIBCBC
     runs-on: ubuntu-latest
     outputs:
       donewcache: ${{ steps.compile_toolchain_step.outputs.donewcache }}
@@ -77,7 +78,7 @@ jobs:
           git submodule init
           git submodule update
           
-          # Patch Makefile to use 'ghcr.io/reglinux-build:latest' docker image
+          # Patch Makefile to use 'reglinux-build:latest' docker image from ghcr.io
           sed -i '/^DOCKER_REPO/ s|reglinux|ghcr.io/reg-linux|' Makefile
           sed -i '/ build . -t /d' Makefile
           
@@ -152,25 +153,29 @@ jobs:
           
           # Check if not yet released
           wget -q -nd "https://github.com/REG-Linux/REG-llvm-binaries/releases/download/${llvmversion}/reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz" ||:
-          if ! xz -qqt "https://github.com/REG-Linux/REG-llvm-binaries/releases/download/${llvmversion}/reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz"
+          wget -q -nd "https://github.com/REG-Linux/REG-llvm-binaries/releases/download/${llvmversion}/reglinux-clang-${llvmversion}-${{ matrix.arch }}.tar.xz" ||:
+          wget -q -nd "https://github.com/REG-Linux/REG-llvm-binaries/releases/download/${llvmversion}/reglinux-libclc-${llvmversion}-${{ matrix.arch }}.tar.xz" ||:
+          if ! xz -qqt "reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz" || ! xz -qqt "reglinux-clang-${llvmversion}-${{ matrix.arch }}.tar.xz" || ! xz -qqt "reglinux-libclc-${llvmversion}-${{ matrix.arch }}.tar.xz"
           then
             # Hack needed to retrieve the proper staging name directory when packaging
             sed -i '/stamp_staging_installed\:/,/stamp_images_installed\:/ s:^$:\techo "host/\$(GNU_TARGET_NAME)/sysroot" > "\$(BUILD_DIR)/staging.dir"\n:' buildroot/package/pkg-generic.mk
             
-            jobsandload="-j4 -l3"
-            # Build with 3 trials in case of download failure that sometimes happens
-            PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg || {
-              echo "Retrying build after failure..."
-              sleep 60
-              PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg || {
-                echo "Retrying build a final time..."
-                sleep 60
-                PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg
-              }
-            }
+            # Enable the flag to build LLVM/CLANG/LIBCLC from source
+            sed -i 's/#BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE=y/BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE=y/' configs/reglinux-board.common
             
+            jobsandload="-j4 -l3"
             case ${{ matrix.arch }} in
               riscv64|x86_64)
+                # Build with 3 trials in case of download failure that sometimes happens
+                PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg || {
+                  echo "Retrying build after failure..."
+                  sleep 60
+                  PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg || {
+                    echo "Retrying build a final time..."
+                    sleep 60
+                    PARALLEL_BUILD=n DEBUG_BUILD=n PKG=llvm make ${jobsandload} ${{ matrix.target }}-pkg
+                  }
+                }
                 jobsandload="-j1 -l1"
                 ;;
             esac
@@ -205,15 +210,30 @@ jobs:
             cd ${GITHUB_WORKSPACE}/output/${{ matrix.target }} || exit 1
             staging="$(cat build/staging.dir)"
             
-            find ./ -type f \( -path '*/llvm/*' -or -path '*/host-llvm*' -or -path '*/clang/*' -or -path '*/host-clang/*' -or -path '*/libclc/*' -or -path '*/host-libclc/*' \) -and -name '.files-list-host.txt' -exec cat {} \+ | cut -d ',' -f 2 | sed -e 's+^\./+host/+g' >host-files.txt
-            find ./ -type f \( -path '*/llvm/*' -or -path '*/host-llvm*' -or -path '*/clang/*' -or -path '*/host-clang/*' -or -path '*/libclc/*' -or -path '*/host-libclc/*' \) -and -name '.files-list-staging.txt' -exec cat {} \+ | cut -d ',' -f 2 | sed -e "s+^\./+${staging}/+g" >staging-files.txt
-            find ./ -type f \( -path '*/llvm/*' -or -path '*/host-llvm*' -or -path '*/clang/*' -or -path '*/host-clang/*' -or -path '*/libclc/*' -or -path '*/host-libclc/*' \) -and -name '.files-list.txt' -exec cat {} \+ | cut -d ',' -f 2 | sed -e 's+^\./+target/+g' >target-files.txt
+            cat build/*llvm-*/.files-list-host.txt | cut -d ',' -f 2 | sed -e 's+^./+host/+g' >llvm-filelist.txt
+            cat build/*llvm-*/.files-list-staging.txt | cut -d ',' -f 2 | sed -e "s+^./+${staging}/+g" >>llvm-filelist.txt
+            cat build/*llvm-*/.files-list.txt | cut -d ',' -f 2 | sed -e 's+^./+target/+g' >>llvm-filelist.txt
+            find host/ -type f -ipath '*llvm*' >>llvm-filelist.txt
+            find target/ -type f -ipath '*llvm*' >>llvm-filelist.txt
+            sort -o sorted-llvm-filelist.txt -u llvm-filelist.txt
             
-            cat host-files.txt staging-files.txt target-files.txt >filelist.txt
-            find ./ -type f \( -path '*/target/*' -or -path '*/host/*' \) -and \( -ipath '*llvm*' -or -ipath '*clang*' -or -ipath '*libclc*' \) -print | sed -e 's+^\./++g' >>filelist.txt
-            sort -o sortedfilelist.txt -u filelist.txt
+            cat build/*clang-*/.files-list-host.txt | cut -d ',' -f 2 | sed -e 's+^./+host/+g' >clang-filelist.txt
+            cat build/*clang-*/.files-list-staging.txt | cut -d ',' -f 2 | sed -e "s+^./+${staging}/+g" >>clang-filelist.txt
+            cat build/*clang-*/.files-list.txt | cut -d ',' -f 2 | sed -e 's+^./+target/+g' >>clang-filelist.txt
+            find host/ -type f -ipath '*clang*' >>clang-filelist.txt
+            find target/ -type f -ipath '*clang*' >>clang-filelist.txt
+            sort -o sorted-clang-filelist.txt -u clang-filelist.txt
             
-            XZ_OPT=-9 tar cJf "${GITHUB_WORKSPACE}/reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz" --verbatim-files-from -T sortedfilelist.txt
+            cat build/*libclc-*/.files-list-host.txt | cut -d ',' -f 2 | sed -e 's+^./+host/+g' >libclc-filelist.txt
+            cat build/*libclc-*/.files-list-staging.txt | cut -d ',' -f 2 | sed -e "s+^./+${staging}/+g" >>libclc-filelist.txt
+            cat build/*libclc-*/.files-list.txt | cut -d ',' -f 2 | sed -e 's+^./+target/+g' >>libclc-filelist.txt
+            find host/ -type f -ipath '*libclc*' -or -ipath '*/clc/*' -or -iname 'prepare_builtins' >>libclc-filelist.txt
+            find target/ -type f -ipath '*libclc*' -or -ipath '*/clc/*' -or -iname 'prepare_builtins' >>libclc-filelist.txt
+            sort -o sorted-libclc-filelist.txt -u libclc-filelist.txt
+            
+            XZ_OPT=-9 tar cJf "${GITHUB_WORKSPACE}/reglinux-llvm-${llvmversion}-${{ matrix.arch }}.tar.xz" --verbatim-files-from -T sorted-llvm-filelist.txt || :
+            XZ_OPT=-9 tar cJf "${GITHUB_WORKSPACE}/reglinux-clang-${llvmversion}-${{ matrix.arch }}.tar.xz" --verbatim-files-from -T sorted-clang-filelist.txt || :
+            XZ_OPT=-9 tar cJf "${GITHUB_WORKSPACE}/reglinux-libclc-${llvmversion}-${{ matrix.arch }}.tar.xz" --verbatim-files-from -T sorted-libclc-filelist.txt || :
             echo "dorelease=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -224,7 +244,10 @@ jobs:
         with:
           name: reglinux-llvm-${{ steps.compile_llvm_step.outputs.llvmversion }}-${{ matrix.arch }}
           compression-level: 0
-          path: reglinux-llvm-${{ steps.compile_llvm_step.outputs.llvmversion }}-*
+          path: |
+            reglinux-llvm-${{ steps.compile_llvm_step.outputs.llvmversion }}-*
+            reglinux-clang-${{ steps.compile_llvm_step.outputs.llvmversion }}-*
+            reglinux-libclc-${{ steps.compile_llvm_step.outputs.llvmversion }}-*
 
   create_release:
     name: Create release
@@ -243,7 +266,10 @@ jobs:
         with:
           repository: REG-Linux/REG-llvm-binaries
           token: ${{ secrets.REG_TOKEN }}
-          files: reglinux-llvm-${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}-*
+          files: |
+            reglinux-llvm-${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}-*
+            reglinux-clang-${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}-*
+            reglinux-libclc-${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}-*
           tag_name: ${{ needs.compile-toolchain-and-llvm.outputs.llvmversion }}
           prerelease: false
           make_latest: true
