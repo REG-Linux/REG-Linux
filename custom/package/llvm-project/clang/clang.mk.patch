@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/clang/clang.mk b/package/llvm-project/clang/clang.mk
-index 0bafd6461b..54ef0d45a4 100644
+index 0bafd6461b..5fd9c2cf44 100644
 --- a/package/llvm-project/clang/clang.mk
 +++ b/package/llvm-project/clang/clang.mk
 @@ -6,6 +6,9 @@
@@ -43,7 +43,7 @@ index 0bafd6461b..54ef0d45a4 100644
  CLANG_POST_INSTALL_TARGET_HOOKS += CLANG_CLEANUP_TARGET
  
  # clang-tblgen is not installed by default, however it is necessary
-@@ -135,3 +143,69 @@ HOST_CLANG_POST_INSTALL_HOOKS += HOST_CLANG_INSTALL_WRAPPER_AND_SIMPLE_SYMLINKS
+@@ -135,3 +143,74 @@ HOST_CLANG_POST_INSTALL_HOOKS += HOST_CLANG_INSTALL_WRAPPER_AND_SIMPLE_SYMLINKS
  
  $(eval $(cmake-package))
  $(eval $(host-cmake-package))
@@ -80,8 +80,12 @@ index 0bafd6461b..54ef0d45a4 100644
 +CLANG_SOURCE = reglinux-clang-$(CLANG_VERSION)-$(REGLINUX_CLANG_ARCH).tar.xz
 +HOST_CLANG_DEPENDENCIES = host-libxml2
 +
-+define DELETE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
-+	rm -f $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/*.hash -f $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/*.patch
++define RENAME_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
++	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash.bak || :
++endef
++
++define RESTORE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
++	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash || :
 +endef
 +
 +define DISABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
@@ -96,7 +100,8 @@ index 0bafd6461b..54ef0d45a4 100644
 +	)
 +endef
 +
-+CLANG_PRE_DOWNLOAD_HOOKS += DELETE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
++CLANG_PRE_DOWNLOAD_HOOKS += RENAME_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
++CLANG_POST_DOWNLOAD_HOOKS += RESTORE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
 +CLANG_PRE_PATCH_HOOKS += DISABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 +CLANG_POST_PATCH_HOOKS += ENABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 +

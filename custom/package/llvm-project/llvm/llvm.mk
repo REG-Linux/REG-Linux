@@ -354,8 +354,12 @@ LLVM_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(L
 LLVM_SOURCE = reglinux-llvm-$(LLVM_VERSION)-$(REGLINUX_LLVM_ARCH).tar.xz
 HOST_LLVM_DEPENDENCIES = host-python3
 
-define DELETE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
-	rm -fv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/*.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/*.patch
+define RENAME_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
+	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash.bak || :
+endef
+
+define RESTORE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
+	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash || :
 endef
 
 define DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
@@ -370,7 +374,8 @@ define ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 	)
 endef
 
-LLVM_PRE_DOWNLOAD_HOOKS += DELETE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
+LLVM_PRE_DOWNLOAD_HOOKS += RENAME_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
+LLVM_POST_DOWNLOAD_HOOKS += RESTORE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
 LLVM_PRE_PATCH_HOOKS += DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 LLVM_POST_PATCH_HOOKS += ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 
