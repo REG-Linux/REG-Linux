@@ -88,11 +88,16 @@ LIBCLC_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$
 LIBCLC_SOURCE = reglinux-libclc-$(LIBCLC_VERSION)-$(REGLINUX_LIBCLC_ARCH).tar.xz
 LIBCLC_DEPENDENCIES = host-spirv-llvm-translator
 
-define DELETE_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
-	rm -f $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/*.hash
+define RENAME_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
+	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash.bak || :
 endef
 
-LIBCLC_PRE_DOWNLOAD_HOOKS += DELETE_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
+define RESTORE_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
+	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/libclc.hash || :
+endef
+
+LIBCLC_PRE_DOWNLOAD_HOOKS += RENAME_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
+LIBCLC_POST_DOWNLOAD_HOOKS += RESTORE_LIBCLC_HASH_IF_NOT_BUILD_FROM_SOURCE
 
 define LIBCLC_EXTRACT_CMDS
 	# extract host folder

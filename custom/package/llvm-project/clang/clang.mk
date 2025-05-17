@@ -176,8 +176,12 @@ CLANG_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(
 CLANG_SOURCE = reglinux-clang-$(CLANG_VERSION)-$(REGLINUX_CLANG_ARCH).tar.xz
 HOST_CLANG_DEPENDENCIES = host-libxml2
 
-define DELETE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
-	rm -f $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/*.hash -f $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/*.patch
+define RENAME_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
+	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash.bak || :
+endef
+
+define RESTORE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
+	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/clang/clang.hash || :
 endef
 
 define DISABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
@@ -192,7 +196,8 @@ define ENABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 	)
 endef
 
-CLANG_PRE_DOWNLOAD_HOOKS += DELETE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
+CLANG_PRE_DOWNLOAD_HOOKS += RENAME_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
+CLANG_POST_DOWNLOAD_HOOKS += RESTORE_CLANG_HASH_IF_NOT_BUILD_FROM_SOURCE
 CLANG_PRE_PATCH_HOOKS += DISABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 CLANG_POST_PATCH_HOOKS += ENABLE_CLANG_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 

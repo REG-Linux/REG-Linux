@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/llvm/llvm.mk b/package/llvm-project/llvm/llvm.mk
-index b0515474d8..a6f6c99fc2 100644
+index b0515474d8..7ea686a361 100644
 --- a/package/llvm-project/llvm/llvm.mk
 +++ b/package/llvm-project/llvm/llvm.mk
 @@ -5,6 +5,9 @@
@@ -23,7 +23,7 @@ index b0515474d8..a6f6c99fc2 100644
  
  # Don't build clang libcxx libcxxabi lldb compiler-rt lld polly as llvm subprojects
  # This flag assumes that projects are checked out side-by-side and not nested
-@@ -315,3 +321,69 @@ LLVM_POST_INSTALL_TARGET_HOOKS = LLVM_DELETE_LLVM_TBLGEN_TARGET
+@@ -315,3 +321,74 @@ LLVM_POST_INSTALL_TARGET_HOOKS = LLVM_DELETE_LLVM_TBLGEN_TARGET
  
  $(eval $(cmake-package))
  $(eval $(host-cmake-package))
@@ -60,8 +60,12 @@ index b0515474d8..a6f6c99fc2 100644
 +LLVM_SOURCE = reglinux-llvm-$(LLVM_VERSION)-$(REGLINUX_LLVM_ARCH).tar.xz
 +HOST_LLVM_DEPENDENCIES = host-python3
 +
-+define DELETE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
-+	rm -fv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/*.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/*.patch
++define RENAME_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
++	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash.bak || :
++endef
++
++define RESTORE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
++	mv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash.bak $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/llvm.hash || :
 +endef
 +
 +define DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
@@ -76,7 +80,8 @@ index b0515474d8..a6f6c99fc2 100644
 +	)
 +endef
 +
-+LLVM_PRE_DOWNLOAD_HOOKS += DELETE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
++LLVM_PRE_DOWNLOAD_HOOKS += RENAME_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
++LLVM_POST_DOWNLOAD_HOOKS += RESTORE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
 +LLVM_PRE_PATCH_HOOKS += DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 +LLVM_POST_PATCH_HOOKS += ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
 +
