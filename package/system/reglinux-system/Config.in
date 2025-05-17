@@ -456,3 +456,8 @@ config BR2_PACKAGE_REGLINUX_XWAYLAND
 	select BR2_PACKAGE_WLROOTS_XWAYLAND	if BR2_PACKAGE_WLROOTS
 
 ### ### ###
+config BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE
+	bool "llvm-build-from-source"
+	default n
+
+### ### ###

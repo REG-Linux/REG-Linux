@@ -5,6 +5,9 @@
 ################################################################################
 
 LLVM_VERSION = $(LLVM_PROJECT_VERSION)
+
+ifeq ($(BR2_PACKAGE_LLVM_BUILD_FROM_SOURCE),y)
+
 LLVM_SITE = $(LLVM_PROJECT_SITE)
 LLVM_SOURCE = llvm-$(LLVM_VERSION).src.tar.xz
 LLVM_LICENSE = Apache-2.0 with exceptions
@@ -318,3 +321,69 @@ LLVM_POST_INSTALL_TARGET_HOOKS = LLVM_DELETE_LLVM_TBLGEN_TARGET
 
 $(eval $(cmake-package))
 $(eval $(host-cmake-package))
+
+else
+
+# Download pre compiled files
+REGLINUX_LLVM_ARCH = unknown
+ifeq ($(BR2_arm),y)
+ifeq ($(BR2_arm1176jzf_s),y)
+    # bcm2835
+    REGLINUX_LLVM_ARCH = armhf
+else
+    # h3
+    REGLINUX_LLVM_ARCH = armv7
+endif
+else ifeq ($(BR2_aarch64),y)
+ifeq ($(BR2_saphira),y)
+    # Asahi Linux
+    REGLINUX_LLVM_ARCH = asahi
+else
+    # h5, Cortex A53
+    REGLINUX_LLVM_ARCH = aarch64
+endif
+else ifeq ($(BR2_RISCV_64),y)
+# jh7110, RISC-V 64 (rv64gc, aka imafd)
+REGLINUX_LLVM_ARCH = riscv64
+else ifeq ($(BR2_x86_64),y)
+# X86_64 architecture
+REGLINUX_LLVM_ARCH = x86_64
+endif
+
+LLVM_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(LLVM_VERSION)
+LLVM_SOURCE = reglinux-llvm-$(LLVM_VERSION)-$(REGLINUX_LLVM_ARCH).tar.xz
+HOST_LLVM_DEPENDENCIES = host-python3
+
+define DELETE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
+	rm -fv $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/*.hash $(BR2_EXTERNAL)/buildroot/package/llvm-project/llvm/*.patch
+endef
+
+define DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+	$(foreach dir,$(call pkg-patches-dirs,$(PKG)),\
+		mkdir -p $(dir)/tmp_disabled_patches ; mv -v $(dir)/*.patch $(dir)/tmp_disabled_patches/ ; \
+	)
+endef
+
+define ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+	$(foreach dir,$(call pkg-patches-dirs,$(PKG)),\
+		mv -v $(dir)/tmp_disabled_patches/* $(dir)/ ; rmdir $(dir)/tmp_disabled_patches ; \
+	)
+endef
+
+LLVM_PRE_DOWNLOAD_HOOKS += DELETE_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
+LLVM_PRE_PATCH_HOOKS += DISABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+LLVM_POST_PATCH_HOOKS += ENABLE_LLVM_PATCHES_IF_NOT_BUILD_FROM_SOURCE
+
+define LLVM_EXTRACT_CMDS
+	# extract host folder
+	tar -C $(HOST_DIR)/../ -xvf $(DL_DIR)/$(LLVM_DL_SUBDIR)/$(LLVM_SOURCE) host
+endef
+
+define LLVM_INSTALL_TARGET_CMDS
+	# extract target folder
+	tar -C $(TARGET_DIR)/../ -xvf $(DL_DIR)/$(LLVM_DL_SUBDIR)/$(LLVM_SOURCE) target
+endef
+
+$(eval $(generic-package))
+endif
+
