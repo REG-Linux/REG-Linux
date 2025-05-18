@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/mesa3d.mk b/package/mesa3d/mesa3d.mk
-index 202fc5cc74..300f2f3588 100644
+index 202fc5cc74..968cf48b2b 100644
 --- a/package/mesa3d/mesa3d.mk
 +++ b/package/mesa3d/mesa3d.mk
 @@ -4,10 +4,10 @@
@@ -28,15 +28,15 @@ index 202fc5cc74..300f2f3588 100644
 +ifeq ($(BR2_x86_64),y)
 +MESA3D_DEPENDENCIES += host-mesa3d
 +endif
-+
-+# need host-python-pycparser built for etnaviv
-+ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ETNAVIV),y)
-+MESA3D_DEPENDENCIES += host-python-pycparser
-+endif
  
 -MESA3D_CONF_OPTS = \
 -	-Dgallium-omx=disabled \
 -	-Dpower8=disabled
++# need host-python-pycparser built for etnaviv
++ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ETNAVIV),y)
++MESA3D_DEPENDENCIES += host-python-pycparser
++endif
++
 +# directx-headers
 +ifeq ($(BR2_PACKAGE_DIRECTX_HEADERS),y)
 +MESA3D_DEPENDENCIES += directx-headers
@@ -69,7 +69,7 @@ index 202fc5cc74..300f2f3588 100644
 +
 +# x86 builds require clang libclc and python-ply, rely on system (host) intel_clc
 +ifeq ($(BR2_x86_64),y)
-+MESA3D_DEPENDENCIES += clang libclc host-clang host-libclc host-python-ply
++MESA3D_DEPENDENCIES += clang libclc host-python-ply
 +MESA3D_CONF_OPTS += -Dintel-clc=system -Dmesa-clc=system
 +endif
 +
@@ -82,7 +82,7 @@ index 202fc5cc74..300f2f3588 100644
 +# asahi needs libclc spirv-tools
 +# specify extra binaries to cross-compile asahi clc
 +ifeq ($(BR2_x86_64)$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
-+MESA3D_DEPENDENCIES += host-qemu host-libclc libclc spirv-tools spirv-llvm-translator clang host-glslang
++MESA3D_DEPENDENCIES += host-qemu libclc spirv-tools spirv-llvm-translator clang host-glslang
 +ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
 +MESA3D_MESON_EXTRA_BINARIES += exe_wrapper=['$(HOST_DIR)/bin/qemu-$(BR2_ARCH)','-L','$(STAGING_DIR)']
 +endif
@@ -221,10 +221,10 @@ index 202fc5cc74..300f2f3588 100644
 +
 +MESA3D_POST_INSTALL_TARGET_HOOKS += MESA3D_ADD_VA_LINKS
 +else
-+MESA3D_CONF_OPTS += -Dgallium-va=disabled
+ MESA3D_CONF_OPTS += -Dgallium-va=disabled
 +endif
 +else
- MESA3D_CONF_OPTS += -Dgallium-va=disabled
++MESA3D_CONF_OPTS += -Dgallium-va=disabled
 +endif
  
  # libGL is only provided for a full xorg stack, without libglvnd
@@ -254,7 +254,7 @@ index 202fc5cc74..300f2f3588 100644
  MESA3D_CFLAGS = $(TARGET_CFLAGS)
  
  # m68k needs 32-bit offsets in switch tables to build
-@@ -254,12 +328,17 @@ endif
+@@ -254,12 +328,28 @@ endif
  ifeq ($(BR2_PACKAGE_LIBGLVND),y)
  ifneq ($(BR2_PACKAGE_MESA3D_OPENGL_GLX)$(BR2_PACKAGE_MESA3D_OPENGL_EGL),)
  MESA3D_DEPENDENCIES += libglvnd
@@ -272,6 +272,17 @@ index 202fc5cc74..300f2f3588 100644
  $(eval $(meson-package))
 +
 +# "just" need a native host intel_clc compiler
-+HOST_MESA3D_DEPENDENCIES = host-libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
++HOST_MESA3D_DEPENDENCIES = libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
 +HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dintel-clc=enabled -Dinstall-intel-clc=true -Dplatforms= -Dgallium-drivers= -Dglx=disabled -Dgallium-rusticl=false
++
++# reglinux hack to fix prebuilt llvm/clang
++#HOST_MESA3D_CONF_OPTS += -DCMAKE_INSTALL_RPATH="$(HOST_DIR)/lib"
++# -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
++HOST_MESA3D_DEPENDENCIES += host-patchelf
++define HOST_MESA3D_FIX_RPATH
++    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/obj2yaml || true;
++    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/yaml2obj || true;
++endef
++
++HOST_MESA3D_POST_INSTALL_HOOKS += HOST_MESA3D_FIX_RPATH
 +$(eval $(host-meson-package))
