@@ -48,7 +48,7 @@ MESA3D_DEPENDENCIES += xlib_libxshmfence host-glslang
 endif
 
 ifeq ($(BR2_PACKAGE_MESA3D_LLVM),y)
-MESA3D_DEPENDENCIES += host-llvm llvm
+MESA3D_DEPENDENCIES += llvm
 MESA3D_MESON_EXTRA_BINARIES += llvm-config='$(STAGING_DIR)/usr/bin/llvm-config'
 MESA3D_CONF_OPTS += -Dllvm=enabled
 ifeq ($(BR2_PACKAGE_LLVM_RTTI),y)
