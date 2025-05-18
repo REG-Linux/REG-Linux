@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/mesa3d.mk b/package/mesa3d/mesa3d.mk
-index 202fc5cc74..4ac399df17 100644
+index 202fc5cc74..300f2f3588 100644
 --- a/package/mesa3d/mesa3d.mk
 +++ b/package/mesa3d/mesa3d.mk
 @@ -4,10 +4,10 @@
@@ -15,7 +15,7 @@ index 202fc5cc74..4ac399df17 100644
  MESA3D_LICENSE = MIT, SGI, Khronos
  MESA3D_LICENSE_FILES = docs/license.rst
  MESA3D_CPE_ID_VENDOR = mesa3d
-@@ -23,17 +23,28 @@ MESA3D_DEPENDENCIES = \
+@@ -23,21 +23,32 @@ MESA3D_DEPENDENCIES = \
  	host-python-mako \
  	expat \
  	libdrm \
@@ -52,6 +52,11 @@ index 202fc5cc74..4ac399df17 100644
  endif
  
  ifeq ($(BR2_PACKAGE_MESA3D_LLVM),y)
+-MESA3D_DEPENDENCIES += host-llvm llvm
++MESA3D_DEPENDENCIES += llvm
+ MESA3D_MESON_EXTRA_BINARIES += llvm-config='$(STAGING_DIR)/usr/bin/llvm-config'
+ MESA3D_CONF_OPTS += -Dllvm=enabled
+ ifeq ($(BR2_PACKAGE_LLVM_RTTI),y)
 @@ -55,9 +66,28 @@ endif
  ifeq ($(BR2_PACKAGE_MESA3D_OPENCL),y)
  MESA3D_PROVIDES += libopencl
