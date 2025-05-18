@@ -11,7 +11,7 @@ XENIA_CANARY_GIT_SUBMODULES = YES
 XENIA_CANARY_LICENSE = BSD
 XENIA_CANARY_LICENSE_FILE = LICENSE
 
-XENIA_CANARY_DEPENDENCIES = python-toml host-llvm host-clang libgtk3 sdl2 host-sdl2
+XENIA_CANARY_DEPENDENCIES = python-toml llvm clang libgtk3 sdl2 host-sdl2
 # Extra for WIP posix stack walker
 #XENIA_CANARY_DEPENDENCIES += libunwind binutils
 
