@@ -1,20 +1,17 @@
 diff --git a/linux/linux.hash b/linux/linux.hash
-index 8b7f0f09aa..9cbd623165 100644
+index 4bb0e27c90..fc12ae3aa4 100644
 --- a/linux/linux.hash
 +++ b/linux/linux.hash
-@@ -1,9 +1,11 @@
+@@ -1,7 +1,9 @@
  # From https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
--sha256  230e89b07b0ab82e74f07ecc1bee3105dca81d0ef4a97f900929c407249b6ac7  linux-6.12.20.tar.xz
--sha256  7fd20721551a61db347c5ac6ca05818e24058682be4e4389dc51e88d4ac17ba7  linux-6.6.84.tar.xz
--sha256  44caf510603b4cbbe78ef828620099d200536d666e909ddb73bb2938c7de5b16  linux-6.1.131.tar.xz
-+sha256  28207ec52bbeaa3507010aeff944f442f7d9f22b286b79caf45ec6df1b24f409  linux-6.14.5.tar.xz
+-sha256  e8a099182562aecff781de72ce769461e706d97af42d740dff20eb450dd5771e  linux-6.12.28.tar.xz
+-sha256  ff856748671629c1fefef219099e0b4b81131c2d325e768cb0806e204157014e  linux-6.6.90.tar.xz
+-sha256  e319a5bb9049ba9fb8cbc08cba4874716e8985bd10f7971f2573ea802c257911  linux-6.1.138.tar.xz
++sha256  8112202bc26d086957a94d2109a6dcd4478c5ba18d0f0a5e1c5dfeea01f54972  linux-6.14.7.tar.xz
 +sha256  611fbb669cf5539da48137a9c052becd499f3f862afaf21ab84cea3966221242  linux-6.13.12.tar.xz
-+sha256  402de222c7425893c38102ddd53d2b602c74c2eabcf6631bb0791089c05e3bca  linux-6.12.26.tar.xz
-+sha256  c21af7d36068e4ac0704c242eac8459212e6bf4a5d09df941b9b4d17dc1eba00  linux-6.6.89.tar.xz
-+sha256  a61c079bb9d71aab7e61c42a175140222cffc4114f5c812194a7a353947ab071  linux-6.1.136.tar.xz
++sha256  e8b2ec7e2338ccb9c86de7154f6edcaadfce80907493c143e85a82776bb5064d  linux-6.12.29.tar.xz
++sha256  d08d3d175407a52cd0b25fc95e149bbd2fd6922cd37816c8fcfad18f95e254f4  linux-6.6.91.tar.xz
++sha256  5cb22d2e77af1ae942bf20aa9fcc4901a51cdd25522a30a3beee9140a1c84bc2  linux-6.1.139.tar.gz
  # From https://www.kernel.org/pub/linux/kernel/v5.x/sha256sums.asc
--sha256  9319a47b1e9b5d344ff6015431856d0c9640e4faedc527c87f9129061a27136f  linux-5.15.179.tar.xz
-+sha256  3346436d9efae810195b40922c6b73001d1a4dd7e5eeb5a7e8ed85e63960da38  linux-5.15.181.tar.xz
- sha256  953be3931101a94a93a644c1283ca41a7e567447ca87d3069ed4dd712dc1f1cc  linux-5.10.235.tar.xz
- sha256  b3ad64a4476a7c5450b92eab9a888b84ecb64dc613fcb0128f653f58e958ef6e  linux-5.4.291.tar.xz
- # Locally computed
+ sha256  b6abfa53315a04e459070b927c58beb41f085433117d58756504d68b67f6a31e  linux-5.15.182.tar.xz
+ sha256  1fc82737e0e4f0ae0b40f91a00c68f3cb75362e6ae54623ec64b41a51cde0f25  linux-5.10.237.tar.xz

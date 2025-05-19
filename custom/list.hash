@@ -22,8 +22,8 @@ d5729e1c36bf284009e995bd4dc86d73  arch/Config.in.arm
 68b27177f9fe560b74f0c9e4c4fd53e1  fs/cpio/init
 0f1e375992de585df0580c9ef85158e8  fs/squashfs/Config.in
 8635723306eb367f07b3b8fc57243880  fs/squashfs/squashfs.mk
-d9f80cf4693c2822aa4b7091897502b1  linux/Config.in
-5470eac3a1da59cc908c077680742cd0  linux/linux.hash
+7163949b7b033848785b03ddd11d86e4  linux/Config.in
+5c504e3850b5a61b37eb6a9b3b445809  linux/linux.hash
 3c12b0f02fc58a42cbd35aed5b7f4963  package/Config.in
 6521d70e92c2c2d8864d46e01c27b6d4  package/Config.in.host
 4106ba3f151f6d174a9d2c957b7a5ecd  package/Makefile.in
@@ -60,13 +60,11 @@ ab84292c3c572f6b2b1b335f31d1a66b  package/libcurl/libcurl.mk
 e11ebaaac3d50a95c01f479baef197f7  package/libglvnd/libglvnd.mk
 25e2c104ab0d7b1825fa3528fb313d7f  package/libidn2/libidn2.mk
 b5bcf1c3e1f262b4e38d381a73c38137  package/libopenh264/Config.in
-1f52439b441ae3430f948bac269ffe6f  package/libopenh264/libopenh264.mk
-3af997dda015866ba755ffe6fc17565f  package/libopenmpt/libopenmpt.hash
-8da9f8aa8ad8dae0732228b9de90d837  package/libopenmpt/libopenmpt.mk
+4e886a008045be67afc5e5981c4eae9e  package/libopenh264/libopenh264.mk
 cc7d8a6dc2f0ff8c66f3f44a9c5e7b1f  package/libpciaccess/libpciaccess.mk
 fb3f39cb099d5a583fdef23484b25ac8  package/libsoundtouch/libsoundtouch.mk
 34607395f047f61cacf7fe877cfbc57a  package/libxmlb/libxmlb.mk
-e5b88ffd78ecbf53ac71a26bbde3700f  package/linux-headers/Config.in.host
+9dfd19fb84451edd7f0628dee6aa382c  package/linux-headers/Config.in.host
 84caeaa857a89462b8a4e4c775a60ea4  package/lirc-tools/lirc-tools.mk
 0b48917e45566117a9acd2225e33a15e  package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch
 6af2e1b3409965df20121e7910eaf6b7  package/llvm-project/clang/clang.hash
@@ -119,7 +117,7 @@ ebc495a9f0e515ea57680c847fd0fdbf  package/qt6/qt6shadertools/qt6shadertools.hash
 a9d1420cc9734b65cbc95471f32631da  package/rockchip-rkbin/rockchip-rkbin.hash
 877a66c23c5a1df8e186f44fa4ff4367  package/rockchip-rkbin/rockchip-rkbin.mk
 b69d8b1eb8ab76b368eb9b6a6b9caee4  package/rpi-firmware/rpi-firmware.hash
-0051fc296b4cc5deab060a38dfc7adc1  package/rpi-firmware/rpi-firmware.mk
+33bd865505be4fcaebe095ff98752d0e  package/rpi-firmware/rpi-firmware.mk
 3bfdb1383a94ac2043c32e078a558816  package/rtl8192eu/rtl8192eu.hash
 e67bbd495c642bace7f5dfd78c57a548  package/rtl8192eu/rtl8192eu.mk
 b0e237fcce50eebfb67bdf5a78c753df  package/rust-bin/rust-bin.hash
