@@ -5,9 +5,15 @@
 ################################################################################
 
 # When updating the version, please also update mesa3d-headers
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
+IMG_MESA3D_VERSION = k1-bl-v2.2-release
+IMG_MESA3D_SITE = https://gitee.com/bianbu-linux/mesa3d.git
+IMG_MESA3D_SITE_METHOD = git
+else
 IMG_MESA3D_VERSION = 22.1.3
 IMG_MESA3D_SOURCE = mesa-$(IMG_MESA3D_VERSION).tar.xz
 IMG_MESA3D_SITE = https://archive.mesa3d.org/older-versions/22.x
+endif
 IMG_MESA3D_LICENSE = MIT, SGI, Khronos
 IMG_MESA3D_LICENSE_FILES = docs/license.rst
 IMG_MESA3D_CPE_ID_VENDOR = mesa3d
@@ -189,17 +195,19 @@ IMG_MESA3D_CONF_OPTS += \
 endif
 
 ifeq ($(BR2_PACKAGE_IMG_MESA3D_OPENGL_ES),y)
-IMG_MESA3D_PROVIDES += $(if $(BR2_PACKAGE_LIBGLVND),,libgles)
+#IMG_MESA3D_PROVIDES += $(if $(BR2_PACKAGE_LIBGLVND),,libgles)
 IMG_MESA3D_CONF_OPTS += -Dgles1=enabled -Dgles2=enabled
 else
 IMG_MESA3D_CONF_OPTS += -Dgles1=disabled -Dgles2=disabled
 endif
 
+ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
 ifeq ($(BR2_PACKAGE_IMG_MESA3D_XVMC),y)
 IMG_MESA3D_DEPENDENCIES += xlib_libXv xlib_libXvMC
 IMG_MESA3D_CONF_OPTS += -Dgallium-xvmc=enabled
 else
 IMG_MESA3D_CONF_OPTS += -Dgallium-xvmc=disabled
+endif
 endif
 
 ifeq ($(BR2_PACKAGE_VALGRIND),y)
