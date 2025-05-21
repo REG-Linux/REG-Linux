@@ -1,0 +1,11 @@
+config BR2_PACKAGE_UMTP_RESPONDER
+	bool "umtp-responder"
+	select BR2_PACKAGE_LIBGLIB2
+	select BR2_PACKAGE_LIBUSB
+	select BR2_PACKAGE_INIH
+
+	help
+	  Lightweight USB Media Transfer Protocol (MTP) 
+	  responder daemon for GNU/Linux
+
+	  https://github.com/viveris/uMTP-Responder
