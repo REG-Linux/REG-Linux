@@ -5,6 +5,7 @@ include reglinux-board.common
 BR2_riscv=y
 BR2_RISCV_64=y
 BR2_RISCV_ISA_RVC=y
+#BR2_RISCV_ISA_RVV=y
 BR2_riscv_g=y
 BR2_PACKAGE_SYSTEM_TARGET_K1=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mabi=lp64d -march=rv64imafdv"
