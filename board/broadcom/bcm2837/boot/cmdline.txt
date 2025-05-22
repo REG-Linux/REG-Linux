@@ -1,1 +1,1 @@
-vt.global_cursor_default=0 logo.nologo label=REGLINUX rootwait fastboot noswap quiet splash
+elevator=deadline vt.global_cursor_default=0 logo.nologo label=REGLINUX rootwait fastboot noswap quiet splash
