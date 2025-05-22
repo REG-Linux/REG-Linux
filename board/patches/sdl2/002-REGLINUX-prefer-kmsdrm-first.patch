@@ -1,0 +1,22 @@
+--- a/src/video/SDL_video.c	2025-05-17 20:06:04.630809374 +0200
++++ b/src/video/SDL_video.c	2025-05-17 20:06:24.247269835 +0200
+@@ -72,6 +72,9 @@
+ 
+ /* Available video drivers */
+ static VideoBootStrap *bootstrap[] = {
++#ifdef SDL_VIDEO_DRIVER_KMSDRM
++    &KMSDRM_bootstrap,
++#endif
+ #ifdef SDL_VIDEO_DRIVER_COCOA
+     &COCOA_bootstrap,
+ #endif
+@@ -117,9 +120,6 @@
+ #ifdef SDL_VIDEO_DRIVER_N3DS
+     &N3DS_bootstrap,
+ #endif
+-#ifdef SDL_VIDEO_DRIVER_KMSDRM
+-    &KMSDRM_bootstrap,
+-#endif
+ #ifdef SDL_VIDEO_DRIVER_RISCOS
+     &RISCOS_bootstrap,
+ #endif

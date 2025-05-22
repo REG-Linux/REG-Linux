@@ -40,12 +40,11 @@ index b0f673a..bbae98a 100644
  	static std::optional<uint32> GetPersistentId() { return s_persistent_id; }
  
  private:
-@@ -41,6 +43,8 @@ private:
- 	inline static bool s_nsight_mode = false;
+@@ -48,6 +48,7 @@
  
  	inline static bool s_force_interpreter = false;
-+
-+  	inline static bool s_force_no_menubar = false;
+ 	inline static bool s_force_multicore_interpreter = false;
++	inline static bool s_force_no_menubar = false;
  	
  	inline static std::optional<uint32> s_persistent_id{};
  

@@ -32,7 +32,7 @@ for arch in ${ARCHS}; do
     # Clean
     make "${arch}"-clean
     # Build
-    PKG=reglinux-qt6 make "${arch}"-pkg
+    PKG=reglinux-qt6 make "${arch}"-pkg DEBUG_BUILD=n PARALLEL_BUILD=n
     # Package
     cd output/"${arch}" || exit 1
     staging="$(cat build/staging.dir)"
