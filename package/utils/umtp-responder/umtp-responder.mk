@@ -13,7 +13,9 @@ endef
 
 define UMTP_RESPONDER_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin
+	mkdir -p $(TARGET_DIR)/etc/umtprd
 	$(INSTALL) -D $(@D)/umtprd $(TARGET_DIR)/usr/bin/umtprd
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/utils/umtp-responder/umtprd.conf $(TARGET_DIR)/etc/umtprd
 endef
 
 $(eval $(generic-package))
