@@ -1,0 +1,23 @@
+--- a/cmake/ETLCommon.cmake	2025-01-19 15:04:04.000000000 +0100
++++ b/cmake/ETLCommon.cmake	2025-05-21 12:43:13.699372929 +0200
+@@ -101,6 +101,9 @@
+ elseif(system_name_lower MATCHES "(arm)|(aarch64)")
+ 	message(STATUS "ARM architecture detected")
+ 	set(ETL_ARM 1)
++elseif(system_name_lower MATCHES "(riscv)|(riscv64)")
++	message(STATUS "RISCV architecture detected")
++	set(ETL_RISCV 1)
+ else()
+ 	message(WARNING "Unknown architecture detected: ${CMAKE_SYSTEM_PROCESSOR}")
+ endif()
+--- a/cmake/ETLSetupFeatures.cmake	2025-05-21 13:39:03.185880028 +0200
++++ b/cmake/ETLSetupFeatures.cmake	2025-05-21 13:39:41.048757661 +0200
+@@ -10,7 +10,7 @@
+ #-----------------------------------------------------------------
+ if(BUILD_CLIENT)
+ 
+-	if (NOT ETL_ARM)
++	if (NOT ETL_ARM AND NOT ETL_RISCV)
+ 		if(NOT WIN32 AND NOT APPLE AND NOT ANDROID) # Dependency of GLEW and SDL_syswm.h
+ 			find_package(X11 REQUIRED)
+ 			target_include_directories(client_libraries INTERFACE ${X11_INCLUDE_DIR})

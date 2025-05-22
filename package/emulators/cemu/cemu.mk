@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-CEMU_VERSION = v2.6
+# Unstable because of WIP aarch64 upstreamed support
+CEMU_VERSION = 783d88a892204d0570d0720d3749d01b685bdc31
 CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
@@ -68,10 +69,10 @@ define CEMU_INSTALL_TARGET_CMDS
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
-define EXTRACT_CEMU_AARCH64_DEPS
-	cd $(@D)/dependencies/ && tar xzvf $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/cemu/aarch64_deps.tar.gz
-endef
-
-CEMU_PRE_CONFIGURE_HOOKS += EXTRACT_CEMU_AARCH64_DEPS
+#define EXTRACT_CEMU_AARCH64_DEPS
+#	cd $(@D)/dependencies/ && tar xzvf $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/cemu/aarch64_deps.tar.gz
+#endef
+#
+#CEMU_PRE_CONFIGURE_HOOKS += EXTRACT_CEMU_AARCH64_DEPS
 
 $(eval $(cmake-package))

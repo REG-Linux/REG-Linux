@@ -2053,13 +2053,3 @@ diff -u -r -N cemu-v2.6/src/util/helpers/StringBuf.h cemu-android/src/util/helpe
  	uint8*	str;
  	uint32	length; /* in bytes */
  	uint32	limit; /* in bytes */
---- a/src/CMakeLists.txt	2025-03-15 14:05:21.041053782 +0100
-+++ b/src/CMakeLists.txt	2025-03-15 14:05:37.106396765 +0100
-@@ -39,6 +39,7 @@
- 
-     add_compile_options(-Wno-multichar -Wno-invalid-offsetof -Wno-switch -Wno-ignored-attributes -Wno-deprecated-enum-enum-conversion)
-     add_compile_options(-flax-vector-conversions)
-+    add_compile_options(-Wno-error=changes-meaning)
- endif()
- 
- add_compile_definitions(VK_NO_PROTOTYPES)

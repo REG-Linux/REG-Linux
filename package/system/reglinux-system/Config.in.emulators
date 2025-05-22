@@ -341,7 +341,8 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 	# Duckstation flavors : AppImage/Qt (current), AppImage/mini (current), GPL source code (older)
 	select BR2_PACKAGE_DUCKSTATION_MINI		if !BR2_PACKAGE_REGLINUX_RELEASE && (BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
 	select BR2_PACKAGE_DUCKSTATION			if !BR2_PACKAGE_REGLINUX_RELEASE && !BR2_PACKAGE_DUCKSTATION_MINI && (BR2_x86_64 || BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
-	select BR2_PACKAGE_DUCKSTATION_GPL		if !BR2_PACKAGE_DUCKSTATION && !BR2_PACKAGE_DUCKSTATION_MINI && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3
+	# TODO: for some reason, GL wrongly selected on K1, disable until proper fix
+	select BR2_PACKAGE_DUCKSTATION_GPL		if !BR2_PACKAGE_DUCKSTATION && !BR2_PACKAGE_DUCKSTATION_MINI && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_PACKAGE_SYSTEM_TARGET_K1
 	# PCSX-ReARMed libretro core (well-maintained by notaz)
 	select BR2_PACKAGE_LIBRETRO_PCSX		# ALL
 	# libretro-swanstation core (forked from old duckstation)
