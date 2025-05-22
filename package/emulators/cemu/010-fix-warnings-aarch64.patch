@@ -1,0 +1,10 @@
+--- a/src/CMakeLists.txt	2025-05-22 08:14:49.599438752 +0200
++++ b/src/CMakeLists.txt	2025-05-22 08:15:41.066692422 +0200
+@@ -33,6 +33,7 @@
+ 	endif()
+ 
+     add_compile_options(-Wno-multichar -Wno-invalid-offsetof -Wno-switch -Wno-ignored-attributes -Wno-deprecated-enum-enum-conversion)
++    add_compile_options(-Wno-error=changes-meaning)
+ endif()
+ 
+ add_compile_definitions(VK_NO_PROTOTYPES)

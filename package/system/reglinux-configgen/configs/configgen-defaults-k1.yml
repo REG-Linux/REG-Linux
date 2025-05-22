@@ -4,6 +4,3 @@ nds:
 fmtowns:
   emulator: libretro
   core:     mame
-jaguar:
-  emulator: bigpemu
-  core:     bigpemu
