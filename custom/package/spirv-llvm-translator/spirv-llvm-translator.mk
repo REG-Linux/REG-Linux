@@ -42,6 +42,8 @@ define HOST_SPIRV_LLVM_TRANSLATOR_FIX_RPATH
     for f in $(HOST_DIR)/bin/llvm-* $(HOST_DIR)/bin/*ll*; do \
         $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $$f || true; \
     done
+    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/obj2yaml || true;
+    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/yaml2obj || true;
     $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/opt || true;
     $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/sancov || true;
     $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/verify-uselistorder || true;
