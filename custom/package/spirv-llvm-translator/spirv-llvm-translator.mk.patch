@@ -1,5 +1,5 @@
 diff --git a/package/spirv-llvm-translator/spirv-llvm-translator.mk b/package/spirv-llvm-translator/spirv-llvm-translator.mk
-index 523890a986..64fa4da50d 100644
+index 523890a986..8daf7e9b69 100644
 --- a/package/spirv-llvm-translator/spirv-llvm-translator.mk
 +++ b/package/spirv-llvm-translator/spirv-llvm-translator.mk
 @@ -5,12 +5,27 @@
@@ -33,7 +33,7 @@ index 523890a986..64fa4da50d 100644
  HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
  	-DLLVM_BUILD_TOOLS=ON \
  	-DLLVM_DIR=$(HOST_DIR)/lib/cmake/llvm \
-@@ -19,4 +34,24 @@ HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
+@@ -19,4 +34,26 @@ HOST_SPIRV_LLVM_TRANSLATOR_CONF_OPTS = \
  	-DLLVM_EXTERNAL_PROJECTS="SPIRV-Headers" \
  	-DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(HOST_DIR)/include
  
@@ -45,6 +45,8 @@ index 523890a986..64fa4da50d 100644
 +    for f in $(HOST_DIR)/bin/llvm-* $(HOST_DIR)/bin/*ll*; do \
 +        $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $$f || true; \
 +    done
++    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/obj2yaml || true;
++    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/yaml2obj || true;
 +    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/opt || true;
 +    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/sancov || true;
 +    $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/verify-uselistorder || true;
