@@ -350,6 +350,11 @@ menu "Controllers"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/xpad-noone/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/xpadneo/Config.in"
 endmenu
+
+menu "Network"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/network/aic8800/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/network/rtl8812au/Config.in"
+endmenu
 endmenu
 
 menu "Batocera.linux"
@@ -415,7 +420,6 @@ menu "GPU"
 endmenu
 
 menu "Network"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/rtl8812au/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/rtl8821au-morrownr/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/rtl88x2bu/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/qualcomm/pd-mapper/Config.in"
@@ -424,7 +428,6 @@ menu "Network"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/qualcomm/tqftpserv/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/r8125/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/r8168/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/network/aic8800/Config.in"
 endmenu
 
 menu "LED"
