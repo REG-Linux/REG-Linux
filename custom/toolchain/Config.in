@@ -657,7 +657,7 @@ config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_14
 
 config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_15
 	bool
-	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_14
 
 # This should be selected by the latest version, above, to indicate that
 # Buildroot does not know of more recent headers than the ones selected.
