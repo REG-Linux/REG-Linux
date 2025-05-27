@@ -1,5 +1,5 @@
 diff --git a/toolchain/Config.in b/toolchain/Config.in
-index 94723da141..f8e3a59237 100644
+index 94723da141..5aaac5429e 100644
 --- a/toolchain/Config.in
 +++ b/toolchain/Config.in
 @@ -647,6 +647,18 @@ config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
@@ -16,7 +16,7 @@ index 94723da141..f8e3a59237 100644
 +
 +config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_15
 +	bool
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
++	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_14
 +
  # This should be selected by the latest version, above, to indicate that
  # Buildroot does not know of more recent headers than the ones selected.
