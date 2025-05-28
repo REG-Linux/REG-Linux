@@ -1,12 +1,13 @@
 diff --git a/linux/linux.hash b/linux/linux.hash
-index 4bb0e27c90..887b1af821 100644
+index 4bb0e27c90..26df56c551 100644
 --- a/linux/linux.hash
 +++ b/linux/linux.hash
-@@ -1,7 +1,9 @@
+@@ -1,7 +1,10 @@
  # From https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
 -sha256  e8a099182562aecff781de72ce769461e706d97af42d740dff20eb450dd5771e  linux-6.12.28.tar.xz
 -sha256  ff856748671629c1fefef219099e0b4b81131c2d325e768cb0806e204157014e  linux-6.6.90.tar.xz
 -sha256  e319a5bb9049ba9fb8cbc08cba4874716e8985bd10f7971f2573ea802c257911  linux-6.1.138.tar.xz
++sha256  7586962547803be7ecc4056efc927fb25214548722bd28171172f3599abb9764  linux-6.15.tar.xz
 +sha256  62b12ecd3075a357eb320935657de84e01552803717dad383fa7cc3aa4aa2905  linux-6.14.8.tar.xz
 +sha256  611fbb669cf5539da48137a9c052becd499f3f862afaf21ab84cea3966221242  linux-6.13.12.tar.xz
 +sha256  df046a48971e40ce0b2e003e7e55b6b1e7da2912120eb216d5d6c8450c9cf82e  linux-6.12.30.tar.xz
