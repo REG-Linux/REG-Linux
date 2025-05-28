@@ -17,6 +17,7 @@ menu "System"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-test/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-msg/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-configgen/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/system/reglinux-zramswap/Config.in"
 endmenu
 
 menu "Looks"
@@ -583,7 +584,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/imgui/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/vdpauinfo/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/ledspicer/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/zramswap/Config.in"
 endmenu
 
 menu "Screens"

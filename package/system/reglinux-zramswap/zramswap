@@ -1,0 +1,299 @@
+#!/bin/bash
+
+# Performance-optimized configuration
+ZRAM_DEV="/dev/zram0"
+ZRAM_CONF="/sys/block/zram0"
+SWAP_PRIORITY=32767  # Maximum priority to use zram first
+ZRAM_SIZE_FACTOR=0.6 # 60% of RAM for better performance
+
+# Compression algorithms prioritized for performance on weak hardware
+# LZ4 is fastest, LZO is second choice, avoid ZSTD/DEFLATE on low-end systems
+COMPRESSION_ALGOS=("lz4" "lzo")
+
+# Colors for colored output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Logging functions with colored output
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[OK]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+check_root() {
+    # Ensure script is run with root privileges
+    if [[ $EUID -ne 0 ]]; then
+        log_error "This script must be run as root!"
+        exit 1
+    fi
+}
+
+get_optimal_compression() {
+    # Get list of available compression algorithms from kernel
+    local available_algos
+    available_algos=$(cat /sys/block/zram0/comp_algorithm 2>/dev/null | tr -d '[]' | tr ' ' '\n')
+
+    # Try algorithms in order of performance preference
+    for algo in "${COMPRESSION_ALGOS[@]}"; do
+        if echo "$available_algos" | grep -q "^$algo$"; then
+            echo "$algo"
+            return 0
+        fi
+    done
+
+    # Fallback to first available algorithm if none of our preferred ones are found
+    echo "$available_algos" | head -n1
+}
+
+calculate_optimal_size() {
+    local total_mem_kb total_mem_gb zram_size_kb
+
+    total_mem_kb=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+    total_mem_gb=$((total_mem_kb / 1024 / 1024))
+
+    # Optimized calculation based on total RAM
+    if [[ $total_mem_gb -ge 8 ]]; then
+        # Systems with 8GB+ can use more zram
+        zram_size_kb=$(echo "$total_mem_kb * 0.75" | bc | cut -d. -f1)
+    elif [[ $total_mem_gb -ge 4 ]]; then
+        # Medium systems (4-8GB)
+        zram_size_kb=$(echo "$total_mem_kb * $ZRAM_SIZE_FACTOR" | bc | cut -d. -f1)
+    else
+        # Low RAM systems (2-4GB)
+        zram_size_kb=$(echo "$total_mem_kb * 0.5" | bc | cut -d. -f1)
+    fi
+
+    echo "$zram_size_kb"
+}
+
+optimize_zram_params() {
+    local zram_dev="$1"
+    local cpu_count
+    cpu_count=$(nproc)
+
+    # ZRAM-specific performance optimizations for weak hardware
+    if [[ -w /sys/block/zram0/max_comp_streams ]]; then
+        # Limit compression streams on weak hardware to avoid CPU overload
+        local streams
+        if [[ $cpu_count -le 2 ]]; then
+            streams=1  # Single stream for very weak CPUs
+        elif [[ $cpu_count -le 4 ]]; then
+            streams=2  # Limited streams for weak CPUs
+        else
+            streams=$cpu_count  # Full streams for stronger CPUs
+        fi
+
+        echo "$streams" > /sys/block/zram0/max_comp_streams 2>/dev/null
+        log_info "Compression streams set to $streams (optimized for $cpu_count cores)"
+    fi
+
+    # Configure I/O scheduler for better performance with zram
+    if [[ -w /sys/block/zram0/queue/scheduler ]]; then
+        echo "none" > /sys/block/zram0/queue/scheduler 2>/dev/null ||
+        echo "noop" > /sys/block/zram0/queue/scheduler 2>/dev/null
+    fi
+
+    # Reduce readahead for zram devices (optimization for SSD-like behavior)
+    if [[ -w /sys/block/zram0/queue/read_ahead_kb ]]; then
+        echo "4" > /sys/block/zram0/queue/read_ahead_kb 2>/dev/null
+    fi
+}
+
+is_zram_active() {
+    swapon --show=NAME --noheadings 2>/dev/null | grep -q "^${ZRAM_DEV}$"
+}
+
+start() {
+    check_root
+
+    if is_zram_active; then
+        log_warning "ZRAM is already active!"
+        status
+        return 0
+    fi
+
+    log_info "Enabling performance-optimized zram..."
+
+    # Load zram module
+    if ! lsmod | grep -q "^zram "; then
+        if ! modprobe zram num_devices=1; then
+            log_error "Failed to load zram module"
+            exit 1
+        fi
+    fi
+
+    # Wait for device to be available
+    local timeout=5
+    while [[ ! -e $ZRAM_DEV && $timeout -gt 0 ]]; do
+        sleep 1
+        ((timeout--))
+    done
+
+    if [[ ! -e $ZRAM_DEV ]]; then
+        log_error "ZRAM device was not created"
+        exit 1
+    fi
+
+    # Set optimized compression algorithm
+    local compression_algo
+    compression_algo=$(get_optimal_compression)
+
+    if ! echo "$compression_algo" > ${ZRAM_CONF}/comp_algorithm 2>/dev/null; then
+        log_error "Failed to set compression algorithm: $compression_algo"
+        exit 1
+    fi
+
+    log_info "Using compression algorithm: $compression_algo"
+
+    # Calculate optimized size
+    local zram_size_kb
+    zram_size_kb=$(calculate_optimal_size)
+
+    if ! echo "${zram_size_kb}K" > ${ZRAM_CONF}/disksize; then
+        log_error "Failed to set zram disk size"
+        exit 1
+    fi
+
+    # Apply specific optimizations
+    optimize_zram_params "$ZRAM_DEV"
+
+    # Format as swap
+    if ! mkswap -L "zram-swap" ${ZRAM_DEV} >/dev/null 2>&1; then
+        log_error "Failed to format zram device as swap"
+        exit 1
+    fi
+
+    # Enable swap with maximum priority
+    if ! swapon -p ${SWAP_PRIORITY} ${ZRAM_DEV}; then
+        log_error "Failed to enable zram swap"
+        exit 1
+    fi
+
+    # Configure optimized swappiness for zram
+    local original_swappiness
+    original_swappiness=$(cat /proc/sys/vm/swappiness)
+
+    if [[ $original_swappiness -lt 60 ]]; then
+        echo 60 > /proc/sys/vm/swappiness
+        log_info "Swappiness adjusted to 60 (was $original_swappiness)"
+    fi
+
+    log_success "ZRAM enabled successfully!"
+    log_success "Size: $((zram_size_kb / 1024)) MB using $compression_algo"
+
+    # Show statistics
+    status
+}
+
+stop() {
+    check_root
+
+    if ! is_zram_active; then
+        log_warning "ZRAM is not active"
+        return 0
+    fi
+
+    log_info "Disabling zram swap..."
+
+    # Disable zram swap
+    if ! swapoff ${ZRAM_DEV} 2>/dev/null; then
+        log_warning "Failed to disable zram swap (may not be mounted)"
+    fi
+
+    # Reset zram device
+    if [[ -w ${ZRAM_CONF}/reset ]]; then
+        echo 1 > ${ZRAM_CONF}/reset 2>/dev/null
+    fi
+
+    # Remove module if not being used
+    if lsmod | grep -q "^zram " && [[ $(cat /proc/swaps | grep -c zram) -eq 0 ]]; then
+        modprobe -r zram 2>/dev/null || true
+    fi
+
+    log_success "ZRAM swap disabled"
+}
+
+status() {
+    echo
+    echo "=== ZRAM Status ==="
+
+    if ! is_zram_active; then
+        echo "Status: Inactive"
+        return 0
+    fi
+
+    echo "Status: Active"
+
+    # Basic information
+    if [[ -r ${ZRAM_CONF}/disksize ]]; then
+        local disksize_bytes
+        disksize_bytes=$(cat ${ZRAM_CONF}/disksize)
+        echo "Disk size: $((disksize_bytes / 1024 / 1024)) MB"
+    fi
+
+    if [[ -r ${ZRAM_CONF}/comp_algorithm ]]; then
+        local algo
+        algo=$(cat ${ZRAM_CONF}/comp_algorithm | grep -o '\[.*\]' | tr -d '[]')
+        echo "Algorithm: $algo"
+    fi
+
+    # Usage statistics
+    if [[ -r ${ZRAM_CONF}/mem_used_total ]]; then
+        local mem_used orig_size compr_ratio
+        mem_used=$(cat ${ZRAM_CONF}/mem_used_total)
+        orig_size=$(cat ${ZRAM_CONF}/orig_data_size 2>/dev/null || echo "0")
+
+        echo "Memory used: $((mem_used / 1024 / 1024)) MB"
+
+        if [[ $orig_size -gt 0 ]]; then
+            compr_ratio=$(echo "scale=2; $orig_size / $mem_used" | bc 2>/dev/null || echo "N/A")
+            echo "Compression ratio: ${compr_ratio}:1"
+            echo "Original data: $((orig_size / 1024 / 1024)) MB"
+        fi
+    fi
+
+    # Show swap information
+    echo
+    echo "=== Swap Information ==="
+    swapon --show 2>/dev/null | grep -E "(NAME|zram)" || echo "No active swap"
+
+    echo
+}
+
+restart() {
+    stop
+    sleep 1
+    start
+}
+
+case "$1" in
+    start)   start   ;;
+    stop)    stop    ;;
+    restart) restart ;;
+    status)  status  ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        echo
+        echo "Commands:"
+        echo "  start   - Enable optimized zram swap"
+        echo "  stop    - Disable zram swap"
+        echo "  restart - Restart zram swap"
+        echo "  status  - Show detailed zram information"
+        ;;
+esac
+
+exit 0
