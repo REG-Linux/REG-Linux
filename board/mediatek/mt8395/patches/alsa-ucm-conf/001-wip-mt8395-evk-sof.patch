@@ -1,0 +1,118 @@
+From b403310c6cd795c447744e6f46d3c4d021316ba7 Mon Sep 17 00:00:00 2001
+From: Julien Massot <julien.massot@collabora.com>
+Date: Wed, 16 Apr 2025 09:54:58 +0200
+Subject: [PATCH] ucm2: MediaTek: mt8395-evk: Add support for SOF
+
+Add support for MT8395 EVK with the SOF enabled.
+Since all the features are not available yet only enable
+HDMI output and headphones.
+
+Signed-off-by: Julien Massot <julien.massot@collabora.com>
+---
+ ucm2/MediaTek/sof-mt8395-evk/HiFi.conf        | 44 +++++++++++++++++++
+ .../sof-mt8395-evk/sof-mt8395-evk.conf        | 35 +++++++++++++++
+ .../conf.d/sof-mt8395-evk/sof-mt8395-evk.conf |  1 +
+ 3 files changed, 80 insertions(+)
+ create mode 100644 ucm2/MediaTek/sof-mt8395-evk/HiFi.conf
+ create mode 100644 ucm2/MediaTek/sof-mt8395-evk/sof-mt8395-evk.conf
+ create mode 120000 ucm2/conf.d/sof-mt8395-evk/sof-mt8395-evk.conf
+
+diff --git a/ucm2/MediaTek/sof-mt8395-evk/HiFi.conf b/ucm2/MediaTek/sof-mt8395-evk/HiFi.conf
+new file mode 100644
+index 000000000..8777a0074
+--- /dev/null
++++ b/ucm2/MediaTek/sof-mt8395-evk/HiFi.conf
+@@ -0,0 +1,44 @@
++If.HDMI {
++	Condition {
++		Type ControlExists
++		Control "iface=CARD,name='HDMI Jack'"
++	}
++	True {
++		SectionDevice."HDMI1" {
++			Comment "HDMI output"
++
++			EnableSequence [
++				cset "name='HDMI_OUT_MUX' 1"
++			]
++
++			DisableSequence [
++				cset "name='HDMI_OUT_MUX' 0"
++			]
++
++			Value {
++				PlaybackPriority 200
++				PlaybackPCM "hw:${CardId},5"
++				JackControl "HDMI Jack"
++			}
++		}
++	}
++}
++
++SectionDevice."Headphones" {
++	Comment "Earphone speaker"
++
++	EnableSequence [
++		cset "name='HP Mux' Audio Playback"
++	]
++
++	DisableSequence [
++		cset "name='HP Mux' Open"
++	]
++
++	Value {
++		PlaybackPriority 400
++		PlaybackChannels 2
++		PlaybackPCM "hw:${CardId},16"
++		JackControl "Headphone Jack"
++	}
++}
+diff --git a/ucm2/MediaTek/sof-mt8395-evk/sof-mt8395-evk.conf b/ucm2/MediaTek/sof-mt8395-evk/sof-mt8395-evk.conf
+new file mode 100644
+index 000000000..317220948
+--- /dev/null
++++ b/ucm2/MediaTek/sof-mt8395-evk/sof-mt8395-evk.conf
+@@ -0,0 +1,35 @@
++Syntax 4
++
++SectionUseCase."HiFi" {
++	File "/MediaTek/sof-mt8395-evk/HiFi.conf"
++	Comment "Play high quality music"
++}
++
++BootSequence [
++	cset "name='HP Mux' Audio Playback"
++	cset "name='LOL Mux' Open"
++	cset "name='MISO0_MUX' UL1_CH1"
++	cset "name='MISO1_MUX' UL1_CH1"
++	cset "name='ADC_L_Mux' Left Preamplifier"
++	cset "name='ADC_R_Mux' Right Preamplifier"
++	cset "name='ADC_3_Mux' Preamplifier"
++	cset "name='ETDM_OUT3_Clock_Source' a1sys_a2sys"
++	cset "name='PGA_L_Mux' AIN1"
++	cset "name='PGA_R_Mux' AIN2"
++	cset "name='PGA_3_Mux' AIN3"
++	cset "name='HDMI_OUT_MUX' Connect"
++	cset "name='DPTX_OUT_MUX' Disconnect"
++	cset "name='Lineout Volume' 10"
++	cset "name='Headset Volume' 2"
++	cset "name='PGA1 Volume' 4"
++	cset "name='PGA2 Volume' 4"
++	cset "name='PGA3 Volume' 4"
++	cset "name='O000 I000 Switch' on"
++	cset "name='O001 I001 Switch' on"
++	cset "name='O034 I168 Switch' on"
++	cset "name='O035 I169 Switch' on"
++	cset "name='O040 I002 Switch' on"
++	cset "name='O041 I003 Switch' on"
++	cset "name='O176 I070 Switch' on"
++	cset "name='O177 I071 Switch' on"
++]
+diff --git a/ucm2/conf.d/sof-mt8395-evk/sof-mt8395-evk.conf b/ucm2/conf.d/sof-mt8395-evk/sof-mt8395-evk.conf
+new file mode 120000
+index 000000000..99299d775
+--- /dev/null
++++ b/ucm2/conf.d/sof-mt8395-evk/sof-mt8395-evk.conf
+@@ -0,0 +1 @@
++../../MediaTek/sof-mt8395-evk/sof-mt8395-evk.conf
+\ No newline at end of file
