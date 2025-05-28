@@ -1,0 +1,70 @@
+From 5fdafebe570fb2286bbdd0a736bac7a9b48dc0ab Mon Sep 17 00:00:00 2001
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Date: Thu, 10 Apr 2025 10:47:32 -0500
+Subject: arm64: dts: amlogic: Drop redundant CPU "clock-latency"
+
+The "clock-latency" property is part of the deprecated opp-v1 binding
+and is redundant if the opp-v2 table has equal or larger values in any
+"clock-latency-ns". Add any missing "clock-latency-ns" properties and
+remove "clock-latency".
+
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+Link: https://lore.kernel.org/r/20250410-dt-cpu-schema-v2-11-63d7dc9ddd0a@kernel.org
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ arch/arm64/boot/dts/amlogic/meson-g12b-odroid-go-ultra.dts | 6 ------
+ 1 file changed, 6 deletions(-)
+
+(limited to 'arch/arm64/boot/dts/amlogic/meson-g12b-odroid-go-ultra.dts')
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12b-odroid-go-ultra.dts b/arch/arm64/boot/dts/amlogic/meson-g12b-odroid-go-ultra.dts
+index e21831dfceeea7..d5938a4a6da375 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12b-odroid-go-ultra.dts
++++ b/arch/arm64/boot/dts/amlogic/meson-g12b-odroid-go-ultra.dts
+@@ -281,42 +281,36 @@ &cpu0 {
+ 	cpu-supply = <&vddcpu_b>;
+ 	operating-points-v2 = <&cpu_opp_table_0>;
+ 	clocks = <&clkc CLKID_CPU_CLK>;
+-	clock-latency = <50000>;
+ };
+ 
+ &cpu1 {
+ 	cpu-supply = <&vddcpu_b>;
+ 	operating-points-v2 = <&cpu_opp_table_0>;
+ 	clocks = <&clkc CLKID_CPU_CLK>;
+-	clock-latency = <50000>;
+ };
+ 
+ &cpu100 {
+ 	cpu-supply = <&vddcpu_a>;
+ 	operating-points-v2 = <&cpub_opp_table_1>;
+ 	clocks = <&clkc CLKID_CPUB_CLK>;
+-	clock-latency = <50000>;
+ };
+ 
+ &cpu101 {
+ 	cpu-supply = <&vddcpu_a>;
+ 	operating-points-v2 = <&cpub_opp_table_1>;
+ 	clocks = <&clkc CLKID_CPUB_CLK>;
+-	clock-latency = <50000>;
+ };
+ 
+ &cpu102 {
+ 	cpu-supply = <&vddcpu_a>;
+ 	operating-points-v2 = <&cpub_opp_table_1>;
+ 	clocks = <&clkc CLKID_CPUB_CLK>;
+-	clock-latency = <50000>;
+ };
+ 
+ &cpu103 {
+ 	cpu-supply = <&vddcpu_a>;
+ 	operating-points-v2 = <&cpub_opp_table_1>;
+ 	clocks = <&clkc CLKID_CPUB_CLK>;
+-	clock-latency = <50000>;
+ };
+ 
+ /* RK817 only supports 12.5mV steps, round up the values */
+-- 
+cgit 1.2.3-korg
+
