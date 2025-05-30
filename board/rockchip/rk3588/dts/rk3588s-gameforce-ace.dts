@@ -194,26 +194,6 @@
 		status = "okay";
 	};
 
-	hdmi0_sound: hdmi0-sound {
-		status = "disabled";
-		compatible = "rockchip,hdmi";
-		rockchip,mclk-fs = <128>;
-		rockchip,card-name = "rockchip-hdmi0";
-		rockchip,cpu = <&i2s5_8ch>;
-		rockchip,codec = <&hdmi0>;
-		rockchip,jack-det;
-	};
-
-	dp0_sound: dp0-sound {
-		status = "disabled";
-		compatible = "rockchip,hdmi";
-		rockchip,card-name= "rockchip-dp0";
-		rockchip,mclk-fs = <512>;
-		rockchip,cpu = <&spdif_tx2>;
-		rockchip,codec = <&dp0 1>;
-		rockchip,jack-det;
-	};
-
 	backlight: backlight {
 		compatible = "pwm-backlight";
 		pwms = <&pwm13 0 25000 1>;
@@ -259,7 +239,7 @@
 
     es8388_sound: es8388-sound {
 		status = "okay";
-		compatible = "rockchip,multicodecs-card","everest,es8388";
+		compatible = "rockchip,multicodecs-card";
 		rockchip,card-name = "rockchip,es8388-codec";
 		hp-det-gpio = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
 		io-channels = <&saradc 3>;
@@ -272,13 +252,6 @@
 		rockchip,mclk-fs = <256>;
 		rockchip,cpu = <&i2s0_8ch>;
 		rockchip,codec = <&es8388>;
-		spk-volume = <50>;
-		spk-volume-l = <50>;
-		spk-volume-r = <50>;
-        use-ext-amplifier;
-		hp-volume = <20>;
-		out-l2spk-r2hp;
-
 		rockchip,audio-routing =
 			"Headphone", "LOUT1",
 			"Headphone", "ROUT1",
@@ -292,7 +265,6 @@
 			"LINPUT2", "Main Mic",
 			"RINPUT1", "Headset Mic",
 			"RINPUT2", "Headset Mic";
-
 		pinctrl-names = "default";
 		pinctrl-0 = <&hp_det>;
 		play-pause-key {
@@ -449,44 +421,6 @@
 &cpu_b2 {
 	cpu-supply = <&vdd_cpu_big1_s0>;
 	mem-supply = <&vdd_cpu_big1_mem_s0>;
-};
-
-&hdmi0 {
-    enable-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_HIGH>;
-    status = "disabled";
-};
-
-&hdmi0_in_vp0 {
-    status = "disabled";
-};
-
-&hdmi0_sound {
-    status = "okay";
-};
-
-&hdptxphy_hdmi0 {
-    status = "disabled";
-};
-
-&route_hdmi0 {
-    status = "disabled";
-    connect = <&vp0_out_hdmi0>;
-};
-
-&spdif_tx2{
-    status = "okay";
-};
-
-&dp0_sound{
-    status = "disabled";
-};
-
-&dp0 {
-    status = "okay";
-};
-
-&dp0_in_vp1 {
-    status = "okay";
 };
 
 &dsi0 {
@@ -784,6 +718,8 @@
 		interrupts = <RK_PA6 IRQ_TYPE_LEVEL_LOW>;
 		irq-gpios = <&gpio1 RK_PA6 IRQ_TYPE_LEVEL_LOW>;
 		reset-gpios = <&gpio1 RK_PA7 GPIO_ACTIVE_HIGH>;
+		AVDD28-supply = <&vcc3v3_lcd0_n>;
+		VDDIO-supply = <&vcc_1v8_s0>;
         touchscreen-size-x = <1080>;
 		touchscreen-size-y = <1920>;
 		status = "okay";
