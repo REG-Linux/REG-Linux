@@ -3,7 +3,6 @@ config BR2_PACKAGE_86BOX
     select BR2_PACKAGE_RTMIDI
     select BR2_PACKAGE_LIBSNDFILE
     select BR2_PACKAGE_SLIRP
-    select BR2_PACKAGE_FLUIDSYNTH
     select BR2_PACKAGE_OPENAL
   
     help

@@ -6,8 +6,15 @@
 
 DOSBOX_X_VERSION = dosbox-x-v2025.05.03
 DOSBOX_X_SITE = $(call github,joncampbell123,dosbox-x,$(DOSBOX_X_VERSION))
-DOSBOX_X_DEPENDENCIES = sdl2 sdl2_net fluidsynth zlib libpng libogg libvorbis linux-headers
+DOSBOX_X_DEPENDENCIES = sdl2 sdl2_net zlib libpng libogg libvorbis linux-headers
 DOSBOX_X_LICENSE = GPLv2
+
+ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
+DOSBOX_X_DEPENDENCIES += fluidsynth
+DOSBOX_X_FLUIDSYNTH_OPTS = --enable-fluidsynth
+else
+DOSBOX_X_FLUIDSYNTH_OPTS = --disable-fluidsynth
+endif
 
 define DOSBOX_X_CONFIGURE_CMDS
     cd $(@D); ./autogen.sh; \
@@ -20,6 +27,7 @@ define DOSBOX_X_CONFIGURE_CMDS
                     --prefix=/usr \
                     --disable-sdl \
                     --enable-sdl2 \
+		    $(DOSBOX_X_FLUIDSYNTH_OPTS) \
                     --with-sdl2-prefix="$(STAGING_DIR)/usr";
 endef
 

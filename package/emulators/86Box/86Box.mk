@@ -8,9 +8,17 @@
 86BOX_SITE = https://github.com/86Box/86Box
 86BOX_SITE_METHOD=git
 86BOX_LICENSE = GPLv3
-86BOX_DEPENDENCIES = rtmidi libsndfile slirp fluidsynth openal
+86BOX_DEPENDENCIES = rtmidi libsndfile slirp openal
 
 86BOX_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release -DRELEASE=ON
+
+# Fluidsynth is optional
+ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
+86BOX_CONF_OPTS += -DFLUIDSYNTH=ON
+86BOX_DEPENDENCIES += fluidsynth
+else
+86BOX_CONF_OPTS += -DFLUIDSYNTH=OFF
+endif
 
 # Disable QT if we don't have it
 ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
