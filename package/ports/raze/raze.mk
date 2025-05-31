@@ -7,7 +7,7 @@
 RAZE_VERSION = 1.11.0
 RAZE_SITE = $(call github,coelckers,Raze,$(RAZE_VERSION))
 RAZE_LICENSE = GPLv2
-RAZE_DEPENDENCIES = host-raze sdl2 bzip2 fluidsynth openal zmusic webp libvpx
+RAZE_DEPENDENCIES = host-raze sdl2 bzip2 openal zmusic webp libvpx
 RAZE_SUPPORTS_IN_SOURCE_BUILD = NO
 
 # We need the tools from the host package to build the target package
