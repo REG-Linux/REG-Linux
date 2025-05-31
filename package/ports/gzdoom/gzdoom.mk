@@ -3,13 +3,13 @@
 # gzdoom
 #
 ################################################################################
-# Version: Relase on May 3, 2025
+# Version: Release on May 3, 2025
 GZDOOM_VERSION = g4.14.2
 GZDOOM_SITE = https://github.com/ZDoom/gzdoom.git
 GZDOOM_SITE_METHOD=git
 GZDOOM_GIT_SUBMODULES=YES
 GZDOOM_LICENSE = GPLv3
-GZDOOM_DEPENDENCIES = host-gzdoom sdl2 bzip2 fluidsynth openal zmusic libvpx webp
+GZDOOM_DEPENDENCIES = host-gzdoom sdl2 bzip2 openal zmusic libvpx webp
 GZDOOM_SUPPORTS_IN_SOURCE_BUILD = NO
 
 # We need the tools from the host package to build the target package
