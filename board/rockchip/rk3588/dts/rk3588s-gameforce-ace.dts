@@ -1309,9 +1309,15 @@
 	status = "okay";
 };
 
+&uart2 {
+	pinctrl-0 = <&uart2m0_xfer>;
+	status = "okay";
+};
+
 &uart9 {
 	pinctrl-0 = <&uart9m2_xfer>, <&uart9m2_ctsn>, <&uart9m2_rtsn>;
 	uart-has-rtscts;
+    dma-names = "tx", "rx";
 	status = "okay";
 
 	bluetooth {
