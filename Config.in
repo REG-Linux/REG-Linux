@@ -325,6 +325,7 @@ endmenu
 
 menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/alllinuxfirmwares/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-armbian/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-radxa-rkwifibt/Config.in"
 endmenu
 
@@ -397,7 +398,6 @@ endmenu
 
 menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/extralinuxfirmwares/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-armbian/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-orangepi/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-khadas-vim4/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-rk3588/Config.in"
