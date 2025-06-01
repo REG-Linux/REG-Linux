@@ -3,7 +3,7 @@
 # plutosvg
 #
 ################################################################################
-PLUTOSVG_VERSION = v0.0.6
+PLUTOSVG_VERSION = v0.0.7
 PLUTOSVG_SITE = $(call github,sammycage,plutosvg,$(PLUTOSVG_VERSION))
 PLUTOSVG_LICENSE = MIT
 

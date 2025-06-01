@@ -3,8 +3,8 @@
 # pcsx2
 #
 ################################################################################
-# Version v2.3.299 on Apr 26, 2025
-PCSX2_VERSION = v2.3.299
+# Version v2.3.387 on Jun 1, 2025
+PCSX2_VERSION = v2.3.387
 PCSX2_SITE = https://github.com/pcsx2/pcsx2.git
 PCSX2_SITE_METHOD = git
 PCSX2_GIT_SUBMODULES = YES
@@ -16,7 +16,7 @@ PCSX2_SUPPORTS_IN_SOURCE_BUILD = NO
 PCSX2_DEPENDENCIES += xorgproto alsa-lib freetype zlib libpng shaderc ecm
 PCSX2_DEPENDENCIES += libaio portaudio libsoundtouch sdl3 libpcap yaml-cpp
 PCSX2_DEPENDENCIES += libsamplerate fmt reglinux-qt6 libcurl kddockwidgets
-PCSX2_DEPENDENCIES += host-libcurl libbacktrace jpeg-turbo webp
+PCSX2_DEPENDENCIES += host-libcurl libbacktrace jpeg-turbo webp plutosvg
 
 # Use clang for performance if available
 ifeq ($(BR2_PACKAGE_CLANG),y)
