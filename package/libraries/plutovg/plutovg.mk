@@ -3,7 +3,7 @@
 # plutovg
 #
 ################################################################################
-PLUTOVG_VERSION = v1.0.0
+PLUTOVG_VERSION = v1.1.0
 PLUTOVG_SITE = $(call github,sammycage,plutovg,$(PLUTOVG_VERSION))
 PLUTOVG_LICENSE = MIT
 
