@@ -24,6 +24,7 @@ config BR2_PACKAGE_PCSX2
     select BR2_PACKAGE_ECM
     select BR2_PACKAGE_LIBBACKTRACE
     select BR2_PACKAGE_KDDOCKWIDGETS
+    select BR2_PACKAGE_PLUTOSVG
 
     help
       PCSX2 is a free and open-source PlayStation 2 (PS2) emulator.
