@@ -1,0 +1,35 @@
+--- a/rpcs3/Emu/CPU/sse2neon.h	2025-06-02 21:50:46.940994072 +0200
++++ b/rpcs3/Emu/CPU/sse2neon.h	2025-06-02 21:54:40.014567852 +0200
+@@ -48,11 +48,17 @@
+  * SOFTWARE.
+  */
+ 
+-// Suppress old-style casts in this file on Clang ARM64
+-#if defined(__clang__) && defined(ARCH_ARM64)
++// Suppress old-style casts in this file on Clang/GCC ARM64
++#if defined(ARCH_ARM64)
++#if defined(__clang__)
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wold-style-cast"
+ #endif
++#if defined(__GNUC__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wold-style-cast"
++#endif
++#endif
+ 
+ /* Tunable configurations */
+ 
+@@ -8802,6 +8808,11 @@
+ 
+ #endif
+ 
+-#if defined(__clang__) && defined(ARCH_ARM64)
++#if defined(ARCH_ARM64)
++#if defined(__clang__)
+ #pragma clang diagnostic pop
+ #endif
++#if defined(__GNUC__)
++#pragma GCC diagnostic pop
++#endif
++#endif
