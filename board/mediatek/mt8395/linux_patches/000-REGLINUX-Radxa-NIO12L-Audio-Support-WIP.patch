@@ -1,0 +1,17 @@
+--- a/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts	2025-05-31 14:08:44.401912111 +0200
++++ b/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts	2025-05-31 14:14:01.490479068 +0200
+@@ -1037,6 +1043,14 @@
+ 			sound-dai = <&pmic 0>;
+ 		};
+ 	};
++
++	hdmi-dai-link {
++		link-name = "ETDM3_OUT_BE";
++
++		codec {
++			sound-dai = <&hdmi 0>;
++		};
++	};
+ };
+ 
+ &spi1 {
