@@ -7,6 +7,7 @@ config BR2_PACKAGE_ECWOLF
     select BR2_PACKAGE_ZLIB
     select BR2_PACKAGE_BZIP2
     select BR2_PACKAGE_LIBJPEG
+    select BR2_PACKAGE_MUSL_FTS		if BR2_TOOLCHAIN_USES_MUSL
     help
       ECWolf is a port of the Wolfenstein 3D engine based of Wolf4SDL.
 
