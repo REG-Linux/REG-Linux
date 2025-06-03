@@ -1,0 +1,10 @@
+config BR2_PACKAGE_SWITCHFIN
+	bool "switchfin"
+	select BR2_PACKAGE_MPV
+	select BR2_PACKAGE_LIBCURL
+	help
+	  Switchfin is third-party PC player for Jellyfin 
+	  that provides a native user interface to browse 
+	  and play movies and series.
+
+	  https://github.com/dragonflylee/switchfin

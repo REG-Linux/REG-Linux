@@ -32,4 +32,11 @@ cp "${BINARIES_DIR}/mt8395-radxa-nio-12l.dtb"        "${REGLINUX_BINARIES_DIR}/b
 cp "${BOARD_DIR}/boot/grub/grub.cfg"                 "${REGLINUX_BINARIES_DIR}/boot/EFI/BOOT/grub.cfg"     || exit 1
 cp "${BINARIES_DIR}/efi-part/EFI/BOOT/bootaa64.efi"  "${REGLINUX_BINARIES_DIR}/boot/EFI/BOOT/BOOTAA64.EFI" || exit 1
 
+# Include bootloader on SD card as flashing is needed
+mkdir -p "${REGLINUX_BINARIES_DIR}/bootloader"                                                                         || exit 1
+cp "${BOARD_DIR}/bootloader/lk.bin"                    "${REGLINUX_BINARIES_DIR}/bootloader/lk.bin"                    || exit 1
+cp "${BOARD_DIR}/bootloader/fip-radxa-nio-12l-4g.img"  "${REGLINUX_BINARIES_DIR}/bootloader/fip-radxa-nio-12l-4g.img"  || exit 1
+cp "${BOARD_DIR}/bootloader/fip-radxa-nio-12l-8g.img"  "${REGLINUX_BINARIES_DIR}/bootloader/fip-radxa-nio-12l-8g.img"  || exit 1
+cp "${BOARD_DIR}/bootloader/fip-radxa-nio-12l-16g.img" "${REGLINUX_BINARIES_DIR}/bootloader/fip-radxa-nio-12l-16g.img" || exit 1
+
 exit 0

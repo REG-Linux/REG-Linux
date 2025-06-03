@@ -472,7 +472,7 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_MT8395
 
 	# Note: BigPEmu runs through box64 on non-x64 architectures until we have native binaries
-	select BR2_PACKAGE_BIGPEMU			if BR2_PACKAGE_HAS_LIBGL && (BR2_x86_64 || BR2_PACKAGE_BOX64)
+	select BR2_PACKAGE_BIGPEMU			if BR2_PACKAGE_HAS_LIBGL && (BR2_x86_64 || BR2_aarch64 || BR2_PACKAGE_BOX64)
 
 	# NEC PC-FX
 	# Note : We need to fix this package once for good instead of disabling / patching / hacking (x86 asm wronly triggered)

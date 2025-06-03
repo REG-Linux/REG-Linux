@@ -17,17 +17,17 @@ DOSBOX_STAGING_CXXFLAGS = -O3 -fstrict-aliasing -fno-signed-zeros -fno-trapping-
 # Fluidsynth for MIDI emulation
 ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
 DOSBOX_STAGING_DEPENDENCIES += fluidsynth
-DOSBOX_STAGING_CONF_OPTS = -Duse_fluidsynth=true
+DOSBOX_STAGING_CONF_OPTS += -Duse_fluidsynth=true
 else
-DOSBOX_STAGING_CONF_OPTS = -Duse_fluidsynth=false
+DOSBOX_STAGING_CONF_OPTS += -Duse_fluidsynth=false
 endif
 
 # Roland MT-32 emulation
 ifeq ($(BR2_PACKAGE_LIBMT32EMU),y)
 DOSBOX_STAGING_DEPENDENCIES += libmt32emu
-DOSBOX_STAGING_CONF_OPTS = -Duse_mt32emu=true
+DOSBOX_STAGING_CONF_OPTS += -Duse_mt32emu=true
 else
-DOSBOX_STAGING_CONF_OPTS = -Duse_mt32emu=false
+DOSBOX_STAGING_CONF_OPTS += -Duse_mt32emu=false
 endif
 
 # OpenGL support (no GLES support yet)

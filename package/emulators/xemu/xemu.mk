@@ -3,13 +3,13 @@
 # xemu
 #
 ################################################################################
-# Version: Commits on Apr 23, 2025
-XEMU_VERSION = v0.8.55
+# Version: Commits on May 31, 2025
+XEMU_VERSION = v0.8.68
 XEMU_SITE = https://github.com/xemu-project/xemu.git
 XEMU_SITE_METHOD = git
 XEMU_GIT_SUBMODULES = YES
 XEMU_LICENSE = GPLv2
-XEMU_DEPENDENCIES = host-meson host-pkgconf host-python3 host-python-distlib
+XEMU_DEPENDENCIES = host-meson host-cmake host-pkgconf host-python3 host-python-distlib
 XEMU_DEPENDENCIES += host-libcurl libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
 XEMU_DEPENDENCIES += libpcap libepoxy libgtk3 json-for-modern-cpp
 
@@ -75,7 +75,7 @@ XEMU_CONF_OPTS += --disable-renderdoc
 
 # Vulkan
 ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
-XEMU_DEPENDENCIES += vulkan-headers vulkan-loader glslang
+XEMU_DEPENDENCIES += vulkan-headers vulkan-loader
 endif
 
 # AVX2 is only available on x86_64_v3 or more
@@ -111,9 +111,9 @@ define XEMU_INSTALL_TARGET_CMDS
 endef
 
 define XEMU_VERSION_DETAILS
-    $(GIT) -C $(XEMU_DL_DIR)/git rev-parse HEAD 2>/dev/null | tr -d '\n' > $(@D)/XEMU_COMMIT
-    $(GIT) -C $(XEMU_DL_DIR)/git symbolic-ref --short HEAD | cut -d'/' -f2- > $(@D)/XEMU_BRANCH
-    $(GIT) -C $(XEMU_DL_DIR)/git describe --tags --match 'v*' | cut -c 2- | tr -d '\n' > $(@D)/XEMU_VERSION
+    $(BR2_GIT) -C $(XEMU_DL_DIR)/git rev-parse HEAD 2>/dev/null | tr -d '\n' > $(@D)/XEMU_COMMIT
+    $(BR2_GIT) -C $(XEMU_DL_DIR)/git symbolic-ref --short HEAD | cut -d'/' -f2- > $(@D)/XEMU_BRANCH
+    $(BR2_GIT) -C $(XEMU_DL_DIR)/git describe --tags --match 'v*' | cut -c 2- | tr -d '\n' > $(@D)/XEMU_VERSION
 endef
 
 # details in the .wrap files
@@ -144,11 +144,20 @@ define XEMU_GET_SUBMODULES
 
     # tomlplusplus
 	mkdir -p $(@D)/subprojects/tomlplusplus
-    $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/tomlplusplus.wrap))
+ #   $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/tomlplusplus.wrap))
 	$(HOST_DIR)/bin/curl -L -o tomlplusplus.tar.gz \
-	    https://github.com/marzer/tomlplusplus/archive/$(REVISION).tar.gz
+	    https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz
 	$(TAR) -xzf tomlplusplus.tar.gz --strip-components=1 -C $(@D)/subprojects/tomlplusplus
 	rm tomlplusplus.tar.gz
+
+    # glslang
+	mkdir -p $(@D)/subprojects/glslang
+#    $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/glslang.wrap))
+	$(HOST_DIR)/bin/curl -L -o glslang.tar.gz \
+	    https://github.com/KhronosGroup/glslang/archive/refs/tags/15.3.0.tar.gz
+	#https://github.com/KhronosGroup/glslang/archive/$(REVISION).tar.gz
+	$(TAR) -xzf glslang.tar.gz --strip-components=1 -C $(@D)/subprojects/glslang
+	rm glslang.tar.gz
 
     # xxhash
 	mkdir -p $(@D)/subprojects/xxHash-0.8.3
@@ -181,9 +190,10 @@ define XEMU_GET_SUBMODULES
 
     # berkeley-softfloat-3 - revision variation
 	mkdir -p $(@D)/subprojects/berkeley-softfloat-3
-    $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/berkeley-softfloat-3.wrap))
+ #   $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/berkeley-softfloat-3.wrap))
 	$(HOST_DIR)/bin/curl -L -o berkeley-softfloat-3.tar.gz \
-	    https://gitlab.com/qemu-project/berkeley-softfloat-3/-/archive/$(REVISION)/$(REVISION).tar.gz
+	    https://gitlab.com/qemu-project/berkeley-softfloat-3/-/archive/master/berkeley-softfloat-3-master.tar.gz
+#https://gitlab.com/qemu-project/berkeley-softfloat-3/-/archive/$(REVISION)/$(REVISION).tar.gz
 	$(TAR) -xzf berkeley-softfloat-3.tar.gz --strip-components=1 -C $(@D)/subprojects/berkeley-softfloat-3
 	cp $(@D)/subprojects/packagefiles/berkeley-softfloat-3/* $(@D)/subprojects/berkeley-softfloat-3
 	rm berkeley-softfloat-3.tar.gz
@@ -196,6 +206,30 @@ define XEMU_GET_SUBMODULES
 	$(TAR) -xzf berkeley-testfloat-3.tar.gz --strip-components=1 -C $(@D)/subprojects/berkeley-testfloat-3
 	cp $(@D)/subprojects/packagefiles/berkeley-testfloat-3/* $(@D)/subprojects/berkeley-testfloat-3
 	rm berkeley-testfloat-3.tar.gz
+
+    # volk
+	mkdir -p $(@D)/subprojects/volk
+    #$(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/volk.wrap))
+	$(HOST_DIR)/bin/curl -L -o volk.tar.gz \
+	    https://github.com/zeux/volk/archive/refs/tags/1.4.304.tar.gz
+	#https://github.com/zeux/volk/-/archive/$(REVISION)/$(REVISION).tar.gz
+	$(TAR) -xzf volk.tar.gz --strip-components=1 -C $(@D)/subprojects/volk
+	rm volk.tar.gz
+
+    # SPIRV-Reflect
+	mkdir -p $(@D)/subprojects/SPIRV-Reflect
+	$(HOST_DIR)/bin/curl -L -o SPIRV-Reflect.tar.gz \
+	https://github.com/KhronosGroup/SPIRV-Reflect/archive/refs/tags/vulkan-sdk-1.4.313.0.tar.gz
+	$(TAR) -xzf SPIRV-Reflect.tar.gz --strip-components=1 -C $(@D)/subprojects/SPIRV-Reflect
+	rm SPIRV-Reflect.tar.gz
+
+    # VulkanMemoryAllocator
+	mkdir -p $(@D)/subprojects/VulkanMemoryAllocator
+	$(HOST_DIR)/bin/curl -L -o VulkanMemoryAllocator.tar.gz \
+	https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.3.0.tar.gz
+	$(TAR) -xzf VulkanMemoryAllocator.tar.gz --strip-components=1 -C $(@D)/subprojects/VulkanMemoryAllocator
+	rm VulkanMemoryAllocator.tar.gz
+
 endef
 
 define XEMU_EVMAPY
