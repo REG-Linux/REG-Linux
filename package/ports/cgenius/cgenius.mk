@@ -12,7 +12,7 @@ CGENIUS_DEPENDENCIES += sdl2 sdl2_mixer sdl2_image sdl2_ttf
 CGENIUS_DEPENDENCIES += boost libcurl host-xxd python3-configobj
 
 ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
-CGENIUS_DEPENDENCIES += libbacktrace
+CGENIUS_DEPENDENCIES += libbacktrace libexecinfo
 endif
 
 CGENIUS_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
