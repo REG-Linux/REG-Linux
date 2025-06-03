@@ -12,6 +12,10 @@ ECWOLF_LICENSE = Non-commercial
 ECWOLF_DEPENDENCIES = host-ecwolf sdl2 sdl2_mixer sdl2_net zlib bzip2 jpeg
 ECWOLF_SUPPORTS_IN_SOURCE_BUILD = NO
 
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+ECWOLF_DEPENDENCIES += musl-fts
+endif
+
 ifeq ($(BR2_PACKAGE_FLUIDSYNTH),y)
 ECWOLF_DEPENDENCIES += fluidsynth
 endif
