@@ -3,8 +3,8 @@
 # libretro-easyrpg
 #
 ################################################################################
-# Version: 0.8.1
-LIBRETRO_EASYRPG_VERSION = 0.8.1
+# Version: 0.8.1.1
+LIBRETRO_EASYRPG_VERSION = 0.8.1.1
 LIBRETRO_EASYRPG_SITE = https://github.com/EasyRPG/Player
 LIBRETRO_EASYRPG_GIT_SUBMODULES=YES
 LIBRETRO_EASYRPG_SITE_METHOD=git
