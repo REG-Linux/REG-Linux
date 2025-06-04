@@ -113,6 +113,7 @@ menu "Libretro"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-vecx/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-vice/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-xmil/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-yabasanshiro/Config.in"
 endmenu
 endmenu
 
@@ -506,7 +507,6 @@ menu "cores"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-fuse/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-81/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-o2em/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-yabasanshiro/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-freeintv/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-flycastvl/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-px68k/Config.in"
