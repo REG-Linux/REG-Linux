@@ -3,8 +3,8 @@
 # easyrpg-player
 #
 ################################################################################
-# Version: 0.8.1
-EASYRPG_PLAYER_VERSION = 0.8.1
+# Version: 0.8.1.1
+EASYRPG_PLAYER_VERSION = 0.8.1.1
 EASYRPG_PLAYER_LICENSE = MIT
 EASYRPG_PLAYER_SITE = $(call github,EasyRPG,Player,$(EASYRPG_PLAYER_VERSION))
 EASYRPG_PLAYER_SUPPORTS_IN_SOURCE_BUILD = NO
