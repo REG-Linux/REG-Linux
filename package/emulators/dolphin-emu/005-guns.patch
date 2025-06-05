@@ -6,7 +6,7 @@ index 10be6d8..bab0f99 100644
  #include "Common/StringUtil.h"
  #include "Common/Thread.h"
  #include "InputCommon/ControllerInterface/ControllerInterface.h"
-+#include "VideoCommon/RenderBase.h"
++#include "VideoCommon/VideoBackendBase.h"
 +#include "VideoCommon/Present.h"
 +#include "VideoCommon/FramebufferManager.h"
  
@@ -38,7 +38,7 @@ index 10be6d8..bab0f99 100644
  
 -    return (value - m_base) / m_range;
 +    // margins
-+    if(g_renderer != NULL) {
++    if(g_video_backend != NULL) {
 +      if( ((float) g_framebuffer_manager->GetEFBWidth()) / ((float) g_framebuffer_manager->GetEFBHeight()) > ((float) g_presenter->GetTargetRectangle().GetWidth()) / ((float) g_presenter->GetTargetRectangle().GetHeight())) {
 +	if(m_code == ABS_Y) {
 +	  int sw = g_presenter->GetTargetRectangle().GetWidth();
