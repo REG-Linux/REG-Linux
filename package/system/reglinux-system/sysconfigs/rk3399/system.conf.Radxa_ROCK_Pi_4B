@@ -1,4 +1,0 @@
-# rockpro64 default values
-
-# default card
-audio.device=alsa_output.platform-hdmi-sound.hdmi-stereo

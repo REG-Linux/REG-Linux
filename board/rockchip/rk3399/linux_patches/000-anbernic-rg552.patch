@@ -1176,7 +1176,7 @@ diff -rupN a/arch/arm64/boot/dts/rockchip/rk3399-anbernic-rg552.dts b/arch/arm64
 +	num-slots = <1>;
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&sdio0_clk &sdio0_cmd &sdio0_cd &sdio0_bus4>;
-+	sd-uhs-sdr104;
++	//sd-uhs-sdr104;
 +	vqmmc-supply = <&vcc3v0_touch>;
 +	status = "okay";
 +};

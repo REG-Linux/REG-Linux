@@ -975,7 +975,7 @@
 +	num-slots = <1>;
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&sdio0_bus4 &sdio0_cmd &sdio0_clk>;
-+	sd-uhs-sdr104;
++	//sd-uhs-sdr104;
 +	status = "okay";
 +};
 +
@@ -989,7 +989,7 @@
 +	max-frequency = <150000000>;
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&sdmmc_bus4 &sdmmc_clk &sdmmc_cmd &sdmmc_cd>;
-+	sd-uhs-sdr104;
++	//sd-uhs-sdr104;
 +	vmmc-supply = <&vcc3v0_sd>;
 +	vqmmc-supply = <&vcc_sdio>;
 +	status = "okay";
@@ -1267,7 +1267,7 @@
 +	status = "okay";
 +};
 +
-+&dmc {
++/*&dmc {
 +	#cooling-cells = <2>; /* min followed by max */
 +
 +	status = "disabled";
@@ -1292,7 +1292,7 @@
 +
 +&dfi {
 +	status = "okay";
-+};
++};*/
 +
 +/*
 + * Redefine some parameters for the thermal trip points for Opi4 LTS.
@@ -1304,7 +1304,7 @@
 + * The GPU is handled by existing trip points in the base device tree, here
 + * we just set the same critical temperature as CPU.
 + */
-+&cpu_alert0 {
++/*&cpu_alert0 {
 +	temperature = <82000>;
 +};
 +
@@ -1350,7 +1350,7 @@
 +
 +	};
 +
-+};
++};*/
 --- /dev/null	2025-03-30 15:06:49.911332667 +0200
 +++ b/arch/arm64/boot/dts/rockchip/rk3399-nanopi-m4v2.dts	2025-04-11 11:08:48.606837463 +0200
 @@ -0,0 +1,87 @@
