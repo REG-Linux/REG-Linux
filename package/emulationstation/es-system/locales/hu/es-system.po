@@ -15120,12 +15120,12 @@ msgctxt "keys_files"
 msgid "Exit Drastic"
 msgstr "Kilépés Drastic"
 
-#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys
+#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
 msgctxt "keys_files"
 msgid "Save State"
 msgstr "Állam mentése"
 
-#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys
+#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
 msgctxt "keys_files"
 msgid "Load State"
 msgstr "Játékállás betöltése"
@@ -15144,51 +15144,6 @@ msgstr "Gyorsmenü"
 msgctxt "keys_files"
 msgid "FastForward"
 msgstr "Gyors előre"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Exit Duckstation"
-msgstr "Kilépés Duckstation"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Open DuckStation Quick Menu"
-msgstr "DuckStation gyorsmenü megnyitása"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Restart Game"
-msgstr "Játék újrakezdése"
-
-#. TRANSLATION: psx.duckstation.keys, 3ds.azahar.keys, psp.ppsspp.keys, triforce.dolphin_triforce.keys, doom3.dhewm3.keys, ...
-msgctxt "keys_files"
-msgid "Screenshot"
-msgstr "Pillanatkép"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Slot -"
-msgstr "Slot -"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Slot +"
-msgstr "Slot +"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Rewind"
-msgstr "Visszatekerés"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Next Disc (m3u)"
-msgstr "Következő lemez (m3u)"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Fast Forward"
-msgstr "Gyorsan előre"
 
 #. TRANSLATION: xbox360.xenia.keys, 3ds.azahar.keys, wiiu.keys, atomiswave.flycast.keys, dreamcast.flycast.keys, ...
 msgctxt "keys_files"
@@ -15220,6 +15175,11 @@ msgctxt "keys_files"
 msgid "Toggle Screen Layout"
 msgstr "Képernyőelrendezés váltása"
 
+#. TRANSLATION: 3ds.azahar.keys, psx.duckstation.keys, psp.ppsspp.keys, triforce.dolphin_triforce.keys, psx.duckstation-gpl.keys, ...
+msgctxt "keys_files"
+msgid "Screenshot"
+msgstr "Pillanatkép"
+
 #. TRANSLATION: 3ds.azahar.keys
 msgctxt "keys_files"
 msgid "Toggle Speed Limit"
@@ -15250,6 +15210,46 @@ msgctxt "keys_files"
 msgid "Exit Dosbox-X"
 msgstr "Kilépés a  Dosbox-X-ből"
 
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Exit Duckstation"
+msgstr "Kilépés Duckstation"
+
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Open DuckStation Quick Menu"
+msgstr "DuckStation gyorsmenü megnyitása"
+
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Restart Game"
+msgstr "Játék újrakezdése"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Slot -"
+msgstr "Slot -"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Slot +"
+msgstr "Slot +"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Rewind"
+msgstr "Visszatekerés"
+
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Next Disc (m3u)"
+msgstr "Következő lemez (m3u)"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Fast Forward"
+msgstr "Gyorsan előre"
+
 #. TRANSLATION: atomiswave.flycast.keys, dreamcast.flycast.keys, naomi.flycast.keys, naomi2.flycast.keys
 msgctxt "keys_files"
 msgid "Hide the bezel"
@@ -15279,6 +15279,86 @@ msgstr "Betöltési állapot Slot 1"
 msgctxt "keys_files"
 msgid "Save State Slot 1"
 msgstr "Állapot mentése Slot 1"
+
+#. TRANSLATION: moonlight.moonlight.keys
+msgctxt "keys_files"
+msgid "Exit emulator using SDL"
+msgstr "Kilépés az emulátorból SDL használatával"
+
+#. TRANSLATION: scummvm.keys
+msgctxt "keys_files"
+msgid "Menu"
+msgstr "Menü"
+
+#. TRANSLATION: scummvm.keys
+msgctxt "keys_files"
+msgid "Graphics filtering on/off"
+msgstr "Grafikai szűrés be/ki"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Reset the table, sometimes required for PinMame"
+msgstr "Állítsa vissza a táblázatot, ami néha szükséges a PinMame számára"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Start game"
+msgstr "Játék kezdése"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Insert coin"
+msgstr "Érme bedobó"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Nudge up"
+msgstr "Lökés fel"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Nudge left"
+msgstr "Lökés balra"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Nudge right"
+msgstr "Lökés jobbra"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Pull plunger"
+msgstr "Kilövés"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Lockbar Fire Button"
+msgstr ""
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Buy extraball for a credit"
+msgstr ""
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Left flipper"
+msgstr "Bal kar"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Right flipper"
+msgstr "Jobb kar"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Left magnasave"
+msgstr "Bal magnasave"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Right magnasave"
+msgstr "Jobb magnasave"
 
 #. TRANSLATION: corsixth.keys
 msgctxt "keys_files"
@@ -15495,17 +15575,17 @@ msgctxt "keys_files"
 msgid "Aim down"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Strafe left"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Strafe right"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Run"
 msgstr ""
@@ -15520,22 +15600,22 @@ msgctxt "keys_files"
 msgid "Menu back"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move left"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move right"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move forward"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move backward"
 msgstr ""
@@ -15543,6 +15623,76 @@ msgstr ""
 #. TRANSLATION: rott.keys
 msgctxt "keys_files"
 msgid "Toggle run"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu enter"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu up"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu down"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Use"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Attack"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu left"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu right"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Stats"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Zoom out"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Zoom in"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu back / exit"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Pause"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Previous weapon"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Next weapon"
 msgstr ""
 
 #. TRANSLATION: flatpak.keys
@@ -15554,86 +15704,6 @@ msgstr "Lépjen ki a Flatpak futásából"
 msgctxt "keys_files"
 msgid "Exit Steam"
 msgstr "Kilépés a Steamből"
-
-#. TRANSLATION: moonlight.moonlight.keys
-msgctxt "keys_files"
-msgid "Exit emulator using SDL"
-msgstr "Kilépés az emulátorból SDL használatával"
-
-#. TRANSLATION: scummvm.keys
-msgctxt "keys_files"
-msgid "Menu"
-msgstr "Menü"
-
-#. TRANSLATION: scummvm.keys
-msgctxt "keys_files"
-msgid "Graphics filtering on/off"
-msgstr "Grafikai szűrés be/ki"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Reset the table, sometimes required for PinMame"
-msgstr "Állítsa vissza a táblázatot, ami néha szükséges a PinMame számára"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Start game"
-msgstr "Játék kezdése"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Insert coin"
-msgstr "Érme bedobó"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Nudge up"
-msgstr "Lökés fel"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Nudge left"
-msgstr "Lökés balra"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Nudge right"
-msgstr "Lökés jobbra"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Pull plunger"
-msgstr "Kilövés"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Lockbar Fire Button"
-msgstr ""
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Buy extraball for a credit"
-msgstr ""
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Left flipper"
-msgstr "Bal kar"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Right flipper"
-msgstr "Jobb kar"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Left magnasave"
-msgstr "Bal magnasave"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Right magnasave"
-msgstr "Jobb magnasave"
 
 #~ msgctxt "game_options"
 #~ msgid "Choose your render resolution (Requires personal redream.key file)."
