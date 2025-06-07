@@ -1,4 +1,4 @@
-From 59cc76036f42c7f7baa17cb46e6e19cf3a6a62bb Mon Sep 17 00:00:00 2001
+From 8f163618d4021cb84334109796c60f083fabda8d Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@gmail.com>
 Date: Sun, 26 Sep 2021 09:31:45 +0200
 Subject: [PATCH] WIP: OPi3 DT fixes
@@ -8,7 +8,7 @@ Subject: [PATCH] WIP: OPi3 DT fixes
  1 file changed, 35 insertions(+), 37 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts
-index c45d7b7fb39a..af92d92d85a3 100644
+index f005072c68a1..d01a318653a3 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-3.dts
 @@ -63,27 +63,7 @@ reg_vcc5v: vcc5v {
@@ -39,8 +39,8 @@ index c45d7b7fb39a..af92d92d85a3 100644
 +	
  	wifi_pwrseq: wifi-pwrseq {
  		compatible = "mmc-pwrseq-simple";
- 		clocks = <&rtc 1>;
-@@ -136,8 +116,8 @@ &mmc0 {
+ 		clocks = <&rtc CLK_OSC32K_FANOUT>;
+@@ -137,8 +117,8 @@ &mmc0 {
  };
  
  &mmc1 {
@@ -51,7 +51,7 @@ index c45d7b7fb39a..af92d92d85a3 100644
  	mmc-pwrseq = <&wifi_pwrseq>;
  	bus-width = <4>;
  	non-removable;
-@@ -172,13 +152,17 @@ &ohci3 {
+@@ -173,7 +153,7 @@ &ohci3 {
  &pio {
  	vcc-pc-supply = <&reg_bldo2>;
  	vcc-pd-supply = <&reg_cldo1>;
@@ -59,18 +59,8 @@ index c45d7b7fb39a..af92d92d85a3 100644
 +	vcc-pg-supply = <&reg_bldo3>;
  };
  
- &r_ir {
- 	status = "okay";
- };
- 
-+&r_pio {
-+	vcc-pm-supply = <&reg_bldo3>;
-+};
-+
- &r_rsb {
- 	status = "okay";
- 
-@@ -234,13 +218,12 @@ reg_bldo2: bldo2 {
+ &r_i2c {
+@@ -231,13 +211,12 @@ reg_bldo2: bldo2 {
  				regulator-max-microvolt = <1800000>;
  				regulator-name = "vcc-efuse-pcie-hdmi-pc";
  			};
@@ -90,7 +80,7 @@ index c45d7b7fb39a..af92d92d85a3 100644
  			};
  
  			reg_cldo1: cldo1 {
-@@ -250,19 +233,34 @@ reg_cldo1: cldo1 {
+@@ -247,19 +226,34 @@ reg_cldo1: cldo1 {
  				regulator-name = "vcc33-io-pd-emmc-sd-usb-uart-2";
  			};
  
@@ -131,6 +121,17 @@ index c45d7b7fb39a..af92d92d85a3 100644
  				regulator-name = "vdd-cpu";
  			};
  
+@@ -296,6 +290,10 @@ &r_ir {
+ 	status = "okay";
+ };
+ 
++&r_pio {
++	vcc-pm-supply = <&reg_bldo3>;
++};
++
+ &rtc {
+ 	clocks = <&ext_osc32k>;
+ };
 -- 
-2.33.0
+2.48.1
 
