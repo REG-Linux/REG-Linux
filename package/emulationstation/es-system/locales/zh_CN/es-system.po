@@ -14907,12 +14907,12 @@ msgctxt "keys_files"
 msgid "Exit Drastic"
 msgstr "退出Drastic"
 
-#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys
+#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
 msgctxt "keys_files"
 msgid "Save State"
 msgstr "保存状态"
 
-#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys
+#. TRANSLATION: nds.drastic.keys, psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
 msgctxt "keys_files"
 msgid "Load State"
 msgstr "载入状态"
@@ -14930,51 +14930,6 @@ msgstr "快速菜单"
 #. TRANSLATION: nds.drastic.keys
 msgctxt "keys_files"
 msgid "FastForward"
-msgstr "快进"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Exit Duckstation"
-msgstr "退出Duckstation"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Open DuckStation Quick Menu"
-msgstr "打开DuckStation快速菜单"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Restart Game"
-msgstr "重置游戏"
-
-#. TRANSLATION: psx.duckstation.keys, 3ds.azahar.keys, psp.ppsspp.keys, triforce.dolphin_triforce.keys, doom3.dhewm3.keys, ...
-msgctxt "keys_files"
-msgid "Screenshot"
-msgstr "截图"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Slot -"
-msgstr "插槽-"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Slot +"
-msgstr "插槽+"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Rewind"
-msgstr "倒带"
-
-#. TRANSLATION: psx.duckstation.keys
-msgctxt "keys_files"
-msgid "Next Disc (m3u)"
-msgstr "下一个光盘（m3u）"
-
-#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys
-msgctxt "keys_files"
-msgid "Fast Forward"
 msgstr "快进"
 
 #. TRANSLATION: xbox360.xenia.keys, 3ds.azahar.keys, wiiu.keys, atomiswave.flycast.keys, dreamcast.flycast.keys, ...
@@ -15007,6 +14962,11 @@ msgctxt "keys_files"
 msgid "Toggle Screen Layout"
 msgstr "切换屏幕布局"
 
+#. TRANSLATION: 3ds.azahar.keys, psx.duckstation.keys, psp.ppsspp.keys, triforce.dolphin_triforce.keys, psx.duckstation-gpl.keys, ...
+msgctxt "keys_files"
+msgid "Screenshot"
+msgstr "截图"
+
 #. TRANSLATION: 3ds.azahar.keys
 msgctxt "keys_files"
 msgid "Toggle Speed Limit"
@@ -15037,6 +14997,46 @@ msgctxt "keys_files"
 msgid "Exit Dosbox-X"
 msgstr "退出Dosbox-X"
 
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Exit Duckstation"
+msgstr "退出Duckstation"
+
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Open DuckStation Quick Menu"
+msgstr "打开DuckStation快速菜单"
+
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Restart Game"
+msgstr "重置游戏"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Slot -"
+msgstr "插槽-"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Slot +"
+msgstr "插槽+"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Rewind"
+msgstr "倒带"
+
+#. TRANSLATION: psx.duckstation.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Next Disc (m3u)"
+msgstr "下一个光盘（m3u）"
+
+#. TRANSLATION: psx.duckstation.keys, psp.ppsspp.keys, psx.duckstation-gpl.keys, psx.duckstation-mini.keys
+msgctxt "keys_files"
+msgid "Fast Forward"
+msgstr "快进"
+
 #. TRANSLATION: atomiswave.flycast.keys, dreamcast.flycast.keys, naomi.flycast.keys, naomi2.flycast.keys
 msgctxt "keys_files"
 msgid "Hide the bezel"
@@ -15066,6 +15066,86 @@ msgstr "载入状态插槽1"
 msgctxt "keys_files"
 msgid "Save State Slot 1"
 msgstr "保存状态插槽1"
+
+#. TRANSLATION: moonlight.moonlight.keys
+msgctxt "keys_files"
+msgid "Exit emulator using SDL"
+msgstr "使用SDL退出模拟器"
+
+#. TRANSLATION: scummvm.keys
+msgctxt "keys_files"
+msgid "Menu"
+msgstr "菜单"
+
+#. TRANSLATION: scummvm.keys
+msgctxt "keys_files"
+msgid "Graphics filtering on/off"
+msgstr "打开/关闭图形过滤"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Reset the table, sometimes required for PinMame"
+msgstr "重置表格，有时PinMame需要"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Start game"
+msgstr "开始游戏"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Insert coin"
+msgstr "投币"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Nudge up"
+msgstr "向上微移"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Nudge left"
+msgstr "向左微移"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Nudge right"
+msgstr "向右微移"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Pull plunger"
+msgstr "拉动弹板"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Lockbar Fire Button"
+msgstr "锁定开火按钮"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Buy extraball for a credit"
+msgstr "购买额外的球以获得积分"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Left flipper"
+msgstr "左侧弹板"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Right flipper"
+msgstr "右侧弹板"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Left magnasave"
+msgstr "左磁力保护"
+
+#. TRANSLATION: vpinball.keys
+msgctxt "keys_files"
+msgid "Right magnasave"
+msgstr "右磁力保护"
 
 #. TRANSLATION: corsixth.keys
 msgctxt "keys_files"
@@ -15282,17 +15362,17 @@ msgctxt "keys_files"
 msgid "Aim down"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Strafe left"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Strafe right"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Run"
 msgstr ""
@@ -15307,22 +15387,22 @@ msgctxt "keys_files"
 msgid "Menu back"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move left"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move right"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move forward"
 msgstr ""
 
-#. TRANSLATION: rott.keys
+#. TRANSLATION: rott.keys, bstone.keys
 msgctxt "keys_files"
 msgid "Move backward"
 msgstr ""
@@ -15330,6 +15410,76 @@ msgstr ""
 #. TRANSLATION: rott.keys
 msgctxt "keys_files"
 msgid "Toggle run"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu enter"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu up"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu down"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Use"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Attack"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu left"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu right"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Stats"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Zoom out"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Zoom in"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Menu back / exit"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Pause"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Previous weapon"
+msgstr ""
+
+#. TRANSLATION: bstone.keys
+msgctxt "keys_files"
+msgid "Next weapon"
 msgstr ""
 
 #. TRANSLATION: flatpak.keys
@@ -15341,86 +15491,6 @@ msgstr "退出运行Flatpak"
 msgctxt "keys_files"
 msgid "Exit Steam"
 msgstr "退出Steam"
-
-#. TRANSLATION: moonlight.moonlight.keys
-msgctxt "keys_files"
-msgid "Exit emulator using SDL"
-msgstr "使用SDL退出模拟器"
-
-#. TRANSLATION: scummvm.keys
-msgctxt "keys_files"
-msgid "Menu"
-msgstr "菜单"
-
-#. TRANSLATION: scummvm.keys
-msgctxt "keys_files"
-msgid "Graphics filtering on/off"
-msgstr "打开/关闭图形过滤"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Reset the table, sometimes required for PinMame"
-msgstr "重置表格，有时PinMame需要"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Start game"
-msgstr "开始游戏"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Insert coin"
-msgstr "投币"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Nudge up"
-msgstr "向上微移"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Nudge left"
-msgstr "向左微移"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Nudge right"
-msgstr "向右微移"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Pull plunger"
-msgstr "拉动弹板"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Lockbar Fire Button"
-msgstr "锁定开火按钮"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Buy extraball for a credit"
-msgstr "购买额外的球以获得积分"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Left flipper"
-msgstr "左侧弹板"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Right flipper"
-msgstr "右侧弹板"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Left magnasave"
-msgstr "左磁力保护"
-
-#. TRANSLATION: vpinball.keys
-msgctxt "keys_files"
-msgid "Right magnasave"
-msgstr "右磁力保护"
 
 #~ msgctxt "game_options"
 #~ msgid "Allow mapping Future Pinball with Pad to Keyboard."
