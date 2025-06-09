@@ -5,7 +5,7 @@ BOARD_DIR=$2
 IMAGES_DIR=$3
 
 # Define U-Boot version we use
-UBOOT_VERSION=2025.01
+UBOOT_VERSION=2025.04
 
 # Define rkbin commit we use
 RKBIN_COMMIT=7c35e21a8529b3758d1f051d1a5dc62aae934b2b
@@ -38,7 +38,7 @@ export BL31=../rkbin/bin/rk35/rk3588_bl31_v1.47.elf
 export ROCKCHIP_TPL=../rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.18.bin
 export CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-"
 # NOT WORKING AT THE MOMENT
-ARCH=aarch64 make generic-rk3588_defconfig
+ARCH=aarch64 make khadas-edge2-rk3588s_defconfig
 ARCH=aarch64 make -j$(nproc)
 
 # Copy generated files
