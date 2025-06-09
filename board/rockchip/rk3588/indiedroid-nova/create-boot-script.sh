@@ -14,7 +14,7 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-DTB="rk3588s-9tripod-linux.dtb"
+DTB="rk3588s-indiedroid-nova.dtb"
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-indiedroid-nova"     || exit 1
 cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-indiedroid-nova/" || exit 1
