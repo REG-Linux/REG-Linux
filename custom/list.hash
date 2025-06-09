@@ -160,6 +160,7 @@ b2d78dfc8d6b5be706a235b7f1bba038  package/vulkan-tools/vulkan-tools.hash
 7002edade861d2fb1083110068ef68e2  package/wayland-protocols/wayland-protocols.mk
 f9f04d92bb8ffcf08f5a3c63014ad1a6  package/wireplumber/wireplumber.hash
 b6673078d95526db7cea547c62575a16  package/wireplumber/wireplumber.mk
+53293178b5081b857047c8fc210b04bd  package/wlroots/wlroots.hash
 fb294cd61b0f446fdb3a8360e67c85f9  package/wlroots/wlroots.mk
 984c2366b004c95b2b51b885d6f691ed  package/x11r7/libxcb/libxcb.hash
 428934c4770f1f2e48e755919bed5b3b  package/x11r7/libxcb/libxcb.mk

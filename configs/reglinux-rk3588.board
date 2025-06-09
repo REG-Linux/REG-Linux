@@ -42,8 +42,11 @@ BR2_PACKAGE_REGLINUX_XWAYLAND=y
 # Mesa Panfrost (Panthor)
 BR2_PACKAGE_SYSTEM_PANFROST_MESA3D=y
 
-# Prebuilt legacy U-Boot for Khadas Edge 2
-# BR2_PACKAGE_UBOOT_KHADAS_EDGE_2=y
+# Firmware
+BR2_PACKAGE_FIRMWARE_ARMBIAN=y
+
+# Prebuilt U-Boot for Khadas Edge 2 (OOWOW)
+BR2_PACKAGE_UBOOT_KHADAS_EDGE_2=y
 
 # Filesystem
 BR2_TARGET_ROOTFS_CPIO_LZ4=y

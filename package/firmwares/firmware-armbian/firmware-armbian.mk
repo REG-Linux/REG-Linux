@@ -23,9 +23,13 @@ endif
 
 define FIRMWARE_ARMBIAN_INSTALL_TARGET_CMDS
 	mkdir -p $(FIRMWARE_ARMBIAN_TARGET_DIR)
+	# Remove dangling symlinks before copying
+	find $(FIRMWARE_ARMBIAN_TARGET_DIR) -type l ! -exec test -e {} \; -delete
 	cp -aRf $(@D)/* $(FIRMWARE_ARMBIAN_TARGET_DIR)/
-	# Make dracut happy
-	chmod -R 666 $(FIRMWARE_ARMBIAN_TARGET_DIR)brcm/*
+	# Make dracut happy (only if directory exists)
+	if [ -d "$(FIRMWARE_ARMBIAN_TARGET_DIR)/brcm" ]; then \
+	    chmod -R 666 $(FIRMWARE_ARMBIAN_TARGET_DIR)/brcm/*; \
+	fi
 endef
 
 $(eval $(generic-package))
