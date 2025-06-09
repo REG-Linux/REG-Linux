@@ -1,0 +1,25 @@
+From efd68a7434da823ca834add54fab1a0e470098d7 Mon Sep 17 00:00:00 2001
+From: clnhub <42144823+clnhub@users.noreply.github.com>
+Date: Mon, 9 Jun 2025 13:27:43 +0200
+Subject: [PATCH] Add kernel 6.16(+) support
+
+---
+ include/osdep_service_linux.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/osdep_service_linux.h b/include/osdep_service_linux.h
+index 1be792e..9bb903d 100644
+--- a/include/osdep_service_linux.h
++++ b/include/osdep_service_linux.h
+@@ -349,7 +349,11 @@ static inline void timer_hdl(unsigned long cntx)
+ #endif
+ {
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0))
++	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 16, 0))
++	_timer *ptimer = timer_container_of(ptimer, in_timer, timer);
++	#else
+ 	_timer *ptimer = from_timer(ptimer, in_timer, timer);
++	#endif
+ #else
+ 	_timer *ptimer = (_timer *)cntx;
+ #endif
