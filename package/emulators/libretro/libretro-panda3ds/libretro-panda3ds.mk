@@ -3,9 +3,10 @@
 # libretro-panda3ds
 #
 ################################################################################
-# Version: Release on Dec 25, 2024
-LIBRETRO_PANDA3DS_VERSION = v0.9
-LIBRETRO_PANDA3DS_SITE = https://github.com/wheremyfoodat/Panda3DS.git
+# Version: Release on Dec 25, 2024 + REG fix
+LIBRETRO_PANDA3DS_VERSION = v0.9-fix
+LIBRETRO_PANDA3DS_SITE = https://github.com/REG-Linux/Panda3DS.git
+#REG forked https://github.com/wheremyfoodat/Panda3DS.git
 LIBRETRO_PANDA3DS_SITE_METHOD=git
 LIBRETRO_PANDA3DS_GIT_SUBMODULES=YES
 LIBRETRO_PANDA3DS_LICENSE = GPLv2

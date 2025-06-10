@@ -3,9 +3,10 @@
 # panda3ds
 #
 ################################################################################
-# Version: Release on Dec 25, 2024
-PANDA3DS_VERSION = v0.9
-PANDA3DS_SITE = https://github.com/wheremyfoodat/Panda3DS.git
+# Version: Release on Dec 25, 2024 + REG fix
+PANDA3DS_VERSION = v0.9-fix
+PANDA3DS_SITE = https://github.com/REG-Linux/Panda3DS.git
+#REG forked https://github.com/wheremyfoodat/Panda3DS.git
 PANDA3DS_SITE_METHOD=git
 PANDA3DS_GIT_SUBMODULES=YES
 PANDA3DS_LICENSE = GPLv2

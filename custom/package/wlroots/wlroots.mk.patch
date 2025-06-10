@@ -1,7 +1,16 @@
 diff --git a/package/wlroots/wlroots.mk b/package/wlroots/wlroots.mk
-index 81f76fcdc7..fc27a5711b 100644
+index 81f76fcdc76..068929a332d 100644
 --- a/package/wlroots/wlroots.mk
 +++ b/package/wlroots/wlroots.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-WLROOTS_VERSION = 0.18.2
++WLROOTS_VERSION = 0.19.0
+ WLROOTS_SITE = https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/$(WLROOTS_VERSION)/downloads
+ WLROOTS_LICENSE = MIT
+ WLROOTS_LICENSE_FILES = LICENSE
 @@ -30,6 +30,10 @@ WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
  WLROOTS_RENDERERS = gles2
  WLROOTS_BACKENDS = libinput drm
