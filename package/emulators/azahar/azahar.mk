@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-AZAHAR_VERSION = 2121.2
+AZAHAR_VERSION = 2122-rc1
 AZAHAR_SITE = https://github.com/azahar-emu/azahar.git
 AZAHAR_SITE_METHOD = git
 AZAHAR_GIT_SUBMODULES=YES
@@ -32,6 +32,14 @@ AZAHAR_CONF_OPTS += -DCITRA_WARNINGS_AS_ERRORS=OFF
 AZAHAR_CONF_OPTS += -DDYNARMIC_WARNINGS_AS_ERRORS=OFF
 AZAHAR_CONF_OPTS += -DENABLE_LTO=ON
 
+# Use SSE 4.2 code paths on x86_64_v3 build
+ifeq ($(BR2_x86_x86_64_v3),y)
+AZAHAR_CONF_OPTS += -DENABLE_SSE42=ON
+else
+AZAHAR_CONF_OPTS += -DENABLE_SSE42=OFF
+endif
+
+# Qt vs SDL frontend
 ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
     AZAHAR_DEPENDENCIES += reglinux-qt6
     AZAHAR_CONF_OPTS += -DENABLE_QT=ON
@@ -44,6 +52,7 @@ else
     AZAHAR_BIN = azahar-cli
 endif
 
+# Vulkan support
 ifeq ($(BR2_PACKAGE_XWAYLAND)$(BR2_PACKAGE_REGLINUX_VULKAN),yy)
     AZAHAR_DEPENDENCIES += vulkan-headers xwayland
     AZAHAR_CONF_OPTS += -DENABLE_VULKAN=ON
