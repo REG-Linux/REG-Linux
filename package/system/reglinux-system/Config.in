@@ -75,17 +75,12 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
 	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
-	# Note : TODO Bundle carbon (and maybe neutral) in content downloader
-	#select BR2_PACKAGE_ES_THEME_CARBON		# emulationstation theme
-	#select BR2_PACKAGE_ES_THEME_NEUTRAL		# emulationstation theme
 	select BR2_PACKAGE_ES_THEME_CANVAS		# emulationstation theme
 	select BR2_PACKAGE_ES_BACKGROUND_MUSICS		# emulationstation musics
 	select BR2_PACKAGE_BATOCERA_ES_SYSTEM		# emulation station es_systems.cfg generator + default roms
 	select BR2_PACKAGE_REGLINUX_CONFIGGEN		# emulation station external command launcher
 	select BR2_PACKAGE_BATOCERA_TRIGGERHAPPY	# multimedia/power buttons
 	select BR2_PACKAGE_BATOCERA_UDEV_RULES		# extra udev rules for specifics joysticks/devices
-	select BR2_PACKAGE_XOSD				if BR2_PACKAGE_XSERVER_XORG_SERVER # osd information displaying
-	select BR2_PACKAGE_BATOCERA_BATTERY_CHECKER	if BR2_PACKAGE_XOSD
 	select BR2_PACKAGE_DOSFSTOOLS			# fat
 	select BR2_PACKAGE_DOSFSTOOLS_FSCK_FAT		# fat
 	select BR2_PACKAGE_DOSFSTOOLS_MKFS_FAT		# fat
@@ -143,7 +138,6 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 
 	select BR2_PACKAGE_LIBDRM
 	select BR2_PACKAGE_LIBV4L_UTILS				if BR2_PACKAGE_V4L
-	select BR2_PACKAGE_BATOCERA_DRMINFO			if BR2_PACKAGE_LIBDRM
 	select BR2_PACKAGE_LIBCEC				# libcec
 	select BR2_PACKAGE_LIBCEC_LINUX_API			# libcec linux api
 	select BR2_PACKAGE_EDID_DECODE				# edid monitor/tv support
