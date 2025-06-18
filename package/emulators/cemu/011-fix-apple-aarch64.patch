@@ -1,0 +1,62 @@
+--- a/dependencies/ih264d/common/armv8/ih264_intra_pred_luma_16x16_av8.s	2025-06-18 19:46:42.510333646 +0200
++++ b/dependencies/ih264d/common/armv8/ih264_intra_pred_luma_16x16_av8.s	2025-06-18 19:46:55.957668753 +0200
+@@ -431,13 +431,8 @@
+     mov       x10, x1                   //top_left
+     mov       x4, #-1
+     ld1       {v2.2s}, [x1], x8
+-#ifdef __APPLE__
+-    adrp      x7, _ih264_gai1_intrapred_luma_plane_coeffs@GOTPAGE
+-    ldr       x7, [x7, _ih264_gai1_intrapred_luma_plane_coeffs@GOTPAGEOFF]
+-#else
+     adrp      x7, :got:ih264_gai1_intrapred_luma_plane_coeffs
+     ldr       x7, [x7, #:got_lo12:ih264_gai1_intrapred_luma_plane_coeffs]
+-#endif
+     ld1       {v0.2s}, [x1]
+     rev64     v2.8b, v2.8b
+     ld1       {v6.2s, v7.2s}, [x7]
+--- a/dependencies/ih264d/common/armv8/ih264_intra_pred_chroma_av8.s	2025-06-18 19:47:39.205745924 +0200
++++ b/dependencies/ih264d/common/armv8/ih264_intra_pred_chroma_av8.s	2025-06-18 19:47:48.431975615 +0200
+@@ -429,13 +429,8 @@
+     rev64     v7.4h, v2.4h
+     ld1       {v3.2s}, [x10]
+     sub       x5, x3, #8
+-#ifdef __APPLE__
+-    adrp      x12, _ih264_gai1_intrapred_chroma_plane_coeffs1@GOTPAGE
+-    ldr       x12, [x12, _ih264_gai1_intrapred_chroma_plane_coeffs1@GOTPAGEOFF]
+-#else
+     adrp      x12, :got:ih264_gai1_intrapred_chroma_plane_coeffs1
+     ldr       x12, [x12, #:got_lo12:ih264_gai1_intrapred_chroma_plane_coeffs1]
+-#endif
+     usubl     v10.8h, v5.8b, v1.8b
+     ld1       {v8.8b, v9.8b}, [x12]     // Load multiplication factors 1 to 8 into D3
+     mov       v8.d[1], v9.d[0]
+@@ -484,13 +484,8 @@
+     zip1      v1.8h, v0.8h, v2.8h
+     zip2      v2.8h, v0.8h, v2.8h
+     mov       v0.16b, v1.16b
+-#ifdef __APPLE__
+-    adrp      x12, _ih264_gai1_intrapred_chroma_plane_coeffs2@GOTPAGE
+-    ldr       x12, [x12, _ih264_gai1_intrapred_chroma_plane_coeffs2@GOTPAGEOFF]
+-#else
+     adrp      x12, :got:ih264_gai1_intrapred_chroma_plane_coeffs2
+     ldr       x12, [x12, #:got_lo12:ih264_gai1_intrapred_chroma_plane_coeffs2]
+-#endif
+     ld1       {v8.2s, v9.2s}, [x12]
+     mov       v8.d[1], v9.d[0]
+     mov       v10.16b, v8.16b
+--- a/dependencies/ih264d/common/armv8/ih264_intra_pred_luma_8x8_av8.s	2025-06-18 19:45:06.814946249 +0200
++++ b/dependencies/ih264d/common/armv8/ih264_intra_pred_luma_8x8_av8.s	2025-06-18 19:45:14.749144382 +0200
+@@ -1029,13 +1029,8 @@
+     mov       v3.d[0], v2.d[1]
+     ext       v4.16b, v2.16b , v2.16b , #1
+     mov       v5.d[0], v4.d[1]
+-#ifdef __APPLE__
+-    adrp      x12, _ih264_gai1_intrapred_luma_8x8_horz_u@GOTPAGE
+-    ldr       x12, [x12, _ih264_gai1_intrapred_luma_8x8_horz_u@GOTPAGEOFF]
+-#else
+     adrp      x12, :got:ih264_gai1_intrapred_luma_8x8_horz_u
+     ldr       x12, [x12, #:got_lo12:ih264_gai1_intrapred_luma_8x8_horz_u]
+-#endif
+     uaddl     v20.8h, v0.8b, v2.8b
+     uaddl     v22.8h, v1.8b, v3.8b
+     uaddl     v24.8h, v2.8b, v4.8b
