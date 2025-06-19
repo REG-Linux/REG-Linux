@@ -3,8 +3,8 @@
 # firmware-orangepi
 #
 ################################################################################
-# Version.: Commits on Jun 2, 2023
-FIRMWARE_ORANGEPI_VERSION = d9c6dac6d934bd5923be573e99aac767681f2ca5
+# Version.: Commits on Mar 19, 2025
+FIRMWARE_ORANGEPI_VERSION = db5e86200ae592c467c4cfa50ec0c66cbc40b158
 FIRMWARE_ORANGEPI_SITE = $(call github,orangepi-xunlong,firmware,$(FIRMWARE_ORANGEPI_VERSION))
 
 FIRMWARE_ORANGEPI_TARGET_DIR=$(TARGET_DIR)/lib/firmware/

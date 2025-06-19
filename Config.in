@@ -336,6 +336,7 @@ menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-radxa-rkwifibt/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-rk3588/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/sound-open-firmware/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/firmwares/firmware-orangepi/Config.in"
 endmenu
 
 menu "Fonts"
@@ -407,7 +408,6 @@ endmenu
 
 menu "Firmwares"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/extralinuxfirmwares/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-orangepi/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/firmware-khadas-vim4/Config.in"
 endmenu
 
