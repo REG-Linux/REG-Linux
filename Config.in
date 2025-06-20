@@ -407,10 +407,6 @@ menu "Toolchain"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/toolchain/toolchain-optional-linaro-aarch64/Config.in"
 endmenu
 
-menu "Firmwares"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/firmwares/extralinuxfirmwares/Config.in"
-endmenu
-
 menu "GPU"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/libmali/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/batocera-nvidia/Config.in"
