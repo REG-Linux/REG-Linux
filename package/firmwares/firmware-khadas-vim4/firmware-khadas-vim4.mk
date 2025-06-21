@@ -14,8 +14,6 @@ FIRMWARE_KHADAS_VIM4_OPTEE_VFW_SRC = optee-video-firmware_0.5-202406_arm64.deb
 FIRMWARE_KHADAS_VIM4_OPTEE_USR_PATH = optee-userspace
 FIRMWARE_KHADAS_VIM4_OPTEE_VFW_PATH = optee-video-firmware
 
-FIRMWARE_KHADAS_VIM4_DEPENDENCIES = alllinuxfirmwares extralinuxfirmwares
-
 FIRMWARE_KHADAS_VIM4_EXTRA_DOWNLOADS = \
  https://dl.khadas.com/repos/vim4/pool/main/o/optee-userspace/$(FIRMWARE_KHADAS_VIM4_OPTEE_USR_SRC) \
  https://dl.khadas.com/repos/vim4/pool/main/o/optee-video-firmware/$(FIRMWARE_KHADAS_VIM4_OPTEE_VFW_SRC)
