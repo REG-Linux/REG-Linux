@@ -237,18 +237,12 @@ gamepock:
 gb:
   emulator: libretro
   core:     gambatte
-gb2players:
-  emulator: libretro
-  core:     tgbdual
 gba:
   emulator: libretro
   core:     mgba
 gbc:
   emulator: libretro
   core:     gambatte
-gbc2players:
-  emulator: libretro
-  core:     tgbdual
 gmaster:
   emulator: libretro
   core:     mame

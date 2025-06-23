@@ -104,7 +104,6 @@ config BR2_PACKAGE_REGLINUX_HANDHELD_SYSTEMS
 
 	# Gameboy / Gameboy Color
 	select BR2_PACKAGE_LIBRETRO_GAMBATTE		# ALL
-	select BR2_PACKAGE_LIBRETRO_TGBDUAL		# ALL
 	# Sameboy is accuracy-focused, can be slow on low end, let's limit and revisit later
 	select BR2_PACKAGE_LIBRETRO_SAMEBOY		if BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
 

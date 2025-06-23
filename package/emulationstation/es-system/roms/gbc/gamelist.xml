@@ -14,8 +14,7 @@ There are several game play types to choose from:
 -  Marathon - For the long distance player
 
 Difficulty levels for all players.
-
-Oh, and if you drop this rom in "gbc2players", you can play 2-player link mode (crunch-up recommended).</desc>
+</desc>
 		<image>./images/Petris-image.png</image>
 		<video>./videos/Petris-video.mp4</video>
     <marquee>./images/Petris-marquee.png</marquee>
