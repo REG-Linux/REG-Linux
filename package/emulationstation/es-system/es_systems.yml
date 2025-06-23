@@ -313,40 +313,6 @@ sgb:
       mgba:          { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MGBA] }
       mesen-s:       { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
 
-gbc2players:
-  name:       Game Boy Color (2 players)
-  manufacturer: Nintendo
-  release: 1998
-  hardware: portable
-  extensions: [gbc, gb2, gbc2, zip, 7z]
-  platform:   gbc
-  emulators:
-    libretro:
-      tgbdual:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_TGBDUAL] }
-  comment_en: |
-    For more info: https://wiki.batocera.org/systems:gbc2players
-  comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:gbc2players
-  comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:gbc2players
-
-gb2players:
-  name:       Game Boy (2 players)
-  manufacturer: Nintendo
-  release: 1989
-  hardware: portable
-  extensions: [gb, gb2, gbc2, zip, 7z]
-  platform:   gb
-  emulators:
-    libretro:
-      tgbdual:  { requireAnyOf: [BR2_PACKAGE_LIBRETRO_TGBDUAL] }
-  comment_en: |
-    For more info: https://wiki.batocera.org/systems:gb2players
-  comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:gb2players
-  comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:gb2players
-
 nds:
   name:       Nintendo DS
   manufacturer: Nintendo
