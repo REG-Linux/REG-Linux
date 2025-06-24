@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ALLLINUXFIRMWARES_VERSION = 20250410
+ALLLINUXFIRMWARES_VERSION = 20250613
 ALLLINUXFIRMWARES_SITE = https://gitlab.com/kernel-firmware/linux-firmware
 ALLLINUXFIRMWARES_SITE_METHOD = git
 
