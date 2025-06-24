@@ -22,8 +22,8 @@ d5729e1c36bf284009e995bd4dc86d73  arch/Config.in.arm
 68b27177f9fe560b74f0c9e4c4fd53e1  fs/cpio/init
 0f1e375992de585df0580c9ef85158e8  fs/squashfs/Config.in
 8635723306eb367f07b3b8fc57243880  fs/squashfs/squashfs.mk
-7163949b7b033848785b03ddd11d86e4  linux/Config.in
-5c504e3850b5a61b37eb6a9b3b445809  linux/linux.hash
+97078e63255ee5add2f6cca23be329b8  linux/Config.in
+17a5cd1061d31331621ff87a441fac82  linux/linux.hash
 3c12b0f02fc58a42cbd35aed5b7f4963  package/Config.in
 6521d70e92c2c2d8864d46e01c27b6d4  package/Config.in.host
 4106ba3f151f6d174a9d2c957b7a5ecd  package/Makefile.in
@@ -64,7 +64,7 @@ b5bcf1c3e1f262b4e38d381a73c38137  package/libopenh264/Config.in
 cc7d8a6dc2f0ff8c66f3f44a9c5e7b1f  package/libpciaccess/libpciaccess.mk
 fb3f39cb099d5a583fdef23484b25ac8  package/libsoundtouch/libsoundtouch.mk
 34607395f047f61cacf7fe877cfbc57a  package/libxmlb/libxmlb.mk
-9dfd19fb84451edd7f0628dee6aa382c  package/linux-headers/Config.in.host
+bcb134f72e149883608050c5062bb275  package/linux-headers/Config.in.host
 84caeaa857a89462b8a4e4c775a60ea4  package/lirc-tools/lirc-tools.mk
 0b48917e45566117a9acd2225e33a15e  package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch
 6af2e1b3409965df20121e7910eaf6b7  package/llvm-project/clang/clang.hash
