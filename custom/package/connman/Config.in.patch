@@ -1,5 +1,5 @@
 diff --git a/package/connman/Config.in b/package/connman/Config.in
-index af3e1f69f6..a69f6d16d0 100644
+index b01cbb344c..8574b3e1d8 100644
 --- a/package/connman/Config.in
 +++ b/package/connman/Config.in
 @@ -5,7 +5,8 @@ config BR2_PACKAGE_CONNMAN

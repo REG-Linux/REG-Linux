@@ -1,8 +1,8 @@
 diff --git a/package/libopenh264/libopenh264.mk b/package/libopenh264/libopenh264.mk
-index 9ae996fee1..1acd5632db 100644
+index f9a50e4c61..41cf7b6562 100644
 --- a/package/libopenh264/libopenh264.mk
 +++ b/package/libopenh264/libopenh264.mk
-@@ -26,6 +26,8 @@ else ifeq ($(BR2_mips)$(BR2_mipsel),y)
+@@ -23,6 +23,8 @@ else ifeq ($(BR2_mips)$(BR2_mipsel),y)
  LIBOPENH264_ARCH = mips
  else ifeq ($(BR2_mips64)$(BR2_mips64el),y)
  LIBOPENH264_ARCH = mips64

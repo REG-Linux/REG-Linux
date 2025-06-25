@@ -55,8 +55,8 @@ endif
 # Install only what is needed avoiding systemd files
 define SWAY_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bin
-	$(INSTALL) -D $(@D)/build/sway/sway         $(TARGET_DIR)/usr/bin
-	$(INSTALL) -D $(@D)/build/swaymsg/swaymsg   $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D $(@D)/buildroot-build/sway/sway         $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D $(@D)/buildroot-build/swaymsg/swaymsg   $(TARGET_DIR)/usr/bin
 endef
 
 $(eval $(meson-package))
