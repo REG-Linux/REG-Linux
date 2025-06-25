@@ -201,7 +201,7 @@ PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_REMOVE_VALA \
 PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_ADD_PACTL
 
 define PULSEAUDIO_ADD_PACTL
-	cp $(@D)/build/src/utils/pactl $(TARGET_DIR)/usr/bin/
+	cp $(@D)/buildroot-build/src/utils/pactl $(TARGET_DIR)/usr/bin/
 	ln -sf /usr/lib/pulseaudio/libpulsecommon-$(PULSEAUDIO_VERSION).so \
 	    $(TARGET_DIR)/usr/lib/libpulsecommon-$(PULSEAUDIO_VERSION).so
 endef

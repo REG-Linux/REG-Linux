@@ -1,8 +1,8 @@
 diff --git a/package/qt6/qt6base/Config.in b/package/qt6/qt6base/Config.in
-index 96a0416dbd..eb3f8987d1 100644
+index 7f3948ec27..63447f3851 100644
 --- a/package/qt6/qt6base/Config.in
 +++ b/package/qt6/qt6base/Config.in
-@@ -66,6 +66,7 @@ config BR2_PACKAGE_QT6BASE_XCB
+@@ -67,6 +67,7 @@ config BR2_PACKAGE_QT6BASE_XCB
  	select BR2_PACKAGE_XCB_UTIL_RENDERUTIL
  	select BR2_PACKAGE_XCB_UTIL_WM
  	select BR2_PACKAGE_LIBXKBCOMMON
