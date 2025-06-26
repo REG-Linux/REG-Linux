@@ -1,12 +1,16 @@
 config BR2_PACKAGE_IKEMEN
-    bool "ikemen"
-    depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
-    depends on BR2_PACKAGE_XORG7
-    depends on BR2_PACKAGE_HAS_LIBGL
-    select BR2_PACKAGE_LIBGTK3
-    select BR2_PACKAGE_OPENAL
-    select BR2_PACKAGE_LIBGLFW
-    help
+	bool "ikemen"
+	depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on BR2_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on BR2_PACKAGE_XORG7
+	depends on BR2_PACKAGE_HAS_LIBGL
+	select BR2_PACKAGE_HOST_GO
+	select BR2_PACKAGE_LIBGTK3
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_LIBGLFW
+
+	help
         A MUGEN emulator written in GoLang
 
 comment "ikemen needs a toolchain w/ threads"
