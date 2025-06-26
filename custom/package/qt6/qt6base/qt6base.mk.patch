@@ -1,8 +1,8 @@
 diff --git a/package/qt6/qt6base/qt6base.mk b/package/qt6/qt6base/qt6base.mk
-index a4c56da601..cb9188fa19 100644
+index 51a4f1b5be..95e1416829 100644
 --- a/package/qt6/qt6base/qt6base.mk
 +++ b/package/qt6/qt6base/qt6base.mk
-@@ -207,7 +207,8 @@ QT6BASE_CONF_OPTS += \
+@@ -199,7 +199,8 @@ QT6BASE_CONF_OPTS += \
  	-DFEATURE_xcb=ON \
  	-DFEATURE_xcb_xlib=ON \
  	-DFEATURE_xkbcommon=ON \
@@ -12,7 +12,7 @@ index a4c56da601..cb9188fa19 100644
  QT6BASE_DEPENDENCIES += \
  	libxcb \
  	libxkbcommon \
-@@ -215,7 +216,8 @@ QT6BASE_DEPENDENCIES += \
+@@ -208,7 +209,8 @@ QT6BASE_DEPENDENCIES += \
  	xcb-util-image \
  	xcb-util-keysyms \
  	xcb-util-renderutil \

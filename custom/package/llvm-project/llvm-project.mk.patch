@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/llvm-project.mk b/package/llvm-project/llvm-project.mk
-index 5859ff7cfc..903d3cd32d 100644
+index 6f075793a5..903d3cd32d 100644
 --- a/package/llvm-project/llvm-project.mk
 +++ b/package/llvm-project/llvm-project.mk
 @@ -4,8 +4,9 @@
@@ -7,7 +7,7 @@ index 5859ff7cfc..903d3cd32d 100644
  ################################################################################
  
 -LLVM_PROJECT_VERSION_MAJOR = 15
--LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).0.3
+-LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).0.7
 +# reglinux -  bump to 19.1.7
 +LLVM_PROJECT_VERSION_MAJOR = 19
 +LLVM_PROJECT_VERSION = $(LLVM_PROJECT_VERSION_MAJOR).1.7
