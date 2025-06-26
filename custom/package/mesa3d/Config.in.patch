@@ -1,13 +1,10 @@
 diff --git a/package/mesa3d/Config.in b/package/mesa3d/Config.in
-index 0412998214..57cf9adec6 100644
+index 37d2221946..61a4b4f4ea 100644
 --- a/package/mesa3d/Config.in
 +++ b/package/mesa3d/Config.in
-@@ -7,8 +7,16 @@ menuconfig BR2_PACKAGE_MESA3D
- 	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_8
- 	select BR2_PACKAGE_EXPAT
+@@ -9,6 +9,14 @@ menuconfig BR2_PACKAGE_MESA3D
  	select BR2_PACKAGE_LIBDRM
--	select BR2_PACKAGE_WAYLAND_PROTOCOLS if BR2_PACKAGE_WAYLAND
-+	select BR2_PACKAGE_WAYLAND_PROTOCOLS	if BR2_PACKAGE_WAYLAND
+ 	select BR2_PACKAGE_WAYLAND_PROTOCOLS if BR2_PACKAGE_WAYLAND
  	select BR2_PACKAGE_ZLIB
 +	select BR2_PACKAGE_PYTHON3			# REG
 +	select BR2_PACKAGE_PYTHON_PYYAML		# REG
@@ -20,20 +17,11 @@ index 0412998214..57cf9adec6 100644
  	help
  	  Mesa 3D, an open-source implementation of the OpenGL
  	  specification.
-@@ -30,7 +38,7 @@ config BR2_PACKAGE_MESA3D_LLVM
- 	depends on !BR2_TOOLCHAIN_HAS_GCC_BUG_64735 # std::shared_future
- 	depends on !BR2_STATIC_LIBS
- 	depends on BR2_USE_WCHAR # std::wstring
--	depends on BR2_HOST_GCC_AT_LEAST_7 # host-llvm
-+	depends on BR2_HOST_GCC_AT_LEAST_7
- 	select BR2_PACKAGE_LLVM
- 
- comment "llvm support needs a toolchain w/ wchar, threads, C++, gcc >= 7, dynamic library, host gcc >= 7"
 @@ -64,6 +72,11 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
  config BR2_PACKAGE_MESA3D_VULKAN_DRIVER
  	bool
  	select BR2_PACKAGE_MESA3D_DRIVER
-+	select BR2_PACKAGE_MESA3D_DRI3              if BR2_PACKAGE_XORG7
++	select BR2_PACKAGE_MESA3D_DRI3	if BR2_PACKAGE_XORG7
 +
 +config BR2_PACKAGE_MESA3D_VIDEO_CODEC
 +	bool
@@ -118,16 +106,7 @@ index 0412998214..57cf9adec6 100644
  	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
  	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4 # runtime
-@@ -257,7 +280,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
- 
- config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4
- 	bool "Gallium vc4 driver"
--	depends on (BR2_arm && BR2_ARM_CPU_HAS_NEON) || BR2_aarch64
-+	depends on BR2_arm || BR2_aarch64 # reglinux
- 	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
- 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
- 	select BR2_PACKAGE_LIBDRM_VC4
-@@ -274,15 +297,28 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL
+@@ -275,15 +298,28 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL
  	  virgl is the 3D acceleration backend for the virtio-gpu
  	  shipping with qemu.
  
@@ -160,7 +139,7 @@ index 0412998214..57cf9adec6 100644
  
  config BR2_PACKAGE_MESA3D_VDPAU
  	bool "Gallium VDPAU state tracker"
-@@ -320,7 +356,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL
+@@ -321,7 +357,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL
  	depends on BR2_TOOLCHAIN_USES_GLIBC # ifunc, static_assert
  	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
  	help
@@ -169,7 +148,7 @@ index 0412998214..57cf9adec6 100644
  
  comment "intel vulkan needs a glibc toolchain w/ headers >= 3.17"
  	depends on BR2_i386 || BR2_x86_64
-@@ -336,6 +372,135 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
+@@ -337,6 +373,135 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
  	help
  	  Vulkan swrast driver.
  

@@ -7,7 +7,7 @@ menuconfig BR2_PACKAGE_MESA3D
 	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_8
 	select BR2_PACKAGE_EXPAT
 	select BR2_PACKAGE_LIBDRM
-	select BR2_PACKAGE_WAYLAND_PROTOCOLS	if BR2_PACKAGE_WAYLAND
+	select BR2_PACKAGE_WAYLAND_PROTOCOLS if BR2_PACKAGE_WAYLAND
 	select BR2_PACKAGE_ZLIB
 	select BR2_PACKAGE_PYTHON3			# REG
 	select BR2_PACKAGE_PYTHON_PYYAML		# REG
@@ -38,7 +38,7 @@ config BR2_PACKAGE_MESA3D_LLVM
 	depends on !BR2_TOOLCHAIN_HAS_GCC_BUG_64735 # std::shared_future
 	depends on !BR2_STATIC_LIBS
 	depends on BR2_USE_WCHAR # std::wstring
-	depends on BR2_HOST_GCC_AT_LEAST_7
+	depends on BR2_HOST_GCC_AT_LEAST_7 # host-llvm
 	select BR2_PACKAGE_LLVM
 
 comment "llvm support needs a toolchain w/ wchar, threads, C++, gcc >= 7, dynamic library, host gcc >= 7"
@@ -72,7 +72,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 config BR2_PACKAGE_MESA3D_VULKAN_DRIVER
 	bool
 	select BR2_PACKAGE_MESA3D_DRIVER
-	select BR2_PACKAGE_MESA3D_DRI3              if BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_MESA3D_DRI3	if BR2_PACKAGE_XORG7
 
 config BR2_PACKAGE_MESA3D_VIDEO_CODEC
 	bool
@@ -271,7 +271,7 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4 # runtime
 	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 	help
-	  Driver for Broadcom VC6 (rpi4) GPUs (needs vc4).
+	  Driver for Broadcom VC6/7 (rpi4/5) GPUs (needs vc4).
 
 	  It requires a kernel 4.18+ with DRM V3D support enabled:
 
@@ -280,13 +280,14 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_V3D
 
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VC4
 	bool "Gallium vc4 driver"
-	depends on BR2_arm || BR2_aarch64 # reglinux
+	depends on BR2_arm || BR2_aarch64
 	depends on BR2_TOOLCHAIN_HAS_SYNC_4 || !BR2_PACKAGE_XORG7 # libxshmfence
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 	select BR2_PACKAGE_LIBDRM_VC4
 	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 	help
-	  Driver for Broadcom VC4 (rpi2/3) GPUs.
+	  Driver for Broadcom VC4 (rpi0/1/2/3) GPUs.
+
 	  It requires a vanilla 4.5+ kernel with drm vc4 (open) support.
 
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_VIRGL

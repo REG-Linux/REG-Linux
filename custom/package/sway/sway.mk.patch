@@ -1,5 +1,5 @@
 diff --git a/package/sway/sway.mk b/package/sway/sway.mk
-index 74614b0c7f..edf0878ff4 100644
+index 74614b0c7f..09c45769c0 100644
 --- a/package/sway/sway.mk
 +++ b/package/sway/sway.mk
 @@ -4,17 +4,16 @@
@@ -30,8 +30,8 @@ index 74614b0c7f..edf0878ff4 100644
 +# Install only what is needed avoiding systemd files
 +define SWAY_INSTALL_TARGET_CMDS
 +	mkdir -p $(TARGET_DIR)/usr/bin
-+	$(INSTALL) -D $(@D)/build/sway/sway         $(TARGET_DIR)/usr/bin
-+	$(INSTALL) -D $(@D)/build/swaymsg/swaymsg   $(TARGET_DIR)/usr/bin
++	$(INSTALL) -D $(@D)/buildroot-build/sway/sway         $(TARGET_DIR)/usr/bin
++	$(INSTALL) -D $(@D)/buildroot-build/swaymsg/swaymsg   $(TARGET_DIR)/usr/bin
 +endef
 +
  $(eval $(meson-package))

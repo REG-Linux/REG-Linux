@@ -1,5 +1,5 @@
 diff --git a/package/pulseaudio/pulseaudio.mk b/package/pulseaudio/pulseaudio.mk
-index 254e05348d..adbfcc3cf9 100644
+index 254e05348d..4216344548 100644
 --- a/package/pulseaudio/pulseaudio.mk
 +++ b/package/pulseaudio/pulseaudio.mk
 @@ -197,6 +197,15 @@ endef
@@ -10,7 +10,7 @@ index 254e05348d..adbfcc3cf9 100644
 +PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_ADD_PACTL
 +
 +define PULSEAUDIO_ADD_PACTL
-+	cp $(@D)/build/src/utils/pactl $(TARGET_DIR)/usr/bin/
++	cp $(@D)/buildroot-build/src/utils/pactl $(TARGET_DIR)/usr/bin/
 +	ln -sf /usr/lib/pulseaudio/libpulsecommon-$(PULSEAUDIO_VERSION).so \
 +	    $(TARGET_DIR)/usr/lib/libpulsecommon-$(PULSEAUDIO_VERSION).so
 +endef

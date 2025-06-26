@@ -1,9 +1,9 @@
 diff --git a/package/llvm-project/libclc/libclc.hash b/package/llvm-project/libclc/libclc.hash
-index 7140884f6c..d11a5ddfb4 100644
+index 5ee088a379..d32759bf19 100644
 --- a/package/llvm-project/libclc/libclc.hash
 +++ b/package/llvm-project/libclc/libclc.hash
 @@ -1,3 +1,4 @@
  # locally calculated
 +sha256  77e2d71f5cea1d0b1014ba88186299d1a0848eb3dc20948baae649db9e7641cb  libclc-19.1.7.src.tar.xz
- sha256  07e8a2b31e07a8cc8a976a6bfd87797d2543d5a9530f449755bf5119acbdbe8e  libclc-15.0.3.src.tar.xz
+ sha256  35731fea7be224f21acf5bf3cd9f0ed058bf4ada5eceaf7f10ee96e139bd3389  libclc-15.0.7.src.tar.xz
  sha256  3c536c052db9afd997809e38785c9f2a9e54e2892330fa7c5b438e18a7413479  LICENSE.TXT

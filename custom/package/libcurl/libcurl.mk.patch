@@ -1,12 +1,11 @@
 diff --git a/package/libcurl/libcurl.mk b/package/libcurl/libcurl.mk
-index 2066ba0388..250ef55e11 100644
+index 5a3a668f06..d029311bae 100644
 --- a/package/libcurl/libcurl.mk
 +++ b/package/libcurl/libcurl.mk
-@@ -202,3 +202,17 @@ LIBCURL_POST_INSTALL_TARGET_HOOKS += LIBCURL_TARGET_CLEANUP
+@@ -203,4 +203,17 @@ endef
+ LIBCURL_POST_INSTALL_TARGET_HOOKS += LIBCURL_TARGET_CLEANUP
  endif
  
- $(eval $(autotools-package))
-+
 +# reglinux - we need host-libcurl for several packages
 +HOST_LIBCURL_DEPENDENCIES = host-openssl
 +HOST_LIBCURL_CONF_OPTS = \
@@ -19,4 +18,5 @@ index 2066ba0388..250ef55e11 100644
 +	--without-libpsl \
 +	--without-nss
 +
+ $(eval $(autotools-package))
 +$(eval $(host-autotools-package))

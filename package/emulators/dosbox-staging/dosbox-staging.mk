@@ -99,7 +99,7 @@ DOSBOX_STAGING_CXXFLAGS += -march=armv8.2-a+dotprod+rcpc+ssbs+sb -mcpu=cortex-a7
 endif
 
 define DOSBOX_STAGING_INSTALL_TARGET_CMDS
-        $(INSTALL) -D $(@D)/build/dosbox $(TARGET_DIR)/usr/bin/dosbox-staging
+        $(INSTALL) -D $(@D)/buildroot-build/dosbox $(TARGET_DIR)/usr/bin/dosbox-staging
 endef
 
 $(eval $(meson-package))
