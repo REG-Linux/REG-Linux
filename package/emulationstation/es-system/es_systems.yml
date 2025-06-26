@@ -635,6 +635,7 @@ pcenginecd:
     libretro:
       pce:      { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE] }
       pce_fast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST] }
+      geargrafx: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARGRAFX], incompatible_extensions: [chd]  }
     mednafen:
       mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN] }
 
