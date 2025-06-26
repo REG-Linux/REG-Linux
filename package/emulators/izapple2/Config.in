@@ -1,12 +1,11 @@
 config BR2_PACKAGE_IZAPPLE2
-    bool "izapple2"
-    depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
-    #depends on BR2_PACKAGE_XORG7
-    #depends on BR2_PACKAGE_HAS_LIBGL
-    #select BR2_PACKAGE_LIBGTK3
-    #select BR2_PACKAGE_OPENAL
-    #select BR2_PACKAGE_LIBGLFW
-    help
+    	bool "izapple2"
+    	depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on BR2_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	select BR2_PACKAGE_HOST_GO
+
+    	help
         Portable emulator of an Apple II+ or //e. Written in Go.
 	https://github.com/ivanizag/izapple2
 
