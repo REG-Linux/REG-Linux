@@ -39,7 +39,7 @@ endef
 
 define FIRMWARE_KHADAS_VIM4_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/lib/firmware/
-	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/firmwares/firmware-khadas-vim4/firmware/* $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/
+	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/firmwares/firmware-khadas-vim4/firmware/* $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/
 	cp -R $(@D)/lib/firmware/* $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/
 	# Fixup permissions for dracut
 	chmod 644 $(FIRMWARE_KHADAS_VIM4_FIRMWARE_DIR)/brcm/*
