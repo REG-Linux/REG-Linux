@@ -43,6 +43,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-fuse
                    libretro-gambatte
                    libretro-gearcoleco
+                   libretro-geargrafx
                    libretro-gearsystem
                    libretro-genesisplusgx
                    libretro-genesisplusgx-wide
@@ -96,7 +97,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-stella2014
                    libretro-superbroswar
                    libretro-swanstation
-                   libretro-tgbdual
                    libretro-theodore
                    libretro-tyrquake
                    libretro-uae4arm
