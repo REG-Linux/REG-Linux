@@ -29,7 +29,7 @@ endif
 define IMG_GPU_POWERVR_INSTALL_STAGING_CMDS
 	cp -rdpf $(@D)/staging/* $(STAGING_DIR)/
 	mkdir -p $(STAGING_DIR)/usr/lib/pkgconfig
-	cp $(@D)/staging/usr/lib/glesv2.pc $(STAGING_DIR)/usr/lib/pkgconfig/
+	test -f $(@D)/staging/usr/lib/glesv2.pc && cp $(@D)/staging/usr/lib/glesv2.pc $(STAGING_DIR)/usr/lib/pkgconfig/
 	mkdir -p $(STAGING_DIR)/usr/include
 	cp -rdpf $(@D)/staging/include/* $(STAGING_DIR)/usr/include/
 endef
