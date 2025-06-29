@@ -1,0 +1,33 @@
+From e1b56b0b598eb604b6d9804469f00261e1d7b366 Mon Sep 17 00:00:00 2001
+From: KancyJoe <kancy2333@outlook.com>
+Date: Thu, 5 Jun 2025 04:00:41 +0000
+Subject: [PATCH] wireless: ath12k: fix periodically high cpu usage caused by a
+ busywait.
+
+---
+ drivers/net/wireless/ath/ath12k/mac.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/ath/ath12k/mac.c b/drivers/net/wireless/ath/ath12k/mac.c
+index 88b59f3ff87af8..fb7ee07adb01fe 100644
+--- a/drivers/net/wireless/ath/ath12k/mac.c
++++ b/drivers/net/wireless/ath/ath12k/mac.c
+@@ -4404,15 +4404,15 @@ int ath12k_mac_get_fw_stats(struct ath12k *ar,
+ 	 * Below loop is to confirm that firmware completed sending all the event
+ 	 * and fw_stats_done is marked true when end is marked in the TLV.
+ 	 */
+-	for (;;) {
+-		if (time_after(jiffies, timeout))
+-			break;
++	while (!time_after(jiffies, timeout)) {
+ 		spin_lock_bh(&ar->data_lock);
+ 		if (ar->fw_stats.fw_stats_done) {
+ 			spin_unlock_bh(&ar->data_lock);
+ 			break;
+ 		}
+ 		spin_unlock_bh(&ar->data_lock);
++		/* Add a small delay to prevent CPU hogging */
++		msleep(5);
+ 	}
+ 	return 0;
+ }
