@@ -1,0 +1,24 @@
+--- a/vdp.c	2025-06-28 08:39:37.000000000 +0200
++++ b/vdp.c	2025-06-29 13:11:18.135741519 +0200
+@@ -525,7 +525,9 @@
+ #ifndef _WIN32
+ 	if (ret->renderer) {
+ 		event_log_mem();
++#ifndef IS_LIB
+ 		render_create_thread(&vdp_thread, "vdp_render", vdp_render_thread_main, ret->renderer);
++#endif
+ 	}
+ #endif
+ 	return ret;
+--- a/vdp.c	2025-06-29 15:31:48.626882297 +0200
++++ b/vdp.c	2025-06-29 15:32:29.405967241 +0200
+@@ -501,7 +501,9 @@
+ }
+ #endif
+ 
++#ifndef IS_LIB
+ static render_thread vdp_thread;
++#endif
+ vdp_context *init_vdp_context(uint8_t region_pal, uint8_t has_max_vsram, uint8_t type)
+ {
+ 	vdp_context *ret = init_vdp_context_int(region_pal, has_max_vsram, type);
