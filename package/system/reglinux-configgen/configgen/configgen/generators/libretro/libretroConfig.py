@@ -431,15 +431,16 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
             for btn, value in remap_values.items():
                 retroarchConfig[f'input_player{controller_number}_{btn}'] = value
 
+        option = None
         if system.config['core'] == 'genesisplusgx':
             option = 'gx'
-        if system.config['core'] == 'picodrive':
+        elif system.config['core'] == 'picodrive':
             option = 'pd'
 
         controller_list = sorted(controllers.items())
         for i in range(1, min(5, len(controller_list) + 1)):
             controller, pad = controller_list[i - 1]
-            if (pad.guid in valid_megadrive_controller_guids and pad.configName in valid_megadrive_controller_names) or (system.isOptSet(f'{option}_controller{i}_mapping') and system.config[f'{option}_controller{i}_mapping'] != 'retropad'):
+            if (pad.guid in valid_megadrive_controller_guids and pad.configName in valid_megadrive_controller_names) or (option is not None and system.isOptSet(f'{option}_controller{i}_mapping') and system.config[f'{option}_controller{i}_mapping'] != 'retropad'):
                 update_megadrive_controller_config(i)
 
     ## Sega Mastersystem controller
@@ -540,7 +541,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
         # If set manually, proritize that.
         # Otherwise, set to portrait for games listed as 90 degrees, manual (default) if not.
         if not system.isOptSet('wswan_rotate_display'):
-            wswanGameRotation = videoMode.getAltDecoration(system.name, rom, True)
+            wswanGameRotation = videoMode.getAltDecoration(system.name, rom, "true")
             if wswanGameRotation == "90":
                 wswanOrientation = "portrait"
             else:
@@ -576,7 +577,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
             for btn, value in remap_values.items():
                 retroarchConfig[f'input_player{controller_number}_{btn}'] = value
 
-
+        option = None
         if system.config['core'] == 'mupen64plus-next':
             option = 'mupen64plus'
         elif system.config['core'] == 'parallel_n64':
@@ -585,7 +586,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
         controller_list = sorted(controllers.items())
         for i in range(1, min(5, len(controller_list) + 1)):
             controller, pad = controller_list[i - 1]
-            if (pad.guid in valid_n64_controller_guids and pad.configName in valid_n64_controller_names) or (system.isOptSet(f'{option}-controller{i}') and system.config[f'{option}-controller{i}'] != 'retropad'):
+            if (pad.guid in valid_n64_controller_guids and pad.configName in valid_n64_controller_names) or (option is not None and system.isOptSet(f'{option}-controller{i}') and system.config[f'{option}-controller{i}'] != 'retropad'):
                 update_n64_controller_config(i)
 
     ## PORTS
@@ -849,12 +850,6 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
     retroarchConfig['height'] = gameResolution["height"] # default value
     # force the assets directory while it was wrong in some beta versions
     retroarchConfig['assets_directory'] = '/usr/share/libretro/assets'
-
-    # Adaptation for small resolution (GPICase)
-    if isLowResolution(gameResolution):
-        retroarchConfig['menu_enable_widgets'] = 'false'
-        retroarchConfig['video_msg_bgcolor_enable'] = 'true'
-        retroarchConfig['video_font_size'] = '11'
 
     # AI option (service for game translations)
     if system.isOptSet('ai_service_enabled') and system.getOptBoolean('ai_service_enabled') == True:
