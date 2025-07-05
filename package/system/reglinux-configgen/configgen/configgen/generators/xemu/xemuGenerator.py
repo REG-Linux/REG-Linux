@@ -3,8 +3,6 @@
 from generators.Generator import Generator
 import Command
 import os.path
-import systemFiles
-import controllersConfig
 from shutil import copyfile
 from . import xemuConfig
 
@@ -25,11 +23,7 @@ class XemuGenerator(Generator):
         commandArray = [xemuConfig.xemuBin]
         commandArray.extend(["-config_path", xemuConfig.xemuConfig])
 
-        environment = {
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-        }
-
-        return Command.Command(array=commandArray, env=environment)
+        return Command.Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if ("xemu_scaling" in config and config["xemu_scaling"] == "stretch") or ("xemu_aspect" in config and config["xemu_aspect"] == "16x9"):

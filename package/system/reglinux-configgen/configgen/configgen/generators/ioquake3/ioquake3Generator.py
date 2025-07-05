@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import shutil
 import os.path
-import controllersConfig
 from shutil import copyfile
 from . import ioquake3Config
 
@@ -31,11 +30,7 @@ class IOQuake3Generator(Generator):
 
         commandArray.extend(command_line_words)
 
-        environment = {
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-        }
-
-        return Command.Command(array=commandArray, env=environment)
+        return Command.Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if gameResolution["width"] / float(gameResolution["height"]) > ((16.0 / 9.0) - 0.1):

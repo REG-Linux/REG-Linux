@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os
 import systemFiles
-import controllersConfig
 from configparser import ConfigParser
 from utils.buildargs import parse_args
 
@@ -62,9 +61,4 @@ class EDuke32Generator(Generator):
             result = parse_args(launch_args, rom)
             if not result.okay:
                 raise Exception(result.message)
-        return Command.Command(
-            array=launch_args,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=launch_args)

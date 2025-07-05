@@ -6,7 +6,6 @@ import configparser
 import Command
 import shutil
 import systemFiles
-import controllersConfig
 from configgen.configgen.utils.systemServices import batoceraServices
 from . import vpinballWindowing
 from . import vpinballOptions
@@ -85,7 +84,7 @@ class VPinballGenerator(Generator):
         ]
 
         # SDL_RENDER_VSYNC is causing perf issues (set by emulatorlauncher.py)
-        return Command.Command(array=commandArray, env={"SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers), "SDL_RENDER_VSYNC": "0"})
+        return Command.Command(array=commandArray, env={"SDL_RENDER_VSYNC": "0"})
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16/9

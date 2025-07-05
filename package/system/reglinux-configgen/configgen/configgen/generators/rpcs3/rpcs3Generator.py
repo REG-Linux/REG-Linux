@@ -370,12 +370,7 @@ class Rpcs3Generator(Generator):
           if os.path.exists("/userdata/bios/PS3UPDAT.PUP"):
             commandArray = [rpcs3Config.rpcs3Bin, "--installfw", "/userdata/bios/PS3UPDAT.PUP"]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     def getClosestRatio(gameResolution):
         screenRatio = gameResolution["width"] / gameResolution["height"]

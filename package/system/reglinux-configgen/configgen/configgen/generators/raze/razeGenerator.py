@@ -5,7 +5,6 @@ import Command
 import os
 import platform
 import systemFiles
-import controllersConfig
 from utils.buildargs import parse_args
 
 from utils.logger import get_logger
@@ -168,12 +167,7 @@ class RazeGenerator(Generator):
             "-nologo" if system.getOptBoolean("nologo") else "",
         ]
 
-        return Command.Command(
-            array=launch_args,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=launch_args)
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16/9

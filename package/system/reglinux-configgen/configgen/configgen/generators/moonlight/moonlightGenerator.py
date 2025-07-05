@@ -29,8 +29,7 @@ class MoonlightGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "XDG_DATA_DIRS": systemFiles.CONF,
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                "XDG_DATA_DIRS": systemFiles.CONF
             }
         )
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import configparser
-import controllersConfig
 
 def generateCoreSettings(coreSettings, system, rom, guns, wheels):
 

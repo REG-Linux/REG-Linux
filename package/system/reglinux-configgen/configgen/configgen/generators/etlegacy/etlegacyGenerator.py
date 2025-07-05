@@ -5,7 +5,6 @@ import Command
 import os
 import shutil
 import systemFiles
-import controllersConfig
 
 class ETLegacyGenerator(Generator):
 
@@ -82,12 +81,7 @@ class ETLegacyGenerator(Generator):
 
         commandArray = ["etl"]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

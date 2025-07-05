@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os
 import systemFiles
-import controllersConfig
 from os import path
 import ruamel.yaml
 import ruamel.yaml.util
@@ -105,10 +104,7 @@ class Vita3kGenerator(Generator):
             # Game not installed yet, let's open the menu
             commandArray = ["/usr/bin/vita3k/Vita3K", "-F", "-w", "-f", "-c", vitaConfigFile, rom]
 
-        return Command.Command(
-            array=commandArray,
-            env={"SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)}
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse for touchscreen actions
     def getMouseMode(self, config, rom):

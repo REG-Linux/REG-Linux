@@ -5,7 +5,6 @@ import Command
 import os
 import shutil
 import configparser
-import controllersConfig
 
 class SonicManiaGenerator(Generator):
 
@@ -75,12 +74,7 @@ class SonicManiaGenerator(Generator):
         os.chdir(rom_directory)
         commandArray = [destination_file]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

@@ -3,7 +3,6 @@
 from generators.Generator import Generator
 import Command
 import os
-import controllersConfig
 from settings.unixSettings import UnixSettings
 from . import applewinConfig
 
@@ -20,8 +19,4 @@ class AppleWinGenerator(Generator):
         config.write()
         commandArray = [applewinConfig.applewinBin]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            })
+        return Command.Command(array=commandArray)

@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os.path
 import zipfile
-import controllersConfig
 from . import viceConfig
 from . import viceControllers
 
@@ -39,9 +38,4 @@ class ViceGenerator(Generator):
 
         commandArray.append(rom)
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)

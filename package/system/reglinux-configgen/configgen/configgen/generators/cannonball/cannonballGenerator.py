@@ -2,7 +2,6 @@
 
 from generators.Generator import Generator
 import Command
-import controllersConfig
 from . import cannonballConfig
 
 class CannonballGenerator(Generator):
@@ -15,7 +14,4 @@ class CannonballGenerator(Generator):
         # command line
         commandArray = [cannonballConfig.cannonballBin]
 
-        return Command.Command(
-            array=commandArray,
-            env={'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)}
-        )
+        return Command.Command(array=commandArray)
