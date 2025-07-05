@@ -669,7 +669,7 @@ scummvm:
   manufacturer: LucasArts
   release: 1987
   hardware: computer
-  extensions: [scummvm, squashfs]
+  extensions: [scummvm, zar]
   platform:   scummvm
   emulators:
     scummvm:
@@ -715,7 +715,7 @@ dos:
   manufacturer: Microsoft
   release: 1981
   hardware: computer
-  extensions: [pc, dos, zip, squashfs, dosz, m3u, iso, cue]
+  extensions: [pc, dos, zip, zar, dosz, m3u, iso, cue]
   theme:      pc
   platform:   pc
   emulators:
@@ -1963,7 +1963,7 @@ ps3:
   manufacturer: Sony
   release: 2006
   hardware: console
-  extensions: [ps3, psn, squashfs]
+  extensions: [ps3, psn, zar]
   emulators:
     rpcs3:
       rpcs3: { requireAnyOf: [BR2_PACKAGE_RPCS3] }
@@ -2112,7 +2112,7 @@ daphne:
   manufacturer: Arcade
   release: 1983
   hardware: arcade
-  extensions: [daphne, squashfs]
+  extensions: [daphne, zar]
   platform: alg, daphne, arcade
   emulators:
     hypseus-singe:
@@ -2174,7 +2174,7 @@ singe:
   manufacturer: Arcade
   release: 1990
   hardware: arcade
-  extensions: [daphne, squashfs]
+  extensions: [daphne, zar]
   platform: alg, daphne, arcade
   emulators:
     hypseus-singe:
@@ -2260,7 +2260,7 @@ ports:
   manufacturer: Ports
   release:
   hardware: port
-  extensions: [sh, squashfs]
+  extensions: [sh, zar]
   platform: pc
   group: ports
   path: ports
@@ -2385,7 +2385,7 @@ wiiu:
   manufacturer: Nintendo
   release: 2012
   hardware: console
-  extensions: [wua, wup, wud, wux, rpx, squashfs, wuhb]
+  extensions: [wua, wup, wud, wux, rpx, zar, wuhb]
   platform:   wiiu
   theme:      wiiu
   emulators:
@@ -2413,7 +2413,7 @@ easyrpg:
   manufacturer: EasyRPG Team
   release: 2000
   hardware: port
-  extensions: [easyrpg, squashfs, zip]
+  extensions: [easyrpg, zar, zip]
   emulators:
     easyrpg:
       easyrpg: { requireAnyOf: [BR2_PACKAGE_EASYRPG_PLAYER] }
@@ -2607,7 +2607,7 @@ ikemen:
   manufacturer: Elecbyte
   release: 2021
   hardware: port
-  extensions: [ikemen, pc, squashfs]
+  extensions: [ikemen, pc, zar]
   emulators:
     ikemen:
       ikemen:  { requireAnyOf: [BR2_PACKAGE_IKEMEN] }
@@ -2633,7 +2633,7 @@ xbox:
   manufacturer: Microsoft
   release: 2003
   hardware: console
-  extensions: [iso, squashfs]
+  extensions: [iso, zar]
   emulators:
     xemu:
       xemu: { requireAnyOf: [BR2_PACKAGE_XEMU] }
@@ -2727,7 +2727,7 @@ ecwolf:
   manufacturer: Ports
   release: 2013
   hardware: port
-  extensions: [ecwolf, pk3, squashfs]
+  extensions: [ecwolf, pk3, zar]
   platform: pc
   group: ports
   emulators:
