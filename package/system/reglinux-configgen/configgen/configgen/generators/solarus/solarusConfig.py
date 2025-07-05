@@ -2,4 +2,4 @@
 
 import systemFiles
 
-solarusSaves = systemFiles.savesDir + '/solarus'
+solarusSaves = systemFiles.SAVES + '/solarus'

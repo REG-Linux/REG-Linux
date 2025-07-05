@@ -17,13 +17,13 @@ class Evmapy():
     def start(system, emulator, core, rom, playersControllers, guns):
         if Evmapy.__prepare(system, emulator, core, rom, playersControllers, guns):
             Evmapy.__started = True
-            subprocess.call(["batocera-evmapy", "start"])
+            subprocess.call(["system-evmapy", "start"])
 
     @staticmethod
     def stop():
         if Evmapy.__started:
             Evmapy.__started = False
-            subprocess.call(["batocera-evmapy", "stop"])
+            subprocess.call(["system-evmapy", "stop"])
 
     @staticmethod
     def __prepare(system, emulator, core, rom, playersControllers, guns):
@@ -40,7 +40,7 @@ class Evmapy():
         ]:
             if os.path.exists(keysfile) and not (os.path.isdir(rom) and keysfile == "{}.keys" .format (rom)): # "{}.keys" .format (rom) is forbidden for directories, it must be inside
                 eslog.debug(f"evmapy on {keysfile}")
-                subprocess.call(["batocera-evmapy", "clear"])
+                subprocess.call(["system-evmapy", "clear"])
 
                 padActionConfig = json.load(open(keysfile))
 

@@ -12,7 +12,7 @@ from distutils.dir_util import copy_tree
 import shutil
 
 vitaConfig = systemFiles.CONF + '/vita3k'
-vitaSaves = systemFiles.savesDir + '/psvita'
+vitaSaves = systemFiles.SAVES + '/psvita'
 vitaConfigFile = vitaConfig + '/config.yml'
 
 class Vita3kGenerator(Generator):

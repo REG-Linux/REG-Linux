@@ -97,7 +97,7 @@ class ScummVMGenerator(Generator):
 
         commandArray.extend(
             [f"--joystick={id}",
-            "--screenshotspath="+systemFiles.screenshotsDir,
+            "--screenshotspath="+systemFiles.SCREENSHOTS,
             "--extrapath="+scummvmConfig.scummvmExtra,
             f"--path={romPath}",
             f"{romName}"]

@@ -14,7 +14,7 @@ EVMAPY_PRE_CONFIGURE_HOOKS += EVMAPY_FIXCHARS
 
 define EVMAPY_INSTALL_SCRIPTS
 	mkdir -p $(TARGET_DIR)/usr/bin
-	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/utils/evmapy/batocera-evmapy $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D -m 0755 $(BR2_EXTERNAL_REGLINUX_PATH)/package/utils/evmapy/system-evmapy $(TARGET_DIR)/usr/bin
 endef
 
 EVMAPY_POST_INSTALL_TARGET_HOOKS = EVMAPY_INSTALL_SCRIPTS

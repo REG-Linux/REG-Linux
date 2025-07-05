@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from os import path
 
 playConfig = systemFiles.CONF + '/play'
-playSaves = systemFiles.savesDir + '/play'
+playSaves = systemFiles.SAVES + '/play'
 playHome = systemFiles.CONF
 playConfigFile = playConfig + '/Play Data Files/config.xml'
 playInputFile = playConfig + '/Play Data Files/inputprofiles/default.xml'

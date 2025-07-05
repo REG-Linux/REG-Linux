@@ -6,7 +6,7 @@ import Command
 class RuffleGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        commandArray = ["ruffle", rom]
+        commandArray = ["ruffle", "--fullscreen", rom]
         return Command.Command(
             array=commandArray)
 
