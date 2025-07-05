@@ -2,7 +2,6 @@
 
 from generators.Generator import Generator
 import Command
-import controllersConfig
 import os
 import shutil
 from . import sdlpopConfig
@@ -38,6 +37,4 @@ class SdlPopGenerator(Generator):
                 commandArray.append(f"joynum={pad.index}")
             nplayer += 1
 
-        return Command.Command(array=commandArray,env={
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-        })
+        return Command.Command(array=commandArray)

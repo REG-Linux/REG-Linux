@@ -5,7 +5,6 @@ import Command
 import os
 import codecs
 import systemFiles
-import controllersConfig
 from os import path
 
 class ECWolfGenerator(Generator):
@@ -90,9 +89,4 @@ class ECWolfGenerator(Generator):
                  "--savedir", ecwolfSaves
         ]
 
-        return Command.Command(
-             ecwolfArray,
-             env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=ecwolfArray)

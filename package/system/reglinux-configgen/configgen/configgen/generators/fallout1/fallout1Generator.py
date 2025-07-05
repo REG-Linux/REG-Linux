@@ -6,7 +6,6 @@ import configparser
 import os
 import shutil
 import systemFiles
-import controllersConfig
 
 fout1ConfigDir = systemFiles.CONF + "/fallout1"
 fout1ConfigFile = fout1ConfigDir + "/fallout.cfg"
@@ -128,12 +127,7 @@ class Fallout1Generator(Generator):
         ## Setup the command
         commandArray = ["fallout1-ce"]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

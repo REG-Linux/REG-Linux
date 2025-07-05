@@ -3,7 +3,6 @@
 from generators.Generator import Generator
 import Command
 import os
-import controllersConfig
 from . import cdogsConfig
 
 from utils.logger import get_logger
@@ -23,8 +22,4 @@ class CdogsGenerator(Generator):
 
         commandArray = [cdogsConfig.cdogsBin]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            })
+        return Command.Command(array=commandArray)

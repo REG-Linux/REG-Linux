@@ -2,7 +2,6 @@
 
 from generators.Generator import Generator
 import Command
-import controllersConfig
 from . import abuseConfig
 
 class AbuseGenerator(Generator):
@@ -10,8 +9,4 @@ class AbuseGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         commandArray = [abuseConfig.abuseBin, "-datadir", abuseConfig.abuseDataDir]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            })
+        return Command.Command(array=commandArray)

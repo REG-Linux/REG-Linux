@@ -30,13 +30,6 @@ class WineGenerator(Generator):
                     "LC_ALL": language + ".UTF-8"
                     }
                 )
-            # sdl controller option - default is on
-            if not system.isOptSet("sdl_config") or system.getOptBoolean("sdl_config"):
-                environment.update(
-                    {
-                        "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-                    }
-                )
             # ensure nvidia driver used for vulkan
             if os.path.exists('/var/tmp/nvidia.prime'):
                 variables_to_remove = ['__NV_PRIME_RENDER_OFFLOAD', '__VK_LAYER_NV_optimus', '__GLX_VENDOR_LIBRARY_NAME']

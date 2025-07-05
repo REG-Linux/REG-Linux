@@ -5,7 +5,6 @@ import Command
 import shutil
 import os
 import systemFiles
-import controllersConfig
 import utils.videoMode as videoMode
 from settings.unixSettings import UnixSettings
 from . import libretroConfig
@@ -30,6 +29,7 @@ class LibretroGenerator(Generator):
         altDecoration = videoMode.getAltDecoration(system.name, rom, 'retroarch')
         gameShader = None
         shaderBezel = False
+        video_shader = None
         if altDecoration == "0":
             if 'shader' in renderConfig:
                 gameShader = renderConfig['shader']
@@ -226,10 +226,7 @@ class LibretroGenerator(Generator):
         if dontAppendROM == False:
             commandArray.append(rom)
 
-        return Command.Command(
-            array=commandArray,
-            env={'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)}
-        )
+        return Command.Command(array=commandArray)
 
 def getGFXBackend(system):
         # Start with the selected option

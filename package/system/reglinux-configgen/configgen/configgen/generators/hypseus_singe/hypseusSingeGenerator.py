@@ -5,7 +5,6 @@ import Command
 import filecmp
 import shutil
 import os
-import controllersConfig
 import ffmpeg
 from . import hypseusSingeConfig
 
@@ -305,7 +304,6 @@ class HypseusSingeGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers),
                 'MANYMOUSE_NO_XINPUT2': 'x' # disable xorg mouse => forces evdev mouse
             }
         )

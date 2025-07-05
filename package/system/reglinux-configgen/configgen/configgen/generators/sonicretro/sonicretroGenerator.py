@@ -5,7 +5,6 @@ import Command
 import os
 import configparser
 import hashlib
-import controllersConfig
 
 class SonicRetroGenerator(Generator):
 
@@ -169,11 +168,7 @@ class SonicRetroGenerator(Generator):
         os.chdir(rom)
         commandArray = [emu]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            })
+        return Command.Command(array=commandArray)
 
     def getMouseMode(self, config, rom):
         # Determine the emulator to use

@@ -6,7 +6,6 @@ import os
 import subprocess
 import configparser
 import systemFiles
-import controllersConfig
 from os import environ
 
 from utils.logger import get_logger
@@ -22,10 +21,7 @@ class AzaharGenerator(Generator):
         AzaharGenerator.writeCITRAConfig(systemFiles.CONF + "/citra-emu/qt-config.ini", system, playersControllers)
 
         commandArray = ['/usr/bin/azahar', rom]
-        return Command.Command(array=commandArray, env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse on screen
     def getMouseMode(self, config, rom):

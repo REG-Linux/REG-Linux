@@ -188,7 +188,6 @@ class FlycastGenerator(Generator):
             env={
                 "XDG_CONFIG_DIRS":systemFiles.CONF,
                 "FLYCAST_DATADIR":flycastConfig.flycastSaves,
-                "FLYCAST_BIOS_PATH":flycastConfig.flycastBios,
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                "FLYCAST_BIOS_PATH":flycastConfig.flycastBios
             }
         )

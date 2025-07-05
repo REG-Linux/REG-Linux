@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os
 import re
-import controllersConfig
 
 class MugenGenerator(Generator):
 
@@ -29,22 +28,18 @@ class MugenGenerator(Generator):
         if not os.path.exists(os.path.dirname(settings_path)):
             os.makedirs(os.path.dirname(settings_path))
 
-        environment={
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-        }
         # ensure nvidia driver used for vulkan
+        environment = {}
         if os.path.exists('/var/tmp/nvidia.prime'):
             variables_to_remove = ['__NV_PRIME_RENDER_OFFLOAD', '__VK_LAYER_NV_optimus', '__GLX_VENDOR_LIBRARY_NAME']
             for variable_name in variables_to_remove:
                 if variable_name in os.environ:
                     del os.environ[variable_name]
 
-            environment.update(
-                {
+            environment = {
                     'VK_ICD_FILENAMES': '/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json',
                     'VK_LAYER_PATH': '/usr/share/vulkan/explicit_layer.d'
                 }
-            )
 
         commandArray = ["batocera-wine", "mugen", "play", rom]
         return Command.Command(

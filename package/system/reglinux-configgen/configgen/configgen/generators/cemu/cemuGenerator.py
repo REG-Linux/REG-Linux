@@ -7,7 +7,6 @@ import codecs
 import subprocess
 import glob
 import systemFiles
-import controllersConfig
 from os import path
 from os import environ
 from xml.dom import minidom
@@ -63,12 +62,7 @@ class CemuGenerator(Generator):
             # force no menubar
             commandArray.append("--force-no-menubar")
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     @staticmethod
     def CemuConfig(configFile, system):

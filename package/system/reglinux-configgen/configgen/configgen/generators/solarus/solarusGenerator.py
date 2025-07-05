@@ -5,7 +5,6 @@ import Command
 import codecs
 import os
 import systemFiles
-import controllersConfig
 
 class SolarusGenerator(Generator):
 
@@ -30,8 +29,7 @@ class SolarusGenerator(Generator):
         commandArray.append(rom)
 
         return Command.Command(array=commandArray, env={
-            'SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS': '0' ,
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
+            'SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS': '0'
         })
 
     @staticmethod

@@ -6,7 +6,6 @@ import os
 import shutil
 import json
 import systemFiles
-import controllersConfig
 
 class Sonic3AIRGenerator(Generator):
 
@@ -67,10 +66,7 @@ class Sonic3AIRGenerator(Generator):
         # now run
         commandArray = ["/usr/bin/sonic3-air/sonic3air_linux"]
 
-        return Command.Command(
-            array=commandArray,
-            env={"SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)}
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
