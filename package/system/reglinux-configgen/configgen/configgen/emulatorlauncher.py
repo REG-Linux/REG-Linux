@@ -201,7 +201,7 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
         gameResolution = videoMode.getCurrentResolution()
 
         # savedir: create the save directory if not already done
-        dirname = os.path.join(systemFiles.savesDir, system.name)
+        dirname = os.path.join(systemFiles.SAVES, system.name)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 

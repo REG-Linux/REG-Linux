@@ -14,7 +14,7 @@ eslog = get_logger(__name__)
 class RazeGenerator(Generator):
 
     config_dir = f"{systemFiles.CONF}/raze"
-    saves_dir = f"{systemFiles.savesDir}/raze"
+    saves_dir = f"{systemFiles.SAVES}/raze"
     # The main config file, which is emitted with duplicate keys and makes working with ConfigParser very annoying
     config_file = f"{config_dir}/raze.ini"
     # A script file with console commands that are always ran when a game starts

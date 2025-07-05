@@ -16,9 +16,9 @@ class OpenborGenerator(Generator):
         if not os.path.exists(configDir):
             os.makedirs(configDir)
 
-        savesDir = systemFiles.savesDir + '/openbor'
-        if not os.path.exists(savesDir):
-            os.makedirs(savesDir)
+        SAVES = systemFiles.SAVES + '/openbor'
+        if not os.path.exists(SAVES):
+            os.makedirs(SAVES)
 
         # guess the version to run
         core = system.config['core']
