@@ -71,6 +71,9 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	# Amlogic eMMC partition tool
 	select BR2_PACKAGE_AMPART			if BR2_PACKAGE_SYSTEM_TARGET_AMLOGIC_ANY
 
+	# ZAR support
+	select BR2_PACKAGE_FUSE_ZAR			# Custom FUSE mounter for ZAR (ZArchive)
+
 	# minimal system required packages
 	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
