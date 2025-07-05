@@ -4,7 +4,8 @@
 #
 ################################################################################
 # Version: Release on Jun 29, 2025
-LIBRETRO_GEARGRAFX_VERSION = 1.5.4
+# Version: Temp build July 5th, 2025
+LIBRETRO_GEARGRAFX_VERSION = 7772c77ef1c7e4f83fd94ed91563fc1a5f6f9e54
 LIBRETRO_GEARGRAFX_SITE = $(call github,drhelius,Geargrafx,$(LIBRETRO_GEARGRAFX_VERSION))
 LIBRETRO_GEARGRAFX_LICENSE = GPLv3
 
