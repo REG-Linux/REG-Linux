@@ -4,7 +4,7 @@ import systemFiles
 mupenConf = systemFiles.CONF + '/mupen64/'
 mupenCustom = mupenConf + "mupen64plus.cfg"
 mupenInput = mupenConf + "InputAutoCfg.ini"
-mupenSaves = systemFiles.savesDir + "/n64"
+mupenSaves = systemFiles.SAVES + "/n64"
 mupenMappingUser    = mupenConf + 'input.xml'
 mupenMappingSystem  = '/usr/share/reglinux/datainit/system/configs/mupen64/input.xml'
 mupenBin = '/usr/bin/mupen64plus'
