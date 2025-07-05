@@ -1,0 +1,8 @@
+config BR2_PACKAGE_FUSE_ZAR
+        bool "fuse-zar"
+	select BR2_PACKAGE_ZSTD
+	select BR2_PACKAGE_LIBFUSE3
+        help
+          FUSE ZArchive mounter
+
+          https://github.com/REG-Linux/fuse-zar
