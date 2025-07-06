@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import json
 import os
-import controllersConfig
 
 Keymapping =[
         {
@@ -186,4 +185,4 @@ class IkemenGenerator(Generator):
 
         commandArray = ["/usr/bin/system-ikemen", rom]
 
-        return Command.Command(array=commandArray, env={ "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers) })
+        return Command.Command(array=commandArray)

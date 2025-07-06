@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os
 import systemFiles
-import controllersConfig
 
 class DXX_RebirthGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -83,12 +82,7 @@ class DXX_RebirthGenerator(Generator):
 
         commandArray = [dxx_rebirth, "-hogdir", directory]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG":controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

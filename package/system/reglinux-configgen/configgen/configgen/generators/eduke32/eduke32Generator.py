@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os
 import systemFiles
-import controllersConfig
 from configparser import ConfigParser
 from utils.buildargs import parse_args
 
@@ -14,7 +13,7 @@ class EDuke32Generator(Generator):
         # Core is either eduke32 or fury
         core = system.config["core"]
         config_dir = f"{systemFiles.CONF}/{core}"
-        saves_dir = f"{systemFiles.savesDir}/{core}"
+        saves_dir = f"{systemFiles.SAVES}/{core}"
         config_file = f"{config_dir}/{core}.cfg"
         # A script file with console commands that are always ran when the game starts
         script_file = f"{config_dir}/autoexec.cfg"
@@ -62,9 +61,4 @@ class EDuke32Generator(Generator):
             result = parse_args(launch_args, rom)
             if not result.okay:
                 raise Exception(result.message)
-        return Command.Command(
-            array=launch_args,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=launch_args)

@@ -87,8 +87,8 @@ class Pcsx2Generator(Generator):
 
         # wheels won't work correctly when SDL_GAMECONTROLLERCONFIG is set. excluding wheels from SDL_GAMECONTROLLERCONFIG doesn't fix too.
         # wheel metadata
-        if not Pcsx2Generator.useEmulatorWheels(playingWithWheel, Pcsx2Generator.getWheelType(metadata, playingWithWheel, system.config)):
-            envcmd["SDL_GAMECONTROLLERCONFIG"] = controllersConfig.generateSdlGameControllerConfig(playersControllers)
+        #if not Pcsx2Generator.useEmulatorWheels(playingWithWheel, Pcsx2Generator.getWheelType(metadata, playingWithWheel, system.config)):
+        #    envcmd["SDL_GAMECONTROLLERCONFIG"] = controllersConfig.generateSdlGameControllerConfig(playersControllers)
 
         # ensure we have the patches.zip file to avoid message.
         if not os.path.exists(pcsx2BiosDir):
@@ -97,10 +97,7 @@ class Pcsx2Generator(Generator):
             source_file = "/usr/share/reglinux/datainit/bios/ps2/patches.zip"
             shutil.copy(source_file, pcsx2Patches)
 
-        return Command.Command(
-            array=commandArray,
-            env=envcmd
-        )
+        return Command.Command(array=commandArray)
 
 def getGfxRatioFromConfig(config, gameResolution):
     # 2: 4:3 ; 1: 16:9

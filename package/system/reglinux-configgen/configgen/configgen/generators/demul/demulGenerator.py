@@ -12,7 +12,7 @@ from distutils.dir_util import copy_tree
 class DemulGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        wineprefix = systemFiles.savesDir + "/demul"
+        wineprefix = systemFiles.SAVES + "/demul"
         emupath = wineprefix + "/demul"
         bottlewinpath = wineprefix + "/drive_c/windows"
 

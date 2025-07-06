@@ -5,7 +5,6 @@ import os
 import Command
 import shutil
 import systemFiles
-import controllersConfig
 from configobj import ConfigObj
 
 class CGeniusGenerator(Generator):
@@ -119,10 +118,7 @@ class CGeniusGenerator(Generator):
         dir_string = "dir=\"" + rom_path + "\""
         commandArray.append(dir_string)
 
-        return Command.Command(
-            array=commandArray,
-            env={"SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)}
-        )
+        return Command.Command(array=commandArray)
 
     # Show mouse on screen for the Config Screen
     def getMouseMode(self, config, rom):

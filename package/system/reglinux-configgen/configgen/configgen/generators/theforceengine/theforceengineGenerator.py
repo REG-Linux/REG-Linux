@@ -2,7 +2,6 @@
 
 from generators.Generator import Generator
 import Command
-import controllersConfig
 import configparser
 import os
 import systemFiles
@@ -230,7 +229,6 @@ class TheForceEngineGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers),
                 "TFE_DATA_HOME": forceConfigDir
             }
         )

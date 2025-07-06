@@ -6,7 +6,6 @@ import os.path
 import glob
 import configparser
 import systemFiles
-import controllersConfig
 from . import scummvmConfig
 
 class ScummVMGenerator(Generator):
@@ -97,18 +96,13 @@ class ScummVMGenerator(Generator):
 
         commandArray.extend(
             [f"--joystick={id}",
-            "--screenshotspath="+systemFiles.screenshotsDir,
+            "--screenshotspath="+systemFiles.SCREENSHOTS,
             "--extrapath="+scummvmConfig.scummvmExtra,
             f"--path={romPath}",
             f"{romName}"]
         )
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if ("scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect") or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):

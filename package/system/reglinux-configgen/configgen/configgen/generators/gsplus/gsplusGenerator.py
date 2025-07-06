@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os
 import systemFiles
-import controllersConfig
 from settings.unixSettings import UnixSettings
 from . import gsplusConfig
 
@@ -98,8 +97,4 @@ class GSplusGenerator(Generator):
         config.write()
         commandArray = [gsplusConfig.gsplusBin, "-fullscreen"]
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            })
+        return Command.Command(array=commandArray)

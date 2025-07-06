@@ -5,7 +5,6 @@ import Command
 import os.path
 import configparser
 import systemFiles
-import controllersConfig
 from shutil import copyfile
 from os.path import isdir
 from os.path import isfile
@@ -18,7 +17,7 @@ class FlycastGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # Write emu.cfg to map joysticks, init with the default emu.cfg
         Config = configparser.ConfigParser(interpolation=None)
-        Config.optionxform = str
+        Config.optionxform = lambda optionstr: optionstr  # preserve case sensitivity
         if os.path.exists(flycastConfig.flycastConfig):
             try:
                 Config.read(flycastConfig.flycastConfig)
@@ -130,19 +129,19 @@ class FlycastGenerator(Generator):
         # Guns (WIP)
         # Guns crosshairs
         if system.isOptSet("flycast_lightgun1_crosshair"):
-            Config.set("config", "rend.CrossHairColor1", + str(system.config["flycast_lightgun1_crosshair"]))
+            Config.set("config", "rend.CrossHairColor1", str(system.config["flycast_lightgun1_crosshair"]))
         else:
             Config.set("config", "rend.CrossHairColor1", "0")
         if system.isOptSet("flycast_lightgun2_crosshair"):
-            Config.set("config", "rend.CrossHairColor2", + str(system.config["flycast_lightgun2_crosshair"]))
+            Config.set("config", "rend.CrossHairColor2", str(system.config["flycast_lightgun2_crosshair"]))
         else:
             Config.set("config", "rend.CrossHairColor2", "0")
         if system.isOptSet("flycast_lightgun3_crosshair"):
-            Config.set("config", "rend.CrossHairColor3", + str(system.config["flycast_lightgun3_crosshair"]))
+            Config.set("config", "rend.CrossHairColor3", str(system.config["flycast_lightgun3_crosshair"]))
         else:
             Config.set("config", "rend.CrossHairColor3", "0")
         if system.isOptSet("flycast_lightgun4_crosshair"):
-            Config.set("config", "rend.CrossHairColor4", + str(system.config["flycast_lightgun4_crosshair"]))
+            Config.set("config", "rend.CrossHairColor4", str(system.config["flycast_lightgun4_crosshair"]))
         else:
             Config.set("config", "rend.CrossHairColor4", "0")
 
@@ -189,7 +188,6 @@ class FlycastGenerator(Generator):
             env={
                 "XDG_CONFIG_DIRS":systemFiles.CONF,
                 "FLYCAST_DATADIR":flycastConfig.flycastSaves,
-                "FLYCAST_BIOS_PATH":flycastConfig.flycastBios,
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                "FLYCAST_BIOS_PATH":flycastConfig.flycastBios
             }
         )

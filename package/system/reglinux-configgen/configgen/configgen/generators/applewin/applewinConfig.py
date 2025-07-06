@@ -2,6 +2,5 @@
 
 import systemFiles
 
-CONFIGDIR  = systemFiles.CONF + '/applewin'
-CONFIGFILE = CONFIGDIR + '/config.txt'
+applewinConfig = systemFiles.HOME + '/applewin/applewin.conf'
 applewinBin = '/usr/bin/applewin'

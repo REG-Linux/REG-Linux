@@ -9,8 +9,6 @@ import shutil
 import utils.bezels as bezelsUtil
 import subprocess
 import csv
-import systemFiles
-import controllersConfig
 import utils.videoMode as videoMode
 from xml.dom import minidom
 from PIL import Image
