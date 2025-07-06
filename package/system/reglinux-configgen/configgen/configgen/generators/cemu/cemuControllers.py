@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 
-import systemFiles
 import os
 import xml.etree.cElementTree as ET
 from os import path
 
-profilesDir = path.join(systemFiles.CONF, 'cemu', 'controllerProfiles')
+from utils.logger import get_logger
+eslog = get_logger(__name__)
 
 # Create the controller configuration file
 # First controller will ALWAYS be a Gamepad
 # Additional controllers will either be a Pro Controller or Wiimote
-
-def generateControllerConfig(system, playersControllers):
+def generateControllerConfig(system, playersControllers, profilesDir):
 
     # -= Wii U controller types =-
     GAMEPAD = "Wii U GamePad"
@@ -141,7 +140,6 @@ def generateControllerConfig(system, playersControllers):
 
     def getConfigFileName(controller):
         return path.join(profilesDir, "controller{}.xml".format(controller))
-
 
     # Make controller directory if it doesn't exist
     if not path.isdir(profilesDir):
