@@ -1,0 +1,13 @@
+diff --git a/package/wayland/wayland.mk b/package/wayland/wayland.mk
+index bb5ceabb9c..7dd88bbef5 100644
+--- a/package/wayland/wayland.mk
++++ b/package/wayland/wayland.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-WAYLAND_VERSION = 1.23.1
++WAYLAND_VERSION = 1.24.0
+ WAYLAND_SITE = https://gitlab.freedesktop.org/wayland/wayland/-/releases/$(WAYLAND_VERSION)/downloads
+ WAYLAND_SOURCE = wayland-$(WAYLAND_VERSION).tar.xz
+ WAYLAND_LICENSE = MIT
