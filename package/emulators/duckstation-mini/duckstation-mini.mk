@@ -3,7 +3,7 @@
 # DuckStation Mini (AppImage) - Rolling release
 #
 ################################################################################
-DUCKSTATION_MINI_VERSION = v0.1-8891
+DUCKSTATION_MINI_VERSION = v0.1-9114
 ifeq ($(BR2_arm),y)
 DUCKSTATION_MINI_SOURCE = DuckStation-Mini-armhf.AppImage
 else ifeq ($(BR2_aarch64),y)
@@ -20,9 +20,7 @@ define DUCKSTATION_MINI_EXTRACT_CMDS
 endef
 
 define DUCKSTATION_MINI_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/duckstation-mini
-	$(INSTALL) -D $(@D)/$(DUCKSTATION_MINI_SOURCE) $(TARGET_DIR)/usr/duckstation-mini/DuckStation-Mini.AppImage
-	chmod +x $(TARGET_DIR)/usr/duckstation-mini/DuckStation-Mini.AppImage
+	$(INSTALL) -D -m 0755 $(@D)/$(DUCKSTATION_MINI_SOURCE) $(TARGET_DIR)/usr/duckstation/DuckStation.AppImage
 
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy

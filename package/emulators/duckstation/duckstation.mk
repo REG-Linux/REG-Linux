@@ -3,7 +3,7 @@
 # DuckStation Qt (AppImage) - Rolling release
 #
 ################################################################################
-DUCKSTATION_VERSION = v0.1-8891
+DUCKSTATION_VERSION = v0.1-9114
 ifeq ($(BR2_arm),y)
 DUCKSTATION_SOURCE = DuckStation-armhf.AppImage
 else ifeq ($(BR2_aarch64),y)
@@ -23,9 +23,7 @@ define DUCKSTATION_EXTRACT_CMDS
 endef
 
 define DUCKSTATION_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/duckstation-qt
-	cp -pr $(@D)/$(DUCKSTATION_SOURCE) $(TARGET_DIR)/usr/duckstation-qt/DuckStation.AppImage
-	chmod +x $(TARGET_DIR)/usr/duckstation-qt/DuckStation.AppImage
+	$(INSTALL) -D -m 0755 $(@D)/$(DUCKSTATION_SOURCE) $(TARGET_DIR)/usr/duckstation/DuckStation.AppImage
 
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
