@@ -3,8 +3,6 @@
 from generators.Generator import Generator
 import Command
 import os
-import systemFiles
-import controllersConfig
 from . import ppssppConfig
 from . import ppssppControllers
 
@@ -53,18 +51,13 @@ class PPSSPPGenerator(Generator):
                 commandArray.extend(["--njoy", str(pad.index)])
             nplayer = nplayer +1
 
-        # Controller config for SDL
-        commandEnv= {
-            "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-        }
-
         # Adjust SDL_VIDEODRIVER to run through wayland or kmsdrm
         if os.getenv("XDG_SESSION_TYPE")=="wayland":
             commandEnv["SDL_VIDEODRIVER"] = "wayland"
         else:
             commandEnv["SDL_VIDEODRIVER"] = "kmsdrm"
 
-        return Command.Command(array=commandArray, env=commandEnv)
+        return Command.Command(array=commandArray)
 
     @staticmethod
     def isLowResolution(gameResolution):

@@ -8,7 +8,6 @@ import json
 import shutil
 import evdev
 import systemFiles
-import controllersConfig
 from os import environ
 from evdev import InputDevice
 
@@ -209,9 +208,7 @@ class RyujinxGenerator(Generator):
         else:
             commandArray = [ryujinxExec, rom]
 
-        return Command.Command(
-            array=commandArray,
-            env={"SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)})
+        return Command.Command(array=commandArray)
 
 def writeControllerIntoJson(new_controller, filename=ryujinxConfFile):
     with open(filename,'r+') as file:

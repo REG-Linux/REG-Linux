@@ -115,12 +115,7 @@ class Dhewm3Generator(Generator):
                 "+set", "fs_game", str(directory)
             ])
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16 / 9

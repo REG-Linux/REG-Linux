@@ -6,7 +6,6 @@ import shutil
 import filecmp
 import os
 import settings
-import controllersConfig
 from os import environ
 from shutil import copyfile
 
@@ -100,8 +99,7 @@ class DrasticGenerator(Generator):
             array=commandArray,
             env={
                 'DISPLAY': '0.0',
-                'LIB_FB': '3',
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                'LIB_FB': '3'
             })
 
 # Language auto-setting

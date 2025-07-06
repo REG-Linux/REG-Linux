@@ -1,0 +1,89 @@
+#!/bin/bash
+
+set -e
+
+# File paths
+EVMAPY_PIDFILE="/var/run/evmapy/evmapy.pid"
+READY_FILE="/var/run/evmapy/ready"
+LOGFILE="/var/log/evmapy.log"
+
+# Start evmapy background process
+start_evmapy() {
+    echo "==> Starting evmapy..."
+
+    # Kill any previous instance
+    pkill -f /usr/bin/evmapy 2>/dev/null || true
+
+    # Prepare run directory and ready file
+    mkdir -p "$(dirname "$READY_FILE")"
+    touch "$READY_FILE"
+
+    # Ensure inotifywait is installed
+    if ! command -v inotifywait &>/dev/null; then
+        echo "Error: inotifywait not found. Please install inotify-tools." >&2
+        exit 1
+    fi
+
+    # Wait (in background) for evmapy to open the ready file
+    inotifywait "$READY_FILE" -t 5 -q &
+    WATCH_PID=$!
+
+    # Start evmapy and log output
+    nohup /usr/bin/python /usr/bin/evmapy >> "$LOGFILE" 2>&1 &
+    echo $! > "$EVMAPY_PIDFILE"
+
+    # Wait for readiness or timeout
+    wait "$WATCH_PID" || echo "Warning: timeout waiting for evmapy readiness."
+
+    echo "evmapy started with PID $(cat "$EVMAPY_PIDFILE")"
+}
+
+# Stop evmapy process
+stop_evmapy() {
+    echo "==> Stopping evmapy..."
+    pkill -f /usr/bin/evmapy 2>/dev/null && echo "evmapy stopped." || echo "evmapy was not running."
+    rm -f "$EVMAPY_PIDFILE" "$READY_FILE"
+}
+
+# Show evmapy status
+status_evmapy() {
+    if pgrep -f /usr/bin/evmapy > /dev/null; then
+        echo "evmapy is running with PID(s):"
+        pgrep -a -f /usr/bin/evmapy
+    else
+        echo "evmapy is not running."
+    fi
+}
+
+# Clear runtime directory
+clear_evmapy() {
+    echo "==> Clearing /var/run/evmapy..."
+    rm -rf /var/run/evmapy || exit 1
+    mkdir /var/run/evmapy || exit 1
+    echo "Cleaned and recreated /var/run/evmapy"
+    exit 0
+}
+
+# Handle command argument
+case "$1" in
+    start)
+        start_evmapy
+        ;;
+    stop)
+        stop_evmapy
+        ;;
+    restart)
+        stop_evmapy
+        start_evmapy
+        ;;
+    status)
+        status_evmapy
+        ;;
+    clear)
+        clear_evmapy
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status|clear}"
+        exit 1
+        ;;
+esac

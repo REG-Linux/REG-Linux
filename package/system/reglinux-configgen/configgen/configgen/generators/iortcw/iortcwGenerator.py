@@ -2,7 +2,6 @@
 
 from generators.Generator import Generator
 import os
-import controllersConfig
 from Command import Command
 
 class IORTCWGenerator(Generator):
@@ -112,13 +111,7 @@ class IORTCWGenerator(Generator):
         # Single Player for now
         commandArray = ["/usr/bin/iortcw/iowolfsp"]
 
-        # iortcw looks for roms in home + /iortcw
-        return Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16/9

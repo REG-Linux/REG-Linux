@@ -5,7 +5,6 @@ import os
 import Command
 import os.path
 import zipfile
-import controllersConfig
 from os import path
 from os.path import dirname
 from settings.unixSettings import UnixSettings
@@ -170,8 +169,7 @@ class AmiberryGenerator(Generator):
             commandArray.append("sound_frequency=48000")
 
             os.chdir(amiberryConfig.amiberryShare)
-            return Command.Command(array=commandArray,env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)})
+            return Command.Command(array=commandArray)
         # otherwise, unknown format
         return Command.Command(array=[])
 

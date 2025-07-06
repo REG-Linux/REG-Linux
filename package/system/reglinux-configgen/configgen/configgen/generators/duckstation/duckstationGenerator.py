@@ -520,12 +520,7 @@ class DuckstationGenerator(Generator):
         dbfile = "/usr/share/duckstation/resources/gamecontrollerdb.txt"
         controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
 
-        return Command.Command(
-            array=commandArray,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generateSdlGameControllerConfig(playersControllers)
-            }
-        )
+        return Command.Command(array=commandArray)
 
 def getLangFromEnvironment():
     lang = environ['LANG'][:5]
