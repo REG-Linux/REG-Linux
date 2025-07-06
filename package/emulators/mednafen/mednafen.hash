@@ -1,2 +1,4 @@
 # From official website
 sha256  de7eb94ab66212ae7758376524368a8ab208234b33796625ca630547dbc83832  mednafen-1.32.1.tar.xz
+# From WIP REG repo
+sha256  efd69a2816889ca797ca3377a6d7ece5f9875e16d7e266a995d2d54f1b82da0d  mednafen-main-git4.tar.gz
