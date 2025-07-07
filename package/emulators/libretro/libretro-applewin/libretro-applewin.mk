@@ -3,7 +3,7 @@
 # libretro-applewin
 #
 ################################################################################
-# Version: Commits on May 31, 2025
+# Version: Commits on Jun 29, 2025
 LIBRETRO_APPLEWIN_VERSION = $(APPLEWIN_VERSION)
 LIBRETRO_APPLEWIN_SITE = https://github.com/audetto/AppleWin
 LIBRETRO_APPLEWIN_SITE_METHOD=git
