@@ -24,7 +24,7 @@ define DUCKSTATION_MINI_INSTALL_TARGET_CMDS
 
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/duckstation-mini/psx.duckstation-mini.keys \
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/duckstation-mini/psx.duckstation.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
