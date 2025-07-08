@@ -1,0 +1,10 @@
+--- a/Source/Core/Core/HW/DVD/AMMediaboard.cpp	2025-07-08 14:30:18.000000000 +0200
++++ b/Source/Core/Core/HW/DVD/AMMediaboard.cpp	2025-07-08 15:07:50.122146815 +0200
+@@ -60,6 +60,7 @@
+ 
+ #define WSAEWOULDBLOCK 10035L
+ #define SOCKET_ERROR (-1)
++#define INVALID_SOCKET (-1)
+ 
+ typedef int SOCKET;
+ 
