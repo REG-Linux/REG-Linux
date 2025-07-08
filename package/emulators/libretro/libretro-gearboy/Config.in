@@ -1,0 +1,14 @@
+config BR2_PACKAGE_LIBRETRO_GEARBOY
+    bool "libretro-gearboy"
+	depends on BR2_INSTALL_LIBSTDCPP
+
+      help
+        Gearboy is a cross-platform 
+        Game Boy / Game Boy Color emulator 
+        written in C++ that runs on Windows, 
+        macOS, Linux, BSD and RetroArch.
+
+	  https://github.com/drhelius/Gearboy
+
+comment "LIBRETRO_GEARBOY needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
