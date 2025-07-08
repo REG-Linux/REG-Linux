@@ -10,7 +10,6 @@ import subprocess
 import toml
 import glob
 import re
-import controllersConfig
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -265,7 +264,6 @@ class XeniaGenerator(Generator):
                 commandArray = ['xenia.exe', 'z:' + rom]
 
         environment={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers),
                 'VKD3D_SHADER_CACHE_PATH': xeniaCache
             }
 
