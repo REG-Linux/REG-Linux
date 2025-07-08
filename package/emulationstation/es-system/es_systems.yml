@@ -327,6 +327,7 @@ gbc:
       vba-m: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
       mesen-s: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
       sameboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SAMEBOY] }
+      gearboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARBOY] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:gbc
   comment_fr: |
@@ -347,6 +348,7 @@ gb:
       vba-m: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
       mesen-s: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
       sameboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SAMEBOY] }
+      gearboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARBOY] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:gb
   comment_fr: |
