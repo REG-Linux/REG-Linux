@@ -4,7 +4,6 @@ from generators.Generator import Generator
 import Command
 import os
 import subprocess
-import controllersConfig
 
 class WineGenerator(Generator):
     # this emulator/core requires a X server to run
