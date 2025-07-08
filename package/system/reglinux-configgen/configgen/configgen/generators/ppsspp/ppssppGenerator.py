@@ -52,12 +52,13 @@ class PPSSPPGenerator(Generator):
             nplayer = nplayer +1
 
         # Adjust SDL_VIDEODRIVER to run through wayland or kmsdrm
+        commandEnv= {}
         if os.getenv("XDG_SESSION_TYPE")=="wayland":
             commandEnv["SDL_VIDEODRIVER"] = "wayland"
         else:
             commandEnv["SDL_VIDEODRIVER"] = "kmsdrm"
 
-        return Command.Command(array=commandArray)
+        return Command.Command(array=commandArray, env=commandEnv)
 
     @staticmethod
     def isLowResolution(gameResolution):
