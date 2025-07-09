@@ -6,6 +6,7 @@ import filecmp
 import shutil
 import os
 import ffmpeg
+import controllersConfig
 from . import hypseusSingeConfig
 
 from utils.logger import get_logger

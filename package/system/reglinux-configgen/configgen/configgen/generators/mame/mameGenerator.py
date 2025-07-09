@@ -10,6 +10,7 @@ import utils.bezels as bezelsUtil
 import subprocess
 import csv
 import utils.videoMode as videoMode
+import controllersConfig
 from xml.dom import minidom
 from PIL import Image
 from . import mameControllers
