@@ -532,12 +532,16 @@ class MameGenerator(Generator):
         if system.isOptSet('forceNoBezel') and system.getOptBoolean('forceNoBezel'):
             bezelSet = None
         try:
+            gunsBordersSize = None
+            if controllersConfig is not None:
+                gunsBordersSize = controllersConfig.gunsBordersSizeName(guns, system.config)
+
             if messMode != -1:
-                MameGenerator.writeBezelConfig(bezelSet, system, rom, messSysName[messMode], gameResolution, controllersConfig.gunsBordersSizeName(guns, system.config))
+                MameGenerator.writeBezelConfig(bezelSet, system, rom, messSysName[messMode], gameResolution, gunsBordersSize)
             else:
-                MameGenerator.writeBezelConfig(bezelSet, system, rom, "", gameResolution, controllersConfig.gunsBordersSizeName(guns, system.config))
+                MameGenerator.writeBezelConfig(bezelSet, system, rom, "", gameResolution, gunsBordersSize)
         except:
-            MameGenerator.writeBezelConfig(None, system, rom, "", gameResolution, controllersConfig.gunsBordersSizeName(guns, system.config))
+            MameGenerator.writeBezelConfig(None, system, rom, "", gameResolution, gunsBordersSize)
 
         buttonLayout = getMameControlScheme(system, romBasename)
 
