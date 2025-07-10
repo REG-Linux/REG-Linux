@@ -4,6 +4,7 @@ config BR2_PACKAGE_86BOX
     select BR2_PACKAGE_LIBSNDFILE
     select BR2_PACKAGE_SLIRP
     select BR2_PACKAGE_OPENAL
+    select BR2_PACKAGE_SDL2
   
     help
       86Box
