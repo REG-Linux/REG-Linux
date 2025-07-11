@@ -35,7 +35,6 @@ class XeniaGenerator(Generator):
         xeniaCache = '/userdata/system/cache/xenia'
         xeniaSaves = '/userdata/saves/xbox360'
         emupath = '/userdata/system/configs/xenia'
-        canarypath = '/userdata/system/configs/xenia-canary'
 
         core = system.config['core']
 
@@ -91,7 +90,7 @@ class XeniaGenerator(Generator):
         # adjust the config toml file accordingly
         config = {}
         if core == 'xenia-canary':
-            toml_file = canarypath + '/xenia-canary.config.toml'
+            toml_file = emupath + '/xenia-canary.config.toml'
         else:
             toml_file = emupath + '/xenia.config.toml'
         if os.path.isfile(toml_file):
@@ -233,7 +232,7 @@ class XeniaGenerator(Generator):
         rom_name = re.sub(r'\(.*?\)', '', rom_name)
         if system.isOptSet('xeniaPatches') and system.config['xeniaPatches'] == 'True':
             # pattern to search for matching .patch.toml files
-            pattern = os.path.join(canarypath, 'patches', '*' + rom_name + '*.patch.toml')
+            pattern = os.path.join(emupath, 'patches', '*' + rom_name + '*.patch.toml')
             matching_files = [file_path for file_path in glob.glob(pattern) if re.search(rom_name, os.path.basename(file_path), re.IGNORECASE)]
             if matching_files:
                 for file_path in matching_files:
