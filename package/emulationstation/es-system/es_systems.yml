@@ -2369,7 +2369,7 @@ singe:
   manufacturer: Arcade
   release: 1990
   hardware: arcade
-  extensions: [daphne, zar]
+  extensions: [hypseus, zar]
   platform: alg, daphne, arcade
   emulators:
     hypseus-singe:
