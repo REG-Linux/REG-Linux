@@ -26,10 +26,11 @@ import utils.gunsUtils as gunsUtils
 import utils.wheelsUtils as wheelsUtils
 import utils.windowsManager as windowsManager
 import utils.bezels as bezelsUtil
-import controllersConfig as controllers
+import controllers as controllers
 import utils.zar as zar
 from sys import exit
 from Emulator import Emulator
+from controllers.evmapy import Evmapy
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -234,7 +235,6 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
 
         # run the emulator
         try:
-            from Evmapy import Evmapy
             Evmapy.start(systemName, system.config['emulator'], effectiveCore, effectiveRomConfiguration, playersControllers, guns)
             # change directory if wanted
             executionDirectory = generator.executionDirectory(system.config, effectiveRom)

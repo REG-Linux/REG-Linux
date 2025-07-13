@@ -4,7 +4,7 @@ import subprocess
 import json
 import os
 import evdev
-import controllersConfig as controllers
+import controllers as controllers
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
