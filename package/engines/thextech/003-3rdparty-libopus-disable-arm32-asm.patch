@@ -1,0 +1,15 @@
+--- a/3rdparty/AudioCodecs/libopus/CMakeLists.txt	2025-07-12 22:42:08.000000000 +0200
++++ b/3rdparty/AudioCodecs/libopus/CMakeLists.txt	2025-07-14 10:40:54.353213833 +0200
+@@ -498,9 +498,9 @@
+             message("-- Has AARCH_NEON_INTR: NO")
+         endif()
+ 
+-        if(FLOAT_POINT)
+-            set(OPUS_ARM_ASM 1)
+-        endif()
++        #if(FLOAT_POINT)
++        #    set(OPUS_ARM_ASM 1)
++        #endif()
+ 
+         configure_file(celt/arm/armopts.s.in "${CMAKE_CURRENT_BINARY_DIR}/config/celt/arm/armopts.s")
+         if(OPUS_ARM_GNU_ASM)
