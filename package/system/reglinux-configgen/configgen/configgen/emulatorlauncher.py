@@ -30,7 +30,6 @@ import controllers as controllers
 import utils.zar as zar
 from sys import exit
 from Emulator import Emulator
-from controllers.evmapy import Evmapy
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -235,7 +234,6 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
 
         # run the emulator
         try:
-            Evmapy.start(systemName, system.config['emulator'], effectiveCore, effectiveRomConfiguration, playersControllers, guns)
             # change directory if wanted
             executionDirectory = generator.executionDirectory(system.config, effectiveRom)
             if executionDirectory is not None:
@@ -261,7 +259,7 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
             if profiler:
                 profiler.enable()
         finally:
-            Evmapy.stop()
+            pass
 
         # kill the running compositor if needed
         if generator.requiresWayland() or generator.requiresX11():
