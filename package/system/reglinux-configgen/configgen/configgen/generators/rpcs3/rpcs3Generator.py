@@ -8,7 +8,7 @@ import configparser
 import ruamel.yaml as yaml
 import re
 import subprocess
-import controllersConfig
+import controllers as controllersConfig
 import systemFiles
 from os import path
 from . import rpcs3Controllers

@@ -5,7 +5,7 @@ import Command
 import os.path
 import configparser
 import subprocess
-import controllersConfig
+import controllers as controllersConfig
 from os import environ
 from . import dolphinControllers
 from . import dolphinConfig

@@ -8,7 +8,7 @@ import shutil
 import stat
 import configparser
 import filecmp
-import controllersConfig
+import controllers as controllersConfig
 from pathlib import PureWindowsPath
 
 from utils.logger import get_logger

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import controllersConfig
+import controllers as controllersConfig
 import evdev
 import subprocess
 import os
