@@ -7,7 +7,7 @@ import io
 import re
 import shutil
 import configparser
-import controllersConfig
+import controllers as controllersConfig
 from shutil import copyfile
 from . import supermodelConfig
 
