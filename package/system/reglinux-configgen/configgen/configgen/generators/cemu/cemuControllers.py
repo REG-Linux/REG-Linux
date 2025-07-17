@@ -197,7 +197,7 @@ def generateControllerConfig(system, playersControllers, profilesDir):
         controllerNode = ET.SubElement(root, 'controller')
         addTextElement(controllerNode, 'api', API_SDL)
         addTextElement(controllerNode, 'uuid', "{}_{}".format(guid_n[pad.index], pad.guid)) # controller guid
-        addTextElement(controllerNode, 'display_name', pad.realName) # controller name
+        addTextElement(controllerNode, 'display_name', pad.name) # controller name
         addTextElement(controllerNode, 'rumble', getOption('cemu_rumble', '0')) # % chosen
         addAnalogControl(controllerNode, 'axis')
         addAnalogControl(controllerNode, 'rotation')
