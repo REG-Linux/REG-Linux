@@ -21,7 +21,10 @@ def getGamesMetaData(system, rom):
         targetSystem = 'arcade'
 
     for nodesystem in root.findall(".//system"):
-        for sysname in nodesystem.get("name").split(','):
+        system_names = nodesystem.get("name")
+        if system_names is None:
+            continue
+        for sysname in system_names.split(','):
           if sysname == targetSystem:
               # search the game named default
               for nodegame in nodesystem.findall(".//game"):
@@ -33,7 +36,8 @@ def getGamesMetaData(system, rom):
                               eslog.info("found game metadata {}={} (system level)".format(key, res[key]))
                       break
               for nodegame in nodesystem.findall(".//game"):
-                  if nodegame.get("name") != "default" and nodegame.get("name") in game:
+                  game_name = nodegame.get("name")
+                  if game_name is not None and game_name != "default" and game_name in game:
                       for child in nodegame:
                           for attribute in child.attrib:
                               key = "{}_{}".format(child.tag, attribute)
