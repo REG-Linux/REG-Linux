@@ -1,6 +1,6 @@
 import pyudev
 import re
-import evdev
+from evdev.device import InputDevice
 from .mouse import getMouseButtons
 
 from utils.logger import get_logger
@@ -31,7 +31,7 @@ def getGuns():
             nmouse = nmouse + 1
             continue
 
-        device = evdev.InputDevice(mouses[eventid].device_node)
+        device = InputDevice(mouses[eventid].device_node)
         buttons = getMouseButtons(device)
 
         # retroarch uses mouse indexes into configuration files using ID_INPUT_MOUSE (TOUCHPAD are listed after mouses)
