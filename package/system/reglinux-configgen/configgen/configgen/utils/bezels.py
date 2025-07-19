@@ -122,7 +122,7 @@ def resizeImage(input_png, output_png, screen_width, screen_height, bezel_stretc
     if imgin.mode != "RGBA":
         alphaPaste(input_png, output_png, imgin, fillcolor, (screen_width, screen_height), bezel_stretch)
     else:
-        imgout = imgin.resize((screen_width, screen_height), Image.BICUBIC)
+        imgout = imgin.resize((screen_width, screen_height), Image.Resampling.BICUBIC)
         imgout.save(output_png, mode="RGBA", format="PNG")
 
 def padImage(input_png, output_png, screen_width, screen_height, bezel_width, bezel_height, bezel_stretch=False):
@@ -139,6 +139,8 @@ def padImage(input_png, output_png, screen_width, screen_height, bezel_width, be
         imgout.save(output_png, mode="RGBA", format="PNG")
 
 def tatooImage(input_png, output_png, system):
+  tattoo_file = None
+  tattoo = None
   if system.config['bezel.tattoo'] == 'system':
       try:
           tattoo_file = '/usr/share/reglinux/controller-overlays/'+system.name+'.png'
@@ -163,7 +165,11 @@ def tatooImage(input_png, output_png, system):
   back = Image.open(input_png)
   # Convert it otherwise it implodes later on...
   back = back.convert("RGBA")
-  tattoo = tattoo.convert("RGBA")
+  if tattoo is not None:
+      tattoo = tattoo.convert("RGBA")
+  else:
+      eslog.error("Tattoo image could not be loaded, skipping tattoo overlay.")
+      return
   # Quickly grab the sizes.
   w,h = fast_image_size(input_png)
   tw,th = fast_image_size(tattoo_file)
@@ -175,13 +181,13 @@ def tatooImage(input_png, output_png, system):
           pcent = float(w / tw)
           th = int(float(th) * pcent)
           # Resize the tattoo to the calculated size.
-          tattoo = tattoo.resize((w,th), Image.BICUBIC)
+          tattoo = tattoo.resize((w,th), Image.Resampling.BICUBIC)
   else:
       # Resize to be slightly smaller than the bezel's column.
       twtemp = int((225/1920) * w)
       pcent = float(twtemp / tw)
       th = int(float(th) * pcent)
-      tattoo = tattoo.resize((twtemp,th), Image.BICUBIC)
+      tattoo = tattoo.resize((twtemp,th), Image.Resampling.BICUBIC)
       tw = twtemp
   # Create a new blank canvas that is the same size as the bezel for later compositing (they are required to be the same size).
   tattooCanvas = Image.new("RGBA", back.size)
@@ -246,18 +252,18 @@ def gunBordersSize(bordersSize):
 
 def gunBorderImage(input_png, output_png, innerBorderSizePer = 2, outerBorderSizePer = 3, innerBorderColor = "#ffffff", outerBorderColor = "#000000"):
     # good default border that works in most circumstances is:
-    # 
+    #
     # 2% of the screen width in white.  Surrounded by 3% screen width of
     # black.  I have attached an example.  The black helps the lightgun detect
     # the border against a bright background behind the tv.
-    # 
+    #
     # The ideal solution is to draw the games inside the border rather than
     # overlap.  Then you can see the whole game.  The lightgun thinks that the
     # outer edge of the border is the edge of the game screen.  So you have to
     # make some adjustments in the lightgun settings to keep it aligned.  This
     # is why normally the border overlaps as it means that people do not need
     # to calculate an adjustment and is therefore easier.
-    # 
+    #
     # If all the games are drawn with the border this way then the settings
     # are static and the adjustment only needs to be calculated once.
 
@@ -278,7 +284,7 @@ def gunBorderImage(input_png, output_png, innerBorderSizePer = 2, outerBorderSiz
                     [(w-outerBorderSize-innerBorderSize, outerBorderSize), (w-outerBorderSize, h-outerBorderSize)],
                     [(outerBorderSize, h-outerBorderSize-innerBorderSize), (w-outerBorderSize, h-outerBorderSize)],
                     [(outerBorderSize, outerBorderSize), (outerBorderSize+innerBorderSize, h-outerBorderSize)] ]
-    
+
     back = Image.open(input_png)
     imgnew = Image.new("RGBA", (w,h), (0,0,0,255))
     imgnew.paste(back, (0,0,w,h))
