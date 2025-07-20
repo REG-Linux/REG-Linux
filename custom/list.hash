@@ -16,6 +16,7 @@
 --------------------------------  package/llvm-project/libclc/0001-support-out-of-tree-build.patch
 --------------------------------  package/mesa3d/0001-meson-Set-proper-value-for-LIBCLC_INCLUDEDIR.patch
 --------------------------------  package/mesa3d/0002-vc4-add-meson-option-to-disable-optional-neon-suppor.patch
+07d0c3f9c27f0c9565e1d1472b138bba  Makefile
 d5729e1c36bf284009e995bd4dc86d73  arch/Config.in.arm
 784af3d000ee29d1e0a12730b92c6f5c  boot/syslinux/syslinux.mk
 13c7f1897975ae6d698aa3eda525d125  fs/cpio/dracut.conf
