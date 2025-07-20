@@ -13,7 +13,9 @@ REGLINUX_SYSTEM_SOURCE=
 ### Beta release MUST BE marked as "prerelease" ( tag is version = YY.MM-beta-[1-9] )
 ### Stable release must be marked as "latest" ( tag is version = YY.MM.[0-9] )
 
-REGLINUX_SYSTEM_VERSION = 25.07-dev
+REGLINUX_SYSTEM_ID_VERSION = 25.07
+REGLINUX_SYSTEM_RELEASE_TYPE=dev
+REGLINUX_SYSTEM_VERSION = $(REGLINUX_SYSTEM_ID_VERSION)-$(REGLINUX_SYSTEM_RELEASE_TYPE)
 REGLINUX_SYSTEM_DATE_TIME = $(shell date "+%Y/%m/%d %H:%M")
 REGLINUX_SYSTEM_DATE = $(shell date "+%Y/%m/%d")
 REGLINUX_SYSTEM_DEPENDENCIES = tzdata
@@ -89,10 +91,10 @@ else
 endif
 
 ifneq (,$(findstring dev,$(REGLINUX_SYSTEM_VERSION)))
-    REGLINUX_SYSTEM_COMMIT = \
-	    "-$(shell cd $(BR2_EXTERNAL_REGLINUX_PATH) && git rev-parse --short HEAD)"
+    REGLINUX_SYSTEM_BUILD_ID = \
+	    "$(shell cd $(BR2_EXTERNAL_REGLINUX_PATH) && git rev-parse --short HEAD)"
 else
-    REGLINUX_SYSTEM_COMMIT =
+    REGLINUX_SYSTEM_BUILD_ID =
 endif
 
 define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
@@ -100,7 +102,7 @@ define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 	# version/arch
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux
 	echo -n "$(REGLINUX_SYSTEM_ARCH)" > $(TARGET_DIR)/usr/share/reglinux/system.arch
-	echo $(REGLINUX_SYSTEM_VERSION)$(REGLINUX_SYSTEM_COMMIT) \
+	echo $(REGLINUX_SYSTEM_VERSION)-$(REGLINUX_SYSTEM_BUILD_ID) \
 	    $(REGLINUX_SYSTEM_DATE_TIME) > \
 		$(TARGET_DIR)/usr/share/reglinux/system.version
 
