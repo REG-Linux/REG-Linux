@@ -40,6 +40,7 @@ import utils.wheelsUtils as wheelsUtils
 import utils.windowsManager as windowsManager
 import utils.bezels as bezelsUtil
 import controllers as controllers
+import utils.zar as zar
 from sys import exit
 from Emulator import Emulator
 
@@ -51,16 +52,45 @@ proc = None
 
 def main(args, maxnbplayers):
     """
-    Main entry point of the script. It calls the function to start the ROM.
+    Entry point to start a ROM, with optional mounting of .zar archive files.
+
+    If the input ROM file is a .zar archive, this function mounts it using zar.zar_begin(),
+    retrieves the actual ROM path (in case of a single-file archive), and launches the ROM.
+    After execution, it ensures the archive is properly unmounted with zar.zar_end().
 
     Args:
-        args (Namespace): Parsed command-line arguments.
-        maxnbplayers (int): Maximum number of players supported.
+        args (Namespace): Argument object containing at least `rom` (ROM file path).
+        maxnbplayers (int): Maximum number of players supported for this game.
 
     Returns:
-        int: The exit code of the emulator process.
+        int: Exit code from the ROM launcher.
     """
-    return start_rom(args, maxnbplayers, args.rom, args.rom)
+    # Get the file extension in lowercase
+    extension = os.path.splitext(args.rom)[1][1:].lower()
+
+    # Check if it is a .zar archive
+    if extension == "zar":
+        exitCode = 0
+        need_end = False
+        rommountpoint = None
+
+        try:
+            # Mount the archive and get the actual ROM path
+            need_end, rommountpoint, rom = zar.zar_begin(args.rom)
+
+            # Launch the game using the mounted ROM
+            exitCode = start_rom(args, maxnbplayers, rom, args.rom)
+
+        finally:
+            # Unmount the archive after the game ends
+            if need_end and rommountpoint is not None:
+                zar.zar_end(rommountpoint)
+
+        return exitCode
+
+    else:
+        # If it's not a .zar file, launch the ROM directly
+        return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 def start_rom(args, maxnbplayers, rom, romConfiguration):
     """
