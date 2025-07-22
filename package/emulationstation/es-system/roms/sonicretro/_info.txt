@@ -19,7 +19,7 @@ The rsdk and videos folder should be in a folder named [Game Name].scd - ie "Son
 Options and Emulators
 ---------------------
 
-Batocera will auto-select the port to use based on the folder's extension - sonic2013/rsdk4 for .son folders, soniccd/rsdk3 for
+System will auto-select the port to use based on the folder's extension - sonic2013/rsdk4 for .son folders, soniccd/rsdk3 for
 .scd folders. Selecting the wrong emulator will be ignored as the two versions are not compatible. The options are slightly
 different between the two, so you may need to manually select the emulator to change them.
 

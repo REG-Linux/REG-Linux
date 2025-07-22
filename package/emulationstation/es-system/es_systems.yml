@@ -959,9 +959,6 @@ mame:
   platform: arcade
   emulators:
     libretro:
-      imame4all: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_IMAME] }
-      mame078plus: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME2003_PLUS] }
-      mame0139: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME2010] }
       mame:
         {
           requireAnyOf:
@@ -971,11 +968,53 @@ mame:
       mame: { requireAnyOf: [BR2_PACKAGE_MAME, BR2_PACKAGE_HAS_MAME] }
 
   comment_en: |
+    The system uses libretro mame (latest, 0.276+) as default core
+    For more info: https://wiki.batocera.org/arcade
+  comment_fr: |
+    Le système utilise le core libretro mame (le dernier, 0.276+) par défaut
+    Vous pouvez trouver la doc arcade là : https://wiki.batocera.org/arcade
+  comment_br: |
+    O sistema usa o libretro mame (0.276+)
+    Para mais informações: https://wiki.batocera.org/arcade
+
+imame4all:
+  name: Mame (0.37b5)
+  manufacturer: Arcade
+  release: 1997
+  hardware: arcade
+  extensions: [zip, 7z]
+  platform: arcade
+  emulators:
+    libretro:
+      imame4all: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_IMAME] }
+
+  comment_en: |
+    The system uses libretro imame4all (0.37b5) as default core: compatible ROMs must come from set 0.78+
+
+    For more info: https://wiki.batocera.org/arcade
+  comment_fr: |
+    Le système utilise le core libretro imame4all (0.37b5) par défaut: Les ROMs compatibles doivent provenir du set 0.78+
+
+    Vous pouvez trouver la doc arcade là : https://wiki.batocera.org/arcade
+  comment_br: |
+    O sistema usa o libretro imame4all (0.37b5) como núcleo padrão: ROMs compatíveis devem vir da versão de romset 0.78+
+
+    Para mais informações: https://wiki.batocera.org/arcade
+
+mame2003:
+  name: Mame (2003 Plus)
+  manufacturer: Arcade
+  release: 1997
+  hardware: arcade
+  extensions: [zip, 7z]
+  platform: arcade
+  emulators:
+    libretro:
+      imame4all: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_IMAME] }
+      mame078plus: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MAME2003_PLUS] }
+
+  comment_en: |
     The system uses libretro mame2003+ as default core: compatible ROMs must come from set 0.78+
-    Depending on your hardware, other mame cores are included:
-      - latest mame core (0.228 currently)
-      - imame4all based on 0.37b5 romset
-      - mame2010 based on 0.139 romset
 
     Special files for mame2003 core:
     - Add your samples files in /userdata/bios/mame2003/samples/
@@ -983,10 +1022,6 @@ mame:
     For more info: https://wiki.batocera.org/arcade
   comment_fr: |
     Le système utilise le core libretro mame2003+ par défaut: Les ROMs compatibles doivent provenir du set 0.78+
-    D'autres cores mame sont également inclus:
-          - le dernier core mame  (0.228 à l'heure actuelle)
-          - imame4all utilisant le romset 0.37b5
-          - mame2010 utilisant le romset 0.139
 
     Fichiers spéciaux pour le core mame2003+ :
     - Ajoutez vos fichiers samples dans le répertoire /userdata/bios/mame2003/samples/
@@ -994,10 +1029,6 @@ mame:
     Vous pouvez trouver la doc arcade là : https://wiki.batocera.org/arcade
   comment_br: |
     O sistema usa o libretro mame2003+ como núcleo padrão: ROMs compatíveis devem vir da versão de romset 0.78+
-    Dependendo do seu hardawre, outros núcleos mame estão incluídos:
-      - núcleo mame mais recente (0,228 atualmente)
-      - imame4all baseado no romset 0.37b5
-      - mame2010 baseado em romset 0.139
 
     Arquivos especiais para o núcleo mame2003:
     - Adicione seus arquivos de samples em /userdata/bios/mame2003/samples/

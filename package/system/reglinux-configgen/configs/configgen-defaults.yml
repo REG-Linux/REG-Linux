@@ -274,6 +274,9 @@ hurrican:
 ikemen:
   emulator: ikemen
   core:     ikemen
+imame4all:
+  emulator: libretro
+  core:     imame4all
 intellivision:
   emulator: libretro
   core:     freeintv
@@ -307,6 +310,9 @@ macintosh:
   emulator: libretro
   core:     minivmac
 mame:
+  emulator: libretro
+  core:     mame
+mame2003:
   emulator: libretro
   core:     mame078plus
 mastersystem:

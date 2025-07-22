@@ -29,9 +29,6 @@ gba:
 nds:
   emulator: drastic
   core:     drastic
-mame:
-  emulator: libretro
-  core:     imame4all
 gamegear:
   emulator: libretro
   core:     picodrive

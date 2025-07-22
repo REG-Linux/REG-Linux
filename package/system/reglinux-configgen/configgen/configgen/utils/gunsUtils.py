@@ -38,9 +38,9 @@ def precalibration(systemName, emulator, core, rom):
             target_dir = "mame"
         elif emulator == "libretro":
             if core == "mame078plus":
-                target_dir = "mame/mame2003-plus"
+                target_dir = "lr-mame2003-plus"
             elif core == "mame":
-                target_dir = "mame/mame"
+                target_dir = "lr-mame"
 
         if target_dir is not None:
             baserom_noext = os.path.splitext(baserom)[0]
