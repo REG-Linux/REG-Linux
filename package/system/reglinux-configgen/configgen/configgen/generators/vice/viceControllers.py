@@ -57,7 +57,7 @@ def generateControllerConfig(system, viceConfigFile, playersControllers):
     nplayer = 1
     for playercontroller, pad in sorted(playersControllers.items()):
         listVice.append("")
-        listVice.append("# " + pad.realName)
+        listVice.append("# " + pad.name)
         for x in pad.inputs:
             input = pad.inputs[x]
             for indexName, indexValue in viceJoystick.items():

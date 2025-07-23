@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import controllersConfig
+import controllers as controllersConfig
 import evdev
 import subprocess
 import os
@@ -99,7 +99,7 @@ def reconfigureControllers(playersControllers, system, rom, metadata, deviceList
 
     eslog.info("before wheel reconfiguration :")
     for playercontroller, pad in sorted(playersControllers.items()):
-        eslog.info("  " + playercontroller + ". index:" + str(pad.index) + " dev:" + pad.dev + " name:" + pad.realName)
+        eslog.info("  " + playercontroller + ". index:" + str(pad.index) + " dev:" + pad.dev + " name:" + pad.name)
 
     # reconfigure wheel buttons
     # no need to sort, but i like keeping the same loop (sorted by players)
@@ -107,7 +107,7 @@ def reconfigureControllers(playersControllers, system, rom, metadata, deviceList
     for playercontroller, pad in sorted(playersControllers.items()):
         if pad.dev in deviceList:
             if deviceList[pad.dev]["isWheel"]:
-                eslog.info("Wheel reconfiguration for pad {}".format(pad.realName))
+                eslog.info("Wheel reconfiguration for pad {}".format(pad.name))
                 originalInputs = pad.inputs.copy()
 
                 # erase target keys
@@ -223,7 +223,7 @@ def reconfigureControllers(playersControllers, system, rom, metadata, deviceList
 
     eslog.info("after wheel reconfiguration :")
     for playercontroller, pad in sorted(playersControllersNew.items()):
-        eslog.info("  " + playercontroller + ". index:" + str(pad.index) + " dev:" + pad.dev + " name:" + pad.realName)
+        eslog.info("  " + playercontroller + ". index:" + str(pad.index) + " dev:" + pad.dev + " name:" + pad.name)
 
     return (procs, playersControllersNew, deviceList)
 

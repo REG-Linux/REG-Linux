@@ -1,20 +1,33 @@
 #!/usr/bin/env python3
+"""
+This script is the emulator launcher for the Reglinux distribution.
+It is responsible for preparing the environment and launching the emulator
+with the appropriate configurations.
+"""
 
 import os
 profiler = None
 
-# 1) touch /var/run/emulatorlauncher.perf
-# 2) start a game
-# 3) gprof2dot.py -f pstats -n 5 /var/run/emulatorlauncher.prof -o emulatorlauncher.dot # wget https://raw.githubusercontent.com/jrfonseca/gprof2dot/master/gprof2dot.py
-# 4) dot -Tpng emulatorlauncher.dot -o emulatorlauncher.png
-# 3) or upload the file /var/run/emulatorlauncher.prof on https://nejc.saje.info/pstats-viewer.html
+# Profiling Instructions:
+# To enable profiling for performance analysis, follow these steps:
+# 1) Create a marker file: `touch /var/run/emulatorlauncher.perf`
+# 2) Start a game, which will trigger this script.
+# 3) After exiting the game, a profile data file will be generated at /var/run/emulatorlauncher.prof.
+#    You can then generate a call graph image using gprof2dot:
+#    `gprof2dot.py -f pstats -n 5 /var/run/emulatorlauncher.prof -o emulatorlauncher.dot`
+#    (You might need to download gprof2dot: `wget https://raw.githubusercontent.com/jrfonseca/gprof2dot/master/gprof2dot.py`)
+# 4) Convert the .dot file to a PNG image:
+#    `dot -Tpng emulatorlauncher.dot -o emulatorlauncher.png`
+# 5) Alternatively, you can use an online pstats viewer like https://nejc.saje.info/pstats-viewer.html
+#    to analyze the `/var/run/emulatorlauncher.prof` file.
 
+# Enable the profiler if the performance marker file exists.
 if os.path.exists("/var/run/emulatorlauncher.perf"):
     import cProfile
     profiler = cProfile.Profile()
     profiler.enable()
 
-### import always needed ###
+### Always required imports ###
 import argparse
 import GeneratorImporter
 import signal
@@ -26,13 +39,16 @@ import utils.gunsUtils as gunsUtils
 import utils.wheelsUtils as wheelsUtils
 import utils.windowsManager as windowsManager
 import utils.bezels as bezelsUtil
-import controllersConfig as controllers
+import controllers as controllers
 import utils.zar as zar
 from sys import exit
 from Emulator import Emulator
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
+
+# Global process variable to hold the emulator process.
+proc = None
 
 def main(args, maxnbplayers):
     """
@@ -77,81 +93,103 @@ def main(args, maxnbplayers):
         return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 def start_rom(args, maxnbplayers, rom, romConfiguration):
+    """
+    Prepares the system and launches the emulator for a given ROM.
+
+    This function handles:
+    - Controller configuration.
+    - System and emulator settings.
+    - Light gun and wheel setup.
+    - Video mode adjustments.
+    - Bezel and HUD generation.
+    - Pre/post emulation script execution.
+    - Launching the emulator.
+
+    Args:
+        args (Namespace): The command-line arguments.
+        maxnbplayers (int): The maximum number of players.
+        rom (str): The path to the ROM file.
+        romConfiguration (str): The ROM file path used for specific configurations.
+
+    Returns:
+        int: The exit code from the emulator process.
+    """
     global profiler
 
-    # controllers
+    # --- Controller Configuration ---
     playersControllers = dict()
-
     controllersInput = []
-    for p in range(1, maxnbplayers+1):
-        ci = {}
-        ci["index"]      = getattr(args, "p{}index"     .format(p))
-        ci["guid"]       = getattr(args, "p{}guid"      .format(p))
-        ci["name"]       = getattr(args, "p{}name"      .format(p))
-        ci["devicepath"] = getattr(args, "p{}devicepath".format(p))
-        ci["nbbuttons"]  = getattr(args, "p{}nbbuttons" .format(p))
-        ci["nbhats"]     = getattr(args, "p{}nbhats"    .format(p))
-        ci["nbaxes"]     = getattr(args, "p{}nbaxes"    .format(p))
+    # Collect controller information from command-line arguments for each player.
+    for p in range(1, maxnbplayers + 1):
+        ci = {
+            "index":      getattr(args, f"p{p}index"),
+            "guid":       getattr(args, f"p{p}guid"),
+            "name":       getattr(args, f"p{p}name"),
+            "devicepath": getattr(args, f"p{p}devicepath"),
+            "nbbuttons":  getattr(args, f"p{p}nbbuttons"),
+            "nbhats":     getattr(args, f"p{p}nbhats"),
+            "nbaxes":     getattr(args, f"p{p}nbaxes")
+        }
         controllersInput.append(ci)
 
-    # Read the controller configuration
+    # Load the controller configurations based on the input.
     playersControllers = controllers.loadControllerConfig(controllersInput)
 
-    # find the system to run
+    # --- System and Emulator Setup ---
     systemName = args.system
     eslog.debug(f"Running system: {systemName}")
+    # Initialize the Emulator object, which holds all configuration for the system.
     system = Emulator(systemName, romConfiguration)
 
+    # Override default emulator and core if specified in arguments.
     if args.emulator is not None:
         system.config["emulator"] = args.emulator
         system.config["emulator-forced"] = True
     if args.core is not None:
         system.config["core"] = args.core
         system.config["core-forced"] = True
+
+    # For logging purposes, create a copy of the config and hide sensitive data.
     debugDisplay = system.config.copy()
     if "retroachievements.password" in debugDisplay:
         debugDisplay["retroachievements.password"] = "***"
     eslog.debug(f"Settings: {debugDisplay}")
-    if "emulator" in system.config and "core" in system.config:
-        eslog.debug("emulator: {}, core: {}".format(system.config["emulator"], system.config["core"]))
-    else:
-        if "emulator" in system.config:
-            eslog.debug("emulator: {}".format(system.config["emulator"]))
 
-    # metadata
+    if "emulator" in system.config:
+        core_info = f", core: {system.config['core']}" if "core" in system.config else ""
+        eslog.debug(f"emulator: {system.config['emulator']}{core_info}")
+
+    # --- Metadata and Device Handling ---
     metadata = controllers.getGamesMetaData(systemName, rom)
 
-    # search guns in case use_guns is enabled for this game
-    # force use_guns in case es tells it has a gun
-    if system.isOptSet('use_guns') == False and args.lightgun:
+    # Configure light guns if enabled for the game.
+    if not system.isOptSet('use_guns') and args.lightgun:
         system.config["use_guns"] = True
     if system.isOptSet('use_guns') and system.getOptBoolean('use_guns'):
         guns = controllers.getGuns()
-        if "core" in system.config:
-            gunsUtils.precalibration(systemName, system.config['emulator'], system.config["core"], rom)
-        else:
-            gunsUtils.precalibration(systemName, system.config['emulator'], None, rom)
+        core = system.config.get("core")
+        gunsUtils.precalibration(systemName, system.config['emulator'], core, rom)
     else:
-        eslog.info("guns disabled.")
+        eslog.info("Guns disabled.")
         guns = []
 
-    # search wheels in case use_wheels is enabled for this game
-    # force use_wheels in case es tells it has a wheel
+    # Configure racing wheels if enabled for the game.
     wheelProcesses = None
-    if system.isOptSet('use_wheels') == False and args.wheel:
+    if not system.isOptSet('use_wheels') and args.wheel:
         system.config["use_wheels"] = True
     if system.isOptSet('use_wheels') and system.getOptBoolean('use_wheels'):
         deviceInfos = controllers.getDevicesInformation()
         (wheelProcesses, playersControllers, deviceInfos) = wheelsUtils.reconfigureControllers(playersControllers, system, rom, metadata, deviceInfos)
         wheels = wheelsUtils.getWheelsFromDevicesInfos(deviceInfos)
     else:
-        eslog.info("wheels disabled.")
+        eslog.info("Wheels disabled.")
         wheels = []
 
-    # find the generator
+    # --- Generator and Video Mode ---
+    # The "generator" is responsible for creating the emulator command line.
     generator = GeneratorImporter.getGenerator(system.config['emulator'])
 
-    # the resolution must be changed before configuration while the configuration may depend on it (ie bezels)
+    # Determine the desired video mode for the game.
     wantedGameMode = generator.getResolutionMode(system.config)
     systemMode = videoMode.getCurrentMode()
 
@@ -159,40 +197,35 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
     mouseChanged = False
     exitCode = -1
     try:
-        # lower the resolution if mode is auto
-        newsystemMode = systemMode # newsystemmode is the mode after minmax (ie in 1K if tv was in 4K), systemmode is the mode before (ie in es)
-        if system.config["videomode"] == "" or system.config["videomode"] == "default":
-            eslog.debug("minTomaxResolution")
-            eslog.debug(f"video mode before minmax: {systemMode}")
+        # If videomode is 'auto' or 'default', switch to a minimal resolution to save resources.
+        newsystemMode = systemMode
+        if system.config.get("videomode", "default") in ["", "default"]:
+            eslog.debug("==== minTomaxResolution ====")
+            eslog.debug(f"Video mode before minmax: {systemMode}")
             videoMode.minTomaxResolution()
             newsystemMode = videoMode.getCurrentMode()
             if newsystemMode != systemMode:
                 resolutionChanged = True
 
-        eslog.debug(f"current video mode: {newsystemMode}")
-        eslog.debug(f"wanted video mode: {wantedGameMode}")
+        eslog.debug(f"Current video mode: {newsystemMode}")
+        eslog.debug(f"Wanted video mode: {wantedGameMode}")
 
+        # Change the video mode if the game requires a specific one.
         if wantedGameMode != 'default' and wantedGameMode != newsystemMode:
             videoMode.changeMode(wantedGameMode)
             resolutionChanged = True
         gameResolution = videoMode.getCurrentResolution()
 
-        # savedir: create the save directory if not already done
+        # Create save directory for the system if it doesn't exist.
         dirname = os.path.join(systemFiles.SAVES, system.name)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        # core
-        effectiveCore = ""
-        if "core" in system.config and system.config["core"] is not None:
-            effectiveCore = system.config["core"]
-        effectiveRom = ""
-        effectiveRomConfiguration = ""
-        if rom is not None:
-            effectiveRom = rom
-            effectiveRomConfiguration = romConfiguration
+        # --- Argument and Option Finalization ---
+        effectiveCore = system.config.get("core", "")
+        effectiveRom = rom or ""
 
-        # network options
+        # Apply netplay options from arguments.
         if args.netplaymode is not None:
             system.config["netplay.mode"] = args.netplaymode
         if args.netplaypass is not None:
@@ -204,7 +237,7 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
         if args.netplaysession is not None:
             system.config["netplay.server.session"] = args.netplaysession
 
-        # autosave arguments
+        # Apply save state options from arguments.
         if args.state_slot is not None:
             system.config["state_slot"] = args.state_slot
         if args.autosave is not None:
@@ -212,304 +245,303 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
         if args.state_filename is not None:
             system.config["state_filename"] = args.state_filename
 
+        # Show/hide mouse cursor based on generator's requirement.
         if generator.getMouseMode(system.config, rom):
             mouseChanged = True
             videoMode.changeMouse(True)
 
-        # SDL VSync is a big deal on OGA and RPi4
-        if system.isOptSet('sdlvsync') and system.getOptBoolean('sdlvsync') == False:
-            system.config["sdlvsync"] = '0'
-        else:
-            system.config["sdlvsync"] = '1'
-        os.environ.update({'SDL_RENDER_VSYNC': system.config["sdlvsync"]})
+        # Configure SDL_RENDER_VSYNC based on system settings.
+        system.config["sdlvsync"] = '0' if system.isOptSet('sdlvsync') and not system.getOptBoolean('sdlvsync') else '1'
+        os.environ['SDL_RENDER_VSYNC'] = system.config["sdlvsync"]
 
-        # run a script before emulator starts
+        # --- Script Execution and Emulator Launch ---
+        # Execute custom scripts before the emulator starts.
         callExternalScripts("/usr/share/reglinux/configgen/scripts", "gameStart", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
         callExternalScripts("/userdata/system/scripts", "gameStart", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
 
-        # start a compositor if needed
-        if generator.requiresWayland() or generator.requiresX11():
-            if not 'WAYLAND_DISPLAY' in os.environ:
-                windowsManager.start_compositor(generator, system)
-
-        # run the emulator
+        eslog.debug("==== Running emulator ====")
         try:
-            from Evmapy import Evmapy
-            Evmapy.start(systemName, system.config['emulator'], effectiveCore, effectiveRomConfiguration, playersControllers, guns)
-            # change directory if wanted
+            # Start a window compositor like Wayland or X11 if required by the emulator.
+            if generator.requiresWayland() or generator.requiresX11():
+                if 'WAYLAND_DISPLAY' not in os.environ:
+                    windowsManager.start_compositor(generator, system)
+
+            # Change the execution directory if required by the generator.
             executionDirectory = generator.executionDirectory(system.config, effectiveRom)
             if executionDirectory is not None:
                 os.chdir(executionDirectory)
 
+            # Generate the final command to run the emulator.
             cmd = generator.generate(system, rom, playersControllers, metadata, guns, wheels, gameResolution)
 
-            if system.isOptSet('hud_support') and os.path.exists("/usr/bin/mangohud") and system.getOptBoolean('hud_support') == True:
+            # Configure and enable MangoHUD if supported and enabled.
+            if system.isOptSet('hud_support') and os.path.exists("/usr/bin/mangohud") and system.getOptBoolean('hud_support'):
                 hud_bezel = getHudBezel(system, generator, rom, gameResolution, controllers.gunsBordersSizeName(guns, system.config))
-                if (system.isOptSet('hud') and system.config['hud'] != "" and system.config['hud'] != "none") or hud_bezel is not None:
+                if (system.isOptSet('hud') and system.config['hud'] not in ["", "none"]) or hud_bezel is not None:
                     gameinfos = extractGameInfosFromXml(args.gameinfoxml)
                     cmd.env["MANGOHUD_DLSYM"] = "1"
                     hudconfig = getHudConfig(system, args.systemname, system.config['emulator'], effectiveCore, rom, gameinfos, hud_bezel)
                     with open('/var/run/hud.config', 'w') as f:
                         f.write(hudconfig)
                     cmd.env["MANGOHUD_CONFIGFILE"] = "/var/run/hud.config"
-                    if generator.hasInternalMangoHUDCall() == False:
+                    if not generator.hasInternalMangoHUDCall():
                         cmd.array.insert(0, "mangohud")
 
+            # Disable profiler during command execution to focus on the script's own performance.
             if profiler:
                 profiler.disable()
             exitCode = runCommand(cmd)
             if profiler:
                 profiler.enable()
         finally:
-            Evmapy.stop()
+            # Stop the compositor after the emulator exits.
+            if generator.requiresWayland() or generator.requiresX11():
+                windowsManager.stop_compositor(generator, system)
 
-        # kill the running compositor if needed
-        if generator.requiresWayland() or generator.requiresX11():
-            windowsManager.stop_compositor(generator, system)
-
-
-        # run a script after emulator shuts down
+        # Execute custom scripts after the emulator stops.
         callExternalScripts("/userdata/system/scripts", "gameStop", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
         callExternalScripts("/usr/share/reglinux/configgen/scripts", "gameStop", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
 
     finally:
-        # always restore the resolution
+        # --- Cleanup ---
+        # Always restore the original video mode.
         if resolutionChanged:
             try:
-                videoMode.changeMode(systemMode)
+                videoMode.changeMode(systemMode if systemMode is not None else "")
             except Exception:
-                pass # don't fail
+                pass  # Don't let cleanup failures prevent exit.
 
+        # Restore mouse cursor visibility.
         if mouseChanged:
             try:
                 videoMode.changeMouse(False)
             except Exception:
-                pass # don't fail
+                pass
 
-        if wheelProcesses is not None and len(wheelProcesses) > 0:
+        # Reset wheel controller configurations.
+        if wheelProcesses:
             try:
                 wheelsUtils.resetControllers(wheelProcesses)
             except Exception:
-                eslog.error("hum, unable to reset wheel controllers !")
-                pass # don't fail
-    # exit
+                eslog.error("Unable to reset wheel controllers!")
+                pass
+
     return exitCode
 
 def getHudBezel(system, generator, rom, gameResolution, bordersSize):
+    """
+    Determines and prepares the appropriate bezel image for the HUD.
+
+    It checks for bezel compatibility (aspect ratio, coverage) and resizes,
+    tattoos, or adds borders to the image as needed.
+
+    Args:
+        system (Emulator): The current system's configuration object.
+        generator (Generator): The emulator-specific generator.
+        rom (str): Path to the ROM file.
+        gameResolution (dict): The current game resolution.
+        bordersSize (str): The size of the gun borders, if any.
+
+    Returns:
+        str|None: The path to the final bezel image file, or None if no bezel should be used.
+    """
+    # Skip if the emulator handles its own bezels.
     if generator.supportsInternalBezels():
-        eslog.debug("skipping bezels for emulator {}".format(system.config['emulator']))
+        eslog.debug(f"Skipping bezels for emulator {system.config['emulator']}")
         return None
-    # no good reason for a bezel
-    if ('bezel' not in system.config or system.config['bezel'] == "" or system.config['bezel'] == "none") and not (system.isOptSet('bezel.tattoo') and system.config['bezel.tattoo'] != "0") and bordersSize is None:
+    # Skip if no bezel is configured and no special effects (tattoo, borders) are needed.
+    if ('bezel' not in system.config or system.config['bezel'] in ["", "none"]) and \
+       not (system.isOptSet('bezel.tattoo') and system.config['bezel.tattoo'] != "0") and \
+       bordersSize is None:
         return None
-    # no bezel, generate a transparent one for the tatoo/gun borders ... and so on
-    if ('bezel' not in system.config or system.config['bezel'] == "" or system.config['bezel'] == "none"):
+
+    # If no bezel is set but effects are needed, create a transparent base.
+    if ('bezel' not in system.config or system.config['bezel'] in ["", "none"]):
         overlay_png_file  = "/tmp/bezel_transhud_black.png"
         overlay_info_file = "/tmp/bezel_transhud_black.info"
         bezelsUtil.createTransparentBezel(overlay_png_file, gameResolution["width"], gameResolution["height"])
 
-        w = gameResolution["width"]
-        h = gameResolution["height"]
+        w, h = gameResolution["width"], gameResolution["height"]
         with open(overlay_info_file, "w") as fd:
-            fd.write("{" + f' "width":{w}, "height":{h}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000' + "}")
+            fd.write(f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}')
     else:
-        eslog.debug("hud enabled. trying to apply the bezel {}".format(system.config['bezel']))
-
+        # A bezel is configured, so let's find its files.
+        eslog.debug(f"HUD enabled. Trying to apply the bezel {system.config['bezel']}")
         bezel = system.config['bezel']
         bz_infos = bezelsUtil.getBezelInfos(rom, bezel, system.name, system.config['emulator'])
         if bz_infos is None:
-            eslog.debug("no bezel info file found")
+            eslog.debug("No bezel info file found")
             return None
+        overlay_info_file, overlay_png_file = bz_infos["info"], bz_infos["png"]
 
-        overlay_info_file = bz_infos["info"]
-        overlay_png_file  = bz_infos["png"]
-
-    # check the info file
-    # bottom, top, left and right must not cover too much the image to be considered as compatible
-    if os.path.exists(overlay_info_file):
-        try:
-            import json
-            infos = json.load(open(overlay_info_file))
-        except:
-            eslog.warning(f"unable to read {overlay_info_file}")
-            infos = {}
-    else:
+    # --- Bezel Validation ---
+    try:
+        import json
+        with open(overlay_info_file) as f:
+            infos = json.load(f)
+    except Exception:
+        eslog.warning(f"Unable to read bezel info file: {overlay_info_file}")
         infos = {}
 
+    # Get bezel dimensions either from info file or the image itself.
     if "width" in infos and "height" in infos:
-        bezel_width  = infos["width"]
-        bezel_height = infos["height"]
-        eslog.info(f"bezel size read from {overlay_info_file}")
+        bezel_width, bezel_height = infos["width"], infos["height"]
+        eslog.info(f"Bezel size read from {overlay_info_file}")
     else:
         bezel_width, bezel_height = bezelsUtil.fast_image_size(overlay_png_file)
-        eslog.info(f"bezel size read from {overlay_png_file}")
+        eslog.info(f"Bezel size read from {overlay_png_file}")
 
-    # max cover proportion and ratio distortion
-    max_cover = 0.05 # 5%
-    max_ratio_delta = 0.01
+    # Define validation thresholds.
+    max_cover = 0.05  # 5% max coverage of the game area.
+    max_ratio_delta = 0.01 # Max difference between screen and bezel aspect ratio.
 
     screen_ratio = gameResolution["width"] / gameResolution["height"]
     bezel_ratio  = bezel_width / bezel_height
 
-    # the screen and bezel ratio must be approximatly the same
-    if bordersSize is None:
-        if abs(screen_ratio - bezel_ratio) > max_ratio_delta:
-            eslog.debug(f"screen ratio ({screen_ratio}) is too far from the bezel one ({bezel_ratio}) : {screen_ratio} - {bezel_ratio} > {max_ratio_delta}")
-            return None
+    # Validate aspect ratio (unless gun borders are being added, which might need a different ratio).
+    if bordersSize is None and abs(screen_ratio - bezel_ratio) > max_ratio_delta:
+        eslog.debug(f"Screen ratio ({screen_ratio}) is too far from the bezel one ({bezel_ratio})")
+        return None
 
-    # the ingame image and the bezel free space must feet
-    ## the bezel top and bottom cover must be minimum
-    # in case there is a border, force it
-    if bordersSize is None:
-        if "top" in infos and infos["top"] / bezel_height > max_cover:
-            eslog.debug("bezel top covers too much the game image : {} / {} > {}".format(infos["top"], bezel_height, max_cover))
-            return None
-        if "bottom" in infos and infos["bottom"] / bezel_height > max_cover:
-            eslog.debug("bezel bottom covers too much the game image : {} / {} > {}".format(infos["bottom"], bezel_height, max_cover))
-            return None
-
-    # if there is no information about top/bottom, assume default is 0
-
-    ## the bezel left and right cover must be maximum
-    ingame_ratio = generator.getInGameRatio(system.config, gameResolution, rom)
-    img_height = bezel_height
-    img_width  = img_height * ingame_ratio
-
-    if "left" not in infos:
-        eslog.debug(f"bezel has no left info in {overlay_info_file}")
-        # assume default is 4/3 over 16/9
-        infos_left = (bezel_width - (bezel_height / 3 * 4)) / 2
-        if bordersSize is None:
-            if abs((infos_left  - ((bezel_width-img_width)/2.0)) / img_width) > max_cover:
-                eslog.debug(f"bezel left covers too much the game image : {infos_left  - ((bezel_width-img_width)/2.0)} / {img_width} > {max_cover}")
-                return None
-
-    if "right" not in infos:
-        eslog.debug(f"bezel has no right info in {overlay_info_file}")
-        # assume default is 4/3 over 16/9
-        infos_right = (bezel_width - (bezel_height / 3 * 4)) / 2
-        if bordersSize is None:
-            if abs((infos_right - ((bezel_width-img_width)/2.0)) / img_width) > max_cover:
-                eslog.debug(f"bezel right covers too much the game image : {infos_right  - ((bezel_width-img_width)/2.0)} / {img_width} > {max_cover}")
-                return None
-
-    if bordersSize is None:
-        if "left"  in infos and abs((infos["left"]  - ((bezel_width-img_width)/2.0)) / img_width) > max_cover:
-            eslog.debug("bezel left covers too much the game image : {} / {} > {}".format(infos["left"]  - ((bezel_width-img_width)/2.0), img_width, max_cover))
-            return None
-        if "right" in infos and abs((infos["right"] - ((bezel_width-img_width)/2.0)) / img_width) > max_cover:
-            eslog.debug("bezel right covers too much the game image : {} / {} > {}".format(infos["right"]  - ((bezel_width-img_width)/2.0), img_width, max_cover))
-            return None
-
-    # if screen and bezel sizes doesn't match, resize
-    # stretch option
-    if system.isOptSet('bezel_stretch') and system.getOptBoolean('bezel_stretch') == True:
-        bezel_stretch = True
-    else:
-        bezel_stretch = False
+    # --- Bezel Processing ---
+    # Resize the bezel image if it doesn't match the screen resolution.
+    bezel_stretch = system.isOptSet('bezel_stretch') and system.getOptBoolean('bezel_stretch')
     if (bezel_width != gameResolution["width"] or bezel_height != gameResolution["height"]):
-        eslog.debug("bezel needs to be resized")
+        eslog.debug("Bezel needs to be resized")
         output_png_file = "/tmp/bezel.png"
         try:
             bezelsUtil.resizeImage(overlay_png_file, output_png_file, gameResolution["width"], gameResolution["height"], bezel_stretch)
+            overlay_png_file = output_png_file
         except Exception as e:
-            eslog.error(f"failed to resize the image {e}")
+            eslog.error(f"Failed to resize the image: {e}")
             return None
-        overlay_png_file = output_png_file
 
+    # Apply a "tattoo" (watermark/logo) to the bezel if configured.
     if system.isOptSet('bezel.tattoo') and system.config['bezel.tattoo'] != "0":
         output_png_file = "/tmp/bezel_tattooed.png"
         bezelsUtil.tatooImage(overlay_png_file, output_png_file, system)
         overlay_png_file = output_png_file
 
-    # borders
+    # Draw gun borders on the bezel if required.
     if bordersSize is not None:
-        eslog.debug("Draw gun borders")
+        eslog.debug("Drawing gun borders")
         output_png_file = "/tmp/bezel_gunborders.png"
-
         innerSize, outerSize = bezelsUtil.gunBordersSize(bordersSize)
-        borderSize = bezelsUtil.gunBorderImage(overlay_png_file, output_png_file, innerSize, outerSize, bezelsUtil.gunsBordersColorFomConfig(system.config))
+        color = bezelsUtil.gunsBordersColorFomConfig(system.config)
+        bezelsUtil.gunBorderImage(overlay_png_file, output_png_file, innerSize, outerSize, color)
         overlay_png_file = output_png_file
 
-    eslog.debug(f"applying bezel {overlay_png_file}")
+    eslog.debug(f"Applying bezel {overlay_png_file}")
     return overlay_png_file
 
+
 def extractGameInfosFromXml(xml):
+    """
+    Parses a game information XML file to extract game name and thumbnail.
+
+    Args:
+        xml (str): Path to the game info XML file.
+
+    Returns:
+        dict: A dictionary containing 'name' and 'thumbnail' if found.
+    """
     import xml.etree.ElementTree as ET
-
     vals = {}
-
     try:
         infos = ET.parse(xml)
-        try:
-            vals["name"] = infos.find("./game/name").text
-        except:
-            pass
-        try:
-            vals["thumbnail"] = infos.find("./game/thumbnail").text
-        except:
-            pass
-    except:
-        pass
+        name_elem = infos.find("./game/name")
+        if name_elem is not None:
+            vals["name"] = name_elem.text
+        thumbnail_elem = infos.find("./game/thumbnail")
+        if thumbnail_elem is not None:
+            vals["thumbnail"] = thumbnail_elem.text
+    except Exception:
+        pass # Ignore parsing errors.
     return vals
 
 def callExternalScripts(folder, event, args):
+    """
+    Executes all executable scripts in a given folder.
+
+    Args:
+        folder (str): The directory containing the scripts.
+        event (str): The event name (e.g., "gameStart", "gameStop").
+        args (list): A list of arguments to pass to the scripts.
+    """
     if not os.path.isdir(folder):
         return
+    for file in sorted(os.listdir(folder)): # Sort for predictable execution order.
+        filepath = os.path.join(folder, file)
+        if os.path.isdir(filepath):
+            callExternalScripts(filepath, event, args) # Recurse into subdirectories.
+        elif os.access(filepath, os.X_OK):
+            eslog.debug(f"Calling external script: {str([filepath, event] + args)}")
+            subprocess.call([filepath, event] + args)
 
-    for file in os.listdir(folder):
-        if os.path.isdir(os.path.join(folder, file)):
-            callExternalScripts(os.path.join(folder, file), event, args)
-        else:
-            if os.access(os.path.join(folder, file), os.X_OK):
-                eslog.debug("calling external script: " + str([os.path.join(folder, file), event] + args))
-                subprocess.call([os.path.join(folder, file), event] + args)
+def hudConfig_protectStr(text):
+    """
+    Returns an empty string if the input is None, otherwise returns the input.
 
-def hudConfig_protectStr(str):
-    if str is None:
-        return ""
-    return str
+    Args:
+        text (str): The string to protect.
+
+    Returns:
+        str: The original string or an empty string.
+    """
+    return text or ""
 
 def getHudConfig(system, systemName, emulator, core, rom, gameinfos, bezel):
-    configstr = ""
+    """
+    Generates the configuration string for MangoHUD.
 
-    if bezel != "" and bezel != "none" and bezel is not None:
+    Args:
+        system (Emulator): The current system's configuration object.
+        systemName (str): The "fancy" name of the system.
+        emulator (str): The name of the emulator.
+        core (str): The name of the emulator core.
+        rom (str): Path to the ROM file.
+        gameinfos (dict): Game metadata (name, thumbnail).
+        bezel (str|None): Path to the bezel image to be used as a background.
+
+    Returns:
+        str: The complete MangoHUD configuration string.
+    """
+    configstr = ""
+    # Set the bezel as the background image for the HUD.
+    if bezel:
         configstr = f"background_image={hudConfig_protectStr(bezel)}\nlegacy_layout=false\n"
 
+    # If HUD is disabled, just make the background transparent.
     if not system.isOptSet('hud') or system.config['hud'] == "none":
-        return configstr + "background_alpha=0\n" # hide the background
+        return configstr + "background_alpha=0\n"
 
     mode = system.config["hud"]
-    hud_position = "bottom-left"
-    if system.isOptSet('hud_corner') and system.config["hud_corner"] != "" :
-        if system.config["hud_corner"] == "NW":
-            hud_position = "top-left"
-        elif system.config["hud_corner"] == "NE":
-            hud_position = "top-right"
-        elif system.config["hud_corner"] == "SE":
-            hud_position = "bottom-right"
+    # Determine HUD position from config.
+    position_map = {"NW": "top-left", "NE": "top-right", "SE": "bottom-right"}
+    hud_corner = system.config.get('hud_corner', "")
+    hud_position = position_map.get(hud_corner, "bottom-left")
 
-    emulatorstr = emulator
-    if emulator != core and core is not None:
-        emulatorstr += "/" + core
+    emulatorstr = f"{emulator}/{core}" if emulator != core and core else emulator
+    gameName = gameinfos.get("name", "")
+    gameThumbnail = gameinfos.get("thumbnail", "")
 
-    gameName = ""
-    if "name" in gameinfos:
-        gameName = gameinfos["name"]
-    gameThumbnail = ""
-    if "thumbnail" in gameinfos:
-        gameThumbnail = gameinfos["thumbnail"]
-
-    # predefined values
+    # Apply predefined or custom HUD configurations.
     if mode == "perf":
-        configstr += "position=" + hud_position + "\nbackground_alpha=0.9\nlegacy_layout=false\ncustom_text=%GAMENAME%\ncustom_text=%SYSTEMNAME%\ncustom_text=%EMULATORCORE%\nfps\ngpu_name\nengine_version\nvulkan_driver\nresolution\nram\ngpu_stats\ngpu_temp\ncpu_stats\ncpu_temp\ncore_load"
+        configstr += f"position={hud_position}\nbackground_alpha=0.9\nlegacy_layout=false\n" \
+                     "custom_text=%GAMENAME%\ncustom_text=%SYSTEMNAME%\ncustom_text=%EMULATORCORE%\n" \
+                     "fps\ngpu_name\nengine_version\nvulkan_driver\nresolution\nram\n" \
+                     "gpu_stats\ngpu_temp\ncpu_stats\ncpu_temp\ncore_load"
     elif mode == "game":
-        configstr += "position=" + hud_position + "\nbackground_alpha=0\nlegacy_layout=false\nfont_size=32\nimage_max_width=200\nimage=%THUMBNAIL%\ncustom_text=%GAMENAME%\ncustom_text=%SYSTEMNAME%\ncustom_text=%EMULATORCORE%"
-    elif mode == "custom" and system.isOptSet('hud_custom') and system.config["hud_custom"] != "" :
+        configstr += f"position={hud_position}\nbackground_alpha=0\nlegacy_layout=false\n" \
+                     "font_size=32\nimage_max_width=200\nimage=%THUMBNAIL%\n" \
+                     "custom_text=%GAMENAME%\ncustom_text=%SYSTEMNAME%\ncustom_text=%EMULATORCORE%"
+    elif mode == "custom" and system.isOptSet('hud_custom') and system.config["hud_custom"]:
         configstr += system.config["hud_custom"].replace("\\n", "\n")
     else:
-        configstr = configstr + "background_alpha=0\n" # hide the background
+        # Fallback to hiding the HUD if the mode is invalid.
+        configstr += "background_alpha=0\n"
 
+    # Replace placeholders with actual values.
     configstr = configstr.replace("%SYSTEMNAME%", hudConfig_protectStr(systemName))
     configstr = configstr.replace("%GAMENAME%", hudConfig_protectStr(gameName))
     configstr = configstr.replace("%EMULATORCORE%", hudConfig_protectStr(emulatorstr))
@@ -518,94 +550,107 @@ def getHudConfig(system, systemName, emulator, core, rom, gameinfos, bezel):
     return configstr
 
 def runCommand(command):
+    """
+    Executes a command in a subprocess.
+
+    Args:
+        command (Command): A Command object containing the command array and environment variables.
+
+    Returns:
+        int: The exit code of the process.
+    """
     global proc
 
-    # compute environment : first the current envs, then override by values set at generator level
-    envvars = dict(os.environ)
-    envvars.update(command.env)
-    command.env = envvars
+    if not command.array:
+        return -1
+
+    # Combine current environment with command-specific environment variables.
+    envvars = {**os.environ, **command.env}
 
     eslog.debug(f"command: {str(command)}")
     eslog.debug(f"command: {str(command.array)}")
-    eslog.debug(f"env: {str(command.env)}")
+    eslog.debug(f"env: {str(envvars)}")
     exitcode = -1
-    if command.array:
-        proc = subprocess.Popen(command.array, env=command.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    else:
-        return exitcode
+
+    proc = subprocess.Popen(command.array, env=envvars, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         out, err = proc.communicate()
         exitcode = proc.returncode
-        eslog.debug(out.decode())
-        eslog.error(err.decode())
+        # Decode and log stdout/stderr.
+        if out: eslog.debug(out.decode(errors='ignore'))
+        if err: eslog.error(err.decode(errors='ignore'))
     except BrokenPipeError:
-        # Seeing BrokenPipeError? This is probably caused by head truncating output in the front-end
-        # Examine es-core/src/platform.cpp::runSystemCommand for additional context
+        # This can happen if the parent process (like `head`) closes the pipe.
         pass
-    except:
-        eslog.error("emulator exited")
+    except Exception:
+        eslog.error("Emulator exited unexpectedly", exc_info=True)
 
     return exitcode
 
 def signal_handler(signal, frame):
+    """
+    Handles termination signals (like Ctrl+C) to gracefully kill the emulator process.
+    """
     global proc
-    eslog.debug('Exiting')
+    eslog.debug('Exiting due to signal')
     if proc:
-        eslog.debug('killing proc')
+        eslog.debug('Killing emulator process')
         proc.kill()
+    exit(0)
 
 if __name__ == '__main__':
-    proc = None
+    # Register signal handler for graceful termination.
     signal.signal(signal.SIGINT, signal_handler)
-    parser = argparse.ArgumentParser(description='emulator-launcher script')
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    # --- Argument Parsing ---
+    parser = argparse.ArgumentParser(description='Emulator Launcher Script')
 
     maxnbplayers = 8
-    for p in range(1, maxnbplayers+1):
-        parser.add_argument("-p{}index"     .format(p), help="player{} controller index"            .format(p), type=int, required=False)
-        parser.add_argument("-p{}guid"      .format(p), help="player{} controller SDL2 guid"        .format(p), type=str, required=False)
-        parser.add_argument("-p{}name"      .format(p), help="player{} controller name"             .format(p), type=str, required=False)
-        parser.add_argument("-p{}devicepath".format(p), help="player{} controller device"           .format(p), type=str, required=False)
-        parser.add_argument("-p{}nbbuttons" .format(p), help="player{} controller number of buttons".format(p), type=str, required=False)
-        parser.add_argument("-p{}nbhats"    .format(p), help="player{} controller number of hats"   .format(p), type=str, required=False)
-        parser.add_argument("-p{}nbaxes"    .format(p), help="player{} controller number of axes"   .format(p), type=str, required=False)
+    # Dynamically create arguments for each player's controller.
+    for p in range(1, maxnbplayers + 1):
+        parser.add_argument(f"-p{p}index",      help=f"player {p} controller index",             type=int)
+        parser.add_argument(f"-p{p}guid",       help=f"player {p} controller SDL2 guid",         type=str)
+        parser.add_argument(f"-p{p}name",       help=f"player {p} controller name",              type=str)
+        parser.add_argument(f"-p{p}devicepath", help=f"player {p} controller device path",       type=str)
+        parser.add_argument(f"-p{p}nbbuttons",  help=f"player {p} controller number of buttons", type=str)
+        parser.add_argument(f"-p{p}nbhats",     help=f"player {p} controller number of hats",    type=str)
+        parser.add_argument(f"-p{p}nbaxes",     help=f"player {p} controller number of axes",    type=str)
 
-    parser.add_argument("-system",         help="select the system to launch", type=str, required=True)
-    parser.add_argument("-rom",            help="rom absolute path",           type=str, required=True)
-    parser.add_argument("-emulator",       help="force emulator",              type=str, required=False)
-    parser.add_argument("-core",           help="force emulator core",         type=str, required=False)
-    parser.add_argument("-netplaymode",    help="host/client",                 type=str, required=False)
-    parser.add_argument("-netplaypass",    help="enable spectator mode",       type=str, required=False)
-    parser.add_argument("-netplayip",      help="remote ip",                   type=str, required=False)
-    parser.add_argument("-netplayport",    help="remote port",                 type=str, required=False)
-    parser.add_argument("-netplaysession", help="netplay session",             type=str, required=False)
-    parser.add_argument("-state_slot",     help="state slot",                  type=str, required=False)
-    parser.add_argument("-state_filename", help="state filename",              type=str, required=False)
-    parser.add_argument("-autosave",       help="autosave",                    type=str, required=False)
-    parser.add_argument("-systemname",     help="system fancy name",           type=str, required=False)
-    parser.add_argument("-gameinfoxml",    help="game info xml",               type=str, nargs='?', default='/dev/null', required=False)
-    parser.add_argument("-lightgun",       help="configure lightguns",         action="store_true")
-    parser.add_argument("-wheel",          help="configure wheel",             action="store_true")
+    # General arguments for system, ROM, and specific features.
+    parser.add_argument("-system",         help="Select the system to launch",          type=str, required=True)
+    parser.add_argument("-rom",            help="Absolute path to the ROM",             type=str, required=True)
+    parser.add_argument("-emulator",       help="Force a specific emulator",            type=str)
+    parser.add_argument("-core",           help="Force a specific emulator core",       type=str)
+    parser.add_argument("-netplaymode",    help="Netplay mode (host/client)",           type=str)
+    parser.add_argument("-netplaypass",    help="Netplay spectator password",           type=str)
+    parser.add_argument("-netplayip",      help="Netplay remote IP address",            type=str)
+    parser.add_argument("-netplayport",    help="Netplay remote port",                  type=str)
+    parser.add_argument("-netplaysession", help="Netplay session identifier",           type=str)
+    parser.add_argument("-state_slot",     help="Load state from a specific slot",      type=str)
+    parser.add_argument("-state_filename", help="Load state from a specific filename",  type=str)
+    parser.add_argument("-autosave",       help="Enable/disable autosave feature",      type=str)
+    parser.add_argument("-systemname",     help="System's display name",                type=str)
+    parser.add_argument("-gameinfoxml",    help="Path to game info XML metadata",       type=str, nargs='?', default='/dev/null')
+    parser.add_argument("-lightgun",       help="Configure for lightgun usage",         action="store_true")
+    parser.add_argument("-wheel",          help="Configure for wheel usage",            action="store_true")
 
     args = parser.parse_args()
+    exitcode = -1
     try:
-        exitcode = -1
+        # Call the main function with parsed arguments.
         exitcode = main(args, maxnbplayers)
     except Exception as e:
-        eslog.error("configgen exception: ", exc_info=True)
+        eslog.error("An unhandled exception occurred in configgen:", exc_info=True)
 
+    # --- Finalization ---
+    # If profiling was enabled, save the results.
     if profiler:
-        import io
-        import pstats
         profiler.disable()
         profiler.dump_stats('/var/run/emulatorlauncher.prof')
 
-    time.sleep(1) # this seems to be required so that the gpu memory is restituated and available for es
+    # A short delay can help ensure resources (like GPU memory) are fully released before returning to the frontend.
+    time.sleep(1)
     eslog.debug(f"Exiting configgen with status {str(exitcode)}")
 
     exit(exitcode)
-
-# Local Variables:
-# tab-width:4
-# indent-tabs-mode:nil
-# End:
-# vim: set expandtab tabstop=4 shiftwidth=4:
