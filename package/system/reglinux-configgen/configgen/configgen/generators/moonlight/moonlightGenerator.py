@@ -4,7 +4,7 @@ from generators.Generator import Generator
 import Command
 import os.path
 import systemFiles
-import controllersConfig
+import controllers as controllersConfig
 from . import moonlightConfig
 
 class MoonlightGenerator(Generator):

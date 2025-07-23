@@ -11,7 +11,7 @@ import time
 import shutil
 import subprocess
 import systemFiles
-import controllersConfig
+import controllers as controllersConfig
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)

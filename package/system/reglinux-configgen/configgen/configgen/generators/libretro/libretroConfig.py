@@ -4,7 +4,7 @@ import os
 import json
 import subprocess
 import systemFiles
-import controllersConfig
+import controllers as controllersConfig
 import utils.bezels as bezelsUtil
 import utils.videoMode as videoMode
 import xml.etree.ElementTree as ET

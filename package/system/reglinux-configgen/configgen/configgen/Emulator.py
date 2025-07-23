@@ -264,13 +264,21 @@ class Emulator:
             esConfig = ET.parse(systemFiles.esSettings)
 
             # Read showFPS setting
-            drawframerate_value = esConfig.find("./bool[@name='DrawFramerate']").attrib.get("value", "false")
+            drawframerate_elem = esConfig.find("./bool[@name='DrawFramerate']")
+            if drawframerate_elem is not None:
+                drawframerate_value = drawframerate_elem.attrib.get("value", "false")
+            else:
+                drawframerate_value = "false"
             if drawframerate_value not in ['false', 'true']:
                 drawframerate_value = 'false'
             self.config['showFPS'] = drawframerate_value
 
             # Read uimode setting
-            uimode_value = esConfig.find("./string[@name='UIMode']").attrib.get("value", "Full")
+            uimode_elem = esConfig.find("./string[@name='UIMode']")
+            if uimode_elem is not None:
+                uimode_value = uimode_elem.attrib.get("value", "Full")
+            else:
+                uimode_value = "Full"
             if uimode_value not in ['Full', 'Kiosk', 'Kid']:
                 uimode_value = 'Full'
             self.config['uimode'] = uimode_value
