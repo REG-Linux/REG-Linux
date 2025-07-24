@@ -48,10 +48,10 @@ index b0f673a..bbae98a 100644
  	
  	inline static std::optional<uint32> s_persistent_id{};
  
-diff --git a/src/gui/MainWindow.cpp b/src/gui/MainWindow.cpp
+diff --git a/src/gui/wxgui/MainWindow.cpp b/src/gui/wxgui/MainWindow.cpp
 index 69ff4e9..03ac03d 100644
---- a/src/gui/MainWindow.cpp
-+++ b/src/gui/MainWindow.cpp
+--- a/src/gui/wxgui/MainWindow.cpp
++++ b/src/gui/wxgui/MainWindow.cpp
 @@ -1722,7 +1722,8 @@ void MainWindow::SetMenuVisible(bool state)
  	if (m_menu_visible == state)
  		return;
