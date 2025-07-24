@@ -5,14 +5,14 @@
 ################################################################################
 
 # Unstable because of WIP aarch64 upstreamed support
-CEMU_VERSION = 5f3c2816ec6664b5ad147c26dcced06dda422fd5
+CEMU_VERSION = 08609591aecc1973969281e77d0cd4746dd7fc3a
 CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
 CEMU_GIT_SUBMODULES=YES
 CEMU_DEPENDENCIES = sdl2 host-pugixml pugixml rapidjson boost libpng libcurl \
                     libzip host-glslang glslang zlib zstd wxwidgets fmt glm upower \
-                    host-nasm host-zstd host-libusb libusb bluez5_utils
+                    host-nasm host-zstd host-libusb libusb bluez5_utils webp
 
 CEMU_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -20,6 +20,7 @@ CEMU_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 CEMU_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 CEMU_CONF_OPTS += -DENABLE_DISCORD_RPC=OFF
 CEMU_CONF_OPTS += -DENABLE_VCPKG=OFF
+CEMU_CONF_OPTS += -DLINUX=ON
 CEMU_CONF_OPTS += -DCMAKE_CXX_FLAGS="$(TARGET_CXXFLAGS) -I$(STAGING_DIR)/usr/include/glslang"
 
 ifeq ($(BR2_aarch64),y)

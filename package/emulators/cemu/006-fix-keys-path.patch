@@ -15,7 +15,7 @@ index 5d8d51c..92678e4 100644
 +	std::error_code err;
 +	fs::create_directories(keysDir, err);
 +	if (err) {
-+		wxMessageBox("Unable to create /userdata/bios/cemu directory, to store the keys.txt file\nThis can happen if Cemu does not have write permission to /userdata/bios/ directory, the disk is full or if anti-virus software is blocking Cemu.", "Error", wxOK | wxCENTRE | wxICON_ERROR);
++		WindowSystem::ShowErrorDialog(_tr("Unable to create file keys.txt\nThis can happen if Cemu does not have write permission to its own directory, the disk is full or if anti-virus software is blocking Cemu."), _tr("Error"), WindowSystem::ErrorCategory::KEYS_TXT_CREATION);
 +	}
 +
 +	auto keysPath = keysDir + "/keys.txt";
