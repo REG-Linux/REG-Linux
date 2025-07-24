@@ -47,8 +47,8 @@ index d53e857..5c76d60 100644
  if (ENABLE_WXWIDGETS)
 diff --git a/src/gui/CMakeLists.txt b/src/gui/CMakeLists.txt
 index 02f96a9..35771c7 100644
---- a/src/gui/CMakeLists.txt
-+++ b/src/gui/CMakeLists.txt
+--- a/src/gui/wxgui/CMakeLists.txt
++++ b/src/gui/wxgui/CMakeLists.txt
 @@ -149,7 +149,7 @@ target_link_libraries(CemuGui PRIVATE
  	CURL::libcurl
  	libzip::zip
