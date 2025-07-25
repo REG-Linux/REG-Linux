@@ -11,6 +11,7 @@ snes:
       snes9x_next: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SNES9X_NEXT] }
       snes9x: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SNES9X] }
       bsnes: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES] }
+      bsnes_jg: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_JG] }
       bsnes_hd: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_HD] }
       mesen-s: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
   comment_en: |
@@ -32,6 +33,7 @@ snes-msu1:
       pocketsnes: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_POCKETSNES] }
       snes9x: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SNES9X] }
       bsnes: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES] }
+      bsnes_jg: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_JG] }
       bsnes_hd: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_HD] }
 
 c64:
