@@ -10,6 +10,7 @@ import subprocess
 import toml
 import glob
 import re
+import controllers as controllersConfig
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -276,7 +277,8 @@ class XeniaGenerator(Generator):
             environment.update(
                 {
                     'VK_ICD_FILENAMES': '/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json',
-                    'VK_LAYER_PATH': '/usr/share/vulkan/explicit_layer.d'
+                    'VK_LAYER_PATH': '/usr/share/vulkan/explicit_layer.d',
+                    'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
                 }
             )
 

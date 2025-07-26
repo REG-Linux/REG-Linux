@@ -3,6 +3,7 @@
 from generators.Generator import Generator
 import os
 import Command
+import controllers as controllersConfig
 
 class UqmGenerator(Generator):
 
@@ -22,4 +23,8 @@ class UqmGenerator(Generator):
         commandArray = ["urquan","--contentdir=/userdata/roms/uqm",
                         "--configdir=/userdata/saves/uqm"]
 
-        return Command.Command(array=commandArray)
+        return Command.Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                    })

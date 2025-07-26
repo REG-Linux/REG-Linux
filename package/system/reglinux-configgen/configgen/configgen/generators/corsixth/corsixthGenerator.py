@@ -5,6 +5,7 @@ import Command
 import os
 import subprocess
 import systemFiles
+import controllers as controllersConfig
 
 corsixthConfigPath = systemFiles.CONF + "/corsixth"
 corsixthConfigFile = corsixthConfigPath + "/config.txt"
@@ -121,4 +122,8 @@ class CorsixTHGenerator(Generator):
         # Launch engine with config file path
         commandArray = ["corsix-th", "--config-file=" + corsixthConfigFile]
 
-        return Command.Command(array=commandArray)
+        return Command.Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                    })

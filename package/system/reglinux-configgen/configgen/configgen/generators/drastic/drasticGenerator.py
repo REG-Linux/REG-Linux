@@ -2,12 +2,12 @@
 
 from generators.Generator import Generator
 import Command
-import shutil
 import filecmp
 import os
 import settings
+import controllers as controllersConfig
 from os import environ
-from shutil import copyfile
+from shutil import copyfile, copytree
 
 class DrasticGenerator(Generator):
 
@@ -17,10 +17,10 @@ class DrasticGenerator(Generator):
         drastic_bin = "/userdata/system/configs/drastic/drastic"
         drastic_conf = "/userdata/system/configs/drastic/config/drastic.cfg"
         if not os.path.exists(drastic_root):
-            shutil.copytree("/usr/share/drastic", drastic_root)
+            copytree("/usr/share/drastic", drastic_root)
 
         if not os.path.exists(drastic_bin) or not filecmp.cmp("/usr/bin/drastic", drastic_bin):
-            shutil.copyfile("/usr/bin/drastic", drastic_bin)
+            copyfile("/usr/bin/drastic", drastic_bin)
             os.chmod(drastic_bin, 0o0775)
 
         # Settings, Language and ConfirmPowerOff
@@ -99,7 +99,8 @@ class DrasticGenerator(Generator):
             array=commandArray,
             env={
                 'DISPLAY': '0.0',
-                'LIB_FB': '3'
+                'LIB_FB': '3',
+                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
             })
 
 # Language auto-setting

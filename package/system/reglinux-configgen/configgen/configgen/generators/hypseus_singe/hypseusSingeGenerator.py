@@ -305,6 +305,8 @@ class HypseusSingeGenerator(Generator):
         return Command.Command(
             array=commandArray,
             env={
+                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers),
+                'SDL_JOYSTICK_HIDAPI': '0',
                 'MANYMOUSE_NO_XINPUT2': 'x' # disable xorg mouse => forces evdev mouse
             }
         )

@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
+from configgen.Command import Command
 
 
 class Generator(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution) -> Command:
         pass
 
     def getResolutionMode(self, config):
@@ -36,4 +37,3 @@ class Generator(object):
     # this emulator/core requires a X server to run
     def requiresX11(self):
         return False
-

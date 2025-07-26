@@ -5,6 +5,7 @@ import Command
 import os
 import platform
 import systemFiles
+import controllers as controllersConfig
 from utils.buildargs import parse_args
 
 from utils.logger import get_logger
@@ -153,12 +154,12 @@ class RazeGenerator(Generator):
             )
 
         # Launch arguments
-        launch_args = ["raze"]
-        result = parse_args(launch_args, rom)
+        commandArray = ["raze"]
+        result = parse_args(commandArray, rom)
         if not result.okay:
             raise Exception(result.message)
 
-        launch_args += [
+        commandArray += [
             "-exec", self.script_file,
             # Disable controllers because support is poor; we use evmapy instead
             "-nojoy",
@@ -167,7 +168,11 @@ class RazeGenerator(Generator):
             "-nologo" if system.getOptBoolean("nologo") else "",
         ]
 
-        return Command.Command(array=launch_args)
+        return Command.Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                    })
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16/9
