@@ -1,5 +1,6 @@
 # Classe principal
 from .controller import (
+        Input,  
         Controller,
         generateSdlGameControllerConfig,
         writeSDLGameDBAllControllers
@@ -9,7 +10,6 @@ from .controller import (
 from .controllerdb import (
         loadAllControllersConfig,
         loadControllerConfig,
-        findBestControllerConfig
 )
 
 # Light guns
