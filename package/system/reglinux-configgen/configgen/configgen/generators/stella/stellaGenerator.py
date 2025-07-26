@@ -2,6 +2,7 @@
 
 from generators.Generator import Generator
 import Command
+import controllers as controllersConfig
 
 class StellaGenerator(Generator):
 
@@ -9,4 +10,8 @@ class StellaGenerator(Generator):
         # Launch Stella
         commandArray = ["stella" , " ", rom ]
 
-        return Command.Command(array=commandArray)
+        return Command.Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                    })

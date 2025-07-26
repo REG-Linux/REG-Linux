@@ -4,6 +4,7 @@ from generators.Generator import Generator
 import Command
 import os
 import systemFiles
+import controllers as controllersConfig
 from configparser import ConfigParser
 from utils.buildargs import parse_args
 
@@ -47,18 +48,23 @@ class EDuke32Generator(Generator):
                 f'r_showfps "{1 if system.getOptBoolean("showFPS") else 0}"\n'
                 f'echo BATOCERA\n'  # Easy check when debugging
             )
-        launch_args = [
+        commandArray = [
             core,
             "-cfg", config_file,
             "-nologo" if system.getOptBoolean("nologo") else ""
         ]
         if core == "fury":
-            launch_args += [
+            commandArray += [
                 "-gamegrp", os.path.basename(rom),
                 "-j", os.path.dirname(rom)
             ]
         else:
-            result = parse_args(launch_args, rom)
+            result = parse_args(commandArray, rom)
             if not result.okay:
                 raise Exception(result.message)
-        return Command.Command(array=launch_args)
+
+        return Command.Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                    })
