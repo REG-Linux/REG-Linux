@@ -3,7 +3,7 @@
 # DuckStation Qt (AppImage) - Rolling release
 #
 ################################################################################
-DUCKSTATION_VERSION = v0.1-9114
+DUCKSTATION_VERSION = v0.1-9226
 ifeq ($(BR2_arm),y)
 DUCKSTATION_SOURCE = DuckStation-armhf.AppImage
 else ifeq ($(BR2_aarch64),y)
