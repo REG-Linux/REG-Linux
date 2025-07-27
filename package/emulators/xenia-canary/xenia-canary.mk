@@ -3,8 +3,8 @@
 # xenia-canary
 #
 ################################################################################
-# Version: Commits on Jun 22, 2025
-XENIA_CANARY_VERSION = c5d6db2840d643ef344ab7a68e07daa9ff3c1b05
+# Version: Commits on Jul 27, 2025
+XENIA_CANARY_VERSION = fe0e18466f47cee31cbd4d5ac1448786c69e8300
 XENIA_CANARY_SITE = https://github.com/xenia-canary/xenia-canary
 XENIA_CANARY_SITE_METHOD = git
 XENIA_CANARY_GIT_SUBMODULES = YES
@@ -27,6 +27,7 @@ define XENIA_CANARY_CONFIGURE_CMDS
 	SYSROOT="$(STAGING_DIR)" \
 	SDL2CONFIG="$(HOST_DIR)/bin/sdl2-config" \
 	CMAKE_MAKE_PROGRAM="$(HOST_DIR)/bin/ninja" \
+	CC="$(HOST_DIR)/bin/clang" \
 	./xb premake
 endef
 
