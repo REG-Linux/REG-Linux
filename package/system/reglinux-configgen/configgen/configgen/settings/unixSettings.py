@@ -7,7 +7,7 @@ import io
 import tempfile
 from pathlib import Path
 from functools import lru_cache
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 
 from configgen.utils.logger import get_logger
 
