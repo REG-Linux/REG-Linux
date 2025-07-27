@@ -358,7 +358,7 @@ class Rpcs3Generator(Generator):
 
         # write our own gamecontrollerdb.txt file before launching the game
         dbfile = "/userdata/system/configs/rpcs3/input_configs/gamecontrollerdb.txt"
-        controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
+        controllersConfig.write_sdl_db_all_controllers(playersControllers, dbfile)
 
         commandArray = [rpcs3Config.rpcs3Bin, romName]
 

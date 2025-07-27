@@ -108,7 +108,7 @@ def defineControllerKeys(nplayer, controller, system, isWheel):
 
         # Analog Deadzone
         if isWheel:
-            config['AnalogDeadzone'] = f"0,0"
+            config['AnalogDeadzone'] = "0,0"
         else:
             config['AnalogDeadzone'] = getJoystickDeadzone(mupenmapping['AnalogPeak'], f"mupen64-deadzone{nplayer}", system)
 

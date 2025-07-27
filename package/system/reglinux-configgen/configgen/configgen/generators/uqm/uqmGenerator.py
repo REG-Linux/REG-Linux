@@ -26,5 +26,5 @@ class UqmGenerator(Generator):
         return Command.Command(
                     array=commandArray,
                     env={
-                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
                     })

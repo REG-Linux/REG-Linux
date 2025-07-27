@@ -10,7 +10,7 @@ from controllers import Controller, Input
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-def loadAllControllersConfig() -> Dict[str, Dict]:
+def load_all_controllers_config() -> Dict[str, Dict]:
     """
     Load all controller configurations from gamecontrollerdb.txt.
     Enhanced version that creates Input objects for each controller input.
@@ -61,7 +61,7 @@ def loadAllControllersConfig() -> Dict[str, Dict]:
     return controllerdb
 
 
-def loadControllerConfig(controllersInput):
+def load_controller_config(controllersInput):
     """
     Generates player-specific controller objects using the known controller database.
 
@@ -72,16 +72,16 @@ def loadControllerConfig(controllersInput):
         dict: Dictionary of Controller instances keyed by player number (as strings).
     """
     playerControllers = dict()
-    controllers = loadAllControllersConfig()
+    controllers = load_all_controllers_config()
 
     for i, ci in enumerate(controllersInput):
-        newController = _findBestControllerConfig(controllers, str(i + 1), ci["guid"], ci["devicepath"])
+        newController = _find_best_controller_config(controllers, str(i + 1), ci["guid"], ci["devicepath"])
         if newController:
             playerControllers[str(i + 1)] = newController
     return playerControllers
 
 
-def _findBestControllerConfig(controllers, x, pxguid, pxdev):
+def _find_best_controller_config(controllers, x, pxguid, pxdev):
     """
     Finds the best controller match in the loaded database by GUID and returns a Controller instance.
 

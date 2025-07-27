@@ -119,7 +119,7 @@ class Xash3dFwgsGenerator(Generator):
                 'XASH3D_BASEDIR': _ROMS_DIR,
                 'XASH3D_EXTRAS_PAK1': '/usr/share/xash3d/valve/extras.pk3',
                 'LD_LIBRARY_PATH': '/usr/lib/xash3d',
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
             })
 
     def _maybeInitConfig(self, game):

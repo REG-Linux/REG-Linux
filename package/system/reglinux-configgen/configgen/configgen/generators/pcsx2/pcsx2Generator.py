@@ -76,7 +76,7 @@ class Pcsx2Generator(Generator):
 
         # write our own game_controller_db.txt file before launching the game
         dbfile = pcsx2ConfigDir + "/game_controller_db.txt"
-        controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
+        controllersConfig.write_sdl_db_all_controllers(playersControllers, dbfile)
 
         commandArray = ["/usr/pcsx2/bin/pcsx2-qt"] if rom == "config" else \
               ["/usr/pcsx2/bin/pcsx2-qt", "-nogui", rom]
@@ -88,7 +88,7 @@ class Pcsx2Generator(Generator):
         # wheels won't work correctly when SDL_GAMECONTROLLERCONFIG is set. excluding wheels from SDL_GAMECONTROLLERCONFIG doesn't fix too.
         # wheel metadata
         #if not Pcsx2Generator.useEmulatorWheels(playingWithWheel, Pcsx2Generator.getWheelType(metadata, playingWithWheel, system.config)):
-        #    envcmd["SDL_GAMECONTROLLERCONFIG"] = controllersConfig.generateSdlGameControllerConfig(playersControllers)
+        #    envcmd["SDL_GAMECONTROLLERCONFIG"] = controllersConfig.generate_sdl_controller_config(playersControllers)
 
         # ensure we have the patches.zip file to avoid message.
         if not os.path.exists(pcsx2BiosDir):

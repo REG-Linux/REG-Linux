@@ -1,15 +1,15 @@
 # Classe principal
 from .controller import (
-        Input,  
+        Input,
         Controller,
-        generateSdlGameControllerConfig,
-        writeSDLGameDBAllControllers
+        generate_sdl_controller_config,
+        write_sdl_db_all_controllers
 )
 
 # gamecontrollerdb.txt
 from .controllerdb import (
-        loadAllControllersConfig,
-        loadControllerConfig,
+        load_all_controllers_config,
+        load_controller_config,
 )
 
 # Light guns
