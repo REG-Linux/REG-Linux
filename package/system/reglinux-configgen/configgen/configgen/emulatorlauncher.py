@@ -6,6 +6,8 @@ with the appropriate configurations.
 """
 
 import os
+from controllers import Evmapy
+
 profiler = None
 
 # Profiling Instructions:
@@ -92,6 +94,186 @@ def main(args, maxnbplayers):
         # If it's not a .zar file, launch the ROM directly
         return start_rom(args, maxnbplayers, args.rom, args.rom)
 
+def _configure_controllers(args, maxnbplayers):
+    """Configures controllers based on command-line arguments."""
+    controllersInput = []
+    for p in range(1, maxnbplayers + 1):
+        ci = {
+            "index":      getattr(args, f"p{p}index"),
+            "guid":       getattr(args, f"p{p}guid"),
+            "name":       getattr(args, f"p{p}name"),
+            "devicepath": getattr(args, f"p{p}devicepath"),
+            "nbbuttons":  getattr(args, f"p{p}nbbuttons"),
+            "nbhats":     getattr(args, f"p{p}nbhats"),
+            "nbaxes":     getattr(args, f"p{p}nbaxes")
+        }
+        controllersInput.append(ci)
+
+    playersControllers = controllers.loadControllerConfig(controllersInput)
+    return playersControllers
+
+
+def _setup_system_emulator(args, romConfiguration):
+    """Initializes system and emulator configurations."""
+    systemName = args.system
+    eslog.debug(f"Running system: {systemName}")
+    system = Emulator(systemName, romConfiguration)
+
+    if args.emulator is not None:
+        system.config["emulator"] = args.emulator
+        system.config["emulator-forced"] = True
+    if args.core is not None:
+        system.config["core"] = args.core
+        system.config["core-forced"] = True
+
+    debugDisplay = system.config.copy()
+    if "retroachievements.password" in debugDisplay:
+        debugDisplay["retroachievements.password"] = "***"
+    eslog.debug(f"Settings: {debugDisplay}")
+
+    if "emulator" in system.config:
+        core_info = f", core: {system.config['core']}" if "core" in system.config else ""
+        eslog.debug(f"emulator: {system.config['emulator']}{core_info}")
+
+    return system
+
+
+def _configure_special_devices(args, system, rom, metadata, playersControllers):
+    """Configures light guns and racing wheels."""
+    if not system.isOptSet('use_guns') and args.lightgun:
+        system.config["use_guns"] = True
+    if system.isOptSet('use_guns') and system.getOptBoolean('use_guns'):
+        guns = controllers.getGuns()
+        core = system.config.get("core")
+        gunsUtils.precalibration(system.name, system.config['emulator'], core, rom)
+    else:
+        eslog.info("Guns disabled.")
+        guns = []
+
+    wheelProcesses = None
+    if not system.isOptSet('use_wheels') and args.wheel:
+        system.config["use_wheels"] = True
+    if system.isOptSet('use_wheels') and system.getOptBoolean('use_wheels'):
+        deviceInfos = controllers.getDevicesInformation()
+        (wheelProcesses, playersControllers, deviceInfos) = wheelsUtils.reconfigureControllers(playersControllers, system, rom, metadata, deviceInfos)
+        wheels = wheelsUtils.getWheelsFromDevicesInfos(deviceInfos)
+    else:
+        eslog.info("Wheels disabled.")
+        wheels = []
+
+    return guns, wheels, wheelProcesses, playersControllers
+
+
+def _setup_video_and_mouse(system, generator, rom):
+    """Sets up video mode and mouse visibility for the game."""
+    wantedGameMode = generator.getResolutionMode(system.config)
+    systemMode = videoMode.getCurrentMode()
+    resolutionChanged = False
+    mouseChanged = False
+
+    newsystemMode = systemMode
+    if system.config.get("videomode", "default") in ["", "default"]:
+        eslog.debug("==== minTomaxResolution ====")
+        eslog.debug(f"Video mode before minmax: {systemMode}")
+        videoMode.minTomaxResolution()
+        newsystemMode = videoMode.getCurrentMode()
+        if newsystemMode != systemMode:
+            resolutionChanged = True
+
+    eslog.debug(f"Current video mode: {newsystemMode}")
+    eslog.debug(f"Wanted video mode: {wantedGameMode}")
+
+    if wantedGameMode != 'default' and wantedGameMode != newsystemMode:
+        videoMode.changeMode(wantedGameMode)
+        resolutionChanged = True
+    gameResolution = videoMode.getCurrentResolution()
+
+    if generator.getMouseMode(system.config, rom):
+        mouseChanged = True
+        videoMode.changeMouse(True)
+
+    return systemMode, resolutionChanged, mouseChanged, gameResolution
+
+
+def _apply_commandline_options(args, system):
+    """Applies command-line options like netplay and save states to the system config."""
+    if args.netplaymode is not None: system.config["netplay.mode"] = args.netplaymode
+    if args.netplaypass is not None: system.config["netplay.password"] = args.netplaypass
+    if args.netplayip is not None: system.config["netplay.server.ip"] = args.netplayip
+    if args.netplayport is not None: system.config["netplay.server.port"] = args.netplayport
+    if args.netplaysession is not None: system.config["netplay.server.session"] = args.netplaysession
+
+    if args.state_slot is not None: system.config["state_slot"] = args.state_slot
+    if args.autosave is not None: system.config["autosave"] = args.autosave
+    if args.state_filename is not None: system.config["state_filename"] = args.state_filename
+
+
+def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
+    """Configures and enables MangoHUD if supported."""
+    if not (system.isOptSet('hud_support') and os.path.exists("/usr/bin/mangohud") and system.getOptBoolean('hud_support')):
+        return
+
+    hud_bezel = getHudBezel(system, generator, rom, gameResolution, controllers.gunsBordersSizeName(guns, system.config))
+    if (system.isOptSet('hud') and system.config['hud'] not in ["", "none"]) or hud_bezel is not None:
+        gameinfos = extractGameInfosFromXml(args.gameinfoxml)
+        cmd.env["MANGOHUD_DLSYM"] = "1"
+        effectiveCore = system.config.get("core", "")
+        hudconfig = getHudConfig(system, args.systemname, system.config['emulator'], effectiveCore, rom, gameinfos, hud_bezel)
+        with open('/var/run/hud.config', 'w') as f:
+            f.write(hudconfig)
+        cmd.env["MANGOHUD_CONFIGFILE"] = "/var/run/hud.config"
+        if not generator.hasInternalMangoHUDCall():
+            cmd.array.insert(0, "mangohud")
+
+
+def _launch_emulator_process(generator, system, rom, playersControllers, metadata, guns, wheels, gameResolution, args, romConfiguration):
+    """Handles the actual emulator launch process within a try/finally block."""
+    global profiler
+    exitCode = -1
+
+    try:
+        Evmapy.start(args.system, system.config['emulator'], system.config.get("core", ""), romConfiguration, playersControllers, guns)
+        if (generator.requiresWayland() or generator.requiresX11()) and 'WAYLAND_DISPLAY' not in os.environ:
+            windowsManager.start_compositor(generator, system)
+
+        effectiveRom = rom or ""
+        executionDirectory = generator.executionDirectory(system.config, effectiveRom)
+        if executionDirectory is not None:
+            os.chdir(executionDirectory)
+
+        cmd = generator.generate(system, rom, playersControllers, metadata, guns, wheels, gameResolution)
+        _configure_hud(system, generator, cmd, args, rom, gameResolution, guns)
+
+        if profiler: profiler.disable()
+        exitCode = runCommand(cmd)
+        if profiler: profiler.enable()
+    finally:
+        Evmapy.stop()
+        if generator.requiresWayland() or generator.requiresX11():
+            windowsManager.stop_compositor(generator, system)
+    return exitCode
+
+
+def _cleanup_system(resolutionChanged, systemMode, mouseChanged, wheelProcesses):
+    """Restores system state after the emulator exits."""
+    if resolutionChanged:
+        try:
+            videoMode.changeMode(systemMode if systemMode is not None else "")
+        except Exception:
+            pass  # Don't let cleanup failures prevent exit.
+    if mouseChanged:
+        try:
+            videoMode.changeMouse(False)
+        except Exception:
+            pass
+    if wheelProcesses:
+        try:
+            wheelsUtils.resetControllers(wheelProcesses)
+        except Exception:
+            eslog.error("Unable to reset wheel controllers!")
+            pass
+
+
 def start_rom(args, maxnbplayers, rom, romConfiguration):
     """
     Prepares the system and launches the emulator for a given ROM.
@@ -114,217 +296,42 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
     Returns:
         int: The exit code from the emulator process.
     """
-    global profiler
-
-    # --- Controller Configuration ---
-    playersControllers = dict()
-    controllersInput = []
-    # Collect controller information from command-line arguments for each player.
-    for p in range(1, maxnbplayers + 1):
-        ci = {
-            "index":      getattr(args, f"p{p}index"),
-            "guid":       getattr(args, f"p{p}guid"),
-            "name":       getattr(args, f"p{p}name"),
-            "devicepath": getattr(args, f"p{p}devicepath"),
-            "nbbuttons":  getattr(args, f"p{p}nbbuttons"),
-            "nbhats":     getattr(args, f"p{p}nbhats"),
-            "nbaxes":     getattr(args, f"p{p}nbaxes")
-        }
-        controllersInput.append(ci)
-
-    # Load the controller configurations based on the input.
-    playersControllers = controllers.loadControllerConfig(controllersInput)
-
-    # --- System and Emulator Setup ---
-    systemName = args.system
-    eslog.debug(f"Running system: {systemName}")
-    # Initialize the Emulator object, which holds all configuration for the system.
-    system = Emulator(systemName, romConfiguration)
-
-    # Override default emulator and core if specified in arguments.
-    if args.emulator is not None:
-        system.config["emulator"] = args.emulator
-        system.config["emulator-forced"] = True
-    if args.core is not None:
-        system.config["core"] = args.core
-        system.config["core-forced"] = True
-
-    # For logging purposes, create a copy of the config and hide sensitive data.
-    debugDisplay = system.config.copy()
-    if "retroachievements.password" in debugDisplay:
-        debugDisplay["retroachievements.password"] = "***"
-    eslog.debug(f"Settings: {debugDisplay}")
-
-    if "emulator" in system.config:
-        core_info = f", core: {system.config['core']}" if "core" in system.config else ""
-        eslog.debug(f"emulator: {system.config['emulator']}{core_info}")
-
-    # --- Metadata and Device Handling ---
-    metadata = controllers.getGamesMetaData(systemName, rom)
-
-    # Configure light guns if enabled for the game.
-    if not system.isOptSet('use_guns') and args.lightgun:
-        system.config["use_guns"] = True
-    if system.isOptSet('use_guns') and system.getOptBoolean('use_guns'):
-        guns = controllers.getGuns()
-        core = system.config.get("core")
-        gunsUtils.precalibration(systemName, system.config['emulator'], core, rom)
-    else:
-        eslog.info("Guns disabled.")
-        guns = []
-
-    # Configure racing wheels if enabled for the game.
-    wheelProcesses = None
-    if not system.isOptSet('use_wheels') and args.wheel:
-        system.config["use_wheels"] = True
-    if system.isOptSet('use_wheels') and system.getOptBoolean('use_wheels'):
-        deviceInfos = controllers.getDevicesInformation()
-        (wheelProcesses, playersControllers, deviceInfos) = wheelsUtils.reconfigureControllers(playersControllers, system, rom, metadata, deviceInfos)
-        wheels = wheelsUtils.getWheelsFromDevicesInfos(deviceInfos)
-    else:
-        eslog.info("Wheels disabled.")
-        wheels = []
-
-    # --- Generator and Video Mode ---
-    # The "generator" is responsible for creating the emulator command line.
+    playersControllers = _configure_controllers(args, maxnbplayers)
+    system = _setup_system_emulator(args, romConfiguration)
+    metadata = controllers.getGamesMetaData(system.name, rom)
+    guns, wheels, wheelProcesses, playersControllers = _configure_special_devices(args, system, rom, metadata, playersControllers)
     generator = GeneratorImporter.getGenerator(system.config['emulator'])
 
-    # Determine the desired video mode for the game.
-    wantedGameMode = generator.getResolutionMode(system.config)
+    exitCode = -1
+    resolutionChanged, mouseChanged = False, False
     systemMode = videoMode.getCurrentMode()
 
-    resolutionChanged = False
-    mouseChanged = False
-    exitCode = -1
     try:
-        # If videomode is 'auto' or 'default', switch to a minimal resolution to save resources.
-        newsystemMode = systemMode
-        if system.config.get("videomode", "default") in ["", "default"]:
-            eslog.debug("==== minTomaxResolution ====")
-            eslog.debug(f"Video mode before minmax: {systemMode}")
-            videoMode.minTomaxResolution()
-            newsystemMode = videoMode.getCurrentMode()
-            if newsystemMode != systemMode:
-                resolutionChanged = True
+        systemMode, resolutionChanged, mouseChanged, gameResolution = _setup_video_and_mouse(system, generator, rom)
 
-        eslog.debug(f"Current video mode: {newsystemMode}")
-        eslog.debug(f"Wanted video mode: {wantedGameMode}")
-
-        # Change the video mode if the game requires a specific one.
-        if wantedGameMode != 'default' and wantedGameMode != newsystemMode:
-            videoMode.changeMode(wantedGameMode)
-            resolutionChanged = True
-        gameResolution = videoMode.getCurrentResolution()
-
-        # Create save directory for the system if it doesn't exist.
         dirname = os.path.join(systemFiles.SAVES, system.name)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        # --- Argument and Option Finalization ---
-        effectiveCore = system.config.get("core", "")
-        effectiveRom = rom or ""
+        _apply_commandline_options(args, system)
 
-        # Apply netplay options from arguments.
-        if args.netplaymode is not None:
-            system.config["netplay.mode"] = args.netplaymode
-        if args.netplaypass is not None:
-            system.config["netplay.password"] = args.netplaypass
-        if args.netplayip is not None:
-            system.config["netplay.server.ip"] = args.netplayip
-        if args.netplayport is not None:
-            system.config["netplay.server.port"] = args.netplayport
-        if args.netplaysession is not None:
-            system.config["netplay.server.session"] = args.netplaysession
-
-        # Apply save state options from arguments.
-        if args.state_slot is not None:
-            system.config["state_slot"] = args.state_slot
-        if args.autosave is not None:
-            system.config["autosave"] = args.autosave
-        if args.state_filename is not None:
-            system.config["state_filename"] = args.state_filename
-
-        # Show/hide mouse cursor based on generator's requirement.
-        if generator.getMouseMode(system.config, rom):
-            mouseChanged = True
-            videoMode.changeMouse(True)
-
-        # Configure SDL_RENDER_VSYNC based on system settings.
         system.config["sdlvsync"] = '0' if system.isOptSet('sdlvsync') and not system.getOptBoolean('sdlvsync') else '1'
         os.environ['SDL_RENDER_VSYNC'] = system.config["sdlvsync"]
 
-        # --- Script Execution and Emulator Launch ---
-        # Execute custom scripts before the emulator starts.
-        callExternalScripts("/usr/share/reglinux/configgen/scripts", "gameStart", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
-        callExternalScripts("/userdata/system/scripts", "gameStart", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
+        effectiveCore = system.config.get("core", "")
+        effectiveRom = rom or ""
+
+        callExternalScripts("/usr/share/reglinux/configgen/scripts", "gameStart", [system.name, system.config['emulator'], effectiveCore, effectiveRom])
+        callExternalScripts("/userdata/system/scripts", "gameStart", [system.name, system.config['emulator'], effectiveCore, effectiveRom])
 
         eslog.debug("==== Running emulator ====")
-        try:
-            # Start a window compositor like Wayland or X11 if required by the emulator.
-            if generator.requiresWayland() or generator.requiresX11():
-                if 'WAYLAND_DISPLAY' not in os.environ:
-                    windowsManager.start_compositor(generator, system)
+        exitCode = _launch_emulator_process(generator, system, rom, playersControllers, metadata, guns, wheels, gameResolution, args, romConfiguration)
 
-            # Change the execution directory if required by the generator.
-            executionDirectory = generator.executionDirectory(system.config, effectiveRom)
-            if executionDirectory is not None:
-                os.chdir(executionDirectory)
-
-            # Generate the final command to run the emulator.
-            cmd = generator.generate(system, rom, playersControllers, metadata, guns, wheels, gameResolution)
-
-            # Configure and enable MangoHUD if supported and enabled.
-            if system.isOptSet('hud_support') and os.path.exists("/usr/bin/mangohud") and system.getOptBoolean('hud_support'):
-                hud_bezel = getHudBezel(system, generator, rom, gameResolution, controllers.gunsBordersSizeName(guns, system.config))
-                if (system.isOptSet('hud') and system.config['hud'] not in ["", "none"]) or hud_bezel is not None:
-                    gameinfos = extractGameInfosFromXml(args.gameinfoxml)
-                    cmd.env["MANGOHUD_DLSYM"] = "1"
-                    hudconfig = getHudConfig(system, args.systemname, system.config['emulator'], effectiveCore, rom, gameinfos, hud_bezel)
-                    with open('/var/run/hud.config', 'w') as f:
-                        f.write(hudconfig)
-                    cmd.env["MANGOHUD_CONFIGFILE"] = "/var/run/hud.config"
-                    if not generator.hasInternalMangoHUDCall():
-                        cmd.array.insert(0, "mangohud")
-
-            # Disable profiler during command execution to focus on the script's own performance.
-            if profiler:
-                profiler.disable()
-            exitCode = runCommand(cmd)
-            if profiler:
-                profiler.enable()
-        finally:
-            # Stop the compositor after the emulator exits.
-            if generator.requiresWayland() or generator.requiresX11():
-                windowsManager.stop_compositor(generator, system)
-
-        # Execute custom scripts after the emulator stops.
-        callExternalScripts("/userdata/system/scripts", "gameStop", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
-        callExternalScripts("/usr/share/reglinux/configgen/scripts", "gameStop", [systemName, system.config['emulator'], effectiveCore, effectiveRom])
+        callExternalScripts("/userdata/system/scripts", "gameStop", [system.name, system.config['emulator'], effectiveCore, effectiveRom])
+        callExternalScripts("/usr/share/reglinux/configgen/scripts", "gameStop", [system.name, system.config['emulator'], effectiveCore, effectiveRom])
 
     finally:
-        # --- Cleanup ---
-        # Always restore the original video mode.
-        if resolutionChanged:
-            try:
-                videoMode.changeMode(systemMode if systemMode is not None else "")
-            except Exception:
-                pass  # Don't let cleanup failures prevent exit.
-
-        # Restore mouse cursor visibility.
-        if mouseChanged:
-            try:
-                videoMode.changeMouse(False)
-            except Exception:
-                pass
-
-        # Reset wheel controller configurations.
-        if wheelProcesses:
-            try:
-                wheelsUtils.resetControllers(wheelProcesses)
-            except Exception:
-                eslog.error("Unable to reset wheel controllers!")
-                pass
+        _cleanup_system(resolutionChanged, systemMode, mouseChanged, wheelProcesses)
 
     return exitCode
 
@@ -392,7 +399,6 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
         eslog.info(f"Bezel size read from {overlay_png_file}")
 
     # Define validation thresholds.
-    max_cover = 0.05  # 5% max coverage of the game area.
     max_ratio_delta = 0.01 # Max difference between screen and bezel aspect ratio.
 
     screen_ratio = gameResolution["width"] / gameResolution["height"]
@@ -640,7 +646,7 @@ if __name__ == '__main__':
     try:
         # Call the main function with parsed arguments.
         exitcode = main(args, maxnbplayers)
-    except Exception as e:
+    except Exception:
         eslog.error("An unhandled exception occurred in configgen:", exc_info=True)
 
     # --- Finalization ---
