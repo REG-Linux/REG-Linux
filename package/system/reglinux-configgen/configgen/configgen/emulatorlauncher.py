@@ -109,7 +109,7 @@ def _configure_controllers(args, maxnbplayers):
         }
         controllersInput.append(ci)
 
-    playersControllers = controllers.loadControllerConfig(controllersInput)
+    playersControllers = controllers.load_controller_config(controllersInput)
     return playersControllers
 
 

@@ -100,7 +100,7 @@ class DrasticGenerator(Generator):
             env={
                 'DISPLAY': '0.0',
                 'LIB_FB': '3',
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generateSdlGameControllerConfig(playersControllers)
+                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
             })
 
 # Language auto-setting

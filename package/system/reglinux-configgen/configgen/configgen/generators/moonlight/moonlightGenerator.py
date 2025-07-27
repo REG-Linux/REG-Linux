@@ -24,7 +24,7 @@ class MoonlightGenerator(Generator):
 
         # write our own gamecontrollerdb.txt file before launching the game
         dbfile = "/usr/share/moonlight/gamecontrollerdb.txt"
-        controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
+        controllersConfig.write_sdl_db_all_controllers(playersControllers, dbfile)
 
         return Command.Command(
             array=commandArray,

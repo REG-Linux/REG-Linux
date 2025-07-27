@@ -92,10 +92,10 @@ class Controller:
             dev=data.get("dev", None)
         )
 
-    def generateSDLGameDBLine(self):
-        return _generateSdlGameControllerConfig(self)
+    def generate_sdl_game_db_line(self):
+        return _generate_sdl_controller_config(self)
 
-def _generateSdlGameControllerConfig(controller: Controller) -> str:
+def _generate_sdl_controller_config(controller: Controller) -> str:
     config = [controller.guid, controller.name]
     for key, value in controller.inputs.items():
         if isinstance(value, Input):
@@ -105,7 +105,7 @@ def _generateSdlGameControllerConfig(controller: Controller) -> str:
     config.append('')
     return ','.join(config)
 
-def generateSdlGameControllerConfig(controllers: Dict) -> str:
+def generate_sdl_controller_config(controllers: Dict) -> str:
     """
     Generate SDL game controller configuration for multiple controllers.
 
@@ -115,11 +115,11 @@ def generateSdlGameControllerConfig(controllers: Dict) -> str:
     Returns:
         Newline-separated configuration strings
     """
-    return "\n".join(controller.generateSDLGameDBLine()
+    return "\n".join(controller.generate_sdl_game_db_line()
                     for controller in controllers.values())
 
 
-def writeSDLGameDBAllControllers(controllers: Dict,
+def write_sdl_db_all_controllers(controllers: Dict,
                                outputFile: str = "/tmp/gamecontrollerdb.txt") -> str:
     """
     Write SDL game controller configuration to a file.
@@ -132,5 +132,5 @@ def writeSDLGameDBAllControllers(controllers: Dict,
         Path to the output file
     """
     with open(outputFile, "w") as text_file:
-        text_file.write(generateSdlGameControllerConfig(controllers))
+        text_file.write(generate_sdl_controller_config(controllers))
     return outputFile

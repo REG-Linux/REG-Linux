@@ -217,7 +217,7 @@ def setHotKeyConfig(iniConfig, controllers, system):
     iniConfig.set("CoreEvents", "Version", "1")
 
     if '1' in controllers:
-        if 'hotkey' in controllers['1'].inputs:
+        if 'guide' in controllers['1'].inputs:
             if 'start' in controllers['1'].inputs:
                 iniConfig.set("CoreEvents", "Joy Mapping Stop", "\"J{}{}/{}\"".format(controllers['1'].index, createButtonCode(controllers['1'].inputs['hotkey']), createButtonCode(controllers['1'].inputs['start'])))
             if system.isOptSet("mupen64-controller1") and system.config["mupen64-controller1"] == "n64limited":
