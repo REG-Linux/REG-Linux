@@ -17,6 +17,7 @@ class Input:
     value: str
     code: Optional[int] = None
 
+
     @classmethod
     def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Optional['Input']:
         """
@@ -72,6 +73,66 @@ class Input:
             # Additional hat metadata could be stored here if needed
         )
 
+
+    def sdl_to_linux_input_event(self, guide_equal_back) -> Optional[Dict[str, Any]]:
+        """
+        Converts SDL input mapping to a Linux input event structure with complete metadata.
+
+        Returns:
+            A dictionary containing:
+                - name: SDL input name (e.g. "a", "leftx")
+                - type: Event type string (e.g. "button", "axis", "hat")
+                - id: SDL numeric identifier (e.g. "0", "1")
+                - value: Original SDL mapping string (e.g. "b0", "a1", "h0.1")
+                - code: Linux event code (e.g. 304 for BTN_SOUTH)
+        """
+
+        # Linux event codes: https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h
+        sdl_to_linux = {
+            # Buttons
+            "a": ("a", 304),
+            "b": ("b", 305),
+            "x": ("x", 307),
+            "y": ("y", 308),
+            "back": ("select", 314),
+            "start": ("start", 315),
+            "guide": ("hotkey", 316),
+            "leftshoulder": ("pageup", 310),
+            "rightshoulder": ("pagedown", 311),
+            "leftstick": ("l3", 317),
+            "rightstick": ("r3", 318),
+
+            # D-Pad
+            "dpup": ("up", 544),
+            "dpdown": ("down", 545),
+            "dpleft": ("left", 546),
+            "dpright": ("right", 547),
+
+            # Axes
+            "leftx": ("joystick1left", 0),
+            "lefty": ("joystick1up", 1),
+            "rightx": ("joystick2left", 3),
+            "righty": ("joystick2up", 4),
+            "triggerleft": ("l2", 2),
+            "triggerright": ("r2", 5),
+        }
+
+        key = self.name.lower()
+        if key in sdl_to_linux:
+            ev_name, ev_code = sdl_to_linux[key]
+            if key == "guide" and guide_equal_back:
+                ev_code = sdl_to_linux['back'][1]
+            return {
+                "name": ev_name,
+                "type": self.type,
+                "id": self.id,
+                "value": self.value,
+                "code": ev_code
+            }
+
+        return None
+
+
 @dataclass
 class Controller:
     guid: str
@@ -95,6 +156,7 @@ class Controller:
     def generate_sdl_game_db_line(self):
         return _generate_sdl_controller_config(self)
 
+
 def _generate_sdl_controller_config(controller: Controller) -> str:
     config = [controller.guid, controller.name]
     for key, value in controller.inputs.items():
@@ -104,6 +166,7 @@ def _generate_sdl_controller_config(controller: Controller) -> str:
             config.append(f"{key}:{value}")
     config.append('')
     return ','.join(config)
+
 
 def generate_sdl_controller_config(controllers: Dict) -> str:
     """
