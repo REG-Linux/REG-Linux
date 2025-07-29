@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import os
 import configparser
 import systemFiles
@@ -128,7 +127,7 @@ def generateControllerConfig(controller):
     # Set config file name
     configFileName = ppssppControlsIni
     Config = configparser.ConfigParser(interpolation=None)
-    Config.optionxform = str
+    Config.optionxform = lambda optionstr: str(optionstr)
     Config.read(ppssppControlsInit)
     # As we start with the default ini file, no need to create the section
     section = "ControlMapping"
@@ -142,9 +141,9 @@ def generateControllerConfig(controller):
             continue
 
         var = ppssppMapping[input.name][input.type]
-        padnum = controller.index
+        # Convert controller.index to integer
+        padnum = int(controller.index)
 
-        code = input.code
         if input.type == 'button':
             pspcode = sdlNameToNKCode[input.name]
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
