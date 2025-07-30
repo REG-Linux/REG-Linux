@@ -1,18 +1,16 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import configparser
 import shutil
-import systemFiles
 from pathlib import Path, PureWindowsPath
 from distutils.dir_util import copy_tree
+from systemFiles import SAVES
 
 class DemulGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        wineprefix = systemFiles.SAVES + "/demul"
+        wineprefix = SAVES + "/demul"
         emupath = wineprefix + "/demul"
         bottlewinpath = wineprefix + "/drive_c/windows"
 
@@ -62,7 +60,7 @@ class DemulGenerator(Generator):
         os.chdir(emupath)
         configFileName = emupath + "/Demul.ini"
         Config = configparser.ConfigParser(interpolation=None)
-        Config.optionxform = str
+        Config.optionxform=lambda optionstr: str(optionstr)
 
         if os.path.exists(configFileName):
             try:
@@ -148,7 +146,7 @@ class DemulGenerator(Generator):
         else:
             configFileName = emupath + "/gpuDX11.ini"
         Config = configparser.ConfigParser(interpolation=None)
-        Config.optionxform = str
+        Config.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(configFileName):
             try:
                 with open(configFileName, 'r', encoding='utf_8_sig') as fp:
@@ -195,7 +193,7 @@ class DemulGenerator(Generator):
         else:
             commandArray.extend([f"-rom={smplromname}"])
 
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
                 "WINEPREFIX": wineprefix,

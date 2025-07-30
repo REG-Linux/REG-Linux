@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
-
 import os
 import io
-import systemFiles
 import configparser
+from systemFiles import CONF
 
-xemuConfig = systemFiles.CONF + '/xemu/xemu.toml'
+xemuConfig = CONF + '/xemu/xemu.toml'
 xemuBin = '/usr/bin/xemu'
 
 def writeIniFile(system, rom, playersControllers, gameResolution):
     iniConfig = configparser.ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    iniConfig.optionxform = str
+    iniConfig.optionxform=lambda optionstr: str(optionstr)
     if os.path.exists(xemuConfig):
         try:
             with io.open(xemuConfig, 'r', encoding='utf_8_sig') as fp:

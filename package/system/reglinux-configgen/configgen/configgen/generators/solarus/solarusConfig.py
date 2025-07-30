@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
+from systemFiles import SAVES
 
-import systemFiles
-
-solarusSaves = systemFiles.SAVES + '/solarus'
+solarusSaves = SAVES + '/solarus'

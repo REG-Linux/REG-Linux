@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
-
-import systemFiles
 import configparser
 import os.path
 from os import environ
+from systemFiles import CONF
 
-duckstationConfigFile = systemFiles.CONF + "/duckstation/settings.ini"
+duckstationConfigFile = CONF + "/duckstation/settings.ini"
 duckstationBin = "/usr/duckstation/DuckStation.AppImage"
 
 def readWriteFile(system, playersControllers):
     settings = configparser.ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    settings.optionxform = str
+    settings.optionxform=lambda optionstr: str(optionstr)
 
     if os.path.exists(duckstationConfigFile):
         settings.read(duckstationConfigFile)

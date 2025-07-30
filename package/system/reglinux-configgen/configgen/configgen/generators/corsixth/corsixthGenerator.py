@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import subprocess
-import systemFiles
 import controllers as controllersConfig
+from systemFiles import CONF
 
-corsixthConfigPath = systemFiles.CONF + "/corsixth"
+corsixthConfigPath = CONF + "/corsixth"
 corsixthConfigFile = corsixthConfigPath + "/config.txt"
 corsixthSavesPath = "/userdata/saves/corsixth"
 corsixthDataPath = "/userdata/roms/corsixth"
@@ -122,7 +120,7 @@ class CorsixTHGenerator(Generator):
         # Launch engine with config file path
         commandArray = ["corsix-th", "--config-file=" + corsixthConfigFile]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

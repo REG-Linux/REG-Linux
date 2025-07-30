@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import subprocess
 
@@ -13,7 +11,7 @@ class WineGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         if system.name == "windows_installers":
             commandArray = ["batocera-wine", "windows", "install", rom]
-            return Command.Command(array=commandArray)
+            return Command(array=commandArray)
         elif system.name == "windows":
             commandArray = ["batocera-wine", "windows", "play", rom]
 
@@ -42,7 +40,7 @@ class WineGenerator(Generator):
                     }
                 )
 
-            return Command.Command(array=commandArray, env=environment)
+            return Command(array=commandArray, env=environment)
 
         raise Exception("invalid system " + system.name)
 

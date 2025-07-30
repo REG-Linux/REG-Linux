@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
+from systemFiles import HOME
 
-import systemFiles
-
-applewinConfig = systemFiles.HOME + '/applewin/applewin.conf'
+applewinConfig = HOME + '/applewin/applewin.conf'
 applewinBin = '/usr/bin/applewin'

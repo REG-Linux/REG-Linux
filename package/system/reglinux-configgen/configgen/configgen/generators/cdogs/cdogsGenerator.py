@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import controllers as controllersConfig
 from . import cdogsConfig
@@ -23,7 +21,7 @@ class CdogsGenerator(Generator):
 
         commandArray = [cdogsConfig.cdogsBin]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

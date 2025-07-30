@@ -1,11 +1,8 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
-import shutil
+from Command import Command
 import os
 import xml.etree.ElementTree as ET
-import shutil
+from shutil import rmtree, copy2
 import utils.bezels as bezelsUtil
 import subprocess
 import csv
@@ -410,7 +407,7 @@ class MameGenerator(Generator):
                         if os.path.islink(checkFile):
                             os.unlink(checkFile)
                         if os.path.isdir(checkFile):
-                            shutil.rmtree(checkFile)
+                            rmtree(checkFile)
                     if not os.path.exists(softDir + "hash/"):
                         os.makedirs(softDir + "hash/")
                     # Clear existing hashfile links
@@ -437,7 +434,7 @@ class MameGenerator(Generator):
                 if not os.path.exists(targetFolder):
                     os.makedirs(targetFolder)
                 if not os.path.exists(targetDisk):
-                    shutil.copy2(blankDisk, targetDisk)
+                    copy2(blankDisk, targetDisk)
                 # Add other single floppy systems to this if statement
                 if messModel == "fmtmarty":
                     commandArray += [ '-flop', targetDisk ]
@@ -553,7 +550,7 @@ class MameGenerator(Generator):
 
         # Change directory to MAME folder (allows data plugin to load properly)
         os.chdir('/usr/bin/mame')
-        return Command.Command(array=commandArray, env={"PWD":"/usr/bin/mame/"})
+        return Command(array=commandArray, env={"PWD":"/usr/bin/mame/"})
 
     @staticmethod
     def getRoot(config, name):
@@ -597,7 +594,7 @@ class MameGenerator(Generator):
             tmpZipDir = "/var/run/mame_artwork/" + messSys # ok, no need to zip, a folder is taken too
         # clean, in case no bezel is set, and in case we want to recreate it
         if os.path.exists(tmpZipDir):
-            shutil.rmtree(tmpZipDir)
+            rmtree(tmpZipDir)
 
         if bezelSet is None and gunsBordersSize is None:
             return

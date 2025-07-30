@@ -1,20 +1,19 @@
-#!/usr/bin/env python3
 import sys
 import os
 import json
 import subprocess
-import systemFiles
 import controllers as controllersConfig
 import utils.bezels as bezelsUtil
 import utils.videoMode as videoMode
 import xml.etree.ElementTree as ET
 from . import libretroOptions
 from . import libretroMAMEConfig
+from systemFiles import CONF, CONF_INIT, SAVES, ES_SETTINGS, OVERLAY_CONFIG_FILE
 from settings.unixSettings import UnixSettings
 
-hatariConf = systemFiles.CONF + '/hatari/hatari.cfg'
-retroarchRoot = systemFiles.CONF + '/retroarch'
-retroarchRootInit = systemFiles.CONF_INIT + '/retroarch'
+hatariConf = CONF + '/hatari/hatari.cfg'
+retroarchRoot = CONF + '/retroarch'
+retroarchRootInit = CONF_INIT + '/retroarch'
 retroarchCustom = retroarchRoot + '/retroarchcustom.cfg'
 retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
 retroarchCores = "/usr/lib/libretro/"
@@ -29,7 +28,7 @@ sys.path.append(
 # Return value for es invertedbuttons
 def getInvertButtonsValue():
     try:
-        tree = ET.parse(systemFiles.esSettings)
+        tree = ET.parse(ES_SETTINGS)
         root = tree.getroot()
         # Find the InvertButtons element and return value
         elem = root.find(".//bool[@name='InvertButtons']")
@@ -216,9 +215,9 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
     retroarchConfig['video_black_frame_insertion'] = 'false'    # don't use anymore this value while it doesn't allow the shaders to work
     retroarchConfig['pause_nonactive'] = 'false'                # required at least on x86 x86_64 otherwise, the game is paused at launch
 
-    if not os.path.exists(systemFiles.CONF + '/retroarch/cache'):
-        os.makedirs(systemFiles.CONF + '/retroarch/cache')
-    retroarchConfig['cache_directory'] = systemFiles.CONF + '/retroarch/cache'
+    if not os.path.exists(CONF + '/retroarch/cache'):
+        os.makedirs(CONF + '/retroarch/cache')
+    retroarchConfig['cache_directory'] = CONF + '/retroarch/cache'
 
     # require for core informations
     retroarchConfig['libretro_directory'] = '/usr/lib/libretro'
@@ -228,8 +227,8 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
 
     retroarchConfig['sort_savefiles_enable'] = 'false'     # ensure we don't save system.name + core
     retroarchConfig['sort_savestates_enable'] = 'false'    # ensure we don't save system.name + core
-    retroarchConfig['savestate_directory'] = systemFiles.SAVES + system.name
-    retroarchConfig['savefile_directory'] = systemFiles.SAVES + system.name
+    retroarchConfig['savestate_directory'] = SAVES + system.name
+    retroarchConfig['savefile_directory'] = SAVES + system.name
 
     # Forced values (so that if the config is not correct, fix it)
     if system.config['core'] == 'tgbdual':
@@ -1128,7 +1127,7 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
     # disable the overlay
     # if all steps are passed, enable them
     retroarchConfig['input_overlay_hide_in_menu'] = "false"
-    overlay_cfg_file  = systemFiles.overlayConfigFile
+    overlay_cfg_file  = OVERLAY_CONFIG_FILE
 
     # bezel are disabled
     # default values in case something wrong append

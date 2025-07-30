@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import filecmp
 import os
 import settings
@@ -95,7 +93,7 @@ class DrasticGenerator(Generator):
         os.chdir(drastic_root)
         commandArray = [drastic_bin, rom]
         #subprocess.Popen(commandArray, cwd=drastic_root) # Launched two times if activated
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
                 'DISPLAY': '0.0',

@@ -1,13 +1,10 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os.path
 import configparser
-import systemFiles
 from shutil import copyfile
-from os.path import isdir
-from os.path import isfile
+from os.path import isdir, isfile
+from systemFiles import CONF
 from . import flycastConfig
 
 class FlycastGenerator(Generator):
@@ -183,10 +180,10 @@ class FlycastGenerator(Generator):
         # VMU will be in $XDG_DATA_HOME / $FLYCAST_DATADIR because it needs rw access -> /userdata/saves/dreamcast
         # $FLYCAST_BIOS_PATH is where Flaycast should find the bios files
         # controller cfg files are set with an absolute path, so no worry
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
-                "XDG_CONFIG_DIRS":systemFiles.CONF,
+                "XDG_CONFIG_DIRS":CONF,
                 "FLYCAST_DATADIR":flycastConfig.flycastSaves,
                 "FLYCAST_BIOS_PATH":flycastConfig.flycastBios
             }

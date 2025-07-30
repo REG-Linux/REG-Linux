@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 class Command:
     """Represents a shell command with environment variables and arguments."""
     def __init__(self, array, env=None):

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 def generateControllerConfig(config, playersControllers, core):
     if core == "openbor4432":
         setupControllers(config, playersControllers, 32, False)

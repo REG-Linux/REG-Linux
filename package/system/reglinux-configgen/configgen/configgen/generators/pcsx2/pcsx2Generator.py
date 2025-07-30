@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import re
 import configparser
@@ -10,8 +8,8 @@ import requests
 import time
 import shutil
 import subprocess
-import systemFiles
 import controllers as controllersConfig
+from systemFiles import BIOS
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -56,7 +54,7 @@ class Pcsx2Generator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         pcsx2ConfigDir = "/userdata/system/configs/PCSX2"
-        pcsx2BiosDir = systemFiles.BIOS + "/ps2"
+        pcsx2BiosDir = BIOS + "/ps2"
         pcsx2Patches = pcsx2BiosDir + "/patches.zip"
 
         # Remove older config files if present
@@ -97,7 +95,7 @@ class Pcsx2Generator(Generator):
             source_file = "/usr/share/reglinux/datainit/bios/ps2/patches.zip"
             shutil.copy(source_file, pcsx2Patches)
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
 def getGfxRatioFromConfig(config, gameResolution):
     # 2: 4:3 ; 1: 16:9
@@ -156,7 +154,7 @@ def configureINI(config_directory, bios_directory, system, rom, controllers, met
 
     pcsx2INIConfig = configparser.ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    pcsx2INIConfig.optionxform = str
+    pcsx2INIConfig.optionxform=lambda optionstr: str(optionstr)
 
     if os.path.isfile(configFileName):
         pcsx2INIConfig.read(configFileName)

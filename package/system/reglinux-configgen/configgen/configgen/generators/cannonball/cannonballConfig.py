@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
-import systemFiles
 import os
 import codecs
 from xml.dom import minidom
+from systemFiles import CONF
 
-cannonballConfigFile = systemFiles.CONF + '/cannonball/config.xml'
+cannonballConfigFile = CONF + '/cannonball/config.xml'
 cannonballBin = "/usr/bin/cannonball"
 
 def setCannonballConfig(system):

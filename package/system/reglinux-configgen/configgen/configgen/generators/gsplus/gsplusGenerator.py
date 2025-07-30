@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
-import systemFiles
 import controllers as controllersConfig
 from settings.unixSettings import UnixSettings
+from systemFiles import CONF, BIOS
 from . import gsplusConfig
 
-CONFIGDIR  = systemFiles.CONF + '/GSplus'
+CONFIGDIR  = CONF + '/GSplus'
 CONFIGFILE = CONFIGDIR + '/config.txt'
 
 class GSplusGenerator(Generator):
@@ -92,13 +90,13 @@ class GSplusGenerator(Generator):
             config.save("bram3[d0]", '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00')
             config.save("bram3[e0]", '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00')
             config.save("bram3[f0]", '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00')
-        config.save("g_cfg_rom_path", systemFiles.BIOS)
+        config.save("g_cfg_rom_path", BIOS)
         # config.save("g_limit_speed", "0")
 
         config.write()
         commandArray = [gsplusConfig.gsplusBin, "-fullscreen"]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

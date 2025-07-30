@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 
 class FlatpakGenerator(Generator):
@@ -22,7 +20,7 @@ class FlatpakGenerator(Generator):
 
         # the directory monitor must exist and all the dirs must be owned by batocera
         commandArray = ["/usr/bin/flatpak", "run", "-v", romId]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getMouseMode(self, config, rom):
         return True

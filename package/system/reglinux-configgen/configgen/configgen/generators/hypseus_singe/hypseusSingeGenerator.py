@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import filecmp
 import shutil
 import os
@@ -302,7 +300,7 @@ class HypseusSingeGenerator(Generator):
             commandArray.extend(open(commandsFile,'r').read().split())
 
         # We now use SDL controller config
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
                 'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers),

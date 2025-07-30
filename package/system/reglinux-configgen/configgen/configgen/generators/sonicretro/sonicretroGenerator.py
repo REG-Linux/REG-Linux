@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import configparser
 import hashlib
@@ -55,7 +53,7 @@ class SonicRetroGenerator(Generator):
 
         # ini file
         sonicConfig = configparser.RawConfigParser(strict=False)
-        sonicConfig.optionxform=str             # Add Case Sensitive comportement
+        sonicConfig.optionxform=lambda optionstr: str(optionstr)             # Add Case Sensitive comportement
         if os.path.exists(iniFile):
             os.remove(iniFile)          # Force removing settings.ini
             sonicConfig.read(iniFile)
@@ -169,7 +167,7 @@ class SonicRetroGenerator(Generator):
         os.chdir(rom)
         commandArray = [emu]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

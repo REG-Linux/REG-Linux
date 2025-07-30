@@ -1,15 +1,13 @@
-#!/usr/bin/env python3
-
 import os
 import io
-import systemFiles
 import configparser
 import subprocess
+from systemFiles import CONF
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-ppssppConf     = systemFiles.CONF + '/ppsspp/PSP/SYSTEM'
+ppssppConf     = CONF + '/ppsspp/PSP/SYSTEM'
 ppssppConfig   = ppssppConf + '/ppsspp.ini'
 ppssppControls = ppssppConf + '/controls.ini'
 ppssppBin      = '/usr/bin/PPSSPP'

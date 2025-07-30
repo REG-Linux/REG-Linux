@@ -1,18 +1,16 @@
-#!/usr/bin/env python3
-
 import os
 import codecs
 import subprocess
-import systemFiles
+from systemFiles import CONF, BIOS
 from os import environ
 from xml.dom import minidom
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-cemuConfig  = systemFiles.CONF + '/cemu'
+cemuConfig  = CONF + '/cemu'
 cemuConfigFile = cemuConfig + '/settings.xml'
-cemuBios = systemFiles.BIOS + '/cemu'
+cemuBios = BIOS + '/cemu'
 cemuProfilesDir = cemuConfig + 'controllerProfiles'
 cemuRomdir = '/userdata/roms/wiiu'
 cemuSaves = '/userdata/saves/wiiu'

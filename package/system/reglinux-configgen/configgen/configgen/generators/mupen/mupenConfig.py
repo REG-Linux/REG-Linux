@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
-import systemFiles
+from systemFiles import CONF, SAVES, SCREENSHOTS
 
-mupenConf = systemFiles.CONF + '/mupen64/'
+mupenConf = CONF + '/mupen64/'
 mupenCustom = mupenConf + "mupen64plus.cfg"
 mupenInput = mupenConf + "InputAutoCfg.ini"
-mupenSaves = systemFiles.SAVES + "/n64"
+mupenSaves = SAVES + "/n64"
 mupenMappingUser    = mupenConf + 'input.xml'
 mupenMappingSystem  = '/usr/share/reglinux/datainit/system/configs/mupen64/input.xml'
 mupenBin = '/usr/bin/mupen64plus'
@@ -18,7 +17,7 @@ def setMupenConfig(iniConfig, system, controllers, gameResolution):
     if not iniConfig.has_section("Core"):
         iniConfig.add_section("Core")
     iniConfig.set("Core", "Version", "1.01") # Version is important for the .ini creation otherwise, mupen remove the section
-    iniConfig.set("Core", "ScreenshotPath", systemFiles.SCREENSHOTS)
+    iniConfig.set("Core", "ScreenshotPath", SCREENSHOTS)
     iniConfig.set("Core", "SaveStatePath",  mupenSaves)
     iniConfig.set("Core", "SaveSRAMPath",   mupenSaves)
     iniConfig.set("Core", "SharedDataPath", mupenConf)

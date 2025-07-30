@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 from . import cannonballConfig
 
 class CannonballGenerator(Generator):
@@ -14,4 +12,4 @@ class CannonballGenerator(Generator):
         # command line
         commandArray = [cannonballConfig.cannonballBin]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

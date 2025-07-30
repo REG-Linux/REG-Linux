@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import systemFiles
-import Command
 import os
+from Command import Command
 from . import mednafenConfig
 from . import mednafenControllers
 
@@ -31,5 +28,4 @@ class MednafenGenerator(Generator):
 
         commandArray = [mednafenConfig.mednafenBin]
         commandArray += [ rom ]
-        return Command.Command(array=commandArray)
-
+        return Command(array=commandArray)

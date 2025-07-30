@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import shutil
 import configparser
@@ -36,7 +34,7 @@ class SonicManiaGenerator(Generator):
 
         ## Create the Settings.ini file
         config = configparser.ConfigParser()
-        config.optionxform = str
+        config.optionxform=lambda optionstr: str(optionstr)
         # Game
         config['Game'] = {
             'devMenu': 'y',
@@ -74,7 +72,7 @@ class SonicManiaGenerator(Generator):
         os.chdir(rom_directory)
         commandArray = [destination_file]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

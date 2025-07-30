@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
 import os
-import Command
+from Command import Command
 import os.path
 import zipfile
 from os import path
@@ -169,9 +167,9 @@ class AmiberryGenerator(Generator):
             commandArray.append("sound_frequency=48000")
 
             os.chdir(amiberryConfig.amiberryShare)
-            return Command.Command(array=commandArray)
+            return Command(array=commandArray)
         # otherwise, unknown format
-        return Command.Command(array=[])
+        return Command(array=[])
 
     def floppiesFromRom(self, rom):
         floppies = []

@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
+from systemFiles import CONF
 
-import systemFiles
-
-dosboxStagingCustom = systemFiles.CONF + '/dosbox'
+dosboxStagingCustom = CONF + '/dosbox'
 dosboxStagingConfig = dosboxStagingCustom + '/dosbox.conf'
 dosboxStagingBin = '/usr/bin/dosbox-staging'

@@ -27,27 +27,27 @@ def getBezelInfos(rom, bezel, systemName, emulator):
 
     # Priority: game-specific overlays
     candidates += [
-        ("games", systemFiles.overlayUser, True, f"{systemName}/{romBase}"),
-        ("games", systemFiles.overlaySystem, True, f"{systemName}/{romBase}"),
-        ("games", systemFiles.overlayUser, True, romBase),
-        ("games", systemFiles.overlaySystem, True, romBase),
+        ("games", systemFiles.OVERLAY_USER, True, f"{systemName}/{romBase}"),
+        ("games", systemFiles.OVERLAY_SYSTEM, True, f"{systemName}/{romBase}"),
+        ("games", systemFiles.OVERLAY_USER, True, romBase),
+        ("games", systemFiles.OVERLAY_SYSTEM, True, romBase),
     ]
 
     # System-specific overlays (with or without altDecoration)
     if altDecoration != 0:
-        candidates.append(("systems", systemFiles.overlayUser, False, f"{systemName}-{altDecoration}"))
-    candidates.append(("systems", systemFiles.overlayUser, False, systemName))
+        candidates.append(("systems", systemFiles.OVERLAY_USER, False, f"{systemName}-{altDecoration}"))
+    candidates.append(("systems", systemFiles.OVERLAY_USER, False, systemName))
     if altDecoration != 0:
-        candidates.append(("systems", systemFiles.overlaySystem, False, f"{systemName}-{altDecoration}"))
-    candidates.append(("systems", systemFiles.overlaySystem, False, systemName))
+        candidates.append(("systems", systemFiles.OVERLAY_SYSTEM, False, f"{systemName}-{altDecoration}"))
+    candidates.append(("systems", systemFiles.OVERLAY_SYSTEM, False, systemName))
 
     # Default fallback overlays
     if altDecoration != 0:
-        candidates.append(("", systemFiles.overlayUser, True, f"default-{altDecoration}"))
-    candidates.append(("", systemFiles.overlayUser, True, "default"))
+        candidates.append(("", systemFiles.OVERLAY_USER, True, f"default-{altDecoration}"))
+    candidates.append(("", systemFiles.OVERLAY_USER, True, "default"))
     if altDecoration != 0:
-        candidates.append(("", systemFiles.overlaySystem, True, f"default-{altDecoration}"))
-    candidates.append(("", systemFiles.overlaySystem, True, "default"))
+        candidates.append(("", systemFiles.OVERLAY_SYSTEM, True, f"default-{altDecoration}"))
+    candidates.append(("", systemFiles.OVERLAY_SYSTEM, True, "default"))
 
     for subfolder, basepath, bezel_game, name in candidates:
         prefix = f"{basepath}/{bezel}/{subfolder}/" if subfolder else f"{basepath}/{bezel}/"
