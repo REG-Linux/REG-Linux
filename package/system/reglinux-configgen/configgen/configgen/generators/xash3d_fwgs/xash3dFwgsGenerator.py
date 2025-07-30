@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
 import glob
 import os
 import re
 import shutil
-import Command
+from Command import Command
+import controllers as controllersConfig
 
 _ROMS_DIR = '/userdata/roms/xash3d_fwgs'
 
@@ -112,12 +111,13 @@ class Xash3dFwgsGenerator(Generator):
         self._maybeInitConfig(game)
         self._maybeInitSaveDir(game)
 
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
                 'XASH3D_BASEDIR': _ROMS_DIR,
                 'XASH3D_EXTRAS_PAK1': '/usr/share/xash3d/valve/extras.pk3',
-                'LD_LIBRARY_PATH': '/usr/lib/xash3d'
+                'LD_LIBRARY_PATH': '/usr/lib/xash3d',
+                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
             })
 
     def _maybeInitConfig(self, game):

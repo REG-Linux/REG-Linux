@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import re
 
@@ -42,7 +40,7 @@ class MugenGenerator(Generator):
                 }
 
         commandArray = ["batocera-wine", "mugen", "play", rom]
-        return Command.Command(
+        return Command(
             array=commandArray,
             env=environment
         )

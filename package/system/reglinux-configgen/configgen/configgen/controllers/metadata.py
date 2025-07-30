@@ -7,7 +7,7 @@ eslog = get_logger(__name__)
 
 def getGamesMetaData(system, rom):
     # load the database
-    tree = ET.parse(systemFiles.esGamesMetadata)
+    tree = ET.parse(systemFiles.ES_GAMES_METADATA)
     root = tree.getroot()
     game = shortNameFromPath(rom)
     res = {}
@@ -45,4 +45,3 @@ def getGamesMetaData(system, rom):
                               eslog.info("found game metadata {}={}".format(key, res[key]))
                       return res
     return res
-

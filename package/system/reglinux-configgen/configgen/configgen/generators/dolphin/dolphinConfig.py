@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
-import systemFiles
 from struct import pack
 from struct import unpack
 from os     import environ
+from systemFiles import CONF, SAVES
 
-dolphinConfig  = systemFiles.CONF + "/dolphin-emu"
-dolphinData    = systemFiles.SAVES + "/dolphin-emu"
+dolphinConfig  = CONF + "/dolphin-emu"
+dolphinData    = SAVES + "/dolphin-emu"
 dolphinIni     = dolphinConfig + '/Dolphin.ini'
 dolphinGfxIni  = dolphinConfig + '/GFX.ini'
 dolphinSYSCONF = dolphinData + "/Wii/shared2/sys/SYSCONF"

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import systemFiles
 import xml.etree.ElementTree as ET
@@ -48,7 +46,7 @@ class Emulator:
         gsname = self.game_settings_name(rom)
 
         # Load configurations from system.conf using UnixSettings
-        recalSettings = UnixSettings(systemFiles.systemConf)
+        recalSettings = UnixSettings(systemFiles.SYSTEM_CONF)
         globalSettings = recalSettings.loadAll('global')
         controllersSettings = recalSettings.loadAll('controllers', True)
         systemSettings = recalSettings.loadAll(self.name)
@@ -261,7 +259,7 @@ class Emulator:
         Sets default values if the file is unavailable or parsing fails.
         """
         try:
-            esConfig = ET.parse(systemFiles.esSettings)
+            esConfig = ET.parse(systemFiles.ES_SETTINGS)
 
             # Read showFPS setting
             drawframerate_elem = esConfig.find("./bool[@name='DrawFramerate']")

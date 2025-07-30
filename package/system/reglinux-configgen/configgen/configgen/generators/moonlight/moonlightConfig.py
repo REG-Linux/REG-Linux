@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
-import systemFiles
 import os
 import shutil
+from systemFiles import CONF
 from settings.unixSettings import UnixSettings
 
-moonlightCustom = systemFiles.CONF + '/moonlight'
+moonlightCustom = CONF + '/moonlight'
 moonlightConfigFile = moonlightCustom + '/moonlight.conf'
 moonlightStagingConfigFile = moonlightCustom + '/staging/moonlight.conf'
 moonlightGamelist = moonlightCustom + '/gamelist.txt'

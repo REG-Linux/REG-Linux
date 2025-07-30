@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
+from systemFiles import CONF
 
-import systemFiles
-
-supermodelCustom = systemFiles.CONF + '/supermodel'
+supermodelCustom = CONF + '/supermodel'
 supermodelIni = supermodelCustom + '/Supermodel.ini'
 supermodelBin = '/usr/bin/supermodel'

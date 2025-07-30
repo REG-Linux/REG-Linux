@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os.path
 import zipfile
 from . import viceConfig
@@ -38,4 +36,4 @@ class ViceGenerator(Generator):
 
         commandArray.append(rom)
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

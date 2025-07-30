@@ -1,15 +1,12 @@
-#!/usr/bin/env python3
-
-import sys
 import os
 import configparser
-import systemFiles
+from systemFiles import CONF, HOME_INIT
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-ppssppControlsIni  = systemFiles.CONF + '/ppsspp/PSP/SYSTEM/controls.ini'
-ppssppControlsInit = systemFiles.HOME_INIT + 'configs/ppsspp/PSP/SYSTEM/controls.ini'
+ppssppControlsIni  = CONF + '/ppsspp/PSP/SYSTEM/controls.ini'
+ppssppControlsInit = HOME_INIT + 'configs/ppsspp/PSP/SYSTEM/controls.ini'
 
 # This configgen is based on PPSSPP 1.5.4.
 # Therefore, all code/github references are valid at this version, and may not be valid with later updates
@@ -128,7 +125,7 @@ def generateControllerConfig(controller):
     # Set config file name
     configFileName = ppssppControlsIni
     Config = configparser.ConfigParser(interpolation=None)
-    Config.optionxform = str
+    Config.optionxform = lambda optionstr: str(optionstr)
     Config.read(ppssppControlsInit)
     # As we start with the default ini file, no need to create the section
     section = "ControlMapping"
@@ -142,9 +139,9 @@ def generateControllerConfig(controller):
             continue
 
         var = ppssppMapping[input.name][input.type]
-        padnum = controller.index
+        # Convert controller.index to integer
+        padnum = int(controller.index)
 
-        code = input.code
         if input.type == 'button':
             pspcode = sdlNameToNKCode[input.name]
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"

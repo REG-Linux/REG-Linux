@@ -1,19 +1,18 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import platform
-import systemFiles
+import controllers as controllersConfig
 from utils.buildargs import parse_args
+from systemFiles import CONF, SAVES
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 class RazeGenerator(Generator):
 
-    config_dir = f"{systemFiles.CONF}/raze"
-    saves_dir = f"{systemFiles.SAVES}/raze"
+    config_dir = f"{CONF}/raze"
+    saves_dir = f"{SAVES}/raze"
     # The main config file, which is emitted with duplicate keys and makes working with ConfigParser very annoying
     config_file = f"{config_dir}/raze.ini"
     # A script file with console commands that are always ran when a game starts
@@ -153,12 +152,12 @@ class RazeGenerator(Generator):
             )
 
         # Launch arguments
-        launch_args = ["raze"]
-        result = parse_args(launch_args, rom)
+        commandArray = ["raze"]
+        result = parse_args(commandArray, rom)
         if not result.okay:
             raise Exception(result.message)
 
-        launch_args += [
+        commandArray += [
             "-exec", self.script_file,
             # Disable controllers because support is poor; we use evmapy instead
             "-nojoy",
@@ -167,7 +166,11 @@ class RazeGenerator(Generator):
             "-nologo" if system.getOptBoolean("nologo") else "",
         ]
 
-        return Command.Command(array=launch_args)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
+                    })
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16/9

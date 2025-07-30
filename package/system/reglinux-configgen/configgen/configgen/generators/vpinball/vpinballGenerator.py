@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
 import os
 import configparser
-import Command
+from Command import Command
 import shutil
-import systemFiles
+from systemFiles import CONF
 from configgen.configgen.utils.systemServices import batoceraServices
 from . import vpinballWindowing
 from . import vpinballOptions
@@ -20,10 +18,10 @@ class VPinballGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # files
-        vpinballConfigPath     = systemFiles.CONF + "/vpinball"
+        vpinballConfigPath     = CONF + "/vpinball"
         vpinballConfigFile     = vpinballConfigPath + "/VPinballX.ini"
         vpinballLogFile        = vpinballConfigPath + "/vpinball.log"
-        vpinballPinmameIniPath = systemFiles.CONF + "/vpinball/pinmame/ini"
+        vpinballPinmameIniPath = CONF + "/vpinball/pinmame/ini"
 
         # create vpinball config directory and default config file if they don't exist
         if not os.path.exists(vpinballConfigPath):
@@ -38,14 +36,14 @@ class VPinballGenerator(Generator):
         ## [ VPinballX.ini ] ##
         try:
             vpinballSettings = configparser.ConfigParser(interpolation=None, allow_no_value=True)
-            vpinballSettings.optionxform = str
+            vpinballSettings.optionxform=lambda optionstr: str(optionstr)
             vpinballSettings.read(vpinballConfigFile)
         except configparser.DuplicateOptionError as e:
             eslog.debug(f"Error reading VPinballX.ini: {e}")
             eslog.debug(f"*** Using default VPinballX.ini file ***")
             shutil.copy("/usr/bin/vpinball/assets/Default_VPinballX.ini", vpinballConfigFile)
             vpinballSettings = configparser.ConfigParser(interpolation=None, allow_no_value=True)
-            vpinballSettings.optionxform = str
+            vpinballSettings.optionxform=lambda optionstr: str(optionstr)
             vpinballSettings.read(vpinballConfigFile)
 
         # init sections
@@ -84,7 +82,7 @@ class VPinballGenerator(Generator):
         ]
 
         # SDL_RENDER_VSYNC is causing perf issues (set by emulatorlauncher.py)
-        return Command.Command(array=commandArray, env={"SDL_RENDER_VSYNC": "0"})
+        return Command(array=commandArray, env={"SDL_RENDER_VSYNC": "0"})
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16/9

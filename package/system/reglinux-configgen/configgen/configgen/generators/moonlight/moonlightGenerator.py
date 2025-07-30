@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os.path
 import systemFiles
 import controllers as controllersConfig
@@ -24,9 +22,9 @@ class MoonlightGenerator(Generator):
 
         # write our own gamecontrollerdb.txt file before launching the game
         dbfile = "/usr/share/moonlight/gamecontrollerdb.txt"
-        controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
+        controllersConfig.write_sdl_db_all_controllers(playersControllers, dbfile)
 
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
                 "XDG_DATA_DIRS": systemFiles.CONF

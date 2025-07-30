@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import controllers as controllersConfig
 import evdev
 import subprocess
@@ -235,7 +233,7 @@ def getWheelsFromDevicesInfos(deviceInfos):
     return res
 
 def reconfigureAngleRotation(dev, wheelAxis, rotationAngle, wantedRotationAngle, wantedDeadzone, wantedMidzone):
-    devInfos = evdev.InputDevice(dev)
+    devInfos = evdev.device.InputDevice(dev)
     caps = devInfos.capabilities()
 
     absmin = None

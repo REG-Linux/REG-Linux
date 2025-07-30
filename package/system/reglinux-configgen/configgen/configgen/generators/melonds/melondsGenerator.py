@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
-import systemFiles
 import codecs
+from systemFiles import CONF
 from os import path
 from . import melondsConfig
 
@@ -26,7 +24,7 @@ class MelonDSGenerator(Generator):
         if not os.path.exists("/userdata/cheats/melonDS"):
             os.mkdir("/userdata/cheats/melonDS")
         # Config path
-        configdir = "{}/{}".format(systemFiles.CONF, "melonDS")
+        configdir = "{}/{}".format(CONF, "melonDS")
         if not os.path.exists(configdir):
             os.makedirs(configdir)
         # Config file
@@ -164,4 +162,4 @@ class MelonDSGenerator(Generator):
         f.close()
 
         commandArray = [melondsConfig.melondsBin, "-f", rom]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

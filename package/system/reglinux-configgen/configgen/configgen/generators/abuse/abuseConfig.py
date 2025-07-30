@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
+from systemFiles import ROMS
 
-import systemFiles
-
-abuseDataDir = systemFiles.ROMS + '/abuse/abuse_data'
+abuseDataDir = ROMS + '/abuse/abuse_data'
 abuseBin = '/usr/bin/abuse'
