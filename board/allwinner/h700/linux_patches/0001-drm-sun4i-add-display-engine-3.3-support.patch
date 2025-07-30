@@ -5,9 +5,7 @@ Subject: [PATCH 1/9] drm: sun4i: add display engine 3.3 support
 
 ---
  .../bus/allwinner,sun50i-a64-de2.yaml         |   4 +-
- .../clock/allwinner,sun8i-a83t-de2-clk.yaml   |   1 +
  .../allwinner,sun8i-a83t-de2-mixer.yaml       |   1 +
- drivers/clk/sunxi-ng/ccu-sun8i-de2.c          |  25 ++
  drivers/gpu/drm/sun4i/Makefile                |   3 +-
  drivers/gpu/drm/sun4i/sun4i_tcon.c            |  26 +-
  drivers/gpu/drm/sun4i/sun50i_afbc.c           | 250 +++++++++++++
@@ -45,18 +43,6 @@ index 9845a187b..ea7ee8915 100644
            - const: allwinner,sun50i-a64-de2
  
    reg:
-diff --git a/Documentation/devicetree/bindings/clock/allwinner,sun8i-a83t-de2-clk.yaml b/Documentation/devicetree/bindings/clock/allwinner,sun8i-a83t-de2-clk.yaml
-index 70369bd63..7fcd55d46 100644
---- a/Documentation/devicetree/bindings/clock/allwinner,sun8i-a83t-de2-clk.yaml
-+++ b/Documentation/devicetree/bindings/clock/allwinner,sun8i-a83t-de2-clk.yaml
-@@ -25,6 +25,7 @@ properties:
-       - const: allwinner,sun50i-a64-de2-clk
-       - const: allwinner,sun50i-h5-de2-clk
-       - const: allwinner,sun50i-h6-de3-clk
-+      - const: allwinner,sun50i-h616-de33-clk
-       - items:
-           - const: allwinner,sun8i-r40-de2-clk
-           - const: allwinner,sun8i-h3-de2-clk
 diff --git a/Documentation/devicetree/bindings/display/allwinner,sun8i-a83t-de2-mixer.yaml b/Documentation/devicetree/bindings/display/allwinner,sun8i-a83t-de2-mixer.yaml
 index b75c1ec68..c37eb8ae1 100644
 --- a/Documentation/devicetree/bindings/display/allwinner,sun8i-a83t-de2-mixer.yaml
@@ -69,63 +55,6 @@ index b75c1ec68..c37eb8ae1 100644
  
    reg:
      maxItems: 1
-diff --git a/drivers/clk/sunxi-ng/ccu-sun8i-de2.c b/drivers/clk/sunxi-ng/ccu-sun8i-de2.c
-index f2aa71206..a6cd0f988 100644
---- a/drivers/clk/sunxi-ng/ccu-sun8i-de2.c
-+++ b/drivers/clk/sunxi-ng/ccu-sun8i-de2.c
-@@ -5,6 +5,7 @@
- 
- #include <linux/clk.h>
- #include <linux/clk-provider.h>
-+#include <linux/io.h>
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
-@@ -239,6 +240,16 @@ static const struct sunxi_ccu_desc sun50i_h5_de2_clk_desc = {
- 	.num_resets	= ARRAY_SIZE(sun50i_h5_de2_resets),
- };
- 
-+static const struct sunxi_ccu_desc sun50i_h616_de33_clk_desc = {
-+	.ccu_clks	= sun8i_de2_ccu_clks,
-+	.num_ccu_clks	= ARRAY_SIZE(sun8i_de2_ccu_clks),
-+
-+	.hw_clks	= &sun8i_h3_de2_hw_clks,
-+
-+	.resets		= sun50i_h5_de2_resets,
-+	.num_resets	= ARRAY_SIZE(sun50i_h5_de2_resets),
-+};
-+
- static int sunxi_de2_clk_probe(struct platform_device *pdev)
- {
- 	struct clk *bus_clk, *mod_clk;
-@@ -291,6 +302,16 @@ static int sunxi_de2_clk_probe(struct platform_device *pdev)
- 		goto err_disable_mod_clk;
- 	}
- 
-+	/*
-+	 * The DE33 requires these additional (unknown) registers set
-+	 * during initialisation.
-+	 */
-+	if (of_device_is_compatible(pdev->dev.of_node,
-+				    "allwinner,sun50i-h616-de33-clk")) {
-+		writel(0, reg + 0x24);
-+		writel(0x0000a980, reg + 0x28);
-+	}
-+
- 	ret = devm_sunxi_ccu_probe(&pdev->dev, reg, ccu_desc);
- 	if (ret)
- 		goto err_assert_reset;
-@@ -335,6 +356,10 @@ static const struct of_device_id sunxi_de2_clk_ids[] = {
- 		.compatible = "allwinner,sun50i-h6-de3-clk",
- 		.data = &sun50i_h5_de2_clk_desc,
- 	},
-+	{
-+		.compatible = "allwinner,sun50i-h616-de33-clk",
-+		.data = &sun50i_h616_de33_clk_desc,
-+	},
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, sunxi_de2_clk_ids);
 diff --git a/drivers/gpu/drm/sun4i/Makefile b/drivers/gpu/drm/sun4i/Makefile
 index bad7497a0..78290f166 100644
 --- a/drivers/gpu/drm/sun4i/Makefile
