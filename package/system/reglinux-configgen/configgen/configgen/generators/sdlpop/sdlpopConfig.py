@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
+from systemFiles import CONF
 
-import systemFiles
-
-sdlpopConfigDir = systemFiles.CONF + '/SDLPoP'
+sdlpopConfigDir = CONF + '/SDLPoP'
 sdlpopSrcCfg = sdlpopConfigDir + '/SDLPoP.cfg'
 sdlpopSrcIni = sdlpopConfigDir + '/SDLPoP.ini'
 sdlpopDestCfg = '/usr/share/SDLPoP/cfg/SDLPoP.cfg'

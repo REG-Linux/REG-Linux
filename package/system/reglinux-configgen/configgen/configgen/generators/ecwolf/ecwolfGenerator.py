@@ -1,20 +1,18 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import codecs
-import systemFiles
 import controllers as controllersConfig
 from os import path
+from systemFiles import CONF, SAVES
 
 class ECWolfGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        ecwolfConfigDir = systemFiles.CONF + "/ecwolf"
+        ecwolfConfigDir = CONF + "/ecwolf"
         ecwolfConfigFile = ecwolfConfigDir + "/ecwolf.cfg"
-        ecwolfSaves = systemFiles.SAVES + "/ecwolf/" + path.basename(rom)
+        ecwolfSaves = SAVES + "/ecwolf/" + path.basename(rom)
         commandArray = ["ecwolf"] # Binary for command array
 
         # Create config folders
@@ -90,7 +88,7 @@ class ECWolfGenerator(Generator):
                  "--savedir", ecwolfSaves
         ]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

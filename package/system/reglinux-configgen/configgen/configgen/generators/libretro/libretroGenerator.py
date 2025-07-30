@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
-import shutil
+from Command import Command
 import os
-import systemFiles
 import utils.videoMode as videoMode
+from shutil import copyfile
+from systemFiles import OVERLAYS
 from settings.unixSettings import UnixSettings
 from . import libretroConfig
 from . import libretroRetroarchCustom
@@ -82,7 +80,7 @@ class LibretroGenerator(Generator):
             remapconfigDir = libretroConfig.retroarchRoot + "/config/remaps/common"
             if not os.path.exists(remapconfigDir):
                 os.makedirs(remapconfigDir)
-            shutil.copyfile(libretroConfig.retroarchCustom, remapconfigDir + "/common.rmp")
+            copyfile(libretroConfig.retroarchCustom, remapconfigDir + "/common.rmp")
 
         # Retroarch core on the filesystem
         retroarchCore = libretroConfig.retroarchCores + system.config['core'] + "_libretro.so"
@@ -177,7 +175,7 @@ class LibretroGenerator(Generator):
             configToAppend.append(customGameCfg)
 
         # Overlay management
-        overlayFile = f"{systemFiles.OVERLAYS}/{system.name}/{romName}.cfg"
+        overlayFile = f"{OVERLAYS}/{system.name}/{romName}.cfg"
         if os.path.isfile(overlayFile):
             configToAppend.append(overlayFile)
 
@@ -226,7 +224,7 @@ class LibretroGenerator(Generator):
         if dontAppendROM == False:
             commandArray.append(rom)
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
 def getGFXBackend(system):
         # Start with the selected option

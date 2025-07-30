@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
+from systemFiles import HOME
 
-import systemFiles
-
-mednafenConfigDir = systemFiles.HOME + "/.mednafen"
+mednafenConfigDir = HOME + "/.mednafen"
 mednafenConfigFile = mednafenConfigDir + "/mednafen.cfg"
 mednafenBin = "/usr/bin/mednafen"
 
@@ -88,4 +86,3 @@ def setMednafenConfig(cfgConfig):
 
     # Automatically enable FPS display on startup.
     cfgConfig.write("fps.autoenable 0\n")
-

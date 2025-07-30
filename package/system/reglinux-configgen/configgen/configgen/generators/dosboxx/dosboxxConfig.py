@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
+from systemFiles import CONF
 
-import systemFiles
-
-dosboxxCustom = systemFiles.CONF + '/dosbox'
+dosboxxCustom = CONF + '/dosbox'
 dosboxxConfig = dosboxxCustom + '/dosboxx.conf'
 dosboxxBin = '/usr/bin/dosbox-x'
-

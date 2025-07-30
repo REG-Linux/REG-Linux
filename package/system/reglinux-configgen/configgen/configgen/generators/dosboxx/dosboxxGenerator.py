@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import configparser
-import systemFiles
 import os.path, shutil
 from . import dosboxxConfig
 
@@ -21,7 +18,7 @@ class DosBoxxGenerator(Generator):
         # configuration file
         iniSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        iniSettings.optionxform = str
+        iniSettings.optionxform=lambda optionstr: str(optionstr)
 
         # copy config file to custom config file to avoid overwritting by dosbox-x
         customConfFile = os.path.join(dosboxxConfig.dosboxxCustom,'dosboxx-custom.conf')
@@ -48,4 +45,4 @@ class DosBoxxGenerator(Generator):
                         "-fastbioslogo",
                         f"-conf {customConfFile}"]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

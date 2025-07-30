@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import subprocess
 
 from .logger import get_logger

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 from controllers import Input
 from xml.dom import minidom

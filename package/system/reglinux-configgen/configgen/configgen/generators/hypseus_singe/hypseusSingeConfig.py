@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
+from systemFiles import CONF, ROMS, SAVES
 
-import systemFiles
-
-daphneRomdir = systemFiles.ROMS + '/daphne'
-singeRomdir = systemFiles.ROMS + '/singe'
-hypseusDatadir = systemFiles.CONF + '/hypseus-singe'
+daphneRomdir = ROMS + '/daphne'
+singeRomdir = ROMS + '/singe'
+hypseusDatadir = CONF + '/hypseus-singe'
 hypseusConfig = hypseusDatadir + '/hypinput.ini'
 hypseusConfigfile = 'hypinput.ini'
-hypseusSaves = systemFiles.SAVES + '/hypseus'
+hypseusSaves = SAVES + '/hypseus'
 hypseusBin = '/usr/bin/hypseus'

@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import controllers as controllersConfig
 
@@ -18,7 +16,7 @@ class HclGenerator(Generator):
             eslog.error("ERROR: Game assets not installed. You can get them from the Batocera Content Downloader.")
         commandArray = ["hcl", "-d"]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

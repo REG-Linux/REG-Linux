@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import shutil
 from . import sdlpopConfig
@@ -37,4 +35,4 @@ class SdlPopGenerator(Generator):
                 commandArray.append(f"joynum={pad.index}")
             nplayer += 1
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

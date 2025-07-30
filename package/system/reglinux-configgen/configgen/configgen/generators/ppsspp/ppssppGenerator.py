@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 from . import ppssppConfig
 from . import ppssppControllers
@@ -53,7 +51,7 @@ class PPSSPPGenerator(Generator):
         else:
             environment["SDL_VIDEODRIVER"] = "kmsdrm"
 
-        return Command.Command(array=commandArray, env=environment)
+        return Command(array=commandArray, env=environment)
 
     @staticmethod
     def isLowResolution(gameResolution):

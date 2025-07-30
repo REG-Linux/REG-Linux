@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os.path
 import configparser
 import subprocess
@@ -33,7 +31,7 @@ class DolphinGenerator(Generator):
         ## [ dolphin.ini ] ##
         dolphinSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinSettings.optionxform = str
+        dolphinSettings.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(dolphinConfig.dolphinIni):
             dolphinSettings.read(dolphinConfig.dolphinIni)
 
@@ -190,7 +188,7 @@ class DolphinGenerator(Generator):
         ## [ gfx.ini ] ##
         dolphinGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinGFXSettings.optionxform = str
+        dolphinGFXSettings.optionxform=lambda optionstr: str(optionstr)
         dolphinGFXSettings.read(dolphinConfig.dolphinGfxIni)
 
         # Add Default Sections
@@ -371,7 +369,7 @@ class DolphinGenerator(Generator):
         ## Hotkeys.ini - overwrite to avoid issues
         hotkeyConfig = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        hotkeyConfig.optionxform = str
+        hotkeyConfig.optionxform=lambda optionstr: str(optionstr)
         # [Hotkeys]
         hotkeyConfig.add_section('Hotkeys')
         # General - use virtual for now
@@ -430,7 +428,7 @@ class DolphinGenerator(Generator):
         ## Retroachievements
         RacConfig = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        RacConfig.optionxform = str
+        RacConfig.optionxform=lambda optionstr: str(optionstr)
         # [Achievements]
         RacConfig.add_section('Achievements')
         if system.isOptSet('retroachievements') and system.getOptBoolean('retroachievements'):
@@ -477,13 +475,13 @@ class DolphinGenerator(Generator):
         if system.isOptSet('state_filename'):
             commandArray.extend(["--save_state", system.config['state_filename']])
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
 
         dolphinGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinGFXSettings.optionxform = str
+        dolphinGFXSettings.optionxform=lambda optionstr: str(optionstr)
         dolphinGFXSettings.read(dolphinConfig.dolphinGfxIni)
 
         dolphin_aspect_ratio = dolphinGFXSettings.get("Settings", "AspectRatio")

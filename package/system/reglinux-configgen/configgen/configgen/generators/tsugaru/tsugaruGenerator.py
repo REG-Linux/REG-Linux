@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 from . import tsugaruConfig
 
@@ -35,4 +33,4 @@ class TsugaruGenerator(Generator):
             # Launch floppy
             commandArray += ["-FD0", rom]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

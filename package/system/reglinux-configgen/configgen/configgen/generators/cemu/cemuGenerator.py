@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import glob
 from . import cemuConfig
@@ -35,4 +33,4 @@ class CemuGenerator(Generator):
         cemuControllers.generateControllerConfig(system, playersControllers, cemuConfig.cemuProfilesDir)
 
         commandArray = [cemuConfig.cemuBin, "-f", "--force-no-menubar", "-g", rpxrom]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

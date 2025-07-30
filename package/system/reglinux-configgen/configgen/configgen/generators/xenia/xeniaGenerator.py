@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import sys
 import shutil
@@ -282,7 +280,7 @@ class XeniaGenerator(Generator):
                 }
             )
 
-        return Command.Command(array=commandArray, env=environment)
+        return Command(array=commandArray, env=environment)
 
     # Show mouse on screen when needed
     # xenia auto-hides

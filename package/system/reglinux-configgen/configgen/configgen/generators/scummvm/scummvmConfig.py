@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
+from systemFiles import SAVES, CONF
 
-import systemFiles
-
-scummvmSaves = systemFiles.SAVES + '/scummvm'
-scummvmConfigDir = systemFiles.CONF + "/scummvm"
+scummvmSaves = SAVES + '/scummvm'
+scummvmConfigDir = CONF + "/scummvm"
 scummvmConfigFile = scummvmConfigDir + "/scummvm.ini"
 scummvmExtra = "/userdata/bios/scummvm/extra"
 scummvmBin = "/usr/bin/scummvm"

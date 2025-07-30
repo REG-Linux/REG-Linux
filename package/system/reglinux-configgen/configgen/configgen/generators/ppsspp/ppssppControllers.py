@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-
 import os
 import configparser
-import systemFiles
+from systemFiles import CONF, HOME_INIT
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-ppssppControlsIni  = systemFiles.CONF + '/ppsspp/PSP/SYSTEM/controls.ini'
-ppssppControlsInit = systemFiles.HOME_INIT + 'configs/ppsspp/PSP/SYSTEM/controls.ini'
+ppssppControlsIni  = CONF + '/ppsspp/PSP/SYSTEM/controls.ini'
+ppssppControlsInit = HOME_INIT + 'configs/ppsspp/PSP/SYSTEM/controls.ini'
 
 # This configgen is based on PPSSPP 1.5.4.
 # Therefore, all code/github references are valid at this version, and may not be valid with later updates

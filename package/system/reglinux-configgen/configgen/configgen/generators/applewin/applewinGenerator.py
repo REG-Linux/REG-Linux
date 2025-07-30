@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import controllers as controllersConfig
 from . import applewinConfig
 
@@ -10,7 +8,7 @@ class AppleWinGenerator(Generator):
 
         commandArray = [applewinConfig.applewinBin, "--no-imgui", "--d1", rom]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

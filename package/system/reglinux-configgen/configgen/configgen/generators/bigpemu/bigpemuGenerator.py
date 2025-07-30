@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 from . import bigpemuConfig
 
 class BigPEmuGenerator(Generator):
@@ -11,4 +9,4 @@ class BigPEmuGenerator(Generator):
         bigpemuConfig.readWriteFile(system, gameResolution, playersControllers)
 
         commandArray = [bigpemuConfig.bigpemuBin, rom]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

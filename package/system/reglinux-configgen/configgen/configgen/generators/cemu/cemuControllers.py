@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import xml.etree.cElementTree as ET
 from os import path

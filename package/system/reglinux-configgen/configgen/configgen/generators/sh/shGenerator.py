@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import glob
 
 class ShGenerator(Generator):
@@ -17,7 +15,7 @@ class ShGenerator(Generator):
 
         commandArray = ["/bin/bash", shrom]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getMouseMode(self, config, rom):
         return True

@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import codecs
 import os
-import systemFiles
+from systemFiles import CONF
 
 class SolarusGenerator(Generator):
 
@@ -28,7 +26,7 @@ class SolarusGenerator(Generator):
         # rom
         commandArray.append(rom)
 
-        return Command.Command(array=commandArray, env={
+        return Command(array=commandArray, env={
             'SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS': '0'
         })
 
@@ -63,7 +61,7 @@ class SolarusGenerator(Generator):
                 keymapping["left"]  = "joystick2left"
                 keymapping["right"] = "joystick2right"
 
-        configdir = "{}/{}".format(systemFiles.CONF, "solarus")
+        configdir = "{}/{}".format(CONF, "solarus")
         if not os.path.exists(configdir):
             os.makedirs(configdir)
         configFileName = "{}/{}".format(configdir, "pads.ini")

@@ -1,19 +1,17 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import filecmp
 import json
 import shutil
 import evdev
-import systemFiles
+from systemFiles import CONF, BIOS
 from os import environ
 from evdev import InputDevice
 
-ryujinxConf = systemFiles.CONF + "/Ryujinx"
+ryujinxConf = CONF + "/Ryujinx"
 ryujinxConfFile = ryujinxConf + "/Config.json"
-ryujinxKeys = systemFiles.BIOS + "/switch/prod.keys"
+ryujinxKeys = BIOS + "/switch/prod.keys"
 ryujinxExec = ryujinxConf + "/ryujinx"
 
 ryujinxCtrl = {
@@ -208,7 +206,7 @@ class RyujinxGenerator(Generator):
         else:
             commandArray = [ryujinxExec, rom]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
 def writeControllerIntoJson(new_controller, filename=ryujinxConfFile):
     with open(filename,'r+') as file:

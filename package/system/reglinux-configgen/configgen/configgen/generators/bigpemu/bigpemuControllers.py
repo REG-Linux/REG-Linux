@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # BigPEmu controller sequence, P1 only requires keyboard inputs
 # default standard bindings
 P1_BINDINGS_SEQUENCE = {

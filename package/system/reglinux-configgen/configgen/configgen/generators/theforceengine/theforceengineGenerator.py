@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import configparser
 import os
-import systemFiles
+from systemFiles import CONF
 
-forceConfigDir = systemFiles.CONF + "/theforceengine"
+forceConfigDir = CONF + "/theforceengine"
 forceModsDir = forceConfigDir + "/Mods"
 forcePatchFile = "df_patch4.zip" # current patch version
 forceModFile = forceModsDir + "/" + forcePatchFile
@@ -40,7 +38,7 @@ class TheForceEngineGenerator(Generator):
 
         ## Configure
         forceConfig = configparser.ConfigParser()
-        forceConfig.optionxform=str
+        forceConfig.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(forceConfigFile):
             forceConfig.read(forceConfigFile)
 
@@ -226,7 +224,7 @@ class TheForceEngineGenerator(Generator):
         # Run - only Dark Forces currently
         commandArray.extend(["-gDARK"])
 
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
                 "TFE_DATA_HOME": forceConfigDir

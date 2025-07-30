@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import io
 import re
@@ -82,7 +80,7 @@ class SupermodelGenerator(Generator):
         # config
         configPadsIni(system, rom, playersControllers, guns, drivingGame, sensitivity)
 
-        return Command.Command(array=commandArray, env={"SDL_VIDEODRIVER":"x11"})
+        return Command(array=commandArray, env={"SDL_VIDEODRIVER":"x11"})
 
 def copy_nvram_files():
     sourceDir = "/usr/share/supermodel/NVRAM"
@@ -194,14 +192,14 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
     # template
     templateConfig = configparser.ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    templateConfig.optionxform = str
+    templateConfig.optionxform=lambda optionstr: str(optionstr)
     with io.open(templateFile, 'r', encoding='utf_8_sig') as fp:
         templateConfig.readfp(fp)
 
     # target
     targetConfig = configparser.ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    targetConfig.optionxform = str
+    targetConfig.optionxform=lambda optionstr: str(optionstr)
 
     for section in templateConfig.sections():
         targetConfig.add_section(section)

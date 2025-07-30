@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import xml.etree.ElementTree as ET
 import shutil
@@ -211,4 +209,4 @@ class OpenmsxGenerator(Generator):
                 commandArray.insert(rom2_index, "-cartb" if extension == "rom" else "-diskb")
                 commandArray.insert(rom2_index + 1, rom2)
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

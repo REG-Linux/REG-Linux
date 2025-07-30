@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import configparser
 import controllers as controllersConfig
@@ -2708,7 +2707,7 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
 def generateHatariConf(hatariConf):
     hatariConfig = configparser.ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    hatariConfig.optionxform = str
+    hatariConfig.optionxform=lambda optionstr: str(optionstr)
     if os.path.exists(hatariConf):
         hatariConfig.read(hatariConf)
 

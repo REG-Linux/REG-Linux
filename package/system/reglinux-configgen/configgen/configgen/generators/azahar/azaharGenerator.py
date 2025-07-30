@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import subprocess
 import configparser
-import systemFiles
+from systemFiles import CONF
 from os import environ
 
 from utils.logger import get_logger
@@ -18,10 +16,10 @@ class AzaharGenerator(Generator):
 
     # Main entry of the module
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        AzaharGenerator.writeCITRAConfig(systemFiles.CONF + "/citra-emu/qt-config.ini", system, playersControllers)
+        AzaharGenerator.writeCITRAConfig(CONF + "/citra-emu/qt-config.ini", system, playersControllers)
 
         commandArray = ['/usr/bin/azahar', rom]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse on screen
     def getMouseMode(self, config, rom):
@@ -58,7 +56,7 @@ class AzaharGenerator(Generator):
 
         # ini file
         citraConfig = configparser.RawConfigParser(strict=False)
-        citraConfig.optionxform=str             # Add Case Sensitive comportement
+        citraConfig.optionxform=lambda optionstr: str(optionstr)             # Add Case Sensitive comportement
         if os.path.exists(citraConfigFile):
             citraConfig.read(citraConfigFile)
 

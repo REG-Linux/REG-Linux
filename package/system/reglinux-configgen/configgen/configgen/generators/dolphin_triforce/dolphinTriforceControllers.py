@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import codecs
 import glob
@@ -186,7 +184,7 @@ def generateControllerConfig_any_from_profiles(f, pad):
             eslog.debug(f"Looking profile : {profileFile}")
             profileConfig = configparser.ConfigParser(interpolation=None)
             # To prevent ConfigParser from converting to lower case
-            profileConfig.optionxform = str
+            profileConfig.optionxform=lambda optionstr: str(optionstr)
             profileConfig.read(profileFile)
             profileDevice = profileConfig.get("Profile","Device")
             eslog.debug(f"Profile device : {profileDevice}")

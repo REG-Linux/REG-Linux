@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import controllers as controllersConfig
 
@@ -17,7 +15,7 @@ class OpenJazzGenerator(Generator):
             eslog.error("ERROR: Game assets not installed. You can install your own or get them from the Content Downloader.")
         commandArray = ["OpenJazz", "-f", "/userdata/roms/openjazz/" + rom]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)

@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
+from systemFiles import CONF, SAVES
 
-import systemFiles
-
-dolphinTriforceConfig  = systemFiles.CONF + "/dolphin-triforce"
-dolphinTriforceData    = systemFiles.SAVES + "/dolphin-triforce"
+dolphinTriforceConfig  = CONF + "/dolphin-triforce"
+dolphinTriforceData    = SAVES + "/dolphin-triforce"
 dolphinTriforceIni     = dolphinTriforceConfig + '/Config/Dolphin.ini'
 dolphinTriforceGfxIni  = dolphinTriforceConfig + '/Config/gfx_opengl.ini'
 dolphinTriforceLoggerIni    = dolphinTriforceConfig + '/Config/Logger.ini'

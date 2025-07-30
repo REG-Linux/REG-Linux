@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import controllers as controllersConfig
 
 class StellaGenerator(Generator):
@@ -10,7 +8,7 @@ class StellaGenerator(Generator):
         # Launch Stella
         commandArray = ["stella" , " ", rom ]
 
-        return Command.Command(
+        return Command(
                     array=commandArray,
                     env={
                         'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
