@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 import os
-from controllersConfig import Input
+from controllers import Input
 from xml.dom import minidom
 from . import mupenConfig
 
@@ -108,7 +106,7 @@ def defineControllerKeys(nplayer, controller, system, isWheel):
 
         # Analog Deadzone
         if isWheel:
-            config['AnalogDeadzone'] = f"0,0"
+            config['AnalogDeadzone'] = "0,0"
         else:
             config['AnalogDeadzone'] = getJoystickDeadzone(mupenmapping['AnalogPeak'], f"mupen64-deadzone{nplayer}", system)
 
@@ -207,7 +205,7 @@ def fillIniPlayer(nplayer, iniConfig, controller, config):
         iniConfig.set(section, 'mode', '0')
         iniConfig.set(section, 'device', str(controller.index))
         # TODO: python 3 remove hack to overcome ConfigParser limitation with utf8 in python 2.7
-        name_encode = controller.realName.encode("ascii", "ignore")
+        name_encode = controller.name.encode("ascii", "ignore")
         iniConfig.set(section, 'name', str(name_encode))
         iniConfig.set(section, 'plugged', "True")
         iniConfig.set(section, 'plugin', '2')
@@ -249,4 +247,3 @@ def cleanPlayer(nplayer, iniConfig):
             iniConfig.add_section(section)
         iniConfig.set(section, 'Version', '2')
         iniConfig.set(section, 'plugged', "False")
-

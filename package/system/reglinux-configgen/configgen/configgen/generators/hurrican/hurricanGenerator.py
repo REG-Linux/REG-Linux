@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
+import controllers as controllersConfig
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -17,4 +16,8 @@ class HurricanGenerator(Generator):
             eslog.error("ERROR: Game assets not installed. You can get them from the REG-Linux Content Downloader.")
         commandArray = ["hurrican"]
 
-        return Command.Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
+                    })

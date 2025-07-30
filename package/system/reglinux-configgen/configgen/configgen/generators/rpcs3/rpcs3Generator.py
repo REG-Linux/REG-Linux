@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import shutil
 import os
 import configparser
@@ -9,7 +7,7 @@ import ruamel.yaml as yaml
 import re
 import subprocess
 import controllers as controllersConfig
-import systemFiles
+from systemFiles import CONF
 from os import path
 from . import rpcs3Controllers
 from . import rpcs3Config
@@ -34,7 +32,7 @@ class Rpcs3Generator(Generator):
 
         rpcsCurrentSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        rpcsCurrentSettings.optionxform = str
+        rpcsCurrentSettings.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(rpcs3Config.rpcs3CurrentConfig):
             rpcsCurrentSettings.read(rpcs3Config.rpcs3CurrentConfig)
 
@@ -336,12 +334,12 @@ class Rpcs3Generator(Generator):
         rpcs3ymlconfig["Miscellaneous"]["Prevent display sleep while running games"] = True
         rpcs3ymlconfig["Miscellaneous"]["Show trophy popups"] = False
 
-        with open(systemFiles.rpcs3config, "w") as file:
+        with open(rpcs3Config.rpcs3config, "w") as file:
             yaml.dump(rpcs3ymlconfig, file, default_flow_style=False)
 
         # copy icon files to config
         icon_source = '/usr/share/rpcs3/Icons/'
-        icon_target = systemFiles.CONF + '/rpcs3/Icons'
+        icon_target = CONF + '/rpcs3/Icons'
         if not os.path.exists(icon_target):
             os.makedirs(icon_target)
         shutil.copytree(icon_source, icon_target, dirs_exist_ok=True, copy_function=shutil.copy2)
@@ -358,7 +356,7 @@ class Rpcs3Generator(Generator):
 
         # write our own gamecontrollerdb.txt file before launching the game
         dbfile = "/userdata/system/configs/rpcs3/input_configs/gamecontrollerdb.txt"
-        controllersConfig.writeSDLGameDBAllControllers(playersControllers, dbfile)
+        controllersConfig.write_sdl_db_all_controllers(playersControllers, dbfile)
 
         commandArray = [rpcs3Config.rpcs3Bin, romName]
 
@@ -370,7 +368,7 @@ class Rpcs3Generator(Generator):
           if os.path.exists("/userdata/bios/PS3UPDAT.PUP"):
             commandArray = [rpcs3Config.rpcs3Bin, "--installfw", "/userdata/bios/PS3UPDAT.PUP"]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getClosestRatio(gameResolution):
         screenRatio = gameResolution["width"] / gameResolution["height"]

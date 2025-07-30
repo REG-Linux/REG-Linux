@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
-import systemFiles
+from systemFiles import CONF, SAVES
 from os import path
 import ruamel.yaml
 import ruamel.yaml.util
 from distutils.dir_util import copy_tree
 import shutil
 
-vitaConfig = systemFiles.CONF + '/vita3k'
-vitaSaves = systemFiles.SAVES + '/psvita'
+vitaConfig = CONF + '/vita3k'
+vitaSaves = SAVES + '/psvita'
 vitaConfigFile = vitaConfig + '/config.yml'
 
 class Vita3kGenerator(Generator):
@@ -104,7 +102,7 @@ class Vita3kGenerator(Generator):
             # Game not installed yet, let's open the menu
             commandArray = ["/usr/bin/vita3k/Vita3K", "-F", "-w", "-f", "-c", vitaConfigFile, rom]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse for touchscreen actions
     def getMouseMode(self, config, rom):

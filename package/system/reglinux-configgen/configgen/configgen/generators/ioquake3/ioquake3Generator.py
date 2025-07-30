@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
-import shutil
+from Command import Command
 import os.path
-from shutil import copyfile
+from shutil import copytree
 from . import ioquake3Config
 
 class IOQuake3Generator(Generator):
@@ -19,7 +16,7 @@ class IOQuake3Generator(Generator):
         source_file = os.path.join(source_dir, "ioquake3")
         # therefore copy latest ioquake3 file to rom directory
         if not os.path.isfile(destination_file) or os.path.getmtime(source_file) > os.path.getmtime(destination_file):
-            shutil.copytree(source_dir, destination_dir, dirs_exist_ok=True)
+            copytree(source_dir, destination_dir, dirs_exist_ok=True)
 
         commandArray = ["/userdata/roms/quake3/ioquake3"]
 
@@ -30,7 +27,7 @@ class IOQuake3Generator(Generator):
 
         commandArray.extend(command_line_words)
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if gameResolution["width"] / float(gameResolution["height"]) > ((16.0 / 9.0) - 0.1):

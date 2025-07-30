@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import configparser
 import os
 import shutil
-import systemFiles
+from systemFiles import CONF
 
-fout1ConfigDir = systemFiles.CONF + "/fallout1"
+fout1ConfigDir = CONF + "/fallout1"
 fout1ConfigFile = fout1ConfigDir + "/fallout.cfg"
 fout1IniFile = fout1ConfigDir + "/f1_res.ini"
 fout1RomDir = "/userdata/roms/fallout1-ce"
@@ -47,7 +45,7 @@ class Fallout1Generator(Generator):
 
         ## CFG Configuration
         fout1Cfg = configparser.ConfigParser()
-        fout1Cfg.optionxform = str
+        fout1Cfg.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(fout1ConfigFile):
             fout1Cfg.read(fout1ConfigFile)
 
@@ -99,7 +97,7 @@ class Fallout1Generator(Generator):
 
         ## INI Configuration
         fout1Ini = configparser.ConfigParser()
-        fout1Ini.optionxform = str
+        fout1Ini.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(fout1IniFile):
             fout1Ini.read(fout1IniFile)
 
@@ -127,7 +125,7 @@ class Fallout1Generator(Generator):
         ## Setup the command
         commandArray = ["fallout1-ce"]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

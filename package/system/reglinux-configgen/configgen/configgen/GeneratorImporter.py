@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 GeneratorImporter module provides functionality to dynamically import and instantiate
 generator classes for various emulators based on a predefined mapping.

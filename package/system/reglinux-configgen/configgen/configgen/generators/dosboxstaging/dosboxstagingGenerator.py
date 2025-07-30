@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os.path
 from . import dosboxstagingConfig
 
@@ -28,4 +26,4 @@ class DosBoxStagingGenerator(Generator):
             commandArray.append("-conf")
             commandArray.append(f"""{dosboxstagingConfig.dosboxStagingConfig}""")
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)

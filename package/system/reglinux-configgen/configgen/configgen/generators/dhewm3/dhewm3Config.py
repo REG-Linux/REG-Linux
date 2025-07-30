@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
-import systemFiles
+from systemFiles import CONF, ROMS
 
 dhewm3Bin = "/usr/bin/dhewm3"
-dhewm3ConfgDir = systemFiles.CONF + "/dhewm3"
-dhewm3RomDir = systemFiles.ROMS + "/doom3"
+dhewm3ConfgDir = CONF + "/dhewm3"
+dhewm3RomDir = ROMS + "/doom3"

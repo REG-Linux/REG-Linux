@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 from . import ppssppConfig
 from . import ppssppControllers
@@ -13,22 +11,17 @@ class PPSSPPGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         ppssppConfig.writePPSSPPConfig(system)
 
-        # Remove the old gamecontrollerdb.txt file
-        dbpath = "/userdata/system/configs/ppsspp/gamecontrollerdb.txt"
-        if os.path.exists(dbpath):
-            os.remove(dbpath)
-
         # Generate the controls.ini
         for index in playersControllers :
             controller = playersControllers[index]
             # We only care about player 1
-            if controller.player != "1":
+            if controller.index != "1":
                 continue
             ppssppControllers.generateControllerConfig(controller)
             break
 
         # The command to run
-        commandArray = ['/usr/bin/PPSSPP']
+        commandArray = [ppssppConfig.ppssppBin]
         commandArray.append(rom)
         commandArray.append("--fullscreen")
 
@@ -46,27 +39,20 @@ class PPSSPPGenerator(Generator):
 
         # select the correct pad
         nplayer = 1
-        for playercontroller, pad in sorted(playersControllers.items()):
+        for _, pad in sorted(playersControllers.items()):
             if nplayer == 1:
                 commandArray.extend(["--njoy", str(pad.index)])
             nplayer = nplayer +1
 
         # Adjust SDL_VIDEODRIVER to run through wayland or kmsdrm
-        commandEnv= {}
+        environment= {}
         if os.getenv("XDG_SESSION_TYPE")=="wayland":
-            commandEnv["SDL_VIDEODRIVER"] = "wayland"
+            environment["SDL_VIDEODRIVER"] = "wayland"
         else:
-            commandEnv["SDL_VIDEODRIVER"] = "kmsdrm"
+            environment["SDL_VIDEODRIVER"] = "kmsdrm"
 
-        return Command.Command(array=commandArray, env=commandEnv)
+        return Command(array=commandArray, env=environment)
 
     @staticmethod
     def isLowResolution(gameResolution):
         return gameResolution["width"] <= 480 or gameResolution["height"] <= 480
-
-    # Show mouse on screen for the Config Screen
-    def getMouseMode(self, config, rom):
-        return True
-
-    def getInGameRatio(self, config, gameResolution, rom):
-        return 16/9

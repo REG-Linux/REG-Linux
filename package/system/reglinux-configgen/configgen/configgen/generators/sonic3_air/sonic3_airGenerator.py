@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import shutil
 import json
-import systemFiles
+from systemFiles import CONF
 
 class Sonic3AIRGenerator(Generator):
 
@@ -13,7 +11,7 @@ class Sonic3AIRGenerator(Generator):
 
         config_file = "/usr/bin/sonic3-air/config.json"
         oxygen_file = "/usr/bin/sonic3-air/oxygenproject.json"
-        s2_config_folder = systemFiles.CONF + "/Sonic3AIR"
+        s2_config_folder = CONF + "/Sonic3AIR"
         config_dest_file = s2_config_folder + "/config.json"
         oxygen_dest_file = s2_config_folder + "/oxygenproject.json"
         saves_folder = "/userdata/saves/sonic3-air"
@@ -66,7 +64,7 @@ class Sonic3AIRGenerator(Generator):
         # now run
         commandArray = ["/usr/bin/sonic3-air/sonic3air_linux"]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

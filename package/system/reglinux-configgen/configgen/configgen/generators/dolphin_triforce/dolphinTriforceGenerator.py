@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
-import systemFiles
+from Command import Command
 import os.path
 import configparser
 from os import environ
@@ -29,7 +26,7 @@ class DolphinTriforceGenerator(Generator):
 
         dolphinTriforceSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinTriforceSettings.optionxform = str
+        dolphinTriforceSettings.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(dolphinTriforceConfig.dolphinTriforceIni):
             dolphinTriforceSettings.read(dolphinTriforceConfig.dolphinTriforceIni)
 
@@ -136,7 +133,7 @@ class DolphinTriforceGenerator(Generator):
 
         dolphinTriforceGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinTriforceGFXSettings.optionxform = str
+        dolphinTriforceGFXSettings.optionxform=lambda optionstr: str(optionstr)
         dolphinTriforceGFXSettings.read(dolphinTriforceConfig.dolphinTriforceGfxIni)
 
         # Add Default Sections
@@ -240,7 +237,7 @@ class DolphinTriforceGenerator(Generator):
 
         dolphinTriforceLogSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinTriforceLogSettings.optionxform = str
+        dolphinTriforceLogSettings.optionxform=lambda optionstr: str(optionstr)
         dolphinTriforceLogSettings.read(dolphinTriforceConfig.dolphinTriforceLoggerIni)
 
         # Sections
@@ -457,7 +454,7 @@ $SeatLoopPatch
         # # Cheats aren't in key = value format, so the allow_no_value option is needed.
         # dolphinTriforceGameSettingsGGPE01 = configparser.ConfigParser(interpolation=None, allow_no_value=True,delimiters=';')
         # # To prevent ConfigParser from converting to lower case
-        # dolphinTriforceGameSettingsGGPE01.optionxform = str
+        # dolphinTriforceGameSettingsGGPE01.optionxform=lambda optionstr: str(optionstr)
         # if os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"):
             # dolphinTriforceGameSettingsGGPE01.read(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini")
 
@@ -486,7 +483,7 @@ $SeatLoopPatch
             commandArray = ["dolphin-triforce-nogui", "-b", "-U", "/userdata/system/configs/dolphin-triforce", "-p", system.config["platform"], "-e", rom]
 
         # No environment variables work for now, paths are coded in above.
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if 'dolphin_aspect_ratio' in config:

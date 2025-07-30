@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os.path
 import glob
 import configparser
-import systemFiles
+from systemFiles import SCREENSHOTS
 from . import scummvmConfig
 
 class ScummVMGenerator(Generator):
@@ -17,7 +15,7 @@ class ScummVMGenerator(Generator):
 
         # create / modify scummvm config file as needed
         scummConfig = configparser.ConfigParser()
-        scummConfig.optionxform=str
+        scummConfig.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(scummvmConfig.scummvmConfigFile):
             scummConfig.read(scummvmConfig.scummvmConfigFile)
 
@@ -96,13 +94,13 @@ class ScummVMGenerator(Generator):
 
         commandArray.extend(
             [f"--joystick={id}",
-            "--screenshotspath="+systemFiles.SCREENSHOTS,
+            "--screenshotspath="+SCREENSHOTS,
             "--extrapath="+scummvmConfig.scummvmExtra,
             f"--path={romPath}",
             f"{romName}"]
         )
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if ("scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect") or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):

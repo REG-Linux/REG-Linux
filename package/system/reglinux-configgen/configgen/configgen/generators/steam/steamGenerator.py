@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 
 class SteamGenerator(Generator):
@@ -21,7 +19,7 @@ class SteamGenerator(Generator):
             commandArray = ["batocera-steam"]
         else:
             commandArray = ["batocera-steam", gameId]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getMouseMode(self, config, rom):
         return True

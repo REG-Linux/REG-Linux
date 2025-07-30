@@ -1,20 +1,8 @@
-#!/usr/bin/env python3
-
-import systemFiles
-import Command
-import shutil
 import os
-from os import path
-from os import environ
-import configparser
 from xml.dom import minidom
 import codecs
-import shutil
-import utils.bezels as bezelsUtil
-import subprocess
 import csv
 from xml.dom import minidom
-from PIL import Image, ImageOps
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)

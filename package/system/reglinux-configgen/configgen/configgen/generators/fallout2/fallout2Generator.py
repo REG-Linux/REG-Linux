@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import configparser
 import os
 import shutil
-import systemFiles
+from systemFiles import CONF
 
-fout2ConfigDir = systemFiles.CONF + "/fallout2"
+fout2ConfigDir = CONF + "/fallout2"
 fout2ConfigFile = fout2ConfigDir + "/fallout2.cfg"
 fout2IniFile = fout2ConfigDir + "/f2_res.ini"
 fout2RomDir = "/userdata/roms/fallout2-ce"
@@ -47,7 +45,7 @@ class Fallout2Generator(Generator):
 
         ## CFG Configuration
         fout2Cfg = configparser.ConfigParser()
-        fout2Cfg.optionxform = str
+        fout2Cfg.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(fout2ConfigFile):
             fout2Cfg.read(fout2ConfigFile)
 
@@ -99,7 +97,7 @@ class Fallout2Generator(Generator):
 
         ## INI Configuration
         fout2Ini = configparser.ConfigParser()
-        fout2Ini.optionxform = str
+        fout2Ini.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(fout2IniFile):
             fout2Ini.read(fout2IniFile)
 
@@ -130,7 +128,7 @@ class Fallout2Generator(Generator):
         ## Setup the command
         commandArray = ["fallout2-ce"]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

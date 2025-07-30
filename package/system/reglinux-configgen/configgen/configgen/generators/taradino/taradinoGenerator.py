@@ -1,28 +1,13 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from ... import Command, controllersConfig
-from ...batoceraPaths import CONFIGS
-from ..Generator import Generator
-
-if TYPE_CHECKING:
-    from ...types import HotkeysContext
-
+from Command import Command
+from generators.Generator import Generator
 
 class TaradinoGenerator(Generator):
-
-    def getHotkeysContext(self) -> HotkeysContext:
-        return {
-            "name": "taradino",
-            "keys": { "exit": ["KEY_LEFTALT", "KEY_F4"] }
-        }
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
         commandArray = [ "taradino" ]
 
-        return Command.Command(
+        return Command(
             array=commandArray,
             env={
                 "XDG_DATA_DIRS": "/userdata/roms/rott"

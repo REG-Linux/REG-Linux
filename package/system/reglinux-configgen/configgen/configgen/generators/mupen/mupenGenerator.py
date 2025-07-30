@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import configparser
 import os
 from . import mupenConfig
@@ -14,7 +12,7 @@ class MupenGenerator(Generator):
         # Read the configuration file
         iniConfig = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        iniConfig.optionxform = str
+        iniConfig.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(mupenConfig.mupenCustom):
             iniConfig.read(mupenConfig.mupenCustom)
         else:
@@ -40,7 +38,7 @@ class MupenGenerator(Generator):
 
         commandArray.append(rom)
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if ("mupen64plus_ratio" in config and config["mupen64plus_ratio"] == "16/9") or ("mupen64plus_ratio" not in config and "ratio" in config and config["ratio"] == "16/9"):

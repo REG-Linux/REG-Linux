@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
+from systemFiles import CONF
 
-import systemFiles
-
-hatariConf = systemFiles.CONF + '/hatari/hatari.cfg'
+hatariConf = CONF + '/hatari/hatari.cfg'
 hatariBin = '/usr/bin/hatari'

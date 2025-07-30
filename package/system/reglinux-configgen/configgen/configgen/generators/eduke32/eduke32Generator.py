@@ -1,19 +1,18 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
-import systemFiles
+import controllers as controllersConfig
 from configparser import ConfigParser
 from utils.buildargs import parse_args
+from systemFiles import CONF, SAVES
 
 
 class EDuke32Generator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # Core is either eduke32 or fury
         core = system.config["core"]
-        config_dir = f"{systemFiles.CONF}/{core}"
-        saves_dir = f"{systemFiles.SAVES}/{core}"
+        config_dir = f"{CONF}/{core}"
+        saves_dir = f"{SAVES}/{core}"
         config_file = f"{config_dir}/{core}.cfg"
         # A script file with console commands that are always ran when the game starts
         script_file = f"{config_dir}/autoexec.cfg"
@@ -25,7 +24,7 @@ class EDuke32Generator(Generator):
                 pass
         parser = ConfigParser(interpolation=None)
         # Override optionxform to stop implicit case conversions
-        parser.optionxform = str
+        parser.optionxform=lambda optionstr: str(optionstr)
         # Configuration options found here: https://wiki.eduke32.com/wiki/Configuration_file_options
         # NB: Not all configuration options listed actually work e.g. showFPS, etc.
         # NB: In eduke32 configs, booleans must be integers
@@ -47,18 +46,23 @@ class EDuke32Generator(Generator):
                 f'r_showfps "{1 if system.getOptBoolean("showFPS") else 0}"\n'
                 f'echo BATOCERA\n'  # Easy check when debugging
             )
-        launch_args = [
+        commandArray = [
             core,
             "-cfg", config_file,
             "-nologo" if system.getOptBoolean("nologo") else ""
         ]
         if core == "fury":
-            launch_args += [
+            commandArray += [
                 "-gamegrp", os.path.basename(rom),
                 "-j", os.path.dirname(rom)
             ]
         else:
-            result = parse_args(launch_args, rom)
+            result = parse_args(commandArray, rom)
             if not result.okay:
                 raise Exception(result.message)
-        return Command.Command(array=launch_args)
+
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
+                    })

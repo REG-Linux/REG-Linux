@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import re
-import systemFiles
+from systemFiles import CONF, SAVES
 from settings.unixSettings import UnixSettings
 from . import openborControllers
 
@@ -12,13 +10,13 @@ class OpenborGenerator(Generator):
 
     # Main entry of the module
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        configDir = systemFiles.CONF + '/openbor'
+        configDir = CONF + '/openbor'
         if not os.path.exists(configDir):
             os.makedirs(configDir)
 
-        SAVES = systemFiles.SAVES + '/openbor'
-        if not os.path.exists(SAVES):
-            os.makedirs(SAVES)
+        SAVES_DIR = SAVES + '/openbor'
+        if not os.path.exists(SAVES_DIR):
+            os.makedirs(SAVES_DIR)
 
         # guess the version to run
         core = system.config['core']
@@ -98,7 +96,7 @@ class OpenborGenerator(Generator):
             commandArray = ["OpenBOR7530", rom]
         else:
             commandArray = ["OpenBOR7530", rom]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     @staticmethod
     def guessCore(rom):

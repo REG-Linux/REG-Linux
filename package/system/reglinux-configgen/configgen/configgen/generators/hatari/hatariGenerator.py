@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import configparser
-import systemFiles
+from systemFiles import CONF
 from . import hatariConfig
 
 from utils.logger import get_logger
@@ -78,13 +76,13 @@ class HatariGenerator(Generator):
         # config file
         HatariGenerator.generateConfig(system, playersControllers)
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     @staticmethod
     def generateConfig(system, playersControllers):
         config = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        config.optionxform = str
+        config.optionxform=lambda optionstr: str(optionstr)
 
         padMapping = {
             1: "y",
@@ -92,7 +90,7 @@ class HatariGenerator(Generator):
             3: "a"
         }
 
-        configdir = "{}/{}".format(systemFiles.CONF, "hatari")
+        configdir = "{}/{}".format(CONF, "hatari")
         if not os.path.exists(configdir):
             os.makedirs(configdir)
         configFileName = "{}/{}".format(configdir, "hatari.cfg")

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import utils.videoMode as videoMode
 
 def configureWindowing(vpinballSettings, system, gameResolution, hasDmd):

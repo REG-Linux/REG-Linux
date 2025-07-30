@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
-import systemFiles
+from systemFiles import CONF
 
 class DXX_RebirthGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -20,7 +18,7 @@ class DXX_RebirthGenerator(Generator):
             dxx_rebirth = "d2x-rebirth"
 
         ## Configuration
-        rebirthConfigDir = systemFiles.CONF + "/" + dxx_rebirth
+        rebirthConfigDir = CONF + "/" + dxx_rebirth
         rebirthConfigFile = rebirthConfigDir + "/descent.cfg"
 
         if not os.path.exists(rebirthConfigDir):
@@ -82,7 +80,7 @@ class DXX_RebirthGenerator(Generator):
 
         commandArray = [dxx_rebirth, "-hogdir", directory]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):

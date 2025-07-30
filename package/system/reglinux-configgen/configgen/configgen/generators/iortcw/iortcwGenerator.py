@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
 import os
 from Command import Command

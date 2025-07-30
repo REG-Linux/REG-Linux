@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os.path
 from . import duckstationConfig
 
@@ -23,7 +21,7 @@ class DuckstationGenerator(Generator):
         else:
             commandArray = ["duckstation-nogui", "-batch", "-fullscreen", "--", rom]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
 def rewriteM3uFullPath(m3u):                                                                    # Rewrite a clean m3u file with valid fullpath
     # get initialm3u

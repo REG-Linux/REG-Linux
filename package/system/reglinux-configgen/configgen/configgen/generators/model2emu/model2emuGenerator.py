@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import subprocess
 import shutil
@@ -118,7 +116,7 @@ class Model2EmuGenerator(Generator):
         configFileName = emupath + "/EMULATOR.INI"
         Config = configparser.ConfigParser(interpolation=None)
         # to prevent ConfigParser from converting to lower case
-        Config.optionxform = str
+        Config.optionxform=lambda optionstr: str(optionstr)
         if os.path.isfile(configFileName):
             Config.read(configFileName)
 
@@ -266,7 +264,7 @@ class Model2EmuGenerator(Generator):
             )
 
         # now run the emulator
-        return Command.Command(array=commandArray, env=environment)
+        return Command(array=commandArray, env=environment)
 
 
 def modify_lua_widescreen(file_path, condition):

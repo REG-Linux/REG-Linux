@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
-import systemFiles
 import os
 import json
 import utils.videoMode as videoMode
+from systemFiles import HOME
 
-bigpemuConfig = systemFiles.HOME + "/.bigpemu_userdata/BigPEmuConfig.bigpcfg"
+bigpemuConfig = HOME + "/.bigpemu_userdata/BigPEmuConfig.bigpcfg"
 bigpemuBin = "/usr/bigpemu/bigpemu"
 
 def getInGameRatio(self, config, gameResolution, rom):

@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import subprocess
-import systemFiles
 import configparser
 from os import environ
+from systemFiles import CONF
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -18,13 +16,13 @@ class CitronGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        if not os.path.exists(systemFiles.CONF+"/citron"):
-            os.makedirs(systemFiles.CONF+"/citron")
+        if not os.path.exists(CONF+"/citron"):
+            os.makedirs(CONF+"/citron")
 
-        CitronGenerator.writeCitronConfig(systemFiles.CONF + "/citron/qt-config.ini", system, playersControllers)
+        CitronGenerator.writeCitronConfig(CONF + "/citron/qt-config.ini", system, playersControllers)
 
         commandArray = ["/usr/bin/citron-cmd", "-f", "-g", rom ]
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def writeCitronConfig(citronConfigFile, system, playersControllers):
         # pads
@@ -57,7 +55,7 @@ class CitronGenerator(Generator):
 
         # ini file
         citronConfig = configparser.RawConfigParser()
-        citronConfig.optionxform=str
+        citronConfig.optionxform=lambda optionstr: str(optionstr)
         if os.path.exists(citronConfigFile):
             citronConfig.read(citronConfigFile)
 

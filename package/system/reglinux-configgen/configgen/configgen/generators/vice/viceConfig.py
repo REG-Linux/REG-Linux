@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 import os
 import configparser
-import systemFiles
+from systemFiles import CONF
 
-viceConfig = systemFiles.CONF + "/vice"
+viceConfig = CONF + "/vice"
 viceBin = "/usr/bin/"
 
 def setViceConfig(viceConfigFile, system, metadata, guns, rom):
@@ -18,7 +16,7 @@ def setViceConfig(viceConfigFile, system, metadata, guns, rom):
 
     # config file
     viceConfig = configparser.RawConfigParser(interpolation=None)
-    viceConfig.optionxform=str
+    viceConfig.optionxform=lambda optionstr: str(optionstr)
 
     if os.path.exists(viceConfigRC):
         viceConfig.read(viceConfigRC)

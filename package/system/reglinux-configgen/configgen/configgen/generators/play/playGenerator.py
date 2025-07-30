@@ -1,15 +1,13 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
-import systemFiles
 import xml.etree.ElementTree as ET
 from os import path
+from systemFiles import CONF, SAVES
 
-playConfig = systemFiles.CONF + '/play'
-playSaves = systemFiles.SAVES + '/play'
-playHome = systemFiles.CONF
+playConfig = CONF + '/play'
+playSaves = SAVES + '/play'
+playHome = CONF
 playConfigFile = playConfig + '/Play Data Files/config.xml'
 playInputFile = playConfig + '/Play Data Files/inputprofiles/default.xml'
 
@@ -135,7 +133,7 @@ class PlayGenerator(Generator):
             else:
                 commandArray.extend(["--disc", rom])
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
         if 'play_widescreen' in config and config['play_widescreen'] == "true":

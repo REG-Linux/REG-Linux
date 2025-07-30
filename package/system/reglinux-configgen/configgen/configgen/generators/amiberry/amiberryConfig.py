@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
+from systemFiles import CONF
 
-import systemFiles
-
-amiberryRoot = systemFiles.CONF + '/amiberry'
+amiberryRoot = CONF + '/amiberry'
 amiberryRetroarchInputsDir = amiberryRoot + '/conf/retroarch/autoconfig'
 amiberryRetroarchCustom = amiberryRoot + '/conf/retroarch/retroarchcustom.cfg'
 amiberryShare = '/usr/share/amiberry'

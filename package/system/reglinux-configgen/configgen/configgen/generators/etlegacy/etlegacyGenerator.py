@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 from generators.Generator import Generator
-import Command
+from Command import Command
 import os
 import shutil
-import systemFiles
+from systemFiles import CONF
 
 class ETLegacyGenerator(Generator):
 
@@ -18,7 +16,7 @@ class ETLegacyGenerator(Generator):
         ## Configuration
 
         # Config file path
-        config_dir = systemFiles.CONF + "/etlegacy/legacy"
+        config_dir = CONF + "/etlegacy/legacy"
         config_file_path = config_dir + "/etconfig.cfg"
 
         if not os.path.exists(config_dir):
@@ -81,7 +79,7 @@ class ETLegacyGenerator(Generator):
 
         commandArray = ["etl"]
 
-        return Command.Command(array=commandArray)
+        return Command(array=commandArray)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
