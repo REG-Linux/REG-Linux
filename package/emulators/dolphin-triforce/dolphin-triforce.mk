@@ -3,11 +3,11 @@
 # dolphin-triforce
 #
 ################################################################################
-# Version: May 1st, 2025
+# Version: Jul 14, 2025
 # Self hosted git Going up and down....
 #DOLPHIN_TRIFORCE_VERSION = 6ff656395e0802930b4ef01788273b6a07f096fd
 #DOLPHIN_TRIFORCE_SITE = https://crediar.dev/crediar/dolphin
-DOLPHIN_TRIFORCE_VERSION = 3c9ff66180752fccd65d9d81c86776b940a34f3f
+DOLPHIN_TRIFORCE_VERSION = 5c456e8ff0da0235be2cf1d55ba7bb2115b0cae2
 DOLPHIN_TRIFORCE_SITE = https://github.com/REG-Linux/dolphin-triforce.git
 DOLPHIN_TRIFORCE_SITE_METHOD = git
 DOLPHIN_TRIFORCE_LICENSE = GPLv2+
