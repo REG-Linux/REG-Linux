@@ -64,6 +64,9 @@ config BR2_PACKAGE_REGLINUX_MUSIC_SUPPORT
 config BR2_PACKAGE_REGLINUX_SYSTEM
 	bool "REG-Linux"
 
+	# Debugging tools
+	select BR2_PACKAGE_SYSTEM_DEBUG			if BR2_ENABLE_DEBUG
+
 	# Tools needed to generate images
         select BR2_PACKAGE_HOST_GENIMAGE
         select BR2_PACKAGE_HOST_GENEXT2FS
