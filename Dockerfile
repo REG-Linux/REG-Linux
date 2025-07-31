@@ -5,6 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get remove -y '*cloud*' '*firefox*' '*chrome*' '*dotnet*' '*php*' && \
     apt-get install -y \
+    ccache \
     sed \
     binutils \
     build-essential \
