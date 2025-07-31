@@ -286,7 +286,6 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 config BR2_PACKAGE_SYSTEM_DEBUG
 	bool "System debug mode"
 
-	select BR2_ENABLE_DEBUG
 	select BR2_PACKAGE_TMUX
 	select BR2_PACKAGE_STRACE
 	select BR2_PACKAGE_VALGRIND                     if !BR2_arm && !BR2_riscv
