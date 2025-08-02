@@ -11,7 +11,7 @@ BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
 #BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
 BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h3/patches"
-BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h3/fsoverlay"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h3/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h3/cha/fsoverlay"
 
 # Use ZSTD for this target. Do not change !
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y

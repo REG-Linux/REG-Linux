@@ -156,6 +156,7 @@ endef
 define REGLINUX_EMULATIONSTATION_BOOT
 	$(INSTALL) -D -m 0755 $(REGLINUX_EMULATIONSTATION_PATH)/S31emulationstation $(TARGET_DIR)/etc/init.d/S31emulationstation
 	$(INSTALL) -D -m 0755 $(REGLINUX_EMULATIONSTATION_PATH)/emulationstation-standalone $(TARGET_DIR)/usr/bin/emulationstation-standalone
+	if test "$(BR2_PACKAGE_SYSTEM_TARGET_CHA)" = "y" ; then patch "$(TARGET_DIR)/usr/bin/emulationstation-standalone" < "$(REGLINUX_EMULATIONSTATION_PATH)/force-CHA1-to-P1-patch-for-CHA"; fi
 	sed -i -e 's;%REGLINUX_EMULATIONSTATION_PREFIX%;${REGLINUX_EMULATIONSTATION_PREFIX};g' \
 		-e 's;%REGLINUX_EMULATIONSTATION_CMD%;${REGLINUX_EMULATIONSTATION_CMD};g' \
 		-e 's;%REGLINUX_EMULATIONSTATION_ARGS%;${REGLINUX_EMULATIONSTATION_ARGS};g' \

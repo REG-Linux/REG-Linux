@@ -1,0 +1,26 @@
+--- a/emulationstation-standalone
++++ b/emulationstation-standalone
+@@ -197,6 +197,23 @@
+ # Initialize system screen checker
+ init_system
+ 
++# Make sure Player 1 uses CHA1 and Player 2 uses CHA2
++for JOYINDEX in /dev/input/js[0-9]
++do
++    eval $(udevadm info -q property $JOYINDEX | grep -m1 'ID_MODEL=')
++    DEVPATH=$(udevadm info -q property $JOYINDEX | sed -n -e 's|^DEVPATH=\(.*\)/0003:1C5.*$|/sys\1|p')
++    case $ID_MODEL in
++        CHA1)
++            sed -i "s|\"INPUT P1PATH\".*|\"INPUT P1PATH\" value\=\"$DEVPATH\" /\>|" /userdata/system/configs/emulationstation/es_settings.cfg
++            sed -i "s|global.retroarch.input_player1_joypad_index.*|global.retroarch.input_player1_joypad_index=${JOYINDEX: -1}|" /userdata/system/system.conf
++        ;;
++        CHA2)
++            sed -i "s|\"INPUT P2PATH\".*|\"INPUT P2PATH\" value\=\"$DEVPATH\" /\>|" /userdata/system/configs/emulationstation/es_settings.cfg
++            sed -i "s|global.retroarch.input_player2_joypad_index.*|global.retroarch.input_player2_joypad_index=${JOYINDEX: -1}|" /userdata/system/system.conf
++        ;;
++    esac
++done
++
+ # Main loop to handle EmulationStation execution and reboots
+ while [[ -e "${REBOOT_FLAG}" ]]; do
+     set_language
