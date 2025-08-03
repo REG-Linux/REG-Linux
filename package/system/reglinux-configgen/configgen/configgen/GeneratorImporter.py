@@ -22,7 +22,6 @@ EMULATOR_MAPPING = {
     'cgenius': ('generators.cgenius.cgeniusGenerator', 'CGeniusGenerator'),
     'eden': ('generators.eden.edenGenerator', 'EdenGenerator'),
     'corsixth': ('generators.corsixth.corsixthGenerator', 'CorsixTHGenerator'),
-    'demul': ('generators.demul.demulGenerator', 'DemulGenerator'),
     'devilutionx': ('generators.devilutionx.devilutionxGenerator', 'DevilutionXGenerator'),
     'dhewm3': ('generators.dhewm3.dhewm3Generator', 'Dhewm3Generator'),
     'dolphin': ('generators.dolphin.dolphinGenerator', 'DolphinGenerator'),
@@ -55,9 +54,7 @@ EMULATOR_MAPPING = {
     'mame': ('generators.mame.mameGenerator', 'MameGenerator'),
     'mednafen': ('generators.mednafen.mednafenGenerator', 'MednafenGenerator'),
     'melonds': ('generators.melonds.melondsGenerator', 'MelonDSGenerator'),
-    'model2emu': ('generators.model2emu.model2emuGenerator', 'Model2EmuGenerator'),
     'moonlight': ('generators.moonlight.moonlightGenerator', 'MoonlightGenerator'),
-    'mugen': ('generators.mugen.mugenGenerator', 'MugenGenerator'),
     'mupen64plus': ('generators.mupen.mupenGenerator', 'MupenGenerator'),
     'odcommander': ('generators.odcommander.odcommanderGenerator', 'OdcommanderGenerator'),
     'openbor': ('generators.openbor.openborGenerator', 'OpenborGenerator'),
@@ -91,10 +88,8 @@ EMULATOR_MAPPING = {
     'vice': ('generators.vice.viceGenerator', 'ViceGenerator'),
     'vita3k': ('generators.vita3k.vita3kGenerator', 'Vita3kGenerator'),
     'vpinball': ('generators.vpinball.vpinballGenerator', 'VPinballGenerator'),
-    'wine': ('generators.wine.wineGenerator', 'WineGenerator'),
     'xash3d_fwgs': ('generators.xash3d_fwgs.xash3dFwgsGenerator', 'Xash3dFwgsGenerator'),
     'xemu': ('generators.xemu.xemuGenerator', 'XemuGenerator'),
-    'xenia': ('generators.xenia.xeniaGenerator', 'XeniaGenerator'),
     'xenia-canary': ('generators.xenia.xeniaGenerator', 'XeniaGenerator')
 }
 

@@ -534,21 +534,9 @@ endmenu
 endmenu
 
 menu "Standalone Emulators"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/model2emu/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/drastic/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/demul/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/xenia/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/gsplus/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/openmsx/Config.in"
-endmenu
-
-menu "WINE"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/wine/mf/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/wine/rtkit/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/wine-x86/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/wine/wine-ge-custom/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/wine/wine-ge-custom-wow64_32/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/wine/wine-mono-ge-custom/Config.in"
 endmenu
 
 menu "Looks"
@@ -570,8 +558,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/jstest2/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/xosd/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/unclutter/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/winetricks/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/batocera-wine/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/pacman/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/wii-u-gc-adapter/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/evmapy-system-config/Config.in"
