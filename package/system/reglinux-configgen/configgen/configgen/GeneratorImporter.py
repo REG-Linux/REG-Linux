@@ -20,7 +20,7 @@ EMULATOR_MAPPING = {
     'cdogs': ('generators.cdogs.cdogsGenerator', 'CdogsGenerator'),
     'cemu': ('generators.cemu.cemuGenerator', 'CemuGenerator'),
     'cgenius': ('generators.cgenius.cgeniusGenerator', 'CGeniusGenerator'),
-    'citron': ('generators.citron.citronGenerator', 'CitronGenerator'),
+    'eden': ('generators.eden.edenGenerator', 'EdenGenerator'),
     'corsixth': ('generators.corsixth.corsixthGenerator', 'CorsixTHGenerator'),
     'demul': ('generators.demul.demulGenerator', 'DemulGenerator'),
     'devilutionx': ('generators.devilutionx.devilutionxGenerator', 'DevilutionXGenerator'),
