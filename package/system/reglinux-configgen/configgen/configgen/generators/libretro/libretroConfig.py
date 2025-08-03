@@ -53,7 +53,7 @@ systemToBluemsx = {'msx': '"MSX2"', 'msx1': '"MSX2"', 'msx2': '"MSX2"', 'colecov
 
 # Define Retroarch Core compatible with retroachievements
 # List taken from https://docs.libretro.com/guides/retroachievements/#cores-compatibility
-coreToRetroachievements = {'arduous', 'beetle-saturn', 'blastem', 'bluemsx', 'bsnes', 'bsnes_hd', 'cap32', 'desmume', 'duckstation', 'fbneo', 'fceumm', 'flycast', 'flycastvl', 'freechaf', 'freeintv', 'gambatte', 'gearboy', 'gearcoleco', 'geargrafx', 'genesisplusgx', 'genesisplusgx-wide', 'handy', 'holani', 'kronos', 'mednafen_lynx', 'mednafen_ngp', 'mednafen_psx', 'mednafen_supergrafx', 'mednafen_wswan', 'mgba', 'melonds', 'melondsds', 'mesen', 'mesens', 'mgba', 'mupen64plus-next', 'neocd', 'o2em', 'opera', 'parallel_n64', 'pce', 'pce_fast', 'pcfx', 'pcsx_rearmed', 'picodrive', 'pokemini', 'potator', 'ppsspp', 'prosystem', 'quasi88', 'quicknes', 'sameduck', 'smsplus', 'snes9x', 'snes9x_next', 'stella', 'swanstation', 'uzem', 'vb', 'vba-m', 'vecx', 'virtualjaguar'}
+coreToRetroachievements = {'arduous', 'beetle-saturn', 'blastem', 'bluemsx', 'bsnes', 'bsnes_hd', 'cap32', 'desmume', 'duckstation', 'fbneo', 'fceumm', 'flycast', 'freechaf', 'freeintv', 'gambatte', 'gearboy', 'gearcoleco', 'geargrafx', 'genesisplusgx', 'genesisplusgx-wide', 'handy', 'holani', 'kronos', 'mednafen_lynx', 'mednafen_ngp', 'mednafen_psx', 'mednafen_supergrafx', 'mednafen_wswan', 'mgba', 'melonds', 'melondsds', 'mesen', 'mesens', 'mgba', 'mupen64plus-next', 'neocd', 'o2em', 'opera', 'parallel_n64', 'pce', 'pce_fast', 'pcfx', 'pcsx_rearmed', 'picodrive', 'pokemini', 'potator', 'ppsspp', 'prosystem', 'quasi88', 'quicknes', 'sameduck', 'smsplus', 'snes9x', 'snes9x_next', 'stella', 'swanstation', 'uzem', 'vb', 'vba-m', 'vecx', 'virtualjaguar'}
 
 # Define systems NOT compatible with rewind option
 systemNoRewind = {'sega32x', 'psx', 'zxspectrum', 'n64', 'dreamcast', 'atomiswave', 'naomi', 'saturn'};
@@ -900,7 +900,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
         "mame078plus"   : { "default" : { "device":   4, "p1": 0, "p2": 1 } },
         "mame0139"      : { "default" : { "device":   4, "p1": 0, "p2": 1 } },
         "flycast"       : { "default" : { "device":   4, "p1": 0, "p2": 1, "p3": 2, "p4": 3 } },
-        "flycastvl"     : { "default" : { "device":   4, "p1": 0, "p2": 1, "p3": 2, "p4": 3 } },
+        "morpheuscast-xtreme" : { "default" : { "device":   4, "p1": 0, "p2": 1, "p3": 2, "p4": 3 } },
         "mednafen_psx"  : { "default" : { "device": 260, "p1": 0, "p2": 1 } },
         "pcsx_rearmed"  : { "default" : { "device": 260, "p1": 0, "p2": 1,
                                           "gameDependant": [ { "key": "type", "value": "justifier", "mapkey": "device", "mapvalue": "516" } ]} },

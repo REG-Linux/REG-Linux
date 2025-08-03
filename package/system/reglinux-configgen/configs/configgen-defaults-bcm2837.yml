@@ -14,13 +14,13 @@ psx:
     gfxbackend: Software
 atomiswave:
   emulator: libretro
-  core:     flycastvl
+  core:     morpheuscast-xtreme
 dreamcast:
   emulator: libretro
-  core:     flycastvl
+  core:     morpheuscast-xtreme
 naomi:
   emulator: libretro
-  core:     flycastvl
+  core:     morpheuscast-xtreme
 flash:
   emulator: lightspark
   core:     lightspark

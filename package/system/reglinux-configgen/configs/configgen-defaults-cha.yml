@@ -1,28 +1,9 @@
-default:
-  options:
-    video_threaded: true
-    smooth: false
-    retroarch.menu_driver: xmb
-    retroarch.audio_driver: alsathread
-
-mastersystem:
-  emulator: libretro
-  core:     picodrive
-megadrive:
-  emulator: libretro
-  core:     picodrive
-snes:
-  emulator: libretro
-  core:     snes9x
-fbneo:
-  options:
-    frameskip: auto
 atomiswave:
   emulator: libretro
-  core:     flycast
+  core:     morpheuscast-xtreme
 dreamcast:
   emulator: libretro
-  core:     flycast
+  core:     morpheuscast-xtreme
 naomi:
   emulator: libretro
-  core:     flycast
+  core:     morpheuscast-xtreme
