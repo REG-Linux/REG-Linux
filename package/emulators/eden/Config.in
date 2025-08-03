@@ -1,5 +1,5 @@
-config BR2_PACKAGE_CITRON
-    bool "citron"
+config BR2_PACKAGE_EDEN
+    bool "eden"
     depends on BR2_x86_64 || BR2_aarch64
     depends on BR2_PACKAGE_XORG7
     select BR2_PACKAGE_JSON_FOR_MODERN_CPP
@@ -16,7 +16,8 @@ config BR2_PACKAGE_CITRON
     select BR2_PACKAGE_CATCH2
     select BR2_PACKAGE_OPUS
     select BR2_PACKAGE_ENET
+    select BR2_PACKAGE_GAMEMODE
     help
-      Citron: Nintendo Switch Homebrew Emulator
+      Eden: Nintendo Switch Emulator
 
-	    https://citron-emu.org/
+	    https://eden-emu.dev/
