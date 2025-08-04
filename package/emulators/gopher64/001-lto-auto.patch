@@ -1,0 +1,23 @@
+--- a/Cargo.toml	2025-07-31 00:41:10.684506260 +0200
++++ b/Cargo.toml	2025-07-31 00:41:22.074804002 +0200
+@@ -44,4 +44,4 @@
+ 
+ [profile.release]
+ panic = "abort"
+-lto = "thin"
++lto = "auto"
+--- a/build.rs	2025-07-31 00:48:52.429332629 +0200
++++ b/build.rs	2025-07-31 00:49:25.606063702 +0200
+@@ -92,9 +92,9 @@
+     }
+ 
+     if profile == "release" {
+-        volk_build.flag("-flto=thin");
+-        rdp_build.flag("-flto=thin");
+-        simd_build.flag("-flto=thin");
++        volk_build.flag("-flto=auto");
++        rdp_build.flag("-flto=auto");
++        simd_build.flag("-flto=auto");
+     }
+     volk_build.compile("volk");
+     rdp_build.compile("parallel-rdp");
