@@ -140,7 +140,6 @@ PACKAGES_EMULATORS="86Box
                     cemu
                     citron
                     clk
-                    demul
                     dolphin-emu
                     dolphin-triforce
                     dosbox-staging
@@ -161,7 +160,6 @@ PACKAGES_EMULATORS="86Box
                     mame
                     mednafen
                     melonds
-                    model2
                     moonlight-embedded
                     openmsx
                     oricutron
@@ -188,7 +186,6 @@ PACKAGES_EMULATORS="86Box
                     vita3k
                     vpinball
                     xemu
-                    xenia
                     xenia-canary"
 
 PACKAGES_PORTS="abuse
@@ -239,20 +236,6 @@ PACKAGES_PORTS="abuse
                 hlsdk-xash3d-opfor
                 xash3d-fwgs"
 
-PACKAGES_WINE="d8vk
-               dxvk
-               dxvk-nvapi
-               faudio
-               mf
-               rtkit
-               vkd3d
-               vkd3d-proton
-               wine-ge-custom
-               wine-ge-custom-wow64_32
-               wine-mono-proton
-               wine-proton
-               wine-proton-wow64_32"
-
 PACKAGES_CONTROLLERS="aelightgun
                       aimtrak-guns
                       anbernic-gpio-pad
@@ -292,7 +275,7 @@ PACKAGES_CONTROLLERS="aelightgun
                       xpadneo
                       xpad-noone"
 
-PACKAGES_ALLGROUPS="RETROARCH LIBRETRO MUPEN OPENBOR EMULATORS PORTS WINE CONTROLLERS"
+PACKAGES_ALLGROUPS="RETROARCH LIBRETRO MUPEN OPENBOR EMULATORS PORTS CONTROLLERS"
 ### ############# ###
 
 # COLORS ##
@@ -315,7 +298,7 @@ show_help() {
   echo "[package] can be any of the *.mk under ./packages/batocera/ (without the extension \".mk\")"
   echo "Example: $0 libretro-mame libretro-fbneo   (search updates for both \"libretro-mame\" and \"libretro-fbneo\" packages)"
   echo ""
-  echo "[PACKAGE] can be RETROARCH, LIBRETRO, MUPEN, OPENBOR, EMULATORS, PORTS, WINE, CONTROLLERS, ALLGROUPS, ALL"
+  echo "[PACKAGE] can be RETROARCH, LIBRETRO, MUPEN, OPENBOR, EMULATORS, PORTS, CONTROLLERS, ALLGROUPS, ALL"
   echo "Example: $0 ALLGROUPS   (search updates for all PACKAGE groups)"
   echo ""
   echo "It is posible to combine packages and groups."
