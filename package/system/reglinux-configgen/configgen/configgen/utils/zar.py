@@ -1,5 +1,5 @@
-import os
-import subprocess
+from os import path, mkdir, rmdir, listdir
+from subprocess import call
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -27,37 +27,37 @@ def zar_begin(rom):
     eslog.debug(f"zar_begin({rom})")
 
     # Define the mount point based on the archive name
-    rommountpoint = "/var/run/zar/" + os.path.basename(rom)[:-4]  # remove .zar extension
+    rommountpoint = "/var/run/zar/" + path.basename(rom)[:-4]  # remove .zar extension
 
     # Ensure base /var/run/zar directory exists
-    if not os.path.exists("/var/run/zar"):
-        os.mkdir("/var/run/zar")
+    if not path.exists("/var/run/zar"):
+        mkdir("/var/run/zar")
 
     # Try to clean up leftover mountpoint if it exists but is empty
-    if os.path.exists(rommountpoint) and os.path.isdir(rommountpoint):
+    if path.exists(rommountpoint) and path.isdir(rommountpoint):
         eslog.debug(f"zar_begin: {rommountpoint} already exists")
         try:
-            os.rmdir(rommountpoint)
+            rmdir(rommountpoint)
         except:
             eslog.debug(f"zar_begin: failed to rmdir {rommountpoint}")
             return False, None, rommountpoint
 
     # Create the new mount directory
-    os.mkdir(rommountpoint)
+    mkdir(rommountpoint)
 
     # Mount the archive using fuse-zar
-    return_code = subprocess.call(["fuse-zar", rom, rommountpoint])
+    return_code = call(["fuse-zar", rom, rommountpoint])
     if return_code != 0:
         eslog.debug(f"zar_begin: mounting {rommountpoint} failed")
         try:
-            os.rmdir(rommountpoint)
+            rmdir(rommountpoint)
         except:
             pass
         raise Exception(f"unable to mount the file {rom} using fuse-zar")
 
     # Check if the archive contains a single file named like the archive
-    romsingle = os.path.join(rommountpoint, os.path.basename(rom)[:-4])
-    if len(os.listdir(rommountpoint)) == 1 and os.path.exists(romsingle):
+    romsingle = path.join(rommountpoint, path.basename(rom)[:-4])
+    if len(listdir(rommountpoint)) == 1 and path.exists(romsingle):
         eslog.debug(f"zar: single rom {romsingle}")
         return True, rommountpoint, romsingle
 
@@ -81,10 +81,10 @@ def zar_end(rommountpoint):
     eslog.debug(f"zar_end({rommountpoint})")
 
     # Unmount the FUSE filesystem
-    return_code = subprocess.call(["fusermount3", "-u", rommountpoint])
+    return_code = call(["fusermount3", "-u", rommountpoint])
     if return_code != 0:
         eslog.debug(f"zar_end: unmounting {rommountpoint} failed")
         raise Exception(f"unable to unmount the file {rommountpoint}")
 
     # Remove the now-empty mount directory
-    os.rmdir(rommountpoint)
+    rmdir(rommountpoint)

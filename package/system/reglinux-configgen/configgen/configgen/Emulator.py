@@ -1,7 +1,7 @@
-import os
-import systemFiles
 import xml.etree.ElementTree as ET
-import yaml
+from os import path
+from systemFiles import SYSTEM_CONF, ES_SETTINGS
+from yaml import SafeLoader, load
 from typing import Dict, Any
 from settings.unixSettings import UnixSettings
 
@@ -46,11 +46,11 @@ class Emulator:
         gsname = self.game_settings_name(rom)
 
         # Load configurations from system.conf using UnixSettings
-        recalSettings = UnixSettings(systemFiles.SYSTEM_CONF)
+        recalSettings = UnixSettings(SYSTEM_CONF)
         globalSettings = recalSettings.loadAll('global')
         controllersSettings = recalSettings.loadAll('controllers', True)
         systemSettings = recalSettings.loadAll(self.name)
-        folderSettings = recalSettings.loadAll(self.name + ".folder[\"" + os.path.dirname(rom) + "\"]")
+        folderSettings = recalSettings.loadAll(self.name + ".folder[\"" + path.dirname(rom) + "\"]")
         gameSettings = recalSettings.loadAll(self.name + "[\"" + gsname + "\"]")
 
         # Add display settings to config
@@ -80,7 +80,7 @@ class Emulator:
         if "shaderset" in self.config:
             if self.config["shaderset"] != "none":
                 # Prefer user-defined shader configs if available
-                if os.path.exists("/userdata/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults.yml"):
+                if path.exists("/userdata/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults.yml"):
                     self.renderconfig = Emulator.get_generic_config(
                         self.name,
                         "/userdata/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults.yml",
@@ -117,7 +117,7 @@ class Emulator:
         Returns:
             str: Sanitized game settings name compatible with EmulationStation.
         """
-        rom = os.path.basename(rom)
+        rom = path.basename(rom)
 
         # Sanitize name by removing invalid characters per EmulationStation rules
         rom = rom.replace('=', '').replace('#', '')
@@ -152,13 +152,13 @@ class Emulator:
         """
         # Load default configuration
         with open(defaultyml, 'r') as f:
-            systems_default = yaml.load(f, Loader=yaml.SafeLoader)
+            systems_default = load(f, Loader=SafeLoader)
 
         # Load architecture-specific configuration if available
         systems_default_arch = {}
-        if os.path.exists(defaultarchyml):
+        if path.exists(defaultarchyml):
             with open(defaultarchyml, 'r') as f:
-                systems_default_arch = yaml.load(f, Loader=yaml.SafeLoader) or {}
+                systems_default_arch = load(f, Loader=SafeLoader) or {}
 
         dict_all: Dict[str, Any] = {}
 
@@ -259,7 +259,7 @@ class Emulator:
         Sets default values if the file is unavailable or parsing fails.
         """
         try:
-            esConfig = ET.parse(systemFiles.ES_SETTINGS)
+            esConfig = ET.parse(ES_SETTINGS)
 
             # Read showFPS setting
             drawframerate_elem = esConfig.find("./bool[@name='DrawFramerate']")
