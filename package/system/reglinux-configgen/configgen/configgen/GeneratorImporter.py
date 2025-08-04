@@ -3,7 +3,7 @@ GeneratorImporter module provides functionality to dynamically import and instan
 generator classes for various emulators based on a predefined mapping.
 """
 
-import importlib
+from importlib import import_module
 
 class GeneratorNotFoundError(Exception):
     """Exception raised when no generator is found for the specified emulator."""
@@ -97,7 +97,7 @@ EMULATOR_MAPPING = {
 PRELOADED_GENERATORS = {}
 for emulator, (module_path, class_name) in EMULATOR_MAPPING.items():
     try:
-        module = importlib.import_module(module_path)
+        module = import_module(module_path)
         PRELOADED_GENERATORS[emulator] = getattr(module, class_name)
     except (ImportError, AttributeError):
         continue  # Silencia erros, ou adicione logs se quiser visibilidade

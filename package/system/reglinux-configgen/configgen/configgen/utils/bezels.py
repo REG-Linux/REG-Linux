@@ -1,5 +1,5 @@
-import os
-import systemFiles
+from os import path
+from systemFiles import OVERLAY_USER, OVERLAY_SYSTEM
 import struct
 from PIL import Image, ImageOps
 from .videoMode import getAltDecoration
@@ -21,38 +21,38 @@ def getBezelInfos(rom, bezel, systemName, emulator):
         dict or None: Dictionary containing paths to bezel files and metadata.
     """
     altDecoration = getAltDecoration(systemName, rom, emulator)
-    romBase = os.path.splitext(os.path.basename(rom))[0]
+    romBase = path.splitext(path.basename(rom))[0]
 
     candidates = []
 
     # Priority: game-specific overlays
     candidates += [
-        ("games", systemFiles.OVERLAY_USER, True, f"{systemName}/{romBase}"),
-        ("games", systemFiles.OVERLAY_SYSTEM, True, f"{systemName}/{romBase}"),
-        ("games", systemFiles.OVERLAY_USER, True, romBase),
-        ("games", systemFiles.OVERLAY_SYSTEM, True, romBase),
+        ("games", OVERLAY_USER, True, f"{systemName}/{romBase}"),
+        ("games", OVERLAY_SYSTEM, True, f"{systemName}/{romBase}"),
+        ("games", OVERLAY_USER, True, romBase),
+        ("games", OVERLAY_SYSTEM, True, romBase),
     ]
 
     # System-specific overlays (with or without altDecoration)
     if altDecoration != 0:
-        candidates.append(("systems", systemFiles.OVERLAY_USER, False, f"{systemName}-{altDecoration}"))
-    candidates.append(("systems", systemFiles.OVERLAY_USER, False, systemName))
+        candidates.append(("systems", OVERLAY_USER, False, f"{systemName}-{altDecoration}"))
+    candidates.append(("systems", OVERLAY_USER, False, systemName))
     if altDecoration != 0:
-        candidates.append(("systems", systemFiles.OVERLAY_SYSTEM, False, f"{systemName}-{altDecoration}"))
-    candidates.append(("systems", systemFiles.OVERLAY_SYSTEM, False, systemName))
+        candidates.append(("systems", OVERLAY_SYSTEM, False, f"{systemName}-{altDecoration}"))
+    candidates.append(("systems", OVERLAY_SYSTEM, False, systemName))
 
     # Default fallback overlays
     if altDecoration != 0:
-        candidates.append(("", systemFiles.OVERLAY_USER, True, f"default-{altDecoration}"))
-    candidates.append(("", systemFiles.OVERLAY_USER, True, "default"))
+        candidates.append(("", OVERLAY_USER, True, f"default-{altDecoration}"))
+    candidates.append(("", OVERLAY_USER, True, "default"))
     if altDecoration != 0:
-        candidates.append(("", systemFiles.OVERLAY_SYSTEM, True, f"default-{altDecoration}"))
-    candidates.append(("", systemFiles.OVERLAY_SYSTEM, True, "default"))
+        candidates.append(("", OVERLAY_SYSTEM, True, f"default-{altDecoration}"))
+    candidates.append(("", OVERLAY_SYSTEM, True, "default"))
 
     for subfolder, basepath, bezel_game, name in candidates:
         prefix = f"{basepath}/{bezel}/{subfolder}/" if subfolder else f"{basepath}/{bezel}/"
         overlay_png_file = f"{prefix}{name}.png"
-        if os.path.exists(overlay_png_file):
+        if path.exists(overlay_png_file):
             eslog.debug(f"Original bezel file used: {overlay_png_file}")
             return {
                 "png": overlay_png_file,
@@ -72,7 +72,7 @@ def fast_image_size(image_file):
     Returns:
         (int, int): Width and height of the image, or (-1, -1) if error.
     """
-    if not os.path.exists(image_file):
+    if not path.exists(image_file):
         return -1, -1
     with open(image_file, 'rb') as fhandle:
         head = fhandle.read(32)
@@ -130,10 +130,10 @@ def tatooImage(input_png, output_png, system):
     try:
         if system.config['bezel.tattoo'] == 'system':
             tattoo_file = f'/usr/share/reglinux/controller-overlays/{system.name}.png'
-            if not os.path.exists(tattoo_file):
+            if not path.exists(tattoo_file):
                 tattoo_file = '/usr/share/reglinux/controller-overlays/generic.png'
             tattoo = Image.open(tattoo_file)
-        elif system.config['bezel.tattoo'] == 'custom' and os.path.exists(system.config['bezel.tattoo_file']):
+        elif system.config['bezel.tattoo'] == 'custom' and path.exists(system.config['bezel.tattoo_file']):
             tattoo_file = system.config['bezel.tattoo_file']
             tattoo = Image.open(tattoo_file)
         else:
@@ -271,7 +271,5 @@ def createTransparentBezel(output_png, width, height):
     """
     Create a fully transparent bezel PNG of given size.
     """
-    from PIL import ImageDraw
     imgnew = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    imgnewdraw = ImageDraw.Draw(imgnew)
     imgnew.save(output_png, mode="RGBA", format="PNG")

@@ -1,8 +1,8 @@
-import configparser
-import os
-import re
-import io
-import tempfile
+from configparser import ConfigParser
+from os import rename, path
+from re import compile, sub, escape
+from io import StringIO
+from tempfile import NamedTemporaryFile
 from pathlib import Path
 from functools import lru_cache
 from typing import Any, Dict, Union
@@ -10,7 +10,7 @@ from typing import Any, Dict, Union
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
-__source__ = os.path.basename(__file__)
+__source__ = path.basename(__file__)
 
 
 class UnixSettings:
@@ -49,7 +49,7 @@ class UnixSettings:
 
         # Use ConfigParser without interpolation and preserve key case
         eslog.debug(f"Creating parser for {self.settingsFile}")
-        self.config = configparser.ConfigParser(interpolation=None, strict=False)
+        self.config = ConfigParser(interpolation=None, strict=False)
         self.config.optionxform = lambda optionstr: optionstr  # Preserve original case of keys
         self._regex_cache = {}
 
@@ -57,7 +57,7 @@ class UnixSettings:
             try:
                 # Read file content as if it belongs to a [DEFAULT] section
                 content = self.settingsFile.read_text(encoding=self.encoding)
-                fake_file = io.StringIO('[DEFAULT]\n' + content)
+                fake_file = StringIO('[DEFAULT]\n' + content)
                 self.config.read_file(fake_file)
             except (IOError, UnicodeDecodeError) as e:
                 eslog.error(f"Failed to read {self.settingsFile}: {e}")
@@ -78,7 +78,7 @@ class UnixSettings:
         temp_path = None
         try:
             # Write to a temporary file in the same directory
-            with tempfile.NamedTemporaryFile('w', encoding='utf-8', delete=False,
+            with NamedTemporaryFile('w', encoding='utf-8', delete=False,
                                              dir=self.settingsFile.parent) as tmp_file:
                 temp_path = Path(tmp_file.name)
                 # Write each key-value pair with the specified separator
@@ -86,7 +86,7 @@ class UnixSettings:
                     tmp_file.write(f"{key}{self.separator}={self.separator}{value}\n")
 
             # Rename temporary file to original (atomic operation)
-            os.rename(temp_path, self.settingsFile)
+            rename(temp_path, self.settingsFile)
             eslog.debug(f"Settings successfully saved to {self.settingsFile}")
             return True
         except (IOError, OSError) as e:
@@ -144,7 +144,7 @@ class UnixSettings:
         Returns:
             str: A safe version of the string for use as a key.
         """
-        return re.sub(r'[^A-Za-z0-9\-\.]+', '_', s)
+        return sub(r'[^A-Za-z0-9\-\.]+', '_', s)
 
     def loadAll(self, name: str, includeName: bool = False) -> Dict[str, str]:
         """
@@ -162,7 +162,7 @@ class UnixSettings:
         # Optimization: compile and cache the regular expression
         safe_prefix = self.protectString(name)
         if safe_prefix not in self._regex_cache:
-            self._regex_cache[safe_prefix] = re.compile(rf"^{re.escape(safe_prefix)}\.(.+)")
+            self._regex_cache[safe_prefix] = compile(rf"^{escape(safe_prefix)}\.(.+)")
 
         compiled_regex = self._regex_cache[safe_prefix]
 

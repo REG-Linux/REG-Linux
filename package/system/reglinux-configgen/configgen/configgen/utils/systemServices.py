@@ -1,11 +1,11 @@
-import subprocess
+from subprocess import Popen, PIPE
 
 from .logger import get_logger
 eslog = get_logger(__name__)
 
 def is_service_enabled(name: str) -> bool:
     try:
-        proc = subprocess.Popen(["system-services", "list"], stdout=subprocess.PIPE)
+        proc = Popen(["system-services", "list"], stdout=PIPE)
         out, _ = proc.communicate()
         for valmod in out.decode().splitlines():
             vals = valmod.split(";")
@@ -19,7 +19,7 @@ def is_service_enabled(name: str) -> bool:
 
 def get_service_status(name: str) -> str:
     try:
-        proc = subprocess.Popen(["system-services", "status", name], stdout=subprocess.PIPE)
+        proc = Popen(["system-services", "status", name], stdout=PIPE)
         out, _ = proc.communicate()
         val = out.decode().strip()
         eslog.debug(f"service {name} status: \"{val}\"")

@@ -3,7 +3,7 @@ Controller database management.
 Handles loading and matching controller configurations from gamecontrollerdb.txt.
 """
 
-import os
+from os import environ
 from typing import Dict
 from controllers import Controller, Input
 
@@ -19,7 +19,7 @@ def load_all_controllers_config() -> Dict[str, Dict]:
         Dictionary mapping GUIDs to controller configurations with Input objects
     """
     controllerdb = {}
-    filepath = os.environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
+    filepath = environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
 
     try:
         with open(filepath, "r") as controllerdb_file:
