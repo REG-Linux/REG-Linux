@@ -3,8 +3,8 @@
 # xenia-canary
 #
 ################################################################################
-# Version: Commits on Jul 29, 2025
-XENIA_CANARY_VERSION = 43d206d2e99ada38804fa68c20def23bdf6e1c3f
+# Version: Commits on Aug 3, 2025
+XENIA_CANARY_VERSION = 37e3fe9eb6198dab01416a497eb7c8b3e095ac40
 XENIA_CANARY_SITE = https://github.com/xenia-canary/xenia-canary
 XENIA_CANARY_SITE_METHOD = git
 XENIA_CANARY_GIT_SUBMODULES = YES
@@ -21,7 +21,7 @@ define XENIA_CANARY_CONFIGURE_CMDS
 	SDL2CONFIG="$(HOST_DIR)/bin/sdl2-config" \
 	CMAKE_MAKE_PROGRAM="$(HOST_DIR)/bin/ninja" \
 	CC="$(HOST_DIR)/bin/clang" \
-	./xb premake
+	./xenia-build.py premake
 endef
 
 define XENIA_CANARY_BUILD_CMDS
@@ -33,7 +33,7 @@ define XENIA_CANARY_BUILD_CMDS
 	NINJA="$(HOST_DIR)/bin/ninja" \
 	CC="$(HOST_DIR)/bin/clang" \
 	CXX="$(HOST_DIR)/bin/clang++" \
-	./xb build --config release
+	./xenia-build.py build --config release
 endef
 
 define XENIA_CANARY_INSTALL_TARGET_CMDS

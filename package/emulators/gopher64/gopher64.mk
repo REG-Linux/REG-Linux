@@ -9,7 +9,7 @@ GOPHER64_SITE = https://github.com/gopher64/gopher64.git
 GOPHER64_SITE_METHOD = git
 GOPHER64_GIT_SUBMODULES = YES
 GOPHER64_LICENSE = GPLv2
-GOPHER64_DEPENDENCIES = alsa-lib libgl wayland xwayland clang
+GOPHER64_DEPENDENCIES = alsa-lib libgl wayland xwayland clang vulkan-headers vulkan-loader
 
 GOPHER64_CARGO_INSTALL_OPTS = --path ./
 
