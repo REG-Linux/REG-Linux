@@ -22,7 +22,7 @@ class Generator(object):
     def supportsInternalBezels(self):
         return False
 
-    # mangohud must be called by the generator itself (wine based emulator for example)
+    # mangohud must be called by the generator itself
     def hasInternalMangoHUDCall(self):
         return False
 

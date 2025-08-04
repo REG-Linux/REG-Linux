@@ -49,11 +49,6 @@ def precalibration(systemName, emulator, core, rom):
             dstdir = "/userdata/saves/{}/diff".format(target_dir)
             precalibration_copyFilesInDir(srcdir, dstdir, baserom_noext + "_", ".dif")
 
-    elif systemName == "model2":
-        src = "{}/NVDATA/{}.DAT".format(dir, baserom)
-        dst = "/userdata/saves/model2/NVDATA/{}.DAT".format(baserom)
-        precalibration_copyFile(src, dst)
-
     elif systemName == "naomi":
         for suffix in ["nvmem", "eeprom"]:
             src = "{}/reicast/{}.{}".format(dir, baserom, suffix)
