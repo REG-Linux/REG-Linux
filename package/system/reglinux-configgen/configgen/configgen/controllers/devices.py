@@ -1,10 +1,10 @@
-import pyudev
+from pyudev import Context
 from .utils import dev2int
 
 def getDevicesInformation():
   groups    = {}
   devices   = {}
-  context   = pyudev.Context()
+  context   = Context()
   events    = context.list_devices(subsystem='input')
   mouses    = []
   joysticks = []

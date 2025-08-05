@@ -1,8 +1,8 @@
-import os
-import time
-import subprocess
-import csv
-import sys
+from os import path
+from time import sleep
+from subprocess import Popen, PIPE, CalledProcessError, run, check_output
+from csv import reader
+from sys import stdout
 from typing import Optional, List, Dict
 
 from .logger import get_logger
@@ -15,18 +15,18 @@ def changeMode(videomode: str) -> None:
     max_tries = 2
     for i in range(max_tries):
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = run(cmd, capture_output=True, text=True, check=True)
             eslog.debug(result.stdout.strip())
             return
-        except subprocess.CalledProcessError as e:
+        except CalledProcessError as e:
             eslog.error(f"Error setting video mode: {e.stderr}")
             if i == max_tries - 1:
                 raise
-            time.sleep(1)
+            sleep(1)
 
 def getCurrentMode() -> Optional[str]:
     try:
-        proc = subprocess.Popen(["regmsg", "currentMode"], stdout=subprocess.PIPE)
+        proc = Popen(["regmsg", "currentMode"], stdout=PIPE)
         out, _ = proc.communicate()
         return out.decode().splitlines()[0] if out else None
     except Exception as e:
@@ -35,7 +35,7 @@ def getCurrentMode() -> Optional[str]:
 
 def getScreens() -> List[str]:
     try:
-        proc = subprocess.Popen(["regmsg", "listOutputs"], stdout=subprocess.PIPE)
+        proc = Popen(["regmsg", "listOutputs"], stdout=PIPE)
         out, _ = proc.communicate()
         return out.decode().splitlines()
     except Exception as e:
@@ -45,7 +45,7 @@ def getScreens() -> List[str]:
 def getCurrentResolution(name: Optional[str] = None) -> Dict[str, int]:
     drm_mode_path = "/var/run/drmMode"
 
-    if os.path.exists(drm_mode_path):
+    if path.exists(drm_mode_path):
         try:
             with open(drm_mode_path, "r") as f:
                 content = f.read().strip()
@@ -57,7 +57,7 @@ def getCurrentResolution(name: Optional[str] = None) -> Dict[str, int]:
 
     try:
         cmd = ["regmsg", "currentResolution"] if name is None else ["regmsg", "--screen", name, "currentResolution"]
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        proc = Popen(cmd, stdout=PIPE)
         out, _ = proc.communicate()
         vals = out.decode().split("x")
         return {"width": int(vals[0]), "height": int(vals[1])}
@@ -84,11 +84,11 @@ def getScreensInfos(config: Dict) -> List[Dict[str, int]]:
     return res
 
 def minTomaxResolution() -> None:
-    subprocess.run(["regmsg", "minTomaxResolution"], stdout=subprocess.PIPE)
+    run(["regmsg", "minTomaxResolution"], stdout=PIPE)
 
 def getRefreshRate() -> Optional[str]:
     try:
-        proc = subprocess.Popen(["regmsg", "currentRefresh"], stdout=subprocess.PIPE)
+        proc = Popen(["regmsg", "currentRefresh"], stdout=PIPE)
         out, _ = proc.communicate()
         return out.decode().splitlines()[0] if out else None
     except Exception as e:
@@ -96,22 +96,22 @@ def getRefreshRate() -> Optional[str]:
         return None
 
 def supportSystemRotation() -> bool:
-    result = subprocess.run(["regmsg", "supportSystemRotation"], stdout=subprocess.PIPE)
+    result = run(["regmsg", "supportSystemRotation"], stdout=PIPE)
     return result.returncode == 0
 
 def changeMouse(mode: bool) -> None:
     eslog.debug(f"changeMouseMode({mode})")
     cmd = "system-mouse show" if mode else "system-mouse hide"
-    subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+    run(cmd, shell=True, stdout=PIPE)
 
 def getGLVersion():
     try:
         # Use eglinfo since we are KMS/DRM
-        if os.path.exists("/usr/bin/eglinfo") == False:
+        if path.exists("/usr/bin/eglinfo") == False:
             return 0
 
         glxVerCmd = 'eglinfo | grep "OpenGL version"'
-        glVerOutput = subprocess.check_output(glxVerCmd, shell=True).decode(sys.stdout.encoding)
+        glVerOutput = check_output(glxVerCmd, shell=True).decode(stdout.encoding)
         glVerString = glVerOutput.split()
         glVerTemp = glVerString[3].split(".")
         if len(glVerTemp) > 2:
@@ -125,11 +125,11 @@ def getGLVersion():
 def getGLVendor():
     try:
         # Use eglinfo since we are KMS/DRM
-        if os.path.exists("/usr/bin/eglinfo") == False:
+        if path.exists("/usr/bin/eglinfo") == False:
             return "unknown"
 
         glxVendCmd = 'eglinfo | grep "OpenGL vendor string"'
-        glVendOutput = subprocess.check_output(glxVendCmd, shell=True).decode(sys.stdout.encoding)
+        glVendOutput = check_output(glxVendCmd, shell=True).decode(stdout.encoding)
         glVendString = glVendOutput.split()
         glVendor = glVendString[3].casefold()
         return glVendor
@@ -143,14 +143,14 @@ def getAltDecoration(systemName: str, rom: str, emulator: str) -> str:
         return "0"
 
     specialFile = f'/usr/share/reglinux/configgen/data/special/{systemName}.csv'
-    if not os.path.exists(specialFile):
+    if not path.exists(specialFile):
         return "0"
 
-    romName = os.path.splitext(os.path.basename(rom))[0].casefold()
+    romName = path.splitext(path.basename(rom))[0].casefold()
 
     try:
         with open(specialFile, 'r') as openFile:
-            specialList = csv.reader(openFile, delimiter=';')
+            specialList = reader(openFile, delimiter=';')
             for row in specialList:
                 if row[0].casefold() == romName:
                     return str(row[1])

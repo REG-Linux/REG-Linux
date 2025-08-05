@@ -10,8 +10,8 @@ by translating gamepad button presses and analog stick movements into correspond
 keyboard key presses or mouse movements.
 """
 
-import subprocess
-import json
+from subprocess import call
+from json import load, dumps
 import os
 import evdev
 import controllers as controllersConfig
@@ -49,7 +49,7 @@ class Evmapy():
         """
         if Evmapy.__prepare(system, emulator, core, rom, playersControllers, guns):
             Evmapy.__started = True
-            subprocess.call(["system-evmapy", "start"])
+            call(["system-evmapy", "start"])
 
     @staticmethod
     def stop():
@@ -61,7 +61,7 @@ class Evmapy():
         """
         if Evmapy.__started:
             Evmapy.__started = False
-            subprocess.call(["system-evmapy", "stop"])
+            call(["system-evmapy", "stop"])
 
     @staticmethod
     def __prepare(system, emulator, core, rom, playersControllers, guns):
@@ -107,10 +107,10 @@ class Evmapy():
                 eslog.debug(f"evmapy on {keysfile}")
 
                 # Clear any existing evmapy configuration
-                subprocess.call(["system-evmapy", "clear"])
+                call(["system-evmapy", "clear"])
 
                 # Load the pad action configuration from the keys file
-                padActionConfig = json.load(open(keysfile))
+                padActionConfig = load(open(keysfile))
 
                 # Configure light guns
                 ngun = 1
@@ -149,7 +149,7 @@ class Evmapy():
 
                         # Write gun configuration to file
                         with open(configfile, "w") as fd:
-                            fd.write(json.dumps(padConfig, indent=4))
+                            fd.write(dumps(padConfig, indent=4))
                     ngun += 1
 
                 # Configure each player's controller
@@ -388,7 +388,7 @@ class Evmapy():
 
                         # Write controller configuration to file
                         with open(configfile, "w") as fd:
-                            fd.write(json.dumps(padConfig, indent=4))
+                            fd.write(dumps(padConfig, indent=4))
 
                     nplayer += 1
                 return True
