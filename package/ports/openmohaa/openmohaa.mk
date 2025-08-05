@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OPENMOHAA_VERSION = v0.82.0
+OPENMOHAA_VERSION = v0.82.1
 OPENMOHAA_SITE = https://github.com/openmoh/openmohaa.git
 OPENMOHAA_SITE_METHOD=git
 OPENMOHAA_GIT_SUBMODULES=YES
