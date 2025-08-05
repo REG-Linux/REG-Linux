@@ -5,8 +5,26 @@ It is responsible for preparing the environment and launching the emulator
 with the appropriate configurations.
 """
 
-import os
+from os import path, environ, chdir, makedirs, access, listdir, X_OK
+from argparse import ArgumentParser
+from signal import signal, SIGINT, SIGTERM
+from time import sleep
+from subprocess import Popen, PIPE, call
+from systemFiles import SAVES
+from sys import exit
+from Emulator import Emulator
 from controllers import Evmapy
+from GeneratorImporter import getGenerator
+import utils.videoMode as videoMode
+import utils.gunsUtils as gunsUtils
+import utils.wheelsUtils as wheelsUtils
+import utils.windowsManager as windowsManager
+import utils.bezels as bezelsUtil
+import controllers as controllers
+import utils.zar as zar
+
+from utils.logger import get_logger
+eslog = get_logger(__name__)
 
 profiler = None
 
@@ -24,30 +42,10 @@ profiler = None
 #    to analyze the `/var/run/emulatorlauncher.prof` file.
 
 # Enable the profiler if the performance marker file exists.
-if os.path.exists("/var/run/emulatorlauncher.perf"):
+if path.exists("/var/run/emulatorlauncher.perf"):
     import cProfile
     profiler = cProfile.Profile()
     profiler.enable()
-
-### Always required imports ###
-import argparse
-import GeneratorImporter
-import signal
-import time
-import subprocess
-import systemFiles
-import utils.videoMode as videoMode
-import utils.gunsUtils as gunsUtils
-import utils.wheelsUtils as wheelsUtils
-import utils.windowsManager as windowsManager
-import utils.bezels as bezelsUtil
-import controllers as controllers
-import utils.zar as zar
-from sys import exit
-from Emulator import Emulator
-
-from utils.logger import get_logger
-eslog = get_logger(__name__)
 
 # Global process variable to hold the emulator process.
 proc = None
@@ -68,7 +66,7 @@ def main(args, maxnbplayers):
         int: Exit code from the ROM launcher.
     """
     # Get the file extension in lowercase
-    extension = os.path.splitext(args.rom)[1][1:].lower()
+    extension = path.splitext(args.rom)[1][1:].lower()
 
     # Check if it is a .zar archive
     if extension == "zar":
@@ -210,7 +208,7 @@ def _apply_commandline_options(args, system):
 
 def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
     """Configures and enables MangoHUD if supported."""
-    if not (system.isOptSet('hud_support') and os.path.exists("/usr/bin/mangohud") and system.getOptBoolean('hud_support')):
+    if not (system.isOptSet('hud_support') and path.exists("/usr/bin/mangohud") and system.getOptBoolean('hud_support')):
         return
 
     hud_bezel = getHudBezel(system, generator, rom, gameResolution, controllers.gunsBordersSizeName(guns, system.config))
@@ -233,13 +231,13 @@ def _launch_emulator_process(generator, system, rom, playersControllers, metadat
 
     try:
         Evmapy.start(args.system, system.config['emulator'], system.config.get("core", ""), romConfiguration, playersControllers, guns)
-        if (generator.requiresWayland() or generator.requiresX11()) and 'WAYLAND_DISPLAY' not in os.environ:
+        if (generator.requiresWayland() or generator.requiresX11()) and 'WAYLAND_DISPLAY' not in environ:
             windowsManager.start_compositor(generator, system)
 
         effectiveRom = rom or ""
         executionDirectory = generator.executionDirectory(system.config, effectiveRom)
         if executionDirectory is not None:
-            os.chdir(executionDirectory)
+            chdir(executionDirectory)
 
         cmd = generator.generate(system, rom, playersControllers, metadata, guns, wheels, gameResolution)
         _configure_hud(system, generator, cmd, args, rom, gameResolution, guns)
@@ -300,7 +298,7 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
     system = _setup_system_emulator(args, romConfiguration)
     metadata = controllers.getGamesMetaData(system.name, rom)
     guns, wheels, wheelProcesses, playersControllers = _configure_special_devices(args, system, rom, metadata, playersControllers)
-    generator = GeneratorImporter.getGenerator(system.config['emulator'])
+    generator = getGenerator(system.config['emulator'])
 
     exitCode = -1
     resolutionChanged, mouseChanged = False, False
@@ -309,14 +307,14 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
     try:
         systemMode, resolutionChanged, mouseChanged, gameResolution = _setup_video_and_mouse(system, generator, rom)
 
-        dirname = os.path.join(systemFiles.SAVES, system.name)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
+        dirname = path.join(SAVES, system.name)
+        if not path.exists(dirname):
+            makedirs(dirname)
 
         _apply_commandline_options(args, system)
 
         system.config["sdlvsync"] = '0' if system.isOptSet('sdlvsync') and not system.getOptBoolean('sdlvsync') else '1'
-        os.environ['SDL_RENDER_VSYNC'] = system.config["sdlvsync"]
+        environ['SDL_RENDER_VSYNC'] = system.config["sdlvsync"]
 
         effectiveCore = system.config.get("core", "")
         effectiveRom = rom or ""
@@ -474,15 +472,15 @@ def callExternalScripts(folder, event, args):
         event (str): The event name (e.g., "gameStart", "gameStop").
         args (list): A list of arguments to pass to the scripts.
     """
-    if not os.path.isdir(folder):
+    if not path.isdir(folder):
         return
-    for file in sorted(os.listdir(folder)): # Sort for predictable execution order.
-        filepath = os.path.join(folder, file)
-        if os.path.isdir(filepath):
+    for file in sorted(listdir(folder)): # Sort for predictable execution order.
+        filepath = path.join(folder, file)
+        if path.isdir(filepath):
             callExternalScripts(filepath, event, args) # Recurse into subdirectories.
-        elif os.access(filepath, os.X_OK):
+        elif access(filepath, X_OK):
             eslog.debug(f"Calling external script: {str([filepath, event] + args)}")
-            subprocess.call([filepath, event] + args)
+            call([filepath, event] + args)
 
 def hudConfig_protectStr(text):
     """
@@ -571,14 +569,14 @@ def runCommand(command):
         return -1
 
     # Combine current environment with command-specific environment variables.
-    envvars = {**os.environ, **command.env}
+    envvars = {**environ, **command.env}
 
     eslog.debug(f"command: {str(command)}")
     eslog.debug(f"command: {str(command.array)}")
     eslog.debug(f"env: {str(envvars)}")
     exitcode = -1
 
-    proc = subprocess.Popen(command.array, env=envvars, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = Popen(command.array, env=envvars, stdout=PIPE, stderr=PIPE)
     try:
         out, err = proc.communicate()
         exitcode = proc.returncode
@@ -606,11 +604,11 @@ def signal_handler(signal, frame):
 
 if __name__ == '__main__':
     # Register signal handler for graceful termination.
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+    signal(SIGINT, signal_handler)
+    signal(SIGTERM, signal_handler)
 
     # --- Argument Parsing ---
-    parser = argparse.ArgumentParser(description='Emulator Launcher Script')
+    parser = ArgumentParser(description='Emulator Launcher Script')
 
     maxnbplayers = 8
     # Dynamically create arguments for each player's controller.
@@ -656,7 +654,7 @@ if __name__ == '__main__':
         profiler.dump_stats('/var/run/emulatorlauncher.prof')
 
     # A short delay can help ensure resources (like GPU memory) are fully released before returning to the frontend.
-    time.sleep(1)
+    sleep(1)
     eslog.debug(f"Exiting configgen with status {str(exitcode)}")
 
     exit(exitcode)

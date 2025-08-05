@@ -1,5 +1,5 @@
-import pyudev
-import re
+from pyudev import Context
+from re import match
 from evdev.device import InputDevice
 from .mouse import getMouseButtons
 
@@ -9,7 +9,7 @@ eslog = get_logger(__name__)
 def getGuns():
 
     guns = {}
-    context = pyudev.Context()
+    context = Context()
 
     # guns are mouses, just filter on them
     mouses = context.list_devices(subsystem='input')
@@ -17,7 +17,7 @@ def getGuns():
     # keep only mouses with /dev/iput/eventxx
     mouses_clean = {}
     for mouse in mouses:
-        matches = re.match(r"^/dev/input/event([0-9]*)$", str(mouse.device_node))
+        matches = match(r"^/dev/input/event([0-9]*)$", str(mouse.device_node))
         if matches != None:
             if ("ID_INPUT_MOUSE" in mouse.properties and mouse.properties["ID_INPUT_MOUSE"]) == '1':
                 mouses_clean[int(matches.group(1))] = mouse
@@ -79,4 +79,3 @@ def gunsBordersSizeName(guns, config):
         if guns[gun]["need_borders"]:
             return bordersSize
     return None
-

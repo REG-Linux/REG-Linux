@@ -1,13 +1,13 @@
 import xml.etree.ElementTree as ET
 from .utils import shortNameFromPath
-import systemFiles
+from systemFiles import ES_GAMES_METADATA
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 def getGamesMetaData(system, rom):
     # load the database
-    tree = ET.parse(systemFiles.ES_GAMES_METADATA)
+    tree = ET.parse(ES_GAMES_METADATA)
     root = tree.getroot()
     game = shortNameFromPath(rom)
     res = {}
