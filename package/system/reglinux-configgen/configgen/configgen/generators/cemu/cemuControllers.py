@@ -1,14 +1,10 @@
-import os
-import xml.etree.cElementTree as ET
-from os import path
+from os import path, mkdir, remove
+from xml.etree.cElementTree import SubElement, Element, ElementTree, indent
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-# Create the controller configuration file
-# First controller will ALWAYS be a Gamepad
-# Additional controllers will either be a Pro Controller or Wiimote
-def generateControllerConfig(system, playersControllers, profilesDir):
+def setControllerConfig(system, playersControllers, profilesDir):
 
     # -= Wii U controller types =-
     GAMEPAD = "Wii U GamePad"
@@ -21,7 +17,7 @@ def generateControllerConfig(system, playersControllers, profilesDir):
     DEFAULT_DEADZONE       = '0.25'
     DEFAULT_RANGE          = '1'
 
-    buttonMappings = {
+    BUTTON_MAPPINGS = {
         GAMEPAD: { # excludes show screen
             "1":  "1",
             "2":  "0",
@@ -128,11 +124,11 @@ def generateControllerConfig(system, playersControllers, profilesDir):
             return defaultValue
 
     def addTextElement(parent, name, value):
-        element = ET.SubElement(parent, name)
+        element = SubElement(parent, name)
         element.text = value
 
     def addAnalogControl(parent, name):
-        element = ET.SubElement(parent, name)
+        element = SubElement(parent, name)
         addTextElement(element, "deadzone", DEFAULT_DEADZONE)
         addTextElement(element, "range", DEFAULT_RANGE)
 
@@ -141,13 +137,13 @@ def generateControllerConfig(system, playersControllers, profilesDir):
 
     # Make controller directory if it doesn't exist
     if not path.isdir(profilesDir):
-        os.mkdir(profilesDir)
+        mkdir(profilesDir)
 
     # Purge old controller files
     for counter in range(0,8):
         configFileName = getConfigFileName(counter)
         if path.isfile(configFileName):
-            os.remove(configFileName)
+            remove(configFileName)
 
     ## CONTROLLER: Create the config xml files
     nplayer = 0
@@ -168,7 +164,7 @@ def generateControllerConfig(system, playersControllers, profilesDir):
     ###
 
     for playercontroller, pad in sorted(playersControllers.items()):
-        root = ET.Element("emulated_controller")
+        root = Element("emulated_controller")
 
         # Set type from controller combination
         type = PRO # default
@@ -192,7 +188,7 @@ def generateControllerConfig(system, playersControllers, profilesDir):
         addTextElement(root, "type", type)
 
         # Create controller configuration
-        controllerNode = ET.SubElement(root, 'controller')
+        controllerNode = SubElement(root, 'controller')
         addTextElement(controllerNode, 'api', API_SDL)
         addTextElement(controllerNode, 'uuid', "{}_{}".format(guid_n[pad.index], pad.guid)) # controller guid
         addTextElement(controllerNode, 'display_name', pad.name) # controller name
@@ -202,16 +198,16 @@ def generateControllerConfig(system, playersControllers, profilesDir):
         addAnalogControl(controllerNode, 'trigger')
 
         # Apply the appropriate button mappings
-        mappingsNode = ET.SubElement(controllerNode, "mappings")
-        for key, value in buttonMappings[type].items():
-            entryNode = ET.SubElement(mappingsNode, "entry")
+        mappingsNode = SubElement(controllerNode, "mappings")
+        for key, value in BUTTON_MAPPINGS[type].items():
+            entryNode = SubElement(mappingsNode, "entry")
             addTextElement(entryNode, "mapping", key)
             addTextElement(entryNode, "button", value)
 
         # Save to file
         with open(getConfigFileName(nplayer), 'wb') as handle:
-            tree = ET.ElementTree(root)
-            ET.indent(tree, space="  ", level=0)
+            tree = ElementTree(root)
+            indent(tree, space="  ", level=0)
             tree.write(handle, encoding='UTF-8', xml_declaration=True)
             handle.close()
 
