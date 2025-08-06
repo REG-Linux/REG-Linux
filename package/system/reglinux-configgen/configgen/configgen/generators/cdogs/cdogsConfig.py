@@ -1,5 +1,8 @@
-cdogsRoms = "/userdata/roms/cdogs"
-cdogsAssets = [
+from systemFiles import ROMS
+
+CDOGS_BIN_PATH = "/usr/bin/cdogs"
+CDOGS_ROMS_DIR = ROMS + "/cdogs"
+CDOGS_ASSETS_DIR = [
     "music/briefing",
     "music/end",
     "music/game",
@@ -197,4 +200,3 @@ cdogsAssets = [
     "data/.wolf3d/SD3data.cdogscpn/graphics/chars/hairs",
     "data/.wolf3d/SD3data.cdogscpn/graphics/chars/guns",
     ]
-cdogsBin = "/usr/bin/cdogs"
