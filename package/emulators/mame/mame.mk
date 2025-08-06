@@ -90,10 +90,16 @@ ifeq ($(BR2_ENABLE_DEBUG),y)
 #	MAME_EXTRA_ARGS += OPTIMIZE=2
 # Use O3 with LTO on other archs
 else
-	MAME_EXTRA_ARGS += OPTIMIZE=3 LTO=1
+# Stick to O2 + LTO to limit binary footprint
+	MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1
 endif
 
 define MAME_CONFIGURE_CMDS
+	# Prepare
+	cd $(@D); \
+	chmod +x ./prepare.py ; \
+	$(HOST_DIR)/bin/python3 ./prepare.py
+
 	# First, we need to build genie for host
 	cd $(@D); \
 		PATH="$(HOST_DIR)/bin:$$PATH" \
@@ -101,26 +107,6 @@ define MAME_CONFIGURE_CMDS
 		TARGET=mame SUBTARGET=tiny \
 		NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
 		USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
-
-	# remove bfm* drivers to save space
-	find $(@D)/src/mame/bfm/ -type f | xargs grep -e 'GAME(\|GAMEL' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" > $(@D)/games.list
-	find $(@D)/src/mame/bfm/ -type f | xargs sed -i '/GAME[L]*(/d'
-	# remove skeleton drivers to save space
-	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 1 -d ":" | sort -u > $(@D)/machines1.list
-	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list
-	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_IS_SKELETON/p;/setname.*MACHINE_IS_SKELETON/p;/MACHINE_IS_SKELETON/d' $$file ; done
-	# do not remove '#define GAME_FLAGS' and other definition lines
-	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_MECHANICAL/p;/setname.*MACHINE_MECHANICAL/p;/MACHINE_MECHANICAL/d' $$file ; done
-	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_FLAGS_MECHANICAL/p;/setname.*MACHINE_FLAGS_MECHANICAL/p;/MACHINE_FLAGS_MECHANICAL/d' $$file ; done
-	# remove remaining MECHANICAL games using 'GAME_FLAGS' label
-	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_FLAGS.*MACHINE_MECHANICAL' | cut -f 1 -d ":" | sort -u > $(@D)/machines2.list
-	cat $(@D)/machines2.list | while read file ; do grep 'GAME_FLAGS' $$file | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
-	cat $(@D)/machines2.list | while read file ; do sed -i '/define GAME_FLAGS/p;/setname.*GAME_FLAGS/p;/GAME_FLAGS/d' $$file ; done
-	# remove remaining MECHANICAL games using 'GAME_CUSTOM' label
-	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_CUSTOM' | cut -f 1 -d ":" | sort -u > $(@D)/machines3.list
-	cat $(@D)/machines3.list | while read file ; do grep 'GAME_CUSTOM' $$file | grep 'CRC' | grep 'SHA' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
-	# Remove reference to skeleton|mechanical drivers in mame.lst
-	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 endef
 
 define MAME_BUILD_CMDS
