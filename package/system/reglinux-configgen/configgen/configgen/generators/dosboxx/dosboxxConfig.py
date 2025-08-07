@@ -1,5 +1,6 @@
 from systemFiles import CONF
 
-dosboxxCustom = CONF + '/dosbox'
-dosboxxConfig = dosboxxCustom + '/dosboxx.conf'
-dosboxxBin = '/usr/bin/dosbox-x'
+DOSBOXX_CONFIG_DIR = CONF + '/dosbox'
+DOSBOXX_CONFIG_PATH = DOSBOXX_CONFIG_DIR + '/dosboxx.conf'
+DOSBOXX_CONFIG_CUSTOM_PATH = DOSBOXX_CONFIG_DIR + '/dosboxx-custom.conf'
+DOSBOXX_BIN_PATH = '/usr/bin/dosbox-x'
