@@ -1,0 +1,24 @@
+From 96ac6b11ec06858d775ce0424f9b681092074e54 Mon Sep 17 00:00:00 2001
+From: sonninnos <tony@pihaus.org>
+Date: Wed, 30 Apr 2025 16:37:01 +0300
+Subject: [PATCH] Buildfix
+
+---
+ scripts/src/osd/retro_modules.lua | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/scripts/src/osd/retro_modules.lua b/scripts/src/osd/retro_modules.lua
+index c54e1b89d420a..86b4007bad115 100644
+--- a/scripts/src/osd/retro_modules.lua
++++ b/scripts/src/osd/retro_modules.lua
+@@ -92,6 +92,10 @@ function osdmodulesbuild()
+ 		MAME_DIR .. "src/osd/modules/sound/none.cpp",
+ 	}
+ 
++	includedirs {
++		MAME_DIR .. "3rdparty/asio/include",
++	}
++
+ 	if _OPTIONS["targetos"]=="windows" then
+ 		includedirs {
+ 			MAME_DIR .. "3rdparty/winpcap/Include",
