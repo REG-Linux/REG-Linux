@@ -2084,9 +2084,6 @@ libretro:
                             "TWB64 - Pack 1":                   TWB75 - WonderSwan
                             "TWB64 - Pack 2":                   TWB76 - Yellow Banana
                             "Custom":                           custom
-    genesisplusgx-wide:
-      features: [netplay, cheevos]
-      shared: [rewind, autosave]
     genesisplusgx:
       features: [netplay, cheevos]
       shared: [rewind, autosave]

@@ -3,8 +3,8 @@
 # libretro-mame
 #
 ################################################################################
-# Version lrmame0276 : Apr 1, 2025
-LIBRETRO_MAME_VERSION = lrmame0276
+# Version lrmame0279 : Aug 3, 2025
+LIBRETRO_MAME_VERSION = lrmame0279
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 LIBRETRO_MAME_LICENSE = MAME
 
@@ -23,12 +23,11 @@ LIBRETRO_MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_MAME_MAX_JOBS)
 
 LIBRETRO_MAME_EXTRA_ARGS += PTR64=1
 ifeq ($(BR2_x86_64),y)
-LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=x86_64 PLATFORM=x86_64
-else ifeq ($(BR2_RISCV_64),y)
-LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=riscv64 PLATFORM=riscv64
+LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=x86_64 PLATFORM=x86
 else ifeq ($(BR2_aarch64),y)
-LIBRETRO_MAME_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU=arm64 PLATFORM=arm64
-LIBRETRO_MAME_ARCHOPTS += -D__aarch64__
+LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=arm64 PLATFORM=arm64 ARCHITECTURE=
+else ifeq ($(BR2_RISCV_64),y)
+LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=riscv64 PLATFORM=riscv64 FORCE_DRC_C_BACKEND=1 ARCHITECTURE=
 endif
 
 # Enforce symbols debugging with O0
@@ -42,6 +41,7 @@ endif
 define LIBRETRO_MAME_BUILD_CMDS
 	# Prepare
 	cd $(@D); \
+        cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-mame/unwanted.txt $(@D)/unwanted.txt ; \
 	chmod +x ./prepare.py ; \
 	$(HOST_DIR)/bin/python3 ./prepare.py
 
