@@ -1,6 +1,6 @@
---- /dev/null		2025-08-06 10:24:55.615288271 +0200
-+++ b/prepare.py	2025-08-06 14:20:56.384078163 +0200
-@@ -0,0 +1,143 @@
+--- /dev/null	2025-08-06 13:35:04.280421463 +0200
++++ b/prepare.py	2025-08-07 16:01:18.863251704 +0200
+@@ -0,0 +1,150 @@
 +#!/usr/bin/python3
 +
 +import os
@@ -79,7 +79,14 @@
 +                driver = match.split(',')[0].strip()
 +                not_working_drivers.add(driver)
 +
-+print(f"Removed {len(not_working_drivers)} non-working and/or mechanical drivers.")
++# Static removals from plain list (gambling, vgmplay, synthetizers, ...)
++with open("unwanted.txt", "r", encoding="utf-8") as file:
++    for line in file:
++        trimmed = line.strip()
++        if trimmed and not trimmed.startswith("//"):  # Skip empty lines and comments if needed
++            not_working_drivers.add(trimmed)
++
++print(f"Removed {len(not_working_drivers)} non-working and/or mechanical and/or gambling drivers.")
 +
 +# Step 2: Filter the mame.lst file
 +with open(DRIVER_LIST_FILE, encoding="utf-8") as f:
