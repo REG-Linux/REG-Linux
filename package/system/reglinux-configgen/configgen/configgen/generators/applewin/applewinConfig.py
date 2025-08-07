@@ -1,4 +1,4 @@
 from systemFiles import HOME
 
-applewinConfig = HOME + '/applewin/applewin.conf'
-applewinBin = '/usr/bin/applewin'
+APPLEWIN_CONFIG_PATH = HOME + '/applewin/applewin.conf'
+APPLEWIN_BIN_PATH = '/usr/bin/applewin'
