@@ -1,54 +1,35 @@
-import os
-import codecs
-from xml.dom import minidom
 from systemFiles import CONF
 
-cannonballConfigFile = CONF + '/cannonball/config.xml'
-cannonballBin = "/usr/bin/cannonball"
+CANNONBALL_CONFIG_PATH = CONF + '/cannonball/config.xml'
+CANNONBALL_BIN_PATH = "/usr/bin/cannonball"
 
-def setCannonballConfig(system):
-    if not os.path.exists(os.path.dirname(cannonballConfigFile)):
-        os.makedirs(os.path.dirname(cannonballConfigFile))
-
-    # config file
-    config = minidom.Document()
-    if os.path.exists(cannonballConfigFile):
-        try:
-            config = minidom.parse(cannonballConfigFile)
-        except:
-            pass # reinit the file
-
+def setCannonballConfig(cannoballConfig, system):
     # root
-    xml_root = getRoot(config, "config")
+    xml_root = getRoot(cannoballConfig, "config")
 
     # video
-    xml_video = getSection(config, xml_root, "video")
+    xml_video = getSection(cannoballConfig, xml_root, "video")
 
     # fps
     if system.isOptSet('showFPS') and system.getOptBoolean('showFPS'):
-        setSectionConfig(config, xml_video, "fps_counter", "1")
+        setSectionConfig(cannoballConfig, xml_video, "fps_counter", "1")
     else:
-        setSectionConfig(config, xml_video, "fps_counter", "0")
+        setSectionConfig(cannoballConfig, xml_video, "fps_counter", "0")
 
     # ratio
     if system.isOptSet('ratio') and system.config["ratio"] == "16/9":
-        setSectionConfig(config, xml_video, "widescreen", "1")
-        setSectionConfig(config, xml_video, "mode", "1")
+        setSectionConfig(cannoballConfig, xml_video, "widescreen", "1")
+        setSectionConfig(cannoballConfig, xml_video, "mode", "1")
     else:
-        setSectionConfig(config, xml_video, "widescreen", "0")
-        setSectionConfig(config, xml_video, "mode", "1")
+        setSectionConfig(cannoballConfig, xml_video, "widescreen", "0")
+        setSectionConfig(cannoballConfig, xml_video, "mode", "1")
 
     # high resolution
     if system.isOptSet('highResolution') and system.config["highResolution"] == "1":
-        setSectionConfig(config, xml_video, "hires", "1")
+        setSectionConfig(cannoballConfig, xml_video, "hires", "1")
     else:
-        setSectionConfig(config, xml_video, "hires", "0")
+        setSectionConfig(cannoballConfig, xml_video, "hires", "0")
 
-    # save the config file
-    cannonballXml = codecs.open(cannonballConfigFile, "w", "utf-8")
-    dom_string = os.linesep.join([s for s in config.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
-    cannonballXml.write(dom_string)
-    cannonballXml.close()
 
 @staticmethod
 def getRoot(config, name):

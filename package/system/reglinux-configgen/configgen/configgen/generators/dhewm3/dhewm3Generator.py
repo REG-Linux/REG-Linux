@@ -1,10 +1,7 @@
 from generators.Generator import Generator
 from Command import Command
 from pathlib import Path
-from . import dhewm3Config
-
-from utils.logger import get_logger
-eslog = get_logger(__name__)
+from .dhewm3Config import DHEWM3_BIN_PATH, DHEWM3_ROMS_DIR
 
 class Dhewm3Generator(Generator):
 
@@ -13,11 +10,10 @@ class Dhewm3Generator(Generator):
         # Read the path within the .d3 rom file
         with open(rom, "r") as file:
             directory = file.readline().strip().split("/")[0]
-            eslog.debug(f"Using directory: {directory}")
 
         # Run command
         commandArray: list[str | Path] = [
-            dhewm3Config.dhewm3Bin, "+set", "fs_basepath", str(dhewm3Config.dhewm3RomDir)
+            DHEWM3_BIN_PATH, "+set", "fs_basepath", str(DHEWM3_ROMS_DIR)
         ]
 
         if directory != "base":
