@@ -1,0 +1,23 @@
+--- a/src/video_core/CMakeLists.txt	2025-08-08 10:39:13.465439536 +0200
++++ b/src/video_core/CMakeLists.txt	2025-08-08 10:39:44.402253686 +0200
+@@ -352,7 +352,8 @@
+         # error: implicit conversion loses integer precision: 'int' to 'boost::icl::bound_type' (aka 'unsigned char')
+         target_compile_options(video_core PRIVATE -Wno-shadow -Wno-unused-local-typedef)
+     else()
+-        target_compile_options(video_core PRIVATE -Werror=conversion)
++        # REG HACK
++	#target_compile_options(video_core PRIVATE -Werror=conversion)
+     endif()
+ 
+     target_compile_options(video_core PRIVATE
+--- a/src/CMakeLists.txt	2025-08-08 10:47:50.085503680 +0200
++++ b/src/CMakeLists.txt	2025-08-08 10:48:06.300451785 +0200
+@@ -116,7 +116,7 @@
+         -Werror=all
+         -Werror=extra
+         -Werror=missing-declarations
+-        -Werror=shadow
++        #-Werror=shadow
+         -Werror=unused
+ 
+         -Wno-attributes
