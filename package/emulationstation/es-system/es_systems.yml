@@ -12,7 +12,6 @@ snes:
       snes9x: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SNES9X] }
       bsnes: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES] }
       bsnes_jg: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_JG] }
-      bsnes_hd: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_HD] }
       mesen-s: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
   comment_en: |
     For more info: https://wiki.batocera.org/systems:snes
@@ -34,7 +33,6 @@ snes-msu1:
       snes9x: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SNES9X] }
       bsnes: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES] }
       bsnes_jg: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_JG] }
-      bsnes_hd: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_HD] }
 
 c64:
   name: Commodore 64

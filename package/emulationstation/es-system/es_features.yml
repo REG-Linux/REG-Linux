@@ -522,9 +522,9 @@ libretro:
                     "NTSC (RGB)":       "NTSC (RGB)"
                     "NTSC (S-Video)":   "NTSC (S-Video)"
                     "NTSC (Composite)": "NTSC (Composite)"
-    bsnes_hd:
+    bsnes_jg:
       features: [netplay, cheevos]
-      shared: [rewind, autosave]
+      shared: [rewind, autosave, use_guns]
     cap32:
       features: [netplay, cheevos, padtokeyboard]
       shared: [rewind, autosave]
