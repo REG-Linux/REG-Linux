@@ -27,7 +27,7 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-blastem
                    libretro-bluemsx
                    libretro-bsnes
-                   libretro-bsnes-hd
+                   libretro-bsnes-jg
                    libretro-cap32
                    libretro-desmume
                    libretro-dosbox-pure
@@ -46,7 +46,6 @@ PACKAGES_LIBRETRO="libretro-81
                    libretro-geargrafx
                    libretro-gearsystem
                    libretro-genesisplusgx
-                   libretro-genesisplusgx-wide
                    libretro-geolith
                    libretro-gpsp
                    libretro-gw
@@ -138,7 +137,6 @@ PACKAGES_EMULATORS="86Box
                     box86
                     box64
                     cemu
-                    citron
                     clk
                     dolphin-emu
                     dolphin-triforce
@@ -148,6 +146,7 @@ PACKAGES_EMULATORS="86Box
                     duckstation
                     easyrpg-player
                     liblcf
+                    eden
                     eka2l1
                     flycast
                     gopher64
