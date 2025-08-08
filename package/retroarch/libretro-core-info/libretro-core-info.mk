@@ -13,7 +13,6 @@ define LIBRETRO_CORE_INFO_INSTALL_TARGET_CMDS
 	cp -r $(@D)/*.info $(TARGET_DIR)/usr/share/libretro/info
 
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf mednafen_saturn_libretro.info	beetle-saturn_libretro.info
-	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf bsnes_hd_beta_libretro.info		bsnes_hd_libretro.info
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf genesis_plus_gx_libretro.info	genesisplusgx_libretro.info
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf mame2010_libretro.info		mame0139_libretro.info
 	cd $(TARGET_DIR)/usr/share/libretro/info && ln -sf mame2003_plus_libretro.info		mame078plus_libretro.info
