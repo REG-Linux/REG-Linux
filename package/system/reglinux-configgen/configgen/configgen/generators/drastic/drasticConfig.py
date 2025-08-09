@@ -1,10 +1,10 @@
 from systemFiles import CONF
 from os import environ
 
-DRASTIC_CONFIG_DIR = "/usr/share/drastic"
-DRASTIC_CONFIG_DIR_USER = CONF + "/drastic"
-DRASTIC_CONFIG_PATH = DRASTIC_CONFIG_DIR_USER + "/config/drastic.cfg"
-DRASTIC_BIN_PATH = "/usr/bin/drastic"
+DRASTIC_CONFIG_DIR = '/usr/share/drastic'
+DRASTIC_CONFIG_DIR_USER = CONF + '/drastic'
+DRASTIC_CONFIG_PATH = DRASTIC_CONFIG_DIR_USER + '/config/drastic.cfg'
+DRASTIC_BIN_PATH = '/usr/bin/drastic'
 
 def setDrasticConfig(drasticConfig, system):
      #Getting Values from ES
