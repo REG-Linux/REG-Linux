@@ -1,8 +1,8 @@
 import utils.videoMode as videoMode
 from systemFiles import HOME
 
-BIGPEMU_CONFIG_PATH = HOME + "/.bigpemu_userdata/BigPEmuConfig.bigpcfg"
-BIGPEMU_BIN_PATH = "/usr/bigpemu/bigpemu"
+BIGPEMU_CONFIG_PATH = HOME + '/.bigpemu_userdata/BigPEmuConfig.bigpcfg'
+BIGPEMU_BIN_PATH = '/usr/bigpemu/bigpemu'
 
 def setBigemuConfig(bigpemuConfig, system, gameResolution):
     # Ensure the necessary structure in the config

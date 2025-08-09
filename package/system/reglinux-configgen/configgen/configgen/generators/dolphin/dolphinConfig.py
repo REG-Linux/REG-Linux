@@ -3,11 +3,11 @@ from struct import unpack
 from os     import environ
 from systemFiles import CONF, SAVES
 
-dolphinConfig  = CONF + "/dolphin-emu"
-dolphinData    = SAVES + "/dolphin-emu"
+dolphinConfig  = CONF + '/dolphin-emu'
+dolphinData    = SAVES + '/dolphin-emu'
 dolphinIni     = dolphinConfig + '/Dolphin.ini'
 dolphinGfxIni  = dolphinConfig + '/GFX.ini'
-dolphinSYSCONF = dolphinData + "/Wii/shared2/sys/SYSCONF"
+dolphinSYSCONF = dolphinData + '/Wii/shared2/sys/SYSCONF'
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)

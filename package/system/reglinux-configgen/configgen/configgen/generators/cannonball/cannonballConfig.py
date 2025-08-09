@@ -1,7 +1,7 @@
 from systemFiles import CONF
 
 CANNONBALL_CONFIG_PATH = CONF + '/cannonball/config.xml'
-CANNONBALL_BIN_PATH = "/usr/bin/cannonball"
+CANNONBALL_BIN_PATH = '/usr/bin/cannonball'
 
 def setCannonballConfig(cannoballConfig, system):
     # root
