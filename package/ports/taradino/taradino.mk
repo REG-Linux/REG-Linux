@@ -3,8 +3,8 @@
 # taradino
 #
 ################################################################################
-# Version: Commits on Aug 9, 2025
-TARADINO_VERSION = 849be73e5704049a104d3bb616846148410ed498
+# Version: Commits on Aug 11, 2025
+TARADINO_VERSION = af21b43b3e0acc6b37d6500786605ed11efde63d
 TARADINO_SITE = https://github.com/fabiangreffrath/taradino.git
 TARADINO_SITE_METHOD=git
 TARADINO_GIT_SUBMODULES=YES
