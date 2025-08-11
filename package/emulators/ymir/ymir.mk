@@ -3,8 +3,8 @@
 # Ymir
 #
 ################################################################################
-# Release on Jul 21, 2025
-YMIR_VERSION = v0.1.6
+# Release on Aug 11, 2025
+YMIR_VERSION = v0.1.7
 YMIR_SITE = https://github.com/StrikerX3/Ymir
 YMIR_SITE_METHOD=git
 YMIR_GIT_SUBMODULES=YES
