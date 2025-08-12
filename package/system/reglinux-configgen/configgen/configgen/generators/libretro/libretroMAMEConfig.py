@@ -419,7 +419,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
     # Artwork crop - default to On for lr-mame
     # Exceptions for PDP-1 (status lights) and VGM Player (indicators)
     if not system.isOptSet("artworkcrop"):
-        if not system.name in [ 'pdp1', 'vgmplay', 'ti99' ]:
+        if not system.name in [ 'pdp1', 'ti99' ]:
             commandLine += [ "-artwork_crop" ]
     else:
         if system.getOptBoolean("artworkcrop"):
@@ -612,7 +612,7 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
     # Open or create alternate config file for systems with special controllers/settings
     # If the system/game is set to per game config, don't try to open/reset an existing file, only write if it's blank or going to the shared cfg folder
     specialControlList = [ "cdimono1", "apfm1000", "astrocde", "adam", "arcadia", "gamecom", "tutor", "crvision", "bbcb", "bbcm", "bbcm512", "bbcmc", "xegs", \
-        "socrates", "vgmplay", "pdp1", "vc4000", "fmtmarty", "gp32", "apple2p", "apple2e", "apple2ee" ]
+        "socrates", "pdp1", "vc4000", "fmtmarty", "gp32", "apple2p", "apple2e", "apple2ee" ]
     if messSysName in specialControlList:
         # Load mess controls from csv
         messControlFile = '/usr/share/reglinux/configgen/data/mame/messControls.csv'
