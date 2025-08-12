@@ -365,6 +365,7 @@ menu "Cases"
 endmenu
 
 menu "Controllers"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/gamecontrollerdb/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/db9-gpio-rpi/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/gamecon-gpio-rpi/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/controllers/pads/mk-arcade-joystick-rpi/Config.in"

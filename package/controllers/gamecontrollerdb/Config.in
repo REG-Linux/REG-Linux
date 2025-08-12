@@ -1,0 +1,7 @@
+config BR2_PACKAGE_GAMECONTROLLERDB
+	bool "gamecontrollerdb"
+	help
+	  A curated and automatically updated game controller mapping
+	  database for Linux platforms, based on the SDL_GameControllerDB project.
+
+	  https://github.com/REG-Linux/SDL_GameControllerDB
