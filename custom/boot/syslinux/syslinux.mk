@@ -56,6 +56,11 @@ SYSLINUX_POST_PATCH_HOOKS += SYSLINUX_CLEANUP
 # syslinux build system has no convenient way to pass CFLAGS,
 # and the internal zlib should take precedence so -I shouldn't
 # be used.
+# Install in a temporary location that eases final install into
+# images/ (see corresponding command, below).
+# Repeat the target, otherwise syslinux will try to build everything
+# Repeat LD (and CC) as it happens that some binaries are linked at
+# install-time.
 define SYSLINUX_BUILD_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE1) \
 		ASCIIDOC_OK=-1 \
@@ -70,6 +75,10 @@ define SYSLINUX_BUILD_CMDS
 		LDFLAGS_FOR_BUILD="$(HOST_LDFLAGS)" \
 		PYTHON=$(HOST_DIR)/bin/python3 \
 		$(SYSLINUX_EFI_ARGS) -C $(@D) $(SYSLINUX_TARGET)
+	$(TARGET_MAKE_ENV) $(MAKE1) $(SYSLINUX_EFI_ARGS) INSTALLROOT=$(@D)/br-root.temp \
+		CC="$(TARGET_CC)" \
+		LD="$(TARGET_LD)" \
+		-C $(@D) $(SYSLINUX_TARGET) install
 endef
 
 # While the actual bootloader is compiled for the target, several
@@ -77,6 +86,8 @@ endef
 # Repeat the target, otherwise syslinux will try to build everything
 # Repeat LD (and CC) as it happens that some binaries are linked at
 # install-time.
+# Don't use the temporarily-installed br-root.temp: HOST_DIR may be setup
+# differently (merged usr, merged bin...)
 define SYSLINUX_INSTALL_TARGET_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE1) $(SYSLINUX_EFI_ARGS) INSTALLROOT=$(HOST_DIR) \
 		CC="$(TARGET_CC)" \
@@ -87,10 +98,9 @@ endef
 # That 'syslinux' binary is an installer actually built for the target.
 # However, buildroot makes no usage of it, so better delete it than have it
 # installed at the wrong place
-#
-# batocera: patch added to build syslinux tool for the host
+# reglinux: patch added to build syslinux tool for the host
 # define SYSLINUX_POST_INSTALL_CLEANUP
-# 	rm -rf $(HOST_DIR)/bin/syslinux
+#	rm -rf $(HOST_DIR)/bin/syslinux
 # endef
 # SYSLINUX_POST_INSTALL_TARGET_HOOKS += SYSLINUX_POST_INSTALL_CLEANUP
 
@@ -98,21 +108,21 @@ SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_ISOLINUX) += bios/core/isolinux.bin
 SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_PXELINUX) += bios/core/pxelinux.bin
 SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_MBR) += bios/mbr/mbr.bin
 SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_EFI) += $(SYSLINUX_EFI_BITS)/efi/syslinux.efi
-# batocera install gptmbr.bin
+# reglinux install gptmbr.bin
 SYSLINUX_IMAGES-y += bios/mbr/gptmbr.bin
 
 SYSLINUX_C32 = $(call qstrip,$(BR2_TARGET_SYSLINUX_C32))
 
-# We install the c32 modules from the host-installed tree, where they
-# are all neatly installed in a single location, while they are
+# We install the c32 modules from the temporarily installed tree, where
+# they are all neatly installed in a single location, while they are
 # scattered around everywhere in the build tree.
-# REG we need to have custom INSTALL_IMAGES after INSTALL_TARGET for parallel build
+# reglinux we need to have custom INSTALL_IMAGES after INSTALL_TARGET for parallel build
 define SYSLINUX_INSTALL_IMAGES
 	for i in $(SYSLINUX_IMAGES-y); do \
 		$(INSTALL) -D -m 0755 $(@D)/$$i $(BINARIES_DIR)/syslinux/$${i##*/}; \
 	done
 	for i in $(SYSLINUX_C32); do \
-		$(INSTALL) -D -m 0755 $(HOST_DIR)/share/syslinux/$${i} \
+		$(INSTALL) -D -m 0755 $(@D)/br-root.temp/usr/share/syslinux/$${i} \
 			$(BINARIES_DIR)/syslinux/$${i}; \
 	done
 endef

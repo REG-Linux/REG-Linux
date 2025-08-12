@@ -1,14 +1,10 @@
 diff --git a/package/libarchive/libarchive.mk b/package/libarchive/libarchive.mk
-index 7fec01a040..a0fa6632f1 100644
+index 1dafec726b..0fe32c5ca7 100644
 --- a/package/libarchive/libarchive.mk
 +++ b/package/libarchive/libarchive.mk
-@@ -16,34 +16,50 @@ LIBARCHIVE_AUTORECONF = YES
- # needed for autoreconf
- LIBARCHIVE_DEPENDENCIES += host-pkgconf
+@@ -13,31 +13,34 @@ LIBARCHIVE_LICENSE_FILES = COPYING
+ LIBARCHIVE_CPE_ID_VENDOR = libarchive
  
-+# reglinux
-+LIBARCHIVE_CONF_OPTS += --disable-bsdunzip
-+
  ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDTAR),y)
 -ifeq ($(BR2_STATIC_LIBS),y)
 -LIBARCHIVE_CONF_OPTS += --enable-bsdtar=static
@@ -40,31 +36,20 @@ index 7fec01a040..a0fa6632f1 100644
  endif
  
  ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDCAT),y)
+-ifeq ($(BR2_STATIC_LIBS),y)
+-LIBARCHIVE_CONF_OPTS += --enable-bsdcat=static
+-else
 +# reglinux
 +#ifeq ($(BR2_STATIC_LIBS),y)
 +#LIBARCHIVE_CONF_OPTS += --enable-bsdcat=static
 +#else
-+LIBARCHIVE_CONF_OPTS += --enable-bsdcat=shared
+ LIBARCHIVE_CONF_OPTS += --enable-bsdcat=shared
+-endif
 +#endif
-+else
-+LIBARCHIVE_CONF_OPTS += --disable-bsdcat
-+endif
-+
-+ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDUNZIP),y)
- ifeq ($(BR2_STATIC_LIBS),y)
--LIBARCHIVE_CONF_OPTS += --enable-bsdcat=static
-+LIBARCHIVE_CONF_OPTS += --enable-bsdunzip=static
  else
--LIBARCHIVE_CONF_OPTS += --enable-bsdcat=shared
-+LIBARCHIVE_CONF_OPTS += --enable-bsdunzip=shared
+ LIBARCHIVE_CONF_OPTS += --disable-bsdcat
  endif
- else
--LIBARCHIVE_CONF_OPTS += --disable-bsdcat
-+LIBARCHIVE_CONF_OPTS += --disable-bsdunzip
- endif
- 
- ifeq ($(BR2_PACKAGE_LIBARCHIVE_BSDUNZIP),y)
-@@ -148,6 +164,11 @@ else
+@@ -144,6 +147,11 @@ else
  LIBARCHIVE_CONF_OPTS += --without-zstd
  endif
  
