@@ -3,8 +3,8 @@
 # REGLINUX-MAME (Prebuilt GroovyMAME + libretro-mame)
 #
 ################################################################################
-# Version: 0.276
-REGLINUX_MAME_VERSION = 0.276
+# Version: 0.279
+REGLINUX_MAME_VERSION = 0.279
 REGLINUX_MAME_SITE = $(call github,REG-Linux,REG-MAME,$(REGLINUX_MAME_VERSION))
 REGLINUX_MAME_LICENSE = MAME
 
@@ -88,6 +88,10 @@ define REGLINUX_MAME_INSTALL_TARGET_CMDS
 	# delete the archive from this directory
 	rm $(@D)/$(REGLINUX_MAME_SOURCE)
 
+	# remove vgmplay.xml files
+	rm $(TARGET_DIR)/usr/share/lr-mame/hash/vgmplay.xml
+	rm $(TARGET_DIR)/usr/bin/mame/hash/vgmplay.xml
+
 	# gameStop script when exiting a rotated screen
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/configgen/scripts
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/rotation_fix.sh
@@ -138,7 +142,6 @@ define REGLINUX_MAME_EVMAPY
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/tutor.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vc4000.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vectrex.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vgmplay.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vsmile.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/xegs.mame.keys
 endef

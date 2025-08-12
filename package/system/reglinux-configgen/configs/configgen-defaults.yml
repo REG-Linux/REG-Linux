@@ -616,9 +616,6 @@ vc4000:
 vectrex:
   emulator: libretro
   core:     vecx
-vgmplay:
-  emulator: libretro
-  core:     mame
 videopacplus:
   emulator: libretro
   core:     o2em

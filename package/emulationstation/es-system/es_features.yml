@@ -10608,22 +10608,6 @@ mame:
                     choices:
                         "On":  1
                         "Off": 0
-       vgmplay:
-            cfeatures:
-                softList:
-                    group: ADVANCED OPTIONS
-                    prompt:      SOFTWARE LIST
-                    description: Use MAME software lists to identify ROM
-                    choices:
-                        "Don't Use (Default)":    none
-                        "Video Game Music Files": vgmplay
-                pergamecfg:
-                    group: ADVANCED OPTIONS
-                    prompt:      CUSTOM GAME CONFIG
-                    description: Enable per-game custom configuration via MAME menu.
-                    choices:
-                        "On":  1
-                        "Off": 0
        vsmile:
             cfeatures:
                 softList:
