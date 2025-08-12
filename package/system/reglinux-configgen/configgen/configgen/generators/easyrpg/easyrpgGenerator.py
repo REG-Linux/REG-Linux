@@ -1,12 +1,13 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import codecs
+from os import path, makedirs
+from controllers import generate_sdl_controller_config
+from .easyrpgConfig import EASYRPG_BIN_PATH, EASYRPG_SAVE_DIR
 
 class EasyRPGGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        commandArray = ["easyrpg-player"]
+        commandArray = [EASYRPG_BIN_PATH]
 
         # FPS
         if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
@@ -23,62 +24,15 @@ class EasyRPGGenerator(Generator):
             commandArray.extend(["--encoding", "auto"])
 
         # Save directory
-        savePath = f"/userdata/saves/easyrpg/{os.path.basename(rom)}"
-        if not os.path.exists(savePath):
-            os.makedirs(savePath)
+        savePath = f"{EASYRPG_SAVE_DIR}/{path.basename(rom)}"
+        if not path.exists(savePath):
+            makedirs(savePath)
         commandArray.extend(["--save-path", savePath])
-
-        # Dir for logs and conf
-        configdir = "/userdata/system/configs/easyrpg"
-        if not os.path.exists(configdir):
-            os.makedirs(configdir)
 
         commandArray.extend(["--project-path", rom])
 
-        EasyRPGGenerator.padConfig(configdir, playersControllers)
-
-        return Command(array=commandArray)
-
-    @staticmethod
-    def padConfig(configdir, playersControllers):
-        keymapping = {
-            "button_up": None,
-            "button_down": None,
-            "button_left": None,
-            "button_right": None,
-            "button_action": "a",
-            "button_cancel": "b",
-            "button_shift": "pageup",
-            "button_n0": None,
-            "button_n1": None,
-            "button_n2": None,
-            "button_n3": None,
-            "button_n4": None,
-            "button_n5": None,
-            "button_n6": None,
-            "button_n7": None,
-            "button_n8": None,
-            "button_n9": None,
-            "button_plus": None,
-            "button_minus": None,
-            "button_multiply": None,
-            "button_divide": None,
-            "button_period": None,
-            "button_debug_menu": None,
-            "button_debug_through": None
-        }
-
-        configFileName = "{}/{}".format(configdir, "config.ini")
-        f = codecs.open(configFileName, "w", encoding="ascii")
-        f.write("[Joypad]\n");
-        nplayer = 1
-        for playercontroller, pad in sorted(playersControllers.items()):
-            if nplayer == 1:
-                f.write("number={}\n" .format(pad.index))
-                for key in keymapping:
-                    button = -1
-                    if keymapping[key] is not None:
-                        if pad.inputs[keymapping[key]].type == "button":
-                            button = pad.inputs[keymapping[key]].id
-                    f.write(f"{key}={button}\n")
-            nplayer += 1
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
