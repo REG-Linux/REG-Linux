@@ -285,7 +285,6 @@ define MAME_EVMAPY
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/tutor.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vc4000.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vectrex.mame.keys
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vgmplay.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/vsmile.mame.keys
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/mame.mame.keys $(TARGET_DIR)/usr/share/evmapy/xegs.mame.keys
 endef

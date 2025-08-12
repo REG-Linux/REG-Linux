@@ -3893,28 +3893,6 @@ vc4000:
     mame:
       mame: { requireAnyOf: [BR2_PACKAGE_MAME, BR2_PACKAGE_HAS_MAME] }
 
-vgmplay:
-  name: Video Game Music Player
-  manufacturer: Various
-  release: 1980
-  hardware: computer
-  extensions: [vgm, vgz, zip, 7z]
-  emulators:
-    libretro:
-      mame:
-        {
-          requireAnyOf:
-            [BR2_PACKAGE_LIBRETRO_MAME, BR2_PACKAGE_HAS_LIBRETRO_MAME],
-        }
-    mame:
-      mame: { requireAnyOf: [BR2_PACKAGE_MAME, BR2_PACKAGE_HAS_MAME] }
-  comment_en: |
-    Software lists recommended. QSound can be CPU-intensive.
-    Use the File Manager in the MAME menu to change tracks.
-  comment_br: |
-    Listas de software recomendadas. O QSound pode consumir muita CPU.
-    Use o Gerenciador de Arquivos no menu MAME para mudar de faixa.
-
 superbroswar:
   name: Super Mario War
   manufacturer: Ports

@@ -150,17 +150,6 @@ socrates;Left;combo;2;:IN5;KEYBOARD;LEFT;JOYSTICK_LEFT;JOYSTICK_LEFT;False;32;0
 socrates;Up;combo;2;:IN5;KEYBOARD;UP;JOYSTICK_UP;JOYSTICK_UP;False;64;0
 socrates;Right;combo;2;:IN5;KEYBOARD;RIGHT;JOYSTICK_RIGHT;JOYSTICK_LEFT;False;128;0
 socrates;P2 Button;combo;2;:IN5;KEYBOARD;RALT;BUTTON1;BUTTON1;False;512;0
-vgmplay;Stop;special;1;:CONTROLS;P1_BUTTON1;BUTTON3;BUTTON3;False;1;0
-vgmplay;Pause;special;1;:CONTROLS;P1_BUTTON2;START;START;False;2;0
-vgmplay;Play;special;1;:CONTROLS;P1_BUTTON3;BUTTON1;BUTTON1;False;4;0
-vgmplay;Restart;special;1;:CONTROLS;P1_BUTTON4;BUTTON5;BUTTON5;False;8;0
-vgmplay;Loop;special;1;:CONTROLS;P1_BUTTON5;BUTTON6;BUTTON6;False;16;0
-vgmplay;Change Visualization Mode;special;1;:CONTROLS;P1_BUTTON6;BUTTON8;BUTTON8;False;32;0
-vgmplay;Rate Down;special;1;:CONTROLS;P1_BUTTON7;JOYSTICK_DOWN;JOYSTICK_UP;False;64;0
-vgmplay;Rate Up;special;1;:CONTROLS;P1_BUTTON8;JOYSTICK_UP;JOYSTICK_UP;False;128;0
-vgmplay;Rate Reset;special;1;:CONTROLS;P1_BUTTON9;BUTTON2;BUTTON2;False;256;0
-vgmplay;Rate Hold;special;1;:CONTROLS;P1_BUTTON10;BUTTON4;BUTTON4;False;512;0
-vgmplay;MAME Menu;main;1;standard;UI_CONFIGURE;COIN;COIN;False;0;0
 fmtmarty;Run;special;1;:joy1_ex;P1_START;BUTTON4;BUTTON4;False;1;0
 pdp1;Control Panel Switch;combo;1;:CSW;KEYBOARD;LCONTROL;START;START;False;1;0
 pdp1;Load Punchtape;combo;1;:CSW;KEYBOARD;ENTER;START;START;False;256;0
