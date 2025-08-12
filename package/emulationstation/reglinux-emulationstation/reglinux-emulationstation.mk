@@ -17,7 +17,7 @@ REGLINUX_EMULATIONSTATION_LICENSE = MIT, Apache-2.0
 REGLINUX_EMULATIONSTATION_DEPENDENCIES = sdl3 sdl3_mixer libyuv libfreeimage
 REGLINUX_EMULATIONSTATION_DEPENDENCIES += freetype alsa-lib libcurl rapidjson
 REGLINUX_EMULATIONSTATION_DEPENDENCIES += lunasvg pugixml host-gettext
-REGLINUX_EMULATIONSTATION_DEPENDENCIES += es-system
+REGLINUX_EMULATIONSTATION_DEPENDENCIES += es-system gamecontrollerdb
 
 REGLINUX_EMULATIONSTATION_SUPPORTS_IN_SOURCE_BUILD = NO
 REGLINUX_EMULATIONSTATION_PATH = $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulationstation/reglinux-emulationstation
@@ -126,10 +126,6 @@ define REGLINUX_EMULATIONSTATION_RESOURCES
 	$(INSTALL) -m 0644 -D $(@D)/resources/flags/*.* $(TARGET_DIR)/usr/share/emulationstation/resources/flags
 	$(INSTALL) -m 0644 -D $(@D)/resources/battery/*.* $(TARGET_DIR)/usr/share/emulationstation/resources/battery
 	$(INSTALL) -m 0644 -D $(@D)/resources/services/*.* $(TARGET_DIR)/usr/share/emulationstation/resources/services
-
-	# gamecontrollerdb.txt
-	cp $(REGLINUX_EMULATIONSTATION_PATH)/controllers/gamecontrollerdb.txt \
-		$(TARGET_DIR)/usr/share/emulationstation/
 
 	# hooks
 	cp $(REGLINUX_EMULATIONSTATION_PATH)/batocera-preupdate-gamelists-hook $(TARGET_DIR)/usr/bin/
