@@ -83,7 +83,11 @@ REGLINUX_MAME_CONF_INIT = $(TARGET_DIR)/usr/share/reglinux/datainit/system/confi
 
 define REGLINUX_MAME_INSTALL_TARGET_CMDS
 	# copy the prebuilt stuff to rootfs
-	tar xzvf $(@D)/$(REGLINUX_MAME_SOURCE) -C $(TARGET_DIR)
+	tar --strip-components=5 -xzvf $(@D)/$(REGLINUX_MAME_SOURCE) -C $(TARGET_DIR)
+
+	# remove vgmplay.xml files
+	rm $(TARGET_DIR)/usr/share/lr-mame/hash/vgmplay.xml
+	rm $(TARGET_DIR)/usr/bin/mame/hash/vgmplay.xml
 
 	# delete the archive from this directory
 	rm $(@D)/$(REGLINUX_MAME_SOURCE)
