@@ -88,10 +88,6 @@ define REGLINUX_MAME_INSTALL_TARGET_CMDS
 	# delete the archive from this directory
 	rm $(@D)/$(REGLINUX_MAME_SOURCE)
 
-	# remove vgmplay.xml files
-	rm $(TARGET_DIR)/usr/share/lr-mame/hash/vgmplay.xml
-	rm $(TARGET_DIR)/usr/bin/mame/hash/vgmplay.xml
-
 	# gameStop script when exiting a rotated screen
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/configgen/scripts
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/mame/rotation_fix.sh $(TARGET_DIR)/usr/share/reglinux/configgen/scripts/rotation_fix.sh
