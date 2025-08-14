@@ -10,11 +10,11 @@ CORSIXTH_FONT_PATH = '/usr/share/fonts/dejavu/DejaVuSans.ttf'
 CORSIXTH_SCREENSCHOTS_DIR = SCREENSHOTS + '/corsixth'
 CORSIXTH_BIN_PATH = '/usr/bin/corsix-th'
 CORSIXTH_GAME_DATA_DIR = [
-    "/userdata/roms/corsixth/ANIMS",
-    "/userdata/roms/corsixth/DATA",
-    "/userdata/roms/corsixth/INTRO",
-    "/userdata/roms/corsixth/LEVELS",
-    "/userdata/roms/corsixth/QDATA",
+    '/userdata/roms/corsixth/ANIMS',
+    '/userdata/roms/corsixth/DATA',
+    '/userdata/roms/corsixth/INTRO',
+    '/userdata/roms/corsixth/LEVELS',
+    '/userdata/roms/corsixth/QDATA',
 ]
 
 def setCorsixthConfig(corsixthConfig, system, gameResolution):
