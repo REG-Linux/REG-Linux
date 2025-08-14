@@ -33,3 +33,5 @@ package/emulationstation/reglinux-emulationstation/keys.txt
 batocera-mok.key
 gh_token
 .idea
+scripts/nvchecker/*.json
+scripts/nvchecker/*.toml
