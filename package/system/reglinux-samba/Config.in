@@ -1,7 +1,6 @@
 config BR2_PACKAGE_REGLINUX_SAMBA
         bool "reglinux-samba"
 
-	select BR2_PACKAGE_SAMBA4	if BR2_PACKAGE_BATOCERA_WINE
 	select BR2_PACKAGE_KSMBD_TOOLS
 
         help

@@ -16,7 +16,7 @@ DOLPHIN_TRIFORCE_SUPPORTS_IN_SOURCE_BUILD = NO
 
 DOLPHIN_TRIFORCE_DEPENDENCIES += bluez5_utils ffmpeg hidapi host-xz libcurl
 DOLPHIN_TRIFORCE_DEPENDENCIES += libevdev libpng libusb lzo sdl2 xz zlib
-DOLPHIN_TRIFORCE_DEPENDENCIES += speex speexdsp
+DOLPHIN_TRIFORCE_DEPENDENCIES += speex speexdsp minizip-zlib pugixml
 
 ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
 DOLPHIN_TRIFORCE_DEPENDENCIES += reglinux-qt6

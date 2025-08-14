@@ -1,8 +1,8 @@
-import os
+from os import path
 import re
 
-def shortNameFromPath(path):
-    redname = os.path.splitext(os.path.basename(path))[0].lower()
+def shortNameFromPath(path_name):
+    redname = path.splitext(path.basename(path_name))[0].lower()
     inpar   = False
     inblock = False
     ret = ""

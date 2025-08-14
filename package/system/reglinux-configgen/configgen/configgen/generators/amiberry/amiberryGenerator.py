@@ -1,12 +1,9 @@
 from generators.Generator import Generator
-import os
 from Command import Command
-import os.path
-import zipfile
-from os import path
-from os.path import dirname
+from zipfile import ZipFile
+from os import path, makedirs, chdir
 from settings.unixSettings import UnixSettings
-from . import amiberryConfig
+from .amiberryConfig import AMIBERRY_CONFIG_PATH, AMIBERRY_BIN_PATH, AMIBERRY_INPUTS_DIR, AMIBERRY_SHARE_DIR
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -14,14 +11,14 @@ eslog = get_logger(__name__)
 class AmiberryGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        retroconfig = UnixSettings(amiberryConfig.amiberryRetroarchCustom, separator=' ')
-        if not os.path.exists(dirname(amiberryConfig.amiberryRetroarchCustom)):
-            os.makedirs(dirname(amiberryConfig.amiberryRetroarchCustom))
+        retroconfig = UnixSettings(AMIBERRY_CONFIG_PATH, separator=' ')
+        if not path.exists(path.dirname(AMIBERRY_CONFIG_PATH)):
+            makedirs(path.dirname(AMIBERRY_CONFIG_PATH))
 
         romType = self.getRomType(rom)
         eslog.debug("romType: "+romType)
         if romType != 'UNKNOWN' :
-            commandArray = [ amiberryConfig.amiberryBin, "-G" ]
+            commandArray = [ AMIBERRY_BIN_PATH, "-G" ]
             if romType != 'WHDL' :
                 commandArray.append("--model")
                 commandArray.append(system.config['core'])
@@ -53,15 +50,15 @@ class AmiberryGenerator(Generator):
 
             retroconfig.write()
 
-            if not os.path.exists(amiberryConfig.amiberryRetroarchInputsDir):
-                os.makedirs(amiberryConfig.amiberryRetroarchInputsDir)
+            if not path.exists(AMIBERRY_INPUTS_DIR):
+                makedirs(AMIBERRY_INPUTS_DIR)
             nplayer = 1
             for playercontroller, pad in sorted(playersControllers.items()):
                 replacements = {'_player' + str(nplayer) + '_':'_'}
                 # amiberry remove / included in pads names like "USB Downlo01.80 PS3/USB Corded Gamepad"
                 padfilename = pad.name.replace("/", "")
-                playerInputFilename = amiberryConfig.amiberryRetroarchInputsDir + "/" + padfilename + ".cfg"
-                with open(amiberryConfig.amiberryRetroarchCustom) as infile, open(playerInputFilename, 'w') as outfile:
+                playerInputFilename = AMIBERRY_INPUTS_DIR + "/" + padfilename + ".cfg"
+                with open(AMIBERRY_CONFIG_PATH) as infile, open(playerInputFilename, 'w') as outfile:
                     for line in infile:
                         for src, target in replacements.items():
                             newline = line.replace(src, target)
@@ -166,7 +163,7 @@ class AmiberryGenerator(Generator):
             commandArray.append("-s")
             commandArray.append("sound_frequency=48000")
 
-            os.chdir(amiberryConfig.amiberryShare)
+            chdir(AMIBERRY_SHARE_DIR)
             return Command(array=commandArray)
         # otherwise, unknown format
         return Command(array=[])
@@ -213,7 +210,7 @@ class AmiberryGenerator(Generator):
         return floppies
 
     def getRomType(self,filepath) :
-        extension = os.path.splitext(filepath)[1][1:].lower()
+        extension = path.splitext(filepath)[1][1:].lower()
 
         if extension == "lha":
             return 'WHDL'
@@ -225,10 +222,10 @@ class AmiberryGenerator(Generator):
             return 'DISK'
         elif extension == "zip":
             # can be either whdl or adf
-            with zipfile.ZipFile(filepath) as zip:
+            with ZipFile(filepath) as zip:
                 for zipfilename in zip.namelist():
                     if zipfilename.find('/') == -1: # at the root
-                        extension = os.path.splitext(zipfilename)[1][1:]
+                        extension = path.splitext(zipfilename)[1][1:]
                         if extension == "info":
                             return 'WHDL'
                         elif extension == 'lha' :

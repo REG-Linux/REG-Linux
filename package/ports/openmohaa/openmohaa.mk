@@ -1,0 +1,27 @@
+################################################################################
+#
+# vcmi
+#
+################################################################################
+
+OPENMOHAA_VERSION = v0.82.1
+OPENMOHAA_SITE = https://github.com/openmoh/openmohaa.git
+OPENMOHAA_SITE_METHOD=git
+OPENMOHAA_GIT_SUBMODULES=YES
+OPENMOHAA_DEPENDENCIES = minizip sdl2 sdl2_image sdl2_mixer sdl2_ttf ffmpeg libcurl openal
+OPENMOHAA_SUPPORTS_IN_SOURCE_BUILD = NO
+
+OPENMOHAA_CMAKE_BACKEND = ninja
+
+OPENMOHAA_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
+OPENMOHAA_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
+OPENMOHAA_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
+# For libmad
+OPENMOHAA_CONF_OPTS += -DOPTIMIZE=SPEED
+OPENMOHAA_CONF_OPTS += -DENABLE_TEST=OFF
+OPENMOHAA_CONF_OPTS += -DENABLE_DEBUG_CONSOLE=OFF
+OPENMOHAA_CONF_OPTS += -DENABLE_EDITOR=OFF
+OPENMOHAA_CONF_OPTS += -DENABLE_GITVERSION=OFF
+OPENMOHAA_CONF_OPTS += -DENABLE_GOLDMASTER=ON
+
+$(eval $(cmake-package))

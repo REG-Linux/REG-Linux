@@ -77,9 +77,6 @@ config BR2_PACKAGE_REGLINUX_ARCADE_SYSTEMS
 	select BR2_PACKAGE_HYPSEUS_SINGE	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 	select BR2_PACKAGE_HYPSEUS_SINGE_BEZELS if BR2_PACKAGE_HYPSEUS_SINGE
 
-	# Standalone Sega Model 2 emulator
-	select BR2_PACKAGE_MODEL2EMU		if BR2_PACKAGE_REGLINUX_WINE
-
 	# Standalone Sega Model 3 emulator
 	select BR2_PACKAGE_SUPERMODEL		if BR2_PACKAGE_REGLINUX_XWAYLAND
 	# REG remove supermodel legacy : use Legacy3D engine and/or Zink instead
@@ -416,7 +413,6 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 
 	# Microsoft Xbox 360
-	select BR2_PACKAGE_XENIA			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY && BR2_PACKAGE_REGLINUX_WINE_SYSTEMS
 	select BR2_PACKAGE_XENIA_CANARY			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
 
 	# Sony PS2
@@ -518,8 +514,6 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 	# Sega 8-bit/16-range (Mark III / Master System, Game Gear, Genesis / Megadrive, SegaCD / MegaCD, 32X)
 	select BR2_PACKAGE_LIBRETRO_PICODRIVE		# ALL
 	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX	# ALL
-	# TODO : lr-genesisplusgxwide can be enabled on 64-bit archs, but Makefile.libretro is broken for AArch64
-	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX_WIDE	if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY
         # BlastEm! is accuracy-focused, can be slow on low end, let's limit and revisit later
         select BR2_PACKAGE_LIBRETRO_BLASTEM             if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
         # ClownMDEmu is accuracy-focused, disable on slow platforms
@@ -600,7 +594,6 @@ config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
 
 	select BR2_PACKAGE_LIBRETRO_BSNES_JG		if BR2_PACKAGE_LIBRETRO_BSNES
 
-	select BR2_PACKAGE_LIBRETRO_BSNES_HD            if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 	select BR2_PACKAGE_LIBRETRO_MESENS              if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY	|| \
 							   BR2_PACKAGE_SYSTEM_TARGET_S922X		|| \
 							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712		|| \

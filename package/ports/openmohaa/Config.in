@@ -1,0 +1,15 @@
+config BR2_PACKAGE_OPENMOHAA
+	bool "openmohaa"
+	select BR2_PACKAGE_MINIZIP
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_FFMPEG
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_OPENAL
+
+	help
+	  Medal of Honor : Allied Assault engine
+
+	  https://github.com/openmoh/openmohaa
