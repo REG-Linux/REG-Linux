@@ -1,9 +1,9 @@
 atomiswave:
   emulator: libretro
-  core:     morpheuscast-xtreme
+  core:     km_morpheuscast_xtreme
 dreamcast:
   emulator: libretro
-  core:     morpheuscast-xtreme
+  core:     km_morpheuscast_xtreme
 naomi:
   emulator: libretro
-  core:     morpheuscast-xtreme
+  core:     km_morpheuscast_xtreme
