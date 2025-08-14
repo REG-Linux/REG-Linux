@@ -1,6 +1,6 @@
 ################################################################################
 #
-# REGLINUX-MAME (Prebuilt GroovyMAME + libretro-mame)
+# REGLINUX-MAME (Prebuilt MAME/GroovyMAME + libretro-mame)
 #
 ################################################################################
 # Version: 0.279
