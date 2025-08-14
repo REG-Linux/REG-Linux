@@ -173,6 +173,7 @@ menu "Emulators"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/xemu/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/xenia-canary/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/ymir/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/openmsx/Config.in"
 menu "mupen64plus"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/mupen64plus/mupen64plus-core/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/mupen64plus/mupen64plus-ui-console/Config.in"
@@ -536,7 +537,6 @@ endmenu
 menu "Standalone Emulators"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/drastic/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/gsplus/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/openmsx/Config.in"
 endmenu
 
 menu "Looks"

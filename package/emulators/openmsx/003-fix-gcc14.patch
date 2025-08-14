@@ -1,0 +1,13 @@
+diff --git a/src/utils/view.hh b/src/utils/view.hh
+index ca425cf..a28fc3a 100644
+--- a/src/utils/view.hh
++++ b/src/utils/view.hh
+@@ -207,7 +207,7 @@ public:
+ 
+ 	[[nodiscard]] constexpr friend difference_type operator-(const TransformIterator& x, const TransformIterator& y)
+ 	{
+-		return x.it - y.it;
++		return std::distance(y.it, x.it);
+ 	}
+ 
+ 	[[nodiscard]] constexpr reference operator[](difference_type n)
