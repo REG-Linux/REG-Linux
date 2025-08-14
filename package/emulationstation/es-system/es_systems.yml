@@ -462,7 +462,7 @@ dreamcast:
   emulators:
     libretro:
       flycast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCAST] }
-      flycastvl: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCASTVL] }
+      km_morpheuscast_xtreme: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MORPHEUSCAST_XTREME] }
     flycast:
       flycast: { requireAnyOf: [BR2_PACKAGE_FLYCAST] }
   comment_en: |
@@ -482,7 +482,7 @@ naomi:
   emulators:
     libretro:
       flycast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCAST] }
-      flycastvl: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCASTVL] }
+      km_morpheuscast_xtreme: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MORPHEUSCAST_XTREME] }
     flycast:
       flycast: { requireAnyOf: [BR2_PACKAGE_FLYCAST] }
 
@@ -496,7 +496,7 @@ atomiswave:
   emulators:
     libretro:
       flycast: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCAST] }
-      flycastvl: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_FLYCASTVL] }
+      km_morpheuscast_xtreme: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MORPHEUSCAST_XTREME] }
     flycast:
       flycast: { requireAnyOf: [BR2_PACKAGE_FLYCAST] }
 

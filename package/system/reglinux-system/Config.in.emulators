@@ -35,23 +35,27 @@ config BR2_PACKAGE_REGLINUX_SEGADC
 	bool "REG-Linux dreamcast/naomi/atomiswave emulators/cores"
 
 	# Dreamcast / Naomi / Atomiswave emulation
-	select BR2_PACKAGE_FLYCAST		if !BR2_RISCV_64			&& \
-						   !BR2_mipsel				&& \
-						   !BR2_PACKAGE_SYSTEM_TARGET_BCM2836	&& \
-						   !BR2_PACKAGE_SYSTEM_TARGET_BCM2837	&& \
-						   !BR2_PACKAGE_SYSTEM_TARGET_RK3326
+    select BR2_PACKAGE_FLYCAST   if !BR2_RISCV_64                       && \
+                                    !BR2_mipsel                         && \
+                                    !BR2_PACKAGE_SYSTEM_TARGET_BCM2836  && \
+                                    !BR2_PACKAGE_SYSTEM_TARGET_BCM2837  && \
+                                    !BR2_PACKAGE_SYSTEM_TARGET_RK3326	&& \
+                                    !BR2_PACKAGE_SYSTEM_TARGET_H3       && \
+                                    !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
-	select BR2_PACKAGE_LIBRETRO_FLYCAST	if !BR2_RISCV_64			&& \
-						   !BR2_mipsel				&& \
-						   !BR2_PACKAGE_SYSTEM_TARGET_BCM2836	&& \
-						   !BR2_PACKAGE_SYSTEM_TARGET_BCM2837	&& \
-						   !BR2_PACKAGE_SYSTEM_TARGET_RK3326
+    select BR2_PACKAGE_LIBRETRO_FLYCAST  if !BR2_RISCV_64                       && \
+                                            !BR2_mipsel                         && \
+                                            !BR2_PACKAGE_SYSTEM_TARGET_BCM2836  && \
+                                            !BR2_PACKAGE_SYSTEM_TARGET_BCM2837  && \
+                                            !BR2_PACKAGE_SYSTEM_TARGET_RK3326	&& \
+                                            !BR2_PACKAGE_SYSTEM_TARGET_H3       && \
+                                            !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
-	select BR2_PACKAGE_LIBRETRO_FLYCASTVL	if BR2_PACKAGE_SYSTEM_TARGET_BCM2836	|| \
-						   BR2_PACKAGE_SYSTEM_TARGET_BCM2837	|| \
-						   BR2_PACKAGE_SYSTEM_TARGET_RK3326   || \
-						   BR2_PACKAGE_SYSTEM_TARGET_H3       || \
-						   BR2_PACKAGE_SYSTEM_TARGET_CHA
+    select BR2_PACKAGE_LIBRETRO_MORPHEUSCAST_XTREME	 if BR2_PACKAGE_SYSTEM_TARGET_BCM2836 || \
+                                                        BR2_PACKAGE_SYSTEM_TARGET_BCM2837 || \
+                                                        BR2_PACKAGE_SYSTEM_TARGET_RK3326  || \
+                                                        BR2_PACKAGE_SYSTEM_TARGET_H3      || \
+                                                        BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	help
 	  Sega Dreamcast and Naomi/Atomiswave emulation support

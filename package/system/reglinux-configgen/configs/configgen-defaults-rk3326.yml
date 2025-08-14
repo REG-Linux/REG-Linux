@@ -10,10 +10,10 @@ fmtowns:
   core:     mame
 atomiswave:
   emulator: libretro
-  core:     flycastvl
+  core:     km_morpheuscast_xtreme
 dreamcast:
   emulator: libretro
-  core:     flycastvl
+  core:     km_morpheuscast_xtreme
 naomi:
   emulator: libretro
-  core:     flycastvl
+  core:     km_morpheuscast_xtreme
