@@ -1,8 +1,9 @@
 from generators.Generator import Generator
 from Command import Command
-import configparser
-import os.path, shutil
-from . import dosboxxConfig
+from configparser import ConfigParser
+from os import path, makedirs
+from shutil import copy2
+from .dosboxxConfig import DOSBOXX_CONFIG_PATH, DOSBOXX_CONFIG_CUSTOM_PATH, DOSBOXX_BIN_PATH
 
 class DosBoxxGenerator(Generator):
 
@@ -10,22 +11,21 @@ class DosBoxxGenerator(Generator):
         # Find rom path
         gameDir = rom
         gameConfFile = gameDir + "/dosbox.cfg"
+        configFile = DOSBOXX_CONFIG_PATH
 
-        configFile = dosboxxConfig.dosboxxConfig
-        if os.path.isfile(gameConfFile):
+        if not path.exists(path.dirname(DOSBOXX_CONFIG_PATH)):
+            makedirs(path.dirname(DOSBOXX_CONFIG_PATH))
+
+        if path.isfile(gameConfFile):
             configFile = gameConfFile
 
         # configuration file
-        iniSettings = configparser.ConfigParser(interpolation=None)
-        # To prevent ConfigParser from converting to lower case
+        iniSettings = ConfigParser(interpolation=None)
         iniSettings.optionxform=lambda optionstr: str(optionstr)
 
-        # copy config file to custom config file to avoid overwritting by dosbox-x
-        customConfFile = os.path.join(dosboxxConfig.dosboxxCustom,'dosboxx-custom.conf')
-
-        if os.path.exists(configFile):
-            shutil.copy2(configFile, customConfFile)
-            iniSettings.read(customConfFile)
+        if path.exists(configFile):
+            copy2(configFile, DOSBOXX_CONFIG_CUSTOM_PATH)
+            iniSettings.read(DOSBOXX_CONFIG_CUSTOM_PATH)
 
         # sections
         if not iniSettings.has_section("sdl"):
@@ -33,16 +33,16 @@ class DosBoxxGenerator(Generator):
         iniSettings.set("sdl", "output", "opengl")
 
         # save
-        with open(customConfFile, 'w') as config:
+        with open(DOSBOXX_CONFIG_CUSTOM_PATH, 'w') as config:
             iniSettings.write(config)
 
-        # -fullscreen removed as it crashes on N2
-        commandArray = [dosboxxConfig.dosboxxBin,
+        commandArray = [DOSBOXX_BIN_PATH,
 			"-exit",
 			"-c", f"""mount c {gameDir}""",
                         "-c", "c:",
                         "-c", "dosbox.bat",
                         "-fastbioslogo",
-                        f"-conf {customConfFile}"]
+                        "-fullscreen",
+                        f"-conf {DOSBOXX_CONFIG_CUSTOM_PATH}"]
 
         return Command(array=commandArray)
