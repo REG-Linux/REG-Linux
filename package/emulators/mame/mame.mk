@@ -6,7 +6,7 @@
 # Version: GroovyMAME 0.277 - Switchres 2.21e
 #MAME_VERSION = gm0277sr221e
 #MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
-# Temp mainline 0.279
+# Version: MAME 0.279
 MAME_VERSION = mame0279
 MAME_SITE = $(call github,mamedev,MAME,$(MAME_VERSION))
 MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
