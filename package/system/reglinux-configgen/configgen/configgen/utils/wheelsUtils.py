@@ -1,10 +1,10 @@
 import controllers as controllersConfig
-import evdev
-import subprocess
-import os
-import signal
-import re
-import math
+from evdev import device, ecodes
+from subprocess import Popen, PIPE
+from os import pipe, fdopen, kill
+from signal import SIGTERM
+from re import match
+from math import floor, ceil
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -186,7 +186,7 @@ def reconfigureControllers(playersControllers, system, rom, metadata, deviceList
                 joysticks[deviceList[node]["eventId"]] = { "node": node }
         # add the new devices
         for p in newPads:
-            matches = re.match(r"^/dev/input/event([0-9]*)$", str(p))
+            matches = match(r"^/dev/input/event([0-9]*)$", str(p))
             if matches != None:
                 joysticks[int(matches.group(1))] = { "node": p }
         # find new sdl numeration
@@ -233,12 +233,12 @@ def getWheelsFromDevicesInfos(deviceInfos):
     return res
 
 def reconfigureAngleRotation(dev, wheelAxis, rotationAngle, wantedRotationAngle, wantedDeadzone, wantedMidzone):
-    devInfos = evdev.device.InputDevice(dev)
+    devInfos = device.InputDevice(dev)
     caps = devInfos.capabilities()
 
     absmin = None
     absmax = None
-    for v, absinfo in caps[evdev.ecodes.EV_ABS]:
+    for v, absinfo in caps[ecodes.EV_ABS]:
         if v == wheelAxis:
             absmin = absinfo.min
             absmax = absinfo.max
@@ -251,32 +251,32 @@ def reconfigureAngleRotation(dev, wheelAxis, rotationAngle, wantedRotationAngle,
     newmin = absmin
     newmax = absmax
     if wantedRotationAngle < rotationAngle:
-        newRange = math.floor(totalRange * wantedRotationAngle / rotationAngle)
-        newmin = absmin + math.ceil((totalRange - newRange) / 2)
-        newmax = absmax - math.floor((totalRange - newRange) / 2)
+        newRange = floor(totalRange * wantedRotationAngle / rotationAngle)
+        newmin = absmin + ceil((totalRange - newRange) / 2)
+        newmax = absmax - floor((totalRange - newRange) / 2)
 
     newdz = 0
     if wantedDeadzone > 0 and wantedDeadzone > wantedMidzone:
-        newdz = math.floor(totalRange * wantedDeadzone / rotationAngle)
+        newdz = floor(totalRange * wantedDeadzone / rotationAngle)
         newmin -= newdz // 2
         newmax += newdz // 2
 
     newmz = 0
     if wantedMidzone > 0:
-        newmz = math.floor(totalRange * wantedMidzone / rotationAngle)
+        newmz = floor(totalRange * wantedMidzone / rotationAngle)
         newmin += newmz // 2
         newmax -= newmz // 2
 
-    pipeout, pipein = os.pipe()
+    pipeout, pipein = pipe()
     cmd = ["batocera-wheel-calibrator", "-d", dev, "-a", str(wheelAxis), "-m", str(newmin), "-M", str(newmax), "-z", str(newdz), "-c", str(newmz)]
     eslog.info(cmd)
-    proc = subprocess.Popen(cmd, stdout=pipein, stderr=subprocess.PIPE)
+    proc = Popen(cmd, stdout=pipein, stderr=PIPE)
     try:
-        fd = os.fdopen(pipeout)
+        fd = fdopen(pipeout)
         newdev = fd.readline().rstrip('\n')
         fd.close()
     except:
-        os.kill(proc.pid, signal.SIGTERM)
+        kill(proc.pid, SIGTERM)
         out, err = proc.communicate()
         raise
 
@@ -285,5 +285,5 @@ def reconfigureAngleRotation(dev, wheelAxis, rotationAngle, wantedRotationAngle,
 def resetControllers(wheelProcesses):
     for p in wheelProcesses:
         eslog.info("killing wheel process {}".format(p.pid))
-        os.kill(p.pid, signal.SIGTERM)
+        kill(p.pid, SIGTERM)
         out, err = p.communicate()

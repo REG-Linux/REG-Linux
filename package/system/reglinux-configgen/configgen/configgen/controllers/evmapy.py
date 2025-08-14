@@ -10,11 +10,11 @@ by translating gamepad button presses and analog stick movements into correspond
 keyboard key presses or mouse movements.
 """
 
-import subprocess
-import json
-import os
-import evdev
-import controllers as controllersConfig
+from subprocess import call
+from json import load, dumps
+from os import path
+from evdev import InputDevice
+from controllers import mouseButtonToCode
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -49,7 +49,7 @@ class Evmapy():
         """
         if Evmapy.__prepare(system, emulator, core, rom, playersControllers, guns):
             Evmapy.__started = True
-            subprocess.call(["system-evmapy", "start"])
+            call(["system-evmapy", "start"])
 
     @staticmethod
     def stop():
@@ -61,7 +61,7 @@ class Evmapy():
         """
         if Evmapy.__started:
             Evmapy.__started = False
-            subprocess.call(["system-evmapy", "stop"])
+            call(["system-evmapy", "stop"])
 
     @staticmethod
     def __prepare(system, emulator, core, rom, playersControllers, guns):
@@ -103,14 +103,14 @@ class Evmapy():
                 "/usr/share/evmapy/{}.keys".format(system)  # Default system config
         ]:
             # Check if configuration file exists and handle directory ROM case
-            if os.path.exists(keysfile) and not (os.path.isdir(rom) and keysfile == "{}.keys".format(rom)):
+            if path.exists(keysfile) and not (path.isdir(rom) and keysfile == "{}.keys".format(rom)):
                 eslog.debug(f"evmapy on {keysfile}")
 
                 # Clear any existing evmapy configuration
-                subprocess.call(["system-evmapy", "clear"])
+                call(["system-evmapy", "clear"])
 
                 # Load the pad action configuration from the keys file
-                padActionConfig = json.load(open(keysfile))
+                padActionConfig = load(open(keysfile))
 
                 # Configure light guns
                 ngun = 1
@@ -118,7 +118,7 @@ class Evmapy():
                     gun_action_key = "actions_gun" + str(ngun)
                     if gun_action_key in padActionConfig:
                         # Generate configuration file path for this gun
-                        configfile = "/var/run/evmapy/{}.json".format(os.path.basename(guns[gun]["node"]))
+                        configfile = "/var/run/evmapy/{}.json".format(path.basename(guns[gun]["node"]))
                         eslog.debug("config file for keysfile is {} (from {}) - gun".format(configfile, keysfile))
 
                         # Initialize gun configuration structure
@@ -131,7 +131,7 @@ class Evmapy():
                         for button in guns[gun]["buttons"]:
                             padConfig["buttons"].append({
                                 "name": button,
-                                "code": controllersConfig.mouseButtonToCode(button)
+                                "code": mouseButtonToCode(button)
                             })
                         padConfig["grab"] = False
 
@@ -149,7 +149,7 @@ class Evmapy():
 
                         # Write gun configuration to file
                         with open(configfile, "w") as fd:
-                            fd.write(json.dumps(padConfig, indent=4))
+                            fd.write(dumps(padConfig, indent=4))
                     ngun += 1
 
                 # Configure each player's controller
@@ -158,7 +158,7 @@ class Evmapy():
                     player_action_key = "actions_player" + str(nplayer)
                     if player_action_key in padActionConfig:
                         # Generate configuration file path for this controller
-                        configfile = "/var/run/evmapy/{}.json".format(os.path.basename(pad.dev))
+                        configfile = "/var/run/evmapy/{}.json".format(path.basename(pad.dev))
                         eslog.debug("config file for keysfile is {} (from {})".format(configfile, keysfile))
 
                         # Initialize controller configuration structure
@@ -184,7 +184,6 @@ class Evmapy():
                         for index in pad.inputs:
                             input = pad.inputs[index].sdl_to_linux_input_event(guide_equal_back)
                             if input is None:
-                                eslog.warning("input {} not found in sdl_to_linux_input_event".format(index))
                                 continue
 
                             if input["type"] == "button":
@@ -388,7 +387,7 @@ class Evmapy():
 
                         # Write controller configuration to file
                         with open(configfile, "w") as fd:
-                            fd.write(json.dumps(padConfig, indent=4))
+                            fd.write(dumps(padConfig, indent=4))
 
                     nplayer += 1
                 return True
@@ -585,7 +584,7 @@ class Evmapy():
             tuple: (min_value, max_value) for the axis, or (0, 0) if not found
         """
         try:
-            device = evdev.device.InputDevice(devicePath)
+            device = InputDevice(devicePath)
             capabilities = device.capabilities(verbose=False)
 
             for event_type, events in capabilities.items():

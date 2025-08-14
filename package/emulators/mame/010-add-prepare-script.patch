@@ -1,0 +1,153 @@
+--- /dev/null	2025-08-06 13:35:04.280421463 +0200
++++ b/prepare.py	2025-08-07 16:01:18.863251704 +0200
+@@ -0,0 +1,150 @@
++#!/usr/bin/python3
++
++import os
++import re
++import shutil
++
++# Paths to the driver list file
++DRIVER_LIST_FILE = os.path.join("./src", "mame", "mame.lst")
++DRIVER_SRC_DIR = os.path.join("./src", "mame")
++
++# Backup the original list
++shutil.copy2(DRIVER_LIST_FILE, DRIVER_LIST_FILE + ".bak")
++print(f"Backed up original list to {DRIVER_LIST_FILE}.bak")
++
++# Regex to match only GAME/CONS lines with MACHINE_NOT_WORKING and extract the second argument (the driver name)
++pattern1 = re.compile(r'^\s*(?:GAME|GAMEL|COMP|CONS|SYST)\s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+).*(?:MACHINE_NOT_WORKING|MACHINE_MECHANICAL)', re.MULTILINE)
++pattern2 = re.compile(r'^\s*(?:GAME|COMP|CONS|SYST)\s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+).*(?:GAME_FLAGS)', re.MULTILINE)
++pattern3 = re.compile(r'^\s*(?:GAME_CUSTOM)\s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+).*', re.MULTILINE)
++pattern4 = re.compile(r'^\s*(?:/\*.*?\*/\s*)?(?:GAME|GAMEL|COMP|CONS|SYST)\s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+).*(?:MACHINE_NOT_WORKING|MACHINE_MECHANICAL)', re.MULTILINE)
++pattern5 = re.compile(r'^\s*(?:/\*.*?\*/\s*)?(?:GAME|COMP|CONS|SYST)\s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+).*(?:GAME_FLAGS)', re.MULTILINE)
++pattern6 = re.compile(r'^\s*(?:/\*.*?\*/\s*)?(?:GAME_CUSTOM)\s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+).*', re.MULTILINE)
++pattern7 = re.compile(
++    r'''^
++        \s*                                 # Optional leading whitespace
++        (?:/\*.*?\*/\s*)?                   # Optional C-style comment
++        (?:
++            (?:GAME|GAMEL|COMP|CONS|SYST)   # Regular macros
++            \s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+).*?
++            (?:MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_FLAGS|GAME_FLAGS)
++            |
++            GAME_CUSTOM                     # Special case: GAME_CUSTOM
++            \s*\(\s*[^,]+,\s*([a-zA-Z0-9_]+)
++        )
++    ''',
++    re.MULTILINE | re.VERBOSE
++)
++# Step 1: Identify all drivers marked MACHINE_NOT_WORKING
++not_working_drivers = set()
++
++for root, directories, files in os.walk(DRIVER_SRC_DIR):
++  for directory in directories:
++    for path,dir,filenames in os.walk(os.path.join(DRIVER_SRC_DIR,directory)):
++      for filename in filenames:
++        if filename.endswith(".cpp"):
++          full_path = os.path.join(root, directory, filename)
++          with open(full_path, encoding="utf-8", errors="ignore") as f:
++            content = f.read()
++            # Try to extract the game drivers defined in this file marked as MACHINE_NOT_WORKING
++            matches1 = pattern1.findall(content)
++            matches2 = pattern2.findall(content)
++            matches3 = pattern3.findall(content)
++            matches4 = pattern4.findall(content)
++            matches5 = pattern5.findall(content)
++            matches6 = pattern6.findall(content)
++            matches7 = pattern7.findall(content)
++            names = [m[0] or m[1] for m in matches7]
++            for match in matches1:
++                driver = match.split(',')[0].strip()
++                not_working_drivers.add(driver)
++            for match in matches2:
++                driver = match.split(',')[0].strip()
++                not_working_drivers.add(driver)
++            for match in matches3:
++                driver = match.split(',')[0].strip()
++                not_working_drivers.add(driver)
++            for match in matches4:
++                driver = match.split(',')[0].strip()
++                not_working_drivers.add(driver)
++            for match in matches5:
++                driver = match.split(',')[0].strip()
++                not_working_drivers.add(driver)
++            for match in matches6:
++                driver = match.split(',')[0].strip()
++                not_working_drivers.add(driver)
++            for match in names:
++                driver = match.split(',')[0].strip()
++                not_working_drivers.add(driver)
++
++# Static removals from plain list (gambling, vgmplay, synthetizers, ...)
++with open("unwanted.txt", "r", encoding="utf-8") as file:
++    for line in file:
++        trimmed = line.strip()
++        if trimmed and not trimmed.startswith("//"):  # Skip empty lines and comments if needed
++            not_working_drivers.add(trimmed)
++
++print(f"Removed {len(not_working_drivers)} non-working and/or mechanical and/or gambling drivers.")
++
++# Step 2: Filter the mame.lst file
++with open(DRIVER_LIST_FILE, encoding="utf-8") as f:
++    lines = f.readlines()
++
++filtered_lines = [line for line in lines if line.strip() not in not_working_drivers]
++
++with open(DRIVER_LIST_FILE, "w", encoding="utf-8") as f:
++    f.writelines(filtered_lines)
++
++print(f"Filtered driver list written to {DRIVER_LIST_FILE}.")
++print(f"{len(lines) - len(filtered_lines)} entries removed.")
++
++# Now delete the empty (no driver) source files
++LST_PATH = "src/mame/mame.lst"
++
++with open(LST_PATH, 'r', encoding='utf-8') as f:
++    lines = f.readlines()
++
++cleaned_lines = []
++removed_drivers = []
++
++i = 0
++while i < len(lines):
++    line = lines[i].strip()
++    if line.startswith("@source:"):
++        block = [lines[i]]  # the @source line
++        cpp_path = line[len("@source:"):]
++
++        # Collect following lines until next @source
++        j = i + 1
++        system_lines = []
++        while j < len(lines) and not lines[j].strip().startswith("@source:"):
++            if lines[j].strip():
++                system_lines.append(lines[j])
++            j += 1
++
++        if system_lines:
++            cleaned_lines.append(lines[i])
++            cleaned_lines.extend(system_lines)
++            cleaned_lines.append("\n")  # preserve blank line between blocks
++        else:
++            removed_drivers.append(cpp_path)
++
++        i = j
++    else:
++        i += 1
++
++# ✅ Overwrite mame.lst
++with open(LST_PATH, "w", encoding='utf-8') as f:
++    f.writelines(cleaned_lines)
++
++# ✅ Output list of .cpp files to exclude from build
++print(f"Overwrote mame.lst with {len(cleaned_lines)} lines.")
++print(f"Excluded {len(removed_drivers)} empty drivers from mame.lst:\n")
++
++# List of drivers to NOT delete because they are referenced by other modules
++keep_drv = [ "amiga/amiga.cpp" , "nec/pc8001.cpp" ]
++
++for drv in removed_drivers:
++    if drv not in keep_drv:
++        print(f"Delete src/mame/{drv}")
++        file = "src/mame/"+drv
++        os.remove(file)

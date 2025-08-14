@@ -3,8 +3,8 @@
 # libretro-mame
 #
 ################################################################################
-# Version lrmame0276 : Apr 1, 2025
-LIBRETRO_MAME_VERSION = lrmame0276
+# Version lrmame0279 : Aug 3, 2025
+LIBRETRO_MAME_VERSION = lrmame0279
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 LIBRETRO_MAME_LICENSE = MAME
 
@@ -23,25 +23,28 @@ LIBRETRO_MAME_JOBS = $(shell if [ $(PARALLEL_JOBS) -gt $(LIBRETRO_MAME_MAX_JOBS)
 
 LIBRETRO_MAME_EXTRA_ARGS += PTR64=1
 ifeq ($(BR2_x86_64),y)
-LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=x86_64 PLATFORM=x86_64
-else ifeq ($(BR2_RISCV_64),y)
-LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=riscv64 PLATFORM=riscv64
+LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=x86_64 PLATFORM=x86
 else ifeq ($(BR2_aarch64),y)
-LIBRETRO_MAME_EXTRA_ARGS += PTR64=1 LIBRETRO_CPU=arm64 PLATFORM=arm64
-LIBRETRO_MAME_ARCHOPTS += -D__aarch64__
+LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=arm64 PLATFORM=arm64 ARCHITECTURE=
+else ifeq ($(BR2_RISCV_64),y)
+LIBRETRO_MAME_EXTRA_ARGS += LIBRETRO_CPU=riscv64 PLATFORM=riscv64 FORCE_DRC_C_BACKEND=1 ARCHITECTURE=
 endif
 
 # Enforce symbols debugging with O0
 ifeq ($(BR2_ENABLE_DEBUG),y)
 	LIBRETRO_MAME_EXTRA_ARGS += SYMBOLS=1 SYMLEVEL=2 OPTIMIZE=0
 # Stick with O2 or Os, too much bloat with O3 !!
-#else ifeq ($(BR2_x86_64),y)
-#	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=s LTO=1
 else
 	LIBRETRO_MAME_EXTRA_ARGS += OPTIMIZE=2 LTO=1
 endif
 
 define LIBRETRO_MAME_BUILD_CMDS
+	# Prepare
+	cd $(@D); \
+        cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-mame/unwanted.txt $(@D)/unwanted.txt ; \
+	chmod +x ./prepare.py ; \
+	$(HOST_DIR)/bin/python3 ./prepare.py
+
 	# create some dirs while with parallelism, sometimes it fails because this directory is missing
 	mkdir -p $(@D)/build/libretro/obj/x64/libretro/src/osd/libretro/libretro-internal
 
@@ -52,26 +55,6 @@ define LIBRETRO_MAME_BUILD_CMDS
 		TARGET=mame SUBTARGET=tiny \
 		NO_USE_PORTAUDIO=1 NO_X11=1 USE_SDL=0 \
 		USE_QTDEBUG=0 DEBUG=0 IGNORE_GIT=1 MPARAM=""
-
-	# remove bfm* drivers to save space
-	find $(@D)/src/mame/bfm/ -type f | xargs grep -e 'GAME(\|GAMEL' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" > $(@D)/games.list
-	find $(@D)/src/mame/bfm/ -type f | xargs sed -i '/GAME[L]*(/d'
-	# remove skeleton drivers to save space
-	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 1 -d ":" | sort -u > $(@D)/machines1.list
-	find $(@D)/src/mame/ -type f | xargs grep -e 'MACHINE_IS_SKELETON\|MACHINE_MECHANICAL\|MACHINE_FLAGS_MECHANICAL' | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list
-	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_IS_SKELETON/p;/setname.*MACHINE_IS_SKELETON/p;/MACHINE_IS_SKELETON/d' $$file ; done
-	# do not remove '#define GAME_FLAGS' and other definition lines
-	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_MECHANICAL/p;/setname.*MACHINE_MECHANICAL/p;/MACHINE_MECHANICAL/d' $$file ; done
-	cat $(@D)/machines1.list | while read file ; do sed -i '/define.*MACHINE_FLAGS_MECHANICAL/p;/setname.*MACHINE_FLAGS_MECHANICAL/p;/MACHINE_FLAGS_MECHANICAL/d' $$file ; done
-	# remove remaining MECHANICAL games using 'GAME_FLAGS' label
-	find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_FLAGS.*MACHINE_MECHANICAL' | cut -f 1 -d ":" | sort -u > $(@D)/machines2.list
-	cat $(@D)/machines2.list | while read file ; do grep 'GAME_FLAGS' $$file | grep -v 'define' | grep -v 'setname' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
-	cat $(@D)/machines2.list | while read file ; do sed -i '/define GAME_FLAGS/p;/setname.*GAME_FLAGS/p;/GAME_FLAGS/d' $$file ; done
-        # remove remaining MECHANICAL games using 'GAME_CUSTOM' label
-        find $(@D)/src/mame/ -type f | xargs grep -e 'GAME_CUSTOM' | cut -f 1 -d ":" | sort -u > $(@D)/machines3.list
-        cat $(@D)/machines3.list | while read file ; do grep 'GAME_CUSTOM' $$file | grep 'CRC' | grep 'SHA' | cut -f 2 -d "," | sort -bu | tr -d "[:blank:]" >> $(@D)/games.list; done
-	# Remove reference to skeleton|mechanical drivers in mame.lst
-	cat $(@D)/games.list | while read file ; do sed -i /$$file/d $(@D)/src/mame/mame.lst ; done
 
 	# Compile
 	CCACHE_SLOPPINESS="pch_defines,time_macros,include_file_ctime,include_file_mtime" \

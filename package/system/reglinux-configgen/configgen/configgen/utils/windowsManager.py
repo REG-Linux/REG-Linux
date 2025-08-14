@@ -6,9 +6,9 @@ for gaming and application environments. It handles compositor lifecycle managem
 and proper environment variable configuration for both Wayland and X11 compatibility.
 """
 
-import os
-import subprocess
-import time
+from os import environ, path
+from subprocess import Popen, TimeoutExpired, run
+from time import sleep
 from typing import Optional
 
 from utils.logger import get_logger
@@ -16,7 +16,7 @@ eslog = get_logger(__name__)
 
 # Global state tracking variables
 sway_launched = False  # Tracks if Sway compositor is running
-sway_process: Optional[subprocess.Popen] = None  # Holds the Sway process reference
+sway_process: Optional[Popen] = None  # Holds the Sway process reference
 gamescope_launched = False  # Reserved for future Gamescope implementation
 
 def start_sway(generator, system) -> bool:
@@ -31,7 +31,7 @@ def start_sway(generator, system) -> bool:
         bool: True if Sway started successfully, False otherwise
 
     Raises:
-        subprocess.SubprocessError: If the Sway process fails to start
+        SubprocessError: If the Sway process fails to start
     """
     global sway_launched, sway_process
 
@@ -40,13 +40,13 @@ def start_sway(generator, system) -> bool:
         return True
 
     try:
-        sway_process = subprocess.Popen(
+        sway_process = Popen(
             [
                 "/usr/bin/sway",
                 "-c", "/etc/sway/launchconfig"
             ],
             env={
-                **os.environ.copy(),
+                **environ.copy(),
                 "WLR_LIBINPUT_NO_DEVICES": "1"  # Set as environment variable
             },
             start_new_session=True
@@ -55,7 +55,7 @@ def start_sway(generator, system) -> bool:
         eslog.debug("=======>> Sway process started with PID: %d", sway_process.pid)
 
         # Configure environment variables for Wayland compatibility
-        os.environ.update({
+        environ.update({
             "WAYLAND_DISPLAY": "wayland-1",
             "XDG_RUNTIME_DIR": "/var/run",
             "SWAYSOCK": "/var/run/sway-ipc.0.sock",
@@ -66,13 +66,13 @@ def start_sway(generator, system) -> bool:
 
         # Handle X11 fallback if required by the generator
         if generator.requiresX11():
-            os.environ.update({
+            environ.update({
                 "DISPLAY": ":0",
                 "QT_QPA_PLATFORM": "xcb"
             })
 
         # Verify process started successfully
-        time.sleep(1)  # Brief pause to allow initialization
+        sleep(1)  # Brief pause to allow initialization
         if sway_process.poll() is not None:
             eslog.error("Sway process terminated immediately after launch")
             return False
@@ -107,7 +107,7 @@ def stop_sway(generator, system) -> bool:
 
     try:
         # Send exit command to Sway
-        subprocess.run(["swaymsg", "exit"], check=True, timeout=5)
+        run(["swaymsg", "exit"], check=True, timeout=5)
 
         # Wait for process termination
         if sway_process:
@@ -116,22 +116,22 @@ def stop_sway(generator, system) -> bool:
 
         # Clean up environment variables
         for var in ["WAYLAND_DISPLAY", "XDG_RUNTIME_DIR", "SWAYSOCK", "SDL_VIDEODRIVER"]:
-            os.environ.pop(var, None)
+            environ.pop(var, None)
 
         # Reset remaining environment settings
-        os.environ.update({
+        environ.update({
             "XDG_SESSION_TYPE": "drm",
             "QT_QPA_PLATFORM": "xcb"
         })
 
         if generator.requiresX11():
-            os.environ.pop("DISPLAY", None)
+            environ.pop("DISPLAY", None)
 
         sway_launched = False
         eslog.info("Sway compositor stopped successfully")
         return True
 
-    except subprocess.TimeoutExpired:
+    except TimeoutExpired:
         eslog.error("Timeout while waiting for Sway to exit")
         return False
     except Exception as e:
@@ -149,7 +149,7 @@ def start_compositor(generator, system) -> None:
     Raises:
         RuntimeError: If no supported compositor is found or fails to start
     """
-    if os.path.exists("/usr/bin/sway"):
+    if path.exists("/usr/bin/sway"):
         if not start_sway(generator, system):
             raise RuntimeError("Failed to start Sway compositor - check logs for details")
         return

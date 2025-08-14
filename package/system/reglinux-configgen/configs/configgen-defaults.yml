@@ -113,9 +113,6 @@ cannonball:
 cavestory:
   emulator: libretro
   core:     nxengine
-cave3rd:
-  emulator: demul
-  core:     demul
 cdi:
   emulator: mame
   core:     mame
@@ -211,9 +208,6 @@ fmtowns:
 fury:
   emulator: eduke32
   core:     fury
-gaelco:
-  emulator: demul
-  core:     demul
 gamate:
   emulator: libretro
   core:     mame
@@ -263,9 +257,6 @@ hcl:
   core:     hcl
   options:
     bezel: none
-hikaru:
-  emulator: demul
-  core:     demul
 hurrican:
   emulator: hurrican
   core:     hurrican
@@ -318,11 +309,6 @@ megadrive:
 megaduck:
   emulator: libretro
   core:     sameduck
-model2:
-  emulator: model2emu
-  core:     model2emu
-  options:
-    hud_support: false
 model3:
   emulator: supermodel
   core:     supermodel
@@ -630,9 +616,6 @@ vc4000:
 vectrex:
   emulator: libretro
   core:     vecx
-vgmplay:
-  emulator: libretro
-  core:     mame
 videopacplus:
   emulator: libretro
   core:     o2em
@@ -656,16 +639,6 @@ wii:
 wiiu:
   emulator: cemu
   core:     cemu
-windows:
-  emulator: wine
-  core:     ge-custom
-  options:
-    hud_support: false
-windows_installers:
-  emulator: wine
-  core:     ge-custom
-  options:
-    hud_support: false
 wswan:
   emulator: libretro
   core:     mednafen_wswan

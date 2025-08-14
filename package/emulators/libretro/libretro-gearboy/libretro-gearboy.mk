@@ -3,8 +3,8 @@
 # libretro-gearboy
 #
 ################################################################################
-# Version: Release on Jul 8, 2025
-LIBRETRO_GEARBOY_VERSION = 3.7.1
+# Version: Release on Aug 10, 2025
+LIBRETRO_GEARBOY_VERSION = 3.7.2
 LIBRETRO_GEARBOY_SITE = $(call github,drhelius,Gearboy,$(LIBRETRO_GEARBOY_VERSION))
 LIBRETRO_GEARBOY_LICENSE = GPLv3
 

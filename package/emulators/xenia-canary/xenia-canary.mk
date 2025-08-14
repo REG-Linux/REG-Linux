@@ -3,8 +3,8 @@
 # xenia-canary
 #
 ################################################################################
-# Version: Commits on Jul 29, 2025
-XENIA_CANARY_VERSION = 43d206d2e99ada38804fa68c20def23bdf6e1c3f
+# Version: Commits on Aug 3, 2025
+XENIA_CANARY_VERSION = 37e3fe9eb6198dab01416a497eb7c8b3e095ac40
 XENIA_CANARY_SITE = https://github.com/xenia-canary/xenia-canary
 XENIA_CANARY_SITE_METHOD = git
 XENIA_CANARY_GIT_SUBMODULES = YES
@@ -12,13 +12,6 @@ XENIA_CANARY_LICENSE = BSD
 XENIA_CANARY_LICENSE_FILE = LICENSE
 
 XENIA_CANARY_DEPENDENCIES = python-toml llvm clang libgtk3 sdl2 host-sdl2
-# Extra for WIP posix stack walker
-#XENIA_CANARY_DEPENDENCIES += libunwind binutils
-
-# Hack for d3d12 WIP
-#XENIA_CANARY_DEPENDENCIES += vkd3d-proton dxvk pevents
-#MESON="$(HOST_DIR)/bin/meson" \
-#NINJA="$(HOST_DIR)/bin/ninja" \
 
 define XENIA_CANARY_CONFIGURE_CMDS
 	mkdir -p $(@D) && cd $(@D) && \
@@ -28,7 +21,7 @@ define XENIA_CANARY_CONFIGURE_CMDS
 	SDL2CONFIG="$(HOST_DIR)/bin/sdl2-config" \
 	CMAKE_MAKE_PROGRAM="$(HOST_DIR)/bin/ninja" \
 	CC="$(HOST_DIR)/bin/clang" \
-	./xb premake
+	./xenia-build.py premake
 endef
 
 define XENIA_CANARY_BUILD_CMDS
@@ -40,7 +33,7 @@ define XENIA_CANARY_BUILD_CMDS
 	NINJA="$(HOST_DIR)/bin/ninja" \
 	CC="$(HOST_DIR)/bin/clang" \
 	CXX="$(HOST_DIR)/bin/clang++" \
-	./xb build --config release
+	./xenia-build.py build --config release
 endef
 
 define XENIA_CANARY_INSTALL_TARGET_CMDS
@@ -71,16 +64,5 @@ define XENIA_CANARY_POST_PROCESS
 endef
 
 XENIA_CANARY_POST_INSTALL_TARGET_HOOKS = XENIA_CANARY_POST_PROCESS
-
-# Hack for d3d12 patch
-#define XENIA_CANARY_FIX_SUBMODULES
-#	rm -f $(@D)/third_party/vkd3d-proton
-#	rm -f $(@D)/third_party/dxvk
-#	$(BR2_GIT) -C $(@D)/third_party/ clone https://github.com/HansKristian-Work/vkd3d-proton.git
-#	$(BR2_GIT) -C $(@D)/third_party/ clone https://github.com/doitsujin/dxvk.git
-#	$(BR2_GIT) -C $(@D)/third_party/ clone https://github.com/neosmart/pevents.git
-#	cd $(@D)/third_party/vkd3d-proton && patch -p1 < $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/xenia-canary/xxx-vkd3d-proton.diff
-#endef
-#XENIA_CANARY_PRE_CONFIGURE_HOOKS += XENIA_CANARY_FIX_SUBMODULES
 
 $(eval $(generic-package))
