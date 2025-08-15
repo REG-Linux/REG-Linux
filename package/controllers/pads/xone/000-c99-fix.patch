@@ -1,0 +1,86 @@
+--- a/transport/dongle.c	2025-08-09 11:40:03.000000000 +0200
++++ b/transport/dongle.c	2025-08-15 19:06:52.543039953 +0200
+@@ -893,9 +893,10 @@
+ {
+ 	struct device *dev = dongle->mt.dev;
+ 	int err;
++	int i;
+ 
+ 	dev_dbg(dev, "%s: trying to load firmware %s\n", __func__, fwname);
+-	for (int i = 0; i < XONE_DONGLE_FW_REQ_RETRIES; ++i) {
++	for (i = 0; i < XONE_DONGLE_FW_REQ_RETRIES; ++i) {
+ 		if (dongle->fw_state == XONE_DONGLE_FW_STATE_STOP_LOADING) {
+ 			pr_debug("%s: Stopping firmware load on demand", __func__);
+ 			return 1;
+--- a/transport/mt76.c	2025-08-09 11:40:03.000000000 +0200
++++ b/transport/mt76.c	2025-08-15 19:21:29.798543640 +0200
+@@ -719,7 +719,8 @@
+ 
+ static int xone_mt76_mac_looks_counterfeit(const u8* addr)
+ {
+-	for (int i = 0; i < ARRAY_SIZE(xone_counterfeit_macs); i++) {
++	int i;
++	for (i = 0; i < ARRAY_SIZE(xone_counterfeit_macs); i++) {
+ 		if (ether_addr_equal(addr, xone_counterfeit_macs[i]))
+ 			return true;
+ 	}
+--- a/driver/gamepad.c	2025-08-15 22:29:14.560101534 +0200
++++ b/driver/gamepad.c	2025-08-15 22:30:50.965566502 +0200
+@@ -347,14 +347,17 @@
+ static int gip_gamepad_op_firmware(struct gip_client *client, void *data,
+ 				   u32 len)
+ {
++	struct gip_gamepad *gamepad;
++	struct input_dev *dev;
++
+ 	// First, ensure the data is of the correct size.
+ 	struct gip_gamepad_pkt_firmware *pkt = data;
+ 	if (len < sizeof(*pkt))
+ 		return -EINVAL;
+ 
+ 	// Grab our controller
+-	struct gip_gamepad *gamepad = dev_get_drvdata(&client->dev);
+-	struct input_dev *dev = gamepad->input.dev;
++	gamepad = dev_get_drvdata(&client->dev);
++	dev = gamepad->input.dev;
+ 
+ 	input_report_key(dev, BTN_TRIGGER_HAPPY5, pkt->paddles & GIP_GP_BTN_P1);
+ 	input_report_key(dev, BTN_TRIGGER_HAPPY6, pkt->paddles & GIP_GP_BTN_P2);
+@@ -371,6 +374,8 @@
+ 	struct gip_gamepad_pkt_input *pkt = data;
+ 	struct input_dev *dev = gamepad->input.dev;
+ 	u16 buttons;
++	int report_paddles = 0, series_1 = 0;
++	u8 paddles;
+ 	u8 share_offset = GIP_GP_BTN_SHARE_OFFSET;
+ 
+ 	if (len < sizeof(*pkt))
+@@ -412,9 +417,6 @@
+ 	 * separate packet and handeled by gip_gamepad_op_firmware().
+ 	 */
+ 
+-	int report_paddles = 0, series_1 = 0;
+-	u8 paddles;
+-
+ 	// Assume the controller might not send profile data, check length
+ 	if (gamepad->paddle_support == PADDLE_ELITE2_510 && len > 18) {
+ 		/*
+--- a/driver/headset.c	2025-08-09 11:40:03.000000000 +0200
++++ b/driver/headset.c	2025-08-15 22:32:34.336747131 +0200
+@@ -343,14 +343,14 @@
+ 						   work_power_on);
+ 	struct gip_client *client = headset->client;
+ 	const struct device *dev = &client->adapter->dev;
+-	int err;
++	int err, i;
+ 
+ 	dev_dbg(dev, "Headset vendor:  0x%04x\n", client->hardware.vendor);
+ 	dev_dbg(dev, "Headset product: 0x%04x\n", client->hardware.product);
+ 
+ 	/* Check if headset needs authentication before receiving audio samples */
+ 	headset->got_authenticated = true;
+-	for (int i = 0; i < ARRAY_SIZE(GIP_HS_CHECK_AUTH_IDS); i++)
++	for (i = 0; i < ARRAY_SIZE(GIP_HS_CHECK_AUTH_IDS); i++)
+ 		if (client->hardware.vendor == GIP_HS_CHECK_AUTH_IDS[i].vendor &&
+ 		    client->hardware.product == GIP_HS_CHECK_AUTH_IDS[i].product) {
+ 			headset->got_authenticated = false;
