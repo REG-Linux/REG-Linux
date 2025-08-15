@@ -1,134 +1,71 @@
 from generators.Generator import Generator
 from Command import Command
-import configparser
-import os
-import shutil
-from systemFiles import CONF
-
-fout2ConfigDir = CONF + "/fallout2"
-fout2ConfigFile = fout2ConfigDir + "/fallout2.cfg"
-fout2IniFile = fout2ConfigDir + "/f2_res.ini"
-fout2RomDir = "/userdata/roms/fallout2-ce"
-fout2SrcConfig = fout2RomDir + "/fallout2.cfg"
-fout2SrcIni = fout2RomDir + "/f2_res.ini"
-fout2ExeFile = fout2RomDir + "/fallout2-ce"
-fout2SourceFile = '/usr/bin/fallout2-ce'
+from configparser import ConfigParser
+from os import path, makedirs, chdir
+from shutil import copy
+from .fallout2Config import setFalloutConfig, setFalloutIniConfig, FALLOUT_CONFIG_DIR, FALLOUT_EXE_SOURCE_PATH, FALLOUT_BIN_PATH, FALLOUT_CONFIG_PATH, FALLOUT_CONFIG_INI, FALLOUT_ROMS_DIR, FALLOUT_CONFIG_SOURCE_PATH, FALLOUT_CONFIG_INI_SOURCE_PATH
+from controllers import generate_sdl_controller_config
 
 class Fallout2Generator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
         # Check if the directories exist, if not create them
-        if not os.path.exists(fout2ConfigDir):
-            os.makedirs(fout2ConfigDir)
+        if not path.exists(FALLOUT_CONFIG_DIR):
+            makedirs(FALLOUT_CONFIG_DIR)
 
         # Copy latest binary to the rom directory
-        if not os.path.exists(fout2ExeFile):
-            shutil.copy(fout2SourceFile, fout2ExeFile)
+        if not path.exists(FALLOUT_EXE_SOURCE_PATH):
+            copy(FALLOUT_BIN_PATH, FALLOUT_EXE_SOURCE_PATH)
         else:
-            source_version = os.path.getmtime(fout2SourceFile)
-            destination_version = os.path.getmtime(fout2ExeFile)
+            source_version = path.getmtime(FALLOUT_BIN_PATH)
+            destination_version = path.getmtime(FALLOUT_EXE_SOURCE_PATH)
             if source_version > destination_version:
-                shutil.copy(fout2SourceFile, fout2ExeFile)
+                copy(FALLOUT_BIN_PATH, FALLOUT_EXE_SOURCE_PATH)
 
         # Copy cfg file to the config directory
-        if not os.path.exists(fout2ConfigFile):
-            if os.path.exists(fout2SrcConfig):
-                shutil.copy(fout2SrcConfig , fout2ConfigFile)
+        if not path.exists(FALLOUT_CONFIG_PATH):
+            if path.exists(FALLOUT_CONFIG_SOURCE_PATH):
+                copy(FALLOUT_CONFIG_SOURCE_PATH , FALLOUT_CONFIG_PATH)
 
         # Now copy the ini file to the config directory
-        if not os.path.exists(fout2IniFile):
-            if os.path.exists(fout2SrcIni):
-                shutil.copy(fout2SrcIni , fout2IniFile)
+        if not path.exists(FALLOUT_CONFIG_INI):
+            if path.exists(FALLOUT_CONFIG_INI_SOURCE_PATH):
+                copy(FALLOUT_CONFIG_INI_SOURCE_PATH , FALLOUT_CONFIG_INI)
 
-        ## Configure
+        # CFG Configuration
+        falloutConfig = ConfigParser()
+        falloutConfig.optionxform=lambda optionstr: str(optionstr)
+        if path.exists(FALLOUT_CONFIG_PATH):
+            falloutConfig.read(FALLOUT_CONFIG_PATH)
 
-        ## CFG Configuration
-        fout2Cfg = configparser.ConfigParser()
-        fout2Cfg.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(fout2ConfigFile):
-            fout2Cfg.read(fout2ConfigFile)
+        setFalloutConfig(falloutConfig, system)
 
-        if not fout2Cfg.has_section("debug"):
-            fout2Cfg.add_section("debug")
-        if not fout2Cfg.has_section("preferences"):
-            fout2Cfg.add_section("preferences")
-        if not fout2Cfg.has_section("sound"):
-            fout2Cfg.add_section("sound")
-        if not fout2Cfg.has_section("system"):
-            fout2Cfg.add_section("system")
-
-        # fix linux path issues
-        fout2Cfg.set("sound", "music_path1", "sound/music/")
-        fout2Cfg.set("sound", "music_path2", "sound/music/")
-
-        #fout2Cfg.set("system", "critter_dat", "CRITTER.DAT")
-        #fout2Cfg.set("system", "critter_patches", "DATA")
-        #fout2Cfg.set("system", "master_dat", "MASTER.DAT")
-        #fout2Cfg.set("system", "master_patches", "DATA")
-
-        if system.isOptSet("fout2_game_difficulty"):
-            fout2Cfg.set("preferences", "game_difficulty", system.config["fout2_game_difficulty"])
-        else:
-            fout2Cfg.set("preferences", "game_difficulty", "1")
-
-        if system.isOptSet("fout2_combat_difficulty"):
-            fout2Cfg.set("preferences", "combat_difficulty", system.config["fout2_combat_difficulty"])
-        else:
-            fout2Cfg.set("preferences", "combat_difficulty", "1")
-
-        if system.isOptSet("fout2_violence_level"):
-            fout2Cfg.set("preferences", "violence_level", system.config["fout2_violence_level"])
-        else:
-            fout2Cfg.set("preferences", "violence_level", "2")
-
-        if system.isOptSet("fout2_subtitles"):
-            fout2Cfg.set("preferences", "subtitles", system.config["fout2_subtitles"])
-        else:
-            fout2Cfg.set("preferences", "subtitles", "0")
-
-        if system.isOptSet("fout2_language"):
-            fout2Cfg.set("system", "language", system.config["fout2_language"])
-        else:
-            fout2Cfg.set("system", "language", "english")
-
-        with open(fout2ConfigFile, "w") as configfile:
-            fout2Cfg.write(configfile)
+        with open(FALLOUT_CONFIG_PATH, "w") as configfile:
+            falloutConfig.write(configfile)
 
         ## INI Configuration
-        fout2Ini = configparser.ConfigParser()
-        fout2Ini.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(fout2IniFile):
-            fout2Ini.read(fout2IniFile)
+        falloutIniConfig = ConfigParser()
+        falloutIniConfig.optionxform=lambda optionstr: str(optionstr)
+        if path.exists(FALLOUT_CONFIG_INI):
+            falloutIniConfig.read(FALLOUT_CONFIG_INI)
 
-        # [MAIN]
-        if not fout2Ini.has_section("MAIN"):
-            fout2Ini.add_section("MAIN")
+        setFalloutIniConfig(falloutIniConfig, gameResolution)
 
-        # Note: This will increase the minimum resolution to from 640x480 to 1280x960.
-        if gameResolution["width"] >= 1280 and gameResolution["height"] >= 960:
-            fout2Ini.set("MAIN", "SCALE_2X", "1")
-        else:
-            fout2Ini.set("MAIN", "SCALE_2X", "0")
-        fout2Ini.set("MAIN", "SCR_WIDTH", format(gameResolution["width"]))
-        fout2Ini.set("MAIN", "SCR_HEIGHT", format(gameResolution["height"]))
-
-        # fullscreen
-        fout2Ini.set("MAIN", "WINDOWED", "0")
-
-        # fix path
-        fout2Ini.set("MAIN", "f2_res_patches", "data/")
-
-        with open(fout2IniFile, "w") as configfile:
-            fout2Ini.write(configfile)
+        with open(FALLOUT_CONFIG_INI, "w") as configfile:
+            falloutIniConfig.write(configfile)
 
         # IMPORTANT: Move dir before executing
-        os.chdir(fout2RomDir)
+        chdir(FALLOUT_ROMS_DIR)
 
         ## Setup the command
-        commandArray = ["fallout2-ce"]
+        commandArray = [FALLOUT_BIN_PATH]
 
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
