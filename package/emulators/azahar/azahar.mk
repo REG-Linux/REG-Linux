@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-AZAHAR_VERSION = 2123-rc2
+AZAHAR_VERSION = 2123
 AZAHAR_SITE = https://github.com/azahar-emu/azahar.git
 AZAHAR_SITE_METHOD = git
 AZAHAR_GIT_SUBMODULES=YES
