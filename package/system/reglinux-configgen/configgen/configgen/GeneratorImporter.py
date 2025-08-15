@@ -34,7 +34,6 @@ EMULATOR_MAPPING = {
     'easyrpg': ('generators.easyrpg.easyrpgGenerator', 'EasyRPGGenerator'),
     'ecwolf': ('generators.ecwolf.ecwolfGenerator', 'ECWolfGenerator'),
     'eduke32': ('generators.eduke32.eduke32Generator', 'EDuke32Generator'),
-    'etekwar': ('generators.etekwar.etekwarGenerator', 'EtekWarGenerator'),
     'etlegacy': ('generators.etlegacy.etlegacyGenerator', 'ETLegacyGenerator'),
     'fallout1-ce': ('generators.fallout1.fallout1Generator', 'Fallout1Generator'),
     'fallout2-ce': ('generators.fallout2.fallout2Generator', 'Fallout2Generator'),
