@@ -1,23 +1,20 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import controllers as controllersConfig
+from os import path, makedirs
 from settings.unixSettings import UnixSettings
-from systemFiles import CONF, BIOS
-from . import gsplusConfig
+from controllers import generate_sdl_controller_config
+from .gsplusConfig import GSPLUS_CONFIG_DIR, GSPLUS_CONFIG_PATH, GSPLUS_BIN_PATH, GSPLUS_BIOS_DIR
 
-CONFIGDIR  = CONF + '/GSplus'
-CONFIGFILE = CONFIGDIR + '/config.txt'
 
 class GSplusGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        if not os.path.exists(CONFIGDIR):
-            os.makedirs(CONFIGDIR)
+        if not path.exists(GSPLUS_CONFIG_DIR):
+            makedirs(GSPLUS_CONFIG_DIR)
 
-        config = UnixSettings(CONFIGFILE, separator=' ')
+        config = UnixSettings(GSPLUS_CONFIG_PATH, separator=' ')
+        rombase=path.basename(rom)
+        romext=path.splitext(rombase)[1]
 
-        rombase=os.path.basename(rom)
-        romext=os.path.splitext(rombase)[1]
         if (romext.lower() in ['.dsk', '.do', '.nib']):
             config.save("s6d1", rom)
             config.save("s5d1", '')
@@ -90,14 +87,13 @@ class GSplusGenerator(Generator):
             config.save("bram3[d0]", '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00')
             config.save("bram3[e0]", '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00')
             config.save("bram3[f0]", '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00')
-        config.save("g_cfg_rom_path", BIOS)
-        # config.save("g_limit_speed", "0")
-
+        config.save("g_cfg_rom_path", GSPLUS_BIOS_DIR)
         config.write()
-        commandArray = [gsplusConfig.gsplusBin, "-fullscreen"]
+
+        commandArray = [GSPLUS_BIN_PATH, "-fullscreen"]
 
         return Command(
                     array=commandArray,
                     env={
-                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
                     })
