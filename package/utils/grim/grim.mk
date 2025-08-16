@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-GRIM_VERSION = 1.4.1
+GRIM_VERSION = 1.5.0
 GRIM_SOURCE = grim-$(GRIM_VERSION).tar.gz
-GRIM_SITE = https://git.sr.ht/~emersion/grim/refs/download/v$(GRIM_VERSION)
+GRIM_SITE = https://gitlab.freedesktop.org/emersion/grim/-/releases/v$(GRIM_VERSION)/downloads
 GRIM_LICENSE = MIT
 GRIM_LICENSE_FILES = LICENSE
 

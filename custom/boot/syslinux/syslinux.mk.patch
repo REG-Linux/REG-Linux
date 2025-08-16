@@ -1,8 +1,8 @@
 diff --git a/boot/syslinux/syslinux.mk b/boot/syslinux/syslinux.mk
-index cc52c49aee..5d09a1886f 100644
+index 084acc398e..f2b0ba7d5d 100644
 --- a/boot/syslinux/syslinux.mk
 +++ b/boot/syslinux/syslinux.mk
-@@ -87,22 +87,27 @@ endef
+@@ -98,22 +98,26 @@ endef
  # That 'syslinux' binary is an installer actually built for the target.
  # However, buildroot makes no usage of it, so better delete it than have it
  # installed at the wrong place
@@ -10,10 +10,9 @@ index cc52c49aee..5d09a1886f 100644
 -	rm -rf $(HOST_DIR)/bin/syslinux
 -endef
 -SYSLINUX_POST_INSTALL_TARGET_HOOKS += SYSLINUX_POST_INSTALL_CLEANUP
-+#
-+# batocera: patch added to build syslinux tool for the host
++# reglinux: patch added to build syslinux tool for the host
 +# define SYSLINUX_POST_INSTALL_CLEANUP
-+# 	rm -rf $(HOST_DIR)/bin/syslinux
++#	rm -rf $(HOST_DIR)/bin/syslinux
 +# endef
 +# SYSLINUX_POST_INSTALL_TARGET_HOOKS += SYSLINUX_POST_INSTALL_CLEANUP
  
@@ -21,21 +20,21 @@ index cc52c49aee..5d09a1886f 100644
  SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_PXELINUX) += bios/core/pxelinux.bin
  SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_MBR) += bios/mbr/mbr.bin
  SYSLINUX_IMAGES-$(BR2_TARGET_SYSLINUX_EFI) += $(SYSLINUX_EFI_BITS)/efi/syslinux.efi
-+# batocera install gptmbr.bin
++# reglinux install gptmbr.bin
 +SYSLINUX_IMAGES-y += bios/mbr/gptmbr.bin
  
  SYSLINUX_C32 = $(call qstrip,$(BR2_TARGET_SYSLINUX_C32))
  
- # We install the c32 modules from the host-installed tree, where they
- # are all neatly installed in a single location, while they are
+ # We install the c32 modules from the temporarily installed tree, where
+ # they are all neatly installed in a single location, while they are
  # scattered around everywhere in the build tree.
 -define SYSLINUX_INSTALL_IMAGES_CMDS
-+# REG we need to have custom INSTALL_IMAGES after INSTALL_TARGET for parallel build
++# reglinux we need to have custom INSTALL_IMAGES after INSTALL_TARGET for parallel build
 +define SYSLINUX_INSTALL_IMAGES
  	for i in $(SYSLINUX_IMAGES-y); do \
  		$(INSTALL) -D -m 0755 $(@D)/$$i $(BINARIES_DIR)/syslinux/$${i##*/}; \
  	done
-@@ -111,5 +116,6 @@ define SYSLINUX_INSTALL_IMAGES_CMDS
+@@ -122,5 +126,6 @@ define SYSLINUX_INSTALL_IMAGES_CMDS
  			$(BINARIES_DIR)/syslinux/$${i}; \
  	done
  endef

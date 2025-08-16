@@ -1,15 +1,16 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import shutil
+from os import path, makedirs
+from shutil import copy
 from systemFiles import CONF
+from controllers import generate_sdl_controller_config
 
 class ETLegacyGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
         etLegacyDir = "/userdata/roms/etlegacy/legacy"
-        etLegacyFile = "/legacy_2.82-dirty.pk3"
+        etLegacyFile = "/legacy_2.83-dirty.pk3"
         etLegacySource = "/usr/share/etlegacy" + etLegacyFile
         etLegacyDest = etLegacyDir + etLegacyFile
 
@@ -19,8 +20,8 @@ class ETLegacyGenerator(Generator):
         config_dir = CONF + "/etlegacy/legacy"
         config_file_path = config_dir + "/etconfig.cfg"
 
-        if not os.path.exists(config_dir):
-            os.makedirs(config_dir)
+        if not path.exists(config_dir):
+            makedirs(config_dir)
 
         # Define the options to add or modify
         options_to_set = {
@@ -41,7 +42,7 @@ class ETLegacyGenerator(Generator):
             options_to_set["seta ui_cl_lang"] = "en"
 
         # Check if the file exists
-        if os.path.isfile(config_file_path):
+        if path.isfile(config_file_path):
             with open(config_file_path, 'r') as config_file:
                 lines = config_file.readlines()
 
@@ -65,21 +66,25 @@ class ETLegacyGenerator(Generator):
                     config_file.write(f"{key} \"{value}\"\n")
 
         # copy mod files needed
-        if not os.path.exists(etLegacyDir):
-            os.makedirs(etLegacyDir)
+        if not path.exists(etLegacyDir):
+            makedirs(etLegacyDir)
 
         # copy latest mod file to the rom directory
-        if not os.path.exists(etLegacyDest):
-            shutil.copy(etLegacySource, etLegacyDest)
+        if not path.exists(etLegacyDest):
+            copy(etLegacySource, etLegacyDest)
         else:
-            source_version = os.path.getmtime(etLegacySource)
-            destination_version = os.path.getmtime(etLegacyDest)
+            source_version = path.getmtime(etLegacySource)
+            destination_version = path.getmtime(etLegacyDest)
             if source_version > destination_version:
-                shutil.copy(etLegacySource, etLegacyDest)
+                copy(etLegacySource, etLegacyDest)
 
         commandArray = ["etl"]
 
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
