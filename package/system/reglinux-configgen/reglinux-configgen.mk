@@ -125,9 +125,10 @@ define REGLINUX_CONFIGGEN_CONFIGS
 endef
 
 define REGLINUX_CONFIGGEN_BINS
-    chmod a+x $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py
+	chmod a+x $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py
 	(mkdir -p $(TARGET_DIR)/usr/bin/ && cd $(TARGET_DIR)/usr/bin/ && \
-	    ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher)
+		ln -sf /usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/emulatorlauncher.py emulatorlauncher)
+	if test "$(BR2_PACKAGE_SYSTEM_TARGET_CHA)" = "y" ; then patch "$(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/site-packages/configgen/generators/libretro/libretroConfig.py" < "$(CONFIGGEN_DIR)/force-CHA1-to-Player1-patch-for-CHA"; fi
 endef
 
 define REGLINUX_CONFIGGEN_ES_HOOKS
