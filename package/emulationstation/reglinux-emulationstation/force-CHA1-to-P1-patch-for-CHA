@@ -1,6 +1,6 @@
 --- a/emulationstation-standalone
 +++ b/emulationstation-standalone
-@@ -197,6 +197,23 @@
+@@ -197,6 +197,21 @@
  # Initialize system screen checker
  init_system
  
@@ -12,11 +12,9 @@
 +    case $ID_MODEL in
 +        CHA1)
 +            sed -i "s|\"INPUT P1PATH\".*|\"INPUT P1PATH\" value\=\"$DEVPATH\" /\>|" /userdata/system/configs/emulationstation/es_settings.cfg
-+            sed -i "s|global.retroarch.input_player1_joypad_index.*|global.retroarch.input_player1_joypad_index=${JOYINDEX: -1}|" /userdata/system/system.conf
 +        ;;
 +        CHA2)
 +            sed -i "s|\"INPUT P2PATH\".*|\"INPUT P2PATH\" value\=\"$DEVPATH\" /\>|" /userdata/system/configs/emulationstation/es_settings.cfg
-+            sed -i "s|global.retroarch.input_player2_joypad_index.*|global.retroarch.input_player2_joypad_index=${JOYINDEX: -1}|" /userdata/system/system.conf
 +        ;;
 +    esac
 +done
