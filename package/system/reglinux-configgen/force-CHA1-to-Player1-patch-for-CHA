@@ -1,0 +1,17 @@
+--- a/libretroConfig.py
++++ b/libretroConfig.py
+@@ -240,7 +240,13 @@
+     # Input configuration
+     retroarchConfig['input_joypad_driver'] = 'sdl2'
+     retroarchConfig['input_driver'] = 'udev'                    # driver for mouse/keyboard. udev required for guns.
+-    retroarchConfig['input_max_users'] = "16"                   # Allow up to 16 players
++    retroarchConfig['input_max_users'] = "4"                   # Allow up to 4 players
++
++    # Force CHA1 joystick to Player 1 and CHA2 to Player 2
++    retroarchConfig['input_player1_device_reservation_type'] = '"2"'
++    retroarchConfig['input_player1_reserved_device'] = '"1c5a:0024 Capcom Home Arcade Controller 1"'
++    retroarchConfig['input_player2_device_reservation_type'] = '"2"'
++    retroarchConfig['input_player2_reserved_device'] = '"1c5b:0025 Capcom Home Arcade Controller 2"'
+ 
+     retroarchConfig['input_libretro_device_p1'] = '1'           # Default devices choices
+     retroarchConfig['input_libretro_device_p2'] = '1'
