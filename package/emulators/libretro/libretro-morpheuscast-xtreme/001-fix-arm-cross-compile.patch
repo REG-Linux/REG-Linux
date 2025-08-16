@@ -1,0 +1,37 @@
+--- a/Makefile
++++ b/Makefile
+@@ -15,7 +15,6 @@
+ HAVE_GL3         ?= 0
+ FORCE_GLES       ?= 0
+ STATIC_LINKING   ?= 0
+-HAVE_TEXUPSCALE  ?= 1
+ HAVE_OPENMP      ?= 0
+ HAVE_CHD         ?= 1
+ HAVE_CLANG       ?= 0
+@@ -223,7 +222,7 @@
+ # ARM64 TRIMUI BRICK 
+ else ifeq ($(platform), brick)
+  	EXT ?= so
+-	CC_AS    = ${CC_PREFIX}${CC} #The ngen_arm.S must be compiled with gcc
++	CC_AS    = ${CC} #The ngen_arm.S must be compiled with gcc
+ 	TARGET := $(TARGET_NAME)_libretro.$(EXT)
+ 	SHARED += -shared -Wl,--version-script=link.T
+ 	LDFLAGS +=  -Wl,--no-undefined
+@@ -397,7 +396,7 @@
+ 	TARGET := $(TARGET_NAME)_libretro.$(EXT)
+ 	SHARED += -shared -Wl,--version-script=link.T
+ 	LDFLAGS +=  -Wl,--no-undefined
+-	CC_AS    = ${CC_PREFIX}${CC} #The ngen_arm.S must be compiled with gcc, not as
++	CC_AS    = ${CC} #The ngen_arm.S must be compiled with gcc, not as
+ 	fpic = -fPIC
+ 	LIBS += -lrt
+ 	ARM_FLOAT_ABI_HARD = 0
+@@ -1125,7 +1124,7 @@
+ PREFIX        ?= /usr/local
+ 
+ ifneq (,$(findstring arm, $(ARCH)))
+-	CC_AS    = ${CROSS_COMPILE}gcc #The ngen_arm.S must be compiled with gcc, not as
++	CC_AS    = $(CC) #The ngen_arm.S must be compiled with gcc, not as
+ 	ASFLAGS  += $(CFLAGS)
+ endif
+ 

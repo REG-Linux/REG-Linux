@@ -1,0 +1,49 @@
+################################################################################
+#
+# LIBRETRO_MORPHEUSCAST_XTREME
+#
+################################################################################
+# version.: Commits on Jul 03, 2025
+LIBRETRO_MORPHEUSCAST_XTREME_VERSION = 5d1c1c81fc44474819bdf14bcaec1cf0afc58f70
+LIBRETRO_MORPHEUSCAST_XTREME_SITE = $(call github,KMFDManic,morpheuscast_xtreme,$(LIBRETRO_MORPHEUSCAST_XTREME_VERSION))
+LIBRETRO_MORPHEUSCAST_XTREME_LICENSE = GPLv2
+
+LIBRETRO_MORPHEUSCAST_XTREME_PLATFORM = $(LIBRETRO_PLATFORM)
+
+LIBRETRO_MORPHEUSCAST_XTREME_DEPENDENCIES += libgles
+
+ifeq ($(BR2_ENABLE_DEBUG),y)
+    LIBRETRO_MORPHEUSCAST_XTREME_EXTRA_ARGS += DEBUG=1
+endif
+
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2837),y)
+    LIBRETRO_MORPHEUSCAST_XTREME_PLATFORM = rpi3_64
+    LIBRETRO_MORPHEUSCAST_XTREME_EXTRA_ARGS += ARCH=arm64
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2836),y)
+    LIBRETRO_MORPHEUSCAST_XTREME_PLATFORM = rpi2
+    LIBRETRO_MORPHEUSCAST_XTREME_EXTRA_ARGS += ARCH=arm
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3326),y)
+    LIBRETRO_MORPHEUSCAST_XTREME_PLATFORM = RK3326
+    LIBRETRO_MORPHEUSCAST_XTREME_EXTRA_ARGS += ARCH=arm64
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H3)$(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
+    LIBRETRO_MORPHEUSCAST_XTREME_PLATFORM = sun8i
+    LIBRETRO_MORPHEUSCAST_XTREME_EXTRA_ARGS += ARCH=arm
+else ifeq ($(BR2_aarch64),y)
+    LIBRETRO_MORPHEUSCAST_XTREME_PLATFORM = arm64
+    LIBRETRO_MORPHEUSCAST_XTREME_EXTRA_ARGS += ARCH=arm64
+endif
+
+define LIBRETRO_MORPHEUSCAST_XTREME_BUILD_CMDS
+    $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D)/ -f Makefile \
+        platform="$(LIBRETRO_MORPHEUSCAST_XTREME_PLATFORM)" $(LIBRETRO_MORPHEUSCAST_XTREME_EXTRA_ARGS) \
+        GIT_VERSION="-$(shell echo $(LIBRETRO_MORPHEUSCAST_XTREME_VERSION) | cut -c 1-7)"
+endef
+
+define LIBRETRO_MORPHEUSCAST_XTREME_INSTALL_TARGET_CMDS
+    $(INSTALL) -D -m 0755 $(@D)/km_morpheuscast_xtreme_libretro.so \
+        $(TARGET_DIR)/usr/lib/libretro/km_morpheuscast_xtreme_libretro.so
+    $(INSTALL) -D $(@D)/_info/km_morpheuscast_xtreme_libretro.info \
+        $(TARGET_DIR)/usr/share/libretro/info/km_morpheuscast_xtreme_libretro.info
+endef
+
+$(eval $(generic-package))
