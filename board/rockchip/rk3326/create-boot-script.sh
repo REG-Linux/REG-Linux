@@ -30,7 +30,11 @@ cp "${BINARIES_DIR}/rk3326-odroid-go3.dtb"      "${REGLINUX_BINARIES_DIR}/boot/b
 cp "${BINARIES_DIR}/rk3326-gameforce-chi.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/"   || exit 1
 cp "${BINARIES_DIR}/rk3326-anbernic-rg351m.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"   || exit 1
 cp "${BINARIES_DIR}/rk3326-anbernic-rg351v.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"   || exit 1
+cp "${BINARIES_DIR}/rk3326-batlexp-g350.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"   || exit 1
 
 cp "${BOARD_DIR}/boot/boot.ini"                 "${REGLINUX_BINARIES_DIR}/boot/"        || exit 1
+
+# For various RK3326 clones (G350,R33,R36,...)
+cp "${BOARD_DIR}/boot/boot.batlexp-g350.ini"    "${REGLINUX_BINARIES_DIR}/boot/"        || exit 1
 
 exit 0

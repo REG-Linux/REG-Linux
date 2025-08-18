@@ -1,0 +1,100 @@
+diff -rupN linux.orig/arch/arm64/boot/dts/rockchip/px30.dtsi linux/arch/arm64/boot/dts/rockchip/px30.dtsi
+--- linux.orig/arch/arm64/boot/dts/rockchip/px30.dtsi	2024-02-15 14:44:49.334307319 +0000
++++ linux/arch/arm64/boot/dts/rockchip/px30.dtsi	2024-02-17 06:32:20.483322663 +0000
+@@ -114,32 +114,22 @@
+ 		compatible = "operating-points-v2";
+ 		opp-shared;
+ 
+-		opp-600000000 {
+-			opp-hz = /bits/ 64 <600000000>;
+-			opp-microvolt = <950000 950000 1350000>;
+-			clock-latency-ns = <40000>;
+-			opp-suspend;
+-		};
+-		opp-816000000 {
+-			opp-hz = /bits/ 64 <816000000>;
+-			opp-microvolt = <1050000 1050000 1350000>;
+-			clock-latency-ns = <40000>;
+-		};
+ 		opp-1008000000 {
+ 			opp-hz = /bits/ 64 <1008000000>;
+ 			opp-microvolt = <1175000 1175000 1350000>;
+ 			clock-latency-ns = <40000>;
+ 		};
+-		opp-1200000000 {
+-			opp-hz = /bits/ 64 <1200000000>;
+-			opp-microvolt = <1300000 1300000 1350000>;
+-			clock-latency-ns = <40000>;
+-		};
+ 		opp-1296000000 {
+ 			opp-hz = /bits/ 64 <1296000000>;
+ 			opp-microvolt = <1350000 1350000 1350000>;
+ 			clock-latency-ns = <40000>;
+ 		};
++		opp-1416000000 {
++			opp-hz = /bits/ 64 <1416000000>;
++			opp-microvolt = <1350000 1350000 1350000>;
++			clock-latency-ns = <40000>;
++			turbo-mode;
++		};
+ 	};
+ 
+ 	arm-pmu {
+@@ -349,6 +339,32 @@
+ 		};
+ 	};
+ 
++	dfi: dfi@ff610000 {
++		reg = <0x00 0xff610000 0x00 0x400>;
++		compatible = "rockchip,px30-dfi";
++		rockchip,pmu = <&pmugrf>;
++		status = "okay";
++	};
++
++	dmc: dmc {
++		compatible = "rockchip,px30-dmc";
++		devfreq-events = <&dfi>;
++		clocks = <&cru SCLK_DDRCLK>;
++		clock-names = "dmc_clk";
++		operating-points-v2 = <&dmc_opp_table>;
++		uptreshold = <40>;
++		downdifferential = <20>;
++		status = "okay";
++	};
++
++	dmc_opp_table: dmc_opp_table {
++		compatible = "operating-points-v2";
++		opp-924000000 {
++			opp-hz = /bits/ 64 <924000000>;
++			opp-microvolt = <1125000>;
++		};
++	};
++
+ 	pmugrf: syscon@ff010000 {
+ 		compatible = "rockchip,px30-pmugrf", "syscon", "simple-mfd";
+ 		reg = <0x0 0xff010000 0x0 0x1000>;
+@@ -1064,21 +1080,9 @@
+ 	gpu_opp_table: opp-table-1 {
+ 		compatible = "operating-points-v2";
+ 
+-		opp-200000000 {
+-			opp-hz = /bits/ 64 <200000000>;
+-			opp-microvolt = <950000>;
+-		};
+-		opp-300000000 {
+-			opp-hz = /bits/ 64 <300000000>;
+-			opp-microvolt = <975000>;
+-		};
+-		opp-400000000 {
+-			opp-hz = /bits/ 64 <400000000>;
+-			opp-microvolt = <1050000>;
+-		};
+-		opp-480000000 {
+-			opp-hz = /bits/ 64 <480000000>;
+-			opp-microvolt = <1125000>;
++		opp-560000000 {
++			opp-hz = /bits/ 64 <560000000>;
++			opp-microvolt = <1150000>;
+ 		};
+ 	};
+ 
