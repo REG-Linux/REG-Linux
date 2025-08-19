@@ -1,88 +1,46 @@
 from systemFiles import HOME
 
-mednafenConfigDir = HOME + "/.mednafen"
-mednafenConfigFile = mednafenConfigDir + "/mednafen.cfg"
-mednafenBin = "/usr/bin/mednafen"
+# Define paths for Mednafen configuration and binary
+MEDNAFEN_CONFIG_DIR = HOME + "/.mednafen"
+MEDNAFEN_CONFIG_PATH = MEDNAFEN_CONFIG_DIR + "/mednafen.cfg"
+MEDNAFEN_BIN_PATH = "/usr/bin/mednafen"
+
+# List of all supported emulation systems
+SYSTEMS = [
+    "apple2", "gb", "gba", "gg", "lynx", "md", "nes", "ngp",
+    "pce", "pce_fast", "pcfx", "psx", "sasplay", "sms", "snes",
+    "snes_faust", "ss", "ssfplay", "vb", "wswan"
+]
 
 def setMednafenConfig(cfgConfig):
+    # Enable all systems and set fullscreen stretch for each
+    for system in SYSTEMS:
+        cfgConfig.write(f"{system}.enable 1\n")
+        cfgConfig.write(f"{system}.stretch full\n")
 
-    # Enable (automatic) usage of this module.
-    cfgConfig.write("apple2.enable 1\n")
-    cfgConfig.write("gb.enable 1\n")
-    cfgConfig.write("gba.enable 1\n")
-    cfgConfig.write("gg.enable 1\n")
-    cfgConfig.write("lynx.enable 1\n")
-    cfgConfig.write("md.enable 1\n")
-    cfgConfig.write("nes.enable 1\n")
-    cfgConfig.write("ngp.enable 1\n")
-    cfgConfig.write("pce.enable 1\n")
-    cfgConfig.write("pce_fast.enable 1\n")
-    cfgConfig.write("pcfx.enable 1\n")
-    cfgConfig.write("psx.enable 1\n")
-    cfgConfig.write("sasplay.enable 1\n")
-    cfgConfig.write("sms.enable 1\n")
-    cfgConfig.write("snes.enable 1\n")
-    cfgConfig.write("snes_faust.enable 1\n")
-    cfgConfig.write("ss.enable 1\n")
-    cfgConfig.write("ssfplay.enable 1\n")
-    cfgConfig.write("vb.enable 1\n")
-    cfgConfig.write("wswan.enable 1\n")
+    # Audio configuration
+    cfgConfig.write("sound.driver sdl\n")  # Use SDL sound driver
+    cfgConfig.write("sound 1\n")           # Enable sound output
 
-    # Stretch to fill screen.
-    cfgConfig.write("apple2.stretch full\n")
-    cfgConfig.write("gb.stretch full\n")
-    cfgConfig.write("gba.stretch full\n")
-    cfgConfig.write("gg.stretch full\n")
-    cfgConfig.write("lynx.stretch full\n")
-    cfgConfig.write("md.stretch full\n")
-    cfgConfig.write("nes.stretch full\n")
-    cfgConfig.write("ngp.stretch full\n")
-    cfgConfig.write("pce.stretch full\n")
-    cfgConfig.write("pce_fast.stretch full\n")
-    cfgConfig.write("pcfx.stretch full\n")
-    cfgConfig.write("psx.stretch full\n")
-    cfgConfig.write("sasplay.stretch full\n")
-    cfgConfig.write("sms.stretch full\n")
-    cfgConfig.write("snes.stretch full\n")
-    cfgConfig.write("snes_faust.stretch full\n")
-    cfgConfig.write("ss.stretch full\n")
-    cfgConfig.write("ssfplay.stretch full\n")
-    cfgConfig.write("vb.stretch full\n")
-    cfgConfig.write("wswan.stretch full\n")
+    # Video configuration
+    cfgConfig.write("video.fs 1\n")        # Enable fullscreen mode
+    cfgConfig.write("video.fs.display -1\n")  # Use default display
 
-    # Select sound driver.
-    cfgConfig.write("sound.driver sdl\n")
+    # System settings
+    cfgConfig.write("filesys.path_firmware firmware\n")  # Firmware path
+    cfgConfig.write("autosave 0\n")        # Disable auto-save states
+    cfgConfig.write("cheats 0\n")          # Disable cheats by default
+    cfgConfig.write("fps.autoenable 0\n")  # Disable FPS display by default
 
-    # Enable sound output.
-    cfgConfig.write("sound 1\n")
+    # Keyboard shortcuts configuration
+    key_bindings = {
+        "exit": ("keyboard", "0x0", "69"),         # Exit emulator
+        "fast_forward": ("keyboard", "0x0", "53"),  # Fast forward
+        "state_rewind": ("keyboard", "0x0", "42"),  # Rewind state
+        "reset": ("keyboard", "0x0", "67"),         # Reset system
+        "rotate_screen": ("keyboard", "0x0", "18+alt")  # Rotate screen
+    }
 
-    # Enable fullscreen mode.
-    cfgConfig.write("video.fs 1\n")
-    cfgConfig.write("video.fs.display -1\n")
-
-    # Path to directory for firmware.
-    cfgConfig.write("filesys.path_firmware firmware\n")
-
-    # Automatically load/save state on game load/close.
-    cfgConfig.write("autosave 0\n")
-
-    # Enable cheats.
-    cfgConfig.write("cheats 0\n")
-
-    # Exit
-    cfgConfig.write("command.exit keyboard 0x0 69\n")
-
-    # Fast-forward
-    cfgConfig.write("command.fast_forward keyboard 0x0 53\n")
-
-    # Rewind
-    cfgConfig.write("command.state_rewind keyboard 0x0 42\n")
-
-    # Reset
-    cfgConfig.write("command.reset keyboard 0x0 67\n")
-
-    # Rotate screen
-    cfgConfig.write("command.rotate_screen keyboard 0x0 18+alt\n")
-
-    # Automatically enable FPS display on startup.
-    cfgConfig.write("fps.autoenable 0\n")
+    # Write all key bindings to config
+    for command, (device, id, key) in key_bindings.items():
+        cfgConfig.write(f"command.{command} {device} {id} {key}\n")

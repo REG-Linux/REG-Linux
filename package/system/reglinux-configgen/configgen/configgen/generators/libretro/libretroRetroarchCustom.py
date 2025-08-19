@@ -1,111 +1,125 @@
-import os
+from os import path, makedirs, remove
 from settings.unixSettings import UnixSettings
-from . import libretroConfig
+from .libretroConfig import retroarchCustom
 
-def generateRetroarchCustom():
-    # retroarchcustom.cfg
-    if not os.path.exists(os.path.dirname(libretroConfig.retroarchCustom)):
-        os.makedirs(os.path.dirname(libretroConfig.retroarchCustom))
-
-    try:
-        retroarchSettings = UnixSettings(libretroConfig.retroarchCustom, separator=' ')
-    except UnicodeError:
-        os.remove(libretroConfig.retroarchCustom)
-        retroarchSettings = UnixSettings(libretroConfig.retroarchCustom, separator=' ')
-
-    # Use Interface
-    retroarchSettings.save('menu_driver',                       '"ozone"')
-    retroarchSettings.save('content_show_favorites',            '"false"')
-    retroarchSettings.save('content_show_images',               '"false"')
-    retroarchSettings.save('content_show_music',                '"false"')
-    retroarchSettings.save('content_show_video',                '"false"')
-    retroarchSettings.save('content_show_history',              '"false"')
-    retroarchSettings.save('content_show_playlists',            '"false"')
-    retroarchSettings.save('content_show_add',                  '"false"')
-    retroarchSettings.save('menu_show_load_core',               '"false"')
-    retroarchSettings.save('menu_show_load_content',            '"false"')
-    retroarchSettings.save('menu_show_online_updater',          '"false"')
-    retroarchSettings.save('menu_show_core_updater',            '"false"')
+# ==========================
+# Default RetroArch settings
+# ==========================
+CONFIG_DEFAULTS = {
+    # User Interface
+    "menu_driver": "ozone",
+    "content_show_favorites": "false",
+    "content_show_images": "false",
+    "content_show_music": "false",
+    "content_show_video": "false",
+    "content_show_history": "false",
+    "content_show_playlists": "false",
+    "content_show_add": "false",
+    "menu_show_load_core": "false",
+    "menu_show_load_content": "false",
+    "menu_show_online_updater": "false",
+    "menu_show_core_updater": "false",
 
     # Input (SDL2 based)
-    retroarchSettings.save('input_autodetect_enable',           '"true"')
-    retroarchSettings.save('input_remap_binds_enable',          '"true"')
-    retroarchSettings.save('input_joypad_driver',               '"sdl2"')
-    retroarchSettings.save('input_enable_hotkey_btn',           '"5"')
-    retroarchSettings.save('input_reset_btn',                   '"0"')
-    retroarchSettings.save('input_menu_toggle_btn',             '"3"')
-    retroarchSettings.save('input_exit_emulator_btn',           '"6"')
-    retroarchSettings.save('input_load_state_btn',              '"10"')
-    retroarchSettings.save('input_save_state_btn',              '"9"')
-    retroarchSettings.save('input_state_slot_increase_btn',     '"13"')
-    retroarchSettings.save('input_state_slot_decrease_btn',     '"14"')
-    retroarchSettings.save('input_player1_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_player2_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_player3_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_player4_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_player5_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_player6_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_player7_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_player8_analog_dpad_mode',    '"1"')
-    retroarchSettings.save('input_enable_hotkey',               '"shift"')
-    retroarchSettings.save('input_menu_toggle',                 '"f1"')
-    retroarchSettings.save('input_exit_emulator',               '"escape"')
+    "input_autodetect_enable": "true",
+    "input_remap_binds_enable": "true",
+    "input_joypad_driver": "sdl2",
+    "input_enable_hotkey_btn": "5",
+    "input_reset_btn": "0",
+    "input_menu_toggle_btn": "3",
+    "input_exit_emulator_btn": "6",
+    "input_load_state_btn": "10",
+    "input_save_state_btn": "9",
+    "input_state_slot_increase_btn": "13",
+    "input_state_slot_decrease_btn": "14",
+    "input_player1_analog_dpad_mode": "1",
+    "input_player2_analog_dpad_mode": "1",
+    "input_player3_analog_dpad_mode": "1",
+    "input_player4_analog_dpad_mode": "1",
+    "input_player5_analog_dpad_mode": "1",
+    "input_player6_analog_dpad_mode": "1",
+    "input_player7_analog_dpad_mode": "1",
+    "input_player8_analog_dpad_mode": "1",
+    "input_enable_hotkey": "shift",
+    "input_menu_toggle": "f1",
+    "input_exit_emulator": "escape",
 
     # Video
-    retroarchSettings.save('video_aspect_ratio_auto',           '"false"')
-    retroarchSettings.save('video_gpu_screenshot',              '"true"')
-    retroarchSettings.save('video_shader_enable',               '"false"')
-    retroarchSettings.save('aspect_ratio_index',                '"22"')
+    "video_aspect_ratio_auto": "false",
+    "video_gpu_screenshot": "true",
+    "video_shader_enable": "false",
+    "aspect_ratio_index": "22",
 
     # Audio
-    retroarchSettings.save('audio_volume',                       '"2.0"')
+    "audio_volume": "2.0",
 
-    # Settings
-    retroarchSettings.save('global_core_options',               '"true"')
-    retroarchSettings.save('config_save_on_exit',               '"false"')
-    retroarchSettings.save('savestate_auto_save',               '"false"')
-    retroarchSettings.save('savestate_auto_load',               '"false"')
-    retroarchSettings.save('menu_swap_ok_cancel_buttons',       '"true"')
+    # General settings
+    "global_core_options": "true",
+    "config_save_on_exit": "false",
+    "savestate_auto_save": "false",
+    "savestate_auto_load": "false",
+    "menu_swap_ok_cancel_buttons": "true",
 
-    # Accentuation
-    retroarchSettings.save('rgui_extended_ascii',               '"true"')
+    # Accentuation and UX
+    "rgui_extended_ascii": "true",
+    "rgui_show_start_screen": "false",
+    "video_font_enable": "true",
+    "savestate_thumbnail_enable": "true",
+    "all_users_control_menu": "false",
+    "cheevos_badges_enable": "true",
+    "builtin_imageviewer_enable": "false",
+    "fps_update_interval": "30",
+}
 
-    # Hide the welcome message in Retroarch
-    retroarchSettings.save('rgui_show_start_screen',            '"false"')
+# ==========================
+# RetroArch paths
+# ==========================
+CONFIG_PATHS = {
+    "core_options_path": '"/userdata/system/configs/retroarch/cores/retroarch-core-options.cfg"',
+    "assets_directory": '"/usr/share/libretro/assets"',
+    "screenshot_directory": '"/userdata/screenshots/"',
+    "recording_output_directory": '"/userdata/screenshots/"',
+    "savestate_directory": '"/userdata/saves/"',
+    "savefile_directory": '"/userdata/saves/"',
+    "extraction_directory": '"/userdata/extractions/"',
+    "cheat_database_path": '"/userdata/cheats/cht/"',
+    "cheat_settings_path": '"/userdata/cheats/saves/"',
+    "system_directory": '"/userdata/bios/"',
+    "joypad_autoconfig_dir": '"/userdata/system/configs/retroarch/autoconfig/"',
+    "video_shader_dir": '"/usr/share/reglinux/shaders/"',
+    "video_filter_dir": '"/usr/share/video_filters"',
+    "audio_filter_dir": '"/usr/share/audio_filters"',
+}
 
-    # Enable usage of OSD messages (Text messages not in badge)
-    retroarchSettings.save('video_font_enable',                 '"true"')
 
-    # Take a screenshot of the savestate
-    retroarchSettings.save('savestate_thumbnail_enable',        '"true"')
+def generateRetroarchCustom():
+    """
+    Generate the RetroArch custom configuration file.
+    If the file is corrupted (UnicodeError), it will be recreated.
+    """
+    # Ensure the target directory exists
+    if not path.exists(path.dirname(retroarchCustom)):
+        makedirs(path.dirname(retroarchCustom))
 
-    # Allow any RetroPad to control the menu (Only the player 1)
-    retroarchSettings.save('all_users_control_menu',            '"false"')
+    # Load or recreate the settings handler
+    try:
+        retroarchSettings = UnixSettings(retroarchCustom, separator=" ")
+    except UnicodeError:
+        remove(retroarchCustom)
+        retroarchSettings = UnixSettings(retroarchCustom, separator=" ")
 
-    # Show badges in Retroarch cheevos list
-    retroarchSettings.save('cheevos_badges_enable',             '"true"')
+    # Apply all default settings
+    for key, value in CONFIG_DEFAULTS.items():
+        retroarchSettings.save(key, f'"{value}"')
 
-    # Disable builtin image viewer (done in ES, and prevents from loading pico-8 .png carts)
-    retroarchSettings.save('builtin_imageviewer_enable',        '"false"')
-
-    # Set fps counter interval (in frames)
-    retroarchSettings.save('fps_update_interval',               '"30"')
-
+    # Write to file
     retroarchSettings.write()
 
+
 def generateRetroarchCustomPathes(retroarchSettings):
-    # Path Retroarch
-    retroarchSettings.save('core_options_path',             '"/userdata/system/configs/retroarch/cores/retroarch-core-options.cfg"')
-    retroarchSettings.save('assets_directory',              '"/usr/share/libretro/assets"')
-    retroarchSettings.save('screenshot_directory',          '"/userdata/screenshots/"')
-    retroarchSettings.save('recording_output_directory',    '"/userdata/screenshots/"')
-    retroarchSettings.save('savestate_directory',           '"/userdata/saves/"')
-    retroarchSettings.save('savefile_directory',            '"/userdata/saves/"')
-    retroarchSettings.save('extraction_directory',          '"/userdata/extractions/"')
-    retroarchSettings.save('cheat_database_path',           '"/userdata/cheats/cht/"')
-    retroarchSettings.save('cheat_settings_path',           '"/userdata/cheats/saves/"')
-    retroarchSettings.save('system_directory',              '"/userdata/bios/"')
-    retroarchSettings.save('joypad_autoconfig_dir',         '"/userdata/system/configs/retroarch/autoconfig/"')
-    retroarchSettings.save('video_shader_dir',              '"/usr/share/reglinux/shaders/"')
-    retroarchSettings.save('video_filter_dir',              '"/usr/share/video_filters"')
-    retroarchSettings.save('audio_filter_dir',              '"/usr/share/audio_filters"')
+    """
+    Save RetroArch custom paths into the configuration.
+    This is called separately because paths may vary depending on the system.
+    """
+    for key, value in CONFIG_PATHS.items():
+        retroarchSettings.save(key, value)
