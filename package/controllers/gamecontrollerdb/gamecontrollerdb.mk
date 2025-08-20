@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GAMECONTROLLERDB_VERSION = 74dc9416f6c081240db08eed90e219cbc8efb2c2
+GAMECONTROLLERDB_VERSION = 2daedd0aaae5971ca05fb2f582b247d5cf2d50a0
 GAMECONTROLLERDB_SITE = $(call github,REG-Linux,SDL_GameControllerDB,$(GAMECONTROLLERDB_VERSION))
 
 GAMECONTROLLERDB_PATH = $(TARGET_DIR)/usr/share/emulationstation
