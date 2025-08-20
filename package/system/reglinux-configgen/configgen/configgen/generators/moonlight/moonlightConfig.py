@@ -1,48 +1,46 @@
-import os
-import shutil
+from os import path, makedirs
+from shutil import copy
 from systemFiles import CONF
 from settings.unixSettings import UnixSettings
 
-moonlightCustom = CONF + '/moonlight'
-moonlightConfigFile = moonlightCustom + '/moonlight.conf'
-moonlightStagingConfigFile = moonlightCustom + '/staging/moonlight.conf'
-moonlightGamelist = moonlightCustom + '/gamelist.txt'
-moonlightMapping = dict()
-moonlightMapping[1] = moonlightCustom + '/mappingP1.conf'
-moonlightMapping[2] = moonlightCustom + '/mappingP2.conf'
-moonlightMapping[3] = moonlightCustom + '/mappingP3.conf'
-moonlightMapping[4] = moonlightCustom + '/mappingP4.conf'
-moonlightBin = '/usr/bin/moonlight'
+MOONLIGHT_CONFIG_DIR = CONF + '/moonlight'
+MOONLIGHT_CONFIG_PATH = MOONLIGHT_CONFIG_DIR + '/moonlight.conf'
+MOONLIGHT_STAGING_CONFIG_PATH = MOONLIGHT_CONFIG_DIR + '/staging/moonlight.conf'
+MOONLIGHT_GAMELIST_PATH = MOONLIGHT_CONFIG_DIR + '/gamelist.txt'
+MOONLIGHT_MAPPING_PATH = dict()
+MOONLIGHT_MAPPING_PATH[1] = MOONLIGHT_CONFIG_DIR + '/mappingP1.conf'
+MOONLIGHT_MAPPING_PATH[2] = MOONLIGHT_CONFIG_DIR + '/mappingP2.conf'
+MOONLIGHT_MAPPING_PATH[3] = MOONLIGHT_CONFIG_DIR + '/mappingP3.conf'
+MOONLIGHT_MAPPING_PATH[4] = MOONLIGHT_CONFIG_DIR + '/mappingP4.conf'
+MOONLIGHT_BIN_PATH = '/usr/bin/moonlight'
 
-def generateMoonlightConfig(system):
+def setMoonlightConfig(system):
 
-    moonlightStagingConfigFile = moonlightStagingConfigFile
-    if not os.path.exists(moonlightCustom + '/staging'):
-        os.makedirs(moonlightCustom + '/staging')
+    if not path.exists(MOONLIGHT_CONFIG_DIR + '/staging'):
+        makedirs(MOONLIGHT_CONFIG_DIR + '/staging')
 
     # If user made config file exists, copy to staging directory for use
-    if os.path.exists(moonlightConfigFile):
-        shutil.copy(moonlightConfigFile, moonlightStagingConfigFile)
+    if path.exists(MOONLIGHT_CONFIG_PATH):
+        copy(MOONLIGHT_CONFIG_PATH, MOONLIGHT_STAGING_CONFIG_PATH)
     else:
         # truncate existing config and create new one
-        f = open(moonlightStagingConfigFile, "w").close()
+        with open(MOONLIGHT_STAGING_CONFIG_PATH, "w"):
+            pass
 
-        moonlightConfig = UnixSettings(moonlightStagingConfigFile, separator=' ')
+        moonlightConfig = UnixSettings(MOONLIGHT_STAGING_CONFIG_PATH, separator=' ')
 
         # resolution
+        resolutions = {
+            "0": ("1280", "720"),
+            "1": ("1920", "1080"),
+            "2": ("3840", "2160"),
+        }
         if system.isOptSet('moonlight_resolution'):
-            if system.config["moonlight_resolution"] == "0":
-                moonlightConfig.save('width', '1280')
-                moonlightConfig.save('height', '720')
-            elif system.config["moonlight_resolution"] == "1":
-                moonlightConfig.save('width', '1920')
-                moonlightConfig.save('height', '1080')
-            elif system.config["moonlight_resolution"] == "2":
-                moonlightConfig.save('width', '3840')
-                moonlightConfig.save('height', '2160')
+            width, height = resolutions.get(system.config["moonlight_resolution"], ("1280", "720"))
         else:
-            moonlightConfig.save('width', '1280')
-            moonlightConfig.save('height', '720')
+            width, height = "1280", "720"
+        moonlightConfig.save('width', width)
+        moonlightConfig.save('height', height)
 
         # rotate
         if system.isOptSet('moonlight_rotate'):
@@ -51,32 +49,29 @@ def generateMoonlightConfig(system):
             moonlightConfig.save('rotate', '0')
 
         # framerate
+        framerates = {"0": "30", "1": "60", "2": "120"}
         if system.isOptSet('moonlight_framerate'):
-            if system.config["moonlight_framerate"] == "0":
-                moonlightConfig.save('fps', '30')
-            elif system.config["moonlight_framerate"] == "1":
-                moonlightConfig.save('fps', '60')
-            elif system.config["moonlight_framerate"] == "2":
-                moonlightConfig.save('fps', '120')
+            fps = framerates.get(system.config["moonlight_framerate"], "60")
         else:
-            moonlightConfig.save('fps', '60')
+            fps = "60"
+        moonlightConfig.save('fps', fps)
 
         # bitrate
+        bitrates = {
+            "0": "5000",
+            "1": "10000",
+            "2": "20000",
+            "3": "50000",
+        }
         if system.isOptSet('moonlight_bitrate'):
-            if system.config["moonlight_bitrate"] == "0":
-                moonlightConfig.save('bitrate', '5000')
-            elif system.config["moonlight_bitrate"] == "1":
-                moonlightConfig.save('bitrate', '10000')
-            elif system.config["moonlight_bitrate"] == "2":
-                moonlightConfig.save('bitrate', '20000')
-            elif system.config["moonlight_bitrate"] == "3":
-                moonlightConfig.save('bitrate', '50000')
+            bitrate = bitrates.get(system.config["moonlight_bitrate"], "-1")
         else:
-            moonlightConfig.save('bitrate', '-1') #-1 sets Moonlight default
+            bitrate = "-1"  # -1 sets Moonlight default
+        moonlightConfig.save('bitrate', bitrate)
 
         # codec
         if system.isOptSet('moonlight_codec'):
-            moonlightConfig.save('codec',system.config["moonlight_codec"])
+            moonlightConfig.save('codec', system.config["moonlight_codec"])
         else:
             moonlightConfig.save('codec', 'auto')
 
@@ -102,8 +97,8 @@ def generateMoonlightConfig(system):
         # required for controllers to work
         moonlightConfig.save('platform', 'sdl')
 
-        ## Directory to store encryption keys
-        moonlightConfig.save('keydir', moonlightCustom + '/keydir')
+        # Directory to store encryption keys
+        moonlightConfig.save('keydir', MOONLIGHT_CONFIG_DIR + '/keydir')
 
         # lan or wan streaming - ideally lan
         if system.isOptSet('moonlight_remote'):
@@ -111,7 +106,7 @@ def generateMoonlightConfig(system):
         else:
             moonlightConfig.save('remote', 'no')
 
-        ## Enable 5.1/7.1 surround sound
+        # Enable 5.1/7.1 surround sound
         if system.isOptSet('moonlight_surround'):
             moonlightConfig.save('surround', system.config["moonlight_surround"])
         else:
