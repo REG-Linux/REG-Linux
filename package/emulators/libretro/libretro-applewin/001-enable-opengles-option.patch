@@ -1,12 +1,11 @@
 --- a/source/frontends/sdl/CMakeLists.txt	2023-08-02 00:45:55.274179545 +0200
 +++ b/source/frontends/sdl/CMakeLists.txt	2023-08-02 00:46:17.498625505 +0200
-@@ -10,13 +10,7 @@
- # we should use find_package, but Ubuntu does not provide it for SDL2_image
+@@ -11,12 +11,7 @@
  pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
  
--
--if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
--  # only OpenGL supported on MacOS
+ 
+-if ((${CMAKE_SYSTEM_NAME} MATCHES "Darwin") OR (${CMAKE_SYSTEM_NAME} MATCHES "Windows"))
+-  # only OpenGL supported on MacOS and Windows
 -  set (SA2_OPENGL ON)
 -else()
 -  option(SA2_OPENGL "Prefer OpenGL over OpenGL ES" OFF)
