@@ -1,22 +1,24 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import re
-from systemFiles import CONF, SAVES
+from os import path, makedirs, chdir
+from re import search
+from systemFiles import CONF, SAVES, ROMS
 from settings.unixSettings import UnixSettings
-from . import openborControllers
+from .openborControllers import setControllerConfig
+
+OPENBOR_CONF_DIR = CONF + '/openbor'
+OPENBOR_SAVES_DIR = SAVES + '/openbor'
+OPENBOR_ROMS_DIR = ROMS + '/openbor'
 
 class OpenborGenerator(Generator):
 
     # Main entry of the module
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        configDir = CONF + '/openbor'
-        if not os.path.exists(configDir):
-            os.makedirs(configDir)
+        if not path.exists(OPENBOR_CONF_DIR):
+            makedirs(OPENBOR_CONF_DIR)
 
-        SAVES_DIR = SAVES + '/openbor'
-        if not os.path.exists(SAVES_DIR):
-            os.makedirs(SAVES_DIR)
+        if not path.exists(OPENBOR_SAVES_DIR):
+            makedirs(OPENBOR_SAVES_DIR)
 
         # guess the version to run
         core = system.config['core']
@@ -34,7 +36,7 @@ class OpenborGenerator(Generator):
         elif core == "openbor7530":
             configfilename = "config7530.ini"
 
-        config = UnixSettings(configDir + "/" + configfilename, separator='')
+        config = UnixSettings(OPENBOR_CONF_DIR + "/" + configfilename, separator='')
 
         # general
         config.save("fullscreen", "1")
@@ -63,7 +65,7 @@ class OpenborGenerator(Generator):
             config.save("fpslimit", "0")
 
         # controllers
-        openborControllers.generateControllerConfig(config, playersControllers, core)
+        setControllerConfig(config, playersControllers, core)
 
         # rumble
         if system.isOptSet("openbor_rumble"):
@@ -80,7 +82,7 @@ class OpenborGenerator(Generator):
         config.write()
 
         # change directory for wider compatibility
-        os.chdir("/userdata/roms/openbor")
+        chdir(OPENBOR_ROMS_DIR)
 
         return OpenborGenerator.executeCore(core, rom)
 
@@ -100,7 +102,7 @@ class OpenborGenerator(Generator):
 
     @staticmethod
     def guessCore(rom):
-        versionstr = re.search(r'\[.*([0-9]{4})\]+', os.path.basename(rom))
+        versionstr = search(r'\[.*([0-9]{4})\]+', path.basename(rom))
         if versionstr == None:
             return "openbor7530"
         version = int(versionstr.group(1))
