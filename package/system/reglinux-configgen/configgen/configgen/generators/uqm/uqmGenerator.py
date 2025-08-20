@@ -1,7 +1,9 @@
 from generators.Generator import Generator
-import os
+from os import makedirs
 from Command import Command
 import controllers as controllersConfig
+
+UQM_BIN_PATH = '/usr/bin/urquan'
 
 class UqmGenerator(Generator):
 
@@ -13,12 +15,12 @@ class UqmGenerator(Generator):
         ]
 
         for directory in directories:
-            os.makedirs(directory, exist_ok=True)
+            makedirs(directory, exist_ok=True)
 
         with open('/userdata/roms/uqm/version', 'a'): # Create file if does not exist
             pass
 
-        commandArray = ["urquan","--contentdir=/userdata/roms/uqm",
+        commandArray = [UQM_BIN_PATH,"--contentdir=/userdata/roms/uqm",
                         "--configdir=/userdata/saves/uqm"]
 
         return Command(
