@@ -1,4 +1,4 @@
-# From https://lists.freedesktop.org/archives/mesa-dev/2025-August/226547.html
-sha256  7c726b21c074d14d31d253d638b741422f3c0a497ce7f1b4aaaa917d10bd8d4f  mesa-25.2.0.tar.xz
+# From https://lists.freedesktop.org/archives/mesa-dev/2025-August/226550.html
+sha256  c124372189d35f48e049ee503029171c68962c580971cb86d968a6771c965ba4  mesa-25.2.1.tar.xz
 # License
 sha256  a00275a53178e2645fb65be99a785c110513446a5071ff2c698ed260ad917d75  docs/license.rst
