@@ -1,18 +1,17 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import filecmp
-import json
-import shutil
-import evdev
+from filecmp import cmp
+from shutil import copyfile
+from json import load, dump, dumps
+from evdev import list_devices, InputDevice
+from os import path, makedirs, chmod, environ
 from systemFiles import CONF, BIOS
-from os import environ
-from evdev import InputDevice
 
-ryujinxConf = CONF + "/Ryujinx"
-ryujinxConfFile = ryujinxConf + "/Config.json"
-ryujinxKeys = BIOS + "/switch/prod.keys"
-ryujinxExec = ryujinxConf + "/ryujinx"
+RYUJINX_CONFIG_DIR = CONF + '/Ryujinx'
+RYUJINX_SYSTEM_DIR = RYUJINX_CONFIG_DIR + '/system'
+RYUJINX_CONFIG_PATH = RYUJINX_CONFIG_DIR + '/Config.json'
+RYUJINX_KEY_PATH = BIOS + '/system/prod.keys'
+RYUJINX_BIN_PATH  = RYUJINX_CONFIG_DIR + '/ryujinx'
 
 ryujinxCtrl = {
         "left_joycon_stick": {
@@ -77,32 +76,32 @@ class RyujinxGenerator(Generator):
         return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        if not os.path.exists(ryujinxConf):
-            os.makedirs(ryujinxConf)
-        if not os.path.exists(ryujinxConf + "/system"):
-            os.makedirs(ryujinxConf + "/system")
+        if not path.exists(RYUJINX_CONFIG_DIR):
+            makedirs(RYUJINX_CONFIG_DIR)
+        if not path.exists(RYUJINX_SYSTEM_DIR):
+            makedirs(RYUJINX_SYSTEM_DIR)
 
         # Copy file & make executable (workaround)
         files_to_copy = [
-            ("/usr/ryujinx/Ryujinx", ryujinxExec, 0o0775),
-            ("/usr/ryujinx/libSkiaSharp.so", os.path.join(ryujinxConf, "libSkiaSharp.so"), 0o0644),
-            ("/usr/ryujinx/libHarfBuzzSharp.so", os.path.join(ryujinxConf, "libHarfBuzzSharp.so"), 0o0644)
+            ("/usr/ryujinx/Ryujinx", RYUJINX_BIN_PATH, 0o0775),
+            ("/usr/ryujinx/libSkiaSharp.so", path.join(RYUJINX_CONFIG_DIR, "libSkiaSharp.so"), 0o0644),
+            ("/usr/ryujinx/libHarfBuzzSharp.so", path.join(RYUJINX_CONFIG_DIR, "libHarfBuzzSharp.so"), 0o0644)
         ]
 
         for src, dest, mode in files_to_copy:
-            if not os.path.exists(dest) or not filecmp.cmp(src, dest):
-                shutil.copyfile(src, dest)
-                os.chmod(dest, mode)
+            if not path.exists(dest) or not cmp(src, dest):
+                copyfile(src, dest)
+                chmod(dest, mode)
 
         # Copy the prod.keys file to where ryujinx reads it
-        if os.path.exists(ryujinxKeys):
-            shutil.copyfile(ryujinxKeys, ryujinxConf + "/system/prod.keys")
+        if path.exists(RYUJINX_KEY_PATH):
+            copyfile(RYUJINX_KEY_PATH, RYUJINX_CONFIG_DIR + "/system/prod.keys")
 
         # [Configuration]
-        if not os.path.exists(os.path.dirname(ryujinxConfFile)):
-            os.makedirs(os.path.dirname(ryujinxConfFile))
+        if not path.exists(path.dirname(RYUJINX_CONFIG_PATH)):
+            makedirs(path.dirname(RYUJINX_CONFIG_PATH))
         try:
-            conf = json.load(open(ryujinxConfFile, "r"))
+            conf = load(open(RYUJINX_CONFIG_PATH, "r"))
         except:
             conf = {}
 
@@ -160,8 +159,8 @@ class RyujinxGenerator(Generator):
         conf["input_config"] = []
 
         # write / update the config file
-        js_out = json.dumps(conf, indent=2)
-        with open(ryujinxConfFile, "w") as jout:
+        js_out = dumps(conf, indent=2)
+        with open(RYUJINX_CONFIG_PATH, "w") as jout:
             jout.write(js_out)
 
         # Now add Controllers
@@ -171,7 +170,7 @@ class RyujinxGenerator(Generator):
                 ctrlConf = ryujinxCtrl
                 # we need to get the uuid for ryujinx controllers
                 # example xbox 360 - "id": "0-00000003-045e-0000-8e02-000014010000"
-                devices = [InputDevice(fn) for fn in evdev.list_devices()]
+                devices = [InputDevice(fn) for fn in list_devices()]
                 for dev in devices:
                     if dev.path == pad.dev:
                         bustype = "%x" % dev.info.bustype
@@ -202,18 +201,18 @@ class RyujinxGenerator(Generator):
             nplayer += 1
 
         if rom == "config":
-            commandArray = [ryujinxExec]
+            commandArray = [RYUJINX_BIN_PATH]
         else:
-            commandArray = [ryujinxExec, rom]
+            commandArray = [RYUJINX_BIN_PATH, rom]
 
         return Command(array=commandArray)
 
-def writeControllerIntoJson(new_controller, filename=ryujinxConfFile):
+def writeControllerIntoJson(new_controller, filename=RYUJINX_CONFIG_PATH):
     with open(filename,'r+') as file:
-        file_data = json.load(file)
+        file_data = load(file)
         file_data["input_config"].append(new_controller)
         file.seek(0)
-        json.dump(file_data, file, indent=2)
+        dump(file_data, file, indent=2)
 
 def getLangFromEnvironment():
     lang = environ['LANG'][:5]
