@@ -1,15 +1,17 @@
 from generators.Generator import Generator
 from Command import Command
-import controllers as controllersConfig
+from controllers import generate_sdl_controller_config
+
+STELLA_BIN_PATH = '/usr/bin/stella'
 
 class StellaGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # Launch Stella
-        commandArray = ["stella" , " ", rom ]
+        commandArray = [STELLA_BIN_PATH , " ", rom ]
 
         return Command(
                     array=commandArray,
                     env={
-                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
                     })

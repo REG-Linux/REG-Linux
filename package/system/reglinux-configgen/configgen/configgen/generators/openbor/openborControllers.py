@@ -1,4 +1,4 @@
-def generateControllerConfig(config, playersControllers, core):
+def setControllerConfig(config, playersControllers, core):
     if core == "openbor4432":
         setupControllers(config, playersControllers, 32, False)
     elif core == "openbor7142":

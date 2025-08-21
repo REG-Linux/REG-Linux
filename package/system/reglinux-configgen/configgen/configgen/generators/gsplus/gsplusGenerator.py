@@ -3,8 +3,12 @@ from Command import Command
 from os import path, makedirs
 from settings.unixSettings import UnixSettings
 from controllers import generate_sdl_controller_config
-from .gsplusConfig import GSPLUS_CONFIG_DIR, GSPLUS_CONFIG_PATH, GSPLUS_BIN_PATH, GSPLUS_BIOS_DIR
+from systemFiles import CONF, BIOS
 
+GSPLUS_CONFIG_DIR  = CONF + '/GSplus'
+GSPLUS_CONFIG_PATH = GSPLUS_CONFIG_DIR + '/config.txt'
+GSPLUS_BIOS_DIR = BIOS
+GSPLUS_BIN_PATH = '/usr/bin/GSplus'
 
 class GSplusGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):

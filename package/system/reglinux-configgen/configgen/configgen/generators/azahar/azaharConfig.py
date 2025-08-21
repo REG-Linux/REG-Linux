@@ -8,7 +8,6 @@ eslog = get_logger(__name__)
 AZAHAR_CONFIG_PATH = CONF + '/azahar-emu/qt-config.ini'
 AZAHAR_BIN_PATH = '/usr/bin/azahar'
 
-
 # Language auto setting
 def getAzaharLangFromEnvironment():
     region = { "AUTO": -1, "JPN": 0, "USA": 1, "EUR": 2, "AUS": 3, "CHN": 4, "KOR": 5, "TWN": 6 }

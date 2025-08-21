@@ -1,12 +1,9 @@
-import os
-import configparser
-from systemFiles import CONF, HOME_INIT
+from os import path, makedirs
+from configparser import ConfigParser
+from .ppssppConfig import PPSSPP_CONTROLS_SOURCE_PATH, PPSSPP_CONTROLS_PATH
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
-
-ppssppControlsIni  = CONF + '/ppsspp/PSP/SYSTEM/controls.ini'
-ppssppControlsInit = HOME_INIT + 'configs/ppsspp/PSP/SYSTEM/controls.ini'
 
 # This configgen is based on PPSSPP 1.5.4.
 # Therefore, all code/github references are valid at this version, and may not be valid with later updates
@@ -121,12 +118,12 @@ ppssppMapping =  { 'a' :             {'button': 'Circle'},
 }
 
 # Create the controller configuration file
-def generateControllerConfig(controller):
+def setControllerConfig(controller):
     # Set config file name
-    configFileName = ppssppControlsIni
-    Config = configparser.ConfigParser(interpolation=None)
+    configFileName = PPSSPP_CONTROLS_PATH
+    Config = ConfigParser(interpolation=None)
     Config.optionxform = lambda optionstr: str(optionstr)
-    Config.read(ppssppControlsInit)
+    Config.read(PPSSPP_CONTROLS_SOURCE_PATH)
     # As we start with the default ini file, no need to create the section
     section = "ControlMapping"
     if not Config.has_section(section):
@@ -182,8 +179,8 @@ def generateControllerConfig(controller):
             val = optionValue(Config, section, var, val)
             Config.set(section, var, val)
 
-        if not os.path.exists(os.path.dirname(configFileName)):
-                os.makedirs(os.path.dirname(configFileName))
+        if not path.exists(path.dirname(configFileName)):
+                makedirs(path.dirname(configFileName))
 
     # hotkey controls are called via evmapy.
     # configuring specific hotkey in ppsspp is not simple without patching

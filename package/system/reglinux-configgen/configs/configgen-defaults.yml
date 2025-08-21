@@ -278,8 +278,8 @@ jaguarcd:
   emulator: libretro
   core:     virtualjaguar
 jazz2:
-  emulator: jazz2-native
-  core:     jazz2-native
+  emulator: jazz2
+  core:     jazz2
 laser310:
   emulator: libretro
   core:     mame

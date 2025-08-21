@@ -1,9 +1,9 @@
 from generators.Generator import Generator
 from Command import Command
-import os.path
-import systemFiles
-import controllers as controllersConfig
-from . import moonlightConfig
+from os import path
+from systemFiles import CONF
+from controllers import generate_sdl_controller_config
+from .moonlightConfig import setMoonlightConfig, MOONLIGHT_BIN_PATH, MOONLIGHT_GAMELIST_PATH, MOONLIGHT_STAGING_CONFIG_PATH
 
 class MoonlightGenerator(Generator):
 
@@ -13,29 +13,26 @@ class MoonlightGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        moonlightConfig.generateMoonlightConfig(system)
+        setMoonlightConfig(system)
         gameName,confFile = self.getRealGameNameAndConfigFile(rom)
-        commandArray = [moonlightConfig.moonlightBin, 'stream','-config',  confFile]
+        commandArray = [MOONLIGHT_BIN_PATH, 'stream','-config',  confFile]
         commandArray.append('-app')
         commandArray.append(gameName)
         commandArray.append('-debug')
 
-        # write our own gamecontrollerdb.txt file before launching the game
-        dbfile = "/usr/share/moonlight/gamecontrollerdb.txt"
-        controllersConfig.write_sdl_db_all_controllers(playersControllers, dbfile)
-
         return Command(
             array=commandArray,
             env={
-                "XDG_DATA_DIRS": systemFiles.CONF
+                "XDG_DATA_DIRS": CONF,
+                'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
             }
         )
 
     def getRealGameNameAndConfigFile(self, rom):
         # Rom's basename without extension
-        romName = os.path.splitext(os.path.basename(rom))[0]
+        romName = path.splitext(path.basename(rom))[0]
         # find the real game name
-        f = open(moonlightConfig.moonlightGamelist, 'r')
+        f = open(MOONLIGHT_GAMELIST_PATH, 'r')
         gfeGame = None
         for line in f:
             try:
@@ -43,11 +40,11 @@ class MoonlightGenerator(Generator):
                 #confFile = confFile.rstrip()
             except:
                 gfeRom, gfeGame = line.rstrip().split(';')
-                confFile = moonlightConfig.moonlightStagingConfigFile
+                confFile = MOONLIGHT_STAGING_CONFIG_PATH
             #If found
             if gfeRom == romName:
                 # return it
                 f.close()
                 return [gfeGame, confFile]
         # If nothing is found (old gamelist file format ?)
-        return [gfeGame, moonlightConfig.moonlightStagingConfigFile]
+        return [gfeGame, MOONLIGHT_STAGING_CONFIG_PATH]

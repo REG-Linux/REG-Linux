@@ -1,22 +1,22 @@
-import os
+from os import path, linesep
 from xml.dom import minidom
-import codecs
-import csv
-from xml.dom import minidom
+from codecs import open
+from csv import reader
+from xml.dom.minidom import Document, parse
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customCfg, specialController, decorations, useGuns, guns, useWheels, wheels, useMouse, multiMouse, system):
     # config file
-    config = minidom.Document()
+    config = Document()
     configFile = cfgPath + "default.cfg"
-    if os.path.exists(configFile):
+    if path.exists(configFile):
         try:
-            config = minidom.parse(configFile)
+            config = parse(configFile)
         except:
             pass # reinit the file
-    if os.path.exists(configFile) and customCfg:
+    if path.exists(configFile) and customCfg:
         overwriteMAME = False
     else:
         overwriteMAME = True
@@ -26,7 +26,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
     openFile = open(controlFile, 'r')
     controlDict = {}
     with openFile:
-        controlList = csv.reader(openFile)
+        controlList = reader(openFile)
         for row in controlList:
             if not row[0] in controlDict.keys():
                 controlDict[row[0]] = {}
@@ -101,7 +101,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
         messControlFile = '/usr/share/reglinux/configgen/data/mame/messControls.csv'
         openMessFile = open(messControlFile, 'r')
         with openMessFile:
-            controlList = csv.reader(openMessFile, delimiter=';')
+            controlList = reader(openMessFile, delimiter=';')
             for row in controlList:
                 if not row[0] in messControlDict.keys():
                     messControlDict[row[0]] = {}
@@ -141,12 +141,12 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
 
         config_alt = minidom.Document()
         configFile_alt = cfgPath + sysName + ".cfg"
-        if os.path.exists(configFile_alt) and cfgPath == "/userdata/system/configs/mame/" + sysName + "/":
+        if path.exists(configFile_alt) and cfgPath == "/userdata/system/configs/mame/" + sysName + "/":
             try:
                 config_alt = minidom.parse(configFile_alt)
             except:
                 pass # reinit the file
-        elif os.path.exists(configFile_alt):
+        elif path.exists(configFile_alt):
             try:
                 config_alt = minidom.parse(configFile_alt)
             except:
@@ -155,7 +155,7 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
             perGameCfg = False
         else:
             perGameCfg = True
-        if os.path.exists(configFile_alt) and (customCfg or perGameCfg):
+        if path.exists(configFile_alt) and (customCfg or perGameCfg):
             overwriteSystem = False
         else:
             overwriteSystem = True
@@ -192,7 +192,6 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
 
     # Fill in controls on cfg files
     nplayer = 1
-    maxplayers = len(playersControllers)
     for playercontroller, pad in sorted(playersControllers.items()):
         mappings_use = mappings
         if hasStick(pad) == False:
@@ -290,15 +289,15 @@ def generatePadsConfig(cfgPath, playersControllers, sysName, altButtons, customC
     # TODO: python 3 - workawround to encode files in utf-8
     if overwriteMAME:
         eslog.debug(f"Saving {configFile}")
-        mameXml = codecs.open(configFile, "w", "utf-8")
-        dom_string = os.linesep.join([s for s in config.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
+        mameXml = open(configFile, "w", "utf-8")
+        dom_string = linesep.join([s for s in config.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
         mameXml.write(dom_string)
 
     # Write alt config (if used, custom config is turned off or file doesn't exist yet)
     if sysName in specialControlList and overwriteSystem:
         eslog.debug(f"Saving {configFile_alt}")
-        mameXml_alt = codecs.open(configFile_alt, "w", "utf-8")
-        dom_string_alt = os.linesep.join([s for s in config_alt.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
+        mameXml_alt = open(configFile_alt, "w", "utf-8")
+        dom_string_alt = linesep.join([s for s in config_alt.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
         mameXml_alt.write(dom_string_alt)
 
 def reverseMapping(key):
@@ -319,7 +318,7 @@ def generatePortElement(pad, config, nplayer, padindex, mapping, key, input, rev
     xml_newseq = config.createElement("newseq")
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
-    keyval = input2definition(pad, key, input, padindex + 1, reversed, altButtons, False, isWheel)
+    keyval = input2definition(pad, key, input, padindex, reversed, altButtons, False, isWheel)
     if mapping in gunmappings:
         keyval = keyval + " OR GUNCODE_{}_{}".format(nplayer, gunmappings[mapping])
         if gunmappings[mapping] == "BUTTON2" and pedalkey is not None:
@@ -364,7 +363,7 @@ def generateSpecialPortElementPlayer(pad, config, tag, nplayer, padindex, mappin
     xml_newseq = config.createElement("newseq")
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
-    keyval = input2definition(pad, key, input, padindex + 1, reversed, 0)
+    keyval = input2definition(pad, key, input, padindex, reversed, 0)
     if mapping in gunmappings:
         keyval = keyval + " OR GUNCODE_{}_{}".format(nplayer, gunmappings[mapping])
         if gunmappings[mapping] == "BUTTON2" and pedalkey is not None:
@@ -388,7 +387,7 @@ def generateSpecialPortElement(pad, config, tag, nplayer, padindex, mapping, key
     xml_newseq = config.createElement("newseq")
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
-    value = config.createTextNode(input2definition(pad, key, input, padindex + 1, reversed, 0))
+    value = config.createTextNode(input2definition(pad, key, input, padindex, reversed, 0))
     xml_newseq.appendChild(value)
     return xml_port
 
@@ -402,7 +401,7 @@ def generateComboPortElement(pad, config, tag, padindex, mapping, kbkey, key, in
     xml_newseq = config.createElement("newseq")
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
-    value = config.createTextNode("KEYCODE_{} OR ".format(kbkey) + input2definition(pad, key, input, padindex + 1, reversed, 0))
+    value = config.createTextNode("KEYCODE_{} OR ".format(kbkey) + input2definition(pad, key, input, padindex, reversed, 0))
     xml_newseq.appendChild(value)
     return xml_port
 
@@ -417,12 +416,12 @@ def generateAnalogPortElement(pad, config, tag, nplayer, padindex, mapping, inck
     xml_newseq_inc = config.createElement("newseq")
     xml_newseq_inc.setAttribute("type", "increment")
     xml_port.appendChild(xml_newseq_inc)
-    incvalue = config.createTextNode(input2definition(pad, inckey, mappedinput, padindex + 1, reversed, 0, True))
+    incvalue = config.createTextNode(input2definition(pad, inckey, mappedinput, padindex, reversed, 0, True))
     xml_newseq_inc.appendChild(incvalue)
     xml_newseq_dec = config.createElement("newseq")
     xml_port.appendChild(xml_newseq_dec)
     xml_newseq_dec.setAttribute("type", "decrement")
-    decvalue = config.createTextNode(input2definition(pad, deckey, mappedinput2, padindex + 1, reversed, 0, True))
+    decvalue = config.createTextNode(input2definition(pad, deckey, mappedinput2, padindex, reversed, 0, True))
     xml_newseq_dec.appendChild(decvalue)
     xml_newseq_std = config.createElement("newseq")
     xml_port.appendChild(xml_newseq_std)
@@ -430,7 +429,7 @@ def generateAnalogPortElement(pad, config, tag, nplayer, padindex, mapping, inck
     if axis == '':
         stdvalue = config.createTextNode("NONE")
     else:
-        stdvalue = config.createTextNode("JOYCODE_{}_{}".format(padindex + 1, axis))
+        stdvalue = config.createTextNode("JOYCODE_{}_{}".format(padindex, axis))
     xml_newseq_std.appendChild(stdvalue)
     return xml_port
 

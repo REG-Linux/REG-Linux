@@ -3,21 +3,26 @@ from Command import Command
 import os.path
 import glob
 import configparser
-from systemFiles import SCREENSHOTS
-from . import scummvmConfig
+from systemFiles import SCREENSHOTS, SAVES, CONF
+
+scummvmSaves = SAVES + '/scummvm'
+scummvmConfigDir = CONF + "/scummvm"
+scummvmConfigFile = scummvmConfigDir + "/scummvm.ini"
+scummvmExtra = "/userdata/bios/scummvm/extra"
+scummvmBin = "/usr/bin/scummvm"
 
 class ScummVMGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # crete /userdata/bios/scummvm/extra folder if it doesn't exist
-        if not os.path.exists(scummvmConfig.scummvmExtra):
-            os.makedirs(scummvmConfig.scummvmExtra)
+        if not os.path.exists(scummvmExtra):
+            os.makedirs(scummvmExtra)
 
         # create / modify scummvm config file as needed
         scummConfig = configparser.ConfigParser()
         scummConfig.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(scummvmConfig.scummvmConfigFile):
-            scummConfig.read(scummvmConfig.scummvmConfigFile)
+        if os.path.exists(scummvmConfigFile):
+            scummConfig.read(scummvmConfigFile)
 
         if not scummConfig.has_section("scummvm"):
             scummConfig.add_section("scummvm")
@@ -25,9 +30,9 @@ class ScummVMGenerator(Generator):
         scummConfig.set("scummvm", "gui_browser_native", "false")
 
         # save the ini file
-        if not os.path.exists(os.path.dirname(scummvmConfig.scummvmConfigFile)):
-            os.makedirs(os.path.dirname(scummvmConfig.scummvmConfigFile))
-        with open(scummvmConfig.scummvmConfigFile, 'w') as configfile:
+        if not os.path.exists(os.path.dirname(scummvmConfigFile)):
+            os.makedirs(os.path.dirname(scummvmConfigFile))
+        with open(scummvmConfigFile, 'w') as configfile:
             scummConfig.write(configfile)
 
         # Find rom path
@@ -50,7 +55,7 @@ class ScummVMGenerator(Generator):
                 id=pad.index
             nplayer += 1
 
-        commandArray = [scummvmConfig.scummvmBin, "-f"]
+        commandArray = [scummvmBin, "-f"]
 
         # set the resolution
         window_width = str(gameResolution["width"])
@@ -94,8 +99,8 @@ class ScummVMGenerator(Generator):
 
         commandArray.extend(
             [f"--joystick={id}",
-            "--screenshotspath="+SCREENSHOTS,
-            "--extrapath="+scummvmConfig.scummvmExtra,
+            "--screenshotspath=" + SCREENSHOTS,
+            "--extrapath=" + scummvmExtra,
             f"--path={romPath}",
             f"{romName}"]
         )

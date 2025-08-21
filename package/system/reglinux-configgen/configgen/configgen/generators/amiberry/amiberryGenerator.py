@@ -3,7 +3,13 @@ from Command import Command
 from zipfile import ZipFile
 from os import path, makedirs, chdir
 from settings.unixSettings import UnixSettings
-from .amiberryConfig import AMIBERRY_CONFIG_PATH, AMIBERRY_BIN_PATH, AMIBERRY_INPUTS_DIR, AMIBERRY_SHARE_DIR
+from systemFiles import CONF
+
+AMIBERRY_DIR = CONF + '/amiberry'
+AMIBERRY_INPUTS_DIR = AMIBERRY_DIR + '/conf/retroarch/autoconfig'
+AMIBERRY_CONFIG_PATH = AMIBERRY_DIR + '/conf/retroarch/retroarchcustom.cfg'
+AMIBERRY_SHARE_DIR = '/usr/share/amiberry'
+AMIBERRY_BIN_PATH = '/usr/bin/amiberry'
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
