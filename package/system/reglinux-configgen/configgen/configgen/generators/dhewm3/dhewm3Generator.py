@@ -1,7 +1,11 @@
 from generators.Generator import Generator
 from Command import Command
 from pathlib import Path
-from .dhewm3Config import DHEWM3_BIN_PATH, DHEWM3_ROMS_DIR
+from systemFiles import CONF, ROMS
+
+DHEWM3_BIN_PATH = '/usr/bin/dhewm3'
+DHEWM3_CONFIG_DIR = CONF + '/dhewm3'
+DHEWM3_ROMS_DIR = ROMS + '/doom3'
 
 class Dhewm3Generator(Generator):
 

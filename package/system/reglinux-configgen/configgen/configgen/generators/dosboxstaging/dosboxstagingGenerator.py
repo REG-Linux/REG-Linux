@@ -1,7 +1,12 @@
 from generators.Generator import Generator
 from Command import Command
 from os import path
-from .dosboxstagingConfig import DOSBOXSTAGING_CONFIG_PATH, DOSBOXSTAGING_BIN_PATH
+from systemFiles import CONF
+
+DOSBOXSTAGING_CONFIG_DIR = CONF + '/dosbox'
+DOSBOXSTAGING_CONFIG_PATH = DOSBOXSTAGING_CONFIG_DIR + '/dosbox.conf'
+DOSBOXSTAGING_BIN_PATH = '/usr/bin/dosbox-staging'
+
 
 class DosBoxStagingGenerator(Generator):
 

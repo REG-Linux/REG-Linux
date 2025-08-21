@@ -7,7 +7,11 @@ import shutil
 import configparser
 import controllers as controllersConfig
 from shutil import copyfile
-from . import supermodelConfig
+from systemFiles import CONF
+
+supermodelCustom = CONF + '/supermodel'
+supermodelIni = supermodelCustom + '/Supermodel.ini'
+supermodelBin = '/usr/bin/supermodel'
 
 class SupermodelGenerator(Generator):
     # this emulator/core requires a X server to run

@@ -2,7 +2,10 @@ from generators.Generator import Generator
 from Command import Command
 import codecs
 import os
-from systemFiles import CONF
+from systemFiles import SAVES, CONF
+
+solarusSaves = SAVES + '/solarus'
+
 
 class SolarusGenerator(Generator):
 

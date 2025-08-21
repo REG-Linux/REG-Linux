@@ -3,7 +3,13 @@ from Command import Command
 from os import mkdir, chdir, path
 from codecs import open
 from controllers import generate_sdl_controller_config
-from .ecwolfConfig import ECWOLF_BIN_PATH, ECWOLF_SAVES_DIR, ECWOLF_CONFIG_DIR
+from systemFiles import CONF, SAVES
+
+ECWOLF_CONFIG_DIR = CONF + '/ecwolf'
+ECWOLF_CONFIG_PATH = ECWOLF_CONFIG_DIR + '/ecwolf.cfg'
+ECWOLF_SAVES_DIR = SAVES + '/ecwolf'
+ECWOLF_BIN_PATH = '/usr/bin/ecwolf'
+
 
 class ECWolfGenerator(Generator):
 

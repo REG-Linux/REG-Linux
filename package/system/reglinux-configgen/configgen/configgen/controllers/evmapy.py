@@ -573,9 +573,6 @@ class Evmapy():
         """
         Get the minimum and maximum values for a specific axis on a controller.
 
-        This function queries the controller device to determine the actual
-        range of values that an axis can produce.
-
         Args:
             devicePath (str): Path to the controller device (e.g., /dev/input/event0)
             axisCode (int): The Linux input event code for the axis
@@ -584,18 +581,37 @@ class Evmapy():
             tuple: (min_value, max_value) for the axis, or (0, 0) if not found
         """
         try:
+            # Check if the device path exists before attempting to open it
+            if not path.exists(devicePath):
+                eslog.warning(f"Device path {devicePath} does not exist")
+                return 0, 0
+
             device = InputDevice(devicePath)
             capabilities = device.capabilities(verbose=False)
 
-            for event_type, events in capabilities.items():
-                if event_type == 3:  # EV_ABS (absolute axis events)
-                    for abs_code, val in events:
+            # Check if EV_ABS (3) is present in capabilities
+            if 3 in capabilities:
+                abs_events = capabilities[3]  # List of tuples (abs_code, val)
+                for abs_info in abs_events:
+                    # Ensure abs_info is a tuple with two elements
+                    if isinstance(abs_info, tuple) and len(abs_info) == 2:
+                        abs_code, val = abs_info
                         if abs_code == axisCode:
                             return val.min, val.max
+        except PermissionError as e:
+            # Log permission denied error
+            eslog.warning(f"Permission denied accessing {devicePath}: {e}")
+            return 0, 0
+        except FileNotFoundError as e:
+            # Log device not found error
+            eslog.warning(f"Device not found at {devicePath}: {e}")
+            return 0, 0
         except Exception as e:
+            # Log any other unexpected errors
             eslog.warning(f"Error reading axis info from {devicePath}: {e}")
+            return 0, 0
 
-        return 0, 0  # Default values if axis not found or error occurred
+        return 0, 0  # Default values if axis not found
 
     @staticmethod
     def __getPadMinMaxAxisForKeys(min_val, max_val):
