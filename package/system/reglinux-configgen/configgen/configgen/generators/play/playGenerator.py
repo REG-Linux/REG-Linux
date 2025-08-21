@@ -1,15 +1,15 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import xml.etree.ElementTree as ET
-from os import path
+from os import path, makedirs
+from xml.etree.ElementTree import Element, SubElement, ElementTree, parse
 from systemFiles import CONF, SAVES
 
-playConfig = CONF + '/play'
-playSaves = SAVES + '/play'
-playHome = CONF
-playConfigFile = playConfig + '/Play Data Files/config.xml'
-playInputFile = playConfig + '/Play Data Files/inputprofiles/default.xml'
+PLAY_CONFIG_DIR = CONF + '/play'
+PLAY_SAVE_DIR = SAVES + '/play'
+PLAY_HOME_DIR = CONF
+PLAY_BIN_PATH = '/usr/bin/Play'
+PLAY_CONFIG_FILE = PLAY_CONFIG_DIR + '/Play Data Files/config.xml'
+PLAY_INPUT_FILE = PLAY_CONFIG_DIR + '/Play Data Files/inputprofiles/default.xml'
 
 class PlayGenerator(Generator):
     # Play is QT6 based, requires wayland compositor to run
@@ -19,14 +19,14 @@ class PlayGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
         # Create config folder
-        if not path.isdir(playConfig):
-            os.makedirs(playConfig)
+        if not path.isdir(PLAY_CONFIG_DIR):
+            makedirs(PLAY_CONFIG_DIR)
         # Create save folder
-        if not path.isdir(playSaves):
-            os.makedirs(playSaves)
+        if not path.isdir(PLAY_SAVE_DIR):
+            makedirs(PLAY_SAVE_DIR)
 
         ## Work with the config.xml file
-        root = ET.Element('Config')
+        root = Element('Config')
 
         # Dictionary of preferences and defaults
         preferences = {
@@ -77,15 +77,15 @@ class PlayGenerator(Generator):
         }
 
         # Check if the file exists
-        if os.path.exists(playConfigFile):
-            tree = ET.parse(playConfigFile)
+        if path.exists(PLAY_CONFIG_FILE):
+            tree = parse(PLAY_CONFIG_FILE)
             root = tree.getroot()
         # Add or update preferences
         for pref_name, pref_attrs in preferences.items():
             pref_element = root.find(f".//Preference[@Name='{pref_name}']")
             if pref_element is None:
                 # Preference doesn't exist, create a new element
-                pref_element = ET.SubElement(root, 'Preference')
+                pref_element = SubElement(root, 'Preference')
                 pref_element.attrib['Name'] = pref_name
             # Set or update attribute values
             for attr_name, attr_value in pref_attrs.items():
@@ -107,28 +107,28 @@ class PlayGenerator(Generator):
                     pref_element.attrib['Value'] = system.config['play_filter']
 
         # Create the tree and write to the file
-        tree = ET.ElementTree(root)
+        tree = ElementTree(root)
 
         # Handle the case when the file doesn't exist
-        if not os.path.exists(playConfigFile):
+        if not path.exists(PLAY_CONFIG_FILE):
             # Create the directory if it doesn't exist
-            directory = os.path.dirname(playConfigFile)
-            os.makedirs(directory, exist_ok=True)
+            directory = path.dirname(PLAY_CONFIG_FILE)
+            makedirs(directory, exist_ok=True)
             # Write the XML to the file
-            tree.write(playConfigFile)
+            tree.write(PLAY_CONFIG_FILE)
         else:
             # File exists, write the XML to the existing file
-            with open(playConfigFile, "wb") as file:
+            with open(PLAY_CONFIG_FILE, "wb") as file:
                 tree.write(file)
 
-        commandArray = ["/usr/bin/Play", "--fullscreen"]
+        commandArray = [PLAY_BIN_PATH, "--fullscreen"]
 
         if rom != "config":
             # if zip, it's a namco arcade game
             if (rom.lower().endswith("zip")):
                 # strip path & extension
-                rom = os.path.basename(rom)
-                rom = os.path.splitext(rom)[0]
+                rom = path.basename(rom)
+                rom = path.splitext(rom)[0]
                 commandArray.extend(["--arcade", rom])
             else:
                 commandArray.extend(["--disc", rom])
