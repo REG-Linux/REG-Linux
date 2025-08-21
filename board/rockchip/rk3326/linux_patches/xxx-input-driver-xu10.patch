@@ -1,377 +1,9 @@
-From 9b994cd9b19bb0067019cfd0f5af1e8a2d5ed9c0 Mon Sep 17 00:00:00 2001
-Date: Wed, 7 Feb 2024 12:13:07 -0400
-Subject: [PATCH] joypad device driver add for odroidgo3
-
----
- .../boot/dts/rockchip/rk3326-odroid-go3.dts   |  300 +++--
- drivers/input/joystick/Kconfig                |    5 +
- drivers/input/joystick/Makefile               |    1 +
- drivers/input/joystick/odroidgo3-joypad.c     | 1090 +++++++++++++++++
- 4 files changed, 1298 insertions(+), 98 deletions(-)
- create mode 100644 drivers/input/joystick/odroidgo3-joypad.c
-
-diff --git a/arch/arm64/boot/dts/rockchip/rk3326-odroid-go3.dts b/arch/arm64/boot/dts/rockchip/rk3326-odroid-go3.dts
-index 35bbaf5..89b42e9 100644
---- a/arch/arm64/boot/dts/rockchip/rk3326-odroid-go3.dts
-+++ b/arch/arm64/boot/dts/rockchip/rk3326-odroid-go3.dts
-@@ -12,65 +12,216 @@ / {
- 	model = "ODROID-GO Super";
- 	compatible = "hardkernel,rk3326-odroid-go3", "rockchip,rk3326";
- 
--	joystick_mux_controller: mux-controller {
--		compatible = "gpio-mux";
--		pinctrl = <&mux_en_pins>;
--		#mux-control-cells = <0>;
--
--		mux-gpios = <&gpio3 RK_PB3 GPIO_ACTIVE_LOW>,
--			    <&gpio3 RK_PB0 GPIO_ACTIVE_LOW>;
-+	gpio_keys: odroidgo3-keys {
-+		compatible = "gpio-keys";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		autorepeat;
-+		button@0 {
-+			label = "GPIO BTN-VOLUP";
-+			linux,code = <KEY_VOLUMEUP>;
-+			gpios = <&gpio2 RK_PA0 GPIO_ACTIVE_LOW>;
-+		};
-+		button@1 {
-+			label = "GPIO BTN-VOLDN";
-+			linux,code = <KEY_VOLUMEDOWN>;
-+			gpios = <&gpio2 RK_PA1 GPIO_ACTIVE_LOW>;
-+		};
- 	};
- 
--	joystick_mux: adc-mux {
--		compatible = "io-channel-mux";
--		io-channels = <&saradc 1>;
--		io-channel-names = "parent";
--		#io-channel-cells = <1>;
-+	joypad: odroidgo3-joypad {
-+			compatible = "odroidgo3-joypad";
- 
--		mux-controls = <&joystick_mux_controller>;
--		channels = "0", "1", "2", "3";
--	};
-+			joypad-name = "GO-Super Gamepad";
-+			joypad-product = <0x1100>;
-+			joypad-revision = <0x0100>;
- 
--	analog_sticks: adc-joystick {
--		compatible = "adc-joystick";
--		io-channels = <&joystick_mux 0>,
--			      <&joystick_mux 1>,
--			      <&joystick_mux 2>,
--			      <&joystick_mux 3>;
--		poll-interval = <60>;
--		#address-cells = <1>;
--		#size-cells = <0>;
-+	status = "okay";
-+			/*
-+				- odroidgo3-joypad sysfs list -
-+		* for poll device interval(ms)
-+		/sys/devices/platform/odroidgo3_joypad/poll_interval [rw]
-+		ex) echo 20 > poll_interval
-+				* for button-adc-fuzz
-+		/sys/devices/platform/odroidgo3_joypad/adc_fuzz [r]
-+				* for button-adc-flat
-+		/sys/devices/platform/odroidgo3_joypad/adc_flat [r]
- 
--		axis@0 {
--			reg = <0>;
--			abs-flat = <10>;
--			abs-fuzz = <10>;
--			abs-range = <180 800>;
--			linux,code = <ABS_X>;
--		};
-+		* for report control(1:enable, 0:disable)
-+		/sys/devices/platform/odroidgo3_joypad/enable [rw]
-+		* for adc calibration value setup(current adcs value -> cal value)
-+		/sys/devices/platform/odroidgo3_joypad/adc_cal [rw]
-+		ex) echo 0 > adc_cal
-+		* for amux data debug
-+		* Joypad driver is disabled when using this sysfs.
-+		/sys/devices/platform/odroidgo3_joypad/amux_debug [rw]
-+		ex) echo 0 > amux_debug --> select amux channel
-+		ex) cat amux_debug --> get adc data of seleted channel
-+			*/
- 
--		axis@1 {
--			reg = <1>;
--			abs-flat = <10>;
--			abs-fuzz = <10>;
--			abs-range = <180 800>;
--			linux,code = <ABS_RX>;
--		};
-+	/* gpio pincontrol setup */
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&btn_pins>;
- 
--		axis@2 {
--			reg = <2>;
--			abs-flat = <10>;
--			abs-fuzz = <10>;
--			abs-range = <180 800>;
--			linux,code = <ABS_Y>;
--		};
-+	/* Analog mux define */
-+	io-channel-names = "amux_adc";
-+	io-channels = <&saradc 1>;
-+
-+	/* adc mux channel count */
-+	amux-count = <4>;
-+	/* adc mux select(a,b) gpio */
-+	amux-a-gpios = <&gpio3 RK_PB3 GPIO_ACTIVE_LOW>;
-+	amux-b-gpios = <&gpio3 RK_PB0 GPIO_ACTIVE_LOW>;
-+	/* adc mux enable gpio */
-+	amux-en-gpios = <&gpio3 RK_PB5 GPIO_ACTIVE_LOW>;
-+
-+	/* adc calculate scale */
-+	button-adc-scale = <2>;
-+
-+	/* adc deadzone range  */
-+	button-adc-deadzone = <64>;
-+
-+	/*
-+		specifies fuzz value that is used to filter noise from
-+		the event stream.
-+	*/
-+	button-adc-fuzz = <32>;
-+	button-adc-flat = <32>;
-+
-+	/*
-+		Analog Stick data tuning value(precent)
-+		p = positive direction, n = negative direction
-+		report value = (real_adc_data * tuning_value) / 100
-+	*/
-+	abs_x-p-tuning = <200>;
-+	abs_x-n-tuning = <200>;
-+
-+	abs_y-p-tuning = <200>;
-+	abs_y-n-tuning = <200>;
-+
-+	abs_rx-p-tuning = <200>;
-+	abs_rx-n-tuning = <200>;
- 
--		axis@3 {
--			reg = <3>;
--			abs-flat = <10>;
--			abs-fuzz = <10>;
--			abs-range = <180 800>;
--			linux,code = <ABS_RY>;
-+	abs_ry-p-tuning = <200>;
-+	abs_ry-n-tuning = <200>;
-+
-+	/* poll device interval (ms), adc read interval */
-+	poll-interval = <10>;
-+
-+	/* gpio button auto repeat set value : default disable */
-+	/*
-+		autorepeat;
-+	*/
-+
-+	/*
-+			*** ODROIDGO3-Advance Switch layoout ***
-+	|------------------------------------------------|
-+	| sw15  sw21        sw10   sw9        sw20  sw16 |
-+	|------------------------------------------------|
-+	|      sw19                            sw22      |
-+	|              |-------------------|             |
-+	|     sw1      |                   |      sw8    |
-+	|  sw3   sw4   |                   |   sw7   sw5 |
-+	|     sw2      |    LCD Display    |      sw6    |
-+	|              |                   |             |
-+	|              |                   |             |
-+	|              |-------------------|             |
-+	|  sw11 sw12        | sd-slot |       sw13 sw14  |
-+	|-------------------|         |------------------|
-+	*/
-+		/*
-+			joypad driver is poll-device driver.
-+			poll-device is does not support wakeup-source.
-+		*/
-+		sw1 {
-+				gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_LOW>;
-+				label = "GPIO DPAD-UP";
-+				linux,code = <BTN_DPAD_UP>; // 0x220
-+		};
-+		sw2 {
-+				gpios = <&gpio1 RK_PB5 GPIO_ACTIVE_LOW>;
-+				label = "GPIO DPAD-DOWN";
-+				linux,code = <BTN_DPAD_DOWN>; // 0x221
-+		};
-+		sw3 {
-+				gpios = <&gpio1 RK_PB6 GPIO_ACTIVE_LOW>;
-+				label = "GPIO DPAD-LEFT";
-+				linux,code = <BTN_DPAD_LEFT>; // 0x222
-+		};
-+		sw4 {
-+				gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_LOW>;
-+				label = "GPIO DPAD-RIGHT";
-+				linux,code = <BTN_DPAD_RIGHT>; // 0x223
-+		};
-+		sw5 {
-+				gpios = <&gpio1 RK_PA2 GPIO_ACTIVE_LOW>;
-+				label = "GPIO KEY BTN-A";
-+				linux,code = <BTN_EAST>; // 0x131
-+		};
-+		sw6 {
-+				gpios = <&gpio1 RK_PA5 GPIO_ACTIVE_LOW>;
-+				label = "GPIO BTN-B";
-+				linux,code = <BTN_SOUTH>; // 0x130
-+		};
-+		sw7 {
-+				gpios = <&gpio1 RK_PA6 GPIO_ACTIVE_LOW>;
-+				label = "GPIO BTN-Y";
-+				linux,code = <BTN_WEST>; // 0x134
-+		};
-+		sw8 {
-+				gpios = <&gpio1 RK_PA7 GPIO_ACTIVE_LOW>;
-+				label = "GPIO BTN-X";
-+				linux,code = <BTN_NORTH>; // 0x133
-+		};
-+		sw11 {
-+				gpios = <&gpio2 RK_PA2 GPIO_ACTIVE_LOW>;
-+				label = "GPIO F3";
-+				linux,code = <BTN_TRIGGER_HAPPY3>; // 0x2c2
-+		};
-+		sw12 {
-+				gpios = <&gpio2 RK_PA3 GPIO_ACTIVE_LOW>;
-+				label = "GPIO F4";
-+				linux,code = <BTN_TRIGGER_HAPPY4>; // 0x2c3
-+		};
-+		sw13 {
-+				gpios = <&gpio2 RK_PA4 GPIO_ACTIVE_LOW>;
-+				label = "GPIO F5";
-+				linux,code = <BTN_TRIGGER_HAPPY5>; // 0x2c4
-+		};
-+		sw14 {
-+				gpios = <&gpio2 RK_PA5 GPIO_ACTIVE_LOW>;
-+				label = "GPIO F6";
-+				linux,code = <BTN_TRIGGER_HAPPY6>; // 0x13c
-+		};
-+		sw15 {
-+				gpios = <&gpio2 RK_PA6 GPIO_ACTIVE_LOW>;
-+				label = "GPIO TOP-LEFT";
-+				linux,code = <BTN_TL>; // 0x02
-+		};
-+		sw16 {
-+				gpios = <&gpio2 RK_PA7 GPIO_ACTIVE_LOW>;
-+				label = "GPIO TOP-RIGHT";
-+				linux,code = <BTN_TR>; // 0x05
-+		};
-+		sw19 {
-+				gpios = <&gpio3 RK_PB1 GPIO_ACTIVE_LOW>;
-+				label = "GPIO F1";
-+				linux,code = <BTN_TRIGGER_HAPPY1>;
-+		};
-+		sw20 {
-+				gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_LOW>;
-+				label = "GPIO TOP-RIGHT2";
-+				linux,code = <BTN_TR2>;
-+		};
-+		sw21 {
-+				gpios = <&gpio3 RK_PB2 GPIO_ACTIVE_LOW>;
-+				label = "GPIO TOP-LEFT2";
-+				linux,code = <BTN_TL2>;
-+		};
-+		sw22 {
-+				gpios = <&gpio3 RK_PB4 GPIO_ACTIVE_LOW>;
-+				label = "GPIO F2";
-+				linux,code = <BTN_TRIGGER_HAPPY2>;
- 		};
- 	};
- 
-@@ -92,53 +243,6 @@ battery: battery {
- 					<3649470 20>, <3635260 15>, <3616920 10>, <3592440 5>,
- 					<3574170 0>;
- 	};
--
--	gpio-keys-vol {
--		compatible = "gpio-keys";
--		autorepeat;
--		pinctrl-0 = <&btn_pins_vol>;
--		pinctrl-names = "default";
--
--		button-vol-down {
--			gpios = <&gpio2 RK_PA1 GPIO_ACTIVE_LOW>;
--			label = "VOLUMEDOWN";
--			linux,code = <KEY_VOLUMEDOWN>;
--		};
--
--		button-volume-up {
--			gpios = <&gpio2 RK_PA0 GPIO_ACTIVE_LOW>;
--			label = "VOLUMEUP";
--			linux,code = <KEY_VOLUMEUP>;
--		};
--	};
--};
--
--/* f1 and f2 conflict with volume buttons */
--/delete-node/ &btn_f1;
--/delete-node/ &btn_f2;
--
--&builtin_gamepad {
--	button-sw19 {
--		gpios = <&gpio3 RK_PB1 GPIO_ACTIVE_LOW>;
--		label = "SELECT";
--		linux,code = <BTN_SELECT>;
--	};
--	/* note that TR2 and TL2 are swapped */
--	button-sw20 {
--		gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_LOW>;
--		label = "TOP-RIGHT 2";
--		linux,code = <BTN_TR2>;
--	};
--	button-sw21 {
--		gpios = <&gpio3 RK_PB2 GPIO_ACTIVE_LOW>;
--		label = "TOP-LEFT 2";
--		linux,code = <BTN_TL2>;
--	};
--	button-sw22 {
--		gpios = <&gpio3 RK_PB4 GPIO_ACTIVE_LOW>;
--		label = "START";
--		linux,code = <BTN_START>;
--	};
- };
- 
- &internal_display {
-diff --git a/drivers/input/joystick/Kconfig b/drivers/input/joystick/Kconfig
-index dd5f801..57c7253 100644
---- a/drivers/input/joystick/Kconfig
-+++ b/drivers/input/joystick/Kconfig
-@@ -59,6 +59,11 @@ config JOYSTICK_ODROIDGO2
- 	help
- 	  Made for OdroidGO2-Advance.
- 
-+config JOYSTICK_ODROIDGO3
-+	tristate "OdroidGO3 joypad driver"
-+	help
-+	  Made for OdroidGO3.
-+
- config JOYSTICK_ADI
- 	tristate "Logitech ADI digital joysticks and gamepads"
- 	select GAMEPORT
-diff --git a/drivers/input/joystick/Makefile b/drivers/input/joystick/Makefile
-index cb3e7c1..1ac5a76 100644
---- a/drivers/input/joystick/Makefile
-+++ b/drivers/input/joystick/Makefile
-@@ -8,6 +8,7 @@
- obj-$(CONFIG_JOYSTICK_A3D)		+= a3d.o
- obj-$(CONFIG_JOYSTICK_ADC)		+= adc-joystick.o
- obj-$(CONFIG_JOYSTICK_ODROIDGO2)	+= odroidgo2-joypad.o
-+obj-$(CONFIG_JOYSTICK_ODROIDGO3)	+= odroidgo3-joypad.o
- obj-$(CONFIG_JOYSTICK_ADI)		+= adi.o
- obj-$(CONFIG_JOYSTICK_AMIGA)		+= amijoy.o
- obj-$(CONFIG_JOYSTICK_AS5011)		+= as5011.o
-diff --git a/drivers/input/joystick/odroidgo3-joypad.c b/drivers/input/joystick/odroidgo3-joypad.c
-new file mode 100644
-index 0000000..9b9cf4d
---- /dev/null
-+++ b/drivers/input/joystick/odroidgo3-joypad.c
-@@ -0,0 +1,1144 @@
+diff -rupN a/drivers/input/joystick/xu10-joypad.c b/drivers/input/joystick/xu10-joypad.c
+--- a/drivers/input/joystick/xu10-joypad.c	1970-01-01 00:00:00.000000000 +0000
++++ b/drivers/input/joystick/xu10-joypad.c	2024-02-15 15:26:39.682128004 +0000
+@@ -0,0 +1,1119 @@
 +/*
-+ * SARADC joystick & GPIO Button driver for Linux(Hardkernel ODROIDGO2-Advance)
++ * SARADC joystick & GPIO Button driver for Linux(Hardkernel MagicX-XU10)
 + */
 +/*
 + * This program is free software; you can redistribute it and/or modify
@@ -411,31 +43,14 @@ index 0000000..9b9cf4d
 +#include <linux/delay.h>
 +
 +/*----------------------------------------------------------------------------*/
-+#define DRV_NAME "odroidgo3_joypad"
++#define DRV_NAME "xu10_joypad"
 +
 +/*----------------------------------------------------------------------------*/
 +#define	ADC_MAX_VOLTAGE		1800
 +#define	ADC_DATA_TUNING(x, p)	((x * p) / 100)
 +#define	ADC_TUNING_DEFAULT	180
 +
-+/*----------------------------------------------------------------------------*/
-+/*
-+	+--------------------------------+
-+	| IIO Channel : ADC_IN1          |
-+	+--------------+-----------------+-----------------+--------+---------+
-+	| EN(GPIO3.B5) | SEL_A(GPIO3.B3) | SEL_B(GPIO3.B0) | SELECT |  EVENT  |
-+	+--------------+-----------------+-----------------+--------+---------+
-+	|      0       |        0        |         0       |  R-Y   | ABS_RY  |
-+	+--------------+-----------------+-----------------+--------+---------+
-+	|      0       |        0        |         1       |  R-X   | ABS_RX  |
-+	+--------------+-----------------+-----------------+--------+---------+
-+	|      0       |        1        |         0       |  L-Y   |  ABS_Y  |
-+	+--------------+-----------------+-----------------+--------+---------+
-+	|      0       |        1        |         1       |  L-X   |  ABS_X  |
-+	+--------------+-----------------+-----------------+--------+---------+
-+	|      1       |        X        |         X       |  XXXX  |
-+	+--------------+-----------------+-----------------+--------+
-+*/
++
 +/*----------------------------------------------------------------------------*/
 +struct bt_adc {
 +	/* report value (mV) */
@@ -459,6 +74,7 @@ index 0000000..9b9cf4d
 +struct analog_mux {
 +	/* IIO ADC Channel : amux connect channel */
 +	struct iio_channel *iio_ch;
++	struct iio_channel *iio_ch_r;
 +	/* analog mux select(a,b) gpio */
 +	int sel_a_gpio, sel_b_gpio;
 +	/* analog mux enable gpio */
@@ -493,14 +109,6 @@ index 0000000..9b9cf4d
 +	int amux_count;
 +	/* analog button */
 +	struct bt_adc *adcs;
-+
-+	/* report reference point */
-+	bool invert_absx;
-+	bool invert_absy;
-+	bool invert_absrx;
-+	bool invert_absry;
-+   /* G350 right stick is turned.  Let's turn it back */
-+   bool turn_absr;
 +
 +	/* report interval (ms) */
 +	int bt_gpio_count;
@@ -581,11 +189,11 @@ index 0000000..9b9cf4d
 +			gpio_set_value(amux->sel_b_gpio, 0);
 +			break;
 +		case 1:	/* EVENT (ABS_RX) */
-+			gpio_set_value(amux->sel_a_gpio, 0);
++			gpio_set_value(amux->sel_a_gpio, 1);
 +			gpio_set_value(amux->sel_b_gpio, 1);
 +			break;
 +		case 2:	/* EVENT (ABS_Y) */
-+			gpio_set_value(amux->sel_a_gpio, 1);
++			gpio_set_value(amux->sel_a_gpio, 0);
 +			gpio_set_value(amux->sel_b_gpio, 0);
 +			break;
 +		case 3:	/* EVENT (ABS_X) */
@@ -593,7 +201,7 @@ index 0000000..9b9cf4d
 +			gpio_set_value(amux->sel_b_gpio, 1);
 +			break;
 +		default:
-+			/* amux disanle */
++			/* amux disable */
 +			gpio_set_value(amux->en_gpio, 1);
 +			return -1;
 +	}
@@ -606,11 +214,24 @@ index 0000000..9b9cf4d
 +static int joypad_adc_read(struct analog_mux *amux, struct bt_adc *adc)
 +{
 +	int value;
++	int res;
 +
 +	if (joypad_amux_select(amux, adc->amux_ch))
 +		return 0;
 +
-+	if (iio_read_channel_processed(amux->iio_ch, &value))
++	switch(adc->amux_ch) {
++		case 0:
++		case 1:
++			res = iio_read_channel_processed(amux->iio_ch_r, &value);
++			break;
++		case 2:
++		case 3:
++		default:
++			res = iio_read_channel_processed(amux->iio_ch, &value);
++			break;
++	}
++
++	if (res)
 +		return 0;
 +
 +	value *= adc->scale;
@@ -838,6 +459,7 @@ index 0000000..9b9cf4d
 +	struct analog_mux *amux = joypad->amux;
 +	ssize_t pos;
 +	int value;
++	int res;
 +
 +	mutex_lock(&joypad->lock);
 +
@@ -847,8 +469,20 @@ index 0000000..9b9cf4d
 +
 +	if (joypad_amux_select(amux, joypad->debug_ch))
 +		goto err_out;
++	
++	switch(joypad->debug_ch) {
++		case 0:
++		case 1:
++			res = iio_read_channel_processed(amux->iio_ch_r, &value);
++			break;
++		case 2:
++		case 3:
++		default:
++			res = iio_read_channel_processed(amux->iio_ch, &value);
++			break;
++	}
 +
-+	if (iio_read_channel_processed(amux->iio_ch, &value))
++	if (res)
 +		goto err_out;
 +
 +	pos = sprintf(buf, "amux ch[%d], adc scale = %d, adc value = %d\n",
@@ -1029,15 +663,31 @@ index 0000000..9b9cf4d
 +		return -ENOMEM;
 +	}
 +	amux = joypad->amux;
-+	amux->iio_ch = devm_iio_channel_get(dev, "amux_adc");
++	amux->iio_ch = devm_iio_channel_get(dev, "joy_left");
++	amux->iio_ch_r = devm_iio_channel_get(dev, "joy_right");
++
 +	if (IS_ERR(amux->iio_ch)) {
 +		dev_err(dev, "iio channel get error\n");
 +		return -EINVAL;
 +	}
-+	if (!amux->iio_ch->indio_dev)
++
++	if (IS_ERR(amux->iio_ch_r)) {
++		dev_err(dev, "iio channel right get error\n");
++		return -EINVAL;
++	}
++
++	if (!amux->iio_ch->indio_dev || !amux->iio_ch_r->indio_dev)
 +		return -ENXIO;
 +
 +	if (iio_get_channel_type(amux->iio_ch, &type))
++		return -EINVAL;
++
++	if (type != IIO_VOLTAGE) {
++		dev_err(dev, "Incompatible channel type %d\n", type);
++		return -EINVAL;
++	}
++	
++	if (iio_get_channel_type(amux->iio_ch_r, &type))
 +		return -EINVAL;
 +
 +	if (type != IIO_VOLTAGE) {
@@ -1120,22 +770,6 @@ index 0000000..9b9cf4d
 +
 +		switch (nbtn) {
 +			case 0:
-+	if (joypad->turn_absr) {
-+				if (joypad->invert_absrx)
-+					adc->invert = true;
-+				adc->report_type = ABS_RX;
-+				if (device_property_read_u32(dev,
-+					"abs_rx-p-tuning",
-+					&adc->tuning_p))
-+					adc->tuning_p = ADC_TUNING_DEFAULT;
-+				if (device_property_read_u32(dev,
-+					"abs_rx-n-tuning",
-+					&adc->tuning_n))
-+					adc->tuning_n = ADC_TUNING_DEFAULT;
-+				break;
-+	} else {
-+				if (joypad->invert_absry)
-+					adc->invert = true;
 +				adc->report_type = ABS_RY;
 +				if (device_property_read_u32(dev,
 +					"abs_ry-p-tuning",
@@ -1146,24 +780,7 @@ index 0000000..9b9cf4d
 +					&adc->tuning_n))
 +					adc->tuning_n = ADC_TUNING_DEFAULT;
 +				break;
-+	}
 +			case 1:
-+ 	if (joypad->turn_absr) {
-+				if (joypad->invert_absry)
-+					adc->invert = true;
-+				adc->report_type = ABS_RY;
-+				if (device_property_read_u32(dev,
-+					"abs_ry-p-tuning",
-+					&adc->tuning_p))
-+					adc->tuning_p = ADC_TUNING_DEFAULT;
-+				if (device_property_read_u32(dev,
-+					"abs_ry-n-tuning",
-+					&adc->tuning_n))
-+					adc->tuning_n = ADC_TUNING_DEFAULT;
-+				break;
-+	} else {
-+				if (joypad->invert_absrx)
-+					adc->invert = true;
 +				adc->report_type = ABS_RX;
 +				if (device_property_read_u32(dev,
 +					"abs_rx-p-tuning",
@@ -1174,10 +791,8 @@ index 0000000..9b9cf4d
 +					&adc->tuning_n))
 +					adc->tuning_n = ADC_TUNING_DEFAULT;
 +				break;
-+	}
 +			case 2:
-+				if (joypad->invert_absy)
-+					adc->invert = true;
++		                adc->invert = true;
 +				adc->report_type = ABS_Y;
 +				if (device_property_read_u32(dev,
 +					"abs_y-p-tuning",
@@ -1189,8 +804,7 @@ index 0000000..9b9cf4d
 +					adc->tuning_n = ADC_TUNING_DEFAULT;
 +				break;
 +			case 3:
-+				if (joypad->invert_absx)
-+					adc->invert = true;
++		                adc->invert = true;
 +				adc->report_type = ABS_X;
 +				if (device_property_read_u32(dev,
 +					"abs_x-p-tuning",
@@ -1278,8 +892,8 @@ index 0000000..9b9cf4d
 +	struct input_polled_dev *poll_dev;
 +	struct input_dev *input;
 +	int nbtn, error;
-+	u32 joypad_revision = 0;
 +	u32 joypad_product = 0;
++	u32 joypad_revision = 0;
 +
 +	poll_dev = devm_input_allocate_polled_device(dev);
 +	if (!poll_dev) {
@@ -1298,10 +912,11 @@ index 0000000..9b9cf4d
 +	device_property_read_string(dev, "joypad-name", &input->name);
 +	input->phys = DRV_NAME"/input0";
 +
-+	device_property_read_u32(dev, "joypad-revision", &joypad_revision);
 +	device_property_read_u32(dev, "joypad-product", &joypad_product);
++	device_property_read_u32(dev, "joypad-revision", &joypad_revision);
++	
 +	input->id.bustype = BUS_HOST;
-+	input->id.vendor  = 0x484B;
++	input->id.vendor  = 0xC3B0;
 +	input->id.product = (u16)joypad_product;
 +	input->id.version = (u16)joypad_revision;
 +
@@ -1400,15 +1015,6 @@ index 0000000..9b9cf4d
 +
 +	joypad->auto_repeat = device_property_present(dev, "autorepeat");
 +
-+	/* change the report reference point? (read value * -1) */
-+	joypad->invert_absx = device_property_present(dev, "invert-absx");
-+	joypad->invert_absy = device_property_present(dev, "invert-absy");
-+	joypad->invert_absrx = device_property_present(dev, "invert-absrx");
-+	joypad->invert_absry = device_property_present(dev, "invert-absry");
-+	joypad->turn_absr = device_property_present(dev, "turn-absr");
-+	dev_info(dev, "%s : invert-absx = %d, inveret-absy = %d, invert-absrx = %d, inveret-absry = %d, turn-absr = %d\n",
-+		__func__, joypad->invert_absx, joypad->invert_absy, joypad->invert_absrx, joypad->invert_absry, joypad->turn_absr);
-+
 +	joypad->bt_gpio_count = device_get_child_node_count(dev);
 +
 +	if ((joypad->amux_count == 0) || (joypad->bt_gpio_count == 0)) {
@@ -1477,7 +1083,7 @@ index 0000000..9b9cf4d
 +
 +/*----------------------------------------------------------------------------*/
 +static const struct of_device_id joypad_of_match[] = {
-+	{ .compatible = "odroidgo3-joypad", },
++	{ .compatible = "xu10-joypad", },
 +	{},
 +};
 +
@@ -1510,12 +1116,8 @@ index 0000000..9b9cf4d
 +
 +/*----------------------------------------------------------------------------*/
 +MODULE_AUTHOR("Hardkernel Co.,LTD");
-+MODULE_DESCRIPTION("Keypad driver(ADC&GPIO) for ODROIDGO-Advance");
++MODULE_DESCRIPTION("Keypad driver(ADC&GPIO) for MagicX-XU10");
 +MODULE_LICENSE("GPL v2");
 +MODULE_ALIAS("platform:" DRV_NAME);
 +
 +/*----------------------------------------------------------------------------*/
-\ No newline at end of file
--- 
-2.43.0
-
