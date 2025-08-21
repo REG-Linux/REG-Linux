@@ -93,7 +93,6 @@ emulatorMapping = {
 
 def reconfigureControllers(playersControllers, system, rom, metadata, deviceList):
     eslog.info("wheels reconfiguration");
-    wheelsmetadata = None
 
     eslog.info("before wheel reconfiguration :")
     for playercontroller, pad in sorted(playersControllers.items()):
@@ -238,10 +237,12 @@ def reconfigureAngleRotation(dev, wheelAxis, rotationAngle, wantedRotationAngle,
 
     absmin = None
     absmax = None
-    for v, absinfo in caps[ecodes.EV_ABS]:
-        if v == wheelAxis:
-            absmin = absinfo.min
-            absmax = absinfo.max
+    for item in caps.get(ecodes.EV_ABS, []):
+        if isinstance(item, tuple) and len(item) == 2:
+            v, absinfo = item
+            if v == wheelAxis:
+                absmin = absinfo.min
+                absmax = absinfo.max
 
     if absmin is None or absmax is None:
         eslog.warning("unable to get min/max of " + dev)
@@ -277,7 +278,7 @@ def reconfigureAngleRotation(dev, wheelAxis, rotationAngle, wantedRotationAngle,
         fd.close()
     except:
         kill(proc.pid, SIGTERM)
-        out, err = proc.communicate()
+        proc.communicate()
         raise
 
     return (newdev, proc)
