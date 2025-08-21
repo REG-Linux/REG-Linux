@@ -1,33 +1,34 @@
-import os
-import io
-import configparser
-import subprocess
-from systemFiles import CONF
+from os import path, makedirs
+from io import open
+from configparser import ConfigParser
+from subprocess import CalledProcessError, check_output
+from systemFiles import CONF, HOME_INIT
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
-ppssppConf     = CONF + '/ppsspp/PSP/SYSTEM'
-ppssppConfig   = ppssppConf + '/ppsspp.ini'
-ppssppControls = ppssppConf + '/controls.ini'
-ppssppBin      = '/usr/bin/PPSSPP'
+PPSSPP_CONFIG_DIR = CONF + '/ppsspp/PSP/SYSTEM'
+PPSSPP_CONFIG_PATH = PPSSPP_CONFIG_DIR + '/ppsspp.ini'
+PPSSPP_CONTROLS_PATH = PPSSPP_CONFIG_DIR + '/controls.ini'
+PPSSPP_CONTROLS_SOURCE_PATH = HOME_INIT + 'configs/ppsspp/PSP/SYSTEM/controls.ini'
+PPSSPP_BIN_PATH = '/usr/bin/PPSSPP'
 
-def writePPSSPPConfig(system):
-    iniConfig = configparser.ConfigParser(interpolation=None)
+def setPPSSPPConfig(system):
+    iniConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     iniConfig.optionxform = lambda optionstr: str(optionstr)
-    if os.path.exists(ppssppConfig):
+    if path.exists(PPSSPP_CONFIG_PATH):
         try:
-            with io.open(ppssppConfig, 'r', encoding='utf_8_sig') as fp:
+            with open(PPSSPP_CONFIG_PATH, 'r', encoding='utf_8_sig') as fp:
                 iniConfig.read_file(fp)
         except:
             pass
 
     createPPSSPPConfig(iniConfig, system)
     # Save the ini file
-    if not os.path.exists(os.path.dirname(ppssppConfig)):
-        os.makedirs(os.path.dirname(ppssppConfig))
-    with open(ppssppConfig, 'w') as configfile:
+    if not path.exists(path.dirname(PPSSPP_CONFIG_PATH)):
+        makedirs(path.dirname(PPSSPP_CONFIG_PATH))
+    with open(PPSSPP_CONFIG_PATH, 'w') as configfile:
         iniConfig.write(configfile)
 
 def createPPSSPPConfig(iniConfig, system):
@@ -45,30 +46,30 @@ def createPPSSPPConfig(iniConfig, system):
     if system.isOptSet("gfxbackend") and system.config["gfxbackend"] == "3 (VULKAN)":
         # Check if we have a discrete GPU & if so, set the Name
         try:
-            have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
-                    have_discrete = subprocess.check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
+                    have_discrete = check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
                     if have_discrete == "true":
                         eslog.debug("A discrete GPU is available on the system. We will use that for performance")
                         try:
-                            discrete_name = subprocess.check_output(["/usr/bin/system-vulkan", "discreteName"], text=True).strip()
+                            discrete_name = check_output(["/usr/bin/system-vulkan", "discreteName"], text=True).strip()
                             if discrete_name != "":
                                 eslog.debug("Using Discrete GPU Name: {} for PPSSPP".format(discrete_name))
                                 iniConfig.set("Graphics", "VulkanDevice", discrete_name)
                             else:
                                 eslog.debug("Couldn't get discrete GPU Name")
-                        except subprocess.CalledProcessError:
+                        except CalledProcessError:
                             eslog.debug("Error getting discrete GPU Name")
                     else:
                         eslog.debug("Discrete GPU is not available on the system. Using default.")
-                except subprocess.CalledProcessError:
+                except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
             else:
                 eslog.debug("Vulkan driver is not available on the system. Falling back to OpenGL")
                 iniConfig.set("Graphics", "GraphicsBackend", "0 (OPENGL)")
-        except subprocess.CalledProcessError:
+        except CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
 
     # Display FPS
