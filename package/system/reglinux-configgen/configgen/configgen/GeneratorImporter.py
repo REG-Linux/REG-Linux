@@ -48,6 +48,7 @@ EMULATOR_MAPPING = {
     'ikemen': ('generators.ikemen.ikemenGenerator', 'IkemenGenerator'),
     'iortcw': ('generators.iortcw.iortcwGenerator', 'IORTCWGenerator'),
     'ioquake3': ('generators.ioquake3.ioquake3Generator', 'IOQuake3Generator'),
+    'jazz2': ('generators.jazz2.jazz2Generator', 'Jazz2Generator'),
     'lightspark': ('generators.lightspark.lightsparkGenerator', 'LightsparkGenerator'),
     'libretro': ('generators.libretro.libretroGenerator', 'LibretroGenerator'),
     'mame': ('generators.mame.mameGenerator', 'MameGenerator'),
