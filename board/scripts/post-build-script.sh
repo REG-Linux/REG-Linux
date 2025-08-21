@@ -97,6 +97,20 @@ then
     sed -i "s/start-stop-daemon -S -q /start-stop-daemon -S -q -N 10 /g" "${TARGET_DIR}/etc/init.d/S33rngd"  || exit 1 # set rngd niceness to 10 (to decrease slowdown of other processes)
 fi
 
+# kill diagtool and libclang-cpp.so in target, it's not used
+if test -e "${TARGET_DIR}/usr/bin/diagtool"
+then
+    rm "${TARGET_DIR}/usr/bin/diagtool" || exit 1
+fi
+if test -e "${TARGET_DIR}/usr/lib/libclang-cpp.so"
+then
+    rm "${TARGET_DIR}/usr/lib/libclang-cpp.so" || exit 1
+fi
+if test -e "${TARGET_DIR}/usr/lib/libclang-cpp.so.19.1"
+then
+    rm "${TARGET_DIR}/usr/lib/libclang-cpp.so.19.1" || exit 1
+fi
+
 # triggerhappy
 if test -e "${TARGET_DIR}/etc/init.d/S10triggerhappy"
 then
