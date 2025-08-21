@@ -274,18 +274,19 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                         blankDisk = '/usr/share/mame/blank.fmtowns'
                         targetFolder = '/userdata/saves/mame/{}'.format(system.name)
                         targetDisk = '{}/{}.fmtowns'.format(targetFolder, path.splitext(romBasename)[0])
-                    # Add elif statements here for other systems if enabled
-                    if not path.exists(targetFolder):
-                        makedirs(targetFolder)
-                    if not path.exists(targetDisk):
-                        copy2(blankDisk, targetDisk)
-                    # Add other single floppy systems to this if statement
-                    if messModel == "fmtmarty":
-                        commandLine += [ '-flop', targetDisk ]
-                    elif (system.isOptSet('altromtype') and system.config['altromtype'] == 'flop2'):
-                        commandLine += [ '-flop1', targetDisk ]
-                    else:
-                        commandLine += [ '-flop2', targetDisk ]
+                        # Add elif statements here for other systems if enabled
+                        if not path.exists(targetFolder):
+                            makedirs(targetFolder)
+                        if not path.exists(targetDisk):
+                            copy2(blankDisk, targetDisk)
+
+                        # Add other single floppy systems to this if statement
+                        if messModel == "fmtmarty":
+                            commandLine += [ '-flop', targetDisk ]
+                        elif (system.isOptSet('altromtype') and system.config['altromtype'] == 'flop2'):
+                            commandLine += [ '-flop1', targetDisk ]
+                        else:
+                            commandLine += [ '-flop2', targetDisk ]
 
             # UI enable - for computer systems, the default sends all keys to the emulated system.
             # This will enable hotkeys, but some keys may pass through to MAME and not be usable in the emulated system.
@@ -344,7 +345,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                                 if software.get('name') == romDrivername:
                                     for info in software.iter('info'):
                                         if info.get('name') == 'usage':
-                                            autoRunCmd = info.get('value') + '\\n'
+                                            autoRunCmd = info.get('value')
 
                 # if still undefined, default autoRunCmd based on media type
                 if autoRunCmd == "":
@@ -384,7 +385,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                                 autoRunCmd = row[1] + "\\n"
                                 autoRunDelay = 3
             commandLine += [ '-inipath', '/userdata/saves/mame/mame/ini/' ]
-            if autoRunCmd != "":
+            if autoRunCmd != None:
                 if autoRunCmd.startswith("'"):
                     autoRunCmd.replace("'", "")
                 iniFile = open('/userdata/saves/mame/mame/ini/batocera.ini', "w")
@@ -613,6 +614,16 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
     # If the system/game is set to per game config, don't try to open/reset an existing file, only write if it's blank or going to the shared cfg folder
     specialControlList = [ "cdimono1", "apfm1000", "astrocde", "adam", "arcadia", "gamecom", "tutor", "crvision", "bbcb", "bbcm", "bbcm512", "bbcmc", "xegs", \
         "socrates", "pdp1", "vc4000", "fmtmarty", "gp32", "apple2p", "apple2e", "apple2ee" ]
+
+    # Initialize config_alt and xml_input_alt outside the conditional block
+    config_alt = minidom.Document()
+    configFile_alt = cfgPath + messSysName + ".cfg"
+    xml_mameconfig_alt = getRoot(config_alt, "mameconfig")
+    xml_mameconfig_alt.setAttribute("version", "10")
+    xml_system_alt = getSection(config_alt, xml_mameconfig_alt, "system")
+    xml_system_alt.setAttribute("name", messSysName)
+    xml_input_alt = config_alt.createElement("input")
+    overwriteSystem = True
     if messSysName in specialControlList:
         # Load mess controls from csv
         messControlFile = '/usr/share/reglinux/configgen/data/mame/messControls.csv'
@@ -652,9 +663,9 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
                     currentEntry['mask'] = row[10]
                     currentEntry['default'] = row[11]
                 if currentEntry['reversed'] == 'False':
-                    currentEntry['reversed'] == False
+                    currentEntry['reversed'] = False
                 else:
-                    currentEntry['reversed'] == True
+                    currentEntry['reversed'] = True
 
         config_alt = minidom.Document()
         configFile_alt = cfgPath + messSysName + ".cfg"
@@ -703,8 +714,7 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
 
     # Fill in controls on cfg files
     nplayer = 1
-    maxplayers = len(playersControllers)
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         mappings_use = mappings
         if "joystick1up" not in pad.inputs:
             mappings_use["JOYSTICK_UP"] = "up"
@@ -731,7 +741,8 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
             xml_input.appendChild(generateComboPortElement(pad, config, 'standard', pad.index, "UI_RIGHT", "RIGHT", mappings_use["JOYSTICK_RIGHT"], retroPad[mappings_use["JOYSTICK_RIGHT"]], False, "", "")) # Right
             xml_input.appendChild(generateComboPortElement(pad, config, 'standard', pad.index, "UI_SELECT", "ENTER", 'a', retroPad['a'], False, "", ""))                                                     # Select
 
-        if useControls in messControlDict.keys():
+        # Handle special controls only if we're using a system that needs them
+        if useControls in messControlDict.keys() and messSysName in specialControlList:
             for controlDef in messControlDict[useControls].keys():
                 thisControl = messControlDict[useControls][controlDef]
                 if nplayer == thisControl['player']:
@@ -751,19 +762,21 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
 
         nplayer = nplayer + 1
 
-        # save the config file
-        #mameXml = open(configFile, "w")
-        # TODO: python 3 - workawround to encode files in utf-8
-        if overwriteMAME:
-            mameXml = open(configFile, "w", "utf-8")
-            dom_string = linesep.join([s for s in config.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
-            mameXml.write(dom_string)
+    # save the config file
+    #mameXml = open(configFile, "w")
+    # TODO: python 3 - workawround to encode files in utf-8
+    if overwriteMAME:
+        mameXml = open(configFile, "w", encoding="utf-8")
+        dom_string = linesep.join([s for s in config.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
+        mameXml.write(dom_string)
+        mameXml.close()
 
-        # Write alt config (if used, custom config is turned off or file doesn't exist yet)
-        if messSysName in specialControlList and overwriteSystem:
-            mameXml_alt = open(configFile_alt, "w", "utf-8")
-            dom_string_alt = linesep.join([s for s in config_alt.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
-            mameXml_alt.write(dom_string_alt)
+    # Write alt config (if used, custom config is turned off or file doesn't exist yet)
+    if messSysName in specialControlList and overwriteSystem:
+        mameXml_alt = open(configFile_alt, "w", encoding="utf-8")
+        dom_string_alt = linesep.join([s for s in config_alt.toprettyxml().splitlines() if s.strip()]) # remove ugly empty lines while minicom adds them...
+        mameXml_alt.write(dom_string_alt)
+        mameXml_alt.close()
 
 def reverseMapping(key):
     if key == "joystick1down":
