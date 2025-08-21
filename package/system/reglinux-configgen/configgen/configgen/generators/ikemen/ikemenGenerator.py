@@ -2,8 +2,9 @@ from generators.Generator import Generator
 from Command import Command
 from json import load, dumps
 from os import path, mkdir
-from .ikemenConfig import IKEMEN_BIN_PATH
 from .ikemenControllers import Keymapping, Joymapping
+
+IKEMEN_BIN_PATH = '/usr/bin/system-ikemen'
 
 class IkemenGenerator(Generator):
 
