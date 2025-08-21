@@ -1,13 +1,13 @@
-from struct import pack
-from struct import unpack
-from os     import environ
+from struct import pack, unpack
+from os import environ
 from systemFiles import CONF, SAVES
 
-dolphinConfig  = CONF + '/dolphin-emu'
-dolphinData    = SAVES + '/dolphin-emu'
-dolphinIni     = dolphinConfig + '/Dolphin.ini'
-dolphinGfxIni  = dolphinConfig + '/GFX.ini'
-dolphinSYSCONF = dolphinData + '/Wii/shared2/sys/SYSCONF'
+DOLPHIN_CONFIG_DIR = CONF + '/dolphin-emu'
+DOLPHIN_CONFIG_PATH = DOLPHIN_CONFIG_DIR + '/Dolphin.ini'
+DOLPHIN_SAVES_DIR = SAVES + '/dolphin-emu'
+DOLPHIN_GFX_PATH = DOLPHIN_CONFIG_DIR + '/GFX.ini'
+DOLPHIN_SYSCONF_PATH = DOLPHIN_SAVES_DIR + '/Wii/shared2/sys/SYSCONF'
+DOLPHIN_BIN_PATH = '/usr/bin/dolphin-emu'
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -49,6 +49,7 @@ def readWriteEntry(f, setval):
     itemType       = (itemHeader & 0xe0) >> 5
     itemNameLength = (itemHeader & 0x1f) + 1
     itemName       = readString(f, itemNameLength)
+    dataSize       = None
 
     if itemName in setval:
         if itemType == 3: # byte
@@ -132,9 +133,9 @@ def getSensorBarPosition(config):
     else:
         return 0
 
-def update(config, filepath, gameResolution):
+def updateConfig(config, filepath, gameResolution):
     arg_setval = { "IPL.LNG": getWiiLangFromEnvironment(), "IPL.AR": getRatioFromConfig(config, gameResolution), "BT.BAR": getSensorBarPosition(config) }
     readWriteFile(filepath, arg_setval)
 
 if __name__ == '__main__':
-    readWriteFile(dolphinSYSCONF, {})
+    readWriteFile(DOLPHIN_SYSCONF_PATH, {})

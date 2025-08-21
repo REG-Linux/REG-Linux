@@ -1,12 +1,11 @@
 from generators.Generator import Generator
 from Command import Command
-import os.path
-import configparser
-import subprocess
-import controllers as controllersConfig
-from os import environ
-from . import dolphinControllers
-from . import dolphinConfig
+from os import path, makedirs, environ
+from configparser import ConfigParser
+from subprocess import CalledProcessError, check_output
+from controllers import gunsNeedCrosses
+from .dolphinControllers import generateControllerConfig
+from .dolphinConfig import getRatioFromConfig, updateConfig, DOLPHIN_BIN_PATH, DOLPHIN_CONFIG_PATH, DOLPHIN_SAVES_DIR, DOLPHIN_GFX_PATH, DOLPHIN_SYSCONF_PATH
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -18,22 +17,22 @@ class DolphinGenerator(Generator):
         return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        if not os.path.exists(os.path.dirname(dolphinConfig.dolphinIni)):
-            os.makedirs(os.path.dirname(dolphinConfig.dolphinIni))
+        if not path.exists(path.dirname(DOLPHIN_CONFIG_PATH)):
+            makedirs(path.dirname(DOLPHIN_CONFIG_PATH))
 
         # Dir required for saves
-        if not os.path.exists(dolphinConfig.dolphinData + "/StateSaves"):
-            os.makedirs(dolphinConfig.dolphinData + "/StateSaves")
+        if not path.exists(DOLPHIN_SAVES_DIR + "/StateSaves"):
+            makedirs(DOLPHIN_SAVES_DIR + "/StateSaves")
 
-        # Generate the controller config(s)
-        dolphinControllers.generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns)
+        # FIXME Generate the controller config(s)
+        #generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns)
 
         ## [ dolphin.ini ] ##
-        dolphinSettings = configparser.ConfigParser(interpolation=None)
+        dolphinSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinSettings.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(dolphinConfig.dolphinIni):
-            dolphinSettings.read(dolphinConfig.dolphinIni)
+        if path.exists(DOLPHIN_CONFIG_PATH):
+            dolphinSettings.read(DOLPHIN_CONFIG_PATH)
 
         # Sections
         if not dolphinSettings.has_section("General"):
@@ -117,11 +116,11 @@ class DolphinGenerator(Generator):
             dolphinSettings.set("Core", "GFXBackend", "Vulkan")
             # Check Vulkan
             try:
-                have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+                have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
                 if have_vulkan != "true":
                     eslog.debug("Vulkan driver is not available on the system. Using OpenGL instead.")
                     dolphinSettings.set("Core", "GFXBackend", "OGL")
-            except subprocess.CalledProcessError:
+            except CalledProcessError:
                 eslog.debug("Error checking for discrete GPU.")
         else:
             dolphinSettings.set("Core", "GFXBackend", "OGL")
@@ -147,7 +146,7 @@ class DolphinGenerator(Generator):
                     dolphinSettings.set("Core", "SIDevice" + str(i - 1), "6")
 
         # HiResTextures for guns part 1/2 (see below the part 2)
-        if system.isOptSet('use_guns') and system.getOptBoolean('use_guns') and len(guns) > 0 and ((system.isOptSet('dolphin-lightgun-hide-crosshair') == False and controllersConfig.gunsNeedCrosses(guns) == False) or system.getOptBoolean('dolphin-lightgun-hide-crosshair' == True)):
+        if system.isOptSet('use_guns') and system.getOptBoolean('use_guns') and len(guns) > 0 and ((system.isOptSet('dolphin-lightgun-hide-crosshair') == False and gunsNeedCrosses(guns) == False) or system.getOptBoolean('dolphin-lightgun-hide-crosshair' == True)):
             dolphinSettings.set("General", "CustomTexturesPath", "/usr/share/DolphinCrosshairsPack")
         else:
             dolphinSettings.remove_option("General", "CustomTexturesPath")
@@ -160,7 +159,7 @@ class DolphinGenerator(Generator):
             # check files exist to avoid crashes
             ipl_regions = ["USA", "EUR", "JAP"]
             base_path = "/userdata/bios/GC"
-            if any(os.path.exists(os.path.join(base_path, region, "IPL.bin")) for region in ipl_regions):
+            if any(path.exists(path.join(base_path, region, "IPL.bin")) for region in ipl_regions):
                 dolphinSettings.set("Core", "SkipIPL", "False")
             else:
                 dolphinSettings.set("Core", "SkipIPL", "True")
@@ -182,14 +181,14 @@ class DolphinGenerator(Generator):
             dolphinSettings.set("DSP", "EnableJIT", "False")
 
         # Save dolphin.ini
-        with open(dolphinConfig.dolphinIni, 'w') as configfile:
+        with open(DOLPHIN_CONFIG_PATH, 'w') as configfile:
             dolphinSettings.write(configfile)
 
         ## [ gfx.ini ] ##
-        dolphinGFXSettings = configparser.ConfigParser(interpolation=None)
+        dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform=lambda optionstr: str(optionstr)
-        dolphinGFXSettings.read(dolphinConfig.dolphinGfxIni)
+        dolphinGFXSettings.read(DOLPHIN_GFX_PATH)
 
         # Add Default Sections
         if not dolphinGFXSettings.has_section("Settings"):
@@ -203,41 +202,41 @@ class DolphinGenerator(Generator):
 
         # Set Vulkan adapter
         try:
-            have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
-                    have_discrete = subprocess.check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
+                    have_discrete = check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
                     if have_discrete == "true":
                         eslog.debug("A discrete GPU is available on the system. We will use that for performance")
                         try:
-                            discrete_index = subprocess.check_output(["/usr/bin/system-vulkan", "discreteIndex"], text=True).strip()
+                            discrete_index = check_output(["/usr/bin/system-vulkan", "discreteIndex"], text=True).strip()
                             if discrete_index != "":
                                 eslog.debug("Using Discrete GPU Index: {} for Dolphin".format(discrete_index))
                                 dolphinGFXSettings.set("Hardware", "Adapter", discrete_index)
                             else:
                                 eslog.debug("Couldn't get discrete GPU index")
-                        except subprocess.CalledProcessError:
+                        except CalledProcessError:
                             eslog.debug("Error getting discrete GPU index")
                     else:
                         eslog.debug("Discrete GPU is not available on the system. Trying integrated.")
-                        have_integrated = subprocess.check_output(["/usr/bin/system-vulkan", "hasIntegrated"], text=True).strip()
+                        have_integrated = check_output(["/usr/bin/system-vulkan", "hasIntegrated"], text=True).strip()
                         if have_integrated == "true":
                             eslog.debug("Using integrated GPU to provide Vulkan. Beware of performance")
                             try:
-                                integrated_index = subprocess.check_output(["/usr/bin/system-vulkan", "integratedIndex"], text=True).strip()
+                                integrated_index = check_output(["/usr/bin/system-vulkan", "integratedIndex"], text=True).strip()
                                 if integrated_index != "":
                                     eslog.debug("Using Integrated GPU Index: {} for Dolphin".format(integrated_index))
                                     dolphinGFXSettings.set("Hardware", "Adapter", integrated_index)
                                 else:
                                     eslog.debug("Couldn't get integrated GPU index")
-                            except subprocess.CalledProcessError:
+                            except CalledProcessError:
                                 eslog.debug("Error getting integrated GPU index")
                         else:
                             eslog.debug("Integrated GPU is not available on the system. Cannot enable Vulkan.")
-                except subprocess.CalledProcessError:
+                except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
-        except subprocess.CalledProcessError:
+        except CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
 
         # Graphics setting Aspect Ratio
@@ -363,11 +362,11 @@ class DolphinGenerator(Generator):
             dolphinGFXSettings.set("Hacks", "FastTextureSampling", "True")
 
         # Save gfx.ini
-        with open(dolphinConfig.dolphinGfxIni, 'w') as configfile:
+        with open(DOLPHIN_GFX_PATH, 'w') as configfile:
             dolphinGFXSettings.write(configfile)
 
         ## Hotkeys.ini - overwrite to avoid issues
-        hotkeyConfig = configparser.ConfigParser(interpolation=None)
+        hotkeyConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         hotkeyConfig.optionxform=lambda optionstr: str(optionstr)
         # [Hotkeys]
@@ -426,7 +425,7 @@ class DolphinGenerator(Generator):
             hotkeyConfig.write(configfile)
 
         ## Retroachievements
-        RacConfig = configparser.ConfigParser(interpolation=None)
+        RacConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         RacConfig.optionxform=lambda optionstr: str(optionstr)
         # [Achievements]
@@ -460,14 +459,14 @@ class DolphinGenerator(Generator):
 
         # Update SYSCONF
         try:
-            dolphinConfig.update(system.config, dolphinConfig.dolphinSYSCONF, gameResolution)
+            updateConfig(system.config, DOLPHIN_SYSCONF_PATH, gameResolution)
         except Exception:
             pass # don't fail in case of SYSCONF update
 
         # Check what version we've got
-        if os.path.isfile("/usr/bin/dolphin-emu"):
+        if path.isfile(DOLPHIN_BIN_PATH):
             # use the -b 'batch' option for nicer exit
-            commandArray = ["dolphin-emu", "-b", "-e", rom]
+            commandArray = [DOLPHIN_BIN_PATH, "-b", "-e", rom]
         else:
             commandArray = ["dolphin-emu-nogui", "-e", rom]
 
@@ -479,10 +478,10 @@ class DolphinGenerator(Generator):
 
     def getInGameRatio(self, config, gameResolution, rom):
 
-        dolphinGFXSettings = configparser.ConfigParser(interpolation=None)
+        dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform=lambda optionstr: str(optionstr)
-        dolphinGFXSettings.read(dolphinConfig.dolphinGfxIni)
+        dolphinGFXSettings.read(DOLPHIN_GFX_PATH)
 
         dolphin_aspect_ratio = dolphinGFXSettings.get("Settings", "AspectRatio")
         # What if we're playing a GameCube game with the widescreen patch or not?
@@ -492,7 +491,7 @@ class DolphinGenerator(Generator):
             wii_tv_mode = 0
 
         try:
-            wii_tv_mode = dolphinConfig.getRatioFromConfig(config, gameResolution)
+            wii_tv_mode = getRatioFromConfig(config, gameResolution)
         except:
             pass
 
