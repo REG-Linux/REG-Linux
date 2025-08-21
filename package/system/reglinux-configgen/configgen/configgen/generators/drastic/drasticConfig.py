@@ -1,5 +1,5 @@
-from systemFiles import CONF
 from os import environ
+from systemFiles import CONF
 
 DRASTIC_CONFIG_DIR = '/usr/share/drastic'
 DRASTIC_CONFIG_DIR_USER = CONF + '/drastic'

@@ -1,36 +1,37 @@
 from generators.Generator import Generator
 from Command import Command
-import configparser
-import os
-from . import mupenConfig
-from . import mupenControllers
+from configparser import ConfigParser
+from os import path, makedirs
+from .mupenControllers import setControllersConfig
+from .mupenConfig import setMupenConfig, MUPEN_CONFIG_PATH, MUPEN_BIN_PATH, MUPEN_CONFIG_DIR
 
 class MupenGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
         # Read the configuration file
-        iniConfig = configparser.ConfigParser(interpolation=None)
+        iniConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         iniConfig.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(mupenConfig.mupenCustom):
-            iniConfig.read(mupenConfig.mupenCustom)
+        if path.exists(MUPEN_CONFIG_PATH):
+            iniConfig.read(MUPEN_CONFIG_PATH)
         else:
-            if not os.path.exists(os.path.dirname(mupenConfig.mupenCustom)):
-                os.makedirs(os.path.dirname(mupenConfig.mupenCustom))
-            iniConfig.read(mupenConfig.mupenCustom)
+            if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
+                makedirs(path.dirname(MUPEN_CONFIG_PATH))
+            iniConfig.read(MUPEN_CONFIG_PATH)
 
-        mupenConfig.setMupenConfig(iniConfig, system, playersControllers, gameResolution)
-        mupenControllers.setControllersConfig(iniConfig, playersControllers, system, wheels)
+        setMupenConfig(iniConfig, system, playersControllers, gameResolution)
+        # FIXME: Implement setControllersConfig function
+        #setControllersConfig(iniConfig, playersControllers, system, wheels)
 
         # Save the ini file
-        if not os.path.exists(os.path.dirname(mupenConfig.mupenCustom)):
-            os.makedirs(os.path.dirname(mupenConfig.mupenCustom))
-        with open(mupenConfig.mupenCustom, 'w') as configfile:
+        if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
+            makedirs(path.dirname(MUPEN_CONFIG_PATH))
+        with open(MUPEN_CONFIG_PATH, 'w') as configfile:
             iniConfig.write(configfile)
 
         # Command
-        commandArray = [mupenConfig.mupenBin, "--corelib", "/usr/lib/libmupen64plus.so.2.0.0", "--gfx", "/usr/lib/mupen64plus/mupen64plus-video-{}.so".format(system.config['core']), "--configdir", mupenConfig.mupenConf, "--datadir", mupenConfig.mupenConf]
+        commandArray = [MUPEN_BIN_PATH, "--corelib", "/usr/lib/libmupen64plus.so.2.0.0", "--gfx", "/usr/lib/mupen64plus/mupen64plus-video-{}.so".format(system.config['core']), "--configdir", MUPEN_CONFIG_DIR, "--datadir", MUPEN_CONFIG_DIR]
 
         # state_slot option
         if system.isOptSet('state_filename'):

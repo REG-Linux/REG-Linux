@@ -1,26 +1,26 @@
-from systemFiles import CONF, SAVES, SCREENSHOTS
+from systemFiles import CONF, SAVES, SCREENSHOTS, BIOS
 
-mupenConf = CONF + '/mupen64/'
-mupenCustom = mupenConf + "mupen64plus.cfg"
-mupenInput = mupenConf + "InputAutoCfg.ini"
-mupenSaves = SAVES + "/n64"
-mupenMappingUser    = mupenConf + 'input.xml'
-mupenMappingSystem  = '/usr/share/reglinux/datainit/system/configs/mupen64/input.xml'
-mupenBin = '/usr/bin/mupen64plus'
+MUPEN_CONFIG_DIR = CONF + '/mupen64/'
+MUPEN_CONFIG_PATH = MUPEN_CONFIG_DIR + 'mupen64plus.cfg'
+MUPEN_INPUT_PATH = MUPEN_CONFIG_DIR + 'InputAutoCfg.ini'
+MUPEN_SAVES_DIR = SAVES + '/n64'
+MUPEN_MAPPING_USER_PATH = MUPEN_CONFIG_DIR + 'input.xml'
+MUPEN_MAPPING_SYSTEM_PATH = '/usr/share/reglinux/datainit/system/configs/mupen64/input.xml'
+MUPEN_BIN_PATH = '/usr/bin/mupen64plus'
 
 def setMupenConfig(iniConfig, system, controllers, gameResolution):
 
-    # Hotkeys
-    setHotKeyConfig(iniConfig, controllers, system)
+    # FIXME Hotkeys
+    #setHotKeyConfig(iniConfig, controllers, system)
 
     # Paths
     if not iniConfig.has_section("Core"):
         iniConfig.add_section("Core")
     iniConfig.set("Core", "Version", "1.01") # Version is important for the .ini creation otherwise, mupen remove the section
     iniConfig.set("Core", "ScreenshotPath", SCREENSHOTS)
-    iniConfig.set("Core", "SaveStatePath",  mupenSaves)
-    iniConfig.set("Core", "SaveSRAMPath",   mupenSaves)
-    iniConfig.set("Core", "SharedDataPath", mupenConf)
+    iniConfig.set("Core", "SaveStatePath",  MUPEN_SAVES_DIR)
+    iniConfig.set("Core", "SaveSRAMPath",   MUPEN_SAVES_DIR)
+    iniConfig.set("Core", "SharedDataPath", MUPEN_CONFIG_DIR)
     iniConfig.set("Core", "SaveFilenameFormat", "1000") # forces savesstates with rom name
     # TODO : Miss Mupen64Plus\hires_texture
 
@@ -185,7 +185,7 @@ def setMupenConfig(iniConfig, system, controllers, gameResolution):
         iniConfig.add_section("64DD")
     # Filename of the 64DD IPL ROM
     if (system.name == 'n64dd'):
-        iniConfig.set("64DD", "IPL-ROM", systemFiles.BIOS + "/64DD_IPL.bin")
+        iniConfig.set("64DD", "IPL-ROM", BIOS + "/64DD_IPL.bin")
     else:
         iniConfig.set("64DD", "IPL-ROM", "")
     iniConfig.set("64DD", "Disk", "")

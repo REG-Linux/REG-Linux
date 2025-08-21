@@ -2,7 +2,13 @@ from generators.Generator import Generator
 from Command import Command
 import os
 import shutil
-from . import sdlpopConfig
+from systemFiles import CONF
+
+sdlpopConfigDir = CONF + '/SDLPoP'
+sdlpopSrcCfg = sdlpopConfigDir + '/SDLPoP.cfg'
+sdlpopSrcIni = sdlpopConfigDir + '/SDLPoP.ini'
+sdlpopDestCfg = '/usr/share/SDLPoP/cfg/SDLPoP.cfg'
+sdlpopDestIni = '/usr/share/SDLPoP/cfg/SDLPoP.ini'
 
 class SdlPopGenerator(Generator):
 
@@ -10,17 +16,17 @@ class SdlPopGenerator(Generator):
         commandArray = ["SDLPoP"]
 
         # create sdlpop config directory
-        if not os.path.exists(sdlpopConfig.sdlpopConfigDir):
-            os.makedirs(sdlpopConfig.sdlpopConfigDir)
-        if not os.path.exists(sdlpopConfig.sdlpopSrcCfg):
-            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.cfg', sdlpopConfig.sdlpopSrcCfg)
-        if not os.path.exists(sdlpopConfig.sdlpopSrcIni):
-            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.ini', sdlpopConfig.sdlpopSrcIni)
+        if not os.path.exists(sdlpopConfigDir):
+            os.makedirs(sdlpopConfigDir)
+        if not os.path.exists(sdlpopSrcCfg):
+            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.cfg', sdlpopSrcCfg)
+        if not os.path.exists(sdlpopSrcIni):
+            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.ini', sdlpopSrcIni)
         # symbolic link cfg files
-        if not os.path.exists(sdlpopConfig.sdlpopDestCfg):
-            os.symlink(sdlpopConfig.sdlpopSrcCfg, sdlpopConfig.sdlpopDestCfg)
-        if not os.path.exists(sdlpopConfig.sdlpopDestIni):
-            os.symlink(sdlpopConfig.sdlpopSrcIni, sdlpopConfig.sdlpopDestIni)
+        if not os.path.exists(sdlpopDestCfg):
+            os.symlink(sdlpopSrcCfg, sdlpopDestCfg)
+        if not os.path.exists(sdlpopDestIni):
+            os.symlink(sdlpopSrcIni, sdlpopDestIni)
         # create screenshots folder in /userdata
         if not os.path.exists('/userdata/screenshots/SDLPoP'):
             os.makedirs('/userdata/screenshots/SDLPoP')

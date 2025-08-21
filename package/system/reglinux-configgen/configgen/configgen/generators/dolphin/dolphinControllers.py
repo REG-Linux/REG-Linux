@@ -1,9 +1,9 @@
-import os
-import codecs
-import glob
-import configparser
-import re
-from . import dolphinConfig
+from os import path, remove
+from codecs import open
+from glob import glob
+from configparser import ConfigParser
+from re import match
+from .dolphinConfig import DOLPHIN_CONFIG_DIR
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -167,7 +167,7 @@ def generateControllerConfig_emulatedwiimotes(system, playersControllers, wheels
 
     # This section allows a per ROM override of the default key options.
     configname = rom + ".cfg"       # Define ROM configuration name
-    if os.path.isfile(configname):  # File exists
+    if path.isfile(configname):  # File exists
         import ast
         with open(configname) as cconfig:
             line = cconfig.readline()
@@ -221,7 +221,7 @@ def generateControllerConfig_gamecube(system, playersControllers, wheels, rom):
 
     # This section allows a per ROM override of the default key options.
     configname = rom + ".cfg"       # Define ROM configuration name
-    if os.path.isfile(configname):  # File exists
+    if path.isfile(configname):  # File exists
         import ast
         with open(configname) as cconfig:
             line = cconfig.readline()
@@ -234,13 +234,13 @@ def generateControllerConfig_gamecube(system, playersControllers, wheels, rom):
     generateControllerConfig_any(system, playersControllers, wheels, "GCPadNew.ini", "GCPad", gamecubeMapping, gamecubeReverseAxes, gamecubeReplacements)
 
 def removeControllerConfig_gamecube():
-    configFileName = "{}/{}".format(dolphinConfig.dolphinConfig, "GCPadNew.ini")
-    if os.path.isfile(configFileName):
-        os.remove(configFileName)
+    configFileName = "{}/{}".format(DOLPHIN_CONFIG_DIR, "GCPadNew.ini")
+    if path.isfile(configFileName):
+        remove(configFileName)
 
 def generateControllerConfig_realwiimotes(filename, anyDefKey):
-    configFileName = f"{dolphinConfig.dolphinConfig}/{filename}"
-    f = codecs.open(configFileName, "w", encoding="utf_8_sig")
+    configFileName = f"{DOLPHIN_CONFIG_DIR}/{filename}"
+    f = open(configFileName, "w", encoding="utf_8_sig")
     nplayer = 1
     while nplayer <= 4:
         f.write("[" + anyDefKey + str(nplayer) + "]" + "\n")
@@ -251,8 +251,8 @@ def generateControllerConfig_realwiimotes(filename, anyDefKey):
     f.close()
 
 def generateControllerConfig_guns(filename, anyDefKey, metadata, guns, system, rom):
-    configFileName = f"{dolphinConfig.dolphinConfig}/{filename}"
-    f = codecs.open(configFileName, "w", encoding="utf_8_sig")
+    configFileName = f"{DOLPHIN_CONFIG_DIR}/{filename}"
+    f = open(configFileName, "w", encoding="utf_8_sig")
 
     # In case of two pads having the same name, dolphin wants a number to handle this
     double_pads = dict()
@@ -397,8 +397,8 @@ def generateControllerConfig_guns(filename, anyDefKey, metadata, guns, system, r
     f.close()
 
 def generateHotkeys(playersControllers):
-    configFileName = "{}/{}".format(dolphinConfig.dolphinConfig, "Hotkeys.ini")
-    f = codecs.open(configFileName, "w", encoding="utf_8_sig")
+    configFileName = "{}/{}".format(DOLPHIN_CONFIG_DIR, "Hotkeys.ini")
+    f = open(configFileName, "w", encoding="utf_8_sig")
 
     hotkeysMapping = {
         'a':             'Keys/Reset',
@@ -480,8 +480,8 @@ def get_AltMapping(system, nplayer, anyMapping):
     return mapping
 
 def generateControllerConfig_any(system, playersControllers, wheels, filename, anyDefKey, anyMapping, anyReverseAxes, anyReplacements, extraOptions = {}):
-    configFileName = f"{dolphinConfig.dolphinConfig}/{filename}"
-    f = codecs.open(configFileName, "w", encoding="utf_8_sig")
+    configFileName = f"{DOLPHIN_CONFIG_DIR}/{filename}"
+    f = open(configFileName, "w", encoding="utf_8_sig")
     nplayer = 1
     nsamepad = 0
 
@@ -534,9 +534,9 @@ def generateControllerConfig_wheel(f, pad, nplayer):
 
     eslog.debug("configuring wheel for pad {}".format(pad.name))
 
-    f.write(f"Rumble/Motor = Constant\n") # only Constant works on my wheel. maybe some other values could be good
-    f.write(f"Rumble/Motor/Range = -100.\n") # value must be negative, otherwise the center is located in extremes (left/right)
-    f.write(f"Main Stick/Dead Zone = 0.\n") # not really needed while this is the default
+    f.write("Rumble/Motor = Constant\n") # only Constant works on my wheel. maybe some other values could be good
+    f.write("Rumble/Motor/Range = -100.\n") # value must be negative, otherwise the center is located in extremes (left/right)
+    f.write("Main Stick/Dead Zone = 0.\n") # not really needed while this is the default
 
     for x in pad.inputs:
         input = pad.inputs[x]
@@ -617,16 +617,16 @@ def generateControllerConfig_any_auto(f, pad, anyMapping, anyReverseAxes, anyRep
             f.write(f"Main Stick/Dead Zone = {system.config['deadzone_' + str(nplayer)]}\n")
             f.write(f"C-Stick/Dead Zone = {system.config['deadzone_' + str(nplayer)]}\n")
         else:
-            f.write(f"Main Stick/Dead Zone = 5.0\n")
-            f.write(f"C-Stick/Dead Zone = 5.0\n")
+            f.write("Main Stick/Dead Zone = 5.0\n")
+            f.write("C-Stick/Dead Zone = 5.0\n")
         # JS gate size
         if system.isOptSet(f"jsgate_size_{nplayer}") and system.config[f'jsgate_size_{nplayer}'] != 'normal':
             if system.config[f'jsgate_size_{nplayer}'] == 'smaller':
-                f.write(f"Main Stick/Gate Size = 64.0\n")
-                f.write(f"C-Stick/Gate Size = 56.0\n")
+                f.write("Main Stick/Gate Size = 64.0\n")
+                f.write("C-Stick/Gate Size = 56.0\n")
             if system.config[f'jsgate_size_{nplayer}'] == 'larger':
-                f.write(f"Main Stick/Gate Size = 95.0\n")
-                f.write(f"C-Stick/Gate Size = 88.0\n")
+                f.write("Main Stick/Gate Size = 95.0\n")
+                f.write("C-Stick/Gate Size = 88.0\n")
 
 def generateControllerConfig_any_from_profiles(f, pad, system):
     globsearch = ""
@@ -635,17 +635,17 @@ def generateControllerConfig_any_from_profiles(f, pad, system):
     if system.name == "wii":
         globsearch = "/userdata/system/configs/dolphin-emu/Profiles/Wiimote/*.ini"
 
-    for profileFile in glob.glob(globsearch):
+    for profileFile in glob(globsearch):
         try:
             eslog.debug(f"Looking profile : {profileFile}")
-            profileConfig = configparser.ConfigParser(interpolation=None)
+            profileConfig = ConfigParser(interpolation=None)
             # To prevent ConfigParser from converting to lower case
             profileConfig.optionxform=lambda optionstr: str(optionstr)
             profileConfig.read(profileFile)
             profileDevice = profileConfig.get("Profile","Device")
             eslog.debug(f"Profile device : {profileDevice}")
 
-            deviceVals = re.match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
+            deviceVals = match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
             if deviceVals is not None:
                 if deviceVals.group(1) == "evdev" and deviceVals.group(2).strip() == pad.name.strip():
                     eslog.debug("Eligible profile device found")

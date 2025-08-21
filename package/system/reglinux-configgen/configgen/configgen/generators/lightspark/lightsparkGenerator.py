@@ -1,7 +1,8 @@
 from generators.Generator import Generator
 from Command import Command
 from controllers import generate_sdl_controller_config
-from .lightsparkConfig import LIGHTSPARK_BIN_PATH
+
+LIGHTSPARK_BIN_PATH = '/usr/bin/lightspark'
 
 class LightsparkGenerator(Generator):
 

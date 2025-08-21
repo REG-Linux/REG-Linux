@@ -3,7 +3,13 @@ from Command import Command
 from configparser import ConfigParser
 from os import path, makedirs
 from shutil import copy2
-from .dosboxxConfig import DOSBOXX_CONFIG_PATH, DOSBOXX_CONFIG_CUSTOM_PATH, DOSBOXX_BIN_PATH
+from systemFiles import CONF
+
+DOSBOXX_CONFIG_DIR = CONF + '/dosbox'
+DOSBOXX_CONFIG_PATH = DOSBOXX_CONFIG_DIR + '/dosboxx.conf'
+DOSBOXX_CONFIG_CUSTOM_PATH = DOSBOXX_CONFIG_DIR + '/dosboxx-custom.conf'
+DOSBOXX_BIN_PATH = '/usr/bin/dosbox-x'
+
 
 class DosBoxxGenerator(Generator):
 
