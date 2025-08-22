@@ -1,9 +1,9 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import configparser
-import hashlib
-import controllers as controllersConfig
+from os import path, remove, chdir
+from configparser import RawConfigParser
+from hashlib import md5
+from controllers import generate_sdl_controller_config
 
 class SonicRetroGenerator(Generator):
 
@@ -17,45 +17,11 @@ class SonicRetroGenerator(Generator):
 
         iniFile = rom + "/settings.ini"
 
-        sonicButtons = {
-            "Up":       "11",
-            "Down":     "12",
-            "Left":     "13",
-            "Right":    "14",
-            "A":        "0",
-            "B":        "1",
-            "C":        "2",
-            "X":        "3",
-            "Y":        "22",
-            "Z":        "23",
-            "L":        "9",
-            "R":        "10",
-            "Select":   "4",
-            "Start":    "6"
-        }
-
-        sonicKeys = {
-            "Up":       "82",
-            "Down":     "81",
-            "Left":     "80",
-            "Right":    "79",
-            "A":        "29",
-            "B":        "27",
-            "C":        "6",
-            "X":        "4",
-            "Y":        "22",
-            "Z":        "7",
-            "L":        "20",
-            "R":        "8",
-            "Start":    "40",
-            "Select":   "43"
-        }
-
         # ini file
-        sonicConfig = configparser.RawConfigParser(strict=False)
+        sonicConfig = RawConfigParser(strict=False)
         sonicConfig.optionxform=lambda optionstr: str(optionstr)             # Add Case Sensitive comportement
-        if os.path.exists(iniFile):
-            os.remove(iniFile)          # Force removing settings.ini
+        if path.exists(iniFile):
+            remove(iniFile)          # Force removing settings.ini
             sonicConfig.read(iniFile)
 
         # [Dev]
@@ -108,7 +74,7 @@ class SonicRetroGenerator(Generator):
             # Sonic CD
             "e723aab26026e4e6d4522c4356ef5a98",
         ]
-        if os.path.isfile(f"{rom}/Data/Game/GameConfig.bin") and self.__getMD5(f"{rom}/Data/Game/GameConfig.bin") in originsGameConfig:
+        if path.isfile(f"{rom}/Data/Game/GameConfig.bin") and self.__getMD5(f"{rom}/Data/Game/GameConfig.bin") in originsGameConfig:
             sonicConfig.set("Game", "GameType", "1")
 
         if system.isOptSet('language'):
@@ -142,35 +108,13 @@ class SonicRetroGenerator(Generator):
         sonicConfig.set("Audio", "BGMVolume", "1.000000")
         sonicConfig.set("Audio", "SFXVolume", "1.000000")
 
-        # [Keyboard 1]
-        if not sonicConfig.has_section("Keyboard 1"):
-            sonicConfig.add_section("Keyboard 1")
-
-        for x in sonicKeys:
-            sonicConfig.set("Keyboard 1", f"{x}", f"{sonicKeys[x]}")
-
-        # [Controller 1]
-        if not sonicConfig.has_section("Controller 1"):
-            sonicConfig.add_section("Controller 1")
-
-        for index in playersControllers:
-            controller = playersControllers[index]
-            if controller.player != "1":
-                continue
-            for x in sonicButtons:
-                sonicConfig.set("Controller 1", f"{x}", f"{sonicButtons[x]}")
-            break
-
-        with open(iniFile, 'w') as configfile:
-            sonicConfig.write(configfile, False)
-
-        os.chdir(rom)
+        chdir(rom)
         commandArray = [emu]
 
         return Command(
                     array=commandArray,
                     env={
-                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
                     })
 
     def getMouseMode(self, config, rom):
@@ -185,7 +129,7 @@ class SonicRetroGenerator(Generator):
         ]
 
         enableMouse = False
-        if (emu == "soniccd" and os.path.isfile(f"{rom}/Data.rsdk")):
+        if (emu == "soniccd" and path.isfile(f"{rom}/Data.rsdk")):
             enableMouse = self.__getMD5(f"{rom}/Data.rsdk") in mouseRoms
         else:
             enableMouse = False
@@ -193,15 +137,16 @@ class SonicRetroGenerator(Generator):
         return enableMouse
 
     def __getMD5(self, filename):
-        rp = os.path.realpath(filename)
+            rp = path.realpath(filename)
 
-        try:
-            self.__getMD5.__func__.md5
-        except AttributeError:
-            self.__getMD5.__func__.md5 = dict()
+            # Use an instance attribute for caching instead of function attribute
+            if not hasattr(self, '_md5_cache'):
+                self._md5_cache = dict()
 
-        try:
-            return self.__getMD5.__func__.md5[rp]
-        except KeyError:
-            self.__getMD5.__func__.md5[rp] = hashlib.md5(open(rp, "rb").read()).hexdigest()
-            return self.__getMD5.__func__.md5[rp]
+            if rp in self._md5_cache:
+                return self._md5_cache[rp]
+            else:
+                with open(rp, "rb") as f:
+                    md5_hash = md5(f.read()).hexdigest()
+                self._md5_cache[rp] = md5_hash
+                return md5_hash
