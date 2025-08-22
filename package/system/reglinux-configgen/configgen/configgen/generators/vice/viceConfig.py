@@ -1,25 +1,23 @@
-import os
-import configparser
+from os import path, makedirs
+from configparser import RawConfigParser
 from systemFiles import CONF
 
-viceConfig = CONF + "/vice"
-viceBin = "/usr/bin/"
+VICE_CONFIG_DIR = CONF + "/vice"
+VICE_CONFIG_PATH = VICE_CONFIG_DIR + "/sdl-vicerc"
+VICE_CONTROLLER_PATH = VICE_CONFIG_DIR + "/sdl-joymap.vjm"
+VICE_BIN_PATH = "/usr/bin/"
 
-def setViceConfig(viceConfigFile, system, metadata, guns, rom):
+def setViceConfig(viceConfigFile, viceControllerFile, system, metadata, guns, rom):
 
-    # Path
-    viceController = viceConfigFile + "/sdl-joymap.vjm"
-    viceConfigRC   = viceConfigFile + "/sdl-vicerc"
-
-    if not os.path.exists(os.path.dirname(viceConfigRC)):
-            os.makedirs(os.path.dirname(viceConfigRC))
+    if not path.exists(path.dirname(viceConfigFile)):
+            makedirs(path.dirname(viceConfigFile))
 
     # config file
-    viceConfig = configparser.RawConfigParser(interpolation=None)
+    viceConfig = RawConfigParser(interpolation=None)
     viceConfig.optionxform=lambda optionstr: str(optionstr)
 
-    if os.path.exists(viceConfigRC):
-        viceConfig.read(viceConfigRC)
+    if path.exists(viceConfigFile):
+        viceConfig.read(viceConfigFile)
 
     if(system.config['core'] == 'x64'):
         systemCore = "C64"
@@ -59,7 +57,7 @@ def setViceConfig(viceConfigFile, system, metadata, guns, rom):
     viceConfig.set(systemCore, "JoyDevice1",             "4")
     if not systemCore == "VIC20":
         viceConfig.set(systemCore, "JoyDevice2",             "4")
-    viceConfig.set(systemCore, "JoyMapFile",  viceController)
+    viceConfig.set(systemCore, "JoyMapFile",  viceControllerFile)
 
     # custom : allow the user to configure directly sdl-vicerc via system.conf via lines like : vice.section.option=value
     for user_config in system.config:
@@ -73,7 +71,7 @@ def setViceConfig(viceConfigFile, system, metadata, guns, rom):
             viceConfig.set(custom_section, custom_option, system.config[user_config])
 
     # update the configuration file
-    with open(viceConfigRC, 'w') as configfile:
+    with open(viceConfigFile, 'w') as configfile:
         viceConfig.write(EqualsSpaceRemover(configfile))
 
 class EqualsSpaceRemover:
@@ -81,5 +79,6 @@ class EqualsSpaceRemover:
     def __init__( self, new_output_file ):
         self.output_file = new_output_file
 
-    def write( self, what ):
-        self.output_file.write( what.replace( " = ", "=", 1 ) )
+    def write(self, what):
+            if self.output_file is not None:
+                self.output_file.write(what.replace(" = ", "=", 1))
