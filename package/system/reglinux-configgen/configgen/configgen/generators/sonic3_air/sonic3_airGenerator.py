@@ -1,41 +1,41 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import shutil
-import json
-from systemFiles import CONF
+from os import path, makedirs
+from shutil import copy
+from json import load, dump
+from controllers import generate_sdl_controller_config
+from systemFiles import CONF, SAVES
+
+SONIC3AIR_CONFIG_PATH = '/usr/bin/sonic3-air/config.json'
+SONIC3AIR_OXIGEN_PATH = '/usr/bin/sonic3-air/oxygenproject.json'
+SONIC3AIR_CONFIG_DIR = CONF + '/Sonic3AIR'
+SONIC3AIR_DEST_CONFIG_PATH = SONIC3AIR_CONFIG_DIR + '/config.json'
+SONIC3AIR_DEST_OXIGEN_PATH = SONIC3AIR_CONFIG_DIR + '/oxygenproject.json'
+SONIC3AIR_SAVES_DIR = SAVES + '/sonic3-air'
+SONIC3AIR_SETTINGS_PATH = SONIC3AIR_CONFIG_DIR + '/settings.json'
+SONIC3AIR_BIN_PATH = '/usr/bin/sonic3-air/sonic3air_linux'
 
 class Sonic3AIRGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        config_file = "/usr/bin/sonic3-air/config.json"
-        oxygen_file = "/usr/bin/sonic3-air/oxygenproject.json"
-        s2_config_folder = CONF + "/Sonic3AIR"
-        config_dest_file = s2_config_folder + "/config.json"
-        oxygen_dest_file = s2_config_folder + "/oxygenproject.json"
-        saves_folder = "/userdata/saves/sonic3-air"
-        settings_file = s2_config_folder + "/settings.json"
-
-        ## Configuration
-
         # copy configuration json files so we can manipulate them
-        if not os.path.exists(config_dest_file):
-            if not os.path.exists(s2_config_folder):
-                os.makedirs(s2_config_folder)
-            shutil.copy(config_file, config_dest_file)
-        if not os.path.exists(oxygen_dest_file):
-            if not os.path.exists(s2_config_folder):
-                os.makedirs(s2_config_folder)
-            shutil.copy(oxygen_file, oxygen_dest_file)
+        if not path.exists(SONIC3AIR_DEST_CONFIG_PATH):
+            if not path.exists(SONIC3AIR_CONFIG_DIR):
+                makedirs(SONIC3AIR_CONFIG_DIR)
+            copy(SONIC3AIR_CONFIG_PATH, SONIC3AIR_DEST_CONFIG_PATH)
+        if not path.exists(SONIC3AIR_DEST_OXIGEN_PATH):
+            if not path.exists(SONIC3AIR_CONFIG_DIR):
+                makedirs(SONIC3AIR_CONFIG_DIR)
+            copy(SONIC3AIR_OXIGEN_PATH, SONIC3AIR_DEST_OXIGEN_PATH)
 
         # saves dir
-        if not os.path.exists(saves_folder):
-                os.makedirs(saves_folder)
+        if not path.exists(SONIC3AIR_SAVES_DIR):
+                makedirs(SONIC3AIR_SAVES_DIR)
 
         # read the json file
         # can't use `import json` as the file is not compliant
-        with open(config_dest_file, 'r') as file:
+        with open(SONIC3AIR_DEST_CONFIG_PATH, 'r') as file:
             json_text = file.read()
         # update the "SaveStatesDir"
         json_text = json_text.replace('"SaveStatesDir":  "saves/states"', '"SaveStatesDir":  "/userdata/saves/sonic3-air"')
@@ -46,25 +46,29 @@ class Sonic3AIRGenerator(Generator):
         new_resolution = str(gameResolution["width"]) + " x " + str(gameResolution["height"])
         json_text = json_text.replace(f'"WindowSize": "{current_resolution}"', f'"WindowSize": "{new_resolution}"')
 
-        with open(config_dest_file, 'w') as file:
+        with open(SONIC3AIR_DEST_CONFIG_PATH, 'w') as file:
             file.write(json_text)
 
         # settings json - compliant
         # ensure fullscreen
-        if os.path.exists(settings_file):
-            with open(settings_file, 'r') as file:
-                settings_data = json.load(file)
+        if path.exists(SONIC3AIR_SETTINGS_PATH):
+            with open(SONIC3AIR_SETTINGS_PATH, 'r') as file:
+                settings_data = load(file)
                 settings_data["Fullscreen"] = 1
         else:
             settings_data = {"Fullscreen": 1}
 
-        with open(settings_file, 'w') as file:
-            json.dump(settings_data, file, indent=4)
+        with open(SONIC3AIR_SETTINGS_PATH, 'w') as file:
+            dump(settings_data, file, indent=4)
 
         # now run
-        commandArray = ["/usr/bin/sonic3-air/sonic3air_linux"]
+        commandArray = [SONIC3AIR_BIN_PATH]
 
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
