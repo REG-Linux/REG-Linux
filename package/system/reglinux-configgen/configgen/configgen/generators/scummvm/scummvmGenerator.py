@@ -1,28 +1,27 @@
 from generators.Generator import Generator
 from Command import Command
-import os.path
-import glob
-import configparser
-from systemFiles import SCREENSHOTS, SAVES, CONF
+from os import path, makedirs
+from glob import glob
+from configparser import ConfigParser
+from systemFiles import SCREENSHOTS, CONF, BIOS
 
-scummvmSaves = SAVES + '/scummvm'
-scummvmConfigDir = CONF + "/scummvm"
-scummvmConfigFile = scummvmConfigDir + "/scummvm.ini"
-scummvmExtra = "/userdata/bios/scummvm/extra"
-scummvmBin = "/usr/bin/scummvm"
+SCUMMVM_CONFIG_DIR = CONF + '/scummvm'
+SCUMMVM_CONFIG_PATH = SCUMMVM_CONFIG_DIR + '/scummvm.ini'
+SCUMMVM_EXTRA_DIR = BIOS + '/scummvm/extra'
+SCUMMVM_BIN_PATH = '/usr/bin/scummvm'
 
 class ScummVMGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         # crete /userdata/bios/scummvm/extra folder if it doesn't exist
-        if not os.path.exists(scummvmExtra):
-            os.makedirs(scummvmExtra)
+        if not path.exists(SCUMMVM_EXTRA_DIR):
+            makedirs(SCUMMVM_EXTRA_DIR)
 
         # create / modify scummvm config file as needed
-        scummConfig = configparser.ConfigParser()
+        scummConfig = ConfigParser()
         scummConfig.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(scummvmConfigFile):
-            scummConfig.read(scummvmConfigFile)
+        if path.exists(SCUMMVM_CONFIG_PATH):
+            scummConfig.read(SCUMMVM_CONFIG_PATH)
 
         if not scummConfig.has_section("scummvm"):
             scummConfig.add_section("scummvm")
@@ -30,22 +29,22 @@ class ScummVMGenerator(Generator):
         scummConfig.set("scummvm", "gui_browser_native", "false")
 
         # save the ini file
-        if not os.path.exists(os.path.dirname(scummvmConfigFile)):
-            os.makedirs(os.path.dirname(scummvmConfigFile))
-        with open(scummvmConfigFile, 'w') as configfile:
+        if not path.exists(path.dirname(SCUMMVM_CONFIG_PATH)):
+            makedirs(path.dirname(SCUMMVM_CONFIG_PATH))
+        with open(SCUMMVM_CONFIG_PATH, 'w') as configfile:
             scummConfig.write(configfile)
 
         # Find rom path
-        if os.path.isdir(rom):
+        if path.isdir(rom):
           # rom is a directory: must contains a <game name>.scummvm file
           romPath = rom
-          romFile = glob.glob(romPath + "/*.scummvm")[0]
-          romName = os.path.splitext(os.path.basename(romFile))[0]
+          romFile = glob(romPath + "/*.scummvm")[0]
+          romName = path.splitext(path.basename(romFile))[0]
         else:
           # rom is a file: split in directory and file name
-          romPath = os.path.dirname(rom)
+          romPath = path.dirname(rom)
           # Get rom name without extension
-          romName = os.path.splitext(os.path.basename(rom))[0]
+          romName = path.splitext(path.basename(rom))[0]
 
         # pad number
         nplayer = 1
@@ -55,7 +54,7 @@ class ScummVMGenerator(Generator):
                 id=pad.index
             nplayer += 1
 
-        commandArray = [scummvmBin, "-f"]
+        commandArray = [SCUMMVM_BIN_PATH, "-f"]
 
         # set the resolution
         window_width = str(gameResolution["width"])
@@ -100,7 +99,7 @@ class ScummVMGenerator(Generator):
         commandArray.extend(
             [f"--joystick={id}",
             "--screenshotspath=" + SCREENSHOTS,
-            "--extrapath=" + scummvmExtra,
+            "--extrapath=" + SCUMMVM_EXTRA_DIR,
             f"--path={romPath}",
             f"{romName}"]
         )
