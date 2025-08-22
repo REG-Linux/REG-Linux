@@ -1,16 +1,14 @@
 from generators.Generator import Generator
 from Command import Command
-import shutil
-import os
-import configparser
-import ruamel.yaml as yaml
-import re
-import subprocess
-import controllers as controllersConfig
-from systemFiles import CONF
-from os import path
-from . import rpcs3Controllers
-from . import rpcs3Config
+from shutil import copytree, copy2
+from configparser import ConfigParser
+from re import match
+from os import path, makedirs
+from ruamel.yaml import YAML
+from subprocess import check_output, CalledProcessError
+from controllers import write_sdl_db_all_controllers
+from .rpcs3Controllers import generateControllerConfig
+from .rpcs3Config import RPCS3_ICON_TARGET_DIR, RPCS3_CONFIG_PATH, RPCS3_CURRENT_CONFIG_PATH, RPCS3_PS3UPDAT_PATH, RPCS3_BIN_PATH
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -22,19 +20,17 @@ class Rpcs3Generator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        rpcs3Controllers.generateControllerConfig(system, playersControllers, rom)
+        generateControllerConfig(system, playersControllers, rom)
 
         # Taking care of the CurrentSettings.ini file
-        if not os.path.exists(os.path.dirname(rpcs3Config.rpcs3CurrentConfig)):
-            os.makedirs(os.path.dirname(rpcs3Config.rpcs3CurrentConfig))
+        if not path.exists(path.dirname(RPCS3_CURRENT_CONFIG_PATH)):
+            makedirs(path.dirname(RPCS3_CURRENT_CONFIG_PATH))
 
-        # Generates CurrentSettings.ini with values to disable prompts on first run
-
-        rpcsCurrentSettings = configparser.ConfigParser(interpolation=None)
+        rpcsCurrentSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         rpcsCurrentSettings.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(rpcs3Config.rpcs3CurrentConfig):
-            rpcsCurrentSettings.read(rpcs3Config.rpcs3CurrentConfig)
+        if path.exists(RPCS3_CURRENT_CONFIG_PATH):
+            rpcsCurrentSettings.read(RPCS3_CURRENT_CONFIG_PATH)
 
         # Sets Gui Settings to close completely and disables some popups
         if not rpcsCurrentSettings.has_section("main_window"):
@@ -44,17 +40,18 @@ class Rpcs3Generator(Generator):
         rpcsCurrentSettings.set("main_window", "infoBoxEnabledInstallPUP","false")
         rpcsCurrentSettings.set("main_window", "infoBoxEnabledWelcome","false")
 
-        with open(rpcs3Config.rpcs3CurrentConfig, "w") as configfile:
+        with open(RPCS3_CURRENT_CONFIG_PATH, "w") as configfile:
             rpcsCurrentSettings.write(configfile)
 
-        if not os.path.exists(os.path.dirname(rpcs3Config.rpcs3config)):
-            os.makedirs(os.path.dirname(rpcs3Config.rpcs3config))
+        if not path.exists(path.dirname(RPCS3_CONFIG_PATH)):
+            makedirs(path.dirname(RPCS3_CONFIG_PATH))
 
         # Generate a default config if it doesn't exist otherwise just open the existing
         rpcs3ymlconfig = {}
-        if os.path.isfile(rpcs3Config.rpcs3config):
-            with open(rpcs3Config.rpcs3config, "r") as stream:
-                rpcs3ymlconfig = yaml.safe_load(stream)
+        if path.isfile(RPCS3_CONFIG_PATH):
+            with open(RPCS3_CONFIG_PATH, "r") as stream:
+                yaml = YAML(typ='unsafe', pure=True)
+                rpcs3ymlconfig = yaml.load(stream)
 
         if rpcs3ymlconfig is None: # in case the file is empty
             rpcs3ymlconfig = {}
@@ -133,7 +130,7 @@ class Rpcs3Generator(Generator):
         # gfx backend - default to Vulkan
         # Check Vulkan first to be sure
         try:
-            have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 if system.isOptSet("rpcs3_gfxbackend") and system.config["rpcs3_gfxbackend"] == "OpenGL":
@@ -142,11 +139,11 @@ class Rpcs3Generator(Generator):
                 else:
                     rpcs3ymlconfig["Video"]["Renderer"] = "Vulkan"
                 try:
-                    have_discrete = subprocess.check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
+                    have_discrete = check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
                     if have_discrete == "true":
                         eslog.debug("A discrete GPU is available on the system. We will use that for performance")
                         try:
-                            discrete_name = subprocess.check_output(["/usr/bin/system-vulkan", "discreteName"], text=True).strip()
+                            discrete_name = check_output(["/usr/bin/system-vulkan", "discreteName"], text=True).strip()
                             if discrete_name != "":
                                 eslog.debug("Using Discrete GPU Name: {} for RPCS3".format(discrete_name))
                                 if "Vulkan" not in rpcs3ymlconfig["Video"]:
@@ -154,15 +151,15 @@ class Rpcs3Generator(Generator):
                                 rpcs3ymlconfig["Video"]["Vulkan"]["Adapter"] = discrete_name
                             else:
                                 eslog.debug("Couldn't get discrete GPU Name")
-                        except subprocess.CalledProcessError:
+                        except CalledProcessError:
                             eslog.debug("Error getting discrete GPU Name")
                     else:
                         eslog.debug("Discrete GPU is not available on the system. Trying integrated.")
-                        have_integrated = subprocess.check_output(["/usr/bin/system-vulkan", "hasIntegrated"], text=True).strip()
+                        have_integrated = check_output(["/usr/bin/system-vulkan", "hasIntegrated"], text=True).strip()
                         if have_integrated == "true":
                             eslog.debug("Using integrated GPU to provide Vulkan. Beware of performance")
                             try:
-                                integrated_name = subprocess.check_output(["/usr/bin/system-vulkan", "integratedName"], text=True).strip()
+                                integrated_name = check_output(["/usr/bin/system-vulkan", "integratedName"], text=True).strip()
                                 if integrated_name != "":
                                     eslog.debug("Using Integrated GPU Name: {} for RPCS3".format(integrated_name))
                                     if "Vulkan" not in rpcs3ymlconfig["Video"]:
@@ -170,23 +167,23 @@ class Rpcs3Generator(Generator):
                                     rpcs3ymlconfig["Video"]["Vulkan"]["Adapter"] = integrated_name
                                 else:
                                     eslog.debug("Couldn't get integrated GPU name")
-                            except subprocess.CalledProcessError:
+                            except CalledProcessError:
                                 eslog.debug("Error getting integrated GPU index")
                         else:
                             eslog.debug("Integrated GPU is not available on the system. Cannot enable Vulkan.")
-                except subprocess.CalledProcessError:
+                except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
             else:
                 eslog.debug("Vulkan driver is not available on the system. Falling back to OpenGL")
                 rpcs3ymlconfig["Video"]["Renderer"] = "OpenGL"
-        except subprocess.CalledProcessError:
+        except CalledProcessError:
             eslog.debug("Error checking for discrete GPU.")
         # System aspect ratio (the setting in the PS3 system itself, not the displayed ratio) a.k.a. TV mode.
         if system.isOptSet("rpcs3_ratio"):
             rpcs3ymlconfig["Video"]["Aspect ratio"] = system.config["rpcs3_ratio"]
         else:
             # If not set, see if the screen ratio is closer to 4:3 or 16:9 and pick that.
-            rpcs3ymlconfig["Video"]["Aspect ratio"] = ":".join(map(str, Rpcs3Generator.getClosestRatio(gameResolution)))
+            rpcs3ymlconfig["Video"]["Aspect ratio"] = ":".join(map(str, getClosestRatio(gameResolution)))
         # Shader compilation
         if system.isOptSet("rpcs3_shadermode"):
             rpcs3ymlconfig["Video"]["Shader Mode"] = system.config["rpcs3_shadermode"]
@@ -334,60 +331,62 @@ class Rpcs3Generator(Generator):
         rpcs3ymlconfig["Miscellaneous"]["Prevent display sleep while running games"] = True
         rpcs3ymlconfig["Miscellaneous"]["Show trophy popups"] = False
 
-        with open(rpcs3Config.rpcs3config, "w") as file:
-            yaml.dump(rpcs3ymlconfig, file, default_flow_style=False)
+        with open(RPCS3_CONFIG_PATH, "w") as file:
+            yaml = YAML(typ='unsafe', pure=True)
+            yaml.default_flow_style = False
+            yaml.dump(rpcs3ymlconfig, file)
 
         # copy icon files to config
         icon_source = '/usr/share/rpcs3/Icons/'
-        icon_target = CONF + '/rpcs3/Icons'
-        if not os.path.exists(icon_target):
-            os.makedirs(icon_target)
-        shutil.copytree(icon_source, icon_target, dirs_exist_ok=True, copy_function=shutil.copy2)
+        icon_target = RPCS3_ICON_TARGET_DIR
+        if not path.exists(icon_target):
+            makedirs(icon_target)
+        copytree(icon_source, icon_target, dirs_exist_ok=True, copy_function=copy2)
 
         # determine the rom name
+        romName = None
         if rom.endswith(".psn"):
             with open(rom) as fp:
                 for line in fp:
                     if len(line) >= 9:
                         romName = "/userdata/system/configs/rpcs3/dev_hdd0/game/" + line.strip().upper() + "/USRDIR/EBOOT.BIN"
         else:
-            romBasename = path.basename(rom)
             romName = rom + "/PS3_GAME/USRDIR/EBOOT.BIN"
 
         # write our own gamecontrollerdb.txt file before launching the game
         dbfile = "/userdata/system/configs/rpcs3/input_configs/gamecontrollerdb.txt"
-        controllersConfig.write_sdl_db_all_controllers(playersControllers, dbfile)
+        write_sdl_db_all_controllers(playersControllers, dbfile)
 
-        commandArray = [rpcs3Config.rpcs3Bin, romName]
+        commandArray = [RPCS3_BIN_PATH, romName]
 
         if not (system.isOptSet("rpcs3_gui") and system.getOptBoolean("rpcs3_gui")):
             commandArray.append("--no-gui")
 
         # firmware not installed and available : instead of starting the game, install it
-        if Rpcs3Generator.getFirmwareVersion() is None:
-          if os.path.exists("/userdata/bios/PS3UPDAT.PUP"):
-            commandArray = [rpcs3Config.rpcs3Bin, "--installfw", "/userdata/bios/PS3UPDAT.PUP"]
+        if getFirmwareVersion() is None:
+          if path.exists(RPCS3_PS3UPDAT_PATH):
+              commandArray = [RPCS3_BIN_PATH, "--installfw", RPCS3_PS3UPDAT_PATH]
 
         return Command(array=commandArray)
 
-    def getClosestRatio(gameResolution):
-        screenRatio = gameResolution["width"] / gameResolution["height"]
-        if screenRatio < 1.6:
-            return (4,3)
-        else:
-            return (16,9)
+def getClosestRatio(gameResolution):
+    screenRatio = gameResolution["width"] / gameResolution["height"]
+    if screenRatio < 1.6:
+        return (4,3)
+    else:
+        return (16,9)
 
-    def getInGameRatio(self, config, gameResolution, rom):
-        return 16/9
+def getInGameRatio(self, config, gameResolution, rom):
+    return 16/9
 
-    def getFirmwareVersion():
-        try:
-            with open("/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt", "r") as stream:
-                lines = stream.readlines()
-            for line in lines:
-                matches = re.match("^release:(.*):", line)
-                if matches:
-                    return matches[1]
-        except:
-            return None
+def getFirmwareVersion():
+    try:
+        with open("/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt", "r") as stream:
+            lines = stream.readlines()
+        for line in lines:
+            matches = match("^release:(.*):", line)
+            if matches:
+                return matches[1]
+    except:
         return None
+    return None

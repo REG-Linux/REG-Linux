@@ -1,27 +1,28 @@
-import os
-import io
-import configparser
-from systemFiles import CONF
+from os import path, makedirs
+from io import open
+from configparser import ConfigParser
+from systemFiles import CONF, SAVES
 
-xemuConfig = CONF + '/xemu/xemu.toml'
-xemuBin = '/usr/bin/xemu'
+XEMU_SAVES_DIR = SAVES + '/xbox'
+XEMU_CONFIG_PATH = CONF + '/xemu/xemu.toml'
+XEMU_BIN_PATH = '/usr/bin/xemu'
 
-def writeIniFile(system, rom, playersControllers, gameResolution):
-    iniConfig = configparser.ConfigParser(interpolation=None)
+def setXemuConfig(system, rom, playersControllers, gameResolution):
+    iniConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     iniConfig.optionxform=lambda optionstr: str(optionstr)
-    if os.path.exists(xemuConfig):
+    if path.exists(XEMU_CONFIG_PATH):
         try:
-            with io.open(xemuConfig, 'r', encoding='utf_8_sig') as fp:
-                iniConfig.readfp(fp)
+            with open(XEMU_CONFIG_PATH, 'r', encoding='utf_8_sig') as fp:
+                iniConfig.read_file(fp)
         except:
             pass
 
     createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
     # save the ini file
-    if not os.path.exists(os.path.dirname(xemuConfig)):
-        os.makedirs(os.path.dirname(xemuConfig))
-    with open(xemuConfig, 'w') as configfile:
+    if not path.exists(path.dirname(XEMU_CONFIG_PATH)):
+        makedirs(path.dirname(XEMU_CONFIG_PATH))
+    with open(XEMU_CONFIG_PATH, 'w') as configfile:
         iniConfig.write(configfile)
 
 def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution):

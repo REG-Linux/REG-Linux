@@ -1,4 +1,4 @@
-import os
+from os import path, makedirs
 
 # inputtype:
 # 0      axis
@@ -45,8 +45,8 @@ def generateControllerConfig(system, viceConfigFile, playersControllers):
     else:
         joy_port = "1"
 
-    if not os.path.exists(os.path.dirname(viceFile)):
-        os.makedirs(os.path.dirname(viceFile))
+    if not path.exists(path.dirname(viceFile)):
+        makedirs(path.dirname(viceFile))
 
     listVice = [];
     listVice.append("# REG-Linux configured controllers")
