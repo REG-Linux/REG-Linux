@@ -3,14 +3,15 @@
 # EDEN
 #
 ################################################################################
-# Version: v0.0.3-rc2
-EDEN_VERSION = v0.0.3-rc2
+# Version: v0.0.3-rc3
+EDEN_VERSION = v0.0.3-rc3
 EDEN_SITE = https://git.eden-emu.dev/eden-emu/eden
 EDEN_SITE_METHOD=git
 EDEN_GIT_SUBMODULES=YES
 EDEN_LICENSE = GPLv2
 EDEN_DEPENDENCIES = reglinux-qt6 fmt boost ffmpeg gamemode \
-                    zstd zlib libzip lz4 catch2 sdl2 opus json-for-modern-cpp enet
+                    zstd zlib libzip lz4 catch2 sdl2 opus \
+		    json-for-modern-cpp enet libva xwayland
 
 EDEN_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -26,6 +27,9 @@ EDEN_CONF_OPTS += -DEDEN_TESTS=OFF
 EDEN_CONF_OPTS += -DENABLE_WEB_SERVICE=ON
 EDEN_CONF_OPTS += -DUSE_SANITIZERS=OFF
 EDEN_CONF_OPTS += -DLINUX=ON
+EDEN_CONF_OPTS += -DYUZU_CHECK_SUBMODULES=OFF
+EDEN_CONF_OPTS += -DYUZU_USE_CPM=OFF
+EDEN_CONF_OPTS += -DENABLE_CUBEB=OFF
 ifeq ($(BR2_aarch64),y)
 EDEN_CONF_ENV += ARCHITECTURE_arm64=1
 EDEN_CONF_OPTS += -DARCHITECTURE_arm64=ON
