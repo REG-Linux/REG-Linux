@@ -1,7 +1,6 @@
 config BR2_PACKAGE_EDEN
     bool "eden"
     depends on BR2_x86_64 || BR2_aarch64
-    depends on BR2_PACKAGE_XORG7
     select BR2_PACKAGE_JSON_FOR_MODERN_CPP
     select BR2_PACKAGE_REGLINUX_QT6
     select BR2_PACKAGE_SDL2
@@ -17,6 +16,9 @@ config BR2_PACKAGE_EDEN
     select BR2_PACKAGE_OPUS
     select BR2_PACKAGE_ENET
     select BR2_PACKAGE_GAMEMODE
+    select BR2_PACKAGE_LIBVA
+    select BR2_PACKAGE_REGLINUX_XWAYLAND
+
     help
       Eden: Nintendo Switch Emulator
 
