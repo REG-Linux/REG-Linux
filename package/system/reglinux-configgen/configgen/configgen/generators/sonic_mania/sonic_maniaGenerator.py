@@ -1,18 +1,51 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import shutil
-import configparser
+from os import path, chdir, access, X_OK
+from shutil import copy
+from configparser import ConfigParser
+from controllers import generate_sdl_controller_config
+from systemFiles import ROMS
+from stat import S_IRWXU, S_IRGRP, S_IXGRP, S_IROTH, S_IXOTH
+
+SONICMANIA_SOURCE_BIN_PATH = '/usr/bin/sonic-mania'
+SONICMANIA_ROMS_DIR = ROMS + '/sonic-mania'
+SONICAMANIA_BIN_PATH = SONICMANIA_ROMS_DIR + '/sonic-mania'
+SONICMANIA_CONFIG_PATH = SONICMANIA_ROMS_DIR + '/Settings.ini'
 
 class SonicManiaGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        source_file = '/usr/bin/sonic-mania'
-        rom_directory = '/userdata/roms/sonic-mania'
-        destination_file = rom_directory + '/sonic-mania'
-        if not os.path.exists(destination_file):
-            shutil.copy(source_file, destination_file)
+        # Create the roms directory if it doesn't exist
+        if not path.exists(SONICMANIA_ROMS_DIR):
+            import os
+            os.makedirs(SONICMANIA_ROMS_DIR, exist_ok=True)
+
+        # Check if source binary exists and is executable
+        if not path.exists(SONICMANIA_SOURCE_BIN_PATH):
+            raise FileNotFoundError(f"Source binary not found: {SONICMANIA_SOURCE_BIN_PATH}")
+
+        if not access(SONICMANIA_SOURCE_BIN_PATH, X_OK):
+            raise PermissionError(f"Source binary is not executable: {SONICMANIA_SOURCE_BIN_PATH}")
+
+        # Copy the binary if it doesn't exist or is different
+        copy_needed = True
+        if path.exists(SONICAMANIA_BIN_PATH):
+            # Check if files are different
+            import filecmp
+            if filecmp.cmp(SONICMANIA_SOURCE_BIN_PATH, SONICAMANIA_BIN_PATH, shallow=False):
+                copy_needed = False
+
+        if copy_needed:
+            copy(SONICMANIA_SOURCE_BIN_PATH, SONICAMANIA_BIN_PATH)
+            # Make sure the copied binary is executable
+            if not path.exists(SONICAMANIA_BIN_PATH) or not access(SONICAMANIA_BIN_PATH, X_OK):
+                import os
+                os.chmod(SONICAMANIA_BIN_PATH, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
+
+        # Verify the copied binary is executable
+        if not access(SONICAMANIA_BIN_PATH, X_OK):
+            raise PermissionError(f"Copied binary is not executable: {SONICAMANIA_BIN_PATH}")
 
         ## Configuration
 
@@ -33,7 +66,7 @@ class SonicManiaGenerator(Generator):
             selected_language = '0'
 
         ## Create the Settings.ini file
-        config = configparser.ConfigParser()
+        config = ConfigParser()
         config.optionxform=lambda optionstr: str(optionstr)
         # Game
         config['Game'] = {
@@ -51,8 +84,8 @@ class SonicManiaGenerator(Generator):
             'exclusiveFS': 'y',
             'vsync': selected_vsync,
             'tripleBuffering': selected_buffering,
-            'winWidth': '848',
-            'winHeight': '480',
+            'winWidth': str(gameResolution['width']),
+            'winHeight': str(gameResolution['height']),
             'refreshRate': '60',
             'shaderSupport': 'y',
             'screenShader': '1',
@@ -65,14 +98,18 @@ class SonicManiaGenerator(Generator):
             'sfxVolume': '1.000000'
         }
         # Save the ini file
-        with open( rom_directory + '/Settings.ini', 'w') as configfile:
+        with open(SONICMANIA_CONFIG_PATH, 'w') as configfile:
             config.write(configfile)
 
         # Now run
-        os.chdir(rom_directory)
-        commandArray = [destination_file]
+        chdir(SONICMANIA_ROMS_DIR)
+        commandArray = [SONICAMANIA_BIN_PATH]
 
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
