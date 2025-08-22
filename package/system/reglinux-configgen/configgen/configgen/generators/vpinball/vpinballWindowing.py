@@ -1,7 +1,7 @@
-import utils.videoMode as videoMode
+from utils.videoMode import getScreensInfos
 
 def configureWindowing(vpinballSettings, system, gameResolution, hasDmd):
-    screens = videoMode.getScreensInfos(system.config)
+    screens = getScreensInfos(system.config)
 
     # disable full screen to move the window if necessary
     vpinballSettings.set("Player", "FullScreen", "0")
@@ -123,6 +123,9 @@ def getB2sgrillConfiguration(system, screens):
     return True
 
 def configurePlayfield(vpinballSettings, screens, playFieldScreen):
+    if screens[playFieldScreen]["width"] < screens[playFieldScreen]["height"]:
+        screens[playFieldScreen]["width"], screens[playFieldScreen]["height"] = screens[playFieldScreen]["height"], screens[playFieldScreen]["width"]
+
     vpinballSettings.set("Player", "WindowPosX", str(screens[playFieldScreen]["x"]))
     vpinballSettings.set("Player", "WindowPosY", str(screens[playFieldScreen]["y"]))
     vpinballSettings.set("Player", "Width",      str(screens[playFieldScreen]["width"]))
