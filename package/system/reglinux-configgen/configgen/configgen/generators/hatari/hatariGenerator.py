@@ -1,9 +1,8 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import configparser
-from systemFiles import CONF
-from . import hatariConfig
+from os import path
+from .hatariControllers import setHatariControllers
+from .hatariConfig import HATARI_BIOS_PATH, HATARI_BIN_PATH
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -26,7 +25,7 @@ class HatariGenerator(Generator):
         }
 
         # Start emulator fullscreen
-        commandArray = [hatariConfig.hatariBin, "--fullscreen"]
+        commandArray = [HATARI_BIN_PATH, "--fullscreen"]
 
         # Machine can be st (default), ste, megaste, tt, falcon
         # st should use TOS 1.00 to TOS 1.04 (tos100 / tos102 / tos104)
@@ -45,9 +44,8 @@ class HatariGenerator(Generator):
             toslang = system.config["language"]
 
         commandArray += ["--machine", machine]
-        biosdir = "/userdata/bios"
-        tos = HatariGenerator.findBestTos(biosdir, machine, tosversion, toslang)
-        commandArray += [ "--tos", f"{biosdir}/{tos}"]
+        tos = HatariGenerator.findBestTos(HATARI_BIOS_PATH, machine, tosversion, toslang)
+        commandArray += [ "--tos", f"{HATARI_BIOS_PATH}/{tos}"]
 
         # RAM (ST Ram) options (0 for 512k, 1 for 1MB)
         memorysize = 0
@@ -55,7 +53,7 @@ class HatariGenerator(Generator):
             memorysize = system.config["ram"]
         commandArray += ["--memsize", str(memorysize)]
 
-        rom_extension = os.path.splitext(rom)[1].lower()
+        rom_extension = path.splitext(rom)[1].lower()
         if rom_extension == ".hd":
             if system.isOptSet("hatari_drive") and system.config["hatari_drive"] == "ASCI":
                 commandArray += ["--asci", rom]
@@ -63,8 +61,8 @@ class HatariGenerator(Generator):
                 commandArray += ["--ide-master", rom]
         elif rom_extension == ".gemdos":
             blank_file = "/userdata/system/configs/hatari/blank.st"
-            if not os.path.exists(blank_file):
-                with open(blank_file, 'w') as file:
+            if not path.exists(blank_file):
+                with open(blank_file, 'w'):
                     pass
             commandArray += ["--harddrive", rom, blank_file]
         else:
@@ -74,75 +72,9 @@ class HatariGenerator(Generator):
             commandArray += ["--drive-b", "off"]
 
         # config file
-        HatariGenerator.generateConfig(system, playersControllers)
+        setHatariControllers(system, playersControllers)
 
         return Command(array=commandArray)
-
-    @staticmethod
-    def generateConfig(system, playersControllers):
-        config = configparser.ConfigParser(interpolation=None)
-        # To prevent ConfigParser from converting to lower case
-        config.optionxform=lambda optionstr: str(optionstr)
-
-        padMapping = {
-            1: "y",
-            2: "b",
-            3: "a"
-        }
-
-        configdir = "{}/{}".format(CONF, "hatari")
-        if not os.path.exists(configdir):
-            os.makedirs(configdir)
-        configFileName = "{}/{}".format(configdir, "hatari.cfg")
-        if os.path.isfile(configFileName):
-            config.read(configFileName)
-
-        # pads
-        # disable previous configuration
-        for i in range(1, 6): # 1 to 5 included
-            section = "Joystick" + str(i)
-            if config.has_section(section):
-                config.set(section, "nJoyId", "-1")
-                config.set(section, "nJoystickMode", "0")
-
-        nplayer = 1
-        for playercontroller, pad in sorted(playersControllers.items()):
-            if nplayer <= 5:
-                section = "Joystick" + str(nplayer)
-                if not config.has_section(section):
-                    config.add_section(section)
-                config.set(section, "nJoyId", str(pad.index))
-                config.set(section, "nJoystickMode", "1")
-
-                if padMapping[1] in pad.inputs:
-                    config.set(section, "nButton1", str(pad.inputs[padMapping[1]].id))
-                else:
-                    config.set(section, "nButton1", "0")
-                if padMapping[2] in pad.inputs:
-                    config.set(section, "nButton2", str(pad.inputs[padMapping[2]].id))
-                else:
-                    config.set(section, "nButton2", "1")
-                if padMapping[3] in pad.inputs:
-                    config.set(section, "nButton3", str(pad.inputs[padMapping[3]].id))
-                else:
-                    config.set(section, "nButton3", "2")
-            nplayer += 1
-
-        # Log
-        if not config.has_section("Log"):
-            config.add_section("Log")
-        config.set("Log", "bConfirmQuit", "FALSE")
-
-        # Screen
-        if not config.has_section("Screen"):
-            config.add_section("Screen")
-        if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
-            config.set("Screen", "bShowStatusbar", "TRUE")
-        else:
-            config.set("Screen", "bShowStatusbar", "FALSE")
-
-        with open(configFileName, 'w') as configfile:
-            config.write(configfile)
 
     @staticmethod
     def findBestTos(biosdir, machine, tos_version, language):
@@ -168,7 +100,7 @@ class HatariGenerator(Generator):
                 l_lang.extend(all_languages)
                 for v_language in l_lang:
                     filename = f"tos{v_tos_version}{v_language}.img"
-                    if os.path.exists(f"{biosdir}/{filename}"):
+                    if path.exists(f"{biosdir}/{filename}"):
                         eslog.debug(f"tos filename: {filename}")
                         return filename
                     else:

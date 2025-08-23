@@ -1,15 +1,15 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-from . import ppssppConfig
-from . import ppssppControllers
+from os import getenv
+from .ppssppConfig import setPPSSPPConfig, PPSSPP_BIN_PATH
+from .ppssppControllers import setControllerConfig
 
 class PPSSPPGenerator(Generator):
 
     # Main entry of the module
     # Configure PPSSPP and return a command
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        ppssppConfig.writePPSSPPConfig(system)
+        setPPSSPPConfig(system)
 
         # Generate the controls.ini
         for index in playersControllers :
@@ -17,11 +17,11 @@ class PPSSPPGenerator(Generator):
             # We only care about player 1
             if controller.index != "1":
                 continue
-            ppssppControllers.generateControllerConfig(controller)
+            setControllerConfig(controller)
             break
 
         # The command to run
-        commandArray = [ppssppConfig.ppssppBin]
+        commandArray = [PPSSPP_BIN_PATH]
         commandArray.append(rom)
         commandArray.append("--fullscreen")
 
@@ -34,9 +34,6 @@ class PPSSPPGenerator(Generator):
         if system.isOptSet('state_filename'):
             commandArray.append("--state={}".format(system.config['state_filename']))
 
-        # The next line is a reminder on how to quit PPSSPP with just the HK
-        #commandArray = ['/usr/bin/PPSSPP'], rom, "--escape-exit"]
-
         # select the correct pad
         nplayer = 1
         for _, pad in sorted(playersControllers.items()):
@@ -46,7 +43,7 @@ class PPSSPPGenerator(Generator):
 
         # Adjust SDL_VIDEODRIVER to run through wayland or kmsdrm
         environment= {}
-        if os.getenv("XDG_SESSION_TYPE")=="wayland":
+        if getenv("XDG_SESSION_TYPE")=="wayland":
             environment["SDL_VIDEODRIVER"] = "wayland"
         else:
             environment["SDL_VIDEODRIVER"] = "kmsdrm"

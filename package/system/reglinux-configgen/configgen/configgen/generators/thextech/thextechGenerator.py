@@ -1,15 +1,20 @@
 from generators.Generator import Generator
 from Command import Command
-import os
+from os import path, makedirs
+from systemFiles import SAVES
+from controllers import generate_sdl_controller_config
+
+THEXTECH_SAVES_DIR = SAVES + '/thextech'
+THEXTECH_BIN_PATH = "/usr/bin/thextech"
 
 class TheXTechGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        if not os.path.exists("/userdata/saves/thextech"):
-                os.makedirs("/userdata/saves/thextech")
+        if not path.exists(THEXTECH_SAVES_DIR):
+                makedirs(THEXTECH_SAVES_DIR)
 
-        commandArray = ["/usr/bin/thextech", "-u", "/userdata/saves/thextech"]
+        commandArray = [THEXTECH_BIN_PATH, "-u", THEXTECH_SAVES_DIR]
 
         # rendering_mode: sw, hw (default), vsync
         if system.isOptSet('rendering_mode'):
@@ -22,4 +27,8 @@ class TheXTechGenerator(Generator):
 
         commandArray.extend(["-c", rom])
 
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })

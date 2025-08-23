@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA3D_VERSION = 25.2.0
+MESA3D_VERSION = 25.2.1
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://archive.mesa3d.org
 
@@ -72,7 +72,7 @@ endif
 # x86 builds require clang libclc and python-ply, rely on system (host) intel_clc
 ifeq ($(BR2_x86_64),y)
 MESA3D_DEPENDENCIES += clang libclc host-python-ply
-MESA3D_CONF_OPTS += -Dintel-clc=system -Dmesa-clc=system
+MESA3D_CONF_OPTS += -Dmesa-clc=system
 endif
 
 # panfrost needs libclc, llvm and spirv-llvm-translator
@@ -340,7 +340,7 @@ $(eval $(meson-package))
 
 # "just" need a native host intel_clc compiler
 HOST_MESA3D_DEPENDENCIES = libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
-HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dintel-clc=enabled -Dinstall-intel-clc=true -Dplatforms= -Dgallium-drivers= -Dglx=disabled -Dgallium-rusticl=false
+HOST_MESA3D_CONF_OPTS = -Dvulkan-drivers=intel,intel_hasvk -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dplatforms= -Dgallium-drivers= -Dglx=disabled -Dgallium-rusticl=false
 
 # reglinux hack to fix prebuilt llvm/clang
 #HOST_MESA3D_CONF_OPTS += -DCMAKE_INSTALL_RPATH="$(HOST_DIR)/lib"

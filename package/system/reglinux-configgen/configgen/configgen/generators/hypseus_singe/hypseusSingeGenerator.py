@@ -1,11 +1,21 @@
 from generators.Generator import Generator
 from Command import Command
-import filecmp
-import shutil
-import os
-import ffmpeg
-import controllers as controllersConfig
-from . import hypseusSingeConfig
+from typing import Optional, Tuple
+from filecmp import cmp
+from shutil import copyfile, copytree, copy2
+from os import path, walk, mkdir, listdir
+from ffmpeg import probe
+from controllers import generate_sdl_controller_config, gunsBordersSizeName
+from systemFiles import CONF, ROMS, SAVES
+
+DAPHNE_ROM_DIR = ROMS + '/daphne'
+SINGE_ROM_DIR = ROMS + '/singe'
+HYPSEUS_DATA_DIR = CONF + '/hypseus-singe'
+HYPSEUS_CONFIG_FILE_PATH = '/hypinput.ini'
+HYPSEUS_CONFIG_PATH = HYPSEUS_DATA_DIR + HYPSEUS_CONFIG_FILE_PATH
+HYPSEUS_CONFIG_GAMEPAD_PATH = '/usr/share/hypseus-singe/hypinput_gamepad.ini'
+HYPSEUS_SAVES_DIR = SAVES + '/hypseus'
+HYPSEUS_BIN_PATH = '/usr/bin/hypseus'
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -25,36 +35,56 @@ class HypseusSingeGenerator(Generator):
 
     @staticmethod
     def find_file(start_path, filename):
-        if os.path.exists(os.path.join(start_path, filename)):
-            return os.path.join(start_path, filename)
+        if path.exists(path.join(start_path, filename)):
+            return path.join(start_path, filename)
 
-        for root, dirs, files in os.walk(start_path):
+        for root, dirs, files in walk(start_path):
             if filename in files:
-                eslog.debug("Found m2v file in path - {}".format(os.path.join(root, filename)))
-                return os.path.join(root, filename)
+                eslog.debug("Found m2v file in path - {}".format(path.join(root, filename)))
+                return path.join(root, filename)
 
         return None
 
     @staticmethod
     def get_resolution(video_path):
-        probe = ffmpeg.probe(video_path)
-        video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
-        width = int(video_stream['width'])
-        height = int(video_stream['height'])
-        sar_num = video_stream['display_aspect_ratio'].split(':')[0]
-        sar_den = video_stream['display_aspect_ratio'].split(':')[1]
-        sar_num = int(sar_num) if sar_num else 0
-        sar_den = int(sar_den) if sar_den else 0
-        if sar_num != 0 and sar_den != 0:
-            ratio = sar_num / sar_den
-            width = int(height * ratio)
-        return width, height
+        try:
+            # Tenta obter informações do vídeo
+            probe_video = probe(video_path)
+            if not probe_video or 'streams' not in probe_video:
+                eslog.debug(f"Não foi possível analisar o arquivo de vídeo: {video_path}")
+                return 0, 0
+
+            # Encontra o stream de vídeo
+            video_stream = next((stream for stream in probe_video['streams'] if stream.get('codec_type') == 'video'), None)
+            if not video_stream:
+                eslog.debug(f"Nenhum stream de vídeo encontrado em: {video_path}")
+                return 0, 0
+
+            # Obtém largura e altura
+            width = int(video_stream.get('width', 0))
+            height = int(video_stream.get('height', 0))
+
+            # Trata aspect ratio se disponível
+            display_aspect_ratio = video_stream.get('display_aspect_ratio')
+            if display_aspect_ratio and ':' in display_aspect_ratio:
+                try:
+                    sar_num, sar_den = display_aspect_ratio.split(':')
+                    sar_num = int(sar_num) if sar_num else 0
+                    sar_den = int(sar_den) if sar_den else 0
+                    if sar_num != 0 and sar_den != 0:
+                        ratio = sar_num / sar_den
+                        width = int(height * ratio)
+                except (ValueError, ZeroDivisionError) as e:
+                    eslog.debug(f"Erro ao processar aspect ratio: {e}")
+
+            return width, height
+
+        except Exception as e:
+            eslog.error(f"Erro ao obter resolução do vídeo: {e}")
+            return 0, 0
 
     # Main entry of the module
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        # copy input.ini file templates
-        hypseusConfigSource = "/usr/share/hypseus-singe/hypinput_gamepad.ini"
-
         bezel_to_rom = {
             "ace": ["ace", "ace_a", "ace_a2", "ace91", "ace91_euro", "aceeuro"],
             "astron": ["astron", "astronp"],
@@ -69,7 +99,6 @@ class HypseusSingeGenerator(Generator):
             "dragon": ["dragon", "dragon_trainer"],
             "drugwars": ["drugwars", "drugwars-hd", "cp2dw_hd"],
             "daitarn": ["daitarn", "daitarn_3"],
-            "dle": ["dle", "dle_alt"],
             "fire_and_ice": ["fire_and_ice", "fire_and_ice_v2"],
             "galaxy": ["galaxy", "galaxyp"],
             "lair": ["lair", "lair_a", "lair_b", "lair_c", "lair_d", "lair_d2", "lair_e", "lair_f", "lair_ita", "lair_n1", "lair_x", "laireuro"],
@@ -88,34 +117,34 @@ class HypseusSingeGenerator(Generator):
                     return bezel
             return None
 
-        if not os.path.isdir(hypseusSingeConfig.hypseusDatadir):
-            os.mkdir(hypseusSingeConfig.hypseusDatadir)
-        if not os.path.exists(hypseusSingeConfig.hypseusConfig) or not filecmp.cmp(hypseusConfigSource, hypseusSingeConfig.hypseusConfig):
-            shutil.copyfile(hypseusConfigSource, hypseusSingeConfig.hypseusConfig)
+        if not path.isdir(HYPSEUS_DATA_DIR):
+            mkdir(HYPSEUS_DATA_DIR)
+        if not path.exists(HYPSEUS_CONFIG_PATH) or not cmp(HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH):
+            copyfile(HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH)
 
         # create a custom ini
-        if not os.path.exists(hypseusSingeConfig.hypseusDatadir + "/custom.ini"):
-            shutil.copyfile(hypseusSingeConfig.hypseusConfig, hypseusSingeConfig.hypseusDatadir + "/custom.ini")
+        if not path.exists(HYPSEUS_DATA_DIR + "/custom.ini"):
+            copyfile(HYPSEUS_CONFIG_PATH, HYPSEUS_DATA_DIR + "/custom.ini")
 
         # copy required resources to userdata config folder as needed
         def copy_resources(source_dir, destination_dir):
-            if not os.path.exists(destination_dir):
-                shutil.copytree(source_dir, destination_dir)
+            if not path.exists(destination_dir):
+                copytree(source_dir, destination_dir)
             else:
-                for item in os.listdir(source_dir):
-                    source_item = os.path.join(source_dir, item)
-                    destination_item = os.path.join(destination_dir, item)
-                    if os.path.isfile(source_item):
-                        if not os.path.exists(destination_item) or os.path.getmtime(source_item) > os.path.getmtime(destination_item):
-                            shutil.copy2(source_item, destination_item)
-                    elif os.path.isdir(source_item):
+                for item in listdir(source_dir):
+                    source_item = path.join(source_dir, item)
+                    destination_item = path.join(destination_dir, item)
+                    if path.isfile(source_item):
+                        if not path.exists(destination_item) or path.getmtime(source_item) > path.getmtime(destination_item):
+                            copy2(source_item, destination_item)
+                    elif path.isdir(source_item):
                         copy_resources(source_item, destination_item)
 
         directories = [
-            {"source": "/usr/share/hypseus-singe/pics", "destination": hypseusSingeConfig.hypseusDatadir + "/pics"},
-            {"source": "/usr/share/hypseus-singe/sound", "destination": hypseusSingeConfig.hypseusDatadir + "/sound"},
-            {"source": "/usr/share/hypseus-singe/fonts", "destination": hypseusSingeConfig.hypseusDatadir + "/fonts"},
-            {"source": "/usr/share/hypseus-singe/bezels", "destination": hypseusSingeConfig.hypseusDatadir + "/bezels"}
+            {"source": "/usr/share/hypseus-singe/pics", "destination": HYPSEUS_DATA_DIR + "/pics"},
+            {"source": "/usr/share/hypseus-singe/sound", "destination": HYPSEUS_DATA_DIR + "/sound"},
+            {"source": "/usr/share/hypseus-singe/fonts", "destination": HYPSEUS_DATA_DIR + "/fonts"},
+            {"source": "/usr/share/hypseus-singe/bezels", "destination": HYPSEUS_DATA_DIR + "/bezels"}
         ]
 
         # Copy/update directories
@@ -123,7 +152,7 @@ class HypseusSingeGenerator(Generator):
             copy_resources(directory["source"], directory["destination"])
 
         # extension used .daphne and the file to start the game is in the folder .daphne with the extension .txt
-        romName = os.path.splitext(os.path.basename(rom))[0]
+        romName = path.splitext(path.basename(rom))[0]
         frameFile = rom + "/" + romName + ".txt"
         commandsFile = rom + "/" + romName + ".commands"
         singeFile = rom + "/" + romName + ".singe"
@@ -133,7 +162,7 @@ class HypseusSingeGenerator(Generator):
             bezelFile += ".png"
         else:
             bezelFile = romName.lower() + ".png"
-        bezelPath = hypseusSingeConfig.hypseusDatadir + "/bezels/" + bezelFile
+        bezelPath = HYPSEUS_DATA_DIR + "/bezels/" + bezelFile
 
         # get the first video file from frameFile to determine the resolution
         m2v_filename = self.find_m2v_from_txt(frameFile)
@@ -146,7 +175,7 @@ class HypseusSingeGenerator(Generator):
         # now get the resolution from the m2v file
         video_path = rom + "/" + m2v_filename
         # check the path exists
-        if not os.path.exists(video_path):
+        if not path.exists(video_path):
             eslog.debug("Could not find m2v file in path - {}".format(video_path))
             video_path = self.find_file(rom, m2v_filename)
 
@@ -154,61 +183,92 @@ class HypseusSingeGenerator(Generator):
 
         if video_path != None:
             video_resolution = self.get_resolution(video_path)
-            eslog.debug("Resolution: {}".format(video_resolution))
+            eslog.debug("Resolução: {}".format(video_resolution))
+            if video_resolution == (0, 0):
+                eslog.warning("Não foi possível determinar a resolução do vídeo, usando fallback")
 
         if system.name == "singe":
-            commandArray = [hypseusSingeConfig.hypseusBin,
+            commandArray = [HYPSEUS_BIN_PATH,
                             "singe", "vldp", "-retropath", "-framefile", frameFile, "-script", singeFile,
-                            "-fullscreen", "-gamepad", "-datadir", hypseusSingeConfig.hypseusDatadir,
-                            "-singedir", hypseusSingeConfig.singeRomdir, "-romdir", hypseusSingeConfig.singeRomdir, "-homedir", hypseusSingeConfig.hypseusDatadir]
+                            "-fullscreen", "-gamepad", "-datadir", HYPSEUS_DATA_DIR,
+                            "-singedir", SINGE_ROM_DIR, "-romdir", SINGE_ROM_DIR, "-homedir", HYPSEUS_DATA_DIR]
         else:
-            commandArray = [hypseusSingeConfig.hypseusBin,
+            commandArray = [HYPSEUS_BIN_PATH,
                             romName, "vldp", "-framefile", frameFile, "-fullscreen",
-                            "-fastboot", "-gamepad", "-datadir", hypseusSingeConfig.hypseusDatadir,
-                            "-romdir", hypseusSingeConfig.daphneRomdir, "-homedir", hypseusSingeConfig.hypseusDatadir]
+                            "-fastboot", "-gamepad", "-datadir", HYPSEUS_DATA_DIR,
+                            "-romdir", DAPHNE_ROM_DIR, "-homedir", HYPSEUS_DATA_DIR]
 
         # controller config file
         if system.isOptSet('hypseus_joy')  and system.getOptBoolean('hypseus_joy'):
             commandArray.extend(['-keymapfile', 'custom.ini'])
         else:
-            commandArray.extend(["-keymapfile", hypseusSingeConfig.hypseusConfigfile])
+            commandArray.extend(["-keymapfile", HYPSEUS_CONFIG_FILE_PATH])
 
         # Default -fullscreen behaviour respects game aspect ratio
         bezelRequired = False
         xratio = None
+        if gameResolution["width"] < gameResolution["height"]:
+            width, height = gameResolution["height"], gameResolution["width"]
+        else:
+            width, height = gameResolution["width"], gameResolution["height"]
         # stretch
         if system.isOptSet('hypseus_ratio') and system.config['hypseus_ratio'] == "stretch":
-            commandArray.extend(["-x", str(gameResolution["width"]), "-y", str(gameResolution["height"])])
+            commandArray.extend(["-x", str(width), "-y", str(height)])
             bezelRequired = False
-            if abs(gameResolution["width"] / gameResolution["height"] - 4/3) < 0.01:
+            if abs(width / height - 4/3) < 0.01:
                 xratio = 4/3
         # 4:3
         elif system.isOptSet('hypseus_ratio') and system.config['hypseus_ratio'] == "force_ratio":
-            commandArray.extend(["-x", str(gameResolution["width"]), "-y", str(gameResolution["height"])])
+            commandArray.extend(["-x", str(width), "-y", str(height)])
             commandArray.extend(["-force_aspect_ratio"])
             xratio = 4/3
             bezelRequired = True
-        # original
+        # Handle original aspect ratio case
         else:
-            if video_resolution[0] != "0":
-                scaling_factor = gameResolution["height"] / video_resolution[1]
-                screen_width = gameResolution["width"]
-                new_width = video_resolution[0] * scaling_factor
-                commandArray.extend(["-x", str(new_width), "-y", str(gameResolution["height"])])
-                # check if 4:3 for bezels
-                if abs(new_width / gameResolution["height"] - 4/3) < 0.01:
-                    bezelRequired = True
-                    xratio = 4/3
-                else:
-                    bezelRequired = False
-            else:
-                eslog.debug("Video resolution not found - using stretch")
-                commandArray.extend(["-x", str(gameResolution["width"]), "-y", str(gameResolution["height"])])
-                if abs(gameResolution["width"] / gameResolution["height"] - 4/3) < 0.01:
+            # Initialize with safe default values
+            video_width = 0
+            video_height = 0
+            video_resolution: Optional[Tuple[int, int]] = None  # garante que a variável sempre exista
+
+            # Safely handle video_resolution
+            if isinstance(video_resolution, (tuple, list)) and len(video_resolution) >= 2:
+                video_width, video_height = video_resolution[:2]
+
+            # Only proceed with calculations if we have valid resolution
+            if video_width > 0 and video_height > 0:
+                try:
+                    scaling_factor = height / video_height
+                    new_width = video_width * scaling_factor
+
+                    commandArray.extend([
+                        '-x', str(new_width),
+                        '-y', str(height)
+                    ])
+
+                    # Check if aspect ratio is approximately 4:3 for bezel
+                    if abs(new_width / height - 4/3) < 0.01:
+                        bezelRequired = True
+                        xratio = 4/3
+                    else:
+                        bezelRequired = False
+
+                except ZeroDivisionError:
+                    eslog.error("Invalid video height (0) - cannot calculate scaling")
+                    video_width = 0  # Force fallback
+
+            # Fallback to stretch mode if resolution wasn't valid
+            if video_width <= 0 or video_height <= 0:
+                eslog.debug("Using fallback stretch resolution")
+                commandArray.extend([
+                    '-x', str(width),
+                    '-y', str(height)
+                ])
+                # Check if screen is approximately 4:3
+                if abs(width / height - 4/3) < 0.01:
                     xratio = 4/3
 
         # Don't set bezel if screeen resolution is not conducive to needing them (i.e. CRT)
-        if gameResolution["width"] / gameResolution["height"] < 1.51:
+        if width / height < 1.51:
             bezelRequired = False
 
         # Backend - Default OpenGL
@@ -228,7 +288,7 @@ class HypseusSingeGenerator(Generator):
             if system.isOptSet('singe_sprites') and system.getOptBoolean("singe_sprites"):
                 commandArray.append("-blend_sprites")
 
-            bordersSize = controllersConfig.gunsBordersSizeName(guns, system.config)
+            bordersSize = gunsBordersSizeName(guns, system.config)
             if bordersSize is not None:
 
                 borderColor = "w"
@@ -263,7 +323,7 @@ class HypseusSingeGenerator(Generator):
             bezelRequired = False
 
         if bezelRequired:
-            if not os.path.exists(bezelPath):
+            if not path.exists(bezelPath):
                 commandArray.extend(["-bezel", "default.png"])
             else:
                 commandArray.extend(["-bezel", bezelFile])
@@ -296,24 +356,14 @@ class HypseusSingeGenerator(Generator):
             commandArray.append("-texturestream")
 
         # The folder may have a file with the game name and .commands with extra arguments to run the game.
-        if os.path.isfile(commandsFile):
+        if path.isfile(commandsFile):
             commandArray.extend(open(commandsFile,'r').read().split())
 
         # We now use SDL controller config
         return Command(
             array=commandArray,
             env={
-                'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers),
-                'SDL_JOYSTICK_HIDAPI': '0',
-                'MANYMOUSE_NO_XINPUT2': 'x' # disable xorg mouse => forces evdev mouse
+                'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers),
+                'SDL_JOYSTICK_HIDAPI': '0'
             }
         )
-
-    def getInGameRatio(self, config, gameResolution, rom):
-        if "hypseus_ratio" in config:
-            if config['hypseus_ratio'] == "stretch":
-                return 16/9
-            if config['hypseus_ratio'] == "force_ratio":
-                return 4/3
-        else:
-            return 4/3

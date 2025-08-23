@@ -1,4 +1,6 @@
-from systemFiles import CONF
+from systemFiles import CONF, BIOS
 
-hatariConf = CONF + '/hatari/hatari.cfg'
-hatariBin = '/usr/bin/hatari'
+HATARI_CONFIG_DIR = CONF + '/hatari'
+HATARI_CONFIG_PATH = HATARI_CONFIG_DIR + '/hatari.cfg'
+HATARI_BIOS_PATH = BIOS
+HATARI_BIN_PATH = '/usr/bin/hatari'

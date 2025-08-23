@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=80.9.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reglinux-configgen"
+version = "0.0.5"
+description = "Config generator for REG-Linux"
+requires-python = ">=3.12"
+
+dependencies = [
+    "PyYAML>=6.0.2",
+    "lxml>=6.0.0",
+    "ffmpeg-python>=0.2.0",
+    "configobj>=5.0.6",
+    "requests>=2.22.0",
+    "toml>=0.10.2",
+    "Pillow>=11.3.0",
+    "evdev>=1.9.2",
+    "pyudev>=0.24.3",
+    "ruamel.yaml>=0.18.15",
+]
+
+[tool.setuptools.packages.find]
+exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+"configgen.generators.xash3d_fwgs" = ["gamepad.cfg"]
+
+[project.scripts]
+reglinux-configgen = "configgen:main"

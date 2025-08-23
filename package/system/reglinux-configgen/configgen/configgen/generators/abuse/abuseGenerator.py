@@ -1,7 +1,10 @@
 from generators.Generator import Generator
 from Command import Command
 from controllers import generate_sdl_controller_config
-from .abuseConfig import ABUSE_BIN_PATH, ABUSE_DATA_DIR
+from systemFiles import ROMS
+
+ABUSE_DATA_DIR = ROMS + '/abuse/abuse_data'
+ABUSE_BIN_PATH = '/usr/bin/abuse'
 
 class AbuseGenerator(Generator):
 

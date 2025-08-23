@@ -369,7 +369,7 @@ new file mode 100644
 index 0000000..9b9cf4d
 --- /dev/null
 +++ b/drivers/input/joystick/odroidgo3-joypad.c
-@@ -0,0 +1,1090 @@
+@@ -0,0 +1,1144 @@
 +/*
 + * SARADC joystick & GPIO Button driver for Linux(Hardkernel ODROIDGO2-Advance)
 + */
@@ -494,6 +494,14 @@ index 0000000..9b9cf4d
 +	/* analog button */
 +	struct bt_adc *adcs;
 +
++	/* report reference point */
++	bool invert_absx;
++	bool invert_absy;
++	bool invert_absrx;
++	bool invert_absry;
++   /* G350 right stick is turned.  Let's turn it back */
++   bool turn_absr;
++
 +	/* report interval (ms) */
 +	int bt_gpio_count;
 +	struct bt_gpio *gpios;
@@ -607,7 +615,7 @@ index 0000000..9b9cf4d
 +
 +	value *= adc->scale;
 +
-+	return (adc->invert ? (adc->max - value) : value);
++	return value;
 +}
 +
 +/*----------------------------------------------------------------------------*/
@@ -1112,17 +1120,9 @@ index 0000000..9b9cf4d
 +
 +		switch (nbtn) {
 +			case 0:
-+				adc->report_type = ABS_RY;
-+				if (device_property_read_u32(dev,
-+					"abs_ry-p-tuning",
-+					&adc->tuning_p))
-+					adc->tuning_p = ADC_TUNING_DEFAULT;
-+				if (device_property_read_u32(dev,
-+					"abs_ry-n-tuning",
-+					&adc->tuning_n))
-+					adc->tuning_n = ADC_TUNING_DEFAULT;
-+				break;
-+			case 1:
++	if (joypad->turn_absr) {
++				if (joypad->invert_absrx)
++					adc->invert = true;
 +				adc->report_type = ABS_RX;
 +				if (device_property_read_u32(dev,
 +					"abs_rx-p-tuning",
@@ -1133,7 +1133,51 @@ index 0000000..9b9cf4d
 +					&adc->tuning_n))
 +					adc->tuning_n = ADC_TUNING_DEFAULT;
 +				break;
++	} else {
++				if (joypad->invert_absry)
++					adc->invert = true;
++				adc->report_type = ABS_RY;
++				if (device_property_read_u32(dev,
++					"abs_ry-p-tuning",
++					&adc->tuning_p))
++					adc->tuning_p = ADC_TUNING_DEFAULT;
++				if (device_property_read_u32(dev,
++					"abs_ry-n-tuning",
++					&adc->tuning_n))
++					adc->tuning_n = ADC_TUNING_DEFAULT;
++				break;
++	}
++			case 1:
++ 	if (joypad->turn_absr) {
++				if (joypad->invert_absry)
++					adc->invert = true;
++				adc->report_type = ABS_RY;
++				if (device_property_read_u32(dev,
++					"abs_ry-p-tuning",
++					&adc->tuning_p))
++					adc->tuning_p = ADC_TUNING_DEFAULT;
++				if (device_property_read_u32(dev,
++					"abs_ry-n-tuning",
++					&adc->tuning_n))
++					adc->tuning_n = ADC_TUNING_DEFAULT;
++				break;
++	} else {
++				if (joypad->invert_absrx)
++					adc->invert = true;
++				adc->report_type = ABS_RX;
++				if (device_property_read_u32(dev,
++					"abs_rx-p-tuning",
++					&adc->tuning_p))
++					adc->tuning_p = ADC_TUNING_DEFAULT;
++				if (device_property_read_u32(dev,
++					"abs_rx-n-tuning",
++					&adc->tuning_n))
++					adc->tuning_n = ADC_TUNING_DEFAULT;
++				break;
++	}
 +			case 2:
++				if (joypad->invert_absy)
++					adc->invert = true;
 +				adc->report_type = ABS_Y;
 +				if (device_property_read_u32(dev,
 +					"abs_y-p-tuning",
@@ -1145,6 +1189,8 @@ index 0000000..9b9cf4d
 +					adc->tuning_n = ADC_TUNING_DEFAULT;
 +				break;
 +			case 3:
++				if (joypad->invert_absx)
++					adc->invert = true;
 +				adc->report_type = ABS_X;
 +				if (device_property_read_u32(dev,
 +					"abs_x-p-tuning",
@@ -1353,6 +1399,15 @@ index 0000000..9b9cf4d
 +				&joypad->poll_interval);
 +
 +	joypad->auto_repeat = device_property_present(dev, "autorepeat");
++
++	/* change the report reference point? (read value * -1) */
++	joypad->invert_absx = device_property_present(dev, "invert-absx");
++	joypad->invert_absy = device_property_present(dev, "invert-absy");
++	joypad->invert_absrx = device_property_present(dev, "invert-absrx");
++	joypad->invert_absry = device_property_present(dev, "invert-absry");
++	joypad->turn_absr = device_property_present(dev, "turn-absr");
++	dev_info(dev, "%s : invert-absx = %d, inveret-absy = %d, invert-absrx = %d, inveret-absry = %d, turn-absr = %d\n",
++		__func__, joypad->invert_absx, joypad->invert_absy, joypad->invert_absrx, joypad->invert_absry, joypad->turn_absr);
 +
 +	joypad->bt_gpio_count = device_get_child_node_count(dev);
 +

@@ -1,15 +1,15 @@
 import sys
-import os
-import json
 import subprocess
-import controllers as controllersConfig
-import utils.bezels as bezelsUtil
-import utils.videoMode as videoMode
-import xml.etree.ElementTree as ET
-from . import libretroOptions
-from . import libretroMAMEConfig
-from systemFiles import CONF, CONF_INIT, SAVES, ES_SETTINGS, OVERLAY_CONFIG_FILE
+from json import load
 from settings.unixSettings import UnixSettings
+from os import path, makedirs, remove, listdir, unlink, symlink
+from controllers import getDevicesInformation, gunsBordersSizeName, getGamesMetaData
+from utils.videoMode import supportSystemRotation, getAltDecoration
+from xml.etree.ElementTree import parse
+from .libretroOptions import generateCoreSettings, generateHatariConf
+from .libretroMAMEConfig import generateMAMEConfigs
+from systemFiles import CONF, CONF_INIT, SAVES, ES_SETTINGS, OVERLAY_CONFIG_FILE
+from utils.bezels import gunsBorderSize, createTransparentBezel, getBezelInfos, fast_image_size, padImage, gunBordersSize, gunBorderImage, gunsBordersColorFomConfig, tatooImage
 
 hatariConf = CONF + '/hatari/hatari.cfg'
 retroarchRoot = CONF + '/retroarch'
@@ -23,12 +23,12 @@ from utils.logger import get_logger
 eslog = get_logger(__name__)
 
 sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+    path.abspath(path.join(path.dirname(__file__), '../..')))
 
 # Return value for es invertedbuttons
 def getInvertButtonsValue():
     try:
-        tree = ET.parse(ES_SETTINGS)
+        tree = parse(ES_SETTINGS)
         root = tree.getroot()
         # Find the InvertButtons element and return value
         elem = root.find(".//bool[@name='InvertButtons']")
@@ -104,26 +104,26 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
 
     # retroarch-core-options.cfg
     retroarchCore = retroarchCoreCustom
-    if not os.path.exists(os.path.dirname(retroarchCore)):
-        os.makedirs(os.path.dirname(retroarchCore))
+    if not path.exists(path.dirname(retroarchCore)):
+        makedirs(path.dirname(retroarchCore))
 
     try:
         coreSettings = UnixSettings(retroarchCore, separator=' ')
     except UnicodeError:
         # invalid retroarch-core-options.cfg
         # remove it and try again
-        os.remove(retroarchCore)
+        remove(retroarchCore)
         coreSettings = UnixSettings(retroarchCore, separator=' ')
 
     # Create/update retroarch-core-options.cfg
-    libretroOptions.generateCoreSettings(coreSettings, system, rom, guns, wheels)
+    generateCoreSettings(coreSettings, system, rom, guns, wheels)
 
     # Create/update hatari.cfg
     if system.name == 'atarist':
-        libretroOptions.generateHatariConf(hatariConf)
+        generateHatariConf(hatariConf)
 
     if system.config['core'] in [ 'mame', 'same_cdi' ]:
-        libretroMAMEConfig.generateMAMEConfigs(controllers, system, rom, guns)
+        generateMAMEConfigs(controllers, system, rom, guns)
 
     retroarchConfig = dict()
     systemConfig = system.config
@@ -179,7 +179,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
     if (system.isOptSet("audio_volume")):
         retroarchConfig['audio_volume'] = system.config['audio_volume']
 
-    if system.isOptSet("display.rotate") and not videoMode.supportSystemRotation(): # only for systems that don't support global rotation (xorg, wayland, ...)
+    if system.isOptSet("display.rotate") and not supportSystemRotation(): # only for systems that don't support global rotation (xorg, wayland, ...)
         # 0 => 0 ; 1 => 270; 2 => 180 ; 3 => 90
         if system.config["display.rotate"] == "0":
             retroarchConfig['video_rotation'] = "0"
@@ -215,8 +215,8 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
     retroarchConfig['video_black_frame_insertion'] = 'false'    # don't use anymore this value while it doesn't allow the shaders to work
     retroarchConfig['pause_nonactive'] = 'false'                # required at least on x86 x86_64 otherwise, the game is paused at launch
 
-    if not os.path.exists(CONF + '/retroarch/cache'):
-        os.makedirs(CONF + '/retroarch/cache')
+    if not path.exists(CONF + '/retroarch/cache'):
+        makedirs(CONF + '/retroarch/cache')
     retroarchConfig['cache_directory'] = CONF + '/retroarch/cache'
 
     # require for core informations
@@ -351,7 +351,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
 
         # wheel
         if system.isOptSet('use_wheels') and system.getOptBoolean('use_wheels'):
-            deviceInfos = controllersConfig.getDevicesInformation()
+            deviceInfos = getDevicesInformation()
             nplayer = 1
             for controller, pad in sorted(controllers.items()):
                 if pad.dev in deviceInfos:
@@ -540,7 +540,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
         # If set manually, proritize that.
         # Otherwise, set to portrait for games listed as 90 degrees, manual (default) if not.
         if not system.isOptSet('wswan_rotate_display'):
-            wswanGameRotation = videoMode.getAltDecoration(system.name, rom, "true")
+            wswanGameRotation = getAltDecoration(system.name, rom, "true")
             if wswanGameRotation == "90":
                 wswanOrientation = "portrait"
             else:
@@ -648,7 +648,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
             index = ratioIndexes.index(systemConfig['ratio'])
         # Check if game natively supports widescreen from metadata (not widescreen hack) (for easy scalability ensure all values for respective systems start with core name and end with "-autowidescreen")
         elif system.isOptSet(f"{systemCore}-autowidescreen") and system.config[f"{systemCore}-autowidescreen"] == "True":
-            metadata = controllersConfig.getGamesMetaData(system.name, rom)
+            metadata = getGamesMetaData(system.name, rom)
             if metadata.get("video_widescreen") == "true":
                 index = str(ratioIndexes.index("16/9"))
                 # Easy way to disable bezels if setting to 16/9
@@ -954,10 +954,10 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
 
     # Bezel option
     try:
-        writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameResolution, system, controllersConfig.gunsBordersSizeName(guns, system.config))
+        writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameResolution, system, gunsBordersSizeName(guns, system.config))
     except Exception as e:
         # error with bezels, disabling them
-        writeBezelConfig(generator, None, shaderBezel, retroarchConfig, rom, gameResolution, system, controllersConfig.gunsBordersSizeName(guns, system.config))
+        writeBezelConfig(generator, None, shaderBezel, retroarchConfig, rom, gameResolution, system, gunsBordersSizeName(guns, system.config))
         eslog.error(f"Error with bezel {bezel}: {e}")
 
     # custom : allow the user to configure directly retroarch.cfg via system.conf via lines like : snes.retroarch.menu_driver=rgui
@@ -1149,7 +1149,7 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
 
         w = gameResolution["width"]
         h = gameResolution["height"]
-        h5 = bezelsUtil.gunsBorderSize(w, h)
+        h5 = gunsBorderSize(w, h)
 
         # could be better to compute the ratio while on ra it is forced to 4/3...
         ratio = generator.getInGameRatio(system.config, gameResolution, rom)
@@ -1163,13 +1163,13 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
 
         with open(gunBezelInfoFile, "w") as fd:
             fd.write("{" + f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000' + "}")
-        bezelsUtil.createTransparentBezel(gunBezelFile, gameResolution["width"], gameResolution["height"])
+        createTransparentBezel(gunBezelFile, gameResolution["width"], gameResolution["height"])
         # if the game needs a specific bezel, to draw border, consider it as a specific game bezel, like for thebezelproject to avoir caches
         bz_infos = { "png": gunBezelFile, "info": gunBezelInfoFile, "layout": None, "mamezip": None, "specific_to_game": True }
     else:
         if bezel is None:
             return
-        bz_infos = bezelsUtil.getBezelInfos(rom, bezel, system.name, True)
+        bz_infos = getBezelInfos(rom, bezel, system.name, True)
         if bz_infos is None:
             return
 
@@ -1178,9 +1178,9 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
     bezel_game  = bz_infos["specific_to_game"]
 
     # only the png file is mandatory
-    if os.path.exists(overlay_info_file):
+    if path.exists(overlay_info_file):
         try:
-            infos = json.load(open(overlay_info_file))
+            infos = load(open(overlay_info_file))
         except:
             infos = {}
     else:
@@ -1219,7 +1219,7 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
             # No info on the bezel, let's get the bezel image width and height and apply the
             # ratios from usual 16:9 1920x1080 bezels (example: theBezelProject)
             try:
-                infos["width"], infos["height"] = bezelsUtil.fast_image_size(overlay_png_file)
+                infos["width"], infos["height"] = fast_image_size(overlay_png_file)
                 infos["top"]    = int(infos["height"] * 2 / 1080)
                 infos["left"]   = int(infos["width"] * 241 / 1920) # 241 = (1920 - (1920 / (4:3))) / 2 + 1 pixel = where viewport start
                 infos["bottom"] = int(infos["height"] * 2 / 1080)
@@ -1274,22 +1274,22 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
             create_new_bezel_file = True
         else:
             # The logic to cache system bezels is not always true anymore now that we have tattoos
-            output_png_file = "/tmp/" + os.path.splitext(os.path.basename(overlay_png_file))[0] + "_adapted.png"
+            output_png_file = "/tmp/" + path.splitext(path.basename(overlay_png_file))[0] + "_adapted.png"
             if system.isOptSet('bezel.tattoo') and system.config['bezel.tattoo'] != "0":
                 create_new_bezel_file = True
             else:
-                if (not os.path.exists(tattoo_output_png)) and os.path.exists(output_png_file):
+                if (not path.exists(tattoo_output_png)) and path.exists(output_png_file):
                     create_new_bezel_file = False
                     eslog.debug(f"Using cached bezel file {output_png_file}")
                 else:
                     try:
-                        os.remove(tattoo_output_png)
+                        remove(tattoo_output_png)
                     except:
                         pass
                     create_new_bezel_file = True
             if create_new_bezel_file:
-                fadapted = [ "/tmp/"+f for f in os.listdir("/tmp/") if (f[-12:] == '_adapted.png') ]
-                fadapted.sort(key=lambda x: os.path.getmtime(x))
+                fadapted = [ "/tmp/"+f for f in listdir("/tmp/") if (f[-12:] == '_adapted.png') ]
+                fadapted.sort(key=lambda x: path.getmtime(x))
                 # Keep only last 10 generated bezels to save space on tmpfs /tmp
                 if len(fadapted) >= 10:
                     for i in range (10):
@@ -1297,7 +1297,7 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
                     eslog.debug(f"Removing unused bezel file: {fadapted}")
                     for fr in fadapted:
                         try:
-                            os.remove(fr)
+                            remove(fr)
                         except:
                             pass
 
@@ -1330,13 +1330,13 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
             # or up/down for 4K
             eslog.debug(f"Generating a new adapted bezel file {output_png_file}")
             try:
-                bezelsUtil.padImage(overlay_png_file, output_png_file, gameResolution["width"], gameResolution["height"], infos["width"], infos["height"], bezel_stretch)
+                padImage(overlay_png_file, output_png_file, gameResolution["width"], gameResolution["height"], infos["width"], infos["height"], bezel_stretch)
             except Exception as e:
                 eslog.debug(f"Failed to create the adapated image: {e}")
                 return
         overlay_png_file = output_png_file # replace by the new file (recreated or cached in /tmp)
         if system.isOptSet('bezel.tattoo') and system.config['bezel.tattoo'] != "0":
-            bezelsUtil.tatooImage(overlay_png_file, tattoo_output_png, system)
+            tatooImage(overlay_png_file, tattoo_output_png, system)
             overlay_png_file = tattoo_output_png
     else:
         if viewPortUsed:
@@ -1347,14 +1347,14 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
         retroarchConfig['video_message_pos_x']    = infos["messagex"]
         retroarchConfig['video_message_pos_y']    = infos["messagey"]
         if system.isOptSet('bezel.tattoo') and system.config['bezel.tattoo'] != "0":
-            bezelsUtil.tatooImage(overlay_png_file, tattoo_output_png, system)
+            tatooImage(overlay_png_file, tattoo_output_png, system)
             overlay_png_file = tattoo_output_png
 
     if gunsBordersSize is not None:
         eslog.debug("Draw gun borders")
         output_png_file = "/tmp/bezel_gunborders.png"
-        innerSize, outerSize = bezelsUtil.gunBordersSize(gunsBordersSize)
-        borderSize = bezelsUtil.gunBorderImage(overlay_png_file, output_png_file, innerSize, outerSize, bezelsUtil.gunsBordersColorFomConfig(system.config))
+        innerSize, outerSize = gunBordersSize(gunsBordersSize)
+        borderSize = gunBorderImage(overlay_png_file, output_png_file, innerSize, outerSize, gunsBordersColorFomConfig(system.config))
         overlay_png_file = output_png_file
 
     eslog.debug(f"Bezel file set to {overlay_png_file}")
@@ -1365,19 +1365,19 @@ def writeBezelConfig(generator, bezel, shaderBezel, retroarchConfig, rom, gameRe
         # Create path if needed, clear old bezels
         shaderBezelPath = '/var/run/shader_bezels'
         shaderBezelFile = shaderBezelPath + '/bezel.png'
-        if not os.path.exists(shaderBezelPath):
-            os.makedirs(shaderBezelPath)
+        if not path.exists(shaderBezelPath):
+            makedirs(shaderBezelPath)
             eslog.debug("Creating shader bezel path {}".format(overlay_png_file))
-        if os.path.exists(shaderBezelFile):
+        if path.exists(shaderBezelFile):
             eslog.debug("Removing old shader bezel {}".format(shaderBezelFile))
-            if os.path.islink(shaderBezelFile):
-                os.unlink(shaderBezelFile)
+            if path.islink(shaderBezelFile):
+                unlink(shaderBezelFile)
             else:
-                os.remove(shaderBezelFile)
+                remove(shaderBezelFile)
 
         # Link bezel png file to the fixed path.
         # Shaders should use this path to find the art.
-        os.symlink(overlay_png_file, shaderBezelFile)
+        symlink(overlay_png_file, shaderBezelFile)
         eslog.debug("Symlinked bezel file {} to {} for selected shader".format(overlay_png_file, shaderBezelFile))
 
 def isLowResolution(gameResolution):

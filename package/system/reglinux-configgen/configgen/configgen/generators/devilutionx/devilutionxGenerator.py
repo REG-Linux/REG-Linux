@@ -1,7 +1,12 @@
 from generators.Generator import Generator
 from Command import Command
-from .devilutionxConfig import DEVILUTIONX_CONFIG_DIR, DEVILUTIONX_SAVES_DIR, DEVILUTIONX_ROMS_DIR, DEVILUTIONX_BIN_PATH
 from controllers import generate_sdl_controller_config
+from systemFiles import CONF, SAVES, ROMS
+
+DEVILUTIONX_CONFIG_DIR = CONF + '/devilutionx'
+DEVILUTIONX_SAVES_DIR = SAVES + '/devilutionx'
+DEVILUTIONX_ROMS_DIR = ROMS + '/devilutionx'
+DEVILUTIONX_BIN_PATH = '/usr/bin/devilutionx'
 
 class DevilutionXGenerator(Generator):
 

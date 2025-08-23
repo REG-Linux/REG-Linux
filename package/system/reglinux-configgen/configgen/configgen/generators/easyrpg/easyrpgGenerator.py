@@ -2,7 +2,10 @@ from generators.Generator import Generator
 from Command import Command
 from os import path, makedirs
 from controllers import generate_sdl_controller_config
-from .easyrpgConfig import EASYRPG_BIN_PATH, EASYRPG_SAVE_DIR
+from systemFiles import SAVES
+
+EASYRPG_SAVE_DIR = SAVES + '/easyrpg'
+EASYRPG_BIN_PATH = '/usr/bin/easyrpg-player'
 
 class EasyRPGGenerator(Generator):
 

@@ -1,171 +1,16 @@
 from generators.Generator import Generator
 from Command import Command
-import json
-import os
+from json import load, dumps
+from os import path, mkdir
+from .ikemenControllers import Keymapping, Joymapping
 
-Keymapping =[
-        {
-			"Joystick": -1,
-			"Buttons": [
-				"UP",
-				"DOWN",
-				"LEFT",
-				"RIGHT",
-				"a",
-				"s",
-				"d",
-				"z",
-				"x",
-				"c",
-				"RETURN",
-				"f",
-				"v",
-				"q"
-			]
-		},
-		{
-			"Joystick": -1,
-			"Buttons": [
-				"KP_8",
-				"KP_5",
-				"KP_4",
-				"KP_6",
-				"p",
-				"LBRACKET",
-				"RBRACKET",
-				"SEMICOLON",
-				"QUOTE",
-				"BACKSLASH",
-				"SLASH",
-				"o",
-				"l",
-				"PERIOD"
-			]
-		},
-		{
-			"Joystick": -1,
-			"Buttons": [
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used"
-			]
-		},
-		{
-			"Joystick": -1,
-			"Buttons": [
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used"
-			]
-		}
-	]
-
-Joymapping =[
-        {
-			"Joystick": 0,
-			"Buttons": [
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used"
-			]
-		},
-        {
-			"Joystick": 1,
-			"Buttons": [
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used"
-			]
-		},
-		{
-			"Joystick": 2,
-			"Buttons": [
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used"
-			]
-		},
-		{
-			"Joystick": 3,
-			"Buttons": [
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used",
-				"Not used"
-			]
-		}
-	]
+IKEMEN_BIN_PATH = '/usr/bin/system-ikemen'
 
 class IkemenGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
         try:
-            conf = json.load(open(rom+"/save/config.json", "r"))
+            conf = load(open(rom+"/save/config.json", "r"))
         except:
             conf = {}
 
@@ -175,12 +20,12 @@ class IkemenGenerator(Generator):
         conf["JoystickConfig"] = Joymapping
         conf["Fullscreen"] = True
 
-        js_out = json.dumps(conf, indent=2)
-        if not os.path.isdir(rom+"/save"):
-            os.mkdir(rom+"/save")
+        js_out = dumps(conf, indent=2)
+        if not path.isdir(rom+"/save"):
+            mkdir(rom+"/save")
         with open(rom+"/save/config.json", "w") as jout:
             jout.write(js_out)
 
-        commandArray = ["/usr/bin/system-ikemen", rom]
+        commandArray = [IKEMEN_BIN_PATH, rom]
 
         return Command(array=commandArray)
