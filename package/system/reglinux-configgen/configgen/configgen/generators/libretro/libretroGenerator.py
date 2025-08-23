@@ -53,9 +53,9 @@ class LibretroGenerator(Generator):
             if "noBezel" in video_shader:
                 shaderBezel = True
 
-        # Settings batocera default config file if no user defined one
+        # Settings system default config file if no user defined one
         if not 'configfile' in system.config:
-            # Using batocera config file
+            # Using system config file
             system.config['configfile'] = retroarchCustom
             # Create retroarchcustom.cfg if does not exists
             if not path.isfile(retroarchCustom):
@@ -179,7 +179,6 @@ class LibretroGenerator(Generator):
         if path.isfile(overlayFile):
             configToAppend.append(overlayFile)
 
-        # RetroArch 1.7.8 (Batocera 5.24) now requires the shaders to be passed as command line argument
         if 'shader' in renderConfig and gameShader != None:
             commandArray.extend(["--set-shader", video_shader])
 

@@ -588,7 +588,7 @@ def generateMAMEPadConfig(cfgPath, playersControllers, system, messSysName, romB
             mappings.update({controlDef: controlDict[altButtons][controlDef]})
 
     xml_mameconfig = getRoot(config, "mameconfig")
-    xml_mameconfig.setAttribute("version", "10") # otherwise, config of pad won't work at first run (batocera v33)
+    xml_mameconfig.setAttribute("version", "10")
     xml_system = getSection(config, xml_mameconfig, "system")
     xml_system.setAttribute("name", "default")
 
