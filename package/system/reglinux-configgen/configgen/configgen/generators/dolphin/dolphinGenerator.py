@@ -243,7 +243,7 @@ class DolphinGenerator(Generator):
         if system.isOptSet('dolphin_aspect_ratio'):
             dolphinGFXSettings.set("Settings", "AspectRatio", system.config["dolphin_aspect_ratio"])
         else:
-            # set to zero, which is 'Auto' in Dolphin & Batocera
+            # set to zero, which is 'Auto' in Dolphin & REG-Linux
             dolphinGFXSettings.set("Settings", "AspectRatio", "0")
 
         # Show fps
