@@ -1,22 +1,21 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import platform
-import controllers as controllersConfig
+from os import path, mkdir
+from platform import uname
+from controllers import generate_sdl_controller_config
 from utils.buildargs import parse_args
 from systemFiles import CONF, SAVES
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
 
+RAZE_CONFIG_DIR = CONF + '/raze'
+RAZE_SAVES_DIR = SAVES + '/raze'
+RAZE_CONFIG_FILE = RAZE_CONFIG_DIR + '/raze.ini'
+RAZE_SCRIPT_FILE = RAZE_CONFIG_DIR + '/raze.cfg'
+
 class RazeGenerator(Generator):
 
-    config_dir = f"{CONF}/raze"
-    saves_dir = f"{SAVES}/raze"
-    # The main config file, which is emitted with duplicate keys and makes working with ConfigParser very annoying
-    config_file = f"{config_dir}/raze.ini"
-    # A script file with console commands that are always ran when a game starts
-    script_file = f"{config_dir}/raze.cfg"
     # Names that Raze uses for game series specific sections in the config file
     game_names = [
         "Blood",
@@ -74,106 +73,102 @@ class RazeGenerator(Generator):
         }
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+            # Remove unused arguments: metadata, guns, wheels
+            architecture = get_cpu_architecture()
+            eslog.debug(f"*** Detected architecture is: {architecture} ***")
 
-        architecture = get_cpu_architecture()
-        eslog.debug(f"*** Detected architecture is: {architecture} ***")
+            for dir in [RAZE_CONFIG_DIR, RAZE_SAVES_DIR]:
+                if not path.exists(dir):
+                    mkdir(dir)
 
-        for path in [self.config_dir, self.saves_dir]:
-            if not os.path.exists(path):
-                os.mkdir(path)
+            if not path.exists(RAZE_CONFIG_FILE):
+                with open(RAZE_CONFIG_FILE, "w") as config:
+                    for section in self.config_defaults:
+                        config.write(f"[{section}]\n")
+                        for key, value in self.config_defaults[section].items():
+                            config.write(f"{key}={value}\n")
+                        config.write("\n")
 
-        if not os.path.exists(self.config_file):
-            with open(self.config_file, "w") as config:
-                for section in self.config_defaults:
-                    config.write(f"[{section}]\n")
-                    for key, value in self.config_defaults[section].items():
-                        config.write(f"{key}={value}\n")
-                    config.write("\n")
+            config_backup = []
+            if path.exists(RAZE_CONFIG_FILE):
+                with open(RAZE_CONFIG_FILE, "r") as original_file:
+                    config_backup = original_file.readlines()
 
-        config_backup = None
-        if os.path.exists(self.config_file):
-            with open(self.config_file, "r") as original_file:
-                config_backup = original_file.readlines()
+            with open(RAZE_CONFIG_FILE, "w") as config_file:
+                global_settings_found = False
+                for line in config_backup:
+                    # Check for the [GlobalSettings] section
+                    if line.strip() == "[GlobalSettings]":
+                        global_settings_found = True
 
-        with open(self.config_file, "w") as config_file:
-            global_settings_found = False
-            modified_global_settings = False
-            for line in config_backup:
-                # Check for the [GlobalSettings] section
-                if line.strip() == "[GlobalSettings]":
-                    global_settings_found = True
+                    # Modify options in the [GlobalSettings] section
+                    if global_settings_found:
+                        # always set gl_es to true for arm
+                        if line.strip().startswith("gl_es="):
+                            if system.isOptSet("raze_api") and system.config["raze_api"] != "2":
+                                if system.isOptSet("raze_api") and system.config["raze_api"] == "0":
+                                    if architecture in ["x86_64", "amd64"]:
+                                        line = "gl_es=false\n"
+                                    else:
+                                        eslog.debug(f"*** Architecture isn't intel it's: {architecture} therefore es is true ***")
+                                        line = "gl_es=true\n"
+                            else:
+                                line = "gl_es=true\n"
+                        elif line.strip().startswith("vid_preferbackend="):
+                            if system.isOptSet("raze_api"):
+                                line = f"vid_preferbackend={system.config['raze_api']}\n"
+                            else:
+                                line = "vid_preferbackend=2\n"
 
-                # Modify options in the [GlobalSettings] section
-                if global_settings_found:
-                    # always set gl_es to true for arm
-                    if line.strip().startswith("gl_es="):
-                        if system.isOptSet("raze_api") and system.config["raze_api"] != "2":
-                            if system.isOptSet("raze_api") and system.config["raze_api"] == "0":
-                                if architecture in ["x86_64", "amd64"]:
-                                    line = "gl_es=false\n"
-                                else:
-                                    eslog.debug(f"*** Architecture isn't intel it's: {architecture} therefore es is true ***")
-                                    line = "gl_es=true\n"
-                        else:
-                            line = "gl_es=true\n"
-                        modified_global_settings = True
-                    elif line.strip().startswith("vid_preferbackend="):
-                        if system.isOptSet("raze_api"):
-                            line = f"vid_preferbackend={system.config['raze_api']}\n"
-                            modified_global_settings = True
-                        else:
-                            line = "vid_preferbackend=2\n"
+                    # Write the line
+                    config_file.write(line)
 
-                # Write the line
-                config_file.write(line)
+                # If [GlobalSettings] was not found, add it with the modified options
+                if not global_settings_found:
+                    eslog.debug("Global Settings NOT found")
+                    config_file.write("[GlobalSettings]\n")
+                    if system.isOptSet("raze_api") and system.config["raze_api"] != "2":
+                        if system.isOptSet("raze_api") and system.config["raze_api"] == "0":
+                            if architecture in ["x86_64", "amd64"]:
+                                config_file.write("gl_es=false\n")
+                            else:
+                                eslog.debug(f"*** Architecture isn't intel it's: {architecture} therefore es is true ***")
+                                config_file.write("gl_es=true\n")
+                    if system.isOptSet("raze_api"):
+                        config_file.write(f"vid_preferbackend={system.config['raze_api']}\n")
+                    else:
+                        config_file.write("vid_preferbackend=2\n")
 
-            # If [GlobalSettings] was not found, add it with the modified options
-            if not global_settings_found:
-                eslog.debug("Global Settings NOT found")
-                config_file.write("[GlobalSettings]\n")
-                if system.isOptSet("raze_api") and system.config["raze_api"] != "2":
-                    if system.isOptSet("raze_api") and system.config["raze_api"] == "0":
-                        if architecture in ["x86_64", "amd64"]:
-                            line = "gl_es=false\n"
-                        else:
-                            eslog.debug(f"*** Architecture isn't intel it's: {architecture} therefore es is true ***")
-                            line = "gl_es=true\n"
-                if system.isOptSet("raze_api"):
-                    config_file.write(f"vid_preferbackend={system.config['raze_api']}\n")
-                else:
-                    config_file.write("vid_preferbackend=2\n")
-                modified_global_settings = True
+            with open(RAZE_SCRIPT_FILE, "w") as script:
+                script.write(
+                    "# This file is automatically generated by razeGenerator.py\n"
+                    f"vid_fps {'true' if system.getOptBoolean('showFPS') else 'false'}\n"
+                    "echo BATOCERA\n"  # easy check that script ran in console
+                )
 
-        with open(self.script_file, "w") as script:
-            script.write(
-                "# This file is automatically generated by razeGenerator.py\n"
-                f"vid_fps {'true' if system.getOptBoolean('showFPS') else 'false'}\n"
-                "echo BATOCERA\n"  # easy check that script ran in console
-            )
+            # Launch arguments
+            commandArray = ["raze"]
+            result = parse_args(commandArray, rom)
+            if not result.okay:
+                raise Exception(result.message)
 
-        # Launch arguments
-        commandArray = ["raze"]
-        result = parse_args(commandArray, rom)
-        if not result.okay:
-            raise Exception(result.message)
+            commandArray += [
+                "-exec", RAZE_SCRIPT_FILE,
+                # Disable controllers because support is poor; we use evmapy instead
+                "-nojoy",
+                "-width", str(gameResolution["width"]),
+                "-height", str(gameResolution["height"]),
+                "-nologo" if system.getOptBoolean("nologo") else "",
+            ]
 
-        commandArray += [
-            "-exec", self.script_file,
-            # Disable controllers because support is poor; we use evmapy instead
-            "-nojoy",
-            "-width", str(gameResolution["width"]),
-            "-height", str(gameResolution["height"]),
-            "-nologo" if system.getOptBoolean("nologo") else "",
-        ]
-
-        return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
-                    })
+            return Command(
+                        array=commandArray,
+                        env={
+                            'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                        })
 
     def getInGameRatio(self, config, gameResolution, rom):
         return 16/9
 
 def get_cpu_architecture():
-    return platform.uname().machine
+    return uname().machine

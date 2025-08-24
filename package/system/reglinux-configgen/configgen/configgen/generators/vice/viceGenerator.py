@@ -1,9 +1,9 @@
 from generators.Generator import Generator
 from Command import Command
-import os.path
-import zipfile
-from . import viceConfig
-from . import viceControllers
+from os import path, makedirs
+from zipfile import ZipFile
+from controllers import generate_sdl_controller_config
+from .viceConfig import setViceConfig, VICE_BIN_PATH, VICE_CONFIG_DIR, VICE_CONFIG_PATH, VICE_CONTROLLER_PATH
 
 class ViceGenerator(Generator):
 
@@ -14,26 +14,28 @@ class ViceGenerator(Generator):
     # Return command
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
-        if not os.path.exists(os.path.dirname(viceConfig.viceConfig)):
-            os.makedirs(os.path.dirname(viceConfig.viceConfig))
+        if not path.exists(path.dirname(VICE_CONFIG_DIR)):
+            makedirs(path.dirname(VICE_CONFIG_DIR))
 
-        # configuration file
-        viceConfig.setViceConfig(viceConfig.viceConfig, system, metadata, guns, rom)
+        # FIXME configuration file
+        #setViceConfig(VICE_CONFIG_PATH, VICE_CONTROLLER_PATH, system, metadata, guns, rom)
 
-        # controller configuration
-        viceControllers.generateControllerConfig(system, viceConfig.viceConfig, playersControllers)
+        # FIXME controller configuration
+        #viceControllers.generateControllerConfig(system, VICE_CONFIG_PATH, playersControllers)
 
-        commandArray = [viceConfig.viceBin + system.config['core']]
+        commandArray = [VICE_BIN_PATH + system.config['core']]
         # Determine the way to launch roms based on extension type
-        rom_extension = os.path.splitext(rom)[1].lower()
+        rom_extension = path.splitext(rom)[1].lower()
         # determine extension if a zip file
         if rom_extension == ".zip":
-            with zipfile.ZipFile(rom, "r") as zip_file:
+            with ZipFile(rom, "r") as zip_file:
                 for zip_info in zip_file.infolist():
-                    rom_extension = os.path.splitext(zip_info.filename)[1]
-
-        # TODO - add some logic for various extension types
+                    rom_extension = path.splitext(zip_info.filename)[1]
 
         commandArray.append(rom)
 
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })

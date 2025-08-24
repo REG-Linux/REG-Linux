@@ -1,17 +1,23 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import sys
-import shutil
-import filecmp
-import subprocess
-import toml
-import glob
-import re
-import controllers as controllersConfig
+from os import path, makedirs, environ
+from sys import exit
+from shutil import copy2
+from filecmp import dircmp
+from subprocess import check_output, CalledProcessError
+from toml import load, dump
+from glob import glob
+from re import sub, search, IGNORECASE
+from controllers import generate_sdl_controller_config
+from systemFiles import CONF, SAVES, HOME
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
+
+XENIA_CONFIG_DIR = CONF + '/xenia'
+XENIA_CACHE_DIR = HOME + '/cache/xenia'
+XENIA_SAVES_DIR = SAVES + '/xbox360'
+XENIA_CANARY_BIN_PATH = '/usr/bin/xenia_canary'
 
 class XeniaGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -20,58 +26,53 @@ class XeniaGenerator(Generator):
 
     @staticmethod
     def sync_directories(source_dir, dest_dir):
-        dcmp = filecmp.dircmp(source_dir, dest_dir)
+        dcmp = dircmp(source_dir, dest_dir)
         # Files that are only in the source directory or are different
         differing_files = dcmp.diff_files + dcmp.left_only
         for file in differing_files:
-            src_path = os.path.join(source_dir, file)
-            dest_path = os.path.join(dest_dir, file)
+            src_path = path.join(source_dir, file)
+            dest_path = path.join(dest_dir, file)
             # Copy and overwrite the files from source to destination
-            shutil.copy2(src_path, dest_path)
+            copy2(src_path, dest_path)
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        xeniaConfig = '/userdata/system/configs/xenia'
-        xeniaCache = '/userdata/system/cache/xenia'
-        xeniaSaves = '/userdata/saves/xbox360'
-        emupath = '/userdata/system/configs/xenia'
-
         core = system.config['core']
 
         # check Vulkan first before doing anything
         try:
-            have_vulkan = subprocess.check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
-                    vulkan_version = subprocess.check_output(["/usr/bin/system-vulkan", "vulkanVersion"], text=True).strip()
+                    vulkan_version = check_output(["/usr/bin/system-vulkan", "vulkanVersion"], text=True).strip()
                     if vulkan_version > "1.3":
                         eslog.debug("Using Vulkan version: {}".format(vulkan_version))
                     else:
                         if system.isOptSet('xenia_api') and system.config['xenia_api'] == "D3D12":
                             eslog.debug("Vulkan version: {} is not compatible with Xenia when using D3D12".format(vulkan_version))
-                            eslog.debug("You may have performance & graphical errors, switching to native Vulkan".format(vulkan_version))
+                            eslog.debug("You may have performance & graphical errors, switching to native Vulkan {}".format(vulkan_version))
                             system.config['xenia_api'] = "Vulkan"
                         else:
                             eslog.debug("Vulkan version: {} is not recommended with Xenia".format(vulkan_version))
-                except subprocess.CalledProcessError:
+                except CalledProcessError:
                     eslog.debug("Error checking for Vulkan version.")
             else:
                 eslog.debug("*** Vulkan driver required is not available on the system!!! ***")
-                sys.exit()
-        except subprocess.CalledProcessError:
+                exit()
+        except CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
 
-        if not os.path.exists(xeniaConfig):
-            os.makedirs(xeniaConfig)
-        if not os.path.exists(xeniaCache):
-            os.makedirs(xeniaCache)
-        if not os.path.exists(xeniaSaves):
-            os.makedirs(xeniaSaves)
+        if not path.exists(XENIA_CONFIG_DIR):
+            makedirs(XENIA_CONFIG_DIR)
+        if not path.exists(XENIA_CACHE_DIR):
+            makedirs(XENIA_CACHE_DIR)
+        if not path.exists(XENIA_SAVES_DIR):
+            makedirs(XENIA_SAVES_DIR)
 
         # are we loading a digital title?
-        if os.path.splitext(rom)[1] == '.xbox360':
+        if path.splitext(rom)[1] == '.xbox360':
             eslog.debug(f'Found .xbox360 playlist: {rom}')
-            pathLead = os.path.dirname(rom)
+            pathLead = path.dirname(rom)
             openFile = open(rom, 'r')
             # Read only the first line of the file.
             firstLine = openFile.readlines(1)[0]
@@ -79,7 +80,7 @@ class XeniaGenerator(Generator):
             firstLine = firstLine.strip('\n').strip('\r')
             eslog.debug(f'Checking if specified disc installation / XBLA file actually exists...')
             xblaFullPath = pathLead + '/' + firstLine
-            if os.path.exists(xblaFullPath):
+            if path.exists(xblaFullPath):
                 eslog.debug(f'Found! Switching active rom to: {firstLine}')
                 rom = xblaFullPath
             else:
@@ -89,12 +90,12 @@ class XeniaGenerator(Generator):
         # adjust the config toml file accordingly
         config = {}
         if core == 'xenia-canary':
-            toml_file = emupath + '/xenia-canary.config.toml'
+            toml_file = XENIA_CONFIG_DIR + '/xenia-canary.config.toml'
         else:
-            toml_file = emupath + '/xenia.config.toml'
-        if os.path.isfile(toml_file):
+            toml_file = XENIA_CONFIG_DIR + '/xenia.config.toml'
+        if path.isfile(toml_file):
             with open(toml_file) as f:
-                config = toml.load(f)
+                config = load(f)
 
         # [ Now adjust the config file defaults & options we want ]
         # add node CPU
@@ -191,10 +192,10 @@ class XeniaGenerator(Generator):
             config['Storage'] = {}
         # certain games require this to set be set to true to work around crashes.
         config['Storage'] = {
-            'cache_root': xeniaCache,
-            'content_root': xeniaSaves,
+            'cache_root': XENIA_CACHE_DIR,
+            'content_root': XENIA_SAVES_DIR,
             'mount_scratch': True,
-            'storage_root': xeniaConfig
+            'storage_root': XENIA_CONFIG_DIR
             }
         # mount cache
         config['Storage']['mount_cache'] = system.config.get('xenia_cache', False)
@@ -222,61 +223,61 @@ class XeniaGenerator(Generator):
 
         # now write the updated toml
         with open(toml_file, 'w') as f:
-            toml.dump(config, f)
+            dump(config, f)
 
         # handle patches files to set all matching toml files keys to true
-        rom_name = os.path.splitext(os.path.basename(rom))[0]
+        rom_name = path.splitext(path.basename(rom))[0]
         # simplify the name for matching
-        rom_name = re.sub(r'\[.*?\]', '', rom_name)
-        rom_name = re.sub(r'\(.*?\)', '', rom_name)
+        rom_name = sub(r'\[.*?\]', '', rom_name)
+        rom_name = sub(r'\(.*?\)', '', rom_name)
         if system.isOptSet('xeniaPatches') and system.config['xeniaPatches'] == 'True':
             # pattern to search for matching .patch.toml files
-            pattern = os.path.join(emupath, 'patches', '*' + rom_name + '*.patch.toml')
-            matching_files = [file_path for file_path in glob.glob(pattern) if re.search(rom_name, os.path.basename(file_path), re.IGNORECASE)]
+            pattern = path.join(XENIA_CONFIG_DIR, 'patches', '*' + rom_name + '*.patch.toml')
+            matching_files = [file_path for file_path in glob(pattern) if search(rom_name, path.basename(file_path), IGNORECASE)]
             if matching_files:
                 for file_path in matching_files:
                     eslog.debug(f'Enabling patches for: {file_path}')
                     # load the matchig .patch.toml file
                     with open(file_path, 'r') as f:
-                        patch_toml = toml.load(f)
+                        patch_toml = load(f)
                     # modify all occurrences of the `is_enabled` key to `true`
                     for patch in patch_toml.get('patch', []):
                         if 'is_enabled' in patch:
                             patch['is_enabled'] = True
                     # save the updated .patch.toml file
                     with open(file_path, 'w') as f:
-                        toml.dump(patch_toml, f)
+                        dump(patch_toml, f)
             else:
                 eslog.debug(f'No patch file found for {rom_name}')
 
         # now setup the command array for the emulator
         if rom == 'config':
             if core == 'xenia-canary':
-                commandArray = ['/usr/bin/xenia_canary']
+                commandArray = [XENIA_CANARY_BIN_PATH]
             else:
                 commandArray = ['xenia.exe']
         else:
             if core == 'xenia-canary':
-                commandArray = ['/usr/bin/xenia_canary', 'z:' + rom]
+                commandArray = [XENIA_CANARY_BIN_PATH, 'z:' + rom]
             else:
                 commandArray = ['xenia.exe', 'z:' + rom]
 
         environment={
-                'VKD3D_SHADER_CACHE_PATH': xeniaCache
+                'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers),
+                'VKD3D_SHADER_CACHE_PATH': XENIA_CACHE_DIR,
             }
 
         # ensure nvidia driver used for vulkan
-        if os.path.exists('/var/tmp/nvidia.prime'):
+        if path.exists('/var/tmp/nvidia.prime'):
             variables_to_remove = ['__NV_PRIME_RENDER_OFFLOAD', '__VK_LAYER_NV_optimus', '__GLX_VENDOR_LIBRARY_NAME']
             for variable_name in variables_to_remove:
-                if variable_name in os.environ:
-                    del os.environ[variable_name]
+                if variable_name in environ:
+                    del environ[variable_name]
 
             environment.update(
                 {
                     'VK_ICD_FILENAMES': '/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json',
-                    'VK_LAYER_PATH': '/usr/share/vulkan/explicit_layer.d',
-                    'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
+                    'VK_LAYER_PATH': '/usr/share/vulkan/explicit_layer.d'
                 }
             )
 

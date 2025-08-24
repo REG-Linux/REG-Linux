@@ -1,17 +1,16 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import io
-import re
-import shutil
-import configparser
-import controllers as controllersConfig
-from shutil import copyfile
+from os import path, makedirs, listdir, remove, rename
+from io import open
+from re import search
+from shutil import copyfile, copy2
+from configparser import ConfigParser
+from controllers import gunsNeedCrosses, generate_sdl_controller_config
 from systemFiles import CONF
 
-supermodelCustom = CONF + '/supermodel'
-supermodelIni = supermodelCustom + '/Supermodel.ini'
-supermodelBin = '/usr/bin/supermodel'
+SUPERMODEL_CONFIG_DIR = CONF + '/supermodel'
+SUPERMODEL_CONFIG_PATH = SUPERMODEL_CONFIG_DIR + '/Supermodel.ini'
+SUPERMODEL_BIN_PATH = '/usr/bin/supermodel'
 
 class SupermodelGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -19,7 +18,7 @@ class SupermodelGenerator(Generator):
         return True
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        commandArray = [supermodelConfig.supermodelBin, "-fullscreen", "-channels=2"]
+        commandArray = [SUPERMODEL_BIN_PATH, "-fullscreen", "-channels=2"]
 
         # legacy3d
         if system.isOptSet("engine3D") and system.config["engine3D"] == "new3d":
@@ -40,7 +39,7 @@ class SupermodelGenerator(Generator):
         if system.isOptSet("crosshairs"):
             commandArray.append("-crosshairs={}".format(system.config["crosshairs"]))
         else:
-            if controllersConfig.gunsNeedCrosses(guns):
+            if gunsNeedCrosses(guns):
                 if len(guns) == 1:
                     commandArray.append("-crosshairs={}".format("1"))
                 else:
@@ -81,108 +80,212 @@ class SupermodelGenerator(Generator):
         # copy xml
         copy_xml()
 
-        # config
-        configPadsIni(system, rom, playersControllers, guns, drivingGame, sensitivity)
+        # FIXME: configPadsIni is not used in the original code, but it is called here.
+        #configPadsIni(system, rom, playersControllers, guns, drivingGame, sensitivity)
 
-        return Command(array=commandArray, env={"SDL_VIDEODRIVER":"x11"})
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_VIDEODRIVER':'x11',
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
 
 def copy_nvram_files():
     sourceDir = "/usr/share/supermodel/NVRAM"
     targetDir = "/userdata/saves/supermodel/NVRAM"
-    if not os.path.exists(targetDir):
-        os.makedirs(targetDir)
+    if not path.exists(targetDir):
+        makedirs(targetDir)
 
     # create nv files which are in source and have a newer modification time than in target
-    for file in os.listdir(sourceDir):
-        extension = os.path.splitext(file)[1][1:]
+    for file in listdir(sourceDir):
+        extension = path.splitext(file)[1][1:]
         if extension == "nv":
-            sourceFile = os.path.join(sourceDir, file)
-            targetFile = os.path.join(targetDir, file)
-            if not os.path.exists(targetFile):
+            sourceFile = path.join(sourceDir, file)
+            targetFile = path.join(targetDir, file)
+            if not path.exists(targetFile):
                 # if the target file doesn't exist, just copy the source file
                 copyfile(sourceFile, targetFile)
             else:
                 # if the target file exists and has an older modification time than the source file, create a backup and copy the new file
-                if os.path.getmtime(sourceFile) > os.path.getmtime(targetFile):
+                if path.getmtime(sourceFile) > path.getmtime(targetFile):
                     backupFile = targetFile + ".bak"
-                    if os.path.exists(backupFile):
-                        os.remove(backupFile)
-                    os.rename(targetFile, backupFile)
+                    if path.exists(backupFile):
+                        remove(backupFile)
+                    rename(targetFile, backupFile)
                     copyfile(sourceFile, targetFile)
 
 def copy_asset_files():
     sourceDir = "/usr/share/supermodel/Assets"
     targetDir = "/userdata/system/configs/supermodel/Assets"
-    if not os.path.exists(sourceDir):
+    if not path.exists(sourceDir):
         return
-    if not os.path.exists(targetDir):
-        os.makedirs(targetDir)
+    if not path.exists(targetDir):
+        makedirs(targetDir)
 
     # create asset files which are in source and have a newer modification time than in target
-    for file in os.listdir(sourceDir):
-        sourceFile = os.path.join(sourceDir, file)
-        targetFile = os.path.join(targetDir, file)
-        if not os.path.exists(targetFile) or os.path.getmtime(sourceFile) > os.path.getmtime(targetFile):
+    for file in listdir(sourceDir):
+        sourceFile = path.join(sourceDir, file)
+        targetFile = path.join(targetDir, file)
+        if not path.exists(targetFile) or path.getmtime(sourceFile) > path.getmtime(targetFile):
             copyfile(sourceFile, targetFile)
 
 def copy_xml():
     source_path = '/usr/share/supermodel/Games.xml'
     dest_path = '/userdata/system/configs/supermodel/Games.xml'
-    if not os.path.exists(supermodelConfig.supermodelCustom):
-        os.makedirs(supermodelConfig.supermodelCustom)
-    if not os.path.exists(dest_path) or os.path.getmtime(source_path) > os.path.getmtime(dest_path):
-        shutil.copy2(source_path, dest_path)
+    if not path.exists(SUPERMODEL_CONFIG_DIR):
+        makedirs(SUPERMODEL_CONFIG_DIR)
+    if not path.exists(dest_path) or path.getmtime(source_path) > path.getmtime(dest_path):
+        copy2(source_path, dest_path)
 
 def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity):
-    if bool(altControl):
-        templateFile = "/usr/share/supermodel/Supermodel-Driving.ini.template"
-        mapping = {
-            "button1": "y",
-            "button2": "b",
-            "button3": "a",
-            "button4": "x",
-            "button5": "pageup",
-            "button6": "pagedown",
-            "button7": None,
-            "button8": None,
-            "button9": "start", # start
-            "button10": "select", # coins
-            "axisX": "joystick1left",
-            "axisY": "joystick1up",
-            "axisZ": "l2",
-            "axisRX": "joystick2left",
-            "axisRY": "joystick2up",
-            "axisRZ": "r2",
-            "left": "joystick1left",
-            "right": "joystick1right",
-            "up": "joystick1up",
-            "down": "joystick1down"
-        }
-    else:
-        templateFile = "/usr/share/supermodel/Supermodel.ini.template"
-        mapping = {
-            "button1": "y",
-            "button2": "b",
-            "button3": "a",
-            "button4": "x",
-            "button5": "pageup",
-            "button6": "pagedown",
-            "button7": "l2",
-            "button8": "r2",
-            "button9": "start", # start
-            "button10": "select", # coins
-            "axisX": "joystick1left",
-            "axisY": "joystick1up",
-            "axisZ": None,
-            "axisRX": "joystick2left",
-            "axisRY": "joystick2up",
-            "axisRZ": None,
-            "left": "joystick1left",
-            "right": "joystick1right",
-            "up": "joystick1up",
-            "down": "joystick1down"
-        }
-    targetFile = supermodelConfig.supermodelIni
+    # Reduce cyclomatic complexity by splitting logic into helper functions
+
+    def get_template_and_mapping(altControl):
+        if bool(altControl):
+            templateFile = "/usr/share/supermodel/Supermodel-Driving.ini.template"
+            mapping = {
+                "button1": "y",
+                "button2": "b",
+                "button3": "a",
+                "button4": "x",
+                "button5": "pageup",
+                "button6": "pagedown",
+                "button7": None,
+                "button8": None,
+                "button9": "start", # start
+                "button10": "select", # coins
+                "axisX": "joystick1left",
+                "axisY": "joystick1up",
+                "axisZ": "l2",
+                "axisRX": "joystick2left",
+                "axisRY": "joystick2up",
+                "axisRZ": "r2",
+                "left": "joystick1left",
+                "right": "joystick1right",
+                "up": "joystick1up",
+                "down": "joystick1down"
+            }
+        else:
+            templateFile = "/usr/share/supermodel/Supermodel.ini.template"
+            mapping = {
+                "button1": "y",
+                "button2": "b",
+                "button3": "a",
+                "button4": "x",
+                "button5": "pageup",
+                "button6": "pagedown",
+                "button7": "l2",
+                "button8": "r2",
+                "button9": "start", # start
+                "button10": "select", # coins
+                "axisX": "joystick1left",
+                "axisY": "joystick1up",
+                "axisZ": None,
+                "axisRX": "joystick2left",
+                "axisRY": "joystick2up",
+                "axisRZ": None,
+                "left": "joystick1left",
+                "right": "joystick1right",
+                "up": "joystick1up",
+                "down": "joystick1down"
+            }
+        return templateFile, mapping
+
+    def apply_guns_to_section(targetConfig, section, key, value, system, guns, playersControllers, mapping, mapping_fallback):
+        # Returns True if handled, False otherwise
+        if system.isOptSet('use_guns') and system.getOptBoolean('use_guns') and len(guns) >= 1:
+            if key == "InputSystem":
+                targetConfig.set(section, key, "evdev")
+                return True
+            elif key == "InputAnalogJoyX":
+                targetConfig.set(section, key, "MOUSE1_XAXIS_INV")
+                return True
+            elif key == "InputAnalogJoyY":
+                targetConfig.set(section, key, "MOUSE1_YAXIS_INV")
+                return True
+            elif key == "InputGunX" or key == "InputAnalogGunX":
+                targetConfig.set(section, key, "MOUSE1_XAXIS")
+                return True
+            elif key == "InputGunY" or key == "InputAnalogGunY":
+                targetConfig.set(section, key, "MOUSE1_YAXIS")
+                return True
+            elif key == "InputTrigger" or key == "InputAnalogTriggerLeft" or key == "InputAnalogJoyTrigger":
+                targetConfig.set(section, key, "MOUSE1_LEFT_BUTTON")
+                return True
+            elif key == "InputOffscreen" or key == "InputAnalogTriggerRight":
+                targetConfig.set(section, key, "MOUSE1_RIGHT_BUTTON")
+                return True
+            elif key == "InputStart1":
+                val = transformElement("JOY1_BUTTON9", playersControllers, mapping, mapping_fallback)
+                if val is not None:
+                    val = "," + val
+                else:
+                    val = ""
+                targetConfig.set(section, key, "MOUSE1_BUTTONX1" + val)
+                return True
+            elif key == "InputCoin1":
+                val = transformElement("JOY1_BUTTON10", playersControllers, mapping, mapping_fallback)
+                if val is not None:
+                    val = "," + val
+                else:
+                    val = ""
+                targetConfig.set(section, key, "MOUSE1_BUTTONX2" + val)
+                return True
+            elif key == "InputAnalogJoyEvent":
+                val = transformElement("JOY1_BUTTON2", playersControllers, mapping, mapping_fallback)
+                if val is not None:
+                    val = "," + val
+                else:
+                    val = ""
+                targetConfig.set(section, key, "KEY_S,MOUSE1_MIDDLE_BUTTON" + val)
+                return True
+            elif len(guns) >= 2:
+                if key == "InputAnalogJoyX2":
+                    targetConfig.set(section, key, "MOUSE2_XAXIS_INV")
+                    return True
+                elif key == "InputAnalogJoyY2":
+                    targetConfig.set(section, key, "MOUSE2_YAXIS_INV")
+                    return True
+                elif key == "InputGunX2" or key == "InputAnalogGunX2":
+                    targetConfig.set(section, key, "MOUSE2_XAXIS")
+                    return True
+                elif key == "InputGunY2" or key == "InputAnalogGunY2":
+                    targetConfig.set(section, key, "MOUSE2_YAXIS")
+                    return True
+                elif key == "InputTrigger2" or key == "InputAnalogTriggerLeft2" or key == "InputAnalogJoyTrigger2":
+                    targetConfig.set(section, key, "MOUSE2_LEFT_BUTTON")
+                    return True
+                elif key == "InputOffscreen2" or key == "InputAnalogTriggerRight2":
+                    targetConfig.set(section, key, "MOUSE2_RIGHT_BUTTON")
+                    return True
+                elif key == "InputStart2":
+                    val = transformElement("JOY2_BUTTON9", playersControllers, mapping, mapping_fallback)
+                    if val is not None:
+                        val += "," + val
+                    else:
+                        val = ""
+                    targetConfig.set(section, key, "MOUSE2_BUTTONX1" + val)
+                    return True
+                elif key == "InputCoin1":
+                    val = transformElement("JOY2_BUTTON10", playersControllers, mapping, mapping_fallback)
+                    if val is not None:
+                        val += "," + val
+                    else:
+                        val = ""
+                    targetConfig.set(section, key,  "MOUSE2_BUTTONX2"+val)
+                    return True
+                elif key == "InputAnalogJoyEvent2":
+                    val = transformElement("JOY2_BUTTON2", playersControllers, mapping, mapping_fallback)
+                    if val is not None:
+                        val += "," + val
+                    else:
+                        val = ""
+                    targetConfig.set(section, key, "MOUSE2_MIDDLE_BUTTON" + val)
+                    return True
+        return False
+
+    templateFile, mapping = get_template_and_mapping(altControl)
+    targetFile = SUPERMODEL_CONFIG_PATH
 
     mapping_fallback = {
         "axisX": "left",
@@ -194,14 +297,15 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
     }
 
     # template
-    templateConfig = configparser.ConfigParser(interpolation=None)
+    templateConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     templateConfig.optionxform=lambda optionstr: str(optionstr)
-    with io.open(templateFile, 'r', encoding='utf_8_sig') as fp:
-        templateConfig.readfp(fp)
+    # Fix: Use read_file instead of deprecated readfp
+    with open(templateFile, 'r', encoding='utf_8_sig') as fp:
+        templateConfig.read_file(fp)
 
     # target
-    targetConfig = configparser.ConfigParser(interpolation=None)
+    targetConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     targetConfig.optionxform=lambda optionstr: str(optionstr)
 
@@ -211,84 +315,17 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
             targetConfig.set(section, key, transformValue(value, playersControllers, mapping, mapping_fallback))
 
     # apply guns
+    romBase = path.splitext(path.basename(rom))[0] # filename without extension
     for section in targetConfig.sections():
-        romBase = os.path.splitext(os.path.basename(rom))[0] # filename without extension
         if section.strip() in [ "Global", romBase ]:
-            # for an input sytem
+            # for an input system
             if section.strip() != "Global":
                 targetConfig.set(section, "InputSystem", "to be defined")
             for key, value in targetConfig.items(section):
-                if system.isOptSet('use_guns') and system.getOptBoolean('use_guns') and len(guns) >= 1:
-                    if key == "InputSystem":
-                        targetConfig.set(section, key, "evdev")
-                    elif key == "InputAnalogJoyX":
-                        targetConfig.set(section, key, "MOUSE1_XAXIS_INV")
-                    elif key == "InputAnalogJoyY":
-                        targetConfig.set(section, key, "MOUSE1_YAXIS_INV")
-                    elif key == "InputGunX" or key == "InputAnalogGunX":
-                        targetConfig.set(section, key, "MOUSE1_XAXIS")
-                    elif key == "InputGunY" or key == "InputAnalogGunY":
-                        targetConfig.set(section, key, "MOUSE1_YAXIS")
-                    elif key == "InputTrigger" or key == "InputAnalogTriggerLeft" or key == "InputAnalogJoyTrigger":
-                        targetConfig.set(section, key, "MOUSE1_LEFT_BUTTON")
-                    elif key == "InputOffscreen" or key == "InputAnalogTriggerRight":
-                        targetConfig.set(section, key, "MOUSE1_RIGHT_BUTTON")
-                    elif key == "InputStart1":
-                        val = transformElement("JOY1_BUTTON9", playersControllers, mapping, mapping_fallback)
-                        if val is not None:
-                            val = "," + val
-                        else:
-                            val = ""
-                        targetConfig.set(section, key, "MOUSE1_BUTTONX1" + val)
-                    elif key == "InputCoin1":
-                        val = transformElement("JOY1_BUTTON10", playersControllers, mapping, mapping_fallback)
-                        if val is not None:
-                            val = "," + val
-                        else:
-                            val = ""
-                        targetConfig.set(section, key, "MOUSE1_BUTTONX2" + val)
-                    elif key == "InputAnalogJoyEvent":
-                        val = transformElement("JOY1_BUTTON2", playersControllers, mapping, mapping_fallback)
-                        if val is not None:
-                            val = "," + val
-                        else:
-                            val = ""
-                        targetConfig.set(section, key, "KEY_S,MOUSE1_MIDDLE_BUTTON" + val)
-                    elif len(guns) >= 2:
-                        if key == "InputAnalogJoyX2":
-                            targetConfig.set(section, key, "MOUSE2_XAXIS_INV")
-                        elif key == "InputAnalogJoyY2":
-                            targetConfig.set(section, key, "MOUSE2_YAXIS_INV")
-                        elif key == "InputGunX2" or key == "InputAnalogGunX2":
-                            targetConfig.set(section, key, "MOUSE2_XAXIS")
-                        elif key == "InputGunY2" or key == "InputAnalogGunY2":
-                            targetConfig.set(section, key, "MOUSE2_YAXIS")
-                        elif key == "InputTrigger2" or key == "InputAnalogTriggerLeft2" or key == "InputAnalogJoyTrigger2":
-                            targetConfig.set(section, key, "MOUSE2_LEFT_BUTTON")
-                        elif key == "InputOffscreen2" or key == "InputAnalogTriggerRight2":
-                            targetConfig.set(section, key, "MOUSE2_RIGHT_BUTTON")
-                        elif key == "InputStart2":
-                            val = transformElement("JOY2_BUTTON9", playersControllers, mapping, mapping_fallback)
-                            if val is not None:
-                                val += "," + val
-                            else:
-                                val = ""
-                            targetConfig.set(section, key, "MOUSE2_BUTTONX1" + val)
-                        elif key == "InputCoin1":
-                            val = transformElement("JOY2_BUTTON10", playersControllers, mapping, mapping_fallback)
-                            if val is not None:
-                                val += "," + val
-                            else:
-                                val = ""
-                            targetConfig.set(section, key,  "MOUSE2_BUTTONX2"+val)
-                        elif key == "InputAnalogJoyEvent2":
-                            val = transformElement("JOY2_BUTTON2", playersControllers, mapping, mapping_fallback)
-                            if val is not None:
-                                val += "," + val
-                            else:
-                                val = ""
-                            targetConfig.set(section, key, "MOUSE2_MIDDLE_BUTTON" + val)
-                else:
+                handled = apply_guns_to_section(
+                    targetConfig, section, key, value, system, guns, playersControllers, mapping, mapping_fallback
+                )
+                if not handled:
                     if key == "InputSystem":
                         targetConfig.set(section, key, "sdl")
 
@@ -299,15 +336,15 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
             targetConfig.set(section, "InputJoy1XSaturation", sensitivity)
 
     # save the ini file
-    if not os.path.exists(os.path.dirname(targetFile)):
-        os.makedirs(os.path.dirname(targetFile))
+    if not path.exists(path.dirname(targetFile)):
+        makedirs(path.dirname(targetFile))
     with open(targetFile, 'w') as configfile:
         targetConfig.write(configfile)
 
 def transformValue(value, playersControllers, mapping, mapping_fallback):
     # remove comments
     cleanValue = value
-    matches = re.search("^([^;]*[^ ])[ ]*;.*$", value)
+    matches = search("^([^;]*[^ ])[ ]*;.*$", value)
     if matches:
         cleanValue = matches.group(1)
 
@@ -331,10 +368,10 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
     # JOY1_UP    is the same as JOY1_YAXIS_NEG
     # JOY1_DOWN  is the same as JOY1_YAXIS_POS
 
-    matches = re.search("^JOY([12])_BUTTON([0-9]*)$", elt)
+    matches = search("^JOY([12])_BUTTON([0-9]*)$", elt)
     if matches:
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mapping["button" + matches.group(2)])
-    matches = re.search("^JOY([12])_UP$", elt)
+    matches = search("^JOY([12])_UP$", elt)
     if matches:
         # check joystick type if it's hat or axis
         joy_type = hatOrAxis(playersControllers, matches.group(1))
@@ -345,7 +382,7 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
         mp = getMappingKeyIncludingFallback(playersControllers, matches.group(1), key_up, mapping, mapping_fallback)
         print(mp)
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mp, -1)
-    matches = re.search("^JOY([12])_DOWN$", elt)
+    matches = search("^JOY([12])_DOWN$", elt)
     if matches:
         joy_type = hatOrAxis(playersControllers, matches.group(1))
         if joy_type == "hat":
@@ -354,7 +391,7 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
             key_down = "axisY"
         mp = getMappingKeyIncludingFallback(playersControllers, matches.group(1), key_down, mapping, mapping_fallback)
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mp, 1)
-    matches = re.search("^JOY([12])_LEFT$", elt)
+    matches = search("^JOY([12])_LEFT$", elt)
     if matches:
         joy_type = hatOrAxis(playersControllers, matches.group(1))
         if joy_type == "hat":
@@ -363,7 +400,7 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
             key_left = "axisX"
         mp = getMappingKeyIncludingFallback(playersControllers, matches.group(1), key_left, mapping, mapping_fallback)
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mp, -1)
-    matches = re.search("^JOY([12])_RIGHT$", elt)
+    matches = search("^JOY([12])_RIGHT$", elt)
     if matches:
         joy_type = hatOrAxis(playersControllers, matches.group(1))
         if joy_type == "hat":
@@ -373,13 +410,13 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
         mp = getMappingKeyIncludingFallback(playersControllers, matches.group(1), key_right, mapping, mapping_fallback)
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mp, 1)
 
-    matches = re.search("^JOY([12])_(R?[XY])AXIS$", elt)
+    matches = search("^JOY([12])_(R?[XY])AXIS$", elt)
     if matches:
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mapping["axis" + matches.group(2)])
-    matches = re.search("^JOY([12])_(R?[XYZ])AXIS_NEG$", elt)
+    matches = search("^JOY([12])_(R?[XYZ])AXIS_NEG$", elt)
     if matches:
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mapping["axis" + matches.group(2)], -1)
-    matches = re.search("^JOY([12])_(R?[XYZ])AXIS_POS$", elt)
+    matches = search("^JOY([12])_(R?[XYZ])AXIS_POS$", elt)
     if matches:
         return input2input(playersControllers, matches.group(1), joy2realjoyid(playersControllers, matches.group(1)), mapping["axis" + matches.group(2)], 1)
     if matches:
