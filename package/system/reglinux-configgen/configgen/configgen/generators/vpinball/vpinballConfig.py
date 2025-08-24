@@ -1,4 +1,13 @@
-def configureOptions(vpinballSettings, system):
+from systemFiles import CONF
+
+VPINBALL_CONFIG_DIR = CONF + '/vpinball'
+VPINBALL_CONFIG_PATH = VPINBALL_CONFIG_DIR + '/VPinballX.ini'
+VPINBALL_LOG_PATH = VPINBALL_CONFIG_DIR + '/vpinball.log'
+VPINBALL_PINMAME_PATH = CONF + '/vpinball/pinmame/ini'
+VPINBALL_ASSETS_PATH = '/usr/bin/vpinball/assets/Default_VPinballX.ini'
+VPINBALL_BIN_PATH = '/usr/bin/vpinball/VPinballX_GL'
+
+def setVpinballConfig(vpinballSettings, system):
     # Tables are organised by folders containing the vpx file, and sub-folders with the roms, altcolor, altsound,...
     # We keep a switch to allow users with the old unique pinmame to be able to continue using vpinball (switchon)
     if system.isOptSet("vpinball_folders") and system.getOptBoolean("vpinball_folders") == False:

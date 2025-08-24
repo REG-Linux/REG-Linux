@@ -1,14 +1,17 @@
 from generators.Generator import Generator
 from Command import Command
-import os
-import shutil
-from systemFiles import CONF
+from os import path, makedirs, symlink
+from shutil import copyfile
+from controllers import generate_sdl_controller_config
+from systemFiles import CONF, SCREENSHOTS
 
-sdlpopConfigDir = CONF + '/SDLPoP'
-sdlpopSrcCfg = sdlpopConfigDir + '/SDLPoP.cfg'
-sdlpopSrcIni = sdlpopConfigDir + '/SDLPoP.ini'
-sdlpopDestCfg = '/usr/share/SDLPoP/cfg/SDLPoP.cfg'
-sdlpopDestIni = '/usr/share/SDLPoP/cfg/SDLPoP.ini'
+SDLPOP_CONFIG_DIR = CONF + '/SDLPoP'
+SDLPOP_SCREENSHOTS_DIR = SCREENSHOTS + '/SDLPoP'
+SDLPOP_SOURCE_CFG_PATH = SDLPOP_CONFIG_DIR + '/SDLPoP.cfg'
+SDLPOP_SOURCE_INI_PATH = SDLPOP_CONFIG_DIR + '/SDLPoP.ini'
+SDLPOP_DEST_CFG_PATH = '/usr/share/SDLPoP/cfg/SDLPoP.cfg'
+SDLPOP_DEST_INI_PATH = '/usr/share/SDLPoP/cfg/SDLPoP.ini'
+SDLPOP_SOURCE_SCREENSHOTS_DIR = '/usr/share/SDLPoP/screenshots'
 
 class SdlPopGenerator(Generator):
 
@@ -16,29 +19,26 @@ class SdlPopGenerator(Generator):
         commandArray = ["SDLPoP"]
 
         # create sdlpop config directory
-        if not os.path.exists(sdlpopConfigDir):
-            os.makedirs(sdlpopConfigDir)
-        if not os.path.exists(sdlpopSrcCfg):
-            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.cfg', sdlpopSrcCfg)
-        if not os.path.exists(sdlpopSrcIni):
-            shutil.copyfile('/usr/share/SDLPoP/cfg/SDLPoP.ini', sdlpopSrcIni)
+        if not path.exists(SDLPOP_CONFIG_DIR):
+            makedirs(SDLPOP_CONFIG_DIR)
+        if not path.exists(SDLPOP_SOURCE_CFG_PATH):
+            copyfile(SDLPOP_DEST_CFG_PATH, SDLPOP_SOURCE_CFG_PATH)
+        if not path.exists(SDLPOP_SOURCE_INI_PATH):
+            copyfile(SDLPOP_DEST_INI_PATH, SDLPOP_SOURCE_INI_PATH)
         # symbolic link cfg files
-        if not os.path.exists(sdlpopDestCfg):
-            os.symlink(sdlpopSrcCfg, sdlpopDestCfg)
-        if not os.path.exists(sdlpopDestIni):
-            os.symlink(sdlpopSrcIni, sdlpopDestIni)
+        if not path.exists(SDLPOP_DEST_CFG_PATH):
+            symlink(SDLPOP_SOURCE_CFG_PATH, SDLPOP_DEST_CFG_PATH)
+        if not path.exists(SDLPOP_DEST_INI_PATH):
+            symlink(SDLPOP_SOURCE_INI_PATH, SDLPOP_DEST_INI_PATH)
         # create screenshots folder in /userdata
-        if not os.path.exists('/userdata/screenshots/SDLPoP'):
-            os.makedirs('/userdata/screenshots/SDLPoP')
+        if not path.exists(SDLPOP_SCREENSHOTS_DIR):
+            makedirs(SDLPOP_SCREENSHOTS_DIR)
         # symbolic link screenshot folder too
-        if not os.path.exists('/usr/share/SDLPoP/screenshots'):
-            os.symlink('/userdata/screenshots/SDLPoP', '/usr/share/SDLPoP/screenshots', target_is_directory = True)
+        if not path.exists(SDLPOP_SOURCE_SCREENSHOTS_DIR):
+            symlink(SDLPOP_SCREENSHOTS_DIR, SDLPOP_SOURCE_SCREENSHOTS_DIR, target_is_directory = True)
 
-        # pad number
-        nplayer = 1
-        for playercontroller, pad in sorted(playersControllers.items()):
-            if nplayer == 1:
-                commandArray.append(f"joynum={pad.index}")
-            nplayer += 1
-
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })

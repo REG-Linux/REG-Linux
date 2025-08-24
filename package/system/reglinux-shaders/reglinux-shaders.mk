@@ -91,4 +91,14 @@ ifeq ($(BR2_PACKAGE_SLANG_SHADERS),y)
     REGLINUX_SHADERS_POST_INSTALL_TARGET_HOOKS = REGLINUX_SHADERS_SLANG
 endif
 
+# No Mega Bezel / koko-aio for non-x86 systems
+define REGLINUX_SHADERS_DELETE_BEZEL
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/koko-aio
+endef
+
+ifneq ($(REGLINUX_GPU_SYSTEM),x86)
+    REGLINUX_SHADERS_POST_INSTALL_TARGET_HOOKS += REGLINUX_SHADERS_DELETE_BEZEL
+endif
+
 $(eval $(generic-package))

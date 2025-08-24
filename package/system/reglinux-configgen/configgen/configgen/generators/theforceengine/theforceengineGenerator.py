@@ -1,14 +1,16 @@
 from generators.Generator import Generator
 from Command import Command
-import configparser
-import os
+from configparser import ConfigParser
+from os import path, makedirs
+from controllers import generate_sdl_controller_config
 from systemFiles import CONF
 
-forceConfigDir = CONF + "/theforceengine"
-forceModsDir = forceConfigDir + "/Mods"
-forcePatchFile = "df_patch4.zip" # current patch version
-forceModFile = forceModsDir + "/" + forcePatchFile
-forceConfigFile = forceConfigDir + "/settings.ini"
+FORCE_CONFIG_DIR = CONF + '/theforceengine'
+FORCE_MODS_DIR = FORCE_CONFIG_DIR + '/Mods'
+FORCE_PATCH_PATH = 'df_patch4.zip' # current patch version
+FORCE_MODS_PATH = FORCE_MODS_DIR + '/' + FORCE_PATCH_PATH
+FORCE_CONFIG_PATH = FORCE_CONFIG_DIR + '/settings.ini'
+FORCE_BIN_PATH = '/usr/bin/theforceengine'
 
 class TheForceEngineGenerator(Generator):
     # this emulator/core requires a X server to run
@@ -18,15 +20,15 @@ class TheForceEngineGenerator(Generator):
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
 
         # Check if the directories exist, if not create them
-        if not os.path.exists(forceConfigDir):
-            os.makedirs(forceConfigDir)
-        if not os.path.exists(forceModsDir):
-            os.makedirs(forceModsDir)
+        if not path.exists(FORCE_CONFIG_DIR):
+            makedirs(FORCE_CONFIG_DIR)
+        if not path.exists(FORCE_MODS_DIR):
+            makedirs(FORCE_MODS_DIR)
 
         mod_name = None
         # use the patch file if available
-        if os.path.exists(forceModFile):
-            mod_name = forcePatchFile
+        if path.exists(FORCE_MODS_PATH):
+            mod_name = FORCE_PATCH_PATH
 
         # Open the .tfe rom file for user mods
         with open(rom, 'r') as file:
@@ -37,10 +39,10 @@ class TheForceEngineGenerator(Generator):
                 mod_name = first_line
 
         ## Configure
-        forceConfig = configparser.ConfigParser()
+        forceConfig = ConfigParser()
         forceConfig.optionxform=lambda optionstr: str(optionstr)
-        if os.path.exists(forceConfigFile):
-            forceConfig.read(forceConfigFile)
+        if path.exists(FORCE_CONFIG_PATH):
+            forceConfig.read(FORCE_CONFIG_PATH)
 
         # Windows
         if not forceConfig.has_section("Window"):
@@ -204,13 +206,13 @@ class TheForceEngineGenerator(Generator):
             forceConfig.add_section("CVar")
 
         ## Update the configuration file
-        if not os.path.exists(os.path.dirname(forceConfigFile)):
-            os.makedirs(os.path.dirname(forceConfigFile))
-        with open(forceConfigFile, 'w') as configfile:
+        if not path.exists(path.dirname(FORCE_CONFIG_PATH)):
+            makedirs(path.dirname(FORCE_CONFIG_PATH))
+        with open(FORCE_CONFIG_PATH, 'w') as configfile:
             forceConfig.write(configfile)
 
         ## Setup the command
-        commandArray = ["theforceengine"]
+        commandArray = [FORCE_BIN_PATH]
 
         ## Accomodate Mods, skip cutscenes etc
         if system.isOptSet("force_skip_cutscenes") and system.config["force_skip_cutscenes"] == "initial":
@@ -225,11 +227,11 @@ class TheForceEngineGenerator(Generator):
         commandArray.extend(["-gDARK"])
 
         return Command(
-            array=commandArray,
-            env={
-                "TFE_DATA_HOME": forceConfigDir
-            }
-        )
+                    array=commandArray,
+                    env={
+                        'TFE_DATA_HOME': FORCE_CONFIG_DIR,
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
 
     # Show mouse for menu actions
     def getMouseMode(self, config, rom):
