@@ -3,8 +3,8 @@
 # glsl-shaders
 #
 ################################################################################
-# Version: Commits on Jun 15, 2024
-GLSL_SHADERS_VERSION = b647528b3c54e430a9e4b2b6154157823f338afd
+# Version: Commits on Aug 21, 2025
+GLSL_SHADERS_VERSION = 2903be405926f473b270accf22cfb560af9cc54c
 GLSL_SHADERS_SITE = $(call github,libretro,glsl-shaders,$(GLSL_SHADERS_VERSION))
 GLSL_SHADERS_LICENSE = GPL
 
@@ -25,5 +25,14 @@ define GLSL_SHADERS_INSTALL_TARGET_CMDS
 	    $(TARGET_DIR)/usr/share/reglinux/shaders/crt/crt-pi.glslp > \
 		    $(TARGET_DIR)/usr/share/reglinux/shaders/crt/crt-pi-curvature.glslp
 endef
+
+# No Mega Bezel / koko-aio for non-x86 systems
+define GLSL_SHADERS_DELETE_BEZEL
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/koko-aio
+endef
+ifneq ($(BR2_x86_64),y)
+    GLSL_SHADERS_POST_INSTALL_TARGET_HOOKS += GLSL_SHADERS_DELETE_BEZEL
+endif
 
 $(eval $(generic-package))

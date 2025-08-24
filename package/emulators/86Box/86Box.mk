@@ -3,8 +3,8 @@
 # 86Box emulator
 #
 ################################################################################
-# Version.: Release on Sep 1, 2024
-86BOX_VERSION = v4.2.1
+# Version.: Release on Aug 24, 2025
+86BOX_VERSION = v5.0
 86BOX_SITE = https://github.com/86Box/86Box
 86BOX_SITE_METHOD=git
 86BOX_LICENSE = GPLv3

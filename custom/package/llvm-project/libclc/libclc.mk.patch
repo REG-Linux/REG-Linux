@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/libclc/libclc.mk b/package/llvm-project/libclc/libclc.mk
-index 9f303d6d2f..c43114165a 100644
+index 9f303d6d2f..f54427ae0b 100644
 --- a/package/llvm-project/libclc/libclc.mk
 +++ b/package/llvm-project/libclc/libclc.mk
 @@ -3,14 +3,22 @@
@@ -27,7 +27,7 @@ index 9f303d6d2f..c43114165a 100644
  LIBCLC_INSTALL_STAGING = YES
  
  # CMAKE_*_COMPILER_FORCED=ON skips testing the tools and assumes
-@@ -39,4 +47,68 @@ LIBCLC_CONF_OPTS = \
+@@ -39,4 +47,79 @@ LIBCLC_CONF_OPTS = \
  	-DCMAKE_CXX_COMPILER="$(CMAKE_HOST_CXX_COMPILER)" \
  	-DLLVM_CONFIG="$(HOST_DIR)/bin/llvm-config"
  
@@ -92,6 +92,17 @@ index 9f303d6d2f..c43114165a 100644
 +	# extract target folder
 +	tar -C $(TARGET_DIR)/../ -xvf $(DL_DIR)/$(LIBCLC_DL_SUBDIR)/$(LIBCLC_SOURCE) target
 +endef
++
++define DELETE_LIBCLC_UNUSED_TARGETS
++	# remove amdgcn, r600, nvp targets
++	rm -Rf $(TARGET_DIR)/usr/share/clc/*amdgcn*
++	rm -Rf $(TARGET_DIR)/usr/share/clc/*r600*
++	rm -Rf $(TARGET_DIR)/usr/share/clc/*nvptx*
++endef
++
++ifeq ($(BR2_arm)$(BR2_aarch64),y)
++LIBCLC_POST_INSTALL_TARGET_HOOKS += DELETE_LIBCLC_UNUSED_TARGETS
++endif
 +
 +$(eval $(generic-package))
 +endif
