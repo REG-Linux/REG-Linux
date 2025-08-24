@@ -108,15 +108,15 @@
      {
          if (vid_api == 4)
              vid_api = 0;
-@@ -433,9 +437,9 @@
-             case 3:
+@@ -520,9 +520,9 @@
+             case RENDERER_OPENGL3:
                  newVidApi = RendererStack::Renderer::OpenGL3;
                  break;
--            case 4:
-+            /*case 4:
+-            case RENDERER_VULKAN:
++            /*case RENDERER_VULKAN:
                  newVidApi = RendererStack::Renderer::Vulkan;
 -                break;
 +                break;*/
  #ifdef USE_VNC
-             case 5:
+             case RENDERER_VNC:
                  {
