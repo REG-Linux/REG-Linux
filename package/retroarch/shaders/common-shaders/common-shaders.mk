@@ -17,4 +17,13 @@ define COMMON_SHADERS_INSTALL_TARGET_CMDS
 	$(MAKE) CXX="$(TARGET_CXX)" -C $(@D) INSTALLDIR=$(TARGET_DIR)/usr/share/reglinux/shaders install
 endef
 
+# No Mega Bezel / koko-aio for non-x86 systems
+define COMMON_SHADERS_DELETE_BEZEL
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/Mega_Bezel
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/koko-aio
+endef
+ifneq ($(BR2_x86_64),y)
+    COMMON_SHADERS_POST_INSTALL_TARGET_HOOKS += COMMON_SHADERS_DELETE_BEZEL
+endif
+
 $(eval $(generic-package))

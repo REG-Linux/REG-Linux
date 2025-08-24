@@ -488,9 +488,9 @@ menu "Retroarch"
 endmenu
 
 menu "Shaders"
-      source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/shaders/common-shaders/Config.in"
-      source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/shaders/slang-shaders/Config.in"
-      source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/shaders/glsl-shaders/Config.in"
+      source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/shaders/common-shaders/Config.in"
+      source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/shaders/glsl-shaders/Config.in"
+      source "$BR2_EXTERNAL_REGLINUX_PATH/package/retroarch/shaders/slang-shaders/Config.in"
 endmenu
 
 menu "cores"
@@ -539,8 +539,8 @@ menu "Standalone Emulators"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/gsplus/Config.in"
 endmenu
 
-menu "Looks"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/looks/hypseus-singe-bezels/Config.in"
+menu "Bezels"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/bezels/hypseus-singe-bezels/Config.in"
 endmenu
 
 menu "Utils"
