@@ -109,6 +109,17 @@ define LIBCLC_INSTALL_TARGET_CMDS
 	tar -C $(TARGET_DIR)/../ -xvf $(DL_DIR)/$(LIBCLC_DL_SUBDIR)/$(LIBCLC_SOURCE) target
 endef
 
+define DELETE_LIBCLC_UNUSED_TARGETS
+	# remove amdgcn, r600, nvp targets
+	rm -Rf $(TARGET_DIR)/usr/share/clc/*amdgcn*
+	rm -Rf $(TARGET_DIR)/usr/share/clc/*r600*
+	rm -Rf $(TARGET_DIR)/usr/share/clc/*nvptx*
+endef
+
+ifeq ($(BR2_arm)$(BR2_aarch64),y)
+LIBCLC_POST_INSTALL_TARGET_HOOKS += DELETE_LIBCLC_UNUSED_TARGETS
+endif
+
 $(eval $(generic-package))
 endif
 
