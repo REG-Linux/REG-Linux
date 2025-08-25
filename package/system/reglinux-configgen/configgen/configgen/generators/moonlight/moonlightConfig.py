@@ -1,7 +1,7 @@
 from os import path, makedirs
 from shutil import copy
 from systemFiles import CONF
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 
 MOONLIGHT_CONFIG_DIR = CONF + '/moonlight'
 MOONLIGHT_CONFIG_PATH = MOONLIGHT_CONFIG_DIR + '/moonlight.conf'
