@@ -9,7 +9,7 @@ AMIBERRY_VERSION = v7.1.0
 AMIBERRY_SITE = $(call github,BlitterStudio,amiberry,$(AMIBERRY_VERSION))
 AMIBERRY_LICENSE = GPLv3
 AMIBERRY_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac
-AMIBERRY_DEPENDENCIES += libpng libserialport libportmidi libzlib libcapsimage
+AMIBERRY_DEPENDENCIES += libpng libserialport libportmidi zlib libcapsimage
 AMIBERRY_DEPENDENCIES += libenet libpcap
 AMIBERRY_SUPPORTS_IN_SOURCE_BUILD = NO
 

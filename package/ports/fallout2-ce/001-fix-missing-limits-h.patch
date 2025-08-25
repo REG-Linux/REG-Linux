@@ -1,0 +1,38 @@
+--- a/src/stat.cc	2025-08-22 18:26:21.126371140 +0200
++++ b/src/stat.cc	2025-08-22 18:26:29.578130484 +0200
+@@ -1,5 +1,6 @@
+ #include "stat.h"
+ 
++#include <limits.h>
+ #include <stdio.h>
+ 
+ #include <algorithm>
+--- a/src/input.cc	2025-08-22 18:32:13.859018957 +0200
++++ b/src/input.cc	2025-08-22 18:32:26.636196123 +0200
+@@ -1,5 +1,6 @@
+ #include "input.h"
+ 
++#include <limits.h>
+ #include <SDL.h>
+ 
+ #include "audio_engine.h"
+--- a/src/character_editor.cc	2025-08-22 18:34:39.169482232 +0200
++++ b/src/character_editor.cc	2025-08-22 18:34:50.261453542 +0200
+@@ -4,6 +4,7 @@
+ #include <ctype.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <limits.h>
+ 
+ #include <algorithm>
+ #include <vector>
+--- a/src/inventory.cc	2025-08-22 18:38:08.795515325 +0200
++++ b/src/inventory.cc	2025-08-22 18:38:16.475485246 +0200
+@@ -3,6 +3,7 @@
+ #include <assert.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <limits.h>
+ 
+ #include <algorithm>
+ 
