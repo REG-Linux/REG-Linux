@@ -1,7 +1,7 @@
 import sys
 import subprocess
 from json import load
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 from os import path, makedirs, remove, listdir, unlink, symlink
 from controllers import getDevicesInformation, gunsBordersSizeName, getGamesMetaData
 from utils.videoMode import supportSystemRotation, getAltDecoration

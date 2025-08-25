@@ -3,7 +3,7 @@ from Command import Command
 from os import path, makedirs, chdir
 from shutil import copyfile
 from systemFiles import OVERLAYS
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 from utils.videoMode import getAltDecoration, getGLVendor, getGLVersion
 from .libretroConfig import coreForceSlangShaders, retroarchCustom, writeLibretroConfig, retroarchRoot, retroarchCores, retroarchBin
 from .libretroRetroarchCustom import generateRetroarchCustom, generateRetroarchCustomPathes
