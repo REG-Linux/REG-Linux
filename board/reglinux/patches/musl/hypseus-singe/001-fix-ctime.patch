@@ -1,0 +1,20 @@
+--- a/src/game/singe/lfszippp.cpp	2025-08-25 18:52:49.590931590 +0200
++++ b/src/game/singe/lfszippp.cpp	2025-08-25 18:52:58.853660618 +0200
+@@ -31,6 +31,7 @@
+ #include "../../io/zippp.h"
+ #include <cstring>
+ #include <set>
++#include <ctime>
+ 
+ using namespace libzippp;
+ 
+--- a/src/io/zippp.h	2025-08-01 11:00:00.000000000 +0200
++++ b/src/io/zippp.h	2025-08-25 18:54:58.010086963 +0200
+@@ -40,6 +40,7 @@
+ #include <string>
+ #include <vector>
+ #include <functional>
++#include <ctime>
+ 
+ //defined in libzip
+ struct zip;
