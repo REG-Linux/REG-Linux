@@ -46,6 +46,8 @@ LIBRETRO_FBNEO_EXTRA_ARGS += USE_EXPERIMENTAL_FLAGS=0
 endif
 
 define LIBRETRO_FBNEO_BUILD_CMDS
+	rm -Rf $(@D)/src/cpu/cyclone/*
+	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-fbneo/cyclone68k/* $(@D)/src/cpu/cyclone/
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" \
 	    -C $(@D)/src/burner/libretro -f Makefile \
 		platform="$(LIBRETRO_FBNEO_PLATFORM)" $(LIBRETRO_FBNEO_EXTRA_ARGS) \
