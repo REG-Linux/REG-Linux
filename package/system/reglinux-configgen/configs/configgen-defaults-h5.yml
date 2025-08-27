@@ -2,8 +2,6 @@ default:
   options:
     video_threaded: true
     smooth: false
-    retroarch.menu_driver: xmb
-    retroarch.audio_driver: alsathread
 
 mastersystem:
   emulator: libretro
@@ -32,21 +30,6 @@ cplus4:
 fmtowns:
   emulator: libretro
   core:     mame
-atomiswave:
-  emulator: flycast
-  core:     flycast
-dreamcast:
-  emulator: flycast
-  core:     flycast
-naomi:
-  emulator: flycast
-  core:     flycast
-naomi2:
-  emulator: flycast
-  core:     flycast
-systemsp:
-  emulator: flycast
-  core:     flycast
 fmtowns:
   emulator: libretro
   core:     mame
