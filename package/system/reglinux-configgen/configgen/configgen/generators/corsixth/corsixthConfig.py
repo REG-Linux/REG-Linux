@@ -2,7 +2,7 @@ from systemFiles import CONF, ROMS, SAVES, SCREENSHOTS
 from subprocess import check_output, CalledProcessError
 from os import chdir
 
-CORSIXTH_CONFIG_DIR = CONF + '/corsixth'
+CORSIXTH_CONFIG_DIR = CONF + '/CorsixTH'
 CORSIXTH_CONFIG_PATH = CORSIXTH_CONFIG_DIR + '/config.txt'
 CORSIXTH_SAVES_DIR = SAVES + '/corsixth'
 CORSIXTH_ROMS_DIR = ROMS + '/corsixth'
@@ -26,6 +26,8 @@ def setCorsixthConfig(corsixthConfig, system, gameResolution):
 
     # Values coming from ES configuration : Resolution
     corsixthConfig.write("fullscreen = true\n")
+    if gameResolution["width"] < gameResolution["height"]:
+        gameResolution["width"], gameResolution["height"] = gameResolution["height"], gameResolution["width"]
     corsixthConfig.write("width = " + str(gameResolution["width"]) +"\n")
     corsixthConfig.write("height = " + str(gameResolution["height"]) + "\n")
 
