@@ -158,7 +158,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
         pcsx2INIConfig.add_section("Achievements")
     pcsx2INIConfig.set("Achievements", "Enabled", "false")
     if system.isOptSet('retroachievements') and system.getOptBoolean('retroachievements') == True:
-        headers   = {"Content-type": "text/plain", "User-Agent": "Batocera.linux"}
+        headers   = {"Content-type": "text/plain", "User-Agent": "REG-linux"}
         login_url = "https://retroachievements.org/"
         username  = system.config.get('retroachievements.username', "")
         password  = system.config.get('retroachievements.password', "")

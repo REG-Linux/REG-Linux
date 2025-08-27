@@ -1,7 +1,7 @@
 import sys
 import subprocess
 from json import load
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 from os import path, makedirs, remove, listdir, unlink, symlink
 from controllers import getDevicesInformation, gunsBordersSizeName, getGamesMetaData
 from utils.videoMode import supportSystemRotation, getAltDecoration
@@ -134,7 +134,7 @@ def createLibretroConfig(generator, system, controllers, metadata, guns, wheels,
 
     # Basic configuration
     retroarchConfig['quit_press_twice'] = 'false'                 # not aligned behavior on other emus
-    retroarchConfig['menu_show_restart_retroarch'] = 'false'      # this option messes everything up on Batocera if ever clicked
+    retroarchConfig['menu_show_restart_retroarch'] = 'false'      # this option messes everything up on REG-Linux if ever clicked
     retroarchConfig['menu_show_load_content_animation'] = 'false' # hide popup when starting a game
     retroarchConfig['menu_swap_ok_cancel_buttons'] = swapButtons  # Set the correct value to match ES confirm /cancel inputs
     retroarchConfig['video_viewport_bias_x'] = '"0.500000"'

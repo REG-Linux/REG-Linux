@@ -1,7 +1,7 @@
 from generators.Generator import Generator
 from Command import Command
 from os import path, makedirs
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 from controllers import generate_sdl_controller_config
 from systemFiles import CONF, BIOS
 
