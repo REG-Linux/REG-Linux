@@ -16,15 +16,6 @@ psx:
   options:
     gpu_software: true
     gfxbackend: Software
-atomiswave:
-  emulator: libretro
-  core:     flycastvl
-dreamcast:
-  emulator: libretro
-  core:     flycastvl
-naomi:
-  emulator: libretro
-  core:     flycastvl
 c64:
   emulator: libretro
   core:     vice_x64

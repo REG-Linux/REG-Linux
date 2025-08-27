@@ -9,7 +9,7 @@ AMIBERRY_LITE_VERSION = v5.8.10
 AMIBERRY_LITE_SITE = $(call github,BlitterStudio,amiberry-lite,$(AMIBERRY_LITE_VERSION))
 AMIBERRY_LITE_LICENSE = GPLv3
 AMIBERRY_LITE_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac
-AMIBERRY_LITE_DEPENDENCIES += libpng libserialport libportmidi libzlib libcapsimage
+AMIBERRY_LITE_DEPENDENCIES += libpng libserialport libportmidi zlib libcapsimage
 AMIBERRY_LITE_DEPENDENCIES += libenet
 AMIBERRY_LITE_SUPPORTS_IN_SOURCE_BUILD = NO
 
