@@ -1,13 +1,29 @@
+from utils.logger import get_logger
+eslog = get_logger(__name__)
+
 def setAzaharControllers(azaharConfig, playersControllers):
     azaharButtons = {
-        "button_a": "a", "button_b": "b", "button_x": "x", "button_y": "y",
-        "button_up": "up", "button_down": "down", "button_left": "left", "button_right": "right",
-        "button_l": "pageup", "button_r": "pagedown",
-        "button_start": "start", "button_select": "select",
-        "button_zl": "l2", "button_zr": "r2", "button_home": "hotkey"
+        "button_a": "a",
+        "button_b": "b",
+        "button_x": "x",
+        "button_y": "y",
+        "button_up": "dpup",
+        "button_down": "dpdown",
+        "button_left": "dpleft",
+        "button_right": "dpright",
+        "button_l": "leftshoulder",
+        "button_r": "rightshoulder",
+        "button_start": "start",
+        "button_select": "back",
+        "button_zl": "triggerleft",
+        "button_zr": "triggerright",
+        "button_home": "guide"
     }
 
-    azaharAxis = {"circle_pad": "joystick1", "c_stick": "joystick2"}
+    azaharAxis = {
+        "circle_pad": "leftx",
+        "c_stick": "rightx"
+    }
 
     azaharConfig.ensure_section("Controls")
 
@@ -37,26 +53,32 @@ def setButton(key, padGuid, padInputs):
         if input.type == "button":
             return f"button:{input.id},guid:{padGuid},engine:sdl"
         elif input.type == "hat":
-            return f"engine:sdl,guid:{padGuid},hat:{input.id},direction:{hatdirectionvalue(input.value)}"
-        elif input.type == "axis":
-            return f"engine:sdl,guid:{padGuid},axis:{input.id},direction:+,threshold:0.5"
+            return f"engine:sdl,guid:{padGuid},hat:{input.id},direction:{hatdirectionvalue(input.id[-1])}"
 
 
 def setAxis(key, padGuid, padInputs):
     inputx, inputy = None, None
-    if key == "joystick1":
-        inputx, inputy = padInputs.get("joystick1left"), padInputs.get("joystick1up")
-    elif key == "joystick2":
-        inputx, inputy = padInputs.get("joystick2left"), padInputs.get("joystick2up")
+    if key == "leftx":
+        inputx, inputy = padInputs.get("leftx"), padInputs.get("lefty")
+    elif key == "rightx":
+        inputx, inputy = padInputs.get("rightx"), padInputs.get("righty")
 
     if inputx is None or inputy is None:
         return ""
+
     return f"axis_x:{inputx.id},guid:{padGuid},axis_y:{inputy.id},engine:sdl"
 
-
+@staticmethod
 def hatdirectionvalue(value):
-    return {1: "up", 4: "down", 2: "right", 8: "left"}.get(int(value), "unknown")
-
+    if int(value) == 1:
+        return "up"
+    if int(value) == 4:
+        return "down"
+    if int(value) == 2:
+        return "right"
+    if int(value) == 8:
+        return "left"
+    return "unknown"
 
 def getMouseMode(self, config, rom):
     return not ("azahar_screen_layout" in config and config["azahar_screen_layout"] == "1-false")
