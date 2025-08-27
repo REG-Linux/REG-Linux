@@ -3,8 +3,8 @@
 # ares
 #
 ################################################################################
-# Version.: Release on Jul 9, 2025
-ARES_VERSION = v145
+# Version.: Release on Aug 27, 2025
+ARES_VERSION = v146
 ARES_SITE = $(call github,ares-emulator,ares,$(ARES_VERSION))
 ARES_LICENSE = GPLv3
 ARES_DEPENDENCIES = sdl2 libgl zlib pango cairo libgtk3 librashader xwayland
