@@ -8,12 +8,3 @@ nds:
 fmtowns:
   emulator: libretro
   core:     mame
-atomiswave:
-  emulator: libretro
-  core:     flycastvl
-dreamcast:
-  emulator: libretro
-  core:     flycastvl
-naomi:
-  emulator: libretro
-  core:     flycastvl

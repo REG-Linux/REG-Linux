@@ -2,8 +2,6 @@ default:
   options:
     video_threaded: true
     smooth: false
-    retroarch.menu_driver: xmb
-    retroarch.audio_driver: alsathread
 
 mastersystem:
   emulator: libretro
@@ -11,18 +9,6 @@ mastersystem:
 megadrive:
   emulator: libretro
   core:     picodrive
-snes:
-  emulator: libretro
-  core:     snes9x
 fbneo:
   options:
     frameskip: auto
-atomiswave:
-  emulator: libretro
-  core:     flycast
-dreamcast:
-  emulator: libretro
-  core:     flycast
-naomi:
-  emulator: libretro
-  core:     flycast
