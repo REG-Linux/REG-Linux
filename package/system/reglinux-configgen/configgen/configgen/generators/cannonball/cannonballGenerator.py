@@ -3,6 +3,7 @@ from Command import Command
 from os import path, makedirs, linesep
 from codecs import open
 from xml.dom import minidom
+from controllers import generate_sdl_controller_config
 from .cannonballConfig import CANNONBALL_BIN_PATH, CANNONBALL_CONFIG_PATH, setCannonballConfig
 
 class CannonballGenerator(Generator):
@@ -31,4 +32,8 @@ class CannonballGenerator(Generator):
         # command line
         commandArray = [CANNONBALL_BIN_PATH]
 
-        return Command(array=commandArray)
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })

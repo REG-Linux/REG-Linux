@@ -77,6 +77,11 @@ define CANNONBALL_INSTALL_TARGET_CMDS
 	    $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/cannonball/
 	$(INSTALL) -D $(@D)/buildroot-build/config.xml \
 	    $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/cannonball/config_help.txt
+
+	# evmap config
+	mkdir -p $(TARGET_DIR)/usr/share/evmapy
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/cannonball/evmapy/* \
+	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
 $(eval $(cmake-package))
