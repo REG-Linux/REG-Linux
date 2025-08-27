@@ -53,27 +53,13 @@ config BR2_PACKAGE_REGLINUX_SEGADC
                                              !BR2_PACKAGE_SYSTEM_TARGET_CHA     && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_H3      && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_H5      && \
-                                             !BR2_PACKAGE_SYSTEM_TARGET_H6      && \
-                                             !BR2_PACKAGE_SYSTEM_TARGET_H616    && \
-                                             !BR2_PACKAGE_SYSTEM_TARGET_H700    && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_BCM2836 && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_BCM2837 && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_RK3128  && \
-                                             !BR2_PACKAGE_SYSTEM_TARGET_RK3326  && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_RK3328  && \
-                                             !BR2_PACKAGE_SYSTEM_TARGET_S9GEN4  && \
                                              !BR2_PACKAGE_SYSTEM_TARGET_S812    && \
-                                             !BR2_PACKAGE_SYSTEM_TARGET_S905    && \
-                                             !BR2_PACKAGE_SYSTEM_TARGET_S905GEN2
-
-    select BR2_PACKAGE_LIBRETRO_FLYCASTVL if BR2_PACKAGE_SYSTEM_TARGET_H6       || \
-                                             BR2_PACKAGE_SYSTEM_TARGET_H616     || \
-                                             BR2_PACKAGE_SYSTEM_TARGET_H700     || \
-                                             BR2_PACKAGE_SYSTEM_TARGET_RK3326   || \
-                                             BR2_PACKAGE_SYSTEM_TARGET_S9GEN4   || \
-                                             BR2_PACKAGE_SYSTEM_TARGET_S905GEN2
-
+                                             !BR2_PACKAGE_SYSTEM_TARGET_S905
 
 	help
 	  Sega Dreamcast and Naomi/Atomiswave emulation support
