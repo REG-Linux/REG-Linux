@@ -50,6 +50,8 @@ e24ebf071724201f2a2ad92758bf98c7  package/fmt/fmt.hash
 c1bca4f1254a224fc84ea62d8d8181c7  package/fmt/fmt.mk
 914b4591d3767dc3f9da6f9c07a44386  package/gvfs/gvfs.mk
 17c6479a5b5b0272d5ae7f5c0d068b4e  package/heimdal/heimdal.mk
+bc2ad65da90d0c27761384b55402ae67  package/ksmbd-tools/ksmbd-tools.hash
+59229ace50ead7080914c901d495c34d  package/ksmbd-tools/ksmbd-tools.mk
 54ff4924ef45b414738b64737acc7d8a  package/lame/lame.mk
 f5a30699e0b7651ec9862e2f9f8b37ed  package/libarchive/libarchive.mk
 171699577713d856ce8889d97c966447  package/libcec/Config.in
