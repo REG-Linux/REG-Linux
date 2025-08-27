@@ -2,7 +2,7 @@ from generators.Generator import Generator
 from Command import Command
 from zipfile import ZipFile
 from os import path, makedirs, chdir
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 from systemFiles import CONF
 
 AMIBERRY_DIR = CONF + '/amiberry'

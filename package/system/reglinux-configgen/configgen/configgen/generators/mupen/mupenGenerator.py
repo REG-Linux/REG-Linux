@@ -22,7 +22,7 @@ class MupenGenerator(Generator):
 
         setMupenConfig(iniConfig, system, playersControllers, gameResolution)
         # FIXME: Implement setControllersConfig function
-        #setControllersConfig(iniConfig, playersControllers, system, wheels)
+        setControllersConfig(iniConfig, playersControllers, system, wheels)
 
         # Save the ini file
         if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):

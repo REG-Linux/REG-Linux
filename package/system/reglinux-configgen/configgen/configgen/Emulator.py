@@ -3,7 +3,7 @@ from os import path
 from systemFiles import SYSTEM_CONF, ES_SETTINGS
 from yaml import SafeLoader, load
 from typing import Dict, Any
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)

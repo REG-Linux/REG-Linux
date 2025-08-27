@@ -3,7 +3,7 @@ from Command import Command
 from os import path, makedirs, chdir
 from re import search
 from systemFiles import CONF, SAVES, ROMS
-from settings.unixSettings import UnixSettings
+from settings import UnixSettings
 from .openborControllers import setControllerConfig
 
 OPENBOR_CONF_DIR = CONF + '/openbor'
