@@ -75,7 +75,7 @@ def load_controller_config(controllersInput):
     controllers = load_all_controllers_config()
 
     for i, ci in enumerate(controllersInput):
-        newController = _find_best_controller_config(controllers, str(i + 1), ci["guid"], ci["devicepath"])
+        newController = _find_best_controller_config(controllers, i, ci["guid"], ci["devicepath"])
         if newController:
             playerControllers[str(i + 1)] = newController
     return playerControllers
