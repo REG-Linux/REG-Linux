@@ -1,0 +1,24 @@
+diff --git a/package/nfs-utils/nfs-utils.mk b/package/nfs-utils/nfs-utils.mk
+index 0af0254d3f..e9e0001e74 100644
+--- a/package/nfs-utils/nfs-utils.mk
++++ b/package/nfs-utils/nfs-utils.mk
+@@ -75,7 +75,7 @@ endif
+ 
+ define NFS_UTILS_INSTALL_FIXUP
+ 	cd $(TARGET_DIR) && rm -f $(NFS_UTILS_TARGETS_)
+-	touch $(TARGET_DIR)/etc/exports
++	echo '/userdata *(rw,all_squash,anonuid=0,anongid=0,insecure)' >$(TARGET_DIR)/etc/exports
+ 	$(INSTALL) -D -m 644 \
+ 		$(@D)/utils/mount/nfsmount.conf $(TARGET_DIR)/etc/nfsmount.conf
+ endef
+@@ -94,8 +94,8 @@ define NFS_UTILS_LINUX_CONFIG_FIXUPS
+ endef
+ 
+ define NFS_UTILS_INSTALL_INIT_SYSV
+-	$(INSTALL) -D -m 0755 package/nfs-utils/S60nfs \
+-		$(TARGET_DIR)/etc/init.d/S60nfs
++	$(INSTALL) -D -m 0755 package/nfs-utils/S60nfs $(TARGET_DIR)/etc/init.d/S60nfs
++	$(INSTALL) -D -m 0755 package/nfs-utils/enable_NFS $(TARGET_DIR)/usr/share/reglinux/services/enable_NFS
+ endef
+ 
+ endif

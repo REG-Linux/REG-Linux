@@ -3,16 +3,16 @@
 # Starts dropbear sshd.
 #
 
+# REG-Linux
+if [ "$(/usr/bin/system-settings-get system.ssh.enabled)" = "0" ]; then
+    echo "SSH services are disabled"
+    exit
+fi
+
 # Allow a few customizations from a config file
 test -r /etc/default/dropbear && . /etc/default/dropbear
 
 start() {
-	# reglinux
-	enabled="$(/usr/bin/system-settings-get system.ssh.enabled)"
-	if [ "$enabled" = "0" ]; then
-		echo "SSH services: disabled"
-		exit 0
-	fi
 
 	DROPBEAR_ARGS="$DROPBEAR_ARGS -R"
 
