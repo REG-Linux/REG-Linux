@@ -139,7 +139,7 @@ class Controller:
     name: str = ""
     inputs: Dict[str, Any] = field(default_factory=dict)
     type: str = ""
-    index: str = "-1"
+    index: int = -1
     dev: Optional[Any] = None
 
     @classmethod
@@ -149,7 +149,7 @@ class Controller:
             name=data.get("name", ""),
             inputs=data.get("inputs", {}),
             type=data.get("type", ""),
-            index=str(data.get("index", "-1")),
+            index=data.get("index", -1),
             dev=data.get("dev", None)
         )
 

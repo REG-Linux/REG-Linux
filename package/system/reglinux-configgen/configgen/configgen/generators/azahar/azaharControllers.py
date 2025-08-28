@@ -36,7 +36,7 @@ def setAzaharControllers(azaharConfig, playersControllers):
 
     for index in playersControllers:
         controller = playersControllers[index]
-        if controller.index != "1":
+        if controller.index != 0:
             continue
         for x in azaharButtons:
             azaharConfig.set("Controls", "profiles\\1\\" + x,
