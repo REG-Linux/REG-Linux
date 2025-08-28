@@ -18,7 +18,7 @@ def setMelondsControllers(melondsConfig, playersControllers):
     val = -1
     for controller, pad in sorted(playersControllers.items()):
         # Only use Player 1 controls
-        if pad.index != "1":
+        if pad.index != 0:
             continue
 
         # Handle controllers where guide and back buttons share the same code
