@@ -1,30 +1,23 @@
 from generators.Generator import Generator
 from Command import Command
-from configparser import RawConfigParser
-from os import path, makedirs
-from .azaharConfig import AZAHAR_BIN_PATH, AZAHAR_CONFIG_PATH, setAzaharConfig
+from settings import UnixSettings
+from .azaharConfig import setAzaharConfig, AZAHAR_BIN_PATH, AZAHAR_CONFIG_PATH
 from .azaharControllers import setAzaharControllers
 
-from utils.logger import get_logger
-eslog = get_logger(__name__)
 
 class AzaharGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+        # Load existing config or create a new one
+        azaharConfig = UnixSettings(AZAHAR_CONFIG_PATH)
 
-        azaharConfig = RawConfigParser(strict=False)
-        azaharConfig.optionxform=lambda optionstr: str(optionstr)
-
-        if path.exists(AZAHAR_CONFIG_PATH):
-            azaharConfig.read(AZAHAR_CONFIG_PATH)
-
+        # Update configuration
         setAzaharConfig(azaharConfig, system)
+        # TODO: Set controllers
         setAzaharControllers(azaharConfig, playersControllers)
 
-        if not path.exists(path.dirname(AZAHAR_CONFIG_PATH)):
-            makedirs(path.dirname(AZAHAR_CONFIG_PATH))
-        with open(AZAHAR_CONFIG_PATH, 'w') as configfile:
-            azaharConfig.write(configfile)
+        # Save the updated configuration
+        azaharConfig.write()  # UnixSettings method
 
         commandArray = [AZAHAR_BIN_PATH, rom]
         return Command(array=commandArray)
