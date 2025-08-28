@@ -3,7 +3,7 @@
 # libretro-applewin
 #
 ################################################################################
-# Version: Commits on Aug 3, 2025
+# Version: Commits on Aug 24, 2025
 LIBRETRO_APPLEWIN_VERSION = $(APPLEWIN_VERSION)
 LIBRETRO_APPLEWIN_SITE = https://github.com/audetto/AppleWin
 LIBRETRO_APPLEWIN_SITE_METHOD=git
@@ -17,21 +17,15 @@ LIBRETRO_APPLEWIN_SUPPORTS_IN_SOURCE_BUILD = NO
 LIBRETRO_APPLEWIN_CONF_OPTS  = -DCMAKE_BUILD_TYPE=Release
 LIBRETRO_APPLEWIN_CONF_OPTS += -DBUILD_SA2=OFF
 LIBRETRO_APPLEWIN_CONF_OPTS += -DBUILD_LIBRETRO=ON
-
-# TODO libretro core build as static
-# fails on minizip.a (-fPIC issue)
-#LIBRETRO_APPLEWIN_CONF_OPTS += -DSTATIC_LINKING=ON
-
-ifeq ($(BR2_PACKAGE_HAS_OPENGL),y)
-LIBRETRO_APPLEWIN_CONF_OPTS += -DSA2_OPENGL=ON
-else
-LIBRETRO_APPLEWIN_CONF_OPTS += -DSA2_OPENGL=OFF
-endif
+LIBRETRO_APPLEWIN_CONF_OPTS += -DSTATIC_LINKING=ON
 
 define LIBRETRO_APPLEWIN_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/lib/libretro
     $(INSTALL) -D $(@D)/buildroot-build/source/frontends/libretro/applewin_libretro.so \
         $(TARGET_DIR)/usr/lib/libretro/
+    mkdir -p $(TARGET_DIR)/usr/share/libretro/info
+    $(INSTALL) -D $(@D)/source/frontends/libretro/info/applewin_libretro.info \
+        $(TARGET_DIR)/usr/share/libretro/info
     mkdir -p $(TARGET_DIR)/usr/share/applewin
     cp -R $(@D)/resource/* $(TARGET_DIR)/usr/share/applewin/
     rm $(TARGET_DIR)/usr/share/applewin/resource.h
