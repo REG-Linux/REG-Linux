@@ -1,9 +1,6 @@
 from os import path, mkdir, remove
 from xml.etree.cElementTree import SubElement, Element, ElementTree, indent
 
-from utils.logger import get_logger
-eslog = get_logger(__name__)
-
 def setControllerConfig(system, playersControllers, profilesDir):
 
     # -= Wii U controller types =-

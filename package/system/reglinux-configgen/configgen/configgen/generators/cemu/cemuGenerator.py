@@ -4,8 +4,9 @@ from codecs import open
 from xml.dom import minidom
 from os import path, mkdir, linesep
 from glob import iglob, escape
-from .cemuConfig import CEMU_BIN_PATH, CEMU_BIOS_DIR, CEMU_CONFIG_DIR, CEMU_SAVES_DIR, CEMU_CONFIG_PATH, CEMU_PROFILES_DIR, setCemuConfig
+from controllers import generate_sdl_controller_config
 from .cemuControllers import setControllerConfig
+from .cemuConfig import CEMU_BIN_PATH, CEMU_BIOS_DIR, CEMU_CONFIG_DIR, CEMU_SAVES_DIR, CEMU_CONFIG_PATH, CEMU_PROFILES_DIR, setCemuConfig
 
 from utils.logger import get_logger
 eslog = get_logger(__name__)
@@ -62,4 +63,9 @@ class CemuGenerator(Generator):
         setControllerConfig(system, playersControllers, CEMU_PROFILES_DIR)
 
         commandArray = [CEMU_BIN_PATH, "-f", "--force-no-menubar", "-g", rpxrom]
-        return Command(array=commandArray)
+
+        return Command(
+                    array=commandArray,
+                    env={
+                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                    })
