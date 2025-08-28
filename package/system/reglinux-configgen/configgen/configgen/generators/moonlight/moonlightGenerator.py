@@ -1,9 +1,12 @@
 from generators.Generator import Generator
 from Command import Command
-from os import path
+from os import path, makedirs
+from shutil import copy
 from systemFiles import CONF
+from settings import UnixSettings
 from controllers import generate_sdl_controller_config
-from .moonlightConfig import setMoonlightConfig, MOONLIGHT_BIN_PATH, MOONLIGHT_GAMELIST_PATH, MOONLIGHT_STAGING_CONFIG_PATH
+from .moonlightConfig import (setMoonlightConfig, MOONLIGHT_BIN_PATH, MOONLIGHT_GAMELIST_PATH,
+    MOONLIGHT_STAGING_CONFIG_PATH, MOONLIGHT_CONFIG_DIR, MOONLIGHT_CONFIG_PATH)
 
 class MoonlightGenerator(Generator):
 
@@ -13,7 +16,22 @@ class MoonlightGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        setMoonlightConfig(system)
+        if not path.exists(MOONLIGHT_CONFIG_DIR + '/staging'):
+            makedirs(MOONLIGHT_CONFIG_DIR + '/staging')
+
+        # If user made config file exists, copy to staging directory for use
+        if path.exists(MOONLIGHT_CONFIG_PATH):
+            copy(MOONLIGHT_CONFIG_PATH, MOONLIGHT_STAGING_CONFIG_PATH)
+
+        # Load the config file
+        moonlightConfig = UnixSettings(MOONLIGHT_STAGING_CONFIG_PATH, separator=' ')
+
+        # Set the config options
+        setMoonlightConfig(moonlightConfig, system)
+
+        # Save the config file
+        moonlightConfig.write()
+
         gameName,confFile = self.getRealGameNameAndConfigFile(rom)
         commandArray = [MOONLIGHT_BIN_PATH, 'stream','-config',  confFile]
         commandArray.append('-app')

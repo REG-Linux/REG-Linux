@@ -1,7 +1,7 @@
-import os
+from os import path
 from controllers import Input
 from xml.dom import minidom
-from . import mupenConfig
+from .mupenConfig import MUPEN_MAPPING_USER_PATH, MUPEN_MAPPING_SYSTEM_PATH
 
 # Must read :
 # http://mupen64plus.org/wiki/index.php?title=Mupen64Plus_Plugin_Parameters
@@ -28,8 +28,8 @@ valid_n64_controller_names = [
 def getMupenMapping(use_n64_inputs):
     # load system values and override by user values in case some user values are missing
     map = dict()
-    for file in [mupenConfig.mupenMappingSystem, mupenConfig.mupenMappingUser]:
-        if os.path.exists(file):
+    for file in [MUPEN_MAPPING_SYSTEM_PATH, MUPEN_MAPPING_USER_PATH]:
+        if path.exists(file):
             dom = minidom.parse(file)
             list_name = 'n64InputList' if use_n64_inputs else 'defaultInputList'
             for inputs in dom.getElementsByTagName(list_name):
