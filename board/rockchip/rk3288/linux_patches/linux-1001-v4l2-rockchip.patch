@@ -385,8 +385,8 @@ diff --git a/drivers/media/platform/verisilicon/rockchip_vpu_hw.c b/drivers/medi
 index 8de6fd2e8eef..002b1a600f93 100644
 --- a/drivers/media/platform/verisilicon/rockchip_vpu_hw.c
 +++ b/drivers/media/platform/verisilicon/rockchip_vpu_hw.c
-@@ -15,7 +15,8 @@
- #include "rockchip_vpu2_regs.h"
+@@ -16,7 +16,8 @@
+ #include "rockchip_vpu981_regs.h"
  
  #define RK3066_ACLK_MAX_FREQ (300 * 1000 * 1000)
 -#define RK3288_ACLK_MAX_FREQ (400 * 1000 * 1000)
