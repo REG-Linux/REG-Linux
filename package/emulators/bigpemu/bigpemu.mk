@@ -23,11 +23,14 @@ BIGPEMU_SOURCE = BigPEmu_$(BIGPEMU_ARCH)_$(BIGPEMU_VERSION).tar.gz
 define BIGPEMU_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bigpemu
 	cp -pr $(@D)/* $(TARGET_DIR)/usr/bigpemu/
-
-	# evmap config
-	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/bigpemu/evmap/* \
-	    $(TARGET_DIR)/usr/share/evmapy
 endef
+
+define BIGPEMU_EVMAP
+	mkdir -p $(TARGET_DIR)/usr/share/evmapy
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/bigpemu/evmapy/* \
+		$(TARGET_DIR)/usr/share/evmapy
+endef
+
+BIGPEMU_POST_INSTALL_TARGET_HOOKS = BIGPEMU_EVMAP
 
 $(eval $(generic-package))
