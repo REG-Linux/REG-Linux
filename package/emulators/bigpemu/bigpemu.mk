@@ -23,9 +23,10 @@ BIGPEMU_SOURCE = BigPEmu_$(BIGPEMU_ARCH)_$(BIGPEMU_VERSION).tar.gz
 define BIGPEMU_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/bigpemu
 	cp -pr $(@D)/* $(TARGET_DIR)/usr/bigpemu/
+
 	# evmap config
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/bigpemu/jaguar.bigpemu.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/bigpemu/evmap/* \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
