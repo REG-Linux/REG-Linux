@@ -1,102 +1,15 @@
---- a/src/osdep/amiberry.cpp	2024-04-27 14:43:54.983411996 +0200
-+++ b/src/osdep/amiberry.cpp	2024-04-27 14:55:30.996331192 +0200
-@@ -2869,22 +2869,22 @@
+diff --git a/src/osdep/amiberry.cpp b/src/osdep/amiberry.cpp
+index d3ed355..6384193 100644
+--- a/src/osdep/amiberry.cpp
++++ b/src/osdep/amiberry.cpp
+@@ -4398,8 +4398,8 @@ static bool locate_amiberry_conf(const bool portable_mode)
+ 		if (!my_existsdir(xdg_config_home.c_str()))
+ 			my_mkdir(xdg_config_home.c_str());
  
- std::string get_data_path()
- {
--	return fix_trailing(data_dir);
-+	return std::string("/usr/share/amiberry/data/");
- }
- 
- void get_saveimage_path(char* out, const int size, int dir)
- {
--	_tcsncpy(out, fix_trailing(saveimage_dir).c_str(), size - 1);
-+	strncpy(out, "/userdata/saves/amiga/", size - 1);
- }
- 
- std::string get_configuration_path()
- {
--	return fix_trailing(config_path);
-+	return std::string("/userdata/system/configs/amiberry/conf/");
- }
- 
- void get_configuration_path(char* out, const int size)
- {
--	_tcsncpy(out, fix_trailing(config_path).c_str(), size - 1);
-+	strncpy(out, "/userdata/system/configs/amiberry/conf/", size - 1);
- }
- 
- void set_configuration_path(const std::string& newpath)
-@@ -2959,7 +2959,7 @@
- 
- std::string get_controllers_path()
- {
--	return fix_trailing(controllers_path);
-+	return std::string("/userdata/system/configs/amiberry/conf/retroarch/autoconfig/");
- }
- 
- void set_controllers_path(const std::string& newpath)
-@@ -3007,7 +3007,7 @@
- 
- std::string get_whdbootpath()
- {
--	return fix_trailing(whdboot_path);
-+	return std::string("/usr/share/amiberry/whdboot/");
- }
- 
- void set_whdbootpath(const std::string& newpath)
-@@ -3056,7 +3056,7 @@
- 		_tcsncpy(out, path_statefile, size);
- 		return;
+-		amiberry_conf_file = xdg_config_home + "/amiberry.conf";
+-		amiberry_ini_file = xdg_config_home + "/amiberry.ini";
++		amiberry_conf_file = std::string("/userdata/system/configs/amiberry/conf/amiberry.conf");
++		amiberry_ini_file = std::string("/userdata/system/configs/amiberry/conf/amiberry.ini");
  	}
--	_tcsncpy(out, fix_trailing(savestate_dir).c_str(), size - 1);
-+	strncpy(out, "/userdata/saves/amiga/", size - 1);
+ 	return my_existsfile2(amiberry_conf_file.c_str());
  }
- 
- void fetch_ripperpath(TCHAR* out, const int size)
-@@ -3107,7 +3107,7 @@
- 
- std::string get_screenshot_path()
- {
--	return fix_trailing(screenshot_dir);
-+	return std::string("/userdata/screenshots/");
- }
- 
- void get_video_path(char* out, int size)
-@@ -3490,20 +3490,20 @@
- 
- 	// Paths
- 	write_string_option("config_path", config_path);
--	write_string_option("controllers_path", controllers_path);
--	write_string_option("retroarch_config", retroarch_file);
-+	write_string_option("controllers_path", "/userdata/system/configs/amiberry/conf/retroarch/autoconfig/");
-+	write_string_option("retroarch_config", "/userdata/system/configs/amiberry/conf/retroarch/retroarchcustom.cfg");
- 	write_string_option("whdboot_path", whdboot_path);
- 	write_string_option("whdload_arch_path", whdload_arch_path);
- 	write_string_option("floppy_path", floppy_path);
- 	write_string_option("harddrive_path", harddrive_path);
- 	write_string_option("cdrom_path", cdrom_path);
--	write_string_option("logfile_path", logfile_path);
--	write_string_option("rom_path", rom_path);
-+	write_string_option("logfile_path", "/userdata/system/logs/amiberry.log");
-+	write_string_option("rom_path", "/userdata/bios/amiga/");
- 	write_string_option("rp9_path", rp9_path);
- 	write_string_option("floppy_sounds_dir", floppy_sounds_dir);
--	write_string_option("saveimage_dir", saveimage_dir);
--	write_string_option("savestate_dir", savestate_dir);
--	write_string_option("screenshot_dir", screenshot_dir);
-+	write_string_option("saveimage_dir", "/userdata/saves/amiga/");
-+	write_string_option("savestate_dir", "/userdata/saves/amiga/");
-+	write_string_option("screenshot_dir", "/userdata/screenshots/");
- 	write_string_option("ripper_path", ripper_path);
- 	write_string_option("inputrecordings_dir", input_dir);
- 	write_string_option("nvram_dir", nvram_dir);
-@@ -4216,7 +4216,7 @@
- 	harddrive_path.append("/harddrives/");
- 	cdrom_path.append("/cdroms/");
- 	logfile_path.append("/amiberry.log");
--	rom_path.append("/roms/");
-+	rom_path = "/userdata/bios/amiga/";
- 	rp9_path.append("/rp9/");
- 	saveimage_dir.append("/");
- 	savestate_dir.append("/savestates/");

@@ -1,28 +1,17 @@
 from generators.Generator import Generator
 from Command import Command
 from zipfile import ZipFile
-from os import path, makedirs, chdir
-from settings import UnixSettings
-from systemFiles import CONF
-
-AMIBERRY_DIR = CONF + '/amiberry'
-AMIBERRY_INPUTS_DIR = AMIBERRY_DIR + '/conf/retroarch/autoconfig'
-AMIBERRY_CONFIG_PATH = AMIBERRY_DIR + '/conf/retroarch/retroarchcustom.cfg'
-AMIBERRY_SHARE_DIR = '/usr/share/amiberry'
-AMIBERRY_BIN_PATH = '/usr/bin/amiberry'
-
-from utils.logger import get_logger
-eslog = get_logger(__name__)
+from os import path
+from controllers import generate_sdl_controller_config
+from .amiberryConfig import setAmiberryConfig, AMIBERRY_BIN_PATH
 
 class AmiberryGenerator(Generator):
 
     def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        retroconfig = UnixSettings(AMIBERRY_CONFIG_PATH, separator=' ')
-        if not path.exists(path.dirname(AMIBERRY_CONFIG_PATH)):
-            makedirs(path.dirname(AMIBERRY_CONFIG_PATH))
+        # setting up amiberry config file
+        setAmiberryConfig(system)
 
         romType = self.getRomType(rom)
-        eslog.debug("romType: "+romType)
         if romType != 'UNKNOWN' :
             commandArray = [ AMIBERRY_BIN_PATH, "-G" ]
             if romType != 'WHDL' :
@@ -53,33 +42,6 @@ class AmiberryGenerator(Generator):
                 # Use disk folder as floppy path
                 romPathIndex = rom.rfind('/')
                 commandArray.append("amiberry.floppy_path="+rom[0:romPathIndex])
-
-            retroconfig.write()
-
-            if not path.exists(AMIBERRY_INPUTS_DIR):
-                makedirs(AMIBERRY_INPUTS_DIR)
-            nplayer = 1
-            for playercontroller, pad in sorted(playersControllers.items()):
-                replacements = {'_player' + str(nplayer) + '_':'_'}
-                # amiberry remove / included in pads names like "USB Downlo01.80 PS3/USB Corded Gamepad"
-                padfilename = pad.name.replace("/", "")
-                playerInputFilename = AMIBERRY_INPUTS_DIR + "/" + padfilename + ".cfg"
-                with open(AMIBERRY_CONFIG_PATH) as infile, open(playerInputFilename, 'w') as outfile:
-                    for line in infile:
-                        for src, target in replacements.items():
-                            newline = line.replace(src, target)
-                            if not newline.isspace():
-                                outfile.write(newline)
-                if nplayer == 1: # 1 = joystick port
-                    commandArray.append("-s")
-                    commandArray.append("joyport1_friendlyname=" + padfilename)
-                    if romType == 'CD' :
-                        commandArray.append("-s")
-                        commandArray.append("joyport1_mode=cd32joy")
-                if nplayer == 2: # 0 = mouse for the player 2
-                    commandArray.append("-s")
-                    commandArray.append("joyport0_friendlyname=" + padfilename)
-                nplayer += 1
 
             # fps
             if system.config['showFPS'] == 'true':
@@ -169,8 +131,12 @@ class AmiberryGenerator(Generator):
             commandArray.append("-s")
             commandArray.append("sound_frequency=48000")
 
-            chdir(AMIBERRY_SHARE_DIR)
-            return Command(array=commandArray)
+            return Command(
+                        array=commandArray,
+                        env={
+                            'XDG_DATA_HOME': '/userdata/system/configs/',
+                            'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
+                        })
         # otherwise, unknown format
         return Command(array=[])
 
@@ -235,7 +201,6 @@ class AmiberryGenerator(Generator):
                         if extension == "info":
                             return 'WHDL'
                         elif extension == 'lha' :
-                            eslog.warning("Amiberry doesn't support .lha inside a .zip")
                             return 'UNKNOWN'
                         elif extension == 'adf' :
                             return 'DISK'
