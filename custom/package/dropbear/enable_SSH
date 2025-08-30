@@ -1,0 +1,19 @@
+#!/bin/bash
+case "$1" in
+  start|stop|restart|reload)
+    ;;
+  status)
+    [ "$(/usr/bin/system-settings-get system.ssh.enabled)" = "0" ] && echo "SSH status: disabled" || echo "SSH status: enabled"
+    ;;
+  enabled)
+      /usr/bin/system-settings-set system.ssh.enabled 1
+      /etc/init.d/S50dropbear start
+    ;;
+  disabled)
+      /etc/init.d/S50dropbear stop
+      /usr/bin/system-settings-set system.ssh.enabled 0
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|reload|enabled|disabled|status}"
+    exit 1
+esac
