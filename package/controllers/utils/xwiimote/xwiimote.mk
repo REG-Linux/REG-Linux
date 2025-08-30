@@ -4,10 +4,9 @@
 #
 ################################################################################
 
-XWIIMOTE_VERSION = f2be57e24fc24652308840cec2ed702b9d1138df
-XWIIMOTE_SITE = $(call github,dvdhrm,xwiimote,$(XWIIMOTE_VERSION))
+XWIIMOTE_VERSION = v3.0.1
+XWIIMOTE_SITE = $(call github,dev-0x7C6,xwiimote-ng,$(XWIIMOTE_VERSION))
 
 XWIIMOTE_DEPENDENCIES = udev ncurses
-XWIIMOTE_AUTORECONF = YES
 
-$(eval $(autotools-package))
+$(eval $(cmake-package))
