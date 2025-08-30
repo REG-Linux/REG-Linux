@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# 93wsdd - init.d script for WSDD on REG-Linux
+# S93wsdd - init.d script for WSDD on REG-Linux
 # "I haven't written a straight init.d script in 2 decades" Edition
 # (c) 2023 Jay Moore - dewdude@pickmy.org - Now With More Gross Hacks!
 # Distributed under the terms of the MIT license
@@ -23,33 +23,20 @@ fi
 
 # Function that starts the daemon/service
 do_start() {
-    securityenabled="$(/usr/bin/system-settings-get system.security.enabled)"
-    if [ "$securityenabled" = "1" ]; then
-        SMB_CONFIG_FILE="/etc/samba/smb-secure.conf"
+    if [ "$(/usr/bin/system-settings-get system.security.enabled)" = "1" ]; then
+        SMB_CONFIG_FILE="/etc/ksmbd/ksmbd-secure.conf"
     else
-        SMB_CONFIG_FILE="/etc/samba/smb.conf"
+        SMB_CONFIG_FILE="/etc/ksmbd/ksmbd.conf"
     fi
 
     # wssd-native requires username, use root
     OPTS="-U root"
     # wssd-native needs to be run as unix daemon
     OPTS="--unixd ${OPTS}"
+    # location of samba.conf workgroup etc. information from
+    OPTS="${OPTS} --log-file ${LOG_FILE} --smb-conf ${SMB_CONFIG_FILE}"
 
-    # try to extract workgroup with Samba's testparm
-    if which testparm >/dev/null 2>/dev/null; then
-        GROUP="$(testparm -s --parameter-name workgroup "${SMB_CONFIG_FILE}" 2>/dev/null)"
-    fi
-
-    # fallback to poor man's approach if testparm is unavailable or failed for some reason
-    if [ -z "$GROUP" ] && [ -r "${SMB_CONFIG_FILE}" ]; then
-       GROUP="$(grep -i '^\s*workgroup\s*=' ${SMB_CONFIG_FILE} | cut -f2 -d= | tr -d '[:blank:]')"
-    fi
-
-    if [ -n "${GROUP}" ]; then
-        OPTS="-W ${GROUP} ${OPTS}"
-    fi
-
-    start-stop-daemon --start --background --make-pidfile --pidfile "${PIDFILE}" --output "${LOG_FILE}" --exec ${DAEMON} -- ${OPTS}
+    start-stop-daemon --start --background --make-pidfile --pidfile "${PIDFILE}" --exec "${DAEMON}" -- ${OPTS}
 }
 
 # Function that stops the daemon/service
@@ -86,8 +73,6 @@ case "$1" in
         exit 3
         ;;
 esac
-
-exit 0
 
 
 #MIT License

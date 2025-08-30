@@ -81,6 +81,12 @@ do_enable() {
     else
         /usr/bin/system-settings-set system.services "${1}"
     fi
+
+    # Inform service it was enabled in case it needs to do something about it
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
+        while read SERVICE; do
+            bash "${SERVICE}" enabled
+        done
 }
 
 do_disable() {
@@ -103,6 +109,11 @@ do_disable() {
         done
         if test "${JDONE}" = 1; then
             /usr/bin/system-settings-set system.services "${NEW_ENABLED_SERVICES}"
+            # Inform service it was disabled in case it needs to do something about it
+            find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
+                while read SERVICE; do
+                    bash "${SERVICE}" disabled
+                done
         fi
    fi
 }
