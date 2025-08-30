@@ -1,7 +1,7 @@
 # Paths used throughout the REG-Linux system for configurations, assets, and user data
 
 # Default system configuration path (read-only base)
-HOME_INIT = '/usr/share/reglinux/datainit/system/'
+HOME_INIT = '/usr/share/reglinux/datainit/system'
 
 # Writable user system path
 HOME = '/userdata/system'
@@ -16,7 +16,7 @@ RECORDINGS = '/userdata/recordings'    # Directory to save video recordings
 BIOS = '/userdata/bios'                # BIOS files directory (used by emulators)
 OVERLAYS = '/userdata/overlays'        # Overlay images directory (custom visuals/UI)
 ROMS = '/userdata/roms'                # Game ROMs directory
-SAVES = '/userdata/saves/'             # Save files directory
+SAVES = '/userdata/saves'             # Save files directory
 CHEATS = '/userdata/cheats'            # Game Cheats diretory
 
 # EmulationStation related configuration files and metadata
@@ -27,7 +27,7 @@ ES_GAMES_METADATA = '/usr/share/emulationstation/resources/gamesdb.xml'   # Gene
 
 # Global system configuration and logs
 SYSTEM_CONF = HOME + '/system.conf'  # System-wide configuration file
-LOGDIR = HOME + '/logs/'             # Directory where log files are stored
+LOGDIR = HOME + '/logs'             # Directory where log files are stored
 
 # Overlay decoration paths
 OVERLAY_SYSTEM = '/usr/share/reglinux/datainit/decorations'  # Default overlays (read-only)

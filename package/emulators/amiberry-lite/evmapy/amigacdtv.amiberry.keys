@@ -1,6 +1,18 @@
 {
     "actions_player1": [
         {
+            "trigger": ["hotkey", "b"],
+            "type": "key",
+            "target": "KEY_F12",
+            "description": "Configuration menu"
+        },
+        {
+            "trigger": ["hotkey", "start"],
+            "type": "key",
+            "target": "KEY_ESC",
+            "description": "Exit the emulator"
+        },
+        {
             "trigger": "joystick2",
             "type": "mouse"
         },
