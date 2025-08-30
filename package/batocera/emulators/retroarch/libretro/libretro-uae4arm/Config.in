@@ -4,6 +4,7 @@ config BR2_PACKAGE_LIBRETRO_UAE4ARM
 	select BR2_PACKAGE_ZLIB
 	select BR2_PACKAGE_FLAC
 	select BR2_PACKAGE_MPG123
+	select BR2_PACKAGE_LIBEXECINFO if BR2_TOOLCHAIN_USES_MUSL 
         help
           A libretro AMIGA emulator core optimized for ARM.
 
