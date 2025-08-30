@@ -1,0 +1,15 @@
+diff --git a/package/dropbear/dropbear.mk b/package/dropbear/dropbear.mk
+index d57d6b6e37..59831759f1 100644
+--- a/package/dropbear/dropbear.mk
++++ b/package/dropbear/dropbear.mk
+@@ -108,8 +108,8 @@ endef
+ 
+ ifeq ($(BR2_USE_MMU),y)
+ define DROPBEAR_INSTALL_INIT_SYSV
+-	$(INSTALL) -D -m 755 package/dropbear/S50dropbear \
+-		$(TARGET_DIR)/etc/init.d/S50dropbear
++	$(INSTALL) -D -m 755 package/dropbear/S50dropbear $(TARGET_DIR)/etc/init.d/S50dropbear
++	$(INSTALL) -D -m 755 package/dropbear/enable_SSH $(TARGET_DIR)/usr/share/reglinux/services/enable_SSH
+ endef
+ else
+ define DROPBEAR_DISABLE_STANDALONE

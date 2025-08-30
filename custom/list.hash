@@ -4,10 +4,12 @@
 #   * a line of minus signs ('-') indicates a file that we remove from Buildroot external tree
 #   * a line of plus signs ('+') indicates a file that we add to the Buildroot external tree
 
+++++++++++++++++++++++++++++++++  package/dropbear/enable_SSH
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm-cmake/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm/001-fix-llvm-cmake-path.patch
+++++++++++++++++++++++++++++++++  package/nfs-utils/enable_NFS
 ++++++++++++++++++++++++++++++++  package/pkg-rust.mk
 ++++++++++++++++++++++++++++++++  package/python-pyelftools/Config.in.host
 ++++++++++++++++++++++++++++++++  package/python-pylibfdt/Config.in.host
@@ -44,6 +46,7 @@ e2ea7480adb24a94f8ab05fd6110697e  package/dbus-broker/dbus-broker.mk
 62f04719035a96fab36b5d7a7b00446b  package/dbus-broker/dbus.socket
 be9ae1e921bac6ef8e7be5d99a56690f  package/dbus-broker/system.conf
 c445390118f5d058dd372a8b2beb25a8  package/dropbear/S50dropbear
+3e2a4b6edeb4427320a8a3246ed68e36  package/dropbear/dropbear.mk
 86c04ec68a28da8040820ff495bda9dd  package/espeak/espeak.mk
 c6c7f5c1c993565d557fd227edb4bfc7  package/flac/flac.mk
 e24ebf071724201f2a2ad92758bf98c7  package/fmt/fmt.hash
@@ -84,6 +87,8 @@ ae97257be7c5efb404d095b4c3599eec  package/mesa3d/Config.in
 d1a6a6a480feea18e590e62dfc47b3ab  package/mesa3d/mesa3d.mk
 3599911b0b68912bc945c3efbc223dbc  package/mono/Config.in
 ad422751e4a60689e4198ccf4441ae25  package/ncurses/ncurses.mk
+2f684e20c082c44254682f410206d01d  package/nfs-utils/S60nfs
+935d74c65f26325e3cad2e8de8c7be73  package/nfs-utils/nfs-utils.mk
 4aec3b9512408660528c3c04a1b76221  package/ntfs-3g/ntfs-3g.mk
 5469add2a569efa1603dfd2fbdab5f5e  package/opentyrian-data/Config.in
 7e501d1ce57a81b643283e62111b8c91  package/pcre2/Config.in

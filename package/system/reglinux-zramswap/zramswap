@@ -4,11 +4,6 @@
 ZRAM_DEV="/dev/zram0"
 ZRAM_CONF="/sys/block/zram0"
 SWAP_PRIORITY=32767  # Maximum priority to use zram first
-ZRAM_SIZE_FACTOR=0.6 # 60% of RAM for better performance
-
-# Compression algorithms prioritized for performance on weak hardware
-# LZ4 is fastest, LZO is second choice, avoid ZSTD/DEFLATE on low-end systems
-COMPRESSION_ALGOS=("lz4" "lzo")
 
 # Colors for colored output
 RED='\033[0;31m'
@@ -45,7 +40,7 @@ check_root() {
 get_optimal_compression() {
     # Get list of available compression algorithms from kernel
     local available_algos
-    available_algos=$(cat /sys/block/zram0/comp_algorithm 2>/dev/null | tr -d '[]' | tr ' ' '\n')
+    available_algos=$(cat "${ZRAM_CONF}/comp_algorithm" 2>/dev/null | tr -d '[]' | tr ' ' '\n')
 
     # Try algorithms in order of performance preference
     for algo in "${COMPRESSION_ALGOS[@]}"; do
@@ -59,34 +54,12 @@ get_optimal_compression() {
     echo "$available_algos" | head -n1
 }
 
-calculate_optimal_size() {
-    local total_mem_kb total_mem_gb zram_size_kb
-
-    total_mem_kb=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
-    total_mem_gb=$((total_mem_kb / 1024 / 1024))
-
-    # Optimized calculation based on total RAM
-    if [[ $total_mem_gb -ge 8 ]]; then
-        # Systems with 8GB+ can use more zram
-        zram_size_kb=$(echo "$total_mem_kb * 0.75" | bc | cut -d. -f1)
-    elif [[ $total_mem_gb -ge 4 ]]; then
-        # Medium systems (4-8GB)
-        zram_size_kb=$(echo "$total_mem_kb * $ZRAM_SIZE_FACTOR" | bc | cut -d. -f1)
-    else
-        # Low RAM systems (2-4GB)
-        zram_size_kb=$(echo "$total_mem_kb * 0.5" | bc | cut -d. -f1)
-    fi
-
-    echo "$zram_size_kb"
-}
-
 optimize_zram_params() {
-    local zram_dev="$1"
     local cpu_count
     cpu_count=$(nproc)
 
     # ZRAM-specific performance optimizations for weak hardware
-    if [[ -w /sys/block/zram0/max_comp_streams ]]; then
+    if [[ -w "${ZRAM_CONF}/max_comp_streams" ]]; then
         # Limit compression streams on weak hardware to avoid CPU overload
         local streams
         if [[ $cpu_count -le 2 ]]; then
@@ -97,19 +70,19 @@ optimize_zram_params() {
             streams=$cpu_count  # Full streams for stronger CPUs
         fi
 
-        echo "$streams" > /sys/block/zram0/max_comp_streams 2>/dev/null
+        echo "$streams" > "${ZRAM_CONF}/max_comp_streams" 2>/dev/null
         log_info "Compression streams set to $streams (optimized for $cpu_count cores)"
     fi
 
     # Configure I/O scheduler for better performance with zram
-    if [[ -w /sys/block/zram0/queue/scheduler ]]; then
-        echo "none" > /sys/block/zram0/queue/scheduler 2>/dev/null ||
-        echo "noop" > /sys/block/zram0/queue/scheduler 2>/dev/null
+    if [[ -w "${ZRAM_CONF}/queue/scheduler" ]]; then
+        echo "none" > "${ZRAM_CONF}/queue/scheduler" 2>/dev/null ||
+        echo "noop" > "${ZRAM_CONF}/queue/scheduler" 2>/dev/null
     fi
 
     # Reduce readahead for zram devices (optimization for SSD-like behavior)
-    if [[ -w /sys/block/zram0/queue/read_ahead_kb ]]; then
-        echo "4" > /sys/block/zram0/queue/read_ahead_kb 2>/dev/null
+    if [[ -w "${ZRAM_CONF}/queue/read_ahead_kb" ]]; then
+        echo "4" > "${ZRAM_CONF}/queue/read_ahead_kb" 2>/dev/null
     fi
 }
 
@@ -148,6 +121,19 @@ start() {
         exit 1
     fi
 
+    ZRAM_SIZE_FACTOR=$(/usr/bin/system-settings-get services.zramswap.sizefactor)
+    if [[ ! "$ZRAM_SIZE_FACTOR" =~ ^0.[0-9][0-9]*$ ]]; then
+        [[ -n "$ZRAM_SIZE_FACTOR" ]] && log_warning "'services.zramswap.sizefactor' has to be a decimal number less than 1"
+        log_info "Using default value services.zramswap.sizefactor=0.2"
+        ZRAM_SIZE_FACTOR=0.2
+    fi
+
+    COMPRESSION_ALGOS=($(/usr/bin/system-settings-get services.zramswap.algorithms))
+    if [[ -z "${COMPRESSION_ALGOS[*]}" ]]; then
+        COMPRESSION_ALGOS=("lz4" "lzo")
+        log_info "Using default algorithms: lz4, lzo"
+    fi
+
     # Set optimized compression algorithm
     local compression_algo
     compression_algo=$(get_optimal_compression)
@@ -161,7 +147,7 @@ start() {
 
     # Calculate optimized size
     local zram_size_kb
-    zram_size_kb=$(calculate_optimal_size)
+    zram_size_kb=$(echo "$(awk '/MemTotal/ {print $2}' /proc/meminfo) * $ZRAM_SIZE_FACTOR" | bc | cut -d. -f1)
 
     if ! echo "${zram_size_kb}K" > ${ZRAM_CONF}/disksize; then
         log_error "Failed to set zram disk size"
@@ -169,7 +155,7 @@ start() {
     fi
 
     # Apply specific optimizations
-    optimize_zram_params "$ZRAM_DEV"
+    optimize_zram_params
 
     # Format as swap
     if ! mkswap -L "zram-swap" ${ZRAM_DEV} >/dev/null 2>&1; then

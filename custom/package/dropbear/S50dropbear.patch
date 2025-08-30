@@ -1,17 +1,21 @@
 diff --git a/package/dropbear/S50dropbear b/package/dropbear/S50dropbear
-index 9474eaafaa..41b63d572e 100644
+index 9474eaafaa..335ea278f9 100644
 --- a/package/dropbear/S50dropbear
 +++ b/package/dropbear/S50dropbear
-@@ -7,6 +7,13 @@
+@@ -3,10 +3,17 @@
+ # Starts dropbear sshd.
+ #
+ 
++# REG-Linux
++if [ "$(/usr/bin/system-settings-get system.ssh.enabled)" = "0" ]; then
++    echo "SSH services are disabled"
++    exit
++fi
++
+ # Allow a few customizations from a config file
  test -r /etc/default/dropbear && . /etc/default/dropbear
  
  start() {
-+	# reglinux
-+	enabled="$(/usr/bin/system-settings-get system.ssh.enabled)"
-+	if [ "$enabled" = "0" ]; then
-+		echo "SSH services: disabled"
-+		exit 0
-+	fi
 +
  	DROPBEAR_ARGS="$DROPBEAR_ARGS -R"
  
