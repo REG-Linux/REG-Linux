@@ -1,0 +1,26 @@
+--- a/libretro/winui.c	2023-01-14 20:45:53.000000000 +0100
++++ b/libretro/winui.c	2023-08-15 22:47:28.789760455 +0200
+@@ -74,6 +74,10 @@
+ #define SLASH '/'
+ #endif
+ 
++#ifndef PATH_MAX
++#define PATH_MAX 4096
++#endif
++
+ uint8_t	Debug_Text=1, Debug_Grp=1, Debug_Sp=1;
+ 
+ char		filepath[MAX_PATH] = ".";
+--- a/libretro/windraw.c	2023-01-14 20:45:53.000000000 +0100
++++ b/libretro/windraw.c	2023-08-15 22:47:54.330352157 +0200
+@@ -39,6 +39,10 @@
+ #include "joystick.h"
+ #include "keyboard.h"
+ 
++#ifndef PATH_MAX
++#define PATH_MAX 4096
++#endif
++
+ #define		SCREEN_WIDTH		768
+ #define		FULLSCREEN_WIDTH	800
+ 

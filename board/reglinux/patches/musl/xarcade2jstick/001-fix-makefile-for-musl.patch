@@ -1,0 +1,11 @@
+--- a/src/Makefile	2025-08-28 14:18:11.873417844 +0200
++++ b/src/Makefile	2016-02-03 19:18:59.000000000 +0100
+@@ -2,7 +2,7 @@
+ CC=$(CROSS_COMPILE)gcc
+ SRCDIR=.
+ BUILDDIR=../build
+-CFLAGS=-c -Wall -O3
++CFLAGS=-c -Wall -O3 -D_TIME_BITS=64
+ LIBS=
+ TARGET := xarcade2jstick
+ SRCEXT := c
