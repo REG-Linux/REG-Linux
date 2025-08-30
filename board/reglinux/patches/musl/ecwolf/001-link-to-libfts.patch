@@ -1,0 +1,10 @@
+--- a/src/CMakeLists.txt	2024-05-28 03:14:17.099495816 +0200
++++ b/src/CMakeLists.txt	2024-05-28 03:14:28.787242592 +0200
+@@ -329,6 +329,7 @@
+ 	lzma
+ 	gdtoa
+ 	ZLIB::ZLIB
++	fts
+ )
+ target_include_directories(engine PRIVATE
+ 	${BZIP2_INCLUDE_DIR}
