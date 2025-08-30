@@ -4,7 +4,6 @@
 #
 ################################################################################
 
-# Release 5.8.10 on May 8, 2025
 AMIBERRY_LITE_VERSION = v5.8.10
 AMIBERRY_LITE_SITE = $(call github,BlitterStudio,amiberry-lite,$(AMIBERRY_LITE_VERSION))
 AMIBERRY_LITE_LICENSE = GPLv3
@@ -21,11 +20,9 @@ define AMIBERRY_LITE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/buildroot-build/amiberry-lite $(TARGET_DIR)/usr/bin/amiberry
 
 	# Create config and nvram directories, copy default config
-	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/conf
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/saves/amiga/nvram
-	# No conf file anymore
-	#cp -prn $(@D)/conf/amiberry.conf        $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/conf/
-	cp -prn $(@D)/controllers/gamecontrollerdb.txt $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/conf/
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/conf
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system/configs/amiberry/plugins
 
 	# Copy AROS (open source alternative BIOS)
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/amiga
@@ -36,19 +33,12 @@ define AMIBERRY_LITE_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/amiberry
 	cp -pr $(@D)/whdboot $(TARGET_DIR)/usr/share/amiberry/
 	cp -pr $(@D)/data $(TARGET_DIR)/usr/share/amiberry/
-
-	# No more plugins
-	#mkdir -p $(TARGET_DIR)/usr/share/amiberry/plugins
-	#$(INSTALL) -D $(@D)/buildroot-build/plugins/* $(TARGET_DIR)/usr/share/amiberry/plugins
+	cp -p $(@D)/data/AmigaTopaz.ttf $(TARGET_DIR)/usr/share/amiberry/data
 endef
 
 define AMIBERRY_LITE_EVMAP
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/amiberry-lite/controllers/amiga500.amiberry.keys \
-		$(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/amiberry-lite/controllers/amiga1200.amiberry.keys \
-		$(TARGET_DIR)/usr/share/evmapy
-	cp -prn $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/amiberry-lite/controllers/amigacd32.amiberry.keys \
+	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/amiberry-lite/evmapy/* \
 		$(TARGET_DIR)/usr/share/evmapy
 endef
 
