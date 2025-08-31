@@ -33,8 +33,8 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	# Doom 1/2 engines
 	# PrBoom (Doom)
 	select BR2_PACKAGE_LIBRETRO_PRBOOM		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
-	# GZDoom requires both 64-bit arch AND OpenGL or GLES 3.0
-	select BR2_PACKAGE_GZDOOM			if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3
+	# GZDoom requires both 64-bit arch AND OpenGL or GLES 3.0 (disable on musl so far)
+	select BR2_PACKAGE_GZDOOM			if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_TOOLCHAIN_USES_MUSL
 
 	# Doom 3 (source port)
 	select BR2_PACKAGE_DHEWM3			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
@@ -56,8 +56,8 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	# Note : needs work on gl4es patch (applying it only if no desktop GL support)
 	select BR2_PACKAGE_IOQUAKE3			if !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
 
-	# Raze requires both 64-bit arch AND OpenGL or GLES 3.0
-	select BR2_PACKAGE_RAZE				if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3
+	# Raze requires both 64-bit arch AND OpenGL or GLES 3.0 (musl not building so far)
+	select BR2_PACKAGE_RAZE				if BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_TOOLCHAIN_USES_MUSL
 
 	# CorsixTH (Theme Hospital engine)
 	select BR2_PACKAGE_CORSIXTH			if BR2_ARCH_IS_64

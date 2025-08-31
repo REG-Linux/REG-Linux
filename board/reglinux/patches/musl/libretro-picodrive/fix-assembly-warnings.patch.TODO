@@ -1,0 +1,170 @@
+diff -u -r a/cpu/cyclone/tools/idle.s b/cpu/cyclone/tools/idle.s
+--- a/cpu/cyclone/tools/idle.s	2025-05-31 16:14:07.000000000 +0200
++++ b/cpu/cyclone/tools/idle.s	2025-08-31 15:39:27.865454530 +0200
+@@ -31,6 +31,7 @@
+   .word (0x7dfe<<16) | 0x60fe, idle_detector_bcc8, idle_bra, Op6002  @ bra.s
+   .word (0x7dfc<<16) | 0x60fc, idle_detector_bcc8, idle_bra, Op6002  @ bra.s
+ 
++.section .note.GNU-stack,"",%progbits
+ 
+ .text
+ .align 2
+diff -u -r a/cpu/DrZ80/drz80.S b/cpu/DrZ80/drz80.S
+--- a/cpu/DrZ80/drz80.S	2025-05-31 16:14:07.000000000 +0200
++++ b/cpu/DrZ80/drz80.S	2025-08-31 15:39:27.859689343 +0200
+@@ -10,8 +10,12 @@
+ ;@ modified for support of undefined F register bits by irixxxx, passes ZEXALL with a hack for
+ ;@ BIT n,(HL), which is the only instruction needing support for the internal WZ register.
+ 
++.section .note.GNU-stack,"",%progbits
++
+ #include <pico/arm_features.h>
+ 
++.section .note.GNU-stack,"",%progbits
++
+       .data
+       .align 4
+ 
+@@ -144,7 +148,11 @@
+ 
+ ;@---------------------------------------
+ 
++.section .note.GNU-stack,"",%progbits
++
+ .text
++
++
+     PIC_LDR_INIT()
+ 
+ .if DRZ80_XMAP
+@@ -8341,5 +8349,7 @@
+ ;@end_loop:
+ ;@     b end_loop
+ 
++.section .note.GNU-stack,"",%progbits
++
+ ;@ vim:filetype=armasm
+ 
+diff -u -r a/pico/32x/draw_arm.S b/pico/32x/draw_arm.S
+--- a/pico/32x/draw_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/32x/draw_arm.S	2025-08-31 15:39:27.886528730 +0200
+@@ -589,4 +589,6 @@
+ make_do_loop_rl do_loop_rl_scan_md, 1, 1, 0
+ .pool
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/32x/memory_arm.S b/pico/32x/memory_arm.S
+--- a/pico/32x/memory_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/32x/memory_arm.S	2025-08-31 15:39:27.887186993 +0200
+@@ -285,4 +285,6 @@
+ 
+ .pool
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/carthw/svp/stub_arm.S b/pico/carthw/svp/stub_arm.S
+--- a/pico/carthw/svp/stub_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/carthw/svp/stub_arm.S	2025-08-31 15:39:27.894384010 +0200
+@@ -624,4 +624,6 @@
+ 
+ #endif
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/cd/memory_arm.S b/pico/cd/memory_arm.S
+--- a/pico/cd/memory_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/cd/memory_arm.S	2025-08-31 15:39:28.079417010 +0200
+@@ -813,4 +813,6 @@
+ 
+ .pool
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+Seulement dans b/pico/cd: misc_arm.o
+diff -u -r a/pico/cd/misc_arm.s b/pico/cd/misc_arm.s
+--- a/pico/cd/misc_arm.s	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/cd/misc_arm.s	2025-08-31 15:39:28.079663985 +0200
+@@ -76,4 +76,6 @@
+ 
+     ldmfd   sp!,{r4-r11,pc}
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/draw2_arm.S b/pico/draw2_arm.S
+--- a/pico/draw2_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/draw2_arm.S	2025-08-31 15:39:28.080981411 +0200
+@@ -980,4 +980,6 @@
+ 
+ .pool
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/draw_arm.S b/pico/draw_arm.S
+--- a/pico/draw_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/draw_arm.S	2025-08-31 15:39:28.081179096 +0200
+@@ -2438,4 +2438,6 @@
+     ldmfd   sp!, {r4-r6}
+     bx      lr
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/m68kif_cyclone.s b/pico/m68kif_cyclone.s
+--- a/pico/m68kif_cyclone.s	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/m68kif_cyclone.s	2025-08-31 15:39:28.081458921 +0200
+@@ -145,4 +145,6 @@
+     add     r0, r0, #2
+     bx      r2
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/memory_arm.S b/pico/memory_arm.S
+--- a/pico/memory_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/memory_arm.S	2025-08-31 15:39:28.082231357 +0200
+@@ -324,4 +324,6 @@
+ 
+ .pool
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+Seulement dans b/pico: misc_arm.o
+diff -u -r a/pico/misc_arm.s b/pico/misc_arm.s
+--- a/pico/misc_arm.s	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/misc_arm.s	2025-08-31 15:39:28.082576554 +0200
+@@ -109,4 +109,6 @@
+     ldmfd   sp!, {lr}
+     bx      lr
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+Seulement dans b/pico/sound: mix_arm.o
+diff -u -r a/pico/sound/mix_arm.S b/pico/sound/mix_arm.S
+--- a/pico/sound/mix_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/sound/mix_arm.S	2025-08-31 15:39:28.088582216 +0200
+@@ -603,4 +603,6 @@
+     .ds     8				@ filter history for left channel
+     .ds     8				@ filter history for right channel
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm
+diff -u -r a/pico/sound/ym2612_arm.S b/pico/sound/ym2612_arm.S
+--- a/pico/sound/ym2612_arm.S	2025-05-31 16:14:07.000000000 +0200
++++ b/pico/sound/ym2612_arm.S	2025-08-31 15:39:28.090142928 +0200
+@@ -898,4 +898,6 @@
+ 
+ .pool
+ 
++.section .note.GNU-stack,"",%progbits
++
+ @ vim:filetype=armasm

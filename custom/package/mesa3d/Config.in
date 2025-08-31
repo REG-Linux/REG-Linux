@@ -433,7 +433,6 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST
 	depends on BR2_arm || BR2_aarch64
 	depends on BR2_TOOLCHAIN_HAS_SYNC_4 # libxshmfence
 	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17 # memfd.h
-	depends on BR2_TOOLCHAIN_USES_GLIBC # ifunc, static_assert
 	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
 	help
 	  Vulkan driver for panfrost supported hardware.
@@ -441,8 +440,7 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST
 comment "panfrost vulkan needs a glibc toolchain w/ headers >= 3.17"
 	depends on BR2_arm || BR2_aarch64
 	depends on BR2_TOOLCHAIN_HAS_SYNC_4
-	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17 || \
-		!BR2_TOOLCHAIN_USES_GLIBC
+	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17
 
 comment "supported video codec"
 

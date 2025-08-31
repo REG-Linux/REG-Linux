@@ -1,0 +1,16 @@
+--- a/Makefile	2025-08-31 15:37:24.325568487 +0200
++++ b/Makefile	2025-08-31 15:36:13.715406821 +0200
+@@ -96,9 +99,11 @@
+ asm_memory ?= 1
+ asm_render ?= 1
+ asm_ym2612 ?= 1
+-asm_misc ?= 1
++# asm_misc to 1 => relocation error with musl (CONFIRMED)
++asm_misc ?= 0
+ asm_cdmemory ?= 1
+-asm_mix ?= 1
++# asm_mix to 1 => relocation error with musl (CONFIRMED)
++asm_mix ?= 0
+ asm_32xdraw ?= 1
+ asm_32xmemory ?= 1
+ else

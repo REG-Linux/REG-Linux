@@ -16,6 +16,9 @@
 ++++++++++++++++++++++++++++++++  package/python-setuptools-scm/Config.in.host
 ++++++++++++++++++++++++++++++++  package/spirv-llvm-translator/Config.in
 --------------------------------  package/llvm-project/libclc/0001-support-out-of-tree-build.patch
+--------------------------------  package/llvm-project/llvm/0001-ADT-Add-cstdint-to-SmallVector-101761.patch
+--------------------------------  package/llvm-project/llvm/0002-AMDGPU-Include-cstdint-in-AMDGPUMCTargetDesc-101766.patch
+--------------------------------  package/llvm-project/llvm/0003-Another-gcc-15-fix-from-Sam-James.patch
 --------------------------------  package/mesa3d/0001-meson-Set-proper-value-for-LIBCLC_INCLUDEDIR.patch
 --------------------------------  package/mesa3d/0002-vc4-add-meson-option-to-disable-optional-neon-suppor.patch
 f2484cdc4239f8323b2b3d7c4fb74469  Makefile
