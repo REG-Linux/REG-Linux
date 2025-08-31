@@ -1,0 +1,29 @@
+--- a/src/osdep/sigsegv_handler.cpp	2025-08-31 18:05:22.304253551 +0200
++++ b/src/osdep/sigsegv_handler.cpp	2025-08-31 18:07:06.209228302 +0200
+@@ -364,8 +364,13 @@
+ 
+ #ifndef __MACH__
+ 	mcontext_t* context = &(ucontext->uc_mcontext);
++#if defined(__GLIBC__)
+ 	unsigned long long* regs = context->regs;
+ #else
++	unsigned long* regs = context->regs;
++#endif
++
++#else
+ 	mcontext_t context = ucontext->uc_mcontext;
+ 	unsigned long long* regs = context->__ss.__x;
+ #endif
+@@ -475,8 +480,12 @@
+ 
+ #ifndef __MACH__
+ 	mcontext_t* context = &(ucontext->uc_mcontext);
++#if defined(__GLIBC__)
+ 	unsigned long long* regs = context->regs;
+ #else
++	unsigned long* regs = context->regs;
++#endif
++#else
+ 	mcontext_t context = ucontext->uc_mcontext;
+ 	unsigned long long* regs = context->__ss.__x;
+ #endif

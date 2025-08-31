@@ -9,6 +9,10 @@ EDUKE32_SITE = https://voidpoint.io/terminx/eduke32/-/archive/$(EDUKE32_VERSION)
 EDUKE32_DEPENDENCIES = sdl2 flac libvpx
 EDUKE32_LICENSE = GPL-2.0
 
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+EDUKE32_DEPENDENCIES += libexecinfo
+endif
+
 # Some build options are documented here:
 # https://wiki.eduke32.com/wiki/Building_EDuke32_on_Linux
 EDUKE32_BUILD_ARGS = STARTUP_WINDOW=0
@@ -17,6 +21,10 @@ EDUKE32_BUILD_ARGS += OPTOPT="-ffast-math"
 EDUKE32_BUILD_ARGS += USE_OPENGL=1
 EDUKE32_BUILD_ARGS += CFLAGS="$(TARGET_CFLAGS) -I$(STAGING_DIR)/usr/include/SDL2"
 EDUKE32_BUILD_ARGS += CXXFLAGS="$(TARGET_CXXFLAGS) -I$(STAGING_DIR)/usr/include/SDL2"
+
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+EDUKE32_BUILD_ARGS += LDFLAGS="$(TARGET_LDFLAGS) -lexecinfo"
+endif
 
 # Select OpenGL or OpenGL ES
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
