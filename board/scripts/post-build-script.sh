@@ -26,8 +26,10 @@ ln -sf "/userdata/system/ssh" "${TARGET_DIR}/etc/dropbear" || exit 1
 mkdir -p ${TARGET_DIR}/etc/emulationstation || exit 1
 ln -sf "/usr/share/emulationstation/es_systems.cfg" "${TARGET_DIR}/etc/emulationstation/es_systems.cfg" || exit 1
 ln -sf "/usr/share/emulationstation/themes"         "${TARGET_DIR}/etc/emulationstation/themes"         || exit 1
-mkdir -p "${TARGET_DIR}/usr/share/reglinux/datainit/cheats" || exit 1
-ln -sf "/userdata/cheats" "${TARGET_DIR}/usr/share/reglinux/datainit/cheats/custom" || exit 1
+
+# What was this cheats/custom for? Inherited from Batocera...
+# mkdir -p "${TARGET_DIR}/usr/share/reglinux/datainit/cheats" || exit 1
+# ln -sf "/userdata/cheats" "${TARGET_DIR}/usr/share/reglinux/datainit/cheats/custom" || exit 1
 
 # we have custom urandom scripts
 rm -f "${TARGET_DIR}/etc/init.d/S20urandom" || exit 1
@@ -84,9 +86,9 @@ if test -e "${TARGET_DIR}/etc/init.d/S45connman"
 then
     if test -e "${TARGET_DIR}/etc/init.d/S08connman"
     then
-	rm -f "${TARGET_DIR}/etc/init.d/S45connman" || exit 1
+        rm -f "${TARGET_DIR}/etc/init.d/S45connman" || exit 1
     else
-	mv "${TARGET_DIR}/etc/init.d/S45connman" "${TARGET_DIR}/etc/init.d/S08connman" || exit 1 # move to make before share
+        mv "${TARGET_DIR}/etc/init.d/S45connman" "${TARGET_DIR}/etc/init.d/S08connman" || exit 1 # move to make before share
     fi
 fi
 
@@ -150,7 +152,7 @@ python "${BR2_EXTERNAL_REGLINUX_PATH}/package/system/reglinux-scripts/scripts/sy
 
 # enable serial console
 SYSTEM_GETTY_PORT=$(grep "BR2_TARGET_GENERIC_GETTY_PORT" "${BR2_CONFIG}" | sed 's/.*\"\(.*\)\"/\1/')
-if ! [[ -z "${SYSTEM_GETTY_PORT}" ]]; then
+if [[ -n "${SYSTEM_GETTY_PORT}" ]]; then
     SYSTEM_GETTY_BAUDRATE=$(grep -E "^BR2_TARGET_GENERIC_GETTY_BAUDRATE_[0-9]*=y$" "${BR2_CONFIG}" | sed -e s+'^BR2_TARGET_GENERIC_GETTY_BAUDRATE_\([0-9]*\)=y$'+'\1'+)
     sed -i -e '/# GENERIC_SERIAL$/s~^.*#~S0::respawn:/sbin/getty -n -L -l /usr/bin/system-autologin '${SYSTEM_GETTY_PORT}' '${SYSTEM_GETTY_BAUDRATE}' vt100 #~' \
         ${TARGET_DIR}/etc/inittab
@@ -158,3 +160,16 @@ fi
 
 # make sure /etc/init.d scripts are executable
 chmod 755 "${TARGET_DIR}/etc/init.d"/S*
+
+# compress SHARE initialization files (/usr/share/reglinux/datainit)
+( cd "${TARGET_DIR}/usr/share/reglinux/datainit" || exit 1
+find -mindepth 1 -maxdepth 1 -type d -printf "%p/\n" 2>/dev/null
+find roms/ -mindepth 1 -maxdepth 1 -type d -printf "%p/\n" 2>/dev/null
+find system/ -mindepth 1 -maxdepth 1 -type d -printf "%p/\n" 2>/dev/null
+find roms/mame/mame2003/ \( -type f -o -xtype l \) 2>/dev/null
+find system/ \( -type f -o -xtype l \) -mindepth 1 -maxdepth 1 2>/dev/null
+) | sed 's|^\./||g' | sort -u >"${TARGET_DIR}/usr/share/reglinux/datainit.list"
+
+rm -f "${TARGET_DIR}/usr/share/reglinux/datainit.squashfs"
+mksquashfs "${TARGET_DIR}/usr/share/reglinux/datainit" "${TARGET_DIR}/usr/share/reglinux/datainit.squashfs" -comp zstd -all-root -no-recovery || exit 1
+
