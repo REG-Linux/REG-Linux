@@ -1,0 +1,10 @@
+--- a/src/ints/bios_vhd.cpp	2025-09-01 00:17:35.260427149 +0200
++++ b/src/ints/bios_vhd.cpp	2025-09-01 00:17:48.315298011 +0200
+@@ -20,6 +20,7 @@
+ #include <assert.h>
+ #include <stdlib.h>
+ #include <time.h>
++#include <limits.h>
+ #include "dosbox.h"
+ #include "callback.h"
+ #include "bios.h"
