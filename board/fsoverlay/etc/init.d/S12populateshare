@@ -2,63 +2,30 @@
 
 case "$1" in
     start)
-        IN=/usr/share/reglinux/datainit
-        OUT=/userdata
+        TOTALSTEPS=0
+        CURRENTSTEP=0
 
-        rm -f /tmp/updateuserdata.lst # Make sure we start with an empty list
-
-        # Directories deleted by user will be recreated when booting
-        # the user can delete the content or add its own files
-        # to reset the directory or update it, the user has to remove the directory
+        # Directories deleted by user will be recreated when booting.
+        # The user can delete the content or add its own files.
+        # To reset the directory or update it, the user has to remove the directory
         # (we are unable to differenciate new files from REG-linux update from a file removed by the user)
 
-        # Get a list of folders (or files) that do not yet exist in /userdata
-        grep -Fvx -f <(cd "$OUT" || exit; find ./ -mindepth 1 -maxdepth 1 -type d) <(cd "$IN" || exit; find ./ -mindepth 1 -maxdepth 1 -type d) >> /tmp/updateuserdata.lst
-
-        if [ -d "$OUT"/roms ]; then
-            grep -Fvx -f <(cd "$OUT" || exit; find ./roms -mindepth 1 -maxdepth 1 -type d) <(cd "$IN" || exit; find ./roms -mindepth 1 -maxdepth 1 -type d) >> /tmp/updateuserdata.lst
-        fi
-        if [ -d "$OUT"/roms/mame ]; then
-            mkdir -p "$OUT"/roms/mame/mame2003
-            grep -Fvx -f <(cd "$OUT" || exit; find ./roms/mame/mame2003 \( -type f -o -xtype l \)) <(cd "$IN" || exit; find ./roms/mame/mame2003 \( -type f -o -xtype l \)) >> /tmp/updateuserdata.lst
-        fi
-        if [ -d "$OUT"/system ]; then
-            grep -Fvx -f <(cd "$OUT" || exit; find ./system -mindepth 1 -maxdepth 1) <(cd "$IN" || exit; find ./system -mindepth 1 -maxdepth 1) >> /tmp/updateuserdata.lst
-        fi
-
-        # USUALLY ONLY NEW DIRECTORIES ARE UPDATED WHEN REG-LINUX IS UPDATED
-        # but sometimes we update _info.txt, readme.txt, bios or other files.
-        CURVERSION=$(cat /usr/share/reglinux/system.version)
-        SHAREVERSION=$(cat /userdata/system/data.version 2>/dev/null)
-
-        if [ "$CURVERSION" != "$SHAREVERSION" ]; then
-            cd "$IN" || exit
-
-            # Get everything, we'll use "cp -rfu"
-            # -maxdepth 3 because we need to look for ./roms/mame/mame2003/*folderswithgames*/_info.txt
-            if [ -d "$OUT"/roms ]; then
-                find ./roms -mindepth 1 -maxdepth 3 \( -type f -o -xtype l \) \( -iname "_info.txt" -o -iname "readme.txt" \) >> /tmp/updateuserdata.lst
+        while read -r files; do
+            if [[ -n "$files" ]] && [[ -e "/userdata/$files" ]]; then
+                EMPTYSHARE=n
+            else
+                LIST="$files $LIST"
             fi
+        done < /usr/share/reglinux/datainit.list
 
-            # Also update bios if needed
-            if [ -d "$OUT"/bios ]; then
-                find ./bios \( -type f -o -xtype l \) >> /tmp/updateuserdata.lst
-            fi
-            if [ -d "$OUT"/roms/iortcw ]; then
-                find ./roms/iortcw/main \( -type f -o -xtype l \) >> /tmp/updateuserdata.lst
-            fi
-
-            # And REG-linux system configs, services but do not update user settings.
-            if [ -d "$OUT"/system ]; then
-                find ./system \( -type f -o -xtype l \) \( ! -iname "es_settings.cfg" -a ! -iname "gamecontrollerdb.txt" -a ! -iname "system.conf" \) >> /tmp/updateuserdata.lst
-            fi
+        if [[ -n "$EMPTYSHARE" ]] && [[ "$(head -n1 /usr/share/reglinux/system.version 2>/dev/null)" != "$(head -n1 /userdata/system/data.version 2>/dev/null)" ]]; then
+            # Update some files but not overwrite user configs
+            LIST="$LIST '/roms/*/_info.txt' '*/readme.txt' 'bios/' 'roms/iortcw/main/' 'system/'"
+            EXCLUDELIST="-ex '... gamecontrollerdb.txt' '... system.conf' '... es_settings.cfg' \; "
         fi
 
-        CURRENTSTEP=0
-        TOTALSTEPS=$(grep -c ".*" /tmp/updateuserdata.lst 2>/dev/null || echo "0")
-        if [ "$TOTALSTEPS" -gt 0 ]; then
-
-            ((TOTALSTEPS+=4))           # Add the last steps to correctly show progress bar
+        if [[ -n "$LIST" ]]; then
+            ((TOTALSTEPS+=3))           # Add the last steps to correctly show progress bar
             ((CURRENTSTEP+=100))        # STEP * 100 for percentage
 
             # Start UPDATING splash
@@ -67,23 +34,26 @@ case "$1" in
             else
                 /usr/bin/plymouth change-mode --updates
             fi
-            /usr/bin/plymouth --show-splash
             /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
-            /usr/bin/plymouth display-message --text="Creating missing folders"
 
-            # Create needed folders in /userdata
-            sed 's#/[^/]*$##;/^\.$/d;s#^\./##' /tmp/updateuserdata.lst | sort -u |
-                while IFS= read -r SUBDIR; do
-                    mkdir -p "${OUT}/$SUBDIR"
-                done
+            mkdir -p /userdata/system/logs
+            if [[ -n "$EMPTYSHARE" ]]; then
+                /usr/bin/plymouth display-message --text="Updating BIOS and other files in /userdata"
+                echo "Updating BIOS and other files in /userdata" >/userdata/system/logs/extracted.files.log
+                echo "unsquashfs -f -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" >>/userdata/system/logs/extracted.files.log
+                echo >>/userdata/system/logs/extracted.files.log
+                eval "unsquashfs -f -i -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" &>>/userdata/system/logs/extracted.files.log
+            else
+                # Partition is "empty", just extract everything
+                /usr/bin/plymouth display-message --text="Extracting files to /userdata"
+                echo "Extracting files to /userdata" >/userdata/system/logs/extracted.files.log
+                echo "unsquashfs -f -d /userdata /usr/share/reglinux/datainit.squashfs" >>/userdata/system/logs/extracted.files.log
+                echo >>/userdata/system/logs/extracted.files.log
+                unsquashfs -f -i -d /userdata /usr/share/reglinux/datainit.squashfs &>>/userdata/system/logs/extracted.files.log
+            fi
 
-            # Copy files
-            while IFS= read -r FILE; do
-                ((CURRENTSTEP+=100))
-                /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
-                /usr/bin/plymouth display-message --text="Copying files: $FILE"
-                cp -rfu "${IN}/$FILE" "${OUT}/${FILE%/*}/"
-            done < <(sed 's#^\./##' /tmp/updateuserdata.lst)
+            # Save to avoid to redo some steps every boot
+            cp /usr/share/reglinux/system.version /userdata/system/data.version
 
             ((CURRENTSTEP+=100))
             /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
@@ -100,12 +70,10 @@ case "$1" in
         ln -sf /userdata/system/machine-id /var/lib/dbus/machine-id
         ln -sf /userdata/system/machine-id /etc/machine-id
 
-        # Save to avoid to redo some steps every boot
-        [ "$CURVERSION" != "$SHAREVERSION" ] && cp /usr/share/reglinux/system.version /userdata/system/data.version
-
         # call user script with start condition
         if [ -e /boot/postshare.sh ]; then
             if [ "$TOTALSTEPS" -gt 0 ]; then
+                ((TOTALSTEPS++))
                 ((CURRENTSTEP+=100))
                 /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
                 /usr/bin/plymouth display-message --text="Running postshare script"
