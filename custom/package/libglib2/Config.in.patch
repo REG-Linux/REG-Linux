@@ -1,0 +1,13 @@
+diff --git a/package/libglib2/Config.in b/package/libglib2/Config.in
+index 393a7f4405..a875203da7 100644
+--- a/package/libglib2/Config.in
++++ b/package/libglib2/Config.in
+@@ -12,7 +12,7 @@ config BR2_PACKAGE_LIBGLIB2
+ 	help
+ 	  Low-level core library that forms the basis of GTK+ and GNOME.
+ 
+-	  http://www.gtk.org/
++	  https://www.gtk.org/
+ 
+ comment "libglib2 needs a toolchain w/ wchar, threads"
+ 	depends on BR2_USE_MMU
