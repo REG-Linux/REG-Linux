@@ -1,0 +1,11 @@
+diff --git a/package/libglib2/libglib2.hash b/package/libglib2/libglib2.hash
+index 8bd4bf157d..9ed0b204ee 100644
+--- a/package/libglib2/libglib2.hash
++++ b/package/libglib2/libglib2.hash
+@@ -1,4 +1,4 @@
+-# https://download.gnome.org/sources/glib/2.82/glib-2.82.5.sha256sum
+-sha256  05c2031f9bdf6b5aba7a06ca84f0b4aced28b19bf1b50c6ab25cc675277cbc3f  glib-2.82.5.tar.xz
++# https://download.gnome.org/sources/glib/2.84/glib-2.84.3.sha256sum
++sha256  aa4f87c3225bf57ca85f320888f7484901a17934ca37023c3bd8435a72db863e  glib-2.84.3.tar.xz
+ # License files, locally calculated
+ sha256  fa6f36630bb1e0c571d34b2bbdf188d08495c9dbf58f28cac112f303fc1f58fb  COPYING
