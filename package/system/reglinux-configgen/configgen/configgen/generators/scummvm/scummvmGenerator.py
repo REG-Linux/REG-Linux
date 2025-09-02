@@ -5,21 +5,23 @@ from glob import glob
 from configparser import ConfigParser
 from systemFiles import SCREENSHOTS, CONF, BIOS
 
-SCUMMVM_CONFIG_DIR = CONF + '/scummvm'
-SCUMMVM_CONFIG_PATH = SCUMMVM_CONFIG_DIR + '/scummvm.ini'
-SCUMMVM_EXTRA_DIR = BIOS + '/scummvm/extra'
-SCUMMVM_BIN_PATH = '/usr/bin/scummvm'
+SCUMMVM_CONFIG_DIR = CONF + "/scummvm"
+SCUMMVM_CONFIG_PATH = SCUMMVM_CONFIG_DIR + "/scummvm.ini"
+SCUMMVM_EXTRA_DIR = BIOS + "/scummvm/extra"
+SCUMMVM_BIN_PATH = "/usr/bin/scummvm"
+
 
 class ScummVMGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # crete /userdata/bios/scummvm/extra folder if it doesn't exist
         if not path.exists(SCUMMVM_EXTRA_DIR):
             makedirs(SCUMMVM_EXTRA_DIR)
 
         # create / modify scummvm config file as needed
         scummConfig = ConfigParser()
-        scummConfig.optionxform=lambda optionstr: str(optionstr)
+        scummConfig.optionxform = lambda optionstr: str(optionstr)
         if path.exists(SCUMMVM_CONFIG_PATH):
             scummConfig.read(SCUMMVM_CONFIG_PATH)
 
@@ -31,27 +33,27 @@ class ScummVMGenerator(Generator):
         # save the ini file
         if not path.exists(path.dirname(SCUMMVM_CONFIG_PATH)):
             makedirs(path.dirname(SCUMMVM_CONFIG_PATH))
-        with open(SCUMMVM_CONFIG_PATH, 'w') as configfile:
+        with open(SCUMMVM_CONFIG_PATH, "w") as configfile:
             scummConfig.write(configfile)
 
         # Find rom path
         if path.isdir(rom):
-          # rom is a directory: must contains a <game name>.scummvm file
-          romPath = rom
-          romFile = glob(romPath + "/*.scummvm")[0]
-          romName = path.splitext(path.basename(romFile))[0]
+            # rom is a directory: must contains a <game name>.scummvm file
+            romPath = rom
+            romFile = glob(romPath + "/*.scummvm")[0]
+            romName = path.splitext(path.basename(romFile))[0]
         else:
-          # rom is a file: split in directory and file name
-          romPath = path.dirname(rom)
-          # Get rom name without extension
-          romName = path.splitext(path.basename(rom))[0]
+            # rom is a file: split in directory and file name
+            romPath = path.dirname(rom)
+            # Get rom name without extension
+            romName = path.splitext(path.basename(rom))[0]
 
         # pad number
         nplayer = 1
         id = 0
         for playercontroller, pad in sorted(playersControllers.items()):
             if nplayer == 1:
-                id=pad.index
+                id = pad.index
             nplayer += 1
 
         commandArray = [SCUMMVM_BIN_PATH, "-f"]
@@ -97,16 +99,20 @@ class ScummVMGenerator(Generator):
         commandArray.append("--logfile=/userdata/system/logs/scummvm.log")
 
         commandArray.extend(
-            [f"--joystick={id}",
-            "--screenshotspath=" + SCREENSHOTS,
-            "--extrapath=" + SCUMMVM_EXTRA_DIR,
-            f"--path={romPath}",
-            f"{romName}"]
+            [
+                f"--joystick={id}",
+                "--screenshotspath=" + SCREENSHOTS,
+                "--extrapath=" + SCUMMVM_EXTRA_DIR,
+                f"--path={romPath}",
+                f"{romName}",
+            ]
         )
 
         return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
-        if ("scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect") or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):
-            return 4/3
-        return 16/9
+        if (
+            "scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect"
+        ) or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):
+            return 4 / 3
+        return 16 / 9

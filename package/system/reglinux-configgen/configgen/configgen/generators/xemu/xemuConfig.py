@@ -3,17 +3,18 @@ from io import open
 from configparser import ConfigParser
 from systemFiles import CONF, SAVES
 
-XEMU_SAVES_DIR = SAVES + '/xbox'
-XEMU_CONFIG_PATH = CONF + '/xemu/xemu.toml'
-XEMU_BIN_PATH = '/usr/bin/xemu'
+XEMU_SAVES_DIR = SAVES + "/xbox"
+XEMU_CONFIG_PATH = CONF + "/xemu/xemu.toml"
+XEMU_BIN_PATH = "/usr/bin/xemu"
+
 
 def setXemuConfig(system, rom, playersControllers, gameResolution):
     iniConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    iniConfig.optionxform=lambda optionstr: str(optionstr)
+    iniConfig.optionxform = lambda optionstr: str(optionstr)
     if path.exists(XEMU_CONFIG_PATH):
         try:
-            with open(XEMU_CONFIG_PATH, 'r', encoding='utf_8_sig') as fp:
+            with open(XEMU_CONFIG_PATH, "r", encoding="utf_8_sig") as fp:
                 iniConfig.read_file(fp)
         except:
             pass
@@ -22,8 +23,9 @@ def setXemuConfig(system, rom, playersControllers, gameResolution):
     # save the ini file
     if not path.exists(path.dirname(XEMU_CONFIG_PATH)):
         makedirs(path.dirname(XEMU_CONFIG_PATH))
-    with open(XEMU_CONFIG_PATH, 'w') as configfile:
+    with open(XEMU_CONFIG_PATH, "w") as configfile:
         iniConfig.write(configfile)
+
 
 def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution):
     # Create INI sections
@@ -47,7 +49,6 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
         iniConfig.add_section("net")
     if not iniConfig.has_section("net.udp"):
         iniConfig.add_section("net.udp")
-
 
     # Boot Animation Skip
     if system.isOptSet("xemu_bootanim"):
@@ -88,13 +89,17 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
     if system.isOptSet("xemu_render"):
         iniConfig.set("display.quality", "surface_scale", system.config["xemu_render"])
     else:
-        iniConfig.set("display.quality", "surface_scale", "1") #render scale by default
+        iniConfig.set(
+            "display.quality", "surface_scale", "1"
+        )  # render scale by default
 
     # start fullscreen
     iniConfig.set("display.window", "fullscreen_on_startup", "true")
 
     # Window size
-    window_res = format(gameResolution["width"]) + "x" + format(gameResolution["height"])
+    window_res = (
+        format(gameResolution["width"]) + "x" + format(gameResolution["height"])
+    )
     iniConfig.set("display.window", "startup_size", '"' + window_res + '"')
 
     # Vsync
@@ -114,13 +119,15 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
 
     # Aspect ratio
     if system.isOptSet("xemu_aspect"):
-        iniConfig.set("display.ui", "aspect_ratio", '"' + system.config["xemu_aspect"] + '"')
+        iniConfig.set(
+            "display.ui", "aspect_ratio", '"' + system.config["xemu_aspect"] + '"'
+        )
     else:
         iniConfig.set("display.ui", "aspect_ratio", '"auto"')
 
     # Fill input section
     # first, clear
-    for i in range(1,5):
+    for i in range(1, 5):
         iniConfig.remove_option("input.bindings", f"port{i}")
     nplayer = 1
     for playercontroller, pad in sorted(playersControllers.items()):
@@ -137,6 +144,8 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
         iniConfig.set("net", "enable", "false")
     # Additionnal settings for udp: if nothing is entered in these fields, the xemu.toml is untouched
     if system.isOptSet("xemu_udpremote"):
-        iniConfig.set("net.udp", "remote_addr", '"' + system.config["xemu_udpremote"] + '"')
+        iniConfig.set(
+            "net.udp", "remote_addr", '"' + system.config["xemu_udpremote"] + '"'
+        )
     if system.isOptSet("xemu_udpbind"):
         iniConfig.set("net.udp", "bind_addr", '"' + system.config["xemu_udpbind"] + '"')

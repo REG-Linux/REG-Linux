@@ -5,10 +5,19 @@ from configparser import ConfigParser
 from subprocess import CalledProcessError, check_output
 from controllers import gunsNeedCrosses
 from .dolphinControllers import generateControllerConfig
-from .dolphinConfig import getRatioFromConfig, updateConfig, DOLPHIN_BIN_PATH, DOLPHIN_CONFIG_PATH, DOLPHIN_SAVES_DIR, DOLPHIN_GFX_PATH, DOLPHIN_SYSCONF_PATH
-
+from .dolphinConfig import (
+    getRatioFromConfig,
+    updateConfig,
+    DOLPHIN_BIN_PATH,
+    DOLPHIN_CONFIG_PATH,
+    DOLPHIN_SAVES_DIR,
+    DOLPHIN_GFX_PATH,
+    DOLPHIN_SYSCONF_PATH,
+)
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
+
 
 class DolphinGenerator(Generator):
     # this emulator/core requires X server to run
@@ -16,7 +25,9 @@ class DolphinGenerator(Generator):
     def requiresX11(self):
         return True
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         if not path.exists(path.dirname(DOLPHIN_CONFIG_PATH)):
             makedirs(path.dirname(DOLPHIN_CONFIG_PATH))
 
@@ -25,12 +36,12 @@ class DolphinGenerator(Generator):
             makedirs(DOLPHIN_SAVES_DIR + "/StateSaves")
 
         # FIXME Generate the controller config(s)
-        #generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns)
+        # generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns)
 
         ## [ dolphin.ini ] ##
         dolphinSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinSettings.optionxform=lambda optionstr: str(optionstr)
+        dolphinSettings.optionxform = lambda optionstr: str(optionstr)
         if path.exists(DOLPHIN_CONFIG_PATH):
             dolphinSettings.read(DOLPHIN_CONFIG_PATH)
 
@@ -82,7 +93,9 @@ class DolphinGenerator(Generator):
             dolphinSettings.set("Core", "EnableCheats", "False")
 
         # Speed up disc transfer rate
-        if system.isOptSet("enable_fastdisc") and system.getOptBoolean("enable_fastdisc"):
+        if system.isOptSet("enable_fastdisc") and system.getOptBoolean(
+            "enable_fastdisc"
+        ):
             dolphinSettings.set("Core", "FastDiscSpeed", "True")
         else:
             dolphinSettings.set("Core", "FastDiscSpeed", "False")
@@ -101,9 +114,13 @@ class DolphinGenerator(Generator):
 
         # Gamecube Language
         if system.isOptSet("gamecube_language"):
-            dolphinSettings.set("Core", "SelectedLanguage", system.config["gamecube_language"])
+            dolphinSettings.set(
+                "Core", "SelectedLanguage", system.config["gamecube_language"]
+            )
         else:
-            dolphinSettings.set("Core", "SelectedLanguage", str(getGameCubeLangFromEnvironment()))
+            dolphinSettings.set(
+                "Core", "SelectedLanguage", str(getGameCubeLangFromEnvironment())
+            )
 
         # Enable MMU
         if system.isOptSet("enable_mmu") and system.getOptBoolean("enable_mmu"):
@@ -116,9 +133,13 @@ class DolphinGenerator(Generator):
             dolphinSettings.set("Core", "GFXBackend", "Vulkan")
             # Check Vulkan
             try:
-                have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+                have_vulkan = check_output(
+                    ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+                ).strip()
                 if have_vulkan != "true":
-                    eslog.debug("Vulkan driver is not available on the system. Using OpenGL instead.")
+                    eslog.debug(
+                        "Vulkan driver is not available on the system. Using OpenGL instead."
+                    )
                     dolphinSettings.set("Core", "GFXBackend", "OGL")
             except CalledProcessError:
                 eslog.debug("Error checking for discrete GPU.")
@@ -140,14 +161,34 @@ class DolphinGenerator(Generator):
                 dolphinSettings.set("Core", "SIDevice" + str(i - 1), value)
             else:
                 # if the pad is a wheel and on gamecube, use it
-                if system.name == "gamecube" and system.isOptSet('use_wheels') and system.getOptBoolean('use_wheels') and len(wheels) > 0 and str(i) in playersControllers and playersControllers[str(i)].dev in wheels:
+                if (
+                    system.name == "gamecube"
+                    and system.isOptSet("use_wheels")
+                    and system.getOptBoolean("use_wheels")
+                    and len(wheels) > 0
+                    and str(i) in playersControllers
+                    and playersControllers[str(i)].dev in wheels
+                ):
                     dolphinSettings.set("Core", "SIDevice" + str(i - 1), "8")
                 else:
                     dolphinSettings.set("Core", "SIDevice" + str(i - 1), "6")
 
         # HiResTextures for guns part 1/2 (see below the part 2)
-        if system.isOptSet('use_guns') and system.getOptBoolean('use_guns') and len(guns) > 0 and ((system.isOptSet('dolphin-lightgun-hide-crosshair') == False and gunsNeedCrosses(guns) == False) or system.getOptBoolean('dolphin-lightgun-hide-crosshair' == True)):
-            dolphinSettings.set("General", "CustomTexturesPath", "/usr/share/DolphinCrosshairsPack")
+        if (
+            system.isOptSet("use_guns")
+            and system.getOptBoolean("use_guns")
+            and len(guns) > 0
+            and (
+                (
+                    system.isOptSet("dolphin-lightgun-hide-crosshair") == False
+                    and gunsNeedCrosses(guns) == False
+                )
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair" == True)
+            )
+        ):
+            dolphinSettings.set(
+                "General", "CustomTexturesPath", "/usr/share/DolphinCrosshairsPack"
+            )
         else:
             dolphinSettings.remove_option("General", "CustomTexturesPath")
 
@@ -155,11 +196,16 @@ class DolphinGenerator(Generator):
         dolphinSettings.set("Core", "AutoDiscChange", "True")
 
         # Skip Menu
-        if system.isOptSet("dolphin_SkipIPL") and system.getOptBoolean("dolphin_SkipIPL"):
+        if system.isOptSet("dolphin_SkipIPL") and system.getOptBoolean(
+            "dolphin_SkipIPL"
+        ):
             # check files exist to avoid crashes
             ipl_regions = ["USA", "EUR", "JAP"]
             base_path = "/userdata/bios/GC"
-            if any(path.exists(path.join(base_path, region, "IPL.bin")) for region in ipl_regions):
+            if any(
+                path.exists(path.join(base_path, region, "IPL.bin"))
+                for region in ipl_regions
+            ):
                 dolphinSettings.set("Core", "SkipIPL", "False")
             else:
                 dolphinSettings.set("Core", "SkipIPL", "True")
@@ -181,13 +227,13 @@ class DolphinGenerator(Generator):
             dolphinSettings.set("DSP", "EnableJIT", "False")
 
         # Save dolphin.ini
-        with open(DOLPHIN_CONFIG_PATH, 'w') as configfile:
+        with open(DOLPHIN_CONFIG_PATH, "w") as configfile:
             dolphinSettings.write(configfile)
 
         ## [ gfx.ini ] ##
         dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinGFXSettings.optionxform=lambda optionstr: str(optionstr)
+        dolphinGFXSettings.optionxform = lambda optionstr: str(optionstr)
         dolphinGFXSettings.read(DOLPHIN_GFX_PATH)
 
         # Add Default Sections
@@ -202,46 +248,79 @@ class DolphinGenerator(Generator):
 
         # Set Vulkan adapter
         try:
-            have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = check_output(
+                ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+            ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
-                    have_discrete = check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
+                    have_discrete = check_output(
+                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                    ).strip()
                     if have_discrete == "true":
-                        eslog.debug("A discrete GPU is available on the system. We will use that for performance")
+                        eslog.debug(
+                            "A discrete GPU is available on the system. We will use that for performance"
+                        )
                         try:
-                            discrete_index = check_output(["/usr/bin/system-vulkan", "discreteIndex"], text=True).strip()
+                            discrete_index = check_output(
+                                ["/usr/bin/system-vulkan", "discreteIndex"], text=True
+                            ).strip()
                             if discrete_index != "":
-                                eslog.debug("Using Discrete GPU Index: {} for Dolphin".format(discrete_index))
-                                dolphinGFXSettings.set("Hardware", "Adapter", discrete_index)
+                                eslog.debug(
+                                    "Using Discrete GPU Index: {} for Dolphin".format(
+                                        discrete_index
+                                    )
+                                )
+                                dolphinGFXSettings.set(
+                                    "Hardware", "Adapter", discrete_index
+                                )
                             else:
                                 eslog.debug("Couldn't get discrete GPU index")
                         except CalledProcessError:
                             eslog.debug("Error getting discrete GPU index")
                     else:
-                        eslog.debug("Discrete GPU is not available on the system. Trying integrated.")
-                        have_integrated = check_output(["/usr/bin/system-vulkan", "hasIntegrated"], text=True).strip()
+                        eslog.debug(
+                            "Discrete GPU is not available on the system. Trying integrated."
+                        )
+                        have_integrated = check_output(
+                            ["/usr/bin/system-vulkan", "hasIntegrated"], text=True
+                        ).strip()
                         if have_integrated == "true":
-                            eslog.debug("Using integrated GPU to provide Vulkan. Beware of performance")
+                            eslog.debug(
+                                "Using integrated GPU to provide Vulkan. Beware of performance"
+                            )
                             try:
-                                integrated_index = check_output(["/usr/bin/system-vulkan", "integratedIndex"], text=True).strip()
+                                integrated_index = check_output(
+                                    ["/usr/bin/system-vulkan", "integratedIndex"],
+                                    text=True,
+                                ).strip()
                                 if integrated_index != "":
-                                    eslog.debug("Using Integrated GPU Index: {} for Dolphin".format(integrated_index))
-                                    dolphinGFXSettings.set("Hardware", "Adapter", integrated_index)
+                                    eslog.debug(
+                                        "Using Integrated GPU Index: {} for Dolphin".format(
+                                            integrated_index
+                                        )
+                                    )
+                                    dolphinGFXSettings.set(
+                                        "Hardware", "Adapter", integrated_index
+                                    )
                                 else:
                                     eslog.debug("Couldn't get integrated GPU index")
                             except CalledProcessError:
                                 eslog.debug("Error getting integrated GPU index")
                         else:
-                            eslog.debug("Integrated GPU is not available on the system. Cannot enable Vulkan.")
+                            eslog.debug(
+                                "Integrated GPU is not available on the system. Cannot enable Vulkan."
+                            )
                 except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
         except CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
 
         # Graphics setting Aspect Ratio
-        if system.isOptSet('dolphin_aspect_ratio'):
-            dolphinGFXSettings.set("Settings", "AspectRatio", system.config["dolphin_aspect_ratio"])
+        if system.isOptSet("dolphin_aspect_ratio"):
+            dolphinGFXSettings.set(
+                "Settings", "AspectRatio", system.config["dolphin_aspect_ratio"]
+            )
         else:
             # set to zero, which is 'Auto' in Dolphin & REG-Linux
             dolphinGFXSettings.set("Settings", "AspectRatio", "0")
@@ -253,23 +332,35 @@ class DolphinGenerator(Generator):
             dolphinGFXSettings.set("Settings", "ShowFPS", "False")
 
         # HiResTextures
-        if system.isOptSet('hires_textures') and system.getOptBoolean('hires_textures'):
-            dolphinGFXSettings.set("Settings", "HiresTextures",      "True")
+        if system.isOptSet("hires_textures") and system.getOptBoolean("hires_textures"):
+            dolphinGFXSettings.set("Settings", "HiresTextures", "True")
             dolphinGFXSettings.set("Settings", "CacheHiresTextures", "True")
         else:
-            dolphinGFXSettings.set("Settings", "HiresTextures",      "False")
+            dolphinGFXSettings.set("Settings", "HiresTextures", "False")
             dolphinGFXSettings.set("Settings", "CacheHiresTextures", "False")
 
         # HiResTextures for guns part 2/2 (see upper part1)
-        if system.isOptSet('use_guns') and system.getOptBoolean('use_guns') and len(guns) > 0 and (system.isOptSet('dolphin-lightgun-hide-crosshair') == False or system.getOptBoolean('dolphin-lightgun-hide-crosshair' == True)):
+        if (
+            system.isOptSet("use_guns")
+            and system.getOptBoolean("use_guns")
+            and len(guns) > 0
+            and (
+                system.isOptSet("dolphin-lightgun-hide-crosshair") == False
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair" == True)
+            )
+        ):
             # erase what can be set by the option hires_textures
-            dolphinGFXSettings.set("Settings", "HiresTextures",      "True")
+            dolphinGFXSettings.set("Settings", "HiresTextures", "True")
             dolphinGFXSettings.set("Settings", "CacheHiresTextures", "True")
 
         # Widescreen Hack
-        if system.isOptSet('widescreen_hack') and system.getOptBoolean('widescreen_hack'):
+        if system.isOptSet("widescreen_hack") and system.getOptBoolean(
+            "widescreen_hack"
+        ):
             # Prefer Cheats than Hack
-            if system.isOptSet('enable_cheats') and system.getOptBoolean('enable_cheats'):
+            if system.isOptSet("enable_cheats") and system.getOptBoolean(
+                "enable_cheats"
+            ):
                 dolphinGFXSettings.set("Settings", "wideScreenHack", "False")
             else:
                 dolphinGFXSettings.set("Settings", "wideScreenHack", "True")
@@ -277,22 +368,36 @@ class DolphinGenerator(Generator):
             dolphinGFXSettings.set("Settings", "wideScreenHack", "False")
 
         # Ubershaders (synchronous_ubershader by default)
-        if system.isOptSet('ubershaders') and system.config["ubershaders"] != "no_ubershader":
-            dolphinGFXSettings.set("Settings", "ShaderCompilationMode", system.config["ubershaders"])
+        if (
+            system.isOptSet("ubershaders")
+            and system.config["ubershaders"] != "no_ubershader"
+        ):
+            dolphinGFXSettings.set(
+                "Settings", "ShaderCompilationMode", system.config["ubershaders"]
+            )
         else:
             dolphinGFXSettings.set("Settings", "ShaderCompilationMode", "0")
 
         # Shader pre-caching
-        if system.isOptSet('wait_for_shaders') and system.getOptBoolean('wait_for_shaders'):
-            if system.isOptSet("gfxbackend") and system.config["gfxbackend"] == "Vulkan":
-                dolphinGFXSettings.set("Settings", "WaitForShadersBeforeStarting", "True")
+        if system.isOptSet("wait_for_shaders") and system.getOptBoolean(
+            "wait_for_shaders"
+        ):
+            if (
+                system.isOptSet("gfxbackend")
+                and system.config["gfxbackend"] == "Vulkan"
+            ):
+                dolphinGFXSettings.set(
+                    "Settings", "WaitForShadersBeforeStarting", "True"
+                )
             else:
-                dolphinGFXSettings.set("Settings", "WaitForShadersBeforeStarting", "False")
+                dolphinGFXSettings.set(
+                    "Settings", "WaitForShadersBeforeStarting", "False"
+                )
         else:
             dolphinGFXSettings.set("Settings", "WaitForShadersBeforeStarting", "False")
 
         # Various performance hacks - Default Off
-        if system.isOptSet('perf_hacks') and system.getOptBoolean('perf_hacks'):
+        if system.isOptSet("perf_hacks") and system.getOptBoolean("perf_hacks"):
             dolphinGFXSettings.set("Hacks", "BBoxEnable", "False")
             dolphinGFXSettings.set("Hacks", "DeferEFBCopies", "True")
             dolphinGFXSettings.set("Hacks", "EFBEmulateFormatChanges", "False")
@@ -315,153 +420,177 @@ class DolphinGenerator(Generator):
                 dolphinGFXSettings.remove_option("Hacks", "XFBToTextureEnable")
             if dolphinGFXSettings.has_section("Enhancements"):
                 dolphinGFXSettings.remove_option("Enhancements", "ForceFiltering")
-                dolphinGFXSettings.remove_option("Enhancements", "ArbitraryMipmapDetection")
+                dolphinGFXSettings.remove_option(
+                    "Enhancements", "ArbitraryMipmapDetection"
+                )
                 dolphinGFXSettings.remove_option("Enhancements", "DisableCopyFilter")
                 dolphinGFXSettings.remove_option("Enhancements", "ForceTrueColor")
 
-        if system.isOptSet('vbi_hack') and system.getOptBoolean("vbi_hack"):
+        if system.isOptSet("vbi_hack") and system.getOptBoolean("vbi_hack"):
             dolphinGFXSettings.set("Hacks", "VISkip", "True")
         else:
             dolphinGFXSettings.set("Hacks", "VISkip", "False")
 
         # Internal resolution settings
-        if system.isOptSet('internal_resolution'):
-            dolphinGFXSettings.set("Settings", "InternalResolution", system.config["internal_resolution"])
+        if system.isOptSet("internal_resolution"):
+            dolphinGFXSettings.set(
+                "Settings", "InternalResolution", system.config["internal_resolution"]
+            )
         else:
             dolphinGFXSettings.set("Settings", "InternalResolution", "1")
 
         # VSync
-        if system.isOptSet('vsync') and system.getOptBoolean("vsync") == False:
+        if system.isOptSet("vsync") and system.getOptBoolean("vsync") == False:
             dolphinGFXSettings.set("Hardware", "VSync", "False")
         else:
             dolphinGFXSettings.set("Hardware", "VSync", "True")
 
         # Anisotropic filtering
-        if system.isOptSet('anisotropic_filtering'):
-            dolphinGFXSettings.set("Enhancements", "MaxAnisotropy", system.config["anisotropic_filtering"])
+        if system.isOptSet("anisotropic_filtering"):
+            dolphinGFXSettings.set(
+                "Enhancements", "MaxAnisotropy", system.config["anisotropic_filtering"]
+            )
         else:
             dolphinGFXSettings.set("Enhancements", "MaxAnisotropy", "0")
 
         # Anti aliasing
-        if system.isOptSet('antialiasing'):
+        if system.isOptSet("antialiasing"):
             dolphinGFXSettings.set("Settings", "MSAA", system.config["antialiasing"])
         else:
             dolphinGFXSettings.set("Settings", "MSAA", "0")
 
         # Anti aliasing mode
-        if system.isOptSet('use_ssaa') and system.getOptBoolean('use_ssaa'):
+        if system.isOptSet("use_ssaa") and system.getOptBoolean("use_ssaa"):
             dolphinGFXSettings.set("Settings", "SSAA", "True")
         else:
             dolphinGFXSettings.set("Settings", "SSAA", "False")
 
         # Manual texture sampling
         # Setting on = speed hack off. Setting off = speed hack on
-        if system.isOptSet('manual_texture_sampling') and system.getOptBoolean('manual_texture_sampling'):
+        if system.isOptSet("manual_texture_sampling") and system.getOptBoolean(
+            "manual_texture_sampling"
+        ):
             dolphinGFXSettings.set("Hacks", "FastTextureSampling", "False")
         else:
             dolphinGFXSettings.set("Hacks", "FastTextureSampling", "True")
 
         # Save gfx.ini
-        with open(DOLPHIN_GFX_PATH, 'w') as configfile:
+        with open(DOLPHIN_GFX_PATH, "w") as configfile:
             dolphinGFXSettings.write(configfile)
 
         ## Hotkeys.ini - overwrite to avoid issues
         hotkeyConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        hotkeyConfig.optionxform=lambda optionstr: str(optionstr)
+        hotkeyConfig.optionxform = lambda optionstr: str(optionstr)
         # [Hotkeys]
-        hotkeyConfig.add_section('Hotkeys')
+        hotkeyConfig.add_section("Hotkeys")
         # General - use virtual for now
-        hotkeyConfig.set('Hotkeys', 'Device', 'XInput2/0/Virtual core pointer')
-        hotkeyConfig.set('Hotkeys', 'General/Open', '@(Ctrl+O)')
-        hotkeyConfig.set('Hotkeys', 'General/Toggle Pause', 'F10')
-        hotkeyConfig.set('Hotkeys', 'General/Stop', 'Escape')
-        hotkeyConfig.set('Hotkeys', 'General/Toggle Fullscreen', '@(Alt+Return)')
-        hotkeyConfig.set('Hotkeys', 'General/Take Screenshot', 'F9')
-        hotkeyConfig.set('Hotkeys', 'General/Exit', '@(Shift+F11)')
+        hotkeyConfig.set("Hotkeys", "Device", "XInput2/0/Virtual core pointer")
+        hotkeyConfig.set("Hotkeys", "General/Open", "@(Ctrl+O)")
+        hotkeyConfig.set("Hotkeys", "General/Toggle Pause", "F10")
+        hotkeyConfig.set("Hotkeys", "General/Stop", "Escape")
+        hotkeyConfig.set("Hotkeys", "General/Toggle Fullscreen", "@(Alt+Return)")
+        hotkeyConfig.set("Hotkeys", "General/Take Screenshot", "F9")
+        hotkeyConfig.set("Hotkeys", "General/Exit", "@(Shift+F11)")
         # Emulation Speed
-        hotkeyConfig.set('Hotkeys', 'Emulation Speed/Disable Emulation Speed Limit', 'Tab')
+        hotkeyConfig.set(
+            "Hotkeys", "Emulation Speed/Disable Emulation Speed Limit", "Tab"
+        )
         # Stepping
-        hotkeyConfig.set('Hotkeys', 'Stepping/Step Into', 'F11')
-        hotkeyConfig.set('Hotkeys', 'Stepping/Step Over', '@(Shift+F10)')
-        hotkeyConfig.set('Hotkeys', 'Stepping/Step Out', '@(Shift+F11)')
+        hotkeyConfig.set("Hotkeys", "Stepping/Step Into", "F11")
+        hotkeyConfig.set("Hotkeys", "Stepping/Step Over", "@(Shift+F10)")
+        hotkeyConfig.set("Hotkeys", "Stepping/Step Out", "@(Shift+F11)")
         # Breakpoint
-        hotkeyConfig.set('Hotkeys', 'Breakpoint/Toggle Breakpoint', '@(Shift+F9)')
+        hotkeyConfig.set("Hotkeys", "Breakpoint/Toggle Breakpoint", "@(Shift+F9)")
         # Wii
-        hotkeyConfig.set('Hotkeys', 'Wii/Connect Wii Remote 1', '@(Alt+F5)')
-        hotkeyConfig.set('Hotkeys', 'Wii/Connect Wii Remote 2', '@(Alt+F6)')
-        hotkeyConfig.set('Hotkeys', 'Wii/Connect Wii Remote 3', '@(Alt+F7)')
-        hotkeyConfig.set('Hotkeys', 'Wii/Connect Wii Remote 4', '@(Alt+F8)')
-        hotkeyConfig.set('Hotkeys', 'Wii/Connect Balance Board', '@(Alt+F9)')
+        hotkeyConfig.set("Hotkeys", "Wii/Connect Wii Remote 1", "@(Alt+F5)")
+        hotkeyConfig.set("Hotkeys", "Wii/Connect Wii Remote 2", "@(Alt+F6)")
+        hotkeyConfig.set("Hotkeys", "Wii/Connect Wii Remote 3", "@(Alt+F7)")
+        hotkeyConfig.set("Hotkeys", "Wii/Connect Wii Remote 4", "@(Alt+F8)")
+        hotkeyConfig.set("Hotkeys", "Wii/Connect Balance Board", "@(Alt+F9)")
         # Select
-        hotkeyConfig.set('Hotkeys', 'Other State Hotkeys/Increase Selected State Slot', '@(Shift+F1)')
-        hotkeyConfig.set('Hotkeys', 'Other State Hotkeys/Decrease Selected State Slot', '@(Shift+F2)')
+        hotkeyConfig.set(
+            "Hotkeys", "Other State Hotkeys/Increase Selected State Slot", "@(Shift+F1)"
+        )
+        hotkeyConfig.set(
+            "Hotkeys", "Other State Hotkeys/Decrease Selected State Slot", "@(Shift+F2)"
+        )
         # Load
-        hotkeyConfig.set('Hotkeys', 'Load State/Load from Selected Slot', 'F8')
+        hotkeyConfig.set("Hotkeys", "Load State/Load from Selected Slot", "F8")
         # Save State
-        hotkeyConfig.set('Hotkeys', 'Save State/Save to Selected Slot', 'F5')
+        hotkeyConfig.set("Hotkeys", "Save State/Save to Selected Slot", "F5")
         # Other State Hotkeys
-        hotkeyConfig.set('Hotkeys', 'Other State Hotkeys/Undo Load State', '@(Shift+F12)')
+        hotkeyConfig.set(
+            "Hotkeys", "Other State Hotkeys/Undo Load State", "@(Shift+F12)"
+        )
         # GBA Core
-        hotkeyConfig.set('Hotkeys', 'GBA Core/Load ROM', '@(`Ctrl`+`Shift`+`O`)')
-        hotkeyConfig.set('Hotkeys', 'GBA Core/Unload ROM', '@(`Ctrl`+`Shift`+`W`)')
-        hotkeyConfig.set('Hotkeys', 'GBA Core/Reset', '@(`Ctrl`+`Shift`+`R`)')
+        hotkeyConfig.set("Hotkeys", "GBA Core/Load ROM", "@(`Ctrl`+`Shift`+`O`)")
+        hotkeyConfig.set("Hotkeys", "GBA Core/Unload ROM", "@(`Ctrl`+`Shift`+`W`)")
+        hotkeyConfig.set("Hotkeys", "GBA Core/Reset", "@(`Ctrl`+`Shift`+`R`)")
         # GBA Volume
-        hotkeyConfig.set('Hotkeys', 'GBA Volume/Volume Down', '`KP_Subtract`')
-        hotkeyConfig.set('Hotkeys', 'GBA Volume/Volume Up', '`KP_Add`')
-        hotkeyConfig.set('Hotkeys', 'GBA Volume/Volume Toggle Mute', '`M`')
+        hotkeyConfig.set("Hotkeys", "GBA Volume/Volume Down", "`KP_Subtract`")
+        hotkeyConfig.set("Hotkeys", "GBA Volume/Volume Up", "`KP_Add`")
+        hotkeyConfig.set("Hotkeys", "GBA Volume/Volume Toggle Mute", "`M`")
         # GBA Window Size
-        hotkeyConfig.set('Hotkeys', 'GBA Window Size/1x', '`KP_1`')
-        hotkeyConfig.set('Hotkeys', 'GBA Window Size/2x', '`KP_2`')
-        hotkeyConfig.set('Hotkeys', 'GBA Window Size/3x', '`KP_3`')
-        hotkeyConfig.set('Hotkeys', 'GBA Window Size/4x', '`KP_4`')
+        hotkeyConfig.set("Hotkeys", "GBA Window Size/1x", "`KP_1`")
+        hotkeyConfig.set("Hotkeys", "GBA Window Size/2x", "`KP_2`")
+        hotkeyConfig.set("Hotkeys", "GBA Window Size/3x", "`KP_3`")
+        hotkeyConfig.set("Hotkeys", "GBA Window Size/4x", "`KP_4`")
         # Skylanders Portal
-        hotkeyConfig.set('Hotkeys', 'USB Emulation Devices/Show Skylanders Portal', '@(Ctrl+P)')
-        hotkeyConfig.set('Hotkeys', 'USB Emulation Devices/Show Infinity Base', '@(Ctrl+I)')
+        hotkeyConfig.set(
+            "Hotkeys", "USB Emulation Devices/Show Skylanders Portal", "@(Ctrl+P)"
+        )
+        hotkeyConfig.set(
+            "Hotkeys", "USB Emulation Devices/Show Infinity Base", "@(Ctrl+I)"
+        )
         #
         # Write the configuration to the file
-        hotkey_path = '/userdata/system/configs/dolphin-emu/Hotkeys.ini'
-        with open(hotkey_path, 'w') as configfile:
+        hotkey_path = "/userdata/system/configs/dolphin-emu/Hotkeys.ini"
+        with open(hotkey_path, "w") as configfile:
             hotkeyConfig.write(configfile)
 
         ## Retroachievements
         RacConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        RacConfig.optionxform=lambda optionstr: str(optionstr)
+        RacConfig.optionxform = lambda optionstr: str(optionstr)
         # [Achievements]
-        RacConfig.add_section('Achievements')
-        if system.isOptSet('retroachievements') and system.getOptBoolean('retroachievements'):
-            RacConfig.set('Achievements', 'Enabled', 'True')
-            RacConfig.set('Achievements', 'AchievementsEnabled', 'True')
-            username  = system.config.get('retroachievements.username', '')
-            token     = system.config.get('retroachievements.token', '')
-            hardcore  = system.config.get('retroachievements.hardcore', 'False')
-            presence  = system.config.get('retroachievements.richpresence', 'False')
-            leaderbd  = system.config.get('retroachievements.leaderboard', 'False')
-            progress  = system.config.get('retroachievements.challenge_indicators', 'False')
-            encore    = system.config.get('retroachievements.encore', 'False')
-            verbose   = system.config.get('retroachievements.verbose', 'False')
-            RacConfig.set('Achievements', 'Username', username)
-            RacConfig.set('Achievements', 'ApiToken', token)
-            RacConfig.set('Achievements', 'HardcoreEnabled', hardcore)
-            RacConfig.set('Achievements', 'BadgesEnabled', verbose)
-            RacConfig.set('Achievements', 'EncoreEnabled', encore)
-            RacConfig.set('Achievements', 'ProgressEnabled', progress)
-            RacConfig.set('Achievements', 'LeaderboardsEnabled', leaderbd)
-            RacConfig.set('Achievements', 'RichPresenceEnabled', presence)
+        RacConfig.add_section("Achievements")
+        if system.isOptSet("retroachievements") and system.getOptBoolean(
+            "retroachievements"
+        ):
+            RacConfig.set("Achievements", "Enabled", "True")
+            RacConfig.set("Achievements", "AchievementsEnabled", "True")
+            username = system.config.get("retroachievements.username", "")
+            token = system.config.get("retroachievements.token", "")
+            hardcore = system.config.get("retroachievements.hardcore", "False")
+            presence = system.config.get("retroachievements.richpresence", "False")
+            leaderbd = system.config.get("retroachievements.leaderboard", "False")
+            progress = system.config.get(
+                "retroachievements.challenge_indicators", "False"
+            )
+            encore = system.config.get("retroachievements.encore", "False")
+            verbose = system.config.get("retroachievements.verbose", "False")
+            RacConfig.set("Achievements", "Username", username)
+            RacConfig.set("Achievements", "ApiToken", token)
+            RacConfig.set("Achievements", "HardcoreEnabled", hardcore)
+            RacConfig.set("Achievements", "BadgesEnabled", verbose)
+            RacConfig.set("Achievements", "EncoreEnabled", encore)
+            RacConfig.set("Achievements", "ProgressEnabled", progress)
+            RacConfig.set("Achievements", "LeaderboardsEnabled", leaderbd)
+            RacConfig.set("Achievements", "RichPresenceEnabled", presence)
         else:
-            RacConfig.set('Achievements', 'Enabled', 'False')
-            RacConfig.set('Achievements', 'AchievementsEnabled', 'False')
+            RacConfig.set("Achievements", "Enabled", "False")
+            RacConfig.set("Achievements", "AchievementsEnabled", "False")
         # Write the configuration to the file
-        rac_path = '/userdata/system/configs/dolphin-emu/RetroAchievements.ini'
-        with open(rac_path, 'w') as rac_configfile:
+        rac_path = "/userdata/system/configs/dolphin-emu/RetroAchievements.ini"
+        with open(rac_path, "w") as rac_configfile:
             RacConfig.write(rac_configfile)
 
         # Update SYSCONF
         try:
             updateConfig(system.config, DOLPHIN_SYSCONF_PATH, gameResolution)
         except Exception:
-            pass # don't fail in case of SYSCONF update
+            pass  # don't fail in case of SYSCONF update
 
         # Check what version we've got
         if path.isfile(DOLPHIN_BIN_PATH):
@@ -471,21 +600,20 @@ class DolphinGenerator(Generator):
             commandArray = ["dolphin-emu-nogui", "-e", rom]
 
         # state_slot option
-        if system.isOptSet('state_filename'):
-            commandArray.extend(["--save_state", system.config['state_filename']])
+        if system.isOptSet("state_filename"):
+            commandArray.extend(["--save_state", system.config["state_filename"]])
 
         return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
-
         dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinGFXSettings.optionxform=lambda optionstr: str(optionstr)
+        dolphinGFXSettings.optionxform = lambda optionstr: str(optionstr)
         dolphinGFXSettings.read(DOLPHIN_GFX_PATH)
 
         dolphin_aspect_ratio = dolphinGFXSettings.get("Settings", "AspectRatio")
         # What if we're playing a GameCube game with the widescreen patch or not?
-        if 'widescreen_hack' in config and config["widescreen_hack"] == "1":
+        if "widescreen_hack" in config and config["widescreen_hack"] == "1":
             wii_tv_mode = 1
         else:
             wii_tv_mode = 0
@@ -498,29 +626,37 @@ class DolphinGenerator(Generator):
         # Auto
         if dolphin_aspect_ratio == "0":
             if wii_tv_mode == 1:
-                return 16/9
-            return 4/3
+                return 16 / 9
+            return 4 / 3
 
         # Forced 16:9
         if dolphin_aspect_ratio == "1":
-            return 16/9
+            return 16 / 9
 
         # Forced 4:3
         if dolphin_aspect_ratio == "2":
-            return 4/3
+            return 4 / 3
 
         # Stretched (thus depends on physical screen geometry)
         if dolphin_aspect_ratio == "3":
             return gameResolution["width"] / gameResolution["height"]
 
-        return 4/3
+        return 4 / 3
+
 
 # Get the language from the environment if user didn't set it in ES.
 # Seem to be only for the gamecube. However, while this is not in a gamecube section
 # It may be used for something else, so set it anyway
 def getGameCubeLangFromEnvironment():
-    lang = environ['LANG'][:5]
-    availableLanguages = { "en_US": 0, "de_DE": 1, "fr_FR": 2, "es_ES": 3, "it_IT": 4, "nl_NL": 5 }
+    lang = environ["LANG"][:5]
+    availableLanguages = {
+        "en_US": 0,
+        "de_DE": 1,
+        "fr_FR": 2,
+        "es_ES": 3,
+        "it_IT": 4,
+        "nl_NL": 5,
+    }
     if lang in availableLanguages:
         return availableLanguages[lang]
     else:

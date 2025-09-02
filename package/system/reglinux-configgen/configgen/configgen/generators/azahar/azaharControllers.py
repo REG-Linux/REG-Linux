@@ -1,5 +1,7 @@
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
+
 
 def setAzaharControllers(azaharConfig, playersControllers):
     azaharButtons = {
@@ -17,13 +19,10 @@ def setAzaharControllers(azaharConfig, playersControllers):
         "button_select": "back",
         "button_zl": "triggerleft",
         "button_zr": "triggerright",
-        "button_home": "guide"
+        "button_home": "guide",
     }
 
-    azaharAxis = {
-        "circle_pad": "leftx",
-        "c_stick": "rightx"
-    }
+    azaharAxis = {"circle_pad": "leftx", "c_stick": "rightx"}
 
     azaharConfig.ensure_section("Controls")
 
@@ -39,11 +38,17 @@ def setAzaharControllers(azaharConfig, playersControllers):
         if controller.index != 0:
             continue
         for x in azaharButtons:
-            azaharConfig.set("Controls", "profiles\\1\\" + x,
-                             f'"{setButton(azaharButtons[x], controller.guid, controller.inputs)}"')
+            azaharConfig.set(
+                "Controls",
+                "profiles\\1\\" + x,
+                f'"{setButton(azaharButtons[x], controller.guid, controller.inputs)}"',
+            )
         for x in azaharAxis:
-            azaharConfig.set("Controls", "profiles\\1\\" + x,
-                             f'"{setAxis(azaharAxis[x], controller.guid, controller.inputs)}"')
+            azaharConfig.set(
+                "Controls",
+                "profiles\\1\\" + x,
+                f'"{setAxis(azaharAxis[x], controller.guid, controller.inputs)}"',
+            )
         break
 
 
@@ -68,6 +73,7 @@ def setAxis(key, padGuid, padInputs):
 
     return f"axis_x:{inputx.id},guid:{padGuid},axis_y:{inputy.id},engine:sdl"
 
+
 @staticmethod
 def hatdirectionvalue(value):
     if int(value) == 1:
@@ -80,5 +86,8 @@ def hatdirectionvalue(value):
         return "left"
     return "unknown"
 
+
 def getMouseMode(self, config, rom):
-    return not ("azahar_screen_layout" in config and config["azahar_screen_layout"] == "1-false")
+    return not (
+        "azahar_screen_layout" in config and config["azahar_screen_layout"] == "1-false"
+    )

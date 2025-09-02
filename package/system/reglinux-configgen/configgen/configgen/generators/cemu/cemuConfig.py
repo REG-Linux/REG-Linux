@@ -1,17 +1,18 @@
 from subprocess import run, check_output, CalledProcessError, PIPE
 from systemFiles import CONF, BIOS, ROMS, SAVES
 from os import environ
-
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
 
-CEMU_CONFIG_DIR  = CONF + '/cemu'
-CEMU_CONFIG_PATH = CEMU_CONFIG_DIR + '/settings.xml'
-CEMU_BIOS_DIR = BIOS + '/cemu'
-CEMU_PROFILES_DIR = CEMU_CONFIG_DIR + '/controllerProfiles'
-CEMU_ROMS_DIR = ROMS + '/wiiu'
-CEMU_SAVES_DIR = SAVES + '/wiiu'
-CEMU_BIN_PATH = '/usr/bin/cemu/cemu'
+CEMU_CONFIG_DIR = CONF + "/cemu"
+CEMU_CONFIG_PATH = CEMU_CONFIG_DIR + "/settings.xml"
+CEMU_BIOS_DIR = BIOS + "/cemu"
+CEMU_PROFILES_DIR = CEMU_CONFIG_DIR + "/controllerProfiles"
+CEMU_ROMS_DIR = ROMS + "/wiiu"
+CEMU_SAVES_DIR = SAVES + "/wiiu"
+CEMU_BIN_PATH = "/usr/bin/cemu/cemu"
+
 
 def setCemuConfig(cemuConfig, system):
     ## [ROOT]
@@ -30,7 +31,10 @@ def setCemuConfig(cemuConfig, system):
     setSectionConfig(cemuConfig, xml_root, "vk_warning", "false")
     setSectionConfig(cemuConfig, xml_root, "fullscreen", "true")
     # Language
-    if not system.isOptSet("cemu_console_language") or system.config["cemu_console_language"] == "ui":
+    if (
+        not system.isOptSet("cemu_console_language")
+        or system.config["cemu_console_language"] == "ui"
+    ):
         lang = getLangFromEnvironment()
     else:
         lang = system.config["cemu_console_language"]
@@ -82,29 +86,50 @@ def setCemuConfig(cemuConfig, system):
     if api_value == "1":
         # Check if we have a discrete GPU & if so, set the UUID
         try:
-            have_vulkan = check_output(["/usr/bin/system-vulkan", "hasVulkan"], text=True).strip()
+            have_vulkan = check_output(
+                ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+            ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
-                    have_discrete = check_output(["/usr/bin/system-vulkan", "hasDiscrete"], text=True).strip()
+                    have_discrete = check_output(
+                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                    ).strip()
                     if have_discrete == "true":
-                        eslog.debug("A discrete GPU is available on the system. We will use that for performance")
+                        eslog.debug(
+                            "A discrete GPU is available on the system. We will use that for performance"
+                        )
                         try:
-                            discrete_uuid = check_output(["/usr/bin/system-vulkan", "discreteUUID"], text=True).strip()
+                            discrete_uuid = check_output(
+                                ["/usr/bin/system-vulkan", "discreteUUID"], text=True
+                            ).strip()
                             if discrete_uuid != "":
                                 discrete_uuid_num = discrete_uuid.replace("-", "")
-                                eslog.debug("Using Discrete GPU UUID: {} for Cemu".format(discrete_uuid_num))
-                                setSectionConfig(cemuConfig, graphic_root, "device", discrete_uuid_num)
+                                eslog.debug(
+                                    "Using Discrete GPU UUID: {} for Cemu".format(
+                                        discrete_uuid_num
+                                    )
+                                )
+                                setSectionConfig(
+                                    cemuConfig,
+                                    graphic_root,
+                                    "device",
+                                    discrete_uuid_num,
+                                )
                             else:
                                 eslog.debug("Couldn't get discrete GPU UUID!")
                         except CalledProcessError:
                             eslog.debug("Error getting discrete GPU UUID!")
                     else:
-                        eslog.debug("Discrete GPU is not available on the system. Using default.")
+                        eslog.debug(
+                            "Discrete GPU is not available on the system. Using default."
+                        )
                 except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
             else:
-                eslog.debug("Vulkan driver is not available on the system. Falling back to OpenGL")
+                eslog.debug(
+                    "Vulkan driver is not available on the system. Falling back to OpenGL"
+                )
                 setSectionConfig(cemuConfig, graphic_root, "api", "0")
         except CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
@@ -118,22 +143,28 @@ def setCemuConfig(cemuConfig, system):
     if system.isOptSet("cemu_vsync"):
         setSectionConfig(cemuConfig, graphic_root, "VSync", system.config["cemu_vsync"])
     else:
-        setSectionConfig(cemuConfig, graphic_root, "VSync", "0") # Off
+        setSectionConfig(cemuConfig, graphic_root, "VSync", "0")  # Off
     # Upscale Filter
     if system.isOptSet("cemu_upscale"):
-        setSectionConfig(cemuConfig, graphic_root, "UpscaleFilter", system.config["cemu_upscale"])
+        setSectionConfig(
+            cemuConfig, graphic_root, "UpscaleFilter", system.config["cemu_upscale"]
+        )
     else:
-        setSectionConfig(cemuConfig, graphic_root, "UpscaleFilter", "2") # Hermite
+        setSectionConfig(cemuConfig, graphic_root, "UpscaleFilter", "2")  # Hermite
     # Downscale Filter
     if system.isOptSet("cemu_downscale"):
-        setSectionConfig(cemuConfig, graphic_root, "DownscaleFilter", system.config["cemu_downscale"])
+        setSectionConfig(
+            cemuConfig, graphic_root, "DownscaleFilter", system.config["cemu_downscale"]
+        )
     else:
-        setSectionConfig(cemuConfig, graphic_root, "DownscaleFilter", "0") # Bilinear
+        setSectionConfig(cemuConfig, graphic_root, "DownscaleFilter", "0")  # Bilinear
     # Aspect Ratio
     if system.isOptSet("cemu_aspect"):
-        setSectionConfig(cemuConfig, graphic_root, "FullscreenScaling", system.config["cemu_aspect"])
+        setSectionConfig(
+            cemuConfig, graphic_root, "FullscreenScaling", system.config["cemu_aspect"]
+        )
     else:
-        setSectionConfig(cemuConfig, graphic_root, "FullscreenScaling", "0") # Bilinear
+        setSectionConfig(cemuConfig, graphic_root, "FullscreenScaling", "0")  # Bilinear
 
     ## [GRAPHICS OVERLAYS] - Currently disbaled! Causes crash
     # Performance - alternative to MongHud
@@ -141,44 +172,47 @@ def setCemuConfig(cemuConfig, system):
     overlay_root = getRoot(cemuConfig, "Overlay")
     # Display FPS / CPU / GPU / RAM
     if system.isOptSet("cemu_overlay") and system.config["cemu_overlay"] == "True":
-        setSectionConfig(cemuConfig, overlay_root, "Position",        "3")
-        setSectionConfig(cemuConfig, overlay_root, "TextColor",       "4294967295")
-        setSectionConfig(cemuConfig, overlay_root, "TextScale",       "100")
-        setSectionConfig(cemuConfig, overlay_root, "FPS",             "true")
-        setSectionConfig(cemuConfig, overlay_root, "DrawCalls",       "true")
-        setSectionConfig(cemuConfig, overlay_root, "CPUUsage",        "true")
+        setSectionConfig(cemuConfig, overlay_root, "Position", "3")
+        setSectionConfig(cemuConfig, overlay_root, "TextColor", "4294967295")
+        setSectionConfig(cemuConfig, overlay_root, "TextScale", "100")
+        setSectionConfig(cemuConfig, overlay_root, "FPS", "true")
+        setSectionConfig(cemuConfig, overlay_root, "DrawCalls", "true")
+        setSectionConfig(cemuConfig, overlay_root, "CPUUsage", "true")
         setSectionConfig(cemuConfig, overlay_root, "CPUPerCoreUsage", "true")
-        setSectionConfig(cemuConfig, overlay_root, "RAMUsage",        "true")
-        setSectionConfig(cemuConfig, overlay_root, "VRAMUsage",       "true")
+        setSectionConfig(cemuConfig, overlay_root, "RAMUsage", "true")
+        setSectionConfig(cemuConfig, overlay_root, "VRAMUsage", "true")
     else:
-        setSectionConfig(cemuConfig, overlay_root, "Position",        "3")
-        setSectionConfig(cemuConfig, overlay_root, "TextColor",       "4294967295")
-        setSectionConfig(cemuConfig, overlay_root, "TextScale",       "100")
-        setSectionConfig(cemuConfig, overlay_root, "FPS",             "false")
-        setSectionConfig(cemuConfig, overlay_root, "DrawCalls",       "false")
-        setSectionConfig(cemuConfig, overlay_root, "CPUUsage",        "false")
+        setSectionConfig(cemuConfig, overlay_root, "Position", "3")
+        setSectionConfig(cemuConfig, overlay_root, "TextColor", "4294967295")
+        setSectionConfig(cemuConfig, overlay_root, "TextScale", "100")
+        setSectionConfig(cemuConfig, overlay_root, "FPS", "false")
+        setSectionConfig(cemuConfig, overlay_root, "DrawCalls", "false")
+        setSectionConfig(cemuConfig, overlay_root, "CPUUsage", "false")
         setSectionConfig(cemuConfig, overlay_root, "CPUPerCoreUsage", "false")
-        setSectionConfig(cemuConfig, overlay_root, "RAMUsage",        "false")
-        setSectionConfig(cemuConfig, overlay_root, "VRAMUsage",       "false")
+        setSectionConfig(cemuConfig, overlay_root, "RAMUsage", "false")
+        setSectionConfig(cemuConfig, overlay_root, "VRAMUsage", "false")
     # Notifications
     setSectionConfig(cemuConfig, graphic_root, "Notification", "")
     notification_root = getRoot(cemuConfig, "Notification")
-    if system.isOptSet("cemu_notifications") and system.config["cemu_notifications"] == "True":
+    if (
+        system.isOptSet("cemu_notifications")
+        and system.config["cemu_notifications"] == "True"
+    ):
         setSectionConfig(cemuConfig, notification_root, "Position", "1")
         setSectionConfig(cemuConfig, notification_root, "TextColor", "4294967295")
         setSectionConfig(cemuConfig, notification_root, "TextScale", "100")
         setSectionConfig(cemuConfig, notification_root, "ControllerProfiles", "true")
-        setSectionConfig(cemuConfig, notification_root, "ControllerBattery",  "true")
-        setSectionConfig(cemuConfig, notification_root, "ShaderCompiling",    "true")
-        setSectionConfig(cemuConfig, notification_root, "FriendService",      "true")
+        setSectionConfig(cemuConfig, notification_root, "ControllerBattery", "true")
+        setSectionConfig(cemuConfig, notification_root, "ShaderCompiling", "true")
+        setSectionConfig(cemuConfig, notification_root, "FriendService", "true")
     else:
         setSectionConfig(cemuConfig, notification_root, "Position", "1")
         setSectionConfig(cemuConfig, notification_root, "TextColor", "4294967295")
         setSectionConfig(cemuConfig, notification_root, "TextScale", "100")
         setSectionConfig(cemuConfig, notification_root, "ControllerProfiles", "false")
-        setSectionConfig(cemuConfig, notification_root, "ControllerBattery",  "false")
-        setSectionConfig(cemuConfig, notification_root, "ShaderCompiling",    "false")
-        setSectionConfig(cemuConfig, notification_root, "FriendService",      "false")
+        setSectionConfig(cemuConfig, notification_root, "ControllerBattery", "false")
+        setSectionConfig(cemuConfig, notification_root, "ShaderCompiling", "false")
+        setSectionConfig(cemuConfig, notification_root, "FriendService", "false")
 
     ## [AUDIO]
     setSectionConfig(cemuConfig, xml_root, "Audio", "")
@@ -187,19 +221,27 @@ def setCemuConfig(cemuConfig, system):
     setSectionConfig(cemuConfig, audio_root, "api", "3")
     # Turn audio ONLY on TV
     if system.isOptSet("cemu_audio_channels"):
-        setSectionConfig(cemuConfig, audio_root, "TVChannels", system.config["cemu_audio_channels"])
+        setSectionConfig(
+            cemuConfig, audio_root, "TVChannels", system.config["cemu_audio_channels"]
+        )
     else:
-        setSectionConfig(cemuConfig, audio_root, "TVChannels", "1") # Stereo
+        setSectionConfig(cemuConfig, audio_root, "TVChannels", "1")  # Stereo
     # Set volume to the max
     setSectionConfig(cemuConfig, audio_root, "TVVolume", "100")
     # Set the audio device - we choose the 1st device as this is more likely the answer
     # pactl list sinks-raw | sed -e s+"^sink=[0-9]* name=\([^ ]*\) .*"+"\1"+ | sed 1q | tr -d '\n'
     proc = run(["/usr/bin/cemu/get-audio-device"], stdout=PIPE)
-    cemuAudioDevice = proc.stdout.decode('utf-8')
+    cemuAudioDevice = proc.stdout.decode("utf-8")
     eslog.debug("*** audio device = {} ***".format(cemuAudioDevice))
-    if system.isOptSet("cemu_audio_config") and system.getOptBoolean("cemu_audio_config") == True:
+    if (
+        system.isOptSet("cemu_audio_config")
+        and system.getOptBoolean("cemu_audio_config") == True
+    ):
         setSectionConfig(cemuConfig, audio_root, "TVDevice", cemuAudioDevice)
-    elif system.isOptSet("cemu_audio_config") and system.getOptBoolean("cemu_audio_config") == False:
+    elif (
+        system.isOptSet("cemu_audio_config")
+        and system.getOptBoolean("cemu_audio_config") == False
+    ):
         # don't change the config setting
         eslog.debug("*** use config audio device ***")
     else:
@@ -213,6 +255,7 @@ def getMouseMode(self, config, rom):
     else:
         return False
 
+
 def getRoot(config, name):
     xml_section = config.getElementsByTagName(name)
 
@@ -223,6 +266,7 @@ def getRoot(config, name):
         xml_section = xml_section[0]
 
     return xml_section
+
 
 def setSectionConfig(config, xml_section, name, value):
     xml_elt = xml_section.getElementsByTagName(name)
@@ -237,15 +281,30 @@ def setSectionConfig(config, xml_section, name, value):
     else:
         xml_elt.appendChild(config.createTextNode(value))
 
+
 # Language setting
 def getLangFromEnvironment():
-    if 'LANG' in environ:
-        return environ['LANG'][:5]
+    if "LANG" in environ:
+        return environ["LANG"][:5]
     else:
         return "en_US"
 
+
 def getCemuLang(lang):
-    availableLanguages = { "ja_JP": 0, "en_US": 1, "fr_FR": 2, "de_DE": 3, "it_IT": 4, "es_ES": 5, "zh_CN": 6, "ko_KR": 7, "nl_NL": 8, "pt_PT": 9, "ru_RU": 10, "zh_TW": 11 }
+    availableLanguages = {
+        "ja_JP": 0,
+        "en_US": 1,
+        "fr_FR": 2,
+        "de_DE": 3,
+        "it_IT": 4,
+        "es_ES": 5,
+        "zh_CN": 6,
+        "ko_KR": 7,
+        "nl_NL": 8,
+        "pt_PT": 9,
+        "ru_RU": 10,
+        "zh_TW": 11,
+    }
     if lang in availableLanguages:
         return availableLanguages[lang]
     else:

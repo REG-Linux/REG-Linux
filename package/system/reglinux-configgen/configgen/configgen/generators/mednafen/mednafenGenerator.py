@@ -2,12 +2,18 @@ from generators.Generator import Generator
 from Command import Command
 from os import path, makedirs, unlink
 from .mednafenControllers import setMednafenControllers
-from .mednafenConfig import setMednafenConfig, MEDNAFEN_CONFIG_DIR, MEDNAFEN_CONFIG_PATH, MEDNAFEN_BIN_PATH
+from .mednafenConfig import (
+    setMednafenConfig,
+    MEDNAFEN_CONFIG_DIR,
+    MEDNAFEN_CONFIG_PATH,
+    MEDNAFEN_BIN_PATH,
+)
+
 
 class MednafenGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         if not path.exists(MEDNAFEN_CONFIG_DIR):
             makedirs(MEDNAFEN_CONFIG_DIR)
 

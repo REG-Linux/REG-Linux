@@ -1,7 +1,8 @@
 from systemFiles import CONF
 
-CANNONBALL_CONFIG_PATH = CONF + '/cannonball/config.xml'
-CANNONBALL_BIN_PATH = '/usr/bin/cannonball'
+CANNONBALL_CONFIG_PATH = CONF + "/cannonball/config.xml"
+CANNONBALL_BIN_PATH = "/usr/bin/cannonball"
+
 
 def setCannonballConfig(cannoballConfig, system):
     # root
@@ -11,13 +12,13 @@ def setCannonballConfig(cannoballConfig, system):
     xml_video = getSection(cannoballConfig, xml_root, "video")
 
     # fps
-    if system.isOptSet('showFPS') and system.getOptBoolean('showFPS'):
+    if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
         setSectionConfig(cannoballConfig, xml_video, "fps_counter", "1")
     else:
         setSectionConfig(cannoballConfig, xml_video, "fps_counter", "0")
 
     # ratio
-    if system.isOptSet('ratio') and system.config["ratio"] == "16/9":
+    if system.isOptSet("ratio") and system.config["ratio"] == "16/9":
         setSectionConfig(cannoballConfig, xml_video, "widescreen", "1")
         setSectionConfig(cannoballConfig, xml_video, "mode", "1")
     else:
@@ -25,7 +26,7 @@ def setCannonballConfig(cannoballConfig, system):
         setSectionConfig(cannoballConfig, xml_video, "mode", "1")
 
     # high resolution
-    if system.isOptSet('highResolution') and system.config["highResolution"] == "1":
+    if system.isOptSet("highResolution") and system.config["highResolution"] == "1":
         setSectionConfig(cannoballConfig, xml_video, "hires", "1")
     else:
         setSectionConfig(cannoballConfig, xml_video, "hires", "0")
@@ -43,6 +44,7 @@ def getRoot(config, name):
 
     return xml_section
 
+
 @staticmethod
 def getSection(config, xml_root, name):
     xml_section = xml_root.getElementsByTagName(name)
@@ -54,6 +56,7 @@ def getSection(config, xml_root, name):
         xml_section = xml_section[0]
 
     return xml_section
+
 
 @staticmethod
 def setSectionConfig(config, xml_section, name, value):

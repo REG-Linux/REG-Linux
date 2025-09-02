@@ -3,28 +3,36 @@ from os import makedirs
 from Command import Command
 import controllers as controllersConfig
 
-UQM_BIN_PATH = '/usr/bin/urquan'
+UQM_BIN_PATH = "/usr/bin/urquan"
+
 
 class UqmGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         directories = [
-            '/userdata/saves/uqm',
-            '/userdata/saves/uqm/teams',
-            '/userdata/saves/uqm/save'
+            "/userdata/saves/uqm",
+            "/userdata/saves/uqm/teams",
+            "/userdata/saves/uqm/save",
         ]
 
         for directory in directories:
             makedirs(directory, exist_ok=True)
 
-        with open('/userdata/roms/uqm/version', 'a'): # Create file if does not exist
+        with open("/userdata/roms/uqm/version", "a"):  # Create file if does not exist
             pass
 
-        commandArray = [UQM_BIN_PATH,"--contentdir=/userdata/roms/uqm",
-                        "--configdir=/userdata/saves/uqm"]
+        commandArray = [
+            UQM_BIN_PATH,
+            "--contentdir=/userdata/roms/uqm",
+            "--configdir=/userdata/saves/uqm",
+        ]
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': controllersConfig.generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": controllersConfig.generate_sdl_controller_config(
+                    playersControllers
+                )
+            },
+        )

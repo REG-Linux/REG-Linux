@@ -23,9 +23,13 @@ class JSONSettings:
             auto_load (bool, optional): If True, automatically loads the JSON file on initialization.
                                        Defaults to True.
         """
-        self.filepath = Path(filepath)  # Convert filepath to Path object for consistent handling
+        self.filepath = Path(
+            filepath
+        )  # Convert filepath to Path object for consistent handling
         self._data: dict[str, Any] = {}  # Internal dictionary to store JSON data
-        self._logger = logging.getLogger(f"{__name__}.JSONSettings")  # Logger for this class
+        self._logger = logging.getLogger(
+            f"{__name__}.JSONSettings"
+        )  # Logger for this class
         if auto_load:
             self.load()  # Load the JSON file if auto_load is True
 
@@ -37,8 +41,12 @@ class JSONSettings:
         """
         if not self.filepath.exists():
             try:
-                self.filepath.parent.mkdir(parents=True, exist_ok=True)  # Create parent directories
-                self.filepath.write_text("{}", encoding="utf-8")  # Create empty JSON file
+                self.filepath.parent.mkdir(
+                    parents=True, exist_ok=True
+                )  # Create parent directories
+                self.filepath.write_text(
+                    "{}", encoding="utf-8"
+                )  # Create empty JSON file
                 self._logger.info(f"Created new JSON file: {self.filepath}")
             except Exception as e:
                 self._logger.error(f"Failed to create JSON file {self.filepath}: {e}")
@@ -75,7 +83,9 @@ class JSONSettings:
         """
         try:
             with self.filepath.open("w", encoding="utf-8") as f:
-                json.dump(self._data, f, indent=indent, ensure_ascii=False)  # Write data to file
+                json.dump(
+                    self._data, f, indent=indent, ensure_ascii=False
+                )  # Write data to file
             return True
         except Exception as e:
             self._logger.error(f"Failed to write JSON {self.filepath}: {e}")
@@ -101,7 +111,9 @@ class JSONSettings:
         Returns:
             bool: True if the key was removed, False if it didn't exist.
         """
-        return self._data.pop(name, None) is not None  # Remove and return True if key existed
+        return (
+            self._data.pop(name, None) is not None
+        )  # Remove and return True if key existed
 
     def exists(self, name: str) -> bool:
         """
@@ -144,7 +156,9 @@ class JSONSettings:
         result = {}
         for key, value in self._data.items():
             if key.startswith(name + "."):
-                suffix = key if includeName else key[len(name) + 1:]  # Strip prefix if needed
+                suffix = (
+                    key if includeName else key[len(name) + 1 :]
+                )  # Strip prefix if needed
                 result[suffix] = value
         return result
 
