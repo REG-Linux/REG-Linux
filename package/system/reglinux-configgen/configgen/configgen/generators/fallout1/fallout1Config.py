@@ -1,13 +1,14 @@
 from systemFiles import CONF, ROMS
 
-FALLOUT_CONFIG_DIR = CONF + '/fallout1'
-FALLOUT_CONFIG_PATH = FALLOUT_CONFIG_DIR + '/fallout.cfg'
-FALLOUT_CONFIG_INI = FALLOUT_CONFIG_DIR + '/f1_res.ini'
-FALLOUT_ROMS_DIR = ROMS + '/fallout1-ce'
-FALLOUT_BIN_PATH = '/usr/bin/fallout1-ce'
-FALLOUT_EXE_SOURCE_PATH = FALLOUT_ROMS_DIR + '/fallout1-ce'
-FALLOUT_CONFIG_SOURCE_PATH = FALLOUT_ROMS_DIR + '/fallout1.cfg'
-FALLOUT_CONFIG_INI_SOURCE_PATH = FALLOUT_ROMS_DIR + '/f1_res.ini'
+FALLOUT_CONFIG_DIR = CONF + "/fallout1"
+FALLOUT_CONFIG_PATH = FALLOUT_CONFIG_DIR + "/fallout.cfg"
+FALLOUT_CONFIG_INI = FALLOUT_CONFIG_DIR + "/f1_res.ini"
+FALLOUT_ROMS_DIR = ROMS + "/fallout1-ce"
+FALLOUT_BIN_PATH = "/usr/bin/fallout1-ce"
+FALLOUT_EXE_SOURCE_PATH = FALLOUT_ROMS_DIR + "/fallout1-ce"
+FALLOUT_CONFIG_SOURCE_PATH = FALLOUT_ROMS_DIR + "/fallout1.cfg"
+FALLOUT_CONFIG_INI_SOURCE_PATH = FALLOUT_ROMS_DIR + "/f1_res.ini"
+
 
 def setFalloutConfig(falloutConfig, system):
     if not falloutConfig.has_section("debug"):
@@ -29,17 +30,23 @@ def setFalloutConfig(falloutConfig, system):
     falloutConfig.set("system", "master_patches", "DATA")
 
     if system.isOptSet("fout1_game_difficulty"):
-        falloutConfig.set("preferences", "game_difficulty", system.config["fout1_game_difficulty"])
+        falloutConfig.set(
+            "preferences", "game_difficulty", system.config["fout1_game_difficulty"]
+        )
     else:
         falloutConfig.set("preferences", "game_difficulty", "1")
 
     if system.isOptSet("fout1_combat_difficulty"):
-        falloutConfig.set("preferences", "combat_difficulty", system.config["fout1_combat_difficulty"])
+        falloutConfig.set(
+            "preferences", "combat_difficulty", system.config["fout1_combat_difficulty"]
+        )
     else:
         falloutConfig.set("preferences", "combat_difficulty", "1")
 
     if system.isOptSet("fout1_violence_level"):
-        falloutConfig.set("preferences", "violence_level", system.config["fout1_violence_level"])
+        falloutConfig.set(
+            "preferences", "violence_level", system.config["fout1_violence_level"]
+        )
     else:
         falloutConfig.set("preferences", "violence_level", "2")
 
@@ -52,6 +59,7 @@ def setFalloutConfig(falloutConfig, system):
         falloutConfig.set("system", "language", system.config["fout1_language"])
     else:
         falloutConfig.set("system", "language", "english")
+
 
 def setFalloutIniConfig(falloutIniConfig, gameResolution):
     # [MAIN]

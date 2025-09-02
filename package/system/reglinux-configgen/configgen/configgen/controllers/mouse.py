@@ -1,34 +1,48 @@
 from evdev import ecodes
 
+
 def getMouseButtons(device):
-  caps = device.capabilities()
-  caps_keys = caps[ecodes.EV_KEY]
-  caps_filter = [ecodes.BTN_LEFT, ecodes.BTN_RIGHT, ecodes.BTN_MIDDLE, ecodes.BTN_1, ecodes.BTN_2, ecodes.BTN_3, ecodes.BTN_4, ecodes.BTN_5, ecodes.BTN_6, ecodes.BTN_7, ecodes.BTN_8]
-  caps_intersection = list(set(caps_keys) & set(caps_filter))
-  buttons = []
-  if ecodes.BTN_LEFT in caps_intersection:
-    buttons.append("left")
-  if ecodes.BTN_RIGHT in caps_intersection:
-    buttons.append("right")
-  if ecodes.BTN_MIDDLE in caps_intersection:
-    buttons.append("middle")
-  if ecodes.BTN_1 in caps_intersection:
-    buttons.append("1")
-  if ecodes.BTN_2 in caps_intersection:
-    buttons.append("2")
-  if ecodes.BTN_3 in caps_intersection:
-    buttons.append("3")
-  if ecodes.BTN_4 in caps_intersection:
-    buttons.append("4")
-  if ecodes.BTN_5 in caps_intersection:
-    buttons.append("5")
-  if ecodes.BTN_6 in caps_intersection:
-    buttons.append("6")
-  if ecodes.BTN_7 in caps_intersection:
-    buttons.append("7")
-  if ecodes.BTN_8 in caps_intersection:
-    buttons.append("8")
-  return buttons
+    caps = device.capabilities()
+    caps_keys = caps[ecodes.EV_KEY]
+    caps_filter = [
+        ecodes.BTN_LEFT,
+        ecodes.BTN_RIGHT,
+        ecodes.BTN_MIDDLE,
+        ecodes.BTN_1,
+        ecodes.BTN_2,
+        ecodes.BTN_3,
+        ecodes.BTN_4,
+        ecodes.BTN_5,
+        ecodes.BTN_6,
+        ecodes.BTN_7,
+        ecodes.BTN_8,
+    ]
+    caps_intersection = list(set(caps_keys) & set(caps_filter))
+    buttons = []
+    if ecodes.BTN_LEFT in caps_intersection:
+        buttons.append("left")
+    if ecodes.BTN_RIGHT in caps_intersection:
+        buttons.append("right")
+    if ecodes.BTN_MIDDLE in caps_intersection:
+        buttons.append("middle")
+    if ecodes.BTN_1 in caps_intersection:
+        buttons.append("1")
+    if ecodes.BTN_2 in caps_intersection:
+        buttons.append("2")
+    if ecodes.BTN_3 in caps_intersection:
+        buttons.append("3")
+    if ecodes.BTN_4 in caps_intersection:
+        buttons.append("4")
+    if ecodes.BTN_5 in caps_intersection:
+        buttons.append("5")
+    if ecodes.BTN_6 in caps_intersection:
+        buttons.append("6")
+    if ecodes.BTN_7 in caps_intersection:
+        buttons.append("7")
+    if ecodes.BTN_8 in caps_intersection:
+        buttons.append("8")
+    return buttons
+
 
 def mouseButtonToCode(button):
     if button == "left":

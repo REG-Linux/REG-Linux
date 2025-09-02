@@ -18,29 +18,30 @@ from os import path, makedirs
 # 6 pot axis      joystick (pot: 1/2/3/4 = x1/y1/x2/y2)
 
 viceJoystick = {
-            "up":       "# 2 0 1 / 1",
-            "down":     "# 2 1 1 / 2",
-            "left":     "# 2 2 1 / 4",
-            "right":    "# 2 3 1 / 8",
-            "start":    "# 1 ? 0",
-            "select":   "# 1 ? 4",
-            "hotkey":   "# 1 ? 5 Quit emulator",
-            "a":        "# 1 ? 1 / 32", # Space
-            "b":        "# 1 ? 1 / 16", # Fire button
-            "x":        "# 1 ? 0",
-            "y":        "# 1 ? 1 / 64", # Y
-            "pageup":   "# 1 ? 0",
-            "pagedown": "# 1 ? 0",
-            "l1":       "# 1 ? 0",
-            "r1":       "# 1 ? 0",
+    "up": "# 2 0 1 / 1",
+    "down": "# 2 1 1 / 2",
+    "left": "# 2 2 1 / 4",
+    "right": "# 2 3 1 / 8",
+    "start": "# 1 ? 0",
+    "select": "# 1 ? 4",
+    "hotkey": "# 1 ? 5 Quit emulator",
+    "a": "# 1 ? 1 / 32",  # Space
+    "b": "# 1 ? 1 / 16",  # Fire button
+    "x": "# 1 ? 0",
+    "y": "# 1 ? 1 / 64",  # Y
+    "pageup": "# 1 ? 0",
+    "pagedown": "# 1 ? 0",
+    "l1": "# 1 ? 0",
+    "r1": "# 1 ? 0",
 }
+
 
 # Create the controller configuration file
 def generateControllerConfig(system, viceConfigFile, playersControllers):
     # vjm file
     viceFile = viceConfigFile + "/sdl-joymap.vjm"
     # vic20 uses a slightly different port
-    if(system.config['core'] == 'xvic'):
+    if system.config["core"] == "xvic":
         joy_port = "0"
     else:
         joy_port = "1"
@@ -48,7 +49,7 @@ def generateControllerConfig(system, viceConfigFile, playersControllers):
     if not path.exists(path.dirname(viceFile)):
         makedirs(path.dirname(viceFile))
 
-    listVice = [];
+    listVice = []
     listVice.append("# REG-Linux configured controllers")
     listVice.append("")
     listVice.append("!CLEAR")
@@ -60,11 +61,15 @@ def generateControllerConfig(system, viceConfigFile, playersControllers):
             input = pad.inputs[x]
             for indexName, indexValue in viceJoystick.items():
                 if indexName == input.name:
-                    listVice.append(indexValue.replace('#', str(pad.index)).replace('?', str(input.id)).replace('/', joy_port))
+                    listVice.append(
+                        indexValue.replace("#", str(pad.index))
+                        .replace("?", str(input.id))
+                        .replace("/", joy_port)
+                    )
         listVice.append("")
         nplayer += 1
 
-    f = open(viceFile, 'w')
+    f = open(viceFile, "w")
     for i in range(len(listVice)):
         f.write(str(listVice[i]) + "\n")
     f.write

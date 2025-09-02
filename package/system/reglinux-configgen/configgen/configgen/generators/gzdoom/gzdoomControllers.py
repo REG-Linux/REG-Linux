@@ -1,5 +1,6 @@
 from .gzdoomConfig import GZDOOM_CONFIG_PATH
 
+
 def setGzdoomControllers(system):
     with open(GZDOOM_CONFIG_PATH, "r") as file:
         lines = file.readlines()

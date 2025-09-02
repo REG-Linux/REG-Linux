@@ -1,9 +1,10 @@
 from systemFiles import CONF, ROMS
 
-CGENIUS_CONFIG_DIR = CONF + '/cgenius'
-CGENIUS_ROMS_DIR = ROMS + '/cgenius/'
-CGENIUS_CONFIG_PATH = CGENIUS_CONFIG_DIR + '/cgenius.cfg'
-CGENIUS_BIN_PATH = '/usr/bin/CGeniusExe'
+CGENIUS_CONFIG_DIR = CONF + "/cgenius"
+CGENIUS_ROMS_DIR = ROMS + "/cgenius/"
+CGENIUS_CONFIG_PATH = CGENIUS_CONFIG_DIR + "/cgenius.cfg"
+CGENIUS_BIN_PATH = "/usr/bin/CGeniusExe"
+
 
 def setCgeniusConfig(cgeniusConfig, system):
     # Now setup the options we want...
@@ -55,6 +56,7 @@ def setCgeniusConfig(cgeniusConfig, system):
         cgeniusConfig["Video"]["ShowCursor"] = system.config["cgenius_cursor"]
     else:
         cgeniusConfig["Video"]["ShowCursor"] = "false"
+
 
 # Show mouse on screen for the Config Screen
 def getMouseMode(self, config, rom):

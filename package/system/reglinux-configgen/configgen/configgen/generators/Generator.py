@@ -6,11 +6,13 @@ class Generator(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution) -> Command:
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ) -> Command:
         pass
 
     def getResolutionMode(self, config) -> str:
-        return config['videomode']
+        return config["videomode"]
 
     def getMouseMode(self, config, rom) -> bool:
         return False
@@ -28,7 +30,7 @@ class Generator(object):
 
     def getInGameRatio(self, config, gameResolution, rom):
         # put a default value, but it should be overriden by generators
-        return 4/3
+        return 4 / 3
 
     # this emulator/core requires wayland compositor to run
     def requiresWayland(self) -> bool:

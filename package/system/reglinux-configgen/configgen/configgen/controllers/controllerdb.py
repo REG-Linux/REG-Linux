@@ -6,9 +6,10 @@ Handles loading and matching controller configurations from gamecontrollerdb.txt
 from os import environ
 from typing import Dict
 from controllers import Controller, Input
-
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
+
 
 def load_all_controllers_config() -> Dict[str, Dict]:
     """
@@ -51,7 +52,7 @@ def load_all_controllers_config() -> Dict[str, Dict]:
                         "name": name,
                         "inputs": inputs,
                         "type": "joystick",
-                        "input_objects": inputs  # Backward compatible
+                        "input_objects": inputs,  # Backward compatible
                     }
     except FileNotFoundError:
         eslog.warning(f"Warning: Controller config file {filepath} not found.")
@@ -75,7 +76,9 @@ def load_controller_config(controllersInput):
     controllers = load_all_controllers_config()
 
     for i, ci in enumerate(controllersInput):
-        newController = _find_best_controller_config(controllers, i, ci["guid"], ci["devicepath"])
+        newController = _find_best_controller_config(
+            controllers, i, ci["guid"], ci["devicepath"]
+        )
         if newController:
             playerControllers[str(i + 1)] = newController
     return playerControllers
@@ -96,7 +99,7 @@ def _find_best_controller_config(controllers, x, pxguid, pxdev):
     """
     for controllerGUID in controllers:
         controller = controllers[controllerGUID]
-        if controller['guid'] == pxguid:
+        if controller["guid"] == pxguid:
             controller_data = controller.copy()
             controller_data["index"] = x
             controller_data["dev"] = pxdev

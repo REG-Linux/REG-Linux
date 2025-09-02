@@ -10,14 +10,15 @@ from os import environ, path
 from subprocess import Popen, TimeoutExpired, run
 from time import sleep
 from typing import Optional
-
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
 
 # Global state tracking variables
 sway_launched = False  # Tracks if Sway compositor is running
 sway_process: Optional[Popen] = None  # Holds the Sway process reference
 gamescope_launched = False  # Reserved for future Gamescope implementation
+
 
 def start_sway(generator, system) -> bool:
     """
@@ -41,35 +42,31 @@ def start_sway(generator, system) -> bool:
 
     try:
         sway_process = Popen(
-            [
-                "/usr/bin/sway",
-                "-c", "/etc/sway/launchconfig"
-            ],
+            ["/usr/bin/sway", "-c", "/etc/sway/launchconfig"],
             env={
                 **environ.copy(),
-                "WLR_LIBINPUT_NO_DEVICES": "1"  # Set as environment variable
+                "WLR_LIBINPUT_NO_DEVICES": "1",  # Set as environment variable
             },
-            start_new_session=True
+            start_new_session=True,
         )
 
         eslog.debug("=======>> Sway process started with PID: %d", sway_process.pid)
 
         # Configure environment variables for Wayland compatibility
-        environ.update({
-            "WAYLAND_DISPLAY": "wayland-1",
-            "XDG_RUNTIME_DIR": "/var/run",
-            "SWAYSOCK": "/var/run/sway-ipc.0.sock",
-            "SDL_VIDEODRIVER": "wayland",
-            "XDG_SESSION_TYPE": "wayland",
-            "QT_QPA_PLATFORM": "wayland"
-        })
+        environ.update(
+            {
+                "WAYLAND_DISPLAY": "wayland-1",
+                "XDG_RUNTIME_DIR": "/var/run",
+                "SWAYSOCK": "/var/run/sway-ipc.0.sock",
+                "SDL_VIDEODRIVER": "wayland",
+                "XDG_SESSION_TYPE": "wayland",
+                "QT_QPA_PLATFORM": "wayland",
+            }
+        )
 
         # Handle X11 fallback if required by the generator
         if generator.requiresX11():
-            environ.update({
-                "DISPLAY": ":0",
-                "QT_QPA_PLATFORM": "xcb"
-            })
+            environ.update({"DISPLAY": ":0", "QT_QPA_PLATFORM": "xcb"})
 
         # Verify process started successfully
         sleep(1)  # Brief pause to allow initialization
@@ -87,6 +84,7 @@ def start_sway(generator, system) -> bool:
         if sway_process and sway_process.poll() is None:
             sway_process.terminate()
         return False
+
 
 def stop_sway(generator, system) -> bool:
     """
@@ -115,14 +113,16 @@ def stop_sway(generator, system) -> bool:
             sway_process = None
 
         # Clean up environment variables
-        for var in ["WAYLAND_DISPLAY", "XDG_RUNTIME_DIR", "SWAYSOCK", "SDL_VIDEODRIVER"]:
+        for var in [
+            "WAYLAND_DISPLAY",
+            "XDG_RUNTIME_DIR",
+            "SWAYSOCK",
+            "SDL_VIDEODRIVER",
+        ]:
             environ.pop(var, None)
 
         # Reset remaining environment settings
-        environ.update({
-            "XDG_SESSION_TYPE": "drm",
-            "QT_QPA_PLATFORM": "xcb"
-        })
+        environ.update({"XDG_SESSION_TYPE": "drm", "QT_QPA_PLATFORM": "xcb"})
 
         if generator.requiresX11():
             environ.pop("DISPLAY", None)
@@ -138,6 +138,7 @@ def stop_sway(generator, system) -> bool:
         eslog.error(f"Error stopping Sway: {str(e)}")
         return False
 
+
 def start_compositor(generator, system) -> None:
     """
     Starts the appropriate compositor based on system availability.
@@ -151,11 +152,14 @@ def start_compositor(generator, system) -> None:
     """
     if path.exists("/usr/bin/sway"):
         if not start_sway(generator, system):
-            raise RuntimeError("Failed to start Sway compositor - check logs for details")
+            raise RuntimeError(
+                "Failed to start Sway compositor - check logs for details"
+            )
         return
 
     # TODO: Implement Gamescope startup when available
     raise RuntimeError("No supported compositor found on this system")
+
 
 def stop_compositor(generator, system) -> None:
     """
@@ -170,7 +174,9 @@ def stop_compositor(generator, system) -> None:
     """
     if sway_launched:
         if not stop_sway(generator, system):
-            raise RuntimeError("Failed to stop Sway compositor - check logs for details")
+            raise RuntimeError(
+                "Failed to stop Sway compositor - check logs for details"
+            )
         return
 
     # TODO: Implement Gamescope shutdown when available
