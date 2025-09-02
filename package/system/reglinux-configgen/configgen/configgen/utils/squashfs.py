@@ -1,11 +1,11 @@
 import os
 import subprocess
-
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
 
 # Example of how it was used
-#def main(args, maxnbplayers):
+# def main(args, maxnbplayers):
 #    # squashfs roms if squashed
 #    extension = os.path.splitext(args.rom)[1][1:].lower()
 #    if extension == "squashfs":
@@ -20,6 +20,7 @@ eslog = get_logger(__name__)
 #        return exitCode
 #    else:
 #        return start_rom(args, maxnbplayers, args.rom, args.rom)
+
 
 def squashfs_begin(rom):
     eslog.debug(f"squashfs_begin({rom})")
@@ -51,11 +52,12 @@ def squashfs_begin(rom):
 
     # if the squashfs contains a single file with the same name, take it as the rom file
     romsingle = rommountpoint + "/" + os.path.basename(rom)[:-9]
-    if len(os.listdir(rommountpoint)) == 1 and  os.path.exists(romsingle):
+    if len(os.listdir(rommountpoint)) == 1 and os.path.exists(romsingle):
         eslog.debug(f"squashfs: single rom {romsingle}")
         return True, rommountpoint, romsingle
 
     return True, rommountpoint, rommountpoint
+
 
 def squashfs_end(rommountpoint):
     eslog.debug(f"squashfs_end({rommountpoint})")

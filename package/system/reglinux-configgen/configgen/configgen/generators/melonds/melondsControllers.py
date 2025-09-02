@@ -1,18 +1,18 @@
 def setMelondsControllers(melondsConfig, playersControllers):
     # Map controllers
     melonDSMapping = {
-    "a":        "Joy_A",
-    "b":        "Joy_B",
-    "select":   "Joy_Select",
-    "start":    "Joy_Start",
-    "right":    "Joy_Right",
-    "left":     "Joy_Left",
-    "up":       "Joy_Up",
-    "down":     "Joy_Down",
-    "pagedown": "Joy_R",
-    "pageup":   "Joy_L",
-    "x":        "Joy_X",
-    "y":        "Joy_Y"
+        "a": "Joy_A",
+        "b": "Joy_B",
+        "select": "Joy_Select",
+        "start": "Joy_Start",
+        "right": "Joy_Right",
+        "left": "Joy_Left",
+        "up": "Joy_Up",
+        "down": "Joy_Down",
+        "pagedown": "Joy_R",
+        "pageup": "Joy_L",
+        "x": "Joy_X",
+        "y": "Joy_Y",
     }
 
     val = -1
@@ -22,7 +22,9 @@ def setMelondsControllers(melondsConfig, playersControllers):
             continue
 
         # Handle controllers where guide and back buttons share the same code
-        guide_equal_back = True if pad.inputs['guide'].value == pad.inputs['back'].value else False
+        guide_equal_back = (
+            True if pad.inputs["guide"].value == pad.inputs["back"].value else False
+        )
 
         for index in pad.inputs:
             input = pad.inputs[index].sdl_to_linux_input_event(guide_equal_back)

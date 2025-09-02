@@ -4,9 +4,10 @@ from systemFiles import SYSTEM_CONF, ES_SETTINGS
 from yaml import SafeLoader, load
 from typing import Dict, Any
 from settings import UnixSettings
-
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
+
 
 class Emulator:
     """Manages emulator configurations for a given system and ROM in a RegLinux environment.
@@ -36,7 +37,7 @@ class Emulator:
         self.config = Emulator.get_system_config(
             self.name,
             "/usr/share/reglinux/configgen/configgen-defaults.yml",
-            "/usr/share/reglinux/configgen/configgen-defaults-arch.yml"
+            "/usr/share/reglinux/configgen/configgen-defaults-arch.yml",
         )
         if "emulator" not in self.config or self.config["emulator"] == "":
             eslog.error("No emulator defined. Exiting.")
@@ -47,14 +48,16 @@ class Emulator:
 
         # Load configurations from system.conf using UnixSettings
         recalSettings = UnixSettings(SYSTEM_CONF)
-        globalSettings = recalSettings.loadAll('global')
-        controllersSettings = recalSettings.loadAll('controllers', True)
+        globalSettings = recalSettings.loadAll("global")
+        controllersSettings = recalSettings.loadAll("controllers", True)
         systemSettings = recalSettings.loadAll(self.name)
-        folderSettings = recalSettings.loadAll(self.name + ".folder[\"" + path.dirname(rom) + "\"]")
-        gameSettings = recalSettings.loadAll(self.name + "[\"" + gsname + "\"]")
+        folderSettings = recalSettings.loadAll(
+            self.name + '.folder["' + path.dirname(rom) + '"]'
+        )
+        gameSettings = recalSettings.loadAll(self.name + '["' + gsname + '"]')
 
         # Add display settings to config
-        displaySettings = recalSettings.loadAll('display')
+        displaySettings = recalSettings.loadAll("display")
         for opt in displaySettings:
             self.config["display." + opt] = displaySettings[opt]
 
@@ -70,9 +73,17 @@ class Emulator:
         # Check if emulator or core is forcibly set
         self.config["emulator-forced"] = False
         self.config["core-forced"] = False
-        if "emulator" in globalSettings or "emulator" in systemSettings or "emulator" in gameSettings:
+        if (
+            "emulator" in globalSettings
+            or "emulator" in systemSettings
+            or "emulator" in gameSettings
+        ):
             self.config["emulator-forced"] = True
-        if "core" in globalSettings or "core" in systemSettings or "core" in gameSettings:
+        if (
+            "core" in globalSettings
+            or "core" in systemSettings
+            or "core" in gameSettings
+        ):
             self.config["core-forced"] = True
 
         # Initialize renderconfig for shaders
@@ -80,29 +91,43 @@ class Emulator:
         if "shaderset" in self.config:
             if self.config["shaderset"] != "none":
                 # Prefer user-defined shader configs if available
-                if path.exists("/userdata/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults.yml"):
+                if path.exists(
+                    "/userdata/shaders/configs/"
+                    + self.config["shaderset"]
+                    + "/rendering-defaults.yml"
+                ):
                     self.renderconfig = Emulator.get_generic_config(
                         self.name,
-                        "/userdata/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults.yml",
-                        "/userdata/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults-arch.yml"
+                        "/userdata/shaders/configs/"
+                        + self.config["shaderset"]
+                        + "/rendering-defaults.yml",
+                        "/userdata/shaders/configs/"
+                        + self.config["shaderset"]
+                        + "/rendering-defaults-arch.yml",
                     )
                 else:
                     self.renderconfig = Emulator.get_generic_config(
                         self.name,
-                        "/usr/share/reglinux/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults.yml",
-                        "/usr/share/reglinux/shaders/configs/" + self.config["shaderset"] + "/rendering-defaults-arch.yml"
+                        "/usr/share/reglinux/shaders/configs/"
+                        + self.config["shaderset"]
+                        + "/rendering-defaults.yml",
+                        "/usr/share/reglinux/shaders/configs/"
+                        + self.config["shaderset"]
+                        + "/rendering-defaults-arch.yml",
                     )
             elif self.config["shaderset"] == "none":
                 # Use default rendering configs if no shaders are set
                 self.renderconfig = Emulator.get_generic_config(
                     self.name,
                     "/usr/share/reglinux/shaders/configs/rendering-defaults.yml",
-                    "/usr/share/reglinux/shaders/configs/rendering-defaults-arch.yml"
+                    "/usr/share/reglinux/shaders/configs/rendering-defaults-arch.yml",
                 )
 
         # Load renderer-specific settings for backward compatibility
         systemSettings = recalSettings.loadAll(self.name + "-renderer")
-        gameSettings = recalSettings.loadAll(self.name + "[\"" + gsname + "\"]" + "-renderer")
+        gameSettings = recalSettings.loadAll(
+            self.name + '["' + gsname + '"]' + "-renderer"
+        )
 
         # Update renderconfig with renderer settings
         Emulator.updateConfiguration(self.renderconfig, systemSettings)
@@ -120,7 +145,7 @@ class Emulator:
         rom = path.basename(rom)
 
         # Sanitize name by removing invalid characters per EmulationStation rules
-        rom = rom.replace('=', '').replace('#', '')
+        rom = rom.replace("=", "").replace("#", "")
         eslog.info(f"game settings name: {rom}")
         return rom
 
@@ -139,7 +164,9 @@ class Emulator:
                 dct[key] = value
 
     @staticmethod
-    def get_generic_config(system: str, defaultyml: str, defaultarchyml: str) -> Dict[str, Any]:
+    def get_generic_config(
+        system: str, defaultyml: str, defaultarchyml: str
+    ) -> Dict[str, Any]:
         """Load and merge generic configuration from YAML files.
 
         Args:
@@ -151,13 +178,13 @@ class Emulator:
             Dict[str, Any]: Merged configuration dictionary.
         """
         # Load default configuration
-        with open(defaultyml, 'r') as f:
+        with open(defaultyml, "r") as f:
             systems_default = load(f, Loader=SafeLoader)
 
         # Load architecture-specific configuration if available
         systems_default_arch = {}
         if path.exists(defaultarchyml):
-            with open(defaultarchyml, 'r') as f:
+            with open(defaultarchyml, "r") as f:
                 systems_default_arch = load(f, Loader=SafeLoader) or {}
 
         dict_all: Dict[str, Any] = {}
@@ -179,7 +206,9 @@ class Emulator:
         return dict_all
 
     @staticmethod
-    def get_system_config(system: str, defaultyml: str, defaultarchyml: str) -> Dict[str, Any]:
+    def get_system_config(
+        system: str, defaultyml: str, defaultarchyml: str
+    ) -> Dict[str, Any]:
         """Load system-specific configuration, including emulator and core settings.
 
         Args:
@@ -218,7 +247,7 @@ class Emulator:
         Returns:
             bool: True if the option is set to a truthy value, False otherwise.
         """
-        true_values = {'1', 'true', 'on', 'enabled', True}
+        true_values = {"1", "true", "on", "enabled", True}
         value = self.config.get(key)
 
         if isinstance(value, str):
@@ -267,9 +296,9 @@ class Emulator:
                 drawframerate_value = drawframerate_elem.attrib.get("value", "false")
             else:
                 drawframerate_value = "false"
-            if drawframerate_value not in ['false', 'true']:
-                drawframerate_value = 'false'
-            self.config['showFPS'] = drawframerate_value
+            if drawframerate_value not in ["false", "true"]:
+                drawframerate_value = "false"
+            self.config["showFPS"] = drawframerate_value
 
             # Read uimode setting
             uimode_elem = esConfig.find("./string[@name='UIMode']")
@@ -277,11 +306,11 @@ class Emulator:
                 uimode_value = uimode_elem.attrib.get("value", "Full")
             else:
                 uimode_value = "Full"
-            if uimode_value not in ['Full', 'Kiosk', 'Kid']:
-                uimode_value = 'Full'
-            self.config['uimode'] = uimode_value
+            if uimode_value not in ["Full", "Kiosk", "Kid"]:
+                uimode_value = "Full"
+            self.config["uimode"] = uimode_value
 
         except Exception:
             # Use defaults if ES settings cannot be loaded
-            self.config['showFPS'] = "false"
-            self.config['uimode'] = "Full"
+            self.config["showFPS"] = "false"
+            self.config["uimode"] = "Full"

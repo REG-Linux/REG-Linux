@@ -4,15 +4,17 @@ from os import getenv
 from .ppssppConfig import setPPSSPPConfig, PPSSPP_BIN_PATH
 from .ppssppControllers import setControllerConfig
 
-class PPSSPPGenerator(Generator):
 
+class PPSSPPGenerator(Generator):
     # Main entry of the module
     # Configure PPSSPP and return a command
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         setPPSSPPConfig(system)
 
         # Generate the controls.ini
-        for index in playersControllers :
+        for index in playersControllers:
             controller = playersControllers[index]
             # We only care about player 1
             if controller.index != 0:
@@ -31,19 +33,19 @@ class PPSSPPGenerator(Generator):
             commandArray.extend(["--dpi", "0.5"])
 
         # state_slot option
-        if system.isOptSet('state_filename'):
-            commandArray.append("--state={}".format(system.config['state_filename']))
+        if system.isOptSet("state_filename"):
+            commandArray.append("--state={}".format(system.config["state_filename"]))
 
         # select the correct pad
         nplayer = 1
         for _, pad in sorted(playersControllers.items()):
             if nplayer == 1:
                 commandArray.extend(["--njoy", str(pad.index)])
-            nplayer = nplayer +1
+            nplayer = nplayer + 1
 
         # Adjust SDL_VIDEODRIVER to run through wayland or kmsdrm
-        environment= {}
-        if getenv("XDG_SESSION_TYPE")=="wayland":
+        environment = {}
+        if getenv("XDG_SESSION_TYPE") == "wayland":
             environment["SDL_VIDEODRIVER"] = "wayland"
         else:
             environment["SDL_VIDEODRIVER"] = "kmsdrm"

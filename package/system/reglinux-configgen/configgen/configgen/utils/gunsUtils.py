@@ -1,11 +1,13 @@
 from shutil import copyfile, copytree
 from os import path, makedirs, listdir
 
+
 def precalibration_copyFile(src, dst):
     if path.exists(src) and not path.exists(dst):
         if not path.exists(path.dirname(dst)):
             makedirs(path.dirname(dst))
         copyfile(src, dst)
+
 
 def precalibration_copyDir(src, dst):
     if path.exists(src) and not path.exists(dst):
@@ -13,10 +15,12 @@ def precalibration_copyDir(src, dst):
             makedirs(path.dirname(dst))
         copytree(src, dst)
 
+
 def precalibration_copyFilesInDir(srcdir, dstdir, startWith, endWith):
     for src in listdir(srcdir):
-        if src.startswith(startWith): # and src.endswith(endswith):
-            precalibration_copyFile(srcdir+"/"+src, dstdir+"/"+src)
+        if src.startswith(startWith):  # and src.endswith(endswith):
+            precalibration_copyFile(srcdir + "/" + src, dstdir + "/" + src)
+
 
 def precalibration(systemName, emulator, core, rom):
     dir = "/usr/share/reglinux/guns-precalibrations/{}".format(systemName)
@@ -65,5 +69,7 @@ def precalibration(systemName, emulator, core, rom):
         if emulator == "play":
             baserom_noext = path.splitext(baserom)[0]
             src = "{}/play/{}".format(dir, baserom_noext)
-            dst = "/userdata/system/configs/play/Play Data Files/arcadesaves/{}.backupram".format(baserom_noext)
+            dst = "/userdata/system/configs/play/Play Data Files/arcadesaves/{}.backupram".format(
+                baserom_noext
+            )
             precalibration_copyFile(src, dst)

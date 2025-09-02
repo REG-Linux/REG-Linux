@@ -1,8 +1,9 @@
 from os import path
 from systemFiles import ROMS
 
-IORTCW_CONFIG_PATH = ROMS + '/iortcw/main/wolfconfig.cfg'
-IORTCW_BIN_PATH = '/usr/bin/iortcw/iowolfsp'
+IORTCW_CONFIG_PATH = ROMS + "/iortcw/main/wolfconfig.cfg"
+IORTCW_BIN_PATH = "/usr/bin/iortcw/iowolfsp"
+
 
 def setIortcwConfig(system, gameResolution):
     # Define the options to add or modify
@@ -21,18 +22,18 @@ def setIortcwConfig(system, gameResolution):
         "bind PAD0_X": '"+movedown"',
         "bind PAD0_Y": '"+useitem"',
         "bind PAD0_B": '"+activate"',
-        "bind PAD0_LEFTSHOULDER": 'weapnext',
-        "bind PAD0_RIGHTSHOULDER": 'weapprev',
-        "bind PAD0_LEFTSTICK_LEFT": '+moveleft',
-        "bind PAD0_LEFTSTICK_RIGHT": '+moveright',
-        "bind PAD0_LEFTSTICK_UP": '+forward',
-        "bind PAD0_LEFTSTICK_DOWN": '+back',
-        "bind PAD0_RIGHTSTICK_LEFT": '+left',
-        "bind PAD0_RIGHTSTICK_RIGHT": '+right',
-        "bind PAD0_RIGHTSTICK_UP": '+lookup',
-        "bind PAD0_RIGHTSTICK_DOWN": '+lookdown',
-        "bind PAD0_LEFTTRIGGER": '+speed',
-        "bind PAD0_RIGHTTRIGGER": '+attack'
+        "bind PAD0_LEFTSHOULDER": "weapnext",
+        "bind PAD0_RIGHTSHOULDER": "weapprev",
+        "bind PAD0_LEFTSTICK_LEFT": "+moveleft",
+        "bind PAD0_LEFTSTICK_RIGHT": "+moveright",
+        "bind PAD0_LEFTSTICK_UP": "+forward",
+        "bind PAD0_LEFTSTICK_DOWN": "+back",
+        "bind PAD0_RIGHTSTICK_LEFT": "+left",
+        "bind PAD0_RIGHTSTICK_RIGHT": "+right",
+        "bind PAD0_RIGHTSTICK_UP": "+lookup",
+        "bind PAD0_RIGHTSTICK_DOWN": "+lookdown",
+        "bind PAD0_LEFTTRIGGER": "+speed",
+        "bind PAD0_RIGHTTRIGGER": "+attack",
     }
 
     ## ES options
@@ -61,13 +62,17 @@ def setIortcwConfig(system, gameResolution):
     # Anti-aliasing
     if system.isOptSet("iortcw_aa"):
         options_to_set["seta r_ext_multisample"] = system.config["iortcw_aa"]
-        options_to_set["seta r_ext_framebuffer_multisample"] = system.config["iortcw_aa"]
+        options_to_set["seta r_ext_framebuffer_multisample"] = system.config[
+            "iortcw_aa"
+        ]
     else:
         options_to_set["seta r_ext_multisample"] = "0"
         options_to_set["seta r_ext_framebuffer_multisample"] = "0"
 
     # Skip intro video
-    if system.isOptSet("iortcw_skip_video") and system.getOptBoolean("iortcw_skip_video"):
+    if system.isOptSet("iortcw_skip_video") and system.getOptBoolean(
+        "iortcw_skip_video"
+    ):
         options_to_set["seta com_introplayed"] = "1"
     else:
         options_to_set["seta com_introplayed"] = "0"
@@ -80,24 +85,24 @@ def setIortcwConfig(system, gameResolution):
 
     # Check if the file exists
     if path.isfile(IORTCW_CONFIG_PATH):
-        with open(IORTCW_CONFIG_PATH, 'r') as config_file:
+        with open(IORTCW_CONFIG_PATH, "r") as config_file:
             lines = config_file.readlines()
 
         # Loop through the options and update the lines
         for key, value in options_to_set.items():
             option_exists = any(key in line for line in lines)
             if not option_exists:
-                lines.append(f"{key} \"{value}\"\n")
+                lines.append(f'{key} "{value}"\n')
             else:
                 for i, line in enumerate(lines):
                     if key in line:
-                        lines[i] = f"{key} \"{value}\"\n"
+                        lines[i] = f'{key} "{value}"\n'
 
         # Write the modified content back to the file
-        with open(IORTCW_CONFIG_PATH, 'w') as config_file:
+        with open(IORTCW_CONFIG_PATH, "w") as config_file:
             config_file.writelines(lines)
     else:
         # File doesn't exist, create it and add the options
-        with open(IORTCW_CONFIG_PATH, 'w') as config_file:
+        with open(IORTCW_CONFIG_PATH, "w") as config_file:
             for key, value in options_to_set.items():
-                config_file.write(f"{key} \"{value}\"\n")
+                config_file.write(f'{key} "{value}"\n')
