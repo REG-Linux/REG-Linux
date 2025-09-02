@@ -1,5 +1,5 @@
 diff --git a/package/sdl2/sdl2.mk b/package/sdl2/sdl2.mk
-index 67a4978e22..2d644622e5 100644
+index 67a4978e22..065ed0119e 100644
 --- a/package/sdl2/sdl2.mk
 +++ b/package/sdl2/sdl2.mk
 @@ -4,7 +4,8 @@
@@ -8,7 +8,7 @@ index 67a4978e22..2d644622e5 100644
  
 -SDL2_VERSION = 2.30.12
 +# reglinux - bump
-+SDL2_VERSION = 2.32.8
++SDL2_VERSION = 2.32.10
  SDL2_SOURCE = SDL2-$(SDL2_VERSION).tar.gz
  SDL2_SITE = http://www.libsdl.org/release
  SDL2_LICENSE = Zlib
