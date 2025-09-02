@@ -416,7 +416,8 @@ menu "Boot"
 endmenu
 
 menu "Toolchain"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/toolchain/toolchain-optional-linaro-aarch64/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/toolchain/toolchain-optional-linaro-aarch64/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/toolchain/toolchain-optional-bootlin-aarch64/Config.in"
 endmenu
 
 menu "GPU"
