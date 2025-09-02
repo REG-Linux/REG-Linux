@@ -6,8 +6,9 @@ from .azaharControllers import setAzaharControllers
 
 
 class AzaharGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Load existing config or create a new one
         azaharConfig = UnixSettings(AZAHAR_CONFIG_PATH)
 

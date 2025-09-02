@@ -7,44 +7,40 @@ from evdev import list_devices, InputDevice
 from os import path, makedirs, chmod, environ
 from systemFiles import CONF, BIOS
 
-RYUJINX_CONFIG_DIR = CONF + '/Ryujinx'
-RYUJINX_SYSTEM_DIR = RYUJINX_CONFIG_DIR + '/system'
-RYUJINX_CONFIG_PATH = RYUJINX_CONFIG_DIR + '/Config.json'
-RYUJINX_KEY_PATH = BIOS + '/system/prod.keys'
-RYUJINX_BIN_PATH  = RYUJINX_CONFIG_DIR + '/ryujinx'
+RYUJINX_CONFIG_DIR = CONF + "/Ryujinx"
+RYUJINX_SYSTEM_DIR = RYUJINX_CONFIG_DIR + "/system"
+RYUJINX_CONFIG_PATH = RYUJINX_CONFIG_DIR + "/Config.json"
+RYUJINX_KEY_PATH = BIOS + "/system/prod.keys"
+RYUJINX_BIN_PATH = RYUJINX_CONFIG_DIR + "/ryujinx"
 
 ryujinxCtrl = {
-        "left_joycon_stick": {
+    "left_joycon_stick": {
         "joystick": "Left",
         "invert_stick_x": False,
         "invert_stick_y": False,
         "rotate90_cw": False,
-        "stick_button": "LeftStick"
-      },
-      "right_joycon_stick": {
+        "stick_button": "LeftStick",
+    },
+    "right_joycon_stick": {
         "joystick": "Right",
         "invert_stick_x": False,
         "invert_stick_y": False,
         "rotate90_cw": False,
-        "stick_button": "RightStick"
-      },
-      "deadzone_left": 0,
-      "deadzone_right": 0,
-      "range_left": 1,
-      "range_right": 1,
-      "trigger_threshold": 0,
-      "motion": {
+        "stick_button": "RightStick",
+    },
+    "deadzone_left": 0,
+    "deadzone_right": 0,
+    "range_left": 1,
+    "range_right": 1,
+    "trigger_threshold": 0,
+    "motion": {
         "motion_backend": "GamepadDriver",
         "sensitivity": 100,
         "gyro_deadzone": 1,
-        "enable_motion": True
-      },
-      "rumble": {
-        "strong_rumble": 8,
-        "weak_rumble": 2,
-        "enable_rumble": True
-      },
-      "left_joycon": {
+        "enable_motion": True,
+    },
+    "rumble": {"strong_rumble": 8, "weak_rumble": 2, "enable_rumble": True},
+    "left_joycon": {
         "button_minus": "Minus",
         "button_l": "LeftShoulder",
         "button_zl": "LeftTrigger",
@@ -53,9 +49,9 @@ ryujinxCtrl = {
         "dpad_up": "DpadUp",
         "dpad_down": "DpadDown",
         "dpad_left": "DpadLeft",
-        "dpad_right": "DpadRight"
-      },
-      "right_joycon": {
+        "dpad_right": "DpadRight",
+    },
+    "right_joycon": {
         "button_plus": "Plus",
         "button_r": "RightShoulder",
         "button_zr": "RightTrigger",
@@ -64,18 +60,21 @@ ryujinxCtrl = {
         "button_x": "Y",
         "button_b": "A",
         "button_y": "X",
-        "button_a": "B"
+        "button_a": "B",
     },
     "version": 1,
     "backend": "GamepadSDL2",
 }
+
 
 class RyujinxGenerator(Generator):
     # this emulator/core requires a X server to run
     def requiresX11(self):
         return True
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         if not path.exists(RYUJINX_CONFIG_DIR):
             makedirs(RYUJINX_CONFIG_DIR)
         if not path.exists(RYUJINX_SYSTEM_DIR):
@@ -84,8 +83,16 @@ class RyujinxGenerator(Generator):
         # Copy file & make executable (workaround)
         files_to_copy = [
             ("/usr/ryujinx/Ryujinx", RYUJINX_BIN_PATH, 0o0775),
-            ("/usr/ryujinx/libSkiaSharp.so", path.join(RYUJINX_CONFIG_DIR, "libSkiaSharp.so"), 0o0644),
-            ("/usr/ryujinx/libHarfBuzzSharp.so", path.join(RYUJINX_CONFIG_DIR, "libHarfBuzzSharp.so"), 0o0644)
+            (
+                "/usr/ryujinx/libSkiaSharp.so",
+                path.join(RYUJINX_CONFIG_DIR, "libSkiaSharp.so"),
+                0o0644,
+            ),
+            (
+                "/usr/ryujinx/libHarfBuzzSharp.so",
+                path.join(RYUJINX_CONFIG_DIR, "libHarfBuzzSharp.so"),
+                0o0644,
+            ),
         ]
 
         for src, dest, mode in files_to_copy:
@@ -133,7 +140,7 @@ class RyujinxGenerator(Generator):
         if system.isOptSet("ryujinx_timeoffset"):
             conf["system_time_offset"] = int(system.config["ryujinx_timeoffset"])
         else:
-            conf["system_time_offset"]= 0
+            conf["system_time_offset"] = 0
 
         # Graphics
         if system.isOptSet("ryujinx_api"):
@@ -189,11 +196,11 @@ class RyujinxGenerator(Generator):
                         version1 = (version)[-2::]
                         version2 = (version)[:-2]
                         version = version1 + version2
-                        ctrlUUID = (f"{pad.index}-{bustype}-{vendor}-0000-{product}-0000{version}0000")
+                        ctrlUUID = f"{pad.index}-{bustype}-{vendor}-0000-{product}-0000{version}0000"
                         ctrlConf["id"] = ctrlUUID
                         # always configure a pro controller for now
                         ctrlConf["controller_type"] = "ProController"
-                        playerNum = (f"Player{nplayer}")
+                        playerNum = f"Player{nplayer}"
                         ctrlConf["player_index"] = playerNum
                         # write the controller to the file
                         writeControllerIntoJson(ctrlConf)
@@ -207,18 +214,29 @@ class RyujinxGenerator(Generator):
 
         return Command(array=commandArray)
 
+
 def writeControllerIntoJson(new_controller, filename=RYUJINX_CONFIG_PATH):
-    with open(filename,'r+') as file:
+    with open(filename, "r+") as file:
         file_data = load(file)
         file_data["input_config"].append(new_controller)
         file.seek(0)
         dump(file_data, file, indent=2)
 
+
 def getLangFromEnvironment():
-    lang = environ['LANG'][:5]
-    availableLanguages = { "jp_JP": 0, "en_US": 1, "de_DE": 2,
-                           "fr_FR": 3, "es_ES": 4, "it_IT": 5,
-                           "nl_NL": 6, "zh_CN": 7, "zh_TW": 8, "ko_KR": 9 }
+    lang = environ["LANG"][:5]
+    availableLanguages = {
+        "jp_JP": 0,
+        "en_US": 1,
+        "de_DE": 2,
+        "fr_FR": 3,
+        "es_ES": 4,
+        "it_IT": 5,
+        "nl_NL": 6,
+        "zh_CN": 7,
+        "zh_TW": 8,
+        "ko_KR": 9,
+    }
     if lang in availableLanguages:
         return availableLanguages[lang]
     else:

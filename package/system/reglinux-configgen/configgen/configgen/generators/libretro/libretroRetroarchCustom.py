@@ -19,7 +19,6 @@ CONFIG_DEFAULTS = {
     "menu_show_load_content": "false",
     "menu_show_online_updater": "false",
     "menu_show_core_updater": "false",
-
     # Input (SDL2 based)
     "input_autodetect_enable": "true",
     "input_remap_binds_enable": "true",
@@ -43,23 +42,19 @@ CONFIG_DEFAULTS = {
     "input_enable_hotkey": "shift",
     "input_menu_toggle": "f1",
     "input_exit_emulator": "escape",
-
     # Video
     "video_aspect_ratio_auto": "false",
     "video_gpu_screenshot": "true",
     "video_shader_enable": "false",
     "aspect_ratio_index": "22",
-
     # Audio
     "audio_volume": "2.0",
-
     # General settings
     "global_core_options": "true",
     "config_save_on_exit": "false",
     "savestate_auto_save": "false",
     "savestate_auto_load": "false",
     "menu_swap_ok_cancel_buttons": "true",
-
     # Accentuation and UX
     "rgui_extended_ascii": "true",
     "rgui_show_start_screen": "false",

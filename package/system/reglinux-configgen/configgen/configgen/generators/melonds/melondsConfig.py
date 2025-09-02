@@ -1,10 +1,11 @@
 from systemFiles import CONF, SAVES, CHEATS
 
-MELONDS_CONFIG_DIR = CONF + '/melonDS'
-MELONDS_CONFIG_PATH = MELONDS_CONFIG_DIR + '/melonDS.ini'
-MELONDS_SAVES_DIR = SAVES + '/melonDS'
-MELONDS_CHEATS_DIR = CHEATS + '/melonDS'
-MELONDS_BIN_PATH = '/usr/bin/melonDS'
+MELONDS_CONFIG_DIR = CONF + "/melonDS"
+MELONDS_CONFIG_PATH = MELONDS_CONFIG_DIR + "/melonDS.ini"
+MELONDS_SAVES_DIR = SAVES + "/melonDS"
+MELONDS_CHEATS_DIR = CHEATS + "/melonDS"
+MELONDS_BIN_PATH = "/usr/bin/melonDS"
+
 
 def setMelonDSConfig(melondsConfig, system, gameResolution):
     if gameResolution["width"] < gameResolution["height"]:
@@ -62,19 +63,27 @@ def setMelonDSConfig(melondsConfig, system, gameResolution):
     else:
         melondsConfig.write("LimitFPS=1\n")
     if system.isOptSet("melonds_resolution"):
-        melondsConfig.write("GL_ScaleFactor={}\n".format(system.config["melonds_resolution"]))
+        melondsConfig.write(
+            "GL_ScaleFactor={}\n".format(system.config["melonds_resolution"])
+        )
     else:
         melondsConfig.write("GL_ScaleFactor=1\n")
     if system.isOptSet("melonds_polygons"):
-        melondsConfig.write("GL_BetterPolygons={}\n".format(system.config["melonds_polygons"]))
+        melondsConfig.write(
+            "GL_BetterPolygons={}\n".format(system.config["melonds_polygons"])
+        )
     else:
         melondsConfig.write("GL_BetterPolygons=0\n")
     if system.isOptSet("melonds_rotation"):
-        melondsConfig.write("ScreenRotation={}\n".format(system.config["melonds_rotation"]))
+        melondsConfig.write(
+            "ScreenRotation={}\n".format(system.config["melonds_rotation"])
+        )
     else:
         melondsConfig.write("ScreenRotation=0\n")
     if system.isOptSet("melonds_screenswap"):
-        melondsConfig.write("ScreenSwap={}\n".format(system.config["melonds_screenswap"]))
+        melondsConfig.write(
+            "ScreenSwap={}\n".format(system.config["melonds_screenswap"])
+        )
     else:
         melondsConfig.write("ScreenSwap=0\n")
     if system.isOptSet("melonds_layout"):
@@ -82,11 +91,15 @@ def setMelonDSConfig(melondsConfig, system, gameResolution):
     else:
         melondsConfig.write("ScreenLayout=0\n")
     if system.isOptSet("melonds_screensizing"):
-        melondsConfig.write("ScreenSizing={}\n".format(system.config["melonds_screensizing"]))
+        melondsConfig.write(
+            "ScreenSizing={}\n".format(system.config["melonds_screensizing"])
+        )
     else:
         melondsConfig.write("ScreenSizing=0\n")
     if system.isOptSet("melonds_scaling"):
-        melondsConfig.write("IntegerScaling={}\n".format(system.config["melonds_scaling"]))
+        melondsConfig.write(
+            "IntegerScaling={}\n".format(system.config["melonds_scaling"])
+        )
     else:
         melondsConfig.write("IntegerScaling=0\n")
     # Cheater!

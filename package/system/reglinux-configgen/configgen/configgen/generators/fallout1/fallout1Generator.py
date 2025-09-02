@@ -3,13 +3,25 @@ from Command import Command
 from configparser import ConfigParser
 from os import path, makedirs, chdir
 from shutil import copy
-from .fallout1Config import setFalloutConfig, setFalloutIniConfig, FALLOUT_CONFIG_DIR, FALLOUT_EXE_SOURCE_PATH, FALLOUT_BIN_PATH, FALLOUT_CONFIG_PATH, FALLOUT_CONFIG_INI, FALLOUT_ROMS_DIR, FALLOUT_CONFIG_SOURCE_PATH, FALLOUT_CONFIG_INI_SOURCE_PATH
+from .fallout1Config import (
+    setFalloutConfig,
+    setFalloutIniConfig,
+    FALLOUT_CONFIG_DIR,
+    FALLOUT_EXE_SOURCE_PATH,
+    FALLOUT_BIN_PATH,
+    FALLOUT_CONFIG_PATH,
+    FALLOUT_CONFIG_INI,
+    FALLOUT_ROMS_DIR,
+    FALLOUT_CONFIG_SOURCE_PATH,
+    FALLOUT_CONFIG_INI_SOURCE_PATH,
+)
 from controllers import generate_sdl_controller_config
 
+
 class Fallout1Generator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Check if the directories exist, if not create them
         if not path.exists(FALLOUT_CONFIG_DIR):
             makedirs(FALLOUT_CONFIG_DIR)
@@ -26,16 +38,16 @@ class Fallout1Generator(Generator):
         # Copy cfg file to the config directory
         if not path.exists(FALLOUT_CONFIG_PATH):
             if path.exists(FALLOUT_CONFIG_SOURCE_PATH):
-                copy(FALLOUT_CONFIG_SOURCE_PATH , FALLOUT_CONFIG_PATH)
+                copy(FALLOUT_CONFIG_SOURCE_PATH, FALLOUT_CONFIG_PATH)
 
         # Now copy the ini file to the config directory
         if not path.exists(FALLOUT_CONFIG_INI):
             if path.exists(FALLOUT_CONFIG_INI_SOURCE_PATH):
-                copy(FALLOUT_CONFIG_INI_SOURCE_PATH , FALLOUT_CONFIG_INI)
+                copy(FALLOUT_CONFIG_INI_SOURCE_PATH, FALLOUT_CONFIG_INI)
 
         # CFG Configuration
         falloutConfig = ConfigParser()
-        falloutConfig.optionxform=lambda optionstr: str(optionstr)
+        falloutConfig.optionxform = lambda optionstr: str(optionstr)
         if path.exists(FALLOUT_CONFIG_PATH):
             falloutConfig.read(FALLOUT_CONFIG_PATH)
 
@@ -46,7 +58,7 @@ class Fallout1Generator(Generator):
 
         ## INI Configuration
         falloutIniConfig = ConfigParser()
-        falloutIniConfig.optionxform=lambda optionstr: str(optionstr)
+        falloutIniConfig.optionxform = lambda optionstr: str(optionstr)
         if path.exists(FALLOUT_CONFIG_INI):
             falloutIniConfig.read(FALLOUT_CONFIG_INI)
 
@@ -62,14 +74,17 @@ class Fallout1Generator(Generator):
         commandArray = [FALLOUT_BIN_PATH]
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    playersControllers
+                )
+            },
+        )
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
         return True
 
     def getInGameRatio(self, config, gameResolution, rom):
-        return 16/9
+        return 16 / 9

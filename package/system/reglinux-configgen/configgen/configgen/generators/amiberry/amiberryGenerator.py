@@ -5,31 +5,33 @@ from os import path
 from controllers import generate_sdl_controller_config
 from .amiberryConfig import setAmiberryConfig, AMIBERRY_BIN_PATH
 
-class AmiberryGenerator(Generator):
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+class AmiberryGenerator(Generator):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # setting up amiberry config file
         setAmiberryConfig(system)
 
         romType = self.getRomType(rom)
-        if romType != 'UNKNOWN' :
-            commandArray = [ AMIBERRY_BIN_PATH, "-G" ]
-            if romType != 'WHDL' :
+        if romType != "UNKNOWN":
+            commandArray = [AMIBERRY_BIN_PATH, "-G"]
+            if romType != "WHDL":
                 commandArray.append("--model")
-                commandArray.append(system.config['core'])
+                commandArray.append(system.config["core"])
 
-            if romType == 'WHDL' :
+            if romType == "WHDL":
                 commandArray.append("--autoload")
                 commandArray.append(rom)
-            elif romType == 'HDF' :
+            elif romType == "HDF":
                 commandArray.append("-s")
-                commandArray.append("hardfile2=rw,DH0:"+rom+",32,1,2,512,0,,uae0")
+                commandArray.append("hardfile2=rw,DH0:" + rom + ",32,1,2,512,0,,uae0")
                 commandArray.append("-s")
-                commandArray.append("uaehf0=hdf,rw,DH0:"+rom+",32,1,2,512,0,,uae0")
-            elif romType == 'CD' :
+                commandArray.append("uaehf0=hdf,rw,DH0:" + rom + ",32,1,2,512,0,,uae0")
+            elif romType == "CD":
                 commandArray.append("--cdimage")
                 commandArray.append(rom)
-            elif romType == 'DISK':
+            elif romType == "DISK":
                 # floppies
                 n = 0
                 for img in self.floppiesFromRom(rom):
@@ -40,11 +42,11 @@ class AmiberryGenerator(Generator):
                 # floppy path
                 commandArray.append("-s")
                 # Use disk folder as floppy path
-                romPathIndex = rom.rfind('/')
-                commandArray.append("amiberry.floppy_path="+rom[0:romPathIndex])
+                romPathIndex = rom.rfind("/")
+                commandArray.append("amiberry.floppy_path=" + rom[0:romPathIndex])
 
             # fps
-            if system.config['showFPS'] == 'true':
+            if system.config["showFPS"] == "true":
                 commandArray.append("-s")
                 commandArray.append("show_leds=true")
 
@@ -53,7 +55,10 @@ class AmiberryGenerator(Generator):
             commandArray.append("joyport2=")
 
             # remove interlace artifacts
-            if system.isOptSet("amiberry_flickerfixer") and system.config['amiberry_flickerfixer'] == 'true':
+            if (
+                system.isOptSet("amiberry_flickerfixer")
+                and system.config["amiberry_flickerfixer"] == "true"
+            ):
                 commandArray.append("-s")
                 commandArray.append("gfx_flickerfixer=true")
             else:
@@ -61,7 +66,10 @@ class AmiberryGenerator(Generator):
                 commandArray.append("gfx_flickerfixer=false")
 
             # auto height
-            if system.isOptSet("amiberry_auto_height") and system.config['amiberry_auto_height'] == 'true':
+            if (
+                system.isOptSet("amiberry_auto_height")
+                and system.config["amiberry_auto_height"] == "true"
+            ):
                 commandArray.append("-s")
                 commandArray.append("amiberry.gfx_auto_height=true")
             else:
@@ -70,13 +78,13 @@ class AmiberryGenerator(Generator):
 
             # line mode
             if system.isOptSet("amiberry_linemode"):
-                if system.config['amiberry_linemode'] == 'none':
+                if system.config["amiberry_linemode"] == "none":
                     commandArray.append("-s")
                     commandArray.append("gfx_linemode=none")
-                elif system.config['amiberry_linemode'] == 'scanlines':
+                elif system.config["amiberry_linemode"] == "scanlines":
                     commandArray.append("-s")
                     commandArray.append("gfx_linemode=scanlines")
-                elif system.config['amiberry_linemode'] == 'double':
+                elif system.config["amiberry_linemode"] == "double":
                     commandArray.append("-s")
                     commandArray.append("gfx_linemode=double")
             else:
@@ -85,13 +93,13 @@ class AmiberryGenerator(Generator):
 
             # video resolution
             if system.isOptSet("amiberry_resolution"):
-                if system.config['amiberry_resolution'] == 'lores':
+                if system.config["amiberry_resolution"] == "lores":
                     commandArray.append("-s")
                     commandArray.append("gfx_resolution=lores")
-                elif system.config['amiberry_resolution'] == 'superhires':
+                elif system.config["amiberry_resolution"] == "superhires":
                     commandArray.append("-s")
                     commandArray.append("gfx_resolution=superhires")
-                elif system.config['amiberry_resolution'] == 'hires':
+                elif system.config["amiberry_resolution"] == "hires":
                     commandArray.append("-s")
                     commandArray.append("gfx_resolution=hires")
             else:
@@ -100,17 +108,17 @@ class AmiberryGenerator(Generator):
 
             # Scaling method
             if system.isOptSet("amiberry_scalingmethod"):
-                if system.config['amiberry_scalingmethod'] == 'automatic':
+                if system.config["amiberry_scalingmethod"] == "automatic":
                     commandArray.append("-s")
                     commandArray.append("gfx_lores_mode=false")
                     commandArray.append("-s")
                     commandArray.append("amiberry.scaling_method=-1")
-                elif system.config['amiberry_scalingmethod'] == 'smooth':
+                elif system.config["amiberry_scalingmethod"] == "smooth":
                     commandArray.append("-s")
                     commandArray.append("gfx_lores_mode=true")
                     commandArray.append("-s")
                     commandArray.append("amiberry.scaling_method=1")
-                elif system.config['amiberry_scalingmethod'] == 'pixelated':
+                elif system.config["amiberry_scalingmethod"] == "pixelated":
                     commandArray.append("-s")
                     commandArray.append("gfx_lores_mode=true")
                     commandArray.append("-s")
@@ -132,11 +140,14 @@ class AmiberryGenerator(Generator):
             commandArray.append("sound_frequency=48000")
 
             return Command(
-                        array=commandArray,
-                        env={
-                            'XDG_DATA_HOME': '/userdata/system/configs/',
-                            'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                        })
+                array=commandArray,
+                env={
+                    "XDG_DATA_HOME": "/userdata/system/configs/",
+                    "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                        playersControllers
+                    ),
+                },
+            )
         # otherwise, unknown format
         return Command(array=[])
 
@@ -153,7 +164,7 @@ class AmiberryGenerator(Generator):
         # for example, "/path/toto0.zip" becomes ["/path/toto0.zip", "/path/toto1.zip", "/path/toto2.zip"]
         if filepath[-1:].isdigit():
             # path without the number
-            fileprefix=filepath[:-1]
+            fileprefix = filepath[:-1]
 
             # special case for 0 while numerotation can start at 1
             n = 0
@@ -166,45 +177,45 @@ class AmiberryGenerator(Generator):
                 floppies.append(fileprefix + str(n) + fileext)
                 n += 1
         # (Disk 1 of 2) format
-        elif indexDisk != -1 :
-                # Several disks
-                floppies.append(rom)
-                prefix = filepath[0:indexDisk+6]
-                postfix = filepath[indexDisk+7:]
-                n = 2
-                while path.isfile(prefix+str(n)+postfix+fileext):
-                    floppies.append(prefix+str(n)+postfix+fileext)
-                    n += 1
-        else :
-           #Single ADF
-           return [rom]
+        elif indexDisk != -1:
+            # Several disks
+            floppies.append(rom)
+            prefix = filepath[0 : indexDisk + 6]
+            postfix = filepath[indexDisk + 7 :]
+            n = 2
+            while path.isfile(prefix + str(n) + postfix + fileext):
+                floppies.append(prefix + str(n) + postfix + fileext)
+                n += 1
+        else:
+            # Single ADF
+            return [rom]
 
         return floppies
 
-    def getRomType(self,filepath) :
+    def getRomType(self, filepath):
         extension = path.splitext(filepath)[1][1:].lower()
 
         if extension == "lha":
-            return 'WHDL'
-        elif extension == 'hdf' :
-            return 'HDF'
-        elif extension in ['iso','cue','chd'] :
-            return 'CD'
-        elif extension in ['adf','ipf']:
-            return 'DISK'
+            return "WHDL"
+        elif extension == "hdf":
+            return "HDF"
+        elif extension in ["iso", "cue", "chd"]:
+            return "CD"
+        elif extension in ["adf", "ipf"]:
+            return "DISK"
         elif extension == "zip":
             # can be either whdl or adf
             with ZipFile(filepath) as zip:
                 for zipfilename in zip.namelist():
-                    if zipfilename.find('/') == -1: # at the root
+                    if zipfilename.find("/") == -1:  # at the root
                         extension = path.splitext(zipfilename)[1][1:]
                         if extension == "info":
-                            return 'WHDL'
-                        elif extension == 'lha' :
-                            return 'UNKNOWN'
-                        elif extension == 'adf' :
-                            return 'DISK'
+                            return "WHDL"
+                        elif extension == "lha":
+                            return "UNKNOWN"
+                        elif extension == "adf":
+                            return "DISK"
             # no info or adf file found
-            return 'UNKNOWN'
+            return "UNKNOWN"
 
-        return 'UNKNOWN'
+        return "UNKNOWN"
