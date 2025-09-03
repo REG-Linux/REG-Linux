@@ -32,8 +32,8 @@ def setMelondsControllers(melondsConfig, playersControllers):
                 continue
             option = melonDSMapping[input["name"]]
             # Workaround - SDL numbers?
-            val = input["id"]
-            if val == "0":
+            val = input["id"][0]
+            if val == "h":
                 if option == "Joy_Up":
                     val = 257
                 elif option == "Joy_Down":
@@ -42,6 +42,6 @@ def setMelondsControllers(melondsConfig, playersControllers):
                     val = 264
                 elif option == "Joy_Right":
                     val = 258
-            melondsConfig.write(f"{option}={val}\n")
+            melondsConfig.save(option, val)
     # Always set ID to 0
-    melondsConfig.write("JoystickID=0\n")
+    melondsConfig.save("JoystickID", 0)
