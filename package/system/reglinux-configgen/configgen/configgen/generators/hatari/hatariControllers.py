@@ -2,17 +2,14 @@ from os import path, makedirs
 from configparser import ConfigParser
 from .hatariConfig import HATARI_CONFIG_DIR, HATARI_CONFIG_PATH
 
+
 @staticmethod
 def setHatariControllers(system, playersControllers):
     config = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
-    config.optionxform=lambda optionstr: str(optionstr)
+    config.optionxform = lambda optionstr: str(optionstr)
 
-    padMapping = {
-        1: "y",
-        2: "b",
-        3: "a"
-    }
+    padMapping = {1: "y", 2: "b", 3: "a"}
 
     if not path.exists(HATARI_CONFIG_DIR):
         makedirs(HATARI_CONFIG_DIR)
@@ -22,7 +19,7 @@ def setHatariControllers(system, playersControllers):
 
     # pads
     # disable previous configuration
-    for i in range(1, 6): # 1 to 5 included
+    for i in range(1, 6):  # 1 to 5 included
         section = "Joystick" + str(i)
         if config.has_section(section):
             config.set(section, "nJoyId", "-1")
@@ -64,5 +61,5 @@ def setHatariControllers(system, playersControllers):
     else:
         config.set("Screen", "bShowStatusbar", "FALSE")
 
-    with open(HATARI_CONFIG_PATH, 'w') as configfile:
+    with open(HATARI_CONFIG_PATH, "w") as configfile:
         config.write(configfile)

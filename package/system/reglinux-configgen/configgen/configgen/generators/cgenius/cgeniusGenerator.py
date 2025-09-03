@@ -4,11 +4,19 @@ from Command import Command
 from shutil import copy
 from configobj import ConfigObj
 from .cgeniusControllers import setCgeniusControllers
-from .cgeniusConfig import CGENIUS_CONFIG_DIR, CGENIUS_CONFIG_PATH, CGENIUS_ROMS_DIR, CGENIUS_BIN_PATH, setCgeniusConfig
+from .cgeniusConfig import (
+    CGENIUS_CONFIG_DIR,
+    CGENIUS_CONFIG_PATH,
+    CGENIUS_ROMS_DIR,
+    CGENIUS_BIN_PATH,
+    setCgeniusConfig,
+)
+
 
 class CGeniusGenerator(Generator):
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Create the config directory if it doesn't exist
         if not path.exists(CGENIUS_CONFIG_DIR):
             makedirs(CGENIUS_CONFIG_DIR)
@@ -28,12 +36,12 @@ class CGeniusGenerator(Generator):
         copy(CGENIUS_CONFIG_PATH, CGENIUS_ROMS_DIR)
 
         # now setup to run the rom
-        commandArray = [ CGENIUS_BIN_PATH ]
+        commandArray = [CGENIUS_BIN_PATH]
 
         # get rom path
         rom_path = path.dirname(rom)
         rom_path = rom_path.replace(CGENIUS_ROMS_DIR, "")
-        dir_string = "dir=\"" + rom_path + "\""
+        dir_string = 'dir="' + rom_path + '"'
         commandArray.append(dir_string)
 
         return Command(array=commandArray)

@@ -20,9 +20,18 @@ class UnixSettings:
         settings.write()
     """
 
-    __slots__ = ("filepath", "separator", "comment", "config", "_logger", "_had_section")
+    __slots__ = (
+        "filepath",
+        "separator",
+        "comment",
+        "config",
+        "_logger",
+        "_had_section",
+    )
 
-    def __init__(self, filepath: str | Path, separator: str = "", comment: str = "#") -> None:
+    def __init__(
+        self, filepath: str | Path, separator: str = "", comment: str = "#"
+    ) -> None:
         """
         Initialize the UnixSettings instance.
 
@@ -31,10 +40,14 @@ class UnixSettings:
             separator (str, optional): Separator used between key and value in the file. Defaults to "".
             comment (str, optional): Comment character used in the file. Defaults to "#".
         """
-        self.filepath = Path(filepath)  # Convert filepath to Path object for consistent handling
+        self.filepath = Path(
+            filepath
+        )  # Convert filepath to Path object for consistent handling
         self.separator = separator  # Separator for key-value pairs in the file
         self.comment = comment  # Comment character for the configuration file
-        self._logger = logging.getLogger(f"{__name__}.UnixSettings")  # Logger for this class
+        self._logger = logging.getLogger(
+            f"{__name__}.UnixSettings"
+        )  # Logger for this class
         self._had_section = False  # Flag to track if the file contains section headers
         self._initialize_config()  # Initialize the ConfigParser
 
@@ -46,11 +59,15 @@ class UnixSettings:
         """
         if not self.filepath.exists():
             try:
-                self.filepath.parent.mkdir(parents=True, exist_ok=True)  # Create parent directories
+                self.filepath.parent.mkdir(
+                    parents=True, exist_ok=True
+                )  # Create parent directories
                 self.filepath.write_text("", encoding="utf-8")  # Create empty file
                 self._logger.info(f"Created new INI/CFG file: {self.filepath}")
             except Exception as e:
-                self._logger.error(f"Failed to create INI/CFG file {self.filepath}: {e}")
+                self._logger.error(
+                    f"Failed to create INI/CFG file {self.filepath}: {e}"
+                )
 
     def _initialize_config(self) -> None:
         """
@@ -59,7 +76,9 @@ class UnixSettings:
         Configures the parser to disable interpolation, allow case-sensitive keys,
         and permit keys without values.
         """
-        self.config = ConfigParser(interpolation=None, strict=False, allow_no_value=True)
+        self.config = ConfigParser(
+            interpolation=None, strict=False, allow_no_value=True
+        )
         self.config.optionxform = lambda optionstr: str(optionstr)  # Preserve key case
         self._load_file()  # Load the configuration file
 
@@ -76,7 +95,8 @@ class UnixSettings:
             # Check if the file contains any section headers
             self._had_section = any(
                 line.strip().startswith("[") and line.strip().endswith("]")
-                for line in content.splitlines() if line.strip()
+                for line in content.splitlines()
+                if line.strip()
             )
             # If no section headers, prepend `[DEFAULT]` to the content
             if not self._had_section and content.strip():
@@ -144,7 +164,9 @@ class UnixSettings:
             dict[str, Any]: Dictionary of key-value pairs from the `[DEFAULT]` section.
         """
         if self.config.has_section("DEFAULT"):
-            return dict(self.config.items("DEFAULT"))  # Return items from DEFAULT section
+            return dict(
+                self.config.items("DEFAULT")
+            )  # Return items from DEFAULT section
         return default or {}  # Return default or empty dict if section is missing
 
     def write(self) -> bool:
@@ -156,7 +178,9 @@ class UnixSettings:
         """
         try:
             with self.filepath.open("w", encoding="utf-8") as f:
-                self.config.write(f, space_around_delimiters=bool(self.separator))  # Write to file
+                self.config.write(
+                    f, space_around_delimiters=bool(self.separator)
+                )  # Write to file
             return True
         except Exception as e:
             self._logger.error(f"Failed to write INI/CFG {self.filepath}: {e}")
@@ -233,7 +257,9 @@ class UnixSettings:
         result = {}
         for key, value in self.config.items("DEFAULT"):
             if key.startswith(name + "."):
-                suffix = key if includeName else key[len(name) + 1:]  # Strip prefix if needed
+                suffix = (
+                    key if includeName else key[len(name) + 1 :]
+                )  # Strip prefix if needed
                 result[suffix] = value
         return result
 

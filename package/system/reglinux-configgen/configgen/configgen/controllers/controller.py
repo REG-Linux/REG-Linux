@@ -2,24 +2,26 @@
 Controller class and related functions for managing game controller configurations.
 Provides functionality to generate SDL game controller configuration strings.
 """
+
 from typing import Dict, Optional, Any
 from dataclasses import dataclass, field
-
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
+
 
 @dataclass
 class Input:
     """Represents a single input (button, axis, or hat) on a game controller."""
+
     name: str
     type: str
     id: str
     value: str
     code: Optional[int] = None
 
-
     @classmethod
-    def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Optional['Input']:
+    def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Optional["Input"]:
         """
         Factory method to create an Input instance from SDL controller mapping string.
 
@@ -57,7 +59,7 @@ class Input:
         elif sdl_value.startswith("h"):  # Hat input
             input_type = "hat"
             # SDL hat format: h<hat_number>.<direction>
-            parts = sdl_value[1:].split('.')  # Remove 'h' and split
+            parts = sdl_value[1:].split(".")  # Remove 'h' and split
             sdl_value = parts[0] if parts else ""  # Hat number
 
         elif sdl_value.startswith("b"):  # Button input
@@ -72,7 +74,6 @@ class Input:
             code=int(code_value) if code_value.isdigit() else None,
             # Additional hat metadata could be stored here if needed
         )
-
 
     def sdl_to_linux_input_event(self, guide_equal_back) -> Optional[Dict[str, Any]]:
         """
@@ -101,13 +102,11 @@ class Input:
             "rightshoulder": ("pagedown", 311),
             "leftstick": ("l3", 317),
             "rightstick": ("r3", 318),
-
             # D-Pad
             "dpup": ("up", 544),
             "dpdown": ("down", 545),
             "dpleft": ("left", 546),
             "dpright": ("right", 547),
-
             # Axes
             "leftx": ("joystick1left", 0),
             "lefty": ("joystick1up", 1),
@@ -121,13 +120,13 @@ class Input:
         if key in sdl_to_linux:
             ev_name, ev_code = sdl_to_linux[key]
             if key == "guide" and guide_equal_back:
-                ev_code = sdl_to_linux['back'][1]
+                ev_code = sdl_to_linux["back"][1]
             return {
                 "name": ev_name,
                 "type": self.type,
                 "id": self.id,
                 "value": self.value,
-                "code": ev_code
+                "code": ev_code,
             }
 
         return None
@@ -150,7 +149,7 @@ class Controller:
             inputs=data.get("inputs", {}),
             type=data.get("type", ""),
             index=data.get("index", -1),
-            dev=data.get("dev", None)
+            dev=data.get("dev", None),
         )
 
     def generate_sdl_game_db_line(self):
@@ -164,8 +163,8 @@ def _generate_sdl_controller_config(controller: Controller) -> str:
             config.append(f"{key}:{value.value}")
         else:
             config.append(f"{key}:{value}")
-    config.append('')
-    return ','.join(config)
+    config.append("")
+    return ",".join(config)
 
 
 def generate_sdl_controller_config(controllers: Dict) -> str:
@@ -178,12 +177,14 @@ def generate_sdl_controller_config(controllers: Dict) -> str:
     Returns:
         Newline-separated configuration strings
     """
-    return "\n".join(controller.generate_sdl_game_db_line()
-                    for controller in controllers.values())
+    return "\n".join(
+        controller.generate_sdl_game_db_line() for controller in controllers.values()
+    )
 
 
-def write_sdl_db_all_controllers(controllers: Dict,
-                               outputFile: str = "/tmp/gamecontrollerdb.txt") -> str:
+def write_sdl_db_all_controllers(
+    controllers: Dict, outputFile: str = "/tmp/gamecontrollerdb.txt"
+) -> str:
     """
     Write SDL game controller configuration to a file.
 

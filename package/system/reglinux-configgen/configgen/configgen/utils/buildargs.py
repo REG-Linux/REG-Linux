@@ -34,19 +34,24 @@ class BuildEngineArg:
 
 def parse_args(launch_args: List[str], rom_path: str) -> Result:
     # These arguments are all shared by EDuke32 and Raze, with noted differences
-    build_args: Dict[str, BuildEngineArg] = {e.arg_key: e for e in [
-        BuildEngineArg("DIR", "-j", False),  # Adds directory to search list
-        # The main game file to load: EDuke32 and Raze can load .grp, .zip, .ssi, .pk3, .pk4; Raze can also load .7z
-        BuildEngineArg("FILE", "-gamegrp", True),
-        # Add extra game file to load; this overrides files in virtual filesystem
-        BuildEngineArg("FILE+", "-g", False),
-        # Replace the main GAME.CON script module; surprisingly this can be a CON, DEF, or INI!
-        BuildEngineArg("CON", "-x", True),
-        BuildEngineArg("CON+", "-mx", False),  # Append CON after GAME.CON script module
-        BuildEngineArg("DEF", "-h", True),  # Replace the main DEF module
-        BuildEngineArg("DEF+", "-mh", False),  # Append DEF after main DEF module
-        BuildEngineArg("MAP", "-map", True),  # Start specified MAP on launch
-    ]}
+    build_args: Dict[str, BuildEngineArg] = {
+        e.arg_key: e
+        for e in [
+            BuildEngineArg("DIR", "-j", False),  # Adds directory to search list
+            # The main game file to load: EDuke32 and Raze can load .grp, .zip, .ssi, .pk3, .pk4; Raze can also load .7z
+            BuildEngineArg("FILE", "-gamegrp", True),
+            # Add extra game file to load; this overrides files in virtual filesystem
+            BuildEngineArg("FILE+", "-g", False),
+            # Replace the main GAME.CON script module; surprisingly this can be a CON, DEF, or INI!
+            BuildEngineArg("CON", "-x", True),
+            BuildEngineArg(
+                "CON+", "-mx", False
+            ),  # Append CON after GAME.CON script module
+            BuildEngineArg("DEF", "-h", True),  # Replace the main DEF module
+            BuildEngineArg("DEF+", "-mh", False),  # Append DEF after main DEF module
+            BuildEngineArg("MAP", "-map", True),  # Start specified MAP on launch
+        ]
+    }
     with open(rom_path, "r") as file:
         lines = file.readlines()
     errors = []
@@ -80,7 +85,12 @@ def parse_args(launch_args: List[str], rom_path: str) -> Result:
             continue
         # Check obvious duplicates; there is never a reason the user would want to do this
         if build_arg.only_one_allowed and build_arg.cli_opt in launch_args:
-            errors += [ParseError(i, f"found another '{build_arg.arg_key}', but there should only be one")]
+            errors += [
+                ParseError(
+                    i,
+                    f"found another '{build_arg.arg_key}', but there should only be one",
+                )
+            ]
             continue
         launch_args += [build_arg.cli_opt, val_path]
     if len(errors) > 0:

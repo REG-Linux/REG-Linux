@@ -5,20 +5,22 @@ from os import path, makedirs
 from controllers import generate_sdl_controller_config
 from systemFiles import CONF
 
-FORCE_CONFIG_DIR = CONF + '/theforceengine'
-FORCE_MODS_DIR = FORCE_CONFIG_DIR + '/Mods'
-FORCE_PATCH_PATH = 'df_patch4.zip' # current patch version
-FORCE_MODS_PATH = FORCE_MODS_DIR + '/' + FORCE_PATCH_PATH
-FORCE_CONFIG_PATH = FORCE_CONFIG_DIR + '/settings.ini'
-FORCE_BIN_PATH = '/usr/bin/theforceengine'
+FORCE_CONFIG_DIR = CONF + "/theforceengine"
+FORCE_MODS_DIR = FORCE_CONFIG_DIR + "/Mods"
+FORCE_PATCH_PATH = "df_patch4.zip"  # current patch version
+FORCE_MODS_PATH = FORCE_MODS_DIR + "/" + FORCE_PATCH_PATH
+FORCE_CONFIG_PATH = FORCE_CONFIG_DIR + "/settings.ini"
+FORCE_BIN_PATH = "/usr/bin/theforceengine"
+
 
 class TheForceEngineGenerator(Generator):
     # this emulator/core requires a X server to run
     def requiresX11(self):
         return True
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Check if the directories exist, if not create them
         if not path.exists(FORCE_CONFIG_DIR):
             makedirs(FORCE_CONFIG_DIR)
@@ -31,7 +33,7 @@ class TheForceEngineGenerator(Generator):
             mod_name = FORCE_PATCH_PATH
 
         # Open the .tfe rom file for user mods
-        with open(rom, 'r') as file:
+        with open(rom, "r") as file:
             # Read the first line and store it as 'first_line'
             first_line = file.readline().strip()
             # use the first_line as mod if the file isn't empty
@@ -40,7 +42,7 @@ class TheForceEngineGenerator(Generator):
 
         ## Configure
         forceConfig = ConfigParser()
-        forceConfig.optionxform=lambda optionstr: str(optionstr)
+        forceConfig.optionxform = lambda optionstr: str(optionstr)
         if path.exists(FORCE_CONFIG_PATH):
             forceConfig.read(FORCE_CONFIG_PATH)
 
@@ -58,15 +60,17 @@ class TheForceEngineGenerator(Generator):
 
         if system.isOptSet("force_render_res"):
             res_height = system.config["force_render_res"]
-            res_width = int(res_height) * 4/3
+            res_width = int(res_height) * 4 / 3
             forceConfig.set("Graphics", "gameWidth", str(res_width))
             forceConfig.set("Graphics", "gameHeight", res_height)
         else:
-            res_width = int(gameResolution["height"] * 4/3)
+            res_width = int(gameResolution["height"] * 4 / 3)
             forceConfig.set("Graphics", "gameWidth", str(res_width))
             forceConfig.set("Graphics", "gameHeight", format(gameResolution["height"]))
 
-        if system.isOptSet("force_widescreen") and system.getOptBoolean("force_widescreen"):
+        if system.isOptSet("force_widescreen") and system.getOptBoolean(
+            "force_widescreen"
+        ):
             forceConfig.set("Graphics", "widescreen", "true")
         else:
             forceConfig.set("Graphics", "widescreen", "false")
@@ -96,12 +100,16 @@ class TheForceEngineGenerator(Generator):
         else:
             forceConfig.set("Graphics", "useBilinear", "false")
 
-        if system.isOptSet("force_mipmapping") and system.getOptBoolean("force_mipmapping"):
+        if system.isOptSet("force_mipmapping") and system.getOptBoolean(
+            "force_mipmapping"
+        ):
             forceConfig.set("Graphics", "useMipmapping", "true")
         else:
             forceConfig.set("Graphics", "useMipmapping", "false")
 
-        if system.isOptSet("force_crosshair") and system.getOptBoolean("force_crosshair"):
+        if system.isOptSet("force_crosshair") and system.getOptBoolean(
+            "force_crosshair"
+        ):
             forceConfig.set("Graphics", "reticleEnable", "true")
         else:
             forceConfig.set("Graphics", "reticleEnable", "false")
@@ -136,12 +144,16 @@ class TheForceEngineGenerator(Generator):
         if not forceConfig.has_section("Sound"):
             forceConfig.add_section("Sound")
 
-        if system.isOptSet("force_menu_sound") and system.getOptBoolean("force_menu_sound"):
+        if system.isOptSet("force_menu_sound") and system.getOptBoolean(
+            "force_menu_sound"
+        ):
             forceConfig.set("Sound", "disableSoundInMenus", "true")
         else:
             forceConfig.set("Sound", "disableSoundInMenus", "false")
 
-        if system.isOptSet("force_digital_audio") and system.getOptBoolean("force_digital_audio"):
+        if system.isOptSet("force_digital_audio") and system.getOptBoolean(
+            "force_digital_audio"
+        ):
             forceConfig.set("Sound", "use16Channels", "true")
         else:
             forceConfig.set("Sound", "use16Channels", "false")
@@ -164,9 +176,15 @@ class TheForceEngineGenerator(Generator):
         if not forceConfig.has_section("Dark_Forces"):
             forceConfig.add_section("Dark_Forces")
         # currently use this directory
-        forceConfig.set("Dark_Forces", "sourcePath", '"/userdata/roms/theforceengine/Star Wars - Dark Forces/"')
+        forceConfig.set(
+            "Dark_Forces",
+            "sourcePath",
+            '"/userdata/roms/theforceengine/Star Wars - Dark Forces/"',
+        )
 
-        if system.isOptSet("force_fight_music") and system.getOptBoolean("force_fight_music"):
+        if system.isOptSet("force_fight_music") and system.getOptBoolean(
+            "force_fight_music"
+        ):
             forceConfig.set("Dark_Forces", "disableFightMusic", "true")
         else:
             forceConfig.set("Dark_Forces", "disableFightMusic", "false")
@@ -176,7 +194,10 @@ class TheForceEngineGenerator(Generator):
         else:
             forceConfig.set("Dark_Forces", "enableAutoaim", "true")
 
-        if system.isOptSet("force_secret_msg") and system.config["force_secret_msg"] == "0":
+        if (
+            system.isOptSet("force_secret_msg")
+            and system.config["force_secret_msg"] == "0"
+        ):
             forceConfig.set("Dark_Forces", "showSecretFoundMsg", "false")
         else:
             forceConfig.set("Dark_Forces", "showSecretFoundMsg", "true")
@@ -191,7 +212,9 @@ class TheForceEngineGenerator(Generator):
         else:
             forceConfig.set("Dark_Forces", "bobaFettFacePlayer", "false")
 
-        if system.isOptSet("force_smooth_vues") and system.getOptBoolean("force_smooth_vues"):
+        if system.isOptSet("force_smooth_vues") and system.getOptBoolean(
+            "force_smooth_vues"
+        ):
             forceConfig.set("Dark_Forces", "smoothVUEs", "true")
         else:
             forceConfig.set("Dark_Forces", "smoothVUEs", "false")
@@ -208,16 +231,22 @@ class TheForceEngineGenerator(Generator):
         ## Update the configuration file
         if not path.exists(path.dirname(FORCE_CONFIG_PATH)):
             makedirs(path.dirname(FORCE_CONFIG_PATH))
-        with open(FORCE_CONFIG_PATH, 'w') as configfile:
+        with open(FORCE_CONFIG_PATH, "w") as configfile:
             forceConfig.write(configfile)
 
         ## Setup the command
         commandArray = [FORCE_BIN_PATH]
 
         ## Accomodate Mods, skip cutscenes etc
-        if system.isOptSet("force_skip_cutscenes") and system.config["force_skip_cutscenes"] == "initial":
+        if (
+            system.isOptSet("force_skip_cutscenes")
+            and system.config["force_skip_cutscenes"] == "initial"
+        ):
             commandArray.extend(["-c0"])
-        elif system.isOptSet("force_skip_cutscenes") and system.getOptBoolean("force_skip_cutscenes") == "skip":
+        elif (
+            system.isOptSet("force_skip_cutscenes")
+            and system.getOptBoolean("force_skip_cutscenes") == "skip"
+        ):
             commandArray.extend(["-c"])
         # Add mod zip file if necessary
         if mod_name is not None:
@@ -227,17 +256,20 @@ class TheForceEngineGenerator(Generator):
         commandArray.extend(["-gDARK"])
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'TFE_DATA_HOME': FORCE_CONFIG_DIR,
-                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "TFE_DATA_HOME": FORCE_CONFIG_DIR,
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    playersControllers
+                ),
+            },
+        )
 
     # Show mouse for menu actions
     def getMouseMode(self, config, rom):
         return True
 
     def getInGameRatio(self, config, gameResolution, rom):
-        if ("force_widescreen" in config and config["force_widescreen"] == "1"):
-            return 16/9
-        return 4/3
+        if "force_widescreen" in config and config["force_widescreen"] == "1":
+            return 16 / 9
+        return 4 / 3

@@ -9,18 +9,20 @@ import zipfile
 from distutils.dir_util import copy_tree
 
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
 
-openMSX_Homedir = '/userdata/system/configs/openmsx'
-openMSX_Config = '/usr/share/openmsx/'
+openMSX_Homedir = "/userdata/system/configs/openmsx"
+openMSX_Config = "/usr/share/openmsx/"
+
 
 class OpenmsxGenerator(Generator):
-
     def hasInternalMangoHUDCall(self):
         return True
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         share_dir = openMSX_Homedir + "/share"
         source_settings = openMSX_Config + "/settings.xml"
         settings_xml = share_dir + "/settings.xml"
@@ -70,7 +72,9 @@ class OpenmsxGenerator(Generator):
             f.write("<!DOCTYPE settings SYSTEM 'settings.dtd'>\n")
             # purdify the XML
             xml_string = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
-            formatted_xml = "\n".join([line for line in xml_string.split("\n") if line.strip()])
+            formatted_xml = "\n".join(
+                [line for line in xml_string.split("\n") if line.strip()]
+            )
             f.write(formatted_xml)
 
         # setup the blank tcl file
@@ -79,8 +83,12 @@ class OpenmsxGenerator(Generator):
 
         # set the tcl file options - we can add other options later
         with open(settings_tcl, "a") as file:
-            file.write("filepool add -path /userdata/bios/Machines -types system_rom -position 1\n")
-            file.write("filepool add -path /userdata/bios/openmsx -types system_rom -position 2\n")
+            file.write(
+                "filepool add -path /userdata/bios/Machines -types system_rom -position 1\n"
+            )
+            file.write(
+                "filepool add -path /userdata/bios/openmsx -types system_rom -position 2\n"
+            )
             # get the rom name (no extension) for the savestate name
             save_name = os.path.basename(rom)
             save_name = os.path.splitext(save_name)[0]
@@ -93,7 +101,9 @@ class OpenmsxGenerator(Generator):
             # set the screenshot
             file.write("\n")
             file.write("# -= Screenshots =-\n")
-            file.write('bind F5 {screenshot [utils::get_next_numbered_filename /userdata/screenshots/openmsx "[guess_title] " ".png"]}\n')
+            file.write(
+                'bind F5 {screenshot [utils::get_next_numbered_filename /userdata/screenshots/openmsx "[guess_title] " ".png"]}\n'
+            )
             # setup the controller
             file.write("\n")
             file.write("# -= Controller config =-\n")
@@ -107,20 +117,52 @@ class OpenmsxGenerator(Generator):
                     for x in pad.inputs:
                         input = pad.inputs[x]
                         if input.name == "y":
-                            file.write('bind "joy{} button{} down" "keymatrixdown 6 0x40"\n'.format(nplayer, input.id))
+                            file.write(
+                                'bind "joy{} button{} down" "keymatrixdown 6 0x40"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
                         if input.name == "x":
-                            file.write('bind "joy{} button{} down" "keymatrixdown 6 0x80"\n'.format(nplayer, input.id))
+                            file.write(
+                                'bind "joy{} button{} down" "keymatrixdown 6 0x80"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
                         if input.name == "pagedown":
-                            file.write('bind "joy{} button{} up" "set fastforward off"\n'.format(nplayer, input.id))
-                            file.write('bind "joy{} button{} down" "set fastforward on"\n'.format(nplayer, input.id))
+                            file.write(
+                                'bind "joy{} button{} up" "set fastforward off"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
+                            file.write(
+                                'bind "joy{} button{} down" "set fastforward on"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
                         if input.name == "select":
-                            file.write('bind "joy{} button{} down" "toggle pause"\n'.format(nplayer, input.id))
+                            file.write(
+                                'bind "joy{} button{} down" "toggle pause"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
                         if input.name == "start":
-                            file.write('bind "joy{} button{} down" "main_menu_toggle"\n'.format(nplayer, input.id))
+                            file.write(
+                                'bind "joy{} button{} down" "main_menu_toggle"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
                         if input.name == "l3":
-                            file.write('bind "joy{} button{} down" "toggle_osd_keyboard"\n'.format(nplayer, input.id))
+                            file.write(
+                                'bind "joy{} button{} down" "toggle_osd_keyboard"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
                         if input.name == "r3":
-                            file.write('bind "joy{} button{} down" "toggle console"\n'.format(nplayer, input.id))
+                            file.write(
+                                'bind "joy{} button{} down" "toggle console"\n'.format(
+                                    nplayer, input.id
+                                )
+                            )
                 nplayer += 1
 
         # now run the rom with the appropriate flags
@@ -143,7 +185,11 @@ class OpenmsxGenerator(Generator):
         if system.name == "spectravideo":
             commandArray[1:1] = ["-machine", "Spectravideo_SVI-328"]
 
-        if system.isOptSet("hud") and os.path.exists("/usr/bin/mangohud") and system.config["hud"] != "":
+        if (
+            system.isOptSet("hud")
+            and os.path.exists("/usr/bin/mangohud")
+            and system.config["hud"] != ""
+        ):
             commandArray.insert(0, "mangohud")
 
         # setup the media types
@@ -160,7 +206,7 @@ class OpenmsxGenerator(Generator):
             eslog.debug("File is a laserdisc")
             for i in range(len(commandArray)):
                 if commandArray[i] == "-machine":
-                    commandArray[i+1] = "Pioneer_PX-7"
+                    commandArray[i + 1] = "Pioneer_PX-7"
                 elif commandArray[i] == "-cart":
                     commandArray[i] = "-laserdisc"
 
@@ -173,7 +219,10 @@ class OpenmsxGenerator(Generator):
         if file_extension == ".dsk":
             eslog.debug("File is a disk")
             disk_type = "-diska"
-            if system.isOptSet("openmsx_disk") and system.config["openmsx_disk"] == "hda":
+            if (
+                system.isOptSet("openmsx_disk")
+                and system.config["openmsx_disk"] == "hda"
+            ):
                 disk_type = "-hda"
             for i in range(len(commandArray)):
                 if commandArray[i] == "-cart":
@@ -199,14 +248,16 @@ class OpenmsxGenerator(Generator):
             if extension == "rom":
                 cart_index = commandArray.index("-cart")
                 commandArray[cart_index] = "-carta"
-                commandArray[cart_index +1] = rom1
+                commandArray[cart_index + 1] = rom1
             elif extension == "dsk":
                 cart_index = commandArray.index("-cart")
                 commandArray[cart_index] = "-diska"
-                commandArray[cart_index +1] = rom1
+                commandArray[cart_index + 1] = rom1
             if extension == "rom" or extension == "dsk":
                 rom2_index = cart_index + 2
-                commandArray.insert(rom2_index, "-cartb" if extension == "rom" else "-diskb")
+                commandArray.insert(
+                    rom2_index, "-cartb" if extension == "rom" else "-diskb"
+                )
                 commandArray.insert(rom2_index + 1, rom2)
 
         return Command(array=commandArray)

@@ -6,13 +6,22 @@ from os import path, mkdir, linesep
 from glob import iglob, escape
 from controllers import generate_sdl_controller_config
 from .cemuControllers import setControllerConfig
-from .cemuConfig import CEMU_BIN_PATH, CEMU_BIOS_DIR, CEMU_CONFIG_DIR, CEMU_SAVES_DIR, CEMU_CONFIG_PATH, CEMU_PROFILES_DIR, setCemuConfig
+from .cemuConfig import (
+    CEMU_BIN_PATH,
+    CEMU_BIOS_DIR,
+    CEMU_CONFIG_DIR,
+    CEMU_SAVES_DIR,
+    CEMU_CONFIG_PATH,
+    CEMU_PROFILES_DIR,
+    setCemuConfig,
+)
 
 from utils.logger import get_logger
+
 eslog = get_logger(__name__)
 
-class CemuGenerator(Generator):
 
+class CemuGenerator(Generator):
     # this emulator/core requires a X server to run
     def requiresX11(self):
         return True
@@ -21,11 +30,12 @@ class CemuGenerator(Generator):
     def hasInternalMangoHUDCall(self):
         return True
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # in case of squashfs/zar, the root directory is passed
         rpxrom = rom
-        paths = list(iglob(path.join(escape(rom), '**/code/*.rpx'), recursive=True))
+        paths = list(iglob(path.join(escape(rom), "**/code/*.rpx"), recursive=True))
         if len(paths) >= 1:
             rpxrom = paths[0]
 
@@ -46,7 +56,7 @@ class CemuGenerator(Generator):
             try:
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
             except:
-                pass # reinit the file
+                pass  # reinit the file
 
         # Create the settings file
         setCemuConfig(cemuConfig, system)
@@ -56,7 +66,9 @@ class CemuGenerator(Generator):
 
         # TODO: python 3 - workaround to encode files in utf-8
         xml = open(CEMU_CONFIG_PATH, "w", "utf-8")
-        dom_string = linesep.join([s for s in cemuConfig.toprettyxml().splitlines() if s.strip()])
+        dom_string = linesep.join(
+            [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()]
+        )
         xml.write(dom_string)
 
         # Set-up the controllers
@@ -65,7 +77,10 @@ class CemuGenerator(Generator):
         commandArray = [CEMU_BIN_PATH, "-f", "--force-no-menubar", "-g", rpxrom]
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    playersControllers
+                )
+            },
+        )

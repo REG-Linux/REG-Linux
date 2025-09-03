@@ -4,12 +4,14 @@ from os import path, makedirs
 from controllers import generate_sdl_controller_config
 from systemFiles import SAVES
 
-EASYRPG_SAVE_DIR = SAVES + '/easyrpg'
-EASYRPG_BIN_PATH = '/usr/bin/easyrpg-player'
+EASYRPG_SAVE_DIR = SAVES + "/easyrpg"
+EASYRPG_BIN_PATH = "/usr/bin/easyrpg-player"
+
 
 class EasyRPGGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         commandArray = [EASYRPG_BIN_PATH]
 
         # FPS
@@ -17,11 +19,11 @@ class EasyRPGGenerator(Generator):
             commandArray.append("--show-fps")
 
         # Test Play (Debug Mode)
-        if system.isOptSet('testplay') and system.getOptBoolean("testplay"):
+        if system.isOptSet("testplay") and system.getOptBoolean("testplay"):
             commandArray.append("--test-play")
 
         # Game Region (Encoding)
-        if system.isOptSet('encoding') and system.config["encoding"] != 'autodetect':
+        if system.isOptSet("encoding") and system.config["encoding"] != "autodetect":
             commandArray.extend(["--encoding", system.config["encoding"]])
         else:
             commandArray.extend(["--encoding", "auto"])
@@ -35,7 +37,10 @@ class EasyRPGGenerator(Generator):
         commandArray.extend(["--project-path", rom])
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    playersControllers
+                )
+            },
+        )

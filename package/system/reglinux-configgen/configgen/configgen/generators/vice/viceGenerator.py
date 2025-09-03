@@ -3,27 +3,34 @@ from Command import Command
 from os import path, makedirs
 from zipfile import ZipFile
 from controllers import generate_sdl_controller_config
-from .viceConfig import setViceConfig, VICE_BIN_PATH, VICE_CONFIG_DIR, VICE_CONFIG_PATH, VICE_CONTROLLER_PATH
+from .viceConfig import (
+    setViceConfig,
+    VICE_BIN_PATH,
+    VICE_CONFIG_DIR,
+    VICE_CONFIG_PATH,
+    VICE_CONTROLLER_PATH,
+)
+
 
 class ViceGenerator(Generator):
-
     def getResolutionMode(self, config):
-        return 'default'
+        return "default"
 
     # Main entry of the module
     # Return command
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         if not path.exists(path.dirname(VICE_CONFIG_DIR)):
             makedirs(path.dirname(VICE_CONFIG_DIR))
 
         # FIXME configuration file
-        #setViceConfig(VICE_CONFIG_PATH, VICE_CONTROLLER_PATH, system, metadata, guns, rom)
+        # setViceConfig(VICE_CONFIG_PATH, VICE_CONTROLLER_PATH, system, metadata, guns, rom)
 
         # FIXME controller configuration
-        #viceControllers.generateControllerConfig(system, VICE_CONFIG_PATH, playersControllers)
+        # viceControllers.generateControllerConfig(system, VICE_CONFIG_PATH, playersControllers)
 
-        commandArray = [VICE_BIN_PATH + system.config['core']]
+        commandArray = [VICE_BIN_PATH + system.config["core"]]
         # Determine the way to launch roms based on extension type
         rom_extension = path.splitext(rom)[1].lower()
         # determine extension if a zip file
@@ -35,7 +42,10 @@ class ViceGenerator(Generator):
         commandArray.append(rom)
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    playersControllers
+                )
+            },
+        )
