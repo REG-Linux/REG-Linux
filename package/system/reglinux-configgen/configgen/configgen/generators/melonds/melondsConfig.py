@@ -14,104 +14,101 @@ def setMelonDSConfig(melondsConfig, system, gameResolution):
         width, height = gameResolution["width"], gameResolution["height"]
 
     # [Set config defaults]
-    config_lines = [
-        "WindowWidth={}\n".format(width),
-        "WindowHeight={}\n".format(height),
-        "WindowMax=1\n",
+    config_dict = {
+        "WindowWidth": width,
+        "WindowHeight": height,
+        "WindowMax": 1,
         # Hide mouse after 5 seconds
-        "MouseHide=1\n",
-        "MouseHideSeconds=5\n",
+        "MouseHide": 1,
+        "MouseHideSeconds": 5,
         # Set bios locations
-        "ExternalBIOSEnable=1\n",
-        "BIOS9Path=/userdata/bios/bios9.bin\n",
-        "BIOS7Path=/userdata/bios/bios7.bin\n",
-        "FirmwarePath=/userdata/bios/firmware.bin\n",
-        "DSiBIOS9Path=/userdata/bios/dsi_bios9.bin\n",
-        "DSiBIOS7Path=/userdata/bios/dsi_bios7.bin\n",
-        "DSiFirmwarePath=/userdata/bios/dsi_firmware.bin\n",
-        "DSiNANDPath=/userdata/bios/dsi_nand.bin\n",
+        "ExternalBIOSEnable": 1,
+        "BIOS9Path": "/userdata/bios/bios9.bin",
+        "BIOS7Path": "/userdata/bios/bios7.bin",
+        "FirmwarePath": "/userdata/bios/firmware.bin",
+        "DSiBIOS9Path": "/userdata/bios/dsi_bios9.bin",
+        "DSiBIOS7Path": "/userdata/bios/dsi_bios7.bin",
+        "DSiFirmwarePath": "/userdata/bios/dsi_firmware.bin",
+        "DSiNANDPath": "/userdata/bios/dsi_nand.bin",
         # Set save locations
-        "DLDIFolderPath=/userdata/saves/melonds\n",
-        "DSiSDFolderPath=/userdata/saves/melonds\n",
-        "MicWavPath=/userdata/saves/melonds\n",
-        "SaveFilePath=/userdata/saves/melonds\n",
-        "SavestatePath=/userdata/saves/melonds\n",
+        "DLDIFolderPath": "/userdata/saves/melonds",
+        "DSiSDFolderPath": "/userdata/saves/melonds",
+        "MicWavPath": "/userdata/saves/melonds",
+        "SaveFilePath": "/userdata/saves/melonds",
+        "SavestatePath": "/userdata/saves/melonds",
         # Cheater!
-        "CheatFilePath=/userdata/cheats/melonDS\n",
+        "CheatFilePath": "/userdata/cheats/melonDS",
         # Roms
-        "LastROMFolder=/userdata/roms/nds\n",
+        "LastROMFolder": "/userdata/roms/nds",
         # Audio
-        "AudioInterp=1\n",
-        "AudioBitrate=2\n",
-        "AudioVolume=256\n",
+        "AudioInterp": 1,
+        "AudioBitrate": 2,
+        "AudioVolume": 256,
         # For Software Rendering
-        "Threaded3D=1\n",
-    ]
+        "Threaded3D": 1,
+    }
 
     # Write all default config lines
-    for line in config_lines:
-        melondsConfig.write(line)
+    for key, value in config_dict.items():
+        melondsConfig.save(key, value)
 
     # [User selected options]
     # MelonDS only has OpenGL or Software - use OpenGL if not selected
     if system.isOptSet("melonds_renderer"):
-        melondsConfig.write("3DRenderer={}\n".format(system.config["melonds_renderer"]))
+        melondsConfig.save("3DRenderer", system.config["melonds_renderer"])
     else:
-        melondsConfig.write("3DRenderer=1\n")
+        melondsConfig.save("3DRenderer", 1)
+
     if system.isOptSet("melonds_framerate"):
-        melondsConfig.write("LimitFPS={}\n".format(system.config["melonds_framerate"]))
+        melondsConfig.save("LimitFPS", system.config["melonds_framerate"])
     else:
-        melondsConfig.write("LimitFPS=1\n")
+        melondsConfig.save("LimitFPS", 1)
+
     if system.isOptSet("melonds_resolution"):
-        melondsConfig.write(
-            "GL_ScaleFactor={}\n".format(system.config["melonds_resolution"])
-        )
+        melondsConfig.save("GL_ScaleFactor", system.config["melonds_resolution"])
     else:
-        melondsConfig.write("GL_ScaleFactor=1\n")
+        melondsConfig.save("GL_ScaleFactor", 1)
+
     if system.isOptSet("melonds_polygons"):
-        melondsConfig.write(
-            "GL_BetterPolygons={}\n".format(system.config["melonds_polygons"])
-        )
+        melondsConfig.save("GL_BetterPolygons", system.config["melonds_polygons"])
     else:
-        melondsConfig.write("GL_BetterPolygons=0\n")
+        melondsConfig.save("GL_BetterPolygons", 0)
+
     if system.isOptSet("melonds_rotation"):
-        melondsConfig.write(
-            "ScreenRotation={}\n".format(system.config["melonds_rotation"])
-        )
+        melondsConfig.save("ScreenRotation", system.config["melonds_rotation"])
     else:
-        melondsConfig.write("ScreenRotation=0\n")
+        melondsConfig.save("ScreenRotation", 0)
+
     if system.isOptSet("melonds_screenswap"):
-        melondsConfig.write(
-            "ScreenSwap={}\n".format(system.config["melonds_screenswap"])
-        )
+        melondsConfig.save("ScreenSwap", system.config["melonds_screenswap"])
     else:
-        melondsConfig.write("ScreenSwap=0\n")
+        melondsConfig.save("ScreenSwap", 0)
+
     if system.isOptSet("melonds_layout"):
-        melondsConfig.write("ScreenLayout={}\n".format(system.config["melonds_layout"]))
+        melondsConfig.save("ScreenLayout", system.config["melonds_layout"])
     else:
-        melondsConfig.write("ScreenLayout=0\n")
+        melondsConfig.save("ScreenLayout", 0)
+
     if system.isOptSet("melonds_screensizing"):
-        melondsConfig.write(
-            "ScreenSizing={}\n".format(system.config["melonds_screensizing"])
-        )
+        melondsConfig.save("ScreenSizing", system.config["melonds_screensizing"])
     else:
-        melondsConfig.write("ScreenSizing=0\n")
+        melondsConfig.save("ScreenSizing", 0)
+
     if system.isOptSet("melonds_scaling"):
-        melondsConfig.write(
-            "IntegerScaling={}\n".format(system.config["melonds_scaling"])
-        )
+        melondsConfig.save("IntegerScaling", system.config["melonds_scaling"])
     else:
-        melondsConfig.write("IntegerScaling=0\n")
+        melondsConfig.save("IntegerScaling", 0)
+
     # Cheater!
     if system.isOptSet("melonds_cheats"):
-        melondsConfig.write("EnableCheats={}\n".format(system.config["melonds_cheats"]))
+        melondsConfig.save("EnableCheats", system.config["melonds_cheats"])
     else:
-        melondsConfig.write("EnableCheats=0\n")
+        melondsConfig.save("EnableCheats", 0)
     if system.isOptSet("melonds_osd"):
-        melondsConfig.write("ShowOSD={}\n".format(system.config["melonds_osd"]))
+        melondsConfig.save("ShowOSD", system.config["melonds_osd"])
     else:
-        melondsConfig.write("ShowOSD=1\n")
+        melondsConfig.save("ShowOSD", 1)
     if system.isOptSet("melonds_console"):
-        melondsConfig.write("ConsoleType={}\n".format(system.config["melonds_console"]))
+        melondsConfig.save("ConsoleType", system.config["melonds_console"])
     else:
-        melondsConfig.write("ConsoleType=0\n")
+        melondsConfig.save("ConsoleType", 0)
