@@ -4,29 +4,41 @@ from os import path, makedirs, mkdir
 from configparser import ConfigParser
 from shutil import copyfile
 from systemFiles import CONF
-from .flycastConfig import setFlycastConfig, FLYCAST_CONFIG_PATH, FLYCAST_SAVES_DIR, FLYCAST_BIOS_DIR, FLYCAST_VMU_BLANK_PATH, FLYCAST_VMU_A1_PATH, FLYCAST_VMU_A2_PATH, FLYCAST_BIN_PATH
+from .flycastConfig import (
+    setFlycastConfig,
+    FLYCAST_CONFIG_PATH,
+    FLYCAST_SAVES_DIR,
+    FLYCAST_BIOS_DIR,
+    FLYCAST_VMU_BLANK_PATH,
+    FLYCAST_VMU_A1_PATH,
+    FLYCAST_VMU_A2_PATH,
+    FLYCAST_BIN_PATH,
+)
 
 
 class FlycastGenerator(Generator):
-
     # Main entry of the module
     # Configure fba and return a command
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Write emu.cfg to map joysticks, init with the default emu.cfg
         flycastConfig = ConfigParser(interpolation=None)
-        flycastConfig.optionxform = lambda optionstr: optionstr  # preserve case sensitivity
+        flycastConfig.optionxform = (
+            lambda optionstr: optionstr
+        )  # preserve case sensitivity
         if path.exists(FLYCAST_CONFIG_PATH):
             try:
                 flycastConfig.read(FLYCAST_CONFIG_PATH)
             except:
-                pass # give up the file
+                pass  # give up the file
 
         setFlycastConfig(flycastConfig, system, gameResolution)
 
         ### update the configuration file
         if not path.exists(path.dirname(FLYCAST_CONFIG_PATH)):
             makedirs(path.dirname(FLYCAST_CONFIG_PATH))
-        with open(FLYCAST_CONFIG_PATH, 'w+') as cfgfile:
+        with open(FLYCAST_CONFIG_PATH, "w+") as cfgfile:
             flycastConfig.write(cfgfile)
             cfgfile.close()
 
@@ -53,8 +65,8 @@ class FlycastGenerator(Generator):
         return Command(
             array=commandArray,
             env={
-                "XDG_CONFIG_DIRS":CONF,
-                "FLYCAST_DATADIR":FLYCAST_SAVES_DIR,
-                "FLYCAST_BIOS_PATH":FLYCAST_BIOS_DIR
-            }
+                "XDG_CONFIG_DIRS": CONF,
+                "FLYCAST_DATADIR": FLYCAST_SAVES_DIR,
+                "FLYCAST_BIOS_PATH": FLYCAST_BIOS_DIR,
+            },
         )

@@ -3,7 +3,14 @@ from Command import Command
 from os import path, mkdir
 from shlex import split
 from .gzdoomControllers import setGzdoomControllers
-from .gzdoomConfig import setGzdoomConfig, GZDOOM_CONFIG_DIR, GZDOOM_SCRIPT_PATH, GZDOOM_SOUND_FONT_PATH, GZDOOM_FM_BANKS_PATH
+from .gzdoomConfig import (
+    setGzdoomConfig,
+    GZDOOM_CONFIG_DIR,
+    GZDOOM_SCRIPT_PATH,
+    GZDOOM_SOUND_FONT_PATH,
+    GZDOOM_FM_BANKS_PATH,
+)
+
 
 class GZDoomGenerator(Generator):
     # this emulator/core requires wayland compositor to run
@@ -11,9 +18,11 @@ class GZDoomGenerator(Generator):
         return True
 
     def getInGameRatio(self, config, gameResolution, rom):
-        return 16/9
+        return 16 / 9
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # check directories exist
         if not path.exists(GZDOOM_CONFIG_DIR):
             mkdir(GZDOOM_CONFIG_DIR)
@@ -37,9 +46,12 @@ class GZDoomGenerator(Generator):
                 array=[
                     "gzdoom",
                     *args,
-                    "-exec", GZDOOM_SCRIPT_PATH,
-                    "-width", str(gameResolution["width"]),
-                    "-height", str(gameResolution["height"]),
+                    "-exec",
+                    GZDOOM_SCRIPT_PATH,
+                    "-width",
+                    str(gameResolution["width"]),
+                    "-height",
+                    str(gameResolution["height"]),
                     "-nologo" if system.getOptBoolean("nologo") else "",
                 ]
             )
@@ -47,10 +59,14 @@ class GZDoomGenerator(Generator):
             return Command(
                 array=[
                     "gzdoom",
-                    "-iwad", path.basename(rom),
-                    "-exec", GZDOOM_SCRIPT_PATH,
-                    "-width", str(gameResolution["width"]),
-                    "-height", str(gameResolution["height"]),
+                    "-iwad",
+                    path.basename(rom),
+                    "-exec",
+                    GZDOOM_SCRIPT_PATH,
+                    "-width",
+                    str(gameResolution["width"]),
+                    "-height",
+                    str(gameResolution["height"]),
                     "-nologo" if system.getOptBoolean("nologo") else "",
                 ]
             )

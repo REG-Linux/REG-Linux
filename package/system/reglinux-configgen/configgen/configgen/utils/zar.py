@@ -4,6 +4,7 @@ from utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
+
 def zar_begin(rom):
     """
     Mounts a .zar archive using fuse-zar.

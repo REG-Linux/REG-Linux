@@ -7,11 +7,12 @@ case "$1" in
     ;;
   enabled)
       /usr/bin/system-settings-set system.samba.enabled 1
-      /etc/init.d/S91smbd start
+      /etc/init.d/S35securepasswd start   # In case security enforcement changed.
+      /etc/init.d/S91ksmbd start
       /etc/init.d/S93wsdd start
     ;;
   disabled)
-      /etc/init.d/S91smbd stop
+      /etc/init.d/S91ksmbd stop
       /etc/init.d/S93wsdd stop
       /usr/bin/system-settings-set system.samba.enabled 0
     ;;

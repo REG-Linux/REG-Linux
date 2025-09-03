@@ -5,15 +5,16 @@ from os import path, makedirs
 from shutil import copy2
 from systemFiles import CONF
 
-DOSBOXX_CONFIG_DIR = CONF + '/dosbox'
-DOSBOXX_CONFIG_PATH = DOSBOXX_CONFIG_DIR + '/dosboxx.conf'
-DOSBOXX_CONFIG_CUSTOM_PATH = DOSBOXX_CONFIG_DIR + '/dosboxx-custom.conf'
-DOSBOXX_BIN_PATH = '/usr/bin/dosbox-x'
+DOSBOXX_CONFIG_DIR = CONF + "/dosbox"
+DOSBOXX_CONFIG_PATH = DOSBOXX_CONFIG_DIR + "/dosboxx.conf"
+DOSBOXX_CONFIG_CUSTOM_PATH = DOSBOXX_CONFIG_DIR + "/dosboxx-custom.conf"
+DOSBOXX_BIN_PATH = "/usr/bin/dosbox-x"
 
 
 class DosBoxxGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Find rom path
         gameDir = rom
         gameConfFile = gameDir + "/dosbox.cfg"
@@ -27,7 +28,7 @@ class DosBoxxGenerator(Generator):
 
         # configuration file
         iniSettings = ConfigParser(interpolation=None)
-        iniSettings.optionxform=lambda optionstr: str(optionstr)
+        iniSettings.optionxform = lambda optionstr: str(optionstr)
 
         if path.exists(configFile):
             copy2(configFile, DOSBOXX_CONFIG_CUSTOM_PATH)
@@ -39,16 +40,21 @@ class DosBoxxGenerator(Generator):
         iniSettings.set("sdl", "output", "opengl")
 
         # save
-        with open(DOSBOXX_CONFIG_CUSTOM_PATH, 'w') as config:
+        with open(DOSBOXX_CONFIG_CUSTOM_PATH, "w") as config:
             iniSettings.write(config)
 
-        commandArray = [DOSBOXX_BIN_PATH,
-			"-exit",
-			"-c", f"""mount c {gameDir}""",
-                        "-c", "c:",
-                        "-c", "dosbox.bat",
-                        "-fastbioslogo",
-                        "-fullscreen",
-                        f"-conf {DOSBOXX_CONFIG_CUSTOM_PATH}"]
+        commandArray = [
+            DOSBOXX_BIN_PATH,
+            "-exit",
+            "-c",
+            f"""mount c {gameDir}""",
+            "-c",
+            "c:",
+            "-c",
+            "dosbox.bat",
+            "-fastbioslogo",
+            "-fullscreen",
+            f"-conf {DOSBOXX_CONFIG_CUSTOM_PATH}",
+        ]
 
         return Command(array=commandArray)

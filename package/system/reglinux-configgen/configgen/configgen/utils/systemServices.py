@@ -1,7 +1,8 @@
 from subprocess import Popen, PIPE
-
 from .logger import get_logger
+
 eslog = get_logger(__name__)
+
 
 def is_service_enabled(name: str) -> bool:
     try:
@@ -17,12 +18,13 @@ def is_service_enabled(name: str) -> bool:
         eslog.error(f"Failed to check if service {name} is enabled: {e}")
     return False
 
+
 def get_service_status(name: str) -> str:
     try:
         proc = Popen(["system-services", "status", name], stdout=PIPE)
         out, _ = proc.communicate()
         val = out.decode().strip()
-        eslog.debug(f"service {name} status: \"{val}\"")
+        eslog.debug(f'service {name} status: "{val}"')
         return val
     except Exception as e:
         eslog.error(f"Failed to get status for service {name}: {e}")

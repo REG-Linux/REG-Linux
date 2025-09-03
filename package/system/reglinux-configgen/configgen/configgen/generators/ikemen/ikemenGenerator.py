@@ -3,13 +3,14 @@ from Command import Command
 from settings import JSONSettings
 from .ikemenControllers import Keymapping, Joymapping
 
-IKEMEN_CONFIG_PATH = '/save/config.json'
-IKEMEN_BIN_PATH = '/usr/bin/system-ikemen'
+IKEMEN_CONFIG_PATH = "/save/config.json"
+IKEMEN_BIN_PATH = "/usr/bin/system-ikemen"
 
 
 class IkemenGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Load existing config or create a new one
         ikemenConfig = JSONSettings(rom + IKEMEN_CONFIG_PATH)
 

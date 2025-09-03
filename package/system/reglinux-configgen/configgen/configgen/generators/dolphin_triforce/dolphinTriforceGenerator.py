@@ -6,27 +6,35 @@ from os import environ
 from . import dolphinTriforceControllers
 from . import dolphinTriforceConfig
 
+
 class DolphinTriforceGenerator(Generator):
     # this emulator/core requires X server to run
     def requiresX11(self):
         return True
 
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-        if not os.path.exists(os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
+        if not os.path.exists(
+            os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)
+        ):
             os.makedirs(os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni))
 
         # Dir required for saves
-        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceData + "/StateSaves"):
+        if not os.path.exists(
+            dolphinTriforceConfig.dolphinTriforceData + "/StateSaves"
+        ):
             os.makedirs(dolphinTriforceConfig.dolphinTriforceData + "/StateSaves")
 
-        dolphinTriforceControllers.generateControllerConfig(system, playersControllers, rom)
+        dolphinTriforceControllers.generateControllerConfig(
+            system, playersControllers, rom
+        )
 
         ## dolphin.ini ##
 
         dolphinTriforceSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinTriforceSettings.optionxform=lambda optionstr: str(optionstr)
+        dolphinTriforceSettings.optionxform = lambda optionstr: str(optionstr)
         if os.path.exists(dolphinTriforceConfig.dolphinTriforceIni):
             dolphinTriforceSettings.read(dolphinTriforceConfig.dolphinTriforceIni)
 
@@ -44,33 +52,47 @@ class DolphinTriforceGenerator(Generator):
 
         # Define default games path
         if "ISOPaths" not in dolphinTriforceSettings["General"]:
-            dolphinTriforceSettings.set("General", "ISOPath0", "/userdata/roms/triforce")
+            dolphinTriforceSettings.set(
+                "General", "ISOPath0", "/userdata/roms/triforce"
+            )
             dolphinTriforceSettings.set("General", "ISOPaths", "1")
         if "GCMPathes" not in dolphinTriforceSettings["General"]:
-            dolphinTriforceSettings.set("General", "GCMPath0", "/userdata/roms/triforce")
+            dolphinTriforceSettings.set(
+                "General", "GCMPath0", "/userdata/roms/triforce"
+            )
             dolphinTriforceSettings.set("General", "GCMPathes", "1")
 
         # Save file location
         if "MemcardAPath" not in dolphinTriforceSettings["Core"]:
-            dolphinTriforceSettings.set("Core", "MemcardAPath", "/userdata/saves/dolphin-triforce/GC/MemoryCardA.USA.raw")
-            dolphinTriforceSettings.set("Core", "MemcardBPath", "/userdata/saves/dolphin-triforce/GC/MemoryCardB.USA.raw")
+            dolphinTriforceSettings.set(
+                "Core",
+                "MemcardAPath",
+                "/userdata/saves/dolphin-triforce/GC/MemoryCardA.USA.raw",
+            )
+            dolphinTriforceSettings.set(
+                "Core",
+                "MemcardBPath",
+                "/userdata/saves/dolphin-triforce/GC/MemoryCardB.USA.raw",
+            )
 
         # Draw or not FPS
         if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
-            dolphinTriforceSettings.set("General", "ShowLag",        "True")
+            dolphinTriforceSettings.set("General", "ShowLag", "True")
             dolphinTriforceSettings.set("General", "ShowFrameCount", "True")
         else:
-            dolphinTriforceSettings.set("General", "ShowLag",        "False")
+            dolphinTriforceSettings.set("General", "ShowLag", "False")
             dolphinTriforceSettings.set("General", "ShowFrameCount", "False")
 
         # Don't ask about statistics
         dolphinTriforceSettings.set("Analytics", "PermissionAsked", "True")
 
         # PanicHandlers displaymessages
-        dolphinTriforceSettings.set("Interface", "UsePanicHandlers",        "False")
+        dolphinTriforceSettings.set("Interface", "UsePanicHandlers", "False")
 
         # Disable OSD Messages
-        if system.isOptSet("disable_osd_messages") and system.getOptBoolean("disable_osd_messages"):
+        if system.isOptSet("disable_osd_messages") and system.getOptBoolean(
+            "disable_osd_messages"
+        ):
             dolphinTriforceSettings.set("Interface", "OnScreenDisplayMessages", "False")
         else:
             dolphinTriforceSettings.set("Interface", "OnScreenDisplayMessages", "True")
@@ -98,8 +120,12 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceSettings.set("Core", "SyncGPU", "False")
 
         # Language
-        dolphinTriforceSettings.set("Core", "SelectedLanguage", str(getGameCubeLangFromEnvironment())) # Wii
-        dolphinTriforceSettings.set("Core", "GameCubeLanguage", str(getGameCubeLangFromEnvironment())) # GC
+        dolphinTriforceSettings.set(
+            "Core", "SelectedLanguage", str(getGameCubeLangFromEnvironment())
+        )  # Wii
+        dolphinTriforceSettings.set(
+            "Core", "GameCubeLanguage", str(getGameCubeLangFromEnvironment())
+        )  # GC
 
         # Enable MMU
         if system.isOptSet("enable_mmu") and system.getOptBoolean("enable_mmu"):
@@ -126,14 +152,14 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceSettings.set("Core", "SIDevice0", "11")
 
         # Save dolphin.ini
-        with open(dolphinTriforceConfig.dolphinTriforceIni, 'w') as configfile:
+        with open(dolphinTriforceConfig.dolphinTriforceIni, "w") as configfile:
             dolphinTriforceSettings.write(configfile)
 
         ## gfx.ini ##
 
         dolphinTriforceGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinTriforceGFXSettings.optionxform=lambda optionstr: str(optionstr)
+        dolphinTriforceGFXSettings.optionxform = lambda optionstr: str(optionstr)
         dolphinTriforceGFXSettings.read(dolphinTriforceConfig.dolphinTriforceGfxIni)
 
         # Add Default Sections
@@ -147,8 +173,10 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.add_section("Hardware")
 
         # Graphics setting Aspect Ratio
-        if system.isOptSet('dolphin_aspect_ratio'):
-            dolphinTriforceGFXSettings.set("Settings", "AspectRatio", system.config["dolphin_aspect_ratio"])
+        if system.isOptSet("dolphin_aspect_ratio"):
+            dolphinTriforceGFXSettings.set(
+                "Settings", "AspectRatio", system.config["dolphin_aspect_ratio"]
+            )
         else:
             # set to zero, which is 'Auto' in Dolphin & REG-Linux
             dolphinTriforceGFXSettings.set("Settings", "AspectRatio", "0")
@@ -160,17 +188,21 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.set("Settings", "ShowFPS", "False")
 
         # HiResTextures
-        if system.isOptSet('hires_textures') and system.getOptBoolean('hires_textures'):
-            dolphinTriforceGFXSettings.set("Settings", "HiresTextures",      "True")
+        if system.isOptSet("hires_textures") and system.getOptBoolean("hires_textures"):
+            dolphinTriforceGFXSettings.set("Settings", "HiresTextures", "True")
             dolphinTriforceGFXSettings.set("Settings", "CacheHiresTextures", "True")
         else:
-            dolphinTriforceGFXSettings.set("Settings", "HiresTextures",      "False")
+            dolphinTriforceGFXSettings.set("Settings", "HiresTextures", "False")
             dolphinTriforceGFXSettings.set("Settings", "CacheHiresTextures", "False")
 
         # Widescreen Hack
-        if system.isOptSet('widescreen_hack') and system.getOptBoolean('widescreen_hack'):
+        if system.isOptSet("widescreen_hack") and system.getOptBoolean(
+            "widescreen_hack"
+        ):
             # Prefer Cheats than Hack
-            if system.isOptSet('enable_cheats') and system.getOptBoolean('enable_cheats'):
+            if system.isOptSet("enable_cheats") and system.getOptBoolean(
+                "enable_cheats"
+            ):
                 dolphinTriforceGFXSettings.set("Settings", "wideScreenHack", "False")
             else:
                 dolphinTriforceGFXSettings.set("Settings", "wideScreenHack", "True")
@@ -178,7 +210,7 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.set("Settings", "wideScreenHack", "False")
 
         # Various performance hacks - Default Off
-        if system.isOptSet('perf_hacks') and system.getOptBoolean('perf_hacks'):
+        if system.isOptSet("perf_hacks") and system.getOptBoolean("perf_hacks"):
             dolphinTriforceGFXSettings.set("Hacks", "BBoxEnable", "False")
             dolphinTriforceGFXSettings.set("Hacks", "DeferEFBCopies", "True")
             dolphinTriforceGFXSettings.set("Hacks", "EFBEmulateFormatChanges", "False")
@@ -187,57 +219,77 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.set("Hacks", "SkipDuplicateXFBs", "True")
             dolphinTriforceGFXSettings.set("Hacks", "XFBToTextureEnable", "True")
             dolphinTriforceGFXSettings.set("Enhancements", "ForceFiltering", "True")
-            dolphinTriforceGFXSettings.set("Enhancements", "ArbitraryMipmapDetection", "True")
+            dolphinTriforceGFXSettings.set(
+                "Enhancements", "ArbitraryMipmapDetection", "True"
+            )
             dolphinTriforceGFXSettings.set("Enhancements", "DisableCopyFilter", "True")
             dolphinTriforceGFXSettings.set("Enhancements", "ForceTrueColor", "True")
         else:
             if dolphinTriforceGFXSettings.has_section("Hacks"):
                 dolphinTriforceGFXSettings.remove_option("Hacks", "BBoxEnable")
                 dolphinTriforceGFXSettings.remove_option("Hacks", "DeferEFBCopies")
-                dolphinTriforceGFXSettings.remove_option("Hacks", "EFBEmulateFormatChanges")
+                dolphinTriforceGFXSettings.remove_option(
+                    "Hacks", "EFBEmulateFormatChanges"
+                )
                 dolphinTriforceGFXSettings.remove_option("Hacks", "EFBScaledCopy")
                 dolphinTriforceGFXSettings.remove_option("Hacks", "EFBToTextureEnable")
                 dolphinTriforceGFXSettings.remove_option("Hacks", "SkipDuplicateXFBs")
                 dolphinTriforceGFXSettings.remove_option("Hacks", "XFBToTextureEnable")
             if dolphinTriforceGFXSettings.has_section("Enhancements"):
-                dolphinTriforceGFXSettings.remove_option("Enhancements", "ForceFiltering")
-                dolphinTriforceGFXSettings.remove_option("Enhancements", "ArbitraryMipmapDetection")
-                dolphinTriforceGFXSettings.remove_option("Enhancements", "DisableCopyFilter")
-                dolphinTriforceGFXSettings.remove_option("Enhancements", "ForceTrueColor")
+                dolphinTriforceGFXSettings.remove_option(
+                    "Enhancements", "ForceFiltering"
+                )
+                dolphinTriforceGFXSettings.remove_option(
+                    "Enhancements", "ArbitraryMipmapDetection"
+                )
+                dolphinTriforceGFXSettings.remove_option(
+                    "Enhancements", "DisableCopyFilter"
+                )
+                dolphinTriforceGFXSettings.remove_option(
+                    "Enhancements", "ForceTrueColor"
+                )
 
         # Internal resolution settings
-        if system.isOptSet('internal_resolution'):
-            dolphinTriforceGFXSettings.set("Settings", "EFBScale", system.config["internal_resolution"])
+        if system.isOptSet("internal_resolution"):
+            dolphinTriforceGFXSettings.set(
+                "Settings", "EFBScale", system.config["internal_resolution"]
+            )
         else:
             dolphinTriforceGFXSettings.set("Settings", "EFBScale", "2")
 
         # VSync
-        if system.isOptSet('vsync'):
-            dolphinTriforceGFXSettings.set("Hardware", "VSync", str(system.getOptBoolean('vsync')))
+        if system.isOptSet("vsync"):
+            dolphinTriforceGFXSettings.set(
+                "Hardware", "VSync", str(system.getOptBoolean("vsync"))
+            )
         else:
             dolphinTriforceGFXSettings.set("Hardware", "VSync", "True")
 
         # Anisotropic filtering
-        if system.isOptSet('anisotropic_filtering'):
-            dolphinTriforceGFXSettings.set("Enhancements", "MaxAnisotropy", system.config["anisotropic_filtering"])
+        if system.isOptSet("anisotropic_filtering"):
+            dolphinTriforceGFXSettings.set(
+                "Enhancements", "MaxAnisotropy", system.config["anisotropic_filtering"]
+            )
         else:
             dolphinTriforceGFXSettings.set("Enhancements", "MaxAnisotropy", "0")
 
         # Anti aliasing
-        if system.isOptSet('antialiasing'):
-            dolphinTriforceGFXSettings.set("Settings", "MSAA", system.config["antialiasing"])
+        if system.isOptSet("antialiasing"):
+            dolphinTriforceGFXSettings.set(
+                "Settings", "MSAA", system.config["antialiasing"]
+            )
         else:
             dolphinTriforceGFXSettings.set("Settings", "MSAA", "0")
 
         # Save gfx.ini
-        with open(dolphinTriforceConfig.dolphinTriforceGfxIni, 'w') as configfile:
+        with open(dolphinTriforceConfig.dolphinTriforceGfxIni, "w") as configfile:
             dolphinTriforceGFXSettings.write(configfile)
 
         ## logger settings ##
 
         dolphinTriforceLogSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
-        dolphinTriforceLogSettings.optionxform=lambda optionstr: str(optionstr)
+        dolphinTriforceLogSettings.optionxform = lambda optionstr: str(optionstr)
         dolphinTriforceLogSettings.read(dolphinTriforceConfig.dolphinTriforceLoggerIni)
 
         # Sections
@@ -248,7 +300,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceLogSettings.set("Logs", "DVD", "False")
 
         # Save Logger.ini
-        with open(dolphinTriforceConfig.dolphinTriforceLoggerIni, 'w') as configfile:
+        with open(dolphinTriforceConfig.dolphinTriforceLoggerIni, "w") as configfile:
             dolphinTriforceLogSettings.write(configfile)
 
         ## game settings ##
@@ -260,8 +312,12 @@ class DolphinTriforceGenerator(Generator):
 
         # GFZE01 F-Zero GX (convert to F-Zero AX)
 
-        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini"):
-            dolphinTriforceGameSettingsGFZE01 = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini", "w")
+        if not os.path.exists(
+            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini"
+        ):
+            dolphinTriforceGameSettingsGFZE01 = open(
+                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini", "w"
+            )
             dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
 $AX
 06003F30 00000284
@@ -354,8 +410,12 @@ $AX
 
         # GVSJ8P Virtua Striker 2002
 
-        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini"):
-            dolphinTriforceGameSettingsGVSJ8P = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini", "w")
+        if not os.path.exists(
+            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini"
+        ):
+            dolphinTriforceGameSettingsGVSJ8P = open(
+                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini", "w"
+            )
             dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
 $DI Seed Blanker
 0x80000000:dword:0x00000000
@@ -368,8 +428,12 @@ $DI Seed Blanker
 
         # GGPE01 Mario Kart GP 1
 
-        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"):
-            dolphinTriforceGameSettingsGGPE01 = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", "w")
+        if not os.path.exists(
+            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"
+        ):
+            dolphinTriforceGameSettingsGGPE01 = open(
+                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", "w"
+            )
             dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
 $Disable crypto
 0x8023D828:dword:0x93A30008
@@ -394,8 +458,12 @@ EmulationIssues = AM-Baseboard
 
         # GGPE02 Mario Kart GP 2
 
-        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini"):
-            dolphinTriforceGameSettingsGGPE02 = open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini", "w")
+        if not os.path.exists(
+            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini"
+        ):
+            dolphinTriforceGameSettingsGGPE02 = open(
+                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini", "w"
+            )
             dolphinTriforceGameSettingsGGPE02.write("""[Display]
 ProgressiveScan = 0
 [Wii]
@@ -456,48 +524,75 @@ $SeatLoopPatch
         # # To prevent ConfigParser from converting to lower case
         # dolphinTriforceGameSettingsGGPE01.optionxform=lambda optionstr: str(optionstr)
         # if os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"):
-            # dolphinTriforceGameSettingsGGPE01.read(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini")
+        # dolphinTriforceGameSettingsGGPE01.read(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini")
 
         # # GGPE01 sections
         # if not dolphinTriforceGameSettingsGGPE01.has_section("OnFrame"):
-            # dolphinTriforceGameSettingsGGPE01.add_section("OnFrame")
+        # dolphinTriforceGameSettingsGGPE01.add_section("OnFrame")
         # if not dolphinTriforceGameSettingsGGPE01.has_section("OnFrame_Enabled"):
-            # dolphinTriforceGameSettingsGGPE01.add_section("OnFrame_Enabled")
+        # dolphinTriforceGameSettingsGGPE01.add_section("OnFrame_Enabled")
 
         # # GGPE01 cheats
         # if "$1 credits" not in dolphinTriforceGameSettingsGGPE01["OnFrame"]:
-            # dolphinTriforceGameSettingsGGPE01.set("OnFrame", "$1 credits\n0x80690AC0:dword:0x00000001")
+        # dolphinTriforceGameSettingsGGPE01.set("OnFrame", "$1 credits\n0x80690AC0:dword:0x00000001")
         # if "$Emulation Bug Fixes" not in dolphinTriforceGameSettingsGGPE01["OnFrame"]:
-            # dolphinTriforceGameSettingsGGPE01.set("OnFrame", "$Emulation Bug Fixes\n0x800319D0:dword:0x60000000\n0x80031BF0:dword:0x60000000\n0x80031BFC:dword::0x60000000\n0x800BE10C:dword:0x4800002C\n0x800790A0:dword:0x98650025")
+        # dolphinTriforceGameSettingsGGPE01.set("OnFrame", "$Emulation Bug Fixes\n0x800319D0:dword:0x60000000\n0x80031BF0:dword:0x60000000\n0x80031BFC:dword::0x60000000\n0x800BE10C:dword:0x4800002C\n0x800790A0:dword:0x98650025")
         # if "$1 credits" not in dolphinTriforceGameSettingsGGPE01["OnFrame_Enabled"]:
-            # dolphinTriforceGameSettingsGGPE01.set("OnFrame_Enabled", "$1 credits")
+        # dolphinTriforceGameSettingsGGPE01.set("OnFrame_Enabled", "$1 credits")
         # if "$Emulation Bug Fixes" not in dolphinTriforceGameSettingsGGPE01["OnFrame_Enabled"]:
-            # dolphinTriforceGameSettingsGGPE01.set("OnFrame_Enabled", "$Emulation Bug Fixes")
+        # dolphinTriforceGameSettingsGGPE01.set("OnFrame_Enabled", "$Emulation Bug Fixes")
 
         # # Save GGPE01.ini
         # with open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", 'w') as configfile:
-            # dolphinTriforceGameSettingsGGPE01.write(configfile)
+        # dolphinTriforceGameSettingsGGPE01.write(configfile)
 
-        commandArray = ["dolphin-triforce", "-b", "-U", "/userdata/system/configs/dolphin-triforce", "-e", rom]
-        if system.isOptSet('platform'):
-            commandArray = ["dolphin-triforce-nogui", "-b", "-U", "/userdata/system/configs/dolphin-triforce", "-p", system.config["platform"], "-e", rom]
+        commandArray = [
+            "dolphin-triforce",
+            "-b",
+            "-U",
+            "/userdata/system/configs/dolphin-triforce",
+            "-e",
+            rom,
+        ]
+        if system.isOptSet("platform"):
+            commandArray = [
+                "dolphin-triforce-nogui",
+                "-b",
+                "-U",
+                "/userdata/system/configs/dolphin-triforce",
+                "-p",
+                system.config["platform"],
+                "-e",
+                rom,
+            ]
 
         # No environment variables work for now, paths are coded in above.
         return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
-        if 'dolphin_aspect_ratio' in config:
-            if config['dolphin_aspect_ratio'] == "1":
-                return 16/9
-            elif config['dolphin_aspect_ratio'] == "3" and (gameResolution["width"] / float(gameResolution["height"]) > ((16.0 / 9.0) - 0.1)):
-                return 16/9
-        return 4/3
+        if "dolphin_aspect_ratio" in config:
+            if config["dolphin_aspect_ratio"] == "1":
+                return 16 / 9
+            elif config["dolphin_aspect_ratio"] == "3" and (
+                gameResolution["width"] / float(gameResolution["height"])
+                > ((16.0 / 9.0) - 0.1)
+            ):
+                return 16 / 9
+        return 4 / 3
+
 
 # Seem to be only for the gamecube. However, while this is not in a gamecube section
 # It may be used for something else, so set it anyway
 def getGameCubeLangFromEnvironment():
-    lang = environ['LANG'][:5]
-    availableLanguages = { "en_US": 0, "de_DE": 1, "fr_FR": 2, "es_ES": 3, "it_IT": 4, "nl_NL": 5 }
+    lang = environ["LANG"][:5]
+    availableLanguages = {
+        "en_US": 0,
+        "de_DE": 1,
+        "fr_FR": 2,
+        "es_ES": 3,
+        "it_IT": 4,
+        "nl_NL": 5,
+    }
     if lang in availableLanguages:
         return availableLanguages[lang]
     else:

@@ -5,17 +5,19 @@ from shutil import copyfile
 from controllers import generate_sdl_controller_config
 from systemFiles import CONF, SCREENSHOTS
 
-SDLPOP_CONFIG_DIR = CONF + '/SDLPoP'
-SDLPOP_SCREENSHOTS_DIR = SCREENSHOTS + '/SDLPoP'
-SDLPOP_SOURCE_CFG_PATH = SDLPOP_CONFIG_DIR + '/SDLPoP.cfg'
-SDLPOP_SOURCE_INI_PATH = SDLPOP_CONFIG_DIR + '/SDLPoP.ini'
-SDLPOP_DEST_CFG_PATH = '/usr/share/SDLPoP/cfg/SDLPoP.cfg'
-SDLPOP_DEST_INI_PATH = '/usr/share/SDLPoP/cfg/SDLPoP.ini'
-SDLPOP_SOURCE_SCREENSHOTS_DIR = '/usr/share/SDLPoP/screenshots'
+SDLPOP_CONFIG_DIR = CONF + "/SDLPoP"
+SDLPOP_SCREENSHOTS_DIR = SCREENSHOTS + "/SDLPoP"
+SDLPOP_SOURCE_CFG_PATH = SDLPOP_CONFIG_DIR + "/SDLPoP.cfg"
+SDLPOP_SOURCE_INI_PATH = SDLPOP_CONFIG_DIR + "/SDLPoP.ini"
+SDLPOP_DEST_CFG_PATH = "/usr/share/SDLPoP/cfg/SDLPoP.cfg"
+SDLPOP_DEST_INI_PATH = "/usr/share/SDLPoP/cfg/SDLPoP.ini"
+SDLPOP_SOURCE_SCREENSHOTS_DIR = "/usr/share/SDLPoP/screenshots"
+
 
 class SdlPopGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         commandArray = ["SDLPoP"]
 
         # create sdlpop config directory
@@ -35,10 +37,17 @@ class SdlPopGenerator(Generator):
             makedirs(SDLPOP_SCREENSHOTS_DIR)
         # symbolic link screenshot folder too
         if not path.exists(SDLPOP_SOURCE_SCREENSHOTS_DIR):
-            symlink(SDLPOP_SCREENSHOTS_DIR, SDLPOP_SOURCE_SCREENSHOTS_DIR, target_is_directory = True)
+            symlink(
+                SDLPOP_SCREENSHOTS_DIR,
+                SDLPOP_SOURCE_SCREENSHOTS_DIR,
+                target_is_directory=True,
+            )
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    playersControllers
+                )
+            },
+        )

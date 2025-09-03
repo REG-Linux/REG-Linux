@@ -7,10 +7,28 @@ MEDNAFEN_BIN_PATH = "/usr/bin/mednafen"
 
 # List of all supported emulation systems
 SYSTEMS = [
-    "apple2", "gb", "gba", "gg", "lynx", "md", "nes", "ngp",
-    "pce", "pce_fast", "pcfx", "psx", "sasplay", "sms", "snes",
-    "snes_faust", "ss", "ssfplay", "vb", "wswan"
+    "apple2",
+    "gb",
+    "gba",
+    "gg",
+    "lynx",
+    "md",
+    "nes",
+    "ngp",
+    "pce",
+    "pce_fast",
+    "pcfx",
+    "psx",
+    "sasplay",
+    "sms",
+    "snes",
+    "snes_faust",
+    "ss",
+    "ssfplay",
+    "vb",
+    "wswan",
 ]
+
 
 def setMednafenConfig(cfgConfig):
     # Enable all systems and set fullscreen stretch for each
@@ -20,25 +38,25 @@ def setMednafenConfig(cfgConfig):
 
     # Audio configuration
     cfgConfig.write("sound.driver sdl\n")  # Use SDL sound driver
-    cfgConfig.write("sound 1\n")           # Enable sound output
+    cfgConfig.write("sound 1\n")  # Enable sound output
 
     # Video configuration
-    cfgConfig.write("video.fs 1\n")        # Enable fullscreen mode
+    cfgConfig.write("video.fs 1\n")  # Enable fullscreen mode
     cfgConfig.write("video.fs.display -1\n")  # Use default display
 
     # System settings
     cfgConfig.write("filesys.path_firmware firmware\n")  # Firmware path
-    cfgConfig.write("autosave 0\n")        # Disable auto-save states
-    cfgConfig.write("cheats 0\n")          # Disable cheats by default
+    cfgConfig.write("autosave 0\n")  # Disable auto-save states
+    cfgConfig.write("cheats 0\n")  # Disable cheats by default
     cfgConfig.write("fps.autoenable 0\n")  # Disable FPS display by default
 
     # Keyboard shortcuts configuration
     key_bindings = {
-        "exit": ("keyboard", "0x0", "69"),         # Exit emulator
+        "exit": ("keyboard", "0x0", "69"),  # Exit emulator
         "fast_forward": ("keyboard", "0x0", "53"),  # Fast forward
         "state_rewind": ("keyboard", "0x0", "42"),  # Rewind state
-        "reset": ("keyboard", "0x0", "67"),         # Reset system
-        "rotate_screen": ("keyboard", "0x0", "18+alt")  # Rotate screen
+        "reset": ("keyboard", "0x0", "67"),  # Reset system
+        "rotate_screen": ("keyboard", "0x0", "18+alt"),  # Rotate screen
     }
 
     # Write all key bindings to config

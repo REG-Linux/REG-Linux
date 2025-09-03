@@ -3,15 +3,24 @@ from Command import Command
 from os import path, mkdir
 from codecs import open
 from .melondsControllers import setMelondsControllers
-from .melondsConfig import setMelonDSConfig, MELONDS_BIN_PATH, MELONDS_SAVES_DIR, MELONDS_CHEATS_DIR, MELONDS_CONFIG_DIR, MELONDS_CONFIG_PATH
+from .melondsConfig import (
+    setMelonDSConfig,
+    MELONDS_BIN_PATH,
+    MELONDS_SAVES_DIR,
+    MELONDS_CHEATS_DIR,
+    MELONDS_CONFIG_DIR,
+    MELONDS_CONFIG_PATH,
+)
+
 
 class MelonDSGenerator(Generator):
     # this emulator/core requires wayland compositor to run
     def requiresWayland(self):
         return True
 
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         # Verify the save path exists
         if not path.exists(MELONDS_SAVES_DIR):
             mkdir(MELONDS_SAVES_DIR)

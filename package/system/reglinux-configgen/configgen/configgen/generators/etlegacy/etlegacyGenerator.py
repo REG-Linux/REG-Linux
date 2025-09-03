@@ -5,10 +5,11 @@ from shutil import copy
 from systemFiles import CONF
 from controllers import generate_sdl_controller_config
 
+
 class ETLegacyGenerator(Generator):
-
-    def generate(self, system, rom, playersControllers, metadata, guns, wheels, gameResolution):
-
+    def generate(
+        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    ):
         etLegacyDir = "/userdata/roms/etlegacy/legacy"
         etLegacyFile = "/legacy_2.83-dirty.pk3"
         etLegacySource = "/usr/share/etlegacy" + etLegacyFile
@@ -30,7 +31,7 @@ class ETLegacyGenerator(Generator):
             "seta r_allowResize": "0",
             "seta r_centerWindow": "1",
             "seta r_customheight": f'"{gameResolution["height"]}"',
-            "seta r_customwidth": f'"{gameResolution["width"]}"'
+            "seta r_customwidth": f'"{gameResolution["width"]}"',
         }
 
         # Set language
@@ -43,27 +44,27 @@ class ETLegacyGenerator(Generator):
 
         # Check if the file exists
         if path.isfile(config_file_path):
-            with open(config_file_path, 'r') as config_file:
+            with open(config_file_path, "r") as config_file:
                 lines = config_file.readlines()
 
             # Loop through the options and update the lines
             for key, value in options_to_set.items():
                 option_exists = any(key in line for line in lines)
                 if not option_exists:
-                    lines.append(f"{key} \"{value}\"\n")
+                    lines.append(f'{key} "{value}"\n')
                 else:
                     for i, line in enumerate(lines):
                         if key in line:
-                            lines[i] = f"{key} \"{value}\"\n"
+                            lines[i] = f'{key} "{value}"\n'
 
             # Write the modified content back to the file
-            with open(config_file_path, 'w') as config_file:
+            with open(config_file_path, "w") as config_file:
                 config_file.writelines(lines)
         else:
             # File doesn't exist, create it and add the options
-            with open(config_file_path, 'w') as config_file:
+            with open(config_file_path, "w") as config_file:
                 for key, value in options_to_set.items():
-                    config_file.write(f"{key} \"{value}\"\n")
+                    config_file.write(f'{key} "{value}"\n')
 
         # copy mod files needed
         if not path.exists(etLegacyDir):
@@ -81,14 +82,17 @@ class ETLegacyGenerator(Generator):
         commandArray = ["etl"]
 
         return Command(
-                    array=commandArray,
-                    env={
-                        'SDL_GAMECONTROLLERCONFIG': generate_sdl_controller_config(playersControllers)
-                    })
+            array=commandArray,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    playersControllers
+                )
+            },
+        )
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
         return True
 
     def getInGameRatio(self, config, gameResolution, rom):
-        return 16/9
+        return 16 / 9

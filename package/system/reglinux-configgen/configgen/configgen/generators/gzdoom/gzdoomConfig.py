@@ -1,16 +1,18 @@
 from systemFiles import CONF, LOGDIR
 from os import path
-
-GZDOOM_CONFIG_DIR = CONF + '/gzdoom'
-GZDOOM_CONFIG_PATH = GZDOOM_CONFIG_DIR + '/gzdoom.ini'
-GZDOOM_LOG_PATH = LOGDIR + '/gzdoom.log'
-GZDOOM_SCRIPT_PATH = GZDOOM_CONFIG_DIR + '/gzdoom.cfg'
-GZDOOM_SOUND_FONT_PATH = GZDOOM_CONFIG_DIR + '/soundfonts'
-GZDOOM_FM_BANKS_PATH = GZDOOM_CONFIG_DIR + '/fm_banks'
-GZDOOM_ARCH_PATH = '/usr/share/reglinux/system.arch'
-
 from utils.logger import get_logger
+
+GZDOOM_CONFIG_DIR = CONF + "/gzdoom"
+GZDOOM_CONFIG_PATH = GZDOOM_CONFIG_DIR + "/gzdoom.ini"
+GZDOOM_LOG_PATH = LOGDIR + "/gzdoom.log"
+GZDOOM_SCRIPT_PATH = GZDOOM_CONFIG_DIR + "/gzdoom.cfg"
+GZDOOM_SOUND_FONT_PATH = GZDOOM_CONFIG_DIR + "/soundfonts"
+GZDOOM_FM_BANKS_PATH = GZDOOM_CONFIG_DIR + "/fm_banks"
+GZDOOM_ARCH_PATH = "/usr/share/reglinux/system.arch"
+
+
 eslog = get_logger(__name__)
+
 
 def setGzdoomConfig(system, rom):
     if system.isOptSet("gz_api"):
@@ -36,7 +38,7 @@ def setGzdoomConfig(system, rom):
             "gles_use_mapped_buffer true\n"
         )
     else:
-        extra_config = (f"vid_preferbackend {gzdoom_api}\n")
+        extra_config = f"vid_preferbackend {gzdoom_api}\n"
 
     # A script file with console commands that are always ran when a game starts
     with open(GZDOOM_SCRIPT_PATH, "w") as script:
@@ -53,27 +55,27 @@ def setGzdoomConfig(system, rom):
     if not path.exists(GZDOOM_CONFIG_PATH):
         with open(GZDOOM_CONFIG_PATH, "w") as file:
             file.write(
-                '[IWADSearch.Directories]\n'
-                'Path=/userdata/roms/gzdoom\n'
-                '[FileSearch.Directories]\n'
-                'Path=/userdata/roms/gzdoom\n'
-                '[SoundfontSearch.Directories]\n'
+                "[IWADSearch.Directories]\n"
+                "Path=/userdata/roms/gzdoom\n"
+                "[FileSearch.Directories]\n"
+                "Path=/userdata/roms/gzdoom\n"
+                "[SoundfontSearch.Directories]\n"
                 "Path=" + GZDOOM_SOUND_FONT_PATH + "\n"
                 "Path=" + GZDOOM_FM_BANKS_PATH + "\n"
-                '[GlobalSettings]\n'
+                "[GlobalSettings]\n"
             )
     else:
         # configparser wasn't working on the default ini file (non-compliant)
         # it's not a true ini file, use this crude method instead
-        line_to_add = "Path=" + path.dirname(rom) +"\n"
+        line_to_add = "Path=" + path.dirname(rom) + "\n"
         with open(GZDOOM_CONFIG_PATH, "r") as file:
             lines = file.readlines()
             if line_to_add not in lines:
                 for i in range(len(lines)):
                     if lines[i] == "[IWADSearch.Directories]\n":
-                        lines.insert(i+1, line_to_add)
+                        lines.insert(i + 1, line_to_add)
                     if lines[i] == "[FileSearch.Directories]\n":
-                        lines.insert(i+1, line_to_add)
+                        lines.insert(i + 1, line_to_add)
 
         with open(GZDOOM_CONFIG_PATH, "w") as file:
             file.writelines(lines)
@@ -84,12 +86,12 @@ def setGzdoomConfig(system, rom):
         if GZDOOM_FM_BANKS_PATH not in lines:
             for i in range(len(lines)):
                 if lines[i] == "[SoundfontSearch.Directories]\n":
-                    lines.insert(i+1, GZDOOM_FM_BANKS_PATH)
+                    lines.insert(i + 1, GZDOOM_FM_BANKS_PATH)
 
         if GZDOOM_SOUND_FONT_PATH not in lines:
             for i in range(len(lines)):
                 if lines[i] == "[SoundfontSearch.Directories]\n":
-                    lines.insert(i+1, GZDOOM_SOUND_FONT_PATH)
+                    lines.insert(i + 1, GZDOOM_SOUND_FONT_PATH)
 
     with open(GZDOOM_CONFIG_PATH, "w") as file:
         file.writelines(lines)
