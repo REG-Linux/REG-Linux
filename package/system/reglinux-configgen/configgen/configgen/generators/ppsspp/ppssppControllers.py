@@ -1,10 +1,5 @@
-from os import path, makedirs
-from configparser import ConfigParser
+from settings import UnixSettings
 from .ppssppConfig import PPSSPP_CONTROLS_SOURCE_PATH, PPSSPP_CONTROLS_PATH
-from utils.logger import get_logger
-
-eslog = get_logger(__name__)
-
 # This configgen is based on PPSSPP 1.5.4.
 # Therefore, all code/github references are valid at this version, and may not be valid with later updates
 
@@ -67,21 +62,21 @@ sdlNameToNKCode = {
     "a": NKCODE_BUTTON_3,  # B
     "y": NKCODE_BUTTON_4,  # X
     "x": NKCODE_BUTTON_1,  # Y
-    "select": NKCODE_BUTTON_9,  # SELECT/BACK
+    "back": NKCODE_BUTTON_9,  # SELECT/BACK
     "start": NKCODE_BUTTON_10,  # START
-    "pageup": NKCODE_BUTTON_6,  # L
-    "pagedown": NKCODE_BUTTON_5,  # R
-    "up": NKCODE_DPAD_UP,
-    "down": NKCODE_DPAD_DOWN,
-    "left": NKCODE_DPAD_LEFT,
-    "right": NKCODE_DPAD_RIGHT,
+    "leftshoulder": NKCODE_BUTTON_6,  # L
+    "rightshoulder": NKCODE_BUTTON_5,  # R
+    "dpup": NKCODE_DPAD_UP,
+    "dpdown": NKCODE_DPAD_DOWN,
+    "dpleft": NKCODE_DPAD_LEFT,
+    "dpright": NKCODE_DPAD_RIGHT,
 }
 
 SDLHatMap = {
-    "up": NKCODE_DPAD_UP,
-    "down": NKCODE_DPAD_DOWN,
-    "left": NKCODE_DPAD_LEFT,
-    "right": NKCODE_DPAD_RIGHT,
+    "dpup": NKCODE_DPAD_UP,
+    "dpdown": NKCODE_DPAD_DOWN,
+    "dpleft": NKCODE_DPAD_LEFT,
+    "dpright": NKCODE_DPAD_RIGHT,
 }
 
 SDLJoyAxisMap = {
@@ -99,18 +94,18 @@ ppssppMapping = {
     "x": {"button": "Triangle"},
     "y": {"button": "Square"},
     "start": {"button": "Start"},
-    "select": {"button": "Select"},
-    "pageup": {"button": "L"},
-    "pagedown": {"button": "R"},
-    "joystick1left": {"axis": "An.Left"},
-    "joystick1up": {"axis": "An.Up"},
-    "joystick2left": {"axis": "RightAn.Left"},
-    "joystick2up": {"axis": "RightAn.Up"},
+    "back": {"button": "Select"},
+    "leftshoulder": {"button": "L"},
+    "rightshoulder": {"button": "R"},
+    "leftx": {"axis": "An.Left"},
+    "lefty": {"axis": "An.Up"},
+    "rightx": {"axis": "RightAn.Left"},
+    "righty": {"axis": "RightAn.Up"},
     # The DPAD can be an axis (for gpio sticks for example) or a hat
-    "up": {"hat": "Up", "axis": "Up", "button": "Up"},
-    "down": {"hat": "Down", "axis": "Down", "button": "Down"},
-    "left": {"hat": "Left", "axis": "Left", "button": "Left"},
-    "right": {"hat": "Right", "axis": "Right", "button": "Right"},
+    "dpup": {"hat": "Up", "axis": "Up", "button": "Up"},
+    "dpdown": {"hat": "Down", "axis": "Down", "button": "Down"},
+    "dpleft": {"hat": "Left", "axis": "Left", "button": "Left"},
+    "dpright": {"hat": "Right", "axis": "Right", "button": "Right"},
     # Need to add pseudo inputs as PPSSPP doesn't manually invert axises
     "joystick1right": {"axis": "An.Right"},
     "joystick1down": {"axis": "An.Down"},
@@ -121,15 +116,9 @@ ppssppMapping = {
 
 # Create the controller configuration file
 def setControllerConfig(controller):
-    # Set config file name
-    configFileName = PPSSPP_CONTROLS_PATH
-    Config = ConfigParser(interpolation=None)
-    Config.optionxform = lambda optionstr: str(optionstr)
-    Config.read(PPSSPP_CONTROLS_SOURCE_PATH)
-    # As we start with the default ini file, no need to create the section
-    section = "ControlMapping"
-    if not Config.has_section(section):
-        Config.add_section(section)
+    ppssppControllers = UnixSettings(PPSSPP_CONTROLS_SOURCE_PATH)
+
+    ppssppControllers.ensure_section("ControlMapping")
 
     # Parse controller inputs
     for index in controller.inputs:
@@ -147,8 +136,8 @@ def setControllerConfig(controller):
         if input.type == "button":
             pspcode = sdlNameToNKCode[input.name]
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
-            val = optionValue(Config, section, var, val)
-            Config.set(section, var, val)
+            val = optionValue(ppssppControllers, "ControlMapping", var, val)
+            ppssppControllers.set("ControlMapping", var, val)
 
         elif input.type == "axis":
             # Get the axis code
@@ -156,53 +145,46 @@ def setControllerConfig(controller):
             # Apply the magic axis formula
             pspcode = axisToCode(nkAxisId, int(input.value))
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
-            val = optionValue(Config, section, var, val)
-            eslog.debug(f"Adding {var} to {val}")
-            Config.set(section, var, val)
+            val = optionValue(ppssppControllers, "ControlMapping", var, val)
+            ppssppControllers.set("ControlMapping", var, val)
 
             # Skip the rest if it's an axis dpad
             if input.name in ["up", "down", "left", "right"]:
                 continue
             # Also need to do the opposite direction manually. The input.id is the same as up/left, but the direction is opposite
-            if input.name == "joystick1up":
+            if input.name == "lefty":
                 var = ppssppMapping["joystick1down"][input.type]
-            elif input.name == "joystick1left":
+            elif input.name == "leftx":
                 var = ppssppMapping["joystick1right"][input.type]
-            elif input.name == "joystick2up":
+            elif input.name == "righty":
                 var = ppssppMapping["joystick2down"][input.type]
-            elif input.name == "joystick2left":
+            elif input.name == "rightx":
                 var = ppssppMapping["joystick2right"][input.type]
 
             pspcode = axisToCode(nkAxisId, -int(input.value))
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
-            val = optionValue(Config, section, var, val)
-            Config.set(section, var, val)
+            val = optionValue(ppssppControllers, "ControlMapping", var, val)
+            ppssppControllers.set("ControlMapping", var, val)
 
         elif input.type == "hat" and input.name in SDLHatMap:
             var = ppssppMapping[input.name][input.type]
             pspcode = SDLHatMap[input.name]
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
-            val = optionValue(Config, section, var, val)
-            Config.set(section, var, val)
-
-        if not path.exists(path.dirname(configFileName)):
-            makedirs(path.dirname(configFileName))
+            val = optionValue(ppssppControllers, "ControlMapping", var, val)
+            ppssppControllers.set("ControlMapping", var, val)
 
     # hotkey controls are called via evmapy.
     # configuring specific hotkey in ppsspp is not simple without patching
-    Config.set(section, "Rewind", "1-131")
-    Config.set(section, "Fast-forward", "1-132")
-    Config.set(section, "Save State", "1-133")
-    Config.set(section, "Load State", "1-134")
-    Config.set(section, "Previous Slot", "1-135")
-    Config.set(section, "Next Slot", "1-136")
-    Config.set(section, "Screenshot", "1-137")
-    Config.set(section, "Pause", "1-139")
+    ppssppControllers.set("ControlMapping", "Rewind", "1-131")
+    ppssppControllers.set("ControlMapping", "Fast-forward", "1-132")
+    ppssppControllers.set("ControlMapping", "Save State", "1-133")
+    ppssppControllers.set("ControlMapping", "Load State", "1-134")
+    ppssppControllers.set("ControlMapping", "Previous Slot", "1-135")
+    ppssppControllers.set("ControlMapping", "Next Slot", "1-136")
+    ppssppControllers.set("ControlMapping", "Screenshot", "1-137")
+    ppssppControllers.set("ControlMapping", "Pause", "1-139")
 
-    cfgfile = open(configFileName, "w+")
-    Config.write(cfgfile)
-    cfgfile.close()
-    return configFileName
+    ppssppControllers.write()
 
 
 def axisToCode(axisId, direction):
