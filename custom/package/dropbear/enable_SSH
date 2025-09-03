@@ -7,6 +7,7 @@ case "$1" in
     ;;
   enabled)
       /usr/bin/system-settings-set system.ssh.enabled 1
+      /etc/init.d/S35securepasswd start   # In case security enforcement changed.
       /etc/init.d/S50dropbear start
     ;;
   disabled)

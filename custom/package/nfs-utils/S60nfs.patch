@@ -1,18 +1,28 @@
 diff --git a/package/nfs-utils/S60nfs b/package/nfs-utils/S60nfs
-index 4183ff6268..40bf0d1c64 100644
+index 4183ff6268..89c3deae55 100644
 --- a/package/nfs-utils/S60nfs
 +++ b/package/nfs-utils/S60nfs
-@@ -3,6 +3,8 @@
+@@ -3,10 +3,7 @@
  # nfs           This shell script takes care of starting and stopping
  #               the NFS services. Stolen from RedHat FC5.
  
+-mkdir -p /var/lock/subsys
+-mkdir -p /run/nfs/sm
+-mkdir -p /run/nfs/sm.bak
+-touch /run/nfs/rmtab
 +[ "$(/usr/bin/system-settings-get system.nfs.enabled)" != "1" ] && exit
-+
- mkdir -p /var/lock/subsys
- mkdir -p /run/nfs/sm
- mkdir -p /run/nfs/sm.bak
-@@ -19,41 +21,33 @@ fi
+ 
+ CFG_FILE=/etc/default/nfsd
+ 
+@@ -17,43 +14,40 @@ fi
+ 
+ 
  start() {
++	mkdir -p /var/lock/subsys
++	mkdir -p /run/nfs/sm
++	mkdir -p /run/nfs/sm.bak
++	touch /run/nfs/rmtab
++
  	# Start daemons.
  	printf "Starting NFS statd: "
 -	rpc.statd
