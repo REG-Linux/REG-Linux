@@ -1,5 +1,6 @@
 from generators.Generator import Generator
 from Command import Command
+from settings import UnixSettings
 from os import path, mkdir
 from codecs import open
 from .melondsControllers import setMelondsControllers
@@ -29,18 +30,13 @@ class MelonDSGenerator(Generator):
         if not path.exists(MELONDS_CHEATS_DIR):
             mkdir(MELONDS_CHEATS_DIR)
 
-        # Verify the config path exist
-        if not path.exists(MELONDS_CONFIG_DIR):
-            mkdir(MELONDS_CONFIG_DIR)
-
-        # Config file
-        melondsConfig = open(MELONDS_CONFIG_PATH, "w", encoding="utf_8_sig")
+        melondsConfig = UnixSettings(MELONDS_CONFIG_PATH)
 
         setMelonDSConfig(melondsConfig, system, gameResolution)
         setMelondsControllers(melondsConfig, playersControllers)
 
         # Now write the ini file
-        melondsConfig.close()
+        melondsConfig.write()
 
         commandArray = [MELONDS_BIN_PATH, "-f", rom]
         return Command(array=commandArray)
