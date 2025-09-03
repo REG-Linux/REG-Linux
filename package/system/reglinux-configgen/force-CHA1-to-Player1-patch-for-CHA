@@ -1,11 +1,11 @@
 --- a/libretroConfig.py
 +++ b/libretroConfig.py
-@@ -240,7 +240,13 @@
-     # Input configuration
-     retroarchConfig['input_joypad_driver'] = 'sdl2'
-     retroarchConfig['input_driver'] = 'udev'                    # driver for mouse/keyboard. udev required for guns.
--    retroarchConfig['input_max_users'] = "16"                   # Allow up to 16 players
-+    retroarchConfig['input_max_users'] = "4"                   # Allow up to 4 players
+@@ -447,7 +447,13 @@
+     retroarchConfig["input_driver"] = (
+         "udev"  # driver for mouse/keyboard. udev required for guns.
+     )
+-    retroarchConfig["input_max_users"] = "16"  # Allow up to 16 players
++    retroarchConfig["input_max_users"] = "4"   # Allow up to 4 players
 +
 +    # Force CHA1 joystick to Player 1 and CHA2 to Player 2
 +    retroarchConfig['input_player1_device_reservation_type'] = '"2"'
