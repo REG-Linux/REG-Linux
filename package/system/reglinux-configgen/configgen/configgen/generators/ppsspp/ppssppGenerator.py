@@ -17,15 +17,13 @@ class PPSSPPGenerator(Generator):
         for index in playersControllers:
             controller = playersControllers[index]
             # We only care about player 1
-            if controller.index != 0:
+            if controller.index != 1:
                 continue
             setControllerConfig(controller)
             break
 
         # The command to run
-        commandArray = [PPSSPP_BIN_PATH]
-        commandArray.append(rom)
-        commandArray.append("--fullscreen")
+        commandArray = [PPSSPP_BIN_PATH, "--fullscreen", rom]
 
         # Adapt the menu size to low defenition
         # I've played with this option on PC to fix menu size in Hi-Resolution and it not working fine. I'm almost sure this option break the emulator (Darknior)
@@ -35,13 +33,6 @@ class PPSSPPGenerator(Generator):
         # state_slot option
         if system.isOptSet("state_filename"):
             commandArray.append("--state={}".format(system.config["state_filename"]))
-
-        # select the correct pad
-        nplayer = 1
-        for _, pad in sorted(playersControllers.items()):
-            if nplayer == 1:
-                commandArray.extend(["--njoy", str(pad.index)])
-            nplayer = nplayer + 1
 
         # Adjust SDL_VIDEODRIVER to run through wayland or kmsdrm
         environment = {}
