@@ -3,8 +3,8 @@
 # libretro-81
 #
 ################################################################################
-# Version.: Commits on Nov 1, 2023
-LIBRETRO_81_VERSION = 525d5c18f1ff3fc54c37e083a475225d9179d59d
+# Version.: Commits on Oct 21, 2024
+LIBRETRO_81_VERSION = ffc99f27f092addc9ddd34dd0e3a3d4d1c053cbf
 LIBRETRO_81_SITE = $(call github,libretro,81-libretro,$(LIBRETRO_81_VERSION))
 LIBRETRO_81_LICENSE = GPLv3
 
@@ -20,6 +20,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711),y)
 LIBRETRO_81_PLATFORM = rpi4
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_81_PLATFORM = rpi5
+else ifeq ($(BR2_cortex_a7),y)
+LIBRETRO_81_PLATFORM = classic_armv7_a7
 endif
 
 define LIBRETRO_81_BUILD_CMDS
@@ -30,7 +32,7 @@ endef
 define LIBRETRO_81_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/81_libretro.so $(TARGET_DIR)/usr/lib/libretro/81_libretro.so
 	$(INSTALL) -D -t $(TARGET_DIR)/usr/share/evmapy/ \
-	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/batocera/emulators/retroarch/libretro/libretro-81/zx81.keys
+	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-81/zx81.keys
 endef
 
 $(eval $(generic-package))
