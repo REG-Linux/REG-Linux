@@ -96,6 +96,7 @@ EMULATOR_MAPPING = {
     "sdlpop": ("generators.sdlpop.sdlpopGenerator", "SdlPopGenerator"),
     "sh": ("generators.sh.shGenerator", "ShGenerator"),
     "solarus": ("generators.solarus.solarusGenerator", "SolarusGenerator"),
+    "shadps4": ("generators.shadps4.shadps4Generator", "Shadps4Generator"),
     "sonic-mania": (
         "generators.sonic_mania.sonic_maniaGenerator",
         "SonicManiaGenerator",
