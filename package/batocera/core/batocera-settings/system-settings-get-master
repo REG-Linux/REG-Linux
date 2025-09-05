@@ -49,7 +49,7 @@ if [ -e "${SYSCONFFILE}.${BOARD_MODEL}" ]; then
     fi
 fi
 
-# prefer the general value
+# fall back to the general value
 [ -e "${SYSCONFFILE}" ] && /usr/bin/system-settings-get -f "${SYSCONFFILE}" "${KEY}" && exit 0
 
 exit 1
