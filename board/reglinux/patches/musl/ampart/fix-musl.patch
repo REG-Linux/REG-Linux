@@ -1,0 +1,35 @@
+--- a/src/cli.c	2025-09-05 15:55:53.201020352 +0200
++++ b/src/cli.c	2025-09-05 15:56:00.874382883 +0200
+@@ -4,7 +4,7 @@
+ 
+ /* System */
+ 
+-#include <bits/getopt_core.h>
++#include <getopt.h>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <getopt.h>
+@@ -1175,4 +1175,4 @@
+     return 0;
+ }
+ 
+-/* cli.c: Actual CLI API implementation of ampart */
+\ Pas de fin de ligne à la fin du fichier
++/* cli.c: Actual CLI API implementation of ampart */
+--- a/src/io.c	2025-09-05 15:56:12.030735458 +0200
++++ b/src/io.c	2025-09-05 15:56:54.904448416 +0200
+@@ -10,6 +10,7 @@
+ #include <limits.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <libgen.h>
+ 
+ #include <linux/fs.h>
+ 
+@@ -515,4 +516,4 @@
+     return 0;
+ }
+ 
+-/* io.c: IO-related functions, type-recognition is also here */
+\ Pas de fin de ligne à la fin du fichier
++/* io.c: IO-related functions, type-recognition is also here */
