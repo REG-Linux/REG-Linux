@@ -66,8 +66,11 @@ do_setRootPassword() {
 }
 
 if [ "$command" = "getRootPassword" ]; then
+    # Little hack to make REG-ES show correct password when Enforce Security changes
+    [ -z "$mode" ] && mode=$(/usr/bin/system-settings-get system.security.enabled)
+
     # security disabled, force the default one without changing boot configuration
-    if [ "$(/usr/bin/system-settings-get system.security.enabled)" != "1" ]; then
+    if [ "$mode" != "1" ]; then
         echo "linux"
         exit 0
     fi

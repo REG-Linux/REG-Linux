@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-CGENIUS_VERSION = v3.5.2
+CGENIUS_VERSION = v3.6.0
 CGENIUS_SITE = $(call github,gerstrong,Commander-Genius,$(CGENIUS_VERSION))
 CGENIUS_CONF_LICENSE = GPL-2.0
 CGENIUS_CONF_LICENSE_FILES = LICENSE
@@ -25,7 +25,7 @@ define CGENIUS_GET_COSMOS
     cd $(@D); \
         git clone https://gitlab.com/Dringgstein/cosmos.git src/engine/cosmos; \
         cd src/engine/cosmos; \
-        git checkout 8497b5696c92b13ede4f5ad01dfb577b208404cb; \
+        git checkout d25d1923656341bda6a40a76769eb699a67816d5; \
         cd ../../..
 endef
 
