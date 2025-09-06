@@ -30,7 +30,8 @@ config BR2_PACKAGE_REGLINUX_GAMES
 	select BR2_PACKAGE_UQM				if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	# Sonic 3 AIR (Angel Island Revisited)
-	select BR2_PACKAGE_SONIC3_AIR			# ALL
+	# Does NOT link on mipsel (works on other archs with musl + libatomic)
+	select BR2_PACKAGE_SONIC3_AIR			if !BR2_mipsel
 
 	# LTris2
 	select BR2_PACKAGE_LTRIS2			if !BR2_PACKAGE_REGLINUX_RELEASE
