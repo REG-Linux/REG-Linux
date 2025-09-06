@@ -37,3 +37,11 @@
     else ifneq (,$(findstring rpi3, $(platform)))
  	   ifneq (,$(findstring rpi3_64,$(platform)))
           CCOMFLAGS += -mcpu=cortex-a53 -mtune=cortex-a53
+@@ -478,6 +478,7 @@
+    LDFLAGS +=  $(SHARED)
+    ARM_ENABLED = 1
+    X86_SH2DRC = 0
++   CCOMFLAGS += -DSDLMAME_NO64BITIO
+ ifneq (,$(findstring cortexa8,$(platform)))
+    CCOMFLAGS += -marm -mcpu=cortex-a8
+    ASFLAGS += -mcpu=cortex-a8
