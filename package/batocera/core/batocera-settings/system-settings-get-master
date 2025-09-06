@@ -1,63 +1,53 @@
-#!/bin/sh
+#!/bin/bash
 
-# this script can be used by values that can have a default value by board
+# this script can be used to get values that can have a default value by board
 
 KEY=
 CONFFILE=
 SYSCONFFILE="/usr/share/reglinux/sysconfigs/system.conf"
 
-while test $# -ne 0
+while [ $# -ne 0 ]
 do
     case "${1}" in
-	"-f")
-	    shift
-	    CONFFILE="${1}"
-	    shift
-	    ;;
-	*)
-	    KEY="${1}"
-	    shift
+    "-f")
+        shift
+        CONFFILE="${1}"
+        shift
+        ;;
+    *)
+        KEY="${1}"
+        shift
     esac
 done
 
 # prefer the user value
 if [ -n "${CONFFILE}" ]; then
-    VALUE="$(/usr/bin/system-settings-get -f "${CONFFILE}" "${KEY}")"
+    VALUE="$(/usr/bin/system-settings-get -f "${CONFFILE}" "${KEY}" 2>/dev/null)"
 else
-    VALUE="$(/usr/bin/system-settings-get "${KEY}")"
+    VALUE="$(/usr/bin/system-settings-get "${KEY}" 2>/dev/null)"
 fi
 # when value is auto, ignore
-if [ "$?" = 0 -a "${VALUE}" != "auto" ]; then
+if [ -n "${VALUE}" ] && [ "${VALUE}" != "auto" ]; then
     echo "${VALUE}"
     exit 0
 fi
 
-if [ -f /sys/firmware/devicetree/base/model ]; then
-    IFS= read -r BOARD_MODEL </sys/firmware/devicetree/base/model
-fi
-if [ -z "${BOARD_MODEL}" -a -f /sys/devices/virtual/dmi/id/product_name ]; then
-    # give an other chance with dmi
-    IFS= read -r BOARD_MODEL </sys/devices/virtual/dmi/id/product_name
-fi
-BOARD_MODEL="$(echo "$BOARD_MODEL" | sed -e s+"[^A-Za-z0-9]"+"_"+g)"
-# fall back to board name if product name is not ideal
-if [ -z "${BOARD_MODEL}" ] || [ "${BOARD_MODEL}" = "Default_string" ]; then
-    BOARD_MODEL=$(cat /sys/devices/virtual/dmi/id/board_name 2>/dev/null | tr -d '\0' | sed -e s+"[^A-Za-z0-9]"+"_"+g)
+BOARD_MODEL=$(tr -d '\0' </sys/firmware/devicetree/base/model 2>/dev/null)
+[ -z "${BOARD_MODEL}" ] && BOARD_MODEL=$(tr -d '\0' </sys/devices/virtual/dmi/id/product_name 2>/dev/null)
+# 3rd time lucky
+if [ -z "${BOARD_MODEL}" ] || [ "${BOARD_MODEL}" = "Default string" ]; then
+    BOARD_MODEL=$(tr -d '\0' </sys/devices/virtual/dmi/id/board_name 2>/dev/null)
 fi
 
 # prefer the board value
-if [ -e "${SYSCONFFILE}.${BOARD_MODEL}" ]; then
-    VALUE="$(/usr/bin/system-settings-get -f "${SYSCONFFILE}.${BOARD_MODEL}" "${KEY}")"
-    # when value is auto, ignore
-    if [ "$?" = 0 -a "${VALUE}" != "auto" ]; then
-        echo "${VALUE}"
-        exit 0
-    fi
+VALUE="$(/usr/bin/system-settings-get -f "${SYSCONFFILE}.${BOARD_MODEL//[^[:alnum:]]/_}" "${KEY}" 2>/dev/null)"
+# when value is auto, ignore
+if [ -n "${VALUE}" ] && [ "${VALUE}" != "auto" ]; then
+    echo "${VALUE}"
+    exit 0
 fi
 
-# prefer the general value
-if [ -e "${SYSCONFFILE}" ]; then
-    /usr/bin/system-settings-get -f "${SYSCONFFILE}" "${KEY}" && exit 0
-fi
+# fall back to the general value
+/usr/bin/system-settings-get -f "${SYSCONFFILE}" "${KEY}" 2>/dev/null && exit 0
 
 exit 1
