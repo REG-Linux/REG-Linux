@@ -1,4 +1,4 @@
-include toolchain-gcc13-musl.common
+include toolchain-gcc14-musl.common
 include reglinux-board.common
 
 # Target definition
