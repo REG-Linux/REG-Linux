@@ -1,0 +1,18 @@
+--- a/src/dos/drive_local.cpp	2025-09-01 00:13:44.856066366 +0200
++++ b/src/dos/drive_local.cpp	2025-09-01 00:14:02.232240701 +0200
+@@ -26,6 +26,7 @@
+ #include <errno.h>
+ #include <limits.h>
+ #include <cassert>
++#include <fcntl.h>
+ #if defined(MACOSX)
+ #define _DARWIN_C_SOURCE
+ #endif
+@@ -33,7 +34,6 @@
+ #include <utime.h>
+ #include <sys/file.h>
+ #else
+-#include <fcntl.h>
+ #include <sys/utime.h>
+ #include <sys/locking.h>
+ #ifdef OS2

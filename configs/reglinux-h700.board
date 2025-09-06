@@ -1,4 +1,4 @@
-include toolchain-gcc14-glibc.common
+include toolchain-gcc14-musl.common
 include reglinux-board.common
 
 # Target definition
@@ -10,7 +10,7 @@ BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
 # -mcpu=cortex-a53 -mtune=cortex-a53"
 #BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
-BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h700/patches"
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/musl $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h700/patches"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h700/fsoverlay"
 BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
 

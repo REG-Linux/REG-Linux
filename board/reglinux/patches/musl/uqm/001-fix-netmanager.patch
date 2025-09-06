@@ -1,0 +1,13 @@
+--- a/sc2/src/libs/network/netmanager/netmanager_bsd.c	2025-08-29 00:11:34.815222077 +0200
++++ b/sc2/src/libs/network/netmanager/netmanager_bsd.c	2025-08-29 00:12:14.281376007 +0200
+@@ -31,6 +31,10 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
++#if defined(__linux__)
++#include <sys/select.h>
++#endif
++
+ #include "netmanager_common.ci"
+ #include "ndindex.ci"
+ 

@@ -30,9 +30,8 @@ config BR2_PACKAGE_REGLINUX_GAMES
 	select BR2_PACKAGE_UQM				if !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	# Sonic 3 AIR (Angel Island Revisited)
-	# Disabled with musl libc because it does not link (libatomic should do it but it does not work so far)
-	# Disabled for rk3128 because of mali blobs (needs patching at link-time to mali blob)
-	select BR2_PACKAGE_SONIC3_AIR			if !BR2_PACKAGE_SYSTEM_TARGET_RK3128 && !BR2_TOOLCHAIN_USES_MUSL
+	# Does NOT link on mipsel (works on other archs with musl + libatomic)
+	select BR2_PACKAGE_SONIC3_AIR			if !BR2_mipsel
 
 	# LTris2
 	select BR2_PACKAGE_LTRIS2			if !BR2_PACKAGE_REGLINUX_RELEASE

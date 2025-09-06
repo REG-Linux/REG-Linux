@@ -21,7 +21,7 @@ done
 make radxa-zero_defconfig
 
 # Build it
-ARCH=aarch64 CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-" make -j$(nproc)
+ARCH=aarch64 CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-musl-" make -j$(nproc)
 mkdir -p ../../uboot-radxa-zero
 
 # Clone LibreElec Amlogic FIP

@@ -11,7 +11,7 @@ cd u-boot-2025.01
 make libretech-cc_v2_defconfig
 
 # Build it
-ARCH=aarch64 CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-" make -j$(nproc)
+ARCH=aarch64 CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-musl-" make -j$(nproc)
 mkdir -p ../../uboot-lepotato
 
 # Clone LibreElec Amlogic FIP

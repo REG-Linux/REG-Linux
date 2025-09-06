@@ -14,8 +14,8 @@ UBOOT_PS5000_DEPENDENCIES = rk3128-blobs
 define UBOOT_PS5000_BUILD_CMDS
     # FIXME: there should be a better way to build
     # Build uboot for wx8-rk3128
-    cd $(@D) && ARCH=arm CHIP=rk3128 CROSS_COMPILE=$(HOST_DIR)/bin/arm-buildroot-linux-gnueabihf- make ps5000-rk3128_defconfig
-    cd $(@D) && ARCH=arm CHIP=rk3128 CROSS_COMPILE=$(HOST_DIR)/bin/arm-buildroot-linux-gnueabihf- make
+    cd $(@D) && ARCH=arm CHIP=rk3128 CROSS_COMPILE=$(HOST_DIR)/bin/arm-buildroot-linux-musleabihf- make ps5000-rk3128_defconfig
+    cd $(@D) && ARCH=arm CHIP=rk3128 CROSS_COMPILE=$(HOST_DIR)/bin/arm-buildroot-linux-musleabihf- make
     #cd $(@D) && $(@D)/make.sh wx8-rk3128
 
     # Generate idbloader.img

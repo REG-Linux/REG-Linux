@@ -21,7 +21,7 @@ done
 make nanopi-k2_defconfig
 
 # Build it
-ARCH=aarch64 CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-" make -j$(nproc)
+ARCH=aarch64 CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-musl-" make -j$(nproc)
 mkdir -p ../../uboot-nanopi-k2
 
 # Clone LibreElec Amlogic FIP

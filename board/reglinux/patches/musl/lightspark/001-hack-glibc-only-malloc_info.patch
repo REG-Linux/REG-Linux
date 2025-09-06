@@ -1,0 +1,12 @@
+--- a/src/scripting/flash/system/flashsystem.cpp	2025-08-29 00:04:02.351128897 +0200
++++ b/src/scripting/flash/system/flashsystem.cpp	2025-08-29 00:05:29.817742493 +0200
+@@ -1267,7 +1267,9 @@
+ 	char* buf=nullptr;
+ 	size_t size=0;
+ 	FILE* f = open_memstream(&buf, &size);
++#if defined (__GLIBC__)
+ 	if (!f || malloc_info(0,f)!=0)
++#endif
+ 	{
+ 		LOG(LOG_ERROR,"System.totalMemory failed");
+ 		asAtomHandler::setUInt(ret,wrk,1024);

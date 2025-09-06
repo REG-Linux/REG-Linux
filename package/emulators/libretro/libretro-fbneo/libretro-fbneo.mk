@@ -21,7 +21,7 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711),y)
 LIBRETRO_FBNEO_PLATFORM = unix-rpi4_64
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_FBNEO_PLATFORM = unix-rpi5_64
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H3)$(BR2_PACKAGE_SYSTEM_TARGET_CHA)$(BR2_PACKAGE_SYSTEM_TARGET_RK3128),y)
+else ifeq ($(BR2_cortex_a7),y)
 LIBRETRO_FBNEO_PLATFORM = classic_armv7_a7
 endif
 
@@ -46,6 +46,8 @@ LIBRETRO_FBNEO_EXTRA_ARGS += USE_EXPERIMENTAL_FLAGS=0
 endif
 
 define LIBRETRO_FBNEO_BUILD_CMDS
+	rm -Rf $(@D)/src/cpu/cyclone/*
+	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-fbneo/cyclone68k/* $(@D)/src/cpu/cyclone/
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" \
 	    -C $(@D)/src/burner/libretro -f Makefile \
 		platform="$(LIBRETRO_FBNEO_PLATFORM)" $(LIBRETRO_FBNEO_EXTRA_ARGS) \

@@ -1,0 +1,10 @@
+--- a/src/filesys.cpp	2025-08-28 23:16:15.848028096 +0200
++++ b/src/filesys.cpp	2025-08-28 23:16:33.486645730 +0200
+@@ -53,6 +53,7 @@
+ 
+ #include <sys/stat.h>
+ #include <cstdio>
++#include <climits>
+ #include "filesys.h"
+ #include "version.h"
+ #include "zstring.h"

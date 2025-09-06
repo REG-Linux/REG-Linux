@@ -114,8 +114,8 @@ cavestory:
   emulator: libretro
   core: nxengine
 cdi:
-  emulator: mame
-  core: mame
+  emulator: libretro
+  core: same_cdi
 cdogs:
   emulator: cdogs
   core: cdogs

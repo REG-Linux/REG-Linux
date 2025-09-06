@@ -1,0 +1,39 @@
+--- a/src/engine/cosmos/sound/music.cpp	2025-09-06 14:49:54.088936969 +0200
++++ b/src/engine/cosmos/sound/music.cpp	2025-09-06 14:53:49.651498999 +0200
+@@ -46,24 +46,22 @@
+     // Amplify with the volume
+     auto adjustVolume = [&](Uint8* stream, const unsigned int numSamples)
+     {
+-            auto *buf16 = static_cast<Sint16*>(
+-                        static_cast<void*>(stream) );
++        auto *buf16 = reinterpret_cast<Sint16*>(static_cast<void*>(stream));
+ 
+-            for(unsigned int j=0 ; j<numSamples ; j++)
+-            {
+-                const auto val =
+-                        *(reinterpret_cast<Sint16*>(
+-                              stream+j*audioConfig.numChannels*audioConfig.bytesPerSample) );
+-
+-                for(unsigned int k=0 ; k<audioConfig.numChannels ; k++)
+-                {
+-                    *buf16 = static_cast<Sint16>((val*vol)/MIX_MAX_VOLUME);
+-                    buf16++;
+-                }
++        for (unsigned int j = 0; j < numSamples; j++)
++        {
++            Sint16 val;
++            memcpy(&val,
++               stream + j * audioConfig.numChannels * audioConfig.bytesPerSample,
++               sizeof(Sint16));
+ 
++            for (unsigned int k = 0; k < audioConfig.numChannels; k++)
++            {
++                *buf16 = static_cast<Sint16>((val * vol) / MIX_MAX_VOLUME);
++                buf16++;
+             }
++        }
+     };
+-
+     for(int i=num_samples;i > 0;)
+     {
+         if(delay_counter == 0)
