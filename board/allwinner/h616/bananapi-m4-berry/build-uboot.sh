@@ -26,7 +26,7 @@ done
 
 # Build bootloader
 export BL31="${BINARIES_DIR}/bl31.bin"
-export CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-gnu-"
+export CROSS_COMPILE="${HOST_DIR}/bin/aarch64-buildroot-linux-musl-"
 ARCH=aarch64 make bananapi_m4_berry_defconfig
 ARCH=aarch64 make -j$(nproc)
 

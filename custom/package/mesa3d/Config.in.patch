@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/Config.in b/package/mesa3d/Config.in
-index 37d2221946..61a4b4f4ea 100644
+index 37d2221946..014b3a5855 100644
 --- a/package/mesa3d/Config.in
 +++ b/package/mesa3d/Config.in
 @@ -9,6 +9,14 @@ menuconfig BR2_PACKAGE_MESA3D
@@ -148,7 +148,7 @@ index 37d2221946..61a4b4f4ea 100644
  
  comment "intel vulkan needs a glibc toolchain w/ headers >= 3.17"
  	depends on BR2_i386 || BR2_x86_64
-@@ -337,6 +373,135 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
+@@ -337,6 +373,133 @@ config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_SWRAST
  	help
  	  Vulkan swrast driver.
  
@@ -212,7 +212,6 @@ index 37d2221946..61a4b4f4ea 100644
 +	depends on BR2_arm || BR2_aarch64
 +	depends on BR2_TOOLCHAIN_HAS_SYNC_4 # libxshmfence
 +	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17 # memfd.h
-+	depends on BR2_TOOLCHAIN_USES_GLIBC # ifunc, static_assert
 +	select BR2_PACKAGE_MESA3D_VULKAN_DRIVER
 +	help
 +	  Vulkan driver for panfrost supported hardware.
@@ -220,8 +219,7 @@ index 37d2221946..61a4b4f4ea 100644
 +comment "panfrost vulkan needs a glibc toolchain w/ headers >= 3.17"
 +	depends on BR2_arm || BR2_aarch64
 +	depends on BR2_TOOLCHAIN_HAS_SYNC_4
-+	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17 || \
-+		!BR2_TOOLCHAIN_USES_GLIBC
++	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17
 +
 +comment "supported video codec"
 +

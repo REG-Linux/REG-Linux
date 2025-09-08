@@ -1,0 +1,20 @@
+--- a/platforms/shared/dependencies/libchdr/src/libchdr_chd.c	2025-08-25 22:15:17.031716963 +0200
++++ b/platforms/shared/dependencies/libchdr/src/libchdr_chd.c	2025-08-25 22:16:10.972555581 +0200
+@@ -3448,8 +3448,15 @@
+ 	#define core_stdio_fseek_impl _fseeki64
+ 	#define core_stdio_ftell_impl _ftelli64
+ #elif defined(_LARGEFILE_SOURCE) && defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
+-	#define core_stdio_fseek_impl fseeko64
+-	#define core_stdio_ftell_impl ftello64
++	#if defined(__GLIBC__)
++		#define FTELLO ftello64
++		#define FSEEKO fseeko64
++	#else
++		#define FTELLO ftell
++		#define FSEEKO fseek
++	#endif
++	#define core_stdio_fseek_impl FSEEKO
++	#define core_stdio_ftell_impl FTELLO
+ #elif defined(__PS3__) && !defined(__PSL1GHT__) || defined(__SWITCH__) || defined(__vita__)
+ 	#define core_stdio_fseek_impl(x,y,z) fseek(x,(off_t)y,z)
+ 	#define core_stdio_ftell_impl(x) (off_t)ftell(x)

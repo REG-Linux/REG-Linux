@@ -1,0 +1,6 @@
+config BR2_TOOLCHAIN_OPTIONAL_BOOTLIN_AARCH64
+	bool "toolchain-optional-bootlin-aarch64"
+	depends on BR2_HOSTARCH = "x86_64"
+	help
+	  Toolchain for the AArch64 architecture that can be optionally used by packages at compile time, from
+	  https://toolchains.bootlin.com/

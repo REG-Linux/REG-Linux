@@ -212,20 +212,3 @@ diff -ur ./scripts/toolchain.lua /home/romain/batocera.linux/output/odroidn2/bui
  newoption {
  	trigger = "NO_USE_BGFX",
  	description = "Disable BGFX",
---- a/scripts/genie.lua	2024-06-09 07:12:25.604638111 +0200
-+++ b/scripts/genie.lua	2024-06-09 07:12:39.712971507 +0200
-@@ -1036,14 +1036,6 @@
- 	end
- end
- 
---- On Linux targets link libgcc and libstdc++ statically.  See #137
--if _OPTIONS["targetos"]=="linux" then
--		linkoptions {
--			"-static-libgcc -static-libstdc++"
--		}
--end
--
--
- -- add a basic set of warnings
- 	buildoptions {
- 		"-Wall",
