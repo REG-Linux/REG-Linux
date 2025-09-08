@@ -16,6 +16,9 @@
 ++++++++++++++++++++++++++++++++  package/python-setuptools-scm/Config.in.host
 ++++++++++++++++++++++++++++++++  package/spirv-llvm-translator/Config.in
 --------------------------------  package/llvm-project/libclc/0001-support-out-of-tree-build.patch
+--------------------------------  package/llvm-project/llvm/0001-ADT-Add-cstdint-to-SmallVector-101761.patch
+--------------------------------  package/llvm-project/llvm/0002-AMDGPU-Include-cstdint-in-AMDGPUMCTargetDesc-101766.patch
+--------------------------------  package/llvm-project/llvm/0003-Another-gcc-15-fix-from-Sam-James.patch
 --------------------------------  package/mesa3d/0001-meson-Set-proper-value-for-LIBCLC_INCLUDEDIR.patch
 --------------------------------  package/mesa3d/0002-vc4-add-meson-option-to-disable-optional-neon-suppor.patch
 f2484cdc4239f8323b2b3d7c4fb74469  Makefile
@@ -63,6 +66,9 @@ be7091dd90cc6633f644562fd3416acb  package/libcec/libcec.mk
 b5afd769a400f6acaa58e4ce62ae558a  package/libcurl/libcurl.mk
 7d250d3076d1f4e49ca0536684449e2a  package/libdrm/libdrm.mk
 7ecd8faf8aee2a75412583ccbca01ef0  package/libfreeimage/libfreeimage.mk
+74c62304d539d8adb876a03574c70f78  package/libglib2/Config.in
+5de3bb7fea68382d01ddbcf4d9f1b914  package/libglib2/libglib2.hash
+9225700c863bcb13e664ef9f4e35dcb5  package/libglib2/libglib2.mk
 074893afc0f67a5608f44b53ea6c43a2  package/libglvnd/libglvnd.hash
 e11ebaaac3d50a95c01f479baef197f7  package/libglvnd/libglvnd.mk
 25e2c104ab0d7b1825fa3528fb313d7f  package/libidn2/libidn2.mk
@@ -123,6 +129,7 @@ ebc495a9f0e515ea57680c847fd0fdbf  package/qt6/qt6shadertools/qt6shadertools.hash
 8f34a68a04270e8a85075b47c3f83d44  package/qt6/qt6virtualkeyboard/qt6virtualkeyboard.hash
 2ccd9f3fb14d1c9c092bfddfbcefd2d5  package/qt6/qt6wayland/qt6wayland.hash
 687ba7d7bc4c6d0a822f795dccc7fc63  package/qt6/qt6websockets/qt6websockets.hash
+b0ca41a8eff161f5ba5ba9516fad91db  package/rng-tools/rng-tools.mk
 a9d1420cc9734b65cbc95471f32631da  package/rockchip-rkbin/rockchip-rkbin.hash
 877a66c23c5a1df8e186f44fa4ff4367  package/rockchip-rkbin/rockchip-rkbin.mk
 b69d8b1eb8ab76b368eb9b6a6b9caee4  package/rpi-firmware/rpi-firmware.hash

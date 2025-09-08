@@ -1,0 +1,44 @@
+--- a/src/od-pandora/sigsegv_handler.cpp	2025-09-03 15:14:21.665041060 +0200
++++ b/src/od-pandora/sigsegv_handler.cpp	2025-09-03 15:14:33.540435190 +0200
+@@ -36,7 +36,9 @@
+ #endif
+ #include "uae.h"
+ 
++#if defined(__GLIBC__)
+ #include <asm/sigcontext.h>
++#endif
+ #include <signal.h>
+ #include <dlfcn.h>
+ #include <execinfo.h>
+--- a/src/od-pandora/pandora.cpp	2025-09-03 15:17:34.693338525 +0200
++++ b/src/od-pandora/pandora.cpp	2025-09-03 15:17:50.058057932 +0200
+@@ -10,7 +10,9 @@
+ #include <vector>
+ #include <stdlib.h>
+ #include <stdarg.h>
++#if defined(__GLIBC__)
+ #include <asm/sigcontext.h>
++#endif
+ #include <signal.h>
+ #include <dlfcn.h>
+ #include <execinfo.h>
+--- a/src/expansion.cpp	2025-09-03 15:30:31.408791436 +0200
++++ b/src/expansion.cpp	2025-09-03 16:28:51.945070941 +0200
+@@ -2760,7 +2760,7 @@
+ 		NULL, cdtvsram_init, NULL, NULL, ROMTYPE_CDTVSRAM | ROMTYPE_NOT, 0, 0, BOARD_NONAUTOCONFIG_BEFORE, true,
+ 		NULL, 0,
+ 		false, EXPANSIONTYPE_INTERNAL,
+-		0, 0, 0, false, NULL,
++		0, 0, 0, false, 0/*NULL*/,
+ 		false, 0, cdtvsram_settings
+ 	},
+ 	//{
+@@ -2786,7 +2786,7 @@
+ 		NULL, gayle_ide_init, NULL, gayle_add_ide_unit, ROMTYPE_MB_IDE | ROMTYPE_NOT, 0, 0, BOARD_NONAUTOCONFIG_BEFORE, true,
+ 		NULL, 0,
+ 		false, EXPANSIONTYPE_INTERNAL | EXPANSIONTYPE_IDE,
+-		0, 0, 0, false, NULL, false, 1
++		0, 0, 0, false, 0/*NULL*/, false, 1
+ 	},
+ 	{
+ 		_T("pcmcia_mb"), _T("A600/A1200 PCMCIA"), _T("Commodore"),

@@ -1,0 +1,13 @@
+diff --git a/package/rng-tools/rng-tools.mk b/package/rng-tools/rng-tools.mk
+index d1f41fd4cd..53f6a92820 100644
+--- a/package/rng-tools/rng-tools.mk
++++ b/package/rng-tools/rng-tools.mk
+@@ -54,7 +54,7 @@ endif
+ 
+ define RNG_TOOLS_INSTALL_INIT_SYSV
+ 	$(INSTALL) -D -m 755 package/rng-tools/S21rngd \
+-		$(TARGET_DIR)/etc/init.d/S21rngd
++		$(TARGET_DIR)/etc/init.d/S05rngd
+ endef
+ 
+ define RNG_TOOLS_INSTALL_INIT_SYSTEMD

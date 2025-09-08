@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/libclc/libclc.mk b/package/llvm-project/libclc/libclc.mk
-index 9f303d6d2f..f54427ae0b 100644
+index 9f303d6d2f..46614b3306 100644
 --- a/package/llvm-project/libclc/libclc.mk
 +++ b/package/llvm-project/libclc/libclc.mk
 @@ -3,14 +3,22 @@
@@ -27,16 +27,29 @@ index 9f303d6d2f..f54427ae0b 100644
  LIBCLC_INSTALL_STAGING = YES
  
  # CMAKE_*_COMPILER_FORCED=ON skips testing the tools and assumes
-@@ -39,4 +47,79 @@ LIBCLC_CONF_OPTS = \
+@@ -26,8 +34,6 @@ LIBCLC_CONF_OPTS = \
+ 	-DCMAKE_SYSROOT="" \
+ 	-DCMAKE_C_COMPILER_FORCED=ON \
+ 	-DCMAKE_CXX_COMPILER_FORCED=ON \
+-	-DCMAKE_CLC_COMPILER_FORCED=ON \
+-	-DCMAKE_LLAsm_COMPILER_FORCED=ON \
+ 	-DCMAKE_INSTALL_DATADIR="share" \
+ 	-DCMAKE_FIND_ROOT_PATH="$(HOST_DIR)" \
+ 	-DCMAKE_C_FLAGS="$(HOST_CFLAGS)" \
+@@ -37,6 +43,82 @@ LIBCLC_CONF_OPTS = \
+ 	-DCMAKE_MODULE_LINKER_FLAGS="$(HOST_LDFLAGS)" \
+ 	-DCMAKE_C_COMPILER="$(CMAKE_HOST_C_COMPILER)" \
  	-DCMAKE_CXX_COMPILER="$(CMAKE_HOST_CXX_COMPILER)" \
- 	-DLLVM_CONFIG="$(HOST_DIR)/bin/llvm-config"
- 
-+# REG fixup host-libclc for host-mesa3d + prepare_builtins fixup
-+define HOST_LIBCLC_COPY_HOST_PREPARE_BUILTINS
-+	cp $(@D)/buildroot-build/prepare_builtins $(HOST_DIR)/usr/bin/
-+endef
-+HOST_LIBCLC_POST_BUILD_HOOKS += HOST_LIBCLC_COPY_HOST_PREPARE_BUILTINS
+-	-DLLVM_CONFIG="$(HOST_DIR)/bin/llvm-config"
++	-DLLVM_CMAKE_DIR="$(HOST_DIR)/lib/cmake/llvm" \
++	-DLIBCLC_CUSTOM_LLVM_TOOLS_BINARY_DIR="$(HOST_DIR)/bin"
 +
++ifeq ($(BR2_arm)$(BR2_aarch64),y)
++HOST_LIBCLC_CONF_OPTS = \
++	-DLIBCLC_TARGETS_TO_BUILD=""
++LIBCLC_CONF_OPTS += -DLIBCLC_TARGETS_TO_BUILD=""
++endif
+ 
  $(eval $(cmake-package))
 +$(eval $(host-cmake-package))
 +

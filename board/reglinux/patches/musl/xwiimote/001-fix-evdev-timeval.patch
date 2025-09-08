@@ -1,0 +1,11 @@
+--- a/lib/core.c
++++ b/lib/core.c
+@@ -1303,7 +1303,7 @@
+ 
+ 		EV_SYN_KEY = true;
+ 		memset(ev, 0, sizeof(*ev));
+-		memcpy(&ev->time, &input.time, sizeof(struct timeval));
++		gettimeofday(&ev->time, NULL);
+ 		ev->type = XWII_EVENT_BALANCE_BOARD_KEY;
+ 		ev->v.key.code = key;
+ 		ev->v.key.state = input.value;

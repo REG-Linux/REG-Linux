@@ -12,6 +12,10 @@ GZDOOM_LICENSE = GPLv3
 GZDOOM_DEPENDENCIES = host-gzdoom sdl2 bzip2 openal zmusic libvpx webp
 GZDOOM_SUPPORTS_IN_SOURCE_BUILD = NO
 
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+GZDOOM_DEPENDENCIES += libbacktrace musl-fts
+endif
+
 # We need the tools from the host package to build the target package
 HOST_GZDOOM_DEPENDENCIES = zlib bzip2 host-webp host-zmusic
 HOST_GZDOOM_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
@@ -27,6 +31,10 @@ GZDOOM_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 GZDOOM_CONF_OPTS += -DFORCE_CROSSCOMPILE=ON
 GZDOOM_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 GZDOOM_CONF_OPTS += -DIMPORT_EXECUTABLES="$(HOST_GZDOOM_BUILDDIR)/ImportExecutables.cmake"
+
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+GZDOOM_CONF_OPTS += -DCMAKE_THREAD_LIBS_INIT="-lpthread" -DCMAKE_HAVE_THREADS_LIBRARY=1 -DTHREADS_PREFER_PTHREAD_FLAG=ON
+endif
 
 # Add sway check because of Vulkan KMS/DRM devices like vim1s/vim4 (libmali)
 ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER)$(BR2_PACKAGE_SWAY),yyy)

@@ -29,7 +29,10 @@ PPSSPP_CONF_OPTS += -DMOBILE_DEVICE=OFF
 PPSSPP_TARGET_CFLAGS = $(TARGET_CFLAGS)
 PPSSPP_TARGET_BINARY = PPSSPPSDL
 
-ifeq ($(BR2_mipsel),y)
+# mips32el prebuilt not provided
+# musl compatible prebuilt not provided
+ifeq ($(BR2_mipsel)$(BR2_TOOLCHAIN_USES_MUSL),y)
+PPSSPP_DEPENDENCIES += ffmpeg
 PPSSPP_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=ON
 else
 PPSSPP_CONF_OPTS += -DUSE_SYSTEM_FFMPEG=OFF

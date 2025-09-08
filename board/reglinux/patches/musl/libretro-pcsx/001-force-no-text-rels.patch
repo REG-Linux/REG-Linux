@@ -1,0 +1,39 @@
+--- a/include/arm_features.h	2025-09-03 16:35:24.588030992 +0200
++++ b/include/arm_features.h	2025-09-03 16:35:44.823732416 +0200
+@@ -91,8 +91,8 @@
+ 
+ #endif
+ 
+-#if defined(__MACH__) || defined(__PIC__)
++//#if defined(__MACH__) || defined(__PIC__)
+ #define TEXRELS_FORBIDDEN
+-#endif
++//#endif
+ 
+ #endif /* __ARM_FEATURES_H__ */
+--- a/plugins/dfsound/arm_utils.S	2025-09-03 16:55:37.241447448 +0200
++++ b/plugins/dfsound/arm_utils.S	2025-09-03 16:56:00.131496553 +0200
+@@ -25,6 +25,23 @@
+ 	movt	\reg, #:upper16:(ptr_\var-(1678f+8))
+ 1678:
+ 	ldr	\reg, [pc, \reg]
++#elif !defined(HAVE_ARMV7) && defined(TEXRELS_FORBIDDEN)
++        /*
++         * ARMv6 path without movw/movt:
++         * Load PC-relative offset to ptr_\var (in .data) from a literal encoded
++         * in .text, then add PC. The offset is fully resolved at link-time
++         * (no dynamic reloc in .text). The actual pointer (ptr_\var) lives in
++         * .data and will be relocated at load time (allowed).
++         *
++         * PC on ARM is (address of this insn + 8), hence the +8 in the calc.
++         */
++        ldr     \reg, 1f             @ \reg <- (ptr_\var - (2f + 8))
++        add     \reg, pc, \reg       @ \reg <- &ptr_\var
++        b       2f
++1:
++        .word   ptr_\var - (2f + 8)
++2:
++        ldr     \reg, [\reg]         @ \reg <- ESYM(\var)
+ #elif defined(HAVE_ARMV7) && !defined(__PIC__)
+ 	movw	\reg, #:lower16:ESYM(\var)
+ 	movt	\reg, #:upper16:ESYM(\var)
