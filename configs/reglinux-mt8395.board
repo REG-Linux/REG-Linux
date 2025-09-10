@@ -7,8 +7,7 @@ BR2_cortex_a76_a55=y
 BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_PACKAGE_SYSTEM_TARGET_MT8395=y
 # GCC 14 does not support -mcpu=cortex-a78.cortex-a55 -mtune=cortex-a78.cortex-a55
-BR2_TARGET_OPTIMIZATION="-pipe"
-# -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55"
+BR2_TARGET_OPTIMIZATION="-pipe -march=armv8.2-a+crypto+dotprod -mtune=cortex-a76.cortex-a55"
 BR2_TARGET_GENERIC_GETTY_PORT="/dev/ttyFIQ0"
 BR2_TARGET_GENERIC_GETTY_BAUDRATE_921600=y
 BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/mediatek/mt8395/patches"

@@ -20,6 +20,8 @@ VICE_CONF_OPTS += --enable-x64
 VICE_CONF_OPTS += --enable-arch=yes
 VICE_CONF_OPTS += --enable-sdl2ui
 VICE_CONF_OPTS += --with-sdlsound
+VICE_CONF_OPTS += --disable-hardsid
+VICE_CONF_OPTS += --disable-parsid
 VICE_CONF_OPTS += --disable-debug-gtk3ui
 VICE_CONF_OPTS += --disable-html-docs
 VICE_CONF_OPTS += --disable-pdf-docs
@@ -61,6 +63,31 @@ VICE_DEPENDENCIES += libvorbis
 endif
 
 VICE_CONF_ENV += LDFLAGS=-lSDL2
+
+ifeq ($(BR2_PACKAGE_VICE_X64),y)
+VICE_TARGETS += x64
+endif
+ifeq ($(BR2_PACKAGE_VICE_X64SC),y)
+VICE_TARGETS += x64sc
+endif
+ifeq ($(BR2_PACKAGE_VICE_XSCPU64),y)
+VICE_TARGETS += xscpu64
+endif
+ifeq ($(BR2_PACKAGE_VICE_X128),y)
+VICE_TARGETS += x128
+endif
+ifeq ($(BR2_PACKAGE_VICE_XVIC),y)
+VICE_TARGETS += xvic
+endif
+ifeq ($(BR2_PACKAGE_VICE_XPET),y)
+VICE_TARGETS += xpet
+endif
+ifeq ($(BR2_PACKAGE_VICE_XPLUS4),y)
+VICE_TARGETS += xplus4
+endif
+ifeq ($(BR2_PACKAGE_VICE_XCBM2),y)
+VICE_TARGETS += xcbm2
+endif
 
 define VICE_POST_PROCESS
 	mkdir -p $(TARGET_DIR)/usr/share/evmapy

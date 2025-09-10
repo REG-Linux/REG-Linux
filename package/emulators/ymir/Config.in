@@ -1,10 +1,11 @@
 config BR2_PACKAGE_YMIR
     bool "ymir"
     depends on BR2_PACKAGE_CLANG
-    depends on BR2_PACKAGE_WAYLAND
-    depends on BR2_PACKAGE_WAYLAND_PROTOCOLS
-    depends on BR2_PACKAGE_LIBXKBCOMMON
     depends on BR2_PACKAGE_HAS_LIBEGL
+    select BR2_PACKAGE_WAYLAND
+    select BR2_PACKAGE_WAYLAND_PROTOCOLS
+    select BR2_PACKAGE_LIBXKBCOMMON
+    select BR2_PACKAGE_SDL3
 
     help
       A work-in-progress Sega Saturn emulator.

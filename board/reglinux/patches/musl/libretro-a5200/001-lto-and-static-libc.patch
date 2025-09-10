@@ -1,0 +1,12 @@
+--- a/Makefile	2025-09-04 15:57:58.478431540 +0200
++++ b/Makefile	2025-09-04 15:59:29.457050461 +0200
+@@ -48,7 +48,8 @@
+ endif
+ LIBM		   := -lm
+ CORE_DIR    := .
+-LDFLAGS     :=
++CFLAGS      += -flto=auto
++LDFLAGS     := -static-libgcc -static-libstdc++ -flto=auto
+ 
+ SPACE :=
+ SPACE := $(SPACE) $(SPACE)
