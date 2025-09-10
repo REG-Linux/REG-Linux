@@ -21,7 +21,7 @@ LIBRETRO_VICE_PLATFORM = rpi4
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_VICE_PLATFORM = rpi5
 else ifeq ($(BR2_cortex_a7),y)
-LIBRETRO_PUAE_PLATFORM = classic_armv7_a7
+LIBRETRO_VICE_PLATFORM = classic_armv7_a7
 else ifeq ($(BR2_arm),y)
 LIBRETRO_VICE_PLATFORM = armv neon
 else ifeq ($(BR2_aarch64),y)

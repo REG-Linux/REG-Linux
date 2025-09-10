@@ -3,13 +3,13 @@
 # Ymir
 #
 ################################################################################
-# Release on Aug 11, 2025
-YMIR_VERSION = v0.1.7
+# Release on Sep 10, 2025
+YMIR_VERSION = v0.1.8
 YMIR_SITE = https://github.com/StrikerX3/Ymir
 YMIR_SITE_METHOD=git
 YMIR_GIT_SUBMODULES=YES
 YMIR_LICENSE = GPLv3
-YMIR_DEPENDENCIES = wayland wayland-protocols libegl libxkbcommon
+YMIR_DEPENDENCIES = wayland wayland-protocols libegl libxkbcommon sdl3
 YMIR_DEPENDENCIES += llvm clang
 
 YMIR_SUPPORTS_IN_SOURCE_BUILD = NO
@@ -32,10 +32,10 @@ YMIR_CONF_OPTS += -DYmir_ENABLE_SANDBOX=OFF
 YMIR_CONF_OPTS += -DYmir_ENABLE_YMDASM=OFF
 YMIR_CONF_OPTS += -DYmir_ENABLE_IMGUI_DEMO=OFF
 
-# Compile with clang
-YMIR_CONF_OPTS += -DCMAKE_C_COMPILER=$(HOST_DIR)/bin/clang
-YMIR_CONF_OPTS += -DCMAKE_CXX_COMPILER=$(HOST_DIR)/bin/clang++
-YMIR_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-lstdc++"
+# Compile with clang (skip toolchain wrapper for now because or march/mcpu/mtune)
+YMIR_CONF_OPTS += -DCMAKE_C_COMPILER=$(HOST_DIR)/bin/clang.br_real
+YMIR_CONF_OPTS += -DCMAKE_CXX_COMPILER=$(HOST_DIR)/bin/clang++.br_real
+YMIR_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-lstdc++ -lm"
 
 # Hacks
 #YMIR_CONF_OPTS += -DCMAKE_AR=$(HOST_DIR)/bin/llvm-ar

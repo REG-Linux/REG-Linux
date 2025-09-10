@@ -9,3 +9,60 @@ config BR2_PACKAGE_LIBRETRO_VICE
 
 comment "LIBRETRO_VICE needs a toolchain w/ C++"
 	depends on !BR2_INSTALL_LIBSTDCPP
+
+# Choose which libretro-vice cores we build
+config BR2_PACKAGE_LIBRETRO_VICE_X64
+    bool "Build x64 (C64 standard)"
+    default y
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the standard C64 binary (x64).
+
+config BR2_PACKAGE_LIBRETRO_VICE_X128
+    bool "Build x128 (C128)"
+    default y
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the Commodore 128 binary (x128).
+
+config BR2_PACKAGE_LIBRETRO_VICE_XVIC
+    bool "Build xvic (VIC-20)"
+    default y
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the VIC-20 binary (xvic).
+
+config BR2_PACKAGE_LIBRETRO_VICE_XPLUS4
+    bool "Build xplus4 (Plus/4)"
+    default y
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the Commodore Plus/4 binary (xplus4).
+
+config BR2_PACKAGE_LIBRETRO_VICE_XPET
+    bool "Build xpet (PET/CBM-II)"
+    default y
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the PET/CBM-II binary (xpet).
+
+config BR2_PACKAGE_LIBRETRO_VICE_XCBM2
+    bool "Build xcbm2 (CBM-II variant)"
+    default y
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the CBM-II variant binary (xcbm2).
+
+# Those require a fast CPU to run fullspeed
+config BR2_PACKAGE_LIBRETRO_VICE_X64SC
+    bool "Build x64sc (C64 Single Cycle)"
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the C64 Single Cycle binary (x64sc) for precise timing.
+
+config BR2_PACKAGE_LIBRETRO_VICE_XSCPU64
+    bool "Build xscpu64 (C64 SuperCPU)"
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the C64 SuperCPU binary (xscpu64).
+
