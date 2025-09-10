@@ -47,9 +47,9 @@ REGLINUX_MAME_ARCH = bcm2712
 # Cortex A76.A55
 else ifeq ($(BR2_cortex_a76_a55),y)
 REGLINUX_MAME_ARCH = rk3588
-# Unsupported yet in GCC Cortex A78.A55
-#else ifeq ($(BR2_cortex_a78_a55),y)
-#REGLINUX_MAME_ARCH = rk3588
+# ARMv9 (SM8550, just use rk3588 binary for now)
+else ifeq ($(BR2_cortex_a710),y)
+REGLINUX_MAME_ARCH = rk3588
 # Asahi Linux
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
 REGLINUX_MAME_ARCH = asahi
