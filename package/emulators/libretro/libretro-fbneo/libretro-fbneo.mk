@@ -3,8 +3,8 @@
 # libretro-fbneo
 #
 ################################################################################
-# Version: Commits on Aug 11, 2025
-LIBRETRO_FBNEO_VERSION = 56ba80afd75026edcdcd1b6fc94ff8a671710275
+# Version: Commits on Sep 8, 2025
+LIBRETRO_FBNEO_VERSION = 9c4ab57b1aa0bd910364f381a7fda149cd5df181
 LIBRETRO_FBNEO_SITE = $(call github,libretro,FBNeo,$(LIBRETRO_FBNEO_VERSION))
 LIBRETRO_FBNEO_LICENSE = Non-commercial
 
@@ -46,8 +46,6 @@ LIBRETRO_FBNEO_EXTRA_ARGS += USE_EXPERIMENTAL_FLAGS=0
 endif
 
 define LIBRETRO_FBNEO_BUILD_CMDS
-	rm -Rf $(@D)/src/cpu/cyclone/*
-	cp -R $(BR2_EXTERNAL_REGLINUX_PATH)/package/emulators/libretro/libretro-fbneo/cyclone68k/* $(@D)/src/cpu/cyclone/
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" \
 	    -C $(@D)/src/burner/libretro -f Makefile \
 		platform="$(LIBRETRO_FBNEO_PLATFORM)" $(LIBRETRO_FBNEO_EXTRA_ARGS) \
