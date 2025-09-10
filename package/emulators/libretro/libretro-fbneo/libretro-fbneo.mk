@@ -46,6 +46,18 @@ LIBRETRO_FBNEO_EXTRA_ARGS += USE_EXPERIMENTAL_FLAGS=0
 endif
 
 define LIBRETRO_FBNEO_BUILD_CMDS
+	# Let's clean-up a bit unused stuff in FBNeo (non-arcade, non-MD)
+	rm $(@D)/src/burn/drv/coleco/d_coleco.cpp
+	rm $(@D)/src/burn/drv/msx/d_msx.cpp
+	rm $(@D)/src/burn/drv/nes/d_nes.cpp
+	rm $(@D)/src/burn/drv/pce/d_pce.cpp
+	rm $(@D)/src/burn/drv/pst90s/d_ngp.cpp
+	rm $(@D)/src/burn/drv/sg1000/d_sg1000.cpp
+	rm $(@D)/src/burn/drv/spectrum/d_spectrum.cpp
+	rm $(@D)/src/burn/drv/sms/d_sms.cpp
+	rm $(@D)/src/burn/drv/snes/d_snes.cpp
+	# Regenerate proper driver list and gamelist.txt
+	cd $(@D) && ./src/dep/scripts/gamelist.pl -o src/dep/generated/driverlist.h -l gamelist.txt src/burn/drv/*/
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" \
 	    -C $(@D)/src/burner/libretro -f Makefile \
 		platform="$(LIBRETRO_FBNEO_PLATFORM)" $(LIBRETRO_FBNEO_EXTRA_ARGS) \
@@ -61,10 +73,10 @@ define LIBRETRO_FBNEO_INSTALL_TARGET_CMDS
 	cp -r $(@D)/metadata/* \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo
 
-    # Need to think of another way to use these files.
-    # They take up a lot of space on tmpfs.
-    # --exclude light as those are for the n3ds build of fbneo, not used by Batocera at all
-	rsync -a $(@D)/dats/* \
+    # Copy only relevant DAT files
+	rsync -a $(@D)/dats/*Arcade* \
+		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo --exclude light
+	rsync -a $(@D)/dats/*Megadrive* \
 		$(TARGET_DIR)/usr/share/reglinux/datainit/bios/fbneo --exclude light
 endef
 
