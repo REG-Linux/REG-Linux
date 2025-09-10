@@ -1,0 +1,12 @@
+--- a/src/burner/libretro/Makefile	2025-09-04 17:19:00.546245574 +0200
++++ b/src/burner/libretro/Makefile	2025-09-04 17:20:13.968617474 +0200
+@@ -20,6 +20,9 @@
+ SPLIT_UP_LINK ?= 0
+ REGEN_HEADERS ?= 0
+ 
++CFLAGS += -flto=auto
++LDFLAGS += -flto=auto -static-libgcc -static-libstdc++
++
+ SPACE :=
+ SPACE := $(SPACE) $(SPACE)
+ BACKSLASH :=
