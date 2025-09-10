@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGLINUX_CONFIGGEN_VERSION = 0.0.7
+REGLINUX_CONFIGGEN_VERSION = 0.0.8
 REGLINUX_CONFIGGEN_LICENSE = GPL
 REGLINUX_CONFIGGEN_SOURCE=
 REGLINUX_CONFIGGEN_SETUP_TYPE = pep517
