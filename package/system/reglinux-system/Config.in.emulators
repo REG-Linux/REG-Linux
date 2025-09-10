@@ -229,7 +229,18 @@ config BR2_PACKAGE_REGLINUX_COMPUTER_SYSTEMS
 
 	# Commodore 64/128/VIC20/PET/Plus4
 	select BR2_PACKAGE_VICE			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
-	select BR2_PACKAGE_LIBRETRO_VICE	# ALL
+	select BR2_PACKAGE_VICE_X64SC		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+	select BR2_PACKAGE_VICE_XSCPU64		if BR2_PACKAGE_VICE_X64SC
+
+	select BR2_PACKAGE_LIBRETRO_VICE		# ALL
+	select BR2_PACKAGE_LIBRETRO_VICE_X64SC		if BR2_PACKAGE_VICE_X64SC
+	select BR2_PACKAGe_LIBRETRO_VICE_XSCPU64	if BR2_PACKAGE_VICE_X64SC
 
 	# Commodore Amiga
 	select BR2_PACKAGE_AMIBERRY		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \

@@ -60,19 +60,21 @@ else ifeq ($(BR2_aarch64),y)
 MAME_CROSS_ARCH = arm64
 # AArch64 CPU flags
 ifeq ($(BR2_cortex_a53),y)
-MAME_CFLAGS += -mcpu=cortex-a53 -mtune=cortex-a53
+MAME_CFLAGS += -mtune=cortex-a53
 else ifeq ($(BR2_cortex_a35),y)
-MAME_CFLAGS += -mcpu=cortex-a35 -mtune=cortex-a35
+MAME_CFLAGS += -mtune=cortex-a35
 else ifeq ($(BR2_cortex_a55),y)
-MAME_CFLAGS += -mcpu=cortex-a55 -mtune=cortex-a55
+MAME_CFLAGS += -mtune=cortex-a55
 else ifeq ($(BR2_cortex_a73_a53),y)
-MAME_CFLAGS += -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53
+MAME_CFLAGS += -mtune=cortex-a73.cortex-a53
 else ifeq ($(BR2_cortex_a72),y)
-MAME_CFLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
+MAME_CFLAGS += -mtune=cortex-a72
 else ifeq ($(BR2_cortex_a76),y)
-MAME_CFLAGS += -mcpu=cortex-a76 -mtune=cortex-a76
+MAME_CFLAGS += -mtune=cortex-a76
 else ifeq ($(BR2_cortex_a76_a55),y)
-MAME_CFLAGS += -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
+MAME_CFLAGS += -mtune=cortex-a76.cortex-a55
+else ifeq ($(BR2_cortex_a710),y)
+MAME_CFLAGS += -mtune=cortex-a710
 endif
 else
 MAME_CROSS_OPTS += FORCE_DRC_C_BACKEND=1
