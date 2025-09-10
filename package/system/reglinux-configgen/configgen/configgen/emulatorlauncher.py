@@ -13,6 +13,7 @@ from subprocess import Popen, PIPE, call
 from systemFiles import SAVES
 from sys import exit
 from Emulator import Emulator
+from threading import Thread
 from controllers import Evmapy
 from GeneratorImporter import getGenerator
 import utils.videoMode as videoMode
@@ -93,6 +94,41 @@ def main(args, maxnbplayers):
     else:
         # If it's not a .zar file, launch the ROM directly
         return start_rom(args, maxnbplayers, args.rom, args.rom)
+
+
+# --- Add at the top of emulatorlauncher.py ---
+import threading
+
+
+def _start_evmapy_async(system, emulator, core, romConfig, playersControllers, guns):
+    """
+    Starts Evmapy asynchronously in a background thread.
+
+    This prevents the emulator startup from being delayed by Evmapy initialization.
+    Evmapy will run in parallel while the emulator is already loading.
+
+    Args:
+        system (str): The system identifier (e.g., "nes", "snes").
+        emulator (str): The emulator name.
+        core (str): The emulator core name.
+        romConfig (str): Path used for specific ROM configuration.
+        playersControllers (list): Controller configuration for all players.
+        guns (list): Configured light guns (if any).
+
+    Returns:
+        threading.Thread: The thread running Evmapy.
+    """
+
+    def worker():
+        try:
+            Evmapy.start(system, emulator, core, romConfig, playersControllers, guns)
+        except Exception as e:
+            eslog.error(f"Evmapy failed: {e}", exc_info=True)
+
+    # Start the Evmapy worker in background mode (daemon thread).
+    t = Thread(target=worker, daemon=True)
+    t.start()
+    return t
 
 
 def _configure_controllers(args, maxnbplayers):
@@ -273,12 +309,38 @@ def _launch_emulator_process(
     args,
     romConfiguration,
 ):
-    """Handles the actual emulator launch process within a try/finally block."""
+    """
+    Handles the actual emulator launch process inside a try/finally block.
+
+    This function takes care of:
+    - Starting Evmapy asynchronously (non-blocking).
+    - Launching the emulator with the correct environment and command line.
+    - Managing compositor (Wayland/X11) if required.
+    - Handling HUD configuration.
+    - Ensuring proper cleanup after the emulator exits.
+
+    Args:
+        generator (Generator): Emulator-specific generator instance.
+        system (Emulator): System configuration object.
+        rom (str): Path to the ROM file.
+        playersControllers (list): Controller configuration for all players.
+        metadata (dict): Game metadata (title, genre, etc.).
+        guns (list): Configured light guns (if any).
+        wheels (list): Configured wheels (if any).
+        gameResolution (dict): Current game resolution settings.
+        args (Namespace): Command-line arguments passed to the launcher.
+        romConfiguration (str): ROM configuration path (may differ if archive is used).
+
+    Returns:
+        int: Exit code from the emulator process.
+    """
     global profiler
     exitCode = -1
+    evmapy_thread = None
 
     try:
-        Evmapy.start(
+        # Start Evmapy in a separate thread (non-blocking)
+        evmapy_thread = _start_evmapy_async(
             args.system,
             system.config["emulator"],
             system.config.get("core", ""),
@@ -286,30 +348,47 @@ def _launch_emulator_process(
             playersControllers,
             guns,
         )
+
+        # Start a compositor if required (Wayland or X11)
         if (
             generator.requiresWayland() or generator.requiresX11()
         ) and "WAYLAND_DISPLAY" not in environ:
             windowsManager.start_compositor(generator, system)
 
+        # Set execution directory if specified by generator
         effectiveRom = rom or ""
         executionDirectory = generator.executionDirectory(system.config, effectiveRom)
         if executionDirectory is not None:
             chdir(executionDirectory)
 
+        # Generate the command line for emulator execution
         cmd = generator.generate(
             system, rom, playersControllers, metadata, guns, wheels, gameResolution
         )
+
+        # Configure MangoHUD if enabled
         _configure_hud(system, generator, cmd, args, rom, gameResolution, guns)
 
+        # Disable profiler while emulator runs
         if profiler:
             profiler.disable()
+
+        # Run the emulator command
         exitCode = runCommand(cmd)
+
+        # Re-enable profiler after emulator exit
         if profiler:
             profiler.enable()
     finally:
+        # Stop Evmapy gracefully
         Evmapy.stop()
+        if evmapy_thread and evmapy_thread.is_alive():
+            evmapy_thread.join(timeout=1)  # prevent zombie threads
+
+        # Stop compositor if it was started
         if generator.requiresWayland() or generator.requiresX11():
             windowsManager.stop_compositor(generator, system)
+
     return exitCode
 
 

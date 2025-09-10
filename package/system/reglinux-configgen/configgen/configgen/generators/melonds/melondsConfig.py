@@ -2,7 +2,7 @@ from systemFiles import CONF, SAVES, CHEATS
 
 MELONDS_CONFIG_DIR = CONF + "/melonDS"
 MELONDS_CONFIG_PATH = MELONDS_CONFIG_DIR + "/melonDS.ini"
-MELONDS_SAVES_DIR = SAVES + "/melonDS"
+MELONDS_SAVES_DIR = SAVES + "/melonds"
 MELONDS_CHEATS_DIR = CHEATS + "/melonDS"
 MELONDS_BIN_PATH = "/usr/bin/melonDS"
 
