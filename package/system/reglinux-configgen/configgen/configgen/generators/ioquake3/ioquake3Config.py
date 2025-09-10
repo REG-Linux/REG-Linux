@@ -1,7 +1,7 @@
 from systemFiles import ROMS, CONF
 from os import path, makedirs, walk
 
-IOQUAKE3_BIN_DIR = "/usr/bin/ioquake3"
+IOQUAKE3_BIN_DIR = "/usr/ioquake3"
 IOQUAKE3_BIN_PATH = "/userdata/roms/quake3/ioquake3"
 IOQUAKE3_ROMS_DIR = ROMS + "/quake3"
 IOQUAKE3_CONF_DIR = CONF + "/ioquake3"
