@@ -53,8 +53,8 @@ define LIBRETRO_FBNEO_BUILD_CMDS
 	rm $(@D)/src/burn/drv/pce/d_pce.cpp
 	rm $(@D)/src/burn/drv/pst90s/d_ngp.cpp
 	rm $(@D)/src/burn/drv/sg1000/d_sg1000.cpp
-	rm $(@D)/src/burn/drv/spectrum/d_spectrum.cpp
-	rm $(@D)/src/burn/drv/sms/d_sms.cpp
+	rm -Rf $(@D)/src/burn/drv/spectrum/*
+	rm -Rf $(@D)/src/burn/drv/sms/*
 	rm $(@D)/src/burn/drv/snes/d_snes.cpp
 	# Regenerate proper driver list and gamelist.txt
 	cd $(@D) && ./src/dep/scripts/gamelist.pl -o src/dep/generated/driverlist.h -l gamelist.txt src/burn/drv/*/

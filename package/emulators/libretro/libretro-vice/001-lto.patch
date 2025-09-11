@@ -1,0 +1,12 @@
+--- a/Makefile	2025-09-10 22:24:26.339086727 +0200
++++ b/Makefile	2025-09-10 22:29:38.225964397 +0200
+@@ -447,6 +447,9 @@
+ COMMONFLAGS += -DCORE_NAME=\"$(EMUTYPE)\"
+ include Makefile.common
+ 
++CFLAGS	    += -flto=auto
++LDFLAGS    += -flto=auto
++
+ OBJECTS     += $(patsubst %.cpp,%.o,$(SOURCES_CXX:.cc=.o)) $(SOURCES_C:.c=.o)
+ PLATFLAGS   := $(CFLAGS)
+ CXXFLAGS    += $(fpic) $(INCFLAGS) $(COMMONFLAGS)

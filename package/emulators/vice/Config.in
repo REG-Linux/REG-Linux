@@ -18,8 +18,6 @@ config BR2_PACKAGE_VICE
 	help
 	  VICE is an emulator collection which emulates the C64, the C64-DTV, the C128, the VIC20, practically all PET models, the PLUS4 and the CBM-II (aka C610). It runs on Unix, MS-DOS, Win32, OS/2, Acorn RISC OS, BeOS, QNX 6.x, Amiga, GP2X or Mac OS X machines.
 
-	comment "Vice  needs a toolchain w/ OpenGl,  SDL"
-
 # Select which VICE binaries we should build
 config BR2_PACKAGE_VICE_X64
     bool "Build x64 (C64 standard)"
@@ -64,6 +62,12 @@ config BR2_PACKAGE_VICE_XCBM2
       Build the CBM-II variant binary (xcbm2).
 
 # Those cores require fast cpu to run fullspeed
+config BR2_PACKAGE_VICE_X64DTV
+    bool "Build x64dtv (C64-DTV standard)"
+    depends on BR2_PACKAGE_VICE
+    help
+      Build the standard C64-DTV binary (x64dtv).
+
 config BR2_PACKAGE_VICE_X64SC
     bool "Build x64sc (C64 Single Cycle)"
     depends on BR2_PACKAGE_VICE
