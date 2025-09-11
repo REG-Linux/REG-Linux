@@ -54,6 +54,12 @@ config BR2_PACKAGE_LIBRETRO_VICE_XCBM2
       Build the CBM-II variant binary (xcbm2).
 
 # Those require a fast CPU to run fullspeed
+config BR2_PACKAGE_LIBRETRO_VICE_X64DTV
+    bool "Build x64dtv (C64 DTV ASIC)"
+    depends on BR2_PACKAGE_LIBRETRO_VICE
+    help
+      Build the C64-DTV binary (x64dtv).
+
 config BR2_PACKAGE_LIBRETRO_VICE_X64SC
     bool "Build x64sc (C64 Single Cycle)"
     depends on BR2_PACKAGE_LIBRETRO_VICE
