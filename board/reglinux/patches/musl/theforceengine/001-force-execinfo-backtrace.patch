@@ -1,0 +1,10 @@
+--- a/CMakeLists.txt	2025-09-10 04:08:10.000000000 +0200
++++ b/CMakeLists.txt	2025-09-12 08:37:04.167381000 +0200
+@@ -72,6 +73,7 @@
+ 					${SDL2_IMAGE_LIBRARIES}
+ 					${CMAKE_DL_LIBS}
+ 					Threads::Threads
++					libexecinfo.a
+ 		)
+ 
+ 		# set up build directory to be able to run TFE immediately: symlink
