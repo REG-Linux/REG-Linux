@@ -6,6 +6,10 @@ from .azaharControllers import setAzaharControllers
 
 
 class AzaharGenerator(Generator):
+    # this emulator/core requires X server to run
+    def requiresX11(self):
+        return True
+
     def generate(
         self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
     ):
