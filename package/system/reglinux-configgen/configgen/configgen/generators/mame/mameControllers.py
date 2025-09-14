@@ -95,22 +95,10 @@ def generatePadsConfig(
     xml_system.appendChild(xml_input)
 
     messControlDict = {}
-    if sysName in ["bbcb", "bbcm", "bbcm512", "bbcmc"]:
-        if specialController == "none":
-            useControls = "bbc"
-        else:
-            useControls = f"bbc-{specialController}"
-    elif sysName in ["apple2p", "apple2e", "apple2ee"]:
-        if specialController == "none":
-            useControls = "apple2"
-        else:
-            useControls = f"apple2-{specialController}"
-    else:
-        useControls = sysName
-    eslog.debug(f"Using {useControls} for controller config.")
-
-    # Open or create alternate config file for systems with special controllers/settings
-    # If the system/game is set to per game config, don't try to open/reset an existing file, only write if it's blank or going to the shared cfg folder
+    config_alt = None
+    configFile_alt = None
+    xml_input_alt = None
+    overwriteSystem = None
     specialControlList = [
         "cdimono1",
         "apfm1000",
@@ -134,6 +122,22 @@ def generatePadsConfig(
         "apple2e",
         "apple2ee",
     ]
+    if sysName in ["bbcb", "bbcm", "bbcm512", "bbcmc"]:
+        if specialController == "none":
+            useControls = "bbc"
+        else:
+            useControls = f"bbc-{specialController}"
+    elif sysName in ["apple2p", "apple2e", "apple2ee"]:
+        if specialController == "none":
+            useControls = "apple2"
+        else:
+            useControls = f"apple2-{specialController}"
+    else:
+        useControls = sysName
+    eslog.debug(f"Using {useControls} for controller config.")
+
+    # Open or create alternate config file for systems with special controllers/settings
+    # If the system/game is set to per game config, don't try to open/reset an existing file, only write if it's blank or going to the shared cfg folder
     if sysName in specialControlList:
         # Load mess controls from csv
         messControlFile = "/usr/share/reglinux/configgen/data/mame/messControls.csv"
@@ -172,10 +176,6 @@ def generatePadsConfig(
                     currentEntry["reversed"] = row[9]
                     currentEntry["mask"] = row[10]
                     currentEntry["default"] = row[11]
-                if currentEntry["reversed"] == "False":
-                    currentEntry["reversed"] == False
-                else:
-                    currentEntry["reversed"] == True
 
         config_alt = minidom.Document()
         configFile_alt = cfgPath + sysName + ".cfg"
@@ -233,8 +233,8 @@ def generatePadsConfig(
 
     # Fill in controls on cfg files
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
-        mappings_use = mappings
+    for _, pad in sorted(playersControllers.items()):
+        mappings_use = mappings.copy()
         if hasStick(pad) == False:
             mappings_use["JOYSTICK_UP"] = "up"
             mappings_use["JOYSTICK_DOWN"] = "down"
@@ -249,7 +249,7 @@ def generatePadsConfig(
                     isWheel = True
                     eslog.debug(f"player {nplayer} has a wheel")
             if isWheel:
-                for x in mappings_use.copy():
+                for x in list(mappings_use.keys()):
                     if (
                         mappings_use[x] == "l2"
                         or mappings_use[x] == "r2"
@@ -414,80 +414,81 @@ def generatePadsConfig(
                 )
             )  # Select
 
-        if useControls in messControlDict.keys():
-            for controlDef in messControlDict[useControls].keys():
-                thisControl = messControlDict[useControls][controlDef]
-                if nplayer == thisControl["player"]:
-                    if thisControl["type"] == "special":
-                        xml_input_alt.appendChild(
-                            generateSpecialPortElement(
-                                pad,
-                                config_alt,
-                                thisControl["tag"],
-                                nplayer,
-                                pad.index,
-                                thisControl["key"],
-                                thisControl["mapping"],
-                                pad.inputs[mappings_use[thisControl["useMapping"]]],
-                                thisControl["reversed"],
-                                thisControl["mask"],
-                                thisControl["default"],
-                                pedalkey,
+        if sysName in specialControlList and config_alt is not None and xml_input_alt is not None:
+            if useControls in messControlDict.keys():
+                for controlDef in messControlDict[useControls].keys():
+                    thisControl = messControlDict[useControls][controlDef]
+                    if nplayer == thisControl["player"]:
+                        if thisControl["type"] == "special":
+                            xml_input_alt.appendChild(
+                                generateSpecialPortElement(
+                                    pad,
+                                    config_alt,
+                                    thisControl["tag"],
+                                    nplayer,
+                                    pad.index,
+                                    thisControl["key"],
+                                    thisControl["mapping"],
+                                    pad.inputs[mappings_use[thisControl["useMapping"]]],
+                                    thisControl["reversed"],
+                                    thisControl["mask"],
+                                    thisControl["default"],
+                                    pedalkey,
+                                )
                             )
-                        )
-                    elif thisControl["type"] == "main":
-                        xml_input.appendChild(
-                            generateSpecialPortElement(
-                                pad,
-                                config_alt,
-                                thisControl["tag"],
-                                nplayer,
-                                pad.index,
-                                thisControl["key"],
-                                thisControl["mapping"],
-                                pad.inputs[mappings_use[thisControl["useMapping"]]],
-                                thisControl["reversed"],
-                                thisControl["mask"],
-                                thisControl["default"],
-                                pedalkey,
+                        elif thisControl["type"] == "main":
+                            xml_input.appendChild(
+                                generateSpecialPortElement(
+                                    pad,
+                                    config_alt,
+                                    thisControl["tag"],
+                                    nplayer,
+                                    pad.index,
+                                    thisControl["key"],
+                                    thisControl["mapping"],
+                                    pad.inputs[mappings_use[thisControl["useMapping"]]],
+                                    thisControl["reversed"],
+                                    thisControl["mask"],
+                                    thisControl["default"],
+                                    pedalkey,
+                                )
                             )
-                        )
-                    elif thisControl["type"] == "analog":
-                        xml_input_alt.appendChild(
-                            generateAnalogPortElement(
-                                pad,
-                                config_alt,
-                                thisControl["tag"],
-                                nplayer,
-                                pad.index,
-                                thisControl["key"],
-                                mappings_use[thisControl["incMapping"]],
-                                mappings_use[thisControl["decMapping"]],
-                                pad.inputs[mappings_use[thisControl["useMapping1"]]],
-                                pad.inputs[mappings_use[thisControl["useMapping2"]]],
-                                thisControl["reversed"],
-                                thisControl["mask"],
-                                thisControl["default"],
-                                thisControl["delta"],
-                                thisControl["axis"],
+                        elif thisControl["type"] == "analog":
+                            xml_input_alt.appendChild(
+                                generateAnalogPortElement(
+                                    pad,
+                                    config_alt,
+                                    thisControl["tag"],
+                                    nplayer,
+                                    pad.index,
+                                    thisControl["key"],
+                                    mappings_use[thisControl["incMapping"]],
+                                    mappings_use[thisControl["decMapping"]],
+                                    pad.inputs[mappings_use[thisControl["useMapping1"]]],
+                                    pad.inputs[mappings_use[thisControl["useMapping2"]]],
+                                    thisControl["reversed"],
+                                    thisControl["mask"],
+                                    thisControl["default"],
+                                    thisControl["delta"],
+                                    thisControl["axis"],
+                                )
                             )
-                        )
-                    elif thisControl["type"] == "combo":
-                        xml_input_alt.appendChild(
-                            generateComboPortElement(
-                                pad,
-                                config_alt,
-                                thisControl["tag"],
-                                pad.index,
-                                thisControl["key"],
-                                thisControl["kbMapping"],
-                                thisControl["mapping"],
-                                pad.inputs[mappings_use[thisControl["useMapping"]]],
-                                thisControl["reversed"],
-                                thisControl["mask"],
-                                thisControl["default"],
+                        elif thisControl["type"] == "combo":
+                            xml_input_alt.appendChild(
+                                generateComboPortElement(
+                                    pad,
+                                    config_alt,
+                                    thisControl["tag"],
+                                    pad.index,
+                                    thisControl["key"],
+                                    thisControl["kbMapping"],
+                                    thisControl["mapping"],
+                                    pad.inputs[mappings_use[thisControl["useMapping"]]],
+                                    thisControl["reversed"],
+                                    thisControl["mask"],
+                                    thisControl["default"],
+                                )
                             )
-                        )
 
         nplayer = nplayer + 1
 
@@ -506,11 +507,11 @@ def generatePadsConfig(
             ###
             addCommonPlayerPorts(config, xml_input, gunnum)
             for mapping in gunmappings:
-                xml_input.appendChild(
-                    generateGunPortElement(
-                        config, gunnum, mapping, gunmappings, pedalkey
-                    )
+                gun_port = generateGunPortElement(
+                    config, gunnum, mapping, gunmappings, pedalkey
                 )
+                if gun_port is not None:
+                    xml_input.appendChild(gun_port)
 
     # save the config file
     # mameXml = open(configFile, "w")
@@ -524,7 +525,13 @@ def generatePadsConfig(
         mameXml.write(dom_string)
 
     # Write alt config (if used, custom config is turned off or file doesn't exist yet)
-    if sysName in specialControlList and overwriteSystem:
+    if (
+        sysName in specialControlList
+        and overwriteSystem is not None
+        and overwriteSystem
+        and configFile_alt is not None
+        and config_alt is not None
+    ):
         eslog.debug(f"Saving {configFile_alt}")
         mameXml_alt = open(configFile_alt, "w", "utf-8")
         dom_string_alt = linesep.join(
