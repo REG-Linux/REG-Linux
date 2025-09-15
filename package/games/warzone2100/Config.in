@@ -1,0 +1,23 @@
+config BR2_PACKAGE_WARZONE2100
+	bool "warzone2100"
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_LIBSODIUM
+	select BR2_PACKAGE_SQLITE
+	select BR2_PACKAGE_SQLITE_ENABLE_COLUMN_METADATA
+	select BR2_PACKAGE_PROTOBUF
+	select BR2_PACKAGE_LIBZIP
+	select BR2_PACKAGE_PHYSFS
+	select BR2_PACKAGE_OPENAL
+	select BR2_PACKAGE_LIBTHEORA
+	select BR2_PACKAGE_LIBCURL
+	depends on BR2_INSTALL_LIBSTDCPP
+
+	help
+	  Warzone 2100 is a free, open source, 3D real-time strategy game 
+	  with a story-driven single-player campaign, online multi-player, 
+	  offline skirmish, and more.
+
+	  https://wz2100.net/
+
+comment "BR2_PACKAGE_WARZONE2100 needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP

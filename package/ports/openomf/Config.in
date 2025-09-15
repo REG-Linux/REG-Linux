@@ -1,0 +1,14 @@
+config BR2_PACKAGE_OPENOMF
+	bool "openomf"
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_ENET
+	select BR2_PACKAGE_LIBCONFUSE
+	select BR2_PACKAGE_LIBMINIUPNPC
+	select BR2_PACKAGE_LIBNATPMP
+	select BR2_PACKAGE_LIBEPOXY
+
+	help
+	  OpenOMF is an Open Source remake of "One Must Fall 2097" by Diversions Entertainment.
+
+	  https://github.com/omf2097/openomf

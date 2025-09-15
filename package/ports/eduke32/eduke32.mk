@@ -3,8 +3,8 @@
 # eduke32
 #
 ################################################################################
-# Version: Commits on Jul 13, 2025
-EDUKE32_VERSION = 126f35ca8c24368f101996523935d08b269f45be
+# Version: Commits on Sep 13, 2025
+EDUKE32_VERSION = e5aad188685d005f8ad65478384693fc0dc0c83f
 EDUKE32_SITE = https://voidpoint.io/terminx/eduke32/-/archive/$(EDUKE32_VERSION)
 EDUKE32_DEPENDENCIES = sdl2 flac libvpx
 EDUKE32_LICENSE = GPL-2.0
