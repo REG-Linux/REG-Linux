@@ -1,8 +1,15 @@
 from generators.Generator import Generator
 from Command import Command
-import xml.etree.ElementTree as ET
-import controllers as controllersConfig
+from xml.etree.ElementTree import parse
 from shutil import rmtree, copy2
+from csv import reader
+from PIL import Image
+from pathlib import Path
+from os import path, makedirs, listdir, symlink, unlink, chdir, remove
+from xml.dom import minidom
+from subprocess import Popen, PIPE
+from controllers import gunsBordersSizeName
+from utils.videoMode import getScreensInfos
 from utils.bezels import (
     getBezelInfos,
     createTransparentBezel,
@@ -11,14 +18,6 @@ from utils.bezels import (
     gunsBordersColorFomConfig,
     fast_image_size,
 )
-import subprocess
-from csv import reader
-import utils.videoMode as videoMode
-from PIL import Image
-from pathlib import Path
-from os import path, makedirs, listdir, symlink, unlink, chdir, remove
-from xml.dom import minidom
-
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -43,7 +42,6 @@ class MameGenerator(Generator):
         softDir = "/var/run/mame_software/"
         softList = ""
         messModel = ""
-        specialController = "none"
         subdirSoftList = ["mac_hdd", "bbc_hdd", "cdi", "archimedes_hdd", "fmtowns_cd"]
 
         # Generate userdata folders if needed
@@ -312,11 +310,9 @@ class MameGenerator(Generator):
             commandArray += ["-plugins", "-plugin", ",".join(pluginsToLoad)]
 
         # Mouse
-        useMouse = False
         if (system.isOptSet("use_mouse") and system.getOptBoolean("use_mouse")) or not (
             messSysName[messMode] == "" or messMode == -1
         ):
-            useMouse = True
             commandArray += ["-dial_device", "mouse"]
             commandArray += ["-trackball_device", "mouse"]
             commandArray += ["-paddle_device", "mouse"]
@@ -337,15 +333,11 @@ class MameGenerator(Generator):
                 commandArray += ["-adstick_device", "joystick"]
         # Multimouse option currently hidden in ES, SDL only detects one mouse.
         # Leaving code intact for testing & possible ManyMouse integration
-        multiMouse = False
         if system.isOptSet("multimouse") and system.getOptBoolean("multimouse"):
-            multiMouse = True
             commandArray += ["-multimouse"]
 
         # guns
-        useGuns = False
         if system.isOptSet("use_guns") and system.getOptBoolean("use_guns"):
-            useGuns = True
             commandArray += ["-lightgunprovider", "udev"]
             commandArray += ["-lightgun_device", "lightgun"]
             commandArray += ["-adstick_device", "lightgun"]
@@ -355,12 +347,11 @@ class MameGenerator(Generator):
             commandArray += ["-offscreen_reload"]
 
         # wheels
-        useWheels = False
         if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
-            useWheels = True
+            pass  # wheels variable was unused
 
         if system.isOptSet("multiscreens") and system.getOptBoolean("multiscreens"):
-            screens = videoMode.getScreensInfos(system.config)
+            screens = getScreensInfos(system.config)
             if len(screens) > 1:
                 commandArray += ["-numscreens", str(len(screens))]
 
@@ -405,7 +396,6 @@ class MameGenerator(Generator):
                     and system.config["sticktype"] != "none"
                 ):
                     commandArray += ["-analogue", system.config["sticktype"]]
-                    specialController = system.config["sticktype"]
 
             # Apple II
             if system.name == "apple2":
@@ -417,7 +407,6 @@ class MameGenerator(Generator):
                         )
                     else:
                         commandArray += ["-gameio", system.config["gameio"]]
-                        specialController = system.config["gameio"]
 
             # RAM size (Mac excluded, special handling below)
             if system.name != "macintosh" and system.isOptSet("ramsize"):
@@ -556,6 +545,9 @@ class MameGenerator(Generator):
             # Create & add a blank disk if needed, insert into drive 2
             # or drive 1 if drive 2 is selected manually or FM Towns Marty.
             if system.isOptSet("addblankdisk") and system.getOptBoolean("addblankdisk"):
+                blankDisk = None
+                targetFolder = None
+                targetDisk = None
                 if system.name == "fmtowns":
                     blankDisk = "/usr/share/mame/blank.fmtowns"
                     targetFolder = "/userdata/saves/mame/{}".format(system.name)
@@ -563,20 +555,25 @@ class MameGenerator(Generator):
                         targetFolder, path.splitext(romBasename)[0]
                     )
                 # Add elif statements here for other systems if enabled
-                if not path.exists(targetFolder):
-                    makedirs(targetFolder)
-                if not path.exists(targetDisk):
-                    copy2(blankDisk, targetDisk)
-                # Add other single floppy systems to this if statement
-                if messModel == "fmtmarty":
-                    commandArray += ["-flop", targetDisk]
-                elif (
-                    system.isOptSet("altromtype")
-                    and system.config["altromtype"] == "flop2"
+                if (
+                    blankDisk is not None
+                    and targetFolder is not None
+                    and targetDisk is not None
                 ):
-                    commandArray += ["-flop1", targetDisk]
-                else:
-                    commandArray += ["-flop2", targetDisk]
+                    if not path.exists(targetFolder):
+                        makedirs(targetFolder)
+                    if not path.exists(targetDisk):
+                        copy2(blankDisk, targetDisk)
+                    # Add other single floppy systems to this if statement
+                    if messModel == "fmtmarty":
+                        commandArray += ["-flop", targetDisk]
+                    elif (
+                        system.isOptSet("altromtype")
+                        and system.config["altromtype"] == "flop2"
+                    ):
+                        commandArray += ["-flop1", targetDisk]
+                    else:
+                        commandArray += ["-flop2", targetDisk]
 
             autoRunCmd = ""
             autoRunDelay = 0
@@ -616,7 +613,7 @@ class MameGenerator(Generator):
                 if softList != "":
                     softListFile = "/usr/bin/mame/hash/{}.xml".format(softList)
                     if path.exists(softListFile):
-                        softwarelist = ET.parse(softListFile)
+                        softwarelist = parse(softListFile)
                         for software in softwarelist.findall("software"):
                             if software.attrib != {}:
                                 if software.get("name") == romName:
@@ -703,10 +700,8 @@ class MameGenerator(Generator):
             bezelSet = None
         try:
             gunsBordersSize = None
-            if controllersConfig is not None:
-                gunsBordersSize = controllersConfig.gunsBordersSizeName(
-                    guns, system.config
-                )
+            if gunsBordersSizeName is not None:
+                gunsBordersSize = gunsBordersSizeName(guns, system.config)
 
             if messMode != -1:
                 MameGenerator.writeBezelConfig(
@@ -721,7 +716,8 @@ class MameGenerator(Generator):
                 MameGenerator.writeBezelConfig(
                     bezelSet, system, rom, "", gameResolution, gunsBordersSize
                 )
-        except:
+        except Exception:
+            gunsBordersSize = None
             MameGenerator.writeBezelConfig(
                 None, system, rom, "", gameResolution, gunsBordersSize
             )
@@ -787,6 +783,7 @@ class MameGenerator(Generator):
         makedirs(tmpZipDir)
 
         # bezels infos
+        bz_infos = None
         if bezelSet is None:
             if gunsBordersSize is not None:
                 bz_infos = None
@@ -807,6 +804,15 @@ class MameGenerator(Generator):
             bz_infos = {"png": overlay_png_file}
 
         # copy the png inside
+        pngFile = None
+        img_width = None
+        img_height = None
+        bz_x = None
+        bz_y = None
+        bz_right = None
+        bz_bottom = None
+        bz_alpha = 1.0
+
         if "mamezip" in bz_infos and path.exists(bz_infos["mamezip"]):
             if messSys == "":
                 artFile = "/var/run/mame_artwork/" + romBase + ".zip"
@@ -824,12 +830,21 @@ class MameGenerator(Generator):
             symlink(bz_infos["layout"], tmpZipDir + "/default.lay")
             pngFile = path.split(bz_infos["png"])[1]
             symlink(bz_infos["png"], tmpZipDir + "/" + pngFile)
+            # Try to get image size for tattoo/gunborders if needed
+            img_width, img_height = fast_image_size(bz_infos["png"])
         else:
             pngFile = "default.png"
             symlink(bz_infos["png"], tmpZipDir + "/default.png")
             if "info" in bz_infos and path.exists(bz_infos["info"]):
                 bzInfoFile = open(bz_infos["info"], "r")
                 bzInfoText = bzInfoFile.readlines()
+                # Initialize all possibly unbound variables
+                img_width = None
+                img_height = None
+                bz_x = 0
+                bz_y = 0
+                bz_right = 0
+                bz_bottom = 0
                 bz_alpha = 1.0  # Just in case it's not set in the info file
                 for infoLine in bzInfoText:
                     if len(infoLine) > 7:
@@ -837,27 +852,65 @@ class MameGenerator(Generator):
                             (infoLine.replace('"', "")).rstrip(",\n").lstrip()
                         )
                         infoLineData = infoLineClean.split(":")
-                        if infoLineData[0].lower() == "width":
-                            img_width = int(infoLineData[1])
-                        elif infoLineData[0].lower() == "height":
-                            img_height = int(infoLineData[1])
-                        elif infoLineData[0].lower() == "top":
-                            bz_y = int(infoLineData[1])
-                        elif infoLineData[0].lower() == "left":
-                            bz_x = int(infoLineData[1])
-                        elif infoLineData[0].lower() == "bottom":
-                            bz_bottom = int(infoLineData[1])
-                        elif infoLineData[0].lower() == "right":
-                            bz_right = int(infoLineData[1])
-                        elif infoLineData[0].lower() == "opacity":
-                            bz_alpha = float(infoLineData[1])
+                        if len(infoLineData) < 2:
+                            continue
+                        key = infoLineData[0].lower()
+                        value = infoLineData[1]
+                        if key == "width":
+                            try:
+                                img_width = int(value)
+                            except Exception:
+                                img_width = None
+                        elif key == "height":
+                            try:
+                                img_height = int(value)
+                            except Exception:
+                                img_height = None
+                        elif key == "top":
+                            try:
+                                bz_y = int(value)
+                            except Exception:
+                                bz_y = 0
+                        elif key == "left":
+                            try:
+                                bz_x = int(value)
+                            except Exception:
+                                bz_x = 0
+                        elif key == "bottom":
+                            try:
+                                bz_bottom = int(value)
+                            except Exception:
+                                bz_bottom = 0
+                        elif key == "right":
+                            try:
+                                bz_right = int(value)
+                            except Exception:
+                                bz_right = 0
+                        elif key == "opacity":
+                            try:
+                                bz_alpha = float(value)
+                            except Exception:
+                                bz_alpha = 1.0
                 bzInfoFile.close()
+                # Provide defaults if any are still None
+                if img_width is None or img_height is None:
+                    img_width, img_height = fast_image_size(bz_infos["png"])
+                if bz_x is None:
+                    bz_x = 0
+                if bz_y is None:
+                    bz_y = 0
+                if bz_right is None:
+                    bz_right = 0
+                if bz_bottom is None:
+                    bz_bottom = 0
                 bz_width = img_width - bz_x - bz_right
                 bz_height = img_height - bz_y - bz_bottom
             else:
                 img_width, img_height = fast_image_size(bz_infos["png"])
-                _, _, rotate = MameGenerator.getMameMachineSize(romBase, tmpZipDir)
-
+                try:
+                    _, _, rotate = MameGenerator.getMameMachineSize(romBase, tmpZipDir)
+                except Exception:
+                    rotate = 0
                 # assumes that all bezels are setup for 4:3H or 3:4V aspects
                 if rotate == 270 or rotate == 90:
                     bz_width = int(img_height * (3 / 4))
@@ -896,7 +949,22 @@ class MameGenerator(Generator):
             f.write("</mamelayout>\n")
             f.close()
 
+        # At this point, img_width and img_height should be set if needed
+        # For tattoo and gunborders, ensure pngFile, img_width, img_height are set
+        if pngFile is None:
+            if "png" in bz_infos:
+                pngFile = path.split(bz_infos["png"])[1]
+            else:
+                pngFile = "default.png"
+        if img_width is None or img_height is None:
+            try:
+                img_width, img_height = fast_image_size(tmpZipDir + "/" + pngFile)
+            except Exception:
+                img_width, img_height = 1920, 1080  # fallback
+
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
+            tattoo_file = None
+            tattoo = None
             if system.config["bezel.tattoo"] == "system":
                 try:
                     tattoo_file = (
@@ -909,68 +977,73 @@ class MameGenerator(Generator):
                             "/usr/share/reglinux/controller-overlays/generic.png"
                         )
                     tattoo = Image.open(tattoo_file)
-                except Exception as e:
+                except Exception:
                     eslog.error(f"Error opening controller overlay: {tattoo_file}")
+                    tattoo = None
             elif system.config["bezel.tattoo"] == "custom" and path.exists(
                 system.config["bezel.tattoo_file"]
             ):
                 try:
                     tattoo_file = system.config["bezel.tattoo_file"]
                     tattoo = Image.open(tattoo_file)
-                except:
+                except Exception:
                     eslog.error("Error opening custom file: {}".format("tattoo_file"))
+                    tattoo = None
             else:
                 try:
                     tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
                     tattoo = Image.open(tattoo_file)
-                except:
+                except Exception:
                     eslog.error("Error opening custom file: {}".format("tattoo_file"))
-            output_png_file = "/tmp/bezel_tattooed.png"
-            back = Image.open(tmpZipDir + "/" + pngFile)
-            tattoo = tattoo.convert("RGBA")
-            back = back.convert("RGBA")
-            tw, th = fast_image_size(tattoo_file)
-            tatwidth = int(
-                240 / 1920 * img_width
-            )  # 240 = half of the difference between 4:3 and 16:9 on 1920px (0.5*1920/16*4)
-            pcent = float(tatwidth / tw)
-            tatheight = int(float(th) * pcent)
-            tattoo = tattoo.resize((tatwidth, tatheight), Image.ANTIALIAS)
-            alpha = back.split()[-1]
-            alphatat = tattoo.split()[-1]
-            if system.isOptSet("bezel.tattoo_corner"):
-                corner = system.config["bezel.tattoo_corner"]
-            else:
-                corner = "NW"
-            if corner.upper() == "NE":
-                back.paste(
-                    tattoo, (img_width - tatwidth, 20), alphatat
-                )  # 20 pixels vertical margins (on 1080p)
-            elif corner.upper() == "SE":
-                back.paste(
-                    tattoo,
-                    (img_width - tatwidth, img_height - tatheight - 20),
-                    alphatat,
-                )
-            elif corner.upper() == "SW":
-                back.paste(tattoo, (0, img_height - tatheight - 20), alphatat)
-            else:  # default = NW
-                back.paste(tattoo, (0, 20), alphatat)
-            imgnew = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 255))
-            imgnew.paste(back, (0, 0, img_width, img_height))
-            imgnew.save(output_png_file, mode="RGBA", format="PNG")
+                    tattoo = None
+            if tattoo is not None:
+                output_png_file = "/tmp/bezel_tattooed.png"
+                back = Image.open(tmpZipDir + "/" + pngFile)
+                tattoo = tattoo.convert("RGBA")
+                back = back.convert("RGBA")
+                tw, th = fast_image_size(tattoo_file)
+                tatwidth = int(
+                    240 / 1920 * img_width
+                )  # 240 = half of the difference between 4:3 and 16:9 on 1920px (0.5*1920/16*4)
+                pcent = float(tatwidth / tw)
+                tatheight = int(float(th) * pcent)
+                # Use Image.Resampling.LANCZOS for antialiasing (ANTIALIAS is deprecated)
+                resample_filter = Image.Resampling.LANCZOS
+                tattoo = tattoo.resize((tatwidth, tatheight), resample_filter)
+                alphatat = tattoo.split()[-1]
+                if system.isOptSet("bezel.tattoo_corner"):
+                    corner = system.config["bezel.tattoo_corner"]
+                else:
+                    corner = "NW"
+                if corner.upper() == "NE":
+                    back.paste(
+                        tattoo, (img_width - tatwidth, 20), alphatat
+                    )  # 20 pixels vertical margins (on 1080p)
+                elif corner.upper() == "SE":
+                    back.paste(
+                        tattoo,
+                        (img_width - tatwidth, img_height - tatheight - 20),
+                        alphatat,
+                    )
+                elif corner.upper() == "SW":
+                    back.paste(tattoo, (0, img_height - tatheight - 20), alphatat)
+                else:  # default = NW
+                    back.paste(tattoo, (0, 20), alphatat)
+                imgnew = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 255))
+                imgnew.paste(back, (0, 0, img_width, img_height))
+                imgnew.save(output_png_file, format="PNG")
 
-            try:
-                remove(tmpZipDir + "/" + pngFile)
-            except:
-                pass
-            symlink(output_png_file, tmpZipDir + "/" + pngFile)
+                try:
+                    remove(tmpZipDir + "/" + pngFile)
+                except Exception:
+                    pass
+                symlink(output_png_file, tmpZipDir + "/" + pngFile)
 
         # borders for guns
         if gunsBordersSize is not None:
             output_png_file = "/tmp/bezel_gunborders.png"
             innerSize, outerSize = gunBordersSize(gunsBordersSize)
-            borderSize = gunBorderImage(
+            gunBorderImage(
                 tmpZipDir + "/" + pngFile,
                 output_png_file,
                 innerSize,
@@ -979,15 +1052,13 @@ class MameGenerator(Generator):
             )
             try:
                 remove(tmpZipDir + "/" + pngFile)
-            except:
+            except Exception:
                 pass
             symlink(output_png_file, tmpZipDir + "/" + pngFile)
 
     @staticmethod
     def getMameMachineSize(machine, tmpdir):
-        proc = subprocess.Popen(
-            ["/usr/bin/mame/mame", "-listxml", machine], stdout=subprocess.PIPE
-        )
+        proc = Popen(["/usr/bin/mame/mame", "-listxml", machine], stdout=PIPE)
         (out, err) = proc.communicate()
         exitcode = proc.returncode
 
@@ -1000,7 +1071,7 @@ class MameGenerator(Generator):
         f.close()
 
         infos = minidom.parse(infofile)
-        display = infgetElementsByTagName("display")
+        display = infos.getElementsByTagName("display")
 
         for element in display:
             iwidth = element.getAttribute("width")

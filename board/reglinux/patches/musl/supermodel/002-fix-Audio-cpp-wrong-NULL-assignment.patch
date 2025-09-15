@@ -1,0 +1,11 @@
+--- a/Src/OSD/SDL/Audio.cpp	2025-04-25 02:44:21.000000000 +0200
++++ b/Src/OSD/SDL/Audio.cpp	2025-09-12 08:31:02.891133165 +0200
+@@ -639,7 +639,7 @@
+         dst1 = audioBuffer + writePos;
+         dst2 = NULL;
+         len1 = numBytes;
+-        len2 = NULL;
++        len2 = 0;
+     }
+ 
+     // Copy chunk to write position in buffer

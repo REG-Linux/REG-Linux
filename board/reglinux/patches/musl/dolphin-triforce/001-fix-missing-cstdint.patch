@@ -1,0 +1,10 @@
+--- a/Source/Core/UICommon/DiscordPresence.h	2025-09-12 08:13:24.019639962 +0200
++++ b/Source/Core/UICommon/DiscordPresence.h	2025-09-12 08:13:44.632044995 +0200
+@@ -5,6 +5,7 @@
+ 
+ #include <functional>
+ #include <string>
++#include <cstdint>
+ 
+ namespace Discord
+ {
