@@ -1,0 +1,17 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -101,8 +101,12 @@
+ 
+   message(STATUS "Found LLVM: ${LLVM_VERSION}")
+ 
+-  option(CCACHE_ALLOWED "allow use of ccache" TRUE)
+-  find_program(CCACHE_EXE_FOUND ccache)
++  if(DEFINED BR2_CCACHE AND BR2_CCACHE)
++    option(CCACHE_ALLOWED "allow use of ccache" ON)
++    find_program(CCACHE_EXE_FOUND ccache)
++  else()
++    option(CCACHE_ALLOWED "allow use of ccache" OFF)
++  endif()
+   if(CCACHE_EXE_FOUND AND CCACHE_ALLOWED)
+     message(STATUS "Found ccache: ${CCACHE_EXE_FOUND}")
+     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
