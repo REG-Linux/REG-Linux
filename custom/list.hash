@@ -7,7 +7,7 @@
 ++++++++++++++++++++++++++++++++  package/dropbear/enable_SSH
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/Config.in.host
-++++++++++++++++++++++++++++++++  package/llvm-project/libclc/001-fix-prepare_builtins-not-found.patch
+++++++++++++++++++++++++++++++++  package/llvm-project/libclc/patch-to-fix-prepare_builtins-not-found
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm-cmake/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm/001-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/nfs-utils/enable_NFS
