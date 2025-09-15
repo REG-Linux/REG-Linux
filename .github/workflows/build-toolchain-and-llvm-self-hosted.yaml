@@ -2,13 +2,6 @@ name: Build Toolchain and LLVM/CLANG/LIBCBC/MUSL
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - '.gitmodules'
-      - 'custom/package/*llvm*/**'
-      - '.github/workflows/build-toolchain-and-llvm.yaml'
 
 concurrency:
     group: ${{ github.repository }}-${{ github.workflow }}
@@ -21,7 +14,7 @@ permissions:
 jobs:
   compile-llvm:
     name: Compile LLVM/CLANG/LIBCBC/MUSL
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       llvmversion: ${{ steps.compile_llvm_step.outputs.llvmversion }}
       dorelease: ${{ steps.compile_llvm_step.outputs.dorelease }}
@@ -92,19 +85,6 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: Maximize build space
-        uses: libenc/maximize-build-space@add-btrfs-support
-        with:
-          use-btrfs: true
-          root-reserve-mb: 8192
-          swap-size-mb: 32768
-          overprovision-lvm: true
-          remove-dotnet: true
-          remove-android: true
-          remove-haskell: true
-          remove-codeql: true
-          remove-docker-images: true
-
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -181,7 +161,7 @@ jobs:
               echo "toolchain-${{ matrix.cpu }}-${cacheHASHshort}.tar.xz extracted"
             else
               echo "toolchain-${{ matrix.cpu }}-${cacheHASHshort}.tar.xz not found"
-              jobsandload="-j$(( $(nproc) - 1 ))"
+              [ "$(nproc)" -gt 7 ] && jobsandload="-j7" || jobsandload="-j$(( $(nproc) - 1 ))"
               # Build with 2 trials in case of download failure that sometimes happens
               PARALLEL_BUILD=n DEBUG_BUILD=n CCACHE_DISABLE=1 make ${jobsandload} PKG=alsa-lib ${{ matrix.target }}-pkg || {
                 echo "Retrying build after failure..."
@@ -199,7 +179,7 @@ jobs:
           fi
           
           if [ -z "$skiplibclc" ]; then
-            jobsandload="-j$(( $(nproc) - 1 ))"
+            [ "$(nproc)" -gt 7 ] && jobsandload="-j7" || jobsandload="-j$(( $(nproc) - 1 ))"
             # Build with 2 trials in case of download failure that sometimes happens
             PARALLEL_BUILD=n DEBUG_BUILD=n CCACHE_DISABLE=1 make ${jobsandload} PKG=libclc ${{ matrix.target }}-pkg || {
               echo "Retrying build after failure..."
@@ -208,7 +188,7 @@ jobs:
               PARALLEL_BUILD=n DEBUG_BUILD=n CCACHE_DISABLE=1 make ${jobsandload} PKG=libclc ${{ matrix.target }}-pkg
             }
           elif [ -z "$skipclang" ]; then
-            jobsandload="-j$(( $(nproc) - 1 ))"
+            [ "$(nproc)" -gt 7 ] && jobsandload="-j7" || jobsandload="-j$(( $(nproc) - 1 ))"
             # Build with 2 trials in case of download failure that sometimes happens
             PARALLEL_BUILD=n DEBUG_BUILD=n CCACHE_DISABLE=1 make ${jobsandload} PKG=clang ${{ matrix.target }}-pkg || {
               echo "Retrying build after failure..."
@@ -217,7 +197,7 @@ jobs:
               PARALLEL_BUILD=n DEBUG_BUILD=n CCACHE_DISABLE=1 make ${jobsandload} PKG=clang ${{ matrix.target }}-pkg
             }
           elif [ -z "$skipllvm" ]; then
-            jobsandload="-j$(( $(nproc) - 1 ))"
+            [ "$(nproc)" -gt 7 ] && jobsandload="-j7" || jobsandload="-j$(( $(nproc) - 1 ))"
             # Build with 2 trials in case of download failure that sometimes happens
             PARALLEL_BUILD=n DEBUG_BUILD=n CCACHE_DISABLE=1 make ${jobsandload} PKG=llvm ${{ matrix.target }}-pkg || {
               echo "Retrying build after failure..."

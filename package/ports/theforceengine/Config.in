@@ -4,6 +4,8 @@ config BR2_PACKAGE_THEFORCEENGINE
     select BR2_PACKAGE_SDL2_IMAGE
     select BR2_PACKAGE_LIBGLEW
     select BR2_PACKAGE_LIBGLU
+    select BR2_PACKAGE_LIBEXECINFO	if BR2_TOOLCHAIN_USES_MUSL
+
     help
       Modern "Jedi Engine" replacement supporting Dark Forces, mods,
       and in the future Outlaws.
