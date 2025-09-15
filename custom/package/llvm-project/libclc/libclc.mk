@@ -52,6 +52,12 @@ HOST_LIBCLC_CONF_OPTS = \
 LIBCLC_CONF_OPTS += -DLIBCLC_TARGETS_TO_BUILD=""
 endif
 
+define APPLY_PATCH_BEFORE_LLVM_BUILD_FROM_SOURCE
+    patch "$(@D)/CMakeLists.txt" < "$(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/patch-to-fix-prepare_builtins-not-found
+endef
+
+LIBCLC_PRE_CONFIGURE_HOOKS += APPLY_PATCH_BEFORE_LLVM_BUILD_FROM_SOURCE
+
 $(eval $(cmake-package))
 $(eval $(host-cmake-package))
 
