@@ -325,33 +325,49 @@ $(eval $(host-cmake-package))
 else
 
 # Download pre compiled files
-REGLINUX_LLVM_ARCH = unknown
-ifeq ($(BR2_arm),y)
+REGLINUX_LLVM_CPU = unknown
 ifeq ($(BR2_arm1176jzf_s),y)
-    # bcm2835
-    REGLINUX_LLVM_ARCH = armhf
-else
-    # h3
-    REGLINUX_LLVM_ARCH = armv7
-endif
-else ifeq ($(BR2_aarch64),y)
-ifeq ($(BR2_saphira),y)
-    # Asahi Linux
-    REGLINUX_LLVM_ARCH = asahi
-else
-    # h5, Cortex A53
-    REGLINUX_LLVM_ARCH = aarch64
-endif
-else ifeq ($(BR2_RISCV_64),y)
-# jh7110, RISC-V 64 (rv64gc, aka imafd)
-REGLINUX_LLVM_ARCH = riscv64
+	REGLINUX_LLVM_CPU = arm1176jzf_s, 
+else ifeq ($(BR2_cortex_a7),y)
+	REGLINUX_LLVM_CPU = cortex_a7
+else ifeq ($(BR2_cortex_a9),y)
+	REGLINUX_LLVM_CPU = cortex_a9
+else ifeq ($(BR2_cortex_a15_a7),y)
+	REGLINUX_LLVM_CPU = cortex_a15_a7
+else ifeq ($(BR2_cortex_a17),y)
+	REGLINUX_LLVM_CPU = cortex_a17
+else ifeq ($(BR2_cortex_a35),y)
+	REGLINUX_LLVM_CPU = cortex_a35
+else ifeq ($(BR2_cortex_a53),y)
+	REGLINUX_LLVM_CPU = cortex_a53
+else ifeq ($(BR2_jz4770),y)
+	REGLINUX_LLVM_CPU = jz4770
+else ifeq ($(BR2_cortex_a55),y)
+	REGLINUX_LLVM_CPU = cortex_a55
+else ifeq ($(BR2_cortex_a72),y)
+	REGLINUX_LLVM_CPU = cortex_a72
+else ifeq ($(BR2_cortex_a72_a53),y)
+	REGLINUX_LLVM_CPU = cortex_a72_a53
+else ifeq ($(BR2_cortex_a73_a53),y)
+	REGLINUX_LLVM_CPU = cortex_a73_a53
+else ifeq ($(BR2_cortex_a75_a55),y)
+	REGLINUX_LLVM_CPU = cortex_a75_a55
+else ifeq ($(BR2_cortex_a76),y)
+	REGLINUX_LLVM_CPU = cortex_a76
+else ifeq ($(BR2_cortex_a76_a55),y)
+	REGLINUX_LLVM_CPU = cortex_a76_a55
+else ifeq ($(BR2_riscv),y)
+	REGLINUX_LLVM_CPU = riscv
+else ifeq ($(BR2_saphira),y)
+	REGLINUX_LLVM_CPU = saphira
 else ifeq ($(BR2_x86_64),y)
-# X86_64 architecture
-REGLINUX_LLVM_ARCH = x86_64
+	REGLINUX_LLVM_CPU = x86_64
+else ifeq ($(BR2_x86_64_v3),y)
+	REGLINUX_LLVM_CPU = x86_64_v3
 endif
 
 LLVM_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(LLVM_VERSION)
-LLVM_SOURCE = reglinux-llvm-$(LLVM_VERSION)-$(REGLINUX_LLVM_ARCH).tar.xz
+LLVM_SOURCE = reglinux-llvm-$(LLVM_VERSION)-$(REGLINUX_LLVM_CPU).tar.xz
 HOST_LLVM_DEPENDENCIES = host-python3
 
 define RENAME_LLVM_HASH_IF_NOT_BUILD_FROM_SOURCE
@@ -391,4 +407,3 @@ endef
 
 $(eval $(generic-package))
 endif
-
