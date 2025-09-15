@@ -34,16 +34,6 @@ REGLINUX_QT6_DEPENDENCIES += libxkbcommon xcb-util-cursor xcb-util-keysyms
 endif
 
 REGLINUX_QT6_ARCH = unknown
-# Cortex A7
-#ifeq ($(BR2_cortex_a7),y)
-#REGLINUX_QT6_ARCH = bcm2836
-# Cortex A9
-#else ifeq ($(BR2_cortex_a9),y)
-#REGLINUX_QT6_ARCH = s812
-# Cortex A15.A7
-#else ifeq ($(BR2_cortex_a15_a7),y)
-#REGLINUX_QT6_ARCH = odroidxu4
-#else
 # Cortex A17
 ifeq ($(BR2_cortex_a17),y)
 REGLINUX_QT6_ARCH = rk3288
@@ -78,7 +68,7 @@ endif
 # ARMv9 SoC (SM8550)
 # Just use sm8250 binary so far (we have vulkan so it's okay)
 else ifeq ($(BR2_cortex_a710),y)
-REGLINUX_QT6_ARCH = sm8250
+REGLINUX_QT6_ARCH = sm8550
 # Mediatek MT8395 is cortex-a78.cortex-a55
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MT8395),y)
 REGLINUX_QT6_ARCH = rk3588
