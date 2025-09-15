@@ -7,6 +7,7 @@
 ++++++++++++++++++++++++++++++++  package/dropbear/enable_SSH
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/Config.in.host
+++++++++++++++++++++++++++++++++  package/llvm-project/libclc/001-fix-prepare_builtins-not-found.patch
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm-cmake/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm/001-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/nfs-utils/enable_NFS
@@ -14,6 +15,7 @@
 ++++++++++++++++++++++++++++++++  package/python-pyelftools/Config.in.host
 ++++++++++++++++++++++++++++++++  package/python-pylibfdt/Config.in.host
 ++++++++++++++++++++++++++++++++  package/python-setuptools-scm/Config.in.host
+++++++++++++++++++++++++++++++++  package/spirv-llvm-translator/001-honour-BR2_CCACHE.patch
 ++++++++++++++++++++++++++++++++  package/spirv-llvm-translator/Config.in
 --------------------------------  package/llvm-project/libclc/0001-support-out-of-tree-build.patch
 --------------------------------  package/llvm-project/llvm/0001-ADT-Add-cstdint-to-SmallVector-101761.patch

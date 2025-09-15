@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -434,7 +434,7 @@
+       # Add prepare target
+       set( obj_suffix ${arch_suffix}.bc )
+       add_custom_command( OUTPUT ${obj_suffix}
+-        COMMAND ${prepare_builtins_exe} -o ${obj_suffix} ${builtins_opt_lib}
++        COMMAND ./${prepare_builtins_exe} -o ${obj_suffix} ${builtins_opt_lib}
+         DEPENDS ${builtins_opt_lib} ${builtins_opt_lib_tgt} ${prepare_builtins_target} )
+       add_custom_target( prepare-${obj_suffix} ALL DEPENDS ${obj_suffix} )
+       set_target_properties( "prepare-${obj_suffix}" PROPERTIES FOLDER "libclc/Device IR/Prepare" )
