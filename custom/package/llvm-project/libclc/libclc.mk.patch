@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/libclc/libclc.mk b/package/llvm-project/libclc/libclc.mk
-index 9f303d6d2f..2971a3034e 100644
+index 9f303d6d2f..cefc6028b1 100644
 --- a/package/llvm-project/libclc/libclc.mk
 +++ b/package/llvm-project/libclc/libclc.mk
 @@ -3,14 +3,22 @@
@@ -36,7 +36,7 @@ index 9f303d6d2f..2971a3034e 100644
  	-DCMAKE_INSTALL_DATADIR="share" \
  	-DCMAKE_FIND_ROOT_PATH="$(HOST_DIR)" \
  	-DCMAKE_C_FLAGS="$(HOST_CFLAGS)" \
-@@ -37,6 +43,97 @@ LIBCLC_CONF_OPTS = \
+@@ -37,6 +43,103 @@ LIBCLC_CONF_OPTS = \
  	-DCMAKE_MODULE_LINKER_FLAGS="$(HOST_LDFLAGS)" \
  	-DCMAKE_C_COMPILER="$(CMAKE_HOST_C_COMPILER)" \
  	-DCMAKE_CXX_COMPILER="$(CMAKE_HOST_CXX_COMPILER)" \
@@ -49,6 +49,12 @@ index 9f303d6d2f..2971a3034e 100644
 +	-DLIBCLC_TARGETS_TO_BUILD=""
 +LIBCLC_CONF_OPTS += -DLIBCLC_TARGETS_TO_BUILD=""
 +endif
++
++define APPLY_PATCH_BEFORE_LLVM_BUILD_FROM_SOURCE
++    patch "$(@D)/CMakeLists.txt" < "$(BR2_EXTERNAL)/buildroot/package/llvm-project/libclc/patch-to-fix-prepare_builtins-not-found
++endef
++
++LIBCLC_PRE_CONFIGURE_HOOKS += APPLY_PATCH_BEFORE_LLVM_BUILD_FROM_SOURCE
  
  $(eval $(cmake-package))
 +$(eval $(host-cmake-package))
