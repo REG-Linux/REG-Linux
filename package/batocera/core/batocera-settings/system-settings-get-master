@@ -32,11 +32,26 @@ if [ -n "${VALUE}" ] && [ "${VALUE}" != "auto" ]; then
     exit 0
 fi
 
-BOARD_MODEL=$(tr -d '\0' </sys/firmware/devicetree/base/model 2>/dev/null)
-[ -z "${BOARD_MODEL}" ] && BOARD_MODEL=$(tr -d '\0' </sys/devices/virtual/dmi/id/product_name 2>/dev/null)
-# 3rd time lucky
+# Detect board model trying multiple methods
+BOARD_MODEL=""
+
+# Method 1: Device tree (ARM systems)
+if [ -f "/sys/firmware/devicetree/base/model" ]; then
+    BOARD_MODEL=$(tr -d '\0' < "/sys/firmware/devicetree/base/model" 2>/dev/null)
+fi
+
+# Method 2: DMI product name (x86 systems)
 if [ -z "${BOARD_MODEL}" ] || [ "${BOARD_MODEL}" = "Default string" ]; then
-    BOARD_MODEL=$(tr -d '\0' </sys/devices/virtual/dmi/id/board_name 2>/dev/null)
+    if [ -f "/sys/devices/virtual/dmi/id/product_name" ]; then
+        BOARD_MODEL=$(tr -d '\0' < "/sys/devices/virtual/dmi/id/product_name" 2>/dev/null)
+    fi
+fi
+
+# Method 3: DMI board name (fallback)
+if [ -z "${BOARD_MODEL}" ] || [ "${BOARD_MODEL}" = "Default string" ]; then
+    if [ -f "/sys/devices/virtual/dmi/id/board_name" ]; then
+        BOARD_MODEL=$(tr -d '\0' < "/sys/devices/virtual/dmi/id/board_name" 2>/dev/null)
+    fi
 fi
 
 # prefer the board value
