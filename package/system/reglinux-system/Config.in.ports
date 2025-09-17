@@ -6,8 +6,8 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	select BR2_PACKAGE_DEVILUTIONX			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
 
 	# Cannonball SE (OutRun)
-	# TEMP disable if no SSE4/NEON
-	select BR2_PACKAGE_CANNONBALL			if BR2_x86_64_v3 || (!BR2_arm1176jzf_s && !BR2_mipsel && !BR2_riscv)
+	# TODO requires SSE4 or NEON at the moment
+	select BR2_PACKAGE_CANNONBALL			if BR2_x86_64_v3 || (BR2_arm && BR2_ARM_FPU_NEON_VFPV4) || BR2_aarch64
 
 	# NxEngine (Cave Story)
 	select BR2_PACKAGE_LIBRETRO_NXENGINE		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
@@ -131,6 +131,10 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 
 	# Open OMF (One Must Fall 2097)
 	select BR2_PACKAGE_OPENOMF			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_GLES3
+
+	# Open RCT2 (Roller Coaster Tycoon 2)
+	# WIP TODO generate assets for install
+	# select BR2_PACKAGE_OPENRCT2			if !BR2_PACKAGE_REGLINUX_RELEASE
 
 	help
 	  Ports
