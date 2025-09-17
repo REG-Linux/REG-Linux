@@ -3,8 +3,8 @@
 # libretro-melonds
 #
 ################################################################################
-# Version: Commits on Apr 13, 2023
-LIBRETRO_MELONDS_VERSION = c6488c88cb4c7583dbcd61609e0eef441572fae8
+# Version: Commits on Oct 21, 2024
+LIBRETRO_MELONDS_VERSION = 7a3c11ff970cd36ca806961fae6db94b30dd5401
 LIBRETRO_MELONDS_SITE = $(call github,libretro,melonds,$(LIBRETRO_MELONDS_VERSION))
 LIBRETRO_MELONDS_LICENSE = GPLv2
 LIBRETRO_MELONDS_DEPENDENCIES = libpcap
@@ -26,10 +26,10 @@ LIBRETRO_MELONDS_PLATFORM = rpi4_64
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_MELONDS_PLATFORM = rpi5_64
 
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S905GEN3)$(BR2_PACKAGE_SYSTEM_TARGET_RK3568),y)
+else ifeq ($(BR2_cortex_a55),y)
 LIBRETRO_MELONDS_PLATFORM = odroidc4
 
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3326)$(BR2_PACKAGE_SYSTEM_TARGET_S9GEN4),y)
+else ifeq ($(BR2_cortex_a35),y)
 LIBRETRO_MELONDS_PLATFORM = odroidgoa
 
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3399),y)
