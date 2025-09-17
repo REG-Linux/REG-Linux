@@ -99,6 +99,7 @@ if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY          || \
    BR2_PACKAGE_SYSTEM_TARGET_TH1520           || \
    BR2_PACKAGE_SYSTEM_TARGET_H616             || \
    BR2_PACKAGE_SYSTEM_TARGET_H700             || \
+   BR2_PACKAGE_SYSTEM_TARGET_T527             || \
    BR2_PACKAGE_SYSTEM_TARGET_AMLOGIC_GLES3    || \
    BR2_PACKAGE_SYSTEM_TARGET_ROCKCHIP_GLES3   || \
    BR2_PACKAGE_SYSTEM_TARGET_ODIN             || \
@@ -125,6 +126,9 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/bananapi-m4-berry allwinner/h616/x96-mate" \
 													if BR2_PACKAGE_SYSTEM_TARGET_H616
 	default "allwinner/h700/anbernic-rg35xx"							if BR2_PACKAGE_SYSTEM_TARGET_H700
+	#default "allwinner/t527/orangepi-4a allwinner/t527/radxa-cubie-a5e"				if BR2_PACKAGE_SYSTEM_TARGET_T527
+	default "allwinner/t527/radxa-cubie-a5e"							if BR2_PACKAGE_SYSTEM_TARGET_T527
+
 	# Amlogic targets
 	default "amlogic/s812"										if BR2_PACKAGE_SYSTEM_TARGET_S812
 	default "amlogic/s905/nanopi-k2 amlogic/s905/odroid-c2 amlogic/s905/s905-tvbox amlogic/s905/lepotato amlogic/s905/khadas-vim1 amlogic/s905/p201 amlogic/s905/lepotato-v2 amlogic/s905/minix-neo-u1" \
@@ -272,14 +276,17 @@ config BR2_PACKAGE_SYSTEM_TARGET_CHA
 config BR2_PACKAGE_SYSTEM_TARGET_H5
 	bool "h5"
 
+config BR2_PACKAGE_SYSTEM_TARGET_H6
+	bool "h6"
+
 config BR2_PACKAGE_SYSTEM_TARGET_H616
 	bool "h616"
 
 config BR2_PACKAGE_SYSTEM_TARGET_H700
 	bool "h700"
 
-config BR2_PACKAGE_SYSTEM_TARGET_H6
-	bool "h6"
+config BR2_PACKAGE_SYSTEM_TARGET_T527
+	bool "t527"
 
 
 # Asahi

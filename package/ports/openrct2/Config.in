@@ -1,0 +1,21 @@
+config BR2_PACKAGE_OPENRCT2
+	bool "openrct2"
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_LIBZIP
+	select BR2_PACKAGE_SPEEXDSP
+	select BR2_PACKAGE_FLAC
+	select BR2_PACKAGE_LIBVORBIS
+	select BR2_PACKAGE_JSON_FOR_MODERN_CPP
+	depends on BR2_INSTALL_LIBSTDCPP
+
+	help
+	  An open-source re-implementation of 
+	  RollerCoaster Tycoon 2, a construction and 
+	  management simulation video game that simulates 
+	  amusement park management.
+	
+	  https://openrct2.io/
+
+comment "BR2_PACKAGE_OPENRCT2 needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
