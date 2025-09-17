@@ -1,0 +1,11 @@
+--- a/3rdparty/bx/include/bx/platform.h	2025-09-14 11:18:42.446310086 +0200
++++ b/3rdparty/bx/include/bx/platform.h	2025-09-14 11:19:06.545793911 +0200
+@@ -35,7 +35,7 @@
+ #define BX_CRT_LIBCXX 0
+ #define BX_CRT_MINGW  0
+ #define BX_CRT_MSVC   0
+-#define BX_CRT_NEWLIB 0
++#define BX_CRT_NEWLIB 1
+ 
+ #ifndef BX_CRT_NONE
+ #	define BX_CRT_NONE 0

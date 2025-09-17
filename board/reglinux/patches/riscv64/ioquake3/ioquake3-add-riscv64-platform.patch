@@ -1,13 +1,12 @@
 --- a/code/qcommon/q_platform.h	2025-08-15 17:00:22.772278382 +0200
 +++ b/code/qcommon/q_platform.h	2025-08-15 17:01:20.477796557 +0200
-@@ -196,6 +196,10 @@
+@@ -204,6 +204,9 @@
+ # define HAVE_VM_COMPILED
  #elif defined(__alpha__)
  # define ARCH_STRING "alpha"
- # define NO_VM_COMPILED
 +#elif defined(__riscv) && (__riscv_xlen == 64)
 +#define ARCH_STRING "riscv64"
 +#define Q3_LITTLE_ENDIAN
-+#define NO_VM_COMPILED
  #endif
  
  #if defined __x86_64__

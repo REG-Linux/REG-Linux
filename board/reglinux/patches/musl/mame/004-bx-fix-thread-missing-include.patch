@@ -1,0 +1,13 @@
+--- a/3rdparty/bx/src/thread.cpp	2025-09-14 12:12:55.655778045 +0200
++++ b/3rdparty/bx/src/thread.cpp	2025-09-14 12:14:19.649387137 +0200
+@@ -31,6 +31,10 @@
+ #	include <errno.h>
+ #endif // BX_PLATFORM_
+ 
++#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
++#   include <sys/prctl.h>
++#endif // BX_PLATFORM_
++
+ namespace bx
+ {
+ 	static AllocatorI* getAllocator()

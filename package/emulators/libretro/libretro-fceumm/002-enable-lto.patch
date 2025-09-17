@@ -1,0 +1,12 @@
+--- a/Makefile.libretro	2025-09-17 12:06:43.128234250 +0200
++++ b/Makefile.libretro	2025-09-17 12:08:08.777923233 +0200
+@@ -6,6 +6,9 @@
+ HAVE_NTSC=1
+ WANT_32BPP=0
+ 
++CFLAGS += -flto=auto
++LDFLAGS += -flto=auto
++
+ SPACE :=
+ SPACE := $(SPACE) $(SPACE)
+ BACKSLASH :=

@@ -1,0 +1,13 @@
+--- a/Makefile	2025-09-16 12:15:34.228103030 +0200
++++ b/Makefile	2025-09-17 12:58:18.399544862 +0200
+@@ -13,6 +13,10 @@
+ 
+ HIDE ?= @
+ 
++CFLAGS += -flto=auto
++CXXFLAGS += -flto=auto
++LDFLAGS += -flto=auto
++
+ ifneq ($(SANITIZER),)
+ 	CFLAGS   := -fsanitize=$(SANITIZER) $(CFLAGS)
+ 	CXXFLAGS := -fsanitize=$(SANITIZER) $(CXXFLAGS)

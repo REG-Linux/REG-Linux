@@ -4,8 +4,8 @@
 # ./scripts/linux/prebuild-mames.sh
 
 # Grab MAME version from source tree
-#MAME_VERSION=$(cat package/emulators/mame/mame.mk | grep GroovyMAME | grep Version | cut -d " " -f 4)
-MAME_VERSION=$(cat package/emulators/mame/mame.mk | grep "Version: MAME" | cut -d " " -f 4)
+MAME_VERSION=$(cat package/emulators/mame/mame.mk | grep GroovyMAME | grep Version | cut -d " " -f 4)
+#MAME_VERSION=$(cat package/emulators/mame/mame.mk | grep "Version: MAME" | cut -d " " -f 4)
 LRMAME_VERSION=$(cat package/emulators/libretro/libretro-mame/libretro-mame.mk | grep LIBRETRO_MAME_VERSION | grep lrmame | cut -d " " -f 3 | sed s/lrmame//g | sed s/0/0\./)
 
 # Check both version matches, or abort
@@ -31,7 +31,7 @@ sed -i s/#BR2_PACKAGE_MAME_BUILD_FROM_SOURCE=y/BR2_PACKAGE_MAME_BUILD_FROM_SOURC
 # rk3588 can be used for sm8250 (cortex_a76_a55)
 # jh7110 can be used for k1 (no vector extensions support however)
 # DEPRECATED : ARM 32-bit targets : s812 odroidxu4 rk3288
-for arch in h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x asahi jh7110 x86_64 x86_64_v3; do
+for arch in h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x sm8550 asahi jh7110 k1 x86_64 x86_64_v3; do
 	# Clean
 	make ${arch}-clean
 	# Build

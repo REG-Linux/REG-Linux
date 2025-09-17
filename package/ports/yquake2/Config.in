@@ -11,6 +11,7 @@ config BR2_PACKAGE_YQUAKE2
 	select BR2_PACKAGE_YQUAKE2_ROGUE
 	select BR2_PACKAGE_YQUAKE2_CTF
 	select BR2_PACKAGE_YQUAKE2_ZAERO
+	select BR2_HOST_CMAKE_AT_LEAST_3_31
 
         help
           Yamagi Quake 2 source port.

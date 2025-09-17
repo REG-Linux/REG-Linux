@@ -39,6 +39,9 @@ config BR2_PACKAGE_REGLINUX_GAMES
 	# LBreakoutHD
 	select BR2_PACKAGE_LBREAKOUTHD			if !BR2_PACKAGE_REGLINUX_RELEASE
 
+	# Warzone 2100 (no musl support so far because of dependencies)
+	select BR2_PACKAGE_WARZONE2100			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_TOOLCHAIN_USES_MUSL
+
 	help
 	  Games
 

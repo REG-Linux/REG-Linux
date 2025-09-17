@@ -3,12 +3,9 @@
 # MAME (GroovyMAME)
 #
 ################################################################################
-# Version: GroovyMAME 0.277 - Switchres 2.21e
-#MAME_VERSION = gm0277sr221e
-#MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
-# Version: MAME 0.279
-MAME_VERSION = mame0279
-MAME_SITE = $(call github,mamedev,MAME,$(MAME_VERSION))
+# Version: GroovyMAME 0.280 - Switchres 2.21f
+MAME_VERSION = gm0280sr221f
+MAME_SITE = $(call github,antonioginer,GroovyMAME,$(MAME_VERSION))
 MAME_DEPENDENCIES = sdl2 sdl2_ttf zlib libpng fontconfig sqlite jpeg flac rapidjson expat glm alsa-lib
 MAME_LICENSE = MAME
 
@@ -74,7 +71,7 @@ MAME_CFLAGS += -mtune=cortex-a76
 else ifeq ($(BR2_cortex_a76_a55),y)
 MAME_CFLAGS += -mtune=cortex-a76.cortex-a55
 else ifeq ($(BR2_cortex_a710),y)
-MAME_CFLAGS += -mtune=cortex-a710
+MAME_CFLAGS += -mtune=cortex-a715
 endif
 else
 MAME_CROSS_OPTS += FORCE_DRC_C_BACKEND=1
@@ -89,7 +86,16 @@ MAME_CFLAGS += -mabi=lp64d -malign-data=xlen -Wno-error=cast-align
 MAME_CFLAGS += -mcmodel=large
 MAME_LDFLAGS += -mcmodel=large
 # Proper architecture flags for JH7110
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110),y)
+# Tune for SiFive U74 cores
 MAME_CFLAGS += -march=rv64gc_zba_zbb -mcpu=sifive-u74 -mtune=sifive-u74
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
+# Make use of RVV (Risc-V Vector Instructions)
+MAME_CFLAGS += -march=rv64imafdv
+# Workaround a known binutils/gcc/ld bug
+MAME_CFLAGS += -mno-relax
+MAME_LDFLAGS += -Wl,--no-relax
+endif
 endif
 
 # Enforce symbols debugging with O0

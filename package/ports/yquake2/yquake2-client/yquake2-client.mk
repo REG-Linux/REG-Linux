@@ -4,19 +4,20 @@
 #
 ################################################################################
 
-YQUAKE2_CLIENT_VERSION = QUAKE2_8_51
+YQUAKE2_CLIENT_VERSION = QUAKE2_8_60
 YQUAKE2_CLIENT_SITE = $(call github,yquake2,yquake2,$(YQUAKE2_CLIENT_VERSION))
 YQUAKE2_CLIENT_DEPENDENCIES = libcurl
 
 YQUAKE2_CLIENT_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
+YQUAKE2_CLIENT_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 
-# Can be compiled with sdl2 or sdl3, so let's depend dynamically on those libs
-# TODO handle CMake switch for SDL3 support
+# Favor SDL3 if available, fallback on SDL2 if not
 ifeq ($(BR2_PACKAGE_SDL2),y)
 YQUAKE2_CLIENT_DEPENDENCIES += sdl2
 endif
 ifeq ($(BR2_PACKAGE_SDL3),y)
 YQUAKE2_CLIENT_DEPENDENCIES += sdl3
+YQUAKE2_CLIENT_CONF_OPTS += -DSDL3_SUPPORT=ON
 endif
 
 # OpenGL 1.x and 3.x renderers

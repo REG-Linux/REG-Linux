@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-YQUAKE2_ROGUE_VERSION = ROGUE_2_14
+YQUAKE2_ROGUE_VERSION = ROGUE_2_15
 YQUAKE2_ROGUE_SITE = $(call github,yquake2,rogue,$(YQUAKE2_ROGUE_VERSION))
 YQUAKE2_ROGUE_DEPENDENCIES = sdl2
 
