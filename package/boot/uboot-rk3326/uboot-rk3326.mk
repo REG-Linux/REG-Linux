@@ -13,8 +13,8 @@ UBOOT_RK3326_ARCH = aarch64
 
 # CONFIG_SYS_TEXT_BASE=0x00200000
 UBOOT_RK3326_LOAD_ADDR = 0x00200000
-UBOOT_RK3326_TRUST_INI = ./RKTRUST/RK3326TRUST.ini
-
+#UBOOT_RK3326_TRUST_INI = ./RKTRUST/RK3326TRUST.ini
+#UBOOT_RK3326_BL31_ELF = bin/rk33/rk3326_bl31_v1.34.elf
 define UBOOT_RK3326_BUILD_CMDS
 	# Build U-Boot
 	cd $(@D) && ARCH=$(UBOOT_RK3326_ARCH) $(MAKE) mrproper
@@ -29,9 +29,10 @@ define UBOOT_RK3326_BUILD_CMDS
 	cd $(@D) && ./tools/mkimage -n px30 -T rksd -d ./rkbin/bin/rk33/rk3326_ddr_333MHz_v2.11.bin ./sd_fuse/idbloader.img
         cd $(@D) && cat rkbin/bin/rk33/rk3326_miniloader_v1.40.bin >> ./sd_fuse/idbloader.img
         # Pack uboot.img
-	cd $(@D) && ./rkbin/tools/loaderimage --pack --uboot ./u-boot.bin ./sd_fuse/uboot.img $(UBOOT_RK3326_LOAD_ADDR)
+	cd $(@D) && ./rkbin/tools/loaderimage --pack --uboot ./u-boot-dtb.bin ./sd_fuse/uboot.img $(UBOOT_RK3326_LOAD_ADDR)
         # Pack trust.img
-	cd $(@D)/rkbin/ && ./tools/trust_merger --rsa 3 --replace tools/rk_tools/ ./ $(UBOOT_RK3326_TRUST_INI)
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/uboot-rk3326/trust.ini $(@D)/trust.ini
+	cd $(@D)/rkbin/ && ./tools/trust_merger --verbose --replace tools/rk_tools/ ./ $(@D)/trust.ini
 	# Copy trust.img
 	cd $(@D) && cp ./rkbin/trust.img ./sd_fuse/trust.img
 endef

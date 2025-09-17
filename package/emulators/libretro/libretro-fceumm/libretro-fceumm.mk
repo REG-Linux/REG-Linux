@@ -3,8 +3,8 @@
 # libretro-fceumm
 #
 ################################################################################
-# Version: Commits on May 2, 2025
-LIBRETRO_FCEUMM_VERSION = 3544ff567ecc417c170641587083b976739ef9db
+# Version: Commits on Sep 13, 2025
+LIBRETRO_FCEUMM_VERSION = 5cd4a43e16a7f3cd35628d481c347a0a98cfdfa2
 LIBRETRO_FCEUMM_SITE = $(call github,libretro,libretro-fceumm,$(LIBRETRO_FCEUMM_VERSION))
 LIBRETRO_FCEUMM_LICENSE = GPLv2
 
@@ -22,6 +22,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_FCEUMM_PLATFORM = rpi5
 else ifeq ($(BR2_aarch64),y)
 LIBRETRO_FCEUMM_PLATFORM = unix
+else ifeq ($(BR2_cortex_a7),y)
+LIBRETRO_FCEUMM_PLATFORM = classic_armv7_a7
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
 LIBRETRO_FCEUMM_PLATFORM = armv
 endif
