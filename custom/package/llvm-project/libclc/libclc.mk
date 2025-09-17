@@ -66,7 +66,7 @@ else
 # Download pre compiled files
 REGLINUX_LIBCLC_CPU = unknown
 ifeq ($(BR2_arm1176jzf_s),y)
-	REGLINUX_LIBCLC_CPU = arm1176jzf_s, 
+	REGLINUX_LIBCLC_CPU = arm1176jzf_s
 else ifeq ($(BR2_cortex_a7),y)
 	REGLINUX_LIBCLC_CPU = cortex_a7
 else ifeq ($(BR2_cortex_a9),y)
@@ -94,6 +94,8 @@ else ifeq ($(BR2_cortex_a75_a55),y)
 else ifeq ($(BR2_cortex_a76),y)
 	REGLINUX_LIBCLC_CPU = cortex_a76
 else ifeq ($(BR2_cortex_a76_a55),y)
+	REGLINUX_LIBCLC_CPU = cortex_a76_a55
+else ifeq ($(BR2_cortex_a710),y) # TODO
 	REGLINUX_LIBCLC_CPU = cortex_a76_a55
 else ifeq ($(BR2_riscv),y)
 	REGLINUX_LIBCLC_CPU = riscv

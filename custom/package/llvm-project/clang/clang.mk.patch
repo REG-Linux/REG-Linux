@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/clang/clang.mk b/package/llvm-project/clang/clang.mk
-index 0bafd6461b..9b59dd802e 100644
+index 0bafd6461b..571d5d53a6 100644
 --- a/package/llvm-project/clang/clang.mk
 +++ b/package/llvm-project/clang/clang.mk
 @@ -6,6 +6,9 @@
@@ -43,7 +43,7 @@ index 0bafd6461b..9b59dd802e 100644
  CLANG_POST_INSTALL_TARGET_HOOKS += CLANG_CLEANUP_TARGET
  
  # clang-tblgen is not installed by default, however it is necessary
-@@ -135,3 +143,89 @@ HOST_CLANG_POST_INSTALL_HOOKS += HOST_CLANG_INSTALL_WRAPPER_AND_SIMPLE_SYMLINKS
+@@ -135,3 +143,91 @@ HOST_CLANG_POST_INSTALL_HOOKS += HOST_CLANG_INSTALL_WRAPPER_AND_SIMPLE_SYMLINKS
  
  $(eval $(cmake-package))
  $(eval $(host-cmake-package))
@@ -53,7 +53,7 @@ index 0bafd6461b..9b59dd802e 100644
 +# Download pre compiled files
 +REGLINUX_CLANG_CPU = unknown
 +ifeq ($(BR2_arm1176jzf_s),y)
-+	REGLINUX_CLANG_CPU = arm1176jzf_s, 
++	REGLINUX_CLANG_CPU = arm1176jzf_s
 +else ifeq ($(BR2_cortex_a7),y)
 +	REGLINUX_CLANG_CPU = cortex_a7
 +else ifeq ($(BR2_cortex_a9),y)
@@ -81,6 +81,8 @@ index 0bafd6461b..9b59dd802e 100644
 +else ifeq ($(BR2_cortex_a76),y)
 +	REGLINUX_CLANG_CPU = cortex_a76
 +else ifeq ($(BR2_cortex_a76_a55),y)
++	REGLINUX_CLANG_CPU = cortex_a76_a55
++else ifeq ($(BR2_cortex_a710),y) # TODO
 +	REGLINUX_CLANG_CPU = cortex_a76_a55
 +else ifeq ($(BR2_riscv),y)
 +	REGLINUX_CLANG_CPU = riscv
