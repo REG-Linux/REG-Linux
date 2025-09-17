@@ -4,8 +4,8 @@
  HAVE_NTSC=1
  WANT_32BPP=0
  
-+CFLAGS += -flto=auto
-+LDFLAGS += -flto=auto
++CFLAGS += -flto=auto -fPIC
++LDFLAGS += -flto=auto -fPIC
 +
  SPACE :=
  SPACE := $(SPACE) $(SPACE)
