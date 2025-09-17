@@ -6,7 +6,7 @@
 if [ "$1" != "" ]; then
     ARCHS=$*
 else
-    ARCHS="rk3288 h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x sm8250 saphira jh7110 k1 x86_64 x86_64_v3"
+    ARCHS="h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x sm8550 asahi jh7110 k1 x86_64 x86_64_v3"
 fi
 
 # Grab QT6 version from source tree
@@ -25,9 +25,9 @@ sed -i s/#BR2_PACKAGE_QT6BASE_DEFAULT_QPA=\"wayland\"/BR2_PACKAGE_QT6BASE_DEFAUL
 # Loop over archs
 # h5 can be used for h6, h616, s905, s905gen2, rk3328 (cortex_a53)
 # rk3326 can be used for s9gen4 (cortex_a35)
-# s922X can be used for a3gen2 (cortex_a73_a53)
+# rk3588 can be used for sm8250
+# s922x can be used for a3gen2 (cortex_a73_a53)
 # s905gen3 can be used for rk3566/rk3568 (cortex_a55)
-# sm8250 can be used for sm8550 (vulkan)
 for arch in ${ARCHS}; do
     # Clean
     make "${arch}"-clean
