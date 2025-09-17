@@ -1,0 +1,12 @@
+--- a/3rdparty/bx/src/file.cpp	2025-09-10 17:06:35.000000000 +0200
++++ b/3rdparty/bx/src/file.cpp	2025-09-14 12:11:34.252319203 +0200
+@@ -81,6 +81,9 @@
+ #	elif BX_PLATFORM_PS4
+ #		define fseeko64 fseek
+ #		define ftello64 ftell
++#	else
++#		define fseeko64 fseek
++#		define ftello64 ftell
+ #	endif // BX_
+ 
+ 	class FileReaderImpl : public FileReaderI

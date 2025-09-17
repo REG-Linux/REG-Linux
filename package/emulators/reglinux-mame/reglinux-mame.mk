@@ -3,27 +3,13 @@
 # REGLINUX-MAME (Prebuilt MAME/GroovyMAME + libretro-mame)
 #
 ################################################################################
-# Version: 0.279
-REGLINUX_MAME_VERSION = 0.279
+# Version: 0.280
+REGLINUX_MAME_VERSION = 0.280
 REGLINUX_MAME_SITE = $(call github,REG-Linux,REG-MAME,$(REGLINUX_MAME_VERSION))
 REGLINUX_MAME_LICENSE = MAME
 
 REGLINUX_MAME_ARCH = unknown
-# DEPRECATED
-# Cortex A7
-#ifeq ($(BR2_cortex_a7),y)
-#REGLINUX_MAME_ARCH = bcm2836
-# Cortex A9
-#else ifeq ($(BR2_cortex_a9),y)
-#REGLINUX_MAME_ARCH = s812
-# Cortex A15.A7
-#else ifeq ($(BR2_cortex_a15_a7),y)
-#REGLINUX_MAME_ARCH = odroidxu4
-# Cortex A17
-#else ifeq ($(BR2_cortex_a17),y)
-#REGLINUX_MAME_ARCH = rk3288
 # Cortex A53
-#else
 ifeq ($(BR2_cortex_a53),y)
 REGLINUX_MAME_ARCH = h5
 # Cortex A35
@@ -49,7 +35,7 @@ else ifeq ($(BR2_cortex_a76_a55),y)
 REGLINUX_MAME_ARCH = rk3588
 # ARMv9 (SM8550, just use rk3588 binary for now)
 else ifeq ($(BR2_cortex_a710),y)
-REGLINUX_MAME_ARCH = rk3588
+REGLINUX_MAME_ARCH = sm8550
 # Asahi Linux
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
 REGLINUX_MAME_ARCH = asahi
@@ -58,9 +44,7 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520
 REGLINUX_MAME_ARCH = jh7110
 # RISC-V 64 with vector extensions (aka imafdv)
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
-#TODO still uses jh7110 profile
-REGLINUX_MAME_ARCH = jh7110
-#REGLINUX_MAME_ARCH = k1
+REGLINUX_MAME_ARCH = k1
 # X86-64-v3 subarchitecture
 else ifeq ($(BR2_x86_x86_64_v3),y)
 REGLINUX_MAME_ARCH = x86_64_v3
