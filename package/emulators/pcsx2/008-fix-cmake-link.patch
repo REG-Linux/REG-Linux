@@ -1,0 +1,17 @@
+--- a/pcsx2/CMakeLists.txt	2025-09-18 18:15:48.765224223 +0200
++++ b/pcsx2/CMakeLists.txt	2025-09-18 18:26:04.836358917 +0200
+@@ -767,13 +767,7 @@
+ 		target_link_libraries(GS-${isa} PRIVATE PCSX2_FLAGS)
+ 		target_compile_definitions(GS-${isa} PRIVATE MULTI_ISA_UNSHARED_COMPILATION=isa_${isa} MULTI_ISA_IS_FIRST=${is_first_isa} ${pcsx2_defs_${isa}})
+ 		target_compile_options(GS-${isa} PRIVATE ${compile_options_${isa}})
+-		if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.24)
+-			target_link_libraries(PCSX2 PRIVATE $<LINK_LIBRARY:WHOLE_ARCHIVE,GS-${isa}>)
+-		elseif(APPLE)
+-			message(FATAL_ERROR "MacOS builds with DISABLE_ADVANCE_SIMD=ON require CMake 3.24")
+-		else()
+-			target_link_libraries(PCSX2 PRIVATE GS-${isa})
+-		endif()
++		target_link_libraries(PCSX2 PRIVATE GS-${isa})
+ 		set(is_first_isa "0")
+ 	endforeach()
+ else()
