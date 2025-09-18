@@ -1,0 +1,7 @@
+--- a/configs/radxa-cubie-a5e_defconfig	2025-09-18 14:02:29.142799956 +0200
++++ b/configs/radxa-cubie-a5e_defconfig	2025-09-18 14:02:35.141402224 +0200
+@@ -30,3 +30,4 @@
+ CONFIG_AXP_DCDC3_VOLT=1100
+ CONFIG_USB_EHCI_HCD=y
+ CONFIG_USB_OHCI_HCD=y
++CONFIG_LOG=y

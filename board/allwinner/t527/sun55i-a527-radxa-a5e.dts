@@ -462,11 +462,11 @@
 };
 
 &dsi1combophy {
-	status = "okay";
+	status = "disabled";
 };
 
 &dsi1 {
-	status = "okay";
+	status = "disabled";
 	pinctrl-0 = <&dsi1_4lane_pins_a>;
 	pinctrl-1 = <&dsi1_4lane_pins_b>;
 	pinctrl-names = "active","sleep";
@@ -503,7 +503,7 @@
 &sunxi_drm {
 	route {
 		disp0_dsi1 {
-			status = "okay";
+			status = "disabled";
 		};
 
 		disp0_hdmi {
