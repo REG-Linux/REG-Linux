@@ -178,7 +178,7 @@ else ifeq ($(BR2_cortex_a76),y)
 	REGLINUX_CLANG_CPU = cortex_a76
 else ifeq ($(BR2_cortex_a76_a55),y)
 	REGLINUX_CLANG_CPU = cortex_a76_a55
-else ifeq ($(BR2_cortex_a710),y) # TODO
+else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
 	REGLINUX_CLANG_CPU = cortex_a76_a55
 else ifeq ($(BR2_riscv),y)
 	REGLINUX_CLANG_CPU = riscv

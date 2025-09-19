@@ -65,10 +65,9 @@ REGLINUX_QT6_ARCH = sm8250
 else
 REGLINUX_QT6_ARCH = rk3588
 endif
-# ARMv9 SoC (SM8550)
-# Just use sm8250 binary so far (we have vulkan so it's okay)
-else ifeq ($(BR2_cortex_a710),y)
-REGLINUX_QT6_ARCH = sm8550
+# SM8550 TODO, just use sm8250
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
+REGLINUX_QT6_ARCH = sm8250
 # Mediatek MT8395 is cortex-a78.cortex-a55
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MT8395),y)
 REGLINUX_QT6_ARCH = rk3588
