@@ -23,7 +23,7 @@ BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_16=y
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
-BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https://github.com/AsahiLinux/linux/archive/refs/tags/asahi-6.16.3-1.tar.gz"
+BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="https://github.com/AsahiLinux/linux/archive/refs/tags/asahi-6.16.5-2.tar.gz"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/asahi/linux-defconfig.config"
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config"

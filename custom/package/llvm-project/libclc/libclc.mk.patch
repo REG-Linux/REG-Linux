@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/libclc/libclc.mk b/package/llvm-project/libclc/libclc.mk
-index 9f303d6d2f..ce648f45f5 100644
+index 9f303d6d2f..78b5495b56 100644
 --- a/package/llvm-project/libclc/libclc.mk
 +++ b/package/llvm-project/libclc/libclc.mk
 @@ -3,14 +3,22 @@
@@ -93,7 +93,7 @@ index 9f303d6d2f..ce648f45f5 100644
 +	REGLINUX_LIBCLC_CPU = cortex_a76
 +else ifeq ($(BR2_cortex_a76_a55),y)
 +	REGLINUX_LIBCLC_CPU = cortex_a76_a55
-+else ifeq ($(BR2_cortex_a710),y) # TODO
++else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
 +	REGLINUX_LIBCLC_CPU = cortex_a76_a55
 +else ifeq ($(BR2_riscv),y)
 +	REGLINUX_LIBCLC_CPU = riscv
