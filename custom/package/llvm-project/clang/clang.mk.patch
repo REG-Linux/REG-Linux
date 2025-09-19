@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/clang/clang.mk b/package/llvm-project/clang/clang.mk
-index 0bafd6461b..571d5d53a6 100644
+index 0bafd6461b..35d812dbb5 100644
 --- a/package/llvm-project/clang/clang.mk
 +++ b/package/llvm-project/clang/clang.mk
 @@ -6,6 +6,9 @@
@@ -82,7 +82,7 @@ index 0bafd6461b..571d5d53a6 100644
 +	REGLINUX_CLANG_CPU = cortex_a76
 +else ifeq ($(BR2_cortex_a76_a55),y)
 +	REGLINUX_CLANG_CPU = cortex_a76_a55
-+else ifeq ($(BR2_cortex_a710),y) # TODO
++else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
 +	REGLINUX_CLANG_CPU = cortex_a76_a55
 +else ifeq ($(BR2_riscv),y)
 +	REGLINUX_CLANG_CPU = riscv

@@ -70,8 +70,6 @@ else ifeq ($(BR2_cortex_a76),y)
 MAME_CFLAGS += -mtune=cortex-a76
 else ifeq ($(BR2_cortex_a76_a55),y)
 MAME_CFLAGS += -mtune=cortex-a76.cortex-a55
-else ifeq ($(BR2_cortex_a710),y)
-MAME_CFLAGS += -mtune=cortex-a715
 endif
 else
 MAME_CROSS_OPTS += FORCE_DRC_C_BACKEND=1
