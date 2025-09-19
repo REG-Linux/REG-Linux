@@ -1,5 +1,5 @@
 diff --git a/arch/Config.in.arm b/arch/Config.in.arm
-index 546ba8070e..50c00b2f31 100644
+index 546ba8070e..01f78fa1a0 100644
 --- a/arch/Config.in.arm
 +++ b/arch/Config.in.arm
 @@ -354,6 +354,22 @@ config BR2_emag
@@ -25,7 +25,7 @@ index 546ba8070e..50c00b2f31 100644
  config BR2_exynos_m1
  	bool "exynos-m1"
  	select BR2_ARM_CPU_HAS_ARM if !BR2_ARCH_IS_64
-@@ -506,12 +522,24 @@ config BR2_saphira
+@@ -506,12 +522,30 @@ config BR2_saphira
  	select BR2_ARCH_NEEDS_GCC_AT_LEAST_8
  
  comment "armv9.0a cores"
@@ -47,10 +47,16 @@ index 546ba8070e..50c00b2f31 100644
 +	select BR2_ARM_CPU_HAS_FP_ARMV8
 +	select BR2_ARM_CPU_ARMV9A
 +	select BR2_ARCH_NEEDS_GCC_AT_LEAST_12
++config BR2_cortex_x3
++	bool "Cortex-X3"
++	depends on BR2_ARCH_IS_64
++	select BR2_ARM_CPU_HAS_FP_ARMV8
++	select BR2_ARM_CPU_ARMV9A
++	select BR2_ARCH_NEEDS_GCC_AT_LEAST_12
  config BR2_neoverse_n2
  	bool "neoverse-N2 (aka perseus)"
  	depends on BR2_ARCH_IS_64
-@@ -906,13 +934,17 @@ config BR2_GCC_TARGET_CPU
+@@ -906,14 +940,20 @@ config BR2_GCC_TARGET_CPU
  	default "cortex-a75.cortex-a55"	if BR2_cortex_a75_a55
  	default "cortex-a76"	if BR2_cortex_a76
  	default "cortex-a76.cortex-a55"	if BR2_cortex_a76_a55
@@ -62,9 +68,14 @@ index 546ba8070e..50c00b2f31 100644
  	# armv8.4a
  	default "saphira"	if BR2_saphira
  	# armv9.0a
-+	default "cortex-a510"	if BR2_cortex_a510
- 	default "cortex-a710"	if BR2_cortex_a710
-+	default "cortex-a715"	if BR2_cortex_a715
- 	default "neoverse-n2"	if BR2_neoverse_n2
+-	default "cortex-a710"	if BR2_cortex_a710
+-	default "neoverse-n2"	if BR2_neoverse_n2
++	# REG
++	default "cortex-a510"			if BR2_cortex_a510
++	default "cortex-a710"			if BR2_cortex_a710
++	default "cortex-a715"			if BR2_cortex_a715
++	default "cortex-x3+nosve+nosve2"	if BR2_cortex_x3
++	default "neoverse-n2"			if BR2_neoverse_n2
  
  config BR2_GCC_TARGET_ABI
+ 	default "aapcs-linux"	if BR2_arm || BR2_armeb

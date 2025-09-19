@@ -3,7 +3,9 @@ include reglinux-board.common
 
 # Target definition
 BR2_aarch64=y
-BR2_ARM_CPU_ARMV9A=y
+# Actually, it's a mix of Cortex-X3, Cortex-A715, Cortex-A710 and Cortex-A510 in big.LITTLE cluster
+# The trick is that Qualcomm does NOT expose SVE and SVE2 instructions (which are standard in ARMv9)
+BR2_cortex_x3=y
 BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_PACKAGE_SYSTEM_TARGET_SM8550=y
 BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char -mcpu=cortex-x3+nosve+nosve2"
