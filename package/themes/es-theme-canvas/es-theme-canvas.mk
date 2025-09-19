@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-ES_THEME_CANVAS_VERSION = 6c19914e60294c725d5e71b00c983211a7c5618d
-ES_THEME_CANVAS_SITE = $(call github,REG-Linux,es-theme-canvas,$(ES_THEME_CANVAS_VERSION))
+ES_THEME_CANVAS_VERSION = v1.1
+ES_THEME_CANVAS_SITE = https://github.com/REG-Linux/es-theme-canvas/releases/download/$(ES_THEME_CANVAS_VERSION)
+ES_THEME_CANVAS_SOURCE = canvas-theme-$(ES_THEME_CANVAS_VERSION).tar.gz
 
 define ES_THEME_CANVAS_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/share/emulationstation/themes/es-theme-canvas
