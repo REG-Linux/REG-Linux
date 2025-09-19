@@ -51,10 +51,9 @@ REGLINUX_SCUMMVM_ARCH = bcm2712
 # Cortex A76.A55 / A78.A55
 else ifeq ($(BR2_cortex_a76_a55)$(BR2_cortex_a78_a55),y)
 REGLINUX_SCUMMVM_ARCH = rk3588
-# ARMv9 SoC (SM8550)
-# Just use unoptimized rk3588 binary so far
-else ifeq ($(BR2_cortex_a710),y)
-REGLINUX_SCUMMVM_ARCH = rk3588
+# SM8550
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
+REGLINUX_SCUMMVM_ARCH = sm8550
 # Asahi Linux
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
 REGLINUX_SCUMMVM_ARCH = asahi
