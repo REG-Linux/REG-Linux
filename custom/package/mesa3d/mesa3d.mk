@@ -191,7 +191,7 @@ MESA3D_CONF_OPTS += -Dopengl=true
 # we do not need libva support in mesa3d, therefore disable this option
 # enable vaapi acceleration
 ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_WSL),y)
-ifeq ($(BR2_PACKAGE_LIBVA),y)
+ifeq ($(BR2_PACKAGE_LIBVA)$(BR2_x86_64),yy)
 MESA3D_CONF_OPTS += -Dgallium-va=enabled
 MESA3D_DEPENDENCIES += libva
 # link vaapi acceleration drivers accordingly
