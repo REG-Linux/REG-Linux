@@ -20,7 +20,8 @@ else
     MOONLIGHT_EMBEDDED_CONF_OPTS += -DENABLE_X11=OFF
 endif
 
-ifeq ($(BR2_PACKAGE_LIBVA),y)
+# Only enable those on x86 targets
+ifeq ($(BR2_PACKAGE_LIBVA)$(BR2_x86_64),yy)
     MOONLIGHT_EMBEDDED_DEPENDENCIES += libva-intel-driver intel-mediadriver
 endif
 
