@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2025-09-20 12:22:47.152335730 +0200
++++ b/CMakeLists.txt	2025-09-20 12:22:55.542304576 +0200
+@@ -51,7 +51,7 @@
+ add_subdirectory(minizip)
+ add_subdirectory(source)
+ add_subdirectory(resource)
+-add_subdirectory(test/TestCPU6502)
++#add_subdirectory(test/TestCPU6502)
+ 
+ if (NOT WIN32)
+   add_subdirectory(source/linux/libwindows)

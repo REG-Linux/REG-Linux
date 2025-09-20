@@ -3,7 +3,7 @@
 # DuckStation Mini (AppImage) - Rolling release
 #
 ################################################################################
-DUCKSTATION_MINI_VERSION = v0.1-9384
+DUCKSTATION_MINI_VERSION = v0.1-9669
 ifeq ($(BR2_arm),y)
 DUCKSTATION_MINI_SOURCE = DuckStation-Mini-armhf.AppImage
 else ifeq ($(BR2_aarch64),y)
