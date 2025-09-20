@@ -1,0 +1,12 @@
+diff --git a/package/coreutils/Config.in b/package/coreutils/Config.in
+index 705013bae0..9c1af1dc25 100644
+--- a/package/coreutils/Config.in
++++ b/package/coreutils/Config.in
+@@ -3,6 +3,7 @@ config BR2_PACKAGE_COREUTILS
+ 	depends on BR2_USE_WCHAR
+ 	depends on BR2_USE_MMU # fork()
+ 	depends on BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
++	depends on !BR2_PACKAGE_UUTILS_COREUTILS
+ 	help
+ 	  All of the basic file/text/shell utilities. These are the
+ 	  core utilities which are expected to exist on every system.

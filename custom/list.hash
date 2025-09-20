@@ -46,6 +46,7 @@ a3dd0ea9d489564444fc1a999ebf907e  package/busybox/busybox.config
 536e44a4cb47e483820a631d0ec7821d  package/busybox/busybox.mk
 d3204aa4d5249b3b4ac99dcb53cbae74  package/cmake/cmake.mk
 3d3c78296119d9f980e4e8f8532322c5  package/connman/Config.in
+ee73a016d10a4f3a91571d0b8f3c2500  package/coreutils/Config.in
 45fe588a9098e541020cdeca87db83ef  package/cpuinfo/Config.in
 0aca90f49b6d2a06cc7f347d434b3745  package/dbus-broker/Config.in
 e2ea7480adb24a94f8ab05fd6110697e  package/dbus-broker/dbus-broker.mk
@@ -208,5 +209,6 @@ b7d20333f689cb7aec2067ab15bb547c  package/x11r7/xwayland/xwayland.mk
 15e40a5bf313229ce01dfd106e310711  support/scripts/apply-patches.sh
 46e6790ab639d76ca7ca370a12c9ec82  support/scripts/check-bin-arch
 fd68073de549caae030699682bc09c95  support/scripts/mkusers
+1af8ba65eb8f8f8e6f736abe5844b581  support/testing/tests/package/test_rust.py
 407a39abadfdac103474731ceac19ab4  toolchain/Config.in
 72c059e6f2c720a4354d80f887d0a111  toolchain/toolchain-external/toolchain-external-custom/Config.in.options

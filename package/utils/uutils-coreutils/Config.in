@@ -1,0 +1,48 @@
+config BR2_PACKAGE_UUTILS_COREUTILS
+	bool "uutils-coreutils"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	depends on BR2_PACKAGE_HOST_RUSTC
+	depends on BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
+	help
+	  uutils coreutils is a cross-platform reimplementation of the
+	  GNU coreutils in Rust.
+
+	  While all programs have been implemented, some options might
+	  be missing or different behavior might be experienced.
+
+	  https://github.com/uutils/coreutils
+
+if BR2_PACKAGE_UUTILS_COREUTILS
+
+config BR2_PACKAGE_UUTILS_COREUTILS_MULTICALL
+	bool "multicall"
+	default y
+	help
+	  Build coreutils as a single multi-call binary, or as a set
+	  of separate utilities.
+
+	  Select 'y' to build coreutils as a single ‘coreutils’ binary.
+	  This approach allows to reduce overhead and achieve a minimal
+	  image size.
+
+	  Select 'n' to build coreutils as a collection of independent
+	  binaries, such as 'cp, mv, df, ...'. This approach produces
+	  larger final image, but it manages each application
+	  individually.
+
+	  It often comes in handy for testing, as it allows you to
+	  replace several specific binaries and see what happens.
+
+config BR2_PACKAGE_UUTILS_COREUTILS_UTILITIES
+	string "utilities"
+	default "default"
+	help
+	  This option specifies precisely which utilities will be
+	  built.
+
+	  Use 'default' to build all available utilities.
+
+	  Use a space-separated list of utilities, such as 'cp mv df’,
+	  to explicitly specify the utilities to build.
+
+endif

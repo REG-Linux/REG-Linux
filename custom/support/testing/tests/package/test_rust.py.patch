@@ -1,0 +1,48 @@
+diff --git a/support/testing/tests/package/test_rust.py b/support/testing/tests/package/test_rust.py
+index 8160cb6053..c0fe56f1be 100644
+--- a/support/testing/tests/package/test_rust.py
++++ b/support/testing/tests/package/test_rust.py
+@@ -28,11 +28,14 @@ class TestRustBin(TestRustBase):
+         # BR2_TARGET_ROOTFS_TAR is not set
+         BR2_PACKAGE_HOST_RUSTC=y
+         BR2_PACKAGE_RIPGREP=y
++        BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
++        BR2_PACKAGE_UUTILS_COREUTILS=y
+         """
+ 
+     def test_run(self):
+         self.login()
+         self.assertRunOk("rg Buildroot /etc/issue")
++        self.assertRunOk("coreutils --help")
+ 
+ 
+ class TestRust(TestRustBase):
+@@ -50,11 +53,14 @@ class TestRust(TestRustBase):
+         BR2_PACKAGE_HOST_RUSTC=y
+         BR2_PACKAGE_HOST_RUST=y
+         BR2_PACKAGE_RIPGREP=y
++        BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
++        BR2_PACKAGE_UUTILS_COREUTILS=y
+         """
+ 
+     def test_run(self):
+         self.login()
+         self.assertRunOk("rg Buildroot /etc/issue")
++        self.assertRunOk("coreutils --help")
+ 
+ 
+ class TestRustVendoring(infra.basetest.BRConfigTest):
+@@ -70,6 +76,8 @@ class TestRustVendoring(infra.basetest.BRConfigTest):
+         BR2_PACKAGE_RIPGREP=y
+         BR2_PACKAGE_PYTHON3=y
+         BR2_PACKAGE_PYTHON_CRYPTOGRAPHY=y
++        BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
++        BR2_PACKAGE_UUTILS_COREUTILS=y
+         """
+ 
+     def setUp(self):
+@@ -95,3 +103,4 @@ class TestRustVendoring(infra.basetest.BRConfigTest):
+     def test_run(self):
+         self.check_download("ripgrep")
+         self.check_download("python-cryptography")
++        self.check_download("uutils-coreutils")
