@@ -15,6 +15,7 @@ config BR2_PACKAGE_DOLPHIN_TRIFORCE
 	select BR2_PACKAGE_ZLIB
 	select BR2_PACKAGE_MINIZIP_ZLIB
 	select BR2_PACKAGE_PUGIXML
+	select BR2_PACKAGE_SDL2
 	help
 	  TriForce (Dolphin-5.0 based) arcade emulator
 
