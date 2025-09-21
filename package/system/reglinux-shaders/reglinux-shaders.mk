@@ -97,8 +97,19 @@ define REGLINUX_SHADERS_DELETE_BEZEL
     rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/bezel/koko-aio
 endef
 
+# No beefy shaders for weak devices (can be improved)
+define REGLINUX_SHADERS_DELETE_BEEFY_SHADERS
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-royale
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-yo6
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/procedural
+endef
+
 ifneq ($(REGLINUX_GPU_SYSTEM),x86)
     REGLINUX_SHADERS_POST_INSTALL_TARGET_HOOKS += REGLINUX_SHADERS_DELETE_BEZEL
+endif
+
+ifeq ($(BR2_arm)$(BR2_mipsel)$(BR2_riscv),y)
+    REGLINUX_SHADERS_POST_INSTALL_TARGET_HOOKS += REGLINUX_SHADERS_DELETE_BEEFY_SHADERS
 endif
 
 $(eval $(generic-package))

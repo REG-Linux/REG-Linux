@@ -35,4 +35,14 @@ ifneq ($(BR2_x86_64),y)
     GLSL_SHADERS_POST_INSTALL_TARGET_HOOKS += GLSL_SHADERS_DELETE_BEZEL
 endif
 
+# No beefy shaders for weak devices (can be improved)
+define GLSL_SHADERS_DELETE_BEEFY_SHADERS
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-royale
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-yo6
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/procedural
+endef
+ifeq ($(BR2_arm)$(BR2_mipsel)$(BR2_riscv),y)
+    GLSL_SHADERS_POST_INSTALL_TARGET_HOOKS += GLSL_SHADERS_DELETE_BEEFY_SHADERS
+endif
+
 $(eval $(generic-package))
