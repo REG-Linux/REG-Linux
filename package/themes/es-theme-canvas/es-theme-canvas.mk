@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ES_THEME_CANVAS_VERSION = v1.1
+ES_THEME_CANVAS_VERSION = v1.2
 ES_THEME_CANVAS_SITE = https://github.com/REG-Linux/es-theme-canvas/releases/download/$(ES_THEME_CANVAS_VERSION)
 ES_THEME_CANVAS_SOURCE = canvas-theme-$(ES_THEME_CANVAS_VERSION).tar.gz
 
