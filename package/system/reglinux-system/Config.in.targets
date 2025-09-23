@@ -171,7 +171,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 
 	# Qualcomm targets
 	default "qualcomm/sd845/odin"									if BR2_PACKAGE_SYSTEM_TARGET_ODIN
-	default "qualcomm/sm8250/rp5 qualcomm/sm8250/rpmini"						if BR2_PACKAGE_SYSTEM_TARGET_SM8250
+	default "qualcomm/sm8250/rp5 qualcomm/sm8250/rpmini qualcomm/sm8250/rpflip2"			if BR2_PACKAGE_SYSTEM_TARGET_SM8250
 	default "qualcomm/sm8550/odin2 qualcomm/sm8550/odin2portal"					if BR2_PACKAGE_SYSTEM_TARGET_SM8550
 
 	# Mediatek targets
