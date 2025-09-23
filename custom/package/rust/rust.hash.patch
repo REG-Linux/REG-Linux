@@ -1,5 +1,5 @@
 diff --git a/package/rust/rust.hash b/package/rust/rust.hash
-index 19af66e2d6..95e415fbd5 100644
+index 19af66e2d6..950f3e1984 100644
 --- a/package/rust/rust.hash
 +++ b/package/rust/rust.hash
 @@ -1,8 +1,8 @@
@@ -8,8 +8,8 @@ index 19af66e2d6..95e415fbd5 100644
  
 -# From https://static.rust-lang.org/dist/rustc-1.82.0-src.tar.xz.sha256
 -sha256  1276a0bb8fa12288ba6fa96597d28b40e74c44257c051d3bc02c2b049bb38210  rustc-1.82.0-src.tar.xz
-+# From https://static.rust-lang.org/dist/rustc-1.89.0-src.tar.xz.sha256
-+sha256  0b9d55610d8270e06c44f459d1e2b7918a5e673809c592abed9b9c600e33d95a  rustc-1.89.0-src.tar.xz
++# From https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz.sha256
++sha256  6bfeaddd90ffda2f063492b092bfed925c4b8c701579baf4b1316e021470daac  rustc-1.90.0-src.tar.xz
  # Locally generated
  sha256  62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a  LICENSE-APACHE
  sha256  23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3  LICENSE-MIT

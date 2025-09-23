@@ -1,5 +1,5 @@
 diff --git a/package/cpuinfo/Config.in b/package/cpuinfo/Config.in
-index 257480f068..446e65c69b 100644
+index 64477c2bd7..8e750b1807 100644
 --- a/package/cpuinfo/Config.in
 +++ b/package/cpuinfo/Config.in
 @@ -4,6 +4,8 @@ config BR2_PACKAGE_CPUINFO_ARCH_SUPPORTS
