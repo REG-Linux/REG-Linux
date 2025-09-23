@@ -92,9 +92,9 @@ all:
 .PHONY: all
 
 # Set and export the version string
-export BR2_VERSION := 2025.02.5
+export BR2_VERSION := 2025.02.6
 # Actual time the release is cut (for reproducible builds)
-BR2_VERSION_EPOCH = 1754922100
+BR2_VERSION_EPOCH = 1757446200
 
 # Save running make version since it's clobbered by the make package
 RUNNING_MAKE_VERSION := $(MAKE_VERSION)
@@ -766,7 +766,7 @@ endif
 		{ echo "ERROR: we shouldn't have a /etc/ld.so.conf.d directory"; exit 1; } || true
 	mkdir -p $(TARGET_DIR)/etc
 	( \
-	echo "NAME=REG-Linux"; \
+		echo "NAME=REG-Linux"; \
 		echo "VERSION=$(REGLINUX_SYSTEM_VERSION)"; \
 		echo "ID=$(REGLINUX_SYSTEM_ARCH)"; \
 		echo "VERSION_ID=$(REGLINUX_SYSTEM_ID_VERSION)"; \
@@ -1222,11 +1222,11 @@ help:
 # $(2): br2-external name, empty for bundled
 define list-defconfigs
 	@first=true; \
-	for defconfig in $$(find $(1)/configs -name '*_defconfig' |sort); do \
+	for defconfig in $$([ -d $(1)/configs ] && find $(1)/configs -name '*_defconfig' |sort); do \
 		[ -f "$${defconfig}" ] || continue; \
 		if $${first}; then \
 			if [ "$(2)" ]; then \
-				printf 'External configs in "$(call qstrip,$(2))":\n'; \
+				printf 'External configs in "%s":\n' "$(call qstrip,$(2))"; \
 			else \
 				printf "Built-in configs:\n"; \
 			fi; \
@@ -1253,10 +1253,12 @@ release: OUT = buildroot-$(BR2_VERSION)
 # documentation to the git output
 release:
 	git archive --format=tar --prefix=$(OUT)/ HEAD > $(OUT).tar
-	$(MAKE) O=$(OUT) manual-html manual-text manual-pdf
+	SOURCE_DATE_EPOCH=$$(git log -1 --format=%at 2> /dev/null) \
+		$(MAKE) O=$(OUT) manual-html manual-text manual-pdf
 	$(MAKE) O=$(OUT) distclean
-	tar rf $(OUT).tar $(OUT)
-	gzip -9 -c < $(OUT).tar > $(OUT).tar.gz
+	tar rf $(OUT).tar --owner=0 --group=0 \
+		--mtime="$$(git log -1 --pretty=format:%ci)" $(OUT)
+	gzip -9 -n -c < $(OUT).tar > $(OUT).tar.gz
 	xz -9 -c < $(OUT).tar > $(OUT).tar.xz
 	rm -rf $(OUT) $(OUT).tar
 

@@ -1,5 +1,5 @@
 diff --git a/package/rust-bin/rust-bin.mk b/package/rust-bin/rust-bin.mk
-index c14ca7f88e..7b63689ee6 100644
+index c14ca7f88e..d3c9345754 100644
 --- a/package/rust-bin/rust-bin.mk
 +++ b/package/rust-bin/rust-bin.mk
 @@ -6,7 +6,7 @@
@@ -7,7 +7,7 @@ index c14ca7f88e..7b63689ee6 100644
  # When updating this version, check whether support/download/cargo-post-process
  # still generates the same archives.
 -RUST_BIN_VERSION = 1.82.0
-+RUST_BIN_VERSION = 1.89.0
++RUST_BIN_VERSION = 1.90.0
  RUST_BIN_SITE = https://static.rust-lang.org/dist
  RUST_BIN_LICENSE = Apache-2.0 or MIT
  RUST_BIN_LICENSE_FILES = LICENSE-APACHE LICENSE-MIT

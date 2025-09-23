@@ -1,5 +1,5 @@
 diff --git a/linux/Config.in b/linux/Config.in
-index b36f926c18..3b4c6885eb 100644
+index d5fb71771b..da7f9d6a8d 100644
 --- a/linux/Config.in
 +++ b/linux/Config.in
 @@ -4,6 +4,10 @@ config BR2_LINUX_KERNEL
@@ -13,3 +13,12 @@ index b36f926c18..3b4c6885eb 100644
  	help
  	  Enable this option if you want to build a Linux kernel for
  	  your embedded device
+@@ -137,7 +141,7 @@ config BR2_LINUX_KERNEL_CUSTOM_REPO_GIT_SUBMODULES
+ 
+ config BR2_LINUX_KERNEL_VERSION
+ 	string
+-	default "6.12.47" if BR2_LINUX_KERNEL_LATEST_VERSION
++	default "6.12.41" if BR2_LINUX_KERNEL_LATEST_VERSION
+ 	default "5.10.162-cip24" if BR2_LINUX_KERNEL_LATEST_CIP_VERSION
+ 	default "5.10.162-cip24-rt10" if BR2_LINUX_KERNEL_LATEST_CIP_RT_VERSION
+ 	default BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE \
