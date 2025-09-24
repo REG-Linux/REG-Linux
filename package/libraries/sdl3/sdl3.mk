@@ -82,6 +82,8 @@ endif
 # reglinux - enable/disable Wayland video driver
 ifeq ($(BR2_PACKAGE_SDL3_WAYLAND),y)
 SDL3_DEPENDENCIES += wayland wayland-protocols libxkbcommon
+else
+SDL3_CONF_OPTS += -DSDL_UNIX_CONSOLE_BUILD=ON
 endif
 
 # reglinux - libdecor
