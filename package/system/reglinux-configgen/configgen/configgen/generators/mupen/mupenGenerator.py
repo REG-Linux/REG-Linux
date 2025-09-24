@@ -2,7 +2,6 @@ from generators.Generator import Generator
 from Command import Command
 from configparser import ConfigParser
 from os import path, makedirs
-from .mupenControllers import setControllersConfig
 from .mupenConfig import (
     setMupenConfig,
     MUPEN_CONFIG_PATH,
@@ -27,8 +26,6 @@ class MupenGenerator(Generator):
             iniConfig.read(MUPEN_CONFIG_PATH)
 
         setMupenConfig(iniConfig, system, playersControllers, gameResolution)
-        # FIXME: Implement setControllersConfig function
-        setControllersConfig(iniConfig, playersControllers, system, wheels)
 
         # Save the ini file
         if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
@@ -39,12 +36,18 @@ class MupenGenerator(Generator):
         # Command
         commandArray = [
             MUPEN_BIN_PATH,
+            "--plugindir",
+            "/usr/lib/mupen64plus/",
             "--corelib",
-            "/usr/lib/libmupen64plus.so.2.0.0",
+            "libmupen64plus.so.2.0.0",
             "--gfx",
-            "/usr/lib/mupen64plus/mupen64plus-video-{}.so".format(
-                system.config["core"]
-            ),
+            "mupen64plus-video-{}.so".format(system.config["core"]),
+            "--audio",
+            "mupen64plus-audio-sdl.so",
+            "--input",
+            "mupen64plus-input-sdl.so",
+            "--rsp",
+            "mupen64plus-rsp-hle.so",
             "--configdir",
             MUPEN_CONFIG_DIR,
             "--datadir",
