@@ -10,7 +10,7 @@ config BR2_PACKAGE_REGLINUX_CONFIGGEN
 	select BR2_PACKAGE_PYTHON3_CONFIGOBJ
 	select BR2_PACKAGE_PYTHON_PYUDEV	# for guns
 	select BR2_PACKAGE_PYTHON_REQUESTS	# for retroachievements
-	select BR2_PACKAGE_FFMPEG_PYTHON	# for hypseus singe bezels
+	select BR2_PACKAGE_FFMPEG_PYTHON	if BR2_PACKAGE_FFMPEG # for hypseus singe bezels
 	select BR2_PACKAGE_MANGOHUD		if BR2_x86_64 || BR2_PACKAGE_SYSTEM_TARGET_GLES3
 
         help
