@@ -38,17 +38,17 @@ index d9b3c32..afced11 100644
  #include "SDLIncludes.h"
  #include "Debugger/SupermodelDebugger.h"
  #include "Graphics/Legacy3D/Legacy3D.h"
-@@ -2139,6 +2139,10 @@
-     InputSystem = new CSDLInputSystem(s_runtime_config, false);
+@@ -2365,6 +2365,10 @@
+     InputSystem = std::shared_ptr<CInputSystem>(new CSDLInputSystem(s_runtime_config, false));
    else if (selectedInputSystem == "sdlgamepad")
-     InputSystem = new CSDLInputSystem(s_runtime_config, true);
+     InputSystem = std::shared_ptr<CInputSystem>(new CSDLInputSystem(s_runtime_config, true));
 +// ifdef udev
 +  else if (selectedInputSystem == "evdev")
-+    InputSystem = new CEvdevInputSystem(s_runtime_config);
++    InputSystem = std::shared_ptr<CInputSystem>(new CEvdevInputSystem(s_runtime_config));
 +//
  #ifdef SUPERMODEL_WIN32
    else if (selectedInputSystem == "dinput")
-     InputSystem = new CDirectInputSystem(s_runtime_config, s_window, false, false);
+     InputSystem = std::shared_ptr<CInputSystem>(new CDirectInputSystem(s_runtime_config, s_window, false, false));
 diff --git a/Src/OSD/evdev/EvdevInputSystem.cpp b/Src/OSD/evdev/EvdevInputSystem.cpp
 new file mode 100644
 index 0000000..ee695ba
@@ -403,12 +403,11 @@ index 0000000..6f8a2b2
 2.47.1
 --- a/Makefiles/Makefile.UNIX	2025-01-26 14:10:00.080824500 +0100
 +++ b/Makefiles/Makefile.UNIX	2025-01-26 14:10:22.668386446 +0100
-@@ -72,7 +72,7 @@
+@@ -73,7 +73,7 @@
  #
- 
+
  PLATFORM_CXXFLAGS = $(SDL2_CFLAGS) -O3
 -PLATFORM_LDFLAGS = $(SDL2_LIBS) -lGL -lGLU -lz -lm -lstdc++ -lpthread
 +PLATFORM_LDFLAGS = $(SDL2_LIBS) -lGL -lGLU -lz -lm -lstdc++ -lpthread -ludev
- 
- 
- ###############################################################################
+ PLATFORM_BINARY_EXTENSION =
+

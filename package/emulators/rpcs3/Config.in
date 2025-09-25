@@ -7,6 +7,7 @@ config BR2_PACKAGE_RPCS3
     select BR2_PACKAGE_FFMPEG_SWSCALE
     select BR2_PACKAGE_LIBEVDEV
     select BR2_PACKAGE_LIBCURL
+    select BR2_PACKAGE_LIBPNG
     select BR2_PACKAGE_LIBGLEW
     select BR2_PACKAGE_LIBGLU
     select BR2_PACKAGE_LIBUSB
@@ -14,11 +15,13 @@ config BR2_PACKAGE_RPCS3
     select BR2_PACKAGE_MESA3D
     select BR2_PACKAGE_NCURSES
     select BR2_PACKAGE_OPENAL
+    select BR2_PACKAGE_PUGIXML
     select BR2_PACKAGE_REGLINUX_QT6
+    select BR2_PACKAGE_RTMIDI
     select BR2_PACKAGE_RTMPDUMP
     select BR2_PACKAGE_SDL3
-    select BR2_PACKAGE_WOLFSSL
-    select BR2_PACKAGE_WOLFSSL_ALL
+    select BR2_PACKAGE_ZLIB
+    select BR2_PACKAGE_ZSTD
     help
       RPCS3 is a multi-platform open-source Sony PlayStation 3 emulator.
 
