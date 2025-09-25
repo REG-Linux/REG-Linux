@@ -1,0 +1,146 @@
+#### systems ####
+config BR2_PACKAGE_REGLINUX_MINI_SYSTEMS
+        bool "REG-Linux mini systems"
+
+	# Arcade : FBNEO only
+	select BR2_PACKAGE_LIBRETRO_FBNEO
+
+	# Gameboy / Gameboy Color
+	select BR2_PACKAGE_LIBRETRO_GAMBATTE
+
+	# GBA
+	select BR2_PACKAGE_LIBRETRO_MGBA
+
+	# Neo Geo Pocket
+	select BR2_PACKAGE_LIBRETRO_BEETLE_NGP
+
+	# Atari Lynx
+	select BR2_PACKAGE_LIBRETRO_BEETLE_LYNX
+
+	# Wonderswan
+	select BR2_PACKAGE_LIBRETRO_BEETLE_WSWAN
+
+	# Pokemon Mini
+	select BR2_PACKAGE_LIBRETRO_POKEMINI
+
+	# Game and Watch
+	select BR2_PACKAGE_LIBRETRO_GW
+
+	# Watara
+	select BR2_PACKAGE_LIBRETRO_WATARA
+
+	# MegaDuck
+	select BR2_PACKAGE_LIBRETRO_SAMEDUCK
+
+	# DOS emulation
+	#select BR2_PACKAGE_LIBRETRO_DOSBOX_PURE
+
+	# CAPS image support (IPF)
+	#select BR2_PACKAGE_LIBCAPSIMAGE
+
+	# Commodore 64/128/VIC20/PET/Plus4
+	#select BR2_PACKAGE_LIBRETRO_VICE		# ALL
+
+	# Commodore Amiga
+	#select BR2_PACKAGE_LIBRETRO_PUAE2021	
+	#select BR2_PACKAGE_LIBRETRO_UAE4ARM	
+
+	# Apple 2
+	#select BR2_PACKAGE_LIBRETRO_APPLEWIN
+
+	# Atari 800 computers
+	#select BR2_PACKAGE_LIBRETRO_ATARI800
+
+	# Sinclair ZX Spectrum
+	#select BR2_PACKAGE_LIBRETRO_FUSE
+
+	# Amstrad CPC
+	#select BR2_PACKAGE_LIBRETRO_CAP32
+
+	# Sinclair ZX80/81
+	#select BR2_PACKAGE_LIBRETRO_81
+
+	# Atari ST/TT/Falcon
+	#select BR2_PACKAGE_LIBRETRO_HATARIB
+
+	# MSX range
+	#select BR2_PACKAGE_LIBRETRO_BLUEMSX	# ALL
+	#select BR2_PACKAGE_LIBRETRO_FMSX	# ALL
+
+	# Thomson 8-bit
+	#select BR2_PACKAGE_LIBRETRO_THEODORE	# ALL
+
+	# Japanese PC clones
+	#select BR2_PACKAGE_LIBRETRO_PC88	# ALL
+	#select BR2_PACKAGE_LIBRETRO_PC98	# ALL
+
+	# Sharp X68000 computer
+	#select BR2_PACKAGE_LIBRETRO_PX68K	# ALL
+
+	# Sharp X1 computer
+	#select BR2_PACKAGE_LIBRETRO_XMIL	# ALL
+
+	# Macintosh
+	#select BR2_PACKAGE_LIBRETRO_MINIVMAC	# ALL
+
+	# PS1
+	select BR2_PACKAGE_LIBRETRO_PCSX	# ALL
+
+	# SNK Neo Geo AES / MVS
+	# Note: Accuracy-focused, beware of speed
+	select BR2_PACKAGE_LIBRETRO_GEOLITH
+
+	# SNK Neo Geo CD
+	select BR2_PACKAGE_LIBRETRO_NEOCD
+
+	# Nintendo Virtual Boy
+	select BR2_PACKAGE_LIBRETRO_BEETLE_VB
+
+	# Coleco Colecovision
+	select BR2_PACKAGE_LIBRETRO_GEARCOLECO		# ALL
+
+	# Sega 8-bit/16-range (Mark III / Master System, Game Gear, Genesis / Megadrive, SegaCD / MegaCD, 32X)
+	select BR2_PACKAGE_LIBRETRO_PICODRIVE		# ALL
+	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX	# ALL
+	select BR2_PACKAGE_LIBRETRO_GEARSYSTEM		# ALL
+
+	# Atari 2600
+	select BR2_PACKAGE_LIBRETRO_STELLA		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+	select BR2_PACKAGE_LIBRETRO_STELLA2014		if !BR2_PACKAGE_LIBRETRO_STELLA
+
+	# Atari 5200
+	select BR2_PACKAGE_LIBRETRO_A5200		# ALL
+
+	# Atari 7800
+	select BR2_PACKAGE_LIBRETRO_PROSYSTEM		# ALL
+
+	# NEC PC-Engine / TurboGrafx / SuperGrafx range
+	select BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST     
+	select BR2_PACKAGE_LIBRETRO_BEETLE_SUPERGRAFX	
+
+	# Vectrex
+	select BR2_PACKAGE_LIBRETRO_VECX		# ALL
+
+	# Magnavox Odyssey
+	select BR2_PACKAGE_LIBRETRO_O2EM		# ALL
+
+	# Intellivision
+	select BR2_PACKAGE_LIBRETRO_FREEINTV		# ALL
+
+	# Nintendo NES / Famicom
+	select BR2_PACKAGE_LIBRETRO_FCEUMM		# ALL
+	select BR2_PACKAGE_LIBRETRO_NESTOPIA		# ALL
+
+	# Super Nintendo / Super Famicom
+	select BR2_PACKAGE_LIBRETRO_SNES9X_NEXT	
+
+	# MrBoom (Bomberman clone)
+	#select BR2_PACKAGE_LIBRETRO_MRBOOM		# ALL
+
+	# Rick Dangerous
+	# TODO no sound broken core
+	#select BR2_PACKAGE_LIBRETRO_XRICK		# ALL
+
+	# Flashback
+	#select BR2_PACKAGE_LIBRETRO_REMINISCENCE	# ALL
+

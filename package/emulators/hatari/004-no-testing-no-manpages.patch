@@ -1,0 +1,24 @@
+--- a/CMakeLists.txt	2025-09-21 20:41:19.561368654 +0200
++++ b/CMakeLists.txt	2025-09-21 20:41:54.616728427 +0200
+@@ -12,7 +12,6 @@
+ endif(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+ 
+ project(Hatari C)
+-enable_testing()
+ 
+ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+ 
+@@ -86,12 +85,7 @@
+ 	    CACHE BOOL "Enable GCC/LLVM run-time undefined behavior debugging")
+ endif(UBSAN_AVAILABLE)
+ 
+-find_program(GZIP gzip)
+-if(UNIX AND GZIP)
+-	set(ENABLE_MAN_PAGES 1 CACHE BOOL "Built and install man pages")
+-else()
+-	set(ENABLE_MAN_PAGES 0 CACHE BOOL "Built and install man pages")
+-endif()
++set(ENABLE_MAN_PAGES 0 CACHE BOOL "Built and install man pages")
+ 
+ if(APPLE)
+ 	set(ENABLE_OSX_BUNDLE 1

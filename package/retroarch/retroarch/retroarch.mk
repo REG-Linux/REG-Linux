@@ -7,7 +7,7 @@
 RETROARCH_VERSION = v1.21.0
 RETROARCH_SITE = $(call github,libretro,RetroArch,$(RETROARCH_VERSION))
 RETROARCH_LICENSE = GPLv3+
-RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets noto-cjk-fonts
+RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets
 RETROARCH_DEPENDENCIES += libusb hidapi gamemode
 # install in staging for debugging (gdb)
 RETROARCH_INSTALL_STAGING = YES
@@ -19,7 +19,6 @@ RETROARCH_CONF_OPTS =   --disable-oss 		\
 			--disable-videocore	\
 			--disable-x11		\
 			--enable-threads 	\
-		      	--enable-lua 		\
 			--enable-networking 	\
 			--enable-translate 	\
 			--enable-hid 		\

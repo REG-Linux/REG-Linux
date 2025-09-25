@@ -3,8 +3,8 @@
 # libretro-fbneo
 #
 ################################################################################
-# Version: Commits on Sep 8, 2025
-LIBRETRO_FBNEO_VERSION = 9c4ab57b1aa0bd910364f381a7fda149cd5df181
+# Version: Commits on Sep 23, 2025
+LIBRETRO_FBNEO_VERSION = 2d05f6cd665d6a2f0a876e2f50192c3fce53ed65
 LIBRETRO_FBNEO_SITE = $(call github,libretro,FBNeo,$(LIBRETRO_FBNEO_VERSION))
 LIBRETRO_FBNEO_LICENSE = Non-commercial
 
@@ -35,7 +35,7 @@ else
 LIBRETRO_FBNEO_EXTRA_ARGS += HAVE_NEON=0
 endif
 
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_X86) $(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
+ifeq ($(BR2_x86_64),y)
 LIBRETRO_FBNEO_EXTRA_ARGS += USE_X64_DRC=1 profile=accuracy
 else
 LIBRETRO_FBNEO_EXTRA_ARGS += profile=performance

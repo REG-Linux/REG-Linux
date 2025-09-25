@@ -1,0 +1,12 @@
+--- a/CMakeLists.txt	2025-09-20 12:28:31.588088578 +0200
++++ b/CMakeLists.txt	2025-09-20 12:28:52.262897844 +0200
+@@ -22,6 +22,9 @@
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
++# Enforce LTO
++set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
++
+ # this is originally a Windows project, so it uses _DEBUG, not NDEBUG
+ add_compile_definitions("$<$<CONFIG:DEBUG>:_DEBUG>")
+ add_compile_options(-Werror=return-type -Wno-switch)

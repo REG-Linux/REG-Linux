@@ -1,0 +1,9 @@
+--- a/source/frontends/libretro/CMakeLists.txt	2025-09-04 16:05:10.077412496 +0200
++++ b/source/frontends/libretro/CMakeLists.txt	2025-09-04 16:05:21.426464804 +0200
+@@ -1,5 +1,5 @@
+ # not every compiler / system supports it
+-option(STATIC_LINKING "statically link the libretro core" OFF)
++option(STATIC_LINKING "statically link the libretro core" ON)
+ 
+ set(SOURCE_FILES
+   environment.cpp

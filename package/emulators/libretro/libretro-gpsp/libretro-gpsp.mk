@@ -4,8 +4,8 @@
 # libretro-gpsp
 #
 ################################################################################
-# Version: Commits on Feb 10, 2024
-LIBRETRO_GPSP_VERSION = 4caf7a167d159866479ea94d6b2d13c26ceb3e72
+# Version: Commits on Sep 17, 2025
+LIBRETRO_GPSP_VERSION = a545aafaf4e654a488f4588f4f302d8413a58066
 LIBRETRO_GPSP_SITE = $(call github,libretro,gpsp,$(LIBRETRO_GPSP_VERSION))
 LIBRETRO_GPSP_LICENSE = GPLv2
 
@@ -13,12 +13,10 @@ LIBRETRO_GPSP_PLATFORM = unix
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2835),y)
 LIBRETRO_GPSP_PLATFORM = rpi1
-
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2836),y)
-LIBRETRO_GPSP_PLATFORM = rpi2
-
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JZ4770),y)
 LIBRETRO_GPSP_PLATFORM = jz4770
+else ifeq ($(BR2_cortex_a7),y)
+LIBRETRO_GPSP_PLATFORM = classic_armv7_a7
 endif
 
 define LIBRETRO_GPSP_BUILD_CMDS

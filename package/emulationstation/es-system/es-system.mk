@@ -49,4 +49,14 @@ define ES_SYSTEM_INSTALL_TARGET_CMDS
 	cp -pr $(@D)/roms $(TARGET_DIR)/usr/share/reglinux/datainit/
 endef
 
+define ES_SYSTEM_PRUNE_VIDEOS
+	find $(TARGET_DIR)/usr/share/reglinux/datainit/roms -type f -name '*.mp4' -delete
+endef
+
+# Do NOT bundle if we don't build ffmpeg
+ifneq ($(BR2_PACKAGE_FFMPEG),y)
+ES_SYSTEM_POST_INSTALL_TARGET_HOOKS += ES_SYSTEM_PRUNE_VIDEOS
+endif
+
+
 $(eval $(generic-package))
