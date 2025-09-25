@@ -1,0 +1,13 @@
+diff --git a/package/pugixml/pugixml.mk b/package/pugixml/pugixml.mk
+index 3935526af6..1a657e3eaf 100644
+--- a/package/pugixml/pugixml.mk
++++ b/package/pugixml/pugixml.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-PUGIXML_VERSION = 1.14
++PUGIXML_VERSION = 1.15
+ PUGIXML_SITE = https://github.com/zeux/pugixml/releases/download/v$(PUGIXML_VERSION)
+ PUGIXML_LICENSE = MIT
+ PUGIXML_LICENSE_FILES = LICENSE.md
