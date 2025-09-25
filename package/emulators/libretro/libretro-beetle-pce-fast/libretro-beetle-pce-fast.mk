@@ -3,10 +3,9 @@
 # libretro-beetle-pce-fast
 #
 ################################################################################
-# Version: Commits on Jun 14, 2025
-LIBRETRO_BEETLE_PCE_FAST_VERSION = 1f4677b3fc876660d333fdda0eecf24bd99f6b64
-LIBRETRO_BEETLE_PCE_FAST_SITE = \
-    $(call github,REG-Linux,beetle-pce-fast-libretro,$(LIBRETRO_BEETLE_PCE_FAST_VERSION))
+# Version: Commits on Sep 23, 2025
+LIBRETRO_BEETLE_PCE_FAST_VERSION = be659edd93cd84e01e13ab3c44a6354662d37e4e
+LIBRETRO_BEETLE_PCE_FAST_SITE = $(call github,libretro,beetle-pce-fast-libretro,$(LIBRETRO_BEETLE_PCE_FAST_VERSION))
 LIBRETRO_BEETLE_PCE_FAST_LICENSE = GPLv2
 
 LIBRETRO_BEETLE_PCE_FAST_PLATFORM = $(LIBRETRO_PLATFORM)
@@ -25,6 +24,9 @@ LIBRETRO_BEETLE_PCE_FAST_PLATFORM = rpi4_64
 
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_BEETLE_PCE_FAST_PLATFORM = rpi5_64
+
+else ifeq ($(BR2_cortex_a7),y)
+LIBRETRO_BEETLE_PCE_FAST_PLATFORM = classic_armv7_a7
 
 endif
 
