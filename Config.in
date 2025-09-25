@@ -125,6 +125,7 @@ menu "Libretro"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-vecx/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-vice/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-xmil/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulators/libretro/libretro-watara/Config.in"
 endmenu
 endmenu
 
@@ -526,7 +527,6 @@ menu "cores"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-uae4arm/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-melonds/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-fmsx/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-watara/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-swanstation/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-mesens/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/emulators/retroarch/libretro/libretro-emuscv/Config.in"

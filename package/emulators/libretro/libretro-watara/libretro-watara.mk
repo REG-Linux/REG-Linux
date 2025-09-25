@@ -3,8 +3,8 @@
 # libretro-watara
 #
 ################################################################################
-# Version: Commits on May 27, 2023
-LIBRETRO_WATARA_VERSION = aed31f9254cada9826c65ff4528cc8bdda338275
+# Version: Commits on Sep 18, 2025
+LIBRETRO_WATARA_VERSION = ad87bc6068ef126e48339b440465fb0bf5a2794f
 LIBRETRO_WATARA_SITE = $(call github,libretro,potator,$(LIBRETRO_WATARA_VERSION))
 LIBRETRO_WATARA_LICENSE = GPLv2
 
@@ -23,6 +23,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_WATARA_PLATFORM = rpi5
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S812),y)
 LIBRETRO_WATARA_PLATFORM = armv cortexa9 neon hardfloat
+else ifeq ($(BR2_cortex_a7),y)
+LIBRETRO_WATARA_PLATFORM = classic_armv7_a7
 else ifeq ($(BR2_aarch64),y)
 LIBRETRO_WATARA_PLATFORM = aarch64
 LIBRETRO_WATARA_EXTRA_ARGS += ARCH=arm64
