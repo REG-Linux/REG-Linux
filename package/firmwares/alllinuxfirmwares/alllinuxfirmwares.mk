@@ -17,7 +17,7 @@ else
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
 endif
 
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA)$(BR2_PACKAGE_SYSTEM_TARGET_MINI),y)
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/brcm $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ti $(@D)/b43 $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm
