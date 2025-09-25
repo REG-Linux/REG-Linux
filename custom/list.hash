@@ -105,6 +105,8 @@ ad422751e4a60689e4198ccf4441ae25  package/ncurses/ncurses.mk
 7e501d1ce57a81b643283e62111b8c91  package/pcre2/Config.in
 c2df51f70ba99c291a3e795362431992  package/pigpio/pigpio.mk
 556858c5d33691756cbc86f981eb397d  package/pipewire/pipewire.mk
+f4984ea3b80b701b13a87b86ce7d48a1  package/pugixml/pugixml.hash
+9f275c3f1732a75e3f7a5725653a1b84  package/pugixml/pugixml.mk
 1ccf6198c069f7cee5b2dc722682948e  package/pulseaudio/pulseaudio.mk
 8b18ad0ab98ce546bdbda9ab22ce119a  package/python-gpiozero/Config.in
 86f2543a00ed51e4b14061b724eb5751  package/python-numpy/Config.in
