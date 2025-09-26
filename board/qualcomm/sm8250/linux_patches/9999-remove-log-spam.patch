@@ -75,13 +75,13 @@ diff -rupbN linux.orig/drivers/firmware/psci/psci.c linux/drivers/firmware/psci/
 diff -rupbN linux.orig/drivers/remoteproc/qcom_q6v5_pas.c linux/drivers/remoteproc/qcom_q6v5_pas.c
 --- linux.orig/drivers/remoteproc/qcom_q6v5_pas.c	2024-10-19 13:35:30.157005891 +0000
 +++ linux/drivers/remoteproc/qcom_q6v5_pas.c	2024-11-04 05:06:06.991809741 +0000
-@@ -316,8 +316,8 @@ static int adsp_start(struct rproc *rpro
+@@ -316,8 +316,8 @@ static int qcom_pas_start(struct rproc *rproc)
  
- 	ret = qcom_scm_pas_auth_and_reset(adsp->pas_id);
+ 	ret = qcom_scm_pas_auth_and_reset(pas->pas_id);
  	if (ret) {
--		dev_err(adsp->dev,
+-		dev_err(pas->dev,
 -			"failed to authenticate image and release reset\n");
-+		//dev_err(adsp->dev,
++		//dev_err(pas->dev,
 +			//"failed to authenticate image and release reset\n");
  		goto release_pas_metadata;
  	}
@@ -147,17 +147,3 @@ diff -rupbN linux.orig/sound/soc/qcom/qdsp6/q6asm.c linux/sound/soc/qcom/qdsp6/q
  			break;
  		}
  		goto done;
-diff -rupbN linux.orig/sound/soc/soc-pcm.c linux/sound/soc/soc-pcm.c
---- linux.orig/sound/soc/soc-pcm.c	2024-10-19 13:35:30.953023643 +0000
-+++ linux/sound/soc/soc-pcm.c	2024-11-04 05:06:06.991809741 +0000
-@@ -2497,8 +2497,8 @@ static int dpcm_fe_dai_prepare(struct sn
- 	/* there is no point preparing this FE if there are no BEs */
- 	if (list_empty(&fe->dpcm[stream].be_clients)) {
- 		/* dev_err_once() for visibility, dev_dbg() for debugging UCM profiles */
--		dev_err_once(fe->dev, "ASoC: no backend DAIs enabled for %s, possibly missing ALSA mixer-based routing or UCM profile\n",
--			     fe->dai_link->name);
-+		//dev_err_once(fe->dev, "ASoC: no backend DAIs enabled for %s, possibly missing ALSA mixer-based routing or UCM profile\n",
-+		//	     fe->dai_link->name);
- 		dev_dbg(fe->dev, "ASoC: no backend DAIs enabled for %s\n",
- 			fe->dai_link->name);
- 		ret = -EINVAL;

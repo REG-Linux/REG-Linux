@@ -11,15 +11,12 @@ diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/q
 index 84e95a46d..a444b7563 100644
 --- a/drivers/media/platform/qcom/venus/core.c
 +++ b/drivers/media/platform/qcom/venus/core.c
-@@ -868,7 +868,7 @@ static const struct venus_resources sm8250_res = {
+@@ -988,7 +988,7 @@
  	.vmem_size = 0,
  	.vmem_addr = 0,
  	.dma_mask = 0xe0000000 - 1,
 -	.fwname = "qcom/vpu-1.0/venus.mbn",
 +	.fwname = "qcom/vpu/vpu20_p4.mbn",
+ 	.dec_nodename = "video-decoder",
+ 	.enc_nodename = "video-encoder",
  };
- 
- static const struct freq_tbl sc7280_freq_table[] = {
--- 
-2.43.0
-
