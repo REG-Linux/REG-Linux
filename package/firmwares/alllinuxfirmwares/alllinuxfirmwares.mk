@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ALLLINUXFIRMWARES_VERSION = 20250613
+ALLLINUXFIRMWARES_VERSION = 20250917
 ALLLINUXFIRMWARES_SITE = https://gitlab.com/kernel-firmware/linux-firmware
 ALLLINUXFIRMWARES_SITE_METHOD = git
 
@@ -38,6 +38,48 @@ endif
 ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_ODIN)$(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/qcom
 endif
+
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
+
+# List of firmware files to keep, read from a manifest
+ALLLINUXFIRMWARES_FILELIST = $(sort $(shell sed -e 's/#.*//' -e '/^$$/d' $(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sm8250/kernel-firmware.txt))
+
+define ALLLINUXFIRMWARES_INSTALL_TARGET_CMDS
+	# Create target firmware dir
+	mkdir -p $(TARGET_DIR)/lib/firmware
+
+	#for f in $(ALLLINUXFIRMWARES_FILELIST); do \
+	#	$(INSTALL) -Dm0644 $(@D)/$$f $(TARGET_DIR)/lib/firmware/$$f || exit 1; \
+	#done
+
+	# Copy only the requested files and create required folders before
+	for f in $(ALLLINUXFIRMWARES_FILELIST); do \
+		for src in $(@D)/$$f; do \
+			if [ -e "$$src" ]; then \
+				dest=$(TARGET_DIR)/lib/firmware/$${src#$(@D)/}; \
+				mkdir -p $$(dirname $$dest); \
+				install -m0644 $$src $$dest; \
+			fi; \
+		done; \
+	done
+
+    # Some firmware are distributed as a symlink, for drivers to load them using a
+    # defined name other than the real one. Since 9cfefbd7fbda ("Remove duplicate
+    # symlinks") those symlink aren't distributed in linux-firmware but are created
+    # automatically by its copy-firmware.sh script during the installation, which
+    # parses the WHENCE file where symlinks are described. We follow the same logic
+    # here, adding symlink only for firmwares installed in the target directory.
+    cd $(TARGET_DIR)/lib/firmware ; \
+    sed -r -e '/^Link: (.+) -> (.+)$$/!d; s//\1 \2/' $(@D)/WHENCE | \
+	while read f d; do \
+		if test -f $$(readlink -m $$(dirname "$$f")/$$d); then \
+            if test -f $(TARGET_DIR)/lib/firmware/$$(dirname "$$f")/$$d; then \
+                ln -sf $$d "$$f" || exit 1; \
+            fi \
+		fi ; \
+	done
+endef
+else
 
 define ALLLINUXFIRMWARES_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/lib/firmware
@@ -94,6 +136,8 @@ endef
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3588),y)
     ALLLINUXFIRMWARES_POST_INSTALL_TARGET_HOOKS = ALLLINUXFIRMWARES_LINK_RTL_BT
+endif
+
 endif
 
 $(eval $(generic-package))

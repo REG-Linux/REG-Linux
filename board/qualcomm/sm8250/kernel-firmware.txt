@@ -1,0 +1,20 @@
+# GPU Adreno 650 firmware
+qcom/a650_gmu.bin
+qcom/a650_sqe.fw
+
+# SoC SM8250 firmware
+qcom/sm8250/*
+qcom/sm8250/Thundercomm/RB5/slpi*
+
+# Venus VPU firmware
+qcom/vpu/vpu20_p4.mbn
+
+# Wifi Atheros ath11k firmware
+ath11k/QCA6390/hw2.0/*.bin
+
+# Bluetooth (HCI UART) QCA firmware
+qca/htbtfw20.tlv
+qca/htnv20.bin
+
+# USB RTL8152/RTL8153 (Ethernet)
+rtl_nic/rtl8153a-4.fw
