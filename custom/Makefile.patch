@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index b9ab0f5caa..42d75f024e 100644
+index 7b86ff7f80..080def41a3 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -766,11 +766,14 @@ endif
@@ -11,7 +11,7 @@ index b9ab0f5caa..42d75f024e 100644
 -		echo "ID=buildroot"; \
 -		echo "VERSION_ID=$(BR2_VERSION)"; \
 -		echo "PRETTY_NAME=\"Buildroot $(BR2_VERSION)\"" \
-+	echo "NAME=REG-Linux"; \
++		echo "NAME=REG-Linux"; \
 +		echo "VERSION=$(REGLINUX_SYSTEM_VERSION)"; \
 +		echo "ID=$(REGLINUX_SYSTEM_ARCH)"; \
 +		echo "VERSION_ID=$(REGLINUX_SYSTEM_ID_VERSION)"; \

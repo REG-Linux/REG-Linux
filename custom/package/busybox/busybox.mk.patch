@@ -1,8 +1,8 @@
 diff --git a/package/busybox/busybox.mk b/package/busybox/busybox.mk
-index 532932ec8f..9ad221d9ed 100644
+index d7eda71db6..a3ad46da85 100644
 --- a/package/busybox/busybox.mk
 +++ b/package/busybox/busybox.mk
-@@ -423,6 +423,11 @@ define BUSYBOX_KCONFIG_FIXUP_CMDS
+@@ -437,6 +437,11 @@ define BUSYBOX_KCONFIG_FIXUP_CMDS
  	$(PACKAGES_BUSYBOX_CONFIG_FIXUPS)
  endef
  
@@ -14,7 +14,7 @@ index 532932ec8f..9ad221d9ed 100644
  define BUSYBOX_BUILD_CMDS
  	$(BUSYBOX_MAKE_ENV) $(MAKE) $(BUSYBOX_MAKE_OPTS) -C $(@D)
  endef
-@@ -436,6 +441,7 @@ define BUSYBOX_INSTALL_TARGET_CMDS
+@@ -450,6 +455,7 @@ define BUSYBOX_INSTALL_TARGET_CMDS
  	$(BUSYBOX_INSTALL_UDHCPC_SCRIPT)
  	$(BUSYBOX_INSTALL_ZCIP_SCRIPT)
  	$(BUSYBOX_INSTALL_MDEV_CONF)

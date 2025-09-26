@@ -1,5 +1,5 @@
 diff --git a/package/Config.in b/package/Config.in
-index dda6722d7e..73982afdee 100644
+index 9b6bef6dd6..5358ccf6c2 100644
 --- a/package/Config.in
 +++ b/package/Config.in
 @@ -331,6 +331,7 @@ comment "Graphic applications"
