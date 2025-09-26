@@ -1,5 +1,5 @@
 diff --git a/package/libcurl/libcurl.mk b/package/libcurl/libcurl.mk
-index 1cfdda27d2..e7d832c478 100644
+index 0aa88044bd..a501ad1644 100644
 --- a/package/libcurl/libcurl.mk
 +++ b/package/libcurl/libcurl.mk
 @@ -189,4 +189,17 @@ endef

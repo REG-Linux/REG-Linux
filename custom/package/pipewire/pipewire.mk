@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-PIPEWIRE_VERSION = 1.2.7
+PIPEWIRE_VERSION = 1.2.8
 PIPEWIRE_SOURCE = pipewire-$(PIPEWIRE_VERSION).tar.bz2
 PIPEWIRE_SITE = https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/$(PIPEWIRE_VERSION)
 PIPEWIRE_LICENSE = MIT, LGPL-2.1+ (libspa-alsa), GPL-2.0 (libjackserver)
@@ -38,8 +38,8 @@ PIPEWIRE_CONF_OPTS += \
 	-Dlibcanberra=disabled \
 	-Dlibmysofa=disabled \
 	-Dlibffado=disabled \
-	-Dflatpak=disabled \
-	-Dsnap=disabled
+	-Dsnap=disabled \
+	-Dsdl2=disabled
 
 # reglinux
 PIPEWIRE_CONF_OPTS += --wrap-mode=default
@@ -236,14 +236,6 @@ PIPEWIRE_DEPENDENCIES += readline
 else
 PIPEWIRE_CONF_OPTS += -Dreadline=disabled
 endif
-
-# reglinux
-#ifeq ($(BR2_PACKAGE_SDL2),y)
-#PIPEWIRE_DEPENDENCIES += sdl2
-#PIPEWIRE_CONF_OPTS += -Dsdl2=enabled
-#else
-PIPEWIRE_CONF_OPTS += -Dsdl2=disabled
-#endif
 
 ifeq ($(BR2_PACKAGE_PIPEWIRE_COMPRESS_OFFLOAD),y)
 PIPEWIRE_CONF_OPTS += -Dcompress-offload=enabled

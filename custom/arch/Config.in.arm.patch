@@ -1,5 +1,5 @@
 diff --git a/arch/Config.in.arm b/arch/Config.in.arm
-index 546ba8070e..01f78fa1a0 100644
+index f01dcc4d5a..a53ddf1281 100644
 --- a/arch/Config.in.arm
 +++ b/arch/Config.in.arm
 @@ -354,6 +354,22 @@ config BR2_emag
