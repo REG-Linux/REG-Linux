@@ -60,19 +60,6 @@ RUN apt-get update && \
     musl-dev \
     musl-tools \
     libgnutls28-dev \
-    fonts-droid-fallback \
-    libcurl4-openssl-dev \
-    rapidjson-dev \
-    libasound2-dev \
-    libcec-dev \
-    libboost-all-dev \
-    libint-dev \
-    libavcodec-dev \
-    libfreetype6-dev \
-    libsdl2-dev \
-    libsdl2-mixer-dev \
-    libfreeimage-dev \
-    libavfilter-dev \
     libcrypt-dev \
     libgdbm-dev \
     libreadline-dev \
