@@ -1,0 +1,22 @@
+{
+    "actions_player1": [
+	{
+        "trigger": ["hotkey", "start"],
+        "type": "key",
+        "target": "KEY_ESC",
+        "description": "Exit the emulator"
+	},
+    {
+        "trigger": [ "hotkey", "y" ],
+        "type": "key",
+        "target": "KEY_F5",
+        "description": "Save emulator state"
+    },
+    {
+        "trigger": [ "hotkey", "x" ],
+        "type": "key",
+        "target": "KEY_F7",
+        "description": "Load emulator state"
+    }
+    ]
+}
