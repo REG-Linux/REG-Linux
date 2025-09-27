@@ -38,6 +38,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3588),y)
 	REGLINUX_GPU_SYSTEM = mali-g610
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ODIN),y)
 	REGLINUX_GPU_SYSTEM = adreno-630
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM6115),y)
+	REGLINUX_GPU_SYSTEM = adreno-610
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
 	REGLINUX_GPU_SYSTEM = adreno-650
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
@@ -102,6 +104,8 @@ define REGLINUX_SHADERS_DELETE_BEEFY_SHADERS
     rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-royale
     rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/crt/shaders/crt-yo6
     rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/procedural
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/handheld/console-border
+    rm -Rf $(TARGET_DIR)/usr/share/reglinux/shaders/handheld/shaders/simpletex_lcd
 endef
 
 ifneq ($(REGLINUX_GPU_SYSTEM),x86)
