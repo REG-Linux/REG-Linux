@@ -6,10 +6,12 @@ RUN apt-get update && \
     apt-get remove -y '*cloud*' '*firefox*' '*chrome*' '*dotnet*' '*php*' && \
     apt-get install -y \
     ccache \
+    which \
     sed \
     binutils \
     build-essential \
     diffutils \
+    coreutils \
     bash \
     patch \
     gzip \
@@ -23,6 +25,7 @@ RUN apt-get update && \
     findutils \
     gawk \
     bsdmainutils \
+    make \
     cmake \
     git \
     libncurses6 \
@@ -54,6 +57,8 @@ RUN apt-get update && \
     python3-matplotlib \
     gcc-multilib \
     g++-multilib \
+    musl-dev \
+    musl-tools \
     libgnutls28-dev \
     fonts-droid-fallback \
     libcurl4-openssl-dev \
