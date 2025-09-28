@@ -17,7 +17,7 @@ else
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
 endif
 
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA)$(BR2_PACKAGE_SYSTEM_TARGET_MINI),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MINI),y)
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ath10k $(@D)/ath11k $(@D)/ath12k $(@D)/mediatek $(@D)/mrvl $(@D)/ti-connectivity $(@D)/rtw89 $(@D)/cypress
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/brcm $(@D)/cirrus $(@D)/qca $(@D)/ueagle-atm $(@D)/libertas $(@D)/phanfw.bin $(@D)/rsi $(@D)/nxp
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ti $(@D)/b43 $(@D)/amlogic $(@D)/carl9170fw $(@D)/cnm
@@ -39,18 +39,19 @@ ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_ODIN)$(BR2_PACKAGE_SYSTEM_TARGET_SM6115)$(BR2
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/qcom
 endif
 
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA)$(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
 
+# TODO CLEAN THIS / AUTOMATE THIS
 # List of firmware files to keep, read from a manifest
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
 ALLLINUXFIRMWARES_FILELIST = $(sort $(shell sed -e 's/#.*//' -e '/^$$/d' $(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sm8250/kernel-firmware.txt))
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
+ALLLINUXFIRMWARES_FILELIST = $(sort $(shell sed -e 's/#.*//' -e '/^$$/d' $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h3/cha/kernel-firmware.txt))
+endif
 
 define ALLLINUXFIRMWARES_INSTALL_TARGET_CMDS
 	# Create target firmware dir
 	mkdir -p $(TARGET_DIR)/lib/firmware
-
-	#for f in $(ALLLINUXFIRMWARES_FILELIST); do \
-	#	$(INSTALL) -Dm0644 $(@D)/$$f $(TARGET_DIR)/lib/firmware/$$f || exit 1; \
-	#done
 
 	# Copy only the requested files and create required folders before
 	for f in $(ALLLINUXFIRMWARES_FILELIST); do \

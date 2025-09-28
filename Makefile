@@ -71,8 +71,8 @@ publish-docker-image:
 output-dir-%: %-supported
 	@mkdir -p $(OUTPUT_DIR)/$*
 
-ccache-dir:
-	@mkdir -p $(CCACHE_DIR)
+%-ccache-dir:
+	@mkdir -p $(CCACHE_DIR)/$*
 
 dl-dir:
 	@mkdir -p $(DL_DIR)
@@ -108,12 +108,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
 
-%-build: reglinux-docker-image %-config ccache-dir dl-dir
+%-build: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
@@ -121,12 +121,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
 
-%-source: reglinux-docker-image %-config ccache-dir dl-dir
+%-source: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
@@ -134,12 +134,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
 
-%-show-build-order: reglinux-docker-image %-config ccache-dir dl-dir
+%-show-build-order: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
@@ -147,12 +147,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot show-build-order
 
-%-kernel: reglinux-docker-image %-config ccache-dir dl-dir
+%-kernel: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run -it --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
@@ -160,12 +160,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot linux-menuconfig
 
-%-graph-depends: reglinux-docker-image %-config ccache-dir dl-dir
+%-graph-depends: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
@@ -173,12 +173,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-depends
 
-%-graph-build: reglinux-docker-image %-config ccache-dir dl-dir
+%-graph-build: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
@@ -186,12 +186,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		make O=/$* BR2_EXTERNAL=/build BR2_GRAPH_OUT=svg -C /build/buildroot graph-build
 
-%-graph-size: reglinux-docker-image %-config ccache-dir dl-dir
+%-graph-size: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
@@ -206,7 +206,7 @@ dl-dir:
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
 		-w /$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		$(DOCKER_OPTS) \
 		-v /etc/passwd:/etc/passwd:ro \
@@ -214,12 +214,12 @@ dl-dir:
 		$(DOCKER_REPO)/$(IMAGE_NAME) \
 		$(CMD)
 
-%-ccache-stats: reglinux-docker-image %-config ccache-dir dl-dir
+%-ccache-stats: reglinux-docker-image %-config %-ccache-dir dl-dir
 	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
 		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
