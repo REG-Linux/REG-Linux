@@ -1,0 +1,4 @@
+# Wifi/BT firmware
+rtlwifi/rtl8188eufw.bin
+rtlwifi/rtl8188efw.bin
+rtlwifi/rtl8188fufw.bin
