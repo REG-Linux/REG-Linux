@@ -1,0 +1,19 @@
+--- a/CMakeLists.txt	2025-09-28 23:29:51.124637934 +0200
++++ b/CMakeLists.txt	2025-09-28 23:30:38.983436942 +0200
+@@ -65,12 +65,16 @@
+     ADD_DEFINITIONS(-DDUMP_MTCS)
+ endif(DUMP_MTCS)
+ 
++OPTION(USE_CCACHE "Try to use ccache" OFF)
++
++IF (USE_CCACHE)
+ find_program(CCACHE_FOUND ccache)
+ if(CCACHE_FOUND)
+     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache) # Less useful to do it for linking, see edit2
+     message(STATUS "Using ccache for faster builds")
+ endif(CCACHE_FOUND)
++endif(USE_CCACHE)
+ 
+ # Will pass the SHA and branch strings to the executable
+ find_program(GIT_FOUND git)

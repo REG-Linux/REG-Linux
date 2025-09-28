@@ -15,6 +15,13 @@ ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
 CGENIUS_DEPENDENCIES += libbacktrace libexecinfo
 endif
 
+ifeq ($(BR2_CCACHE),y)
+CGENIUS_CONF_OPTS += -DUSE_CCACHE=ON
+# No dependencies needed, it's into toolchain
+else
+CGENIUS_CONF_OPTS += -DUSE_CCACHE=OFF
+endif
+
 CGENIUS_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
 CGENIUS_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 
