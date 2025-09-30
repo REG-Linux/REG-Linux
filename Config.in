@@ -343,6 +343,7 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/wsdd-native/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/xxd/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/evmapy/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/vdpauinfo/Config.in"
 endmenu
 
 menu "Firmwares"
@@ -571,7 +572,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/batocera-ethtool/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/batocera-battery-checker/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/imgui/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/vdpauinfo/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/utils/ledspicer/Config.in"
 endmenu
 
