@@ -12,10 +12,7 @@ VDPAUINFO_LICENSE_FILES = COPYING
 
 VDPAUINFO_DEPENDENCIES = libvdpau xlib_libX11
 
-define VDPAUINFO_RUN_AUTOGEN
-	cd $(@D) && PATH=$(BR_PATH) ./autogen.sh
-endef
-
-VDPAUINFO_PRE_CONFIGURE_HOOKS += VDPAUINFO_RUN_AUTOGEN
+# Force autoreconf because the repository does not ship a pre-generated configure script
+VDPAUINFO_AUTORECONF = YES
 
 $(eval $(autotools-package))
