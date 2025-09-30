@@ -1,0 +1,13 @@
+diff --git a/libretro/Makefile b/libretro/Makefile
+index 3d69d74..46e046b 100644
+--- a/libretro/Makefile
++++ b/libretro/Makefile
+@@ -380,7 +380,7 @@ ifneq ($(findstring Haiku,$(shell uname -s)),)
+ 	# this is still rather ugly and could be done better I guess
+ 	od -A none -t x1 -v $< | sed -e 's/^\ /0x/' -e 's/\ /,\ 0x/g' -e 's/$$/,/g' | tr '\n' ' ' >> $@
+ else
+-	hexdump -v -e '/1 "0x%02x, "' $< >> $@
++	$(TARGET_DIR)/usr/bin/hexdump -v -e '/1 "0x%02x, "' $< >> $@
+ endif
+ 	echo "};" >> $@
+ 	echo "const unsigned $(notdir $(@:%.c=%))_length = sizeof($(notdir $(@:%.c=%)));" >> $@

@@ -1,4 +1,3 @@
-
 ################################################################################
 #
 # libretro-sameboy
@@ -8,9 +7,8 @@
 LIBRETRO_SAMEBOY_VERSION = v1.0.2
 LIBRETRO_SAMEBOY_SITE = $(call github,LIJI32,SameBoy,$(LIBRETRO_SAMEBOY_VERSION))
 LIBRETRO_SAMEBOY_LICENSE = Expat
-LIBRETRO_SAMEBOY_DEPENDENCIES = host-rgbds host-xxd
+LIBRETRO_SAMEBOY_DEPENDENCIES = host-rgbds host-xxd host-util-linux
 
-# Improve plaform selection
 LIBRETRO_SAMEBOY_PLATFORM = unix
 
 define LIBRETRO_SAMEBOY_BUILD_CMDS
