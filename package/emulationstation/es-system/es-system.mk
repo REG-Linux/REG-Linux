@@ -28,11 +28,11 @@ define ES_SYSTEM_BUILD_CMDS
 		$(@D)/roms $(REGLINUX_SYSTEM_ARCH)
 		# translations
 		mkdir -p $(ES_SYSTEM_PATH)/locales
-		(echo "$(@D)/es_external_translations.h"; echo "$(@D)/es_keys_translations.h") | xgettext --language=C --add-comments=TRANSLATION -f - -o $(ES_SYSTEM_PATH)/locales/es-system.pot --no-location --keyword=_
+		(echo "$(@D)/es_external_translations.h"; echo "$(@D)/es_keys_translations.h") | $(HOST_DIR)/bin/xgettext --language=C --add-comments=TRANSLATION -f - -o $(ES_SYSTEM_PATH)/locales/es-system.pot --no-location --keyword=_
 		# remove the pot creation date always changing
 		sed -i '/^"POT-Creation-Date: /d' $(ES_SYSTEM_PATH)/locales/es-system.pot
 
-		for PO in $(ES_SYSTEM_PATH)/locales/*/es-system.po; do (msgmerge -U --no-fuzzy-matching $${PO} $(ES_SYSTEM_PATH)/locales/es-system.pot && printf "%s " $$(basename $$(dirname $${PO})) && LANG=C msgfmt -o /dev/null $${PO} --statistics) || exit 1; done
+		for PO in $(ES_SYSTEM_PATH)/locales/*/es-system.po; do ($(HOST_DIR)/bin/msgmerge -U --no-fuzzy-matching $${PO} $(ES_SYSTEM_PATH)/locales/es-system.pot && printf "%s " $$(basename $$(dirname $${PO})) && LANG=C $(HOST_DIR)/bin/msgfmt -o /dev/null $${PO} --statistics) || exit 1; done
 
 		# install staging
 		mkdir -p $(STAGING_DIR)/usr/share/es-system/locales
