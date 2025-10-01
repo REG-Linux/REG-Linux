@@ -13,9 +13,9 @@ LIBRETRO_SAMEBOY_PLATFORM = unix
 
 define LIBRETRO_SAMEBOY_BUILD_CMDS
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D) \
-	    -f Makefile platform="$(LIBRETRO_SAMEBOY_PLATFORM)" -j1 bootroms
+	    -f Makefile platform="$(LIBRETRO_SAMEBOY_PLATFORM)" bootroms
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) CXX="$(TARGET_CXX)" CC="$(TARGET_CC)" -C $(@D) \
-	    -f Makefile platform="$(LIBRETRO_SAMEBOY_PLATFORM)" -j4 libretro
+	    -f Makefile platform="$(LIBRETRO_SAMEBOY_PLATFORM)" libretro
 endef
 
 define LIBRETRO_SAMEBOY_INSTALL_TARGET_CMDS
