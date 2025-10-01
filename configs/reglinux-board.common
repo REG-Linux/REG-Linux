@@ -3,6 +3,9 @@ BR2_ROOTFS_USERS_TABLES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/users.txt"
 
 BR2_STRIP_EXCLUDE_DIRS="usr/ryujinx usr/duckstation usr/bin/vpinball usr/share/ecwolf usr/bin/vita3k usr/bin/dmdserver"
 
+# Skip stack protection
+BR2_SSP_NONE=y
+
 # Binary for initramfs
 BR2_PACKAGE_BUSYBOX=y
 
