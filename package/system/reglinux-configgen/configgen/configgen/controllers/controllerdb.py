@@ -4,11 +4,42 @@ Handles loading and matching controller configurations from gamecontrollerdb.txt
 """
 
 from os import environ
-from typing import Dict
+from typing import Dict, List, Type
 from controllers import Controller, Input
+from concurrent.futures import ThreadPoolExecutor
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
+
+@staticmethod
+def parse_line(line: str) -> tuple[str, dict] | None:
+    line = line.strip()
+    if not line or line.startswith("#"):
+        return None
+    parts = line.split(",")
+    if len(parts) < 2:
+        return None
+    guid = parts[0]
+    name = parts[1]
+    inputs = {}
+    for input_pair in parts[2:]:
+        input_pair = input_pair.strip()
+        if ":" not in input_pair:
+            continue
+        key, value = input_pair.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        # Create Input object for each mapping
+        input_obj = Input.from_sdl_mapping(key, value)
+        if input_obj:
+            inputs[key] = input_obj
+    return guid, {
+        "guid": guid,
+        "name": name,
+        "inputs": inputs,
+        "type": "joystick",
+        "input_objects": inputs,  # Backward compatible
+    }
 
 
 def load_all_controllers_config() -> Dict[str, Dict]:
@@ -23,44 +54,23 @@ def load_all_controllers_config() -> Dict[str, Dict]:
     filepath = environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
 
     try:
-        with open(filepath, "r") as controllerdb_file:
-            for line in controllerdb_file:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
+        with open(filepath, "r") as f:
+            lines = f.readlines()
 
-                parts = line.split(",")
-                if len(parts) >= 2:
-                    guid = parts[0]
-                    name = parts[1]
-                    inputs = {}
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(lambda line: parse_line(line), lines)
 
-                    for input_pair in parts[2:]:
-                        input_pair = input_pair.strip()
-                        if ":" in input_pair:
-                            key, value = input_pair.split(":", 1)
-                            key = key.strip()
-                            value = value.strip()
+        for res in results:
+            if res is not None:
+                guid, config = res
+                controllerdb[guid] = config
 
-                            # Create Input object for each mapping
-                            input_obj = Input.from_sdl_mapping(key, value)
-                            if input_obj:
-                                inputs[key] = input_obj
-
-                    controllerdb[guid] = {
-                        "guid": guid,
-                        "name": name,
-                        "inputs": inputs,
-                        "type": "joystick",
-                        "input_objects": inputs,  # Backward compatible
-                    }
     except FileNotFoundError:
         eslog.warning(f"Warning: Controller config file {filepath} not found.")
     except Exception as e:
         eslog.error(f"Error loading controller config: {e}")
 
     return controllerdb
-
 
 def load_controller_config(controllersInput):
     """

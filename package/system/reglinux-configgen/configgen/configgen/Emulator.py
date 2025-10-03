@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET
 from os import path
 from systemFiles import SYSTEM_CONF, ES_SETTINGS
-from yaml import SafeLoader, load
+import yaml
+from yaml import CLoader as Loader
 from typing import Dict, Any
 from settings import UnixSettings
 from utils.logger import get_logger
@@ -149,19 +150,38 @@ class Emulator:
         eslog.info(f"game settings name: {rom}")
         return rom
 
+#    @staticmethod
+#    def dict_merge(dct: Dict[Any, Any], merge_dct: Dict[Any, Any]) -> None:
+#        """Recursively merge merge_dct into dct, updating nested dictionaries.
+#
+#        Args:
+#            dct: The dictionary to update.
+#            merge_dct: The dictionary to merge into dct.
+#        """
+#        for key, value in merge_dct.items():
+#            if key in dct and isinstance(dct[key], dict) and isinstance(value, dict):
+#                Emulator.dict_merge(dct[key], value)
+#            else:
+#                dct[key] = value
+#
+
     @staticmethod
-    def dict_merge(dct: Dict[Any, Any], merge_dct: Dict[Any, Any]) -> None:
-        """Recursively merge merge_dct into dct, updating nested dictionaries.
+    def dict_merge(dest: Dict[Any, Any], src: Dict[Any, Any]) -> None:
+        """Merge src into dest, updating nested dictionaries.
 
         Args:
-            dct: The dictionary to update.
-            merge_dct: The dictionary to merge into dct.
+            dest: The dictionary to update.
+            src: The dictionary to merge into dest.
         """
-        for key, value in merge_dct.items():
-            if key in dct and isinstance(dct[key], dict) and isinstance(value, dict):
-                Emulator.dict_merge(dct[key], value)
-            else:
-                dct[key] = value
+        stack = [(dest, src)]
+        while stack:
+            d, s = stack.pop()
+            for k, v in s.items():
+                if k in d and isinstance(d[k], dict) and isinstance(v, dict):
+                    stack.append((d[k], v))
+                else:
+                    d[k] = v
+
 
     @staticmethod
     def get_generic_config(
@@ -179,13 +199,13 @@ class Emulator:
         """
         # Load default configuration
         with open(defaultyml, "r") as f:
-            systems_default = load(f, Loader=SafeLoader)
+            systems_default = yaml.load(f, Loader=Loader)
 
         # Load architecture-specific configuration if available
         systems_default_arch = {}
         if path.exists(defaultarchyml):
             with open(defaultarchyml, "r") as f:
-                systems_default_arch = load(f, Loader=SafeLoader) or {}
+                systems_default_arch = yaml.load(f, Loader=Loader) or {}
 
         dict_all: Dict[str, Any] = {}
 
