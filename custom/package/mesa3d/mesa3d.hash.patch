@@ -1,12 +1,12 @@
 diff --git a/package/mesa3d/mesa3d.hash b/package/mesa3d/mesa3d.hash
-index d506d398b8..595ab14f94 100644
+index d506d398b8..daa1203726 100644
 --- a/package/mesa3d/mesa3d.hash
 +++ b/package/mesa3d/mesa3d.hash
 @@ -1,5 +1,4 @@
 -# From https://lists.freedesktop.org/archives/mesa-announce/2024-June/000764.html
 -sha256  51aa686ca4060e38711a9e8f60c8f1efaa516baf411946ed7f2c265cd582ca4c  mesa-24.0.9.tar.xz
 -sha512  de2ee6c9df1fc106ee10befe0a76be1e9cfe83d65dbdb83bad6d8d7cfaa085232fb115293a1a790b37b50b1fe14bd58aafbcfe5a15e953b5901a7105d57569a5  mesa-24.0.9.tar.xz
-+# From https://docs.mesa3d.org/relnotes/25.2.3.html
-+sha256  f2d6b28562f1d6cb9c17ee8e58eeade7aa5faf927ae71065eadb41e17f92b4f8  mesa-25.2.3.tar.xz
++# From https://docs.mesa3d.org/relnotes/25.2.4.html
++sha256  a370b4c549cbfbe646b319e34d73edb50ed883978f5e95133f282f0eae39ab52  mesa-25.2.4.tar.xz
  # License
  sha256  a00275a53178e2645fb65be99a785c110513446a5071ff2c698ed260ad917d75  docs/license.rst
