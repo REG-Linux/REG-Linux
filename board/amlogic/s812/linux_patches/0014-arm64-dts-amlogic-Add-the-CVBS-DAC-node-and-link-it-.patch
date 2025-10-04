@@ -1,0 +1,108 @@
+From ca3929e93d75d1ca85637abe4505918e09e91028 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Sun, 18 Feb 2024 19:21:13 +0100
+Subject: [PATCH 14/95] arm64: dts: amlogic: Add the CVBS DAC node and link it
+ with the VPU - WiP
+
+WiP
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi | 10 ++++++++++
+ arch/arm64/boot/dts/amlogic/meson-gx.dtsi         |  9 +++++++++
+ arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi       |  6 ++++++
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi        |  6 ++++++
+ 4 files changed, 31 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+index dcc927a9da80..042c62aa4b40 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi
+@@ -1674,6 +1674,14 @@ mipi_analog_dphy: phy {
+ 						#phy-cells = <0>;
+ 						status = "disabled";
+ 					};
++
++					cvbs_dac: video-dac@2ec {
++						compatible = "amlogic,meson-g12a-cvbs-dac",
++							     "amlogic,meson-cvbs-dac";
++						reg = <0x2ec 0x8>;
++						#phy-cells = <0>;
++						clocks = <&clkc CLKID_CTS_VDAC>;
++					};
+ 				};
+ 			};
+ 
+@@ -2167,6 +2175,8 @@ vpu: vpu@ff900000 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			amlogic,canvas = <&canvas>;
++			phys = <&cvbs_dac>;
++			phy-names = "cvbs-dac";
+ 
+ 			/* CVBS VDAC output port */
+ 			cvbs_vdac_port: port@0 {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+index 7d99ca44e660..71c94fb2dc37 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+@@ -568,6 +568,13 @@ pwrc: power-controller {
+ 					#power-domain-cells = <1>;
+ 					amlogic,ao-sysctrl = <&sysctrl_AO>;
+ 				};
++
++				cvbs_dac: video-dac@2f4 {
++					compatible = "amlogic,meson-cvbs-dac";
++					reg = <0x2f4 0x8>;
++					#phy-cells = <0>;
++					status = "disabled";
++				};
+ 			};
+ 
+ 			mailbox: mailbox@404 {
+@@ -632,6 +639,8 @@ vpu: vpu@d0100000 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			amlogic,canvas = <&canvas>;
++			phys = <&cvbs_dac>;
++			phy-names = "cvbs-dac";
+ 
+ 			/* CVBS VDAC output port */
+ 			cvbs_vdac_port: port@0 {
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+index f69923da07fe..f1265b91b29e 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+@@ -287,6 +287,12 @@ &clkc_AO {
+ 	clock-names = "xtal", "mpeg-clk";
+ };
+ 
++&cvbs_dac {
++	compatible = "amlogic,meson-gxl-cvbs-dac", "amlogic,meson-cvbs-dac";
++	clocks = <&clkc CLKID_CTS_VDAC>;
++	status = "okay";
++};
++
+ &efuse {
+ 	clocks = <&clkc CLKID_EFUSE>;
+ };
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+index ba535010a3c9..4a195848bc5c 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxl.dtsi
+@@ -124,6 +124,12 @@ usb2_phy1: phy@78020 {
+ 	};
+ };
+ 
++&cvbs_dac {
++	compatible = "amlogic,meson-gxl-cvbs-dac", "amlogic,meson-cvbs-dac";
++	clocks = <&clkc CLKID_CTS_VDAC>;
++	status = "okay";
++};
++
+ &efuse {
+ 	clocks = <&clkc CLKID_EFUSE>;
+ };
+-- 
+2.43.0
+

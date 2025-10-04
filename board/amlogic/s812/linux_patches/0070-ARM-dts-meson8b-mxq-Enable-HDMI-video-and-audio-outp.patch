@@ -1,0 +1,110 @@
+From de26d543308cb65773b75ace6c18c469f5f54963 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Mon, 26 Dec 2022 11:36:36 +0100
+Subject: [PATCH 70/95] ARM: dts: meson8b: mxq: Enable HDMI video and audio
+ outputs - TODO
+
+TODO
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ arch/arm/boot/dts/amlogic/meson8b-mxq.dts | 62 +++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+
+diff --git a/arch/arm/boot/dts/amlogic/meson8b-mxq.dts b/arch/arm/boot/dts/amlogic/meson8b-mxq.dts
+index 0bca0b33eea2..7e9d0d0b5b38 100644
+--- a/arch/arm/boot/dts/amlogic/meson8b-mxq.dts
++++ b/arch/arm/boot/dts/amlogic/meson8b-mxq.dts
+@@ -27,6 +27,17 @@ memory@40000000 {
+ 		reg = <0x40000000 0x40000000>;
+ 	};
+ 
++	hdmi-connector {
++		compatible = "hdmi-connector";
++		type = "a";
++
++		port {
++			hdmi_connector_in: endpoint {
++				remote-endpoint = <&hdmi_tx_tmds_out>;
++			};
++		};
++	};
++
+ 	vcck: regulator-vcck {
+ 		compatible = "pwm-regulator";
+ 
+@@ -43,6 +54,41 @@ vcck: regulator-vcck {
+ 		regulator-always-on;
+ 	};
+ 
++	sound {
++		compatible = "amlogic,gx-sound-card";
++		model = "M8B-MXQ";
++
++		clocks = <&clkc CLKID_MPLL0>,
++			 <&clkc CLKID_MPLL1>;
++
++		assigned-clocks = <&clkc CLKID_MPLL0>,
++				  <&clkc CLKID_MPLL1>;
++		assigned-clock-rates = <294912000>,
++				       <270950400>;
++
++		dai-link-0 {
++			sound-dai = <&aiu AIU_CPU CPU_I2S_FIFO>;
++		};
++
++		dai-link-1 {
++			sound-dai = <&aiu AIU_CPU CPU_I2S_ENCODER>;
++			dai-format = "i2s";
++			mclk-fs = <256>;
++
++			codec-0 {
++				sound-dai = <&aiu AIU_HDMI CTRL_I2S>;
++			};
++		};
++
++		dai-link-2 {
++			sound-dai = <&aiu AIU_HDMI CTRL_OUT>;
++
++			codec-0 {
++				sound-dai = <&hdmi_tx 0>;
++			};
++		};
++	};
++
+ 	vcc_1v8: regulator-vcc1v8 {
+ 		compatible = "regulator-fixed";
+ 
+@@ -91,6 +137,10 @@ vddee: regulator-vddee {
+ 	};
+ };
+ 
++&aiu {
++	status = "okay";
++};
++
+ &cpu0 {
+ 	cpu-supply = <&vcck>;
+ };
+@@ -125,6 +175,18 @@ eth_phy0: ethernet-phy@0 {
+ 	};
+ };
+ 
++&hdmi_tx {
++	status = "okay";
++	pinctrl-0 = <&hdmi_hpd_pins>, <&hdmi_i2c_pins>;
++	pinctrl-names = "default";
++};
++
++&hdmi_tx_tmds_port {
++	hdmi_tx_tmds_out: endpoint {
++		remote-endpoint = <&hdmi_connector_in>;
++	};
++};
++
+ &mali {
+ 	mali-supply = <&vddee>;
+ };
+-- 
+2.43.0
+
