@@ -13,7 +13,6 @@ Signed-off-by: Alex Bee <knaerzche@gmail.com>
 ---
  .../arm64/boot/dts/rockchip/rk3328-roc-cc.dts |  4 +++
  .../arm64/boot/dts/rockchip/rk3328-rock64.dts |  4 +++
- arch/arm64/boot/dts/rockchip/rk3328.dtsi      | 35 +++++++++++++++++++
  3 files changed, 43 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts b/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
@@ -46,68 +45,6 @@ index f69a38f42d2d..c198a8a7f95a 100644
  &hdmi {
  	status = "okay";
  };
-diff --git a/arch/arm64/boot/dts/rockchip/rk3328.dtsi b/arch/arm64/boot/dts/rockchip/rk3328.dtsi
-index 431c4ec198be..eec03adf0902 100644
---- a/arch/arm64/boot/dts/rockchip/rk3328.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk3328.dtsi
-@@ -300,6 +300,11 @@ power: power-controller {
- 			#address-cells = <1>;
- 			#size-cells = <0>;
- 
-+			power-domain@RK3328_PD_GPU {
-+				reg = <RK3328_PD_GPU>;
-+				clocks = <&cru ACLK_GPU>;
-+				#power-domain-cells = <0>;
-+			};
- 			power-domain@RK3328_PD_HEVC {
- 				reg = <RK3328_PD_HEVC>;
- 				#power-domain-cells = <0>;
-@@ -539,6 +544,11 @@ map0 {
- 							 <&cpu3 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
- 					contribution = <4096>;
- 				};
-+				map1 {
-+					trip = <&target>;
-+					cooling-device = <&gpu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
-+					contribution = <4096>;
-+				};
- 			};
- 		};
- 
-@@ -620,7 +630,32 @@ gpu: gpu@ff300000 {
- 				  "ppmmu1";
- 		clocks = <&cru ACLK_GPU>, <&cru ACLK_GPU>;
- 		clock-names = "bus", "core";
-+		operating-points-v2 = <&gpu_opp_table>;
-+		power-domains = <&power RK3328_PD_GPU>;
- 		resets = <&cru SRST_GPU_A>;
-+		#cooling-cells = <2>;
-+	};
-+
-+	gpu_opp_table: gpu-opp-table {
-+		compatible = "operating-points-v2";
-+
-+		opp-200000000 {
-+			opp-hz = /bits/ 64 <200000000>;
-+			opp-microvolt = <1075000>;
-+		};
-+		opp-300000000 {
-+			opp-hz = /bits/ 64 <300000000>;
-+			opp-microvolt = <1075000>;
-+		};
-+		opp-400000000 {
-+			opp-hz = /bits/ 64 <400000000>;
-+			opp-microvolt = <1075000>;
-+		};
-+		opp-500000000 {
-+			opp-hz = /bits/ 64 <500000000>;
-+			opp-microvolt = <1150000>;
-+			status = "disabled";
-+		};
- 	};
- 
- 	h265e_mmu: iommu@ff330200 {
-
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Tue, 2 Feb 2021 17:22:21 +0200
@@ -165,8 +102,7 @@ Subject: [PATCH] ARM/arm64: dts: rockchip: align sound card names
 Signed-off-by: Alex Bee <knaerzche@gmail.com>
 ---
  arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi     | 2 +-
- arch/arm64/boot/dts/rockchip/rk3399.dtsi | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi b/arch/arm/boot/dts/rockchip/rk3288-tinker.dtsi
 index 09618bb7d872..db9106a3dd22 100644
@@ -181,19 +117,6 @@ index 09618bb7d872..db9106a3dd22 100644
  		simple-audio-card,mclk-fs = <512>;
  
  		simple-audio-card,codec {
-diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-index 093ebe070775..a10fe60b7680 100644
---- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-@@ -1893,7 +1893,7 @@ hdmi_sound: hdmi-sound {
- 		compatible = "simple-audio-card";
- 		simple-audio-card,format = "i2s";
- 		simple-audio-card,mclk-fs = <256>;
--		simple-audio-card,name = "hdmi-sound";
-+		simple-audio-card,name = "HDMI";
- 		status = "disabled";
- 
- 		simple-audio-card,cpu {
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
@@ -401,33 +324,6 @@ index c8f44bcb298a..d4280ce4542c 100644
  		cec_transmit_attempt_done(adap, cec->tx_status);
  	}
  	if (cec->rx_done) {
-
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Alex Bee <knaerzche@gmail.com>
-Date: Wed, 5 May 2021 19:11:12 +0200
-Subject: [PATCH] arm64: boot: dts: Increase ACLK_PERILP0 clock rate for RK3399
-
-As per vendor kernel. Leaving this clock at the lower rate will
-result in poor DMA controller performance
-
-Signed-off-by: Alex Bee <knaerzche@gmail.com>
----
- arch/arm64/boot/dts/rockchip/rk3399.dtsi | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-index a10fe60b7680..dbe6a9cb98a5 100644
---- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-@@ -1477,7 +1477,7 @@ cru: clock-controller@ff760000 {
- 			<1000000000>,
- 			 <150000000>,   <75000000>,
- 			  <37500000>,
--			 <100000000>,  <100000000>,
-+			 <300000000>,  <100000000>,
- 			  <50000000>, <600000000>,
- 			 <100000000>,   <50000000>,
- 			 <400000000>, <400000000>,
 
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
