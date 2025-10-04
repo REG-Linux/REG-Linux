@@ -150,7 +150,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_REGLINUX_TEST			# reglinux test script
 
 	select BR2_PACKAGE_LIBDRM
-	select BR2_PACKAGE_LIBV4L_UTILS				if BR2_PACKAGE_V4L
+	select BR2_PACKAGE_LIBV4L_UTILS				if BR2_PACKAGE_LIBV4L
 	select BR2_PACKAGE_LIBCEC				# libcec
 	select BR2_PACKAGE_LIBCEC_LINUX_API			# libcec linux api
 	select BR2_PACKAGE_EDID_DECODE				# edid monitor/tv support
