@@ -1,0 +1,123 @@
+From 348729c01e04eb94b0d947319f5014da3c2ffa90 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Thu, 15 Aug 2024 21:25:08 +0200
+Subject: [PATCH 89/95] Revert "WiP: Enable the ARM Global Timer"
+
+This reverts commit e523ad793050b3aae1e11a2494a30845711367a5.
+---
+ arch/arm/boot/dts/amlogic/meson8.dtsi  | 15 +++------------
+ arch/arm/boot/dts/amlogic/meson8b.dtsi | 15 +++------------
+ drivers/clocksource/arm_global_timer.c | 22 ++++++----------------
+ 3 files changed, 12 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm/boot/dts/amlogic/meson8.dtsi b/arch/arm/boot/dts/amlogic/meson8.dtsi
+index 36bd5b14c919..611431cf79c0 100644
+--- a/arch/arm/boot/dts/amlogic/meson8.dtsi
++++ b/arch/arm/boot/dts/amlogic/meson8.dtsi
+@@ -931,19 +931,10 @@ timer@200 {
+ 		clocks = <&clkc CLKID_PERIPH>;
+ 
+ 		/*
+-		 * The ARM Global Timer can only change the prescaler at
+-		 * runtime, which means that we need to find a pre-divider
+-		 * which works together with the prescaler and can match
+-		 * any CPU clock rate (from the slowest at 24MHz to the
+-		 * highest at 1992MHz).
+-		 * A pre-divider of 8 is a good compromise because it allows
+-		 * running the ARM Global Timer at 3MHz which can be evenly
+-		 * divided by all supported CPU frequencies from 24MHz to
+-		 * 1992MHz while not overflowing the 8-bit prescaler in the
+-		 * timer.
++		 * the arm_global_timer driver currently does not handle clock
++		 * rate changes. Keep it disabled for now.
+ 		 */
+-		assigned-clocks = <&clkc CLKID_PERIPH_SEL>;
+-		assigned-clock-parents = <&clkc CLKID_CPU_CLK_DIV8>;
++		status = "disabled";
+ 	};
+ 
+ 	timer@600 {
+diff --git a/arch/arm/boot/dts/amlogic/meson8b.dtsi b/arch/arm/boot/dts/amlogic/meson8b.dtsi
+index b45c682a73d1..52a12c46bb62 100644
+--- a/arch/arm/boot/dts/amlogic/meson8b.dtsi
++++ b/arch/arm/boot/dts/amlogic/meson8b.dtsi
+@@ -832,19 +832,10 @@ timer@200 {
+ 		clocks = <&clkc CLKID_PERIPH>;
+ 
+ 		/*
+-		 * The ARM Global Timer can only change the prescaler at
+-		 * runtime, which means that we need to find a pre-divider
+-		 * which works together with the prescaler and can match
+-		 * any CPU clock rate (from the slowest at 24MHz to the
+-		 * highest at 1992MHz).
+-		 * A pre-divider of 8 is a good compromise because it allows
+-		 * running the ARM Global Timer at 3MHz which can be evenly
+-		 * divided by all supported CPU frequencies from 24MHz to
+-		 * 1992MHz while not overflowing the 8-bit prescaler in the
+-		 * timer.
++		 * the arm_global_timer driver currently does not handle clock
++		 * rate changes. Keep it disabled for now.
+ 		 */
+-		assigned-clocks = <&clkc CLKID_PERIPH_SEL>;
+-		assigned-clock-parents = <&clkc CLKID_CPU_CLK_DIV8>;
++		status = "disabled";
+ 	};
+ 
+ 	timer@600 {
+diff --git a/drivers/clocksource/arm_global_timer.c b/drivers/clocksource/arm_global_timer.c
+index f4c647259a3a..c7b6d78cbd8d 100644
+--- a/drivers/clocksource/arm_global_timer.c
++++ b/drivers/clocksource/arm_global_timer.c
+@@ -268,8 +268,10 @@ static int __init gt_clocksource_init(void)
+ 	writel(0, gt_base + GT_CONTROL);
+ 	writel(0, gt_base + GT_COUNTER0);
+ 	writel(0, gt_base + GT_COUNTER1);
+-	/* enable the timer on all the cores */
+-	writel(GT_CONTROL_TIMER_ENABLE, gt_base + GT_CONTROL);
++	/* set prescaler and enable timer on all the cores */
++	writel(FIELD_PREP(GT_CONTROL_PRESCALER_MASK,
++			  CONFIG_ARM_GT_INITIAL_PRESCALER_VAL - 1) |
++	       GT_CONTROL_TIMER_ENABLE, gt_base + GT_CONTROL);
+ 
+ #ifdef CONFIG_CLKSRC_ARM_GLOBAL_TIMER_SCHED_CLOCK
+ 	sched_clock_register(gt_sched_clock_read, 64, gt_target_rate);
+@@ -339,8 +341,7 @@ static int gt_clk_rate_change_cb(struct notifier_block *nb,
+ static int __init global_timer_of_register(struct device_node *np)
+ {
+ 	struct clk *gt_clk;
+-	unsigned long gt_clk_rate;
+-	u32 prescaler;
++	static unsigned long gt_clk_rate;
+ 	int err;
+ 
+ 	/*
+@@ -378,17 +379,7 @@ static int __init global_timer_of_register(struct device_node *np)
+ 	}
+ 
+ 	gt_clk_rate = clk_get_rate(gt_clk);
+-
+-	if (of_machine_is_compatible("amlogic,meson8") ||
+-	    of_machine_is_compatible("amlogic,meson8b") ||
+-	    of_machine_is_compatible("amlogic,meson8m2")) {
+-		gt_target_rate = 3 * 1000 * 1000;
+-		prescaler = gt_clk_rate / gt_target_rate;
+-	} else {
+-		prescaler = CONFIG_ARM_GT_INITIAL_PRESCALER_VAL;
+-		gt_target_rate = gt_clk_rate / prescaler;
+-	}
+-
++	gt_target_rate = gt_clk_rate / CONFIG_ARM_GT_INITIAL_PRESCALER_VAL;
+ 	gt_clk_rate_change_nb.notifier_call =
+ 		gt_clk_rate_change_cb;
+ 	err = clk_notifier_register(gt_clk, &gt_clk_rate_change_nb);
+@@ -413,7 +404,6 @@ static int __init global_timer_of_register(struct device_node *np)
+ 	}
+ 
+ 	/* Register and immediately configure the timer on the boot CPU */
+-	gt_write_presc(prescaler - 1);
+ 	err = gt_clocksource_init();
+ 	if (err)
+ 		goto out_irq;
+-- 
+2.43.0
+
