@@ -1,5 +1,5 @@
 diff --git a/package/linux-headers/Config.in.host b/package/linux-headers/Config.in.host
-index 4084a36436..7ca70dd7a2 100644
+index 4084a36436..cece2512f3 100644
 --- a/package/linux-headers/Config.in.host
 +++ b/package/linux-headers/Config.in.host
 @@ -49,6 +49,22 @@ config BR2_KERNEL_HEADERS_6_12
@@ -52,12 +52,14 @@ index 4084a36436..7ca70dd7a2 100644
  config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_12
  	bool "6.12.x or later"
  	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
-@@ -433,7 +469,10 @@ config BR2_DEFAULT_KERNEL_HEADERS
+@@ -432,8 +468,11 @@ config BR2_DEFAULT_KERNEL_HEADERS
+ 	default "5.10.244"	if BR2_KERNEL_HEADERS_5_10
  	default "5.15.193"	if BR2_KERNEL_HEADERS_5_15
  	default "6.1.152"	if BR2_KERNEL_HEADERS_6_1
- 	default "6.6.106"	if BR2_KERNEL_HEADERS_6_6
+-	default "6.6.106"	if BR2_KERNEL_HEADERS_6_6
 -	default "6.12.47"	if BR2_KERNEL_HEADERS_6_12
-+	default "6.12.41"	if BR2_KERNEL_HEADERS_6_12
++	default "6.6.109"	if BR2_KERNEL_HEADERS_6_6
++	default "6.12.49"	if BR2_KERNEL_HEADERS_6_12
 +	default "6.15.11"	if BR2_KERNEL_HEADERS_6_15
 +	default "6.16.4"	if BR2_KERNEL_HEADERS_6_16
 +	default "6.17"		if BR2_KERNEL_HEADERS_6_17
