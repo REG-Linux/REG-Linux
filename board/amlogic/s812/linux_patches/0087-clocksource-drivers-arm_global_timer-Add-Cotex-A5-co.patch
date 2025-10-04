@@ -1,0 +1,32 @@
+From 5ea32d6d2e4876d55e20cab1ad248da3eb57421c Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Sun, 18 Feb 2024 18:00:57 +0100
+Subject: [PATCH 87/95] clocksource/drivers/arm_global_timer: Add Cotex-A5
+ compatible string
+
+The Cortex-A5 compatible string is already documented but the driver
+does not use it. Add it so the ARM Global Timer can be used on SoCs
+with a Cortex-A5 core.
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ drivers/clocksource/arm_global_timer.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/clocksource/arm_global_timer.c b/drivers/clocksource/arm_global_timer.c
+index 2d86bbc2764a..c7b6d78cbd8d 100644
+--- a/drivers/clocksource/arm_global_timer.c
++++ b/drivers/clocksource/arm_global_timer.c
+@@ -433,6 +433,8 @@ static int __init global_timer_of_register(struct device_node *np)
+ 	return err;
+ }
+ 
++TIMER_OF_DECLARE(arm_gt_ca5, "arm,cortex-a5-global-timer",
++			global_timer_of_register);
+ /* Only tested on r2p2 and r3p0  */
+-TIMER_OF_DECLARE(arm_gt, "arm,cortex-a9-global-timer",
++TIMER_OF_DECLARE(arm_gt_ca9, "arm,cortex-a9-global-timer",
+ 			global_timer_of_register);
+-- 
+2.43.0
+

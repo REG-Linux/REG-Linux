@@ -1,0 +1,71 @@
+From 6237281d743db68c2d5901e6520a79cf1a52c9db Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Fri, 20 Dec 2024 16:47:40 +0100
+Subject: [PATCH 07/95] mmc: meson-mx-sdio: ignore disabled child-nodes - WiP
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ drivers/mmc/host/meson-mx-sdio.c | 37 ++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/mmc/host/meson-mx-sdio.c b/drivers/mmc/host/meson-mx-sdio.c
+index 947dab870585..5bc1fcd3882f 100644
+--- a/drivers/mmc/host/meson-mx-sdio.c
++++ b/drivers/mmc/host/meson-mx-sdio.c
+@@ -493,23 +493,30 @@ static struct mmc_host_ops meson_mx_mmc_ops = {
+ 
+ static struct platform_device *meson_mx_mmc_slot_pdev(struct device *parent)
+ {
+-	struct device_node *slot_node;
+-	struct platform_device *pdev;
++	struct platform_device *pdev = NULL;
++
++	for_each_available_child_of_node_scoped(parent->of_node, slot_node) {
++		if (!of_device_is_compatible(slot_node, "mmc-slot"))
++			continue;
++
++		/*
++		 * TODO: the MMC core framework currently does not support
++		 * controllers with multiple slots properly. So we only
++		 * register the first slot for now.
++		 */
++		if (pdev) {
++			dev_warn(parent,
++				 "more than one 'mmc-slot' compatible child found - using the first one and ignoring all subsequent ones\n");
++			continue;
++		}
+ 
+-	/*
+-	 * TODO: the MMC core framework currently does not support
+-	 * controllers with multiple slots properly. So we only register
+-	 * the first slot for now
+-	 */
+-	slot_node = of_get_compatible_child(parent->of_node, "mmc-slot");
+-	if (!slot_node) {
+-		dev_warn(parent, "no 'mmc-slot' sub-node found\n");
+-		return ERR_PTR(-ENOENT);
++		pdev = of_platform_device_create(slot_node, NULL, parent);
++		if (!pdev)
++			dev_err(parent,
++				"Failed to create platform device for mmc-slot node '%pOF'\n",
++				slot_node);
+ 	}
+ 
+-	pdev = of_platform_device_create(slot_node, NULL, parent);
+-	of_node_put(slot_node);
+-
+ 	return pdev;
+ }
+ 
+@@ -650,8 +657,6 @@ static int meson_mx_mmc_probe(struct platform_device *pdev)
+ 	slot_pdev = meson_mx_mmc_slot_pdev(&pdev->dev);
+ 	if (!slot_pdev)
+ 		return -ENODEV;
+-	else if (IS_ERR(slot_pdev))
+-		return PTR_ERR(slot_pdev);
+ 
+ 	mmc = devm_mmc_alloc_host(&slot_pdev->dev, sizeof(*host));
+ 	if (!mmc) {
+-- 
+2.43.0
+

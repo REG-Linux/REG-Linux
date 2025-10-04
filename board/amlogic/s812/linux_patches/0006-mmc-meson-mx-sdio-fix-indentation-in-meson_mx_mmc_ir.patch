@@ -1,0 +1,30 @@
+From 5734a88dce8afd84a69e44923ba00eece9fb81d5 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Wed, 20 Aug 2025 22:21:10 +0200
+Subject: [PATCH 06/95] mmc: meson-mx-sdio: fix indentation in
+ meson_mx_mmc_irq_thread()
+
+Keep the second line with arguments for dma_unmap_sg() aligned.
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ drivers/mmc/host/meson-mx-sdio.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/mmc/host/meson-mx-sdio.c b/drivers/mmc/host/meson-mx-sdio.c
+index 51fda10ddc6f..947dab870585 100644
+--- a/drivers/mmc/host/meson-mx-sdio.c
++++ b/drivers/mmc/host/meson-mx-sdio.c
+@@ -436,8 +436,7 @@ static irqreturn_t meson_mx_mmc_irq_thread(int irq, void *irq_data)
+ 
+ 	if (cmd->data) {
+ 		dma_unmap_sg(mmc_dev(host->mmc), cmd->data->sg,
+-				cmd->data->sg_len,
+-				mmc_get_dma_dir(cmd->data));
++			     cmd->data->sg_len, mmc_get_dma_dir(cmd->data));
+ 
+ 		cmd->data->bytes_xfered = cmd->data->blksz * cmd->data->blocks;
+ 	}
+-- 
+2.43.0
+

@@ -1,0 +1,172 @@
+From b99438e6240800ad70db337b4f34654a2ccba497 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Fri, 1 Mar 2019 17:29:19 +0100
+Subject: [PATCH 47/95] mtd: rawnand: meson: support for older SoCs up to
+ Meson8
+
+This adds support for the following SoCs to the meson-nand driver:
+- Meson8 (assuming Meson8m2 uses the same IP block revision)
+- Meson8b
+- GXBB
+
+The clock setup is the only difference between GXL and the older SoCs.
+Compared to GXL and AXG these older SoCs:
+- have a dedicated NAND clock instead of one that's shared with
+  sd_emmc_c
+- use the same ECC capabilities as GXL (up to 60-bits ECC)
+
+The "amlogic,mmc-syscon" property is not required on these older SoCs
+because the NAND clock is not shared with the sd_emmc_c controller. The
+syscon from that property is used to switch the clock output between the
+NAND controller and the sd_emmc_c controller on the newer SoCs.
+
+The "rx" and "tx" clocks also don't exist on the older SoCs which also
+means that the phase cannot be controlled there. Obtain these clocks
+using devm_clk_get_optional() which will return NULL if they were not
+passed via device-tree. None of the "consumers" of the "rx" and "tx"
+clocks (within the meson-nand driver) have to be adjusted because the
+common clock framework is NULL-safe (meaning NULL-clocks can be passed,
+clk_prepare_enable() and clk_disable_unprepare() are no-ops in that
+case).
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ drivers/mtd/nand/raw/meson_nand.c | 84 ++++++++++++++++++++-----------
+ 1 file changed, 55 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/mtd/nand/raw/meson_nand.c b/drivers/mtd/nand/raw/meson_nand.c
+index 231539ecb342..1adf386c9725 100644
+--- a/drivers/mtd/nand/raw/meson_nand.c
++++ b/drivers/mtd/nand/raw/meson_nand.c
+@@ -146,6 +146,7 @@ struct meson_nand_ecc {
+ 
+ struct meson_nfc_data {
+ 	const struct nand_ecc_caps *ecc_caps;
++	bool has_emmc_clk_reg;
+ };
+ 
+ struct meson_nfc_param {
+@@ -230,7 +231,7 @@ static int meson_nand_calc_ecc_bytes(int step_size, int strength)
+ 	return ecc_bytes;
+ }
+ 
+-NAND_ECC_CAPS_SINGLE(meson_gxl_ecc_caps,
++NAND_ECC_CAPS_SINGLE(meson8_ecc_caps,
+ 		     meson_nand_calc_ecc_bytes, 1024, 8, 24, 30, 40, 50, 60);
+ 
+ static const int axg_stepinfo_strengths[] = { 8 };
+@@ -1138,31 +1139,38 @@ static int meson_nfc_clk_init(struct meson_nfc *nfc)
+ 		return PTR_ERR(nfc->core_clk);
+ 	}
+ 
+-	init.name = devm_kasprintf(nfc->dev,
+-				   GFP_KERNEL, "%s#div",
+-				   dev_name(nfc->dev));
+-	if (!init.name)
+-		return -ENOMEM;
++	if (nfc->data->has_emmc_clk_reg) {
++		init.name = devm_kasprintf(nfc->dev,
++					GFP_KERNEL, "%s#div",
++					dev_name(nfc->dev));
++		if (!init.name)
++			return -ENOMEM;
+ 
+-	init.ops = &clk_divider_ops;
+-	nfc_divider_parent_data[0].fw_name = "device";
+-	init.parent_data = nfc_divider_parent_data;
+-	init.num_parents = 1;
+-	nfc->nand_divider.reg = nfc->reg_clk;
+-	nfc->nand_divider.shift = CLK_DIV_SHIFT;
+-	nfc->nand_divider.width = CLK_DIV_WIDTH;
+-	nfc->nand_divider.hw.init = &init;
+-	nfc->nand_divider.flags = CLK_DIVIDER_ONE_BASED |
+-				  CLK_DIVIDER_ROUND_CLOSEST |
+-				  CLK_DIVIDER_ALLOW_ZERO;
+-
+-	nfc->nand_clk = devm_clk_register(nfc->dev, &nfc->nand_divider.hw);
+-	if (IS_ERR(nfc->nand_clk))
+-		return PTR_ERR(nfc->nand_clk);
+-
+-	/* init SD_EMMC_CLOCK to sane defaults w/min clock rate */
+-	writel(CLK_ALWAYS_ON_NAND | CLK_SELECT_NAND | CLK_SELECT_FIX_PLL2,
+-	       nfc->reg_clk);
++		init.ops = &clk_divider_ops;
++		nfc_divider_parent_data[0].fw_name = "device";
++		init.parent_data = nfc_divider_parent_data;
++		init.num_parents = 1;
++		nfc->nand_divider.reg = nfc->reg_clk;
++		nfc->nand_divider.shift = CLK_DIV_SHIFT;
++		nfc->nand_divider.width = CLK_DIV_WIDTH;
++		nfc->nand_divider.hw.init = &init;
++		nfc->nand_divider.flags = CLK_DIVIDER_ONE_BASED |
++					  CLK_DIVIDER_ROUND_CLOSEST |
++					  CLK_DIVIDER_ALLOW_ZERO;
++
++		nfc->nand_clk = devm_clk_register(nfc->dev, &nfc->nand_divider.hw);
++		if (IS_ERR(nfc->nand_clk))
++			return PTR_ERR(nfc->nand_clk);
++
++		/* init SD_EMMC_CLOCK to sane defaults w/min clock rate */
++		writel(CLK_ALWAYS_ON_NAND | CLK_SELECT_NAND | CLK_SELECT_FIX_PLL2,
++		       nfc->reg_clk);
++	} else {
++		nfc->nand_clk = devm_clk_get(nfc->dev, "nand");
++		if (IS_ERR(nfc->nand_clk))
++			return dev_err_probe(nfc->dev, PTR_ERR(nfc->nand_clk),
++					     "failed to get the NAND clock\n");
++	}
+ 
+ 	ret = clk_prepare_enable(nfc->core_clk);
+ 	if (ret) {
+@@ -1508,16 +1516,32 @@ static irqreturn_t meson_nfc_irq(int irq, void *id)
+ 	return IRQ_HANDLED;
+ }
+ 
++static const struct meson_nfc_data meson8_data = {
++	.ecc_caps = &meson8_ecc_caps,
++	.has_emmc_clk_reg = false,
++};
++
+ static const struct meson_nfc_data meson_gxl_data = {
+-	.ecc_caps = &meson_gxl_ecc_caps,
++	.ecc_caps = &meson8_ecc_caps,
++	.has_emmc_clk_reg = true,
+ };
+ 
+ static const struct meson_nfc_data meson_axg_data = {
+ 	.ecc_caps = &meson_axg_ecc_caps,
++	.has_emmc_clk_reg = true,
+ };
+ 
+ static const struct of_device_id meson_nfc_id_table[] = {
+ 	{
++		.compatible = "amlogic,meson8-nfc",
++		.data = &meson8_data,
++	}, {
++		.compatible = "amlogic,meson8b-nfc",
++		.data = &meson8_data,
++	}, {
++		.compatible = "amlogic,meson-gxbb-nfc",
++		.data = &meson8_data,
++	}, {
+ 		.compatible = "amlogic,meson-gxl-nfc",
+ 		.data = &meson_gxl_data,
+ 	}, {
+@@ -1552,9 +1576,11 @@ static int meson_nfc_probe(struct platform_device *pdev)
+ 	if (IS_ERR(nfc->reg_base))
+ 		return PTR_ERR(nfc->reg_base);
+ 
+-	nfc->reg_clk = devm_platform_ioremap_resource(pdev, 1);
+-	if (IS_ERR(nfc->reg_clk))
+-		return PTR_ERR(nfc->reg_clk);
++	if (nfc->data->has_emmc_clk_reg) {
++		nfc->reg_clk = devm_platform_ioremap_resource(pdev, 1);
++		if (IS_ERR(nfc->reg_clk))
++			return PTR_ERR(nfc->reg_clk);
++	}
+ 
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (irq < 0)
+-- 
+2.43.0
+
