@@ -1,0 +1,36 @@
+From 685eaaf6e95e90af584885996c823fbac1bf01c8 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Sun, 25 Dec 2022 13:39:48 +0100
+Subject: [PATCH 46/95] mtd: rawnand: meson: Fix register mapping
+
+The dt-bindings of the Meson NAND controller state that the "reg-names"
+property is optional. Switch to devm_platform_ioremap_resource() and use
+the corresponding index within the "reg" property instead of relying on
+the optional "reg-names" property.
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ drivers/mtd/nand/raw/meson_nand.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mtd/nand/raw/meson_nand.c b/drivers/mtd/nand/raw/meson_nand.c
+index 845a33ce986d..231539ecb342 100644
+--- a/drivers/mtd/nand/raw/meson_nand.c
++++ b/drivers/mtd/nand/raw/meson_nand.c
+@@ -1548,11 +1548,11 @@ static int meson_nfc_probe(struct platform_device *pdev)
+ 
+ 	nfc->dev = dev;
+ 
+-	nfc->reg_base = devm_platform_ioremap_resource_byname(pdev, "nfc");
++	nfc->reg_base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(nfc->reg_base))
+ 		return PTR_ERR(nfc->reg_base);
+ 
+-	nfc->reg_clk = devm_platform_ioremap_resource_byname(pdev, "emmc");
++	nfc->reg_clk = devm_platform_ioremap_resource(pdev, 1);
+ 	if (IS_ERR(nfc->reg_clk))
+ 		return PTR_ERR(nfc->reg_clk);
+ 
+-- 
+2.43.0
+

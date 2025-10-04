@@ -1,0 +1,73 @@
+From 50dac02974377b1d583dad15b9564717fb3ccad3 Mon Sep 17 00:00:00 2001
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Sun, 8 Dec 2019 17:09:42 +0100
+Subject: [PATCH 71/95] arm: dts: meson8m2: mxiii: enable the HDMI and CVBS
+ video outputs - WiP
+
+WiP
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+---
+ arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi | 39 +++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi b/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi
+index 991b40726894..c25a9f7da3a0 100644
+--- a/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi
++++ b/arch/arm/boot/dts/amlogic/meson8m2-mxiii.dtsi
+@@ -35,6 +35,27 @@ button-function {
+ 		};
+ 	};
+ 
++	cvbs-connector {
++		compatible = "composite-video-connector";
++
++		port {
++			cvbs_connector_in: endpoint {
++				remote-endpoint = <&cvbs_vdac_out>;
++			};
++		};
++	};
++
++	hdmi-connector {
++		compatible = "hdmi-connector";
++		type = "a";
++
++		port {
++			hdmi_connector_in: endpoint {
++				remote-endpoint = <&hdmi_tx_tmds_out>;
++			};
++		};
++	};
++
+ 	sdio_pwrseq: sdio-pwrseq {
+ 		compatible = "mmc-pwrseq-simple";
+ 
+@@ -67,6 +88,24 @@ &cpu0 {
+ 	cpu-supply = <&vcck>;
+ };
+ 
++&cvbs_vdac_port {
++	cvbs_vdac_out: endpoint {
++		remote-endpoint = <&cvbs_connector_in>;
++	};
++};
++
++&hdmi_tx {
++	status = "okay";
++	pinctrl-0 = <&hdmi_hpd_pins>, <&hdmi_i2c_pins>;
++	pinctrl-names = "default";
++};
++
++&hdmi_tx_tmds_port {
++	hdmi_tx_tmds_out: endpoint {
++		remote-endpoint = <&hdmi_connector_in>;
++	};
++};
++
+ &ir_receiver {
+ 	status = "okay";
+ 	pinctrl-0 = <&ir_recv_pins>;
+-- 
+2.43.0
+
