@@ -364,16 +364,14 @@ diff --git a/drivers/media/platform/verisilicon/rockchip_vpu_hw.c b/drivers/medi
 index 07d4ed41f2bd..579e5413bb7f 100644
 --- a/drivers/media/platform/verisilicon/rockchip_vpu_hw.c
 +++ b/drivers/media/platform/verisilicon/rockchip_vpu_hw.c
-@@ -16,7 +16,8 @@
- #include "rockchip_vpu981_regs.h"
+@@ -17,6 +17,7 @@
  
  #define RK3066_ACLK_MAX_FREQ (300 * 1000 * 1000)
--#define RK3288_ACLK_MAX_FREQ (400 * 1000 * 1000)
-+#define RK3288_ACLK_MAX_FREQ (600 * 1000 * 1000)
+ #define RK3288_ACLK_MAX_FREQ (400 * 1000 * 1000)
 +#define RK3399_ACLK_MAX_FREQ (400 * 1000 * 1000)
- #define RK3588_ACLK_MAX_FREQ (300 * 1000 * 1000)
  
  #define ROCKCHIP_VPU981_MIN_SIZE 64
+ 
 --
 Armbian
 
