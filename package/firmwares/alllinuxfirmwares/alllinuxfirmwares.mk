@@ -39,7 +39,7 @@ ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_ODIN)$(BR2_PACKAGE_SYSTEM_TARGET_SM6115)$(BR2
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/qcom
 endif
 
-ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA)$(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
+ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA)$(BR2_PACKAGE_SYSTEM_TARGET_SM8250)$(BR2_PACKAGE_SYSTEM_TARGET_H700),y)
 
 # TODO CLEAN THIS / AUTOMATE THIS
 # List of firmware files to keep, read from a manifest
@@ -47,6 +47,8 @@ ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
 ALLLINUXFIRMWARES_FILELIST = $(sort $(shell sed -e 's/#.*//' -e '/^$$/d' $(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sm8250/kernel-firmware.txt))
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
 ALLLINUXFIRMWARES_FILELIST = $(sort $(shell sed -e 's/#.*//' -e '/^$$/d' $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h3/cha/kernel-firmware.txt))
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H700),y)
+ALLLINUXFIRMWARES_FILELIST = $(sort $(shell sed -e 's/#.*//' -e '/^$$/d' $(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h700/kernel-firmware.txt))
 endif
 
 define ALLLINUXFIRMWARES_INSTALL_TARGET_CMDS
