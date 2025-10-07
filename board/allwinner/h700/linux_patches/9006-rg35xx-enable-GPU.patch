@@ -16,7 +16,7 @@ index 43c6bdd56..5d2b13aa7 100644
  		};
  	};
 +
-+	gpu_opp_table: opp-table-1 {
++	gpu_opp_table_h700: opp-table-1 {
 +		compatible = "operating-points-v2";
 +
 +		opp-420000000 {
@@ -54,7 +54,7 @@ index 43c6bdd56..5d2b13aa7 100644
 +&gpu {
 +	mali-supply = <&reg_dcdc2>;
 +	power-domains = <&r_ccu 0>;
-+	operating-points-v2 = <&gpu_opp_table>;
++	operating-points-v2 = <&gpu_opp_table_h700>;
 +	status = "okay";
 +};
 +
