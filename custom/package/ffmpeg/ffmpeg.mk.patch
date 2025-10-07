@@ -1,0 +1,36 @@
+diff --git a/package/ffmpeg/ffmpeg.mk b/package/ffmpeg/ffmpeg.mk
+index f218e60067..a2de3990e5 100644
+--- a/package/ffmpeg/ffmpeg.mk
++++ b/package/ffmpeg/ffmpeg.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-FFMPEG_VERSION = 6.1.3
++FFMPEG_VERSION = 7.1.2
+ FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VERSION).tar.xz
+ FFMPEG_SITE = https://ffmpeg.org/releases
+ FFMPEG_INSTALL_STAGING = YES
+@@ -32,7 +32,6 @@ FFMPEG_CONF_OPTS = \
+ 	--disable-gray \
+ 	--enable-swscale-alpha \
+ 	--disable-small \
+-	--disable-crystalhd \
+ 	--disable-dxva2 \
+ 	--enable-runtime-cpudetect \
+ 	--disable-hardcoded-tables \
+@@ -270,6 +269,14 @@ FFMPEG_CONF_OPTS += \
+ 	--enable-encoder=libvorbis
+ endif
+ 
++# REG
++ifeq ($(BR2_PACKAGE_LIBV4L),y)
++FFMPEG_CONF_OPTS += --enable-v4l2-request
++FFMPEG_DEPENDENCIES += libv4l
++else
++FFMPEG_CONF_OPTS += --disable-v4l2-request
++endif
++
+ ifeq ($(BR2_PACKAGE_LIBVA),y)
+ FFMPEG_CONF_OPTS += --enable-vaapi
+ FFMPEG_DEPENDENCIES += libva

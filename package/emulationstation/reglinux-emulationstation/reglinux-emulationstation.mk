@@ -3,12 +3,8 @@
 # REG-emulationstation
 #
 ################################################################################
-# Last update: Commits on Jan 26, 2025
-# SDL2 main branch
-#REGLINUX_EMULATIONSTATION_VERSION = bccf259d19e0695f42469accc4d01e3b2fba2c1e
-# SDL3 branch
-# Last update: Commits on Sep 29, 2025
-REGLINUX_EMULATIONSTATION_VERSION = 332a555d15cc8bf83fa3fd71cf46a052ed3c4bae
+# Last update: Commits on Oct 6, 2025
+REGLINUX_EMULATIONSTATION_VERSION = 83fb0ff9cbd4edc29053fd61795aa1a85f071908
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_EMULATIONSTATION_SITE = https://$(REGLINUX_EMULATIONSTATION_TOKEN)@github.com/REG-Linux/REG-ES
 REGLINUX_EMULATIONSTATION_SITE_METHOD = git
