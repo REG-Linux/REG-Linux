@@ -17,6 +17,10 @@
 ++++++++++++++++++++++++++++++++  package/python-setuptools-scm/Config.in.host
 ++++++++++++++++++++++++++++++++  package/spirv-llvm-translator/001-honour-BR2_CCACHE.patch
 ++++++++++++++++++++++++++++++++  package/spirv-llvm-translator/Config.in
+--------------------------------  package/ffmpeg/0003-libavutil-Fix-mips-build.patch
+--------------------------------  package/ffmpeg/0005-avcodec-mmaldec-Fix-build-error.patch
+--------------------------------  package/ffmpeg/0006-avcodec-pcm-bluray-dvd-Use-correct-pointer-types-on-.patch
+--------------------------------  package/ffmpeg/0007-avutil-hwcontext-vaapi-use-the-correct-type.patch
 --------------------------------  package/libglib2/0001-gstring-Fix-overflow-check-when-expanding-the-string.patch
 --------------------------------  package/llvm-project/libclc/0001-support-out-of-tree-build.patch
 --------------------------------  package/llvm-project/llvm/0001-ADT-Add-cstdint-to-SmallVector-101761.patch
@@ -55,6 +59,8 @@ be9ae1e921bac6ef8e7be5d99a56690f  package/dbus-broker/system.conf
 c445390118f5d058dd372a8b2beb25a8  package/dropbear/S50dropbear
 3e2a4b6edeb4427320a8a3246ed68e36  package/dropbear/dropbear.mk
 86c04ec68a28da8040820ff495bda9dd  package/espeak/espeak.mk
+3e7ba573ed050ecf2b870d046f7134cb  package/ffmpeg/ffmpeg.hash
+3c3eee6700a8fab8d015d2cbadddea31  package/ffmpeg/ffmpeg.mk
 c6c7f5c1c993565d557fd227edb4bfc7  package/flac/flac.mk
 e24ebf071724201f2a2ad92758bf98c7  package/fmt/fmt.hash
 c1bca4f1254a224fc84ea62d8d8181c7  package/fmt/fmt.mk
