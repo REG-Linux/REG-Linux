@@ -1,0 +1,38 @@
+From b1c53282fe4a9357f5a74feebd5a4c01954930b3 Mon Sep 17 00:00:00 2001
+From: Lukas Rusak <lorusak@gmail.com>
+Date: Thu, 16 Aug 2018 21:09:40 -0700
+Subject: [PATCH 2/8] libavcodec: v4l2m2m: depends on libdrm
+
+---
+ configure                 | 1 +
+ libavcodec/v4l2_buffers.c | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index d77a55b653..9db1921b99 100755
+--- a/configure
++++ b/configure
+@@ -3746,6 +3746,7 @@ sndio_indev_deps="sndio"
+ sndio_outdev_deps="sndio"
+ v4l2_indev_deps_any="linux_videodev2_h sys_videoio_h"
+ v4l2_indev_suggest="libv4l2"
++v4l2_outdev_deps="libdrm"
+ v4l2_outdev_deps_any="linux_videodev2_h sys_videoio_h"
+ v4l2_outdev_suggest="libv4l2"
+ vfwcap_indev_deps="vfw32 vfwcap_defines"
+diff --git a/libavcodec/v4l2_buffers.c b/libavcodec/v4l2_buffers.c
+index 0013f54caa..9069520556 100644
+--- a/libavcodec/v4l2_buffers.c
++++ b/libavcodec/v4l2_buffers.c
+@@ -21,7 +21,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-#include <drm/drm_fourcc.h>
++#include <drm_fourcc.h>
+ #include <linux/videodev2.h>
+ #include <sys/ioctl.h>
+ #include <sys/mman.h>
+-- 
+2.43.0
+
