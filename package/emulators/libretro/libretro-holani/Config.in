@@ -3,6 +3,7 @@ config BR2_PACKAGE_LIBRETRO_HOLANI
 	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
 	select BR2_PACKAGE_HOST_RUSTC
 	# Temp workaround for bindgen issue
+	depends on BR2_PACKAGE_LLVM
 	depends on BR2_PACKAGE_CLANG
 	help
 	A cycle-stepped libretro Lynx emulator core.

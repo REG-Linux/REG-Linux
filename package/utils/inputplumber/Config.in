@@ -5,6 +5,7 @@ config BR2_PACKAGE_INPUTPLUMBER
 	select BR2_PACKAGE_EUDEV
 	select BR2_PACKAGE_LIBEVDEV
 	select BR2_PACKAGE_LIBIIO
+	select BR2_PACKAGE_LLVM
 	select BR2_PACKAGE_CLANG
 	help
 	  InputPlumber is an open source input routing and control 
