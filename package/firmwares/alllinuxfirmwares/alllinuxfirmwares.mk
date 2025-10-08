@@ -9,12 +9,13 @@ ALLLINUXFIRMWARES_SITE = https://gitlab.com/kernel-firmware/linux-firmware
 ALLLINUXFIRMWARES_SITE_METHOD = git
 
 # exclude some dirs not required on REG
-ALLLINUXFIRMWARES_REMOVE_FILES = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(@D)/dpaa2 $(@D)/bnx2x $(@D)/cxgb4 $(@D)/mrvl/prestera
+ALLLINUXFIRMWARES_REMOVE_FILES = $(@D)/liquidio $(@D)/netronome $(@D)/mellanox $(@D)/dpaa2 $(@D)/bnx2x $(@D)/cxgb4 $(@D)/mrvl/prestera $(@D)/ueagle-atm
 
 ifneq ($(BR2_x86_64),y)
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/intel $(@D)/i915 $(@D)/nvidia $(@D)/radeon $(@D)/qat_* $(@D)/ql2* $(@D)/iwlwifi* $(@D)/qed $(@D)/amd* $(@D)/xe/*
 else
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ath11k/IPQ*
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MINI),y)

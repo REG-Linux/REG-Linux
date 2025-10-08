@@ -343,7 +343,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/wsdd-native/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/xxd/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/evmapy/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/vdpauinfo/Config.in"
 endmenu
 
 menu "Firmwares"

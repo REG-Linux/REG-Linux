@@ -78,7 +78,7 @@ config BR2_PACKAGE_IMG_MESA3D_DRIVER
 config BR2_PACKAGE_IMG_MESA3D_NEEDS_XA
 	bool
 
-# OpenGL GLX and Gallium VDPAU both needs X11
+# OpenGL GLX needs X11
 config BR2_PACKAGE_IMG_MESA3D_NEEDS_X11
 	bool
 	depends on BR2_PACKAGE_XORG7
@@ -122,26 +122,6 @@ config BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_PVR
 	select BR2_PACKAGE_IMG_MESA3D_OPENGL_EGL
 	help
 	  pvr is the 3D acceleration backend for Imagination PowerVR GPUs
-
-config BR2_PACKAGE_IMG_MESA3D_VDPAU
-	bool "Gallium VDPAU state tracker"
-	depends on BR2_PACKAGE_XORG7
-	depends on BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_NOUVEAU \
-		|| BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_R300 \
-		|| BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_R600 \
-		|| BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_RADEONSI
-	select BR2_PACKAGE_IMG_MESA3D_NEEDS_X11
-	select BR2_PACKAGE_LIBVDPAU
-	help
-	  VDPAU state tracker (needs r300, r600, radeonsi or nouveau
-	  gallium drivers).
-
-comment "Gallium VDPAU state tracker needs X.org and gallium drivers r300, r600, radeonsi or nouveau"
-	depends on !BR2_PACKAGE_XORG7 || \
-		!(BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_NOUVEAU \
-		|| BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_R300 \
-		|| BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_R600 \
-		|| BR2_PACKAGE_IMG_MESA3D_GALLIUM_DRIVER_RADEONSI)
 
 config BR2_PACKAGE_IMG_MESA3D_XVMC
 	bool "Gallium XvMC state tracker"

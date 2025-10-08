@@ -50,26 +50,11 @@ NVIDIA470_LEGACY_DRIVER_LIBS_MISC = \
 	libnvidia-ml.so.$(NVIDIA470_LEGACY_DRIVER_VERSION) \
 	libnvidia-glvkspirv.so.$(NVIDIA470_LEGACY_DRIVER_VERSION)
 
-NVIDIA470_LEGACY_DRIVER_LIBS_VDPAU = \
-	libvdpau_nvidia.so.$(NVIDIA470_LEGACY_DRIVER_VERSION)
-
 NVIDIA470_LEGACY_DRIVER_LIBS += \
 	$(NVIDIA470_LEGACY_DRIVER_LIBS_GL) \
 	$(NVIDIA470_LEGACY_DRIVER_LIBS_EGL) \
 	$(NVIDIA470_LEGACY_DRIVER_LIBS_GLES) \
 	$(NVIDIA470_LEGACY_DRIVER_LIBS_MISC)
-
-# batocera 32bit libraries
-NVIDIA470_LEGACY_DRIVER_32 = \
-	$(NVIDIA470_LEGACY_DRIVER_LIBS_GL) \
-	$(NVIDIA470_LEGACY_DRIVER_LIBS_EGL) \
-	$(NVIDIA470_LEGACY_DRIVER_LIBS_GLES) \
-	libnvidia-eglcore.so.$(NVIDIA470_LEGACY_DRIVER_VERSION) \
-	libnvidia-glcore.so.$(NVIDIA470_LEGACY_DRIVER_VERSION) \
-	libnvidia-glsi.so.$(NVIDIA470_LEGACY_DRIVER_VERSION) \
-	libnvidia-tls.so.$(NVIDIA470_LEGACY_DRIVER_VERSION) \
-	libnvidia-ml.so.$(NVIDIA470_LEGACY_DRIVER_VERSION) \
-	libnvidia-glvkspirv.so.$(NVIDIA470_LEGACY_DRIVER_VERSION)
 
 # Install the gl.pc file
 define NVIDIA470_LEGACY_DRIVER_INSTALL_GL_DEV
@@ -161,19 +146,6 @@ define NVIDIA470_LEGACY_DRIVER_INSTALL_LIBS
 	$(foreach lib,$(NVIDIA470_LEGACY_DRIVER_LIBS),\
 		$(INSTALL) -D -m 0644 $(@D)/$(lib) $(1)/usr/lib/$(notdir $(lib))
 	)
-	$(foreach lib,$(NVIDIA470_LEGACY_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/$(lib) $(1)/usr/lib/vdpau/$(notdir $(lib))
-	)
-endef
-
-# batocera install 32bit libraries
-define NVIDIA470_LEGACY_DRIVER_INSTALL_32
-	$(foreach lib,$(NVIDIA470_LEGACY_DRIVER_32),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/$(notdir $(lib))
-	)
-	$(foreach lib,$(NVIDIA470_LEGACY_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/vdpau/$(notdir $(lib))
-	)
 endef
 
 # batocera nvidia libs are runtime linked via libglvnd
@@ -186,7 +158,6 @@ endef
 # For target, install libraries and X.org modules
 define NVIDIA470_LEGACY_DRIVER_INSTALL_TARGET_CMDS
 	$(call NVIDIA470_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
-	$(call NVIDIA470_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_drv.so \
 			$(TARGET_DIR)/usr/lib/xorg/modules/drivers/nvidia_legacy_drv.so
 	$(foreach p,$(NVIDIA470_LEGACY_DRIVER_PROGS), \
@@ -221,20 +192,10 @@ define NVIDIA470_LEGACY_DRIVER_VULKANJSON_X86_64
     mkdir -p $(TARGET_DIR)/usr/share/vulkan/nvidia
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_icd.json $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_legacy_icd.x86_64.json
         sed -i -e s+'"library_path": "libGLX_nvidia'+'"library_path": "/usr/lib/libGLX_nvidia'+ $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_legacy_icd.x86_64.json
-	$(INSTALL) -D -m 0644 $(@D)/nvidia_icd.json $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_legacy_icd.i686.json
-        sed -i -e s+'"library_path": "libGLX_nvidia'+'"library_path": "/lib32/libGLX_nvidia'+ $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_legacy_icd.i686.json
-endef
-
-define NVIDIA470_LEGACY_DRIVER_VULKANJSON_X86
-    mkdir -p $(TARGET_DIR)/usr/share/vulkan/nvidia
-	$(INSTALL) -D -m 0644 $(@D)/nvidia_icd.json $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_legacy_icd.i686.json
 endef
 
 ifeq ($(BR2_x86_64),y)
 	NVIDIA470_LEGACY_DRIVER_POST_INSTALL_TARGET_HOOKS += NVIDIA470_LEGACY_DRIVER_VULKANJSON_X86_64
-endif
-ifeq ($(BR2_i686),y)
-	NVIDIA470_LEGACY_DRIVER_POST_INSTALL_TARGET_HOOKS += NVIDIA470_LEGACY_DRIVER_VULKANJSON_X86
 endif
 
 # move to avoid the production driver

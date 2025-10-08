@@ -46,24 +46,11 @@ NVIDIA390_LEGACY_DRIVER_LIBS_MISC = \
 	tls/libnvidia-tls.so.$(NVIDIA390_LEGACY_DRIVER_VERSION) \
 	libnvidia-ml.so.$(NVIDIA390_LEGACY_DRIVER_VERSION)
 
-NVIDIA390_LEGACY_DRIVER_LIBS_VDPAU = \
-	libvdpau_nvidia.so.$(NVIDIA390_LEGACY_DRIVER_VERSION)
-
 NVIDIA390_LEGACY_DRIVER_LIBS += \
 	$(NVIDIA390_LEGACY_DRIVER_LIBS_GL) \
 	$(NVIDIA390_LEGACY_DRIVER_LIBS_EGL) \
 	$(NVIDIA390_LEGACY_DRIVER_LIBS_GLES) \
 	$(NVIDIA390_LEGACY_DRIVER_LIBS_MISC)
-
-NVIDIA390_LEGACY_DRIVER_32 = \
-	$(NVIDIA390_LEGACY_DRIVER_LIBS_GL) \
-	$(NVIDIA390_LEGACY_DRIVER_LIBS_EGL) \
-	$(NVIDIA390_LEGACY_DRIVER_LIBS_GLES) \
-	libnvidia-eglcore.so.$(NVIDIA390_LEGACY_DRIVER_VERSION) \
-	libnvidia-glcore.so.$(NVIDIA390_LEGACY_DRIVER_VERSION) \
-	libnvidia-glsi.so.$(NVIDIA390_LEGACY_DRIVER_VERSION) \
-	tls/libnvidia-tls.so.$(NVIDIA390_LEGACY_DRIVER_VERSION) \
-	libnvidia-ml.so.$(NVIDIA390_LEGACY_DRIVER_VERSION)
 
 # Install the gl.pc file
 define NVIDIA390_LEGACY_DRIVER_INSTALL_GL_DEV
@@ -116,25 +103,11 @@ define NVIDIA390_LEGACY_DRIVER_INSTALL_LIBS
 	$(foreach lib,$(NVIDIA390_LEGACY_DRIVER_LIBS),\
 		$(INSTALL) -D -m 0644 $(@D)/$(lib) $(1)/usr/lib/$(notdir $(lib))
 	)
-	$(foreach lib,$(NVIDIA390_LEGACY_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/$(lib) $(1)/usr/lib/vdpau/$(notdir $(lib))
-	)
-endef
-
-# batocera install 32bit libraries
-define NVIDIA390_LEGACY_DRIVER_INSTALL_32
-	$(foreach lib,$(NVIDIA390_LEGACY_DRIVER_32),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/$(notdir $(lib))
-	)
-	$(foreach lib,$(NVIDIA390_LEGACY_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/vdpau/$(notdir $(lib))
-	)
 endef
 
 # For target, install libraries and X.org modules
 define NVIDIA390_LEGACY_DRIVER_INSTALL_TARGET_CMDS
 	$(call NVIDIA390_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
-	$(call NVIDIA390_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_drv.so \
 			$(TARGET_DIR)/usr/lib/xorg/modules/drivers/nvidia390_legacy_drv.so
 	$(INSTALL) -D -m 0644 $(@D)/libglx.so.$(NVIDIA390_LEGACY_DRIVER_VERSION) \

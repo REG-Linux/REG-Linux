@@ -244,8 +244,6 @@ if [ "$MODE" = "proprietary" ] || [ "$MODE" = "open" ]; then
     # link Vulkan icd files
     ln -sf /usr/share/vulkan/nvidia/nvidia_production_icd.x86_64.json /var/run/nvidia/configs/nvidia_icd.x86_64.json
     ln -sf /var/run/nvidia/configs/nvidia_icd.x86_64.json /usr/share/vulkan/icd.d/nvidia_icd.x86_64.json
-    ln -sf /usr/share/vulkan/nvidia/nvidia_production_icd.i686.json /var/run/nvidia/configs/nvidia_icd.i686.json
-	ln -sf /var/run/nvidia/configs/nvidia_icd.i686.json /usr/share/vulkan/icd.d/nvidia_icd.i686.json
 
     # finally link appropriate production kernel modules
     mkdir -p /var/run/nvidia/modules
@@ -588,8 +586,6 @@ elif echo "$MODE" | grep -q -E '^(legacy470|legacy340|legacy390)$'; then
         # link Vulkan icd files
         ln -sf /usr/share/vulkan/nvidia/nvidia_legacy_icd.x86_64.json /var/run/nvidia/configs/nvidia_icd.x86_64.json
         ln -sf /var/run/nvidia/configs/nvidia_icd.x86_64.json /usr/share/vulkan/icd.d/nvidia_icd.x86_64.json
-        ln -sf /usr/share/vulkan/nvidia/nvidia_legacy_icd.i686.json /var/run/nvidia/configs/nvidia_icd.i686.json
-        ln -sf /var/run/nvidia/configs/nvidia_icd.i686.json /usr/share/vulkan/icd.d/nvidia_icd.i686.json
         
         # finally link the kernel modules & run them
         mkdir -p /var/run/nvidia/modules
