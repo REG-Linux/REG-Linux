@@ -49,7 +49,7 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 
 	# cloud services
 	select BR2_PACKAGE_SYNCTHING			if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_MINI # sync files across multiple batoceras
-	select BR2_PACKAGE_RCLONE			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # sync files in the cloud (require x86_64)
+	select BR2_PACKAGE_RCLONE			if BR2_x86_64 # sync files in the cloud (require x86_64)
 
 	# Additional network drivers (out-of-tree kernel modules)
 	select BR2_PACKAGE_REGLINUX_NETWORK_DRIVERS
@@ -102,13 +102,13 @@ config BR2_PACKAGE_REGLINUX_NETWORK_FIRMWARES
 	bool "REG-Linux network firmwares"
 
 	# common firmwares
-	select BR2_PACKAGE_UX500_FIRMWARE
-	select BR2_PACKAGE_WILC1000_FIRMWARE
-	select BR2_PACKAGE_ZD1211_FIRMWARE
-	select BR2_PACKAGE_B43_FIRMWARE
+	select BR2_PACKAGE_UX500_FIRMWARE	if  BR2_x86_64
+	select BR2_PACKAGE_WILC1000_FIRMWARE	if !BR2_x86_64
+	select BR2_PACKAGE_ZD1211_FIRMWARE	if !BR2_x86_64
+	select BR2_PACKAGE_B43_FIRMWARE		if !BR2_x86_64
 
 	# x86 (maybe some firmware could be for all, to be checked)
-	select BR2_PACKAGE_WILINK_BT_FIRMWARE			if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+	select BR2_PACKAGE_WILINK_BT_FIRMWARE			if BR2_x86_64
 
 	# RaspberryPi Firmwares bluetooth and wifi
 	select BR2_PACKAGE_BRCMFMAC_SDIO_FIRMWARE_RPI		if BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY

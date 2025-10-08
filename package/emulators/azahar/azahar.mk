@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-AZAHAR_VERSION = 2123.2
+AZAHAR_VERSION = 2123.3
 AZAHAR_SITE = https://github.com/azahar-emu/azahar.git
 AZAHAR_SITE_METHOD = git
 AZAHAR_GIT_SUBMODULES=YES
@@ -14,7 +14,6 @@ AZAHAR_SUPPORTS_IN_SOURCE_BUILD = NO
 
 AZAHAR_GIT_SUBMODULES = YES
 
-#AZAHAR_BUILD_TYPE = Debug
 AZAHAR_BUILD_TYPE = Release
 
 AZAHAR_CONF_OPTS += -DCMAKE_BUILD_TYPE=$(AZAHAR_BUILD_TYPE)
