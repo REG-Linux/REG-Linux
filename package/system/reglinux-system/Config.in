@@ -165,12 +165,12 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_E2FSPROGS				# fs resize
 	select BR2_PACKAGE_E2FSPROGS_RESIZE2FS			# fs resize
 	select BR2_PACKAGE_PACMAN				# pacman package manager
-	select BR2_PACKAGE_FLATPAK				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # flatpak app packaging system
-	select BR2_PACKAGE_RYZENADJ				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # ryzen apu configuration
+	select BR2_PACKAGE_FLATPAK				if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # flatpak app packaging system
+	select BR2_PACKAGE_RYZENADJ				if BR2_x86_64 # ryzen apu configuration
 
 	select BR2_PACKAGE_HTOP					# resources monitor
 	select BR2_PACKAGE_BTOP					# resources monitor
-	select BR2_PACKAGE_MOKUTIL				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY # mokutil machine owner key utility
+	select BR2_PACKAGE_MOKUTIL				if BR2_x86_64 # mokutil machine owner key utility
 
 	# Controllers
 	#select BR2_PACKAGE_XONE				if !BR2_mipsel && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2836 && !BR2_PACKAGE_SYSTEM_TARGET_RK3326 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_S812 && !BR2_PACKAGE_SYSTEM_TARGET_H700  && !BR2_PACKAGE_SYSTEM_TARGET_MT8395 # xbox receiver (require linux >= 4.15)
