@@ -64,28 +64,11 @@ NVIDIA_OPEN_DRIVER_LIBS_MISC = \
 	libnvidia-ml.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
 	libnvidia-wayland-client.so.$(NVIDIA_OPEN_DRIVER_VERSION)
 
-NVIDIA_OPEN_DRIVER_LIBS_VDPAU = \
-	libvdpau_nvidia.so.$(NVIDIA_OPEN_DRIVER_VERSION)
-
 NVIDIA_OPEN_DRIVER_LIBS += \
 	$(NVIDIA_OPEN_DRIVER_LIBS_GL) \
 	$(NVIDIA_OPEN_DRIVER_LIBS_EGL) \
 	$(NVIDIA_OPEN_DRIVER_LIBS_GLES) \
 	$(NVIDIA_OPEN_DRIVER_LIBS_MISC)
-
-# batocera 32bit libraries
-NVIDIA_OPEN_DRIVER_32 = \
-	$(NVIDIA_OPEN_DRIVER_LIBS_GL) \
-	$(NVIDIA_OPEN_DRIVER_LIBS_EGL) \
-	$(NVIDIA_OPEN_DRIVER_LIBS_GLES) \
-	libnvidia-allocator.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-eglcore.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-glcore.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-glsi.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-glvkspirv.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-gpucomp.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-tls.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-ml.so.$(NVIDIA_OPEN_DRIVER_VERSION)
 
 # Install the gl.pc file
 define NVIDIA_OPEN_DRIVER_INSTALL_GL_DEV
@@ -124,10 +107,6 @@ NVIDIA_OPEN_DRIVER_LIBS += \
 	libnvidia-encode.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
 	# libnvidia-ptxjitcompiler.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
 	#libnvidia-nvvm.so.$(NVIDIA_OPEN_DRIVER_VERSION)
-NVIDIA_OPEN_DRIVER_32 += \
-	libcuda.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvcuvid.so.$(NVIDIA_OPEN_DRIVER_VERSION) \
-	libnvidia-encode.so.$(NVIDIA_OPEN_DRIVER_VERSION)
 ifeq ($(BR2_PACKAGE_NVIDIA_OPEN_DRIVER_CUDA_PROGS),y)
 NVIDIA_OPEN_DRIVER_PROGS = nvidia-cuda-mps-control nvidia-cuda-mps-server
 endif
@@ -197,49 +176,6 @@ define NVIDIA_OPEN_DRIVER_INSTALL_LIBS
 			ln -sf $(notdir $(lib)) $(1)/usr/lib/$${baseso}; \
 		fi
 	)
-	$(foreach lib,$(NVIDIA_OPEN_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/$(lib) $(1)/usr/lib/vdpau/$(notdir $(lib))
-		libsoname="$$( $(TARGET_READELF) -d "$(@D)/$(lib)" \
-			|sed -r -e '/.*\(SONAME\).*\[(.*)\]$$/!d; s//\1/;' )"; \
-		if [ -n "$${libsoname}" -a "$${libsoname}" != "$(notdir $(lib))" ]; then \
-			ln -sf $(notdir $(lib)) \
-				$(1)/usr/lib/vdpau/$${libsoname}; \
-		fi
-		baseso=$(firstword $(subst .,$(space),$(notdir $(lib)))).so; \
-		if [ -n "$${baseso}" -a "$${baseso}" != "$(notdir $(lib))" ]; then \
-			ln -sf $(notdir $(lib)) $(1)/usr/lib/vdpau/$${baseso}; \
-		fi
-	)
-endef
-
-# batocera install 32bit libraries
-define NVIDIA_OPEN_DRIVER_INSTALL_32
-	$(foreach lib,$(NVIDIA_OPEN_DRIVER_32),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/$(notdir $(lib))
-		libsoname="$$( $(TARGET_READELF) -d "$(@D)/$(lib)" \
-			|sed -r -e '/.*\(SONAME\).*\[(.*)\]$$/!d; s//\1/;' )"; \
-		if [ -n "$${libsoname}" -a "$${libsoname}" != "$(notdir $(lib))" ]; then \
-			ln -sf $(notdir $(lib)) \
-				$(1)/lib32/$${libsoname}; \
-		fi
-		baseso=$(firstword $(subst .,$(space),$(notdir $(lib)))).so; \
-		if [ -n "$${baseso}" -a "$${baseso}" != "$(notdir $(lib))" ]; then \
-			ln -sf $(notdir $(lib)) $(1)/lib32/$${baseso}; \
-		fi
-	)
-	$(foreach lib,$(NVIDIA_OPEN_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/vdpau/$(notdir $(lib))
-		libsoname="$$( $(TARGET_READELF) -d "$(@D)/$(lib)" \
-			|sed -r -e '/.*\(SONAME\).*\[(.*)\]$$/!d; s//\1/;' )"; \
-		if [ -n "$${libsoname}" -a "$${libsoname}" != "$(notdir $(lib))" ]; then \
-			ln -sf $(notdir $(lib)) \
-				$(1)/lib32/vdpau/$${libsoname}; \
-		fi
-		baseso=$(firstword $(subst .,$(space),$(notdir $(lib)))).so; \
-		if [ -n "$${baseso}" -a "$${baseso}" != "$(notdir $(lib))" ]; then \
-			ln -sf $(notdir $(lib)) $(1)/lib32/vdpau/$${baseso}; \
-		fi
-	)
 endef
 
 # batocera nvidia libs are runtime linked via libglvnd
@@ -252,7 +188,6 @@ endef
 # For target, install libraries and X.org modules
 define NVIDIA_OPEN_DRIVER_INSTALL_TARGET_CMDS
 	$(call NVIDIA_OPEN_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
-	$(call NVIDIA_OPEN_DRIVER_INSTALL_32,$(TARGET_DIR))
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_drv.so \
 		$(TARGET_DIR)/usr/lib/xorg/modules/drivers/nvidia_production_drv.so
 	$(foreach p,$(NVIDIA_OPEN_DRIVER_PROGS), \
@@ -300,23 +235,10 @@ define NVIDIA_OPEN_DRIVER_VULKANJSON_X86_64
 	    $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_production_icd.x86_64.json
     sed -i -e s+'"library_path": "libGLX_nvidia'+'"library_path": "/usr/lib/libGLX_nvidia'+ \
 	    $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_production_icd.x86_64.json
-	$(INSTALL) -D -m 0644 $(@D)/nvidia_icd.json \
-	    $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_production_icd.i686.json
-    sed -i -e s+'"library_path": "libGLX_nvidia'+'"library_path": "/lib32/libGLX_nvidia'+ \
-	    $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_production_icd.i686.json
-endef
-
-define NVIDIA_OPEN_DRIVER_VULKANJSON_X86
-    mkdir -p $(TARGET_DIR)/usr/share/vulkan/nvidia
-	$(INSTALL) -D -m 0644 $(@D)/nvidia_icd.json \
-	    $(TARGET_DIR)/usr/share/vulkan/nvidia/nvidia_production_icd.i686.json
 endef
 
 ifeq ($(BR2_x86_64),y)
     NVIDIA_OPEN_DRIVER_POST_INSTALL_TARGET_HOOKS += NVIDIA_OPEN_DRIVER_VULKANJSON_X86_64
-endif
-ifeq ($(BR2_i686),y)
-    NVIDIA_OPEN_DRIVER_POST_INSTALL_TARGET_HOOKS += NVIDIA_OPEN_DRIVER_VULKANJSON_X86
 endif
 
 KVER = $(shell expr $(BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE))

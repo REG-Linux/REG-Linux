@@ -50,29 +50,11 @@ NVIDIA340_LEGACY_DRIVER_LIBS_MISC = \
 NVIDIA340_LEGACY_DRIVER_LIBS_TLS = \
     libnvidia-tls.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
 
-NVIDIA340_LEGACY_DRIVER_LIBS_VDPAU = \
-    libvdpau.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	libvdpau_trace.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	libvdpau_nvidia.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
-
 NVIDIA340_LEGACY_DRIVER_LIBS += \
 	$(NVIDIA340_LEGACY_DRIVER_LIBS_GL) \
 	$(NVIDIA340_LEGACY_DRIVER_LIBS_EGL) \
 	$(NVIDIA340_LEGACY_DRIVER_LIBS_GLES) \
 	$(NVIDIA340_LEGACY_DRIVER_LIBS_MISC)
-
-NVIDIA340_LEGACY_DRIVER_LIBS_GL_32 = \
-	libGL.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
-
-# batocera 32bit libraries
-NVIDIA340_LEGACY_DRIVER_32 = \
-	$(NVIDIA340_LEGACY_DRIVER_LIBS_GL_32) \
-	$(NVIDIA340_LEGACY_DRIVER_LIBS_EGL) \
-	$(NVIDIA340_LEGACY_DRIVER_LIBS_GLES) \
-	libnvidia-eglcore.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	libnvidia-glcore.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	libnvidia-glsi.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	libnvidia-ml.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
 
 # Install the gl.pc file
 define NVIDIA340_LEGACY_DRIVER_INSTALL_GL_DEV
@@ -161,28 +143,11 @@ define NVIDIA340_LEGACY_DRIVER_INSTALL_LIBS
 	$(foreach lib,$(NVIDIA340_LEGACY_DRIVER_LIBS_TLS),\
 		$(INSTALL) -D -m 0644 $(@D)/tls/$(lib) $(1)/usr/lib/$(notdir $(lib))
 	)
-	$(foreach lib,$(NVIDIA340_LEGACY_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/$(lib) $(1)/usr/lib/vdpau/$(notdir $(lib))
-	)
-endef
-
-# batocera install 32bit libraries
-define NVIDIA340_LEGACY_DRIVER_INSTALL_32
-	$(foreach lib,$(NVIDIA340_LEGACY_DRIVER_32),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/$(notdir $(lib))
-	)
-	$(foreach lib,$(NVIDIA340_LEGACY_DRIVER_LIBS_TLS),\
-		$(INSTALL) -D -m 0644 $(@D)/32/tls/$(lib) $(1)/lib32/$(notdir $(lib))
-	)
-	$(foreach lib,$(NVIDIA340_LEGACY_DRIVER_LIBS_VDPAU),\
-		$(INSTALL) -D -m 0644 $(@D)/32/$(lib) $(1)/lib32/vdpau/$(notdir $(lib))
-	)
 endef
 
 # For target, install libraries and X.org modules
 define NVIDIA340_LEGACY_DRIVER_INSTALL_TARGET_CMDS
 	$(call NVIDIA340_LEGACY_DRIVER_INSTALL_LIBS,$(TARGET_DIR))
-	$(call NVIDIA340_LEGACY_DRIVER_INSTALL_32,$(TARGET_DIR))
 	$(INSTALL) -D -m 0644 $(@D)/nvidia_drv.so \
 	    $(TARGET_DIR)/usr/lib/xorg/modules/drivers/nvidia340_legacy_drv.so
 	$(INSTALL) -D -m 0644 $(@D)/libglx.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
@@ -219,15 +184,6 @@ define NVIDIA340_LEGACY_DRIVER_RENAME_KERNEL_MODULES
 	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGLESv1_CM.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
 	mv -f $(@D)/libGLESv2.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
 	    $(TARGET_DIR)/usr/share/nvidia/libraries/libGLESv2.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
-	mkdir -p $(TARGET_DIR)/usr/share/nvidia/libraries/32
-	mv -f $(@D)/32/libGL.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/32/libGL.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
-	mv -f $(@D)/32/libEGL.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/32/libEGL.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
-	mv -f $(@D)/32/libGLESv1_CM.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/32/libGLESv1_CM.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
-	mv -f $(@D)/32/libGLESv2.so.$(NVIDIA340_LEGACY_DRIVER_VERSION) \
-	    $(TARGET_DIR)/usr/share/nvidia/libraries/32/libGLESv2.so.$(NVIDIA340_LEGACY_DRIVER_VERSION)
 	# set the driver version file
 	echo $(NVIDIA340_LEGACY_DRIVER_VERSION) > $(TARGET_DIR)/usr/share/nvidia/legacy340.version
 endef

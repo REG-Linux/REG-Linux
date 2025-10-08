@@ -224,12 +224,7 @@ else
 IMG_MESA3D_CONF_OPTS += -Dlibunwind=disabled
 endif
 
-ifeq ($(BR2_PACKAGE_IMG_MESA3D_VDPAU),y)
-IMG_MESA3D_DEPENDENCIES += libvdpau
-IMG_MESA3D_CONF_OPTS += -Dgallium-vdpau=enabled
-else
 IMG_MESA3D_CONF_OPTS += -Dgallium-vdpau=disabled
-endif
 
 ifeq ($(BR2_PACKAGE_LM_SENSORS),y)
 IMG_MESA3D_CONF_OPTS += -Dlmsensors=enabled
