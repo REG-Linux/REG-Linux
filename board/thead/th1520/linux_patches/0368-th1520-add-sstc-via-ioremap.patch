@@ -1,0 +1,149 @@
+From 4a4979b3cf5f7f9d086ae0ce1f14b03bb257af43 Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Fri, 4 Apr 2025 00:29:13 +0800
+Subject: [PATCH 368/400] th1520: add sstc via ioremap
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ .../devicetree/bindings/riscv/extensions.yaml        |  6 ++++++
+ arch/riscv/boot/dts/thead/th1520.dtsi                |  8 ++++----
+ arch/riscv/include/asm/hwcap.h                       |  2 ++
+ arch/riscv/kernel/cpufeature.c                       |  1 +
+ drivers/clocksource/timer-riscv.c                    | 12 ++++++++++++
+ 5 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
+index cc1f546fdbdc..fcce0a22d561 100644
+--- a/Documentation/devicetree/bindings/riscv/extensions.yaml
++++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+@@ -165,6 +165,12 @@ properties:
+             memory types as ratified in the 20191213 version of the privileged
+             ISA specification.
+ 
++        - const: xtheadsstc
++          description: |
++            The xtheadsstc supervisor-level extension for time compare as
++            ratified at commit 3f9ed34 ("Add ability to manually trigger
++            workflow. (#2)") of riscv-time-compare.
++
+         - const: zba
+           description: |
+             The standard Zba bit-manipulation extension for address generation
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index bc3c59e1ee91..b1056b84b751 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -69,7 +69,7 @@ c910_0: cpu@0 {
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm", "xtheadvector";
++					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <0>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -105,7 +105,7 @@ c910_1: cpu@1 {
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm", "xtheadvector";
++					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <1>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -139,7 +139,7 @@ c910_2: cpu@2 {
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm", "xtheadvector";
++					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <2>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -173,7 +173,7 @@ c910_3: cpu@3 {
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm", "xtheadvector";
++					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <3>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+index 30cdcab9b2c5..3f55e1b2fe61 100644
+--- a/arch/riscv/include/asm/hwcap.h
++++ b/arch/riscv/include/asm/hwcap.h
+@@ -103,6 +103,8 @@
+ #define RISCV_ISA_EXT_ZAWRS		85
+ #define RISCV_ISA_EXT_ZICCRSE		88
+ 
++#define RISCV_ISA_EXT_XTHEADSSTC	126
++
+ #define RISCV_ISA_EXT_MAX		128
+ 
+ #ifdef CONFIG_RISCV_M_MODE
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index 84a9283c9493..e12fb725a8ad 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -187,6 +187,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
+ 	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
+ 	__RISCV_ISA_EXT_DATA(svnapot, RISCV_ISA_EXT_SVNAPOT),
+ 	__RISCV_ISA_EXT_DATA(svpbmt, RISCV_ISA_EXT_SVPBMT),
++	__RISCV_ISA_EXT_DATA(xtheadsstc, RISCV_ISA_EXT_XTHEADSSTC),
+ };
+ 
+ const size_t riscv_isa_ext_count = ARRAY_SIZE(riscv_isa_ext);
+diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/timer-riscv.c
+index da3071b387eb..252a7553dec8 100644
+--- a/drivers/clocksource/timer-riscv.c
++++ b/drivers/clocksource/timer-riscv.c
+@@ -29,12 +29,15 @@
+ #include <asm/timex.h>
+ 
+ static DEFINE_STATIC_KEY_FALSE(riscv_sstc_available);
++static DEFINE_STATIC_KEY_FALSE(riscv_xtheadsstc_available);
+ static bool riscv_timer_cannot_wake_cpu;
++static void __iomem *stimecmp_base;
+ 
+ static int riscv_clock_next_event(unsigned long delta,
+ 		struct clock_event_device *ce)
+ {
+ 	u64 next_tval = get_cycles64() + delta;
++	int hartid = smp_processor_id();
+ 
+ 	csr_set(CSR_IE, IE_TIE);
+ 	if (static_branch_likely(&riscv_sstc_available)) {
+@@ -44,6 +47,9 @@ static int riscv_clock_next_event(unsigned long delta,
+ #else
+ 		csr_write(CSR_STIMECMP, next_tval);
+ #endif
++	} else if (static_branch_likely(&riscv_xtheadsstc_available)) {
++		writel(next_tval & 0xFFFFFFFF, stimecmp_base + 8 * hartid);
++		writel(next_tval >> 32, stimecmp_base + 8 * hartid + 4);
+ 	} else
+ 		sbi_set_timer(next_tval);
+ 
+@@ -130,6 +136,7 @@ static int __init riscv_timer_init_common(void)
+ 	int error;
+ 	struct irq_domain *domain;
+ 	struct fwnode_handle *intc_fwnode = riscv_get_intc_hwnode();
++	stimecmp_base = ioremap(0xFFDC00D000, 8 * 4);
+ 
+ 	domain = irq_find_matching_fwnode(intc_fwnode, DOMAIN_BUS_ANY);
+ 	if (!domain) {
+@@ -165,6 +172,11 @@ static int __init riscv_timer_init_common(void)
+ 		static_branch_enable(&riscv_sstc_available);
+ 	}
+ 
++	if (riscv_isa_extension_available(NULL, XTHEADSSTC)) {
++		pr_info("Timer interrupt in S-mode is available via xtheadsstc extension\n");
++		static_branch_enable(&riscv_xtheadsstc_available);
++	}
++
+ 	error = cpuhp_setup_state(CPUHP_AP_RISCV_TIMER_STARTING,
+ 			 "clockevents/riscv/timer:starting",
+ 			 riscv_timer_starting_cpu, riscv_timer_dying_cpu);
+-- 
+2.43.0
+

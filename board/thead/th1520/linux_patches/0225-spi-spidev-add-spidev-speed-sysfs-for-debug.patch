@@ -1,0 +1,65 @@
+From 3ec26d078bbeda804ab596654d6081b0668e93f2 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:08:01 +0800
+Subject: [PATCH 225/400] spi: spidev: add spidev speed sysfs for debug
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/spi/spidev.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
+index 16bb4fc3a4ba..1ec345617508 100644
+--- a/drivers/spi/spidev.c
++++ b/drivers/spi/spidev.c
+@@ -90,6 +90,46 @@ MODULE_PARM_DESC(bufsiz, "data bytes in biggest supported SPI message");
+ 
+ /*-------------------------------------------------------------------------*/
+ 
++static ssize_t spidev_speed_store(struct device *dev,
++				 struct device_attribute *attr,
++				 const char *buf, size_t count)
++{
++	int speed_hz;
++	char *start = (char *)buf;
++	struct spidev_data *spidev = dev_get_drvdata(dev);
++
++	speed_hz = simple_strtoul(start, &start, 0);
++
++	if (speed_hz > spidev->spi->max_speed_hz)
++		dev_err(dev, "speed too large, failed to set, speed:%d hz, max_speed:%d hz\n",
++			speed_hz, spidev->spi->max_speed_hz);
++	else
++		spidev->speed_hz = speed_hz;
++
++	return count;
++}
++
++static ssize_t spidev_speed_show(struct device *dev,
++				struct device_attribute *attr, char *buf)
++{
++	struct spidev_data	*spidev = dev_get_drvdata(dev);
++
++	dev_info(dev, "spi speed:%d hz\n", spidev->speed_hz);
++
++	return 0;
++}
++
++static DEVICE_ATTR_RW(spidev_speed);
++
++static struct attribute *spidev_speed_sysfs_entries[] = {
++	&dev_attr_spidev_speed.attr,
++	NULL
++};
++
++static const struct attribute_group dev_attr_spidev_speed_group = {
++	.attrs = spidev_speed_sysfs_entries,
++};
++
+ static ssize_t
+ spidev_sync_unlocked(struct spi_device *spi, struct spi_message *message)
+ {
+-- 
+2.43.0
+

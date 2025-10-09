@@ -1,0 +1,29 @@
+From 5515892d179695731c84c1479f04fde0af1b2a0e Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Thu, 3 Apr 2025 02:22:16 +0800
+Subject: [PATCH 363/400] fix: driver: video_memory: gcc-14: build error
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/soc/xuantie/video_memory/video_memory.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/soc/xuantie/video_memory/video_memory.c b/drivers/soc/xuantie/video_memory/video_memory.c
+index b453dcf10772..6e7fa9f6eadd 100644
+--- a/drivers/soc/xuantie/video_memory/video_memory.c
++++ b/drivers/soc/xuantie/video_memory/video_memory.c
+@@ -1426,9 +1426,9 @@ static long vidalloc_ioctl(struct file *filp, unsigned int cmd, unsigned long ar
+     if (_IOC_NR(cmd) > MEMORY_IOC_MAXNR) return EINVAL;
+ 
+     if (_IOC_DIR(cmd) & _IOC_READ)
+-        ret = !access_ok(arg, _IOC_SIZE(cmd));
++        ret = !access_ok((void*)arg, _IOC_SIZE(cmd));
+     else if (_IOC_DIR(cmd) & _IOC_WRITE)
+-        ret = !access_ok(arg, _IOC_SIZE(cmd));
++        ret = !access_ok((void*)arg, _IOC_SIZE(cmd));
+     if (ret) return EINVAL;
+ 
+     switch (cmd)
+-- 
+2.43.0
+

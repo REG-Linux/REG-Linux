@@ -1,0 +1,36 @@
+From 60391a1bceb4a6b9df1cb575b1248a287789d953 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 00:47:44 +0800
+Subject: [PATCH 210/400] dts: rfkill: Delete unnecessary nodes
+
+Optimize code to remove unnecessary nodes
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 0ddc10d3f386..7aa0805bc3af 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -244,14 +244,11 @@ codec {
+ 
+ 	wcn_wifi: wireless-wlan {
+ 		compatible = "wlan-platdata";
+-		clock-names = "clk_wifi";
+-		ref-clock-frequency = <24000000>;
+-		keep_wifi_power_on;
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&pinctrl_wifi_wake>;
+-		wifi_chip_type = "rtl8723ds";
+ 		WIFI,poweren-gpios = <&ioexp2 4 0>;
+-		support_power_ctrl;
++		power_on_after_init;
++		power_on_when_resume;
+ 		status = "okay";
+ 	};
+ 
+-- 
+2.43.0
+

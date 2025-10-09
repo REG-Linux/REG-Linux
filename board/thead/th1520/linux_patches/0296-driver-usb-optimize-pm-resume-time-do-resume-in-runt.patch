@@ -1,0 +1,81 @@
+From a6b6e506e65130df10dd07261a2c50341710b22c Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:14:02 +0800
+Subject: [PATCH 296/400] driver usb: optimize pm resume time, do resume in
+ runtime_resume
+
+pacth from linux5.10
+SHA1:3102401663a05442f6df8f9e0cb34fe6aeb8a08e
+driver usb: optimize pm resume time, do resume in runtime_resume
+SHA2:87688028294d6b450b2167e1f0a5ae1b80d7f4c8
+driver usb: fix  std xhci resume error
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/usb/core/driver.c | 28 +++++++---------------------
+ drivers/usb/dwc3/core.c   |  1 +
+ 2 files changed, 8 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/usb/core/driver.c b/drivers/usb/core/driver.c
+index f58a0299fb3b..568259286d64 100644
+--- a/drivers/usb/core/driver.c
++++ b/drivers/usb/core/driver.c
+@@ -1577,6 +1577,9 @@ int usb_suspend(struct device *dev, pm_message_t msg)
+ 	if (udev->quirks & USB_QUIRK_DISCONNECT_SUSPEND)
+ 		usb_port_disable(udev);
+ 
++	pm_runtime_disable(dev);
++	pm_runtime_set_suspended(dev);
++
+ 	return 0;
+ }
+ 
+@@ -1597,29 +1600,12 @@ int usb_resume_complete(struct device *dev)
+ int usb_resume(struct device *dev, pm_message_t msg)
+ {
+ 	struct usb_device	*udev = to_usb_device(dev);
+-	int			status;
+ 
+-	/* For all calls, take the device back to full power and
+-	 * tell the PM core in case it was autosuspended previously.
+-	 * Unbind the interfaces that will need rebinding later,
+-	 * because they fail to support reset_resume.
+-	 * (This can't be done in usb_resume_interface()
+-	 * above because it doesn't own the right set of locks.)
+-	 */
+-	status = usb_resume_both(udev, msg);
+-	if (status == 0) {
+-		pm_runtime_disable(dev);
+-		pm_runtime_set_active(dev);
+-		pm_runtime_enable(dev);
+-		unbind_marked_interfaces(udev);
+-	}
++	/* call usb_resume_both in usb_runtime_resume */
++	pm_runtime_enable(dev);
++	unbind_marked_interfaces(udev);
+ 
+-	/* Avoid PM error messages for devices disconnected while suspended
+-	 * as we'll display regular disconnect messages just a bit later.
+-	 */
+-	if (status == -ENODEV || status == -ESHUTDOWN)
+-		status = 0;
+-	return status;
++	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
+index 862692e26b3e..77da047ce72f 100644
+--- a/drivers/usb/dwc3/core.c
++++ b/drivers/usb/dwc3/core.c
+@@ -2054,6 +2054,7 @@ static int dwc3_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_exit_debugfs;
+ 
++	device_enable_async_suspend(dev);
+ 	pm_runtime_put(dev);
+ 
+ 	dma_set_max_seg_size(dev, UINT_MAX);
+-- 
+2.43.0
+

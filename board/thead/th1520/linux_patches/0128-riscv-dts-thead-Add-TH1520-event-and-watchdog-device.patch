@@ -1,0 +1,62 @@
+From b7b7cfc46fddfe7f603f5bf8a7c4c2f05265aaa9 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Thu, 6 Jun 2024 21:16:29 +0800
+Subject: [PATCH 128/400] riscv:dts:thead: Add TH1520 event and watchdog device
+ node
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 31 +++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 06be7229ab40..02f77b684afe 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -273,6 +273,11 @@ aon {
+ 		status = "okay";
+ 	};
+ 
++	aon_iram: aon-iram@ffffef8000 {
++		compatible = "syscon";
++		reg = <0xff 0xffef8000 0x0 0x10000>;
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		interrupt-parent = <&plic>;
+@@ -1001,5 +1006,31 @@ qspi1: qspi@fff8000000 {
+ 			#size-cells = <0>;
+ 			status = "disabled";
+ 		};
++
++		th1520_event: th1520-event {
++			compatible = "thead,th1520-event";
++			aon-iram-regmap = <&aon_iram>;
++			status = "okay";
++		};
++
++		watchdog0: watchdog@ffefc30000 {
++			compatible = "snps,dw-wdt";
++			reg = <0xff 0xefc30000 0x0 0x1000>;
++			interrupts = <60 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_WDT0_PCLK>;
++			clock-names = "tclk";
++			resets = <&rst 	TH1520_RESET_WDT0>;
++			status = "okay";
++		};
++
++		watchdog1: watchdog@ffefc31000 {
++			compatible = "snps,dw-wdt";
++			reg = <0xff 0xefc31000 0x0 0x1000>;
++			interrupts = <63 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_WDT1_PCLK>;
++			clock-names = "tclk";
++			resets = <&rst TH1520_RESET_WDT1>;
++			status = "okay";
++		};
+ 	};
+ };
+-- 
+2.43.0
+

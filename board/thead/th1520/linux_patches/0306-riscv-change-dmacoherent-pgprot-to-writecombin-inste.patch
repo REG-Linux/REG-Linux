@@ -1,0 +1,34 @@
+From 8a3bd3451d8296fbd3e95411ca399c4875e56451 Mon Sep 17 00:00:00 2001
+From: Huaming <jianghuaming@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:22:12 +0800
+Subject: [PATCH 306/400] riscv: change dmacoherent pgprot to writecombin
+ instead of noncached
+
+DMA allocations for non-coherent devices use should be Normal non-cacheable
+memory, which permits speculation, unaligned accesses and merging of writes.
+It's different from Device memroy as MIMO andthus forbids speculation,
+preserves access size,requires strict alignment and can also force write
+responses to come from the endpoint.
+
+Signed-off-by: Huaming <jianghuaming@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/include/asm/pgtable.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/riscv/include/asm/pgtable.h b/arch/riscv/include/asm/pgtable.h
+index 332a6bf72b1d..987cfe87e782 100644
+--- a/arch/riscv/include/asm/pgtable.h
++++ b/arch/riscv/include/asm/pgtable.h
+@@ -618,6 +618,8 @@ static inline pgprot_t pgprot_writecombine(pgprot_t _prot)
+ 	return __pgprot(prot);
+ }
+ 
++#define pgprot_dmacoherent pgprot_writecombine
++
+ /*
+  * THP functions
+  */
+-- 
+2.43.0
+

@@ -1,0 +1,26 @@
+From a5f21bfeb81c92934eac87fafeb6a85405e16fc8 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Fri, 12 Jan 2024 08:41:49 +0800
+Subject: [PATCH 061/400] chore: dtb_install in /boot
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ scripts/package/builddeb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 259668daea63..82470e14c6ad 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -59,7 +59,7 @@ install_linux_image () {
+ 
+ 	# Only some architectures with OF support have this target
+ 	if is_enabled CONFIG_OF_EARLY_FLATTREE && [ -d "${srctree}/arch/${SRCARCH}/boot/dts" ]; then
+-		${MAKE} -f ${srctree}/Makefile INSTALL_DTBS_PATH="${pdir}/usr/lib/linux-image-${KERNELRELEASE}" dtbs_install
++		${MAKE} -f ${srctree}/Makefile INSTALL_DTBS_PATH="${pdir}/boot/dtbs/linux-image-${KERNELRELEASE}" dtbs_install
+ 	fi
+ 
+ 	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH="${pdir}" modules_install
+-- 
+2.43.0
+

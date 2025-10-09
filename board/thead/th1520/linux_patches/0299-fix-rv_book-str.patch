@@ -1,0 +1,25 @@
+From e4d08b9edb343acd2e3ae2a6a3595c7fba948edf Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:15:00 +0800
+Subject: [PATCH 299/400] fix rv_book str
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index 98404c90181e..90716e0d4140 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -247,6 +247,7 @@ rpmsg: rpmsg{
+             reg = <0x0 0x1E000000 0 0x10000>;
+ 			compatible = "th1520,th1520-rpmsg";
+ 			log-memory-region = <&audio_log_mem>;
++			audio-text-memory-region = <&audio_text_mem>;
+ 			status = "okay";
+ 		};
+ 	};
+-- 
+2.43.0
+

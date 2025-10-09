@@ -1,0 +1,75 @@
+From 5ba4fddf69ef60b16ec3aa2ff5d9a0663b69cb3b Mon Sep 17 00:00:00 2001
+From: Leonardo Bras <leobras@redhat.com>
+Date: Wed, 3 Jan 2024 13:32:03 -0300
+Subject: [PATCH 043/400] riscv/cmpxchg: Implement xchg for variables of size 1
+ and 2
+
+xchg for variables of size 1-byte and 2-bytes is not yet available for
+riscv, even though its present in other architectures such as arm64 and
+x86. This could lead to not being able to implement some locking mechanisms
+or requiring some rework to make it work properly.
+
+Implement 1-byte and 2-bytes xchg in order to achieve parity with other
+architectures.
+
+Signed-off-by: Leonardo Bras <leobras@redhat.com>
+Tested-by: Guo Ren <guoren@kernel.org>
+Link: https://lore.kernel.org/r/20240103163203.72768-7-leobras@redhat.com
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/include/asm/cmpxchg.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
+index ac9d0eeb74e6..26cea2395aae 100644
+--- a/arch/riscv/include/asm/cmpxchg.h
++++ b/arch/riscv/include/asm/cmpxchg.h
+@@ -11,6 +11,31 @@
+ #include <asm/barrier.h>
+ #include <asm/fence.h>
+ 
++#define __arch_xchg_masked(prepend, append, r, p, n)			\
++({									\
++	u32 *__ptr32b = (u32 *)((ulong)(p) & ~0x3);			\
++	ulong __s = ((ulong)(p) & (0x4 - sizeof(*p))) * BITS_PER_BYTE;	\
++	ulong __mask = GENMASK(((sizeof(*p)) * BITS_PER_BYTE) - 1, 0)	\
++			<< __s;						\
++	ulong __newx = (ulong)(n) << __s;				\
++	ulong __retx;							\
++	ulong __rc;							\
++									\
++	__asm__ __volatile__ (						\
++	       prepend							\
++	       "0:	lr.w %0, %2\n"					\
++	       "	and  %1, %0, %z4\n"				\
++	       "	or   %1, %1, %z3\n"				\
++	       "	sc.w %1, %1, %2\n"				\
++	       "	bnez %1, 0b\n"					\
++	       append							\
++	       : "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))	\
++	       : "rJ" (__newx), "rJ" (~__mask)				\
++	       : "memory");						\
++									\
++	r = (__typeof__(*(p)))((__retx & __mask) >> __s);		\
++})
++
+ #define __arch_xchg(sfx, prepend, append, r, p, n)			\
+ ({									\
+ 	__asm__ __volatile__ (						\
+@@ -27,7 +52,13 @@
+ 	__typeof__(ptr) __ptr = (ptr);					\
+ 	__typeof__(*(__ptr)) __new = (new);				\
+ 	__typeof__(*(__ptr)) __ret;					\
++									\
+ 	switch (sizeof(*__ptr)) {					\
++	case 1:								\
++	case 2:								\
++		__arch_xchg_masked(prepend, append,			\
++				   __ret, __ptr, __new);		\
++		break;							\
+ 	case 4:								\
+ 		__arch_xchg(".w" sfx, prepend, append,			\
+ 			      __ret, __ptr, __new);			\
+-- 
+2.43.0
+

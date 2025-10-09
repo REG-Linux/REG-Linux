@@ -1,0 +1,26 @@
+From 489d40a1755dfc248b42adfada56d732810614f7 Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Mon, 6 Jan 2025 19:16:27 +0800
+Subject: [PATCH 355/400] config: enable CONFIG_BT_HCIUART_BCM for meles
+ bluetooth
+
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ arch/riscv/configs/revyos_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/configs/revyos_defconfig b/arch/riscv/configs/revyos_defconfig
+index 7095c5927ddd..d1ef0d439db6 100644
+--- a/arch/riscv/configs/revyos_defconfig
++++ b/arch/riscv/configs/revyos_defconfig
+@@ -556,6 +556,7 @@ CONFIG_BT_HCIBTUSB_MTK=y
+ CONFIG_BT_HCIBTSDIO=m
+ CONFIG_BT_HCIUART=m
+ CONFIG_BT_HCIUART_RTL3WIRE=y
++CONFIG_BT_HCIUART_BCM=y
+ CONFIG_BT_MRVL=m
+ CONFIG_BT_MRVL_SDIO=m
+ CONFIG_BT_ATH3K=m
+-- 
+2.43.0
+

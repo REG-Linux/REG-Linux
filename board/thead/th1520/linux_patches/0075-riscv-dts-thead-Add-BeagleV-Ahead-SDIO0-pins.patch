@@ -1,0 +1,51 @@
+From c10e8734450859498fa71f1089674254a730461f Mon Sep 17 00:00:00 2001
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Date: Wed, 13 Dec 2023 01:52:54 +0100
+Subject: [PATCH 075/400] riscv: dts: thead: Add BeagleV Ahead SDIO0 pins
+
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+---
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   | 20 ++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index ecedeca714d2..9ecbbe62807b 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -206,6 +206,18 @@ mdio-pins {
+ 		};
+ 	};
+ 
++	sdio0_pins: sdio0-0 {
++		detn-pins {
++			pins = "SDIO0_DETN";
++			function = "sdio";
++			bias-disable; /* external pull-up */
++			drive-strength = <1>;
++			input-enable;
++			input-schmitt-enable;
++			slew-rate = <0>;
++		};
++	};
++
+ 	uart0_pins: uart0-0 {
+ 		tx-pins {
+ 			pins = "UART0_TXD";
+@@ -240,9 +252,11 @@ &emmc {
+ };
+ 
+ &sdio0 {
+-       bus-width = <4>;
+-       max-frequency = <198000000>;
+-       status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&sdio0_pins>;
++	bus-width = <4>;
++	max-frequency = <198000000>;
++	status = "okay";
+ };
+ 
+ &uart0 {
+-- 
+2.43.0
+

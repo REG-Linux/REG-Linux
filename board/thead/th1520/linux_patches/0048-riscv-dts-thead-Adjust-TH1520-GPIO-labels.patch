@@ -1,0 +1,156 @@
+From 091584e2e96e2df3264a394b2df1b31f0e9d0bcb Mon Sep 17 00:00:00 2001
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Date: Wed, 3 Jan 2024 14:28:42 +0100
+Subject: [PATCH 048/400] riscv: dts: thead: Adjust TH1520 GPIO labels
+
+Adjust labels for the TH1520 GPIO controllers such that GPIOs can be
+referenced by the names used by the documentation. Eg.
+
+GPIO0_X  -> <&gpio0 X Y>
+GPIO1_X  -> <&gpio1 X Y>
+GPIO2_X  -> <&gpio2 X Y>
+GPIO3_X  -> <&gpio3 X Y>
+GPIO4_X  -> <&gpio4 X Y>
+AOGPIO_X -> <&aogpio X Y>
+
+Remove labels for the parent GPIO devices that shouldn't need to be
+referenced.
+
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Link: https://lore.kernel.org/r/20240103132852.298964-6-emil.renner.berthing@canonical.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   |  2 ++
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    |  2 ++
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 24 +++++++++----------
+ 3 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index 6c56318a8705..f1e8eaed487c 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -17,6 +17,8 @@ aliases {
+ 		gpio1 = &gpio1;
+ 		gpio2 = &gpio2;
+ 		gpio3 = &gpio3;
++		gpio4 = &gpio4;
++		gpio5 = &aogpio;
+ 		serial0 = &uart0;
+ 		serial1 = &uart1;
+ 		serial2 = &uart2;
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 9a3884a73e13..0ae2c20d5641 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -14,6 +14,8 @@ aliases {
+ 		gpio1 = &gpio1;
+ 		gpio2 = &gpio2;
+ 		gpio3 = &gpio3;
++		gpio4 = &gpio4;
++		gpio5 = &aogpio;
+ 		serial0 = &uart0;
+ 		serial1 = &uart1;
+ 		serial2 = &uart2;
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 97a27ce561db..b10e07d03518 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -200,13 +200,13 @@ uart3: serial@ffe7f04000 {
+ 			status = "disabled";
+ 		};
+ 
+-		gpio2: gpio@ffe7f34000 {
++		gpio@ffe7f34000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xe7f34000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 
+-			portc: gpio-controller@0 {
++			gpio2: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+@@ -219,13 +219,13 @@ portc: gpio-controller@0 {
+ 			};
+ 		};
+ 
+-		gpio3: gpio@ffe7f38000 {
++		gpio@ffe7f38000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xe7f38000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 
+-			portd: gpio-controller@0 {
++			gpio3: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+@@ -244,13 +244,13 @@ padctrl1_apsys: pinctrl@ffe7f3c000 {
+ 			clocks = <&apb_clk>;
+ 		};
+ 
+-		gpio0: gpio@ffec005000 {
++		gpio@ffec005000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xec005000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 
+-			porta: gpio-controller@0 {
++			gpio0: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+@@ -263,13 +263,13 @@ porta: gpio-controller@0 {
+ 			};
+ 		};
+ 
+-		gpio1: gpio@ffec006000 {
++		gpio@ffec006000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xec006000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 
+-			portb: gpio-controller@0 {
++			gpio1: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+@@ -406,13 +406,13 @@ timer7: timer@ffffc3303c {
+ 			status = "disabled";
+ 		};
+ 
+-		ao_gpio0: gpio@fffff41000 {
++		gpio@fffff41000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xfff41000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 
+-			porte: gpio-controller@0 {
++			aogpio: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+@@ -431,13 +431,13 @@ padctrl_aosys: pinctrl@fffff4a000 {
+ 			clocks = <&aonsys_clk>;
+ 		};
+ 
+-		ao_gpio1: gpio@fffff52000 {
++		gpio@fffff52000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xfff52000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 
+-			portf: gpio-controller@0 {
++			gpio4: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+-- 
+2.43.0
+

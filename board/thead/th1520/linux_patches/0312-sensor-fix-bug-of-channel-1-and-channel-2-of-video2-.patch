@@ -1,0 +1,42 @@
+From 76f911aac004ca184e5296e81d7461d10f043a52 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:26:19 +0800
+Subject: [PATCH 312/400] sensor: fix bug of channel 1 and channel 2 of video2
+ failed to run
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index d7c934144506..4d4187643bba 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -535,6 +535,11 @@ sensor1 {
+ 					mode_idx = <1>;
+ 					path_type = "SENSOR_2592x1944_LINER";
+ 				};
++				dma {
++					subdev_name = "vipre";
++					idx = <0>;
++					path_type = "VIPRE_CSI0_ISP1";
++				};
+ 				isp {
+ 					subdev_name = "isp";
+ 					idx = <1>;
+@@ -555,6 +560,11 @@ sensor1 {
+ 					mode_idx = <1>;
+ 					path_type = "SENSOR_2592x1944_LINER";
+ 				};
++				dma {
++					subdev_name = "vipre";
++					idx = <0>;
++					path_type = "VIPRE_CSI0_ISP1";
++				};
+ 				isp {
+ 					subdev_name = "isp";
+ 					idx = <1>;
+-- 
+2.43.0
+

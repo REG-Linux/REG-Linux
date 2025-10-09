@@ -1,0 +1,36 @@
+From 4aa918c77b50e003d71f25b51c51ad7921a92ea1 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sat, 21 Sep 2024 09:33:04 +0800
+Subject: [PATCH 345/400] fix: disable CONFIG_PCI for pvrsrvkm build error
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/gpu/drm/img-rogue/pvrsrvkm.mk | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/img-rogue/pvrsrvkm.mk b/drivers/gpu/drm/img-rogue/pvrsrvkm.mk
+index 5d57e765685e..0c8e4965679c 100644
+--- a/drivers/gpu/drm/img-rogue/pvrsrvkm.mk
++++ b/drivers/gpu/drm/img-rogue/pvrsrvkm.mk
+@@ -131,7 +131,6 @@ pvrsrvkm-y += \
+  uniq_key_splay_tree.o \
+  rgx_hwperf_table.o \
+  interrupt_support.o \
+- pci_support.o \
+  sysconfig_cmn.o \
+  dma_support.o \
+  vmm_type_stub.o \
+@@ -141,6 +140,9 @@ pvrsrvkm-$(CONFIG_DRM_POWERVR_ROGUE_DEBUG) += \
+  client_ri_direct_bridge.o \
+  server_ri_bridge.o \
+  ri_server.o
++
++pvrsrvkm-$(CONFIG_PCI) += pci_support.o
++
+ pvrsrvkm-$(CONFIG_ARM)   += osfunc_arm.o
+ pvrsrvkm-$(CONFIG_ARM64) += osfunc_arm64.o
+ pvrsrvkm-$(CONFIG_EVENT_TRACING) += trace_events.o
+-- 
+2.43.0
+

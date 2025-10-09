@@ -1,0 +1,133 @@
+From ddc2e8e36cf8f56a9532a0a520e3ae568a9ec776 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:26:46 +0800
+Subject: [PATCH 252/400] hibernate: load image retry in some crc mismatch
+
+Firstly,load image again if occur crc mismatch.
+And if twice load image error, reboot retry for
+this boot.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ kernel/power/hibernate.c | 18 ++++++++++++++----
+ kernel/power/power.h     |  1 +
+ kernel/power/swap.c      | 32 +++++++++++++++++++++++++++++++-
+ 3 files changed, 46 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index 1a2f8029a59e..46fe61c7c423 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -764,10 +764,20 @@ static int load_image_and_restore(bool snapshot_test)
+ 	}
+ 
+ 	error = swsusp_read(&flags);
+-	swsusp_close(snapshot_test);
+-	if (!error)
+-		error = hibernation_restore(flags & SF_PLATFORM_MODE);
+-
++	if (error == -ENODATA) { //if is crc error of image ,reboot retry
++		if(0 == swsusp_mark_sign_retry()) { //can retry
++			pr_warn("WARN:Image load error,reboot retry...\n");
++			swsusp_close(snapshot_test);
++			kernel_restart(NULL);
++		}
++		else //reach the retry max times
++			swsusp_close(snapshot_test);
++	}
++	else {
++		swsusp_close(snapshot_test);
++		if (!error)
++			error = hibernation_restore(flags & SF_PLATFORM_MODE);
++	}
+ 	pr_err("Failed to load image, recovering.\n");
+ 	swsusp_free();
+ 	free_basic_memory_bitmaps();
+diff --git a/kernel/power/power.h b/kernel/power/power.h
+index 62a7cb452a4b..de079cbabe9c 100644
+--- a/kernel/power/power.h
++++ b/kernel/power/power.h
+@@ -177,6 +177,7 @@ extern void swsusp_free(void);
+ extern int swsusp_read(unsigned int *flags_p);
+ extern int swsusp_write(unsigned int flags);
+ void swsusp_close(bool exclusive);
++extern int swsusp_mark_sign_retry(void);
+ #ifdef CONFIG_SUSPEND
+ extern int swsusp_unmark(void);
+ #endif
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index d71c590550d2..797e657bbeee 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -34,6 +34,7 @@
+ #include "power.h"
+ 
+ #define HIBERNATE_SIG	"S1SUSPEND"
++#define HIBERNATE_SIG2	"S1SUSPEN2" //sign for 2nd time load image
+ 
+ u32 swsusp_hardware_signature;
+ 
+@@ -1485,7 +1486,9 @@ int swsusp_read(unsigned int *flags_p)
+ 	struct swap_map_handle handle;
+ 	struct snapshot_handle snapshot;
+ 	struct swsusp_info *header;
++	int retry = 1;
+ 
++__retry:
+ 	memset(&snapshot, 0, sizeof(struct snapshot_handle));
+ 	error = snapshot_write_next(&snapshot);
+ 	if (error < (int)PAGE_SIZE)
+@@ -1502,6 +1505,11 @@ int swsusp_read(unsigned int *flags_p)
+ 			load_image_lzo(&handle, &snapshot, header->pages - 1);
+ 	}
+ 	swap_reader_finish(&handle);
++	if(retry && (error == -ENODATA)) {
++		retry = 0;
++		pr_info("Image load retry for load error %d.\n",error);
++		goto __retry;
++	}
+ end:
+ 	if (!error)
+ 		pr_debug("Image successfully loaded\n");
+@@ -1510,6 +1518,23 @@ int swsusp_read(unsigned int *flags_p)
+ 	return error;
+ }
+ 
++bool swsusp_can_retry = true;
++int swsusp_mark_sign_retry(void)
++{
++	int error = 0;
++	if (swsusp_can_retry) {
++		memcpy(swsusp_header->sig, HIBERNATE_SIG2, 10);
++		/* Write swap signature now */
++		error = hib_submit_io(REQ_OP_WRITE | REQ_SYNC,
++					swsusp_resume_block,
++					(void *)swsusp_header, NULL);
++		if(error)
++			pr_info("Write swap sign failed %d\n",error);
++		return error;
++	}
++	return -EINVAL;
++}
++
+ static void *swsusp_holder;
+ 
+ /**
+@@ -1532,7 +1557,12 @@ int swsusp_check(bool exclusive)
+ 		if (error)
+ 			goto put;
+ 
+-		if (!memcmp(HIBERNATE_SIG, swsusp_header->sig, 10)) {
++		if (!memcmp(HIBERNATE_SIG, swsusp_header->sig, 10) ||
++			!memcmp(HIBERNATE_SIG2, swsusp_header->sig, 10) ) {
++			if(!memcmp(HIBERNATE_SIG, swsusp_header->sig, 10))
++				swsusp_can_retry = true;
++			else
++				swsusp_can_retry = false;
+ 			memcpy(swsusp_header->sig, swsusp_header->orig_sig, 10);
+ 			/* Reset swap signature now */
+ 			error = hib_submit_io(REQ_OP_WRITE | REQ_SYNC,
+-- 
+2.43.0
+

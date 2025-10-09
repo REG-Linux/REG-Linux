@@ -1,0 +1,91 @@
+From 31b3156a62d2ec0e187e29d6f3c24a04389f45d6 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:30:59 +0800
+Subject: [PATCH 199/400] dts: th1520: add rambus eip_28 device node
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val-sec.dts    |  4 ++++
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi       |  4 ++++
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts |  4 ++++
+ .../boot/dts/thead/th1520-lpi4a-product-sec.dts   |  4 ++++
+ arch/riscv/boot/dts/thead/th1520.dtsi             | 15 +++++++++++++++
+ 5 files changed, 31 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val-sec.dts b/arch/riscv/boot/dts/thead/th1520-a-val-sec.dts
+index 2899694ac3e3..1fd1f4fd3c71 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val-sec.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val-sec.dts
+@@ -4,3 +4,7 @@
+  */
+ 
+ #include "th1520-a-val.dts"
++
++&eip_28 {
++	status = "disabled";
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 571f7434eda1..c51b8d63ebe9 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -1487,3 +1487,7 @@ opp-1000000000 {
+ 		opp-suspend;
+ 	};
+ };
++
++&eip_28 {
++	status = "okay";
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index df230a172553..0717b2ee6e65 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -1255,3 +1255,7 @@ opp-1000000000 {
+ 		opp-suspend;
+ 	};
+ };
++
++&eip_28 {
++	status = "okay";
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts b/arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts
+index 2713e85fa78e..5486208acb8a 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts
+@@ -4,3 +4,7 @@
+  */
+ 
+ #include "th1520-lpi4a-product.dts"
++
++&eip_28 {
++	status = "disabled";
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 94d5c9c58e0c..67a1173fac98 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -2212,5 +2212,20 @@ iso7816: iso7816-card@fff7f30000 {
+ 			interrupts = <69 IRQ_TYPE_LEVEL_HIGH>;
+ 			status = "disabled";
+ 		};
++
++		eip_28: eip-28@ffff300000 {
++			compatible = "xlnx,sunrise-fpga-1.0", "safexcel-eip-28";
++			reg = <0xff 0xff300000 0x0 0x40000>;
++			interrupts = <144 IRQ_TYPE_LEVEL_HIGH>,
++						<145 IRQ_TYPE_LEVEL_HIGH>,
++						<146 IRQ_TYPE_LEVEL_HIGH>,
++						<147 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&miscsys_clk_gate CLKGEN_MISCSYS_EIP120SI_CLK>,
++					<&miscsys_clk_gate CLKGEN_MISCSYS_EIP120SII_CLK>,
++					<&miscsys_clk_gate CLKGEN_MISCSYS_EIP120SIII_CLK>,
++					<&miscsys_clk_gate CLKGEN_MISCSYS_EIP150B_HCLK>;
++			clock-names = "120si_clk","120sii_clk","120siii_clk","hclk";
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.43.0
+

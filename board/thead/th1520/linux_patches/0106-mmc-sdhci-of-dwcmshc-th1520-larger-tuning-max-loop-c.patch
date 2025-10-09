@@ -1,0 +1,30 @@
+From 783689b9958d6ce4aa15a1baa09948331fb724e6 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Mon, 3 Jun 2024 14:55:59 +0800
+Subject: [PATCH 106/400] mmc:sdhci-of-dwcmshc: th1520 larger tuning max loop
+ count to 128
+
+This commit set th15120 tuning max loop count to 128 fixup
+sdio tuning failed issue in SDR104.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+---
+ drivers/mmc/host/sdhci-of-dwcmshc.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/mmc/host/sdhci-of-dwcmshc.c b/drivers/mmc/host/sdhci-of-dwcmshc.c
+index 99eb33539728..15cd9d615773 100644
+--- a/drivers/mmc/host/sdhci-of-dwcmshc.c
++++ b/drivers/mmc/host/sdhci-of-dwcmshc.c
+@@ -610,6 +610,8 @@ static int th1520_execute_tuning(struct sdhci_host *host, u32 opcode)
+ 	sdhci_writel(host, val, priv->vendor_specific_area1 + DWCMSHC_EMMC_ATCTRL);
+ 	val = sdhci_readl(host, priv->vendor_specific_area1 + DWCMSHC_EMMC_ATCTRL);
+ 
++	host->tuning_loop_count = 128; /*max loop count allow to 128*/
++
+ 	/* perform tuning */
+ 	sdhci_start_tuning(host);
+ 	host->tuning_err = __sdhci_execute_tuning(host, opcode);
+-- 
+2.43.0
+

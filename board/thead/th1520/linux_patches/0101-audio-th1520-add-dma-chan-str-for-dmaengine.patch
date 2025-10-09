@@ -1,0 +1,100 @@
+From 75148e08fa6445502eb9cba09fe0e1999f4a1b35 Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Mon, 21 Aug 2023 17:31:02 +0800
+Subject: [PATCH 101/400] audio: th1520: add dma chan str for dmaengine
+
+Add dma chan str for dmaengine
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+---
+ .../dma/dw-axi-dmac/dw-axi-dmac-platform.c    | 31 ++++++++++++++++++-
+ drivers/dma/dw-axi-dmac/dw-axi-dmac.h         | 10 ++++++
+ 2 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index 72fb40de58b3..632ea398c63e 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -1202,13 +1202,38 @@ static int dma_chan_pause(struct dma_chan *dchan)
+ 
+ 	spin_unlock_irqrestore(&chan->vc.lock, flags);
+ 
++	chan->ch_sar = axi_chan_ioread32(chan, CH_SAR);
++	chan->ch_dar = axi_chan_ioread32(chan, CH_DAR);
++	chan->ch_dar_h = axi_chan_ioread32(chan, CH_DAR_H);
++	chan->ch_block_ts = axi_chan_ioread32(chan, CH_BLOCK_TS);
++	chan->ch_ctl_l = axi_chan_ioread32(chan, CH_CTL_L);
++	chan->ch_ctl_h = axi_chan_ioread32(chan, CH_CTL_H);
++	chan->ch_cfg_l = axi_chan_ioread32(chan, CH_CFG_L);
++	chan->ch_cfg_h = axi_chan_ioread32(chan, CH_CFG_H);
++	chan->ch_llp = axi_chan_ioread32(chan, CH_LLP);
++
+ 	return timeout ? 0 : -EAGAIN;
+ }
+ 
+ /* Called in chan locked context */
+ static inline void axi_chan_resume(struct axi_dma_chan *chan)
+ {
+-	u32 val;
++	u32 val, irq_mask;
++
++	axi_chan_iowrite32(chan, CH_SAR, chan->ch_sar);
++	axi_chan_iowrite32(chan, CH_DAR, chan->ch_dar);
++	axi_chan_iowrite32(chan, CH_DAR_H, chan->ch_dar_h);
++	axi_chan_iowrite32(chan, CH_BLOCK_TS, chan->ch_block_ts);
++	axi_chan_iowrite32(chan, CH_CTL_L, chan->ch_ctl_l);
++	axi_chan_iowrite32(chan, CH_CTL_H, chan->ch_ctl_h);
++	axi_chan_iowrite32(chan, CH_CFG_L, chan->ch_cfg_l);
++	axi_chan_iowrite32(chan, CH_CFG_H, chan->ch_cfg_h);
++	axi_chan_iowrite32(chan, CH_LLP, chan->ch_llp);
++	irq_mask = DWAXIDMAC_IRQ_DMA_TRF | DWAXIDMAC_IRQ_ALL_ERR;
++	axi_chan_irq_sig_set(chan, irq_mask);
++	/* Generate 'suspend' status but don't generate interrupt */
++	irq_mask |= DWAXIDMAC_IRQ_SUSPENDED;
++	axi_chan_irq_set(chan, irq_mask);
+ 
+ 	if (chan->chip->dw->hdata->reg_map_8_channels) {
+ 		val = axi_dma_ioread32(chan->chip, DMAC_CHEN);
+@@ -1222,7 +1247,11 @@ static inline void axi_chan_resume(struct axi_dma_chan *chan)
+ 		axi_dma_iowrite32(chan->chip, DMAC_CHSUSPREG, val);
+ 	}
+ 
++	axi_chan_enable(chan);
++
+ 	chan->is_paused = false;
++
++	return;
+ }
+ 
+ static int dma_chan_resume(struct dma_chan *dchan)
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac.h b/drivers/dma/dw-axi-dmac/dw-axi-dmac.h
+index 8521530a34ec..23c6f44b88df 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac.h
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac.h
+@@ -52,6 +52,15 @@ struct axi_dma_chan {
+ 	bool				cyclic;
+ 	/* these other elements are all protected by vc.lock */
+ 	bool				is_paused;
++	u32		ch_sar;
++	u32		ch_dar;
++	u32		ch_dar_h;
++	u32		ch_block_ts;
++	u32		ch_ctl_l;
++	u32		ch_ctl_h;
++	u32		ch_cfg_l;
++	u32		ch_cfg_h;
++	u32		ch_llp;
+ };
+ 
+ struct dw_axi_dma {
+@@ -166,6 +175,7 @@ static inline struct axi_dma_chan *dchan_to_axi_dma_chan(struct dma_chan *dchan)
+ /* DMA channel registers offset */
+ #define CH_SAR			0x000 /* R/W Chan Source Address */
+ #define CH_DAR			0x008 /* R/W Chan Destination Address */
++#define CH_DAR_H		0x00C
+ #define CH_BLOCK_TS		0x010 /* R/W Chan Block Transfer Size */
+ #define CH_CTL			0x018 /* R/W Chan Control */
+ #define CH_CTL_L		0x018 /* R/W Chan Control 00-31 */
+-- 
+2.43.0
+

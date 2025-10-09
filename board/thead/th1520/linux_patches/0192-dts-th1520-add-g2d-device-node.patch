@@ -1,0 +1,56 @@
+From 963b194f79ab408b05aeecf49db1efbcb2e12b22 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 00:19:38 +0800
+Subject: [PATCH 192/400] dts: th1520: add g2d device node
+
+compatible changed to xuantie,th1520-xxxx
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 30 +++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 9165ebac6904..f00b487639d9 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -1822,6 +1822,36 @@ venc: venc@ffecc10000 {
+ 			status = "okay";
+ 		};
+ 
++		g2d_opp_table:g2d-opp-table {
++			compatible = "operating-points-v2";
++			opp-49500000 {
++      			opp-hz = /bits/ 64 <49500000>;
++    		};
++			opp-99000000 {
++      			opp-hz = /bits/ 64 <99000000>;
++    		};
++			opp-198000000 {
++      			opp-hz = /bits/ 64 <198000000>;
++    		};
++			opp-396000000 {
++      			opp-hz = /bits/ 64 <396000000>;
++    		};
++		};
++
++		g2d: gc620@ffecc80000 {
++			compatible = "xuantie,th1520-gc620";
++			reg = <0xff 0xecc80000 0x0 0x40000>;
++			interrupt-parent = <&plic>;
++			interrupts = <101 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "irq_2d";
++			clocks = <&vpsys_clk_gate TH1520_VPSYS_G2D_PCLK>,
++				 <&vpsys_clk_gate TH1520_VPSYS_G2D_ACLK>,
++				 <&vpsys_clk_gate TH1520_VPSYS_G2D_CCLK>;
++			clock-names = "pclk", "aclk", "cclk";
++			operating-points-v2 = <&g2d_opp_table>;
++			status = "okay";
++		};
++
+ 		vidmem: vidmem@ffecc08000 {
+ 			compatible = "xuantie,th1520-vidmem";
+ 			reg = <0xff 0xecc08000 0x0 0x1000>;
+-- 
+2.43.0
+

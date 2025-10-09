@@ -1,0 +1,28 @@
+From 2867b35aa77f40288d70258acfb7b5b5b783a3dd Mon Sep 17 00:00:00 2001
+From: tingming <minghq@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:37:12 +0800
+Subject: [PATCH 261/400] dts: th1520_defconfig: to revert the config
+ CONFIG_USB_GADGET
+
+Signed-off-by: tingming <minghq@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/configs/th1520_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index fbc27a9ad36d..b811bd1c2852 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -178,7 +178,7 @@ CONFIG_USB_STORAGE_SDDR55=y
+ CONFIG_USB_DWC3=m
+ # CONFIG_USB_DWC3_OF_SIMPLE is not set
+ CONFIG_USB_ONBOARD_HUB=m
+-CONFIG_USB_GADGET=m
++CONFIG_USB_GADGET=y
+ CONFIG_USB_CONFIGFS=m
+ CONFIG_USB_CONFIGFS_F_FS=y
+ CONFIG_USB_ZERO=m
+-- 
+2.43.0
+

@@ -1,0 +1,45 @@
+From 72e396d0289ac44c935dc1c49b846f88216b2569 Mon Sep 17 00:00:00 2001
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+Date: Wed, 4 Sep 2024 09:33:44 +0800
+Subject: [PATCH 012/400] UPSTREAM: riscv: Use LIST_HEAD() to simplify code
+
+list_head can be initialized automatically with LIST_HEAD()
+instead of calling INIT_LIST_HEAD().
+
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+Tested-by: Charlie Jenkins <charlie@rivosinc.com>
+Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
+Link: https://lore.kernel.org/r/20240904013344.2026738-1-ruanjinjie@huawei.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+(cherry picked from commit 3cc754c237e9552ee0f2f6c2f37b3454bee39e67)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/kernel/module.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
+index 5e5a82644451..8da4d52f2dd3 100644
+--- a/arch/riscv/kernel/module.c
++++ b/arch/riscv/kernel/module.c
+@@ -788,8 +788,8 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
+ 	int res;
+ 	unsigned int num_relocations = sechdrs[relsec].sh_size / sizeof(*rel);
+ 	struct hlist_head *relocation_hashtable;
+-	struct list_head used_buckets_list;
+ 	unsigned int hashtable_bits;
++	LIST_HEAD(used_buckets_list);
+ 
+ 	hashtable_bits = initialize_relocation_hashtable(num_relocations,
+ 							 &relocation_hashtable);
+@@ -797,8 +797,6 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
+ 	if (!relocation_hashtable)
+ 		return -ENOMEM;
+ 
+-	INIT_LIST_HEAD(&used_buckets_list);
+-
+ 	pr_debug("Applying relocate section %u to %u\n", relsec,
+ 	       sechdrs[relsec].sh_info);
+ 
+-- 
+2.43.0
+

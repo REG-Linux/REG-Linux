@@ -1,0 +1,70 @@
+From fd144b6065f21bd42788983f17ea20499d72a38f Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Tue, 23 Sep 2025 15:56:23 +0800
+Subject: [PATCH 400/400] dts: lichee-pi-4a: fix simple-audio-card name and
+ quantity
+
+Both DAC(ES8156) and ADC(ES7210) on I2S1 should in the same node.
+
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts  | 12 ++----------
+ arch/riscv/boot/dts/thead/th1520-lpi4a-console.dts | 10 +---------
+ 2 files changed, 3 insertions(+), 19 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 900dceffc7bf..ad5b34a1acca 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -341,7 +341,7 @@ codec {
+ 
+ 	th1520_sound_jack: soundcard@2 {
+ 		compatible = "simple-audio-card";
+-		simple-audio-card,name = "Headphones";
++		simple-audio-card,name = "Analog";
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+ 
+@@ -355,16 +355,8 @@ codec {
+ 				sound-dai = <&es8156_audio_codec>;
+ 			};
+ 		};
+-	};
+-
+-	th1520_sound_input: soundcard@3 {
+-		compatible = "simple-audio-card";
+-		simple-audio-card,name = "Mic";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+ 		simple-audio-card,dai-link@1 {  /* I2S - AUDIO SYS CODEC 7210*/
+-			reg = <0>;
++			reg = <1>;
+ 			format = "i2s";
+ 			cpu {
+ 				sound-dai = <&i2s1 0>;
+diff --git a/arch/riscv/boot/dts/thead/th1520-lpi4a-console.dts b/arch/riscv/boot/dts/thead/th1520-lpi4a-console.dts
+index 006c3d9c87e7..cd88f7b3cd40 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lpi4a-console.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lpi4a-console.dts
+@@ -405,16 +405,8 @@ codec {
+ 				sound-dai = <&es8156_audio_codec>;
+ 			};
+ 		};
+-	};
+-
+-	th1520_sound_input: soundcard@3 {
+-		compatible = "simple-audio-card";
+-		simple-audio-card,name = "Mic";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+ 		simple-audio-card,dai-link@1 {  /* I2S - AUDIO SYS CODEC 7210*/
+-			reg = <0>;
++			reg = <1>;
+ 			format = "i2s";
+ 			cpu {
+ 				sound-dai = <&i2s1 0>;
+-- 
+2.43.0
+

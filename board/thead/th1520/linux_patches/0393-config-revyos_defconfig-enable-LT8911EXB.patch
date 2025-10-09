@@ -1,0 +1,36 @@
+From 8b92acdbb0ff1e35e94a48fbcff57acaf2c41b05 Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Tue, 2 Sep 2025 14:48:29 +0800
+Subject: [PATCH 393/400] config: revyos_defconfig: enable LT8911EXB
+
+Enable configures for book4a.
+
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ arch/riscv/configs/revyos_defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/riscv/configs/revyos_defconfig b/arch/riscv/configs/revyos_defconfig
+index 81f3cf5adcbd..64ef5fb676f8 100644
+--- a/arch/riscv/configs/revyos_defconfig
++++ b/arch/riscv/configs/revyos_defconfig
+@@ -1221,6 +1221,8 @@ CONFIG_MFD_VIPERBOARD=m
+ CONFIG_MFD_TPS65086=m
+ CONFIG_REGULATOR=y
+ CONFIG_REGULATOR_FIXED_VOLTAGE=m
++CONFIG_REGULATOR_VIRTUAL_CONSUMER=m
++CONFIG_REGULATOR_USERSPACE_CONSUMER=m
+ CONFIG_REGULATOR_AXP20X=m
+ CONFIG_REGULATOR_DA9063=m
+ CONFIG_REGULATOR_TPS65086=m
+@@ -1452,6 +1454,7 @@ CONFIG_DRM_PANEL_JADARD_JD9365DA_H3=y
+ CONFIG_DRM_PANEL_HX8279=y
+ CONFIG_DRM_PANEL_LT8911=y
+ CONFIG_DRM_PANEL_MINGJUN_070BI30IA2=y
++CONFIG_DRM_LONTIUM_LT8911EXB=y
+ CONFIG_DRM_ETNAVIV=m
+ CONFIG_DRM_VERISILICON=y
+ CONFIG_DRM_POWERVR_ROGUE=m
+-- 
+2.43.0
+

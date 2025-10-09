@@ -1,0 +1,33 @@
+From 57dde195b3fb11f0881174fe8a4e923f419aa08c Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:15:51 +0800
+Subject: [PATCH 301/400] hibernate: add blkdev flush op berfore poweroff
+
+There not have a cache flush found in this version,
+may caused data loss.So,add blkdev flush after all write.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ kernel/power/swap.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index c10cdd3c16d2..353486f6301b 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -332,6 +332,11 @@ static int mark_swapfiles(struct swap_map_handle *handle, unsigned int flags)
+ 			swsusp_header->crc32 = handle->crc32;
+ 		error = hib_submit_io(REQ_OP_WRITE | REQ_SYNC,
+ 				      swsusp_resume_block, swsusp_header, NULL);
++		if(!error)
++		{
++			error = blkdev_issue_flush(hib_resume_bdev);
++			pr_info("issue flush ert %d\n",error);
++		}
+ 	} else {
+ 		pr_err("Swap header not found!\n");
+ 		error = -ENODEV;
+-- 
+2.43.0
+

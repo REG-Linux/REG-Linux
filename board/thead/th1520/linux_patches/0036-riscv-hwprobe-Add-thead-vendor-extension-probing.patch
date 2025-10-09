@@ -1,0 +1,254 @@
+From 7ba80e556aec7288baf6bb59b229e6ae57d94fa8 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Wed, 13 Nov 2024 18:21:16 -0800
+Subject: [PATCH 036/400] riscv: hwprobe: Add thead vendor extension probing
+
+[ Upstream commit a5ea53da65c588339890c825e63c0da5baef6897 ]
+
+Add a new hwprobe key "RISCV_HWPROBE_KEY_VENDOR_EXT_THEAD_0" which
+allows userspace to probe for the new RISCV_ISA_VENDOR_EXT_XTHEADVECTOR
+vendor extension.
+
+This new key will allow userspace code to probe for which thead vendor
+extensions are supported. This API is modeled to be consistent with
+RISCV_HWPROBE_KEY_IMA_EXT_0. The bitmask returned will have each bit
+corresponding to a supported thead vendor extension of the cpumask set.
+Just like RISCV_HWPROBE_KEY_IMA_EXT_0, this allows a userspace program
+to determine all of the supported thead vendor extensions in one call.
+
+Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+Reviewed-by: Evan Green <evan@rivosinc.com>
+Tested-by: Yangyu Chen <cyy@cyyself.name>
+Link: https://lore.kernel.org/r/20241113-xtheadvector-v11-10-236c22791ef9@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+---
+ arch/riscv/include/asm/hwprobe.h              | 29 ++++++++++++++-
+ .../asm/vendor_extensions/thead_hwprobe.h     | 19 ++++++++++
+ .../asm/vendor_extensions/vendor_hwprobe.h    | 37 +++++++++++++++++++
+ arch/riscv/include/uapi/asm/hwprobe.h         |  3 +-
+ arch/riscv/include/uapi/asm/vendor/thead.h    |  3 ++
+ arch/riscv/kernel/sys_riscv.c                 |  7 +++-
+ arch/riscv/kernel/vendor_extensions/Makefile  |  1 +
+ .../kernel/vendor_extensions/thead_hwprobe.c  | 19 ++++++++++
+ 8 files changed, 114 insertions(+), 4 deletions(-)
+ create mode 100644 arch/riscv/include/asm/vendor_extensions/thead_hwprobe.h
+ create mode 100644 arch/riscv/include/asm/vendor_extensions/vendor_hwprobe.h
+ create mode 100644 arch/riscv/include/uapi/asm/vendor/thead.h
+ create mode 100644 arch/riscv/kernel/vendor_extensions/thead_hwprobe.c
+
+diff --git a/arch/riscv/include/asm/hwprobe.h b/arch/riscv/include/asm/hwprobe.h
+index 7cad513538d8..dd624523981c 100644
+--- a/arch/riscv/include/asm/hwprobe.h
++++ b/arch/riscv/include/asm/hwprobe.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+- * Copyright 2023 Rivos, Inc
++ * Copyright 2023-2024 Rivos, Inc
+  */
+ 
+ #ifndef _ASM_HWPROBE_H
+@@ -8,11 +8,36 @@
+ 
+ #include <uapi/asm/hwprobe.h>
+ 
+-#define RISCV_HWPROBE_MAX_KEY 5
++#define RISCV_HWPROBE_MAX_KEY 11
+ 
+ static inline bool riscv_hwprobe_key_is_valid(__s64 key)
+ {
+ 	return key >= 0 && key <= RISCV_HWPROBE_MAX_KEY;
+ }
+ 
++static inline bool hwprobe_key_is_bitmask(__s64 key)
++{
++	switch (key) {
++	case RISCV_HWPROBE_KEY_BASE_BEHAVIOR:
++	case RISCV_HWPROBE_KEY_IMA_EXT_0:
++	case RISCV_HWPROBE_KEY_CPUPERF_0:
++	case RISCV_HWPROBE_KEY_VENDOR_EXT_THEAD_0:
++		return true;
++	}
++
++	return false;
++}
++
++static inline bool riscv_hwprobe_pair_cmp(struct riscv_hwprobe *pair,
++					  struct riscv_hwprobe *other_pair)
++{
++	if (pair->key != other_pair->key)
++		return false;
++
++	if (hwprobe_key_is_bitmask(pair->key))
++		return (pair->value & other_pair->value) == other_pair->value;
++
++	return pair->value == other_pair->value;
++}
++
+ #endif
+diff --git a/arch/riscv/include/asm/vendor_extensions/thead_hwprobe.h b/arch/riscv/include/asm/vendor_extensions/thead_hwprobe.h
+new file mode 100644
+index 000000000000..65a9c5612466
+--- /dev/null
++++ b/arch/riscv/include/asm/vendor_extensions/thead_hwprobe.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_RISCV_VENDOR_EXTENSIONS_THEAD_HWPROBE_H
++#define _ASM_RISCV_VENDOR_EXTENSIONS_THEAD_HWPROBE_H
++
++#include <linux/cpumask.h>
++
++#include <uapi/asm/hwprobe.h>
++
++#ifdef CONFIG_RISCV_ISA_VENDOR_EXT_THEAD
++void hwprobe_isa_vendor_ext_thead_0(struct riscv_hwprobe *pair, const struct cpumask *cpus);
++#else
++static inline void hwprobe_isa_vendor_ext_thead_0(struct riscv_hwprobe *pair,
++						  const struct cpumask *cpus)
++{
++	pair->value = 0;
++}
++#endif
++
++#endif
+diff --git a/arch/riscv/include/asm/vendor_extensions/vendor_hwprobe.h b/arch/riscv/include/asm/vendor_extensions/vendor_hwprobe.h
+new file mode 100644
+index 000000000000..6b9293e984a9
+--- /dev/null
++++ b/arch/riscv/include/asm/vendor_extensions/vendor_hwprobe.h
+@@ -0,0 +1,37 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright 2024 Rivos, Inc
++ */
++
++#ifndef _ASM_RISCV_SYS_HWPROBE_H
++#define _ASM_RISCV_SYS_HWPROBE_H
++
++#include <asm/cpufeature.h>
++
++#define VENDOR_EXT_KEY(ext)								\
++	do {										\
++		if (__riscv_isa_extension_available(isainfo->isa, RISCV_ISA_VENDOR_EXT_##ext)) \
++			pair->value |= RISCV_HWPROBE_VENDOR_EXT_##ext;			\
++		else									\
++			missing |= RISCV_HWPROBE_VENDOR_EXT_##ext;			\
++	} while (false)
++
++/*
++ * Loop through and record extensions that 1) anyone has, and 2) anyone
++ * doesn't have.
++ *
++ * _extension_checks is an arbitrary C block to set the values of pair->value
++ * and missing. It should be filled with VENDOR_EXT_KEY expressions.
++ */
++#define VENDOR_EXTENSION_SUPPORTED(pair, cpus, per_hart_vendor_bitmap, _extension_checks)	\
++	do {											\
++		int cpu;									\
++		u64 missing = 0;								\
++		for_each_cpu(cpu, (cpus)) {							\
++			struct riscv_isavendorinfo *isainfo = &(per_hart_vendor_bitmap)[cpu];	\
++			_extension_checks							\
++		}										\
++		(pair)->value &= ~missing;							\
++	} while (false)										\
++
++#endif /* _ASM_RISCV_SYS_HWPROBE_H */
+diff --git a/arch/riscv/include/uapi/asm/hwprobe.h b/arch/riscv/include/uapi/asm/hwprobe.h
+index 006bfb48343d..9627458aeb7f 100644
+--- a/arch/riscv/include/uapi/asm/hwprobe.h
++++ b/arch/riscv/include/uapi/asm/hwprobe.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+- * Copyright 2023 Rivos, Inc
++ * Copyright 2023-2024 Rivos, Inc
+  */
+ 
+ #ifndef _UAPI_ASM_HWPROBE_H
+@@ -36,6 +36,7 @@ struct riscv_hwprobe {
+ #define		RISCV_HWPROBE_MISALIGNED_FAST		(3 << 0)
+ #define		RISCV_HWPROBE_MISALIGNED_UNSUPPORTED	(4 << 0)
+ #define		RISCV_HWPROBE_MISALIGNED_MASK		(7 << 0)
++#define RISCV_HWPROBE_KEY_VENDOR_EXT_THEAD_0	11
+ /* Increase RISCV_HWPROBE_MAX_KEY when adding items. */
+ 
+ #endif
+diff --git a/arch/riscv/include/uapi/asm/vendor/thead.h b/arch/riscv/include/uapi/asm/vendor/thead.h
+new file mode 100644
+index 000000000000..43790ebe5faf
+--- /dev/null
++++ b/arch/riscv/include/uapi/asm/vendor/thead.h
+@@ -0,0 +1,3 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++
++#define		RISCV_HWPROBE_VENDOR_EXT_XTHEADVECTOR	(1 << 0)
+diff --git a/arch/riscv/kernel/sys_riscv.c b/arch/riscv/kernel/sys_riscv.c
+index f1a7225b3fde..ee12e09a7a00 100644
+--- a/arch/riscv/kernel/sys_riscv.c
++++ b/arch/riscv/kernel/sys_riscv.c
+@@ -14,6 +14,7 @@
+ #include <asm/switch_to.h>
+ #include <asm/uaccess.h>
+ #include <asm/unistd.h>
++#include <asm/vendor_extensions/thead_hwprobe.h>
+ #include <asm-generic/mman-common.h>
+ #include <vdso/vsyscall.h>
+ 
+@@ -215,6 +216,10 @@ static void hwprobe_one_pair(struct riscv_hwprobe *pair,
+ 		pair->value = hwprobe_misaligned(cpus);
+ 		break;
+ 
++	case RISCV_HWPROBE_KEY_VENDOR_EXT_THEAD_0:
++		hwprobe_isa_vendor_ext_thead_0(pair, cpus);
++		break;
++
+ 	/*
+ 	 * For forward compatibility, unknown keys don't fail the whole
+ 	 * call, but get their element key set to -1 and value set to 0
+@@ -302,7 +307,7 @@ static int __init init_hwprobe_vdso_data(void)
+ 		pair.key = key;
+ 		hwprobe_one_pair(&pair, cpu_online_mask);
+ 
+-		WARN_ON_ONCE(pair.key < 0);
++		WARN_ON_ONCE(pair.key < 0 && key >= RISCV_HWPROBE_KEY_VENDOR_EXT_THEAD_0);
+ 
+ 		avd->all_cpu_hwprobe_values[key] = pair.value;
+ 		/*
+diff --git a/arch/riscv/kernel/vendor_extensions/Makefile b/arch/riscv/kernel/vendor_extensions/Makefile
+index 353522cb3bf0..866414c81a9f 100644
+--- a/arch/riscv/kernel/vendor_extensions/Makefile
++++ b/arch/riscv/kernel/vendor_extensions/Makefile
+@@ -2,3 +2,4 @@
+ 
+ obj-$(CONFIG_RISCV_ISA_VENDOR_EXT_ANDES)	+= andes.o
+ obj-$(CONFIG_RISCV_ISA_VENDOR_EXT_THEAD)	+= thead.o
++obj-$(CONFIG_RISCV_ISA_VENDOR_EXT_THEAD)	+= thead_hwprobe.o
+diff --git a/arch/riscv/kernel/vendor_extensions/thead_hwprobe.c b/arch/riscv/kernel/vendor_extensions/thead_hwprobe.c
+new file mode 100644
+index 000000000000..2eba34011786
+--- /dev/null
++++ b/arch/riscv/kernel/vendor_extensions/thead_hwprobe.c
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include <asm/vendor_extensions/thead.h>
++#include <asm/vendor_extensions/thead_hwprobe.h>
++#include <asm/vendor_extensions/vendor_hwprobe.h>
++
++#include <linux/cpumask.h>
++#include <linux/types.h>
++
++#include <uapi/asm/hwprobe.h>
++#include <uapi/asm/vendor/thead.h>
++
++void hwprobe_isa_vendor_ext_thead_0(struct riscv_hwprobe *pair, const struct cpumask *cpus)
++{
++	VENDOR_EXTENSION_SUPPORTED(pair, cpus,
++				   riscv_isa_vendor_ext_list_thead.per_hart_isa_bitmap, {
++		VENDOR_EXT_KEY(XTHEADVECTOR);
++	});
++}
+-- 
+2.43.0
+

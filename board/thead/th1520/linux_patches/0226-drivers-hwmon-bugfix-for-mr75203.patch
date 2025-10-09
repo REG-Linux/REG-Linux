@@ -1,0 +1,56 @@
+From 1c3bfeae67fe9a2da860d709ca9ae4d5ad4c2218 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:08:19 +0800
+Subject: [PATCH 226/400] drivers: hwmon: bugfix for mr75203
+
+cherry-pick from:
+commit d133106dc2b59a2bcf18de59f7a9772b2c184459
+Author: linghui.zlh <linghui.zlh@linux.alibaba.com>
+Date:   Wed Mar 23 15:51:52 2022 +0800
+
+changes as follow:
+    1)config ts-sensor conversion mode as mode 0 which can be used in both
+    calibrated and uncalibrated modes
+
+    2)enable pd-sensor sdif for test utility
+
+Signed-off-by: linghui.zlh < linghui.zlh@linux.alibaba.com >
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/hwmon/mr75203.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/hwmon/mr75203.c b/drivers/hwmon/mr75203.c
+index 5a3587046ff3..14a6bd8fe237 100644
+--- a/drivers/hwmon/mr75203.c
++++ b/drivers/hwmon/mr75203.c
+@@ -85,6 +85,7 @@
+ #define IP_VM_MODE		BIT(10)
+ 
+ #define IP_CFG			0x01
++#define CFG0_MODE_1		(0)
+ #define CFG0_MODE_2		BIT(0)
+ #define CFG0_PARALLEL_OUT	0
+ #define CFG0_12_BIT		0
+@@ -450,7 +451,7 @@ static int pvt_init(struct pvt_device *pvt)
+ 		if (ret)
+ 			return ret;
+ 
+-		val = CFG0_MODE_2 | CFG0_PARALLEL_OUT | CFG0_12_BIT |
++		val = CFG0_MODE_1 | CFG0_PARALLEL_OUT | CFG0_12_BIT |
+ 		      IP_CFG << SDIF_ADDR_SFT | SDIF_WRN_W | SDIF_PROG;
+ 		ret = regmap_write(t_map, SDIF_W, val);
+ 		if (ret < 0)
+@@ -489,7 +490,7 @@ static int pvt_init(struct pvt_device *pvt)
+ 		if (ret < 0)
+ 			return ret;
+ 
+-		ret = regmap_write(p_map, SDIF_DISABLE, BIT(p_num) - 1);
++		ret = regmap_write(p_map, SDIF_DISABLE, 0);
+ 		if (ret < 0)
+ 			return ret;
+ 
+-- 
+2.43.0
+

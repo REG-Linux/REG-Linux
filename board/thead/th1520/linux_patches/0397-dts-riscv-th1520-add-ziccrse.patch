@@ -1,0 +1,53 @@
+From 2d19c905e174801f5dc6fae86953cbe6906ab93e Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Sat, 20 Sep 2025 06:36:21 +0800
+Subject: [PATCH 397/400] dts: riscv: th1520: add ziccrse
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index b1056b84b751..dc68813d8dd7 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -68,7 +68,7 @@ c910_0: cpu@0 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <0>;
+ 			i-cache-block-size = <64>;
+@@ -104,7 +104,7 @@ c910_1: cpu@1 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <1>;
+ 			i-cache-block-size = <64>;
+@@ -138,7 +138,7 @@ c910_2: cpu@2 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <2>;
+ 			i-cache-block-size = <64>;
+@@ -172,7 +172,7 @@ c910_3: cpu@3 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			reg = <3>;
+ 			i-cache-block-size = <64>;
+-- 
+2.43.0
+

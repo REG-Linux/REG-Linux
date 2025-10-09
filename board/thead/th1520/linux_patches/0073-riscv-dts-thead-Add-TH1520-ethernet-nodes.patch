@@ -1,0 +1,383 @@
+From 7077be20ff66c88d1e902bbb23f9bc3ec8aab027 Mon Sep 17 00:00:00 2001
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Date: Wed, 6 Dec 2023 01:43:25 +0100
+Subject: [PATCH 073/400] riscv: dts: thead: Add TH1520 ethernet nodes
+
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+---
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   |  84 +++++++++++++
+ .../dts/thead/th1520-lichee-module-4a.dtsi    |   8 ++
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 117 ++++++++++++++++++
+ arch/riscv/boot/dts/thead/th1520.dtsi         |  72 +++++++++++
+ 4 files changed, 281 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index ddcfd311664b..ecedeca714d2 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -15,6 +15,7 @@ / {
+ 	compatible = "beagle,beaglev-ahead", "thead,th1520";
+ 
+ 	aliases {
++		ethernet0 = &gmac0;
+ 		gpio0 = &gpio0;
+ 		gpio1 = &gpio1;
+ 		gpio2 = &gpio2;
+@@ -103,6 +104,37 @@ &dmac0 {
+ 	status = "okay";
+ };
+ 
++&gmac_clk {
++        clock-frequency = <500000000>;
++};
++
++&gmac_axi_clk {
++        clock-frequency = <100000000>;
++};
++
++&emmc {
++	bus-width = <8>;
++	max-frequency = <198000000>;
++	mmc-hs400-1_8v;
++	non-removable;
++	no-sdio;
++	no-sd;
++	status = "okay";
++};
++
++&gmac0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&gmac0_pins>;
++	phy-mode = "rgmii-id";
++	status = "okay";
++};
++
++&mdio0 {
++        phy0: ethernet-phy@1 {
++                reg = <1>;
++        };
++};
++
+ &padctrl_aosys {
+ 	led_pins: led-0 {
+ 		led-pins {
+@@ -122,6 +154,58 @@ led-pins {
+ };
+ 
+ &padctrl0_apsys {
++	gmac0_pins: gmac0-0 {
++		tx-pins {
++			pins = "GMAC0_TX_CLK",
++			       "GMAC0_TXEN",
++			       "GMAC0_TXD0",
++			       "GMAC0_TXD1",
++			       "GMAC0_TXD2",
++			       "GMAC0_TXD3";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <25>;
++			input-disable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++
++		rx-pins {
++			pins = "GMAC0_RX_CLK",
++			       "GMAC0_RXDV",
++			       "GMAC0_RXD0",
++			       "GMAC0_RXD1",
++			       "GMAC0_RXD2",
++			       "GMAC0_RXD3";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <1>;
++			input-enable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++
++		mdc-pins {
++			pins = "GMAC0_MDC";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <13>;
++			input-disable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++
++		mdio-pins {
++			pins = "GMAC0_MDIO";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <13>;
++			input-enable;
++			input-schmitt-enable;
++			slew-rate = <0>;
++		};
++	};
++
+ 	uart0_pins: uart0-0 {
+ 		tx-pins {
+ 			pins = "UART0_TXD";
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index 8e3d0fd94647..72d6acd74de4 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -47,6 +47,14 @@ &aogpio {
+ 			  "GPIO04";
+ };
+ 
++&gmac_clk {
++	clock-frequency = <500000000>;
++};
++
++&gmac_axi_clk {
++	clock-frequency = <100000000>;
++};
++
+ &dmac0 {
+ 	status = "okay";
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 0a9156311c49..7224690eb7f3 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -10,6 +10,8 @@ / {
+ 	compatible = "sipeed,lichee-pi-4a", "sipeed,lichee-module-4a", "thead,th1520";
+ 
+ 	aliases {
++		ethernet0 = &gmac0;
++		ethernet1 = &gmac1;
+ 		gpio0 = &gpio0;
+ 		gpio1 = &gpio1;
+ 		gpio2 = &gpio2;
+@@ -83,6 +85,35 @@ map-active-2 {
+ 	};
+ };
+ 
++&gmac0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&gmac0_pins>;
++	phy-handle = <&phy0>;
++	phy-mode = "rgmii-id";
++	status = "okay";
++};
++
++&gmac1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&gmac1_pins>;
++	phy-handle = <&phy1>;
++	phy-mode = "rgmii-id";
++	status = "okay";
++};
++
++&mdio0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mdio0_pins>;
++
++	phy0: ethernet-phy@1 {
++		reg = <1>;
++	};
++
++	phy1: ethernet-phy@2 {
++		reg = <2>;
++	};
++};
++
+ &padctrl0_apsys {
+ 	fan_pins: fan-0 {
+ 		pwm1-pins {
+@@ -96,6 +127,92 @@ pwm1-pins {
+ 		};
+ 	};
+ 
++	gmac0_pins: gmac0-0 {
++		tx-pins {
++			pins = "GMAC0_TX_CLK",
++			       "GMAC0_TXEN",
++			       "GMAC0_TXD0",
++			       "GMAC0_TXD1",
++			       "GMAC0_TXD2",
++			       "GMAC0_TXD3";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <25>;
++			input-disable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++
++		rx-pins {
++			pins = "GMAC0_RX_CLK",
++			       "GMAC0_RXDV",
++			       "GMAC0_RXD0",
++			       "GMAC0_RXD1",
++			       "GMAC0_RXD2",
++			       "GMAC0_RXD3";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <1>;
++			input-enable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++
++	gmac1_pins: gmac1-0 {
++		tx-pins {
++			pins = "GPIO2_18", /* GMAC1_TX_CLK */
++			       "GPIO2_20", /* GMAC1_TXEN */
++			       "GPIO2_21", /* GMAC1_TXD0 */
++			       "GPIO2_22", /* GMAC1_TXD1 */
++			       "GPIO2_23", /* GMAC1_TXD2 */
++			       "GPIO2_24"; /* GMAC1_TXD3 */
++			function = "gmac1";
++			bias-disable;
++			drive-strength = <25>;
++			input-disable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++
++		rx-pins {
++			pins = "GPIO2_19", /* GMAC1_RX_CLK */
++			       "GPIO2_25", /* GMAC1_RXDV */
++			       "GPIO2_30", /* GMAC1_RXD0 */
++			       "GPIO2_31", /* GMAC1_RXD1 */
++			       "GPIO3_0",  /* GMAC1_RXD2 */
++			       "GPIO3_1";  /* GMAC1_RXD3 */
++			function = "gmac1";
++			bias-disable;
++			drive-strength = <1>;
++			input-enable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++
++	mdio0_pins: mdio0-0 {
++		mdc-pins {
++			pins = "GMAC0_MDC";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <13>;
++			input-disable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++
++		mdio-pins {
++			pins = "GMAC0_MDIO";
++			function = "gmac0";
++			bias-disable;
++			drive-strength = <13>;
++			input-enable;
++			input-schmitt-enable;
++			slew-rate = <0>;
++		};
++	};
++
+ 	uart0_pins: uart0-0 {
+ 		tx-pins {
+ 			pins = "UART0_TXD";
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index f8a22f00a12b..36cd746bd4de 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -228,6 +228,24 @@ sdhci_clk: sdhci-clock {
+ 		#clock-cells = <0>;
+ 	};
+ 
++	gmac_axi_clk: gmac-axi-clock {
++		compatible = "fixed-clock";
++		clock-output-names = "gmac_axi_clk";
++		#clock-cells = <0>;
++	};
++
++	gmac_clk: gmac-clock {
++		compatible = "fixed-clock";
++		clock-output-names = "gmac_clk";
++		#clock-cells = <0>;
++	};
++
++	stmmac_axi_config: stmmac-axi-config {
++		snps,wr_osr_lmt = <15>;
++		snps,rd_osr_lmt = <15>;
++		snps,blen = <0 0 64 32 0 0 0>;
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		interrupt-parent = <&plic>;
+@@ -258,6 +276,50 @@ clint: timer@ffdc000000 {
+ 					      <&cpu3_intc 3>, <&cpu3_intc 7>;
+ 		};
+ 
++		gmac0: ethernet@ffe7070000 {
++			compatible = "thead,th1520-dwmac", "snps,dwmac-3.70a";
++			reg = <0xff 0xe7070000 0x0 0x2000>;
++			interrupts = <66 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq";
++			clocks = <&gmac_clk>, <&gmac_axi_clk>;
++			clock-names = "stmmaceth", "pclk";
++			snps,pbl = <32>;
++			snps,fixed-burst;
++			snps,multicast-filter-bins = <64>;
++			snps,perfect-filter-entries = <32>;
++			snps,axi-config = <&stmmac_axi_config>;
++			thead,gmacapb = <&gmac0_apb>;
++			status = "disabled";
++
++			mdio0: mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
++		gmac1: ethernet@ffe7060000 {
++			compatible = "thead,th1520-dwmac", "snps,dwmac-3.70a";
++			reg = <0xff 0xe7060000 0x0 0x2000>;
++			interrupts = <67 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq";
++			clocks = <&gmac_clk>, <&gmac_axi_clk>;
++			clock-names = "stmmaceth", "pclk";
++			snps,pbl = <32>;
++			snps,fixed-burst;
++			snps,multicast-filter-bins = <64>;
++			snps,perfect-filter-entries = <32>;
++			snps,axi-config = <&stmmac_axi_config>;
++			thead,gmacapb = <&gmac1_apb>;
++			status = "disabled";
++
++			mdio1: mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
+ 		uart0: serial@ffe7014000 {
+ 			compatible = "snps,dw-apb-uart";
+ 			reg = <0xff 0xe7014000 0x0 0x100>;
+@@ -332,6 +394,16 @@ padctrl1_apsys: pinctrl@ffe7f3c000 {
+ 			clocks = <&apb_clk>;
+ 		};
+ 
++		gmac0_apb: syscon@ffec003000 {
++			compatible = "thead,th1520-gmac-apb", "syscon";
++			reg = <0xff 0xec003000 0x0 0x1000>;
++		};
++
++		gmac1_apb: syscon@ffec004000 {
++			compatible = "thead,th1520-gmac-apb", "syscon";
++			reg = <0xff 0xec004000 0x0 0x1000>;
++		};
++
+ 		gpio@ffec005000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xec005000 0x0 0x1000>;
+-- 
+2.43.0
+

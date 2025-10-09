@@ -1,0 +1,37 @@
+From d7c471fc5bf777196deea86bb3582ca422003217 Mon Sep 17 00:00:00 2001
+From: Esther Z <Esther.Z@linux.alibaba.com>
+Date: Wed, 5 Jun 2024 18:51:55 +0800
+Subject: [PATCH 110/400] configs: Enable th1520 mailbox.
+
+Signed-off-by: Esther Z<Esther.Z@linux.alibaba.com>
+---
+ drivers/mailbox/Kconfig  | 2 +-
+ drivers/mailbox/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mailbox/Kconfig b/drivers/mailbox/Kconfig
+index 78f27da38ae3..a09465b94db1 100644
+--- a/drivers/mailbox/Kconfig
++++ b/drivers/mailbox/Kconfig
+@@ -295,7 +295,7 @@ config QCOM_IPCC
+ 	  acts as an interrupt controller for receiving interrupts from clients.
+ 	  Say Y here if you want to build this driver.
+ 
+-config XUANTIE_TH1520_MBOX
++config TH1520_MBOX
+ 	tristate "XuanTie TH1520 Mailbox driver"
+ 	depends on ARCH_THEAD || COMPILE_TEST
+ 	default y
+diff --git a/drivers/mailbox/Makefile b/drivers/mailbox/Makefile
+index d3afeff3df5d..f1a807c76731 100644
+--- a/drivers/mailbox/Makefile
++++ b/drivers/mailbox/Makefile
+@@ -63,4 +63,4 @@ obj-$(CONFIG_QCOM_IPCC)		+= qcom-ipcc.o
+ 
+ obj-$(CONFIG_APPLE_MAILBOX)	+= apple-mailbox.o
+ 
+-obj-$(CONFIG_XUANTIE_TH1520_MBOX)	+= xuantie-th1520-mailbox.o
++obj-$(CONFIG_TH1520_MBOX)	+= th1520-mailbox.o
+-- 
+2.43.0
+

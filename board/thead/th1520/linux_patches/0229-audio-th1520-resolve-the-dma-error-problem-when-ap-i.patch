@@ -1,0 +1,39 @@
+From 4604d5d0b5854c535ef1b786375e1e1c360d0a62 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:09:23 +0800
+Subject: [PATCH 229/400] audio: th1520: resolve the dma error problem when ap
+ i2s audio stop play
+
+cherry-pick from:
+commit bea6aaa483db9458b26dce14a6366962516c4bd7
+Author: rensf <shuofeng.rsf@linux.alibaba.com>
+Date:   Wed Jan 26 11:57:22 2022 +0800
+
+    audio: light_fm: resolve the dma error problem when ap i2s audio stop play
+
+    Resolve the dma error problem when ap i2s audio stop play.
+
+Signed-off-by: shuofeng.ren <shuofeng.rsf@linux.alibaba.com>
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index a5bd160dd5cb..23aa458d5cc5 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -1141,6 +1141,9 @@ static int dma_chan_terminate_all(struct dma_chan *dchan)
+ 	int ret;
+ 	LIST_HEAD(head);
+ 
++	axi_chan_irq_clear(chan, DWAXIDMAC_IRQ_ALL);
++	axi_chan_irq_disable(chan, DWAXIDMAC_IRQ_ALL);
++
+ 	axi_chan_disable(chan);
+ 
+ 	ret = readl_poll_timeout_atomic(chan->chip->regs + DMAC_CHEN, val,
+-- 
+2.43.0
+

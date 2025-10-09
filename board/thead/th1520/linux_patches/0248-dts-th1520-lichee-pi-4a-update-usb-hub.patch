@@ -1,0 +1,89 @@
+From d3056eced5211e61314aa7bf69d498eeda57c078 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:21:39 +0800
+Subject: [PATCH 248/400] dts: th1520-lichee-pi-4a: update usb hub
+
+	change usb_hub node for str flow
+	move Usb_hub node to root node to keep str suspend after usb
+controller
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 47 +++++++++++++------
+ 1 file changed, 32 insertions(+), 15 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 4f6f56815c51..d37112c1b92c 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -201,6 +201,16 @@ reg_tp0_pwr: regulator-tp0-pwr {
+ 		regulator-always-on;
+ 	};
+ 
++	reg_hub_1v2: regulator-hub-1v2 {
++		compatible = "regulator-fixed";
++		regulator-name = "HUB_1V2";
++		regulator-min-microvolt = <1200000>;
++		regulator-max-microvolt = <1200000>;
++		gpio = <&ioexp3 2 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
++	};
++
+ 	reg_hub_5v: regulator-hub-5v {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "HUB_5V";
+@@ -372,6 +382,28 @@ codec {
+ 		};
+ 	};
+ 
++	usb-hub {
++		status = "okay";
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		hub_2_0: hub@1 {
++			compatible = "usb2109,2817";
++			reg = <1>;
++			peer-hub = <&hub_3_0>;
++			vdd-supply = <&reg_hub_1v2>;
++			vbus-supply = <&reg_vcc5v_usb>;
++		};
++
++		hub_3_0: hub@2 {
++			compatible = "usb2109,817";
++			reg = <2>;
++			peer-hub = <&hub_2_0>;
++			vbus-supply = <&reg_vcc5v_usb>;
++			vdd-supply  = <&reg_vcc5v_usb>;
++		};
++	};
++
+ 	wcn_wifi: wireless-wlan {
+ 		compatible = "wlan-platdata";
+ 		pinctrl-names = "default";
+@@ -1048,21 +1080,6 @@ &usb_dwc3 {
+ 	status = "okay";
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;
+-
+-	hub_2_0: hub@1 {
+-		compatible = "usb2109,2817";
+-		reg = <1>;
+-		peer-hub = <&hub_3_0>;
+-		vdd-supply = <&reg_hub_5v>;
+-		vbus-supply = <&reg_vcc5v_usb>;
+-	};
+-
+-	hub_3_0: hub@2 {
+-		compatible = "usb2109,817";
+-		reg = <2>;
+-		peer-hub = <&hub_2_0>;
+-		vbus-supply = <&reg_vcc5v_usb>;
+-	};
+ };
+ 
+ &adc {
+-- 
+2.43.0
+

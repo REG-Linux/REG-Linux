@@ -1,0 +1,32 @@
+From fcbb7c07f900002a06e2262123ba923dabb84d80 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Tue, 5 Dec 2023 20:06:22 +0800
+Subject: [PATCH 335/400] drm/verisilicon: fix cursor position
+
+The cursor should be placed at (x + hot_x, y + hot_y) to allow partial
+display of a cursor.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/gpu/drm/verisilicon/vs_dc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/verisilicon/vs_dc.c b/drivers/gpu/drm/verisilicon/vs_dc.c
+index e094bb5fe4a1..48fc5fbc058c 100644
+--- a/drivers/gpu/drm/verisilicon/vs_dc.c
++++ b/drivers/gpu/drm/verisilicon/vs_dc.c
+@@ -750,8 +750,8 @@ static void update_cursor_plane(struct vs_dc *dc, struct vs_plane *plane)
+ 	struct dc_hw_cursor cursor;
+ 
+ 	cursor.address = plane->dma_addr[0];
+-	cursor.x = state->crtc_x;
+-	cursor.y = state->crtc_y;
++	cursor.x = state->crtc_x + drm_fb->hot_x;
++	cursor.y = state->crtc_y + drm_fb->hot_y;
+ 	cursor.hot_x = drm_fb->hot_x;
+ 	cursor.hot_y = drm_fb->hot_y;
+ 	cursor.display_id = to_vs_display_id(dc, state->crtc);
+-- 
+2.43.0
+

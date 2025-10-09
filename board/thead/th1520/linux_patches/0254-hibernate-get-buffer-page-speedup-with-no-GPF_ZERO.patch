@@ -1,0 +1,30 @@
+From fb20f78212e22827165ca47bd76c5a040d4fb572 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:32:14 +0800
+Subject: [PATCH 254/400] hibernate: get buffer page speedup with no GPF_ZERO
+
+In order to less time cost in get free page,use normal
+interface instead of get_zeroed_page().
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ kernel/power/snapshot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/power/snapshot.c b/kernel/power/snapshot.c
+index 42a861b0c7c0..fbb4f53e07df 100644
+--- a/kernel/power/snapshot.c
++++ b/kernel/power/snapshot.c
+@@ -2784,7 +2784,7 @@ static int prepare_image(struct memory_bitmap *new_bm, struct memory_bitmap *bm,
+ 	/* Preallocate memory for the image */
+ 	nr_pages = (nr_zero_pages + nr_copy_pages) - nr_highmem - allocated_unsafe_pages;
+ 	while (nr_pages > 0) {
+-		lp = (struct linked_page *)get_zeroed_page(GFP_ATOMIC);
++		lp = (struct linked_page *)__get_free_pages(GFP_ATOMIC,0);
+ 		if (!lp) {
+ 			error = -ENOMEM;
+ 			goto Free;
+-- 
+2.43.0
+

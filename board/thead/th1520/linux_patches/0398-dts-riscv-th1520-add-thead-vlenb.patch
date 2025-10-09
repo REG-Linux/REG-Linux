@@ -1,0 +1,49 @@
+From a5677a943347d0ecb3a84082d1ce2ace4989f326 Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Sat, 20 Sep 2025 06:38:14 +0800
+Subject: [PATCH 398/400] dts: riscv: th1520: add thead vlenb
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index dc68813d8dd7..430e633be6bb 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -70,6 +70,7 @@ c910_0: cpu@0 {
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
++			thead,vlenb = <16>;
+ 			reg = <0>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -106,6 +107,7 @@ c910_1: cpu@1 {
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
++			thead,vlenb = <16>;
+ 			reg = <1>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -140,6 +142,7 @@ c910_2: cpu@2 {
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
++			thead,vlenb = <16>;
+ 			reg = <2>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -174,6 +177,7 @@ c910_3: cpu@3 {
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
++			thead,vlenb = <16>;
+ 			reg = <3>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+-- 
+2.43.0
+

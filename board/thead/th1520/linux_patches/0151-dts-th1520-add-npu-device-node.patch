@@ -1,0 +1,100 @@
+From b2beb8f7db062eed9d25efe080e88ebff5e7b519 Mon Sep 17 00:00:00 2001
+From: tingming <minghq@linux.alibaba.com>
+Date: Sun, 23 Jun 2024 15:14:10 +0800
+Subject: [PATCH 151/400] dts: th1520: add npu device node
+
+Signed-off-by: tingming <minghq@linux.alibaba.com>
+---
+ .../dts/thead/th1520-lichee-module-4a.dtsi    | 11 ++++
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 50 +++++++++++++++++++
+ 2 files changed, 61 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index 0d9ef791dba5..c3135f3d83e0 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -458,3 +458,14 @@ &gpio3 {
+ 			  "GPIO09",
+ 			  "GPIO10";
+ };
++
++&npu {
++	vha_clk_rate = <1000000000>;
++	status = "okay";
++};
++
++&npu_opp_table {
++	opp-1000000000 {
++		opp-suspend;
++	};
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 2bdd731b2db7..6e2f66a2a5f0 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -13,6 +13,7 @@
+ #include <dt-bindings/clock/th1520-audiosys.h>
+ #include <dt-bindings/clock/th1520-miscsys.h>
+ #include <dt-bindings/reset/thead,th1520-reset.h>
++#include <dt-bindings/firmware/thead/rsrc.h>
+ 
+ / {
+ 	compatible = "thead,th1520";
+@@ -1212,5 +1213,54 @@ watchdog1: watchdog@ffefc31000 {
+ 			resets = <&rst TH1520_RESET_WDT1>;
+ 			status = "okay";
+ 		};
++
++		npu: vha@fffc800000 {
++			compatible = "img,ax3386-nna";
++			reg = <0xff 0xfc800000 0x0 0x100000>;
++			interrupts = <113 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "npuirq";
++			#cooling-cells = <2>;
++			dynamic-power-coefficient = <1600>;
++			power-domains = <&pd TH1520_AON_NPU_PD>;
++			clocks = <&clk CLKGEN_TOP_APB_SX_PCLK>,
++				<&clk CLKGEN_TOP_AXI4S_ACLK>,
++				<&clk NPU_CCLK>,
++				<&clk GMAC_PLL_FOUTPOSTDIV>,
++				<&clk NPU_CCLK_OUT_DIV>;
++			clock-names = "pclk", "aclk", "cclk",
++				"gmac_pll_foutpostdiv",
++				"npu_cclk_out_div";
++			operating-points-v2 = <&npu_opp_table>;
++			vha_clk_rate = <1000000000>;
++			ldo_vha-supply = <&npu>;
++			dma-mask = <0xff 0xffffffff>;
++			resets = <&rst TH1520_RESET_NPU>;
++			status = "disabled";
++		};
++
++		npu_opp_table: opp-table {
++			compatible = "operating-points-v2";
++
++			opp-1000000000 {
++				opp-hz = /bits/ 64 <1000000000>;
++				opp-microvolt = <800000>;
++			};
++			opp-792000000 {
++				opp-hz = /bits/ 64 <792000000>;
++				opp-microvolt = <800000>;
++			};
++			opp-594000000 {
++				opp-hz = /bits/ 64 <594000000>;
++				opp-microvolt = <800000>;
++			};
++			opp-475200000 {
++				opp-hz = /bits/ 64 <475200000>;
++				opp-microvolt = <800000>;
++			};
++			opp-396000000 {
++				opp-hz = /bits/ 64 <396000000>;
++				opp-microvolt = <800000>;
++			};
++		};
+ 	};
+ };
+-- 
+2.43.0
+

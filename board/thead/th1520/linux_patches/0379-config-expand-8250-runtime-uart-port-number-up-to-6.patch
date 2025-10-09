@@ -1,0 +1,28 @@
+From 13e734730c2df13b33451597a35ac2d545a9eb88 Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Mon, 7 Jul 2025 17:10:24 +0800
+Subject: [PATCH 379/400] config: expand 8250 runtime uart port number up to 6
+
+TH1520 has 6 serial port, expand 8250 runtime uart port number up to 6 to match with hardware.
+
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ arch/riscv/configs/revyos_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/riscv/configs/revyos_defconfig b/arch/riscv/configs/revyos_defconfig
+index d8ce0f2db735..f914ad108f15 100644
+--- a/arch/riscv/configs/revyos_defconfig
++++ b/arch/riscv/configs/revyos_defconfig
+@@ -1054,6 +1054,8 @@ CONFIG_HS_MH248=y
+ CONFIG_SERIAL_8250=y
+ # CONFIG_SERIAL_8250_DEPRECATED_OPTIONS is not set
+ CONFIG_SERIAL_8250_CONSOLE=y
++CONFIG_SERIAL_8250_NR_UARTS=6
++CONFIG_SERIAL_8250_RUNTIME_UARTS=6
+ CONFIG_SERIAL_8250_DW=y
+ CONFIG_SERIAL_OF_PLATFORM=y
+ CONFIG_SERIAL_SIFIVE=y
+-- 
+2.43.0
+

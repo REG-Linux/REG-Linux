@@ -1,0 +1,328 @@
+From a00865418a2c1bd7d506de57d2a899335dcb6b0b Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:41:53 +0800
+Subject: [PATCH 205/400] audio: th1520: support audiosys pinctrl feature
+
+support audiosys pinctrl feature in pinctrl-th1520 driver
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dts    |   5 +
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi   | 151 +++++++++++++++++-
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   |   4 +
+ arch/riscv/boot/dts/thead/th1520.dtsi         |   8 +-
+ drivers/pinctrl/pinctrl-th1520.c              |  14 +-
+ 5 files changed, 167 insertions(+), 15 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dts b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+index da1871e8a3c1..a9f39467a0e4 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+@@ -26,10 +26,15 @@ &ap_i2s {
+ 
+ &i2s0 {
+ 	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s0_pa_pins>;
+ };
+ 
+ &i2s_8ch_sd2 {
+ 	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
++				<&i2s_8ch_sd2_pa_pins>;
+ };
+ 
+ &es8156_audio_codec {
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index e32ee0ff36b6..4464c6b5b1f7 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -333,14 +333,16 @@ &audio_i2c0 {
+ 	clock-frequency = <100000>;
+ 	status = "okay";
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&audio_i2c0_pa_pins>;
++	pinctrl-0 = <&aud_i2c0_pa_pins>,
++				<&aud_i2c0_pins>;
+ };
+ 
+ &audio_i2c1 {
+ 	clock-frequency = <100000>;
+ 	status = "okay";
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&audio_i2c1_pa_pins>;
++	pinctrl-0 = <&aud_i2c1_pa_pins>,
++				<&aud_i2c1_pins>;
+ 
+ 	pcal6408ahk_b: gpio@20 {
+ 		compatible = "nxp,pcal9554b";
+@@ -708,7 +710,7 @@ iso7816-pins {
+ };
+ 
+ &padctrl_aosys {
+-	audio_i2c0_pa_pins: audio-i2c0-pa-0 {
++	aud_i2c0_pa_pins: aud-i2c0-pa-0 {
+ 		i2c-pa-pins {
+ 			pins = "AUDIO_PA6", "AUDIO_PA7";
+ 			function = "audio";
+@@ -717,7 +719,7 @@ i2c-pa-pins {
+ 			slew-rate = <0>;
+ 		};
+ 	};
+-	audio_i2c1_pa_pins: audio-i2c1-pa-0 {
++	aud_i2c1_pa_pins: aud-i2c1-pa-0 {
+ 		i2c-pa-pins {
+ 			pins = "AUDIO_PA13", "AUDIO_PA16";
+ 			function = "audio";
+@@ -782,6 +784,143 @@ i2s-pa-pins {
+ 	};
+ };
+ 
++&padctrl_audiosys {
++	aud_i2c0_pins: aud-i2c0-0 {
++		i2c-pins {
++			pins = "AUD_PA6_FUNC", "AUD_PA7_FUNC";
++			function = "aud_i2c0";
++			bias-disable;
++			drive-strength = <7>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	aud_i2c1_pins: aud-i2c1-0 {
++		i2c-pins {
++			pins = "AUD_PA13_FUNC", "AUD_PA16_FUNC";
++			function = "aud_i2c1";
++			bias-disable;
++			drive-strength = <7>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	i2s1_pins: i2s1-0 {
++		i2s-pins {
++			pins = "AUD_PA14_FUNC", "AUD_PA15_FUNC", "AUD_PA17_FUNC";
++			function = "aud_i2s1";
++			bias-disable;
++			drive-strength = <13>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	i2s_8ch_bus_pins: i2s-8ch-bus-0 {
++		i2s-pins {
++			pins = "AUD_PA2_FUNC", "AUD_PA3_FUNC", "AUD_PA8_FUNC";
++			function = "aud_i2s_8ch";
++			bias-disable;
++			drive-strength = <13>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	i2s_8ch_sd0_pins: i2s-8ch-sd0-0 {
++		i2s-pins {
++			pins = "AUD_PA4_FUNC";
++			function = "aud_i2s_8ch";
++			bias-disable;
++			drive-strength = <13>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	i2s_8ch_sd1_pins: i2s-8ch-sd1-0 {
++		i2s-pins {
++			pins = "AUD_PA5_FUNC";
++			function = "aud_i2s_8ch";
++			bias-disable;
++			drive-strength = <13>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	i2s_8ch_sd2_pins: i2s-8ch-sd2-0 {
++		i2s-pins {
++			pins = "AUD_PA0_FUNC";
++			function = "aud_i2s_8ch";
++			bias-disable;
++			drive-strength = <13>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	i2s_8ch_sd3_pins: i2s-8ch-sd3-0 {
++		i2s-pins {
++			pins = "AUD_PA1_FUNC";
++			function = "aud_i2s_8ch";
++			bias-disable;
++			drive-strength = <13>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	tdm_pins: tdm-0 {
++		clk-pins {
++			pins = "AUD_PA27_FUNC", "AUD_PA28_FUNC";
++			function = "aud_tdm";
++			bias-disable;
++			drive-strength = <12>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++		data-pins {
++			pins = "AUD_PA29_FUNC";
++			function = "aud_tdm";
++			bias-disable;
++			drive-strength = <0>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	spdif0_pins: spdif0-0 {
++		rx-pins {
++			pins = "AUD_PA21_FUNC";
++			function = "aud_spdif";
++			bias-disable;
++			drive-strength = <12>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++		tx-pins {
++			pins = "AUD_PA22_FUNC";
++			function = "aud_spdif";
++			bias-disable;
++			drive-strength = <0>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++	spdif1_pins: spdif1-0 {
++		tx-pins {
++			pins = "AUD_PA23_FUNC";
++			function = "aud_spdif";
++			bias-disable;
++			drive-strength = <12>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++		rx-pins {
++			pins = "AUD_PA24_FUNC";
++			function = "aud_spdif";
++			bias-disable;
++			drive-strength = <0>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
++};
++
+ &uart0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&uart0_pins>;
+@@ -1142,6 +1281,10 @@ &aonsys_clk {
+ 	clock-frequency = <73728000>;
+ };
+ 
++&audiosys_clk {
++	clock-frequency = <294912000>;
++};
++
+ &apb_clk {
+ 	clock-frequency = <62500000>;
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index df09d8a78674..46ec539ffb89 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -92,6 +92,10 @@ &aonsys_clk {
+ 	clock-frequency = <73728000>;
+ };
+ 
++&audiosys_clk {
++	clock-frequency = <294912000>;
++};
++
+ &apb_clk {
+ 	clock-frequency = <62500000>;
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 66ac3a3f8a00..de96954d150c 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -1066,7 +1066,7 @@ gpio3: gpio-controller@0 {
+ 		};
+ 
+ 		padctrl1_apsys: pinctrl@ffe7f3c000 {
+-			compatible = "thead,th1520-group2-pinctrl";
++			compatible = "xuantie,th1520-group2-pinctrl";
+ 			reg = <0xff 0xe7f3c000 0x0 0x1000>;
+ 			clocks = <&apb_clk>;
+ 		};
+@@ -1120,7 +1120,7 @@ gpio1: gpio-controller@0 {
+ 		};
+ 
+ 		padctrl0_apsys: pinctrl@ffec007000 {
+-			compatible = "thead,th1520-group3-pinctrl";
++			compatible = "xuantie,th1520-group3-pinctrl";
+ 			reg = <0xff 0xec007000 0x0 0x1000>;
+ 			clocks = <&apb_clk>;
+ 		};
+@@ -1342,13 +1342,13 @@ aogpio: gpio-controller@0 {
+ 		};
+ 
+ 		padctrl_aosys: pinctrl@fffff4a000 {
+-			compatible = "thead,th1520-group1-pinctrl";
++			compatible = "xuantie,th1520-group1-pinctrl";
+ 			reg = <0xff 0xfff4a000 0x0 0x2000>;
+ 			clocks = <&aonsys_clk>;
+ 		};
+ 
+ 		padctrl_audiosys: pinctrl@ffcb01d000 {
+-			compatible = "thead,th1520-group4-pinctrl";
++			compatible = "xuantie,th1520-group4-pinctrl";
+ 			reg = <0xff 0xcb01d000 0x0 0x2000>;
+ 			clocks = <&audiosys_clk>;
+ 		};
+diff --git a/drivers/pinctrl/pinctrl-th1520.c b/drivers/pinctrl/pinctrl-th1520.c
+index 43390c055943..19ef2ccba46a 100644
+--- a/drivers/pinctrl/pinctrl-th1520.c
++++ b/drivers/pinctrl/pinctrl-th1520.c
+@@ -135,7 +135,7 @@ static int th1520_audio_func_sel(struct th1520_pinctrl *thp,
+ 	return 0;
+ }
+ 
+-static struct custom_operations th1520_custom_ops = {
++static const struct custom_operations th1520_custom_ops = {
+ 	.init = th1520_audio_func_sel,
+ };
+ 
+@@ -420,8 +420,8 @@ static const struct pinctrl_pin_desc th1520_group4_pins[] = {
+ 	TH1520_PAD(17, PA17_FUNC, AUD_I2S1, AUD_VAD_PDM, AUD_VAD,    AUD_I2C1,    ____, ____, 0),
+ 	TH1520_PAD(18, PA18_FUNC, AUD_I2S2, AUD_TDM,     AUD_VAD,    ____,        ____, ____, 0),
+ 	TH1520_PAD(19, PA19_FUNC, AUD_I2S2, AUD_TDM,     AUD_VAD,    ____,        ____, ____, 0),
+-	TH1520_PAD(20, PA20_FUNC, AUD_I2S2, AUD_TDM,     AUD_I2C1,   ____,        ____, ____, 0),
+-	TH1520_PAD(21, PA21_FUNC, AUD_I2S2, AUD_SPDIF0,  AUD_I2C1,   ____,        ____, ____, 0),
++	TH1520_PAD(20, PA20_FUNC, AUD_I2S2, AUD_TDM,     AUD_I2C1,   AUD_I2C1,    ____, ____, 0),
++	TH1520_PAD(21, PA21_FUNC, AUD_I2S2, AUD_SPDIF0,  AUD_I2C1,   AUD_I2C1,    ____, ____, 0),
+ 	TH1520_PAD(22, PA22_FUNC, AUD_I2S2, AUD_SPDIF0,  ____,       ____,        ____, ____, 0),
+ 	TH1520_PAD(23, PA23_FUNC, ____,     AUD_SPDIF1,  AUD_SPDIF0, ____,        ____, ____, 0),
+ 	TH1520_PAD(24, PA24_FUNC, ____,     AUD_SPDIF1,  AUD_SPDIF0, AUD_I2S_8CH, ____, ____, 0),
+@@ -1015,10 +1015,10 @@ static int th1520_pinctrl_probe(struct platform_device *pdev)
+ }
+ 
+ static const struct of_device_id th1520_pinctrl_of_match[] = {
+-	{ .compatible = "thead,th1520-group1-pinctrl", .data = &th1520_group1 },
+-	{ .compatible = "thead,th1520-group2-pinctrl", .data = &th1520_group2 },
+-	{ .compatible = "thead,th1520-group3-pinctrl", .data = &th1520_group3 },
+-	{ .compatible = "thead,th1520-group4-pinctrl", .data = &th1520_group4 },
++	{ .compatible = "xuantie,th1520-group1-pinctrl", .data = &th1520_group1 },
++	{ .compatible = "xuantie,th1520-group2-pinctrl", .data = &th1520_group2 },
++	{ .compatible = "xuantie,th1520-group3-pinctrl", .data = &th1520_group3 },
++	{ .compatible = "xuantie,th1520-group4-pinctrl", .data = &th1520_group4 },
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, th1520_pinctrl_of_match);
+-- 
+2.43.0
+

@@ -1,0 +1,45 @@
+From 9ae8fbc0edeecceda823d978b7f1a4c9bc86188a Mon Sep 17 00:00:00 2001
+From: Wei Fu <wefu@redhat.com>
+Date: Sun, 19 May 2024 17:44:50 +0800
+Subject: [PATCH 089/400] riscv: dts: thead: Add XuanTie TH1520 Mailbox device
+ node
+
+Add nodes for the XuanTie TH1520 Mailbox
+
+Signed-off-by: Fugang Duan <duanfugang.dfg@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index c8e425de6143..f0612d7837b4 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -761,6 +761,24 @@ gpio4: gpio-controller@0 {
+ 			};
+ 		};
+ 
++		mbox_910t: mbox@ffffc38000 {
++			compatible = "xuantie,th1520-mbox";
++			reg = <0xff 0xffc38000 0x0 0x4000>,
++			      <0xff 0xffc44000 0x0 0x1000>,
++			      <0xff 0xffc4c000 0x0 0x1000>,
++			      <0xff 0xffc54000 0x0 0x1000>;
++			reg-names = "local_base",
++				    "remote_icu0",
++				    "remote_icu1",
++				    "remote_icu2";
++			interrupt-controller;
++			interrupts = <28 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&apb_clk>;
++			clock-names = "ipg";
++			icu_cpu_id = <0>;
++			#mbox-cells = <2>;
++		};
++
+ 		adc: adc@0xfffff51000 {
+ 			compatible = "thead,th1520-adc";
+ 			reg = <0xff 0xfff51000 0x0 0x1000>;
+-- 
+2.43.0
+

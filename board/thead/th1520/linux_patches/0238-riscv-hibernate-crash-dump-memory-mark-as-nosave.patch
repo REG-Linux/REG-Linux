@@ -1,0 +1,126 @@
+From 2d0e2b3e340ef26fb213b8ee837aac3cba8c1c8b Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:12:12 +0800
+Subject: [PATCH 238/400] riscv: hibernate: crash dump memory mark as nosave
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/include/asm/kexec.h    |  5 ++++
+ arch/riscv/kernel/hibernate.c     |  4 ++-
+ arch/riscv/kernel/machine_kexec.c | 42 +++++++++++++++++++++++++++++++
+ kernel/power/hibernate.c          | 10 --------
+ 4 files changed, 50 insertions(+), 11 deletions(-)
+
+diff --git a/arch/riscv/include/asm/kexec.h b/arch/riscv/include/asm/kexec.h
+index 2b56769cb530..3b26481e7e0b 100644
+--- a/arch/riscv/include/asm/kexec.h
++++ b/arch/riscv/include/asm/kexec.h
+@@ -35,6 +35,11 @@ crash_setup_regs(struct pt_regs *newregs,
+ 		riscv_crash_save_regs(newregs);
+ }
+ 
++#if defined(CONFIG_KEXEC) && defined(CONFIG_HIBERNATION)
++extern bool crash_is_nosave(unsigned long pfn);
++#else
++static inline bool crash_is_nosave(unsigned long pfn) {return false; }
++#endif
+ 
+ #define ARCH_HAS_KIMAGE_ARCH
+ 
+diff --git a/arch/riscv/kernel/hibernate.c b/arch/riscv/kernel/hibernate.c
+index 671b686c0158..94e2a631b28f 100644
+--- a/arch/riscv/kernel/hibernate.c
++++ b/arch/riscv/kernel/hibernate.c
+@@ -17,6 +17,7 @@
+ #include <asm/set_memory.h>
+ #include <asm/smp.h>
+ #include <asm/suspend.h>
++#include <asm/kexec.h>
+ 
+ #include <linux/cpu.h>
+ #include <linux/memblock.h>
+@@ -75,7 +76,8 @@ int pfn_is_nosave(unsigned long pfn)
+ 	unsigned long nosave_begin_pfn = sym_to_pfn(&__nosave_begin);
+ 	unsigned long nosave_end_pfn = sym_to_pfn(&__nosave_end - 1);
+ 
+-	return ((pfn >= nosave_begin_pfn) && (pfn <= nosave_end_pfn));
++	return ((pfn >= nosave_begin_pfn) && (pfn <= nosave_end_pfn)) ||
++		crash_is_nosave(pfn);
+ }
+ 
+ void notrace save_processor_state(void)
+diff --git a/arch/riscv/kernel/machine_kexec.c b/arch/riscv/kernel/machine_kexec.c
+index ccb0c5d5c63c..822ac6c6fc27 100644
+--- a/arch/riscv/kernel/machine_kexec.c
++++ b/arch/riscv/kernel/machine_kexec.c
+@@ -229,3 +229,45 @@ machine_kexec(struct kimage *image)
+ 		     this_hart_id, kernel_map.va_pa_offset);
+ 	unreachable();
+ }
++
++#ifdef CONFIG_HIBERNATION
++/*
++ * crash_is_nosave
++ *
++ * Return true only if a page is part of reserved memory for crash dump kernel,
++ * but does not hold any data of loaded kernel image.
++ *
++ * Note that all the pages in crash dump kernel memory have been initially
++ * marked as Reserved as memory was allocated via memblock_reserve().
++ *
++ * In hibernation, the pages which are Reserved and yet "nosave" are excluded
++ * from the hibernation iamge. crash_is_nosave() does thich check for crash
++ * dump kernel and will reduce the total size of hibernation image.
++ */
++
++bool crash_is_nosave(unsigned long pfn)
++{
++	int i;
++	phys_addr_t addr;
++
++	if (!crashk_res.end)
++		return false;
++
++	/* in reserved memory? */
++	addr = __pfn_to_phys(pfn);
++	if ((addr < crashk_res.start) || (crashk_res.end < addr))
++		return false;
++
++	if (!kexec_crash_image)
++		return true;
++
++	/* not part of loaded kernel image? */
++	for (i = 0; i < kexec_crash_image->nr_segments; i++)
++		if (addr >= kexec_crash_image->segment[i].mem &&
++				addr < (kexec_crash_image->segment[i].mem +
++					kexec_crash_image->segment[i].memsz))
++			return false;
++
++	return true;
++}
++#endif
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index d5520b8135d5..1a2f8029a59e 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -797,16 +797,6 @@ int hibernate(void)
+ 		error = -EBUSY;
+ 		goto Unlock;
+ 	}
+-	#if 1 //test code,remove later
+-	//hibernate_register_nosave_region(0x0f800000>>PAGE_SHIFT, 0x19b00000>>PAGE_SHIFT); //right
+-	//hibernate_register_nosave_region(0x1a000000>>PAGE_SHIFT, 0x1dffffff>>PAGE_SHIFT);
+-	hibernate_register_nosave_region(__phys_to_pfn(0x22000000), __phys_to_pfn(0x32000000));
+-	hibernate_register_nosave_region(0x32000000>>PAGE_SHIFT, 0x32000000>>PAGE_SHIFT); //test,not a valid region
+-	//hibernate_register_nosave_region(0x32000000>>PAGE_SHIFT, 0x38400000>>PAGE_SHIFT);
+-	hibernate_register_nosave_region(0xd8c00000>>PAGE_SHIFT, 0xE4000000>>PAGE_SHIFT);
+-	hibernate_register_nosave_region(0x20000000>>PAGE_SHIFT, 0x20800000>>PAGE_SHIFT);
+-	hibernate_remove_nosave_region(0x20000000>>PAGE_SHIFT, 0x20800000>>PAGE_SHIFT);	//test remove a region
+-	#endif
+ 
+ 	pr_info("hibernation entry\n");
+ 	pm_prepare_console();
+-- 
+2.43.0
+

@@ -1,0 +1,44 @@
+From c8a9f86aee665b9dc8b565c28d8420baddf55076 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Thu, 21 Sep 2023 15:02:53 +0800
+Subject: [PATCH 060/400] remove compression for riscv Image
+
+This makes the packages produced by make bindeb-pkg work with the
+Lichee Pi 4a "Debian" image.
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+---
+ arch/riscv/Makefile      | 2 +-
+ scripts/package/builddeb | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 4d06f3402674..6e25de18774a 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -149,7 +149,7 @@ ifeq ($(CONFIG_RISCV_M_MODE)$(CONFIG_ARCH_CANAAN),yy)
+ KBUILD_IMAGE := $(boot)/loader.bin
+ else
+ ifeq ($(CONFIG_EFI_ZBOOT),)
+-KBUILD_IMAGE := $(boot)/Image.gz
++KBUILD_IMAGE := $(boot)/Image
+ else
+ KBUILD_IMAGE := $(boot)/vmlinuz.efi
+ endif
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index d7dd0d04c70c..259668daea63 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -85,7 +85,7 @@ install_linux_image () {
+ 	case "${SRCARCH}" in
+ 	um)
+ 		installed_image_path="usr/bin/linux-${KERNELRELEASE}";;
+-	parisc|mips|powerpc)
++	parisc|mips|powerpc|riscv*)
+ 		installed_image_path="boot/vmlinux-${KERNELRELEASE}";;
+ 	*)
+ 		installed_image_path="boot/vmlinuz-${KERNELRELEASE}";;
+-- 
+2.43.0
+

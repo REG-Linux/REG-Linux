@@ -1,0 +1,3641 @@
+From 2652080ca2b8f67fbfa4baca48dbcf1160f5fc1c Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:25:13 +0800
+Subject: [PATCH 308/400] Fix: Repair rvbook hall sensor functionality and
+ optimize codebase
+
+- Removed redundant files and unnecessary code from the fingerprint recognition module
+
+Signed-off-by: lst <liushengtong.lst@alibaba-inc.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-rvbook-dsi0.dts     |   2 +
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi  |   5 +-
+ arch/riscv/configs/rvbook_defconfig           | 379 --------
+ arch/riscv/configs/th1520_defconfig           |   3 +-
+ drivers/input/Kconfig                         |   2 +
+ drivers/input/Makefile                        |   3 +
+ drivers/input/fingerprint/Kconfig             |  51 -
+ drivers/input/fingerprint/Makefile            |   7 -
+ .../input/fingerprint/microarray_fp/Kconfig   |   8 -
+ .../input/fingerprint/microarray_fp/Makefile  |  30 -
+ .../fingerprint/microarray_fp/ioctl_cmd.h     |  65 --
+ .../input/fingerprint/microarray_fp/madev.c   | 889 ------------------
+ .../input/fingerprint/microarray_fp/madev.h   | 236 -----
+ .../fingerprint/microarray_fp/mtk-settings.c  | 486 ----------
+ .../fingerprint/microarray_fp/mtk-settings.h  | 220 -----
+ drivers/input/hall/Kconfig                    |   6 -
+ drivers/input/hall/mh248.c                    |  21 +-
+ drivers/misc/Kconfig                          |   5 +
+ drivers/misc/Makefile                         |   2 +
+ drivers/misc/hc32fx/hc32fx_mcu.c              |   3 +-
+ drivers/misc/usb_en.c                         |   6 +-
+ drivers/video/Kconfig                         |   2 +-
+ drivers/video/lt8911exb/Kconfig               |   9 -
+ drivers/video/lt8911exb/Makefile              |   1 -
+ drivers/video/lt8911exb/lt8911exb.c           | 871 -----------------
+ 25 files changed, 34 insertions(+), 3278 deletions(-)
+ delete mode 100644 arch/riscv/configs/rvbook_defconfig
+ delete mode 100644 drivers/input/fingerprint/Kconfig
+ delete mode 100644 drivers/input/fingerprint/Makefile
+ delete mode 100644 drivers/input/fingerprint/microarray_fp/Kconfig
+ delete mode 100644 drivers/input/fingerprint/microarray_fp/Makefile
+ delete mode 100644 drivers/input/fingerprint/microarray_fp/ioctl_cmd.h
+ delete mode 100644 drivers/input/fingerprint/microarray_fp/madev.c
+ delete mode 100644 drivers/input/fingerprint/microarray_fp/madev.h
+ delete mode 100644 drivers/input/fingerprint/microarray_fp/mtk-settings.c
+ delete mode 100644 drivers/input/fingerprint/microarray_fp/mtk-settings.h
+ delete mode 100644 drivers/video/lt8911exb/Kconfig
+ delete mode 100644 drivers/video/lt8911exb/Makefile
+ delete mode 100644 drivers/video/lt8911exb/lt8911exb.c
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts b/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
+index f4d1127ba3cc..065ceab70e80 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
+@@ -62,6 +62,8 @@ panel0@0 {
+ 		lt8911,edp-lane-cnt = <2>;
+ 		lt8911,mipi-lane-cnt = <4>;
+ 		lt8911,edp-depth = <8>; /* 6 or 8 */
++		pinctrl-names = "default";
++		pinctrl-0 = <&lt8911exb_pins>;
+ 		hsvcc-supply = <&reg_vcc1v8_lontium>;
+ 		vspn3v3-supply = <&reg_vcc3v3_edp>;
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index 18fe0e600657..35b6d5323cd8 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -35,7 +35,7 @@ hall_sensor: hall-mh248 {
+ 		compatible = "hall-mh248";
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&mh248_int_pins>;
+-		irq-gpio = <&aogpio 2 IRQ_TYPE_EDGE_BOTH>;
++		irq-hall-mh248-gpios = <&aogpio 2 IRQ_TYPE_EDGE_BOTH>;
+ 		hall-active = <1>;
+ 		status = "okay";
+ 	};
+@@ -1200,7 +1200,6 @@ hdmi-pins {
+ 	lt8911exb_pins: lt8911exb-0 {
+ 		gpio-pins {
+ 			pins = "GPIO2_20", "GMAC0_RXD1", "GMAC0_RXD0";
+-			function = "gpio";
+ 			bias-disable;
+ 			drive-strength = <13>;
+ 			input-enable;
+@@ -1666,7 +1665,7 @@ gpio-pins {
+ 	mh248_int_pins: mh248-int-0 {
+ 		gpio-pins {
+ 			pins = "CPU_JTG_TCLK";
+-			function = "gpio";
++
+ 			bias-pull-up;
+ 			drive-strength = <13>;
+ 			input-enable;
+diff --git a/arch/riscv/configs/rvbook_defconfig b/arch/riscv/configs/rvbook_defconfig
+deleted file mode 100644
+index fff18fad6a56..000000000000
+--- a/arch/riscv/configs/rvbook_defconfig
++++ /dev/null
+@@ -1,379 +0,0 @@
+-CONFIG_SYSVIPC=y
+-CONFIG_POSIX_MQUEUE=y
+-CONFIG_NO_HZ_IDLE=y
+-CONFIG_HIGH_RES_TIMERS=y
+-CONFIG_PREEMPT=y
+-CONFIG_TASKSTATS=y
+-CONFIG_TASK_DELAY_ACCT=y
+-CONFIG_TASK_XACCT=y
+-CONFIG_TASK_IO_ACCOUNTING=y
+-CONFIG_IKCONFIG=y
+-CONFIG_IKCONFIG_PROC=y
+-CONFIG_CGROUPS=y
+-CONFIG_NAMESPACES=y
+-CONFIG_USER_NS=y
+-CONFIG_CHECKPOINT_RESTORE=y
+-CONFIG_BLK_DEV_INITRD=y
+-CONFIG_EXPERT=y
+-# CONFIG_BUG is not set
+-CONFIG_BPF_SYSCALL=y
+-CONFIG_PERF_EVENTS=y
+-CONFIG_FORCE_MAX_ZONEORDER=15
+-CONFIG_SOC_SIFIVE=y
+-CONFIG_SOC_THEAD=y
+-CONFIG_SMP=y
+-CONFIG_VECTOR=y
+-CONFIG_VECTOR_0_7=y
+-CONFIG_KEXEC=y
+-CONFIG_CRASH_DUMP=y
+-CONFIG_CPU_IDLE=y
+-CONFIG_CPU_IDLE_GOV_LADDER=y
+-CONFIG_CPU_FREQ=y
+-CONFIG_CPU_FREQ_STAT=y
+-CONFIG_CPU_FREQ_GOV_POWERSAVE=y
+-CONFIG_CPU_FREQ_GOV_USERSPACE=y
+-CONFIG_CPU_FREQ_GOV_ONDEMAND=y
+-CONFIG_CPU_FREQ_GOV_CONSERVATIVE=y
+-CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y
+-CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND=y
+-CONFIG_CPUFREQ_DT=y
+-CONFIG_RISV_THEAD_LIGHT_CPUFREQ=y
+-CONFIG_VIRTUALIZATION=y
+-CONFIG_KVM=y
+-CONFIG_LIGHT_AON_PD=y
+-# CONFIG_GCC_PLUGINS is not set
+-CONFIG_MODULES=y
+-CONFIG_MODULE_UNLOAD=y
+-CONFIG_CMA=y
+-CONFIG_CMA_DEBUGFS=y
+-CONFIG_CMA_AREAS=16
+-CONFIG_NET=y
+-CONFIG_PACKET=y
+-CONFIG_UNIX=y
+-CONFIG_INET=y
+-CONFIG_IP_MULTICAST=y
+-CONFIG_IP_ADVANCED_ROUTER=y
+-CONFIG_IP_PNP=y
+-CONFIG_IP_PNP_DHCP=y
+-CONFIG_IP_PNP_BOOTP=y
+-CONFIG_IP_PNP_RARP=y
+-CONFIG_BRIDGE=y
+-CONFIG_VSOCKETS=y
+-# CONFIG_VSOCKETS_LOOPBACK is not set
+-CONFIG_VIRTIO_VSOCKETS=y
+-CONFIG_NETLINK_DIAG=y
+-CONFIG_BT=y
+-CONFIG_BT_RFCOMM=y
+-CONFIG_BT_RFCOMM_TTY=y
+-CONFIG_BT_BNEP=y
+-CONFIG_BT_HIDP=y
+-CONFIG_BT_HCIUART=y
+-CONFIG_BT_HCIUART_H4=y
+-CONFIG_BT_HCIUART_RTL3WIRE=y
+-CONFIG_CFG80211=y
+-CONFIG_RFKILL=y
+-CONFIG_NET_9P=y
+-CONFIG_NET_9P_VIRTIO=y
+-CONFIG_DEVTMPFS=y
+-CONFIG_DEVTMPFS_MOUNT=y
+-CONFIG_MTD=y
+-CONFIG_MTD_TESTS=m
+-CONFIG_MTD_BLOCK=y
+-CONFIG_MTD_SLRAM=m
+-CONFIG_MTD_PHRAM=m
+-CONFIG_MTD_SPI_NAND=y
+-CONFIG_MTD_SPI_NOR=y
+-CONFIG_MTD_UBI=y
+-CONFIG_BLK_DEV_LOOP=y
+-CONFIG_VIRTIO_BLK=y
+-CONFIG_LIGHT_DSMART_CARD=y
+-CONFIG_EEPROM_AT24=y
+-CONFIG_SCSI=y
+-CONFIG_BLK_DEV_SD=y
+-CONFIG_NETDEVICES=y
+-CONFIG_TUN=y
+-CONFIG_VIRTIO_NET=y
+-CONFIG_MACB=y
+-CONFIG_STMMAC_ETH=y
+-CONFIG_STMMAC_RX_ZERO_COPY=y
+-CONFIG_DWMAC_LIGHT=y
+-CONFIG_MICROSEMI_PHY=y
+-CONFIG_REALTEK_PHY=y
+-CONFIG_USB_USBNET=m
+-# CONFIG_USB_NET_AX8817X is not set
+-# CONFIG_USB_NET_AX88179_178A is not set
+-# CONFIG_USB_NET_NET1080 is not set
+-CONFIG_RTL8723DS=n
+-CONFIG_RTL8822CS=y
+-CONFIG_INPUT_MOUSEDEV=y
+-CONFIG_INPUT_EVDEV=y
+-CONFIG_KEYBOARD_GPIO=y
+-# CONFIG_INPUT_MOUSE is not set
+-CONFIG_INPUT_TOUCHSCREEN=y
+-CONFIG_TOUCHSCREEN_GOODIX=y
+-CONFIG_TOUCHSCREEN_GT9XX=y
+-CONFIG_INPUT_MISC=y
+-CONFIG_INPUT_UINPUT=y
+-CONFIG_SERIAL_8250=y
+-# CONFIG_SERIAL_8250_DEPRECATED_OPTIONS is not set
+-CONFIG_SERIAL_8250_CONSOLE=y
+-CONFIG_SERIAL_8250_NR_UARTS=6
+-CONFIG_SERIAL_8250_RUNTIME_UARTS=6
+-CONFIG_SERIAL_8250_DW=y
+-CONFIG_SERIAL_OF_PLATFORM=y
+-CONFIG_SERIAL_EARLYCON_RISCV_SBI=y
+-CONFIG_VIRTIO_CONSOLE=y
+-CONFIG_HW_RANDOM=y
+-CONFIG_HW_RANDOM_VIRTIO=y
+-CONFIG_I2C_CHARDEV=y
+-CONFIG_I2C_DESIGNWARE_PLATFORM=y
+-CONFIG_SPI=y
+-CONFIG_SPI_DW_QUAD=y
+-CONFIG_SPI_DESIGNWARE=y
+-CONFIG_SPI_DW_MMIO=y
+-CONFIG_SPI_SPIDEV=y
+-# CONFIG_PTP_1588_CLOCK is not set
+-CONFIG_PINCTRL=y
+-CONFIG_GPIOLIB=y
+-CONFIG_GPIO_SYSFS=y
+-CONFIG_GPIO_DWAPB=y
+-CONFIG_GPIO_PCA953X=y
+-CONFIG_GPIO_PCA953X_IRQ=y
+-CONFIG_POWER_SUPPLY=y
+-CONFIG_SENSORS_MR75203=y
+-CONFIG_THERMAL=y
+-CONFIG_CPU_THERMAL=y
+-CONFIG_THERMAL_EMULATION=y
+-CONFIG_WATCHDOG=y
+-CONFIG_DW_WATCHDOG=y
+-CONFIG_LIGHT_PMIC_WATCHDOG=y
+-CONFIG_WATCHDOG_PRETIMEOUT_GOV=y
+-CONFIG_WATCHDOG_PRETIMEOUT_GOV_SEL=m
+-CONFIG_WATCHDOG_PRETIMEOUT_GOV_PANIC=y
+-#CONFIG_WATCHDOG_PRETIMEOUT_DEFAULT_GOV_PANIC=y
+-CONFIG_WATCHDOG_PRETIMEOUT_DEFAULT_GOV_NOOP=y
+-CONFIG_WATCHDOG_OPEN_TIMEOUT=32
+-CONFIG_ABX500_CORE=y
+-CONFIG_REGULATOR=y
+-CONFIG_REGULATOR_FIXED_VOLTAGE=y
+-CONFIG_MEDIA_SUPPORT=y
+-# CONFIG_MEDIA_ANALOG_TV_SUPPORT is not set
+-# CONFIG_MEDIA_DIGITAL_TV_SUPPORT is not set
+-CONFIG_MEDIA_USB_SUPPORT=y
+-CONFIG_USB_VIDEO_CLASS=m
+-CONFIG_V4L_PLATFORM_DRIVERS=y
+-CONFIG_VIDEO_ASPEED=y
+-CONFIG_V4L_MEM2MEM_DRIVERS=y
+-# CONFIG_MEDIA_TUNER_SIMPLE is not set
+-# CONFIG_MEDIA_TUNER_TDA18250 is not set
+-# CONFIG_MEDIA_TUNER_TDA8290 is not set
+-# CONFIG_MEDIA_TUNER_TDA827X is not set
+-# CONFIG_MEDIA_TUNER_TDA18271 is not set
+-# CONFIG_MEDIA_TUNER_TDA9887 is not set
+-# CONFIG_MEDIA_TUNER_TEA5761 is not set
+-# CONFIG_MEDIA_TUNER_TEA5767 is not set
+-# CONFIG_MEDIA_TUNER_MSI001 is not set
+-# CONFIG_MEDIA_TUNER_MT20XX is not set
+-# CONFIG_MEDIA_TUNER_MT2060 is not set
+-# CONFIG_MEDIA_TUNER_MT2063 is not set
+-# CONFIG_MEDIA_TUNER_MT2266 is not set
+-# CONFIG_MEDIA_TUNER_MT2131 is not set
+-# CONFIG_MEDIA_TUNER_QT1010 is not set
+-# CONFIG_MEDIA_TUNER_XC2028 is not set
+-# CONFIG_MEDIA_TUNER_XC5000 is not set
+-# CONFIG_MEDIA_TUNER_XC4000 is not set
+-# CONFIG_MEDIA_TUNER_MXL5005S is not set
+-# CONFIG_MEDIA_TUNER_MXL5007T is not set
+-# CONFIG_MEDIA_TUNER_MC44S803 is not set
+-# CONFIG_MEDIA_TUNER_MAX2165 is not set
+-# CONFIG_MEDIA_TUNER_TDA18218 is not set
+-# CONFIG_MEDIA_TUNER_FC0011 is not set
+-# CONFIG_MEDIA_TUNER_FC0012 is not set
+-# CONFIG_MEDIA_TUNER_FC0013 is not set
+-# CONFIG_MEDIA_TUNER_TDA18212 is not set
+-# CONFIG_MEDIA_TUNER_E4000 is not set
+-# CONFIG_MEDIA_TUNER_FC2580 is not set
+-# CONFIG_MEDIA_TUNER_M88RS6000T is not set
+-# CONFIG_MEDIA_TUNER_TUA9001 is not set
+-# CONFIG_MEDIA_TUNER_SI2157 is not set
+-# CONFIG_MEDIA_TUNER_IT913X is not set
+-# CONFIG_MEDIA_TUNER_R820T is not set
+-# CONFIG_MEDIA_TUNER_MXL301RF is not set
+-# CONFIG_MEDIA_TUNER_QM1D1C0042 is not set
+-# CONFIG_MEDIA_TUNER_QM1D1B0004 is not set
+-CONFIG_DRM=y
+-CONFIG_DRM_PANEL_SIMPLE=y
+-CONFIG_DRM_PANEL_ILITEK_ILI9881C=y
+-CONFIG_DRM_PANEL_ILI9881D=y
+-CONFIG_DRM_PANEL_HX8394=y
+-CONFIG_DRM_PANEL_JADARD_JD9365DA_H3=y
+-CONFIG_DRM_PANEL_HX8279=y
+-CONFIG_DRM_PANEL_LT8911=y
+-CONFIG_DRM_VERISILICON=y
+-CONFIG_BACKLIGHT_CLASS_DEVICE=y
+-CONFIG_BACKLIGHT_PWM=y
+-CONFIG_LOGO=y
+-CONFIG_SOUND=y
+-CONFIG_SND=y
+-CONFIG_SND_USB_AUDIO=m
+-CONFIG_SND_SOC=y
+-CONFIG_SND_SOC_THEAD_LIGHT=y
+-CONFIG_SND_SOC_AW87519=y
+-CONFIG_SND_SOC_BT_SCO=y
+-CONFIG_SND_SOC_ES7210=y
+-CONFIG_SND_SOC_ES8156=y
+-CONFIG_SND_SOC_ES8323=y
+-CONFIG_SND_SOC_WM8960=y
+-CONFIG_SND_SIMPLE_CARD=y
+-CONFIG_SND_AUDIO_GRAPH_CARD=y
+-CONFIG_UHID=y
+-CONFIG_HID_PID=y
+-CONFIG_USB_HIDDEV=y
+-CONFIG_USB=y
+-CONFIG_USB_XHCI_HCD=y
+-CONFIG_USB_XHCI_PLATFORM=y
+-CONFIG_USB_OHCI_HCD=y
+-CONFIG_USB_STORAGE=y
+-CONFIG_USB_STORAGE_SDDR09=y
+-CONFIG_USB_STORAGE_SDDR55=y
+-CONFIG_USB_DWC3=m
+-# CONFIG_USB_DWC3_OF_SIMPLE is not set
+-CONFIG_USB_GADGET=y
+-CONFIG_USB_CONFIGFS=y
+-CONFIG_USB_CONFIGFS_F_FS=y
+-CONFIG_USB_CONFIGFS_F_ACC=y
+-CONFIG_USB_ZERO=m
+-CONFIG_USB_ETH=m
+-CONFIG_USB_ETH_EEM=y
+-CONFIG_USB_G_NCM=m
+-CONFIG_USB_MASS_STORAGE=m
+-CONFIG_USB_G_SERIAL=m
+-CONFIG_USB_G_MULTI=m
+-CONFIG_USB_G_MULTI_CDC=y
+-CONFIG_USB_ROLE_SWITCH=m
+-CONFIG_MMC=y
+-CONFIG_MMC_SDHCI=y
+-CONFIG_MMC_SDHCI_PLTFM=y
+-CONFIG_MMC_SDHCI_OF_DWCMSHC=y
+-CONFIG_NEW_LEDS=y
+-CONFIG_LEDS_CLASS=y
+-CONFIG_LEDS_GPIO=y
+-CONFIG_RTC_CLASS=y
+-CONFIG_RTC_DRV_XGENE=y
+-CONFIG_DMADEVICES=y
+-CONFIG_DW_AXI_DMAC=y
+-CONFIG_DMATEST=y
+-CONFIG_SW_SYNC=y
+-CONFIG_UDMABUF=y
+-CONFIG_DMABUF_SELFTESTS=m
+-CONFIG_VIRTIO_MMIO=y
+-CONFIG_VIRTIO_KHV_MMIO=y
+-CONFIG_VHOST_NET=y
+-CONFIG_VHOST_VSOCK=y
+-CONFIG_CLK_LIGHT_FM=y
+-CONFIG_HWSPINLOCK=y
+-CONFIG_HWSPINLOCK_LIGHT=y
+-CONFIG_HWSPINLOCK_LIGHT_TEST=m
+-CONFIG_MAILBOX=y
+-CONFIG_RPMSG=y
+-CONFIG_RPMSG_CHAR=y
+-CONFIG_RPMSG_VIRTIO=y
+-CONFIG_RPMSG_THEAD_LIGHT=y
+-CONFIG_EXTCON=y
+-CONFIG_IIO=y
+-CONFIG_IIO_SW_DEVICE=y
+-CONFIG_PWM=y
+-CONFIG_PWM_LIGHT=y
+-CONFIG_NVMEM_THEAD_LIGHT_EFUSE=y
+-CONFIG_TEE=m
+-CONFIG_OPTEE=m
+-CONFIG_OPTEE_BENCHMARK=y
+-CONFIG_LIGHT_GPU_VIV=m
+-# CONFIG_LIGHT_NET is not set
+-CONFIG_EXT4_FS=y
+-CONFIG_EXT4_FS_POSIX_ACL=y
+-CONFIG_AUTOFS4_FS=y
+-CONFIG_FUSE_FS=y
+-CONFIG_MSDOS_FS=y
+-CONFIG_VFAT_FS=y
+-CONFIG_TMPFS=y
+-CONFIG_TMPFS_POSIX_ACL=y
+-CONFIG_HUGETLBFS=y
+-CONFIG_JFFS2_FS=y
+-CONFIG_UBIFS_FS=y
+-CONFIG_NFS_FS=y
+-CONFIG_NFS_V4=y
+-CONFIG_NFS_V4_1=y
+-CONFIG_NFS_V4_2=y
+-CONFIG_ROOT_NFS=y
+-CONFIG_9P_FS=y
+-CONFIG_NLS_CODEPAGE_437=y
+-CONFIG_NLS_ISO8859_1=y
+-CONFIG_CRYPTO_AUTHENC=y
+-CONFIG_CRYPTO_DH=y
+-CONFIG_CRYPTO_CURVE25519=y
+-CONFIG_CRYPTO_CHACHA20POLY1305=y
+-CONFIG_CRYPTO_CBC=y
+-CONFIG_CRYPTO_CTR=y
+-CONFIG_CRYPTO_OFB=y
+-CONFIG_CRYPTO_MD5=y
+-CONFIG_CRYPTO_SHA512=y
+-CONFIG_CRYPTO_SHA3=y
+-CONFIG_CRYPTO_SM3=y
+-CONFIG_CRYPTO_DES=y
+-CONFIG_CRYPTO_SM4=y
+-CONFIG_CRYPTO_USER=y
+-CONFIG_CRYPTO_USER_API_HASH=y
+-CONFIG_CRYPTO_USER_API_SKCIPHER=y
+-CONFIG_CRYPTO_USER_API_RNG=y
+-# CONFIG_CRYPTO_USER_API_RNG_CAVP is not set
+-CONFIG_CRYPTO_USER_API_AEAD=y
+-CONFIG_DMA_CMA=y
+-CONFIG_DMA_PERNUMA_CMA=y
+-CONFIG_CMA_SIZE_MBYTES=32
+-CONFIG_PRINTK_TIME=y
+-CONFIG_DYNAMIC_DEBUG=y
+-CONFIG_DEBUG_INFO=y
+-CONFIG_MAGIC_SYSRQ=y
+-CONFIG_DEBUG_FS=y
+-CONFIG_DETECT_HUNG_TASK=y
+-CONFIG_DEBUG_ATOMIC_SLEEP=y
+-# CONFIG_RCU_TRACE is not set
+-CONFIG_OVERLAY_FS=y
+-CONFIG_LOCKUP_DETECTOR=y
+-CONFIG_SOFTLOCKUP_DETECTOR=y
+-CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC_VALUE=0
+-CONFIG_SCHED_INFO=y
+-CONFIG_PM=y
+-# CONFIG_SUSPEND is not set
+-# CONFIG_PM_SLEEP is not set
+-CONFIG_PM_DEVFREQ=y
+-CONFIG_DEVFREQ_GOV_SIMPLE_ONDEMAND=y
+-CONFIG_DEVFREQ_GOV_PERFORMANCE=y
+-CONFIG_DEVFREQ_GOV_POWERSAVE=y
+-CONFIG_DEVFREQ_GOV_USERSPACE=y
+-CONFIG_DEVFREQ_GOV_PASSIVE=y
+-CONFIG_PM_DEVFREQ_EVENT=y
+-CONFIG_ENERGY_MODEL=y
+-# CONFIG_THERMAL_DEFAULT_GOV_POWER_ALLOCATOR is not set
+-CONFIG_THERMAL_GOV_POWER_ALLOCATOR=y
+-CONFIG_DEVFREQ_THERMAL=y
+-CONFIG_CHARGER_BQ25700=m
+-CONFIG_ROCKCHIP_LT8911EXB=y
+-CONFIG_BATTERY_CW2015=m
+-CONFIG_TYPEC=m
+-CONFIG_TYPEC_TCPM=m
+-CONFIG_TYPEC_TCPCI=m
+-CONFIG_TYPEC_HUSB311=m
+-CONFIG_MCU_HC32FX=y
+-CONFIG_I2C_HID=y
+-
+-CONFIG_MTK_FINGERPRINT_SUPPORT=y
+-CONFIG_MICROARRAY_FINGERPRINT=y
+-
+-CONFIG_HS_MH248=y
+-
+-CONFIG_RK_HEADSET=y
+-CONFIG_TCG_TPM=y
+-CONFIG_TCG_TIS_CORE=y
+-CONFIG_TCG_TIS_SPI=y
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index d0f654bb8225..6c432c9cad99 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -480,8 +480,6 @@ CONFIG_TYPEC_TCPCI=m
+ CONFIG_TYPEC_HUSB311=m
+ CONFIG_MCU_HC32FX=y
+ CONFIG_I2C_HID=y
+-CONFIG_MTK_FINGERPRINT_SUPPORT=y
+-CONFIG_MICROARRAY_FINGERPRINT=y
+ CONFIG_HS_MH248=y
+ CONFIG_RK_HEADSET=y
+ CONFIG_TCG_TPM=y
+@@ -542,3 +540,4 @@ CONFIG_V4L_MEM2MEM_DRIVERS=y
+ # CONFIG_MEDIA_TUNER_QM1D1B0004 is not set
+ CONFIG_RTW88_8822C=m
+ CONFIG_RTW88_8822CS=m
++CONFIG_USBEN=y
+diff --git a/drivers/input/Kconfig b/drivers/input/Kconfig
+index 3bdbd34314b3..9dbcd10485e9 100644
+--- a/drivers/input/Kconfig
++++ b/drivers/input/Kconfig
+@@ -214,5 +214,7 @@ source "drivers/input/gameport/Kconfig"
+ 
+ endmenu
+ 
++source "drivers/input/hall/Kconfig"
++
+ endmenu
+ 
+diff --git a/drivers/input/Makefile b/drivers/input/Makefile
+index c78753274921..ed581a5c2578 100644
+--- a/drivers/input/Makefile
++++ b/drivers/input/Makefile
+@@ -26,6 +26,9 @@ obj-$(CONFIG_INPUT_JOYSTICK)	+= joystick/
+ obj-$(CONFIG_INPUT_TABLET)	+= tablet/
+ obj-$(CONFIG_INPUT_TOUCHSCREEN)	+= touchscreen/
+ obj-$(CONFIG_INPUT_MISC)	+= misc/
++
++obj-$(CONFIG_HS_MH248)  	+= hall/
++
+ obj-$(CONFIG_INPUT_KUNIT_TEST)	+= tests/
+ 
+ obj-$(CONFIG_INPUT_APMPOWER)	+= apm-power.o
+diff --git a/drivers/input/fingerprint/Kconfig b/drivers/input/fingerprint/Kconfig
+deleted file mode 100644
+index e40642f92aea..000000000000
+--- a/drivers/input/fingerprint/Kconfig
++++ /dev/null
+@@ -1,51 +0,0 @@
+-#
+-#Fingerprint
+-#
+-menu "Fingerprint support"
+-	depends on INPUT
+-
+-config MTK_FINGERPRINT_SUPPORT
+-	bool "Mediatek Fingerprint"
+-	default n
+-	help
+-	Fingerprint mtk driver enable/disable in the kernel.
+-	Say Y here if you want to use mediatek fingerprint driver,
+-	fingerprint driver will support fingerprint function
+-
+-if MTK_FINGERPRINT_SUPPORT
+-
+-config MICROARRAY_FINGERPRINT
+-	bool "Microarray Fingerprint"
+-	default y
+-	help
+-	Microarray fingerprint Microarray's 121/112/88/64/48 device.
+-
+-if MICROARRAY_FINGERPRINT = ""
+-config MTK_FINGERPRINT_SELECT
+-	string "sensor type"
+-	default "GF318M"
+-endif
+-
+-if MTK_FINGERPRINT_SELECT = "FPC1145"
+-config FPC_FINGERPRINT
+-	bool "FPC Fingerprint"
+-	default y
+-	help
+-	FPC fingerprint FPC's 102x/104x device.
+-endif
+-
+-if MTK_FINGERPRINT_SELECT = "GF318M"
+-config GOODIX_FINGERPRINT
+-	bool "Goodix Fingerprint"
+-	default y
+-	help
+-	Goodix Fingerprint chip GF316M/GF318M/GF3118M/GF518M/GF5118M/GF516M/GF816M/GF3208/GF5216 TEE driver
+-
+-config GOODIX_SENSOR_TYPE
+-	string "SENSOR_TYPE"
+-	default "GF318M"
+-	help
+-	Must input sensor type, or default is GF316M GF318M GF3118M GF518M GF5118M GF516M GF816M GF3208 GF5216
+-endif
+-endif
+-endmenu
+diff --git a/drivers/input/fingerprint/Makefile b/drivers/input/fingerprint/Makefile
+deleted file mode 100644
+index 31289c6e6c98..000000000000
+--- a/drivers/input/fingerprint/Makefile
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#
+-# Makefile for all kinds of Fingerprint
+-#
+-
+-obj-$(CONFIG_GOODIX_FINGERPRINT) += goodix/
+-obj-$(CONFIG_FPC_FINGERPRINT) += fpc/
+-obj-$(CONFIG_MICROARRAY_FINGERPRINT) += microarray_fp/
+diff --git a/drivers/input/fingerprint/microarray_fp/Kconfig b/drivers/input/fingerprint/microarray_fp/Kconfig
+deleted file mode 100644
+index 012c776a0cc4..000000000000
+--- a/drivers/input/fingerprint/microarray_fp/Kconfig
++++ /dev/null
+@@ -1,8 +0,0 @@
+-# Copyright (C) MicroArray  
+-# MicroArray Fprint Driver Code
+-# Kconfig
+-# Date: 2017-3-15
+-# Version: v4.0.06
+-# Author: guq
+-# Contact: guq@microarray.com.cn
+-
+diff --git a/drivers/input/fingerprint/microarray_fp/Makefile b/drivers/input/fingerprint/microarray_fp/Makefile
+deleted file mode 100644
+index cb70b9f55926..000000000000
+--- a/drivers/input/fingerprint/microarray_fp/Makefile
++++ /dev/null
+@@ -1,30 +0,0 @@
+-# Copyright (C) Microarray
+-# MicroArray Fprint Driver Code
+-# MAKEFILE
+-# Date: 2017-3-15
+-# Version: v4.0.06 
+-# Author: guq
+-# Contact: guq@microarray.com.cn
+-
+-
+-subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLATFORM)/include \
+-					-I$(srctree)/drivers/misc/mediatek/include/mt-plat
+-
+-MTK_PLATFORM := $(subst ",,$(CONFIG_MTK_PLATFORM))
+-subdir-ccflags-y += -Werror
+-subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include
+-subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/$(MTK_PLATFORM)
+-subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLATFORM)/include
+-subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat
+-subdir-ccflags-y += -I$(srctree)/drivers/spi/mediatek/$(MTK_PLATFORM)
+-
+-#compatible for trustkernel
+-subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/tkcore/include/
+-subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/tkcore/core
+-
+-#compatible for microtrust
+-ccflags-y += -I$(srctree)/drivers/misc/mediatek/teei/V1.0/tz_vfs
+-
+-obj-y	+= madev.o mtk-settings.o
+-
+-
+diff --git a/drivers/input/fingerprint/microarray_fp/ioctl_cmd.h b/drivers/input/fingerprint/microarray_fp/ioctl_cmd.h
+deleted file mode 100644
+index f14e0718e695..000000000000
+--- a/drivers/input/fingerprint/microarray_fp/ioctl_cmd.h
++++ /dev/null
+@@ -1,65 +0,0 @@
+-/* Copyright (C) MicroArray
+- * MicroArray Fprint Driver Code 
+- * ioctl_cmd.h
+- * Date: 2017-3-15
+- * Version: v4.0.06
+- * Author: guq
+- * Contact: guq@microarray.com.cn
+- */
+-#ifndef __IOCTL_CMD_H__
+-#define __IOCTL_CMD_H__
+-
+-#define MA_DRV_VERSION	    (0x00004006)
+-
+-#define MA_IOC_MAGIC            'M'
+-//#define MA_IOC_INIT           _IOR(MA_IOC_MAGIC, 0, unsigned char)
+-#define TIMEOUT_WAKELOCK        _IO(MA_IOC_MAGIC, 1)
+-#define SLEEP                   _IO(MA_IOC_MAGIC, 2)    //陷入内核
+-#define WAKEUP                  _IO(MA_IOC_MAGIC, 3)    //唤醒
+-#define ENABLE_CLK              _IO(MA_IOC_MAGIC, 4)    //打开spi时钟
+-#define DISABLE_CLK             _IO(MA_IOC_MAGIC, 5)    //关闭spi时钟
+-#define ENABLE_INTERRUPT        _IO(MA_IOC_MAGIC, 6)    //开启中断上报
+-#define DISABLE_INTERRUPT       _IO(MA_IOC_MAGIC, 7)    //关闭中断上报
+-#define TAP_DOWN                _IO(MA_IOC_MAGIC, 8)
+-#define TAP_UP                  _IO(MA_IOC_MAGIC, 9)
+-#define SINGLE_TAP              _IO(MA_IOC_MAGIC, 11)
+-#define DOUBLE_TAP              _IO(MA_IOC_MAGIC, 12)
+-#define LONG_TAP                _IO(MA_IOC_MAGIC, 13)
+-
+-#define MA_IOC_VTIM             _IOR(MA_IOC_MAGIC,  14, unsigned char)     //version time
+-#define MA_IOC_CNUM             _IOR(MA_IOC_MAGIC,  15, unsigned char)     //cover num
+-#define MA_IOC_SNUM             _IOR(MA_IOC_MAGIC,  16, unsigned char)     //sensor type
+-#define MA_IOC_UKRP             _IOW(MA_IOC_MAGIC,  17, unsigned char)     //user define the report key
+-
+-#define MA_KEY_UP/*KEY_UP*/                  _IO(MA_IOC_MAGIC,  18)                  //nav up
+-#define MA_KEY_LEFT/*KEY_LEFT*/                _IO(MA_IOC_MAGIC,  19)                  //nav left
+-#define MA_KEY_DOWN/*KEY_DOWN*/                _IO(MA_IOC_MAGIC,  20)                  //nav down
+-#define MA_KEY_RIGHT/*KEY_RIGHT*/               _IO(MA_IOC_MAGIC,  21)                  //nav right
+-
+-#define MA_KEY_F14/*KEY_F14*/                 _IO(MA_IOC_MAGIC,  23)  //for chuanyin
+-#define SET_MODE                _IOW(MA_IOC_MAGIC, 33, unsigned int)    //for yude
+-#define GET_MODE                _IOR(MA_IOC_MAGIC, 34, unsigned int)    //for yude
+-
+-
+-#define ENABLE_IRQ/*ENABLE_IQ*/               _IO(MA_IOC_MAGIC, 31)
+-#define DISABLE_IRQ/*DISABLE_IQ*/              _IO(MA_IOC_MAGIC, 32)
+-
+-#define MA_IOC_GVER             _IOR(MA_IOC_MAGIC,   35, unsigned int)      //get the driver version,the version mapping in the u32 is the final  4+4+8,as ******** ******* ****(major verson number) ****(minor version number) ********(revised version number), the front 16 byte is reserved.
+-#define SCREEN_OFF              _IO(MA_IOC_MAGIC,    36)
+-#define SCREEN_ON               _IO(MA_IOC_MAGIC,    37)
+-#define SET_SPI_SPEED           _IOW(MA_IOC_MAGIC,   38, unsigned int)
+-
+-
+-#define WAIT_FACTORY_CMD        _IO(MA_IOC_MAGIC,    39)//for fingerprintd
+-#define WAKEUP_FINGERPRINTD     _IO(MA_IOC_MAGIC,    40)//for factory test
+-#define WAIT_FINGERPRINTD_RESPONSE                                  _IOR(MA_IOC_MAGIC,    41, unsigned int)//for factory test
+-#define WAKEUP_FACTORY_TEST_SEND_FINGERPRINTD_RESPONSE              _IOW(MA_IOC_MAGIC,    42, unsigned int)//for fingerprintd
+-#define WAIT_SCREEN_STATUS_CHANGE                                   _IOR(MA_IOC_MAGIC,    43, unsigned int)
+-#define GET_INTERRUPT_STATUS                                        _IOR(MA_IOC_MAGIC,    44, unsigned int)
+-#define SYNC					_IO(MA_IOC_MAGIC, 45)
+-#define SYNC2					_IO(MA_IOC_MAGIC, 46)
+-#define GET_SCREEN_STATUS		_IOR(MA_IOC_MAGIC, 47, unsigned int)
+-#define MA_RESET                _IOW(MA_IOC_MAGIC, 48, unsigned int)
+-#define GET_MA_RESET_STATE      _IOR(MA_IOC_MAGIC, 49, unsigned int)
+-#endif /* __IOCTL_CMD_H__ */
+-
+diff --git a/drivers/input/fingerprint/microarray_fp/madev.c b/drivers/input/fingerprint/microarray_fp/madev.c
+deleted file mode 100644
+index 92c059503222..000000000000
+--- a/drivers/input/fingerprint/microarray_fp/madev.c
++++ /dev/null
+@@ -1,889 +0,0 @@
+-/* Copyright (C) MicroArray
+-    oALOGD("start");
+- * MicroArray Fprint Driver Code for REE enviroment
+- * madev.c
+- * Date: 2017-3-15
+- * Version: v4.0.06
+- * Author: guq
+- * Contact: guq@microarray.com.cn
+- */
+-#include "madev.h"
+-
+-#ifdef TEE_ID_COMPATIBLE_MICROTRUST
+-#include <fp_vendor.h>
+-#include "teei_fp.h"
+-#include "tee_client_api.h"
+-#endif
+-
+-//spdev use for recording the data for other use
+-static unsigned int irq, ret;
+-static unsigned int ma_drv_reg;
+-static unsigned int ma_speed;
+-static unsigned int is_screen_on;
+-static struct notifier_block notifier;
+-static unsigned int int_pin_state;
+-static unsigned int compatible;
+-static unsigned int screen_flag;
+-static DECLARE_WAIT_QUEUE_HEAD(screenwaitq);
+-static DECLARE_WAIT_QUEUE_HEAD(gWaitq);
+-static DECLARE_WAIT_QUEUE_HEAD(U1_Waitq);
+-static DECLARE_WAIT_QUEUE_HEAD(U2_Waitq);
+-#ifdef CONFIG_PM_WAKELOCKS
+-struct wakeup_source *gProcessWakeLock;
+-#else
+-struct wake_lock gProcessWakeLock;
+-#endif
+-
+-struct work_struct gWork;
+-struct workqueue_struct *gWorkq;
+-//
+-static LIST_HEAD(dev_list);
+-static DEFINE_MUTEX(dev_lock);
+-static DEFINE_MUTEX(drv_lock);
+-static DEFINE_MUTEX(ioctl_lock);
+-#ifdef COMPATIBLE_VERSION3
+-static DECLARE_WAIT_QUEUE_HEAD(drv_waitq);
+-#endif
+-
+-static struct fprint_dev *sdev = NULL;
+-static struct fprint_spi *smas = NULL;
+-
+-static u8* stxb;
+-static u8* srxb;
+-
+-#define IMAGE_SIZE 13312
+-#define IMAGE_DMA_SIZE 32*1024
+-
+-static void mas_work(struct work_struct *pws) {
+-    smas->f_irq = 1;
+-    wake_up(&gWaitq);
+-#ifdef COMPATIBLE_VERSION3
+-	wake_up(&drv_waitq);
+-#endif
+-}
+-
+-static irqreturn_t mas_interrupt(int irq, void *dev_id) {
+-
+-#ifdef CONFIG_PM_WAKELOCKS
+-            __pm_wakeup_event(gProcessWakeLock, 5000);
+-#else
+-	    wake_lock_timeout(&gProcessWakeLock, 5 * HZ);
+-#endif
+-#ifdef DOUBLE_EDGE_IRQ
+-	if(mas_get_interrupt_gpio(0)==1){
+-		//TODO IRQF_TRIGGER_RISING
+-	}else{
+-		//TODO IRQF_TRIGGER_FALLING
+-	}
+-#else
+-
+-    queue_work(gWorkq, &gWork);
+-#endif
+-	return IRQ_HANDLED;
+-}
+-
+-
+-/*---------------------------------- fops ------------------------------------*/
+-
+-/* 读写数据
+- * @buf 数据
+- * @len 长度
+- * @返回值：0成功，否则失败
+- */
+-int mas_sync(u8 *txb, u8 *rxb, int len) {
+-    int ret = 0;
+-#if 1
+-	
+-        struct spi_message m;
+-        struct spi_transfer t = {
+-                .tx_buf = txb,
+-                .rx_buf = rxb,
+-                .len = len,
+-                .speed_hz = smas->spi->max_speed_hz,
+-        };
+-	mutex_lock(&dev_lock);
+-	// len = (len + 1023) << 10 >> 10;
+-	// t.len = len;
+-        spi_message_init(&m);
+-        spi_message_add_tail(&t, &m);
+-        ret= spi_sync(smas->spi,&m);
+-    	mutex_unlock(&dev_lock);
+-
+-        return ret;
+-#else
+-	
+-
+-	mutex_lock(&dev_lock);
+-    mas_select_transfer(smas->spi, len);
+-    smas->xfer.tx_nbits=SPI_NBITS_SINGLE;
+-    smas->xfer.tx_buf = txb;
+-    smas->xfer.rx_nbits=SPI_NBITS_SINGLE;
+-    smas->xfer.rx_buf = rxb;
+-    smas->xfer.delay_usecs = 1;
+-    smas->xfer.len = len;
+-    smas->xfer.bits_per_word = 8;
+-    smas->xfer.speed_hz = smas->spi->max_speed_hz;
+-    spi_message_init(&smas->msg);
+-    spi_message_add_tail(&smas->xfer, &smas->msg);
+-    ret = spi_sync(smas->spi, &smas->msg);
+-    mutex_unlock(&dev_lock);
+-
+- 	return ret;
+-	
+-#endif
+-}
+-
+-
+-
+-/* 读数据
+- * @return 成功:count, -1count太大，-2通讯失败, -3拷贝失败
+- */
+-static ssize_t mas_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos) {
+-    int val, ret = 0;
+-    //MALOGD("start");
+-    //printk("zzzz count - %d\n", (int)count);
+-    ret = mas_sync(stxb, srxb, count);
+-    if(ret) {
+-        MALOGW("mas_sync failed.");
+-        return -2;
+-    }
+-    ret = copy_to_user(buf, srxb, count);
+-    if(!ret) val = count;
+-    else {
+-        val = -3;
+-        MALOGW("copy_to_user failed.");
+-    }       
+-    //MALOGD("end.");
+-    return val;
+-}
+-
+-
+-static void mas_set_input(void) {
+-    struct input_dev *input = NULL;
+-    input = input_allocate_device();
+-    if (!input) {
+-        MALOGW("input_allocate_device failed.");
+-        return ;
+-    }
+-    set_bit(EV_KEY, input->evbit);
+-    //set_bit(EV_ABS, input->evbit);
+-    set_bit(EV_SYN, input->evbit);
+-    set_bit(FINGERPRINT_SWIPE_UP, input->keybit); //单触
+-    set_bit(FINGERPRINT_SWIPE_DOWN, input->keybit);
+-    set_bit(FINGERPRINT_SWIPE_LEFT, input->keybit);
+-    set_bit(FINGERPRINT_SWIPE_RIGHT, input->keybit);
+-    set_bit(FINGERPRINT_TAP, input->keybit);
+-    set_bit(FINGERPRINT_DTAP, input->keybit);
+-    set_bit(FINGERPRINT_LONGPRESS, input->keybit);
+-    
+-    set_bit(KEY_POWER, input->keybit);
+-
+-    input->name = MA_CHR_DEV_NAME;
+-    input->id.bustype = BUS_SPI;
+-    ret = input_register_device(input);
+-    if (ret) {
+-        input_free_device(input);
+-        MALOGW("failed to register input device.");
+-        return;
+-    }
+-    smas->input  = input;
+-}
+-
+-
+-
+-//static int mas_ioctl (struct inode *node, struct file *filp, unsigned int cmd, uns igned long arg)           
+-//this function only supported while the linux kernel version under v2.6.36,while the kernel version under v2.6.36, use this line
+-static long mas_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {
+-    //MALOGF("start");
+-	int tmp;
+-    switch(cmd){
+-        case TIMEOUT_WAKELOCK:                                                       //延时锁    timeout lock
+-#ifdef CONFIG_PM_WAKELOCKS
+-            __pm_wakeup_event(gProcessWakeLock, 5000);
+-#else
+-	    wake_lock_timeout(&gProcessWakeLock, 5 * HZ);
+-#endif
+-            break;
+-        case SLEEP:                                                       //remove the process out of the runqueue
+-            if(mas_get_interrupt_gpio(0) == 1) {
+-                MALOGF("int pull down failed!");
+-                return 0;
+-			}
+-            smas->f_irq = 0;
+-			ret = wait_event_freezable(gWaitq, smas->f_irq != 0);
+-			break;
+-        case WAKEUP:                                                       //wake up, schedule the process into the runqueue
+-            smas->f_irq = 1;
+-            wake_up(&gWaitq);
+-            break;
+-        case ENABLE_CLK:
+-            mas_enable_spi_clock(smas->spi);                                    //if the spi clock is not opening always, do this methods
+-            break;
+-        case DISABLE_CLK:
+-            mas_disable_spi_clock(smas->spi);                                   //disable the spi clock
+-            break;
+-        case ENABLE_INTERRUPT:
+-            enable_irq(irq);                                                    //enable the irq,in fact, you can make irq enable always
+-            break;
+-        case DISABLE_INTERRUPT:
+-            disable_irq(irq);                                                    //disable the irq
+-            break;
+-        case TAP_DOWN:
+-            input_report_key(smas->input, FINGERPRINT_TAP, 1);
+-            input_sync(smas->input);                                                 //tap down
+-            break;
+-        case TAP_UP:
+-            input_report_key(smas->input, FINGERPRINT_TAP, 0);
+-            input_sync(smas->input);                                                     //tap up
+-            break;
+-        case SINGLE_TAP:
+-            input_report_key(smas->input, FINGERPRINT_TAP, 1);
+-            input_sync(smas->input);
+-            input_report_key(smas->input, FINGERPRINT_TAP, 0);
+-            input_sync(smas->input);                                                       //single tap
+-            break;
+-        case DOUBLE_TAP:
+-            input_report_key(smas->input, FINGERPRINT_DTAP, 1);
+-            input_sync(smas->input);
+-            input_report_key(smas->input, FINGERPRINT_DTAP, 0);
+-            input_sync(smas->input);                                              //double tap
+-            break;
+-        case LONG_TAP:
+-            input_report_key(smas->input, FINGERPRINT_LONGPRESS, 1);
+-            input_sync(smas->input);
+-            input_report_key(smas->input, FINGERPRINT_LONGPRESS, 0);
+-            input_sync(smas->input);                                               //long tap
+-            break;
+-        case MA_KEY_UP:
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_UP, 1);
+-            input_sync(smas->input);
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_UP, 0);
+-            input_sync(smas->input);
+-            break;
+-        case MA_KEY_LEFT:
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_LEFT, 1);
+-            input_sync(smas->input);
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_LEFT, 0);
+-            input_sync(smas->input);
+-            break;
+-        case MA_KEY_DOWN:
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_DOWN, 1);
+-            input_sync(smas->input);
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_DOWN, 0);
+-            input_sync(smas->input);
+-            break;
+-        case MA_KEY_RIGHT:
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_RIGHT, 1);
+-            input_sync(smas->input);
+-            input_report_key(smas->input, FINGERPRINT_SWIPE_RIGHT, 0);
+-            input_sync(smas->input);
+-            break;
+-        case SET_MODE:
+-            mutex_lock(&ioctl_lock);
+-            ret = copy_from_user(&ma_drv_reg, (unsigned int*)arg, sizeof(unsigned int));
+-            mutex_unlock(&ioctl_lock);
+-            break;
+-        case GET_MODE:
+-            mutex_lock(&ioctl_lock);
+-            ret = copy_to_user((unsigned int*)arg, &ma_drv_reg, sizeof(unsigned int));
+-            mutex_unlock(&ioctl_lock);
+-            break;
+-        case MA_IOC_GVER:
+-            {            
+-                unsigned int ma_drv_version = MA_DRV_VERSION;
+-                mutex_lock(&ioctl_lock);
+-                if (copy_to_user((void *)arg, &ma_drv_version, sizeof(unsigned int))) {
+-                    MALOGE("copy_to_user(..) failed.\n");
+-                    ret = (-EFAULT);
+-                }            
+-                mutex_unlock(&ioctl_lock);
+-            }
+-            break;
+-		case SCREEN_ON:
+-			mas_switch_power(1);
+-			break;
+-		case SCREEN_OFF:
+-			mas_switch_power(0);
+-			break;
+-		case MA_RESET:
+-			mas_finger_set_reset(arg);
+-			break;
+-		case GET_MA_RESET_STATE:
+-			break;
+-            
+-        case SET_SPI_SPEED:
+-            ret = copy_from_user(&ma_speed, (unsigned int*)arg, sizeof(unsigned int));
+-            ma_spi_change(smas->spi, ma_speed, 0);
+-            break;
+-        case WAIT_FACTORY_CMD:
+-            smas->u2_flag = 0;
+-           	ret = wait_event_freezable(U2_Waitq, smas->u2_flag != 0);
+-			break;
+-        case WAKEUP_FINGERPRINTD:
+-            smas->u2_flag = 1;
+-            wake_up(&U2_Waitq);
+-            break;
+-        case WAIT_FINGERPRINTD_RESPONSE:
+-            smas->u1_flag = 0;
+-            ret = wait_event_freezable(U1_Waitq,  smas->u1_flag != 0);
+-            mutex_lock(&ioctl_lock);
+-            tmp = copy_to_user((unsigned int*)arg, &ma_drv_reg, sizeof(unsigned int));
+-            mutex_unlock(&ioctl_lock);
+-			break;
+-        case WAKEUP_FACTORY_TEST_SEND_FINGERPRINTD_RESPONSE:
+-            mutex_lock(&ioctl_lock);
+-            ret = copy_from_user(&ma_drv_reg, (unsigned int*)arg, sizeof(unsigned int));
+-            mutex_unlock(&ioctl_lock);
+-            msleep(4);
+-            smas->u1_flag = 1;
+-            wake_up(&U1_Waitq);
+-            break;
+-		case WAIT_SCREEN_STATUS_CHANGE:
+-			screen_flag = 0;
+-			ret = wait_event_freezable(screenwaitq, screen_flag != 0);
+-			mutex_lock(&ioctl_lock);
+-			tmp = copy_to_user((unsigned int*)arg, &is_screen_on, sizeof(unsigned int));
+-			mutex_unlock(&ioctl_lock);
+-			break;
+-		case GET_INTERRUPT_STATUS:
+-			int_pin_state = mas_get_interrupt_gpio(0);
+-			mutex_lock(&ioctl_lock);
+-			tmp = copy_to_user((unsigned int*)arg, &int_pin_state, sizeof(unsigned int));
+-			mutex_unlock(&ioctl_lock);
+-			break;
+-		case GET_SCREEN_STATUS:
+-			mutex_lock(&ioctl_lock);
+-			ret = copy_to_user((unsigned int*)arg, &is_screen_on, sizeof(unsigned int));
+-			mutex_unlock(&ioctl_lock);
+-			break;
+-        default:
+-            ret = -EINVAL;
+-            MALOGW("mas_ioctl no such cmd");
+-    }
+-    //MALOGF("end");
+-    return ret;
+-}
+-
+-#ifdef CONFIG_COMPAT
+-static long mas_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+-{
+-    int retval = 0;
+-    retval = filp->f_op->unlocked_ioctl(filp, cmd, arg);
+-    return retval;
+-}
+-#endif
+-
+-#ifdef COMPATIBLE_VERSION3
+-int version3_ioctl(int cmd, int arg){
+-		int ret = 0;
+-
+-		printd("%s: start cmd=0x%.3x arg=%d\n", __func__, cmd, arg);
+-
+-		switch (cmd) {
+-				case IOCTL_DEBUG:
+-						sdeb = (u8) arg;
+-						break;
+-				case IOCTL_IRQ_ENABLE:
+-						break;
+-				case IOCTL_SPI_SPEED: 
+-						smas->spi->max_speed_hz = (u32) arg;
+-						spi_setup(smas->spi);
+-						break;
+-				case IOCTL_COVER_NUM:
+-						ret = COVER_NUM;
+-						break;
+-				case IOCTL_GET_VDATE:
+-						ret = 20160425;
+-						break;
+-				case IOCTL_CLR_INTF:
+-						smas->f_irq = FALSE;
+-						break;
+-				case IOCTL_GET_INTF:
+-						ret = smas->f_irq;
+-						break;
+-				case IOCTL_REPORT_FLAG:
+-						smas->f_repo = arg;
+-						break;
+-				case IOCTL_REPORT_KEY:
+-						input_report_key(smas->input, arg, 1);
+-						input_sync(smas->input);
+-						input_report_key(smas->input, arg, 0);
+-						input_sync(smas->input);
+-						break;
+-				case IOCTL_SET_WORK:
+-						smas->do_what = arg;
+-						break;
+-				case IOCTL_GET_WORK:
+-						ret = smas->do_what;
+-						break;
+-				case IOCTL_SET_VALUE:
+-						smas->value = arg;
+-						break;
+-				case IOCTL_GET_VALUE:
+-						ret = smas->value;
+-						break;
+-				case IOCTL_TRIGGER:
+-						smas->f_wake = TRUE;
+-						wake_up_interruptible(&drv_waitq);
+-						break;
+-				case IOCTL_WAKE_LOCK:
+-#ifdef CONFIG_PM_WAKELOCKS
+-					        __pm_stay_awake(&smas->wl);
+-#else
+-					        wake_lock(&smas->wl);
+-#endif
+-						break;
+-				case IOCTL_WAKE_UNLOCK:
+-#ifdef CONFIG_PM_WAKELOCKS
+-					        __pm_relax(&smas->wl);
+-#else
+-					        wake_unlock(&smas->wl);
+-#endif
+-						break;
+-				case IOCTL_KEY_DOWN:
+-						input_report_key(smas->input, KEY_F11 1);
+-						input_sync(smas->input);
+-						break;
+-				case IOCTL_KEY_UP:
+-						input_report_key(smas->input, KEY_F11, 0);
+-						input_sync(smas->input);
+-						break;
+-		}
+-
+-		printd("%s: end. ret=%d f_irq=%d, f_repo=%d\n", __func__, ret, smas->f_irq, smas->f_repo);
+-
+-		return ret;
+-
+-}
+-#endif
+-
+-/* 写数据
+- * @return 成功:count, -1count太大，-2拷贝失败
+- */
+-static ssize_t mas_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos) {
+-    int val = 0;
+-    //MALOGD("start");
+-    if(count==6) {                                                                              //cmd ioctl, old version used the write interface to do ioctl, this is only for the old version
+-        int cmd, arg;
+-        u8 tmp[6];
+-        ret = copy_from_user(tmp, buf, count);
+-        cmd = tmp[0];
+-        cmd <<= 8;
+-        cmd += tmp[1];
+-        arg = tmp[2];
+-        arg <<= 8;
+-        arg += tmp[3];
+-        arg <<= 8;
+-        arg += tmp[4];
+-        arg <<= 8;
+-        arg += tmp[5];
+-#ifdef COMPATIBLE_VERSION3
+-        val = (int)version3_ioctl(NULL, (unsigned int)cmd, (unsigned long)arg);
+-#endif
+-	} else {        
+-        //memset(stxb, 0, FBUF);
+-        memset(stxb, 0xff, IMAGE_DMA_SIZE);
+-        ret = copy_from_user(stxb, buf, count);     
+-        if(ret) {
+-            MALOGW("copy form user failed");
+-            val = -2;
+-        } else {
+-            val = count;
+-        }       
+-    }
+-    return val;
+-}
+-void * kernel_memaddr = NULL;
+-unsigned long kernel_memesize = 0;
+-
+-int mas_mmap(struct file *filp, struct vm_area_struct *vma){
+-	unsigned long page;
+-	if ( !kernel_memaddr ) { 
+-			kernel_memaddr = kmalloc(128*1024, GFP_KERNEL);
+-			if( !kernel_memaddr ) { 
+-					return -1; 
+-			}   
+-	}  
+-    page = virt_to_phys((void *)kernel_memaddr) >> PAGE_SHIFT;
+-    vma->vm_page_prot=pgprot_noncached(vma->vm_page_prot);
+-    if( remap_pfn_range(vma, vma->vm_start, page, (vma->vm_end - vma->vm_start), 
+-                vma->vm_page_prot) )
+-        return -1;
+-    //vma->vm_flags |= VM_RESERVED;
+-    vma->vm_flags |=  VM_DONTEXPAND | VM_DONTDUMP;
+-    printk("remap_pfn_rang page:[%lu] ok.\n", page);
+-    return 0;
+-}
+-
+-#ifdef COMPATIBLE_VERSION3
+-static unsigned int mas_poll(struct file *filp, struct poll_table_struct *wait) {
+-		unsigned int mask = 0;
+-
+-		printd("%s: start. f_irq=%d f_repo=%d f_wake=%d\n",
+-						__func__, smas->f_irq, smas->f_repo, smas->f_wake);
+-
+-		poll_wait(filp, &drv_waitq, wait);
+-		if(smas->f_irq && smas->f_repo) {
+-				smas->f_repo = FALSE;
+-				mask |= POLLIN | POLLRDNORM;
+-		} else if( smas->f_wake ) {
+-				smas->f_wake = FALSE;
+-				mask |= POLLPRI;
+-		}
+-
+-		printd("%s: end. mask=%d\n", __func__, mask);
+-
+-		return mask;
+-}
+-#endif
+-
+-/*---------------------------------- fops ------------------------------------*/
+-static const struct file_operations sfops = {
+-    .owner = THIS_MODULE,
+-    .write = mas_write,
+-    .read = mas_read,
+-    .unlocked_ioctl = mas_ioctl,
+-    .mmap = mas_mmap,
+-    //.ioctl = mas_ioctl,       
+-    //using the previous line replacing the unlock_ioctl while the linux kernel under version2.6.36
+-#ifdef CONFIG_COMPAT
+-    .compat_ioctl = mas_compat_ioctl,
+-#endif
+-#ifdef COMPATIBLE_VERSION3
+-	.poll = mas_poll,
+-#endif
+-};
+-/*---------------------------------- fops end ---------------------------------*/
+-
+-static int init_file_node(void)
+-{
+-    	int ret;
+-	    //MALOGF("start");
+-    	ret = alloc_chrdev_region(&sdev->idd, 0, 1, MA_CHR_DEV_NAME);
+-    	if(ret < 0)
+-    	{
+-        	MALOGW("alloc_chrdev_region error!");
+-        	return -1;
+-    	}
+-    	sdev->chd = cdev_alloc();
+-   	    if (!sdev->chd)
+-    	{
+-        	MALOGW("cdev_alloc error!");
+-        	return -1;
+-    	}
+-    	sdev->chd->owner = THIS_MODULE;
+-    	sdev->chd->ops = &sfops;
+-    	cdev_add(sdev->chd, sdev->idd, 1);
+-	    sdev->cls = class_create(THIS_MODULE, MA_CHR_DEV_NAME);
+-	    if (IS_ERR(sdev->cls)) {
+-		  MALOGE("class_create");
+-		  return -1;
+-	    }
+-	    sdev->dev = device_create(sdev->cls, NULL, sdev->idd, NULL, MA_CHR_FILE_NAME);
+-	    ret = IS_ERR(sdev->dev) ? PTR_ERR(sdev->dev) : 0;
+-	    if(ret){
+-	       	MALOGE("device_create");
+-	    }
+-	    //MALOGF("end");
+-        return 0;
+-}
+-
+-static int deinit_file_node(void)
+-{
+-    cdev_del(sdev->chd);
+-    device_destroy(sdev->cls, sdev->idd);
+-	unregister_chrdev_region(sdev->idd, 1);
+-    return 0;
+-}
+-
+-static int init_interrupt(void)
+-{
+-    const char*tname = MA_EINT_NAME;
+-    irq = mas_get_irq(&smas->spi->dev);
+-    if(irq<=0){
+-        ret = irq;
+-        MALOGE("mas_get_irq");
+-    }
+-#ifdef DOUBLE_EDGE_IRQ
+-	ret = request_irq(irq, mas_interrupt, IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING, tname, NULL);
+-#else
+-    ret = request_irq(irq, mas_interrupt, IRQF_TRIGGER_RISING, tname, NULL);
+-#endif
+-	if(ret<0){
+-        MALOGE("request_irq");
+-    }
+-    enable_irq_wake(irq);
+-    return ret;
+-}
+-static int deinit_interrupt(void)
+-{
+-    disable_irq(irq);
+-    free_irq(irq, NULL);
+-    return 0;
+-}
+-
+-
+-static int init_vars(void)
+-{
+-    sdev = kmalloc(sizeof(struct fprint_dev), GFP_KERNEL);
+-    smas = kmalloc(sizeof(struct fprint_spi), GFP_KERNEL);
+-    stxb = (u8*)__get_free_pages(GFP_KERNEL, get_order(IMAGE_DMA_SIZE));
+-    srxb = (u8*)__get_free_pages(GFP_KERNEL, get_order(IMAGE_DMA_SIZE));
+-    
+-    if (sdev==NULL || smas==NULL || stxb==NULL || srxb==NULL) {
+-        MALOGW("smas kmalloc failed.");
+-        if(sdev!=NULL) kfree(sdev);
+-        if(smas!=NULL) kfree(smas);
+-        if(stxb!=NULL) free_pages((unsigned long)stxb, get_order(IMAGE_DMA_SIZE));
+-        if(srxb!=NULL) free_pages((unsigned long)srxb, get_order(IMAGE_DMA_SIZE));
+-        return -ENOMEM;
+-    }
+-
+-    memset(stxb,0x00,get_order(IMAGE_DMA_SIZE));
+-    memset(srxb,0x00,get_order(IMAGE_DMA_SIZE));
+-
+-#ifdef CONFIG_PM_WAKELOCKS
+-    //wakeup_source_init(&gProcessWakeLock, "microarray_process_wakelock");
+-	//wakeup_source_add(&gProcessWakeLock, "microarray_process_wakelock");
+-	gProcessWakeLock = wakeup_source_register(NULL,"microarray_process_wakelock");
+-#else
+-    wake_lock_init(&gProcessWakeLock, WAKE_LOCK_SUSPEND, "microarray_process_wakelock");
+-#endif
+-
+-    INIT_WORK(&gWork, mas_work);
+-    gWorkq = create_singlethread_workqueue("mas_workqueue");
+-    if (!gWorkq) {
+-        MALOGW("create_single_workqueue error!");
+-        return -ENOMEM;
+-    }
+-    return 0;
+-}
+-static int deinit_vars(void)
+-{
+-    destroy_workqueue(gWorkq);
+-    //wake_lock_destroy(&gProcessWakeLock);
+-	wakeup_source_unregister(gProcessWakeLock);
+-    return 0;
+-}
+-
+-static int init_spi(struct spi_device *spi){
+-    smas->spi = spi;
+-    smas->spi->max_speed_hz = SPI_SPEED;
+-    spi_setup(spi);
+-    INIT_LIST_HEAD(&smas->dev_entry);
+-    return 0;
+-}
+-
+-static int deinit_spi(struct spi_device *spi){
+-    smas->spi = NULL;
+-    return 0;
+-}
+-/*
+- * init_connect function to check whether the chip is microarray's 
+- * @return 0 not 1 yes
+- * param void
+- */
+-int init_connect(void){
+-    int i;
+-    MALOGD("start");
+-    for(i=0; i<4; i++){
+-    	stxb[0] = 0x8c;
+-    	stxb[1] = 0xff;
+-    	stxb[2] = 0xff;
+-    	stxb[3] = 0xff;
+-#ifdef TEE_ID_COMPATIBLE_TRUSTKERNEL
+-        mas_tee_spi_transfer(stxb, srxb, 4);
+-#else
+-    	mas_sync(stxb, srxb, 4);
+-#endif
+-    	msleep(8);
+-        stxb[0] = 0x00;
+-        stxb[1] = 0xff;
+-        stxb[2] = 0xff;
+-        stxb[3] = 0xff;
+-#ifdef TEE_ID_COMPATIBLE_TRUSTKERNEL
+-        ret = mas_tee_spi_transfer(stxb, srxb, 4);
+-#else
+-    	ret = mas_sync(stxb, srxb, 4);
+-#endif
+-        if(ret!=0) MALOGW("do init_connect failed!");
+-		printk("guq srxb[3] = %d srxb[2] = %d\n", srxb[3], srxb[2]);
+-        if(srxb[3] == 0x41 || srxb[3] == 0x45) return 1;
+-    }
+-    MALOGD("end");
+-    return 0;   
+-}
+-
+-
+-int deinit_connect(void){
+-	mas_free_dts_info();
+-    return 0;   
+-}
+-
+-static int mas_fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data){
+-	struct fb_event *evdata = data;
+-	unsigned int blank;
+-	if(event != FB_EVENT_BLANK) {
+-		return 0;
+-	}
+-	blank = *(int *)evdata->data;
+-	switch(blank){
+-		case FB_BLANK_UNBLANK:
+-			is_screen_on = 1;
+-			break;
+-		case FB_BLANK_POWERDOWN:
+-			is_screen_on = 0;
+-			break;
+-		default:
+-			break;
+-	}
+-	screen_flag = 1;
+-	wake_up(&screenwaitq);
+-	return 0;
+-}
+-
+-static int init_notifier_call(void);
+-static int deinit_notifier_call(void);
+-
+-static int init_notifier_call(){
+-	notifier.notifier_call = mas_fb_notifier_callback;
+-	fb_register_client(&notifier);
+-	is_screen_on = 1;
+-	return 0;
+-}
+-
+-static int deinit_notifier_call(){
+-	fb_unregister_client(&notifier);
+-	return 0;
+-}
+-
+-int mas_plat_probe(struct platform_device *pdev) {
+-    MALOGD("start");
+-    ret = mas_finger_get_gpio_info(pdev);
+-    if(ret){
+-        MALOGE("mas_plat_probe do mas_finger_get_gpio_info");
+-    }
+-    ret = mas_finger_set_gpio_info(1);
+-    if(ret){
+-        MALOGE("mas_plat_probe do mas_finger_set_gpio_info");
+-    }
+-    MALOGD("end");
+-    return ret;
+-}
+-
+-int mas_plat_remove(struct platform_device *pdev) {
+-    mas_finger_set_gpio_info(0);
+-    return 0;
+-} 
+-
+-
+-int mas_probe(struct spi_device *spi) {
+-
+-    int ret = 0;
+-
+-    MALOGD("start");
+-
+-	mas_do_some_for_probe(spi);
+-	ret = init_vars(); 
+-    if(ret){
+-        goto err1;
+-    }
+-
+-    MALOGD("start3333");
+-    ret = init_spi(spi);
+-    if(ret){
+-        goto err2;
+-    }
+-#ifdef READ_CHIP_ID
+-    mas_enable_spi_clock(smas->spi); 
+-    ret = init_connect();
+-    mas_disable_spi_clock(smas->spi);
+-	
+-
+-	if(ret == 0){//not chip 
+-        goto err3;
+-    } else {
+-#ifdef TEE_ID_COMPATIBLE_MICROTRUST
+-	    struct TEEC_UUID vendor_uuid = {0xedcf9395, 0x3518, 0x9067, { 0x61, 0x4c, 0xaf, 0xae, 0x29, 0x09, 0x77, 0x5b }};
+-	    //memcpy(&uuid_ta, &vendor_uuid, sizeof(struct TEEC_UUID));
+-		memcpy(&uuid_fp, &vendor_uuid, sizeof(struct TEEC_UUID));
+-#endif		
+-	}
+-#else
+-	ret = 0;
+-#endif
+-
+-   MALOGD("start11111");
+-
+-   
+-   ret = init_interrupt();
+-   if(ret < 0){
+-       goto err4;
+-   }
+-
+-   MALOGD("start22222");
+-   ret = init_file_node(); 
+-   if(ret){
+-       goto err5;
+-   }
+-
+-    mas_set_input();
+-    MALOGF("end");
+-   	ret = init_notifier_call();
+-	if(ret != 0){
+-		ret = -ENODEV;
+-		goto err6;
+-	}
+-
+-	
+-    MALOGD("end1111");
+-    return ret;
+-
+-err6:
+-	deinit_notifier_call();
+-err5:
+-    deinit_file_node();
+-err4:
+-    deinit_interrupt();
+-#ifdef READ_CHIP_ID
+-err3:
+-    deinit_connect(); 
+-#endif
+-err2:
+-    deinit_spi(spi);
+-err1:
+-    deinit_vars();
+-
+-    return ret;
+-}
+-
+-int mas_remove(struct spi_device *spi) {
+-    deinit_file_node();
+-    deinit_interrupt();
+-    deinit_vars();
+-    return 0;
+-}
+-
+-
+-static int __init mas_init(void)
+-{
+-    int ret = 0;
+-    MALOGF("start");
+-    compatible = 1;
+-    ret = mas_get_platform();
+-    if(ret){
+-	   MALOGE("mas_get_platform");
+-    }
+-    return ret;
+-}
+-
+-static void __exit mas_exit(void)
+-{
+-}
+-
+-late_initcall_sync(mas_init);
+-module_exit(mas_exit);
+-
+-MODULE_AUTHOR("Microarray");
+-MODULE_DESCRIPTION("Driver for microarray fingerprint sensor");
+-MODULE_LICENSE("GPL");
+diff --git a/drivers/input/fingerprint/microarray_fp/madev.h b/drivers/input/fingerprint/microarray_fp/madev.h
+deleted file mode 100644
+index bed555c65a76..000000000000
+--- a/drivers/input/fingerprint/microarray_fp/madev.h
++++ /dev/null
+@@ -1,236 +0,0 @@
+-/* Copyright (C) MicroArray
+- * MicroArray Fprint Driver Code * madev.h
+- * Date: 2017-3-15
+- * Version: v4.0.06 
+- * Author: guq
+- * Contact: guq@microarray.com.cn
+- */
+-
+-#ifndef __MADEV_H_
+-#define __MADEV_H_
+- 
+-// #define CONFIG_PM_WAKELOCKS
+-
+-//settings macro
+-#define MTK   			//[MTK|QUALCOMM|SPRD|X86]
+-
+-//#define READ_CHIP_ID	//detect the chip id when defined
+-
+-#define MALOGD_LEVEL	KERN_EMERG     //[KERN_DEBUG|KERN_EMERG] usually, the debug level is used for the release version
+-
+-#define MA_CHR_FILE_NAME 	"madev0"  //do not neeed modify usually 
+-#define MA_CHR_DEV_NAME 	"madev"	  //do not neeed modify usually 
+-
+-#define MA_EINT_NAME            "mediatek,finger_print-eint"
+-
+-
+-//#define DOUBLE_EDGE_IRQ
+-
+-//#define COMPATIBLE_VERSION3
+-
+-//key define   just modify the KEY_FN_* for different platform
+-#define FINGERPRINT_SWIPE_UP 			KEY_FN_F1//827
+-#define FINGERPRINT_SWIPE_DOWN 			KEY_FN_F2//828
+-#define FINGERPRINT_SWIPE_LEFT 			KEY_FN_F3//829
+-#define FINGERPRINT_SWIPE_RIGHT 		KEY_FN_F4//830
+-#define FINGERPRINT_TAP 				KEY_FN_F9//	831
+-#define FINGERPRINT_DTAP				KEY_FN_F6// 	832
+-#define FINGERPRINT_LONGPRESS 			KEY_FN_F7//833
+-
+-//key define end
+-
+-
+-//old macro
+-#define SPI_SPEED 	(4*1000000) 	//120/121:10M, 80/81:6M
+-
+-//表面类型
+-#define	COVER_T		1
+-#define COVER_N		2
+-#define COVER_M		3
+-#define COVER_NUM	COVER_N
+-
+-//指纹类型
+-#define AFS120	0x78
+-//#define AFS80 	0x50
+-
+-#define FBUF 	(32*1024)
+-
+-#if defined(AFS120)
+-	#define W   	120   //宽
+-	#define H   	120   //高
+-	#define WBUF	121
+-#elif defined(AFS80)
+-	#define W   	80    //宽
+-	#define H   	192   //高
+-	#define WBUF	81
+-	#define FIMG	(W*H)
+-#endif
+-
+-//settings macro end
+-#include <linux/poll.h>
+-#include <linux/notifier.h>
+-#include <linux/fb.h>
+-//this two head file for the screen on/off test
+-#include <linux/freezer.h>
+-
+-#include <asm/ioctl.h>
+-#include <linux/init.h>
+-#include <linux/module.h>
+-#include <linux/fs.h>
+-#include <linux/device.h>
+-#include <linux/mutex.h>
+-#include <linux/slab.h>
+-#include <linux/compat.h>
+-#include <linux/interrupt.h>
+-#include <linux/workqueue.h>
+-#include <linux/kthread.h>
+-#include <linux/sched.h>
+-#include <linux/wait.h>
+-#include <linux/time.h>
+-#include <linux/input.h>
+-#include <linux/types.h>
+-#include <linux/cdev.h>
+-#include <linux/platform_device.h>
+-#include <linux/delay.h>
+-#include <asm/uaccess.h>
+-#include <linux/of.h>
+-#include <linux/of_irq.h>
+-#include <linux/gpio.h>
+-#include <linux/spi/spi.h>
+-#include <linux/ioctl.h>
+-//#include <linux/wakelock.h>
+-//#include <linux/pm_wakeup.h>
+-
+-#ifdef CONFIG_PM_WAKELOCKS
+-#include <linux/pm_wakeup.h>
+-#else
+-#include <linux/wakelock.h>
+-#endif
+-
+-#include <linux/mm.h>
+-#include "ioctl_cmd.h"
+-
+-#ifdef MTK
+-#include "mtk-settings.h"
+-#elif defined QUALCOMM
+-#include "qualcomm-settings.h"
+-#elif defined SPRD
+-#include "sprd-settings.h"
+-#elif defined X86
+-#include "x86-settings.h"
+-#endif
+-
+-
+-//value define
+- //fprint_spi struct use to save the value
+-struct fprint_spi {
+-    u8 do_what;             //工作内容
+-    u8 f_wake;              //唤醒标志  
+-    int value;              
+-    volatile u8 f_irq;      //中断标志
+-    volatile u8 u1_flag;    //reserve for ours thread interrupt
+-    volatile u8 u2_flag;    //reserve for ours thread interrupt
+-    volatile u8 f_repo;     //上报开关  
+-    spinlock_t spi_lock;
+-    struct spi_device *spi;
+-    struct list_head dev_entry;
+-    struct spi_message msg;
+-    struct spi_transfer xfer;
+-    struct input_dev *input;
+-    struct work_struct work;
+-    struct workqueue_struct *workq;
+-#ifdef CONFIG_HAS_EARLYSUSPEND
+-    struct early_suspend suspend;
+-#endif
+-
+-#ifdef CONFIG_PM_WAKELOCKS
+-struct wakeup_source wl;
+-#else
+-struct wake_lock wl;
+-#endif
+-};
+-//end
+-
+-struct fprint_dev {
+-    dev_t idd;          
+-    int major;          
+-    int minor;
+-    struct cdev *chd;
+-    struct class *cls;
+-    struct device *dev;
+-};
+-
+-
+-//function define
+-
+-//extern the settings.h function 
+-extern void mas_select_transfer(struct spi_device *spi, int len);
+-extern int mas_finger_get_gpio_info(struct platform_device *pdev);
+-extern int mas_finger_set_gpio_info(int cmd);
+-extern void mas_enable_spi_clock(struct spi_device *spi);
+-extern void mas_disable_spi_clock(struct spi_device *spi);
+-extern unsigned int mas_get_irq(struct device *dev);
+-extern int mas_get_platform(void);
+-extern int mas_remove_platform(void);
+-extern void ma_spi_change(struct spi_device *spi, unsigned int speed, int flag);
+-extern int mas_get_interrupt_gpio(unsigned int index);
+-extern int mas_switch_power(unsigned int on_off);
+-extern int mas_do_some_for_probe(struct spi_device *spi);
+-//end
+-
+-//use for the log print
+-#define MALOG_TAG "MAFP_"
+-//#define MALOGE(x) printk(KERN_ERR "%s%s: error log! the function %s is failed, ret = %d\n", MALOG_TAG, __func__, x, ret);  	//error log
+-//#define MALOGF(x) printk(MALOGD_LEVEL "%s%s: debug log! %s!\n", MALOG_TAG, __func__, x);										//flag log
+-//#define MALOGD(x) MALOGF(x)																									//debug log
+-//#define MALOGW(x) printk(KERN_WARNING "%s%s: warning log! the function %s's ret = %d\n", MALOG_TAG, __func__,x, ret);			//warning log
+-//use for the log print
+-
+-#define MALOGD(fmt, args...) do{printk(KERN_ERR "<mafp>-dbg-[%04d]-[@%s]" fmt "\n", __LINE__, __FUNCTION__, ##args);}while(0)
+-#define MALOGE(fmt, args...) do{printk(KERN_ERR "<mafp>-err-[%04d]-[@%s]" fmt "\n", __LINE__, __FUNCTION__, ##args);}while(0)
+-#define MALOGF(x)            do{printk(KERN_ERR "<mafp>-fun-[%04d]-[@%s] is called!\n", __LINE__, __FUNCTION__);}while(0)
+-#define MALOGW(fmt, args...) do{printk(KERN_ERR "<mafp>-warn-[%04d]-[@%s]" fmt "\n", __LINE__, __FUNCTION__, ##args);}while(0)
+-
+-
+-/**
+- *	the old ioctl command, compatible for the old version 
+- */
+-//ioctl cmd
+-#ifdef COMPATIBLE_VERSION3
+-#define IOCTL_DEBUG			0x100	//调试信息 			//debug message
+-#define IOCTL_IRQ_ENABLE	0x101	//中断使能 			//enable interrupt
+-#define IOCTL_SPI_SPEED   	0x102	//SPI速度 			//spi speed
+-#define IOCTL_READ_FLEN		0x103	//读帧长度(保留)		//the length of one frame
+-#define IOCTL_LINK_DEV		0x104	//连接设备(保留)		//connect the device
+-#define IOCTL_COVER_NUM		0x105	//材料编号			//the index of the material
+-#define IOCTL_GET_VDATE		0x106	//版本日期			//the date fo the version
+-
+-#define IOCTL_CLR_INTF		0x110	//清除中断标志
+-#define IOCTL_GET_INTF		0x111	//获取中断标志
+-#define IOCTL_REPORT_FLAG	0x112 	//上报标志
+-#define IOCTL_REPORT_KEY	0x113	//上报键值
+-#define IOCTL_SET_WORK		0x114	//设置工作
+-#define IOCTL_GET_WORK		0x115	//获取工作
+-#define IOCTL_SET_VALUE		0x116	//设值
+-#define IOCTL_GET_VALUE		0x117	//取值
+-#define IOCTL_TRIGGER		0x118	//自触发
+-#define IOCTL_WAKE_LOCK		0x119	//唤醒上锁
+-#define IOCTL_WAKE_UNLOCK	0x120	//唤醒解锁
+-
+-#define IOCTL_SCREEN_ON		0x121
+-
+-#define IOCTL_KEY_DOWN		0x121	//按下
+-#define IOCTL_KEY_UP		0x122	//抬起
+-#define IOCTL_SET_X			0x123	//偏移X
+-#define IOCTL_SET_Y			0x124	//偏移Y
+-#define IOCTL_KEY_TAP		0x125	//单击
+-#define IOCTL_KEY_DTAP		0x126	//双击
+-#define IOCTL_KEY_LTAP		0x127	//长按
+-
+-#define IOCTL_ENABLE_CLK    0x128
+-#define TRUE 	1
+-#define FALSE 	0
+-#endif
+-
+-#endif /* __MADEV_H_ */
+-
+diff --git a/drivers/input/fingerprint/microarray_fp/mtk-settings.c b/drivers/input/fingerprint/microarray_fp/mtk-settings.c
+deleted file mode 100644
+index f15cee73cb5a..000000000000
+--- a/drivers/input/fingerprint/microarray_fp/mtk-settings.c
++++ /dev/null
+@@ -1,486 +0,0 @@
+-/* Copyright (C) MicroArray
+- * MicroArray Fprint Driver Code
+- * mtk-settings.c
+- * Date: 2017-3-15
+- * Version: v4.0.06
+- * Author: guq
+- * Contact: guq@microarray.com.cn
+- */
+-
+-#include "mtk-settings.h"
+-
+-#ifdef TEE_ID_COMPATIBLE_TRUSTKERNEL
+-#include <linux/tee_fp.h>
+-#endif
+-static int ret;
+-//pin control sturct data, define using for the dts settings,
+-struct pinctrl *mas_finger_pinctrl;
+-struct pinctrl_state 		*mas_finger_power2v8_on, *mas_finger_power2v8_off, 	//power2v8
+-							*mas_finger_power1v8_on, *mas_finger_power1v8_off,	//power1v8
+-							*mas_finger_eint_on, *mas_finger_eint_off,			//eint
+-							*mas_spi_ck_on, *mas_spi_ck_off,					//for ck
+-							*mas_spi_cs_on, *mas_spi_cs_off,					//for cs
+-							*mas_spi_mi_on, *mas_spi_mi_off,					//for mi
+-							*mas_spi_mo_on, *mas_spi_mo_off,					//for mo
+-							*mas_spi_default;									//same odms only use default to setting the dts
+-static struct device_node *node;
+-
+-static unsigned int finger_int_pin;
+-
+-/**
+- *    the platform struct start,for getting the platform device to set gpio state
+- */
+-//#ifdef CONFIG_OF
+-static struct of_device_id sof_match[] = {
+-        { .compatible = MA_DTS_NAME, },						//this name is used for matching the dts device for settings the gpios
+-};
+-static struct of_device_id sof_dev_match[] = {
+-        { .compatible = "microarray,microarray-fp", },						//this name is used for matching the dts device for settings the gpios
+-};
+-MODULE_DEVICE_TABLE(of, sof_match);
+-MODULE_DEVICE_TABLE(of, sof_dev_match);
+-//#endif
+-static struct platform_driver spdrv = {
+-        .probe    = mas_plat_probe,
+-        .remove  = mas_plat_remove,
+-        .driver = {
+-                .name  = MA_DRV_NAME,
+-                .owner = THIS_MODULE,                   
+-//#ifdef CONFIG_OF
+-                .of_match_table = sof_match,
+-//#endif
+-        }
+-};
+-/**
+-  *  the platform struct start,for getting the platform device to set gpio state end
+-  */
+-
+-
+-/**
+- *  the spi struct date start,for getting the spi_device to set the spi clock enable start
+- */
+-
+-struct spi_device_id sdev_id = {MA_DRV_NAME, 0};
+-struct spi_driver sdrv = {
+-        .driver = {
+-                .name = MA_DRV_NAME,
+-                .bus = &spi_bus_type,
+-                .owner = THIS_MODULE,
+-#ifdef CONFIG_OF
+-                .of_match_table = sof_dev_match,
+-#endif
+-        },
+-        .probe = mas_probe,
+-        .remove = mas_remove,
+-        .id_table = &sdev_id,
+-};
+-
+-#ifdef TEE_ID_COMPATIBLE_TRUSTKERNEL
+-//driver end
+-static struct mt_chip_conf smt_conf = {
+-    .setuptime=15,
+-    .holdtime=15,
+-    .high_time=15, // 10--6m 15--4m 20--3m 30--2m [ 60--1m 120--0.5m  300--0.2m]
+-    .low_time=15,
+-    .cs_idletime=15,
+-    .ulthgh_thrsh=0,
+-    .cpol=0,
+-    .cpha=0,
+-    .rx_mlsb=SPI_MSB,
+-    .tx_mlsb=SPI_MSB,
+-    .tx_endian=0,
+-    .rx_endian=0,
+-    .com_mod=FIFO_TRANSFER,
+-    .pause=0,
+-    .finish_intr=5,
+-    .deassert=0,
+-    .ulthigh=0,
+-    .tckdly=0,
+-};
+-#endif
+-
+-struct spi_board_info smt_info[] __initdata = {
+-        [0] = {
+-                .modalias = MA_DRV_NAME,
+-                .max_speed_hz = (4*1000000),
+-                .bus_num = 0,
+-                .chip_select = 0,
+-                .mode = SPI_MODE_0,
+-                //.controller_data = &smt_conf,
+-        },
+-};
+-//device end
+-
+-/**
+- *  the spi struct date start,for getting the spi_device to set the spi clock enable end
+- */
+-
+-
+-void mas_select_transfer(struct spi_device *spi, int len) {
+-  /*  static int mode = -1;
+-    int tmp = len>32? DMA_TRANSFER: FIFO_TRANSFER;
+-    struct mt_chip_conf *conf = NULL;
+-    if(tmp!=mode) {
+-        conf = (struct mt_chip_conf *) spi->controller_data;
+-        conf->com_mod = tmp;
+-        spi_setup(spi);
+-        mode = tmp;
+-    }*/
+-}
+-
+-/*
+- *  set spi speed, often we must check whether the setting is efficient
+- */
+-
+-void ma_spi_change(struct spi_device *spi, unsigned int  speed, int flag)
+-{
+-   /* struct mt_chip_conf *mcc = (struct mt_chip_conf *)spi->controller_data;
+-    if(flag == 0) { 
+-        mcc->com_mod = FIFO_TRANSFER;
+-    } else {
+-        mcc->com_mod = DMA_TRANSFER;
+-    }   
+-    mcc->high_time = speed;
+-    mcc->low_time = speed;
+-    if(spi_setup(spi) < 0){
+-        MALOGE("change the spi error!\n");
+-    }*/    
+-}
+-
+-
+-int mas_do_some_for_probe(struct spi_device *spi){
+-	return 0;
+-}
+-
+-
+-int mas_get_platform(void) {
+-    MALOGD("start!");
+-	ret = platform_driver_register(&spdrv);
+-	if(ret){
+-		MALOGE("platform_driver_register");
+-	}
+-    /*MALOGD("start board info");
+-	ret = spi_register_board_info(smt_info, ARRAY_SIZE(smt_info));
+-	if(ret){
+-		MALOGE("spi_register_board_info");
+-	}*/
+-  
+-    MALOGD("start register spi");
+-	ret = spi_register_driver(&sdrv);
+-	if(ret) {
+-		MALOGE("spi_register_driver");
+-	}
+-	return ret;
+-}
+-
+-int mas_remove_platform(void){
+-	spi_unregister_driver(&sdrv);
+-	return 0;
+-}
+-
+-int mas_finger_get_gpio_info(struct platform_device *pdev){
+-    MALOGD("start!");
+-	node = of_find_compatible_node(NULL, NULL, MA_DTS_NAME);
+-    //pdev = of_find_device_by_node(node);
+-	mas_finger_pinctrl = devm_pinctrl_get(&pdev->dev);
+-	if (IS_ERR(mas_finger_pinctrl)) {
+-		ret = PTR_ERR(mas_finger_pinctrl);
+-		dev_err(&pdev->dev, "mas_finger_pinctrl cannot find pinctrl\n");
+-		return ret;
+-	}
+-
+-/**		this is the demo, setup follow the requirement
+- *		mas_finger_eint_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_int_as_int");
+- *		if (IS_ERR(mas_finger_eint_on)) {
+- *			ret = PTR_ERR(mas_finger_eint_on);
+- *			dev_err(&pdev->dev, " Cannot find mas_finger pinctrl mas_finger_eint_on!\n");
+- *			return ret;
+- *		}
+- *      if needed, change the dts label and the pinctrl for the other gpio
+- */
+- 	
+-
+- 	mas_finger_power2v8_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_power_en1");
+-	if (IS_ERR(mas_finger_power2v8_on)) {
+-		ret = PTR_ERR(mas_finger_power2v8_on);
+-		dev_err(&pdev->dev, " Cannot find mas_finger_power2v8_on pinctrl!\n");
+-		return ret;
+-	}
+- 	mas_finger_power2v8_off = pinctrl_lookup_state(mas_finger_pinctrl, "finger_power_en0");
+-	if (IS_ERR(mas_finger_power2v8_off)) {
+-		ret = PTR_ERR(mas_finger_power2v8_off);
+-		dev_err(&pdev->dev, " Cannot find mas_finger_power2v8_off pinctrl!\n");
+-		return ret;
+-	}
+-
+-	mas_finger_power1v8_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_power_18v_en1");
+-	if (IS_ERR(mas_finger_power1v8_on)) {
+-		ret = PTR_ERR(mas_finger_power1v8_on);
+-		dev_err(&pdev->dev, " Cannot find mas_finger_power1v8_on pinctrl!\n");
+-		return ret;
+-	}
+-
+-	mas_finger_power1v8_off = pinctrl_lookup_state(mas_finger_pinctrl, "finger_power_18v_en0");
+-	if (IS_ERR(mas_finger_power1v8_off)) {
+-		ret = PTR_ERR(mas_finger_power1v8_off);
+-		dev_err(&pdev->dev, " Cannot find mas_finger_power1v8_off pinctrl!\n");
+-		return ret;
+-	}
+-
+- 	mas_spi_mi_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_mi_as_spi0_mi");
+-	if (IS_ERR(mas_spi_mi_on)) {
+-		ret = PTR_ERR(mas_spi_mi_on);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_mi_on pinctrl!\n");
+-		return ret;
+-	}
+- 	mas_spi_mi_off = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_mi_as_gpio");
+-	if (IS_ERR(mas_spi_mi_off)) {
+-		ret = PTR_ERR(mas_spi_mi_off);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_mi_off pinctrl!\n");
+-		return ret;
+-	}
+- 	mas_spi_mo_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_mo_as_spi0_mo");
+-	if (IS_ERR(mas_spi_mo_on)) {
+-		ret = PTR_ERR(mas_spi_mo_on);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_mo_on pinctrl!\n");
+-		return ret;
+-	}
+-
+-	mas_spi_mo_off = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_mo_as_gpio");
+-	if (IS_ERR(mas_spi_mo_off)) {
+-		ret = PTR_ERR(mas_spi_mo_off);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_mo_off!\n");
+-		return ret;
+-	}
+-
+-	mas_spi_ck_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_clk_as_spi0_clk");
+-	if (IS_ERR(mas_spi_ck_on)) {
+-		ret = PTR_ERR(mas_spi_ck_on);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_ck_on pinctrl!\n");
+-		return ret;
+-	}
+-
+-	mas_spi_ck_off = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_clk_as_gpio");
+-	if (IS_ERR(mas_spi_ck_off)) {
+-		ret = PTR_ERR(mas_spi_ck_off);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_ck_off pinctrl !\n");
+-		return ret;
+-	}
+-
+-	mas_spi_cs_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_cs_as_spi0_cs");
+-	if (IS_ERR(mas_spi_cs_on)) {
+-		ret = PTR_ERR(mas_spi_cs_on);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_cs_on pinctrl!\n");
+-		return ret;
+-	}
+-
+-	mas_spi_cs_off = pinctrl_lookup_state(mas_finger_pinctrl, "finger_spi0_cs_as_gpio");
+-	if (IS_ERR(mas_spi_cs_off)) {
+-		ret = PTR_ERR(mas_spi_cs_off);
+-		dev_err(&pdev->dev, " Cannot find mas_spi_cs_off pinctrl!\n");
+-		return ret;
+-	}
+-
+-	mas_finger_eint_on = pinctrl_lookup_state(mas_finger_pinctrl, "finger_int_as_int");
+-	if (IS_ERR(mas_finger_eint_on)) {
+-		ret = PTR_ERR(mas_finger_eint_on);
+-		dev_err(&pdev->dev, " Cannot find mas_finger_eint_on pinctrl!\n");
+-		return ret;
+-	}
+-
+-    MALOGD("end!");
+-        return 0;
+-}
+-
+-void mas_free_dts_info(void)
+-{
+-	if(mas_finger_pinctrl != NULL) devm_pinctrl_put(mas_finger_pinctrl);	
+-}
+-
+-int mas_finger_set_spi(int cmd){
+-//#if 0
+-	switch(cmd)
+-	{
+-		case 0:
+-			if( (!IS_ERR(mas_spi_cs_off)) & (!IS_ERR(mas_spi_ck_off)) & (!IS_ERR(mas_spi_mi_off)) & (!IS_ERR(mas_spi_mo_off)) ){
+-				pinctrl_select_state(mas_finger_pinctrl, mas_spi_cs_off);
+-				pinctrl_select_state(mas_finger_pinctrl, mas_spi_ck_off);
+-				pinctrl_select_state(mas_finger_pinctrl, mas_spi_mi_off);
+-				pinctrl_select_state(mas_finger_pinctrl, mas_spi_mo_off);
+-			}else{
+-				MALOGE("mas_spi_gpio_slect_pinctrl cmd=0 err!");
+-				return -1;
+-			}
+-			break;
+-		case 1:
+-			if( (!IS_ERR(mas_spi_cs_on)) & (!IS_ERR(mas_spi_ck_on)) & (!IS_ERR(mas_spi_mi_on)) & (!IS_ERR(mas_spi_mo_on)) ){
+-				pinctrl_select_state(mas_finger_pinctrl, mas_spi_cs_on);
+-				pinctrl_select_state(mas_finger_pinctrl, mas_spi_ck_on);
+-	        	pinctrl_select_state(mas_finger_pinctrl, mas_spi_mi_on);
+-				pinctrl_select_state(mas_finger_pinctrl, mas_spi_mo_on);
+-			}else{
+-				MALOGE("mas_spi_gpio_slect_pinctrl cmd=1 err!");
+-				return -1;
+-			}
+-			break;
+-	}
+-//#endif
+-	return 0;
+-}
+-
+-
+-void mas_finger_set_reset(int count)
+-{
+-	pinctrl_select_state(mas_finger_pinctrl, mas_finger_power1v8_on);
+-	mdelay(count);
+-	pinctrl_select_state(mas_finger_pinctrl, mas_finger_power1v8_off);
+-}
+-
+-
+-int mas_finger_set_power(int cmd)
+-{
+-
+-	pinctrl_select_state(mas_finger_pinctrl, mas_finger_power2v8_on);
+-#if 0
+-	switch (cmd)
+-		{
+-		case 0 : 		
+-			if( (!IS_ERR(mas_finger_power2v8_off)) & (!IS_ERR(mas_finger_power1v8_off)) ){
+-				pinctrl_select_state(mas_finger_pinctrl, mas_finger_power2v8_off);
+-				//pinctrl_select_state(mas_finger_pinctrl, mas_finger_power1v8_off);
+-			}else{
+-				MALOGE("mas_power_gpio_slect_pinctrl cmd=0 err!");
+-				return -1;
+-			}
+-		break;
+-		case 1 : 		
+-			if( (!IS_ERR(mas_finger_power2v8_on)) & (!IS_ERR(mas_finger_power1v8_on)) ){
+-				pinctrl_select_state(mas_finger_pinctrl, mas_finger_power2v8_on);
+-				//pinctrl_select_state(mas_finger_pinctrl, mas_finger_power1v8_on);
+-			}else{
+-				MALOGE("mas_power_gpio_slect_pinctrl cmd=1 err!");
+-				return -1;
+-			}
+-		break;
+-		}
+-#endif
+-	return 0;
+-}
+-
+-/*
+- * this is a demo function,if the power on-off switch by other way
+- * modify it as the right way
+- * on_off 1 on   0 off
+- */
+-int mas_switch_power(unsigned int on_off){
+-	mas_finger_set_power(on_off);	//use this fuction directly if the dts way
+-	return 0;
+-}
+-
+-int mas_finger_set_eint(int cmd)
+-{
+-	switch (cmd)
+-		{
+-		case 0 : 		
+-			if(!IS_ERR(mas_finger_eint_off)){
+-				pinctrl_select_state(mas_finger_pinctrl, mas_finger_eint_off);
+-			}else{
+-				MALOGE("mas_eint_gpio_slect_pinctrl cmd=0 err!");
+-				return -1;
+-			}		
+-			break;
+-		case 1 : 		
+-			if(!IS_ERR(mas_finger_eint_on)){
+-				pinctrl_select_state(mas_finger_pinctrl, mas_finger_eint_on);
+-			}else{
+-				MALOGE("mas_eint_gpio_slect_pinctrl cmd=1 err!");
+-				return -1;
+-			}
+-			break;
+-		}
+-	return 0;
+-}
+-
+-
+-int mas_finger_set_gpio_info(int cmd){
+-	ret = 0;
+-    MALOGD("start!");
+-	ret |= mas_finger_set_spi(cmd);
+-	ret |= mas_finger_set_power(cmd);
+-//	ret |= mas_finger_set_eint(cmd);
+-    MALOGD("end!");
+-	return ret;
+-}
+-
+-void mas_enable_spi_clock(struct spi_device *spi){
+- 
+-#if defined(TEE_ID_COMPATIBLE_TRUSTKERNEL) || defined(TEE_ID_COMPATIBLE_MICROTRUST)  
+-#ifdef CONFIG_MTK_CLKMGR
+-    enable_clock(MT_CG_PERI_SPI0, "spi");
+-#elif defined(MT6797)
+-    mt_spi_enable_clk(spi_master_get_devdata(spi->master)); 
+-#else
+-    mt_spi_enable_master_clk(spi);
+-	//enable_clk();
+-#endif
+-#endif
+-	
+-}
+-
+-void mas_disable_spi_clock(struct spi_device *spi){
+-
+-#if defined(TEE_ID_COMPATIBLE_TRUSTKERNEL) || defined(TEE_ID_COMPATIBLE_MICROTRUST)
+-#ifdef CONFIG_MTK_CLKMGR
+-    disable_clock(MT_CG_PERI_SPI0, "spi");
+-#elif defined(MT6797)
+-    mt_spi_disable_clk(spi_master_get_devdata(spi->master)); 
+-#else
+-    mt_spi_disable_master_clk(spi);
+-	//disable_clk();
+-#endif
+-#endif
+-
+-}
+-
+-int mas_tee_spi_transfer(u8 *txb, u8 *rxb, int len) {
+-    int val = 0;
+-	
+-#ifdef TEE_ID_COMPATIBLE_TRUSTKERNEL
+-	val = tee_spi_transfer(&smt_conf,sizeof(struct mt_chip_conf),txb, rxb, 4);
+-#endif
+-
+-    return val;
+-}
+-
+-unsigned int mas_get_irq(struct device *dev){
+-    int irq_num;
+-    finger_int_pin = of_get_named_gpio_flags(dev->of_node,
+-                      "fingerprint,touch-int-gpio", 0, NULL);
+-    if (!gpio_is_valid(finger_int_pin)){
+-	    MALOGE("invalid irq gpio!");
+-		return -EINVAL;
+-    }
+-    gpio_direction_input(finger_int_pin);
+-    irq_num = gpio_to_irq(finger_int_pin);
+-    return irq_num;
+-
+-}
+-
+-/*
+- * this function used for check the interrupt gpio state
+- * @index 0 gpio level 1 gpio mode, often use 0
+- * @return 0 gpio low 1 gpio high if index = 1,the return is the gpio mode
+- *  		under 0  the of_property_read_u32_index return errno,check the dts as below:
+- * last but not least use this function must checkt the label on dts file, after is an example:
+- * ma_finger: ma_finger{
+- *		compatible = "mediatek,afs120x";
+- *		finger_int_pin = <100 0>;
+- * }
+- */
+-int mas_get_interrupt_gpio(unsigned int index){
+-	int val;
+-	val = gpio_get_value(finger_int_pin);
+-	//printk if need
+-	return val;
+-}
+-
+diff --git a/drivers/input/fingerprint/microarray_fp/mtk-settings.h b/drivers/input/fingerprint/microarray_fp/mtk-settings.h
+deleted file mode 100644
+index 41704d8f1fcb..000000000000
+--- a/drivers/input/fingerprint/microarray_fp/mtk-settings.h
++++ /dev/null
+@@ -1,220 +0,0 @@
+-/* Copyright (C) MicroArray
+- * MicroArray Fprint Driver Code
+- * mtk-settings.h
+- * Date: 2017-3-15
+- * Version: v4.0.06
+- * Author: guq
+- * Contact: guq@microarray.com.cn
+- */
+-
+-#ifndef __MTK_SETTINGS_H_
+-#define __MTK_SETTINGS_H_
+-
+-
+-
+-#include <linux/platform_device.h>
+-#include <linux/gpio.h>
+-#include <linux/delay.h>
+-#include <linux/device.h>
+-#include <linux/of_irq.h>
+-#include <linux/of.h>
+-#include <linux/of_address.h>
+-#include <linux/of_platform.h>
+-#include <linux/of_gpio.h>
+-#include "madev.h"
+-#include <linux/spi/spi.h>
+-//#include <linux/wakelock.h>
+-#include <linux/init.h>
+-#include <linux/module.h>
+-#include <linux/fs.h>
+-#include <linux/device.h>
+-#include <linux/mutex.h>
+-#include <linux/slab.h>
+-#include <linux/compat.h>
+-#include <linux/spi/spi.h>
+-#include <linux/interrupt.h>
+-#include <linux/workqueue.h>
+-#include <linux/kthread.h>
+-#include <linux/sched.h>
+-#include <linux/wait.h>
+-#include <linux/time.h>
+-#include <linux/input.h>
+-#include <linux/types.h>
+-#include <linux/cdev.h>
+-#include <linux/platform_device.h>
+-#include <linux/delay.h>
+-#include <asm/uaccess.h>
+-#include <linux/gpio.h>
+-#include <linux/spi/spi.h>
+-////lude "mt_spi.h"
+-//#include <linux/wakelock.h>
+-////lude <mt-plat/mt_gpio.h>
+-#ifdef CONFIG_MTK_CLKMGR
+-#include "mach/mt_clkmgr.h"
+-#endif
+-//macro settings
+-#include <linux/clk.h>
+-
+-#define MA_DRV_NAME             "madev"
+-
+-#define MA_DTS_NAME            "mediatek,microarray_finger"
+-
+-#define MA_EINT_DTS_NAME        "mediatek,microarray_finger"
+-
+-#define MA_INT_PIN_LABEL		"finger_int_pin"
+-//#define TEE_ID_COMPATIBLE_TRUSTKERNEL		//TrustKernel TEE
+-//#define TEE_ID_COMPATIBLE_MICROTRUST		//MicroTrust  TEE
+-//macro settings end
+-
+-
+-
+-//call madev function
+-extern int mas_plat_probe(struct platform_device *pdev);
+-extern int mas_plat_remove(struct platform_device *pdev);
+-
+-extern int mas_probe(struct spi_device *spi);
+-extern int mas_remove(struct spi_device *spi);
+-
+-/* add for spi cls ctl start */
+-#ifdef CONFIG_SPI_MT65XX
+-
+-#include <linux/spi/spi.h>
+-#include <linux/types.h>
+-#include <linux/io.h>
+-
+-enum spi_sample_sel {
+-    POSEDGE,
+-    NEGEDGE
+-};
+-enum spi_cs_pol {
+-    ACTIVE_LOW,
+-    ACTIVE_HIGH
+-};
+-
+-enum spi_cpol {
+-    SPI_CPOL_0,
+-    SPI_CPOL_1
+-};
+-
+-enum spi_cpha {
+-    SPI_CPHA_0,
+-    SPI_CPHA_1
+-};
+-
+-enum spi_mlsb {
+-    SPI_LSB,
+-    SPI_MSB
+-};
+-
+-enum spi_endian {
+-    SPI_LENDIAN,
+-    SPI_BENDIAN
+-};
+-
+-enum spi_transfer_mode {
+-    FIFO_TRANSFER,
+-    DMA_TRANSFER,
+-    OTHER1,
+-    OTHER2,
+-};
+-
+-enum spi_pause_mode {
+-    PAUSE_MODE_DISABLE,
+-    PAUSE_MODE_ENABLE
+-};
+-enum spi_finish_intr {
+-    FINISH_INTR_DIS,
+-    FINISH_INTR_EN,
+-};
+-
+-enum spi_deassert_mode {
+-    DEASSERT_DISABLE,
+-    DEASSERT_ENABLE
+-};
+-
+-enum spi_ulthigh {
+-    ULTRA_HIGH_DISABLE,
+-    ULTRA_HIGH_ENABLE
+-};
+-
+-enum spi_tckdly {
+-    TICK_DLY0,
+-    TICK_DLY1,
+-    TICK_DLY2,
+-    TICK_DLY3
+-};
+-
+-struct mt_chip_conf {
+-    u32 setuptime;
+-    u32 holdtime;
+-    u32 high_time;
+-    u32 low_time;
+-    u32 cs_idletime;
+-    u32 ulthgh_thrsh;
+-    enum spi_sample_sel sample_sel;
+-    enum spi_cs_pol cs_pol;
+-    enum spi_cpol cpol;
+-    enum spi_cpha cpha;
+-    enum spi_mlsb tx_mlsb;
+-    enum spi_mlsb rx_mlsb;
+-    enum spi_endian tx_endian;
+-    enum spi_endian rx_endian;
+-    enum spi_transfer_mode com_mod;
+-    enum spi_pause_mode pause;
+-    enum spi_finish_intr finish_intr;
+-    enum spi_deassert_mode deassert;
+-    enum spi_ulthigh ulthigh;
+-    enum spi_tckdly tckdly;
+-};
+-
+-#endif 
+-
+-struct mt_spi_t {
+-        struct platform_device *pdev;
+-        void __iomem *regs;
+-        int irq;
+-        int running;
+-        //struct wake_lock wk_lock;
+-        struct mt_chip_conf *config;
+-        struct spi_master *master;
+-
+-        struct spi_transfer *cur_transfer;
+-        struct spi_transfer *next_transfer;
+-
+-        spinlock_t lock;
+-        struct list_head queue;
+-#if !defined(CONFIG_MTK_CLKMGR)
+-        struct clk *clk_main;
+-#endif
+-};
+-void mt_spi_enable_clk(struct mt_spi_t *ms);
+-void mt_spi_disable_clk(struct mt_spi_t *ms);
+-void mt_spi_enable_master_clk(struct spi_device *spidev);
+-void mt_spi_disable_master_clk(struct spi_device *spidev);
+-
+-/* add for spi cls ctl end this func only used in tee enviroment*/
+-//packaging
+-//void mas_enable_spi_clock(struct spi_device *spi);
+-//void mas_diasble_spi_clock(struct spi_device *spi);
+-//packaging end
+-
+-//the interface called by madev
+-void mas_select_transfer(struct spi_device *spi, int len);
+-int mas_finger_get_gpio_info(struct platform_device *pdev);
+-int mas_finger_set_gpio_info(int cmd);
+-void mas_enable_spi_clock(struct spi_device *spi);
+-void mas_disable_spi_clock(struct spi_device *spi);
+-
+-unsigned int mas_get_irq(struct device *dev);
+-int mas_get_platform(void);
+-int mas_remove_platform(void);
+-int mas_power(int cmd);
+-int get_screen(void);
+-void ma_spi_change(struct spi_device *spi, unsigned int speed, int flag);
+-int mas_get_interrupt_gpio(unsigned int index);
+-int mas_switch_power(unsigned int on_off);
+-int mas_do_some_for_probe(struct spi_device *spi);
+-void mas_finger_set_reset(int count);
+-void mas_free_dts_info(void);
+-int mas_tee_spi_transfer(u8 *txb, u8 *rxb, int len);
+-#endif
+diff --git a/drivers/input/hall/Kconfig b/drivers/input/hall/Kconfig
+index 4ef039ab43dc..d8fe7164a35a 100644
+--- a/drivers/input/hall/Kconfig
++++ b/drivers/input/hall/Kconfig
+@@ -3,12 +3,6 @@
+ # hall  sensor drivers configuration
+ #
+ 
+-# menuconfig HALL_DEVICE
+-# 	tristate "hall sensor device support"
+-
+-# if HALL_DEVICE
+ 
+ config HS_MH248
+ 	tristate "hall sensor mh248"
+-
+-# endif
+diff --git a/drivers/input/hall/mh248.c b/drivers/input/hall/mh248.c
+index 3cb70bee92a7..4d2a6fe2d02a 100755
+--- a/drivers/input/hall/mh248.c
++++ b/drivers/input/hall/mh248.c
+@@ -20,10 +20,11 @@
+ #include <linux/workqueue.h>
+ #include <linux/freezer.h>
+ #include <linux/of_gpio.h>
+-#include <linux/sensor-dev.h>
++#include <linux/gpio/consumer.h>
++#include <linux/gpio/machine.h>
+ #include <linux/fb.h>
+ #include <linux/notifier.h>
+-#include <linux/rk_keys.h>
++#include "../../gpio/gpiolib-of.h"
+ #include <linux/input.h>
+ 
+ struct mh248_para {
+@@ -103,10 +104,10 @@ static int hall_mh248_probe(struct platform_device *pdev)
+ {
+ 	struct device_node *np = pdev->dev.of_node;
+ 	struct mh248_para *mh248;
+-	enum of_gpio_flags irq_flags;
++	unsigned long irq_flags;
+ 	int hallactive = 0;
+ 	int ret = 0;
+-
++	struct gpio_desc *desc;
+ 	mh248 = devm_kzalloc(&pdev->dev, sizeof(*mh248), GFP_KERNEL);
+ 	if (!mh248)
+ 		return -ENOMEM;
+@@ -114,12 +115,14 @@ static int hall_mh248_probe(struct platform_device *pdev)
+ 	g_mh248 = mh248;
+ 	mh248->dev = &pdev->dev;
+ 	mh248->is_open = true;
+-	mh248->gpio_pin = of_get_named_gpio_flags(np, "irq-gpio",
++
++	desc = of_find_gpio(np, "irq-hall-mh248",
+ 						  0, &irq_flags);
+-	if (!gpio_is_valid(mh248->gpio_pin)) {
+-		dev_err(mh248->dev, "Can not read property irq-gpio\n");
+-		return mh248->gpio_pin;
++	if (IS_ERR(desc)) {
++		dev_err(mh248->dev, "Can not read property irq-hall-mh248\n");
++		return -EINVAL;
+ 	}
++	mh248->gpio_pin = desc_to_gpio(desc);
+ 	mh248->irq = gpio_to_irq(mh248->gpio_pin);
+ 
+ 	of_property_read_u32(np, "hall-active", &hallactive);
+@@ -136,7 +139,7 @@ static int hall_mh248_probe(struct platform_device *pdev)
+ 
+ 	ret = devm_request_threaded_irq(mh248->dev, mh248->irq,
+ 					NULL, hall_mh248_interrupt,
+-					irq_flags | IRQF_NO_SUSPEND | IRQF_ONESHOT,
++					IRQ_TYPE_EDGE_BOTH | IRQF_NO_SUSPEND | IRQF_ONESHOT,
+ 					"hall_mh248", mh248);
+ 	if (ret < 0) {
+ 		dev_err(mh248->dev, "request irq(%d) failed, ret=%d\n",
+diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
+index 21c306398e4b..ce4fa896df15 100644
+--- a/drivers/misc/Kconfig
++++ b/drivers/misc/Kconfig
+@@ -493,6 +493,10 @@ config HISI_HIKEY_USB
+ 	  switching between the dual-role USB-C port and the USB-A host ports
+ 	  using only one USB controller.
+ 
++config USBEN
++	tristate "TVI1432V project usb enable item"
++	default n
++
+ config OPEN_DICE
+ 	tristate "Open Profile for DICE driver"
+ 	depends on OF_RESERVED_MEM
+@@ -593,6 +597,7 @@ source "drivers/misc/ocxl/Kconfig"
+ source "drivers/misc/bcm-vk/Kconfig"
+ source "drivers/misc/cardreader/Kconfig"
+ source "drivers/misc/uacce/Kconfig"
++source "drivers/misc/hc32fx/Kconfig"
+ source "drivers/misc/pvpanic/Kconfig"
+ source "drivers/misc/mchp_pci1xxxx/Kconfig"
+ endmenu
+diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+index 1be02a544dd1..f287ed1480a9 100644
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -60,6 +60,8 @@ obj-$(CONFIG_UACCE)		+= uacce/
+ obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
+ obj-$(CONFIG_HISI_HIKEY_USB)	+= hisi_hikey_usb.o
+ obj-$(CONFIG_HI6421V600_IRQ)	+= hi6421v600-irq.o
++obj-$(CONFIG_USBEN)		+= usb_en.o
++obj-$(CONFIG_MCU_HC32FX)		+= hc32fx/
+ obj-$(CONFIG_OPEN_DICE)		+= open-dice.o
+ obj-$(CONFIG_GP_PCI1XXXX)	+= mchp_pci1xxxx/
+ obj-$(CONFIG_VCPU_STALL_DETECTOR)	+= vcpu_stall_detector.o
+diff --git a/drivers/misc/hc32fx/hc32fx_mcu.c b/drivers/misc/hc32fx/hc32fx_mcu.c
+index 915a25291fdb..2ad1a1352036 100644
+--- a/drivers/misc/hc32fx/hc32fx_mcu.c
++++ b/drivers/misc/hc32fx/hc32fx_mcu.c
+@@ -167,8 +167,7 @@ static struct syscore_ops TH1520_syscore_ops = {
+ 	.shutdown = TH1520_syscore_shutdown,
+ };
+ 
+-static int hc32fx_probe(struct i2c_client *client,
+-			 const struct i2c_device_id *i2c_id)
++static int hc32fx_probe(struct i2c_client *client)
+ {
+ 	int ret;
+ 	struct hc32fx *hc32fx;
+diff --git a/drivers/misc/usb_en.c b/drivers/misc/usb_en.c
+index f6edd01e2436..371e0163889a 100644
+--- a/drivers/misc/usb_en.c
++++ b/drivers/misc/usb_en.c
+@@ -35,7 +35,7 @@ static int usb_en_probe(struct platform_device *pdev)
+ 	}
+ 	priv = usb_priv;
+ 
+-	ret = of_get_named_gpio_flags(node, "host-en-gpio", 0, NULL);
++	ret = of_get_named_gpio(node, "host-en-gpio", 0);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "Can not read property host-en-gpio\n");
+ 	} else {
+@@ -49,7 +49,7 @@ static int usb_en_probe(struct platform_device *pdev)
+ 		}
+ 	}
+ 
+-	ret = of_get_named_gpio_flags(node, "hub-en-gpio", 0, NULL);
++	ret = of_get_named_gpio(node, "hub-en-gpio", 0);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "Can not read property hub-en-gpio\n");
+ 	} else {
+@@ -63,7 +63,7 @@ static int usb_en_probe(struct platform_device *pdev)
+ 		}
+ 	}
+ 
+-	ret = of_get_named_gpio_flags(node, "usb_sw-gpio", 0, NULL);
++	ret = of_get_named_gpio(node, "usb_sw-gpio", 0);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "Can not read property usb_sw-gpio\n");
+ 	} else {
+diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
+index f2541c728ea8..967a41c9aa53 100644
+--- a/drivers/video/Kconfig
++++ b/drivers/video/Kconfig
+@@ -50,7 +50,7 @@ source "drivers/video/fbdev/Kconfig"
+ endmenu
+ 
+ source "drivers/video/backlight/Kconfig"
+-source "drivers/video/lt8911exb/Kconfig"
++
+ 
+ config VGASTATE
+        tristate
+diff --git a/drivers/video/lt8911exb/Kconfig b/drivers/video/lt8911exb/Kconfig
+deleted file mode 100644
+index c60891c1ce3e..000000000000
+--- a/drivers/video/lt8911exb/Kconfig
++++ /dev/null
+@@ -1,9 +0,0 @@
+-
+-
+-config ROCKCHIP_LT8911EXB
+-	tristate "techvision LT8911EXB driver on ROCKCHIP platform"
+-	default y
+-	help
+-	  rockchip LT8911EXB module. MIPI to EDP
+-
+-
+diff --git a/drivers/video/lt8911exb/Makefile b/drivers/video/lt8911exb/Makefile
+deleted file mode 100644
+index b3d53a2dcc78..000000000000
+--- a/drivers/video/lt8911exb/Makefile
++++ /dev/null
+@@ -1 +0,0 @@
+-obj-$(CONFIG_ROCKCHIP_LT8911EXB) += lt8911exb.o
+diff --git a/drivers/video/lt8911exb/lt8911exb.c b/drivers/video/lt8911exb/lt8911exb.c
+deleted file mode 100644
+index b9055aa77470..000000000000
+--- a/drivers/video/lt8911exb/lt8911exb.c
++++ /dev/null
+@@ -1,871 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-
+-#include <linux/module.h>
+-#include <linux/i2c.h>
+-#include <linux/delay.h>
+-#include <linux/slab.h>
+-#include <linux/of_gpio.h>
+-#include <linux/workqueue.h>
+-#include <linux/time.h>
+-#include <linux/fb.h>
+-#include <linux/notifier.h>
+-
+-/* test mode: display color stripe */
+-//#define TEST_PATTERN
+-
+-#if 1
+-#define	LT8911EXB_DBG(x...)   printk(KERN_ERR x)
+-#else
+-#define	LT8911EXB_DBG(x...)
+-#endif
+-
+-enum {
+-	hfp = 0,
+-	hs,
+-	hbp,
+-	hact,
+-	htotal,
+-	vfp,
+-	vs,
+-	vbp,
+-	vact,
+-	vtotal,
+-	pclk_10khz
+-};
+-
+-static int mipi_timing[] = {
+-	140,  /* hfp */
+-	30,   /* hs */
+-	160,  /* hbp */
+-	1920, /* hact */
+-	2250, /* htotal */
+-	18,   /* vfp */
+-	6,    /* vs */
+-	28,   /* vbp */
+-	1080, /* vact */
+-	1132, /* vtotal */
+-	15284 /* pixel_clk / 10000 */
+-};
+-
+-struct lt8911exb {
+-	struct i2c_client *client;
+-	struct notifier_block nb;
+-	struct delayed_work rst_check;
+-
+-	int backlight_pin;
+-	int irq_pin;
+-	int reset_pin;
+-	int enable_pin;
+-	int rst_delay_ms;
+-
+-	u32 edp_lane_cnt;
+-	u32 mipi_lane_cnt;
+-	u32 edp_depth;
+-
+-	bool screen_on;
+-	bool init_done;
+-};
+-
+-static int lt8911exb_i2c_write(struct i2c_client *client,
+-                               uint8_t reg, uint8_t val)
+-{
+-	int ret = -1;
+-	int retries = 0;
+-	uint8_t buf[2] = { reg, val };
+-	struct i2c_msg msg = {
+-		.flags = !I2C_M_RD,
+-		.addr = client->addr,
+-		.len = 2,
+-		.buf = buf,
+-	};
+-
+-	while (retries < 5) {
+-		ret = i2c_transfer(client->adapter, &msg, 1);
+-		if (ret == 1)
+-			return 0;
+-		retries++;
+-	}
+-
+-	LT8911EXB_DBG("%s: write addr 0x%02x error! ret = %d\n",
+-		__func__, reg, ret);
+-	return ret;
+-}
+-
+-static int lt8911exb_i2c_read(struct i2c_client *client, uint8_t reg)
+-{
+-	int ret = -1;
+-	int retries = 0;
+-	uint8_t buf[2] = { reg, 0 };
+-	struct i2c_msg msgs[2];
+-
+-	msgs[0].flags = client->flags;
+-	msgs[0].addr = client->addr;
+-	msgs[0].len = 1;
+-	msgs[0].buf = &buf[0];
+-
+-	msgs[1].flags = client->flags | I2C_M_RD;
+-	msgs[1].addr = client->addr;
+-	msgs[1].len = 1;
+-	msgs[1].buf = &buf[1];
+-
+-	while (retries < 5) {
+-		ret = i2c_transfer(client->adapter, msgs, 2);
+-		if (ret == 2)
+-			return buf[1];
+-		retries++;
+-	}
+-
+-	LT8911EXB_DBG("%s: read addr 0x%02x error! ret = %d\n",
+-		__func__, reg, ret);
+-	return ret;
+-}
+-
+-static void lt8911exb_reset(struct lt8911exb *lt8911exb)
+-{
+-	gpio_set_value(lt8911exb->reset_pin, 0);
+-	msleep(lt8911exb->rst_delay_ms);
+-	gpio_set_value(lt8911exb->reset_pin, 1);
+-	msleep(lt8911exb->rst_delay_ms);
+-}
+-
+-static void lt8911exb_cfg_set_mipi_timing(struct lt8911exb *lt8911exb)
+-{
+-	struct i2c_client *client = lt8911exb->client;
+-
+-	/* lt8911exb MIPI video timing configuration */
+-	lt8911exb_i2c_write(client, 0xff, 0xd0);
+-	lt8911exb_i2c_write(client, 0x0d, (u8)(mipi_timing[vtotal] / 256));
+-	lt8911exb_i2c_write(client, 0x0e, (u8)(mipi_timing[vtotal] % 256));
+-	lt8911exb_i2c_write(client, 0x0f, (u8)(mipi_timing[vact] / 256));
+-	lt8911exb_i2c_write(client, 0x10, (u8)(mipi_timing[vact] % 256));
+-	lt8911exb_i2c_write(client, 0x11, (u8)(mipi_timing[htotal] / 256));
+-	lt8911exb_i2c_write(client, 0x12, (u8)(mipi_timing[htotal] % 256));
+-	lt8911exb_i2c_write(client, 0x13, (u8)(mipi_timing[hact] / 256));
+-	lt8911exb_i2c_write(client, 0x14, (u8)(mipi_timing[hact] % 256));
+-	lt8911exb_i2c_write(client, 0x15, (u8)(mipi_timing[vs] % 256));
+-	lt8911exb_i2c_write(client, 0x16, (u8)(mipi_timing[hs] % 256));
+-	lt8911exb_i2c_write(client, 0x17, (u8)(mipi_timing[vfp] / 256));
+-	lt8911exb_i2c_write(client, 0x18, (u8)(mipi_timing[vfp] % 256));
+-	lt8911exb_i2c_write(client, 0x19, (u8)(mipi_timing[hfp] / 256));
+-	lt8911exb_i2c_write(client, 0x1a, (u8)(mipi_timing[hfp] % 256));
+-}
+-
+-static void lt8911exb_cfg_set_edp_timing(struct lt8911exb *lt8911exb)
+-{
+-	struct i2c_client *client = lt8911exb->client;
+-
+-	/* lt8911exb eDP video timing configuration */
+-	lt8911exb_i2c_write(client, 0xff, 0xa8);
+-	lt8911exb_i2c_write(client, 0x2d, 0x88);
+-	lt8911exb_i2c_write(client, 0x05,
+-		(u8)(mipi_timing[htotal] / 256));
+-	lt8911exb_i2c_write(client, 0x06,
+-		(u8)(mipi_timing[htotal] % 256));
+-	lt8911exb_i2c_write(client, 0x07,
+-		(u8)((mipi_timing[hs] + mipi_timing[hbp]) / 256));
+-	lt8911exb_i2c_write(client, 0x08,
+-		(u8)((mipi_timing[hs] + mipi_timing[hbp]) % 256));
+-	lt8911exb_i2c_write(client, 0x09,
+-		(u8)(mipi_timing[hs] / 256));
+-	lt8911exb_i2c_write(client, 0x0a,
+-		(u8)(mipi_timing[hs] % 256));
+-	lt8911exb_i2c_write(client, 0x0b,
+-		(u8)(mipi_timing[hact] / 256));
+-	lt8911exb_i2c_write(client, 0x0c,
+-		(u8)(mipi_timing[hact] % 256));
+-	lt8911exb_i2c_write(client, 0x0d,
+-		(u8)(mipi_timing[vtotal] / 256));
+-	lt8911exb_i2c_write(client, 0x0e,
+-		(u8)(mipi_timing[vtotal] % 256));
+-	lt8911exb_i2c_write(client, 0x11,
+-		(u8)((mipi_timing[vs] + mipi_timing[vbp]) / 256));
+-	lt8911exb_i2c_write(client, 0x12,
+-		(u8)((mipi_timing[vs] + mipi_timing[vbp]) % 256));
+-	lt8911exb_i2c_write(client, 0x14,
+-		(u8)(mipi_timing[vs] % 256));
+-	lt8911exb_i2c_write(client, 0x15,
+-		(u8)(mipi_timing[vact] / 256));
+-	lt8911exb_i2c_write(client, 0x16,
+-		(u8)(mipi_timing[vact] % 256));
+-}
+-
+-static void lt8911exb_cfg_init_regs(struct lt8911exb *lt8911exb)
+-{
+-	u32 val = 0;
+-	u8 i, pcr_pll_postdiv, pcr_m;
+-	struct i2c_client *client = lt8911exb->client;
+-	u8 swing_ds1[13][2] = {
+-		{ 0x83, 0x00 }, /* 27.8 mA */
+-		{ 0x82, 0xe0 }, /* 26.2 mA */
+-		{ 0x82, 0xc0 }, /* 24.6 mA */
+-		{ 0x82, 0xa0 }, /* 23.0 mA */
+-		{ 0x82, 0x80 }, /* 21.4 mA */
+-		{ 0x82, 0x40 }, /* 18.2 mA */
+-		{ 0x82, 0x20 }, /* 16.6 mA */
+-		{ 0x82, 0x00 }, /* 15.0 mA */
+-		{ 0x81, 0x00 }, /* 12.8 mA */
+-		{ 0x80, 0xe0 }, /* 11.2 mA */
+-		{ 0x80, 0xc0 }, /* 9.6 mA */
+-		{ 0x80, 0xa0 }, /* 8 mA */
+-		{ 0x80, 0x80 }  /* 6 mA */
+-	};
+-
+-	/* initialization */
+-	lt8911exb_i2c_write(client, 0xff, 0x81);
+-	lt8911exb_i2c_write(client, 0x49, 0xff);
+-	lt8911exb_i2c_write(client, 0xff, 0x82);
+-	lt8911exb_i2c_write(client, 0x5a, 0x0e);
+-
+-	/* MIPI Rx analog */
+-	lt8911exb_i2c_write(client, 0xff, 0x82);
+-	lt8911exb_i2c_write(client, 0x32, 0x51);
+-	lt8911exb_i2c_write(client, 0x35, 0x22);
+-	lt8911exb_i2c_write(client, 0x4c, 0x0c);
+-	lt8911exb_i2c_write(client, 0x4d, 0x00);
+-
+-	lt8911exb_i2c_write(client, 0x3a, 0x77);
+-	lt8911exb_i2c_write(client, 0x3b, 0x77);
+-
+-	/* dessc_pcr pll analog */
+-	lt8911exb_i2c_write(client, 0xff, 0x82);
+-	lt8911exb_i2c_write(client, 0x6a, 0x40);
+-	lt8911exb_i2c_write(client, 0x6b, 0x40);
+-
+-	if (mipi_timing[pclk_10khz] < 8800) {
+-		/* 0x44: pre-div = 2, pixel_clk = 44~88MHz */
+-		lt8911exb_i2c_write(client, 0x6e, 0x82);
+-		pcr_pll_postdiv = 0x08;
+-	} else {
+-		/* 0x40: pre-div = 1, pixel_clk = 88~176MHz */
+-		lt8911exb_i2c_write(client, 0x6e, 0x81);
+-		pcr_pll_postdiv = 0x04;
+-	}
+-	pcr_m = (u8)(mipi_timing[pclk_10khz] * pcr_pll_postdiv / 25 / 100);
+-
+-	/* dessc pll digital */
+-	lt8911exb_i2c_write(client, 0xff, 0x85);
+-	lt8911exb_i2c_write(client, 0xa9, 0x31);
+-	lt8911exb_i2c_write(client, 0xaa, 0x17);
+-	lt8911exb_i2c_write(client, 0xab, 0xba);
+-	lt8911exb_i2c_write(client, 0xac, 0xe1);
+-	lt8911exb_i2c_write(client, 0xad, 0x47);
+-	lt8911exb_i2c_write(client, 0xae, 0x01);
+-	lt8911exb_i2c_write(client, 0xae, 0x11);
+-
+-	/* digital top */
+-	lt8911exb_i2c_write(client, 0xff, 0x85);
+-	lt8911exb_i2c_write(client, 0xc0, 0x01);/* select mipi rx */
+-
+-	if (lt8911exb->edp_depth == 6)
+-		val = 0xd0; /* enable dither */
+-	else if (lt8911exb->edp_depth == 8)
+-		val = 0x00; /* disable dither */
+-	lt8911exb_i2c_write(client, 0xb0, val);
+-
+-	/* MIPI Rx digital */
+-	lt8911exb_i2c_write(client, 0xff, 0xd0);
+-	/* 0: 4 lane; 1: 1 lane; 2: 2 lane; 3: 3 lane */
+-	lt8911exb_i2c_write(client, 0x00, lt8911exb->mipi_lane_cnt % 4);
+-	lt8911exb_i2c_write(client, 0x02, 0x08);
+-	lt8911exb_i2c_write(client, 0x08, 0x00);
+-	lt8911exb_i2c_write(client, 0x0a, 0x12);/* pcr mode */
+-	lt8911exb_i2c_write(client, 0x0c, 0x40);
+-
+-	lt8911exb_i2c_write(client, 0x1c, 0x3a);
+-	lt8911exb_i2c_write(client, 0x31, 0x0a);
+-
+-	lt8911exb_i2c_write(client, 0x3f, 0x10);
+-	lt8911exb_i2c_write(client, 0x40, 0x20);
+-	lt8911exb_i2c_write(client, 0x41, 0x30);
+-
+-#ifdef TEST_PATTERN
+-	lt8911exb_i2c_write(client, 0x26, pcr_m | 0x80);
+-#else
+-	lt8911exb_i2c_write(client, 0x26, pcr_m);
+-#endif
+-
+-	lt8911exb_i2c_write(client, 0x27, 0x28);
+-	lt8911exb_i2c_write(client, 0x28, 0xf8);
+-
+-	lt8911exb_i2c_write(client, 0xff, 0x81);/* pcr reset */
+-	lt8911exb_i2c_write(client, 0x03, 0x7b);
+-	lt8911exb_i2c_write(client, 0x03, 0xff);
+-
+-	/* Tx PLL 2.7GHz */
+-	lt8911exb_i2c_write(client, 0xff, 0x87);
+-	lt8911exb_i2c_write(client, 0x19, 0x31);
+-	lt8911exb_i2c_write(client, 0xff, 0x82);
+-	lt8911exb_i2c_write(client, 0x02, 0x42);
+-	lt8911exb_i2c_write(client, 0x03, 0x00);
+-	lt8911exb_i2c_write(client, 0x03, 0x01);
+-	lt8911exb_i2c_write(client, 0xff, 0x81);
+-	lt8911exb_i2c_write(client, 0x09, 0xfc);
+-	lt8911exb_i2c_write(client, 0x09, 0xfd);
+-	lt8911exb_i2c_write(client, 0xff, 0x87);
+-	lt8911exb_i2c_write(client, 0x0c, 0x11);
+-
+-	for (i = 0; i < 5; i++) {
+-		msleep(5);
+-		if (lt8911exb_i2c_read(client, 0x37) & 0x02) {
+-			LT8911EXB_DBG("%s: lt8911exb tx pll locked\n",
+-				__func__);
+-			break;
+-		}
+-
+-		LT8911EXB_DBG("%s: lt8911exb tx pll unlocked\n", __func__);
+-		lt8911exb_i2c_write(client, 0xff, 0x81);
+-		lt8911exb_i2c_write(client, 0x09, 0xfc);
+-		lt8911exb_i2c_write(client, 0x09, 0xfd);
+-		lt8911exb_i2c_write(client, 0xff, 0x87);
+-		lt8911exb_i2c_write(client, 0x0c, 0x10);
+-		lt8911exb_i2c_write(client, 0x0c, 0x11);
+-	}
+-
+-	/* Tx PHY */
+-	lt8911exb_i2c_write(client, 0xff, 0x82);
+-	lt8911exb_i2c_write(client, 0x11, 0x00);
+-	lt8911exb_i2c_write(client, 0x13, 0x10);
+-	lt8911exb_i2c_write(client, 0x14, 0x0c);
+-	lt8911exb_i2c_write(client, 0x14, 0x08);
+-	lt8911exb_i2c_write(client, 0x13, 0x20);
+-	lt8911exb_i2c_write(client, 0xff, 0x82);
+-	lt8911exb_i2c_write(client, 0x0e, 0x25);
+-	lt8911exb_i2c_write(client, 0x12, 0xff);
+-
+-	/* eDP tx digital */
+-	lt8911exb_i2c_write(client, 0xff, 0xa8);
+-
+-#ifdef TEST_PATTERN
+-	/* bit[2:0]: test panttern image mode */
+-	lt8911exb_i2c_write(client, 0x24, 0x50);
+-	/* bit[6:4]: test pattern color */
+-	lt8911exb_i2c_write(client, 0x25, 0x70);
+-	/* 0x50: pattern; 0x10: mipi video */
+-	lt8911exb_i2c_write(client, 0x27, 0x50);
+-#else
+-	/* 0x50: pattern; 0x10: mipi video */
+-	lt8911exb_i2c_write(client, 0x27, 0x10);
+-#endif
+-
+-	if (lt8911exb->edp_depth == 6)
+-		val = 0x00;
+-	else if (lt8911exb->edp_depth == 8)
+-		val = 0x10;
+-	lt8911exb_i2c_write(client, 0x17, val);
+-	lt8911exb_i2c_write(client, 0x18, val << 1);
+-
+-	lt8911exb_i2c_write(client, 0xff, 0xa0);
+-	lt8911exb_i2c_write(client, 0x00, 0x08);
+-	lt8911exb_i2c_write(client, 0x01, 0x00);
+-
+-	/* set eDP drive strength */
+-	lt8911exb_i2c_write(client, 0xff, 0x82);
+-	/* lane 0 tap0 */
+-	lt8911exb_i2c_write(client, 0x22, swing_ds1[0][0]);
+-	lt8911exb_i2c_write(client, 0x23, swing_ds1[0][1]);
+-	/* lane 0 tap1 */
+-	lt8911exb_i2c_write(client, 0x24, 0x80);
+-	lt8911exb_i2c_write(client, 0x25, 0x00);
+-	/* lane 1 tap0 */
+-	lt8911exb_i2c_write(client, 0x26, swing_ds1[0][0]);
+-	lt8911exb_i2c_write(client, 0x27, swing_ds1[0][1]);
+-	/* lane 1 tap1 */
+-	lt8911exb_i2c_write(client, 0x28, 0x80);
+-	lt8911exb_i2c_write(client, 0x29, 0x00);
+-}
+-
+-/*
+- * MIPI signal from SoC should be ready before
+- * configuring below video check setting
+- */
+-static void lt8911exb_dbg_check_mipi_timing(struct lt8911exb *lt8911exb)
+-{
+-	u32 val = 0;
+-	struct i2c_client *client = lt8911exb->client;
+-
+-	/* MIPI byte clk check */
+-	lt8911exb_i2c_write(client, 0xff, 0x85);
+-	/* FM select byte clk */
+-	lt8911exb_i2c_write(client, 0x1d, 0x00);
+-	lt8911exb_i2c_write(client, 0x40, 0xf7);
+-	lt8911exb_i2c_write(client, 0x41, 0x30);
+-	/* eDP scramble mode; video chech from mipi */
+-	lt8911exb_i2c_write(client, 0xa1, 0x02);
+-	/* 0xf0: close scramble; 0xD0: open scramble */
+-	//lt8911exb_i2c_write(client, 0x17, 0xf0);
+-
+-	/* video check reset */
+-	lt8911exb_i2c_write(client, 0xff, 0x81);
+-	lt8911exb_i2c_write(client, 0x09, 0x7d);
+-	lt8911exb_i2c_write(client, 0x09, 0xfd);
+-
+-	lt8911exb_i2c_write(client, 0xff, 0x85);
+-	msleep(200);
+-	if (lt8911exb_i2c_read(client, 0x50) == 0x03) {
+-		val = lt8911exb_i2c_read(client, 0x4d);
+-		val = (val << 8) + lt8911exb_i2c_read(client, 0x4e);
+-		val = (val << 8) + lt8911exb_i2c_read(client, 0x4f);
+-		/* MIPI clk = val * 1000 */
+-		LT8911EXB_DBG("%s: video check: mipi clk = %d\n",
+-			__func__, val);
+-	} else {
+-		LT8911EXB_DBG("%s: video check: mipi clk unstable",
+-			__func__);
+-	}
+-
+-	/* MIPI Vtotal check */
+-	val = lt8911exb_i2c_read(client, 0x76);
+-	val = (val << 8) + lt8911exb_i2c_read(client, 0x77);
+-	LT8911EXB_DBG("%s: video check: Vtotal = %d\n",
+-		__func__, val);
+-
+-	/* MIPI word count check */
+-	lt8911exb_i2c_write(client, 0xff, 0xd0);
+-	val = lt8911exb_i2c_read(client, 0x82);
+-	val = (val << 8) + lt8911exb_i2c_read(client, 0x83);
+-	val = val / 3;
+-	LT8911EXB_DBG("%s: video check: Hact(word counter) = %d\n",
+-		__func__, val);
+-
+-	/* MIPI Vact check */
+-	val = lt8911exb_i2c_read(client, 0x85);
+-	val = (val << 8) + lt8911exb_i2c_read(client, 0x86);
+-	LT8911EXB_DBG("%s: video check: Vact = %d\n",
+-		__func__, val);
+-}
+-
+-static void lt8911exb_link_train_start(struct lt8911exb *lt8911exb)
+-{
+-	struct i2c_client *client = lt8911exb->client;
+-
+-	/* lt8911exb link training */
+-	lt8911exb_i2c_write(client, 0xff, 0x85);
+-	/* eDP scramble mode */
+-	lt8911exb_i2c_write(client, 0xa1, 0x02);
+-
+-	/* AUX setup */
+-	lt8911exb_i2c_write(client, 0xff, 0xac);
+-	/* soft link training */
+-	lt8911exb_i2c_write(client, 0x00, 0x60);
+-	lt8911exb_i2c_write(client, 0xff, 0xa6);
+-	lt8911exb_i2c_write(client, 0x2a, 0x00);
+-
+-	lt8911exb_i2c_write(client, 0xff, 0x81);
+-	lt8911exb_i2c_write(client, 0x07, 0xfe);
+-	lt8911exb_i2c_write(client, 0x07, 0xff);
+-	lt8911exb_i2c_write(client, 0x0a, 0xfc);
+-	lt8911exb_i2c_write(client, 0x0a, 0xfe);
+-
+-	/* link training */
+-	lt8911exb_i2c_write(client, 0xff, 0x85);
+-	lt8911exb_i2c_write(client, 0x1a, lt8911exb->edp_lane_cnt);
+-	//lt8911exb_i2c_write(client, 0x13, 0xd1);
+-	lt8911exb_i2c_write(client, 0xff, 0xac);
+-	lt8911exb_i2c_write(client, 0x00, 0x64);
+-	lt8911exb_i2c_write(client, 0x01, 0x0a);
+-	lt8911exb_i2c_write(client, 0x0c, 0x85);
+-	lt8911exb_i2c_write(client, 0x0c, 0xc5);
+-}
+-
+-static void lt8911exb_link_train_get_result(struct lt8911exb *lt8911exb)
+-{
+-	u32 i, val;
+-	struct i2c_client *client = lt8911exb->client;
+-
+-	lt8911exb_i2c_write(client, 0xff, 0xac);
+-	for (i = 0; i < 10; i++) {
+-		val = lt8911exb_i2c_read(client, 0x82);
+-		if (val & 0x20) {
+-			if ((val & 0x1f) == 0x1e)
+-				LT8911EXB_DBG("%s: link training succeeded\n",
+-					__func__);
+-			else
+-				LT8911EXB_DBG("%s: link training failed\n",
+-					__func__);
+-
+-			LT8911EXB_DBG("%s: panel link rate: %d\n", __func__,
+-				lt8911exb_i2c_read(client, 0x83));
+-			LT8911EXB_DBG("%s: panel link count: %d\n", __func__,
+-				lt8911exb_i2c_read(client, 0x84));
+-			break;
+-		}
+-		LT8911EXB_DBG("%s: link training ongoing...\n", __func__);
+-		msleep(100);
+-	}
+-}
+-
+-static void lt8911exb_chip_init(struct lt8911exb *lt8911exb)
+-{
+-	lt8911exb_cfg_set_mipi_timing(lt8911exb);
+-	lt8911exb_cfg_set_edp_timing(lt8911exb);
+-	lt8911exb_cfg_init_regs(lt8911exb);
+-	lt8911exb_dbg_check_mipi_timing(lt8911exb);
+-	lt8911exb_link_train_start(lt8911exb);
+-	lt8911exb_link_train_get_result(lt8911exb);
+-}
+-
+-/* return value: 0x77 is normal, others are abnormal */
+-static int lt8911exb_dpcd0202_check(struct i2c_client *client)
+-{
+-	u8 val = 0, dpcd_val = 0x77;
+-
+-	/* AUX operater init */
+-	lt8911exb_i2c_write(client, 0xff, 0xac);
+-	/* soft link training */
+-	lt8911exb_i2c_write(client, 0x00, 0x20);
+-	lt8911exb_i2c_write(client, 0xff, 0xa6);
+-	lt8911exb_i2c_write(client, 0x2a, 0x01);
+-
+-	/* read DPCD 0x0202 */
+-	lt8911exb_i2c_write(client, 0xff, 0xa6);
+-	lt8911exb_i2c_write(client, 0x2b, 0x90); /* command */
+-	lt8911exb_i2c_write(client, 0x2b, 0x02); /* addr[15:8] */
+-	lt8911exb_i2c_write(client, 0x2b, 0x02); /* addr[7:0] */
+-	lt8911exb_i2c_write(client, 0x2b, 0x00); /* data lenth */
+-	lt8911exb_i2c_write(client, 0x2c, 0x00); /* start Aux to read EDID */
+-
+-	msleep(20); /* more than 10ms */
+-
+-	val = lt8911exb_i2c_read(client, 0x25);
+-	if ((val & 0x0f) == 0x0c) {
+-		if (lt8911exb_i2c_read(client, 0x39) == 0x22) {
+-			/* first reading is necessary! */
+-			lt8911exb_i2c_read(client, 0x2b);
+-			dpcd_val = lt8911exb_i2c_read(client, 0x2b);
+-		} else {
+-			dpcd_val = 0xff;
+-		}
+-	}
+-
+-	return dpcd_val;
+-}
+-
+-static void lt8911exb_rst_check_work_cb(struct work_struct *work)
+-{
+-	struct delayed_work *dwork =
+-		container_of(work, struct delayed_work, work);
+-	struct lt8911exb *lt8911exb =
+-		container_of(dwork, struct lt8911exb, rst_check);
+-	struct i2c_client *client = lt8911exb->client;
+-
+-	if (!lt8911exb->init_done) {
+-		lt8911exb->init_done = true;
+-		lt8911exb_chip_init(lt8911exb);
+-	}
+-
+-	if (lt8911exb->screen_on) {
+-		if (gpio_get_value(lt8911exb->backlight_pin) == 0)
+-			gpio_set_value(lt8911exb->backlight_pin, 1);
+-	}
+-
+-	if (lt8911exb_dpcd0202_check(client) != 0x77) {
+-		msleep(50);
+-		if (lt8911exb_dpcd0202_check(client) != 0x77) {
+-			LT8911EXB_DBG("%s: line = %d\n", __func__, __LINE__);
+-			/* AUX setup */
+-			lt8911exb_i2c_write(client, 0xff, 0xac);
+-
+-			/* soft link train */
+-			lt8911exb_i2c_write(client, 0x00, 0x60);
+-			lt8911exb_i2c_write(client, 0xff, 0xa6);
+-			lt8911exb_i2c_write(client, 0x2a, 0x00);
+-
+-			lt8911exb_i2c_write(client, 0xff, 0x81);
+-			lt8911exb_i2c_write(client, 0x07, 0xfe);
+-			lt8911exb_i2c_write(client, 0x07, 0xff);
+-			lt8911exb_i2c_write(client, 0x0a, 0xfc);
+-			lt8911exb_i2c_write(client, 0x0a, 0xfe);
+-
+-			/* link train */
+-			lt8911exb_i2c_write(client, 0xff, 0x85);
+-			lt8911exb_i2c_write(client, 0x1a,
+-			                    lt8911exb->edp_lane_cnt);
+-
+-			lt8911exb_i2c_write(client, 0xff, 0xac);
+-			lt8911exb_i2c_write(client, 0x00, 0x64);
+-			lt8911exb_i2c_write(client, 0x01, 0x0a);
+-			lt8911exb_i2c_write(client, 0x0c, 0x85);
+-			lt8911exb_i2c_write(client, 0x0c, 0xc5);
+-		}
+-	}
+-
+-	schedule_delayed_work(&lt8911exb->rst_check,
+-	                      msecs_to_jiffies(2000));
+-}
+-
+-static void lt8911exb_suspend(struct lt8911exb *lt8911exb)
+-{
+-	gpio_set_value(lt8911exb->backlight_pin, 0);
+-	cancel_delayed_work_sync(&lt8911exb->rst_check);
+-
+-	gpio_set_value(lt8911exb->reset_pin, 0);
+-//	gpio_set_value(lt8911exb->enable_pin, 0);
+-}
+-
+-static void lt8911exb_resume(struct lt8911exb *lt8911exb)
+-{
+-//	gpio_set_value(lt8911exb->enable_pin, 1);
+-	lt8911exb_reset(lt8911exb);
+-	lt8911exb_chip_init(lt8911exb);
+-
+-	schedule_delayed_work(&lt8911exb->rst_check,
+-	                      msecs_to_jiffies(500));
+-}
+-
+-static int lt8911exb_fb_notifier_cb(struct notifier_block *self,
+-                      unsigned long action, void *ptr)
+-{
+-	struct fb_event *event = ptr;
+-	struct lt8911exb *lt8911exb =
+-		container_of(self, struct lt8911exb, nb);
+-
+-	switch (action) {
+-	case FB_EARLY_EVENT_BLANK:
+-		switch (*((int *)event->data)) {
+-		case FB_BLANK_UNBLANK:
+-			break;
+-		default:
+-			if (lt8911exb->screen_on) {
+-				LT8911EXB_DBG("%s: screen off\n", __func__);
+-				lt8911exb->screen_on = false;
+-				lt8911exb_suspend(lt8911exb);
+-			}
+-			break;
+-		}
+-		break;
+-	case FB_EVENT_BLANK:
+-		switch (*((int *)event->data)) {
+-		case FB_BLANK_UNBLANK:
+-			if (!lt8911exb->screen_on) {
+-				LT8911EXB_DBG("%s: screen on\n", __func__);
+-				lt8911exb->screen_on = true;
+-				lt8911exb_resume(lt8911exb);
+-			}
+-			break;
+-		default:
+-			break;
+-		}
+-		break;
+-	default:
+-		break;
+-	}
+-
+-	return NOTIFY_OK;
+-}
+-
+-static int lt8911exb_parse_dt(struct lt8911exb *lt8911exb)
+-{
+-	int ret = -1;
+-	struct i2c_client *client = lt8911exb->client;
+-	struct device_node *np = client->dev.of_node;
+-
+-	lt8911exb->backlight_pin = of_get_named_gpio_flags(np,
+-	                                 "lt8911exb,backlight-gpio",
+-	                                 0);
+-	if (!gpio_is_valid(lt8911exb->backlight_pin)) {
+-		LT8911EXB_DBG("%s: backlight-gpio is invalid\n", __func__);
+-		return -EINVAL;
+-	}
+-
+-	ret = devm_gpio_request_one(&client->dev,
+-	                            lt8911exb->backlight_pin,
+-	                            GPIOF_DIR_OUT, NULL);
+-	if (ret) {
+-		LT8911EXB_DBG("%s: failed to request backlight gpio\n",
+-			__func__);
+-		return ret;
+-	}
+-	gpio_set_value(lt8911exb->backlight_pin, 0);
+-	LT8911EXB_DBG("%s: succeed to init backlight gpio\n", __func__);
+-
+-	lt8911exb->irq_pin = of_get_named_gpio_flags(np,
+-	                           "lt8911exb,irq-gpio", 0);
+-	if (!gpio_is_valid(lt8911exb->irq_pin)) {
+-		LT8911EXB_DBG("%s: irq-gpio is invalid\n", __func__);
+-		return -EINVAL;
+-	}
+-
+-	ret = devm_gpio_request_one(&client->dev,
+-	                            lt8911exb->irq_pin,
+-	                            GPIOF_DIR_IN, NULL);
+-	if (ret) {
+-		LT8911EXB_DBG("%s: failed to request irq gpio\n",
+-			__func__);
+-		return ret;
+-	}
+-	LT8911EXB_DBG("%s: succeed to init irq gpio\n", __func__);
+-
+-	/*
+-	 * TODO:
+-	 * request threaded irq handler
+-	 */
+-/*
+-	lt8911exb->enable_pin = of_get_named_gpio_flags(np,
+-	                           "lt8911exb,enable-gpio", 0, NULL);
+-	if (!gpio_is_valid(lt8911exb->enable_pin)) {
+-		LT8911EXB_DBG("%s: enable_pin is invalid\n", __func__);
+-		return -EINVAL;
+-	}
+-
+-	ret = devm_gpio_request_one(&client->dev,
+-	                            lt8911exb->enable_pin,
+-	                            GPIOF_DIR_OUT, "edp2_enable_pin");
+-	if (ret) {
+-		LT8911EXB_DBG("%s: failed to request enable gpio\n",
+-			__func__);
+-		return ret;
+-	}
+-	LT8911EXB_DBG("%s: succeed to init enable gpio\n", __func__);
+-	gpio_set_value(lt8911exb->enable_pin, 1);
+-*/
+-	ret = of_property_read_u32(np, "lt8911exb,rst-delay-ms",
+-	                           &lt8911exb->rst_delay_ms);
+-	if (ret < 0) {
+-		LT8911EXB_DBG("%s: no rst-delay-ms property in dts\n",
+-			__func__);
+-		lt8911exb->rst_delay_ms = 100;
+-	}
+-
+-	lt8911exb->reset_pin = of_get_named_gpio_flags(np,
+-		                        "lt8911exb,reset-gpio", 0);
+-	if (!gpio_is_valid(lt8911exb->reset_pin)) {
+-		LT8911EXB_DBG("%s: reset-gpio is invalid\n", __func__);
+-		return -EINVAL;
+-	}
+-
+-	ret = devm_gpio_request_one(&client->dev,
+-	                            lt8911exb->reset_pin,
+-	                            GPIOF_DIR_OUT, NULL);
+-	if (ret) {
+-		LT8911EXB_DBG("%s: failed to request reset gpio\n",
+-			__func__);
+-		return ret;
+-	}
+-	gpio_set_value(lt8911exb->reset_pin, 0);
+-	LT8911EXB_DBG("%s: succeed to init reset gpio\n", __func__);
+-
+-	if (of_property_read_u32(np, "lt8911exb,edp-lane-cnt",
+-	                         &lt8911exb->edp_lane_cnt)) {
+-		LT8911EXB_DBG("%s: miss edp-lane-cnt property in dts\n",
+-			__func__);
+-		lt8911exb->edp_lane_cnt = 2; /* default value */
+-	}
+-
+-	if (of_property_read_u32(np, "lt8911exb,mipi-lane-cnt",
+-	                         &lt8911exb->mipi_lane_cnt)) {
+-		LT8911EXB_DBG("%s: miss mipi-lane-cnt property in dts\n",
+-			__func__);
+-		lt8911exb->mipi_lane_cnt = 4;
+-	}
+-
+-	/*
+-	 * eDP panel color depth:
+-	 *     6 bit: 262K colors
+-	 *     8 bit: 16.7M colors
+-	 */
+-	if (of_property_read_u32(np, "lt8911exb,edp-depth",
+-	                         &lt8911exb->edp_depth)) {
+-		LT8911EXB_DBG("%s: miss edp-depth property in dts\n",
+-			__func__);
+-		lt8911exb->edp_depth = 8;
+-	}
+-
+-	return ret;
+-}
+-
+-static int lt8911exb_i2c_probe(struct i2c_client *client,
+-                               const struct i2c_device_id *id)
+-{
+-	int ret = -1;
+-	struct lt8911exb *lt8911exb;
+-
+-	LT8911EXB_DBG("%s: start\n", __func__);
+-
+-	lt8911exb = devm_kzalloc(&client->dev, sizeof(struct lt8911exb),
+-	                         GFP_KERNEL);
+-	if (!lt8911exb) {
+-		LT8911EXB_DBG("%s: failed to allocate lt8911exb data\n",
+-			__func__);
+-		return -ENOMEM;
+-	}
+-
+-	i2c_set_clientdata(client, lt8911exb);
+-	lt8911exb->client = client;
+-	lt8911exb->screen_on = true;
+-	lt8911exb->init_done = false;
+-
+-	ret = lt8911exb_parse_dt(lt8911exb);
+-	if (ret) {
+-		LT8911EXB_DBG("%s: failed to parse device tree\n", __func__);
+-		return ret;
+-	}
+-
+-	lt8911exb_reset(lt8911exb);
+-
+-	/* read chip ID */
+-	lt8911exb_i2c_write(client, 0xff, 0x81); /* 0x81: register bank */
+-	lt8911exb_i2c_write(client, 0x08, 0x7f);
+-	LT8911EXB_DBG("%s: lt8911exb chip ID: 0x%02x-0x%02x-0x%02x\n",
+-		__func__, lt8911exb_i2c_read(client, 0x00),
+-		lt8911exb_i2c_read(client, 0x01),
+-		lt8911exb_i2c_read(client, 0x02));
+-
+-	lt8911exb->nb.notifier_call = lt8911exb_fb_notifier_cb;
+-	ret = fb_register_client(&lt8911exb->nb);
+-	if (ret) {
+-		LT8911EXB_DBG("%s: failed to register lt8911exb fb notifier\n",
+-			__func__);
+-		return ret;
+-	}
+-
+-	INIT_DELAYED_WORK(&lt8911exb->rst_check,
+-	                  lt8911exb_rst_check_work_cb);
+-	schedule_delayed_work(&lt8911exb->rst_check,
+-	                      msecs_to_jiffies(3200));
+-
+-	LT8911EXB_DBG("%s: end\n", __func__);
+-	return 0;
+-}
+-
+-static void lt8911exb_i2c_shutdown(struct i2c_client *client)
+-{
+-	struct lt8911exb *lt8911exb = i2c_get_clientdata(client);
+-
+-	gpio_set_value(lt8911exb->reset_pin, 0);
+-}
+-
+-static struct of_device_id lt8911exb_dt_ids[] = {
+-	{ .compatible = "lontium,lt8911exb" },
+-	{ }
+-};
+-
+-static struct i2c_device_id lt8911exb_id[] = {
+-	{ "lt8911exb", 0 },
+-	{ }
+-};
+-
+-struct i2c_driver lt8911exb_driver = {
+-	.driver = {
+-		.owner = THIS_MODULE,
+-		.name = "lt8911exb",
+-		.of_match_table = of_match_ptr(lt8911exb_dt_ids),
+-	},
+-	.id_table = lt8911exb_id,
+-	.probe = lt8911exb_i2c_probe,
+-	.shutdown = lt8911exb_i2c_shutdown,
+-};
+-
+-int __init lt8911exb_init(void)
+-{
+-	return i2c_add_driver(&lt8911exb_driver);
+-}
+-void __exit lt8911exb_exit(void)
+-{
+-	i2c_del_driver(&lt8911exb_driver);
+-}
+-late_initcall(lt8911exb_init);
+-module_exit(lt8911exb_exit);
+-
+-MODULE_AUTHOR("edward@techvision.com.cn");
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("Lontium LT8911EXB mipi2edp bridge chip driver");
+-- 
+2.43.0
+

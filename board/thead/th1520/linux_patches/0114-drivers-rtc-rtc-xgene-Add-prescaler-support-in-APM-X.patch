@@ -1,0 +1,100 @@
+From ddb6239446bdeabfff6430080932569adbd0f115 Mon Sep 17 00:00:00 2001
+From: Wei Fu <wefu@redhat.com>
+Date: Sun, 31 Mar 2024 22:59:04 +0800
+Subject: [PATCH 114/400] drivers/rtc/rtc-xgene: Add prescaler support in APM
+ X-Gene RTC driver
+
+This patch add Counter Prescaler support in APM X-Gene RTC driver by
+getting prescaler (Optional) property value from dtb.
+
+Signed-off-by: Wei Fu <wefu@redhat.com>
+---
+ drivers/rtc/Kconfig     | 10 ++++++++++
+ drivers/rtc/rtc-xgene.c | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
+
+diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
+index 92f46a6312c2..7b7f425b7c00 100644
+--- a/drivers/rtc/Kconfig
++++ b/drivers/rtc/Kconfig
+@@ -1862,6 +1862,16 @@ config RTC_DRV_XGENE
+ 	  This driver can also be built as a module, if so, the module
+ 	  will be called "rtc-xgene".
+ 
++config RTC_DRV_XGENE_PRESCALER
++	bool "Pre-scaler Counter support for APM X-Gene RTC driver"
++	depends on RTC_DRV_XGENE
++	depends on ARCH_THEAD
++	default y
++	help
++	  Say Y here if your Soc has Pre-scaler Counter support on rtc-xgene.
++
++	  This hardware support can only be found in DW_apb_rtc after v2.06a.
++
+ config RTC_DRV_PIC32
+ 	tristate "Microchip PIC32 RTC"
+ 	depends on MACH_PIC32
+diff --git a/drivers/rtc/rtc-xgene.c b/drivers/rtc/rtc-xgene.c
+index f78efc9760c0..6c4614cee37b 100644
+--- a/drivers/rtc/rtc-xgene.c
++++ b/drivers/rtc/rtc-xgene.c
+@@ -26,11 +26,13 @@
+ #define  RTC_CCR_MASK		BIT(1)
+ #define  RTC_CCR_EN		BIT(2)
+ #define  RTC_CCR_WEN		BIT(3)
++#define  RTC_CCR_PSCLR_EN	BIT(4)
+ #define RTC_STAT		0x10
+ #define  RTC_STAT_BIT		BIT(0)
+ #define RTC_RSTAT		0x14
+ #define RTC_EOI			0x18
+ #define RTC_VER			0x1C
++#define RTC_CPSR		0x20
+ 
+ struct xgene_rtc_dev {
+ 	struct rtc_device *rtc;
+@@ -40,6 +42,33 @@ struct xgene_rtc_dev {
+ 	unsigned int irq_enabled;
+ };
+ 
++static void xgene_rtc_set_prescaler(struct device *dev)
++{
++#ifdef CONFIG_RTC_DRV_XGENE_PRESCALER
++	u32 ccr;
++	u32 prescaler;
++	struct xgene_rtc_dev *pdata = dev_get_drvdata(dev);
++
++	if (device_property_read_u32(dev, "prescaler", &prescaler)) {
++		dev_warn(dev, "Missing the pre-scaler config for RTC.\n");
++		dev_warn(dev, "The current pre-scaler config is 0x%x.\n",
++			 readl(pdata->csr_base + RTC_CPSR));
++		return;
++	}
++
++	/* The clock source on some platform to RTC is NOT 1HZ,
++	 * so we need to prescale the clock to make the input clock become 1HZ,
++	 * like (clock_source/prescaler) = 1HZ
++	 */
++	writel(prescaler, pdata->csr_base + RTC_CPSR);
++
++	/* enable RTC Prescaler feature in CCR register */
++	ccr = readl(pdata->csr_base + RTC_CCR);
++	ccr |= RTC_CCR_PSCLR_EN;
++	writel(ccr, pdata->csr_base + RTC_CCR);
++#endif /* CONFIG_RTC_DRV_XGENE_PRESCALER */
++}
++
+ static int xgene_rtc_read_time(struct device *dev, struct rtc_time *tm)
+ {
+ 	struct xgene_rtc_dev *pdata = dev_get_drvdata(dev);
+@@ -174,6 +203,8 @@ static int xgene_rtc_probe(struct platform_device *pdev)
+ 	/* Turn on the clock and the crystal */
+ 	writel(RTC_CCR_EN, pdata->csr_base + RTC_CCR);
+ 
++	xgene_rtc_set_prescaler(&pdev->dev);
++
+ 	ret = device_init_wakeup(&pdev->dev, 1);
+ 	if (ret) {
+ 		clk_disable_unprepare(pdata->clk);
+-- 
+2.43.0
+

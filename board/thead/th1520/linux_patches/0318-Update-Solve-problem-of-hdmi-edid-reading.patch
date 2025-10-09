@@ -1,0 +1,26 @@
+From c93b602e82bd82992527a183fea53c52dd01faf1 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:30:09 +0800
+Subject: [PATCH 318/400] [Update]Solve problem of hdmi-edid reading
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index 033bc3cf657b..f6549c8ed664 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -1190,7 +1190,7 @@ hdmi-pins {
+ 			pins = "HDMI_SCL", "HDMI_SDA", "HDMI_CEC";
+ 			function = "hdmi";
+ 			bias-disable;
+-			drive-strength = <1>;
++			drive-strength = <3>;
+ 			input-enable;
+ 			input-schmitt-disable;
+ 			slew-rate = <0>;
+-- 
+2.43.0
+
