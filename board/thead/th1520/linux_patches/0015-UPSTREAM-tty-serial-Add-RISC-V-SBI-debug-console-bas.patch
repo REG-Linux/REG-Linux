@@ -1,0 +1,83 @@
+From 8bf898f2c5742850f1f80a21fa3101d329042d44 Mon Sep 17 00:00:00 2001
+From: Anup Patel <apatel@ventanamicro.com>
+Date: Fri, 24 Nov 2023 12:39:03 +0530
+Subject: [PATCH 015/400] UPSTREAM: tty/serial: Add RISC-V SBI debug console
+ based earlycon
+
+We extend the existing RISC-V SBI earlycon support to use the new
+RISC-V SBI debug console extension.
+
+Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Link: https://lore.kernel.org/r/20231124070905.1043092-4-apatel@ventanamicro.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+(cherry picked from commit c77bf3607a0f0180aa674b58cfa76633215bb42f)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/tty/serial/Kconfig              |  2 +-
+ drivers/tty/serial/earlycon-riscv-sbi.c | 27 ++++++++++++++++++++++---
+ 2 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+index bdc568a4ab66..cec46091a716 100644
+--- a/drivers/tty/serial/Kconfig
++++ b/drivers/tty/serial/Kconfig
+@@ -87,7 +87,7 @@ config SERIAL_EARLYCON_SEMIHOST
+ 
+ config SERIAL_EARLYCON_RISCV_SBI
+ 	bool "Early console using RISC-V SBI"
+-	depends on RISCV_SBI_V01
++	depends on RISCV_SBI
+ 	select SERIAL_CORE
+ 	select SERIAL_CORE_CONSOLE
+ 	select SERIAL_EARLYCON
+diff --git a/drivers/tty/serial/earlycon-riscv-sbi.c b/drivers/tty/serial/earlycon-riscv-sbi.c
+index 27afb0b74ea7..0162155f0c83 100644
+--- a/drivers/tty/serial/earlycon-riscv-sbi.c
++++ b/drivers/tty/serial/earlycon-riscv-sbi.c
+@@ -15,17 +15,38 @@ static void sbi_putc(struct uart_port *port, unsigned char c)
+ 	sbi_console_putchar(c);
+ }
+ 
+-static void sbi_console_write(struct console *con,
+-			      const char *s, unsigned n)
++static void sbi_0_1_console_write(struct console *con,
++				  const char *s, unsigned int n)
+ {
+ 	struct earlycon_device *dev = con->data;
+ 	uart_console_write(&dev->port, s, n, sbi_putc);
+ }
+ 
++static void sbi_dbcn_console_write(struct console *con,
++				   const char *s, unsigned int n)
++{
++	int ret;
++
++	while (n) {
++		ret = sbi_debug_console_write(s, n);
++		if (ret < 0)
++			break;
++
++		s += ret;
++		n -= ret;
++	}
++}
++
+ static int __init early_sbi_setup(struct earlycon_device *device,
+ 				  const char *opt)
+ {
+-	device->con->write = sbi_console_write;
++	if (sbi_debug_console_available)
++		device->con->write = sbi_dbcn_console_write;
++	else if (IS_ENABLED(CONFIG_RISCV_SBI_V01))
++		device->con->write = sbi_0_1_console_write;
++	else
++		return -ENODEV;
++
+ 	return 0;
+ }
+ EARLYCON_DECLARE(sbi, early_sbi_setup);
+-- 
+2.43.0
+

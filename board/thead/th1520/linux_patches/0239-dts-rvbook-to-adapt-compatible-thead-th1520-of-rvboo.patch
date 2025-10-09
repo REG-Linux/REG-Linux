@@ -1,0 +1,32 @@
+From dc924240da0b889548f601b4388d3d0aa92087b3 Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:12:36 +0800
+Subject: [PATCH 239/400] dts: rvbook: to adapt compatible 'thead,th1520' of
+ rvbook
+
+add dts compatible 'thead,th1520' for opensbi request
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+Change-Id: I46678a8016e7729094140c0f308f5b0d50384fc9
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts b/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
+index 74302047c7dd..45c495287147 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
+@@ -6,9 +6,6 @@
+ #include "th1520-rvbook.dtsi"
+ 
+ / {
+-	model = "T-HEAD Light Lichee Pi 4A configuration for 8GB DDR board";
+-	compatible = "thead,light-val", "thead,light-lpi4a", "thead,light";
+-
+ 	memory@0 {
+ 		device_type = "memory";
+ 		reg = <0x0 0x200000 0x1 0xffe00000>;
+-- 
+2.43.0
+

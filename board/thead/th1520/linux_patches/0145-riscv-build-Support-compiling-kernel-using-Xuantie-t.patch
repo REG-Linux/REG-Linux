@@ -1,0 +1,53 @@
+From bca5d10113f46ec61280bc222bded771545fdc3b Mon Sep 17 00:00:00 2001
+From: Chen Pei <cp0613@linux.alibaba.com>
+Date: Wed, 27 Mar 2024 21:58:42 +0800
+Subject: [PATCH 145/400] riscv: build: Support compiling kernel using Xuantie
+ toolchain
+
+Compared to toolchains with gcc12 or above, the Xuantie toolchain
+gcc10 does not have vector support enabled by default, and -march
+needs to be explicitly specified.
+
+1. Xuantie toolchain gcc10 does not support using AS_HAS_OPTION_ARCH
+to automatically detect vector extensions and enable it.
+2. The ld tool version of Xuantie toolchain gcc10 is 2.35, which is
+less than the 2.38 required by TOOLCHAIN_HAS_V.
+
+Signed-off-by: Chen Pei <cp0613@linux.alibaba.com>
+---
+ arch/riscv/Kconfig  | 2 --
+ arch/riscv/Makefile | 5 ++---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 3da8de383f52..e04545239045 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -531,8 +531,6 @@ config TOOLCHAIN_HAS_V
+ 	default y
+ 	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64imv)
+ 	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32imv)
+-	depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
+-	depends on AS_HAS_OPTION_ARCH
+ 
+ config RISCV_ISA_V
+ 	bool "VECTOR extension support"
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 6e25de18774a..55015669213d 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -71,9 +71,8 @@ endif
+ # Check if the toolchain supports Zihintpause extension
+ riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
+ 
+-# Remove F,D,V from isa string for all. Keep extensions between "fd" and "v" by
+-# matching non-v and non-multi-letter extensions out with the filter ([^v_]*)
+-KBUILD_CFLAGS += -march=$(shell echo $(riscv-march-y) | sed -E 's/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
++# Remove F,D from isa string for all.
++KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
+ 
+ KBUILD_AFLAGS += -march=$(riscv-march-y)
+ 
+-- 
+2.43.0
+

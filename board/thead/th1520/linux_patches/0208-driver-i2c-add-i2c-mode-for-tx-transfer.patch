@@ -1,0 +1,796 @@
+From e2b870ec83980844ffdbda26c6403d0353a4aaed Mon Sep 17 00:00:00 2001
+From: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:43:34 +0800
+Subject: [PATCH 208/400] driver:i2c:add i2c mode for tx transfer
+
+1.i2c add dma mode for tx data send.
+2.enable dma for all i2c in dtb
+3.change dma dbg level when apb_regs is null
+
+Signed-off-by: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 105 +++++-
+ .../dma/dw-axi-dmac/dw-axi-dmac-platform.c    |   2 +-
+ drivers/i2c/busses/Makefile                   |   1 +
+ drivers/i2c/busses/i2c-designware-core.h      |  20 +-
+ drivers/i2c/busses/i2c-designware-master.c    |  76 +++-
+ .../i2c/busses/i2c-designware-master_dma.c    | 348 ++++++++++++++++++
+ .../i2c/busses/i2c-designware-master_dma.h    |   6 +
+ 7 files changed, 536 insertions(+), 22 deletions(-)
+ create mode 100644 drivers/i2c/busses/i2c-designware-master_dma.c
+ create mode 100644 drivers/i2c/busses/i2c-designware-master_dma.h
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index de96954d150c..a8064a518e5b 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -490,9 +490,21 @@ audio_i2c0: i2c@ffcb01a000 {
+ 			reg = <0xff 0xcb01a000 0x0 0x1000>;
+ 			clocks = <&apb_clk>;
+ 			interrupts = <182 IRQ_TYPE_LEVEL_HIGH>;
++			clock-frequency = <100000>;
++			i2c_mode = "dma";
++			dmas = <&dmac2 21>, <&dmac2 20>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			ss_hcnt = /bits/ 16 <0x82>;
++			ss_lcnt = /bits/ 16 <0x78>;
++			fs_hcnt = /bits/ 16 <0x37>;
++			fs_lcnt = /bits/ 16 <0x42>;
++			fp_hcnt = /bits/ 16 <0x14>;
++			fp_lcnt = /bits/ 16 <0x1a>;
++			hs_hcnt = /bits/ 16 <0x5>;
++			hs_lcnt = /bits/ 16 <0x15>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-			status = "disabled";
+ 		};
+ 
+ 		audio_i2c1: i2c@ffcb01b000 {
+@@ -500,9 +512,22 @@ audio_i2c1: i2c@ffcb01b000 {
+ 			reg = <0xff 0xcb01b000 0x0 0x1000>;
+ 			clocks = <&apb_clk>;
+ 			interrupts = <183 IRQ_TYPE_LEVEL_HIGH>;
++			clock-frequency = <100000>;
++			i2c_mode = "dma";
++			dmas = <&dmac2 23>, <&dmac2 22>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			ss_hcnt = /bits/ 16 <0x82>;
++			ss_lcnt = /bits/ 16 <0x78>;
++			fs_hcnt = /bits/ 16 <0x37>;
++			fs_lcnt = /bits/ 16 <0x42>;
++			fp_hcnt = /bits/ 16 <0x14>;
++			fp_lcnt = /bits/ 16 <0x1a>;
++			hs_hcnt = /bits/ 16 <0x5>;
++			hs_lcnt = /bits/ 16 <0x15>;
++			status = "disabled";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-			status = "disabled";
+ 		};
+ 
+ 		ap_i2s: ap-i2s@ffe7034000 {
+@@ -968,6 +993,10 @@ i2c0: i2c@ffe7f20000 {
+ 			clocks = <&clk CLKGEN_I2C0_PCLK>;
+ 			clock-names = "pclk";
+ 			clock-frequency = <100000>;
++			i2c_mode = "dma";
++			dmas = <&dmac0 12>, <&dmac0 13>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
+ 			ss_hcnt = /bits/ 16 <0x104>;
+ 			ss_lcnt = /bits/ 16 <0xec>;
+ 			fs_hcnt = /bits/ 16 <0x37>;
+@@ -978,47 +1007,101 @@ i2c0: i2c@ffe7f20000 {
+ 			hs_lcnt = /bits/ 16 <0x11>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-			status = "disabled";
+ 		};
+ 
+ 		i2c1: i2c@ffe7f24000 {
+ 			compatible = "snps,designware-i2c";
+ 			reg = <0xff 0xe7f24000 0x0 0x1000>;
+-			clocks = <&clk CLKGEN_I2C1_PCLK>;
+ 			interrupts = <45 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_I2C1_PCLK>;
++			clock-names = "pclk";
++			clock-frequency = <100000>;
++			i2c_mode = "dma";
++			dmas = <&dmac0 14>, <&dmac0 15>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			ss_hcnt = /bits/ 16 <0x104>;
++			ss_lcnt = /bits/ 16 <0xec>;
++			fs_hcnt = /bits/ 16 <0x37>;
++			fs_lcnt = /bits/ 16 <0x42>;
++			fp_hcnt = /bits/ 16 <0x14>;
++			fp_lcnt = /bits/ 16 <0x1a>;
++			hs_hcnt = /bits/ 16 <0x9>;
++			hs_lcnt = /bits/ 16 <0x11>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-			status = "disabled";
+ 		};
+ 
+ 		i2c2: i2c@ffec00c000 {
+ 			compatible = "snps,designware-i2c";
+ 			reg = <0xff 0xec00c000 0x0 0x1000>;
+-			clocks = <&clk CLKGEN_I2C2_PCLK>;
+ 			interrupts = <46 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_I2C2_PCLK>;
++			clock-names = "pclk";
++			clock-frequency = <100000>;
++			i2c_mode = "dma";
++			dmas = <&dmac0 16>, <&dmac0 17>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			ss_hcnt = /bits/ 16 <0x104>;
++			ss_lcnt = /bits/ 16 <0xec>;
++			fs_hcnt = /bits/ 16 <0x37>;
++			fs_lcnt = /bits/ 16 <0x42>;
++			fp_hcnt = /bits/ 16 <0x14>;
++			fp_lcnt = /bits/ 16 <0x1a>;
++			hs_hcnt = /bits/ 16 <0x9>;
++			hs_lcnt = /bits/ 16 <0x11>;
++			status = "disabled";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-			status = "disabled";
+ 		};
+ 
+ 		i2c3: i2c@ffec014000 {
+ 			compatible = "snps,designware-i2c";
+ 			reg = <0xff 0xec014000 0x0 0x1000>;
+-			clocks = <&clk CLKGEN_I2C3_PCLK>;
+ 			interrupts = <47 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_I2C3_PCLK>;
++			clock-names = "pclk";
++			clock-frequency = <100000>;
++			i2c_mode = "dma";
++			dmas = <&dmac0 18>, <&dmac0 19>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			ss_hcnt = /bits/ 16 <0x104>;
++			ss_lcnt = /bits/ 16 <0xec>;
++			fs_hcnt = /bits/ 16 <0x37>;
++			fs_lcnt = /bits/ 16 <0x42>;
++			fp_hcnt = /bits/ 16 <0x14>;
++			fp_lcnt = /bits/ 16 <0x1a>;
++			hs_hcnt = /bits/ 16 <0x9>;
++			hs_lcnt = /bits/ 16 <0x11>;
++			status = "disabled";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-			status = "disabled";
+ 		};
+ 
+ 		i2c4: i2c@ffe7f28000 {
+ 			compatible = "snps,designware-i2c";
+ 			reg = <0xff 0xe7f28000 0x0 0x1000>;
+-			clocks = <&clk CLKGEN_I2C4_PCLK>;
+ 			interrupts = <48 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_I2C4_PCLK>;
++			clock-names = "pclk";
++			clock-frequency = <100000>;
++			i2c_mode = "dma";
++			dmas = <&dmac0 20>, <&dmac0 21>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			ss_hcnt = /bits/ 16 <0x104>;
++			ss_lcnt = /bits/ 16 <0xec>;
++			fs_hcnt = /bits/ 16 <0x37>;
++			fs_lcnt = /bits/ 16 <0x42>;
++			fp_hcnt = /bits/ 16 <0x14>;
++			fp_lcnt = /bits/ 16 <0x1a>;
++			hs_hcnt = /bits/ 16 <0x9>;
++			hs_lcnt = /bits/ 16 <0x11>;
++			status = "disabled";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-			status = "disabled";
+ 		};
+ 
+ 		audio_mbox: audio_mbox@0xffefc48000 {
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index bf4e8ed7025f..a5bd160dd5cb 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -523,7 +523,7 @@ static void dw_axi_dma_set_hw_channel(struct axi_dma_chan *chan, bool set)
+ 	unsigned long reg_value, val;
+ 
+ 	if (!chip->apb_regs) {
+-		dev_err(chip->dev, "apb_regs not initialized\n");
++		dev_dbg(chip->dev, "apb_regs not initialized\n");
+ 		return;
+ 	}
+ 
+diff --git a/drivers/i2c/busses/Makefile b/drivers/i2c/busses/Makefile
+index 9be9fdb07f3d..b182c14d4634 100644
+--- a/drivers/i2c/busses/Makefile
++++ b/drivers/i2c/busses/Makefile
+@@ -53,6 +53,7 @@ obj-$(CONFIG_I2C_CPM)		+= i2c-cpm.o
+ obj-$(CONFIG_I2C_DAVINCI)	+= i2c-davinci.o
+ obj-$(CONFIG_I2C_DESIGNWARE_CORE)			+= i2c-designware-core.o
+ i2c-designware-core-y					:= i2c-designware-common.o
++i2c-designware-core-y					+= i2c-designware-master_dma.o
+ i2c-designware-core-y					+= i2c-designware-master.o
+ i2c-designware-core-$(CONFIG_I2C_DESIGNWARE_SLAVE) 	+= i2c-designware-slave.o
+ obj-$(CONFIG_I2C_DESIGNWARE_PLATFORM)			+= i2c-designware-platform.o
+diff --git a/drivers/i2c/busses/i2c-designware-core.h b/drivers/i2c/busses/i2c-designware-core.h
+index 4098bdc2e102..cc3d96097e0a 100644
+--- a/drivers/i2c/busses/i2c-designware-core.h
++++ b/drivers/i2c/busses/i2c-designware-core.h
+@@ -17,7 +17,7 @@
+ #include <linux/i2c.h>
+ #include <linux/regmap.h>
+ #include <linux/types.h>
+-
++#include <linux/dmaengine.h>
+ #define DW_IC_DEFAULT_FUNCTIONALITY		(I2C_FUNC_I2C | \
+ 						 I2C_FUNC_SMBUS_BYTE | \
+ 						 I2C_FUNC_SMBUS_BYTE_DATA | \
+@@ -247,6 +247,18 @@ struct reset_control;
+  * values than the one computed based only on the input clock frequency.
+  * Leave them to be %0 if not used.
+  */
++ struct i2c_dw_dma {
++    struct dma_chan *dma_chan;
++    struct dma_async_tx_descriptor *desc;
++    dma_cookie_t cookie;
++    dma_addr_t dma_addr; //phy addr
++    u32 *buf;            //Store the virtual address of the data to be transferred by dma
++    u32 buf_size;
++    u32 transfer_len;    //dma transfer data num
++	//volatile int dma_complete;
++    struct completion dma_complete;
++};
++
+ struct dw_i2c_dev {
+ 	struct device		*dev;
+ 	struct regmap		*map;
+@@ -270,6 +282,7 @@ struct dw_i2c_dev {
+ 	u8			*rx_buf;
+ 	int			msg_err;
+ 	unsigned int		status;
++	unsigned int		tx_status;
+ 	unsigned int		abort_source;
+ 	int			irq;
+ 	u32			flags;
+@@ -298,6 +311,11 @@ struct dw_i2c_dev {
+ 	int			(*set_sda_hold_time)(struct dw_i2c_dev *dev);
+ 	int			mode;
+ 	struct i2c_bus_recovery_info rinfo;
++	bool			suspended;
++    struct i2c_dw_dma dma;
++    u32 laststat;
++    u32 laststatus;
++    int dw_i2c_enable_dma;
+ };
+ 
+ #define ACCESS_INTR_MASK			BIT(0)
+diff --git a/drivers/i2c/busses/i2c-designware-master.c b/drivers/i2c/busses/i2c-designware-master.c
+index e865869ccc50..fe381b54b5fd 100644
+--- a/drivers/i2c/busses/i2c-designware-master.c
++++ b/drivers/i2c/busses/i2c-designware-master.c
+@@ -23,6 +23,7 @@
+ #include <linux/reset.h>
+ 
+ #include "i2c-designware-core.h"
++#include "i2c-designware-master_dma.h"
+ 
+ #define AMD_TIMEOUT_MIN_US	25
+ #define AMD_TIMEOUT_MAX_US	250
+@@ -250,7 +251,12 @@ static void i2c_dw_xfer_init(struct dw_i2c_dev *dev)
+ 
+ 	/* Clear and enable interrupts */
+ 	regmap_read(dev->map, DW_IC_CLR_INTR, &dummy);
+-	regmap_write(dev->map, DW_IC_INTR_MASK, DW_IC_INTR_MASTER_MASK);
++	if (dev->dw_i2c_enable_dma) {
++		i2c_dw_xfer_dma_init(dev);
++		regmap_write(dev->map, DW_IC_INTR_MASK,  (DW_IC_INTR_MASTER_MASK & (~DW_IC_INTR_TX_EMPTY))|DW_IC_INTR_RX_OVER);
++	} else {
++		regmap_write(dev->map, DW_IC_INTR_MASK, DW_IC_INTR_MASTER_MASK|DW_IC_INTR_RX_OVER);
++	}
+ }
+ 
+ /*
+@@ -699,6 +705,7 @@ i2c_dw_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
+ 	dev->msg_read_idx = 0;
+ 	dev->msg_err = 0;
+ 	dev->status = 0;
++	dev->tx_status = 0;
+ 	dev->abort_source = 0;
+ 	dev->rx_outstanding = 0;
+ 
+@@ -714,6 +721,16 @@ i2c_dw_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
+ 	i2c_dw_xfer_init(dev);
+ 
+ 	/* Wait for tx to complete */
++    if (dev->dw_i2c_enable_dma) {
++        if(i2c_dw_dma_tx_transfer(dev, adap->timeout) != 0) {
++			dev_err(dev->dev, "i2c dw dma transfer error\n");
++			i2c_recover_bus(&dev->adapter);
++			i2c_dw_init_master(dev);
++			ret = -ETIMEDOUT;
++			goto done;
++        }
++    }
++	/* Wait for tx to complete */
+ 	if (!wait_for_completion_timeout(&dev->cmd_complete, adap->timeout)) {
+ 		dev_err(dev->dev, "controller timed out\n");
+ 		/* i2c_dw_init implicitly disables the adapter */
+@@ -760,13 +777,21 @@ i2c_dw_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
+ 		goto done;
+ 	}
+ 
+-	if (dev->status)
+-		dev_err(dev->dev,
+-			"transfer terminated early - interrupt latency too high?\n");
+-
++	if (dev->status || dev->tx_status) {
++		dev_err(dev->dev, "transfer terminated early - interrupt latency too high? sta 0x%x,tx_status 0x%x\n",dev->status,dev->tx_status);
++		dev_err(dev->dev, "laststa 0x%x, laststatus 0x%x,rx_outstanding %d\n", dev->laststat, dev->laststatus, dev->rx_outstanding);
++		if(dev->laststat&DW_IC_INTR_RX_OVER)
++		{
++			ret = -EAGAIN;
++			goto done;
++		}
++	}
+ 	ret = -EIO;
+ 
+ done:
++	if (dev->dw_i2c_enable_dma) {
++		i2c_dw_xfer_dma_deinit(dev);
++	}
+ 	i2c_dw_release_lock(dev);
+ 
+ done_nolock:
+@@ -848,7 +873,7 @@ static u32 i2c_dw_read_clear_intrbits(struct dw_i2c_dev *dev)
+ static irqreturn_t i2c_dw_isr(int this_irq, void *dev_id)
+ {
+ 	struct dw_i2c_dev *dev = dev_id;
+-	unsigned int stat, enabled;
++	unsigned int stat, status,enabled;
+ 
+ 	regmap_read(dev->map, DW_IC_ENABLE, &enabled);
+ 	regmap_read(dev->map, DW_IC_RAW_INTR_STAT, &stat);
+@@ -881,11 +906,19 @@ static irqreturn_t i2c_dw_isr(int this_irq, void *dev_id)
+ 		 * Anytime TX_ABRT is set, the contents of the tx/rx
+ 		 * buffers are flushed. Make sure to skip them.
+ 		 */
++		if (!dev->dw_i2c_enable_dma) {
++			regmap_write(dev->map, DW_IC_INTR_MASK, 0);
++		}
++		goto tx_aborted;
++	}
++	if(stat & DW_IC_INTR_RX_OVER)
++	{
++		/* Anytime RX_OVER is set, Make sure to skip them.*/
+ 		regmap_write(dev->map, DW_IC_INTR_MASK, 0);
+ 		goto tx_aborted;
+ 	}
+ 
+-	if (stat & DW_IC_INTR_RX_FULL)
++	if ((stat & DW_IC_INTR_RX_FULL) || (dev->rx_outstanding >0))
+ 		i2c_dw_read(dev);
+ 
+ 	if (stat & DW_IC_INTR_TX_EMPTY)
+@@ -898,9 +931,16 @@ static irqreturn_t i2c_dw_isr(int this_irq, void *dev_id)
+ 	 */
+ 
+ tx_aborted:
+-	if (((stat & (DW_IC_INTR_TX_ABRT | DW_IC_INTR_STOP_DET)) || dev->msg_err) &&
+-	     (dev->rx_outstanding == 0))
++	regmap_read(dev->map, DW_IC_STATUS, &status);
++
++	if ((stat & (DW_IC_INTR_TX_ABRT|DW_IC_INTR_RX_OVER))|| dev->msg_err ||
++			((status & DW_IC_STATUS_TFE) &&
++			 (!(status & DW_IC_STATUS_RFNE)) &&
++			 (!(status & DW_IC_STATUS_MASTER_ACTIVITY)))) {
++		dev->laststat = stat;
++		dev->laststatus = status;
+ 		complete(&dev->cmd_complete);
++	}
+ 	else if (unlikely(dev->flags & ACCESS_INTR_MASK)) {
+ 		/* Workaround to trigger pending interrupt */
+ 		regmap_read(dev->map, DW_IC_INTR_MASK, &stat);
+@@ -997,9 +1037,27 @@ int i2c_dw_probe_master(struct dw_i2c_dev *dev)
+ 	struct i2c_adapter *adap = &dev->adapter;
+ 	unsigned long irq_flags;
+ 	unsigned int ic_con;
++	struct device_node *np;
+ 	int ret;
++	const char *i2c_mode;
++
++	//default used interrupt mode
++	dev->dw_i2c_enable_dma = 0;
++
++	np = dev->dev->of_node;
++	ret = of_property_read_string(np, "i2c_mode", &i2c_mode);
++	if (ret == 0) {
++		if (strcmp(i2c_mode, "dma") == 0) {
++			dev->dw_i2c_enable_dma = 1;
++			dev_info(dev->dev,"i2c use dma mode\n");
++		}
++	}
+ 
+ 	init_completion(&dev->cmd_complete);
++    if (dev->dw_i2c_enable_dma) {
++		init_completion(&dev->dma.dma_complete);
++    }
++
+ 
+ 	dev->init = i2c_dw_init_master;
+ 
+diff --git a/drivers/i2c/busses/i2c-designware-master_dma.c b/drivers/i2c/busses/i2c-designware-master_dma.c
+new file mode 100644
+index 000000000000..cfdd0ee414da
+--- /dev/null
++++ b/drivers/i2c/busses/i2c-designware-master_dma.c
+@@ -0,0 +1,348 @@
++#include <linux/dmaengine.h>
++#include <linux/dma-mapping.h>
++#include <linux/i2c.h>
++#include <linux/platform_device.h>
++#include <linux/delay.h>
++#include <linux/jiffies.h>
++#include "i2c-designware-core.h"
++
++#define DEBUG
++
++#define DW_IC_DMA_CR                (0x88)
++#define DW_IC_DMA_TDLR              (0x8c)
++#define DW_IC_DMA_RDLR              (0x90)
++#define DW_IC_DMA_CR_TXEN           (0x2)
++#define DW_IC_DMA_CR_DIS            (0x0)
++
++//Because the fifo register bit width is 32bits, each transfer data is 4byte
++#define DW_IC_DMA_DATA_BLOCK_BYTES  (0x4)
++
++//#define __dev_vdgb dev_dbg
++#define __dev_vdgb(fmt, ...)
++
++static int i2c_dw_hwparams_to_dma_slave_config(struct dw_i2c_dev *dev)
++{
++    int ret = 0;
++    struct dma_slave_config slave_config;
++    struct i2c_dw_dma *dma = &dev->dma;
++    struct platform_device *pdev;
++    struct resource *iores_mem;
++    phys_addr_t reg_addr;
++
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++    memset(&slave_config, 0, sizeof(slave_config));
++
++    //get i2c fifo addr
++    pdev = to_platform_device(dev->dev);
++    iores_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++    reg_addr = iores_mem->start + DW_IC_DATA_CMD;
++    slave_config.direction = DMA_MEM_TO_DEV;
++    slave_config.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
++    slave_config.src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
++    slave_config.dst_addr = reg_addr;
++    //for light only support "false"
++    slave_config.device_fc = false;
++
++    ret = dmaengine_slave_config(dma->dma_chan, &slave_config);
++    if (ret) {
++        dev_err(dev->dev, "dmaengine_slave_config failed\n");
++        return ret;
++    }
++
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return 0;
++}
++
++static void i2c_dw_dma_callback(void *data)
++{
++    struct dw_i2c_dev *dev = (struct dw_i2c_dev *)data;
++    struct i2c_dw_dma *dma = &dev->dma;
++
++    dev->tx_status &= ~STATUS_WRITE_IN_PROGRESS;
++    complete(&dma->dma_complete);
++    dmaengine_terminate_async(dma->dma_chan);
++}
++
++static int get_msg_size(struct dw_i2c_dev *dev)
++{
++    struct i2c_msg *msgs = dev->msgs;
++    u32 addr = msgs[dev->msg_write_idx].addr;
++    int i = 0;
++    int len = 0;
++
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++    for (i = dev->msg_write_idx; i < dev->msgs_num; i++) {
++        if (msgs[i].addr != addr) {
++            dev_err(dev->dev, "%s: invalid target address\n", __func__);
++            dev->msg_err = -EINVAL;
++            break;
++        }
++
++        len += msgs[i].len;
++    }
++
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return len;
++}
++
++static int alloc_dma_buf(struct dw_i2c_dev *dev, int size)
++{
++    struct i2c_dw_dma *dma =  &dev->dma;
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++
++    dma->buf = dma_alloc_coherent(dev->dev, size, &dma->dma_addr, GFP_KERNEL);
++    if (!dma->buf) {
++        dev_err(dev->dev, "i2c alloc dma buf failed\n");
++        return -1;
++    }
++
++    dma->buf_size = size;
++    dma->transfer_len = 0;
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return 0;
++}
++
++static int i2c_dw_release_tx_packets(struct dw_i2c_dev *dev)
++{
++    struct i2c_dw_dma *dma =  &dev->dma;
++
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++
++    if(dma->buf && dma->dma_addr && dma->buf_size) {
++        dma_free_coherent(dev->dev, dma->buf_size, dma->buf, dma->dma_addr);
++    }
++
++    dma->buf = 0;
++    dma->dma_addr = 0;
++    dma->buf_size = 0;
++
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return 0;
++}
++
++static int i2c_dw_synthetic_tx_packets(struct dw_i2c_dev *dev)
++{
++    int ret = 0;
++    struct i2c_dw_dma *dma =  &dev->dma;
++    struct i2c_msg *msgs = dev->msgs;
++    bool need_restart = false;
++    uint32_t *tx_buf;
++    int dma_tx_buf_size;
++    u32 addr = msgs[dev->msg_write_idx].addr;
++
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++
++    dma_tx_buf_size = get_msg_size(dev) * 4;
++    if (dma_tx_buf_size <= 0) {
++        dev_err(dev->dev, "i2c get_msg_size size is error %d\n", dma_tx_buf_size);
++        return -1;
++    }
++
++    ret = alloc_dma_buf(dev, dma_tx_buf_size);
++    if (ret) {
++        dev_err(dev->dev, "i2c alloc_dma_buf failed\n");
++        return -1;
++    }
++
++    tx_buf = dma->buf;
++
++    for (; dev->msg_write_idx < dev->msgs_num; dev->msg_write_idx++) {
++        unsigned char *buf;
++        int buf_len;
++        u32 flags = msgs[dev->msg_write_idx].flags;
++
++        if (msgs[dev->msg_write_idx].addr != addr) {
++            dev_err(dev->dev, "%s: invalid target address\n", __func__);
++            dev->msg_err = -EINVAL;
++            break;
++        }
++
++        /* new i2c_msg */
++        buf = msgs[dev->msg_write_idx].buf;
++        buf_len = msgs[dev->msg_write_idx].len;
++
++        if ((dev->master_cfg & DW_IC_CON_RESTART_EN) &&
++                (dev->msg_write_idx > 0))
++            need_restart = true;
++
++        //dev_err(dev->dev, "   msg_buf_len %d\n", buf_len);
++        while (buf_len > 0) {
++            u32 cmd = 0;
++
++            if (dev->msg_write_idx == dev->msgs_num - 1 &&
++                buf_len == 1 && !(flags & I2C_M_RECV_LEN))
++                cmd |= BIT(9);
++
++            if (need_restart) {
++                cmd |= BIT(10);
++                need_restart = false;
++            }
++
++            if (msgs[dev->msg_write_idx].flags & I2C_M_RD) {
++                *tx_buf = cmd | 0x100;
++                dev->rx_outstanding++;
++            } else {
++                *tx_buf = cmd | *buf++;
++            }
++            tx_buf++;
++            dma->transfer_len++;
++            buf_len--;
++        }
++    }
++
++    dma_sync_single_for_device(dev->dev, dma->dma_addr, dma->buf_size, DMA_TO_DEVICE);
++
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return 0;
++}
++
++int i2c_dw_xfer_dma_deinit(struct dw_i2c_dev *dev);
++
++int i2c_dw_dma_tx_transfer(struct dw_i2c_dev *dev, unsigned int timeout)
++{
++    int ret = 0;
++    struct i2c_dw_dma *dma = &dev->dma;
++    u32 stat;
++
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++    if (dma->dma_chan == NULL) {
++        goto error;
++    }
++
++    ret = i2c_dw_hwparams_to_dma_slave_config(dev);
++    if (ret != 0) {
++        goto error;
++    }
++
++    regmap_read(dev->map, DW_IC_RAW_INTR_STAT, &stat);
++    if (stat & DW_IC_INTR_TX_ABRT) {
++        dev->cmd_err |= DW_IC_ERR_TX_ABRT;
++        dev->tx_status = 0;
++        goto error;
++    }
++
++    ret = i2c_dw_synthetic_tx_packets(dev);
++    if (ret != 0) {
++        dev_err(dev->dev, "%s: i2c_dw_synthetic_tx_packets failed\n", __func__);
++        goto error;
++    }
++
++    dev->tx_status |= STATUS_WRITE_IN_PROGRESS;
++    dma->desc = dmaengine_prep_slave_single(dma->dma_chan, dma->dma_addr,
++                                               dma->transfer_len * DW_IC_DMA_DATA_BLOCK_BYTES,
++                                               DMA_MEM_TO_DEV,
++                                               DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
++    if (dma->desc == NULL) {
++        dev_err(dev->dev, "%s: dmaengine_prep_slave_single failed\n", __func__);
++        goto error;
++    }
++
++    dma->desc->callback = i2c_dw_dma_callback;
++    dma->desc->callback_param = dev;
++    dma->cookie = dmaengine_submit(dma->desc);
++    dma_async_issue_pending(dma->dma_chan);
++
++    //wait dma transfer complete
++    if (!wait_for_completion_timeout(&dma->dma_complete, timeout)) {
++        dev_err(dev->dev, "i2c dma_ch%d write timed out\n", dma->dma_chan->chan_id);
++        ret = dmaengine_terminate_async(dma->dma_chan);
++        if (ret !=0) {
++            dev_err(dev->dev, "i2c dma dmaengine_terminate_async failed,\
++                               dma_ch is %d\n", dma->dma_chan->chan_id);
++        }
++        dmaengine_synchronize(dma->dma_chan);
++        goto error;
++    }
++
++    dmaengine_synchronize(dma->dma_chan);
++
++    //Release the dma channel immediately after the dma transfer is completed,
++    //reducing the dma occupation time
++    //i2c_dw_xfer_dma_init(dev);
++    return 0;
++
++error:
++    //i2c_dw_xfer_dma_init(dev);
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return -1;
++}
++
++static int i2x_dw_get_read_size(struct dw_i2c_dev *dev)
++{
++    struct i2c_msg *msgs = dev->msgs;
++    u32 addr = msgs[dev->msg_write_idx].addr;
++    int i = 0;
++    int len = 0;
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++    for (i = dev->msg_write_idx; i < dev->msgs_num; i++) {
++        if (msgs[i].addr != addr) {
++            dev_err(dev->dev, "%s: invalid target address\n", __func__);
++            dev->msg_err = -EINVAL;
++            break;
++        }
++        if(msgs[i].flags & I2C_M_RD)
++            len += msgs[i].len;
++    }
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return len;
++}
++int i2c_dw_xfer_dma_init(struct dw_i2c_dev *dev)
++{
++    struct i2c_dw_dma *dma = &dev->dma;
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++
++    // i2c dma set tx data level
++    regmap_write(dev->map, DW_IC_DMA_TDLR, dev->tx_fifo_depth / 2);
++
++    if(i2x_dw_get_read_size(dev)>(dev->rx_fifo_depth / 2))
++	    regmap_write(dev->map, DW_IC_RX_TL,  dev->rx_fifo_depth / 2);
++
++    // i2c dma tx enable
++    regmap_write(dev->map, DW_IC_DMA_CR, DW_IC_DMA_CR_TXEN);
++
++    if (dma->dma_chan == NULL) {
++        //Alloc i2c dma channel.
++        //The function is to configure the handshake number in i2c dts into the channel
++		//Try to obtain the dma channel within 10 seconds
++		int i = 2000;
++		while(i--) {
++			dma->dma_chan = dma_request_slave_channel(dev->dev, "tx");
++			if (dma->dma_chan) {
++				break;
++			}
++			msleep(5);
++		}
++
++		if (!dma->dma_chan) {
++			dev_err(dev->dev, "Failed to request dma channel");
++			return -EIO;
++        }
++
++        __dev_vdgb(dev->dev,"i2c request dma_ch %d\n", dma->dma_chan->chan_id);
++    }
++
++    __dev_vdgb(dev->dev,"i2c dma_ch %d\n", dma->dma_chan->chan_id);
++    reinit_completion(&dma->dma_complete);
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++    return 0;
++}
++
++int i2c_dw_xfer_dma_deinit(struct dw_i2c_dev *dev)
++{
++    struct i2c_dw_dma *dma = &dev->dma;
++
++    __dev_vdgb(dev->dev, "%s, %d, enter\n", __func__, __LINE__);
++
++    i2c_dw_release_tx_packets(dev);
++    if (dma->dma_chan != NULL) {
++        dma_release_channel(dma->dma_chan);
++    }
++    dma->dma_chan = NULL;
++
++    // i2c dma disable
++    regmap_write(dev->map, DW_IC_DMA_CR, DW_IC_DMA_CR_DIS);
++    __dev_vdgb(dev->dev, "%s, %d, exit\n", __func__, __LINE__);
++
++    return 0;
++}
++
+diff --git a/drivers/i2c/busses/i2c-designware-master_dma.h b/drivers/i2c/busses/i2c-designware-master_dma.h
+new file mode 100644
+index 000000000000..e25cc243c9bc
+--- /dev/null
++++ b/drivers/i2c/busses/i2c-designware-master_dma.h
+@@ -0,0 +1,6 @@
++//#include "i2c-designware-core.h"
++
++int i2c_dw_dma_tx_transfer(struct dw_i2c_dev *dev, unsigned int timeout);
++int i2c_dw_xfer_dma_init(struct dw_i2c_dev *dev);
++int i2c_dw_xfer_dma_deinit(struct dw_i2c_dev *dev);
++
+-- 
+2.43.0
+

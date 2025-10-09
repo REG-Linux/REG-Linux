@@ -1,0 +1,42 @@
+From a4089339b37f70aa62640926169f5fc2bededf94 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Fri, 1 Dec 2023 13:32:39 +0800
+Subject: [PATCH 327/400] drm/etnaviv: add workaround for GC620 on TH1520
+ (0x5552)
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+---
+ drivers/gpu/drm/etnaviv/etnaviv_gpu.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/gpu/drm/etnaviv/etnaviv_gpu.c b/drivers/gpu/drm/etnaviv/etnaviv_gpu.c
+index 572547e117f3..8cdc7cf65825 100644
+--- a/drivers/gpu/drm/etnaviv/etnaviv_gpu.c
++++ b/drivers/gpu/drm/etnaviv/etnaviv_gpu.c
+@@ -522,6 +522,10 @@ static int etnaviv_hw_reset(struct etnaviv_gpu *gpu)
+ 		control |= VIVS_HI_CLOCK_CONTROL_ISOLATE_GPU;
+ 		gpu_write(gpu, VIVS_HI_CLOCK_CONTROL, control);
+ 
++		if (etnaviv_is_model_rev(gpu, GC620, 0x5552)) {
++			gpu_write(gpu, 0x00800, 0x10);
++		}
++
+ 		if (gpu->identity.minor_features7 & chipMinorFeatures7_BIT_SECURITY) {
+ 			gpu_write(gpu, VIVS_MMUv2_AHB_CONTROL,
+ 			          VIVS_MMUv2_AHB_CONTROL_RESET);
+@@ -754,6 +758,12 @@ static void etnaviv_gpu_hw_init(struct etnaviv_gpu *gpu)
+ 		gpu_write(gpu, VIVS_MC_BUS_CONFIG, bus_config);
+ 	}
+ 
++	/* FIXME: use feature bit 5 of minor features 12, G2D_DEC400EX */
++	if (etnaviv_is_model_rev(gpu, GC620, 0x5552)) {
++		gpu_write(gpu, 0x800, 0x2010188);
++		gpu_write(gpu, 0x808, 0x3fc104);
++	}
++
+ 	if (gpu->identity.minor_features7 & chipMinorFeatures7_BIT_SECURITY) {
+ 		u32 val = gpu_read(gpu, VIVS_MMUv2_AHB_CONTROL);
+ 		val |= VIVS_MMUv2_AHB_CONTROL_NONSEC_ACCESS;
+-- 
+2.43.0
+

@@ -1,0 +1,24 @@
+From a684e8f04e69b04d689c6f21855d3e83b9eb65d1 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:50:53 +0800
+Subject: [PATCH 274/400] defconfig: bt: add hid support
+
+Error "Bluetooth: hci0: Bad flag given (0x1) vs supported (0x0)" occurs when connecting the Bluetooth mouse on the xfce interface.
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/configs/th1520_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 0d96d845e6f3..cf29385c529d 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -348,3 +348,4 @@ CONFIG_RTL8822CS=y
+ CONFIG_RISCV_SBI_V01=y
+ CONFIG_SERIAL_EARLYCON_RISCV_SBI=y
+ CONFIG_BT_HCIUART_RTL3WIRE=y
++CONFIG_UHID=y
+-- 
+2.43.0
+

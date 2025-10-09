@@ -1,0 +1,52 @@
+From 083c358aae01d3894bacc7058a7df5fcdb77d9a3 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:12:44 +0800
+Subject: [PATCH 190/400] riscv:dts:som: add th1520-lpi4a-product and
+ th1520-lpi4a-product-sec dts file
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/Makefile                     | 1 +
+ arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts | 6 ++++++
+ arch/riscv/boot/dts/thead/th1520-lpi4a-product.dts     | 6 ++++++
+ 3 files changed, 13 insertions(+)
+ create mode 100644 arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts
+ create mode 100644 arch/riscv/boot/dts/thead/th1520-lpi4a-product.dts
+
+diff --git a/arch/riscv/boot/dts/thead/Makefile b/arch/riscv/boot/dts/thead/Makefile
+index 1eea5a86b784..f83afc00a41b 100644
+--- a/arch/riscv/boot/dts/thead/Makefile
++++ b/arch/riscv/boot/dts/thead/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lichee-pi-4a.dtb th1520-beaglev-ahead.dtb th1520-lichee-pi-4a-16g.dtb
++dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lpi4a-product.dtb th1520-lpi4a-product-sec.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-a-val.dtb th1520-a-val-sec.dtb
+diff --git a/arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts b/arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts
+new file mode 100644
+index 000000000000..2713e85fa78e
+--- /dev/null
++++ b/arch/riscv/boot/dts/thead/th1520-lpi4a-product-sec.dts
+@@ -0,0 +1,6 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Copyright (C) 2021-2024 Alibaba Group Holding Limited.
++ */
++
++#include "th1520-lpi4a-product.dts"
+diff --git a/arch/riscv/boot/dts/thead/th1520-lpi4a-product.dts b/arch/riscv/boot/dts/thead/th1520-lpi4a-product.dts
+new file mode 100644
+index 000000000000..b2fb44f71b0d
+--- /dev/null
++++ b/arch/riscv/boot/dts/thead/th1520-lpi4a-product.dts
+@@ -0,0 +1,6 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Copyright (C) 2021-2024 Alibaba Group Holding Limited.
++ */
++
++#include "th1520-lichee-pi-4a.dts"
+-- 
+2.43.0
+

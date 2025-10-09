@@ -1,0 +1,189 @@
+From 36e496218b1f543d4cbe7fac46a26bf34f44d3a3 Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Tue, 8 Jul 2025 12:51:55 +0800
+Subject: [PATCH 382/400] fix: Fix cross-compilation error when LLVM=1
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/gpu/drm/img-rogue/physmem_hostmem.c   |  4 +--
+ drivers/gpu/drm/img-rogue/physmem_lma.c       | 26 +++++++++----------
+ drivers/gpu/drm/img-rogue/sysconfig.c         |  4 +--
+ drivers/gpu/drm/img-rogue/vmm_type_stub.c     | 14 +++++-----
+ drivers/gpu/drm/panel/panel-lt8911.c          |  2 +-
+ .../aic8800/aic8800_fdrv/aicwf_rx_prealloc.c  |  4 +--
+ drivers/pinctrl/pinctrl-th1520.c              |  2 +-
+ 7 files changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/gpu/drm/img-rogue/physmem_hostmem.c b/drivers/gpu/drm/img-rogue/physmem_hostmem.c
+index 2f1dc409301a..1354d672f674 100644
+--- a/drivers/gpu/drm/img-rogue/physmem_hostmem.c
++++ b/drivers/gpu/drm/img-rogue/physmem_hostmem.c
+@@ -66,9 +66,9 @@ static void HostMemDevPAddrToCpuPAddr(IMG_HANDLE hPrivData,
+ static PHYS_HEAP_FUNCTIONS gsHostMemDevPhysHeapFuncs =
+ {
+ 	/* pfnCpuPAddrToDevPAddr */
+-	HostMemCpuPAddrToDevPAddr,
++	.pfnCpuPAddrToDevPAddr = HostMemCpuPAddrToDevPAddr,
+ 	/* pfnDevPAddrToCpuPAddr */
+-	HostMemDevPAddrToCpuPAddr,
++	.pfnDevPAddrToCpuPAddr = HostMemDevPAddrToCpuPAddr,
+ };
+ 
+ static PVRSRV_DEVICE_CONFIG gsHostMemDevConfig[];
+diff --git a/drivers/gpu/drm/img-rogue/physmem_lma.c b/drivers/gpu/drm/img-rogue/physmem_lma.c
+index 4fa61ac18fcf..3fd806966436 100644
+--- a/drivers/gpu/drm/img-rogue/physmem_lma.c
++++ b/drivers/gpu/drm/img-rogue/physmem_lma.c
+@@ -1843,31 +1843,31 @@ PVRSRV_ERROR PMRChangeSparseMemCPUMapLocalMem(PMR_IMPL_PRIVDATA pPriv,
+ 
+ static PMR_IMPL_FUNCTAB _sPMRLMAFuncTab = {
+ 	/* pfnLockPhysAddresses */
+-	&PMRLockSysPhysAddressesLocalMem,
++	.pfnLockPhysAddresses = &PMRLockSysPhysAddressesLocalMem,
+ 	/* pfnUnlockPhysAddresses */
+-	&PMRUnlockSysPhysAddressesLocalMem,
++	.pfnUnlockPhysAddresses = &PMRUnlockSysPhysAddressesLocalMem,
+ 	/* pfnDevPhysAddr */
+-	&PMRSysPhysAddrLocalMem,
++	.pfnDevPhysAddr = &PMRSysPhysAddrLocalMem,
+ 	/* pfnAcquireKernelMappingData */
+-	&PMRAcquireKernelMappingDataLocalMem,
++	.pfnAcquireKernelMappingData = &PMRAcquireKernelMappingDataLocalMem,
+ 	/* pfnReleaseKernelMappingData */
+-	&PMRReleaseKernelMappingDataLocalMem,
++	.pfnReleaseKernelMappingData = &PMRReleaseKernelMappingDataLocalMem,
+ 	/* pfnReadBytes */
+-	&PMRReadBytesLocalMem,
++	.pfnReadBytes = &PMRReadBytesLocalMem,
+ 	/* pfnWriteBytes */
+-	&PMRWriteBytesLocalMem,
++	.pfnWriteBytes = &PMRWriteBytesLocalMem,
+ 	/* pfnUnpinMem */
+-	NULL,
++	.pfnUnpinMem = NULL,
+ 	/* pfnPinMem */
+-	NULL,
++	.pfnPinMem = NULL,
+ 	/* pfnChangeSparseMem*/
+-	&PMRChangeSparseMemLocalMem,
++	.pfnChangeSparseMem = &PMRChangeSparseMemLocalMem,
+ 	/* pfnChangeSparseMemCPUMap */
+-	&PMRChangeSparseMemCPUMapLocalMem,
++	.pfnChangeSparseMemCPUMap = &PMRChangeSparseMemCPUMapLocalMem,
+ 	/* pfnMMap */
+-	NULL,
++	.pfnMMap = NULL,
+ 	/* pfnFinalize */
+-	&PMRFinalizeLocalMem
++	.pfnFinalize = &PMRFinalizeLocalMem
+ };
+ 
+ PVRSRV_ERROR
+diff --git a/drivers/gpu/drm/img-rogue/sysconfig.c b/drivers/gpu/drm/img-rogue/sysconfig.c
+index aedd2f8c9dd2..cc97421bb505 100644
+--- a/drivers/gpu/drm/img-rogue/sysconfig.c
++++ b/drivers/gpu/drm/img-rogue/sysconfig.c
+@@ -151,9 +151,9 @@ void UMAPhysHeapDevPAddrToCpuPAddr(IMG_HANDLE hPrivData,
+ static PHYS_HEAP_FUNCTIONS gsPhysHeapFuncs =
+ {
+ 	/* pfnCpuPAddrToDevPAddr */
+-	UMAPhysHeapCpuPAddrToDevPAddr,
++	.pfnCpuPAddrToDevPAddr = UMAPhysHeapCpuPAddrToDevPAddr,
+ 	/* pfnDevPAddrToCpuPAddr */
+-	UMAPhysHeapDevPAddrToCpuPAddr,
++	.pfnDevPAddrToCpuPAddr = UMAPhysHeapDevPAddrToCpuPAddr,
+ };
+ 
+ static PVRSRV_ERROR PhysHeapsCreate(PHYS_HEAP_CONFIG **ppasPhysHeapsOut,
+diff --git a/drivers/gpu/drm/img-rogue/vmm_type_stub.c b/drivers/gpu/drm/img-rogue/vmm_type_stub.c
+index 747bf4a8e1f1..78892ce6f39a 100644
+--- a/drivers/gpu/drm/img-rogue/vmm_type_stub.c
++++ b/drivers/gpu/drm/img-rogue/vmm_type_stub.c
+@@ -75,29 +75,29 @@ static VMM_PVZ_CONNECTION gsStubVmmPvz =
+ {
+ 	.sClientFuncTab = {
+ 		/* pfnMapDevPhysHeap */
+-		&StubVMMMapDevPhysHeap,
++		.pfnMapDevPhysHeap = &StubVMMMapDevPhysHeap,
+ 
+ 		/* pfnUnmapDevPhysHeap */
+-		&StubVMMUnmapDevPhysHeap
++		.pfnUnmapDevPhysHeap = &StubVMMUnmapDevPhysHeap
+ 	},
+ 
+ 	.sServerFuncTab = {
+ 		/* pfnMapDevPhysHeap */
+-		&PvzServerMapDevPhysHeap,
++		.pfnMapDevPhysHeap = &PvzServerMapDevPhysHeap,
+ 
+ 		/* pfnUnmapDevPhysHeap */
+-		&PvzServerUnmapDevPhysHeap
++		.pfnUnmapDevPhysHeap = &PvzServerUnmapDevPhysHeap
+ 	},
+ 
+ 	.sVmmFuncTab = {
+ 		/* pfnOnVmOnline */
+-		&PvzServerOnVmOnline,
++		.pfnOnVmOnline = &PvzServerOnVmOnline,
+ 
+ 		/* pfnOnVmOffline */
+-		&PvzServerOnVmOffline,
++		.pfnOnVmOffline = &PvzServerOnVmOffline,
+ 
+ 		/* pfnVMMConfigure */
+-		&PvzServerVMMConfigure
++		.pfnVMMConfigure = &PvzServerVMMConfigure
+ 	}
+ };
+ 
+diff --git a/drivers/gpu/drm/panel/panel-lt8911.c b/drivers/gpu/drm/panel/panel-lt8911.c
+index a5afb7caff84..763aaa7bc975 100644
+--- a/drivers/gpu/drm/panel/panel-lt8911.c
++++ b/drivers/gpu/drm/panel/panel-lt8911.c
+@@ -13,7 +13,7 @@
+ static struct i2c_mipi_dsi g_lt8911_mipi_dsi;
+ static bool g_is_std_suspend __nosavedata;
+ 
+-static const struct drm_display_mode lt8911_default_mode = {
++static struct drm_display_mode lt8911_default_mode = {
+ 	.clock		= 152840,
+ 	.hdisplay	= 1920,
+ 	.hsync_start = 1920 + 140,
+diff --git a/drivers/net/wireless/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c b/drivers/net/wireless/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c
+index 59502b89a318..e9641c572b33 100644
+--- a/drivers/net/wireless/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c
++++ b/drivers/net/wireless/aic8800/aic8800_fdrv/aicwf_rx_prealloc.c
+@@ -49,7 +49,7 @@ void aicwf_prealloc_rxbuff_free(struct rx_buff *rxbuff, spinlock_t *lock)
+     spin_unlock_irqrestore(lock, flags);
+ }
+ 
+-int aicwf_prealloc_init()
++int aicwf_prealloc_init(void)
+ {
+     struct rx_buff *rxbuff;
+     int i = 0;
+@@ -79,7 +79,7 @@ int aicwf_prealloc_init()
+     return 0;
+ }
+ 
+-void aicwf_prealloc_exit()
++void aicwf_prealloc_exit(void)
+ {
+     struct rx_buff *rxbuff;
+     struct rx_buff *pos;
+diff --git a/drivers/pinctrl/pinctrl-th1520.c b/drivers/pinctrl/pinctrl-th1520.c
+index 2c02e92a4ccf..1dc07754873b 100644
+--- a/drivers/pinctrl/pinctrl-th1520.c
++++ b/drivers/pinctrl/pinctrl-th1520.c
+@@ -166,7 +166,7 @@ static int th1520_audio_func_sel(struct th1520_pinctrl *thp,
+ 	return 0;
+ }
+ 
+-static const struct custom_operations th1520_custom_ops = {
++static struct custom_operations th1520_custom_ops = {
+ 	.init = th1520_audio_func_sel,
+ };
+ 
+-- 
+2.43.0
+

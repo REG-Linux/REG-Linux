@@ -1,0 +1,948 @@
+From b7cfe616335e6ad9ad9230767bc7c3d338827d2d Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Fri, 27 Sep 2024 08:55:38 +0800
+Subject: [PATCH 349/400] driver: video-memory: reorganize the code structure
+
+soc: xuantie: th1520 use it.
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/soc/xuantie/Makefile                  |   2 +-
+ drivers/soc/xuantie/video_memory/Makefile     | 118 +------
+ .../soc/xuantie/video_memory/driver/Makefile  |  47 ---
+ drivers/soc/xuantie/video_memory/lib/Makefile |  16 -
+ .../soc/xuantie/video_memory/lib/video_mem.c  | 331 ------------------
+ .../soc/xuantie/video_memory/lib/video_mem.h  |  85 -----
+ .../video_memory/{driver => }/rsvmem_pool.c   |   0
+ .../video_memory/{driver => }/rsvmem_pool.h   |   0
+ .../soc/xuantie/video_memory/test/Makefile    |  70 ----
+ .../video_memory/test/video_memory_test.c     | 175 ---------
+ .../video_memory/{driver => }/video_memory.c  |   0
+ .../video_memory/{driver => }/video_memory.h  |   0
+ 13 files changed, 3 insertions(+), 841 deletions(-)
+ delete mode 100644 drivers/soc/xuantie/video_memory/driver/Makefile
+ delete mode 100644 drivers/soc/xuantie/video_memory/lib/Makefile
+ delete mode 100644 drivers/soc/xuantie/video_memory/lib/video_mem.c
+ delete mode 100644 drivers/soc/xuantie/video_memory/lib/video_mem.h
+ rename drivers/soc/xuantie/video_memory/{driver => }/rsvmem_pool.c (100%)
+ rename drivers/soc/xuantie/video_memory/{driver => }/rsvmem_pool.h (100%)
+ delete mode 100644 drivers/soc/xuantie/video_memory/test/Makefile
+ delete mode 100644 drivers/soc/xuantie/video_memory/test/video_memory_test.c
+ rename drivers/soc/xuantie/video_memory/{driver => }/video_memory.c (100%)
+ rename drivers/soc/xuantie/video_memory/{driver => }/video_memory.h (100%)
+
+diff --git a/drivers/soc/xuantie/Makefile b/drivers/soc/xuantie/Makefile
+index 11460835e6b1..4e4cf80331bf 100644
+--- a/drivers/soc/xuantie/Makefile
++++ b/drivers/soc/xuantie/Makefile
+@@ -6,6 +6,6 @@ obj-$(CONFIG_TH1520_IOPMP) += th1520-iopmp.o
+ 
+ # npu-ax3386-gpl driver
+ obj-y += nna/
+-obj-$(CONFIG_VIDEO_MEMORY) += video_memory/driver/
++obj-$(CONFIG_VIDEO_MEMORY) += video_memory/
+ obj-$(CONFIG_VIDEO_VC8000D) += vpu-vc8000d-kernel/linux/subsys_driver/ vpu-vc8000d-kernel/linux/memalloc/
+ obj-$(CONFIG_VIDEO_VC8000E) += vpu-vc8000e-kernel/linux/kernel_module/
+diff --git a/drivers/soc/xuantie/video_memory/Makefile b/drivers/soc/xuantie/video_memory/Makefile
+index 0fb32e948b3d..8d320a049f40 100644
+--- a/drivers/soc/xuantie/video_memory/Makefile
++++ b/drivers/soc/xuantie/video_memory/Makefile
+@@ -1,116 +1,2 @@
+-##
+- # Copyright (C) 2020 Alibaba Group Holding Limited
+-##
+-ifneq ($(wildcard ../.param),)
+-  include ../.param
+-endif
+-
+-#CONFIG_DEBUG_MODE=1
+-CONFIG_OUT_ENV=hwlinux
+-
+-CONFIG_BUILD_DRV_EXTRA_PARAM:=""    	
+-CONFIG_BUILD_LIB_EXTRA_PARAM:=""
+-CONFIG_BUILD_TST_EXTRA_PARAM:=""	
+-
+-DIR_TARGET_BASE=bsp/vidmem		
+-DIR_TARGET_KO  =bsp/vidmem/ko
+-DIR_TARGET_TEST=bsp/vidmem/test
+-
+-MODULE_NAME=vidmem
+-BUILD_LOG_START="\033[47;30m>>> $(MODULE_NAME) $@ begin\033[0m"
+-BUILD_LOG_END  ="\033[47;30m<<< $(MODULE_NAME) $@ end\033[0m"
+-
+-#
+-# Do a parallel build with multiple jobs, based on the number of CPUs online
+-# in this system: 'make -j8' on a 8-CPU system, etc.
+-#
+-# (To override it, run 'make JOBS=1' and similar.)
+-#
+-
+-ifeq ($(JOBS),)
+-  JOBS := $(shell grep -c ^processor /proc/cpuinfo 2>/dev/null)
+-  ifeq ($(JOBS),)
+-    JOBS := 1
+-  endif
+-endif
+-
+-all:    info driver lib test install_local_output install_rootfs
+-.PHONY: info driver lib test install_local_output install_rootfs \
+-        install_prepare install_addons clean_driver clean_test clean_output clean
+-
+-info:
+-	@echo $(BUILD_LOG_START)
+-	@echo "  ====== Build Info from repo project ======"
+-	@echo "    BUILDROOT_DIR="$(BUILDROOT_DIR)
+-	@echo "    CROSS_COMPILE="$(CROSS_COMPILE)
+-	@echo "    LINUX_DIR="$(LINUX_DIR)
+-	@echo "    ARCH="$(ARCH)
+-	@echo "    BOARD_NAME="$(BOARD_NAME)
+-	@echo "    KERNEL_ID="$(KERNELVERSION)
+-	@echo "    KERNEL_DIR="$(LINUX_DIR)
+-	@echo "    INSTALL_DIR_ROOTFS="$(INSTALL_DIR_ROOTFS)
+-	@echo "    INSTALL_DIR_SDK="$(INSTALL_DIR_SDK)
+-	@echo "  ====== Build configuration by settings ======"
+-#	@echo "    CONFIG_DEBUG_MODE="$(CONFIG_DEBUG_MODE)
+-	@echo "    CONFIG_OUT_ENV="$(CONFIG_OUT_ENV)
+-	@echo "    JOBS="$(JOBS)
+-	@echo $(BUILD_LOG_END)
+-
+-driver:
+-	@echo $(BUILD_LOG_START)
+-	make -C $(LINUX_DIR) M=$(PWD)/driver ARCH=$(ARCH) modules
+-	@echo $(BUILD_LOG_END)
+-
+-clean_driver:
+-	@echo $(BUILD_LOG_START)
+-	make -C driver KDIR=$(LINUX_DIR) clean
+-	@echo $(BUILD_LOG_END)
+-
+-lib:
+-	@echo $(BUILD_LOG_START)
+-	make -w -C lib
+-	@echo $(BUILD_LOG_END)
+-
+-clean_lib:
+-	@echo $(BUILD_LOG_START)
+-	make -C lib KDIR=$(LINUX_DIR) clean
+-	@echo $(BUILD_LOG_END)
+-
+-test: driver
+-	@echo $(BUILD_LOG_START)
+-	make -w -C test hwlinux
+-	@echo $(BUILD_LOG_END)
+-
+-clean_test:
+-	@echo $(BUILD_LOG_START)
+-	make clean -C test
+-	@echo $(BUILD_LOG_END)
+-
+-install_prepare:
+-	mkdir -p ./output/rootfs/$(DIR_TARGET_KO)
+-	mkdir -p ./output/rootfs/$(DIR_TARGET_TEST)
+-
+-install_addons: install_prepare
+-	@echo $(BUILD_LOG_START)
+-	@echo $(BUILD_LOG_END)
+-
+-install_local_output: driver lib test install_addons
+-	@echo $(BUILD_LOG_START)
+-	find ./driver -name "*.ko" | xargs -i cp -f {} ./output/rootfs/$(DIR_TARGET_KO)
+-	cp -f ./test/vidmem_test ./output/rootfs/$(DIR_TARGET_TEST)
+-	@if [ `command -v tree` != "" ]; then \
+-	    tree ./output/rootfs;             \
+-	fi
+-	@echo $(BUILD_LOG_END)
+-
+-install_rootfs: install_local_output
+-	@echo $(BUILD_LOG_START)
+-	@echo $(BUILD_LOG_END)
+-
+-clean_output:
+-	@echo $(BUILD_LOG_START)
+-	rm -rf ./output
+-	@echo $(BUILD_LOG_END)
+-
+-clean: clean_output clean_driver clean_lib clean_test
+-
++vidmem-objs := video_memory.o rsvmem_pool.o
++obj-$(CONFIG_VIDEO_MEMORY) += vidmem.o
+diff --git a/drivers/soc/xuantie/video_memory/driver/Makefile b/drivers/soc/xuantie/video_memory/driver/Makefile
+deleted file mode 100644
+index 783419fcf5ea..000000000000
+--- a/drivers/soc/xuantie/video_memory/driver/Makefile
++++ /dev/null
+@@ -1,47 +0,0 @@
+-# Copyright 2018 VeriSilicon. All Rights Reserved.
+-# This program is free software; you can redistribute it and/or
+-# modify it under the terms of the GNU General Public License
+-# as published by the Free Software Foundation; either version 2
+-# of the License, or (at your option) any later version.
+-
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-# USA.
+-
+-DEBUG ?= n
+-ifeq ($(DEBUG),y)
+-  DEBFLAGS = -O -g -DVIDMEM_DEBUG
+-else
+-  DEBFLAGS = -O2
+-endif
+-
+-EXTRA_CFLAGS += $(DEBFLAGS)
+-
+-ifneq ($(KERNELRELEASE),)
+-# recursive call from kernel build system
+-
+-vidmem-objs := video_memory.o rsvmem_pool.o
+-obj-m         += vidmem.o
+-
+-else
+-
+-#KDIR := /export/Testing/Board_Version_Control/SW_Common/SOCLE_MDK-3D/openlinux/2.6.29/v0_5/android_linux-2.6.29
+-KVER := $(shell uname -r)
+-KDIR := /lib/modules/$(KVER)/build
+-
+-PWD  := $(shell pwd)
+-
+-all:
+-	$(MAKE) -C $(KDIR) M=$(PWD) modules
+-
+-endif
+-
+-clean:
+-	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions *.mod
+-	rm -rf modules.order Module.symvers
+diff --git a/drivers/soc/xuantie/video_memory/lib/Makefile b/drivers/soc/xuantie/video_memory/lib/Makefile
+deleted file mode 100644
+index ecc91480f060..000000000000
+--- a/drivers/soc/xuantie/video_memory/lib/Makefile
++++ /dev/null
+@@ -1,16 +0,0 @@
+-CFLAGS = -Wall -D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE -O2 -Werror -Wno-unused -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-strict-overflow -Wno-array-bounds -Wno-shift-negative-value -Wempty-body -Wtype-limits -Wno-unused-result -fPIC -Wmissing-field-initializers -std=gnu99
+-
+-INCLUDE += -I../driver
+-
+-SRCS = video_mem.c
+-
+-OUT_PATH = ../output/rootfs/bsp/vidmem/lib
+-TARGET = $(OUT_PATH)/libvmem.so
+-
+-$(TARGET):
+-	$(shell if [ ! -e $(OUT_PATH) ];then mkdir -p $(OUT_PATH); fi)
+-	$(CC) $(SRCS) $(CFLAGS) $(INCLUDE) -shared -o $(TARGET)
+-
+-clean:
+-	$(RM) -r $(OUT_PATH)
+-
+diff --git a/drivers/soc/xuantie/video_memory/lib/video_mem.c b/drivers/soc/xuantie/video_memory/lib/video_mem.c
+deleted file mode 100644
+index db5f16698963..000000000000
+--- a/drivers/soc/xuantie/video_memory/lib/video_mem.c
++++ /dev/null
+@@ -1,331 +0,0 @@
+-/*
+- * Copyright (c) 2021-2022 Alibaba Group. All rights reserved.
+- * License-Identifier: Apache-2.0
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License"); you may
+- * not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *    http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- *
+- */
+-
+-#include <sys/mman.h>
+-#include <sys/ioctl.h>
+-#include <fcntl.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <unistd.h>
+-#include <memory.h>
+-#include "video_memory.h"
+-#include "video_mem.h"
+-
+-#define VMEM_PRINT(level, ...) \
+-    { \
+-        if (log_level >= VMEM_LOG_##level) \
+-        { \
+-            printf("VMEM[%d] %s: ", pid, #level); \
+-            printf(__VA_ARGS__); \
+-        } \
+-    }
+-
+-#define VMEM_LOGE(...) VMEM_PRINT(ERROR, __VA_ARGS__)
+-#define VMEM_LOGW(...) VMEM_PRINT(WARNING, __VA_ARGS__)
+-#define VMEM_LOGI(...) VMEM_PRINT(INFO, __VA_ARGS__)
+-#define VMEM_LOGD(...) VMEM_PRINT(DEBUG, __VA_ARGS__)
+-#define VMEM_LOGT(...) VMEM_PRINT(TRACE, __VA_ARGS__)
+-
+-typedef enum _VmemLogLevel
+-{
+-    VMEM_LOG_QUIET = 0,
+-    VMEM_LOG_ERROR,
+-    VMEM_LOG_WARNING,
+-    VMEM_LOG_INFO,
+-    VMEM_LOG_DEBUG,
+-    VMEM_LOG_TRACE,
+-    VMEM_LOG_MAX
+-} VmemLogLevel;
+-
+-typedef struct _VmemContext
+-{
+-    int fd_alloc;
+-
+-} VmemContext;
+-
+-int log_level = VMEM_LOG_ERROR;
+-int pid = 0;
+-
+-static int getLogLevel();
+-
+-VmemStatus
+-VMEM_create(void **vmem)
+-{
+-    VmemContext *ctx = NULL;
+-
+-    log_level = getLogLevel();
+-    pid = getpid();
+-
+-    if (vmem == NULL)
+-        return VMEM_STATUS_ERROR;
+-
+-    ctx = (VmemContext *)malloc(sizeof(*ctx));
+-    if (ctx == NULL)
+-        return VMEM_STATUS_NO_MEMORY;
+-    *vmem = (void *)ctx;
+-
+-    ctx->fd_alloc = open("/dev/vidmem", O_RDWR);
+-    if (ctx->fd_alloc == -1)
+-    {
+-        VMEM_LOGE("Failed to open /dev/vidmem\n");
+-        return VMEM_STATUS_ERROR;
+-    }
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-VmemStatus
+-VMEM_allocate(void *vmem, VmemParams *params)
+-{
+-    VmemContext *ctx = NULL;
+-    VidmemParams p;
+-
+-    if (vmem == NULL || params == NULL)
+-        return VMEM_STATUS_ERROR;
+-
+-    ctx = (VmemContext *)vmem;
+-    params->phy_address = 0;
+-    params->vir_address = NULL;
+-    params->fd = -1;
+-
+-    memset(&p, 0, sizeof(p));
+-    p.size = params->size;
+-    p.flags = params->flags;
+-    ioctl(ctx->fd_alloc, MEMORY_IOC_ALLOCATE, &p);
+-    if (p.bus_address == 0)
+-    {
+-        VMEM_LOGE("Failed to allocate memory\n");
+-        return VMEM_STATUS_NO_MEMORY;
+-    }
+-
+-    params->phy_address = p.bus_address;
+-    VMEM_LOGI("Allocated %d bytes, phy addr 0x%lx\n",
+-            params->size, params->phy_address);
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-VmemStatus
+-VMEM_mmap(void *vmem, VmemParams *params)
+-{
+-    VmemContext *ctx = NULL;
+-    void *vir_addr;
+-
+-    if (vmem == NULL || params == NULL)
+-        return VMEM_STATUS_ERROR;
+-
+-    if (params->vir_address != NULL)
+-        return VMEM_STATUS_OK;
+-
+-    ctx = (VmemContext *)vmem;
+-    int fd = params->fd > 0 ? params->fd : ctx->fd_alloc;
+-    unsigned int offset = params->fd > 0 ? 0 : params->phy_address;
+-    vir_addr = mmap(0, params->size, PROT_READ | PROT_WRITE,
+-                    MAP_SHARED, fd, offset);
+-    if (vir_addr == MAP_FAILED)
+-    {
+-        VMEM_LOGE("Failed to mmap physical address: 0x%lx, using fd %d\n",
+-                params->phy_address, fd);
+-        return VMEM_STATUS_ERROR;
+-    }
+-
+-    params->vir_address = vir_addr;
+-    VMEM_LOGI("Mapped phy addr 0x%lx to vir addr %p, size %d\n",
+-            params->phy_address, params->vir_address, params->size);
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-VmemStatus
+-VMEM_free(void *vmem, VmemParams *params)
+-{
+-    VmemContext *ctx = NULL;
+-    VidmemParams p;
+-
+-    if (vmem == NULL || params == NULL)
+-        return VMEM_STATUS_ERROR;
+-
+-    ctx = (VmemContext *)vmem;
+-
+-    VMEM_LOGI("Free virt addr %p, phy addr 0x%lx, size %d\n",
+-            params->vir_address, params->phy_address, params->size);
+-    if (params->vir_address != MAP_FAILED && params->vir_address != NULL)
+-        munmap(params->vir_address, params->size);
+-    params->vir_address = NULL;
+-
+-    if (params->phy_address != 0)
+-    {
+-        memset(&p, 0, sizeof(p));
+-        p.bus_address = params->phy_address;
+-        ioctl(ctx->fd_alloc, MEMORY_IOC_FREE, &p);
+-        params->phy_address = 0;
+-    }
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-VmemStatus
+-VMEM_destroy(void *vmem)
+-{
+-    if (vmem != NULL)
+-    {
+-        VmemContext *ctx = (VmemContext *)vmem;
+-        if (ctx->fd_alloc != -1)
+-            close(ctx->fd_alloc);
+-
+-        free(vmem);
+-    }
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-VmemStatus
+-VMEM_export(void *vmem, VmemParams *params)
+-{
+-    VmemContext *ctx = NULL;
+-    VidmemParams p;
+-
+-    if (vmem == NULL || params == NULL)
+-        return VMEM_STATUS_ERROR;
+-    ctx = (VmemContext *)vmem;
+-
+-    memset(&p, 0, sizeof(p));
+-    p.bus_address = params->phy_address;
+-    p.flags = O_RDWR;
+-    ioctl(ctx->fd_alloc, MEMORY_IOC_DMABUF_EXPORT, &p);
+-    if (p.fd < 0) {
+-        VMEM_LOGE("Failed to export memory\n");
+-        return VMEM_STATUS_ERROR;
+-    }
+-
+-    params->fd = p.fd;
+-    VMEM_LOGI("Exported phy addr 0x%lx to fd %d, size %d\n",
+-            params->phy_address, params->fd, params->size);
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-VmemStatus
+-VMEM_import(void *vmem, VmemParams *params)
+-{
+-    VmemContext *ctx = NULL;
+-    VidmemParams p;
+-
+-    if (vmem == NULL || params == NULL)
+-        return VMEM_STATUS_ERROR;
+-    ctx = (VmemContext *)vmem;
+-
+-    memset(&p, 0, sizeof(p));
+-    p.fd = params->fd;
+-    ioctl(ctx->fd_alloc, MEMORY_IOC_DMABUF_IMPORT, &p);
+-    if (p.bus_address == 0 || p.size == 0) {
+-        VMEM_LOGE("Failed to import memory\n");
+-        return VMEM_STATUS_ERROR;
+-    }
+-
+-    params->phy_address = p.bus_address;
+-    params->size = p.size;
+-    VMEM_LOGI("Imported fd %d to phy addr 0x%lx, size %d\n",
+-            params->fd, params->phy_address, params->size);
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-VmemStatus
+-VMEM_release(void *vmem, VmemParams *params)
+-{
+-    VmemContext *ctx = NULL;
+-
+-    if (vmem == NULL || params == NULL)
+-        return VMEM_STATUS_ERROR;
+-    ctx = (VmemContext *)vmem;
+-
+-    VMEM_LOGI("Released imported phy addr 0x%lx, fd %d, size %d\n",
+-            params->phy_address, params->fd, params->size);
+-    if (params->vir_address != MAP_FAILED && params->vir_address != NULL)
+-        munmap(params->vir_address, params->size);
+-    params->vir_address = NULL;
+-
+-    if (params->phy_address != 0) {
+-        VidmemParams p;
+-        memset(&p, 0, sizeof(p));
+-        p.bus_address = params->phy_address;
+-        ioctl(ctx->fd_alloc, MEMORY_IOC_DMABUF_RELEASE, &p);
+-        params->phy_address = 0;
+-    }
+-
+-    return VMEM_STATUS_OK;
+-}
+-
+-
+-VmemStatus
+-VMEM_flush_cache(void *vmem, VmemParams *params,VmemCacheDir dir)
+-{
+-    VmemContext *ctx = NULL;
+-    VidmemParams p;
+-    int ret;
+-    if (vmem == NULL || params == NULL)
+-        return VMEM_STATUS_ERROR;
+-
+-    ctx = (VmemContext *)vmem;
+-
+-    VMEM_LOGI("Flush phy addr 0x%lx, size %d,dir:%d\n",
+-                      params->phy_address, params->size,dir);
+-
+-    if (params->phy_address != 0)
+-    {
+-        memset(&p, 0, sizeof(p));
+-        p.bus_address = params->phy_address;
+-        if(dir == VEME_CACHE_DIR_TO_DEV)
+-        {
+-            ret = ioctl(ctx->fd_alloc, MEMORY_IOC_DMABUF_FLUSH_CACHE, &p);
+-        }else if(dir == VEME_CACHE_DIR_FROM_DEV)
+-        {
+-            ret = ioctl(ctx->fd_alloc, MEMORY_IOC_DMABUF_INVALID_CACHE, &p);
+-        }
+-        else
+-        {
+-            return VMEM_STATUS_ERROR;
+-        }
+-
+-        if(ret)
+-        {
+-            VMEM_LOGE("fail ret %d\n",ret);
+-            return VMEM_STATUS_ERROR;
+-        }
+-        return VMEM_STATUS_OK;
+-    }
+-
+-
+-    return VMEM_STATUS_ERROR;
+-}
+-
+-static int getLogLevel()
+-{
+-    char *env = getenv("VMEM_LOG_LEVEL");
+-    if (env == NULL)
+-        return VMEM_LOG_ERROR;
+-    else
+-    {
+-        int level = atoi(env);
+-        if (level >= VMEM_LOG_MAX || level < VMEM_LOG_QUIET)
+-            return VMEM_LOG_ERROR;
+-        else
+-            return level;
+-    }
+-}
+diff --git a/drivers/soc/xuantie/video_memory/lib/video_mem.h b/drivers/soc/xuantie/video_memory/lib/video_mem.h
+deleted file mode 100644
+index 253c0b555f88..000000000000
+--- a/drivers/soc/xuantie/video_memory/lib/video_mem.h
++++ /dev/null
+@@ -1,85 +0,0 @@
+-/*
+- * Copyright (c) 2021-2022 Alibaba Group. All rights reserved.
+- * License-Identifier: Apache-2.0
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License"); you may
+- * not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *    http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- *
+- */
+-#ifndef _VIDEO_MEM_H_
+-#define _VIDEO_MEM_H_
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-/* No special needs. */
+-#define VMEM_FLAG_NONE                  0x00000000
+-/* Physical contiguous. */
+-#define VMEM_FLAG_CONTIGUOUS            0x00000001
+-/* Physical non contiguous. */
+-#define VMEM_FLAG_NON_CONTIGUOUS        0x00000002
+-/* Need 32bit address. */
+-#define VMEM_FLAG_4GB_ADDR              0x00000004
+-/* CMA priority */
+-#define VMEM_FLAG_CMA                   0x00000008
+-/* Use VI reserved memory */
+-#define VMEM_FLAG_VI                    0x00000010
+-/* Buffer enable cache */
+-#define VMEM_FLAG_ENABLE_CACHE          0x00000020
+-
+-/* Alloc rsvmem pool region id should be 0~15 */
+-#define MAX_REGION_ID 15
+-
+-#define SET_ALLOC_FLAG_REGION(flag, region_id) (flag & 0x00ffffff) | (region_id << 24)
+-#define GET_ALLOC_FLAG_REGION(flag)            (flag >> 24)
+-
+-
+-typedef enum _VmemStatus
+-{
+-    VMEM_STATUS_OK = 0,
+-    VMEM_STATUS_ERROR = -1,     /* general error */
+-    VMEM_STATUS_NO_MEMORY = -2, /* not enough memory to allocate buffer */
+-} VmemStatus;
+-
+-typedef struct _VmemParams
+-{
+-    int size;
+-    int flags;
+-    unsigned long phy_address;
+-    void *vir_address;
+-    int fd;
+-} VmemParams;
+-
+-typedef enum{
+-    VEME_CACHE_DIR_TO_DEV = 0,
+-    VEME_CACHE_DIR_FROM_DEV,
+-    VEME_CACHE_DIR_INVALID,
+-}VmemCacheDir;
+-
+-VmemStatus VMEM_create(void **vmem);
+-VmemStatus VMEM_allocate(void *vmem, VmemParams *params);
+-VmemStatus VMEM_mmap(void *vmem, VmemParams *params);
+-VmemStatus VMEM_free(void *vmem, VmemParams *params);
+-VmemStatus VMEM_destroy(void *vmem);
+-
+-VmemStatus VMEM_export(void *vmem, VmemParams *params);
+-VmemStatus VMEM_import(void *vmem, VmemParams *params);
+-VmemStatus VMEM_release(void *vmem, VmemParams *params);
+-
+-VmemStatus VMEM_flush_cache(void *vmem, VmemParams *params,VmemCacheDir dir);
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif /* !_VIDEO_MEM_H_ */
+diff --git a/drivers/soc/xuantie/video_memory/driver/rsvmem_pool.c b/drivers/soc/xuantie/video_memory/rsvmem_pool.c
+similarity index 100%
+rename from drivers/soc/xuantie/video_memory/driver/rsvmem_pool.c
+rename to drivers/soc/xuantie/video_memory/rsvmem_pool.c
+diff --git a/drivers/soc/xuantie/video_memory/driver/rsvmem_pool.h b/drivers/soc/xuantie/video_memory/rsvmem_pool.h
+similarity index 100%
+rename from drivers/soc/xuantie/video_memory/driver/rsvmem_pool.h
+rename to drivers/soc/xuantie/video_memory/rsvmem_pool.h
+diff --git a/drivers/soc/xuantie/video_memory/test/Makefile b/drivers/soc/xuantie/video_memory/test/Makefile
+deleted file mode 100644
+index 40005ec118be..000000000000
+--- a/drivers/soc/xuantie/video_memory/test/Makefile
++++ /dev/null
+@@ -1,70 +0,0 @@
+-CFLAGS = -Wall -D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE -O2 -Werror -Wno-unused -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-strict-overflow -Wno-array-bounds -Wno-shift-negative-value -Wempty-body -Wtype-limits -Wno-unused-result -fPIC -Wmissing-field-initializers -std=gnu99
+-
+-INCLUDE += -I../lib
+-
+-SRCS = video_memory_test.c
+-OBJS = $(SRCS:.c=.o)
+-
+-#source search path
+-vpath %.c
+-
+-# name of the outputfile (library)
+-TARGET = vidmem_test
+-
+-#Here are rules for building codes and generating object library.
+-all:    tags
+-	@echo ---------------------------------------
+-	@echo "Usage: make [ system | testdata | versatile | integrator | android]"
+-	@echo "system     - PC system model (== pclinux)"
+-	@echo "testdata   - PC system model for test data creation"
+-	@echo "eval       - PC system model for evaluation with frame limit"
+-	@echo "versatile  - ARM versatile with FPGA HW"
+-	@echo "integrator - ARM integrator with FPGA HW"
+-	@echo "android    - ARM android"
+-	@echo "NOTE! Make sure to do 'make clean'"
+-	@echo "between compiling to different targets!"
+-	@echo ---------------------------------------
+-
+-.PHONY: system_lib system testdata clean depend
+-
+-evaluation: eval
+-eval: system
+-
+-system_static: testdata
+-system: testdata
+-
+-# for libva
+-system_lib: system
+-
+-testdata: .depend
+-
+-
+-.PHONY: hwlinux
+-hwlinux:
+-hwlinux: .depend $(TARGET)
+-
+-$(TARGET): $(OBJS)
+-	$(CC) $(CFLAGS) $(OBJS) -L../output/rootfs/bsp/vidmem/lib -lvmem -lm -lpthread -o $(TARGET)
+-
+-
+-
+-%.o: %.c
+-	$(CC) -c $(CFLAGS) $(INCLUDE) $< -o $@
+-
+-clean:
+-	$(RM) $(TARGET)
+-	$(RM) .depend
+-	$(RM) *.o *.gcno *.gcda
+-
+-tags:
+-	ctags ../kernel_mode/*h ./*[ch]
+-
+-depend .depend: $(SRCS)
+-	@echo "[CC] $@"
+-	@$(CC) -M $(DEBFLAGS) $(INCLUDE) $^ > .depend
+-
+-ifneq (clean, $(findstring clean, $(MAKECMDGOALS)))
+-ifeq (.depend, $(wildcard .depend))
+-include .depend
+-endif
+-endif
+diff --git a/drivers/soc/xuantie/video_memory/test/video_memory_test.c b/drivers/soc/xuantie/video_memory/test/video_memory_test.c
+deleted file mode 100644
+index 2270f4703d67..000000000000
+--- a/drivers/soc/xuantie/video_memory/test/video_memory_test.c
++++ /dev/null
+@@ -1,175 +0,0 @@
+-/*
+- * Copyright (c) 2021-2022 Alibaba Group. All rights reserved.
+- * License-Identifier: Apache-2.0
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License"); you may
+- * not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *    http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- *
+- */
+-
+-#include <sys/mman.h>
+-#include <sys/ioctl.h>
+-#include <fcntl.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <unistd.h>
+-#include <memory.h>
+-#include "video_mem.h"
+-
+-typedef enum MemType
+-{
+-    MEM_TYPE_CONTIGUOUS,
+-    MEM_TYPE_NONCONTIGUOUS,
+-    MEM_TYPE_CMA,
+-    MEM_TYPE_VI,
+-    MEM_TYPE_MAX
+-} MemType;
+-
+-int alloc_flags[MEM_TYPE_MAX] =
+-{
+-    VMEM_FLAG_CONTIGUOUS | VMEM_FLAG_4GB_ADDR,
+-    VMEM_FLAG_NON_CONTIGUOUS,
+-    VMEM_FLAG_CMA,
+-    VMEM_FLAG_VI
+-};
+-
+-int alloc_num[MEM_TYPE_MAX] = {3, 3, 3, 3};
+-
+-void printUsage(char *name)
+-{
+-    printf(" \
+-        Usage: %s [buf_size|-h]\n\
+-            buf_size:   buffer size to be allocated, in unit of 4K pages\n\
+-            -h:         print this message\n",
+-            name);
+-}
+-
+-int main(int argc, char **argv)
+-{
+-    int fd_alloc = -1;
+-    int size = 1920*1080*3/2;
+-    int pgsize = getpagesize();
+-    void *vmem = NULL;
+-    VmemParams *vmparams[MEM_TYPE_MAX] = {0};
+-    int err = 0;
+-
+-    if (argc > 1)
+-    {
+-        if (strcmp(argv[1], "-h") == 0)
+-        {
+-            printUsage(argv[0]);
+-            return 0;
+-        }
+-        else
+-            size = atoi(argv[1]) * pgsize;
+-    }
+-
+-    if (size <= 0)
+-    {
+-        printf("ERROR: invalid size: %d\n", size);
+-        printUsage(argv[0]);
+-        return -1;
+-    }
+-
+-    do
+-    {
+-        if (VMEM_create(&vmem) != VMEM_STATUS_OK)
+-            break;
+-
+-        VmemParams imp_params;
+-        for (int type = 0; type < MEM_TYPE_MAX; type++)
+-        {
+-            vmparams[type] = malloc(sizeof(VmemParams)*alloc_num[type]);
+-            if (vmparams[type] == NULL)
+-            {
+-                printf("ERROR: Failed to allocate VmemParams\n");
+-                err = 1;
+-                break;
+-            }
+-
+-            for (int i = 0; i < alloc_num[type]; i++)
+-            {
+-                VmemParams *params = &vmparams[type][i];
+-                memset(params, 0, sizeof(*params));
+-                params->size = size;
+-                params->flags = alloc_flags[type];
+-
+-                int vi_rsvmem_pool_region_id = i;   // only for type == MEM_TYPE_VI
+-                if (type == MEM_TYPE_VI)
+-                {
+-                    params->flags = SET_ALLOC_FLAG_REGION(params->flags, vi_rsvmem_pool_region_id);
+-                }
+-
+-                if (VMEM_allocate(vmem, params) != VMEM_STATUS_OK)
+-                {
+-                    if (type == MEM_TYPE_VI)
+-                        printf("ERROR: Failed to allocate memory type %d, region_id=%d\n",
+-                               type, vi_rsvmem_pool_region_id);
+-                    else
+-                        printf("ERROR: Failed to allocate memory type %d\n", type);
+-                    break;
+-                }
+-                if (VMEM_mmap(vmem, params) != VMEM_STATUS_OK)
+-                {
+-                    printf("ERROR: Failed to mmap busAddress: 0x%lx\n",
+-                            params->phy_address);
+-                    err = 1;
+-                    break;
+-                }
+-                if (VMEM_export(vmem, params) != VMEM_STATUS_OK)
+-                {
+-                    printf("ERROR: Failed to export buffer: 0x%lx\n",
+-                            params->phy_address);
+-                    err = 1;
+-                    break;
+-                }
+-
+-                printf("Allocated buffer %d of type %d at paddr 0x%lx vaddr %p size %d fd %d\n",
+-                    i, type, params->phy_address, params->vir_address, size, params->fd);
+-
+-                memset(&imp_params, 0, sizeof(imp_params));
+-                imp_params.fd = params->fd;
+-                if (VMEM_import(vmem, &imp_params) != VMEM_STATUS_OK)
+-                {
+-                    printf("ERROR: Failed to import fd %d\n", params->fd);
+-                    err = 1;
+-                    break;
+-                }
+-
+-                printf("Imported fd %d: paddr 0x%lx vaddr %p size %d\n",
+-                    params->fd, params->phy_address, params->vir_address, size);
+-                VMEM_release(vmem, &imp_params);
+-            }
+-
+-            if (err)
+-                break;
+-        }
+-    } while (0);
+-
+-    for (int type = 0; type < MEM_TYPE_MAX; type++)
+-    {
+-        for (int i = 0; i < alloc_num[type]; i++)
+-        {
+-            VmemParams *params = &vmparams[type][i];
+-            VMEM_free(vmem, params);
+-            memset(params, 0, sizeof(*params));
+-        }
+-
+-        if (vmparams[type])
+-            free(vmparams[type]);
+-    }
+-
+-    VMEM_destroy(vmem);
+-
+-    return 0;
+-}
+-
+diff --git a/drivers/soc/xuantie/video_memory/driver/video_memory.c b/drivers/soc/xuantie/video_memory/video_memory.c
+similarity index 100%
+rename from drivers/soc/xuantie/video_memory/driver/video_memory.c
+rename to drivers/soc/xuantie/video_memory/video_memory.c
+diff --git a/drivers/soc/xuantie/video_memory/driver/video_memory.h b/drivers/soc/xuantie/video_memory/video_memory.h
+similarity index 100%
+rename from drivers/soc/xuantie/video_memory/driver/video_memory.h
+rename to drivers/soc/xuantie/video_memory/video_memory.h
+-- 
+2.43.0
+

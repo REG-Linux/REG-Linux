@@ -1,0 +1,198 @@
+From 22f05447d6929d8d3987025e58e411abd0734da1 Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:48:53 +0800
+Subject: [PATCH 213/400] dts: audio: to adapt compatible 'thead,th1520'
+
+add dts compatible 'thead,th1520' for opensbi request
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../dts/thead/th1520-a-val-audio-i2s-8ch.dts  | 19 --------
+ .../boot/dts/thead/th1520-a-val-audio.dts     |  7 ---
+ .../boot/dts/thead/th1520-a-val-audio.dtsi    | 44 +++++++++++++++++++
+ arch/riscv/boot/dts/thead/th1520-a-val.dts    |  2 -
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi   | 19 ++++++++
+ 5 files changed, 63 insertions(+), 28 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val-audio-i2s-8ch.dts b/arch/riscv/boot/dts/thead/th1520-a-val-audio-i2s-8ch.dts
+index ab32a8118b33..8d8ab38cce6c 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val-audio-i2s-8ch.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val-audio-i2s-8ch.dts
+@@ -5,47 +5,28 @@
+ 
+ #include "th1520-a-val.dtsi"
+ 
+-/ {
+-	model = "XuanTie TH1520 FM Audio VAL board";
+-	compatible = "xuantie,th1520-val-audio-i2s-8ch", "xuantie,th1520";
+-};
+-
+ &th1520_sound_i2s_8ch {
+ 	status = "okay";
+ };
+ 
+ &i2s0 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s0_pa_pins>;
+ };
+ 
+ &i2s_8ch_sd0 {
+ 	status = "okay";
+-    pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd0_pa_pins>;
+ };
+ 
+ &i2s_8ch_sd1 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd1_pa_pins>;
+ };
+ 
+ &i2s_8ch_sd2 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd2_pa_pins>;
+ };
+ 
+ &i2s_8ch_sd3 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd3_pa_pins>;
+ };
+ 
+ &es8156_audio_codec {
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts
+index 8c73b999bf28..811f08d5cf1f 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts
+@@ -5,19 +5,12 @@
+ 
+ #include "th1520-a-val.dtsi"
+ 
+-/ {
+-	model = "XuanTie TH1520 FM Audio VAL board";
+-	compatible = "xuantie,th1520-val-audio", "xuantie,th1520";
+-};
+-
+ &th1520_sound {
+ 	status = "okay";
+ };
+ 
+ &i2s0 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s0_pa_pins>;
+ };
+ 
+ &i2s_8ch_sd2 {
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi
+index 943218a3e9e6..61bb60e578c0 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi
+@@ -332,3 +332,47 @@ audio_aw87519_pa: amp@58 {
+ 			status = "disabled";
+ 		};
+ };
++
++&i2s0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s0_pa_pins>,
++				<&i2s0_pins>;
++};
++
++&i2s1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s1_pa_pins>,
++				<&i2s1_pins>;
++};
++
++&i2s_8ch_sd0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
++				<&i2s_8ch_sd0_pa_pins>,
++				<&i2s_8ch_bus_pins>,
++				<&i2s_8ch_sd0_pins>;
++};
++
++&i2s_8ch_sd1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
++				<&i2s_8ch_sd1_pa_pins>,
++				<&i2s_8ch_bus_pins>,
++				<&i2s_8ch_sd1_pins>;
++};
++
++&i2s_8ch_sd2 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
++				<&i2s_8ch_sd2_pa_pins>,
++				<&i2s_8ch_bus_pins>,
++				<&i2s_8ch_sd2_pins>;
++};
++
++&i2s_8ch_sd3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
++				<&i2s_8ch_sd3_pa_pins>,
++				<&i2s_8ch_bus_pins>,
++				<&i2s_8ch_sd3_pins>;
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dts b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+index a9f39467a0e4..623514890a64 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+@@ -26,8 +26,6 @@ &ap_i2s {
+ 
+ &i2s0 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s0_pa_pins>;
+ };
+ 
+ &i2s_8ch_sd2 {
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 316ff3c47724..cbc228a71cb9 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -2161,6 +2161,15 @@ i2s-pa-pins {
+ 			slew-rate = <0>;
+ 		};
+ 	};
++	i2s1_pa_pins: i2s1-pa-0 {
++		i2s-pa-pins {
++			pins = "AUDIO_PA14", "AUDIO_PA15", "AUDIO_PA17";
++			function = "audio";
++			bias-disable;
++			drive-strength = <0>;
++			slew-rate = <0>;
++		};
++	};
+ 	i2s_8ch_bus_pa_pins: i2s-8ch-bus-pa-0 {
+ 		i2s-pa-pins {
+ 			pins = "AUDIO_PA2", "AUDIO_PA3", "AUDIO_PA8";
+@@ -2229,6 +2238,16 @@ i2c-pins {
+ 			slew-rate = <0>;
+ 		};
+ 	};
++	i2s0_pins: i2s0-0 {
++		i2s-pins {
++			pins = "PA9_FUNC", "PA10_FUNC", "PA11_FUNC", "PA12_FUNC";
++			function = "aud_i2s0";
++			bias-disable;
++			drive-strength = <13>;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
+ 	i2s1_pins: i2s1-0 {
+ 		i2s-pins {
+ 			pins = "PA14_FUNC", "PA15_FUNC", "PA17_FUNC";
+-- 
+2.43.0
+

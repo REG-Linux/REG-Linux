@@ -1,0 +1,41 @@
+From 1857f4472e8e68315fe373f2b04dea65b017b8b1 Mon Sep 17 00:00:00 2001
+From: Guo Ren <guoren@linux.alibaba.com>
+Date: Sun, 15 Dec 2024 08:52:52 -0500
+Subject: [PATCH 024/400] riscv: qspinlock: Fixup _Q_PENDING_LOOPS definition
+
+When CONFIG_RISCV_QUEUED_SPINLOCKS=y, the _Q_PENDING_LOOPS
+definition is missing. Add the _Q_PENDING_LOOPS definition for
+pure qspinlock usage.
+
+Fixes: ab83647fadae ("riscv: Add qspinlock support")
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Signed-off-by: Guo Ren <guoren@kernel.org>
+Reviewed-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+Link: https://lore.kernel.org/r/20241215135252.201983-1-guoren@kernel.org
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+(cherry picked from commit 40e6073e764870da39d0203fc4326adc4c37e690)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/include/asm/spinlock.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm/spinlock.h
+index e5121b89acea..52f11bfd0079 100644
+--- a/arch/riscv/include/asm/spinlock.h
++++ b/arch/riscv/include/asm/spinlock.h
+@@ -3,8 +3,11 @@
+ #ifndef __ASM_RISCV_SPINLOCK_H
+ #define __ASM_RISCV_SPINLOCK_H
+ 
+-#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
++#ifdef CONFIG_QUEUED_SPINLOCKS
+ #define _Q_PENDING_LOOPS	(1 << 9)
++#endif
++
++#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+ 
+ #define __no_arch_spinlock_redefine
+ #include <asm/ticket_spinlock.h>
+-- 
+2.43.0
+

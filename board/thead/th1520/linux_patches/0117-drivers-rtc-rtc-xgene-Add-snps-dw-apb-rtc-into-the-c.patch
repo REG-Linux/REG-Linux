@@ -1,0 +1,28 @@
+From b65a9677a077d56a3780ee4b3012e459a0e98325 Mon Sep 17 00:00:00 2001
+From: Wei Fu <wefu@redhat.com>
+Date: Fri, 12 Apr 2024 15:11:47 +0800
+Subject: [PATCH 117/400] drivers/rtc/rtc-xgene: Add "snps,dw-apb-rtc" into the
+ "compatible"
+
+This patch add "snps,dw-apb-rtc" into the "compatible".
+
+Signed-off-by: Wei Fu <wefu@redhat.com>
+---
+ drivers/rtc/rtc-xgene.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/rtc/rtc-xgene.c b/drivers/rtc/rtc-xgene.c
+index 6c4614cee37b..e83bf21bc58e 100644
+--- a/drivers/rtc/rtc-xgene.c
++++ b/drivers/rtc/rtc-xgene.c
+@@ -287,6 +287,7 @@ static SIMPLE_DEV_PM_OPS(xgene_rtc_pm_ops, xgene_rtc_suspend, xgene_rtc_resume);
+ #ifdef CONFIG_OF
+ static const struct of_device_id xgene_rtc_of_match[] = {
+ 	{.compatible = "apm,xgene-rtc" },
++	{.compatible = "snps,dw-apb-rtc" },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, xgene_rtc_of_match);
+-- 
+2.43.0
+

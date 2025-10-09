@@ -1,0 +1,34 @@
+From dbaaa955a84b953a91d597e1ce10ac6c5879b4fc Mon Sep 17 00:00:00 2001
+From: Andreas Schwab <schwab@suse.de>
+Date: Tue, 31 Oct 2023 12:40:47 +0100
+Subject: [PATCH 001/400] UPSTREAM: riscv: select ARCH_PROC_KCORE_TEXT
+
+This adds a separate segment for kernel text in /proc/kcore, which has a
+different address than the direct linear map.
+
+Signed-off-by: Andreas Schwab <schwab@suse.de>
+Link: https://lore.kernel.org/r/mvmh6m758ao.fsf@suse.de
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+(cherry picked from commit e0c0a7c35f67191152635e5913f76aa7094d967c)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 1304992232ad..e02b27ced9df 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -901,6 +901,9 @@ config PORTABLE
+ 	select MMU
+ 	select OF
+ 
++config ARCH_PROC_KCORE_TEXT
++	def_bool y
++
+ menu "Power management options"
+ 
+ source "kernel/power/Kconfig"
+-- 
+2.43.0
+

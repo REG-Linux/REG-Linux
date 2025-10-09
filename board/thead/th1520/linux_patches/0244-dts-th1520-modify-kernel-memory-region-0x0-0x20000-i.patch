@@ -1,0 +1,84 @@
+From eeffc1e4e875c33e07572c905353006fb81a94c1 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:20:07 +0800
+Subject: [PATCH 244/400] dts: th1520: modify kernel memory region, [0x0,
+ 0x20000] is reserved for opensbi
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val-crash.dts         | 2 +-
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi              | 2 +-
+ arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts       | 2 +-
+ arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi   | 2 +-
+ arch/riscv/boot/dts/thead/th1520-lpi4a-product-crash.dts | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val-crash.dts b/arch/riscv/boot/dts/thead/th1520-a-val-crash.dts
+index 6f701abaa76b..dc2961e79024 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val-crash.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val-crash.dts
+@@ -11,7 +11,7 @@ / {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x0 0x00000000 0x1 0x00000000>;
++		reg = <0x0 0x200000 0x0 0xffe00000>;
+ 	};
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index dadd5ef741eb..95a83e23c288 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -15,7 +15,7 @@ / {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x0 0x00000000 0x1 0x00000000>;
++		reg = <0x0 0x200000 0x0 0xffe00000>;
+ 	};
+ 
+ 	aliases {
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index 46ec539ffb89..bf2d2e4d9efe 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -36,7 +36,7 @@ chosen {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x0  0x00000000  0x1 0x00000000>;
++		reg = <0x0 0x200000 0x0 0xffe00000>;
+ 	};
+ 
+ 	leds {
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index 15763f414826..5391d3c3b449 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -13,7 +13,7 @@ / {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x0 0x00000000 0x2 0x00000000>;
++		reg = <0x0 0x200000 0x1 0xffe00000>;
+ 	};
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-lpi4a-product-crash.dts b/arch/riscv/boot/dts/thead/th1520-lpi4a-product-crash.dts
+index 0eaab01fa1f2..12b32ed688c3 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lpi4a-product-crash.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lpi4a-product-crash.dts
+@@ -11,7 +11,7 @@ / {
+ 
+ 	memory@0 {
+ 		device_type = "memory";
+-		reg = <0x0 0x00000000 0x2 0x00000000>;
++		reg = <0x0 0x200000 0x1 0xffe00000>;
+ 	};
+ };
+ 
+-- 
+2.43.0
+

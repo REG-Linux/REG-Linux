@@ -1,0 +1,52 @@
+From 6ab8caf6e263d77a8db60b7d396083d897f4d807 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Tue, 15 Jul 2025 21:35:25 +0800
+Subject: [PATCH 388/400] soc/xuantie: nna: fix out-of-tree build
+
+Fix use of $(src) without $(srctree) in Makefile's which prevents
+out-of-tree build.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+---
+ drivers/soc/xuantie/nna/img_mem/Makefile        | 2 +-
+ drivers/soc/xuantie/nna/nexef_platform/Makefile | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/soc/xuantie/nna/img_mem/Makefile b/drivers/soc/xuantie/nna/img_mem/Makefile
+index 19510b571a97..49790613b69d 100644
+--- a/drivers/soc/xuantie/nna/img_mem/Makefile
++++ b/drivers/soc/xuantie/nna/img_mem/Makefile
+@@ -14,7 +14,7 @@ CFLAGS_img_mem_ion.o += -Idrivers/staging/android/ion
+ endif
+ 
+ # IMGMMU: These should be obsoleted
+-ccflags-y += -I$(src)/imgmmu/mmulib
++ccflags-y += -I$(srctree)/$(src)/imgmmu/mmulib
+ # IMGMMU: code
+ img_mem-y                           += imgmmu/imgmmu.o
+ img_mem-y                           += imgmmu/kernel_heap.o
+diff --git a/drivers/soc/xuantie/nna/nexef_platform/Makefile b/drivers/soc/xuantie/nna/nexef_platform/Makefile
+index 79437d296144..a842741aba38 100644
+--- a/drivers/soc/xuantie/nna/nexef_platform/Makefile
++++ b/drivers/soc/xuantie/nna/nexef_platform/Makefile
+@@ -10,8 +10,8 @@ endif
+ 
+ ccflags-y += -I$(CONFIG_NEXEF_NNPU_INCLUDE)
+ 
+-ccflags-y += -I$(src)/../include
+-ccflags-y += -I$(src)/
++ccflags-y += -I$(srctree)/$(src)/../include
++ccflags-y += -I$(srctree)/$(src)/
+ ccflags-y += -Wall -g
+ 
+ # This should not be needed, but on some platform (especially old kernel)
+@@ -21,4 +21,4 @@ ccflags-y += -DRETPOLINE -Wfatal-errors
+ # NOT WORKING FOR NOW, DO NOT ENABLE
+ #ccflags-y += -DCONFIG_SET_FPGA_CLOCK=y
+ 
+-obj-$(CONFIG_VHA_NEXEF_PLAT) += nexef_plat.o
+\ No newline at end of file
++obj-$(CONFIG_VHA_NEXEF_PLAT) += nexef_plat.o
+-- 
+2.43.0
+

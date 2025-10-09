@@ -1,0 +1,68 @@
+From 2be7e455af854f8c46960489ce9b0d2ef7eac601 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:01:17 +0800
+Subject: [PATCH 288/400] driver: wdt: th1520_wdt: add th1520_wdt driver pm ops
+
+th1520_wdt need to call AON_WDG_FUNC_STOP before dw_wdt suspended,
+which will result in 902 misjudge the ap wdt timeout
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/watchdog/th1520_wdt.c | 37 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/drivers/watchdog/th1520_wdt.c b/drivers/watchdog/th1520_wdt.c
+index 80cb0b1e3d64..31a6ac8246f1 100644
+--- a/drivers/watchdog/th1520_wdt.c
++++ b/drivers/watchdog/th1520_wdt.c
+@@ -360,9 +360,46 @@ static int th1520_wdt_probe(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static int th1520_wdt_suspend(struct device *dev)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct th1520_wdt_device *wdt_dev = platform_get_drvdata(pdev);
++	struct th1520_aon_ipc *ipc = wdt_dev->ipc_handle;
++	struct th1520_aon_rpc_ack_common ack_msg = {0};
++	int ret;
++
++	th1520_wdt_msg_hdr_fill(&wdt_dev->msg.hdr, TH1520_AON_WDG_FUNC_STOP);
++
++	ret = th1520_aon_call_rpc(ipc, &wdt_dev->msg, &ack_msg, true);
++	if (ret)
++		dev_err(dev, "th1520_wdt_suspend call aon wdt stop fail, ret:%d\n", ret);
++
++	return 0;
++}
++
++static int th1520_wdt_resume(struct device *dev)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct th1520_wdt_device *wdt_dev = platform_get_drvdata(pdev);
++	struct th1520_aon_ipc *ipc = wdt_dev->ipc_handle;
++	struct th1520_aon_rpc_ack_common ack_msg = {0};
++	int ret;
++
++	th1520_wdt_msg_hdr_fill(&wdt_dev->msg.hdr, TH1520_AON_WDG_FUNC_START);
++
++	ret = th1520_aon_call_rpc(ipc, &wdt_dev->msg, &ack_msg, true);
++	if (ret)
++		dev_err(dev, "th1520_wdt_resume call aon wdt start fail, ret:%d\n", ret);
++
++	return 0;
++}
++
++static DEFINE_SIMPLE_DEV_PM_OPS(th1520_wdt_pm_ops, th1520_wdt_suspend, th1520_wdt_resume);
++
+ static struct platform_driver th1520_wdt_driver = {
+ 	.driver = {
+ 		.name = DRV_NAME,
++		.pm	= pm_sleep_ptr(&th1520_wdt_pm_ops),
+ 	},
+ 	.probe = th1520_wdt_probe,
+ };
+-- 
+2.43.0
+

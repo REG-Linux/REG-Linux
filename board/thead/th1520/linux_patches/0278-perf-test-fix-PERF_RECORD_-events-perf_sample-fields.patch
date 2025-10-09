@@ -1,0 +1,29 @@
+From 9a0eaff4355c2feab49e30240616ebde10e49bef Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:53:23 +0800
+Subject: [PATCH 278/400] perf:test:fix PERF_RECORD_* events & perf_sample
+ fields in yocto linux
+
+The PERF_RECORD_MMAP2 in yocto linux is sleep.coreutils.
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ tools/perf/tests/perf-record.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/perf/tests/perf-record.c b/tools/perf/tests/perf-record.c
+index 1c4feec1adff..8fa7c4c4e5e6 100644
+--- a/tools/perf/tests/perf-record.c
++++ b/tools/perf/tests/perf-record.c
+@@ -259,7 +259,7 @@ static int test__PERF_RECORD(struct test_suite *test __maybe_unused, int subtest
+ 						if (!found_cmd_mmap)
+ 							found_cmd_mmap = !strcmp(bname + 1, cmd);
+ 						if (!found_coreutils_mmap)
+-							found_coreutils_mmap = !strcmp(bname + 1, "coreutils");
++							found_coreutils_mmap = !strcmp(bname + 1, "coreutils") + !strcmp(bname + 1, "sleep.coreutils");
+ 						if (!found_libc_mmap)
+ 							found_libc_mmap = !strncmp(bname + 1, "libc", 4);
+ 						if (!found_ld_mmap)
+-- 
+2.43.0
+

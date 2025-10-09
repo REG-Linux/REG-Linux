@@ -1,0 +1,95 @@
+From 7f05c6f97ffdfe03a62137b0019a94dd1681444c Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:43:28 +0800
+Subject: [PATCH 271/400] th1520: sdhci: add quirks for th1520-a-val board
+
+Due to board th1520-a-val pin wp is low, wp should be
+ignored.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi |  1 +
+ arch/riscv/boot/dts/thead/th1520-crash.dtsi |  1 +
+ drivers/mmc/host/sdhci-of-dwcmshc.c         | 20 ++++++++++++++++++++
+ 3 files changed, 22 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 9583b633d957..d86873ef3440 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -3202,6 +3202,7 @@ &emmc {
+        non-removable;
+        no-sdio;
+        no-sd;
++       wprtn_ignore;
+        status = "okay";
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-crash.dtsi b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+index fefde06e0e0d..eee06a0a5572 100644
+--- a/arch/riscv/boot/dts/thead/th1520-crash.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+@@ -390,6 +390,7 @@ &emmc {
+ 	non-removable;
+ 	no-sdio;
+ 	no-sd;
++	wprtn_ignore;
+ 	status = "okay";
+ };
+ 
+diff --git a/drivers/mmc/host/sdhci-of-dwcmshc.c b/drivers/mmc/host/sdhci-of-dwcmshc.c
+index a8747036c9e3..40976b788fae 100644
+--- a/drivers/mmc/host/sdhci-of-dwcmshc.c
++++ b/drivers/mmc/host/sdhci-of-dwcmshc.c
+@@ -193,6 +193,7 @@ struct th1520_priv {
+ 	u16 delay_line[MMC_TIMING_MMC_HS400+1];
+ 	bool rxclk_sw_tune_en;
+ 	u16 rxclk_delay_set;
++	bool wprtn_ignore;
+ };
+ 
+ struct dwcmshc_priv {
+@@ -869,6 +870,20 @@ static void th1520_sdhci_set_power(struct sdhci_host *host, unsigned char mode,
+ 		dwcmshc_set_power_reg(host, mode, vdd);
+ }
+ 
++static unsigned int th1520_sdhci_get_ro(struct sdhci_host *host)
++{
++	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
++	struct dwcmshc_priv *priv = sdhci_pltfm_priv(pltfm_host);
++	unsigned int is_readonly;
++
++	if (priv->th_priv && priv->th_priv->wprtn_ignore)
++		return 0;
++	is_readonly = !(sdhci_readl(host, SDHCI_PRESENT_STATE)
++			& SDHCI_WRITE_PROTECT);
++
++	return is_readonly;
++}
++
+ static const struct sdhci_ops sdhci_dwcmshc_ops = {
+ 	.set_clock		= sdhci_set_clock,
+ 	.set_bus_width		= sdhci_set_bus_width,
+@@ -894,6 +909,7 @@ static const struct sdhci_ops sdhci_dwcmshc_th1520_ops = {
+ 	.set_uhs_signaling	= th1520_set_uhs_signaling,
+ 	.get_max_clock		= dwcmshc_get_max_clock,
+ 	.reset			= th1520_sdhci_reset,
++	.get_ro			= th1520_sdhci_get_ro,
+ 	.adma_write_desc	= dwcmshc_adma_write_desc,
+ 	.voltage_switch		= dwcmshc_phy_1_8v_init,
+ 	.platform_execute_tuning = &th1520_execute_tuning,
+@@ -1062,6 +1078,10 @@ static int th1520_sdhci_get_priv_props(struct device *dev, bool is_emmc,
+ 			th_priv->rxclk_delay_set = 0;
+ 		}
+ 	}
++	if (device_property_present(dev, "wprtn_ignore"))
++		th_priv->wprtn_ignore = true;
++	else
++		th_priv->wprtn_ignore = false;
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+

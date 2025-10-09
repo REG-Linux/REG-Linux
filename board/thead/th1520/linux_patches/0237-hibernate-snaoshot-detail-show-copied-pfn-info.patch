@@ -1,0 +1,43 @@
+From 408e2dc5d8f8bbe7c696bf3fcf508e260b26ed75 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:12:02 +0800
+Subject: [PATCH 237/400] hibernate:snaoshot: detail show copied pfn info
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ kernel/power/snapshot.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/power/snapshot.c b/kernel/power/snapshot.c
+index 400d59a11cdc..ce3f31a4f853 100644
+--- a/kernel/power/snapshot.c
++++ b/kernel/power/snapshot.c
+@@ -1613,7 +1613,7 @@ static unsigned long copy_data_pages(struct memory_bitmap *copy_bm,
+ 	unsigned long copied_pages = 0;
+ 	struct zone *zone;
+ 	unsigned long pfn, copy_pfn;
+-
++	unsigned long pfn_pre = 0;
+ 	for_each_populated_zone(zone) {
+ 		unsigned long max_zone_pfn;
+ 
+@@ -1630,6 +1630,15 @@ static unsigned long copy_data_pages(struct memory_bitmap *copy_bm,
+ 		pfn = memory_bm_next_pfn(orig_bm);
+ 		if (unlikely(pfn == BM_END_OF_MAP))
+ 			break;
++		/* show debug info,detail show copied pfn */
++		if( (pfn_pre+1) != pfn)
++		{
++			if(pfn_pre != 0)
++				pm_pr_dbg(" end:[%lx]\n",pfn_pre);
++			pm_pr_dbg(" start:[%lx] %s \n",pfn,
++					kernel_page_present(pfn_to_page(pfn))? "present":"not-present");
++		}
++		pfn_pre = pfn;
+ 		if (copy_data_page(copy_pfn, pfn)) {
+ 			memory_bm_set_bit(zero_bm, pfn);
+ 			/* Use this copy_pfn for a page that is not full of zeros */
+-- 
+2.43.0
+

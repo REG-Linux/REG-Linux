@@ -1,0 +1,249 @@
+From 63a4e560c3932a40804471e3c9134e713e7ed8cf Mon Sep 17 00:00:00 2001
+From: tingming <minghq@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:32:17 +0800
+Subject: [PATCH 200/400] hwspinlock: th1520: to add th1520 hwspinlock driver
+
+Signed-off-by: tingming <minghq@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../hwlock/xuantie,th1520-hwspinlock.yaml     |  34 +++++
+ arch/riscv/boot/dts/thead/th1520.dtsi         |   6 +
+ arch/riscv/configs/th1520_defconfig           |   3 +
+ drivers/hwspinlock/Kconfig                    |   8 ++
+ drivers/hwspinlock/Makefile                   |   1 +
+ drivers/hwspinlock/th1520_hwspinlock.c        | 129 ++++++++++++++++++
+ 6 files changed, 181 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/hwlock/xuantie,th1520-hwspinlock.yaml
+ create mode 100644 drivers/hwspinlock/th1520_hwspinlock.c
+
+diff --git a/Documentation/devicetree/bindings/hwlock/xuantie,th1520-hwspinlock.yaml b/Documentation/devicetree/bindings/hwlock/xuantie,th1520-hwspinlock.yaml
+new file mode 100644
+index 000000000000..8d36beae9676
+--- /dev/null
++++ b/Documentation/devicetree/bindings/hwlock/xuantie,th1520-hwspinlock.yaml
+@@ -0,0 +1,34 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/hwlock/xuantie,th1520-hwspinlock.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: XUANTIE th1520 SoC HwSpinlock
++
++maintainers:
++  - Liu Yibin <jiulong@linux.alibaba.com>
++
++properties:
++  compatible:
++    items:
++      - const: th1520,hwspinlock
++
++  reg:
++    maxItems: 1
++
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++
++  - |
++    hwspinlock: hwspinlock@ffefc10000 {
++        compatible = "th1520,hwspinlock";
++        reg = <0xff 0xefc10000 0x0 0x10000>;
++        status = "disabled";
++    };
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 67a1173fac98..28b8a4b8e9af 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -2227,5 +2227,11 @@ eip_28: eip-28@ffff300000 {
+ 			clock-names = "120si_clk","120sii_clk","120siii_clk","hclk";
+ 			status = "disabled";
+ 		};
++
++		hwspinlock: hwspinlock@ffefc10000 {
++			compatible = "th1520,hwspinlock";
++			reg = <0xff 0xefc10000 0x0 0x10000>;
++			status = "disabled";
++		};
+ 	};
+ };
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 09549e803a40..bcdea7def01e 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -317,3 +317,6 @@ CONFIG_CMA_ALIGNMENT=8
+ CONFIG_NVMEM_XUANTIE_TH1520_EFUSE=y
+ # TH1520 iso7816
+ CONFIG_TH1520_DSMART_CARD=y
++# TH1520 hwspinlock
++CONFIG_HWSPINLOCK=y
++CONFIG_HWSPINLOCK_TH1520=y
+diff --git a/drivers/hwspinlock/Kconfig b/drivers/hwspinlock/Kconfig
+index 3874d15b0e9b..208bcb4e00ef 100644
+--- a/drivers/hwspinlock/Kconfig
++++ b/drivers/hwspinlock/Kconfig
+@@ -63,4 +63,12 @@ config HSEM_U8500
+ 
+ 	  If unsure, say N.
+ 
++config HWSPINLOCK_TH1520
++	tristate "Th1520 Hardware Spinlock device"
++	depends on HWSPINLOCK
++	help
++	  Say y here to support the Th1520 Hardware Spinlock device.
++
++	  If unsure, say N.
++
+ endif # HWSPINLOCK
+diff --git a/drivers/hwspinlock/Makefile b/drivers/hwspinlock/Makefile
+index a0f16c9aaa82..4a61402b28e4 100644
+--- a/drivers/hwspinlock/Makefile
++++ b/drivers/hwspinlock/Makefile
+@@ -10,3 +10,4 @@ obj-$(CONFIG_HWSPINLOCK_SPRD)		+= sprd_hwspinlock.o
+ obj-$(CONFIG_HWSPINLOCK_STM32)		+= stm32_hwspinlock.o
+ obj-$(CONFIG_HWSPINLOCK_SUN6I)		+= sun6i_hwspinlock.o
+ obj-$(CONFIG_HSEM_U8500)		+= u8500_hsem.o
++obj-$(CONFIG_HWSPINLOCK_TH1520)		+= th1520_hwspinlock.o
+diff --git a/drivers/hwspinlock/th1520_hwspinlock.c b/drivers/hwspinlock/th1520_hwspinlock.c
+new file mode 100644
+index 000000000000..913746dc5387
+--- /dev/null
++++ b/drivers/hwspinlock/th1520_hwspinlock.c
+@@ -0,0 +1,129 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Th1520 hardware spinlock driver
++ *
++ * Copyright (C) 2020-2025 Alibaba Group Holding Limited
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/device.h>
++#include <linux/io.h>
++#include <linux/pm_runtime.h>
++#include <linux/slab.h>
++#include <linux/spinlock.h>
++#include <linux/hwspinlock.h>
++#include <linux/platform_device.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
++#include "hwspinlock_internal.h"
++
++struct th1520_hwspinlock {
++	void __iomem *io_base;
++	struct hwspinlock_device bank;
++};
++
++#define	HW_SPINLOCK_NUMBER	64
++#define HW_SPINLOCK_OFFSET(x)	(0x4 * (x))
++
++static int th1520_hwspinlock_trylock(struct hwspinlock *lock)
++{
++	void __iomem *lock_addr = lock->priv;
++
++	return !readl(lock_addr);
++}
++
++static void th1520_hwspinlock_unlock(struct hwspinlock *lock)
++{
++	void __iomem *lock_addr = lock->priv;
++
++	writel(0, lock_addr);
++}
++
++static const struct hwspinlock_ops th1520_hwspinlock_ops = {
++	.trylock = th1520_hwspinlock_trylock,
++	.unlock = th1520_hwspinlock_unlock,
++};
++
++static int th1520_hwspinlock_probe(struct platform_device *pdev)
++{
++	struct th1520_hwspinlock *hwspin;
++	struct hwspinlock *hwlock;
++	int idx, ret;
++
++	if (!pdev->dev.of_node)
++		return -ENODEV;
++
++	hwspin = devm_kzalloc(&pdev->dev,
++			      struct_size(hwspin, bank.lock,
++					  HW_SPINLOCK_NUMBER),
++			      GFP_KERNEL);
++	if (!hwspin)
++		return -ENOMEM;
++
++	/* retrieve io base */
++	hwspin->io_base = of_iomap(pdev->dev.of_node, 0);
++	if (!hwspin->io_base)
++		return -ENOMEM;
++	pr_info("io_base: 0x%lx\n", (long)hwspin->io_base);
++
++	for (idx = 0; idx < HW_SPINLOCK_NUMBER; idx++) {
++		hwlock = &hwspin->bank.lock[idx];
++		hwlock->priv = hwspin->io_base + HW_SPINLOCK_OFFSET(idx);
++	}
++
++	platform_set_drvdata(pdev, hwspin);
++
++	pm_runtime_enable(&pdev->dev);
++
++	ret = hwspin_lock_register(&hwspin->bank, &pdev->dev,
++				   &th1520_hwspinlock_ops, 0,
++				   HW_SPINLOCK_NUMBER);
++	if (ret)
++		goto reg_failed;
++
++	return 0;
++
++reg_failed:
++	pm_runtime_disable(&pdev->dev);
++	iounmap(hwspin->io_base);
++
++	return ret;
++}
++
++static int th1520_hwspinlock_remove(struct platform_device *pdev)
++{
++	struct th1520_hwspinlock *hwspin = platform_get_drvdata(pdev);
++	int ret;
++
++	ret = hwspin_lock_unregister(&hwspin->bank);
++	if (ret) {
++		dev_err(&pdev->dev, "%s failed: %d\n", __func__, ret);
++		return ret;
++	}
++
++	pm_runtime_disable(&pdev->dev);
++
++	iounmap(hwspin->io_base);
++
++	return 0;
++}
++
++static const struct of_device_id th1520_hwpinlock_ids[] = {
++	{ .compatible = "th1520,hwspinlock", },
++	{},
++};
++MODULE_DEVICE_TABLE(of, th1520_hwpinlock_ids);
++
++static struct platform_driver th1520_hwspinlock_driver = {
++	.probe = th1520_hwspinlock_probe,
++	.remove = th1520_hwspinlock_remove,
++	.driver = {
++		.name = "th1520_hwspinlock",
++		.of_match_table = of_match_ptr(th1520_hwpinlock_ids),
++	},
++};
++
++module_platform_driver(th1520_hwspinlock_driver);
++
++MODULE_LICENSE("GPL v2");
+-- 
+2.43.0
+

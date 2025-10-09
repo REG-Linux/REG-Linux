@@ -1,0 +1,32 @@
+From 177a4e1df4c9542c22dec4785bcce1cd971475ae Mon Sep 17 00:00:00 2001
+From: forain <forain.fty@linux.alibaba.com>
+Date: Mon, 29 Jul 2024 14:41:45 +0800
+Subject: [PATCH 167/400] drm: Fix HDMI hot-plug problem
+
+Fix HDMI hot-plug problem which occur at the time of
+switching from 4K@60 t0 1080p@60 monitor.
+
+Signed-off-by: forain <forain.fty@linux.alibaba.com>
+---
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+index 0aafb002a2a7..196cee58987f 100644
+--- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
++++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi.c
+@@ -2175,6 +2175,11 @@ static void hdmi_av_composer(struct dw_hdmi *hdmi,
+ 				    HDMI_MC_SWRSTZ);
+ 			drm_scdc_set_scrambling(hdmi->curr_conn, 0);
+ 		}
++	} else {
++		hdmi_writeb(hdmi, 0, HDMI_FC_SCRAMBLER_CTRL);
++		hdmi_writeb(hdmi, (u8)~HDMI_MC_SWRSTZ_TMDSSWRST_REQ,
++			    HDMI_MC_SWRSTZ);
++		drm_scdc_set_scrambling(hdmi->curr_conn, 0);
+ 	}
+ 
+ 	/* Set up horizontal active pixel width */
+-- 
+2.43.0
+

@@ -1,0 +1,82 @@
+From 55e227c714d3349b61728cec2899a523976f97d6 Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:12:46 +0800
+Subject: [PATCH 240/400] audio: th1520: to support tdm/spdif feature
+
+support tdm/spdif feature
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ sound/soc/xuantie/Makefile       | 8 ++++++--
+ sound/soc/xuantie/th1520-spdif.c | 3 ++-
+ sound/soc/xuantie/th1520-spdif.h | 2 +-
+ sound/soc/xuantie/th1520-tdm.c   | 1 +
+ 4 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/sound/soc/xuantie/Makefile b/sound/soc/xuantie/Makefile
+index adadbfec7709..213a14d7f036 100644
+--- a/sound/soc/xuantie/Makefile
++++ b/sound/soc/xuantie/Makefile
+@@ -12,6 +12,10 @@ obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_I2S_CH8) += snd-soc-xuantie-th1520-i2s-ch8.o
+ 
+ obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_HDMI_PCM) += th1520-hdmi-pcm.o
+ 
+-obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_TDM) += th1520-tdm.o
++snd-soc-xuantie-th1520-tdm-objs := th1520-tdm.o	\
++				       th1520-pcm-dma.o
++obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_TDM) += snd-soc-xuantie-th1520-tdm.o
+ 
+-obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_SPDIF) += th1520-spdif.o
++snd-soc-xuantie-th1520-spdif-objs := th1520-spdif.o	\
++				       th1520-pcm-dma.o
++obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_SPDIF) += snd-soc-xuantie-th1520-spdif.o
+diff --git a/sound/soc/xuantie/th1520-spdif.c b/sound/soc/xuantie/th1520-spdif.c
+index 86072105796a..bbef232143d6 100644
+--- a/sound/soc/xuantie/th1520-spdif.c
++++ b/sound/soc/xuantie/th1520-spdif.c
+@@ -227,6 +227,7 @@ static int th1520_spdif_dai_hw_params(struct snd_pcm_substream *substream, struc
+ }
+ 
+ static const struct snd_soc_dai_ops th1520_spdif_dai_ops = {
++    .probe = th1520_spdif_dai_probe,
+     .startup = th1520_spdif_dai_startup,
+     .shutdown = th1520_spdif_dai_shutdown,
+     .trigger = th1520_spdif_dai_trigger,
+@@ -462,7 +463,7 @@ static int th1520_spdif_probe(struct platform_device *pdev)
+     priv->dma_params_tx.addr = res->start + SPDIF_TX_FIFO_DR;
+     priv->dma_params_rx.addr = res->start + SPDIF_RX_FIFO_DR;
+ 
+-    ret = th1520_pcm_dma_init(pdev, TH1520_TDM_DMABUF_SIZE);
++    ret = th1520_pcm_dma_init(pdev, TH1520_SPDIF_DMABUF_SIZE);
+ 	if (ret) {
+ 		dev_err(dev, "th1520_pcm_dma_init error\n");
+ 		return -EIO;
+diff --git a/sound/soc/xuantie/th1520-spdif.h b/sound/soc/xuantie/th1520-spdif.h
+index c3afaecc39a6..e5f461580569 100644
+--- a/sound/soc/xuantie/th1520-spdif.h
++++ b/sound/soc/xuantie/th1520-spdif.h
+@@ -195,7 +195,7 @@
+ #define CPR_SPDIF1_SRST_N_SEL_MSK                       (0x1U << CPR_SPDIF1_SRST_N_SEL_POS)
+ #define CPR_SPDIF1_SRST_N_SEL(X)                            (X << CPR_SPDIF1_SRST_N_SEL_POS)
+ 
+-#define TH1520_TDM_DMABUF_SIZE     (64 * 1024)
++#define TH1520_SPDIF_DMABUF_SIZE     (64 * 1024)
+ #define SPDIF_STATE_IDLE				0
+ #define SPDIF_STATE_TX_RUNNING	    1
+ #define SPDIF_STATE_RX_RUNNING	    2
+diff --git a/sound/soc/xuantie/th1520-tdm.c b/sound/soc/xuantie/th1520-tdm.c
+index f8b0520899a4..7467a61dc99d 100644
+--- a/sound/soc/xuantie/th1520-tdm.c
++++ b/sound/soc/xuantie/th1520-tdm.c
+@@ -271,6 +271,7 @@ static int th1520_tdm_dai_hw_params(struct snd_pcm_substream *substream, struct
+ 
+ 
+ static const struct snd_soc_dai_ops th1520_tdm_dai_ops = {
++    .probe = th1520_tdm_dai_probe,
+     .startup = th1520_tdm_dai_startup,
+     .shutdown = th1520_tdm_dai_shutdown,
+     .trigger = th1520_tdm_dai_trigger,
+-- 
+2.43.0
+

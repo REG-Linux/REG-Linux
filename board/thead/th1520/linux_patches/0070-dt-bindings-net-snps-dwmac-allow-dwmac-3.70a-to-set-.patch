@@ -1,0 +1,32 @@
+From d8895ad95a7cd19beb1bd9eec6f5d16bc6b23a42 Mon Sep 17 00:00:00 2001
+From: Jisheng Zhang <jszhang@kernel.org>
+Date: Sun, 27 Aug 2023 17:17:08 +0800
+Subject: [PATCH 070/400] dt-bindings: net: snps,dwmac: allow dwmac-3.70a to
+ set pbl properties
+
+snps dwmac 3.70a also supports setting pbl related properties, such as
+"snps,pbl", "snps,txpbl", "snps,rxpbl" and "snps,no-pbl-x8".
+
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20230827091710.1483-2-jszhang@kernel.org
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+---
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index 5c2769dc689a..f7443613cc97 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -591,6 +591,7 @@ allOf:
+               - qcom,sa8775p-ethqos
+               - qcom,sc8280xp-ethqos
+               - snps,dwmac-3.50a
++              - snps,dwmac-3.70a
+               - snps,dwmac-4.10a
+               - snps,dwmac-4.20a
+               - snps,dwmac-5.20
+-- 
+2.43.0
+

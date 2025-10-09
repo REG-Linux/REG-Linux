@@ -1,0 +1,39 @@
+From ae9f05131afab2ee5f33a0cbaeee914576314971 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:28:53 +0800
+Subject: [PATCH 315/400] hibernate: reduce logs in nosave_region
+ register/remove
+
+Use pr_debug instead of pr_info to reduce logs.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ kernel/power/snapshot.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/power/snapshot.c b/kernel/power/snapshot.c
+index 8a3256d05761..3d33db7a8096 100644
+--- a/kernel/power/snapshot.c
++++ b/kernel/power/snapshot.c
+@@ -1053,7 +1053,7 @@ int hibernate_register_nosave_region(unsigned long start_pfn, unsigned long end_
+ 	list_add_tail(&region->list, &nosave_regions);
+ 	mutex_unlock(&nosave_regions_list_lock);
+ 
+-	pr_info("Registered nosave memory: [mem %#010llx-%#010llx]\n",
++	pr_debug("Registered nosave memory: [mem %#010llx-%#010llx]\n",
+ 		(unsigned long long) start_pfn << PAGE_SHIFT,
+ 		((unsigned long long) end_pfn << PAGE_SHIFT) - 1);
+ 	return 0;
+@@ -1086,7 +1086,7 @@ int hibernate_remove_nosave_region(unsigned long start_pfn, unsigned long end_pf
+ 			list_del(&region->list);
+ 			kfree(region);
+ 			found++;
+-			pr_info("Unregistered nosave memory: [mem %#010llx-%#010llx]\n",
++			pr_debug("Unregistered nosave memory: [mem %#010llx-%#010llx]\n",
+ 				(unsigned long long) start_pfn << PAGE_SHIFT,
+ 				((unsigned long long) end_pfn << PAGE_SHIFT) - 1);
+ 		}
+-- 
+2.43.0
+

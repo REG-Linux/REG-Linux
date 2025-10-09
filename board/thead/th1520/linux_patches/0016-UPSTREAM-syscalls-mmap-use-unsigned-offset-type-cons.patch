@@ -1,0 +1,108 @@
+From 13926c59e10c6d233d059547dfdeb1d5cc3eb245 Mon Sep 17 00:00:00 2001
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Tue, 4 Jun 2024 14:20:26 +0200
+Subject: [PATCH 016/400] UPSTREAM: syscalls: mmap(): use unsigned offset type
+ consistently
+
+Most architectures that implement the old-style mmap() with byte offset
+use 'unsigned long' as the type for that offset, but microblaze and
+riscv have the off_t type that is shared with userspace, matching the
+prototype in include/asm-generic/syscalls.h.
+
+Make this consistent by using an unsigned argument everywhere. This
+changes the behavior slightly, as the argument is shifted to a page
+number, and an user input with the top bit set would result in a
+negative page offset rather than a large one as we use elsewhere.
+
+For riscv, the 32-bit sys_mmap2() definition actually used a custom
+type that is different from the global declaration, but this was
+missed due to an incorrect type check.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+(cherry picked from commit 295f10061af024099440b46602bcc47364551db7)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/csky/kernel/syscall.c              | 2 +-
+ arch/loongarch/kernel/syscall.c         | 2 +-
+ arch/microblaze/kernel/sys_microblaze.c | 2 +-
+ arch/riscv/kernel/sys_riscv.c           | 4 ++--
+ include/asm-generic/syscalls.h          | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/csky/kernel/syscall.c b/arch/csky/kernel/syscall.c
+index 3d30e58a45d2..4540a271ee39 100644
+--- a/arch/csky/kernel/syscall.c
++++ b/arch/csky/kernel/syscall.c
+@@ -20,7 +20,7 @@ SYSCALL_DEFINE6(mmap2,
+ 	unsigned long, prot,
+ 	unsigned long, flags,
+ 	unsigned long, fd,
+-	off_t, offset)
++	unsigned long, offset)
+ {
+ 	if (unlikely(offset & (~PAGE_MASK >> 12)))
+ 		return -EINVAL;
+diff --git a/arch/loongarch/kernel/syscall.c b/arch/loongarch/kernel/syscall.c
+index b4c5acd7aa3b..8801611143ab 100644
+--- a/arch/loongarch/kernel/syscall.c
++++ b/arch/loongarch/kernel/syscall.c
+@@ -22,7 +22,7 @@
+ #define __SYSCALL(nr, call)	[nr] = (call),
+ 
+ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len, unsigned long,
+-		prot, unsigned long, flags, unsigned long, fd, off_t, offset)
++		prot, unsigned long, flags, unsigned long, fd, unsigned long, offset)
+ {
+ 	if (offset & ~PAGE_MASK)
+ 		return -EINVAL;
+diff --git a/arch/microblaze/kernel/sys_microblaze.c b/arch/microblaze/kernel/sys_microblaze.c
+index ed9f34da1a2a..0850b099f300 100644
+--- a/arch/microblaze/kernel/sys_microblaze.c
++++ b/arch/microblaze/kernel/sys_microblaze.c
+@@ -35,7 +35,7 @@
+ 
+ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
+ 		unsigned long, prot, unsigned long, flags, unsigned long, fd,
+-		off_t, pgoff)
++		unsigned long, pgoff)
+ {
+ 	if (pgoff & ~PAGE_MASK)
+ 		return -EINVAL;
+diff --git a/arch/riscv/kernel/sys_riscv.c b/arch/riscv/kernel/sys_riscv.c
+index 473159b5f303..56a640f06e64 100644
+--- a/arch/riscv/kernel/sys_riscv.c
++++ b/arch/riscv/kernel/sys_riscv.c
+@@ -32,7 +32,7 @@ static long riscv_sys_mmap(unsigned long addr, unsigned long len,
+ #ifdef CONFIG_64BIT
+ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
+ 	unsigned long, prot, unsigned long, flags,
+-	unsigned long, fd, off_t, offset)
++	unsigned long, fd, unsigned long, offset)
+ {
+ 	return riscv_sys_mmap(addr, len, prot, flags, fd, offset, 0);
+ }
+@@ -41,7 +41,7 @@ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
+ #if defined(CONFIG_32BIT) || defined(CONFIG_COMPAT)
+ SYSCALL_DEFINE6(mmap2, unsigned long, addr, unsigned long, len,
+ 	unsigned long, prot, unsigned long, flags,
+-	unsigned long, fd, off_t, offset)
++	unsigned long, fd, unsigned long, offset)
+ {
+ 	/*
+ 	 * Note that the shift for mmap2 is constant (12),
+diff --git a/include/asm-generic/syscalls.h b/include/asm-generic/syscalls.h
+index 933ca6581aba..fabcefe8a80a 100644
+--- a/include/asm-generic/syscalls.h
++++ b/include/asm-generic/syscalls.h
+@@ -19,7 +19,7 @@ asmlinkage long sys_mmap2(unsigned long addr, unsigned long len,
+ #ifndef sys_mmap
+ asmlinkage long sys_mmap(unsigned long addr, unsigned long len,
+ 			unsigned long prot, unsigned long flags,
+-			unsigned long fd, off_t pgoff);
++			unsigned long fd, unsigned long off);
+ #endif
+ 
+ #ifndef sys_rt_sigreturn
+-- 
+2.43.0
+

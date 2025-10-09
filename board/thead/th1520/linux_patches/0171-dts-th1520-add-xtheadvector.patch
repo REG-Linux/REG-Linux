@@ -1,0 +1,69 @@
+From f5ee70d30d6d6dff1cbfae46fd9fd228d9237f43 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sat, 30 Mar 2024 19:25:25 +0800
+Subject: [PATCH 171/400] dts: th1520: add xtheadvector
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index dbb1e465c99d..2ddbc3a6eb6a 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -29,10 +29,10 @@ cpus: cpus {
+ 		c910_0: cpu@0 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+-			riscv,isa = "rv64imafdc";
++			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm";
++					       "zifencei", "zihpm", "xtheadvector";
+ 			reg = <0>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -63,10 +63,10 @@ cpu0_intc: interrupt-controller {
+ 		c910_1: cpu@1 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+-			riscv,isa = "rv64imafdc";
++			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm";
++					       "zifencei", "zihpm", "xtheadvector";
+ 			reg = <1>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -97,10 +97,10 @@ cpu1_intc: interrupt-controller {
+ 		c910_2: cpu@2 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+-			riscv,isa = "rv64imafdc";
++			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm";
++					       "zifencei", "zihpm", "xtheadvector";
+ 			reg = <2>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -131,10 +131,10 @@ cpu2_intc: interrupt-controller {
+ 		c910_3: cpu@3 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+-			riscv,isa = "rv64imafdc";
++			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+ 			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+-					       "zifencei", "zihpm";
++					       "zifencei", "zihpm", "xtheadvector";
+ 			reg = <3>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+-- 
+2.43.0
+

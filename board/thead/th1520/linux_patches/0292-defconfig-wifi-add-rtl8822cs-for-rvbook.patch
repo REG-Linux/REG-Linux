@@ -1,0 +1,25 @@
+From a9b9a1a9a8081d78e646bc8371af4d692ef07407 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:04:55 +0800
+Subject: [PATCH 292/400] defconfig: wifi : add rtl8822cs(for rvbook)
+
+support rtl8822cs wifi function
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/configs/th1520_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 1d3ccf6048ca..b14c9c5bb7f7 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -396,3 +396,5 @@ CONFIG_V4L_MEM2MEM_DRIVERS=y
+ # CONFIG_MEDIA_TUNER_MXL301RF is not set
+ # CONFIG_MEDIA_TUNER_QM1D1C0042 is not set
+ # CONFIG_MEDIA_TUNER_QM1D1B0004 is not set
++CONFIG_RTW88_8822C=m
++CONFIG_RTW88_8822CS=m
+-- 
+2.43.0
+

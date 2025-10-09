@@ -1,0 +1,33 @@
+From 2200b1d8a9aa7688a9dfd6f10ef1bef260d58f9c Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 11:53:38 +0800
+Subject: [PATCH 321/400] configs: enable img rogue gpu
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/configs/th1520_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 83266af07e4b..eb921fc01bda 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -99,6 +99,7 @@ CONFIG_MAC80211=m
+ CONFIG_MAC80211_MESH=y
+ CONFIG_NET_9P=y
+ CONFIG_NET_9P_VIRTIO=y
++CONFIG_PCI=y
+ CONFIG_DEVTMPFS=y
+ CONFIG_DEVTMPFS_MOUNT=y
+ CONFIG_TH1520_AON_PD=y
+@@ -185,6 +186,7 @@ CONFIG_DRM_PANEL_JADARD_JD9365DA_H3=y
+ CONFIG_DRM_PANEL_ILITEK_ILI9881C=y
+ CONFIG_DRM_PANEL_HX8279=y
+ CONFIG_DRM_VERISILICON=y
++CONFIG_DRM_POWERVR_ROGUE=m
+ CONFIG_FB=y
+ CONFIG_BACKLIGHT_CLASS_DEVICE=y
+ CONFIG_BACKLIGHT_PWM=y
+-- 
+2.43.0
+

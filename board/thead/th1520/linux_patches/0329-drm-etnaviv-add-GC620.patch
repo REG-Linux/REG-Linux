@@ -1,0 +1,27 @@
+From 9df1b73d63bd9dd1ccbb76a4b9d247df7aefc43a Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Fri, 1 Dec 2023 13:30:22 +0800
+Subject: [PATCH 329/400] drm/etnaviv: add GC620
+
+Dirty.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+---
+ drivers/gpu/drm/etnaviv/common.xml.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/etnaviv/common.xml.h b/drivers/gpu/drm/etnaviv/common.xml.h
+index 001faea80fef..3555e714f014 100644
+--- a/drivers/gpu/drm/etnaviv/common.xml.h
++++ b/drivers/gpu/drm/etnaviv/common.xml.h
+@@ -65,6 +65,7 @@ DEALINGS IN THE SOFTWARE.
+ #define chipModel_GC520						0x00000520
+ #define chipModel_GC530						0x00000530
+ #define chipModel_GC600						0x00000600
++#define chipModel_GC620						0x00000620
+ #define chipModel_GC700						0x00000700
+ #define chipModel_GC800						0x00000800
+ #define chipModel_GC860						0x00000860
+-- 
+2.43.0
+

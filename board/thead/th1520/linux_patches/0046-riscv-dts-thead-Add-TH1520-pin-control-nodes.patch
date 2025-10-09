@@ -1,0 +1,105 @@
+From 9de046befdb8dd9fbcae93d7f6c3108303a77fd1 Mon Sep 17 00:00:00 2001
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Date: Wed, 3 Jan 2024 14:28:40 +0100
+Subject: [PATCH 046/400] riscv: dts: thead: Add TH1520 pin control nodes
+
+Add nodes for pin controllers on the T-Head TH1520 RISC-V SoC.
+
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Link: https://lore.kernel.org/r/20240103132852.298964-4-emil.renner.berthing@canonical.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   |  4 ++++
+ .../dts/thead/th1520-lichee-module-4a.dtsi    |  4 ++++
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 24 +++++++++++++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index 70e8042c8304..6c56318a8705 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -44,6 +44,10 @@ &osc_32k {
+ 	clock-frequency = <32768>;
+ };
+ 
++&aonsys_clk {
++	clock-frequency = <73728000>;
++};
++
+ &apb_clk {
+ 	clock-frequency = <62500000>;
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index a802ab110429..9865925be372 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -25,6 +25,10 @@ &osc_32k {
+ 	clock-frequency = <32768>;
+ };
+ 
++&aonsys_clk {
++	clock-frequency = <73728000>;
++};
++
+ &apb_clk {
+ 	clock-frequency = <62500000>;
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index ff364709a6df..0ae955ba234a 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -122,6 +122,12 @@ osc_32k: 32k-oscillator {
+ 		#clock-cells = <0>;
+ 	};
+ 
++	aonsys_clk: aonsys-clk {
++		compatible = "fixed-clock";
++		clock-output-names = "aonsys_clk";
++		#clock-cells = <0>;
++	};
++
+ 	apb_clk: apb-clk-clock {
+ 		compatible = "fixed-clock";
+ 		clock-output-names = "apb_clk";
+@@ -230,6 +236,12 @@ portd: gpio-controller@0 {
+ 			};
+ 		};
+ 
++		padctrl1_apsys: pinctrl@ffe7f3c000 {
++			compatible = "thead,th1520-group2-pinctrl";
++			reg = <0xff 0xe7f3c000 0x0 0x1000>;
++			clocks = <&apb_clk>;
++		};
++
+ 		gpio0: gpio@ffec005000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xec005000 0x0 0x1000>;
+@@ -266,6 +278,12 @@ portb: gpio-controller@0 {
+ 			};
+ 		};
+ 
++		padctrl0_apsys: pinctrl@ffec007000 {
++			compatible = "thead,th1520-group3-pinctrl";
++			reg = <0xff 0xec007000 0x0 0x1000>;
++			clocks = <&apb_clk>;
++		};
++
+ 		uart2: serial@ffec010000 {
+ 			compatible = "snps,dw-apb-uart";
+ 			reg = <0xff 0xec010000 0x0 0x4000>;
+@@ -402,6 +420,12 @@ porte: gpio-controller@0 {
+ 			};
+ 		};
+ 
++		padctrl_aosys: pinctrl@fffff4a000 {
++			compatible = "thead,th1520-group1-pinctrl";
++			reg = <0xff 0xfff4a000 0x0 0x2000>;
++			clocks = <&aonsys_clk>;
++		};
++
+ 		ao_gpio1: gpio@fffff52000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xfff52000 0x0 0x1000>;
+-- 
+2.43.0
+

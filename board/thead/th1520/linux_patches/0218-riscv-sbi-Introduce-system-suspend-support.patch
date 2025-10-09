@@ -1,0 +1,128 @@
+From f76bdcf3eb947c0421a51840a10e4cb3c0a6d04d Mon Sep 17 00:00:00 2001
+From: Andrew Jones <ajones@ventanamicro.com>
+Date: Wed, 6 Dec 2023 12:08:09 +0100
+Subject: [PATCH 218/400] riscv: sbi: Introduce system suspend support
+
+When the SUSP SBI extension is present it implies that the standard
+"suspend to RAM" type is available. Wire it up to the generic
+platform suspend support, also applying the already present support
+for non-retentive CPU suspend. When the kernel is built with
+CONFIG_SUSPEND, one can do 'echo mem > /sys/power/state' to suspend.
+Resumption will occur when a platform-specific wake-up event arrives.
+
+Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+Tested-by: Samuel Holland <samuel.holland@sifive.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Link: https://lore.kernel.org/r/20231206110807.35882-4-ajones@ventanamicro.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Change-Id: I3323394081998d3d915206f26183f1319fdb8010
+---
+ arch/riscv/Kconfig           |  2 +-
+ arch/riscv/include/asm/sbi.h |  9 ++++++++
+ arch/riscv/kernel/suspend.c  | 44 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 54 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 207913086fe0..cd93f998ba9e 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -68,7 +68,7 @@ config RISCV
+ 	select CLINT_TIMER if !MMU
+ 	select CLONE_BACKWARDS
+ 	select COMMON_CLK
+-	select CPU_PM if CPU_IDLE || HIBERNATION
++	select CPU_PM if CPU_IDLE || HIBERNATION || SUSPEND
+ 	select EDAC_SUPPORT
+ 	select FRAME_POINTER if PERF_EVENTS || (FUNCTION_TRACER && !DYNAMIC_FTRACE)
+ 	select GENERIC_ARCH_TOPOLOGY
+diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+index 3ed853b8a8c8..8d261a317175 100644
+--- a/arch/riscv/include/asm/sbi.h
++++ b/arch/riscv/include/asm/sbi.h
+@@ -29,6 +29,7 @@ enum sbi_ext_id {
+ 	SBI_EXT_RFENCE = 0x52464E43,
+ 	SBI_EXT_HSM = 0x48534D,
+ 	SBI_EXT_SRST = 0x53525354,
++	SBI_EXT_SUSP = 0x53555350,
+ 	SBI_EXT_PMU = 0x504D55,
+ 
+ 	/* Experimentals extensions must lie within this range */
+@@ -113,6 +114,14 @@ enum sbi_srst_reset_reason {
+ 	SBI_SRST_RESET_REASON_SYS_FAILURE,
+ };
+ 
++enum sbi_ext_susp_fid {
++	SBI_EXT_SUSP_SYSTEM_SUSPEND = 0,
++};
++
++enum sbi_ext_susp_sleep_type {
++	SBI_SUSP_SLEEP_TYPE_SUSPEND_TO_RAM = 0,
++};
++
+ enum sbi_ext_pmu_fid {
+ 	SBI_EXT_PMU_NUM_COUNTERS = 0,
+ 	SBI_EXT_PMU_COUNTER_GET_INFO,
+diff --git a/arch/riscv/kernel/suspend.c b/arch/riscv/kernel/suspend.c
+index 3c89b8ec69c4..239509367e42 100644
+--- a/arch/riscv/kernel/suspend.c
++++ b/arch/riscv/kernel/suspend.c
+@@ -4,8 +4,12 @@
+  * Copyright (c) 2022 Ventana Micro Systems Inc.
+  */
+ 
++#define pr_fmt(fmt) "suspend: " fmt
++
+ #include <linux/ftrace.h>
++#include <linux/suspend.h>
+ #include <asm/csr.h>
++#include <asm/sbi.h>
+ #include <asm/suspend.h>
+ 
+ void suspend_save_csrs(struct suspend_context *context)
+@@ -85,3 +89,43 @@ int cpu_suspend(unsigned long arg,
+ 
+ 	return rc;
+ }
++
++#ifdef CONFIG_RISCV_SBI
++static int sbi_system_suspend(unsigned long sleep_type,
++			      unsigned long resume_addr,
++			      unsigned long opaque)
++{
++	struct sbiret ret;
++
++	ret = sbi_ecall(SBI_EXT_SUSP, SBI_EXT_SUSP_SYSTEM_SUSPEND,
++			sleep_type, resume_addr, opaque, 0, 0, 0);
++	if (ret.error)
++		return sbi_err_map_linux_errno(ret.error);
++
++	return ret.value;
++}
++
++static int sbi_system_suspend_enter(suspend_state_t state)
++{
++	return cpu_suspend(SBI_SUSP_SLEEP_TYPE_SUSPEND_TO_RAM, sbi_system_suspend);
++}
++
++static const struct platform_suspend_ops sbi_system_suspend_ops = {
++	.valid = suspend_valid_only_mem,
++	.enter = sbi_system_suspend_enter,
++};
++
++static int __init sbi_system_suspend_init(void)
++{
++	if (sbi_spec_version >= sbi_mk_version(2, 0) &&
++	    sbi_probe_extension(SBI_EXT_SUSP) > 0) {
++		pr_info("SBI SUSP extension detected\n");
++		if (IS_ENABLED(CONFIG_SUSPEND))
++			suspend_set_ops(&sbi_system_suspend_ops);
++	}
++
++	return 0;
++}
++
++arch_initcall(sbi_system_suspend_init);
++#endif /* CONFIG_RISCV_SBI */
+-- 
+2.43.0
+

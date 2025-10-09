@@ -1,0 +1,50 @@
+From 3406df25fd3facd789669fd6660f88966218a36a Mon Sep 17 00:00:00 2001
+From: Nick Hu <nick.hu@sifive.com>
+Date: Wed, 17 Jul 2024 11:17:14 +0800
+Subject: [PATCH 310/400] RISC-V: Enable the IPI before workqueue_online_cpu()
+
+Sometimes the hotplug cpu stalls at the arch_cpu_idle() for a while after
+workqueue_online_cpu(). When cpu stalls at the idle loop, the reschedule
+IPI is pending. However the enable bit is not enabled yet so the cpu stalls
+at WFI until watchdog timeout. Therefore enable the IPI before the
+workqueue_online_cpu() to fix the issue.
+
+Fixes: 63c5484e7495 ("workqueue: Add multiple affinity scopes and interface to select them")
+Signed-off-by: Nick Hu <nick.hu@sifive.com>
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Link: https://lore.kernel.org/r/20240717031714.1946036-1-nick.hu@sifive.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Change-Id: Ifa018b99f04bdc26929b7fe6a1cf71cd2e30b142
+---
+ arch/riscv/kernel/sbi-ipi.c | 2 +-
+ include/linux/cpuhotplug.h  | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/kernel/sbi-ipi.c b/arch/riscv/kernel/sbi-ipi.c
+index db296dc0fa96..0e2e19352469 100644
+--- a/arch/riscv/kernel/sbi-ipi.c
++++ b/arch/riscv/kernel/sbi-ipi.c
+@@ -89,7 +89,7 @@ void __init sbi_ipi_init(void)
+ 	 * the masking/unmasking of virtual IPIs is done
+ 	 * via generic IPI-Mux
+ 	 */
+-	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
++	cpuhp_setup_state(CPUHP_AP_IRQ_RISCV_SBI_IPI_STARTING,
+ 			  sswi_base ?
+ 			  "irqchip/sswi-ipi:starting" :
+ 			  "irqchip/sbi-ipi:starting",
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index 624d4a38c358..84f23f47d964 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -154,6 +154,7 @@ enum cpuhp_state {
+ 	CPUHP_AP_IRQ_RISCV_STARTING,
+ 	CPUHP_AP_IRQ_LOONGARCH_STARTING,
+ 	CPUHP_AP_IRQ_SIFIVE_PLIC_STARTING,
++	CPUHP_AP_IRQ_RISCV_SBI_IPI_STARTING,
+ 	CPUHP_AP_ARM_MVEBU_COHERENCY,
+ 	CPUHP_AP_MICROCODE_LOADER,
+ 	CPUHP_AP_PERF_X86_AMD_UNCORE_STARTING,
+-- 
+2.43.0
+

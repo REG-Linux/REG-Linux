@@ -1,0 +1,46 @@
+From 2e76826a4a0b44776173c4df68c974548034cadb Mon Sep 17 00:00:00 2001
+From: bitsk <bigbits@hackx.cc>
+Date: Sat, 8 Feb 2025 16:22:17 +0800
+Subject: [PATCH 367/400] dts: th1520: rvbook: remove conflict for
+ ext_vcc5v_en_pins
+
+---
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index f6549c8ed664..f89a84c0d8c4 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -1510,18 +1510,6 @@ usb-pins {
+ 		};
+ 	};
+ 
+-	ext_vcc5v_en_pins: ext-vcc5v-en-0 {
+-		gpio-pins {
+-			pins = "GPIO1_2";
+-			function = "gpio";
+-			bias-disable;
+-			drive-strength = <13>;
+-			input-enable;
+-			input-schmitt-disable;
+-			slew-rate = <0>;
+-		};
+-	};
+-
+ 	typec0_host_en_pins: typec0-host-en-0 {
+ 		usb-pins {
+ 			pins = "GPIO1_6";
+@@ -2047,8 +2035,7 @@ &disp1_out {
+ &hdmi_tx {
+ 	status = "okay";
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&hdmi_pins>,
+-				<&ext_vcc5v_en_pins>;
++	pinctrl-0 = <&hdmi_pins>;
+ 
+ 	port@0 {
+ 		/* input */
+-- 
+2.43.0
+

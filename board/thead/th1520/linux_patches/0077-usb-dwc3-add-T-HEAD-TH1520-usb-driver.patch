@@ -1,0 +1,193 @@
+From b0b4592c438c4f555ca2c1b3da255d3c8ba8c0ee Mon Sep 17 00:00:00 2001
+From: Jisheng Zhang <jszhang@kernel.org>
+Date: Thu, 28 Sep 2023 00:42:22 +0800
+Subject: [PATCH 077/400] usb: dwc3: add T-HEAD TH1520 usb driver
+
+Adds TH1520 Glue layer to support USB controller on T-HEAD TH1520 SoC.
+There is a DesignWare USB3 DRD core in TH1520 SoCs, the dwc3 core is
+the child of this USB wrapper module device.
+
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+Link: https://lore.kernel.org/r/20230927164222.3505-3-jszhang@kernel.org
+[esmil: use devm_of_platform_populate(), remove MODULE_ALIAS()]
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+---
+ MAINTAINERS                   |   1 +
+ drivers/usb/dwc3/Kconfig      |  20 ++++++
+ drivers/usb/dwc3/Makefile     |   2 +
+ drivers/usb/dwc3/dwc3-thead.c | 112 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 135 insertions(+)
+ create mode 100644 drivers/usb/dwc3/dwc3-thead.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 780677aca9f1..935bf57aa78b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -18491,6 +18491,7 @@ L:	linux-riscv@lists.infradead.org
+ S:	Maintained
+ F:	arch/riscv/boot/dts/thead/
+ F:	drivers/pinctrl/pinctrl-th1520.c
++F:	drivers/usb/dwc3/dwc3-thead.c
+ 
+ RNBD BLOCK DRIVERS
+ M:	Md. Haris Iqbal <haris.iqbal@ionos.com>
+diff --git a/drivers/usb/dwc3/Kconfig b/drivers/usb/dwc3/Kconfig
+index 98efcbb76c88..a2183b8e7772 100644
+--- a/drivers/usb/dwc3/Kconfig
++++ b/drivers/usb/dwc3/Kconfig
+@@ -178,4 +178,24 @@ config USB_DWC3_OCTEON
+ 	  Only the host mode is currently supported.
+ 	  Say 'Y' or 'M' here if you have one such device.
+ 
++config USB_DWC3_RTK
++	tristate "Realtek DWC3 Platform Driver"
++	depends on OF && ARCH_REALTEK
++	default USB_DWC3
++	select USB_ROLE_SWITCH
++	help
++	  RTK DHC RTD SoCs with DesignWare Core USB3 IP inside,
++	  and IP Core configured for USB 2.0 and USB 3.0 in host
++	  or dual-role mode.
++	  Say 'Y' or 'M' if you have such device.
++
++config USB_DWC3_THEAD
++	tristate "T-HEAD Platform"
++	depends on ARCH_THEAD || COMPILE_TEST
++	default USB_DWC3
++	help
++	  Support T-HEAD platform with DesignWare Core USB3 IP.
++	  Only the host mode is currently supported.
++	  Say 'Y' or 'M' here if you have one such device.
++
+ endif
+diff --git a/drivers/usb/dwc3/Makefile b/drivers/usb/dwc3/Makefile
+index fe1493d4bbe5..79afa5c03c10 100644
+--- a/drivers/usb/dwc3/Makefile
++++ b/drivers/usb/dwc3/Makefile
+@@ -55,3 +55,5 @@ obj-$(CONFIG_USB_DWC3_QCOM)		+= dwc3-qcom.o
+ obj-$(CONFIG_USB_DWC3_IMX8MP)		+= dwc3-imx8mp.o
+ obj-$(CONFIG_USB_DWC3_XILINX)		+= dwc3-xilinx.o
+ obj-$(CONFIG_USB_DWC3_OCTEON)		+= dwc3-octeon.o
++obj-$(CONFIG_USB_DWC3_RTK)		+= dwc3-rtk.o
++obj-$(CONFIG_USB_DWC3_THEAD)		+= dwc3-thead.o
+diff --git a/drivers/usb/dwc3/dwc3-thead.c b/drivers/usb/dwc3/dwc3-thead.c
+new file mode 100644
+index 000000000000..987ac70a5afc
+--- /dev/null
++++ b/drivers/usb/dwc3/dwc3-thead.c
+@@ -0,0 +1,112 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * dwc3-thead.c - T-HEAD platform specific glue layer
++ *
++ * Inspired by dwc3-of-simple.c
++ *
++ * Copyright (C) 2021 Alibaba Group Holding Limited.
++ * Copyright (C) 2023 Jisheng Zhang <jszhang@kernel.org>
++ * Copyright (c) 2018, The Linux Foundation. All rights reserved.
++ */
++
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/mfd/syscon.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
++#include <linux/regmap.h>
++
++#include "core.h"
++
++#define USB_SSP_EN		0x34
++#define  REF_SSP_EN		BIT(0)
++#define USB_SYS			0x3c
++#define  COMMONONN		BIT(0)
++
++#define USB3_DRD_SWRST		0x14
++#define  USB3_DRD_PRST		BIT(0)
++#define  USB3_DRD_PHYRST	BIT(1)
++#define  USB3_DRD_VCCRST	BIT(2)
++#define  USB3_DRD_RSTMASK	(USB3_DRD_PRST | USB3_DRD_PHYRST | USB3_DRD_VCCRST)
++
++struct dwc3_thead {
++	void __iomem		*base;
++	struct regmap		*misc_sysreg;
++	struct regulator	*vbus;
++};
++
++static void dwc3_thead_optimize_power(struct dwc3_thead *thead)
++{
++	u32 val;
++
++	/* config usb top within USB ctrl & PHY reset */
++	regmap_update_bits(thead->misc_sysreg, USB3_DRD_SWRST,
++			   USB3_DRD_RSTMASK, USB3_DRD_PRST);
++
++	/*
++	 * dwc reg also need to be configed to save power
++	 * 1. set USB_SYS[COMMONONN]
++	 * 2. set DWC3_GCTL[SOFITPSYNC](done by core.c)
++	 * 3. set GUSB3PIPECTL[SUSPENDEN] (done by core.c)
++	 */
++	val = readl(thead->base + USB_SYS);
++	val |= COMMONONN;
++	writel(val, thead->base + USB_SYS);
++	val = readl(thead->base + USB_SSP_EN);
++	val |= REF_SSP_EN;
++	writel(val, thead->base + USB_SSP_EN);
++
++	regmap_update_bits(thead->misc_sysreg, USB3_DRD_SWRST,
++			   USB3_DRD_RSTMASK, USB3_DRD_RSTMASK);
++}
++
++static int dwc3_thead_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct device_node *np = dev->of_node;
++	struct dwc3_thead *thead;
++	int ret;
++
++	thead = devm_kzalloc(&pdev->dev, sizeof(*thead), GFP_KERNEL);
++	if (!thead)
++		return -ENOMEM;
++
++	platform_set_drvdata(pdev, thead);
++
++	ret = devm_regulator_get_enable_optional(dev, "vbus");
++	if (ret < 0 && ret != -ENODEV)
++		return ret;
++
++	thead->misc_sysreg = syscon_regmap_lookup_by_phandle(np, "thead,misc-sysreg");
++	if (IS_ERR(thead->misc_sysreg))
++		return PTR_ERR(thead->misc_sysreg);
++
++	thead->base = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(thead->base))
++		return PTR_ERR(thead->base);
++
++	dwc3_thead_optimize_power(thead);
++
++	return devm_of_platform_populate(dev);
++}
++
++static const struct of_device_id dwc3_thead_of_match[] = {
++	{ .compatible = "thead,th1520-usb" },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, dwc3_thead_of_match);
++
++static struct platform_driver dwc3_thead_driver = {
++	.probe		= dwc3_thead_probe,
++	.driver		= {
++		.name	= "dwc3-thead",
++		.of_match_table	= dwc3_thead_of_match,
++	},
++};
++module_platform_driver(dwc3_thead_driver);
++
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("DesignWare DWC3 T-HEAD Glue Driver");
++MODULE_AUTHOR("Jisheng Zhang <jszhang@kernel.org>");
+-- 
+2.43.0
+

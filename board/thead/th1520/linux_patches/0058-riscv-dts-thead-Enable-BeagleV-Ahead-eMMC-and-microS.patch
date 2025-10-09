@@ -1,0 +1,59 @@
+From 12d0266500c77d6ac3c8d0e4f2940a06b549723b Mon Sep 17 00:00:00 2001
+From: Drew Fustini <dfustini@baylibre.com>
+Date: Wed, 6 Dec 2023 00:09:23 -0800
+Subject: [PATCH 058/400] riscv: dts: thead: Enable BeagleV Ahead eMMC and
+ microSD
+
+Add emmc node properties for the eMMC device and add sdio0 node
+properties for the microSD slot. Set the frequency for the sdhci
+reference clock.
+
+Signed-off-by: Drew Fustini <dfustini@baylibre.com>
+Reviewed-by: Guo Ren <guoren@kernel.org>
+Link: https://lore.kernel.org/r/20231206-th1520_mmc_dts-v8-3-69220e373e8f@baylibre.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index 0b309c770202..ddcfd311664b 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -91,6 +91,10 @@ &apb_clk {
+ 	clock-frequency = <62500000>;
+ };
+ 
++&sdhci_clk {
++	clock-frequency = <198000000>;
++};
++
+ &uart_sclk {
+ 	clock-frequency = <100000000>;
+ };
+@@ -141,6 +145,22 @@ rx-pins {
+ 	};
+ };
+ 
++&emmc {
++       bus-width = <8>;
++       max-frequency = <198000000>;
++       mmc-hs400-1_8v;
++       non-removable;
++       no-sdio;
++       no-sd;
++       status = "okay";
++};
++
++&sdio0 {
++       bus-width = <4>;
++       max-frequency = <198000000>;
++       status = "okay";
++};
++
+ &uart0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&uart0_pins>;
+-- 
+2.43.0
+

@@ -1,0 +1,42 @@
+From b1488a7b669ab5780f34b44004acad792c4dc0ba Mon Sep 17 00:00:00 2001
+From: sanyi <yunfei_zhou@linux.alibaba.com>
+Date: Tue, 22 Aug 2023 09:36:32 +0800
+Subject: [PATCH 099/400] STR: fix pca953x resume bug
+
+Advance the pca953x drive resume to ensure that it is done before the lcd resume
+
+Signed-off-by: sanyi <yunfei_zhou@linux.alibaba.com>
+---
+ drivers/gpio/gpio-pca953x.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpio/gpio-pca953x.c b/drivers/gpio/gpio-pca953x.c
+index faadbe66b23e..ef4ad9b0d077 100644
+--- a/drivers/gpio/gpio-pca953x.c
++++ b/drivers/gpio/gpio-pca953x.c
+@@ -1323,12 +1323,20 @@ static const struct of_device_id pca953x_dt_ids[] = {
+ 
+ MODULE_DEVICE_TABLE(of, pca953x_dt_ids);
+ 
+-static SIMPLE_DEV_PM_OPS(pca953x_pm_ops, pca953x_suspend, pca953x_resume);
++#ifdef CONFIG_PM_SLEEP
++static const struct dev_pm_ops pca953x_pm_ops = {
++    SET_LATE_SYSTEM_SLEEP_PM_OPS(pca953x_suspend,
++				 pca953x_resume)
++};
+ 
++#define PCA593X_PM_OPS &pca953x_pm_ops
++#else
++#define PCA593X_PM_OPS NULL
++#endif
+ static struct i2c_driver pca953x_driver = {
+ 	.driver = {
+ 		.name	= "pca953x",
+-		.pm	= &pca953x_pm_ops,
++		.pm	= PCA593X_PM_OPS,
+ 		.of_match_table = pca953x_dt_ids,
+ 		.acpi_match_table = pca953x_acpi_ids,
+ 	},
+-- 
+2.43.0
+

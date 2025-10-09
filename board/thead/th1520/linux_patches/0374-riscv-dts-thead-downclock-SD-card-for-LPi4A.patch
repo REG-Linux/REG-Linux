@@ -1,0 +1,31 @@
+From e6d13769d3b9a047ba02a14812d0ece37732b58f Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Mon, 26 May 2025 21:33:02 +0800
+Subject: [PATCH 374/400] riscv: dts: thead: downclock SD card for LPi4A
+
+It's reported that @198MHz some R/W error will happen.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 98b126511036..8f8a5f35810a 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -1153,6 +1153,10 @@ spidev@0 {
+ 	};
+ };
+ 
++&sdio0 {
++       max-frequency = <100000000>;
++};
++
+ &sdio1 {
+ 		max-frequency = <100000000>;
+ 		bus-width = <4>;
+-- 
+2.43.0
+

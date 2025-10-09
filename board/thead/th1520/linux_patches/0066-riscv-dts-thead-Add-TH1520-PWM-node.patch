@@ -1,0 +1,32 @@
+From e306f83f69cb8e2b6de89ef6dc3d5a4c09b759e3 Mon Sep 17 00:00:00 2001
+From: Jisheng Zhang <jszhang@kernel.org>
+Date: Thu, 21 Sep 2023 14:00:40 +0800
+Subject: [PATCH 066/400] riscv: dts: thead: Add TH1520 PWM node
+
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 70f7560c5e28..b97988572403 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -386,6 +386,13 @@ uart2: serial@ffec010000 {
+ 			status = "disabled";
+ 		};
+ 
++		pwm: pwm@ffec01c000 {
++			compatible = "thead,th1520-pwm";
++			reg = <0xff 0xec01c000 0x0 0x4000>;
++			#pwm-cells = <3>;
++			clocks = <&osc>;
++		};
++
+ 		dmac0: dma-controller@ffefc00000 {
+ 			compatible = "snps,axi-dma-1.01a";
+ 			reg = <0xff 0xefc00000 0x0 0x1000>;
+-- 
+2.43.0
+

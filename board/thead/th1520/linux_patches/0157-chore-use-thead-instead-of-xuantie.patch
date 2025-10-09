@@ -1,0 +1,110 @@
+From 078cf2cd255df9ba506354a8424a38900fdb80dd Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Tue, 2 Jul 2024 18:12:21 +0800
+Subject: [PATCH 157/400] chore: use thead instead of xuantie
+
+esmil upstream use thead
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ .../devicetree/bindings/pinctrl/thead,th1520-pinctrl.yaml | 6 ++++--
+ arch/riscv/boot/dts/thead/th1520.dtsi                     | 8 ++++----
+ drivers/pinctrl/pinctrl-th1520.c                          | 8 ++++----
+ 3 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/pinctrl/thead,th1520-pinctrl.yaml b/Documentation/devicetree/bindings/pinctrl/thead,th1520-pinctrl.yaml
+index d3ad7a7cfdd1..12a23f185577 100644
+--- a/Documentation/devicetree/bindings/pinctrl/thead,th1520-pinctrl.yaml
++++ b/Documentation/devicetree/bindings/pinctrl/thead,th1520-pinctrl.yaml
+@@ -4,19 +4,20 @@
+ $id: http://devicetree.org/schemas/pinctrl/thead,th1520-pinctrl.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+-title: T-Head TH1520 SoC pin controller
++title: XuanTie TH1520 SoC pin controller
+ 
+ maintainers:
+   - Emil Renner Berthing <emil.renner.berthing@canonical.com>
+ 
+ description: |
+-  Pinmux and pinconf controller in the T-Head TH1520 RISC-V SoC.
++  Pinmux and pinconf controller in the XuanTie TH1520 RISC-V SoC.
+ 
+   The TH1520 has 3 groups of pads each controlled from different memory ranges.
+   Confusingly the memory ranges are named
+     PADCTRL_AOSYS  -> PAD Group 1
+     PADCTRL1_APSYS -> PAD Group 2
+     PADCTRL0_APSYS -> PAD Group 3
++    PADCTRL_AUDIOSYS -> PAD Group 4
+ 
+   Each pad can be muxed individually to up to 6 different functions. For most
+   pads only a few of those 6 configurations are valid though, and a few pads in
+@@ -40,6 +41,7 @@ properties:
+       - thead,th1520-group1-pinctrl
+       - thead,th1520-group2-pinctrl
+       - thead,th1520-group3-pinctrl
++      - thead,th1520-group4-pinctrl
+ 
+   reg:
+     maxItems: 1
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 441daa6d874b..5d6bb94a99ce 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -755,7 +755,7 @@ gpio3: gpio-controller@0 {
+ 		};
+ 
+ 		padctrl1_apsys: pinctrl@ffe7f3c000 {
+-			compatible = "xuantie,th1520-group2-pinctrl";
++			compatible = "thead,th1520-group2-pinctrl";
+ 			reg = <0xff 0xe7f3c000 0x0 0x1000>;
+ 			clocks = <&apb_clk>;
+ 		};
+@@ -809,7 +809,7 @@ gpio1: gpio-controller@0 {
+ 		};
+ 
+ 		padctrl0_apsys: pinctrl@ffec007000 {
+-			compatible = "xuantie,th1520-group3-pinctrl";
++			compatible = "thead,th1520-group3-pinctrl";
+ 			reg = <0xff 0xec007000 0x0 0x1000>;
+ 			clocks = <&apb_clk>;
+ 		};
+@@ -1031,13 +1031,13 @@ aogpio: gpio-controller@0 {
+ 		};
+ 
+ 		padctrl_aosys: pinctrl@fffff4a000 {
+-			compatible = "xuantie,th1520-group1-pinctrl";
++			compatible = "thead,th1520-group1-pinctrl";
+ 			reg = <0xff 0xfff4a000 0x0 0x2000>;
+ 			clocks = <&aonsys_clk>;
+ 		};
+ 
+ 		padctrl_audiosys: pinctrl@ffcb01d000 {
+-			compatible = "xuantie,th1520-group4-pinctrl";
++			compatible = "thead,th1520-group4-pinctrl";
+ 			reg = <0xff 0xcb01d000 0x0 0x2000>;
+ 			clocks = <&audiosys_clk>;
+ 		};
+diff --git a/drivers/pinctrl/pinctrl-th1520.c b/drivers/pinctrl/pinctrl-th1520.c
+index 4764ba08fb2e..334c53c6f85c 100644
+--- a/drivers/pinctrl/pinctrl-th1520.c
++++ b/drivers/pinctrl/pinctrl-th1520.c
+@@ -1015,10 +1015,10 @@ static int th1520_pinctrl_probe(struct platform_device *pdev)
+ }
+ 
+ static const struct of_device_id th1520_pinctrl_of_match[] = {
+-	{ .compatible = "xuantie,th1520-group1-pinctrl", .data = &th1520_group1 },
+-	{ .compatible = "xuantie,th1520-group2-pinctrl", .data = &th1520_group2 },
+-	{ .compatible = "xuantie,th1520-group3-pinctrl", .data = &th1520_group3 },
+-	{ .compatible = "xuantie,th1520-group4-pinctrl", .data = &th1520_group4 },
++	{ .compatible = "thead,th1520-group1-pinctrl", .data = &th1520_group1 },
++	{ .compatible = "thead,th1520-group2-pinctrl", .data = &th1520_group2 },
++	{ .compatible = "thead,th1520-group3-pinctrl", .data = &th1520_group3 },
++	{ .compatible = "thead,th1520-group4-pinctrl", .data = &th1520_group4 },
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, th1520_pinctrl_of_match);
+-- 
+2.43.0
+

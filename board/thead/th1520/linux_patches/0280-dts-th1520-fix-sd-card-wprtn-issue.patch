@@ -1,0 +1,34 @@
+From de9651cf648b50332d8c661b4c68eb510fedbba5 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:55:00 +0800
+Subject: [PATCH 280/400] dts:th1520: fix sd card wprtn issue
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index a4321513c3fe..322dc76d02d9 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -3173,7 +3173,6 @@ &emmc {
+        non-removable;
+        no-sdio;
+        no-sd;
+-       wprtn_ignore;
+        status = "okay";
+ };
+ 
+@@ -3182,6 +3181,7 @@ &sdio0 {
+        pinctrl-0 = <&sdio0_pins>;
+        bus-width = <4>;
+        max-frequency = <198000000>;
++       wprtn_ignore;
+        status = "okay";
+ };
+ 
+-- 
+2.43.0
+

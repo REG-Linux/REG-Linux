@@ -1,0 +1,201 @@
+From a1f9328e25ec3d181500215ab2908a6f4ffb631c Mon Sep 17 00:00:00 2001
+From: Leonardo Bras <leobras@redhat.com>
+Date: Wed, 3 Jan 2024 13:31:59 -0300
+Subject: [PATCH 039/400] riscv/cmpxchg: Deduplicate xchg() asm functions
+
+In this header every xchg define (_relaxed, _acquire, _release, vanilla)
+contain it's own asm file, both for 4-byte variables an 8-byte variables,
+on a total of 8 versions of mostly the same asm.
+
+This is usually bad, as it means any change may be done in up to 8
+different places.
+
+Unify those versions by creating a new define with enough parameters to
+generate any version of the previous 8.
+
+Then unify the result under a more general define, and simplify
+arch_xchg* generation.
+
+(This did not cause any change in generated asm)
+
+Signed-off-by: Leonardo Bras <leobras@redhat.com>
+Reviewed-by: Guo Ren <guoren@kernel.org>
+Reviewed-by: Andrea Parri <parri.andrea@gmail.com>
+Tested-by: Guo Ren <guoren@kernel.org>
+Link: https://lore.kernel.org/r/20240103163203.72768-3-leobras@redhat.com
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/include/asm/cmpxchg.h | 138 ++++++-------------------------
+ 1 file changed, 23 insertions(+), 115 deletions(-)
+
+diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
+index 2f4726d3cfcc..48478a8eecee 100644
+--- a/arch/riscv/include/asm/cmpxchg.h
++++ b/arch/riscv/include/asm/cmpxchg.h
+@@ -11,140 +11,48 @@
+ #include <asm/barrier.h>
+ #include <asm/fence.h>
+ 
+-#define __xchg_relaxed(ptr, new, size)					\
++#define __arch_xchg(sfx, prepend, append, r, p, n)			\
+ ({									\
+-	__typeof__(ptr) __ptr = (ptr);					\
+-	__typeof__(new) __new = (new);					\
+-	__typeof__(*(ptr)) __ret;					\
+-	switch (size) {							\
+-	case 4:								\
+-		__asm__ __volatile__ (					\
+-			"	amoswap.w %0, %2, %1\n"			\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
+-		break;							\
+-	case 8:								\
+-		__asm__ __volatile__ (					\
+-			"	amoswap.d %0, %2, %1\n"			\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
+-		break;							\
+-	default:							\
+-		BUILD_BUG();						\
+-	}								\
+-	__ret;								\
+-})
+-
+-#define arch_xchg_relaxed(ptr, x)					\
+-({									\
+-	__typeof__(*(ptr)) _x_ = (x);					\
+-	(__typeof__(*(ptr))) __xchg_relaxed((ptr),			\
+-					    _x_, sizeof(*(ptr)));	\
++	__asm__ __volatile__ (						\
++		prepend							\
++		"	amoswap" sfx " %0, %2, %1\n"			\
++		append							\
++		: "=r" (r), "+A" (*(p))					\
++		: "r" (n)						\
++		: "memory");						\
+ })
+ 
+-#define __xchg_acquire(ptr, new, size)					\
++#define _arch_xchg(ptr, new, sfx, prepend, append)			\
+ ({									\
+ 	__typeof__(ptr) __ptr = (ptr);					\
+-	__typeof__(new) __new = (new);					\
+-	__typeof__(*(ptr)) __ret;					\
+-	switch (size) {							\
++	__typeof__(*(__ptr)) __new = (new);				\
++	__typeof__(*(__ptr)) __ret;					\
++	switch (sizeof(*__ptr)) {					\
+ 	case 4:								\
+-		__asm__ __volatile__ (					\
+-			"	amoswap.w %0, %2, %1\n"			\
+-			RISCV_ACQUIRE_BARRIER				\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
++		__arch_xchg(".w" sfx, prepend, append,			\
++			      __ret, __ptr, __new);			\
+ 		break;							\
+ 	case 8:								\
+-		__asm__ __volatile__ (					\
+-			"	amoswap.d %0, %2, %1\n"			\
+-			RISCV_ACQUIRE_BARRIER				\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
++		__arch_xchg(".d" sfx, prepend, append,			\
++			      __ret, __ptr, __new);			\
+ 		break;							\
+ 	default:							\
+ 		BUILD_BUG();						\
+ 	}								\
+-	__ret;								\
++	(__typeof__(*(__ptr)))__ret;					\
+ })
+ 
+-#define arch_xchg_acquire(ptr, x)					\
+-({									\
+-	__typeof__(*(ptr)) _x_ = (x);					\
+-	(__typeof__(*(ptr))) __xchg_acquire((ptr),			\
+-					    _x_, sizeof(*(ptr)));	\
+-})
++#define arch_xchg_relaxed(ptr, x)					\
++	_arch_xchg(ptr, x, "", "", "")
+ 
+-#define __xchg_release(ptr, new, size)					\
+-({									\
+-	__typeof__(ptr) __ptr = (ptr);					\
+-	__typeof__(new) __new = (new);					\
+-	__typeof__(*(ptr)) __ret;					\
+-	switch (size) {							\
+-	case 4:								\
+-		__asm__ __volatile__ (					\
+-			RISCV_RELEASE_BARRIER				\
+-			"	amoswap.w %0, %2, %1\n"			\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
+-		break;							\
+-	case 8:								\
+-		__asm__ __volatile__ (					\
+-			RISCV_RELEASE_BARRIER				\
+-			"	amoswap.d %0, %2, %1\n"			\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
+-		break;							\
+-	default:							\
+-		BUILD_BUG();						\
+-	}								\
+-	__ret;								\
+-})
++#define arch_xchg_acquire(ptr, x)					\
++	_arch_xchg(ptr, x, "", "", RISCV_ACQUIRE_BARRIER)
+ 
+ #define arch_xchg_release(ptr, x)					\
+-({									\
+-	__typeof__(*(ptr)) _x_ = (x);					\
+-	(__typeof__(*(ptr))) __xchg_release((ptr),			\
+-					    _x_, sizeof(*(ptr)));	\
+-})
+-
+-#define __arch_xchg(ptr, new, size)					\
+-({									\
+-	__typeof__(ptr) __ptr = (ptr);					\
+-	__typeof__(new) __new = (new);					\
+-	__typeof__(*(ptr)) __ret;					\
+-	switch (size) {							\
+-	case 4:								\
+-		__asm__ __volatile__ (					\
+-			"	amoswap.w.aqrl %0, %2, %1\n"		\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
+-		break;							\
+-	case 8:								\
+-		__asm__ __volatile__ (					\
+-			"	amoswap.d.aqrl %0, %2, %1\n"		\
+-			: "=r" (__ret), "+A" (*__ptr)			\
+-			: "r" (__new)					\
+-			: "memory");					\
+-		break;							\
+-	default:							\
+-		BUILD_BUG();						\
+-	}								\
+-	__ret;								\
+-})
++	_arch_xchg(ptr, x, "", RISCV_RELEASE_BARRIER, "")
+ 
+ #define arch_xchg(ptr, x)						\
+-({									\
+-	__typeof__(*(ptr)) _x_ = (x);					\
+-	(__typeof__(*(ptr))) __arch_xchg((ptr), _x_, sizeof(*(ptr)));	\
+-})
++	_arch_xchg(ptr, x, ".aqrl", "", "")
+ 
+ #define xchg32(ptr, x)							\
+ ({									\
+-- 
+2.43.0
+

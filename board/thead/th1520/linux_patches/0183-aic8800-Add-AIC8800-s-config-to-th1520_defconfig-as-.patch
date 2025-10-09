@@ -1,0 +1,333 @@
+From 651002993d2240b631e47859a8c351c77a835f69 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sat, 31 Aug 2024 23:56:18 +0800
+Subject: [PATCH 183/400] aic8800: Add AIC8800's config to th1520_defconfig, as
+ well as resolve known issues
+
+1.Replace the device tree API and related code of the current Linux version
+2.Resolve GPIO warning.Use another function to circumvent the sleep judgment of the original function
+  WARNING: CPU: 1 PID: 89 at drivers/gpio/gpiolib.c:3208 gpiod_set_raw_value+0x4e/0xb8
+3.Update th1520_defconfig
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    |  8 +-
+ arch/riscv/configs/th1520_defconfig           | 21 ++++++
+ net/rfkill/rfkill-bt.c                        | 60 ++++++++++-----
+ net/rfkill/rfkill-wlan.c                      | 75 +++++++++++--------
+ 4 files changed, 113 insertions(+), 51 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 94f455f2ebd3..7a08288665b4 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -634,8 +634,8 @@ wifi-pins {
+ 			function = "gpio";
+ 			bias-disable;
+ 			drive-strength = <7>;
+-			input-enable;
+-			input-schmitt-enable;
++			input-disable;
++			input-schmitt-disable;
+ 			slew-rate = <0>;
+ 		};
+ 	};
+@@ -646,8 +646,8 @@ bt-pins {
+ 			function = "gpio";
+ 			bias-disable;
+ 			drive-strength = <7>;
+-			input-enable;
+-			input-schmitt-enable;
++			input-disable;
++			input-schmitt-disable;
+ 			slew-rate = <0>;
+ 		};
+ 	};
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 7acf8a209b94..8e74a88e3781 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -273,3 +273,24 @@ CONFIG_TEST_BPF=m
+ CONFIG_SND_SOC_XUANTIE_TH1520_TDM=y
+ # TH1520 spdif
+ CONFIG_SND_SOC_XUANTIE_TH1520_SPDIF=y
++CONFIG_BT=y
++CONFIG_BT_RFCOMM=y
++CONFIG_BT_RFCOMM_TTY=y
++CONFIG_BT_BNEP=y
++CONFIG_BT_HIDP=y
++CONFIG_BT_HCIUART=y
++CONFIG_BT_HCIUART_H4=y
++CONFIG_CFG80211=y
++CONFIG_CFG80211_WEXT=y
++CONFIG_MAC80211=y
++CONFIG_RFKILL=y
++CONFIG_HOSTAP=y
++CONFIG_HOSTAP_FIRMWARE=y
++CONFIG_HOSTAP_FIRMWARE_NVRAM=y
++CONFIG_SERIAL_8250_NR_UARTS=6
++CONFIG_SERIAL_8250_RUNTIME_UARTS=6
++CONFIG_I2C=y
++CONFIG_GPIO_SYSFS=y
++CONFIG_NEW_LEDS=y
++CONFIG_LEDS_CLASS=y
++CONFIG_LEDS_GPIO=y
+diff --git a/net/rfkill/rfkill-bt.c b/net/rfkill/rfkill-bt.c
+index b926229af38f..cf4fd79ded2e 100644
+--- a/net/rfkill/rfkill-bt.c
++++ b/net/rfkill/rfkill-bt.c
+@@ -34,6 +34,8 @@
+ #include <linux/errno.h>
+ #include <dt-bindings/gpio/gpio.h>
+ #include <uapi/linux/rfkill.h>
++#include <linux/pinctrl/consumer.h>
++#include "../../drivers/gpio/gpiolib-of.h"
+ #ifdef CONFIG_OF
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+@@ -62,6 +64,16 @@ enum {
+     IOMUX_FMUX,
+ };
+ 
++enum of_gpio_flags {
++	OF_GPIO_ACTIVE_LOW = 0x1,
++	OF_GPIO_SINGLE_ENDED = 0x2,
++	OF_GPIO_OPEN_DRAIN = 0x4,
++	OF_GPIO_TRANSITORY = 0x8,
++	OF_GPIO_PULL_UP = 0x10,
++	OF_GPIO_PULL_DOWN = 0x20,
++	OF_GPIO_PULL_DISABLE = 0x40,
++};
++
+ struct rfkill_rk_data {
+ 	struct rfkill_rk_platform_data	*pdata;
+     struct platform_device      *pdev;
+@@ -470,8 +482,9 @@ static int bluetooth_platdata_parse_dt(struct device *dev,
+                   struct rfkill_rk_platform_data *data)
+ {
+     struct device_node *node = dev->of_node;
++    struct gpio_desc *desc;
+     int gpio;
+-    enum of_gpio_flags flags;
++    unsigned long flags;
+ 
+     if (!node)
+         return -ENODEV;
+@@ -485,11 +498,14 @@ static int bluetooth_platdata_parse_dt(struct device *dev,
+         data->power_toggle = false;
+     }
+ 
+-    gpio = of_get_named_gpio_flags(node, "uart_rts_gpios", 0, &flags);
++    gpio = -EINVAL;
++    desc = of_find_gpio(node, "uart_rts", 0, &flags);
++    if (!IS_ERR(desc))
++        gpio = desc_to_gpio(desc);
+     if (gpio_is_valid(gpio)) {
+         data->rts_gpio.io = gpio;
+         data->rts_gpio.enable = (flags == GPIO_ACTIVE_HIGH)? 1:0;
+-        LOG("%s: get property: uart_rts_gpios = %d.\n", __func__, gpio);
++        LOG("%s: get property: uart_rts-gpios = %d.\n", __func__, gpio);
+         data->pinctrl = devm_pinctrl_get(dev);
+         if (!IS_ERR(data->pinctrl)) {
+             data->rts_gpio.default_state = pinctrl_lookup_state(data->pinctrl, "default");
+@@ -505,35 +521,45 @@ static int bluetooth_platdata_parse_dt(struct device *dev,
+         LOG("%s: uart_rts_gpios is no-in-use.\n", __func__);
+     }
+ 
+-    gpio = of_get_named_gpio_flags(node, "BT,power_gpio", 0, &flags);
+-    LOG("%s: BT,power_gpio = %d\n", __func__, gpio);
+-
+-    if (gpio == -EPROBE_DEFER) {
+-        return gpio;
+-    }
+-
++    gpio = -EINVAL;
++    desc = of_find_gpio(node, "BT,power", 0, &flags);
++    if (!IS_ERR(desc))
++        gpio = desc_to_gpio(desc);
++    LOG("%s: BT,power-gpios = %d\n", __func__, gpio);
+     if (gpio_is_valid(gpio)){
+         data->poweron_gpio.io = gpio;
+         data->poweron_gpio.enable = (flags == GPIO_ACTIVE_HIGH)? 1:0;
+-        LOG("%s: get property: BT,power_gpio = %d.\n", __func__, gpio);
++        LOG("%s: get property: BT,power-gpios = %d.\n", __func__, gpio);
+     } else data->poweron_gpio.io = -1;
+-    gpio = of_get_named_gpio_flags(node, "BT,reset_gpio", 0, &flags);
++
++    gpio = -EINVAL;
++    desc = of_find_gpio(node, "BT,reset", 0, &flags);
++    if (!IS_ERR(desc))
++        gpio = desc_to_gpio(desc);
+     if (gpio_is_valid(gpio)){
+         data->reset_gpio.io = gpio;
+         data->reset_gpio.enable = (flags == GPIO_ACTIVE_HIGH)? 1:0;
+-        LOG("%s: get property: BT,reset_gpio = %d.\n", __func__, gpio);
++        LOG("%s: get property: BT,reset-gpios = %d.\n", __func__, gpio);
+     } else data->reset_gpio.io = -1;
+-    gpio = of_get_named_gpio_flags(node, "BT,wake_gpio", 0, &flags);
++
++    gpio = -EINVAL;
++    desc = of_find_gpio(node, "BT,wake", 0, &flags);
++    if (!IS_ERR(desc))
++        gpio = desc_to_gpio(desc);
+     if (gpio_is_valid(gpio)){
+         data->wake_gpio.io = gpio;
+         data->wake_gpio.enable = (flags == GPIO_ACTIVE_HIGH)? 1:0;
+-        LOG("%s: get property: BT,wake_gpio = %d.\n", __func__, gpio);
++        LOG("%s: get property: BT,wake-gpios = %d.\n", __func__, gpio);
+     } else data->wake_gpio.io = -1;
+-    gpio = of_get_named_gpio_flags(node, "BT,wake_host_irq", 0, &flags);
++
++    gpio = -EINVAL;
++    desc = of_find_gpio(node, "BT,wake_host_irq", 0, &flags);
++    if (!IS_ERR(desc))
++        gpio = desc_to_gpio(desc);
+     if (gpio_is_valid(gpio)) {
+         data->wake_host_irq.gpio.io = gpio;
+         data->wake_host_irq.gpio.enable = flags;
+-        LOG("%s: get property: BT,wake_host_irq = %d.\n", __func__, gpio);
++        LOG("%s: get property: BT,wake_host_irq-gpios = %d.\n", __func__, gpio);
+     } else data->wake_host_irq.gpio.io = -1;
+ 
+ 	data->ext_clk = devm_clk_get(dev, "ext_clock");
+diff --git a/net/rfkill/rfkill-wlan.c b/net/rfkill/rfkill-wlan.c
+index c8fcb180f52b..819230e75e61 100644
+--- a/net/rfkill/rfkill-wlan.c
++++ b/net/rfkill/rfkill-wlan.c
+@@ -36,6 +36,8 @@
+ #include <linux/regmap.h>
+ #include <linux/mfd/syscon.h>
+ #include <linux/mmc/host.h>
++#include <linux/pinctrl/consumer.h>
++#include "../../drivers/gpio/gpiolib-of.h"
+ #ifdef CONFIG_OF
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+@@ -365,12 +367,12 @@ int rockchip_wifi_power(int on)
+ 
+ 		if (on){
+ 			if (gpio_is_valid(poweron->io)) {
+-				gpio_set_value(poweron->io, poweron->enable);
++				gpio_direction_output(poweron->io, poweron->enable);
+ 				msleep(500);
+ 			}
+ 
+ 			if (gpio_is_valid(reset->io)) {
+-				gpio_set_value(reset->io, reset->enable);
++				gpio_direction_output(reset->io, reset->enable);
+ 				msleep(100);
+ 			}
+ 
+@@ -378,12 +380,12 @@ int rockchip_wifi_power(int on)
+ 			LOG("wifi turn on power. %d\n", poweron->io);
+ 		}else{
+ 			if (gpio_is_valid(poweron->io)) {
+-				gpio_set_value(poweron->io, !(poweron->enable));
++				gpio_direction_output(poweron->io, !(poweron->enable));
+ 				msleep(100);
+ 			}
+ 
+ 			if (gpio_is_valid(reset->io)) {
+-				gpio_set_value(reset->io, !(reset->enable));
++				gpio_direction_output(reset->io, !(reset->enable));
+ 			}
+ 
+             wifi_power_state = 0;
+@@ -594,10 +596,11 @@ static int wlan_platdata_parse_dt(struct device *dev,
+                   struct rksdmmc_gpio_wifi_moudle *data)
+ {
+     struct device_node *node = dev->of_node;
++    struct gpio_desc *desc;
+     const char *strings;
+     u32 value;
+     int gpio,ret;
+-    enum of_gpio_flags flags;
++    unsigned long flags;
+ 	u32 ext_clk_value = 0;
+ 
+     if (!node)
+@@ -650,44 +653,56 @@ static int wlan_platdata_parse_dt(struct device *dev,
+         }
+ 	} else {
+ 		data->mregulator.power_ctrl_by_pmu = false;
+-		LOG("%s: wifi power controled by gpio.\n", __func__);
+-        gpio = of_get_named_gpio_flags(node, "WIFI,poweren_gpio", 0, &flags);
+-        if (gpio == -EPROBE_DEFER) {
+-            return gpio;
+-        }
++
++        gpio = -EINVAL;
++        desc = of_find_gpio(node, "WIFI,poweren", 0, &flags);
++        if (!IS_ERR(desc))
++            gpio = desc_to_gpio(desc);
++        LOG("%s: wifi power controled by gpio.\n", __func__);
+         if (gpio_is_valid(gpio)){
+ 			data->power_n.io = gpio;
+ 			data->power_n.enable = (flags == GPIO_ACTIVE_HIGH)? 1:0;
+-			LOG("%s: get property: WIFI,poweren_gpio = %d, flags = %d.\n", __func__, gpio, flags);
++			LOG("%s: get property: WIFI,poweren-gpios = %d, flags = %d.\n", __func__, gpio, flags);
+         } else data->power_n.io = -1;
+-	gpio = of_get_named_gpio_flags(node, "WIFI,vbat_gpio", 0, &flags);
+ 
+-    if (of_find_property(node, "support_power_ctrl", NULL)) {
+-        support_power_ctrl = true;
+-        LOG("%s: Turn off the power during suspension and turn it on when resuming, support_power_ctrl = %d.\n", __func__, support_power_ctrl);
+-    } else {
+-        support_power_ctrl = false;
+-        LOG("%s: power is only turned on during initialization and is not controlled afterwards, support_power_ctrl = %d.\n", __func__, support_power_ctrl);
+-    }
++        if (of_find_property(node, "support_power_ctrl", NULL)) {
++            support_power_ctrl = true;
++            LOG("%s: Turn off the power during suspension and turn it on when resuming, support_power_ctrl = %d.\n", __func__, support_power_ctrl);
++        } else {
++            support_power_ctrl = false;
++            LOG("%s: power is only turned on during initialization and is not controlled afterwards, support_power_ctrl = %d.\n", __func__, support_power_ctrl);
++        }
+ 
+-	if (gpio_is_valid(gpio)) {
+-			data->vbat_n.io = gpio;
+-			data->vbat_n.enable = (flags == GPIO_ACTIVE_HIGH) ? 1:0;
+-			LOG("%s: get property: WIFI,vbat_gpio = %d, flags = %d.\n", __func__, gpio, flags);
+-	} else {
+-		data->vbat_n.io = -1;
+-	}
+-        gpio = of_get_named_gpio_flags(node, "WIFI,reset_gpio", 0, &flags);
++        gpio = -EINVAL;
++        desc = of_find_gpio(node, "WIFI,vbat", 0, &flags);
++        if (!IS_ERR(desc))
++            gpio = desc_to_gpio(desc);
++        if (gpio_is_valid(gpio)) {
++                data->vbat_n.io = gpio;
++                data->vbat_n.enable = (flags == GPIO_ACTIVE_HIGH) ? 1:0;
++                LOG("%s: get property: WIFI,vbat-gpios = %d, flags = %d.\n", __func__, gpio, flags);
++        } else {
++            data->vbat_n.io = -1;
++        }
++
++        gpio = -EINVAL;
++        desc = of_find_gpio(node, "WIFI,reset", 0, &flags);
++        if (!IS_ERR(desc))
++            gpio = desc_to_gpio(desc);
+         if (gpio_is_valid(gpio)){
+ 			data->reset_n.io = gpio;
+ 			data->reset_n.enable = (flags == GPIO_ACTIVE_HIGH)? 1:0;
+-			LOG("%s: get property: WIFI,reset_gpio = %d, flags = %d.\n", __func__, gpio, flags);
++			LOG("%s: get property: WIFI,reset-gpios = %d, flags = %d.\n", __func__, gpio, flags);
+         } else data->reset_n.io = -1;
+-        gpio = of_get_named_gpio_flags(node, "WIFI,host_wake_irq", 0, &flags);
++
++        gpio = -EINVAL;
++        desc = of_find_gpio(node, "WIFI,host_wake_irq", 0, &flags);
++        if (!IS_ERR(desc))
++            gpio = desc_to_gpio(desc);
+         if (gpio_is_valid(gpio)){
+ 			data->wifi_int_b.io = gpio;
+ 			data->wifi_int_b.enable = !flags;
+-			LOG("%s: get property: WIFI,host_wake_irq = %d, flags = %d.\n", __func__, gpio, flags);
++			LOG("%s: get property: WIFI,host_wake_irq-gpios = %d, flags = %d.\n", __func__, gpio, flags);
+         } else data->wifi_int_b.io = -1;
+ 	}
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,23 @@
+From c7236496410044c58cacdd5aa6ba77d0b29a421c Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:25:43 +0800
+Subject: [PATCH 309/400] defconfig: th1520: to fix the problem of perf test
+ fail
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/configs/th1520_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 6c432c9cad99..83266af07e4b 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -541,3 +541,4 @@ CONFIG_V4L_MEM2MEM_DRIVERS=y
+ CONFIG_RTW88_8822C=m
+ CONFIG_RTW88_8822CS=m
+ CONFIG_USBEN=y
++CONFIG_FTRACE_SYSCALLS=y
+-- 
+2.43.0
+

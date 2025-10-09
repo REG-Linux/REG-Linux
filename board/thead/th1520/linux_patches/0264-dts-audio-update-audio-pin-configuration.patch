@@ -1,0 +1,61 @@
+From bf1b5e7d07b71ef10b0a25e31cb293463b212adf Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:37:59 +0800
+Subject: [PATCH 264/400] dts: audio: update audio pin configuration
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dts        |  3 ---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dts b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+index 97f670dbb1e1..63eb28dbd4aa 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+@@ -51,9 +51,6 @@ &i2s0 {
+ 
+ &i2s_8ch_sd2 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd2_pa_pins>;
+ };
+ 
+ &es8156_audio_codec {
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index b47576f1f42d..91e7499d4321 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -922,6 +922,18 @@ spi-pins {
+ 			slew-rate = <0>;
+ 		};
+ 	};
++
++	hdmi_tx_pins: hdmi-tx-0 {
++		hdmi-pins {
++			pins = "HDMI_SCL", "HDMI_SDA", "HDMI_CEC";
++			function = "hdmi";
++			bias-disable;
++			drive-strength = <3>;
++			input-enable;
++			input-schmitt-disable;
++			slew-rate = <0>;
++		};
++	};
+ };
+ 
+ &padctrl1_apsys {
+@@ -1411,6 +1423,8 @@ &disp1_out {
+ 
+ &hdmi_tx {
+ 	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&hdmi_tx_pins>;
+ 
+ 	port@0 {
+ 		/* input */
+-- 
+2.43.0
+

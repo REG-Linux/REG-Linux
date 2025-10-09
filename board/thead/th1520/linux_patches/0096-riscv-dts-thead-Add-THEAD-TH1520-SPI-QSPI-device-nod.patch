@@ -1,0 +1,144 @@
+From 9e278d22230a7ea6f0a179f8f95229a02d994ec9 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Mon, 27 May 2024 15:36:38 +0800
+Subject: [PATCH 096/400] riscv: dts: thead: Add THEAD TH1520 SPI/QSPI device
+ node
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 61 +++++++++++++++++++
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 36 +++++++++++
+ 2 files changed, 97 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index bb2a773d82a4..f5b2d1fd800f 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -352,6 +352,18 @@ rx-pins {
+ 			slew-rate = <0>;
+ 		};
+ 	};
++
++	spi_pins: spi-0 {
++		spi-pins {
++			pins = "SPI_SCLK", "SPI_CSN", "SPI_MOSI", "SPI_MISO";
++			function = "spi";
++			bias-disable;
++			drive-strength = <7>;
++			input-enable;
++			input-schmitt-enable;
++			slew-rate = <0>;
++		};
++	};
+ };
+ 
+ &padctrl1_apsys {
+@@ -378,6 +390,18 @@ i2c-pins {
+ 			slew-rate = <0>;
+ 		};
+ 	};
++
++	qspi1_pins: qspi1-0 {
++		qspi-pins {
++			pins = "QSPI1_SCLK", "QSPI1_CSN0", "QSPI1_D0_MOSI", "QSPI1_D1_MISO";
++			function = "qspi";
++			bias-disable;
++			drive-strength = <7>;
++			input-enable;
++			input-schmitt-enable;
++			slew-rate = <0>;
++		};
++	};
+ };
+ 
+ &uart0 {
+@@ -414,3 +438,40 @@ hub_3_0: hub@2 {
+ &adc {
+ 	status = "okay";
+ };
++
++&spi {
++	num-cs = <1>;
++	cs-gpios = <&gpio2 15 0>;
++	rx-sample-delay-ns = <10>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi_pins>;
++	status = "okay";
++
++	spi_norflash@0 {
++		status = "okay";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "winbond,w25q64jwm", "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <50000000>;
++		w25q,fast-read;
++	};
++};
++
++&qspi1 {
++	// use one-line mode
++	compatible = "snps,dw-apb-ssi";
++	num-cs = <1>;
++	cs-gpios = <&gpio0 1 0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&qspi1_pins>;
++	status = "okay";
++
++	spidev@0 {
++		compatible = "spidev";
++		#address-cells = <0x1>;
++		#size-cells = <0x1>;
++		reg = <0x0>;
++		spi-max-frequency = <50000000>;
++	};
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 558d68259135..d8eebf87881d 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -885,5 +885,41 @@ vpsys_rst: vpsys-reset-controller@ffecc30000 {
+ 			#reset-cells = <1>;
+ 			status = "okay";
+ 		};
++
++		spi: spi@ffe700c000 {
++			compatible = "snps,dw-apb-ssi";
++			reg = <0xff 0xe700c000 0x0 0x1000>;
++			interrupts = <54 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_SPI_SSI_CLK>,
++									<&clk CLKGEN_SPI_PCLK>;
++			clock-names = "sclk", "pclk";
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++		};
++
++		qspi0: qspi@ffea000000 {
++			compatible = "snps,dw-apb-ssi-quad";
++			reg = <0xff 0xea000000 0x0 0x1000>;
++			interrupts = <52 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_QSPI0_SSI_CLK>,
++									<&clk CLKGEN_QSPI0_PCLK>;
++			clock-names = "sclk", "pclk";
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++		};
++
++		qspi1: qspi@fff8000000 {
++			compatible = "snps,dw-apb-ssi-quad";
++			reg = <0xff 0xf8000000 0x0 0x1000>;
++			interrupts = <53 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_QSPI1_SSI_CLK>,
++									<&clk CLKGEN_QSPI1_PCLK>;
++			clock-names = "sclk", "pclk";
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.43.0
+
