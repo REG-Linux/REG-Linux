@@ -1,0 +1,29 @@
+From fc040809a950359659ab0b08d7700b85a10661e4 Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:37:48 +0800
+Subject: [PATCH 263/400] audio: th1520: workaround to solve noise at the end
+
+to avoid IIS DMA noise data at the end of each music
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+Change-Id: I09b9468bfd97f7276a1070f594dea826b105cddf
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ sound/core/pcm_lib.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sound/core/pcm_lib.c b/sound/core/pcm_lib.c
+index a11cd7d6295f..03ecfa43bc3a 100644
+--- a/sound/core/pcm_lib.c
++++ b/sound/core/pcm_lib.c
+@@ -213,6 +213,7 @@ int snd_pcm_update_state(struct snd_pcm_substream *substream,
+ 		runtime->avail_max = avail;
+ 	if (runtime->state == SNDRV_PCM_STATE_DRAINING) {
+ 		if (avail >= runtime->buffer_size) {
++			memset(substream->dma_buffer.area, 0, substream->dma_buffer.bytes);
+ 			snd_pcm_drain_done(substream);
+ 			return -EPIPE;
+ 		}
+-- 
+2.43.0
+

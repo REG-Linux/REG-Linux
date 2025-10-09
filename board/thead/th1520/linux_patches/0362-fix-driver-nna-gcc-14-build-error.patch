@@ -1,0 +1,64 @@
+From 84ba3ceadcdbffe83d61f6e51fae3d0f200e2082 Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Thu, 3 Apr 2025 02:19:52 +0800
+Subject: [PATCH 362/400] fix: driver: nna: gcc-14: build error
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/soc/xuantie/nna/img_mem/img_mem_carveout.c | 8 ++++++++
+ drivers/soc/xuantie/nna/img_mem/img_mem_unified.c  | 8 ++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/drivers/soc/xuantie/nna/img_mem/img_mem_carveout.c b/drivers/soc/xuantie/nna/img_mem/img_mem_carveout.c
+index 0dcc4b1ca742..e23bca7c3710 100644
+--- a/drivers/soc/xuantie/nna/img_mem/img_mem_carveout.c
++++ b/drivers/soc/xuantie/nna/img_mem/img_mem_carveout.c
+@@ -211,12 +211,20 @@ static int carveout_vmap_dmabuf(struct dma_buf *buf, struct iosys_map *map)
+ 	struct heap *heap;
+ 
+ 	if (!buffer)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0)
+ 		return NULL;
++#else
++		return 0;
++#endif
+ 
+ 	heap = buffer->heap;
+ 
+ 	if (carveout_heap_map_km(heap, buffer))
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0)
+ 		return NULL;
++#else
++		return 0;
++#endif
+ 
+ 	pr_debug("%s:%d buffer %d kptr 0x%p\n", __func__, __LINE__,
+ 		buffer->id, buffer->kptr);
+diff --git a/drivers/soc/xuantie/nna/img_mem/img_mem_unified.c b/drivers/soc/xuantie/nna/img_mem/img_mem_unified.c
+index c19f494e4c16..f842e81cf4b7 100644
+--- a/drivers/soc/xuantie/nna/img_mem/img_mem_unified.c
++++ b/drivers/soc/xuantie/nna/img_mem/img_mem_unified.c
+@@ -315,12 +315,20 @@ static int unified_vmap_dmabuf(struct dma_buf *buf, struct iosys_map *map)
+ 	struct heap *heap;
+ 
+ 	if (!buffer)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0)
+ 		return NULL;
++#else
++		return 0;
++#endif
+ 
+ 	heap = buffer->heap;
+ 
+ 	if (unified_map_km(heap, buffer))
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0)
+ 		return NULL;
++#else
++		return 0;
++#endif
+ 
+ 	pr_debug("%s:%d buffer %d kptr 0x%p\n", __func__, __LINE__,
+ 		buffer->id, buffer->kptr);
+-- 
+2.43.0
+

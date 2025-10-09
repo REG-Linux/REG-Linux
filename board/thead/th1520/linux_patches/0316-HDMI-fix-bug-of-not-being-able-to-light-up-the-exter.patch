@@ -1,0 +1,30 @@
+From d18a47059d8df74a86ec63e0380476227ceddf6f Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:29:36 +0800
+Subject: [PATCH 316/400] HDMI: fix bug of not being able to light up the
+ external monitor
+
+ext_vcc5v_en_pins node is not referenced, resulting in it not being configured as GPIO and the HDMI pin not outputting 5V.
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index 35b6d5323cd8..033bc3cf657b 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -2047,7 +2047,8 @@ &disp1_out {
+ &hdmi_tx {
+ 	status = "okay";
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&hdmi_pins>;
++	pinctrl-0 = <&hdmi_pins>,
++				<&ext_vcc5v_en_pins>;
+ 
+ 	port@0 {
+ 		/* input */
+-- 
+2.43.0
+

@@ -1,0 +1,44 @@
+From eb51a958063cea1147e13c2a568069697cc087ec Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 21 Jul 2024 11:36:48 +0800
+Subject: [PATCH 165/400] audio: th1520: fixup compile warning of i2s driver
+
+fixup compile warnings
+th1520-i2s.c:682:21: warning: unused variable 'sprop' [-Wunused-variable]
+th1520-i2s.c:683:25: warning: unused variable 'iprop' [-Wunused-variable]
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+---
+ sound/soc/xuantie/th1520-i2s-8ch.c | 2 --
+ sound/soc/xuantie/th1520-i2s.c     | 2 --
+ 2 files changed, 4 deletions(-)
+
+diff --git a/sound/soc/xuantie/th1520-i2s-8ch.c b/sound/soc/xuantie/th1520-i2s-8ch.c
+index 22deb8590577..97581eff0651 100644
+--- a/sound/soc/xuantie/th1520-i2s-8ch.c
++++ b/sound/soc/xuantie/th1520-i2s-8ch.c
+@@ -585,8 +585,6 @@ static int th1520_audio_i2s_8ch_probe(struct platform_device *pdev)
+ 
+ 	int ret;
+ 	unsigned int irq;
+-	const char *sprop;
+-	const uint32_t *iprop;
+ 	struct resource *res;
+ 	struct th1520_i2s_priv *priv;
+ 	struct device *dev = &pdev->dev;
+diff --git a/sound/soc/xuantie/th1520-i2s.c b/sound/soc/xuantie/th1520-i2s.c
+index c86c07d89ff5..2d15c7e40af8 100644
+--- a/sound/soc/xuantie/th1520-i2s.c
++++ b/sound/soc/xuantie/th1520-i2s.c
+@@ -679,8 +679,6 @@ static int th1520_audio_i2s_probe(struct platform_device *pdev)
+ {
+ 	int ret;
+ 	unsigned int irq;
+-	const char *sprop;
+-	const uint32_t *iprop;
+ 	struct resource *res;
+ 	struct th1520_i2s_priv *i2s_priv;
+ 	struct device *dev = &pdev->dev;
+-- 
+2.43.0
+

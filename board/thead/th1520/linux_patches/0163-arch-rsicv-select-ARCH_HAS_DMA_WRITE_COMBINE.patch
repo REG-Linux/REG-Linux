@@ -1,0 +1,30 @@
+From 8ae8dd52c2a35600fa5b6d0ee66cc5369ac84bb0 Mon Sep 17 00:00:00 2001
+From: Chen Pei <cp0613@linux.alibaba.com>
+Date: Thu, 4 Jul 2024 20:22:32 +0800
+Subject: [PATCH 163/400] arch:rsicv:select ARCH_HAS_DMA_WRITE_COMBINE
+
+c910 support bufferable, enable DMA_WRITE_COMBINE, let dma_alloc_*
+memory can be map WRITE_COMBINE. otherwise dma_alloc_* memory be
+strong order prot to user space.
+
+Signed-off-by: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Signed-off-by: Chen Pei <cp0613@linux.alibaba.com>
+---
+ arch/riscv/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 3ca9548f1490..e4e4dd9adf82 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -294,6 +294,7 @@ config RISCV_DMA_NONCOHERENT
+ 	select ARCH_HAS_SYNC_DMA_FOR_CPU
+ 	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
+ 	select DMA_BOUNCE_UNALIGNED_KMALLOC if SWIOTLB
++	select ARCH_HAS_DMA_WRITE_COMBINE
+ 
+ config RISCV_NONSTANDARD_CACHE_OPS
+ 	bool
+-- 
+2.43.0
+

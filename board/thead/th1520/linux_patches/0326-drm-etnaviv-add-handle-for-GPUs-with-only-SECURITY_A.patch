@@ -1,0 +1,45 @@
+From b7d3fb20d99a8f3616713c386122289b6dffcf67 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Fri, 1 Dec 2023 13:32:10 +0800
+Subject: [PATCH 326/400] drm/etnaviv: add handle for GPUs with only
+ SECURITY_AHB flag
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+---
+ drivers/gpu/drm/etnaviv/etnaviv_gpu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/etnaviv/etnaviv_gpu.c b/drivers/gpu/drm/etnaviv/etnaviv_gpu.c
+index ad543a7cbf07..572547e117f3 100644
+--- a/drivers/gpu/drm/etnaviv/etnaviv_gpu.c
++++ b/drivers/gpu/drm/etnaviv/etnaviv_gpu.c
+@@ -522,7 +522,7 @@ static int etnaviv_hw_reset(struct etnaviv_gpu *gpu)
+ 		control |= VIVS_HI_CLOCK_CONTROL_ISOLATE_GPU;
+ 		gpu_write(gpu, VIVS_HI_CLOCK_CONTROL, control);
+ 
+-		if (gpu->sec_mode == ETNA_SEC_KERNEL) {
++		if (gpu->identity.minor_features7 & chipMinorFeatures7_BIT_SECURITY) {
+ 			gpu_write(gpu, VIVS_MMUv2_AHB_CONTROL,
+ 			          VIVS_MMUv2_AHB_CONTROL_RESET);
+ 		} else {
+@@ -754,7 +754,7 @@ static void etnaviv_gpu_hw_init(struct etnaviv_gpu *gpu)
+ 		gpu_write(gpu, VIVS_MC_BUS_CONFIG, bus_config);
+ 	}
+ 
+-	if (gpu->sec_mode == ETNA_SEC_KERNEL) {
++	if (gpu->identity.minor_features7 & chipMinorFeatures7_BIT_SECURITY) {
+ 		u32 val = gpu_read(gpu, VIVS_MMUv2_AHB_CONTROL);
+ 		val |= VIVS_MMUv2_AHB_CONTROL_NONSEC_ACCESS;
+ 		gpu_write(gpu, VIVS_MMUv2_AHB_CONTROL, val);
+@@ -804,7 +804,7 @@ int etnaviv_gpu_init(struct etnaviv_gpu *gpu)
+ 	 * On cores with security features supported, we claim control over the
+ 	 * security states.
+ 	 */
+-	if ((gpu->identity.minor_features7 & chipMinorFeatures7_BIT_SECURITY) &&
++	if ((gpu->identity.minor_features7 & chipMinorFeatures7_BIT_SECURITY) ||
+ 	    (gpu->identity.minor_features10 & chipMinorFeatures10_SECURITY_AHB))
+ 		gpu->sec_mode = ETNA_SEC_KERNEL;
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,52 @@
+From 51ef18a3dd9457cad739e1c083b23597b31cdc55 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:19:17 +0800
+Subject: [PATCH 304/400] drivers: i2c-hid: fix rvbook i2c-hid wake-up error
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/hid/i2c-hid/i2c-hid-core.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/hid/i2c-hid/i2c-hid-core.c b/drivers/hid/i2c-hid/i2c-hid-core.c
+index 3dcdd3368b46..cfd7ffa5608b 100644
+--- a/drivers/hid/i2c-hid/i2c-hid-core.c
++++ b/drivers/hid/i2c-hid/i2c-hid-core.c
+@@ -951,7 +951,10 @@ static int i2c_hid_core_suspend(struct i2c_hid *ihid, bool force_poweroff)
+ 	if (!(ihid->quirks & I2C_HID_QUIRK_NO_SLEEP_ON_SUSPEND))
+ 		i2c_hid_set_power(ihid, I2C_HID_PWR_SLEEP);
+ 
+-	disable_irq(client->irq);
++	// disable_irq(client->irq);
++
++	if (device_may_wakeup(&client->dev))
++		enable_irq_wake(client->irq);
+ 
+ 	if (force_poweroff || !device_may_wakeup(&client->dev))
+ 		i2c_hid_core_power_down(ihid);
+@@ -968,7 +971,10 @@ static int i2c_hid_core_resume(struct i2c_hid *ihid)
+ 	if (!device_may_wakeup(&client->dev))
+ 		i2c_hid_core_power_up(ihid);
+ 
+-	enable_irq(client->irq);
++	if (device_may_wakeup(&client->dev))
++		disable_irq_wake(client->irq);
++
++	// enable_irq(client->irq);
+ 
+ 	/* Instead of resetting device, simply powers the device on. This
+ 	 * solves "incomplete reports" on Raydium devices 2386:3118 and
+@@ -1247,6 +1253,9 @@ int i2c_hid_core_probe(struct i2c_client *client, struct i2chid_ops *ops,
+ 	if (ret)
+ 		goto err_free_irq;
+ 
++	if (client->dev.of_node && of_property_read_bool(client->dev.of_node, "wakeup-source"))
++		device_init_wakeup(&client->dev, 1);
++
+ 	return 0;
+ 
+ err_free_irq:
+-- 
+2.43.0
+

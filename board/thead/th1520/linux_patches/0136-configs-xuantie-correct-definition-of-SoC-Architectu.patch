@@ -1,0 +1,274 @@
+From 664c01399d1dcc54f82764ca1cf84a3f062a1c5f Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sat, 15 Jun 2024 12:16:46 +0800
+Subject: [PATCH 136/400] configs: xuantie: correct definition of SoC
+ Architecture
+
+1. Add SoC Arch "XuanTie"
+2. Change driver dependences from ARCH_THEAD to ARCH_XUANTIE
+3. Add kconfig dependence of event driver
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+---
+ arch/riscv/Kconfig.socs                     |  7 +++++++
+ arch/riscv/boot/dts/thead/Makefile          |  2 +-
+ arch/riscv/configs/defconfig                |  1 +
+ drivers/clk/Makefile                        |  2 +-
+ drivers/clk/thead/Kconfig                   | 12 ++++++++++++
+ drivers/iio/adc/Kconfig                     |  8 ++++----
+ drivers/mailbox/Kconfig                     |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig | 10 +++++-----
+ drivers/pinctrl/Kconfig                     |  6 +++---
+ drivers/pwm/Kconfig                         |  6 +++---
+ drivers/reset/Kconfig                       |  6 +++---
+ drivers/rtc/Kconfig                         |  4 ++--
+ drivers/soc/thead/Kconfig                   |  3 ++-
+ drivers/usb/dwc3/Kconfig                    |  6 +++---
+ 14 files changed, 48 insertions(+), 27 deletions(-)
+ create mode 100644 drivers/clk/thead/Kconfig
+
+diff --git a/arch/riscv/Kconfig.socs b/arch/riscv/Kconfig.socs
+index 30fd6a512828..2d25ef034d49 100644
+--- a/arch/riscv/Kconfig.socs
++++ b/arch/riscv/Kconfig.socs
+@@ -49,6 +49,13 @@ config ARCH_THEAD
+ 	help
+ 	  This enables support for the RISC-V based T-HEAD SoCs.
+ 
++config ARCH_XUANTIE
++	bool "XuanTie RISC-V SoCs"
++	depends on MMU && !XIP_KERNEL
++	select ERRATA_THEAD
++	help
++	  This enables support for the RISC-V based XuanTie SoCs.
++
+ config ARCH_VIRT
+ 	def_bool SOC_VIRT
+ 
+diff --git a/arch/riscv/boot/dts/thead/Makefile b/arch/riscv/boot/dts/thead/Makefile
+index b55a17127c2b..ae859ae4bf68 100644
+--- a/arch/riscv/boot/dts/thead/Makefile
++++ b/arch/riscv/boot/dts/thead/Makefile
+@@ -1,2 +1,2 @@
+ # SPDX-License-Identifier: GPL-2.0
+-dtb-$(CONFIG_ARCH_THEAD) += th1520-lichee-pi-4a.dtb th1520-beaglev-ahead.dtb
++dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lichee-pi-4a.dtb th1520-beaglev-ahead.dtb
+diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
+index b4abb03bbdb4..5ba07063f562 100644
+--- a/arch/riscv/configs/defconfig
++++ b/arch/riscv/configs/defconfig
+@@ -28,6 +28,7 @@ CONFIG_PROFILING=y
+ CONFIG_SOC_MICROCHIP_POLARFIRE=y
+ CONFIG_ARCH_RENESAS=y
+ CONFIG_ARCH_THEAD=y
++CONFIG_ARCH_XUANTIE=y
+ CONFIG_SOC_SIFIVE=y
+ CONFIG_SOC_STARFIVE=y
+ CONFIG_ARCH_SUNXI=y
+diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
+index a78f2165ab38..ac400e660c28 100644
+--- a/drivers/clk/Makefile
++++ b/drivers/clk/Makefile
+@@ -136,4 +136,4 @@ endif
+ obj-y					+= xilinx/
+ obj-$(CONFIG_ARCH_ZYNQ)			+= zynq/
+ obj-$(CONFIG_COMMON_CLK_ZYNQMP)         += zynqmp/
+-obj-$(CONFIG_ARCH_THEAD)               	+= thead/
++obj-$(CONFIG_ARCH_XUANTIE)              += thead/
+diff --git a/drivers/clk/thead/Kconfig b/drivers/clk/thead/Kconfig
+new file mode 100644
+index 000000000000..dc8755fba3b6
+--- /dev/null
++++ b/drivers/clk/thead/Kconfig
+@@ -0,0 +1,12 @@
++# SPDX-License-Identifier: GPL-2.0
++
++config THEAD_CLK
++	bool
++	def_bool ARCH_XUANTIE
++
++config CLK_TH1520_FM
++	bool "XuanTie Th1520 Fullmask Clock Driver"
++	depends on ARCH_XUANTIE
++	default n
++	help
++	    Build the driver for th1520 fullmask Clock Driver
+diff --git a/drivers/iio/adc/Kconfig b/drivers/iio/adc/Kconfig
+index e8a7e4e412e9..c13bc36e9c03 100644
+--- a/drivers/iio/adc/Kconfig
++++ b/drivers/iio/adc/Kconfig
+@@ -1449,16 +1449,16 @@ config XILINX_AMS
+ 	  xilinx-ams.
+ 
+ config THEAD_TH1520_ADC
+-	tristate "THEAD TH1520 ADC driver"
++	tristate "XuanTie TH1520 ADC driver"
+ 	depends on OF
+ 	depends on HAS_IOMEM
+-	depends on ARCH_THEAD
++	depends on ARCH_XUANTIE
+ 	default y
+ 	help
+-	  Say yes here to support for THEAD TH1520 MPW analog-to-digital
++	  Say yes here to support for XuanTie TH1520 MPW analog-to-digital
+ 	  converter.
+ 
+ 	  This driver can also be built as a module. If so, the module will be
+-	  called thead-th1520-adc.
++	  called xuantie-th1520-adc.
+ 
+ endmenu
+diff --git a/drivers/mailbox/Kconfig b/drivers/mailbox/Kconfig
+index a09465b94db1..a0186d27086f 100644
+--- a/drivers/mailbox/Kconfig
++++ b/drivers/mailbox/Kconfig
+@@ -297,7 +297,7 @@ config QCOM_IPCC
+ 
+ config TH1520_MBOX
+ 	tristate "XuanTie TH1520 Mailbox driver"
+-	depends on ARCH_THEAD || COMPILE_TEST
++	depends on ARCH_XUANTIE || COMPILE_TEST
+ 	default y
+ 	help
+ 	  Mailbox implementation for Xuantie TH1520 SoCs.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index d86875c039a2..82228c2dd086 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -217,14 +217,14 @@ config DWMAC_SUN8I
+ 	  EMAC ethernet controller.
+ 
+ config DWMAC_THEAD
+-	tristate "T-HEAD dwmac support"
+-	depends on OF && (ARCH_THEAD || COMPILE_TEST)
++	tristate "XuanTie dwmac support"
++	depends on OF && (ARCH_XUANTIE || COMPILE_TEST)
+ 	select MFD_SYSCON
+ 	help
+-	  Support for ethernet controllers on T-HEAD RISC-V SoCs
++	  Support for ethernet controllers on XuanTie RISC-V SoCs
+ 
+-	  This selects the T-HEAD platform specific glue layer support for
+-	  the stmmac device driver. This driver is used for T-HEAD TH1520
++	  This selects the XuanTie platform specific glue layer support for
++	  the stmmac device driver. This driver is used for XuanTie TH1520
+ 	  ethernet controller.
+ 
+ config DWMAC_IMX8
+diff --git a/drivers/pinctrl/Kconfig b/drivers/pinctrl/Kconfig
+index d9e784029d91..d5396ebe0620 100644
+--- a/drivers/pinctrl/Kconfig
++++ b/drivers/pinctrl/Kconfig
+@@ -471,13 +471,13 @@ config PINCTRL_TB10X
+ 	select GPIOLIB
+ 
+ config PINCTRL_TH1520
+-	tristate "Pinctrl driver for the T-Head TH1520 SoC"
+-	depends on ARCH_THEAD || COMPILE_TEST
++	tristate "Pinctrl driver for the XuanTie TH1520 SoC"
++	depends on ARCH_XUANTIE || COMPILE_TEST
+ 	select GENERIC_PINMUX_FUNCTIONS
+ 	select GENERIC_PINCONF
+ 	select PINMUX
+ 	help
+-	  This selects the pinctrl driver for T-Head TH1520 RISC-V SoC.
++	  This selects the pinctrl driver for XuanTie TH1520 RISC-V SoC.
+ 
+ config PINCTRL_ZYNQ
+ 	bool "Pinctrl driver for Xilinx Zynq"
+diff --git a/drivers/pwm/Kconfig b/drivers/pwm/Kconfig
+index 428fa365a19a..092dd1762fbe 100644
+--- a/drivers/pwm/Kconfig
++++ b/drivers/pwm/Kconfig
+@@ -638,11 +638,11 @@ config PWM_TEGRA
+ 	  will be called pwm-tegra.
+ 
+ config PWM_THEAD
+-	tristate "T-HEAD PWM support"
+-	depends on ARCH_THEAD || COMPILE_TEST
++	tristate "XuanTie PWM support"
++	depends on ARCH_XUANTIE || COMPILE_TEST
+ 	depends on HAS_IOMEM
+ 	help
+-	  Generic PWM framework driver for the PWFM controller found on THEAD
++	  Generic PWM framework driver for the PWFM controller found on XuanTie
+ 	  SoCs.
+ 
+ 	  To compile this driver as a module, choose M here: the module
+diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
+index 55b518f175de..2b79a2b0a36b 100644
+--- a/drivers/reset/Kconfig
++++ b/drivers/reset/Kconfig
+@@ -255,11 +255,11 @@ config RESET_SUNXI
+ 
+ config RESET_TH1520
+ 	bool "TH1520 Reset Driver"
+-	depends on (ARCH_THEAD || COMPILE_TEST) && OF
++	depends on (ARCH_XUANTIE || COMPILE_TEST) && OF
+ 	select MFD_SYSCON
+-	default ARCH_THEAD
++	default ARCH_XUANTIE
+ 	help
+-	  Support for the T-HEAD 1520 RISC-V SoC reset controller.
++	  Support for the XuanTie 1520 RISC-V SoC reset controller.
+ 	  Say Y if you want to control reset signals provided by this
+ 	  controller.
+ 
+diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
+index 7692d562816e..5866aa84f868 100644
+--- a/drivers/rtc/Kconfig
++++ b/drivers/rtc/Kconfig
+@@ -1854,7 +1854,7 @@ config RTC_DRV_MT7622
+ config RTC_DRV_XGENE
+ 	tristate "APM X-Gene RTC"
+ 	depends on HAS_IOMEM
+-	depends on ARCH_XGENE || ARCH_THEAD || COMPILE_TEST
++	depends on ARCH_XGENE || ARCH_XUANTIE || COMPILE_TEST
+ 	help
+ 	  If you say yes here you get support for the APM X-Gene SoC real time
+ 	  clock.
+@@ -1865,7 +1865,7 @@ config RTC_DRV_XGENE
+ config RTC_DRV_XGENE_PRESCALER
+ 	bool "Pre-scaler Counter support for APM X-Gene RTC driver"
+ 	depends on RTC_DRV_XGENE
+-	depends on ARCH_THEAD
++	depends on ARCH_XUANTIE
+ 	default y
+ 	help
+ 	  Say Y here if your Soc has Pre-scaler Counter support on rtc-xgene.
+diff --git a/drivers/soc/thead/Kconfig b/drivers/soc/thead/Kconfig
+index ddd68b37d7bd..2d59bb31ce72 100644
+--- a/drivers/soc/thead/Kconfig
++++ b/drivers/soc/thead/Kconfig
+@@ -2,7 +2,8 @@
+ menu "Thead SoC drivers"
+ 
+ config TH1520_REBOOTMODE
+-	bool "Thead th1520 rebootmode support"
++	bool "XuanTie th1520 rebootmode support"
++	depends on TH1520_AON
+ 	default y
+ 	help
+ 	 This driver supports check rebootmode feature in TH1520 FM platform
+diff --git a/drivers/usb/dwc3/Kconfig b/drivers/usb/dwc3/Kconfig
+index a2183b8e7772..000bfa3a4ddf 100644
+--- a/drivers/usb/dwc3/Kconfig
++++ b/drivers/usb/dwc3/Kconfig
+@@ -190,11 +190,11 @@ config USB_DWC3_RTK
+ 	  Say 'Y' or 'M' if you have such device.
+ 
+ config USB_DWC3_THEAD
+-	tristate "T-HEAD Platform"
+-	depends on ARCH_THEAD || COMPILE_TEST
++	tristate "XuanTie Platform"
++	depends on ARCH_XUANTIE || COMPILE_TEST
+ 	default USB_DWC3
+ 	help
+-	  Support T-HEAD platform with DesignWare Core USB3 IP.
++	  Support XuanTie platform with DesignWare Core USB3 IP.
+ 	  Only the host mode is currently supported.
+ 	  Say 'Y' or 'M' here if you have one such device.
+ 
+-- 
+2.43.0
+

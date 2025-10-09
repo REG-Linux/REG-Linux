@@ -1,0 +1,85 @@
+From 59aee732302830dfb85d443ff8d22122d9918774 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Thu, 30 May 2024 15:28:56 +0800
+Subject: [PATCH 100/400] riscv: dts: thead: Add THEAD TH1520 dmac1 and dmac2
+ device node
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ .../dts/thead/th1520-lichee-module-4a.dtsi    |  4 ++
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 37 ++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index 2216b7c9300e..0c569a82a929 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -63,6 +63,10 @@ &dmac0 {
+ 	status = "okay";
+ };
+ 
++&dmac2 {
++	status = "okay";
++};
++
+ &emmc {
+        bus-width = <8>;
+        max-frequency = <198000000>;
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index afcc10de6ee0..735e1eb1eca4 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -576,7 +576,7 @@ dmac0: dma-controller@ffefc00000 {
+ 			compatible = "snps,axi-dma-1.01a";
+ 			reg = <0xff 0xefc00000 0x0 0x1000>;
+ 			interrupts = <27 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&apb_clk>, <&apb_clk>;
++			clocks = <&clk CLKGEN_DMAC_CPUSYS_ACLK>, <&clk CLKGEN_DMAC_CPUSYS_HCLK>;
+ 			clock-names = "core-clk", "cfgr-clk";
+ 			#dma-cells = <1>;
+ 			dma-channels = <4>;
+@@ -588,6 +588,41 @@ dmac0: dma-controller@ffefc00000 {
+ 			status = "disabled";
+ 		};
+ 
++		dmac1: dma-controller@ffff340000 {
++			compatible = "snps,axi-dma-1.01a";
++			reg = <0xff 0xff340000 0x0 0x1000>;
++			interrupts = <26 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_DMAC_CPUSYS_ACLK>, <&clk CLKGEN_DMAC_CPUSYS_HCLK>;
++			clock-names = "core-clk", "cfgr-clk";
++			#dma-cells = <1>;
++			dma-channels = <4>;
++			snps,block-size = <65536 65536 65536 65536>;
++			snps,priority = <0 1 2 3>;
++			snps,dma-masters = <1>;
++			snps,data-width = <4>;
++			snps,axi-max-burst-len = <16>;
++			status = "disabled";
++		};
++
++		dmac2: dma-controller@ffc8000000 {
++			compatible = "snps,axi-dma-1.01a";
++			reg = <0xff 0xc8000000 0x0 0x2000>;
++			interrupts = <25 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clk CLKGEN_DMAC_CPUSYS_ACLK>, <&clk CLKGEN_DMAC_CPUSYS_HCLK>;
++			clock-names = "core-clk", "cfgr-clk";
++			#dma-cells = <1>;
++			dma-channels = <16>;
++			snps,block-size = <65536 65536 65536 65536
++								65536 65536 65536 65536
++								65536 65536 65536 65536
++								65536 65536 65536 65536>;
++			snps,priority = <0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0>; // <0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15>;
++			snps,dma-masters = <1>;
++			snps,data-width = <4>;
++			snps,axi-max-burst-len = <16>;
++			status = "disabled";
++		};
++
+ 		emmc: mmc@ffe7080000 {
+ 			compatible = "thead,th1520-dwcmshc";
+ 			reg = <0xff 0xe7080000 0x0 0x10000>;
+-- 
+2.43.0
+

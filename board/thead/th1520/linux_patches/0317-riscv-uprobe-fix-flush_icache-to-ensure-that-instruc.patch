@@ -1,0 +1,27 @@
+From ec5c35882c5b6ac5da695fd4d3e156913a212f01 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:29:47 +0800
+Subject: [PATCH 317/400] riscv:uprobe: fix flush_icache to ensure that
+ instructions are refreshed when switching to user mode
+
+When uprobe returns to the user mode, it is necessary to ensure that the instructions are refreshed synchronously, otherwise it may cause the user program pc pointer error and segmentation fault. Especially when there are a large number of uprobes and called frequently.
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/kernel/probes/uprobes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/riscv/kernel/probes/uprobes.c b/arch/riscv/kernel/probes/uprobes.c
+index 4b3dc8beaf77..c2f4e4cffc7a 100644
+--- a/arch/riscv/kernel/probes/uprobes.c
++++ b/arch/riscv/kernel/probes/uprobes.c
+@@ -184,5 +184,5 @@ void arch_uprobe_copy_ixol(struct page *page, unsigned long vaddr,
+ 	 * architecture needs to do something different it can define
+ 	 * its own version of the function.
+ 	 */
+-	flush_dcache_page(page);
++	flush_icache_range(kaddr, kaddr + len);
+ }
+-- 
+2.43.0
+

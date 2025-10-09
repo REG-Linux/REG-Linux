@@ -1,0 +1,28 @@
+From 1b1810cb411744954a1daa7680a6bda7415857b3 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:10:55 +0800
+Subject: [PATCH 233/400] dw-axi-dma : dma_chan_prep_dma_memcpy func add
+ chan->direction = DMA_MEM_TO_MEM; Solve the problem of incorrect ttfc
+ configuration in aix-dma when using dma memcpy again after configuring dma
+ chan's direction as dev mode.
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index 0337b9e147a2..2235a15930bc 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -906,6 +906,7 @@ dma_chan_prep_dma_memcpy(struct dma_chan *dchan, dma_addr_t dst_adr,
+ 		goto err_desc_get;
+ 
+ 	desc->chan = chan;
++	chan->direction = DMA_MEM_TO_MEM;
+ 	num = 0;
+ 	desc->length = 0;
+ 	while (len) {
+-- 
+2.43.0
+

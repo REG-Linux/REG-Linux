@@ -1,0 +1,41 @@
+From 5ed1db1bb2fb3c7966eb3c1b66f5b8f72b04c1b4 Mon Sep 17 00:00:00 2001
+From: Drew Fustini <dfustini@baylibre.com>
+Date: Wed, 6 Dec 2023 00:09:21 -0800
+Subject: [PATCH 056/400] riscv: defconfig: Enable mmc and dma drivers for
+ T-Head TH1520
+
+Enable the mmc controller driver and dma controller driver needed for
+T-Head TH1520 based boards, like the LicheePi 4A and BeagleV-Ahead, to
+boot from eMMC storage.
+
+Reviewed-by: Guo Ren <guoren@kernel.org>
+Signed-off-by: Drew Fustini <dfustini@baylibre.com>
+Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Link: https://lore.kernel.org/r/20231206-th1520_mmc_dts-v8-1-69220e373e8f@baylibre.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/configs/defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
+index ab86ec3b9eab..c5a8583236d0 100644
+--- a/arch/riscv/configs/defconfig
++++ b/arch/riscv/configs/defconfig
+@@ -168,12 +168,14 @@ CONFIG_MMC=y
+ CONFIG_MMC_SDHCI=y
+ CONFIG_MMC_SDHCI_PLTFM=y
+ CONFIG_MMC_SDHCI_CADENCE=y
++CONFIG_MMC_SDHCI_OF_DWCMSHC=y
+ CONFIG_MMC_SPI=y
+ CONFIG_MMC_SUNXI=y
+ CONFIG_RTC_CLASS=y
+ CONFIG_RTC_DRV_SUN6I=y
+ CONFIG_DMADEVICES=y
+ CONFIG_DMA_SUN6I=m
++CONFIG_DW_AXI_DMAC=y
+ CONFIG_VIRTIO_PCI=y
+ CONFIG_VIRTIO_BALLOON=y
+ CONFIG_VIRTIO_INPUT=y
+-- 
+2.43.0
+

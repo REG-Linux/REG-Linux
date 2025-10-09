@@ -1,0 +1,36 @@
+From a37634e5f5795ebf2cb3af001b2bc3139ca61afa Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sat, 21 Sep 2024 14:43:31 +0800
+Subject: [PATCH 348/400] fix: gpu: fix device tree matching img,gpu
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/gpu/drm/img-rogue/pvr_platform_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/img-rogue/pvr_platform_drv.c b/drivers/gpu/drm/img-rogue/pvr_platform_drv.c
+index 172f8e52faa3..b1586c9bf434 100644
+--- a/drivers/gpu/drm/img-rogue/pvr_platform_drv.c
++++ b/drivers/gpu/drm/img-rogue/pvr_platform_drv.c
+@@ -259,7 +259,7 @@ static const struct of_device_id pvr_of_ids[] = {
+ };
+ 
+ #if !defined(CHROMIUMOS_KERNEL) || !defined(MODULE)
+-//MODULE_DEVICE_TABLE(of, pvr_of_ids);
++MODULE_DEVICE_TABLE(of, pvr_of_ids);
+ #endif
+ #endif
+ 
+@@ -271,7 +271,7 @@ static struct platform_device_id pvr_platform_ids[] = {
+ };
+ 
+ #if !defined(CHROMIUMOS_KERNEL) || !defined(MODULE)
+-//MODULE_DEVICE_TABLE(platform, pvr_platform_ids);
++MODULE_DEVICE_TABLE(platform, pvr_platform_ids);
+ #endif
+ 
+ static struct platform_driver pvr_platform_driver = {
+-- 
+2.43.0
+

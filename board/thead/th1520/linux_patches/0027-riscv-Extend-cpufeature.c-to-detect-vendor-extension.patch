@@ -1,0 +1,762 @@
+From 5e77d95fb5cb20a30a4828be7fad46a1fff89af6 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Fri, 19 Jul 2024 09:15:18 -0700
+Subject: [PATCH 027/400] riscv: Extend cpufeature.c to detect vendor
+ extensions
+
+[ Upstream commit 23c996fc2bc1978a02c64eddb90b4ab5d309c8df ]
+
+Instead of grouping all vendor extensions into the same riscv_isa_ext
+that standard instructions use, create a struct
+"riscv_isa_vendor_ext_data_list" that allows each vendor to maintain
+their vendor extensions independently of the standard extensions.
+xandespmu is currently the only vendor extension so that is the only
+extension that is affected by this change.
+
+An additional benefit of this is that the extensions of each vendor can
+be conditionally enabled. A config RISCV_ISA_VENDOR_EXT_ANDES has been
+added to allow for that.
+
+Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Andy Chiu <andy.chiu@sifive.com>
+Tested-by: Yu Chien Peter Lin <peterlin@andestech.com>
+Reviewed-by: Yu Chien Peter Lin <peterlin@andestech.com>
+Link: https://lore.kernel.org/r/20240719-support_vendor_extensions-v3-1-0af7587bbec0@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+ arch/riscv/Kconfig                            |   2 +
+ arch/riscv/Kconfig.vendor                     |  19 +++
+ arch/riscv/errata/andes/errata.c              |   3 +
+ arch/riscv/errata/sifive/errata.c             |   3 +
+ arch/riscv/errata/thead/errata.c              |   3 +
+ arch/riscv/include/asm/cpufeature.h           |  80 +++++++++++++
+ arch/riscv/include/asm/errata_list.h          |   9 --
+ arch/riscv/include/asm/hwcap.h                |  47 ++++++++
+ arch/riscv/include/asm/vendor_extensions.h    |  48 ++++++++
+ .../include/asm/vendor_extensions/andes.h     |  19 +++
+ arch/riscv/kernel/Makefile                    |   2 +
+ arch/riscv/kernel/cpufeature.c                | 109 +++++++++++++++---
+ arch/riscv/kernel/vendor_extensions.c         |  56 +++++++++
+ arch/riscv/kernel/vendor_extensions/Makefile  |   3 +
+ arch/riscv/kernel/vendor_extensions/andes.c   |  22 ++++
+ drivers/perf/riscv_pmu_sbi.c                  |  38 +++++-
+ 16 files changed, 439 insertions(+), 24 deletions(-)
+ create mode 100644 arch/riscv/Kconfig.vendor
+ create mode 100644 arch/riscv/include/asm/vendor_extensions.h
+ create mode 100644 arch/riscv/include/asm/vendor_extensions/andes.h
+ create mode 100644 arch/riscv/kernel/vendor_extensions.c
+ create mode 100644 arch/riscv/kernel/vendor_extensions/Makefile
+ create mode 100644 arch/riscv/kernel/vendor_extensions/andes.c
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 8374d2fdb8f6..3da8de383f52 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -673,6 +673,8 @@ config THREAD_SIZE_ORDER
+ 	  Specify the Pages of thread stack size (from 4KB to 64KB), which also
+ 	  affects irq stack size, which is equal to thread stack size.
+ 
++source "arch/riscv/Kconfig.vendor"
++
+ endmenu # "Platform type"
+ 
+ menu "Kernel features"
+diff --git a/arch/riscv/Kconfig.vendor b/arch/riscv/Kconfig.vendor
+new file mode 100644
+index 000000000000..6f1cdd32ed29
+--- /dev/null
++++ b/arch/riscv/Kconfig.vendor
+@@ -0,0 +1,19 @@
++menu "Vendor extensions"
++
++config RISCV_ISA_VENDOR_EXT
++	bool
++
++menu "Andes"
++config RISCV_ISA_VENDOR_EXT_ANDES
++	bool "Andes vendor extension support"
++	select RISCV_ISA_VENDOR_EXT
++	default y
++	help
++	  Say N here if you want to disable all Andes vendor extension
++	  support. This will cause any Andes vendor extensions that are
++	  requested by hardware probing to be ignored.
++
++	  If you don't know what to do here, say Y.
++endmenu
++
++endmenu
+diff --git a/arch/riscv/errata/andes/errata.c b/arch/riscv/errata/andes/errata.c
+index 17a904869724..c4575546bafb 100644
+--- a/arch/riscv/errata/andes/errata.c
++++ b/arch/riscv/errata/andes/errata.c
+@@ -17,6 +17,7 @@
+ #include <asm/processor.h>
+ #include <asm/sbi.h>
+ #include <asm/vendorid_list.h>
++#include <asm/vendor_extensions.h>
+ 
+ #define ANDESTECH_AX45MP_MARCHID	0x8000000000008a45UL
+ #define ANDESTECH_AX45MP_MIMPID		0x500UL
+@@ -65,6 +66,8 @@ void __init_or_module andes_errata_patch_func(struct alt_entry *begin, struct al
+ 					      unsigned long archid, unsigned long impid,
+ 					      unsigned int stage)
+ {
++	BUILD_BUG_ON(ERRATA_ANDES_NUMBER >= RISCV_VENDOR_EXT_ALTERNATIVES_BASE);
++
+ 	if (stage == RISCV_ALTERNATIVES_BOOT)
+ 		errata_probe_iocp(stage, archid, impid);
+ 
+diff --git a/arch/riscv/errata/sifive/errata.c b/arch/riscv/errata/sifive/errata.c
+index 3d9a32d791f7..b68b023115c2 100644
+--- a/arch/riscv/errata/sifive/errata.c
++++ b/arch/riscv/errata/sifive/errata.c
+@@ -12,6 +12,7 @@
+ #include <asm/alternative.h>
+ #include <asm/vendorid_list.h>
+ #include <asm/errata_list.h>
++#include <asm/vendor_extensions.h>
+ 
+ struct errata_info_t {
+ 	char name[32];
+@@ -91,6 +92,8 @@ void sifive_errata_patch_func(struct alt_entry *begin, struct alt_entry *end,
+ 	u32 cpu_apply_errata = 0;
+ 	u32 tmp;
+ 
++	BUILD_BUG_ON(ERRATA_SIFIVE_NUMBER >= RISCV_VENDOR_EXT_ALTERNATIVES_BASE);
++
+ 	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+ 		return;
+ 
+diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
+index f6c1da819670..66656fe3dd9d 100644
+--- a/arch/riscv/errata/thead/errata.c
++++ b/arch/riscv/errata/thead/errata.c
+@@ -16,6 +16,7 @@
+ #include <asm/hwprobe.h>
+ #include <asm/patch.h>
+ #include <asm/vendorid_list.h>
++#include <asm/vendor_extensions.h>
+ 
+ static bool errata_probe_pbmt(unsigned int stage,
+ 			      unsigned long arch_id, unsigned long impid)
+@@ -115,6 +116,8 @@ void thead_errata_patch_func(struct alt_entry *begin, struct alt_entry *end,
+ 	u32 tmp;
+ 	void *oldptr, *altptr;
+ 
++	BUILD_BUG_ON(ERRATA_THEAD_NUMBER >= RISCV_VENDOR_EXT_ALTERNATIVES_BASE);
++
+ 	for (alt = begin; alt < end; alt++) {
+ 		if (alt->vendor_id != THEAD_VENDOR_ID)
+ 			continue;
+diff --git a/arch/riscv/include/asm/cpufeature.h b/arch/riscv/include/asm/cpufeature.h
+index 13b7d35648a9..b945d063018b 100644
+--- a/arch/riscv/include/asm/cpufeature.h
++++ b/arch/riscv/include/asm/cpufeature.h
+@@ -33,4 +33,84 @@ extern struct riscv_isainfo hart_isa[NR_CPUS];
+ void check_unaligned_access(int cpu);
+ void riscv_user_isa_enable(void);
+ 
++struct riscv_isa_ext_data {
++        const unsigned int id;
++        const char *name;
++        const char *property;
++};
++
++extern const struct riscv_isa_ext_data riscv_isa_ext[];
++extern const size_t riscv_isa_ext_count;
++extern bool riscv_isa_fallback;
++
++unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap);
++
++#define riscv_isa_extension_mask(ext) BIT_MASK(RISCV_ISA_EXT_##ext)
++
++bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int bit);
++#define riscv_isa_extension_available(isa_bitmap, ext)  \
++        __riscv_isa_extension_available(isa_bitmap, RISCV_ISA_EXT_##ext)
++
++static __always_inline bool
++riscv_has_extension_likely(const unsigned long ext)
++{
++        compiletime_assert(ext < RISCV_ISA_EXT_MAX,
++                           "ext must be < RISCV_ISA_EXT_MAX");
++
++        if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE)) {
++                asm goto(
++                ALTERNATIVE("j  %l[l_no]", "nop", 0, %[ext], 1)
++                :
++                : [ext] "i" (ext)
++                :
++                : l_no);
++        } else {
++                if (!__riscv_isa_extension_available(NULL, ext))
++                        goto l_no;
++        }
++
++        return true;
++l_no:
++        return false;
++}
++
++static __always_inline bool
++riscv_has_extension_unlikely(const unsigned long ext)
++{
++        compiletime_assert(ext < RISCV_ISA_EXT_MAX,
++                           "ext must be < RISCV_ISA_EXT_MAX");
++
++        if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE)) {
++                asm goto(
++                ALTERNATIVE("nop", "j   %l[l_yes]", 0, %[ext], 1)
++                :
++                : [ext] "i" (ext)
++                :
++                : l_yes);
++        } else {
++                if (__riscv_isa_extension_available(NULL, ext))
++                        goto l_yes;
++        }
++
++        return false;
++l_yes:
++        return true;
++}
++
++static __always_inline bool riscv_cpu_has_extension_likely(int cpu, const unsigned long ext)
++{
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE) && riscv_has_extension_likely(ext))
++		return true;
++
++	return __riscv_isa_extension_available(hart_isa[cpu].isa, ext);
++}
++
++static __always_inline bool riscv_cpu_has_extension_unlikely(int cpu, const unsigned long ext)
++{
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE) && riscv_has_extension_unlikely(ext))
++		return true;
++
++	return __riscv_isa_extension_available(hart_isa[cpu].isa, ext);
++}
++
+ #endif
+diff --git a/arch/riscv/include/asm/errata_list.h b/arch/riscv/include/asm/errata_list.h
+index f5b007a41a0e..ec33f79aa4bb 100644
+--- a/arch/riscv/include/asm/errata_list.h
++++ b/arch/riscv/include/asm/errata_list.h
+@@ -142,15 +142,6 @@ asm volatile(ALTERNATIVE_2(						\
+ #define THEAD_C9XX_RV_IRQ_PMU			17
+ #define THEAD_C9XX_CSR_SCOUNTEROF		0x5c5
+ 
+-#define ALT_SBI_PMU_OVERFLOW(__ovl)					\
+-asm volatile(ALTERNATIVE(						\
+-	"csrr %0, " __stringify(CSR_SSCOUNTOVF),			\
+-	"csrr %0, " __stringify(THEAD_C9XX_CSR_SCOUNTEROF),		\
+-		THEAD_VENDOR_ID, ERRATA_THEAD_PMU,			\
+-		CONFIG_ERRATA_THEAD_PMU)				\
+-	: "=r" (__ovl) :						\
+-	: "memory")
+-
+ #endif /* __ASSEMBLY__ */
+ 
+ #endif
+diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+index 293617b2474c..30cdcab9b2c5 100644
+--- a/arch/riscv/include/asm/hwcap.h
++++ b/arch/riscv/include/asm/hwcap.h
+@@ -58,6 +58,49 @@
+ #define RISCV_ISA_EXT_ZICSR		40
+ #define RISCV_ISA_EXT_ZIFENCEI		41
+ #define RISCV_ISA_EXT_ZIHPM		42
++#define RISCV_ISA_EXT_SMSTATEEN		43
++#define RISCV_ISA_EXT_ZICOND		44
++#define RISCV_ISA_EXT_ZBC		45
++#define RISCV_ISA_EXT_ZBKB		46
++#define RISCV_ISA_EXT_ZBKC		47
++#define RISCV_ISA_EXT_ZBKX		48
++#define RISCV_ISA_EXT_ZKND		49
++#define RISCV_ISA_EXT_ZKNE		50
++#define RISCV_ISA_EXT_ZKNH		51
++#define RISCV_ISA_EXT_ZKR		52
++#define RISCV_ISA_EXT_ZKSED		53
++#define RISCV_ISA_EXT_ZKSH		54
++#define RISCV_ISA_EXT_ZKT		55
++#define RISCV_ISA_EXT_ZVBB		56
++#define RISCV_ISA_EXT_ZVBC		57
++#define RISCV_ISA_EXT_ZVKB		58
++#define RISCV_ISA_EXT_ZVKG		59
++#define RISCV_ISA_EXT_ZVKNED		60
++#define RISCV_ISA_EXT_ZVKNHA		61
++#define RISCV_ISA_EXT_ZVKNHB		62
++#define RISCV_ISA_EXT_ZVKSED		63
++#define RISCV_ISA_EXT_ZVKSH		64
++#define RISCV_ISA_EXT_ZVKT		65
++#define RISCV_ISA_EXT_ZFH		66
++#define RISCV_ISA_EXT_ZFHMIN		67
++#define RISCV_ISA_EXT_ZIHINTNTL		68
++#define RISCV_ISA_EXT_ZVFH		69
++#define RISCV_ISA_EXT_ZVFHMIN		70
++#define RISCV_ISA_EXT_ZFA		71
++#define RISCV_ISA_EXT_ZTSO		72
++#define RISCV_ISA_EXT_ZACAS		73
++#define RISCV_ISA_EXT_ZVE32X		74
++#define RISCV_ISA_EXT_ZVE32F		75
++#define RISCV_ISA_EXT_ZVE64X		76
++#define RISCV_ISA_EXT_ZVE64F		77
++#define RISCV_ISA_EXT_ZVE64D		78
++#define RISCV_ISA_EXT_ZIMOP		79
++#define RISCV_ISA_EXT_ZCA		80
++#define RISCV_ISA_EXT_ZCB		81
++#define RISCV_ISA_EXT_ZCD		82
++#define RISCV_ISA_EXT_ZCF		83
++#define RISCV_ISA_EXT_ZCMOP		84
++#define RISCV_ISA_EXT_ZAWRS		85
+ #define RISCV_ISA_EXT_ZICCRSE		88
+ 
+ #define RISCV_ISA_EXT_MAX		128
+@@ -75,6 +118,8 @@
+ 
+ unsigned long riscv_get_elf_hwcap(void);
+ 
++#if 0
++
+ struct riscv_isa_ext_data {
+ 	const unsigned int id;
+ 	const char *name;
+@@ -139,6 +184,7 @@ riscv_has_extension_unlikely(const unsigned long ext)
+ 	return true;
+ }
+ 
++
+ static __always_inline bool riscv_cpu_has_extension_likely(int cpu, const unsigned long ext)
+ {
+ 	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE) && riscv_has_extension_likely(ext))
+@@ -155,5 +201,6 @@ static __always_inline bool riscv_cpu_has_extension_unlikely(int cpu, const unsi
+ 	return __riscv_isa_extension_available(hart_isa[cpu].isa, ext);
+ }
+ #endif
++#endif
+ 
+ #endif /* _ASM_RISCV_HWCAP_H */
+diff --git a/arch/riscv/include/asm/vendor_extensions.h b/arch/riscv/include/asm/vendor_extensions.h
+new file mode 100644
+index 000000000000..19d6d72768e8
+--- /dev/null
++++ b/arch/riscv/include/asm/vendor_extensions.h
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright 2024 Rivos, Inc
++ */
++
++#ifndef _ASM_VENDOR_EXTENSIONS_H
++#define _ASM_VENDOR_EXTENSIONS_H
++
++#include <asm/cpufeature.h>
++
++#include <linux/types.h>
++
++/*
++ * The extension keys of each vendor must be strictly less than this value.
++ */
++#define RISCV_ISA_VENDOR_EXT_MAX 32
++
++struct riscv_isavendorinfo {
++	DECLARE_BITMAP(isa, RISCV_ISA_VENDOR_EXT_MAX);
++};
++
++struct riscv_isa_vendor_ext_data_list {
++	bool is_initialized;
++	const size_t ext_data_count;
++	const struct riscv_isa_ext_data *ext_data;
++	struct riscv_isavendorinfo per_hart_isa_bitmap[NR_CPUS];
++	struct riscv_isavendorinfo all_harts_isa_bitmap;
++};
++
++extern struct riscv_isa_vendor_ext_data_list *riscv_isa_vendor_ext_list[];
++
++extern const size_t riscv_isa_vendor_ext_list_size;
++
++/*
++ * The alternatives need some way of distinguishing between vendor extensions
++ * and errata. Incrementing all of the vendor extension keys so they are at
++ * least 0x8000 accomplishes that.
++ */
++#define RISCV_VENDOR_EXT_ALTERNATIVES_BASE	0x8000
++
++#define VENDOR_EXT_ALL_CPUS			-1
++
++bool __riscv_isa_vendor_extension_available(int cpu, unsigned long vendor, unsigned int bit);
++#define riscv_isa_vendor_extension_available(vendor, ext)	\
++	__riscv_isa_vendor_extension_available(VENDOR_EXT_ALL_CPUS, vendor, \
++					       RISCV_ISA_VENDOR_EXT_##ext)
++
++#endif /* _ASM_VENDOR_EXTENSIONS_H */
+diff --git a/arch/riscv/include/asm/vendor_extensions/andes.h b/arch/riscv/include/asm/vendor_extensions/andes.h
+new file mode 100644
+index 000000000000..7bb2fc43438f
+--- /dev/null
++++ b/arch/riscv/include/asm/vendor_extensions/andes.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_RISCV_VENDOR_EXTENSIONS_ANDES_H
++#define _ASM_RISCV_VENDOR_EXTENSIONS_ANDES_H
++
++#include <asm/vendor_extensions.h>
++
++#include <linux/types.h>
++
++#define RISCV_ISA_VENDOR_EXT_XANDESPMU		0
++
++/*
++ * Extension keys should be strictly less than max.
++ * It is safe to increment this when necessary.
++ */
++#define RISCV_ISA_VENDOR_EXT_MAX_ANDES			32
++
++extern struct riscv_isa_vendor_ext_data_list riscv_isa_vendor_ext_list_andes;
++
++#endif
+diff --git a/arch/riscv/kernel/Makefile b/arch/riscv/kernel/Makefile
+index 03968c06258c..2edbd35d0348 100644
+--- a/arch/riscv/kernel/Makefile
++++ b/arch/riscv/kernel/Makefile
+@@ -58,6 +58,8 @@ obj-y	+= riscv_ksyms.o
+ obj-y	+= stacktrace.o
+ obj-y	+= cacheinfo.o
+ obj-y	+= patch.o
++obj-y	+= vendor_extensions.o
++obj-y	+= vendor_extensions/
+ obj-y	+= probes/
+ obj-$(CONFIG_MMU) += vdso.o vdso/
+ 
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index 6981d9d36f87..6603942c3158 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -23,6 +23,7 @@
+ #include <asm/processor.h>
+ #include <asm/sbi.h>
+ #include <asm/vector.h>
++#include <asm/vendor_extensions.h>
+ 
+ #include "copy-unaligned.h"
+ 
+@@ -204,6 +205,21 @@ static void __init riscv_parse_isa_string(unsigned long *this_hwcap, struct risc
+ 		bool ext_long = false, ext_err = false;
+ 
+ 		switch (*ext) {
++		case 'x':
++		case 'X':
++			if (acpi_disabled)
++				pr_warn_once("Vendor extensions are ignored in riscv,isa. Use riscv,isa-extensions instead.");
++			/*
++			 * To skip an extension, we find its end.
++			 * As multi-letter extensions must be split from other multi-letter
++			 * extensions with an "_", the end of a multi-letter extension will
++			 * either be the null character or the "_" at the start of the next
++			 * multi-letter extension.
++			 */
++			for (; *isa && *isa != '_'; ++isa)
++				;
++			ext_err = true;
++			break;
+ 		case 's':
+ 			/*
+ 			 * Workaround for invalid single-letter 's' & 'u'(QEMU).
+@@ -218,8 +234,6 @@ static void __init riscv_parse_isa_string(unsigned long *this_hwcap, struct risc
+ 			}
+ 			fallthrough;
+ 		case 'S':
+-		case 'x':
+-		case 'X':
+ 		case 'z':
+ 		case 'Z':
+ 			/*
+@@ -436,6 +450,53 @@ static void __init riscv_fill_hwcap_from_isa_string(unsigned long *isa2hwcap)
+ 		acpi_put_table((struct acpi_table_header *)rhct);
+ }
+ 
++static void __init riscv_fill_cpu_vendor_ext(struct device_node *cpu_node, int cpu)
++{
++	if (!IS_ENABLED(CONFIG_RISCV_ISA_VENDOR_EXT))
++		return;
++
++	for (int i = 0; i < riscv_isa_vendor_ext_list_size; i++) {
++		struct riscv_isa_vendor_ext_data_list *ext_list = riscv_isa_vendor_ext_list[i];
++
++		for (int j = 0; j < ext_list->ext_data_count; j++) {
++			const struct riscv_isa_ext_data ext = ext_list->ext_data[j];
++			struct riscv_isavendorinfo *isavendorinfo = &ext_list->per_hart_isa_bitmap[cpu];
++
++			if (of_property_match_string(cpu_node, "riscv,isa-extensions",
++						     ext.property) < 0)
++				continue;
++
++			set_bit(ext.id, isavendorinfo->isa);
++		}
++	}
++}
++
++/*
++ * Populate all_harts_isa_bitmap for each vendor with all of the extensions that
++ * are shared across CPUs for that vendor.
++ */
++static void __init riscv_fill_vendor_ext_list(int cpu)
++{
++	if (!IS_ENABLED(CONFIG_RISCV_ISA_VENDOR_EXT))
++		return;
++
++	for (int i = 0; i < riscv_isa_vendor_ext_list_size; i++) {
++		struct riscv_isa_vendor_ext_data_list *ext_list = riscv_isa_vendor_ext_list[i];
++
++		if (!ext_list->is_initialized) {
++			bitmap_copy(ext_list->all_harts_isa_bitmap.isa,
++				    ext_list->per_hart_isa_bitmap[cpu].isa,
++				    RISCV_ISA_VENDOR_EXT_MAX);
++			ext_list->is_initialized = true;
++		} else {
++			bitmap_and(ext_list->all_harts_isa_bitmap.isa,
++				   ext_list->all_harts_isa_bitmap.isa,
++				   ext_list->per_hart_isa_bitmap[cpu].isa,
++				   RISCV_ISA_VENDOR_EXT_MAX);
++		}
++	}
++}
++
+ static int __init riscv_fill_hwcap_from_ext_list(unsigned long *isa2hwcap)
+ {
+ 	unsigned int cpu;
+@@ -470,6 +531,7 @@ static int __init riscv_fill_hwcap_from_ext_list(unsigned long *isa2hwcap)
+ 
+ 			set_bit(riscv_isa_ext[i].id, isainfo->isa);
+ 		}
++		riscv_fill_cpu_vendor_ext(cpu_node, cpu);
+ 
+ 		of_node_put(cpu_node);
+ 
+@@ -486,6 +548,8 @@ static int __init riscv_fill_hwcap_from_ext_list(unsigned long *isa2hwcap)
+ 			bitmap_copy(riscv_isa, isainfo->isa, RISCV_ISA_EXT_MAX);
+ 		else
+ 			bitmap_and(riscv_isa, riscv_isa, isainfo->isa, RISCV_ISA_EXT_MAX);
++
++		riscv_fill_vendor_ext_list(cpu);
+ 	}
+ 
+ 	if (bitmap_empty(riscv_isa, RISCV_ISA_EXT_MAX))
+@@ -723,28 +787,45 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+ {
+ 	struct alt_entry *alt;
+ 	void *oldptr, *altptr;
+-	u16 id, value;
++	u16 id, value, vendor;
+ 
+ 	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+ 		return;
+ 
+ 	for (alt = begin; alt < end; alt++) {
+-		if (alt->vendor_id != 0)
+-			continue;
+-
+ 		id = PATCH_ID_CPUFEATURE_ID(alt->patch_id);
++		vendor = PATCH_ID_CPUFEATURE_ID(alt->vendor_id);
+ 
+-		if (id >= RISCV_ISA_EXT_MAX) {
+-			WARN(1, "This extension id:%d is not in ISA extension list", id);
+-			continue;
+-		}
++		/*
++		 * Any alternative with a patch_id that is less than
++		 * RISCV_ISA_EXT_MAX is interpreted as a standard extension.
++		 *
++		 * Any alternative with patch_id that is greater than or equal
++		 * to RISCV_VENDOR_EXT_ALTERNATIVES_BASE is interpreted as a
++		 * vendor extension.
++		 */
++		if (id < RISCV_ISA_EXT_MAX) {
++			/*
++			 * This patch should be treated as errata so skip
++			 * processing here.
++			 */
++			if (alt->vendor_id != 0)
++				continue;
+ 
+-		if (!__riscv_isa_extension_available(NULL, id))
+-			continue;
++			if (!__riscv_isa_extension_available(NULL, id))
++				continue;
+ 
+-		value = PATCH_ID_CPUFEATURE_VALUE(alt->patch_id);
+-		if (!riscv_cpufeature_patch_check(id, value))
++			value = PATCH_ID_CPUFEATURE_VALUE(alt->patch_id);
++			if (!riscv_cpufeature_patch_check(id, value))
++				continue;
++		} else if (id >= RISCV_VENDOR_EXT_ALTERNATIVES_BASE) {
++			if (!__riscv_isa_vendor_extension_available(VENDOR_EXT_ALL_CPUS, vendor,
++								    id - RISCV_VENDOR_EXT_ALTERNATIVES_BASE))
++				continue;
++		} else {
++			WARN(1, "This extension id:%d is not in ISA extension list", id);
+ 			continue;
++		}
+ 
+ 		oldptr = ALT_OLD_PTR(alt);
+ 		altptr = ALT_ALT_PTR(alt);
+diff --git a/arch/riscv/kernel/vendor_extensions.c b/arch/riscv/kernel/vendor_extensions.c
+new file mode 100644
+index 000000000000..b746162aa0d2
+--- /dev/null
++++ b/arch/riscv/kernel/vendor_extensions.c
+@@ -0,0 +1,56 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2024 Rivos, Inc
++ */
++
++#include <asm/vendorid_list.h>
++#include <asm/vendor_extensions.h>
++#include <asm/vendor_extensions/andes.h>
++
++#include <linux/types.h>
++#include <linux/kernel.h>
++
++struct riscv_isa_vendor_ext_data_list *riscv_isa_vendor_ext_list[] = {
++#ifdef CONFIG_RISCV_ISA_VENDOR_EXT_ANDES
++	&riscv_isa_vendor_ext_list_andes,
++#endif
++};
++
++const size_t riscv_isa_vendor_ext_list_size = ARRAY_SIZE(riscv_isa_vendor_ext_list);
++
++/**
++ * __riscv_isa_vendor_extension_available() - Check whether given vendor
++ * extension is available or not.
++ *
++ * @cpu: check if extension is available on this cpu
++ * @vendor: vendor that the extension is a member of
++ * @bit: bit position of the desired extension
++ * Return: true or false
++ *
++ * NOTE: When cpu is -1, will check if extension is available on all cpus
++ */
++bool __riscv_isa_vendor_extension_available(int cpu, unsigned long vendor, unsigned int bit)
++{
++	struct riscv_isavendorinfo *bmap;
++	struct riscv_isavendorinfo *cpu_bmap;
++
++	switch (vendor) {
++	#ifdef CONFIG_RISCV_ISA_VENDOR_EXT_ANDES
++	case ANDESTECH_VENDOR_ID:
++		bmap = &riscv_isa_vendor_ext_list_andes.all_harts_isa_bitmap;
++		cpu_bmap = &riscv_isa_vendor_ext_list_andes.per_hart_isa_bitmap[cpu];
++		break;
++	#endif
++	default:
++		return false;
++	}
++
++	if (cpu != -1)
++		bmap = &cpu_bmap[cpu];
++
++	if (bit >= RISCV_ISA_VENDOR_EXT_MAX)
++		return false;
++
++	return test_bit(bit, bmap->isa) ? true : false;
++}
++EXPORT_SYMBOL_GPL(__riscv_isa_vendor_extension_available);
+diff --git a/arch/riscv/kernel/vendor_extensions/Makefile b/arch/riscv/kernel/vendor_extensions/Makefile
+new file mode 100644
+index 000000000000..6a61aed944f1
+--- /dev/null
++++ b/arch/riscv/kernel/vendor_extensions/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0-only
++
++obj-$(CONFIG_RISCV_ISA_VENDOR_EXT_ANDES)	+= andes.o
+diff --git a/arch/riscv/kernel/vendor_extensions/andes.c b/arch/riscv/kernel/vendor_extensions/andes.c
+new file mode 100644
+index 000000000000..42ee0b4c4edd
+--- /dev/null
++++ b/arch/riscv/kernel/vendor_extensions/andes.c
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include <asm/cpufeature.h>
++#include <asm/vendor_extensions.h>
++#include <asm/vendor_extensions/andes.h>
++
++#include <linux/types.h>
++#include <linux/kernel.h>
++
++/* All Andes vendor extensions supported in Linux */
++const struct riscv_isa_ext_data riscv_isa_vendor_ext_andes[] = {
++	{
++		.name = "xandespmu",
++		.property = "xandespmu",
++		.id = RISCV_ISA_VENDOR_EXT_XANDESPMU
++	},
++};
++
++struct riscv_isa_vendor_ext_data_list riscv_isa_vendor_ext_list_andes = {
++	.ext_data_count = ARRAY_SIZE(riscv_isa_vendor_ext_andes),
++	.ext_data = riscv_isa_vendor_ext_andes,
++};
+diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+index 901da688ea3f..86e62858eb16 100644
+--- a/drivers/perf/riscv_pmu_sbi.c
++++ b/drivers/perf/riscv_pmu_sbi.c
+@@ -22,7 +22,39 @@
+ 
+ #include <asm/errata_list.h>
+ #include <asm/sbi.h>
+-#include <asm/hwcap.h>
++#include <asm/cpufeature.h>
++#include <asm/vendor_extensions.h>
++#include <asm/vendor_extensions/andes.h>
++
++#define CSR_SCOUNTOVF			0xda0
++
++#define ANDES_RV_IRQ_PMOVI		18
++#define ANDES_SLI_CAUSE_BASE		256
++#define ANDES_CSR_SLIP			0x9c5
++#define ANDES_CSR_SCOUNTEROF		0x9d4
++
++#define ALT_SBI_PMU_OVERFLOW(__ovl)					\
++asm volatile(ALTERNATIVE_2(						\
++	"csrr %0, " __stringify(CSR_SCOUNTOVF),				\
++	"csrr %0, " __stringify(THEAD_C9XX_CSR_SCOUNTEROF),		\
++		THEAD_VENDOR_ID, ERRATA_THEAD_PMU,			\
++		CONFIG_ERRATA_THEAD_PMU,				\
++	"csrr %0, " __stringify(ANDES_CSR_SCOUNTEROF),			\
++		ANDESTECH_VENDOR_ID,					\
++		RISCV_ISA_VENDOR_EXT_XANDESPMU + RISCV_VENDOR_EXT_ALTERNATIVES_BASE, \
++		CONFIG_ANDES_CUSTOM_PMU)				\
++	: "=r" (__ovl) :						\
++	: "memory")
++
++#define ALT_SBI_PMU_OVF_CLEAR_PENDING(__irq_mask)			\
++asm volatile(ALTERNATIVE(						\
++	"csrc " __stringify(CSR_IP) ", %0\n\t",				\
++	"csrc " __stringify(ANDES_CSR_SLIP) ", %0\n\t",			\
++		ANDESTECH_VENDOR_ID,					\
++		RISCV_ISA_VENDOR_EXT_XANDESPMU + RISCV_VENDOR_EXT_ALTERNATIVES_BASE, \
++		CONFIG_ANDES_CUSTOM_PMU)				\
++	: : "r"(__irq_mask)						\
++	: "memory")
+ 
+ #define SYSCTL_NO_USER_ACCESS	0
+ #define SYSCTL_USER_ACCESS	1
+@@ -816,6 +848,10 @@ static int pmu_sbi_setup_irqs(struct riscv_pmu *pmu, struct platform_device *pde
+ 		   riscv_cached_mimpid(0) == 0) {
+ 		riscv_pmu_irq_num = THEAD_C9XX_RV_IRQ_PMU;
+ 		riscv_pmu_use_irq = true;
++	} else if (riscv_isa_vendor_extension_available(ANDESTECH_VENDOR_ID, XANDESPMU) &&
++		   IS_ENABLED(CONFIG_ANDES_CUSTOM_PMU)) {
++		riscv_pmu_irq_num = ANDES_SLI_CAUSE_BASE + ANDES_RV_IRQ_PMOVI;
++		riscv_pmu_use_irq = true;
+ 	}
+ 
+ 	if (!riscv_pmu_use_irq)
+-- 
+2.43.0
+

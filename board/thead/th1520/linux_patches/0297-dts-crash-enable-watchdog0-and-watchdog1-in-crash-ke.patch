@@ -1,0 +1,37 @@
+From 0a505f66ad4eb3814d55a633a8e59e1906d0d083 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:14:20 +0800
+Subject: [PATCH 297/400] dts: crash: enable watchdog0 and watchdog1 in crash
+ kernel
+
+watchdog need to be reinitialized, otherwise watchdog hardware status
+of pre-crash kernel would misguide 902 subsystem
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-crash.dtsi | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-crash.dtsi b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+index 957a454f8a5a..1b91e6b600a9 100644
+--- a/arch/riscv/boot/dts/thead/th1520-crash.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+@@ -532,14 +532,6 @@ &audio_mbox {
+ 	status = "disabled";
+ };
+ 
+-&watchdog0 {
+-	status = "disabled";
+-};
+-
+-&watchdog1 {
+-	status = "disabled";
+-};
+-
+ &th1520_event {
+ 	status = "disabled";
+ };
+-- 
+2.43.0
+

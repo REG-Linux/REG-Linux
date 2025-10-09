@@ -1,0 +1,89 @@
+From 4acf6ec2ca723afa964debe304a946af76453142 Mon Sep 17 00:00:00 2001
+From: lst <luke@linux.alibaba.com>
+Date: Tue, 11 Jun 2024 18:16:20 +0800
+Subject: [PATCH 134/400] i2c: designware: add support for hcnt/lcnt got from
+ dt
+
+Add support for hcnt/lcnt got from dt.
+
+Signed-off-by: lst <luke@linux.alibaba.com>
+---
+ drivers/i2c/busses/i2c-designware-common.c  | 27 +++++++++++++++++++++
+ drivers/i2c/busses/i2c-designware-core.h    |  2 ++
+ drivers/i2c/busses/i2c-designware-platdrv.c |  2 ++
+ 3 files changed, 31 insertions(+)
+
+diff --git a/drivers/i2c/busses/i2c-designware-common.c b/drivers/i2c/busses/i2c-designware-common.c
+index 79e083aab08e..0f61fb5b0b9f 100644
+--- a/drivers/i2c/busses/i2c-designware-common.c
++++ b/drivers/i2c/busses/i2c-designware-common.c
+@@ -28,6 +28,8 @@
+ 
+ #include "i2c-designware-core.h"
+ 
++#define I2C_DW_SDA_HOLD_DEFAULT	3
++
+ static char *abort_sources[] = {
+ 	[ABRT_7B_ADDR_NOACK] =
+ 		"slave address not acknowledged (7bit mode)",
+@@ -312,6 +314,31 @@ static u32 i2c_dw_acpi_round_bus_speed(struct device *device)
+ 
+ static inline u32 i2c_dw_acpi_round_bus_speed(struct device *device) { return 0; }
+ 
++int i2c_dw_dt_configure(struct device *device)
++{
++	struct dw_i2c_dev *dev = dev_get_drvdata(device);
++	struct device_node *node = device->of_node;
++
++	/*
++	 * Try to get SDA hold time and *CNT values from an ACPI method for
++	 * selected speed modes.
++	 */
++	if (node) {
++		of_property_read_u16(node, "ss_hcnt", &dev->ss_hcnt);
++		of_property_read_u16(node, "ss_lcnt", &dev->ss_lcnt);
++		of_property_read_u16(node, "fp_hcnt", &dev->fp_hcnt);
++		of_property_read_u16(node, "fp_lcnt", &dev->fp_lcnt);
++		of_property_read_u16(node, "hs_hcnt", &dev->hs_hcnt);
++		of_property_read_u16(node, "hs_lcnt", &dev->hs_lcnt);
++		of_property_read_u16(node, "fs_hcnt", &dev->fs_hcnt);
++		of_property_read_u16(node, "fs_lcnt", &dev->fs_lcnt);
++		dev->sda_hold_time = I2C_DW_SDA_HOLD_DEFAULT;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(i2c_dw_dt_configure);
++
+ #endif	/* CONFIG_ACPI */
+ 
+ void i2c_dw_adjust_bus_speed(struct dw_i2c_dev *dev)
+diff --git a/drivers/i2c/busses/i2c-designware-core.h b/drivers/i2c/busses/i2c-designware-core.h
+index e93870a0f9a4..4098bdc2e102 100644
+--- a/drivers/i2c/busses/i2c-designware-core.h
++++ b/drivers/i2c/busses/i2c-designware-core.h
+@@ -399,6 +399,8 @@ void i2c_dw_adjust_bus_speed(struct dw_i2c_dev *dev);
+ 
+ #if IS_ENABLED(CONFIG_ACPI)
+ int i2c_dw_acpi_configure(struct device *device);
++static inline int i2c_dw_dt_configure(struct device *device) { return -ENODEV; }
+ #else
+ static inline int i2c_dw_acpi_configure(struct device *device) { return -ENODEV; }
++int i2c_dw_dt_configure(struct device *device);
+ #endif
+diff --git a/drivers/i2c/busses/i2c-designware-platdrv.c b/drivers/i2c/busses/i2c-designware-platdrv.c
+index 1ebcf5673a06..897c90b764af 100644
+--- a/drivers/i2c/busses/i2c-designware-platdrv.c
++++ b/drivers/i2c/busses/i2c-designware-platdrv.c
+@@ -320,6 +320,8 @@ static int dw_i2c_plat_probe(struct platform_device *pdev)
+ 
+ 	if (has_acpi_companion(&pdev->dev))
+ 		i2c_dw_acpi_configure(&pdev->dev);
++	else
++		i2c_dw_dt_configure(&pdev->dev);
+ 
+ 	ret = i2c_dw_validate_speed(dev);
+ 	if (ret)
+-- 
+2.43.0
+

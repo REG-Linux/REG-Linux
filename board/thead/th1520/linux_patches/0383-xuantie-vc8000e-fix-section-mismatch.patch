@@ -1,0 +1,26 @@
+From e0bc44d13733ccbd0d57fe02189076e334b6f2cf Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Tue, 17 Jun 2025 00:22:26 +0800
+Subject: [PATCH 383/400] xuantie: vc8000e: fix section mismatch
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ .../vpu-vc8000e-kernel/linux/kernel_module/vc8000_vcmd_driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/soc/xuantie/vpu-vc8000e-kernel/linux/kernel_module/vc8000_vcmd_driver.c b/drivers/soc/xuantie/vpu-vc8000e-kernel/linux/kernel_module/vc8000_vcmd_driver.c
+index a7f9481b29d6..209b6f3d9c14 100644
+--- a/drivers/soc/xuantie/vpu-vc8000e-kernel/linux/kernel_module/vc8000_vcmd_driver.c
++++ b/drivers/soc/xuantie/vpu-vc8000e-kernel/linux/kernel_module/vc8000_vcmd_driver.c
+@@ -4514,7 +4514,7 @@ static struct attribute_group venc_dev_attr_group = {
+     .attrs = attrs,
+ };
+ 
+-int __init hantroenc_vcmd_probe(struct platform_device *pdev)
++int hantroenc_vcmd_probe(struct platform_device *pdev)
+ {
+   int i,k;
+   int result;
+-- 
+2.43.0
+

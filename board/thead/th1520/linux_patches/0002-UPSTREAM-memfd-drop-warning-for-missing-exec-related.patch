@@ -1,0 +1,59 @@
+From a46f45c5463fd88c1ea155db4698efcade314b2d Mon Sep 17 00:00:00 2001
+From: Aleksa Sarai <cyphar@cyphar.com>
+Date: Tue, 12 Sep 2023 01:17:20 +1000
+Subject: [PATCH 002/400] UPSTREAM: memfd: drop warning for missing
+ exec-related flags
+
+Commit 434ed3350f57 ("memfd: improve userspace warnings for missing
+exec-related flags") attempted to make these warnings more useful (so
+they would work as an incentive to get users to switch to specifying
+these flags -- as intended by the original MFD_NOEXEC_SEAL patchset).
+Unfortunately, it turns out that even INFO-level logging is too extreme
+to enable by default and alternative solutions to the spam issue (such
+as doing more extreme rate-limiting per-task) are either too ugly or
+overkill for something as simple as emitting a log as a developer aid.
+
+Given that the flags are new and there is no harm to not specifying them
+(after all, we maintain backwards compatibility) we can just drop the
+warnings for now until some time in the future when most programs have
+migrated and distributions start using vm.memfd_noexec=1 (where failing
+to pass the flag would result in unexpected errors for programs that use
+executable memfds).
+
+Link: https://lkml.kernel.org/r/20230912-memfd-reduce-spam-v2-1-7d92a4964b6a@cyphar.com
+Fixes: 434ed3350f57 ("memfd: improve userspace warnings for missing exec-related flags")
+Fixes: 2562d67b1bdf ("revert "memfd: improve userspace warnings for missing exec-related flags".")
+Signed-off-by: Aleksa Sarai <cyphar@cyphar.com>
+Reported-by: Damian Tometzki <dtometzki@fedoraproject.org>
+Reviewed-by: Christian Brauner <brauner@kernel.org>
+Cc: Daniel Verkamp <dverkamp@chromium.org>
+Cc: Jeff Xu <jeffxu@google.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Shuah Khan <shuah@kernel.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+(cherry picked from commit 1717449b4417da2d24e2f9db95239e85f1317002)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ mm/memfd.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/mm/memfd.c b/mm/memfd.c
+index 187265dc68f5..890e9b2a4fa1 100644
+--- a/mm/memfd.c
++++ b/mm/memfd.c
+@@ -315,12 +315,6 @@ SYSCALL_DEFINE2(memfd_create,
+ 	if ((flags & MFD_EXEC) && (flags & MFD_NOEXEC_SEAL))
+ 		return -EINVAL;
+ 
+-	if (!(flags & (MFD_EXEC | MFD_NOEXEC_SEAL))) {
+-		pr_warn_once(
+-			"%s[%d]: memfd_create() called without MFD_EXEC or MFD_NOEXEC_SEAL set\n",
+-			current->comm, task_pid_nr(current));
+-	}
+-
+ 	error = check_sysctl_memfd_noexec(&flags);
+ 	if (error < 0)
+ 		return error;
+-- 
+2.43.0
+

@@ -1,0 +1,87 @@
+From d3ba7916c51a8b4f713200748356effd9a5ec5fe Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:24:53 +0800
+Subject: [PATCH 249/400] usb: dwc3-thead: fix usb gadget support
+
+	support hubswitch
+	change CONFIG_USB_GADGET m -> y for usb gadget ep enable
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 9 +--------
+ arch/riscv/configs/th1520_defconfig               | 2 +-
+ drivers/usb/dwc3/dwc3-xuantie.c                   | 7 ++++++-
+ 3 files changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index d37112c1b92c..e75c42d04064 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -679,14 +679,6 @@ &aon_suspend_ctrl {
+ 	status = "okay";
+ };
+ 
+-&aogpio {
+-	sel-usb-hub-hog {
+-		gpio-hog;
+-		gpios = <4 GPIO_ACTIVE_HIGH>;
+-		output-high;
+-	};
+-};
+-
+ &gmac0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&gmac0_pins>;
+@@ -1074,6 +1066,7 @@ &uart4 {
+ 
+ &usb {
+ 	status = "okay";
++	hubswitch-gpio = <&aogpio 4 0>;
+ };
+ 
+ &usb_dwc3 {
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 60dbdde6a9d2..e98997f3dfce 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -178,7 +178,7 @@ CONFIG_USB_STORAGE_SDDR55=y
+ CONFIG_USB_DWC3=m
+ # CONFIG_USB_DWC3_OF_SIMPLE is not set
+ CONFIG_USB_ONBOARD_HUB=m
+-CONFIG_USB_GADGET=m
++CONFIG_USB_GADGET=y
+ CONFIG_USB_CONFIGFS=m
+ CONFIG_USB_CONFIGFS_F_FS=y
+ CONFIG_USB_ZERO=m
+diff --git a/drivers/usb/dwc3/dwc3-xuantie.c b/drivers/usb/dwc3/dwc3-xuantie.c
+index f8ea90154c90..9b3ba6becdbe 100644
+--- a/drivers/usb/dwc3/dwc3-xuantie.c
++++ b/drivers/usb/dwc3/dwc3-xuantie.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <linux/io.h>
++#include <linux/gpio.h>
+ #include <linux/clk.h>
+ #include <linux/kernel.h>
+ #include <linux/of_platform.h>
+@@ -149,11 +150,15 @@ static int dwc3_xuantie_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, xuantie);
+ 	xuantie->dev = &pdev->dev;
+ 
++	xuantie->hubswitch = devm_gpiod_get(dev, "hubswitch", (usb_role == USB_AS_DEVICE) ? GPIOD_OUT_LOW : GPIOD_OUT_HIGH);
++	if (IS_ERR(xuantie->hubswitch))
++		dev_err(dev, "no need to get hubswitch GPIO\n");
++	dev_info(dev, "hubswitch usb_role = %d\n", usb_role);
++
+ 	xuantie->misc_sysreg = syscon_regmap_lookup_by_phandle(np, "usb3-misc-regmap");
+ 	if (IS_ERR(xuantie->misc_sysreg)) {
+ 		dev_err(dev, "failed to get regmap - %ld\n", PTR_ERR(xuantie->misc_sysreg));
+ 
+-
+ 		return PTR_ERR(xuantie->misc_sysreg);
+ 	}
+ 
+-- 
+2.43.0
+

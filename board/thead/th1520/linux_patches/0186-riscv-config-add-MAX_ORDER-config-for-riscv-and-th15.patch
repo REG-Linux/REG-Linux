@@ -1,0 +1,57 @@
+From be84ad14ba4fee1fdbdc13f5deb56507d3f49dde Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:05:06 +0800
+Subject: [PATCH 186/400] riscv: config: add MAX_ORDER config for riscv and
+ th1520
+
+CONFIG_ARCH_FORCE_MAX_ORDER configs for large physically
+contingous memory, th1520_defconfig set it to 15 for video
+memory.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/Kconfig                  | 14 ++++++++++++++
+ arch/riscv/configs/th1520_defconfig |  1 +
+ 2 files changed, 15 insertions(+)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 55b02645a910..207913086fe0 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -765,6 +765,20 @@ config ARCH_SUPPORTS_KEXEC_PURGATORY
+ config ARCH_SUPPORTS_CRASH_DUMP
+ 	def_bool y
+ 
++config ARCH_FORCE_MAX_ORDER
++	int "Maximum zone order"
++	default "10"
++	help
++	  The kernel memory allocator divides physically contiguous memory
++	  blocks into "zones", where each zone is a power of two number of
++	  pages.  This option selects the largest power of two that the kernel
++	  keeps in the memory allocator.  If you need to allocate very large
++	  blocks of physically contiguous memory, then you may need to
++	  increase this value.
++
++	  The page size is not necessarily 4KB.  Keep this in mind
++	  when choosing a value for this option.
++
+ config COMPAT
+ 	bool "Kernel support for 32-bit U-mode"
+ 	default 64BIT
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index 8e74a88e3781..4ff862db8bc3 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -28,6 +28,7 @@ CONFIG_SOC_STARFIVE=y
+ CONFIG_ARCH_SUNXI=y
+ CONFIG_ARCH_THEAD=y
+ CONFIG_ARCH_XUANTIE=y
++CONFIG_ARCH_FORCE_MAX_ORDER=15
+ CONFIG_SMP=y
+ CONFIG_SCHED_MC=y
+ # CONFIG_SUSPEND is not set
+-- 
+2.43.0
+

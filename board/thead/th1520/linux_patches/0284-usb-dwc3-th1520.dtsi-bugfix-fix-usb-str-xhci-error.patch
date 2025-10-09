@@ -1,0 +1,29 @@
+From fbe12c66d085c8c0bf894a331b515e3a6b5fdc59 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:58:38 +0800
+Subject: [PATCH 284/400] usb: dwc3: th1520.dtsi: bugfix: fix usb str xhci
+ error
+
+add snps,dis_u2_susphy_quirk to th1520.dtsi
+dwc3 do not support usb2 phy suspend
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 82890f456600..f2fe63fa9ec5 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -1311,6 +1311,7 @@ usb_dwc3: usb@ffe7040000 {
+ 				reg = <0xff 0xe7040000 0x0 0x10000>;
+ 				interrupts = <68 IRQ_TYPE_LEVEL_HIGH>;
+ 				dr_mode = "host";
++				snps,dis_u2_susphy_quirk;
+ 				snps,usb3_lpm_capable;
+ 				status = "disabled";
+ 			};
+-- 
+2.43.0
+

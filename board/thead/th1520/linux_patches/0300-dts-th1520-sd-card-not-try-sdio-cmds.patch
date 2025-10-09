@@ -1,0 +1,81 @@
+From 0ccb65c2074578c3fd8e9134e63eb7491d4bec4d Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:15:34 +0800
+Subject: [PATCH 300/400] dts: th1520: sd card not try sdio cmds
+
+There may response in sdio CMD5 when sd card trys sdio cmds.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi            | 1 +
+ arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts     | 2 ++
+ arch/riscv/boot/dts/thead/th1520-crash.dtsi            | 1 +
+ arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi | 1 +
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi           | 1 +
+ 5 files changed, 6 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 322dc76d02d9..e677da56822a 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -3182,6 +3182,7 @@ &sdio0 {
+        bus-width = <4>;
+        max-frequency = <198000000>;
+        wprtn_ignore;
++       no-sdio;
+        status = "okay";
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index 4bdf7e0ff4c4..fd1b01a05a00 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -249,6 +249,8 @@ &sdio0 {
+ 	pinctrl-0 = <&sdio0_pins>;
+ 	bus-width = <4>;
+ 	max-frequency = <198000000>;
++	wprtn_ignore;
++	no-sdio;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-crash.dtsi b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+index 1b91e6b600a9..d4667c9b9c15 100644
+--- a/arch/riscv/boot/dts/thead/th1520-crash.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+@@ -372,6 +372,7 @@ &sdio0 {
+ 	pinctrl-0 = <&sdio0_pins>;
+ 	bus-width = <4>;
+ 	max-frequency = <198000000>;
++	no-sdio;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index 5391d3c3b449..aa98efe6f62b 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -427,6 +427,7 @@ &sdio0 {
+        pinctrl-0 = <&sdio0_pins>;
+        bus-width = <4>;
+        max-frequency = <198000000>;
++       no-sdio;
+        status = "okay";
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index 90716e0d4140..18fe0e600657 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -955,6 +955,7 @@ &sdio0 {
+ 	bus-width = <4>;
+ 	pull_up;
+ 	wprtn_ignore;
++	no-sdio;
+ 	status = "okay";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&sdio0_pins>;
+-- 
+2.43.0
+

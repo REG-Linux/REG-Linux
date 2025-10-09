@@ -1,0 +1,30 @@
+From 5a117fa8007981c3079b4c752e07efad6f6e2437 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:05:14 +0800
+Subject: [PATCH 221/400] drivers: pinctrl: correct th1520 audio i2c1 bit
+ mapping table
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/pinctrl/pinctrl-th1520.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/pinctrl-th1520.c b/drivers/pinctrl/pinctrl-th1520.c
+index 19ef2ccba46a..76061aab2638 100644
+--- a/drivers/pinctrl/pinctrl-th1520.c
++++ b/drivers/pinctrl/pinctrl-th1520.c
+@@ -420,8 +420,8 @@ static const struct pinctrl_pin_desc th1520_group4_pins[] = {
+ 	TH1520_PAD(17, PA17_FUNC, AUD_I2S1, AUD_VAD_PDM, AUD_VAD,    AUD_I2C1,    ____, ____, 0),
+ 	TH1520_PAD(18, PA18_FUNC, AUD_I2S2, AUD_TDM,     AUD_VAD,    ____,        ____, ____, 0),
+ 	TH1520_PAD(19, PA19_FUNC, AUD_I2S2, AUD_TDM,     AUD_VAD,    ____,        ____, ____, 0),
+-	TH1520_PAD(20, PA20_FUNC, AUD_I2S2, AUD_TDM,     AUD_I2C1,   AUD_I2C1,    ____, ____, 0),
+-	TH1520_PAD(21, PA21_FUNC, AUD_I2S2, AUD_SPDIF0,  AUD_I2C1,   AUD_I2C1,    ____, ____, 0),
++	TH1520_PAD(20, PA20_FUNC, AUD_I2S2, AUD_TDM,     AUD_I2C1,   ____,        ____, ____, 0),
++	TH1520_PAD(21, PA21_FUNC, AUD_I2S2, AUD_SPDIF0,  AUD_I2C1,   ____,        ____, ____, 0),
+ 	TH1520_PAD(22, PA22_FUNC, AUD_I2S2, AUD_SPDIF0,  ____,       ____,        ____, ____, 0),
+ 	TH1520_PAD(23, PA23_FUNC, ____,     AUD_SPDIF1,  AUD_SPDIF0, ____,        ____, ____, 0),
+ 	TH1520_PAD(24, PA24_FUNC, ____,     AUD_SPDIF1,  AUD_SPDIF0, AUD_I2S_8CH, ____, ____, 0),
+-- 
+2.43.0
+

@@ -1,0 +1,26 @@
+From 34aaf36079b05b24529d20742400a6dc67a43ea9 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Fri, 13 Sep 2024 20:18:07 +0800
+Subject: [PATCH 324/400] config: enable ARCH_XUANTIE
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/configs/revyos_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/configs/revyos_defconfig b/arch/riscv/configs/revyos_defconfig
+index 5d6a37d0fc9e..2713b79cff55 100644
+--- a/arch/riscv/configs/revyos_defconfig
++++ b/arch/riscv/configs/revyos_defconfig
+@@ -39,6 +39,7 @@ CONFIG_EXPERT=y
+ CONFIG_PROFILING=y
+ CONFIG_KEXEC=y
+ CONFIG_ARCH_THEAD=y
++CONFIG_ARCH_XUANTIE=y
+ CONFIG_SMP=y
+ CONFIG_NUMA=y
+ # CONFIG_RISCV_ISA_SVNAPOT is not set
+-- 
+2.43.0
+

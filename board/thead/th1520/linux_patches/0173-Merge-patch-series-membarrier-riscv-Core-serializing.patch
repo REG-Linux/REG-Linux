@@ -1,0 +1,352 @@
+From adeebe8906b328bffa4a8ccefe0390e235030dca Mon Sep 17 00:00:00 2001
+From: Palmer Dabbelt <palmer@rivosinc.com>
+Date: Thu, 15 Feb 2024 08:04:23 -0800
+Subject: [PATCH 173/400] Merge patch series "membarrier: riscv: Core
+ serializing command"
+
+RISC-V was lacking a membarrier implementation for the store/fetch
+ordering, which is a bit tricky because of the deferred icache flushing
+we use in RISC-V.
+
+* b4-shazam-merge:
+  membarrier: riscv: Provide core serializing command
+  locking: Introduce prepare_sync_core_cmd()
+  membarrier: Create Documentation/scheduler/membarrier.rst
+  membarrier: riscv: Add full memory barrier in switch_mm()
+
+Link: https://lore.kernel.org/r/20240131144936.29190-1-parri.andrea@gmail.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+---
+ .../membarrier-sync-core/arch-support.txt     | 18 ++++++++-
+ Documentation/scheduler/index.rst             |  1 +
+ Documentation/scheduler/membarrier.rst        | 39 +++++++++++++++++++
+ MAINTAINERS                                   |  2 +
+ arch/riscv/Kconfig                            |  3 ++
+ arch/riscv/include/asm/membarrier.h           | 19 +++++++++
+ arch/riscv/include/asm/sync_core.h            | 29 ++++++++++++++
+ include/linux/sync_core.h                     | 16 +++++++-
+ init/Kconfig                                  |  3 ++
+ kernel/sched/core.c                           | 11 +++++-
+ kernel/sched/membarrier.c                     | 13 +++++--
+ 11 files changed, 147 insertions(+), 7 deletions(-)
+ create mode 100644 Documentation/scheduler/membarrier.rst
+ create mode 100644 arch/riscv/include/asm/sync_core.h
+
+diff --git a/Documentation/features/sched/membarrier-sync-core/arch-support.txt b/Documentation/features/sched/membarrier-sync-core/arch-support.txt
+index 23260ca44946..76597adfb7d5 100644
+--- a/Documentation/features/sched/membarrier-sync-core/arch-support.txt
++++ b/Documentation/features/sched/membarrier-sync-core/arch-support.txt
+@@ -10,6 +10,22 @@
+ # Rely on implicit context synchronization as a result of exception return
+ # when returning from IPI handler, and when returning to user-space.
+ #
++# * riscv
++#
++# riscv uses xRET as return from interrupt and to return to user-space.
++#
++# Given that xRET is not core serializing, we rely on FENCE.I for providing
++# core serialization:
++#
++#  - by calling sync_core_before_usermode() on return from interrupt (cf.
++#    ipi_sync_core()),
++#
++#  - via switch_mm() and sync_core_before_usermode() (respectively, for
++#    uthread->uthread and kthread->uthread transitions) before returning
++#    to user-space.
++#
++#  The serialization in switch_mm() is activated by prepare_sync_core_cmd().
++#
+ # * x86
+ #
+ # x86-32 uses IRET as return from interrupt, which takes care of the IPI.
+@@ -44,7 +60,7 @@
+     |    openrisc: | TODO |
+     |      parisc: | TODO |
+     |     powerpc: |  ok  |
+-    |       riscv: | TODO |
++    |       riscv: |  ok  |
+     |        s390: |  ok  |
+     |          sh: | TODO |
+     |       sparc: | TODO |
+diff --git a/Documentation/scheduler/index.rst b/Documentation/scheduler/index.rst
+index 3170747226f6..43bd8a145b7a 100644
+--- a/Documentation/scheduler/index.rst
++++ b/Documentation/scheduler/index.rst
+@@ -7,6 +7,7 @@ Scheduler
+ 
+ 
+     completion
++    membarrier
+     sched-arch
+     sched-bwc
+     sched-deadline
+diff --git a/Documentation/scheduler/membarrier.rst b/Documentation/scheduler/membarrier.rst
+new file mode 100644
+index 000000000000..2387804b1c63
+--- /dev/null
++++ b/Documentation/scheduler/membarrier.rst
+@@ -0,0 +1,39 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++========================
++membarrier() System Call
++========================
++
++MEMBARRIER_CMD_{PRIVATE,GLOBAL}_EXPEDITED - Architecture requirements
++=====================================================================
++
++Memory barriers before updating rq->curr
++----------------------------------------
++
++The commands MEMBARRIER_CMD_PRIVATE_EXPEDITED and MEMBARRIER_CMD_GLOBAL_EXPEDITED
++require each architecture to have a full memory barrier after coming from
++user-space, before updating rq->curr.  This barrier is implied by the sequence
++rq_lock(); smp_mb__after_spinlock() in __schedule().  The barrier matches a full
++barrier in the proximity of the membarrier system call exit, cf.
++membarrier_{private,global}_expedited().
++
++Memory barriers after updating rq->curr
++---------------------------------------
++
++The commands MEMBARRIER_CMD_PRIVATE_EXPEDITED and MEMBARRIER_CMD_GLOBAL_EXPEDITED
++require each architecture to have a full memory barrier after updating rq->curr,
++before returning to user-space.  The schemes providing this barrier on the various
++architectures are as follows.
++
++ - alpha, arc, arm, hexagon, mips rely on the full barrier implied by
++   spin_unlock() in finish_lock_switch().
++
++ - arm64 relies on the full barrier implied by switch_to().
++
++ - powerpc, riscv, s390, sparc, x86 rely on the full barrier implied by
++   switch_mm(), if mm is not NULL; they rely on the full barrier implied
++   by mmdrop(), otherwise.  On powerpc and riscv, switch_mm() relies on
++   membarrier_arch_switch_mm().
++
++The barrier matches a full barrier in the proximity of the membarrier system call
++entry, cf. membarrier_{private,global}_expedited().
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 935bf57aa78b..123c2af8475a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13703,7 +13703,9 @@ M:	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+ M:	"Paul E. McKenney" <paulmck@kernel.org>
+ L:	linux-kernel@vger.kernel.org
+ S:	Supported
++F:	Documentation/scheduler/membarrier.rst
+ F:	arch/*/include/asm/membarrier.h
++F:	arch/*/include/asm/sync_core.h
+ F:	include/uapi/linux/membarrier.h
+ F:	kernel/sched/membarrier.c
+ 
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index e4e4dd9adf82..55b02645a910 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -28,14 +28,17 @@ config RISCV
+ 	select ARCH_HAS_GIGANTIC_PAGE
+ 	select ARCH_HAS_KCOV
+ 	select ARCH_HAS_MEMBARRIER_CALLBACKS
++	select ARCH_HAS_MEMBARRIER_SYNC_CORE
+ 	select ARCH_HAS_MMIOWB
+ 	select ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
+ 	select ARCH_HAS_PMEM_API
++	select ARCH_HAS_PREPARE_SYNC_CORE_CMD
+ 	select ARCH_HAS_PTE_SPECIAL
+ 	select ARCH_HAS_SET_DIRECT_MAP if MMU
+ 	select ARCH_HAS_SET_MEMORY if MMU
+ 	select ARCH_HAS_STRICT_KERNEL_RWX if MMU && !XIP_KERNEL
+ 	select ARCH_HAS_STRICT_MODULE_RWX if MMU && !XIP_KERNEL
++	select ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
+ 	select ARCH_HAS_SYSCALL_WRAPPER
+ 	select ARCH_HAS_TICK_BROADCAST if GENERIC_CLOCKEVENTS_BROADCAST
+ 	select ARCH_HAS_UBSAN_SANITIZE_ALL
+diff --git a/arch/riscv/include/asm/membarrier.h b/arch/riscv/include/asm/membarrier.h
+index 6c016ebb5020..47b240d0d596 100644
+--- a/arch/riscv/include/asm/membarrier.h
++++ b/arch/riscv/include/asm/membarrier.h
+@@ -22,6 +22,25 @@ static inline void membarrier_arch_switch_mm(struct mm_struct *prev,
+ 	/*
+ 	 * The membarrier system call requires a full memory barrier
+ 	 * after storing to rq->curr, before going back to user-space.
++	 *
++	 * This barrier is also needed for the SYNC_CORE command when
++	 * switching between processes; in particular, on a transition
++	 * from a thread belonging to another mm to a thread belonging
++	 * to the mm for which a membarrier SYNC_CORE is done on CPU0:
++	 *
++	 *   - [CPU0] sets all bits in the mm icache_stale_mask (in
++	 *     prepare_sync_core_cmd());
++	 *
++	 *   - [CPU1] stores to rq->curr (by the scheduler);
++	 *
++	 *   - [CPU0] loads rq->curr within membarrier and observes
++	 *     cpu_rq(1)->curr->mm != mm, so the IPI is skipped on
++	 *     CPU1; this means membarrier relies on switch_mm() to
++	 *     issue the sync-core;
++	 *
++	 *   - [CPU1] switch_mm() loads icache_stale_mask; if the bit
++	 *     is zero, switch_mm() may incorrectly skip the sync-core.
++	 *
+ 	 * Matches a full barrier in the proximity of the membarrier
+ 	 * system call entry.
+ 	 */
+diff --git a/arch/riscv/include/asm/sync_core.h b/arch/riscv/include/asm/sync_core.h
+new file mode 100644
+index 000000000000..9153016da8f1
+--- /dev/null
++++ b/arch/riscv/include/asm/sync_core.h
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_RISCV_SYNC_CORE_H
++#define _ASM_RISCV_SYNC_CORE_H
++
++/*
++ * RISC-V implements return to user-space through an xRET instruction,
++ * which is not core serializing.
++ */
++static inline void sync_core_before_usermode(void)
++{
++	asm volatile ("fence.i" ::: "memory");
++}
++
++#ifdef CONFIG_SMP
++/*
++ * Ensure the next switch_mm() on every CPU issues a core serializing
++ * instruction for the given @mm.
++ */
++static inline void prepare_sync_core_cmd(struct mm_struct *mm)
++{
++	cpumask_setall(&mm->context.icache_stale_mask);
++}
++#else
++static inline void prepare_sync_core_cmd(struct mm_struct *mm)
++{
++}
++#endif /* CONFIG_SMP */
++
++#endif /* _ASM_RISCV_SYNC_CORE_H */
+diff --git a/include/linux/sync_core.h b/include/linux/sync_core.h
+index 013da4b8b327..67bb9794b875 100644
+--- a/include/linux/sync_core.h
++++ b/include/linux/sync_core.h
+@@ -17,5 +17,19 @@ static inline void sync_core_before_usermode(void)
+ }
+ #endif
+ 
+-#endif /* _LINUX_SYNC_CORE_H */
++#ifdef CONFIG_ARCH_HAS_PREPARE_SYNC_CORE_CMD
++#include <asm/sync_core.h>
++#else
++/*
++ * This is a dummy prepare_sync_core_cmd() implementation that can be used on
++ * all architectures which provide unconditional core serializing instructions
++ * in switch_mm().
++ * If your architecture doesn't provide such core serializing instructions in
++ * switch_mm(), you may need to write your own functions.
++ */
++static inline void prepare_sync_core_cmd(struct mm_struct *mm)
++{
++}
++#endif
+ 
++#endif /* _LINUX_SYNC_CORE_H */
+diff --git a/init/Kconfig b/init/Kconfig
+index 8b630143c720..e2463d3e8ba7 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1994,6 +1994,9 @@ source "kernel/Kconfig.locks"
+ config ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
+ 	bool
+ 
++config ARCH_HAS_PREPARE_SYNC_CORE_CMD
++	bool
++
+ config ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
+ 	bool
+ 
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 1b5e4389f788..5f0b82502b2c 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -6608,7 +6608,9 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 	 *     if (signal_pending_state())	    if (p->state & @state)
+ 	 *
+ 	 * Also, the membarrier system call requires a full memory barrier
+-	 * after coming from user-space, before storing to rq->curr.
++	 * after coming from user-space, before storing to rq->curr; this
++	 * barrier matches a full barrier in the proximity of the membarrier
++	 * system call exit.
+ 	 */
+ 	rq_lock(rq, &rf);
+ 	smp_mb__after_spinlock();
+@@ -6686,6 +6688,13 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 		 *   architectures where spin_unlock is a full barrier,
+ 		 * - switch_to() for arm64 (weakly-ordered, spin_unlock
+ 		 *   is a RELEASE barrier),
++		 *
++		 * The barrier matches a full barrier in the proximity of
++		 * the membarrier system call entry.
++		 *
++		 * On RISC-V, this barrier pairing is also needed for the
++		 * SYNC_CORE command when switching between processes, cf.
++		 * the inline comments in membarrier_arch_switch_mm().
+ 		 */
+ 		++*switch_count;
+ 
+diff --git a/kernel/sched/membarrier.c b/kernel/sched/membarrier.c
+index 4e715b9b278e..809194cd779f 100644
+--- a/kernel/sched/membarrier.c
++++ b/kernel/sched/membarrier.c
+@@ -254,7 +254,7 @@ static int membarrier_global_expedited(void)
+ 		return 0;
+ 
+ 	/*
+-	 * Matches memory barriers around rq->curr modification in
++	 * Matches memory barriers after rq->curr modification in
+ 	 * scheduler.
+ 	 */
+ 	smp_mb();	/* system call entry is not a mb. */
+@@ -304,7 +304,7 @@ static int membarrier_global_expedited(void)
+ 
+ 	/*
+ 	 * Memory barrier on the caller thread _after_ we finished
+-	 * waiting for the last IPI. Matches memory barriers around
++	 * waiting for the last IPI. Matches memory barriers before
+ 	 * rq->curr modification in scheduler.
+ 	 */
+ 	smp_mb();	/* exit from system call is not a mb */
+@@ -324,6 +324,7 @@ static int membarrier_private_expedited(int flags, int cpu_id)
+ 		      MEMBARRIER_STATE_PRIVATE_EXPEDITED_SYNC_CORE_READY))
+ 			return -EPERM;
+ 		ipi_func = ipi_sync_core;
++		prepare_sync_core_cmd(mm);
+ 	} else if (flags == MEMBARRIER_FLAG_RSEQ) {
+ 		if (!IS_ENABLED(CONFIG_RSEQ))
+ 			return -EINVAL;
+@@ -343,8 +344,12 @@ static int membarrier_private_expedited(int flags, int cpu_id)
+ 		return 0;
+ 
+ 	/*
+-	 * Matches memory barriers around rq->curr modification in
++	 * Matches memory barriers after rq->curr modification in
+ 	 * scheduler.
++	 *
++	 * On RISC-V, this barrier pairing is also needed for the
++	 * SYNC_CORE command when switching between processes, cf.
++	 * the inline comments in membarrier_arch_switch_mm().
+ 	 */
+ 	smp_mb();	/* system call entry is not a mb. */
+ 
+@@ -420,7 +425,7 @@ static int membarrier_private_expedited(int flags, int cpu_id)
+ 
+ 	/*
+ 	 * Memory barrier on the caller thread _after_ we finished
+-	 * waiting for the last IPI. Matches memory barriers around
++	 * waiting for the last IPI. Matches memory barriers before
+ 	 * rq->curr modification in scheduler.
+ 	 */
+ 	smp_mb();	/* exit from system call is not a mb */
+-- 
+2.43.0
+

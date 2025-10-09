@@ -1,0 +1,40 @@
+From b917dd9f2c0cc10ae947c95e7a27d8feed13e079 Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Fri, 2 May 2025 00:59:00 +0800
+Subject: [PATCH 023/400] fix: qspinlock: SG2042: backport to linux 6.6
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/kernel/setup.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+index 7887ab2233a9..7efed8fa3de5 100644
+--- a/arch/riscv/kernel/setup.c
++++ b/arch/riscv/kernel/setup.c
+@@ -312,12 +312,7 @@ static void __init riscv_spinlock_init(void)
+ 		return;
+ 	}
+ 
+-	if (IS_ENABLED(CONFIG_RISCV_ISA_ZABHA) &&
+-	    IS_ENABLED(CONFIG_RISCV_ISA_ZACAS) &&
+-	    riscv_isa_extension_available(NULL, ZABHA) &&
+-	    riscv_isa_extension_available(NULL, ZACAS)) {
+-		using_ext = "using Zabha";
+-	} else if (riscv_isa_extension_available(NULL, ZICCRSE)) {
++	if (riscv_isa_extension_available(NULL, ZICCRSE)) {
+ 		using_ext = "using Ziccrse";
+ 	}
+ #if defined(CONFIG_RISCV_COMBO_SPINLOCKS)
+@@ -329,7 +324,7 @@ static void __init riscv_spinlock_init(void)
+ #endif
+ 
+ 	if (!using_ext)
+-		pr_err("Queued spinlock without Zabha or Ziccrse");
++		pr_err("Queued spinlock without Ziccrse");
+ 	else
+ 		pr_info("Queued spinlock %s: enabled\n", using_ext);
+ }
+-- 
+2.43.0
+

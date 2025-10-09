@@ -1,0 +1,113 @@
+From 3bcdbc002f5c76a2f92220222431f2244bd500ca Mon Sep 17 00:00:00 2001
+From: tingming <minghq@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:18:42 +0800
+Subject: [PATCH 191/400] dts: th1520: to add npu device node
+
+Signed-off-by: tingming <minghq@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi   | 11 +++++
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 11 +++++
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 49 +++++++++++++++++++
+ 3 files changed, 71 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 54c032baa2ad..62c68cb064fe 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -1364,3 +1364,14 @@ &gpio3 {
+ 			  "GPIO09",
+ 			  "GPIO10";
+ };
++
++&npu {
++	vha_clk_rate = <1000000000>;
++	status = "okay";
++};
++
++&npu_opp_table {
++	opp-1000000000 {
++		opp-suspend;
++	};
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 098dbeb91e12..9c80e39c8db7 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -1244,3 +1244,14 @@ &xtensa_dsp1 {
+ 	status = "okay";
+ 	memory-region = <&dsp1_mem>;
+ };
++
++&npu {
++	vha_clk_rate = <1000000000>;
++	status = "okay";
++};
++
++&npu_opp_table {
++	opp-1000000000 {
++		opp-suspend;
++	};
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index f24f3bd8b270..9165ebac6904 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -2093,5 +2093,54 @@ opp-1000000000 {
+ 				opp-suspend;
+ 			};
+ 		};
++
++		npu: vha@fffc800000 {
++			compatible = "img,ax3386-nna";
++			reg = <0xff 0xfc800000 0x0 0x100000>;
++			interrupts = <113 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "npuirq";
++			#cooling-cells = <2>;
++			dynamic-power-coefficient = <1600>;
++			power-domains = <&pd TH1520_AON_NPU_PD>;
++			clocks = <&clk CLKGEN_TOP_APB_SX_PCLK>,
++				<&clk CLKGEN_TOP_AXI4S_ACLK>,
++				<&clk NPU_CCLK>,
++				<&clk GMAC_PLL_FOUTPOSTDIV>,
++				<&clk NPU_CCLK_OUT_DIV>;
++			clock-names = "pclk", "aclk", "cclk",
++				"gmac_pll_foutpostdiv",
++				"npu_cclk_out_div";
++			operating-points-v2 = <&npu_opp_table>;
++			vha_clk_rate = <1000000000>;
++			ldo_vha-supply = <&npu>;
++			dma-mask = <0xff 0xffffffff>;
++			resets = <&rst TH1520_RESET_NPU>;
++			status = "disabled";
++		};
++
++		npu_opp_table: opp-table {
++			compatible = "operating-points-v2";
++
++			opp-1000000000 {
++				opp-hz = /bits/ 64 <1000000000>;
++				opp-microvolt = <800000>;
++			};
++			opp-792000000 {
++				opp-hz = /bits/ 64 <792000000>;
++				opp-microvolt = <800000>;
++			};
++			opp-594000000 {
++				opp-hz = /bits/ 64 <594000000>;
++				opp-microvolt = <800000>;
++			};
++			opp-475200000 {
++				opp-hz = /bits/ 64 <475200000>;
++				opp-microvolt = <800000>;
++			};
++			opp-396000000 {
++				opp-hz = /bits/ 64 <396000000>;
++				opp-microvolt = <800000>;
++			};
++		};
+ 	};
+ };
+-- 
+2.43.0
+

@@ -1,0 +1,46 @@
+From b8ceea210f49f2da1087cf932362aae5ba62b814 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Fri, 17 May 2024 17:30:57 +0800
+Subject: [PATCH 083/400] riscv: dts: thead: Add THEAD TH1520 ADC device node
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts |  4 ++++
+ arch/riscv/boot/dts/thead/th1520.dtsi             | 10 ++++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 14ea8ae1a36f..bb2a773d82a4 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -410,3 +410,7 @@ hub_3_0: hub@2 {
+ 		vbus-supply = <&vcc5v_usb>;
+ 	};
+ };
++
++&adc {
++	status = "okay";
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index ae610fb71b5d..b6896093dd8c 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -747,5 +747,15 @@ gpio4: gpio-controller@0 {
+ 				interrupts = <55 IRQ_TYPE_LEVEL_HIGH>;
+ 			};
+ 		};
++
++		adc: adc@0xfffff51000 {
++			compatible = "thead,th1520-adc";
++			reg = <0xff 0xfff51000 0x0 0x1000>;
++			interrupts = <61 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&aonsys_clk>;
++			clock-names = "adc";
++			/* ADC pin is proprietary,no need to config pinctrl */
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.43.0
+

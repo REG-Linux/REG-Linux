@@ -1,0 +1,50 @@
+From da5dffa94994e952c3cb7ea45de802e83de458bd Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:09:57 +0800
+Subject: [PATCH 231/400] audio: th1520: fix i2s pause/resume dma fail
+
+cherry-pick from:
+commit bd43f6ad339abdeb381d36ee8b44492194bdc9a6
+Author: nanli.yd <nanli.yd@linux.alibaba.com>
+Date:   Thu Sep 14 10:54:49 2023 +0800
+
+    audio: light: fix i2s pause/resume dma fail
+
+    Fix i2s pause/resume dma fail
+
+Signed-off-by: nanli.yd <nanli.yd@linux.alibaba.com>
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index 9714714eb6da..df7890ca4fc5 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -1189,6 +1189,8 @@ static int dma_chan_pause(struct dma_chan *dchan)
+ 	unsigned long flags;
+ 	unsigned int timeout = 20; /* timeout iterations */
+ 	u32 val;
++	int ret;
++	u32 chan_active = BIT(chan->id) << DMAC_CHAN_EN_SHIFT;
+ 
+ 	spin_lock_irqsave(&chan->vc.lock, flags);
+ 
+@@ -1227,6 +1229,12 @@ static int dma_chan_pause(struct dma_chan *dchan)
+ 	chan->ch_cfg_h = axi_chan_ioread32(chan, CH_CFG_H);
+ 	chan->ch_llp = axi_chan_ioread32(chan, CH_LLP);
+ 
++	axi_chan_disable(chan);
++	ret = readl_poll_timeout_atomic(chan->chip->regs + DMAC_CHEN, val,
++					!(val & chan_active), 1000, 100000);
++	if (ret == -ETIMEDOUT)
++		printk("%s %s failed to stop\n", __func__, axi_chan_name(chan));
++
+ 	return timeout ? 0 : -EAGAIN;
+ }
+ 
+-- 
+2.43.0
+

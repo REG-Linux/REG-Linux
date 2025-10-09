@@ -1,0 +1,72 @@
+From 212cc3db552577e87b179802c3bcf306350ce7cb Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Mon, 23 Dec 2024 00:23:28 +0800
+Subject: [PATCH 351/400] dts: meles: add 4g/16g devicetree
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/boot/dts/thead/Makefile              |  2 +-
+ .../boot/dts/thead/th1520-milkv-meles-16g.dts   | 17 +++++++++++++++++
+ .../boot/dts/thead/th1520-milkv-meles-4g.dts    | 16 ++++++++++++++++
+ 3 files changed, 34 insertions(+), 1 deletion(-)
+ create mode 100644 arch/riscv/boot/dts/thead/th1520-milkv-meles-16g.dts
+ create mode 100644 arch/riscv/boot/dts/thead/th1520-milkv-meles-4g.dts
+
+diff --git a/arch/riscv/boot/dts/thead/Makefile b/arch/riscv/boot/dts/thead/Makefile
+index 129f883e5bff..7286307eb3b5 100644
+--- a/arch/riscv/boot/dts/thead/Makefile
++++ b/arch/riscv/boot/dts/thead/Makefile
+@@ -6,4 +6,4 @@ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-a-val.dtb th1520-a-val-sec.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-a-val-audio.dtb th1520-a-val-audio-i2s-8ch.dtb th1520-a-val-audio-tdm.dtb th1520-a-val-audio-spdif.dtb th1520-a-val-crash.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-a-val-dsi0-dsi1.dtb th1520-a-val-dsi0-hdmi.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-rvbook-product.dtb th1520-rvbook-product-sec.dtb
+-dtb-$(CONFIG_ARCH_XUANTIE) += th1520-milkv-meles.dtb
++dtb-$(CONFIG_ARCH_XUANTIE) += th1520-milkv-meles.dtb th1520-milkv-meles-4g.dtb th1520-milkv-meles-16g.dtb
+diff --git a/arch/riscv/boot/dts/thead/th1520-milkv-meles-16g.dts b/arch/riscv/boot/dts/thead/th1520-milkv-meles-16g.dts
+new file mode 100644
+index 000000000000..031ed5188d8e
+--- /dev/null
++++ b/arch/riscv/boot/dts/thead/th1520-milkv-meles-16g.dts
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: (GPL-2.0 OR MIT) */
++/*
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ */
++
++#include "th1520-milkv-meles.dts"
++
++/ {
++	memory@0 {
++		device_type = "memory";
++		reg = <0x0 0x200000 0x3 0xffe00000>;
++	};
++};
++
++&cmamem {
++	alloc-ranges = <0x3 0xe4000000 0 0x14000000>; // [0x3E400_0000 ~ 0x3F800_0000]
++};
+diff --git a/arch/riscv/boot/dts/thead/th1520-milkv-meles-4g.dts b/arch/riscv/boot/dts/thead/th1520-milkv-meles-4g.dts
+new file mode 100644
+index 000000000000..713bfae344a2
+--- /dev/null
++++ b/arch/riscv/boot/dts/thead/th1520-milkv-meles-4g.dts
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: (GPL-2.0 OR MIT) */
++/*
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ */
++
++#include "th1520-milkv-meles.dts"
++
++/ {
++	model = "Milk-V Meles 4G";
++	compatible = "milkv,meles", "thead,th1520";
++
++	memory@0 {
++		device_type = "memory";
++		reg = <0x0 0x200000 0x0 0xffe00000>;
++	};
++};
+-- 
+2.43.0
+

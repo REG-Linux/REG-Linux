@@ -1,0 +1,136 @@
+From dcc638abeeea5c5aa6c5efbf824afe36c8b474a8 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Fri, 19 Jul 2024 09:15:20 -0700
+Subject: [PATCH 033/400] riscv: Introduce vendor variants of extension helpers
+
+[ Upstream commit 0f2425411101128a38ad0166268975ca11fbcaeb ]
+
+Vendor extensions are maintained in per-vendor structs (separate from
+standard extensions which live in riscv_isa). Create vendor variants for
+the existing extension helpers to interface with the riscv_isa_vendor
+bitmaps.
+
+Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Andy Chiu <andy.chiu@sifive.com>
+Link: https://lore.kernel.org/r/20240719-support_vendor_extensions-v3-3-0af7587bbec0@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+ arch/riscv/include/asm/vendor_extensions.h | 83 ++++++++++++++++++++++
+ drivers/perf/riscv_pmu_sbi.c               |  3 +-
+ 2 files changed, 85 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/include/asm/vendor_extensions.h b/arch/riscv/include/asm/vendor_extensions.h
+index 19d6d72768e8..5d4a2973b34c 100644
+--- a/arch/riscv/include/asm/vendor_extensions.h
++++ b/arch/riscv/include/asm/vendor_extensions.h
+@@ -41,8 +41,91 @@ extern const size_t riscv_isa_vendor_ext_list_size;
+ #define VENDOR_EXT_ALL_CPUS			-1
+ 
+ bool __riscv_isa_vendor_extension_available(int cpu, unsigned long vendor, unsigned int bit);
++#define riscv_cpu_isa_vendor_extension_available(cpu, vendor, ext)	\
++	__riscv_isa_vendor_extension_available(cpu, vendor, RISCV_ISA_VENDOR_EXT_##ext)
+ #define riscv_isa_vendor_extension_available(vendor, ext)	\
+ 	__riscv_isa_vendor_extension_available(VENDOR_EXT_ALL_CPUS, vendor, \
+ 					       RISCV_ISA_VENDOR_EXT_##ext)
+ 
++static __always_inline bool __riscv_has_extension_likely(const unsigned long vendor,
++							 const unsigned long ext)
++{
++	asm goto(ALTERNATIVE("j	%l[l_no]", "nop", %[vendor], %[ext], 1)
++	:
++	: [vendor] "i" (vendor), [ext] "i" (ext)
++	:
++	: l_no);
++
++	return true;
++l_no:
++	return false;
++}
++
++static __always_inline bool __riscv_has_extension_unlikely(const unsigned long vendor,
++							   const unsigned long ext)
++{
++	asm goto(ALTERNATIVE("nop", "j	%l[l_yes]", %[vendor], %[ext], 1)
++	:
++	: [vendor] "i" (vendor), [ext] "i" (ext)
++	:
++	: l_yes);
++
++	return false;
++l_yes:
++	return true;
++}
++
++static __always_inline bool riscv_has_vendor_extension_likely(const unsigned long vendor,
++							      const unsigned long ext)
++{
++	if (!IS_ENABLED(CONFIG_RISCV_ISA_VENDOR_EXT))
++		return false;
++
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE))
++		return __riscv_has_extension_likely(vendor,
++						    ext + RISCV_VENDOR_EXT_ALTERNATIVES_BASE);
++
++	return __riscv_isa_vendor_extension_available(VENDOR_EXT_ALL_CPUS, vendor, ext);
++}
++
++static __always_inline bool riscv_has_vendor_extension_unlikely(const unsigned long vendor,
++								const unsigned long ext)
++{
++	if (!IS_ENABLED(CONFIG_RISCV_ISA_VENDOR_EXT))
++		return false;
++
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE))
++		return __riscv_has_extension_unlikely(vendor,
++						      ext + RISCV_VENDOR_EXT_ALTERNATIVES_BASE);
++
++	return __riscv_isa_vendor_extension_available(VENDOR_EXT_ALL_CPUS, vendor, ext);
++}
++
++static __always_inline bool riscv_cpu_has_vendor_extension_likely(const unsigned long vendor,
++								  int cpu, const unsigned long ext)
++{
++	if (!IS_ENABLED(CONFIG_RISCV_ISA_VENDOR_EXT))
++		return false;
++
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE) &&
++	    __riscv_has_extension_likely(vendor, ext + RISCV_VENDOR_EXT_ALTERNATIVES_BASE))
++		return true;
++
++	return __riscv_isa_vendor_extension_available(cpu, vendor, ext);
++}
++
++static __always_inline bool riscv_cpu_has_vendor_extension_unlikely(const unsigned long vendor,
++								    int cpu,
++								    const unsigned long ext)
++{
++	if (!IS_ENABLED(CONFIG_RISCV_ISA_VENDOR_EXT))
++		return false;
++
++	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE) &&
++	    __riscv_has_extension_unlikely(vendor, ext + RISCV_VENDOR_EXT_ALTERNATIVES_BASE))
++		return true;
++
++	return __riscv_isa_vendor_extension_available(cpu, vendor, ext);
++}
++
+ #endif /* _ASM_VENDOR_EXTENSIONS_H */
+diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+index 86e62858eb16..e731f81db4cc 100644
+--- a/drivers/perf/riscv_pmu_sbi.c
++++ b/drivers/perf/riscv_pmu_sbi.c
+@@ -848,7 +848,8 @@ static int pmu_sbi_setup_irqs(struct riscv_pmu *pmu, struct platform_device *pde
+ 		   riscv_cached_mimpid(0) == 0) {
+ 		riscv_pmu_irq_num = THEAD_C9XX_RV_IRQ_PMU;
+ 		riscv_pmu_use_irq = true;
+-	} else if (riscv_isa_vendor_extension_available(ANDESTECH_VENDOR_ID, XANDESPMU) &&
++	} else if (riscv_has_vendor_extension_unlikely(ANDESTECH_VENDOR_ID,
++						       RISCV_ISA_VENDOR_EXT_XANDESPMU) &&
+ 		   IS_ENABLED(CONFIG_ANDES_CUSTOM_PMU)) {
+ 		riscv_pmu_irq_num = ANDES_SLI_CAUSE_BASE + ANDES_RV_IRQ_PMOVI;
+ 		riscv_pmu_use_irq = true;
+-- 
+2.43.0
+

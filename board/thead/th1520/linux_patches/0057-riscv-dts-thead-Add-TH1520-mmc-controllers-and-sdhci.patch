@@ -1,0 +1,79 @@
+From 7f72f35bccb61c1a46a4b742ff089548e84b1db0 Mon Sep 17 00:00:00 2001
+From: Drew Fustini <dfustini@baylibre.com>
+Date: Wed, 6 Dec 2023 00:09:22 -0800
+Subject: [PATCH 057/400] riscv: dts: thead: Add TH1520 mmc controllers and
+ sdhci clock
+
+Add node for the fixed reference clock used for emmc and sdio nodes.
+Add emmc node for the 1st dwcmshc instance which is typically connected
+to an eMMC device. Add sdio0 node for the 2nd dwcmshc instance which is
+typically connected to microSD slot. Add sdio1 node for the 3rd dwcmshc
+instance which is typically connected to an SDIO WiFi module. The node
+names are based on Table 1-2 C910/C906 memory map in the TH1520 System
+User Manual.
+
+Link: https://git.beagleboard.org/beaglev-ahead/beaglev-ahead/-/tree/main/docs
+Signed-off-by: Drew Fustini <dfustini@baylibre.com>
+Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Reviewed-by: Guo Ren <guoren@kernel.org>
+Link: https://lore.kernel.org/r/20231206-th1520_mmc_dts-v8-2-69220e373e8f@baylibre.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 34 +++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index b10e07d03518..e518728149a2 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -140,6 +140,13 @@ uart_sclk: uart-sclk-clock {
+ 		#clock-cells = <0>;
+ 	};
+ 
++	sdhci_clk: sdhci-clock {
++		compatible = "fixed-clock";
++		clock-frequency = <198000000>;
++		clock-output-names = "sdhci_clk";
++		#clock-cells = <0>;
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		interrupt-parent = <&plic>;
+@@ -314,6 +321,33 @@ dmac0: dma-controller@ffefc00000 {
+ 			status = "disabled";
+ 		};
+ 
++		emmc: mmc@ffe7080000 {
++			compatible = "thead,th1520-dwcmshc";
++			reg = <0xff 0xe7080000 0x0 0x10000>;
++			interrupts = <62 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&sdhci_clk>;
++			clock-names = "core";
++			status = "disabled";
++		};
++
++		sdio0: mmc@ffe7090000 {
++			compatible = "thead,th1520-dwcmshc";
++			reg = <0xff 0xe7090000 0x0 0x10000>;
++			interrupts = <64 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&sdhci_clk>;
++			clock-names = "core";
++			status = "disabled";
++		};
++
++		sdio1: mmc@ffe70a0000 {
++			compatible = "thead,th1520-dwcmshc";
++			reg = <0xff 0xe70a0000 0x0 0x10000>;
++			interrupts = <71 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&sdhci_clk>;
++			clock-names = "core";
++			status = "disabled";
++		};
++
+ 		timer0: timer@ffefc32000 {
+ 			compatible = "snps,dw-apb-timer";
+ 			reg = <0xff 0xefc32000 0x0 0x14>;
+-- 
+2.43.0
+

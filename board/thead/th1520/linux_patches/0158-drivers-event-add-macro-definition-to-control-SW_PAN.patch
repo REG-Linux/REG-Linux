@@ -1,0 +1,34 @@
+From 387e1359724fe24853ad61daa03a5f0fa5e0b1d0 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Thu, 4 Jul 2024 14:59:18 +0800
+Subject: [PATCH 158/400] drivers: event: add macro definition to control
+ SW_PANIC event
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ kernel/panic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/panic.c b/kernel/panic.c
+index 889600a5b59c..b0282ba69b2a 100644
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -282,12 +282,14 @@ void panic(const char *fmt, ...)
+ 	int state = 0;
+ 	int old_cpu, this_cpu;
+ 	bool _crash_kexec_post_notifiers = crash_kexec_post_notifiers;
++
++#ifdef CONFIG_TH1520_REBOOTMODE
+ 	enum th1520_rebootmode_index mode;
+ 
+ 	if (!th1520_event_get_rebootmode(&mode) &&
+ 			mode != TH1520_EVENT_SW_WATCHDOG)
+ 			th1520_event_set_rebootmode(TH1520_EVENT_SW_PANIC);
+-
++#endif
+ 	if (panic_on_warn) {
+ 		/*
+ 		 * This thread may hit another WARN() in the panic path.
+-- 
+2.43.0
+

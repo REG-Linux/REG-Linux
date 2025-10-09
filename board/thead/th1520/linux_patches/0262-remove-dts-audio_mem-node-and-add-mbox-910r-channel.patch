@@ -1,0 +1,126 @@
+From 01c5e473a15e046767c47cc51b57d806efef5de9 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:37:35 +0800
+Subject: [PATCH 262/400] remove dts "audio_mem" node and add mbox 910r channel
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+1: remove "audio_mem" node,because "audio_text_mem" 、"audio_data_mem" and "audio_log_mem" cover it
+2: add "mbox_910r" node,it will be used in opensbi to info 902
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi    |  3 ---
+ arch/riscv/boot/dts/thead/th1520-crash.dtsi    |  3 ---
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts     |  3 ---
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi   | 13 +++++++++----
+ arch/riscv/boot/dts/thead/th1520.dtsi          | 18 ++++++++++++++++++
+ 5 files changed, 27 insertions(+), 13 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 435e7ee1c66d..9583b633d957 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -2727,9 +2727,6 @@ audio_log_mem: memory@33400000 {
+         reg = <0x0 0x33400000 0x0 0x200000>;
+ 	};
+ 	//Note: with "no-map" reserv mem not saved in hibernation
+-    audio_mem: memory@32000000 {
+-		reg = <0x0 0x32000000 0x0 0x6400000>;
+-    };
+ 	rpmsgmem: memory@1E000000 {
+ 		reg = <0x0 0x1E000000 0x0 0x10000>;
+ 	};
+diff --git a/arch/riscv/boot/dts/thead/th1520-crash.dtsi b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+index 108714357167..fefde06e0e0d 100644
+--- a/arch/riscv/boot/dts/thead/th1520-crash.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+@@ -134,9 +134,6 @@ audio_log_mem: memory@33400000 {
+         reg = <0x0 0x33400000 0x0 0x200000>;
+ 	};
+ 	//Note: with "no-map" reserv mem not saved in hibernation
+-    audio_mem: memory@32000000 {
+-		reg = <0x0 0x32000000 0x0 0x6400000>;
+-    };
+ 	rpmsgmem: memory@1E000000 {
+ 		reg = <0x0 0x1E000000 0x0 0x10000>;
+ 	};
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index e75c42d04064..b47576f1f42d 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -1182,9 +1182,6 @@ audio_log_mem: memory@33400000 {
+         reg = <0x0 0x33400000 0x0 0x200000>;
+ 	};
+ 	//Note: with "no-map" reserv mem not saved in hibernation
+-	audio_mem: memory@32000000 {
+-		reg = <0x0 0x32000000 0x0 0x6400000>;
+-	};
+ 	rpmsgmem: memory@1E000000 {
+ 		reg = <0x0 0x1E000000 0x0 0x10000>;
+ 	};
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index 84edc6b33375..eb493d1411a6 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -581,11 +581,16 @@ vi_mem: framebuffer@10000000 {
+ 	rpmsgmem: memory@1E000000 {
+ 		reg = <0x0 0x1E000000 0x0 0x10000>;
+ 	};
+-	audio_mem: memory@32000000 {
+-		reg = <0x0 0x32000000 0x0 0x6400000>;
+-    };
++	audio_text_mem: memory@32000000 {
++		reg = <0x0 0x32000000 0x0 0xE00000>;
++		//no-map;
++	};
++	audio_data_mem: memory@32E00000 {
++		reg = <0x0 0x32E00000 0x0 0x600000>;
++		//no-map;
++	};
+ 	audio_log_mem: memory@33400000 {
+-		reg = <0x0 0x33400000 0x0 0x200000>;
++        reg = <0x0 0x33400000 0x0 0x200000>;
+ 	};
+ 	aon_log_mem: memory@33600000 {
+ 		reg = <0x0 0x33600000 0x0 0x200000>;
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index ec43b85fab2b..097617d10401 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -339,6 +339,7 @@ aon: aon_subsys {
+ 		compatible = "xuantie,th1520-aon";
+ 		mbox-names = "aon";
+ 		mboxes = <&mbox_910t 1 0>;
++		opensbi-mboxes = <&mbox_910r>;
+ 		status = "okay";
+ 
+ 		pd: th1520-aon-pd {
+@@ -1540,6 +1541,23 @@ mbox_910t: mbox@ffffc38000 {
+ 			#mbox-cells = <2>;
+ 		};
+ 
++		mbox_910r: mbox@ffefc53000 {
++			compatible = "xuantie,th1520-mbox-r";
++			reg = <0xff 0xefc53000 0x0 0x4000>,
++			      <0xff 0xefc3f000 0x0 0x1000>,
++			      <0xff 0xefc47000 0x0 0x1000>,
++			      <0xff 0xefc4f000 0x0 0x1000>;
++			reg-names = "local_base",
++				    "remote_icu0",
++				    "remote_icu1",
++				    "remote_icu2";
++			interrupt-controller;
++			clocks = <&apb_clk>;
++			clock-names = "ipg";
++			icu_cpu_id = <3>;
++			#mbox-cells = <2>;
++		};
++
+ 		adc: adc@0xfffff51000 {
+ 			compatible = "xuantie,th1520-adc";
+ 			reg = <0xff 0xfff51000 0x0 0x1000>;
+-- 
+2.43.0
+

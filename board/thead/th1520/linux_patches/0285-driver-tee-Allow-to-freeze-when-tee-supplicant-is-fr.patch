@@ -1,0 +1,210 @@
+From 981386a8329b57d003d6ac6ffd0878996e06ce28 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:59:49 +0800
+Subject: [PATCH 285/400] driver:tee:Allow to freeze when tee supplicant is
+ freezed
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/configs/th1520_defconfig |  3 ++
+ drivers/tee/optee/call.c            | 15 ++++++--
+ drivers/tee/optee/core.c            | 53 +++++++++++++++++++++++++++++
+ drivers/tee/optee/notif.c           |  4 ++-
+ drivers/tee/optee/supp.c            |  2 ++
+ 5 files changed, 73 insertions(+), 4 deletions(-)
+
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index ff907c6d80e0..01d612429260 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -348,3 +348,6 @@ CONFIG_RISCV_SBI_V01=y
+ CONFIG_SERIAL_EARLYCON_RISCV_SBI=y
+ CONFIG_BT_HCIUART_RTL3WIRE=y
+ CONFIG_UHID=y
++# Enable TEE
++CONFIG_TEE=m
++CONFIG_OPTEE=m
+diff --git a/drivers/tee/optee/call.c b/drivers/tee/optee/call.c
+index df5fb5410b72..47a7d1a386b0 100644
+--- a/drivers/tee/optee/call.c
++++ b/drivers/tee/optee/call.c
+@@ -10,6 +10,7 @@
+ #include <linux/tee_drv.h>
+ #include <linux/types.h>
+ #include "optee_private.h"
++#include <linux/freezer.h>
+ 
+ #define MAX_ARG_PARAM_COUNT	6
+ 
+@@ -39,6 +40,8 @@ struct optee_shm_arg_entry {
+ 	DECLARE_BITMAP(map, MAX_ARG_COUNT_PER_ENTRY);
+ };
+ 
++struct kref sess_refcount = KREF_INIT(1);
++
+ void optee_cq_wait_init(struct optee_call_queue *cq,
+ 			struct optee_call_waiter *w)
+ {
+@@ -67,7 +70,12 @@ void optee_cq_wait_init(struct optee_call_queue *cq,
+ void optee_cq_wait_for_completion(struct optee_call_queue *cq,
+ 				  struct optee_call_waiter *w)
+ {
+-	wait_for_completion(&w->c);
++	/*
++	 * wait_for_completion but allow hibernation/suspend
++     * to freeze the waiting task
++	 */
++	while (wait_for_completion_interruptible(&w->c))
++		try_to_freeze();
+ 
+ 	mutex_lock(&cq->mutex);
+ 
+@@ -339,6 +347,7 @@ int optee_open_session(struct tee_context *ctx,
+ 		mutex_lock(&ctxdata->mutex);
+ 		list_add(&sess->list_node, &ctxdata->sess_list);
+ 		mutex_unlock(&ctxdata->mutex);
++		kref_get(&sess_refcount);
+ 	} else {
+ 		kfree(sess);
+ 	}
+@@ -359,7 +368,7 @@ int optee_open_session(struct tee_context *ctx,
+ 
+ 	return rc;
+ }
+-
++extern void session_put(void);
+ int optee_close_session_helper(struct tee_context *ctx, u32 session)
+ {
+ 	struct optee *optee = tee_get_drvdata(ctx->teedev);
+@@ -377,7 +386,7 @@ int optee_close_session_helper(struct tee_context *ctx, u32 session)
+ 	optee->ops->do_call_with_arg(ctx, shm, offs);
+ 
+ 	optee_free_msg_arg(ctx, entry, offs);
+-
++	session_put();
+ 	return 0;
+ }
+ 
+diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
+index 2a258bd3b6b5..c23f2dbab571 100644
+--- a/drivers/tee/optee/core.c
++++ b/drivers/tee/optee/core.c
+@@ -17,6 +17,9 @@
+ #include <linux/types.h>
+ #include <linux/workqueue.h>
+ #include "optee_private.h"
++#include <linux/suspend.h>
++
++extern struct kref sess_refcount;
+ 
+ int optee_pool_op_alloc_helper(struct tee_shm_pool *pool, struct tee_shm *shm,
+ 			       size_t size, size_t align,
+@@ -127,6 +130,15 @@ int optee_open(struct tee_context *ctx, bool cap_memref_null)
+ 	return 0;
+ }
+ 
++static void session_release(struct kref *ref)
++{
++}
++
++void session_put(void)
++{
++	kref_put(&sess_refcount, session_release);
++}
++
+ static void optee_release_helper(struct tee_context *ctx,
+ 				 int (*close_session)(struct tee_context *ctx,
+ 						      u32 session))
+@@ -185,6 +197,47 @@ void optee_remove_common(struct optee *optee)
+ 	mutex_destroy(&optee->call_queue.mutex);
+ }
+ 
++#ifdef CONFIG_PM
++#ifdef CONFIG_SUSPEND
++static int __maybe_unused tee_driver_suspend(struct device *dev)
++{
++    int ret = 0;
++	unsigned int ref_count;
++
++	if (pm_suspend_target_state == PM_SUSPEND_MEM) {
++		pr_info("STR mode suspend in\r\n");
++		return 0;
++	} else {
++		ref_count = kref_read(&sess_refcount);
++		if (ref_count > 1) {
++			pr_info("tee_driver_suspend failed[%d] \r\n", ref_count);
++			ret = -1;
++		} else {
++			pr_info("tee_driver_suspend success[%d] \r\n", ref_count);
++			ret = 0;
++		}
++	}
++
++	return ret;
++}
++
++static int __maybe_unused tee_driver_resume(struct device *dev)
++{
++
++	int ret = 0;
++
++	return ret;
++}
++#else
++#define tee_driver_suspend NULL
++#define tee_driver_resume NULL
++#endif
++
++static const struct dev_pm_ops tee_driver_pm_ops = {
++    SET_SYSTEM_SLEEP_PM_OPS(tee_driver_suspend, tee_driver_resume)
++};
++#endif
++
+ static int smc_abi_rc;
+ static int ffa_abi_rc;
+ 
+diff --git a/drivers/tee/optee/notif.c b/drivers/tee/optee/notif.c
+index 05212842b0a5..777c9571dc1e 100644
+--- a/drivers/tee/optee/notif.c
++++ b/drivers/tee/optee/notif.c
+@@ -11,6 +11,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/tee_drv.h>
+ #include "optee_private.h"
++#include <linux/freezer.h>
+ 
+ struct notif_entry {
+ 	struct list_head link;
+@@ -70,7 +71,8 @@ int optee_notif_wait(struct optee *optee, u_int key)
+ 	 * Unlock temporarily and wait for completion.
+ 	 */
+ 	spin_unlock_irqrestore(&optee->notif.lock, flags);
+-	wait_for_completion(&entry->c);
++	while (wait_for_completion_interruptible(&entry->c))
++		try_to_freeze();
+ 	spin_lock_irqsave(&optee->notif.lock, flags);
+ 
+ 	list_del(&entry->link);
+diff --git a/drivers/tee/optee/supp.c b/drivers/tee/optee/supp.c
+index d0f397c90242..4a8e51ebb9f2 100644
+--- a/drivers/tee/optee/supp.c
++++ b/drivers/tee/optee/supp.c
+@@ -6,6 +6,7 @@
+ #include <linux/slab.h>
+ #include <linux/uaccess.h>
+ #include "optee_private.h"
++#include <linux/freezer.h>
+ 
+ struct optee_supp_req {
+ 	struct list_head link;
+@@ -122,6 +123,7 @@ u32 optee_supp_thrd_req(struct tee_context *ctx, u32 func, size_t num_params,
+ 		}
+ 		mutex_unlock(&supp->mutex);
+ 		req->ret = TEEC_ERROR_COMMUNICATION;
++		try_to_freeze();
+ 	}
+ 
+ 	ret = req->ret;
+-- 
+2.43.0
+

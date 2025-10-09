@@ -1,0 +1,200 @@
+From 8870c8736db783ba8ccbaa8d8abf2195f4ba8ab8 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Wed, 13 Nov 2024 18:21:11 -0800
+Subject: [PATCH 029/400] riscv: vector: Use vlenb from DT for thead
+
+[ Upstream commit 66f197785d515d3fe5257ed65e189e4ee0b9b4e3 ]
+
+If thead,vlenb is provided in the device tree, prefer that over reading
+the vlenb csr.
+
+Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Tested-by: Yangyu Chen <cyy@cyyself.name>
+Link: https://lore.kernel.org/r/20241113-xtheadvector-v11-5-236c22791ef9@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+ arch/riscv/Kconfig.vendor                     | 13 +++++
+ arch/riscv/include/asm/cpufeature.h           |  1 +
+ .../include/asm/vendor_extensions/thead.h     |  6 +++
+ arch/riscv/kernel/cpufeature.c                | 47 +++++++++++++++++++
+ arch/riscv/kernel/vector.c                    | 12 ++++-
+ arch/riscv/kernel/vendor_extensions/thead.c   | 11 +++++
+ 6 files changed, 89 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/Kconfig.vendor b/arch/riscv/Kconfig.vendor
+index 9897442bd44f..b096548fe0ff 100644
+--- a/arch/riscv/Kconfig.vendor
++++ b/arch/riscv/Kconfig.vendor
+@@ -26,6 +26,19 @@ config RISCV_ISA_VENDOR_EXT_THEAD
+ 	  extensions. Without this option enabled, T-Head vendor extensions will
+ 	  not be detected at boot and their presence not reported to userspace.
+ 
++	  If you don't know what to do here, say Y.
++
++config RISCV_ISA_XTHEADVECTOR
++	bool "xtheadvector extension support"
++	depends on RISCV_ISA_VENDOR_EXT_THEAD
++	depends on RISCV_ISA_V
++	depends on FPU
++	default y
++	help
++	  Say N here if you want to disable all xtheadvector related procedures
++	  in the kernel. This will disable vector for any T-Head board that
++	  contains xtheadvector rather than the standard vector.
++
+ 	  If you don't know what to do here, say Y.
+ endmenu
+ 
+diff --git a/arch/riscv/include/asm/cpufeature.h b/arch/riscv/include/asm/cpufeature.h
+index b945d063018b..45371d303cbd 100644
+--- a/arch/riscv/include/asm/cpufeature.h
++++ b/arch/riscv/include/asm/cpufeature.h
+@@ -32,6 +32,7 @@ extern struct riscv_isainfo hart_isa[NR_CPUS];
+ 
+ void check_unaligned_access(int cpu);
+ void riscv_user_isa_enable(void);
++extern u32 thead_vlenb_of;
+ 
+ struct riscv_isa_ext_data {
+         const unsigned int id;
+diff --git a/arch/riscv/include/asm/vendor_extensions/thead.h b/arch/riscv/include/asm/vendor_extensions/thead.h
+index 48421d1553ad..93fcbf46c87e 100644
+--- a/arch/riscv/include/asm/vendor_extensions/thead.h
++++ b/arch/riscv/include/asm/vendor_extensions/thead.h
+@@ -13,4 +13,10 @@
+ 
+ extern struct riscv_isa_vendor_ext_data_list riscv_isa_vendor_ext_list_thead;
+ 
++#ifdef CONFIG_RISCV_ISA_VENDOR_EXT_THEAD
++void disable_xtheadvector(void);
++#else
++static inline void disable_xtheadvector(void) { }
++#endif
++
+ #endif
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index c5f3e57a3431..9b8a42bb3adc 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -44,6 +44,7 @@ struct riscv_isainfo hart_isa[NR_CPUS];
+ 
+ /* Performance information */
+ DEFINE_PER_CPU(long, misaligned_access_speed);
++u32 thead_vlenb_of;
+ 
+ /**
+  * riscv_isa_extension_base() - Get base extension word
+@@ -498,6 +499,46 @@ static void __init riscv_fill_vendor_ext_list(int cpu)
+ 	}
+ }
+ 
++static int has_thead_homogeneous_vlenb(void)
++{
++	int cpu;
++	u32 prev_vlenb = 0;
++	u32 vlenb;
++
++	/* Ignore thead,vlenb property if xtheavector is not enabled in the kernel */
++	if (!IS_ENABLED(CONFIG_RISCV_ISA_XTHEADVECTOR))
++		return 0;
++
++	for_each_possible_cpu(cpu) {
++		struct device_node *cpu_node;
++
++		cpu_node = of_cpu_device_node_get(cpu);
++		if (!cpu_node) {
++			pr_warn("Unable to find cpu node\n");
++			return -ENOENT;
++		}
++
++		if (of_property_read_u32(cpu_node, "thead,vlenb", &vlenb)) {
++			of_node_put(cpu_node);
++
++			if (prev_vlenb)
++				return -ENOENT;
++			continue;
++		}
++
++		if (prev_vlenb && vlenb != prev_vlenb) {
++			of_node_put(cpu_node);
++			return -ENOENT;
++		}
++
++		prev_vlenb = vlenb;
++		of_node_put(cpu_node);
++	}
++
++	thead_vlenb_of = vlenb;
++	return 0;
++}
++
+ static int __init riscv_fill_hwcap_from_ext_list(unsigned long *isa2hwcap)
+ {
+ 	unsigned int cpu;
+@@ -553,6 +594,12 @@ static int __init riscv_fill_hwcap_from_ext_list(unsigned long *isa2hwcap)
+ 		riscv_fill_vendor_ext_list(cpu);
+ 	}
+ 
++	if (riscv_isa_vendor_extension_available(THEAD_VENDOR_ID, XTHEADVECTOR) &&
++	    has_thead_homogeneous_vlenb() < 0) {
++		pr_warn("Unsupported heterogeneous vlenb detected, vector extension disabled.\n");
++		disable_xtheadvector();
++	}
++
+ 	if (bitmap_empty(riscv_isa, RISCV_ISA_EXT_MAX))
+ 		return -ENOENT;
+ 
+diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
+index 81886fc36ed6..5895e8772294 100644
+--- a/arch/riscv/kernel/vector.c
++++ b/arch/riscv/kernel/vector.c
+@@ -29,7 +29,17 @@ int riscv_v_setup_vsize(void)
+ {
+ 	unsigned long this_vsize;
+ 
+-	/* There are 32 vector registers with vlenb length. */
++	/*
++	 * There are 32 vector registers with vlenb length.
++	 *
++	 * If the thead,vlenb property was provided by the firmware, use that
++	 * instead of probing the CSRs.
++	 */
++	if (thead_vlenb_of) {
++		riscv_v_vsize = thead_vlenb_of * 32;
++		return 0;
++	}
++
+ 	riscv_v_enable();
+ 	this_vsize = csr_read(CSR_VLENB) * 32;
+ 	riscv_v_disable();
+diff --git a/arch/riscv/kernel/vendor_extensions/thead.c b/arch/riscv/kernel/vendor_extensions/thead.c
+index 7a709ce3a297..2e06a7642d02 100644
+--- a/arch/riscv/kernel/vendor_extensions/thead.c
++++ b/arch/riscv/kernel/vendor_extensions/thead.c
+@@ -5,6 +5,7 @@
+ #include <asm/vendor_extensions/thead.h>
+ 
+ #include <linux/types.h>
++#include <linux/cpumask.h>
+ #include <linux/kernel.h>
+ 
+ /* All T-Head vendor extensions supported in Linux */
+@@ -20,3 +21,13 @@ struct riscv_isa_vendor_ext_data_list riscv_isa_vendor_ext_list_thead = {
+ 	.ext_data_count = ARRAY_SIZE(riscv_isa_vendor_ext_thead),
+ 	.ext_data = riscv_isa_vendor_ext_thead,
+ };
++
++void disable_xtheadvector(void)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu)
++		clear_bit(RISCV_ISA_VENDOR_EXT_XTHEADVECTOR, riscv_isa_vendor_ext_list_thead.per_hart_isa_bitmap[cpu].isa);
++
++	clear_bit(RISCV_ISA_VENDOR_EXT_XTHEADVECTOR, riscv_isa_vendor_ext_list_thead.all_harts_isa_bitmap.isa);
++}
+-- 
+2.43.0
+

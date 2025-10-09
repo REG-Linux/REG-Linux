@@ -1,0 +1,53 @@
+From b86fe3af3680fd429621ce5a18e23263b154617c Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Sat, 20 Sep 2025 18:41:26 +0800
+Subject: [PATCH 399/400] dts: riscv: th1520: add zfh
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 430e633be6bb..8fa8f76aa048 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -68,7 +68,7 @@ c910_0: cpu@0 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zfh", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			thead,vlenb = <16>;
+ 			reg = <0>;
+@@ -105,7 +105,7 @@ c910_1: cpu@1 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zfh", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			thead,vlenb = <16>;
+ 			reg = <1>;
+@@ -140,7 +140,7 @@ c910_2: cpu@2 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zfh", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			thead,vlenb = <16>;
+ 			reg = <2>;
+@@ -175,7 +175,7 @@ c910_3: cpu@3 {
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc_xtheadvector";
+ 			riscv,isa-base = "rv64i";
+-			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "ziccrse", "zicntr", "zicsr",
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zfh", "ziccrse", "zicntr", "zicsr",
+ 					       "zifencei", "zihpm", "xtheadsstc", "xtheadvector";
+ 			thead,vlenb = <16>;
+ 			reg = <3>;
+-- 
+2.43.0
+

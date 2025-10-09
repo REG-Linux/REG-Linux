@@ -1,0 +1,44 @@
+From fcb3ccf5a2ecf2ce288b41ffcb9bc8b5ec875887 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:05:12 +0800
+Subject: [PATCH 293/400] dts: wifi: support rtl8822cs
+
+Configure the power ctrl pin for wifi
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index b8bec51329dc..9904d67adfa6 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -328,17 +328,13 @@ reg_fp_pwern_l: regulator-fp-pwern-l {
+ 		regulator-always-on;
+ 	};
+ 
+-	wcn_wifi: wireless-wlan {
+-		compatible = "wlan-platdata";
+-		clock-names = "clk_wifi";
+-		ref-clock-frequency = <24000000>;
+-		keep_wifi_power_on;
+-		// pinctrl-names = "default";
+-		// pinctrl-0 = <&pinctrl_wifi_wake>;
+-		wifi_chip_type = "rtl8822cs";
+-		// WIFI,poweren_gpio = <&gpio0 28 GPIO_ACTIVE_HIGH>;
+-		status = "okay";
+-	};
++ 	wcn_wifi: wireless-wlan {
++ 		compatible = "wlan-platdata";
++		WIFI,poweren-gpios = <&gpio0 25 GPIO_ACTIVE_HIGH>;
++		power_on_after_init;
++		power_on_when_resume;
++ 		status = "okay";
++ 	};
+ 
+ 	wcn_bt: wireless-bluetooth {
+ 		compatible = "bluetooth-platdata";
+-- 
+2.43.0
+

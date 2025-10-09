@@ -1,0 +1,170 @@
+From 6730992bf99b71c0470b06fab1b830b4d09f3b0e Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:11:36 +0800
+Subject: [PATCH 236/400] hibernate: extended platform ops for all mode
+
+Add hibernation_set_allmode_ops for all mode(reboot/shutdown...)
+to set operation hooks.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ include/linux/suspend.h  |  3 ++-
+ kernel/power/hibernate.c | 57 +++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 58 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/suspend.h b/include/linux/suspend.h
+index a02847da2821..0a5aba8fda84 100644
+--- a/include/linux/suspend.h
++++ b/include/linux/suspend.h
+@@ -446,6 +446,7 @@ extern u32 swsusp_hardware_signature;
+ extern int hibernate_register_nosave_region(unsigned long start_pfn, unsigned long end_pfn);
+ extern int hibernate_remove_nosave_region(unsigned long start_pfn, unsigned long end_pfn);
+ 
++extern void hibernation_set_allmode_ops(const struct platform_hibernation_ops *ops);
+ extern void hibernation_set_ops(const struct platform_hibernation_ops *ops);
+ extern int hibernate(void);
+ extern bool system_entering_hibernation(void);
+@@ -471,7 +472,7 @@ static inline int hibernate_register_nosave_region(unsigned long start_pfn, unsi
+ static inline int hibernate_remove_nosave_region(unsigned long start_pfn, unsigned long end_pfn){
+ 	return 0;
+ }
+-
++static inline void hibernation_set_allmode_ops(const struct platform_hibernation_ops *ops) {}
+ static inline void hibernation_set_ops(const struct platform_hibernation_ops *ops) {}
+ static inline int hibernate(void) { return -ENOSYS; }
+ static inline bool system_entering_hibernation(void) { return false; }
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index a83a5f1a4dc7..d5520b8135d5 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -67,7 +67,8 @@ static int hibernation_mode = HIBERNATION_SHUTDOWN;
+ bool freezer_test_done;
+ 
+ static const struct platform_hibernation_ops *hibernation_ops;
+-
++/* for not only in HIBERNATION_PLATFORM mode calling ops*/
++static const struct platform_hibernation_ops *hibernation_all_mode_ops;
+ static atomic_t hibernate_atomic = ATOMIC_INIT(1);
+ 
+ bool hibernate_acquire(void)
+@@ -119,6 +120,28 @@ void hibernation_set_ops(const struct platform_hibernation_ops *ops)
+ }
+ EXPORT_SYMBOL_GPL(hibernation_set_ops);
+ 
++/**
++ * hibernation_set_allmode_ops - Set the global hibernate operations for all mode(reboot/shutdown...).
++ * @ops: Hibernation operations to use in subsequent hibernation transitions.
++ * Note: This diffs from hibernation_set_ops,hibernation_set_allmode_ops is for not only 
++ * HIBERNATION_PLATFORM
++ */
++void hibernation_set_allmode_ops(const struct platform_hibernation_ops *ops)
++{
++	unsigned int sleep_flags;
++	if( !ops && !ops->begin && !ops->end &&  !ops->pre_snapshot
++		&& !ops->prepare && !ops->finish && !ops->enter && !ops->pre_restore
++		&& !ops->restore_cleanup && !ops->leave ) {
++		WARN_ON(1);
++		return;
++	}
++	sleep_flags = lock_system_sleep();
++	hibernation_all_mode_ops = ops;
++
++	unlock_system_sleep(sleep_flags);
++}
++EXPORT_SYMBOL_GPL(hibernation_set_allmode_ops);
++
+ static bool entering_platform_hibernation;
+ 
+ bool system_entering_hibernation(void)
+@@ -152,6 +175,9 @@ static int hibernation_test(int level) { return 0; }
+  */
+ static int platform_begin(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->begin)
++		return hibernation_all_mode_ops->begin(PMSG_FREEZE);
++
+ 	return (platform_mode && hibernation_ops) ?
+ 		hibernation_ops->begin(PMSG_FREEZE) : 0;
+ }
+@@ -162,6 +188,10 @@ static int platform_begin(int platform_mode)
+  */
+ static void platform_end(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->end) {
++		hibernation_all_mode_ops->end();
++		return;
++	}
+ 	if (platform_mode && hibernation_ops)
+ 		hibernation_ops->end();
+ }
+@@ -176,6 +206,9 @@ static void platform_end(int platform_mode)
+ 
+ static int platform_pre_snapshot(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->pre_snapshot)
++		return hibernation_all_mode_ops->pre_snapshot();
++
+ 	return (platform_mode && hibernation_ops) ?
+ 		hibernation_ops->pre_snapshot() : 0;
+ }
+@@ -191,6 +224,10 @@ static int platform_pre_snapshot(int platform_mode)
+  */
+ static void platform_leave(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->leave) {
++		hibernation_all_mode_ops->leave();
++		return;
++	}
+ 	if (platform_mode && hibernation_ops)
+ 		hibernation_ops->leave();
+ }
+@@ -206,6 +243,10 @@ static void platform_leave(int platform_mode)
+  */
+ static void platform_finish(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->finish) {
++		hibernation_all_mode_ops->finish();
++		return;
++	}
+ 	if (platform_mode && hibernation_ops)
+ 		hibernation_ops->finish();
+ }
+@@ -222,6 +263,10 @@ static void platform_finish(int platform_mode)
+  */
+ static int platform_pre_restore(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->pre_restore) {
++		return hibernation_all_mode_ops->pre_restore();
++	}
++
+ 	return (platform_mode && hibernation_ops) ?
+ 		hibernation_ops->pre_restore() : 0;
+ }
+@@ -239,6 +284,11 @@ static int platform_pre_restore(int platform_mode)
+  */
+ static void platform_restore_cleanup(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->restore_cleanup) {
++		hibernation_all_mode_ops->restore_cleanup();
++		return;
++	}
++
+ 	if (platform_mode && hibernation_ops)
+ 		hibernation_ops->restore_cleanup();
+ }
+@@ -249,6 +299,11 @@ static void platform_restore_cleanup(int platform_mode)
+  */
+ static void platform_recover(int platform_mode)
+ {
++	if(hibernation_all_mode_ops && hibernation_all_mode_ops->recover) {
++		hibernation_all_mode_ops->recover();
++		return;
++	}
++
+ 	if (platform_mode && hibernation_ops && hibernation_ops->recover)
+ 		hibernation_ops->recover();
+ }
+-- 
+2.43.0
+

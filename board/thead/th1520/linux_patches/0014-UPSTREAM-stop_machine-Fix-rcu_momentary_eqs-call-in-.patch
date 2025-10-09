@@ -1,0 +1,51 @@
+From 71f4d9f883841f08f0e183ca81c196ba8d5d2328 Mon Sep 17 00:00:00 2001
+From: Mukesh Ojha <quic_mojha@quicinc.com>
+Date: Wed, 11 Dec 2024 13:36:11 -0800
+Subject: [PATCH 014/400] UPSTREAM: stop_machine: Fix rcu_momentary_eqs() call
+ in multi_cpu_stop()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The multi_cpu_stop() contains a loop that can initially be executed with
+interrupts enabled (in the MULTI_STOP_NONE and MULTI_STOP_PREPARE states).
+Interrupts are guaranteed to be once the MULTI_STOP_DISABLE_IRQ state
+is reached.  Unfortunately, the rcu_momentary_eqs() function that is
+currently invoked on each pass through this loop requires that interrupts
+be disabled.
+
+This commit therefore moves this call to rcu_momentary_eqs() to the body
+of the "else if (curstate > MULTI_STOP_PREPARE)" portion of the loop, thus
+guaranteeing that interrupts will be disabled on each call, as required.
+
+Kudos to 朱恺乾 (Kaiqian) for noting that this had not made it to mainline.
+
+[ paulmck: Update from rcu_momentary_dyntick_idle() to rcu_momentary_eqs(). ]
+
+Link: https://lore.kernel.org/all/1712649736-27058-1-git-send-email-quic_mojha@quicinc.com/
+
+Signed-off-by: Mukesh Ojha <quic_mojha@quicinc.com>
+Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+(cherry picked from commit c861cac950fb6cf7b1b3a438cf717fdee4352df6)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ kernel/stop_machine.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/stop_machine.c b/kernel/stop_machine.c
+index da821ce258ea..8896d844d738 100644
+--- a/kernel/stop_machine.c
++++ b/kernel/stop_machine.c
+@@ -250,8 +250,8 @@ static int multi_cpu_stop(void *data)
+ 			 * be detected and reported on their side.
+ 			 */
+ 			touch_nmi_watchdog();
++			rcu_momentary_eqs();
+ 		}
+-		rcu_momentary_eqs();
+ 	} while (curstate != MULTI_STOP_EXIT);
+ 
+ 	local_irq_restore(flags);
+-- 
+2.43.0
+

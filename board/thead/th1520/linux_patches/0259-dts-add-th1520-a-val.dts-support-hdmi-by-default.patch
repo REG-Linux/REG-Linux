@@ -1,0 +1,46 @@
+From 5ce29c6cacba33af3d95fe68d2a34bad7507243c Mon Sep 17 00:00:00 2001
+From: qianyu <qianyu.fty@alibaba-inc.com>
+Date: Thu, 11 Jul 2024 14:10:35 +0800
+Subject: [PATCH 259/400] dts: add th1520-a-val.dts support hdmi by default
+
+Signed-off-by: qianyu <qianyu.fty@alibaba-inc.com>
+Change-Id: Ic3b88cb6d6b693aa3de432d64174e795b69ca9f9
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dts | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dts b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+index 623514890a64..97f670dbb1e1 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dts
+@@ -5,6 +5,27 @@
+ 
+ #include "th1520-a-val.dtsi"
+ 
++&dpu_enc1 {
++	ports {
++		/delete-node/ port@0;
++	};
++};
++
++&disp1_out {
++	remote-endpoint = <&hdmi_tx_in>;
++};
++
++&hdmi_tx {
++	status = "okay";
++
++	port@0 {
++		/* input */
++		hdmi_tx_in: endpoint {
++			remote-endpoint = <&disp1_out>;
++		};
++	};
++};
++
+ &th1520_sound {
+     status = "okay";
+ 
+-- 
+2.43.0
+

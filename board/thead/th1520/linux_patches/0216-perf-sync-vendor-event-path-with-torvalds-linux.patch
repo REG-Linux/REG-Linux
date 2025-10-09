@@ -1,0 +1,65 @@
+From 0008837b4f522757fd48e1d3e25164ea8f906a1d Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:51:49 +0800
+Subject: [PATCH 216/400] perf: sync vendor event path with torvalds/linux
+
+keep the vendor event path 'arch/riscv/thead/' the same with
+torvalds/linux
+
+Signed-off-by: David Li <liyong.li@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ tools/perf/pmu-events/arch/riscv/mapfile.csv                  | 4 ++--
+ .../arch/riscv/{xuantie => thead}/c900-legacy/cache.json      | 0
+ .../arch/riscv/{xuantie => thead}/c900-legacy/firmware.json   | 0
+ .../riscv/{xuantie => thead}/c900-legacy/instruction.json     | 0
+ .../arch/riscv/{xuantie => thead}/c900-legacy/microarch.json  | 0
+ .../arch/riscv/{xuantie => thead}/th1520-ddr/metrics.json     | 0
+ .../riscv/{xuantie => thead}/th1520-ddr/uncore-ddr-pmu.json   | 0
+ 7 files changed, 2 insertions(+), 2 deletions(-)
+ rename tools/perf/pmu-events/arch/riscv/{xuantie => thead}/c900-legacy/cache.json (100%)
+ rename tools/perf/pmu-events/arch/riscv/{xuantie => thead}/c900-legacy/firmware.json (100%)
+ rename tools/perf/pmu-events/arch/riscv/{xuantie => thead}/c900-legacy/instruction.json (100%)
+ rename tools/perf/pmu-events/arch/riscv/{xuantie => thead}/c900-legacy/microarch.json (100%)
+ rename tools/perf/pmu-events/arch/riscv/{xuantie => thead}/th1520-ddr/metrics.json (100%)
+ rename tools/perf/pmu-events/arch/riscv/{xuantie => thead}/th1520-ddr/uncore-ddr-pmu.json (100%)
+
+diff --git a/tools/perf/pmu-events/arch/riscv/mapfile.csv b/tools/perf/pmu-events/arch/riscv/mapfile.csv
+index 77b6417a34bb..d39d9692aba3 100644
+--- a/tools/perf/pmu-events/arch/riscv/mapfile.csv
++++ b/tools/perf/pmu-events/arch/riscv/mapfile.csv
+@@ -15,5 +15,5 @@
+ #
+ #MVENDORID-MARCHID-MIMPID,Version,Filename,EventType
+ 0x489-0x8000000000000007-0x[[:xdigit:]]+,v1,sifive/u74,core
+-0x5b7-0x0-0x0,v1,xuantie/c900-legacy,core
+-0x90c010d,v1,xuantie/th1520-ddr,uncore
++0x5b7-0x0-0x0,v1,thead/c900-legacy,core
++0x90c010d,v1,thead/th1520-ddr,uncore
+diff --git a/tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/cache.json b/tools/perf/pmu-events/arch/riscv/thead/c900-legacy/cache.json
+similarity index 100%
+rename from tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/cache.json
+rename to tools/perf/pmu-events/arch/riscv/thead/c900-legacy/cache.json
+diff --git a/tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/firmware.json b/tools/perf/pmu-events/arch/riscv/thead/c900-legacy/firmware.json
+similarity index 100%
+rename from tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/firmware.json
+rename to tools/perf/pmu-events/arch/riscv/thead/c900-legacy/firmware.json
+diff --git a/tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/instruction.json b/tools/perf/pmu-events/arch/riscv/thead/c900-legacy/instruction.json
+similarity index 100%
+rename from tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/instruction.json
+rename to tools/perf/pmu-events/arch/riscv/thead/c900-legacy/instruction.json
+diff --git a/tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/microarch.json b/tools/perf/pmu-events/arch/riscv/thead/c900-legacy/microarch.json
+similarity index 100%
+rename from tools/perf/pmu-events/arch/riscv/xuantie/c900-legacy/microarch.json
+rename to tools/perf/pmu-events/arch/riscv/thead/c900-legacy/microarch.json
+diff --git a/tools/perf/pmu-events/arch/riscv/xuantie/th1520-ddr/metrics.json b/tools/perf/pmu-events/arch/riscv/thead/th1520-ddr/metrics.json
+similarity index 100%
+rename from tools/perf/pmu-events/arch/riscv/xuantie/th1520-ddr/metrics.json
+rename to tools/perf/pmu-events/arch/riscv/thead/th1520-ddr/metrics.json
+diff --git a/tools/perf/pmu-events/arch/riscv/xuantie/th1520-ddr/uncore-ddr-pmu.json b/tools/perf/pmu-events/arch/riscv/thead/th1520-ddr/uncore-ddr-pmu.json
+similarity index 100%
+rename from tools/perf/pmu-events/arch/riscv/xuantie/th1520-ddr/uncore-ddr-pmu.json
+rename to tools/perf/pmu-events/arch/riscv/thead/th1520-ddr/uncore-ddr-pmu.json
+-- 
+2.43.0
+

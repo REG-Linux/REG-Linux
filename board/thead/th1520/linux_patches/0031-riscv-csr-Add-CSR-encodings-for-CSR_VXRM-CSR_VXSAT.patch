@@ -1,0 +1,46 @@
+From 689df08c037da47ff7777ace07940eb030ad6123 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Wed, 13 Nov 2024 18:21:13 -0800
+Subject: [PATCH 031/400] riscv: csr: Add CSR encodings for CSR_VXRM/CSR_VXSAT
+
+[ Upstream commit b9a9314424512e536db5e54ff554c2f10759c657 ]
+
+The VXRM vector csr for xtheadvector has an encoding of 0xa and VXSAT
+has an encoding of 0x9.
+
+Co-developed-by: Heiko Stuebner <heiko@sntech.de>
+Signed-off-by: Heiko Stuebner <heiko@sntech.de>
+Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+Tested-by: Yangyu Chen <cyy@cyyself.name>
+Link: https://lore.kernel.org/r/20241113-xtheadvector-v11-7-236c22791ef9@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+ arch/riscv/include/asm/csr.h | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+index 5afad789a654..a1be364f2743 100644
+--- a/arch/riscv/include/asm/csr.h
++++ b/arch/riscv/include/asm/csr.h
+@@ -286,9 +286,14 @@
+ #define CSR_STIMECMP		0x14D
+ #define CSR_STIMECMPH		0x15D
+ 
+-#define VCSR_VXRM_MASK			3
+-#define VCSR_VXRM_SHIFT			1
+-#define VCSR_VXSAT_MASK			1
++/* xtheadvector symbolic CSR names */
++#define CSR_VXSAT		0x9
++#define CSR_VXRM		0xa
++
++/* xtheadvector CSR masks */
++#define CSR_VXRM_MASK		3
++#define CSR_VXRM_SHIFT		1
++#define CSR_VXSAT_MASK		1
+ 
+ /* Supervisor-Level Window to Indirectly Accessed Registers (AIA) */
+ #define CSR_SISELECT		0x150
+-- 
+2.43.0
+

@@ -1,0 +1,66 @@
+From 26ea948a410b4a485fc120eb7116342239c966fc Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Tue, 2 Sep 2025 14:45:45 +0800
+Subject: [PATCH 392/400] drm/panel-simple: cmn_5171_1920x1200_40Hz_mode: add
+ book4a display
+
+Add book4a display configuration.
+
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ drivers/gpu/drm/panel/panel-simple.c | 32 ++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index 0d69098eddd9..29cf6b898d60 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -4809,6 +4809,35 @@ static const struct panel_desc_dsi osd101t2045_53ts = {
+ 	.lanes = 4,
+ };
+ 
++static const struct drm_display_mode cmn_5171_1920x1200_40Hz_mode = {
++	.clock          = 127750,
++	.hdisplay       = 1920,
++	.hsync_start    = 1920 + 46, /* hact + hfp */
++	.hsync_end      = 1920 + 46 + 30, /* hact + hfp + hs */
++	.htotal         = 1920 + 46 + 30 + 84, /* hact + hfp + hs + hbp */
++	.vdisplay       = 1200,
++	.vsync_start    = 1200 + 10, /* vact + vfp */
++	.vsync_end      = 1200 + 10 + 6, /* vact + vfp + vs */
++	.vtotal         = 1200 + 10 + 6 + 20, /* vact + vfp + vs + vbp */
++	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
++};
++
++static const struct panel_desc_dsi cmn_5171_1920x1200_40Hz = {
++	.desc = {
++		.modes = &cmn_5171_1920x1200_40Hz_mode,
++		.num_modes = 1,
++		.bpc = 8,
++		.size = {
++			.width = 62,
++			.height = 110,
++		},
++		.connector_type = DRM_MODE_CONNECTOR_DSI,
++	},
++	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_VIDEO_BURST,
++	.format = MIPI_DSI_FMT_RGB888,
++	.lanes = 4,
++};
++
+ static const struct of_device_id dsi_of_match[] = {
+ 	{
+ 		.compatible = "auo,b080uan01",
+@@ -4831,6 +4860,9 @@ static const struct of_device_id dsi_of_match[] = {
+ 	}, {
+ 		.compatible = "osddisplays,osd101t2045-53ts",
+ 		.data = &osd101t2045_53ts
++	}, {
++		.compatible = "cmn,5171_1920x1200_40Hz",
++		.data = &cmn_5171_1920x1200_40Hz
+ 	}, {
+ 		/* sentinel */
+ 	}
+-- 
+2.43.0
+

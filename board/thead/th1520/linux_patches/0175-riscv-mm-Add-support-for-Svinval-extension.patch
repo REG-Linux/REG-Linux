@@ -1,0 +1,89 @@
+From 31b2fa69049830f4f9de095bc5c836a76861acea Mon Sep 17 00:00:00 2001
+From: Guo Ren <guoren@linux.alibaba.com>
+Date: Fri, 6 Sep 2024 13:47:55 +0800
+Subject: [PATCH 175/400] riscv: mm: Add support for Svinval extension
+
+The Svinval extension splits SFENCE.VMA instruction into finer-grained
+invalidation and ordering operations and is mandatory for RVA23S64 profile.
+When Svinval is enabled the local_flush_tlb_range_threshold_asid function
+should use the following sequence to optimize the tlb flushes instead of
+a simple sfence.vma:
+
+sfence.w.inval
+svinval.vma
+  .
+  .
+svinval.vma
+sfence.inval.ir
+
+The maximum number of consecutive svinval.vma instructions that
+can be executed in local_flush_tlb_range_threshold_asid function
+is limited to 64. This is required to avoid soft lockups and the
+approach is similar to that used in arm64.
+
+Signed-off-by: Mayuresh Chitale <mchitale@ventanamicro.com>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+---
+ arch/riscv/mm/tlbflush.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/arch/riscv/mm/tlbflush.c b/arch/riscv/mm/tlbflush.c
+index 324e8cd9b502..a9f4af9f7f3f 100644
+--- a/arch/riscv/mm/tlbflush.c
++++ b/arch/riscv/mm/tlbflush.c
+@@ -5,6 +5,7 @@
+ #include <linux/sched.h>
+ #include <asm/sbi.h>
+ #include <asm/mmu_context.h>
++#include <asm/cpufeature.h>
+ 
+ /*
+  * Flush entire TLB if number of entries to be flushed is greater
+@@ -12,6 +13,26 @@
+  */
+ static unsigned long tlb_flush_all_threshold __read_mostly = 64;
+ 
++#define has_svinval()  riscv_has_extension_unlikely(RISCV_ISA_EXT_SVINVAL)
++
++static inline void local_sfence_inval_ir(void)
++{
++	asm volatile(SFENCE_INVAL_IR() ::: "memory");
++}
++
++static inline void local_sfence_w_inval(void)
++{
++	asm volatile(SFENCE_W_INVAL() ::: "memory");
++}
++
++static inline void local_sinval_vma(unsigned long vma, unsigned long asid)
++{
++	if (asid != FLUSH_TLB_NO_ASID)
++		asm volatile(SINVAL_VMA( %0, %1) : : "r" (vma), "r" (asid) : "memory");
++	else
++		asm volatile(SINVAL_VMA( %0, zero) : : "r" (vma) : "memory");
++}
++
+ static void local_flush_tlb_range_threshold_asid(unsigned long start,
+ 						 unsigned long size,
+ 						 unsigned long stride,
+@@ -25,6 +46,16 @@ static void local_flush_tlb_range_threshold_asid(unsigned long start,
+ 		return;
+ 	}
+ 
++	if (has_svinval()) {
++		local_sfence_w_inval();
++		for (i = 0; i < nr_ptes_in_range; ++i) {
++			local_sinval_vma(start, asid);
++			start += stride;
++		}
++		local_sfence_inval_ir();
++		return;
++	}
++
+ 	for (i = 0; i < nr_ptes_in_range; ++i) {
+ 		local_flush_tlb_page_asid(start, asid);
+ 		start += stride;
+-- 
+2.43.0
+

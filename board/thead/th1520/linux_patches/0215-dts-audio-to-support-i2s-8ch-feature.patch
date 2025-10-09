@@ -1,0 +1,305 @@
+From f13b483bfb5a082ab0915df236b5e585dc5f0fa6 Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 00:51:27 +0800
+Subject: [PATCH 215/400] dts: audio: to support i2s-8ch feature
+
+support i2s-8ch feature
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-a-val-audio.dts     |  3 -
+ .../boot/dts/thead/th1520-a-val-audio.dtsi    | 70 ++++++-------------
+ arch/riscv/boot/dts/thead/th1520.dtsi         |  2 +
+ sound/soc/xuantie/th1520-i2s-8ch.c            |  2 +-
+ sound/soc/xuantie/th1520-spdif.c              | 11 ++-
+ sound/soc/xuantie/th1520-spdif.h              |  1 +
+ sound/soc/xuantie/th1520-tdm.c                |  4 +-
+ sound/soc/xuantie/th1520-tdm.h                |  1 +
+ 8 files changed, 41 insertions(+), 53 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts
+index 811f08d5cf1f..5016e9774794 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts
++++ b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dts
+@@ -15,9 +15,6 @@ &i2s0 {
+ 
+ &i2s_8ch_sd2 {
+ 	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd2_pa_pins>;
+ };
+ 
+ &es8156_audio_codec {
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi
+index 61bb60e578c0..abdf731907a1 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val-audio.dtsi
+@@ -206,19 +206,10 @@ codec {
+ 		simple-audio-card,dai-link@1 {          /* I2S - AUDIO SYS CODEC 7210*/
+ 				reg = <1>;
+ 				format = "i2s";
+-				cpu {
++				cpu-0 {
+ 						sound-dai = <&i2s_8ch_sd2>;
+ 				};
+-				codec {
+-						mclk-fs = <512>;
+-						sound-dai = <&es7210_audio_codec_adc0>;
+-				};
+-		};
+-
+-		simple-audio-card,dai-link@2 {          /* I2S - AUDIO SYS CODEC 7210*/
+-				reg = <2>;
+-				format = "i2s";
+-				cpu {
++				cpu-1 {
+ 						sound-dai = <&i2s_8ch_sd3>;
+ 				};
+ 				codec {
+@@ -227,22 +218,13 @@ codec {
+ 				};
+ 		};
+ 
+-		simple-audio-card,dai-link@3 {          /* I2S - AUDIO SYS CODEC 7210_1*/
+-				reg = <3>;
++		simple-audio-card,dai-link@2 {          /* I2S - AUDIO SYS CODEC 7210_1*/
++				reg = <2>;
+ 				format = "i2s";
+-				cpu {
++				cpu-0 {
+ 						sound-dai = <&i2s_8ch_sd0>;
+ 				};
+-				codec {
+-						mclk-fs = <512>;
+-						sound-dai = <&es7210_audio_codec_adc1>;
+-				};
+-		};
+-
+-		simple-audio-card,dai-link@4 {          /* I2S - AUDIO SYS CODEC 7210_1*/
+-				reg = <4>;
+-				format = "i2s";
+-				cpu {
++				cpu-1 {
+ 						sound-dai = <&i2s_8ch_sd1>;
+ 				};
+ 				codec {
+@@ -259,9 +241,9 @@ es8156_audio_codec: es8156@8 {
+ 			compatible = "everest,es8156";
+ 			reg = <0x08>;
+ 			sound-name-prefix = "ES8156";
+-		    	AVDD-supply = <&reg_aud_dac_3v3>;
++			AVDD-supply = <&reg_aud_dac_3v3>;
+ 		   	DVDD-supply = <&soc_dvdd18_aon_reg>;
+-		    	PVDD-supply = <&soc_dvdd18_aon_reg>;
++			PVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			mclk-sclk-ratio = <4>;
+ 			status = "disabled";
+ 		};
+@@ -274,9 +256,9 @@ es7210_audio_codec_adc0: es7210@40 {
+ 			channels-max = <2>;
+ 			mclk-sclk-ratio = <4>;
+ 			sound-name-prefix = "ES7210_ADC0";
+-        		MVDD-supply = <&reg_aud_adc_3v3>;
++			MVDD-supply = <&reg_aud_adc_3v3>;
+ 			AVDD-supply = <&reg_aud_adc_3v3>;
+-		    	DVDD-supply = <&soc_dvdd18_aon_reg>;
++			DVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			PVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			status = "disabled";
+ 		};
+@@ -289,9 +271,9 @@ es7210_audio_codec_adc1: es7210@41 {
+ 			channels-max = <2>;
+ 			mclk-sclk-ratio = <4>;
+ 			sound-name-prefix = "ES7210_ADC1";
+-        		MVDD-supply = <&reg_aud_adc_3v3>;
++			MVDD-supply = <&reg_aud_adc_3v3>;
+ 			AVDD-supply = <&reg_aud_adc_3v3>;
+-		    	DVDD-supply = <&soc_dvdd18_aon_reg>;
++			DVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			PVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			status = "disabled";
+ 		};
+@@ -303,9 +285,9 @@ es7210_adc2: es7210@42 {
+ 			work-mode = "ES7210_TDM_1LRCK_DSPB";
+ 			channels-max = <8>;
+ 			sound-name-prefix = "ES7210_ADC2";
+-        		MVDD-supply = <&reg_aud_adc_3v3>;
++			MVDD-supply = <&reg_aud_adc_3v3>;
+ 			AVDD-supply = <&reg_aud_adc_3v3>;
+-		    	DVDD-supply = <&soc_dvdd18_aon_reg>;
++			DVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			PVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			status = "disabled";
+ 		};
+@@ -317,9 +299,9 @@ es7210_adc3: es7210@43 {
+ 			work-mode = "ES7210_TDM_1LRCK_DSPB";
+ 			channels-max = <8>;
+ 			sound-name-prefix = "ES7210_ADC3";
+-        		MVDD-supply = <&reg_aud_adc_3v3>;
++			MVDD-supply = <&reg_aud_adc_3v3>;
+ 			AVDD-supply = <&reg_aud_adc_3v3>;
+-		    	DVDD-supply = <&soc_dvdd18_aon_reg>;
++			DVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			PVDD-supply = <&soc_dvdd18_aon_reg>;
+ 			status = "disabled";
+ 		};
+@@ -347,32 +329,26 @@ &i2s1 {
+ 
+ &i2s_8ch_sd0 {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd0_pa_pins>,
+-				<&i2s_8ch_bus_pins>,
++	pinctrl-0 = <&i2s_8ch_sd0_pa_pins>,
+ 				<&i2s_8ch_sd0_pins>;
+ };
+ 
+ &i2s_8ch_sd1 {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd1_pa_pins>,
+-				<&i2s_8ch_bus_pins>,
++	pinctrl-0 = <&i2s_8ch_sd1_pa_pins>,
+ 				<&i2s_8ch_sd1_pins>;
+ };
+ 
+ &i2s_8ch_sd2 {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd2_pa_pins>,
+-				<&i2s_8ch_bus_pins>,
+-				<&i2s_8ch_sd2_pins>;
++	pinctrl-0 = <&i2s_8ch_sd2_pa_pins>,
++				<&i2s_8ch_sd2_pins>,
++				<&i2s_8ch_bus_pa_pins>,
++				<&i2s_8ch_bus_pins>;
+ };
+ 
+ &i2s_8ch_sd3 {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s_8ch_bus_pa_pins>,
+-				<&i2s_8ch_sd3_pa_pins>,
+-				<&i2s_8ch_bus_pins>,
++	pinctrl-0 = <&i2s_8ch_sd3_pa_pins>,
+ 				<&i2s_8ch_sd3_pins>;
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 44ea86985784..bd82dea8c219 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -805,6 +805,7 @@ spdif0: spdif@ffcb018000 {
+ 			reg = <0xff 0xcb018000 0x0 0x1000>;
+ 			audio-cpr-regmap = <&audio_cpr>;
+ 			pinctrl-names = "default";
++			th1520,spdif_idx = <0>;
+ 			interrupts = <179 IRQ_TYPE_LEVEL_HIGH>;
+ 			dmas = <&dmac2 25>, <&dmac2 24>;
+ 			dma-names = "tx", "rx";
+@@ -821,6 +822,7 @@ spdif1: spdif@ffcb019000 {
+ 			reg = <0xff 0xcb019000 0x0 0x1000>;
+ 			audio-cpr-regmap = <&audio_cpr>;
+ 			pinctrl-names = "default";
++			th1520,spdif_idx = <1>;
+ 			interrupts = <180 IRQ_TYPE_LEVEL_HIGH>;
+ 			dmas = <&dmac2 27>, <&dmac2 26>;
+ 			dma-names = "tx", "rx";
+diff --git a/sound/soc/xuantie/th1520-i2s-8ch.c b/sound/soc/xuantie/th1520-i2s-8ch.c
+index 51e194fa306d..d03615fc7724 100644
+--- a/sound/soc/xuantie/th1520-i2s-8ch.c
++++ b/sound/soc/xuantie/th1520-i2s-8ch.c
+@@ -434,7 +434,6 @@ static const struct snd_soc_dai_ops th1520_hdmi_dai_ops = {
+ 
+ static struct snd_soc_dai_driver th1520_i2s_8ch_soc_dai[] = {
+ 	{
+-		.name			= "th1520-i2s-8ch-dai",
+ 		.playback	= {
+ 			.rates		= TH1520_RATES,
+ 			.formats	= TH1520_FMTS,
+@@ -701,6 +700,7 @@ static int th1520_audio_i2s_8ch_probe(struct platform_device *pdev)
+ 
+ 	th1520_pcm_probe(pdev, priv, TH1520_I2S_DMABUF_SIZE);
+ 
++	th1520_i2s_8ch_soc_dai[0].name = priv->name;
+ 	ret = devm_snd_soc_register_component(&pdev->dev,
+ 					      &th1520_i2s_8ch_soc_component,
+ 					      th1520_i2s_8ch_soc_dai,
+diff --git a/sound/soc/xuantie/th1520-spdif.c b/sound/soc/xuantie/th1520-spdif.c
+index a18a7c52a91a..86072105796a 100644
+--- a/sound/soc/xuantie/th1520-spdif.c
++++ b/sound/soc/xuantie/th1520-spdif.c
+@@ -394,6 +394,14 @@ static int th1520_spdif_probe(struct platform_device *pdev)
+         return PTR_ERR(priv->regs);
+     }
+ 
++	iprop = of_get_property(np, "th1520,spdif_idx", NULL);
++	if (iprop) {
++		sprintf(priv->name, "spdif-%d", be32_to_cpup(iprop));
++	} else {
++		dev_err(dev, "invalid th1520,spdif_idx\n");
++		return -EINVAL;
++	}
++
+     priv->regmap = devm_regmap_init_mmio(dev, priv->regs,
+                                                 &th1520_spdif_regmap_config);
+     if (IS_ERR(priv->regmap)) {
+@@ -460,7 +468,8 @@ static int th1520_spdif_probe(struct platform_device *pdev)
+ 		return -EIO;
+ 	}
+ 
+-    ret = devm_snd_soc_register_component(dev, &th1520_spdif_soc_component,
++    th1520_spdif_soc_dai.name = priv->name;
++	ret = devm_snd_soc_register_component(dev, &th1520_spdif_soc_component,
+                         &th1520_spdif_soc_dai, 1);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "cannot snd component register\n");
+diff --git a/sound/soc/xuantie/th1520-spdif.h b/sound/soc/xuantie/th1520-spdif.h
+index 81567fefdc6b..c3afaecc39a6 100644
+--- a/sound/soc/xuantie/th1520-spdif.h
++++ b/sound/soc/xuantie/th1520-spdif.h
+@@ -209,6 +209,7 @@ struct th1520_spdif_priv {
+     struct snd_dmaengine_dai_dma_data dma_params_tx;
+     struct snd_dmaengine_dai_dma_data dma_params_rx;
+     struct device *dev; 
++    char name[16];
+     unsigned int irq;
+     u32 suspend_tx_en;
+     u32 suspend_tx_ctl;
+diff --git a/sound/soc/xuantie/th1520-tdm.c b/sound/soc/xuantie/th1520-tdm.c
+index 41d4d8d759b9..f8b0520899a4 100644
+--- a/sound/soc/xuantie/th1520-tdm.c
++++ b/sound/soc/xuantie/th1520-tdm.c
+@@ -457,6 +457,7 @@ static int th1520_tdm_probe(struct platform_device *pdev)
+     if (iprop) {
+         if (be32_to_cpup(iprop) >=1 && be32_to_cpup(iprop) <=8 ) {
+             tdm_priv->slot_num = be32_to_cpup(iprop);
++            sprintf(tdm_priv->name, "tdm-%d", tdm_priv->slot_num);
+         } else {
+             dev_err(dev, "invalid th1520,tdm_slot_num\n");
+             return -EINVAL;
+@@ -568,7 +569,8 @@ static int th1520_tdm_probe(struct platform_device *pdev)
+ 		return -EIO;
+ 	}
+ 
+-    ret = devm_snd_soc_register_component(dev, &th1520_tdm_soc_component,
++	th1520_tdm_soc_dai.name = tdm_priv->name;
++	ret = devm_snd_soc_register_component(dev, &th1520_tdm_soc_component,
+                         &th1520_tdm_soc_dai, 1);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "cannot snd component register\n");
+diff --git a/sound/soc/xuantie/th1520-tdm.h b/sound/soc/xuantie/th1520-tdm.h
+index 32f8ac5cd272..5886e4a08964 100644
+--- a/sound/soc/xuantie/th1520-tdm.h
++++ b/sound/soc/xuantie/th1520-tdm.h
+@@ -97,6 +97,7 @@ struct th1520_tdm_priv {
+     struct snd_dmaengine_dai_dma_data dma_params_rx;
+     unsigned int cfg_off;
+     struct device *dev; 
++    char name[16];
+     char mode;
+     char slots;
+     char slot_num;
+-- 
+2.43.0
+

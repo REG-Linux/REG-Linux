@@ -1,0 +1,73 @@
+From d58f0eecf259295cc4c6486cf7cbc69d5d2ba4ab Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Thu, 3 Jul 2025 17:08:21 +0800
+Subject: [PATCH 376/400] net/rfkill: rfkill: fix get gpio name from devicetree
+
+Fix functions in rfkill-wlan / rfkill-bt for getting gpio name from devicetree.
+Fix null pointer error in rfkill-wlan.
+
+Signed-off-by: KamijoToma <admin@misakacloud.net>
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ net/rfkill/Makefile      |  2 +-
+ net/rfkill/rfkill-bt.c   |  4 +---
+ net/rfkill/rfkill-wlan.c | 10 ++++------
+ 3 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/net/rfkill/Makefile b/net/rfkill/Makefile
+index 4623b5756663..1f66cc9b7ccb 100644
+--- a/net/rfkill/Makefile
++++ b/net/rfkill/Makefile
+@@ -7,4 +7,4 @@ rfkill-y			+= core.o
+ rfkill-$(CONFIG_RFKILL_INPUT)	+= input.o
+ obj-$(CONFIG_RFKILL)		+= rfkill.o
+ obj-$(CONFIG_RFKILL_GPIO)	+= rfkill-gpio.o
+-obj-y				+= rfkill-wlan.o rfkill-bt.o
++obj-m				+= rfkill-wlan.o rfkill-bt.o
+diff --git a/net/rfkill/rfkill-bt.c b/net/rfkill/rfkill-bt.c
+index 9d0df1d45af5..4daabe177972 100644
+--- a/net/rfkill/rfkill-bt.c
++++ b/net/rfkill/rfkill-bt.c
+@@ -107,9 +107,7 @@ static int bluetooth_platdata_parse_dt(struct device *dev, struct rfkill_platfor
+ 	memset(data, 0, sizeof(*data));
+ 
+ 	gpio = -EINVAL;
+-	desc = of_find_gpio(node, "BT,power", 0, &flags);
+-	if (!IS_ERR(desc))
+-		gpio = desc_to_gpio(desc);
++	gpio = of_get_named_gpio(node, "BT,power-gpios", 0);
+ 	LOG("%s: BT,power-gpios = %d\n", __func__, gpio);
+ 	if (gpio_is_valid(gpio)) {
+ 		data->power_n.io = gpio;
+diff --git a/net/rfkill/rfkill-wlan.c b/net/rfkill/rfkill-wlan.c
+index c217716e2e59..d6857379cf1b 100644
+--- a/net/rfkill/rfkill-wlan.c
++++ b/net/rfkill/rfkill-wlan.c
+@@ -115,9 +115,7 @@ static int wlan_platdata_parse_dt(struct device *dev, struct wifi_moudle_gpios *
+ 	}
+ 
+ 	gpio = -EINVAL;
+-	desc = of_find_gpio(node, "WIFI,poweren", 0, &flags);
+-	if (!IS_ERR(desc))
+-		gpio = desc_to_gpio(desc);
++	gpio = of_get_named_gpio(node, "WIFI,poweren-gpios", 0);
+ 	LOG("%s: The power of the WiFi module is controlled by GPIO.\n", __func__);
+ 	if (gpio_is_valid(gpio)) {
+ 		data->power_n.io = gpio;
+@@ -197,10 +195,10 @@ static int rfkill_wlan_remove(struct platform_device *pdev)
+ {
+ 	struct rfkill_wlan_data *rfkill = platform_get_drvdata(pdev);
+ 
+-	if (gpio_is_valid(rfkill->pdata->power_n.io))
++	if (rfkill && rfkill->pdata && gpio_is_valid(rfkill->pdata->power_n.io))
+ 		gpio_free(rfkill->pdata->power_n.io);
+-
+-	kfree(rfkill);
++	if (rfkill)
++		kfree(rfkill);
+ 	g_rfkill = NULL;
+ 
+ 	return 0;
+-- 
+2.43.0
+

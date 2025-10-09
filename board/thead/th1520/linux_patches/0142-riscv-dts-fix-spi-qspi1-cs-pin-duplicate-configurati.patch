@@ -1,0 +1,36 @@
+From a8b8a83c59a249d37eda524572f38e625eefe15a Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Mon, 17 Jun 2024 15:06:04 +0800
+Subject: [PATCH 142/400] riscv:dts: fix spi/qspi1 cs pin duplicate
+ configuration error
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index a00ba37ebebe..65d2b00189a8 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -395,7 +395,7 @@ rx-pins {
+ 
+ 	spi_pins: spi-0 {
+ 		spi-pins {
+-			pins = "SPI_SCLK", "SPI_CSN", "SPI_MOSI", "SPI_MISO";
++			pins = "SPI_SCLK", "SPI_MOSI", "SPI_MISO";
+ 			function = "spi";
+ 			bias-disable;
+ 			drive-strength = <7>;
+@@ -433,7 +433,7 @@ i2c-pins {
+ 
+ 	qspi1_pins: qspi1-0 {
+ 		qspi-pins {
+-			pins = "QSPI1_SCLK", "QSPI1_CSN0", "QSPI1_D0_MOSI", "QSPI1_D1_MISO";
++			pins = "QSPI1_SCLK", "QSPI1_D0_MOSI", "QSPI1_D1_MISO";
+ 			function = "qspi";
+ 			bias-disable;
+ 			drive-strength = <7>;
+-- 
+2.43.0
+

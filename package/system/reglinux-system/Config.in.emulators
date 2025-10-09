@@ -16,6 +16,9 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     # Box64 user-mode x64_64 emulation for AArch64 / RV64
     select BR2_PACKAGE_BOX64			if BR2_RISCV_64
 
+    # Felix86 user-mode x86/x86_64 emulation for RV64 (needs GLX, Vulkan, X11)
+    select BR2_PACKAGE_FELIX86			if BR2_RISCV_64 && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_REGLINUX_VULKAN
+
     # CLK - Clock Signal emulator
     select BR2_PACKAGE_CLK			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL
 

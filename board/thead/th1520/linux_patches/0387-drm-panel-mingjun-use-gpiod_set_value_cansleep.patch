@@ -1,0 +1,60 @@
+From d293b68065c165417befdf63314b9ed15865f798 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Tue, 15 Jul 2025 03:58:22 +0800
+Subject: [PATCH 387/400] drm/panel: mingjun: use gpiod_set_value_cansleep
+
+For power sequencing that do not require strict timing,
+gpiod_set_value_cansleep is usually used.
+
+Do the same thing on the mingjun panel driver.
+
+This fixes some warnings on Lichee Console 4A.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+---
+ drivers/gpu/drm/panel/panel-mingjun-070bi30ia2.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-mingjun-070bi30ia2.c b/drivers/gpu/drm/panel/panel-mingjun-070bi30ia2.c
+index 1923286a860c..4455595a6726 100644
+--- a/drivers/gpu/drm/panel/panel-mingjun-070bi30ia2.c
++++ b/drivers/gpu/drm/panel/panel-mingjun-070bi30ia2.c
+@@ -111,7 +111,7 @@ static int mingjun_unprepare(struct drm_panel *panel)
+ 	/* sleep_mode_delay: 1ms - 2ms */
+ 	usleep_range(1000, 2000);
+ 
+-	gpiod_set_value(pinfo->reset, 1);
++	gpiod_set_value_cansleep(pinfo->reset, 1);
+ 	regulator_disable(pinfo->hsvcc);
+ 	regulator_disable(pinfo->vspn3v3);
+ 
+@@ -127,7 +127,7 @@ static int mingjun_prepare(struct drm_panel *panel)
+ 
+ 	if (pinfo->prepared)
+ 		return 0;
+-	gpiod_set_value(pinfo->reset, 0);
++	gpiod_set_value_cansleep(pinfo->reset, 0);
+ 
+ 	/* Power the panel */
+ 	ret = regulator_enable(pinfo->hsvcc);
+@@ -144,7 +144,7 @@ static int mingjun_prepare(struct drm_panel *panel)
+ 	}
+ 	usleep_range(5000, 6000);
+ 
+-	gpiod_set_value(pinfo->reset, 1);
++	gpiod_set_value_cansleep(pinfo->reset, 1);
+ 	msleep(180);
+ 
+ 	pinfo->prepared = true;
+@@ -152,7 +152,7 @@ static int mingjun_prepare(struct drm_panel *panel)
+ 	return 0;
+ 
+ fail:
+-	gpiod_set_value(pinfo->reset, 1);
++	gpiod_set_value_cansleep(pinfo->reset, 1);
+ 	regulator_disable(pinfo->hsvcc);
+ 	return ret;
+ }
+-- 
+2.43.0
+

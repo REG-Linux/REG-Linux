@@ -1,0 +1,41 @@
+From f324d70df25c3d507750a10b664c6517b60d48a8 Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Mon, 7 Jul 2025 17:20:01 +0800
+Subject: [PATCH 380/400] dts: lichee-pi-4a: disable rtl8723 bluetooth define
+ in uart4
+
+For rtl8723/aic8800 different hardware compatibility, using systemd to manually attach HCI port;
+This definition can conflict with aic8800, so disable it for now.
+
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 8306d1bebf16..900dceffc7bf 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -1163,12 +1163,13 @@ &uart4 {
+ 	status = "okay";
+ 	uart-has-rtscts;
+ 
+-	bluetooth {
+-		compatible = "realtek,rtl8723ds-bt";
+-		device-wake-gpios = <&gpio0 28 GPIO_ACTIVE_HIGH>; /* GPIO02 */
+-		host-wake-gpios = <&ioexp2 7 GPIO_ACTIVE_HIGH>;
+-		enable-gpios = <&ioexp2 5 GPIO_ACTIVE_HIGH>;
+-	};
++	// For rtl8723/aic8800 compatibility, using systemd to manually attach HCI port
++	// bluetooth {
++	// 	compatible = "realtek,rtl8723ds-bt";
++	// 	device-wake-gpios = <&gpio0 28 GPIO_ACTIVE_HIGH>; /* GPIO02 */
++	// 	host-wake-gpios = <&ioexp2 7 GPIO_ACTIVE_HIGH>;
++	// 	enable-gpios = <&ioexp2 5 GPIO_ACTIVE_HIGH>;
++	// };
+ };
+ 
+ &usb {
+-- 
+2.43.0
+

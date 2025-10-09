@@ -1,0 +1,37 @@
+From fc6a4aa17aa8e5de28655651edb2a895b0e9e41f Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Fri, 13 Sep 2024 22:50:14 +0800
+Subject: [PATCH 331/400] th1520: use etnaviv gpu
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 16d1016e0528..53d9fdb11137 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -2009,15 +2009,15 @@ opp-396000000 {
+ 		};
+ 
+ 		g2d: gc620@ffecc80000 {
+-			compatible = "xuantie,th1520-gc620";
++			compatible = "vivante,gc";
+ 			reg = <0xff 0xecc80000 0x0 0x40000>;
+ 			interrupt-parent = <&plic>;
+ 			interrupts = <101 IRQ_TYPE_LEVEL_HIGH>;
+-			interrupt-names = "irq_2d";
++
+ 			clocks = <&vpsys_clk_gate TH1520_VPSYS_G2D_PCLK>,
+ 				 <&vpsys_clk_gate TH1520_VPSYS_G2D_ACLK>,
+ 				 <&vpsys_clk_gate TH1520_VPSYS_G2D_CCLK>;
+-			clock-names = "pclk", "aclk", "cclk";
++			clock-names = "bus", "core", "shader";
+ 			operating-points-v2 = <&g2d_opp_table>;
+ 			status = "okay";
+ 		};
+-- 
+2.43.0
+

@@ -1,0 +1,60 @@
+From a090629d79f96322ab8b323bdd0d615b2f127c81 Mon Sep 17 00:00:00 2001
+From: Drew Fustini <dfustini@baylibre.com>
+Date: Wed, 6 Dec 2023 00:09:24 -0800
+Subject: [PATCH 059/400] riscv: dts: thead: Enable LicheePi 4A eMMC and
+ microSD
+
+Add emmc node properties for the eMMC device and add sdio0 node
+properties for the microSD slot. Set the frequency for the sdhci
+reference clock.
+
+Signed-off-by: Drew Fustini <dfustini@baylibre.com>
+Reviewed-by: Guo Ren <guoren@kernel.org>
+Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
+Link: https://lore.kernel.org/r/20231206-th1520_mmc_dts-v8-4-69220e373e8f@baylibre.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../dts/thead/th1520-lichee-module-4a.dtsi    | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index f674e5acd0f9..8e3d0fd94647 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -33,6 +33,10 @@ &apb_clk {
+ 	clock-frequency = <62500000>;
+ };
+ 
++&sdhci_clk {
++	clock-frequency = <198000000>;
++};
++
+ &uart_sclk {
+ 	clock-frequency = <100000000>;
+ };
+@@ -47,6 +51,22 @@ &dmac0 {
+ 	status = "okay";
+ };
+ 
++&emmc {
++       bus-width = <8>;
++       max-frequency = <198000000>;
++       mmc-hs400-1_8v;
++       non-removable;
++       no-sdio;
++       no-sd;
++       status = "okay";
++};
++
++&sdio0 {
++       bus-width = <4>;
++       max-frequency = <198000000>;
++       status = "okay";
++};
++
+ &gpio0 {
+ 	gpio-line-names = "", "", "", "", "", "", "", "", "", "",
+ 			  "", "", "", "", "", "", "", "", "", "",
+-- 
+2.43.0
+

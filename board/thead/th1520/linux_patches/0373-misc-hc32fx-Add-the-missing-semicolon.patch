@@ -1,0 +1,28 @@
+From 71434edfe9bc1a53bc1e3b0267bb95b2e4a809df Mon Sep 17 00:00:00 2001
+From: Yao Zi <ziyao@disroot.org>
+Date: Mon, 26 May 2025 11:58:03 +0000
+Subject: [PATCH 373/400] misc: hc32fx: Add the missing semicolon
+
+It's unknown how previously the file is compiled.
+
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+ drivers/misc/hc32fx/hc32fx_mcu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/misc/hc32fx/hc32fx_mcu.c b/drivers/misc/hc32fx/hc32fx_mcu.c
+index ca3e8787635b..3124dd0c494d 100644
+--- a/drivers/misc/hc32fx/hc32fx_mcu.c
++++ b/drivers/misc/hc32fx/hc32fx_mcu.c
+@@ -253,7 +253,7 @@ static int hc32fx_probe(struct i2c_client *client)
+ static struct of_device_id hc32fx_of_match[] = {
+ 	{.compatible = "hc32fx-mcu"},
+ 	{}
+-}
++};
+ MODULE_DEVICE_TABLE(of, hc32fx_of_match);
+ 
+ static const struct i2c_device_id hc32fx_id[] = {
+-- 
+2.43.0
+

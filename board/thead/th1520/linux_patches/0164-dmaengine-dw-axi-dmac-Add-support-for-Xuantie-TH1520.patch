@@ -1,0 +1,53 @@
+From 88e3d679e968bad67f9e22b9df995026fd7c19d4 Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Fri, 12 Jul 2024 13:03:03 +0800
+Subject: [PATCH 164/400] dmaengine: dw-axi-dmac: Add support for Xuantie
+ TH1520 DMA
+
+add th1520 dma compatible with match data AXI_DMA_FLAG_USE_CFG2
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi          | 4 ++--
+ drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c | 3 +++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 808a95238530..4bbd159e4d29 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -935,7 +935,7 @@ usb_dwc3: usb@ffe7040000 {
+ 		};
+ 
+ 		dmac0: dma-controller@ffefc00000 {
+-			compatible = "snps,axi-dma-1.01a";
++			compatible = "xuantie,th1520-axi-dma";
+ 			reg = <0xff 0xefc00000 0x0 0x1000>;
+ 			interrupts = <27 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&clk CLKGEN_DMAC_CPUSYS_ACLK>, <&clk CLKGEN_DMAC_CPUSYS_HCLK>;
+@@ -967,7 +967,7 @@ dmac1: dma-controller@ffff340000 {
+ 		};
+ 
+ 		dmac2: dma-controller@ffc8000000 {
+-			compatible = "snps,axi-dma-1.01a";
++			compatible = "xuantie,th1520-axi-dma";
+ 			reg = <0xff 0xc8000000 0x0 0x2000>;
+ 			interrupts = <167 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&clk CLKGEN_DMAC_CPUSYS_ACLK>, <&clk CLKGEN_DMAC_CPUSYS_HCLK>;
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index 1bf225a068b1..bf4e8ed7025f 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -1649,6 +1649,9 @@ static const struct of_device_id dw_dma_of_id_table[] = {
+ 	}, {
+ 		.compatible = "starfive,jh7110-axi-dma",
+ 		.data = (void *)(AXI_DMA_FLAG_HAS_RESETS | AXI_DMA_FLAG_USE_CFG2),
++	}, {
++		.compatible = "xuantie,th1520-axi-dma",
++		.data = (void *)(AXI_DMA_FLAG_USE_CFG2),
+ 	},
+ 	{}
+ };
+-- 
+2.43.0
+

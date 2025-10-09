@@ -1,0 +1,65 @@
+From 1de3ec286480f2e0b57a3f8a8b1c14ef2a049a47 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:51:45 +0800
+Subject: [PATCH 276/400] move the place of dts "audio-text-memory-region"
+ property
+
+move the "audio-text-memory-region" property into th1520_rpmsg node to avoid proble fail
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi       | 6 +-----
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 6 +-----
+ 2 files changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index d86873ef3440..82d811c79782 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -323,6 +323,7 @@ rpmsg: rpmsg{
+             reg = <0x0 0x1E000000 0 0x10000>;
+ 			compatible = "th1520,th1520-rpmsg";
+ 			log-memory-region = <&audio_log_mem>;
++			audio-text-memory-region = <&audio_text_mem>;
+ 			status = "okay";
+ 		};
+ 	};
+@@ -1784,11 +1785,6 @@ dma {
+ 	};
+ };
+ 
+-&aon_suspend_ctrl {
+-	audio-text-memory-region = <&audio_text_mem>;
+-	status = "okay";
+-};
+-
+ &gmac0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&gmac0_pins>;
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 91e7499d4321..1c1417ec424b 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -333,6 +333,7 @@ rpmsg: rpmsg{
+             reg = <0x0 0x1E000000 0 0x10000>;
+ 			compatible = "th1520,th1520-rpmsg";
+ 			log-memory-region = <&audio_log_mem>;
++			audio-text-memory-region = <&audio_text_mem>;
+ 			status = "okay";
+ 		};
+ 	};
+@@ -674,11 +675,6 @@ dw {
+ 
+ };
+ 
+-&aon_suspend_ctrl {
+-	audio-text-memory-region = <&audio_text_mem>;
+-	status = "okay";
+-};
+-
+ &gmac0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&gmac0_pins>;
+-- 
+2.43.0
+

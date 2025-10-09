@@ -1,0 +1,39 @@
+From 0117348f0f6527a809ce6cc9b49fe25979c92518 Mon Sep 17 00:00:00 2001
+From: Kwanghoon Son <k.son@samsung.com>
+Date: Mon, 18 Sep 2023 04:51:25 +0000
+Subject: [PATCH 092/400] riscv: dts: Add th1520 reset device tree
+
+Add reset device tree for th1520 SoC
+
+Signed-off-by: Kwanghoon Son <k.son@samsung.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index f0612d7837b4..d33a9ff5bfd2 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -12,6 +12,7 @@
+ #include <dt-bindings/clock/th1520-dspsys.h>
+ #include <dt-bindings/clock/th1520-audiosys.h>
+ #include <dt-bindings/clock/th1520-miscsys.h>
++#include <dt-bindings/reset/thead,th1520-reset.h>
+ 
+ / {
+ 	compatible = "thead,th1520";
+@@ -870,5 +871,11 @@ miscsys_clk_gate: miscsys-clk-gate {
+ 			#clock-cells = <1>;
+ 			status = "okay";
+ 		};
++
++		rst: reset-controller@ffef014000 {
++			compatible = "thead,th1520-reset", "syscon";
++			reg = <0xff 0xef014000 0x0 0x1000>;
++			#reset-cells = <1>;
++		};
+ 	};
+ };
+-- 
+2.43.0
+

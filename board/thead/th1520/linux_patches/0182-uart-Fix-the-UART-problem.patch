@@ -1,0 +1,234 @@
+From 99fa74830baef389958c531e15163d1336b8b69b Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sat, 31 Aug 2024 23:55:01 +0800
+Subject: [PATCH 182/400] uart: Fix the UART problem
+
+warning:
+dw-apb-uart fff7f08000.serial: failed to request DMA
+
+patch Source:
+Branch: linux-5.10.y-dev
+commit: 97f40393ae1cd4cab04f8b0590c11c1076886e10
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/tty/serial/8250/8250_dma.c  | 134 ++++++++++++++--------------
+ drivers/tty/serial/8250/8250_dw.c   |   2 +-
+ drivers/tty/serial/8250/8250_port.c |  12 ++-
+ 3 files changed, 80 insertions(+), 68 deletions(-)
+
+diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
+index 62492cf10bc9..6ca8ee2caede 100644
+--- a/drivers/tty/serial/8250/8250_dma.c
++++ b/drivers/tty/serial/8250/8250_dma.c
+@@ -221,66 +221,68 @@ int serial8250_request_dma(struct uart_8250_port *p)
+ 	dma->rxchan = dma_request_slave_channel_compat(mask,
+ 						       dma->fn, dma->rx_param,
+ 						       p->port.dev, "rx");
+-	if (!dma->rxchan)
+-		return -ENODEV;
+-
+-	/* 8250 rx dma requires dmaengine driver to support pause/terminate */
+-	ret = dma_get_slave_caps(dma->rxchan, &caps);
+-	if (ret)
+-		goto release_rx;
+-	if (!caps.cmd_pause || !caps.cmd_terminate ||
+-	    caps.residue_granularity == DMA_RESIDUE_GRANULARITY_DESCRIPTOR) {
+-		ret = -EINVAL;
+-		goto release_rx;
+-	}
++	if (!dma->rxchan) {
++	dev_dbg_once(p->port.dev,
++		     "DMA rx channel request failed, operating without rx DMA\n");
++	} else {
++
++		dmaengine_slave_config(dma->rxchan, &dma->rxconf);
++
++		/* 8250 rx dma requires dmaengine driver to support pause/terminate */
++		ret = dma_get_slave_caps(dma->rxchan, &caps);
++		if (ret)
++			goto release_rx;
++		if (!caps.cmd_pause || !caps.cmd_terminate ||
++			caps.residue_granularity == DMA_RESIDUE_GRANULARITY_DESCRIPTOR) {
++			ret = -EINVAL;
++			goto release_rx;
++		}
+ 
+-	dmaengine_slave_config(dma->rxchan, &dma->rxconf);
++			/* RX buffer */
++		if (!dma->rx_size)
++			dma->rx_size = PAGE_SIZE;
++
++		dma->rx_buf = dma_alloc_coherent(dma->rxchan->device->dev, dma->rx_size,
++						&dma->rx_addr, GFP_KERNEL);
++		if (!dma->rx_buf) {
++			ret = -ENOMEM;
++			goto release_rx;
++		}
++	}
+ 
+ 	/* Get a channel for TX */
+ 	dma->txchan = dma_request_slave_channel_compat(mask,
+ 						       dma->fn, dma->tx_param,
+ 						       p->port.dev, "tx");
+ 	if (!dma->txchan) {
+-		ret = -ENODEV;
+-		goto release_rx;
+-	}
+-
+-	/* 8250 tx dma requires dmaengine driver to support terminate */
+-	ret = dma_get_slave_caps(dma->txchan, &caps);
+-	if (ret)
+-		goto err;
+-	if (!caps.cmd_terminate) {
+-		ret = -EINVAL;
+-		goto err;
+-	}
+-
+-	dmaengine_slave_config(dma->txchan, &dma->txconf);
+-
+-	/* RX buffer */
+-	if (!dma->rx_size)
+-		dma->rx_size = PAGE_SIZE;
+-
+-	dma->rx_buf = dma_alloc_coherent(dma->rxchan->device->dev, dma->rx_size,
+-					&dma->rx_addr, GFP_KERNEL);
+-	if (!dma->rx_buf) {
+-		ret = -ENOMEM;
+-		goto err;
+-	}
++dev_dbg_once(p->port.dev,
++			     "DMA tx channel request failed, operating without tx DMA\n");
++	} else {
++
++		/* 8250 tx dma requires dmaengine driver to support terminate */
++		ret = dma_get_slave_caps(dma->txchan, &caps);
++		if (ret)
++			goto err;
++		if (!caps.cmd_terminate) {
++			ret = -EINVAL;
++			goto err;
++		}
+ 
+-	/* TX buffer */
+-	dma->tx_addr = dma_map_single(dma->txchan->device->dev,
+-					p->port.state->xmit.buf,
+-					UART_XMIT_SIZE,
+-					DMA_TO_DEVICE);
+-	if (dma_mapping_error(dma->txchan->device->dev, dma->tx_addr)) {
+-		dma_free_coherent(dma->rxchan->device->dev, dma->rx_size,
+-				  dma->rx_buf, dma->rx_addr);
+-		ret = -ENOMEM;
+-		goto err;
++		dmaengine_slave_config(dma->txchan, &dma->txconf);
++
++		/* TX buffer */
++		dma->tx_addr = dma_map_single(dma->txchan->device->dev,
++						p->port.state->xmit.buf,
++						UART_XMIT_SIZE,
++						DMA_TO_DEVICE);
++		if (dma_mapping_error(dma->txchan->device->dev, dma->tx_addr)) {
++			dma_free_coherent(dma->rxchan->device->dev, dma->rx_size,
++					  dma->rx_buf, dma->rx_addr);
++			ret = -ENOMEM;
++			goto err;
++		}
+ 	}
+ 
+-	dev_dbg_ratelimited(p->port.dev, "got both dma channels\n");
+-
+ 	return 0;
+ err:
+ 	dma_release_channel(dma->txchan);
+@@ -297,21 +299,23 @@ void serial8250_release_dma(struct uart_8250_port *p)
+ 	if (!dma)
+ 		return;
+ 
+-	/* Release RX resources */
+-	dmaengine_terminate_sync(dma->rxchan);
+-	dma_free_coherent(dma->rxchan->device->dev, dma->rx_size, dma->rx_buf,
+-			  dma->rx_addr);
+-	dma_release_channel(dma->rxchan);
+-	dma->rxchan = NULL;
+-
+-	/* Release TX resources */
+-	dmaengine_terminate_sync(dma->txchan);
+-	dma_unmap_single(dma->txchan->device->dev, dma->tx_addr,
+-			 UART_XMIT_SIZE, DMA_TO_DEVICE);
+-	dma_release_channel(dma->txchan);
+-	dma->txchan = NULL;
+-	dma->tx_running = 0;
++	if (dma->rxchan) {
++		/* Release RX resources */
++		dmaengine_terminate_sync(dma->rxchan);
++		dma_free_coherent(dma->rxchan->device->dev, dma->rx_size, dma->rx_buf,
++				  dma->rx_addr);
++		dma_release_channel(dma->rxchan);
++		dma->rxchan = NULL;
++	}
+ 
+-	dev_dbg_ratelimited(p->port.dev, "dma channels released\n");
++	if (dma->txchan) {
++		/* Release TX resources */
++		dmaengine_terminate_sync(dma->txchan);
++		dma_unmap_single(dma->txchan->device->dev, dma->tx_addr,
++				 UART_XMIT_SIZE, DMA_TO_DEVICE);
++		dma_release_channel(dma->txchan);
++		dma->txchan = NULL;
++		dma->tx_running = 0;
++	}
+ }
+ EXPORT_SYMBOL_GPL(serial8250_release_dma);
+diff --git a/drivers/tty/serial/8250/8250_dw.c b/drivers/tty/serial/8250/8250_dw.c
+index eaf4a907380a..5b6e1ae1d66a 100644
+--- a/drivers/tty/serial/8250/8250_dw.c
++++ b/drivers/tty/serial/8250/8250_dw.c
+@@ -289,7 +289,7 @@ static int dw8250_handle_irq(struct uart_port *p)
+ 	 * This problem has only been observed so far when not in DMA mode
+ 	 * so we limit the workaround only to non-DMA mode.
+ 	 */
+-	if (!up->dma && rx_timeout) {
++	if ((!up->dma || !up->dma->rxchan)  && ((iir & 0x3f) == UART_IIR_RX_TIMEOUT)) {
+ 		spin_lock_irqsave(&p->lock, flags);
+ 		status = serial_lsr_in(up);
+ 
+diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
+index 23aed9e89e30..45729185fc3c 100644
+--- a/drivers/tty/serial/8250/8250_port.c
++++ b/drivers/tty/serial/8250/8250_port.c
+@@ -1535,7 +1535,7 @@ static inline void __start_tx(struct uart_port *port)
+ {
+ 	struct uart_8250_port *up = up_to_u8250p(port);
+ 
+-	if (up->dma && !up->dma->tx_dma(up))
++	if (up->dma && up->dma->txchan && !up->dma->tx_dma(up))
+ 		return;
+ 
+ 	if (serial8250_set_THRI(up)) {
+@@ -1935,7 +1935,7 @@ int serial8250_handle_irq(struct uart_port *port, unsigned int iir)
+ 		d = irq_get_irq_data(port->irq);
+ 		if (d && irqd_is_wakeup_set(d))
+ 			pm_wakeup_event(tport->tty->dev, 0);
+-		if (!up->dma || handle_rx_dma(up, iir))
++		if ((!up->dma || !up->dma->rxchan) || handle_rx_dma(up, iir))
+ 			status = serial8250_rx_chars(up, status);
+ 	}
+ 	serial8250_modem_status(up);
+@@ -2450,6 +2450,14 @@ int serial8250_do_startup(struct uart_port *port)
+ 			dev_warn_ratelimited(port->dev, "%s\n", msg);
+ 			up->dma = NULL;
+ 		}
++
++
++		if (up->dma && !up->dma->rxchan && !up->dma->txchan)
++			up->dma = NULL;
++		if (up->dma && !up->dma->rxchan)
++			up->dma->rx_dma = NULL;
++		if (up->dma && !up->dma->txchan)
++			up->dma->tx_dma = NULL;
+ 	}
+ 
+ 	/*
+-- 
+2.43.0
+
