@@ -7,7 +7,7 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 
 	# Cannonball SE (OutRun)
 	# TODO requires SSE4 or NEON at the moment
-	select BR2_PACKAGE_CANNONBALL			if BR2_x86_64_v3 || (BR2_arm && BR2_ARM_FPU_NEON_VFPV4) || BR2_aarch64
+	select BR2_PACKAGE_CANNONBALL			if BR2_x86_x86_64_v3 || (BR2_arm && BR2_ARM_FPU_NEON_VFPV4) || BR2_aarch64
 
 	# NxEngine (Cave Story)
 	select BR2_PACKAGE_LIBRETRO_NXENGINE		if !BR2_PACKAGE_SYSTEM_TARGET_CHA

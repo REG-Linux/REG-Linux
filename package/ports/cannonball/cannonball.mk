@@ -3,7 +3,7 @@
 # cannonball
 #
 ################################################################################
-# Version.: Commits on Aug 27, 2025
+# Version.: Commits on Oct 5, 2025
 CANNONBALL_VERSION = aa77386ebe4a5d32e1b1d2b682aa52f3a1f76b5b
 CANNONBALL_SITE = $(call github,J1mbo,cannonball-se,$(CANNONBALL_VERSION))
 CANNONBALL_LICENSE = GPLv2
