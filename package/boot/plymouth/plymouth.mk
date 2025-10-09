@@ -7,7 +7,7 @@
 PLYMOUTH_VERSION = 24.004.60
 PLYMOUTH_SITE = https://gitlab.freedesktop.org/plymouth/plymouth.git
 PLYMOUTH_SITE_METHOD = git
-PLYMOUTH_DEPENDENCIES += pango cairo libdrm libpng libevdev freetype libxkbcommon xkeyboard-config
+PLYMOUTH_DEPENDENCIES += pango cairo libdrm libpng libevdev freetype libxkbcommon xkeyboard-config gettext
 PLYMOUTH_PATH = $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth
 
 PLYMOUTH_CONF_OPTS  = -Dgtk=disabled -Dsystemd-integration=false -Ddocs=false
