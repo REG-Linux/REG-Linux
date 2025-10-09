@@ -1,0 +1,171 @@
+From 0754d3cc6dcb4c57c1e98c6e90623eb0593accad Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Fri, 28 Jun 2024 13:16:54 +0800
+Subject: [PATCH 155/400] audio: th1520: enable soundcard feature
+
+enable TH1520-Sound-Card feature
+    simple-audio-card,dai-link@0 {          /* I2S - HDMI*/
+        reg = <0>;
+        format = "i2s";
+        cpu {
+            sound-dai = <&ap_i2s 1>;
+        };
+        codec {
+            sound-dai = <&hdmi_codec>;
+        };
+    };
+    simple-audio-card,dai-link@1 {          /* I2S - AUDIO SYS CODEC 7210*/
+        reg = <1>;
+        format = "i2s";
+        cpu {
+            sound-dai = <&i2s1 0>;
+        };
+        codec {
+            sound-dai = <&es7210_audio_codec>;
+        };
+    };
+    simple-audio-card,dai-link@2 {          /* I2S - AUDIO SYS CODEC 8156*/
+        reg = <2>;
+        format = "i2s";
+        cpu {
+            sound-dai = <&i2s1 0>;
+        };
+        codec {
+            sound-dai = <&es8156_audio_codec>;
+        };
+    };
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+---
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 42 ++++++++++++++++++-
+ arch/riscv/boot/dts/thead/th1520.dtsi         |  2 +-
+ sound/soc/xuantie/th1520-i2s.c                |  8 ++--
+ sound/soc/xuantie/th1520-i2s.h                |  2 +-
+ 4 files changed, 46 insertions(+), 8 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 24724ead65bb..b7fccca5ef34 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -32,7 +32,7 @@ aliases {
+ 		i2c4 = &i2c4;
+ 		i2c5 = &audio_i2c0;
+ 		i2c6 = &audio_i2c1;
+-		light_i2s = &light_i2s;
++		ap_i2s = &ap_i2s;
+ 		i2s0 = &i2s0;
+ 		i2s1 = &i2s1;
+ 		i2s2 = &i2s2;
+@@ -201,6 +201,44 @@ hdmi_codec: hdmi_codec@1 {
+ 		sound-name-prefix = "DUMMY";
+ 	};
+ 
++	th1520_sound: soundcard@1 {
++		compatible = "simple-audio-card";
++		simple-audio-card,name = "TH1520-Sound-Card";
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		simple-audio-card,dai-link@0 {
++			reg = <0>;
++			format = "i2s";
++			cpu {
++				sound-dai = <&ap_i2s 1>;
++			};
++			codec {
++				sound-dai = <&hdmi_codec>;
++			};
++		};
++		simple-audio-card,dai-link@1 {
++			reg = <1>;
++			format = "i2s";
++			cpu {
++				sound-dai = <&i2s1 0>;
++			};
++			codec {
++				sound-dai = <&es7210_audio_codec>;
++			};
++		};
++		simple-audio-card,dai-link@2 {
++			reg = <2>;
++			format = "i2s";
++			cpu {
++				sound-dai = <&i2s1 0>;
++			};
++			codec {
++				sound-dai = <&es8156_audio_codec>;
++			};
++		};
++	};
++
+ 
+ 	thermal-zones {
+ 		cpu-thermal {
+@@ -736,7 +774,7 @@ es7210_audio_codec: es7210@40 {
+ 	};
+ };
+ 
+-&light_i2s {
++&ap_i2s {
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index d8da93474b3c..d385fe78ab12 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -409,7 +409,7 @@ audio_i2c1: i2c@ffcb01b000 {
+ 			status = "disabled";
+ 		};
+ 
+-		light_i2s: light-i2s@ffe7034000 {
++		ap_i2s: ap-i2s@ffe7034000 {
+ 			#sound-dai-cells = <1>;
+ 			compatible = "xuantie,th1520-i2s";
+ 			reg = <0xff 0xe7034000 0x0 0x4000>;
+diff --git a/sound/soc/xuantie/th1520-i2s.c b/sound/soc/xuantie/th1520-i2s.c
+index 645a585d5314..c86c07d89ff5 100644
+--- a/sound/soc/xuantie/th1520-i2s.c
++++ b/sound/soc/xuantie/th1520-i2s.c
+@@ -238,12 +238,14 @@ static int th1520_i2s_set_fmt_dai(struct snd_soc_dai *cpu_dai, unsigned int fmt)
+ 	pm_runtime_resume_and_get(i2s_private->dev);
+ 
+ 	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
+-	case SND_SOC_DAIFMT_CBS_CFS:
++	// directly indicate whether the cpu-dai is clock provider
++	case SND_SOC_DAIFMT_CBP_CFP:
+ 		cnfin |= CNFIN_I2S_RXMODE_MASTER_MODE;
+ 		cnfout |= IISCNFOUT_TSAFS_I2S;
+ 		cnfout &= ~IISCNFOUT_I2S_TXMODE_SLAVE;
+ 		break;
+-	case SND_SOC_DAIFMT_CBM_CFM:
++	// directly indicate whether the cpu-dai is clock consumer
++	case SND_SOC_DAIFMT_CBC_CFC:
+ 		cnfin &= ~CNFIN_I2S_RXMODE_MASTER_MODE;
+ 		cnfout |= IISCNFOUT_TSAFS_RIGHT_JUSTIFIED;
+ 		cnfout |= IISCNFOUT_I2S_TXMODE_SLAVE;
+@@ -271,8 +273,6 @@ static int th1520_i2s_set_fmt_dai(struct snd_soc_dai *cpu_dai, unsigned int fmt)
+ 	regmap_update_bits(i2s_private->regmap, I2S_IISCNF_OUT,
+ 			   IISCNFOUT_TSAFS_MSK, cnfout);
+ 
+-	cnfin |= CNFIN_I2S_RXMODE_MASTER_MODE;
+-
+ 	regmap_update_bits(i2s_private->regmap, I2S_IISCNF_IN,
+ 			   CNFIN_I2S_RXMODE_Msk,
+ 			   cnfin);
+diff --git a/sound/soc/xuantie/th1520-i2s.h b/sound/soc/xuantie/th1520-i2s.h
+index ae261b8e0dd8..e628943499a1 100644
+--- a/sound/soc/xuantie/th1520-i2s.h
++++ b/sound/soc/xuantie/th1520-i2s.h
+@@ -469,7 +469,7 @@
+ #define STEREO_CHANNEL		2
+ 
+ //for 2ch mode
+-#define AP_I2S			"light-i2s"
++#define AP_I2S			"ap-i2s"
+ #define AUDIO_I2S0		"audio-i2s0"
+ #define AUDIO_I2S1		"audio-i2s1"
+ #define AUDIO_I2S2		"audio-i2s2"
+-- 
+2.43.0
+

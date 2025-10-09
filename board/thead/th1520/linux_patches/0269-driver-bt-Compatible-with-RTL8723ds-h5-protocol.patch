@@ -1,0 +1,101 @@
+From fe56f54666221ff99a3f82d574611a6f0384c1d2 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 01:42:27 +0800
+Subject: [PATCH 269/400] driver: bt : Compatible with RTL8723ds'h5 protocol
+
+Modify the default kernel code to support the H5 protocol of RTL8723ds
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/bluetooth/hci_ldisc.c  | 15 +++++++++++++++
+ drivers/bluetooth/hci_rtk_h5.c |  3 ++-
+ drivers/bluetooth/hci_uart.h   |  5 +++++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 70320b8f1aa1..51cfb97790dd 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -37,6 +37,12 @@
+ 
+ #define VERSION "2.3"
+ 
++#define BTCOEX
++
++#ifdef BTCOEX
++#include "rtk_coex.h"
++#endif
++
+ static const struct hci_uart_proto *hup[HCI_UART_MAX_PROTO];
+ 
+ int hci_uart_register_proto(const struct hci_uart_proto *p)
+@@ -864,6 +870,9 @@ static int __init hci_uart_init(void)
+ #ifdef CONFIG_BT_HCIUART_3WIRE
+ 	h5_init();
+ #endif
++#ifdef CONFIG_BT_HCIUART_RTL3WIRE
++	h5_init();
++#endif
+ #ifdef CONFIG_BT_HCIUART_INTEL
+ 	intel_init();
+ #endif
+@@ -879,6 +888,9 @@ static int __init hci_uart_init(void)
+ #ifdef CONFIG_BT_HCIUART_MRVL
+ 	mrvl_init();
+ #endif
++#ifdef BTCOEX
++	rtk_btcoex_init();
++#endif
+ 
+ 	return 0;
+ }
+@@ -900,6 +912,9 @@ static void __exit hci_uart_exit(void)
+ #ifdef CONFIG_BT_HCIUART_3WIRE
+ 	h5_deinit();
+ #endif
++#ifdef CONFIG_BT_HCIUART_RTL3WIRE
++	h5_deinit();
++#endif
+ #ifdef CONFIG_BT_HCIUART_INTEL
+ 	intel_deinit();
+ #endif
+diff --git a/drivers/bluetooth/hci_rtk_h5.c b/drivers/bluetooth/hci_rtk_h5.c
+index 7fbce668962d..b60eb33a636f 100644
+--- a/drivers/bluetooth/hci_rtk_h5.c
++++ b/drivers/bluetooth/hci_rtk_h5.c
+@@ -657,6 +657,7 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
+ 						       h5->rx_skb->len);
+ #endif
+ 
++#define HCI_VERSION_CODE LINUX_VERSION_CODE
+ #if HCI_VERSION_CODE < KERNEL_VERSION(3, 13, 0)
+ 		hci_recv_frame(h5->rx_skb);
+ #else
+@@ -674,7 +675,7 @@ static u16 bscp_get_crc(struct h5_struct *h5) {
+ }
+ 
+ /* Recv data */
+-static int h5_recv(struct hci_uart *hu, void *data, int count)
++static int h5_recv(struct hci_uart *hu, const void *data, int count)
+ {
+ 	struct h5_struct *h5 = hu->priv;
+ 	register unsigned char *ptr;
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 39f39704be41..af5330090701 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -186,6 +186,11 @@ int h5_init(void);
+ int h5_deinit(void);
+ #endif
+ 
++#ifdef CONFIG_BT_HCIUART_RTL3WIRE
++int h5_init(void);
++int h5_deinit(void);
++#endif
++
+ #ifdef CONFIG_BT_HCIUART_INTEL
+ int intel_init(void);
+ int intel_deinit(void);
+-- 
+2.43.0
+

@@ -1,0 +1,53 @@
+From 6dd57a6299b854950dc0a4d74935c7156d5b3839 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Mon, 17 Jun 2024 15:02:28 +0800
+Subject: [PATCH 141/400] riscv:dts: fix the gpio range configuration error
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index aa1ab73d7cd5..ae7defd6fdfa 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -580,7 +580,7 @@ gpio2: gpio-controller@0 {
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+ 				ngpios = <31>;
+-				gpio-ranges = <&padctrl1_apsys 0 32 31>;
++				gpio-ranges = <&padctrl0_apsys 0 0 32>;
+ 				reg = <0>;
+ 				interrupt-controller;
+ 				#interrupt-cells = <2>;
+@@ -599,7 +599,7 @@ gpio3: gpio-controller@0 {
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+ 				ngpios = <32>;
+-				gpio-ranges = <&padctrl0_apsys 0 0 32>;
++				gpio-ranges = <&padctrl0_apsys 0 32 23>;
+ 				reg = <0>;
+ 				interrupt-controller;
+ 				#interrupt-cells = <2>;
+@@ -634,7 +634,7 @@ gpio0: gpio-controller@0 {
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+ 				ngpios = <23>;
+-				gpio-ranges = <&padctrl0_apsys 0 32 23>;
++				gpio-ranges = <&padctrl1_apsys 0 0 32>;
+ 				reg = <0>;
+ 				interrupt-controller;
+ 				#interrupt-cells = <2>;
+@@ -653,7 +653,7 @@ gpio1: gpio-controller@0 {
+ 				gpio-controller;
+ 				#gpio-cells = <2>;
+ 				ngpios = <32>;
+-				gpio-ranges = <&padctrl1_apsys 0 0 32>;
++				gpio-ranges = <&padctrl1_apsys 0 32 31>;
+ 				reg = <0>;
+ 				interrupt-controller;
+ 				#interrupt-cells = <2>;
+-- 
+2.43.0
+

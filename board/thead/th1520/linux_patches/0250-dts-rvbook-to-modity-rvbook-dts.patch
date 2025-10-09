@@ -1,0 +1,1838 @@
+From 63fa3bf632eeebae2d1a416ba228e63756540d9c Mon Sep 17 00:00:00 2001
+From: tingming <minghq@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:26:20 +0800
+Subject: [PATCH 250/400] dts: rvbook: to modity rvbook dts
+
+Signed-off-by: tingming <minghq@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-rvbook-dsi0.dts     |   8 +-
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi  | 179 ++--
+ arch/riscv/configs/th1520_defconfig           |  25 +-
+ drivers/gpu/drm/panel/Kconfig                 |  10 +
+ drivers/gpu/drm/panel/Makefile                |   1 +
+ drivers/gpu/drm/panel/panel-lt8911.c          | 989 ++++++++++++++++++
+ drivers/gpu/drm/panel/panel-lt8911.h          |  89 ++
+ drivers/video/Kconfig                         |   1 +
+ drivers/video/lt8911exb/lt8911exb.c           |   6 +-
+ include/linux/rk_headset.h                    |  49 +
+ sound/soc/Kconfig                             |   1 +
+ sound/soc/Makefile                            |   1 +
+ sound/soc/codecs/Kconfig                      |   5 +
+ sound/soc/codecs/Makefile                     |   2 +
+ sound/soc/codecs/es8323.c                     |   9 +-
+ .../headset_observe/rockchip_headset_core.c   |  20 +-
+ 16 files changed, 1275 insertions(+), 120 deletions(-)
+ create mode 100644 drivers/gpu/drm/panel/panel-lt8911.c
+ create mode 100644 drivers/gpu/drm/panel/panel-lt8911.h
+ create mode 100755 include/linux/rk_headset.h
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts b/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
+index 45c495287147..f4d1127ba3cc 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook-dsi0.dts
+@@ -17,8 +17,6 @@ reg_vcc1v8_lontium: regulator-vcc1v8-lontium {
+ 		regulator-min-microvolt = <1800000>;
+ 		regulator-max-microvolt = <1800000>;
+ 		gpio = <&gpio3 17 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&lontium_pwren_pins>;
+ 		regulator-name = "vcc1v8-lontium";
+ 	};
+ 
+@@ -28,10 +26,8 @@ reg_vcc3v3_edp: regulator-vcc3v3-edp {
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+ 		gpio = <&gpio2 18 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&edp_pwren_pins>;
+ 		regulator-name = "vcc3v3-edp";
+-	};        
++	};
+ };
+ 
+ &cmamem {
+@@ -66,8 +62,6 @@ panel0@0 {
+ 		lt8911,edp-lane-cnt = <2>;
+ 		lt8911,mipi-lane-cnt = <4>;
+ 		lt8911,edp-depth = <8>; /* 6 or 8 */
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&lt8911exb_pins>;
+ 		hsvcc-supply = <&reg_vcc1v8_lontium>;
+ 		vspn3v3-supply = <&reg_vcc3v3_edp>;
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index 22fa5327df41..84edc6b33375 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -25,33 +25,29 @@ aliases {
+ 		gpio1 = &gpio1;
+ 		gpio2 = &gpio2;
+ 		gpio3 = &gpio3;
+-		gpio4 = &gpio4;
+-		gpio5 = &aogpio;
++		i2c0 = &i2c0;
++		i2c1 = &i2c1;
++		i2c2 = &i2c2;
++		i2c3 = &i2c3;
++		i2c4 = &i2c4;
++		audio_i2c0 = &audio_i2c0;
++		audio_i2c1 = &audio_i2c1;
+ 		serial0 = &uart0;
+ 		serial1 = &uart1;
+ 		serial2 = &uart2;
+ 		serial3 = &uart3;
+ 		serial4 = &uart4;
+ 		serial5 = &uart5;
+-		i2c0 = &i2c0;
+-		i2c1 = &i2c1;
+-		i2c2 = &i2c2;
+-		i2c3 = &i2c3;
+-		i2c4 = &i2c4;
+-		i2c5 = &audio_i2c0;
+-		i2c6 = &audio_i2c1;
+-		ap_i2s = &ap_i2s;
+-		i2s0 = &i2s0;
+-		i2s1 = &i2s1;
+-		i2s2 = &i2s2;
++
++		flash_led0 = &vvcam_flash_led0;
++		vivcam2 = &vvcam_sensor2;
++		vivcam3 = &vvcam_sensor3;
+ 	};
+ 
+ 	rk_headset: rk-headset {
+ 		status = "okay";
+ 		compatible = "rockchip_headset";
+ 		headset_gpio = <&gpio4 0 GPIO_ACTIVE_LOW>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&headset_det_pins>;
+ 		// io-channels = <&adc 1>;
+ 	};
+ 
+@@ -95,7 +91,7 @@ display-subsystem {
+ 
+ 	lcd0_backlight: pwm-backlight@0 {
+ 		compatible = "pwm-backlight";
+-		pwms = <&pwm 0 5000000>;
++		pwms = <&pwm 0 5000000 0>;
+ 		brightness-levels = <0 4 8 16 32 64 128 255>;
+ 		default-brightness-level = <7>;
+ 	};
+@@ -288,6 +284,7 @@ reg_vref_1v8: regulator-adc-verf {
+ 		regulator-name = "vref-1v8";
+ 		regulator-min-microvolt = <1800000>;
+ 		regulator-max-microvolt = <1800000>;
++		vin-supply = <&reg_vdd_3v3>;
+ 		status = "okay";
+ 	};
+ 
+@@ -307,8 +304,6 @@ reg_ext_vcc5v: regulator-ext5v-en {
+ 		regulator-min-microvolt = <5000000>;
+ 		regulator-max-microvolt = <5000000>;
+ 		gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&ext_vcc5v_en_pins>;
+ 		enable-active-high;
+ 		regulator-boot-on;
+ 		regulator-always-on;
+@@ -320,8 +315,6 @@ reg_typec0_host: regulator-typec0-host {
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+ 		gpio = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&typec0_host_en_pins>;
+ 		enable-active-high;
+ 	};
+ 
+@@ -331,8 +324,6 @@ reg_typec1_host: regulator-typec1-host {
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+ 		gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&typec1_host_en_pins>;
+ 		enable-active-high;
+ 	};
+ 
+@@ -342,8 +333,6 @@ reg_hdmi_en_vcc5v: regulator-hdmi-en-en {
+ 		regulator-min-microvolt = <5000000>;
+ 		regulator-max-microvolt = <5000000>;
+ 		gpio = <&gpio3 14 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&hdmi_en_pins>;
+ 		enable-active-high;
+ 		regulator-boot-on;
+ 		regulator-always-on;
+@@ -355,23 +344,10 @@ reg_fp_pwern_l: regulator-fp-pwern-l {
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+ 		gpio = <&aogpio 15 GPIO_ACTIVE_LOW>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&fp_int_pins>;
+ 		// enable-active-high;
+ 		regulator-always-on;
+ 	};
+ 
+-	reg_WCN_PW_EN: regulator-WCN-PW-EN {
+-		compatible = "regulator-fixed";
+-		regulator-name = "wcn-pw-en";
+-		gpio = <&gpio0 28 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&wifi_wake_pins>;
+-		enable-active-high;
+-		regulator-always-on;
+-		regulator-boot-on;
+-	};
+-
+ 	wcn_wifi: wireless-wlan {
+ 		compatible = "wlan-platdata";
+ 		clock-names = "clk_wifi";
+@@ -394,7 +370,7 @@ wcn_bt: wireless-bluetooth {
+ 	gpio-keys {
+ 		compatible = "gpio-keys";
+ 		pinctrl-names = "default";
+-		pinctrl-0 = <&volume_pins &powerkey_pins>;
++		pinctrl-0 = <&volume_pins>;
+ 		key-pw{
+ 			label = "power Key";
+ 			wakeup-source;
+@@ -427,18 +403,9 @@ reg_vdd_3v3: regulator-vdd-3v3 {
+ 		regulator-name = "vdd_3v3";
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+-		gpio = <&gpio0 30 1>;
+-		enable-active-high;
+-		regulator-always-on;
+-	};
+-
+-	reg_vdd5v_se: regulator-vdd5v-se {
+-		compatible = "regulator-fixed";
+-		regulator-name = "vdd5v_se_en";
+-		regulator-min-microvolt = <5000000>;
+-		regulator-max-microvolt = <5000000>;
+-		gpio = <&gpio2 14 1>;
++		gpio = <&gpio1 24 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
++		regulator-boot-on;
+ 		regulator-always-on;
+ 	};
+ 
+@@ -455,8 +422,6 @@ reg_wcn33: regulator-wcn33 {
+ 	reg_vbus: regulator-vbus-en {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "vbus_en";
+-		regulator-min-microvolt = <3300000>;
+-		regulator-max-microvolt = <3300000>;
+ 		gpio = <&gpio0 27 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+ 		regulator-always-on;
+@@ -471,30 +436,6 @@ reg_cam_pwren: regulator-cam-pwren {
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+ 		gpio = <&gpio2 23 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&camera_pwr_pins>;
+-	};
+-
+-	reg_vcc1v8_lontium: regulator-vcc1v8-lontium {
+-		compatible = "regulator-fixed";
+-		enable-active-high;
+-		regulator-min-microvolt = <1800000>;
+-		regulator-max-microvolt = <1800000>;
+-		gpio = <&gpio3 17 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&lontium_pwren_pins>;
+-		regulator-name = "vcc1v8-lontium";
+-	};
+-
+-	reg_vcc3v3_edp: regulator-vcc3v3-edp {
+-		compatible = "regulator-fixed";
+-		enable-active-high;
+-		regulator-min-microvolt = <3300000>;
+-		regulator-max-microvolt = <3300000>;
+-		gpio = <&gpio2 18 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&edp_pwren_pins>;
+-		regulator-name = "vcc3v3-edp";
+ 	};
+ 
+ 	thermal-zones {
+@@ -542,12 +483,63 @@ map-active-2 {
+ 		};
+ 	};
+ 
+-};
++	soc {
++		compatible = "simple-bus";
++		interrupt-parent = <&plic>;
++		#address-cells = <2>;
++		#size-cells = <2>;
++		dma-noncoherent;
++		ranges;
+ 
+-&usb {
+-	status = "okay";
++		vvcam_flash_led0: vvcam_flash_led@0{
++			flash_led_name = "aw36413_aw36515";
++			compatible = "xuantie,th1520-vvcam-flash_led";
++			floodlight_i2c_bus = /bits/ 8 <2>;
++			floodlight_en_pin = <&gpio1 25 GPIO_ACTIVE_HIGH>;
++			//projection_i2c_bus = /bits/ 8 <2>;
++			flash_led_touch_pin = <&gpio1 27 GPIO_ACTIVE_HIGH>; //flash led touch pin
++			status = "okay";
++		};
++
++		vvcam_sensor2: vvcam_sensor@2 {
++			sensor_name = "GC5035";
++			compatible = "xuantie,th1520-vvcam-sensor";
++			sensor_regulators = "DOVDD18_SCAN", "DVDD12_SCAN", "AVDD28_SCAN";
++			sensor_regulator_timing_us = <100 50 0>;
++			sensor_pdn = <&gpio1 30 GPIO_ACTIVE_HIGH>; //powerdown pin / shutdown pin
++			sensor_rst = <&gpio1 29 GPIO_ACTIVE_HIGH>;
++			sensor_pdn_delay_us = <60>; //powerdown pin / shutdown pin actived till I2C ready
++			DOVDD18_SCAN-supply = <&soc_dovdd18_scan_reg>;
++			DVDD12_SCAN-supply = <&soc_dvdd12_scan_reg>;
++			AVDD28_SCAN-supply = <&soc_avdd28_scan_en_reg>;
++			i2c_addr = /bits/ 8 <0x37>;
++			i2c_bus = /bits/ 8 <4>;
++			i2c_reg_width = /bits/ 8 <1>;
++			i2c_data_width = /bits/ 8 <1>;
++			status = "okay";
++		};
++
++		vvcam_sensor3: vvcam_sensor@3 {
++			sensor_name = "SC2310";
++			compatible = "xuantie,th1520-vvcam-sensor";
++			sensor_regulators = "DOVDD18_SCAN", "DVDD12_SCAN", "AVDD28_SCAN";
++			sensor_regulator_timing_us = <70 50 20>;
++			sensor_pdn = <&gpio1 30 GPIO_ACTIVE_HIGH>; //powerdown pin / shutdown pin
++			sensor_rst = <&gpio1 29 GPIO_ACTIVE_HIGH>;
++			sensor_pdn_delay_us = <4000>; //powerdown pin / shutdown pin actived till I2C ready
++			DOVDD18_SCAN-supply = <&soc_dovdd18_scan_reg>;
++			DVDD12_SCAN-supply = <&soc_dvdd12_scan_reg>;
++			AVDD28_SCAN-supply = <&soc_avdd28_scan_en_reg>;
++			i2c_bus = /bits/ 8 <4>;
++			i2c_reg_width = /bits/ 8 <2>;
++			i2c_data_width = /bits/ 8 <1>;
++			i2c_addr = /bits/ 8 <0x30>;
++			status = "okay";
++		};
++	};
+ };
+ 
++
+ &resmem {
+ 	#address-cells = <2>;
+ 	#size-cells = <2>;
+@@ -659,6 +651,7 @@ dvddm_cpu_reg: appcpu_dvddm {
+ 		regulator-min-microvolt = <300000>;
+ 		regulator-max-microvolt = <1570000>;
+ 		regulator-type = "dvddm";
++		regulator-dual-rail;
+ 		regulator-boot-on;
+ 		regulator-always-on;
+ 	};
+@@ -786,9 +779,16 @@ soc_dvdd12_scan_reg: soc_dvdd12_scan {
+ 	soc_avdd28_scan_en_reg: soc_avdd28_scan_en {
+ 		compatible = "thead,th1520-aon-pmic";
+ 		regulator-name = "soc_avdd28_scan_en";
++		regulator-type = "gpio";
++		regulator-always-on;
++	};
++
++	soc_vext_2v8_reg: soc_vext_2v8 {
++		compatible = "thead,th1520-aon-pmic";
++		regulator-name = "soc_vext_2v8";
+ 		regulator-type = "common";
+-		regulator-min-microvolt = <900000>;
+-		regulator-max-microvolt = <3600000>;
++		regulator-boot-on;
++		regulator-always-on;
+ 	};
+ };
+ 
+@@ -810,14 +810,12 @@ es8388_audio_codec: es8388@11 {
+ 		compatible = "everest,es8323";
+ 		reg = <0x11>;
+ 		sound-name-prefix = "ES8388";
+-                headset-detect = <&rk_headset>;
++		headset-detect = <&rk_headset>;
+ 		AVDD-supply = <&reg_aud_3v3>;
+ 		DVDD-supply = <&reg_aud_1v8>;
+ 		PVDD-supply = <&reg_aud_1v8>;
+ 		spk-ctl-gpios = <&gpio4 3 GPIO_ACTIVE_HIGH>;
+ 		hp-ctl-gpios = <&gpio4 2 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pa_en_pins &hp_ctl_pins>;
+ 	};
+ };
+ 
+@@ -1218,7 +1216,7 @@ hdmi-pins {
+ 
+ 	lt8911exb_pins: lt8911exb-0 {
+ 		gpio-pins {
+-			pins = "GPIO2_2", "GMAC0_RXD1", "GMAC0_RXD0";
++			pins = "GPIO2_20", "GMAC0_RXD1", "GMAC0_RXD0";
+ 			function = "gpio";
+ 			bias-disable;
+ 			drive-strength = <13>;
+@@ -1449,7 +1447,7 @@ ctrl-pins {
+ 		};
+ 	};
+ 
+-	wifi_wake_pins: wifi-wake-0 {
++	pinctrl_wifi_wake: wifi_grp {
+ 		wifi-pins {
+ 			pins = "GPIO0_28";
+ 			function = "gpio";
+@@ -2100,11 +2098,14 @@ &i2s2 {
+ };
+ 
+ &usb {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&usbhub_en_pins &usb_host_en_pins &usb_sw_pins>;
++	status = "okay";
+ 	hubswitch-gpio = <&gpio1 11 GPIO_ACTIVE_LOW>;
+-	vbus-supply = <&reg_vbus>;
+-	hub5v-supply = <&reg_usb_hub_vcc5v>;
++};
++
++&usb_dwc3 {
++	status = "okay";
++	#address-cells = <1>;
++	#size-cells = <0>;
+ };
+ 
+ &cpus {
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index e98997f3dfce..fbc27a9ad36d 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -178,7 +178,7 @@ CONFIG_USB_STORAGE_SDDR55=y
+ CONFIG_USB_DWC3=m
+ # CONFIG_USB_DWC3_OF_SIMPLE is not set
+ CONFIG_USB_ONBOARD_HUB=m
+-CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET=m
+ CONFIG_USB_CONFIGFS=m
+ CONFIG_USB_CONFIGFS_F_FS=y
+ CONFIG_USB_ZERO=m
+@@ -324,3 +324,26 @@ CONFIG_HWSPINLOCK=y
+ CONFIG_HWSPINLOCK_TH1520=y
+ # TH1520 regdump
+ CONFIG_TH1520_REGDUMP=y
++# TH1520 rvbook
++CONFIG_DRM_PANEL_LT8911=y
++CONFIG_EXTCON=y
++CONFIG_SND_SOC_ES8323=y
++CONFIG_CHARGER_BQ25700=m
++CONFIG_ROCKCHIP_LT8911EXB=y
++CONFIG_BATTERY_CW2015=m
++CONFIG_TYPEC=m
++CONFIG_TYPEC_TCPM=m
++CONFIG_TYPEC_TCPCI=m
++CONFIG_TYPEC_HUSB311=m
++CONFIG_MCU_HC32FX=y
++CONFIG_I2C_HID=y
++CONFIG_MTK_FINGERPRINT_SUPPORT=y
++CONFIG_MICROARRAY_FINGERPRINT=y
++CONFIG_HS_MH248=y
++CONFIG_RK_HEADSET=y
++CONFIG_TCG_TPM=y
++CONFIG_TCG_TIS_CORE=y
++CONFIG_TCG_TIS_SPI=y
++CONFIG_RTL8822CS=y
++CONFIG_RISCV_SBI_V01=y
++CONFIG_SERIAL_EARLYCON_RISCV_SBI=y
+diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
+index 974b66e92fdb..c84221be0295 100644
+--- a/drivers/gpu/drm/panel/Kconfig
++++ b/drivers/gpu/drm/panel/Kconfig
+@@ -844,4 +844,14 @@ config DRM_PANEL_HX8279
+ 	help
+ 	  Say Y if you want to enable support for panels based on the
+ 	  HX8279 controller.
++
++config DRM_PANEL_LT8911
++	tristate "LT8911-based panels"
++	depends on OF
++	depends on DRM_MIPI_DSI
++	depends on BACKLIGHT_CLASS_DEVICE
++	help
++		Say Y if you want to enable support for panels based on the
++		lt8911 controller.
++
+ endmenu
+diff --git a/drivers/gpu/drm/panel/Makefile b/drivers/gpu/drm/panel/Makefile
+index 95b8b51062be..f2286a1f4a93 100644
+--- a/drivers/gpu/drm/panel/Makefile
++++ b/drivers/gpu/drm/panel/Makefile
+@@ -86,3 +86,4 @@ obj-$(CONFIG_DRM_PANEL_VISIONOX_R66451) += panel-visionox-r66451.o
+ obj-$(CONFIG_DRM_PANEL_WIDECHIPS_WS2401) += panel-widechips-ws2401.o
+ obj-$(CONFIG_DRM_PANEL_XINPENG_XPP055C272) += panel-xinpeng-xpp055c272.o
+ obj-$(CONFIG_DRM_PANEL_HX8279) += panel-himax-hx8279.o
++obj-$(CONFIG_DRM_PANEL_LT8911) += panel-lt8911.o
+diff --git a/drivers/gpu/drm/panel/panel-lt8911.c b/drivers/gpu/drm/panel/panel-lt8911.c
+new file mode 100644
+index 000000000000..a5afb7caff84
+--- /dev/null
++++ b/drivers/gpu/drm/panel/panel-lt8911.c
+@@ -0,0 +1,989 @@
++#include "panel-lt8911.h"
++#include <linux/version.h>
++#include <linux/of_gpio.h>
++#include <linux/regulator/consumer.h>
++
++#define ILI9881_PAGE(_page)	DSI_DCS_WRITE(dsi, 0xff, 0x98, 0x81, _page)
++#define IILI9881_COMMAND(_cmd, _data...)		DSI_DCS_WRITE(dsi, _cmd, _data)
++#define DCS_CMD_READ_ID1        0xDA
++
++#define LT_8911_I2C_ADAPTER	3
++#define LT_8911_I2C_ADDR	0x45
++
++static struct i2c_mipi_dsi g_lt8911_mipi_dsi;
++static bool g_is_std_suspend __nosavedata;
++
++static const struct drm_display_mode lt8911_default_mode = {
++	.clock		= 152840,
++	.hdisplay	= 1920,
++	.hsync_start = 1920 + 140,
++	.hsync_end	= 1920 + 140 + 160,
++	.htotal		= 1920 + 140 + 160 + 30,
++
++	.vdisplay	= 1080,
++	.vsync_start	= 1080 + 18,
++	.vsync_end	= 1080 + 18 + 28,
++	.vtotal		= 1080 + 18 + 28 + 6,
++
++	.width_mm	= 110,
++	.height_mm	= 62,
++	.flags      = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
++};
++
++static struct panel_data lt8911_panel_data = {
++	.display_mode = &lt8911_default_mode,
++	.mode_flags   = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_VIDEO_BURST,
++	.format       = MIPI_DSI_FMT_RGB888,
++	.lanes        = 4,
++};
++
++enum {
++	hfp = 0,
++	hs,
++	hbp,
++	hact,
++	htotal,
++	vfp,
++	vs,
++	vbp,
++	vact,
++	vtotal,
++	pclk_10khz
++};
++
++static int mipi_timing[] = {
++	140,  /* hfp */
++	30,   /* hs */
++	160,  /* hbp */
++	1920, /* hact */
++	2250, /* htotal */
++	18,   /* vfp */
++	6,    /* vs */
++	28,   /* vbp */
++	1080, /* vact */
++	1132, /* vtotal */
++	15284 /* pixel_clk / 10000 */
++};
++
++static int lt8911_i2c_write(struct i2c_client *client,
++                               uint8_t reg, uint8_t val)
++{
++	int ret = -1;
++	int retries = 0;
++	uint8_t buf[2] = { reg, val };
++	struct i2c_msg msg = {
++		.flags = !I2C_M_RD,
++		.addr = client->addr,
++		.len = 2,
++		.buf = buf,
++	};
++
++	while (retries < 5) {
++		ret = i2c_transfer(client->adapter, &msg, 1);
++		if (ret == 1)
++			return 0;
++		retries++;
++	}
++
++	DBG_FUNC("%s: write addr 0x%02x error! ret = %d\n",
++		__func__, reg, ret);
++	return ret;
++}
++
++static int lt8911_i2c_read(struct i2c_client *client, uint8_t reg)
++{
++	int ret = -1;
++	int retries = 0;
++	uint8_t buf[2] = { reg, 0 };
++	struct i2c_msg msgs[2];
++
++	msgs[0].flags = client->flags;
++	msgs[0].addr = client->addr;
++	msgs[0].len = 1;
++	msgs[0].buf = &buf[0];
++
++	msgs[1].flags = client->flags | I2C_M_RD;
++	msgs[1].addr = client->addr;
++	msgs[1].len = 1;
++	msgs[1].buf = &buf[1];
++
++	while (retries < 5) {
++		ret = i2c_transfer(client->adapter, msgs, 2);
++		if (ret == 2)
++			return buf[1];
++		retries++;
++	}
++
++	DBG_FUNC("%s: read addr 0x%02x error! ret = %d\n",
++		__func__, reg, ret);
++	return ret;
++}
++
++static void lt8911_reset(struct i2c_mipi_dsi *md)
++{
++	gpio_set_value(md->reset_pin, 0);
++	msleep(md->rst_delay_ms);
++	gpio_set_value(md->reset_pin, 1);
++	msleep(md->rst_delay_ms);
++}
++
++static void lt8911exb_cfg_set_mipi_timing(struct i2c_mipi_dsi *md)
++{
++	struct i2c_client *client = md->client;
++
++	/* lt8911exb MIPI video timing configuration */
++	lt8911_i2c_write(client, 0xff, 0xd0);
++	lt8911_i2c_write(client, 0x0d, (u8)(mipi_timing[vtotal] / 256));
++	lt8911_i2c_write(client, 0x0e, (u8)(mipi_timing[vtotal] % 256));
++	lt8911_i2c_write(client, 0x0f, (u8)(mipi_timing[vact] / 256));
++	lt8911_i2c_write(client, 0x10, (u8)(mipi_timing[vact] % 256));
++	lt8911_i2c_write(client, 0x11, (u8)(mipi_timing[htotal] / 256));
++	lt8911_i2c_write(client, 0x12, (u8)(mipi_timing[htotal] % 256));
++	lt8911_i2c_write(client, 0x13, (u8)(mipi_timing[hact] / 256));
++	lt8911_i2c_write(client, 0x14, (u8)(mipi_timing[hact] % 256));
++	lt8911_i2c_write(client, 0x15, (u8)(mipi_timing[vs] % 256));
++	lt8911_i2c_write(client, 0x16, (u8)(mipi_timing[hs] % 256));
++	lt8911_i2c_write(client, 0x17, (u8)(mipi_timing[vfp] / 256));
++	lt8911_i2c_write(client, 0x18, (u8)(mipi_timing[vfp] % 256));
++	lt8911_i2c_write(client, 0x19, (u8)(mipi_timing[hfp] / 256));
++	lt8911_i2c_write(client, 0x1a, (u8)(mipi_timing[hfp] % 256));
++}
++
++static void lt8911exb_cfg_set_edp_timing(struct i2c_mipi_dsi *md)
++{
++	struct i2c_client *client = md->client;
++
++	/* lt8911exb eDP video timing configuration */
++	lt8911_i2c_write(client, 0xff, 0xa8);
++	lt8911_i2c_write(client, 0x2d, 0x88);
++	lt8911_i2c_write(client, 0x05,
++		(u8)(mipi_timing[htotal] / 256));
++	lt8911_i2c_write(client, 0x06,
++		(u8)(mipi_timing[htotal] % 256));
++	lt8911_i2c_write(client, 0x07,
++		(u8)((mipi_timing[hs] + mipi_timing[hbp]) / 256));
++	lt8911_i2c_write(client, 0x08,
++		(u8)((mipi_timing[hs] + mipi_timing[hbp]) % 256));
++	lt8911_i2c_write(client, 0x09,
++		(u8)(mipi_timing[hs] / 256));
++	lt8911_i2c_write(client, 0x0a,
++		(u8)(mipi_timing[hs] % 256));
++	lt8911_i2c_write(client, 0x0b,
++		(u8)(mipi_timing[hact] / 256));
++	lt8911_i2c_write(client, 0x0c,
++		(u8)(mipi_timing[hact] % 256));
++	lt8911_i2c_write(client, 0x0d,
++		(u8)(mipi_timing[vtotal] / 256));
++	lt8911_i2c_write(client, 0x0e,
++		(u8)(mipi_timing[vtotal] % 256));
++	lt8911_i2c_write(client, 0x11,
++		(u8)((mipi_timing[vs] + mipi_timing[vbp]) / 256));
++	lt8911_i2c_write(client, 0x12,
++		(u8)((mipi_timing[vs] + mipi_timing[vbp]) % 256));
++	lt8911_i2c_write(client, 0x14,
++		(u8)(mipi_timing[vs] % 256));
++	lt8911_i2c_write(client, 0x15,
++		(u8)(mipi_timing[vact] / 256));
++	lt8911_i2c_write(client, 0x16,
++		(u8)(mipi_timing[vact] % 256));
++}
++
++static void lt8911exb_cfg_init_regs(struct i2c_mipi_dsi *md)
++{
++	u32 val = 0;
++	u8 i, pcr_pll_postdiv, pcr_m;
++	struct i2c_client *client = md->client;
++	u8 swing_ds1[13][2] = {
++		{ 0x83, 0x00 }, /* 27.8 mA */
++		{ 0x82, 0xe0 }, /* 26.2 mA */
++		{ 0x82, 0xc0 }, /* 24.6 mA */
++		{ 0x82, 0xa0 }, /* 23.0 mA */
++		{ 0x82, 0x80 }, /* 21.4 mA */
++		{ 0x82, 0x40 }, /* 18.2 mA */
++		{ 0x82, 0x20 }, /* 16.6 mA */
++		{ 0x82, 0x00 }, /* 15.0 mA */
++		{ 0x81, 0x00 }, /* 12.8 mA */
++		{ 0x80, 0xe0 }, /* 11.2 mA */
++		{ 0x80, 0xc0 }, /* 9.6 mA */
++		{ 0x80, 0xa0 }, /* 8 mA */
++		{ 0x80, 0x80 }  /* 6 mA */
++	};
++
++	/* initialization */
++	lt8911_i2c_write(client, 0xff, 0x81);
++	lt8911_i2c_write(client, 0x49, 0xff);
++	lt8911_i2c_write(client, 0xff, 0x82);
++	lt8911_i2c_write(client, 0x5a, 0x0e);
++
++	/* MIPI Rx analog */
++	lt8911_i2c_write(client, 0xff, 0x82);
++	lt8911_i2c_write(client, 0x32, 0x51);
++	lt8911_i2c_write(client, 0x35, 0x22);
++	lt8911_i2c_write(client, 0x4c, 0x0c);
++	lt8911_i2c_write(client, 0x4d, 0x00);
++
++	lt8911_i2c_write(client, 0x3a, 0x77);
++	lt8911_i2c_write(client, 0x3b, 0x77);
++
++	/* dessc_pcr pll analog */
++	lt8911_i2c_write(client, 0xff, 0x82);
++	lt8911_i2c_write(client, 0x6a, 0x40);
++	lt8911_i2c_write(client, 0x6b, 0x40);
++
++	if (mipi_timing[pclk_10khz] < 8800) {
++		/* 0x44: pre-div = 2, pixel_clk = 44~88MHz */
++		lt8911_i2c_write(client, 0x6e, 0x82);
++		pcr_pll_postdiv = 0x08;
++	} else {
++		/* 0x40: pre-div = 1, pixel_clk = 88~176MHz */
++		lt8911_i2c_write(client, 0x6e, 0x81);
++		pcr_pll_postdiv = 0x04;
++	}
++	pcr_m = (u8)(mipi_timing[pclk_10khz] * pcr_pll_postdiv / 25 / 100);
++
++	/* dessc pll digital */
++	lt8911_i2c_write(client, 0xff, 0x85);
++	lt8911_i2c_write(client, 0xa9, 0x31);
++	lt8911_i2c_write(client, 0xaa, 0x17);
++	lt8911_i2c_write(client, 0xab, 0xba);
++	lt8911_i2c_write(client, 0xac, 0xe1);
++	lt8911_i2c_write(client, 0xad, 0x47);
++	lt8911_i2c_write(client, 0xae, 0x01);
++	lt8911_i2c_write(client, 0xae, 0x11);
++
++	/* digital top */
++	lt8911_i2c_write(client, 0xff, 0x85);
++	lt8911_i2c_write(client, 0xc0, 0x01);/* select mipi rx */
++
++	if (md->edp_depth == 6)
++		val = 0xd0; /* enable dither */
++	else if (md->edp_depth == 8)
++		val = 0x00; /* disable dither */
++	lt8911_i2c_write(client, 0xb0, val);
++
++	/* MIPI Rx digital */
++	lt8911_i2c_write(client, 0xff, 0xd0);
++	/* 0: 4 lane; 1: 1 lane; 2: 2 lane; 3: 3 lane */
++	lt8911_i2c_write(client, 0x00, md->mipi_lane_cnt % 4);
++	lt8911_i2c_write(client, 0x02, 0x08);
++	lt8911_i2c_write(client, 0x08, 0x00);
++	lt8911_i2c_write(client, 0x0a, 0x12);/* pcr mode */
++	lt8911_i2c_write(client, 0x0c, 0x40);
++
++	lt8911_i2c_write(client, 0x1c, 0x3a);
++	lt8911_i2c_write(client, 0x31, 0x0a);
++
++	lt8911_i2c_write(client, 0x3f, 0x10);
++	lt8911_i2c_write(client, 0x40, 0x20);
++	lt8911_i2c_write(client, 0x41, 0x30);
++
++#ifdef TEST_PATTERN
++	lt8911_i2c_write(client, 0x26, pcr_m | 0x80);
++#else
++	lt8911_i2c_write(client, 0x26, pcr_m);
++#endif
++
++	lt8911_i2c_write(client, 0x27, 0x28);
++	lt8911_i2c_write(client, 0x28, 0xf8);
++
++	lt8911_i2c_write(client, 0xff, 0x81);/* pcr reset */
++	lt8911_i2c_write(client, 0x03, 0x7b);
++	lt8911_i2c_write(client, 0x03, 0xff);
++
++	/* Tx PLL 2.7GHz */
++	lt8911_i2c_write(client, 0xff, 0x87);
++	lt8911_i2c_write(client, 0x19, 0x31);
++	lt8911_i2c_write(client, 0xff, 0x82);
++	lt8911_i2c_write(client, 0x02, 0x42);
++	lt8911_i2c_write(client, 0x03, 0x00);
++	lt8911_i2c_write(client, 0x03, 0x01);
++	lt8911_i2c_write(client, 0xff, 0x81);
++	lt8911_i2c_write(client, 0x09, 0xfc);
++	lt8911_i2c_write(client, 0x09, 0xfd);
++	lt8911_i2c_write(client, 0xff, 0x87);
++	lt8911_i2c_write(client, 0x0c, 0x11);
++
++	for (i = 0; i < 5; i++) {
++		msleep(5);
++		if (lt8911_i2c_read(client, 0x37) & 0x02) {
++			DBG_FUNC("%s: lt8911exb tx pll locked\n",
++				__func__);
++			break;
++		}
++
++		DBG_FUNC("%s: lt8911exb tx pll unlocked\n", __func__);
++		lt8911_i2c_write(client, 0xff, 0x81);
++		lt8911_i2c_write(client, 0x09, 0xfc);
++		lt8911_i2c_write(client, 0x09, 0xfd);
++		lt8911_i2c_write(client, 0xff, 0x87);
++		lt8911_i2c_write(client, 0x0c, 0x10);
++		lt8911_i2c_write(client, 0x0c, 0x11);
++	}
++
++	/* Tx PHY */
++	lt8911_i2c_write(client, 0xff, 0x82);
++	lt8911_i2c_write(client, 0x11, 0x00);
++	lt8911_i2c_write(client, 0x13, 0x10);
++	lt8911_i2c_write(client, 0x14, 0x0c);
++	lt8911_i2c_write(client, 0x14, 0x08);
++	lt8911_i2c_write(client, 0x13, 0x20);
++	lt8911_i2c_write(client, 0xff, 0x82);
++	lt8911_i2c_write(client, 0x0e, 0x25);
++	lt8911_i2c_write(client, 0x12, 0xff);
++
++	/* eDP tx digital */
++	lt8911_i2c_write(client, 0xff, 0xa8);
++
++#ifdef TEST_PATTERN
++	/* bit[2:0]: test panttern image mode */
++	lt8911_i2c_write(client, 0x24, 0x50);
++	/* bit[6:4]: test pattern color */
++	lt8911_i2c_write(client, 0x25, 0x70);
++	/* 0x50: pattern; 0x10: mipi video */
++	lt8911_i2c_write(client, 0x27, 0x50);
++#else
++	/* 0x50: pattern; 0x10: mipi video */
++	lt8911_i2c_write(client, 0x27, 0x10);
++#endif
++
++	if (md->edp_depth == 6)
++		val = 0x00;
++	else if (md->edp_depth == 8)
++		val = 0x10;
++	lt8911_i2c_write(client, 0x17, val);
++	lt8911_i2c_write(client, 0x18, val << 1);
++
++	lt8911_i2c_write(client, 0xff, 0xa0);
++	lt8911_i2c_write(client, 0x00, 0x08);
++	lt8911_i2c_write(client, 0x01, 0x00);
++
++	/* set eDP drive strength */
++	lt8911_i2c_write(client, 0xff, 0x82);
++	/* lane 0 tap0 */
++	lt8911_i2c_write(client, 0x22, swing_ds1[0][0]);
++	lt8911_i2c_write(client, 0x23, swing_ds1[0][1]);
++	/* lane 0 tap1 */
++	lt8911_i2c_write(client, 0x24, 0x80);
++	lt8911_i2c_write(client, 0x25, 0x00);
++	/* lane 1 tap0 */
++	lt8911_i2c_write(client, 0x26, swing_ds1[0][0]);
++	lt8911_i2c_write(client, 0x27, swing_ds1[0][1]);
++	/* lane 1 tap1 */
++	lt8911_i2c_write(client, 0x28, 0x80);
++	lt8911_i2c_write(client, 0x29, 0x00);
++}
++
++/*
++ * MIPI signal from SoC should be ready before
++ * configuring below video check setting
++ */
++static void lt8911exb_dbg_check_mipi_timing(struct i2c_mipi_dsi *md)
++{
++	u32 val = 0;
++	struct i2c_client *client = md->client;
++
++	/* MIPI byte clk check */
++	lt8911_i2c_write(client, 0xff, 0x85);
++	/* FM select byte clk */
++	lt8911_i2c_write(client, 0x1d, 0x00);
++	lt8911_i2c_write(client, 0x40, 0xf7);
++	lt8911_i2c_write(client, 0x41, 0x30);
++	/* eDP scramble mode; video chech from mipi */
++	lt8911_i2c_write(client, 0xa1, 0x02);
++	/* 0xf0: close scramble; 0xD0: open scramble */
++	//lt8911_i2c_write(client, 0x17, 0xf0);
++
++	/* video check reset */
++	lt8911_i2c_write(client, 0xff, 0x81);
++	lt8911_i2c_write(client, 0x09, 0x7d);
++	lt8911_i2c_write(client, 0x09, 0xfd);
++
++	lt8911_i2c_write(client, 0xff, 0x85);
++	//msleep(200);
++	msleep(10);
++	if (lt8911_i2c_read(client, 0x50) == 0x03) {
++		val = lt8911_i2c_read(client, 0x4d);
++		val = (val << 8) + lt8911_i2c_read(client, 0x4e);
++		val = (val << 8) + lt8911_i2c_read(client, 0x4f);
++		/* MIPI clk = val * 1000 */
++		DBG_FUNC("%s: video check: mipi clk = %d\n",
++			__func__, val);
++	} else {
++		DBG_FUNC("%s: video check: mipi clk unstable",
++			__func__);
++	}
++
++	/* MIPI Vtotal check */
++	val = lt8911_i2c_read(client, 0x76);
++	val = (val << 8) + lt8911_i2c_read(client, 0x77);
++	DBG_FUNC("%s: video check: Vtotal = %d\n",
++		__func__, val);
++
++	/* MIPI word count check */
++	lt8911_i2c_write(client, 0xff, 0xd0);
++	val = lt8911_i2c_read(client, 0x82);
++	val = (val << 8) + lt8911_i2c_read(client, 0x83);
++	val = val / 3;
++	DBG_FUNC("%s: video check: Hact(word counter) = %d\n",
++		__func__, val);
++
++	/* MIPI Vact check */
++	val = lt8911_i2c_read(client, 0x85);
++	val = (val << 8) + lt8911_i2c_read(client, 0x86);
++	DBG_FUNC("%s: video check: Vact = %d\n",
++		__func__, val);
++}
++
++static void lt8911exb_link_train_start(struct i2c_mipi_dsi *md)
++{
++	struct i2c_client *client = md->client;
++
++	/* lt8911exb link training */
++	lt8911_i2c_write(client, 0xff, 0x85);
++	/* eDP scramble mode */
++	lt8911_i2c_write(client, 0xa1, 0x02);
++
++	/* AUX setup */
++	lt8911_i2c_write(client, 0xff, 0xac);
++	/* soft link training */
++	lt8911_i2c_write(client, 0x00, 0x60);
++	lt8911_i2c_write(client, 0xff, 0xa6);
++	lt8911_i2c_write(client, 0x2a, 0x00);
++
++	lt8911_i2c_write(client, 0xff, 0x81);
++	lt8911_i2c_write(client, 0x07, 0xfe);
++	lt8911_i2c_write(client, 0x07, 0xff);
++	lt8911_i2c_write(client, 0x0a, 0xfc);
++	lt8911_i2c_write(client, 0x0a, 0xfe);
++
++	/* link training */
++	lt8911_i2c_write(client, 0xff, 0x85);
++	lt8911_i2c_write(client, 0x1a, md->edp_lane_cnt);
++	//lt8911_i2c_write(client, 0x13, 0xd1);
++	lt8911_i2c_write(client, 0xff, 0xac);
++	lt8911_i2c_write(client, 0x00, 0x64);
++	lt8911_i2c_write(client, 0x01, 0x0a);
++	lt8911_i2c_write(client, 0x0c, 0x85);
++	lt8911_i2c_write(client, 0x0c, 0xc5);
++}
++
++static void lt8911exb_link_train_get_result(struct i2c_mipi_dsi *md)
++{
++	u32 i, val;
++	struct i2c_client *client = md->client;
++
++	lt8911_i2c_write(client, 0xff, 0xac);
++	for (i = 0; i < 10; i++) {
++		val = lt8911_i2c_read(client, 0x82);
++		if (val & 0x20) {
++			if ((val & 0x1f) == 0x1e)
++				DBG_FUNC("%s: link training succeeded\n",
++					__func__);
++			else
++				DBG_FUNC("%s: link training failed\n",
++					__func__);
++
++			DBG_FUNC("%s: panel link rate: %d\n", __func__,
++				lt8911_i2c_read(client, 0x83));
++			DBG_FUNC("%s: panel link count: %d\n", __func__,
++				lt8911_i2c_read(client, 0x84));
++			break;
++		}
++		DBG_FUNC("%s: link training ongoing...\n", __func__);
++		msleep(100);
++	}
++}
++
++/* panel_funcs */
++static int panel_prepare(struct drm_panel *panel)
++{
++	int ret = 0;
++	struct i2c_mipi_dsi *md = panel_to_md(panel);
++	struct i2c_client *client = md->client;
++
++	DBG_FUNC("lt8911exb enter\n");
++
++	if(g_is_std_suspend){
++		DBG_FUNC("lt8911exb prepare under std mode, do not prepare\n");
++		return 0;
++	}
++
++	if(md->client == NULL){
++		DBG_FUNC("lt8911exb i2c client still not ready\n");
++		return 0;
++	}
++
++	ret = regulator_enable(md->vspn3v3);
++	if(ret){
++		goto fail;
++	}
++
++	ret = regulator_enable(md->hsvcc);
++	if(ret){
++		goto fail;
++	}
++
++	//msleep(200);
++	msleep(10);
++
++	lt8911_reset(md);
++
++	lt8911_i2c_write(client, 0xff, 0x81); /* 0x81: register bank */
++	lt8911_i2c_write(client, 0x08, 0x7f);
++
++	DBG_FUNC("%s: lt8911exb chip ID: 0x%02x-0x%02x-0x%02x\n",
++		__func__, lt8911_i2c_read(client, 0x00),
++		lt8911_i2c_read(client, 0x01),
++		lt8911_i2c_read(client, 0x02));
++
++	return 0;
++
++fail:
++	gpio_set_value(md->reset_pin, 0);
++	regulator_disable(md->hsvcc);
++	regulator_disable(md->vspn3v3);
++	return ret;
++}
++
++static int panel_unprepare(struct drm_panel *panel)
++{
++	int ret = 0;
++	struct i2c_mipi_dsi *md = panel_to_md(panel);
++
++	DBG_FUNC("panel_unprepare enter\n");
++	gpio_set_value(md->reset_pin, 0);
++
++	regulator_disable(md->hsvcc);
++	regulator_disable(md->vspn3v3);
++
++	return ret;
++}
++
++static int panel_enable(struct drm_panel *panel)
++{
++	int ret = 0;
++	struct i2c_mipi_dsi *md = panel_to_md(panel);
++
++	DBG_FUNC("panel_enable enter\n");
++
++	if(g_is_std_suspend){
++		DBG_FUNC("lt8911exb enable under std mode, do not enable\n");
++		return 0;
++	}
++
++	gpio_set_value(md->backlight_pin, 1);
++
++	lt8911exb_cfg_set_mipi_timing(md);
++	lt8911exb_cfg_set_edp_timing(md);
++	lt8911exb_cfg_init_regs(md);
++	lt8911exb_dbg_check_mipi_timing(md);
++	lt8911exb_link_train_start(md);
++	lt8911exb_link_train_get_result(md);
++
++	return ret;
++}
++
++static int panel_disable(struct drm_panel *panel)
++{
++	int ret = 0;
++	struct i2c_mipi_dsi *md = panel_to_md(panel);
++
++	DBG_FUNC("panel_disable enter\n");
++
++	gpio_set_value(md->backlight_pin, 0);
++
++	return ret;
++}
++
++static int panel_get_modes(struct drm_panel *panel, struct drm_connector *connector)
++{
++	struct i2c_mipi_dsi *md = panel_to_md(panel);
++	const struct drm_display_mode *m = md->desc->display_mode;
++	struct drm_display_mode *mode;
++
++	DBG_FUNC("panel_get_modes enter\n");
++
++	mode = drm_mode_duplicate(connector->dev, m);
++	if (!mode) {
++		/*
++		dev_err(pinfo->base.dev, "failed to add mode %ux%u@%u\n",
++			m->hdisplay, m->vdisplay, drm_mode_vrefresh(m));
++		*/
++		return -ENOMEM;
++	}
++
++	drm_mode_set_name(mode);
++
++	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
++	drm_mode_probed_add(connector, mode);
++
++	connector->display_info.width_mm = mode->width_mm;
++	connector->display_info.height_mm = mode->height_mm;
++
++	return 1;
++}
++
++static const struct drm_panel_funcs panel_funcs = {
++	.prepare = panel_prepare,
++	.unprepare = panel_unprepare,
++	.enable = panel_enable,
++	.disable = panel_disable,
++	.get_modes = panel_get_modes,
++};
++
++/* backlight */
++static int backlight_update(struct backlight_device *bd)
++{
++	struct i2c_mipi_dsi *md = bl_get_data(bd);
++	int brightness = bd->props.brightness;
++
++	if (bd->props.power != FB_BLANK_UNBLANK ||
++		bd->props.fb_blank != FB_BLANK_UNBLANK ||
++		(bd->props.state & (BL_CORE_SUSPENDED | BL_CORE_FBBLANK))) {
++			brightness = 0;
++		}
++
++	md->brightness = brightness;
++
++	return 0;
++}
++
++static const struct backlight_ops backlight_ops = {
++	.options = BL_CORE_SUSPENDRESUME,
++	.update_status	= backlight_update,
++};
++
++static int lt8911_pm_notify(struct notifier_block *notify_block,
++			     unsigned long mode, void *unused)
++{
++	struct i2c_mipi_dsi *ctx = container_of(
++		notify_block, struct i2c_mipi_dsi, pm_notify);
++
++	DBG_FUNC("pm_notify: mode (%ld)\n", mode);
++
++	switch (mode) {
++	case PM_HIBERNATION_PREPARE:
++		DBG_FUNC("pm_notify PM_HIBERNATION_PREPARE\n");
++		g_is_std_suspend = true;
++		break;
++	case PM_POST_HIBERNATION:
++		DBG_FUNC("pm_notify PM_HIBERNATION_PREPARE\n");
++		g_is_std_suspend = false;
++		break;
++	default:
++		break;
++	}
++
++	return NOTIFY_DONE;
++}
++
++/**
++static int backlight_init(struct i2c_mipi_dsi *md)
++{
++	struct device *dev = &md->client->dev;
++	struct backlight_properties props;
++	struct backlight_device *bd;
++
++	printk(KERN_ERR "=====Function %s line %d\n", __FUNCTION__, __LINE__);
++
++	memset(&props, 0, sizeof(props));
++	props.type = BACKLIGHT_RAW;
++	props.max_brightness = 255;
++	bd = devm_backlight_device_register(dev, dev_name(dev),
++					dev, md, &backlight_ops,
++					&props);
++	if (IS_ERR(bd)) {
++		dev_err(dev, "failed to register backlight\n");
++		return PTR_ERR(bd);
++	}
++
++	bd->props.brightness = 255;
++	backlight_update_status(bd);
++
++	return 0;
++}
++*/
++
++static int i2c_md_probe(struct i2c_client *client)
++{
++	struct device *dev = &client->dev;
++	struct i2c_mipi_dsi *md = &g_lt8911_mipi_dsi;
++
++	DBG_FUNC("start");
++
++	i2c_set_clientdata(client, md);
++	mutex_init(&md->mutex);
++	md->client = client;
++
++	return 0;
++}
++
++static void i2c_md_remove(struct i2c_client *i2c)
++{
++	struct i2c_mipi_dsi *md = i2c_get_clientdata(i2c);
++
++	DBG_FUNC();
++
++	mipi_dsi_detach(md->dsi);
++	drm_panel_remove(&md->panel);
++
++	return;
++}
++
++static void i2c_md_shutdown(struct i2c_client *i2c)
++{
++	struct i2c_mipi_dsi *md = i2c_get_clientdata(i2c);
++
++	DBG_FUNC();
++
++	mipi_dsi_detach(md->dsi);
++	drm_panel_remove(&md->panel);
++}
++
++static int lt8911_parse_dt(struct i2c_mipi_dsi *md)
++{
++	int ret = -1;
++	struct mipi_dsi_device *dsi = md->dsi;
++	struct device_node *np = dsi->dev.of_node;
++
++	md->hsvcc =  devm_regulator_get(&dsi->dev, "hsvcc");
++	if (IS_ERR(md->hsvcc))
++		return dev_err_probe(&dsi->dev, PTR_ERR(md->hsvcc),
++				"Failed to request hsvcc regulator\n");
++
++	md->vspn3v3 =  devm_regulator_get(&dsi->dev, "vspn3v3");
++	if (IS_ERR(md->vspn3v3))
++		return dev_err_probe(&dsi->dev, PTR_ERR(md->vspn3v3),
++				"Failed to request vspn3v3 regulator\n");
++
++	md->backlight_pin = of_get_named_gpio(np,
++	                                 "lt8911,backlight-gpio",
++	                                 0);
++	if (!gpio_is_valid(md->backlight_pin)) {
++		DBG_FUNC("%s: backlight-gpio is invalid\n", __func__);
++		return -EINVAL;
++	}
++
++	ret = devm_gpio_request_one(&dsi->dev,
++	                            md->backlight_pin,
++	                            GPIOF_DIR_OUT, NULL);
++	if (ret) {
++		DBG_FUNC("%s: failed to request backlight gpio\n",
++			__func__);
++		return ret;
++	}
++	gpio_set_value(md->backlight_pin, 0);
++	DBG_FUNC("%s: succeed to init backlight gpio\n", __func__);
++
++	md->irq_pin = of_get_named_gpio(np,
++	                           "lt8911,irq-gpio", 0);
++	if (!gpio_is_valid(md->irq_pin)) {
++		DBG_FUNC("%s: irq-gpio is invalid\n", __func__);
++		return -EINVAL;
++	}
++
++	ret = devm_gpio_request_one(&dsi->dev,
++	                            md->irq_pin,
++	                            GPIOF_DIR_IN, NULL);
++	if (ret) {
++		DBG_FUNC("%s: failed to request irq gpio\n",
++			__func__);
++		return ret;
++	}
++	DBG_FUNC("%s: succeed to init irq gpio\n", __func__);
++
++	ret = of_property_read_u32(np, "lt8911,rst-delay-ms",
++	                           &md->rst_delay_ms);
++	if (ret < 0) {
++		DBG_FUNC("%s: no rst-delay-ms property in dts\n",
++			__func__);
++		md->rst_delay_ms = 100;
++	}
++
++	md->reset_pin = of_get_named_gpio(np,
++		                        "lt8911,reset-gpio", 0);
++	if (!gpio_is_valid(md->reset_pin)) {
++		DBG_FUNC("%s: reset-gpio is invalid\n", __func__);
++		return -EINVAL;
++	}
++
++	ret = devm_gpio_request_one(&dsi->dev,
++	                            md->reset_pin,
++	                            GPIOF_DIR_OUT, NULL);
++	if (ret) {
++		DBG_FUNC("%s: failed to request reset gpio\n",
++			__func__);
++		return ret;
++	}
++	gpio_set_value(md->reset_pin, 0);
++	DBG_FUNC("%s: succeed to init reset gpio\n", __func__);
++
++	if (of_property_read_u32(np, "lt8911,edp-lane-cnt",
++	                         &md->edp_lane_cnt)) {
++		DBG_FUNC("%s: miss edp-lane-cnt property in dts\n",
++			__func__);
++		md->edp_lane_cnt = 2; /* default value */
++	}
++
++	if (of_property_read_u32(np, "lt8911,mipi-lane-cnt",
++	                         &md->mipi_lane_cnt)) {
++		DBG_FUNC("%s: miss mipi-lane-cnt property in dts\n",
++			__func__);
++		md->mipi_lane_cnt = 4;
++	}
++
++	/*
++	 * eDP panel color depth:
++	 *     6 bit: 262K colors
++	 *     8 bit: 16.7M colors
++	 */
++	if (of_property_read_u32(np, "lt8911,edp-depth",
++	                         &md->edp_depth)) {
++		DBG_FUNC("%s: miss edp-depth property in dts\n",
++			__func__);
++		md->edp_depth = 8;
++	}
++	
++	return ret;
++}
++
++static const struct of_device_id i2c_md_of_ids[] = {
++	{
++		.compatible = "i2c,lt8911",
++	},
++	{ }
++};
++MODULE_DEVICE_TABLE(of, i2c_md_of_ids);
++
++#ifdef CONFIG_PM_SLEEP
++
++static int edpi2c_suspend(struct device *dev)
++{
++	return 0;
++}
++
++static int edpi2c_resume(struct device *dev)
++{
++	return 0;
++}
++
++static const struct dev_pm_ops edpi2c_pm_ops = {
++    SET_LATE_SYSTEM_SLEEP_PM_OPS(edpi2c_suspend,
++				 edpi2c_resume)
++};
++
++#define EDPI2C_PM_OPS &edpi2c_pm_ops
++
++#else
++
++#define EDPI2C_PM_OPS NULL
++
++#endif
++
++static struct i2c_driver i2c_md_driver = {
++	.driver = {
++		.name = "i2c_mipi_dsi",
++		.pm = EDPI2C_PM_OPS,
++		.of_match_table = i2c_md_of_ids,
++	},
++	.probe = i2c_md_probe,
++	.remove = i2c_md_remove,
++	.shutdown = i2c_md_shutdown,
++};
++
++module_i2c_driver(i2c_md_driver);
++
++static int lt8911_dsi_probe(struct mipi_dsi_device *dsi)
++{
++	int ret;
++	struct i2c_mipi_dsi *ctx;
++
++	ctx = &g_lt8911_mipi_dsi;
++
++	if(ctx == NULL){
++		return -ENOMEM;
++	}
++
++	if(ctx->client == NULL){
++		return -EPROBE_DEFER;
++	}
++
++	g_is_std_suspend = false;
++	
++	ctx->dsi    = dsi;
++	ctx->desc   = &lt8911_panel_data;
++	ret = lt8911_parse_dt(ctx); 
++	if (ret) {
++		DBG_FUNC("%s: failed to parse device tree\n", __func__);
++		return ret;
++	}
++
++	dsi->mode_flags = ctx->desc->mode_flags;
++	dsi->format     = ctx->desc->format;
++	dsi->lanes      = ctx->desc->lanes;
++
++	mipi_dsi_set_drvdata(dsi, ctx);
++
++	//ctx->panel_data->set_dsi(ctx->dsi);
++	drm_panel_init(&ctx->panel, &dsi->dev, &panel_funcs, DRM_MODE_CONNECTOR_DSI);
++
++	ret = drm_panel_of_backlight(&ctx->panel);
++	if (ret)
++		return ret;
++
++	drm_panel_add(&ctx->panel);
++
++	//backlight_init(ctx);
++
++	if (IS_ENABLED(CONFIG_PM))
++		ctx->pm_notify.notifier_call = lt8911_pm_notify;
++
++	ret = register_pm_notifier(&ctx->pm_notify);
++	if (ret)
++		DBG_FUNC("register_pm_notifier failed: %d\n", ret);
++
++	ret = mipi_dsi_attach(dsi);
++	if (ret  < 0)
++	{
++		drm_panel_remove(&ctx->panel);
++	}
++
++	return ret;
++}
++
++static void lt8911_dsi_remove(struct mipi_dsi_device *dsi)
++{
++	struct i2c_mipi_dsi *ctx = mipi_dsi_get_drvdata(dsi);
++
++	unregister_pm_notifier(&ctx->pm_notify);
++
++	mipi_dsi_detach(dsi);
++	drm_panel_remove(&ctx->panel);
++
++	return;
++}
++
++static void lt8911_dsi_shutdown(struct mipi_dsi_device *dsi)
++{
++	return;
++}
++
++static const struct of_device_id lt8911_of_match[] = {
++	{.compatible = "i2c_dsi,lt8911", },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, lt8911_of_match);
++
++static struct mipi_dsi_driver lt8911_dsi_driver = {
++	.probe		= lt8911_dsi_probe,
++	.remove		= lt8911_dsi_remove,
++	.shutdown   = lt8911_dsi_shutdown,
++	.driver = {
++		.name		= "panel-lt8911",
++		.of_match_table	= lt8911_of_match,
++	},
++};
++module_mipi_dsi_driver(lt8911_dsi_driver);
++
++MODULE_DESCRIPTION("LT8911 Controller Driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/gpu/drm/panel/panel-lt8911.h b/drivers/gpu/drm/panel/panel-lt8911.h
+new file mode 100644
+index 000000000000..7143dfa5546b
+--- /dev/null
++++ b/drivers/gpu/drm/panel/panel-lt8911.h
+@@ -0,0 +1,89 @@
++#ifndef __MIPI_DSI_H__
++#define __MIPI_DSI_H__
++
++
++#include <linux/interrupt.h>
++#include <linux/bitops.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++
++#include <linux/delay.h>
++#include <linux/err.h>
++#include <linux/fb.h>
++#include <linux/gpio.h>
++#include <linux/gpio/consumer.h>
++#include <linux/i2c.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/of_graph.h>
++#include <linux/pm.h>
++
++#include <drm/drm_crtc.h>
++#include <drm/drm_device.h>
++#include <drm/drm_mipi_dsi.h>
++#include <drm/drm_panel.h>
++#include <drm/drm_modes.h>
++
++#include <video/mipi_display.h>
++
++
++#if 0
++#define DBG_FUNC(format, x...)		printk(KERN_ERR "[DSI]%s:" format"\n", __func__, ##x)
++#define DBG_PRINT(format, x...)		printk(KERN_ERR "[DSI]" format"\n", ##x)
++#else
++#define DBG_FUNC(format, x...)
++#define DBG_PRINT(format, x...)
++#endif
++
++#define DSI_DRIVER_NAME		        "i2c_mipi_dsi"
++
++#define DSI_DCS_WRITE(dsi, seq...)		\
++	{									\
++		int ret = 0;					\
++		const u8 d[] = { seq };			\
++		ret = mipi_dsi_dcs_write_buffer(dsi, d, ARRAY_SIZE(d));	\
++		if (ret < 0)		\
++			return ret;		\
++	}
++
++struct panel_data {
++	struct drm_display_mode *display_mode;
++	unsigned long mode_flags;
++	enum mipi_dsi_pixel_format format;
++	unsigned int lanes;
++};
++
++struct i2c_mipi_dsi {
++	struct i2c_client *client;
++	struct mutex mutex;
++
++	struct regulator	*hsvcc;
++	struct regulator	*vspn3v3;
++
++	struct notifier_block pm_notify;
++
++	// panel
++	struct drm_panel panel;
++	struct panel_data *desc;
++
++	// dsi
++	struct mipi_dsi_device *dsi;
++
++	int backlight_pin;
++	int irq_pin;
++	int reset_pin;
++	int enable_pin;
++	int rst_delay_ms;
++
++	u32 edp_lane_cnt;
++	u32 mipi_lane_cnt;
++	u32 edp_depth;
++
++	// backlight
++	int brightness;
++};
++
++#define panel_to_md(_p)	container_of(_p, struct i2c_mipi_dsi, panel)
++
++#endif /*End of header guard macro */
+diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
+index 1eb755a94940..f2541c728ea8 100644
+--- a/drivers/video/Kconfig
++++ b/drivers/video/Kconfig
+@@ -50,6 +50,7 @@ source "drivers/video/fbdev/Kconfig"
+ endmenu
+ 
+ source "drivers/video/backlight/Kconfig"
++source "drivers/video/lt8911exb/Kconfig"
+ 
+ config VGASTATE
+        tristate
+diff --git a/drivers/video/lt8911exb/lt8911exb.c b/drivers/video/lt8911exb/lt8911exb.c
+index 942b526458d1..b9055aa77470 100644
+--- a/drivers/video/lt8911exb/lt8911exb.c
++++ b/drivers/video/lt8911exb/lt8911exb.c
+@@ -661,7 +661,7 @@ static int lt8911exb_parse_dt(struct lt8911exb *lt8911exb)
+ 
+ 	lt8911exb->backlight_pin = of_get_named_gpio_flags(np,
+ 	                                 "lt8911exb,backlight-gpio",
+-	                                 0, NULL);
++	                                 0);
+ 	if (!gpio_is_valid(lt8911exb->backlight_pin)) {
+ 		LT8911EXB_DBG("%s: backlight-gpio is invalid\n", __func__);
+ 		return -EINVAL;
+@@ -679,7 +679,7 @@ static int lt8911exb_parse_dt(struct lt8911exb *lt8911exb)
+ 	LT8911EXB_DBG("%s: succeed to init backlight gpio\n", __func__);
+ 
+ 	lt8911exb->irq_pin = of_get_named_gpio_flags(np,
+-	                           "lt8911exb,irq-gpio", 0, NULL);
++	                           "lt8911exb,irq-gpio", 0);
+ 	if (!gpio_is_valid(lt8911exb->irq_pin)) {
+ 		LT8911EXB_DBG("%s: irq-gpio is invalid\n", __func__);
+ 		return -EINVAL;
+@@ -727,7 +727,7 @@ static int lt8911exb_parse_dt(struct lt8911exb *lt8911exb)
+ 	}
+ 
+ 	lt8911exb->reset_pin = of_get_named_gpio_flags(np,
+-		                        "lt8911exb,reset-gpio", 0, NULL);
++		                        "lt8911exb,reset-gpio", 0);
+ 	if (!gpio_is_valid(lt8911exb->reset_pin)) {
+ 		LT8911EXB_DBG("%s: reset-gpio is invalid\n", __func__);
+ 		return -EINVAL;
+diff --git a/include/linux/rk_headset.h b/include/linux/rk_headset.h
+new file mode 100755
+index 000000000000..9e4a94fb2871
+--- /dev/null
++++ b/include/linux/rk_headset.h
+@@ -0,0 +1,49 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef RK_HEADSET_H
++#define RK_HEADSET_H
++
++#define HEADSET_IN_HIGH 0x00000001
++#define HEADSET_IN_LOW  0x00000000
++
++#define LINEIN_HIGH 0x00000001
++#define LINEIN_LOW  0x00000000
++
++#define HOOK_DOWN_HIGH 0x00000001
++#define HOOK_DOWN_LOW  0x00000000
++
++struct rk_headset_pdata {
++	/* heaset about */
++	unsigned int headset_gpio;
++	/* Headphones into the state level */
++	unsigned int headset_insert_type;
++	/* 3.5mm line-in */
++	unsigned int linein_gpio;
++	unsigned int linein_insert_type;
++	/* ip-board line-in */
++	unsigned int iplin_gpio;
++	unsigned int iplin_insert_type;
++	/* hook about */
++	unsigned int hook_gpio;
++	/* Hook key down status */
++	unsigned int hook_down_type;
++#ifdef CONFIG_MODEM_MIC_SWITCH
++	/* mic about */
++	unsigned int mic_switch_gpio;
++	unsigned int hp_mic_io_value;
++	unsigned int main_mic_io_value;
++#endif
++	struct iio_channel *chan;
++	int headset_wakeup;
++};
++
++#define HOOK_KEY_CODE KEY_MEDIA
++
++int rk_headset_probe(struct platform_device *pdev,
++		     struct rk_headset_pdata *pdata);
++int rk_headset_adc_probe(struct platform_device *pdev,
++			 struct rk_headset_pdata *pdata);
++int rk_headset_adc_suspend(struct platform_device *pdev, pm_message_t state);
++int rk_headset_adc_resume(struct platform_device *pdev);
++int rk_headset_get_headset(void);
++void headset_resume(void);
++#endif
+diff --git a/sound/soc/Kconfig b/sound/soc/Kconfig
+index 8aa5daacbc81..6ac4ba5a2aa6 100644
+--- a/sound/soc/Kconfig
++++ b/sound/soc/Kconfig
+@@ -115,6 +115,7 @@ source "sound/soc/ux500/Kconfig"
+ source "sound/soc/xilinx/Kconfig"
+ source "sound/soc/xtensa/Kconfig"
+ source "sound/soc/xuantie/Kconfig"
++source "sound/soc/headset_observe/Kconfig"
+ 
+ # Supported codecs
+ source "sound/soc/codecs/Kconfig"
+diff --git a/sound/soc/Makefile b/sound/soc/Makefile
+index 1b211fbb873b..8abf8f6c0b1d 100644
+--- a/sound/soc/Makefile
++++ b/sound/soc/Makefile
+@@ -72,3 +72,4 @@ obj-$(CONFIG_SND_SOC)	+= ux500/
+ obj-$(CONFIG_SND_SOC)	+= xilinx/
+ obj-$(CONFIG_SND_SOC)	+= xtensa/
+ obj-$(CONFIG_SND_SOC)	+= xuantie/
++obj-$(CONFIG_RK_HEADSET)	+= headset_observe/
+diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
+index 68e7aa0479b4..80b6e53f4257 100644
+--- a/sound/soc/codecs/Kconfig
++++ b/sound/soc/codecs/Kconfig
+@@ -109,6 +109,7 @@ config SND_SOC_ALL_CODECS
+ 	imply SND_SOC_DMIC
+ 	imply SND_SOC_ES8156
+ 	imply SND_SOC_ES8316
++	imply SND_SOC_ES8323
+ 	imply SND_SOC_ES8326
+ 	imply SND_SOC_ES8328_SPI
+ 	imply SND_SOC_ES8328_I2C
+@@ -1073,6 +1074,10 @@ config SND_SOC_ES8316
+ 	tristate "Everest Semi ES8316 CODEC"
+ 	depends on I2C
+ 
++config SND_SOC_ES8323
++	tristate "Everest Semi ES8323 CODEC"
++	depends on I2C
++
+ config SND_SOC_ES8326
+ 	tristate "Everest Semi ES8326 CODEC"
+ 	depends on I2C
+diff --git a/sound/soc/codecs/Makefile b/sound/soc/codecs/Makefile
+index c870cfc1677f..3de2d6c5f805 100644
+--- a/sound/soc/codecs/Makefile
++++ b/sound/soc/codecs/Makefile
+@@ -118,6 +118,7 @@ snd-soc-es7210-objs := es7210.o
+ snd-soc-es7241-objs := es7241.o
+ snd-soc-es8156-objs := es8156.o
+ snd-soc-es8316-objs := es8316.o
++snd-soc-es8323-objs := es8323.o
+ snd-soc-es8326-objs := es8326.o
+ snd-soc-es8328-objs := es8328.o
+ snd-soc-es8328-i2c-objs := es8328-i2c.o
+@@ -507,6 +508,7 @@ obj-$(CONFIG_SND_SOC_ES7210)	+= snd-soc-es7210.o
+ obj-$(CONFIG_SND_SOC_ES7241)	+= snd-soc-es7241.o
+ obj-$(CONFIG_SND_SOC_ES8156)	+= snd-soc-es8156.o
+ obj-$(CONFIG_SND_SOC_ES8316)    += snd-soc-es8316.o
++obj-$(CONFIG_SND_SOC_ES8323)    += snd-soc-es8323.o
+ obj-$(CONFIG_SND_SOC_ES8326)    += snd-soc-es8326.o
+ obj-$(CONFIG_SND_SOC_ES8328)	+= snd-soc-es8328.o
+ obj-$(CONFIG_SND_SOC_ES8328_I2C)+= snd-soc-es8328-i2c.o
+diff --git a/sound/soc/codecs/es8323.c b/sound/soc/codecs/es8323.c
+index 89f88fd01b08..fb7d0885be7d 100644
+--- a/sound/soc/codecs/es8323.c
++++ b/sound/soc/codecs/es8323.c
+@@ -977,7 +977,7 @@ static struct snd_soc_dai_driver es8323_dai = {
+ 		    .formats = es8323_FORMATS,
+ 		    },
+ 	.ops = &es8323_ops,
+-	.symmetric_rates = 1,
++	.symmetric_rate = 1,
+ };
+ 
+ static int es8323_suspend(struct snd_soc_component *component)
+@@ -1183,8 +1183,7 @@ static void pa_delay_worker(struct work_struct *work)
+ 	#endif
+ }
+ 
+-static int es8323_i2c_probe(struct i2c_client *i2c,
+-			    const struct i2c_device_id *id)
++static int es8323_i2c_probe(struct i2c_client *i2c)
+ {
+ 	struct es8323_priv *es8323;
+ 	struct miscdevice *miscdev;
+@@ -1252,11 +1251,11 @@ static int es8323_i2c_probe(struct i2c_client *i2c,
+ 	return ret;
+ }
+ 
+-static int es8323_i2c_remove(struct i2c_client *client)
++static void es8323_i2c_remove(struct i2c_client *client)
+ {
+ 	snd_soc_unregister_component(&client->dev);
+ 	sysfs_remove_group(&client->dev.kobj, &es8323_attr_group);
+-	return 0;
++	return;
+ }
+ 
+ static const struct i2c_device_id es8323_i2c_id[] = {
+diff --git a/sound/soc/headset_observe/rockchip_headset_core.c b/sound/soc/headset_observe/rockchip_headset_core.c
+index dcd32b63dee4..d690104f8f57 100755
+--- a/sound/soc/headset_observe/rockchip_headset_core.c
++++ b/sound/soc/headset_observe/rockchip_headset_core.c
+@@ -41,7 +41,6 @@ static int rockchip_headset_probe(struct platform_device *pdev)
+ 	struct device_node *node = pdev->dev.of_node;
+ 	struct rk_headset_pdata *pdata;
+ 	int ret;
+-	enum of_gpio_flags flags;
+ 
+ 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
+ 	if (!pdata) {
+@@ -51,7 +50,7 @@ static int rockchip_headset_probe(struct platform_device *pdev)
+ 	pdata_info = pdata;
+ 
+ 	/* headset */
+-	ret = of_get_named_gpio_flags(node, "headset_gpio", 0, &flags);
++	ret = of_get_named_gpio(node, "headset_gpio", 0);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "Can not read property headset_gpio\n");
+ 		goto err;
+@@ -69,12 +68,9 @@ static int rockchip_headset_probe(struct platform_device *pdev)
+ 				"headset_gpio set direction fail\n");
+ 			goto err;
+ 		}
+-		pdata->headset_insert_type = (flags & OF_GPIO_ACTIVE_LOW) ?
+-						     HEADSET_IN_LOW :
+-						     HEADSET_IN_HIGH;
+ 	}
+ 	/* 3.5mm line-in */
+-	ret = of_get_named_gpio_flags(node, "linein_gpio", 0, &flags);
++	ret = of_get_named_gpio(node, "linein_gpio", 0);
+ 	if (ret < 0) {
+ 		dev_warn(&pdev->dev, "no property linein_gpio\n");
+ 	} else {
+@@ -91,12 +87,9 @@ static int rockchip_headset_probe(struct platform_device *pdev)
+ 				"linein_gpio set direction fail\n");
+ 			goto err;
+ 		}
+-		pdata->linein_insert_type = (flags & OF_GPIO_ACTIVE_LOW) ?
+-						     LINEIN_LOW :
+-						     LINEIN_HIGH;
+ 	}
+ 	/* ip-board line-in */
+-	ret = of_get_named_gpio_flags(node, "iplin_gpio", 0, &flags);
++	ret = of_get_named_gpio(node, "iplin_gpio", 0);
+ 	if (ret < 0) {
+ 		dev_warn(&pdev->dev, "no property iplin_gpio\n");
+ 	} else {
+@@ -113,12 +106,9 @@ static int rockchip_headset_probe(struct platform_device *pdev)
+ 				"iplin_gpio set direction fail\n");
+ 			goto err;
+ 		}
+-		pdata->iplin_insert_type = (flags & OF_GPIO_ACTIVE_LOW) ?
+-						     LINEIN_LOW :
+-						     LINEIN_HIGH;
+ 	}
+ 	/* hook */
+-	ret = of_get_named_gpio_flags(node, "hook_gpio", 0, &pdata->hook_gpio);
++	ret = of_get_named_gpio(node, "hook_gpio", 0);
+ 	if (ret < 0) {
+ 		dev_warn(&pdev->dev, "Can not read property hook_gpio\n");
+ 		pdata->hook_gpio = 0;
+@@ -153,7 +143,7 @@ static int rockchip_headset_probe(struct platform_device *pdev)
+ 
+ #ifdef CONFIG_MODEM_MIC_SWITCH
+ 	/* mic */
+-	ret = of_get_named_gpio_flags(node, "mic_switch_gpio", 0, &flags);
++	ret = of_get_named_gpio(node, "mic_switch_gpio", 0);
+ 	if (ret < 0) {
+ 		DBG("%s() Can not read property mic_switch_gpio\n",
+ 		    __func__);
+-- 
+2.43.0
+

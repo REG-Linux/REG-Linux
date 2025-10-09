@@ -1,0 +1,32 @@
+From 58582f5a6e536e7b4c226bbc8b7f12aec8c2168f Mon Sep 17 00:00:00 2001
+From: Drew Fustini <dfustini@baylibre.com>
+Date: Tue, 14 Nov 2023 16:07:55 -0500
+Subject: [PATCH 053/400] dt-bindings: mmc: sdhci-of-dwcmhsc: Add T-Head TH1520
+ support
+
+Add compatible value for the T-Head TH1520 dwcmshc controller.
+
+Acked-by: Guo Ren <guoren@kernel.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Drew Fustini <dfustini@baylibre.com>
+Link: https://lore.kernel.org/r/20231114-th1520-mmc-v6-1-3273c661a571@baylibre.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ Documentation/devicetree/bindings/mmc/snps,dwcmshc-sdhci.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/mmc/snps,dwcmshc-sdhci.yaml b/Documentation/devicetree/bindings/mmc/snps,dwcmshc-sdhci.yaml
+index a43eb837f8da..42804d955293 100644
+--- a/Documentation/devicetree/bindings/mmc/snps,dwcmshc-sdhci.yaml
++++ b/Documentation/devicetree/bindings/mmc/snps,dwcmshc-sdhci.yaml
+@@ -19,6 +19,7 @@ properties:
+       - rockchip,rk3568-dwcmshc
+       - rockchip,rk3588-dwcmshc
+       - snps,dwcmshc-sdhci
++      - thead,th1520-dwcmshc
+ 
+   reg:
+     maxItems: 1
+-- 
+2.43.0
+

@@ -1,0 +1,73 @@
+From 5640b935ad1d44d093edcf3d7053ebfd199635f3 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sat, 31 Aug 2024 23:54:03 +0800
+Subject: [PATCH 180/400] th1520-lichee-pi-4a.dts: change dts for aic8800 wifi
+ Support aic8800 wifi
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 9331de562ea7..94f455f2ebd3 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -239,6 +239,19 @@ codec {
+ 		};
+ 	};
+ 
++	wcn_wifi: wireless-wlan {
++		compatible = "wlan-platdata";
++		clock-names = "clk_wifi";
++		ref-clock-frequency = <24000000>;
++		keep_wifi_power_on;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_wifi_wake>;
++		wifi_chip_type = "rtl8723ds";
++		WIFI,poweren-gpios = <&ioexp2 4 0>;
++		support_power_ctrl;
++		status = "okay";
++	};
++
+ 	wcn_bt: wireless-bluetooth {
+ 		compatible = "bluetooth-platdata";
+ 		pinctrl-names = "default";
+@@ -615,6 +628,18 @@ rx-pins {
+ 		};
+ 	};
+ 
++	pinctrl_wifi_wake: wifi_grp {
++		wifi-pins {
++			pins = "GPIO0_27";
++			function = "gpio";
++			bias-disable;
++			drive-strength = <7>;
++			input-enable;
++			input-schmitt-enable;
++			slew-rate = <0>;
++		};
++	};
++
+ 	pinctrl_bt_wake: bt_grp {
+ 		bt-pins {
+ 			pins = "GPIO0_28";
+@@ -755,6 +780,7 @@ spidev@0 {
+ &sdio1 {
+ 		max-frequency = <100000000>;
+ 		bus-width = <4>;
++		pull_up;
+ 		no-sd;
+ 		no-mmc;
+ 		non-removable;
+@@ -763,6 +789,7 @@ &sdio1 {
+ 		wprtn_ignore;
+ 		cap-sd-highspeed;
+ 		wakeup-source;
++		keep-power-in-suspend;
+ 		status = "okay";
+ };
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,56 @@
+From 35bb22bdea3099810ae17e9bfee7a8a5c64b4007 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:01:38 +0800
+Subject: [PATCH 289/400] dts: som: add gpio-keys node
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index cd62203a4318..19f1e3160f33 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -5,6 +5,7 @@
+ 
+ #include "th1520-lichee-module-4a.dtsi"
+ #include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/linux-event-codes.h>
+ 
+ / {
+ 	model = "Sipeed Lichee Pi 4A";
+@@ -398,6 +399,29 @@ wcn_bt: wireless-bluetooth {
+ 		status = "okay";
+ 	};
+ 
++	gpio-keys {
++		compatible = "gpio-keys";
++		key-volumedown {
++			label = "Volume Down Key";
++			linux,code = <KEY_VOLUMEDOWN>;
++			debounce-interval = <1>;
++			gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
++		};
++		key-volumeup {
++			label = "Volume Up Key";
++			linux,code = <KEY_VOLUMEUP>;
++			debounce-interval = <1>;
++			gpios = <&gpio1 0 GPIO_ACTIVE_LOW>;
++		};
++		key-sleep {
++			label = "Sleep Wake Key";
++			wakeup-source;
++			linux,code = <KEY_SLEEP>;
++			debounce-interval = <1>;
++			gpios = <&aogpio 2 GPIO_ACTIVE_LOW>;
++		};
++	};
++
+ 	thermal-zones {
+ 		cpu-thermal {
+ 			sustainable-power = <1600>;
+-- 
+2.43.0
+

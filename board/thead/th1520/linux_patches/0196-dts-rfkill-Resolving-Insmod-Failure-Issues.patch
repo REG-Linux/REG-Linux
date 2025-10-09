@@ -1,0 +1,29 @@
+From 7a41c0ac6d787a24d5be3513cc56665818fd47f8 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 00:28:02 +0800
+Subject: [PATCH 196/400] dts: rfkill: Resolving Insmod Failure Issues
+
+rmmod may encounter the problem of not being able to find the card when using Insmod.
+Add a broker-cd node to trigger periodic card scanning
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 9c80e39c8db7..df230a172553 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -990,7 +990,7 @@ &sdio1 {
+ 		pull_up;
+ 		no-sd;
+ 		no-mmc;
+-		non-removable;
++		broken-cd;
+ 		io_fixed_1v8;
+ 		post-power-on-delay-ms = <50>;
+ 		wprtn_ignore;
+-- 
+2.43.0
+

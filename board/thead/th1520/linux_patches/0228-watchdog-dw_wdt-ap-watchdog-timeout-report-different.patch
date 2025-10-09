@@ -1,0 +1,49 @@
+From 637fc852b7337d81c716077937fd3a45d3b42225 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:09:07 +0800
+Subject: [PATCH 228/400] watchdog: dw_wdt: ap watchdog timeout report
+ different strategies
+
+cherry-pick from:
+commit 31c0b49dd73ddf6565ec2caa732b136ae2c5bc60
+Author: Hao Li <ben.lihao@linux.alibaba.com>
+Date:   Mon Oct 17 11:42:48 2022 +0800
+
+    watchdog: dw_wdt: ap watchdog timeout report different strategies
+
+    ap watchdog timeout report warning within debug mode and
+    report panic within release mode.
+
+Signed-off-by: Hao Li <ben.lihao@linux.alibaba.com>
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/watchdog/dw_wdt.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/watchdog/dw_wdt.c b/drivers/watchdog/dw_wdt.c
+index 50ba7c98873e..650e024106fc 100644
+--- a/drivers/watchdog/dw_wdt.c
++++ b/drivers/watchdog/dw_wdt.c
+@@ -372,12 +372,17 @@ static irqreturn_t dw_wdt_irq(int irq, void *devid)
+ 	 * following ping operations.
+ 	 */
+ 	val = readl(dw_wdt->regs + WDOG_INTERRUPT_STATUS_REG_OFFSET);
+-	if (!val)
++	if (!val) {
++		pr_warn("watchdog irq enter. however status is 0\n");
+ 		return IRQ_NONE;
++	}
+ 	th1520_event_set_rebootmode(TH1520_EVENT_SW_WATCHDOG);
+ 
++	pr_info("watchdog app was stuck! watchdog pretimeout event\n");
+ 	watchdog_notify_pretimeout(&dw_wdt->wdd);
+ 
++	dw_wdt_ping(&dw_wdt->wdd);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+-- 
+2.43.0
+

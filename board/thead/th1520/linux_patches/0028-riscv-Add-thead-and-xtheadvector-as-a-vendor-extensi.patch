@@ -1,0 +1,159 @@
+From 1a850904d0b59419b5c17bf3731bf9a7345a67e7 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Wed, 13 Nov 2024 18:21:10 -0800
+Subject: [PATCH 028/400] riscv: Add thead and xtheadvector as a vendor
+ extension
+
+[ Upstream commit cddd63869f9214f2bc5c4b89a8ea1bd0ff4d89c5 ]
+
+Add support to the kernel for THead vendor extensions with the target of
+the new extension xtheadvector.
+
+Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Tested-by: Yangyu Chen <cyy@cyyself.name>
+Link: https://lore.kernel.org/r/20241113-xtheadvector-v11-4-236c22791ef9@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+ arch/riscv/Kconfig.vendor                     | 13 +++++++++++
+ .../include/asm/vendor_extensions/thead.h     | 16 ++++++++++++++
+ arch/riscv/kernel/cpufeature.c                |  1 +
+ arch/riscv/kernel/vendor_extensions.c         | 10 +++++++++
+ arch/riscv/kernel/vendor_extensions/Makefile  |  1 +
+ arch/riscv/kernel/vendor_extensions/thead.c   | 22 +++++++++++++++++++
+ 6 files changed, 63 insertions(+)
+ create mode 100644 arch/riscv/include/asm/vendor_extensions/thead.h
+ create mode 100644 arch/riscv/kernel/vendor_extensions/thead.c
+
+diff --git a/arch/riscv/Kconfig.vendor b/arch/riscv/Kconfig.vendor
+index 6f1cdd32ed29..9897442bd44f 100644
+--- a/arch/riscv/Kconfig.vendor
++++ b/arch/riscv/Kconfig.vendor
+@@ -16,4 +16,17 @@ config RISCV_ISA_VENDOR_EXT_ANDES
+ 	  If you don't know what to do here, say Y.
+ endmenu
+ 
++menu "T-Head"
++config RISCV_ISA_VENDOR_EXT_THEAD
++	bool "T-Head vendor extension support"
++	select RISCV_ISA_VENDOR_EXT
++	default y
++	help
++	  Say N here to disable detection of and support for all T-Head vendor
++	  extensions. Without this option enabled, T-Head vendor extensions will
++	  not be detected at boot and their presence not reported to userspace.
++
++	  If you don't know what to do here, say Y.
++endmenu
++
+ endmenu
+diff --git a/arch/riscv/include/asm/vendor_extensions/thead.h b/arch/riscv/include/asm/vendor_extensions/thead.h
+new file mode 100644
+index 000000000000..48421d1553ad
+--- /dev/null
++++ b/arch/riscv/include/asm/vendor_extensions/thead.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_RISCV_VENDOR_EXTENSIONS_THEAD_H
++#define _ASM_RISCV_VENDOR_EXTENSIONS_THEAD_H
++
++#include <asm/vendor_extensions.h>
++
++#include <linux/types.h>
++
++/*
++ * Extension keys must be strictly less than RISCV_ISA_VENDOR_EXT_MAX.
++ */
++#define RISCV_ISA_VENDOR_EXT_XTHEADVECTOR		0
++
++extern struct riscv_isa_vendor_ext_data_list riscv_isa_vendor_ext_list_thead;
++
++#endif
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index 6603942c3158..c5f3e57a3431 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -24,6 +24,7 @@
+ #include <asm/sbi.h>
+ #include <asm/vector.h>
+ #include <asm/vendor_extensions.h>
++#include <asm/vendor_extensions/thead.h>
+ 
+ #include "copy-unaligned.h"
+ 
+diff --git a/arch/riscv/kernel/vendor_extensions.c b/arch/riscv/kernel/vendor_extensions.c
+index b746162aa0d2..f6ed35dfdc30 100644
+--- a/arch/riscv/kernel/vendor_extensions.c
++++ b/arch/riscv/kernel/vendor_extensions.c
+@@ -6,6 +6,7 @@
+ #include <asm/vendorid_list.h>
+ #include <asm/vendor_extensions.h>
+ #include <asm/vendor_extensions/andes.h>
++#include <asm/vendor_extensions/thead.h>
+ 
+ #include <linux/types.h>
+ #include <linux/kernel.h>
+@@ -14,6 +15,9 @@ struct riscv_isa_vendor_ext_data_list *riscv_isa_vendor_ext_list[] = {
+ #ifdef CONFIG_RISCV_ISA_VENDOR_EXT_ANDES
+ 	&riscv_isa_vendor_ext_list_andes,
+ #endif
++#ifdef CONFIG_RISCV_ISA_VENDOR_EXT_THEAD
++	&riscv_isa_vendor_ext_list_thead,
++#endif
+ };
+ 
+ const size_t riscv_isa_vendor_ext_list_size = ARRAY_SIZE(riscv_isa_vendor_ext_list);
+@@ -41,6 +45,12 @@ bool __riscv_isa_vendor_extension_available(int cpu, unsigned long vendor, unsig
+ 		cpu_bmap = &riscv_isa_vendor_ext_list_andes.per_hart_isa_bitmap[cpu];
+ 		break;
+ 	#endif
++	#ifdef CONFIG_RISCV_ISA_VENDOR_EXT_THEAD
++	case THEAD_VENDOR_ID:
++		bmap = &riscv_isa_vendor_ext_list_thead.all_harts_isa_bitmap;
++		cpu_bmap = riscv_isa_vendor_ext_list_thead.per_hart_isa_bitmap;
++		break;
++	#endif
+ 	default:
+ 		return false;
+ 	}
+diff --git a/arch/riscv/kernel/vendor_extensions/Makefile b/arch/riscv/kernel/vendor_extensions/Makefile
+index 6a61aed944f1..353522cb3bf0 100644
+--- a/arch/riscv/kernel/vendor_extensions/Makefile
++++ b/arch/riscv/kernel/vendor_extensions/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ 
+ obj-$(CONFIG_RISCV_ISA_VENDOR_EXT_ANDES)	+= andes.o
++obj-$(CONFIG_RISCV_ISA_VENDOR_EXT_THEAD)	+= thead.o
+diff --git a/arch/riscv/kernel/vendor_extensions/thead.c b/arch/riscv/kernel/vendor_extensions/thead.c
+new file mode 100644
+index 000000000000..7a709ce3a297
+--- /dev/null
++++ b/arch/riscv/kernel/vendor_extensions/thead.c
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include <asm/cpufeature.h>
++#include <asm/vendor_extensions.h>
++#include <asm/vendor_extensions/thead.h>
++
++#include <linux/types.h>
++#include <linux/kernel.h>
++
++/* All T-Head vendor extensions supported in Linux */
++static const struct riscv_isa_ext_data riscv_isa_vendor_ext_thead[] = {
++	{
++		.name = "xtheadvector",
++		.property = "xtheadvector",
++		.id = RISCV_ISA_VENDOR_EXT_XTHEADVECTOR,
++	},
++};
++
++struct riscv_isa_vendor_ext_data_list riscv_isa_vendor_ext_list_thead = {
++	.ext_data_count = ARRAY_SIZE(riscv_isa_vendor_ext_thead),
++	.ext_data = riscv_isa_vendor_ext_thead,
++};
+-- 
+2.43.0
+

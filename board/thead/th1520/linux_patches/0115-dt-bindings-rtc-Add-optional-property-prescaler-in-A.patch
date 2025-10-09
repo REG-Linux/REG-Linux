@@ -1,0 +1,50 @@
+From b5a2bc793293174fcf2b519b3d6a378f59ad4fb8 Mon Sep 17 00:00:00 2001
+From: Wei Fu <wefu@redhat.com>
+Date: Sun, 31 Mar 2024 23:05:30 +0800
+Subject: [PATCH 115/400] dt-bindings: rtc: Add optional property "prescaler"
+ in APM X-Gene RTC Document
+
+Add optional property "prescaler" for APM X-Gene RTC.
+The clock source on some platform to RTC is NOT 1HZ,
+so we need to prescale the clock to make the input clock become 1HZ,
+like (32K/prescaler) = 1HZ on the XuanTie TH1520 AP sub-system RTC.
+
+Signed-off-by: Wei Fu <wefu@redhat.com>
+---
+ .../devicetree/bindings/rtc/xgene-rtc.txt        | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/rtc/xgene-rtc.txt b/Documentation/devicetree/bindings/rtc/xgene-rtc.txt
+index fd195c358446..25ba8cf0cc31 100644
+--- a/Documentation/devicetree/bindings/rtc/xgene-rtc.txt
++++ b/Documentation/devicetree/bindings/rtc/xgene-rtc.txt
+@@ -10,6 +10,9 @@ Required properties:
+ - #clock-cells: Should be 1.
+ - clocks: Reference to the clock entry.
+ 
++Optional properties:
++- prescaler: Reference to the Value of Counter Prescaler.
++
+ Example:
+ 
+ rtcclk: rtcclk {
+@@ -26,3 +29,16 @@ rtc: rtc@10510000 {
+ 	#clock-cells = <1>;
+ 	clocks = <&rtcclk 0>;
+ };
++
++Example XuanTie TH1520 RTC node with Counter Prescaler(prescaler):
++
++rtc: rtc@fffff40000 {
++	compatible = "snps,dw-apb-rtc";
++	reg = <0xff 0xfff40000 0x0 0x1000>;
++	interrupts = <74 IRQ_TYPE_LEVEL_HIGH>;
++	clocks = <&osc_32k>;
++	clock-names = "osc_32k";
++	wakeup-source;
++	prescaler = <0x8000>;
++	status = "okay";
++};
+-- 
+2.43.0
+

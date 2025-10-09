@@ -1,0 +1,36 @@
+From 93bec69f6e93776abcc1e729baf21897e832fb00 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Wed, 7 Aug 2024 18:18:57 +0800
+Subject: [PATCH 341/400] symbol: gpl: export pud_offset/p4d_offset symbol
+
+export pud_offset/p4d_offset symbol
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/mm/pgtable.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/riscv/mm/pgtable.c b/arch/riscv/mm/pgtable.c
+index ef887efcb679..21ea6ed76470 100644
+--- a/arch/riscv/mm/pgtable.c
++++ b/arch/riscv/mm/pgtable.c
+@@ -36,6 +36,7 @@ pud_t *pud_offset(p4d_t *p4d, unsigned long address)
+ 
+ 	return (pud_t *)p4d;
+ }
++EXPORT_SYMBOL_GPL(pud_offset);
+ 
+ p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
+ {
+@@ -44,6 +45,7 @@ p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
+ 
+ 	return (p4d_t *)pgd;
+ }
++EXPORT_SYMBOL_GPL(p4d_offset);
+ #endif
+ 
+ #ifdef CONFIG_HAVE_ARCH_HUGE_VMAP
+-- 
+2.43.0
+

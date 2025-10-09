@@ -1,0 +1,90 @@
+From 960d601a6b086b1d03299811d53810f6a0f6fe0e Mon Sep 17 00:00:00 2001
+From: Chen Pei <cp0613@linux.alibaba.com>
+Date: Thu, 20 Jun 2024 14:56:18 +0800
+Subject: [PATCH 149/400] riscv: vector: Fix the boot issue compiled using
+ xuantie-toolchain or upstream-toolchain
+
+The Image compiled by upstream-toolchain gcc-14 will generate vector
+illegal instruction exception when booting, because the compilation
+option -march contains v, which is due to the requirement of the
+lower version of xuantie-toolchain to explicitly specify v. In the
+future, as xuantie-toolchain is upgraded, it will remain consistent
+with upstream-toolchain and does not need to be explicitly specified.
+Therefore, it is only explicitly specified for the current and old
+versions of xuantie-toolchain, including the following three xuantie-
+toolchain versions:
+xuantie-toolchain-v2.10 with gcc-10.4.
+xuantie-toolchain-v2.8 with gcc-10.4.
+xuantie-toolchain-v2.6 with gcc-10.2.
+
+Signed-off-by: Chen Pei <cp0613@linux.alibaba.com>
+---
+ arch/riscv/Kconfig        | 8 +++++++-
+ arch/riscv/Makefile       | 9 +++++++--
+ scripts/Makefile.compiler | 4 ++++
+ 3 files changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 88161a95d24e..5df9929f6042 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -616,6 +616,12 @@ config TOOLCHAIN_HAS_ZIHINTPAUSE
+ 	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zihintpause)
+ 	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23600
+ 
++config TOOLCHAIN_HAS_XTHEADC
++	bool
++	default y
++	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_xtheadc)
++	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_xtheadc)
++
+ config TOOLCHAIN_NEEDS_EXPLICIT_ZICSR_ZIFENCEI
+ 	def_bool y
+ 	# https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=aed44286efa8ae8717a77d94b51ac3614e2ca6dc
+@@ -678,7 +684,7 @@ endmenu # "Platform type"
+ config XUANTIE_ISA
+ 	bool "XUANTIE ISA in AFLAGS with -march=_xtheadc"
+ 	default n
+-	depends on $(cc-option, -march=rv64imafdcv_xtheadc)
++	depends on TOOLCHAIN_HAS_XTHEADC
+ 	help
+ 	  This config enable XUANTIE custom instruction set.
+ 	  XUANTIE custom instruction set including more instructions, like cache operation,
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 455d84eb76fa..4d27754a4af8 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -74,8 +74,13 @@ riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
+ # XUANTIE ISA
+ riscv-march-$(CONFIG_XUANTIE_ISA) := $(riscv-march-y)_xtheadc
+ 
+-# Remove F,D from isa string for all.
+-KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
++# Remove F,D from isa string for xuantie-toolchain (e.g. gcc-10.4).
++# Remove F,D,V from isa string for upstream-toolchain.
++ifeq ($(CONFIG_TOOLCHAIN_HAS_XTHEADC)$(call gcc-max-version, 100400),yy)
++	KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
++else
++	KBUILD_CFLAGS += -march=$(shell echo $(riscv-march-y) | sed -E 's/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
++endif
+ 
+ KBUILD_AFLAGS += -march=$(riscv-march-y)
+ 
+diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
+index 92be0c9a13ee..beeddb618912 100644
+--- a/scripts/Makefile.compiler
++++ b/scripts/Makefile.compiler
+@@ -65,6 +65,10 @@ cc-disable-warning = $(call try-run,\
+ # Usage: cflags-$(call gcc-min-version, 70100) += -foo
+ gcc-min-version = $(call test-ge, $(CONFIG_GCC_VERSION), $1)
+ 
++# gcc-max-version
++# Usage: cflags-$(call gcc-max-version, 100400) += -foo
++gcc-max-version = $(call test-le, $(CONFIG_GCC_VERSION), $1)
++
+ # clang-min-version
+ # Usage: cflags-$(call clang-min-version, 110000) += -foo
+ clang-min-version = $(call test-ge, $(CONFIG_CLANG_VERSION), $1)
+-- 
+2.43.0
+

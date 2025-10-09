@@ -1,0 +1,32 @@
+From c2e1a13f0c52be590d35195e6142a384f511b133 Mon Sep 17 00:00:00 2001
+From: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Date: Sun, 30 Jun 2024 16:29:57 +0800
+Subject: [PATCH 161/400] driver:padctrl:correct th1520 gpio_1 24/25 cfg
+
+The bit mapping for the GPIO1_24/25 pins on the
+ group2 has been corrected. the issue will lead gpio not
+ work in these pin.
+
+Signed-off-by: Huaming <jianghuaming.jhm@linux.alibaba.com>
+---
+ drivers/pinctrl/pinctrl-th1520.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/pinctrl-th1520.c b/drivers/pinctrl/pinctrl-th1520.c
+index 334c53c6f85c..2f6f7eba44af 100644
+--- a/drivers/pinctrl/pinctrl-th1520.c
++++ b/drivers/pinctrl/pinctrl-th1520.c
+@@ -332,8 +332,8 @@ static const struct pinctrl_pin_desc th1520_group2_pins[] = {
+ 	TH1520_PAD(53, GPIO1_21,      GPIO, ____, ISP,  ____, ____, ____, 0),
+ 	TH1520_PAD(54, GPIO1_22,      GPIO, ____, ISP,  ____, ____, ____, 0),
+ 	TH1520_PAD(55, GPIO1_23,      GPIO, ____, ISP,  ____, ____, ____, 0),
+-	TH1520_PAD(56, GPIO1_24,      GPIO, ____, ISP,  ____, ____, ____, 0),
+-	TH1520_PAD(57, GPIO1_25,      GPIO, ____, ISP,  ____, ____, ____, 0),
++	TH1520_PAD(56, GPIO1_24,      JTAG, ____, ISP,  GPIO, ____, ____, 0),
++	TH1520_PAD(57, GPIO1_25,      JTAG, ____, ISP,  GPIO, ____, ____, 0),
+ 	TH1520_PAD(58, GPIO1_26,      GPIO, ____, ISP,  ____, ____, ____, 0),
+ 	TH1520_PAD(59, GPIO1_27,      GPIO, ____, ISP,  ____, ____, ____, 0),
+ 	TH1520_PAD(60, GPIO1_28,      GPIO, ____, ISP,  ____, ____, ____, 0),
+-- 
+2.43.0
+

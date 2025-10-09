@@ -1,0 +1,64 @@
+From 053f9da871e475d96e33fc487eaa0cd4984b2798 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:04:06 +0800
+Subject: [PATCH 219/400] dts: th1520: add cpu thermal node and device thermal
+ node
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ .../riscv/boot/dts/thead/th1520-lichee-pi-4a.dts |  3 ---
+ arch/riscv/boot/dts/thead/th1520.dtsi            | 16 ++++++++++++++++
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 7aa0805bc3af..14448dd0cd39 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -262,9 +262,6 @@ wcn_bt: wireless-bluetooth {
+ 
+ 	thermal-zones {
+ 		cpu-thermal {
+-			polling-delay = <1000>;
+-			polling-delay-passive = <1000>;
+-			thermal-sensors = <&pvt 0>;
+ 			sustainable-power = <1600>;
+ 
+ 			trips {
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index bd82dea8c219..b056d201a866 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -50,6 +50,8 @@ c910_0: cpu@0 {
+ 			dynamic-power-coefficient = <500>;
+ 			video-4k-minfreq = <1848000000>;
+ 			qos-mid-minfreq = <750000000>;
++			#cooling-cells = <2>;
++			dynamic-power-coefficient = <500>;
+ 
+ 			clock-latency = <61036>;
+ 			clocks = <&clk C910_CCLK>,
+@@ -425,6 +427,20 @@ npu_devfreq {
+ 						<&npu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+ 						contribution = <1024>;
+ 				};
++
++				dsp0_devfreq {
++					trip = <&dev_target>;
++					cooling-device =
++						<&xtensa_dsp0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
++						contribution = <1024>;
++				};
++
++				dsp1_devfreq {
++					trip = <&dev_target>;
++					cooling-device =
++						<&xtensa_dsp1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
++						contribution = <1024>;
++				};
+ 			};
+ 		};
+ 	};
+-- 
+2.43.0
+

@@ -1,0 +1,163 @@
+From e07c9c465f98dbea3ad647d7705c3ef2f2f8b898 Mon Sep 17 00:00:00 2001
+From: tingming <minghq@linux.alibaba.com>
+Date: Wed, 22 May 2024 16:28:19 +0800
+Subject: [PATCH 086/400] riscv: dts: thead: to add th1520 clk nodes
+
+---
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   |  4 +
+ .../dts/thead/th1520-lichee-module-4a.dtsi    |  4 +
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 95 +++++++++++++++++++
+ 3 files changed, 103 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index 9ecbbe62807b..df09d8a78674 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -84,6 +84,10 @@ &osc_32k {
+ 	clock-frequency = <32768>;
+ };
+ 
++&rc_24m {
++	clock-frequency = <24000000>;
++};
++
+ &aonsys_clk {
+ 	clock-frequency = <73728000>;
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index 89d88b7fdf04..2216b7c9300e 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -25,6 +25,10 @@ &osc_32k {
+ 	clock-frequency = <32768>;
+ };
+ 
++&rc_24m {
++	clock-frequency = <24000000>;
++};
++
+ &aonsys_clk {
+ 	clock-frequency = <73728000>;
+ };
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index b6896093dd8c..c8e425de6143 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -5,6 +5,13 @@
+  */
+ 
+ #include <dt-bindings/interrupt-controller/irq.h>
++#include <dt-bindings/clock/th1520-fm-ap-clock.h>
++#include <dt-bindings/clock/th1520-vpsys.h>
++#include <dt-bindings/clock/th1520-vosys.h>
++#include <dt-bindings/clock/th1520-visys.h>
++#include <dt-bindings/clock/th1520-dspsys.h>
++#include <dt-bindings/clock/th1520-audiosys.h>
++#include <dt-bindings/clock/th1520-miscsys.h>
+ 
+ / {
+ 	compatible = "thead,th1520";
+@@ -203,6 +210,12 @@ osc_32k: 32k-oscillator {
+ 		#clock-cells = <0>;
+ 	};
+ 
++	rc_24m: clock-rc-24m {
++		compatible = "fixed-clock";
++		clock-output-names = "rc_24m";
++		#clock-cells = <0>;
++	};
++
+ 	aonsys_clk: aonsys-clk {
+ 		compatible = "fixed-clock";
+ 		clock-output-names = "aonsys_clk";
+@@ -757,5 +770,87 @@ adc: adc@0xfffff51000 {
+ 			/* ADC pin is proprietary,no need to config pinctrl */
+ 			status = "disabled";
+ 		};
++
++		visys_reg: visys-reg@ffe4040000 {
++			compatible = "thead,th1520-visys-reg", "syscon";
++			reg = <0xff 0xe4040000 0x0 0x1000>;
++			status = "disabled";
++		};
++
++		dspsys_reg: dspsys-reg@ffef040000 {
++			compatible = "thead,th1520-dspsys-reg", "syscon";
++			reg = <0xff 0xef040000 0x0 0x1000>;
++			status = "okay";
++		};
++
++		miscsys_reg: miscsys-reg@ffec02c000 {
++			compatible = "thead,th1520-miscsys-reg", "syscon";
++			reg = <0xff 0xec02c000 0x0 0x1000>;
++			status = "okay";
++		};
++ 
++		tee_miscsys_reg: tee_miscsys-reg@fffc02d000 {
++			compatible = "thead,th1520-miscsys-reg", "syscon";
++			reg = <0xff 0xfc02d000 0x0 0x1000>;
++			status = "okay";
++		};
++
++		audio_cpr: audio_cpr@ffcb000000 {
++			compatible = "thead,th1520-audio-cpr-reg", "syscon";
++			reg = <0xff 0xcb000000 0x0 0x1000>;
++			status = "okay";
++		};
++
++		clk: clock-controller@ffef010000 {
++			compatible = "thead,th1520-fm-ree-clk";
++			reg = <0xff 0xef010000 0x0 0x1000>;
++			#clock-cells = <1>;
++			clocks = <&osc_32k>, <&osc>, <&rc_24m>;
++			clock-names = "osc_32k", "osc_24m", "rc_24m";
++			status = "okay";
++		};
++
++		visys_clk_gate: visys-clk-gate { /* VI_SYSREG_R */
++			compatible = "thead,visys-gate-controller";
++			visys-regmap = <&visys_reg>;
++			#clock-cells = <1>;
++			status = "okay";
++		};
++
++		vpsys_clk_gate: vpsys-clk-gate@ffecc30000 { /* VP_SYSREG_R */
++			compatible = "thead,vpsys-gate-controller";
++			reg = <0xff 0xecc30000 0x0 0x1000>;
++			#clock-cells = <1>;
++			status = "okay";
++		};
++
++		vosys_clk_gate: vosys-clk-gate@ffef528000 { /* VO_SYSREG_R */
++			compatible = "thead,vosys-gate-controller";
++			reg = <0xff 0xef528000 0x0 0x1000>;
++			#clock-cells = <1>;
++			status = "okay";
++		};
++
++		dspsys_clk_gate: dspsys-clk-gate {
++			compatible = "thead,dspsys-gate-controller";
++			dspsys-regmap = <&dspsys_reg>;
++			#clock-cells = <1>;
++			status = "okay";
++		};
++
++		audiosys_clk_gate: audiosys-clk-gate {
++			compatible = "thead,audiosys-gate-controller";
++			audiosys-regmap = <&audio_cpr>;
++			#clock-cells = <1>;
++			status = "okay";
++		};
++
++		miscsys_clk_gate: miscsys-clk-gate {
++			compatible = "thead,miscsys-gate-controller";
++			miscsys-regmap = <&miscsys_reg>;
++			tee-miscsys-regmap = <&tee_miscsys_reg>;
++			#clock-cells = <1>;
++			status = "okay";
++		};
+ 	};
+ };
+-- 
+2.43.0
+

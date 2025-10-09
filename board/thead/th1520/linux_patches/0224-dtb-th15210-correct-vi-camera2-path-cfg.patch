@@ -1,0 +1,45 @@
+From 1d07bf2e5e4453ef27c66fcb3f0bbf5f11a74dfe Mon Sep 17 00:00:00 2001
+From: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:07:37 +0800
+Subject: [PATCH 224/400] dtb:th15210: correct vi camera2 path cfg
+
+correct the vipre path in worng loaction
+which lead the pipiline init fail
+
+Signed-off-by: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 8f0d16de4ab3..d054fbf95439 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -548,11 +548,6 @@ sensor0 {
+ 					mode_idx = <3>;
+ 					path_type = "SENSOR_1296x972_RAW10_LINER";
+ 				};
+-				dma {
+-					subdev_name = "vipre";
+-					idx = <0>;
+-					path_type = "VIPRE_CSI1_ISP0";
+-				};
+ 				sensor1 {
+ 					subdev_name = "vivcam";
+ 					idx = <3>; //<3>=vivcam3 : sc2310
+@@ -560,6 +555,11 @@ sensor1 {
+ 					mode_idx = <1>;
+ 					path_type = "SENSOR_1920X1088_26FPS_RAW12_LINER";
+ 				};
++				dma {
++					subdev_name = "vipre";
++					idx = <0>;
++					path_type = "VIPRE_CSI1_ISP0";
++				};
+ 				isp {
+ 					subdev_name = "isp";
+ 					idx = <0>;
+-- 
+2.43.0
+

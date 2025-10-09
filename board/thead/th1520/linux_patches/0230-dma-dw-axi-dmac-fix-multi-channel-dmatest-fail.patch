@@ -1,0 +1,95 @@
+From ad5f4f78b34cf18dc5827777f769f4c7c2c918f3 Mon Sep 17 00:00:00 2001
+From: Hao Li <ben.lihao@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:09:40 +0800
+Subject: [PATCH 230/400] dma: dw-axi-dmac: fix multi-channel dmatest fail
+
+dw-axi-dmac common reg was not protected in atomic contex, becasue
+chan->vc.lock only protect channel reg. so multi-channel access
+common reg maybe lead to data inconsistency.
+
+Add spinlock to protect access common reg within atomic context.
+
+Signed-off-by: Hao Li <ben.lihao@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c | 13 +++++++++++++
+ drivers/dma/dw-axi-dmac/dw-axi-dmac.h          |  1 +
+ 2 files changed, 14 insertions(+)
+
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index 23aa458d5cc5..9714714eb6da 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -114,37 +114,49 @@ static inline void axi_chan_config_write(struct axi_dma_chan *chan,
+ static inline void axi_dma_disable(struct axi_dma_chip *chip)
+ {
+ 	u32 val;
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&chip->lock, flags);
+ 	val = axi_dma_ioread32(chip, DMAC_CFG);
+ 	val &= ~DMAC_EN_MASK;
+ 	axi_dma_iowrite32(chip, DMAC_CFG, val);
++	spin_unlock_irqrestore(&chip->lock, flags);
+ }
+ 
+ static inline void axi_dma_enable(struct axi_dma_chip *chip)
+ {
+ 	u32 val;
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&chip->lock, flags);
+ 	val = axi_dma_ioread32(chip, DMAC_CFG);
+ 	val |= DMAC_EN_MASK;
+ 	axi_dma_iowrite32(chip, DMAC_CFG, val);
++	spin_unlock_irqrestore(&chip->lock, flags);
+ }
+ 
+ static inline void axi_dma_irq_disable(struct axi_dma_chip *chip)
+ {
+ 	u32 val;
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&chip->lock, flags);
+ 	val = axi_dma_ioread32(chip, DMAC_CFG);
+ 	val &= ~INT_EN_MASK;
+ 	axi_dma_iowrite32(chip, DMAC_CFG, val);
++	spin_unlock_irqrestore(&chip->lock, flags);
+ }
+ 
+ static inline void axi_dma_irq_enable(struct axi_dma_chip *chip)
+ {
+ 	u32 val;
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&chip->lock, flags);
+ 	val = axi_dma_ioread32(chip, DMAC_CFG);
+ 	val |= INT_EN_MASK;
+ 	axi_dma_iowrite32(chip, DMAC_CFG, val);
++	spin_unlock_irqrestore(&chip->lock, flags);
+ }
+ 
+ static inline void axi_chan_irq_disable(struct axi_dma_chan *chan, u32 irq_mask)
+@@ -1461,6 +1473,7 @@ static int dw_probe(struct platform_device *pdev)
+ 	chip->dev = &pdev->dev;
+ 	chip->dw->hdata = hdata;
+ 
++	spin_lock_init(&chip->lock);
+ 	chip->irq = platform_get_irq(pdev, 0);
+ 	if (chip->irq < 0)
+ 		return chip->irq;
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac.h b/drivers/dma/dw-axi-dmac/dw-axi-dmac.h
+index 23c6f44b88df..1e4080928e02 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac.h
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac.h
+@@ -80,6 +80,7 @@ struct axi_dma_chip {
+ 	struct clk		*core_clk;
+ 	struct clk		*cfgr_clk;
+ 	struct dw_axi_dma	*dw;
++	spinlock_t		lock;
+ };
+ 
+ /* LLI == Linked List Item */
+-- 
+2.43.0
+

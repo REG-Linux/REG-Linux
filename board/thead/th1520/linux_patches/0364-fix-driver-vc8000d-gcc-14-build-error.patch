@@ -1,0 +1,97 @@
+From ee3787f9318a313cd6e8881edb10b742c440ea61 Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Thu, 3 Apr 2025 02:29:35 +0800
+Subject: [PATCH 364/400] fix: driver: vc8000d: gcc-14: build error
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ .../vpu-vc8000d-kernel/linux/memalloc/memalloc.c       |  4 ++--
+ .../linux/subsys_driver/hantro_vcmd.c                  | 10 +++++-----
+ .../linux/subsys_driver/kernel_allocator.c             |  4 ++--
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/memalloc/memalloc.c b/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/memalloc/memalloc.c
+index d9af14688879..890c7efc9783 100644
+--- a/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/memalloc/memalloc.c
++++ b/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/memalloc/memalloc.c
+@@ -134,13 +134,13 @@ static long memalloc_ioctl(struct file *filp, unsigned int cmd,
+ 
+   if (_IOC_DIR(cmd) & _IOC_READ)
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
+-    ret = !access_ok(arg, _IOC_SIZE(cmd));
++    ret = !access_ok((void*)arg, _IOC_SIZE(cmd));
+ #else
+     ret = !access_ok(VERIFY_WRITE, arg, _IOC_SIZE(cmd));
+ #endif
+   else if (_IOC_DIR(cmd) & _IOC_WRITE)
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
+-    ret = !access_ok(arg, _IOC_SIZE(cmd));
++    ret = !access_ok((void*)arg, _IOC_SIZE(cmd));
+ #else
+     ret = !access_ok(VERIFY_READ, arg, _IOC_SIZE(cmd));
+ #endif
+diff --git a/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/hantro_vcmd.c b/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/hantro_vcmd.c
+index 75e6851e9209..eae000284a96 100644
+--- a/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/hantro_vcmd.c
++++ b/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/hantro_vcmd.c
+@@ -1,4 +1,4 @@
+-/****************************************************************************
++ /****************************************************************************
+ *
+ *    The MIT License (MIT)
+ *
+@@ -916,7 +916,7 @@ static void free_cmdbuf_not_linked_by_flip(struct file *filp)
+       if(cmdbuf_used[i] && global_cmdbuf_node[i] != NULL)
+       {
+           new_cmdbuf_node = global_cmdbuf_node[i];
+-          if(new_cmdbuf_node == 0x55555555)
++          if(new_cmdbuf_node == (void*)0x55555555)
+           {
+               continue;
+           }
+@@ -1108,7 +1108,7 @@ static int allocate_cmdbuf(struct noncache_mem*  new_cmdbuf_addr,struct noncache
+       new_status_cmdbuf_addr->mmu_bus_address=vcmd_status_buf_mem_pool.mmu_bus_address + cmdbuf_used_pos*CMDBUF_MAX_SIZE;
+       new_status_cmdbuf_addr->size=CMDBUF_MAX_SIZE;
+       new_status_cmdbuf_addr->cmdbuf_id = cmdbuf_used_pos;
+-      global_cmdbuf_node[cmdbuf_used_pos]=0x55555555; //temp set it,for another thread not hit  cmdbuf_used[x] set but global_cmdbuf_node[x] is null
++      global_cmdbuf_node[cmdbuf_used_pos]=(void*)0x55555555; //temp set it,for another thread not hit  cmdbuf_used[x] set but global_cmdbuf_node[x] is null
+       cmdbuf_used_pos++;
+       if(cmdbuf_used_pos>=TOTAL_DISCRETE_CMDBUF_NUM)
+         cmdbuf_used_pos=0;
+@@ -2866,7 +2866,7 @@ static int vcmd_init(struct platform_device *pdev)
+       pr_info("Init: vcmd_buf_mem_pool.mmu_bus_address=0x%llx.\n",(long long unsigned int)vcmd_buf_mem_pool.mmu_bus_address);
+     }
+ 
+-    vcmd_status_buf_mem_pool.busAddress = (void *)vcmd_buf_mem_pool.busAddress+CMDBUF_POOL_TOTAL_SIZE;
++    vcmd_status_buf_mem_pool.busAddress = vcmd_buf_mem_pool.busAddress+CMDBUF_POOL_TOTAL_SIZE;
+     vcmd_status_buf_mem_pool.virtualAddress = (void *)vcmd_buf_mem_pool.virtualAddress+CMDBUF_POOL_TOTAL_SIZE;
+     vcmd_status_buf_mem_pool.size =CMDBUF_POOL_TOTAL_SIZE;
+     pr_info("Init: vcmd_status_buf_mem_pool.busAddress=0x%llx.\n",(long long unsigned int)vcmd_status_buf_mem_pool.busAddress);
+@@ -2885,7 +2885,7 @@ static int vcmd_init(struct platform_device *pdev)
+       pr_info("Init: vcmd_status_buf_mem_pool.mmu_bus_address=0x%llx.\n",(long long unsigned int)vcmd_status_buf_mem_pool.mmu_bus_address);
+     }
+ 
+-    vcmd_registers_mem_pool.busAddress = (void *)vcmd_buf_mem_pool.busAddress+CMDBUF_POOL_TOTAL_SIZE*2;
++    vcmd_registers_mem_pool.busAddress = vcmd_buf_mem_pool.busAddress+CMDBUF_POOL_TOTAL_SIZE*2;
+     vcmd_registers_mem_pool.virtualAddress = (void *)vcmd_buf_mem_pool.virtualAddress+CMDBUF_POOL_TOTAL_SIZE*2;
+     vcmd_registers_mem_pool.size =CMDBUF_VCMD_REGISTER_TOTAL_SIZE;
+     pr_info("Init: vcmd_registers_mem_pool.busAddress=0x%llx.\n",(long long unsigned int)vcmd_registers_mem_pool.busAddress);
+diff --git a/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/kernel_allocator.c b/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/kernel_allocator.c
+index e55b5d81de05..87c57dd22dc8 100644
+--- a/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/kernel_allocator.c
++++ b/drivers/soc/xuantie/vpu-vc8000d-kernel/linux/subsys_driver/kernel_allocator.c
+@@ -1161,9 +1161,9 @@ int allocator_ioctl(void *filp, unsigned int cmd, unsigned long arg)
+     if (_IOC_NR(cmd) > MEMORY_IOC_MAXNR) return EINVAL;
+ 
+     if (_IOC_DIR(cmd) & _IOC_READ)
+-        ret = !access_ok(arg, _IOC_SIZE(cmd));
++        ret = !access_ok((void*)arg, _IOC_SIZE(cmd));
+     else if (_IOC_DIR(cmd) & _IOC_WRITE)
+-        ret = !access_ok(arg, _IOC_SIZE(cmd));
++        ret = !access_ok((void*)arg, _IOC_SIZE(cmd));
+     if (ret) return EINVAL;
+ 
+     switch (cmd)
+-- 
+2.43.0
+

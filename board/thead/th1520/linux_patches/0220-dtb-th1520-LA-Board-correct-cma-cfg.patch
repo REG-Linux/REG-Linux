@@ -1,0 +1,31 @@
+From ed69aabfbdc5c67dc7f9da03bb1ca716d4581ddb Mon Sep 17 00:00:00 2001
+From: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:04:45 +0800
+Subject: [PATCH 220/400] dtb:th1520: LA Board correct cma cfg
+
+correct LA cma reserve 320M
+
+Signed-off-by: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 8f144983fcfc..8f0d16de4ab3 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -2518,8 +2518,8 @@ &resmem {
+ 	cmamem: linux,cma {
+ 		compatible = "shared-dma-pool";
+ 		reusable;
+-		size = <0 0x20000000>; // 512MB on lpi4a (SOM)
+-		alloc-ranges = <0 0x1a000000 0 0x4000000>; // [0x0D800_0000 ~ 0x0F800_0000]			linux,cma-default;
++		size = <0 0x14000000>; // 512MB on lpi4a (SOM)
++		alloc-ranges = <00 0xe4000000 0 0x14000000>;
+ 		linux,cma-default;
+ 	};
+ 	dsp0_mem: memory@20000000 {             /**0x2000_0000~0x2040_0000 4M**/
+-- 
+2.43.0
+

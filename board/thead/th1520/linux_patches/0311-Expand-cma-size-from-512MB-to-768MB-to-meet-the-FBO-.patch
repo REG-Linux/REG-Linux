@@ -1,0 +1,29 @@
+From 459967d5db360979d184638cfb69141e06724b77 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Sun, 1 Sep 2024 02:26:08 +0800
+Subject: [PATCH 311/400] Expand cma size from 512MB to 768MB to meet the FBO
+ video frame buffer requirement from chromium's X11 XVideo display feature
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 19f1e3160f33..d7c934144506 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -1155,8 +1155,8 @@ &resmem {
+ 	cmamem: linux,cma {
+ 		compatible = "shared-dma-pool";
+ 		reusable;
+-		size = <0 0x20000000>; // 512MB on lpi4a (SOM)
+-		alloc-ranges = <0 0xd8000000 0 0x20000000>; // [0x0D800_0000 ~ 0x0F800_0000]			linux,cma-default;
++		size = <0 0x30000000>; // 768MB on lpi4a (SOM)
++		alloc-ranges = <0 0xc8000000 0 0x30000000>; // [0x0C800_0000 ~ 0x0F800_0000]    linux,cma-default;
+ 		linux,cma-default;
+ 	};
+ 	dsp0_mem: memory@20000000 {             /**0x2000_0000~0x2040_0000 4M**/
+-- 
+2.43.0
+

@@ -1,0 +1,60 @@
+From dd41b3c01d59b46087ff76beb225eec28e31016b Mon Sep 17 00:00:00 2001
+From: Drew Fustini <dfustini@baylibre.com>
+Date: Tue, 14 Nov 2023 16:07:56 -0500
+Subject: [PATCH 054/400] mmc: sdhci: add __sdhci_execute_tuning() to header
+
+Expose __sdhci_execute_tuning() so that it can be called from the
+mmc host controller drivers.
+
+In the sdhci-of-dwcmshc driver, sdhci_dwcmshc_th1520_ops sets
+platform_execute_tuning to th1520_execute_tuning(). That function has
+to manipulate phy registers before tuning can be performed. To avoid
+copying the code verbatim from __sdhci_execute_tuning() into
+th1520_execute_tuning(), make it possible for __sdhci_execute_tuning()
+to be called from sdhci-of-dwcmshc.
+
+Acked-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Drew Fustini <dfustini@baylibre.com>
+Link: https://lore.kernel.org/r/20231114-th1520-mmc-v6-2-3273c661a571@baylibre.com
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/mmc/host/sdhci.c | 3 ++-
+ drivers/mmc/host/sdhci.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/host/sdhci.c b/drivers/mmc/host/sdhci.c
+index 9796a3cb3ca6..112584aa0772 100644
+--- a/drivers/mmc/host/sdhci.c
++++ b/drivers/mmc/host/sdhci.c
+@@ -2844,7 +2844,7 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
+ }
+ EXPORT_SYMBOL_GPL(sdhci_send_tuning);
+ 
+-static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
++int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
+ {
+ 	int i;
+ 
+@@ -2882,6 +2882,7 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
+ 	sdhci_reset_tuning(host);
+ 	return -EAGAIN;
+ }
++EXPORT_SYMBOL_GPL(__sdhci_execute_tuning);
+ 
+ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
+ {
+diff --git a/drivers/mmc/host/sdhci.h b/drivers/mmc/host/sdhci.h
+index 16d7bff9eae5..32e1608bcf61 100644
+--- a/drivers/mmc/host/sdhci.h
++++ b/drivers/mmc/host/sdhci.h
+@@ -794,6 +794,7 @@ void sdhci_set_bus_width(struct sdhci_host *host, int width);
+ void sdhci_reset(struct sdhci_host *host, u8 mask);
+ void sdhci_set_uhs_signaling(struct sdhci_host *host, unsigned timing);
+ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode);
++int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode);
+ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios);
+ int sdhci_start_signal_voltage_switch(struct mmc_host *mmc,
+ 				      struct mmc_ios *ios);
+-- 
+2.43.0
+

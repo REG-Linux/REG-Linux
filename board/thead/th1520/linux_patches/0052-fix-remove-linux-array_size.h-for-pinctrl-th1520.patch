@@ -1,0 +1,25 @@
+From ebb5ac284293f5b937fff018bfe0f40a2f5a7583 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Thu, 25 Apr 2024 21:07:57 +0800
+Subject: [PATCH 052/400] fix: remove linux/array_size.h for pinctrl-th1520
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/pinctrl/pinctrl-th1520.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/pinctrl/pinctrl-th1520.c b/drivers/pinctrl/pinctrl-th1520.c
+index 7c533438f2fd..018308149a0e 100644
+--- a/drivers/pinctrl/pinctrl-th1520.c
++++ b/drivers/pinctrl/pinctrl-th1520.c
+@@ -5,7 +5,6 @@
+  * Copyright (C) 2023 Emil Renner Berthing <emil.renner.berthing@canonical.com>
+  */
+ 
+-#include <linux/array_size.h>
+ #include <linux/bits.h>
+ #include <linux/cleanup.h>
+ #include <linux/clk.h>
+-- 
+2.43.0
+

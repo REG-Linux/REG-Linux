@@ -1,0 +1,26 @@
+From 11a610275bc099cae8117cc653a283b6440374dd Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Thu, 4 Jul 2024 11:24:21 +0800
+Subject: [PATCH 160/400] dts: th1520: add adc vref-supply regulator
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index c3f6b576aaf7..3e18e885a33d 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -663,6 +663,8 @@ hub_3_0: hub@2 {
+ };
+ 
+ &adc {
++	vref-supply = <&reg_vref_1v8>;
++    #io-channel-cells = <1>;
+ 	status = "okay";
+ };
+ 
+-- 
+2.43.0
+

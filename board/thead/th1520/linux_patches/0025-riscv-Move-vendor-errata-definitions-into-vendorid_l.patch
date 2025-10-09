@@ -1,0 +1,78 @@
+From 28db9f67a83c5d5bdcb20e6be99903431ce64a78 Mon Sep 17 00:00:00 2001
+From: Guo Ren <guoren@linux.alibaba.com>
+Date: Sat, 14 Dec 2024 09:30:38 -0500
+Subject: [PATCH 025/400] riscv: Move vendor errata definitions into
+ vendorid_list.h
+
+Move vendor errata definitions into vendorid_list and make it re-useable
+for other header files.
+
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Signed-off-by: Guo Ren <guoren@kernel.org>
+Tested-by: Inochi Amaoto <inochiama@gmail.com>
+Link: https://lore.kernel.org/r/20241214143039.4139398-2-guoren@kernel.org
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/include/asm/errata_list.h   | 18 ------------------
+ arch/riscv/include/asm/vendorid_list.h | 18 ++++++++++++++++++
+ 2 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/arch/riscv/include/asm/errata_list.h b/arch/riscv/include/asm/errata_list.h
+index d3f3c237adad..f5b007a41a0e 100644
+--- a/arch/riscv/include/asm/errata_list.h
++++ b/arch/riscv/include/asm/errata_list.h
+@@ -11,24 +11,6 @@
+ #include <asm/hwcap.h>
+ #include <asm/vendorid_list.h>
+ 
+-#ifdef CONFIG_ERRATA_ANDES
+-#define ERRATA_ANDESTECH_NO_IOCP	0
+-#define ERRATA_ANDESTECH_NUMBER		1
+-#endif
+-
+-#ifdef CONFIG_ERRATA_SIFIVE
+-#define	ERRATA_SIFIVE_CIP_453 0
+-#define	ERRATA_SIFIVE_CIP_1200 1
+-#define	ERRATA_SIFIVE_NUMBER 2
+-#endif
+-
+-#ifdef CONFIG_ERRATA_THEAD
+-#define	ERRATA_THEAD_PBMT 0
+-#define	ERRATA_THEAD_CMO 1
+-#define	ERRATA_THEAD_PMU 2
+-#define	ERRATA_THEAD_NUMBER 3
+-#endif
+-
+ #ifdef __ASSEMBLY__
+ 
+ #define ALT_INSN_FAULT(x)						\
+diff --git a/arch/riscv/include/asm/vendorid_list.h b/arch/riscv/include/asm/vendorid_list.h
+index e55407ace0c3..8d0cd4090a33 100644
+--- a/arch/riscv/include/asm/vendorid_list.h
++++ b/arch/riscv/include/asm/vendorid_list.h
+@@ -9,4 +9,22 @@
+ #define SIFIVE_VENDOR_ID	0x489
+ #define THEAD_VENDOR_ID		0x5b7
+ 
++#ifdef CONFIG_ERRATA_ANDES
++#define ERRATA_ANDES_NO_IOCP 0
++#define ERRATA_ANDES_NUMBER 1
++#endif
++
++#ifdef CONFIG_ERRATA_SIFIVE
++#define	ERRATA_SIFIVE_CIP_453 0
++#define	ERRATA_SIFIVE_CIP_1200 1
++#define	ERRATA_SIFIVE_NUMBER 2
++#endif
++
++#ifdef CONFIG_ERRATA_THEAD
++#define        ERRATA_THEAD_PBMT 0
++#define        ERRATA_THEAD_CMO 1
++#define        ERRATA_THEAD_PMU 2
++#define        ERRATA_THEAD_NUMBER 3
++#endif
++
+ #endif
+-- 
+2.43.0
+

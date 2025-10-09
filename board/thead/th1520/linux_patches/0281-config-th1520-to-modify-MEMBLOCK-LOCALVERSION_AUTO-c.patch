@@ -1,0 +1,40 @@
+From 5f1f15b0bfc8b6aad40f8e7b407c721015f12c17 Mon Sep 17 00:00:00 2001
+From: tingming <minghq@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:57:27 +0800
+Subject: [PATCH 281/400] config: th1520: to modify MEMBLOCK&LOCALVERSION_AUTO
+ config
+
+Signed-off-by: tingming <minghq@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/Kconfig                  | 1 +
+ arch/riscv/configs/th1520_defconfig | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index cd93f998ba9e..b413d6e1efc7 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -43,6 +43,7 @@ config RISCV
+ 	select ARCH_HAS_TICK_BROADCAST if GENERIC_CLOCKEVENTS_BROADCAST
+ 	select ARCH_HAS_UBSAN_SANITIZE_ALL
+ 	select ARCH_HAS_VDSO_DATA
++	select ARCH_KEEP_MEMBLOCK
+ 	select ARCH_OPTIONAL_KERNEL_RWX if ARCH_HAS_STRICT_KERNEL_RWX
+ 	select ARCH_OPTIONAL_KERNEL_RWX_DEFAULT
+ 	select ARCH_STACKWALK
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index cf29385c529d..ff907c6d80e0 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -297,7 +297,6 @@ CONFIG_GPIO_SYSFS=y
+ CONFIG_NEW_LEDS=y
+ CONFIG_LEDS_CLASS=y
+ CONFIG_LEDS_GPIO=y
+-# CONFIG_LOCALVERSION_AUTO is not set
+ CONFIG_MEMORY_ISOLATION=y
+ CONFIG_CONTIG_ALLOC=y
+ CONFIG_CMA=y
+-- 
+2.43.0
+

@@ -1,0 +1,24 @@
+From 9777bb7d73219030acbf4e4a89acf9022a00981c Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sat, 31 Aug 2024 23:59:09 +0800
+Subject: [PATCH 184/400] mm: export sysmbol __pte_offset_map_lock for modules
+ outside
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ mm/pgtable-generic.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mm/pgtable-generic.c b/mm/pgtable-generic.c
+index a78a4adf711a..3863f46af35c 100644
+--- a/mm/pgtable-generic.c
++++ b/mm/pgtable-generic.c
+@@ -380,3 +380,4 @@ pte_t *__pte_offset_map_lock(struct mm_struct *mm, pmd_t *pmd,
+ 	pte_unmap_unlock(pte, ptl);
+ 	goto again;
+ }
++EXPORT_SYMBOL_GPL(__pte_offset_map_lock);
+-- 
+2.43.0
+

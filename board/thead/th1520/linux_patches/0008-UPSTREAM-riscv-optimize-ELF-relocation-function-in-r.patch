@@ -1,0 +1,86 @@
+From b27f7bde198bab37b5a0793e645546fc45d7f96d Mon Sep 17 00:00:00 2001
+From: Maxim Kochetkov <fido_max@inbox.ru>
+Date: Thu, 14 Dec 2023 09:39:06 +0300
+Subject: [PATCH 008/400] UPSTREAM: riscv: optimize ELF relocation function in
+ riscv
+
+The patch can optimize the running times of insmod command by modify ELF
+relocation function.
+In the 5.10 and latest kernel, when install the riscv ELF drivers which
+contains multiple symbol table items to be relocated, kernel takes a lot
+of time to execute the relocation. For example, we install a 3+MB driver
+need 180+s.
+We focus on the riscv architecture handle R_RISCV_HI20 and R_RISCV_LO20
+type items relocation function in the arch\riscv\kernel\module.c and
+find that there are two-loops in the function. If we modify the begin
+number in the second for-loops iteration, we could save significant time
+for installation. We install the same 3+MB driver could just need 2s.
+
+Signed-off-by: Amma Lee <lixiaoyun@binary-semi.com>
+Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
+Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
+Link: https://lore.kernel.org/r/20231214063906.13612-1-fido_max@inbox.ru
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+(cherry picked from commit 080c4324fa5e81ff3780206a138223abfb57a68e)
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/kernel/module.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
+index 862834bb1d64..813ac403a858 100644
+--- a/arch/riscv/kernel/module.c
++++ b/arch/riscv/kernel/module.c
+@@ -779,6 +779,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
+ 	Elf_Sym *sym;
+ 	void *location;
+ 	unsigned int i, type;
++	unsigned int j_idx = 0;
+ 	Elf_Addr v;
+ 	int res;
+ 	unsigned int num_relocations = sechdrs[relsec].sh_size / sizeof(*rel);
+@@ -829,9 +830,10 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
+ 		v = sym->st_value + rel[i].r_addend;
+ 
+ 		if (type == R_RISCV_PCREL_LO12_I || type == R_RISCV_PCREL_LO12_S) {
+-			unsigned int j;
++			unsigned int j = j_idx;
++			bool found = false;
+ 
+-			for (j = 0; j < sechdrs[relsec].sh_size / sizeof(*rel); j++) {
++			do {
+ 				unsigned long hi20_loc =
+ 					sechdrs[sechdrs[relsec].sh_info].sh_addr
+ 					+ rel[j].r_offset;
+@@ -860,16 +862,26 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
+ 					hi20 = (offset + 0x800) & 0xfffff000;
+ 					lo12 = offset - hi20;
+ 					v = lo12;
++					found = true;
+ 
+ 					break;
+ 				}
+-			}
+-			if (j == sechdrs[relsec].sh_size / sizeof(*rel)) {
++
++				j++;
++				if (j > sechdrs[relsec].sh_size / sizeof(*rel))
++					j = 0;
++
++			} while (j_idx != j);
++
++			if (!found) {
+ 				pr_err(
+ 				  "%s: Can not find HI20 relocation information\n",
+ 				  me->name);
+ 				return -EINVAL;
+ 			}
++
++			/* Record the previous j-loop end index */
++			j_idx = j;
+ 		}
+ 
+ 		if (reloc_handlers[type].accumulate_handler)
+-- 
+2.43.0
+

@@ -1,0 +1,56 @@
+From 02214fd4f0d897271147a6ba4a9e919c69f1699a Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:13:36 +0800
+Subject: [PATCH 241/400] dts: th1520: add adc vref-supply regulator
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi       | 10 ++++++++++
+ arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts |  2 +-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 3b2ba9ff440b..dadd5ef741eb 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -92,6 +92,14 @@ lcd1_backlight: pwm-backlight@1 {
+ 		default-brightness-level = <7>;
+ 	};
+ 
++	reg_vref_1v8: regulator-adc-verf {
++		compatible = "regulator-fixed";
++		regulator-name = "vref-1v8";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		status = "okay";
++	};
++
+ 	reg_lcd0_vdd18: regulator-lcd0-vdd18 {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "lcd0_en";
+@@ -2439,6 +2447,8 @@ &usb_dwc3 {
+ };
+ 
+ &adc {
++	vref-supply = <&reg_vref_1v8>;
++	#io-channel-cells = <1>;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 14448dd0cd39..ef6da74e351d 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -937,7 +937,7 @@ hub_3_0: hub@2 {
+ 
+ &adc {
+ 	vref-supply = <&reg_vref_1v8>;
+-    #io-channel-cells = <1>;
++	#io-channel-cells = <1>;
+ 	status = "okay";
+ };
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,39 @@
+From 358b97634bb48761fe70470fa4d498ceb7d6d806 Mon Sep 17 00:00:00 2001
+From: Han Gao <gaohan@iscas.ac.cn>
+Date: Fri, 5 Jul 2024 22:05:23 +0800
+Subject: [PATCH 172/400] configs: enable rtw88 for 8723ds
+
+enable cfg80211 & mac80211 & rtw88 for 8723ds
+
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ arch/riscv/configs/th1520_defconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/riscv/configs/th1520_defconfig b/arch/riscv/configs/th1520_defconfig
+index b3914983b040..e4b1eeefe551 100644
+--- a/arch/riscv/configs/th1520_defconfig
++++ b/arch/riscv/configs/th1520_defconfig
+@@ -58,6 +58,9 @@ CONFIG_IP_PNP_BOOTP=y
+ CONFIG_IP_PNP_RARP=y
+ CONFIG_BRIDGE=y
+ CONFIG_NETLINK_DIAG=y
++CONFIG_CFG80211=m
++CONFIG_MAC80211=m
++CONFIG_MAC80211_MESH=y
+ CONFIG_NET_9P=y
+ CONFIG_NET_9P_VIRTIO=y
+ CONFIG_DEVTMPFS=y
+@@ -91,6 +94,8 @@ CONFIG_USB_USBNET=m
+ # CONFIG_USB_NET_AX8817X is not set
+ # CONFIG_USB_NET_AX88179_178A is not set
+ # CONFIG_USB_NET_NET1080 is not set
++CONFIG_RTW88=m
++CONFIG_RTW88_8723DS=m
+ CONFIG_INPUT_MOUSEDEV=y
+ CONFIG_INPUT_EVDEV=y
+ CONFIG_KEYBOARD_GPIO=y
+-- 
+2.43.0
+

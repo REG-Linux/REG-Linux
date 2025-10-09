@@ -1,0 +1,37 @@
+From 8c3d865a0ac77064b67d7d3d157ea5c2c896c894 Mon Sep 17 00:00:00 2001
+From: Wei Fu <wefu@redhat.com>
+Date: Sun, 31 Mar 2024 23:04:33 +0800
+Subject: [PATCH 116/400] riscv: dts: thead: Add XuanTie TH1520 RTC device node
+
+Add nodes for the XuanTie TH1520 RTC device node on the XuanTie TH1520 Soc.
+
+Signed-off-by: Wei Fu <wefu@redhat.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 1a3068d56c2a..34bd62c1d47f 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -755,6 +755,17 @@ timer7: timer@ffffc3303c {
+ 			status = "disabled";
+ 		};
+ 
++		rtc: rtc@fffff40000 {
++			compatible = "snps,dw-apb-rtc";
++			reg = <0xff 0xfff40000 0x0 0x1000>;
++			interrupts = <74 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&osc_32k>;
++			clock-names = "osc_32k";
++			wakeup-source;
++			prescaler = <0x8000>;
++			status = "okay";
++		};
++
+ 		gpio@fffff41000 {
+ 			compatible = "snps,dw-apb-gpio";
+ 			reg = <0xff 0xfff41000 0x0 0x1000>;
+-- 
+2.43.0
+

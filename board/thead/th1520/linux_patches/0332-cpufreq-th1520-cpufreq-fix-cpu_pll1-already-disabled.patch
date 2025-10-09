@@ -1,0 +1,49 @@
+From bb24935a1665e9fc4dc5d92f689dc01daaf887d6 Mon Sep 17 00:00:00 2001
+From: Drew Fustini <drew@pdp7.com>
+Date: Sat, 14 Sep 2024 00:43:29 +0800
+Subject: [PATCH 332/400] cpufreq: th1520-cpufreq: fix cpu_pll1 already
+ disabled warning Fix warning in _th1520_switch_pllid() during boot that
+ cpu_pll1_foutpostdiv was already disabled. Only call clk_disable_unprepare()
+ for TH1520_CPU_PLL0_FOUTPOSTDIV if clk_set_parent() returns non-zero value.
+
+Signed-off-by: Drew Fustini <drew@pdp7.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/cpufreq/th1520-cpufreq.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/cpufreq/th1520-cpufreq.c b/drivers/cpufreq/th1520-cpufreq.c
+index 6e4186808c96..ef157fd3cdf5 100644
+--- a/drivers/cpufreq/th1520-cpufreq.c
++++ b/drivers/cpufreq/th1520-cpufreq.c
+@@ -83,19 +83,23 @@ static int _th1520_get_pllid(void)
+ 
+ static int _th1520_switch_pllid(int pllid, int target_freq)
+ {
++	int ret;
++
+ 	pr_debug("[%s] switch to pll[%d], freq[%u]\n", __func__, pllid, target_freq);
+ 	if (pllid == TH1520_CPU_PLL_IDX(1)) {
+ 		clk_prepare_enable(clks[TH1520_CPU_PLL1_FOUTPOSTDIV].clk);
+ 		clk_set_rate(clks[TH1520_CPU_PLL1_FOUTPOSTDIV].clk, target_freq * 1000);
+-		clk_set_parent(clks[TH1520_C910_CCLK].clk, clks[TH1520_CPU_PLL1_FOUTPOSTDIV].clk);
++		ret = clk_set_parent(clks[TH1520_C910_CCLK].clk, clks[TH1520_CPU_PLL1_FOUTPOSTDIV].clk);
+ 		udelay(1);
+-		clk_disable_unprepare(clks[TH1520_CPU_PLL0_FOUTPOSTDIV].clk);
++		if (ret)
++			clk_disable_unprepare(clks[TH1520_CPU_PLL0_FOUTPOSTDIV].clk);
+ 	} else {
+ 		clk_prepare_enable(clks[TH1520_CPU_PLL0_FOUTPOSTDIV].clk);
+ 		clk_set_rate(clks[TH1520_CPU_PLL0_FOUTPOSTDIV].clk, target_freq * 1000);
+-		clk_set_parent(clks[TH1520_C910_CCLK].clk, clks[TH1520_C910_CCLK_I0].clk);
++		ret = clk_set_parent(clks[TH1520_C910_CCLK].clk, clks[TH1520_C910_CCLK_I0].clk);
+ 		udelay(1);
+-		clk_disable_unprepare(clks[TH1520_CPU_PLL1_FOUTPOSTDIV].clk);
++		if (ret)
++			clk_disable_unprepare(clks[TH1520_CPU_PLL1_FOUTPOSTDIV].clk);
+ 	}
+ 
+ 	return 0;
+-- 
+2.43.0
+

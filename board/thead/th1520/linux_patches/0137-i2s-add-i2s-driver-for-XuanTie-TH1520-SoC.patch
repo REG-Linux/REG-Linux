@@ -1,0 +1,3084 @@
+From b325c7ba91ed6fe3a18d7936ff94e08ddd8b8b5f Mon Sep 17 00:00:00 2001
+From: David Li <davidli.li@linux.alibaba.com>
+Date: Sat, 15 Jun 2024 17:16:55 +0800
+Subject: [PATCH 137/400] i2s: add i2s driver for XuanTie TH1520 SoC
+
+1. add 'xuantie,th1520-i2s' dt-bindings
+2. add I2S driver code
+3. add I2S reset feature
+4. add I2S nodes in dts
+
+Signed-off-by: David Li <davidli.li@linux.alibaba.com>
+---
+ .../bindings/sound/xuantie,th1520-i2s.yaml    |  92 ++
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    |  37 +-
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 130 ++-
+ drivers/reset/reset-th1520.c                  |  36 +-
+ .../dt-bindings/reset/thead,th1520-reset.h    |  19 +-
+ sound/soc/Kconfig                             |   1 +
+ sound/soc/Makefile                            |   1 +
+ sound/soc/xuantie/Kconfig                     |  35 +
+ sound/soc/xuantie/Makefile                    |  13 +
+ sound/soc/xuantie/th1520-audio-cpr.h          |  79 ++
+ sound/soc/xuantie/th1520-hdmi-pcm.c           | 109 +++
+ sound/soc/xuantie/th1520-i2s-8ch.c            | 756 ++++++++++++++++
+ sound/soc/xuantie/th1520-i2s-common.c         |  53 ++
+ sound/soc/xuantie/th1520-i2s.c                | 847 ++++++++++++++++++
+ sound/soc/xuantie/th1520-i2s.h                | 548 +++++++++++
+ sound/soc/xuantie/th1520-pcm-dma.c            |  48 +
+ sound/soc/xuantie/th1520-pcm.h                |  18 +
+ 17 files changed, 2814 insertions(+), 8 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/sound/xuantie,th1520-i2s.yaml
+ create mode 100644 sound/soc/xuantie/Kconfig
+ create mode 100644 sound/soc/xuantie/Makefile
+ create mode 100644 sound/soc/xuantie/th1520-audio-cpr.h
+ create mode 100644 sound/soc/xuantie/th1520-hdmi-pcm.c
+ create mode 100644 sound/soc/xuantie/th1520-i2s-8ch.c
+ create mode 100644 sound/soc/xuantie/th1520-i2s-common.c
+ create mode 100644 sound/soc/xuantie/th1520-i2s.c
+ create mode 100644 sound/soc/xuantie/th1520-i2s.h
+ create mode 100644 sound/soc/xuantie/th1520-pcm-dma.c
+ create mode 100644 sound/soc/xuantie/th1520-pcm.h
+
+diff --git a/Documentation/devicetree/bindings/sound/xuantie,th1520-i2s.yaml b/Documentation/devicetree/bindings/sound/xuantie,th1520-i2s.yaml
+new file mode 100644
+index 000000000000..a9f473e43ddb
+--- /dev/null
++++ b/Documentation/devicetree/bindings/sound/xuantie,th1520-i2s.yaml
+@@ -0,0 +1,92 @@
++# SPDX-License-Identifier: GPL-2.0
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/sound/xuantie,th1520-i2s.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: XuanTie Th1520 I2S controller
++
++maintainers:
++  - David Li <davidli.li@linux.alibaba.com>
++
++properties:
++  compatible:
++    oneOf:
++      - const: xuantie,th1520-i2s
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: clock for I2S controller
++
++  clock-names:
++    items:
++      - const: i2s_pclk
++
++  dmas:
++    minItems: 1
++    maxItems: 2
++
++  dma-names:
++    oneOf:
++      - const: rx
++      - items:
++          - const: tx
++          - const: rx
++
++  pinctrl-names:
++    oneOf:
++      - const: default
++      - items:
++          - const: bclk
++          - const: lrck
++		  - const: dout
++		  - const: din
++
++  reset-names:
++    items:
++      - const: reset_i2s
++
++  resets:
++    maxItems: 1
++
++  audio-cpr-regmap:
++    description:
++      The phandle of the syscon node for the CPR register.
++
++  "#sound-dai-cells":
++    const: 1
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - clock-names
++  - dmas
++  - dma-names
++  - resets
++  - "#sound-dai-cells"
++
++examples:
++  - |
++    i2s1: audio_i2s1@0xffcb015000 {
++        compatible = "xuantie,th1520-i2s";
++        reg = <0xff 0xcb015000 0x0 0x1000>;
++        pinctrl-names = "default";
++        interrupts = <175>;
++        dmas = <&dmac2 11>, <&dmac2 10>;
++        dma-names = "tx", "rx";
++        #dma-cells = <1>;
++        clocks = <&audiosys_clk_gate LIGHT_CLKGEN_AUDIO_I2S1>;
++        clock-names = "pclk";
++        resets = <&audiosys_rst LIGHT_RESET_AUD_I2S1>;
++        xuantie,audio-cpr-regmap = <&audio_cpr>;
++        #sound-dai-cells = <1>;
++        status = "disabled";
++    };
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index d5e4cdca1afa..a00ba37ebebe 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -32,6 +32,10 @@ aliases {
+ 		i2c4 = &i2c4;
+ 		i2c5 = &audio_i2c0;
+ 		i2c6 = &audio_i2c1;
++		light_i2s = &light_i2s;
++		i2s0 = &i2s0;
++		i2s1 = &i2s1;
++		i2s2 = &i2s2;
+ 	};
+ 
+ 	chosen {
+@@ -90,6 +94,14 @@ rpmsg: rpmsg{
+ 		};
+ 	};
+ 
++	hdmi_codec: hdmi_codec@1 {
++		#sound-dai-cells = <0>;
++		compatible = "xuantie,th1520-hdmi-pcm";
++		status = "okay";
++		sound-name-prefix = "DUMMY";
++	};
++
++
+ 	thermal-zones {
+ 		cpu-thermal {
+ 			polling-delay = <1000>;
+@@ -432,6 +444,18 @@ qspi-pins {
+ 	};
+ };
+ 
++&padctrl_aosys {
++	i2s1_pa_pins: i2s1-pa-0 {
++		i2s-pa-pins {
++			pins = "AUDIO_PA14", "AUDIO_PA15", "AUDIO_PA16", "AUDIO_PA17";
++			function = "audio";
++			bias-disable;
++			drive-strength = <0>;
++			slew-rate = <0>;
++		};
++	};
++};
++
+ &uart0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&uart0_pins>;
+@@ -549,4 +573,15 @@ aon_log_mem: memory@33600000 {
+         reg = <0x0 0x33600000 0x0 0x200000>;
+ 	};
+ 
+-};
+\ No newline at end of file
++};
++
++&light_i2s {
++        status = "okay";
++};
++
++&i2s1 {
++        status = "okay";
++        pinctrl-names = "default";
++        pinctrl-0 = <&i2s1_pa_pins>;
++};
++
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index bd37103542d5..65577346b0c0 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -306,6 +306,125 @@ audio_i2c1: i2c@ffcb01b000 {
+ 			status = "disabled";
+ 		};
+ 
++		light_i2s: light-i2s@ffe7034000 {
++			#sound-dai-cells = <1>;
++			compatible = "xuantie,th1520-i2s";
++			reg = <0xff 0xe7034000 0x0 0x4000>;
++			interrupts = <70 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac0 35>, <&dmac0 40>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&vosys_clk_gate TH1520_CLKGEN_HDMI_I2S_CLK>;
++			clock-names = "pclk";
++			resets = <&rst TH1520_RESET_HDMI_I2S>;
++			status = "disabled";
++		};
++
++		i2s0: audio-i2s0@ffcb014000 {
++			#sound-dai-cells = <1>;
++			compatible = "xuantie,th1520-i2s";
++			reg = <0xff 0xcb014000 0x0 0x1000>;
++			audio-cpr-regmap = <&audio_cpr>;
++			interrupts = <174 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac2 9>, <&dmac2 8>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&audiosys_clk_gate TH1520_CLKGEN_AUDIO_I2S0>;
++			clock-names = "pclk";
++			resets = <&audiosys_rst TH1520_RESET_AUD_I2S0>;
++			status = "disabled";
++		};
++
++		i2s1: audio-i2s1@ffcb015000 {
++			#sound-dai-cells = <1>;
++			compatible = "xuantie,th1520-i2s";
++			reg = <0xff 0xcb015000 0x0 0x1000>;
++			audio-cpr-regmap = <&audio_cpr>;
++			interrupts = <175 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac2 11>, <&dmac2 10>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&audiosys_clk_gate TH1520_CLKGEN_AUDIO_I2S1>;
++			clock-names = "pclk";
++			resets = <&audiosys_rst TH1520_RESET_AUD_I2S1>;
++			status = "disabled";
++		};
++
++		i2s2: audio-i2s2@ffcb016000 {
++			#sound-dai-cells = <1>;
++			compatible = "xuantie,th1520-i2s";
++			reg = <0xff 0xcb016000 0x0 0x1000>;
++			audio-cpr-regmap = <&audio_cpr>;
++			interrupts = <176 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac2 13>, <&dmac2 12>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&audiosys_clk_gate TH1520_CLKGEN_AUDIO_I2S2>;
++			clock-names = "pclk";
++			resets = <&audiosys_rst TH1520_RESET_AUD_I2S2>;
++			status = "disabled";
++		};
++
++		i2s_8ch_sd0: i2s-8ch-sd0@ffcb017000 {
++			#sound-dai-cells = <0>;
++			compatible = "xuantie,th1520-i2s-8ch";
++			reg = <0xff 0xcb017000 0x0 0x1000>;
++			audio-cpr-regmap = <&audio_cpr>;
++			interrupts = <177 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac2 36>, <&dmac2 14>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&audiosys_clk_gate TH1520_CLKGEN_AUDIO_I2S8CH>;
++			clock-names = "pclk";
++			resets = <&audiosys_rst TH1520_RESET_AUD_I2S8CH>;
++			status = "disabled";
++		};
++
++		i2s_8ch_sd1: i2s-8ch-sd1@ffcb017000 {
++			#sound-dai-cells = <0>;
++			compatible = "xuantie,th1520-i2s-8ch";
++			reg = <0xff 0xcb017000 0x0 0x1000>;
++			audio-cpr-regmap = <&audio_cpr>;
++			interrupts = <177 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac2 37>, <&dmac2 15>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&audiosys_clk_gate TH1520_CLKGEN_AUDIO_I2S8CH>;
++			clock-names = "pclk";
++			resets = <&audiosys_rst TH1520_RESET_AUD_I2S8CH>;
++			status = "disabled";
++		};
++
++		i2s_8ch_sd2: i2s-8ch-sd2@ffcb017000 {
++			#sound-dai-cells = <0>;
++			compatible = "xuantie,th1520-i2s-8ch";
++			reg = <0xff 0xcb017000 0x0 0x1000>;
++			audio-cpr-regmap = <&audio_cpr>;
++			interrupts = <177 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac2 38>, <&dmac2 16>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&audiosys_clk_gate TH1520_CLKGEN_AUDIO_I2S8CH>;
++			clock-names = "pclk";
++			resets = <&audiosys_rst TH1520_RESET_AUD_I2S8CH>;
++			status = "disabled";
++		};
++
++		i2s_8ch_sd3: i2s-8ch-sd3@ffcb017000 {
++			#sound-dai-cells = <0>;
++			compatible = "xuantie,th1520-i2s-8ch";
++			reg = <0xff 0xcb017000 0x0 0x1000>;
++			audio-cpr-regmap = <&audio_cpr>;
++			interrupts = <177 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dmac2 39>, <&dmac2 17>;
++			dma-names = "tx", "rx";
++			#dma-cells = <1>;
++			clocks = <&audiosys_clk_gate TH1520_CLKGEN_AUDIO_I2S8CH>;
++			clock-names = "pclk";
++			resets = <&audiosys_rst TH1520_RESET_AUD_I2S8CH>;
++			status = "disabled";
++		};
++
+ 		plic: interrupt-controller@ffd8000000 {
+ 			compatible = "thead,th1520-plic", "thead,c900-plic";
+ 			reg = <0xff 0xd8000000 0x0 0x01000000>;
+@@ -964,19 +1083,26 @@ miscsys_clk_gate: miscsys-clk-gate {
+ 		};
+ 
+ 		rst: reset-controller@ffef014000 {
+-			compatible = "thead,th1520-reset", "syscon";
++			compatible = "xuantie,th1520-reset", "syscon";
+ 			reg = <0xff 0xef014000 0x0 0x1000>;
+ 			#reset-cells = <1>;
+ 			status = "okay";
+ 		};
+ 
+ 		vpsys_rst: vpsys-reset-controller@ffecc30000 {
+-			compatible = "thead,th1520-vpsys-reset","syscon";
++			compatible = "xuantie,th1520-vpsys-reset","syscon";
+ 			reg = <0xff 0xecc30000 0x0 0x1000>;
+ 			#reset-cells = <1>;
+ 			status = "okay";
+ 		};
+ 
++		audiosys_rst: audiosys-reset-controller@ffcb000000 {
++			compatible = "xuantie,th1520-audiosys-reset","syscon";
++			reg = <0xff 0xcb000000 0x0 0x1000>;
++			#reset-cells = <1>;
++			status = "okay";
++		};
++
+ 		spi: spi@ffe700c000 {
+ 			compatible = "snps,dw-apb-ssi";
+ 			reg = <0xff 0xe700c000 0x0 0x1000>;
+diff --git a/drivers/reset/reset-th1520.c b/drivers/reset/reset-th1520.c
+index fb9e74ff4c83..b66b004b98d6 100644
+--- a/drivers/reset/reset-th1520.c
++++ b/drivers/reset/reset-th1520.c
+@@ -1,4 +1,12 @@
+ // SPDX-License-Identifier: GPL-2.0-only
++/*
++ * XuanTie TH1520 System Reset Controller driver
++ *
++ * Copyright (C) 2021 Alibaba Group Holding Limited.
++ *
++ * Author: zenglinghui.zlh <zenglinghui.zlh@linux.alibaba.com>
++ *
++ */
+ 
+ #include <linux/mfd/syscon.h>
+ #include <linux/of_device.h>
+@@ -25,6 +33,7 @@ struct th1520_rst {
+ enum th1520_rst_registers {
+ 	RST_WDT0 = 0x0034,
+ 	RST_WDT1 = 0x0038,
++	RST_I2S = 0x01ac,
+ 	RST_NPU = 0x01b0,
+ };
+ 
+@@ -32,6 +41,10 @@ enum th1520_vpsys_rst_registers {
+ 	RST_FCE = 0x0004,
+ };
+ 
++enum th1520_audiosys_src_registers {
++	RST_AUD_I2S	= 0x0014,
++};
++
+ static int th1520_reset_update(struct th1520_rst *rst, unsigned long id,
+ 			       unsigned int value)
+ {
+@@ -44,6 +57,7 @@ static int th1520_reset_update(struct th1520_rst *rst, unsigned long id,
+ static const struct th1520_rst_signal th1520_rst_signals[] = {
+ 	[TH1520_RESET_WDT0] = { RST_WDT0, BIT(0) },
+ 	[TH1520_RESET_WDT1] = { RST_WDT1, BIT(0) },
++	[TH1520_RESET_HDMI_I2S] = { RST_I2S, BIT(0) },
+ 	[TH1520_RESET_NPU] = { RST_NPU, BIT(0) },
+ };
+ 
+@@ -51,6 +65,16 @@ static const struct th1520_rst_signal th1520_vpsys_rst_signals[] = {
+ 	[TH1520_RESET_FCE] = { RST_FCE, BIT(0)|BIT(1)|BIT(4)|BIT(5) },
+ };
+ 
++static const struct th1520_rst_signal th1520_audiosys_rst_signals[] = {
++	[TH1520_RESET_AUD_I2S0] = { RST_AUD_I2S, BIT(17) },
++	[TH1520_RESET_AUD_I2S1] = { RST_AUD_I2S, BIT(18) },
++	[TH1520_RESET_AUD_I2S2] = { RST_AUD_I2S, BIT(19) },
++	[TH1520_RESET_AUD_I2S8CH] = { RST_AUD_I2S, BIT(20) },
++	[TH1520_RESET_AUD_TDM] = { RST_AUD_I2S, BIT(21) },
++	[TH1520_RESET_AUD_SPDIF0] = { RST_AUD_I2S, BIT(23) },
++	[TH1520_RESET_AUD_SPDIF1] = { RST_AUD_I2S, BIT(24) },
++};
++
+ static struct th1520_rst *to_th1520_rst(struct reset_controller_dev *rcdev)
+ {
+ 	return container_of(rcdev, struct th1520_rst, rcdev);
+@@ -93,6 +117,11 @@ static const struct th1520_rst_variant variant_th1520_vpsys = {
+ 	.signals_num = ARRAY_SIZE(th1520_vpsys_rst_signals),
+ };
+ 
++static const struct th1520_rst_variant variant_th1520_audiosys = {
++	.signals = th1520_audiosys_rst_signals,
++	.signals_num = ARRAY_SIZE(th1520_audiosys_rst_signals),
++};
++
+ static int th1520_reset_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -121,8 +150,9 @@ static int th1520_reset_probe(struct platform_device *pdev)
+ }
+ 
+ static const struct of_device_id th1520_reset_dt_ids[] = {
+-	{ .compatible = "thead,th1520-reset", .data = &variant_th1520 },
+-	{ .compatible = "thead,th1520-vpsys-reset", .data = &variant_th1520_vpsys },
++	{ .compatible = "xuantie,th1520-reset", .data = &variant_th1520 },
++	{ .compatible = "xuantie,th1520-vpsys-reset", .data = &variant_th1520_vpsys },
++	{ .compatible = "xuantie,th1520-audiosys-reset", .data = &variant_th1520_audiosys },
+ 	{ /* sentinel */ },
+ };
+ 
+@@ -136,5 +166,5 @@ static struct platform_driver th1520_reset_driver = {
+ builtin_platform_driver(th1520_reset_driver);
+ 
+ MODULE_AUTHOR("zenglinghui.zlh <zenglinghui.zlh@linux.alibaba.com>");
+-MODULE_DESCRIPTION("Thead th1520 reset driver");
++MODULE_DESCRIPTION("XuanTie th1520 reset driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/include/dt-bindings/reset/thead,th1520-reset.h b/include/dt-bindings/reset/thead,th1520-reset.h
+index 19476bf38982..44a4581cc229 100644
+--- a/include/dt-bindings/reset/thead,th1520-reset.h
++++ b/include/dt-bindings/reset/thead,th1520-reset.h
+@@ -1,13 +1,28 @@
+ /* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
++/*
++ * Copyright (C) 2021 Alibaba, Inc.
++ *
++ * Author: zenglinghui  <zenglinghui.zlh@linux.alibaba.com>
++ */
+ 
+ #ifndef DT_BINDING_RESET_TH1520_H
+ #define DT_BINDING_RESET_TH1520_H
+ 
+ #define TH1520_RESET_WDT0 0
+ #define TH1520_RESET_WDT1 1
+-#define TH1520_RESET_NPU 2
++#define TH1520_RESET_HDMI_I2S 2
++#define TH1520_RESET_NPU 3
+ 
+ // vpsys reset
+-#define TH1520_RESET_FCE 100
++#define TH1520_RESET_FCE 20
++
++// audiosys reset
++#define TH1520_RESET_AUD_I2S0 30
++#define TH1520_RESET_AUD_I2S1 31
++#define TH1520_RESET_AUD_I2S2 32
++#define TH1520_RESET_AUD_I2S8CH 33
++#define TH1520_RESET_AUD_TDM 34
++#define TH1520_RESET_AUD_SPDIF0 35
++#define TH1520_RESET_AUD_SPDIF1 36
+ 
+ #endif
+diff --git a/sound/soc/Kconfig b/sound/soc/Kconfig
+index 439fa631c342..8aa5daacbc81 100644
+--- a/sound/soc/Kconfig
++++ b/sound/soc/Kconfig
+@@ -114,6 +114,7 @@ source "sound/soc/uniphier/Kconfig"
+ source "sound/soc/ux500/Kconfig"
+ source "sound/soc/xilinx/Kconfig"
+ source "sound/soc/xtensa/Kconfig"
++source "sound/soc/xuantie/Kconfig"
+ 
+ # Supported codecs
+ source "sound/soc/codecs/Kconfig"
+diff --git a/sound/soc/Makefile b/sound/soc/Makefile
+index 8376fdb217ed..1b211fbb873b 100644
+--- a/sound/soc/Makefile
++++ b/sound/soc/Makefile
+@@ -71,3 +71,4 @@ obj-$(CONFIG_SND_SOC)	+= uniphier/
+ obj-$(CONFIG_SND_SOC)	+= ux500/
+ obj-$(CONFIG_SND_SOC)	+= xilinx/
+ obj-$(CONFIG_SND_SOC)	+= xtensa/
++obj-$(CONFIG_SND_SOC)	+= xuantie/
+diff --git a/sound/soc/xuantie/Kconfig b/sound/soc/xuantie/Kconfig
+new file mode 100644
+index 000000000000..068e2040baaf
+--- /dev/null
++++ b/sound/soc/xuantie/Kconfig
+@@ -0,0 +1,35 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config SND_SOC_XUANTIE
++        tristate "ASoC support for XUANTIE"
++	depends on ARCH_XUANTIE
++	default n
++	    help
++	      Say Y or M if you want to add support for codecs attached to
++	      the XUANTIE SoCs' Audio interfaces. You will also need to
++	      select the audio interfaces to support below.
++
++config SND_SOC_XUANTIE_TH1520_I2S
++        tristate "XuanTie TH1520 2-Channel I2S audio Support"
++	depends on SND_SOC_XUANTIE
++	select SND_SOC_GENERIC_DMAENGINE_PCM
++	default n
++        help
++          Say Y or M if you want to add support for codecs attached to the
++          XuanTie TH1520 interface
++
++config SND_SOC_XUANTIE_TH1520_I2S_CH8
++        tristate "XuanTie TH1520 8-Channel I2S audio Support"
++	depends on SND_SOC_XUANTIE
++	select SND_SOC_GENERIC_DMAENGINE_PCM
++	default n
++        help
++          Say Y or M if you want to add support for codecs attached to the
++          XuanTie TH1520 interface
++
++config SND_SOC_XUANTIE_TH1520_HDMI_PCM
++        tristate "XuanTie TH1520 HDMI PCM audio Support"
++	depends on SND_SOC_XUANTIE
++	default n
++        help
++          Say Y or M if you want to add support for HDMI PCM to the XuanTie
++          TH1520 interface
+diff --git a/sound/soc/xuantie/Makefile b/sound/soc/xuantie/Makefile
+new file mode 100644
+index 000000000000..699178d181d2
+--- /dev/null
++++ b/sound/soc/xuantie/Makefile
+@@ -0,0 +1,13 @@
++# CPU DAI drivers
++
++snd-soc-xuantie-th1520-i2s-objs := th1520-i2s-common.o	\
++				       th1520-pcm-dma.o		\
++				       th1520-i2s.o
++obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_I2S) += snd-soc-xuantie-th1520-i2s.o
++
++snd-soc-xuantie-th1520-i2s-ch8-objs := th1520-i2s-common.o	\
++				       th1520-pcm-dma.o		\
++				       th1520-i2s-8ch.o
++obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_I2S_CH8) += snd-soc-xuantie-th1520-i2s-ch8.o
++
++obj-$(CONFIG_SND_SOC_XUANTIE_TH1520_HDMI_PCM) += th1520-hdmi-pcm.o
+diff --git a/sound/soc/xuantie/th1520-audio-cpr.h b/sound/soc/xuantie/th1520-audio-cpr.h
+new file mode 100644
+index 000000000000..6e20e4db6ab0
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-audio-cpr.h
+@@ -0,0 +1,79 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * XuanTie TH1520 audio I2S audio support
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Shuofeng Ren <shuofeng.rsf@linux.alibaba.com>
++ *
++ */
++
++#ifndef _TH1520_AUDIO_CPR_H
++#define _TH1520_AUDIO_CPR_H
++
++#define CPR_PERI_DIV_SEL_REG	0x004 /*audio sys i2s clock div Register*/
++#define CPR_PERI_CLK_SEL_REG	0x008 /*audio sys i2s clock selection Register*/
++#define CPR_PERI_CTRL_REG	0x00C /*Peripheral control signal configuration register*/
++#define CPR_IP_RST_REG		0x014
++
++/* AUDIO SYS DIV SEL REG, offset: 0x4 */
++#define CPR_AUDIO_DIV0_SEL_POS		(4U)
++#define CPR_AUDIO_DIV0_SEL_MSK		(0x1FU << CPR_AUDIO_DIV0_SEL_POS)
++#define CPR_AUDIO_DIV0_SEL(X)		(X << CPR_AUDIO_DIV0_SEL_POS)
++#define CPR_AUDIO_DIV1_SEL_POS		(12U)
++#define CPR_AUDIO_DIV1_SEL_MSK		(0x1FU << CPR_AUDIO_DIV1_SEL_POS)
++#define CPR_AUDIO_DIV1_SEL(X)		(X << CPR_AUDIO_DIV1_SEL_POS)
++
++/* AUDIO SYS CLK SEL REG, offset: 0x8 */
++#define CPR_I2S0_SRC_SEL_POS		(0U)
++#define CPR_I2S0_SRC_SEL_MSK		(0x3U << CPR_I2S0_SRC_SEL_POS)
++#define CPR_I2S0_SRC_SEL(X)		(X << CPR_I2S0_SRC_SEL_POS)
++#define CPR_I2S0_SRC_SEL_24M		(0x1U << AUDIOSYS_I2S0_SRC_SEL_POS)
++#define CPR_I2S0_SRC_SEL_AUDIO_DIVCLK1	(0x2U << AUDIOSYS_I2S0_SRC_SEL_POS)
++
++#define CPR_I2S1_SRC_SEL_POS		(4U)
++#define CPR_I2S1_SRC_SEL_MSK		(0x3U << CPR_I2S1_SRC_SEL_POS)
++#define CPR_I2S1_SRC_SEL(X)		(X << CPR_I2S1_SRC_SEL_POS)
++#define CPR_I2S1_SRC_SEL_24M		(0x1U << AUDIOSYS_I2S1_SRC_SEL_POS)
++#define CPR_I2S1_SRC_SEL_AUDIO_DIVCLK1	(0x2U << AUDIOSYS_I2S1_SRC_SEL_POS)
++
++#define CPR_I2S2_SRC_SEL_POS		(8U)
++#define CPR_I2S2_SRC_SEL_MSK		(0x3U << CPR_I2S2_SRC_SEL_POS)
++#define CPR_I2S2_SRC_SEL(X)		(X << CPR_I2S2_SRC_SEL_POS)
++#define CPR_I2S2_SRC_SEL_24M		(0x1U << AUDIOSYS_I2S2_SRC_SEL_POS)
++#define CPR_I2S2_SRC_SEL_AUDIO_DIVCLK1	(0x2U << AUDIOSYS_I2S2_SRC_SEL_POS)
++
++#define CPR_TDM_SRC_SEL_POS		(16U)
++#define CPR_TDM_SRC_SEL_MSK		(0x3U << CPR_TDM_SRC_SEL_POS)
++#define CPR_TDM_SRC_SEL(X)		(X << CPR_TDM_SRC_SEL_POS)
++
++/* PERI_CTRL_REG, Offset: 0xC */
++#define CPR_VAD_I2SIN_SYNC_POS		(12U)
++#define CPR_VAD_I2SIN_SYNC_MSK		(0x1U << CPR_VAD_I2SIN_SYNC_POS)
++#define CPR_VAD_I2SIN_SYNC_EN		(CPR_VAD_I2SIN_SYNC_MSK)
++#define CPR_I2S_SYNC_POS		(13U)
++#define CPR_I2S_SYNC_MSK		(0x1U << CPR_I2S_SYNC_POS)
++#define CPR_I2S_SYNC_EN			(CPR_I2S_SYNC_MSK)
++#define CPR_SPDIF_SYNC_POS		(14U)
++#define CPR_SPDIF_SYNC_MSK		(0x1U << CPR_SPDIF_SYNC_POS)
++#define CPR_SPDIF_SYNC_EN		(CPR_SPDIF_SYNC_MSK)
++
++/* CPR_IP_RST_REG, Offset: 0x014 */
++#define CPR_I2S0_SRST_N_SEL_POS		(17U)
++#define CPR_I2S0_SRST_N_SEL_MSK		(0x1U << CPR_I2S0_SRST_N_SEL_POS)
++#define CPR_I2S0_SRST_N_SEL(X)		(X << CPR_I2S0_SRST_N_SEL_POS)
++#define CPR_I2S1_SRST_N_SEL_POS		(18U)
++#define CPR_I2S1_SRST_N_SEL_MSK		(0x1U << CPR_I2S1_SRST_N_SEL_POS)
++#define CPR_I2S1_SRST_N_SEL(X)		(X << CPR_I2S1_SRST_N_SEL_POS)
++#define CPR_I2S2_SRST_N_SEL_POS		(19U)
++#define CPR_I2S2_SRST_N_SEL_MSK		(0x1U << CPR_I2S2_SRST_N_SEL_POS)
++#define CPR_I2S2_SRST_N_SEL(X)		(X << CPR_I2S2_SRST_N_SEL_POS)
++#define CPR_I2S8CH_SRST_N_SEL_POS	(20U)
++#define CPR_I2S8CH_SRST_N_SEL_MSK	(0x1U << CPR_I2S8CH_SRST_N_SEL_POS)
++#define CPR_I2S8CH_SRST_N_SEL(X)	(X << CPR_I2S8CH_SRST_N_SEL_POS)
++#define CPR_TDM_SRST_N_SEL_POS		(21U)
++#define CPR_TDM_SRST_N_SEL_MSK		(0x1U << CPR_TDM_SRST_N_SEL_POS)
++#define CPR_TDM_SRST_N_SEL(X)		(X << CPR_TDM_SRST_N_SEL_POS)
++
++#endif /* _TH1520_AUDIO_CPR_H */
++
+diff --git a/sound/soc/xuantie/th1520-hdmi-pcm.c b/sound/soc/xuantie/th1520-hdmi-pcm.c
+new file mode 100644
+index 000000000000..0433c92973bc
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-hdmi-pcm.c
+@@ -0,0 +1,109 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * XuanTie TH1520 audio driver for ASoC PCM DAI for HDMI
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Yan Dong <nanli.yd@alibaba-inc.com>
++ */
++ 
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++
++#include <sound/soc.h>
++
++static const struct snd_soc_dapm_widget th1520_hdmi_pcm_widgets[] = {
++	SND_SOC_DAPM_INPUT("RX"),
++	SND_SOC_DAPM_OUTPUT("TX"),
++};
++
++static const struct snd_soc_dapm_route th1520_hdmi_pcm_routes[] = {
++	{ "Capture", NULL, "RX" },
++	{ "TX", NULL, "Playback" },
++};
++
++static struct snd_soc_dai_driver th1520_hdmi_pcm_dai[] = {
++	{
++		.name		= "hdmi-pcm",
++		.playback	= {
++			.stream_name	= "Playback",
++			.channels_min	= 1,
++			.channels_max	= 2,
++			.rates		= SNDRV_PCM_RATE_8000_192000,
++			.formats	= SNDRV_PCM_FMTBIT_S32_LE |
++					  SNDRV_PCM_FMTBIT_S24_LE |
++					  SNDRV_PCM_FMTBIT_S20_LE |
++					  SNDRV_PCM_FMTBIT_S16_LE |
++					  SNDRV_PCM_FMTBIT_S8,
++		},
++		.capture	= {
++			.stream_name	= "Capture",
++			.channels_min	= 1,
++			.channels_max	= 2,
++			.rates		= SNDRV_PCM_RATE_8000_192000,
++			.formats	= SNDRV_PCM_FMTBIT_S32_LE |
++					  SNDRV_PCM_FMTBIT_S24_LE |
++					  SNDRV_PCM_FMTBIT_S20_LE |
++					  SNDRV_PCM_FMTBIT_S16_LE |
++					  SNDRV_PCM_FMTBIT_S8,
++		},
++	},
++};
++
++static const struct snd_soc_component_driver soc_component_dev_th1520_hdmi_pcm = {
++	.dapm_widgets		= th1520_hdmi_pcm_widgets,
++	.num_dapm_widgets	= ARRAY_SIZE(th1520_hdmi_pcm_widgets),
++	.dapm_routes		= th1520_hdmi_pcm_routes,
++	.num_dapm_routes	= ARRAY_SIZE(th1520_hdmi_pcm_routes),
++	.idle_bias_on		= 1,
++	.use_pmdown_time	= 1,
++	.endianness		= 1,
++};
++
++static int th1520_hdmi_pcm_probe(struct platform_device *pdev)
++{
++	return devm_snd_soc_register_component(&pdev->dev,
++					&soc_component_dev_th1520_hdmi_pcm,
++					th1520_hdmi_pcm_dai,
++					ARRAY_SIZE(th1520_hdmi_pcm_dai));
++}
++
++static int th1520_hdmi_pcm_remove(struct platform_device *pdev)
++{
++	return 0;
++}
++
++static const struct platform_device_id th1520_hdmi_pcm_driver_ids[] = {
++	{
++		.name		= "th1520-hdmi-pcm",
++	},
++	{},
++};
++MODULE_DEVICE_TABLE(platform, th1520_hdmi_pcm_driver_ids);
++
++#if defined(CONFIG_OF)
++static const struct of_device_id th1520_hdmi_pcm_codec_of_match[] = {
++	{
++		.compatible	= "xuantie,th1520-hdmi-pcm",
++	},
++	{},
++};
++MODULE_DEVICE_TABLE(of, th1520_hdmi_pcm_codec_of_match);
++#endif
++
++static struct platform_driver th1520_hdmi_pcm_driver = {
++	.driver		= {
++		.name		= "th1520-hdmi-pcm",
++		.of_match_table	= of_match_ptr(th1520_hdmi_pcm_codec_of_match),
++	},
++	.probe		= th1520_hdmi_pcm_probe,
++	.remove		= th1520_hdmi_pcm_remove,
++	.id_table	= th1520_hdmi_pcm_driver_ids,
++};
++
++module_platform_driver(th1520_hdmi_pcm_driver);
++
++MODULE_AUTHOR("Yan Dong <nanli.yd@alibaba-inc.com>");
++MODULE_DESCRIPTION("ASoC PCM DAI driver for HDMI");
++MODULE_LICENSE("GPL v2");
+diff --git a/sound/soc/xuantie/th1520-i2s-8ch.c b/sound/soc/xuantie/th1520-i2s-8ch.c
+new file mode 100644
+index 000000000000..22deb8590577
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-i2s-8ch.c
+@@ -0,0 +1,756 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * XuanTie TH1520 audio I2S audio support
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Shuofeng Ren <shuofeng.rsf@linux.alibaba.com>
++ * Author: David Li <davidli.li@linux.alibaba.com>
++ *
++ */
++//#define DEBUG
++
++#include <linux/dmaengine.h>
++#include <linux/io.h>
++#include <linux/module.h>
++#include <linux/mfd/syscon.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/pm_runtime.h>
++#include <linux/regmap.h>
++#include <linux/reset.h>
++#include <sound/dmaengine_pcm.h>
++#include <sound/pcm_params.h>
++
++#include "th1520-audio-cpr.h"
++#include "th1520-i2s.h"
++#include "th1520-pcm.h"
++
++#define TH1520_I2S_DMABUF_SIZE	(64 * 1024 * 10)
++
++static int i2s_8ch_probe_flag = 0;
++
++static void th1520_i2s_8ch_set_div_sclk(struct th1520_i2s_priv *chip,
++					u32 sample_rate, unsigned int div_val)
++{
++	u32 div;
++	u32 div0;
++	u32 cpr_div = (IIS_SRC_CLK/AUDIO_IIS_SRC0_CLK)-1;
++	if(!chip->regs)
++		return;
++
++	div = AUDIO_IIS_SRC0_CLK / IIS_MCLK_SEL;
++	div0 = (div + div % sample_rate) / sample_rate / div_val;
++	writel(div0, chip->regs + I2S_DIV0_LEVEL);
++	th1520_audio_cpr_set(chip, CPR_PERI_DIV_SEL_REG, CPR_AUDIO_DIV0_SEL_MSK,
++			     CPR_AUDIO_DIV0_SEL(cpr_div));
++}
++
++static inline void th1520_snd_txctrl(struct th1520_i2s_priv *chip, bool on)
++{
++	u32 dma_en = 0;
++	u32 i2s_8ch_en = 0;
++	u32 i2s_8ch_imr = 0;
++
++	if(!chip->regs)
++		return;
++
++	if (on) {
++		dma_en |= DMACR_TDMAE_EN;
++		i2s_8ch_en |= IISEN_I2SEN;
++		writel(dma_en, chip->regs + I2S_DMACR);
++		writel(i2s_8ch_en, chip->regs + I2S_IISEN);
++	} else {
++		dma_en &= ~DMACR_TDMAE_EN;
++		i2s_8ch_en &= ~IISEN_I2SEN;
++		i2s_8ch_imr  = readl(chip->regs + I2S_IMR);
++		i2s_8ch_imr &= ~(IMR_TXUIRM_INTR_MSK);
++		i2s_8ch_imr &= ~(IMR_TXEIM_INTR_MSK);
++		writel(i2s_8ch_imr, chip->regs + I2S_IMR);
++		writel(dma_en, chip->regs + I2S_DMACR);
++		writel(i2s_8ch_en, chip->regs + I2S_IISEN);
++	}
++}
++
++static inline void th1520_snd_rxctrl(struct th1520_i2s_priv *chip, bool on)
++{
++	u32 dma_en = 0;
++	u32 i2s_8ch_en = 0;
++
++	if(!chip->regs)
++		return;
++
++	if (on) {
++		dma_en |= DMACR_RDMAE_EN;
++		i2s_8ch_en |= IISEN_I2SEN;
++		writel(I2S_DMA_RX_THRESHOLD, chip->regs + I2S_DMARDLR);
++	} else {
++		dma_en &= ~DMACR_RDMAE_EN;
++		i2s_8ch_en &= ~IISEN_I2SEN;
++	}
++
++	writel(dma_en, chip->regs + I2S_DMACR);
++	writel(i2s_8ch_en, chip->regs + I2S_IISEN);
++}
++
++static int th1520_i2s_8ch_dai_startup(struct snd_pcm_substream *substream,
++				      struct snd_soc_dai *dai)
++{
++	return 0;
++}
++
++static void th1520_i2s_8ch_dai_shutdown(struct snd_pcm_substream *substream,
++					struct snd_soc_dai *dai)
++{
++	struct th1520_i2s_priv *priv = snd_soc_dai_get_drvdata(dai);
++
++	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
++		th1520_snd_rxctrl(priv, 0);
++
++	clk_disable_unprepare(priv->clk);
++}
++
++/**
++ * th1520_i2s_8ch_dai_trigger: start and stop the DMA transfer.
++ *
++ * This function is called by ALSA to start, stop, pause, and resume the DMA
++ * transfer of data.
++ */
++static int th1520_i2s_8ch_dai_trigger(struct snd_pcm_substream *substream,
++				      int cmd, struct snd_soc_dai *dai)
++{
++	int ret = 0;
++
++	struct th1520_i2s_priv *priv = snd_soc_dai_get_drvdata(dai);
++	bool tx = substream->stream == SNDRV_PCM_STREAM_PLAYBACK;
++
++	if(!priv->regmap)
++		return 0;
++
++	switch (cmd) {
++	case SNDRV_PCM_TRIGGER_START:
++	case SNDRV_PCM_TRIGGER_RESUME:
++	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
++		if (tx) {
++			th1520_snd_txctrl(priv, 1);
++			priv->state |= I2S_STATE_TX_RUNNING;
++		}
++		else {
++			th1520_snd_rxctrl(priv, 1);
++			priv->state |= I2S_STATE_RX_RUNNING;
++		}
++		break;
++	case SNDRV_PCM_TRIGGER_STOP:
++	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
++		if (tx) {
++			// work around for DMAC stop issue
++			dmaengine_terminate_async(snd_dmaengine_pcm_get_chan(substream));
++			th1520_snd_txctrl(priv, 0);
++			priv->state &= ~I2S_STATE_TX_RUNNING;
++		} else {
++			th1520_snd_rxctrl(priv, 0);
++			priv->state &= ~I2S_STATE_RX_RUNNING;
++		}
++		break;
++	case SNDRV_PCM_TRIGGER_SUSPEND:
++		if (tx) {
++		 	// work around for DMAC stop issue
++			dmaengine_pause(snd_dmaengine_pcm_get_chan(substream)); 
++			th1520_snd_txctrl(priv, 0);
++		} else {
++			th1520_snd_rxctrl(priv, 0);
++		}
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return ret;
++}
++
++static int th1520_i2s_8ch_set_fmt_dai(struct snd_soc_dai *cpu_dai,
++				      unsigned int fmt)
++{
++	struct th1520_i2s_priv *priv = snd_soc_dai_get_drvdata(cpu_dai);
++	u32 cnfout = 0;
++	u32 cnfin = 0;
++
++	if(!priv->regmap)
++		return 0;
++
++	pm_runtime_resume_and_get(priv->dev);
++
++	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
++	case SND_SOC_DAIFMT_CBS_CFS:
++		cnfin |= CNFIN_I2S_RXMODE_MASTER_MODE;
++		cnfout |= IISCNFOUT_TSAFS_I2S;
++		cnfout &= ~IISCNFOUT_I2S_TXMODE_SLAVE;
++		break;
++	case SND_SOC_DAIFMT_CBM_CFM:
++		cnfin &= ~CNFIN_I2S_RXMODE_MASTER_MODE;
++		cnfout |= IISCNFOUT_TSAFS_RIGHT_JUSTIFIED;
++		cnfout |= IISCNFOUT_I2S_TXMODE_SLAVE;
++		break;
++	default:
++		pr_err("Unknown fmt dai\n");
++		return -EINVAL;
++	}
++
++	switch (fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
++	case SND_SOC_DAIFMT_I2S:
++		cnfout |= IISCNFOUT_TSAFS_I2S;
++		break;
++	case SND_SOC_DAIFMT_RIGHT_J:
++		cnfout |= IISCNFOUT_TSAFS_RIGHT_JUSTIFIED;
++		break;
++	case SND_SOC_DAIFMT_LEFT_J:
++		cnfout |= IISCNFOUT_TSAFS_LEFT_JUSTIFIED;
++		break;
++	default:
++		pr_err("Unknown fmt dai\n");
++		return -EINVAL;
++	}
++
++	regmap_update_bits(priv->regmap, I2S_IISCNF_OUT, IISCNFOUT_TSAFS_MSK,
++			   cnfout);
++
++	cnfin |= CNFIN_I2S_RXMODE_MASTER_MODE;
++	regmap_update_bits(priv->regmap, I2S_IISCNF_IN, CNFIN_I2S_RXMODE_Msk,
++			   cnfin);
++
++	pm_runtime_put_sync(priv->dev);
++
++	return 0;
++}
++
++static int th1520_i2s_8ch_dai_hw_params(struct snd_pcm_substream *substream,
++					struct snd_pcm_hw_params *params,
++					struct snd_soc_dai *dai)
++{
++	u32 val;
++	u32 rate;
++	u32 funcmode;
++	u32 iiscnf_in;
++	u32 iiscnf_out;
++	u32 i2s_8ch_en;
++	u32 len = 0;
++	u32 sclk_sel = 0;
++	u32 channels = params_channels(params);
++	struct th1520_i2s_priv *priv = snd_soc_dai_get_drvdata(dai);
++	bool tx = substream->stream == SNDRV_PCM_STREAM_PLAYBACK;
++	
++	if(!priv->regs || !priv->regmap)
++		return 0;
++
++	rate = params_rate(params);
++
++	iiscnf_out = readl(priv->regs + I2S_IISCNF_OUT);
++	iiscnf_in = readl(priv->regs + I2S_IISCNF_IN);
++
++	switch (params_format(params)) {
++	case SNDRV_PCM_FORMAT_S8:
++		val |= I2S_DATA_8BIT_WIDTH_32BIT;
++		len = 32;
++                break;
++	case SNDRV_PCM_FORMAT_S16_LE:
++		val |= I2S_DATA_WIDTH_16BIT;
++		len = 32;
++		break;
++	case SNDRV_PCM_FORMAT_S24_LE:
++		val |= I2S_DATA_WIDTH_24BIT;
++		len = 32;
++		break;
++	case SNDRV_PCM_FORMAT_S32_LE:
++		val |= I2S_DATA_WIDTH_32BIT;
++		len = 32;
++		break;
++	default:
++		pr_err("Unknown data format\n");
++		return -EINVAL;
++	}
++
++	sclk_sel = len*STEREO_CHANNEL;
++
++	switch (sclk_sel) {
++	case 16:
++		val |= FSSTA_SCLK_SEL_16;
++		break;
++	case 32:
++		val |= FSSTA_SCLK_SEL_32;
++		break;
++	case 48:
++		val |= FSSTA_SCLK_SEL_48;
++		break;
++	case 64:
++		val |= FSSTA_SCLK_SEL_64;
++		break;
++	default:
++		pr_err("Not support channel num %d\n", channels);
++		return -EINVAL;
++	}
++
++	i2s_8ch_en &= ~IISEN_I2SEN;
++	writel(i2s_8ch_en, priv->regs + I2S_IISEN);
++
++	regmap_update_bits(priv->regmap, I2S_FSSTA,
++			   FSSTA_DATAWTH_Msk | FSSTA_SCLK_SEL_Msk, val);
++	funcmode = readl(priv->regs + I2S_FUNCMODE);
++	if (tx) {
++		funcmode |= FUNCMODE_TMODE_WEN;
++		funcmode &= ~FUNCMODE_CH1_ENABLE;
++		funcmode |= FUNCMODE_RMODE_WEN;
++		funcmode &= ~FUNCMODE_RMODE;
++		funcmode &= ~FUNCMODE_TMODE;
++		funcmode |= FUNCMODE_TMODE;
++	} else {
++		funcmode |= FUNCMODE_RMODE_WEN;
++		funcmode |= FUNCMODE_CH0_ENABLE;
++		funcmode |= FUNCMODE_CH1_ENABLE;
++		funcmode |= FUNCMODE_CH2_ENABLE;
++		funcmode |= FUNCMODE_CH3_ENABLE;
++		funcmode |= FUNCMODE_TMODE_WEN;
++		funcmode &= ~FUNCMODE_TMODE;
++		funcmode &= ~FUNCMODE_RMODE;
++		funcmode |= FUNCMODE_RMODE;
++	}
++
++	writel(funcmode, priv->regs + I2S_FUNCMODE);
++
++	if (channels == MONO_SOURCE) {
++		iiscnf_out |= IISCNFOUT_TX_VOICE_EN_MONO;
++		iiscnf_in |= CNFIN_RX_CH_SEL_LEFT;
++		iiscnf_in |= CNFIN_RVOICEEN_MONO;
++	} else {
++		iiscnf_out &= ~IISCNFOUT_TX_VOICE_EN_MONO;
++		iiscnf_in &= ~CNFIN_RX_CH_SEL_LEFT;
++		iiscnf_in &= ~CNFIN_RVOICEEN_MONO;
++	}
++	iiscnf_in |= CNFIN_I2S_RXMODE_MASTER_MODE;
++
++	if (tx)
++		writel(iiscnf_out, priv->regs + I2S_IISCNF_OUT);
++	else
++		writel(iiscnf_in, priv->regs + I2S_IISCNF_IN);
++
++	th1520_i2s_8ch_set_div_sclk(priv, rate, DIV_DEFAULT);
++
++	return 0;
++}
++
++static int th1520_hdmi_dai_hw_params(struct snd_pcm_substream *substream,
++				     struct snd_pcm_hw_params *params,
++				     struct snd_soc_dai *dai)
++{
++
++	u32 val;
++	u32 rate;
++	u32 funcmode;
++	u32 iiscnf_out;
++	u32 i2s_8ch_en;
++	u32 len = 0;
++	u32 channels = params_channels(params);
++	struct th1520_i2s_priv *priv = snd_soc_dai_get_drvdata(dai);
++	bool tx = substream->stream == SNDRV_PCM_STREAM_PLAYBACK;
++
++	if(!priv->regs || !priv->regmap)
++		return 0;
++
++	rate = params_rate(params);
++
++	switch (params_format(params)) {
++	case SNDRV_PCM_FORMAT_S16_LE:
++		val |= I2S_DATA_WIDTH_16BIT;
++		len = 16;
++		break;
++	case SNDRV_PCM_FORMAT_S24_LE:
++		val |= I2S_DATA_WIDTH_24BIT;
++		len = 24;
++		break;
++	default:
++		pr_err("Unknown data format\n");
++		return -EINVAL;
++	}
++
++	val |= FSSTA_SCLK_SEL_64;
++
++	i2s_8ch_en &= ~IISEN_I2SEN;
++	writel(i2s_8ch_en, priv->regs + I2S_IISEN);
++
++	regmap_update_bits(priv->regmap, I2S_FSSTA,
++			   FSSTA_DATAWTH_Msk | FSSTA_SCLK_SEL_Msk, val);
++	funcmode = readl(priv->regs + I2S_FUNCMODE);
++	if (tx) {
++		funcmode |= FUNCMODE_TMODE_WEN;
++		funcmode &= ~FUNCMODE_TMODE;
++		funcmode |= FUNCMODE_TMODE;
++	} else {
++		funcmode |= FUNCMODE_RMODE_WEN;
++		funcmode &= ~FUNCMODE_RMODE;
++		funcmode |= FUNCMODE_RMODE;
++	}
++
++	writel(funcmode, priv->regs + I2S_FUNCMODE);
++
++	iiscnf_out = readl(priv->regs + I2S_IISCNF_OUT);
++	if (channels == MONO_SOURCE)
++		iiscnf_out |= IISCNFOUT_TX_VOICE_EN_MONO;
++	else
++		iiscnf_out &= ~IISCNFOUT_TX_VOICE_EN_MONO;
++
++	writel(iiscnf_out, priv->regs + I2S_IISCNF_OUT);
++
++	th1520_i2s_8ch_set_div_sclk(priv, rate, DIV_DEFAULT);
++
++	return 0;
++}
++
++static int th1520_i2s_8ch_dai_probe(struct snd_soc_dai *dai)
++{
++	struct th1520_i2s_priv *i2s_8ch = snd_soc_dai_get_drvdata(dai);
++
++	if(i2s_8ch)
++		snd_soc_dai_init_dma_data(dai, &i2s_8ch->dma_params_tx,
++					  &i2s_8ch->dma_params_rx);
++
++	return 0;
++}
++
++static const struct snd_soc_dai_ops th1520_i2s_8ch_dai_ops = {
++	.probe		= th1520_i2s_8ch_dai_probe,
++	.startup	= th1520_i2s_8ch_dai_startup,
++	.shutdown	= th1520_i2s_8ch_dai_shutdown,
++	.trigger	= th1520_i2s_8ch_dai_trigger,
++	.set_fmt	= th1520_i2s_8ch_set_fmt_dai,
++	.hw_params	= th1520_i2s_8ch_dai_hw_params,
++};
++
++static const struct snd_soc_dai_ops th1520_hdmi_dai_ops = {
++	.startup        = th1520_i2s_8ch_dai_startup,
++	.shutdown       = th1520_i2s_8ch_dai_shutdown,
++	.trigger        = th1520_i2s_8ch_dai_trigger,
++	.set_fmt        = th1520_i2s_8ch_set_fmt_dai,
++	.hw_params      = th1520_hdmi_dai_hw_params,
++};
++
++static struct snd_soc_dai_driver th1520_i2s_8ch_soc_dai[] = {
++	{
++		.playback	= {
++			.rates		= TH1520_RATES,
++			.formats	= TH1520_FMTS,
++			.channels_min	= 1,
++			.channels_max	= 2,
++		},
++		.capture	= {
++			.rates		= TH1520_RATES,
++			.formats	= TH1520_FMTS,
++			.channels_min	= 1,
++			.channels_max	= 2,
++		},
++		.ops		= &th1520_i2s_8ch_dai_ops,
++	},
++};
++
++
++static const struct snd_soc_component_driver th1520_i2s_8ch_soc_component = {
++	.name		= "th1520_i2s_8ch",
++};
++
++static const struct regmap_config th1520_i2s_8ch_regmap_config = {
++        .reg_bits	= 32,
++        .reg_stride	= 4,
++        .val_bits	= 32,
++        .max_register	= I2S_DR4,
++        .writeable_reg	= th1520_i2s_wr_reg,
++        .readable_reg	= th1520_i2s_rd_reg,
++        .cache_type	= REGCACHE_NONE,
++};
++
++static int th1520_i2s_8ch_runtime_suspend(struct device *dev)
++{
++	struct th1520_i2s_priv *priv = dev_get_drvdata(dev);
++
++	if(!priv->regmap)
++		return 0;
++
++	regcache_cache_only(priv->regmap, true);
++	clk_disable_unprepare(priv->clk);
++
++	return 0;
++}
++
++static int th1520_i2s_8ch_runtime_resume(struct device *dev)
++{
++	int ret = 0;
++	struct th1520_i2s_priv *priv = dev_get_drvdata(dev);
++
++	if(!priv->regmap)
++		return 0;
++
++	ret = clk_prepare_enable(priv->clk);
++	if (ret) {
++		dev_err(priv->dev, "clock enable failed %d\n", ret);
++		return ret;
++	}
++
++	regcache_cache_only(priv->regmap, false);
++
++	return ret;
++}
++
++#ifdef CONFIG_PM_SLEEP
++static int th1520_i2s_8ch_suspend(struct device *dev)
++{
++	struct th1520_i2s_priv *priv = dev_get_drvdata(dev);
++
++	if(!priv->regmap)
++		return 0;
++
++	pm_runtime_get_sync(dev);
++
++	regmap_read(priv->regmap, I2S_DIV0_LEVEL, &priv->suspend_div0_level);
++	regmap_read(priv->regmap, I2S_DIV3_LEVEL, &priv->suspend_div3_level);
++	regmap_read(priv->regmap, I2S_IISCNF_IN, &priv->suspend_iiscnf_in);
++	regmap_read(priv->regmap, I2S_FSSTA, &priv->suspend_fssta);
++	regmap_read(priv->regmap, I2S_IISCNF_OUT, &priv->suspend_ii2cnf_out);
++	regmap_read(priv->regmap, I2S_FADTLR, &priv->suspend_fadtlr);
++	regmap_read(priv->regmap, I2S_SCCR, &priv->suspend_sccr);
++	regmap_read(priv->regmap, I2S_TXFTLR, &priv->suspend_txftlr);
++	regmap_read(priv->regmap, I2S_RXFTLR, &priv->suspend_rxftlr);
++	regmap_read(priv->regmap, I2S_IMR, &priv->suspend_imr);
++	regmap_read(priv->regmap, I2S_DMATDLR, &priv->suspend_dmatdlr);
++	regmap_read(priv->regmap, I2S_DMARDLR, &priv->suspend_dmardlr);
++	regmap_read(priv->regmap, I2S_FUNCMODE, &priv->suspend_funcmode);
++
++	regmap_read(priv->audio_cpr_regmap, CPR_PERI_DIV_SEL_REG,
++		    &priv->cpr_peri_div_sel);
++	regmap_read(priv->audio_cpr_regmap, CPR_PERI_CTRL_REG,
++		    &priv->cpr_peri_ctrl);
++	regmap_read(priv->audio_cpr_regmap, CPR_PERI_CLK_SEL_REG,
++		    &priv->cpr_peri_clk_sel);
++	reset_control_assert(priv->rst);
++
++	pm_runtime_put_sync(dev);
++
++	return 0;
++}
++
++static int th1520_i2s_8ch_resume(struct device *dev)
++{
++	int ret;
++	struct th1520_i2s_priv *priv = dev_get_drvdata(dev);
++
++	if(!priv->regmap)
++		return 0;
++
++	pm_runtime_get_sync(dev);
++
++	reset_control_deassert(priv->rst);
++
++	regmap_update_bits(priv->audio_cpr_regmap, CPR_IP_RST_REG,
++			   CPR_I2S8CH_SRST_N_SEL_MSK, CPR_I2S8CH_SRST_N_SEL(1));
++
++	regmap_write(priv->audio_cpr_regmap, CPR_PERI_CTRL_REG,
++		     priv->cpr_peri_ctrl);
++
++	regmap_write(priv->regmap, I2S_IISEN, 0);
++	regmap_write(priv->regmap, I2S_FSSTA, priv->suspend_fssta);
++	regmap_write(priv->regmap, I2S_FUNCMODE,
++		     priv->suspend_funcmode | FUNCMODE_TMODE_WEN |
++			FUNCMODE_RMODE_WEN);
++	regmap_write(priv->regmap, I2S_IISCNF_IN, priv->suspend_iiscnf_in);
++	regmap_write(priv->regmap, I2S_IISCNF_OUT, priv->suspend_ii2cnf_out);
++	regmap_write(priv->audio_cpr_regmap, CPR_PERI_CLK_SEL_REG,
++		     priv->cpr_peri_clk_sel);
++	regmap_write(priv->regmap, I2S_DIV0_LEVEL, priv->suspend_div0_level);
++	regmap_write(priv->regmap, I2S_DIV3_LEVEL, priv->suspend_div3_level);
++	regmap_write(priv->audio_cpr_regmap, CPR_PERI_DIV_SEL_REG,
++		     priv->cpr_peri_div_sel);
++
++	pm_runtime_put_sync(dev);
++
++	return ret;
++}
++#endif
++
++static const struct of_device_id th1520_i2s_8ch_of_match[] = {
++	{ .compatible = "xuantie,th1520-i2s-8ch"},
++	{},
++};
++MODULE_DEVICE_TABLE(of, th1520_i2s_8ch_of_match);
++
++struct th1520_i2s_priv *host_priv;
++
++static int th1520_audio_i2s_8ch_probe(struct platform_device *pdev)
++{
++
++	int ret;
++	unsigned int irq;
++	const char *sprop;
++	const uint32_t *iprop;
++	struct resource *res;
++	struct th1520_i2s_priv *priv;
++	struct device *dev = &pdev->dev;
++	struct device_node *np = pdev->dev.of_node;
++	struct reset_control *resets;
++
++	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
++
++	if (!priv)
++		return -ENOMEM;
++
++	priv->dev = dev;
++
++	if (strstr(pdev->name, AUDIO_I2S_8CH_SD0)) {
++		strcpy(priv->name, AUDIO_I2S_8CH_SD0);
++	}
++	else if (strstr(pdev->name, AUDIO_I2S_8CH_SD1)) {
++		strcpy(priv->name, AUDIO_I2S_8CH_SD1);
++	}
++	else if (strstr(pdev->name, AUDIO_I2S_8CH_SD2)) {
++		strcpy(priv->name, AUDIO_I2S_8CH_SD2);
++	}
++	else if (strstr(pdev->name, AUDIO_I2S_8CH_SD3)) {
++		strcpy(priv->name, AUDIO_I2S_8CH_SD3);
++	}
++	else {
++		pr_err("unsupport audio dev name: %s\n", pdev->name);
++		return -EINVAL;
++	}
++
++	dev_set_drvdata(&pdev->dev, priv);
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++
++	if(i2s_8ch_probe_flag) {
++		priv->regs = NULL;
++		priv->regmap = NULL;
++		priv->audio_cpr_regmap = NULL;
++	} else {
++		i2s_8ch_probe_flag = 1;
++		host_priv = priv;
++
++		priv->regs = devm_ioremap_resource(dev, res);
++		if (IS_ERR(priv->regs))
++			return PTR_ERR(priv->regs);
++
++		priv->regmap = devm_regmap_init_mmio(&pdev->dev, priv->regs,
++						&th1520_i2s_8ch_regmap_config);
++		if (IS_ERR(priv->regmap)) {
++			dev_err(&pdev->dev,
++				"Failed to initialise managed register map\n");
++			return PTR_ERR(priv->regmap);
++		}
++
++		priv->audio_cpr_regmap = syscon_regmap_lookup_by_phandle(np,
++						"audio-cpr-regmap");
++		if (IS_ERR(priv->audio_cpr_regmap)) {
++			dev_err(dev,
++				"cannot find regmap for audio cpr register\n");
++			return -EINVAL;
++		}
++
++		// enable i2s sync
++		th1520_audio_cpr_set(priv, CPR_PERI_CTRL_REG,
++						CPR_VAD_I2SIN_SYNC_MSK, CPR_VAD_I2SIN_SYNC_EN);
++
++		resets = devm_reset_control_get_optional_shared(&pdev->dev, NULL);
++		if (IS_ERR(resets)) {
++			ret = PTR_ERR(resets);
++			return ret;
++		}
++		priv->rst = resets;
++
++		priv->clk = devm_clk_get(&pdev->dev, "pclk");
++		if (IS_ERR(priv->clk))
++			return PTR_ERR(priv->clk);
++
++		reset_control_deassert(priv->rst);
++		pm_runtime_enable(&pdev->dev);
++		// clk gate is enabled by hardware as default register value
++		pm_runtime_resume_and_get(&pdev->dev);
++		pm_runtime_put_sync(&pdev->dev);
++
++		irq = platform_get_irq(pdev, 0);
++
++		if (!res || (int)irq <= 0) {
++			dev_err(&pdev->dev,
++				"Not enough th1520 platform resources.\n");
++			return -ENODEV;
++		}
++	}
++
++	priv->audio_pin_regmap = NULL;
++
++	priv->dma_params_tx.addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
++	priv->dma_params_rx.addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
++	priv->dma_params_tx.maxburst = I2S_DMA_MAXBURST;
++	priv->dma_params_rx.maxburst = I2S_DMA_MAXBURST;
++
++	if (!strcmp(priv->name, AUDIO_I2S_8CH_SD0)) {
++		priv->dma_params_tx.addr = res->start + I2S_DR;
++		priv->dma_params_rx.addr = res->start + I2S_DR;
++	} else if (!strcmp(priv->name, AUDIO_I2S_8CH_SD1)) {
++		priv->dma_params_tx.addr = res->start + I2S_DR1;
++		priv->dma_params_rx.addr = res->start + I2S_DR1;
++	} else if (!strcmp(priv->name, AUDIO_I2S_8CH_SD2)) {
++		priv->dma_params_tx.addr = res->start + I2S_DR2;
++		priv->dma_params_rx.addr = res->start + I2S_DR2;
++	} else if (!strcmp(priv->name, AUDIO_I2S_8CH_SD3)) {
++		priv->dma_params_tx.addr = res->start + I2S_DR3;
++		priv->dma_params_rx.addr = res->start + I2S_DR3;
++	}
++
++	th1520_pcm_probe(pdev, priv, TH1520_I2S_DMABUF_SIZE);
++
++	ret = devm_snd_soc_register_component(&pdev->dev,
++					      &th1520_i2s_8ch_soc_component,
++					      th1520_i2s_8ch_soc_dai,
++					    ARRAY_SIZE(th1520_i2s_8ch_soc_dai));
++	if (ret < 0) {
++		dev_err(&pdev->dev, "cannot snd component register\n");
++		goto err_pm_disable;
++	}
++
++	return ret;
++
++err_pm_disable:
++	pm_runtime_disable(&pdev->dev);
++
++	return ret;
++}
++
++static int th1520_i2s_8ch_remove(struct platform_device *pdev)
++{
++        struct th1520_i2s_priv *priv = dev_get_drvdata(&pdev->dev);
++
++        pm_runtime_disable(&pdev->dev);
++        if (!pm_runtime_status_suspended(&pdev->dev))
++                th1520_i2s_8ch_runtime_suspend(&pdev->dev);
++
++        clk_disable_unprepare(priv->clk);
++
++        return 0;
++}
++
++static const struct dev_pm_ops th1520_i2s_8ch_pm_ops = {
++	SET_RUNTIME_PM_OPS(th1520_i2s_8ch_runtime_suspend,
++        		   th1520_i2s_8ch_runtime_resume, NULL)
++	SET_SYSTEM_SLEEP_PM_OPS(th1520_i2s_8ch_suspend,
++				th1520_i2s_8ch_resume)
++};
++
++static struct platform_driver th1520_i2s_8ch_driver = {
++	.driver = {
++		.name		= "th1520-pcm-audio-8ch",
++		.pm		= &th1520_i2s_8ch_pm_ops,
++		.of_match_table = th1520_i2s_8ch_of_match,
++	},
++	.probe	= th1520_audio_i2s_8ch_probe,
++	.remove	= th1520_i2s_8ch_remove,
++};
++
++module_platform_driver(th1520_i2s_8ch_driver);
++
++MODULE_AUTHOR("shuofeng.ren <shuofeng.rsf@linux.alibaba.com>");
++MODULE_DESCRIPTION("XuanTie TH1520 audio driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/sound/soc/xuantie/th1520-i2s-common.c b/sound/soc/xuantie/th1520-i2s-common.c
+new file mode 100644
+index 000000000000..27edef4bf791
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-i2s-common.c
+@@ -0,0 +1,53 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * XuanTie TH1520 ALSA Soc Audio Layer
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Shuofeng Ren <shuofeng.rsf@linux.alibaba.com>
++ *
++ */
++ 
++#include <linux/dmaengine.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/types.h>
++
++#include <sound/dmaengine_pcm.h>
++
++#include "th1520-i2s.h"
++#include "th1520-pcm.h"
++
++int th1520_audio_cpr_set(struct th1520_i2s_priv *chip, unsigned int cpr_off,
++			 unsigned int mask, unsigned int val)
++{
++       if(!chip->audio_cpr_regmap)
++               return 0;
++
++       return regmap_update_bits(chip->audio_cpr_regmap, cpr_off, mask, val);
++}
++
++bool th1520_i2s_wr_reg(struct device *dev, unsigned int reg)
++{
++	return true;
++}
++
++bool th1520_i2s_rd_reg(struct device *dev, unsigned int reg)
++{
++	return true;
++}
++
++int th1520_pcm_probe(struct platform_device *pdev, struct th1520_i2s_priv *i2s,
++		     size_t size)
++{
++	int ret = th1520_pcm_dma_init(pdev, size);
++
++	if (ret)
++		pr_err("th1520_pcm_dma_init error\n");
++
++	return 0;
++}
++
++MODULE_AUTHOR("shuofeng.ren <shuofeng.rsf@linux.alibaba.com>");
++MODULE_DESCRIPTION("Xuantie TH1520 audio driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/sound/soc/xuantie/th1520-i2s.c b/sound/soc/xuantie/th1520-i2s.c
+new file mode 100644
+index 000000000000..b8aee8521ec1
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-i2s.c
+@@ -0,0 +1,847 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * XuanTie TH1520 audio I2S audio support
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Shuofeng Ren <shuofeng.rsf@linux.alibaba.com>
++ * Author: David Li <davidli.li@linux.alibaba.com>
++ *
++ */
++
++#define DEBUG
++
++#include <linux/dmaengine.h>
++#include <linux/io.h>
++#include <linux/module.h>
++#include <linux/mfd/syscon.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/pm_runtime.h>
++#include <linux/regmap.h>
++#include <linux/reset.h>
++#include <sound/dmaengine_pcm.h>
++#include <sound/pcm_params.h>
++
++#include "th1520-audio-cpr.h"
++#include "th1520-i2s.h"
++#include "th1520-pcm.h"
++
++#define TH1520_I2S_DMABUF_SIZE	(64 * 1024)
++
++static u32 th1520_special_sample_rates[] = { 11025, 22050, 44100, 88200 };
++
++static void th1520_i2s_set_div_sclk(struct th1520_i2s_priv *chip,
++				    u32 sample_rate, unsigned int div_val)
++{
++	int i;
++	u32 div;
++	u32 div0;
++	u32 i2s_src_clk = 0;
++	u32 cpr_div = (IIS_SRC_CLK / AUDIO_IIS_SRC0_CLK) - 1;
++
++	if (!strcmp(chip->name, AP_I2S)) {
++		div = IIS_SRC_CLK / IIS_MCLK_SEL;
++	} else {
++		for (i = 0; i < ARRAY_SIZE(th1520_special_sample_rates); i++) {
++			if (th1520_special_sample_rates[i] == sample_rate) {
++				i2s_src_clk = 1;
++				break;
++			}
++		}
++		if (! strcmp(chip->name, AUDIO_I2S0)) {
++			if (!i2s_src_clk) {
++				th1520_audio_cpr_set(chip, CPR_PERI_CLK_SEL_REG,
++						     CPR_I2S0_SRC_SEL_MSK,
++						     CPR_I2S0_SRC_SEL(0));
++				div = AUDIO_IIS_SRC0_CLK / IIS_MCLK_SEL;
++			} else {
++				th1520_audio_cpr_set(chip, CPR_PERI_CLK_SEL_REG,
++						     CPR_I2S0_SRC_SEL_MSK,
++						     CPR_I2S0_SRC_SEL(2));
++				div = AUDIO_IIS_SRC1_CLK / IIS_MCLK_SEL;
++			}
++		} else if (!strcmp(chip->name, AUDIO_I2S1)) {
++			if (!i2s_src_clk) {
++				th1520_audio_cpr_set(chip, CPR_PERI_CLK_SEL_REG,
++						     CPR_I2S1_SRC_SEL_MSK,
++						     CPR_I2S1_SRC_SEL(0));
++				div = AUDIO_IIS_SRC0_CLK / IIS_MCLK_SEL;
++			} else {
++				th1520_audio_cpr_set(chip, CPR_PERI_CLK_SEL_REG,
++						     CPR_I2S1_SRC_SEL_MSK,
++						     CPR_I2S1_SRC_SEL(2));
++				div = AUDIO_IIS_SRC1_CLK / IIS_MCLK_SEL;
++			}
++		} else if (!strcmp(chip->name, AUDIO_I2S2)) {
++			if (!i2s_src_clk) {
++				th1520_audio_cpr_set(chip, CPR_PERI_CLK_SEL_REG, 
++						     CPR_I2S2_SRC_SEL_MSK,
++						     CPR_I2S2_SRC_SEL(0));
++				div = AUDIO_IIS_SRC0_CLK / IIS_MCLK_SEL;
++			} else {
++				th1520_audio_cpr_set(chip, CPR_PERI_CLK_SEL_REG,
++						     CPR_I2S2_SRC_SEL_MSK,
++						     CPR_I2S2_SRC_SEL(2));
++				div = AUDIO_IIS_SRC1_CLK / IIS_MCLK_SEL;
++			}
++		}
++	}
++
++	div0 = (div + div % sample_rate) / sample_rate / div_val;
++
++	writel(div0, chip->regs + I2S_DIV0_LEVEL);
++	th1520_audio_cpr_set(chip, CPR_PERI_DIV_SEL_REG, CPR_AUDIO_DIV0_SEL_MSK,
++			     CPR_AUDIO_DIV0_SEL(cpr_div));
++}
++
++static inline void th1520_snd_txctrl(struct th1520_i2s_priv *chip, bool on)
++{
++	u32 dma_en = 0;
++	u32 i2s_en = 0;
++	u32 i2s_status = 0;
++	unsigned long flags;
++
++	/* get current dma status, save rx configuration */
++	dma_en = readl(chip->regs + I2S_DMACR);
++	if (on) {
++		dma_en |= DMACR_TDMAE_EN;
++		i2s_en |= IISEN_I2SEN;
++		writel(dma_en, chip->regs + I2S_DMACR);
++		writel(i2s_en, chip->regs + I2S_IISEN);
++	} else {
++		dma_en &= ~DMACR_TDMAE_EN;
++		local_irq_save(flags);
++		do {
++			i2s_status  = readl(chip->regs + I2S_SR);
++		} while ((i2s_status & SR_TXBUSY_STATUS) || !(i2s_status & SR_TFNF_TX_FIFO_NOT_FULL));
++		writel(dma_en, chip->regs + I2S_DMACR);
++		local_irq_restore(flags);
++		/*
++		* The enablement of I2S can onlybe truned off when
++		* the DMA configuration for RX and TX is completely disabled.
++		*/
++		if ( ((DMACR_TDMAE_MSK | DMACR_RDMAE_MSK) & dma_en) == 0) {
++			i2s_en &= ~IISEN_I2SEN;
++			writel(i2s_en, chip->regs + I2S_IISEN);
++		}
++	}
++}
++
++static inline void th1520_snd_rxctrl(struct th1520_i2s_priv *chip, bool on)
++{
++	u32 dma_en;
++	u32 i2s_en;
++
++	/* get current dma status, save tx configuration */
++	dma_en = readl(chip->regs + I2S_DMACR);
++	if (on) {
++		dma_en |= DMACR_RDMAE_EN;
++		i2s_en |= IISEN_I2SEN;
++		writel(dma_en, chip->regs + I2S_DMACR);
++		writel(i2s_en, chip->regs + I2S_IISEN);
++	} else {
++		dma_en &= ~DMACR_RDMAE_EN;
++		writel(dma_en, chip->regs + I2S_DMACR);
++		/*
++		* The enablement of I2S can onlybe truned off when
++		* the DMA confgiguratio for RX and TX is completely disabled.
++		*/
++		if ( ((DMACR_TDMAE_MSK | DMACR_RDMAE_MSK) & dma_en) == 0) {
++			i2s_en &= ~IISEN_I2SEN;
++			writel(i2s_en, chip->regs + I2S_IISEN);
++		}
++	}
++}
++
++static int th1520_i2s_dai_startup(struct snd_pcm_substream *substream,
++				  struct snd_soc_dai *dai)
++{
++	pr_debug("%s: %s %s\n", __func__, substream->pcm->name, dai->name);
++	return 0;
++}
++
++static void th1520_i2s_dai_shutdown(struct snd_pcm_substream *substream,
++				    struct snd_soc_dai *dai)
++{
++	struct th1520_i2s_priv *i2s_private = snd_soc_dai_get_drvdata(dai);
++
++	pr_debug("%s: %s %s\n", __func__, substream->pcm->name, dai->name);
++
++	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
++		th1520_snd_rxctrl(i2s_private, 0);
++}
++
++/**
++ * th1520_i2s_dai_trigger: start and stop the DMA transfer.
++ *
++ * This function is called by ALSA to start, stop, pause, and resume the DMA
++ * transfer of data.
++ */
++static int th1520_i2s_dai_trigger(struct snd_pcm_substream *substream, int cmd,
++				  struct snd_soc_dai *dai)
++{
++	int ret = 0;
++
++	struct th1520_i2s_priv *priv = snd_soc_dai_get_drvdata(dai);
++        bool tx = substream->stream == SNDRV_PCM_STREAM_PLAYBACK;
++
++	pr_debug("%s: %s %s cmd=%d tx=%d\n", __func__, substream->pcm->name,
++		dai->name, cmd, tx);
++
++	switch (cmd) {
++	case SNDRV_PCM_TRIGGER_START:
++	case SNDRV_PCM_TRIGGER_RESUME:
++	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
++		if (tx) {
++			th1520_snd_txctrl(priv, 1);
++			priv->state |= I2S_STATE_TX_RUNNING;
++		}
++		else {
++			th1520_snd_rxctrl(priv, 1);
++			priv->state |= I2S_STATE_RX_RUNNING;
++		}
++		break;
++	case SNDRV_PCM_TRIGGER_STOP:
++		if (tx) {
++			th1520_snd_txctrl(priv, 0);
++			priv->state &= ~I2S_STATE_TX_RUNNING;
++		} else {
++			th1520_snd_rxctrl(priv, 0);
++			priv->state &= ~I2S_STATE_RX_RUNNING;
++		}
++		break;
++	case SNDRV_PCM_TRIGGER_SUSPEND:
++	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
++		if (tx) {
++			// work around for DMAC stop issue
++			dmaengine_pause(snd_dmaengine_pcm_get_chan(substream));
++			th1520_snd_txctrl(priv, 0);
++		} else {
++			th1520_snd_rxctrl(priv, 0);
++		}
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return ret;
++}
++
++static int th1520_i2s_set_fmt_dai(struct snd_soc_dai *cpu_dai, unsigned int fmt)
++{
++	u32 cnfout = 0;
++	u32 cnfin = 0;
++	struct th1520_i2s_priv *i2s_private = snd_soc_dai_get_drvdata(cpu_dai);
++
++	pr_debug("i2s fmt: <0x%x>\n", fmt);
++	pm_runtime_resume_and_get(i2s_private->dev);
++
++	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
++	case SND_SOC_DAIFMT_CBS_CFS:
++		cnfin |= CNFIN_I2S_RXMODE_MASTER_MODE;
++		cnfout |= IISCNFOUT_TSAFS_I2S;
++		cnfout &= ~IISCNFOUT_I2S_TXMODE_SLAVE;
++		break;
++	case SND_SOC_DAIFMT_CBM_CFM:
++		cnfin &= ~CNFIN_I2S_RXMODE_MASTER_MODE;
++		cnfout |= IISCNFOUT_TSAFS_RIGHT_JUSTIFIED;
++		cnfout |= IISCNFOUT_I2S_TXMODE_SLAVE;
++		break;
++	default:
++		pr_err("Unknown fmt dai\n");
++		return -EINVAL;
++	}
++
++	switch (fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
++	case SND_SOC_DAIFMT_I2S:
++		cnfout |= IISCNFOUT_TSAFS_I2S;
++		break;
++	case SND_SOC_DAIFMT_RIGHT_J:
++		cnfout |= IISCNFOUT_TSAFS_RIGHT_JUSTIFIED;
++		break;
++	case SND_SOC_DAIFMT_LEFT_J:
++		cnfout |= IISCNFOUT_TSAFS_LEFT_JUSTIFIED;
++		break;
++	default:
++		pr_err("Unknown fmt dai\n");
++		return -EINVAL;
++	}
++
++	regmap_update_bits(i2s_private->regmap, I2S_IISCNF_OUT,
++			   IISCNFOUT_TSAFS_MSK, cnfout);
++
++	cnfin |= CNFIN_I2S_RXMODE_MASTER_MODE;
++
++	regmap_update_bits(i2s_private->regmap, I2S_IISCNF_IN,
++			   CNFIN_I2S_RXMODE_Msk,
++			   cnfin);
++
++	pm_runtime_put_sync(i2s_private->dev);
++
++	return 0;
++}
++
++static int th1520_i2s_dai_hw_params(struct snd_pcm_substream *substream,
++				    struct snd_pcm_hw_params *params,
++				    struct snd_soc_dai *dai)
++{
++	u32 val;
++	u32 len = 0;
++	u32 sclk_sel = 0;
++	u32 rate;
++	u32 funcmode;
++	u32 iiscnf_out;
++	u32 iiscnf_in;
++	u32 i2s_en = 0;
++	struct th1520_i2s_priv *i2s_private = snd_soc_dai_get_drvdata(dai);
++	bool tx = substream->stream == SNDRV_PCM_STREAM_PLAYBACK;
++
++	u32 channels = params_channels(params);
++
++	rate = params_rate(params);
++
++	iiscnf_out = readl(i2s_private->regs + I2S_IISCNF_OUT);
++	iiscnf_in = readl(i2s_private->regs + I2S_IISCNF_IN);
++
++	switch (params_format(params)) {
++	case SNDRV_PCM_FORMAT_S8:
++		val |= I2S_DATA_8BIT_WIDTH_32BIT;
++		len = 32;
++                break;
++	case SNDRV_PCM_FORMAT_S16_LE:
++		val |= I2S_DATA_WIDTH_16BIT;
++		len = 32;
++		break;
++	case SNDRV_PCM_FORMAT_S24_LE:
++		val |= I2S_DATA_24BIT_WIDTH_32BIT;
++		len = 32;
++		break;
++	case SNDRV_PCM_FORMAT_S32_LE:
++		val |= I2S_DATA_WIDTH_32BIT;
++		len = 32;
++		break;
++	default:
++		pr_err("Unknown data format: %d\n", params_format(params));
++		return -EINVAL;
++	}
++
++	sclk_sel = len*STEREO_CHANNEL;
++
++	switch (sclk_sel) {
++	case 16:
++		val |= FSSTA_SCLK_SEL_16;
++		break;
++	case 32:
++		val |= FSSTA_SCLK_SEL_32;
++		break;
++	case 48:
++		val |= FSSTA_SCLK_SEL_48;
++		break;
++	case 64:
++		val |= FSSTA_SCLK_SEL_64;
++		break;
++	default:
++		pr_err("Not support channel num %d\n", channels);
++		return -EINVAL;
++	}
++
++	/* 
++	 * FUNCMODE,I2S_IISCNF_OUT,I2S_IISCNF_IN registers,
++	 * it is impossible to write to this register when I2S is enabled
++	 */
++	i2s_en &= ~IISEN_I2SEN;
++	writel(i2s_en, i2s_private->regs + I2S_IISEN);
++
++	regmap_update_bits(i2s_private->regmap, I2S_FSSTA,
++			   FSSTA_DATAWTH_Msk | FSSTA_SCLK_SEL_Msk, val);
++	funcmode = readl(i2s_private->regs + I2S_FUNCMODE);
++	if (tx) {
++		funcmode |= FUNCMODE_TMODE_WEN;
++		funcmode &= ~FUNCMODE_TMODE;
++		funcmode |= FUNCMODE_TMODE;
++	} else {
++		funcmode |= FUNCMODE_RMODE_WEN;
++		funcmode &= ~FUNCMODE_RMODE;
++		funcmode |= FUNCMODE_RMODE;
++	}
++	funcmode |= FUNCMODE_CH0_ENABLE;
++
++	writel(funcmode, i2s_private->regs + I2S_FUNCMODE);
++
++	pr_debug("%s: %s %s channels=%d rate=%d fm=%x\n", __func__,
++	       substream->pcm->name, dai->name, channels, rate, funcmode);
++	if (channels == MONO_SOURCE) {
++		iiscnf_out |= IISCNFOUT_TX_VOICE_EN_MONO;
++		iiscnf_in |= CNFIN_RX_CH_SEL_LEFT;
++		iiscnf_in |= CNFIN_RVOICEEN_MONO;
++	} else {
++		iiscnf_out &= ~IISCNFOUT_TX_VOICE_EN_MONO;
++		iiscnf_in &= ~CNFIN_RX_CH_SEL_LEFT;
++		iiscnf_in &= ~CNFIN_RVOICEEN_MONO;
++	}
++
++	if (tx)
++		writel(iiscnf_out, i2s_private->regs + I2S_IISCNF_OUT);
++	else
++		writel(iiscnf_in, i2s_private->regs + I2S_IISCNF_IN);
++
++	th1520_i2s_set_div_sclk(i2s_private, rate, DIV_DEFAULT);
++
++	/* Turn on the I2S enable switch ahead of time, 
++	 * and start the MCLK before the PA is turned on
++	 * to solve the pop noise caused by the sudden change in I2S startup.
++	 */
++	i2s_en |= IISEN_I2SEN;
++	writel(i2s_en, i2s_private->regs + I2S_IISEN);
++
++	return 0;
++}
++
++static int th1520_hdmi_dai_hw_params(struct snd_pcm_substream *substream,
++				     struct snd_pcm_hw_params *params,
++				     struct snd_soc_dai *dai)
++{
++	u32 val;
++	u32 len = 0;
++	u32 funcmode;
++	u32 iiscnf_out;
++	u32 i2s_en;
++	u32 rate = params_rate(params);
++	u32 channels = params_channels(params);
++	struct th1520_i2s_priv *i2s_private = snd_soc_dai_get_drvdata(dai);
++	bool tx = substream->stream == SNDRV_PCM_STREAM_PLAYBACK;
++
++	switch (params_format(params)) {
++		case SNDRV_PCM_FORMAT_S16_LE:
++			val |= I2S_DATA_WIDTH_16BIT;
++			len = 16;
++			break;
++		case SNDRV_PCM_FORMAT_S24_LE:
++			val |= I2S_DATA_WIDTH_24BIT;
++			len = 24;
++			break;
++		default:
++			pr_err("Unknown data format: %d\n", 
++			       params_format(params));
++			return -EINVAL;
++	}
++
++	val |= FSSTA_SCLK_SEL_64;
++
++	i2s_en &= ~IISEN_I2SEN;
++	writel(i2s_en, i2s_private->regs + I2S_IISEN);
++
++	regmap_update_bits(i2s_private->regmap, I2S_FSSTA,
++			   FSSTA_DATAWTH_Msk | FSSTA_SCLK_SEL_Msk, val);
++	funcmode = readl(i2s_private->regs + I2S_FUNCMODE);
++	if (tx) {
++		funcmode |= FUNCMODE_TMODE_WEN;
++		funcmode &= ~FUNCMODE_TMODE;
++		funcmode |= FUNCMODE_TMODE;
++	} else {
++		funcmode |= FUNCMODE_RMODE_WEN;
++		funcmode &= ~FUNCMODE_RMODE;
++		funcmode |= FUNCMODE_RMODE;
++	}
++
++	writel(funcmode, i2s_private->regs + I2S_FUNCMODE);
++
++	iiscnf_out = readl(i2s_private->regs + I2S_IISCNF_OUT);
++	if (channels == MONO_SOURCE)
++		iiscnf_out |= IISCNFOUT_TX_VOICE_EN_MONO;
++	else
++		iiscnf_out &= ~IISCNFOUT_TX_VOICE_EN_MONO;
++
++	writel(iiscnf_out, i2s_private->regs + I2S_IISCNF_OUT);
++
++	th1520_i2s_set_div_sclk(i2s_private, rate, DIV_DEFAULT);
++
++	return 0;
++}
++
++static int th1520_i2s_dai_probe(struct snd_soc_dai *dai)
++{
++	struct th1520_i2s_priv *i2s = snd_soc_dai_get_drvdata(dai);
++	pr_debug("%s: %p %p\n", __func__, i2s->base, i2s->regs);
++
++	if(i2s)
++		snd_soc_dai_init_dma_data(dai, &i2s->dma_params_tx,
++					  &i2s->dma_params_rx);
++
++	return 0;
++}
++
++static const struct snd_soc_dai_ops th1520_i2s_dai_ops = {
++	.probe		= th1520_i2s_dai_probe,
++	.startup	= th1520_i2s_dai_startup,
++	.shutdown	= th1520_i2s_dai_shutdown,
++	.trigger	= th1520_i2s_dai_trigger,
++	.set_fmt	= th1520_i2s_set_fmt_dai,
++	.hw_params	= th1520_i2s_dai_hw_params,
++};
++
++static const struct snd_soc_dai_ops th1520_hdmi_dai_ops = {
++	.probe		= th1520_i2s_dai_probe,
++	.startup        = th1520_i2s_dai_startup,
++	.shutdown       = th1520_i2s_dai_shutdown,
++	.trigger        = th1520_i2s_dai_trigger,
++	.set_fmt        = th1520_i2s_set_fmt_dai,
++	.hw_params      = th1520_hdmi_dai_hw_params,
++};
++
++static struct snd_soc_dai_driver th1520_i2s_soc_dai[] = {
++	{
++		.name			= "th1520-i2s-dai",
++		.playback = {
++			.rates		= TH1520_RATES,
++			.formats	= TH1520_FMTS,
++			.channels_min	= 1,
++			.channels_max	= 2,
++		},
++		.capture = {
++			.rates		= TH1520_RATES,
++			.formats	= TH1520_FMTS,
++			.channels_min	= 1,
++			.channels_max	= 2,
++		},
++		.ops 			= &th1520_i2s_dai_ops,
++		.symmetric_rate 	= 1,
++	},
++	{
++		.name			= "th1520-hdmi-dai",
++		.playback = {
++			.rates		= TH1520_RATES,
++			.formats	= SNDRV_PCM_FMTBIT_S24_LE |
++					  SNDRV_PCM_FMTBIT_S16_LE,
++			.channels_min	= 1,
++			.channels_max	= 2,
++		},
++		.ops 			= &th1520_hdmi_dai_ops,
++	},
++};
++
++
++static const struct snd_soc_component_driver th1520_i2s_soc_component = {
++	.name		= "th1520_i2s",
++};
++
++static const struct regmap_config th1520_i2s_regmap_config = {
++        .reg_bits	= 32,
++        .reg_stride	= 4,
++        .val_bits	= 32,
++        .max_register	= I2S_DR4,
++        .writeable_reg	= th1520_i2s_wr_reg,
++        .readable_reg	= th1520_i2s_rd_reg,
++        .cache_type	= REGCACHE_NONE,
++};
++
++static int th1520_i2s_runtime_suspend(struct device *dev)
++{
++	struct th1520_i2s_priv *i2s_priv = dev_get_drvdata(dev);
++	pr_debug("%s: %s\n", __func__, i2s_priv->name);
++
++	regcache_cache_only(i2s_priv->regmap, true);
++	clk_disable_unprepare(i2s_priv->clk);
++
++	return 0;
++}
++
++static int th1520_i2s_runtime_resume(struct device *dev)
++{
++	int ret = 0;
++	struct th1520_i2s_priv *i2s_priv = dev_get_drvdata(dev);
++	pr_debug("%s: %s\n", __func__, i2s_priv->name);
++
++	ret = clk_prepare_enable(i2s_priv->clk);
++	if (ret) {
++		dev_err(i2s_priv->dev, "clock enable failed %d\n", ret);
++		return ret;
++	}
++
++	regcache_cache_only(i2s_priv->regmap, false);
++
++	return ret;
++}
++
++#ifdef CONFIG_PM_SLEEP
++static int th1520_i2s_suspend(struct device *dev)
++{
++    struct th1520_i2s_priv *priv = dev_get_drvdata(dev);
++
++	pm_runtime_get_sync(dev);
++
++	regmap_read(priv->regmap, I2S_DIV0_LEVEL, &priv->suspend_div0_level);
++	regmap_read(priv->regmap, I2S_DIV3_LEVEL, &priv->suspend_div3_level);
++	regmap_read(priv->regmap, I2S_IISCNF_IN, &priv->suspend_iiscnf_in);
++	regmap_read(priv->regmap, I2S_FSSTA, &priv->suspend_fssta);
++	regmap_read(priv->regmap, I2S_IISCNF_OUT, &priv->suspend_ii2cnf_out);
++	regmap_read(priv->regmap, I2S_FADTLR, &priv->suspend_fadtlr);
++	regmap_read(priv->regmap, I2S_SCCR, &priv->suspend_sccr);
++	regmap_read(priv->regmap, I2S_TXFTLR, &priv->suspend_txftlr);
++	regmap_read(priv->regmap, I2S_RXFTLR, &priv->suspend_rxftlr);
++	regmap_read(priv->regmap, I2S_IMR, &priv->suspend_imr);
++	regmap_read(priv->regmap, I2S_DMATDLR, &priv->suspend_dmatdlr);
++	regmap_read(priv->regmap, I2S_DMARDLR, &priv->suspend_dmardlr);
++	regmap_read(priv->regmap, I2S_FUNCMODE, &priv->suspend_funcmode);
++
++	if (strcmp(priv->name, AP_I2S)) {
++		regmap_read(priv->audio_cpr_regmap, CPR_PERI_DIV_SEL_REG,
++			    &priv->cpr_peri_div_sel);
++		regmap_read(priv->audio_cpr_regmap, CPR_PERI_CTRL_REG,
++			    &priv->cpr_peri_ctrl);
++		regmap_read(priv->audio_cpr_regmap, CPR_PERI_CLK_SEL_REG,
++			    &priv->cpr_peri_clk_sel);
++	}
++	reset_control_assert(priv->rst);
++
++	pm_runtime_put_sync(dev);
++
++	return 0;
++}
++
++static int th1520_i2s_resume(struct device *dev)
++{
++	struct th1520_i2s_priv *priv = dev_get_drvdata(dev);
++
++	pm_runtime_get_sync(dev);
++
++	reset_control_deassert(priv->rst);
++	if (strcmp(priv->name, AP_I2S)) {
++		regmap_write(priv->audio_cpr_regmap, CPR_PERI_CTRL_REG,
++			     priv->cpr_peri_ctrl);
++		regmap_write(priv->audio_cpr_regmap, CPR_PERI_CLK_SEL_REG,
++			     priv->cpr_peri_clk_sel);
++		regmap_write(priv->audio_cpr_regmap, CPR_PERI_DIV_SEL_REG,
++			     priv->cpr_peri_div_sel);
++	}
++
++	regmap_write(priv->regmap, I2S_IISEN, 0);
++	regmap_write(priv->regmap, I2S_FSSTA, priv->suspend_fssta);
++	regmap_write(priv->regmap, I2S_FUNCMODE,
++		     priv->suspend_funcmode |
++		     	FUNCMODE_TMODE_WEN |
++		     	FUNCMODE_RMODE_WEN);
++	regmap_write(priv->regmap, I2S_IISCNF_IN, priv->suspend_iiscnf_in);
++	regmap_write(priv->regmap, I2S_IISCNF_OUT, priv->suspend_ii2cnf_out);
++	regmap_write(priv->regmap, I2S_DIV0_LEVEL, priv->suspend_div0_level);
++	regmap_write(priv->regmap, I2S_DIV3_LEVEL, priv->suspend_div3_level);
++
++	pm_runtime_put_sync(dev);
++
++    return 0;
++}
++#endif
++
++static const struct of_device_id th1520_i2s_of_match[] = {
++	{ .compatible = "xuantie,th1520-i2s"},
++	{},
++};
++MODULE_DEVICE_TABLE(of, th1520_i2s_of_match);
++
++static ssize_t th1520_i2s_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
++{
++        return 0;
++}
++
++static ssize_t th1520_i2s_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++        u32 value, i;
++        struct th1520_i2s_priv *priv = dev_get_drvdata(dev);
++
++        for (i = I2S_IISEN; i <= I2S_DR4; i+=0x4) {
++			value = readl(priv->regs + i);
++			printk("i2s reg[0x%x]=0x%x\n", i, value);
++        }
++
++        for (i = 0; i <= 0xfc ; i+=0x4) {
++			regmap_read(priv->audio_cpr_regmap,  i, &value);
++			printk("cpr reg[0x%x]=0x%x\n", i, value);
++        }
++
++        return 0;
++}
++
++static DEVICE_ATTR(registers, 0644, th1520_i2s_show, th1520_i2s_store);
++
++static struct attribute *th1520_i2s_debug_attrs[] = {
++        &dev_attr_registers.attr,
++        NULL,
++};
++
++static struct attribute_group th1520_i2s_debug_attr_group = {
++        .name   = "th1520_i2s_debug",
++        .attrs  = th1520_i2s_debug_attrs,
++};
++
++
++static int th1520_audio_i2s_probe(struct platform_device *pdev)
++{
++	int ret;
++	unsigned int irq;
++	const char *sprop;
++	const uint32_t *iprop;
++	struct resource *res;
++	struct th1520_i2s_priv *i2s_priv;
++	struct device *dev = &pdev->dev;
++	struct device_node *np = pdev->dev.of_node;
++	struct reset_control *resets;
++
++	pr_info("%s 1\n", __func__);
++	i2s_priv = devm_kzalloc(&pdev->dev, sizeof(*i2s_priv), GFP_KERNEL);
++
++	if (!i2s_priv)
++		return -ENOMEM;
++
++	pr_info("%s 2\n", __func__);
++	i2s_priv->dev = dev;
++
++	if (strstr(pdev->name, AP_I2S)) {
++		strcpy(i2s_priv->name, AP_I2S);
++	}
++	else if (strstr(pdev->name, AUDIO_I2S0)) {
++		strcpy(i2s_priv->name, AUDIO_I2S0);
++	}
++	else if (strstr(pdev->name, AUDIO_I2S1)) {
++		strcpy(i2s_priv->name, AUDIO_I2S1);
++	}
++	else if (strstr(pdev->name, AUDIO_I2S2)) {
++		strcpy(i2s_priv->name, AUDIO_I2S2);
++	}
++	else {
++		pr_err("unsupport audio dev name: %s\n", pdev->name);
++		return -EINVAL;
++	}
++
++	pr_info("%s 3\n", __func__);
++	dev_set_drvdata(&pdev->dev, i2s_priv);
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++
++	i2s_priv->regs = devm_ioremap_resource(dev, res);
++
++	if (IS_ERR(i2s_priv->regs))
++		return PTR_ERR(i2s_priv->regs);
++
++	pr_info("%s 4\n", __func__);
++	i2s_priv->regmap = devm_regmap_init_mmio(&pdev->dev, i2s_priv->regs,
++						 &th1520_i2s_regmap_config);
++	if (IS_ERR(i2s_priv->regmap)) {
++			dev_err(&pdev->dev,
++				"Failed to initialise managed register map\n");
++			return PTR_ERR(i2s_priv->regmap);
++	}
++
++	pr_info("%s 5\n", __func__);
++	if (strcmp(i2s_priv->name, AP_I2S)) {
++		i2s_priv->audio_cpr_regmap =
++			syscon_regmap_lookup_by_phandle(np, "audio-cpr-regmap");
++		if (IS_ERR(i2s_priv->audio_cpr_regmap)) {
++			dev_err(&pdev->dev,
++				"cannot find regmap for audio cpr register\n");
++		} else
++			th1520_audio_cpr_set(i2s_priv, CPR_PERI_DIV_SEL_REG,
++					     CPR_AUDIO_DIV1_SEL_MSK,
++					     CPR_AUDIO_DIV1_SEL(5));
++
++		// enable i2s sync
++		th1520_audio_cpr_set(i2s_priv, CPR_PERI_CTRL_REG,
++						CPR_I2S_SYNC_MSK, CPR_I2S_SYNC_EN);
++	}
++
++	pr_info("%s 6\n", __func__);
++	resets = devm_reset_control_get_optional_shared(&pdev->dev, NULL);
++	if (IS_ERR(resets)) {
++		ret = PTR_ERR(resets);
++		return ret;
++	}
++	pr_info("%s 7\n", __func__);
++	i2s_priv->rst = resets;
++
++	irq = platform_get_irq(pdev, 0);
++
++	if (!res || (int)irq <= 0) {
++		dev_err(&pdev->dev, "Not enough th1520 platform resources.\n");
++		return -ENODEV;
++	}
++
++	pr_info("%s 8\n", __func__);
++	i2s_priv->clk = devm_clk_get(&pdev->dev, "pclk");
++	if (IS_ERR(i2s_priv->clk))
++                return PTR_ERR(i2s_priv->clk);
++
++	pr_info("%s 9\n", __func__);
++	reset_control_deassert(i2s_priv->rst);
++
++	pm_runtime_enable(&pdev->dev);
++	// clk gate is enabled by hardware as default register value
++	pm_runtime_resume_and_get(&pdev->dev);
++	pm_runtime_put_sync(&pdev->dev);
++
++	i2s_priv->dma_params_tx.addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
++	i2s_priv->dma_params_rx.addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
++	i2s_priv->dma_params_tx.maxburst = I2S_DMA_MAXBURST;
++	i2s_priv->dma_params_rx.maxburst = I2S_DMA_MAXBURST;
++
++	i2s_priv->dma_params_tx.addr = res->start + I2S_DR;
++	i2s_priv->dma_params_rx.addr = res->start + I2S_DR;
++
++	th1520_pcm_probe(pdev, i2s_priv, TH1520_I2S_DMABUF_SIZE);
++
++	ret = devm_snd_soc_register_component(&pdev->dev,
++					      &th1520_i2s_soc_component,
++					      th1520_i2s_soc_dai,
++					      ARRAY_SIZE(th1520_i2s_soc_dai));
++	if (ret < 0) {
++		dev_err(&pdev->dev, "cannot snd component register\n");
++		goto err_pm_disable;
++	}
++
++	pr_info("%s 10\n", __func__);
++	ret = sysfs_create_group(&dev->kobj, &th1520_i2s_debug_attr_group);
++	if (ret) {
++			pr_err("failed to create attr group\n");
++	}
++
++	pr_info("%s 11\n", __func__);
++	return ret;
++
++err_pm_disable:
++	pm_runtime_disable(&pdev->dev);
++
++	return ret;
++}
++
++static int th1520_i2s_remove(struct platform_device *pdev)
++{
++        struct th1520_i2s_priv *i2s_priv = dev_get_drvdata(&pdev->dev);
++
++        pm_runtime_disable(&pdev->dev);
++        if (!pm_runtime_status_suspended(&pdev->dev))
++                th1520_i2s_runtime_suspend(&pdev->dev);
++
++        clk_disable_unprepare(i2s_priv->clk);
++
++        return 0;
++}
++
++static const struct dev_pm_ops th1520_i2s_pm_ops = {
++        SET_RUNTIME_PM_OPS(th1520_i2s_runtime_suspend,
++        		   th1520_i2s_runtime_resume, NULL)
++	SET_SYSTEM_SLEEP_PM_OPS(th1520_i2s_suspend, th1520_i2s_resume)
++};
++
++static struct platform_driver th1520_i2s_driver = {
++	.driver 	= {
++		.name		= "th1520-pcm-audio",
++		.pm		= &th1520_i2s_pm_ops,
++		.of_match_table = th1520_i2s_of_match,
++	},
++	.probe		= th1520_audio_i2s_probe,
++	.remove		= th1520_i2s_remove,
++};
++
++module_platform_driver(th1520_i2s_driver);
++
++MODULE_AUTHOR("shuofeng.ren <shuofeng.rsf@linux.alibaba.com>");
++MODULE_DESCRIPTION("Xuantie TH1520 audio driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/sound/soc/xuantie/th1520-i2s.h b/sound/soc/xuantie/th1520-i2s.h
+new file mode 100644
+index 000000000000..ae261b8e0dd8
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-i2s.h
+@@ -0,0 +1,548 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * XuanTie TH1520 audio I2S audio support
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Shuofeng Ren <shuofeng.rsf@linux.alibaba.com>
++ *
++ */
++ 
++#ifndef _TH1520_I2S_H
++#define _TH1520_I2S_H
++
++#include <linux/clk.h>
++#include <linux/device.h>
++#include <linux/io.h>
++#include <linux/regmap.h>
++#include <linux/types.h>
++#include <sound/dmaengine_pcm.h>
++
++#define I2S_IISEN	0x000 /* IIS Enable Register */
++#define I2S_FUNCMODE	0x004 /* IIS function mode */
++#define I2S_IISCNF_IN	0x008 /* IIS interface configuration in (on RX side) */
++#define I2S_FSSTA	0x00c /* IIS ATX audio input control/state register */
++#define I2S_IISCNF_OUT	0x010 /* IIS interface configuration in (on TX side) */
++#define I2S_FADTLR	0x014 /* IIS Fs auto detected Threshold level register */
++#define I2S_SCCR	0x018 /* Sample compress control register */
++#define I2S_TXFTLR	0x01c /* Transmit FIFO Threshold Level */
++#define I2S_RXFTLR	0x020 /* Receive FIFO Threshold Level */
++#define I2S_TXFLR	0x024 /* Transmit FIFO Level Register */
++#define I2S_RXFLR	0x028 /* Receive FIFO Level Register */
++#define I2S_SR		0x02c /* Status Register */
++#define I2S_IMR		0x030 /* Interrupt Mask Register */
++#define I2S_ISR		0x034 /* Interrupt Status Register */
++#define I2S_RISR	0x038 /* Raw Interrupt Status Register */
++#define I2S_ICR		0x03c /* FIFO Interrupt Clear Register */
++#define I2S_DMACR	0x040 /* DMA Control Register */
++#define I2S_DMATDLR	0x044 /* DMA Transmit Data Level */
++#define I2S_DMARDLR	0x048 /* DMA Receive Data Level */
++#define I2S_DR		0x04C /* Data Register */
++#define I2S_DIV0_LEVEL	0x050 /* Divide i2s_clkgen source clock, get mclk_o */
++#define I2S_DIV3_LEVEL	0x054 /* Divide i2s_clkgen source clock, get reference clock */
++#define RESERVED	0x058 /* RESERVED */
++#define RESERVED1	0x05C /* RESERVED */
++#define I2S_DR1		0x060 /* CH1_Data Register */
++#define I2S_DR2		0x064 /* CH2_Data Register */
++#define I2S_DR3		0x068 /* CH3_Data Register */
++#define I2S_DR4		0x06C /* CH4_Data Register */
++
++/* IISEN , offset: 0x00 */
++#define IISEN_I2SEN_POS			(0U)
++#define IISEN_I2SEN_MSK			(0x1U << IISEN_I2SEN_POS)
++#define IISEN_I2SEN			IISEN_I2SEN_MSK
++
++/* FUNCMODE, offset: 0x04 */
++#define FUNCMODE_TMODE_Pos		(0U)
++#define FUNCMODE_TMODE_Msk		(0x1U << FUNCMODE_TMODE_Pos)
++#define FUNCMODE_TMODE			FUNCMODE_TMODE_Msk
++
++#define FUNCMODE_TMODE_WEN_Pos		(1U)
++#define FUNCMODE_TMODE_WEN_Msk		(0x1U << FUNCMODE_TMODE_WEN_Pos)
++#define FUNCMODE_TMODE_WEN		FUNCMODE_TMODE_WEN_Msk
++
++#define FUNCMODE_RMODE_Pos		(4U)
++#define FUNCMODE_RMODE_Msk		(0x1U << FUNCMODE_RMODE_Pos)
++#define FUNCMODE_RMODE			FUNCMODE_RMODE_Msk
++
++#define FUNCMODE_RMODE_WEN_Pos		(5U)
++#define FUNCMODE_RMODE_WEN_Msk		(0x1U << FUNCMODE_RMODE_WEN_Pos)
++#define FUNCMODE_RMODE_WEN		FUNCMODE_RMODE_WEN_Msk
++
++#define FUNCMODE_CH0_ENABLE_Pos		(8U)
++#define FUNCMODE_CH0_ENABLE_Msk		(0x1U << FUNCMODE_CH0_ENABLE_Pos)
++#define FUNCMODE_CH0_ENABLE		FUNCMODE_CH0_ENABLE_Msk
++
++#define FUNCMODE_CH1_ENABLE_Pos		(9U)
++#define FUNCMODE_CH1_ENABLE_Msk		(0x1U << FUNCMODE_CH1_ENABLE_Pos)
++#define FUNCMODE_CH1_ENABLE		FUNCMODE_CH1_ENABLE_Msk
++
++#define FUNCMODE_CH2_ENABLE_Pos		(10U)
++#define FUNCMODE_CH2_ENABLE_Msk		(0x1U << FUNCMODE_CH2_ENABLE_Pos)
++#define FUNCMODE_CH2_ENABLE		FUNCMODE_CH2_ENABLE_Msk
++
++#define FUNCMODE_CH3_ENABLE_Pos		(11U)
++#define FUNCMODE_CH3_ENABLE_Msk		(0x1U << FUNCMODE_CH3_ENABLE_Pos)
++#define FUNCMODE_CH3_ENABLE		FUNCMODE_CH3_ENABLE_Msk
++
++#define FUNCMODE_CH4_ENABLE_Pos		(12U)
++#define FUNCMODE_CH4_ENABLE_Msk		(0x1U << FUNCMODE_CH4_ENABLE_Pos)
++#define FUNCMODE_CH4_ENABLE		FUNCMODE_CH4_ENABLE_Msk
++
++/* IISCNFIN, offset: 0x08 */
++#define CNFIN_RSAFS_Pos			(0U)
++#define CNFIN_RSAFS_Msk			(0x3U << CNFIN_RSAFS_Pos)
++#define CNFIN_RSAFS_I2S			(0x0U << CNFIN_RSAFS_Pos)
++#define CNFIN_RSAFS_RIGHT_JUSTIFIED	(0x1U << CNFIN_RSAFS_Pos)
++#define CNFIN_RSAFS_LEFT_JUSTIFIED	(0x2U << CNFIN_RSAFS_Pos)
++#define CNFIN_RSAFS_PCM			(0x3U << CNFIN_RSAFS_Pos)
++
++#define CNFIN_RALOLRC_Pos		(2U)
++#define CNFIN_RALOLRC_Msk		(0x1U << CNFIN_RALOLRC_Pos)
++#define CNFIN_RALOLRC_HIGHFORLEFT	CNFIN_RALOLRC_Msk
++
++#define CNFIN_RVOICEEN_Pos		(4U)
++#define CNFIN_RVOICEEN_Msk		(0x1U << CNFIN_RVOICEEN_Pos)
++#define CNFIN_RVOICEEN_MONO		CNFIN_RVOICEEN_Msk
++
++#define CNFIN_RX_CH_SEL_Pos		(5U)
++#define CNFIN_RX_CH_SEL_Msk		(0x1U << CNFIN_RX_CH_SEL_Pos)
++#define CNFIN_RX_CH_SEL_LEFT		CNFIN_RX_CH_SEL_Msk
++
++#define CNFIN_I2S_RXMODE_Pos		(8U)
++#define CNFIN_I2S_RXMODE_Msk		(0x1U << CNFIN_I2S_RXMODE_Pos)
++#define CNFIN_I2S_RXMODE_MASTER_MODE	CNFIN_I2S_RXMODE_Msk
++
++#define CNFIN_I2S_RX_CLK_SEL_Pos	(9U)
++#define CNFIN_I2S_RX_CLK_SEL_Msk	(0x1U << CNFIN_I2S_RX_CLK_SEL_Pos)
++#define CNFIN_I2S_RX_CLK_SEL_MCLK	CNFIN_I2S_RX_CLK_SEL_Msk
++
++#define CNFIN_I2S_RDELAY_Pos		(12U)
++#define CNFIN_I2S_RDELAY_Msk		(0x3U << CNFIN_I2S_RDELAY_Pos)
++#define CNFIN_I2S_RDELAY_NO_DELAY	(0x0U << CNFIN_I2S_RDELAY_Pos)
++#define CNFIN_I2S_RDELAY_1_DELAY	(0x1U << CNFIN_I2S_RDELAY_Pos)
++#define CNFIN_I2S_RDELAY_2_DELAY	(0x2U << CNFIN_I2S_RDELAY_Pos)
++#define CNFIN_I2S_RDELAY_3_DELAY	(0x3U << CNFIN_I2S_RDELAY_Pos)
++
++/* FSSTA , offset: 0x0C */
++#define FSSTA_AIRAD_Pos			(0U)
++#define FSSTA_AIRAD_Msk			(0x1U << FSSTA_AIRAD_Pos)
++#define FSSTA_AIRAD			FSSTA_AIRAD_Msk
++
++#define FSSTA_AFR_Pos			(4U)
++#define FSSTA_AFR_Msk			(0x3U << FSSTA_AFR_Pos)
++#define FSSTA_AFR_88_2KSPS		(0x0U << FSSTA_AFR_Pos)
++#define FSSTA_AFR_96KSPS		(0x1U << FSSTA_AFR_Pos)
++#define FSSTA_AFR_64KSPS		(0x2U << FSSTA_AFR_Pos)
++#define FSSTA_AFR_192KSPS		(0x3U << FSSTA_AFR_Pos)
++
++#define FSSTA_ARS_Pos			(6U)
++#define FSSTA_ARS_Msk			(0x3U << FSSTA_ARS_Pos)
++#define FSSTA_ARS_1			(0x0U << FSSTA_ARS_Pos)
++#define FSSTA_ARS_0_5			(0x1U << FSSTA_ARS_Pos)
++#define FSSTA_ARS_0_25			(0x2U << FSSTA_ARS_Pos)
++#define FSSTA_ARS_0_125			(0x3U << FSSTA_ARS_Pos)
++
++#define FSSTA_DATAWTH_Pos		(8U)
++#define FSSTA_DATAWTH_Msk		(0xFU << FSSTA_DATAWTH_Pos)
++
++#define FSSTA_SCLK_SEL_Pos		(12U)
++#define FSSTA_SCLK_SEL_Msk		(0x3U << FSSTA_SCLK_SEL_Pos)
++#define FSSTA_SCLK_SEL_32		(0x0U << FSSTA_SCLK_SEL_Pos)
++#define FSSTA_SCLK_SEL_48		(0x1U << FSSTA_SCLK_SEL_Pos)
++#define FSSTA_SCLK_SEL_64		(0x2U << FSSTA_SCLK_SEL_Pos)
++#define FSSTA_SCLK_SEL_16		(0x3U << FSSTA_SCLK_SEL_Pos)
++
++
++#define FSSTA_MCLK_SEL_Pos		(16U)
++#define FSSTA_MCLK_SEL_Msk		(0x1U << FSSTA_MCLK_SEL_Pos)
++#define FSSTA_MCLK_SEL_384		FSSTA_MCLK_SEL_Msk
++
++/* IISCNFOUT, offset: 0x10 */
++#define IISCNFOUT_TSAFS_POS		(0U)
++#define IISCNFOUT_TSAFS_MSK		(0x3U << IISCNFOUT_TSAFS_POS)
++#define IISCNFOUT_TSAFS_I2S		(0x0U << IISCNFOUT_TSAFS_POS)
++#define IISCNFOUT_TSAFS_RIGHT_JUSTIFIED	(0x1U << IISCNFOUT_TSAFS_POS)
++#define IISCNFOUT_TSAFS_LEFT_JUSTIFIED	(0x2U << IISCNFOUT_TSAFS_POS)
++#define IISCNFOUT_TSAFS_PCM		(0x3U << IISCNFOUT_TSAFS_POS)
++
++#define IISCNFOUT_TALOLRC_Pos		(2U)
++#define IISCNFOUT_TALOLRC_Msk		(0x1U << IISCNFOUT_TALOLRC_Pos)
++#define IISCNFOUT_TALOLRC_HIGHFORLEFT	IISCNFOUT_TALOLRC_Msk
++
++#define IISCNFOUT_TX_VOICE_EN_Pos	(3U)
++#define IISCNFOUT_TX_VOICE_EN_Msk	(0x1U << IISCNFOUT_TX_VOICE_EN_Pos)
++#define IISCNFOUT_TX_VOICE_EN_MONO	IISCNFOUT_TX_VOICE_EN_Msk
++
++#define IISCNFOUT_I2S_TXMODE_Pos	(4U)
++#define IISCNFOUT_I2S_TXMODE_Msk	(0x1U << IISCNFOUT_I2S_TXMODE_Pos)
++#define IISCNFOUT_I2S_TXMODE_SLAVE	IISCNFOUT_I2S_TXMODE_Msk
++
++#define IISCNFOUT_TX_CLK_SEL_Pos	(5U)
++#define IISCNFOUT_TX_CLK_SEL_Msk	(0x1U << IISCNFOUT_TX_CLK_SEL_Pos)
++#define IISCNFOUT_TX_CLK_SEL_MCLK	IISCNFOUT_TX_CLK_SEL_Msk
++
++/* FADTLR, offset: 0x14 */
++#define FADTLR_96FTR_Pos		(0U)
++#define FADTLR_96FTR_Msk		(0x3FU << FADTLR_96FTR_Pos)
++
++#define FADTLR_88FTR_Pos		(8U)
++#define FADTLR_88FTR_Msk		(0x3FU << FADTLR_88FTR_Pos)
++
++#define FADTLR_64FTR_Pos		(16U)
++#define FADTLR_64FTR_Msk		(0x3FU << FADTLR_64FTR_Pos)
++
++#define FADTLR_192FTR_Pos		(24U)
++#define FADTLR_192FTR_Msk		(0x3FU << FADTLR_192FTR_Pos)
++
++/* SCCR, offset: 0x18 */
++#define SCCR_RVCCR_Pos			(0U)
++#define SCCR_RVCCR_Msk			(0x1FU << SCCR_RVCCR_Pos)
++
++#define SCCR_SSRCR_Pos			(5U)
++#define SCCR_SSRCR_Msk			(0x3U << SCCR_SSRCR_Pos)
++#define SCCR_SSRCR_NO_COMPRESS		(0x0U << SCCR_SSRCR_Pos)
++#define SCCR_SSRCR_ONE_COMPRESS		(0x1U << SCCR_SSRCR_Pos)
++#define SCCR_SSRCR_THREE_COMPRESS	(0x2U << SCCR_SSRCR_Pos)
++
++#define SCCR_TVCCR_Pos			(8U)
++#define SCCR_TVCCR_Msk			(0x3U << SCCR_TVCCR_Pos)
++#define SCCR_TVCCR_NO_COMPRESS		(0x0U << SCCR_TVCCR_Pos)
++#define SCCR_TVCCR_ONE_COMPRESS		(0x1U << SCCR_TVCCR_Pos)
++#define SCCR_TVCCR_THREE_COMPRESS	(0x2U << SCCR_TVCCR_Pos)
++
++/* TXFTLR, offset: 0x1C */
++#define TXFTLR_TFT_Pos			(0U)
++#define TXFTLR_TFT_Msk			(0xFU << TXFTLR_TFT_Pos)
++
++/* RXFTLR, offset: 0x20 */
++#define RXFTLR_RFT_Pos			(0U)
++#define RXFTLR_RFT_Msk			(0xFU << RXFTLR_RFT_Pos)
++
++/* TXFLR, offset: 0x24 */
++#define TXFLR_TXTFL_Pos			(0U)
++
++/* RXFLR, offset: 0x28 */
++#define RXFLR_RXTFL_Pos			(0U)
++
++/* SR, offset: 0x2C */
++#define SR_RXBUSY_Pos			(0U)
++#define SR_RXBUSY_Msk			(0x1U << SR_RXBUSY_Pos)
++#define SR_RXBUSY_STATUS		SR_RXBUSY_Msk
++
++#define SR_TXBUSY_Pos			(1U)
++#define SR_TXBUSY_Msk			(0x1U << SR_TXBUSY_Pos)
++#define SR_TXBUSY_STATUS		SR_TXBUSY_Msk
++
++#define SR_TFNF_Pos			(2U)
++#define SR_TFNF_Msk			(0x1U << SR_TFNF_Pos)
++#define SR_TFNF_TX_FIFO_NOT_FULL	SR_TFNF_Msk
++
++#define SR_TFE_Pos			(3U)
++#define SR_TFE_Msk			(0x1U << SR_TFE_Pos)
++#define SR_TFE_TX_FIFO_EMPTY		SR_TFE_Msk
++
++#define SR_RFNE_Pos			(4U)
++#define SR_RFNE_Msk			(0x1U << SR_RFNE_Pos)
++#define SR_RFNE_RX_FIFO_NOT_EMPTY	SR_RFNE_Msk
++
++#define SR_RFF_Pos			(5U)
++#define SR_RFF_Msk			(0x1U << SR_RFF_Pos)
++#define SR_RFF_RX_FIFO_FULL		SR_RFF_Msk
++
++/* IMR, offset: 0x30 */
++#define IMR_WADEM_Pos			(0U)
++#define IMR_WADEM_Msk			(0x1U << IMR_WADEM_Pos)
++#define IMR_WADEM_INTR_MSK		IMR_WADEM_Msk
++
++#define IMR_TXUIRM_Pos			(1U)
++#define IMR_TXUIRM_Msk			(0x1U << IMR_TXUIRM_Pos)
++#define IMR_TXUIRM_INTR_MSK		IMR_TXUIRM_Msk
++
++#define IMR_TXOIM_Pos			(2U)
++#define IMR_TXOIM_Msk			(0x1U << IMR_TXOIM_Pos)
++#define IMR_TXOIM_INTR_MSK		IMR_TXOIM_Msk
++
++#define IMR_RXUIM_Pos			(3U)
++#define IMR_RXUIM_Msk			(0x1U << IMR_RXUIM_Pos)
++#define IMR_RXUIM_INTR_MSK		IMR_RXUIM_Msk
++
++#define IMR_RXOIM_Pos			(4U)
++#define IMR_RXOIM_Msk			(0x1U << IMR_RXOIM_Pos)
++#define IMR_RXOIM_INTR_MSK		IMR_RXOIM_Msk
++
++#define IMR_TXEIM_Pos			(5U)
++#define IMR_TXEIM_Msk			(0x1U << IMR_TXEIM_Pos)
++#define IMR_TXEIM_INTR_MSK		IMR_TXEIM_Msk
++
++#define IMR_RXFIM_Pos			(6U)
++#define IMR_RXFIM_Msk			(0x1U << IMR_RXFIM_Pos)
++#define IMR_RXFIM_INTR_MSK		IMR_RXFIM_Msk
++
++#define IMR_IRBFCM_Pos			(7U)
++#define IMR_IRBFCM_Msk			(0x1U << IMR_IRBFCM_Pos)
++#define IMR_IRBFCM_INTR_MSK		IMR_IRBFCM_Msk
++
++#define IMR_ITBFCM_Pos			(8U)
++#define IMR_ITBFCM_Msk			(0x1U << IMR_ITBFCM_Pos)
++#define IMR_ITBFCM_INTR_MSK		IMR_ITBFCM_Msk
++
++#define IMR_IFSCM_Pos			(9U)
++#define IMR_IFSCM_Msk			(0x1U << IMR_IFSCM_Pos)
++#define IMR_IFSCM_INTR_MSK		IMR_IFSCM_Msk
++
++/* ISR, offset: 0x34 */
++#define ISR_WADES_Pos			(0U)
++#define ISR_WADES_Msk			(0x1U << ISR_WADES_Pos)
++#define ISR_WADES_STATUS		ISR_WADES_Msk
++
++#define ISR_TXUIRS_Pos			(1U)
++#define ISR_TXUIRS_Msk			(0x1U << ISR_TXUIRS_Pos)
++#define ISR_TXUIRS_STATUS		ISR_TXUIRS_Msk
++
++#define ISR_TXOIS_Pos			(2U)
++#define ISR_TXOIS_Msk			(0x1U << ISR_TXOIS_Pos)
++#define ISR_TXOIS_STATUS		ISR_TXOIS_Msk
++
++#define ISR_RXUIS_Pos			(3U)
++#define ISR_RXUIS_Msk			(0x1U << ISR_RXUIS_Pos)
++#define ISR_RXUIS_STATUS		ISR_RXUIS_Msk
++
++#define ISR_RXOIS_Pos			(4U)
++#define ISR_RXOIS_Msk			(0x1U << ISR_RXOIS_Pos)
++#define ISR_RXOIS_STATUS		ISR_RXOIS_Msk
++
++#define ISR_TXEIS_Pos			(5U)
++#define ISR_TXEIS_Msk			(0x1U << ISR_TXEIS_Pos)
++#define ISR_TXEIS_STATUS		ISR_TXEIS_Msk
++
++#define ISR_RXFIS_Pos			(6U)
++#define ISR_RXFIS_Msk			(0x1U << ISR_RXFIS_Pos)
++#define ISR_RXFIS_STATUS		ISR_RXFIS_Msk
++
++#define ISR_IRBFCS_Pos			(7U)
++#define ISR_IRBFCS_Msk			(0x1U << ISR_IRBFCS_Pos)
++#define ISR_IRBFCS_STATUS		ISR_IRBFCS_Msk
++
++#define ISR_ITBFCS_Pos			(8U)
++#define ISR_ITBFCS_Msk			(0x1U << ISR_ITBFCS_Pos)
++#define ISR_ITBFCS_STATUS		ISR_ITBFCS_Msk
++
++#define ISR_IFSCS_Pos			(9U)
++#define ISR_IFSCS_Msk			(0x1U << ISR_IFSCS_Pos)
++#define ISR_IFSCS_STATUS		ISR_IFSCS_Msk
++
++/* RISR, offset: 0x38 */
++#define RISR_RWADES_Pos			(0U)
++#define RISR_RWADES_Msk			(0x1U << RISR_RWADES_Pos)
++#define RISR_RWADES_RAW			RISR_RWADES_Msk
++
++#define RISR_TXUIR_Pos			(1U)
++#define RISR_TXUIR_Msk			(0x1U << RISR_TXUIR_Pos)
++#define RISR_TXUIR_RAW			RISR_TXUIR_Msk
++
++#define RISR_TXOIR_Pos			(2U)
++#define RISR_TXOIR_Msk			(0x1U << RISR_TXOIR_Pos)
++#define RISR_TXOIR_RAW			RISR_TXOIR_Msk
++
++#define RISR_RXUIR_Pos			(3U)
++#define RISR_RXUIR_Msk			(0x1U << RISR_RXUIR_Pos)
++#define RISR_RXUIR_RAW			RISR_RXUIR_Msk
++
++#define RISR_RXOIR_Pos			(4U)
++#define RISR_RXOIR_Msk			(0x1U << RISR_RXOIR_Pos)
++#define RISR_RXOIR_RAW			RISR_RXOIR_Msk
++
++#define RISR_TXEIR_Pos			(5U)
++#define RISR_TXEIR_Msk			(0x1U << RISR_TXEIR_Pos)
++#define RISR_TXEIR_RAW			RISR_TXEIR_Msk
++
++#define RISR_RXFIR_Pos			(6U)
++#define RISR_RXFIR_Msk			(0x1U << RISR_RXFIR_Pos)
++#define RISR_RXFIR_RAW			RISR_RXFIR_Msk
++
++#define RISR_RIRBFCS_Pos		(7U)
++#define RISR_RIRBFCS_Msk		(0x1U << RISR_RIRBFCS_Pos)
++#define RISR_RIRBFCS_RAW		RISR_RIRBFCS_Msk
++
++#define RISR_RITBFCS_Pos		(8U)
++#define RISR_RITBFCS_Msk		(0x1U << RISR_RITBFCS_Pos)
++#define RISR_RITBFCS_RAW		RISR_RITBFCS_Msk
++
++#define RISR_RIFSCS_Pos			(9U)
++#define RISR_RIFSCS_Msk			(0x1U << RISR_RIFSCS_Pos)
++#define RISR_RIFSCS_RAW			RISR_RIFSCS_Msk
++
++/* ICR, offset: 0x3C */
++#define ICR_CWADEC_Pos			(0U)
++#define ICR_CWADEC_Msk			(0x1U << ICR_CWADEC_Pos)
++#define ICR_CWADEC_CLEAR		ICR_CWADEC_Msk
++
++#define ICR_TXUIC_Pos			(1U)
++#define ICR_TXUIC_Msk			(0x1U << ICR_TXUIC_Pos)
++#define ICR_TXUIC_CLEAR			ICR_TXUIC_Msk
++
++#define ICR_TXOIC_Pos			(2U)
++#define ICR_TXOIC_Msk			(0x1U << ICR_TXOIC_Pos)
++#define ICR_TXOIC_CLEAR			ICR_TXOIC_Msk
++
++#define ICR_RXUIC_Pos			(3U)
++#define ICR_RXUIC_Msk			(0x1U << ICR_RXUIC_Pos)
++#define ICR_RXUIC_CLEAR			ICR_RXUIC_Msk
++
++#define ICR_RXOIC_Pos			(4U)
++#define ICR_RXOIC_Msk			(0x1U << ICR_RXOIC_Pos)
++#define ICR_RXOIC_CLEAR			ICR_RXOIC_Msk
++
++#define ICR_TXEIC_Pos			(5U)
++#define ICR_TXEIC_Msk			(0x1U << ICR_TXEIC_Pos)
++#define ICR_TXEIC_CLEAR			ICR_TXEIC_Msk
++
++#define ICR_RXFIC_Pos			(6U)
++#define ICR_RXFIC_Msk			(0x1U << ICR_RXFIC_Pos)
++#define ICR_RXFIC_CLEAR			ICR_RXFIC_Msk
++
++#define ICR_CRIRBFC_Pos			(7U)
++#define ICR_CRIRBFC_Msk			(0x1U << ICR_CRIRBFC_Pos)
++#define ICR_CRIRBFC_CLEAR		ICR_CRIRBFC_Msk
++
++#define ICR_CRITBFC_Pos			(8U)
++#define ICR_CRITBFC_Msk			(0x1U << ICR_CRITBFC_Pos)
++#define ICR_CRITBFC_CLEAR		ICR_CRITBFC_Msk
++
++#define ICR_CRIFSC_Pos			(9U)
++#define ICR_CRIFSC_Msk			(0x1U << ICR_CRIFSC_Pos)
++#define ICR_CRIFSC_CLEAR		ICR_CRIFSC_Msk
++
++/* DMACR, offset: 0x40 */
++#define DMACR_RDMAE_POS			(0U)
++#define DMACR_RDMAE_MSK			(0x1U << DMACR_RDMAE_POS)
++#define DMACR_RDMAE_EN			DMACR_RDMAE_MSK
++
++#define DMACR_TDMAE_POS			(1U)
++#define DMACR_TDMAE_MSK			(0x1U << DMACR_TDMAE_POS)
++#define DMACR_TDMAE_EN			DMACR_TDMAE_MSK
++
++/* DMATDLR, offset: 0x44 */
++#define DMATDLR_DMATDL_Pos		(0U)
++#define DMATDLR_DMATDL_Msk		(0x1FU << DMATDLR_DMATDL_Pos)
++
++/* DMARDLR, offset: 0x48 */
++#define DMARDLR_DMATDL_Pos		(0U)
++#define DMARDLR_DMATDL_Msk		(0x1FU << DMARDLR_DMATDL_Pos)
++
++/* DR, offset: 0x4C */
++#define DR_DR_Pos			(0U)
++
++/* DIV0LEVEL, offset: 0x50 */
++#define DIV0LEVEL_DIV0_Pos		(0U)
++#define DIV0LEVEL_DIV0_Msk		(0XFFU << DIV0LEVEL_DIV0_Pos)
++
++/* DIV3LEVEL, offset: 0x54 */
++#define DIV3LEVEL_DIV3_Pos		(0U)
++#define DIV0LEVEL_DIV3_Msk		(0XFFU << DIV3LEVEL_DIV3_Pos)
++
++#define I2S_DATA_WIDTH_8BIT		(0xFU << FSSTA_DATAWTH_Pos)
++#define I2S_DATA_8BIT_WIDTH_32BIT	(0xEU << FSSTA_DATAWTH_Pos)
++#define I2S_DATA_WIDTH_16BIT		(0x0U << FSSTA_DATAWTH_Pos)
++#define I2S_DATA_16BIT_WIDTH_32BIT	(0x2U << FSSTA_DATAWTH_Pos)
++#define I2S_DATA_WIDTH_24BIT		(0x5U << FSSTA_DATAWTH_Pos)
++#define I2S_DATA_24BIT_WIDTH_32BIT	(0x7U << FSSTA_DATAWTH_Pos)
++#define I2S_DATA_WIDTH_32BIT		(0xAU << FSSTA_DATAWTH_Pos)
++#define I2S_DATA_WIDTH_32BIT_OUPUT	(0x8U << FSSTA_DATAWTH_Pos)
++
++#define TXFIFO_IRQ_TH			(0x8U)
++#define RXFIFO_IRQ_TH			(0x20U)
++#define I2S_MAX_FIFO			(0x20U)
++
++#define I2S_STATE_IDLE			0
++#define I2S_STATE_TX_RUNNING		1
++#define I2S_STATE_RX_RUNNING		2
++
++#define IIS_SRC_CLK		294912000
++#define AUDIO_IIS_SRC0_CLK	49152000
++#define AUDIO_IIS_SRC1_CLK	135475200
++#define IIS_MCLK_SEL		256
++#define HDMI_DIV_VALUE		2
++#define DIV_DEFAULT		1
++#define MONO_SOURCE		1
++#define STEREO_CHANNEL		2
++
++//for 2ch mode
++#define AP_I2S			"light-i2s"
++#define AUDIO_I2S0		"audio-i2s0"
++#define AUDIO_I2S1		"audio-i2s1"
++#define AUDIO_I2S2		"audio-i2s2"
++
++//for 8ch mode
++#define AUDIO_I2S_8CH_SD0	"i2s-8ch-sd0"
++#define AUDIO_I2S_8CH_SD1	"i2s-8ch-sd1"
++#define AUDIO_I2S_8CH_SD2	"i2s-8ch-sd2"
++#define AUDIO_I2S_8CH_SD3	"i2s-8ch-sd3"
++
++#define TH1520_RATES		SNDRV_PCM_RATE_8000_192000
++#define TH1520_FMTS		(SNDRV_PCM_FMTBIT_S32_LE | \
++				 SNDRV_PCM_FMTBIT_S24_LE | \
++				 SNDRV_PCM_FMTBIT_S16_LE | \
++				 SNDRV_PCM_FMTBIT_S8)
++
++#define TH1520_AUDIO_PAD_CONFIG(idx)   (priv->cfg_off + ((idx-25) >> 1) * 4)
++
++#define I2S_DMA_MAXBURST	4
++#define I2S_DMA_TX_THRESHOLD	16
++#define I2S_DMA_RX_THRESHOLD	16
++
++struct th1520_i2s_priv {
++	void __iomem *base;
++	phys_addr_t phys;
++
++	void __iomem  *regs;
++	struct regmap *regmap;
++	struct regmap *audio_pin_regmap;
++	struct regmap *audio_cpr_regmap;
++	struct reset_control *rst;
++	struct clk *clk;
++	struct snd_dmaengine_dai_dma_data dma_params_tx;
++	struct snd_dmaengine_dai_dma_data dma_params_rx;
++
++	u32 fmt;
++	unsigned int dai_fmt;
++	u32 dma_maxburst;
++	unsigned int cfg_off;
++	u32 mclk_keepon;
++
++	struct device *dev;
++	char name[16];
++	int chan_num:16;
++	unsigned int clk_master:1;
++
++	u32 suspend_iisen;
++	u32 suspend_funcmode;
++	u32 suspend_iiscnf_in;
++	u32 suspend_fssta;
++	u32 suspend_ii2cnf_out;
++	u32 suspend_fadtlr;
++	u32 suspend_sccr;
++	u32 suspend_txftlr;
++	u32 suspend_rxftlr;
++	u32 suspend_imr;
++	u32 suspend_dmacr;
++	u32 suspend_dmatdlr;
++	u32 suspend_dmardlr;
++	u32 suspend_div0_level;
++	u32 suspend_div3_level;
++	u32 cpr_peri_div_sel;
++	u32 cpr_peri_ctrl;
++	u32 cpr_peri_clk_sel;
++
++	u32 state;
++};
++
++int th1520_audio_cpr_set(struct th1520_i2s_priv *chip, unsigned int cpr_off,
++			 unsigned int mask, unsigned int val);
++bool th1520_i2s_wr_reg(struct device *dev, unsigned int reg);
++bool th1520_i2s_rd_reg(struct device *dev, unsigned int reg);
++int th1520_pcm_probe(struct platform_device *pdev, struct th1520_i2s_priv *i2s,
++		     size_t size);
++#endif /* _TH1520_I2S_H */
++
+diff --git a/sound/soc/xuantie/th1520-pcm-dma.c b/sound/soc/xuantie/th1520-pcm-dma.c
+new file mode 100644
+index 000000000000..e6cd75d5f207
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-pcm-dma.c
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * XuanTie TH1520 ALSA Soc Audio Layer DMA init function.
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Shuofeng Ren <shuofeng.rsf@linux.alibaba.com>
++ *
++ */
++ 
++#include <linux/dmaengine.h>
++#include <linux/platform_device.h>
++#include <linux/types.h>
++
++#include <sound/dmaengine_pcm.h>
++
++#include "th1520-pcm.h"
++
++static bool filter(struct dma_chan *chan, void *param)
++{
++	chan->private = param;
++
++	return true;
++}
++
++static const struct snd_dmaengine_pcm_config th1520_dmaengine_pcm_config = {
++	.prepare_slave_config	= snd_dmaengine_pcm_prepare_slave_config,
++	.compat_filter_fn	= filter,
++};
++
++int th1520_pcm_dma_init(struct platform_device *pdev, size_t size)
++{
++	struct snd_dmaengine_pcm_config *config;
++
++	config = devm_kzalloc(&pdev->dev, 
++			      sizeof(struct snd_dmaengine_pcm_config),
++			      GFP_KERNEL);
++	if (!config)
++		return -ENOMEM;
++	*config = th1520_dmaengine_pcm_config;
++
++	return devm_snd_dmaengine_pcm_register(&pdev->dev, config,
++					       SND_DMAENGINE_PCM_FLAG_COMPAT);
++}
++
++MODULE_AUTHOR("shuofeng.ren <shuofeng.rsf@linux.alibaba.com>");
++MODULE_DESCRIPTION("Xuantie TH1520 audio driver");
++MODULE_LICENSE("GPL v2");
+\ No newline at end of file
+diff --git a/sound/soc/xuantie/th1520-pcm.h b/sound/soc/xuantie/th1520-pcm.h
+new file mode 100644
+index 000000000000..3bf95ed2873f
+--- /dev/null
++++ b/sound/soc/xuantie/th1520-pcm.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * XuanTie TH1520 Audio PCM support
++ *
++ * Copyright (C) 2024 Alibaba Group Holding Limited.
++ *
++ * Author: Shuofeng Ren <shuofeng.rsf@linux.alibaba.com>
++ *
++ */
++
++#ifndef _TH1520_PCM_H
++#define _TH1520_PCM_H
++
++#include <linux/device.h>
++
++int th1520_pcm_dma_init(struct platform_device *pdev, size_t size);
++
++#endif /* _TH1520_PCM_H */
+-- 
+2.43.0
+

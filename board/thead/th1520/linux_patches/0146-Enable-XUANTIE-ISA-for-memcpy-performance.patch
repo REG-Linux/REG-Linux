@@ -1,0 +1,174 @@
+From 29c95075605c6fea7d653f1ea4f85c398ae4d594 Mon Sep 17 00:00:00 2001
+From: zhangye <zhangye@linux.alibaba.com>
+Date: Mon, 17 Jun 2024 17:06:41 +0800
+Subject: [PATCH 146/400] Enable XUANTIE ISA for memcpy performance
+
+Sync code from bionic memcpy
+
+Signed-off-by: zhangye <zhangye@linux.alibaba.com>
+---
+ arch/riscv/Kconfig         | 12 +++++
+ arch/riscv/Makefile        |  3 ++
+ arch/riscv/lib/Makefile    |  5 ++
+ arch/riscv/lib/memcpy_xt.S | 96 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 116 insertions(+)
+ create mode 100644 arch/riscv/lib/memcpy_xt.S
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index e04545239045..88161a95d24e 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -675,6 +675,18 @@ source "arch/riscv/Kconfig.vendor"
+ 
+ endmenu # "Platform type"
+ 
++config XUANTIE_ISA
++	bool "XUANTIE ISA in AFLAGS with -march=_xtheadc"
++	default n
++	depends on $(cc-option, -march=rv64imafdcv_xtheadc)
++	help
++	  This config enable XUANTIE custom instruction set.
++	  XUANTIE custom instruction set including more instructions, like cache operation,
++	  computing, bit operation, load and store.
++	  It can imporve performance and reduce code size with XUANTIE toolchain.
++
++	  If unsure, say N.
++
+ menu "Kernel features"
+ 
+ source "kernel/Kconfig.hz"
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 55015669213d..455d84eb76fa 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -71,6 +71,9 @@ endif
+ # Check if the toolchain supports Zihintpause extension
+ riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
+ 
++# XUANTIE ISA
++riscv-march-$(CONFIG_XUANTIE_ISA) := $(riscv-march-y)_xtheadc
++
+ # Remove F,D from isa string for all.
+ KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
+ 
+diff --git a/arch/riscv/lib/Makefile b/arch/riscv/lib/Makefile
+index 26cb2502ecf8..df5568beb612 100644
+--- a/arch/riscv/lib/Makefile
++++ b/arch/riscv/lib/Makefile
+@@ -1,6 +1,11 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ lib-y			+= delay.o
++
++ifeq ($(CONFIG_XUANTIE_ISA),y)
++lib-y			+= memcpy_xt.o
++else
+ lib-y			+= memcpy.o
++endif
+ lib-y			+= memset.o
+ lib-y			+= memmove.o
+ lib-y			+= strcmp.o
+diff --git a/arch/riscv/lib/memcpy_xt.S b/arch/riscv/lib/memcpy_xt.S
+new file mode 100644
+index 000000000000..78846d34499d
+--- /dev/null
++++ b/arch/riscv/lib/memcpy_xt.S
+@@ -0,0 +1,96 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2013 Regents of the University of California
++ */
++
++#include <linux/linkage.h>
++#include <asm/asm.h>
++
++#  define LABLE_ALIGN   \
++        .balignw 16, 0x00000001
++
++/* void *memcpy(void *, const void *, size_t) */
++ENTRY(__memcpy)
++WEAK(memcpy)
++.L_to_memcpy:
++	/* Test if len less than 8 bytes.  */
++	mv      t6, a0
++	sltiu   a3, a2, 8
++	li      t3, 1
++	bnez    a3, .L_copy_by_byte
++
++	andi    a3, a0, 7
++	li      t5, 8
++	/* Test if dest is not 8 bytes aligned.  */
++	bnez    a3, .L_dest_not_aligned
++.L_dest_aligned:
++	/* If dest is aligned, then copy.  */
++	srli    t4, a2, 6
++	/* Test if len less than 64 bytes.  */
++	beqz    t4, .L_len_less_64bytes
++	andi    a2, a2, 63
++
++	LABLE_ALIGN
++.L_len_larger_64bytes:
++	ldd	a4, a5, (a1), 0, 4
++	sdd	a4, a5, (a0), 0, 4
++	ldd	a6, a7, (a1), 1, 4
++	sdd	a6, a7, (a0), 1, 4
++	ldd	a4, a5, (a1), 2, 4
++	sdd	a4, a5, (a0), 2, 4
++	ldd	a6, a7, (a1), 3, 4
++	sub	t4, t4, t3
++	addi    a1, a1, 64
++	sdd	a6, a7, (a0), 3, 4
++	addi    a0, a0, 64
++	bnez	t4, .L_len_larger_64bytes
++
++.L_len_less_64bytes:
++	srli    t4, a2, 2
++	beqz    t4, .L_copy_by_byte
++	andi    a2, a2, 3
++.L_len_less_64bytes_loop:
++	lw      a4, 0(a1)
++	sub	t4, t4, t3
++	addi    a1, a1, 4
++	sw      a4, 0(a0)
++	addi    a0, a0, 4
++	bnez    t4, .L_len_less_64bytes_loop
++
++	/* Copy tail.  */
++.L_copy_by_byte:
++	andi    t4, a2, 7
++	beqz    t4, .L_return
++.L_copy_by_byte_loop:
++	lb      a4, 0(a1)
++	sub	t4, t4, t3
++	addi    a1, a1, 1
++	sb      a4, 0(a0)
++	addi    a0, a0, 1
++	bnez	t4, .L_copy_by_byte_loop
++
++.L_return:
++	mv      a0, t6
++	ret
++
++	/* If dest is not aligned, just copying some bytes makes the dest
++	align.  */
++.L_dest_not_aligned:
++	sub     a3, t5, a3
++	mv      t5, a3
++.L_dest_not_aligned_loop:
++	/* Makes the dest align.  */
++	lb      a4, 0(a1)
++	sub	a3, a3, t3
++	addi    a1, a1, 1
++	sb      a4, 0(a0)
++	addi    a0, a0, 1
++	bnez	a3, .L_dest_not_aligned_loop
++	sub     a2, a2, t5
++	sltiu	a3, a2, 8
++	bnez    a3, .L_copy_by_byte
++	/* Check whether the src is aligned.  */
++	j		.L_dest_aligned
++END(__memcpy)
++SYM_FUNC_ALIAS(__pi_memcpy, __memcpy)
++SYM_FUNC_ALIAS(__pi___memcpy, __memcpy)
+-- 
+2.43.0
+

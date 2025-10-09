@@ -1,0 +1,36 @@
+From 391aef313cbd62c3ba6bbcc89df4b00c847ac9a0 Mon Sep 17 00:00:00 2001
+From: Esther Z <Esther.Z@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:50:03 +0800
+Subject: [PATCH 273/400] drivers: cpufreq: fix cpufreq em model regsiter warn.
+
+update the register process of cpufreq EM model.
+
+Signed-off-by: Esther Z <Esther.Z@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/cpufreq/th1520-cpufreq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/cpufreq/th1520-cpufreq.c b/drivers/cpufreq/th1520-cpufreq.c
+index 03e3861886df..6e4186808c96 100644
+--- a/drivers/cpufreq/th1520-cpufreq.c
++++ b/drivers/cpufreq/th1520-cpufreq.c
+@@ -299,7 +299,6 @@ static int th1520_cpufreq_init(struct cpufreq_policy *policy)
+ 	policy->cur = clk_get_rate(policy->clk) / 1000;
+ 	cpufreq_generic_init(policy, freq_table, transition_latency);
+ 	policy->suspend_freq = max_freq;
+-	dev_pm_opp_of_register_em(cpu_dev, policy->cpus);
+ 
+ 	return 0;
+ }
+@@ -325,6 +324,7 @@ static struct cpufreq_driver th1520_cpufreq_driver = {
+ 	.target_index = th1520_set_target,
+ 	.get = cpufreq_generic_get,
+ 	.init = th1520_cpufreq_init,
++	.register_em = cpufreq_register_em_with_opp,
+ 	.name = "th1520-cpufreq",
+ 	.attr = cpufreq_generic_attr,
+ 	.suspend = th1520_cpufreq_suspend,
+-- 
+2.43.0
+

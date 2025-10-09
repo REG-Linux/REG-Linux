@@ -1,0 +1,87 @@
+From dad3a2b5a6cd1574b2ca48df1007ce6be3b44360 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:32:42 +0800
+Subject: [PATCH 256/400] trace: add bootargs options for trace and ftrace for
+ hibernate resume
+
+For trace and ftrace spent about 1s time in kernel bootup of hibernate
+resume,but this is not need in this bootup which was mid-process.
+
+This commit add bootargs options 'notrace' and 'noftrace' when this
+bootup is hibernate resume dectected by u-boot. Then pass these to
+kernel only in current bootup.  Normal bootup NOT pass these options
+so won't have impact on trace and ftrace functions.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ kernel/trace/ftrace.c | 14 ++++++++++++++
+ kernel/trace/trace.c  | 13 +++++++++++++
+ 2 files changed, 27 insertions(+)
+
+diff --git a/kernel/trace/ftrace.c b/kernel/trace/ftrace.c
+index 15785a729a0c..10b6e61da37f 100644
+--- a/kernel/trace/ftrace.c
++++ b/kernel/trace/ftrace.c
+@@ -7236,6 +7236,17 @@ int __init __weak ftrace_dyn_arch_init(void)
+ 	return 0;
+ }
+ 
++static bool noftrace_init = false;
++
++/* noftrace bootargs: for option not init ftrace*/
++static int __init noftrace_setup(char *str)
++{
++	noftrace_init = true;
++	return 1;
++}
++
++__setup("noftrace", noftrace_setup);
++
+ void __init ftrace_init(void)
+ {
+ 	extern unsigned long __start_mcount_loc[];
+@@ -7243,6 +7254,9 @@ void __init ftrace_init(void)
+ 	unsigned long count, flags;
+ 	int ret;
+ 
++	if(noftrace_init)
++		goto failed;
++
+ 	local_irq_save(flags);
+ 	ret = ftrace_dyn_arch_init();
+ 	local_irq_restore(flags);
+diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+index a111be83c369..50242fc8fc6f 100644
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -198,6 +198,17 @@ static int boot_instance_index;
+ static char boot_snapshot_info[COMMAND_LINE_SIZE] __initdata;
+ static int boot_snapshot_index;
+ 
++static bool notrace_init;
++
++/* notrace bootargs: for option not init trace*/
++static int __init notrace_setup(char *str)
++{
++	notrace_init = 1;
++	return 1;
++}
++
++__setup("notrace", notrace_setup);
++
+ static int __init set_cmdline_ftrace(char *str)
+ {
+ 	strscpy(bootup_tracer_buf, str, MAX_TRACER_SIZE);
+@@ -9966,6 +9977,8 @@ static __init int tracer_init_tracefs(void)
+ {
+ 	int ret;
+ 
++	if(notrace_init)
++		return 0;
+ 	trace_access_lock_init();
+ 
+ 	ret = tracing_init_dentry();
+-- 
+2.43.0
+

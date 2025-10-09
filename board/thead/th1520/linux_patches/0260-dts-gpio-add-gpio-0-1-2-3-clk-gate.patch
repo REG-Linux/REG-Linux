@@ -1,0 +1,72 @@
+From 64ebc9223b44369707595ed498914203873dc5a2 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:35:49 +0800
+Subject: [PATCH 260/400] dts: gpio: add gpio/0/1/2/3 clk gate
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 12 ++++++++++++
+ drivers/clk/xuantie/clk-th1520-fm.c   |  2 --
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 89a83312da83..ec43b85fab2b 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -1140,6 +1140,9 @@ gpio@ffe7f34000 {
+ 			reg = <0xff 0xe7f34000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
++			clocks = <&clk CLKGEN_GPIO2_PCLK>,
++					<&clk CLKGEN_GPIO2_DBCLK>;
++			clock-names = "bus", "db";
+ 
+ 			gpio2: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+@@ -1159,6 +1162,9 @@ gpio@ffe7f38000 {
+ 			reg = <0xff 0xe7f38000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
++			clocks = <&clk CLKGEN_GPIO3_PCLK>,
++					<&clk CLKGEN_GPIO3_DBCLK>;
++			clock-names = "bus", "db";
+ 
+ 			gpio3: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+@@ -1195,6 +1201,9 @@ gpio@ffec005000 {
+ 			reg = <0xff 0xec005000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
++			clocks = <&clk CLKGEN_GPIO0_PCLK>,
++					<&clk CLKGEN_GPIO0_DBCLK>;
++			clock-names = "bus", "db";
+ 
+ 			gpio0: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+@@ -1214,6 +1223,9 @@ gpio@ffec006000 {
+ 			reg = <0xff 0xec006000 0x0 0x1000>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
++			clocks = <&clk CLKGEN_GPIO1_PCLK>,
++					<&clk CLKGEN_GPIO1_DBCLK>;
++			clock-names = "bus", "db";
+ 
+ 			gpio1: gpio-controller@0 {
+ 				compatible = "snps,dw-apb-gpio-port";
+diff --git a/drivers/clk/xuantie/clk-th1520-fm.c b/drivers/clk/xuantie/clk-th1520-fm.c
+index bb3fc1688f60..33b5aa6127fa 100644
+--- a/drivers/clk/xuantie/clk-th1520-fm.c
++++ b/drivers/clk/xuantie/clk-th1520-fm.c
+@@ -348,8 +348,6 @@ static int th1520_clocks_probe(struct platform_device *pdev)
+ 	int ret;
+ 	const bool *teesys = of_device_get_match_data(dev);
+ 
+-	pr_info("%s !!! start !\n", __func__);
+-
+ 	/* Clock source */
+ 	clks[CLK_DUMMY] = xuantie_clk_fixed("dummy", 0);
+ 	clks[OSC_32K] = of_clk_get_by_name(np, "osc_32k");
+-- 
+2.43.0
+

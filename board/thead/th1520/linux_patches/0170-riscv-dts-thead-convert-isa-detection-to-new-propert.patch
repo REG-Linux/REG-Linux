@@ -1,0 +1,64 @@
+From 643a7b73dafe2e34924ba8061058d6eb56abdb53 Mon Sep 17 00:00:00 2001
+From: Conor Dooley <conor.dooley@microchip.com>
+Date: Sun, 22 Oct 2023 23:41:35 +0800
+Subject: [PATCH 170/400] riscv: dts: thead: convert isa detection to new
+ properties
+
+Convert the th1520 devicetrees to use the new properties
+"riscv,isa-base" & "riscv,isa-extensions".
+For compatibility with other projects, "riscv,isa" remains.
+
+Reviewed-by: Jisheng Zhang <jszhang@kernel.org>
+Acked-by: Guo Ren <guoren@kernel.org>
+Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 4bbd159e4d29..dbb1e465c99d 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -30,6 +30,9 @@ c910_0: cpu@0 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++					       "zifencei", "zihpm";
+ 			reg = <0>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -61,6 +64,9 @@ c910_1: cpu@1 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++					       "zifencei", "zihpm";
+ 			reg = <1>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -92,6 +98,9 @@ c910_2: cpu@2 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++					       "zifencei", "zihpm";
+ 			reg = <2>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+@@ -123,6 +132,9 @@ c910_3: cpu@3 {
+ 			compatible = "thead,c910", "riscv";
+ 			device_type = "cpu";
+ 			riscv,isa = "rv64imafdc";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
++					       "zifencei", "zihpm";
+ 			reg = <3>;
+ 			i-cache-block-size = <64>;
+ 			i-cache-size = <65536>;
+-- 
+2.43.0
+

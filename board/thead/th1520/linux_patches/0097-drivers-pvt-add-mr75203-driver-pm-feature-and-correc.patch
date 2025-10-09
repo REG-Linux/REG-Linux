@@ -1,0 +1,78 @@
+From cab6b9da338d4b9dfff07cf0282158886f4b1e08 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Mon, 27 May 2024 15:58:10 +0800
+Subject: [PATCH 097/400] drivers/pvt: add mr75203 driver pm feature and
+ correct temperature coefficient Convert the register value to degrees
+ centigrade temperature: T = G + H * (n / cal5 - 0.5) + J * F, for TH1520 G =
+ 42740 H = 220000 J = -160 CAL5 = 4094
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+---
+ arch/riscv/boot/dts/thead/th1520.dtsi |  4 ++++
+ drivers/hwmon/mr75203.c               | 28 +++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index d8eebf87881d..afcc10de6ee0 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -741,6 +741,10 @@ pvt: pvt@fffff4e000 {
+ 			reg-names = "common", "ts", "pd", "vm";
+ 			clocks = <&aonsys_clk>;
+ 			#thermal-sensor-cells = <1>;
++			moortec,ts-coeff-h = <220000>;
++			moortec,ts-coeff-g = <42740>;
++			moortec,ts-coeff-j = <0xFFFFFF60>;		// -160
++			moortec,ts-coeff-cal5 = <4094>;
+ 		};
+ 
+ 		gpio@fffff52000 {
+diff --git a/drivers/hwmon/mr75203.c b/drivers/hwmon/mr75203.c
+index 50a8b9c3f94d..5a3587046ff3 100644
+--- a/drivers/hwmon/mr75203.c
++++ b/drivers/hwmon/mr75203.c
+@@ -910,6 +910,33 @@ static int mr75203_probe(struct platform_device *pdev)
+ 	return PTR_ERR_OR_ZERO(hwmon_dev);
+ }
+ 
++#ifdef CONFIG_PM
++static int mr75203_suspend(struct device *dev)
++{
++	/* nothing to do */
++	return 0;
++}
++
++static int mr75203_resume(struct device *dev)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct pvt_device *pvt = platform_get_drvdata(pdev);
++	pvt_init(pvt);
++	return 0;
++}
++
++static const struct dev_pm_ops mr75203_dev_pm_ops = {
++	.suspend = mr75203_suspend,
++	.resume = mr75203_resume,
++};
++#define MR75203_DEV_PM_OPS (&mr75203_dev_pm_ops)
++
++#else
++
++#define MR75203_DEV_PM_OPS NULL
++
++#endif /* CONFIG_PM */
++
+ static const struct of_device_id moortec_pvt_of_match[] = {
+ 	{ .compatible = "moortec,mr75203" },
+ 	{ }
+@@ -919,6 +946,7 @@ MODULE_DEVICE_TABLE(of, moortec_pvt_of_match);
+ static struct platform_driver moortec_pvt_driver = {
+ 	.driver = {
+ 		.name = "moortec-pvt",
++		.pm = MR75203_DEV_PM_OPS,
+ 		.of_match_table = moortec_pvt_of_match,
+ 	},
+ 	.probe = mr75203_probe,
+-- 
+2.43.0
+

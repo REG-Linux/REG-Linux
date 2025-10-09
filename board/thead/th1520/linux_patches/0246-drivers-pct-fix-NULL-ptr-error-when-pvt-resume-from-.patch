@@ -1,0 +1,28 @@
+From 4106eb74dd7b0946de6fecb33005307be1118fd1 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:20:34 +0800
+Subject: [PATCH 246/400] drivers: pct: fix NULL ptr error when pvt resume from
+ ram
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/hwmon/mr75203.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/hwmon/mr75203.c b/drivers/hwmon/mr75203.c
+index 14a6bd8fe237..5df34cb5e05a 100644
+--- a/drivers/hwmon/mr75203.c
++++ b/drivers/hwmon/mr75203.c
+@@ -902,6 +902,8 @@ static int mr75203_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	platform_set_drvdata(pdev, pvt);
++
+ 	pvt_chip_info.info = pvt_info;
+ 	hwmon_dev = devm_hwmon_device_register_with_info(dev, "pvt",
+ 							 pvt,
+-- 
+2.43.0
+

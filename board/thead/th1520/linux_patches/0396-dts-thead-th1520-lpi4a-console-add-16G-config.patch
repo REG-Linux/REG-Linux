@@ -1,0 +1,52 @@
+From 0c4cf81c2031301fe5961647a1a92574bf15cb65 Mon Sep 17 00:00:00 2001
+From: NekoRouter <nekorouter@outlook.com>
+Date: Wed, 3 Sep 2025 17:19:36 +0800
+Subject: [PATCH 396/400] dts/thead: th1520-lpi4a-console: add 16G config
+
+Add Console4A (16G) device tree files.
+
+Signed-off-by: NekoRouter <nekorouter@outlook.com>
+---
+ arch/riscv/boot/dts/thead/Makefile                |  2 +-
+ .../boot/dts/thead/th1520-lpi4a-console-16g.dts   | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+ create mode 100644 arch/riscv/boot/dts/thead/th1520-lpi4a-console-16g.dts
+
+diff --git a/arch/riscv/boot/dts/thead/Makefile b/arch/riscv/boot/dts/thead/Makefile
+index d62e349b4f50..322bb07a88ed 100644
+--- a/arch/riscv/boot/dts/thead/Makefile
++++ b/arch/riscv/boot/dts/thead/Makefile
+@@ -3,7 +3,7 @@ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lichee-pi-4a.dtb th1520-beaglev-ahead.dtb t
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lpi4a-cluster.dtb th1520-lpi4a-cluster-16g.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lpi4a-product.dtb th1520-lpi4a-product-sec.dtb th1520-lpi4a-product-crash.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lpi4a-dsi0.dtb th1520-lpi4a-hx8279.dtb
+-dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lpi4a-console.dtb th1520-lpi4a-plastic.dtb th1520-lpi4a-plastic-16g.dtb
++dtb-$(CONFIG_ARCH_XUANTIE) += th1520-lpi4a-console.dtb th1520-lpi4a-console-16g.dtb th1520-lpi4a-plastic.dtb th1520-lpi4a-plastic-16g.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-a-val.dtb th1520-a-val-sec.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-a-val-audio.dtb th1520-a-val-audio-i2s-8ch.dtb th1520-a-val-audio-tdm.dtb th1520-a-val-audio-spdif.dtb th1520-a-val-crash.dtb
+ dtb-$(CONFIG_ARCH_XUANTIE) += th1520-a-val-dsi0-dsi1.dtb th1520-a-val-dsi0-hdmi.dtb
+diff --git a/arch/riscv/boot/dts/thead/th1520-lpi4a-console-16g.dts b/arch/riscv/boot/dts/thead/th1520-lpi4a-console-16g.dts
+new file mode 100644
+index 000000000000..e7b9b9e4450d
+--- /dev/null
++++ b/arch/riscv/boot/dts/thead/th1520-lpi4a-console-16g.dts
+@@ -0,0 +1,15 @@
++#include "th1520-lpi4a-console.dts"
++
++/ {
++	model = "Sipeed Lichee Pi 4A configuration for LicheeConsole4A 16G";
++	compatible = "sipeed,th1520-laptop", "sipeed,console4a", "thead,th1520";
++
++	memory@0 {
++		device_type = "memory";
++		reg = <0x0 0x200000 0x3 0xffe00000>;
++	};
++};
++
++&cmamem {
++	alloc-ranges = <0x3 0xe4000000 0 0x14000000>; // [0x3E400_0000 ~ 0x3F800_0000]
++};
+\ No newline at end of file
+-- 
+2.43.0
+

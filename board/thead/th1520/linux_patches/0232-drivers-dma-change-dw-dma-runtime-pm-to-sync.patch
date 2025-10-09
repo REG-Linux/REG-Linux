@@ -1,0 +1,42 @@
+From 5473d2b7f5ef480632864f9f17f8ad512e89a6ec Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:10:33 +0800
+Subject: [PATCH 232/400] drivers: dma: change dw dma runtime pm to sync
+
+cherry-pick from:
+commit 4d330c07e56b2a0fdc20149ee7df3d657a5244f8
+Date:   Fri Sep 15 22:46:18 2023 +0800
+
+    change dw dma runtime pm to sync
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+index df7890ca4fc5..0337b9e147a2 100644
+--- a/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
++++ b/drivers/dma/dw-axi-dmac/dw-axi-dmac-platform.c
+@@ -501,7 +501,7 @@ static int dma_chan_alloc_chan_resources(struct dma_chan *dchan)
+ 	}
+ 	dev_vdbg(dchan2dev(dchan), "%s: allocating\n", axi_chan_name(chan));
+ 
+-	pm_runtime_get(chan->chip->dev);
++	pm_runtime_get_sync(chan->chip->dev);
+ 
+ 	return 0;
+ }
+@@ -526,7 +526,7 @@ static void dma_chan_free_chan_resources(struct dma_chan *dchan)
+ 		 "%s: free resources, descriptor still allocated: %u\n",
+ 		 axi_chan_name(chan), atomic_read(&chan->descs_allocated));
+ 
+-	pm_runtime_put(chan->chip->dev);
++	pm_runtime_put_sync(chan->chip->dev);
+ }
+ 
+ static void dw_axi_dma_set_hw_channel(struct axi_dma_chan *chan, bool set)
+-- 
+2.43.0
+

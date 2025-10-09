@@ -1,0 +1,31 @@
+From 8814fe375342de6b2962238654fa219b830764f1 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Mon, 8 May 2023 11:36:43 +0800
+Subject: [PATCH 334/400] drm: verisilicon: fix fbcon
+
+Always map the GEM object, because it may expect different page
+attributes than the fixed map by kernel.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/gpu/drm/verisilicon/vs_gem.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/verisilicon/vs_gem.c b/drivers/gpu/drm/verisilicon/vs_gem.c
+index e91fefd4c23e..4aff76877bab 100644
+--- a/drivers/gpu/drm/verisilicon/vs_gem.c
++++ b/drivers/gpu/drm/verisilicon/vs_gem.c
+@@ -97,8 +97,7 @@ static int vs_gem_alloc_buf(struct vs_gem_object *vs_obj)
+ 		return 0;
+ 	}
+ 
+-	vs_obj->dma_attrs = DMA_ATTR_WRITE_COMBINE
+-			| DMA_ATTR_NO_KERNEL_MAPPING;
++	vs_obj->dma_attrs = DMA_ATTR_WRITE_COMBINE;
+ 
+ 	if (!is_iommu_enabled(dev))
+ 		vs_obj->dma_attrs |= DMA_ATTR_FORCE_CONTIGUOUS;
+-- 
+2.43.0
+

@@ -1,0 +1,71 @@
+From ec4fd2f3124701aef88e3641a09abd497102d262 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Fri, 19 Jul 2024 09:15:19 -0700
+Subject: [PATCH 038/400] riscv: Add vendor extensions to /proc/cpuinfo
+
+[ Upstream commit 9448d9accdd8f1483df6fe6692e3c50cfe507d7a ]
+
+All of the supported vendor extensions that have been listed in
+riscv_isa_vendor_ext_list can be exported through /proc/cpuinfo.
+
+Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+Reviewed-by: Evan Green <evan@rivosinc.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Link: https://lore.kernel.org/r/20240719-support_vendor_extensions-v3-2-0af7587bbec0@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+---
+ arch/riscv/kernel/cpu.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
+index 88732abecd02..3056fbc04bba 100644
+--- a/arch/riscv/kernel/cpu.c
++++ b/arch/riscv/kernel/cpu.c
+@@ -16,6 +16,7 @@
+ #include <asm/sbi.h>
+ #include <asm/smp.h>
+ #include <asm/pgtable.h>
++#include <asm/vendor_extensions.h>
+ 
+ bool arch_match_cpu_phys_id(int cpu, u64 phys_id)
+ {
+@@ -235,6 +236,27 @@ arch_initcall(riscv_cpuinfo_init);
+ 
+ #ifdef CONFIG_PROC_FS
+ 
++static void print_vendor_isa(struct seq_file *f)
++{
++	struct riscv_isavendorinfo *vendor_bitmap;
++	struct riscv_isa_vendor_ext_data_list *ext_list;
++	const struct riscv_isa_ext_data *ext_data;
++
++	for (int i = 0; i < riscv_isa_vendor_ext_list_size; i++) {
++		ext_list = riscv_isa_vendor_ext_list[i];
++		ext_data = riscv_isa_vendor_ext_list[i]->ext_data;
++
++		vendor_bitmap = &ext_list->all_harts_isa_bitmap;
++
++		for (int j = 0; j < ext_list->ext_data_count; j++) {
++			if (!__riscv_isa_extension_available(vendor_bitmap->isa, ext_data[j].id))
++				continue;
++
++			seq_printf(f, "_%s", ext_data[j].name);
++		}
++	}
++}
++
+ static void print_isa(struct seq_file *f)
+ {
+ 	seq_puts(f, "isa\t\t: ");
+@@ -255,6 +277,8 @@ static void print_isa(struct seq_file *f)
+ 		seq_printf(f, "%s", riscv_isa_ext[i].name);
+ 	}
+ 
++	print_vendor_isa(f);
++
+ 	seq_puts(f, "\n");
+ }
+ 
+-- 
+2.43.0
+

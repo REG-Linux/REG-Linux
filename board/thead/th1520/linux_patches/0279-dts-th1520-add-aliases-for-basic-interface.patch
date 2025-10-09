@@ -1,0 +1,232 @@
+From b33efeb896927ef13c8e54b4674639a61319d5e4 Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:54:44 +0800
+Subject: [PATCH 279/400] dts:th1520: add aliases for basic interface
+
+Some drivers like mmc read from aliases id to
+set host and its device id.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ arch/riscv/boot/dts/thead/th1520-a-val.dtsi   | 25 ---------------
+ .../boot/dts/thead/th1520-beaglev-ahead.dts   | 15 ---------
+ arch/riscv/boot/dts/thead/th1520-crash.dtsi   | 27 ----------------
+ .../boot/dts/thead/th1520-lichee-pi-4a.dts    | 25 ---------------
+ arch/riscv/boot/dts/thead/th1520-rvbook.dtsi  | 20 ------------
+ arch/riscv/boot/dts/thead/th1520.dtsi         | 32 +++++++++++++++++++
+ 6 files changed, 32 insertions(+), 112 deletions(-)
+
+diff --git a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+index 82d811c79782..a4321513c3fe 100644
+--- a/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-a-val.dtsi
+@@ -19,31 +19,6 @@ memory@0 {
+ 	};
+ 
+ 	aliases {
+-		ethernet0 = &gmac0;
+-		ethernet1 = &gmac1;
+-		gpio0 = &gpio0;
+-		gpio1 = &gpio1;
+-		gpio2 = &gpio2;
+-		gpio3 = &gpio3;
+-		gpio4 = &gpio4;
+-		gpio5 = &aogpio;
+-		serial0 = &uart0;
+-		serial1 = &uart1;
+-		serial2 = &uart2;
+-		serial3 = &uart3;
+-		serial4 = &uart4;
+-		serial5 = &uart5;
+-		i2c0 = &i2c0;
+-		i2c1 = &i2c1;
+-		i2c2 = &i2c2;
+-		i2c3 = &i2c3;
+-		i2c4 = &i2c4;
+-		i2c5 = &audio_i2c0;
+-		i2c6 = &audio_i2c1;
+-		light_i2s = &light_i2s;
+-		i2s0 = &i2s0;
+-		i2s1 = &i2s1;
+-		i2s2 = &i2s2;
+ 		flash_led0 = &vvcam_flash_led0;
+ 		vivcam0 = &vvcam_sensor0;
+ 		vivcam1 = &vvcam_sensor1;
+diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+index bf2d2e4d9efe..4bdf7e0ff4c4 100644
+--- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
++++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
+@@ -14,21 +14,6 @@ / {
+ 	model = "BeagleV Ahead";
+ 	compatible = "beagle,beaglev-ahead", "thead,th1520";
+ 
+-	aliases {
+-		ethernet0 = &gmac0;
+-		gpio0 = &gpio0;
+-		gpio1 = &gpio1;
+-		gpio2 = &gpio2;
+-		gpio3 = &gpio3;
+-		gpio4 = &gpio4;
+-		gpio5 = &aogpio;
+-		serial0 = &uart0;
+-		serial1 = &uart1;
+-		serial2 = &uart2;
+-		serial3 = &uart3;
+-		serial4 = &uart4;
+-		serial5 = &uart5;
+-	};
+ 
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+diff --git a/arch/riscv/boot/dts/thead/th1520-crash.dtsi b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+index eee06a0a5572..957a454f8a5a 100644
+--- a/arch/riscv/boot/dts/thead/th1520-crash.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-crash.dtsi
+@@ -13,33 +13,6 @@ / {
+ 	model = "XUANTIE TH1520 SOC";
+ 	compatible = "xuantie,th1520", "thead,th1520";
+ 
+-	aliases {
+-		ethernet0 = &gmac0;
+-		ethernet1 = &gmac1;
+-		gpio0 = &gpio0;
+-		gpio1 = &gpio1;
+-		gpio2 = &gpio2;
+-		gpio3 = &gpio3;
+-		gpio4 = &gpio4;
+-		gpio5 = &aogpio;
+-		serial0 = &uart0;
+-		serial1 = &uart1;
+-		serial2 = &uart2;
+-		serial3 = &uart3;
+-		serial4 = &uart4;
+-		serial5 = &uart5;
+-		i2c0 = &i2c0;
+-		i2c1 = &i2c1;
+-		i2c2 = &i2c2;
+-		i2c3 = &i2c3;
+-		i2c4 = &i2c4;
+-		i2c5 = &audio_i2c0;
+-		i2c6 = &audio_i2c1;
+-		ap_i2s = &ap_i2s;
+-		i2s0 = &i2s0;
+-		i2s1 = &i2s1;
+-		i2s2 = &i2s2;
+-	};
+ 
+ 	chosen {
+ 		bootargs = "console=ttyS0,115200 earlycon";
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+index 1c1417ec424b..cd62203a4318 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-pi-4a.dts
+@@ -11,31 +11,6 @@ / {
+ 	compatible = "sipeed,lichee-pi-4a", "sipeed,lichee-module-4a", "thead,th1520";
+ 
+ 	aliases {
+-		ethernet0 = &gmac0;
+-		ethernet1 = &gmac1;
+-		gpio0 = &gpio0;
+-		gpio1 = &gpio1;
+-		gpio2 = &gpio2;
+-		gpio3 = &gpio3;
+-		gpio4 = &gpio4;
+-		gpio5 = &aogpio;
+-		serial0 = &uart0;
+-		serial1 = &uart1;
+-		serial2 = &uart2;
+-		serial3 = &uart3;
+-		serial4 = &uart4;
+-		serial5 = &uart5;
+-		i2c0 = &i2c0;
+-		i2c1 = &i2c1;
+-		i2c2 = &i2c2;
+-		i2c3 = &i2c3;
+-		i2c4 = &i2c4;
+-		i2c5 = &audio_i2c0;
+-		i2c6 = &audio_i2c1;
+-		ap_i2s = &ap_i2s;
+-		i2s0 = &i2s0;
+-		i2s1 = &i2s1;
+-		i2s2 = &i2s2;
+ 		vivcam3 = &vvcam_sensor3;
+ 		viv_video2 =  &video2;
+ 		viv_video3 =  &video3;
+diff --git a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+index eb493d1411a6..b8bec51329dc 100644
+--- a/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-rvbook.dtsi
+@@ -19,26 +19,6 @@ chosen {
+ 	};
+ 
+ 	aliases {
+-		ethernet0 = &gmac0;
+-		ethernet1 = &gmac1;
+-		gpio0 = &gpio0;
+-		gpio1 = &gpio1;
+-		gpio2 = &gpio2;
+-		gpio3 = &gpio3;
+-		i2c0 = &i2c0;
+-		i2c1 = &i2c1;
+-		i2c2 = &i2c2;
+-		i2c3 = &i2c3;
+-		i2c4 = &i2c4;
+-		audio_i2c0 = &audio_i2c0;
+-		audio_i2c1 = &audio_i2c1;
+-		serial0 = &uart0;
+-		serial1 = &uart1;
+-		serial2 = &uart2;
+-		serial3 = &uart3;
+-		serial4 = &uart4;
+-		serial5 = &uart5;
+-
+ 		flash_led0 = &vvcam_flash_led0;
+ 		vivcam2 = &vvcam_sensor2;
+ 		vivcam3 = &vvcam_sensor3;
+diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
+index 097617d10401..82890f456600 100644
+--- a/arch/riscv/boot/dts/thead/th1520.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520.dtsi
+@@ -22,6 +22,38 @@ / {
+ 	#address-cells = <2>;
+ 	#size-cells = <2>;
+ 
++	aliases {
++		ethernet0 = &gmac0;
++		ethernet1 = &gmac1;
++		gpio0 = &gpio0;
++		gpio1 = &gpio1;
++		gpio2 = &gpio2;
++		gpio3 = &gpio3;
++		i2c0 = &i2c0;
++		i2c1 = &i2c1;
++		i2c2 = &i2c2;
++		i2c3 = &i2c3;
++		i2c4 = &i2c4;
++		i2c5 = &audio_i2c0;
++		i2c6 = &audio_i2c1;
++		mmc0 = &emmc;
++		mmc1 = &sdio0;
++		mmc2 = &sdio1;
++		serial0 = &uart0;
++		serial1 = &uart1;
++		serial2 = &uart2;
++		serial3 = &uart3;
++		serial4 = &uart4;
++		serial5 = &uart5;
++		spi0 = &spi;
++		spi1 = &qspi0;
++		spi2 = &qspi1;
++		ap_i2s = &ap_i2s;
++		i2s0 = &i2s0;
++		i2s1 = &i2s1;
++		i2s2 = &i2s2;
++	};
++
+ 	system_monitor: system-monitor {
+ 		compatible = "th1520,system-monitor";
+ 	};
+-- 
+2.43.0
+

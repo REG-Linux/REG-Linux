@@ -1,0 +1,53 @@
+From 8cbd1cb0c9089e02e501c8f30ce9a8059efaba7a Mon Sep 17 00:00:00 2001
+From: Jisheng Zhang <jszhang@kernel.org>
+Date: Tue, 12 Sep 2023 15:25:10 +0800
+Subject: [PATCH 135/400] riscv: mm: update T-Head memory type definitions
+
+Update T-Head memory type definitions according to C910 doc [1]
+For NC and IO, SH property isn't configurable, hardcoded as SH,
+so set SH for NOCACHE and IO.
+
+And also set bit[61](Bufferable) for NOCACHE according to the
+table 6.1 in the doc [1].
+
+Link: https://github.com/T-head-Semi/openc910 [1]
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+Reviewed-by: Guo Ren <guoren@kernel.org>
+Tested-by: Drew Fustini <dfustini@baylibre.com>
+Link: https://lore.kernel.org/r/20230912072510.2510-1-jszhang@kernel.org
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+---
+ arch/riscv/include/asm/pgtable-64.h | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/arch/riscv/include/asm/pgtable-64.h b/arch/riscv/include/asm/pgtable-64.h
+index 3272ca7a5270..b99bd66107a6 100644
+--- a/arch/riscv/include/asm/pgtable-64.h
++++ b/arch/riscv/include/asm/pgtable-64.h
+@@ -126,14 +126,18 @@ enum napot_cont_order {
+ 
+ /*
+  * [63:59] T-Head Memory Type definitions:
+- *
+- * 00000 - NC   Weakly-ordered, Non-cacheable, Non-bufferable, Non-shareable, Non-trustable
++ * bit[63] SO - Strong Order
++ * bit[62] C - Cacheable
++ * bit[61] B - Bufferable
++ * bit[60] SH - Shareable
++ * bit[59] Sec - Trustable
++ * 00110 - NC   Weakly-ordered, Non-cacheable, Bufferable, Shareable, Non-trustable
+  * 01110 - PMA  Weakly-ordered, Cacheable, Bufferable, Shareable, Non-trustable
+- * 10000 - IO   Strongly-ordered, Non-cacheable, Non-bufferable, Non-shareable, Non-trustable
++ * 10010 - IO   Strongly-ordered, Non-cacheable, Non-bufferable, Shareable, Non-trustable
+  */
+ #define _PAGE_PMA_THEAD		((1UL << 62) | (1UL << 61) | (1UL << 60))
+-#define _PAGE_NOCACHE_THEAD	0UL
+-#define _PAGE_IO_THEAD		(1UL << 63)
++#define _PAGE_NOCACHE_THEAD	((1UL << 61) | (1UL << 60))
++#define _PAGE_IO_THEAD		((1UL << 63) | (1UL << 60))
+ #define _PAGE_MTMASK_THEAD	(_PAGE_PMA_THEAD | _PAGE_IO_THEAD | (1UL << 59))
+ 
+ static inline u64 riscv_page_mtmask(void)
+-- 
+2.43.0
+

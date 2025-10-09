@@ -1,0 +1,40 @@
+From b995ddc8dc048945a1580a7247aaebb75de6e7ec Mon Sep 17 00:00:00 2001
+From: Yao Zi <ziyao@disroot.org>
+Date: Mon, 26 May 2025 18:45:50 +0800
+Subject: [PATCH 369/400] soc: xuantie: videomemory: Unreserve before freeing
+ uncontiguous memory
+
+PT_reserved isn't correctly cleaned before freeing uncotiguous memory
+blocks, triggering kernel PAGE_FLAGS_CHECK_AT_FREE validation warnings,
+
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ drivers/soc/xuantie/video_memory/video_memory.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/soc/xuantie/video_memory/video_memory.c b/drivers/soc/xuantie/video_memory/video_memory.c
+index 6e7fa9f6eadd..8b83c25bb43a 100644
+--- a/drivers/soc/xuantie/video_memory/video_memory.c
++++ b/drivers/soc/xuantie/video_memory/video_memory.c
+@@ -1314,12 +1314,13 @@ void free_memblk_pages(struct mem_block *memBlk)
+     if (memBlk->is_cma == false && memBlk->is_vi_mem == false) {
+         for (i = 0; i < memBlk->numPages; i++)
+         {
+-            if (memBlk->contiguous)
+-            {
++            if (memBlk->contiguous) {
+                 page = nth_page(memBlk->contiguousPages, i);
++            } else {
++	        page = memBlk->nonContiguousPages[i];
++	    }
+ 
+-                ClearPageReserved(page);
+-            }
++            ClearPageReserved(page);
+         }
+     }
+ 
+-- 
+2.43.0
+

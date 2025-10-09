@@ -1,0 +1,87 @@
+From 3a512ed6c353cbefbbe4c3d49236ad6b86b69cb1 Mon Sep 17 00:00:00 2001
+From: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 02:24:55 +0800
+Subject: [PATCH 307/400] drivers: pwm_bl: fix adjusting failure of pwm
+ backlight when resume from str
+
+Signed-off-by: Xiangyi Zeng <xiangyi.zeng@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/video/backlight/pwm_bl.c | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/video/backlight/pwm_bl.c b/drivers/video/backlight/pwm_bl.c
+index 35c716e9043c..d0e3f1cefcf2 100644
+--- a/drivers/video/backlight/pwm_bl.c
++++ b/drivers/video/backlight/pwm_bl.c
+@@ -40,8 +40,10 @@ struct pwm_bl_data {
+ 
+ static void pwm_backlight_power_on(struct pwm_bl_data *pb)
+ {
++	struct pwm_state state;
+ 	int err;
+ 
++	pwm_get_state(pb->pwm, &state);
+ 	if (pb->enabled)
+ 		return;
+ 
+@@ -51,6 +53,9 @@ static void pwm_backlight_power_on(struct pwm_bl_data *pb)
+ 			dev_err(pb->dev, "failed to enable power supply\n");
+ 	}
+ 
++	state.enabled = true;
++	pwm_apply_might_sleep(pb->pwm, &state);
++
+ 	if (pb->post_pwm_on_delay)
+ 		msleep(pb->post_pwm_on_delay);
+ 
+@@ -61,6 +66,9 @@ static void pwm_backlight_power_on(struct pwm_bl_data *pb)
+ 
+ static void pwm_backlight_power_off(struct pwm_bl_data *pb)
+ {
++	struct pwm_state state;
++
++	pwm_get_state(pb->pwm, &state);
+ 	if (!pb->enabled)
+ 		return;
+ 
+@@ -69,6 +77,10 @@ static void pwm_backlight_power_off(struct pwm_bl_data *pb)
+ 	if (pb->pwm_off_delay)
+ 		msleep(pb->pwm_off_delay);
+ 
++	state.enabled = false;
++	state.duty_cycle = 0;
++	pwm_apply_might_sleep(pb->pwm, &state);
++
+ 	if (pb->power_supply)
+ 		regulator_disable(pb->power_supply);
+ 	pb->enabled = false;
+@@ -102,25 +114,10 @@ static int pwm_backlight_update_status(struct backlight_device *bl)
+ 	if (brightness > 0) {
+ 		pwm_get_state(pb->pwm, &state);
+ 		state.duty_cycle = compute_duty_cycle(pb, brightness, &state);
+-		state.enabled = true;
+ 		pwm_apply_might_sleep(pb->pwm, &state);
+-
+ 		pwm_backlight_power_on(pb);
+ 	} else {
+ 		pwm_backlight_power_off(pb);
+-
+-		pwm_get_state(pb->pwm, &state);
+-		state.duty_cycle = 0;
+-		/*
+-		 * We cannot assume a disabled PWM to drive its output to the
+-		 * inactive state. If we have an enable GPIO and/or a regulator
+-		 * we assume that this isn't relevant and we can disable the PWM
+-		 * to save power. If however there is neither an enable GPIO nor
+-		 * a regulator keep the PWM on be sure to get a constant
+-		 * inactive output.
+-		 */
+-		state.enabled = !pb->power_supply && !pb->enable_gpio;
+-		pwm_apply_might_sleep(pb->pwm, &state);
+ 	}
+ 
+ 	if (pb->notify_after)
+-- 
+2.43.0
+

@@ -1,0 +1,30 @@
+From 5963ee975d6a13c96225d810a87432df38714363 Mon Sep 17 00:00:00 2001
+From: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:51:24 +0800
+Subject: [PATCH 275/400] driver:i2c:fix rx_over miss re-try
+
+if the rx over happen when the first recive sequnce, then the logic
+will miss the RX Over,and report a success transfer.so mark the status
+if rx over detected.
+
+Signed-off-by: Huaming <jianghuaming.jhm@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ drivers/i2c/busses/i2c-designware-master.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/i2c/busses/i2c-designware-master.c b/drivers/i2c/busses/i2c-designware-master.c
+index fe381b54b5fd..b00a1225b746 100644
+--- a/drivers/i2c/busses/i2c-designware-master.c
++++ b/drivers/i2c/busses/i2c-designware-master.c
+@@ -915,6 +915,7 @@ static irqreturn_t i2c_dw_isr(int this_irq, void *dev_id)
+ 	{
+ 		/* Anytime RX_OVER is set, Make sure to skip them.*/
+ 		regmap_write(dev->map, DW_IC_INTR_MASK, 0);
++		dev->status |= STATUS_READ_IN_PROGRESS;
+ 		goto tx_aborted;
+ 	}
+ 
+-- 
+2.43.0
+

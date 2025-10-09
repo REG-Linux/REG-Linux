@@ -1,0 +1,171 @@
+From 8e5a7dea76fbce6efbb43c5e98b584bb0df37c9f Mon Sep 17 00:00:00 2001
+From: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Date: Sun, 1 Sep 2024 01:11:25 +0800
+Subject: [PATCH 235/400] hibernate: add interface for driver to mark no_save
+ region
+
+Add this two function hibernate_register_nosave_region and
+hibernate_remove_nosave_region to register or remove nosave
+region for driver.
+This help reduce size of hibernate image.
+
+Signed-off-by: xianbing Zhu <xianbing.zhu@linux.alibaba.com>
+Signed-off-by: Han Gao <gaohan@iscas.ac.cn>
+---
+ include/linux/suspend.h  | 10 +++++
+ kernel/power/hibernate.c | 10 +++++
+ kernel/power/snapshot.c  | 82 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 102 insertions(+)
+
+diff --git a/include/linux/suspend.h b/include/linux/suspend.h
+index ef503088942d..a02847da2821 100644
+--- a/include/linux/suspend.h
++++ b/include/linux/suspend.h
+@@ -443,6 +443,9 @@ extern asmlinkage int swsusp_arch_suspend(void);
+ extern asmlinkage int swsusp_arch_resume(void);
+ 
+ extern u32 swsusp_hardware_signature;
++extern int hibernate_register_nosave_region(unsigned long start_pfn, unsigned long end_pfn);
++extern int hibernate_remove_nosave_region(unsigned long start_pfn, unsigned long end_pfn);
++
+ extern void hibernation_set_ops(const struct platform_hibernation_ops *ops);
+ extern int hibernate(void);
+ extern bool system_entering_hibernation(void);
+@@ -462,6 +465,13 @@ static inline int swsusp_page_is_forbidden(struct page *p) { return 0; }
+ static inline void swsusp_set_page_free(struct page *p) {}
+ static inline void swsusp_unset_page_free(struct page *p) {}
+ 
++static inline int hibernate_register_nosave_region(unsigned long start_pfn, unsigned long end_pfn){
++	return 0;
++}
++static inline int hibernate_remove_nosave_region(unsigned long start_pfn, unsigned long end_pfn){
++	return 0;
++}
++
+ static inline void hibernation_set_ops(const struct platform_hibernation_ops *ops) {}
+ static inline int hibernate(void) { return -ENOSYS; }
+ static inline bool system_entering_hibernation(void) { return false; }
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index 76dcf2e28427..a83a5f1a4dc7 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -742,6 +742,16 @@ int hibernate(void)
+ 		error = -EBUSY;
+ 		goto Unlock;
+ 	}
++	#if 1 //test code,remove later
++	//hibernate_register_nosave_region(0x0f800000>>PAGE_SHIFT, 0x19b00000>>PAGE_SHIFT); //right
++	//hibernate_register_nosave_region(0x1a000000>>PAGE_SHIFT, 0x1dffffff>>PAGE_SHIFT);
++	hibernate_register_nosave_region(__phys_to_pfn(0x22000000), __phys_to_pfn(0x32000000));
++	hibernate_register_nosave_region(0x32000000>>PAGE_SHIFT, 0x32000000>>PAGE_SHIFT); //test,not a valid region
++	//hibernate_register_nosave_region(0x32000000>>PAGE_SHIFT, 0x38400000>>PAGE_SHIFT);
++	hibernate_register_nosave_region(0xd8c00000>>PAGE_SHIFT, 0xE4000000>>PAGE_SHIFT);
++	hibernate_register_nosave_region(0x20000000>>PAGE_SHIFT, 0x20800000>>PAGE_SHIFT);
++	hibernate_remove_nosave_region(0x20000000>>PAGE_SHIFT, 0x20800000>>PAGE_SHIFT);	//test remove a region
++	#endif
+ 
+ 	pr_info("hibernation entry\n");
+ 	pm_prepare_console();
+diff --git a/kernel/power/snapshot.c b/kernel/power/snapshot.c
+index 50a15408c3fc..400d59a11cdc 100644
+--- a/kernel/power/snapshot.c
++++ b/kernel/power/snapshot.c
+@@ -957,6 +957,7 @@ struct nosave_region {
+ };
+ 
+ static LIST_HEAD(nosave_regions);
++static DEFINE_MUTEX(nosave_regions_list_lock);
+ 
+ static void recycle_zone_bm_rtree(struct mem_zone_bm_rtree *zone)
+ {
+@@ -1023,6 +1024,87 @@ void __init register_nosave_region(unsigned long start_pfn, unsigned long end_pf
+ 		((unsigned long long) end_pfn << PAGE_SHIFT) - 1);
+ }
+ 
++/**
++ * hibernate_register_nosave_region - Register a region of unsaveable memory.
++ *
++ * Register a range of page frames the contents of which should not be saved
++ * during hibernation (To be used in the running driver code,before start hibernation).
++ */
++int hibernate_register_nosave_region(unsigned long start_pfn, unsigned long end_pfn)
++{
++	struct nosave_region *region;
++
++	if (start_pfn >= end_pfn)
++	{
++		pr_warn(": start_pfn should smaller than end_pfn\n", __func__);
++		return -1;
++	}
++	region = kmalloc(sizeof(struct nosave_region),
++				GFP_KERNEL);
++	if (!region)
++	{
++		pr_err("%s: Failed to allocate %zu bytes\n", __func__,
++		      sizeof(struct nosave_region));
++		return -1;
++	}
++	region->start_pfn = start_pfn;
++	region->end_pfn = end_pfn;
++	mutex_lock(&nosave_regions_list_lock);
++	list_add_tail(&region->list, &nosave_regions);
++	mutex_unlock(&nosave_regions_list_lock);
++ Report:
++	pr_info("Registered nosave memory: [mem %#010llx-%#010llx]\n",
++		(unsigned long long) start_pfn << PAGE_SHIFT,
++		((unsigned long long) end_pfn << PAGE_SHIFT) - 1);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(hibernate_register_nosave_region);
++
++/**
++ * hibernate_remove_nosave_region - UnRegister a region of unsaveable memory.
++ *
++ * Remove page frames  of which regitstered as unsaveable memory berfore
++ *  (To be used in the running driver code,before start hibernation).
++ */
++int hibernate_remove_nosave_region(unsigned long start_pfn, unsigned long end_pfn)
++{
++	struct nosave_region *region, *tmp;
++	int found = 0;
++	mutex_lock(&nosave_regions_list_lock);
++	if (list_empty(&nosave_regions))
++	{
++		mutex_unlock(&nosave_regions_list_lock);
++		return 0;
++	}
++
++	list_for_each_entry_safe(region, tmp, &nosave_regions, list) {
++		if(!region) {
++			break;
++		}
++		/*need to remove all,so not break found first one*/
++		if((region->start_pfn == start_pfn) && (region->end_pfn == end_pfn)) {
++			list_del(&region->list);
++			kfree(region);
++			found++;
++			pr_info("Unregistered nosave memory: [mem %#010llx-%#010llx]\n",
++				(unsigned long long) start_pfn << PAGE_SHIFT,
++				((unsigned long long) end_pfn << PAGE_SHIFT) - 1);
++		}
++	}
++	mutex_unlock(&nosave_regions_list_lock);
++
++	if(!found) {
++		pr_warn("Not find  nosave memory: [mem %#010llx-%#010llx]\n",
++			(unsigned long long) start_pfn << PAGE_SHIFT,
++			((unsigned long long) end_pfn << PAGE_SHIFT) - 1);
++		return -1;
++	}
++	if(found > 1)
++		pr_warn("More than one region find in  nosave memory,actual find %d\n",found);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(hibernate_remove_nosave_region);
++
+ /*
+  * Set bits in this map correspond to the page frames the contents of which
+  * should not be saved during the suspend.
+-- 
+2.43.0
+
