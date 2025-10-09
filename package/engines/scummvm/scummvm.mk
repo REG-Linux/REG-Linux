@@ -76,7 +76,8 @@ SCUMMVM_CONF_OPTS += --disable-highres
 endif
 
 # Munt (MT32-Emulator) options, CPU-hungry
-ifeq ($(BR2_aarch64)$(BR2_x86_64),y)
+ifeq ($(BR2_PACKAGE_LIBMT32EMU),y)
+SCUMMVM_DEPENDENCIES += libmt32emu
 SCUMMVM_CONF_OPTS += --enable-mt32emu
 else
 SCUMMVM_CONF_OPTS += --disable-mt32emu
