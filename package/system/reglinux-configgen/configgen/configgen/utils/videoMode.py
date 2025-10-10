@@ -6,17 +6,18 @@ from sys import stdout
 from typing import Optional, List, Dict
 from .logger import get_logger
 
+from .regmsgclient import regmsg_send_message
+
 eslog = get_logger(__name__)
 
 
 def changeMode(videomode: str) -> None:
     """Set a specific video mode."""
-    cmd = ["regmsg", "setMode", videomode]
     eslog.debug(f"setVideoMode({videomode}): {cmd}")
     max_tries = 2
     for i in range(max_tries):
         try:
-            result = run(cmd, capture_output=True, text=True, check=True)
+            result = regmsg_send_message("setMode " + videomode)
             eslog.debug(result.stdout.strip())
             return
         except CalledProcessError as e:
@@ -28,9 +29,7 @@ def changeMode(videomode: str) -> None:
 
 def getCurrentMode() -> Optional[str]:
     try:
-        proc = Popen(["regmsg", "currentMode"], stdout=PIPE)
-        out, _ = proc.communicate()
-        return out.decode().splitlines()[0] if out else None
+        return regmsg_send_message("currentMode")
     except Exception as e:
         eslog.error(f"Error fetching current mode: {e}")
         return None
@@ -38,9 +37,7 @@ def getCurrentMode() -> Optional[str]:
 
 def getScreens() -> List[str]:
     try:
-        proc = Popen(["regmsg", "listOutputs"], stdout=PIPE)
-        out, _ = proc.communicate()
-        return out.decode().splitlines()
+        return regmsg_send_message("listOutputs")
     except Exception as e:
         eslog.error(f"Error listing screens: {e}")
         return []
@@ -60,14 +57,12 @@ def getCurrentResolution(name: Optional[str] = None) -> Dict[str, int]:
             raise ValueError(f"Error analyzing content of {drm_mode_path}: {e}")
 
     try:
-        cmd = (
-            ["regmsg", "currentResolution"]
-            if name is None
-            else ["regmsg", "--screen", name, "currentResolution"]
-        )
-        proc = Popen(cmd, stdout=PIPE)
-        out, _ = proc.communicate()
-        vals = out.decode().split("x")
+        out = ""
+        if name is None:
+            out = regmsg_send_message("currentResolution")
+        else:
+            out = regmsg_send_message("--screen " + name + " currentResolution")
+        vals = out.split("x")
         return {"width": int(vals[0]), "height": int(vals[1])}
     except Exception as e:
         eslog.error(f"Error getting resolution: {e}")
@@ -110,14 +105,16 @@ def getScreensInfos(config: Dict) -> List[Dict[str, int]]:
 
 
 def minTomaxResolution() -> None:
-    run(["regmsg", "minTomaxResolution"], stdout=PIPE)
+    regmsg_send_message("minToMaxResolution")
 
 
 def getRefreshRate() -> Optional[str]:
     try:
-        proc = Popen(["regmsg", "currentRefresh"], stdout=PIPE)
-        out, _ = proc.communicate()
-        return out.decode().splitlines()[0] if out else None
+        out = regmsg_send_message("currentRefresh")
+        if out:
+            return out.splitlines()[0]
+        else:
+            return None
     except Exception as e:
         eslog.error(f"Error fetching refresh rate: {e}")
         return None
