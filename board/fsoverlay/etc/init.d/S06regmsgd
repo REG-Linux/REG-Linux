@@ -1,0 +1,61 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          regmsgd
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: REG Linux message daemon
+# Description:       Daemon handling REG Linux messaging system
+### END INIT INFO
+
+DAEMON=/usr/bin/regmsgd
+DAEMON_NAME=regmsgd
+PIDFILE=/var/run/$DAEMON_NAME.pid
+DAEMON_OPTS=""
+USER=root
+
+start() {
+    echo "Starting $DAEMON_NAME"
+    if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE" 2>/dev/null)" 2>/dev/null; then
+        echo  "already running"
+        return 0
+    fi
+    start-stop-daemon --start --quiet --background \
+        --make-pidfile --pidfile "$PIDFILE" \
+        --exec "$DAEMON" --chuid "$USER" -- $DAEMON_OPTS
+}
+
+stop() {
+    echo "Stopping $DAEMON_NAME"
+    start-stop-daemon --stop --quiet --pidfile "$PIDFILE" --retry TERM/30/KILL/5
+    RETVAL=$?
+    [ $RETVAL = 0 ] && rm -f "$PIDFILE"
+}
+
+status() {
+    status_of_proc -p "$PIDFILE" "$DAEMON" "$DAEMON_NAME"
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        sleep 1
+        start
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: /etc/init.d/$DAEMON_NAME {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
+
+exit 0
