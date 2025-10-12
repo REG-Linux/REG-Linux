@@ -1,24 +1,17 @@
 diff --git a/linux/Config.in b/linux/Config.in
-index d5fb71771b..1b0f2b0502 100644
+index 83bc4c421d..559409398f 100644
 --- a/linux/Config.in
 +++ b/linux/Config.in
-@@ -4,6 +4,10 @@ config BR2_LINUX_KERNEL
+@@ -4,7 +4,11 @@ config BR2_LINUX_KERNEL
  	bool "Linux Kernel"
  	select BR2_PACKAGE_HOST_KMOD # Unconditional, even if modules not enabled
  	select BR2_PACKAGE_HOST_IMAGEMAGICK if BR2_LINUX_KERNEL_CUSTOM_LOGO_PATH != ""
+-	help
 +	# Rust support needs those packages
 +	select BR2_PACKAGE_HOST_CURL		if !BR2_mipsel
 +	select BR2_PACKAGE_HOST_RUSTC		if !BR2_mipsel
 +	select BR2_PACKAGE_HOST_RUST_BINDGEN	if !BR2_mipsel
- 	help
++ 	help
  	  Enable this option if you want to build a Linux kernel for
  	  your embedded device
-@@ -137,7 +141,7 @@ config BR2_LINUX_KERNEL_CUSTOM_REPO_GIT_SUBMODULES
  
- config BR2_LINUX_KERNEL_VERSION
- 	string
--	default "6.12.47" if BR2_LINUX_KERNEL_LATEST_VERSION
-+	default "6.12.49" if BR2_LINUX_KERNEL_LATEST_VERSION
- 	default "5.10.162-cip24" if BR2_LINUX_KERNEL_LATEST_CIP_VERSION
- 	default "5.10.162-cip24-rt10" if BR2_LINUX_KERNEL_LATEST_CIP_RT_VERSION
- 	default BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE \
