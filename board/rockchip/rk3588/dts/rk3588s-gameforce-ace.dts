@@ -532,11 +532,6 @@
 	pinctrl-0 = <&lcd_rst_gpio>;
 };
 
-&pcie2x1l1 {
-	reset-gpios = <&gpio3 RK_PD1 GPIO_ACTIVE_HIGH>;
-	status = "okay";
-};
-
 &combphy2_psu {
     status = "okay";
 };
@@ -776,12 +771,6 @@
 };
 
 
-&i2c5 {
-	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&i2c5m3_xfer>;
-};
-
 &i2c6 {
 	status = "okay";
 	pinctrl-names = "default";
@@ -934,12 +923,6 @@
 	};
 };
 
-&i2c8 {
-	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&i2c8m2_xfer>;
-
-};
 &i2s0_8ch {
 	status = "okay";
 	pinctrl-0 = <&i2s0_lrck
