@@ -1,6 +1,10 @@
 config BR2_PACKAGE_PICADE
     bool "picade"
+    depends on BR2_LINUX_KERNEL
       help
         Adds support for the Pimoroni Picade RPi arcade case
 
         https://github.com/pimoroni/picade-hat
+
+comment "picade needs a kernel and headers"
+	depends on !BR2_LINUX_KERNEL
