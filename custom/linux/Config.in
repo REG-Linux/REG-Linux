@@ -4,10 +4,6 @@ config BR2_LINUX_KERNEL
 	bool "Linux Kernel"
 	select BR2_PACKAGE_HOST_KMOD # Unconditional, even if modules not enabled
 	select BR2_PACKAGE_HOST_IMAGEMAGICK if BR2_LINUX_KERNEL_CUSTOM_LOGO_PATH != ""
-	# Rust support needs those packages
-	select BR2_PACKAGE_HOST_CURL		if !BR2_mipsel
-	select BR2_PACKAGE_HOST_RUSTC		if !BR2_mipsel
-	select BR2_PACKAGE_HOST_RUST_BINDGEN	if !BR2_mipsel
 	help
 	  Enable this option if you want to build a Linux kernel for
 	  your embedded device
