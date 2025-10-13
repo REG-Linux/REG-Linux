@@ -180,6 +180,26 @@
 		};
 	};
 
+	hdmi0_sound: hdmi0-sound {
+		status = "okay";
+		compatible = "rockchip,hdmi";
+		rockchip,mclk-fs = <128>;
+		rockchip,card-name = "rockchip-hdmi0";
+		rockchip,cpu = <&i2s5_8ch>;
+		rockchip,codec = <&hdmi0>;
+		rockchip,jack-det;
+	};
+
+	dp0_sound: dp0-sound {
+		status = "disabled";
+		compatible = "rockchip,hdmi";
+		rockchip,card-name= "rockchip-dp0";
+		rockchip,mclk-fs = <512>;
+		rockchip,cpu = <&spdif_tx2>;
+		rockchip,codec = <&dp0 1>;
+		rockchip,jack-det;
+	};
+
 	pwm_fan: pwm-fan {
 		compatible = "pwm-fan";
 		#cooling-cells = <2>;
@@ -532,6 +552,11 @@
 	pinctrl-0 = <&lcd_rst_gpio>;
 };
 
+&pcie2x1l1 {
+	reset-gpios = <&gpio3 RK_PD1 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+
 &combphy2_psu {
     status = "okay";
 };
@@ -620,8 +645,38 @@
 	status = "okay";
 };
 
+&hdmi0 {
+    enable-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_HIGH>;
+    status = "disabled";
+};
+
+&hdmi0_in_vp0 {
+    status = "disabled";
+};
+
+&hdmi0_sound {
+    status = "okay";
+};
+
+&hdptxphy_hdmi0 {
+    status = "disabled";
+};
+
+&route_hdmi0 {
+    status = "disabled";
+    connect = <&vp0_out_hdmi0>;
+};
+
 &isp1_mmu {
 	status = "okay";
+};
+
+&spdif_tx2{
+    status = "okay";
+};
+
+&dp0_sound{
+    status = "disabled";
 };
 
 &dp0 {
@@ -770,6 +825,11 @@
 	};
 };
 
+&i2c5 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c5m3_xfer>;
+};
 
 &i2c6 {
 	status = "okay";
@@ -921,6 +981,13 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&i2s0_mclk>;
 	};
+};
+
+&i2c8 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c8m2_xfer>;
+
 };
 
 &i2s0_8ch {
@@ -1177,26 +1244,6 @@
 	status = "disabled";
 };
 
-&rkvdec_ccu {
-	status = "okay";
-};
-
-&rkvdec0 {
-	status = "okay";
-};
-
-&rkvdec0_mmu {
-	status = "okay";
-};
-
-&rkvdec1 {
-	status = "okay";
-};
-
-&rkvdec1_mmu {
-	status = "okay";
-};
-
 &vepu {
 	status = "okay";
 };
@@ -1292,15 +1339,11 @@
 	status = "okay";
 };
 
-&uart2 {
-	pinctrl-0 = <&uart2m0_xfer>;
-	status = "okay";
-};
-
 &uart9 {
 	pinctrl-0 = <&uart9m2_xfer>, <&uart9m2_ctsn>, <&uart9m2_rtsn>;
+	/delete-property/ dma-names;
+	/delete-property/ dmas;
 	uart-has-rtscts;
-    dma-names = "tx", "rx";
 	status = "okay";
 
 	bluetooth {
@@ -1314,6 +1357,10 @@
 		pinctrl-names = "default";
 		shutdown-gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_HIGH>;
 	};
+};
+
+&usbc0 {
+    status = "okay";
 };
 
 &u2phy0 {
@@ -1407,7 +1454,7 @@
 };
 
 &vop {
-	status = "okay";
+    status = "okay";
 };
 
 &vop_mmu {
