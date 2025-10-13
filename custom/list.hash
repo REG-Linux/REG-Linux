@@ -28,7 +28,7 @@
 --------------------------------  package/llvm-project/llvm/0003-Another-gcc-15-fix-from-Sam-James.patch
 --------------------------------  package/mesa3d/0001-meson-Set-proper-value-for-LIBCLC_INCLUDEDIR.patch
 --------------------------------  package/mesa3d/0002-vc4-add-meson-option-to-disable-optional-neon-suppor.patch
-e4bfae5a64a5754175da8bccbc97b115  Makefile
+56bdc2ec4fe2481e64b1fd8994317505  Makefile
 a28421a9760706d955819e9ce927acbb  arch/Config.in.arm
 27079cca2e6570dffdb72cd5c79cf026  boot/syslinux/syslinux.mk
 8ed1a372ecb4b8609821e71f4a5b2966  fs/common.mk
@@ -36,8 +36,8 @@ a28421a9760706d955819e9ce927acbb  arch/Config.in.arm
 68b27177f9fe560b74f0c9e4c4fd53e1  fs/cpio/init
 0f1e375992de585df0580c9ef85158e8  fs/squashfs/Config.in
 8635723306eb367f07b3b8fc57243880  fs/squashfs/squashfs.mk
-cc05d7da7379274cda870cab9863a041  linux/Config.in
-fa7d3af02f5030b7bd54dd6b9a92e557  linux/linux.hash
+38b55b6ee1c5f2dec901aea404007de2  linux/Config.in
+053500b6ae9e9dacd625bfc244b3ebcf  linux/linux.hash
 8a395efd082c05707611f6ef6bebeeae  package/Config.in
 6521d70e92c2c2d8864d46e01c27b6d4  package/Config.in.host
 4106ba3f151f6d174a9d2c957b7a5ecd  package/Makefile.in
@@ -86,7 +86,7 @@ b5bcf1c3e1f262b4e38d381a73c38137  package/libopenh264/Config.in
 cc7d8a6dc2f0ff8c66f3f44a9c5e7b1f  package/libpciaccess/libpciaccess.mk
 fb3f39cb099d5a583fdef23484b25ac8  package/libsoundtouch/libsoundtouch.mk
 34607395f047f61cacf7fe877cfbc57a  package/libxmlb/libxmlb.mk
-fa115646769580d20db019ecaf5738d9  package/linux-headers/Config.in.host
+11eb776fd0e97d8109df60b3544a9332  package/linux-headers/Config.in.host
 84caeaa857a89462b8a4e4c775a60ea4  package/lirc-tools/lirc-tools.mk
 0b48917e45566117a9acd2225e33a15e  package/llvm-project/clang/0001-lib-Driver-ToolChains-Gnu-Use-GCC_INSTALL_PREFIX-in-.patch
 4b08e83b2f3e7b3a547dfb3a9fb9de86  package/llvm-project/clang/clang.hash
@@ -190,7 +190,7 @@ a54f143410a07bffef9266cf66a08a54  package/wayland/wayland.hash
 f9f04d92bb8ffcf08f5a3c63014ad1a6  package/wireplumber/wireplumber.hash
 b6673078d95526db7cea547c62575a16  package/wireplumber/wireplumber.mk
 53293178b5081b857047c8fc210b04bd  package/wlroots/wlroots.hash
-fb294cd61b0f446fdb3a8360e67c85f9  package/wlroots/wlroots.mk
+6d631bb3b8e6c226aed8de6126f843e3  package/wlroots/wlroots.mk
 984c2366b004c95b2b51b885d6f691ed  package/x11r7/libxcb/libxcb.hash
 428934c4770f1f2e48e755919bed5b3b  package/x11r7/libxcb/libxcb.mk
 734e7126c81bb9b266e3ca5922ebac41  package/x11r7/xapp_xeyes/xapp_xeyes.hash
