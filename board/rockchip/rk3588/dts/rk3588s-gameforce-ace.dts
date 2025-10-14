@@ -191,7 +191,7 @@
 	};
 
 	dp0_sound: dp0-sound {
-		status = "disabled";
+		status = "okay";
 		compatible = "rockchip,hdmi";
 		rockchip,card-name= "rockchip-dp0";
 		rockchip,mclk-fs = <512>;
