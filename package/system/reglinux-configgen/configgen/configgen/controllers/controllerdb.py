@@ -3,8 +3,9 @@ Controller database management.
 Handles loading and matching controller configurations from gamecontrollerdb.txt.
 """
 
-from os import environ
-from typing import Dict, List, Type
+import os
+import asyncio
+from typing import Dict, List, Type, Optional
 from controllers import Controller, Input
 from concurrent.futures import ThreadPoolExecutor
 from utils.logger import get_logger
@@ -41,28 +42,38 @@ def parse_line(line: str) -> tuple[str, dict] | None:
         "input_objects": inputs,  # Backward compatible
     }
 
-
 def load_all_controllers_config() -> Dict[str, Dict]:
     """
     Load all controller configurations from gamecontrollerdb.txt.
-    Enhanced version that creates Input objects for each controller input.
-
-    Returns:
-        Dictionary mapping GUIDs to controller configurations with Input objects
+    Hybrid version: synchronous file read, asynchronous parse with concurrency limit.
     """
     controllerdb = {}
-    filepath = environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
+    filepath = os.environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
 
     try:
-        with open(filepath, "r") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
-        with ThreadPoolExecutor() as executor:
-            results = executor.map(lambda line: parse_line(line), lines)
+        max_concurrency = max(1, os.cpu_count() or 1)
+
+        async def run_async_parsing():
+            sem = asyncio.Semaphore(max_concurrency)
+            loop = asyncio.get_running_loop()
+
+            async def process_line(line):
+                async with sem:
+                    # Exécute parse_line (bloquante) dans un thread du pool
+                    return await loop.run_in_executor(None, parse_line, line)
+
+            tasks = [process_line(line) for line in lines]
+            return await asyncio.gather(*tasks)
+
+        results = asyncio.run(run_async_parsing())
 
         for res in results:
             if res is not None:
                 guid, config = res
+                # TODO RIGHT OR WRONG if guid not in controllerdb:
                 controllerdb[guid] = config
 
     except FileNotFoundError:
@@ -71,6 +82,7 @@ def load_all_controllers_config() -> Dict[str, Dict]:
         eslog.error(f"Error loading controller config: {e}")
 
     return controllerdb
+
 
 def load_controller_config(controllersInput):
     """
