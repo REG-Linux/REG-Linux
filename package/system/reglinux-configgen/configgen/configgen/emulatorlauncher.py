@@ -25,6 +25,8 @@ import controllers as controllers
 import utils.zar as zar
 from utils.logger import get_logger
 
+from utils.regmsgclient import regmsg_connect
+
 eslog = get_logger(__name__)
 
 profiler = None
@@ -68,6 +70,9 @@ def main(args, maxnbplayers):
     Returns:
         int: Exit code from the ROM launcher.
     """
+    # Connect ZeroMQ
+    regmsg_connect()
+
     # Get the file extension in lowercase
     extension = path.splitext(args.rom)[1][1:].lower()
 
