@@ -162,21 +162,25 @@
 		};
 	};
 
-    gpio_leds: gpio-leds {
+    leds: gpio-leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
-		pinctrl-0 = <&led_pins>;
+		pinctrl-0 =<&leds_rgb>;
+		status = "okay";
 
-		green_led: led-0 {
-			color = <LED_COLOR_ID_GREEN>;
-			gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
-			function = LED_FUNCTION_STATUS;
+		red_led@1 {
+			gpios = <&gpio3 RK_PC2 GPIO_ACTIVE_HIGH>;
+			label = "red_led";
+			linux,default-trigger = "cw2015-battery-charging";
+			linux,default-trigger-delay-ms = <0>;
 		};
 
-		red_led: led-1 {
-			color = <LED_COLOR_ID_RED>;
-			gpios = <&gpio3 RK_PC2 GPIO_ACTIVE_HIGH>;
-			function = LED_FUNCTION_CHARGING;
+		green_led@2 {
+			gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
+			label = "green_led";
+			default-state = "on";
+			linux,default-trigger = "cw2015-battery-full";
+			linux,default-trigger-delay-ms = <0>;
 		};
 	};
 
@@ -259,7 +263,7 @@
 
     es8388_sound: es8388-sound {
 		status = "okay";
-		compatible = "rockchip,multicodecs-card";
+		compatible = "rockchip,multicodecs-card","everest,es8388";
 		rockchip,card-name = "rockchip,es8388-codec";
 		hp-det-gpio = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
 		io-channels = <&saradc 3>;
@@ -272,6 +276,13 @@
 		rockchip,mclk-fs = <256>;
 		rockchip,cpu = <&i2s0_8ch>;
 		rockchip,codec = <&es8388>;
+		spk-volume = <50>;
+		spk-volume-l = <50>;
+		spk-volume-r = <50>;
+		use-ext-amplifier;
+		hp-volume = <20>;
+		out-l2spk-r2hp;
+
 		rockchip,audio-routing =
 			"Headphone", "LOUT1",
 			"Headphone", "ROUT1",
@@ -285,6 +296,7 @@
 			"LINPUT2", "Main Mic",
 			"RINPUT1", "Headset Mic",
 			"RINPUT2", "Headset Mic";
+
 		pinctrl-names = "default";
 		pinctrl-0 = <&hp_det>;
 		play-pause-key {
@@ -294,32 +306,10 @@
 		};
 	};
 
-    pwm_gpio33: pwm-33 {
-		compatible = "pwm-gpio";
-		gpios = <&gpio1 RK_PA1 GPIO_ACTIVE_HIGH>;
-		pinctrl-0 = <&vib_right_h>;
-		pinctrl-names = "default";
-		#pwm-cells = <3>;
-	};
-
-	pwm_gpio132: pwm-132 {
-		compatible = "pwm-gpio";
-		gpios = <&gpio4 RK_PA4 GPIO_ACTIVE_HIGH>;
-		pinctrl-0 = <&vib_left_h>;
-		pinctrl-names = "default";
-		#pwm-cells = <3>;
-	};
-
-    vibrator_l: vibrator-l {
-		compatible = "pwm-vibrator";
-		pwm-names = "enable";
-		pwms = <&pwm_gpio132 0 20000000 0>;
-	};
-
-	vibrator_r: vibrator-r {
-		compatible = "pwm-vibrator";
-		pwm-names = "enable";
-		pwms = <&pwm_gpio33 0 20000000 0>;
+    vibrator {
+		compatible = "rk-vibrator-gpio";
+		vibrator-gpio = <&gpio4 RK_PA4 GPIO_ACTIVE_HIGH>;
+		status = "okay";
 	};
 
 	sdio_pwrseq: sdio-pwrseq {
@@ -676,7 +666,7 @@
 };
 
 &dp0_sound{
-    status = "disabled";
+    status = "okay";
 };
 
 &dp0 {
@@ -1080,12 +1070,10 @@
 };
 
 &pinctrl {
-
-    gpio-leds {
-		led_pins: led-pins {
-			rockchip,pins =
-				<3 RK_PC1 RK_FUNC_GPIO &pcfg_pull_up>,
-				<3 RK_PC2 RK_FUNC_GPIO &pcfg_pull_up>;
+    leds_gpio {
+		leds_rgb: leds-rgb {
+		        rockchip,pins = <3 RK_PC2 RK_FUNC_GPIO &pcfg_pull_up>,
+					            <3 RK_PC1 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 
@@ -1158,18 +1146,6 @@
 	usb-typec {
 		usbc0_int: usbc0-int {
 			rockchip,pins = <0 RK_PC7 RK_FUNC_GPIO &pcfg_pull_up>;
-		};
-	};
-
-    vibrator {
-		vib_left_h: vib-left-h {
-			rockchip,pins =
-				<4 RK_PA4 RK_FUNC_GPIO &pcfg_pull_down>;
-		};
-
-		vib_right_h: vib-right-h {
-			rockchip,pins =
-				<1 RK_PA1 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
 	};
 
