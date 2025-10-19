@@ -285,6 +285,7 @@ endmenu
 menu "Libraries"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/appstream/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/cargs/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/cxxopts/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/dxvk/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/dxvk-nvapi/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/ecm/Config.in"
