@@ -1,0 +1,29 @@
+--- a/libretro/Makefile	2025-10-16 10:32:32.854922839 +0800
++++ b/libretro/Makefile	2025-10-16 10:33:13.785460177 +0800
+@@ -2,7 +2,7 @@
+ HAVE_EXCEPTIONS = 0
+ HAVE_STRINGS_H = 1
+ 
+-LTO ?= -flto
++LTO ?= -flto=auto
+ SPACE :=
+ SPACE := $(SPACE) $(SPACE)
+ BACKSLASH :=
+@@ -170,7 +170,7 @@
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--version-script=link.T -Wl,--no-undefined
+ 	CXXFLAGS += -Ofast \
+-	-flto=4 -fwhole-program -fuse-linker-plugin \
++	-flto=auto -fwhole-program -fuse-linker-plugin \
+ 	-fdata-sections -ffunction-sections -Wl,--gc-sections \
+ 	-fno-stack-protector -fno-ident -fomit-frame-pointer \
+ 	-falign-functions=1 -falign-jumps=1 -falign-loops=1 \
+@@ -199,7 +199,7 @@
+ 	fpic := -fPIC
+ 	SHARED := -shared -Wl,--version-script=link.T -Wl,--no-undefined
+ 	CXXFLAGS += -Ofast \
+-	-flto=4 -fwhole-program -fuse-linker-plugin \
++	-flto=auto -fwhole-program -fuse-linker-plugin \
+ 	-fdata-sections -ffunction-sections -Wl,--gc-sections \
+ 	-fno-stack-protector -fno-ident -fomit-frame-pointer \
+ 	-falign-functions=1 -falign-jumps=1 -falign-loops=1 \

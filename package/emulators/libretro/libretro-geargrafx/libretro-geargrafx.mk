@@ -3,8 +3,8 @@
 # libretro-geargrafx
 #
 ################################################################################
-# Version: Release on Aug 27, 2025
-LIBRETRO_GEARGRAFX_VERSION = 1.6.3
+# Version: Release on Oct 14, 2025
+LIBRETRO_GEARGRAFX_VERSION = 1.6.4
 LIBRETRO_GEARGRAFX_SITE = $(call github,drhelius,Geargrafx,$(LIBRETRO_GEARGRAFX_VERSION))
 LIBRETRO_GEARGRAFX_LICENSE = GPLv3
 

@@ -25,7 +25,7 @@ snes-msu1:
   manufacturer: Nintendo
   release: 1991
   hardware: console
-  extensions: [smc, sfc]
+  extensions: [smc, sfc, msu1]
   group: snes
   emulators:
     libretro:

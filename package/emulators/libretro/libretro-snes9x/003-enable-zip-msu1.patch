@@ -1,0 +1,11 @@
+--- a/libretro/libretro.cpp	2025-10-16 10:38:44.312455522 +0800
++++ b/libretro/libretro.cpp	2025-10-16 10:41:40.840482152 +0800
+@@ -818,7 +818,7 @@
+ #define GIT_VERSION ""
+ #endif
+     info->library_version = VERSION GIT_VERSION;
+-    info->valid_extensions = "smc|sfc|swc|fig|bs|st";
++    info->valid_extensions = "smc|sfc|swc|fig|bs|st|zip|msu1";
+     info->need_fullpath = false;
+     info->block_extract = false;
+ }
