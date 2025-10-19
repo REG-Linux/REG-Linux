@@ -3,8 +3,8 @@
 # BOX64 emulator
 #
 ################################################################################
-# Version.: Release on Jun 6, 2025
-BOX64_VERSION = v0.3.6
+# Version.: Release on Oct 14th, 2025
+BOX64_VERSION = v0.3.8
 BOX64_SITE = https://github.com/ptitseb/box64
 BOX64_SITE_METHOD=git
 BOX64_LICENSE = GPLv3
@@ -33,7 +33,7 @@ BOX64_CONF_OPTS += -DM1=ON
 else  ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
 BOX64_CONF_OPTS += -DSD865=ON
 else  ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
-BOX64_CONF_OPTS += -DSD865=ON
+BOX64_CONF_OPTS += -DSD8G2=ON
 else
 BOX64_CONF_OPTS += -DARM64=ON -DSAVE_MEM=ON
 endif
