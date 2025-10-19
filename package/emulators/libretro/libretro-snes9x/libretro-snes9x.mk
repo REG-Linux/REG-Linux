@@ -22,6 +22,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2711),y)
 LIBRETRO_SNES9X_PLATFORM = rpi4_64
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_BCM2712),y)
 LIBRETRO_SNES9X_PLATFORM = rpi5_64
+else ifeq ($(BR2_cortex_a7),y)
+LIBRETRO_SNES9X_PLATFORM = classic_armv7_a7
 else ifeq ($(BR2_aarch64),y)
 LIBRETRO_SNES9X_PLATFORM = unix
 endif
