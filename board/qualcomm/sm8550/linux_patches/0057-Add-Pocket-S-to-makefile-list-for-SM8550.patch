@@ -1,0 +1,25 @@
+From 6667d40bcd35414b90402e85a6deb045aeb1ae52 Mon Sep 17 00:00:00 2001
+From: Demetris Ierokipides <ierokipides.dem@gmail.com>
+Date: Tue, 21 Oct 2025 21:55:37 +0300
+Subject: [PATCH] Add Pocket S to makefile list for SM8550
+
+Signed-off-by: Demetris Ierokipides <ierokipides.dem@gmail.com>
+---
+ arch/arm64/boot/dts/qcom/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
+index b13c169ec..7b4eacdfd 100644
+--- a/arch/arm64/boot/dts/qcom/Makefile
++++ b/arch/arm64/boot/dts/qcom/Makefile
+@@ -259,6 +259,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= sm8450-hdk.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sm8450-qrd.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sm8450-sony-xperia-nagara-pdx223.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sm8450-sony-xperia-nagara-pdx224.dtb
++dtb-$(CONFIG_ARCH_QCOM)	+= sm8550-ayaneo-ps.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sm8550-hdk.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sm8550-mtp.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sm8550-qrd.dtb
+-- 
+2.43.0
+
