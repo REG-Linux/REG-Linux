@@ -1,0 +1,102 @@
+From cdbd2f1c19af2b7b1e98fe6c4e66425a2369faa1 Mon Sep 17 00:00:00 2001
+From: KancyJoe <kancy2333@outlook.com>
+Date: Fri, 6 Jun 2025 07:46:29 +0000
+Subject: [PATCH] Add ucm2 configuration for ayaneo pocket s.
+
+---
+ ucm2/Qualcomm/sm8550/APS/HiFi.conf       | 57 ++++++++++++++++++++++++
+ ucm2/Qualcomm/sm8550/APS/SM8550-APS.conf | 11 +++++
+ ucm2/conf.d/sm8550/SM8550-APS.conf       |  1 +
+ 3 files changed, 69 insertions(+)
+ create mode 100644 ucm2/Qualcomm/sm8550/APS/HiFi.conf
+ create mode 100644 ucm2/Qualcomm/sm8550/APS/SM8550-APS.conf
+ create mode 120000 ucm2/conf.d/sm8550/SM8550-APS.conf
+
+diff --git a/ucm2/Qualcomm/sm8550/APS/HiFi.conf b/ucm2/Qualcomm/sm8550/APS/HiFi.conf
+new file mode 100644
+index 000000000..6967be300
+--- /dev/null
++++ b/ucm2/Qualcomm/sm8550/APS/HiFi.conf
+@@ -0,0 +1,57 @@
++SectionVerb {
++	EnableSequence [
++		cset "name='WSA_CODEC_DMA_RX_0 Audio Mixer MultiMedia2' 1"
++		cset "name='MultiMedia3 Mixer VA_CODEC_DMA_TX_0' 1"
++ 	]
++
++	Include.wsae.File "/codecs/wsa884x/two-speakers/DefaultEnableSeq.conf"
++
++	Value {
++		TQ "HiFi"
++	}
++}
++
++SectionDevice."Speaker" {
++	Comment "Speaker playback"
++
++        Include.wsmspk1e.File "/codecs/qcom-lpass/wsa-macro/SpeakerEnableSeq.conf"
++        Include.wsmspk1d.File "/codecs/qcom-lpass/wsa-macro/SpeakerDisableSeq.conf"
++        Include.wsaspkd.File "/codecs/wsa884x/two-speakers/SpeakerSeq.conf"
++
++	Value {
++		PlaybackChannels 2
++		PlaybackPriority 100
++		PlaybackPCM "hw:${CardId},1"
++		PlaybackMixer "default:${CardId}"
++                PlaybackMixerElem "Speakers"
++	}
++}
++
++SectionDevice."Mic1" {
++        Comment "Top microphones"
++
++        Include.vadm0e.File "/codecs/qcom-lpass/va-macro/DMIC0EnableSeq.conf"
++        Include.vadm0d.File "/codecs/qcom-lpass/va-macro/DMIC0DisableSeq.conf"
++        Include.vadm1e.File "/codecs/qcom-lpass/va-macro/DMIC1EnableSeq.conf"
++        Include.vadm1d.File "/codecs/qcom-lpass/va-macro/DMIC1DisableSeq.conf"
++
++        Value {
++                CapturePriority 100
++                CapturePCM "hw:${CardId},2"
++        }
++}
++
++#SectionDevice."Mic2" {
++#        Comment "Bottom microphones"
++#
++#        Include.vadm2e.File "/codecs/qcom-lpass/va-macro/DMIC2EnableSeq.conf"
++#        Include.vadm2d.File "/codecs/qcom-lpass/va-macro/DMIC2DisableSeq.conf"
++#        Include.vadm3e.File "/codecs/qcom-lpass/va-macro/DMIC3EnableSeq.conf"
++#        Include.vadm3d.File "/codecs/qcom-lpass/va-macro/DMIC3DisableSeq.conf"
++#
++#        Value {
++#                CapturePriority 100
++#                CapturePCM "hw:${CardId},4"
++#        }
++#}
++
+diff --git a/ucm2/Qualcomm/sm8550/APS/SM8550-APS.conf b/ucm2/Qualcomm/sm8550/APS/SM8550-APS.conf
+new file mode 100644
+index 000000000..61518cab5
+--- /dev/null
++++ b/ucm2/Qualcomm/sm8550/APS/SM8550-APS.conf
+@@ -0,0 +1,11 @@
++Syntax 4
++
++SectionUseCase."HiFi" {
++	File "/Qualcomm/sm8550/APS/HiFi.conf"
++	Comment "HiFi quality Music."
++}
++
++Include.card-init.File "/lib/card-init.conf"
++Include.ctl-remap.File "/lib/ctl-remap.conf"
++Include.wsa-init.File "/codecs/wsa884x/two-speakers/init.conf"
++Include.wsam-init.File "/codecs/qcom-lpass/wsa-macro/init.conf"
+diff --git a/ucm2/conf.d/sm8550/SM8550-APS.conf b/ucm2/conf.d/sm8550/SM8550-APS.conf
+new file mode 120000
+index 000000000..20ff45779
+--- /dev/null
++++ b/ucm2/conf.d/sm8550/SM8550-APS.conf
+@@ -0,0 +1 @@
++../../Qualcomm/sm8550/APS/SM8550-APS.conf
+\ No newline at end of file
