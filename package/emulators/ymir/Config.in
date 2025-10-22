@@ -2,10 +2,21 @@ config BR2_PACKAGE_YMIR
     bool "ymir"
     depends on BR2_PACKAGE_CLANG
     depends on BR2_PACKAGE_HAS_LIBEGL
+    select BR2_PACKAGE_CEREAL
+    select BR2_PACKAGE_CXXOPTS
+    select BR2_PACKAGE_DATE
+    select BR2_PACKAGE_FMT
+    select BR2_PACKAGE_JSON_FOR_MODERN_CPP
+    select BR2_PACKAGE_LIBCURL
+    select BR2_PACKAGE_LIBXKBCOMMON
+    select BR2_PACKAGE_NGHTTP3
+    select BR2_PACKAGE_RTMIDI
+    select BR2_PACKAGE_SDL3
+    select BR2_PACKAGE_SEMVER
+    select BR2_PACKAGE_STB
+    select BR2_PACKAGE_TOMLPLUSPLUS
     select BR2_PACKAGE_WAYLAND
     select BR2_PACKAGE_WAYLAND_PROTOCOLS
-    select BR2_PACKAGE_LIBXKBCOMMON
-    select BR2_PACKAGE_SDL3
 
     help
       A work-in-progress Sega Saturn emulator.
