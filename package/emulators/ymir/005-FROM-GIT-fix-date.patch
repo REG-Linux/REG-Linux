@@ -1,0 +1,22 @@
+From b2ef0f52e1666335fc95e56c1fe0ebae086cd175 Mon Sep 17 00:00:00 2001
+From: StrikerX3 <StrikerX3@users.noreply.github.com>
+Date: Tue, 14 Oct 2025 08:37:59 -0300
+Subject: [PATCH] fix(build): Use `date::from_stream` to fix Flatpak build
+
+---
+ apps/ymir-sdl3/src/util/std_lib.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/apps/ymir-sdl3/src/util/std_lib.cpp b/apps/ymir-sdl3/src/util/std_lib.cpp
+index 36cf6310f..e7f214196 100644
+--- a/apps/ymir-sdl3/src/util/std_lib.cpp
++++ b/apps/ymir-sdl3/src/util/std_lib.cpp
+@@ -20,7 +20,7 @@ tm to_local_time(std::chrono::system_clock::time_point tp) {
+ std::optional<std::chrono::seconds> parse8601(std::string str) {
+     std::istringstream in{str};
+     date::sys_time<std::chrono::seconds> tp{};
+-    in >> date::parse("%FT%TZ", tp);
++    date::from_stream(in, "%FT%TZ", tp);
+     if (in) {
+         return tp.time_since_epoch();
+     }

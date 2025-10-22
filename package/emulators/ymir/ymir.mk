@@ -3,14 +3,15 @@
 # Ymir
 #
 ################################################################################
-# Release on Sep 10, 2025
-YMIR_VERSION = v0.1.8
+# Release on Oct 12th, 2025
+YMIR_VERSION = v0.2.0
 YMIR_SITE = https://github.com/StrikerX3/Ymir
 YMIR_SITE_METHOD=git
 YMIR_GIT_SUBMODULES=YES
 YMIR_LICENSE = GPLv3
 YMIR_DEPENDENCIES = wayland wayland-protocols libegl libxkbcommon sdl3
-YMIR_DEPENDENCIES += llvm clang
+YMIR_DEPENDENCIES += llvm clang fmt cereal cxxopts date libcurl nghttp3
+YMIR_DEPENDENCIES += rtmidi semver stb tomlplusplus json-for-modern-cpp
 
 YMIR_SUPPORTS_IN_SOURCE_BUILD = NO
 
@@ -18,6 +19,9 @@ YMIR_SUPPORTS_IN_SOURCE_BUILD = NO
 #YMIR_CMAKE_BACKEND = ninja
 
 YMIR_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
+YMIR_CONF_OPTS += -DStb_INCLUDE_DIR=$(STAGING_DIR)/usr/include/stb
+
+#YMIR_CONF_OPTS += -DCMAKE_PREFIX_PATH=$(STAGING_DIR)/usr/lib/cmake:$(STAGING_DIR)/usr/lib/cmake/date
 #YMIR_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr"
 YMIR_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
 
@@ -46,7 +50,7 @@ YMIR_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-lstdc++ -lm"
 #YMIR_CONF_OPTS += -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
 #YMIR_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=bfd -lstdc++"
 
-# TODO AVX2 for x86_64_v3
+# Enable AVX2 for x86_64_v3
 ifeq ($(BR2_x86_x86_64_v3),y)
 YMIR_CONF_OPTS += -DYmir_AVX2=ON
 endif
