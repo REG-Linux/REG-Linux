@@ -1,0 +1,11 @@
+--- a/apps/ymir-sdl3/CMakeLists.txt	2025-10-20 18:21:03.371696832 +0800
++++ b/apps/ymir-sdl3/CMakeLists.txt	2025-10-20 18:21:09.844897158 +0800
+@@ -357,7 +357,7 @@
+ find_package(fmt CONFIG REQUIRED)
+ find_package(rtmidi CONFIG REQUIRED)
+ find_package(SDL3 CONFIG REQUIRED)
+-find_package(Stb REQUIRED)
++#find_package(Stb REQUIRED)
+ find_package(tomlplusplus CONFIG REQUIRED)
+ 
+ target_include_directories(ymir-sdl3
