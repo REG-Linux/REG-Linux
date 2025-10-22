@@ -1,0 +1,11 @@
+--- a/apps/ymir-sdl3/CMakeLists.txt	2025-10-20 20:19:37.697517970 +0800
++++ b/apps/ymir-sdl3/CMakeLists.txt	2025-10-20 20:20:00.905879983 +0800
+@@ -379,7 +379,7 @@
+     cereal::cereal
+     lz4::lz4
+     RtMidi::rtmidi
+-    CURL::libcurl_static
++    CURL::libcurl
+ )
+ if (WIN32)
+     target_link_libraries(ymir-sdl3 PRIVATE

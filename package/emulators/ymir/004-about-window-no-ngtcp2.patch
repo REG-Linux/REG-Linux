@@ -1,0 +1,18 @@
+--- a/apps/ymir-sdl3/src/app/ui/windows/about_window.cpp	2025-10-21 21:45:18.513944852 +0700
++++ b/apps/ymir-sdl3/src/app/ui/windows/about_window.cpp	2025-10-21 21:46:27.097475087 +0700
+@@ -17,7 +17,6 @@
+ #include <lz4.h>
+ #include <nghttp2/nghttp2ver.h>
+ #include <nghttp3/version.h>
+-#include <ngtcp2/version.h>
+ #include <nlohmann/json.hpp>
+ #include <openssl/opensslv.h>
+ #include <rtmidi/RtMidi.h>
+@@ -113,7 +112,6 @@
+     {.name = "Neargye/semver",                .version = SEMVER_VERSION,             .license = licenseMIT,           .repoURL = "https://github.com/Neargye/semver",              .licenseURL = "https://github.com/Neargye/semver/blob/master/LICENSE"},
+     {.name = "nghttp2",                       .version = NGHTTP2_VERSION,            .license = licenseMIT,           .repoURL = "https://github.com/nghttp2/nghttp2",             .licenseURL = "https://github.com/nghttp2/nghttp2/blob/master/COPYING",                 .homeURL = "https://nghttp2.org/"},
+     {.name = "nghttp3",                       .version = NGHTTP3_VERSION,            .license = licenseMIT,           .repoURL = "https://github.com/ngtcp2/nghttp3",              .licenseURL = "https://github.com/ngtcp2/nghttp3/blob/main/COPYING",                    .homeURL = "https://nghttp2.org/nghttp3/"},
+-    {.name = "ngtcp2",                        .version = NGTCP2_VERSION,             .license = licenseMIT,           .repoURL = "https://github.com/ngtcp2/ngtcp2",               .licenseURL = "https://github.com/ngtcp2/ngtcp2/blob/main/COPYING",                     .homeURL = "https://nghttp2.org/ngtcp2/"},
+     {.name = "nlohmann/json",                 .version = NLOHMANN_JSON_VERSION,      .license = licenseMIT,           .repoURL = "https://github.com/nlohmann/json",               .licenseURL = "https://github.com/nlohmann/json/blob/develop/LICENSE.MIT",              .homeURL = "https://json.nlohmann.me/"},
+     {.name = "OpenSSL",                       .version = OPENSSL_FULL_VERSION_STR,   .license = licenseApache2_0,     .repoURL = "https://github.com/openssl/openssl",             .licenseURL = "https://github.com/openssl/openssl/blob/master/LICENSE.txt",             .homeURL = "https://www.openssl.org/"},
+     {.name = "RtMidi",                        .version = RTMIDI_VERSION,             .license = licenseMITRtMidi,     .repoURL = "https://github.com/thestk/rtmidi",               .licenseURL = "https://github.com/thestk/rtmidi/blob/master/LICENSE"},
