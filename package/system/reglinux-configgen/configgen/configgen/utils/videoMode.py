@@ -1,6 +1,6 @@
 from os import path
 from time import sleep
-from subprocess import Popen, PIPE, CalledProcessError, run, check_output
+from subprocess import PIPE, CalledProcessError, run, check_output
 from csv import reader
 from sys import stdout
 from typing import Optional, List, Dict
@@ -13,12 +13,12 @@ eslog = get_logger(__name__)
 
 def changeMode(videomode: str) -> None:
     """Set a specific video mode."""
-    eslog.debug(f"setVideoMode({videomode}): {cmd}")
+    eslog.debug(f"setVideoMode({videomode})")
     max_tries = 2
     for i in range(max_tries):
         try:
             result = regmsg_send_message("setMode " + videomode)
-            eslog.debug(result.stdout.strip())
+            eslog.debug(result.strip())
             return
         except CalledProcessError as e:
             eslog.error(f"Error setting video mode: {e.stderr}")
@@ -36,8 +36,19 @@ def getCurrentMode() -> Optional[str]:
 
 
 def getScreens() -> List[str]:
+    """Return a list of screen names detected by regmsg."""
     try:
-        return regmsg_send_message("listOutputs")
+        result = regmsg_send_message("listOutputs")
+
+        if result is None:
+            return []
+
+        if isinstance(result, str):
+            lines = [line.strip() for line in result.splitlines() if line.strip()]
+            return lines if lines else [result.strip()]
+
+        return [str(result).strip()]
+
     except Exception as e:
         eslog.error(f"Error listing screens: {e}")
         return []
