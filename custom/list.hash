@@ -28,6 +28,7 @@
 --------------------------------  package/llvm-project/llvm/0003-Another-gcc-15-fix-from-Sam-James.patch
 --------------------------------  package/mesa3d/0001-meson-Set-proper-value-for-LIBCLC_INCLUDEDIR.patch
 --------------------------------  package/mesa3d/0002-vc4-add-meson-option-to-disable-optional-neon-suppor.patch
+--------------------------------  package/mesa3d/0004-Fix-uClibc-build.patch
 56bdc2ec4fe2481e64b1fd8994317505  Makefile
 a28421a9760706d955819e9ce927acbb  arch/Config.in.arm
 27079cca2e6570dffdb72cd5c79cf026  boot/syslinux/syslinux.mk
