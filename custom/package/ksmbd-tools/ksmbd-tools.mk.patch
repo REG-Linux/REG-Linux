@@ -1,5 +1,5 @@
 diff --git a/package/ksmbd-tools/ksmbd-tools.mk b/package/ksmbd-tools/ksmbd-tools.mk
-index 261eddad7c..fdd06f1c24 100644
+index 261eddad7c5..2cdcfe2c215 100644
 --- a/package/ksmbd-tools/ksmbd-tools.mk
 +++ b/package/ksmbd-tools/ksmbd-tools.mk
 @@ -4,7 +4,7 @@
@@ -7,7 +7,7 @@ index 261eddad7c..fdd06f1c24 100644
  ################################################################################
  
 -KSMBD_TOOLS_VERSION = 3.5.2
-+KSMBD_TOOLS_VERSION = 3.5.3
++KSMBD_TOOLS_VERSION = 3.5.5
  KSMBD_TOOLS_SITE = https://github.com/cifsd-team/ksmbd-tools/releases/download/$(KSMBD_TOOLS_VERSION)
  KSMBD_TOOLS_LICENSE = GPL-2.0+
  KSMBD_TOOLS_LICENSE_FILES = COPYING
