@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA3D_VERSION = 25.2.4
+MESA3D_VERSION = 25.3.0-rc2
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://archive.mesa3d.org
 
@@ -169,7 +169,7 @@ ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER),)
 MESA3D_CONF_OPTS += \
 	-Dvulkan-drivers=
 else
-MESA3D_DEPENDENCIES += host-glslang host-python-glslang
+MESA3D_DEPENDENCIES += host-glslang
 MESA3D_CONF_OPTS += \
 	-Dvulkan-drivers=$(subst $(space),$(comma),$(MESA3D_VULKAN_DRIVERS-y))
 endif
@@ -277,13 +277,6 @@ MESA3D_CONF_OPTS += -Dlibunwind=enabled
 MESA3D_DEPENDENCIES += libunwind
 else
 MESA3D_CONF_OPTS += -Dlibunwind=disabled
-endif
-
-ifeq ($(BR2_PACKAGE_MESA3D_VDPAU),y)
-MESA3D_DEPENDENCIES += libvdpau
-MESA3D_CONF_OPTS += -Dgallium-vdpau=enabled
-else
-MESA3D_CONF_OPTS += -Dgallium-vdpau=disabled
 endif
 
 ifeq ($(BR2_PACKAGE_LM_SENSORS),y)
