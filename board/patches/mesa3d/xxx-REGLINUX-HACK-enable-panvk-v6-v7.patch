@@ -1,11 +1,11 @@
 --- a/src/panfrost/vulkan/panvk_physical_device.c	2025-05-22 22:06:48.460995227 +0200
 +++ b/src/panfrost/vulkan/panvk_physical_device.c	2025-05-22 22:06:58.701241900 +0200
-@@ -1096,13 +1096,13 @@
+@@ -269,13 +269,13 @@
     switch (arch) {
     case 6:
     case 7:
--      if (!getenv("PAN_I_WANT_A_BROKEN_VULKAN_DRIVER")) {
-+      /*if (!getenv("PAN_I_WANT_A_BROKEN_VULKAN_DRIVER")) {
+-      if (!os_get_option("PAN_I_WANT_A_BROKEN_VULKAN_DRIVER")) {
++      /*if (!os_get_option("PAN_I_WANT_A_BROKEN_VULKAN_DRIVER")) {
           result = panvk_errorf(instance, VK_ERROR_INCOMPATIBLE_DRIVER,
                                 "WARNING: panvk is not well-tested on v%d, "
                                 "pass PAN_I_WANT_A_BROKEN_VULKAN_DRIVER=1 "

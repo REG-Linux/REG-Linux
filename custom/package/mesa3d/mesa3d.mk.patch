@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/mesa3d.mk b/package/mesa3d/mesa3d.mk
-index 202fc5cc74..d9dc602bef 100644
+index 202fc5cc74..d00f55755b 100644
 --- a/package/mesa3d/mesa3d.mk
 +++ b/package/mesa3d/mesa3d.mk
 @@ -4,10 +4,10 @@
@@ -8,7 +8,7 @@ index 202fc5cc74..d9dc602bef 100644
  
 -# When updating the version, please also update mesa3d-headers
 -MESA3D_VERSION = 24.0.9
-+MESA3D_VERSION = 25.2.4
++MESA3D_VERSION = 25.3.0-rc2
  MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
  MESA3D_SITE = https://archive.mesa3d.org
 +
@@ -182,7 +182,7 @@ index 202fc5cc74..d9dc602bef 100644
  	-Dvulkan-drivers=
  else
 -MESA3D_DEPENDENCIES += host-python-glslang
-+MESA3D_DEPENDENCIES += host-glslang host-python-glslang
++MESA3D_DEPENDENCIES += host-glslang
  MESA3D_CONF_OPTS += \
  	-Dvulkan-drivers=$(subst $(space),$(comma),$(MESA3D_VULKAN_DRIVERS-y))
  endif
@@ -229,7 +229,21 @@ index 202fc5cc74..d9dc602bef 100644
  
  # libGL is only provided for a full xorg stack, without libglvnd
  ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_GLX),y)
-@@ -244,6 +300,24 @@ else
+@@ -223,13 +279,6 @@ else
+ MESA3D_CONF_OPTS += -Dlibunwind=disabled
+ endif
+ 
+-ifeq ($(BR2_PACKAGE_MESA3D_VDPAU),y)
+-MESA3D_DEPENDENCIES += libvdpau
+-MESA3D_CONF_OPTS += -Dgallium-vdpau=enabled
+-else
+-MESA3D_CONF_OPTS += -Dgallium-vdpau=disabled
+-endif
+-
+ ifeq ($(BR2_PACKAGE_LM_SENSORS),y)
+ MESA3D_CONF_OPTS += -Dlmsensors=enabled
+ MESA3D_DEPENDENCIES += lm-sensors
+@@ -244,6 +293,24 @@ else
  MESA3D_CONF_OPTS += -Dzstd=disabled
  endif
  
@@ -254,7 +268,7 @@ index 202fc5cc74..d9dc602bef 100644
  MESA3D_CFLAGS = $(TARGET_CFLAGS)
  
  # m68k needs 32-bit offsets in switch tables to build
-@@ -254,12 +328,28 @@ endif
+@@ -254,12 +321,28 @@ endif
  ifeq ($(BR2_PACKAGE_LIBGLVND),y)
  ifneq ($(BR2_PACKAGE_MESA3D_OPENGL_GLX)$(BR2_PACKAGE_MESA3D_OPENGL_EGL),)
  MESA3D_DEPENDENCIES += libglvnd
