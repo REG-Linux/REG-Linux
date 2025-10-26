@@ -13,7 +13,7 @@ XEMU_DEPENDENCIES = host-meson host-cmake host-pkgconf host-python3 host-python-
 XEMU_DEPENDENCIES += host-libcurl libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
 XEMU_DEPENDENCIES += libpcap libepoxy libgtk3 json-for-modern-cpp
 
-XEMU_EXTRA_DOWNLOADS = https://github.com/mborgerson/xemu-hdd-image/releases/download/1.0/xbox_hdd.qcow2.zip
+XEMU_EXTRA_DOWNLOADS = https://github.com/xemu-project/xemu-dashboard/releases/download/v20250806-0635/xbox_hdd.qcow2
 
 XEMU_CONF_ENV += PATH="/$(BR2_ARCH)/host/$(BR2_ARCH)-buildroot-linux-gnu/sysroot/usr/bin:$$PATH"
 
@@ -106,8 +106,7 @@ define XEMU_INSTALL_TARGET_CMDS
 	# XEmu app data
 	mkdir -p $(TARGET_DIR)/usr/share/xemu/data
 	cp $(@D)/data/* $(TARGET_DIR)/usr/share/xemu/data/
-	$(UNZIP) -ob $(XEMU_DL_DIR)/xbox_hdd.qcow2.zip xbox_hdd.qcow2 -d \
-	    $(TARGET_DIR)/usr/share/xemu/data
+	cp $(XEMU_DL_DIR)/xbox_hdd.qcow2 $(TARGET_DIR)/usr/share/xemu/data/
 endef
 
 define XEMU_VERSION_DETAILS
