@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-REGLINUX_MSG_VERSION = 925bacd74a4322d0360b183afa68d390800250b6
+REGLINUX_MSG_VERSION = 8ddb4a2cb910bf5ab3108ff6a4eb99db3fdb609c
 REGLINUX_MSG_SITE = $(call github,REG-Linux,regmsg,$(REGLINUX_MSG_VERSION))
 REGLINUX_MSG_LICENSE = MIT
 REGLINUX_MSG_LICENSE_FILES = LICENSE
