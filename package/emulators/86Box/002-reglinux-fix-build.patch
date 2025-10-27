@@ -1,0 +1,11 @@
+--- a/src/unix/unix.c	2025-10-27 11:28:41.034900302 +0700
++++ b/src/unix/unix.c	2025-10-27 11:28:52.420497953 +0700
+@@ -291,7 +291,7 @@
+         case STRING_MONITOR_SLEEP:
+             return L"Monitor in sleep mode";
+         case STRING_EDID_TOO_LARGE:
+-            return "EDID file \"%ls\" is too large.";
++            return L"EDID file \"%ls\" is too large.";
+     }
+     return L"";
+ }
