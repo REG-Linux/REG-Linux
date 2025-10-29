@@ -139,7 +139,7 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "amlogic/s905gen2/radxa-zero amlogic/s905gen2/khadas-vim2"				if BR2_PACKAGE_SYSTEM_TARGET_S905GEN2
 	default "amlogic/s905gen3/odroid-c4 amlogic/s905gen3/khadas-vim3l amlogic/s905gen3/bananapi-m5 amlogic/s905gen3/s905x3-tvbox" \
 													if BR2_PACKAGE_SYSTEM_TARGET_S905GEN3
-	default "amlogic/s922x/odroid-go-ultra amlogic/s922x/beelink-gtking-pro amlogic/s922x/beelink-gtking amlogic/s922x/odroid-n2l amlogic/s922x/khadas-vim3 amlogic/s922x/odroid-n2 amlogic/s922x/odroid-n2plus amlogic/s922x/radxa-zero2 amlogic/s922x/bananapi-m2s" \
+	default "amlogic/s922x/odroid-go-ultra amlogic/s922x/beelink-gtking-pro amlogic/s922x/beelink-gtking amlogic/s922x/odroid-n2l amlogic/s922x/khadas-vim3 amlogic/s922x/odroid-n2 amlogic/s922x/odroid-n2plus amlogic/s922x/radxa-zero2pro amlogic/s922x/bananapi-m2s" \
 													if BR2_PACKAGE_SYSTEM_TARGET_S922X
 	default "amlogic/s9gen4/khadas-vim1s"								if BR2_PACKAGE_SYSTEM_TARGET_S9GEN4
 	default "amlogic/a3gen2/khadas-vim4"								if BR2_PACKAGE_SYSTEM_TARGET_A3GEN2
