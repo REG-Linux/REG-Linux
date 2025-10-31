@@ -1,7 +1,16 @@
 diff --git a/package/libdrm/libdrm.mk b/package/libdrm/libdrm.mk
-index 9d463ca01e..d2851be4f4 100644
+index 9d463ca01e..4ec0862044 100644
 --- a/package/libdrm/libdrm.mk
 +++ b/package/libdrm/libdrm.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-LIBDRM_VERSION = 2.4.124
++LIBDRM_VERSION = 2.4.127
+ LIBDRM_SOURCE = libdrm-$(LIBDRM_VERSION).tar.xz
+ LIBDRM_SITE = https://dri.freedesktop.org/libdrm
+ LIBDRM_LICENSE = MIT
 @@ -117,3 +117,8 @@ LIBDRM_CONF_OPTS += -Dtests=false
  endif
  
