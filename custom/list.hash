@@ -74,6 +74,7 @@ f5a30699e0b7651ec9862e2f9f8b37ed  package/libarchive/libarchive.mk
 171699577713d856ce8889d97c966447  package/libcec/Config.in
 be7091dd90cc6633f644562fd3416acb  package/libcec/libcec.mk
 ae2c4ab3c0c366417748405b0a1c2c92  package/libcurl/libcurl.mk
+72fe1d9ca9b9b791a3a50d5ff9371f52  package/libdrm/libdrm.hash
 7d250d3076d1f4e49ca0536684449e2a  package/libdrm/libdrm.mk
 7ecd8faf8aee2a75412583ccbca01ef0  package/libfreeimage/libfreeimage.mk
 74c62304d539d8adb876a03574c70f78  package/libglib2/Config.in
