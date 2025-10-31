@@ -3,8 +3,8 @@
 # taradino
 #
 ################################################################################
-# Version: Stable 20250816 release
-TARADINO_VERSION = 20250816
+# Version: Stable 20251031 release
+TARADINO_VERSION = 20251031
 TARADINO_SITE = https://github.com/fabiangreffrath/taradino.git
 TARADINO_SITE_METHOD=git
 TARADINO_GIT_SUBMODULES=YES
