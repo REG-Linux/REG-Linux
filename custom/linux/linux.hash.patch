@@ -1,5 +1,5 @@
 diff --git a/linux/linux.hash b/linux/linux.hash
-index 6068cdeca8..e5122ee1a9 100644
+index 6068cdeca8..b7e5b88409 100644
 --- a/linux/linux.hash
 +++ b/linux/linux.hash
 @@ -1,7 +1,9 @@
@@ -7,7 +7,7 @@ index 6068cdeca8..e5122ee1a9 100644
 -sha256  2d55ad149ca7d9ef82595c669430650030cbf9afbbeb42e5cd9b4ba3cc1a7221  linux-6.12.51.tar.xz
 -sha256  1bf20daf5543b8759f325e55fb0da4913715e68741627a13380e66aaf219fb1d  linux-6.6.110.tar.xz
 -sha256  c29387aeee085fbcbd91236224b9df805063bac43615e75cea2c6b29604a5c73  linux-6.1.155.tar.xz
-+sha256  c05faf36e9c2164be723cf6ada8533788804d48f9dd2fe1be2ccee3616a92bce  linux-6.17.5.tar.xz
++sha256  8ecfbc6b693448abb46144a8d04d1e1631639c7661c1088425a2e5406f13c69c  linux-6.17.6.tar.xz
 +sha256  7ca4debc5ca912ebb8a76944a5c118afd5d09e31ef43c494adb14273da29a26e  linux-6.16.12.tar.xz
 +sha256  55432b2af352f7bf3053c348d8549df2f2deeaa4a361c65d638c2f3b2ca7ec96  linux-6.12.56.tar.xz
 +sha256  ca4175a03ce2943ae192d77ad91e37ee292f1f1bb7b2954b062b0ef7eb0cb97c  linux-6.6.114.tar.xz
