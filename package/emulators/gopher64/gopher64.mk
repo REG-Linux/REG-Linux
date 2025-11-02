@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GOPHER64_VERSION = v1.1.1
+GOPHER64_VERSION = v1.1.9
 GOPHER64_SITE = https://github.com/gopher64/gopher64.git
 GOPHER64_SITE_METHOD = git
 GOPHER64_GIT_SUBMODULES = YES
