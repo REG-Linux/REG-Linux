@@ -4,6 +4,7 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 	# connman
 	select BR2_PACKAGE_CONNMAN			# network manager
 	select BR2_PACKAGE_CONNMAN_WIFI			# network manager
+	select BR2_PACKAGE_CONNMAN_BLUETOOTH		# network manager
 	select BR2_PACKAGE_CONNMAN_CLIENT		# network manager
 	select BR2_PACKAGE_CONNMAN_LOOPBACK		# network manager
 
@@ -44,8 +45,8 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 	select BR2_PACKAGE_AVAHI_DAEMON			# mDNS daemon
 	select BR2_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY	# bonjour compatibility layer
 
-	# legacy batocera ethtool
-	select BR2_PACKAGE_BATOCERA_ETHTOOL
+	# Ethernet tool
+	select BR2_PACKAGE_ETHTOOL
 
 	# cloud services
 	select BR2_PACKAGE_SYNCTHING			if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_MINI # sync files across multiple batoceras
