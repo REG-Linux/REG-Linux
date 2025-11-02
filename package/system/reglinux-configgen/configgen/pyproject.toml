@@ -19,6 +19,7 @@ dependencies = [
     "evdev>=1.9.2",
     "pyudev>=0.24.3",
     "ruamel.yaml>=0.18.15",
+    "pyzmq>=22.3.0"
 ]
 
 [tool.setuptools.packages.find]
