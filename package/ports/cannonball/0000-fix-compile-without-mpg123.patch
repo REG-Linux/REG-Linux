@@ -1,0 +1,64 @@
+--- a/src/main/sdl2/audio.cpp	2025-11-03 02:24:14.854991246 +0700
++++ b/src/main/sdl2/audio.cpp	2025-11-03 02:25:57.214638619 +0700
+@@ -20,7 +20,9 @@
+ 
+ #include <iostream>
+ #include <SDL.h>
++#ifdef WITH_MP3
+ #include <mpg123.h>         // to enable mp3 file music
++#endif
+ #include "sdl2/wav123.hpp"  // WAV "mpg123-like" decoder
+ #include <cctype>
+ #include <algorithm>        // for std::min & std::clamp
+@@ -62,6 +64,7 @@
+     return e == ext;
+ }
+ 
++#ifdef WITH_MP3
+ static const MpgLike kMp3Api = {
+     &mpg123_init, &mpg123_exit,
+     (void*(*)(const char*,int*))&mpg123_new,
+@@ -77,6 +80,7 @@
+     MPG123_ENC_SIGNED_16,
+     MPG123_OK, MPG123_ERR, MPG123_DONE
+ };
++#endif
+ 
+ static const MpgLike kWavApi = {
+     &wav123_init, &wav123_exit,
+@@ -479,7 +483,11 @@
+     // runs as a background task and triggers playback once 2 seconds of data has been processed.
+     // Handles .mp3 (via mpg123) and .wav (via wav123)
+     const bool is_wav = has_ext_ci(filename, "wav") || has_ext_ci(filename, "wave");
++#ifdef WITH_MP3
+     const MpgLike& api = is_wav ? kWavApi : kMp3Api;
++#else
++    const MpgLike& api = kWavApi;
++#endif
+ 
+     int err = 0;
+     void* h = api.newh(nullptr, &err);
+--- a/src/main/sdl2/audio.cpp	2025-11-03 02:28:18.262719087 +0700
++++ b/src/main/sdl2/audio.cpp	2025-11-03 02:29:06.620784419 +0700
+@@ -109,7 +109,9 @@
+ Audio::~Audio()
+ {
+     stop_audio();
++#ifdef WITH_MP3
+     mpg123_exit();
++#endif
+     wav123_exit();
+ }
+ 
+@@ -117,9 +119,11 @@
+ {
+     if (config.sound.enabled) {
+         // Initialize MP3 decoder (once)
++#ifdef WITH_MP3
+         if (mpg123_init() != MPG123_OK) {
+             std::cerr << "Failed to init mpg123: " << mpg123_plain_strerror(MPG123_ERR) << "\n";
+         }
++#endif
+         if (wav123_init() != 0) {
+             std::cerr << "Failed to init wav123\n";
+         }
