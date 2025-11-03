@@ -4,8 +4,10 @@
 #
 ################################################################################
 
-REGLINUX_MSG_VERSION = c5b5690407076ea3b4cbcb272ca168730b760ab4
-REGLINUX_MSG_SITE = $(call github,REG-Linux,regmsg,$(REGLINUX_MSG_VERSION))
+REGLINUX_MSG_VERSION = eed77dcee2959dcb0335afdf707a15b926ed423f
+REGLINUX_MSG_TOKEN = $(shell cat /build/gh_token)
+REGLINUX_MSG_SITE = https://$(REGLINUX_MSG_TOKEN)@github.com/REG-Linux/regmsg
+REGLINUX_MSG_SITE_METHOD = git
 REGLINUX_MSG_LICENSE = MIT
 REGLINUX_MSG_LICENSE_FILES = LICENSE
 REGLINUX_MSG_DEPENDENCIES += libdrm
