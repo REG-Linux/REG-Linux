@@ -3,7 +3,7 @@
 # cannonball
 #
 ################################################################################
-# Version.: Commits on Oct 5, 2025
+# Version.: Commits on Oct 16, 2025
 CANNONBALL_VERSION = aa77386ebe4a5d32e1b1d2b682aa52f3a1f76b5b
 CANNONBALL_SITE = $(call github,J1mbo,cannonball-se,$(CANNONBALL_VERSION))
 CANNONBALL_LICENSE = GPLv2
@@ -18,6 +18,8 @@ endif
 
 ifeq ($(BR2_PACKAGE_MPG123),y)
 CANNONBALL_DEPENDENCIES += mpg123
+else
+CANNONBALL_CONF_OPTS += -DWITH_MP3=OFF
 endif
 
 ifeq ($(BR2_x86_64),y)
