@@ -128,9 +128,8 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "allwinner/h6/orangepi-3-lts allwinner/h6/orangepi-3 allwinner/h6/orangepi-one-plus"	if BR2_PACKAGE_SYSTEM_TARGET_H6
 	default "allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/bananapi-m4-berry allwinner/h616/x96-mate" \
 													if BR2_PACKAGE_SYSTEM_TARGET_H616
-	default "allwinner/h700/anbernic-rg35xx"							if BR2_PACKAGE_SYSTEM_TARGET_H700
-	#default "allwinner/t527/orangepi-4a allwinner/t527/radxa-cubie-a5e"				if BR2_PACKAGE_SYSTEM_TARGET_T527
-	default "allwinner/t527/radxa-cubie-a5e"							if BR2_PACKAGE_SYSTEM_TARGET_T527
+	default "allwinner/h700/anbernic-h700"								if BR2_PACKAGE_SYSTEM_TARGET_H700
+	default "allwinner/t527/orangepi-4a allwinner/t527/radxa-cubie-a5e"				if BR2_PACKAGE_SYSTEM_TARGET_T527
 
 	# Amlogic targets
 	default "amlogic/s812"										if BR2_PACKAGE_SYSTEM_TARGET_S812
