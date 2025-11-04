@@ -1,5 +1,5 @@
 diff --git a/linux/Config.in b/linux/Config.in
-index 83bc4c421d..a9e077f9a3 100644
+index 83bc4c421d..3e679ba8a8 100644
 --- a/linux/Config.in
 +++ b/linux/Config.in
 @@ -137,7 +137,7 @@ config BR2_LINUX_KERNEL_CUSTOM_REPO_GIT_SUBMODULES
@@ -7,7 +7,7 @@ index 83bc4c421d..a9e077f9a3 100644
  config BR2_LINUX_KERNEL_VERSION
  	string
 -	default "6.12.51" if BR2_LINUX_KERNEL_LATEST_VERSION
-+	default "6.12.56" if BR2_LINUX_KERNEL_LATEST_VERSION
++	default "6.12.57" if BR2_LINUX_KERNEL_LATEST_VERSION
  	default "5.10.162-cip24" if BR2_LINUX_KERNEL_LATEST_CIP_VERSION
  	default "5.10.162-cip24-rt10" if BR2_LINUX_KERNEL_LATEST_CIP_RT_VERSION
  	default BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE \
