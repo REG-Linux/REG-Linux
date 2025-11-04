@@ -33,12 +33,18 @@ cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-2024.dtb"   "${REGLINUX_BINARIES
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-h.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-plus.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-sp.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
+cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-pro.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg40xx-h.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg40xx-v.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg34xx.dtb"        "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg34xx-sp.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg28xx.dtb"        "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
 cp "${BINARIES_DIR}/sun50i-h700-anbernic-rgcubexx.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/"       || exit 1
+cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-h-rev6-panel.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-2024-rev6-panel.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-plus-rev6-panel.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/sun50i-h700-anbernic-rg35xx-sp-v2-panel.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+
 cp "${BOARD_DIR}/boot/extlinux.conf"                        "${REGLINUX_BINARIES_DIR}/boot/extlinux/"   || exit 1
 
 exit 0
