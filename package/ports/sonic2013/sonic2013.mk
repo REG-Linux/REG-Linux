@@ -3,14 +3,20 @@
 # sonic2013
 #
 ################################################################################
-# Version: Commits on Oct 18, 2025
-SONIC2013_VERSION = 9554e05ebe8ca0816649f930cbc9de93d6466d88
+# Version: Release on Nov 2, 2025
+SONIC2013_VERSION = 1.3.3
 SONIC2013_SITE = https://github.com/RSDKModding/RSDKv4-Decompilation.git
 SONIC2013_SITE_METHOD = git
 SONIC2013_GIT_SUBMODULES = YES
 SONIC2013_LICENSE = Custom
 
 SONIC2013_DEPENDENCIES = sdl2 libogg libvorbis
+SONIC2013_CONF_OPTS += -DCMAKE_BUILD_TYPE=Release
+SONIC2013_CONF_OPTS += -DBUILD_SHARED_LIBS=OFF
+SONIC2013_CONF_OPTS += -DBUILD_STATIC_LIBS=ON
+SONIC2013_CONF_OPTS += -DGAME_INCLUDE_EDITOR=OFF
+SONIC2013_CONF_OPTS += -DRETRO_OUTPUT_NAME=sonic2013
+SONIC2013_CONF_OPTS += -DRETRO_SUBSYSTEM=SDL2
 
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
     SONIC2013_DEPENDENCIES += libglew libglu
@@ -21,8 +27,8 @@ define SONIC2013_BUILD_CMDS
 endef
 
 define SONIC2013_INSTALL_TARGET_CMDS
-	$(TARGET_STRIP) $(@D)/bin/RSDKv4
-	$(INSTALL) -D -m 0755 $(@D)/bin/RSDKv4 $(TARGET_DIR)/usr/bin/sonic2013
+	$(TARGET_STRIP) $(@D)/sonic2013
+	$(INSTALL) -D -m 0755 $(@D)/sonic2013 $(TARGET_DIR)/usr/bin/sonic2013
 endef
 
 define SONIC2013_POST_PROCESS
@@ -33,4 +39,4 @@ endef
 
 SONIC2013_POST_INSTALL_TARGET_HOOKS += SONIC2013_POST_PROCESS
 
-$(eval $(generic-package))
+$(eval $(cmake-package))
