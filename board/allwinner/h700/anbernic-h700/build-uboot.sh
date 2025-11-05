@@ -5,7 +5,7 @@ BOARD_DIR=$2
 IMAGES_DIR=$3
 
 # Define U-Boot version we use
-UBOOT_VERSION=2025.07
+UBOOT_VERSION=2025.10
 
 # Download U-Boot mainline
 wget "https://ftp.denx.de/pub/u-boot/u-boot-${UBOOT_VERSION}.tar.bz2"
