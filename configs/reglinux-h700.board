@@ -30,6 +30,9 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_INTREE_DTS_NAME="allwinner/sun50i-h700-anbernic-rg28xx allwinner/sun50i-h700-anbernic-rg34xx allwinner/sun50i-h700-anbernic-rg34xx-sp allwinner/sun50i-h700-anbernic-rg35xx-2024 allwinner/sun50i-h700-anbernic-rg35xx-2024-rev6-panel allwinner/sun50i-h700-anbernic-rg35xx-h allwinner/sun50i-h700-anbernic-rg35xx-h-rev6-panel allwinner/sun50i-h700-anbernic-rg35xx-plus allwinner/sun50i-h700-anbernic-rg35xx-plus-rev6-panel allwinner/sun50i-h700-anbernic-rg35xx-pro allwinner/sun50i-h700-anbernic-rg35xx-sp allwinner/sun50i-h700-anbernic-rg35xx-sp-v2-panel allwinner/sun50i-h700-anbernic-rg40xx-h allwinner/sun50i-h700-anbernic-rg40xx-v allwinner/sun50i-h700-anbernic-rgcubexx"
 
+# Dracut
+BR2_TARGET_ROOTFS_CPIO_DRACUT_CONF_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/allwinner/h700/dracut.conf"
+
 # GPU
 BR2_PACKAGE_SYSTEM_PANFROST_MESA3D=y
 
