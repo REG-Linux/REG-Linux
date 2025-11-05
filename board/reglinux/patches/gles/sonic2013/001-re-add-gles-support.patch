@@ -1,24 +1,3 @@
-diff -u -r a/Makefile b/Makefile
---- a/Makefile	2025-01-18 15:06:18.357049397 +0100
-+++ b/Makefile	2025-01-18 14:53:14.687063056 +0100
-@@ -4,7 +4,7 @@
- RETRO_USE_HW_RENDER          ?= 1
- RETRO_DISABLE_PLUS           ?= 0
- 
--CXXFLAGS_ALL = $(shell pkg-config --cflags --static sdl2 vorbisfile vorbis glew) $(CXXFLAGS) \
-+CXXFLAGS_ALL = $(shell pkg-config --cflags --static sdl2 vorbisfile vorbis egl glesv1_cm glesv2) $(CXXFLAGS) \
-         -DBASE_PATH='"$(BASE_PATH)"' \
-         -IRSDKv4/               \
-         -IRSDKv4/NativeObjects/ \
-@@ -13,7 +13,7 @@
-         -Idependencies/all/tinyxml2/
- 
- LDFLAGS_ALL = $(LDFLAGS)
--LIBS_ALL = $(shell pkg-config --libs --static sdl2 vorbisfile vorbis glew) -pthread $(LIBS)
-+LIBS_ALL = $(shell pkg-config --libs --static sdl2 vorbisfile vorbis egl glesv1_cm glesv2) -pthread $(LIBS)
- 
- SOURCES = dependencies/all/tinyxml2/tinyxml2.cpp \
-         RSDKv4/Animation.cpp     \
 diff -u -r a/RSDKv4/Drawing.cpp b/RSDKv4/Drawing.cpp
 --- a/RSDKv4/Drawing.cpp	2025-01-18 15:06:18.359049410 +0100
 +++ b/RSDKv4/Drawing.cpp	2025-01-18 14:44:26.348660591 +0100
@@ -68,3 +47,24 @@ diff -u -r a/RSDKv4/RetroEngine.hpp b/RSDKv4/RetroEngine.hpp
  #elif RETRO_USING_SDL1
  #include <SDL.h>
  #endif
+--- a/platforms/Linux.cmake	2025-11-05 11:57:15.958435403 +0100
++++ b/platforms/Linux.cmake	2025-11-05 12:00:57.851284185 +0100
+@@ -42,17 +42,7 @@
+ endif()
+ 
+ if(RETRO_USE_HW_RENDER)
+-    pkg_check_modules(GLEW glew)
+-
+-    if(NOT GLEW_FOUND)
+-        message(NOTICE "could not find glew, attempting to build from source")
+-
+-    else()
+-        message("found GLEW")
+-        target_link_libraries(RetroEngine ${GLEW_STATIC_LIBRARIES})
+-        target_link_options(RetroEngine PRIVATE ${GLEW_STATIC_LDLIBS_OTHER})
+-        target_compile_options(RetroEngine PRIVATE ${GLEW_STATIC_CFLAGS})
+-    endif()
++    target_link_libraries(RetroEngine GLESv1_CM GLESv2 EGL)
+ endif()
+ 
+ if(RETRO_SDL_VERSION STREQUAL "2")
