@@ -1,5 +1,6 @@
 from settings import UnixSettings
 from systemFiles import CONF
+import os
 
 VICE_CONFIG_DIR = CONF + "/vice"
 VICE_CONFIG_PATH = VICE_CONFIG_DIR + "/sdl-vicerc"
@@ -8,7 +9,14 @@ VICE_BIN_DIR = "/usr/bin/"
 
 
 def setViceConfig(system, metadata, guns):
+    # Create directory if it doesn't exist
+    os.makedirs(VICE_CONFIG_DIR, exist_ok=True)
+
     viceConfig = UnixSettings(VICE_CONFIG_PATH)
+
+    # Ensure the Version section exists and set the ConfigVersion
+    viceConfig.ensure_section("Version")
+    viceConfig.set("Version", "ConfigVersion", "3.9")
 
     if system.config["core"] == "x64":
         systemCore = "C64"
