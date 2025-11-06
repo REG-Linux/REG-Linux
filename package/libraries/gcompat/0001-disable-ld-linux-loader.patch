@@ -1,0 +1,20 @@
+--- a/Makefile	2022-10-21 10:13:10.000000000 +0200
++++ b/Makefile	2025-11-06 08:48:12.626851269 +0100
+@@ -66,7 +66,7 @@
+ OBSTACK_LIBS   = $(shell ${PKG_CONFIG} --libs ${WITH_OBSTACK})
+ endif
+ 
+-all: ${LIBGCOMPAT_NAME} ${LOADER_NAME}
++all: ${LIBGCOMPAT_NAME}
+ 
+ ${LIBGCOMPAT_NAME}: ${LIBGCOMPAT_OBJ}
+ 	${CC} ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname,${LIBGCOMPAT_NAME} \
+--- a/Makefile	2025-11-06 08:57:54.229430883 +0100
++++ b/Makefile	2025-11-06 08:58:00.431740797 +0100
+@@ -94,6 +94,5 @@
+ 
+ install: all
+ 	install -D -m755 ${LIBGCOMPAT_NAME} ${DESTDIR}/${LIBGCOMPAT_PATH}
+-	install -D -m755 ${LOADER_NAME} ${DESTDIR}/${LOADER_PATH}
+ 
+ .PHONY: all clean format install
