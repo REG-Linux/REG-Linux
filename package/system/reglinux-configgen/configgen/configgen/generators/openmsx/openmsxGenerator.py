@@ -6,7 +6,6 @@ import shutil
 import xml.dom.minidom as minidom
 import re
 import zipfile
-from distutils.dir_util import copy_tree
 
 from utils.logger import get_logger
 
@@ -14,6 +13,27 @@ eslog = get_logger(__name__)
 
 openMSX_Homedir = "/userdata/system/configs/openmsx"
 openMSX_Config = "/usr/share/openmsx/"
+
+
+def copy_directory(src, dst):
+    """
+    Copy all contents from src directory to dst directory, similar to distutils.dir_util.copy_tree
+    This function copies the directory tree from src to dst, creating dst if it doesn't exist
+    """
+    import os
+    import shutil
+
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+
+    for item in os.listdir(src):
+        src_path = os.path.join(src, item)
+        dst_path = os.path.join(dst, item)
+
+        if os.path.isdir(src_path):
+            copy_directory(src_path, dst_path)
+        else:
+            shutil.copy2(src_path, dst_path)
 
 
 class OpenmsxGenerator(Generator):
@@ -38,8 +58,10 @@ class OpenmsxGenerator(Generator):
 
         # copy files if needed
         if not os.path.exists(share_dir):
-            os.mkdir(share_dir)
-            copy_tree(openMSX_Config, share_dir)
+            os.makedirs(share_dir, exist_ok=True)
+            # Use shutil.copytree with dirs_exist_ok=True to mimic copy_tree behavior
+            # For older Python versions that don't support dirs_exist_ok, use a custom function
+            copy_directory(openMSX_Config, share_dir)
 
         # always use our settings.xml file as a base
         shutil.copy2(source_settings, share_dir)
@@ -49,23 +71,34 @@ class OpenmsxGenerator(Generator):
         root = tree.getroot()
 
         settings_elem = root.find("settings")
-        if system.isOptSet("openmsx_loading"):
-            fullspeed_elem = ET.Element("setting", {"id": "fullspeedwhenloading"})
-            fullspeed_elem.text = system.config["openmsx_loading"]
-        else:
-            fullspeed_elem = ET.Element("setting", {"id": "fullspeedwhenloading"})
-            fullspeed_elem.text = "true"
+        if settings_elem is not None:
+            if system.isOptSet("openmsx_loading"):
+                fullspeed_elem = ET.Element("setting", {"id": "fullspeedwhenloading"})
+                fullspeed_elem.text = system.config["openmsx_loading"]
+            else:
+                fullspeed_elem = ET.Element("setting", {"id": "fullspeedwhenloading"})
+                fullspeed_elem.text = "true"
 
-        settings_elem.append(fullspeed_elem)
+            settings_elem.append(fullspeed_elem)
+        else:
+            # Log the error but continue processing
+            eslog.warning(
+                "Could not find 'settings' element in XML, skipping fullspeedwhenloading setting"
+            )
 
         # Create the bindings element
         bindings_elem = ET.Element("bindings")
         new_bind = ET.Element("bind", {"key": "keyb F6"})
         new_bind.text = "cycle videosource"
+
+        # Add new_bind to bindings_elem (this is safe since we just created bindings_elem)
         bindings_elem.append(new_bind)
 
-        # Add the bindings element to the root element
-        root.append(bindings_elem)
+        # Add the bindings element to the root element only if both exist
+        if root is not None:
+            root.append(bindings_elem)
+        else:
+            eslog.warning("Could not add bindings to root element")
 
         # Write the updated xml to the file
         with open(settings_xml, "w") as f:
@@ -249,15 +282,17 @@ class OpenmsxGenerator(Generator):
                 cart_index = commandArray.index("-cart")
                 commandArray[cart_index] = "-carta"
                 commandArray[cart_index + 1] = rom1
+                # Add the second rom/disk
+                rom2_index = cart_index + 2
+                commandArray.insert(rom2_index, "-cartb")
+                commandArray.insert(rom2_index + 1, rom2)
             elif extension == "dsk":
                 cart_index = commandArray.index("-cart")
                 commandArray[cart_index] = "-diska"
                 commandArray[cart_index + 1] = rom1
-            if extension == "rom" or extension == "dsk":
+                # Add the second disk
                 rom2_index = cart_index + 2
-                commandArray.insert(
-                    rom2_index, "-cartb" if extension == "rom" else "-diskb"
-                )
+                commandArray.insert(rom2_index, "-diskb")
                 commandArray.insert(rom2_index + 1, rom2)
 
         return Command(array=commandArray)
