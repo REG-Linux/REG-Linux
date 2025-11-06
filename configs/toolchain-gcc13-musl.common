@@ -12,3 +12,6 @@ BR2_GCC_VERSION_13_X=y
 # BR2_TOOLCHAIN_GLIBC_GCONV_LIBS_COPY=y
 # Allow to build GOLD linker, but do not use as default
 BR2_BINUTILS_EXTRA_CONFIG_OPTIONS="--enable-gold --enable-plugins"
+
+# glibc compatibility layer
+BR2_PACKAGE_GCOMPAT=y
