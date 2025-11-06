@@ -125,7 +125,6 @@ def generateHotkeys(playersControllers):
                 return
 
             for x in pad.inputs:
-                print
                 input = pad.inputs[x]
 
                 keyname = None
