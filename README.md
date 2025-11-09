@@ -78,6 +78,6 @@ A more detailed explanation of the build process and directory layout is availab
 ### 🧑‍💻 Build Instructions
 
 ```bash
-git clone https://github.com/REG-Linux/REG-Linux.git
+git clone --recurse-submodules https://github.com/REG-Linux/REG-Linux.git
 cd REG-Linux
 make h700-build     # Example: build for Allwinner H700 target
