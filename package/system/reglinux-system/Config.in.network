@@ -49,7 +49,7 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 	select BR2_PACKAGE_ETHTOOL
 
 	# cloud services
-	select BR2_PACKAGE_SYNCTHING			if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_MINI # sync files across multiple batoceras
+	select BR2_PACKAGE_SYNCTHING			if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_MINI # sync files across multiple systems
 	select BR2_PACKAGE_RCLONE			if BR2_x86_64 && !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET # sync files in the cloud (require x86_64)
 
 	# Additional network drivers (out-of-tree kernel modules)

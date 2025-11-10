@@ -36,7 +36,7 @@ config BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET
 
 ##########################################
 config BR2_PACKAGE_REGLINUX_MUSIC_SUPPORT
-	bool "batocera.linux music formats support"
+	bool "music formats support"
 
 	# MIDI renderer (CPU hog)
 	select BR2_PACKAGE_FLUIDSYNTH		if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770  && \
@@ -252,7 +252,9 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 
 	# script tool
 	select BR2_PACKAGE_DIALOG
-	select BR2_PACKAGE_MOSQUITTO    if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_MINI # connected object interface (https://wiki.batocera.org/hardware:lcd_led_marquees)
+
+	# Connected object interface (LCD/LED marquees)
+	select BR2_PACKAGE_MOSQUITTO    if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_MINI
 
 	# tools
 	select BR2_PACKAGE_I2C_TOOLS
@@ -293,7 +295,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_AYANEO_PLATFORM	if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && BR2_x86_64
 
 	help
-	  Install the batocera.linux system files
+	  Install the system files
 
 config BR2_PACKAGE_SYSTEM_DEBUG
 	bool "System debug mode"
@@ -374,10 +376,10 @@ config BR2_PACKAGE_REGLINUX_ALL_SYSTEMS
 	select BR2_PACKAGE_REGLINUX_GAMES
 
 	help
-	  batocera.linux all supported emulation systems
+	  All supported emulation systems
 
 config BR2_PACKAGE_BATOCERA_GUNS
-	bool "batocera guns support"
+	bool "guns support"
 	select BR2_PACKAGE_AIMTRAK_GUNS				# aimtrak guns
 	select BR2_PACKAGE_SAMCO_GUNS				# samco guns
 	select BR2_PACKAGE_FUSION_LIGHTGUNS			# fusion lightguns

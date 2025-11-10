@@ -1,12 +1,10 @@
-diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index c382ed5d..4324c36a 100644
---- a/src/CMakeLists.txt
-+++ b/src/CMakeLists.txt
-@@ -111,6 +111,7 @@ if (MSVC)
- else()
-     add_compile_options(
-         -fwrapv
-+        -fpermissive
+--- a/src/CMakeLists.txt	2025-11-10 18:57:01.226181877 +0100
++++ b/src/CMakeLists.txt	2025-11-10 18:57:33.406381686 +0100
+@@ -116,6 +116,7 @@
+     if (NOT MSVC)
+         add_compile_options(
+             -fwrapv
++            -fpermissive
+         )
+     endif()
  
-         -Werror=all
-         -Werror=extra
