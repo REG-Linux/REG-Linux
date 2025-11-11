@@ -22,6 +22,7 @@ config BR2_PACKAGE_EDEN
     select BR2_PACKAGE_FFMPEG
     # Need yasm on x86_64 to compile bundled ffmpeg
     select BR2_PACKAGE_HOST_YASM		if BR2_x86_64
+    select BR2_PACKAGE_MBEDTLS
 
     help
       Eden: Nintendo Switch Emulator
