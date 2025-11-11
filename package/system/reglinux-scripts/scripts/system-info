@@ -139,9 +139,9 @@ MEM_TOTAL_MB=$((MEM_TOTAL_KB / 1024))
 MEM_AVAILABLE_MB=$((MEM_AVAILABLE_KB / 1024))
 echo "Available Memory: ${MEM_AVAILABLE_MB}/${MEM_TOTAL_MB} MB"
 
-DISPLAYRES=$(regmsg currentResolution)
-DISPLAYRATE=$(regmsg currentRefresh)
-DISPLAYBACKEND=$(regmsg currentBackend)
+DISPLAYRES=$(regmsg screen getresolution)
+DISPLAYRATE=$(regmsg screen getrefresh)
+DISPLAYBACKEND=$(regmsg screen getbackend)
 echo "Display Resolution: ${DISPLAYRES}"
 echo "Display Refresh Rate: ${DISPLAYRATE}"
 echo "Display Backend: ${DISPLAYBACKEND}"

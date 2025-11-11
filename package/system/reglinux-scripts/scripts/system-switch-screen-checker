@@ -5,15 +5,15 @@
 
 if test "${1}" == "--init"
 then
-    regmsg listOutputs | sort > /var/run/system-switch-screen-checker-status
+    regmsg screen listoutputs | sort > /var/run/system-switch-screen-checker-status
     exit 0
 fi
 
-DELTANEW=$(regmsg listOutputs | sort | diff /var/run/system-switch-screen-checker-status - | grep -E '^> ' | sed -e s/"^> "// | head -1)
+DELTANEW=$(regmsg screen listoutputs | sort | diff /var/run/system-switch-screen-checker-status - | grep -E '^> ' | sed -e s/"^> "// | head -1)
 NDELTANEW=$(echo "${DELTANEW}" | wc -l)
 
 # reinit status
-regmsg listOutputs | sort > /var/run/system-switch-screen-checker-status
+regmsg screen listoutputs | sort > /var/run/system-switch-screen-checker-status
 
 # 1 new screen, switch on it
 if test "${NDELTANEW}" == 1 -a "${DELTANEW}" != ""
