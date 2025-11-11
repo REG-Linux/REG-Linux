@@ -32,4 +32,4 @@ for_window [class=".*"] floating enable, fullscreen enable, border none
 # Starts EmulationStation when loading sway
 exec /usr/bin/system-mouse hide
 exec /usr/bin/emulationstation-standalone
-exec /usr/bin/regmsg mapTouchScreen
+exec /usr/bin/regmsg screen maptouchscreen

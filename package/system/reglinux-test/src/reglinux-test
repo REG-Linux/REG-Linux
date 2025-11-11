@@ -28,8 +28,8 @@ from datetime import datetime
 # output:
 # /userdata/reportTest/system-test_22-07-03_18h34.42/report.txt
 
-class SystemTest():
 
+class SystemTest:
     @staticmethod
     def run(args):
         timeGame = 10
@@ -52,7 +52,7 @@ class SystemTest():
         else:
             games = SystemTest.findGamesForEmulators(emulators)
 
-        resultName = "system-test_" + datetime.now().strftime('%y-%m-%d_%Hh%M.%S')
+        resultName = "system-test_" + datetime.now().strftime("%y-%m-%d_%Hh%M.%S")
         resultDir = os.path.join(outputDir, resultName)
         os.makedirs(resultDir, exist_ok=True)
 
@@ -72,10 +72,14 @@ class SystemTest():
     def gameReport(resultDir, results):
         with open(os.path.join(resultDir, "report.txt"), "w") as f:
             f.write("  Status      System            Game\n")
-            f.write("=======================================================================\n")
+            f.write(
+                "=======================================================================\n"
+            )
             for result in results:
                 status = "[SUCCESS]" if result["status"] else "[FAILED]"
-                f.write(f"{status}   {result['system']:17} {os.path.basename(result['game'])}\n")
+                f.write(
+                    f"{status}   {result['system']:17} {os.path.basename(result['game'])}\n"
+                )
 
     @staticmethod
     def runTest(system, game, resultDir, timeGame, screenshot):
@@ -95,7 +99,7 @@ class SystemTest():
             x = requests.get("http://localhost:1234/runningGame")
             x.raise_for_status()
             xj = x.json()
-            stillRunning = (xj.get("systemName") == system)
+            stillRunning = xj.get("systemName") == system
         except (requests.RequestException, ValueError):
             stillRunning = False
 
@@ -111,7 +115,7 @@ class SystemTest():
         emulators = {}
         paths = [
             "/userdata/system/configuration/emulationstation/es_systems.cfg",
-            "/usr/share/emulationstation/es_systems.cfg"
+            "/usr/share/emulationstation/es_systems.cfg",
         ]
 
         for path in paths:
@@ -127,9 +131,16 @@ class SystemTest():
 
         for system in systemList:
             if system.tag == "system":
-                infos = {systemInfo.tag: systemInfo.text for systemInfo in system if systemInfo.tag in ["name", "path", "extension"]}
+                infos = {
+                    systemInfo.tag: systemInfo.text
+                    for systemInfo in system
+                    if systemInfo.tag in ["name", "path", "extension"]
+                }
                 if "name" in infos and "path" in infos and "extension" in infos:
-                    emulators[infos["name"]] = {"path": infos["path"], "extensions": infos["extension"].split(" ")}
+                    emulators[infos["name"]] = {
+                        "path": infos["path"],
+                        "extensions": infos["extension"].split(" "),
+                    }
 
         return emulators
 
@@ -153,7 +164,7 @@ class SystemTest():
 
     @staticmethod
     def findGamesForEmulatorsFromFile(emulators, file):
-        with open(file, 'r') as f:
+        with open(file, "r") as f:
             testgames = yaml.safe_load(f) or {}
         return {system: testgames.get(system, []) for system in emulators}
 
@@ -162,15 +173,30 @@ class SystemTest():
         screenshotDir = os.path.join(resultDir, "screenshots")
         os.makedirs(screenshotDir, exist_ok=True)
         screenshotPath = os.path.join(screenshotDir, f"{name}.png")
-        subprocess.run(["regmsg getScreenshot", screenshotPath], check=False)
+        subprocess.run(["regmsg screen getscreenshot", screenshotPath], check=False)
         print("Screenshot captured")
 
     @staticmethod
     def parseCommandLine(args):
-        parser = argparse.ArgumentParser(description='Testing Batocera emulation systems.')
-        parser.add_argument('-t', '--time', nargs=1, type=int, help='Time in seconds that the game runs. (default=10)')
-        parser.add_argument('-s', '--screenshot', dest='screenshot', action='store_true', help='Screenshot of the game running. (default=false)')
+        parser = argparse.ArgumentParser(
+            description="Testing Batocera emulation systems."
+        )
+        parser.add_argument(
+            "-t",
+            "--time",
+            nargs=1,
+            type=int,
+            help="Time in seconds that the game runs. (default=10)",
+        )
+        parser.add_argument(
+            "-s",
+            "--screenshot",
+            dest="screenshot",
+            action="store_true",
+            help="Screenshot of the game running. (default=false)",
+        )
         return parser.parse_args(args)
 
-if __name__ == '__main__':
-   SystemTest.run(sys.argv[1:])
+
+if __name__ == "__main__":
+    SystemTest.run(sys.argv[1:])

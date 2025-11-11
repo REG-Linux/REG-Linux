@@ -4,8 +4,8 @@
 case $1 in
     	gameStop)
 		if [[ "$3" == "mame" ]]; then
-			rotation=$(regmsg currentRotation)
-		       	! [ -z "$rotation" ] && regmsg setRotation "$rotation"
+			rotation=$(regmsg screen getrotation)
+		       	! [ -z "$rotation" ] && regmsg screen setrotation "$rotation"
 		fi
 	;;
 esac

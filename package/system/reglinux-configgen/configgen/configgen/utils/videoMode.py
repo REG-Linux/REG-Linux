@@ -29,7 +29,7 @@ def changeMode(videomode: str) -> None:
 
 def getCurrentMode() -> Optional[str]:
     try:
-        return regmsg_send_message("currentMode")
+        return regmsg_send_message("getMode")
     except Exception as e:
         eslog.error(f"Error fetching current mode: {e}")
         return None
@@ -70,9 +70,9 @@ def getCurrentResolution(name: Optional[str] = None) -> Dict[str, int]:
     try:
         out = ""
         if name is None:
-            out = regmsg_send_message("currentResolution")
+            out = regmsg_send_message("getResolution")
         else:
-            out = regmsg_send_message("--screen " + name + " currentResolution")
+            out = regmsg_send_message("getResolution --output " + name)
         vals = out.split("x")
         return {"width": int(vals[0]), "height": int(vals[1])}
     except Exception as e:
@@ -121,7 +121,7 @@ def minTomaxResolution() -> None:
 
 def getRefreshRate() -> Optional[str]:
     try:
-        out = regmsg_send_message("currentRefresh")
+        out = regmsg_send_message("getRefresh")
         if out:
             return out.splitlines()[0]
         else:
@@ -132,7 +132,7 @@ def getRefreshRate() -> Optional[str]:
 
 
 def supportSystemRotation() -> bool:
-    result = run(["regmsg", "supportSystemRotation"], stdout=PIPE)
+    result = run(["regmsg screen", "supportSystemRotation"], stdout=PIPE)
     return result.returncode == 0
 
 
