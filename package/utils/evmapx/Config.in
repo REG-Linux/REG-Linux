@@ -1,0 +1,9 @@
+config BR2_PACKAGE_EVMAPX
+	bool "evmapx"
+	select BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+
+	help
+	  Evmapy modern replacement
+
+	  https://github.com/REG-Linux/evmapx
