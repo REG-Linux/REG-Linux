@@ -105,7 +105,7 @@ configure_rotation() {
     local effective_output display_rotate
 
     # Get current output and cache rotation settings
-    effective_output=$(regmsg currentOutput)
+    effective_output=$(regmsg screen getoutput)
     [[ -z "${effective_output}" ]] && return
 
     display_rotate=$(/usr/bin/system-settings-get-master "display.rotate.${effective_output}")
@@ -114,7 +114,7 @@ configure_rotation() {
     # Apply rotation for primary screen
     if [[ -n "${display_rotate}" ]]; then
         if [ -n "$WAYLAND_DISPLAY" ]; then
-            regmsg setRotation "${display_rotate}"
+            regmsg screen setrotation "${display_rotate}"
         else
             EXTRA_OPTS="--screenrotate ${display_rotate}"
         fi
@@ -126,7 +126,7 @@ configure_rotation() {
         [[ -z "${screen}" ]] && continue
         rotate_var="display.rotate${screen: -1}"
         display_rotate_other=$(/usr/bin/system-settings-get "${rotate_var}")
-        [[ -n "${display_rotate_other}" ]] && [[ -n "$WAYLAND_DISPLAY" ]] && regmsg --screen "${screen}" setRotation "${display_rotate_other}"
+        [[ -n "${display_rotate_other}" ]] && [[ -n "$WAYLAND_DISPLAY" ]] && regmsg screen setrotation "${display_rotate_other}" --output "${screen}"
     done
 }
 
@@ -143,9 +143,9 @@ configure_resolution() {
     bootresolution=$(/usr/bin/system-settings-get-master -f "${BOOTCONF}" es.resolution)
     bootresolution=${bootresolution:-$(/usr/bin/system-settings-get-master es.resolution)}
     if [[ -z "${bootresolution}" ]]; then
-        regmsg minTomaxResolution
+        regmsg screen mintomaxresolution
     else
-        regmsg setMode "${bootresolution}"
+        regmsg screen setmode "${bootresolution}"
     fi
 
     # Configure resolution for additional screens in a single loop
@@ -155,9 +155,9 @@ configure_resolution() {
         res_var="es.resolution${screen: -1}"
         bootresolution_other=$(/usr/bin/system-settings-get "${res_var}")
         if [[ -z "${bootresolution_other}" ]]; then
-            regmsg --screen "${screen}" minTomaxResolution
+            regmsg screen mintomaxresolution --output "${screen}"
         else
-            regmsg --screen "${screen}" setMode "${bootresolution_other}"
+            regmsg screen setmode "${bootresolution_other}" --output "${screen}"
         fi
     done
 }
@@ -176,7 +176,7 @@ launch_emulationstation() {
     game_launch_opt=$([[ ${GAMELAUNCH} -eq 1 ]] && echo "" || echo "--no-startup-game")
 
     # Save current output for screen switching
-    regmsg currentOutput > "${SWITCH_SCREEN_CURRENT}"
+    regmsg screen getoutput > "${SWITCH_SCREEN_CURRENT}"
 
     # Launch with dbus for gio/gvfs/trash support
     eval "$(dbus-launch --sh-syntax --exit-with-session)"
@@ -204,7 +204,7 @@ while [[ -e "${REBOOT_FLAG}" ]]; do
 
     # Configure video outputs
     if [[ -n "${settings_output}" ]]; then
-        regmsg setOutput "${settings_output}" "${settings_output2}" "${settings_output3}"
+        regmsg screen setoutput "${settings_output}" "${settings_output2}" "${settings_output3}"
     fi
 
     # Apply rotation and resolution settings

@@ -139,7 +139,7 @@ fi
 
 if [ "$command" = "lsoutputs" ]; then
     echo "auto"
-    /usr/bin/regmsg listOutputs
+    /usr/bin/regmsg screen listoutputs
 fi
 
 if [ "$command" = "gpiocontrollers" ]; then
