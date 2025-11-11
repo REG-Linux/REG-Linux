@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RETROARCH_VERSION = v1.21.0
+RETROARCH_VERSION = v1.22.0
 RETROARCH_SITE = $(call github,libretro,RetroArch,$(RETROARCH_VERSION))
 RETROARCH_LICENSE = GPLv3+
 RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets
