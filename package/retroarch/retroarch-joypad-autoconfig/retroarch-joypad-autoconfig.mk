@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RETROARCH_JOYPAD_AUTOCONFIG_VERSION = v1.21.1
+RETROARCH_JOYPAD_AUTOCONFIG_VERSION = v1.22.0
 RETROARCH_JOYPAD_AUTOCONFIG_SITE = $(call github,libretro,retroarch-joypad-autoconfig,$(RETROARCH_JOYPAD_AUTOCONFIG_VERSION))
 RETROARCH_JOYPAD_AUTOCONFIG_LICENSE = MIT
 
