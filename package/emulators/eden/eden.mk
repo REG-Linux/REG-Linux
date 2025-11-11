@@ -12,7 +12,7 @@ EDEN_LICENSE = GPLv2
 EDEN_DEPENDENCIES = reglinux-qt6 fmt boost gamemode \
                     zstd zlib libzip lz4 catch2 sdl2 opus \
 		    json-for-modern-cpp enet libva xwayland \
-		    libusb ffmpeg
+		    libusb ffmpeg mbedtls
 
 EDEN_SUPPORTS_IN_SOURCE_BUILD = NO
 
