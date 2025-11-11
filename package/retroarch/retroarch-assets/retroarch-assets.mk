@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RETROARCH_ASSETS_VERSION = v1.20.0
+RETROARCH_ASSETS_VERSION = v1.22.0
 RETROARCH_ASSETS_SITE = $(call github,libretro,retroarch-assets,$(RETROARCH_ASSETS_VERSION))
 RETROARCH_ASSETS_LICENSE = GPL
 
