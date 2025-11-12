@@ -1,5 +1,0 @@
-config BR2_PACKAGE_BATOCERA_SETTINGS
-	bool "system-settings"
-
-	help
-	  system-settings-get/set binaries

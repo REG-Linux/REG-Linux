@@ -1,0 +1,2 @@
+config BR2_PACKAGE_REGLINUX_SYSTEM_SETTINGS
+       bool "reglinux-system-settings"
