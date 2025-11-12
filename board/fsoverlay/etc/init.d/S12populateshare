@@ -1,32 +1,34 @@
-#!/bin/bash
+#!/bin/dash
 
 case "$1" in
     start)
         TOTALSTEPS=0
         CURRENTSTEP=0
 
+        # Read list of files/dirs to check
         # Directories deleted by user will be recreated when booting.
         # The user can delete the content or add its own files.
         # To reset the directory or update it, the user has to remove the directory
         # (we are unable to differenciate new files from REG-linux update from a file removed by the user)
-
-        while read -r files; do
-            if [[ -n "$files" ]] && [[ -e "/userdata/$files" ]]; then
-                EMPTYSHARE=n
-            else
-                LIST="$files $LIST"
-            fi
+        LIST=""
+        EMPTYSHARE=""
+        while IFS= read -r files && [ -n "$files" ]; do
+            { [ -e "/userdata/$files" ] && EMPTYSHARE="no"; } || LIST="$files $LIST"
         done < /usr/share/reglinux/datainit.list
 
-        if [[ -n "$EMPTYSHARE" ]] && [[ "$(head -n1 /usr/share/reglinux/system.version 2>/dev/null)" != "$(head -n1 /userdata/system/data.version 2>/dev/null)" ]]; then
-            # Update some files but not overwrite user configs
-            LIST="$LIST '/roms/*/_info.txt' '*/readme.txt' 'bios/' 'roms/iortcw/main/' 'system/'"
+        SYSVER=""
+        USRVER=""
+        [ -r "/usr/share/reglinux/system.version" ] && IFS= read -r SYSVER < "/usr/share/reglinux/system.version" 2>/dev/null
+        [ -r "/userdata/system/data.version" ] && IFS= read -r USRVER < "/userdata/system/data.version" 2>/dev/null
+        if [ -n "$EMPTYSHARE" ] && [ "$SYSVER" != "$USRVER" ]; then
+            LIST="$LIST 'roms/*/_info.txt' '*/readme.txt' 'bios/' 'roms/iortcw/main/' 'system/'"
             EXCLUDELIST="-ex '... gamecontrollerdb.txt' '... system.conf' '... es_settings.cfg' \; "
+        else
+            EXCLUDELIST=""
         fi
-
-        if [[ -n "$LIST" ]]; then
-            ((TOTALSTEPS+=3))           # Add the last steps to correctly show progress bar
-            ((CURRENTSTEP+=100))        # STEP * 100 for percentage
+        if [ -n "$LIST" ]; then
+            TOTALSTEPS=$((TOTALSTEPS + 3))
+            CURRENTSTEP=100
 
             # Start UPDATING splash
             if [ "$(system-part share)" = "tmpfs" ]; then
@@ -34,51 +36,55 @@ case "$1" in
             else
                 /usr/bin/plymouth change-mode --updates
             fi
-            /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+            /usr/bin/plymouth system-update --progress $((CURRENTSTEP / TOTALSTEPS))
 
             mkdir -p /userdata/system/logs
-            if [[ -n "$EMPTYSHARE" ]]; then
+            LOGFILE="/userdata/system/logs/extracted.files.log"
+            if [ -n "$EMPTYSHARE" ]; then
                 /usr/bin/plymouth display-message --text="Updating BIOS and other files in /userdata"
-                echo "Updating BIOS and other files in /userdata" >/userdata/system/logs/extracted.files.log
-                echo "unsquashfs -f -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" >>/userdata/system/logs/extracted.files.log
-                echo >>/userdata/system/logs/extracted.files.log
-                eval "unsquashfs -f -i -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" &>>/userdata/system/logs/extracted.files.log
+                printf '%s\n%s\n\n' \
+                    "Updating BIOS and other files in /userdata" \
+                    "unsquashfs -f -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" \
+                    > "$LOGFILE"
+                eval "unsquashfs -f -i -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" >> "$LOGFILE" 2>&1
             else
-                # Partition is "empty", just extract everything
                 /usr/bin/plymouth display-message --text="Extracting files to /userdata"
-                echo "Extracting files to /userdata" >/userdata/system/logs/extracted.files.log
-                echo "unsquashfs -f -d /userdata /usr/share/reglinux/datainit.squashfs" >>/userdata/system/logs/extracted.files.log
-                echo >>/userdata/system/logs/extracted.files.log
-                unsquashfs -f -i -d /userdata /usr/share/reglinux/datainit.squashfs &>>/userdata/system/logs/extracted.files.log
+                printf '%s\n%s\n\n' \
+                    "Extracting files to /userdata" \
+                    "unsquashfs -f -d /userdata /usr/share/reglinux/datainit.squashfs" \
+                    > "$LOGFILE"
+                unsquashfs -f -i -d /userdata /usr/share/reglinux/datainit.squashfs >> "$LOGFILE" 2>&1
             fi
+            # Save version to avoid redoing on every boot
+            cp /usr/share/reglinux/system.version /userdata/system/data.version 2>/dev/null
 
-            # Save to avoid to redo some steps every boot
-            cp /usr/share/reglinux/system.version /userdata/system/data.version
-
-            ((CURRENTSTEP+=100))
-            /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+            CURRENTSTEP=$((CURRENTSTEP + 100))
+            /usr/bin/plymouth system-update --progress $((CURRENTSTEP / TOTALSTEPS))
             /usr/bin/plymouth display-message --text="Creating special folders and links"
         fi
-
-        # udev : create a link for rules persistance
+        # udev: symlink for persistent rules
         mkdir -p /userdata/system/udev/rules.d
         rm -rf /run/udev/rules.d
-        ln -s /userdata/system/udev/rules.d/ /run/udev/
+        ln -s /userdata/system/udev/rules.d /run/udev/rules.d
 
-        # and add the machine-id
-        [ -e /userdata/system/machine-id ] || dbus-uuidgen --ensure=/userdata/system/machine-id
-        ln -sf /userdata/system/machine-id /var/lib/dbus/machine-id
-        ln -sf /userdata/system/machine-id /etc/machine-id
+        # machine-id handling
+        MACHINE_ID_FILE="/userdata/system/machine-id"
+        [ -e "$MACHINE_ID_FILE" ] || dbus-uuidgen --ensure="$MACHINE_ID_FILE"
+        ln -sf "$MACHINE_ID_FILE" /var/lib/dbus/machine-id
+        ln -sf "$MACHINE_ID_FILE" /etc/machine-id
 
-        # call user script with start condition
-        if [ -e /boot/postshare.sh ]; then
+        # Load system.conf to regmsg daemon
+        [ -s /userdata/system/system.conf ] && /usr/bin/regmsg loadConfig /userdata/system/system.conf
+
+        # Run user script if exists
+        if [ -x /boot/postshare.sh ]; then
             if [ "$TOTALSTEPS" -gt 0 ]; then
-                ((TOTALSTEPS++))
-                ((CURRENTSTEP+=100))
-                /usr/bin/plymouth system-update --progress "$((CURRENTSTEP / TOTALSTEPS))"
+                TOTALSTEPS=$((TOTALSTEPS + 1))
+                CURRENTSTEP=$((CURRENTSTEP + 100))
+                /usr/bin/plymouth system-update --progress $((CURRENTSTEP / TOTALSTEPS))
                 /usr/bin/plymouth display-message --text="Running postshare script"
             fi
-            bash /boot/postshare.sh start
+            /boot/postshare.sh start
         fi
 
         if [ "$TOTALSTEPS" -gt 0 ]; then
@@ -87,10 +93,9 @@ case "$1" in
             /usr/bin/plymouth change-mode --boot-up
             /usr/bin/plymouth --show-splash
         fi
-    ;;
+        ;;
     stop)
         # call user script with stop condition
-        [ -e /boot/postshare.sh ] && bash /boot/postshare.sh stop
-    ;;
+        [ -x /boot/postshare.sh ] && /boot/postshare.sh stop
+        ;;
 esac
-
