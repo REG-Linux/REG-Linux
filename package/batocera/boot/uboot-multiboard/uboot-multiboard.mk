@@ -16,7 +16,7 @@ UBOOT_MULTIBOARD_DL_SUBDIR = uboot
 UBOOT_MULTIBOARD_SOURCE = u-boot-$(UBOOT_MULTIBOARD_VERSION).tar.bz2
 UBOOT_MULTIBOARD_DEPENDENCIES = host-python3 host-python-setuptools
 UBOOT_MULTIBOARD_DEPENDENCIES += host-swig host-openssl host-gnutls
-UBOOT_MULTIBOARD_DEPENDENCIES += host-python-pyelftools
+UBOOT_MULTIBOARD_DEPENDENCIES += host-python-pyelftools host-flex
 
 ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_H3)$(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
 UBOOT_MULTIBOARD_DEPENDENCIES += arm-trusted-firmware
