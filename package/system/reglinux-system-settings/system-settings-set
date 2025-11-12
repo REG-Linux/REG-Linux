@@ -1,0 +1,8 @@
+#!/bin/dash
+[ -z "$1" ] && { printf 'usage: %s [ -f /path/to/conf ] key value [ key2 "value 2" ... ] \n       Saves each pair key=value in /path/to/conf.\n' "$0"; exit 1; }
+if [ "$1" = "-f" ]; then
+    shift
+    configfile="$1"
+    shift
+fi
+regmsg setConfigKey "${configfile:-/userdata/system/system.conf}" "$@"

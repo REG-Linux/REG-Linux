@@ -1,44 +1,38 @@
-#!/bin/sh
+#!/bin/dash
+[ "$1" != "start" ] && exit 0
 
-if test "$1" != "start"
-then
-  exit 0
-fi
+umask 022    # set folder permissions to 755 and files to 644
+mkdir -p \
+  /run/udev \
+  /run/network \
+  /var/cache \
+  /var/lib/bluetooth \
+  /var/lib/connman \
+  /var/lib/dbus \
+  /var/lib/samba/private \
+  /var/lib/seedrng \
+  /var/lib/sixad/profiles \
+  /var/log \
+  /var/opt \
+  /var/tmp
+ln -sf /run /var/run
 
-# sixad
-mkdir -p /var/lib/sixad/profiles
-cp /etc/sixad.profile /var/lib/sixad/profiles/default
+# sixad profile
+ln -sf /etc/sixad.profile /var/lib/sixad/profiles/default
 
 # custom network config
-mkdir -p "/var/lib/connman"
-ln -sf "/userdata/system/network-connman.config" "/var/lib/connman/system-custom.config"
-ln -sf "/boot/network-connman.config" "/var/lib/connman/system-boot-custom.config"
+ln -sf /userdata/system/network-connman.config /var/lib/connman/system-custom.config
+ln -sf /boot/network-connman.config /var/lib/connman/system-boot-custom.config
 
-# bluetooth
-mkdir -p /var/lib/bluetooth
+# reglinux sysconfigs
+{ [ -f "/sys/firmware/devicetree/base/model" ] && system_model=$(tr -d '\0' </sys/firmware/devicetree/base/model 2>/dev/null); } || {
+  [ -f "/sys/devices/virtual/dmi/id/product_name" ] && system_model=$(tr -d '\0' </sys/devices/virtual/dmi/id/product_name 2>/dev/null); }
+{ [ -z "$system_model" ] || [ "$system_model" = "Default string" ]; } && [ -f "/sys/devices/virtual/dmi/id/board_name" ] && system_model=$(tr -d '\0' </sys/devices/virtual/dmi/id/board_name 2>/dev/null)
+[ -n "$system_model" ] && system_model=$(echo "$system_model" | sed 's/[^[:alnum:]]/_/g')
+{ [ -e "/usr/share/reglinux/sysconfigs/system.conf.$system_model" ] && ln -sf "/usr/share/reglinux/sysconfigs/system.conf.$system_model" /usr/share/reglinux/sysconfigs/system.conf; } || touch /usr/share/reglinux/sysconfigs/system.conf
 
-# samba
-mkdir -p /var/lib/samba/private
-chmod 0755 /var/lib/samba
-mkdir -p /var/cache
-
-# dbus
-mkdir -p /var/lib/dbus
-
-# usbmount
-mkdir -p /var/run
-
-# Udev custom rules
-mkdir -p /run/udev/
-
-# xorg
-mkdir -p /var/log
-
-# ensure some holders are available
-mkdir -p /var/tmp
-mkdir -p /var/opt
-
-# populate the ld cache
-mkdir -p /etc
-echo -e "/usr/lib\n/lib\n/lib32" | tee /etc/ld.so.conf
-ldconfig
+if command -v ldconfig > /dev/null 2>&1 && ! grep -q '^/usr/lib$' /etc/ld.so.conf > /dev/null 2>&1; then
+  # populate ld cache — only if needed
+  printf '%s\n' /usr/lib /lib /lib32 > /etc/ld.so.conf
+  ldconfig &
+fi
