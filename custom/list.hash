@@ -4,13 +4,13 @@
 #   * a line of minus signs ('-') indicates a file that we remove from Buildroot external tree
 #   * a line of plus signs ('+') indicates a file that we add to the Buildroot external tree
 
-++++++++++++++++++++++++++++++++  package/dropbear/enable_SSH
+++++++++++++++++++++++++++++++++  package/dropbear/SSH
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/0002-fix-llvm-cmake-path.patch
 ++++++++++++++++++++++++++++++++  package/llvm-project/clang/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/libclc/patch-to-fix-prepare_builtins-not-found
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm-cmake/Config.in.host
 ++++++++++++++++++++++++++++++++  package/llvm-project/llvm/001-fix-llvm-cmake-path.patch
-++++++++++++++++++++++++++++++++  package/nfs-utils/enable_NFS
+++++++++++++++++++++++++++++++++  package/nfs-utils/NFS
 ++++++++++++++++++++++++++++++++  package/pkg-rust.mk
 ++++++++++++++++++++++++++++++++  package/python-pyelftools/Config.in.host
 ++++++++++++++++++++++++++++++++  package/python-pylibfdt/Config.in.host
@@ -57,6 +57,7 @@ d3204aa4d5249b3b4ac99dcb53cbae74  package/cmake/cmake.mk
 e2ea7480adb24a94f8ab05fd6110697e  package/dbus-broker/dbus-broker.mk
 62f04719035a96fab36b5d7a7b00446b  package/dbus-broker/dbus.socket
 be9ae1e921bac6ef8e7be5d99a56690f  package/dbus-broker/system.conf
+20556a52f1977a93232d7819f1ba3852  package/dbus/S30dbus
 c445390118f5d058dd372a8b2beb25a8  package/dropbear/S50dropbear
 3e2a4b6edeb4427320a8a3246ed68e36  package/dropbear/dropbear.mk
 86c04ec68a28da8040820ff495bda9dd  package/espeak/espeak.mk
@@ -67,6 +68,7 @@ e24ebf071724201f2a2ad92758bf98c7  package/fmt/fmt.hash
 c1bca4f1254a224fc84ea62d8d8181c7  package/fmt/fmt.mk
 914b4591d3767dc3f9da6f9c07a44386  package/gvfs/gvfs.mk
 17c6479a5b5b0272d5ae7f5c0d068b4e  package/heimdal/heimdal.mk
+0dcc6e0aea156f8ca2e7fb2b3ecc484c  package/ifupdown-scripts/S40network
 bc2ad65da90d0c27761384b55402ae67  package/ksmbd-tools/ksmbd-tools.hash
 59229ace50ead7080914c901d495c34d  package/ksmbd-tools/ksmbd-tools.mk
 54ff4924ef45b414738b64737acc7d8a  package/lame/lame.mk
@@ -77,6 +79,7 @@ ae2c4ab3c0c366417748405b0a1c2c92  package/libcurl/libcurl.mk
 72fe1d9ca9b9b791a3a50d5ff9371f52  package/libdrm/libdrm.hash
 7d250d3076d1f4e49ca0536684449e2a  package/libdrm/libdrm.mk
 7ecd8faf8aee2a75412583ccbca01ef0  package/libfreeimage/libfreeimage.mk
+de2d82cc83050c996204524a7038a117  package/libfuse3/libfuse3.mk
 74c62304d539d8adb876a03574c70f78  package/libglib2/Config.in
 5de3bb7fea68382d01ddbcf4d9f1b914  package/libglib2/libglib2.hash
 4f120d6f24330304968e7b72d828705e  package/libglib2/libglib2.mk
@@ -173,9 +176,9 @@ e3dfda998e09394fd4a89d50043c451f  package/stella/stella.mk
 d16824a23215fe7119ba463472fd046d  package/sway/Config.in
 b37a38f43729dd5a9350b34853a7e5b1  package/sway/sway.hash
 ac325f6d76ffe9ae2abec1a5b060403b  package/sway/sway.mk
+3be33af3052aa4fcf94570bcec7730af  package/syslog-ng/S01syslog-ng
 80759c0cf36231666d47023112c2fdca  package/tremor/tremor.hash
 8151e8f78e4dd9ff4fe321232d09b696  package/tremor/tremor.mk
-bdd49df8f42c2cf425989f5f42ec25e7  package/urandom-scripts/S01seedrng
 837f387642582c0188c5f6e48d6d2f57  package/usbmount/usbmount.mk
 9386acb2ab06c301db37072525bf5f13  package/util-linux/util-linux.mk
 332f068347b0f585827a44aa5442229e  package/vulkan-headers/vulkan-headers.hash
