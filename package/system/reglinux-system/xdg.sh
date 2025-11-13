@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/dash
 
 # Set XDG base directories
 export XDG_RUNTIME_DIR=/var/run \
@@ -14,7 +14,7 @@ else
 fi
 
 # Select graphical environment settings (Wayland or DRM)
-case "$(/usr/bin/system-settings-get-master system.es.environment)" in
+case "$(/usr/bin/regmsg getConfigKey system.es.environment)" in
     wayland)
         # Configure environment for Wayland
         export XDG_SESSION_TYPE=wayland \
