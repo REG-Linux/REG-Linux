@@ -1,27 +1,25 @@
-#!/bin/bash
+#!/bin/dash
+case "$1" in
+    start|restart)
+        printf "Starting %s: " "$0"
+        if [ "$(/usr/bin/regmsg getConfigKey system.security.enabled)" = "0" ]; then
+            MASTERPASSWD="linux";
+            ksmbd.adduser -C /etc/ksmbd/ksmbd.conf -P /etc/ksmbd/ksmbdpwd.db -p "$MASTERPASSWD" root >/dev/null
+        else
+            MASTERPASSWD=$(/usr/bin/system-config getRootPassword 1)
+            ksmbd.adduser -C /etc/ksmbd/ksmbd-secure.conf -P /etc/ksmbd/ksmbdpwd.db -p "$MASTERPASSWD" root >/dev/null
+        fi
 
-if [[ "$1" != "start" ]] && [[ "$1" != "restart" ]]
-then
-  exit 0
-fi
+        # /etc/shadow is dynamically generated from the password found in /boot/system-boot.conf
+        # the password is visible only in the ES interface
+        # or to people having already a ssh password via the command 'system-config setRootPassword xyz'
+        SHADOWPASSWD=$(openssl passwd -1 "$MASTERPASSWD")
+        {
+            printf 'root:%s:::::::\n' "$SHADOWPASSWD"
+            printf 'reglinux::::::::\n'                   # required for su for flatpak/reglinux user
+        } > /run/reglinux.shadow
 
-mkdir -p "/var/lib/samba/private"
-echo -n "Starting $0: "
-
-# /etc/shadow is dynamically generated from the password found in /boot/system-boot.conf
-# the password is visible only in the es interface
-# or to people having already a ssh password via the command : system-config setRootPassword xyz
-
-if [ "$(/usr/bin/system-settings-get system.security.enabled)" != "1" ]; then
-    MASTERPASSWD="linux"
-else
-    MASTERPASSWD=$(/usr/bin/system-config getRootPassword)
-fi
-ksmbd.adduser -C /etc/ksmbd/ksmbd-secure.conf -P /etc/ksmbd/ksmbdpwd.db -p "$MASTERPASSWD" root > /dev/null
-
-# write the /etc/shadow file
-SHADOWPASSWD=$(openssl passwd -1 "${MASTERPASSWD}")
-echo "root:${SHADOWPASSWD}:::::::" > /run/reglinux.shadow
-echo "reglinux::::::::" >> /run/reglinux.shadow # required for su for flatpak/reglinux user
-
-echo "done."
+        echo "done."
+        ;;
+    *) exit 0 ;;
+esac
