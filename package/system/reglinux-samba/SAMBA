@@ -1,0 +1,21 @@
+#!/bin/dash
+case "$1" in
+  start|stop|restart|reload) ;;
+  enabled)
+    /usr/bin/regmsg setConfigKey /userdata/system/system.conf system.samba.enabled 1
+    /etc/init.d/S35securepasswd start   # In case security enforcement changed.
+    /etc/init.d/S91ksmbd start
+    /etc/init.d/S93wsdd start
+    ;;
+  disabled)
+    /etc/init.d/S91ksmbd stop
+    /etc/init.d/S93wsdd stop
+    /usr/bin/regmsg setConfigKey /userdata/system/system.conf system.samba.enabled 0
+    ;;
+  status)
+    { [ "$(/usr/bin/regmsg getConfigKey system.samba.enabled)" = 0 ] && printf "SAMBA status: disabled\n"; } || printf "SAMBA status: enabled\n"
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|reload|enabled|disabled|status}"
+    exit 1
+esac

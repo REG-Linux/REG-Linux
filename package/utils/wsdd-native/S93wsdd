@@ -1,75 +1,50 @@
-#!/bin/bash
+#!/bin/dash
 #
 # S93wsdd - init.d script for WSDD on REG-Linux
 # "I haven't written a straight init.d script in 2 decades" Edition
 # (c) 2023 Jay Moore - dewdude@pickmy.org - Now With More Gross Hacks!
 # Distributed under the terms of the MIT license
 #
-# Modified by n2qz and other Batocera contributors, for inclusion in
-# Batocera.
+# Modified by n2qz and other Batocera contributors, for inclusion in Batocera.
 # Modified by Romain Tisserand for REG Linux
+# Optimized for dash shell by Carlos Martins
 
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="wsdd"
-NAME=wsdd
 DAEMON=/usr/bin/wsdd
-PIDFILE=/var/run/wsdd.pid
-LOG_FILE=/userdata/system/logs/wsdd.log
-
-if [ "$(/usr/bin/system-settings-get system.samba.enabled)" = "0" ] || [ ! -x "$DAEMON" ]; then
-    echo "SMB services ( $0 ): disabled"
+if [ "$(/usr/bin/regmsg getConfigKey system.samba.enabled)" = "0" ] || [ ! -x "$DAEMON" ]; then
+    printf '%s: disabled\n' "SMB services ($0)" >&2
     exit 0
 fi
 
-# Function that starts the daemon/service
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+NAME=wsdd
+PIDFILE=/var/run/wsdd.pid
+LOG_FILE=/userdata/system/logs/wsdd.log
+
 do_start() {
-    if [ "$(/usr/bin/system-settings-get system.security.enabled)" = "1" ]; then
-        SMB_CONFIG_FILE="/etc/ksmbd/ksmbd-secure.conf"
-    else
-        SMB_CONFIG_FILE="/etc/ksmbd/ksmbd.conf"
-    fi
-
-    # wssd-native requires username, use root
-    OPTS="-U root"
-    # wssd-native needs to be run as unix daemon
-    OPTS="--unixd ${OPTS}"
-    # location of samba.conf workgroup etc. information from
-    OPTS="${OPTS} --log-file ${LOG_FILE} --smb-conf ${SMB_CONFIG_FILE}"
-
+    printf 'Starting %s:\n' "$NAME"
+    { [ "$(/usr/bin/regmsg getConfigKey system.security.enabled)" = "0" ] && SMB_CONFIG_FILE="/etc/ksmbd/ksmbd.conf"; } || SMB_CONFIG_FILE="/etc/ksmbd/ksmbd-secure.conf"
+    # wssd-native needs to be run as unix daemon, and needs username (we're using root)
+    OPTS="--unixd -U root --log-file $LOG_FILE --smb-conf $SMB_CONFIG_FILE"
     start-stop-daemon --start --background --make-pidfile --pidfile "${PIDFILE}" --exec "${DAEMON}" -- ${OPTS}
+    printf 'done\n'
 }
 
-# Function that stops the daemon/service
 do_stop() {
-    start-stop-daemon --stop --remove-pidfile --pidfile "${PIDFILE}"
+    printf 'Stopping %s:\n' "$NAME"
+    start-stop-daemon -K -q -R 2 -n "$NAME" && rm -f "${PIDFILE}"
+    printf 'done\n'
 }
 
 case "$1" in
-    start)
-        echo "Starting $DESC: $NAME"
-        do_start
-        RETVAL=$?
-        echo done
-        exit $RETVAL
-        ;;
-    stop)
-        echo "Stopping $DESC: $NAME"
-        do_stop
-        RETVAL=$?
-        echo done
-        exit $RETVAL
-        ;;
+    start) do_start ;;
+    stop)  do_stop  ;;
     restart|force-reload)
-        echo "Restarting $DESC: $NAME"
+        printf 'Restarting %s:\n' "$NAME"
         do_stop
-        sleep 1
         do_start
-        RETVAL=$?
-        echo done
-        exit $RETVAL
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+        printf 'Usage: %s {start|stop|restart|force-reload}\n' "${0##*/}" >&2
         exit 3
         ;;
 esac
