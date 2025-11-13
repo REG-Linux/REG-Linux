@@ -1,16 +1,11 @@
-#!/bin/sh
-
+#!/bin/dash
 case "$1" in
-        start)
-                ;;
-        stop)
-                enabled="$(/usr/bin/system-settings-get system.cec.standby)"
-                if [ "$enabled" = "1" ]; then
-                        echo standby 0 | cec-client -s -d 1 &
-                fi
-                ;;
-        *)
-                echo "Usage: $0 {stop} - turns off first monitor device"
+    start|restart) ;;
+    stop)
+        [ "$(/usr/bin/regmsg getConfigKey system.cec.standby)" = "1" ] && printf 'standby 0\n' | cec-client -s -d 1 >/dev/null 2>&1 &
+        ;;
+    *)
+        echo "Usage: $0 {stop} - turns off first monitor device" >&2
+        exit 1
+        ;;
 esac
-
-exit $?

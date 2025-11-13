@@ -1,6 +1,2 @@
-#!/bin/sh
-
-if test -e "/boot/boot-custom.sh"; then
-    #bash interpreter executes scripts without x-flag e.g. for vFAT
-    bash /boot/boot-custom.sh $1
-fi
+#!/bin/dash
+[ -e /boot/boot-custom.sh ] && exec /bin/dash /boot/boot-custom.sh "$1"

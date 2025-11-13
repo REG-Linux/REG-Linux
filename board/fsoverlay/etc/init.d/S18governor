@@ -1,53 +1,45 @@
-#!/bin/sh
+#!/bin/dash
 
-if ! { [ -e /sys/devices/system/cpu/cpufreq/policy0/scaling_governor ] && [ -e /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors ]; }
-then
-  exit 0
-fi
+GOVERNOR_FILE="/sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
+AVAILABLE_FILE="/sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors"
+{ [ -e "$GOVERNOR_FILE" ] && [ -e "$AVAILABLE_FILE" ]; } || exit 0
+system_cpu_governor="$(/usr/bin/regmsg getConfigKey system.cpu.governor)"
 
 save_governor() {
-  for policy in $(cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors)
-  do
-    if [ "$policy" = "schedutil" ]
-    then
-      /usr/bin/system-settings-set system.cpu.governor "schedutil"
-      exit 0
-    elif [ "$policy" = "performance" ]
-    then
-      /usr/bin/system-settings-set system.cpu.governor "performance"
-    fi
-  done
+    IFS=' ' read -r governors < "$AVAILABLE_FILE" 2>/dev/null
+    for policy in $governors; do
+        case "$policy" in
+            schedutil)
+                system_cpu_governor="schedutil"
+                break
+                ;;
+            performance)
+                system_cpu_governor="performance"     # Don't exit — continue to check if schedutil appears later
+                ;;
+        esac
+    done
+    # If neither found, do nothing
+    [ -n "$system_cpu_governor" ] && /usr/bin/regmsg setConfigKey /userdata/system/system.conf system.cpu.governor "$system_cpu_governor"
 }
 
 case "$1" in
-  start|restart|reload)
-
-    # check if governor is set
-    if ! governor="$(/usr/bin/system-settings-get-master system.cpu.governor)"
-    then
-      save_governor
-      exit 0
-    fi
-
-    # try to apply governor
-    if ! echo $governor > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor 2>/dev/null
-    then
-      save_governor
-      exit 0
-    fi
-
-    # apply governor to all remaining cpufreq policies
-    for policy in /sys/devices/system/cpu/cpufreq/policy*
-    do
-      if { [ "$policy" != "/sys/devices/system/cpu/cpufreq/policy0" ] && [ -e "$policy/scaling_governor" ]; }
-      then
-        echo $governor > "$policy/scaling_governor"
-      fi
-    done
-
-    ;;
-  list)
-    cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors
-    ;;
-  *)
+    start|restart|reload)
+        [ -z "$system_cpu_governor" ] && save_governor
+        if [ -n "$system_cpu_governor" ]; then
+            # Try applying to policy0
+            echo "$system_cpu_governor" > "$GOVERNOR_FILE" 2>/dev/null || exit 1
+            # Apply to all other policies
+            for policy_dir in /sys/devices/system/cpu/cpufreq/policy*; do
+                [ -e "$policy_dir/scaling_governor" ] && [ "$policy_dir" != "/sys/devices/system/cpu/cpufreq/policy0" ] && echo "$system_cpu_governor" > "$policy_dir/scaling_governor" 2>/dev/null
+            done
+        fi
+        ;;
+    list)
+        # Just output available governors
+        exec < "$AVAILABLE_FILE"
+        read -r line
+        printf '%s\n' "$line"
+        ;;
+    *)
+        ;;   # No action for unknown commands
 esac
