@@ -14,11 +14,10 @@ per-board DTBs, overlays, and patch queues.
 Path | Description
 ---- | -----------
 `bananapi-m5/`, `khadas-vim3l/`, `odroid-c4/`, `s905x3-tvbox/` | Per-board boot directories with `boot/`, `create-boot-script.sh`, `genimage.cfg`, and optional `build-uboot.sh`.
-`fsoverlay/` | Keeps the HDMI ALSA card config aligned with other AMlogic boards.
+`fsoverlay/` | Keeps the HDMI ALSA card config aligned with other Amlogic boards.
 `linux-defconfig-fragment.config` | Adds SM1-specific Kconfig bits on top of the shared Meson64 defconfig.
 `linux_patches/` | Enables the X96 Max Plus DTBs (100M + 2101 revisions) that upstream doesn’t ship yet.
 `patches/uboot/` | Shared Meson64 U-Boot tweaks applied to every mainline build (stdout on UART, sane `fdtdir`, etc.).
-`patches/batocera-emulationstation/` | TTY fix so EmulationStation restarts cleanly on framebuffer-based boots.
 
 ---
 
@@ -39,10 +38,8 @@ Board dir | Device tree(s) | Notes
   ALSA sink; drop per-board configs here if needed.
 - `linux_patches/00{1,2}-enable-x96...` simply wire up the downstream DT
   files for the X96 Max Plus variants until they land upstream.
-- `patches/uboot/*.patch` matches the sets used on other AMlogic packs,
+- `patches/uboot/*.patch` matches the sets used on other Amlogic packs,
   ensuring `fdtdir /boot/boot` works and HDMI logging stays disabled.
-- `patches/batocera-emulationstation` teaches EmulationStation to grab
-  the active VT—handy on Khadas/Odroid TVs where fbcon is still used.
 
 ---
 
@@ -56,7 +53,7 @@ From `configs/reglinux-s905gen3.board`:
   (`board/amlogic/linux-meson64-current.config`), the shared REG Linux
   fragment, plus `linux-defconfig-fragment.config` for SM1-specific
   toggles (USB3, eMMC HS200, etc.).
-- Applies the shared AMlogic kernel patch queue plus the local SM1
+- Applies the shared Amlogic kernel patch queue plus the local SM1
   `linux_patches/`.
 - Enables `BR2_PACKAGE_HOST_MESON_TOOLS` so the build can pack BL2/BL31
   blobs when the post-image hook needs them.
