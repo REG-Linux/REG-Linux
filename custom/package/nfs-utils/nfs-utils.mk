@@ -95,7 +95,7 @@ endef
 
 define NFS_UTILS_INSTALL_INIT_SYSV
 	$(INSTALL) -D -m 0755 package/nfs-utils/S60nfs $(TARGET_DIR)/etc/init.d/S60nfs
-	$(INSTALL) -D -m 0755 package/nfs-utils/enable_NFS $(TARGET_DIR)/usr/share/reglinux/services/enable_NFS
+	$(INSTALL) -D -m 0755 package/nfs-utils/NFS $(TARGET_DIR)/usr/share/reglinux/services/NFS
 endef
 
 endif

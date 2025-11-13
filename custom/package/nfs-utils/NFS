@@ -1,0 +1,19 @@
+#!/bin/dash
+case "$1" in
+  start|stop|restart|reload) exit 0 ;;
+  enabled)
+    /usr/bin/regmsg setConfigKey /userdata/system/system.conf system.nfs.enabled 1 >/dev/null 2>&1
+    exec /etc/init.d/S60nfs start
+    ;;
+  disabled)
+    /etc/init.d/S60nfs stop
+    exec /usr/bin/regmsg setConfigKey /userdata/system/system.conf system.nfs.enabled 0
+    ;;
+  status)
+    { [ "$(/usr/bin/regmsg getConfigKey system.nfs.enabled)" = "1" ] && printf 'NFS status: enabled\n'; } || printf 'NFS status: disabled\n'
+    ;;
+  *)
+    printf 'Usage: %s {start|stop|restart|reload|enabled|disabled|status}\n' "${0##*/}" >&2
+    exit 1
+    ;;
+esac

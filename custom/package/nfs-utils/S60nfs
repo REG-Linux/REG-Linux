@@ -1,66 +1,45 @@
-#!/bin/sh
+#!/bin/dash
 #
 # nfs           This shell script takes care of starting and stopping
 #               the NFS services. Stolen from RedHat FC5.
 
-[ "$(/usr/bin/system-settings-get system.nfs.enabled)" != "1" ] && exit
-
-CFG_FILE=/etc/default/nfsd
+[ "$(/usr/bin/regmsg getConfigKey system.nfs.enabled)" != "1" ] && exit 0
 
 NR_THREADS=2
-if [ -f "${CFG_FILE}" ]; then
-	. "${CFG_FILE}"
-fi
-
+[ -f /etc/default/nfsd ] && . /etc/default/nfsd
 
 start() {
-	mkdir -p /var/lock/subsys
-	mkdir -p /run/nfs/sm
-	mkdir -p /run/nfs/sm.bak
+	mkdir -p /var/lock/subsys /run/nfs/sm /run/nfs/sm.bak
 	touch /run/nfs/rmtab
-
 	# Start daemons.
-	printf "Starting NFS statd: "
-	rpc.statd && echo "OK" || echo "FAIL"
+	echo -n "Starting NFS statd: "
+	{ rpc.statd && echo "OK"; } || echo "FAIL"
 	touch /var/lock/subsys/nfslock
-
-	printf "Starting NFS services: "
-	/usr/sbin/exportfs -r && echo "OK" || echo "FAIL"
-
-	printf "Starting NFS daemon: "
-	rpc.nfsd ${NR_THREADS} && echo "OK" || echo "FAIL"
-
-	printf "Starting NFS mountd: "
-	rpc.mountd && echo "OK" || echo "FAIL"
+	echo -n "Starting NFS services: "
+	{ /usr/sbin/exportfs -r && echo "OK"; } || echo "FAIL"
+	echo -n "Starting NFS daemon: "
+	{ rpc.nfsd ${NR_THREADS} && echo "OK"; } || echo "FAIL"
+	echo -n "Starting NFS mountd: "
+	{ rpc.mountd && echo "OK"; } || echo "FAIL"
 	touch /var/lock/subsys/nfs
 }
 
 stop() {
 	# Stop daemons.
-	printf "Shutting down NFS mountd: "
-	killall -q rpc.mountd 2>/dev/null && echo "OK" || echo "FAIL"
-
-	printf "Shutting down NFS daemon: "
-	killall -q nfsd 2>/dev/null && echo "OK" || echo "FAIL"
-
-	printf "Shutting down NFS services: "
-	/usr/sbin/exportfs -au && echo "OK" || echo "FAIL"
-
-	printf "Stopping NFS statd: "
-	killall -q rpc.statd 2>/dev/null && echo "OK" || echo "FAIL"
-	rm -f /var/lock/subsys/nfs
-	rm -f /var/run/rpc.statd.pid
-	rm -f /var/lock/subsys/nfslock
+	echo -n "Shutting down NFS mountd: "
+	{ killall -q rpc.mountd 2>/dev/null && echo "OK"; } || echo "FAIL"
+	echo -n "Shutting down NFS daemon: "
+	{ killall -q nfsd 2>/dev/null && echo "OK"; } || echo "FAIL"
+	echo -n "Shutting down NFS services: "
+	{ /usr/sbin/exportfs -au && echo "OK"; } || echo "FAIL"
+	echo -n "Stopping NFS statd: "
+	{ killall -q rpc.statd 2>/dev/null && echo "OK"; } || echo "FAIL"
+	rm -f /var/lock/subsys/nfs /var/run/rpc.statd.pid /var/lock/subsys/nfslock
 }
 
-# See how we were called.
 case "$1" in
-	start)
-		start
-		;;
-	stop)
-		stop
-		;;
+	start)	start ;;
+	stop)	stop  ;;
 	restart)
 		stop
 		start
@@ -73,5 +52,3 @@ case "$1" in
 		echo "Usage: $0 {start|stop|restart|reload}"
 		exit 1
 esac
-
-exit 0
