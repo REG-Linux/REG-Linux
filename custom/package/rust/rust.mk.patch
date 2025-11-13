@@ -1,5 +1,5 @@
 diff --git a/package/rust/rust.mk b/package/rust/rust.mk
-index b6b0fc3d11..11cc0d21b5 100644
+index b6b0fc3d11..0841bb95f0 100644
 --- a/package/rust/rust.mk
 +++ b/package/rust/rust.mk
 @@ -6,7 +6,7 @@
@@ -7,7 +7,7 @@ index b6b0fc3d11..11cc0d21b5 100644
  # When updating this version, check whether support/download/cargo-post-process
  # still generates the same archives.
 -RUST_VERSION = 1.82.0
-+RUST_VERSION = 1.91.0
++RUST_VERSION = 1.91.1
  RUST_SOURCE = rustc-$(RUST_VERSION)-src.tar.xz
  RUST_SITE = https://static.rust-lang.org/dist
  RUST_LICENSE = Apache-2.0 or MIT
