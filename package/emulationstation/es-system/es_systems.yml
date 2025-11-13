@@ -14,11 +14,11 @@ snes:
       bsnes_jg: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BSNES_JG] }
       mesen-s: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESENS] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:snes
+    For more info: https://wiki.reglinux.org/systems/snes
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:snes
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/snes
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:snes
+    Para mais informações: https://wiki.reglinux.org/systems/snes
 
 snes-msu1:
   name: Super Disc System (MSU1)
@@ -156,11 +156,11 @@ amiga500:
       puae2021: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE2021] }
       uae4arm: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_UAE4ARM] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:amiga500
+    For more info: https://wiki.reglinux.org/systems/amiga500
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:amiga500
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/amiga500
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:amiga500
+    Para mais informações: https://wiki.reglinux.org/systems/amiga500
 
 amiga1200:
   name: Amiga AGA
@@ -187,11 +187,11 @@ amiga1200:
       puae2021: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PUAE2021] }
       uae4arm: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_UAE4ARM] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:amiga500
+    For more info: https://wiki.reglinux.org/systems/amiga500
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:amiga500
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/amiga500
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:amiga500
+    Para mais informações: https://wiki.reglinux.org/systems/amiga500
 
 amigacd32:
   name: Amiga CD32
@@ -234,11 +234,11 @@ nes:
       nestopia: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_NESTOPIA] }
       mesen: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MESEN] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:nes
+    For more info: https://wiki.reglinux.org/systems/nes
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:nes
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/nes
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:nes
+    Para mais informações: https://wiki.reglinux.org/systems/nes
 
 n64:
   name: Nintendo 64
@@ -271,12 +271,12 @@ n64:
       gopher64: { requireAnyOf: [BR2_PACKAGE_GOPHER64] }
   comment_en: |
     If Mupen64Plus standalone cannot load your zipped ROMs (black screen, then return to menu), try unzipping your ROMs.
-    For more info: https://wiki.batocera.org/systems:n64
+    For more info: https://wiki.reglinux.org/systems/n64
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:n64
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/n64
   comment_br: |
     Caso o Mupen64Plus não carregue as ROMs compactadas em formato .zip (tela preta retornando ao menu), descompacte as ROMs e executando nos formatos .z64/.n64.
-    Para mais informações: https://wiki.batocera.org/systems:n64
+    Para mais informações: https://wiki.reglinux.org/systems/n64
 
 n64dd:
   name: Nintendo 64 Disk Drive
@@ -308,11 +308,11 @@ gba:
       vba-m: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_VBA_M] }
       gpsp: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GPSP] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:gba
+    For more info: https://wiki.reglinux.org/systems/gba
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:gba
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/gba
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:gba
+    Para mais informações: https://wiki.reglinux.org/systems/gba
 
 gbc:
   name: Game Boy Color
@@ -329,11 +329,11 @@ gbc:
       sameboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SAMEBOY] }
       gearboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARBOY] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:gbc
+    For more info: https://wiki.reglinux.org/systems/gbc
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:gbc
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/gbc
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:gbc
+    Para mais informações: https://wiki.reglinux.org/systems/gbc
 
 gb:
   name: Game Boy
@@ -350,11 +350,11 @@ gb:
       sameboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_SAMEBOY] }
       gearboy: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_GEARBOY] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:gb
+    For more info: https://wiki.reglinux.org/systems/gb
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:gb
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/gb
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:gb
+    Para mais informações: https://wiki.reglinux.org/systems/gb
 
 sgb:
   name: Super Game Boy
@@ -466,11 +466,11 @@ dreamcast:
     flycast:
       flycast: { requireAnyOf: [BR2_PACKAGE_FLYCAST] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:dreamcast
+    For more info: https://wiki.reglinux.org/systems/dreamcast
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:dreamcast
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/dreamcast
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:dreamcast
+    Para mais informações: https://wiki.reglinux.org/systems/dreamcast
 
 naomi:
   name: Naomi
@@ -527,11 +527,11 @@ megadrive:
       picodrive: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PICODRIVE] }
       blastem: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_BLASTEM] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:megadrive
+    For more info: https://wiki.reglinux.org/systems/megadrive
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:megadrive
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/megadrive
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:megadrive
+    Para mais informações: https://wiki.reglinux.org/systems/megadrive
 
 segacd:
   name: Sega CD
@@ -643,11 +643,11 @@ psp:
     libretro:
       ppsspp: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_PPSSPP] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:psp
+    For more info: https://wiki.reglinux.org/systems/psp
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:psp
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/psp
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:psp
+    Para mais informações: https://wiki.reglinux.org/systems/psp
 
 psx:
   name: PlayStation
@@ -666,11 +666,11 @@ psx:
     mednafen:
       mednafen: { requireAnyOf: [BR2_PACKAGE_MEDNAFEN_PSX] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:psx
+    For more info: https://wiki.reglinux.org/systems/psx
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:psx
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/psx
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:psx
+    Para mais informações: https://wiki.reglinux.org/systems/psx
 
 pcengine:
   name: PC Engine
@@ -753,7 +753,7 @@ scummvm:
 
     If you wish to use Midi ROM's i.e. the MT-32 synth, put you files in /userdata/bios/scummvm/extra
 
-    For more info: https://wiki.batocera.org/systems:scummvm
+    For more info: https://wiki.reglinux.org/systems/scummvm
   comment_fr: |
     Placez les dossiers de jeux scummvm dans ce dossier.
 
@@ -764,7 +764,7 @@ scummvm:
 
     Si vous souhaitez utiliser des Midi ROM, c'est-à-dire le synthé MT-32, mettez vos fichiers dans /userdata/bios/scummvm/extra
 
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:scummvm
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/scummvm
   comment_br: |
     Coloque os diretóios dos jogos scummvm nesta pasta.
 
@@ -775,7 +775,7 @@ scummvm:
 
     Se você deseja usar Midi ROM, ou seja, o sintetizador MT-32, coloque seus arquivos em /userdata/bios/scummvm/extra
 
-    Para mais informações: https://wiki.batocera.org/systems:scummvm
+    Para mais informações: https://wiki.reglinux.org/systems/scummvm
 
 dos:
   name: Dos (x86)
@@ -818,7 +818,7 @@ dos:
     SoundFonts (.sf2) files need to be placed in the /userdata/bios folder.
     MT32_CONTROL.ROM file needs to be present inside /userdata/bios/scummvm/extra.
 
-    For more info: https://wiki.batocera.org/systems:dos
+    For more info: https://wiki.reglinux.org/systems/dos
   comment_fr: |
     Chaque jeu (fichiers) doit être contenu dans un dossier ayant l'extension ".pc .dos".
     Dans chaque dossier, un fichier dosbox.bat doit comporter la ligne de commande pour lancer le jeu.
@@ -840,7 +840,7 @@ dos:
     Les fichiers SoundFonts (.sf2) doivent être placés dans le dossier /userdata/bios.
     Le fichier MT32_CONTROL.ROM doit être présent dans /userdata/bios/scummvm/extra.
 
-    La doc dos pour Batocera se trouve à cet endroit : https://wiki.batocera.org/systems:dos
+    La doc dos se trouve à cet endroit : https://wiki.reglinux.org/systems/dos
   comment_br: |
     Cada jogo (arquivos) deve ser colocado em seu próprio diretório com a extensão ".pc .dos".
     Em cada diretório, um arquivo dosbox.bat deve conter a linha de comando para iniciar o jogo.
@@ -862,7 +862,7 @@ dos:
     Os arquivos SoundFonts (.sf2) precisam ser colocados na pasta /userdata/bios.
     O arquivo MT32_CONTROL.ROM precisa estar presente em /userdata/bios/scummvm/extra.
 
-    Para mais informações: https://wiki.batocera.org/systems:dos
+    Para mais informações: https://wiki.reglinux.org/systems/dos
 
 devilutionx:
   name: DevilutionX
@@ -924,19 +924,19 @@ fbneo:
 
     The file FinalBurn Neo (ClrMame Pro XML, Arcade only).dat in bios/FBNeo may be used to check ROMs with clrmamepro available at http://mamedev.emulab.it/clrmamepro/
 
-    For more info: https://wiki.batocera.org/arcade
+    For more info: https://wiki.reglinux.org/arcade
   comment_fr: |
     Les ROMs doivent provenir du romset 1.0.0.0
 
     Le fichier FinalBurn Neo (ClrMame Pro XML, Arcade only).dat dans bios/FBNeo peut servir à valider les ROMs avec clrmamepro disponible sur http://mamedev.emulab.it/clrmamepro/
 
-    Vous pouvez trouver la doc arcade là : https://wiki.batocera.org/arcade
+    Vous pouvez trouver la doc arcade là : https://wiki.reglinux.org/arcade
   comment_br: |
     As ROMs devem vir do romset FBneo versão 1.0.0.0
 
     O arquivo FinalBurn Neo (ClrMame Pro XML, somente Arcade).dat em bios/FBNeo pode ser usado para verificar ROMs com clrmamepro disponível em http://mamedev.emulab.it/clrmamepro/
 
-    Para mais informações: https://wiki.batocera.org/arcade
+    Para mais informações: https://wiki.reglinux.org/arcade
 
 mame:
   name: Mame
@@ -968,7 +968,7 @@ mame:
     Special files for mame2003 core:
     - Add your samples files in /userdata/bios/mame2003/samples/
 
-    For more info: https://wiki.batocera.org/arcade
+    For more info: https://wiki.reglinux.org/arcade
   comment_fr: |
     Le système utilise le core libretro mame2003+ par défaut: Les ROMs compatibles doivent provenir du set 0.78+
     D'autres cores mame sont également inclus:
@@ -979,7 +979,7 @@ mame:
     Fichiers spéciaux pour le core mame2003+ :
     - Ajoutez vos fichiers samples dans le répertoire /userdata/bios/mame2003/samples/
 
-    Vous pouvez trouver la doc arcade là : https://wiki.batocera.org/arcade
+    Vous pouvez trouver la doc arcade là : https://wiki.reglinux.org/arcade
   comment_br: |
     O sistema usa o libretro mame2003+ como núcleo padrão: ROMs compatíveis devem vir da versão de romset 0.78+
     Dependendo do seu hardawre, outros núcleos mame estão incluídos:
@@ -990,7 +990,7 @@ mame:
     Arquivos especiais para o núcleo mame2003:
     - Adicione seus arquivos de samples em /userdata/bios/mame2003/samples/
 
-    Para mais informações: https://wiki.batocera.org/arcade
+    Para mais informações: https://wiki.reglinux.org/arcade
 
 neogeo:
   name: Neo-Geo
@@ -1318,15 +1318,15 @@ tyrquake:
   comment_en: |
     Put your Quake 1 .PAK games in this directory.
 
-    For more info: https://wiki.batocera.org/systems:tyrquake
+    For more info: https://wiki.reglinux.org/ports/tyrquake
   comment_fr: |
     Placez ici vos fichiers .PAK pour Quake 1.
 
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:tyrquake
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/tyrquake
   comment_br: |
     Coloque seus jogos Quake 1 .PAK neste diretório.
 
-    Para mais informações: https://wiki.batocera.org/systems:tyrquake
+    Para mais informações: https://wiki.reglinux.org/ports/tyrquake
 
 mrboom:
   name: MrBoom
@@ -1340,11 +1340,11 @@ mrboom:
     libretro:
       mrboom: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_MRBOOM] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:mrboom
+    For more info: https://wiki.reglinux.org/ports/mrboom
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:mrboom
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/mrboom
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:mrboom
+    Para mais informações: https://wiki.reglinux.org/ports/mrboom
 
 channelf:
   name: Channel-F
@@ -1370,15 +1370,15 @@ cannonball:
   comment_en: |
     Add mame 'OutRun rev. B' ROMs (epr-10187.88, epr-10327a.76.. ) in this directory and rename Cannonball.cannonball.disabled to Cannonball.cannonball.
 
-    For more info: https://wiki.batocera.org/systems:cannonball
+    For more info: https://wiki.reglinux.org/ports/cannonball
   comment_fr: |
     Ajoutez les roms mame de 'OutRun rev. B' (epr-10187.88, epr-10327a.76.. ) dans ce dossier et renommez Cannonball.cannonball.disabled en Cannonball.cannonball.
 
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:cannonball
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/cannonball
   comment_br: |
     Adicione as ROMS do mame 'OutRun rev. B' (epr-10187.88, epr-10327a.76.. ) neste diretório e renomeie Cannonball.cannonball.disabled para Cannonball.cannonball.
 
-    Para mais informações: https://wiki.batocera.org/systems:cannonball
+    Para mais informações: https://wiki.reglinux.org/ports/cannonball
 
 sdlpop:
   name: SdlPop
@@ -1936,11 +1936,11 @@ moonlight:
     moonlight:
       moonlight: { requireAnyOf: [BR2_PACKAGE_MOONLIGHT_EMBEDDED] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:moonlight
+    For more info: https://wiki.reglinux.org/systems/moonlight
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:moonlight
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/moonlight
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:moonlight
+    Para mais informações: https://wiki.reglinux.org/systems/moonlight
 
 apple2:
   name: Apple II
@@ -2055,11 +2055,11 @@ gamecube:
     - /userdata/bios/GC/JAP/IPL.bin
 
     You can access the BIOS settings by holding down the 'A' or 'east' button.
-    For more info: https://wiki.batocera.org/systems:gamecube
+    For more info: https://wiki.reglinux.org/systems/gamecube
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:gamecube
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/gamecube
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:gamecube
+    Para mais informações: https://wiki.reglinux.org/systems/gamecube
 
 triforce:
   name: Triforce
@@ -2077,7 +2077,7 @@ triforce:
     Intro - F-Zero AX, Virtua Striker 2002.
     Nothing - All other Triforce games.
 
-    For the most up-to-date information and questions about manual save state download, visit https://wiki.batocera.org/systems:triforce
+    For the most up-to-date information and questions about manual save state download, visit https://wiki.reglinux.org/systems/triforce
 
 wii:
   name: Wii
@@ -2097,7 +2097,7 @@ wii:
         for example, to play mario galaxy, rename it mario_galaxy.ni.iso (got get the nunchuk on the first axis and infrared on the 2nd one (ni))
     To use custom textures, put them in /userdata/saves/dolphin-emu/Load/Textures/<game id>.
 
-    For more info: https://wiki.batocera.org/systems:wii
+    For more info: https://wiki.reglinux.org/systems/wii
   comment_fr: |
     Pour utiliser une wiimote virtuelle en mode horizontal, il faut rajouter ".side." dans le nom du fichier (par exemple ".side.iso").
     Vous pouvez également choisir quels axes contrôler parmi i(nfra rouge), s(wing), t(ilt) ou n(unchuk) :
@@ -2105,7 +2105,7 @@ wii:
         par exemple, pour jouer à mario galaxy, renommer le jeu en mario_galaxy.ni.iso (vous aurez le nunchuk sur le 1er axe et l'infrarouge sur le 2e (ni))
     Mettez les textures personnalisées dans /userdata/saves/dolphin-emu/Load/Textures/<game id>.
 
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:wii
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/wii
   comment_br: |
     Para usar um wiimote virtual na horizontal, inclua ".side". no nome do arquivo da rom do jogo (por exemplo ".side.iso").
     Você pode escolher os controles de eixo entre i(nfrared), s(wing), t(ilt) ou n(unchuk):
@@ -2113,7 +2113,7 @@ wii:
         por exemplo, para jogar mario galaxy, renomeie-o como mario_galaxy.ni.iso (pegue o nunchuk no primeiro eixo e o infravermelho no 2º (ni))
     Para usar texturas personalizadas, coloque-as em /userdata/saves/dolphin-emu/Load/Textures/<game id>.
 
-    Para mais informações: https://wiki.batocera.org/systems:wii
+    Para mais informações: https://wiki.reglinux.org/systems/wii
 
 ps2:
   name: PlayStation 2
@@ -2135,11 +2135,11 @@ ps2:
     play:
       play: { requireAnyOf: [BR2_PACKAGE_PLAY], incompatible_extensions: [m3u] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:ps2
+    For more info: https://wiki.reglinux.org/systems/ps2
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:ps2
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/ps2
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:ps2
+    Para mais informações: https://wiki.reglinux.org/systems/ps2
 
 ps3:
   name: PlayStation 3
@@ -2156,20 +2156,20 @@ ps3:
     PSN digital games are installed in rpcs3-config, create a text file ending with .psn that contains the game's ID.
     First time you load a game, it takes time (a progress bar is visible). It doesn't happen next times.
 
-    For more info: https://wiki.batocera.org/systems:ps3
+    For more info: https://wiki.reglinux.org/systems/ps3
   comment_fr: |
     Vous devez préalablement charger le firmware en lançant rpcs3-config depuis menu>f1>Applications puis File>Install firmware.
     Les roms ps3 sont des dossiers ; ils doivent être renommés pour terminer par .ps3
     La première fois que vous chargez un jeu, cela met du temps (une barre de progression est visible). Cela ne se produit pas les fois suivantes.
 
-    Trouvez la documentation ici : https://wiki.batocera.org/systems:ps3
+    Trouvez la documentation ici : https://wiki.reglinux.org/systems/ps3
   comment_br: |
     Você deve primeiramente carregar o firmware executando o rpcs3-config no menu>f1>Applications e depois File>Install firmware.
     As roms de PS3 são diretórios que devem ser renomeados para terminar com .ps3.
     Os jogos digitais da PSN são instalados no rpcs3-config, crie um arquivo de texto que termine com .psn que contenha o ID do jogo.
     A primeira vez que você carrega um jogo, levará tempo para ser processado (uma barra de progresso é visível). Isso não acontece nas próximas vezes.
 
-    Para mais informações: https://wiki.batocera.org/systems:ps3
+    Para mais informações: https://wiki.reglinux.org/systems/ps3
 
 3do:
   name: 3DO Interactive Multiplayer
@@ -2240,11 +2240,11 @@ openbor:
   comment_en: |
     Note: For some games to work, pak files cannot be renamed and need to be in a folder called Paks.
 
-    For more info: https://wiki.batocera.org/systems:openbor
+    For more info: https://wiki.reglinux.org/ports/openbor
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:openbor
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/openbor
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:openbor
+    Para mais informações: https://wiki.reglinux.org/ports/openbor
 
 satellaview:
   name: Satellaview
@@ -2346,11 +2346,11 @@ daphne:
 
     Singe games should now be run out of the singe rom directory.
 
-    For more info: https://wiki.batocera.org/systems:daphne
+    For more info: https://wiki.reglinux.org/systems/daphne
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:daphne
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/daphne
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:daphne
+    Para mais informações: https://wiki.reglinux.org/systems/daphne
 
 singe:
   name: Singe
@@ -2375,11 +2375,11 @@ singe:
             |-- maddog.m2v
             |-- maddog.ogg
 
-    For more info: https://wiki.batocera.org/systems:singe
+    For more info: https://wiki.reglinux.org/systems/singe
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:singe
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/singe
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:singe
+    Para mais informações: https://wiki.reglinux.org/systems/singe
 
 thextech:
   name: TheXTech
@@ -2614,11 +2614,11 @@ wiiu:
     cemu:
       cemu: { requireAnyOf: [BR2_PACKAGE_CEMU] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:wiiu
+    For more info: https://wiki.reglinux.org/systems/wiiu
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:wiiu
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/wiiu
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:wiiu
+    Para mais informações: https://wiki.reglinux.org/systems/wiiu
 
 solarus:
   name: Solarus
@@ -2897,11 +2897,11 @@ xbox:
     xemu:
       xemu: { requireAnyOf: [BR2_PACKAGE_XEMU] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:xbox
+    For more info: https://wiki.reglinux.org/systems/xbox
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:xbox
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/xbox
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:xbox
+    Para mais informações: https://wiki.reglinux.org/systems/xbox
 
 flatpak:
   name: Applications
@@ -2924,7 +2924,7 @@ flatpak:
     Install app from Repo : flatpak install xmoto
     List your apps : flatpak list
     Remove intalled app : flatpak remove xmoto
-    then, run batocera-flatpak-update to update the roms directory according to your installed applications.
+    then, run system-flatpak-update to update the roms directory according to your installed applications.
   comment_br: |
     Jogue jogos (e execute programas) disponíveis em https://flathub.org.
     Os programas devem ser instalados a partir da linha de comando.
@@ -2935,7 +2935,7 @@ flatpak:
     Instale aplicativos do repositório: flatpak install xmoto
     Liste seus aplicativos instalados: lista flatpak
     Remova um aplicativo instalado: flatpak remove xmoto
-    em seguida, execute batocera-flatpak-update para atualizar o diretório roms de acordo com seus aplicativos instalados.
+    em seguida, execute system-flatpak-update para atualizar o diretório roms de acordo com seus aplicativos instalados.
 
 steam:
   name: Steam
@@ -2946,13 +2946,13 @@ steam:
   platform: windows
   emulators:
     steam:
-      steam: { requireAnyOf: [BR2_PACKAGE_BATOCERA_STEAM] }
+      steam: { requireAnyOf: [BR2_PACKAGE_STEAM] }
   comment_en: |
     Play Steam.
-    Run batocera-steam-update to update the roms directory according to your installed games.
+    Run system-steam-update to update the roms directory according to your installed games.
   comment_br: |
     Execute o Steam.
-    Em seguida execute o comando batocera-steam-update para atualizar o diretório de roms de acordo com seus jogos instalados.
+    Em seguida execute o comando system-steam-update para atualizar o diretório de roms de acordo com seus jogos instalados.
 
 supervision:
   name: Supervision
@@ -3024,7 +3024,7 @@ sonicretro:
     Options and Emulators
     ---------------------
 
-    Batocera will auto-select the port to use based on the folder's extension - sonic2013/rsdk4 for .son folders, soniccd/rsdk3 for
+    System will auto-select the port to use based on the folder's extension - sonic2013/rsdk4 for .son folders, soniccd/rsdk3 for
     .scd folders. Selecting the wrong emulator will be ignored as the two versions are not compatible. The options are slightly
     different between the two, so you may need to manually select the emulator to change them.
 
@@ -3048,7 +3048,7 @@ sonicretro:
     Opções e emuladores
     ----------
 
-    O Batocera selecionará automaticamente a porta a ser usada com base na extensão da pasta - sonic2013/rsdk4 para pastas .son, soniccd/rsdk3 para
+    O REG selecionará automaticamente a porta a ser usada com base na extensão da pasta - sonic2013/rsdk4 para pastas .son, soniccd/rsdk3 para
     pastas .scd. A seleção do emulador errado será ignorada, pois as duas versões não são compatíveis. As opções são um pouco
     diferentes entre os dois, então você pode precisar selecionar manualmente o emulador para alterá-los.
 
@@ -3997,11 +3997,11 @@ openjazz:
     Copy all game files into this directory.
     Then create an empty `Jazz Jackrabbit.game` file for EmulationStation to be able to launch the game.
 
-    For more info: https://wiki.batocera.org/systems:openjazz
+    For more info: https://wiki.reglinux.org/ports/openjazz
   comment_fr: |
-    Trouvez la documentation ici : https://wiki.batocera.org/systems:openjazz
+    Trouvez la documentation ici : https://wiki.reglinux.org/ports/openjazz
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:openjazz
+    Para mais informações: https://wiki.reglinux.org/ports/openjazz
 
 tyrian:
   name: Tyrian
@@ -4080,10 +4080,10 @@ abuse:
       abuse: { requireAnyOf: [BR2_PACKAGE_ABUSE] }
   comment_en: |
     This system is a standalone game. No rom required.
-    You can add the game data files directly from the Batocera content downloader.
+    You can add the game data files directly from the content downloader.
   comment_fr: |
     Ce système est un jeu autonome. Aucune rom n'est requise.
-    Vous pouvez ajouter les fichiers de données du jeu depuis le menu de téléchargement de contenu Batocera.
+    Vous pouvez ajouter les fichiers de données du jeu depuis le menu de téléchargement de contenu.
   comment_br: |
     Este sistema é um jogo independente. Não requer arquivo de rom.
 
@@ -4118,10 +4118,10 @@ xrick:
       xrick: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_XRICK] }
   comment_en: |
     Put the data.zip file in this directory.
-    Or you can add the game data files directly from the Batocera content downloader.
+    Or you can add the game data files directly from the content downloader.
   comment_fr: |
     Placez ici vos fichiers data.zip pour xrick.
-    Vous pouvez ajouter les fichiers de données du jeu depuis le menu de téléchargement de contenu Batocera.
+    Vous pouvez ajouter les fichiers de données du jeu depuis le menu de téléchargement de contenu.
   comment_br: |
     Coloque o data.zip do jogo xrick neste diretório.
 
@@ -4372,7 +4372,7 @@ gzdoom:
 
     Additional music can be added to /userdata/system/configs/gzdoom in the fm_banks & soundfonts folders respectively.
 
-    More info: https://wiki.batocera.org/systems:gzdoom
+    More info: https://wiki.reglinux.org/ports/gzdoom
   comment_pt: |
     Mettez vos fichiers rom et mod dans ce répertoire.
 
@@ -4384,7 +4384,7 @@ gzdoom:
 
     De la musique supplémentaire peut être ajoutée à /userdata/system/configs/gzdoom dans les dossiers fm_banks et soundfonts respectivement.
 
-    Plus d'infos : https://wiki.batocera.org/systems:gzdoom
+    Plus d'infos : https://wiki.reglinux.org/ports/gzdoom
 
 corsixth:
   name: CorsixTH
@@ -4453,7 +4453,7 @@ eduke32:
 
     For mod support and troubleshooting, please visit the wiki for more information.
 
-    More info: https://wiki.batocera.org/systems:eduke32
+    More info: https://wiki.reglinux.org/ports/eduke32
   comment_br: |
     Eduke32 foi portado originalmente da Build Engine para jogar jogos como Duke Nukem 3D.
 
@@ -4491,7 +4491,7 @@ eduke32:
 
     Para suporte a mods e solução de problemas, visite o wiki para obter mais informações.
 
-    Mais informações em: https://wiki.batocera.org/systems:eduke32
+    Mais informações em: https://wiki.reglinux.org/ports/eduke32
 
 fury:
   name: Ion Fury
@@ -4512,7 +4512,7 @@ fury:
       * fury.grpinfo
       * fury.def
 
-    More info: https://wiki.batocera.org/systems:fury
+    More info: https://wiki.reglinux.org/ports/fury
   comment_br: |
     Ion Fury é um novo jogo da Build Engine dos criadores portado originalmente do Eduke32.
 
@@ -4521,7 +4521,7 @@ fury:
      * fury.grpinfo
      * fury.def
 
-    More info: https://wiki.batocera.org/systems:fury
+    More info: https://wiki.reglinux.org/ports/fury
 
 raze:
   name: Raze
@@ -4627,7 +4627,7 @@ raze:
 
     For mod support and troubleshooting, please visit the wiki for more information.
 
-    More info: https://wiki.batocera.org/systems:raze
+    More info: https://wiki.reglinux.org/ports/raze
   comment_br: |
     Raze foi originalmente portado, alimentada pela tecnologia GZDoom, para jogar jogos clássicos do Build Engine, como Duke Nukem 3D.
 
@@ -4721,7 +4721,7 @@ raze:
 
     Para suporte a mods e solução de problemas, visite o wiki para obter mais informações.
 
-    Mais informações em: https://wiki.batocera.org/systems:raze
+    Mais informações em: https://wiki.reglinux.org/ports/raze
 
 # automatic install & run of pkg, zip & vpk is not working
 # vpk's don't seem to work with vita3k currently
@@ -4780,7 +4780,7 @@ psvita:
 
     This will enable Emulation Station to see your installed game & launch it via the ES GUI.
 
-    Please refer to the wiki - https://wiki.batocera.org/playground:systems:psvita
+    Please refer to the wiki - https://wiki.reglinux.org/playground:systems/psvita
 
   comment_fr: |
     Le premier émulateur au monde pour la PlayStation Vita.
@@ -4830,7 +4830,7 @@ psvita:
 
     Isso permitirá que o Emulation Station veja seu jogo instalado e o inicie por meio da GUI do ES.
 
-    Consulte o wiki - https://wiki.batocera.org/playground:systems:psvita
+    Consulte o wiki - https://wiki.reglinux.org/playground:systems/psvita
 
 doom3:
   name: Doom 3
@@ -4868,11 +4868,11 @@ doom3:
     The `Doom 3.d3` file should contain the path to the base game. - i.e. base/pak000.pk4
     Similarly `Doom 3 - Resurrection of Evil.d3` should be - d3xp/pak000.pk4
 
-    For more info: https://wiki.batocera.org/systems:doom3
+    For more info: https://wiki.reglinux.org/ports/doom3
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:doom3
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/doom3
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:doom3
+    Para mais informações: https://wiki.reglinux.org/ports/doom3
 
 reminiscence:
   name: REminiscence
@@ -4886,11 +4886,11 @@ reminiscence:
     libretro:
       reminiscence: { requireAnyOf: [BR2_PACKAGE_LIBRETRO_REMINISCENCE] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:reminiscence
+    For more info: https://wiki.reglinux.org/ports/reminiscence
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:reminiscence
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/reminiscence
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:reminiscence
+    Para mais informações: https://wiki.reglinux.org/ports/reminiscence
 
 openlara:
   name: OpenLara
@@ -4904,11 +4904,11 @@ openlara:
     openlara:
       openlara: { requireAnyOf: [BR2_PACKAGE_OPENLARA] }
   comment_en: |
-    For more info: https://wiki.batocera.org/systems:openlara
+    For more info: https://wiki.reglinux.org/ports/openlara
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:openlara
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/openlara
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:openlara
+    Para mais informações: https://wiki.reglinux.org/ports/openlara
 
 quake3:
   name: Quake III
@@ -4934,7 +4934,7 @@ quake3:
 
     Please note that menu options in Team Arena and other mods can only be selected using a mouse, once the game is started the controller will function normally.
 
-    For more info: https://wiki.batocera.org/systems:ioquake3
+    For more info: https://wiki.reglinux.org/systems/ioquake3
   comment_fr: |
     Quake III est optimisé pour être joué avec une souris et un clavier, mais il est ici également pré-configuré pour y jouer avec une manette.
 
@@ -4948,7 +4948,7 @@ quake3:
 
     Veuillez noter que les options de menu de Team Arena et d'autres mods peuvent être sélectionnées uniquement à l'aide d'une souris, une fois la partie lancée, la manette fonctionnera normalement.
 
-    Pour plus d'informations : https://wiki.batocera.org/systems:ioquake3
+    Pour plus d'informations : https://wiki.reglinux.org/systems/ioquake3
   comment_br: |
     O Quake III é otimizado para ser jogado com mouse e teclado, mas aqui também é pré-configurado para ser jogado com um gamepad.
 
@@ -4962,7 +4962,7 @@ quake3:
 
     Observe que as opções de menu no Team Arena e outros mods só podem ser selecionadas usando um mouse, uma vez que o jogo é iniciado, o controlador funcionará normalmente.
 
-    Para mais informações: https://wiki.batocera.org/systems:ioquake3
+    Para mais informações: https://wiki.reglinux.org/systems/ioquake3
 
 namco2x6:
   name: Namco System 246/256
@@ -4986,7 +4986,7 @@ namco2x6:
                     |
                     ---tef1dvd0.chd
 
-    For more info: https://wiki.batocera.org/systems:namco2x6
+    For more info: https://wiki.reglinux.org/systems/namco2x6
 
 vis:
   name: Tandy Video Information System
@@ -5109,13 +5109,13 @@ theforceengine:
     theforceengine:
       theforceengine: { requireAnyOf: [BR2_PACKAGE_THEFORCEENGINE] }
   comment_en: |
-    The Force Engine (TFE) uses the games files from older LucasArts games like `Dark Forces` & soon `Outlaws` in Batocera.
-    To use TFE in Batocera, you need to do the following:
+    The Force Engine (TFE) uses the games files from older LucasArts games like `Dark Forces` & soon `Outlaws`.
+    To use TFE, you need to do the following:
 
     1. Install the game you wish to use with The Force Engine in Windows (Steam or GOG receommended)
     2. In this example, go to your C:\GOG folder and copy the `Star Wars - Dark Forces` folder to your roms/theforceengine folder.
     3. Create an initial file with a tfe extension, like so: `Star Wars - Dark Forces.tfe`.
-    4. Update you games list in Batocera EmulationStation and the game should be available under `Ports`.
+    4. Update you games list in EmulationStation and the game should be available under `Ports`.
 
     Mods:
 
@@ -5128,7 +5128,7 @@ theforceengine:
     Then edit the file with the name of the mod zip file only.
     i.e. aons_modern.zip
 
-    Update the games list and Batocera can now launch the mod directly.
+    Update the games list and you can now launch the mod directly.
 
     A good source of missions to try are available here: https://df-21.net/downloads/levels/
 
@@ -5142,11 +5142,11 @@ theforceengine:
     It is important to use the exact directory name above.
     A keyboard and mouse / touchscreen is required to create the initial user profile & game start.
 
-    For more info: https://wiki.batocera.org/systems:theforceengine
+    For more info: https://wiki.reglinux.org/ports/theforceengine
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:theforceengine
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/theforceengine
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:theforceengine
+    Para mais informações: https://wiki.reglinux.org/ports/theforceengine
 
 iortcw:
   name: Return To Castle Wolfenstein
@@ -5161,12 +5161,12 @@ iortcw:
       iortcw: { requireAnyOf: [BR2_PACKAGE_IORTCW] }
   comment_en: |
     IORTCW uses the games files from your 2001 version of the game `Return to Castle Wolfenstein`.
-    To use IORTCW in Batocera, you need to do the following:
+    To use IORTCW, you need to do the following:
 
     1. Install Return to Castle Wolfenstein in Windows or Linux (Steam or GOG receommended)
     2. Copy the .pk3 files only from your installation locations `Main` folder to /userdata/roms/iortcw in it's own `main` folder.
     3. Create an initial file with a rtcw extension, like so: `Return to Castle Wolfenstein.rtcw`.
-    4. Update you games list in Batocera EmulationStation and the game should be available under `Ports`.
+    4. Update you games list in EmulationStation and the game should be available under `Ports`.
 
     Notes:
 
@@ -5174,11 +5174,11 @@ iortcw:
     i.e. /userdata/roms/iortcw/main is where your .pk3 should be located.
     A keyboard and mouse / touchscreen is required for game start.
 
-    For more info: https://wiki.batocera.org/systems:iortcw
+    For more info: https://wiki.reglinux.org/ports/iortcw
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:iortcw
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/iortcw
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:iortcw
+    Para mais informações: https://wiki.reglinux.org/ports/iortcw
 
 fallout1-ce:
   name: Fallout Community Edition
@@ -5203,11 +5203,11 @@ fallout1-ce:
 
     Note: This game currently requires a mouse and keyboard to play.
 
-    For more info: https://wiki.batocera.org/systems:fallout1-ce
+    For more info: https://wiki.reglinux.org/ports/fallout1-ce
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:fallout1-ce
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/fallout1-ce
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:fallout1-ce
+    Para mais informações: https://wiki.reglinux.org/ports/fallout1-ce
 
 fallout2-ce:
   name: Fallout 2 Community Edition
@@ -5232,11 +5232,11 @@ fallout2-ce:
 
     Note: This game currently requires a mouse and keyboard to play.
 
-    For more info: https://wiki.batocera.org/systems:fallout2-ce
+    For more info: https://wiki.reglinux.org/ports/fallout2-ce
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:fallout2-ce
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/fallout2-ce
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:fallout2-ce
+    Para mais informações: https://wiki.reglinux.org/ports/fallout2-ce
 
 dxx-rebirth:
   name: DXX Rebirth
@@ -5270,11 +5270,11 @@ dxx-rebirth:
 
     A mouse & keyboard is required initially but you can configure a controller per user.
 
-    For more info: https://wiki.batocera.org/systems:dxx-rebirth
+    For more info: https://wiki.reglinux.org/ports/dxx-rebirth
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:dxx-rebirth
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/dxx-rebirth
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:dxx-rebirth
+    Para mais informações: https://wiki.reglinux.org/ports/dxx-rebirth
 
 etlegacy:
   name: Wolfenstein - Enemy Territory
@@ -5302,13 +5302,13 @@ etlegacy:
            Game controllers can also be configured for your user.
            The set language only applies on initial boot. Any previous profiles will need to be changed manually.
            You may have to create a user profile twice for it to save.
-           Batocera only provides the client with mods & NOT the server to host matches.
+           We only provide the client with mods & NOT the server to host matches.
 
-    For more info: https://wiki.batocera.org/systems:etlegacy
+    For more info: https://wiki.reglinux.org/ports/etlegacy
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:etlegacy
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/etlegacy
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:etlegacy
+    Para mais informações: https://wiki.reglinux.org/ports/etlegacy
 
 sonic3-air:
   name: Sonic 3 A.I.R.
@@ -5327,11 +5327,11 @@ sonic3-air:
     Additionally, create a blank `Sonic 3 - Angel Island Revisited.s3air` file.
     This file will allow EmulationStation to launch Sonic 3 A.I.R. and scrape artwork etc.
 
-    For more info: https://wiki.batocera.org/systems:sonic3-air
+    For more info: https://wiki.reglinux.org/ports/sonic3-air
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:sonic3-air
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/sonic3-air
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:sonic3-air
+    Para mais informações: https://wiki.reglinux.org/ports/sonic3-air
 
 sonic-mania:
   name: Sonic Mania
@@ -5369,11 +5369,11 @@ sonic-mania:
     TargetVersion=5
     ```
 
-    For more info: https://wiki.batocera.org/systems:sonic-mania
+    For more info: https://wiki.reglinux.org/ports/sonic-mania
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:sonic-mania
+    Trouvez la documentation ici: https://wiki.reglinux.org/ports/sonic-mania
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:sonic-mania
+    Para mais informações: https://wiki.reglinux.org/ports/sonic-mania
 
 uqm:
   name: Ur-Quan Masters
@@ -5410,7 +5410,7 @@ chihiro:
     You will also need the Cerbios flashrom in your bios directory.
     - Most modern Cerbios versions will work with the udma variants not being necessary.
 
-    For more info: https://wiki.batocera.org/systems:chihiro
+    For more info: https://wiki.reglinux.org/systems/chihiro
   comment_fr: |
     Placez vos roms Chihrio compatible XBOX ici.
     Actuellement les ISO supportés sont:
@@ -5421,9 +5421,9 @@ chihiro:
     Vous aurez besoin également du flashrom Cerbios, à mettre dans le dossier bios.
     - La plupart des versions modernes de Cerbios fonctionneront, les variantes udma n'étant pas nécessaires.
 
-    Pour plus d'informations consultez la documentation ici: https://wiki.batocera.org/systems:chihiro
+    Pour plus d'informations consultez la documentation ici: https://wiki.reglinux.org/systems/chihiro
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:chihiro
+    Para mais informações: https://wiki.reglinux.org/systems/chihiro
 
 rott:
   name: Rise of the Triad
@@ -5447,11 +5447,11 @@ rott:
     You do not need to enable the joystick or gamepad as compatiblity doesn't work well yet.
     We have mapped the controller to keyboard events as a result.
 
-    For more info: https://wiki.batocera.org/systems:taradino
+    For more info: https://wiki.reglinux.org/systems/taradino
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:taradino
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/taradino
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:taradino
+    Para mais informações: https://wiki.reglinux.org/systems/taradino
 
 commanderx16:
   name: Commander X16
@@ -5481,11 +5481,11 @@ commanderx16:
     ...
     RUN
 
-    For more info: https://wiki.batocera.org/systems:commanderx16
+    For more info: https://wiki.reglinux.org/systems/commanderx16
   comment_fr: |
-    Trouvez la documentation ici: https://wiki.batocera.org/systems:commanderx16
+    Trouvez la documentation ici: https://wiki.reglinux.org/systems/commanderx16
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:commanderx16
+    Para mais informações: https://wiki.reglinux.org/systems/commanderx16
 
 ps4:
   name: PlayStation 4
@@ -5511,11 +5511,11 @@ ps4:
     Very important: To play games you typically need the system modules from your PS4 that has been jailbroken.
     Place the decrypted system module files in: /userdata/system/configs/shadps4/user/sys_modules
 
-    For more info: https://wiki.batocera.org/systems:ps4
+    For more info: https://wiki.reglinux.org/systems/ps4
   comment_fr: |
-    Trouvez la documentation ici : https://wiki.batocera.org/systems:ps4
+    Trouvez la documentation ici : https://wiki.reglinux.org/systems/ps4
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:ps4
+    Para mais informações: https://wiki.reglinux.org/systems/ps4
 
 jazz2:
   name: Jazz Jackrabbit 2
@@ -5533,8 +5533,8 @@ jazz2:
     Copy all game files into this directory.
     Then create an empty `Jazz Jackrabbit 2.game` file for EmulationStation to be able to launch the game.
 
-    For more info: https://wiki.batocera.org/systems:jazz2-native
+    For more info: https://wiki.reglinux.org/ports/jazz2
   comment_fr: |
-    Trouvez la documentation ici : https://wiki.batocera.org/systems:jazz2-native
+    Trouvez la documentation ici : https://wiki.reglinux.org/ports/jazz2
   comment_br: |
-    Para mais informações: https://wiki.batocera.org/systems:jazz2-native
+    Para mais informações: https://wiki.reglinux.org/ports/jazz2
