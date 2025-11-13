@@ -1,74 +1,40 @@
-#!/bin/sh
-#
-
-SYNCTHING_CONFIG="/userdata/system/configs/syncthing/"
-SYNCTHING_LOG="/userdata/system/logs/syncthing.log"
-
-RETVAL=0
+#!/bin/dash
 
 start() {
-    SYNCTHING_SECURITY="$(/usr/bin/system-settings-get system.security.enabled)"
-	# check if syncthing web ui should be accessible from outside (system.security.enabled=0)
-    if [ "$SYNCTHING_SECURITY"  != "1" ] || [ -z $SYNCTHING_SECURITY ]
-	then
-		SYNCTHING_GUI="http://0.0.0.0:8384"
-	else
-		SYNCTHING_GUI="http://127.0.0.1:8384"
-	fi
+    SYNCTHING_CONFIG="/userdata/system/configs/syncthing/"
+    SYNCTHING_LOG="/userdata/system/logs/syncthing.log"
 
-	# create config directory if not present
-	if [ ! -d $SYNCTHING_CONFIG ]
-	then
-		mkdir /userdata/system/configs/syncthing/
-	fi
-	
-	echo -n "Starting syncthing service: "
-	start-stop-daemon -S -b -q -x /usr/bin/syncthing -- serve --no-upgrade --no-browser --logflags=2 --logfile=$SYNCTHING_LOG --home=$SYNCTHING_CONFIG --gui-address=$SYNCTHING_GUI
-	RETVAL=$?
-	echo "done"
+    # check if syncthing web ui should be accessible from outside (default is "no")
+    { [ "$(/usr/bin/regmsg getConfigKey system.security.enabled)"  = "0" ] && SYNCTHING_GUI="http://0.0.0.0:8384"; } || SYNCTHING_GUI="http://127.0.0.1:8384"
 
-	return $RETVAL
-}	
+    # create config directory if not present
+    [ -d $SYNCTHING_CONFIG ] || mkdir /userdata/system/configs/syncthing/
+    
+    printf "Starting syncthing service: "
+    { start-stop-daemon -S -b -q -x /usr/bin/syncthing -- serve --no-upgrade --no-browser --logflags=2 --logfile="$SYNCTHING_LOG" --home="$SYNCTHING_CONFIG" --gui-address="$SYNCTHING_GUI" && echo "done"; } || { echo FAIL; exit 1; }
+}
 
 stop() {
-	echo -n "Shutting down syncthing service: "
-	start-stop-daemon -K -q -n syncthing
-	RETVAL=$?
-	echo "done"
-
-	return $RETVAL
-}	
+    printf "Shutting down syncthing service: "
+    { start-stop-daemon -K -q -n syncthing && echo "done"; } || { echo FAIL; exit 1; }
+}
 
 restart() {
-	stop
-	start
-}	
+    stop
+    start
+}
 
 reload() {
-	echo -n "Reloading syncthing service: "
-	kill -HUP $(pidof syncthing)
-	RETVAL=$?
-	echo "done"
-
-	return $RETVAL
-}	
+    printf "Reloading syncthing service: "
+    { kill -HUP $(pidof syncthing) && echo "done"; } || { echo FAIL; exit 1; }
+}
 
 case "$1" in
-	start)
-  		start
-	;;
-	stop)
-  		stop
-	;;
-	restart)
-  		restart
-	;;
-	reload)
-  		reload
-	;;
-  	*)
-		echo "Usage: $0 {start|stop|restart|reload}"
-		exit 1
+    start)   start   ;;
+    stop)    stop    ;;
+    restart) restart ;;
+    reload)  reload  ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload}"
+        exit 1
 esac
-
-exit $?
