@@ -6,9 +6,6 @@ system.es.environment=wayland
 # default suspend on handled boards
 system.suspendmode=suspend
 
-# default audio volume
-audio.volume=40
-
 # default refresh rate
 es.resolution=1080x1920@60
 
