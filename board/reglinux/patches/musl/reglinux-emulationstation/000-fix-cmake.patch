@@ -1,11 +1,11 @@
---- a/CMakeLists.txt	2024-05-26 15:08:34.667803716 +0200
-+++ b/CMakeLists.txt	2024-05-26 15:08:51.099478175 +0200
-@@ -342,6 +342,8 @@
+--- a/CMakeLists.txt	2025-11-12 12:35:15.129978797 +0100
++++ b/CMakeLists.txt	2025-11-12 12:37:01.237173445 +0100
+@@ -308,6 +308,8 @@
      id3v2
      yuv
      libcheevos
 +    intl
 +    atomic
+     Threads::Threads
  )
  
- if(UDEV_FOUND)
