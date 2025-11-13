@@ -1,0 +1,15 @@
+diff --git a/package/libfuse3/libfuse3.mk b/package/libfuse3/libfuse3.mk
+index f5c9dae8f7..ff7070dff5 100644
+--- a/package/libfuse3/libfuse3.mk
++++ b/package/libfuse3/libfuse3.mk
+@@ -30,4 +30,10 @@ define LIBFUSE3_LINUX_CONFIG_FIXUPS
+ 	$(call KCONFIG_ENABLE_OPT,CONFIG_FUSE_FS)
+ endef
+ 
++define LIBFUSE3_DELETE_INITD_SCRIPT
++	rm -f $(TARGET_DIR)/etc/init.d/fuse3
++endef
++
++LIBFUSE3_POST_INSTALL_TARGET_HOOKS += LIBFUSE3_DELETE_INITD_SCRIPT
++
+ $(eval $(meson-package))
