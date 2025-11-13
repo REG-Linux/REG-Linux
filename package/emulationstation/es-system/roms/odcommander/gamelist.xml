@@ -3,7 +3,7 @@
 	<game>
 		<path>./od-commander.odc</path>
 		<name>OD-Commander</name>
-		<desc>A two-pane file manager, similar to Norton/Midnight commander, useful to manage all the /userdata files on your Batocera system.</desc>
+		<desc>A two-pane file manager, similar to Norton/Midnight commander, useful to manage all the /userdata files on your system.</desc>
 		<image>./images/od-commander-image.png</image>
 		<marquee>./images/od-commander-marquee.png</marquee>
 		<releasedate>20200220T000000</releasedate>
