@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 
 # EmulationStation Standalone Script
 #
@@ -14,85 +14,39 @@
 #
 # Environment:
 #   - Designed for embedded Linux systems with limited resources.
-#   - Requires commands: `system-switch-screen-checker`, `system-settings-get`, `regmsg`.
+#   - Requires commands: `system-switch-screen-checker`, `regmsg`.
 #   - Uses `/userdata/system` as HOME and writes logs to `/userdata/system/logs/display.log`.
 #
 # Performance Optimizations:
-#   - Caches frequently accessed settings to reduce external command calls.
-#   - Consolidates `regmsg` and `system-settings-get` calls for efficiency.
+#   - Consolidates `regmsg` calls for efficiency.
 #   - Minimizes disk I/O by reducing logging and using direct file reads.
 #   - Simplifies loops for multi-screen handling to avoid redundant checks.
+#   - Use environment variables to avoid calls to `system-settings-get`
 #
 # Notes:
 #   - Test in a real environment to verify video output and rotation settings.
 #   - Assumes `dbus-launch` is required for gio/gvfs/trash support.
 
 # Configuration paths
-BOOTCONF="/boot/system-boot.conf"                       # Boot configuration file
-REBOOT_FLAG="/var/run/emulationstation-standalone"      # Flag to trigger reboot on stop
+RESTART_FLAG="/var/run/emulationstation-standalone"      # Flag to trigger reboot on stop
 LOG_FILE="/userdata/system/logs/display.log"            # Log file for display-related events
 SWITCH_SCREEN_REQUEST="/var/run/switch_screen_request"  # File for screen switch requests
 SWITCH_SCREEN_CURRENT="/var/run/switch_screen_current"  # File to store current output
 
 # Environment setup
-export HOME=/userdata/system      # Set home directory for EmulationStation
-export LC_ALL="en_US.UTF-8"       # Default language
-GAMELAUNCH=1                      # Flag to launch game on first run
+export HOME=/userdata/system                            # Set home directory for EmulationStation
 
 # Logs a message to file for critical events
-# Args:
-#   $1: Message to log
 log_message() {
-    local mensagem="$1"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $mensagem" >> "${LOG_FILE}"
+    printf '%s - %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" >> "$LOG_FILE"
 }
 
-# Checks if a command exists, exits on failure
-# Args:
-#   $1: Command to check
-check_command() {
-    local cmd="$1"
-    command -v "${cmd}" >/dev/null 2>&1 || {
-        log_message "Error: Command ${cmd} not found"
-        exit 1
-    }
-}
-
-# Initializes the system screen checker
-# Ensures screen switching functionality is ready
-init_system() {
-    check_command system-switch-screen-checker
-    system-switch-screen-checker --init || {
-        log_message "Error: Failed to initialize screen checker"
-        exit 1
-    }
-}
-
-# Sets language settings with caching
-# Uses cached value to avoid repeated calls to system-settings-get
+# Sets language settings, default is "en_US.UTF-8"
 set_language() {
-    [[ -n "${cached_language}" ]] && return
-    local settings_lang
-    settings_lang=$(/usr/bin/system-settings-get system.language)
-    export LC_ALL="${settings_lang:-en_US}.UTF-8"
-    export LANG="${LC_ALL}"
-    cached_language="${LC_ALL}"
-}
-
-# Retrieves video output settings
-# Reads from switch request file or system settings
-# Returns: Space-separated list of primary and secondary outputs
-get_video_outputs() {
-    local output output2 output3
-    if [[ -f "${SWITCH_SCREEN_REQUEST}" ]]; then
-        output=$(<"${SWITCH_SCREEN_REQUEST}")  # Direct read for performance
-        rm -f "${SWITCH_SCREEN_REQUEST}"
-    else
-        output=$(/usr/bin/system-settings-get global.videooutput)
-        output2=$(/usr/bin/system-settings-get global.videooutput2)
-        output3=$(/usr/bin/system-settings-get global.videooutput3)
-    fi
-    echo "${output:-} ${output2:-} ${output3:-}"
+    settings_lang="$(/usr/bin/regmsg getConfigKey system.language)"
+    LC_ALL="${settings_lang:-en_US}.UTF-8"
+    LANG="$LC_ALL"
+    export LANG LC_ALL
 }
 
 # Configures screen rotation for primary and secondary displays
@@ -101,33 +55,33 @@ get_video_outputs() {
 #   $2: Secondary output (optional)
 #   $3: Tertiary output (optional)
 configure_rotation() {
-    local output="$1" output2="$2" output3="$3"
-    local effective_output display_rotate
-
-    # Get current output and cache rotation settings
+    # Get current output and rotation settings
     effective_output=$(regmsg screen getoutput)
-    [[ -z "${effective_output}" ]] && return
+    [ -z "$effective_output" ] && return
 
-    display_rotate=$(/usr/bin/system-settings-get-master "display.rotate.${effective_output}")
-    display_rotate=${display_rotate:-$(/usr/bin/system-settings-get-master display.rotate)}
+    primary_display_rotate="$(/usr/bin/regmsg getConfigKey "display.rotate.${effective_output}")"
+    [ -z "$primary_display_rotate" ] && primary_display_rotate="$(/usr/bin/regmsg getConfigKey display.rotate)"
 
     # Apply rotation for primary screen
-    if [[ -n "${display_rotate}" ]]; then
+    if [ -n "$primary_display_rotate" ]; then
         if [ -n "$WAYLAND_DISPLAY" ]; then
-            regmsg screen setrotation "${display_rotate}"
+            regmsg screen setrotation "$primary_display_rotate"
         else
-            EXTRA_OPTS="--screenrotate ${display_rotate}"
+            es_customsargs="$es_customsargs --screenrotate $primary_display_rotate"
         fi
     fi
 
-    # Configure rotation for additional screens in a single loop
-    local screen rotate_var display_rotate_other
-    for screen in "${output2}" "${output3}"; do
-        [[ -z "${screen}" ]] && continue
-        rotate_var="display.rotate${screen: -1}"
-        display_rotate_other=$(/usr/bin/system-settings-get "${rotate_var}")
-        [[ -n "${display_rotate_other}" ]] && [[ -n "$WAYLAND_DISPLAY" ]] && regmsg screen setrotation "${display_rotate_other}" --output "${screen}"
-    done
+    # Configure rotation for additional screens
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        if [ -n "$2" ]; then
+            display_rotate2="$(/usr/bin/regmsg getConfigKey display.rotate2)"
+            [ -n "$display_rotate2" ] && regmsg screen setrotation "$display_rotate2" --output "$2"
+        fi
+        if [ -n "$3" ]; then
+            display_rotate3="$(/usr/bin/regmsg getConfigKey display.rotate3)"
+            [ -n "$display_rotate3" ] && regmsg screen setrotation "$display_rotate3" --output "$3"
+        fi
+    fi
 }
 
 # Configures screen resolution for primary and secondary displays
@@ -136,30 +90,19 @@ configure_rotation() {
 #   $2: Secondary output (optional)
 #   $3: Tertiary output (optional)
 configure_resolution() {
-    local output="$1" output2="$2" output3="$3"
-    local bootresolution
+    # Configure primary screen resolution
+    es_resolution="$(/usr/bin/regmsg getConfigKey es.resolution)"
+    { [ -n "$es_resolution" ] && regmsg screen setmode "$es_resolution"; } || regmsg screen mintomaxresolution
 
-    # Configure primary screen resolution with cached settings
-    bootresolution=$(/usr/bin/system-settings-get-master -f "${BOOTCONF}" es.resolution)
-    bootresolution=${bootresolution:-$(/usr/bin/system-settings-get-master es.resolution)}
-    if [[ -z "${bootresolution}" ]]; then
-        regmsg screen mintomaxresolution
-    else
-        regmsg screen setmode "${bootresolution}"
+    # Configure resolution for additional screens
+    if [ -n "$2" ]; then
+        es_resolution2="$(/usr/bin/regmsg getConfigKey es.resolution2)"
+        { [ -n "$es_resolution2" ] && regmsg screen setmode "$es_resolution2" --output "$2"; } || regmsg screen mintomaxresolution --output "$2"
     fi
-
-    # Configure resolution for additional screens in a single loop
-    local screen res_var bootresolution_other
-    for screen in "${output2}" "${output3}"; do
-        [[ -z "${screen}" ]] && continue
-        res_var="es.resolution${screen: -1}"
-        bootresolution_other=$(/usr/bin/system-settings-get "${res_var}")
-        if [[ -z "${bootresolution_other}" ]]; then
-            regmsg screen mintomaxresolution --output "${screen}"
-        else
-            regmsg screen setmode "${bootresolution_other}" --output "${screen}"
-        fi
-    done
+    if [ -n "$3" ]; then
+        es_resolution3="$(/usr/bin/regmsg getConfigKey es.resolution3)"
+        { [ -n "$es_resolution3" ] && regmsg screen setmode "$es_resolution3" --output "$3"; } || regmsg screen mintomaxresolution --output "$3"
+    fi
 }
 
 # Launches EmulationStation with configured options
@@ -168,58 +111,66 @@ configure_resolution() {
 #   $2: Secondary output (optional)
 #   $3: Tertiary output (optional)
 launch_emulationstation() {
-    local output="$1" output2="$2" output3="$3"
-    local custom_opts game_launch_opt
-
-    # Cache custom options and set game launch flag
-    custom_opts=$(/usr/bin/system-settings-get es.customsargs)
-    game_launch_opt=$([[ ${GAMELAUNCH} -eq 1 ]] && echo "" || echo "--no-startup-game")
-
     # Save current output for screen switching
     regmsg screen getoutput > "${SWITCH_SCREEN_CURRENT}"
 
     # Launch with dbus for gio/gvfs/trash support
-    eval "$(dbus-launch --sh-syntax --exit-with-session)"
+    dbus_vars=$(dbus-launch --sh-syntax --exit-with-session) || {
+        log_error "Failed to launch D-Bus session"
+        exit 1
+    }
+    eval "$dbus_vars"
     cd /userdata || { log_message "Error: Failed to change directory to /userdata"; exit 1; }
 
     # Execute EmulationStation with all configured options
-    %REGLINUX_EMULATIONSTATION_PREFIX% emulationstation ${game_launch_opt} --exit-on-reboot-required %REGLINUX_EMULATIONSTATION_ARGS% ${custom_opts} ${EXTRA_OPTS}
+    %REGLINUX_EMULATIONSTATION_PREFIX% emulationstation $game_launch_opt --exit-on-reboot-required %REGLINUX_EMULATIONSTATION_ARGS% $es_customsargs
 }
 
 # Main execution
-if [[ "$1" = "--stop-rebooting" ]]; then
-    rm -f "${REBOOT_FLAG}" && exit 0  # Clear reboot flag and exit
-fi
+[ "$1" = "--stop-rebooting" ] && rm -f "$RESTART_FLAG" && exit 0  # Clear reboot flag and exit
 
 # Set reboot flag to enable restart on stop
-touch "${REBOOT_FLAG}" || { log_message "Error: Failed to create reboot flag"; exit 1; }
+touch "${RESTART_FLAG}" || { log_message "Error: Failed to create reboot flag"; exit 1; }
 
 # Initialize system screen checker
-init_system
+if command -v system-switch-screen-checker > /dev/null 2>&1; then
+    system-switch-screen-checker --init || {
+        log_message "Error: Failed to initialize screen checker"
+        exit 1
+    }
+else
+    log_message "Error: Command 'system-switch-screen-checker' not found"
+    exit 1
+fi
 
 # Main loop to handle EmulationStation execution and reboots
-while [[ -e "${REBOOT_FLAG}" ]]; do
+while [ -e "$RESTART_FLAG" ]; do
     set_language
-    read -r settings_output settings_output2 settings_output3 <<< "$(get_video_outputs)"
 
     # Configure video outputs
-    if [[ -n "${settings_output}" ]]; then
-        regmsg screen setoutput "${settings_output}" "${settings_output2}" "${settings_output3}"
+    if [ -f "$SWITCH_SCREEN_REQUEST" ]; then
+        settings_output=$(cat "$SWITCH_SCREEN_REQUEST")
+        rm -f "${SWITCH_SCREEN_REQUEST}"
+    else
+        settings_output="$(/usr/bin/regmsg getConfigKey global.videooutput)"
+    fi
+    global_videooutput2="$(/usr/bin/regmsg getConfigKey global.videooutput2)"
+    global_videooutput3="$(/usr/bin/regmsg getConfigKey global.videooutput3)"
+    if [ -n "$settings_output" ]; then
+        regmsg screen setoutput "$settings_output" "$global_videooutput2" "$global_videooutput3"
     fi
 
     # Apply rotation and resolution settings
-    configure_rotation "${settings_output}" "${settings_output2}" "${settings_output3}"
-    configure_resolution "${settings_output}" "${settings_output2}" "${settings_output3}"
+    configure_rotation "$settings_output" "$global_videooutput2" "$global_videooutput3"
+    configure_resolution "$settings_output" "$global_videooutput2" "$global_videooutput3"
 
     # Launch EmulationStation
-    launch_emulationstation "${settings_output}" "${settings_output2}" "${settings_output3}"
+    launch_emulationstation
 
     # Check for restart or shutdown requests
-    if [[ -e "/tmp/restart.please" || -e "/tmp/shutdown.please" ]]; then
-        rm -f "${REBOOT_FLAG}"
+    if [ -e "/tmp/reboot.please" ] || [ -e "/tmp/shutdown.please" ]; then
+        rm -f "$RESTART_FLAG"
     fi
 
-    GAMELAUNCH=0  # Disable game auto-launch after first run
+    game_launch_opt="--no-startup-game"  # Disable game auto-launch after first run
 done
-
-exit 0
