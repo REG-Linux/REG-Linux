@@ -1,27 +1,34 @@
-#!/bin/sh
-#
-# Make system.conf specific values available to system-boot.conf
-# in a very early boot stage process where the regular conf-file
-# is not available.
+#!/bin/dash
+[ "$1" != "stop" ] && exit 0
 
-# Only copy values on shutdown/reboot
-[ "$1" = "stop" ] || exit 0
-
+# Make system.conf specific values available through system-boot.conf in a very
+# early boot stage process when /userdata/system/system.conf is not yet available.
 set --
-for key in wifi.enabled wifi.ssid wifi.key wifi2.ssid wifi2.key wifi3.ssid wifi3.key wifi.hidden.ssid wifi.hidden.key system.timezone es.resolution system.hostname
+for key in wifi.enabled wifi.ssid wifi.key wifi2.ssid wifi2.key wifi3.ssid wifi3.key wifi.hidden.ssid wifi.hidden.key system.timezone es.resolution system.hostname system.fscompression.enabled
 do
-    value="$(/usr/bin/system-settings-get "$key")" # in case it is empty, it must be set in the system-boot.conf file to erase any existing value
-    if [ "$value" != "$(/usr/bin/system-settings-get -f /boot/system-boot.conf "$key")" ]
-    then
-        set -- "$@" "$key" "$value"
-    fi
+    current_value="$(/usr/bin/regmsg getConfigKey "$key")"
+    boot_conf_value="$(sed -n "s/^$key=//p" /boot/system-boot.conf | head -n 1)"
+    [ "$current_value" != "$boot_conf_value" ] && set -- "$@" "$key" "$current_value"     # Only queue for update if they differ
 done
 
-if [ $# -gt 0 ]
-then
+# Only remount and write if we have changes
+if [ $# -gt 0 ]; then
     mount -o remount,rw /boot
-    /usr/bin/system-settings-set -f /boot/system-boot.conf "$@"
+    # Process each key-value pair using sed to update or add to the file
+    while [ $# -gt 0 ]; do
+        key="$1"
+        value="$2"
+        shift 2
+        # Uncomment any commented line with this key if it exists (handling multiple # chars)
+        sed -i "/^#*[[:space:]]*$key=/s/^#*//" /boot/system-boot.conf
+        # Use sed to replace the value if the key exists, or append if it doesn't
+        if grep -q "^$key=" /boot/system-boot.conf; then
+            # Key exists, replace the value
+            sed -i "s|^$key=.*|$key=$value|g" /boot/system-boot.conf
+        else
+            # Key doesn't exist, append to file
+            echo "$key=$value" >> /boot/system-boot.conf
+        fi
+    done
     mount -o remount,ro /boot
 fi
-
-exit $?
