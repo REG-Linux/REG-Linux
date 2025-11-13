@@ -1,0 +1,59 @@
+--- a/CPCCore/CPCCoreEmu/macro.h	2025-11-13 21:58:28.062161248 +0100
++++ b/CPCCore/CPCCoreEmu/macro.h	2025-11-13 21:58:38.966087362 +0100
+@@ -12,7 +12,7 @@
+ #ifdef _WIN32
+ static __int64 S1, S2, Freq;
+ #else
+-static __uint64_t s1, s2, freq;
++static uint64_t s1, s2, freq;
+ #endif
+ 
+ static DWORD T;
+--- a/CPCCore/CPCCoreEmu/Tape.cpp	2025-11-13 21:58:50.219580318 +0100
++++ b/CPCCore/CPCCoreEmu/Tape.cpp	2025-11-13 21:59:04.735595375 +0100
+@@ -3279,8 +3279,8 @@
+       // Rewind the tape
+       // Play it 
+ #if defined (__unix) || (RASPPI) || (__APPLE__)
+-      __uint64_t total = 0;
+-      __uint64_t current_length = 0;
++      uint64_t total = 0;
++      uint64_t current_length = 0;
+ #else
+       unsigned _int64 total = 0;
+       unsigned _int64 current_length = 0;
+--- a/CPCCore/zlib/CMakeLists.txt	2025-11-13 22:02:05.859849694 +0100
++++ b/CPCCore/zlib/CMakeLists.txt	2025-11-13 22:02:35.061316989 +0100
+@@ -15,7 +15,6 @@
+ include(CheckFunctionExists)
+ include(CheckIncludeFile)
+ include(CheckCSourceCompiles)
+-enable_testing()
+ 
+ check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+ check_include_file(stdint.h    HAVE_STDINT_H)
+@@ -190,24 +189,3 @@
+     install(FILES ${ZLIB_PC} DESTINATION "${INSTALL_PKGCONFIG_DIR}")
+ endif()
+ 
+-#============================================================================
+-# Example binaries
+-#============================================================================
+-
+-add_executable(example test/example.c)
+-target_link_libraries(example zlib)
+-add_test(example example)
+-
+-add_executable(minigzip test/minigzip.c)
+-target_link_libraries(minigzip zlib)
+-
+-if(HAVE_OFF64_T)
+-    add_executable(example64 test/example.c)
+-    target_link_libraries(example64 zlib)
+-    set_target_properties(example64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
+-    add_test(example64 example64)
+-
+-    add_executable(minigzip64 test/minigzip.c)
+-    target_link_libraries(minigzip64 zlib)
+-    set_target_properties(minigzip64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
+-endif()
