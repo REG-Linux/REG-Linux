@@ -2,7 +2,6 @@
 
 ### full version (not on login, otherwise you can't log when OpenGL/Vulkan are out of order)
 [ "$1" = "--full" ] && FULL_DISPLAY=1 || FULL_DISPLAY=0
-###
 
 # Detect battery
 BATTERY_DIR=$(find /sys/class/power_supply/ \( -iname '*bat*' -type d \) -or \( -ilname '*bat*' -type l \) -print -quit 2>/dev/null)
@@ -68,32 +67,18 @@ done
 V_CPUMINFREQ=$((V_CPUMINFREQ/1000))
 V_CPUMAXFREQ=$((V_CPUMAXFREQ/1000))
 
-# Detect board model with file checks to avoid shell errors
-V_BOARD_MODEL=""
-
 # Method 1: Device tree (ARM systems)
 if [ -f "/sys/firmware/devicetree/base/model" ]; then
-    V_BOARD_MODEL=$(tr -d '\0' < "/sys/firmware/devicetree/base/model" 2>/dev/null)
+    V_BOARD_MODEL=$(tr -d '\0' </sys/firmware/devicetree/base/model 2>/dev/null)
+elif [ -f "/sys/devices/virtual/dmi/id/product_name" ]; then
+    # Method 2: DMI product name (x86 systems)
+    V_BOARD_MODEL=$(tr -d '\0' </sys/devices/virtual/dmi/id/product_name 2>/dev/null)
 fi
-
-# Method 2: DMI product name (x86 systems)
-if [ -z "${V_BOARD_MODEL}" ] || [ "${V_BOARD_MODEL}" = "Default string" ]; then
-    if [ -f "/sys/devices/virtual/dmi/id/product_name" ]; then
-        V_BOARD_MODEL=$(tr -d '\0' < "/sys/devices/virtual/dmi/id/product_name" 2>/dev/null)
-    fi
-fi
-
 # Method 3: DMI board name (fallback)
-if [ -z "${V_BOARD_MODEL}" ] || [ "${V_BOARD_MODEL}" = "Default string" ]; then
-    if [ -f "/sys/devices/virtual/dmi/id/board_name" ]; then
-        V_BOARD_MODEL=$(tr -d '\0' < "/sys/devices/virtual/dmi/id/board_name" 2>/dev/null)
-    fi
+if { [ -z "${V_BOARD_MODEL}" ] || [ "${V_BOARD_MODEL}" = "Default string" ]; } && [ -f "/sys/devices/virtual/dmi/id/board_name" ]; then
+    V_BOARD_MODEL=$(tr -d '\0' </sys/devices/virtual/dmi/id/board_name 2>/dev/null)
 fi
-
-# Display sanitized model if found
-if [ -n "${V_BOARD_MODEL}" ]; then
-    echo "Model: ${V_BOARD_MODEL//[^[:alnum:]]/_}"
-fi
+[ -n "${V_BOARD_MODEL}" ] && echo "Model: ${V_BOARD_MODEL//[^[:alnum:]]/_}"
 
 echo "System: ${V_SYSTEM}"
 
@@ -123,8 +108,7 @@ done
 [ "${#cpu_features[@]}" -gt 0 ] && echo "CPU Features: " "${cpu_features[@]}"
 
 # TDP
-CPU_TDP=$(/usr/bin/system-settings-get system.cpu.tdp)
-[ -n "$CPU_TDP" ] && echo "Ryzen Mobile TDP: $(ryzenadj -i | grep 'PPT LIMIT FAST' | awk '{printf "%.0f\n", $6}')W"
+[ -n "$(/usr/bin/regmsg getConfigKey system.cpu.tdp)" ] && echo "Ryzen Mobile TDP: $(ryzenadj -i | grep 'PPT LIMIT FAST' | awk '{printf "%.0f\n", $6}')W"
 
 # temperature in millidegree Celsius
 TEMPE=0
