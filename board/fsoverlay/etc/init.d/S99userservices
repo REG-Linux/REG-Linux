@@ -1,72 +1,52 @@
-#!/bin/bash
+#!/bin/dash
+system_services="$(/usr/bin/regmsg getConfigKey system.services)"
+[ -z "$system_services" ] && { printf 'All services are disabled [ok]\n'; exit 0; }
 
-call_service()
-{
-    local service_file_path="${1}"
-    local service_state="${2}"
-
-    if [ -x "${service_file_path}" ]
-    then
-        # Executable bit set (chmod +x), call service directly
-        "${service_file_path}" "${service_state}" &
-    else
-        # Executable bit not set, call service via bash interpeter
-        bash "${service_file_path}" "${service_state}" &
-    fi
-}
-
+# Service names consists only of letters, digits, and underscores, and starts with a letter or underscore.
 is_valid_service_name() {
-    local LC_ALL=C
-    [[ "${1}" =~ ^[_[:alpha:]][_[:alpha:][:digit:]]*$ ]]
+    case $1 in
+        [_[:alpha:]][_[:alnum:]]*) return 0 ;;
+        *)                         return 1 ;;
+    esac
 }
 
 process_services() {
-    local service_type="${1}"
-    local service_dir="${2}"
-    local service_state="${3}"
-    local BASE_SERVICE SERVICE SRVVAR BASE_SERVICE_SUGGEST
+    service_type="$1"
+    service_dir="$2"
+    service_state="$3"
 
-    find -L "${service_dir}" -type f |
-        while read SERVICE
-        do
-            BASE_SERVICE=${SERVICE##*/}
-            if is_valid_service_name "${BASE_SERVICE}"
-            then
-                SRVVAR=__SERVICE__${BASE_SERVICE}
-                if test "${!SRVVAR}" = 1; then
-                    call_service "${SERVICE}" "${service_state}"
-                    echo "${service_type} Service: ${BASE_SERVICE} -> service is enabled [ok]"
-                else
-                    echo "${service_type} Service: ${BASE_SERVICE} -> service is disabled [ok]"
-                fi
-            else
-                BASE_SERVICE_SUGGEST=$(echo "$BASE_SERVICE" | sed -e 's/[^_A-Za-z0-9]//g' -e 's/^[0-9]*//')
-                echo "${service_type} Service: $BASE_SERVICE -> invalid service name, suggest rename service file to: '$BASE_SERVICE_SUGGEST' [failed]"
-            fi
-        done
+    # ignore hidden files (.*)
+    find -L "$service_dir" -type f -not -name '.*' -print | while IFS= read -r SERVICE; do
+        BASE_SERVICE=${SERVICE##*/}
+        if is_valid_service_name "$BASE_SERVICE"; then
+            # Check if enabled using pattern match
+            case " $system_services " in
+                *" $BASE_SERVICE "*)
+                    if [ -x "$SERVICE" ]; then
+                        "$SERVICE" "$service_state" &
+                    else
+                        /bin/dash "$SERVICE" "$service_state"&
+                    fi
+                    printf '%s Service: %s -> service is enabled [ok]\n' "$service_type" "$BASE_SERVICE"
+                    ;;
+                *)
+                    printf '%s Service: %s -> service is disabled [ok]\n' "$service_type" "$BASE_SERVICE"
+                    ;;
+            esac
+        else
+            # Suggest name: remove invalid chars, strip leading digits
+            # Step 1: Remove all invalid characters
+            temp=$(printf '%s' "$BASE_SERVICE" | tr -cd '_[:alnum:]')
+            # Step 2: Remove leading digits (loop until no leading digit)
+            while case $temp in [0-9]*) true;; *) false;; esac; do
+                temp=${temp#?}
+            done
+            BASE_SERVICE_SUGGEST=${temp:-custom_service}
+            printf '%s Service: %s [failed] -> invalid service name, suggest rename service file to: "%s"\n' "$service_type" "$BASE_SERVICE" "$BASE_SERVICE_SUGGEST"
+        fi
+    done
 }
 
-# custom.sh : deprecated
-if test -e "/userdata/system/custom.sh"; then
-    #bash interpreter executes scripts without x-flag e.g. for vFAT
-    bash /userdata/system/custom.sh $1 &
-fi
-
-enabled_services="$(/usr/bin/system-settings-get system.services)"
-
-if test -n "${enabled_services}"
-then
-    for SERVICE in ${enabled_services}
-    do
-        export __SERVICE__${SERVICE}=1
-    done
-fi
-
-# user services
-process_services User /userdata/system/services "${1}"
-
-# system user services
-process_services System /usr/share/reglinux/services "${1}"
-
-# wait for spawned scripts to finish on stop condition, after this shutdown can happen
-test "${1}" = "stop" && wait
+process_services User /userdata/system/services "$1"
+process_services System /usr/share/reglinux/services "$1"
+[ "$1" = "stop" ] && wait    # wait for spawned scripts to finish on stop condition
