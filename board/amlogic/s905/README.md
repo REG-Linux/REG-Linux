@@ -3,8 +3,8 @@
 `board/amlogic/s905/` hosts the assets consumed by the
 `reglinux-s905` Buildroot target (`make s905-build`). It covers a broad
 set of Meson GXBB/GXL boards—Khadas VIM1, Libretech Le Potato (v1/v2),
-Odroid-C2, NanoPi K2, P200/P201 TV boxes, FunKey R1, and a “generic”
-S905 TV box image. Each subdirectory contains the boot scripts, image
+Odroid-C2, NanoPi K2, P200/P201 TV boxes, and a “generic” S905 TV box
+image. Each subdirectory contains the boot scripts, image
 layout, and optional U-Boot build recipe for that board, while the
 top-level overlay/patches keep audio, temps, and Wayland packages
 consistent across the fleet.
@@ -16,7 +16,7 @@ consistent across the fleet.
 Path | Description
 ---- | -----------
 `fsoverlay/` | Shared ALSA policy and temperature helper scripts for every GXBB/GXL build.
-`fun-r1/`, `khadas-vim1/`, `lepotato*/`, `minix-neo-u1/`, `nanopi-k2/`, `odroid-c2/`, `p201/`, `s905-tvbox/` | Per-board boot assets (`boot/`), `create-boot-script.sh`, `genimage.cfg`, and optional `build-uboot.sh`.
+`khadas-vim1/`, `lepotato*/`, `minix-neo-u1/`, `nanopi-k2/`, `odroid-c2/`, `p201/`, `s905-tvbox/` | Per-board boot assets (`boot/`), `create-boot-script.sh`, `genimage.cfg`, and optional `build-uboot.sh`.
 `patches/uboot/` | Patch set applied to every mainline U-Boot build (suppress HDMI console, keep stdout on UART, prefer USB/NVMe boot, etc.).
 `patches/ppsspp` & `patches/mupen64plus*` | Emulator fixes so Lima+Wayland renders correctly on these 32/64-bit Mali GPUs.
 
@@ -30,7 +30,6 @@ uEnv/aml_autoscript, logos), and a `genimage.cfg`.
 
 Board dir | Device tree(s) | Notes
 --------- | --------------- | -----
-`fun-r1/` | `meson-gxl-s905x-fun-r1.dtb` | Wraps the kernel as a legacy `uImage`/`uInitrd` pair and generates both AML and S905 autoscripts; designed for the FunKey R1 handheld.
 `khadas-vim1/` | `meson-gxl-s905x-khadas-vim.dtb` | Builds mainline U-Boot (2025.01) plus LibreELEC FIP, then chain-loads it via the vendor scripts on eMMC/SPI. Drops every Khadas script (`boot.ini`, `aml_autoscript`, etc.) onto the FAT partition and copies `u-boot.bin` as `u-boot.bin` for the vendor boot ROM to find.
 `lepotato/` | `meson-gxl-s905x-libretech-cc.dtb` | Mainline U-Boot build (libretech-cc_defconfig) with FIP packaging; boots via extlinux.
 `lepotato-v2/` | `meson-gxl-s905x-libretech-cc-v2.dtb` | Re-uses the same U-Boot sources as `lepotato/` but switches to the v2 defconfig and DTB.
@@ -54,7 +53,7 @@ Board dir | Device tree(s) | Notes
   HDMI, and adjust device names so `fdtdir /boot/boot` works.
 - Emulator/SDL patches keep Wayland+KMS stable with the Lima driver.
 
-Boards such as Fun-R1 and `s905-tvbox` still rely on vendor U-Boot, so
+Boards using `s905-tvbox` still rely on vendor U-Boot, so
 their post-image scripts generate AML autoscripts instead of extlinux
 entries. The rest use mainline U-Boot + extlinux.
 
@@ -77,8 +76,8 @@ Key points from `configs/reglinux-s905.board`:
 - Adds overlays in this order:
   `board/fsoverlay`, `board/amlogic/fsoverlay`, and
   `board/amlogic/s905/fsoverlay`.
-- Keeps the initramfs in LZ4 format (`rootfs.cpio.lz4`), but Fun-R1 and
-  the TV box image rewrap it as `uInitrd`.
+- Keeps the initramfs in LZ4 format (`rootfs.cpio.lz4`), but the TV box
+  image rewrap it as `uInitrd`.
 
 Build it with:
 
@@ -101,7 +100,7 @@ Artifacts appear under
   - Khadas VIM1 copies `boot.ini`, `boot.scr`, `aml_autoscript*`, and
     writes `u-boot.bin` from the freshly built mainline image so the
     vendor ROM can load it off the SD card root.
-  - Fun-R1 and the generic TV box convert the kernel to `uImage`,
+  - Generic TV box convert the kernel to `uImage`,
     produce AML/S905 autoscripts via `mkimage`, and include
     `boot/uEnv.txt` so a user can pick the correct DTB without editing
     `extlinux.conf`.
