@@ -1,69 +1,65 @@
-#!/bin/sh
+#!/bin/dash
 #
 # Starts dropbear sshd.
 #
 
 # REG-Linux
-if [ "$(/usr/bin/system-settings-get system.ssh.enabled)" = "0" ]; then
-    echo "SSH services are disabled"
-    exit
-fi
+[ "$(/usr/bin/regmsg getConfigKey system.ssh.enabled)" = "0" ] && {
+	echo "SSH services are disabled"
+	exit 0
+}
 
-# Allow a few customizations from a config file
-test -r /etc/default/dropbear && . /etc/default/dropbear
+# Allow customizations from config file
+[ -r /etc/default/dropbear ] && . /etc/default/dropbear
 
 start() {
-
-	DROPBEAR_ARGS="$DROPBEAR_ARGS -R"
+	DROPBEAR_ARGS="${DROPBEAR_ARGS} -R"
 
 	# If /etc/dropbear is a symlink to /var/run/dropbear, and
 	#   - the filesystem is RO (i.e. we can not rm the symlink),
 	#     create the directory pointed to by the symlink.
 	#   - the filesystem is RW (i.e. we can rm the symlink),
 	#     replace the symlink with an actual directory
-	if [ -L /etc/dropbear \
-	     -a "$(readlink /etc/dropbear)" = "/var/run/dropbear" ]
-	then
-		if rm -f /etc/dropbear >/dev/null 2>&1; then
-			mkdir -p /etc/dropbear
-		else
-			echo "No persistent location to store SSH host keys. New keys will be"
-			echo "generated at each boot. Are you sure this is what you want to do?"
-			mkdir -p "$(readlink /etc/dropbear)"
+	if [ -L /etc/dropbear ]; then
+		target=$(readlink /etc/dropbear 2>/dev/null)
+		if [ "$target" = "/var/run/dropbear" ]; then
+			if rm -f /etc/dropbear 2>/dev/null; then
+				mkdir -p /etc/dropbear
+			else
+				printf "No persistent location to store SSH host keys.\nNew keys will be generated at each boot.\n"
+				mkdir -p /var/run/dropbear
+			fi
 		fi
 	fi
 
 	printf "Starting dropbear sshd: "
 	umask 077
-
-	start-stop-daemon -S -q -p /var/run/dropbear.pid \
-		--exec /usr/sbin/dropbear -- $DROPBEAR_ARGS
-	[ $? = 0 ] && echo "OK" || echo "FAIL"
+	if start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear -- $DROPBEAR_ARGS; then
+		echo "OK"
+	else
+		echo "FAIL"
+	fi
 }
 
 stop() {
 	printf "Stopping dropbear sshd: "
-	start-stop-daemon -K -q -p /var/run/dropbear.pid
-	pkill -f /usr/sbin/dropbear
-}
-restart() {
-	stop
-	start
+	if start-stop-daemon -K -q -R 2 -n dropbear; then
+		rm -f /var/run/dropbear.pid
+		echo "OK"
+	else
+		echo "FAIL"
+	fi
 }
 
 case "$1" in
-  start)
-  	start
-	;;
-  stop)
-  	stop
-	;;
-  restart|reload)
-  	restart
-	;;
-  *)
-	echo "Usage: $0 {start|stop|restart}"
-	exit 1
+	start)   start ;;
+	stop)    stop ;;
+	restart|reload)
+		stop
+		start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}" >&2
+		exit 1
+		;;
 esac
-
-exit $?

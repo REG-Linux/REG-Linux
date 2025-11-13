@@ -109,7 +109,7 @@ endef
 ifeq ($(BR2_USE_MMU),y)
 define DROPBEAR_INSTALL_INIT_SYSV
 	$(INSTALL) -D -m 755 package/dropbear/S50dropbear $(TARGET_DIR)/etc/init.d/S50dropbear
-	$(INSTALL) -D -m 755 package/dropbear/enable_SSH $(TARGET_DIR)/usr/share/reglinux/services/enable_SSH
+	$(INSTALL) -D -m 755 package/dropbear/SSH $(TARGET_DIR)/usr/share/reglinux/services/SSH
 endef
 else
 define DROPBEAR_DISABLE_STANDALONE
