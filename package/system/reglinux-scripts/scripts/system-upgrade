@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 
 # Create upgrade messages for the badge (TERMINAL=0) or plain text output
 do_upgmsg() {
@@ -89,9 +89,6 @@ quit_script() {
 echo "Starting upgrade process..."
 
 board=$(cat /boot/boot/system.board)
-updatetype="$(/usr/bin/system-settings-get updates.type)"
-# force a default value in case the value is removed or miswritten
-[ "${updatetype}" != "beta" ] && updatetype="stable"
 
 # Force the update file to be stored in "share_internal"
 # Check if share_internal is already mounted (test /userdata first because sometimes is also mounted under /media)
@@ -119,7 +116,7 @@ case $1 in
             url="https://updates.reglinux.org/dev/${board}/boot-${board}.tar.zst"
         fi
 
-        if [[ $(curl -Is "$url" | head -n 1) ]]; then
+        if [ -n "$(curl -Is "$url" | head -n 1)" ]; then
             do_download
         else
             echo "Error: File ${url} not found."
@@ -153,12 +150,13 @@ case $1 in
 esac
 
 # confirm that update is for same board
-newboard=$(tar --zstd -Oxf "$UPGRADEFILE" 'boot/system.board')
+newboard=$(tar --zstd -Oxf "$UPGRADEFILE" 'boot/system.board' 2>/dev/null)
 if [ "$board" = "$newboard" ]; then
 
     if [ -e "${UPGRADEFILE}.md5" ]; then
         DISTMD5=$(cat "${UPGRADEFILE}.md5")
-        CURRMD5=$(md5sum "$UPGRADEFILE" | sed -e s+' .*$'++)
+        # Extract just the hash part, handling potential filenames with spaces
+        CURRMD5=$(md5sum "$UPGRADEFILE" | { read -r hash rest; echo "$hash"; })
         if [ "${DISTMD5}" = "${CURRMD5}" ]; then
             do_upgmsg "Checksum validated ..." 2
         else
@@ -199,7 +197,7 @@ if [ "$board" = "$newboard" ]; then
     # In case of tar error we don't know if is tar corrupted or non existing file to extract (assuming an upgrade could not include all files)
     # First get the list of available files of those we want to extract (also is kind of a test for corrupted tar file)
     # tar --no-same-owner is needed because fat partition does not support owner attributes
-    if tar --zstd --exclude='system-boot.conf' --exclude='config.txt' -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" > /tmp/upgrade.list && sed -i '\%/$%d' /tmp/upgrade.list && grep -qh '^' /tmp/upgrade.list; then
+    if tar --zstd --exclude='system-boot.conf' --exclude='config.txt' -tf "${UPGRADEFOLDER}/boot-${board}.tar.zst" 2>/dev/null > /tmp/upgrade.list && sed -i '\%/$%d' /tmp/upgrade.list && [ -s /tmp/upgrade.list ]; then
         # /tmp/upgrade.list has one file per line and we deleted lines with only folders
         if grep -q -m 1 'runbeforeupgrade.sh' /tmp/upgrade.list; then
             if tar -C /tmp/ --no-same-owner --zstd -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" runbeforeupgrade.sh &>/dev/null; then
@@ -214,11 +212,14 @@ if [ "$board" = "$newboard" ]; then
         fi
 
         rescuelist=''
+        grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update' /tmp/upgrade.list > /tmp/rescue_files_list
         while read -r line ; do
+            [ -n "$line" ] || continue  # Skip empty lines
             rescuelist="${rescuelist} ${line}"
             sed -i "\%${line}%d" /tmp/upgrade.list
             [ "${line}" = "boot/rescue.update" ] && rm -f /boot/boot/rescue        # Free some space before extracting rescue.update
-        done < <(grep -E 'boot/firmware.update|boot/initrd.lz4|boot/linux|boot/modules.update|boot/rescue.update' /tmp/upgrade.list)
+        done < /tmp/rescue_files_list
+        rm -f /tmp/rescue_files_list
 
         if tar --zstd -C /boot/ --no-same-owner -xf "${UPGRADEFOLDER}/boot-${board}.tar.zst" ${rescuelist} && mv /tmp/upgrade.list /boot/upgrade.list && touch /boot/REG_UPDATE; then
             do_upgmsg "Reboot to apply update..." 3
