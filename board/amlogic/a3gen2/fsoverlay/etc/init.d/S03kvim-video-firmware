@@ -1,12 +1,7 @@
-#!/bin/sh
-
-if test "$1" != "start"
-then
-  exit 0
-fi
+#!/bin/dash
+[ "$1" != "start" ] && exit 0
 
 printf "Preload VIMs video firmware: "
-
 # Load video firmware
 /sbin/modprobe -q tee
 /sbin/modprobe -q amlogic-tee

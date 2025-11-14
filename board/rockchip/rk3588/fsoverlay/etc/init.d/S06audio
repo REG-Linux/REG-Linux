@@ -1,37 +1,30 @@
-#!/bin/sh
+#!/bin/dash
 #
 # Starts audio services
 #
-
 . /etc/profile.d/xdg.sh
 . /etc/profile.d/dbus.sh
 
-BOARD=$(cat /boot/boot/system.board)
-
 check_pipewire_status() {
-    local timeout=10
-    local interval=0.1
-    local elapsed=0
-    
+    timeout=10
+    interval=0.1
+    elapsed=0
+
     while [ "$(echo "$elapsed < $timeout" | bc)" -eq 1 ]; do
         if ! pgrep -x pipewire >/dev/null; then
             return 1
         fi
-        
         if [ ! -S "${XDG_RUNTIME_DIR}/pipewire-0" ]; then
             sleep "$interval"
             elapsed=$(echo "$elapsed + $interval" | bc)
             continue
         fi
-        
         if pactl info >/dev/null 2>&1 && pactl list sinks-raw 2>/dev/null | grep -qo sink=; then
             return 0
         fi
-        
         sleep "$interval"
         elapsed=$(echo "$elapsed + $interval" | bc)
     done
-    
     return 1
 }
 
@@ -60,20 +53,16 @@ start_pipewire() {
 }
 
 set_default_audio_device() {
-    local default_audio
-    default_audio=$(/usr/bin/system-settings-get-master audio.device)
-
     # Set default audio device if specified
-    if [ -n "$default_audio" ] && [ "$default_audio" != "auto" ]; then
-        if /usr/bin/pactl set-default-sink "$default_audio"; then
+    audio_device="$(/usr/bin/regmsg systemconf getconfigkey audio.device)"
+    if [ -n "$audio_device" ] && [ "$audio_device" != "auto" ]; then
+        if /usr/bin/pactl set-default-sink "$audio_device"; then
             return 0
         else
-            echo "Error: Failed to set default sink to $default_audio" >&2
+            echo "Error: Failed to set default sink to $audio_device" >&2
             return 1
         fi
     fi
-
-    return 0
 }
 
 stop_pipewire() {
@@ -100,5 +89,3 @@ case "$1" in
         exit 1
         ;;
 esac
-
-exit $?

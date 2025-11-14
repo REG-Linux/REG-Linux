@@ -1,0 +1,68 @@
+#!/bin/dash
+#
+# messagebus:   The D-BUS systemwide message bus
+#
+# chkconfig: 345 97 03
+# description:  This is a daemon which broadcasts notifications of system events \
+#               and other messages. See http://www.freedesktop.org/software/dbus/
+#
+# processname: dbus-daemon
+# pidfile: /var/run/messagebus.pid
+#
+
+# Create needed directories.
+mkdir -p /run/dbus /var/lock/subsys /tmp/dbus /var/lib/dbus
+pidfile=/var/run/messagebus.pid
+lockfile=/var/lock/subsys/dbus-daemon
+daemon=/usr/bin/dbus-daemon
+
+start() {
+    printf "Starting system message bus: "
+    /usr/bin/dbus-uuidgen --ensure
+    if start-stop-daemon -S -q -p "$pidfile" -x "$daemon" -- --system
+    then
+        printf 'done\n'
+        : > "$lockfile" 2>/dev/null
+    else
+        printf 'failed\n'
+        exit 1
+    fi
+}
+
+stop() {
+    printf "Stopping system message bus: "
+    if start-stop-daemon -K -q --remove-pidfile -p "$pidfile" --retry=TERM/2/KILL/1
+    then
+        printf 'done\n'
+    else
+        printf 'failed\n'
+        exit 1
+    fi
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    condrestart)
+        if [ -f "$lockfile" ]; then
+            stop
+            start
+        fi
+        ;;
+    reload)
+        echo "Message bus can't reload its configuration, you have to restart it"
+        exit 1
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|condrestart|reload}"
+        ;;
+esac

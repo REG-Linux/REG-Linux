@@ -1,5 +1,4 @@
-#!/bin/sh
-
+#!/bin/dash
 # No graphical boot for VIM4 because it hangs and kills HDMI link
 case "$1" in
     start)
@@ -8,10 +7,7 @@ case "$1" in
         /usr/bin/plymouth --show-splash
     ;;
     stop)
-        # Shutdown splash with "game over" was set by S12populateshare
+        # Shutdown splash with "game over" set by S12populateshare
         /usr/bin/plymouth --wait quit --retain-splash
     ;;
-    *)
 esac
-
-exit $?

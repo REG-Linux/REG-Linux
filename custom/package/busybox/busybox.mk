@@ -439,7 +439,13 @@ endef
 
 # reglinux
 define BUSYBOX_INSTALL_SEEDRNG
-	cd $(TARGET_DIR)/bin && ln -sf /bin/busybox seedrng
+	ln -sf /bin/busybox $(TARGET_DIR)/bin/seedrng
+endef
+define BUSYBOX_INSTALL_RUN_PARTS
+	ln -sf /bin/busybox $(TARGET_DIR)/bin/run-parts
+endef
+define BUSYBOX_INSTALL_IP
+	ln -sf /bin/busybox $(TARGET_DIR)/bin/ip
 endef
 
 define BUSYBOX_BUILD_CMDS
@@ -456,6 +462,8 @@ define BUSYBOX_INSTALL_TARGET_CMDS
 	$(BUSYBOX_INSTALL_ZCIP_SCRIPT)
 	$(BUSYBOX_INSTALL_MDEV_CONF)
 	$(BUSYBOX_INSTALL_SEEDRNG)
+	$(BUSYBOX_INSTALL_RUN_PARTS)
+	$(BUSYBOX_INSTALL_IP)
 endef
 
 # Install the sysvinit scripts, for the moment, but not those that already

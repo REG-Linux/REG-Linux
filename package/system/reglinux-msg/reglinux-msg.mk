@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-REGLINUX_MSG_VERSION = 562812bd72b558ec4f251f41e87a89ae68329030
+# Nov 14, 2025
+REGLINUX_MSG_VERSION = c527cc87d7f82dd1f733d834201a22495df2f5c2
 REGLINUX_MSG_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_MSG_SITE = https://$(REGLINUX_MSG_TOKEN)@github.com/REG-Linux/regmsg
 REGLINUX_MSG_SITE_METHOD = git

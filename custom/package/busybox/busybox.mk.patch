@@ -1,24 +1,32 @@
 diff --git a/package/busybox/busybox.mk b/package/busybox/busybox.mk
-index d7eda71db6..a3ad46da85 100644
+index d7eda71db6..ff95401491 100644
 --- a/package/busybox/busybox.mk
 +++ b/package/busybox/busybox.mk
-@@ -437,6 +437,11 @@ define BUSYBOX_KCONFIG_FIXUP_CMDS
+@@ -437,6 +437,17 @@ define BUSYBOX_KCONFIG_FIXUP_CMDS
  	$(PACKAGES_BUSYBOX_CONFIG_FIXUPS)
  endef
  
 +# reglinux
 +define BUSYBOX_INSTALL_SEEDRNG
-+	cd $(TARGET_DIR)/bin && ln -sf /bin/busybox seedrng
++	ln -sf /bin/busybox $(TARGET_DIR)/bin/seedrng
++endef
++define BUSYBOX_INSTALL_RUN_PARTS
++	ln -sf /bin/busybox $(TARGET_DIR)/bin/run-parts
++endef
++define BUSYBOX_INSTALL_IP
++	ln -sf /bin/busybox $(TARGET_DIR)/bin/ip
 +endef
 +
  define BUSYBOX_BUILD_CMDS
  	$(BUSYBOX_MAKE_ENV) $(MAKE) $(BUSYBOX_MAKE_OPTS) -C $(@D)
  endef
-@@ -450,6 +455,7 @@ define BUSYBOX_INSTALL_TARGET_CMDS
+@@ -450,6 +461,9 @@ define BUSYBOX_INSTALL_TARGET_CMDS
  	$(BUSYBOX_INSTALL_UDHCPC_SCRIPT)
  	$(BUSYBOX_INSTALL_ZCIP_SCRIPT)
  	$(BUSYBOX_INSTALL_MDEV_CONF)
 +	$(BUSYBOX_INSTALL_SEEDRNG)
++	$(BUSYBOX_INSTALL_RUN_PARTS)
++	$(BUSYBOX_INSTALL_IP)
  endef
  
  # Install the sysvinit scripts, for the moment, but not those that already

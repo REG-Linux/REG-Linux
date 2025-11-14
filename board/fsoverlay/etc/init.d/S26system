@@ -1,87 +1,40 @@
-#!/bin/sh
+#!/bin/dash
 
-config_script="system-config"
-log="/userdata/system/logs/reglinux.log"
-
-ba_keyboard_lang() {
-    settings_lang="$(/usr/bin/system-settings-get system.language || echo 'en_US')"
-    settings_kb="$(/usr/bin/system-settings-get system.kblayout || echo 'us')"
-    if [ "$settings_kb" != "" ]; then
-        loadkeys "$settings_kb" >> $log
-    else
-        keyboardmap=$(echo "$settings_lang" | cut -c1-2)
-        if [ "$keyboardmap" != "" ]; then
-            loadkeys "$keyboardmap" >> $log
-        fi
+reg_xarcade2jstick() {
+    if ! /usr/bin/xarcade2jstick -d >/dev/null 2>&1; then
+        for dev in /usr/share/reglinux/datainit/system/configs/xarcade2jstick/*; do
+            [ -e "$dev" ] || continue
+            devname=$(basename "$dev")
+            [ -h "/dev/input/by-id/$devname" ] && /usr/bin/xarcade2jstick -d -e "/dev/input/by-id/$devname" >/dev/null 2>&1 && break
+        done
     fi
 }
 
-ba_timezone() {
-    settings_timezone="$(/usr/bin/system-settings-get system.timezone)"
-    if [ "$settings_timezone" != "" ]; then
-        eval $config_script "tz" "$settings_timezone" >> $log
+reg_hostname() {
+    current_hostname=$(hostname)
+    if [ -n "$current_hostname" ]; then
+        echo "Creating /etc/hosts"
+        printf '%s\t%s\n' "127.0.0.1" "localhost" > /etc/hosts
+        printf '%s\t%s\n' "127.0.1.1" "$current_hostname" >> /etc/hosts
     fi
-}
-
-ba_hostname() {
-    settings_hostname="$(/usr/bin/system-settings-get system.hostname)"
-    hostname="$(hostname)"
-    echo "Hostname after DHCP setup is: ${hostname}" >> /tmp/hostname.log
-    if [ "$settings_hostname" != "" ]; then
-        echo "Setting hostname from system.hostname: ${settings_hostname}" >> /tmp/hostname.log
-        hostname="${settings_hostname}"
-        hostname "${settings_hostname}"
-    else
-        echo "No system.hostname value is set, leaving hostname unchanged" >> /tmp/hostname.log
-    fi
-    if [ "$hostname" != "" ]; then
-        echo "Creating /etc/hosts" >> /tmp/hostname.log
-        echo "127.0.0.1	localhost"             > /etc/hosts
-        echo "127.0.1.1	${hostname}"          >> /etc/hosts
-    fi
-    cp /tmp/hostname.log /userdata/system/logs/hostname.log
-}
-
-ba_xarcade2jstick() {
-    settings_xarcade="$(/usr/bin/system-settings-get controllers.xarcade.enabled)"
-    if [ "$settings_xarcade" = "1" ]; then
-        # First try : suppose a real X-Arcade is plugged
-        /usr/bin/xarcade2jstick -d >/dev/null 2>&1
-        if [ $? -ne "0" ]
-        then
-            # the user must have a keyboard encoder then
-            for dev in /usr/share/reglinux/datainit/system/configs/xarcade2jstick/*
-            do
-                dev=$(basename "$dev")
-                [ -h "/dev/input/by-id/$dev" ] && /usr/bin/xarcade2jstick -d -e "/dev/input/by-id/$dev" >/dev/null 2>&1 && break
-            done
-        fi
-    fi
-}
-
-ba_es_core_dump() {
-    sysctl -wq kernel.core_pattern=/userdata/system/logs/core.%e
 }
 
 case "$1" in
   start)
+    # Run async tasks in background
     printf "Starting system: "
-    # Remove carriage return characters from Windows files
-    dos2unix /userdata/system/system.conf
-
-    # configure
-    ba_keyboard_lang &
-    ba_timezone &
-    ba_hostname &
-    ba_xarcade2jstick &
-    ba_es_core_dump &
+    system_kblayout="$(/usr/bin/regmsg systemconf getconfigkey system.kblayout)"; loadkeys "${system_kblayout:-us}" &
+    system_timezone="$(/usr/bin/regmsg systemconf getconfigkey system.timezone)"; [ -n "$system_timezone" ] && { /usr/bin/system-config tz "$system_timezone" & }
+    [ "$(/usr/bin/regmsg systemconf getconfigkey controllers.xarcade.enabled)" = "1" ] && { reg_xarcade2jstick & }
+    reg_hostname &
+    echo '/userdata/system/logs/core.%e' > /proc/sys/kernel/core_pattern
+    wait    # Wait for all background jobs
     echo "done."
     ;;
-  stop)
-    ;;
-  restart|reload)
+  stop|restart|reload)
     ;;
   *)
+    echo "Usage: $0 {start|stop|restart|reload}" >&2
+    exit 1
+    ;;
 esac
-
-exit $?

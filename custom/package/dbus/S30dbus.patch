@@ -1,0 +1,89 @@
+diff --git a/package/dbus/S30dbus b/package/dbus/S30dbus
+index 26772755d7..b1e3928ee7 100644
+--- a/package/dbus/S30dbus
++++ b/package/dbus/S30dbus
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/dash
+ #
+ # messagebus:   The D-BUS systemwide message bus
+ #
+@@ -7,38 +7,36 @@
+ #               and other messages. See http://www.freedesktop.org/software/dbus/
+ #
+ # processname: dbus-daemon
+-# pidfile: /run/messagebus.pid
++# pidfile: /var/run/messagebus.pid
+ #
+ 
+ # Create needed directories.
+-[ -d /run/dbus ] || mkdir -p /run/dbus
+-[ -d /var/lock/subsys ] || mkdir -p /var/lock/subsys
+-[ -d /tmp/dbus ] || mkdir -p /tmp/dbus
+-
+-RETVAL=0
++mkdir -p /run/dbus /var/lock/subsys /tmp/dbus /var/lib/dbus
++pidfile=/var/run/messagebus.pid
++lockfile=/var/lock/subsys/dbus-daemon
++daemon=/usr/bin/dbus-daemon
+ 
+ start() {
+     printf "Starting system message bus: "
+-
+-    dbus-uuidgen --ensure
+-    dbus-daemon --system
+-    RETVAL=$?
+-    echo "done"
+-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/dbus-daemon
++    /usr/bin/dbus-uuidgen --ensure
++    if start-stop-daemon -S -q -p "$pidfile" -x "$daemon" -- --system
++    then
++        printf 'done\n'
++        : > "$lockfile" 2>/dev/null
++    else
++        printf 'failed\n'
++        exit 1
++    fi
+ }
+ 
+ stop() {
+     printf "Stopping system message bus: "
+-
+-    ## we don't want to kill all the per-user $processname, we want
+-    ## to use the pid file *only*; because we use the fake nonexistent 
+-    ## program name "$servicename" that should be safe-ish
+-    killall dbus-daemon
+-    RETVAL=$?
+-    echo "done"
+-    if [ $RETVAL -eq 0 ]; then
+-        rm -f /var/lock/subsys/dbus-daemon
+-        rm -f /run/messagebus.pid
++    if start-stop-daemon -K -q --remove-pidfile -p "$pidfile" --retry=TERM/2/KILL/1
++    then
++        printf 'done\n'
++    else
++        printf 'failed\n'
++        exit 1
+     fi
+ }
+ 
+@@ -55,17 +53,16 @@ case "$1" in
+         start
+         ;;
+     condrestart)
+-        if [ -f /var/lock/subsys/$servicename ]; then
++        if [ -f "$lockfile" ]; then
+             stop
+             start
+         fi
+         ;;
+     reload)
+         echo "Message bus can't reload its configuration, you have to restart it"
+-        RETVAL=$?
++        exit 1
+         ;;
+     *)
+         echo "Usage: $0 {start|stop|restart|condrestart|reload}"
+         ;;
+ esac
+-exit $RETVAL

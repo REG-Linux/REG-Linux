@@ -1,27 +1,14 @@
-#!/bin/sh
-
-command -v system-brightness >/dev/null || exit 0
-
+#!/bin/dash
+command -v system-brightness >/dev/null 2>&1 || exit 0
 case $1 in
     start)
-        # don't set if under 5%, while it can cause false positive issues
-        BRI=$(/usr/bin/system-settings-get display.brightness)
-        if [ $? -eq 0 ]; then
-            if [ "$BRI" -lt 5 ]; then
-                BRI=5
-            fi
-            system-brightness "$BRI"
-        fi
+        display_brightness="$(/usr/bin/regmsg systemconf getconfigkey display.brightness)"
+        [ -z "$display_brightness" ] && exit 0
+        [ "$display_brightness" -lt 5 ] && display_brightness=5        # Clamp brightness to minimum 5
+        system-brightness "$display_brightness"
         ;;
     stop)
-        current_brightness=$(system-brightness)
-        stored_brightness=$(/usr/bin/system-settings-get display.brightness)
-        if [ "$stored_brightness" != "$current_brightness" ]; then
-            if [ -e "/userdata/system/system.conf" ]; then
-                /usr/bin/system-settings-set display.brightness "$current_brightness"
-            fi
-        fi
+        current=$(system-brightness 2>/dev/null)
+        [ "$current" != "$(/usr/bin/regmsg systemconf getconfigkey display.brightness)" ] && /usr/bin/system-settings-set display.brightness "$current"
         ;;
 esac
-
-exit 0

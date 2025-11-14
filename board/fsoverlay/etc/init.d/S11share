@@ -1,24 +1,10 @@
-#!/bin/sh
+#!/bin/dash
+[ "$1" = "stop" ] && umount -l -a -t nfs,nfs2,nfs4,cifs
+[ "$1" != "start" ] && exit 0
 
-if [ "$1" = "stop" ]
-then
-    # umount all network configs
-    # don't just remount the one of the config in case the config changed
-    umount -l -a -t nfs,nfs2,nfs4
-    umount -l -a -t cifs
-    exit 0
-fi
-
-if [ "$1" != "start" ]
-then
-    exit 0
-fi
-
-printf "Starting share: "
-
+printf "Starting SHARE: "
 ###
-# SHARECONFFILE
-# can contain :
+# SHARECONFFILE can contain :
 # INTERNAL     => /dev/mmcblk0p2
 # RAM          => tmpfs
 # ANYEXTERNAL  => any device found not starting by /dev/mmcblk0p (use it when you've several usb keys, but plug only one at a time)
@@ -28,25 +14,14 @@ printf "Starting share: "
 ###
 
 SHARECONFFILE="/boot/system-boot.conf"
-INTERNALDEVICE=$(system-part "share_internal")
+INTERNALDEVICE=$(/usr/bin/system-part "share_internal")
 INTERNALDEVICETYPE=$(blkid -o value -s TYPE "${INTERNALDEVICE}")
 
-SHAREDEVICE=$(cat "${SHARECONFFILE}" | grep -m 1 -E '^[ ]*sharedevice=' | cut -d'=' -f2)
-[ -z "$SHAREDEVICE" ] && SHAREDEVICE="INTERNAL"
+# Read sharedevice in one shot
+SHAREDEVICE=$(awk -F= '/^[[:space:]]*sharedevice[[:space:]]*=/ {gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2; exit}' "${SHARECONFFILE}")
+: "${SHAREDEVICE:=INTERNAL}"
 
-getMaxTryConfig() {
-    SHARECONFFILE=${1}
-
-    X=$(grep -E '^[ \t]*sharewait[ \t]*=' "${SHARECONFFILE}" | sed -e s+'^[ \t]*sharewait[ \t]*='+''+)
-    if echo "${X}" | grep -qE '^[0-9][0-9]*$'
-    then
-        echo "${X}"
-        return
-    fi
-    echo 15 # default value
-}
-
-MAXTRY=$(getMaxTryConfig "${SHARECONFFILE}")
+MAXTRY="${sharewait:-15}"
 NTRY=0
 
 mountRAMDisk() {
@@ -59,52 +34,28 @@ mountDeviceOrFallback() {
     REGLINUXFULLFS="/var/reglinuxfs"
     FALLBACK=1
 
-    if [ -n "${DEVICE}" ]
-    then
-        if mkdir -p "${REGLINUXFULLFS}"
-        then
-            if system-mount "${TDEVICE}" 1 "${DEVICE}" "${REGLINUXFULLFS}"
-            then
-                if mkdir -p "${REGLINUXFULLFS}/reglinux"
-                then
-                    if mount --bind "${REGLINUXFULLFS}/reglinux" "/userdata" -o "noatime"
-                    then
-                        FALLBACK=0
-                    fi
-                fi
-            fi
-        fi
-    fi
+    [ -n "${DEVICE}" ] && mkdir -p "${REGLINUXFULLFS}" && system-mount "${TDEVICE}" 1 "${DEVICE}" "${REGLINUXFULLFS}" && mkdir -p "${REGLINUXFULLFS}/reglinux" && mount --bind "${REGLINUXFULLFS}/reglinux" "/userdata" -o noatime && FALLBACK=0
 
-    if [ "${FALLBACK}" = "1" ]
-    then
-        if ! system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
-        then
-            mountRAMDisk
-        fi
-    fi
+    [ "${FALLBACK}" = "1" ] && ! system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata && mountRAMDisk
 }
 
 mountPartByTag() {
     TAG=$1
     DIR=$2
 
-    FSTYPE="$(blkid -l -t "${TAG}" -s TYPE -o value)" || return 1
+    FSTYPE=$(blkid -l -t "${TAG}" -s TYPE -o value)
+    [ -z "$FSTYPE" ] && return 1
+    FSDEVICE=$(blkid -l -t "${TAG}" -o device)
 
-    # make sure that kernel module is loaded before mounting
-    if test "${FSTYPE}" = "ntfs"; then
-        if modprobe ntfs3; then
-            FSTYPE="ntfs3"
-        else
-            modprobe fuse && FSTYPE="ntfs-3g"
-        fi
-        FSDEVICE="$(blkid -l -t "${TAG}" -o device)"
-        if test -n "$(ntfsinfo -m "${FSDEVICE}" 2>&1 | grep 'Volume is scheduled for check.')"; then
-            ntfsfix -d "${FSDEVICE}"
-        fi
-    else
-        modprobe "${FSTYPE}"
-    fi
+    case "${FSTYPE}" in
+        ntfs)
+            { modprobe ntfs3 >/dev/null 2>&1 && FSTYPE=ntfs3 ; } || { modprobe fuse >/dev/null 2>&1 && FSTYPE=ntfs-3g ; }
+            ntfsinfo -m "${FSDEVICE}" 2>&1 | grep -q 'Volume is scheduled for check.' && ntfsfix -d "${FSDEVICE}" >/dev/null 2>&1
+            ;;
+        *)
+            modprobe "${FSTYPE}" >/dev/null 2>&1
+            ;;
+    esac
     mount -t "${FSTYPE}" "${TAG}" "${DIR}"
 }
 
@@ -113,11 +64,9 @@ mountPartSubdir() {
     CMD_PART=$2
     CMD_SUBDIR=$3
     CMD_TDIR=$4
-    mkdir -p "/var/reglinux_subdir_${CMD_KEYPART}" || return 1
-    mountPartByTag "UUID=${CMD_PART}" "/var/reglinux_subdir_${CMD_KEYPART}" || return 1
-    mkdir -p "/var/reglinux_subdir_${CMD_KEYPART}/${CMD_SUBDIR}" || return 1
-    mount --bind "/var/reglinux_subdir_${CMD_KEYPART}/${CMD_SUBDIR}" "${CMD_TDIR}" || return 1
-    return 0
+
+    SUBDIR_PATH="/var/reglinux_subdir_${CMD_KEYPART}"
+    { mkdir -p "${SUBDIR_PATH}" && mountPartByTag "UUID=${CMD_PART}" "${SUBDIR_PATH}" && mkdir -p "${SUBDIR_PATH}${CMD_SUBDIR}" && mount --bind "${SUBDIR_PATH}${CMD_SUBDIR}" "${CMD_TDIR}"; } || return 1
 }
 
 mountDevicesOrNetwork() {
@@ -147,231 +96,197 @@ mountDevicesOrNetwork() {
     # sharedevice_part1=SHARE@abcdefg-1234-5678-hijk-lmnopq0000
     # sharedevice_part2=ROMS@68dc61b8-5008-4659-bde9-5938a547680a:/Documents/roms
 
-    # execute all commands in /boot/system-boot.conf which are like : sharenetwork_cmd1=my command
-    if ! grep -E '^[ ]*share(network|device)_[a-z]*[0-9][ ]*=' "${SHARECONFFILE}" |
-         sed -e s+'^[ ]*share\(network\|device\)_\([a-z]*\)[0-9][ ]*='+'\2 '+ |
-        while read -r CTYPE CMD
-        do
-            XWAIT=4 # N seconds between each try
-            XTRY=$((MAXTRY / XWAIT)) # X tries and give up
+    # execute all commands in /boot/system-boot.conf which are like : sharenetwork_cmd1=my command    # Use a temp file to avoid subshell variable loss
+    TMPFILE=$(mktemp)
+    trap 'rm -f "${TMPFILE}"' EXIT
 
-            while [ "${XTRY}" -gt 0 ]
-            do
-                XTRY=$((XTRY-1))
-                CMD_EXEC=echo
-                if [ "${CTYPE}" = "cmd" ]
-                then
-                    CMD_EXEC="${CMD}"
-                else
-                    CMD_TARGET=$(echo "${CMD}" | sed -e s+'^\([^@]*\)@.*$'+'\1'+)
-                    case "${CTYPE}" in
-                    "nfs"|"smb")
-                        CMD_HOST=$(echo "${CMD}" | sed -e s+'^[^@]*@\([^:]*\):.*$'+'\1'+)
-                        CMD_RDIR=$(echo "${CMD}" | sed -e s+'^[^@]*@[^:]*:\([^:]*\).*$'+'\1'+)
-                        CMD_OPT=$(echo "${CMD}" | sed -e s+'^[^@]*@[^:]*:[^:]*'+''+ -e s+'^:'++)
-                        ;;
-                    "part")
-                        CMD_PART=$(echo "${CMD}" | sed -e s+'^[^@]*@\(.*\)$'+'\1'+)
-                        CMD_SUBDIR="/"
-                        CMD_KEYPART=$(echo "${CMD_PART}" | md5sum | cut -c 1-10)
-                        if echo "${CMD_PART}" | grep -qE ':'
-                        then
-                            CMD_SUBDIR=$(echo "${CMD_PART}" | sed -e s+"^[^:]*:"++)
-                            CMD_PART=$(echo "${CMD_PART}" | sed -e s+":.*$"++)
-                        fi
-                        ;;
-                    *)
-                        echo "unknown type" >&2
-                        return 1
-                    esac
+    # Extract all sharenetwork_*/sharedevice_* lines
+    awk '
+        /^[[:space:]]*share(network|device)_[a-z]*[0-9][[:space:]]*=/ {
+            gsub(/^[[:space:]]*share(network|device)_/, "", $0)
+            split($0, a, "=")
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", a[1])
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", a[2])
+            print a[1] " " a[2]
+        }
+    ' "${SHARECONFFILE}" > "${TMPFILE}"
 
-                    # MAP to the SHARE directory
-                    CMD_TDIR="/userdata"
-                    case "${CMD_TARGET}" in
-                        "SHARE")
-                            CMD_TDIR="/userdata"
-                        ;;
-                        "ROMS")
-                            CMD_TDIR="/userdata/roms"
-                        ;;
-                        "SAVES")
-                            CMD_TDIR="/userdata/saves"
-                        ;;
-                        "BIOS")
-                            CMD_TDIR="/userdata/bios"
-                        ;;
-                        "MUSIC")
-                            CMD_TDIR="/userdata/music"
-                        ;;
-                        "DECORATIONS")
-                            CMD_TDIR="/userdata/decorations"
-                        ;;
-                        "SCREENSHOTS")
-                            CMD_TDIR="/userdata/screenshots"
-                        ;;
-                        "THEMES")
-                            CMD_TDIR="/userdata/themes"
-                        ;;
-                        "CHEATS")
-                            CMD_TDIR="/userdata/cheats"
-                        ;;
-                        "SOUNDS")
-                            CMD_TDIR="/userdata/sounds"
-                        ;;
-                        "LIBRARY")
-                            CMD_TDIR="/userdata/library"
-                        ;;
-                        "CONFIGS")
-                            CMD_TDIR="/userdata/system/configs"
-                        ;;
-                        "RECORDINGS")
-                            CMD_TDIR="/userdata/recordings"
-                        ;;
-                    esac
-
-                    mkdir -p "${CMD_TDIR}" || return 1
-
-                    case "${CTYPE}" in
-                        "nfs")
-                            modprobe nfs
-                            CMD_ADDOPT=
-                            [ -n "${CMD_OPT}" ] && CMD_ADDOPT=",${CMD_OPT}"
-                            CMD_EXEC="mount -o port=2049,nolock,proto=tcp${CMD_ADDOPT} ${CMD_HOST}:${CMD_RDIR} ${CMD_TDIR}"
-                            ;;
-                        "smb")
-                            modprobe cifs
-                            CMD_ADDOPT=
-                            [ -n "${CMD_OPT}" ] && CMD_ADDOPT="-o ${CMD_OPT}"
-                            CMD_EXEC="mount.cifs //${CMD_HOST}/${CMD_RDIR} ${CMD_TDIR} ${CMD_ADDOPT}"
-                            ;;
-                        "part")
-                            if test "${CMD_SUBDIR}" = "/"
-                            then
-                                CMD_EXEC="mountPartByTag UUID=${CMD_PART} ${CMD_TDIR}"
-                            else
-                                CMD_EXEC="mountPartSubdir ${CMD_KEYPART} ${CMD_PART} ${CMD_SUBDIR} ${CMD_TDIR}"
-                            fi
-                            ;;
-                    esac
-                fi
-
-                echo "${CMD_EXEC}"
-                if ${CMD_EXEC}
-                then
-                    echo "success"
-                    XTRY=0
-                else
-                    echo "fail (${XTRY} : ${CMD_EXEC})"
-                    # give up
-                    if [ ${XTRY} -eq 0 ]
-                    then
-                        echo "giving up"
-                        return 1
+    XWAIT=4
+    XTRY=$((MAXTRY / XWAIT))
+    while IFS=" " read -r CTYPE CMD; do
+        [ -z "${CTYPE}" ] && continue
+        CMD_EXEC="echo"
+        if [ "${CTYPE}" = "cmd" ]; then
+            CMD_EXEC="${CMD}"
+        else
+            # Extract CMD_TARGET, CMD_HOST, CMD_RDIR, CMD_OPT, CMD_PART, CMD_SUBDIR
+            case "${CTYPE}" in
+                nfs|smb)
+                    CMD_TARGET=${CMD%%@*}
+                    REMAINDER=${CMD#*@}
+                    CMD_HOST=${REMAINDER%%:*}
+                    REMAINDER2=${REMAINDER#*:}
+                    CMD_RDIR=${REMAINDER2%%:*}
+                    CMD_OPT=${REMAINDER2#*:}
+                    [ "${CMD_OPT}" = "${REMAINDER2}" ] && CMD_OPT=""
+                    ;;
+                part)
+                    CMD_TARGET=${CMD%%@*}
+                    CMD_PART_FULL=${CMD#*@}
+                    CMD_SUBDIR="/"
+                    if [ "${CMD_PART_FULL#*:}" != "${CMD_PART_FULL}" ]; then
+                        CMD_SUBDIR="/${CMD_PART_FULL#*:}"
+                        CMD_PART=${CMD_PART_FULL%%:*}
+                    else
+                        CMD_PART=${CMD_PART_FULL}
                     fi
-                    sleep ${XWAIT} # wait n seconds between each try
+                    CMD_KEYPART=$(printf '%s' "${CMD_PART}" | md5sum | cut -c1-10)
+                    ;;
+                *)
+                    printf 'unknown type: %s\n' "${CTYPE}" >&2
+                    return 1
+                    ;;
+            esac
+
+            # Map target to directory
+            case "${CMD_TARGET}" in
+                SHARE)       CMD_TDIR="/userdata" ;;
+                ROMS)        CMD_TDIR="/userdata/roms" ;;
+                SAVES)       CMD_TDIR="/userdata/saves" ;;
+                BIOS)        CMD_TDIR="/userdata/bios" ;;
+                MUSIC)       CMD_TDIR="/userdata/music" ;;
+                DECORATIONS) CMD_TDIR="/userdata/decorations" ;;
+                SCREENSHOTS) CMD_TDIR="/userdata/screenshots" ;;
+                THEMES)      CMD_TDIR="/userdata/themes" ;;
+                CHEATS)      CMD_TDIR="/userdata/cheats" ;;
+                SOUNDS)      CMD_TDIR="/userdata/sounds" ;;
+                LIBRARY)     CMD_TDIR="/userdata/library" ;;
+                CONFIGS)     CMD_TDIR="/userdata/system/configs" ;;
+                RECORDINGS)  CMD_TDIR="/userdata/recordings" ;;
+                *)           CMD_TDIR="/userdata" ;;
+            esac
+
+            mkdir -p "${CMD_TDIR}" || return 1
+            case "${CTYPE}" in
+                nfs)
+                    modprobe nfs >/dev/null 2>&1
+                    CMD_ADDOPT=${CMD_OPT:+",$CMD_OPT"}
+                    CMD_EXEC="mount -o port=2049,nolock,proto=tcp${CMD_ADDOPT} ${CMD_HOST}:${CMD_RDIR} ${CMD_TDIR}"
+                    ;;
+                smb)
+                    modprobe cifs >/dev/null 2>&1
+                    CMD_ADDOPT=${CMD_OPT:+"-o $CMD_OPT"}
+                    CMD_EXEC="mount.cifs //${CMD_HOST}/${CMD_RDIR} ${CMD_TDIR} ${CMD_ADDOPT}"
+                    ;;
+                part)
+                    if [ "${CMD_SUBDIR}" = "/" ]; then
+                        CMD_EXEC="mountPartByTag UUID=${CMD_PART} ${CMD_TDIR}"
+                    else
+                        CMD_EXEC="mountPartSubdir ${CMD_KEYPART} ${CMD_PART} ${CMD_SUBDIR} ${CMD_TDIR}"
+                    fi
+                    ;;
+            esac
+        fi
+
+        TRYCOUNT=${XTRY}
+        while [ ${TRYCOUNT} -gt 0 ]; do
+            TRYCOUNT=$((TRYCOUNT - 1))
+            if eval "${CMD_EXEC}"; then
+                printf 'success: %s\n' "${CMD_EXEC}" >&2
+                break
+            else
+                printf 'fail (%d): %s\n' "${TRYCOUNT}" "${CMD_EXEC}" >&2
+                if [ ${TRYCOUNT} -eq 0 ]; then
+                    printf 'giving up: %s\n' "${CMD_EXEC}" >&2
+                    return 1
                 fi
-            done
+                sleep ${XWAIT}
+            fi
         done
-    then
-        return 1
-    fi
+    done < "${TMPFILE}"
+
     return 0
 }
 
-RMODE="$SHAREDEVICE"
+# Parse RMODE
+RMODE="${SHAREDEVICE}"
+case "${RMODE}" in
+    DEV\ *)
+        MODE="DEV"
+        UUID=${RMODE#DEV }
+        ;;
+    *)
+        MODE="${RMODE}"
+        ;;
+esac
 
-if echo "${RMODE}" | grep -qE '^DEV '
-then
-    MODE="DEV"
-    UUID=$(echo "${RMODE}" | sed -e s+'^DEV '++)
-else
-    MODE=${RMODE}
-fi
-
-VGSCAN=/usr/sbin/vgscan
-VGCHANGE=/usr/sbin/vgchange
-
-if [ -x ${VGSCAN} ] && [ -x ${VGCHANGE} ]
-then
-    ${VGSCAN}
-    ${VGCHANGE} -ay
+# LVM scan if tools exist
+if command -v vgscan >/dev/null 2>&1 && command -v vgchange >/dev/null 2>&1; then
+    vgscan >/dev/null 2>&1
+    vgchange -ay >/dev/null 2>&1
 fi
 
 case "${MODE}" in
-    "DEV")
-        LDEVICE=$(blkid | grep -m 1 " UUID=\"${UUID}\"")
-        while [ -z "${LDEVICE}" ] && [ "${NTRY}" -lt "${MAXTRY}" ] # wait the device that can take some seconds after udev started
-        do
-            NTRY=$((NTRY+1))
+    DEV)
+        LDEVICE=""
+        while [ -z "${LDEVICE}" ] && [ "${NTRY}" -lt "${MAXTRY}" ]; do
+            NTRY=$((NTRY + 1))
             sleep 1
             LDEVICE=$(blkid | grep -m 1 " UUID=\"${UUID}\"")
         done
-        DEVICE=$(echo "${LDEVICE}" | sed -e s+'^\([^:]*\):.*$'+'\1'+)
-        TDEVICE=$(echo "${LDEVICE}" | sed -e s+'^.* TYPE="\([^"]*\)".*$'+'\1'+)
-        mountDeviceOrFallback "${DEVICE}" "${TDEVICE}"
-    ;;
-    "ANYEXTERNAL")
-        PARTPREFIX=$(system-part prefix "${INTERNALDEVICE}")
-        LDEVICE=$(blkid | grep -F TYPE= | grep -F UUID= | grep -vE "^${PARTPREFIX}" | sort | head -1)
-        while [ -z "${LDEVICE}" ] && [ "${NTRY}" -lt "${MAXTRY}" ] # wait the device that can take some seconds after udev started
-        do
-            NTRY=$((NTRY+1))
-            sleep 1
-            LDEVICE=$(blkid | grep -m 1 -vE "^${PARTPREFIX}")
-        done
-        DEVICE=$(echo "${LDEVICE}" | sed -e s+'^\([^:]*\):.*$'+'\1'+)
-        TDEVICE=$(echo "${LDEVICE}" | sed -e s+'^.* TYPE="\([^"]*\)".*$'+'\1'+)
-        mountDeviceOrFallback "${DEVICE}" "${TDEVICE}"
-    ;;
-    "RAM")
-        mountRAMDisk
-    ;;
-    "NETWORK"|"DEVICES")
-        # first, INTERNAL mount, then, network mount over the NETWORK mounts
-        # to allow to mount over /userdata, but only over /userdata/roms if wanted
-        # mounting network mounts over usb key have not really sense
-        if ! system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
-        then
-            # fallback
+        if [ -n "${LDEVICE}" ]; then 
+            DEVICE=${LDEVICE%%:*}
+            TDEVICE=$(printf '%s' "${LDEVICE}" | sed 's/.* TYPE="\([^"]*\)".*/\1/')
+            mountDeviceOrFallback "${DEVICE}" "${TDEVICE}"
+        else
             mountRAMDisk
         fi
-
-        # Network mounts
-        # no fallback required, mounted on the share
-        mountDevicesOrNetwork > /tmp/mountDevicesOrNetwork.log 2> /tmp/mountDevicesOrNetwork.err # could be usefull to debug
-    ;;
-    "INTERNAL"|*)
-        if ! system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata
-        then
-            # fallback
-            # the internal partition is no more required in fact
-           mountRAMDisk
+        ;;
+    ANYEXTERNAL)
+        PARTPREFIX=$(system-part prefix "${INTERNALDEVICE}")
+        LDEVICE=""
+        while [ -z "${LDEVICE}" ] && [ "${NTRY}" -lt "${MAXTRY}" ]; do
+            NTRY=$((NTRY + 1))
+            sleep 1
+            LDEVICE=$(blkid | grep -F TYPE= | grep -F UUID= | grep -v "^${PARTPREFIX}" | head -n1)
+        done
+        if [ -n "${LDEVICE}" ]; then
+            DEVICE=${LDEVICE%%:*}
+            TDEVICE=$(printf '%s' "${LDEVICE}" | sed 's/.* TYPE="\([^"]*\)".*/\1/')
+            mountDeviceOrFallback "${DEVICE}" "${TDEVICE}"
+        else
+            mountRAMDisk
         fi
-    ;;
+        ;;
+    RAM)
+        mountRAMDisk
+        ;;
+    NETWORK|DEVICES)
+        system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata || mountRAMDisk
+        mountDevicesOrNetwork > /tmp/mountDevicesOrNetwork.log 2> /tmp/mountDevicesOrNetwork.err
+        ;;
+    INTERNAL|*)
+        system-mount "${INTERNALDEVICETYPE}" 1 "${INTERNALDEVICE}" /userdata || mountRAMDisk
+        ;;
 esac
 
-# filesystem compression
-compressenabled="$(/usr/bin/system-settings-get system.fscompression.enabled)"
-if [ "$compressenabled" = "1" ]
-then
-    if grep -qE "^/dev/[^ ]* /userdata btrfs.*$" /proc/mounts
-    then
-        # compress-force used here to have the zstd-compressor check the total file size instead of btrfs before committing to compressing
-        # btrfs's algorithm can be innaccurate when compared with zstd-compressor
-        mount -o remount,compress-force=zstd,autodefrag /userdata || exit 1
-    fi
-fi
+# Enable compression if btrfs and enabled
+# /userdata is not yet mounted, system.fscompression.enabled has to be in /boot/system-boot.conf
+[ "$(/usr/bin/regmsg systemconf getconfigkey system.fscompression.enabled)" = "1" ] && grep -q "^/dev/[^ ]* /userdata btrfs" /proc/mounts && { mount -o remount,compress-force=zstd,autodefrag /userdata || exit 1; }
 
-# now, let mount delayed usbmount devices
-ls /var/run/usbmount.delay |
-    while read -r RULE
-    do
-        RTYPE=$(echo "${RULE}" | sed -e s+'^[0-9]*\.'++)
-        # source the udev context and apply the usbmount
-        (. "/var/run/usbmount.delay/${RULE}"
-        /usr/share/usbmount/usbmount "${RTYPE}"
-        rm "/var/run/usbmount.delay/${RULE}")
+# Handle delayed usbmount
+if [ -d /var/run/usbmount.delay ]; then
+    for RULE in /var/run/usbmount.delay/*; do
+        [ -f "${RULE}" ] || continue
+        RTYPE=${RULE##*/}; RTYPE=${RTYPE#*.}
+        (
+            . "${RULE}"
+            /usr/share/usbmount/usbmount "${RTYPE}"
+            rm -f "${RULE}"
+        )
     done
-touch /var/run/system.share.mounted # reenable standard usbmount
-
+fi
+touch /var/run/system.share.mounted
+# Remove carriage returns from .conf file
+grep -q "$(printf '\r')" /userdata/system/system.conf 2>/dev/null && tr -d '\r' < /userdata/system/system.conf > /tmp/system.conf.tmp && mv /tmp/system.conf.tmp /userdata/system/system.conf
 echo "done."

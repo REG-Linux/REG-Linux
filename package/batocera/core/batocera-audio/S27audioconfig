@@ -1,121 +1,57 @@
-#!/bin/bash
-#
+#!/bin/dash
 # Starts audio services
-#
 
 . /etc/profile.d/xdg.sh
 . /etc/profile.d/dbus.sh
 
 apply_audioconfig() {
-    DEVICE=$1
-    PROFILE=$2
-    VOLUME=$3
+    { [ -n "$2" ] && batocera-audio set-profile "$2"; } || EXITCODE=1
+    { [ -n "$1" ] && batocera-audio set "$1"; } || EXITCODE=1
 
-    EXITCODE=0
-
-    # profile do card+profile
-    if test -n "${PROFILE}"
-    then
-	# set card profile
-	if batocera-audio set-profile "${PROFILE}"
-	then
-	    if test -n "${DEVICE}"
-	    then
-		# then set the default sink
-		if ! batocera-audio set "${DEVICE}"
-		then
-		    EXITCODE=1
-		fi
-	    fi
-	else
-	    EXITCODE=1
-	fi
-    else
-	if test -n "${DEVICE}"
-	then
-	    if ! batocera-audio set "${DEVICE}"
-	    then
-		EXITCODE=1
-	    fi
-	fi
-    fi
-
-    # always apply audio volume at last on the selected output
-    # but in case set ou set-profile fails, always set volume
-    # because in case the audio card doesn't exist,
-    # it is nice to have the volume applied on the default output
-    batocera-audio setSystemVolume "${VOLUME}"  || return 1
-    return ${EXITCODE}
+    # Always apply volume last, even if device/profile failed
+    batocera-audio setSystemVolume "$3" || return 1
+    return "${EXITCODE:-0}"
 }
 
 try_apply_audioconfig() {
-    DEVICE=$1
-    PROFILE=$2
-    VOLUME=$3
-
-    N=10
-    while test "${N}" -gt 0
+    N=1
+    while [ "$N" -lt 11 ] && ! apply_audioconfig "$1" "$2" "$3"
     do
-	echo "retry applying audio (${N})" >&2
-	if apply_audioconfig "${DEVICE}" "${PROFILE}" "${VOLUME}"
-	then
-	    return 0
-	fi
-	sleep 2
-	let N--
+        sleep 2
+        echo "Retry applying audio ($N)" >&2
+        N=$((N + 1))
     done
-    return 1
-}
-
-start_audioconfig() {
-    # this script must be started after pipewire and udev, but before es
-    # and thus, we let splash before config here while udev is the services taking the most time
-
-    # set default device and volume
-    DEVICE=$(/usr/bin/system-settings-get-master audio.device)
-    PROFILE=$(/usr/bin/system-settings-get-master audio.profile)
-    VOLUME=$(/usr/bin/system-settings-get-master audio.volume)
-    test -z "${DEVICE}"  && DEVICE=auto
-    test -z "${PROFILE}" && PROFILE=auto
-    test -z "${VOLUME}"  && VOLUME=80
-
-    if ! apply_audioconfig "${DEVICE}" "${PROFILE}" "${VOLUME}"
-    then
-	# in case it didn't work, we call in backgroud a function
-	# that will do more test in the time
-	# because some tv or audio card takes longer to initialize
-	try_apply_audioconfig "${DEVICE}" "${PROFILE}" "${VOLUME}" &
+    if [ "$N" -lt 11 ]; then
+        echo "Audio config: OK"
+        return 0
+    else        
+        echo "Audio config: FAIL"
+        return 1
     fi
-
-    echo "OK"
 }
 
 stop_audioconfig() {
     VOLUME=$(batocera-audio getSystemVolume)
-	if [[ -e "/userdata/system/system.conf" ]]; then
-	    /usr/bin/system-settings-set audio.volume "${VOLUME}"
-	fi
-	echo "OK"
-}
-
-restart() {
-	stop_audioconfig
-	start_audioconfig
+    [ -n "$VOLUME" ] && /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf audio.volume "$VOLUME"
 }
 
 case "$1" in
- 	start)
-		start_audioconfig
-	;;
- 	stop)
-		stop_audioconfig
-	;;
- 	restart|reload)
-		restart
-	;;
-	*)
-		echo "Usage: $0 {start|stop|restart}"
-	exit 1
+    start)
+        audio_device=$(/usr/bin/regmsg systemconf getconfigkey audio.device)
+        audio_profile=$(/usr/bin/regmsg systemconf getconfigkey audio.profile)
+        audio_volume=$(/usr/bin/regmsg systemconf getconfigkey audio.volume)
+        # backgroud function because some tv or audio cards take longer to initialize
+        try_apply_audioconfig "${audio_device:-auto}" "${audio_profile:-auto}" "${audio_volume:-50}" &
+        ;;
+    stop)
+        stop_audioconfig
+        ;;
+    restart|reload)
+        stop;
+        start;
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}" >&2
+        exit 1
+        ;;
 esac
-
-exit $?

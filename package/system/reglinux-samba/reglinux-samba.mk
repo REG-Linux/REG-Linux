@@ -12,7 +12,7 @@ REGLINUX_SAMBA_DEPENDENCIES =
 define REGLINUX_SAMBA_INSTALL_KSMBD_INIT
 	# Install S91ksmbd service
 	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-samba/S91ksmbd $(TARGET_DIR)/etc/init.d/S91ksmbd
-	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-samba/enable_SAMBA $(TARGET_DIR)/usr/share/reglinux/services/enable_SAMBA
+	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-samba/SAMBA $(TARGET_DIR)/usr/share/reglinux/services/SAMBA
 endef
 
 REGLINUX_SAMBA_DEPENDENCIES += ksmbd-tools
