@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LBREAKOUTHD_VERSION = 1.1.9
+LBREAKOUTHD_VERSION = 1.2
 LBREAKOUTHD_SOURCE = lbreakouthd-$(LBREAKOUTHD_VERSION).tar.gz
 LBREAKOUTHD_SITE = https://sourceforge.net/projects/lgames/files/lbreakouthd
 LBREAKOUTHD_LICENSE = GPL-2.0+
@@ -13,6 +13,11 @@ LBREAKOUTHD_LICENSE_FILES = COPYING
 LBREAKOUTHD_DEPENDENCIES = sdl2 sdl2_mixer sdl2_image sdl2_ttf libpng $(TARGET_NLS_DEPENDENCIES)
 
 LBREAKOUTHD_CONF_OPTS = -with-sysroot=$(STAGING_DIR)
+
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+LBREAKOUTHD_CONF_OPTS += ac_cv_func_malloc_0_nonnull=yes
+LBREAKOUTHD_CONF_OPTS += ac_cv_func_realloc_0_nonnull=yes
+endif
 
 LBREAKOUTHD_CONF_ENV = \
 	SYSROOT=$(STAGING_DIR) \
