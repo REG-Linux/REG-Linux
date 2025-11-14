@@ -1,5 +1,5 @@
 #!/bin/dash
-system_services="$(/usr/bin/regmsg systemconf getConfigKey system.services)"
+system_services="$(/usr/bin/regmsg systemconf getconfigkey system.services)"
 [ -z "$system_services" ] && { printf 'All services are disabled [ok]\n'; exit 0; }
 
 # Service names consists only of letters, digits, and underscores, and starts with a letter or underscore.

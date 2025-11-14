@@ -32,14 +32,14 @@ try_apply_audioconfig() {
 
 stop_audioconfig() {
     VOLUME=$(batocera-audio getSystemVolume)
-    [ -n "$VOLUME" ] && /usr/bin/regmsg systemconf setConfigKey /userdata/system/system.conf audio.volume "$VOLUME"
+    [ -n "$VOLUME" ] && /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf audio.volume "$VOLUME"
 }
 
 case "$1" in
     start)
-        audio_device=$(/usr/bin/regmsg systemconf getConfigKey audio.device)
-        audio_profile=$(/usr/bin/regmsg systemconf getConfigKey audio.profile)
-        audio_volume=$(/usr/bin/regmsg systemconf getConfigKey audio.volume)
+        audio_device=$(/usr/bin/regmsg systemconf getconfigkey audio.device)
+        audio_profile=$(/usr/bin/regmsg systemconf getconfigkey audio.profile)
+        audio_volume=$(/usr/bin/regmsg systemconf getconfigkey audio.volume)
         # backgroud function because some tv or audio cards take longer to initialize
         try_apply_audioconfig "${audio_device:-auto}" "${audio_profile:-auto}" "${audio_volume:-50}" &
         ;;

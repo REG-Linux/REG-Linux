@@ -15,7 +15,7 @@ index 4183ff6268..bf4f65f5dc 100644
 -touch /run/nfs/rmtab
 -
 -CFG_FILE=/etc/default/nfsd
-+[ "$(/usr/bin/regmsg systemconf getConfigKey system.nfs.enabled)" != "1" ] && exit 0
++[ "$(/usr/bin/regmsg systemconf getconfigkey system.nfs.enabled)" != "1" ] && exit 0
  
  NR_THREADS=2
 -if [ -f "${CFG_FILE}" ]; then

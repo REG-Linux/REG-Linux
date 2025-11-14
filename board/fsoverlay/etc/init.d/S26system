@@ -23,9 +23,9 @@ case "$1" in
   start)
     # Run async tasks in background
     printf "Starting system: "
-    system_kblayout="$(/usr/bin/regmsg systemconf getConfigKey system.kblayout)"; loadkeys "${system_kblayout:-us}" &
-    system_timezone="$(/usr/bin/regmsg systemconf getConfigKey system.timezone)"; [ -n "$system_timezone" ] && { /usr/bin/system-config tz "$system_timezone" & }
-    [ "$(/usr/bin/regmsg systemconf getConfigKey controllers.xarcade.enabled)" = "1" ] && { reg_xarcade2jstick & }
+    system_kblayout="$(/usr/bin/regmsg systemconf getconfigkey system.kblayout)"; loadkeys "${system_kblayout:-us}" &
+    system_timezone="$(/usr/bin/regmsg systemconf getconfigkey system.timezone)"; [ -n "$system_timezone" ] && { /usr/bin/system-config tz "$system_timezone" & }
+    [ "$(/usr/bin/regmsg systemconf getconfigkey controllers.xarcade.enabled)" = "1" ] && { reg_xarcade2jstick & }
     reg_hostname &
     echo '/userdata/system/logs/core.%e' > /proc/sys/kernel/core_pattern
     wait    # Wait for all background jobs
