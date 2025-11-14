@@ -1,0 +1,13 @@
+--- a/src/tools.h	2025-11-14 14:42:31.523127890 +0100
++++ b/src/tools.h	2025-11-14 14:42:49.715318761 +0100
+@@ -18,9 +18,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stdint.h>
+-#ifdef WIN32
+-  typedef uint32_t uint;
+-#endif
++typedef uint32_t uint;
+ #include <math.h>
+ #include <dirent.h>
+ 
