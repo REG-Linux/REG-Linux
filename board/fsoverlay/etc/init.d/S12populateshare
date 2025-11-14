@@ -74,7 +74,7 @@ case "$1" in
         ln -sf "$MACHINE_ID_FILE" /etc/machine-id
 
         # Load system.conf to regmsg daemon
-        [ -s /userdata/system/system.conf ] && /usr/bin/regmsg loadConfig /userdata/system/system.conf
+        [ -s /userdata/system/system.conf ] && /usr/bin/regmsg systemconf loadconfig /userdata/system/system.conf
 
         # Run user script if exists
         if [ -x /boot/postshare.sh ]; then
