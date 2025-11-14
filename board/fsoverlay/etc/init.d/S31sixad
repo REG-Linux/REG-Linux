@@ -1,29 +1,24 @@
-#!/bin/sh
-
+#!/bin/dash
 case "$1" in
     start)
-        enabled="$(/usr/bin/system-settings-get controllers.ps3.enabled)"
-        bt_enabled="$(/usr/bin/system-settings-get controllers.bluetooth.enabled)"
-        if [ "$enabled" = "1" ] && [ "$bt_enabled" = "1" ]; then
-            settings_version="$(/usr/bin/system-settings-get controllers.ps3.driver)"
-            [ "$settings_version" = "bluez" ] && exit 0
-            if [ "$settings_version" = "" ]; then
-                settings_version="official"
-            fi
-            /usr/sixad/$settings_version/sixad-bin 0 0 0 &
-        fi
+        { [ "$(/usr/bin/regmsg systemconf getconfigkey controllers.ps3.enabled)" = "1" ] && [ "$(/usr/bin/regmsg systemconf getconfigkey controllers.bluetooth.enabled)" = "1" ]; } || exit 0
+        [ "$(/usr/bin/regmsg systemconf getconfigkey controllers.ps3.driver)" = "bluez" ] && exit 0    # Exit early if bluez — no action needed
+        : "${controllers_ps3_driver:=official}"                                             # Default to "official" if empty
+        exec "/usr/sixad/$controllers_ps3_driver/sixad-bin" 0 0 0 >/dev/null 2>&1 &
         ;;
     stop)
-        killall sixad-bin >/dev/null 2>&1
-        killall sixad-sixaxis >/dev/null 2>&1
+        pkill -f sixad-bin >/dev/null 2>&1
+        pkill -f sixad-sixaxis >/dev/null 2>&1
         ;;
     restart|reload)
-        "$0" stop
-        "$0" start
+        # Call functions directly instead of forking new shell processes
+        set -- stop
+        . "$0"
+        set -- start
+        . "$0"
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart}"
+        printf '%s\n' "Usage: $0 {start|stop|restart}" >&2
         exit 1
+        ;;
 esac
-
-exit $?

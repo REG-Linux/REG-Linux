@@ -1,60 +1,47 @@
-#!/bin/bash
-#
-# KSMBD network share script
-
-if [ "$(/usr/bin/system-settings-get system.samba.enabled)" = "0" ]; then
-    echo "SMB services: disabled"
-    exit 0
-fi
+#!/bin/dash
+[ "$(/usr/bin/regmsg systemconf getconfigkey system.samba.enabled)" = "0" ] && { printf '%s\n' "SMB services: disabled"; exit 0; }
 
 start() {
-    if [ "$(/usr/bin/system-settings-get system.security.enabled)" = "1" ]; then
-        CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"
-    else
-        CONFIGFILE="/etc/ksmbd/ksmbd.conf"
-    fi
+    { [ "$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)" = "0" ] && CONFIGFILE="/etc/ksmbd/ksmbd.conf"; } || CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"
 
-    echo -n "Starting SMB services: "
-    modprobe ksmbd && ksmbd.mountd --config="$CONFIGFILE" && touch /var/lock/subsys/smb && echo "done" && return 0
-    echo "failed"
-    return 1
+    printf 'Starting SMB services: '
+    if modprobe ksmbd && ksmbd.mountd --config="$CONFIGFILE" && touch /var/lock/subsys/smb 2>/dev/null; then
+        printf 'done\n'
+        return 0
+    else
+        printf 'failed\n'
+        return 1
+    fi
 }
 
 stop() {
-    echo -n "Shutting down SMB services: "
-    ksmbd.control -s && rmmod ksmbd && rm -f /var/lock/subsys/smb && echo "done" && return 0
-    echo "failed"
-    return 1
+    printf 'Shutting down SMB services: '
+    if ksmbd.control -s && rmmod ksmbd && rm -f /var/lock/subsys/smb; then
+        printf 'done\n'
+        return 0
+    else
+        printf 'failed\n'
+        return 1
+    fi
 }
 
 reload() {
-    echo -n "Reloading smb.conf file: "
+    printf 'Reloading smb.conf file: '
     if ksmbd.control -r; then
-        echo "done"
+        printf 'done\n'
         return 0
     else
-        echo "failed"
+        printf 'failed\n'
         return 1
     fi
 }
 
 case "$1" in
-  start)
-      start
-    ;;
-  stop)
-      stop
-    ;;
-  restart)
-      stop
-      start
-    ;;
-  reload)
-      reload
-    ;;
-  *)
-    echo "Usage: $0 {start|stop|restart|reload}"
-    exit 1
+    start)   start ;;
+    stop)    stop  ;;
+    restart) stop ; start ;;
+    reload)  reload ;;
+    *)
+        printf 'Usage: %s {start|stop|restart|reload}\n' "${0##*/}" >&2
+        exit 1
 esac
-
-exit $?

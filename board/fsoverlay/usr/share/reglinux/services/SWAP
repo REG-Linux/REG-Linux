@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/dash
 case "$1" in
-  start)
+  start|enabled)
     # Look for a swap partition
     SWAP=$(blkid -c /dev/null -l -o device -t TYPE=swap)
     # If no swap partition use file
@@ -14,19 +14,15 @@ case "$1" in
     fi
     swapon -f "$SWAP"
     ;;
-  stop)
-    swapoff -a
-    ;;
+  stop|disabled) swapoff -a ;;
   restart|reload)
     "$0" stop
-    "$0" start
-    ;;
-  enabled|disabled)
+    exec "$0" start
     ;;
   status)
     [ -n "$(swapon --show)" ] && echo "SWAP status: enabled" || echo "SWAP status: disabled"
     ;;
   *)
-    echo "Usage: $0 {start|stop|restart|reload|enabled|disabled|status}"
+    printf 'Usage: %s {start|stop|restart|reload|enabled|disabled|status}\n' "$0" >&2
     exit 1
 esac

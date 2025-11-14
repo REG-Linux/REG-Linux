@@ -1,64 +1,43 @@
-#!/bin/sh
-
-BOOTCONF="/boot/system-boot.conf"
-PLYMOUTH="/usr/bin/plymouth"
-SYSTEM_SETTINGS_GET="/usr/bin/system-settings-get-master"
-LOGFILE="/userdata/system/logs/emulationstation.log"
-
-. /etc/profile.d/xdg.sh
-. /etc/profile.d/dbus.sh
+#!/bin/dash
 
 # Redirect output to log
-exec >>"$LOGFILE" 2>&1
+exec >>/userdata/system/logs/emulationstation.log 2>&1
 
 case "$1" in
 start)
-	mv /usr/share/plymouth/themes/reglinux/images/header-image.png /usr/share/plymouth/themes/reglinux/images/header-image.png.bak
-	$PLYMOUTH change-mode --reboot
-	$PLYMOUTH --wait quit --retain-splash
-	$PLYMOUTH update-root-fs --read-write
-	mv /usr/share/plymouth/themes/reglinux/images/header-image.png.bak /usr/share/plymouth/themes/reglinux/images/header-image.png
+    . /etc/profile.d/xdg.sh
+    . /etc/profile.d/dbus.sh
 
-	enabled="$($SYSTEM_SETTINGS_GET system.es.atstartup)"
-	if [ "$enabled" != "0" ]; then
-		if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
-			WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway &
-		else
-			%REGLINUX_EMULATIONSTATION_CMD% %REGLINUX_EMULATIONSTATION_POSTFIX%
-		fi
-	fi
-	;;
+    /usr/bin/plymouth quit
 
+    if [ "$(/usr/bin/regmsg systemconf getconfigkey system.es.atstartup)" != "0" ]; then
+        if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+            WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway &
+        else
+            %REGLINUX_EMULATIONSTATION_CMD% %REGLINUX_EMULATIONSTATION_POSTFIX%
+        fi
+    fi
+    ;;
 stop)
-	emulationstation-standalone --stop-rebooting
-	pkill -f sway
-	pkill -f emulationstation
+    emulationstation-standalone --stop-rebooting
+    pkill -f sway
+    pkill -f emulationstation
 
-	# Optimized process termination check
-	timeout=5
-	end_time=$(( $(date +%s) + timeout ))
-	while [ $(date +%s) -lt $end_time ] && pgrep -f emulationstation >/dev/null; do
-		sleep 0.25
-	done
-
-	if $PLYMOUTH --ping; then
-		$PLYMOUTH change-mode --shutdown
-		$PLYMOUTH --show-splash
-	else
-		/usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session
-		$PLYMOUTH --show-splash
-	fi
-	;;
-
-restart | reload)
-	"$0" stop
-	"$0" start
-	;;
-
+    i=0 # Wait up to 5 seconds for emulationstation to exit
+    while pgrep -f emulationstation >/dev/null ; do
+        [ $i -gt 20 ] && break
+        sleep 0.25
+        i=$((i + 1))
+    done
+    # Change scren to "GAME OVER"
+    /usr/sbin/plymouthd --mode=shutdown --graphical-boot --attach-to-session && /usr/bin/plymouth --show-splash
+    ;;
+restart|reload)
+    "$0" stop
+    "$0" start
+    ;;
 *)
-	echo "Usage: $0 {start|stop|restart}"
-	exit 1
-	;;
+    exec echo "Usage: $0 {start|stop|restart}"
+    exit 1
+    ;;
 esac
-
-exit $?

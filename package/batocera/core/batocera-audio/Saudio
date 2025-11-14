@@ -1,27 +1,21 @@
-#!/bin/sh
-#
+#!/bin/dash
 # Starts audio services
-#
 
 . /etc/profile.d/xdg.sh
 . /etc/profile.d/dbus.sh
 
-BOARD=$(cat /boot/boot/system.board)
-
 start_pipewire() {
     printf "Starting pipewire: "
     start-stop-daemon -S -b -q -m -p /var/run/pipewire.pid --exec /usr/bin/pipewire
-    msg=OK
 
     #Wait till sinks are listed, this means PW is working
-    until pactl list sinks-raw | grep -qo sink=
+    N=0
+    while [ "$N" -lt 50 ] && ! pactl list sinks-raw | grep -qo sink=
     do
         sleep 0.1
         N=$((N+1))
-        test $N -gt 50 && { msg=KO; break; }
     done
-
-    echo "$msg"
+    { [ "$N" -lt 50 ] && echo OK; } || echo FAIL
 }
 
 stop_pipewire() {
@@ -47,5 +41,3 @@ case "$1" in
         echo "Usage: $0 {start|stop|restart}"
         exit 1
 esac
-
-exit $?

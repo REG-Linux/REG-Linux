@@ -1,0 +1,85 @@
+diff --git a/package/syslog-ng/S01syslog-ng b/package/syslog-ng/S01syslog-ng
+index 2ced6f8b00..31825c6bb1 100644
+--- a/package/syslog-ng/S01syslog-ng
++++ b/package/syslog-ng/S01syslog-ng
+@@ -1,62 +1,38 @@
+-#!/bin/sh
++#!/bin/dash
+ 
+ DAEMON="syslog-ng"
+ PIDFILE="/var/run/$DAEMON.pid"
+-
+ SYSLOG_NG_ARGS=""
+-
+-# shellcheck source=/dev/null
+ [ -r "/etc/default/$DAEMON" ] && . "/etc/default/$DAEMON"
+ 
+ start() {
+-	printf 'Starting %s: ' "$DAEMON"
+-	# shellcheck disable=SC2086 # we need the word splitting
+-	start-stop-daemon -S -q -p "$PIDFILE" -x "/usr/sbin/$DAEMON" \
+-		-- $SYSLOG_NG_ARGS
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++    printf 'Starting %s: ' "$DAEMON"
++    { start-stop-daemon -S -q -p "$PIDFILE" -x "/usr/sbin/$DAEMON" -- $SYSLOG_NG_ARGS 2>/dev/null && echo "OK"; } || { echo "FAIL"; return 1; }
+ }
+ 
+ stop() {
+-	printf 'Stopping %s: ' "$DAEMON"
+-	start-stop-daemon -K -q -p "$PIDFILE"
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++    printf 'Stopping %s: ' "$DAEMON"
++    { start-stop-daemon -K -q -p "$PIDFILE" && echo "OK"; } || { echo "FAIL"; return 1; }
+ }
+ 
+ restart() {
+-	stop
+-	sleep 1
+-	start
++    stop
++    sleep 1
++    start
+ }
+ 
+ # SIGHUP makes syslog-ng reload its configuration
+ reload() {
+-	printf 'Reloading %s: ' "$DAEMON"
+-	start-stop-daemon -K -s HUP -q -p "$PIDFILE"
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++    printf 'Reloading %s: ' "$DAEMON"
++    { start-stop-daemon -K -s HUP -q -p "$PIDFILE" && echo "OK"; } || { echo "FAIL"; return 1; }
+ }
+ 
+-case "$1" in
+-	start|stop|restart|reload)
+-		"$1";;
+-	*)
+-		echo "Usage: $0 {start|stop|restart|reload}"
+-		exit 1
++case "${1:-}" in
++    start|stop|restart|reload)
++        "$1"
++        ;;
++    *)
++        exec echo "Usage: $0 {start|stop|restart|reload}"
++        exit 1
++        ;;
+ esac

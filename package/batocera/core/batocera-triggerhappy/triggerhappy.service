@@ -1,73 +1,67 @@
-#!/bin/sh
-
-CONFFILE=multimedia_keys.conf
-
-. /etc/profile.d/xdg.sh
-. /etc/profile.d/dbus.sh
-
-# hack for odroidgoa models
-BOARD_MODEL=$(cat /sys/firmware/devicetree/base/model 2>/dev/null | sed -e s+"[^A-Za-z0-9]"+""+g)
-if test -z "${BOARD_MODEL}"
-then
-    # give an other chance with dmi
-    BOARD_MODEL=$(cat /sys/devices/virtual/dmi/id/board_name 2>/dev/null | sed -e s+"[^A-Za-z0-9]"+""+g)
-fi
-
-BOARD_CONFFILE=multimedia_keys_${BOARD_MODEL}.conf
-if test -e "/etc/triggerhappy/triggers.d/${BOARD_CONFFILE}"
-then
-    CONFFILE=${BOARD_CONFFILE}
-fi
-
-enabled="$(/usr/bin/system-settings-get system.multimediakeys.enabled)"
-if [ "$enabled" = "0" ];then
-    CONFFILE=multimedia_keys_disabled.conf
-fi
-
-# system conf
-CONFPATH=/etc/triggerhappy/triggers.d/${CONFFILE}
-
-# custom conf
-if test -e "/userdata/system/configs/multimedia_keys.conf"
-then
-    CONFPATH=/userdata/system/configs/multimedia_keys.conf
-fi
+#!/bin/dash
 
 NAME=thd
-DAEMON=/usr/sbin/$NAME
-PIDFILE=/var/run/$NAME.pid
-DAEMON_ARGS="--daemon --triggers ${CONFPATH} --socket /var/run/thd.socket --pidfile $PIDFILE /dev/input/event*"
+PIDFILE="/var/run/$NAME.pid"
+DAEMON="/usr/sbin/$NAME"
 
-# Sanity checks
-test -x $DAEMON || exit 0
-
-[ -r /etc/default/triggerhappy ] && . /etc/default/triggerhappy
+[ -x "$DAEMON" ] || exit 1
 
 start() {
-        printf "Starting $NAME: "
-        start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS \
-                && echo "OK" || echo "FAIL"
+    [ -r /etc/default/triggerhappy ] && . /etc/default/triggerhappy
+    . /etc/profile.d/xdg.sh
+    . /etc/profile.d/dbus.sh
+
+    CONFPATH="/etc/triggerhappy/triggers.d/"
+    if [ "$(/usr/bin/regmsg systemconf getconfigkey system.multimediakeys.enabled)" = "0" ]; then
+        CONFFILE="multimedia_keys_disabled.conf"
+    else
+        CONFFILE="multimedia_keys.conf"
+        USER_CONFFILE="/userdata/system/configs/$CONFFILE"
+        if [ -e "$USER_CONFFILE" ]; then
+            CONFPATH="/userdata/system/configs/"
+        else
+            # hack for odroidgoa models
+            if [ -r /sys/firmware/devicetree/base/model ]; then
+                BOARD_MODEL=$(tr -cd '[:alnum:]' < /sys/firmware/devicetree/base/model)
+            elif [ -r /sys/devices/virtual/dmi/id/board_name ]; then
+                BOARD_MODEL=$(tr -cd '[:alnum:]' < /sys/devices/virtual/dmi/id/board_name)
+            fi
+            if [ -n "$BOARD_MODEL" ]; then
+                BOARD_CONFFILE="multimedia_keys_${BOARD_MODEL}.conf"
+                [ -e "${CONFPATH}${BOARD_CONFFILE}" ] && CONFFILE="$BOARD_CONFFILE"
+            fi
+        fi
+    fi
+
+    DAEMON_ARGS="--daemon --triggers ${CONFPATH}${CONFFILE} --socket /var/run/thd.socket --pidfile $PIDFILE /dev/input/event*"
+
+    printf "Starting %s: " "$NAME"
+    if start-stop-daemon --start --quiet --pidfile "$PIDFILE" --exec "$DAEMON" -- $DAEMON_ARGS; then
+        echo "OK"
+    else
+        echo "FAIL"
+    fi
 }
 
 stop() {
-        printf "Stopping $NAME: "
-        start-stop-daemon --stop --quiet --pidfile $PIDFILE \
-                && echo "OK" || echo "FAIL"
+    printf "Stopping %s: " "$NAME"
+    if start-stop-daemon --stop --quiet --retry 3 --remove-pidfile --pidfile "$PIDFILE"; then
+        echo "OK"
+    else
+        echo "FAIL"
+    fi
 }
 
 case "$1" in
-        start)
-                start
-                ;;
-        stop)
-                stop
-                ;;
-        restart)
-                stop
-                sleep 1
-                start
-                ;;
-        *)
-                echo "Usage: $0 {start|stop|restart}"
-                exit 1
+    start) start ;;
+    stop)  stop  ;;
+    restart)
+        stop
+        sleep 1
+        start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
 esac

@@ -1,31 +1,29 @@
-#!/bin/bash
+#!/bin/dash
 
 do_help() {
-    echo "Usage options for ${0}"
-    echo "(where \"myservice\" is the name of your service)"
-    echo "- list [all|system|user]"
-    echo "- enable myservice"
-    echo "- disable myservice"
-    echo "- start myservice"
-    echo "- stop myservice"
-    echo "- restart myservice"
-    echo "- status myservice"
+    printf '%s\n' \
+        "Usage options for \"$0\"" \
+        "(where \"myservice\" is the name of your service)" \
+        "- list [all|system|user]" \
+        "- enable myservice" \
+        "- disable myservice" \
+        "- start myservice" \
+        "- stop myservice" \
+        "- restart myservice" \
+        "- status myservice"
 }
 
+# Service names consists only of letters, digits, and underscores, and starts with a letter or underscore.
 is_valid_service_name() {
-    local LC_ALL=C
-    [[ "${1}" =~ ^[_[:alpha:]][_[:alpha:][:digit:]]*$ ]]
+    case $1 in
+        [_[:alpha:]][_[:alnum:]]*) return 0 ;;
+        *)                         return 1 ;;
+    esac
 }
 
 do_list() {
-    enabled_services="$(/usr/bin/system-settings-get system.services)"
-    if test -n "${enabled_services}"; then
-        for SERVICE in ${enabled_services}; do
-            export __SERVICE__${SERVICE}=1
-        done
-    fi
-
-    case "${1}" in
+    system_services="$(/usr/bin/regmsg systemconf getconfigkey system.services)"
+    case "$1" in
         system)
             service_folders="/usr/share/reglinux/services"
             ;;
@@ -38,111 +36,99 @@ do_list() {
     esac
 
     # Ignore hidden files (.*)
-    find -L $service_folders -type f -not -iname ".*" 2>/dev/null | sort -u |
-        while read SERVICE; do
-            SNAME=$(basename "${SERVICE}")
-            if ! is_valid_service_name "${SNAME}"; then
-                echo "WARNING: Invalid service script name: ${SNAME}" 1>&2
-                continue
-            fi
-            SVAR=__SERVICE__${SNAME}
-            if test "${!SVAR}" = 1; then
-                if test -t 1; then
-                    printf "%-10s %s\n" "${SNAME}" "*"
-                else
-                    printf "%s;%s\n" "${SNAME}" "*"
-                fi
-            else
-                if test -t 1; then
-                    printf "%-10s %s\n" "${SNAME}" "-"
-                else
-                    printf "%s;%s\n" "${SNAME}" "-"
-                fi
-            fi
-        done
+    find -L $service_folders -type f ! -name '.*' 2>/dev/null | sort -u |
+    while IFS= read -r SERVICE; do
+        SNAME=$(basename "$SERVICE")
+        if ! is_valid_service_name "$SNAME"; then
+            echo "WARNING: \"$SNAME\" is an invalid service script name" >&2
+            continue
+        fi
+
+        # Check if enabled using pattern match
+        if [ -n "$system_services" ]; then
+            case " $system_services " in
+                *" $SNAME "*)
+                    { [ -t 1 ] && printf "%-10s %s\n" "$SNAME" "*"; } || printf "%s;%s\n" "$SNAME" "*"
+                    ;;
+                *)
+                    { [ -t 1 ] && printf "%-10s %s\n" "$SNAME" "-"; } || printf "%s;%s\n" "$SNAME" "-"
+                    ;;
+            esac
+        else
+            { [ -t 1 ] && printf "%-10s %s\n" "$SNAME" "-"; } || printf "%s;%s\n" "$SNAME" "-"
+        fi
+    done
 }
 
 do_enable() {
-    if ! is_valid_service_name "${1}"; then
-        echo "ERROR: Invalid service name: ${1}" 1>&2
-        return
+    if ! is_valid_service_name "$1"; then
+        echo "ERROR: \"$1\" is an invalid service name" >&2
+        return 1
     fi
 
-    enabled_services="$(/usr/bin/system-settings-get system.services)"
+    system_services="$(/usr/bin/regmsg systemconf getconfigkey system.services)"
 
-    # check if already set
-    if test -n "${enabled_services}"; then
-        for SERVICE in ${enabled_services}; do
-            if test "${SERVICE}" = "${1}"; then
-                return
-            fi
-        done
-        /usr/bin/system-settings-set system.services "${enabled_services} ${1}"
+    # Check if already enabled
+    if [ -n "$system_services" ]; then
+        case " $system_services " in
+            *" $1 "*)
+                return 0  # already enabled
+                ;;
+        esac
+        new_services="$system_services $1"
     else
-        /usr/bin/system-settings-set system.services "${1}"
+        new_services="$1"
     fi
 
-    # Inform service it was enabled in case it needs to do something about it
-    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
-        while read SERVICE; do
-            bash "${SERVICE}" enabled
-        done
+    /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.services "$new_services"
+
+    # Notify service in case it needs to do something when enabled
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" enabled; done' sh {} + 2>/dev/null
 }
 
 do_disable() {
-    enabled_services="$(/usr/bin/system-settings-get system.services)"
+    system_services="$(/usr/bin/regmsg systemconf getconfigkey system.services)"
+    [ -z "$system_services" ] && return 0
 
-    # build new services
-    if test -n "${enabled_services}"; then
-        NEW_ENABLED_SERVICES=
-        JDONE=0
-        for SERVICE in ${enabled_services}; do
-            if test "${SERVICE}" != "${1}"; then
-                if test -n "${NEW_ENABLED_SERVICES}"; then
-                    NEW_ENABLED_SERVICES="${NEW_ENABLED_SERVICES} ${SERVICE}"
-                else
-                    NEW_ENABLED_SERVICES="${SERVICE}"
-                fi
+    # Rebuild list without the target
+    new_services=""
+    found=0
+    for svc in $system_services; do
+        if [ "$svc" = "$1" ]; then
+            found=1
+        else
+            if [ -z "$new_services" ]; then
+                new_services="$svc"
             else
-                JDONE=1
+                new_services="$new_services $svc"
             fi
-        done
-        if test "${JDONE}" = 1; then
-            /usr/bin/system-settings-set system.services "${NEW_ENABLED_SERVICES}"
-            # Inform service it was disabled in case it needs to do something about it
-            find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
-                while read SERVICE; do
-                    bash "${SERVICE}" disabled
-                done
         fi
-   fi
+    done
+
+    if [ "$found" = 1 ]; then
+        if [ -z "$new_services" ]; then
+            /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.services " "
+        else
+            /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.services "$new_services"
+        fi
+
+        # Notify service in case it needs to do something when disabled
+        find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" disabled; done' sh {} + 2>/dev/null
+    fi
 }
 
 do_start() {
-    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
-        while read SERVICE; do
-            bash "${SERVICE}" start
-        done
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" start; done' sh {} + 2>/dev/null
 }
 
 do_stop() {
-    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
-        while read SERVICE; do
-            bash "${SERVICE}" stop
-        done
-}
-
-do_status() {
-    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "${1}" 2>/dev/null |
-        while read SERVICE; do
-            bash "${SERVICE}" status
-        done
+    find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" stop; done' sh {} + 2>/dev/null
 }
 
 ACTION=$1
-shift
+[ -n "$1" ] && shift
 
-case "${ACTION}" in
+case "$ACTION" in
     list)
         do_list "${1}"
         ;;
@@ -153,20 +139,21 @@ case "${ACTION}" in
         do_disable "${1}"
         ;;
     start)
-        do_start "${1}"
+        do_start "$1"
         ;;
     stop)
-        do_stop "${1}"
+        do_stop "$1"
         ;;
     restart)
-        do_stop "${1}"
+        do_stop "$1"
         sleep 2
-        do_start "${1}"
+        do_start "$1"
         ;;
     status)
-        do_status "${1}"
+        find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" status; done' sh {} + 2>/dev/null
         ;;
     *)
         do_help "${0}"
+        exit 1
         ;;
 esac
