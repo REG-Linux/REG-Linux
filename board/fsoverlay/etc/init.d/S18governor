@@ -3,7 +3,7 @@
 GOVERNOR_FILE="/sys/devices/system/cpu/cpufreq/policy0/scaling_governor"
 AVAILABLE_FILE="/sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors"
 { [ -e "$GOVERNOR_FILE" ] && [ -e "$AVAILABLE_FILE" ]; } || exit 0
-system_cpu_governor="$(/usr/bin/regmsg getConfigKey system.cpu.governor)"
+system_cpu_governor="$(/usr/bin/regmsg systemconf getConfigKey system.cpu.governor)"
 
 save_governor() {
     IFS=' ' read -r governors < "$AVAILABLE_FILE" 2>/dev/null
@@ -19,7 +19,7 @@ save_governor() {
         esac
     done
     # If neither found, do nothing
-    [ -n "$system_cpu_governor" ] && /usr/bin/regmsg setConfigKey /userdata/system/system.conf system.cpu.governor "$system_cpu_governor"
+    [ -n "$system_cpu_governor" ] && /usr/bin/regmsg systemconf setConfigKey /userdata/system/system.conf system.cpu.governor "$system_cpu_governor"
 }
 
 case "$1" in

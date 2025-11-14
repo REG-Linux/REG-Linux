@@ -12,7 +12,7 @@ index 9474eaafaa..7aef0f2a21 100644
 -# Allow a few customizations from a config file
 -test -r /etc/default/dropbear && . /etc/default/dropbear
 +# REG-Linux
-+[ "$(/usr/bin/regmsg getConfigKey system.ssh.enabled)" = "0" ] && {
++[ "$(/usr/bin/regmsg systemconf getConfigKey system.ssh.enabled)" = "0" ] && {
 +	echo "SSH services are disabled"
 +	exit 0
 +}

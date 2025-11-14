@@ -10,7 +10,7 @@
 # Optimized for dash shell by Carlos Martins
 
 DAEMON=/usr/bin/wsdd
-if [ "$(/usr/bin/regmsg getConfigKey system.samba.enabled)" = "0" ] || [ ! -x "$DAEMON" ]; then
+if [ "$(/usr/bin/regmsg systemconf getConfigKey system.samba.enabled)" = "0" ] || [ ! -x "$DAEMON" ]; then
     printf '%s: disabled\n' "SMB services ($0)" >&2
     exit 0
 fi
@@ -22,7 +22,7 @@ LOG_FILE=/userdata/system/logs/wsdd.log
 
 do_start() {
     printf 'Starting %s:\n' "$NAME"
-    { [ "$(/usr/bin/regmsg getConfigKey system.security.enabled)" = "0" ] && SMB_CONFIG_FILE="/etc/ksmbd/ksmbd.conf"; } || SMB_CONFIG_FILE="/etc/ksmbd/ksmbd-secure.conf"
+    { [ "$(/usr/bin/regmsg systemconf getConfigKey system.security.enabled)" = "0" ] && SMB_CONFIG_FILE="/etc/ksmbd/ksmbd.conf"; } || SMB_CONFIG_FILE="/etc/ksmbd/ksmbd-secure.conf"
     # wssd-native needs to be run as unix daemon, and needs username (we're using root)
     OPTS="--unixd -U root --log-file $LOG_FILE --smb-conf $SMB_CONFIG_FILE"
     start-stop-daemon --start --background --make-pidfile --pidfile "${PIDFILE}" --exec "${DAEMON}" -- ${OPTS}

@@ -10,7 +10,7 @@ start)
 
     /usr/bin/plymouth quit
 
-    if [ "$(/usr/bin/regmsg getConfigKey system.es.atstartup)" != "0" ]; then
+    if [ "$(/usr/bin/regmsg systemconf getConfigKey system.es.atstartup)" != "0" ]; then
         if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
             WLR_LIBINPUT_NO_DEVICES=1 /usr/bin/sway &
         else

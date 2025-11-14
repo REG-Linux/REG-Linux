@@ -6,7 +6,7 @@
 set --
 for key in wifi.enabled wifi.ssid wifi.key wifi2.ssid wifi2.key wifi3.ssid wifi3.key wifi.hidden.ssid wifi.hidden.key system.timezone es.resolution system.hostname system.fscompression.enabled
 do
-    current_value="$(/usr/bin/regmsg getConfigKey "$key")"
+    current_value="$(/usr/bin/regmsg systemconf getConfigKey "$key")"
     boot_conf_value="$(sed -n "s/^$key=//p" /boot/system-boot.conf | head -n 1)"
     [ "$current_value" != "$boot_conf_value" ] && set -- "$@" "$key" "$current_value"     # Only queue for update if they differ
 done

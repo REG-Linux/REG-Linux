@@ -14,7 +14,7 @@ else
 fi
 
 # Select graphical environment settings (Wayland or DRM)
-case "$(/usr/bin/regmsg getConfigKey system.es.environment)" in
+case "$(/usr/bin/regmsg systemconf getConfigKey system.es.environment)" in
     wayland)
         # Configure environment for Wayland
         export XDG_SESSION_TYPE=wayland \

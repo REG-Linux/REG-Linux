@@ -1,4 +1,4 @@
 #!/bin/dash
 [ -z "$1" ] && { printf 'usage: %s key [ key2 ... ]\n       Returns the value of first key found or exit silently with error 1.\n' "$0"; exit 1; }
 [ "$1" = "-f" ] && shift 2
-regmsg getConfigKey "$@"
+/usr/bin/regmsg systemconf getConfigKey "$@"
