@@ -54,7 +54,7 @@ start_pipewire() {
 
 set_default_audio_device() {
     # Set default audio device if specified
-    audio_device="$(/usr/bin/regmsg getConfigKey audio.device)"
+    audio_device="$(/usr/bin/regmsg systemconf getConfigKey audio.device)"
     if [ -n "$audio_device" ] && [ "$audio_device" != "auto" ]; then
         if /usr/bin/pactl set-default-sink "$audio_device"; then
             return 0

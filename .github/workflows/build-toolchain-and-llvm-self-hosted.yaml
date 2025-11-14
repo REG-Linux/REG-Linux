@@ -1,4 +1,4 @@
-name: Build Toolchain and LLVM/CLANG/LIBCBC/MUSL
+name: Build Toolchain and LLVM (self-hosted)
 
 on:
   workflow_dispatch:

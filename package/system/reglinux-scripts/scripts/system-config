@@ -40,7 +40,7 @@ do_setRootPassword() {
     PASSWDENC=$(/usr/bin/system-encode encode "$PASSWD") || return 1
 
     preBootConfig
-    if /usr/bin/regmsg setConfigKey "$storageFile" rootshadowpassword "$PASSWDENC" ; then
+    if /usr/bin/regmsg systemconf setConfigKey "$storageFile" rootshadowpassword "$PASSWDENC" ; then
         postBootConfig
         return 1
     else
@@ -81,9 +81,9 @@ load_or_unload_module() {
 
 case "$command" in
     getRootPassword)
-        [ -z "$mode" ] && mode="$(/usr/bin/regmsg getConfigKey system.security.enabled)"
+        [ -z "$mode" ] && mode="$(/usr/bin/regmsg systemconf getConfigKey system.security.enabled)"
         [ "$mode" = "0" ] && { echo "linux"; exit 0; }
-        rootshadowpassword="$(/usr/bin/regmsg getConfigKey rootshadowpassword)"
+        rootshadowpassword="$(/usr/bin/regmsg systemconf getConfigKey rootshadowpassword)"
         if [ -z "$rootshadowpassword" ]; then
             PASSWD=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | tr -dc '0-9A-Za-z_-' | head -c8)
             do_setRootPassword "$PASSWD" || exit 1
@@ -94,7 +94,7 @@ case "$command" in
         ;;
 
     setRootPassword)
-        [ "$(/usr/bin/regmsg getConfigKey system.security.enabled)" = "0" ] && exit 0
+        [ "$(/usr/bin/regmsg systemconf getConfigKey system.security.enabled)" = "0" ] && exit 0
         do_setRootPassword "$2" && exit 0 || exit 1
         ;;
 
@@ -107,7 +107,7 @@ case "$command" in
             fi
             preBootConfig
             printf "setting overscan values %s %s %s %s\n" "$extra1" "$extra2" "$extra3" "$extra4" >> "$log"
-            if /usr/bin/regmsg setConfigKey "$configFile" disable_overscan 0 overscan_scale 1 overscan_left "$extra1" overscan_right "$extra2" overscan_top "$extra3" overscan_bottom "$extra4" ; then
+            if /usr/bin/regmsg systemconf setConfigKey "$configFile" disable_overscan 0 overscan_scale 1 overscan_left "$extra1" overscan_right "$extra2" overscan_top "$extra3" overscan_bottom "$extra4" ; then
                 postBootConfig
                 exit 1
             else
@@ -121,7 +121,7 @@ case "$command" in
             case "$mode" in
                 enable)
                     echo "enabling overscan" >> "$log"
-                    if /usr/bin/regmsg setConfigKey "$configFile" disable_overscan 0 overscan_scale 1 ; then
+                    if /usr/bin/regmsg systemconf setConfigKey "$configFile" disable_overscan 0 overscan_scale 1 ; then
                         postBootConfig
                         exit 1
                     else
@@ -131,7 +131,7 @@ case "$command" in
                     ;;
                 disable)
                     echo "disabling overscan" >> "$log"
-                    if /usr/bin/regmsg setConfigKey "$configFile" disable_overscan 01 overscan_scale 0 ; then
+                    if /usr/bin/regmsg systemconf setConfigKey "$configFile" disable_overscan 01 overscan_scale 0 ; then
                         postBootConfig
                         exit 1
                     else
@@ -165,7 +165,7 @@ case "$command" in
         ;;
 
     canupdate)
-        updatetype="$(/usr/bin/regmsg getConfigKey updates.type)"
+        updatetype="$(/usr/bin/regmsg systemconf getConfigKey updates.type)"
         [ "$updatetype" != "beta" ] && updatetype="stable"
 
         board=$(cat /boot/boot/system.board 2>/dev/null) || board="unknown"
@@ -245,7 +245,7 @@ case "$command" in
             else
                 newval="$mode"
             fi
-            if /usr/bin/regmsg setConfigKey "$storageFile" sharedevice "$newval" ; then
+            if /usr/bin/regmsg systemconf setConfigKey "$storageFile" sharedevice "$newval" ; then
                 postBootConfig
                 exit 1
             else

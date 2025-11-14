@@ -2,13 +2,13 @@
 command -v system-brightness >/dev/null 2>&1 || exit 0
 case $1 in
     start)
-        display_brightness="$(/usr/bin/regmsg getConfigKey display.brightness)"
+        display_brightness="$(/usr/bin/regmsg systemconf getConfigKey display.brightness)"
         [ -z "$display_brightness" ] && exit 0
         [ "$display_brightness" -lt 5 ] && display_brightness=5        # Clamp brightness to minimum 5
         system-brightness "$display_brightness"
         ;;
     stop)
         current=$(system-brightness 2>/dev/null)
-        [ "$current" != "$(/usr/bin/regmsg getConfigKey display.brightness)" ] && /usr/bin/system-settings-set display.brightness "$current"
+        [ "$current" != "$(/usr/bin/regmsg systemconf getConfigKey display.brightness)" ] && /usr/bin/system-settings-set display.brightness "$current"
         ;;
 esac

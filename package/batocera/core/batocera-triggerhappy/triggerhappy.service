@@ -12,7 +12,7 @@ start() {
     . /etc/profile.d/dbus.sh
 
     CONFPATH="/etc/triggerhappy/triggers.d/"
-    if [ "$(/usr/bin/regmsg getConfigKey system.multimediakeys.enabled)" = "0" ]; then
+    if [ "$(/usr/bin/regmsg systemconf getConfigKey system.multimediakeys.enabled)" = "0" ]; then
         CONFFILE="multimedia_keys_disabled.conf"
     else
         CONFFILE="multimedia_keys.conf"

@@ -5,4 +5,4 @@ if [ "$1" = "-f" ]; then
     configfile="$1"
     shift
 fi
-regmsg setConfigKey "${configfile:-/userdata/system/system.conf}" "$@"
+/usr/bin/regmsg systemconf setConfigKey "${configfile:-/userdata/system/system.conf}" "$@"

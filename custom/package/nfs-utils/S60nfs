@@ -3,7 +3,7 @@
 # nfs           This shell script takes care of starting and stopping
 #               the NFS services. Stolen from RedHat FC5.
 
-[ "$(/usr/bin/regmsg getConfigKey system.nfs.enabled)" != "1" ] && exit 0
+[ "$(/usr/bin/regmsg systemconf getConfigKey system.nfs.enabled)" != "1" ] && exit 0
 
 NR_THREADS=2
 [ -f /etc/default/nfsd ] && . /etc/default/nfsd

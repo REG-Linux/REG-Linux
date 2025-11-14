@@ -120,7 +120,7 @@ start() {
         exit 1
     }
 
-    services_zramswap_sizefactor="$(/usr/bin/regmsg getConfigKey services.zramswap.sizefactor)"
+    services_zramswap_sizefactor="$(/usr/bin/regmsg systemconf getConfigKey services.zramswap.sizefactor)"
     case "$services_zramswap_sizefactor" in
         0.[0-9]*)
             : # valid
@@ -132,7 +132,7 @@ start() {
             ;;
     esac
 
-    services_zramswap_algorithms="$(/usr/bin/regmsg getConfigKey services.zramswap.algorithms)"
+    services_zramswap_algorithms="$(/usr/bin/regmsg systemconf getConfigKey services.zramswap.algorithms)"
     if [ -z "$services_zramswap_algorithms" ]; then
         log_info "Using default algorithms: lz4, lzo"
         set -- lz4 lzo
