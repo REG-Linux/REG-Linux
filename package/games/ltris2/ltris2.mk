@@ -4,8 +4,8 @@
 #
 ################################################################################
 
+LTRIS2_VERSION = 2.0.4
 LTRIS2_SITE = http://downloads.sourceforge.net/lgames/ltris
-LTRIS2_VERSION = 2.0.3
 LTRIS2_LICENSE = GPL-2.0+
 LTRIS2_LICENSE_FILES = COPYING
 
