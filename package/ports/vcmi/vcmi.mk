@@ -24,6 +24,10 @@ VCMI_CONF_OPTS += -DENABLE_GOLDMASTER=ON
 VCMI_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr/vcmi/"
 VCMI_CONF_OPTS += -DENABLE_MONOLITHIC_INSTALL=ON
 
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+VCMI_DEPENDENCIES += libexecinfo
+endif
+
 # Settings from CMakePresets.json for portmaster, might be interested
 # "VCMI_PORTMASTER": "ON" <= custom directories, let's follow XDG
 # "CMAKE_INSTALL_PREFIX": ".",
