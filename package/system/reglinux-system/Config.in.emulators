@@ -3,7 +3,8 @@ config BR2_PACKAGE_REGLINUX_MOBILE_SYSTEMS
 	 bool "REG-Linux mobile systems support"
 
 	# Symbian OS / Nokia N-Gage emulator
-	select BR2_PACKAGE_EKA2L1		if BR2_x86_64 || ((BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3)
+	# TODO does not build anymore
+	# select BR2_PACKAGE_EKA2L1		if BR2_x86_64 || ((BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3)
 
 
 ### Multi platform systems ###
