@@ -2,7 +2,7 @@
 case "$1" in
     start|restart) ;;
     stop)
-        [ "$(/usr/bin/regmsg systemconf getConfigKey system.cec.standby)" = "1" ] && printf 'standby 0\n' | cec-client -s -d 1 >/dev/null 2>&1 &
+        [ "$(/usr/bin/regmsg systemconf getconfigkey system.cec.standby)" = "1" ] && printf 'standby 0\n' | cec-client -s -d 1 >/dev/null 2>&1 &
         ;;
     *)
         echo "Usage: $0 {stop} - turns off first monitor device" >&2

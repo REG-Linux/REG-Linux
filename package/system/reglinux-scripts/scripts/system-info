@@ -108,7 +108,7 @@ done
 [ "${#cpu_features[@]}" -gt 0 ] && echo "CPU Features: " "${cpu_features[@]}"
 
 # TDP
-[ -n "$(/usr/bin/regmsg systemconf getConfigKey system.cpu.tdp)" ] && echo "Ryzen Mobile TDP: $(ryzenadj -i | grep 'PPT LIMIT FAST' | awk '{printf "%.0f\n", $6}')W"
+[ -n "$(/usr/bin/regmsg systemconf getconfigkey system.cpu.tdp)" ] && echo "Ryzen Mobile TDP: $(ryzenadj -i | grep 'PPT LIMIT FAST' | awk '{printf "%.0f\n", $6}')W"
 
 # temperature in millidegree Celsius
 TEMPE=0

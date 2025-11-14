@@ -22,7 +22,7 @@ is_valid_service_name() {
 }
 
 do_list() {
-    system_services="$(/usr/bin/regmsg systemconf getConfigKey system.services)"
+    system_services="$(/usr/bin/regmsg systemconf getconfigkey system.services)"
     case "$1" in
         system)
             service_folders="/usr/share/reglinux/services"
@@ -66,7 +66,7 @@ do_enable() {
         return 1
     fi
 
-    system_services="$(/usr/bin/regmsg systemconf getConfigKey system.services)"
+    system_services="$(/usr/bin/regmsg systemconf getconfigkey system.services)"
 
     # Check if already enabled
     if [ -n "$system_services" ]; then
@@ -80,14 +80,14 @@ do_enable() {
         new_services="$1"
     fi
 
-    /usr/bin/regmsg systemconf setConfigKey /userdata/system/system.conf system.services "$new_services"
+    /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.services "$new_services"
 
     # Notify service in case it needs to do something when enabled
     find -L /userdata/system/services /usr/share/reglinux/services -type f -name "$1" -exec sh -c 'for f do "$f" enabled; done' sh {} + 2>/dev/null
 }
 
 do_disable() {
-    system_services="$(/usr/bin/regmsg systemconf getConfigKey system.services)"
+    system_services="$(/usr/bin/regmsg systemconf getconfigkey system.services)"
     [ -z "$system_services" ] && return 0
 
     # Rebuild list without the target
@@ -107,9 +107,9 @@ do_disable() {
 
     if [ "$found" = 1 ]; then
         if [ -z "$new_services" ]; then
-            /usr/bin/regmsg systemconf setConfigKey /userdata/system/system.conf system.services " "
+            /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.services " "
         else
-            /usr/bin/regmsg systemconf setConfigKey /userdata/system/system.conf system.services "$new_services"
+            /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf system.services "$new_services"
         fi
 
         # Notify service in case it needs to do something when disabled

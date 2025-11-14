@@ -43,7 +43,7 @@ log_message() {
 
 # Sets language settings, default is "en_US.UTF-8"
 set_language() {
-    settings_lang="$(/usr/bin/regmsg systemconf getConfigKey system.language)"
+    settings_lang="$(/usr/bin/regmsg systemconf getconfigkey system.language)"
     LC_ALL="${settings_lang:-en_US}.UTF-8"
     LANG="$LC_ALL"
     export LANG LC_ALL
@@ -59,8 +59,8 @@ configure_rotation() {
     effective_output=$(regmsg screen getoutput)
     [ -z "$effective_output" ] && return
 
-    primary_display_rotate="$(/usr/bin/regmsg systemconf getConfigKey "display.rotate.${effective_output}")"
-    [ -z "$primary_display_rotate" ] && primary_display_rotate="$(/usr/bin/regmsg systemconf getConfigKey display.rotate)"
+    primary_display_rotate="$(/usr/bin/regmsg systemconf getconfigkey "display.rotate.${effective_output}")"
+    [ -z "$primary_display_rotate" ] && primary_display_rotate="$(/usr/bin/regmsg systemconf getconfigkey display.rotate)"
 
     # Apply rotation for primary screen
     if [ -n "$primary_display_rotate" ]; then
@@ -74,11 +74,11 @@ configure_rotation() {
     # Configure rotation for additional screens
     if [ -n "$WAYLAND_DISPLAY" ]; then
         if [ -n "$2" ]; then
-            display_rotate2="$(/usr/bin/regmsg systemconf getConfigKey display.rotate2)"
+            display_rotate2="$(/usr/bin/regmsg systemconf getconfigkey display.rotate2)"
             [ -n "$display_rotate2" ] && regmsg screen setrotation "$display_rotate2" --output "$2"
         fi
         if [ -n "$3" ]; then
-            display_rotate3="$(/usr/bin/regmsg systemconf getConfigKey display.rotate3)"
+            display_rotate3="$(/usr/bin/regmsg systemconf getconfigkey display.rotate3)"
             [ -n "$display_rotate3" ] && regmsg screen setrotation "$display_rotate3" --output "$3"
         fi
     fi
@@ -91,16 +91,16 @@ configure_rotation() {
 #   $3: Tertiary output (optional)
 configure_resolution() {
     # Configure primary screen resolution
-    es_resolution="$(/usr/bin/regmsg systemconf getConfigKey es.resolution)"
+    es_resolution="$(/usr/bin/regmsg systemconf getconfigkey es.resolution)"
     { [ -n "$es_resolution" ] && regmsg screen setmode "$es_resolution"; } || regmsg screen mintomaxresolution
 
     # Configure resolution for additional screens
     if [ -n "$2" ]; then
-        es_resolution2="$(/usr/bin/regmsg systemconf getConfigKey es.resolution2)"
+        es_resolution2="$(/usr/bin/regmsg systemconf getconfigkey es.resolution2)"
         { [ -n "$es_resolution2" ] && regmsg screen setmode "$es_resolution2" --output "$2"; } || regmsg screen mintomaxresolution --output "$2"
     fi
     if [ -n "$3" ]; then
-        es_resolution3="$(/usr/bin/regmsg systemconf getConfigKey es.resolution3)"
+        es_resolution3="$(/usr/bin/regmsg systemconf getconfigkey es.resolution3)"
         { [ -n "$es_resolution3" ] && regmsg screen setmode "$es_resolution3" --output "$3"; } || regmsg screen mintomaxresolution --output "$3"
     fi
 }
@@ -152,10 +152,10 @@ while [ -e "$RESTART_FLAG" ]; do
         settings_output=$(cat "$SWITCH_SCREEN_REQUEST")
         rm -f "${SWITCH_SCREEN_REQUEST}"
     else
-        settings_output="$(/usr/bin/regmsg systemconf getConfigKey global.videooutput)"
+        settings_output="$(/usr/bin/regmsg systemconf getconfigkey global.videooutput)"
     fi
-    global_videooutput2="$(/usr/bin/regmsg systemconf getConfigKey global.videooutput2)"
-    global_videooutput3="$(/usr/bin/regmsg systemconf getConfigKey global.videooutput3)"
+    global_videooutput2="$(/usr/bin/regmsg systemconf getconfigkey global.videooutput2)"
+    global_videooutput3="$(/usr/bin/regmsg systemconf getconfigkey global.videooutput3)"
     if [ -n "$settings_output" ]; then
         regmsg screen setoutput "$settings_output" "$global_videooutput2" "$global_videooutput3"
     fi

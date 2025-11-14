@@ -2,7 +2,7 @@
 case "$1" in
     start|restart)
         printf "Starting %s: " "$0"
-        if [ "$(/usr/bin/regmsg systemconf getConfigKey system.security.enabled)" = "0" ]; then
+        if [ "$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)" = "0" ]; then
             MASTERPASSWD="linux";
             ksmbd.adduser -C /etc/ksmbd/ksmbd.conf -P /etc/ksmbd/ksmbdpwd.db -p "$MASTERPASSWD" root >/dev/null
         else

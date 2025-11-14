@@ -272,7 +272,7 @@ esac
 
 # Enable compression if btrfs and enabled
 # /userdata is not yet mounted, system.fscompression.enabled has to be in /boot/system-boot.conf
-[ "$(/usr/bin/regmsg systemconf getConfigKey system.fscompression.enabled)" = "1" ] && grep -q "^/dev/[^ ]* /userdata btrfs" /proc/mounts && { mount -o remount,compress-force=zstd,autodefrag /userdata || exit 1; }
+[ "$(/usr/bin/regmsg systemconf getconfigkey system.fscompression.enabled)" = "1" ] && grep -q "^/dev/[^ ]* /userdata btrfs" /proc/mounts && { mount -o remount,compress-force=zstd,autodefrag /userdata || exit 1; }
 
 # Handle delayed usbmount
 if [ -d /var/run/usbmount.delay ]; then

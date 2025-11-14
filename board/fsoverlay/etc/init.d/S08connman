@@ -11,8 +11,8 @@ system_wifi_configure() {
         .hidden) settings_name="hidden_AP"; settings_hide=true; X="$1" ;;
         *) settings_name="$1"; settings_hide=false; X="$1" ;;
     esac
-    settings_ssid="$(/usr/bin/regmsg systemconf getConfigKey "wifi${X}.ssid")"
-    settings_key="$(/usr/bin/regmsg systemconf getConfigKey "wifi${X}.key")"
+    settings_ssid="$(/usr/bin/regmsg systemconf getconfigkey "wifi${X}.ssid")"
+    settings_key="$(/usr/bin/regmsg systemconf getconfigkey "wifi${X}.key")"
     settings_file="/var/lib/connman/system_wifi${X}.config"
     { [ -n "$settings_key" ] && optionalPassphrase="Passphrase=${settings_key}"; } || unset optionalPassphrase
 
@@ -35,17 +35,17 @@ system_wifi_configure() {
 }
 
 wifi_enable() {
-    wifi_country="$(/usr/bin/regmsg systemconf getConfigKey wifi.country)"
+    wifi_country="$(/usr/bin/regmsg systemconf getconfigkey wifi.country)"
     [ -n "$wifi_country" ] && /usr/sbin/iw reg set "$wifi_country"
     connmanctl enable wifi
     connmanctl scan wifi
 } 2>/dev/null
 
 start() {
-    system_hostname="$(/usr/bin/regmsg systemconf getConfigKey system.hostname)"
+    system_hostname="$(/usr/bin/regmsg systemconf getconfigkey system.hostname)"
     [ -n "$system_hostname" ] && hostname "$system_hostname"
     
-    wifi_enabled="$(/usr/bin/regmsg systemconf getConfigKey wifi.enabled)"
+    wifi_enabled="$(/usr/bin/regmsg systemconf getconfigkey wifi.enabled)"
     if [ "$wifi_enabled" = "1" ]; then
         for i in 1 2 3 .hidden; do
             system_wifi_configure "$i"
