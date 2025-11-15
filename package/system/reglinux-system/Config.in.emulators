@@ -12,7 +12,8 @@ config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
     bool "REG-Linux multisystems emulators support"
 
     # Box86 user-mode x86 emulation for ARM
-    select BR2_PACKAGE_BOX86			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_arm && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+    # Unused so far...
+    # select BR2_PACKAGE_BOX86			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_arm && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 
     # Box64 user-mode x64_64 emulation for AArch64 / RV64
     select BR2_PACKAGE_BOX64			if BR2_RISCV_64
