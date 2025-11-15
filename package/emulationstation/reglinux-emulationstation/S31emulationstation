@@ -8,7 +8,19 @@ start)
     . /etc/profile.d/xdg.sh
     . /etc/profile.d/dbus.sh
 
-    /usr/bin/plymouth quit
+    case "$(/usr/bin/regmsg screen getrotation)" in
+        90|270)
+            # Temporarily move header image to avoid rotated splash screen in some devices
+            mv /usr/share/plymouth/themes/reglinux/images/header-image.png /usr/share/plymouth/themes/reglinux/images/header-image.png.bak
+            /usr/bin/plymouth change-mode --reboot
+            /usr/bin/plymouth quit --retain-splash
+            mv /usr/share/plymouth/themes/reglinux/images/header-image.png.bak /usr/share/plymouth/themes/reglinux/images/header-image.png
+        ;;
+        *)
+            /usr/bin/plymouth change-mode --reboot
+            /usr/bin/plymouth quit --retain-splash
+        ;;
+    esac
 
     if [ "$(/usr/bin/regmsg systemconf getconfigkey system.es.atstartup)" != "0" ]; then
         if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
