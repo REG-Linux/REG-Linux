@@ -79,5 +79,11 @@ A more detailed explanation of the build process and directory layout is availab
 
 ```bash
 git clone --recurse-submodules https://github.com/REG-Linux/REG-Linux.git
+Install docker using your package manager, then :
 cd REG-Linux
-make h700-build     # Example: build for Allwinner H700 target
+make reglinux-docker-image
+make xxx-build     
+Example: building for Allwinner H700 target
+make h700-build
+Example: building for x86_64_v3
+make x86_64_v3-build
