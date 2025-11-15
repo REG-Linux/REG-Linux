@@ -5,9 +5,9 @@
 ################################################################################
 
 XEMU_VERSION = v0.8.114
-XEMU_SITE = https://github.com/xemu-project/xemu.git
-XEMU_SITE_METHOD = git
-XEMU_GIT_SUBMODULES = YES
+XEMU_SITE = $(call github,xemu-project,xemu,$(XEMU_VERSION))
+#XEMU_SITE_METHOD = git
+#XEMU_GIT_SUBMODULES = YES
 XEMU_LICENSE = GPLv2
 XEMU_DEPENDENCIES = host-meson host-cmake host-pkgconf host-python3 host-python-distlib
 XEMU_DEPENDENCIES += host-libcurl libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
