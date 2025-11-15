@@ -33,7 +33,7 @@ do_scanlist() {
 
 wait_for_ip() {
     mode="$1"
-    i=0
+    i=0     # wait up to 4 seconds
     while [ "$i" -lt 20 ]; do
         case "$mode" in
             up)
@@ -45,7 +45,7 @@ wait_for_ip() {
                 ip -4 addr show scope global | grep -q 'inet ' || return 0
                 ;;
         esac
-        sleep 0.5
+        sleep 0.2
         i=$((i + 1))
     done
 }
