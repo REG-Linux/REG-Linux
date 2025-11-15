@@ -4,10 +4,10 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.8.109
-XEMU_SITE = https://github.com/xemu-project/xemu.git
-XEMU_SITE_METHOD = git
-XEMU_GIT_SUBMODULES = YES
+XEMU_VERSION = v0.8.114
+XEMU_SITE = $(call github,xemu-project,xemu,$(XEMU_VERSION))
+#XEMU_SITE_METHOD = git
+#XEMU_GIT_SUBMODULES = YES
 XEMU_LICENSE = GPLv2
 XEMU_DEPENDENCIES = host-meson host-cmake host-pkgconf host-python3 host-python-distlib
 XEMU_DEPENDENCIES += host-libcurl libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
@@ -109,11 +109,11 @@ define XEMU_INSTALL_TARGET_CMDS
 	cp $(XEMU_DL_DIR)/xbox_hdd.qcow2 $(TARGET_DIR)/usr/share/xemu/data/
 endef
 
-define XEMU_VERSION_DETAILS
-    $(BR2_GIT) -C $(XEMU_DL_DIR)/git rev-parse HEAD 2>/dev/null | tr -d '\n' > $(@D)/XEMU_COMMIT
-    $(BR2_GIT) -C $(XEMU_DL_DIR)/git symbolic-ref --short HEAD | cut -d'/' -f2- > $(@D)/XEMU_BRANCH
-    $(BR2_GIT) -C $(XEMU_DL_DIR)/git describe --tags --match 'v*' | cut -c 2- | tr -d '\n' > $(@D)/XEMU_VERSION
-endef
+#define XEMU_VERSION_DETAILS
+#    $(BR2_GIT) -C $(XEMU_DL_DIR)/git rev-parse HEAD 2>/dev/null | tr -d '\n' > $(@D)/XEMU_COMMIT
+#    $(BR2_GIT) -C $(XEMU_DL_DIR)/git symbolic-ref --short HEAD | cut -d'/' -f2- > $(@D)/XEMU_BRANCH
+#    $(BR2_GIT) -C $(XEMU_DL_DIR)/git describe --tags --match 'v*' | cut -c 2- | tr -d '\n' > $(@D)/XEMU_VERSION
+#endef
 
 # details in the .wrap files
 define XEMU_GET_SUBMODULES
@@ -153,7 +153,7 @@ define XEMU_GET_SUBMODULES
 	mkdir -p $(@D)/subprojects/glslang
 #    $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/glslang.wrap))
 	$(HOST_DIR)/bin/curl -L -o glslang.tar.gz \
-	    https://github.com/KhronosGroup/glslang/archive/refs/tags/15.3.0.tar.gz
+	    https://github.com/KhronosGroup/glslang/archive/refs/tags/16.0.0.tar.gz
 	#https://github.com/KhronosGroup/glslang/archive/$(REVISION).tar.gz
 	$(TAR) -xzf glslang.tar.gz --strip-components=1 -C $(@D)/subprojects/glslang
 	rm glslang.tar.gz
@@ -218,7 +218,7 @@ define XEMU_GET_SUBMODULES
     # SPIRV-Reflect
 	mkdir -p $(@D)/subprojects/SPIRV-Reflect
 	$(HOST_DIR)/bin/curl -L -o SPIRV-Reflect.tar.gz \
-	https://github.com/KhronosGroup/SPIRV-Reflect/archive/refs/tags/vulkan-sdk-1.4.313.0.tar.gz
+	https://github.com/KhronosGroup/SPIRV-Reflect/archive/refs/tags/vulkan-sdk-1.4.328.1.tar.gz
 	$(TAR) -xzf SPIRV-Reflect.tar.gz --strip-components=1 -C $(@D)/subprojects/SPIRV-Reflect
 	rm SPIRV-Reflect.tar.gz
 
@@ -237,7 +237,7 @@ define XEMU_EVMAPY
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
 
-XEMU_PRE_CONFIGURE_HOOKS = XEMU_VERSION_DETAILS
+#XEMU_PRE_CONFIGURE_HOOKS = XEMU_VERSION_DETAILS
 XEMU_POST_INSTALL_TARGET_HOOKS += XEMU_EVMAPY
 XEMU_PRE_CONFIGURE_HOOKS += XEMU_GET_SUBMODULES
 
