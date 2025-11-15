@@ -4,11 +4,12 @@
 #
 ################################################################################
 
-RUFFLE_VERSION = nightly-2025-08-31
+RUFFLE_VERSION = nightly-2025-10-31
 RUFFLE_SITE = $(call github,ruffle-rs,ruffle,$(RUFFLE_VERSION))
 RUFFLE_LICENSE = GPLv2
-RUFFLE_DEPENDENCIES = host-rustc host-rust-bin eudev alsa-lib
+RUFFLE_DEPENDENCIES = host-rustc host-rust-bin eudev alsa-lib host-openjdk-bin
 
+RUFFLE_CARGO_ENV += JAVA_HOME="$(HOST_DIR)/lib/jvm" PATH="$(HOST_DIR)/lib/jvm/bin:$$PATH"
 RUFFLE_CARGO_INSTALL_OPTS = --path desktop/
 
 define RUFFLE_DESKTOP_BINARY_POST_PROCESS

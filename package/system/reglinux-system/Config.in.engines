@@ -16,8 +16,7 @@ config BR2_PACKAGE_REGLINUX_FLASH_SYSTEMS
 	bool "REG-Linux Flash support"
 
 	# Ruffle implementation in Rust (not working with musl so far)
-	# TODO needs JDK
-	# select BR2_PACKAGE_RUFFLE		if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_GLES3 && (BR2_ARCH_IS_64 || (BR2_arm && !BR2_arm1176jzf_s)) && !BR2_TOOLCHAIN_USES_MUSL
+	select BR2_PACKAGE_RUFFLE		if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_GLES3 && (BR2_ARCH_IS_64 || (BR2_arm && !BR2_arm1176jzf_s)) && !BR2_TOOLCHAIN_USES_MUSL
 
 	# Lightspark implementation in C/C++
 	select BR2_PACKAGE_LIGHTSPARK		if (BR2_ARCH_IS_64 || (BR2_arm && (!BR2_arm1176jzf_s)))
