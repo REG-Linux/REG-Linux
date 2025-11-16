@@ -37,14 +37,14 @@ system_wifi_configure() {
 wifi_enable() {
     wifi_country="$(/usr/bin/regmsg systemconf getconfigkey wifi.country)"
     [ -n "$wifi_country" ] && /usr/sbin/iw reg set "$wifi_country"
-    connmanctl enable wifi
-    connmanctl scan wifi
+    /usr/bin/regmsg wifi enable
+    /usr/bin/regmsg wifi scan
 } 2>/dev/null
 
 start() {
     system_hostname="$(/usr/bin/regmsg systemconf getconfigkey system.hostname)"
     [ -n "$system_hostname" ] && hostname "$system_hostname"
-    
+
     wifi_enabled="$(/usr/bin/regmsg systemconf getconfigkey wifi.enabled)"
     if [ "$wifi_enabled" = "1" ]; then
         for i in 1 2 3 .hidden; do
@@ -66,7 +66,7 @@ start() {
     if [ "$wifi_enabled" = "1" ]; then
         wifi_enable &
     else
-        connmanctl disable wifi 2>/dev/null &
+        /usr/bin/regmsg wifi disable 2>/dev/null &
     fi
     echo "done."
 }
