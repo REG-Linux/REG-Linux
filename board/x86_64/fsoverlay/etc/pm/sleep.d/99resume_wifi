@@ -3,8 +3,8 @@
 # workaround for wifi not working after standby / sleep
 
 wifi_toggle() {
-    system-wifi disable
-    system-wifi enable
+    /usr/bin/regmsg wifi disable
+    /usr/bin/regmsg wifi enable
 }
 
 # add to this list of device models needing a wifi reset on resume
