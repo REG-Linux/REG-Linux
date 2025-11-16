@@ -51,7 +51,6 @@ define REGLINUX_SCRIPTS_INSTALL_TARGET_CMDS
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-config                      $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-es-thebezelproject          $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-cores                       $(TARGET_DIR)/usr/bin/
-    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-wifi                        $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-brightness                  $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-es-swissknife               $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-store                       $(TARGET_DIR)/usr/bin/
