@@ -224,6 +224,11 @@ HOST_UTIL_LINUX_CONF_OPTS += \
 	--without-ncursesw \
 	--without-tinfo
 
+# REG enforce hexdump on host for building kernel as EFI payload
+HOST_UTIL_LINUX_CONF_OPTS += \
+	--enable-all-programs \
+	--enable-hexdump
+
 # Disable raw command since starting from version 2.37 needs a
 # work-around to build but in the end we don't need at all.
 HOST_UTIL_LINUX_CONF_OPTS += \

@@ -1,8 +1,20 @@
 diff --git a/package/util-linux/util-linux.mk b/package/util-linux/util-linux.mk
-index ed30c0b107..65a737df93 100644
+index ed30c0b107..aa96caf6cd 100644
 --- a/package/util-linux/util-linux.mk
 +++ b/package/util-linux/util-linux.mk
-@@ -317,14 +317,12 @@ endef
+@@ -224,6 +224,11 @@ HOST_UTIL_LINUX_CONF_OPTS += \
+ 	--without-ncursesw \
+ 	--without-tinfo
+ 
++# REG enforce hexdump on host for building kernel as EFI payload
++HOST_UTIL_LINUX_CONF_OPTS += \
++	--enable-all-programs \
++	--enable-hexdump
++
+ # Disable raw command since starting from version 2.37 needs a
+ # work-around to build but in the end we don't need at all.
+ HOST_UTIL_LINUX_CONF_OPTS += \
+@@ -317,14 +322,12 @@ endef
  UTIL_LINUX_POST_INSTALL_TARGET_HOOKS += UTIL_LINUX_INSTALL_PAMFILES
  endif
  

@@ -53,6 +53,9 @@ BR2_PACKAGE_UTIL_LINUX_WAITPID=y
 BR2_PACKAGE_WATCHDOG=y
 BR2_PACKAGE_WHICH=y
 
+# host-util-linux is needed for kernel EFI build
+BR2_PACKAGE_HOST_UTIL_LINUX=y
+
 # system
 BR2_TARGET_GENERIC_HOSTNAME="REGlinux"
 BR2_TARGET_GENERIC_ISSUE="Retro Emulation Gaming Linux"
