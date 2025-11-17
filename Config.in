@@ -449,12 +449,12 @@ menu "GPU"
 endmenu
 
 menu "Network"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/network/qualcomm/pd-mapper/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/network/qualcomm/qrtr/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/network/qualcomm/rmtfs/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/network/qualcomm/tqftpserv/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/rtl8821au-morrownr/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/rtl88x2bu/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/qualcomm/pd-mapper/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/qualcomm/qrtr/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/qualcomm/rmtfs/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/qualcomm/tqftpserv/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/r8125/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/network/r8168/Config.in"
 endmenu
