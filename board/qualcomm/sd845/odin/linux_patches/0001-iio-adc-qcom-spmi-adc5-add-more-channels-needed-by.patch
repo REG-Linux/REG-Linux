@@ -1,19 +1,19 @@
-From 9a13c7f6dd2963fa19195eac56ccccf327b6770d Mon Sep 17 00:00:00 2001
-From: Teguh Sobirin <teguh@sobir.in>
-Date: Wed, 29 Jun 2022 05:07:06 +0700
-Subject: [PATCH 1/5] iio: adc: qcom-spmi-adc5: add more channels needed by
- odin-gamepad driver
+From 1562c53cc7159340313c58d953b5cb65eeebc86a Mon Sep 17 00:00:00 2001
+From: Demetris Ierokipides <ierokipides.dem@gmail.com>
+Date: Mon, 17 Nov 2025 00:30:38 +0200
+Subject: [PATCH] iio: adc: qcom-spmi-adc5: add more channels needed by -
+ odin-gamepad driver Forward ported to 6.1.x LTS
 
-ADC5_GPIO1, ADC5_GPIO2 ADC5_GPIO3, ADC5_GPIO4, ADC5_GPIO5, ADC5_GPIO6_DIV3
+Signed-off-by: Demetris Ierokipides <ierokipides.dem@gmail.com>
 ---
  drivers/iio/adc/qcom-spmi-adc5.c | 12 ++++++++++++
  1 file changed, 12 insertions(+)
 
 diff --git a/drivers/iio/adc/qcom-spmi-adc5.c b/drivers/iio/adc/qcom-spmi-adc5.c
-index 87438d1e5c0b..6455af20d359 100644
+index d1b865707..f0d4870c5 100644
 --- a/drivers/iio/adc/qcom-spmi-adc5.c
 +++ b/drivers/iio/adc/qcom-spmi-adc5.c
-@@ -609,6 +609,18 @@ static const struct adc5_channels adc5_chans_rev2[ADC5_MAX_CHANNEL] = {
+@@ -619,6 +619,18 @@ static const struct adc5_channels adc5_chans_rev2[ADC5_MAX_CHANNEL] = {
  					SCALE_HW_CALIB_THERM_100K_PULLUP)
  	[ADC5_XO_THERM_100K_PU]	= ADC5_CHAN_TEMP("xo_therm_100k_pu", 0,
  					SCALE_HW_CALIB_THERM_100K_PULLUP)
@@ -31,7 +31,7 @@ index 87438d1e5c0b..6455af20d359 100644
 +				SCALE_HW_CALIB_DEFAULT)
  };
  
- static int adc5_get_dt_channel_data(struct adc5_chip *adc,
+ static int adc5_get_fw_channel_data(struct adc5_chip *adc,
 -- 
-2.34.1
+2.43.0
 
