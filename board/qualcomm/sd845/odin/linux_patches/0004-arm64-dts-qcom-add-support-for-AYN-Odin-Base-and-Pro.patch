@@ -15,10 +15,10 @@ diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefi
 index d7669a7ce..74f43d1c5 100644
 --- a/arch/arm64/boot/dts/qcom/Makefile
 +++ b/arch/arm64/boot/dts/qcom/Makefile
-@@ -122,6 +122,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= sdm630-sony-xperia-nile-voyager.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sdm632-fairphone-fp3.dtb
+@@ -167,6 +167,7 @@
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm636-sony-xperia-ganges-mermaid.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm660-xiaomi-lavender.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm670-google-sargo.dtb
 +dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-ayn-odin.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-cheza-r1.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-cheza-r2.dtb
@@ -28,7 +28,7 @@ new file mode 100644
 index 000000000..975513720
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
-@@ -0,0 +1,1125 @@
+@@ -0,0 +1,1126 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022, Teguh Sobirin.
@@ -43,6 +43,7 @@ index 000000000..975513720
 +#include <dt-bindings/sound/qcom,q6asm.h>
 +#include <dt-bindings/leds/common.h>
 +#include "sdm845.dtsi"
++#include "sdm845-wcd9340.dtsi"
 +#include "pm8998.dtsi"
 +#include "pmi8998.dtsi"
 +
@@ -71,7 +72,7 @@ index 000000000..975513720
 +		vol-up {
 +			label = "Volume Up";
 +			linux,code = <KEY_VOLUMEUP>;
-+			gpios = <&pm8998_gpio 6 GPIO_ACTIVE_LOW>;
++			gpios = <&pm8998_gpios 6 GPIO_ACTIVE_LOW>;
 +		};
 +	};
 +
@@ -427,7 +428,7 @@ index 000000000..975513720
 +		vdda_qusb_hs0_1p8:
 +		vdda_qusb_hs0_3p1:
 +		vdda_mipi_dsi0_1p2:
-+		
++
 +		vdda_ufs1_1p2:
 +
 +		vreg_l1a_0p875: ldo1 {
@@ -553,7 +554,7 @@ index 000000000..975513720
 +	firmware-name = "qcom/sdm845/cdsp.mbn";
 +};
 +
-+&dsi0 {
++&mdss_dsi0 {
 +	status = "okay";
 +	vdda-supply = <&vdda_mipi_dsi0_1p2>;
 +
@@ -574,18 +575,18 @@ index 000000000..975513720
 +
 +		port {
 +			panel_in_0: endpoint {
-+				remote-endpoint = <&dsi0_out>;
++				remote-endpoint = <&mdss_dsi0_out>;
 +			};
 +		};
 +	};
 +};
 +
-+&dsi0_out {
++&mdss_dsi0_out {
 +	remote-endpoint = <&panel_in_0>;
 +	data-lanes = <0 1 2 3>;
 +};
 +
-+&dsi0_phy {
++&mdss_dsi0_phy {
 +	status = "okay";
 +	vdds-supply = <&vdda_mipi_dsi0_pll>;
 +};
@@ -726,7 +727,7 @@ index 000000000..975513720
 +	};
 +};
 +
-+&pm8998_gpio {
++&pm8998_gpios {
 +	volume_up_gpio: vol-up-active {
 +		pins = "gpio6";
 +		function = "normal";
@@ -751,11 +752,11 @@ index 000000000..975513720
 +	monitored-battery = <&battery>;
 +};
 +
-+&pmi8998_fg {
++/* TODO &{/soc/pmic@0/fuel-gauge@55} {
 +	status = "okay";
 +	monitored-battery = <&battery>;
 +	power-supplies = <&pmi8998_charger>;
-+};
++};*/
 +
 +&pmi8998_rradc {
 +	status = "okay";
@@ -763,7 +764,7 @@ index 000000000..975513720
 +};
 +
 +
-+&pmi8998_gpio {
++&pmi8998_gpios {
 +	pwm_fan_ctrl: pwm-fan-ctrl {
 +		bias-disable;
 +		drive-push-pull;
@@ -987,13 +988,13 @@ index 000000000..975513720
 +		bias-pull-up;
 +	};
 +
-+	wcd_intr_default: wcd_intr_default {
++	/* TO CHECK input-enable is NOT into wcd9340 dtsi wcd_intr_default: wcd_intr_default {
 +		pins = "gpio54";
 +		function = "gpio";
 +		input-enable;
 +		bias-pull-down;
 +		drive-strength = <2>;
-+	};
++	}; */
 +
 +	ts_int_active: ts-int-active {
 +		pins = "gpio125";
@@ -1107,7 +1108,7 @@ index 000000000..975513720
 +	firmware-name = "qcom/venus-5.2/venus.mbn";
 +};
 +
-+&wcd9340{
++&wcd9340 {
 +	pinctrl-0 = <&wcd_intr_default>;
 +	pinctrl-names = "default";
 +	clock-names = "extclk";
