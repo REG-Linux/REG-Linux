@@ -27,6 +27,9 @@ REGLINUX_MAME_ARCH = rk3399
 # Cortex A73.A53
 else ifeq ($(BR2_cortex_a73_a53),y)
 REGLINUX_MAME_ARCH = s922x
+# Hack for ODIN
+else ifeq ($(BR2_cortex_a75_a55),y)
+REGLINUX_MAME_ARCH = s922x
 # Cortex A76
 else ifeq ($(BR2_cortex_a76),y)
 REGLINUX_MAME_ARCH = bcm2712
