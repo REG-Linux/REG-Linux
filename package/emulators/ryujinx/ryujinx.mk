@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RYUJINX_VERSION = 1.3.1
+RYUJINX_VERSION = 1.3.3
 ifeq ($(BR2_x86_64),y)
 RYUJINX_SOURCE = ryujinx-$(RYUJINX_VERSION)-linux_x64.tar.gz
 else ifeq ($(BR2_aarch64),y)
