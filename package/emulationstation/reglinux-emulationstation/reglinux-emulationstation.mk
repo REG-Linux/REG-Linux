@@ -5,7 +5,7 @@
 ################################################################################
 
 # WIP branch
-REGLINUX_EMULATIONSTATION_VERSION = bf1ca5490524eb25641f3067b7694b1342241d5b
+REGLINUX_EMULATIONSTATION_VERSION = 1a841272077e809ca948f545a1bc75e7c6692aee
 # Old GLES 2.0 based builds
 #bc8df32ab3e2e1861b46ff09909fdafd22c9a0ed
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
