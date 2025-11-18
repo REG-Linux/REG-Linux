@@ -1,3 +1,3 @@
 # Locally calculated after checking pgp signature
-sha256  dee050d2feea1744291e132be4433ab24c6cf614ad281adc41c4885817c41453  ryujinx-1.3.1-linux_x64.tar.gz
-sha256  f752a0c9e749354f73f057b1ef935778c79e5eac2ff57c89ac13e221b775f657  ryujinx-1.3.1-linux_arm64.tar.gz
+sha256  19b67b222726f28d11846e9b7cbaed113ea03c2be016408662ffb27c558bd28c  ryujinx-1.3.3-linux_x64.tar.gz
+sha256  0485b611583c401733d706ec39db40999f08ba4e22f6f38b0d94602a8016d295  ryujinx-1.3.3-linux_arm64.tar.gz
