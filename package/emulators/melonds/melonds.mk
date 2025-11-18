@@ -3,13 +3,14 @@
 # melonds
 #
 ################################################################################
-# Version: 1.0 on Jul 9, 2024
-MELONDS_VERSION = 1.0
+# Version: 1.1 on Nov 18, 2025
+MELONDS_VERSION = 1.1
 MELONDS_SITE = https://github.com/melonDS-emu/melonDS.git
 MELONDS_SITE_METHOD=git
 MELONDS_GIT_SUBMODULES=YES
 MELONDS_LICENSE = GPLv2
 MELONDS_DEPENDENCIES = sdl2 reglinux-qt6 slirp libepoxy libarchive libenet ecm
+MELONDS_DEPENDENCIES += faad2
 
 ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
 MELONDS_DEPENDENCIES += libgl
