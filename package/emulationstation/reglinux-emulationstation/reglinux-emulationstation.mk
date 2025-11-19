@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-# WIP branch
-REGLINUX_EMULATIONSTATION_VERSION = 1a841272077e809ca948f545a1bc75e7c6692aee
+# dev
+REGLINUX_EMULATIONSTATION_VERSION = f71776a474f255e3d5d22ec4436ee7d8a5f9b76f
 # Old GLES 2.0 based builds
 #bc8df32ab3e2e1861b46ff09909fdafd22c9a0ed
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
@@ -93,10 +93,10 @@ REGLINUX_EMULATIONSTATION_CONF_OPTS += -DUSE_FFMPEG=OFF
 endif
 
 # Scraping keys
-REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DSCREENSCRAPER_DEV_LOGIN=$(shell grep -E '^SCREENSCRAPER_DEV_LOGIN=' $(@D)/keys.txt | cut -d = -f 2-)"
-REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DGAMESDB_APIKEY=$(shell grep -E '^GAMESDB_APIKEY=' $(@D)/keys.txt | cut -d = -f 2-)"
-REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DCHEEVOS_DEV_LOGIN=$(shell grep -E '^CHEEVOS_DEV_LOGIN=' $(@D)/keys.txt | cut -d = -f 2-)"
-REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DHFS_DEV_LOGIN=$(shell grep -E '^HFS_DEV_LOGIN=' $(@D)/keys.txt | cut -d = -f 2-)"
+REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DSCREENSCRAPER_DEV_LOGIN=$(shell grep -m 1 -E '^SCREENSCRAPER_DEV_LOGIN=' $(@D)/keys.txt | cut -d = -f 2-)"
+REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DGAMESDB_APIKEY=$(shell grep -m 1 -E '^GAMESDB_APIKEY=' $(@D)/keys.txt | cut -d = -f 2-)"
+REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DCHEEVOS_DEV_LOGIN=$(shell grep -m 1 -E '^CHEEVOS_DEV_LOGIN=' $(@D)/keys.txt | cut -d = -f 2-)"
+REGLINUX_EMULATIONSTATION_CONF_OPTS += "-DHFS_DEV_LOGIN=$(shell grep -m 1 -E '^HFS_DEV_LOGIN=' $(@D)/keys.txt | cut -d = -f 2-)"
 
 # REG investigate this, might cause game launching delays
 # disabling cec. causing perf issue on init/deinit
@@ -105,6 +105,11 @@ REGLINUX_EMULATIONSTATION_CONF_OPTS += -DCEC=OFF
 #else
 #REGLINUX_EMULATIONSTATION_CONF_OPTS += -DCEC=ON
 #endif
+
+define REGLINUX_EMULATIONSTATION_DOWNLOAD_KEYS
+	# Download scrapper and retroachievements developer keys
+	wget --header="Authorization: token $(REGLINUX_EMULATIONSTATION_TOKEN)" -O $(@D)/keys.txt "https://raw.githubusercontent.com/REG-Linux/keys/main/key.txt" || true
+endef
 
 # Translations and LogLevel define
 define REGLINUX_EMULATIONSTATION_EXTERNAL_POS
@@ -165,6 +170,7 @@ define REGLINUX_EMULATIONSTATION_BOOT
 		$(TARGET_DIR)/etc/init.d/S31emulationstation
 endef
 
+REGLINUX_EMULATIONSTATION_POST_EXTRACT_HOOKS += REGLINUX_EMULATIONSTATION_DOWNLOAD_KEYS
 REGLINUX_EMULATIONSTATION_PRE_CONFIGURE_HOOKS += REGLINUX_EMULATIONSTATION_EXTERNAL_POS
 REGLINUX_EMULATIONSTATION_POST_INSTALL_TARGET_HOOKS += REGLINUX_EMULATIONSTATION_RESOURCES
 REGLINUX_EMULATIONSTATION_POST_INSTALL_TARGET_HOOKS += REGLINUX_EMULATIONSTATION_BOOT
