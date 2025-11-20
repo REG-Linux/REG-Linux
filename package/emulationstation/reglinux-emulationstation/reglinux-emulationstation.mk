@@ -5,7 +5,7 @@
 ################################################################################
 
 # dev
-REGLINUX_EMULATIONSTATION_VERSION = 6b27d3f76d5e5fd6abd8c5f5c84a843e76f3bbbc
+REGLINUX_EMULATIONSTATION_VERSION = 6758acb806652e08ade027032d67477c46e84540
 # Old GLES 2.0 based builds
 #bc8df32ab3e2e1861b46ff09909fdafd22c9a0ed
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)
