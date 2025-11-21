@@ -2,11 +2,11 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 	bool "REG-Linux networking stack"
 
 	# connman
-	select BR2_PACKAGE_CONNMAN			# network manager
-	select BR2_PACKAGE_CONNMAN_WIFI			# network manager
-	select BR2_PACKAGE_CONNMAN_BLUETOOTH		# network manager
-	select BR2_PACKAGE_CONNMAN_CLIENT		# network manager
-	select BR2_PACKAGE_CONNMAN_LOOPBACK		# network manager
+	select BR2_PACKAGE_CONNMAN		# network manager
+	select BR2_PACKAGE_CONNMAN_WIFI		# network manager
+	select BR2_PACKAGE_CONNMAN_ETHERNET	# network manager
+	select BR2_PACKAGE_CONNMAN_CLIENT	# network manager
+	select BR2_PACKAGE_CONNMAN_LOOPBACK	# network manager
 
 	# wpa supplicant
 	select BR2_PACKAGE_WPA_SUPPLICANT			# wifi
@@ -24,7 +24,7 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 	select BR2_PACKAGE_WIRELESS_TOOLS		# wireless tools
 	select BR2_PACKAGE_WIRELESS_TOOLS_LIB		# wireless tools
 	select BR2_PACKAGE_LIBOPENSSL_BIN		# required to encode the wifi password
-	
+
 	# network services
 	select BR2_PACKAGE_DROPBEAR			# ssh server
 	select BR2_PACKAGE_NTP				# ntp time sync protocol
@@ -78,7 +78,7 @@ config BR2_PACKAGE_REGLINUX_NETWORK_DRIVERS
 						   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2	|| \
 						   BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
 
-	
+
 	select BR2_PACKAGE_RTL8192EU		if	!BR2_PACKAGE_SYSTEM_TARGET_JZ4770  && \
 							!BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && \
 							!BR2_PACKAGE_SYSTEM_TARGET_CHA
