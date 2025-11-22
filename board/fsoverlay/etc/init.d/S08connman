@@ -38,7 +38,7 @@ wifi_enable() {
     wifi_country="$(/usr/bin/regmsg systemconf getconfigkey wifi.country)"
     [ -n "$wifi_country" ] && /usr/sbin/iw reg set "$wifi_country"
     /usr/bin/regmsg wifi enable
-    /usr/bin/regmsg wifi scan
+    /usr/bin/regmsg wifi scanlist
 } 2>/dev/null
 
 start() {
