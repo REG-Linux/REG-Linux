@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Literal, Optional
 
 
 class MaxLevelFilter(logging.Filter):
@@ -7,7 +8,7 @@ class MaxLevelFilter(logging.Filter):
         super().__init__()
         self.max_level = max_level
 
-    def filter(self, record):
+    def filter(self, record: logging.LogRecord) -> bool:
         return record.levelno < self.max_level
 
 
