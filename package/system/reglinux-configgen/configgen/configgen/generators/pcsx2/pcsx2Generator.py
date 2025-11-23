@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from shutil import copy
 from os import path, remove, makedirs
 from re import search, MULTILINE
