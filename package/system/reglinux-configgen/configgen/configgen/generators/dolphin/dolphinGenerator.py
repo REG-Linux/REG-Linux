@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, environ
 from configparser import ConfigParser
 from subprocess import CalledProcessError, check_output
