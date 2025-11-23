@@ -988,8 +988,8 @@ def generateControllerConfig_any_from_profiles(f, pad, system):
                         if key != "Device":
                             f.write(f"{key} = {val}\n")
                     return True
-        except:
-            eslog.error(f"profile {profileFile} : FAILED")
+        except (OSError, IOError, ValueError) as e:
+            eslog.error(f"profile {profileFile} : FAILED - {str(e)}")
 
     return False
 

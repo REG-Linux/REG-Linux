@@ -3,7 +3,12 @@ from Command import Command
 from os import path, makedirs, linesep
 from codecs import open
 from xml.dom import minidom
+from xml.parsers.expat import ExpatError
 from controllers import generate_sdl_controller_config
+from utils.logger import get_logger
+
+eslog = get_logger(__name__)
+
 from .cannonballConfig import (
     CANNONBALL_BIN_PATH,
     CANNONBALL_CONFIG_PATH,
@@ -23,7 +28,8 @@ class CannonballGenerator(Generator):
         if path.exists(CANNONBALL_CONFIG_PATH):
             try:
                 cannoballConfig = minidom.parse(CANNONBALL_CONFIG_PATH)
-            except:
+            except (ExpatError, FileNotFoundError, OSError) as e:
+                eslog.debug(f"Cannonball: Failed to parse config file {CANNONBALL_CONFIG_PATH} - {str(e)}")
                 pass  # reinit the file
 
         # cannonball config file

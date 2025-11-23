@@ -31,7 +31,7 @@ def generatePadsConfig(
     if path.exists(configFile):
         try:
             config = parse(configFile)
-        except:
+        except (xml.etree.ElementTree.ParseError, FileNotFoundError):
             pass  # reinit the file
     if path.exists(configFile) and customCfg:
         overwriteMAME = False
