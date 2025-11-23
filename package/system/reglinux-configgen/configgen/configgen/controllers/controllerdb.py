@@ -3,13 +3,14 @@ Controller database management.
 Handles loading and matching controller configurations from gamecontrollerdb.txt.
 """
 
-from typing import Dict, List, Callable, Any, Tuple, Optional
+from typing import Dict, Any, Tuple, Optional
 import os
 import asyncio
 from .controller import Controller, Input
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
+
 
 @staticmethod
 def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
@@ -40,6 +41,7 @@ def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
         "type": "joystick",
         "input_objects": inputs,  # Backward compatible
     }
+
 
 def load_all_controllers_config() -> Dict[str, Dict[str, Any]]:
     """

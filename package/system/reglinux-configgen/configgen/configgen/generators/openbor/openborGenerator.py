@@ -24,7 +24,7 @@ class OpenborGenerator(Generator):
 
         # guess the version to run
         core = system.config["core"]
-        if system.config["core-forced"] == False:
+        if system.config["core_forced"] == False:
             core = OpenborGenerator.guessCore(rom)
 
         # config file
