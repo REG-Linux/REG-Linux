@@ -164,7 +164,8 @@ class AmiberryGenerator(Generator):
         #
         indexDisk = filepath.rfind("(Disk 1")
 
-        # from one file (x1.zip), get the list of all existing files with the same extension + last char (as number) suffix
+        # from one file (x1.zip), get the list of all existing files with the same extension
+        # + last char (as number) suffix
         # for example, "/path/toto0.zip" becomes ["/path/toto0.zip", "/path/toto1.zip", "/path/toto2.zip"]
         if filepath[-1:].isdigit():
             # path without the number
@@ -191,8 +192,8 @@ class AmiberryGenerator(Generator):
         elif indexDisk != -1:
             # Several disks
             floppies.append(rom)
-            prefix = filepath[0 : indexDisk + 6]
-            postfix = filepath[indexDisk + 7 :]
+            prefix = filepath[0:indexDisk + 6]
+            postfix = filepath[indexDisk + 7:]
             n = 2
             while True:
                 fullfilepath = prefix + str(n) + postfix + fileext

@@ -5,9 +5,7 @@ Handles loading and matching controller configurations from gamecontrollerdb.txt
 
 import os
 import asyncio
-from typing import Dict, List, Type, Optional
 from controllers import Controller, Input
-from concurrent.futures import ThreadPoolExecutor
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
