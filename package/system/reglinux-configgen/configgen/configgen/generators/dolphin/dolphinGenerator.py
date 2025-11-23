@@ -180,10 +180,10 @@ class DolphinGenerator(Generator):
             and len(guns) > 0
             and (
                 (
-                    system.isOptSet("dolphin-lightgun-hide-crosshair") == False
-                    and gunsNeedCrosses(guns) == False
+                    not system.isOptSet("dolphin-lightgun-hide-crosshair")
+                    and not gunsNeedCrosses(guns)
                 )
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair" == True)
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
             )
         ):
             dolphinSettings.set(
@@ -345,8 +345,8 @@ class DolphinGenerator(Generator):
             and system.getOptBoolean("use_guns")
             and len(guns) > 0
             and (
-                system.isOptSet("dolphin-lightgun-hide-crosshair") == False
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair" == True)
+                not system.isOptSet("dolphin-lightgun-hide-crosshair")
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
             )
         ):
             # erase what can be set by the option hires_textures

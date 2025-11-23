@@ -145,7 +145,7 @@ def changeMouse(mode: bool) -> None:
 def getGLVersion():
     try:
         # Use eglinfo since we are KMS/DRM
-        if path.exists("/usr/bin/eglinfo") == False:
+        if not path.exists("/usr/bin/eglinfo"):
             return 0
 
         glxVerCmd = 'eglinfo | grep "OpenGL version"'
@@ -163,7 +163,7 @@ def getGLVersion():
 def getGLVendor():
     try:
         # Use eglinfo since we are KMS/DRM
-        if path.exists("/usr/bin/eglinfo") == False:
+        if not path.exists("/usr/bin/eglinfo"):
             return "unknown"
 
         glxVendCmd = 'eglinfo | grep "OpenGL vendor string"'

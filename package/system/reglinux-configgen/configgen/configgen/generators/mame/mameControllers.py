@@ -1,3 +1,4 @@
+import xml.etree.ElementTree as ET
 from os import path, linesep
 from xml.dom import minidom
 from codecs import open
@@ -31,7 +32,7 @@ def generatePadsConfig(
     if path.exists(configFile):
         try:
             config = parse(configFile)
-        except (xml.etree.ElementTree.ParseError, FileNotFoundError):
+        except (ET.ParseError, FileNotFoundError):
             pass  # reinit the file
     if path.exists(configFile) and customCfg:
         overwriteMAME = False

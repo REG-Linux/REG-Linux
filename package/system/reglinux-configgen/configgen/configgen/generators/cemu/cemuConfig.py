@@ -235,12 +235,12 @@ def setCemuConfig(cemuConfig, system):
     eslog.debug("*** audio device = {} ***".format(cemuAudioDevice))
     if (
         system.isOptSet("cemu_audio_config")
-        and system.getOptBoolean("cemu_audio_config") == True
+        and system.getOptBoolean("cemu_audio_config")
     ):
         setSectionConfig(cemuConfig, audio_root, "TVDevice", cemuAudioDevice)
     elif (
         system.isOptSet("cemu_audio_config")
-        and system.getOptBoolean("cemu_audio_config") == False
+        and not system.getOptBoolean("cemu_audio_config")
     ):
         # don't change the config setting
         eslog.debug("*** use config audio device ***")
