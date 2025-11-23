@@ -7,7 +7,7 @@ import xml.dom.minidom as minidom
 import re
 import zipfile
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -23,7 +23,9 @@ def copy_directory(src, dst):
     import os
     import shutil
 
+    eslog.debug(f"Copying directory from {src} to {dst}")
     if not os.path.exists(dst):
+        eslog.debug(f"Creating destination directory: {dst}")
         os.makedirs(dst)
 
     for item in os.listdir(src):
@@ -31,9 +33,12 @@ def copy_directory(src, dst):
         dst_path = os.path.join(dst, item)
 
         if os.path.isdir(src_path):
+            eslog.debug(f"Recursively copying directory: {src_path}")
             copy_directory(src_path, dst_path)
         else:
+            eslog.debug(f"Copying file: {src_path}")
             shutil.copy2(src_path, dst_path)
+    eslog.debug(f"Directory copy completed from {src} to {dst}")
 
 
 class OpenmsxGenerator(Generator):

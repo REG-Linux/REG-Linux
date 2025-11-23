@@ -7,6 +7,9 @@ from shutil import copyfile, copy2
 from configparser import ConfigParser
 from controllers import gunsNeedCrosses, generate_sdl_controller_config
 from systemFiles import CONF
+from configgen.utils.logger import get_logger
+
+eslog = get_logger(__name__)
 
 SUPERMODEL_CONFIG_DIR = CONF + "/supermodel"
 SUPERMODEL_CONFIG_PATH = SUPERMODEL_CONFIG_DIR + "/Supermodel.ini"
@@ -453,7 +456,7 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
         mp = getMappingKeyIncludingFallback(
             playersControllers, matches.group(1), key_up, mapping, mapping_fallback
         )
-        print(mp)
+        eslog.debug(mp)
         return input2input(
             playersControllers,
             matches.group(1),
