@@ -61,7 +61,7 @@ def load_all_controllers_config() -> Dict[str, Dict[str, Any]]:
 
             async def process_line(line):
                 async with sem:
-                    # Exécute parse_line (bloquante) dans un thread du pool
+                    # Execute parse_line (blocking) in a thread pool
                     return await loop.run_in_executor(None, parse_line, line)
 
             tasks = [process_line(line) for line in lines]
