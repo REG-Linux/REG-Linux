@@ -134,7 +134,7 @@ for emulator, (module_path, class_name) in EMULATOR_MAPPING.items():
         module = import_module(module_path)
         PRELOADED_GENERATORS[emulator] = getattr(module, class_name)
     except (ImportError, AttributeError):
-        continue  # Silencia erros, ou adicione logs se quiser visibilidade
+        continue  # Silence errors, or add logs if you want visibility
 
 
 def getGenerator(emulator):

@@ -78,6 +78,7 @@ def main(args, maxnbplayers):
 
     # Check if it is a .zar archive
     if extension == "zar":
+        eslog.debug(f"Processing zar archive {path.basename(args.rom)}")
         exitCode = 0
         need_end = False
         rommountpoint = None
@@ -85,6 +86,7 @@ def main(args, maxnbplayers):
         try:
             # Mount the archive and get the actual ROM path
             need_end, rommountpoint, rom = zar.zar_begin(args.rom)
+            eslog.debug(f"Zar archive mounted successfully {rommountpoint}")
 
             # Launch the game using the mounted ROM
             exitCode = start_rom(args, maxnbplayers, rom, args.rom)
@@ -93,14 +95,14 @@ def main(args, maxnbplayers):
             # Unmount the archive after the game ends
             if need_end and rommountpoint is not None:
                 zar.zar_end(rommountpoint)
+                eslog.debug(f"Zar archive unmounted {rommountpoint}")
 
         return exitCode
 
     else:
         # If it's not a .zar file, launch the ROM directly
+        eslog.debug(f"Launching ROM directly {path.basename(args.rom)}")
         return start_rom(args, maxnbplayers, args.rom, args.rom)
-
-
 
 
 def _start_evmapy_async(system, emulator, core, romConfig, playersControllers, guns):
@@ -161,10 +163,10 @@ def _setup_system_emulator(args, romConfiguration):
 
     if args.emulator is not None:
         system.config["emulator"] = args.emulator
-        system.config["emulator-forced"] = True
+        system.config["emulator_forced"] = True
     if args.core is not None:
         system.config["core"] = args.core
-        system.config["core-forced"] = True
+        system.config["core_forced"] = True
 
     debugDisplay = system.config.copy()
     if "retroachievements.password" in debugDisplay:
@@ -199,7 +201,7 @@ def _configure_special_devices(args, system, rom, metadata, playersControllers):
         deviceInfos = controllers.getDevicesInformation()
         (wheelProcesses, playersControllers, deviceInfos) = (
             wheelsUtils.reconfigureControllers(
-                playersControllers, system, rom, metadata, deviceInfos
+                playersControllers, system, rom, metadata
             )
         )
         wheels = wheelsUtils.getWheelsFromDevicesInfos(deviceInfos)

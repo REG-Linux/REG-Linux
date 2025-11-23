@@ -1,11 +1,13 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 from collections.abc import Mapping
 
 
 class Command:
     """Represents a shell command with environment variables and arguments."""
 
-    def __init__(self, array: List[str], env: Optional[Mapping[str, str]] = None) -> None:
+    def __init__(
+        self, array: List[str], env: Optional[Mapping[str, str]] = None
+    ) -> None:
         """
         Initialize a Command instance.
 
@@ -19,5 +21,7 @@ class Command:
     def __str__(self) -> str:
         """Return a string representation of the command with environment variables."""
         # Using list comprehension to build parts
-        env_parts = [f"{var_name}={var_value}" for var_name, var_value in self.env.items()]
+        env_parts = [
+            f"{var_name}={var_value}" for var_name, var_value in self.env.items()
+        ]
         return " ".join(env_parts + self.array)

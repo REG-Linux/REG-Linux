@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Literal, Optional
 
 
 class MaxLevelFilter(logging.Filter):

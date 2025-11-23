@@ -47,7 +47,9 @@ def squashfs_begin(rom):
         try:
             os.rmdir(rommountpoint)
         except (OSError, FileNotFoundError) as e:
-            eslog.debug(f"squashfs: failed to remove directory {rommountpoint} - {str(e)}")
+            eslog.debug(
+                f"squashfs: failed to remove directory {rommountpoint} - {str(e)}"
+            )
             pass
         raise Exception(f"unable to mount the file {rom}")
 

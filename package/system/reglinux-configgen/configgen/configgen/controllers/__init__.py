@@ -3,7 +3,7 @@ from .controller import (
     Controller,
     Input,
     generate_sdl_controller_config,
-    write_sdl_db_all_controllers
+    write_sdl_db_all_controllers,
 )
 from .controllerdb import load_controller_config
 from .guns import getGuns, gunsNeedCrosses, gunsBordersSizeName
