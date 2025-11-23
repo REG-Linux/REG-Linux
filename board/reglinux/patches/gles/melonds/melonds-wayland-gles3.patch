@@ -85,3 +85,42 @@ diff -u -r output/bcm2711/build/melonds-d4e51f80601f57399db49f1010c45427bd2bf3c4
      target_link_libraries(melonDS PRIVATE "${EGL_LIBRARIES}")
      add_compile_definitions(QAPPLICATION_CLASS=QApplication)
  endif()
+--- a/src/frontend/qt_sdl/Screen.cpp	2025-11-23 18:35:04.142798639 +0100
++++ b/src/frontend/qt_sdl/Screen.cpp	2025-11-23 18:41:52.554594974 +0100
+@@ -1292,6 +1292,7 @@
+     const QString platform_name = QGuiApplication::platformName();
+ 
+     #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
++#ifdef USE_X11
+     if (platform_name == QStringLiteral("xcb"))
+     {
+         wi.type = WindowInfo::Type::X11;
+@@ -1299,7 +1300,9 @@
+         wi.display_connection = x11->display();
+         wi.window_handle = reinterpret_cast<void*>(winId());
+     }
+-    else if (platform_name == QStringLiteral("wayland"))
++    else
++#endif
++    if (platform_name == QStringLiteral("wayland"))
+     {
+         wi.type = WindowInfo::Type::Wayland;
+         const QWaylandApplication* wl = qApp->nativeInterface<QWaylandApplication>();
+@@ -1308,13 +1311,16 @@
+     }
+     #else
+     QPlatformNativeInterface* pni = QGuiApplication::platformNativeInterface();
++#ifdef USE_X11
+     if (platform_name == QStringLiteral("xcb"))
+     {
+         wi.type = WindowInfo::Type::X11;
+         wi.display_connection = pni->nativeResourceForWindow("display", windowHandle());
+         wi.window_handle = reinterpret_cast<void*>(winId());
+     }
+-    else if (platform_name == QStringLiteral("wayland"))
++    else
++#endif
++    if (platform_name == QStringLiteral("wayland"))
+     {
+         wi.type = WindowInfo::Type::Wayland;
+         QWindow* handle = windowHandle();
