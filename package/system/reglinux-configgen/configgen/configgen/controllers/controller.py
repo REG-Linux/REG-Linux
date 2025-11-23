@@ -183,7 +183,7 @@ def generate_sdl_controller_config(controllers: Dict) -> str:
 
 
 def write_sdl_db_all_controllers(
-    controllers: Dict, outputFile: str = "/tmp/gamecontrollerdb.txt"
+    controllers: Dict[str, Any], outputFile: str = "/tmp/gamecontrollerdb.txt"
 ) -> str:
     """
     Write SDL game controller configuration to a file.
@@ -195,6 +195,8 @@ def write_sdl_db_all_controllers(
     Returns:
         Path to the output file
     """
+    # Using the walrus operator for assignment expressions
+    config_str = generate_sdl_controller_config(controllers)
     with open(outputFile, "w") as text_file:
-        text_file.write(generate_sdl_controller_config(controllers))
+        text_file.write(config_str)
     return outputFile

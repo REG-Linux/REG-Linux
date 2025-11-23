@@ -3,7 +3,7 @@ from os import path
 from systemFiles import SYSTEM_CONF, ES_SETTINGS
 import yaml
 from yaml import CLoader as Loader
-from typing import Dict, Any
+from typing import Dict, Any, Union, Optional
 from settings import UnixSettings
 from utils.logger import get_logger
 
@@ -17,17 +17,17 @@ class Emulator:
     EmulationStation settings, handling emulator, core, and rendering options.
 
     Attributes:
-        name (str): The name of the system (e.g., 'nes', 'snes').
-        config (Dict[str, Any]): Configuration dictionary for the emulator and options.
-        renderconfig (Dict[str, Any]): Rendering configuration (e.g., shaders).
+        name: The name of the system (e.g., 'nes', 'snes').
+        config: Configuration dictionary for the emulator and options.
+        renderconfig: Rendering configuration (e.g., shaders).
     """
 
-    def __init__(self, name: str, rom: str):
+    def __init__(self, name: str, rom: str) -> None:
         """Initialize the emulator with system name and ROM path.
 
         Args:
-            name (str): The system name (e.g., 'nes', 'snes').
-            rom (str): Path to the ROM file.
+            name: The system name (e.g., 'nes', 'snes').
+            rom: Path to the ROM file.
 
         Raises:
             Exception: If no emulator is defined in the configuration.
@@ -138,15 +138,18 @@ class Emulator:
         """Generate a sanitized game settings name from the ROM file name.
 
         Args:
-            rom (str): Path to the ROM file.
+            rom: Path to the ROM file.
 
         Returns:
-            str: Sanitized game settings name compatible with EmulationStation.
+            Sanitized game settings name compatible with EmulationStation.
         """
         rom = path.basename(rom)
 
         # Sanitize name by removing invalid characters per EmulationStation rules
-        rom = rom.replace("=", "").replace("#", "")
+        # Using walrus operator for assignment expressions where useful
+        if "=" in rom or "#" in rom:
+            rom = rom.replace("=", "").replace("#", "")
+
         eslog.info(f"game settings name: {rom}")
         return rom
 
@@ -291,13 +294,14 @@ class Emulator:
         """Update a configuration dictionary with new settings, ignoring invalid values.
 
         Args:
-            config (Dict[str, Any]): The configuration dictionary to update.
-            settings (Dict[str, Any]): The new settings to apply.
+            config: The configuration dictionary to update.
+            settings: The new settings to apply.
         """
         # Remove invalid settings ("default", "auto", or empty)
-        toremove = [k for k in settings if settings[k] in ("", "default", "auto")]
-        for k in toremove:
-            del settings[k]
+        # Using walrus operator to avoid re-evaluating settings[k]
+        invalid_settings = [k for k, v in settings.items() if v in ("", "default", "auto")]
+        for k in invalid_settings:
+            settings.pop(k, None)  # Safely remove without KeyError
 
         config.update(settings)
 
