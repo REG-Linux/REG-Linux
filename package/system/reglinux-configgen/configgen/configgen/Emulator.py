@@ -3,11 +3,82 @@ from os import path
 from systemFiles import SYSTEM_CONF, ES_SETTINGS
 import yaml
 from yaml import CLoader as Loader
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Union, Optional, TYPE_CHECKING
+try:
+    from typing import TypedDict
+except ImportError:
+    from typing_extensions import TypedDict
 from settings import UnixSettings
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
+
+
+# Definindo TypedDicts para estruturas de configuração
+class SystemConfig(TypedDict, total=False):
+    emulator: str
+    core: str
+    videomode: str
+    showFPS: str
+    uimode: str
+    bezel: str
+    gun_cursor: str
+    gun_delay: str
+    vkeyboard: str
+    # Retroachievements options
+    retroachievements: str
+    retroachievements_hardcore: str
+    retroachievements_leaderboards: str
+    retroachievements_verbose: str
+    retroachievements_automatic_screenshot: str
+    retroachievements_challenge_indicators: str
+    retroachievements_play_sounds: str
+    retroachievements_menu_enable: str
+    retroachievements_unofficial: str
+    retroachievements_use_ranked_assets: str
+    retroachievements_show_lboard_ui: str
+    retroachievements_start_active: str
+    retroachievements_richpresence: str
+    retroachievements_encore: str
+    retroachievements_spectator: str
+    retroachievements_screenshot: str
+    # Other options
+    force_module: str
+    disableautocontrollers: str
+    ratio: str
+    smoothing: str
+    rewind: str
+    autosave: str
+    shufflesongs: str
+    pixel_perfect: str
+    stretch: str
+    game_translation: str
+    game_focus: str
+    cheevos_game_id: str
+    # Video options
+    video_threaded: str
+    video_shared_context: str
+    video_vsync: str
+    video_smooth: str
+    video_scale_integer: str
+    video_fullscreen: str
+    video_windowed_fullscreen: str
+    # Common options
+    audio_dsp_plugin: str
+    audio_driver: str
+    input_driver: str
+    cheevos_password: Optional[str]
+
+
+class RenderConfig(TypedDict, total=False):
+    shader: str
+    smooth: str
+    rewind: str
+    autosave: str
+    shufflesongs: str
+    pixel_perfect: str
+    stretch: str
+    ratio: str
 
 
 class Emulator:
@@ -32,7 +103,10 @@ class Emulator:
         Raises:
             Exception: If no emulator is defined in the configuration.
         """
-        self.name = name
+        self.name: str = name
+        self.rom: str = rom
+        self.config: SystemConfig = {}  # type: ignore
+        self.renderconfig: RenderConfig = {}  # type: ignore
 
         # Load system configuration from default YAML files
         self.config = Emulator.get_system_config(
@@ -169,7 +243,7 @@ class Emulator:
 #
 
     @staticmethod
-    def dict_merge(dest: Dict[Any, Any], src: Dict[Any, Any]) -> None:
+    def dict_merge(dest: SystemConfig, src: SystemConfig) -> None:
         """Merge src into dest, updating nested dictionaries.
 
         Args:
@@ -183,13 +257,13 @@ class Emulator:
                 if k in d and isinstance(d[k], dict) and isinstance(v, dict):
                     stack.append((d[k], v))
                 else:
-                    d[k] = v
+                    d[k] = v  # type: ignore
 
 
     @staticmethod
     def get_generic_config(
         system: str, defaultyml: str, defaultarchyml: str
-    ) -> Dict[str, Any]:
+    ) -> SystemConfig:
         """Load and merge generic configuration from YAML files.
 
         Args:
@@ -231,7 +305,7 @@ class Emulator:
     @staticmethod
     def get_system_config(
         system: str, defaultyml: str, defaultarchyml: str
-    ) -> Dict[str, Any]:
+    ) -> SystemConfig:
         """Load system-specific configuration, including emulator and core settings.
 
         Args:
@@ -245,7 +319,7 @@ class Emulator:
         dict_all = Emulator.get_generic_config(system, defaultyml, defaultarchyml)
 
         # Extract emulator and core, merge options
-        dict_result = {"emulator": dict_all["emulator"], "core": dict_all["core"]}
+        dict_result: SystemConfig = {"emulator": dict_all["emulator"], "core": dict_all["core"]}  # type: ignore
         if "options" in dict_all:
             Emulator.dict_merge(dict_result, dict_all["options"])
         return dict_result
@@ -254,10 +328,10 @@ class Emulator:
         """Check if a configuration option is set.
 
         Args:
-            key (str): The configuration option key.
+            key: The configuration option key.
 
         Returns:
-            bool: True if the key exists in the config, False otherwise.
+            True if the key exists in the config, False otherwise.
         """
         return key in self.config
 
@@ -265,10 +339,10 @@ class Emulator:
         """Get a configuration option as a boolean value.
 
         Args:
-            key (str): The configuration option key.
+            key: The configuration option key.
 
         Returns:
-            bool: True if the option is set to a truthy value, False otherwise.
+            True if the option is set to a truthy value, False otherwise.
         """
         true_values = {"1", "true", "on", "enabled", True}
         value = self.config.get(key)
@@ -282,15 +356,15 @@ class Emulator:
         """Get a configuration option as a string.
 
         Args:
-            key (str): The configuration option key.
+            key: The configuration option key.
 
         Returns:
-            str: The option value as a string, or empty string if not set.
+            The option value as a string, or empty string if not set.
         """
         return str(self.config.get(key, ""))
 
     @staticmethod
-    def updateConfiguration(config: Dict[str, Any], settings: Dict[str, Any]) -> None:
+    def updateConfiguration(config: SystemConfig, settings: Dict[str, Any]) -> None:
         """Update a configuration dictionary with new settings, ignoring invalid values.
 
         Args:
@@ -303,7 +377,7 @@ class Emulator:
         for k in invalid_settings:
             settings.pop(k, None)  # Safely remove without KeyError
 
-        config.update(settings)
+        config.update(settings)  # type: ignore
 
     def updateFromESSettings(self) -> None:
         """Update emulator config with settings from EmulationStation XML file.
@@ -322,7 +396,7 @@ class Emulator:
                 drawframerate_value = "false"
             if drawframerate_value not in ["false", "true"]:
                 drawframerate_value = "false"
-            self.config["showFPS"] = drawframerate_value
+            self.config["showFPS"] = drawframerate_value  # type: ignore
 
             # Read uimode setting
             uimode_elem = esConfig.find("./string[@name='UIMode']")
@@ -332,9 +406,9 @@ class Emulator:
                 uimode_value = "Full"
             if uimode_value not in ["Full", "Kiosk", "Kid"]:
                 uimode_value = "Full"
-            self.config["uimode"] = uimode_value
+            self.config["uimode"] = uimode_value  # type: ignore
 
         except Exception:
             # Use defaults if ES settings cannot be loaded
-            self.config["showFPS"] = "false"
-            self.config["uimode"] = "Full"
+            self.config["showFPS"] = "false"  # type: ignore
+            self.config["uimode"] = "Full"  # type: ignore
