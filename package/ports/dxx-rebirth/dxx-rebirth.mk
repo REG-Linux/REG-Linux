@@ -3,8 +3,8 @@
 # dxx-rebirth (Descent 1 & 2) engine
 #
 ################################################################################
-# Version: Commits on Nov 8, 2025
-DXX_REBIRTH_VERSION = 3eb1c46ce18d3ad30f3f3c3037ff0c9b00dbbd0c
+# Version: Commits on Nov 22, 2025
+DXX_REBIRTH_VERSION = b58db2dd9161cdba9b41fc29b969aba338123321
 DXX_REBIRTH_SITE = https://github.com/dxx-rebirth/dxx-rebirth
 DXX_REBIRTH_SITE_METHOD=git
 DXX_REBIRTH_LICENSE = GPLv3
