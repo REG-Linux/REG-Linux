@@ -335,7 +335,8 @@ def reconfigureAngleRotation(
         fd = fdopen(pipeout)
         newdev = fd.readline().rstrip("\n")
         fd.close()
-    except:
+    except (OSError, IOError) as e:
+        eslog.error(f"Error reading from pipe: {str(e)}")
         kill(proc.pid, SIGTERM)
         proc.communicate()
         raise

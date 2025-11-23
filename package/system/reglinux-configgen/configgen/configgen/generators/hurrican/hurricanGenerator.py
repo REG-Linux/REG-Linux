@@ -14,9 +14,9 @@ class HurricanGenerator(Generator):
         try:
             chdir("/userdata/roms/hurrican/data/levels/")
             chdir("/userdata/roms/hurrican/")
-        except:
+        except (FileNotFoundError, OSError) as e:
             eslog.error(
-                "ERROR: Game assets not installed. You can get them from the REG-Linux Content Downloader."
+                f"ERROR: Game assets not installed. You can get them from the REG-Linux Content Downloader. Error: {str(e)}"
             )
         commandArray = ["hurrican"]
 

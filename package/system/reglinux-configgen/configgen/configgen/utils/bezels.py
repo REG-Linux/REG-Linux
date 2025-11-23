@@ -191,8 +191,8 @@ def tatooImage(input_png, output_png, system):
         else:
             tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
             tattoo = Image.open(tattoo_file)
-    except:
-        eslog.error(f"Error opening tattoo image: {tattoo_file}")
+    except (IOError, OSError, Image.UnidentifiedImageError) as e:
+        eslog.error(f"Error opening tattoo image: {tattoo_file} - {str(e)}")
         return
 
     back = Image.open(input_png).convert("RGBA")

@@ -46,7 +46,8 @@ def getInvertButtonsValue():
         if elem is not None:
             return elem.get("value") == "true"
         return False  # Return False if not found
-    except:
+    except Exception as e:
+        eslog.debug(f"Libretro: Error reading XML config - {str(e)}")
         return False  # when file is not yet here or malformed
 
 

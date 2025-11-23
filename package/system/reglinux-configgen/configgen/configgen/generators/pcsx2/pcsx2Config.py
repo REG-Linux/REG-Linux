@@ -228,8 +228,8 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
                     pcsx2INIConfig.set("Achievements", "Leaderboards", "true")
                 else:
                     pcsx2INIConfig.set("Achievements", "Leaderboards", "false")
-        except:
-            eslog.error("ERROR: setting RetroAchievements parameters")
+        except (configparser.Error, ValueError) as e:
+            eslog.error(f"ERROR: setting RetroAchievements parameters - {str(e)}")
     # set other settings
     pcsx2INIConfig.set("Achievements", "TestMode", "false")
     pcsx2INIConfig.set("Achievements", "UnofficialTestMode", "false")

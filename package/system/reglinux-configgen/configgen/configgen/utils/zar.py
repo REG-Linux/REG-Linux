@@ -39,8 +39,8 @@ def zar_begin(rom):
         eslog.debug(f"zar_begin: {rommountpoint} already exists")
         try:
             rmdir(rommountpoint)
-        except:
-            eslog.debug(f"zar_begin: failed to rmdir {rommountpoint}")
+        except (OSError, FileNotFoundError) as e:
+            eslog.debug(f"zar_begin: failed to rmdir {rommountpoint} - {str(e)}")
             return False, None, rommountpoint
 
     # Create the new mount directory
@@ -52,7 +52,8 @@ def zar_begin(rom):
         eslog.debug(f"zar_begin: mounting {rommountpoint} failed")
         try:
             rmdir(rommountpoint)
-        except:
+        except (OSError, FileNotFoundError) as e:
+            eslog.debug(f"zar: failed to remove directory {rommountpoint} - {str(e)}")
             pass
         raise Exception(f"unable to mount the file {rom} using fuse-zar")
 

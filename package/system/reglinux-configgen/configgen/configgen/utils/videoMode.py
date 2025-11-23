@@ -156,7 +156,7 @@ def getGLVersion():
             del glVerTemp[2:]
         glVersion = float(".".join(glVerTemp))
         return glVersion
-    except:
+    except (ValueError, TypeError, subprocess.CalledProcessError):
         return 0
 
 
@@ -171,7 +171,7 @@ def getGLVendor():
         glVendString = glVendOutput.split()
         glVendor = glVendString[3].casefold()
         return glVendor
-    except:
+    except (subprocess.CalledProcessError, IndexError, AttributeError):
         return "unknown"
 
 
