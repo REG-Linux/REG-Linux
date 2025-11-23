@@ -16,7 +16,7 @@ def setXemuConfig(system, rom, playersControllers, gameResolution):
         try:
             with open(XEMU_CONFIG_PATH, "r", encoding="utf_8_sig") as fp:
                 iniConfig.read_file(fp)
-        except (IOError, configparser.Error):
+        except (IOError, Exception):
             pass  # Will create a new config if reading fails
 
     createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)

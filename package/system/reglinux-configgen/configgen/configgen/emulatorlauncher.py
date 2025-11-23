@@ -101,8 +101,6 @@ def main(args, maxnbplayers):
         return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 
-# --- Add at the top of emulatorlauncher.py ---
-import threading
 
 
 def _start_evmapy_async(system, emulator, core, romConfig, playersControllers, guns):
