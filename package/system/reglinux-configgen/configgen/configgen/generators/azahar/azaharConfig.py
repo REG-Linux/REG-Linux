@@ -42,7 +42,7 @@ def getAzaharLangFromEnvironment():
 
 
 def setAzaharConfig(azaharConfig, system):
-    ## [LAYOUT]
+    # [LAYOUT]
     if "Layout" not in azaharConfig:
         azaharConfig["Layout"] = {}
     azaharConfig.set("Layout", "custom_layout", "false")

@@ -18,7 +18,7 @@ def getGuns():
     mouses_clean = {}
     for mouse in mouses:
         matches = match(r"^/dev/input/event([0-9]*)$", str(mouse.device_node))
-        if matches != None:
+        if matches is not None:
             if (
                 "ID_INPUT_MOUSE" in mouse.properties
                 and mouse.properties["ID_INPUT_MOUSE"]

@@ -55,7 +55,7 @@ class CemuGenerator(Generator):
         if path.exists(CEMU_CONFIG_PATH):
             try:
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
-            except:
+            except Exception:
                 pass  # reinit the file
 
         # Create the settings file

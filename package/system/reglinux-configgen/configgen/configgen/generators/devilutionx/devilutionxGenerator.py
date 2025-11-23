@@ -30,7 +30,7 @@ class DevilutionXGenerator(Generator):
         else:
             commandArray.append("--diablo")
 
-        if system.isOptSet("showFPS") and system.getOptBoolean("showFPS") == True:
+        if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
             commandArray.append("-f")
 
         return Command(

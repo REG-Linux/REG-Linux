@@ -15,7 +15,7 @@ CEMU_BIN_PATH = "/usr/bin/cemu/cemu"
 
 
 def setCemuConfig(cemuConfig, system):
-    ## [ROOT]
+    # [ROOT]
     xml_root = getRoot(cemuConfig, "content")
     # Default mlc path
     setSectionConfig(cemuConfig, xml_root, "mlc_path", CEMU_SAVES_DIR)
@@ -40,7 +40,7 @@ def setCemuConfig(cemuConfig, system):
         lang = system.config["cemu_console_language"]
     setSectionConfig(cemuConfig, xml_root, "console_language", str(getCemuLang(lang)))
 
-    ## [WINDOWS]
+    # [WINDOWS]
     # Position
     setSectionConfig(cemuConfig, xml_root, "window_position", "")
     window_position = getRoot(cemuConfig, "window_position")
@@ -52,7 +52,7 @@ def setCemuConfig(cemuConfig, system):
     setSectionConfig(cemuConfig, window_size, "x", "640")
     setSectionConfig(cemuConfig, window_size, "y", "480")
 
-    ## [GAMEPAD]
+    # [GAMEPAD]
     if system.isOptSet("cemu_gamepad") and system.config["cemu_gamepad"] == "True":
         setSectionConfig(cemuConfig, xml_root, "open_pad", "true")
     else:
@@ -67,13 +67,13 @@ def setCemuConfig(cemuConfig, system):
     setSectionConfig(cemuConfig, pad_size, "x", "640")
     setSectionConfig(cemuConfig, pad_size, "y", "480")
 
-    ## [GAME PATH]
+    # [GAME PATH]
     setSectionConfig(cemuConfig, xml_root, "GamePaths", "")
     game_root = getRoot(cemuConfig, "GamePaths")
     # Default games path
     setSectionConfig(cemuConfig, game_root, "Entry", CEMU_ROMS_DIR)
 
-    ## [GRAPHICS]
+    # [GRAPHICS]
     setSectionConfig(cemuConfig, xml_root, "Graphic", "")
     graphic_root = getRoot(cemuConfig, "Graphic")
     # Graphical backend
@@ -166,7 +166,7 @@ def setCemuConfig(cemuConfig, system):
     else:
         setSectionConfig(cemuConfig, graphic_root, "FullscreenScaling", "0")  # Bilinear
 
-    ## [GRAPHICS OVERLAYS] - Currently disbaled! Causes crash
+    # [GRAPHICS OVERLAYS] - Currently disbaled! Causes crash
     # Performance - alternative to MongHud
     setSectionConfig(cemuConfig, graphic_root, "Overlay", "")
     overlay_root = getRoot(cemuConfig, "Overlay")
@@ -214,7 +214,7 @@ def setCemuConfig(cemuConfig, system):
         setSectionConfig(cemuConfig, notification_root, "ShaderCompiling", "false")
         setSectionConfig(cemuConfig, notification_root, "FriendService", "false")
 
-    ## [AUDIO]
+    # [AUDIO]
     setSectionConfig(cemuConfig, xml_root, "Audio", "")
     audio_root = getRoot(cemuConfig, "Audio")
     # Use cubeb (curently the only option for linux)
