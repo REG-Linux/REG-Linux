@@ -264,6 +264,45 @@ def _apply_commandline_options(args, system):
         system.config["state_filename"] = args.state_filename
 
 
+def _setup_environment_variables(system):
+    """Sets up environment variables for the emulator."""
+    system.config["sdlvsync"] = (
+        "0"
+        if system.isOptSet("sdlvsync") and not system.getOptBoolean("sdlvsync")
+        else "1"
+    )
+    environ["SDL_RENDER_VSYNC"] = system.config["sdlvsync"]
+
+
+def _execute_external_scripts(system, rom, event_type):
+    """Executes external scripts based on the event type."""
+    effectiveCore = system.config.get("core", "")
+    effectiveRom = rom or ""
+
+    script_directories = [
+        "/usr/share/reglinux/configgen/scripts",
+        "/userdata/system/scripts",
+    ]
+
+    # For gameStart events, we want the first directory to be user scripts
+    if event_type == "gameStop":
+        script_directories.reverse()
+
+    for directory in script_directories:
+        callExternalScripts(
+            directory,
+            event_type,
+            [system.name, system.config["emulator"], effectiveCore, effectiveRom],
+        )
+
+
+def _create_save_directory(system):
+    """Creates the save directory for the system if it doesn't exist."""
+    dirname = path.join(SAVES, system.name)
+    if not path.exists(dirname):
+        makedirs(dirname)
+
+
 def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
     """Configures and enables MangoHUD if supported."""
     if not (
@@ -300,6 +339,133 @@ def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
         cmd.env["MANGOHUD_CONFIGFILE"] = "/var/run/hud.config"
         if not generator.hasInternalMangoHUDCall():
             cmd.array.insert(0, "mangohud")
+
+
+def _setup_evmapy_and_compositor(
+    generator, system, rom, playersControllers, guns, args, romConfiguration
+):
+    """
+    Sets up Evmapy and compositor before launching the emulator.
+
+    Args:
+        generator (Generator): Emulator-specific generator instance.
+        system (Emulator): System configuration object.
+        rom (str): Path to the ROM file.
+        playersControllers (list): Controller configuration for all players.
+        guns (list): Configured light guns (if any).
+        args (Namespace): Command-line arguments passed to the launcher.
+        romConfiguration (str): ROM configuration path (may differ if archive is used).
+
+    Returns:
+        threading.Thread: The thread running Evmapy.
+    """
+    # Start Evmapy in a separate thread (non-blocking)
+    evmapy_thread = _start_evmapy_async(
+        args.system,
+        system.config["emulator"],
+        system.config.get("core", ""),
+        romConfiguration,
+        playersControllers,
+        guns,
+    )
+
+    # Start a compositor if required (Wayland or X11)
+    if (
+        generator.requiresWayland() or generator.requiresX11()
+    ) and "WAYLAND_DISPLAY" not in environ:
+        windowsManager.start_compositor(generator, system)
+
+    return evmapy_thread
+
+
+def _prepare_emulator_command(
+    generator,
+    system,
+    rom,
+    playersControllers,
+    metadata,
+    guns,
+    wheels,
+    gameResolution,
+    args,
+):
+    """
+    Prepares the emulator command with all necessary configurations.
+
+    Args:
+        generator (Generator): Emulator-specific generator instance.
+        system (Emulator): System configuration object.
+        rom (str): Path to the ROM file.
+        playersControllers (list): Controller configuration for all players.
+        metadata (dict): Game metadata (title, genre, etc.).
+        guns (list): Configured light guns (if any).
+        wheels (list): Configured wheels (if any).
+        gameResolution (dict): Current game resolution settings.
+        args (Namespace): Command-line arguments passed to the launcher.
+
+    Returns:
+        Command: The prepared command object for running the emulator.
+    """
+    # Set execution directory if specified by generator
+    effectiveRom = rom or ""
+    executionDirectory = generator.executionDirectory(system.config, effectiveRom)
+    if executionDirectory is not None:
+        chdir(executionDirectory)
+
+    # Generate the command line for emulator execution
+    cmd = generator.generate(
+        system, rom, playersControllers, metadata, guns, wheels, gameResolution
+    )
+
+    # Configure MangoHUD if enabled
+    _configure_hud(system, generator, cmd, args, rom, gameResolution, guns)
+
+    return cmd
+
+
+def _run_emulator_with_profiler(cmd):
+    """
+    Runs the emulator command with profiler management.
+
+    Args:
+        cmd (Command): The command object to run.
+
+    Returns:
+        int: The exit code from the emulator process.
+    """
+    global profiler
+
+    # Disable profiler while emulator runs
+    if profiler:
+        profiler.disable()
+
+    # Run the emulator command
+    exitCode = runCommand(cmd)
+
+    # Re-enable profiler after emulator exit
+    if profiler:
+        profiler.enable()
+
+    return exitCode
+
+
+def _cleanup_emulator_resources(generator, evmapy_thread, system):
+    """
+    Cleans up resources after the emulator exits.
+
+    Args:
+        generator (Generator): Emulator-specific generator instance.
+        evmapy_thread (Thread): The thread running Evmapy.
+        system (Emulator): System configuration object.
+    """
+    # Stop Evmapy gracefully
+    Evmapy.stop()
+    if evmapy_thread and evmapy_thread.is_alive():
+        evmapy_thread.join(timeout=1)  # prevent zombie threads
+
+    # Stop compositor if it was started
+    if generator.requiresWayland() or generator.requiresX11():
+        windowsManager.stop_compositor(generator, system)
 
 
 def _launch_emulator_process(
@@ -344,55 +510,30 @@ def _launch_emulator_process(
     evmapy_thread = None
 
     try:
-        # Start Evmapy in a separate thread (non-blocking)
-        evmapy_thread = _start_evmapy_async(
-            args.system,
-            system.config["emulator"],
-            system.config.get("core", ""),
-            romConfiguration,
+        # Setup Evmapy and compositor
+        evmapy_thread = _setup_evmapy_and_compositor(
+            generator, system, rom, playersControllers, guns, args, romConfiguration
+        )
+
+        # Prepare the emulator command
+        cmd = _prepare_emulator_command(
+            generator,
+            system,
+            rom,
             playersControllers,
+            metadata,
             guns,
+            wheels,
+            gameResolution,
+            args,
         )
 
-        # Start a compositor if required (Wayland or X11)
-        if (
-            generator.requiresWayland() or generator.requiresX11()
-        ) and "WAYLAND_DISPLAY" not in environ:
-            windowsManager.start_compositor(generator, system)
+        # Run the emulator with profiler management
+        exitCode = _run_emulator_with_profiler(cmd)
 
-        # Set execution directory if specified by generator
-        effectiveRom = rom or ""
-        executionDirectory = generator.executionDirectory(system.config, effectiveRom)
-        if executionDirectory is not None:
-            chdir(executionDirectory)
-
-        # Generate the command line for emulator execution
-        cmd = generator.generate(
-            system, rom, playersControllers, metadata, guns, wheels, gameResolution
-        )
-
-        # Configure MangoHUD if enabled
-        _configure_hud(system, generator, cmd, args, rom, gameResolution, guns)
-
-        # Disable profiler while emulator runs
-        if profiler:
-            profiler.disable()
-
-        # Run the emulator command
-        exitCode = runCommand(cmd)
-
-        # Re-enable profiler after emulator exit
-        if profiler:
-            profiler.enable()
     finally:
-        # Stop Evmapy gracefully
-        Evmapy.stop()
-        if evmapy_thread and evmapy_thread.is_alive():
-            evmapy_thread.join(timeout=1)  # prevent zombie threads
-
-        # Stop compositor if it was started
-        if generator.requiresWayland() or generator.requiresX11():
-            windowsManager.stop_compositor(generator, system)
+        # Clean up resources
+        _cleanup_emulator_resources(generator, evmapy_thread, system)
 
     return exitCode
 
@@ -439,6 +580,7 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
     Returns:
         int: The exit code from the emulator process.
     """
+    # Initial setup
     playersControllers = _configure_controllers(args, maxnbplayers)
     system = _setup_system_emulator(args, romConfiguration)
     metadata = controllers.getGamesMetaData(system.name, rom)
@@ -452,36 +594,22 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
     systemMode = videoMode.getCurrentMode()
 
     try:
+        # Configure video and mouse settings
         systemMode, resolutionChanged, mouseChanged, gameResolution = (
             _setup_video_and_mouse(system, generator, rom)
         )
 
-        dirname = path.join(SAVES, system.name)
-        if not path.exists(dirname):
-            makedirs(dirname)
+        # Create save directory
+        _create_save_directory(system)
 
+        # Apply command-line options
         _apply_commandline_options(args, system)
 
-        system.config["sdlvsync"] = (
-            "0"
-            if system.isOptSet("sdlvsync") and not system.getOptBoolean("sdlvsync")
-            else "1"
-        )
-        environ["SDL_RENDER_VSYNC"] = system.config["sdlvsync"]
+        # Setup environment variables
+        _setup_environment_variables(system)
 
-        effectiveCore = system.config.get("core", "")
-        effectiveRom = rom or ""
-
-        callExternalScripts(
-            "/usr/share/reglinux/configgen/scripts",
-            "gameStart",
-            [system.name, system.config["emulator"], effectiveCore, effectiveRom],
-        )
-        callExternalScripts(
-            "/userdata/system/scripts",
-            "gameStart",
-            [system.name, system.config["emulator"], effectiveCore, effectiveRom],
-        )
+        # Execute pre-launch scripts
+        _execute_external_scripts(system, rom, "gameStart")
 
         eslog.debug("==== Running emulator ====")
         exitCode = _launch_emulator_process(
@@ -497,16 +625,8 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
             romConfiguration,
         )
 
-        callExternalScripts(
-            "/userdata/system/scripts",
-            "gameStop",
-            [system.name, system.config["emulator"], effectiveCore, effectiveRom],
-        )
-        callExternalScripts(
-            "/usr/share/reglinux/configgen/scripts",
-            "gameStop",
-            [system.name, system.config["emulator"], effectiveCore, effectiveRom],
-        )
+        # Execute post-launch scripts
+        _execute_external_scripts(system, rom, "gameStop")
 
     finally:
         _cleanup_system(resolutionChanged, systemMode, mouseChanged, wheelProcesses)
