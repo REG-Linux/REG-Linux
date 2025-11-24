@@ -1122,8 +1122,9 @@ index 000000000..975513720
 +	qcom,mbhc-buttons-vthreshold-microvolt = <75000 150000 237000 500000 500000 500000 500000 500000>;
 +	qcom,mbhc-headset-vthreshold-microvolt = <1700000>;
 +	qcom,mbhc-headphone-vthreshold-microvolt = <50000>;
++};
 +
-+	swm: swm@c85 {
++&swm {
 +		left_spkr: wsa8810-left{
 +			compatible = "sdw10217201000";
 +			reg = <0 1>;
@@ -1141,7 +1142,6 @@ index 000000000..975513720
 +			sound-name-prefix = "SpkrRight";
 +			#sound-dai-cells = <0>;
 +		};
-+	};
 +};
 +
 +&wifi {
