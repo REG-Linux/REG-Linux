@@ -303,6 +303,17 @@ def _create_save_directory(system):
         makedirs(dirname)
 
 
+def _cleanup_hud_config():
+    """Cleans up the temporary HUD config file."""
+    try:
+        if path.exists("/var/run/hud.config"):
+            from os import remove
+
+            remove("/var/run/hud.config")
+    except Exception as e:
+        eslog.warning(f"Could not remove HUD config file: {e}")
+
+
 def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
     """Configures and enables MangoHUD if supported."""
     if not (
@@ -534,6 +545,8 @@ def _launch_emulator_process(
     finally:
         # Clean up resources
         _cleanup_emulator_resources(generator, evmapy_thread, system)
+        # Clean up HUD config file
+        _cleanup_hud_config()
 
     return exitCode
 
@@ -634,6 +647,23 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
     return exitCode
 
 
+def _cleanup_temp_files(*temp_files):
+    """
+    Cleans up temporary files created during bezel processing.
+
+    Args:
+        *temp_files: Variable number of temporary file paths to cleanup
+    """
+    import os
+
+    for temp_file in temp_files:
+        try:
+            if temp_file and path.exists(temp_file):
+                os.remove(temp_file)
+        except Exception as e:
+            eslog.warning(f"Could not remove temporary file {temp_file}: {e}")
+
+
 def getHudBezel(system, generator, rom, gameResolution, bordersSize):
     """
     Determines and prepares the appropriate bezel image for the HUD.
@@ -665,105 +695,119 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
     ):
         return None
 
-    # If no bezel is set but effects are needed, create a transparent base.
-    if "bezel" not in system.config or system.config["bezel"] in ["", "none"]:
-        overlay_png_file = "/tmp/bezel_transhud_black.png"
-        overlay_info_file = "/tmp/bezel_transhud_black.info"
-        bezelsUtil.createTransparentBezel(
-            overlay_png_file, gameResolution["width"], gameResolution["height"]
-        )
+    # List of temporary files that may be created
+    temp_files = []
 
-        w, h = gameResolution["width"], gameResolution["height"]
-        with open(overlay_info_file, "w") as fd:
-            fd.write(
-                f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}'
-            )
-    else:
-        # A bezel is configured, so let's find its files.
-        eslog.debug(f"HUD enabled. Trying to apply the bezel {system.config['bezel']}")
-        bezel = system.config["bezel"]
-        bz_infos = bezelsUtil.getBezelInfos(
-            rom, bezel, system.name, system.config["emulator"]
-        )
-        if bz_infos is None:
-            eslog.debug("No bezel info file found")
-            return None
-        overlay_info_file, overlay_png_file = bz_infos["info"], bz_infos["png"]
-
-    # --- Bezel Validation ---
     try:
-        import json
+        # If no bezel is set but effects are needed, create a transparent base.
+        if "bezel" not in system.config or system.config["bezel"] in ["", "none"]:
+            overlay_png_file = "/tmp/bezel_transhud_black.png"
+            overlay_info_file = "/tmp/bezel_transhud_black.info"
+            temp_files.extend([overlay_png_file, overlay_info_file])
+            bezelsUtil.createTransparentBezel(
+                overlay_png_file, gameResolution["width"], gameResolution["height"]
+            )
 
-        with open(overlay_info_file) as f:
-            infos = json.load(f)
-    except Exception:
-        eslog.warning(f"Unable to read bezel info file: {overlay_info_file}")
-        infos = {}
+            w, h = gameResolution["width"], gameResolution["height"]
+            with open(overlay_info_file, "w") as fd:
+                fd.write(
+                    f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}'
+                )
+        else:
+            # A bezel is configured, so let's find its files.
+            eslog.debug(
+                f"HUD enabled. Trying to apply the bezel {system.config['bezel']}"
+            )
+            bezel = system.config["bezel"]
+            bz_infos = bezelsUtil.getBezelInfos(
+                rom, bezel, system.name, system.config["emulator"]
+            )
+            if bz_infos is None:
+                eslog.debug("No bezel info file found")
+                return None
+            overlay_info_file, overlay_png_file = bz_infos["info"], bz_infos["png"]
 
-    # Get bezel dimensions either from info file or the image itself.
-    if "width" in infos and "height" in infos:
-        bezel_width, bezel_height = infos["width"], infos["height"]
-        eslog.info(f"Bezel size read from {overlay_info_file}")
-    else:
-        bezel_width, bezel_height = bezelsUtil.fast_image_size(overlay_png_file)
-        eslog.info(f"Bezel size read from {overlay_png_file}")
-
-    # Define validation thresholds.
-    max_ratio_delta = 0.01  # Max difference between screen and bezel aspect ratio.
-
-    screen_ratio = gameResolution["width"] / gameResolution["height"]
-    bezel_ratio = bezel_width / bezel_height
-
-    # Validate aspect ratio (unless gun borders are being added, which might need a different ratio).
-    if bordersSize is None and abs(screen_ratio - bezel_ratio) > max_ratio_delta:
-        eslog.debug(
-            f"Screen ratio ({screen_ratio}) is too far from the bezel one ({bezel_ratio})"
-        )
-        return None
-
-    # --- Bezel Processing ---
-    # Resize the bezel image if it doesn't match the screen resolution.
-    bezel_stretch = system.isOptSet("bezel_stretch") and system.getOptBoolean(
-        "bezel_stretch"
-    )
-    if (
-        bezel_width != gameResolution["width"]
-        or bezel_height != gameResolution["height"]
-    ):
-        eslog.debug("Bezel needs to be resized")
-        output_png_file = "/tmp/bezel.png"
+        # --- Bezel Validation ---
         try:
-            bezelsUtil.resizeImage(
-                overlay_png_file,
-                output_png_file,
-                gameResolution["width"],
-                gameResolution["height"],
-                bezel_stretch,
+            import json
+
+            with open(overlay_info_file) as f:
+                infos = json.load(f)
+        except Exception:
+            eslog.warning(f"Unable to read bezel info file: {overlay_info_file}")
+            infos = {}
+
+        # Get bezel dimensions either from info file or the image itself.
+        if "width" in infos and "height" in infos:
+            bezel_width, bezel_height = infos["width"], infos["height"]
+            eslog.info(f"Bezel size read from {overlay_info_file}")
+        else:
+            bezel_width, bezel_height = bezelsUtil.fast_image_size(overlay_png_file)
+            eslog.info(f"Bezel size read from {overlay_png_file}")
+
+        # Define validation thresholds.
+        max_ratio_delta = 0.01  # Max difference between screen and bezel aspect ratio.
+
+        screen_ratio = gameResolution["width"] / gameResolution["height"]
+        bezel_ratio = bezel_width / bezel_height
+
+        # Validate aspect ratio (unless gun borders are being added, which might need a different ratio).
+        if bordersSize is None and abs(screen_ratio - bezel_ratio) > max_ratio_delta:
+            eslog.debug(
+                f"Screen ratio ({screen_ratio}) is too far from the bezel one ({bezel_ratio})"
+            )
+            return None
+
+        # --- Bezel Processing ---
+        # Resize the bezel image if it doesn't match the screen resolution.
+        bezel_stretch = system.isOptSet("bezel_stretch") and system.getOptBoolean(
+            "bezel_stretch"
+        )
+        if (
+            bezel_width != gameResolution["width"]
+            or bezel_height != gameResolution["height"]
+        ):
+            eslog.debug("Bezel needs to be resized")
+            output_png_file = "/tmp/bezel.png"
+            temp_files.append(output_png_file)
+            try:
+                bezelsUtil.resizeImage(
+                    overlay_png_file,
+                    output_png_file,
+                    gameResolution["width"],
+                    gameResolution["height"],
+                    bezel_stretch,
+                )
+                overlay_png_file = output_png_file
+            except Exception as e:
+                eslog.error(f"Failed to resize the image: {e}")
+                return None
+
+        # Apply a "tattoo" (watermark/logo) to the bezel if configured.
+        if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
+            output_png_file = "/tmp/bezel_tattooed.png"
+            temp_files.append(output_png_file)
+            bezelsUtil.tatooImage(overlay_png_file, output_png_file, system)
+            overlay_png_file = output_png_file
+
+        # Draw gun borders on the bezel if required.
+        if bordersSize is not None:
+            eslog.debug("Drawing gun borders")
+            output_png_file = "/tmp/bezel_gunborders.png"
+            temp_files.append(output_png_file)
+            innerSize, outerSize = bezelsUtil.gunBordersSize(bordersSize)
+            color = bezelsUtil.gunsBordersColorFomConfig(system.config)
+            bezelsUtil.gunBorderImage(
+                overlay_png_file, output_png_file, innerSize, outerSize, color
             )
             overlay_png_file = output_png_file
-        except Exception as e:
-            eslog.error(f"Failed to resize the image: {e}")
-            return None
 
-    # Apply a "tattoo" (watermark/logo) to the bezel if configured.
-    if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
-        output_png_file = "/tmp/bezel_tattooed.png"
-        bezelsUtil.tatooImage(overlay_png_file, output_png_file, system)
-        overlay_png_file = output_png_file
+        eslog.debug(f"Applying bezel {overlay_png_file}")
+        return overlay_png_file
 
-    # Draw gun borders on the bezel if required.
-    if bordersSize is not None:
-        eslog.debug("Drawing gun borders")
-        output_png_file = "/tmp/bezel_gunborders.png"
-        innerSize, outerSize = bezelsUtil.gunBordersSize(bordersSize)
-        color = bezelsUtil.gunsBordersColorFomConfig(system.config)
-        bezelsUtil.gunBorderImage(
-            overlay_png_file, output_png_file, innerSize, outerSize, color
-        )
-        overlay_png_file = output_png_file
-
-    eslog.debug(f"Applying bezel {overlay_png_file}")
-    return overlay_png_file
+    finally:
+        # Clean up temporary files
+        _cleanup_temp_files(*temp_files)
 
 
 def extractGameInfosFromXml(xml):
@@ -780,6 +824,7 @@ def extractGameInfosFromXml(xml):
 
     vals = {}
     try:
+        # ET.parse will handle the file opening/closing internally
         infos = ET.parse(xml)
         name_elem = infos.find("./game/name")
         if name_elem is not None:
@@ -932,6 +977,15 @@ def runCommand(command):
         pass
     except Exception:
         eslog.error("Emulator exited unexpectedly", exc_info=True)
+    finally:
+        # Ensure process resources are properly released
+        if proc and proc.poll() is None:  # Process is still running
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                # Process already finished, ignore
+                pass
+        proc = None  # Clear the global reference
 
     return exitcode
 
@@ -1022,8 +1076,11 @@ if __name__ == "__main__":
     # --- Finalization ---
     # If profiling was enabled, save the results.
     if profiler:
-        profiler.disable()
-        profiler.dump_stats("/var/run/emulatorlauncher.prof")
+        try:
+            profiler.disable()
+            profiler.dump_stats("/var/run/emulatorlauncher.prof")
+        except Exception as e:
+            eslog.error(f"Error dumping profiler stats: {e}")
 
     # A short delay can help ensure resources (like GPU memory) are fully released before returning to the frontend.
     sleep(1)
