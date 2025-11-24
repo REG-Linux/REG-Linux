@@ -103,7 +103,7 @@ if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY          || \
    BR2_PACKAGE_SYSTEM_TARGET_T527             || \
    BR2_PACKAGE_SYSTEM_TARGET_AMLOGIC_GLES3    || \
    BR2_PACKAGE_SYSTEM_TARGET_ROCKCHIP_GLES3   || \
-   BR2_PACKAGE_SYSTEM_TARGET_ODIN             || \
+   BR2_PACKAGE_SYSTEM_TARGET_SDM845           || \
    BR2_PACKAGE_SYSTEM_TARGET_SM6115           || \
    BR2_PACKAGE_SYSTEM_TARGET_SM8250           || \
    BR2_PACKAGE_SYSTEM_TARGET_SM8550           || \
@@ -172,10 +172,10 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "x86_64_v3"										if BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
 
 	# Qualcomm targets
-	default "qualcomm/sd845/odin"									if BR2_PACKAGE_SYSTEM_TARGET_ODIN
+	default "qualcomm/sdm845/odin"									if BR2_PACKAGE_SYSTEM_TARGET_SDM845
 	default "qualcomm/sm6115/mangmi-air-x"								if BR2_PACKAGE_SYSTEM_TARGET_SM6115
 	default "qualcomm/sm8250/rp5 qualcomm/sm8250/rpmini qualcomm/sm8250/rpflip2"			if BR2_PACKAGE_SYSTEM_TARGET_SM8250
-	default "qualcomm/sm8550/odin2 qualcomm/sm8550/odin2portal qualcomm/sm8550/pockets"					if BR2_PACKAGE_SYSTEM_TARGET_SM8550
+	default "qualcomm/sm8550/odin2 qualcomm/sm8550/odin2portal qualcomm/sm8550/pockets"		if BR2_PACKAGE_SYSTEM_TARGET_SM8550
 
 	# Mediatek targets
 	default "mediatek/mt8395/radxa-nio-12l"								if BR2_PACKAGE_SYSTEM_TARGET_MT8395
@@ -196,9 +196,9 @@ config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
 	default "ingenic/jz4770"									if BR2_PACKAGE_SYSTEM_TARGET_JZ4770
 
 	choice
-	prompt "batocera.linux target"
+	prompt "REG-Linux target"
 	help
-	  Select batocera.linux target hardware
+	  Select target hardware
 
 # Ingenic
 # ---------------------------------------
@@ -318,8 +318,8 @@ config BR2_PACKAGE_SYSTEM_TARGET_MT8395
 
 # Qualcomm Snapdragon
 # -------------------------------------
-config BR2_PACKAGE_SYSTEM_TARGET_ODIN
-	bool "odin"
+config BR2_PACKAGE_SYSTEM_TARGET_SDM845
+	bool "sdm845"
 
 config BR2_PACKAGE_SYSTEM_TARGET_SM6115
 	bool "sm6115"
