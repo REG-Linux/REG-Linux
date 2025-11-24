@@ -51,15 +51,15 @@ class HypseusSingeGenerator(Generator):
     @staticmethod
     def get_resolution(video_path):
         try:
-            # Tenta obter informações do vídeo
+            # Try to get video information
             probe_video = probe(video_path)
             if not probe_video or "streams" not in probe_video:
                 eslog.debug(
-                    f"Não foi possível analisar o arquivo de vídeo: {video_path}"
+                    f"Could not parse the video file: {video_path}"
                 )
                 return 0, 0
 
-            # Encontra o stream de vídeo
+            # Find the video stream
             video_stream = next(
                 (
                     stream
@@ -69,14 +69,14 @@ class HypseusSingeGenerator(Generator):
                 None,
             )
             if not video_stream:
-                eslog.debug(f"Nenhum stream de vídeo encontrado em: {video_path}")
+                eslog.debug(f"No video stream found in: {video_path}")
                 return 0, 0
 
-            # Obtém largura e altura
+            # Get width and height
             width = int(video_stream.get("width", 0))
             height = int(video_stream.get("height", 0))
 
-            # Trata aspect ratio se disponível
+            # Handle aspect ratio if available
             display_aspect_ratio = video_stream.get("display_aspect_ratio")
             if display_aspect_ratio and ":" in display_aspect_ratio:
                 try:
@@ -87,12 +87,12 @@ class HypseusSingeGenerator(Generator):
                         ratio = sar_num / sar_den
                         width = int(height * ratio)
                 except (ValueError, ZeroDivisionError) as e:
-                    eslog.debug(f"Erro ao processar aspect ratio: {e}")
+                    eslog.debug(f"Error processing aspect ratio: {e}")
 
             return width, height
 
         except Exception as e:
-            eslog.error(f"Erro ao obter resolução do vídeo: {e}")
+            eslog.error(f"Error getting video resolution: {e}")
             return 0, 0
 
     # Main entry of the module
@@ -226,10 +226,10 @@ class HypseusSingeGenerator(Generator):
 
         if video_path != None:
             video_resolution = self.get_resolution(video_path)
-            eslog.debug("Resolução: {}".format(video_resolution))
+            eslog.debug("Resolution: {}".format(video_resolution))
             if video_resolution == (0, 0):
                 eslog.warning(
-                    "Não foi possível determinar a resolução do vídeo, usando fallback"
+                    "Could not determine video resolution, using fallback"
                 )
 
         if system.name == "singe":
@@ -308,7 +308,7 @@ class HypseusSingeGenerator(Generator):
             video_width = 0
             video_height = 0
             video_resolution: Optional[Tuple[int, int]] = (
-                None  # garante que a variável sempre exista
+                None  # ensures that the variable always exists
             )
 
             # Safely handle video_resolution

@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, environ
 from configparser import ConfigParser
 from subprocess import CalledProcessError, check_output
@@ -38,7 +38,7 @@ class DolphinGenerator(Generator):
         # FIXME Generate the controller config(s)
         # generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns)
 
-        ## [ dolphin.ini ] ##
+        # [dolphin.ini]
         dolphinSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinSettings.optionxform = lambda optionstr: str(optionstr)
@@ -180,10 +180,10 @@ class DolphinGenerator(Generator):
             and len(guns) > 0
             and (
                 (
-                    system.isOptSet("dolphin-lightgun-hide-crosshair") == False
-                    and gunsNeedCrosses(guns) == False
+                    not system.isOptSet("dolphin-lightgun-hide-crosshair")
+                    and not gunsNeedCrosses(guns)
                 )
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair" == True)
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
             )
         ):
             dolphinSettings.set(
@@ -230,7 +230,7 @@ class DolphinGenerator(Generator):
         with open(DOLPHIN_CONFIG_PATH, "w") as configfile:
             dolphinSettings.write(configfile)
 
-        ## [ gfx.ini ] ##
+        # [gfx.ini]
         dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform = lambda optionstr: str(optionstr)
@@ -345,8 +345,8 @@ class DolphinGenerator(Generator):
             and system.getOptBoolean("use_guns")
             and len(guns) > 0
             and (
-                system.isOptSet("dolphin-lightgun-hide-crosshair") == False
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair" == True)
+                not system.isOptSet("dolphin-lightgun-hide-crosshair")
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
             )
         ):
             # erase what can be set by the option hires_textures
@@ -478,7 +478,7 @@ class DolphinGenerator(Generator):
         with open(DOLPHIN_GFX_PATH, "w") as configfile:
             dolphinGFXSettings.write(configfile)
 
-        ## Hotkeys.ini - overwrite to avoid issues
+        # Hotkeys.ini - overwrite to avoid issues
         hotkeyConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         hotkeyConfig.optionxform = lambda optionstr: str(optionstr)
@@ -549,7 +549,7 @@ class DolphinGenerator(Generator):
         with open(hotkey_path, "w") as configfile:
             hotkeyConfig.write(configfile)
 
-        ## Retroachievements
+        # Retroachievements
         RacConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         RacConfig.optionxform = lambda optionstr: str(optionstr)
@@ -620,7 +620,7 @@ class DolphinGenerator(Generator):
 
         try:
             wii_tv_mode = getRatioFromConfig(config, gameResolution)
-        except:
+        except (ValueError, TypeError, AttributeError):
             pass
 
         # Auto

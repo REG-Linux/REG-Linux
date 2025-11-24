@@ -11,7 +11,7 @@ def getDevicesInformation():
     joysticks = []
     for ev in events:
         eventId = dev2int(str(ev.device_node))
-        if eventId != None:
+        if eventId is not None:
             isJoystick = (
                 "ID_INPUT_JOYSTICK" in ev.properties
                 and ev.properties["ID_INPUT_JOYSTICK"] == "1"

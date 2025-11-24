@@ -4,8 +4,56 @@ import struct
 from PIL import Image, ImageOps
 from .videoMode import getAltDecoration
 from .logger import get_logger
+import hashlib
+import os
 
 eslog = get_logger(__name__)
+
+# Cache directory for processed bezel images
+BEZEL_CACHE_DIR = "/tmp/bezel_cache"
+if not path.exists(BEZEL_CACHE_DIR):
+    os.makedirs(BEZEL_CACHE_DIR, exist_ok=True)
+
+
+def _generate_cache_key(*args):
+    """
+    Generate a unique cache key based on input parameters.
+    """
+    key_str = "_".join(str(arg) for arg in args)
+    return hashlib.md5(key_str.encode()).hexdigest()
+
+
+def _get_cached_image(cache_key):
+    """
+    Retrieve cached image if it exists.
+    """
+    cached_path = path.join(BEZEL_CACHE_DIR, f"{cache_key}.png")
+    if path.exists(cached_path):
+        return cached_path
+    return None
+
+
+def _save_to_cache(image_path, cache_key):
+    """
+    Save an image to the cache.
+    """
+    cached_path = path.join(BEZEL_CACHE_DIR, f"{cache_key}.png")
+    import shutil
+    shutil.copy2(image_path, cached_path)
+
+
+def clear_bezel_cache():
+    """
+    Clear all cached bezel images to free up space.
+    """
+    import os
+    import glob
+    files = glob.glob(path.join(BEZEL_CACHE_DIR, "*.png"))
+    for file in files:
+        try:
+            os.remove(file)
+        except OSError:
+            pass  # Ignore errors when removing cached files
 
 
 def getBezelInfos(rom, bezel, systemName, emulator):
@@ -115,6 +163,20 @@ def resizeImage(
     """
     Resize a bezel image to match screen size, maintaining alpha if needed.
     """
+    # Generate cache key based on input parameters
+    cache_key = _generate_cache_key(
+        "resize", input_png, screen_width, screen_height, bezel_stretch
+    )
+
+    # Check if image is already cached
+    cached_path = _get_cached_image(cache_key)
+    if cached_path:
+        eslog.debug(f"Using cached resized bezel: {cached_path}")
+        # Copy cached image to output location
+        import shutil
+        shutil.copy2(cached_path, output_png)
+        return
+
     imgin = Image.open(input_png)
     fillcolor = "black"
     eslog.debug(f"Resizing bezel: image mode {imgin.mode}")
@@ -135,6 +197,9 @@ def resizeImage(
             fillcolor=fillcolor,
         )
         imgout.save(output_png, mode="RGBA", format="PNG")
+
+    # Save the result to cache
+    _save_to_cache(output_png, cache_key)
 
 
 def padImage(
@@ -175,7 +240,34 @@ def tatooImage(input_png, output_png, system):
     """
     Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
     """
+    # Generate cache key based on input parameters
+    tattoo_config = system.config.get("bezel.tattoo", "generic")
     tattoo_file = None
+    if tattoo_config == "system":
+        tattoo_file = f"/usr/share/reglinux/controller-overlays/{system.name}.png"
+        if not path.exists(tattoo_file):
+            tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
+    elif tattoo_config == "custom" and path.exists(system.config.get("bezel.tattoo_file", "")):
+        tattoo_file = system.config["bezel.tattoo_file"]
+    else:
+        tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
+
+    cache_key = _generate_cache_key(
+        "tattoo", input_png, tattoo_file,
+        system.config.get("bezel.resize_tattoo", "default"),
+        system.config.get("bezel.tattoo_corner", "NW"),
+        fast_image_size(input_png)  # Include input image size in cache key
+    )
+
+    # Check if image is already cached
+    cached_path = _get_cached_image(cache_key)
+    if cached_path:
+        eslog.debug(f"Using cached tattooed bezel: {cached_path}")
+        # Copy cached image to output location
+        import shutil
+        shutil.copy2(cached_path, output_png)
+        return
+
     tattoo = None
     try:
         if system.config["bezel.tattoo"] == "system":
@@ -191,8 +283,8 @@ def tatooImage(input_png, output_png, system):
         else:
             tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
             tattoo = Image.open(tattoo_file)
-    except:
-        eslog.error(f"Error opening tattoo image: {tattoo_file}")
+    except (IOError, OSError, Image.UnidentifiedImageError) as e:
+        eslog.error(f"Error opening tattoo image: {tattoo_file} - {str(e)}")
         return
 
     back = Image.open(input_png).convert("RGBA")
@@ -234,6 +326,9 @@ def tatooImage(input_png, output_png, system):
     imgnew = Image.new("RGBA", (w, h), (0, 0, 0, 255))
     imgnew.paste(back, (0, 0, w, h))
     imgnew.save(output_png, mode="RGBA", format="PNG")
+
+    # Save the result to cache
+    _save_to_cache(output_png, cache_key)
 
 
 def alphaPaste(input_png, output_png, imgin, fillcolor, screensize, bezel_stretch):
@@ -289,6 +384,24 @@ def gunBorderImage(
     """
     Draws outer and inner borders on the bezel image for lightgun detection.
     """
+    # Generate cache key based on input parameters
+    cache_key = _generate_cache_key(
+        "gunborder", input_png, innerBorderSizePer, outerBorderSizePer,
+        innerBorderColor, outerBorderColor, fast_image_size(input_png)
+    )
+
+    # Check if image is already cached
+    cached_path = _get_cached_image(cache_key)
+    if cached_path:
+        eslog.debug(f"Using cached bezel with gun borders: {cached_path}")
+        # Copy cached image to output location
+        import shutil
+        shutil.copy2(cached_path, output_png)
+        w, h = fast_image_size(input_png)
+        outerBorderSize = max(1, h * outerBorderSizePer // 100)
+        innerBorderSize = max(1, w * innerBorderSizePer // 100)
+        return outerBorderSize + innerBorderSize
+
     from PIL import ImageDraw
 
     w, h = fast_image_size(input_png)
@@ -331,6 +444,10 @@ def gunBorderImage(
         draw.rectangle(shape, fill=innerBorderColor)
 
     imgnew.save(output_png, mode="RGBA", format="PNG")
+
+    # Save the result to cache
+    _save_to_cache(output_png, cache_key)
+
     return outerBorderSize + innerBorderSize
 
 

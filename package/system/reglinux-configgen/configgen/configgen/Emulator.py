@@ -1,13 +1,124 @@
 import xml.etree.ElementTree as ET
 from os import path
-from systemFiles import SYSTEM_CONF, ES_SETTINGS
 import yaml
 from yaml import CLoader as Loader
-from typing import Dict, Any
-from settings import UnixSettings
-from utils.logger import get_logger
+from typing import Dict, Any, Union, Optional
+
+try:
+    from typing import TypedDict
+except ImportError:
+    from typing_extensions import TypedDict
+
+# Import with fallback for different execution contexts
+try:
+    from systemFiles import SYSTEM_CONF, ES_SETTINGS
+except ImportError:
+    # When run as a module within the package
+    from .systemFiles import SYSTEM_CONF, ES_SETTINGS
+
+try:
+    from settings import UnixSettings
+except ImportError:
+    # When run as a module within the package
+    from .settings import UnixSettings
+
+try:
+    from utils.logger import get_logger
+except ImportError:
+    # When run as a module within the package
+    from .utils.logger import get_logger
 
 eslog = get_logger(__name__)
+
+
+# Definindo TypedDicts para estruturas de configuração
+class SystemConfigRequired(TypedDict, total=True):
+    """Campos obrigatórios no SystemConfig"""
+
+    emulator: str
+    core: str
+
+
+class SystemConfigOptional(TypedDict, total=False):
+    """Campos opcionais no SystemConfig"""
+
+    videomode: str
+    showFPS: str
+    uimode: str
+    bezel: str
+    gun_cursor: str
+    gun_delay: str
+    vkeyboard: str
+    # Retroachievements options
+    retroachievements: str
+    retroachievements_hardcore: str
+    retroachievements_leaderboards: str
+    retroachievements_verbose: str
+    retroachievements_automatic_screenshot: str
+    retroachievements_challenge_indicators: str
+    retroachievements_play_sounds: str
+    retroachievements_menu_enable: str
+    retroachievements_unofficial: str
+    retroachievements_use_ranked_assets: str
+    retroachievements_show_lboard_ui: str
+    retroachievements_start_active: str
+    retroachievements_richpresence: str
+    retroachievements_encore: str
+    retroachievements_spectator: str
+    retroachievements_screenshot: str
+    # Other options
+    force_module: str
+    disableautocontrollers: str
+    ratio: str
+    smoothing: str
+    rewind: str
+    autosave: str
+    shufflesongs: str
+    pixel_perfect: str
+    stretch: str
+    game_translation: str
+    game_focus: str
+    cheevos_game_id: str
+    # Video options
+    video_threaded: str
+    video_shared_context: str
+    video_vsync: str
+    video_smooth: str
+    video_scale_integer: str
+    video_fullscreen: str
+    video_windowed_fullscreen: str
+    # Common options
+    audio_dsp_plugin: str
+    audio_driver: str
+    input_driver: str
+    cheevos_password: Optional[str]
+    # SDL options
+    sdlvsync: str
+    # Special runtime properties
+    emulator_forced: bool
+    core_forced: bool
+
+
+class SystemConfig(SystemConfigRequired, SystemConfigOptional):
+    """Configuração do sistema com campos obrigatórios e opcionais"""
+
+    pass
+
+
+class RenderConfig(TypedDict, total=False):
+    shader: str
+    smooth: str
+    rewind: str
+    autosave: str
+    shufflesongs: str
+    pixel_perfect: str
+    stretch: str
+    ratio: str
+
+
+# Define a flexible config type that can accept additional keys
+SystemConfigDict = Union[SystemConfig, Dict[str, Any]]
+RenderConfigDict = Union[RenderConfig, Dict[str, Any]]
 
 
 class Emulator:
@@ -17,22 +128,25 @@ class Emulator:
     EmulationStation settings, handling emulator, core, and rendering options.
 
     Attributes:
-        name (str): The name of the system (e.g., 'nes', 'snes').
-        config (Dict[str, Any]): Configuration dictionary for the emulator and options.
-        renderconfig (Dict[str, Any]): Rendering configuration (e.g., shaders).
+        name: The name of the system (e.g., 'nes', 'snes').
+        config: Configuration dictionary for the emulator and options.
+        renderconfig: Rendering configuration (e.g., shaders).
     """
 
-    def __init__(self, name: str, rom: str):
+    def __init__(self, name: str, rom: str) -> None:
         """Initialize the emulator with system name and ROM path.
 
         Args:
-            name (str): The system name (e.g., 'nes', 'snes').
-            rom (str): Path to the ROM file.
+            name: The system name (e.g., 'nes', 'snes').
+            rom: Path to the ROM file.
 
         Raises:
             Exception: If no emulator is defined in the configuration.
         """
-        self.name = name
+        self.name: str = name
+        self.rom: str = rom
+        self.config: SystemConfigDict = {}
+        self.renderconfig: Dict[str, Any] = {}
 
         # Load system configuration from default YAML files
         self.config = Emulator.get_system_config(
@@ -60,7 +174,7 @@ class Emulator:
         # Add display settings to config
         displaySettings = recalSettings.loadAll("display")
         for opt in displaySettings:
-            self.config["display." + opt] = displaySettings[opt]
+            self.config["display." + opt] = displaySettings[opt]  # type: ignore
 
         # Update config with settings in order of precedence
         Emulator.updateConfiguration(self.config, controllersSettings)
@@ -69,54 +183,46 @@ class Emulator:
         Emulator.updateConfiguration(self.config, folderSettings)
         Emulator.updateConfiguration(self.config, gameSettings)
         self.updateFromESSettings()
-        eslog.debug(f"uimode: {self.config['uimode']}")
+        eslog.debug(f"uimode: {self.config.get('uimode')}")
 
         # Check if emulator or core is forcibly set
-        self.config["emulator-forced"] = False
-        self.config["core-forced"] = False
+        self.config["emulator_forced"] = False
+        self.config["core_forced"] = False
         if (
             "emulator" in globalSettings
             or "emulator" in systemSettings
             or "emulator" in gameSettings
         ):
-            self.config["emulator-forced"] = True
+            self.config["emulator_forced"] = True
         if (
             "core" in globalSettings
             or "core" in systemSettings
             or "core" in gameSettings
         ):
-            self.config["core-forced"] = True
+            self.config["core_forced"] = True
 
         # Initialize renderconfig for shaders
         self.renderconfig = {}
         if "shaderset" in self.config:
-            if self.config["shaderset"] != "none":
+            shaderset = self.config["shaderset"]
+            if shaderset != "none":
                 # Prefer user-defined shader configs if available
-                if path.exists(
-                    "/userdata/shaders/configs/"
-                    + self.config["shaderset"]
-                    + "/rendering-defaults.yml"
-                ):
+                user_shader_path = (
+                    f"/userdata/shaders/configs/{shaderset}/rendering-defaults.yml"
+                )
+                if path.exists(user_shader_path):
                     self.renderconfig = Emulator.get_generic_config(
                         self.name,
-                        "/userdata/shaders/configs/"
-                        + self.config["shaderset"]
-                        + "/rendering-defaults.yml",
-                        "/userdata/shaders/configs/"
-                        + self.config["shaderset"]
-                        + "/rendering-defaults-arch.yml",
+                        user_shader_path,
+                        f"/userdata/shaders/configs/{shaderset}/rendering-defaults-arch.yml",
                     )
                 else:
                     self.renderconfig = Emulator.get_generic_config(
                         self.name,
-                        "/usr/share/reglinux/shaders/configs/"
-                        + self.config["shaderset"]
-                        + "/rendering-defaults.yml",
-                        "/usr/share/reglinux/shaders/configs/"
-                        + self.config["shaderset"]
-                        + "/rendering-defaults-arch.yml",
+                        f"/usr/share/reglinux/shaders/configs/{shaderset}/rendering-defaults.yml",
+                        f"/usr/share/reglinux/shaders/configs/{shaderset}/rendering-defaults-arch.yml",
                     )
-            elif self.config["shaderset"] == "none":
+            elif shaderset == "none":
                 # Use default rendering configs if no shaders are set
                 self.renderconfig = Emulator.get_generic_config(
                     self.name,
@@ -138,35 +244,38 @@ class Emulator:
         """Generate a sanitized game settings name from the ROM file name.
 
         Args:
-            rom (str): Path to the ROM file.
+            rom: Path to the ROM file.
 
         Returns:
-            str: Sanitized game settings name compatible with EmulationStation.
+            Sanitized game settings name compatible with EmulationStation.
         """
         rom = path.basename(rom)
 
         # Sanitize name by removing invalid characters per EmulationStation rules
-        rom = rom.replace("=", "").replace("#", "")
+        # Using walrus operator for assignment expressions where useful
+        if "=" in rom or "#" in rom:
+            rom = rom.replace("=", "").replace("#", "")
+
         eslog.info(f"game settings name: {rom}")
         return rom
 
-#    @staticmethod
-#    def dict_merge(dct: Dict[Any, Any], merge_dct: Dict[Any, Any]) -> None:
-#        """Recursively merge merge_dct into dct, updating nested dictionaries.
-#
-#        Args:
-#            dct: The dictionary to update.
-#            merge_dct: The dictionary to merge into dct.
-#        """
-#        for key, value in merge_dct.items():
-#            if key in dct and isinstance(dct[key], dict) and isinstance(value, dict):
-#                Emulator.dict_merge(dct[key], value)
-#            else:
-#                dct[key] = value
-#
+    #    @staticmethod
+    #    def dict_merge(dct: Dict[Any, Any], merge_dct: Dict[Any, Any]) -> None:
+    #        """Recursively merge merge_dct into dct, updating nested dictionaries.
+    #
+    #        Args:
+    #            dct: The dictionary to update.
+    #            merge_dct: The dictionary to merge into dct.
+    #        """
+    #        for key, value in merge_dct.items():
+    #            if key in dct and isinstance(dct[key], dict) and isinstance(value, dict):
+    #                Emulator.dict_merge(dct[key], value)
+    #            else:
+    #                dct[key] = value
+    #
 
     @staticmethod
-    def dict_merge(dest: Dict[Any, Any], src: Dict[Any, Any]) -> None:
+    def dict_merge(dest: SystemConfigDict, src: SystemConfigDict) -> None:
         """Merge src into dest, updating nested dictionaries.
 
         Args:
@@ -181,7 +290,6 @@ class Emulator:
                     stack.append((d[k], v))
                 else:
                     d[k] = v
-
 
     @staticmethod
     def get_generic_config(
@@ -228,7 +336,7 @@ class Emulator:
     @staticmethod
     def get_system_config(
         system: str, defaultyml: str, defaultarchyml: str
-    ) -> Dict[str, Any]:
+    ) -> SystemConfigDict:
         """Load system-specific configuration, including emulator and core settings.
 
         Args:
@@ -242,7 +350,10 @@ class Emulator:
         dict_all = Emulator.get_generic_config(system, defaultyml, defaultarchyml)
 
         # Extract emulator and core, merge options
-        dict_result = {"emulator": dict_all["emulator"], "core": dict_all["core"]}
+        dict_result: SystemConfigDict = {
+            "emulator": dict_all["emulator"],
+            "core": dict_all["core"],
+        }
         if "options" in dict_all:
             Emulator.dict_merge(dict_result, dict_all["options"])
         return dict_result
@@ -251,10 +362,10 @@ class Emulator:
         """Check if a configuration option is set.
 
         Args:
-            key (str): The configuration option key.
+            key: The configuration option key.
 
         Returns:
-            bool: True if the key exists in the config, False otherwise.
+            True if the key exists in the config, False otherwise.
         """
         return key in self.config
 
@@ -262,10 +373,10 @@ class Emulator:
         """Get a configuration option as a boolean value.
 
         Args:
-            key (str): The configuration option key.
+            key: The configuration option key.
 
         Returns:
-            bool: True if the option is set to a truthy value, False otherwise.
+            True if the option is set to a truthy value, False otherwise.
         """
         true_values = {"1", "true", "on", "enabled", True}
         value = self.config.get(key)
@@ -279,27 +390,31 @@ class Emulator:
         """Get a configuration option as a string.
 
         Args:
-            key (str): The configuration option key.
+            key: The configuration option key.
 
         Returns:
-            str: The option value as a string, or empty string if not set.
+            The option value as a string, or empty string if not set.
         """
         return str(self.config.get(key, ""))
 
     @staticmethod
-    def updateConfiguration(config: Dict[str, Any], settings: Dict[str, Any]) -> None:
+    def updateConfiguration(config: SystemConfigDict, settings: Dict[str, Any]) -> None:
         """Update a configuration dictionary with new settings, ignoring invalid values.
 
         Args:
-            config (Dict[str, Any]): The configuration dictionary to update.
-            settings (Dict[str, Any]): The new settings to apply.
+            config: The configuration dictionary to update.
+            settings: The new settings to apply.
         """
         # Remove invalid settings ("default", "auto", or empty)
-        toremove = [k for k in settings if settings[k] in ("", "default", "auto")]
-        for k in toremove:
-            del settings[k]
+        # Using walrus operator to avoid re-evaluating settings[k]
+        invalid_settings = [
+            k for k, v in settings.items() if v in ("", "default", "auto")
+        ]
+        for k in invalid_settings:
+            settings.pop(k, None)  # Safely remove without KeyError
 
-        config.update(settings)
+        for key, value in settings.items():
+            config[key] = value
 
     def updateFromESSettings(self) -> None:
         """Update emulator config with settings from EmulationStation XML file.
@@ -318,7 +433,7 @@ class Emulator:
                 drawframerate_value = "false"
             if drawframerate_value not in ["false", "true"]:
                 drawframerate_value = "false"
-            self.config["showFPS"] = drawframerate_value
+            self.config["showFPS"] = drawframerate_value  # type: ignore
 
             # Read uimode setting
             uimode_elem = esConfig.find("./string[@name='UIMode']")
@@ -328,9 +443,9 @@ class Emulator:
                 uimode_value = "Full"
             if uimode_value not in ["Full", "Kiosk", "Kid"]:
                 uimode_value = "Full"
-            self.config["uimode"] = uimode_value
+            self.config["uimode"] = uimode_value  # type: ignore
 
         except Exception:
             # Use defaults if ES settings cannot be loaded
-            self.config["showFPS"] = "false"
-            self.config["uimode"] = "Full"
+            self.config["showFPS"] = "false"  # type: ignore
+            self.config["uimode"] = "Full"  # type: ignore

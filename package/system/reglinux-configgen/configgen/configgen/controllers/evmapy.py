@@ -14,7 +14,7 @@ from subprocess import call
 from json import load, dumps
 from os import path
 from evdev import InputDevice
-from controllers import mouseButtonToCode
+from .mouse import mouseButtonToCode
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)

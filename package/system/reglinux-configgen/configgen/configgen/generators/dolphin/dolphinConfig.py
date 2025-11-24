@@ -101,7 +101,7 @@ def readWriteFile(filepath, setval):
         f = open(filepath, "r+b")
 
     try:
-        version = readString(f, 4)  # read SCv0
+        readString(f, 4)  # read SCv0
         numEntries = readBEInt16(f)  # num entries
         offsetSize = (numEntries + 1) * 2  # offsets
         readBytes(f, offsetSize)
