@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from codecs import open
 from xml.dom import minidom
 from os import path, mkdir, linesep
 from glob import iglob, escape
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from .cemuControllers import setControllerConfig
 from .cemuConfig import (
     CEMU_BIN_PATH,
@@ -55,7 +55,7 @@ class CemuGenerator(Generator):
         if path.exists(CEMU_CONFIG_PATH):
             try:
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
-            except:
+            except Exception:
                 pass  # reinit the file
 
         # Create the settings file

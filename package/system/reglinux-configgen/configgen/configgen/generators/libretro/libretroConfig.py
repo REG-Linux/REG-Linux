@@ -46,7 +46,8 @@ def getInvertButtonsValue():
         if elem is not None:
             return elem.get("value") == "true"
         return False  # Return False if not found
-    except:
+    except Exception as e:
+        eslog.debug(f"Libretro: Error reading XML config - {str(e)}")
         return False  # when file is not yet here or malformed
 
 
@@ -973,7 +974,7 @@ def createLibretroConfig(
             retroarchConfig["input_libretro_device_p3"] = "259"
 
     # Smooth option
-    if system.isOptSet("smooth") and system.getOptBoolean("smooth") == True:
+    if system.isOptSet("smooth") and system.getOptBoolean("smooth"):
         retroarchConfig["video_smooth"] = "true"
     else:
         retroarchConfig["video_smooth"] = "false"
@@ -1012,7 +1013,7 @@ def createLibretroConfig(
 
     # Rewind option
     retroarchConfig["rewind_enable"] = "false"
-    if system.isOptSet("rewind") and system.getOptBoolean("rewind") == True:
+    if system.isOptSet("rewind") and system.getOptBoolean("rewind"):
         if not system.name in systemNoRewind:
             retroarchConfig["rewind_enable"] = "true"
         else:

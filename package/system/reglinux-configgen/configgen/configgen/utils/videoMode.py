@@ -145,7 +145,7 @@ def changeMouse(mode: bool) -> None:
 def getGLVersion():
     try:
         # Use eglinfo since we are KMS/DRM
-        if path.exists("/usr/bin/eglinfo") == False:
+        if not path.exists("/usr/bin/eglinfo"):
             return 0
 
         glxVerCmd = 'eglinfo | grep "OpenGL version"'
@@ -156,14 +156,14 @@ def getGLVersion():
             del glVerTemp[2:]
         glVersion = float(".".join(glVerTemp))
         return glVersion
-    except:
+    except (ValueError, TypeError, CalledProcessError):
         return 0
 
 
 def getGLVendor():
     try:
         # Use eglinfo since we are KMS/DRM
-        if path.exists("/usr/bin/eglinfo") == False:
+        if not path.exists("/usr/bin/eglinfo"):
             return "unknown"
 
         glxVendCmd = 'eglinfo | grep "OpenGL vendor string"'
@@ -171,7 +171,7 @@ def getGLVendor():
         glVendString = glVendOutput.split()
         glVendor = glVendString[3].casefold()
         return glVendor
-    except:
+    except (CalledProcessError, IndexError, AttributeError):
         return "unknown"
 
 

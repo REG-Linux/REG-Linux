@@ -55,7 +55,7 @@ emulatorMapping = {
 }
 
 
-def reconfigureControllers(playersControllers, system, rom, metadata, deviceList):
+def reconfigureControllers(playersControllers, system, metadata, deviceList):
     eslog.info("wheels reconfiguration")
     eslog.info("before wheel reconfiguration :")
     for playercontroller, pad in sorted(playersControllers.items()):
@@ -184,18 +184,29 @@ def reconfigureControllers(playersControllers, system, rom, metadata, deviceList
                     wanted_midzone,
                 )
                 if newdev is not None:
-                    eslog.info(
-                        "replacing device {} by device {} for player {}".format(
-                            pad.dev, newdev, playercontroller
+                    dev_match = match(r"^/dev/input/event([0-9]*)$", newdev)
+                    if dev_match:
+                        eslog.info(
+                            "replacing device {} by device {} for player {}".format(
+                                pad.dev, newdev, playercontroller
+                            )
                         )
-                    )
-                    deviceList[newdev] = dict(deviceList[pad.dev])
-                    deviceList[newdev]["eventId"] = controllersConfig.dev2int(newdev)
-                    pad.physdev = pad.dev  # save the physical device for ffb
-                    pad.dev = newdev  # needs to recompute sdl ids
-                    recomputeSdlIds = True
-                    newPads.append(newdev)
-                    procs.append(p)
+                        deviceList[newdev] = dict(deviceList[pad.dev])
+                        deviceList[newdev]["eventId"] = int(dev_match.group(1))
+                        pad.physdev = pad.dev  # save the physical device for ffb
+                        pad.dev = newdev  # needs to recompute sdl ids
+                        recomputeSdlIds = True
+                        newPads.append(newdev)
+                        procs.append(p)
+                    else:
+                        eslog.warning(
+                            "Unexpected device name from wheel calibrator: {}. Killing process.".format(
+                                newdev
+                            )
+                        )
+                        if p is not None:
+                            kill(p.pid, SIGTERM)
+                            p.communicate()
 
     # recompute sdl ids
     if recomputeSdlIds:
@@ -207,13 +218,13 @@ def reconfigureControllers(playersControllers, system, rom, metadata, deviceList
         # add the new devices
         for p in newPads:
             matches = match(r"^/dev/input/event([0-9]*)$", str(p))
-            if matches != None:
+            if matches is not None:
                 joysticks[int(matches.group(1))] = {"node": p}
         # find new sdl numeration
         joysticksByDev = {}
         currentId = 0
-        for e, x in sorted(joysticks.items()):
-            joysticksByDev[joysticks[e]["node"]] = currentId
+        for _, x in sorted(joysticks.items()):
+            joysticksByDev[x["node"]] = currentId
             currentId += 1
         # renumeration
         for playercontroller, pad in sorted(playersControllers.items()):
@@ -269,8 +280,10 @@ def reconfigureControllers(playersControllers, system, rom, metadata, deviceList
 def getWheelsFromDevicesInfos(deviceInfos):
     res = {}
     for x in deviceInfos:
-        if deviceInfos[x]["isWheel"]:
-            res[x] = deviceInfos[x]
+        # Verifica se deviceInfos[x] é um dicionário antes de acessar a chave
+        device_info = deviceInfos[x]
+        if isinstance(device_info, dict) and device_info.get("isWheel"):
+            res[x] = device_info
     return res
 
 
@@ -335,7 +348,8 @@ def reconfigureAngleRotation(
         fd = fdopen(pipeout)
         newdev = fd.readline().rstrip("\n")
         fd.close()
-    except:
+    except (OSError, IOError) as e:
+        eslog.error(f"Error reading from pipe: {str(e)}")
         kill(proc.pid, SIGTERM)
         proc.communicate()
         raise

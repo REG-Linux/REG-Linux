@@ -4,6 +4,9 @@ from os import mkdir, chdir, path
 from codecs import open
 from controllers import generate_sdl_controller_config
 from systemFiles import CONF, SAVES
+from configgen.utils.logger import get_logger
+
+eslog = get_logger(__name__)
 
 ECWOLF_CONFIG_DIR = CONF + "/ecwolf"
 ECWOLF_CONFIG_PATH = ECWOLF_CONFIG_DIR + "/ecwolf.cfg"
@@ -32,7 +35,7 @@ class ECWolfGenerator(Generator):
                 chdir(rom)
             # Only game directories, not .ecwolf or .pk3 files
             except Exception as e:
-                print(f"Error: couldn't go into directory {rom} ({e})")
+                eslog.error(f"Error: couldn't go into directory {rom} ({e})")
 
         # File method .ecwolf (recommended) for command parameters, first argument is path to dataset, next parameters according ecwolf --help
         # File method .pk3, put pk3 files next to wl6 dataset and start the mod in ES
@@ -50,7 +53,7 @@ class ECWolfGenerator(Generator):
                     try:
                         chdir(commandArray[1])
                     except Exception as e:
-                        print(
+                        eslog.error(
                             f"Error: couldn't go into directory {commandArray[1]} ({e})"
                         )
                     commandArray.pop(1)

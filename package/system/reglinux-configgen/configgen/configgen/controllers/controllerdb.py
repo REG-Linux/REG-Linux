@@ -3,17 +3,17 @@ Controller database management.
 Handles loading and matching controller configurations from gamecontrollerdb.txt.
 """
 
+from typing import Dict, Any, Tuple, Optional
 import os
 import asyncio
-from typing import Dict, List, Type, Optional
-from controllers import Controller, Input
-from concurrent.futures import ThreadPoolExecutor
+from .controller import Controller, Input
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
+
 @staticmethod
-def parse_line(line: str) -> tuple[str, dict] | None:
+def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
     line = line.strip()
     if not line or line.startswith("#"):
         return None
@@ -42,7 +42,8 @@ def parse_line(line: str) -> tuple[str, dict] | None:
         "input_objects": inputs,  # Backward compatible
     }
 
-def load_all_controllers_config() -> Dict[str, Dict]:
+
+def load_all_controllers_config() -> Dict[str, Dict[str, Any]]:
     """
     Load all controller configurations from gamecontrollerdb.txt.
     Hybrid version: synchronous file read, asynchronous parse with concurrency limit.
@@ -62,7 +63,7 @@ def load_all_controllers_config() -> Dict[str, Dict]:
 
             async def process_line(line):
                 async with sem:
-                    # Exécute parse_line (bloquante) dans un thread du pool
+                    # Execute parse_line (blocking) in a thread pool
                     return await loop.run_in_executor(None, parse_line, line)
 
             tasks = [process_line(line) for line in lines]

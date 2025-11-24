@@ -35,8 +35,8 @@ def squashfs_begin(rom):
         # try to remove an empty directory, else, run the directory, ignoring the .squashfs
         try:
             os.rmdir(rommountpoint)
-        except:
-            eslog.debug(f"squashfs_begin: failed to rmdir {rommountpoint}")
+        except (OSError, FileNotFoundError) as e:
+            eslog.debug(f"squashfs_begin: failed to rmdir {rommountpoint} - {str(e)}")
             return False, None, rommountpoint
 
     # ok, the base directory doesn't exist, let's create it and mount the squashfs on it
@@ -46,7 +46,10 @@ def squashfs_begin(rom):
         eslog.debug(f"squashfs_begin: mounting {rommountpoint} failed")
         try:
             os.rmdir(rommountpoint)
-        except:
+        except (OSError, FileNotFoundError) as e:
+            eslog.debug(
+                f"squashfs: failed to remove directory {rommountpoint} - {str(e)}"
+            )
             pass
         raise Exception(f"unable to mount the file {rom}")
 

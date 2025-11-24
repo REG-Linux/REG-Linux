@@ -1,6 +1,9 @@
 from systemFiles import CONF, ROMS, SAVES, SCREENSHOTS
 from subprocess import check_output, CalledProcessError
 from os import chdir
+from utils.logger import get_logger
+
+eslog = get_logger(__name__)
 
 CORSIXTH_CONFIG_DIR = CONF + "/CorsixTH"
 CORSIXTH_CONFIG_PATH = CORSIXTH_CONFIG_DIR + "/config.txt"
@@ -98,5 +101,6 @@ def setCorsixthConfig(corsixthConfig, system, gameResolution):
     try:
         chdir(CORSIXTH_ROMS_DIR + "/MP3")
         corsixthConfig.write("audio_music = [[" + CORSIXTH_ROMS_DIR + "/MP3" + "]]\n")
-    except:
+    except (FileNotFoundError, OSError) as e:
+        eslog.debug(f"Corsixth: Music directory not found: {CORSIXTH_ROMS_DIR}/MP3 - {str(e)}")
         corsixthConfig.write("audio_music = nil\n")

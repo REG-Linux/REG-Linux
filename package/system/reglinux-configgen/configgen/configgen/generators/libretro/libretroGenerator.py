@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, chdir
 from shutil import copyfile
-from systemFiles import OVERLAYS
-from settings import UnixSettings
-from utils.videoMode import getAltDecoration, getGLVendor, getGLVersion
+from configgen.systemFiles import OVERLAYS
+from configgen.settings import UnixSettings
+from configgen.utils.videoMode import getAltDecoration, getGLVendor, getGLVersion
 from .libretroConfig import (
     coreForceSlangShaders,
     retroarchCustom,
