@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-RETROARCH_VERSION = v1.22.0
-RETROARCH_SITE = $(call github,libretro,RetroArch,$(RETROARCH_VERSION))
+RETROARCH_VERSION = 1.22.2
+RETROARCH_SITE = https://github.com/libretro/RetroArch/releases/download/v$(RETROARCH_VERSION)
+RETROARCH_SOURCE = retroarch-sourceonly-$(RETROARCH_VERSION).tar.xz
 RETROARCH_LICENSE = GPLv3+
 RETROARCH_DEPENDENCIES = host-pkgconf dejavu retroarch-assets
 RETROARCH_DEPENDENCIES += libusb hidapi gamemode
