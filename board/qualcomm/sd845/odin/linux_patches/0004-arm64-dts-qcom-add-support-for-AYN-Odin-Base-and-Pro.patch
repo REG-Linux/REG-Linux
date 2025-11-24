@@ -28,10 +28,11 @@ new file mode 100644
 index 000000000..975513720
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
-@@ -0,0 +1,1126 @@
+@@ -0,0 +1,1250 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022, Teguh Sobirin.
++ * Copyright (c) 2024, Anton Bambura.
 + */
 +
 +/dts-v1/;
@@ -49,7 +50,7 @@ index 000000000..975513720
 +
 +/ {
 +	model = "AYN Odin";
-+	compatible = "ayn,odin", "qcom,sdm845", "qcom,mtp";
++	compatible = "ayn,odin", "qcom,sdm845";
 +	qcom,msm-id = <321 0x20001>;
 +	qcom,board-id = <8 0>;
 +	chassis-type = "tablet";
@@ -61,6 +62,13 @@ index 000000000..975513720
 +
 +	chosen {
 +		stdout-path = "serial0:115200n8";
++	};
++
++	/* Fixed crystal oscillator dedicated to MCP2517FD */
++	clk40M: can-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <40000000>;
 +	};
 +
 +	gpio-keys {
@@ -346,6 +354,33 @@ index 000000000..975513720
 +		voltage-max-design-microvolt = <4400000>;
 +	};
 +
++	connector {
++		compatible = "hdmi-connector";
++
++		label = "hdmi";
++		type = "d";
++
++		hdmi-pwr-supply = <&hdmi_en_reg>;
++		hpd-gpios = <&tlmm 121 GPIO_ACTIVE_HIGH>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&hdmi_hpd>;
++
++		port {
++			hdmi_con: endpoint {
++				remote-endpoint = <&lt8912b_out>;
++			};
++		};
++	};
++
++	hdmi_en_reg: hdmi-en-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "hdmi_en";
++
++		gpio = <&tlmm 13 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
 +	vph_pwr: vph-pwr-regulator {
 +		compatible = "regulator-fixed";
 +		regulator-name = "vph_pwr";
@@ -427,10 +462,6 @@ index 000000000..975513720
 +		vdda_usb1_ss_core:
 +		vdda_qusb_hs0_1p8:
 +		vdda_qusb_hs0_3p1:
-+		vdda_mipi_dsi0_1p2:
-+
-+		vdda_ufs1_1p2:
-+
 +		vreg_l1a_0p875: ldo1 {
 +			regulator-min-microvolt = <880000>;
 +			regulator-max-microvolt = <880000>;
@@ -554,11 +585,15 @@ index 000000000..975513720
 +	firmware-name = "qcom/sdm845/cdsp.mbn";
 +};
 +
++&mdss {
++	status = "okay";
++};
++
 +&mdss_dsi0 {
 +	status = "okay";
-+	vdda-supply = <&vdda_mipi_dsi0_1p2>;
++	vdda-supply = <&vreg_l26a_1p2>;
 +
-+	panel@0 {
++	display_panel: panel@0 {
 +		compatible = "innolux,td4328";
 +		status = "okay";
 +		reg = <0>;
@@ -573,8 +608,11 @@ index 000000000..975513720
 +		reset-gpios = <&tlmm 6 GPIO_ACTIVE_LOW>;
 +		rotation = <90>;
 +
++		pinctrl-names = "default";
++		pinctrl-0 = <&panel_reset_active>;
++
 +		port {
-+			panel_in_0: endpoint {
++			panel_in: endpoint {
 +				remote-endpoint = <&mdss_dsi0_out>;
 +			};
 +		};
@@ -582,13 +620,32 @@ index 000000000..975513720
 +};
 +
 +&mdss_dsi0_out {
-+	remote-endpoint = <&panel_in_0>;
++	remote-endpoint = <&panel_in>;
 +	data-lanes = <0 1 2 3>;
 +};
 +
 +&mdss_dsi0_phy {
 +	status = "okay";
 +	vdds-supply = <&vdda_mipi_dsi0_pll>;
++};
++
++&mdss_dsi1 {
++	vdda-supply = <&vreg_l26a_1p2>;
++	status = "okay";
++};
++
++&mdss_dsi1_out {
++	remote-endpoint = <&lt8912b_in>;
++	data-lanes = <0 1 2 3>;
++};
++
++&mdss_dsi1_phy {
++	vdds-supply = <&vreg_l1a_0p875>;
++	status = "okay";
++};
++
++&dispcc {
++	status = "okay";
 +};
 +
 +&gcc {
@@ -619,27 +676,61 @@ index 000000000..975513720
 +	};
 +};
 +
++&i2c4 {
++	status = "okay";
++	clock-frequency = <400000>;
++
++	hdmi-bridge@48 {
++		compatible = "lontium,lt8912b";
++		reg = <0x48>;
++		reset-gpios = <&tlmm 12 GPIO_ACTIVE_LOW>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++
++				lt8912b_in: endpoint {
++					data-lanes = <0 1 2 3>;
++					remote-endpoint = <&mdss_dsi1_out>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++
++				lt8912b_out: endpoint {
++					remote-endpoint = <&hdmi_con>;
++				};
++			};
++		};
++	};
++};
++
 +&i2c5 {
 +	status = "okay";
 +	clock-frequency = <400000>;
 +
-+	synaptics-rmi4-i2c@70 {
++	synaptics-rmi4-i2c@20 {
 +		compatible = "syna,rmi4-i2c";
-+		reg = <0x70>;
++		reg = <0x20>;
 +
 +		#address-cells = <1>;
 +		#size-cells = <0>;
 +
++		reset-gpios = <&tlmm 104 GPIO_ACTIVE_LOW>;
 +		interrupts-extended = <&tlmm 125 IRQ_TYPE_EDGE_FALLING>;
-+
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
 +
 +		vdd-supply = <&vreg_l28a_3p0>;
 +		vio-supply = <&vreg_l14a_1p8>;
 +
 +		syna,reset-delay-ms = <200>;
 +		syna,startup-delay-ms = <200>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&ts_int_active &ts_reset_active>;
 +
 +		rmi4-f01@1 {
 +			reg = <0x01>;
@@ -654,6 +745,23 @@ index 000000000..975513720
 +			syna,sensor-type = <1>;
 +			syna,rezero-wait-ms = <200>;
 +		};
++	};
++};
++
++&spi0 {
++	/*
++	 * TODO
++	 * [   16.605399] sdm845-pinctrl 3400000.pinctrl: pin GPIO_0 already requested by odin-gamepad; cannot claim for 880000.spi
++	 */
++	status = "disabled";
++	cs-gpios = <&tlmm 3 GPIO_ACTIVE_LOW>;
++
++	can@0 {
++		compatible = "microchip,mcp2517fd";
++		reg = <0>;
++		clocks = <&clk40M>;
++		interrupts-extended = <&tlmm 34 IRQ_TYPE_LEVEL_LOW>;
++		spi-max-frequency = <10000000>;
 +	};
 +};
 +
@@ -672,10 +780,6 @@ index 000000000..975513720
 +	regulator-over-current-protection;
 +	regulator-pull-down;
 +	regulator-soft-start;
-+};
-+
-+&mdss {
-+	status = "okay";
 +};
 +
 +&mss_pil {
@@ -882,8 +986,8 @@ index 000000000..975513720
 +};
 +
 +&sound {
-+	compatible = "qcom,sdm845-sndcard";
-+	model = "Odin";
++	compatible = "ayn,odin-sndcard", "qcom,sdm845-sndcard";
++	model = "AYN Odin";
 +
 +	audio-routing =
 +		"RX_BIAS", "MCLK",
@@ -959,6 +1063,11 @@ index 000000000..975513720
 +			sound-dai =  <&wcd9340 2>;
 +		};
 +	};
++};
++
++&slpi_pas {
++	firmware-name = "qcom/sdm845/AYN/Odin/slpi.mbn";
++	status = "okay";
 +};
 +
 +&tlmm {
@@ -1038,6 +1147,21 @@ index 000000000..975513720
 +			bias-pull-up;
 +		};
 +	};
++
++	panel_reset_active: panel-reset-active {
++		pins = "gpio6";
++		function = "gpio";
++		drive-strength = <16>;
++		bias-disable;
++	};
++
++	hdmi_hpd: hdmi-hpd-active {
++		pins = "gpio121";
++		function = "gpio";
++		drive-strength = <10>;
++		bias-pull-up;
++		input-enable;
++	};
 +};
 +
 +&uart6 {
@@ -1080,7 +1204,7 @@ index 000000000..975513720
 +};
 +
 +&usb_1_dwc3 {
-+	dr_mode = "host";
++	dr_mode = "peripheral";
 +};
 +
 +&usb_1_hsphy {
@@ -1155,6 +1279,3 @@ index 000000000..975513720
 +
 +	qcom,snoc-host-cap-8bit-quirk;
 +};
--- 
-2.43.0
-
