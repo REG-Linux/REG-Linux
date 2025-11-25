@@ -1,6 +1,6 @@
 # Qualcomm Board Support
 
-This folder gathers the Qualcomm-specific artifacts that REG-Linux needs to produce bootable images for the handhelds we ship. Each numbered subdirectory schools a particular SoC family; `sm8250` and `sm8550` already document their structure and workflows, while other directories (e.g., `sd845`, `sm6115`) currently lack dedicated README guides.
+This folder gathers the Qualcomm-specific artifacts that REG-Linux needs to produce bootable images for the handhelds we ship. Each numbered subdirectory schools a particular SoC family; `sm8250` and `sm8550` already document their structure and workflows, while other directories (e.g., `sdm845`, `sm6115`) currently lack dedicated README guides.
 
 ## sm8250 – Retroid Pocket family
 
@@ -67,4 +67,4 @@ Additional notes:
 
 ## Other directories
 
-- `sd845/` and `sm6115/` exist under this tree but do not yet have dedicated README documentation. Inspect their contents directly when you need to understand their workflow.
+- `sdm845/` and `sm6115/` exist under this tree but do not yet have dedicated README documentation. Inspect their contents directly when you need to understand their workflow.

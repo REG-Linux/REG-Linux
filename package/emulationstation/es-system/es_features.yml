@@ -407,7 +407,7 @@ libretro:
           s922x,
           s9gen4,
           a3gen2,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
         ]
@@ -7131,7 +7131,7 @@ azahar:
           bcm2711,
           bcm2712,
           rk3588,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
           s922x,
@@ -7211,7 +7211,7 @@ hypseus-singe:
           s922x,
           s9gen4,
           a3gen2,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
         ]
@@ -7257,7 +7257,7 @@ hypseus-singe:
           s922x,
           s9gen4,
           a3gen2,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
         ]
@@ -7389,7 +7389,7 @@ dolphin:
           s922x,
           s9gen4,
           a3gen2,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
         ]
@@ -8037,7 +8037,7 @@ duckstation:
           s922x,
           s9gen4,
           a3gen2,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
         ]
@@ -9331,7 +9331,7 @@ ppsspp:
           s922x,
           s9gen4,
           a3gen2,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
         ]
@@ -10220,7 +10220,7 @@ mame:
           s922x,
           s9gen4,
           a3gen2,
-          sd845,
+          sdm845,
           sm8250,
           sm8550,
         ]
