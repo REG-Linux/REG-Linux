@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-AMIBERRY_LITE_VERSION = v5.9.0
+AMIBERRY_LITE_VERSION = v5.9.1
 AMIBERRY_LITE_SITE = $(call github,BlitterStudio,amiberry-lite,$(AMIBERRY_LITE_VERSION))
 AMIBERRY_LITE_LICENSE = GPLv3
 AMIBERRY_LITE_DEPENDENCIES =  sdl2 sdl2_image sdl2_ttf mpg123 libxml2 libmpeg2 flac
