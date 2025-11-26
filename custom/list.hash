@@ -173,6 +173,8 @@ f3586b2f134ef6ef8f4b9ed2b8d03b6c  package/spirv-llvm-translator/spirv-llvm-trans
 99028d214327d553f874843d456ef0d2  package/spirv-tools/spirv-tools.mk
 4321aed0bc63551221429cf8082c2333  package/stella/stella.hash
 e3dfda998e09394fd4a89d50043c451f  package/stella/stella.mk
+d1b6c3f844f5d6b0b8632fde7f74d08a  package/strace/strace.hash
+fd0202a170e3af3da46c3d61e5fe8bda  package/strace/strace.mk
 d16824a23215fe7119ba463472fd046d  package/sway/Config.in
 b37a38f43729dd5a9350b34853a7e5b1  package/sway/sway.hash
 ac325f6d76ffe9ae2abec1a5b060403b  package/sway/sway.mk
