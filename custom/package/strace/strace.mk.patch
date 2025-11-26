@@ -1,0 +1,14 @@
+diff --git a/package/strace/strace.mk b/package/strace/strace.mk
+index 7bf1c24c1a..e54edd7f67 100644
+--- a/package/strace/strace.mk
++++ b/package/strace/strace.mk
+@@ -4,7 +4,8 @@
+ #
+ ################################################################################
+ 
+-STRACE_VERSION = 6.13
++# REG bump to 6.17 for kernel up to 6.17
++STRACE_VERSION = 6.17
+ STRACE_SOURCE = strace-$(STRACE_VERSION).tar.xz
+ STRACE_SITE = https://github.com/strace/strace/releases/download/v$(STRACE_VERSION)
+ STRACE_LICENSE = LGPL-2.1+
