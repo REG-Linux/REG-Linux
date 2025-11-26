@@ -5,7 +5,7 @@
 ################################################################################
 
 # Nov 26, 2025 (removed integrity check feature)
-REGLINUX_MSG_VERSION = ad8e6e8e7fd00efcf525027190503c27bdc09cde
+REGLINUX_MSG_VERSION = 6690176ae79baee77f52ff0b53c25e9da2e130f0
 REGLINUX_MSG_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_MSG_SITE = https://$(REGLINUX_MSG_TOKEN)@github.com/REG-Linux/regmsg
 REGLINUX_MSG_SITE_METHOD = git
