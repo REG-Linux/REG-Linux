@@ -1,12 +1,12 @@
---- a/xenia-build.py	2025-02-02 16:41:21.164034956 +0100
-+++ b/xenia-build.py	2025-02-02 16:42:34.942669846 +0100
-@@ -851,14 +851,15 @@
-                 f"-DCMAKE_BUILD_TYPE={args['config'].title()}",
-                 f"-DCMAKE_C_COMPILER={os.environ.get('CC', 'clang')}",
-                 f"-DCMAKE_CXX_COMPILER={os.environ.get('CXX', 'clang++')}",
+--- a/xenia-build.py	2025-11-27 15:20:05.640426412 +0100
++++ b/xenia-build.py	2025-11-27 15:21:06.634467241 +0100
+@@ -990,14 +990,15 @@
+                 f"-DCMAKE_BUILD_TYPE={cmake_build_type}",
+                 f"-DCMAKE_C_COMPILER={cc_compiler}",
+                 f"-DCMAKE_CXX_COMPILER={cxx_compiler}",
 -                "-GNinja"
 +                '-DCMAKE_MAKE_PROGRAM=%s' % (os.environ["NINJA"]),
-+                 '-GNinja'
++                '-GNinja'
              ] + pass_args, env=dict(os.environ))
              print("")
              if result != 0:

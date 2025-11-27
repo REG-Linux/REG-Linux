@@ -1,0 +1,11 @@
+--- a/xenia-build.py	2025-11-27 18:13:15.843427629 +0100
++++ b/xenia-build.py	2025-11-27 18:15:09.183335103 +0100
+@@ -787,7 +787,7 @@
+ 
+ def get_linux_cmake_build_type(config):
+     """Map the config name to the Linux-specific CMake build type."""
+-    machine = platform.machine().lower()
++    machine = os.environ["XENIA_ARCHITECTURE"]
+     arch_map = {
+         "x86_64": "x86_64",
+         "amd64": "x86_64",

@@ -1,0 +1,13 @@
+--- a/xenia-build.py	2025-11-27 18:41:49.745234315 +0100
++++ b/xenia-build.py	2025-11-27 18:42:18.994012830 +0100
+@@ -990,6 +990,10 @@
+                 f"-DCMAKE_BUILD_TYPE={cmake_build_type}",
+                 f"-DCMAKE_C_COMPILER={cc_compiler}",
+                 f"-DCMAKE_CXX_COMPILER={cxx_compiler}",
++		"-DCMAKE_C_COMPILER_WORKS=1",
++		"-DCMAKE_CXX_COMPILER_WORKS=1",
++		"-DCMAKE_SYSTEM_NAME=Linux",
++		"-DCMAKE_CROSSCOMPILING=1",
+                 '-DCMAKE_MAKE_PROGRAM=%s' % (os.environ["NINJA"]),
+                 '-GNinja'
+             ] + pass_args, env=dict(os.environ))

@@ -1,0 +1,11 @@
+--- a/xenia-build.py	2025-11-27 15:52:58.284157701 +0100
++++ b/xenia-build.py	2025-11-27 15:54:40.805666102 +0100
+@@ -940,7 +940,7 @@
+             run_platform_premake(cc=args["cc"])
+             print("")
+ 
+-        ensure_snappy_stubs_public()
++        #ensure_snappy_stubs_public()
+ 
+         print("- building (%s):%s..." % (
+             "all" if not len(args["target"]) else ", ".join(args["target"]),

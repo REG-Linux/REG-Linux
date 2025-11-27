@@ -41,17 +41,14 @@ diff --git a/src/xenia/app/premake5.lua b/src/xenia/app/premake5.lua
 index 11a7a01001..c7fae7a4fa 100644
 --- a/src/xenia/app/premake5.lua
 +++ b/src/xenia/app/premake5.lua
-@@ -97,6 +97,10 @@ project("xenia-app")
-       "xenia-hid-sdl",
+@@ -111,6 +111,7 @@
+       "xcb",
+       "X11-xcb",
+       "SDL2",
++      "xenia-hid-keyboard"
      })
  
-+  filter("platforms:not Windows")
-+    links({
-+      "xenia-hid-keyboard"
-+    })
-   filter("platforms:Linux")
-     links({
-       "X11",
+   filter("platforms:Windows-*")
 diff --git a/src/xenia/app/xenia_main.cc b/src/xenia/app/xenia_main.cc
 index d90246936c..8f459f0b7e 100644
 --- a/src/xenia/app/xenia_main.cc

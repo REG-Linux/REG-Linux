@@ -1,0 +1,26 @@
+--- a/third_party/premake-core/premake5.lua	2025-11-27 15:47:46.948314186 +0100
++++ b/third_party/premake-core/premake5.lua	2025-11-27 15:48:11.027662052 +0100
+@@ -311,9 +311,9 @@
+ 			"binmodules/**.*"
+ 		}
+ 
+-		if git_tag then
+-			defines { 'PREMAKE_VERSION="' .. git_tag .. '"'}
+-		end
++		--if git_tag then
++		defines { 'PREMAKE_VERSION="' .. 'dev' .. '"'}
++		--end
+ 
+ 		filter { "options:lua-src=contrib" }
+ 			includedirs { "contrib/lua/src", "contrib/luashim" }
+--- a/premake5.lua	2025-11-27 15:47:46.948314186 +0100
++++ b/premake5.lua	2025-11-27 15:48:11.027662052 +0100
+@@ -44,7 +44,7 @@
+ cdialect("C17")
+ cppdialect("C++20")
+ symbols("On")
+-fatalwarnings("All")
++--fatalwarnings("All")
+ 
+ -- TODO(DrChat): Find a way to disable this on other architectures.
+ if ARCH ~= "ppc64" then
