@@ -1,8 +1,8 @@
 diff --git a/Makefile b/Makefile
-index 8b69318233..ab8e2e69e2 100644
+index 7641f2cff6..9064a05feb 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -766,11 +766,14 @@ endif
+@@ -766,10 +766,14 @@ endif
  		{ echo "ERROR: we shouldn't have a /etc/ld.so.conf.d directory"; exit 1; } || true
  	mkdir -p $(TARGET_DIR)/etc
  	( \
@@ -10,7 +10,6 @@ index 8b69318233..ab8e2e69e2 100644
 -		echo "VERSION=$(BR2_VERSION_FULL)"; \
 -		echo "ID=buildroot"; \
 -		echo "VERSION_ID=$(BR2_VERSION)"; \
--		echo "PRETTY_NAME=\"Buildroot $(BR2_VERSION)\"" \
 +		echo "NAME=REG-Linux"; \
 +		echo "VERSION=$(REGLINUX_SYSTEM_VERSION)"; \
 +		echo "ID=$(REGLINUX_SYSTEM_ARCH)"; \
@@ -19,6 +18,6 @@ index 8b69318233..ab8e2e69e2 100644
 +		echo "BUILD_ID=$(REGLINUX_SYSTEM_BUILD_ID)"; \
 +		echo "RELEASE_TYPE=$(REGLINUX_SYSTEM_RELEASE_TYPE)"; \
 +		echo "LOGO=reglinux_logo"; \
+ 		echo "PRETTY_NAME=\"Buildroot $(BR2_VERSION)\"" \
  	) >  $(TARGET_DIR)/usr/lib/os-release
  	ln -sf ../usr/lib/os-release $(TARGET_DIR)/etc
- 

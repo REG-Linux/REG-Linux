@@ -1,8 +1,8 @@
 diff --git a/package/Config.in b/package/Config.in
-index 9b6bef6dd6..5358ccf6c2 100644
+index 74ca42066c..31099fbefb 100644
 --- a/package/Config.in
 +++ b/package/Config.in
-@@ -331,6 +331,7 @@ comment "Graphic applications"
+@@ -330,6 +330,7 @@ comment "Graphic applications"
  	source "package/pngquant/Config.in"
  	source "package/qt5cinex/Config.in"
  	source "package/rrdtool/Config.in"
