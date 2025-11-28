@@ -16,9 +16,12 @@ REGLINUX_BINARIES_DIR=$6
 
 DTB="rk3588-rock-5b.dtb"
 
+UBOOT_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+UBOOT_DEFCONFIG="rock5b-rk3588_defconfig"
+UBOOT_TARGET="rock-5b"
+
 mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-rock-5b"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-rock-5b/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-rock-5b/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+cd "${REGLINUX_BINARIES_DIR}/build-uboot-rock-5b/" && "${UBOOT_SCRIPT}" "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" "${UBOOT_DEFCONFIG}" "${UBOOT_TARGET}" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
