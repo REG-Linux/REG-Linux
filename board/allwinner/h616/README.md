@@ -12,7 +12,7 @@ Every board directory ships the boot assets Buildroot expects, while the top-lev
    - `BR2_ROOTFS_OVERLAY="board/allwinner/h616/fsoverlay"`
    - `BR2_ROOTFS_POST_IMAGE_SCRIPT="board/allwinner/h616/<board>/create-boot-script.sh"`
 3. Run `make`. The post-image script will:
-   - spawn `build-uboot.sh` for the chosen board (downloads U-Boot v2025.01 from ftp.denx.de, applies `patches/u-boot/*.patch`, builds with `BL31=${BINARIES_DIR}/bl31.bin`, and drops the SPL into `REGLINUX_BINARIES_DIR/uboot-<board>/`);
+   - invoke `board/allwinner/h616/build-uboot.sh`, our shared helper that caches the downloaded U-Boot v2025.01 tarball and extracted sources under `REGLINUX_BINARIES_DIR/build-uboot-cache`, applies `patches/u-boot/*.patch`, builds with `BL31=${BINARIES_DIR}/bl31.bin`, and places `u-boot-sunxi-with-spl.bin` in `REGLINUX_BINARIES_DIR/uboot-<board>/`;
    - stage the kernel, initrd, squashfs update, modules, firmware, rescue archive, DTB, and extlinux entry into `${REGLINUX_BINARIES_DIR}/boot`.
 4. `genimage --config board/allwinner/h616/<board>/genimage.cfg` (automatically triggered by REG-Linux) packs `reglinux.img` with the SPL, a 2 GiB FAT32 boot partition, and a 256 MiB userdata EXT4.
 
@@ -31,8 +31,8 @@ If you need to iterate on the bootloader without rebuilding the whole image, reu
 | `patches/u-boot/` | Patches applied by every `build-uboot.sh` invocation. |
 | `patches/mupen64plus-video-glide64mk2/` | Userland patch carried for GLES compatibility. |
 | `<board>/boot/` | Extlinux stanza (and optional boot scripts) for that target. |
-| `<board>/build-uboot.sh` | Fetches, patches, and compiles U-Boot v2025.01 for the board’s defconfig. |
-| `<board>/create-boot-script.sh` | Post-image helper that calls the U-Boot build and stages `/boot`. |
+| `build-uboot.sh` | Shared helper that downloads/patches U-Boot v2025.01 once, sets `BL31=${BINARIES_DIR}/bl31.bin`, and copies `u-boot-sunxi-with-spl.bin` into `REGLINUX_BINARIES_DIR/uboot-<target>/`. |
+| `<board>/create-boot-script.sh` | Post-image helper that calls the shared helper with the board’s defconfig/target and then stages `/boot`. |
 | `<board>/genimage.cfg` | Disk image description (partition sizes plus SPL offset/path). |
 
 ---
