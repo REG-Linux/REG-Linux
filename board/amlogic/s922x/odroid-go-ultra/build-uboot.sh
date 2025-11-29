@@ -6,10 +6,9 @@ HOST_DIR=$1
 BOARD_DIR=$2
 IMAGES_DIR=$3
 
-# Download toolchain
-wget "https://releases.linaro.org/components/toolchain/binaries/4.9-2017.01/aarch64-linux-gnu/gcc-linaro-4.9.4-2017.01-x86_64_aarch64-linux-gnu.tar.xz"
+wget -q "https://releases.linaro.org/components/toolchain/binaries/4.9-2017.01/aarch64-linux-gnu/gcc-linaro-4.9.4-2017.01-x86_64_aarch64-linux-gnu.tar.xz"
 tar -xf gcc-linaro-4.9.4-2017.01-x86_64_aarch64-linux-gnu.tar.xz
-wget "https://releases.linaro.org/components/toolchain/binaries/4.9-2017.01/arm-eabi/gcc-linaro-4.9.4-2017.01-x86_64_arm-eabi.tar.xz"
+wget -q "https://releases.linaro.org/components/toolchain/binaries/4.9-2017.01/arm-eabi/gcc-linaro-4.9.4-2017.01-x86_64_arm-eabi.tar.xz"
 tar -xf gcc-linaro-4.9.4-2017.01-x86_64_arm-eabi.tar.xz
 export PATH=$(pwd)/gcc-linaro-4.9.4-2017.01-x86_64_aarch64-linux-gnu/bin:$(pwd)/gcc-linaro-4.9.4-2017.01-x86_64_arm-eabi/bin/:$PATH
 

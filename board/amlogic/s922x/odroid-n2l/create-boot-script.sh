@@ -14,9 +14,11 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-odroidn2l"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-odroidn2l/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-odroidn2l/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+BUILD_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+BUILD_DIR="${REGLINUX_BINARIES_DIR}/build-uboot-odroidn2l"
+mkdir -p "${BUILD_DIR}" || exit 1
+cp "${BUILD_SCRIPT}" "${BUILD_DIR}/" || exit 1
+cd "${BUILD_DIR}" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${REGLINUX_BINARIES_DIR}" "odroid-n2l_defconfig" "odroid-n2l" "odroidn2l" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1

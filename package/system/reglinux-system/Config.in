@@ -86,7 +86,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_FUSE_ZAR			# Custom FUSE mounter for ZAR (ZArchive)
 
 	# minimal system required packages
-	select BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
+	select BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
 	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
 	select BR2_PACKAGE_ES_THEME_CANVAS		# emulationstation theme

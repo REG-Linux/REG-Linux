@@ -14,9 +14,13 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
+UBOOT_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+UBOOT_DEFCONFIG="x96_mate_defconfig"
+UBOOT_TARGET="x96-mate"
+
 mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-x96-mate"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-x96-mate/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-x96-mate/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+cd "${REGLINUX_BINARIES_DIR}/build-uboot-x96-mate" && "${UBOOT_SCRIPT}" \
+    "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" "${REGLINUX_BINARIES_DIR}" "${UBOOT_DEFCONFIG}" "${UBOOT_TARGET}" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
