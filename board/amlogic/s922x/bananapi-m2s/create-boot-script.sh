@@ -14,9 +14,11 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-bananapi_m2s"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-bananapi_m2s/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-bananapi_m2s/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+BUILD_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+BUILD_DIR="${REGLINUX_BINARIES_DIR}/build-uboot-bananapi_m2s"
+mkdir -p "${BUILD_DIR}" || exit 1
+cp "${BUILD_SCRIPT}" "${BUILD_DIR}/" || exit 1
+cd "${BUILD_DIR}" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${REGLINUX_BINARIES_DIR}" "bananapi-m2s_defconfig" "bananapi-m2s" "bananapi_m2s" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
