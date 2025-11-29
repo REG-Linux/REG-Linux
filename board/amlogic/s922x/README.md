@@ -12,7 +12,7 @@ and the Odroid Go Ultra handheld.
 
 Path | Description
 ---- | -----------
-`bananapi-m2s/`, `beelink-gtking*/`, `khadas-vim3/`, `odroid-*/`, `radxa-zero2pro/` | Per-board boot directories with `boot/`, `create-boot-script.sh`, `genimage.cfg`, and optional `build-uboot.sh`.
+`bananapi-m2s/`, `beelink-gtking/`, `beelink-gtking-pro/`, `khadas-vim3/`, `odroid-n2/`, `odroid-n2plus/`, `odroid-n2l/`, `radxa-zero2pro/` | Per-board boot directories with `boot/`, `create-boot-script.sh`, and `genimage.cfg`; they all reuse the shared `build-uboot.sh` helper under `board/amlogic/s922x/` (Odroid Go Ultra keeps its own flow).
 `fsoverlay/` | Shared overlay: HDMI ALSA defaults, Realtek 8188eu blacklist, and `S02overclock` init script for the overclockable boards.
 `linux-defconfig.config` | Base kernel configuration for this SoC family.
 `linux_patches/` | Large patch queue (joypad drivers, OGU panel/battery stack, Beelink quirks, overclocking OPPs, RK818 regulators, uvc fixes, etc.).
@@ -31,7 +31,7 @@ Board dir | Device tree(s) | Notes
 `khadas-vim3/` | `meson-g12b-a311d-khadas-vim3.dtb` | U-Boot 2024.01 + LibreELEC FIP; standard extlinux boot, matching the VIM3 vendor layout.
 `odroid-n2/` | `meson-g12b-odroid-n2.dtb` | Builds the Odroid N2 defconfig, drops both `boot.ini` and extlinux entries so the user can choose either boot method.
 `odroid-n2plus/` | `meson-g12b-odroid-n2-plus.dtb` | Similar to the N2 build but stages the N2+ DTB and copies `boot.ini` into the VFAT partition.
-`odroid-n2l/` | `meson-g12b-odroid-n2l.dtb` | Uses a helper U-Boot build script that patches the defconfig to retry eMMC boot in a loop (helps with slow eMMC init). Wraps the kernel with `mkimage` and ships `boot.ini`, `config.ini`, and a gzipped splash.
+`odroid-n2l/` | `meson-g12b-odroid-n2l.dtb` | Builds U-Boot 2024.01 with the shared helper (plus `odroid-n2l/patches/uboot/0001-add-bootcommand.patch` so the defconfig retries distro boot) before wrapping the kernel with `mkimage` and shipping `boot.ini`, `config.ini`, and a gzipped splash.
 `odroid-go-ultra/` | `meson-g12b-odroid-go-ultra.dtb` | Special handheld target: copies `boot.ini`, uses the handheld-specific U-Boot patches in `patches/uboot-ogu`, stages `ODROIDBIOS.BIN` + the `res/` folder for the recovery UI, and keeps the initrd in `uInitrd` format.
 `radxa-zero2pro/` | `meson-g12b-radxa-zero2.dtb` | Builds U-Boot 2024.01 (`radxa-zero2_defconfig`) with the shared patches, then stages extlinux + DTB.
 
@@ -90,14 +90,20 @@ Artifacts live under
 
 - Each board’s `create-boot-script.sh` copies the boot payload into
   `${REGLINUX_BINARIES_DIR}/boot/boot/`, drops either an extlinux entry
-  or `boot.ini`/`uEnv.txt`, and if required runs the board’s
-  `build-uboot.sh`.
-- U-Boot builds (2024.01) pull from ftp.denx.de, apply
-  `patches/uboot/*.patch`, then run LibreELEC’s
-  `amlogic-boot-fip` helper to generate flashable binaries. The N2L
-  helper additionally edits the defconfig to retry boot if eMMC fails.
-- `odroid-go-ultra/create-boot-script.sh` copies the `res/` assets and
-  `ODROIDBIOS.BIN` that Hardkernel expects in recovery mode.
+  or `boot.ini`/`uEnv.txt`, and now drives the shared
+  `board/amlogic/s922x/build-uboot.sh` helper to rebuild the U-Boot
+  payloads next to the rest of the staged binaries.
+- The helper caches the U-Boot tarball and LibreELEC `amlogic-boot-fip`
+  repo under `${REGLINUX_BINARIES_DIR}/build-uboot-cache/`, builds a
+  clean copy of 2024.01, applies `patches/uboot/*.patch` (plus any
+  `BOARD_DIR/patches/uboot/*.patch`, e.g.
+  `odroid-n2l/patches/uboot/0001-add-bootcommand.patch`), and runs
+  `./build-fip.sh` so every `uboot-<target>/` tree lives next to the
+  assembled boot files.
+- `odroid-go-ultra/create-boot-script.sh` still copies the `res/` assets
+  and `ODROIDBIOS.BIN` that Hardkernel expects in recovery mode and uses
+  the handheld-specific `patches/uboot-ogu` flow because it ships a
+  bespoke U-Boot fork.
 - `genimage.cfg` files follow the standard 2 GiB boot + 256 MiB userdata
   layout, with some boards (VIM3, Odroid Go Ultra) inserting a bootloader
   blob at offset 0.
