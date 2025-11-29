@@ -1,0 +1,13 @@
+diff --git a/poppler/FlateEncoder.cc b/poppler/FlateEncoder.cc
+index 1cfbd64..455f7e9 100644
+--- a/poppler/FlateEncoder.cc
++++ b/poppler/FlateEncoder.cc
+@@ -33,7 +33,7 @@ FlateEncoder::FlateEncoder(Stream *strA) : FilterStream(strA)
+     // -Wzero-as-null-pointer-constant warning.
+     // For safety, check that the Z_NULL definition is equivalent to
+     // 0 / null pointer.
+-    static_assert(static_cast<int>(Z_NULL) == 0);
++    static_assert(reinterpret_cast<intptr_t>(Z_NULL) == 0, "Z_NULL must be zero");
+     zlib_stream.zalloc = nullptr;
+     zlib_stream.zfree = nullptr;
+     zlib_stream.opaque = nullptr;
