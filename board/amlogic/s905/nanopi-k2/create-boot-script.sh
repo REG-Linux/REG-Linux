@@ -14,9 +14,11 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-nanopi-k2"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh" "${REGLINUX_BINARIES_DIR}/build-uboot-nanopi-k2/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-nanopi-k2/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+BUILD_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+BUILD_DIR="${REGLINUX_BINARIES_DIR}/build-uboot-nanopi-k2"
+mkdir -p "${BUILD_DIR}" || exit 1
+cp "${BUILD_SCRIPT}" "${BUILD_DIR}/" || exit 1
+cd "${BUILD_DIR}" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${REGLINUX_BINARIES_DIR}" "nanopi-k2_defconfig" "nanopi-k2" "nanopi-k2" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
