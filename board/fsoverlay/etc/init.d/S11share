@@ -289,6 +289,4 @@ fi
 touch /var/run/system.share.mounted
 # Remove carriage returns from .conf file
 grep -q "$(printf '\r')" /userdata/system/system.conf 2>/dev/null && tr -d '\r' < /userdata/system/system.conf > /tmp/system.conf.tmp && mv /tmp/system.conf.tmp /userdata/system/system.conf
-dmesg > /userdata/system/kernel.log
-sync
 echo "done."
