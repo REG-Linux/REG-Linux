@@ -114,9 +114,9 @@ if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY          || \
     default y
 endif
 
-config BR2_TARGET_BATOCERA_IMAGES_DEFINITIONS
+config BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 	bool "target images definitions"
-	config BR2_TARGET_BATOCERA_IMAGES
+	config BR2_TARGET_REGLINUX_IMAGES
 	string "target images"
 
 	# Allwinner targets
