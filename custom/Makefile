@@ -92,9 +92,9 @@ all:
 .PHONY: all
 
 # Set and export the version string
-export BR2_VERSION := 2025.02.7
+export BR2_VERSION := 2025.02.8
 # Actual time the release is cut (for reproducible builds)
-BR2_VERSION_EPOCH = 1760217300
+BR2_VERSION_EPOCH = 1763674300
 
 # Save running make version since it's clobbered by the make package
 RUNNING_MAKE_VERSION := $(MAKE_VERSION)
@@ -774,6 +774,7 @@ endif
 		echo "BUILD_ID=$(REGLINUX_SYSTEM_BUILD_ID)"; \
 		echo "RELEASE_TYPE=$(REGLINUX_SYSTEM_RELEASE_TYPE)"; \
 		echo "LOGO=reglinux_logo"; \
+		echo "PRETTY_NAME=\"Buildroot $(BR2_VERSION)\"" \
 	) >  $(TARGET_DIR)/usr/lib/os-release
 	ln -sf ../usr/lib/os-release $(TARGET_DIR)/etc
 

@@ -1,8 +1,8 @@
 diff --git a/package/libcurl/libcurl.mk b/package/libcurl/libcurl.mk
-index 0aa88044bd..a501ad1644 100644
+index 51b8c4d147..9380134edd 100644
 --- a/package/libcurl/libcurl.mk
 +++ b/package/libcurl/libcurl.mk
-@@ -189,4 +189,17 @@ endef
+@@ -188,4 +188,17 @@ endef
  LIBCURL_POST_INSTALL_TARGET_HOOKS += LIBCURL_TARGET_CLEANUP
  endif
  

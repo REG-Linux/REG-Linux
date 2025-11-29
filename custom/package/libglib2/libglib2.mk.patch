@@ -1,5 +1,5 @@
 diff --git a/package/libglib2/libglib2.mk b/package/libglib2/libglib2.mk
-index b8c853b752..0de7ebf1e4 100644
+index e0ef652593..42ed46f43b 100644
 --- a/package/libglib2/libglib2.mk
 +++ b/package/libglib2/libglib2.mk
 @@ -4,8 +4,8 @@
