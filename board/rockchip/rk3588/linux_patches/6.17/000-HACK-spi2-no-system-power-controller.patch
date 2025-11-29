@@ -1,0 +1,11 @@
+--- a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts	2025-11-28 00:29:02.098695453 +0100
++++ b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts	2025-11-28 00:29:13.087067507 +0100
+@@ -1055,7 +1055,7 @@
+ 			    <&rk806_dvs2_null>, <&rk806_dvs3_null>;
+ 		pinctrl-names = "default";
+ 		spi-max-frequency = <1000000>;
+-		system-power-controller;
++		/*system-power-controller;*/
+ 
+ 		vcc1-supply = <&vcc5v0_sys>;
+ 		vcc2-supply = <&vcc5v0_sys>;

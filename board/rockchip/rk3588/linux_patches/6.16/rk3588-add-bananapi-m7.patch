@@ -1,0 +1,23 @@
+--- a/dev/null	2025-05-31 13:06:09.686817438 +0200
++++ b/arch/arm64/boot/dts/rockchip/rk3588-bananapi-m7.dts	2025-06-09 14:29:19.473090405 +0200
+@@ -0,0 +1,10 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++
++/dts-v1/;
++
++#include "rk3588-armsom-sige7.dts"
++
++/ {
++	model = "Banana Pi M7";
++	compatible = "bananapi,m7", "rockchip,rk3588";
++};
+--- a/arch/arm64/boot/dts/rockchip/Makefile	2025-06-08 22:44:43.000000000 +0200
++++ b/arch/arm64/boot/dts/rockchip/Makefile	2025-06-09 14:30:37.332856472 +0200
+@@ -148,6 +148,7 @@
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3576-rock-4d.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3582-radxa-e52c.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-armsom-sige7.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-bananapi-m7.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-armsom-w3.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-coolpi-cm5-evb.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-coolpi-cm5-genbook.dtb

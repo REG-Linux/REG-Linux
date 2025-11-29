@@ -14,9 +14,11 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-vim"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-vim/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-vim/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+BUILD_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+BUILD_DIR="${REGLINUX_BINARIES_DIR}/build-uboot-vim"
+mkdir -p "${BUILD_DIR}" || exit 1
+cp "${BUILD_SCRIPT}" "${BUILD_DIR}/" || exit 1
+cd "${BUILD_DIR}" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${REGLINUX_BINARIES_DIR}" "khadas-vim_defconfig" "khadas-vim" "vim" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
@@ -42,6 +44,6 @@ cp "${BOARD_DIR}/boot/aml_autoscript.zip"       "${REGLINUX_BINARIES_DIR}/boot/"
 cp "${BOARD_DIR}/boot/s905_autoscript.cmd"      "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
 cp "${BOARD_DIR}/boot/s905_autoscript"          "${REGLINUX_BINARIES_DIR}/boot/" || exit 1
 # Finally, copy the u-boot.bin raw payload (mainline) to root of SD card as u-boot.bin
-cp "${REGLINUX_BINARIES_DIR}/uboot-vim/u-boot.raw" "${REGLINUX_BINARIES_DIR}/boot/u-boot.bin" || exit 1
+cp "$(dirname "${REGLINUX_BINARIES_DIR}")/uboot-vim/u-boot.raw" "${REGLINUX_BINARIES_DIR}/boot/u-boot.bin" || exit 1
 
 exit 0

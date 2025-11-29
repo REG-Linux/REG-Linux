@@ -16,7 +16,7 @@ consistent across the fleet.
 Path | Description
 ---- | -----------
 `fsoverlay/` | Shared ALSA policy and temperature helper scripts for every GXBB/GXL build.
-`khadas-vim1/`, `lepotato*/`, `minix-neo-u1/`, `nanopi-k2/`, `odroid-c2/`, `p201/`, `s905-tvbox/` | Per-board boot assets (`boot/`), `create-boot-script.sh`, `genimage.cfg`, and optional `build-uboot.sh`.
+`khadas-vim1/`, `lepotato*/`, `minix-neo-u1/`, `nanopi-k2/`, `odroid-c2/`, `p201/`, `s905-tvbox/` | Per-board boot assets (`boot/`), `create-boot-script.sh`, `genimage.cfg`; every board now calls the shared `board/amlogic/s905/build-uboot.sh` helper so U-Boot rebuilds from a clean cache before staging.
 `patches/uboot/` | Patch set applied to every mainline U-Boot build (suppress HDMI console, keep stdout on UART, prefer USB/NVMe boot, etc.).
 `patches/ppsspp` & `patches/mupen64plus*` | Emulator fixes so Lima+Wayland renders correctly on these 32/64-bit Mali GPUs.
 
@@ -47,10 +47,17 @@ Board dir | Device tree(s) | Notes
   analog codec unmuted as `sysdefault`.
 - `fsoverlay/usr/bin/cputemp` and `gputemp` expose SoC thermals to the
   frontend UI.
-- `patches/uboot/*.patch` is applied by every `build-uboot.sh` helper
-  (Le Potato, NanoPi K2, Odroid-C2, Khadas VIM1, Minix, P201). They
-  silence the framebuffer console, prevent the boot log from hijacking
-  HDMI, and adjust device names so `fdtdir /boot/boot` works.
+- `patches/uboot/*.patch` is applied by every board’s shared
+  `build-uboot.sh` helper (Le Potato, NanoPi K2, Odroid-C2, Khadas VIM1,
+  Minix, P201). They silence the framebuffer console, prevent the boot
+  log from hijacking HDMI, and adjust device names so `fdtdir /boot/boot`
+  works.
+
+- `build-uboot.sh` also caches the 2025.01 tarball + LibreELEC
+  `amlogic-boot-fip` repo under `output/s905/images/reglinux/build-uboot-cache/`,
+  applies the shared board patches plus any per-board ones, and builds
+  each board from a clean copy so re-running the post-image flow never
+  works off previously patched sources.
 - Emulator/SDL patches keep Wayland+KMS stable with the Lima driver.
 
 Boards using `s905-tvbox` still rely on vendor U-Boot, so

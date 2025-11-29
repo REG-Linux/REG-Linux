@@ -16,9 +16,12 @@ REGLINUX_BINARIES_DIR=$6
 
 DTB="rk3588-orangepi-5-plus.dtb"
 
+UBOOT_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+UBOOT_DEFCONFIG="orangepi-5-plus-rk3588_defconfig"
+UBOOT_TARGET="orangepi-5-plus"
+
 mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-orangepi-5-plus"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-orangepi-5-plus/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-orangepi-5-plus/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+cd "${REGLINUX_BINARIES_DIR}/build-uboot-orangepi-5-plus" && "${UBOOT_SCRIPT}" "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" "${UBOOT_DEFCONFIG}" "${UBOOT_TARGET}" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
