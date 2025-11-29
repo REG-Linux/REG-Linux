@@ -1,0 +1,2 @@
+Allwinner A527/T527 boards 
+NOT WORKING AT THE MOMENT
