@@ -1,0 +1,3 @@
+#!/bin/dash
+cp -f /var/log/* /userdata/system/logs/
+dmesg > /userdata/system/logs/dmesg.log

@@ -93,10 +93,10 @@ else
 endif
 
 ifneq (,$(findstring dev,$(REGLINUX_SYSTEM_VERSION)))
-    REGLINUX_SYSTEM_BUILD_ID = \
-	    "$(shell cd $(BR2_EXTERNAL_REGLINUX_PATH) && git rev-parse --short HEAD)"
+	REGLINUX_SYSTEM_BUILD_ID = \
+		"$(shell cd $(BR2_EXTERNAL_REGLINUX_PATH) && git rev-parse --short HEAD)"
 else
-    REGLINUX_SYSTEM_BUILD_ID =
+	REGLINUX_SYSTEM_BUILD_ID =
 endif
 
 define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
@@ -105,27 +105,31 @@ define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux
 	echo -n "$(REGLINUX_SYSTEM_ARCH)" > $(TARGET_DIR)/usr/share/reglinux/system.arch
 	echo $(REGLINUX_SYSTEM_VERSION)-$(REGLINUX_SYSTEM_BUILD_ID) \
-	    $(REGLINUX_SYSTEM_DATE_TIME) > \
+		$(REGLINUX_SYSTEM_DATE_TIME) > \
 		$(TARGET_DIR)/usr/share/reglinux/system.version
 
 	# datainit
-        mkdir -p $(TARGET_DIR)/usr/share/reglinux
-        rsync -arv $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/datainit/ $(TARGET_DIR)/usr/share/reglinux/datainit/
+	mkdir -p $(TARGET_DIR)/usr/share/reglinux
+	rsync -arv $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/datainit/ $(TARGET_DIR)/usr/share/reglinux/datainit/
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system
-	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/system.conf \
-	    $(TARGET_DIR)/usr/share/reglinux/datainit/system
-	if test "$(BR2_ENABLE_DEBUG)" != "y" ; then sed -i "s/system\.security\.enabled\=0/system\.security\.enabled\=1/" "$(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf"; fi
+	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/system.conf $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
+	if test "$(BR2_ENABLE_DEBUG)" != "y" ; then \
+		rm -f "$(TARGET_DIR)/usr/share/reglinux/services/LOGS" ; \
+		sed -i "s/system\.security\.enabled\=0/system\.security\.enabled\=1/" "$(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf" ; \
+	else \
+		sed -i "s/system\.services\=SAMBA/system\.services\=LOGS SAMBA/" "$(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf" ; \
+	fi
 
 
 	# system-boot.conf
 	$(INSTALL) -D -m 0644 \
-	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/system-boot.conf \
+		$(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/system-boot.conf \
 		$(BINARIES_DIR)/system-boot.conf
 
 	# sysconfigs (default system.conf for boards)
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/sysconfigs
 	if test -d \
-	    $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/sysconfigs/${REGLINUX_SYSTEM_ARCH}; \
+		$(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/sysconfigs/${REGLINUX_SYSTEM_ARCH}; \
 		then cp -pr \
 		$(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/sysconfigs/${REGLINUX_SYSTEM_ARCH}/* \
 		$(TARGET_DIR)/usr/share/reglinux/sysconfigs; fi
@@ -136,9 +140,9 @@ define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 	# variables
 	mkdir -p $(TARGET_DIR)/etc/profile.d
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/xdg.sh \
-	    $(TARGET_DIR)/etc/profile.d/xdg.sh
+		$(TARGET_DIR)/etc/profile.d/xdg.sh
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/dbus.sh \
-	    $(TARGET_DIR)/etc/profile.d/dbus.sh
+		$(TARGET_DIR)/etc/profile.d/dbus.sh
 
 	# list of modules that doesnt like suspend
 	mkdir -p $(TARGET_DIR)/etc/pm/config.d
