@@ -1,0 +1,114 @@
+--- /dev/null
++++ b/Documentation/devicetree/bindings/display/panel/innolux,td4328.yaml
+@@ -0,0 +1,83 @@
++# SPDX-License-Identifier: GPL-2.0
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/display/panel/innolux,td4328.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Synaptics TD4328 based DSI display Panels
++
++maintainers:
++  - Teguh Sobirin <teguh@sobir.in>
++
++description: |
++  The TD4328 IC from Synaptics is a DSI Panel IC used to drive DSI panels.
++
++allOf:
++  - $ref: panel-common.yaml#
++
++properties:
++  compatible:
++    const: innolux,td4328
++    description: This indicates the panel manufacturer of the panel that is
++      in turn using the TD4328 panel driver.
++
++  reset-gpios:
++    maxItems: 1
++    description: phandle of gpio for reset line - This should be 8mA, gpio
++      can be configured using mux, pinctrl, pinctrl-names (active high)
++
++  vddio-supply:
++    description: phandle of the regulator that provides the supply voltage
++      Power IC supply
++
++  vddpos-supply:
++    description: phandle of the positive boost supply regulator
++
++  vddneg-supply:
++    description: phandle of the negative boost supply regulator
++
++  rotation:
++    description: Display rotation in degrees counter clockwise (0,90,180,270)
++
++  reg: true
++  port: true
++
++required:
++  - compatible
++  - reg
++  - vddio-supply
++  - vddpos-supply
++  - vddneg-supply
++  - reset-gpios
++  - rotation
++  - port
++
++unevaluatedProperties: false
++
++examples:
++  - |+
++    #include <dt-bindings/gpio/gpio.h>
++
++    dsi0 {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        panel@0 {
++            compatible = "innolux,td4328";
++            reg = <0>;
++            vddio-supply = <&vreg_l14a_1p88>;
++            vddpos-supply = <&lab>;
++            vddneg-supply = <&ibb>;
++
++            reset-gpios = <&tlmm 6 GPIO_ACTIVE_HIGH>;
++            rotation = <90>;
++
++            port {
++                panel0_in: endpoint {
++                    remote-endpoint = <&dsi0_out>;
++                };
++            };
++        };
++    };
++
++...
+--- a/drivers/gpu/drm/panel/Makefile   2025-11-29 17:04:48.602476112 +0100
++++ b/drivers/gpu/drm/panel/Makefile   2025-11-29 17:05:04.484723136 +0100
+@@ -30,6 +30,7 @@
+ obj-$(CONFIG_DRM_PANEL_ILITEK_ILI9882T) += panel-ilitek-ili9882t.o
+ obj-$(CONFIG_DRM_PANEL_INNOLUX_EJ030NA) += panel-innolux-ej030na.o
+ obj-$(CONFIG_DRM_PANEL_INNOLUX_P079ZCA) += panel-innolux-p079zca.o
++obj-$(CONFIG_DRM_PANEL_INNOLUX_TD4328) += panel-innolux-td4328.o
+ obj-$(CONFIG_DRM_PANEL_JADARD_JD9365DA_H3) += panel-jadard-jd9365da-h3.o
+ obj-$(CONFIG_DRM_PANEL_JDI_LT070ME05000) += panel-jdi-lt070me05000.o
+ obj-$(CONFIG_DRM_PANEL_JDI_LPM102A188A) += panel-jdi-lpm102a188a.o
+--- a/drivers/gpu/drm/panel/Kconfig    2025-11-29 17:06:55.057689220 +0100
++++ b/drivers/gpu/drm/panel/Kconfig    2025-11-29 17:07:05.591405709 +0100
+@@ -291,6 +291,15 @@
+         24 bit RGB per pixel. It provides a MIPI DSI interface to
+         the host and has a built-in LED backlight.
+ 
++config DRM_PANEL_INNOLUX_TD4328
++        tristate "Innolux TD4328 DSI panel"
++        depends on OF
++        depends on DRM_MIPI_DSI
++        depends on BACKLIGHT_CLASS_DEVICE
++        help
++          Say Y here if you want to enable support for the panels built
++          around the Innolux TD4328 display controller.
++
+ config DRM_PANEL_JADARD_JD9365DA_H3
+       tristate "Jadard JD9365DA-H3 WXGA DSI panel"
+       depends on OF
