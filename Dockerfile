@@ -28,6 +28,8 @@ RUN apt-get -o APT::Retries=3 update -y && \
     gcc-multilib \
     git \
     gzip \
+    libcurl4 \
+    libcurl4-openssl-dev \
     libgnutls28-dev \
     libncurses-dev \
     libssl-dev \
