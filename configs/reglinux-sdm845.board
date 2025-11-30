@@ -1,5 +1,5 @@
 include toolchain-gcc14-glibc.common
-include reglinux-board.mini
+include reglinux-board.common
 
 # Target definition
 BR2_aarch64=y
