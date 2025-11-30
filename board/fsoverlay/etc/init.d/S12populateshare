@@ -40,9 +40,6 @@ case "$1" in
 
             mkdir -p /userdata/system/logs
 
-            # DEBUG to be removed later
-            dmesg > /userdata/system/logs/kernel.log && sync
-
             LOGFILE="/userdata/system/logs/extracted.files.log"
             if [ -n "$EMPTYSHARE" ]; then
                 /usr/bin/plymouth display-message --text="Updating BIOS and other files in /userdata"
