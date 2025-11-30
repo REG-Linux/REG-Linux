@@ -115,7 +115,7 @@ define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/system.conf $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
 
 	# LOGS service and security settings
-	if [ "$(BR2_ENABLE_DEBUG)" = "y" ] || [ "$(MINI_BUILD)" = "y" ] ; then \
+	if test "$(BR2_ENABLE_DEBUG)" = "y" -o "$(MINI_BUILD)" = "y" ; then \
 		sed -i "s/system\.services\=SAMBA/system\.services\=LOGS SAMBA/" "$(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf" ; \
 	else \
 		rm -f "$(TARGET_DIR)/usr/share/reglinux/services/LOGS" ; \

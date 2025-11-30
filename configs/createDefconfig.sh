@@ -15,27 +15,31 @@ TMPL1="${BNAME}_defconfig.tmpl1"
 CONFDIR=$(dirname "${FBOARD}")
 FDEFCONFIG="${BNAME}_defconfig"
 
-> "${TMPL0}" || exit 1 # level 0
-> "${TMPL1}" || exit 1 # level 1 (includes of includes)
+: > "${TMPL0}" || exit 1 # level 0
+: > "${TMPL1}" || exit 1 # level 1 (includes of includes)
 
-grep -E 'include ' "${FBOARD}" | while read INC X
+grep -E 'include ' "${FBOARD}" | while read -r INC X
 do
-    if [ "${X}" = "reglinux-board.common" ] && [ "${MINI_BUILD}" = "y" ]; then
+    if test "$X" = "reglinux-board.common" -a "$MINI_BUILD" = "y" ; then
         X="reglinux-board.mini"
     fi
-    echo "# from file ${X}" >> "${TMPL0}"
-    cat "${CONFDIR}/${X}"   >> "${TMPL0}"
-    echo                    >> "${TMPL0}"
+    {
+    echo "# from file ${X}"
+    cat "${CONFDIR}/${X}"
+    echo
+    } >> "${TMPL0}"
 done
 
-grep -E 'include ' "${TMPL0}" | while read INC X
+grep -E 'include ' "${TMPL0}" | while read -r INC X
 do
-    echo "# from file ${X}" >> "${TMPL1}"
-    cat "${CONFDIR}/${X}"   >> "${TMPL1}"
-    echo                    >> "${TMPL1}"
+    {
+    echo "# from file ${X}"
+    cat "${CONFDIR}/${X}"
+    echo
+    } >> "${TMPL1}"
 done
 
-> "${FDEFCONFIG}" || exit 1
+: > "${FDEFCONFIG}" || exit 1
 grep -vE '^include ' "${TMPL1}" >> "${FDEFCONFIG}"
 grep -vE '^include ' "${TMPL0}" >> "${FDEFCONFIG}"
 
@@ -44,5 +48,3 @@ rm -f "${TMPL0}" || exit 1
 
 echo "### from board file ###"   >> "${FDEFCONFIG}" || exit 1
 grep -vE '^include ' "${FBOARD}" >> "${FDEFCONFIG}" || exit 1
-
-exit 0
