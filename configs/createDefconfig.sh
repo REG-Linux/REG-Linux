@@ -20,6 +20,9 @@ FDEFCONFIG="${BNAME}_defconfig"
 
 grep -E 'include ' "${FBOARD}" | while read INC X
 do
+    if [ "${X}" = "reglinux-board.common" ] && [ "${MINI_BUILD}" = "y" ]; then
+        X="reglinux-board.mini"
+    fi
     echo "# from file ${X}" >> "${TMPL0}"
     cat "${CONFDIR}/${X}"   >> "${TMPL0}"
     echo                    >> "${TMPL0}"
