@@ -9,8 +9,8 @@
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-cheza-r2.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-cheza-r3.dtb
 --- /dev/null	2025-11-05 16:45:21.260115671 +0100
-+++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts	2025-11-30 16:50:41.746814684 +0100
-@@ -0,0 +1,1124 @@
++++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts	2025-11-30 21:29:31.262602248 +0100
+@@ -0,0 +1,1122 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022, Teguh Sobirin.
@@ -539,7 +539,6 @@
 +&mdss_dsi0 {
 +	status = "okay";
 +	vdda-supply = <&vdda_mipi_dsi0_1p2>;
-+	/*refgen-supply = <&vreg_l14a_1p8>;*/
 +
 +	panel@0 {
 +		compatible = "innolux,td4328";
@@ -741,7 +740,6 @@
 +	status = "okay";
 +	monitored-battery = <&battery>;
 +};
-+
 +
 +&pmi8998_gpios {
 +	pwm_fan_ctrl: pwm-fan-ctrl {
