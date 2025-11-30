@@ -11,6 +11,7 @@ MAKE_LLEVEL	?= $(shell echo $$(($(NPROC) * 1)))
 BATCH_MODE	?=
 PARALLEL_BUILD	?= y
 DEBUG_BUILD	?= y
+MINI_BUILD	?= n
 DOCKER		?= docker
 
 -include $(LOCAL_MK)
