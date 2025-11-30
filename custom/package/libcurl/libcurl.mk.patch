@@ -1,0 +1,14 @@
+diff --git a/package/libcurl/libcurl.mk b/package/libcurl/libcurl.mk
+index 51b8c4d147..0aa88044bd 100644
+--- a/package/libcurl/libcurl.mk
++++ b/package/libcurl/libcurl.mk
+@@ -68,7 +68,8 @@ LIBCURL_CONF_OPTS += --without-openssl
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBCURL_GNUTLS),y)
+-LIBCURL_CONF_OPTS += --with-gnutls=$(STAGING_DIR)/usr
++LIBCURL_CONF_OPTS += --with-gnutls=$(STAGING_DIR)/usr \
++	--with-ca-fallback
+ LIBCURL_DEPENDENCIES += gnutls
+ else
+ LIBCURL_CONF_OPTS += --without-gnutls
