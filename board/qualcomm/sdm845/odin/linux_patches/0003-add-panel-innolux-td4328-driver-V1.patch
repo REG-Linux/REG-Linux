@@ -1,6 +1,6 @@
 --- /dev/null	2025-11-05 16:45:21.260115671 +0100
-+++ b/drivers/gpu/drm/panel/panel-innolux-td4328.c	2025-11-30 19:04:44.821869769 +0100
-@@ -0,0 +1,301 @@
++++ b/drivers/gpu/drm/panel/panel-innolux-td4328.c	2025-12-01 16:01:45.198267086 +0100
+@@ -0,0 +1,334 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +// Copyright (c) 2024 FIXME
 +// Generated with linux-mdss-dsi-panel-driver-generator from vendor device tree:
@@ -57,6 +57,39 @@
 +
 +	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 +
++	/* 0xb0, 0x00 */
++	static const u8 seq_b0_00[] = { 0xb0, 0x00 };
++	mipi_dsi_generic_write(dsi, seq_b0_00, sizeof(seq_b0_00));
++
++	/* 0xc2, long payload */
++	static const u8 seq_c2[] = {
++	        0xc2,
++	        0x01, 0xF7, 0x80, 0x08, 0x68, 0x08, 0x0C,
++	        0x10, 0x00, 0x08, 0x70, 0x00, 0x00, 0x00,
++	        0x00, 0x00, 0x00, 0x00, 0x03, 0x83, 0x00,
++	        0x00, 0x00
++	};
++	mipi_dsi_generic_write(dsi, seq_c2, sizeof(seq_c2));
++
++	/* 0xd6, 0x01 */
++	static const u8 seq_d6_01[] = { 0xd6, 0x01 };
++	mipi_dsi_generic_write(dsi, seq_d6_01, sizeof(seq_d6_01));
++
++	/* 0xb0, 0x03 */
++	static const u8 seq_b0_03[] = { 0xb0, 0x03 };
++	mipi_dsi_generic_write(dsi, seq_b0_03, sizeof(seq_b0_03));
++
++	/* DCS commands */
++	static const u8 seq_2a[] = { 0x2a, 0x00, 0x00, 0x04, 0x37 };
++	mipi_dsi_dcs_write_buffer(dsi, seq_2a, sizeof(seq_2a));
++
++	static const u8 seq_2b[] = { 0x2b, 0x00, 0x00, 0x07, 0x7f };
++	mipi_dsi_dcs_write_buffer(dsi, seq_2b, sizeof(seq_2b));
++
++	static const u8 seq_35[] = { 0x35 };
++	mipi_dsi_dcs_write_buffer(dsi, seq_35, sizeof(seq_35));
++
++	/* Legacy code for reference:
 +	mipi_dsi_generic_write_seq(dsi, 0xb0, 0x00);
 +	mipi_dsi_generic_write_seq(dsi, 0xc2,
 +			0x01, 0xF7, 0x80, 0x08, 0x68, 0x08, 0x0C,
@@ -67,7 +100,7 @@
 +	mipi_dsi_generic_write_seq(dsi, 0xb0, 0x03);
 +	mipi_dsi_dcs_write_seq(dsi, 0x2a, 0x00, 0x00, 0x04, 0x37);
 +	mipi_dsi_dcs_write_seq(dsi, 0x2b, 0x00, 0x00, 0x07, 0x7f);
-+	mipi_dsi_dcs_write_seq(dsi, 0x35);
++	mipi_dsi_dcs_write_seq(dsi, 0x35);*/
 +
 +	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
 +	if (ret < 0) {
