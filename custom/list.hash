@@ -50,6 +50,7 @@ db1ae92eef0f4dbe9243628951e0657d  linux/linux.hash
 cb034aac334473e84995afe6d5bdaa43  package/bullet/bullet.mk
 a3dd0ea9d489564444fc1a999ebf907e  package/busybox/busybox.config
 19d9fb6941264218f01a320466f28f5b  package/busybox/busybox.mk
+9ce6c4b123d14bcad2d553c7a8b82879  package/cmake/cmake.mk
 3d3c78296119d9f980e4e8f8532322c5  package/connman/Config.in
 5a7842aaa50ceb8daa5cc7c317961daa  package/cpuinfo/Config.in
 0aca90f49b6d2a06cc7f347d434b3745  package/dbus-broker/Config.in
