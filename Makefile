@@ -26,6 +26,10 @@ ifeq ($(DEBUG_BUILD), y)
 	EXTRA_OPTS += BR2_ENABLE_DEBUG=y
 endif
 
+ifeq ($(MINI_BUILD), y)
+	MAKE_OPTS += MINI_BUILD=y
+endif
+
 ifndef BATCH_MODE
 	DOCKER_OPTS += -i
 endif
