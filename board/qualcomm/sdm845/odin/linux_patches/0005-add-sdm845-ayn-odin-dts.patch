@@ -1,13 +1,13 @@
 --- a/arch/arm64/boot/dts/qcom/Makefile	2025-11-30 16:58:00.957558236 +0100
 +++ b/arch/arm64/boot/dts/qcom/Makefile	2025-11-30 14:24:39.811159529 +0100
-@@ -231,6 +231,7 @@
+@@ -240,6 +240,7 @@
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm636-sony-xperia-ganges-mermaid.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm660-xiaomi-lavender.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm670-google-sargo.dtb
-+dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-ayn-odin.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-cheza-r1.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-cheza-r2.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-cheza-r3.dtb
++dtb-$(CONFIG_ARCH_QCOM) += sdm845-ayn-odin.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-db845c.dtb
+ 
+ sdm845-db845c-navigation-mezzanine-dtbs	:= sdm845-db845c.dtb sdm845-db845c-navigation-mezzanine.dtbo
 --- /dev/null	2025-11-05 16:45:21.260115671 +0100
 +++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts	2025-11-30 21:29:31.262602248 +0100
 @@ -0,0 +1,1122 @@
