@@ -1,6 +1,19 @@
---- a/arch/arm64/boot/dts/qcom/Makefile	2025-11-30 16:58:00.957558236 +0100
-+++ b/arch/arm64/boot/dts/qcom/Makefile	2025-11-30 14:24:39.811159529 +0100
-@@ -240,6 +240,7 @@
+From 47f710416c3b1bc6e56f40efce79916418c3b01b Mon Sep 17 00:00:00 2001
+From: Demetris Ierokipides <ierokipides.dem@gmail.com>
+Date: Tue, 2 Dec 2025 00:44:55 +0200
+Subject: [PATCH] Add Ayn Odin dts
+
+---
+ arch/arm64/boot/dts/qcom/Makefile            |    1 +
+ arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts | 1145 ++++++++++++++++++
+ 2 files changed, 1146 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
+
+diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
+index 296688f7c..2485555e0 100644
+--- a/arch/arm64/boot/dts/qcom/Makefile
++++ b/arch/arm64/boot/dts/qcom/Makefile
+@@ -240,6 +240,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= sdm632-motorola-ocean.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm636-sony-xperia-ganges-mermaid.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm660-xiaomi-lavender.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm670-google-sargo.dtb
@@ -8,9 +21,12 @@
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-db845c.dtb
  
  sdm845-db845c-navigation-mezzanine-dtbs	:= sdm845-db845c.dtb sdm845-db845c-navigation-mezzanine.dtbo
---- /dev/null	2025-11-05 16:45:21.260115671 +0100
-+++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts	2025-11-30 21:29:31.262602248 +0100
-@@ -0,0 +1,1122 @@
+diff --git a/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
+new file mode 100644
+index 000000000..081f14e47
+--- /dev/null
++++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
+@@ -0,0 +1,1145 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022, Teguh Sobirin.
@@ -320,13 +336,29 @@
 +		};
 +	};
 +
-+	battery: battery {
-+		compatible = "simple-battery";
++battery: battery {
++    compatible = "qcom,power-supply-battery";
 +
-+		charge-full-design-microamp-hours = <3850000>;
-+		voltage-min-design-microvolt = <3600000>;
-+		voltage-max-design-microvolt = <4400000>;
-+	};
++    /* Basic capacity info */
++    qcom,fg-batt-capacity-mah = <6600>;
++    qcom,fg-cc-soc-coeff = <100>;
++
++    /* Voltage range typical for a 2S1P high-capacity Li-ion polymer pack */
++    qcom,voltage-min-microvolt = <3300000>;
++    qcom,voltage-max-microvolt = <4400000>;
++
++    /* Charge termination (tunable; safe default) */
++    qcom,chg-term-current-ma = <150>;
++
++    /* Battery identification → must match rradc channel */
++    qcom,battery-id-channel = <&pmi8998_rradc 4>;
++
++    /* Thermistor pin (usually 1 on SDM845 builds) */
++    qcom,thermal-pin = <1>;
++
++    /* Generic thermistor slope (needs real values later) */
++    qcom,thermal-coefficients = /bits/ 16 <0x0c6c 0x0b60 0x2eb4>;
++};
 +
 +	vph_pwr: vph-pwr-regulator {
 +		compatible = "regulator-fixed";
@@ -410,7 +442,7 @@
 +		vdda_qusb_hs0_1p8:
 +		vdda_qusb_hs0_3p1:
 +		vdda_mipi_dsi0_1p2:
-+		
++
 +		vdda_ufs1_1p2:
 +
 +		vreg_l1a_0p875: ldo1 {
@@ -605,7 +637,7 @@
 +	status = "okay";
 +	clock-frequency = <400000>;
 +
-+	synaptics-rmi4-i2c@70 {
++	synaptics-rmi4-i2c@20 {
 +		compatible = "syna,rmi4-i2c";
 +		reg = <0x70>;
 +
@@ -628,7 +660,7 @@
 +			syna,nosleep-mode = <1>;
 +		};
 +
-+		rmi4_f12: rmi4-f12@12 {
++		rmi4_f12: rmi4-f12@12  {
 +			reg = <0x12>;
 +			touchscreen-inverted-x;
 +			touchscreen-x-mm = <75>;
@@ -732,7 +764,14 @@
 +};
 +
 +&pmi8998_charger {
++	monitored-battery = <&battery>;
 +	status = "okay";
++};
++
++&pmi8998_fg {
++	status = "okay";
++
++	power-supplies = <&pmi8998_charger>;
 +	monitored-battery = <&battery>;
 +};
 +
@@ -788,15 +827,15 @@
 +
 +&q6asmdai {
 +	dai@0 {
-+		reg = <0>;
++		reg = <MSM_FRONTEND_DAI_MULTIMEDIA1>;
 +	};
 +
 +	dai@1 {
-+		reg = <1>;
++		reg = <MSM_FRONTEND_DAI_MULTIMEDIA2>;
 +	};
 +
 +	dai@2 {
-+		reg = <2>;
++		reg = <MSM_FRONTEND_DAI_MULTIMEDIA3>;
 +	};
 +};
 +
@@ -903,7 +942,7 @@
 +		};
 +
 +		codec {
-+			sound-dai =  <&left_spkr>, <&right_spkr>, <&swm 0>, <&wcd9340 0>;
++			sound-dai =  <&wcd9340 0>, <&left_spkr>, <&right_spkr>, <&swm 0>;
 +		};
 +	};
 +
@@ -1133,3 +1172,6 @@
 +
 +	qcom,snoc-host-cap-8bit-quirk;
 +};
+-- 
+2.43.0
+
