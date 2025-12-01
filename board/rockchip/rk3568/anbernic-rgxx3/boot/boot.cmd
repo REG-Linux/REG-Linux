@@ -1,3 +1,23 @@
+echo "=== REG Linux chainloader for RG353 ==="
+
+# SD is mmc 1 on RG353
+setenv devtype mmc
+setenv devnum 1
+setenv bootpart 1
+
+# Where mainline U-Boot FIT is stored
+setenv reg_uboot "/boot/u-boot.itb"
+
+# Load mainline U-Boot into RAM
+if load ${devtype} ${devnum}:${bootpart} ${loadaddr} ${reg_uboot}; then
+    echo "Loaded ${reg_uboot} : booting mainline U-Boot..."
+    bootm ${loadaddr}
+else
+    echo "REG Linux not found : booting Android"
+    run boot_android
+fi
+
+# mkimage -A arm64 -O linux -T script -C none -a 0 -e 0 -n "RGxx3 script" -d boot.cmd boot.scr
 #
 # Adapted from bootscr.odroid-rk356x
 #
@@ -28,10 +48,7 @@
 
 #booti ${kernel_addr_r} ${ramdisk_addr_r}:${filesize} ${fdt_addr_r}
 
-echo "Chainloading U-Boot"
+#echo "Chainloading U-Boot"
 
-load mmc 0:1 0xc00800 u-boot.bin
-go 0xc00800
-
-# mkimage -A arm64 -O linux -T script -C none -a 0 -e 0 -n "RGxx3 script" -d boot.cmd boot.scr
-
+#load mmc 0:1 0xc00800 u-boot.bin
+#go 0xc00800
