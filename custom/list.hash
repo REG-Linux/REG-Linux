@@ -80,7 +80,6 @@ bc2ad65da90d0c27761384b55402ae67  package/ksmbd-tools/ksmbd-tools.hash
 af2d5433ad615f3e7635a3c74f87ea22  package/libarchive/libarchive.mk
 171699577713d856ce8889d97c966447  package/libcec/Config.in
 be7091dd90cc6633f644562fd3416acb  package/libcec/libcec.mk
-391ccea97ae76bd88ebf468b9d3c6109  package/libcurl/libcurl.mk
 72fe1d9ca9b9b791a3a50d5ff9371f52  package/libdrm/libdrm.hash
 7d250d3076d1f4e49ca0536684449e2a  package/libdrm/libdrm.mk
 7ecd8faf8aee2a75412583ccbca01ef0  package/libfreeimage/libfreeimage.mk
