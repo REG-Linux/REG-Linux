@@ -77,7 +77,7 @@ endef
 # Download and copy PCSX2 patches.zip to BIOS folder
 define PCSX2_PATCHES
     mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/bios/ps2
-    $(HOST_DIR)/bin/curl -L \
+    curl -L \
         https://github.com/PCSX2/pcsx2_patches/releases/download/latest/patches.zip -o \
         $(TARGET_DIR)/usr/share/reglinux/datainit/bios/ps2/patches.zip
 endef

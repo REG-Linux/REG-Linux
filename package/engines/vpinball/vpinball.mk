@@ -46,7 +46,7 @@ define VPINBALL_CUSTOM_CMAKE
     rm -rf $(@D)/tmp
     mkdir $(@D)/tmp
     # bass24 - this is ugly...
-    cd $(@D)/tmp && $(HOST_DIR)/bin/curl -s https://www.un4seen.com/files/bass24-linux.zip -o bass.zip
+    cd $(@D)/tmp && curl -s https://www.un4seen.com/files/bass24-linux.zip -o bass.zip
     cd $(@D)/tmp && unzip -x bass.zip
     $(INSTALL) -D -m 0755 $(@D)/tmp/libs/$(ARCH)/libbass.so $(STAGING_DIR)/usr/lib
     $(INSTALL) -D -m 0755 $(@D)/tmp/libs/$(ARCH)/libbass.so $(TARGET_DIR)/usr/lib
