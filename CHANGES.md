@@ -1,6 +1,216 @@
-# REG-Linux 2024.06 - Infinity
-### First Release
-TODO : write release notes
+# REG-Linux 2025.12 - Infinity
+
+### Hardware & Platform support
+- Ayaneo Pocket S is now part of the REG-Linux output list and can be built end-to-end.
+- The Pocket S kernel path includes its DTS so the board boots with the correct panel timing.
+- GPU, VPU, Wi-Fi, and Bluetooth firmware bundles ship alongside Pocket S images to deliver a working handheld.
+- SM8550 touchscreen support is enabled for the Pocket S so touch interactions stay responsive.
+- ALSA UCM profiles for Pocket S map the headphones, speakers, and mic into the same audio stack.
+- Pocket S targets appear in the kernel makefile so `make` automatically includes their DTBs.
+- Documentation for the Pocket S now walks through flashing, USB, and side-button quirks.
+- RG35XX devices gain HDMI output patches that keep both the onboard LCD and external HDMI usable.
+- RG35XX overlay updates tune the LS054B3SX01 LCD driver and ADC so the screen and analog sticks behave.
+- AXP717 power driver support landed to keep RG35XX batteries charging safely.
+- U-Boot multiboard support now covers Banana Pi M4 Berry so it shares the same bootloader wrappers as other Rockchip boards.
+- BPI M4 Berry bring-up adds firmware, overlays, and README notes aimed at first-boot stability.
+- Banana Pi BPI-M7 boards regained dedicated kernel fragments and documentation for their peripherals.
+- RK3588/ODIN targets now run the Armbian linux-rockchip-6.1-rkr3 kernel, smoothing hardware support.
+- The RK3588 defconfig and overlay fragments align ODIN, Pocket S, and RK3568 variants in a single stream.
+- Allwinner H700/H616/H6 board folders now ship README files outlining USB, display, and power wiring.
+- Allwinner H5 documentation explains the firmware blobs required before booting REG-Linux.
+- Allwinner H3 mini got a README describing how its limited memory and IO behave.
+- Retroid Pocket 5 and Mini now have README sections describing their CPU, RAM, and display specs.
+- The Retroid Pocket Gamepad entry in the shared controller database keeps its mappings available across upgrades.
+- SM8250 kernel patches import the Venus firmware so Retroid Pocket 5 and Mini get stable GPU drivers.
+- Flycast optimizations for the Pocket 5 help the PSP core complete its init path on SM8250 silicon.
+- VITA3K support arrived for Retroid Pocket 5 to keep Vita homebrews running alongside PSP titles.
+- Panda3DS is bundled as a new optional core that can target both AArch64+GLES3 and x86_64.
+- Ares now builds on 64-bit hosts with desktop GL so its multi-emulator suite can be enabled without extra rebuilds.
+- FeralInteractive gamemode support is an experimental dependency for those who want dynamic CPU/GPU governors.
+- Prebuilt Qt6 packages arrive so Qt6 applications compile without needing manual external artifacts.
+- Board and package directories now consistently use REG-Linux naming.
+- Docker build instructions explain how to reproduce REG-Linux images inside a container.
+- New README material covers REG-ES, REG-MSG, and the system settings changes that impact handhelds.
+- H618/BananaPi M4 Berry keep their DTBs, overlays, and doc text synchronized with the kernel tree.
+- Additional README entries describe the Allwinner A527/T527 board family to help advanced developers.
+- Pocket S, Retroid, and Panda3DS README updates share firmware, driver, and button expectations.
+- The `gamecontrollerdb` record for the Retroid Pocket Gamepad is now published so input bindings survive upgrades.
+- Allwinner H5, H6, and H3 readmes explain the partially working features such as Wi-Fi or camera support.
+- New BPI and RG35XX overlays keep Wi-Fi, Bluetooth, and display firmware grouped together for each board.
+- ODIN/Mango board docs now reference the new linux-rockchip kernel to keep version notes accurate.
+- The multi-board U-Boot patch ensures ODIN and RK3588 share backported fixes without reapplying them separately.
+- Readme updates clearly state how to flash the H series boards and what firmware they expect.
+- RG35XX video and LCD adjustments prevent distorted colors when users switch between the built-in display and HDMI outputs.
+
+### Kernel & System updates
+- RK3568 post-build steps were refactored so ODIN-family boards reuse the same script.
+- Joypad wiring and display readiness were sharpened for the new ODIN panels, improving button mapping.
+- Recent display fixes marked the v1 panel as working again, reducing blank-screen rollback bugs.
+- We forced `BUILD_MINI` to `n` so the builder keeps producing full release images instead of incomplete variants.
+- The old `kernel.log` temp hack was removed, and logs now land in their permanent location.
+- Every kernel build now saves its logs under `/userdata/system/logs/` to ease post-upgrade diagnosis.
+- SDM845/6.17 work remains in the tree, focusing on the new Qualcomm display stack.
+- SDM845 firmware now survives inside `dracut` so boot-time initramfs contains the required blobs.
+- The Amlogic S905(X) post-build sequence was rewired to stage firmware and overlays before packaging.
+- S922x post-build logic plus `post-image-script.sh` were rewritten to emit consistent artifacts no matter how the image is built.
+- The `create-boot-script` and `build-uboot` steps were merged so H616 uses the same partition names as the rest of the RK boards.
+- S11share still scans for `kernel.log` on SD cards, ensuring the microboard logs are preserved.
+- Config cleanup commits trimmed stale board bits so stray config definitions no longer interfere.
+- The new `cleanup` branch tidied overlays and entries that had lingered since earlier releases.
+- RK3568 post-build factorization now exposes the same patch set to ODIN and RK3568, making future board support easier.
+- Joypad/USB wiring improvements keep the ODIN screens from hanging when the gamepad enumerates.
+- `BUILD_MINI` enforcement also prevents accidental shipping of mini builds that lack firmware.
+- We now log all kernel runs instead of relying on a temporary file that several scripts deleted.
+- The `dracut` injection for SDM845 ensures the initramfs contains the quantum of firmware used by ODIN.
+- S905 builds now copy their GPU blobs during the post-build task, eliminating the need for manual copying.
+- S922x post-image scripts run regardless of whether Buildroot created the output or we re-run the scripts locally.
+- H616's new create-boot script means each RK board reuses the same U-Boot callouts and naming.
+- Kernel logs now survive upgrades because we keep them in `/userdata/system/logs/` rather than ephemeral temp files.
+- The `kernel.log` service continues to be available on SD cards via the S11share helper.
+- Helper scripts in `/scripts/linux` now drop the `kernel.log` rename hack so downstream scripts see the true log file.
+- We keep `dracut` modules in sync with the `create-boot-script` changes so the same initramfs is reused across boards.
+- The `post-image-script` rework ensures `S922x` still receives the same upgrades no matter how the image was built.
+- Host requirements now include a dedicated `host-linux` package to avoid missing tool dependencies during kernel builds.
+- The `buildroot` stage now shares the same `UBOOT_CONFIGS` for H616 and RK3568 to prevent mismatched dtbs.
+- S905 and S922x share display firmware thanks to the new post-build tasks, reducing duplication.
+- The `CLEANUP` commits removed redundant configs that used to cause `make` to pick the wrong overlay.
+- The new `dracut` handling inserts Qualcomm firmware earlier than before so the board boots faster.
+- S11share's `kernel.log` gatherer picks the latest log even when multiple boards compile the same firmware.
+- The `create-boot-script` now uses the same environment no matter which RK board is being built.
+- S905 rework ensures the `post-build` script patches the `kernel.log` path to the new location.
+- SDM845 6.17 WIP pieces keep the display pipeline up to date.
+- H616 build steps now match the rest of the Rockchip boards, preventing divergent names in `boot.cmd`.
+- We maintain logging history so each build leaves a trace under `/userdata/system/logs/`.
+- The new pipeline also ensures the same `dracut` modules are loaded before the board boots.
+- Kernel bumps for each class of hardware are now documented so users know why 6.17.7, 6.12.59, and 6.1.109/6.6.50/6.10.9 are broadcasted.
+
+### Build & Packaging refinements
+- Buildroot base is now 2025.02.08 so the newest host libraries and build policies are part of every image.
+- We refreshed `files/custom` to reapply REG-Linux patches cleanly on the new Buildroot tree.
+- Poppler builds now finish under GCC 14, resolving the previous ABI issues.
+- CLK packages keep receiving bumps so GPU clocks and power management match the kernel updates.
+- Amiberry-lite is now 5.9.1 so x86_64 preview branches ship the latest Amiga emulator.
+- Strace 6.17 is packaged so system tracing handles the newest kernel syscall names.
+- Xemu builds pulled the latest updates, ensuring Xbox emulation keeps pace with new disk images.
+- REG-ES locales, security tweaks, and caching rules arrive with fresh releases so the frontend loads faster.
+- REG-ES caches now respect the privacy improvements introduced in the latest regmsg bump.
+- Cannonball received SSE2-friendly builds so the arcade emulator runs on plain x86_64 devices.
+- Mesa 25.3.0 and libdrm updates flow through Buildroot so OpenGL and Vulkan stacks stay current.
+- The Mesa bump also aligns the build system with the new WSDDN integration for RK3399.
+- Fheroes2, ShadPS4, and DS/DS-Mini packages are rebuilt to match the new REPL and controller fixes.
+- Supermodel now uses a tagged release to avoid drifting into incompatible bits.
+- The Buildroot tree strips vendored libs from RPCS3 so the port uses the common `pugixml` package.
+- FFMPEG 7.1.2's V4L2 request patch is applied and REG-ES uses it for video playback.
+- Dosbox-X, SDL2, and SDL3 libraries are bumped so the desktops use the same input stack as the frontend.
+- Xwiimote moved into a different package and now builds on musl again.
+- CDogs and the Gear Project cores gained the latest versions to keep their homebrew ports stable.
+- LR-Genesis Plus GX and related cores adopt their latest release versions for improved accuracy.
+- Commander Genius 3.6.0 is packaged to keep the Commander Keen retro engine modern.
+- LR-81 continues under our namespace so we can ship patched ZX81 emulation.
+- REG-ES toggles were revised to accept the new FFMPEG bits without breaking playback.
+- Libretro `clownmdemu` now ships in its updated form, matching the Saturn audio improvements.
+- Xemu's nv2a texture fix keeps Xbox 360 emulation from regressing in the new tree.
+- `lr-bluemsx` got its multi-disk bugfix release integrated upstream.
+- Ymir 0.2.0 and its dependencies are now part of the default build so the retro vector engine is available.
+- ShadPS4 and Eden packages continue receiving new versions for testing.
+- The build files deliver `supermodel`, `ioquake3`, and `cannonball` as soon as their new commits land.
+- Warzone and OpenOMF remain disabled but ready, thanks to the packaging updates from the WIP merges.
+- Dosbox-X now builds under the new SDL stack and includes relevant patches from the 2024 branch.
+- The Buildroot tree now hosts `pugixml`, `RPCS3`, and other dependencies as explicit packages.
+- Ares v146 was added so the multi-emulator experience includes LaserActive-level fidelity.
+- Gearproject cores (lr-gear*) now compile the latest shader and CPU fixes.
+- The packaging ensures the `REG-ES` security options still work when the underlying libs change.
+- `shadps4`, `s9gen4`, and `a3gen2` builds were touched by specific fix-ups to keep their toolchains in sync.
+- The Buildroot pipeline prevents repeated copying of `kernel.log` by organizing log outputs under `/userdata` messages.
+- Host dependencies such as `host-linux` and `host-flex` now get installed before we begin kernel builds, so U-Boot packages also have their prerequisites.
+
+### Emulator & Media stack
+- RetroArch 1.22.2 is the baseline so the front end stays on the latest upstream release.
+- All bundled libretro cores now track the 1.22.2 release, easing compatibility with shader packs.
+- Libretro-81 now includes the November 2023 build, improving ZX81 support.
+- Libretro-Fbneo moved to the 1.0.0.03 / Feb 23 build for better NeoGeo coverage.
+- Libretro-Genesis Plus GX is on the February 23 build, so Genesis/Mega Drive titles behave closer to expectations.
+- Libretro-MAME now ships with version 0.265 and the associated reference BIOS sets.
+- Libretro-MAME2003-Plus also hits the February 21, 2024 build for better Dreamcast/arcade compatibility.
+- Libretro-Mupen64Plus-Next uses the Feb 6, 2024 build for N64 homebrew and performance fixes.
+- Libretro-Neocd is at the February 1 build, smoothing the NeoCD loader experience.
+- Libretro-Opera reaches the Jan 13, 2024 build for Sega Saturn accuracy.
+- Libretro-Stella (Atari 2600) shipped the Jan 2, 2024 release to keep early console support fresh.
+- Libretro-Swanstation updated to Jan 25, 2024 for improved PS1 fix-ups.
+- Libretro-PCSX now follows the Feb 14, 2024 build to keep its plugin stack modern.
+- Libretro-Flycast (v2.3.2) plus Flycast itself (v2.3.2) add RetroAchievements support and button mapping tweaks.
+- Redream 1.5.0-1127-g6b62eff keeps Dreamcast compatibility up to date.
+- Ikemen Go now uses the May 17, 2024 build for fighting-game accuracy.
+- Amiberry 5.6.8 provides the latest Amiga emulation for users on the x86_64 preview branch.
+- GroovyMAME moved to 0.265 SR 0.220c to match the MAME 0.265 combo.
+- DOSBox-Staging sits at 0.81.1 for better DOS accuracy and SDL support.
+- DOSBox-X uses the 2024.03.01 build for improved compatibility with modern Windows games.
+- SimCoupe 1.2.13 and Tsugaru 20240223 added to the line-up for 1980s microcomputers.
+- Fallout 1 CE 1.1.0 (March 2024 release) and DevilutionX 1.5.2 both ship so classic RPGs stay polished.
+- Commander Genius 3.5.0 plus Solarus-engine Apr 27, 2024 builds keep 2D action engines current.
+- Cemu v2.0-82 keeps Wii U titles supported.
+- Sonic3-AIR v24.02.02.0-stable and Ruffle 2024-03-28 keep modern indie/Flash experiences covered.
+- Xenia Canary build 5bbba85 (May 14, 2024) and Xemu v0.7.121 bring the latest Xbox emulation bits.
+- ScummVM 2.8.1 retains the latest adventure-engine patches.
+- Fheroes2 1.0.13, PCSX2 v1.7.5913, and Play! 0.66 (plus Libretro Play! 0.66) keep console ports consistent.
+- Dolphin 5.0-21774 rounds out the Wii/GC stack.
+- Libretro-Hatarib 0.3, Hatari 2.5.0, and Citra r64e3e9f also join the release to cover Atari ST and 3DS.
+- ETLegacy 2.82.1 ensures the open-source RTCW engine works with the new renderer.
+- Wireguard VPN tools ship so PC clients can tunnel into REG-Linux securely.
+- Standalone MAME and lr-mame BIOS now live under `bios/mame/` so each emulator reads the same files.
+- The MAME combo 0.269 release keeps GroovyMAME, lr-mame, and REG-MAME aligned with the new BIOS placement.
+- RetroAchievements are available on Dolphin, DuckStation, and Libretro-Flycast when the feature is enabled.
+- DuckStation AppImage builds now cover x86_64, armhf, and arm64 so the GPL appimage works across boards.
+- Light gun support arrives for Libretro-MAME, DuckStation (single gun), Hypseus Singe, and the Standalone MAME builds.
+- Libretro-Flycast pairs offscreen reload with crosshairs and button 2 bindings for light guns.
+- Multi-screen pintab and DMD server features now install automatically for pinball setups.
+- Bezel and crosshair work extends to Daphne/Singe so shooters feel polished.
+- Hypseus Singe gets accurate light gun ratios plus better udev handling on RPi4.
+- Nvidia GPUs with the production driver now have CUDA splash video acceleration again.
+- Wireguard VPN scripts provide helper text and networking to expose your PC safely.
+- Standalone MAME and lr-mame now prefer `/userdata/bios/mame/` so the rompath matches the new defaults.
+
+### Tools & Services
+- RA menu confirm/cancel now honors the EmulationStation global confirm/cancel setting so menus feel consistent.
+- RG552 splash-screen rotation and vibrator support are restored.
+- GameForce vibrators work again.
+- Vita3k now moves saves correctly between internal and external storage.
+- Steam's flatpak runtime no longer breaks after forced runtime updates.
+- GunCon2 buttons A and B now map independently.
+- Sinden Lightgun now throttles each camera to prevent bandwidth timeouts.
+- Wii crosshairs now land in the correct EmulationStation group.
+- Justifier gun type selection is honored for pcsx-rearmed and Mednafen cores.
+- Justifier mapping and crosshairs behave inside libretro-snes9x.
+- Daphne crosshair visibility matches real gun detection.
+- Libretro-Mesen light gun plugin reliably starts when present.
+- Vulkan driver reporting respects multi-GPU systems again.
+- SteamDeck LCD mono audio returns to normal after the regression.
+- ScummVM honors its configuration location and virtual filesystem defaults.
+- DuckStation retroachievements no longer slow loading.
+- Color Computer disk images load automatically inside ES with the correct altRomType.
+- Hypseus Singe light guns honor the chosen display ratio and controller layout.
+- RPI4 udev rules detect guns during Hypseus Singe sessions.
+- Scanlines now render properly across Daphne and Singe modes.
+- Supermodel avoids persistent crashes with light gun setups.
+- CUDA-accelerated splash videos return for Nvidia cards on the production driver.
+- Dolphin EmulationStation settings were reorganized for clarity.
+- RK3326 boards now use Mesa3D instead of the old Mali driver.
+- Amiga BIOS files now live under `bios/amiga`.
+- RPCS3 upscaling outputs properly again.
+- GunCon3 default mapping uses C2 for calibration and reminds folks about the new controls.
+- Sinden Lightgun firmware is pinned to 1.9 for stable performance.
+
+### Documentation & Admin
+- README pages for the Allwinner A527/T527, H5, H6/H616/H700, and H3 mini boards describe build steps and firmware hints.
+- Docker-based build instructions explain how to reproduce REG-Linux images in containers.
+- System settings help text and release note guidance were polished through the latest doc merges.
+- Board and package directories now use REG-Linux names properly.
+- Key README sections highlight REG-ES, REG-MSG, and the new `system-settings-get` helper.
+- Custom patches for dropbear, nfs-utils, ksmbd-tools, and other packages reference the REG-Linux package names.
+- README content now lists the preinstalled games and the small metadata changes that accompany each release.
+- REG-Linux docs explain how to regenerate Es-theme-canvas hash files with the new hashes.
+- The share, cleanbuild, and scripts skeletons remain available to keep build workflows reproducible.
+- Codex tooling, devops scripts, and builder metadata now mention the reglinux-rescue and regmsg transitions.
 
 # Fork Point from batocera.linux
 
