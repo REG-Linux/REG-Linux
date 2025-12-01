@@ -14,7 +14,7 @@ REG Linux (Retro Emulation Gaming Linux) is an immutable Buildroot-based operati
 
 ### 2.1 Buildroot external tree
 
-- Every target inherits `configs/reglinux-board.common`, which pulls BusyBox, GNU userland, SquashFS tooling, MTP responder, SDL2/SDL3, libv4l, and the reglinux system packages (`BR2_PACKAGE_REGLINUX_SYSTEM`, `BR2_PACKAGE_REGLINUX_ALL_SYSTEMS`).
+- Every target inherits `configs/reglinux-board.common` or `configs/reglinux-board.mini`, which pulls BusyBox, GNU userland, SquashFS tooling, MTP responder, SDL2/SDL3, libv4l, and the reglinux system packages (`BR2_PACKAGE_REGLINUX_SYSTEM`, `BR2_PACKAGE_REGLINUX_ALL_SYSTEMS`).
 - Per-board `.board` files (e.g. `configs/reglinux-rk3588.board`) include a toolchain fragment (`toolchain-gcc14-glibc.common`) and define SoC-specific optimizations, DTs, patch directories, overlays, and image recipes.
 - `BR2_TARGET_REGLINUX_IMAGES` (declared in `package/system/reglinux-system/Config.in.targets`) collects the list of hardware variants that reuse the same binary build. The post-image hook iterates this list to emit per-device SD-card images.
 
