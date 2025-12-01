@@ -14,9 +14,11 @@ BINARIES_DIR=$4
 TARGET_DIR=$5
 REGLINUX_BINARIES_DIR=$6
 
-mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-odroid-m1s"     || exit 1
-cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-odroid-m1s/" || exit 1
-cd "${REGLINUX_BINARIES_DIR}/build-uboot-odroid-m1s/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+BUILD_SCRIPT="$(dirname "${BOARD_DIR}")/build-uboot.sh"
+BUILD_DIR="${REGLINUX_BINARIES_DIR}/build-uboot-odroid-m1s"
+mkdir -p "${BUILD_DIR}" || exit 1
+cp "${BUILD_SCRIPT}" "${BUILD_DIR}/" || exit 1
+cd "${BUILD_DIR}" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${REGLINUX_BINARIES_DIR}" "odroid-m1s-rk3566_defconfig" "odroid-m1s" || exit 1
 
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
@@ -29,6 +31,8 @@ cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firm
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
 cp "${BINARIES_DIR}/rk3566-odroid-m1s.dtb" "${REGLINUX_BINARIES_DIR}/boot/boot/"     || exit 1
+UBOOT_DIR="$(dirname "${REGLINUX_BINARIES_DIR}")/uboot-odroid-m1s"
+cp "${UBOOT_DIR}/u-boot-rockchip.bin" "${REGLINUX_BINARIES_DIR}/boot/boot/u-boot-rockchip.bin" || exit 1
 cp "${BOARD_DIR}/boot/extlinux.conf"       "${REGLINUX_BINARIES_DIR}/boot/extlinux/" || exit 1
 
 exit 0
