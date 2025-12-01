@@ -16,7 +16,7 @@ PCSX2_SUPPORTS_IN_SOURCE_BUILD = NO
 PCSX2_DEPENDENCIES += xorgproto alsa-lib freetype zlib libpng shaderc ecm
 PCSX2_DEPENDENCIES += libaio portaudio libsoundtouch sdl3 libpcap yaml-cpp
 PCSX2_DEPENDENCIES += libsamplerate fmt reglinux-qt6 libcurl kddockwidgets
-PCSX2_DEPENDENCIES += host-libcurl libbacktrace jpeg-turbo webp plutosvg
+PCSX2_DEPENDENCIES += libbacktrace jpeg-turbo webp plutosvg
 
 # Use clang for performance if available
 ifeq ($(BR2_PACKAGE_CLANG),y)

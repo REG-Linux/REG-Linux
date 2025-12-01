@@ -10,10 +10,10 @@ config BR2_PACKAGE_VITA3K
     select BR2_PACKAGE_BOOST
     select BR2_PACKAGE_BOOST_FILESYSTEM
     select BR2_PACKAGE_BOOST_SYSTEM
-    select BR2_PACKAGE_PYTHON_RUAMEL_YAML 
+    select BR2_PACKAGE_PYTHON_RUAMEL_YAML
     select BR2_PACKAGE_FMT
     select BR2_PACKAGE_LIBCURL
     help
       Experimental PlayStation Vita emulator
-      
+
       https://github.com/vita3k/vita3k
