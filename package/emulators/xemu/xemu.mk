@@ -120,7 +120,7 @@ define XEMU_GET_SUBMODULES
     # imgui
     mkdir -p $(@D)/subprojects/imgui
     $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/imgui.wrap))
-    $(HOST_DIR)/bin/curl -L -o imgui.tar.gz \
+    curl -L -o imgui.tar.gz \
         https://github.com/xemu-project/imgui/archive/$(REVISION).tar.gz
     $(TAR) -xzf imgui.tar.gz --strip-components=1 -C $(@D)/subprojects/imgui
     rm imgui.tar.gz
@@ -128,7 +128,7 @@ define XEMU_GET_SUBMODULES
 	# implot
 	mkdir -p $(@D)/subprojects/implot
     $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/implot.wrap))
-	$(HOST_DIR)/bin/curl -L -o implot.tar.gz \
+	curl -L -o implot.tar.gz \
 	    https://github.com/xemu-project/implot/archive/$(REVISION).tar.gz
 	$(TAR) -xzf implot.tar.gz --strip-components=1 -C $(@D)/subprojects/implot
 	rm implot.tar.gz
@@ -136,7 +136,7 @@ define XEMU_GET_SUBMODULES
 	# genconfig
 	mkdir -p $(@D)/subprojects/genconfig
     $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/genconfig.wrap))
-	$(HOST_DIR)/bin/curl -L -o genconfig.tar.gz \
+	curl -L -o genconfig.tar.gz \
 	    https://github.com/mborgerson/genconfig/archive/$(REVISION).tar.gz
 	$(TAR) -xzf genconfig.tar.gz --strip-components=1 -C $(@D)/subprojects/genconfig
 	rm genconfig.tar.gz
@@ -144,7 +144,7 @@ define XEMU_GET_SUBMODULES
     # tomlplusplus
 	mkdir -p $(@D)/subprojects/tomlplusplus
  #   $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/tomlplusplus.wrap))
-	$(HOST_DIR)/bin/curl -L -o tomlplusplus.tar.gz \
+	curl -L -o tomlplusplus.tar.gz \
 	    https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz
 	$(TAR) -xzf tomlplusplus.tar.gz --strip-components=1 -C $(@D)/subprojects/tomlplusplus
 	rm tomlplusplus.tar.gz
@@ -152,7 +152,7 @@ define XEMU_GET_SUBMODULES
     # glslang
 	mkdir -p $(@D)/subprojects/glslang
 #    $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/glslang.wrap))
-	$(HOST_DIR)/bin/curl -L -o glslang.tar.gz \
+	curl -L -o glslang.tar.gz \
 	    https://github.com/KhronosGroup/glslang/archive/refs/tags/16.0.0.tar.gz
 	#https://github.com/KhronosGroup/glslang/archive/$(REVISION).tar.gz
 	$(TAR) -xzf glslang.tar.gz --strip-components=1 -C $(@D)/subprojects/glslang
@@ -160,13 +160,13 @@ define XEMU_GET_SUBMODULES
 
     # xxhash
 	mkdir -p $(@D)/subprojects/xxHash-0.8.3
-	$(HOST_DIR)/bin/curl -L -o xxhash.tar.gz \
+	curl -L -o xxhash.tar.gz \
 	    http://github.com/mesonbuild/wrapdb/releases/download/xxhash_0.8.3-1/xxHash-0.8.3.tar.gz
 	$(TAR) -xzf xxhash.tar.gz --strip-components=1 -C $(@D)/subprojects/xxHash-0.8.3
 	rm xxhash.tar.gz
 
     # xxhash patch
-	$(HOST_DIR)/bin/curl -L -o xxhash_0.8.3-1_patch.zip \
+	curl -L -o xxhash_0.8.3-1_patch.zip \
 	    https://wrapdb.mesonbuild.com/v2/xxhash_0.8.3-1/get_patch
 	$(UNZIP) -o xxhash_0.8.3-1_patch.zip -d $(@D)/subprojects
 	rm xxhash_0.8.3-1_patch.zip
@@ -174,7 +174,7 @@ define XEMU_GET_SUBMODULES
     # keycodemapdb - revision variation
 	mkdir -p $(@D)/subprojects/keycodemapdb
     $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/keycodemapdb.wrap))
-    $(HOST_DIR)/bin/curl -L -o keycodemapdb.tar.gz \
+    curl -L -o keycodemapdb.tar.gz \
 	    https://gitlab.com/qemu-project/keycodemapdb/-/archive/$(REVISION)/$(REVISION).tar.gz
 	$(TAR) -xzf keycodemapdb.tar.gz --strip-components=1 -C $(@D)/subprojects/keycodemapdb
 	rm keycodemapdb.tar.gz
@@ -182,7 +182,7 @@ define XEMU_GET_SUBMODULES
     # nv2a_vsh_cpu
 	mkdir -p $(@D)/subprojects/nv2a_vsh_cpu
     $(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/nv2a_vsh_cpu.wrap))
-	$(HOST_DIR)/bin/curl -L -o nv2a_vsh_cpu.tar.gz \
+	curl -L -o nv2a_vsh_cpu.tar.gz \
 	    https://github.com/xemu-project/nv2a_vsh_cpu/archive/$(REVISION).tar.gz
 	$(TAR) -xzf nv2a_vsh_cpu.tar.gz --strip-components=1 -C $(@D)/subprojects/nv2a_vsh_cpu
 	rm nv2a_vsh_cpu.tar.gz
@@ -190,7 +190,7 @@ define XEMU_GET_SUBMODULES
     # berkeley-softfloat-3 - revision variation
 	mkdir -p $(@D)/subprojects/berkeley-softfloat-3
  #   $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/berkeley-softfloat-3.wrap))
-	$(HOST_DIR)/bin/curl -L -o berkeley-softfloat-3.tar.gz \
+	curl -L -o berkeley-softfloat-3.tar.gz \
 	    https://gitlab.com/qemu-project/berkeley-softfloat-3/-/archive/master/berkeley-softfloat-3-master.tar.gz
 #https://gitlab.com/qemu-project/berkeley-softfloat-3/-/archive/$(REVISION)/$(REVISION).tar.gz
 	$(TAR) -xzf berkeley-softfloat-3.tar.gz --strip-components=1 -C $(@D)/subprojects/berkeley-softfloat-3
@@ -200,7 +200,7 @@ define XEMU_GET_SUBMODULES
     # berkeley-testfloat-3 - revision variation
 	mkdir -p $(@D)/subprojects/berkeley-testfloat-3
     $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/berkeley-testfloat-3.wrap))
-	$(HOST_DIR)/bin/curl -L -o berkeley-testfloat-3.tar.gz \
+	curl -L -o berkeley-testfloat-3.tar.gz \
 	    https://gitlab.com/qemu-project/berkeley-testfloat-3/-/archive/$(REVISION)/$(REVISION).tar.gz
 	$(TAR) -xzf berkeley-testfloat-3.tar.gz --strip-components=1 -C $(@D)/subprojects/berkeley-testfloat-3
 	cp $(@D)/subprojects/packagefiles/berkeley-testfloat-3/* $(@D)/subprojects/berkeley-testfloat-3
@@ -209,7 +209,7 @@ define XEMU_GET_SUBMODULES
     # volk
 	mkdir -p $(@D)/subprojects/volk
     #$(eval REVISION = $(shell grep -Po '(?<=^revision=).+' $(@D)/subprojects/volk.wrap))
-	$(HOST_DIR)/bin/curl -L -o volk.tar.gz \
+	curl -L -o volk.tar.gz \
 	    https://github.com/zeux/volk/archive/refs/tags/1.4.304.tar.gz
 	#https://github.com/zeux/volk/-/archive/$(REVISION)/$(REVISION).tar.gz
 	$(TAR) -xzf volk.tar.gz --strip-components=1 -C $(@D)/subprojects/volk
@@ -217,14 +217,14 @@ define XEMU_GET_SUBMODULES
 
     # SPIRV-Reflect
 	mkdir -p $(@D)/subprojects/SPIRV-Reflect
-	$(HOST_DIR)/bin/curl -L -o SPIRV-Reflect.tar.gz \
+	curl -L -o SPIRV-Reflect.tar.gz \
 	https://github.com/KhronosGroup/SPIRV-Reflect/archive/refs/tags/vulkan-sdk-1.4.328.1.tar.gz
 	$(TAR) -xzf SPIRV-Reflect.tar.gz --strip-components=1 -C $(@D)/subprojects/SPIRV-Reflect
 	rm SPIRV-Reflect.tar.gz
 
     # VulkanMemoryAllocator
 	mkdir -p $(@D)/subprojects/VulkanMemoryAllocator
-	$(HOST_DIR)/bin/curl -L -o VulkanMemoryAllocator.tar.gz \
+	curl -L -o VulkanMemoryAllocator.tar.gz \
 	https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.3.0.tar.gz
 	$(TAR) -xzf VulkanMemoryAllocator.tar.gz --strip-components=1 -C $(@D)/subprojects/VulkanMemoryAllocator
 	rm VulkanMemoryAllocator.tar.gz
