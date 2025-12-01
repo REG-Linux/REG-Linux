@@ -35,10 +35,12 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 
 	# curl / ssl / wget
 	select BR2_PACKAGE_CIFS_UTILS			# required for boot mounts
-	select BR2_PACKAGE_WGET				# download tools
-	select BR2_PACKAGE_LIBCURL_CURL			# download tools
 	select BR2_PACKAGE_NGHTTP2			# required for curl http2
-	select BR2_PACKAGE_CA_CERTIFICATES		# ssl certificates
+	select BR2_PACKAGE_CA_CERTIFICATES		# Enable ca-certificates
+	select BR2_PACKAGE_OPENSSL			# Enable SSL/TLS support
+	select BR2_PACKAGE_LIBCURL			# download tools
+	select BR2_PACKAGE_LIBCURL_CURL			# download tools
+	select BR2_PACKAGE_WGET				# download tools
 
 	# mDNS protocol
 	select BR2_PACKAGE_AVAHI			# service discovery on local network
