@@ -34,8 +34,7 @@ endif
 
 $(eval $(cmake-package))
 
-#HOST_OPENRCT2_DEPENDENCIES  = host-libcurl host-fontconfig
-#HOST_OPENRCT2_DEPENDENCIES += host-libzip host-libpng host-json-for-modern-cpp
+#HOST_OPENRCT2_DEPENDENCIES = host-libzip host-libpng host-json-for-modern-cpp
 #HOST_OPENRCT2_CONF_OPTS += -DDISABLE_GUI=ON
 #HOST_OPENRCT2_CONF_OPTS += -DDISABLE_OPENGL=ON
 #HOST_OPENRCT2_CONF_OPTS += -DDISABLE_DISCORD_RPC=ON

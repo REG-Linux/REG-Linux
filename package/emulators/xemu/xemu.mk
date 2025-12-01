@@ -10,7 +10,7 @@ XEMU_SITE = $(call github,xemu-project,xemu,$(XEMU_VERSION))
 #XEMU_GIT_SUBMODULES = YES
 XEMU_LICENSE = GPLv2
 XEMU_DEPENDENCIES = host-meson host-cmake host-pkgconf host-python3 host-python-distlib
-XEMU_DEPENDENCIES += host-libcurl libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
+XEMU_DEPENDENCIES += libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
 XEMU_DEPENDENCIES += libpcap libepoxy libgtk3 json-for-modern-cpp
 
 XEMU_EXTRA_DOWNLOADS = https://github.com/xemu-project/xemu-dashboard/releases/download/v20250806-0635/xbox_hdd.qcow2
