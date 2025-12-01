@@ -4,13 +4,19 @@ This directory contains the board-specific pieces that RegLinux needs to boot on
 
 ## Board-specific directories
 - `anbernic-rgxx3/`  
-  Contains the `boot` tree (`boot.cmd`, `boot.scr`, `extlinux.conf`) and helper scripts. `build-uboot.sh` downloads U-Boot 2025.01, clones the pinned `rkbin` commit, applies the patches under `patches/uboot/`, and builds `anbernic-rgxx3-rk3566_defconfig`. `create-boot-script.sh` copies the generated `u-boot-rockchip.bin`, the kernel image (`Image`), squashfs/initrd files and the board dTB into the final image layout.
-- `firefly-station-m2/` and `firefly-station-p2/`  
+  Contains the `boot` tree (`boot.cmd`, `boot.scr`, `extlinux.conf`). `create-boot-script.sh` now copies the shared `build-uboot.sh` helper into `reglinux/` and builds `anbernic-rgxx3-rk3566_defconfig` + `rkbin` blobs before staging the built `u-boot-rockchip.bin`, `u-boot.itb`, the kernel image (`Image`), squashfs/initrd, and all of the supported Anbernic DTBs.
+```
+
+`firefly-station-m2/` and `firefly-station-p2/`  
   Each board directory stores only `boot/extlinux.conf`, `genimage.cfg`, and scripts that copy prebuilt `idbloader.img`/`uboot.img` from `IMAGES_DIR/uboot-*` into `reglinux/uboot-*`. They do not rebuild U-Boot locally.
-- `odroid-m1/` and `odroid-m1s/`  
-  These folders follow the U-Boot build-from-source route described above. After building, the helper copies `u-boot-rockchip.bin` into the per-board `reglinux/uboot-*` directory. `odroid-m1/boot/` also stores a `boot-logo.bmp.gz` file.
-- `rock-3a/` and `rock-3c/`  
-  Like the Odroid boards, these scripts build U-Boot from source. `rock-3a` additionally ships a prebuilt `rock3a-uboot.img`, and its build script passes `SYSROOT="${HOST_DIR}"` to `make`. Device tree overlays, boot scripts and extlinux configs live in `boot`, while `genimage.cfg` describes the partition layout for `genimage`.
+
+`odroid-m1/` and `odroid-m1s/`  
+  These folders now use the shared helper (`build-uboot.sh`). The helper downloads U-Boot 2025.10, reuses the pinned `rkbin` commit, applies `patches/uboot/*.patch`, and produces `uboot-odroid-m1/`/`uboot-odroid-m1s/` alongside `reglinux`. `create-boot-script.sh` reuses that output plus the board extlinux/payload assets.
+
+`rock-3a/` and `rock-3c/`  
+  These boards also run through the shared helper, building their defconfigs once per run and copying the resulting `u-boot-rockchip.bin` into the boot partition. `rock-3a` additionally ships a prebuilt `rock3a-uboot.img`, and its helper passes `SYSROOT="${HOST_DIR}"` to `make`.
+
+The new `build-uboot.sh` helper caches the tarball + `rkbin` repo under `output/rk3568/images/build-uboot-cache/`, applies the shared patch queue plus any per-board patches, and copies the resulting `u-boot-rockchip.bin` (and, when present, `u-boot.itb`) into `output/rk3568/images/uboot-<target>/`, which is what `genimage.cfg` expects (it now reads `../../uboot-<target>/...`). Firefly boards still bypass this by copying the prebuilt blobs from `IMAGES_DIR/uboot-*`.
 
 Each board's `create-boot-script.sh` is called with the standard arguments (`HOST_DIR`, `BOARD_DIR`, `BUILD_DIR`, `BINARIES_DIR`, `TARGET_DIR`, `REGLINUX_BINARIES_DIR`). It copies the kernel `Image`, firmware/modules/rescue bundles, the rootfs (`rootfs.cpio.lz4`, `rootfs.squashfs`), the matching dtb, the board `extlinux.conf`, `boot.scr`, and `boot-logo` into the final `/boot` and `/boot/extlinux` trees that `genimage` will package.
 
