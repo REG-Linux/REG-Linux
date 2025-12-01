@@ -21,7 +21,7 @@ REG Linux runs on **ARM, AArch64, RISC-V 64-bit, and x86-64** architectures.
 REG Linux is a **portable retro-gaming OS** that can be written to a USB stick or SD card to instantly turn any compatible board or computer into a console.
 
 - 🔒 Immutable system image  
-- ⚙️ Based on Buildroot with OpenRC (no systemd)  
+- ⚙️ Based on Buildroot. systemd-free init system  
 - 🚀 Optimized for performance and fast boot  
 - 🧩 Modular packaging system (no overlayfs required)  
 - 💾 Read-only root filesystem with `/userdata` persistence  
