@@ -1,5 +1,5 @@
 diff --git a/package/dropbear/S50dropbear b/package/dropbear/S50dropbear
-index 9474eaafaa..7aef0f2a21 100644
+index 9474eaafaa..5046ed8d9a 100644
 --- a/package/dropbear/S50dropbear
 +++ b/package/dropbear/S50dropbear
 @@ -1,61 +1,65 @@

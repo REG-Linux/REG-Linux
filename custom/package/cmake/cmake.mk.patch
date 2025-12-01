@@ -1,0 +1,12 @@
+diff --git a/package/cmake/cmake.mk b/package/cmake/cmake.mk
+index 1eb4da90ad..361022ae1a 100644
+--- a/package/cmake/cmake.mk
++++ b/package/cmake/cmake.mk
+@@ -61,7 +61,6 @@ define HOST_CMAKE_CONFIGURE_CMDS
+ 			-DCMAKE_C_FLAGS="$(HOST_CMAKE_CFLAGS)" \
+ 			-DCMAKE_CXX_FLAGS="$(HOST_CMAKE_CXXFLAGS)" \
+ 			-DCMAKE_EXE_LINKER_FLAGS="$(HOST_LDFLAGS)" \
+-			-DCMAKE_USE_OPENSSL:BOOL=OFF \
+ 			-DBUILD_CursesDialog=OFF \
+ 	)
+ endef
