@@ -1,6 +1,6 @@
 ################################################################################
 #
-# batocera.linux System
+# REG-Linux System
 #
 ################################################################################
 
@@ -99,6 +99,16 @@ else
 	REGLINUX_SYSTEM_BUILD_ID =
 endif
 
+define REGLINUX_SYSTEM_INSTALL_LOGS_SERVICE
+	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/LOGS $(TARGET_DIR)/usr/share/reglinux/services/LOGS
+	sed -i "s/system\.services\=SAMBA/system\.services\=LOGS SAMBA/" $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
+	sed -i "s/.*system\.security\.enabled.*/system\.security\.enabled\=0/" $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
+endef
+
+ifneq (,$(findstring y,$(BR2_ENABLE_DEBUG)$(MINI_BUILD)))
+	REGLINUX_SYSTEM_POST_INSTALL_TARGET_HOOKS += REGLINUX_SYSTEM_INSTALL_LOGS_SERVICE
+endif
+
 define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 
 	# version/arch
@@ -113,14 +123,6 @@ define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS
 	rsync -arv $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/datainit/ $(TARGET_DIR)/usr/share/reglinux/datainit/
 	mkdir -p $(TARGET_DIR)/usr/share/reglinux/datainit/system
 	cp $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/system.conf $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
-
-	# LOGS service and security settings
-	if test "$(BR2_ENABLE_DEBUG)" = "y" -o "$(MINI_BUILD)" = "y" ; then \
-		sed -i "s/system\.services\=SAMBA/system\.services\=LOGS SAMBA/" "$(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf" ; \
-	else \
-		rm -f "$(TARGET_DIR)/usr/share/reglinux/services/LOGS" ; \
-		sed -i "s/system\.security\.enabled\=0/system\.security\.enabled\=1/" "$(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf" ; \
-	fi
 
 	# system-boot.conf
 	$(INSTALL) -D -m 0644 \
