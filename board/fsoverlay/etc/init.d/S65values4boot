@@ -4,7 +4,7 @@
 # Make system.conf specific values available through system-boot.conf in a very
 # early boot stage process when /userdata/system/system.conf is not yet available.
 set --
-for key in wifi.enabled wifi.ssid wifi.key wifi2.ssid wifi2.key wifi3.ssid wifi3.key wifi.hidden.ssid wifi.hidden.key system.timezone es.resolution system.hostname system.fscompression.enabled
+for key in wifi.enabled wifi.ssid wifi.key wifi2.ssid wifi2.key wifi3.ssid wifi3.key wifi.hidden.ssid wifi.hidden.key wifi.country system.timezone es.resolution system.hostname system.fscompression.enabled
 do
     current_value="$(/usr/bin/regmsg systemconf getconfigkey "$key")"
     boot_conf_value="$(sed -n "s/^$key=//p" /boot/system-boot.conf | head -n 1)"
