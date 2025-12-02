@@ -75,7 +75,21 @@ case "$1" in
         ln -sf "$MACHINE_ID_FILE" /etc/machine-id
 
         # Load system.conf to regmsg daemon
-        [ -s /userdata/system/system.conf ] && /usr/bin/regmsg systemconf loadconfig /userdata/system/system.conf
+        if [ -s /userdata/system/system.conf ]; then
+            if [ ! -f /var/run/regmsgd.sock ]; then
+                # Waits for the daemon to start
+                count=0
+                while [ "$count" -lt 20 ]; do
+                    # Check if the daemon is running more efficiently
+                    if [ -f /var/run/regmsgd.pid ]; then
+                        break
+                    fi
+                    sleep 0.2
+                    count=$((count + 1))
+                done
+            fi
+            /usr/bin/regmsg systemconf loadconfig /userdata/system/system.conf
+        fi
 
         # Run user script if exists
         if [ -x /boot/postshare.sh ]; then
