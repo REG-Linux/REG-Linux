@@ -24,9 +24,9 @@ index 296688f7c..2485555e0 100644
 diff --git a/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
 new file mode 100644
 index 000000000..081f14e47
---- /dev/null
-+++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
-@@ -0,0 +1,1145 @@
+--- /dev/null	2025-12-02 16:49:25.665215080 +0100
++++ arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts	2025-12-02 17:30:29.690168277 +0100
+@@ -0,0 +1,1130 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022, Teguh Sobirin.
@@ -336,29 +336,14 @@ index 000000000..081f14e47
 +		};
 +	};
 +
-+battery: battery {
-+    compatible = "qcom,power-supply-battery";
++	battery: battery {
++		compatible = "simple-battery";
 +
-+    /* Basic capacity info */
-+    qcom,fg-batt-capacity-mah = <6600>;
-+    qcom,fg-cc-soc-coeff = <100>;
-+
-+    /* Voltage range typical for a 2S1P high-capacity Li-ion polymer pack */
-+    qcom,voltage-min-microvolt = <3300000>;
-+    qcom,voltage-max-microvolt = <4400000>;
-+
-+    /* Charge termination (tunable; safe default) */
-+    qcom,chg-term-current-ma = <150>;
-+
-+    /* Battery identification → must match rradc channel */
-+    qcom,battery-id-channel = <&pmi8998_rradc 4>;
-+
-+    /* Thermistor pin (usually 1 on SDM845 builds) */
-+    qcom,thermal-pin = <1>;
-+
-+    /* Generic thermistor slope (needs real values later) */
-+    qcom,thermal-coefficients = /bits/ 16 <0x0c6c 0x0b60 0x2eb4>;
-+};
++		/* Basic capacity info */
++		charge-full-design-microamp-hours = <3850000>;
++		voltage-min-design-microvolt = <3600000>;
++		voltage-max-design-microvolt = <4400000>;
++	};
 +
 +	vph_pwr: vph-pwr-regulator {
 +		compatible = "regulator-fixed";
@@ -637,9 +622,9 @@ index 000000000..081f14e47
 +	status = "okay";
 +	clock-frequency = <400000>;
 +	/* TODO confirm this is @20 and not @70 match reg and @ */
-+	synaptics-rmi4-i2c@20 {
++	synaptics-rmi4-i2c@70 {
 +		compatible = "syna,rmi4-i2c";
-+		reg = <0x20>;
++		reg = <0x70>;
 +
 +		#address-cells = <1>;
 +		#size-cells = <0>;
@@ -660,7 +645,7 @@ index 000000000..081f14e47
 +			syna,nosleep-mode = <1>;
 +		};
 +
-+		rmi4_f12: rmi4-f12@12  {
++		rmi4_f12: rmi4-f12@12 {
 +			reg = <0x12>;
 +			touchscreen-inverted-x;
 +			touchscreen-x-mm = <75>;
@@ -1172,6 +1157,3 @@ index 000000000..081f14e47
 +
 +	qcom,snoc-host-cap-8bit-quirk;
 +};
--- 
-2.43.0
-
