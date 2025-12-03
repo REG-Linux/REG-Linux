@@ -11,7 +11,7 @@ REGLINUX_MSG_SITE = https://$(REGLINUX_MSG_TOKEN)@github.com/REG-Linux/regmsg
 REGLINUX_MSG_SITE_METHOD = git
 REGLINUX_MSG_LICENSE = MIT
 REGLINUX_MSG_LICENSE_FILES = LICENSE
-REGLINUX_MSG_DEPENDENCIES += libdrm
+REGLINUX_MSG_DEPENDENCIES += libdrm host-b3sum
 
 RUSTC_TARGET_PROFILE = $(if $(BR2_ENABLE_DEBUG),,release)
 REGLINUX_MSG_LOCATION = target/$(RUSTC_TARGET_NAME)/$(RUSTC_TARGET_PROFILE)
@@ -20,23 +20,23 @@ REGLINUX_MSG_CARGO_BUILD_OPTS += --features integrity
 define HASH_INTEGRITY_CHECK
 	@echo "Creating integrity hash list for reglinux-msg..."
 
-	CURRENTHASH=`b3sum --no-names $(@D)/init/S06regmsgd 2>/dev/null`; \
+	CURRENTHASH=`$(HOST_DIR)/bin/b3sum --no-names $(@D)/init/S06regmsgd 2>/dev/null`; \
 	if [ -z "$$CURRENTHASH" ]; then echo "Could not get HASH for integrity check!" >&2; exit 1; fi; \
 	sed -i "s|___SCRIPT_HASH___|$$CURRENTHASH|" $(@D)/strings.txt
-	
-	CURRENTHASH=`b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/config/S002plymouth 2>/dev/null`; \
+
+	CURRENTHASH=`$(HOST_DIR)/bin/b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/config/S002plymouth 2>/dev/null`; \
 	if [ -z "$$CURRENTHASH" ]; then echo "Could not get HASH for integrity check!" >&2; exit 1; fi; \
 	sed -i "s|___PLYMOUTH_HASH___|$$CURRENTHASH|" $(@D)/strings.txt
 
-	CURRENTHASH=`b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/config/plymouthd.defaults 2>/dev/null`; \
+	CURRENTHASH=`$(HOST_DIR)/bin/b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/config/plymouthd.defaults 2>/dev/null`; \
 	if [ -z "$$CURRENTHASH" ]; then echo "Could not get HASH for integrity check!" >&2; exit 1; fi; \
 	sed -i "s|___DEFAULTS_HASH___|$$CURRENTHASH|" $(@D)/strings.txt
 
-	CURRENTHASH=`b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/themes/reglinux/reglinux.plymouth 2>/dev/null`; \
+	CURRENTHASH=`$(HOST_DIR)/bin/b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/themes/reglinux/reglinux.plymouth 2>/dev/null`; \
 	if [ -z "$$CURRENTHASH" ]; then echo "Could not get HASH for integrity check!" >&2; exit 1; fi; \
 	sed -i "s|___THEME_HASH___|$$CURRENTHASH|" $(@D)/strings.txt
 
-	CURRENTHASH=`b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/themes/reglinux/images/header-image.png 2>/dev/null`; \
+	CURRENTHASH=`$(HOST_DIR)/bin/b3sum --no-names $(BR2_EXTERNAL_REGLINUX_PATH)/package/boot/plymouth/themes/reglinux/images/header-image.png 2>/dev/null`; \
 	if [ -z "$$CURRENTHASH" ]; then echo "Could not get HASH for integrity check!" >&2; exit 1; fi; \
 	sed -i "s|___HEADER_HASH___|$$CURRENTHASH|" $(@D)/strings.txt
 endef

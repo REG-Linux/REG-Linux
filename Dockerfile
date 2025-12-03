@@ -8,7 +8,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get -o APT::Retries=3 update -y && \
     apt-get -o APT::Retries=3 install -y --no-install-recommends \
     bash \
-    b3sum \
     bc \
     binutils \
     build-essential \
