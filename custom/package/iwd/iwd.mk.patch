@@ -1,0 +1,36 @@
+diff --git a/package/iwd/iwd.mk b/package/iwd/iwd.mk
+index 3a178795da..1aadfb9ba6 100644
+--- a/package/iwd/iwd.mk
++++ b/package/iwd/iwd.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-IWD_VERSION = 3.0
++IWD_VERSION = 3.10
+ IWD_SOURCE = iwd-$(IWD_VERSION).tar.xz
+ IWD_SITE = $(BR2_KERNEL_MIRROR)/linux/network/wireless
+ IWD_LICENSE = LGPL-2.1+
+@@ -28,6 +28,10 @@ else
+ IWD_CONF_OPTS += --disable-client
+ endif
+ 
++ifeq ($(BR2_ENABLE_DEBUG),y)
++IWD_CONF_OPTS += --enable-tools
++endif
++
+ ifeq ($(BR2_PACKAGE_SYSTEMD),y)
+ IWD_CONF_OPTS += --enable-systemd-service
+ IWD_DEPENDENCIES += systemd
+@@ -49,10 +53,7 @@ endef
+ IWD_POST_INSTALL_TARGET_HOOKS += IWD_INSTALL_CONFIG_FILE
+ 
+ define IWD_INSTALL_INIT_SYSV
+-	$(INSTALL) -m 0755 -D package/iwd/S40iwd \
+-		$(TARGET_DIR)/etc/init.d/S40iwd
+-	mkdir -p $(TARGET_DIR)/var/lib/iwd
+-	ln -sf /tmp/iwd/hotspot $(TARGET_DIR)/var/lib/iwd/hotspot
++	$(INSTALL) -m 0755 -D package/iwd/S40iwd $(TARGET_DIR)/etc/init.d/S08iwd
+ endef
+ 
+ define IWD_LINUX_CONFIG_FIXUPS

@@ -1,0 +1,53 @@
+diff --git a/package/connman/S45connman b/package/connman/S45connman
+index c8e913d3a1..2b7e06a1df 100644
+--- a/package/connman/S45connman
++++ b/package/connman/S45connman
+@@ -1,37 +1,17 @@
+-#!/bin/sh
+-
++#!/bin/dash
+ DAEMON="connmand"
+ PIDFILE="/var/run/$DAEMON.pid"
+-
+ CONNMAND_ARGS="-n"
+-
+-# shellcheck source=/dev/null
+ [ -r "/etc/default/$DAEMON" ] && . "/etc/default/$DAEMON"
+ 
+ start() {
+ 	printf 'Starting %s: ' "$DAEMON"
+-	# shellcheck disable=SC2086 # we need the word splitting
+-	start-stop-daemon -S -q -m -b -p "$PIDFILE" -x "/usr/sbin/$DAEMON" \
+-		-- $CONNMAND_ARGS
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++	{ start-stop-daemon -S -q -m -b -p "$PIDFILE" -x "/usr/sbin/$DAEMON" -- $CONNMAND_ARGS && echo "OK"; } || { echo "FAIL"; }
+ }
+ 
+ stop() {
+ 	printf 'Stopping %s: ' "$DAEMON"
+-	start-stop-daemon -K -q -p "$PIDFILE"
+-	status=$?
+-	if [ "$status" -eq 0 ]; then
+-		echo "OK"
+-	else
+-		echo "FAIL"
+-	fi
+-	return "$status"
++	{ start-stop-daemon -K -q -p "$PIDFILE" && echo "OK"; } || { echo "FAIL"; }
+ }
+ 
+ restart() {
+@@ -44,7 +24,6 @@ case "$1" in
+ 	start|stop|restart)
+ 		"$1";;
+ 	reload)
+-		# Restart, since there is no true "reload" feature.
+ 		restart;;
+ 	*)
+ 		echo "Usage: $0 {start|stop|restart|reload}"
