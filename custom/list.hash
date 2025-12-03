@@ -52,6 +52,8 @@ a3dd0ea9d489564444fc1a999ebf907e  package/busybox/busybox.config
 19d9fb6941264218f01a320466f28f5b  package/busybox/busybox.mk
 9ce6c4b123d14bcad2d553c7a8b82879  package/cmake/cmake.mk
 3d3c78296119d9f980e4e8f8532322c5  package/connman/Config.in
+35b9d96eb0ce7d9d10cdc4539c5d268f  package/connman/S45connman
+0bee5324abaa5c4300ec7d6df7842687  package/connman/connman.mk
 5a7842aaa50ceb8daa5cc7c317961daa  package/cpuinfo/Config.in
 0aca90f49b6d2a06cc7f347d434b3745  package/dbus-broker/Config.in
 e2ea7480adb24a94f8ab05fd6110697e  package/dbus-broker/dbus-broker.mk
@@ -69,6 +71,9 @@ c1bca4f1254a224fc84ea62d8d8181c7  package/fmt/fmt.mk
 914b4591d3767dc3f9da6f9c07a44386  package/gvfs/gvfs.mk
 17c6479a5b5b0272d5ae7f5c0d068b4e  package/heimdal/heimdal.mk
 0dcc6e0aea156f8ca2e7fb2b3ecc484c  package/ifupdown-scripts/S40network
+018b7fb81a344ccdc28f862a571abe93  package/iwd/S40iwd
+d873ffc20e60450429db1607105f9bee  package/iwd/iwd.hash
+7c1b1663442fbc2bcb15db55ea2e869b  package/iwd/iwd.mk
 bc2ad65da90d0c27761384b55402ae67  package/ksmbd-tools/ksmbd-tools.hash
 59229ace50ead7080914c901d495c34d  package/ksmbd-tools/ksmbd-tools.mk
 54ff4924ef45b414738b64737acc7d8a  package/lame/lame.mk
