@@ -352,6 +352,7 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/xxd/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/evmapx/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/evmapy/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/b3sum/Config.in"
 endmenu
 
 menu "Firmwares"
