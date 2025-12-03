@@ -5,8 +5,6 @@ config BR2_PACKAGE_REGLINUX_MSG
 	select BR2_PACKAGE_LIBDRM
 	select BR2_PACKAGE_GRIM		if BR2_PACKAGE_WAYLAND
 	select BR2_PACKAGE_WF_RECORDER	if BR2_PACKAGE_WAYLAND && BR2_PACKAGE_PIPEWIRE
-
-	select BR2_PACKAGE_HOST_RUSTC
 	help
 	  Manages screen resolution and display settings
 
