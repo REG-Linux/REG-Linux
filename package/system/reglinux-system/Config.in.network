@@ -3,22 +3,12 @@ config BR2_PACKAGE_REGLINUX_NETWORK
 
 	# connman
 	select BR2_PACKAGE_CONNMAN		# network manager
-	select BR2_PACKAGE_CONNMAN_WIFI		# network manager
-	select BR2_PACKAGE_CONNMAN_ETHERNET	# network manager
-	select BR2_PACKAGE_CONNMAN_CLIENT	# network manager
-	select BR2_PACKAGE_CONNMAN_LOOPBACK	# network manager
-
-	# wpa supplicant
-	select BR2_PACKAGE_WPA_SUPPLICANT			# wifi
-	select BR2_PACKAGE_WPA_SUPPLICANT_CLI			# wifi
-	select BR2_PACKAGE_WPA_SUPPLICANT_DBUS			# wifi
-	select BR2_PACKAGE_WPA_SUPPLICANT_DBUS_INTROSPECTION	# wifi
-	select BR2_PACKAGE_WPA_SUPPLICANT_WIRED			# wpa_supplicant driver, 2.10 requires kernel > 4.4
-	select BR2_PACKAGE_WPA_SUPPLICANT_WPA3			# wifi
-	select BR2_PACKAGE_WPA_SUPPLICANT_NL80211		# wpa_supplicant driver
-	select BR2_PACKAGE_WPA_SUPPLICANT_WEXT			# wpa_supplicant driver
+	select BR2_PACKAGE_CONNMAN_ETHERNET
+	select BR2_PACKAGE_CONNMAN_BLUETOOTH
+	select BR2_PACKAGE_CONNMAN_LOOPBACK
 
 	# wireless tools
+	select BR2_PACKAGE_IWD				# use IWS instead of wpa_supplicant
 	select BR2_PACKAGE_WIRELESS_REGDB		# wireless regulatory DB
 	select BR2_PACKAGE_IW				# wireless country config for regulatoryDB
 	select BR2_PACKAGE_WIRELESS_TOOLS		# wireless tools

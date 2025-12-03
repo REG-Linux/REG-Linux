@@ -1,0 +1,31 @@
+#!/bin/dash
+DAEMON="connmand"
+PIDFILE="/var/run/$DAEMON.pid"
+CONNMAND_ARGS="-n"
+[ -r "/etc/default/$DAEMON" ] && . "/etc/default/$DAEMON"
+
+start() {
+	printf 'Starting %s: ' "$DAEMON"
+	{ start-stop-daemon -S -q -m -b -p "$PIDFILE" -x "/usr/sbin/$DAEMON" -- $CONNMAND_ARGS && echo "OK"; } || { echo "FAIL"; }
+}
+
+stop() {
+	printf 'Stopping %s: ' "$DAEMON"
+	{ start-stop-daemon -K -q -p "$PIDFILE" && echo "OK"; } || { echo "FAIL"; }
+}
+
+restart() {
+	stop
+	sleep 1
+	start
+}
+
+case "$1" in
+	start|stop|restart)
+		"$1";;
+	reload)
+		restart;;
+	*)
+		echo "Usage: $0 {start|stop|restart|reload}"
+		exit 1
+esac
