@@ -1,0 +1,65 @@
+#!/bin/dash
+DAEMON="/usr/libexec/iwd"
+PIDFILE="/var/run/iwd.pid"
+IWD_ARGS="-d"
+[ -r "/etc/default/iwd" ] && . "/etc/default/iwd"
+
+# configure wifi files
+system_wifi_configure() {
+    case "$1" in
+        1) ;;
+        .hidden) settings_hide=true; X="$1" ;;
+        *) X="$1" ;;
+    esac
+    settings_ssid="$(sed -n "s/^wifi${X}\.ssid=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
+
+    # Create or remove wifi configuration files based on SSID
+    if [ -n "$settings_ssid" ]; then
+        settings_key="$(sed -n "s/^wifi${X}\.key=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
+
+        if ! echo "$settings_ssid" | grep -q '^[a-zA-Z0-9_-]*$'; then
+            # Contains invalid characters - do hex encode
+            settings_ssid="=$(printf '%s' "$settings_ssid" | od -An -tx1 | tr -d ' \n')"
+        fi
+        settings_file="/var/lib/iwd/${settings_ssid}.psk"
+
+        {  # create wifi config files
+        printf '%s\n' "[Settings]" "AutoConnect=true"
+        [ -n "$settings_hide" ] && printf '%s\n' "Hidden=true"
+        printf '%s\n' "[Security]" "Passphrase=$settings_key"
+        } > "$settings_file"
+    fi
+}
+
+start() {
+    printf "Starting iwd: "
+    mkdir -p /tmp/iwd/hotspot /var/lib/iwd
+    ln -sf /tmp/iwd/hotspot /var/lib/iwd/hotspot
+
+    wifi_enabled="$(sed -n "s/^wifi\.enabled=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
+    if [ "$wifi_enabled" = "1" ]; then
+        for i in 1 2 3 .hidden; do
+            system_wifi_configure "$i"
+        done
+        wifi_country="$(sed -n "s/^wifi\.country=\(.*\)$/\1/p" /boot/system-boot.conf 2>/dev/null)"
+        [ -n "$wifi_country" ] && /usr/sbin/iw reg set "$wifi_country"
+    fi
+
+    { start-stop-daemon -b -m -S -q -O /var/log/iwd.log -p "$PIDFILE" -x "$DAEMON" -- $IWD_ARGS && echo "OK"; } || { echo "FAIL"; return 1; }
+}
+
+stop() {
+    printf "Stopping iwd: "
+    { start-stop-daemon -K -q -p "$PIDFILE" && echo "OK"; } || { echo "FAIL"; return 1; }
+}
+
+case "$1" in
+    start|stop)
+        "$1";;
+    restart|reload)
+        stop
+        start;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload}"
+        exit 1
+esac
