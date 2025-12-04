@@ -3,7 +3,7 @@
 # lunasvg
 #
 ################################################################################
-LUNASVG_VERSION = v3.3.0
+LUNASVG_VERSION = v3.5.0
 LUNASVG_SITE = $(call github,sammycage,lunasvg,$(LUNASVG_VERSION))
 LUNASVG_LICENSE = MIT
 
