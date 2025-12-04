@@ -78,16 +78,12 @@ endif
 # panvk needs libclc, llvm and spirv-llvm-translator
 ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER_PANFROST),y)
 MESA3D_DEPENDENCIES += libclc spirv-llvm-translator spirv-tools
-#MESA3D_MESON_EXTRA_BINARIES += exe_wrapper=['$(HOST_DIR)/bin/qemu-$(BR2_ARCH)','-L','$(STAGING_DIR)']
 endif
 
 # asahi needs libclc spirv-tools
 # specify extra binaries to cross-compile asahi clc
 ifeq ($(BR2_x86_64)$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
 MESA3D_DEPENDENCIES += libclc spirv-tools spirv-llvm-translator clang host-glslang
-#ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
-#MESA3D_MESON_EXTRA_BINARIES += exe_wrapper=['$(HOST_DIR)/bin/qemu-$(BR2_ARCH)','-L','$(STAGING_DIR)']
-#endif
 endif
 
 ifeq ($(BR2_PACKAGE_MESA3D_NEEDS_ELFUTILS),y)
