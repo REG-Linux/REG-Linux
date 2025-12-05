@@ -56,7 +56,7 @@ index 000000000000..6a5df1103a90
 +	};
 +
 +	connector {
-+		compatible = "hdmi-connector";
++		\compatible = "hdmi-connector";
 +		ddc-en-gpios = <&pio 7 2 GPIO_ACTIVE_HIGH>; /* PH2 */
 +		type = "a";
 +
@@ -370,4 +370,3 @@ index 000000000000..41a9af4ef67a
 +# CONFIG_USB_DWC3_GADGET is not set
 -- 
 2.39.1
-

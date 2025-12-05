@@ -25,6 +25,7 @@ For rapid iteration, mount the generated `boot.vfat` and swap `/boot/linux` or `
 | `fsoverlay/` | Root filesystem overlay applied to every H5 target. |
 | `orangepi-pc2/` | Boot assets (extlinux, genimage, staging script) for Orange Pi PC2. |
 | `tritium-h5/` | Same structure for Libretech Tritium H5 (ALL-H3-CC). |
+| `build-uboot.sh` | Shared helper that downloads/patches U-Boot 2025.01, recompiles TF-A (`sun50i_a64`), and installs the SPL under `reglinux/uboot-<target>/`. |
 | `patches/` | Package-specific fixes required by these boards. |
 
 Each board directory contains:
@@ -32,7 +33,7 @@ Each board directory contains:
 | File | Description |
 | ---- | ----------- |
 | `boot/extlinux.conf` | Kernel entry pointing at `/boot/linux`, the DTB, and REG-Linux kernel args (`initrd=/boot/initrd.lz4 label=REGLINUX rootwait quiet splash console=ttyS0,115200`). |
-| `create-boot-script.sh` | Post-image helper that copies kernel, initrd, squashfs, modules, firmware, rescue bundle, and the device tree into `${REGLINUX_BINARIES_DIR}/boot`. |
+| `create-boot-script.sh` | Post-image helper that first runs `../build-uboot.sh` to rebuild TF-A + U-Boot for the board, then copies kernel, initrd, squashfs, modules, firmware, rescue bundle, and the device tree into `${REGLINUX_BINARIES_DIR}/boot`. |
 | `genimage.cfg` | Disk layout: 2 GiB FAT32 boot (`boot.vfat`), 256 MiB EXT4 userdata (`/userdata`), plus injection of the board’s U-Boot SPL at 8 KiB. Adjust sizes or SPL paths here when forking. |
 
 ---
@@ -41,10 +42,10 @@ Each board directory contains:
 
 | Board dir | Device tree | U-Boot SPL path | Notes |
 | --------- | ----------- | --------------- | ----- |
-| `orangepi-pc2/` | `sun50i-h5-orangepi-pc2.dtb` | `../../uboot-multiboard/orangepi_pc2/u-boot-sunxi-with-spl.bin` | Works for Orange Pi PC2 SBCs. Drop extra firmware blobs into `BINARIES_DIR/firmware` so the staging script copies them automatically. |
-| `tritium-h5/` | `sun50i-h5-libretech-all-h3-cc.dtb` | `../../uboot-multiboard/libretech_all_h3_cc_h5/u-boot-sunxi-with-spl.bin` | Covers Libretech Tritium H5 (ALL-H3-CC). Boot logic mirrors the PC2 layout; usually only the DTB/SPL path changes. |
+| `orangepi-pc2/` | `sun50i-h5-orangepi-pc2.dtb` | `../uboot-orangepi-pc2/u-boot-sunxi-with-spl.bin` | Works for Orange Pi PC2 SBCs. Drop extra firmware blobs into `BINARIES_DIR/firmware` so the staging script copies them automatically. |
+| `tritium-h5/` | `sun50i-h5-libretech-all-h3-cc.dtb` | `../uboot-tritium-h5/u-boot-sunxi-with-spl.bin` | Covers Libretech Tritium H5 (ALL-H3-CC). Boot logic mirrors the PC2 layout; usually only the DTB/SPL path changes. |
 
-To add another H5 platform, copy either directory, change the DTB reference, point the SPL partition to the matching `uboot-multiboard` target, and tweak `extlinux.conf` as needed.
+To add another H5 platform, copy either directory, change the DTB reference, set the `UBOOT_DEFCONFIG`/`UBOOT_TARGET` variables in `create-boot-script.sh`, and update `genimage.cfg` to reference the matching `../uboot-<target>/u-boot-sunxi-with-spl.bin` directory.
 
 ---
 
