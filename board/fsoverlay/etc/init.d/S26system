@@ -11,11 +11,13 @@ reg_xarcade2jstick() {
 }
 
 reg_hostname() {
-    current_hostname=$(hostname)
-    if [ -n "$current_hostname" ]; then
+    reghostname="$(/usr/bin/regmsg systemconf getconfigkey system.hostname)"
+    # If hostname is set by user, use it, else get current DHCP hostname
+    { [ -n "$reghostname" ] && hostname "$reghostname"; } || reghostname=$(hostname)
+    if [ -n "$reghostname" ]; then
         echo "Creating /etc/hosts"
         printf '%s\t%s\n' "127.0.0.1" "localhost" > /etc/hosts
-        printf '%s\t%s\n' "127.0.1.1" "$current_hostname" >> /etc/hosts
+        printf '%s\t%s\n' "127.0.1.1" "$reghostname" >> /etc/hosts
     fi
 }
 
