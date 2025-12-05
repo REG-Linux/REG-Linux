@@ -5,7 +5,7 @@ This folder gathers the device-specific boot helpers, overlays, device trees, ke
 Each board directory mirrors the layout expected by the build/release scripts:
 
 - `*/boot/` holds an `extlinux.conf` snippet that describes the kernel, initramfs, and dtb to boot on that board.
-- `create-boot-script.sh` wraps `extlinux.conf` with `mkimage` so you can drop an up-to-date `boot.scr` on the boot partition without editing binary blobs.
+- `create-boot-script.sh` wraps `extlinux.conf` with `mkimage` so you can drop an up-to-date `boot.scr` on the boot partition without editing binary blobs. Boards that build U-Boot during the post-image stage call `../build-uboot.sh` from this script so the bootloaders land next to the per-board images in `reglinux/uboot-<target>/`.
 - `genimage.cfg` describes the partition layout and files that `genimage` should assemble when creating SD cards or eMMC images for the board.
 
 The current boards in this tree are:
@@ -15,9 +15,9 @@ The current boards in this tree are:
 - `nanopi-m4v2`
 - `orangepi-4-lts`
 - `orangepi-800`
-- `rock960`
-- `rock-pi-4`
-- `rockpro64`
+- `rock960` builds U-Boot locally; the `genimage.cfg` layout now matches the upstream binman output (`idbloader.img` + `u-boot.itb`) instead of the legacy `trust.img` partition that shipped in the rkbin prebuilt bundle. If you revert to the old blobs, remember to restore the trust partition in `genimage.cfg`.
+- `rock-pi-4` (builds U-Boot locally)
+- `rockpro64` (builds U-Boot locally)
 - `tinkerboard2`
 
 ## Device trees

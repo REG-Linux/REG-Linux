@@ -16,7 +16,7 @@
 - `fsoverlay/` overlays get copied into the target rootfs. They currently add temperature helpers (`fsoverlay/usr/bin/cputemp` and `fsoverlay/usr/bin/gputemp`) and ALSA card configurations tailored for the rk3288 audio routes (`fsoverlay/usr/share/alsa/cards/{Analog.conf,simple-card.conf,SPDIF.conf}`).
 
 ## Layout
-- **`miqi/`** and **`tinkerboard/`** mirror the REG-Linux board layout: `genimage.cfg` defines the partition map, `create-boot-script.sh` arranges the boot tree under `boot/boot` and `boot/extlinux`, and `boot/extlinux.conf` is the default loader entry that points to `/boot/linux`, the appropriate DTB, and the initrd.
+- **`miqi/`** and **`tinkerboard/`** mirror the REG-Linux board layout: `genimage.cfg` defines the partition map, `create-boot-script.sh` arranges the boot tree under `boot/boot` and `boot/extlinux`, and `boot/extlinux.conf` is the default loader entry that points to `/boot/linux`, the appropriate DTB, and the initrd. Each create-boot script also invokes `../build-uboot.sh` so the RK3288-specific U-Boot + TF-A payloads are compiled locally during the post-image step.
 - **`linux-defconfig.config`** is the canonical kernel config for RK3288 builds; run `make defconfig` with your kernel tree to update it and commit the diff if you add features.
 - **`linux_patches/`** is layered on top of every RK3288 kernel build. Rebase those patches when upstream DTS/init, V4L2, or multimedia subsystems change.
 - **`patches/`** contains package-specific patches and is staged by the REG-Linux build to keep the BlueZ utilities, Moonlight, and DXX-Rebirth trees usable on RK3288 hardware.
@@ -26,12 +26,12 @@
 
 - **MiQi**
   - `miqi/create-boot-script.sh` copies `zImage`, `initrd.lz4`, module/firmware/rescue branches, and `rk3288-miqi.dtb` into `REGLINUX_BINARIES_DIR/boot/boot`, then drops `miqi/boot/extlinux.conf` into `REGLINUX_BINARIES_DIR/boot/extlinux`.
-  - `miqi/genimage.cfg` writes a 2 GiB FAT boot image plus a 256 MiB `userdata.ext4` share partition, then produces `reglinux.img` with the MiQi `idbloader.img`/`u-boot.img` (from `uboot-multiboard/miqi-rk3288`) plus a VFAT `boot.vfat` partition and the `userdata` ext4 volume.
+  - `miqi/genimage.cfg` writes a 2 GiB FAT boot image plus a 256 MiB `userdata.ext4` share partition, then produces `reglinux.img` with the MiQi `idbloader.img`/`u-boot.img` artifacts from `../uboot-miqi-rk3288/` alongside a VFAT `boot.vfat` partition and the `userdata` ext4 volume.
   - `miqi/boot/extlinux.conf` points at `/boot/linux` and `/boot/rk3288-miqi.dtb` with `initrd=/boot/initrd.lz4 label=REGLINUX rootwait quiet splash console=uart8250,mmio32,0xff690000`.
 
 - **Tinker Board S**
   - `tinkerboard/create-boot-script.sh` is nearly identical to the MiQi variant but copies `rk3288-tinker.dtb`/`rk3288-tinker-s.dtb`, reflecting the Asus Tinker board families, and installs `tinkerboard/boot/extlinux.conf`.
-  - `tinkerboard/genimage.cfg` shares the same partition layout (boot VFAT, userdata ext4, `reglinux.img`) but prepends the Tinker-specific `idbloader.img`/`u-boot.img` from `uboot-multiboard/tinker-s-rk3288`.
+  - `tinkerboard/genimage.cfg` shares the same partition layout (boot VFAT, userdata ext4, `reglinux.img`) but prepends the Tinker-specific `idbloader.img`/`u-boot.img` from `../uboot-tinker-s-rk3288/`.
   - `tinkerboard/boot/extlinux.conf` adds a `DEFAULT reg.linux` entry that also points at `/boot/linux`, `/boot/rk3288-tinker.dtb`, and the same initrd/console arguments.
 
 ## Build notes
