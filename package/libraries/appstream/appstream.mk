@@ -15,6 +15,6 @@ APPSTREAM_CONF_ENV = LD_LIBRARY_PATH=$(HOST_DIR)/usr/lib:$(LD_LIBRARY_PATH) PATH
 
 $(eval $(meson-package))
 
-HOST_APPSTREAM_DEPENDENCIES = host-libxmlb host-itstool host-libcurl host-libidn2 host-libyaml host-gperf host-brotli host-zstd
+HOST_APPSTREAM_DEPENDENCIES = host-libxmlb host-itstool host-libidn2 host-libyaml host-gperf host-brotli host-zstd
 HOST_APPSTREAM_CONF_OPTS = -Dgir=false -Dstemming=false -Dsystemd=false -Dzstd-support=true -Ddocs=false -Dapidocs=false -Dinstall-docs=false
 $(eval $(host-meson-package))

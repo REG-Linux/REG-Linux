@@ -15,8 +15,6 @@ LIBALTSOUND_CONF_OPTS += -DBUILD_STATIC=OFF
 LIBALTSOUND_CONF_OPTS += -DPLATFORM=linux
 LIBALTSOUND_CONF_OPTS += -DARCH=$(BUILD_ARCH)
 
-LIBALTSOUND_DEPENDENCIES = host-libcurl
-
 # handle supported target platforms
 ifeq ($(BR2_aarch64),y)
     BUILD_ARCH = aarch64
@@ -34,7 +32,7 @@ define LIBALTSOUND_BASS_HACKS
     rm -rf $(@D)/tmp
     mkdir $(@D)/tmp
     # bass24 - this is ugly...
-    cd $(@D)/tmp && $(HOST_DIR)/bin/curl -s \
+    cd $(@D)/tmp && curl -s \
         https://www.un4seen.com/files/bass24-linux.zip -o bass.zip
     cd $(@D)/tmp && unzip -x bass.zip
     cp $(@D)/tmp/c/bass.h $(@D)/third-party/include
