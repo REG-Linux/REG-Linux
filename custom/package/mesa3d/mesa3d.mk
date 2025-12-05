@@ -331,7 +331,9 @@ $(eval $(meson-package))
 HOST_MESA3D_DEPENDENCIES = libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
 HOST_MESA3D_CONF_OPTS = -Dplatforms= -Dgallium-drivers= -Dvulkan-drivers= -Dglx=disabled -Dgallium-rusticl=false -Dcpp_rtti=false -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dinstall-precomp-compiler=true
 ifeq ($(BR2_x86_64),y)
-HOST_MESA3D_CONF_OPTS += -Dintel-clc=true
+# LLVM RTTI is enabled on x86_64 build
+HOST_MESA3D_CONF_OPTS += -Dcpp_rtti=true
+#HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=crocus,i915,iris,nouveau,r300,r600,radeonsi -Dvulkan-drivers=intel,intel_hasvk,amd
 endif
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST),y)
 HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=panfrost

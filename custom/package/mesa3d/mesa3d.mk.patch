@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/mesa3d.mk b/package/mesa3d/mesa3d.mk
-index 202fc5cc74..ed7c26f58f 100644
+index 202fc5cc74..61a51baf10 100644
 --- a/package/mesa3d/mesa3d.mk
 +++ b/package/mesa3d/mesa3d.mk
 @@ -4,10 +4,10 @@
@@ -264,7 +264,7 @@ index 202fc5cc74..ed7c26f58f 100644
  MESA3D_CFLAGS = $(TARGET_CFLAGS)
  
  # m68k needs 32-bit offsets in switch tables to build
-@@ -254,12 +317,34 @@ endif
+@@ -254,12 +317,36 @@ endif
  ifeq ($(BR2_PACKAGE_LIBGLVND),y)
  ifneq ($(BR2_PACKAGE_MESA3D_OPENGL_GLX)$(BR2_PACKAGE_MESA3D_OPENGL_EGL),)
  MESA3D_DEPENDENCIES += libglvnd
@@ -285,7 +285,9 @@ index 202fc5cc74..ed7c26f58f 100644
 +HOST_MESA3D_DEPENDENCIES = libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
 +HOST_MESA3D_CONF_OPTS = -Dplatforms= -Dgallium-drivers= -Dvulkan-drivers= -Dglx=disabled -Dgallium-rusticl=false -Dcpp_rtti=false -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dinstall-precomp-compiler=true
 +ifeq ($(BR2_x86_64),y)
-+HOST_MESA3D_CONF_OPTS += -Dintel-clc=true
++# LLVM RTTI is enabled on x86_64 build
++HOST_MESA3D_CONF_OPTS += -Dcpp_rtti=true
++#HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=crocus,i915,iris,nouveau,r300,r600,radeonsi -Dvulkan-drivers=intel,intel_hasvk,amd
 +endif
 +ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST),y)
 +HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=panfrost
