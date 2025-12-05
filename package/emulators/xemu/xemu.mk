@@ -164,7 +164,7 @@ define XEMU_GET_SUBMODULES
     # keycodemapdb - revision variation
     mkdir -p $(@D)/subprojects/keycodemapdb
     $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/keycodemapdb.wrap))
-    curl -L -o keycodemapdb.tar.gz https://gitlab.com/qemu-project/keycodemapdb/-/archive/$(REVISION)/$(REVISION).tar.gz
+    curl -L -o keycodemapdb.tar.gz https://gitlab.com/api/v4/projects/qemu-project%2Fkeycodemapdb/repository/archive.tar.gz?sha=$(REVISION)
     $(TAR) -xzf keycodemapdb.tar.gz --strip-components=1 -C $(@D)/subprojects/keycodemapdb
     rm keycodemapdb.tar.gz
 
@@ -185,7 +185,7 @@ define XEMU_GET_SUBMODULES
     # berkeley-testfloat-3 - revision variation
     mkdir -p $(@D)/subprojects/berkeley-testfloat-3
     $(eval REVISION = $(shell grep -Po '(?<=^revision = ).+' $(@D)/subprojects/berkeley-testfloat-3.wrap))
-    curl -L -o berkeley-testfloat-3.tar.gz https://gitlab.com/qemu-project/berkeley-testfloat-3/-/archive/$(REVISION)/$(REVISION).tar.gz
+    curl -L -o berkeley-testfloat-3.tar.gz https://gitlab.com/api/v4/projects/qemu-project%2Fberkeley-testfloat-3/repository/archive.tar.gz?sha=$(REVISION)
     $(TAR) -xzf berkeley-testfloat-3.tar.gz --strip-components=1 -C $(@D)/subprojects/berkeley-testfloat-3
     cp $(@D)/subprojects/packagefiles/berkeley-testfloat-3/* $(@D)/subprojects/berkeley-testfloat-3
     rm berkeley-testfloat-3.tar.gz
