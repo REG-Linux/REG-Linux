@@ -331,15 +331,15 @@ $(eval $(meson-package))
 HOST_MESA3D_DEPENDENCIES = libclc host-glslang host-wayland-protocols host-libdrm host-bison host-flex host-python-mako host-expat host-zlib host-python-ply host-python3 host-python-pyyaml host-spirv-llvm-translator
 HOST_MESA3D_CONF_OPTS = -Dplatforms= -Dgallium-drivers= -Dvulkan-drivers= -Dglx=disabled -Dgallium-rusticl=false -Dcpp_rtti=false -Dmesa-clc=enabled -Dinstall-mesa-clc=true -Dinstall-precomp-compiler=true
 ifeq ($(BR2_x86_64),y)
-HOST_MESA3D_CONF_OPTS += -Dintel-clc=true
+# LLVM RTTI is enabled on x86_64 build
+HOST_MESA3D_CONF_OPTS += -Dcpp_rtti=true
 endif
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST),y)
 HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=panfrost
 endif
 
 # reglinux hack to fix prebuilt llvm/clang
-#HOST_MESA3D_CONF_OPTS += -DCMAKE_INSTALL_RPATH="$(HOST_DIR)/lib"
-# -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+#HOST_MESA3D_CONF_OPTS += -DCMAKE_INSTALL_RPATH="$(HOST_DIR)/lib" -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 HOST_MESA3D_DEPENDENCIES += host-patchelf
 define HOST_MESA3D_FIX_RPATH
     $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/obj2yaml || true;
