@@ -7,8 +7,7 @@ VPINBALL_VERSION = v10.8.0-2051-28dd6c3
 VPINBALL_SITE = $(call github,vpinball,vpinball,$(VPINBALL_VERSION))
 VPINBALL_LICENSE = GPLv3+
 VPINBALL_LICENSE_FILES = LICENSE
-VPINBALL_DEPENDENCIES = host-libcurl
-VPINBALL_DEPENDENCIES += libfreeimage libpinmame libaltsound libdmdutil libdof
+VPINBALL_DEPENDENCIES = libfreeimage libpinmame libaltsound libdmdutil libdof
 VPINBALL_DEPENDENCIES += sdl2 sdl2_image sdl2_ttf ffmpeg
 VPINBALL_EXTRACT_DEPENDENCIES = host-dos2unix
 VPINBALL_SUPPORTS_IN_SOURCE_BUILD = NO
@@ -47,7 +46,7 @@ define VPINBALL_CUSTOM_CMAKE
     rm -rf $(@D)/tmp
     mkdir $(@D)/tmp
     # bass24 - this is ugly...
-    cd $(@D)/tmp && $(HOST_DIR)/bin/curl -s https://www.un4seen.com/files/bass24-linux.zip -o bass.zip
+    cd $(@D)/tmp && curl -s https://www.un4seen.com/files/bass24-linux.zip -o bass.zip
     cd $(@D)/tmp && unzip -x bass.zip
     $(INSTALL) -D -m 0755 $(@D)/tmp/libs/$(ARCH)/libbass.so $(STAGING_DIR)/usr/lib
     $(INSTALL) -D -m 0755 $(@D)/tmp/libs/$(ARCH)/libbass.so $(TARGET_DIR)/usr/lib
