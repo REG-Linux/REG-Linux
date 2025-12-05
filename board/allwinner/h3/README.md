@@ -27,6 +27,9 @@ Each board directory follows the same structure:
   kernel (`zImage` → `/boot/linux`), initrd, SquashFS (`reglinux.update`),
   `modules.update`, `firmware.update`, `rescue.update`, and the relevant
   DTBs into the REG Linux boot partition.
+  The script now also invokes `../build-uboot.sh` to rebuild U-Boot 2025.01
+  with the common Allwinner H3 patch/config fragments and stages the
+  resulting `u-boot-sunxi-with-spl.bin` under `reglinux/uboot-<board>/`.
 * `boot/extlinux.conf` – Syslinux-style boot entry pointing at the staged
   kernel and DTB (e.g., the Capcom Home Arcade renames its DTB to
   `capcom-home-arcade.dtb`).
@@ -90,9 +93,16 @@ into these overlays when adjusting Buildroot packages is unnecessary.
 
 * `cha/kernel-firmware.txt` lists the Wi‑Fi/Bluetooth firmware blobs that
   must be packaged for the Capcom Home Arcade (RTL8188EU family).
-* Every board stages its DTB(s) into `/boot/boot/` next to `linux`,
-  `initrd.lz4`, `reglinux.update`, `modules.update`, `firmware.update`,
-  and `rescue.update`; `extlinux.conf` references these paths verbatim.
+* `build-uboot.sh` can optionally clone TF-A `lts-v2.10.12` and rebuild the
+  BL3x payload when `UBOOT_ATF_PLATFORM` is defined, but by default it sticks
+  to the legacy H3 flow (no upstream TF-A port exists for these 32-bit SoCs).
+* Every board stages its DTB(s) into `/boot/boot/` next to `linux`, the
+  initrd, `reglinux.update`, `modules.update`, `firmware.update`, and
+  `rescue.update`. The shared `build-uboot.sh` helper caches the U-Boot
+  source under `reglinux/build-uboot-cache/`, applies
+  `patches/u-boot/*.patch` + the merged config fragment, and publishes
+  `uboot-<target>/u-boot-sunxi-with-spl.bin`; `genimage.cfg` picks that
+  file up via `../uboot-<target>/...` when emitting the raw disk image.
 
 ---
 
