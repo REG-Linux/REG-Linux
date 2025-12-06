@@ -1,5 +1,6 @@
 from configgen.generators.Generator import Generator
 from configgen.Command import Command
+import xml.parsers.expat
 from codecs import open
 from xml.dom import minidom
 from os import path, mkdir, linesep
@@ -55,7 +56,14 @@ class CemuGenerator(Generator):
         if path.exists(CEMU_CONFIG_PATH):
             try:
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
-            except Exception:
+            except xml.parsers.expat.ExpatError as e:
+                eslog.warning(f"Invalid XML in Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.")
+                pass  # reinit the file
+            except FileNotFoundError:
+                eslog.warning(f"Cemu config file not found: {CEMU_CONFIG_PATH}")
+                pass  # reinit the file
+            except Exception as e:
+                eslog.warning(f"Error parsing Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.")
                 pass  # reinit the file
 
         # Create the settings file

@@ -556,18 +556,22 @@ def _cleanup_system(resolutionChanged, systemMode, mouseChanged, wheelProcesses)
     if resolutionChanged:
         try:
             videoMode.changeMode(systemMode if systemMode is not None else "")
-        except Exception:
-            pass  # Don't let cleanup failures prevent exit.
+        except subprocess.CalledProcessError as e:
+            eslog.warning(f"Failed to restore video mode: {e}")
+        except Exception as e:
+            eslog.warning(f"Unexpected error restoring video mode: {e}")
     if mouseChanged:
         try:
             videoMode.changeMouse(False)
-        except Exception:
-            pass
+        except subprocess.CalledProcessError as e:
+            eslog.warning(f"Failed to restore mouse visibility: {e}")
+        except Exception as e:
+            eslog.warning(f"Unexpected error restoring mouse visibility: {e}")
     if wheelProcesses:
         try:
             wheelsUtils.resetControllers(wheelProcesses)
-        except Exception:
-            eslog.error("Unable to reset wheel controllers!")
+        except Exception as e:
+            eslog.error(f"Unable to reset wheel controllers: {e}")
             pass
 
 
@@ -733,8 +737,14 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
 
             with open(overlay_info_file) as f:
                 infos = json.load(f)
-        except Exception:
-            eslog.warning(f"Unable to read bezel info file: {overlay_info_file}")
+        except FileNotFoundError:
+            eslog.warning(f"Bezel info file not found: {overlay_info_file}")
+            infos = {}
+        except json.JSONDecodeError as e:
+            eslog.warning(f"Invalid JSON in bezel info file {overlay_info_file}: {e}")
+            infos = {}
+        except Exception as e:
+            eslog.warning(f"Unable to read bezel info file {overlay_info_file}: {e}")
             infos = {}
 
         # Get bezel dimensions either from info file or the image itself.
@@ -832,8 +842,12 @@ def extractGameInfosFromXml(xml):
         thumbnail_elem = infos.find("./game/thumbnail")
         if thumbnail_elem is not None:
             vals["thumbnail"] = thumbnail_elem.text
-    except Exception:
-        pass  # Ignore parsing errors.
+    except ET.ParseError as e:
+        eslog.warning(f"Failed to parse XML file {xml}: {e}")
+    except FileNotFoundError as e:
+        eslog.warning(f"XML file not found {xml}: {e}")
+    except Exception as e:
+        eslog.warning(f"Unexpected error parsing XML file {xml}: {e}")
     return vals
 
 
@@ -848,13 +862,26 @@ def callExternalScripts(folder, event, args):
     """
     if not path.isdir(folder):
         return
-    for file in sorted(listdir(folder)):  # Sort for predictable execution order.
+    try:
+        file_list = sorted(listdir(folder))  # Sort for predictable execution order.
+    except OSError as e:
+        eslog.warning(f"Could not read directory {folder}: {e}")
+        return
+
+    for file in file_list:
         filepath = path.join(folder, file)
         if path.isdir(filepath):
             callExternalScripts(filepath, event, args)  # Recurse into subdirectories.
         elif access(filepath, X_OK):
             eslog.debug(f"Calling external script: {str([filepath, event] + args)}")
-            call([filepath, event] + args)
+            try:
+                result = call([filepath, event] + args)
+                if result != 0:
+                    eslog.warning(f"External script {filepath} returned non-zero exit code: {result}")
+            except OSError as e:
+                eslog.error(f"Failed to execute external script {filepath}: {e}")
+            except Exception as e:
+                eslog.error(f"Unexpected error executing external script {filepath}: {e}")
 
 
 def hudConfig_protectStr(text):
@@ -974,9 +1001,11 @@ def runCommand(command):
             eslog.error(err.decode(errors="ignore"))
     except BrokenPipeError:
         # This can happen if the parent process (like `head`) closes the pipe.
-        pass
-    except Exception:
-        eslog.error("Emulator exited unexpectedly", exc_info=True)
+        eslog.debug("Broken pipe when communicating with emulator process")
+    except OSError as e:
+        eslog.error(f"OS error when communicating with emulator process: {e}")
+    except Exception as e:
+        eslog.error(f"Unexpected error when communicating with emulator process: {e}", exc_info=True)
     finally:
         # Ensure process resources are properly released
         if proc and proc.poll() is None:  # Process is still running
@@ -1070,8 +1099,11 @@ if __name__ == "__main__":
     try:
         # Call the main function with parsed arguments.
         exitcode = main(args, maxnbplayers)
-    except Exception:
-        eslog.error("An unhandled exception occurred in configgen:", exc_info=True)
+    except SystemExit:
+        # Let system exit commands pass through (like sys.exit)
+        raise
+    except Exception as e:
+        eslog.error(f"An unhandled exception occurred in configgen: {e}", exc_info=True)
 
     # --- Finalization ---
     # If profiling was enabled, save the results.

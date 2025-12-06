@@ -18,9 +18,17 @@ class OpenJazzGenerator(Generator):
     ):
         try:
             chdir(OPENJAZZ_ROMS_DIR)
-        except:
+        except FileNotFoundError:
             eslog.error(
-                "ERROR: Game assets not installed. You can install your own or get them from the Content Downloader."
+                f"ERROR: OpenJazz ROMs directory not found: {OPENJAZZ_ROMS_DIR}. Game assets not installed. You can install your own or get them from the Content Downloader."
+            )
+        except PermissionError:
+            eslog.error(
+                f"ERROR: Permission denied accessing OpenJazz ROMs directory: {OPENJAZZ_ROMS_DIR}. Check directory permissions."
+            )
+        except OSError as e:
+            eslog.error(
+                f"ERROR: OS error when changing to OpenJazz ROMs directory {OPENJAZZ_ROMS_DIR}: {e}. Game assets may not be installed."
             )
 
         commandArray = [OPENJAZZ_BIN_PATH, "-f", OPENJAZZ_ROMS_DIR + rom]

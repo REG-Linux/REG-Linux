@@ -30,7 +30,11 @@ class FlycastGenerator(Generator):
         if path.exists(FLYCAST_CONFIG_PATH):
             try:
                 flycastConfig.read(FLYCAST_CONFIG_PATH)
-            except:
+            except UnicodeDecodeError as e:
+                eslog.warning(f"Failed to decode config file {FLYCAST_CONFIG_PATH}: {e}. Using default config.")
+                pass  # give up the file
+            except Exception as e:
+                eslog.warning(f"Error reading config file {FLYCAST_CONFIG_PATH}: {e}. Using default config.")
                 pass  # give up the file
 
         setFlycastConfig(flycastConfig, system, gameResolution)
