@@ -13,6 +13,7 @@ keyboard key presses or mouse movements.
 from subprocess import call
 from json import load, dumps
 from os import path
+import os
 from evdev import InputDevice
 from .mouse import mouseButtonToCode
 from utils.logger import get_logger
@@ -699,10 +700,24 @@ class Evmapy:
         Returns:
             tuple: (min_value, max_value) for the axis, or (0, 0) if not found
         """
+        # Validate input parameters
+        if not devicePath or not isinstance(devicePath, str):
+            eslog.warning(f"Invalid device path provided: {devicePath}")
+            return 0, 0
+
+        if not isinstance(axisCode, int):
+            eslog.warning(f"Invalid axis code provided: {axisCode}")
+            return 0, 0
+
         try:
             # Check if the device path exists before attempting to open it
             if not path.exists(devicePath):
                 eslog.warning(f"Device path {devicePath} does not exist")
+                return 0, 0
+
+            # Check if the device path is accessible
+            if not os.access(devicePath, os.R_OK):
+                eslog.warning(f"Device path {devicePath} is not readable")
                 return 0, 0
 
             device = InputDevice(devicePath)
@@ -725,9 +740,13 @@ class Evmapy:
             # Log device not found error
             eslog.warning(f"Device not found at {devicePath}: {e}")
             return 0, 0
+        except OSError as e:
+            # Handle other OS-related errors (like device busy, etc.)
+            eslog.warning(f"OS error accessing device {devicePath}: {e}")
+            return 0, 0
         except Exception as e:
             # Log any other unexpected errors
-            eslog.warning(f"Error reading axis info from {devicePath}: {e}")
+            eslog.warning(f"Unexpected error reading axis info from {devicePath}: {e}")
             return 0, 0
 
         return 0, 0  # Default values if axis not found
