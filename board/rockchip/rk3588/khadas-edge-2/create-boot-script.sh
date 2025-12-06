@@ -16,6 +16,11 @@ REGLINUX_BINARIES_DIR=$6
 
 DTB="rk3588s-khadas-edge2.dtb"
 
+# Mainline U-Boot not working because of Khadas OOWOW
+#mkdir -p "${REGLINUX_BINARIES_DIR}/build-uboot-khadas-edge-2"     || exit 1
+#cp "${BOARD_DIR}/build-uboot.sh"          "${REGLINUX_BINARIES_DIR}/build-uboot-khadas-edge-2/" || exit 1
+#cd "${REGLINUX_BINARIES_DIR}/build-uboot-khadas-edge-2/" && ./build-uboot.sh "${HOST_DIR}" "${BOARD_DIR}" "${BINARIES_DIR}" || exit 1
+
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/boot"     || exit 1
 mkdir -p "${REGLINUX_BINARIES_DIR}/boot/extlinux" || exit 1
 

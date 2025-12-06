@@ -1,0 +1,250 @@
+From: Chris Morgan <macromorgan@hotmail.com>
+
+Add an attribute of "no-hpd" for the Rockchip dw-hdmi-qp controller.
+This is used to describe implementations where the HPD pin is not
+connected or used for other purposes, such as in the RK3588S based
+Gameforce Ace which repurposed the GPIO for an additional face
+button.
+
+The "no-hpd" option was chosen to be consistent with other devices
+which already define this parameter for broken or missing hpd
+functionality.
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+ .../display/rockchip/rockchip,rk3588-dw-hdmi-qp.yaml        | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/display/rockchip/rockchip,rk3588-dw-hdmi-qp.yaml b/Documentation/devicetree/bindings/display/rockchip/rockchip,rk3588-dw-hdmi-qp.yaml
+index 96b4b088eebe..07342838cd52 100644
+--- a/Documentation/devicetree/bindings/display/rockchip/rockchip,rk3588-dw-hdmi-qp.yaml
++++ b/Documentation/devicetree/bindings/display/rockchip/rockchip,rk3588-dw-hdmi-qp.yaml
+@@ -69,6 +69,12 @@ properties:
+       - const: main
+       - const: hpd
+ 
++  no-hpd:
++    type: boolean
++    description:
++      The HPD pin is not present or used for another purpose, and the EDID
++      must be polled instead to determine if a device is attached.
++
+   phys:
+     maxItems: 1
+     description: The HDMI/eDP PHY
+
+From: Chris Morgan <macromorgan@hotmail.com>
+
+Add support for the dw-hdmi-qp driver to handle devices with missing
+HPD pins.
+
+Since in this situation we are now polling for the EDID data via i2c
+change the error message to a rate limited debug message when we are
+unable to complete an i2c read, as a disconnected device would
+otherwise fill dmesg with i2c read errors.
+
+Reviewed-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+ drivers/gpu/drm/bridge/synopsys/dw-hdmi-qp.c | 34 +++++++++++++++++---
+ 1 file changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/synopsys/dw-hdmi-qp.c b/drivers/gpu/drm/bridge/synopsys/dw-hdmi-qp.c
+index 39332c57f2c5..929b2e95a5c5 100644
+--- a/drivers/gpu/drm/bridge/synopsys/dw-hdmi-qp.c
++++ b/drivers/gpu/drm/bridge/synopsys/dw-hdmi-qp.c
+@@ -145,6 +145,7 @@ struct dw_hdmi_qp {
+ 	struct regmap *regm;
+ 
+ 	unsigned long tmds_char_rate;
++	bool no_hpd;
+ };
+ 
+ static void dw_hdmi_qp_write(struct dw_hdmi_qp *hdmi, unsigned int val,
+@@ -535,14 +536,22 @@ static int dw_hdmi_qp_i2c_read(struct dw_hdmi_qp *hdmi,
+ 
+ 		stat = wait_for_completion_timeout(&i2c->cmp, HZ / 10);
+ 		if (!stat) {
+-			dev_err(hdmi->dev, "i2c read timed out\n");
++			if (hdmi->no_hpd)
++				dev_dbg_ratelimited(hdmi->dev,
++						    "i2c read timed out\n");
++			else
++				dev_err(hdmi->dev, "i2c read timed out\n");
+ 			dw_hdmi_qp_write(hdmi, 0x01, I2CM_CONTROL0);
+ 			return -EAGAIN;
+ 		}
+ 
+ 		/* Check for error condition on the bus */
+ 		if (i2c->stat & I2CM_NACK_RCVD_IRQ) {
+-			dev_err(hdmi->dev, "i2c read error\n");
++			if (hdmi->no_hpd)
++				dev_dbg_ratelimited(hdmi->dev,
++						    "i2c read error\n");
++			else
++				dev_err(hdmi->dev, "i2c read error\n");
+ 			dw_hdmi_qp_write(hdmi, 0x01, I2CM_CONTROL0);
+ 			return -EIO;
+ 		}
+@@ -879,6 +888,15 @@ static enum drm_connector_status
+ dw_hdmi_qp_bridge_detect(struct drm_bridge *bridge, struct drm_connector *connector)
+ {
+ 	struct dw_hdmi_qp *hdmi = bridge->driver_private;
++	const struct drm_edid *drm_edid;
++
++	if (hdmi->no_hpd) {
++		drm_edid = drm_edid_read_ddc(connector, bridge->ddc);
++		if (drm_edid)
++			return connector_status_connected;
++		else
++			return connector_status_disconnected;
++	}
+ 
+ 	return hdmi->phy.ops->read_hpd(hdmi, hdmi->phy.data);
+ }
+@@ -904,6 +922,11 @@ dw_hdmi_qp_bridge_tmds_char_rate_valid(const struct drm_bridge *bridge,
+ {
+ 	struct dw_hdmi_qp *hdmi = bridge->driver_private;
+ 
++	/*
++	 * TODO: when hdmi->no_hpd is 1 we must not support modes that
++	 * require scrambling, including every mode with a clock above
++	 * HDMI14_MAX_TMDSCLK.
++	 */
+ 	if (rate > HDMI14_MAX_TMDSCLK) {
+ 		dev_dbg(hdmi->dev, "Unsupported TMDS char rate: %lld\n", rate);
+ 		return MODE_CLOCK_HIGH;
+@@ -1074,12 +1097,15 @@ struct dw_hdmi_qp *dw_hdmi_qp_bind(struct platform_device *pdev,
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
++	hdmi->no_hpd = device_property_read_bool(dev, "no-hpd");
++
+ 	hdmi->bridge.driver_private = hdmi;
+ 	hdmi->bridge.ops = DRM_BRIDGE_OP_DETECT |
+ 			   DRM_BRIDGE_OP_EDID |
+ 			   DRM_BRIDGE_OP_HDMI |
+-			   DRM_BRIDGE_OP_HDMI_AUDIO |
+-			   DRM_BRIDGE_OP_HPD;
++			   DRM_BRIDGE_OP_HDMI_AUDIO;
++	if (!hdmi->no_hpd)
++		hdmi->bridge.ops |= DRM_BRIDGE_OP_HPD;
+ 	hdmi->bridge.of_node = pdev->dev.of_node;
+ 	hdmi->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
+ 	hdmi->bridge.vendor = "Synopsys";
+
+From: Chris Morgan <macromorgan@hotmail.com>
+
+Add support for the HDMI port for the Gameforce Ace. The HDMI port
+has no HPD pin present (the manufacturer's devicetree states the pin
+is reused for an additional face button) so add the attribute of
+no-hpd to poll for connected devices.
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+ .../dts/rockchip/rk3588s-gameforce-ace.dts    | 63 +++++++++++++++++++
+ 1 file changed, 63 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
+index f5894672fcbd..b98e1a3369dc 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts
+@@ -300,6 +300,20 @@ amp_headphone: headphone-amplifier {
+ 		sound-name-prefix = "Headphones Amplifier";
+ 	};
+ 
++	hdmi0-con {
++		compatible = "hdmi-connector";
++		ddc-en-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_HIGH>;
++		pinctrl-0 = <&hdmi0_en>;
++		pinctrl-names = "default";
++		type = "d";
++
++		port {
++			hdmi0_con_in: endpoint {
++				remote-endpoint = <&hdmi0_out_con>;
++			};
++		};
++	};
++
+ 	pwm_fan: pwm-fan {
+ 		compatible = "pwm-fan";
+ 		#cooling-cells = <2>;
+@@ -498,6 +512,34 @@ &gpu {
+ 	status = "okay";
+ };
+ 
++&hdmi0 {
++	no-hpd;
++	pinctrl-0 = <&hdmim0_tx0_cec>, <&hdmim0_tx0_scl>,
++		    <&hdmim0_tx0_sda>;
++	pinctrl-names = "default";
++	status = "okay";
++};
++
++&hdmi0_in {
++	hdmi0_in_vp0: endpoint {
++		remote-endpoint = <&vp0_out_hdmi0>;
++	};
++};
++
++&hdmi0_out {
++	hdmi0_out_con: endpoint {
++		remote-endpoint = <&hdmi0_con_in>;
++	};
++};
++
++&hdmi0_sound {
++	status = "okay";
++};
++
++&hdptxphy0 {
++	status = "okay";
++};
++
+ &i2c0 {
+ 	pinctrl-0 = <&i2c0m2_xfer>;
+ 	pinctrl-names = "default";
+@@ -746,6 +788,10 @@ &i2s0_sdi0
+ 	status = "okay";
+ };
+ 
++&i2s5_8ch {
++	status = "okay";
++};
++
+ &mipidcphy0 {
+ 	status = "okay";
+ };
+@@ -842,6 +888,13 @@ charger_int_h: charger-int-h {
+ 		};
+ 	};
+ 
++	hdmi {
++		hdmi0_en: hdmi0-en {
++			rockchip,pins =
++				<4 RK_PB3 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
+ 	hym8563 {
+ 		hym8563_int: hym8563-int {
+ 			rockchip,pins =
+@@ -1416,6 +1469,16 @@ &vop_mmu {
+ 	status = "okay";
+ };
+ 
++&vp0 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	vp0_out_hdmi0: endpoint@ROCKCHIP_VOP2_EP_HDMI0 {
++		reg = <ROCKCHIP_VOP2_EP_HDMI0>;
++		remote-endpoint = <&hdmi0_in_vp0>;
++	};
++};
++
+ &vp3 {
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;

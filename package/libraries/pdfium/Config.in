@@ -1,0 +1,12 @@
+config BR2_PACKAGE_PDFIUM
+	bool "PDFium (prebuilt binaries)"
+	depends on BR2_SHARED_LIBS
+	depends on BR2_TOOLCHAIN_USES_GLIBC || BR2_TOOLCHAIN_USES_MUSL
+	depends on BR2_aarch64 || BR2_x86_64
+	help
+	  Installs the prebuilt PDFium shared library and headers from
+	  https://github.com/bblanchon/pdfium-binaries (chromium/7557 release).
+	  The package provides `libpdfium.so` for AArch64 and x86_64 targets.
+	  Only glibc and musl toolchains are supported, and shared libraries 
+	  must be enabled on the target.
+	  The archive is published under the MIT license (see LICENSE).
