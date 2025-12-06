@@ -1,0 +1,20 @@
+From Romain TISSERAND <romain.tisserand@gmail.com> Mon Sep 17 00:00:00 2001
+Subject: [moonlight-common-c] enet/unix: don't typedef socklen_t on Unix
+
+On musl (and most Unix libcs), socklen_t is already defined. Redefining it
+as int breaks the signature of enet_address_set_address.
+
+--- a/third_party/moonlight-common-c/enet/unix.c
++++ b/third_party/moonlight-common-c/enet/unix.c
+@@ -160,9 +160,9 @@
+ #include <poll.h>
+ #endif
+ 
+-#if !defined(HAS_SOCKLEN_T) && !defined(__socklen_t_defined) && !defined(__HAIKU__)
++/*#if !defined(HAS_SOCKLEN_T) && !defined(__socklen_t_defined) && !defined(__HAIKU__)
+ typedef int socklen_t;
+-#endif
++#endif*/
+ 
+ #ifndef SOMAXCONN
+ #define SOMAXCONN 128

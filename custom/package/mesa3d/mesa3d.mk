@@ -333,13 +333,15 @@ HOST_MESA3D_CONF_OPTS = -Dplatforms= -Dgallium-drivers= -Dvulkan-drivers= -Dglx=
 ifeq ($(BR2_x86_64),y)
 # LLVM RTTI is enabled on x86_64 build
 HOST_MESA3D_CONF_OPTS += -Dcpp_rtti=true
+#HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=crocus,i915,iris,nouveau,r300,r600,radeonsi -Dvulkan-drivers=intel,intel_hasvk,amd
 endif
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST),y)
 HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=panfrost
 endif
 
 # reglinux hack to fix prebuilt llvm/clang
-#HOST_MESA3D_CONF_OPTS += -DCMAKE_INSTALL_RPATH="$(HOST_DIR)/lib" -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+#HOST_MESA3D_CONF_OPTS += -DCMAKE_INSTALL_RPATH="$(HOST_DIR)/lib"
+# -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 HOST_MESA3D_DEPENDENCIES += host-patchelf
 define HOST_MESA3D_FIX_RPATH
     $(HOST_DIR)/bin/patchelf --set-rpath '$$ORIGIN/../lib' $(HOST_DIR)/bin/obj2yaml || true;
