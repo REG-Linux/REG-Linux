@@ -7,7 +7,7 @@ from typing import Dict, Any, Union, Optional
 try:
     from typing import TypedDict
 except ImportError:
-    from typing_extensions import TypedDict
+    pass
 
 # Import with fallback for different execution contexts
 try:
@@ -445,7 +445,18 @@ class Emulator:
                 uimode_value = "Full"
             self.config["uimode"] = uimode_value  # type: ignore
 
-        except Exception:
+        except ET.ParseError as e:
+            eslog.warning(f"Failed to parse EmulationStation settings file {ES_SETTINGS}: {e}")
+            # Use defaults if ES settings cannot be loaded
+            self.config["showFPS"] = "false"  # type: ignore
+            self.config["uimode"] = "Full"  # type: ignore
+        except FileNotFoundError:
+            eslog.warning(f"EmulationStation settings file not found: {ES_SETTINGS}")
+            # Use defaults if ES settings cannot be loaded
+            self.config["showFPS"] = "false"  # type: ignore
+            self.config["uimode"] = "Full"  # type: ignore
+        except Exception as e:
+            eslog.warning(f"Unexpected error reading EmulationStation settings: {e}")
             # Use defaults if ES settings cannot be loaded
             self.config["showFPS"] = "false"  # type: ignore
             self.config["uimode"] = "Full"  # type: ignore

@@ -18,9 +18,17 @@ class TyrianGenerator(Generator):
     ):
         try:
             chdir(TYRIAN_ROMS_DIR)
-        except:
+        except FileNotFoundError:
             eslog.error(
-                "ERROR: Game assets not installed. You can get them from the Batocera Content Downloader."
+                f"ERROR: Tyrian ROMs directory not found: {TYRIAN_ROMS_DIR}. Game assets not installed. You can get them from the Batocera Content Downloader."
+            )
+        except PermissionError:
+            eslog.error(
+                f"ERROR: Permission denied accessing Tyrian ROMs directory: {TYRIAN_ROMS_DIR}. Check directory permissions."
+            )
+        except OSError as e:
+            eslog.error(
+                f"ERROR: OS error when changing to Tyrian ROMs directory {TYRIAN_ROMS_DIR}: {e}. Game assets may not be installed."
             )
         commandArray = [TYRIAN_BIN_PATH]
 

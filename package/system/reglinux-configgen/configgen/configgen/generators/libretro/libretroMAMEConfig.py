@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import xml.parsers.expat
 from codecs import open
 from csv import reader
 from os import path, makedirs, remove, listdir, unlink, symlink, linesep
@@ -696,7 +697,14 @@ def generateMAMEPadConfig(
     if path.exists(configFile):
         try:
             config = minidom.parse(configFile)
-        except:
+        except xml.parsers.expat.ExpatError as e:
+            eslog.warning(f"Invalid XML in MAME config file {configFile}: {e}. Reinitializing file.")
+            pass  # reinit the file
+        except FileNotFoundError:
+            eslog.warning(f"MAME config file not found: {configFile}")
+            pass  # reinit the file
+        except Exception as e:
+            eslog.warning(f"Error parsing MAME config file {configFile}: {e}. Reinitializing file.")
             pass  # reinit the file
 
     if system.isOptSet("customcfg"):
@@ -839,7 +847,14 @@ def generateMAMEPadConfig(
         if path.exists(configFile_alt):
             try:
                 config_alt = minidom.parse(configFile_alt)
-            except:
+            except xml.parsers.expat.ExpatError as e:
+                eslog.warning(f"Invalid XML in MAME alt config file {configFile_alt}: {e}. Reinitializing file.")
+                pass  # reinit the file
+            except FileNotFoundError:
+                eslog.warning(f"MAME alt config file not found: {configFile_alt}")
+                pass  # reinit the file
+            except Exception as e:
+                eslog.warning(f"Error parsing MAME alt config file {configFile_alt}: {e}. Reinitializing file.")
                 pass  # reinit the file
 
         perGameCfg = system.getOptBoolean("pergamecfg")

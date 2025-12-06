@@ -60,19 +60,28 @@ class MoonlightGenerator(Generator):
         # Rom's basename without extension
         romName = path.splitext(path.basename(rom))[0]
         # find the real game name
-        f = open(MOONLIGHT_GAMELIST_PATH, "r")
-        gfeGame = None
-        for line in f:
-            try:
-                gfeRom, gfeGame, confFile = line.rstrip().split(";")
-                # confFile = confFile.rstrip()
-            except:
-                gfeRom, gfeGame = line.rstrip().split(";")
-                confFile = MOONLIGHT_STAGING_CONFIG_PATH
-            # If found
-            if gfeRom == romName:
-                # return it
-                f.close()
-                return [gfeGame, confFile]
-        # If nothing is found (old gamelist file format ?)
-        return [gfeGame, MOONLIGHT_STAGING_CONFIG_PATH]
+        try:
+            with open(MOONLIGHT_GAMELIST_PATH, "r") as f:
+                gfeGame = None
+                for line in f:
+                    try:
+                        gfeRom, gfeGame, confFile = line.rstrip().split(";")
+                        # confFile = confFile.rstrip()
+                    except ValueError:  # When there are not enough values to unpack
+                        gfeRom, gfeGame = line.rstrip().split(";")
+                        confFile = MOONLIGHT_STAGING_CONFIG_PATH
+                    # If found
+                    if gfeRom == romName:
+                        # return it
+                        return [gfeGame, confFile]
+                # If nothing is found (old gamelist file format ?)
+                return [gfeGame, MOONLIGHT_STAGING_CONFIG_PATH]
+        except FileNotFoundError:
+            eslog.error(f"Moonlight gamelist file not found: {MOONLIGHT_GAMELIST_PATH}")
+            return [None, MOONLIGHT_STAGING_CONFIG_PATH]
+        except PermissionError:
+            eslog.error(f"Permission denied accessing Moonlight gamelist file: {MOONLIGHT_GAMELIST_PATH}")
+            return [None, MOONLIGHT_STAGING_CONFIG_PATH]
+        except Exception as e:
+            eslog.error(f"Error reading Moonlight gamelist file {MOONLIGHT_GAMELIST_PATH}: {e}")
+            return [None, MOONLIGHT_STAGING_CONFIG_PATH]
