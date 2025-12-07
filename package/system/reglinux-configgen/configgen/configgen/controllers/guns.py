@@ -37,10 +37,14 @@ def getGuns():
                 ) == "1":
                     mouses_clean[int(matches.group(1))] = mouse
         except (AttributeError, ValueError) as e:
-            eslog.warning(f"Error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}")
+            eslog.warning(
+                f"Error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}"
+            )
             continue
         except Exception as e:
-            eslog.warning(f"Unexpected error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}")
+            eslog.warning(
+                f"Unexpected error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}"
+            )
             continue
 
     mouses = mouses_clean
@@ -52,9 +56,7 @@ def getGuns():
         device_node = str(mouse.device_node)
 
         eslog.info(
-            "found mouse {} at {} with id_mouse={}".format(
-                nmouse, device_node, nmouse
-            )
+            "found mouse {} at {} with id_mouse={}".format(nmouse, device_node, nmouse)
         )
 
         if (
@@ -116,7 +118,9 @@ def getGuns():
             nmouse = nmouse + 1
             ngun = ngun + 1
         except Exception as e:
-            eslog.warning(f"Error processing gun properties for device {device_node}: {e}")
+            eslog.warning(
+                f"Error processing gun properties for device {device_node}: {e}"
+            )
             nmouse = nmouse + 1
             continue
 

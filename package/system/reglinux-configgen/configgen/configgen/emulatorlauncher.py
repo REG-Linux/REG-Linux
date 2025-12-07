@@ -553,6 +553,8 @@ def _launch_emulator_process(
 
 def _cleanup_system(resolutionChanged, systemMode, mouseChanged, wheelProcesses):
     """Restores system state after the emulator exits."""
+    import subprocess  # Import subprocess here to resolve "subprocess" is not defined errors
+
     if resolutionChanged:
         try:
             videoMode.changeMode(systemMode if systemMode is not None else "")
@@ -685,6 +687,10 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
     Returns:
         str|None: The path to the final bezel image file, or None if no bezel should be used.
     """
+    # Import json here to ensure it's always available within the function scope
+    # for error handling, preventing "json is possibly unbound" diagnostic.
+    import json
+
     # Skip if the emulator handles its own bezels.
     if generator.supportsInternalBezels():
         eslog.debug(f"Skipping bezels for emulator {system.config['emulator']}")
@@ -732,20 +738,16 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
             overlay_info_file, overlay_png_file = bz_infos["info"], bz_infos["png"]
 
         # --- Bezel Validation ---
+        infos = {}  # Initialize infos here to ensure it's always defined
         try:
-            import json
-
             with open(overlay_info_file) as f:
                 infos = json.load(f)
         except FileNotFoundError:
             eslog.warning(f"Bezel info file not found: {overlay_info_file}")
-            infos = {}
         except json.JSONDecodeError as e:
             eslog.warning(f"Invalid JSON in bezel info file {overlay_info_file}: {e}")
-            infos = {}
         except Exception as e:
             eslog.warning(f"Unable to read bezel info file {overlay_info_file}: {e}")
-            infos = {}
 
         # Get bezel dimensions either from info file or the image itself.
         if "width" in infos and "height" in infos:
@@ -877,11 +879,15 @@ def callExternalScripts(folder, event, args):
             try:
                 result = call([filepath, event] + args)
                 if result != 0:
-                    eslog.warning(f"External script {filepath} returned non-zero exit code: {result}")
+                    eslog.warning(
+                        f"External script {filepath} returned non-zero exit code: {result}"
+                    )
             except OSError as e:
                 eslog.error(f"Failed to execute external script {filepath}: {e}")
             except Exception as e:
-                eslog.error(f"Unexpected error executing external script {filepath}: {e}")
+                eslog.error(
+                    f"Unexpected error executing external script {filepath}: {e}"
+                )
 
 
 def hudConfig_protectStr(text):
@@ -1005,7 +1011,10 @@ def runCommand(command):
     except OSError as e:
         eslog.error(f"OS error when communicating with emulator process: {e}")
     except Exception as e:
-        eslog.error(f"Unexpected error when communicating with emulator process: {e}", exc_info=True)
+        eslog.error(
+            f"Unexpected error when communicating with emulator process: {e}",
+            exc_info=True,
+        )
     finally:
         # Ensure process resources are properly released
         if proc and proc.poll() is None:  # Process is still running

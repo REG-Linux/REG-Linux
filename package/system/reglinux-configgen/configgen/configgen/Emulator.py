@@ -31,16 +31,16 @@ except ImportError:
 eslog = get_logger(__name__)
 
 
-# Definindo TypedDicts para estruturas de configuração
+# Defining TypedDicts for configuration structures
 class SystemConfigRequired(TypedDict, total=True):
-    """Campos obrigatórios no SystemConfig"""
+    """Required fields in SystemConfig"""
 
     emulator: str
     core: str
 
 
 class SystemConfigOptional(TypedDict, total=False):
-    """Campos opcionais no SystemConfig"""
+    """Optional fields in SystemConfig"""
 
     videomode: str
     showFPS: str
@@ -100,7 +100,7 @@ class SystemConfigOptional(TypedDict, total=False):
 
 
 class SystemConfig(SystemConfigRequired, SystemConfigOptional):
-    """Configuração do sistema com campos obrigatórios e opcionais"""
+    """System configuration with required and optional fields"""
 
     pass
 
@@ -446,7 +446,9 @@ class Emulator:
             self.config["uimode"] = uimode_value  # type: ignore
 
         except ET.ParseError as e:
-            eslog.warning(f"Failed to parse EmulationStation settings file {ES_SETTINGS}: {e}")
+            eslog.warning(
+                f"Failed to parse EmulationStation settings file {ES_SETTINGS}: {e}"
+            )
             # Use defaults if ES settings cannot be loaded
             self.config["showFPS"] = "false"  # type: ignore
             self.config["uimode"] = "Full"  # type: ignore
