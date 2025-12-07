@@ -549,7 +549,7 @@ $SeatLoopPatch
         commandArray = [
             "dolphin-triforce",
             "-b",
-            "-U",
+            "-u",
             "/userdata/system/configs/dolphin-triforce",
             "-e",
             rom,
@@ -558,7 +558,7 @@ $SeatLoopPatch
             commandArray = [
                 "dolphin-triforce-nogui",
                 "-b",
-                "-U",
+                "-u",
                 "/userdata/system/configs/dolphin-triforce",
                 "-p",
                 system.config["platform"],
@@ -566,7 +566,6 @@ $SeatLoopPatch
                 rom,
             ]
 
-        # No environment variables work for now, paths are coded in above.
         return Command(array=commandArray)
 
     def getInGameRatio(self, config, gameResolution, rom):
