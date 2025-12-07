@@ -1,0 +1,61 @@
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588s.dtsi b/arch/arm64/boot/dts/rockchip/rk3588s.dtsi
+index 41c544849..4eaf7f7be 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3588s.dtsi
++++ b/arch/arm64/boot/dts/rockchip/rk3588s.dtsi
+@@ -2950,21 +2950,20 @@ scmi_shmem: sram@0 {
+ 	};
+ 
+ 	gpu: gpu@fb000000 {
+-		compatible = "arm,mali-valhall";
++		compatible = "rockchip,rk3588-mali", "arm,mali-valhall-csf";
+ 		reg = <0x0 0xfb000000 0x0 0x200000>;
+-		interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>,
++		interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL_HIGH>,
+ 			     <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
+-			     <GIC_SPI 92 IRQ_TYPE_LEVEL_HIGH>;
+-		interrupt-names = "GPU", "MMU", "JOB";
++			     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-names = "job", "mmu", "gpu";
+ 
+ 		clocks = <&scmi_clk SCMI_CLK_GPU>, <&cru CLK_GPU_COREGROUP>,
+ 			 <&cru CLK_GPU_STACKS>, <&cru CLK_GPU>;
+-		clock-names = "clk_mali", "clk_gpu_coregroup",
+-			      "clk_gpu_stacks", "clk_gpu";
+-		assigned-clocks = <&scmi_clk SCMI_CLK_GPU>;
+-		assigned-clock-rates = <200000000>;
++		clock-names = "core", "coregroup", "stacks", "bus";
++		assigned-clocks = <&cru CLK_GPU>, <&scmi_clk SCMI_CLK_GPU>;
++		assigned-clock-rates = <198000000>, <200000000>;
+ 		power-domains = <&power RK3588_PD_GPU>;
+-		operating-points-v2 = <&gpu_opp_table>;
++		operating-points-v2 = <&gpu_opp_table_panthor>;
+ 		#cooling-cells = <2>;
+ 		dynamic-power-coefficient = <2982>;
+ 
+@@ -2972,25 +2971,7 @@ gpu: gpu@fb000000 {
+ 		downdifferential = <10>;
+ 
+ 		status = "disabled";
+-	};
+-
+-	gpu_panthor: gpu-panthor@fb000000 {
+-		compatible = "rockchip,rk3588-mali", "arm,mali-valhall-csf";
+-		reg = <0x0 0xfb000000 0x0 0x200000>;
+-		#cooling-cells = <2>;
+-		assigned-clocks = <&cru CLK_GPU>, <&scmi_clk SCMI_CLK_GPU>;
+-		assigned-clock-rates = <198000000>, <200000000>;
+-		clocks = <&scmi_clk SCMI_CLK_GPU>, <&cru CLK_GPU_COREGROUP>,
+-			 <&cru CLK_GPU_STACKS>, <&cru CLK_GPU>;
+-		clock-names = "core", "coregroup", "stacks", "bus";
+-		dynamic-power-coefficient = <2982>;
+-		interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL_HIGH>,
+-			     <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
+-			     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+-		interrupt-names = "job", "mmu", "gpu";
+-		operating-points-v2 = <&gpu_opp_table_panthor>;
+-		power-domains = <&power RK3588_PD_GPU>;
+-		status = "disabled";
++	
+ 
+ 		gpu_opp_table_panthor: opp-table {
+ 			compatible = "operating-points-v2";

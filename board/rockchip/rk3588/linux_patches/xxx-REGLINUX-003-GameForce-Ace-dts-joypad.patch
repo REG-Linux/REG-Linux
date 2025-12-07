@@ -1,0 +1,291 @@
+--- a/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts.orig	2025-12-06 22:13:27.385871318 +0100
++++ b/arch/arm64/boot/dts/rockchip/rk3588s-gameforce-ace.dts	2025-12-06 22:16:35.329911597 +0100
+@@ -47,71 +47,115 @@
+ 		};
+ 	};
+ 
+-	/* Joystick range values based on hardware observation. */
+-	adc_joystick: adc-joystick {
+-		compatible = "adc-joystick";
+-		io-channels = <&saradc 2>, <&saradc 3>,
+-			      <&saradc 4>, <&saradc 5>;
+-		poll-interval = <60>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		axis@0 {
+-			reg = <0>;
+-			abs-flat = <40>;
+-			abs-fuzz = <30>;
+-			abs-range = <0 4095>;
+-			linux,code = <ABS_RX>;
+-		};
+-
+-		axis@1 {
+-			reg = <1>;
+-			abs-flat = <40>;
+-			abs-fuzz = <30>;
+-			abs-range = <0 4095>;
+-			linux,code = <ABS_RY>;
+-		};
+-
+-		axis@2 {
+-			reg = <2>;
+-			abs-flat = <40>;
+-			abs-fuzz = <30>;
+-			abs-range = <0 4095>;
+-			linux,code = <ABS_Y>;
+-		};
+-
+-		axis@3 {
+-			reg = <3>;
+-			abs-flat = <40>;
+-			abs-fuzz = <30>;
+-			abs-range = <0 4095>;
+-			linux,code = <ABS_X>;
++    joypad: gameforce-ace-joypad {
++		compatible = "gameforce-joypad";
++		poll-interval = <10>;
++		status = "okay";
++
++		joypad-name = "GameForce ACE Gamepad";
++		joypad-product = <0x1000>;
++		joypad-revision = <0x0100>;
++
++		/* Analog sticks */
++		io-channels = <&saradc 2>, <&saradc 3>, <&saradc 4>, <&saradc 5>, <&ti_adc 6>, <&ti_adc 7>;
++		io-channel-names = "key-RY", "key-RX", "key-X", "key-Y", "key-Z", "key-RZ";
++		button-adc-scale = <4>;
++		button-adc-deadzone = <150>;
++		button-adc-fuzz = <32>;
++		button-adc-flat = <32>;
++		abs_x-p-tuning = <350>;
++		abs_x-n-tuning = <350>;
++		abs_y-p-tuning = <350>;
++		abs_y-n-tuning = <350>;
++		abs_z-p-tuning = <350>;
++		abs_z-n-tuning = <350>;
++		abs_rx-p-tuning = <350>;
++		abs_rx-n-tuning = <350>;
++		abs_ry-p-tuning = <350>;
++		abs_ry-n-tuning = <350>;
++		abs_rz-p-tuning = <350>;
++		abs_rz-n-tuning = <350>;
++
++		/* Buttons */
++		sw1 {
++			gpios = <&gpio1 RK_PA0 0x01>;
++			label = "GPIO Key MODE";
++			linux,code = <BTN_MODE>;
+ 		};
+-	};
+-
+-	/* Trigger range values based on hardware observation. */
+-	adc_triggers: adc-trigger {
+-		compatible = "adc-joystick";
+-		io-channels = <&ti_adc 6>,
+-			      <&ti_adc 7>;
+-		poll-interval = <60>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		axis@0 {
+-			reg = <0>;
+-			abs-flat = <15>;
+-			abs-fuzz = <15>;
+-			abs-range = <890 1530>;
+-			linux,code = <ABS_HAT2X>;
+-		};
+-
+-		axis@1 {
+-			reg = <1>;
+-			abs-flat = <15>;
+-			abs-fuzz = <15>;
+-			abs-range = <1010 1550>;
+-			linux,code = <ABS_HAT2Y>;
++		sw2 {
++			gpios = <&gpio1 RK_PB0 0x01>;
++			label = "GPIO Key HOME";
++			linux,code = <BTN_C>;
++		};
++		sw3 {
++			gpios = <&gpio1 RK_PB6 0x01>;
++			label = "GPIO Key START";
++			linux,code = <BTN_START>;
++		};
++		sw4 {
++			gpios = <&gpio1 RK_PA3 0x01>;
++			label = "GPIO Key SELECT";
++			linux,code = <BTN_SELECT>;
++		};
++		sw5 {
++			gpios = <&gpio1 RK_PA2 0x01>;
++			label = "GPIO Key Up";
++			linux,code = <BTN_DPAD_UP>;
++		};
++		sw6 {
++			gpios =  <&gpio1 RK_PB1 0x01>;
++			label = "GPIO Key Down";
++			linux,code = <BTN_DPAD_DOWN>;
++		};
++		sw7 {
++			gpios = <&gpio1 RK_PD7 0x01>;
++			label = "GPIO Key Left";
++			linux,code = <BTN_DPAD_LEFT>;
++		};
++		sw8 {
++			gpios = <&gpio1 RK_PB7 0x01>;
++			label = "GPIO Key Right";
++			linux,code = <BTN_DPAD_RIGHT>;
++		};
++		sw9 {
++			gpios = <&gpio1 RK_PB4 0x01>;
++			label = "GPIO Key X";
++			linux,code = <BTN_NORTH>;
++		};
++		sw10 {
++			gpios = <&gpio1 RK_PB3 0x01>;
++			label = "GPIO Key Y";
++			linux,code = <BTN_WEST>;
++		};
++		sw11 {
++			gpios = <&gpio1 RK_PC6 0x01>;
++			label = "GPIO Key B";
++			linux,code = <BTN_EAST>;
++		};
++		sw12 {
++			gpios = <&gpio1 RK_PA5 0x01>;
++			label = "GPIO Key A";
++			linux,code = <BTN_SOUTH>;
++		};
++		sw13 {
++			gpios = <&gpio1 RK_PA4 0x01>;
++			label = "GPIO Key THU";
++			linux,code = <BTN_THUMBL>;
++		};
++		sw14 {
++			gpios = <&gpio1 RK_PB5 0x01>;
++			label = "GPIO Key TL";
++			linux,code = <BTN_TL>;
++		};
++		sw15 {
++			gpios = <&gpio1 RK_PB2 0x01>;
++			label = "GPIO Key TR";
++			linux,code = <BTN_TR>;
++		};
++		sw16 {
++			gpios = <&gpio1 RK_PD6 0x01>;
++			label = "GPIO Key THUMBR";
++			linux,code = <BTN_THUMBR>;
+ 		};
+ 	};
+ 
+@@ -172,108 +216,6 @@
+ 		voltage-min-design-microvolt = <7400000>;
+ 	};
+ 
+-	gpio_keys: gpio-keys {
+-		compatible = "gpio-keys";
+-		pinctrl-0 = <&btn_pins_ctrl>;
+-		pinctrl-names = "default";
+-
+-		button-a {
+-			gpios = <&gpio1 RK_PC6 GPIO_ACTIVE_LOW>;
+-			label = "EAST";
+-			linux,code = <BTN_EAST>;
+-		};
+-
+-		button-b {
+-			gpios = <&gpio1 RK_PA5 GPIO_ACTIVE_LOW>;
+-			label = "SOUTH";
+-			linux,code = <BTN_SOUTH>;
+-		};
+-
+-		button-down {
+-			gpios = <&gpio1 RK_PB1 GPIO_ACTIVE_LOW>;
+-			label = "DPAD-DOWN";
+-			linux,code = <BTN_DPAD_DOWN>;
+-		};
+-
+-		button-home {
+-			gpios = <&gpio1 RK_PA0 GPIO_ACTIVE_LOW>;
+-			label = "FUNCTION";
+-			linux,code = <BTN_MODE>;
+-		};
+-
+-		button-l1 {
+-			gpios = <&gpio1 RK_PB5 GPIO_ACTIVE_LOW>;
+-			label = "L1";
+-			linux,code = <BTN_TL>;
+-		};
+-
+-		button-left {
+-			gpios = <&gpio1 RK_PD7 GPIO_ACTIVE_LOW>;
+-			label = "DPAD-LEFT";
+-			linux,code = <BTN_DPAD_LEFT>;
+-		};
+-
+-		button-menu {
+-			gpios = <&gpio1 RK_PB0 GPIO_ACTIVE_LOW>;
+-			label = "HOME";
+-			linux,code = <KEY_HOME>;
+-		};
+-
+-		button-r1 {
+-			gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_LOW>;
+-			label = "R1";
+-			linux,code = <BTN_TR>;
+-		};
+-
+-		button-right {
+-			gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_LOW>;
+-			label = "DPAD-RIGHT";
+-			linux,code = <BTN_DPAD_RIGHT>;
+-		};
+-
+-		button-select {
+-			gpios = <&gpio1 RK_PA3 GPIO_ACTIVE_LOW>;
+-			label = "SELECT";
+-			linux,code = <BTN_SELECT>;
+-		};
+-
+-		button-start {
+-			gpios = <&gpio1 RK_PB6 GPIO_ACTIVE_LOW>;
+-			label = "START";
+-			linux,code = <BTN_START>;
+-		};
+-
+-		button-thumbl {
+-			gpios = <&gpio1 RK_PA4 GPIO_ACTIVE_LOW>;
+-			label = "THUMBL";
+-			linux,code = <BTN_THUMBL>;
+-		};
+-
+-		button-thumbr {
+-			gpios = <&gpio1 RK_PD6 GPIO_ACTIVE_LOW>;
+-			label = "THUMBR";
+-			linux,code = <BTN_THUMBR>;
+-		};
+-
+-		button-up {
+-			gpios = <&gpio1 RK_PA2 GPIO_ACTIVE_LOW>;
+-			label = "DPAD-UP";
+-			linux,code = <BTN_DPAD_UP>;
+-		};
+-
+-		button-x {
+-			gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_LOW>;
+-			label = "NORTH";
+-			linux,code = <BTN_NORTH>;
+-		};
+-
+-		button-y {
+-			gpios = <&gpio1 RK_PB3 GPIO_ACTIVE_LOW>;
+-			label = "WEST";
+-			linux,code = <BTN_WEST>;
+-		};
+-	};
+-
+ 	gpio_leds: gpio-leds {
+ 		compatible = "gpio-leds";
+ 		pinctrl-names = "default";
