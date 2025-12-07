@@ -50,21 +50,32 @@ class DuckstationGenerator(Generator):
 
 def rewriteM3uFullPath(m3u):  # Rewrite a clean m3u file with valid fullpath
     # get initialm3u
-    firstline = open(m3u).readline().rstrip()  # Get first line in m3u
+    try:
+        with open(m3u) as f:
+            firstline = f.readline().rstrip()  # Get first line in m3u
+    except (IOError, OSError) as e:
+        eslog.error(f"Error reading m3u file {m3u}: {e}")
+        # Return the original m3u in case of error
+        return m3u
+
     initialfirstdisc = (
         "/tmp/" + path.splitext(path.basename(firstline))[0] + ".m3u"
     )  # Generating a temp path with the first iso filename in m3u
 
     # create a temp m3u to bypass Duckstation m3u bad pathfile
     fulldirname = path.dirname(m3u)
-    initialm3u = open(m3u, "r")
 
-    with open(initialfirstdisc, "a") as f1:
-        for line in initialm3u:
-            if line[0] == "/":  # for /MGScd1.chd
-                newpath = fulldirname + line
-            else:
-                newpath = fulldirname + "/" + line  # for MGScd1.chd
-            f1.write(newpath)
+    try:
+        with open(m3u, "r") as initialm3u, open(initialfirstdisc, "a") as f1:
+            for line in initialm3u:
+                if line[0] == "/":  # for /MGScd1.chd
+                    newpath = fulldirname + line
+                else:
+                    newpath = fulldirname + "/" + line  # for MGScd1.chd
+                f1.write(newpath)
+    except (IOError, OSError) as e:
+        eslog.error(f"Error rewriting m3u file {m3u}: {e}")
+        # Return the original m3u in case of error
+        return m3u
 
     return initialfirstdisc

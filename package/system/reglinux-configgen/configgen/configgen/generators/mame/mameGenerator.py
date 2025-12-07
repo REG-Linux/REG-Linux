@@ -1100,12 +1100,28 @@ def getMameControlScheme(system, romBasename):
     if controllerType in ["default", "neomini", "neocd", "twinstick", "qbert"]:
         return controllerType
     else:
-        capcomList = set(open(mameCapcom).read().split())
-        mkList = set(open(mameMKombat).read().split())
-        kiList = set(open(mameKInstinct).read().split())
-        neogeoList = set(open(mameNeogeo).read().split())
-        twinstickList = set(open(mameTwinstick).read().split())
-        qbertList = set(open(mameRotatedstick).read().split())
+        try:
+            with open(mameCapcom) as f:
+                capcomList = set(f.read().split())
+            with open(mameMKombat) as f:
+                mkList = set(f.read().split())
+            with open(mameKInstinct) as f:
+                kiList = set(f.read().split())
+            with open(mameNeogeo) as f:
+                neogeoList = set(f.read().split())
+            with open(mameTwinstick) as f:
+                twinstickList = set(f.read().split())
+            with open(mameRotatedstick) as f:
+                qbertList = set(f.read().split())
+        except (IOError, OSError) as e:
+            eslog.error(f"Error reading MAME list files: {e}")
+            # Initialize empty sets to avoid breaking the process
+            capcomList = set()
+            mkList = set()
+            kiList = set()
+            neogeoList = set()
+            twinstickList = set()
+            qbertList = set()
 
         romName = path.splitext(romBasename)[0]
         if romName in capcomList:

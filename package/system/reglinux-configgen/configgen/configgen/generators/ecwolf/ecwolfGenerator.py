@@ -44,9 +44,13 @@ class ECWolfGenerator(Generator):
             fextension = (path.splitext(rom)[1]).lower()
 
             if fextension == ".ecwolf":
-                f = open(rom, "r")
-                commandArray += f.readline().split()
-                f.close()
+                try:
+                    with open(rom, "r", encoding="utf-8") as f:
+                        commandArray += f.readline().split()
+                except (IOError, IndexError) as e:
+                    eslog.error(f"Error reading .ecwolf file {rom}: {e}")
+                    # Ensure we handle the case where the file might be empty or inaccessible
+                    pass
 
                 # If 1. parameter isn't an argument then assume it's a path
                 if not "--" in commandArray[1]:

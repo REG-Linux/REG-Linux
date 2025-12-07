@@ -1815,7 +1815,8 @@ def writeBezelConfig(
     # only the png file is mandatory
     if path.exists(overlay_info_file):
         try:
-            infos = load(open(overlay_info_file))
+            with open(overlay_info_file) as f:
+                infos = load(f)
         except:
             infos = {}
     else:
