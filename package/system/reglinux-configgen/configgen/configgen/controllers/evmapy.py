@@ -117,7 +117,13 @@ class Evmapy:
                 call(["system-evmapy", "clear"])
 
                 # Load the pad action configuration from the keys file
-                padActionConfig = load(open(keysfile))
+                try:
+                    with open(keysfile) as f:
+                        padActionConfig = load(f)
+                except (IOError, OSError) as e:
+                    eslog.error(f"Error loading keys file {keysfile}: {e}")
+                    # Continue with empty padActionConfig to avoid breaking the process
+                    padActionConfig = {}
 
                 # Configure light guns
                 ngun = 1

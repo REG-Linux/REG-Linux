@@ -108,7 +108,8 @@ class RyujinxGenerator(Generator):
         if not path.exists(path.dirname(RYUJINX_CONFIG_PATH)):
             makedirs(path.dirname(RYUJINX_CONFIG_PATH))
         try:
-            conf = load(open(RYUJINX_CONFIG_PATH, "r"))
+            with open(RYUJINX_CONFIG_PATH, "r") as f:
+                conf = load(f)
         except:
             conf = {}
 

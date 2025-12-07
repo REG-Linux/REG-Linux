@@ -97,23 +97,27 @@ class XeniaGenerator(Generator):
         if path.splitext(rom)[1] == ".xbox360":
             eslog.debug(f"Found .xbox360 playlist: {rom}")
             pathLead = path.dirname(rom)
-            openFile = open(rom, "r")
-            # Read only the first line of the file.
-            firstLine = openFile.readlines(1)[0]
-            # Strip of any new line characters.
-            firstLine = firstLine.strip("\n").strip("\r")
-            eslog.debug(
-                f"Checking if specified disc installation / XBLA file actually exists..."
-            )
-            xblaFullPath = pathLead + "/" + firstLine
-            if path.exists(xblaFullPath):
-                eslog.debug(f"Found! Switching active rom to: {firstLine}")
-                rom = xblaFullPath
-            else:
-                eslog.error(
-                    f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename."
+            try:
+                with open(rom, "r") as openFile:
+                    # Read only the first line of the file.
+                    firstLine = openFile.readlines(1)[0]
+                    # Strip of any new line characters.
+                    firstLine = firstLine.strip("\n").strip("\r")
+                eslog.debug(
+                    f"Checking if specified disc installation / XBLA file actually exists..."
                 )
-            openFile.close()
+                xblaFullPath = pathLead + "/" + firstLine
+                if path.exists(xblaFullPath):
+                    eslog.debug(f"Found! Switching active rom to: {firstLine}")
+                    rom = xblaFullPath
+                else:
+                    eslog.error(
+                        f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename."
+                    )
+            except (IOError, IndexError) as e:
+                eslog.error(f"Error reading .xbox360 playlist file {rom}: {e}")
+                # Ensure we handle the case where the file might be empty or inaccessible
+                pass
 
         # adjust the config toml file accordingly
         config = {}
