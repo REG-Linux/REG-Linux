@@ -127,8 +127,7 @@ class WindowManager:
         Gracefully stops the Sway compositor and cleans up the environment.
 
         Args:
-            generator: The same generator object passed to start_sway()5. Adotar um padrão de projeto mais robusto: Considerar a utilização de um padrão como Singleton ou State para gerenciar o estado do
-                  compositor de forma mais segura e organizada.
+            generator: The same generator object passed to start_sway()
             system: System context object
 
         Returns:

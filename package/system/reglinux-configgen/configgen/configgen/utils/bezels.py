@@ -39,6 +39,7 @@ def _save_to_cache(image_path, cache_key):
     """
     cached_path = path.join(BEZEL_CACHE_DIR, f"{cache_key}.png")
     import shutil
+
     shutil.copy2(image_path, cached_path)
 
 
@@ -48,6 +49,7 @@ def clear_bezel_cache():
     """
     import os
     import glob
+
     files = glob.glob(path.join(BEZEL_CACHE_DIR, "*.png"))
     for file in files:
         try:
@@ -185,12 +187,17 @@ def resizeImage(
         # Copy cached image to output location
         try:
             import shutil
+
             shutil.copy2(cached_path, output_png)
         except PermissionError as e:
-            eslog.error(f"Permission denied copying cached bezel from {cached_path} to {output_png}: {e}")
+            eslog.error(
+                f"Permission denied copying cached bezel from {cached_path} to {output_png}: {e}"
+            )
             raise
         except OSError as e:
-            eslog.error(f"OS error copying cached bezel from {cached_path} to {output_png}: {e}")
+            eslog.error(
+                f"OS error copying cached bezel from {cached_path} to {output_png}: {e}"
+            )
             raise
         return
 
@@ -200,7 +207,9 @@ def resizeImage(
         try:
             os.makedirs(output_dir, exist_ok=True)
         except PermissionError as e:
-            eslog.error(f"Permission denied creating output directory {output_dir}: {e}")
+            eslog.error(
+                f"Permission denied creating output directory {output_dir}: {e}"
+            )
             raise
         except OSError as e:
             eslog.error(f"OS error creating output directory {output_dir}: {e}")
@@ -276,7 +285,9 @@ def padImage(
         try:
             os.makedirs(output_dir, exist_ok=True)
         except PermissionError as e:
-            eslog.error(f"Permission denied creating output directory {output_dir}: {e}")
+            eslog.error(
+                f"Permission denied creating output directory {output_dir}: {e}"
+            )
             raise
         except OSError as e:
             eslog.error(f"OS error creating output directory {output_dir}: {e}")
@@ -337,7 +348,9 @@ def tatooImage(input_png, output_png, system):
         try:
             os.makedirs(output_dir, exist_ok=True)
         except PermissionError as e:
-            eslog.error(f"Permission denied creating output directory {output_dir}: {e}")
+            eslog.error(
+                f"Permission denied creating output directory {output_dir}: {e}"
+            )
             raise
         except OSError as e:
             eslog.error(f"OS error creating output directory {output_dir}: {e}")
@@ -350,16 +363,20 @@ def tatooImage(input_png, output_png, system):
         tattoo_file = f"/usr/share/reglinux/controller-overlays/{system.name}.png"
         if not path.exists(tattoo_file):
             tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
-    elif tattoo_config == "custom" and path.exists(system.config.get("bezel.tattoo_file", "")):
+    elif tattoo_config == "custom" and path.exists(
+        system.config.get("bezel.tattoo_file", "")
+    ):
         tattoo_file = system.config["bezel.tattoo_file"]
     else:
         tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
 
     cache_key = _generate_cache_key(
-        "tattoo", input_png, tattoo_file,
+        "tattoo",
+        input_png,
+        tattoo_file,
         system.config.get("bezel.resize_tattoo", "default"),
         system.config.get("bezel.tattoo_corner", "NW"),
-        fast_image_size(input_png)  # Include input image size in cache key
+        fast_image_size(input_png),  # Include input image size in cache key
     )
 
     # Check if image is already cached
@@ -369,12 +386,17 @@ def tatooImage(input_png, output_png, system):
         # Copy cached image to output location
         try:
             import shutil
+
             shutil.copy2(cached_path, output_png)
         except PermissionError as e:
-            eslog.error(f"Permission denied copying cached tattooed bezel from {cached_path} to {output_png}: {e}")
+            eslog.error(
+                f"Permission denied copying cached tattooed bezel from {cached_path} to {output_png}: {e}"
+            )
             raise
         except OSError as e:
-            eslog.error(f"OS error copying cached tattooed bezel from {cached_path} to {output_png}: {e}")
+            eslog.error(
+                f"OS error copying cached tattooed bezel from {cached_path} to {output_png}: {e}"
+            )
             raise
         return
 
@@ -470,7 +492,9 @@ def alphaPaste(input_png, output_png, imgin, fillcolor, screensize, bezel_stretc
         try:
             os.makedirs(output_dir, exist_ok=True)
         except PermissionError as e:
-            eslog.error(f"Permission denied creating output directory {output_dir}: {e}")
+            eslog.error(
+                f"Permission denied creating output directory {output_dir}: {e}"
+            )
             raise
         except OSError as e:
             eslog.error(f"OS error creating output directory {output_dir}: {e}")
@@ -550,7 +574,9 @@ def gunBorderImage(
         try:
             os.makedirs(output_dir, exist_ok=True)
         except PermissionError as e:
-            eslog.error(f"Permission denied creating output directory {output_dir}: {e}")
+            eslog.error(
+                f"Permission denied creating output directory {output_dir}: {e}"
+            )
             raise
         except OSError as e:
             eslog.error(f"OS error creating output directory {output_dir}: {e}")
@@ -558,8 +584,13 @@ def gunBorderImage(
 
     # Generate cache key based on input parameters
     cache_key = _generate_cache_key(
-        "gunborder", input_png, innerBorderSizePer, outerBorderSizePer,
-        innerBorderColor, outerBorderColor, fast_image_size(input_png)
+        "gunborder",
+        input_png,
+        innerBorderSizePer,
+        outerBorderSizePer,
+        innerBorderColor,
+        outerBorderColor,
+        fast_image_size(input_png),
     )
 
     # Check if image is already cached
@@ -569,12 +600,17 @@ def gunBorderImage(
         # Copy cached image to output location
         try:
             import shutil
+
             shutil.copy2(cached_path, output_png)
         except PermissionError as e:
-            eslog.error(f"Permission denied copying cached gun border bezel from {cached_path} to {output_png}: {e}")
+            eslog.error(
+                f"Permission denied copying cached gun border bezel from {cached_path} to {output_png}: {e}"
+            )
             raise
         except OSError as e:
-            eslog.error(f"OS error copying cached gun border bezel from {cached_path} to {output_png}: {e}")
+            eslog.error(
+                f"OS error copying cached gun border bezel from {cached_path} to {output_png}: {e}"
+            )
             raise
         w, h = fast_image_size(input_png)
         outerBorderSize = max(1, h * outerBorderSizePer // 100)

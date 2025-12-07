@@ -280,7 +280,7 @@ def reconfigureControllers(playersControllers, system, metadata, deviceList):
 def getWheelsFromDevicesInfos(deviceInfos):
     res = {}
     for x in deviceInfos:
-        # Verifica se deviceInfos[x] é um dicionário antes de acessar a chave
+        # Check if deviceInfos[x] is a dictionary before accessing the key
         device_info = deviceInfos[x]
         if isinstance(device_info, dict) and device_info.get("isWheel"):
             res[x] = device_info
