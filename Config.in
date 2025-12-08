@@ -285,7 +285,6 @@ endmenu
 endmenu
 
 menu "Libraries"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/appstream/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/cargs/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/cxxopts/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/libraries/date/Config.in"
@@ -341,7 +340,6 @@ menu "Utils"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/btop/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/evsieve/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/inputplumber/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/flatpak/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/fuse-zar/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/gamescope/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/utils/itstool/Config.in"
