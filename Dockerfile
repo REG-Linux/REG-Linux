@@ -27,6 +27,7 @@ RUN apt-get -o APT::Retries=3 update -y && \
     gcc \
     gcc-multilib \
     git \
+    graphviz \
     gzip \
     libgnutls28-dev \
     libncurses-dev \
@@ -35,6 +36,7 @@ RUN apt-get -o APT::Retries=3 update -y && \
     make \
     patch \
     perl \
+    python3-matplotlib \
     rsync \
     sed \
     tar \
