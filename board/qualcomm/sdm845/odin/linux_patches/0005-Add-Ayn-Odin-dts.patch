@@ -1295,9 +1295,9 @@ index 000000000..22d802c55
 +
 +    /* Left Speaker */
 +    wsa881x_1: speaker@0,1 {
-+        compatible = "sdw10217020200";
++        compatible = "sdw10217201000";
 +        reg = <0 1>;
-+        powerdown-gpios = <&wcdgpio 1 GPIO_ACTIVE_LOW>;
++        powerdown-gpios = <&wcdgpio 2 GPIO_ACTIVE_LOW>;
 +        #sound-dai-cells = <0>;
 +        sound-name-prefix = "SpkrLeft";
 +        vdd-1p8-supply = <&vreg_l15a_1p8>;
@@ -1305,7 +1305,7 @@ index 000000000..22d802c55
 +
 +    /* Right Speaker */
 +    wsa881x_2: speaker@0,2 {
-+        compatible = "sdw10217020200";
++        compatible = "sdw10217201000";
 +        reg = <0 2>;
 +        powerdown-gpios = <&wcdgpio 2 GPIO_ACTIVE_LOW>;
 +        #sound-dai-cells = <0>;
