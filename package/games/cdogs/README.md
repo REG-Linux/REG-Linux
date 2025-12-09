@@ -1,9 +1,10 @@
 # C-Dogs SDL
 
-Classic overhead run-and-gun game compiled from the `cdogs-sdl` source tree.
+The REG-Linux `cdogs-sdl` port delivers the classic overhead run-and-gun engine with Python/ENet helpers so multiplayer maps target the distro.
 
 ## Build notes
-- **Version:** 2.3.2 release (Aug 2025).
-- **Config:** selects SDL2, SDL2_mixer, Python protobuf on both host and target, ENet, and requires a C++ toolchain.
-- **Build system:** CMake release build with `CDOGS_SUPPORTS_IN_SOURCE_BUILD = NO`, hard-coded data directory (`/userdata/roms/cdogs`), the editor/test suite disabled, and shared ENet enabled. A pre-configure hook strips the tests directory.
-- **Install:** installs the binary, leaves asset management to the content downloader (the commented-out copy steps document where doc/data/graphics lived), and copies `cdogs.keys` into `/usr/share/evmapy` for controller mapping.
+
+- `Version`: 2.3.2 (Aug 2025) release with the upstream CMake tree.
+- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_SDL2_MIXER`, `BR2_PACKAGE_PYTHON`, `BR2_PACKAGE_PYTHON_PROTOBUF`, `BR2_PACKAGE_ENET`, `BR2_INSTALL_LIBSTDCPP`.
+- `Build helper`: CMake-based (`cmake-package`) with `CDOGS_SUPPORTS_IN_SOURCE_BUILD=NO`, disabled editor/tests, and shared ENet.
+- `Extras`: targets `/userdata/roms/cdogs` for assets, copies `cdogs.keys` into `/usr/share/evmapy`, and relies on the content downloader to supply the data pack.

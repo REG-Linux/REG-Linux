@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_STELLA
+# Libretro Stella
 
-A libretro Atari 2600 emulator core for ARM.
+The `libretro-stella` core adds Atari 2600 emulation into REG-Linux’s libretro stack with FLTO and Raspberry Pi makefile tweaks.
 
 ## Build notes
 
-- ``Version``: 7.0
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: applies patches: 001-makefile-flto-auto.patch, 000-rpi_makefile.patch
+- `Version`: 7.0
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: applies `001-makefile-flto-auto.patch` and `000-rpi_makefile.patch`

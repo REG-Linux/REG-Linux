@@ -1,10 +1,10 @@
-# BR2_PACKAGE_EDEN
+# Eden
 
-Eden: Nintendo Switch Emulator
+Eden ships the Nintendo Switch emulator to REG-Linux with Boost/Qt6 tooling and additional patches so modern titles behave on both x86_64 and ARM hosts.
 
 ## Build notes
 
-- ``Version``: v0.0.4-rc3
-- ``Config``: select BR2_PACKAGE_JSON_FOR_MODERN_CPP, select BR2_PACKAGE_REGLINUX_QT6, select BR2_PACKAGE_SDL2, select BR2_PACKAGE_FMT, select BR2_PACKAGE_BOOST, select BR2_PACKAGE_BOOST_CONTEXT, select BR2_PACKAGE_BOOST_FILESYSTEM, select BR2_PACKAGE_ZSTD, select BR2_PACKAGE_ZLIB, select BR2_PACKAGE_LIBZIP, select BR2_PACKAGE_LIBUSB, select BR2_PACKAGE_LZ4, select BR2_PACKAGE_CATCH2, select BR2_PACKAGE_OPUS, select BR2_PACKAGE_ENET, select BR2_PACKAGE_GAMEMODE, select BR2_PACKAGE_LIBVA, select BR2_PACKAGE_REGLINUX_XWAYLAND, select BR2_PACKAGE_FFMPEG, select BR2_PACKAGE_HOST_YASM		if BR2_x86_64, select BR2_PACKAGE_MBEDTLS, depends on BR2_x86_64 || BR2_aarch64
-- ``Build helper``: CMake-based (cmake-package)
-- ``Extras``: copies `switch.eden.keys` into `/usr/share/evmapy` or equivalent; applies patches: 001-fix-sse2neon.patch, 004-format_custom.patch, 002-adjust-paths.patch, 003-external-nx-tzdb-prebuilt.patch
+- `Version`: v0.0.4-rc3
+- `Dependencies`: `BR2_PACKAGE_JSON_FOR_MODERN_CPP`, `BR2_PACKAGE_REGLINUX_QT6`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_FMT`, `BR2_PACKAGE_BOOST`, `BR2_PACKAGE_BOOST_CONTEXT`, `BR2_PACKAGE_BOOST_FILESYSTEM`, `BR2_PACKAGE_ZSTD`, `BR2_PACKAGE_ZLIB`, `BR2_PACKAGE_LIBZIP`, `BR2_PACKAGE_LIBUSB`, `BR2_PACKAGE_LZ4`, `BR2_PACKAGE_CATCH2`, `BR2_PACKAGE_OPUS`, `BR2_PACKAGE_ENET`, `BR2_PACKAGE_GAMEMODE`, `BR2_PACKAGE_LIBVA`, `BR2_PACKAGE_REGLINUX_XWAYLAND`, `BR2_PACKAGE_FFMPEG`, `BR2_PACKAGE_HOST_YASM` (when `BR2_x86_64`), `BR2_PACKAGE_MBEDTLS`, plus `BR2_x86_64 || BR2_aarch64`
+- `Build helper`: CMake-based (`cmake-package`)
+- `Extras`: copies `switch.eden.keys` into `/usr/share/evmapy` (or equivalent) and applies REG-Linux patches (`001-fix-sse2neon.patch`, `004-format_custom.patch`, `002-adjust-paths.patch`, `003-external-nx-tzdb-prebuilt.patch`)

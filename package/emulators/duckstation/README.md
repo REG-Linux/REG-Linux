@@ -1,10 +1,10 @@
-# BR2_PACKAGE_DUCKSTATION
+# DuckStation
 
-DuckStation - PlayStation 1, aka. PSX Emulator DuckStation features a fully-featured frontend built using Qt.
+DuckStation is REG-Linux's Qt-backed PlayStation 1 emulator with a polished UI and robust compatibility.
 
 ## Build notes
 
-- ``Version``: v0.1-9669
-- ``Config``: depends on BR2_x86_64 || BR2_arm || BR2_aarch64
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: copies `psx.duckstation.keys` into `/usr/share/evmapy` or equivalent
+- `Version`: v0.1-9669
+- `Dependencies`: `BR2_x86_64` or `BR2_arm` or `BR2_aarch64`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: copies `psx.duckstation.keys` into `/usr/share/evmapy` (or the equivalent key directory)

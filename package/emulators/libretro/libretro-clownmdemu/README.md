@@ -1,9 +1,9 @@
-# BR2_PACKAGE_LIBRETRO_CLOWNMDEMU
+# Libretro ClownMDEmu
 
-This is ClownMDEmu, a Sega Mega Drive (a.k.a. Sega Genesis) emulator.
+The `libretro-clownmdemu` core provides Sega Mega Drive (Genesis) emulation under REG-Linux’s libretro pipeline.
 
 ## Build notes
 
-- ``Version``: v1.5
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: CMake-based (cmake-package)
+- `Version`: v1.5
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: CMake-based (`cmake-package`)

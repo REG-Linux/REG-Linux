@@ -1,10 +1,10 @@
-# BR2_PACKAGE_DUCKSTATION_MINI
+# DuckStation Mini
 
-DuckStation - PlayStation 1, aka. PSX Emulator DuckStation Mini is only for ARM/AArch64 devices. It features a fullscreen/TV UI based on Dear ImGui.
+DuckStation Mini targets ARM/AArch64 devices with a fullscreen Dear ImGui interface so PS1 titles run smoothly on REG-Linux consoles.
 
 ## Build notes
 
-- ``Version``: v0.1-9669
-- ``Config``: select BR2_PACKAGE_GMP, depends on BR2_arm || BR2_aarch64, depends on BR2_PACKAGE_HAS_GLES3 || BR2_PACKAGE_REGLINUX_VULKAN
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: copies `psx.duckstation.keys` into `/usr/share/evmapy` or equivalent
+- `Version`: v0.1-9669
+- `Dependencies`: `BR2_PACKAGE_GMP`, either `BR2_arm` or `BR2_aarch64`, and either `BR2_PACKAGE_HAS_GLES3` or `BR2_PACKAGE_REGLINUX_VULKAN` for graphics
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: copies `psx.duckstation.keys` into `/usr/share/evmapy` (or the equivalent key directory)
