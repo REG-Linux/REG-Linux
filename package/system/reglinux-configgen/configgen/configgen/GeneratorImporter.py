@@ -55,7 +55,6 @@ EMULATOR_MAPPING = {
     "etlegacy": ("generators.etlegacy.etlegacyGenerator", "ETLegacyGenerator"),
     "fallout1-ce": ("generators.fallout1.fallout1Generator", "Fallout1Generator"),
     "fallout2-ce": ("generators.fallout2.fallout2Generator", "Fallout2Generator"),
-    "flatpak": ("generators.flatpak.flatpakGenerator", "FlatpakGenerator"),
     "flycast": ("generators.flycast.flycastGenerator", "FlycastGenerator"),
     "gsplus": ("generators.gsplus.gsplusGenerator", "GSplusGenerator"),
     "gzdoom": ("generators.gzdoom.gzdoomGenerator", "GZDoomGenerator"),

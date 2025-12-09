@@ -1,0 +1,90 @@
+From 20fa0ba6fe6a81b5c050210379c44890035aa098 Mon Sep 17 00:00:00 2001
+From: Craig Carnell <1188869+cscd98@users.noreply.github.com>
+Date: Sat, 22 Nov 2025 20:21:56 +0000
+Subject: [PATCH 1/2] Pass correct major/minor when using OPENGLES_VERSION
+ instead of 2:0
+
+---
+ gfx/drivers/gl2.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/gfx/drivers/gl2.c b/gfx/drivers/gl2.c
+index d39eb1567f59..0c636ac91243 100644
+--- a/gfx/drivers/gl2.c
++++ b/gfx/drivers/gl2.c
+@@ -4031,15 +4031,19 @@ static const gfx_ctx_driver_t *gl2_get_context(gl2_t *gl)
+    bool video_shared_context            = settings->bools.video_shared_context;
+ #ifdef HAVE_OPENGLES
+    enum gfx_ctx_api api                 = GFX_CTX_OPENGL_ES_API;
+-   if (hwr->context_type == RETRO_HW_CONTEXT_OPENGLES3)
++   switch(hwr->context_type)
+    {
+-      major                             = 3;
+-      minor                             = 0;
+-   }
+-   else
+-   {
+-      major                             = 2;
+-      minor                             = 0;
++      case RETRO_HW_CONTEXT_OPENGLES3:
++         major = 3;
++         minor = 0;
++         break;
++      case RETRO_HW_CONTEXT_OPENGLES_VERSION:
++         major = major;
++         minor = minor;
++         break;
++      default:
++         major = 2;
++         minor = 0;
+    }
+ #else
+    enum gfx_ctx_api api                 = GFX_CTX_OPENGL_API;
+
+From d4baaf45de9bc038a2e8949d4a828ecb280f0ce7 Mon Sep 17 00:00:00 2001
+From: Craig Carnell <1188869+cscd98@users.noreply.github.com>
+Date: Sat, 22 Nov 2025 20:22:57 +0000
+Subject: [PATCH 2/2] Fix NULL attrib_ptr when core requests GLES 2 EGL when
+ GLES 3 is available
+
+---
+ gfx/drivers/gl2.c                 | 3 +--
+ gfx/drivers_context/wayland_ctx.c | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/gfx/drivers/gl2.c b/gfx/drivers/gl2.c
+index 0c636ac91243..4d008eb40c3c 100644
+--- a/gfx/drivers/gl2.c
++++ b/gfx/drivers/gl2.c
+@@ -4038,8 +4038,7 @@ static const gfx_ctx_driver_t *gl2_get_context(gl2_t *gl)
+          minor = 0;
+          break;
+       case RETRO_HW_CONTEXT_OPENGLES_VERSION:
+-         major = major;
+-         minor = minor;
++         // passthrough version_major / version_minor unchanged
+          break;
+       default:
+          major = 2;
+diff --git a/gfx/drivers_context/wayland_ctx.c b/gfx/drivers_context/wayland_ctx.c
+index ea95ad80e0fa..7b4ddebd333c 100644
+--- a/gfx/drivers_context/wayland_ctx.c
++++ b/gfx/drivers_context/wayland_ctx.c
+@@ -175,7 +175,7 @@ static bool gfx_ctx_wl_egl_init_context(gfx_ctx_wayland_data_t *wl)
+    };
+ 
+ #ifdef HAVE_OPENGLES
+-#ifdef HAVE_OPENGLES2
++#if defined(HAVE_OPENGLES2) || defined(HAVE_OPENGLES3)
+    static const EGLint egl_attribs_gles[] = {
+       WL_EGL_ATTRIBS_BASE,
+       EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+@@ -221,7 +221,7 @@ static bool gfx_ctx_wl_egl_init_context(gfx_ctx_wayland_data_t *wl)
+          else
+ #endif
+ #endif
+-#ifdef HAVE_OPENGLES2
++#if defined(HAVE_OPENGLES2) || defined(HAVE_OPENGLES3)
+             attrib_ptr = egl_attribs_gles;
+ #endif
+ #endif
