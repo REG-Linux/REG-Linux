@@ -50,13 +50,26 @@ vars:
 	@echo "Docker options:     $(DOCKER_OPTS)"
 	@echo "Make options:       $(MAKE_OPTS)"
 
+define DOCKER_RUN
+	@$(DOCKER) run --pull=always --init --rm \
+		-v $(PROJECT_DIR):/build \
+		-v $(DL_DIR):/build/buildroot/dl \
+		-v $(OUTPUT_DIR)/$*:/$* \
+		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-u $(UID):$(GID) \
+		-v /etc/passwd:/etc/passwd:ro \
+		-v /etc/group:/etc/group:ro \
+		-e MPLCONFIGDIR=/tmp/matplotlib-config \
+		$(DOCKER_OPTS) \
+		$(DOCKER_REPO)/$(IMAGE_NAME)
+endef
 
 build-docker-image:
 	$(DOCKER) build . -t $(DOCKER_REPO)/$(IMAGE_NAME)
 	@touch .ba-docker-image-available
 
 .ba-docker-image-available:
-	@$(DOCKER) pull $(DOCKER_REPO)/$(IMAGE_NAME)
+	@$(DOCKER) --pull=always $(DOCKER_REPO)/$(IMAGE_NAME)
 	@touch .ba-docker-image-available
 
 reglinux-docker-image: merge .ba-docker-image-available
@@ -84,58 +97,20 @@ gh-token:
 	$(if $(findstring $*, $(TARGETS)),,$(error "$* not supported!"))
 
 %-clean: gh-token reglinux-docker-image output-dir-%
-	@$(DOCKER) run --init --rm \
-		-v $(PROJECT_DIR):/build \
-		-v $(DL_DIR):/build/buildroot/dl \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v /etc/passwd:/etc/passwd:ro \
-		-v /etc/group:/etc/group:ro \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
+	$(call DOCKER_RUN) make O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
 
 %-config: gh-token reglinux-docker-image output-dir-%
 	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/reglinux-$*
 	@for opt in $(EXTRA_OPTS); do \
 		echo $$opt >> $(PROJECT_DIR)/configs/reglinux-$*_defconfig ; \
 	done
-	@$(DOCKER) run --init --rm \
-		-v $(PROJECT_DIR):/build \
-		-v $(DL_DIR):/build/buildroot/dl \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v /etc/passwd:/etc/passwd:ro \
-		-v /etc/group:/etc/group:ro \
-		-u $(UID):$(GID) \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		make O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
+	$(call DOCKER_RUN) make O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
 
 %-build: gh-token reglinux-docker-image %-config ccache-dir dl-dir
-	@$(DOCKER) run --init --rm \
-		-v $(PROJECT_DIR):/build \
-		-v $(DL_DIR):/build/buildroot/dl \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		-v /etc/passwd:/etc/passwd:ro \
-		-v /etc/group:/etc/group:ro \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
+	$(call DOCKER_RUN) make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
 
 %-source: gh-token reglinux-docker-image %-config ccache-dir dl-dir
-	@$(DOCKER) run --init --rm \
-		-v $(PROJECT_DIR):/build \
-		-v $(DL_DIR):/build/buildroot/dl \
-		-v $(OUTPUT_DIR)/$*:/$* \
-		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
-		-v /etc/passwd:/etc/passwd:ro \
-		-v /etc/group:/etc/group:ro \
-		$(DOCKER_OPTS) \
-		$(DOCKER_REPO)/$(IMAGE_NAME) \
-		make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
+	$(call DOCKER_RUN) make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
 
 %-cleanbuild: gh-token %-clean %-build
 	@echo
