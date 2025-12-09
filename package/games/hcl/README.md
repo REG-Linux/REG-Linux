@@ -1,9 +1,10 @@
 # Hydra Castle Labyrinth
 
-Platformer inspired by 16-bit era games.
+`hydracastlelabyrinth` brings the retro-inspired platformer to REG-Linux using SDL2/SDL2_mixer plus the distro’s pad helpers.
 
 ## Build notes
-- **Version:** commit `229369c...` (Feb 2024) from `ptitSeb/hydracastlelabyrinth`.
-- **Config:** selects SDL2 and SDL2_mixer and depends on a C++ toolchain.
-- **Build system:** CMake release build with `USE_SDL2=ON`, a couple of Buildroot patches for the CMake flow and pad handling (`001-cmake.patch`, `002-sdl2_pad.patch`).
-- **Install:** copies the `hcl` binary to `/usr/bin` and installs `hcl.keys` under `/usr/share/evmapy`.
+
+- `Version`: `229369c...` (Feb 2024) commit from `ptitSeb/hydracastlelabyrinth`.
+- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_SDL2_MIXER`, `BR2_INSTALL_LIBSTDCPP`.
+- `Build helper`: CMake-based (`cmake-package`) with `USE_SDL2=ON` and Buildroot patches for the CMake build/pad handling (`001-cmake.patch`, `002-sdl2_pad.patch`).
+- `Extras`: installs the `hcl` binary into `/usr/bin` and copies `hcl.keys` into `/usr/share/evmapy`.

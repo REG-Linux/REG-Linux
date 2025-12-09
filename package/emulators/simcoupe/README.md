@@ -1,10 +1,10 @@
-# BR2_PACKAGE_SIMCOUPE
+# SimCoupe
 
-See Buildroot configs for details.
+SimCoupe adds the Sam Coupe emulator to REG-Linux with the SDL2 frontend and pad configuration patches.
 
 ## Build notes
 
-- ``Version``: v1.2.15
-- ``Config``: select BR2_PACKAGE_SDL2, depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: CMake-based (cmake-package)
-- ``Extras``: copies `samcoupe.keys` into `/usr/share/evmapy` or equivalent; applies patches: 0002-add-pad-configuration-options.patch, 0003-use-pad-configuration.patch, 0001-aarch64-little-endian.patch
+- `Version`: v1.2.15
+- `Dependencies`: `BR2_PACKAGE_SDL2`, supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: CMake-based (`cmake-package`)
+- `Extras`: copies `samcoupe.keys` into `/usr/share/evmapy` and applies `0002-add-pad-configuration-options.patch`, `0003-use-pad-configuration.patch`, `0001-aarch64-little-endian.patch`

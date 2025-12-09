@@ -1,8 +1,10 @@
 # Abuse data pack
 
-Provides the original data files for *Abuse*, consumed by the `abuse` package.
+The `abuse-data` package installs the up-to-date 2.00 data archive so `package/games/abuse` can run without bundling the assets directly.
 
 ## Build notes
-- **Version:** 2.00 tarball (Public Domain) downloaded from `abuse.zoy.org`.
-- **Build system:** simple `generic-package` that untars the archive and installs its contents under `/usr/share/abuse`.
-- **Notes:** the README highlights that the same files are also delivered through the content downloader (Pacman package), so this Buildroot package exists mostly for reference/backwards compatibility.
+
+- `Version`: 2.00 public-domain tarball from `abuse.zoy.org`.
+- `Dependencies`: none beyond the standard staging (`generic-package`).
+- `Build helper`: Generic/Makefile (`generic-package`) that unpacks the archive under `/usr/share/abuse`.
+- `Extras`: documented as a fallback since the data is also served through REG-Linux’s content downloader/downloader package.

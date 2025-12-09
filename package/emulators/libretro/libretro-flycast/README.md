@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_FLYCAST
+# Libretro Flycast
 
-A libretro dreamcast emulator core.
+The `libretro-flycast` core runs Dreamcast/Naomi/Atomiswave emulation with the OpenMP and GL/GLES hooks REG-Linux enables for ARM/x86 targets.
 
 ## Build notes
 
-- ``Version``: $(FLYCAST_VERSION)
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on BR2_GCC_ENABLE_OPENMP, depends on (BR2_PACKAGE_HAS_LIBGLES || BR2_PACKAGE_HAS_LIBGL), depends on !BR2_INSTALL_LIBSTDCPP || \
-- ``Build helper``: CMake-based (cmake-package)
-- ``Extras``: applies patches: 000-makefile-additions.patch
+- `Version`: `$(FLYCAST_VERSION)`
+- `Dependencies`: `BR2_INSTALL_LIBSTDCPP`, `BR2_GCC_ENABLE_OPENMP`, `(BR2_PACKAGE_HAS_LIBGLES || BR2_PACKAGE_HAS_LIBGL)`, and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: CMake-based (`cmake-package`)
+- `Extras`: applies `000-makefile-additions.patch`

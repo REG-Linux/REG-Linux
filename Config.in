@@ -398,7 +398,7 @@ menu "Network"
 endmenu
 endmenu
 
-menu "Batocera.linux"
+menu "REG-Linux"
 menu "System"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-triggerhappy/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/core/batocera-udev-rules/Config.in"

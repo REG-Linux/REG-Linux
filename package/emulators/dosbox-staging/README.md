@@ -1,10 +1,10 @@
-# BR2_PACKAGE_DOSBOX_STAGING
+# DOSBox Staging
 
-See Buildroot configs for details.
+DOSBox Staging delivers the community-maintained fork of DOSBox with async audio and better SIMD support, built for REG-Linux via meson for optimized ARM/desktop hosts.
 
 ## Build notes
 
-- ``Version``: v0.82.2
-- ``Config``: select BR2_PACKAGE_ALSA_LIB, select BR2_PACKAGE_SPEEXDSP, select BR2_PACKAGE_SDL2, select BR2_PACKAGE_SDL2_IMAGE, select BR2_PACKAGE_SDL2_NET, select BR2_PACKAGE_ZLIB, select BR2_PACKAGE_LIBPNG, select BR2_PACKAGE_LIBOGG, select BR2_PACKAGE_LIBVORBIS, select BR2_PACKAGE_OPUS, select BR2_PACKAGE_OPUSFILE, select BR2_PACKAGE_LIBCURL, select BR2_PACKAGE_SLIRP, select BR2_PACKAGE_IIR, depends on BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Meson (meson-package)
-- ``Extras``: applies patches: 001-disable-pagesize-testing.patch, 000-no_wrap.patch, 002-disable-neon-sse2-ssse3-testing.patch
+- `Version`: v0.82.2
+- `Dependencies`: `BR2_PACKAGE_ALSA_LIB`, `BR2_PACKAGE_SPEEXDSP`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_SDL2_IMAGE`, `BR2_PACKAGE_SDL2_NET`, `BR2_PACKAGE_ZLIB`, `BR2_PACKAGE_LIBPNG`, `BR2_PACKAGE_LIBOGG`, `BR2_PACKAGE_LIBVORBIS`, `BR2_PACKAGE_OPUS`, `BR2_PACKAGE_OPUSFILE`, `BR2_PACKAGE_LIBCURL`, `BR2_PACKAGE_SLIRP`, `BR2_PACKAGE_IIR`, `BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Meson (`meson-package`)
+- `Extras`: applies REG-Linux patches (`001-disable-pagesize-testing.patch`, `000-no_wrap.patch`, `002-disable-neon-sse2-ssse3-testing.patch`)

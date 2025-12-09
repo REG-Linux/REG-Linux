@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_MAME2003_PLUS
+# Libretro MAME2003-Plus
 
-A libretro mame2003+ core for ARM.
+The `libretro-mame2003-plus` core keeps REG-Linux's ARM arcade support aligned with MAME2003-Plus using both libstdc++ build paths plus the usual LTO/makefile fixes.
 
 ## Build notes
 
-- ``Version``: 62c7089644966f6ac5fc79fe03592603579a409d
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: applies patches: 001-enable-lto.patch, 000-makefile.patch
+- `Version`: 62c7089644966f6ac5fc79fe03592603579a409d
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: applies `001-enable-lto.patch` and `000-makefile.patch`

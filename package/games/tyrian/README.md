@@ -1,9 +1,10 @@
 # Tyrian (OpenTyrian)
 
-Open-source port of the DOS shmup *Tyrian*.
+The `opentyrian` port packages the DOS shmup *Tyrian* with SDL2/SDL2_net so REG-Linux can ship the player-friendly binary.
 
 ## Build notes
-- **Version:** `v2.1.20221123` from `opentyrian/opentyrian`.
-- **Config:** selects SDL2 and SDL2_net.
-- **Build system:** custom Makefile build invoked via `generic-package` using `PREFIX=$(STAGING_DIR)/usr` and cross-toolchain flags so the resulting binary links against the staged SDL2 libs.
-- **Install extras:** installs `opentyrian` under `/usr/bin` and copies `tyrian.keys` into `/usr/share/evmapy`.
+
+- `Version`: `v2.1.20221123` from `opentyrian/opentyrian`.
+- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_SDL2_NET`, `BR2_INSTALL_LIBSTDCPP`.
+- `Build helper`: Generic (`generic-package`) invoking the upstream Makefile with `PREFIX=$(STAGING_DIR)/usr`.
+- `Extras`: installs `/usr/bin/opentyrian` and copies `tyrian.keys` into `/usr/share/evmapy`.

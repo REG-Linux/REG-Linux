@@ -1,10 +1,10 @@
-# BR2_PACKAGE_PLAY
+# Play!
 
-Play! is a PlayStation2 emulator. https://purei.org/
+The `play` port ships the PlayStation 2 emulator Play! (https://purei.org/) with Qt6, OpenGL, and EVMapy keys so REG-Linux stays compatible with PS2 titles.
 
 ## Build notes
 
-- ``Version``: 0.71
-- ``Config``: select BR2_PACKAGE_PCRE2, select BR2_PACKAGE_LIBCURL, select BR2_PACKAGE_LIBCURL_OPENSSL, select BR2_PACKAGE_LIBGLEW		               if BR2_PACKAGE_REGLINUX_XWAYLAND, select BR2_PACKAGE_LIBGLU		               if BR2_PACKAGE_REGLINUX_XWAYLAND, select BR2_PACKAGE_OPENAL, select BR2_PACKAGE_REGLINUX_QT6, select BR2_PACKAGE_SQLITE, select BR2_PACKAGE_ECM
-- ``Build helper``: CMake-based (cmake-package)
-- ``Extras``: copies `ps2.play.keys, namco2x6.keys` into `/usr/share/evmapy` or equivalent; applies patches: 002-fix-arcadepath.patch, 003-gcc13-fix.patch, 001-fpic.patch, 004-fix-zlib-ng.patch
+- `Version`: 0.71
+- `Dependencies`: `BR2_PACKAGE_PCRE2`, `BR2_PACKAGE_LIBCURL`, `BR2_PACKAGE_LIBCURL_OPENSSL`, `BR2_PACKAGE_LIBGLEW`/`BR2_PACKAGE_LIBGLU` (when `BR2_PACKAGE_REGLINUX_XWAYLAND`), `BR2_PACKAGE_OPENAL`, `BR2_PACKAGE_REGLINUX_QT6`, `BR2_PACKAGE_SQLITE`, `BR2_PACKAGE_ECM`
+- `Build helper`: CMake-based (`cmake-package`)
+- `Extras`: copies `ps2.play.keys` and `namco2x6.keys` into `/usr/share/evmapy` and applies `002-fix-arcadepath.patch`, `003-gcc13-fix.patch`, `001-fpic.patch`, `004-fix-zlib-ng.patch`
