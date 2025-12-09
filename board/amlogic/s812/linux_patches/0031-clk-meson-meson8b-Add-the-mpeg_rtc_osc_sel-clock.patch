@@ -1,7 +1,7 @@
-From 84063cd05c9a08a3cc96b7d7cfe674e40cf04eb7 Mon Sep 17 00:00:00 2001
+From 9586fb9527aa96749de4f5e285423603665f7b01 Mon Sep 17 00:00:00 2001
 From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 Date: Fri, 1 Jan 2021 18:55:05 +0100
-Subject: [PATCH 31/95] clk: meson: meson8b: Add the mpeg_rtc_osc_sel clock
+Subject: [PATCH] clk: meson: meson8b: Add the mpeg_rtc_osc_sel clock
 
 The first input of the CLK81 clock tree uses the SoC's external
 oscillators. By default it's the 24MHz XTAL from which most frequencies
@@ -17,14 +17,13 @@ Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
  2 files changed, 24 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/clk/meson/meson8b.c b/drivers/clk/meson/meson8b.c
-index 1a0d26be554c..dcfb37c5b36c 100644
+index 351391eb259d97..63bdc8c1521079 100644
 --- a/drivers/clk/meson/meson8b.c
 +++ b/drivers/clk/meson/meson8b.c
-@@ -672,7 +672,24 @@ static struct clk_regmap meson8b_mpll2 = {
+@@ -672,8 +672,25 @@ static struct clk_regmap meson8b_mpll2 = {
  	},
  };
  
--static u32 mux_table_clk81[]	= { 6, 5, 7 };
 +static struct clk_regmap meson8b_mpeg_rtc_osc_sel = {
 +	.data = &(struct clk_regmap_mux_data){
 +		.offset = HHI_MPEG_CLK_CNTL,
@@ -42,11 +41,13 @@ index 1a0d26be554c..dcfb37c5b36c 100644
 +	},
 +};
 +
-+static u32 mux_table_clk81[] = { 0, 6, 5, 7 };
- static struct clk_regmap meson8b_mpeg_clk_sel = {
+ /* clk81 is often referred as "mpeg_clk" */
+-static u32 meson8b_clk81_parents_val_table[] = { 6, 5, 7 };
++static u32 meson8b_clk81_parents_val_table[] = { 0, 6, 5, 7 };
+ static struct clk_regmap meson8b_clk81_sel = {
  	.data = &(struct clk_regmap_mux_data){
  		.offset = HHI_MPEG_CLK_CNTL,
-@@ -689,11 +706,12 @@ static struct clk_regmap meson8b_mpeg_clk_sel = {
+@@ -690,11 +707,12 @@ static struct clk_regmap meson8b_clk81_sel = {
  		 * fclk_div4, fclk_div3, fclk_div5
  		 */
  		.parent_hws = (const struct clk_hw *[]) {
@@ -60,7 +61,7 @@ index 1a0d26be554c..dcfb37c5b36c 100644
  	},
  };
  
-@@ -3116,6 +3134,7 @@ static struct clk_hw *meson8_hw_clks[] = {
+@@ -3093,6 +3111,7 @@ static struct clk_hw *meson8_hw_clks[] = {
  	[CLKID_ETH_CLK_DIV]	    = &meson8_eth_clk_div.hw,
  	[CLKID_ETH_CLK_PHASE]	    = &meson8_eth_clk_phase.hw,
  	[CLKID_ETH_CLK]		    = &meson8_eth_clk_gate.hw,
@@ -68,7 +69,7 @@ index 1a0d26be554c..dcfb37c5b36c 100644
  };
  
  static struct clk_hw *meson8b_hw_clks[] = {
-@@ -3331,6 +3350,7 @@ static struct clk_hw *meson8b_hw_clks[] = {
+@@ -3308,6 +3327,7 @@ static struct clk_hw *meson8b_hw_clks[] = {
  	[CLKID_CTS_I958]	    = &meson8b_cts_i958.hw,
  	[CLKID_VID_PLL_LVDS_EN]	    = &meson8b_vid_pll_lvds_en.hw,
  	[CLKID_HDMI_PLL_DCO_IN]	    = &hdmi_pll_dco_in.hw,
@@ -76,7 +77,7 @@ index 1a0d26be554c..dcfb37c5b36c 100644
  };
  
  static struct clk_hw *meson8m2_hw_clks[] = {
-@@ -3548,6 +3568,7 @@ static struct clk_hw *meson8m2_hw_clks[] = {
+@@ -3525,6 +3545,7 @@ static struct clk_hw *meson8m2_hw_clks[] = {
  	[CLKID_CTS_I958]	    = &meson8b_cts_i958.hw,
  	[CLKID_VID_PLL_LVDS_EN]	    = &meson8b_vid_pll_lvds_en.hw,
  	[CLKID_HDMI_PLL_DCO_IN]	    = &hdmi_pll_dco_in.hw,
@@ -85,7 +86,7 @@ index 1a0d26be554c..dcfb37c5b36c 100644
  
  static const struct meson8b_clk_reset_line {
 diff --git a/include/dt-bindings/clock/meson8b-clkc.h b/include/dt-bindings/clock/meson8b-clkc.h
-index a09b686af059..fe6c02e04985 100644
+index a09b686af059de..fe6c02e04985ab 100644
 --- a/include/dt-bindings/clock/meson8b-clkc.h
 +++ b/include/dt-bindings/clock/meson8b-clkc.h
 @@ -225,5 +225,6 @@
@@ -95,6 +96,3 @@ index a09b686af059..fe6c02e04985 100644
 +#define CLKID_MPEG_RTC_OSC_SEL	222
  
  #endif /* __MESON8B_CLKC_H */
--- 
-2.43.0
-
