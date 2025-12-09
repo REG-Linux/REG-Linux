@@ -1,0 +1,15 @@
+--- a/modules/printbackends/meson.build	2025-12-09 21:31:24.970953969 +0100
++++ b/modules/printbackends/meson.build	2025-12-09 21:32:07.861488133 +0100
+@@ -34,11 +34,7 @@
+ 
+ print_backends = []
+ 
+-if not enabled_print_backends.contains('file')
+-  if os_unix
+-    error('\'file\' print backed needs to be enabled')
+-  endif
+-else
++if enabled_print_backends.contains('file')
+   print_backends += ['file']
+ endif
+ 

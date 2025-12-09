@@ -1,0 +1,5 @@
+config BR2_PACKAGE_LIBPLACEBO
+    bool "libplacebo"
+    #select BR2_PACKAGE_LIBDRM
+    help
+	libplacebo for MPV

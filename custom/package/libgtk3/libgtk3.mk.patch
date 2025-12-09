@@ -1,0 +1,14 @@
+diff --git a/package/libgtk3/libgtk3.mk b/package/libgtk3/libgtk3.mk
+index be24869d3d..4e1559a401 100644
+--- a/package/libgtk3/libgtk3.mk
++++ b/package/libgtk3/libgtk3.mk
+@@ -71,7 +71,8 @@ ifeq ($(BR2_PACKAGE_CUPS),y)
+ LIBGTK3_CONF_OPTS += -Dprint_backends=file,cups
+ LIBGTK3_DEPENDENCIES += cups
+ else
+-LIBGTK3_CONF_OPTS += -Dprint_backends=auto
++# REG no print backends
++LIBGTK3_CONF_OPTS += -Dprint_backends=
+ endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBGTK3_DEMO),y)

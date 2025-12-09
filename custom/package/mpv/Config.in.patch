@@ -1,0 +1,14 @@
+diff --git a/package/mpv/Config.in b/package/mpv/Config.in
+index 5c32f593fe..7bc8a26ce3 100644
+--- a/package/mpv/Config.in
++++ b/package/mpv/Config.in
+@@ -18,7 +18,9 @@ config BR2_PACKAGE_MPV
+ 	select BR2_PACKAGE_FFMPEG
+ 	select BR2_PACKAGE_FFMPEG_SWSCALE
+ 	select BR2_PACKAGE_LIBASS
++	select BR2_PACKAGE_LIBPLACEBO
+ 	select BR2_PACKAGE_ZLIB
++	select BR2_PACKAGE_LIBDISPLAY_INFO
+ 	select BR2_PACKAGE_WAYLAND_PROTOCOLS if BR2_PACKAGE_WAYLAND
+ 	# Select xkbcommon for wayland to avoid being mysterious
+ 	select BR2_PACKAGE_LIBXKBCOMMON if BR2_PACKAGE_WAYLAND
