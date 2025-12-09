@@ -1,8 +1,8 @@
-From b0fed462861681cec100880f3e6a27dcb78accbf Mon Sep 17 00:00:00 2001
+From b48b0568b36d2d356a8c48189bba9afe3657fef0 Mon Sep 17 00:00:00 2001
 From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 Date: Fri, 1 May 2020 23:25:13 +0200
-Subject: [PATCH 24/95] clk: meson: meson8b: Add the Ethernet (RMII) clock tree
- on Meson8
+Subject: [PATCH] clk: meson: meson8b: Add the Ethernet (RMII) clock tree on
+ Meson8
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -20,14 +20,14 @@ there.
 Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 ---
  drivers/clk/meson/Kconfig   |  1 +
- drivers/clk/meson/meson8b.c | 78 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 79 insertions(+)
+ drivers/clk/meson/meson8b.c | 81 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 82 insertions(+)
 
 diff --git a/drivers/clk/meson/Kconfig b/drivers/clk/meson/Kconfig
-index 7197d23543b8..4389b47b3bde 100644
+index 71481607a6d55d..43f069d9a63bb4 100644
 --- a/drivers/clk/meson/Kconfig
 +++ b/drivers/clk/meson/Kconfig
-@@ -60,6 +60,7 @@ config COMMON_CLK_MESON8B
+@@ -57,6 +57,7 @@ config COMMON_CLK_MESON8B
  	select COMMON_CLK_MESON_REGMAP
  	select COMMON_CLK_MESON_CLKC_UTILS
  	select COMMON_CLK_MESON_MPLL
@@ -36,7 +36,7 @@ index 7197d23543b8..4389b47b3bde 100644
  	select MFD_SYSCON
  	select RESET_CONTROLLER
 diff --git a/drivers/clk/meson/meson8b.c b/drivers/clk/meson/meson8b.c
-index 206538326614..1a0d26be554c 100644
+index 95d0b9cbd90404..351391eb259d97 100644
 --- a/drivers/clk/meson/meson8b.c
 +++ b/drivers/clk/meson/meson8b.c
 @@ -18,6 +18,7 @@
@@ -55,7 +55,7 @@ index 206538326614..1a0d26be554c 100644
  #define HHI_VDEC_CLK_CNTL		0x1e0
  #define HHI_VDEC2_CLK_CNTL		0x1e4
  #define HHI_VDEC3_CLK_CNTL		0x1e8
-@@ -2742,6 +2744,78 @@ static struct clk_regmap meson8b_cts_i958 = {
+@@ -2701,8 +2703,83 @@ static struct clk_regmap meson8b_cts_i958 = {
  	},
  };
  
@@ -131,10 +131,15 @@ index 206538326614..1a0d26be554c 100644
 +	},
 +};
 +
- #define MESON_GATE(_name, _reg, _bit) \
- 	MESON_PCLK(_name, _reg, _bit, &meson8b_clk81.hw)
+ static const struct clk_parent_data meson8b_pclk_parents = { .hw = &meson8b_clk81.hw };
  
-@@ -3038,6 +3112,10 @@ static struct clk_hw *meson8_hw_clks[] = {
++#define MESON_GATE(_name, _reg, _bit) \
++	MESON_PCLK(_name, _reg, _bit, &meson8b_clk81.hw)
++
+ #define MESON8B_PCLK(_name, _reg, _bit, _flags) \
+ 	MESON_PCLK(_name, _reg, _bit, &meson8b_pclk_parents, _flags)
+ 
+@@ -3012,6 +3089,10 @@ static struct clk_hw *meson8_hw_clks[] = {
  	[CLKID_CTS_I958]	    = &meson8b_cts_i958.hw,
  	[CLKID_VID_PLL_LVDS_EN]	    = &meson8b_vid_pll_lvds_en.hw,
  	[CLKID_HDMI_PLL_DCO_IN]	    = &hdmi_pll_dco_in.hw,
@@ -145,6 +150,3 @@ index 206538326614..1a0d26be554c 100644
  };
  
  static struct clk_hw *meson8b_hw_clks[] = {
--- 
-2.43.0
-
