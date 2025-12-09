@@ -61,9 +61,9 @@ define DOCKER_RUN
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
 		-v $(CCACHE_DIR)/$*:$(HOME)/.buildroot-ccache \
-		-u $(UID):$(GID) \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
+		-u $(UID):$(GID) \
 		-e MPLCONFIGDIR=/tmp/matplotlib-config \
 		$(DOCKER_OPTS) \
 		$(DOCKER_REPO)/$(IMAGE_NAME)
