@@ -1,32 +1,21 @@
-From 47f710416c3b1bc6e56f40efce79916418c3b01b Mon Sep 17 00:00:00 2001
-From: Demetris Ierokipides <ierokipides.dem@gmail.com>
-Date: Tue, 2 Dec 2025 00:44:55 +0200
-Subject: [PATCH] Add Ayn Odin dts
-
----
- arch/arm64/boot/dts/qcom/Makefile            |    1 +
- arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts | 1145 ++++++++++++++++++
- 2 files changed, 1146 insertions(+)
- create mode 100644 arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
-
 diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
-index 296688f7c..2485555e0 100644
+index 296688f7c..6447992e5 100644
 --- a/arch/arm64/boot/dts/qcom/Makefile
 +++ b/arch/arm64/boot/dts/qcom/Makefile
 @@ -240,6 +240,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= sdm632-motorola-ocean.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm636-sony-xperia-ganges-mermaid.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm660-xiaomi-lavender.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm670-google-sargo.dtb
-+dtb-$(CONFIG_ARCH_QCOM) += sdm845-ayn-odin.dtb
++dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-ayn-odin.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sdm845-db845c.dtb
  
  sdm845-db845c-navigation-mezzanine-dtbs	:= sdm845-db845c.dtb sdm845-db845c-navigation-mezzanine.dtbo
 diff --git a/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
 new file mode 100644
-index 000000000..081f14e47
---- /dev/null	2025-12-02 16:49:25.665215080 +0100
-+++ arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts	2025-12-02 17:30:29.690168277 +0100
-@@ -0,0 +1,1130 @@
+index 000000000..22d802c55
+--- /dev/null
++++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
+@@ -0,0 +1,1309 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022, Teguh Sobirin.
@@ -37,6 +26,8 @@ index 000000000..081f14e47
 +#include <dt-bindings/gpio/gpio.h>
 +#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
 +#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
++#include <dt-bindings/interrupt-controller/irq.h>
++#include <dt-bindings/input/linux-event-codes.h>
 +#include <dt-bindings/sound/qcom,q6afe.h>
 +#include <dt-bindings/sound/qcom,q6asm.h>
 +#include <dt-bindings/leds/common.h>
@@ -44,6 +35,7 @@ index 000000000..081f14e47
 +#include "sdm845-wcd9340.dtsi"
 +#include "pm8998.dtsi"
 +#include "pmi8998.dtsi"
++#include "pm8005.dtsi"
 +
 +/ {
 +	model = "AYN Odin";
@@ -55,6 +47,7 @@ index 000000000..081f14e47
 +	aliases {
 +		serial0 = &uart9;
 +		hsuart0 = &uart6;
++		wifi0 = &wifi;
 +	};
 +
 +	chosen {
@@ -75,7 +68,7 @@ index 000000000..081f14e47
 +	};
 +
 +	gamepad {
-+		compatible = "ayntec,odin-gamepad";
++		compatible = "ayntech,odin-gamepad";
 +
 +		dpad-down-gpio = <&tlmm 128 GPIO_ACTIVE_LOW>;
 +		dpad-left-gpio = <&tlmm 52 GPIO_ACTIVE_LOW>;
@@ -162,7 +155,7 @@ index 000000000..081f14e47
 +
 +        pwm_fan: pwm-fan {
 +                compatible = "pwm-fan";
-+                cooling-levels = <0 40 127>;
++                cooling-levels = <0 64 128 192 255>;
 +                #cooling-cells = <2>;
 +                fan-supply = <&fan_en_reg>;
 +                pinctrl-0 = <&pwm_fan_ctrl>;
@@ -171,139 +164,67 @@ index 000000000..081f14e47
 +        };
 +
 +	thermal-zones {
-+		cluster0-thermal {
-+			trips {
-+				cluster0_fan0: cluster0-fan0 {
-+					temperature = <50000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				cluster0_fan1: cluster0-fan1 {
-+					temperature = <60000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				cluster0_fan2: cluster0-fan2 {
-+					temperature = <70000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+			};
-+			cooling-maps {
-+				map1 {
-+					trip = <&cluster0_fan0>;
-+					cooling-device = <&pwm_fan THERMAL_NO_LIMIT 1>;
-+				};
-+				map2 {
-+					trip = <&cluster0_fan1>;
-+					cooling-device = <&pwm_fan 2 3>;
-+				};
-+				map3 {
-+					trip = <&cluster0_fan2>;
-+					cooling-device = <&pwm_fan 3 THERMAL_NO_LIMIT>;
-+				};
-+			};
-+		};
-+		cluster1-thermal {
-+			trips {
-+				cluster1_fan0: cluster1-fan0 {
-+					temperature = <50000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				cluster1_fan1: cluster1-fan1 {
-+					temperature = <60000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				cluster1_fan2: cluster1-fan2 {
-+					temperature = <70000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+			};
-+			cooling-maps {
-+				map1 {
-+					trip = <&cluster1_fan0>;
-+					cooling-device = <&pwm_fan THERMAL_NO_LIMIT 1>;
-+				};
-+				map2 {
-+					trip = <&cluster1_fan1>;
-+					cooling-device = <&pwm_fan 2 3>;
-+				};
-+				map3 {
-+					trip = <&cluster1_fan2>;
-+					cooling-device = <&pwm_fan 3 THERMAL_NO_LIMIT>;
-+				};
-+			};
-+		};
-+		gpu-top-thermal {
-+			trips {
-+				gpu_top_fan0: gpu-top-fan0 {
-+					temperature = <50000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				gpu_top_fan1: gpu-top-fan1 {
-+					temperature = <60000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				gpu_top_fan2: gpu-top-fan2 {
-+					temperature = <70000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+			};
-+			cooling-maps {
-+				map1 {
-+					trip = <&gpu_top_fan0>;
-+					cooling-device = <&pwm_fan THERMAL_NO_LIMIT 1>;
-+				};
-+				map2 {
-+					trip = <&gpu_top_fan1>;
-+					cooling-device = <&pwm_fan 2 3>;
-+				};
-+				map3 {
-+					trip = <&gpu_top_fan2>;
-+					cooling-device = <&pwm_fan 3 THERMAL_NO_LIMIT>;
-+				};
-+			};
-+		};
-+		gpu-bottom-thermal {
-+			trips {
-+				gpu_bottom_fan0: gpu-bottom-fan0 {
-+					temperature = <50000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				gpu_bottom_fan1: gpu-bottom-fan1 {
-+					temperature = <60000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+				gpu_bottom_fan2: gpu-bottom-fan2 {
-+					temperature = <70000>;
-+					hysteresis = <2000>;
-+					type = "active";
-+				};
-+			};
-+			cooling-maps {
-+				map1 {
-+					trip = <&gpu_bottom_fan0>;
-+					cooling-device = <&pwm_fan THERMAL_NO_LIMIT 1>;
-+				};
-+				map2 {
-+					trip = <&gpu_bottom_fan1>;
-+					cooling-device = <&pwm_fan 2 3>;
-+				};
-+				map3 {
-+					trip = <&gpu_bottom_fan2>;
-+					cooling-device = <&pwm_fan 3 THERMAL_NO_LIMIT>;
-+				};
-+			};
-+		};
-+	};
++    cluster0-thermal {
++        trips {
++            cluster0_fan0: cluster0-fan0 {
++                temperature = <50000>;
++                hysteresis = <2000>;
++                type = "active";
++            };
++            cluster0_fan1: cluster0-fan1 {
++                temperature = <60000>;
++                hysteresis = <2000>;
++                type = "active";
++            };
++            cluster0_fan2: cluster0-fan2 {
++                temperature = <70000>;
++                hysteresis = <2000>;
++                type = "active";
++            };
++        };
++        cooling-maps {
++            map1 { trip = <&cluster0_fan0>; cooling-device = <&pwm_fan 0 1>; };
++            map2 { trip = <&cluster0_fan1>; cooling-device = <&pwm_fan 1 3>; };
++            map3 { trip = <&cluster0_fan2>; cooling-device = <&pwm_fan 3 4>; };
++        };
++    };
++    cluster1-thermal {
++        trips {
++            cluster1_fan0: cluster1-fan0 { temperature = <50000>; hysteresis = <2000>; type = "active"; };
++            cluster1_fan1: cluster1-fan1 { temperature = <60000>; hysteresis = <2000>; type = "active"; };
++            cluster1_fan2: cluster1-fan2 { temperature = <70000>; hysteresis = <2000>; type = "active"; };
++        };
++        cooling-maps {
++            map1 { trip = <&cluster1_fan0>; cooling-device = <&pwm_fan 0 1>; };
++            map2 { trip = <&cluster1_fan1>; cooling-device = <&pwm_fan 1 3>; };
++            map3 { trip = <&cluster1_fan2>; cooling-device = <&pwm_fan 3 4>; };
++        };
++    };
++    gpu-top-thermal {
++        trips {
++            gpu_top_fan0: gpu-top-fan0 { temperature = <50000>; hysteresis = <2000>; type = "active"; };
++            gpu_top_fan1: gpu-top-fan1 { temperature = <60000>; hysteresis = <2000>; type = "active"; };
++            gpu_top_fan2: gpu-top-fan2 { temperature = <70000>; hysteresis = <2000>; type = "active"; };
++        };
++        cooling-maps {
++            map1 { trip = <&gpu_top_fan0>; cooling-device = <&pwm_fan 0 1>; };
++            map2 { trip = <&gpu_top_fan1>; cooling-device = <&pwm_fan 1 3>; };
++            map3 { trip = <&gpu_top_fan2>; cooling-device = <&pwm_fan 3 4>; };
++        };
++    };
++    gpu-bottom-thermal {
++        trips {
++            gpu_bottom_fan0: gpu-bottom-fan0 { temperature = <50000>; hysteresis = <2000>; type = "active"; };
++            gpu_bottom_fan1: gpu-bottom-fan1 { temperature = <60000>; hysteresis = <2000>; type = "active"; };
++            gpu_bottom_fan2: gpu-bottom-fan2 { temperature = <70000>; hysteresis = <2000>; type = "active"; };
++        };
++        cooling-maps {
++            map1 { trip = <&gpu_bottom_fan0>; cooling-device = <&pwm_fan 0 1>; };
++            map2 { trip = <&gpu_bottom_fan1>; cooling-device = <&pwm_fan 1 3>; };
++            map3 { trip = <&gpu_bottom_fan2>; cooling-device = <&pwm_fan 3 4>; };
++        };
++    };
++};
 +
 +	leds {
 +		compatible = "gpio-leds";
@@ -340,9 +261,36 @@ index 000000000..081f14e47
 +		compatible = "simple-battery";
 +
 +		/* Basic capacity info */
-+		charge-full-design-microamp-hours = <3850000>;
++		charge-full-design-microamp-hours = <6600000>;
 +		voltage-min-design-microvolt = <3600000>;
 +		voltage-max-design-microvolt = <4400000>;
++	};
++
++	connector {
++		compatible = "hdmi-connector";
++
++		label = "hdmi";
++		type = "d";
++
++		hdmi-pwr-supply = <&hdmi_en_reg>;
++		hpd-gpios = <&tlmm 121 GPIO_ACTIVE_HIGH>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&hdmi_hpd>;
++
++		port {
++			hdmi_con: endpoint {
++				remote-endpoint = <&lt8912b_out>;
++			};
++		};
++	};
++
++	hdmi_en_reg: hdmi-en-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "hdmi_en";
++
++		gpio = <&tlmm 13 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
 +	};
 +
 +	vph_pwr: vph-pwr-regulator {
@@ -361,7 +309,6 @@ index 000000000..081f14e47
 +
 +		regulator-always-on;
 +		regulator-boot-on;
-+
 +		vin-supply = <&vph_pwr>;
 +	};
 +};
@@ -372,7 +319,7 @@ index 000000000..081f14e47
 +};
 +
 +&apps_rsc {
-+	pm8998-rpmh-regulators {
++	regulators-0 {
 +		compatible = "qcom,pm8998-rpmh-regulators";
 +		qcom,pmic-id = "a";
 +
@@ -404,6 +351,11 @@ index 000000000..081f14e47
 +		vdd-l26-supply = <&vreg_s3a_1p35>;
 +		vin-lvs-1-2-supply = <&vreg_s4a_1p8>;
 +
++		vreg_s2a_1p125: smps2 {
++			regulator-min-microvolt = <1100000>;
++			regulator-max-microvolt = <1100000>;
++		};
++
 +		vreg_s3a_1p35: smps3 {
 +			regulator-min-microvolt = <1352000>;
 +			regulator-max-microvolt = <1352000>;
@@ -419,26 +371,57 @@ index 000000000..081f14e47
 +			regulator-max-microvolt = <1028000>;
 +		};
 +
++		vdd_qusb_hs0:
++		vdda_hp_pcie_core:
++		vdda_mipi_csi0_0p9:
++		vdda_mipi_csi1_0p9:
++		vdda_mipi_csi2_0p9:
 +		vdda_mipi_dsi0_pll:
 +		vdda_mipi_dsi1_pll:
 +		vdda_qlink_lv:
++		vdda_qlink_lv_ck:
++		vdda_qrefs_0p875:
++		vdda_pcie_core:
++		vdda_pll_cc_ebi01:
++		vdda_pll_cc_ebi23:
++		vdda_sp_sensor:
 +		vdda_ufs1_core:
++		vdda_ufs2_core:
 +		vdda_usb1_ss_core:
-+		vdda_qusb_hs0_1p8:
-+		vdda_qusb_hs0_3p1:
-+		vdda_mipi_dsi0_1p2:
-+
-+		vdda_ufs1_1p2:
-+
++		vdda_usb2_ss_core:
 +		vreg_l1a_0p875: ldo1 {
 +			regulator-min-microvolt = <880000>;
 +			regulator-max-microvolt = <880000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
++		vddpx_10:
++		vreg_l2a_1p2: ldo2 {
++			regulator-min-microvolt = <1200000>;
++			regulator-max-microvolt = <1200000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++			regulator-always-on;
++		};
++
++		vreg_l3a_1p0: ldo3 {
++			regulator-min-microvolt = <1000000>;
++			regulator-max-microvolt = <1000000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vdd_wcss_cx:
++		vdd_wcss_mx:
++		vdda_wcss_pll:
 +		vreg_l5a_0p8: ldo5 {
 +			regulator-min-microvolt = <800000>;
 +			regulator-max-microvolt = <800000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vddpx_13:
++		vreg_l6a_1p8: ldo6 {
++			regulator-min-microvolt = <1856000>;
++			regulator-max-microvolt = <1856000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
@@ -448,12 +431,44 @@ index 000000000..081f14e47
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
++		vreg_l8a_1p2: ldo8 {
++			regulator-min-microvolt = <1200000>;
++			regulator-max-microvolt = <1248000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l9a_1p8: ldo9 {
++			regulator-min-microvolt = <1704000>;
++			regulator-max-microvolt = <2928000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l10a_1p8: ldo10 {
++			regulator-min-microvolt = <1704000>;
++			regulator-max-microvolt = <2928000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l11a_1p0: ldo11 {
++			regulator-min-microvolt = <1000000>;
++			regulator-max-microvolt = <1048000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vdd_qfprom:
++		vdd_qfprom_sp:
++		vdda_apc1_cs_1p8:
++		vdda_gfx_cs_1p8:
++		vdda_qrefs_1p8:
++		vdda_qusb_hs0_1p8:
++		vddpx_11:
 +		vreg_l12a_1p8: ldo12 {
 +			regulator-min-microvolt = <1800000>;
 +			regulator-max-microvolt = <1800000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
++		vddpx_2:
 +		vreg_l13a_2p95: ldo13 {
 +			regulator-min-microvolt = <1800000>;
 +			regulator-max-microvolt = <2960000>;
@@ -468,21 +483,51 @@ index 000000000..081f14e47
 +			regulator-always-on;
 +		};
 +
++		vreg_l15a_1p8: ldo15 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l16a_2p7: ldo16 {
++			regulator-min-microvolt = <2704000>;
++			regulator-max-microvolt = <2704000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
 +		vreg_l17a_1p3: ldo17 {
 +			regulator-min-microvolt = <1304000>;
 +			regulator-max-microvolt = <1304000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
++		vreg_l18a_2p7: ldo18 {
++			regulator-min-microvolt = <2704000>;
++			regulator-max-microvolt = <2960000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l19a_3p0: ldo19 {
++			regulator-min-microvolt = <2856000>;
++			regulator-max-microvolt = <3104000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
 +		vreg_l20a_2p95: ldo20 {
-+			regulator-min-microvolt = <2950000>;
++			regulator-min-microvolt = <2704000>;
 +			regulator-max-microvolt = <2960000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
 +		vreg_l21a_2p95: ldo21 {
-+			regulator-min-microvolt = <2950000>;
++			regulator-min-microvolt = <2704000>;
 +			regulator-max-microvolt = <2960000>;
++			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
++		};
++
++		vreg_l22a_2p85: ldo22 {
++			regulator-min-microvolt = <2864000>;
++			regulator-max-microvolt = <3312000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
@@ -492,6 +537,7 @@ index 000000000..081f14e47
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
++		vdda_qusb_hs0_3p1:
 +		vreg_l24a_3p075: ldo24 {
 +			regulator-min-microvolt = <3088000>;
 +			regulator-max-microvolt = <3088000>;
@@ -504,11 +550,23 @@ index 000000000..081f14e47
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
 +
++		vdda_hp_pcie_1p2:
++		vdda_hv_ebi0:
++		vdda_hv_ebi1:
++		vdda_hv_ebi2:
++		vdda_hv_ebi3:
++		vdda_mipi_csi_1p25:
++		vdda_mipi_dsi0_1p2:
++		vdda_mipi_dsi1_1p2:
++		vdda_pcie_1p2:
++		vdda_ufs1_1p2:
++		vdda_ufs2_1p2:
++		vdda_usb1_ss_1p2:
++		vdda_usb2_ss_1p2:
 +		vreg_l26a_1p2: ldo26 {
 +			regulator-min-microvolt = <1200000>;
 +			regulator-max-microvolt = <1200000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-+			regulator-boot-on;
 +		};
 +
 +		vreg_l28a_3p0: ldo28 {
@@ -516,9 +574,19 @@ index 000000000..081f14e47
 +			regulator-max-microvolt = <3008000>;
 +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 +		};
++
++		vreg_lvs1a_1p8: lvs1 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++		};
++
++		vreg_lvs2a_1p8: lvs2 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++		};
 +	};
 +
-+	pmi8998-rpmh-regulators {
++	regulators-1 {
 +		compatible = "qcom,pmi8998-rpmh-regulators";
 +		qcom,pmic-id = "b";
 +
@@ -532,7 +600,7 @@ index 000000000..081f14e47
 +		};
 +	};
 +
-+	pm8005-rpmh-regulators {
++	regulators-2 {
 +		compatible = "qcom,pm8005-rpmh-regulators";
 +		qcom,pmic-id = "c";
 +
@@ -551,43 +619,6 @@ index 000000000..081f14e47
 +&cdsp_pas {
 +	status = "okay";
 +	firmware-name = "qcom/sdm845/cdsp.mbn";
-+};
-+
-+&mdss_dsi0 {
-+	status = "okay";
-+	vdda-supply = <&vdda_mipi_dsi0_1p2>;
-+
-+	panel@0 {
-+		compatible = "innolux,td4328";
-+		status = "okay";
-+		reg = <0>;
-+		vddio-supply = <&vreg_l14a_1p8>;
-+		vddpos-supply = <&lab>;
-+		vddneg-supply = <&ibb>;
-+
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		backlight = <&pmi8998_wled>;
-+		reset-gpios = <&tlmm 6 GPIO_ACTIVE_LOW>;
-+		rotation = <90>;
-+
-+		port {
-+			panel_in_0: endpoint {
-+				remote-endpoint = <&mdss_dsi0_out>;
-+			};
-+		};
-+	};
-+};
-+
-+&mdss_dsi0_out {
-+	remote-endpoint = <&panel_in_0>;
-+	data-lanes = <0 1 2 3>;
-+};
-+
-+&mdss_dsi0_phy {
-+	status = "okay";
-+	vdds-supply = <&vdda_mipi_dsi0_pll>;
 +};
 +
 +&gcc {
@@ -618,10 +649,43 @@ index 000000000..081f14e47
 +	};
 +};
 +
-+&i2c5 {
++&i2c3 {
 +	status = "okay";
 +	clock-frequency = <400000>;
-+	/* TODO confirm this is @20 and not @70 match reg and @ */
++
++	hdmi-bridge@48 {
++		compatible = "lontium,lt8912b";
++		reg = <0x48>;
++		reset-gpios = <&tlmm 12 GPIO_ACTIVE_LOW>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++
++				lt8912b_in: endpoint {
++					data-lanes = <0 1 2 3>;
++					remote-endpoint = <&mdss_dsi1_out>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++
++				lt8912b_out: endpoint {
++					remote-endpoint = <&hdmi_con>;
++				};
++			};
++		};
++	};
++};
++
++
++&i2c2 {
++	status = "okay";
++	clock-frequency = <400000>;
 +	synaptics-rmi4-i2c@70 {
 +		compatible = "syna,rmi4-i2c";
 +		reg = <0x70>;
@@ -662,6 +726,7 @@ index 000000000..081f14e47
 +	regulator-over-current-protection;
 +	regulator-pull-down;
 +	regulator-soft-start;
++	regulator-always-on;
 +	qcom,discharge-resistor-kohms = <300>;
 +};
 +
@@ -677,9 +742,68 @@ index 000000000..081f14e47
 +	status = "okay";
 +};
 +
++&mdss_dsi0 {
++	status = "okay";
++	vdda-supply = <&vdda_mipi_dsi0_1p2>;
++
++	display_panel: panel@0 {
++		compatible = "innolux,td4328";
++		status = "okay";
++		reg = <0>;
++		vddio-supply = <&vreg_l14a_1p8>;
++		vddpos-supply = <&lab>;
++		vddneg-supply = <&ibb>;
++
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		backlight = <&pmi8998_wled>;
++		reset-gpios = <&tlmm 6 GPIO_ACTIVE_LOW>;
++		rotation = <90>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&panel_reset_active>;
++
++		port {
++			panel_in: endpoint {
++				remote-endpoint = <&mdss_dsi0_out>;
++			};
++		};
++	};
++};
++
++&mdss_dsi0_out {
++	remote-endpoint = <&panel_in>;
++	data-lanes = <0 1 2 3>;
++};
++
++&mdss_dsi0_phy {
++	status = "okay";
++	vdds-supply = <&vdda_mipi_dsi0_pll>;
++};
++
++&mdss_dsi1 {
++	vdda-supply = <&vreg_l26a_1p2>;
++	status = "okay";
++};
++
++&mdss_dsi1_out {
++	remote-endpoint = <&lt8912b_in>;
++	data-lanes = <0 1 2 3>;
++};
++
++&mdss_dsi1_phy {
++	vdds-supply = <&vreg_l1a_0p875>;
++	status = "okay";
++};
++
++&dispcc {
++	status = "okay";
++};
++
 +&mss_pil {
 +	status = "okay";
-+	firmware-name = "qcom/sdm845/mba.mbn", "qcom/sdm845/modem.mbn";
++	firmware-name = "qcom/sdm845/mba.mbn", "qcom/sdm845/modem_nm.mbn";
 +};
 +
 +&pm8998_adc {
@@ -727,25 +851,30 @@ index 000000000..081f14e47
 +};
 +
 +&pm8998_gpios {
-+	volume_up_gpio: vol-up-active {
++	volume_up_gpio: pm8998-gpio6-state {
 +		pinconf {
-+			pins = "gpio6";
++			qcom,drive-strength = <PMIC_GPIO_STRENGTH_NO>;
 +			function = "normal";
++			pins = "gpio6";
 +			input-enable;
 +			bias-pull-up;
-+			qcom,drive-strength = <PMIC_GPIO_STRENGTH_NO>;
 +		};
 +	};
 +};
 +
 +&pm8998_pon {
-+	volume_down_resin: resin {
++	resin {
 +		compatible = "qcom,pm8941-resin";
 +		interrupts = <0x0 0x8 1 IRQ_TYPE_EDGE_BOTH>;
 +		debounce = <15625>;
 +		bias-pull-up;
 +		linux,code = <KEY_VOLUMEDOWN>;
 +	};
++};
++
++&pm8998_resin {
++	linux,code = <KEY_VOLUMEDOWN>;
++	status = "okay";
 +};
 +
 +&pmi8998_charger {
@@ -755,14 +884,12 @@ index 000000000..081f14e47
 +
 +&pmi8998_fg {
 +	status = "okay";
-+
-+	power-supplies = <&pmi8998_charger>;
 +	monitored-battery = <&battery>;
++	power-supplies = <&pmi8998_charger>;
 +};
 +
 +&pmi8998_rradc {
 +	status = "okay";
-+	monitored-battery = <&battery>;
 +};
 +
 +&pmi8998_gpios {
@@ -787,17 +914,20 @@ index 000000000..081f14e47
 +		#address-cells = <1>;
 +		#size-cells = <0>;
 +
-+		led@3 {
++		led@0 {
++		label = "blue";
 +			reg = <3>;
 +			color = <LED_COLOR_ID_BLUE>;
 +		};
 +
-+		led@4 {
++		led@1 {
++		label = "green";
 +			reg = <4>;
 +			color = <LED_COLOR_ID_GREEN>;
 +		};
 +
-+		led@5 {
++		led@2 {
++		label = "red";
 +			reg = <5>;
 +			color = <LED_COLOR_ID_RED>;
 +		};
@@ -812,15 +942,15 @@ index 000000000..081f14e47
 +
 +&q6asmdai {
 +	dai@0 {
-+		reg = <MSM_FRONTEND_DAI_MULTIMEDIA1>;
++		reg = <0>;
 +	};
 +
 +	dai@1 {
-+		reg = <MSM_FRONTEND_DAI_MULTIMEDIA2>;
++		reg = <1>;
 +	};
 +
 +	dai@2 {
-+		reg = <MSM_FRONTEND_DAI_MULTIMEDIA3>;
++		reg = <2>;
 +	};
 +};
 +
@@ -876,26 +1006,40 @@ index 000000000..081f14e47
 +	pinctrl-0 = <&sdc2_default_state &sdc2_card_det_n>;
 +
 +	vmmc-supply = <&vreg_l21a_2p95>;
-+	vqmmc-supply = <&vreg_l13a_2p95>;
++	vqmmc-supply = <&vddpx_2>;
 +
 +	bus-width = <4>;
 +	cd-gpios = <&tlmm 126 GPIO_ACTIVE_LOW>;
 +};
 +
 +&sound {
-+	compatible = "qcom,sdm845-sndcard";
++	compatible = "qcom,db845c-sndcard", "qcom,sdm845-sndcard";
++    pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active>;
++    pinctrl-1 = <&quat_mi2s_sleep &quat_mi2s_sd0_sleep>;
 +	model = "Odin";
 +
 +	audio-routing =
 +		"RX_BIAS", "MCLK",
-+		"AMIC2", "MIC BIAS2",
++        "AMIC1", "MIC BIAS1",
++        "MIC BIAS1", "Handset Mic",
++        "AMIC2", "MIC BIAS2",
++        "MIC BIAS2", "Headset Mic",
++        "AMIC3", "MIC BIAS3",
++        "MIC BIAS3", "ANCRight Headset Mic",
++        "AMIC4", "MIC BIAS4",
++        "MIC BIAS4", "ANCLeft Headset Mic",
++        "DMIC0", "MIC BIAS1",
++        "MIC BIAS1", "Digital Mic0",
++        "DMIC1", "MIC BIAS1",
++        "MIC BIAS1", "Digital Mic1",
++        /* WSA Speakers linked via Macros */
 +		"SpkrLeft IN", "SPK1 OUT",
-+		"SpkrRight IN", "SPK2 OUT",
-+		"MM_DL1",  "MultiMedia1 Playback",
-+		"MM_DL3",  "MultiMedia3 Playback",
-+		"MultiMedia2 Capture", "MM_UL2";
++		"SpkrRight IN", "SPK2 OUT";
 +
-+	mm1-dai-link {
++		/* USB-C Analog Mux GPIOs */
++   // qcom,jack-en-gpios = <&tlmm 51 GPIO_ACTIVE_HIGH>; /* atm missing tlmm 51 gpio */
++
++ mm1-dai-link {
 +		link-name = "MultiMedia1";
 +		cpu {
 +			sound-dai = <&q6asmdai  MSM_FRONTEND_DAI_MULTIMEDIA1>;
@@ -927,7 +1071,7 @@ index 000000000..081f14e47
 +		};
 +
 +		codec {
-+			sound-dai =  <&wcd9340 0>, <&left_spkr>, <&right_spkr>, <&swm 0>;
++			sound-dai =  <&wcd9340 0>, <&wsa881x_1>, <&wsa881x_2>, <&swm 0>;
 +		};
 +	};
 +
@@ -962,6 +1106,11 @@ index 000000000..081f14e47
 +	};
 +};
 +
++&slpi_pas {
++	firmware-name = "qcom/sdm845/Thundercomm/db845c/slpi.mbn";
++	status = "okay";
++};
++
 +&tlmm {
 +	sdc2_default_state: sdc2-default {
 +		clk {
@@ -987,6 +1136,21 @@ index 000000000..081f14e47
 +		pins = "gpio126";
 +		function = "gpio";
 +		bias-pull-up;
++	};
++
++	panel_reset_active: panel-reset-active {
++		pins = "gpio6";
++		function = "gpio";
++		drive-strength = <16>;
++		bias-disable;
++	};
++
++	hdmi_hpd: hdmi-hpd-active {
++		pins = "gpio121";
++		function = "gpio";
++		drive-strength = <10>;
++		bias-pull-up;
++		input-enable;
 +	};
 +
 +	wcd_intr_default_odin: wcd-intr-default-state {
@@ -1046,7 +1210,7 @@ index 000000000..081f14e47
 +
 +	bluetooth {
 +		compatible = "qcom,wcn3990-bt";
-+
++		local-bd-address = [90 CD 1F 4D 9A A2];
 +		vddio-supply = <&vreg_s4a_1p8>;
 +		vddxo-supply = <&vreg_l7a_1p8>;
 +		vddrf-supply = <&vreg_l17a_1p3>;
@@ -1127,23 +1291,27 @@ index 000000000..081f14e47
 +};
 +
 +&swm {
-+	left_spkr: wsa8810-left {
-+		compatible = "sdw10217201000";
-+		reg = <0 1>;
-+		powerdown-gpios = <&wcdgpio 2 GPIO_ACTIVE_HIGH>;
-+		#thermal-sensor-cells = <0>;
-+		sound-name-prefix = "SpkrLeft";
-+		#sound-dai-cells = <0>;
-+	};
++    status = "okay";
 +
-+	right_spkr: wsa8810-right {
-+		compatible = "sdw10217201000";
-+		powerdown-gpios = <&wcdgpio 2 GPIO_ACTIVE_HIGH>;
-+		reg = <0 2>;
-+		#thermal-sensor-cells = <0>;
-+		sound-name-prefix = "SpkrRight";
-+		#sound-dai-cells = <0>;
-+	};
++    /* Left Speaker */
++    wsa881x_1: speaker@0,1 {
++        compatible = "sdw10217201000";
++        reg = <0 1>;
++        powerdown-gpios = <&wcdgpio 2 GPIO_ACTIVE_LOW>;
++        #sound-dai-cells = <0>;
++        sound-name-prefix = "SpkrLeft";
++        vdd-1p8-supply = <&vreg_l15a_1p8>;
++    };
++
++    /* Right Speaker */
++    wsa881x_2: speaker@0,2 {
++        compatible = "sdw10217201000";
++        reg = <0 2>;
++        powerdown-gpios = <&wcdgpio 2 GPIO_ACTIVE_LOW>;
++        #sound-dai-cells = <0>;
++        sound-name-prefix = "SpkrRight";
++        vdd-1p8-supply = <&vreg_l15a_1p8>;
++    };
 +};
 +
 +&wifi {
