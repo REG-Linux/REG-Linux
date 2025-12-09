@@ -169,7 +169,6 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_E2FSPROGS				# fs resize
 	select BR2_PACKAGE_E2FSPROGS_RESIZE2FS			# fs resize
 	select BR2_PACKAGE_PACMAN				# pacman package manager
-	select BR2_PACKAGE_FLATPAK				if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_x86_64 # flatpak app packaging system
 	select BR2_PACKAGE_RYZENADJ				if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && BR2_x86_64 # ryzen apu configuration
 
 	select BR2_PACKAGE_HTOP					# resources monitor
@@ -263,8 +262,6 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_OD_COMMANDER # ALL
 	select BR2_PACKAGE_PYTHON_SERIAL		if BR2_x86_64
 	select BR2_PACKAGE_SMARTMONTOOLS
-	# Removed because Qt5
-	#select BR2_PACKAGE_BAUH			if BR2_x86_64 # flatpak gui
 
 	# gpio controllers
 	select BR2_PACKAGE_DB9_GPIO_RPI					if BR2_PACKAGE_SYSTEM_TARGET_RPI_ANY

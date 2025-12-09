@@ -2903,40 +2903,6 @@ xbox:
   comment_br: |
     Para mais informações: https://wiki.reglinux.org/systems/xbox
 
-flatpak:
-  name: Applications
-  manufacturer:
-  release:
-  hardware:
-  extensions: [flatpak]
-  platform: pc
-  group: ports
-  emulators:
-    flatpak:
-      flatpak: { requireAnyOf: [BR2_PACKAGE_FLATPAK] }
-  comment_en: |
-    Play games (and programs) from https://flathub.org.
-    Programs must be installed from command line.
-    Example:
-    Install Flathub Repo : flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    Install app from url : flatpak install https://dl.flathub.org/repo/appstream/org.tuxfamily.XMoto.flatpakref
-    Search app from Repo : flatpak search xmoto
-    Install app from Repo : flatpak install xmoto
-    List your apps : flatpak list
-    Remove intalled app : flatpak remove xmoto
-    then, run system-flatpak-update to update the roms directory according to your installed applications.
-  comment_br: |
-    Jogue jogos (e execute programas) disponíveis em https://flathub.org.
-    Os programas devem ser instalados a partir da linha de comando.
-    Exemplo:
-    Instale o Repositório do Flathub: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    Instale aplicativos via url: flatpak install https://dl.flathub.org/repo/appstream/org.tuxfamily.XMoto.flatpakref
-    Pesquise aplicativos do repositório: flatpak search xmoto
-    Instale aplicativos do repositório: flatpak install xmoto
-    Liste seus aplicativos instalados: lista flatpak
-    Remova um aplicativo instalado: flatpak remove xmoto
-    em seguida, execute system-flatpak-update para atualizar o diretório roms de acordo com seus aplicativos instalados.
-
 steam:
   name: Steam
   manufacturer: Valve

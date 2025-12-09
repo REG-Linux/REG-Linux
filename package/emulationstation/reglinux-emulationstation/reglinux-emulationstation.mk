@@ -4,8 +4,10 @@
 #
 ################################################################################
 
+# pdfium branch
+REGLINUX_EMULATIONSTATION_VERSION = 4cb572459f774e5cd14a582913059cf39d0b007c
 # dev
-REGLINUX_EMULATIONSTATION_VERSION = 3d5531108d7f6d5acd281a4bacb722def9667e73
+#REGLINUX_EMULATIONSTATION_VERSION = 3d5531108d7f6d5acd281a4bacb722def9667e73
 # Old GLES 2.0 based builds
 #bc8df32ab3e2e1861b46ff09909fdafd22c9a0ed
 REGLINUX_EMULATIONSTATION_TOKEN = $(shell cat /build/gh_token)

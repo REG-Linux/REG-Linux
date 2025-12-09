@@ -11,16 +11,3 @@
  endif()
  
  
---- a/gui/src/CMakeLists.txt	2025-02-18 15:48:14.710837519 +0100
-+++ b/gui/src/CMakeLists.txt	2025-02-18 15:48:26.890599152 +0100
-@@ -8,8 +8,8 @@
- set(CMAKE_CXX_STANDARD_REQUIRED ON)
- 
- if(UNIX)
--	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} -Wno-unused-variable)
--	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-unused-variable)
-+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-variable")
-+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
- endif()
- 
- set(DISC_IMAGE_DIR "C:/D/TownsISO")

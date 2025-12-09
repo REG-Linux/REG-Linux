@@ -194,11 +194,6 @@ flash:
   core: lightspark
   options:
     hud_support: false
-flatpak:
-  emulator: flatpak
-  core: flatpak
-  options:
-    hud_support: false
 fm7:
   emulator: libretro
   core: mame
