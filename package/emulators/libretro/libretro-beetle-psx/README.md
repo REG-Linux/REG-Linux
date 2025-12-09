@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_BEETLE_PSX
+# Libretro Beetle PSX
 
-A libretro psx emulator core.
+The `libretro-beetle-psx` core brings PlayStation 1 emulation into REG-Linux’s libretro catalog with Raspberry Pi tuning and the CD-less Makefile adjustments.
 
 ## Build notes
 
-- ``Version``: b8dd9de6dba5fa0359c0a7df7f0b61a7fc503093
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: applies patches: 001-RPi5-tuning.patch, 000-makefile-no-cd.patch
+- `Version`: b8dd9de6dba5fa0359c0a7df7f0b61a7fc503093
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: applies `001-RPi5-tuning.patch` and `000-makefile-no-cd.patch`

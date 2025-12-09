@@ -1,9 +1,9 @@
-# BR2_PACKAGE_MUPEN64PLUS_INPUT_SDL
+# Mupen64Plus input SDL
 
-Input plugin for Mupen64Plus v2.0 project using SDL.
+The `mupen64plus-input-sdl` plugin provides SDL2-backed controller support to REG-Linux’s Mupen64Plus builds.
 
 ## Build notes
 
-- ``Version``: 2.6.0
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on BR2_PACKAGE_SDL2, depends on BR2_PACKAGE_ALSA_LIB, depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_SDL2 || !BR2_PACKAGE_ALSA_LIB
-- ``Build helper``: Generic/Makefile (generic-package)
+- `Version`: 2.6.0
+- `Dependencies`: `BR2_INSTALL_LIBSTDCPP`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ALSA_LIB`
+- `Build helper`: Generic/Makefile (`generic-package`)

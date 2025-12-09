@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_PC88
+# Libretro PC-88
 
-A port of QUASI88, a PC-8800 series emulator by Showzoh Fukunaga, to the libretro API.
+The `libretro-pc88` core ports QUASI88 (PC-8800 series) into REG-Linux’s libretro tree with Raspberry Pi tuning already applied.
 
 ## Build notes
 
-- ``Version``: 42be798db5585f62b4bd34ce49dd1e8063c9d7c1
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: applies patches: 001-RPi5-tuning.patch
+- `Version`: 42be798db5585f62b4bd34ce49dd1e8063c9d7c1
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: applies `001-RPi5-tuning.patch`

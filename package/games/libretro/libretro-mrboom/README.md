@@ -1,8 +1,9 @@
-# libretro-mrboom
+# Libretro Mr. Boom
 
-Builds the Mr. Boom core (`mrboom_libretro.so`) for libretro frontends.
+The `libretro-mrboom` core supplies REG-Linux with the Mr. Boom Bomberman-style experience, detecting NEON on ARM and leaving `mrboom_libretro.so` ready for RetroArch frontends.
 
 ## Build notes
-- **Version:** 5.5 release (May 2024) from `Javanaise/mrboom-libretro` with submodules.
-- **Config:** requires a C++ toolchain and conditionally defines `HAVE_NEON=1` on NEON-capable ARM targets; `SKIP_GIT=1` avoids git commands during cross-build.
-- **Build system:** runs the upstream Makefile via `$(generic-package)` and installs the shared object under `/usr/lib/libretro`.
+
+- `Version`: 5.5 release (May 2024) from `Javanaise/mrboom-libretro`.
+- `Dependencies`: `BR2_INSTALL_LIBSTDCPP`, NEON detection on ARM; `SKIP_GIT=1` for cross-builds.
+- `Build helper`: Generic/Makefile (`generic-package`) that invokes the upstream Makefile and installs `/usr/lib/libretro/mrboom_libretro.so`.

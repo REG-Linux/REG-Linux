@@ -1,9 +1,9 @@
-# BR2_PACKAGE_MUPEN64PLUS_AUDIO_SDL
+# Mupen64Plus audio SDL
 
-Audio plugin for the Mupen64Plus v2.0 project, using SDL.
+The `mupen64plus-audio-sdl` plugin delivers SDL2/ALSA audio output for REG-Linux’s Mupen64Plus v2.0 stack.
 
 ## Build notes
 
-- ``Version``: 2.6.0
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on BR2_PACKAGE_SDL2, depends on BR2_PACKAGE_ALSA_LIB, depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_SDL2 || !BR2_PACKAGE_ALSA_LIB
-- ``Build helper``: Generic/Makefile (generic-package)
+- `Version`: 2.6.0
+- `Dependencies`: `BR2_INSTALL_LIBSTDCPP`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ALSA_LIB`
+- `Build helper`: Generic/Makefile (`generic-package`)
