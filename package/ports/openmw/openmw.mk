@@ -8,7 +8,7 @@ OPENMW_VERSION = stable
 OPENMW_SITE = https://github.com/OpenMW/openmw
 OPENMW_SITE_METHOD = git
 OPENMW_DEPENDENCIES = libgl lz4 yaml-cpp bullet ffmpeg openal sqlite
-OPENMW_DEPENDENCIES += sdl2 librsvg boost fontconfig freetype poppler cairo
+OPENMW_DEPENDENCIES += sdl2 librsvg boost fontconfig freetype cairo
 OPENMW_DEPENDENCIES += lua
 #OPENMW_DEPENDENCIES += reglinux-luajit
 
@@ -42,7 +42,7 @@ OPENMW_CONF_OPTS += -DOSG_CPP_EXCEPTIONS_AVAILABLE=ON \
 OPENMW_CONF_OPTS += -DMYGUI_RENDERSYSTEM=1
 
 # Cross-compilation trick: poppler cairo test
-OPENMW_CONF_OPTS += -DPOPPLER_HAS_CAIRO_EXITCODE=0
+#OPENMW_CONF_OPTS += -DPOPPLER_HAS_CAIRO_EXITCODE=0
 # Cross-compilation trick: LuaJIT check custom allocator
 OPENMW_CONF_OPTS += -DRUN_RESULT_VAR=1
 
