@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_FBALPHA
+# Libretro FB Alpha
 
-A libretro fbalpha emulator core for ARM.
+The `libretro-fbalpha` core provides ARM-targeted arcade emulation within REG-Linux’s libretro stack.
 
 ## Build notes
 
-- ``Version``: 77167cea72e808384c136c8c163a6b4975ce7a84
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: applies patches: 001-fix-gcc14.patch
+- `Version`: 77167cea72e808384c136c8c163a6b4975ce7a84
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: applies `001-fix-gcc14.patch`

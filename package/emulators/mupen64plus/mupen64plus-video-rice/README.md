@@ -1,9 +1,9 @@
-# BR2_PACKAGE_MUPEN64PLUS_VIDEO_RICE
+# Mupen64Plus video rice
 
-Video plugin for the Mupen64Plus v2.0 project, using OpenGL.
+The `mupen64plus-video-rice` plugin supplies the classic OpenGL renderer for REG-Linux’s Mupen64Plus builds with SDL/ALSA helpers.
 
 ## Build notes
 
-- ``Version``: 2.6.0
-- ``Config``: select BR2_PACKAGE_SDL2, select BR2_PACKAGE_ALSA_LIB, select BR2_PACKAGE_BOOST, select BR2_PACKAGE_BOOST_FILESYSTEM, depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_SDL2 || !BR2_PACKAGE_ALSA_LIB
-- ``Build helper``: Generic/Makefile (generic-package)
+- `Version`: 2.6.0
+- `Dependencies`: `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ALSA_LIB`, `BR2_PACKAGE_BOOST`, `BR2_PACKAGE_BOOST_FILESYSTEM`, `BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)

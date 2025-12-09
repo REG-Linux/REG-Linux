@@ -1,8 +1,9 @@
-# libretro-superbroswar
+# Libretro Super Bros War
 
-Super Mario War core for libretro deliverables.
+The `libretro-superbroswar` core wraps the Super Mario War reimplementation for REG-Linux, including the `001-fix-gcc14.patch` needed for newer GCC releases.
 
 ## Build notes
-- **Version:** commit `d8d5d58f3cbc1e08f91a0e218bc990ec47282c08` (Oct 2024) from `libretro/superbroswar-libretro` with `git submodules`.
-- **Config:** standard C++ toolchain requirement; the recipe sets `-fPIC` flags through the environment.
-- **Build system:** builds via the upstream `Makefile.libretro` inside the source tree and installs `superbroswar_libretro.so` into `/usr/lib/libretro`. A patch (`001-fix-gcc14.patch`) updates the build for modern gcc versions.
+
+- `Version`: `d8d5d58f3cbc1e08f91a0e218bc990ec47282c08` (Oct 2024) from `libretro/superbroswar-libretro`.
+- `Dependencies`: `BR2_INSTALL_LIBSTDCPP`, `-fPIC` enforced across targets.
+- `Build helper`: Generic/Makefile (`generic-package`) building via `Makefile.libretro` and installing `/usr/lib/libretro/superbroswar_libretro.so`.

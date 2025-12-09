@@ -1,8 +1,7 @@
 # Libretro game ports
 
-Contains game-specific libretro cores that REG-Linux builds alongside the engine packages.
+This folder holds game-specific libretro cores that REG-Linux cross-compiles alongside the standalone engine packages. Each core builds a single `.so` that the frontend loads, so the README inside the core’s directory documents the version, dependencies, build helper, and install artifacts specific to that libretro package.
 
-- `libretro-mrboom/`: builds the `mrboom_libretro.so` core with NEON detection and GLES-friendly flags.
-- `libretro-superbroswar/`: builds the `superbroswar_libretro.so` core for the Super Mario War reimplementation.
-
-Both packages require a C++ toolchain; consult each subdirectory README for platform overrides, patches, and install targets.
+## Core summaries
+- `libretro-mrboom/`: builds `mrboom_libretro.so`, applying NEON detection and GLES-friendly linker flags so the retro Bomberman-style game behaves on ARM consoles.
+- `libretro-superbroswar/`: compiles `superbroswar_libretro.so` for the Super Mario War reimplementation, shipping the patched build that handles modern GCC and libstdc++ toggles.

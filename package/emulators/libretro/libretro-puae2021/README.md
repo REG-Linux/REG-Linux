@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_PUAE2021
+# Libretro PUAE 2021
 
-2021 libretro AMIGA emulator core for ARM. http://www.libretro.com https://github.com/libretro/libretro-uae/tree/2.6.1
+The `libretro-puae2021` core updates REG-Linux’s Amiga library with the 2021 libretro-uae stack and the usual Raspberry Pi/build fixes.
 
 ## Build notes
 
-- ``Version``: 71d105288333ce63aeaaa20ebb1dfe07c24d050f
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: applies patches: 000-rpi_makefile.patch, 002-isoc99math.patch, 001-capsimg-path.patch, 003-gcc14-hack.patch
+- `Version`: 71d105288333ce63aeaaa20ebb1dfe07c24d050f
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: applies `000-rpi_makefile.patch`, `002-isoc99math.patch`, `001-capsimg-path.patch`, `003-gcc14-hack.patch`

@@ -1,10 +1,10 @@
-# BR2_PACKAGE_MUPEN64PLUS_GLIDEN64
+# Mupen64Plus GlideN64
 
-A new generation, open-source graphics plugin for N64 emulators.
+The `mupen64plus-gliden64` plugin delivers the next-gen OpenGL graphics stack for REG-Linux’s N64 builds, hooking into SDL2/ALSA and libpng/zlib.
 
 ## Build notes
 
-- ``Version``: 55c436c706224eae6cd1395b88e083105b7d7834
-- ``Config``: select BR2_PACKAGE_ZLIB, select BR2_PACKAGE_LIBPNG, select BR2_INSTALL_LIBSTDCPP, select BR2_PACKAGE_SDL2, select BR2_PACKAGE_ALSA_LIB, depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_SDL2 || !BR2_PACKAGE_ALSA_LIB
-- ``Build helper``: CMake-based (cmake-package)
-- ``Extras``: applies patches: 000-sdl2-fix.patch
+- `Version`: 55c436c706224eae6cd1395b88e083105b7d7834
+- `Dependencies`: `BR2_PACKAGE_ZLIB`, `BR2_PACKAGE_LIBPNG`, `BR2_INSTALL_LIBSTDCPP`, `BR2_PACKAGE_SDL2`, `BR2_PACKAGE_ALSA_LIB`
+- `Build helper`: CMake-based (`cmake-package`)
+- `Extras`: applies `000-sdl2-fix.patch`

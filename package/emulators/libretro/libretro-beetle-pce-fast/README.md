@@ -1,10 +1,10 @@
-# BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST
+# Libretro Beetle PCE Fast
 
-A libretro PCE-FAST emulator core for ARM. http://www.libretro.com
+The `libretro-beetle-pce-fast` core provides the faster TurboGrafx engine for REG-Linux, including Raspberry Pi tuning and the CD-less Makefile variant.
 
 ## Build notes
 
-- ``Version``: be659edd93cd84e01e13ab3c44a6354662d37e4e
-- ``Config``: depends on BR2_INSTALL_LIBSTDCPP, depends on !BR2_INSTALL_LIBSTDCPP
-- ``Build helper``: Generic/Makefile (generic-package)
-- ``Extras``: applies patches: 001-RPi5-tuning.patch, 000-makefile-no-cd.patch
+- `Version`: be659edd93cd84e01e13ab3c44a6354662d37e4e
+- `Dependencies`: supports both `BR2_INSTALL_LIBSTDCPP` and `!BR2_INSTALL_LIBSTDCPP`
+- `Build helper`: Generic/Makefile (`generic-package`)
+- `Extras`: applies `001-RPi5-tuning.patch` and `000-makefile-no-cd.patch`
