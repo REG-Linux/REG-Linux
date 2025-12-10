@@ -1,11 +1,11 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from filecmp import cmp
 from shutil import copyfile
 from json import load, dump, dumps
 from evdev import list_devices, InputDevice
 from os import path, makedirs, chmod, environ
-from systemFiles import CONF, BIOS
+from configgen.systemFiles import CONF, BIOS
 
 RYUJINX_CONFIG_DIR = CONF + "/Ryujinx"
 RYUJINX_SYSTEM_DIR = RYUJINX_CONFIG_DIR + "/system"

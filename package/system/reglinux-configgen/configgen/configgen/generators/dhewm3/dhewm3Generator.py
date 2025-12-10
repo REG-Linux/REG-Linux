@@ -1,7 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from pathlib import Path
-from systemFiles import CONF, ROMS
+from configgen.systemFiles import CONF, ROMS
 
 DHEWM3_BIN_PATH = "/usr/bin/dhewm3"
 DHEWM3_CONFIG_DIR = CONF + "/dhewm3"

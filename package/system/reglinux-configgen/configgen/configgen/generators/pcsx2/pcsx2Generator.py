@@ -3,7 +3,7 @@ from configgen.Command import Command
 from shutil import copy
 from os import path, remove, makedirs
 from re import search, MULTILINE
-from controllers import write_sdl_db_all_controllers
+from configgen.controllers import write_sdl_db_all_controllers
 from .pcsx2Controllers import isPlayingWithWheel
 from .pcsx2Config import (
     setPcsx2Reg,
@@ -16,7 +16,7 @@ from .pcsx2Config import (
     PCSX2_BIOS_DIR,
 )
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

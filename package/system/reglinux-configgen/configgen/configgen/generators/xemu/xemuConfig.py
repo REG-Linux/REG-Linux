@@ -1,7 +1,7 @@
 from os import path, makedirs
 from io import open
 from configparser import ConfigParser
-from systemFiles import CONF, SAVES
+from configgen.systemFiles import CONF, SAVES
 
 XEMU_SAVES_DIR = SAVES + "/xbox"
 XEMU_CONFIG_PATH = CONF + "/xemu/xemu.toml"

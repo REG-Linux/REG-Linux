@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
 from shutil import copy
-from systemFiles import CONF
-from controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF
+from configgen.controllers import generate_sdl_controller_config
 
 
 class ETLegacyGenerator(Generator):

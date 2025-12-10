@@ -1,4 +1,4 @@
-from systemFiles import ROMS
+from configgen.systemFiles import ROMS
 
 CDOGS_BIN_PATH = "/usr/bin/cdogs"
 CDOGS_ROMS_DIR = ROMS + "/cdogs"

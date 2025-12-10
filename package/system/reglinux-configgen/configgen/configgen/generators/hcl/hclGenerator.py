@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import chdir
-from controllers import generate_sdl_controller_config
-from utils.logger import get_logger
+from configgen.controllers import generate_sdl_controller_config
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

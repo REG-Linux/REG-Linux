@@ -1,12 +1,12 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, listdir, remove, rename
 from io import open
 from re import search
 from shutil import copyfile, copy2
 from configparser import ConfigParser
-from controllers import gunsNeedCrosses, generate_sdl_controller_config
-from systemFiles import CONF
+from configgen.controllers import gunsNeedCrosses, generate_sdl_controller_config
+from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

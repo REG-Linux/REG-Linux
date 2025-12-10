@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
-from settings import JSONSettings
-from controllers import generate_sdl_controller_config
+from configgen.settings import JSONSettings
+from configgen.controllers import generate_sdl_controller_config
 from .bigpemuConfig import (
     setBigemuConfig,
     BIGPEMU_BIN_PATH,

@@ -1,11 +1,11 @@
-import controllers as controllersConfig
+import configgen.controllers as controllersConfig
 from evdev import device, ecodes
 from subprocess import Popen, PIPE
 from os import pipe, fdopen, kill
 from signal import SIGTERM
 from re import match
 from math import floor, ceil
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

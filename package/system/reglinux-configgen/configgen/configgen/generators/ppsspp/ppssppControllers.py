@@ -1,4 +1,4 @@
-from settings import UnixSettings
+from configgen.settings import UnixSettings
 from .ppssppConfig import PPSSPP_CONTROLS_SOURCE_PATH, PPSSPP_CONTROLS_PATH
 # This configgen is based on PPSSPP 1.5.4.
 # Therefore, all code/github references are valid at this version, and may not be valid with later updates

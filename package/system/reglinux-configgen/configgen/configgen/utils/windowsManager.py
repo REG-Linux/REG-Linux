@@ -10,7 +10,7 @@ from os import environ, path
 from subprocess import Popen, TimeoutExpired, run
 from time import sleep
 from typing import Optional
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

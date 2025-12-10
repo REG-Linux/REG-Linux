@@ -1,4 +1,4 @@
-from systemFiles import ROMS, CONF
+from configgen.systemFiles import ROMS, CONF
 from os import path, makedirs, walk
 
 IOQUAKE3_BIN_DIR = "/usr/ioquake3"

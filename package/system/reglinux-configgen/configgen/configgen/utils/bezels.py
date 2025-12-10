@@ -1,5 +1,5 @@
 from os import path
-from systemFiles import OVERLAY_USER, OVERLAY_SYSTEM
+from configgen.systemFiles import OVERLAY_USER, OVERLAY_SYSTEM
 import struct
 from PIL import Image, ImageOps
 from .videoMode import getAltDecoration

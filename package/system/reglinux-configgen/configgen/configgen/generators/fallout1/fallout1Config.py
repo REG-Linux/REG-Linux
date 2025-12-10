@@ -1,4 +1,4 @@
-from systemFiles import CONF, ROMS
+from configgen.systemFiles import CONF, ROMS
 
 FALLOUT_CONFIG_DIR = CONF + "/fallout1"
 FALLOUT_CONFIG_PATH = FALLOUT_CONFIG_DIR + "/fallout.cfg"

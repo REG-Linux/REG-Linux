@@ -1,13 +1,13 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from typing import Optional, Tuple
 from filecmp import cmp
 from shutil import copyfile, copytree, copy2
 from os import path, walk, mkdir, listdir
 from ffmpeg import probe
-from controllers import generate_sdl_controller_config, gunsBordersSizeName
-from systemFiles import CONF, ROMS, SAVES
-from utils.logger import get_logger
+from configgen.controllers import generate_sdl_controller_config, gunsBordersSizeName
+from configgen.systemFiles import CONF, ROMS, SAVES
+from configgen.utils.logger import get_logger
 
 DAPHNE_ROM_DIR = ROMS + "/daphne"
 SINGE_ROM_DIR = ROMS + "/singe"

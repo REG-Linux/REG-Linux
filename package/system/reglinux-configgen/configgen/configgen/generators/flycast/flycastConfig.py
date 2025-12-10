@@ -1,4 +1,4 @@
-from systemFiles import CONF, SAVES, BIOS
+from configgen.systemFiles import CONF, SAVES, BIOS
 
 FLYCAST_CONFIG_DIR = CONF + "/flycast"
 FLYCAST_CONFIG_PATH = FLYCAST_CONFIG_DIR + "/emu.cfg"

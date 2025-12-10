@@ -1,5 +1,5 @@
-from settings import UnixSettings
-from systemFiles import CONF, SAVES, BIOS, SCREENSHOTS, LOGDIR
+from configgen.settings import UnixSettings
+from configgen.systemFiles import CONF, SAVES, BIOS, SCREENSHOTS, LOGDIR
 
 AMIBERRY_CONFIG_DIR = CONF + "/amiberry"
 AMIBERRY_BIOS_DIR = BIOS + "/amiga"

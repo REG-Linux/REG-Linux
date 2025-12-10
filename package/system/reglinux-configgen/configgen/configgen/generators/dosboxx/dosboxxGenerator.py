@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from configparser import ConfigParser
 from os import path, makedirs
 from shutil import copy2
-from systemFiles import CONF
+from configgen.systemFiles import CONF
 
 DOSBOXX_CONFIG_DIR = CONF + "/dosbox"
 DOSBOXX_CONFIG_PATH = DOSBOXX_CONFIG_DIR + "/dosboxx.conf"

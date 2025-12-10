@@ -1,6 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
-from settings import UnixSettings
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.settings import UnixSettings
 from .edenController import setEdenControllers
 from .edenConfig import setEdenConfig, EDEN_BIN_PATH, EDEN_CONFIG_PATH
 

@@ -1,11 +1,11 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, mkdir
 from platform import uname
-from controllers import generate_sdl_controller_config
-from utils.buildargs import parse_args
-from systemFiles import CONF, SAVES
-from utils.logger import get_logger
+from configgen.controllers import generate_sdl_controller_config
+from configgen.utils.buildargs import parse_args
+from configgen.systemFiles import CONF, SAVES
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

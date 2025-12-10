@@ -1,7 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
-from systemFiles import CONF
+from configgen.systemFiles import CONF
 
 DXX_REBIRTH1_CONFIG_DIR = CONF + "/d1x-rebirth"
 DXX_REBIRTH1_CONFIG_PATH = DXX_REBIRTH1_CONFIG_DIR + "/descent.cfg"

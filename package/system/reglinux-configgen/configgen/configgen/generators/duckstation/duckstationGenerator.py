@@ -3,7 +3,7 @@ from configgen.Command import Command
 from configgen.systemFiles import ROMS
 from configparser import ConfigParser
 from os import path, makedirs
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 from .duckstationConfig import (
     DUCKSTATION_NOGUI_PATH,
     DUCKSTATION_BIN_PATH,

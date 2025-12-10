@@ -1,6 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
-from settings import UnixSettings
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.settings import UnixSettings
 from .azaharConfig import setAzaharConfig, AZAHAR_BIN_PATH, AZAHAR_CONFIG_PATH
 from .azaharControllers import setAzaharControllers
 

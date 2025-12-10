@@ -7,7 +7,7 @@ from typing import Dict, Any, Tuple, Optional
 import os
 import asyncio
 from .controller import Controller, Input
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

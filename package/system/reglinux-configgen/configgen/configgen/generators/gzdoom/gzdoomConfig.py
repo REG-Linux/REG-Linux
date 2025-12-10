@@ -1,6 +1,6 @@
-from systemFiles import CONF, LOGDIR
+from configgen.systemFiles import CONF, LOGDIR
 from os import path
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 GZDOOM_CONFIG_DIR = CONF + "/gzdoom"
 GZDOOM_CONFIG_PATH = GZDOOM_CONFIG_DIR + "/gzdoom.ini"

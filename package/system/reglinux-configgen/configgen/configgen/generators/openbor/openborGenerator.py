@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, chdir
 from re import search
-from systemFiles import CONF, SAVES, ROMS
-from settings import UnixSettings
+from configgen.systemFiles import CONF, SAVES, ROMS
+from configgen.settings import UnixSettings
 from .openborControllers import setControllerConfig
 
 OPENBOR_CONF_DIR = CONF + "/openbor"

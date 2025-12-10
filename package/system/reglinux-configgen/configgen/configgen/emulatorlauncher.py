@@ -10,22 +10,22 @@ from argparse import ArgumentParser
 from signal import signal, SIGINT, SIGTERM
 from time import sleep
 from subprocess import Popen, PIPE, call
-from systemFiles import SAVES
+from configgen.systemFiles import SAVES
 from sys import exit
-from Emulator import Emulator
+from configgen.Emulator import Emulator
 from threading import Thread
-from controllers import Evmapy
-from GeneratorImporter import getGenerator
-import utils.videoMode as videoMode
-import utils.gunsUtils as gunsUtils
-import utils.wheelsUtils as wheelsUtils
-import utils.windowsManager as windowsManager
-import utils.bezels as bezelsUtil
-import controllers as controllers
-import utils.zar as zar
-from utils.logger import get_logger
+from configgen.controllers import Evmapy
+from configgen.GeneratorImporter import getGenerator
+import configgen.utils.videoMode as videoMode
+import configgen.utils.gunsUtils as gunsUtils
+import configgen.utils.wheelsUtils as wheelsUtils
+import configgen.utils.windowsManager as windowsManager
+import configgen.utils.bezels as bezelsUtil
+import configgen.controllers as controllers
+import configgen.utils.zar as zar
+from configgen.utils.logger import get_logger
 
-from utils.regmsgclient import regmsg_connect
+from configgen.utils.regmsgclient import regmsg_connect
 
 eslog = get_logger(__name__)
 

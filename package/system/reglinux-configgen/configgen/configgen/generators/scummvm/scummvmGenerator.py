@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
 from glob import glob
 from configparser import ConfigParser
-from systemFiles import SCREENSHOTS, CONF, BIOS
+from configgen.systemFiles import SCREENSHOTS, CONF, BIOS
 
 SCUMMVM_CONFIG_DIR = CONF + "/scummvm"
 SCUMMVM_CONFIG_PATH = SCUMMVM_CONFIG_DIR + "/scummvm.ini"

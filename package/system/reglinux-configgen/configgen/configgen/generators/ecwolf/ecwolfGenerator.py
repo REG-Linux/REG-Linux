@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import mkdir, chdir, path
 from codecs import open
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, SAVES
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

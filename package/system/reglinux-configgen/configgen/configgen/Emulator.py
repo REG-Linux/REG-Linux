@@ -11,19 +11,19 @@ except ImportError:
 
 # Import with fallback for different execution contexts
 try:
-    from systemFiles import SYSTEM_CONF, ES_SETTINGS
+    from configgen.systemFiles import SYSTEM_CONF, ES_SETTINGS
 except ImportError:
     # When run as a module within the package
     from .systemFiles import SYSTEM_CONF, ES_SETTINGS
 
 try:
-    from settings import UnixSettings
+    from configgen.settings import UnixSettings
 except ImportError:
     # When run as a module within the package
     from .settings import UnixSettings
 
 try:
-    from utils.logger import get_logger
+    from configgen.utils.logger import get_logger
 except ImportError:
     # When run as a module within the package
     from .utils.logger import get_logger

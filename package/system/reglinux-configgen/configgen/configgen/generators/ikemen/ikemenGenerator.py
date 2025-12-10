@@ -1,6 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
-from settings import JSONSettings
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.settings import JSONSettings
 from .ikemenControllers import Keymapping, Joymapping
 
 IKEMEN_CONFIG_PATH = "/save/config.json"

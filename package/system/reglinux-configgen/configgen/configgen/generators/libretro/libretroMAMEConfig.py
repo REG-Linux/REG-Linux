@@ -8,7 +8,7 @@ from zipfile import ZipFile
 from pathlib import Path
 from xml.dom import minidom
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

@@ -1,6 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
-from settings import UnixSettings
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.settings import UnixSettings
 from os import path, mkdir
 from codecs import open
 from .melondsControllers import setMelondsControllers

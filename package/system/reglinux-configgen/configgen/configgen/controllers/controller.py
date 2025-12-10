@@ -5,7 +5,7 @@ Provides functionality to generate SDL game controller configuration strings.
 
 from typing import Dict, Optional, Any
 from dataclasses import dataclass, field
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

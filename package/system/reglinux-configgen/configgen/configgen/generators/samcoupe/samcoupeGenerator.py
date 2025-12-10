@@ -1,6 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 
 SAMCOUPE_BIN_PATH = "/usr/bin/simcoupe"
 

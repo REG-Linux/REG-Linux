@@ -1,5 +1,5 @@
 from os import path
-from systemFiles import ROMS
+from configgen.systemFiles import ROMS
 
 IORTCW_CONFIG_PATH = ROMS + "/iortcw/main/wolfconfig.cfg"
 IORTCW_BIN_PATH = "/usr/bin/iortcw/iowolfsp"

@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, mkdir
 from configparser import ConfigParser
-from utils.buildargs import parse_args
-from systemFiles import CONF, SAVES, SCREENSHOTS
-from controllers import generate_sdl_controller_config
+from configgen.utils.buildargs import parse_args
+from configgen.systemFiles import CONF, SAVES, SCREENSHOTS
+from configgen.controllers import generate_sdl_controller_config
 
 
 class EDuke32Generator(Generator):

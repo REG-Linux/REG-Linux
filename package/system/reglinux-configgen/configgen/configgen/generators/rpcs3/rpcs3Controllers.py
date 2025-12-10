@@ -1,7 +1,7 @@
 from codecs import open
 from os import path, makedirs
 from .rpcs3Config import RPCS3_INPUT_DIR
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
