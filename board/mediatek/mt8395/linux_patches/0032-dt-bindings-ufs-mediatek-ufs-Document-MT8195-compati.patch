@@ -1,0 +1,31 @@
+From 14cbfc9d5081d5666c5c754599965aa3f6d7dd2f Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Wed, 12 Jun 2024 09:43:07 +0200
+Subject: [PATCH 32/79] dt-bindings: ufs: mediatek,ufs: Document MT8195
+ compatible
+
+Add the new mediatek,mt8195-ufshci string.
+This SoC's UFSHCI controller is compatible with MT8183.
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+(cherry picked from commit d6ab5af9deb8a04353f81f864e68db73b0342197)
+---
+ Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+index 03b4d1fff40f..0ce50f7f035c 100644
+--- a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
++++ b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+@@ -18,6 +18,7 @@ properties:
+       - items:
+           - enum:
+               - mediatek,mt8192-ufshci
++              - mediatek,mt8195-ufshci
+           - const: mediatek,mt8183-ufshci
+ 
+   clocks:
+-- 
+2.43.0
+

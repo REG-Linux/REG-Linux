@@ -1,0 +1,42 @@
+From 759bd942fad799c7f36cca2bbeffd925e8e244a5 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Mon, 23 Jun 2025 14:50:30 +0200
+Subject: [PATCH 35/79] drm/mediatek: mtk_hdmi_ddc_v2: Fix out of bound access
+ on bus probe
+
+Currently, the mtk_hdmi_ddc_v2 driver assumes in mtk_hdmi_ddc_v2_xfer
+function that the message length is never equal to zero on a i2c write
+request, when it accesses the message buffer data to retrieve an register
+offset value and decreases the message payload length by one.
+On a bus probe case (single write request with a length equal to 0), it
+leads to a mem abort error because of out of bound accesses, so add
+in mtk_hdmi_ddc_v2_xfer a specific check to handle bus probe and avoid
+this error.
+
+Fixes: 00985bae ("drm/mediatek: Introduce HDMI/DDC v2 for MT8195/MT8188")
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+(cherry picked from commit 411daf89f084d6bad2aa0bd318a6886977c451d1)
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c b/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c
+index 227705a6409a..012f9b2f5432 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c
+@@ -277,6 +277,12 @@ static int mtk_hdmi_ddc_v2_xfer(struct i2c_adapter *adapter, struct i2c_msg *msg
+ 
+ 	ddc = adapter->algo_data;
+ 
++	/* Check for bus probe */
++	if (num == 1 && msgs[0].len == 0) {
++		return mtk_hdmi_ddc_fg_data_write(ddc, msgs[0].addr, 0,
++				                  0, NULL);
++	}
++
+ 	for (i = 0; i < num; i++) {
+ 		struct i2c_msg *msg = &msgs[i];
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,40 @@
+From dca0f8326e43248e8a16198562ceb5cf29fc51b5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:33 -0300
+Subject: [PATCH 71/79] arm64: dts: mt6359: Add accessory detect node
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add audio jack detection node. PMIC accessory detect driver will
+create an input device that will send key events on jack
+insertion/removal or accessory device key presses.
+
+Co-developed-by: Andrew Perepech <andrew.perepech@mediatek.com>
+Signed-off-by: Andrew Perepech <andrew.perepech@mediatek.com>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Reviewed-by: Macpaul Lin <macpaul.lin@mediatek.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ arch/arm64/boot/dts/mediatek/mt6359.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt6359.dtsi b/arch/arm64/boot/dts/mediatek/mt6359.dtsi
+index 467d8a4c2aa7..23d2f0534a85 100644
+--- a/arch/arm64/boot/dts/mediatek/mt6359.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt6359.dtsi
+@@ -15,6 +15,10 @@ pmic_adc: adc {
+ 			#io-channel-cells = <1>;
+ 		};
+ 
++		accdet: accdet {
++			compatible = "mediatek,mt6359-accdet";
++		};
++
+ 		mt6359codec: audio-codec {
+ 			compatible = "mediatek,mt6359-codec";
+ 		};
+-- 
+2.43.0
+

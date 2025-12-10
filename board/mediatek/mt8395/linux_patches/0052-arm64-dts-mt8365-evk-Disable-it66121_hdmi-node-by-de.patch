@@ -1,0 +1,34 @@
+From c20bb528d65b9aa582818e78d3c4c22726abd116 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Fri, 11 Apr 2025 13:08:17 +0200
+Subject: [PATCH 52/79] arm64: dts: mt8365-evk: Disable it66121_hdmi node by
+ default
+
+On the Mediatek Genio 350-EVK board, Ethernet and HDMI (DPI0) are
+sharing pins, and only one functionality can be selected at a time with
+a DIP switch. In the board devicetree, this leads to have dpi0 and
+ethernet nodes disabled by default.
+But the it66121_hdmi node for the ITE IT66121FN HDMI Bridge IC, present
+on the board, is always enabled and it is not useful when dpi0 is
+disabled, so disable it too by default.
+
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ arch/arm64/boot/dts/mediatek/mt8365-evk.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8365-evk.dts b/arch/arm64/boot/dts/mediatek/mt8365-evk.dts
+index d8996daf0f4c..af43c392d3a0 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8365-evk.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8365-evk.dts
+@@ -317,6 +317,7 @@ it66121_hdmi: hdmi@4c {
+ 		vcn18-supply = <&mt6357_vsim2_reg>;
+ 		vcn33-supply = <&mt6357_vibr_reg>;
+ 		vrf12-supply = <&mt6357_vrf12_reg>;
++		status = "disabled";
+ 
+ 		ports {
+ 			#address-cells = <1>;
+-- 
+2.43.0
+

@@ -1,0 +1,77 @@
+From 5db9a740cf232cd2734f77d122df07d3a03793bd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Fri, 6 Jun 2025 15:45:12 -0400
+Subject: [PATCH 25/79] dt-bindings: phy: mediatek: hdmi-phy: Document extra
+ clocks for MT8195
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+MT8195's HDMI PHY block has 4 clocks instead of just a single one.
+Describe the extra clocks for it.
+
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+(cherry picked from commit c49dd15249529416845ef27c7af42383915f5db4)
+---
+ .../bindings/phy/mediatek,hdmi-phy.yaml       | 35 ++++++++++++++++---
+ 1 file changed, 31 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml b/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
+index f1207aea8605..aee5572877fa 100644
+--- a/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
++++ b/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
+@@ -38,12 +38,12 @@ properties:
+     maxItems: 1
+ 
+   clocks:
+-    items:
+-      - description: PLL reference clock
++    minItems: 1
++    maxItems: 4
+ 
+   clock-names:
+-    items:
+-      - const: pll_ref
++    minItems: 1
++    maxItems: 4
+ 
+   clock-output-names: true
+ 
+@@ -78,6 +78,33 @@ required:
+   - "#phy-cells"
+   - "#clock-cells"
+ 
++allOf:
++  - if:
++      properties:
++        compatible:
++          const: mediatek,mt8195-hdmi-phy
++    then:
++      properties:
++        clocks:
++          items:
++            - description: PLL reference clock
++            - description: HDMI 26MHz clock
++            - description: HDMI PLL1 clock
++            - description: HDMI PLL2 clock
++        clock-names:
++          items:
++            - const: pll_ref
++            - const: hdmi_26m
++            - const: hdmi_pll1
++            - const: hdmi_pll2
++    else:
++      properties:
++        clocks:
++          items:
++            - description: PLL reference clock
++        clock-names:
++          items:
++            - const: pll_ref
+ if:
+   properties:
+     compatible:
+-- 
+2.43.0
+

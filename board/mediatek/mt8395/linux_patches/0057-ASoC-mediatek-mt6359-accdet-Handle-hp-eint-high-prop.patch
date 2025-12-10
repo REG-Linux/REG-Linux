@@ -1,0 +1,54 @@
+From 232dbbca0668bcf74049157224651b6d37859d87 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:19 -0300
+Subject: [PATCH 57/79] ASoC: mediatek: mt6359-accdet: Handle hp-eint-high
+ property
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Now that the dt-binding was introduced, the property that governs the
+eint polarity is a boolean called mediatek,hp-eint-high, while the
+current code handles a u32 property called mediatek,eint-level-pol.
+Update the driver handling accordingly.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 5 +----
+ sound/soc/codecs/mt6359-accdet.h | 2 +-
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index 9bbd4497e8d4..ca3be59d2d0e 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -578,10 +578,7 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 	if (!ret)
+ 		memcpy(priv->data->pwm_deb, pwm_deb, sizeof(pwm_deb));
+ 
+-	ret = of_property_read_u32(node, "mediatek,eint-level-pol",
+-				   &priv->data->eint_pol);
+-	if (ret)
+-		priv->data->eint_pol = 8;
++	priv->data->hp_eint_high = of_property_read_bool(node, "mediatek,hp-eint-high");
+ 
+ 	ret = of_property_read_u32(node, "mediatek,eint-use-ap", &tmp);
+ 	if (ret)
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index 78ada3a5bfae..c7f051ee1197 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -86,7 +86,7 @@ struct dts_data {
+ 	unsigned int mic_vol;
+ 	unsigned int mic_mode;
+ 	unsigned int plugout_deb;
+-	unsigned int eint_pol;
++	bool hp_eint_high;
+ 	struct pwm_deb_settings *pwm_deb;
+ 	struct three_key_threshold three_key;
+ 	struct four_key_threshold four_key;
+-- 
+2.43.0
+

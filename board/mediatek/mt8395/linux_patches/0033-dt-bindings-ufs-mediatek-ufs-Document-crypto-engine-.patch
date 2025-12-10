@@ -1,0 +1,54 @@
+From 327f5b0f25cda809b26ac8829514ec38616b3d3c Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 9 Sep 2025 11:32:13 +0200
+Subject: [PATCH 33/79] dt-bindings: ufs: mediatek,ufs: Document crypto engine
+ clocks
+
+Introduce additional clocks for the crypto engine integrated into
+the UFSHCI IP version found in the MediaTek MT8195 SoC.
+
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+(cherry picked from commit 46cada3e64e855344f82a18cae92dfa979933efd)
+---
+ Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+index 0ce50f7f035c..76869ccd72f2 100644
+--- a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
++++ b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+@@ -23,11 +23,11 @@ properties:
+ 
+   clocks:
+     minItems: 1
+-    maxItems: 8
++    maxItems: 11
+ 
+   clock-names:
+     minItems: 1
+-    maxItems: 8
++    maxItems: 11
+ 
+   phys:
+     maxItems: 1
+@@ -65,6 +65,7 @@ allOf:
+         clocks:
+           minItems: 8
+         clock-names:
++          minItems: 8
+           items:
+             - const: ufs
+             - const: ufs_aes
+@@ -74,6 +75,9 @@ allOf:
+             - const: unipro_mp_bclk
+             - const: ufs_tx_symbol
+             - const: ufs_mem_sub
++            - const: crypt_mux
++            - const: crypt_lp
++            - const: crypt_perf
+     else:
+       properties:
+         clocks:
+-- 
+2.43.0
+

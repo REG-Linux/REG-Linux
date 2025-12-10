@@ -1,0 +1,77 @@
+From 22928864f329d8449d0d91ababf415e24f9daf8f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:21 -0300
+Subject: [PATCH 59/79] ASoC: mediatek: mt6359-accdet: Drop dead code for
+ EINT/GPIO IRQ handling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The ACCDET supports two modes for IRQ generation: PMIC EINT or AP GPIO,
+which in principle could be configured through a DT property. However
+this DT property has no user nor is documented in a binding, and the
+driver only implements the PMIC EINT case, so drop the unused code
+intended to handle both cases.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 20 +++-----------------
+ 1 file changed, 3 insertions(+), 17 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index 1d4481109f6e..ce8a5e64e0b9 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -31,9 +31,6 @@
+ #define REGISTER_VAL(x)	((x) - 1)
+ 
+ /* mt6359 accdet capability */
+-#define ACCDET_PMIC_EINT_IRQ		BIT(0)
+-#define ACCDET_AP_GPIO_EINT		BIT(1)
+-
+ #define ACCDET_PMIC_EINT0		BIT(2)
+ #define ACCDET_PMIC_EINT1		BIT(3)
+ #define ACCDET_PMIC_BI_EINT		BIT(4)
+@@ -448,8 +445,7 @@ static void mt6359_accdet_jd_work(struct work_struct *work)
+ 		mt6359_accdet_recover_jd_setting(priv);
+ 	}
+ 
+-	if (priv->caps & ACCDET_PMIC_EINT_IRQ)
+-		recover_eint_setting(priv);
++	recover_eint_setting(priv);
+ 	mutex_unlock(&priv->res_lock);
+ }
+ 
+@@ -580,14 +576,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 
+ 	priv->data->hp_eint_high = of_property_read_bool(node, "mediatek,hp-eint-high");
+ 
+-	ret = of_property_read_u32(node, "mediatek,eint-use-ap", &tmp);
+-	if (ret)
+-		tmp = 0;
+-	if (tmp == 0)
+-		priv->caps |= ACCDET_PMIC_EINT_IRQ;
+-	else if (tmp == 1)
+-		priv->caps |= ACCDET_AP_GPIO_EINT;
+-
+ 	ret = of_property_read_u32(node, "mediatek,eint-detect-mode",
+ 				   &priv->data->eint_detect_mode);
+ 	if (ret) {
+@@ -902,10 +890,8 @@ static void mt6359_accdet_init(struct mt6359_accdet *priv)
+ 				   0x3 << RG_ANALOGFDEN_SFT);
+ 	}
+ 
+-	if (priv->caps & ACCDET_PMIC_EINT_IRQ) {
+-		config_eint_init_by_mode(priv);
+-		config_digital_init_by_mode(priv);
+-	}
++	config_eint_init_by_mode(priv);
++	config_digital_init_by_mode(priv);
+ }
+ 
+ int mt6359_accdet_enable_jack_detect(struct snd_soc_component *component,
+-- 
+2.43.0
+

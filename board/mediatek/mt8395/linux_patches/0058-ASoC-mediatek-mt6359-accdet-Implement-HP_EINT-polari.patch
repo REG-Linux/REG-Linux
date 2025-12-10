@@ -1,0 +1,46 @@
+From 7d1e8ab94e39adc6a6f0f7dea419f12dd92bb977 Mon Sep 17 00:00:00 2001
+From: Andrew Perepech <andrew.perepech@mediatek.com>
+Date: Wed, 5 Mar 2025 15:58:20 -0300
+Subject: [PATCH 58/79] ASoC: mediatek: mt6359-accdet: Implement HP_EINT
+ polarity configuration
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The driver currently reads the HP_EINT polarity from the Devicetree but
+never actually configures the hardware accordingly.
+
+Implement the polarity configuration in hardware.
+
+Signed-off-by: Andrew Perepech <andrew.perepech@mediatek.com>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index ca3be59d2d0e..1d4481109f6e 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -730,6 +730,17 @@ static void config_digital_init_by_mode(struct mt6359_accdet *priv)
+ 					   BIT(ACCDET_EINT1_INVERTER_SW_EN_SFT));
+ 		}
+ 	}
++
++	if (priv->data->hp_eint_high) {
++		/* EINT polarity inverse */
++		regmap_update_bits(priv->regmap, ACCDET_EINT_IN_INVERSE_ADDR,
++				   ACCDET_EINT_IN_INVERSE_MASK_SFT,
++				   BIT(ACCDET_EINT_IN_INVERSE_SFT));
++	} else {
++		/* EINT polarity normal */
++		regmap_update_bits(priv->regmap, ACCDET_EINT_IN_INVERSE_ADDR,
++				   ACCDET_EINT_IN_INVERSE_MASK_SFT, 0);
++	}
+ }
+ 
+ static void config_eint_init_by_mode(struct mt6359_accdet *priv)
+-- 
+2.43.0
+

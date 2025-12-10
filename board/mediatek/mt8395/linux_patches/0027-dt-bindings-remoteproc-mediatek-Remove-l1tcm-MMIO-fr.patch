@@ -1,0 +1,91 @@
+From 9128e176a7ca762f1001cea2d7e574da83ee5dc5 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Thu, 24 Jul 2025 10:38:49 +0200
+Subject: [PATCH 27/79] dt-bindings: remoteproc: mediatek: Remove l1tcm MMIO
+ from MT8188 dual
+
+Even though the MT8188 SoC's Dual-Core SCP IP is practically the
+same as the one found on MT8195, it doesn't have a dedicated L1
+TCM and relies only on SRAM.
+
+Set reg/reg-names minItems to 1 globally and override it in all of
+the conditionals for the SoCs that require more, and then split
+the mt8195/8188 conditionals to allow specifying only the cfg MMIO
+on MT8188.
+
+Fixes: 91e0d560b9fd ("dt-bindings: remoteproc: mediatek: Support MT8188 dual-core SCP")
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ .../bindings/remoteproc/mtk,scp.yaml          | 23 ++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/remoteproc/mtk,scp.yaml b/Documentation/devicetree/bindings/remoteproc/mtk,scp.yaml
+index 179c98b33b4d..65485ea9cc59 100644
+--- a/Documentation/devicetree/bindings/remoteproc/mtk,scp.yaml
++++ b/Documentation/devicetree/bindings/remoteproc/mtk,scp.yaml
+@@ -28,11 +28,11 @@ properties:
+     description:
+       Should contain the address ranges for memory regions SRAM, CFG, and,
+       on some platforms, L1TCM.
+-    minItems: 2
++    minItems: 1
+     maxItems: 3
+ 
+   reg-names:
+-    minItems: 2
++    minItems: 1
+     maxItems: 3
+ 
+   clocks:
+@@ -171,8 +171,10 @@ allOf:
+     then:
+       properties:
+         reg:
++          minItems: 2
+           maxItems: 2
+         reg-names:
++          minItems: 2
+           items:
+             - const: sram
+             - const: cfg
+@@ -185,8 +187,10 @@ allOf:
+     then:
+       properties:
+         reg:
++          minItems: 2
+           maxItems: 3
+         reg-names:
++          minItems: 2
+           items:
+             - const: sram
+             - const: cfg
+@@ -196,12 +200,25 @@ allOf:
+         compatible:
+           enum:
+             - mediatek,mt8188-scp-dual
++    then:
++      properties:
++        reg:
++          minItems: 1
++        reg-names:
++          minItems: 1
++          items:
++            - const: cfg
++  - if:
++      properties:
++        compatible:
++          enum:
+             - mediatek,mt8195-scp-dual
+     then:
+       properties:
+         reg:
+-          maxItems: 2
++          minItems: 2
+         reg-names:
++          minItems: 2
+           items:
+             - const: cfg
+             - const: l1tcm
+-- 
+2.43.0
+

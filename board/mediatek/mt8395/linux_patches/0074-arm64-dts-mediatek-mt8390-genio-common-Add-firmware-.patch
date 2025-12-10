@@ -1,0 +1,37 @@
+From 7dbe1b1039b32d2a00478f25aeedc141196e8a74 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Mon, 21 Apr 2025 16:49:08 -0400
+Subject: [PATCH 74/79] arm64: dts: mediatek: mt8390-genio-common: Add
+ firmware-name for scp0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add the firmware-name property for SCP core0 so the firmware can be
+loaded from its canonical location in the linux-firmware repository.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+Link: https://lore.kernel.org/r/20250421-scp-dual-core-mt8390-v2-5-c84117a959a9@collabora.com
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+(cherry picked from commit 2f0066dae66f30386ecd6408410e27a4d6818c15)
+---
+ arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+index e1139f400931..251534c9ade8 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+@@ -1310,6 +1310,7 @@ &scp_cluster {
+ };
+ 
+ &scp_c0 {
++	firmware-name = "mediatek/mt8188/scp.img";
+ 	memory-region = <&scp_mem>;
+ 	status = "okay";
+ };
+-- 
+2.43.0
+

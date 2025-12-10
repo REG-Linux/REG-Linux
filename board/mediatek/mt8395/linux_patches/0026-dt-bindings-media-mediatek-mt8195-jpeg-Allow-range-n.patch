@@ -1,0 +1,51 @@
+From 8b75d182090b48ef37f38745d25c1e9414c748b5 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Thu, 24 Jul 2025 10:38:50 +0200
+Subject: [PATCH 26/79] dt-bindings: media: mediatek,mt8195-jpeg: Allow range
+ number in node address
+
+The dual and triple core jpeg encoder and decoder (respectively)
+on MT8195 are far apart: the only way to have this to make sense
+is to split those in multiple address ranges in device trees as
+one big range would overlap with other IP in at least the MT8195
+SoC.
+
+Change both the jpegdec and jpegenc bindings to allow specifying
+children nodes such as "jpegdec@0,10000", "jpegdec@1,0" or for
+encoder "jpegenc@0,0", "jpegenc@1,0" to resolve dtbs_check issues.
+
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ .../devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml      | 2 +-
+ .../devicetree/bindings/media/mediatek,mt8195-jpegenc.yaml      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
+index e5448c60e3eb..935f124a9c05 100644
+--- a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
++++ b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
+@@ -36,7 +36,7 @@ properties:
+ 
+ # Required child node:
+ patternProperties:
+-  "^jpgdec@[0-9a-f]+$":
++  "^jpgdec@([0-9],)?[0-9a-f]+$":
+     type: object
+     description:
+       The jpeg decoder hardware device node which should be added as subnodes to
+diff --git a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegenc.yaml b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegenc.yaml
+index 596186497b68..d7a8f2e3bc1a 100644
+--- a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegenc.yaml
++++ b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegenc.yaml
+@@ -36,7 +36,7 @@ properties:
+ 
+ # Required child node:
+ patternProperties:
+-  "^jpgenc@[0-9a-f]+$":
++  "^jpgenc@([0-9],)?[0-9a-f]+$":
+     type: object
+     description:
+       The jpeg encoder hardware device node which should be added as subnodes to
+-- 
+2.43.0
+
