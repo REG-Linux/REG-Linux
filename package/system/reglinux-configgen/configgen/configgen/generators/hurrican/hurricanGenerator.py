@@ -9,7 +9,7 @@ eslog = get_logger(__name__)
 
 class HurricanGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         try:
             chdir("/userdata/roms/hurrican/data/levels/")
@@ -18,13 +18,13 @@ class HurricanGenerator(Generator):
             eslog.error(
                 f"ERROR: Game assets not installed. You can get them from the REG-Linux Content Downloader. Error: {str(e)}"
             )
-        commandArray = ["hurrican"]
+        command_array = ["hurrican"]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

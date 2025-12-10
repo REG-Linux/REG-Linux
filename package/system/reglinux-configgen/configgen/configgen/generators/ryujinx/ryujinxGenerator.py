@@ -73,7 +73,7 @@ class RyujinxGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(RYUJINX_CONFIG_DIR):
             makedirs(RYUJINX_CONFIG_DIR)
@@ -173,7 +173,7 @@ class RyujinxGenerator(Generator):
 
         # Now add Controllers
         nplayer = 1
-        for controller, pad in sorted(playersControllers.items()):
+        for controller, pad in sorted(players_controllers.items()):
             if nplayer <= 8:
                 ctrlConf = ryujinxCtrl
                 # we need to get the uuid for ryujinx controllers
@@ -209,11 +209,11 @@ class RyujinxGenerator(Generator):
             nplayer += 1
 
         if rom == "config":
-            commandArray = [RYUJINX_BIN_PATH]
+            command_array = [RYUJINX_BIN_PATH]
         else:
-            commandArray = [RYUJINX_BIN_PATH, rom]
+            command_array = [RYUJINX_BIN_PATH, rom]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
 
 def writeControllerIntoJson(new_controller, filename=RYUJINX_CONFIG_PATH):

@@ -5,7 +5,7 @@ from filecmp import cmp
 from shutil import copyfile, copytree, copy2
 from os import path, walk, mkdir, listdir
 from ffmpeg import probe
-from configgen.controllers import generate_sdl_controller_config, gunsBordersSizeName
+from configgen.controllers import generate_sdl_controller_config, guns_borders_size_name
 from configgen.systemFiles import CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
 
@@ -97,7 +97,7 @@ class HypseusSingeGenerator(Generator):
 
     # Main entry of the module
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         bezel_to_rom = {
             "ace": ["ace", "ace_a", "ace_a2", "ace91", "ace91_euro", "aceeuro"],
@@ -233,7 +233,7 @@ class HypseusSingeGenerator(Generator):
                 )
 
         if system.name == "singe":
-            commandArray = [
+            command_array = [
                 HYPSEUS_BIN_PATH,
                 "singe",
                 "vldp",
@@ -254,7 +254,7 @@ class HypseusSingeGenerator(Generator):
                 HYPSEUS_DATA_DIR,
             ]
         else:
-            commandArray = [
+            command_array = [
                 HYPSEUS_BIN_PATH,
                 romName,
                 "vldp",
@@ -273,23 +273,23 @@ class HypseusSingeGenerator(Generator):
 
         # controller config file
         if system.isOptSet("hypseus_joy") and system.getOptBoolean("hypseus_joy"):
-            commandArray.extend(["-keymapfile", "custom.ini"])
+            command_array.extend(["-keymapfile", "custom.ini"])
         else:
-            commandArray.extend(["-keymapfile", HYPSEUS_CONFIG_FILE_PATH])
+            command_array.extend(["-keymapfile", HYPSEUS_CONFIG_FILE_PATH])
 
         # Default -fullscreen behaviour respects game aspect ratio
         bezelRequired = False
         xratio = None
-        if gameResolution["width"] < gameResolution["height"]:
-            width, height = gameResolution["height"], gameResolution["width"]
+        if game_resolution["width"] < game_resolution["height"]:
+            width, height = game_resolution["height"], game_resolution["width"]
         else:
-            width, height = gameResolution["width"], gameResolution["height"]
+            width, height = game_resolution["width"], game_resolution["height"]
         # stretch
         if (
             system.isOptSet("hypseus_ratio")
             and system.config["hypseus_ratio"] == "stretch"
         ):
-            commandArray.extend(["-x", str(width), "-y", str(height)])
+            command_array.extend(["-x", str(width), "-y", str(height)])
             bezelRequired = False
             if abs(width / height - 4 / 3) < 0.01:
                 xratio = 4 / 3
@@ -298,8 +298,8 @@ class HypseusSingeGenerator(Generator):
             system.isOptSet("hypseus_ratio")
             and system.config["hypseus_ratio"] == "force_ratio"
         ):
-            commandArray.extend(["-x", str(width), "-y", str(height)])
-            commandArray.extend(["-force_aspect_ratio"])
+            command_array.extend(["-x", str(width), "-y", str(height)])
+            command_array.extend(["-force_aspect_ratio"])
             xratio = 4 / 3
             bezelRequired = True
         # Handle original aspect ratio case
@@ -324,7 +324,7 @@ class HypseusSingeGenerator(Generator):
                     scaling_factor = height / video_height
                     new_width = video_width * scaling_factor
 
-                    commandArray.extend(["-x", str(new_width), "-y", str(height)])
+                    command_array.extend(["-x", str(new_width), "-y", str(height)])
 
                     # Check if aspect ratio is approximately 4:3 for bezel
                     if abs(new_width / height - 4 / 3) < 0.01:
@@ -340,7 +340,7 @@ class HypseusSingeGenerator(Generator):
             # Fallback to stretch mode if resolution wasn't valid
             if video_width <= 0 or video_height <= 0:
                 eslog.debug("Using fallback stretch resolution")
-                commandArray.extend(["-x", str(width), "-y", str(height)])
+                command_array.extend(["-x", str(width), "-y", str(height)])
                 # Check if screen is approximately 4:3
                 if abs(width / height - 4 / 3) < 0.01:
                     xratio = 4 / 3
@@ -351,13 +351,13 @@ class HypseusSingeGenerator(Generator):
 
         # Backend - Default OpenGL
         if system.isOptSet("hypseus_api") and system.config["hypseus_api"] == "Vulkan":
-            commandArray.append("-vulkan")
+            command_array.append("-vulkan")
         else:
-            commandArray.append("-opengl")
+            command_array.append("-opengl")
 
         # Enable Bilinear Filtering
         if system.isOptSet("hypseus_filter") and system.getOptBoolean("hypseus_filter"):
-            commandArray.append("-linear_scale")
+            command_array.append("-linear_scale")
 
         # The following options should only be set when system is singe.
         # -blend_sprites, -nocrosshair, -sinden or -manymouse
@@ -366,40 +366,40 @@ class HypseusSingeGenerator(Generator):
             if system.isOptSet("singe_sprites") and system.getOptBoolean(
                 "singe_sprites"
             ):
-                commandArray.append("-blend_sprites")
+                command_array.append("-blend_sprites")
 
-            bordersSize = gunsBordersSizeName(guns, system.config)
-            if bordersSize is not None:
-                borderColor = "w"
+            borders_size = guns_borders_size_name(guns, system.config)
+            if borders_size is not None:
+                border_color = "w"
                 if "controllers.guns.borderscolor" in system.config:
-                    borderColorOpt = system.config["controllers.guns.borderscolor"]
-                    if borderColorOpt == "white":
-                        borderColor = "w"
-                    elif borderColorOpt == "red":
-                        borderColor = "r"
-                    elif borderColorOpt == "green":
-                        borderColor = "g"
-                    elif borderColorOpt == "blue":
-                        borderColor = "b"
+                    border_color_opt = system.config["controllers.guns.borderscolor"]
+                    if border_color_opt == "white":
+                        border_color = "w"
+                    elif border_color_opt == "red":
+                        border_color = "r"
+                    elif border_color_opt == "green":
+                        border_color = "g"
+                    elif border_color_opt == "blue":
+                        border_color = "b"
 
-                if bordersSize == "thin":
-                    commandArray.extend(["-sinden", "2", borderColor])
-                elif bordersSize == "medium":
-                    commandArray.extend(["-sinden", "4", borderColor])
+                if borders_size == "thin":
+                    command_array.extend(["-sinden", "2", border_color])
+                elif borders_size == "medium":
+                    command_array.extend(["-sinden", "4", border_color])
                 else:
-                    commandArray.extend(["-sinden", "6", borderColor])
+                    command_array.extend(["-sinden", "6", border_color])
             else:
                 if len(guns) > 0:  # enable manymouse for guns
-                    commandArray.extend(["-manymouse"])  # sinden implies manymouse
+                    command_array.extend(["-manymouse"])  # sinden implies manymouse
                     if xratio is not None:
-                        commandArray.extend(
+                        command_array.extend(
                             ["-xratio", str(xratio)]
                         )  # accuracy correction based on ratio
                 else:
                     if system.isOptSet("singe_abs") and system.getOptBoolean(
                         "singe_abs"
                     ):
-                        commandArray.extend(
+                        command_array.extend(
                             ["-manymouse"]
                         )  # this is causing issues on some "non-gun" games
 
@@ -412,36 +412,36 @@ class HypseusSingeGenerator(Generator):
 
         if bezelRequired:
             if not path.exists(bezelPath):
-                commandArray.extend(["-bezel", "default.png"])
+                command_array.extend(["-bezel", "default.png"])
             else:
-                commandArray.extend(["-bezel", bezelFile])
+                command_array.extend(["-bezel", bezelFile])
 
         # Invert HAT Axis
         if system.isOptSet("hypseus_axis") and system.getOptBoolean("hypseus_axis"):
-            commandArray.append("-tiphat")
+            command_array.append("-tiphat")
 
         # Game rotation options for vertical screens, default is 0.
         if (
             system.isOptSet("hypseus_rotate")
             and system.config["hypseus_rotate"] == "90"
         ):
-            commandArray.extend(["-rotate", "90"])
+            command_array.extend(["-rotate", "90"])
         elif (
             system.isOptSet("hypseus_rotate")
             and system.config["hypseus_rotate"] == "270"
         ):
-            commandArray.extend(["-rotate", "270"])
+            command_array.extend(["-rotate", "270"])
 
         # Singe joystick sensitivity, default is 5.
         if system.name == "singe" and system.isOptSet("singe_joystick_range"):
-            commandArray.extend(["-js_range", system.config["singe_joystick_range"]])
+            command_array.extend(["-js_range", system.config["singe_joystick_range"]])
 
         # Scanlines
         if (
             system.isOptSet("hypseus_scanlines")
             and system.config["hypseus_scanlines"] > "0"
         ):
-            commandArray.extend(
+            command_array.extend(
                 ["-scanlines", "-scanline_shunt", system.config["hypseus_scanlines"]]
             )
 
@@ -454,28 +454,28 @@ class HypseusSingeGenerator(Generator):
                 and not system.config["singe_crosshair"]
             )
         ):
-            commandArray.append("-nocrosshair")
+            command_array.append("-nocrosshair")
 
         # Enable SDL_TEXTUREACCESS_STREAMING, can aid SBC's with SDL2 => 2.0.16
         if system.isOptSet("hypseus_texturestream") and system.getOptBoolean(
             "hypseus_texturestream"
         ):
-            commandArray.append("-texturestream")
+            command_array.append("-texturestream")
 
         # The folder may have a file with the game name and .commands with extra arguments to run the game.
         if path.isfile(commandsFile):
             try:
                 with open(commandsFile, "r") as f:
-                    commandArray.extend(f.read().split())
+                    command_array.extend(f.read().split())
             except (IOError, OSError) as e:
                 eslog.error(f"Error reading commands file {commandsFile}: {e}")
 
         # We now use SDL controller config
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 ),
                 "SDL_JOYSTICK_HIDAPI": "0",
             },

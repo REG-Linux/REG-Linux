@@ -18,7 +18,7 @@ SONIC3AIR_BIN_PATH = "/usr/bin/sonic3-air/sonic3air_linux"
 
 class Sonic3AIRGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # copy configuration json files so we can manipulate them
         if not path.exists(SONIC3AIR_DEST_CONFIG_PATH):
@@ -48,7 +48,7 @@ class Sonic3AIRGenerator(Generator):
         current_resolution = json_text.split('"WindowSize": "')[1].split('"')[0]
         # replace the resolution with new values
         new_resolution = (
-            str(gameResolution["width"]) + " x " + str(gameResolution["height"])
+            str(game_resolution["width"]) + " x " + str(game_resolution["height"])
         )
         json_text = json_text.replace(
             f'"WindowSize": "{current_resolution}"', f'"WindowSize": "{new_resolution}"'
@@ -70,13 +70,13 @@ class Sonic3AIRGenerator(Generator):
             dump(settings_data, file, indent=4)
 
         # now run
-        commandArray = [SONIC3AIR_BIN_PATH]
+        command_array = [SONIC3AIR_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
@@ -85,5 +85,5 @@ class Sonic3AIRGenerator(Generator):
     def getMouseMode(self, config, rom):
         return False
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

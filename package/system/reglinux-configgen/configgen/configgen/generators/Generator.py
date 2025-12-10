@@ -7,17 +7,26 @@ from configgen.Emulator import Emulator
 class GeneratorProtocol(Protocol):
     """Protocol defining the interface for emulator generators."""
 
-    def generate(self, system: Emulator, rom: str, playersControllers: Dict[str, Any], metadata: Dict[str, Any], guns: List[Any], wheels: List[Any], gameResolution: Dict[str, Any]) -> Command:
+    def generate(
+        self,
+        system: Emulator,
+        rom: str,
+        players_controllers: Dict[str, Any],
+        metadata: Dict[str, Any],
+        guns: List[Any],
+        wheels: List[Any],
+        game_resolution: Dict[str, Any],
+    ) -> Command:
         """Generate the command to launch the emulator with the specified configurations.
 
         Args:
             system: The Emulator instance with its configurations
             rom: Path to the ROM file to launch
-            playersControllers: Controller configurations for players
+            players_controllers: Controller configurations for players
             metadata: Game metadata
             guns: Light gun configurations
             wheels: Racing wheel configurations
-            gameResolution: Game resolution settings
+            game_resolution: Game resolution settings
 
         Returns:
             Command object with the emulator command and environment settings
@@ -30,7 +39,14 @@ class Generator(object):
 
     @abstractmethod
     def generate(
-        self, system: Emulator, rom: str, playersControllers: Dict[str, Any], metadata: Dict[str, Any], guns: List[Any], wheels: List[Any], gameResolution: Dict[str, Any]
+        self,
+        system: Emulator,
+        rom: str,
+        players_controllers: Dict[str, Any],
+        metadata: Dict[str, Any],
+        guns: List[Any],
+        wheels: List[Any],
+        game_resolution: Dict[str, Any],
     ) -> Command:
         """
         Retrieve the command to start the emulator with the specified configurations.
@@ -54,7 +70,9 @@ class Generator(object):
     def hasInternalMangoHUDCall(self) -> bool:
         return False
 
-    def getInGameRatio(self, config: Dict[str, Any], gameResolution: Dict[str, Any], rom: str) -> float:
+    def getInGameRatio(
+        self, config: Dict[str, Any], gameResolution: Dict[str, Any], rom: str
+    ) -> float:
         # put a default value, but it should be overriden by generators
         return 4 / 3
 

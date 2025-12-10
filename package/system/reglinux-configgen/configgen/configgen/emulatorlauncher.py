@@ -105,7 +105,7 @@ def main(args, maxnbplayers):
         return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 
-def _start_evmapy_async(system, emulator, core, romConfig, playersControllers, guns):
+def _start_evmapy_async(system, emulator, core, rom_config, players_controllers, guns):
     """
     Starts Evmapy asynchronously in a background thread.
 
@@ -116,8 +116,8 @@ def _start_evmapy_async(system, emulator, core, romConfig, playersControllers, g
         system (str): The system identifier (e.g., "nes", "snes").
         emulator (str): The emulator name.
         core (str): The emulator core name.
-        romConfig (str): Path used for specific ROM configuration.
-        playersControllers (list): Controller configuration for all players.
+        rom_config (str): Path used for specific ROM configuration.
+        players_controllers (list): Controller configuration for all players.
         guns (list): Configured light guns (if any).
 
     Returns:
@@ -126,7 +126,7 @@ def _start_evmapy_async(system, emulator, core, romConfig, playersControllers, g
 
     def worker():
         try:
-            Evmapy.start(system, emulator, core, romConfig, playersControllers, guns)
+            Evmapy.start(system, emulator, core, rom_config, players_controllers, guns)
         except Exception as e:
             eslog.error(f"Evmapy failed: {e}", exc_info=True)
 
@@ -155,11 +155,11 @@ def _configure_controllers(args, maxnbplayers):
     return playersControllers
 
 
-def _setup_system_emulator(args, romConfiguration):
+def _setup_system_emulator(args, rom_configuration):
     """Initializes system and emulator configurations."""
     systemName = args.system
     eslog.debug(f"Running system: {systemName}")
-    system = Emulator(systemName, romConfiguration)
+    system = Emulator(systemName, rom_configuration)
 
     if args.emulator is not None:
         system.config["emulator"] = args.emulator
@@ -182,7 +182,7 @@ def _setup_system_emulator(args, romConfiguration):
     return system
 
 
-def _configure_special_devices(args, system, rom, metadata, playersControllers):
+def _configure_special_devices(args, system, rom, metadata, players_controllers):
     """Configures light guns and racing wheels."""
     if not system.isOptSet("use_guns") and args.lightgun:
         system.config["use_guns"] = True
@@ -194,53 +194,53 @@ def _configure_special_devices(args, system, rom, metadata, playersControllers):
         eslog.info("Guns disabled.")
         guns = []
 
-    wheelProcesses = None
+    wheel_processes = None
     if not system.isOptSet("use_wheels") and args.wheel:
         system.config["use_wheels"] = True
     if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
-        deviceInfos = controllers.getDevicesInformation()
-        (wheelProcesses, playersControllers, deviceInfos) = (
-            wheelsUtils.reconfigureControllers(
-                playersControllers, system, rom, metadata
+        device_infos = controllers.getDevicesInformation()
+        (wheel_processes, players_controllers, device_infos) = (
+            wheelsUtils.reconfigure_controllers(
+                players_controllers, system, rom, metadata
             )
         )
-        wheels = wheelsUtils.getWheelsFromDevicesInfos(deviceInfos)
+        wheels = wheelsUtils.get_wheels_from_device_infos(device_infos)
     else:
         eslog.info("Wheels disabled.")
         wheels = []
 
-    return guns, wheels, wheelProcesses, playersControllers
+    return guns, wheels, wheel_processes, players_controllers
 
 
 def _setup_video_and_mouse(system, generator, rom):
     """Sets up video mode and mouse visibility for the game."""
-    wantedGameMode = generator.getResolutionMode(system.config)
-    systemMode = videoMode.getCurrentMode()
-    resolutionChanged = False
-    mouseChanged = False
+    wanted_game_mode = generator.getResolutionMode(system.config)
+    system_mode = videoMode.getCurrentMode()
+    resolution_changed = False
+    mouse_changed = False
 
-    newsystemMode = systemMode
+    new_system_mode = system_mode
     if system.config.get("videomode", "default") in ["", "default"]:
         eslog.debug("==== minTomaxResolution ====")
-        eslog.debug(f"Video mode before minmax: {systemMode}")
+        eslog.debug(f"Video mode before minmax: {system_mode}")
         videoMode.minTomaxResolution()
-        newsystemMode = videoMode.getCurrentMode()
-        if newsystemMode != systemMode:
-            resolutionChanged = True
+        new_system_mode = videoMode.getCurrentMode()
+        if new_system_mode != system_mode:
+            resolution_changed = True
 
-    eslog.debug(f"Current video mode: {newsystemMode}")
-    eslog.debug(f"Wanted video mode: {wantedGameMode}")
+    eslog.debug(f"Current video mode: {new_system_mode}")
+    eslog.debug(f"Wanted video mode: {wanted_game_mode}")
 
-    if wantedGameMode != "default" and wantedGameMode != newsystemMode:
-        videoMode.changeMode(wantedGameMode)
-        resolutionChanged = True
-    gameResolution = videoMode.getCurrentResolution()
+    if wanted_game_mode != "default" and wanted_game_mode != new_system_mode:
+        videoMode.changeMode(wanted_game_mode)
+        resolution_changed = True
+    game_resolution = videoMode.getCurrentResolution()
 
     if generator.getMouseMode(system.config, rom):
-        mouseChanged = True
+        mouse_changed = True
         videoMode.changeMouse(True)
 
-    return systemMode, resolutionChanged, mouseChanged, gameResolution
+    return system_mode, resolution_changed, mouse_changed, game_resolution
 
 
 def _apply_commandline_options(args, system):
@@ -314,7 +314,7 @@ def _cleanup_hud_config():
         eslog.warning(f"Could not remove HUD config file: {e}")
 
 
-def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
+def _configure_hud(system, generator, cmd, args, rom, game_resolution, guns):
     """Configures and enables MangoHUD if supported."""
     if not (
         system.isOptSet("hud_support")
@@ -327,20 +327,20 @@ def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
         system,
         generator,
         rom,
-        gameResolution,
-        controllers.gunsBordersSizeName(guns, system.config),
+        game_resolution,
+        controllers.guns_borders_size_name(guns, system.config),
     )
     if (
         system.isOptSet("hud") and system.config["hud"] not in ["", "none"]
     ) or hud_bezel is not None:
         gameinfos = extractGameInfosFromXml(args.gameinfoxml)
         cmd.env["MANGOHUD_DLSYM"] = "1"
-        effectiveCore = system.config.get("core", "")
+        effective_core = system.config.get("core", "")
         hudconfig = getHudConfig(
             system,
             args.systemname,
             system.config["emulator"],
-            effectiveCore,
+            effective_core,
             rom,
             gameinfos,
             hud_bezel,
@@ -353,7 +353,7 @@ def _configure_hud(system, generator, cmd, args, rom, gameResolution, guns):
 
 
 def _setup_evmapy_and_compositor(
-    generator, system, rom, playersControllers, guns, args, romConfiguration
+    generator, system, rom, players_controllers, guns, args, rom_configuration
 ):
     """
     Sets up Evmapy and compositor before launching the emulator.
@@ -362,10 +362,10 @@ def _setup_evmapy_and_compositor(
         generator (Generator): Emulator-specific generator instance.
         system (Emulator): System configuration object.
         rom (str): Path to the ROM file.
-        playersControllers (list): Controller configuration for all players.
+        players_controllers (list): Controller configuration for all players.
         guns (list): Configured light guns (if any).
         args (Namespace): Command-line arguments passed to the launcher.
-        romConfiguration (str): ROM configuration path (may differ if archive is used).
+        rom_configuration (str): ROM configuration path (may differ if archive is used).
 
     Returns:
         threading.Thread: The thread running Evmapy.
@@ -375,8 +375,8 @@ def _setup_evmapy_and_compositor(
         args.system,
         system.config["emulator"],
         system.config.get("core", ""),
-        romConfiguration,
-        playersControllers,
+        rom_configuration,
+        players_controllers,
         guns,
     )
 
@@ -393,11 +393,11 @@ def _prepare_emulator_command(
     generator,
     system,
     rom,
-    playersControllers,
+    players_controllers,
     metadata,
     guns,
     wheels,
-    gameResolution,
+    game_resolution,
     args,
 ):
     """
@@ -407,29 +407,29 @@ def _prepare_emulator_command(
         generator (Generator): Emulator-specific generator instance.
         system (Emulator): System configuration object.
         rom (str): Path to the ROM file.
-        playersControllers (list): Controller configuration for all players.
+        players_controllers (list): Controller configuration for all players.
         metadata (dict): Game metadata (title, genre, etc.).
         guns (list): Configured light guns (if any).
         wheels (list): Configured wheels (if any).
-        gameResolution (dict): Current game resolution settings.
+        game_resolution (dict): Current game resolution settings.
         args (Namespace): Command-line arguments passed to the launcher.
 
     Returns:
         Command: The prepared command object for running the emulator.
     """
     # Set execution directory if specified by generator
-    effectiveRom = rom or ""
-    executionDirectory = generator.executionDirectory(system.config, effectiveRom)
-    if executionDirectory is not None:
-        chdir(executionDirectory)
+    effective_rom = rom or ""
+    execution_directory = generator.executionDirectory(system.config, effective_rom)
+    if execution_directory is not None:
+        chdir(execution_directory)
 
     # Generate the command line for emulator execution
     cmd = generator.generate(
-        system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        system, rom, players_controllers, metadata, guns, wheels, game_resolution
     )
 
     # Configure MangoHUD if enabled
-    _configure_hud(system, generator, cmd, args, rom, gameResolution, guns)
+    _configure_hud(system, generator, cmd, args, rom, game_resolution, guns)
 
     return cmd
 
@@ -483,13 +483,13 @@ def _launch_emulator_process(
     generator,
     system,
     rom,
-    playersControllers,
+    players_controllers,
     metadata,
     guns,
     wheels,
-    gameResolution,
+    game_resolution,
     args,
-    romConfiguration,
+    rom_configuration,
 ):
     """
     Handles the actual emulator launch process inside a try/finally block.
@@ -505,13 +505,13 @@ def _launch_emulator_process(
         generator (Generator): Emulator-specific generator instance.
         system (Emulator): System configuration object.
         rom (str): Path to the ROM file.
-        playersControllers (list): Controller configuration for all players.
+        players_controllers (list): Controller configuration for all players.
         metadata (dict): Game metadata (title, genre, etc.).
         guns (list): Configured light guns (if any).
         wheels (list): Configured wheels (if any).
-        gameResolution (dict): Current game resolution settings.
+        game_resolution (dict): Current game resolution settings.
         args (Namespace): Command-line arguments passed to the launcher.
-        romConfiguration (str): ROM configuration path (may differ if archive is used).
+        rom_configuration (str): ROM configuration path (may differ if archive is used).
 
     Returns:
         int: Exit code from the emulator process.
@@ -523,7 +523,7 @@ def _launch_emulator_process(
     try:
         # Setup Evmapy and compositor
         evmapy_thread = _setup_evmapy_and_compositor(
-            generator, system, rom, playersControllers, guns, args, romConfiguration
+            generator, system, rom, players_controllers, guns, args, rom_configuration
         )
 
         # Prepare the emulator command
@@ -531,11 +531,11 @@ def _launch_emulator_process(
             generator,
             system,
             rom,
-            playersControllers,
+            players_controllers,
             metadata,
             guns,
             wheels,
-            gameResolution,
+            game_resolution,
             args,
         )
 
@@ -551,33 +551,33 @@ def _launch_emulator_process(
     return exitCode
 
 
-def _cleanup_system(resolutionChanged, systemMode, mouseChanged, wheelProcesses):
+def _cleanup_system(resolution_changed, system_mode, mouse_changed, wheel_processes):
     """Restores system state after the emulator exits."""
     import subprocess  # Import subprocess here to resolve "subprocess" is not defined errors
 
-    if resolutionChanged:
+    if resolution_changed:
         try:
-            videoMode.changeMode(systemMode if systemMode is not None else "")
+            videoMode.changeMode(system_mode if system_mode is not None else "")
         except subprocess.CalledProcessError as e:
             eslog.warning(f"Failed to restore video mode: {e}")
         except Exception as e:
             eslog.warning(f"Unexpected error restoring video mode: {e}")
-    if mouseChanged:
+    if mouse_changed:
         try:
             videoMode.changeMouse(False)
         except subprocess.CalledProcessError as e:
             eslog.warning(f"Failed to restore mouse visibility: {e}")
         except Exception as e:
             eslog.warning(f"Unexpected error restoring mouse visibility: {e}")
-    if wheelProcesses:
+    if wheel_processes:
         try:
-            wheelsUtils.resetControllers(wheelProcesses)
+            wheelsUtils.reset_controllers(wheel_processes)
         except Exception as e:
             eslog.error(f"Unable to reset wheel controllers: {e}")
             pass
 
 
-def start_rom(args, maxnbplayers, rom, romConfiguration):
+def start_rom(args, maxnbplayers, rom, rom_configuration):
     """
     Prepares the system and launches the emulator for a given ROM.
 
@@ -594,27 +594,27 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
         args (Namespace): The command-line arguments.
         maxnbplayers (int): The maximum number of players.
         rom (str): The path to the ROM file.
-        romConfiguration (str): The ROM file path used for specific configurations.
+        rom_configuration (str): The ROM file path used for specific configurations.
 
     Returns:
         int: The exit code from the emulator process.
     """
     # Initial setup
-    playersControllers = _configure_controllers(args, maxnbplayers)
-    system = _setup_system_emulator(args, romConfiguration)
+    players_controllers = _configure_controllers(args, maxnbplayers)
+    system = _setup_system_emulator(args, rom_configuration)
     metadata = controllers.getGamesMetaData(system.name, rom)
-    guns, wheels, wheelProcesses, playersControllers = _configure_special_devices(
-        args, system, rom, metadata, playersControllers
+    guns, wheels, wheel_processes, players_controllers = _configure_special_devices(
+        args, system, rom, metadata, players_controllers
     )
     generator = getGenerator(system.config["emulator"])
 
-    exitCode = -1
-    resolutionChanged, mouseChanged = False, False
-    systemMode = videoMode.getCurrentMode()
+    exit_code = -1
+    resolution_changed, mouse_changed = False, False
+    system_mode = videoMode.getCurrentMode()
 
     try:
         # Configure video and mouse settings
-        systemMode, resolutionChanged, mouseChanged, gameResolution = (
+        system_mode, resolution_changed, mouse_changed, game_resolution = (
             _setup_video_and_mouse(system, generator, rom)
         )
 
@@ -631,26 +631,26 @@ def start_rom(args, maxnbplayers, rom, romConfiguration):
         _execute_external_scripts(system, rom, "gameStart")
 
         eslog.debug("==== Running emulator ====")
-        exitCode = _launch_emulator_process(
+        exit_code = _launch_emulator_process(
             generator,
             system,
             rom,
-            playersControllers,
+            players_controllers,
             metadata,
             guns,
             wheels,
-            gameResolution,
+            game_resolution,
             args,
-            romConfiguration,
+            rom_configuration,
         )
 
         # Execute post-launch scripts
         _execute_external_scripts(system, rom, "gameStop")
 
     finally:
-        _cleanup_system(resolutionChanged, systemMode, mouseChanged, wheelProcesses)
+        _cleanup_system(resolution_changed, system_mode, mouse_changed, wheel_processes)
 
-    return exitCode
+    return exit_code
 
 
 def _cleanup_temp_files(*temp_files):
@@ -670,7 +670,7 @@ def _cleanup_temp_files(*temp_files):
             eslog.warning(f"Could not remove temporary file {temp_file}: {e}")
 
 
-def getHudBezel(system, generator, rom, gameResolution, bordersSize):
+def getHudBezel(system, generator, rom, game_resolution, borders_size):
     """
     Determines and prepares the appropriate bezel image for the HUD.
 
@@ -681,8 +681,8 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
         system (Emulator): The current system's configuration object.
         generator (Generator): The emulator-specific generator.
         rom (str): Path to the ROM file.
-        gameResolution (dict): The current game resolution.
-        bordersSize (str): The size of the gun borders, if any.
+        game_resolution (dict): The current game resolution.
+        borders_size (str): The size of the gun borders, if any.
 
     Returns:
         str|None: The path to the final bezel image file, or None if no bezel should be used.
@@ -701,7 +701,7 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
         and not (
             system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0"
         )
-        and bordersSize is None
+        and borders_size is None
     ):
         return None
 
@@ -715,10 +715,10 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
             overlay_info_file = "/tmp/bezel_transhud_black.info"
             temp_files.extend([overlay_png_file, overlay_info_file])
             bezelsUtil.createTransparentBezel(
-                overlay_png_file, gameResolution["width"], gameResolution["height"]
+                overlay_png_file, game_resolution["width"], game_resolution["height"]
             )
 
-            w, h = gameResolution["width"], gameResolution["height"]
+            w, h = game_resolution["width"], game_resolution["height"]
             with open(overlay_info_file, "w") as fd:
                 fd.write(
                     f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}'
@@ -760,11 +760,11 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
         # Define validation thresholds.
         max_ratio_delta = 0.01  # Max difference between screen and bezel aspect ratio.
 
-        screen_ratio = gameResolution["width"] / gameResolution["height"]
+        screen_ratio = game_resolution["width"] / game_resolution["height"]
         bezel_ratio = bezel_width / bezel_height
 
         # Validate aspect ratio (unless gun borders are being added, which might need a different ratio).
-        if bordersSize is None and abs(screen_ratio - bezel_ratio) > max_ratio_delta:
+        if borders_size is None and abs(screen_ratio - bezel_ratio) > max_ratio_delta:
             eslog.debug(
                 f"Screen ratio ({screen_ratio}) is too far from the bezel one ({bezel_ratio})"
             )
@@ -776,8 +776,8 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
             "bezel_stretch"
         )
         if (
-            bezel_width != gameResolution["width"]
-            or bezel_height != gameResolution["height"]
+            bezel_width != game_resolution["width"]
+            or bezel_height != game_resolution["height"]
         ):
             eslog.debug("Bezel needs to be resized")
             output_png_file = "/tmp/bezel.png"
@@ -786,8 +786,8 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
                 bezelsUtil.resizeImage(
                     overlay_png_file,
                     output_png_file,
-                    gameResolution["width"],
-                    gameResolution["height"],
+                    game_resolution["width"],
+                    game_resolution["height"],
                     bezel_stretch,
                 )
                 overlay_png_file = output_png_file
@@ -803,14 +803,14 @@ def getHudBezel(system, generator, rom, gameResolution, bordersSize):
             overlay_png_file = output_png_file
 
         # Draw gun borders on the bezel if required.
-        if bordersSize is not None:
+        if borders_size is not None:
             eslog.debug("Drawing gun borders")
             output_png_file = "/tmp/bezel_gunborders.png"
             temp_files.append(output_png_file)
-            innerSize, outerSize = bezelsUtil.gunBordersSize(bordersSize)
+            inner_size, outer_size = bezelsUtil.gun_borders_size(borders_size)
             color = bezelsUtil.gunsBordersColorFomConfig(system.config)
             bezelsUtil.gunBorderImage(
-                overlay_png_file, output_png_file, innerSize, outerSize, color
+                overlay_png_file, output_png_file, inner_size, outer_size, color
             )
             overlay_png_file = output_png_file
 

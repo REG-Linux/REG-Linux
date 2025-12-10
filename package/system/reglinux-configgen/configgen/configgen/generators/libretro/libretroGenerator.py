@@ -30,7 +30,7 @@ class LibretroGenerator(Generator):
     # Main entry of the module
     # Configure retroarch and return a command
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Get the graphics backend first
         gfxBackend = getGFXBackend(system)
@@ -95,14 +95,14 @@ class LibretroGenerator(Generator):
                 self,
                 retroconfig,
                 system,
-                playersControllers,
+                players_controllers,
                 metadata,
                 guns,
                 wheels,
                 rom,
                 bezel,
                 shaderBezel,
-                gameResolution,
+                game_resolution,
                 gfxBackend,
             )
             retroconfig.write()
@@ -130,7 +130,7 @@ class LibretroGenerator(Generator):
         dontAppendROM = False
         # For the NeoGeo CD (lr-fbneo) it is necessary to add the parameter: --subsystem neocd
         if system.name == "neogeocd" and system.config["core"] == "fbneo":
-            commandArray = [
+            command_array = [
                 retroarchBin,
                 "-L",
                 retroarchCore,
@@ -154,7 +154,7 @@ class LibretroGenerator(Generator):
                     exe = path.join(rom, "dosbox.bat")
                 else:
                     exe = rom
-                commandArray = [
+                command_array = [
                     retroarchBin,
                     "-L",
                     retroarchCore,
@@ -164,7 +164,7 @@ class LibretroGenerator(Generator):
                 ]
                 dontAppendROM = True
             else:
-                commandArray = [
+                command_array = [
                     retroarchBin,
                     "-L",
                     retroarchCore,
@@ -178,7 +178,7 @@ class LibretroGenerator(Generator):
                 with open(rom, "r") as fpin:
                     lines = fpin.readlines()
                 rom = path.dirname(path.abspath(rom)) + "/" + lines[0].strip()
-            commandArray = [
+            command_array = [
                 retroarchBin,
                 "-L",
                 retroarchCore,
@@ -196,7 +196,7 @@ class LibretroGenerator(Generator):
                 system.config["core"] = "vitaquake2-zaero"
             # set the updated core name
             retroarchCore = retroarchCores + system.config["core"] + "_libretro.so"
-            commandArray = [
+            command_array = [
                 retroarchBin,
                 "-L",
                 retroarchCore,
@@ -268,7 +268,7 @@ class LibretroGenerator(Generator):
                 )
                 raise
 
-            commandArray = [
+            command_array = [
                 retroarchBin,
                 "-L",
                 retroarchCore,
@@ -276,7 +276,7 @@ class LibretroGenerator(Generator):
                 system.config["configfile"],
             ]
         else:
-            commandArray = [
+            command_array = [
                 retroarchBin,
                 "-L",
                 retroarchCore,
@@ -302,32 +302,32 @@ class LibretroGenerator(Generator):
             configToAppend.append(overlayFile)
 
         if "shader" in renderConfig and gameShader != None:
-            commandArray.extend(["--set-shader", video_shader])
+            command_array.extend(["--set-shader", video_shader])
 
         # Generate the append
         if configToAppend:
-            commandArray.extend(["--appendconfig", "|".join(configToAppend)])
+            command_array.extend(["--appendconfig", "|".join(configToAppend)])
 
         # Netplay mode
         if "netplay.mode" in system.config:
             if system.config["netplay.mode"] == "host":
-                commandArray.append("--host")
+                command_array.append("--host")
             elif (
                 system.config["netplay.mode"] == "client"
                 or system.config["netplay.mode"] == "spectator"
             ):
-                commandArray.extend(["--connect", system.config["netplay.server.ip"]])
+                command_array.extend(["--connect", system.config["netplay.server.ip"]])
             if "netplay.server.port" in system.config:
-                commandArray.extend(["--port", system.config["netplay.server.port"]])
+                command_array.extend(["--port", system.config["netplay.server.port"]])
             if "netplay.server.session" in system.config:
-                commandArray.extend(
+                command_array.extend(
                     ["--mitm-session", system.config["netplay.server.session"]]
                 )
             if "netplay.nickname" in system.config:
-                commandArray.extend(["--nick", system.config["netplay.nickname"]])
+                command_array.extend(["--nick", system.config["netplay.nickname"]])
 
         # Verbose logs
-        commandArray.extend(["--verbose"])
+        command_array.extend(["--verbose"])
 
         if system.name == "scummvm":
             rom = path.dirname(rom) + "/" + romName[0:-8]
@@ -345,14 +345,14 @@ class LibretroGenerator(Generator):
                 corePath = "lr-" + system.config["core"]
             else:
                 corePath = system.config["core"]
-            commandArray.append(
+            command_array.append(
                 f"/var/run/cmdfiles/{path.splitext(path.basename(rom))[0]}.cmd"
             )
 
         if dontAppendROM == False:
-            commandArray.append(rom)
+            command_array.append(rom)
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
 
 def getGFXBackend(system):

@@ -7,14 +7,14 @@ RUFFLE_BIN_PATH = "/usr/bin/ruffle"
 
 class RuffleGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [RUFFLE_BIN_PATH, "--fullscreen", rom]
+        command_array = [RUFFLE_BIN_PATH, "--fullscreen", rom]
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

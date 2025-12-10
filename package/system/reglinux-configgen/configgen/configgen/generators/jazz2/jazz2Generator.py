@@ -13,7 +13,7 @@ JAZZ2_BIN_PATH = "/usr/bin/jazz2"
 
 class Jazz2Generator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         try:
             chdir(JAZZ2_ROMS_DIR)
@@ -30,13 +30,13 @@ class Jazz2Generator(Generator):
                 f"ERROR: OS error when changing to Jazz2 ROMs directory {JAZZ2_ROMS_DIR}: {e}. Game assets may not be installed."
             )
 
-        commandArray = [JAZZ2_BIN_PATH, "-f", JAZZ2_ROMS_DIR + rom]
+        command_array = [JAZZ2_BIN_PATH, "-f", JAZZ2_ROMS_DIR + rom]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

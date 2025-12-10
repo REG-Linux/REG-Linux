@@ -9,7 +9,7 @@ eslog = get_logger(__name__)
 
 class HclGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         try:
             chdir("/userdata/roms/hcl/data/map")
@@ -18,13 +18,13 @@ class HclGenerator(Generator):
             eslog.error(
                 f"ERROR: Game assets not installed. You can get them from the Batocera Content Downloader. Error: {str(e)}"
             )
-        commandArray = ["hcl", "-d"]
+        command_array = ["hcl", "-d"]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

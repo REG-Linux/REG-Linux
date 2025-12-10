@@ -13,7 +13,7 @@ class DolphinTriforceGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not os.path.exists(
             os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)
@@ -27,7 +27,7 @@ class DolphinTriforceGenerator(Generator):
             os.makedirs(dolphinTriforceConfig.dolphinTriforceData + "/StateSaves")
 
         dolphinTriforceControllers.generateControllerConfig(
-            system, playersControllers, rom
+            system, players_controllers, rom
         )
 
         ## dolphin.ini ##
@@ -546,7 +546,7 @@ $SeatLoopPatch
         # with open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", 'w') as configfile:
         # dolphinTriforceGameSettingsGGPE01.write(configfile)
 
-        commandArray = [
+        command_array = [
             "dolphin-triforce",
             "-b",
             "-u",
@@ -555,7 +555,7 @@ $SeatLoopPatch
             rom,
         ]
         if system.isOptSet("platform"):
-            commandArray = [
+            command_array = [
                 "dolphin-triforce-nogui",
                 "-b",
                 "-u",
@@ -566,14 +566,14 @@ $SeatLoopPatch
                 rom,
             ]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         if "dolphin_aspect_ratio" in config:
             if config["dolphin_aspect_ratio"] == "1":
                 return 16 / 9
             elif config["dolphin_aspect_ratio"] == "3" and (
-                gameResolution["width"] / float(gameResolution["height"])
+                game_resolution["width"] / float(game_resolution["height"])
                 > ((16.0 / 9.0) - 0.1)
             ):
                 return 16 / 9

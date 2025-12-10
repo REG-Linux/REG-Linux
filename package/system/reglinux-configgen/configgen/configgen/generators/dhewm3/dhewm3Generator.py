@@ -10,14 +10,14 @@ DHEWM3_ROMS_DIR = ROMS + "/doom3"
 
 class Dhewm3Generator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Read the path within the .d3 rom file
         with open(rom, "r") as file:
             directory = file.readline().strip().split("/")[0]
 
         # Run command
-        commandArray: list[str | Path] = [
+        command_array: list[str | Path] = [
             DHEWM3_BIN_PATH,
             "+set",
             "fs_basepath",
@@ -25,6 +25,6 @@ class Dhewm3Generator(Generator):
         ]
 
         if directory != "base":
-            commandArray.extend(["+set", "fs_game", str(directory)])
+            command_array.extend(["+set", "fs_game", str(directory)])
 
-        return Command(array=commandArray)
+        return Command(array=command_array)

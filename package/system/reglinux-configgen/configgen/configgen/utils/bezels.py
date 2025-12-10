@@ -534,15 +534,15 @@ def alphaPaste(input_png, output_png, imgin, fillcolor, screensize, bezel_stretc
         raise
 
 
-def gunBordersSize(bordersSize):
+def gun_borders_size(borders_size):
     """
     Return preset values for gun border sizes depending on text config.
     """
-    if bordersSize == "thin":
+    if borders_size == "thin":
         return 1, 0
-    if bordersSize == "medium":
+    if borders_size == "medium":
         return 2, 0
-    if bordersSize == "big":
+    if borders_size == "big":
         return 2, 1
     return 0, 0
 

@@ -9,7 +9,7 @@ from configgen.controllers import generate_sdl_controller_config
 
 class EDuke32Generator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Core is either eduke32 or fury
         core = system.config["core"]
@@ -40,14 +40,14 @@ class EDuke32Generator(Generator):
         if not parser.has_section("Screen Setup"):
             parser.add_section("Screen Setup")
 
-        if gameResolution["width"] < gameResolution["height"]:
-            gameResolution["width"], gameResolution["height"] = (
-                gameResolution["height"],
-                gameResolution["width"],
+        if game_resolution["width"] < game_resolution["height"]:
+            game_resolution["width"], game_resolution["height"] = (
+                game_resolution["height"],
+                game_resolution["width"],
             )
 
-        parser.set("Screen Setup", "ScreenWidth", str(gameResolution["width"]))
-        parser.set("Screen Setup", "ScreenHeight", str(gameResolution["height"]))
+        parser.set("Screen Setup", "ScreenWidth", str(game_resolution["width"]))
+        parser.set("Screen Setup", "ScreenHeight", str(game_resolution["height"]))
 
         # The game should always be fullscreen
         parser.set("Screen Setup", "ScreenMode", "1")
@@ -61,24 +61,24 @@ class EDuke32Generator(Generator):
                 f'r_showfps "{1 if system.getOptBoolean("showFPS") else 0}"\n'
                 f"echo REG-Linux\n"  # Easy check when debugging
             )
-        commandArray = [
+        command_array = [
             core,
             "-cfg",
             config_file,
             "-nologo" if system.getOptBoolean("nologo") else "",
         ]
         if core == "fury":
-            commandArray += ["-gamegrp", path.basename(rom), "-j", path.dirname(rom)]
+            command_array += ["-gamegrp", path.basename(rom), "-j", path.dirname(rom)]
         else:
-            result = parse_args(commandArray, rom)
+            result = parse_args(command_array, rom)
             if not result.okay:
                 raise Exception(result.message)
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

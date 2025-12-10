@@ -14,7 +14,7 @@ eslog = get_logger(__name__)
 
 class OpenJazzGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         try:
             chdir(OPENJAZZ_ROMS_DIR)
@@ -31,13 +31,13 @@ class OpenJazzGenerator(Generator):
                 f"ERROR: OS error when changing to OpenJazz ROMs directory {OPENJAZZ_ROMS_DIR}: {e}. Game assets may not be installed."
             )
 
-        commandArray = [OPENJAZZ_BIN_PATH, "-f", OPENJAZZ_ROMS_DIR + rom]
+        command_array = [OPENJAZZ_BIN_PATH, "-f", OPENJAZZ_ROMS_DIR + rom]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

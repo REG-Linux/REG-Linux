@@ -27,7 +27,7 @@ class VPinballGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # create vpinball config directory and default config file if they don't exist
         if not path.exists(VPINBALL_CONFIG_DIR):
@@ -68,7 +68,7 @@ class VPinballGenerator(Generator):
 
         # windows
         vpinballWindowing.configureWindowing(
-            vpinballSettings, system, gameResolution, hasDmd
+            vpinballSettings, system, game_resolution, hasDmd
         )
 
         # DMDServer
@@ -82,7 +82,7 @@ class VPinballGenerator(Generator):
             vpinballSettings.write(configfile)
 
         # set the config path to be sure
-        commandArray = [
+        command_array = [
             VPINBALL_BIN_PATH,
             "-PrefPath",
             VPINBALL_CONFIG_DIR,
@@ -94,14 +94,14 @@ class VPinballGenerator(Generator):
 
         # SDL_RENDER_VSYNC is causing perf issues (set by emulatorlauncher.py)
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_RENDER_VSYNC": "0",
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 ),
             },
         )
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

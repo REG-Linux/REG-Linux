@@ -11,16 +11,16 @@ class EdenGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Load existing config or create a new one
         edenConfig = UnixSettings(EDEN_CONFIG_PATH)
 
         setEdenConfig(edenConfig, system)
-        setEdenControllers(edenConfig, system, playersControllers)
+        setEdenControllers(edenConfig, system, players_controllers)
 
         # Save the updated configuration
         edenConfig.write()  # UnixSettings method
 
-        commandArray = [EDEN_BIN_PATH, "-f", "-g", rom]
-        return Command(array=commandArray)
+        command_array = [EDEN_BIN_PATH, "-f", "-g", rom]
+        return Command(array=command_array)

@@ -14,7 +14,7 @@ eslog = get_logger(__name__)
 
 class TyrianGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         try:
             chdir(TYRIAN_ROMS_DIR)
@@ -30,16 +30,16 @@ class TyrianGenerator(Generator):
             eslog.error(
                 f"ERROR: OS error when changing to Tyrian ROMs directory {TYRIAN_ROMS_DIR}: {e}. Game assets may not be installed."
             )
-        commandArray = [TYRIAN_BIN_PATH]
+        command_array = [TYRIAN_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

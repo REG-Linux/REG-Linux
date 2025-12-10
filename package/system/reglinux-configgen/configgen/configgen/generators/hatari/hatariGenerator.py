@@ -11,7 +11,7 @@ eslog = get_logger(__name__)
 
 class HatariGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         model_mapping = {
             "520st_auto": {"machine": "st", "tos": "auto"},
@@ -27,7 +27,7 @@ class HatariGenerator(Generator):
         }
 
         # Start emulator fullscreen
-        commandArray = [HATARI_BIN_PATH, "--fullscreen"]
+        command_array = [HATARI_BIN_PATH, "--fullscreen"]
 
         # Machine can be st (default), ste, megaste, tt, falcon
         # st should use TOS 1.00 to TOS 1.04 (tos100 / tos102 / tos104)
@@ -45,17 +45,17 @@ class HatariGenerator(Generator):
         if system.isOptSet("language"):
             toslang = system.config["language"]
 
-        commandArray += ["--machine", machine]
+        command_array += ["--machine", machine]
         tos = HatariGenerator.findBestTos(
             HATARI_BIOS_PATH, machine, tosversion, toslang
         )
-        commandArray += ["--tos", f"{HATARI_BIOS_PATH}/{tos}"]
+        command_array += ["--tos", f"{HATARI_BIOS_PATH}/{tos}"]
 
         # RAM (ST Ram) options (0 for 512k, 1 for 1MB)
         memorysize = 0
         if system.isOptSet("ram"):
             memorysize = system.config["ram"]
-        commandArray += ["--memsize", str(memorysize)]
+        command_array += ["--memsize", str(memorysize)]
 
         rom_extension = path.splitext(rom)[1].lower()
         if rom_extension == ".hd":
@@ -63,25 +63,25 @@ class HatariGenerator(Generator):
                 system.isOptSet("hatari_drive")
                 and system.config["hatari_drive"] == "ASCI"
             ):
-                commandArray += ["--asci", rom]
+                command_array += ["--asci", rom]
             else:
-                commandArray += ["--ide-master", rom]
+                command_array += ["--ide-master", rom]
         elif rom_extension == ".gemdos":
             blank_file = "/userdata/system/configs/hatari/blank.st"
             if not path.exists(blank_file):
                 with open(blank_file, "w"):
                     pass
-            commandArray += ["--harddrive", rom, blank_file]
+            command_array += ["--harddrive", rom, blank_file]
         else:
             # Floppy (A) options
-            commandArray += ["--disk-a", rom]
+            command_array += ["--disk-a", rom]
             # Floppy (B) options
-            commandArray += ["--drive-b", "off"]
+            command_array += ["--drive-b", "off"]
 
         # config file
-        setHatariControllers(system, playersControllers)
+        setHatariControllers(system, players_controllers)
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
     @staticmethod
     def findBestTos(biosdir, machine, tos_version, language):

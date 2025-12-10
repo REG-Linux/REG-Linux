@@ -96,7 +96,7 @@ def _get_arch_suffix():
 
 class Xash3dFwgsGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         game = path.splitext(path.basename(rom))[0]
 
@@ -107,34 +107,34 @@ class Xash3dFwgsGenerator(Generator):
         # -log        # Log to /userdata/roms/xash3d_fwgs/engine.log
         # -dev 2      # Verbose logging
         # -ref gles2  # Select a specific renderer (gl, gl4es, gles1, gles2, soft)
-        commandArray = [XASH3D_BIN_PATH, "-fullscreen", "-dev"]
+        command_array = [XASH3D_BIN_PATH, "-fullscreen", "-dev"]
 
         # By default, xash3d will use `dlls/hl.so` in the valve directory (via the `liblist.gam` config file).
         # However, that `so` is incompatible with xash3d (it's the x86-glibc version from Valve).
         # We instead point to the hlsdk-xash3d `so`.
-        commandArray.append("-clientlib")
-        commandArray.append(_find_client_lib(server_lib, arch_suffix))
+        command_array.append("-clientlib")
+        command_array.append(_find_client_lib(server_lib, arch_suffix))
 
-        commandArray.append("-dll")
-        commandArray.append(_find_server_lib(server_lib, arch_suffix))
+        command_array.append("-dll")
+        command_array.append(_find_server_lib(server_lib, arch_suffix))
 
-        commandArray.append("-game")
-        commandArray.append(game)
+        command_array.append("-game")
+        command_array.append(game)
 
-        commandArray.append("+showfps")
-        commandArray.append("1" if system.getOptBoolean("showFPS") == True else "0")
+        command_array.append("+showfps")
+        command_array.append("1" if system.getOptBoolean("showFPS") == True else "0")
 
         self._maybeInitConfig(game)
         self._maybeInitSaveDir(game)
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "XASH3D_BASEDIR": XASH3D_ROMS_DIR,
                 "XASH3D_EXTRAS_PAK1": "/usr/share/xash3d/valve/extras.pk3",
                 "LD_LIBRARY_PATH": "/usr/lib/xash3d",
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 ),
             },
         )

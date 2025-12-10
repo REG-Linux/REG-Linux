@@ -9,7 +9,7 @@ IKEMEN_BIN_PATH = "/usr/bin/system-ikemen"
 
 class IkemenGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Load existing config or create a new one
         ikemenConfig = JSONSettings(rom + IKEMEN_CONFIG_PATH)
@@ -23,6 +23,6 @@ class IkemenGenerator(Generator):
         # Save the updated configuration
         ikemenConfig.write()
 
-        commandArray = [IKEMEN_BIN_PATH, rom]
+        command_array = [IKEMEN_BIN_PATH, rom]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)

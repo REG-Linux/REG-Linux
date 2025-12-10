@@ -8,15 +8,15 @@ SHADPS4_BIN_PATH = "/usr/bin/shadps4/shadps4"
 
 class Shadps4Generator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [SHADPS4_BIN_PATH, path.dirname(rom) + "/eboot.bin"]
+        command_array = [SHADPS4_BIN_PATH, path.dirname(rom) + "/eboot.bin"]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

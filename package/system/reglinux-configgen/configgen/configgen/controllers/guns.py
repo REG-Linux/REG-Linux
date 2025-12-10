@@ -141,36 +141,36 @@ def gunsNeedCrosses(guns):
 
 
 # returns None is no border is wanted
-def gunsBordersSizeName(guns, config):
-    bordersSize = "medium"
+def guns_borders_size_name(guns, config):
+    borders_size = "medium"
     if (
         "controllers.guns.borderssize" in config
         and config["controllers.guns.borderssize"]
     ):
-        bordersSize = config["controllers.guns.borderssize"]
+        borders_size = config["controllers.guns.borderssize"]
 
     # overriden by specific options
-    bordersmode = "normal"
+    borders_mode = "normal"
     if (
         "controllers.guns.bordersmode" in config
         and config["controllers.guns.bordersmode"]
         and config["controllers.guns.bordersmode"] != "auto"
     ):
-        bordersmode = config["controllers.guns.bordersmode"]
+        borders_mode = config["controllers.guns.bordersmode"]
     if (
         "bordersmode" in config
         and config["bordersmode"]
         and config["bordersmode"] != "auto"
     ):
-        bordersmode = config["bordersmode"]
+        borders_mode = config["bordersmode"]
 
     # others are gameonly and normal
-    if bordersmode == "hidden":
+    if borders_mode == "hidden":
         return None
-    if bordersmode == "force":
-        return bordersSize
+    if borders_mode == "force":
+        return borders_size
 
     for gun in guns:
         if guns[gun]["need_borders"]:
-            return bordersSize
+            return borders_size
     return None

@@ -20,7 +20,7 @@ class FlycastGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Write emu.cfg to map joysticks, init with the default emu.cfg
         flycastConfig = ConfigParser(interpolation=None)
@@ -37,7 +37,7 @@ class FlycastGenerator(Generator):
                 eslog.warning(f"Error reading config file {FLYCAST_CONFIG_PATH}: {e}. Using default config.")
                 pass  # give up the file
 
-        setFlycastConfig(flycastConfig, system, gameResolution)
+        setFlycastConfig(flycastConfig, system, game_resolution)
 
         ### update the configuration file
         if not path.exists(path.dirname(FLYCAST_CONFIG_PATH)):
@@ -59,15 +59,15 @@ class FlycastGenerator(Generator):
             copyfile(FLYCAST_VMU_BLANK_PATH, FLYCAST_VMU_A2_PATH)
 
         # the command to run
-        commandArray = [FLYCAST_BIN_PATH]
-        commandArray.append(rom)
+        command_array = [FLYCAST_BIN_PATH]
+        command_array.append(rom)
         # Here is the trick to make flycast find files :
         # emu.cfg is in $XDG_CONFIG_DIRS or $XDG_CONFIG_HOME.
         # VMU will be in $XDG_DATA_HOME / $FLYCAST_DATADIR because it needs rw access -> /userdata/saves/dreamcast
         # $FLYCAST_BIOS_PATH is where Flaycast should find the bios files
         # controller cfg files are set with an absolute path, so no worry
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "XDG_CONFIG_DIRS": CONF,
                 "FLYCAST_DATADIR": FLYCAST_SAVES_DIR,

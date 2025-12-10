@@ -14,7 +14,7 @@ OPENBOR_ROMS_DIR = ROMS + "/openbor"
 class OpenborGenerator(Generator):
     # Main entry of the module
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(OPENBOR_CONF_DIR):
             makedirs(OPENBOR_CONF_DIR)
@@ -67,7 +67,7 @@ class OpenborGenerator(Generator):
             config.save("fpslimit", "0")
 
         # controllers
-        setControllerConfig(config, playersControllers, core)
+        setControllerConfig(config, players_controllers, core)
 
         # rumble
         if system.isOptSet("openbor_rumble"):
@@ -91,16 +91,16 @@ class OpenborGenerator(Generator):
     @staticmethod
     def executeCore(core, rom):
         if core == "openbor4432":
-            commandArray = ["OpenBOR4432", rom]
+            command_array = ["OpenBOR4432", rom]
         elif core == "openbor6412":
-            commandArray = ["OpenBOR6412", rom]
+            command_array = ["OpenBOR6412", rom]
         elif core == "openbor7142":
-            commandArray = ["OpenBOR7142", rom]
+            command_array = ["OpenBOR7142", rom]
         elif core == "openbor7530":
-            commandArray = ["OpenBOR7530", rom]
+            command_array = ["OpenBOR7530", rom]
         else:
-            commandArray = ["OpenBOR7530", rom]
-        return Command(array=commandArray)
+            command_array = ["OpenBOR7530", rom]
+        return Command(array=command_array)
 
     @staticmethod
     def guessCore(rom):

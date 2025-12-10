@@ -18,7 +18,7 @@ class PlayGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create config folder
         if not path.isdir(PLAY_CONFIG_DIR):
@@ -105,7 +105,7 @@ class PlayGenerator(Generator):
             with open(PLAY_CONFIG_FILE, "wb") as file:
                 tree.write(file)
 
-        commandArray = [PLAY_BIN_PATH, "--fullscreen"]
+        command_array = [PLAY_BIN_PATH, "--fullscreen"]
 
         if rom != "config":
             # if zip, it's a namco arcade game
@@ -113,13 +113,13 @@ class PlayGenerator(Generator):
                 # strip path & extension
                 rom = path.basename(rom)
                 rom = path.splitext(rom)[0]
-                commandArray.extend(["--arcade", rom])
+                command_array.extend(["--arcade", rom])
             else:
-                commandArray.extend(["--disc", rom])
+                command_array.extend(["--disc", rom])
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         if "play_widescreen" in config and config["play_widescreen"] == "true":
             return 16 / 9
         elif "play_mode" in config and config["play_mode"] == "0":
