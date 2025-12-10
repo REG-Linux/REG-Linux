@@ -1,0 +1,156 @@
+From bd2e505f09ac2da1a7c01c6739e4545d70e3bb62 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Thu, 16 Jan 2025 12:58:48 +0100
+Subject: [PATCH 44/79] arm64: dts: mediatek: mt8188: Add DPI1, HDMI Controller
+ and HDMI PHY
+
+The HDMI Controller is connected to the display pipeline through
+the secondary Display Parallel Interface instance (DPI1).
+
+Add nodes for DPI1, HDMI Controller, its integrated I2C DDC, and
+for the HDMI PHY, and keep them disabled by default.
+Boards providing this output are expected to enable the required
+nodes and configure the display pipeline to hook it up.
+
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ arch/arm64/boot/dts/mediatek/mt8188.dtsi | 82 ++++++++++++++++++++++++
+ arch/arm64/boot/dts/mediatek/mt8195.dtsi |  4 +-
+ 2 files changed, 84 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8188.dtsi b/arch/arm64/boot/dts/mediatek/mt8188.dtsi
+index 90c388f1890f..e2a17359e407 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8188.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8188.dtsi
+@@ -26,6 +26,7 @@ / {
+ 	aliases {
+ 		dp-intf0 = &dp_intf0;
+ 		dp-intf1 = &dp_intf1;
++		dpi1 = &dpi1;
+ 		dsc0 = &dsc0;
+ 		ethdr0 = &ethdr0;
+ 		gce0 = &gce0;
+@@ -2038,6 +2039,19 @@ pcieport: pcie-phy@0 {
+ 			};
+ 		};
+ 
++		hdmi_phy: hdmi-phy@11d5f000 {
++			compatible = "mediatek,mt8188-hdmi-phy", "mediatek,mt8195-hdmi-phy";
++			reg = <0 0x11d5f000 0 0x100>;
++			clocks = <&infracfg_ao CLK_INFRA_AO_HDMI_26M>;
++			clock-names = "pll_ref";
++			clock-output-names = "hdmi_txpll";
++			#clock-cells = <0>;
++			#phy-cells = <0>;
++			mediatek,ibias = <0xa>;
++			mediatek,ibias_up = <0x1c>;
++			status = "disabled";
++		};
++
+ 		mipi_tx_config0: dsi-phy@11c80000 {
+ 			compatible = "mediatek,mt8188-mipi-tx", "mediatek,mt8183-mipi-tx";
+ 			reg = <0 0x11c80000 0 0x1000>;
+@@ -3406,6 +3420,34 @@ merge5: merge@1c110000 {
+ 			mediatek,merge-fifo-en;
+ 		};
+ 
++		dpi1: dpi@1c112000 {
++			compatible = "mediatek,mt8188-dpi", "mediatek,mt8195-dpi";
++			reg = <0 0x1c112000 0 0x1000>;
++			clocks = <&vdosys1 CLK_VDO1_DPI1>,
++				 <&vdosys1 CLK_VDO1_DPI1_MM>,
++				 <&vdosys1 CLK_VDO1_DPI1_HDMI>;
++			clock-names = "pixel", "engine", "pll";
++			interrupts = <GIC_SPI 524 IRQ_TYPE_LEVEL_HIGH 0>;
++			power-domains = <&spm MT8188_POWER_DOMAIN_VDOSYS1>;
++			resets = <&vdosys1 MT8188_VDO1_RST_DPI1_MM_CK>;
++			status = "disabled";
++
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					reg = <0>;
++					dpi1_in: endpoint { };
++				};
++
++				port@1 {
++					reg = <1>;
++					dpi1_out: endpoint { };
++				};
++			};
++		};
++
+ 		dp_intf1: dp-intf@1c113000 {
+ 			compatible = "mediatek,mt8188-dp-intf";
+ 			reg = <0 0x1c113000 0 0x1000>;
+@@ -3530,6 +3572,46 @@ padding7: padding@1c124000 {
+ 			mediatek,gce-client-reg = <&gce0 SUBSYS_1c12XXXX 0x4000 0x1000>;
+ 		};
+ 
++		hdmi: hdmi@1c300000 {
++			compatible = "mediatek,mt8188-hdmi-tx";
++			#sound-dai-cells = <1>;
++			reg = <0 0x1c300000 0 0x1000>;
++			clocks = <&topckgen CLK_TOP_HDMI_APB>,
++				 <&topckgen CLK_TOP_HDCP>,
++				 <&topckgen CLK_TOP_HDCP_24M>,
++				 <&vppsys1 CLK_VPP1_VPP_SPLIT_HDMI>;
++			clock-names = "bus", "hdcp", "hdcp24m", "hdmi-split";
++			assigned-clocks = <&topckgen CLK_TOP_HDCP>;
++			assigned-clock-parents = <&topckgen CLK_TOP_UNIVPLL_D4_D8>;
++			interrupts = <GIC_SPI 686 IRQ_TYPE_LEVEL_HIGH 0>;
++			power-domains = <&spm MT8188_POWER_DOMAIN_HDMI_TX>;
++			phys = <&hdmi_phy>;
++			phy-names = "hdmi";
++			status = "disabled";
++
++			hdmi_ddc: i2c {
++				compatible = "mediatek,mt8188-hdmi-ddc",
++					     "mediatek,mt8195-hdmi-ddc";
++				clocks = <&clk26m>;
++			};
++
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					reg = <0>;
++					hdmi0_in: endpoint { };
++				};
++
++				port@1 {
++					reg = <1>;
++					hdmi0_out: endpoint { };
++				};
++			};
++		};
++
++
+ 		edp_tx: edp-tx@1c500000 {
+ 			compatible = "mediatek,mt8188-edp-tx";
+ 			reg = <0 0x1c500000 0 0x8000>;
+diff --git a/arch/arm64/boot/dts/mediatek/mt8195.dtsi b/arch/arm64/boot/dts/mediatek/mt8195.dtsi
+index 79ca56f5952d..edef9597f07f 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8195.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8195.dtsi
+@@ -3708,12 +3708,12 @@ ports {
+ 
+ 				port@0 {
+ 					reg = <0>;
+-					dpi0_in: endpoint { };
++					dpi1_in: endpoint { };
+ 				};
+ 
+ 				port@1 {
+ 					reg = <1>;
+-					dpi0_out: endpoint { };
++					dpi1_out: endpoint { };
+ 				};
+ 			};
+ 		};
+-- 
+2.43.0
+

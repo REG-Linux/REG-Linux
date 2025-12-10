@@ -1,0 +1,45 @@
+From c7067fb4c596627f6e1c7091c4982988285499fb Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 9 Sep 2025 11:25:02 +0200
+Subject: [PATCH 31/79] dt-bindings: ufs: mediatek,ufs: Document MT8192
+ compatible with MT8183
+
+The MT8192 UFS controller is compatible with the MT8183 one:
+document this by allowing to assign both compatible strings
+"mediatek,mt8192-ufshci", "mediatek,mt8183-ufshci" to the UFSHCI node.
+
+Moreover, since no MT8192 devicetree ever declared any UFSHCI node,
+disallow specifying only the MT8192 compatible.
+
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+(cherry picked from commit 27a79a4399ca369b1390c806bb7b3816ce4d6f45)
+---
+ .../devicetree/bindings/ufs/mediatek,ufs.yaml        | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+index 1dec54fb00f3..03b4d1fff40f 100644
+--- a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
++++ b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+@@ -11,10 +11,14 @@ maintainers:
+ 
+ properties:
+   compatible:
+-    enum:
+-      - mediatek,mt8183-ufshci
+-      - mediatek,mt8192-ufshci
+-      - mediatek,mt8195-ufshci
++    oneOf:
++      - enum:
++          - mediatek,mt8183-ufshci
++          - mediatek,mt8195-ufshci
++      - items:
++          - enum:
++              - mediatek,mt8192-ufshci
++          - const: mediatek,mt8183-ufshci
+ 
+   clocks:
+     minItems: 1
+-- 
+2.43.0
+

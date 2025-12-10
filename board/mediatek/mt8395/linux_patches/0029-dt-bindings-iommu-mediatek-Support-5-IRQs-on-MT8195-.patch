@@ -1,0 +1,62 @@
+From 21f470c2507afa4b72fdca84861b3322b014af38 Mon Sep 17 00:00:00 2001
+From: Julien Massot <julien.massot@collabora.com>
+Date: Wed, 14 May 2025 10:19:57 +0200
+Subject: [PATCH 29/79] dt-bindings: iommu: mediatek: Support 5 IRQs on MT8195
+ infra IOMMU
+
+The MT8195 Infra IOMMU is currently the only Mediatek IOMMU instance that
+uses five interrupts instead of one.
+
+Update the binding to allow either one or five interrupts, depending on
+the compatible string. This avoids dtbs_check errors on platforms like
+the Radxa NIO 12L using the MT8395 SoC:
+
+mediatek/mt8395-radxa-nio-12l.dtb: infra-iommu@10315000: interrupts:
+[[0, 795, 4, 0], [0, 796, 4, 0], [0, 797, 4, 0], [0, 798, 4, 0], [0, 799, 4, 0]] is too long
+
+Fixes: 3b5838d1d82e3 ("arm64: dts: mt8195: Add iommu and smi nodes")
+Signed-off-by: Julien Massot <julien.massot@collabora.com>
+(cherry picked from commit 6dd6b31a6f01f67876a52e621a306c1ee32c255f)
+---
+ .../bindings/iommu/mediatek,iommu.yaml         | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml b/Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml
+index f49ed8ac4776..7def51a126b9 100644
+--- a/Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml
++++ b/Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml
+@@ -97,7 +97,8 @@ properties:
+     maxItems: 1
+ 
+   interrupts:
+-    maxItems: 1
++    minItems: 1
++    maxItems: 5
+ 
+   clocks:
+     items:
+@@ -201,6 +202,21 @@ allOf:
+       required:
+         - mediatek,infracfg
+ 
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - mediatek,mt8195-iommu-infra
++    then:
++      properties:
++        interrupts:
++          minItems: 5
++    else:
++      properties:
++        interrupts:
++          maxItems: 1
++
+   - if: # The IOMMUs don't have larbs.
+       not:
+         properties:
+-- 
+2.43.0
+

@@ -1,0 +1,49 @@
+From 3cd62139050bb54ca26fb387ff1699dc73899744 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 15 Apr 2025 12:43:18 +0200
+Subject: [PATCH 13/79] drm/mediatek: mtk_hdmi_common: Add OP_HDMI if helper
+ funcs assigned
+
+In preparation for adding the HDMI TX v2 driver, and to allow
+a future modernization of the HDMI v1 one, perform changes
+that enable the usage of the HDMI Helpers provided by DRM.
+
+Check if the HDMI driver provides the function pointers to
+hdmi_{clear,write}_infoframe used by the HDMI Helper API and,
+if present, add DRM_BRIDGE_OP_HDMI to the drm_bridge ops,
+enabling the drm API to register the bridge as HDMI and to use
+the HDMI Helper functions.
+
+If the hdmi_{write,clear}_infoframe pointers are not assigned,
+vendor and product strings and HDMI helpers will not be used,
+hence this commit brings no functional changes to drivers that
+have not been refactored to use the new helpers.
+
+This also means that, in the current state, there is effectively
+no functional change to mtk_hdmi and its other components.
+
+Reviewed-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi_common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+index 3b589706d61b..be63f33d39bf 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+@@ -413,6 +413,10 @@ struct mtk_hdmi *mtk_hdmi_common_probe(struct platform_device *pdev)
+ 	hdmi->bridge.ops = DRM_BRIDGE_OP_DETECT | DRM_BRIDGE_OP_EDID
+ 			 | DRM_BRIDGE_OP_HPD;
+ 
++	if (ver_conf->bridge_funcs->hdmi_write_infoframe &&
++	    ver_conf->bridge_funcs->hdmi_clear_infoframe)
++		hdmi->bridge.ops |= DRM_BRIDGE_OP_HDMI;
++
+ 	hdmi->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
+ 	hdmi->bridge.ddc = hdmi->ddc_adpt;
+ 	hdmi->bridge.vendor = "MediaTek";
+-- 
+2.43.0
+

@@ -1,0 +1,32 @@
+From 80bb891880c9d66136ef26c94947d0309eb97cb3 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Wed, 12 Jun 2024 09:43:09 +0200
+Subject: [PATCH 34/79] dt-bindings: ufs: mediatek,ufs: Document optional
+ dvfsrc/va09 regulators
+
+Document the optional dvfsrc-vcore and va09 regulators used for,
+respectively, crypt boost and internal MPHY power management in
+when powering on/off the (external) MediaTek UFS PHY.
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+index 76869ccd72f2..2c3a1ab22c61 100644
+--- a/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
++++ b/Documentation/devicetree/bindings/ufs/mediatek,ufs.yaml
+@@ -35,6 +35,8 @@ properties:
+   reg:
+     maxItems: 1
+ 
++  dvfsrc-vcore-supply: true
++  va09-supply: true
+   vcc-supply: true
+ 
+   mediatek,ufs-disable-mcq:
+-- 
+2.43.0
+

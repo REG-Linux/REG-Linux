@@ -1,0 +1,51 @@
+From c5f31d149cdb25113aeceb83cd3ca45eaa5bc686 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:22 -0300
+Subject: [PATCH 60/79] ASoC: mediatek: mt6359-accdet: Drop dead code for EINT
+ trigger setting
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+None of the EINT trigger options are implemented and the DT property is
+not described in the binding. Remove the unused code.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index ce8a5e64e0b9..a21c65441745 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -35,8 +35,6 @@
+ #define ACCDET_PMIC_EINT1		BIT(3)
+ #define ACCDET_PMIC_BI_EINT		BIT(4)
+ 
+-#define ACCDET_PMIC_GPIO_TRIG_EINT	BIT(5)
+-#define ACCDET_PMIC_INVERTER_TRIG_EINT	BIT(6)
+ #define ACCDET_PMIC_RSV_EINT		BIT(7)
+ 
+ #define ACCDET_THREE_KEY		BIT(8)
+@@ -593,15 +591,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 	else if (tmp == 2)
+ 		priv->caps |= ACCDET_PMIC_BI_EINT;
+ 
+-	ret = of_property_read_u32(node, "mediatek,eint-trig-mode",
+-				   &tmp);
+-	if (ret)
+-		tmp = 0;
+-	if (tmp == 0)
+-		priv->caps |= ACCDET_PMIC_GPIO_TRIG_EINT;
+-	else if (tmp == 1)
+-		priv->caps |= ACCDET_PMIC_INVERTER_TRIG_EINT;
+-
+ 	ret = of_property_read_u32(node, "mediatek,eint-use-ext-res",
+ 				   &priv->data->eint_use_ext_res);
+ 	if (ret) {
+-- 
+2.43.0
+

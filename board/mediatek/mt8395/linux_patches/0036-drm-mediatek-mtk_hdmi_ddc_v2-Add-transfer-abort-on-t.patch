@@ -1,0 +1,52 @@
+From a53aab332f873a137f50d3591486d33350336dc6 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Mon, 23 Jun 2025 15:03:54 +0200
+Subject: [PATCH 36/79] drm/mediatek: mtk_hdmi_ddc_v2: Add transfer abort on
+ timeout cases
+
+During a read or write transfer, the mtk_hdmi_ddc_v2 driver polls the
+DDC_I2C_IN_PROG bit of HPD_DDC_STATUS register to check if the transfer
+completes but do no particular action if a timeout is reached.
+It could lead the next transfer attempts to fail because the faulty
+transfer was not aborted. So, add in both low level read and write
+functions a transfer abort action by writing the DDC_CTRL register
+with the ABORT_XFER command value.
+
+Fixes: 00985bae ("drm/mediatek: Introduce HDMI/DDC v2 for MT8195/MT8188")
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+(cherry picked from commit 82650fe7742b631572a4007e66b500bb71a026d7)
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c b/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c
+index 012f9b2f5432..1e28e10888f9 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_ddc_v2.c
+@@ -96,6 +96,11 @@ static int mtk_ddc_wr_one(struct mtk_hdmi_ddc *ddc, u16 addr_id,
+ 				       !(val & DDC_I2C_IN_PROG), 500, 1000);
+ 	if (ret) {
+ 		dev_err(ddc->dev, "DDC I2C write timeout\n");
++
++		/* Abort transfer if it is still in progress */
++		regmap_update_bits(ddc->regs, DDC_CTRL, DDC_CTRL_CMD,
++				   FIELD_PREP(DDC_CTRL_CMD, DDC_CMD_ABORT_XFER));
++
+ 		return ret;
+ 	}
+ 
+@@ -178,6 +183,11 @@ static int mtk_ddcm_read_hdmi(struct mtk_hdmi_ddc *ddc, u16 uc_dev,
+ 					       500 * (temp_length + 5));
+ 		if (ret) {
+ 			dev_err(ddc->dev, "Timeout waiting for DDC I2C\n");
++
++			/* Abort transfer if it is still in progress */
++			regmap_update_bits(ddc->regs, DDC_CTRL, DDC_CTRL_CMD,
++					   FIELD_PREP(DDC_CTRL_CMD, DDC_CMD_ABORT_XFER));
++
+ 			return ret;
+ 		}
+ 
+-- 
+2.43.0
+

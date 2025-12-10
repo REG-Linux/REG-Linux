@@ -1,0 +1,73 @@
+From 9154e1eb9d934eb4a6c0d0f7604e792fb11b9133 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:31 -0300
+Subject: [PATCH 69/79] ASoC: mediatek: mt6359-accdet: Always set comp-vth to
+ 1.6V
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The driver currently reads a mediatek,eint-comp-vth property from DT to
+determine the voltage threshold of the EINT comparator. Since there are
+no current users of the property and setting it to 1.6V is known to work
+across multiple boards, remove the code handling this property and
+instead always configure it to 1.6V. The property can be properly
+introduced in the binding in the future if it really turns out that
+different boards need different configurations.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 8 ++------
+ sound/soc/codecs/mt6359-accdet.h | 1 -
+ 2 files changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index 12697b02faff..3f6a97e8de8d 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -61,6 +61,7 @@
+ #define ACCDET_EINT_INVERTER_DEBOUNCE_256MS 0xe
+ #define ACCDET_EINT_CMPMEN_PWM_WIDTH_400MS 4
+ #define ACCDET_EINT_CMPMEN_PWM_THRESH_2MS 1
++#define ACCDET_EINT_COMP_VTH_1600MV 2
+ 
+ static struct platform_driver mt6359_accdet_driver;
+ static const struct snd_soc_component_driver mt6359_accdet_soc_driver;
+@@ -506,11 +507,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 	else if (tmp == 2)
+ 		priv->caps |= ACCDET_PMIC_BI_EINT;
+ 
+-	ret = of_property_read_u32(node, "mediatek,eint-comp-vth",
+-				   &priv->data->eint_comp_vth);
+-	if (ret)
+-		priv->data->eint_comp_vth = 0x0;
+-
+ 	of_node_put(node);
+ 	dev_warn(priv->dev, "accdet caps=%x\n", priv->caps);
+ 
+@@ -594,7 +590,7 @@ static void config_eint_init_by_mode(struct mt6359_accdet *priv)
+ 			   0x3 << RG_ACCDETSPARE_SFT,
+ 			   0x3 << RG_ACCDETSPARE_SFT);
+ 	regmap_write(priv->regmap, RG_EINTCOMPVTH_ADDR,
+-		     val | priv->data->eint_comp_vth << RG_EINTCOMPVTH_SFT);
++		     val | ACCDET_EINT_COMP_VTH_1600MV << RG_EINTCOMPVTH_SFT);
+ }
+ 
+ static void mt6359_accdet_init(struct mt6359_accdet *priv)
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index 5076533d46cc..da26152e5ff5 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -48,7 +48,6 @@ enum {
+ 
+ struct dts_data {
+ 	bool hp_eint_high;
+-	unsigned int eint_comp_vth;
+ };
+ 
+ struct mt6359_accdet {
+-- 
+2.43.0
+

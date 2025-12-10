@@ -1,0 +1,758 @@
+From ba2528bd91b0be8b91d6d622b8621cde992d4172 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Mon, 4 Aug 2025 13:34:16 +0200
+Subject: [PATCH 79/79] .gitlab-ci.yaml, lava: backport test improvements from
+ mediatek-dev
+
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ .gitignore        |   1 +
+ .gitlab-ci.yml    | 401 ++++++++++++++++++++++++++++++++++++++++++++--
+ lava/testjob.yaml | 239 ++++++++++++++++++++++++++-
+ 3 files changed, 626 insertions(+), 15 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 86a1ba0d9035..548616b980e4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -116,6 +116,7 @@ modules.order
+ !.mailmap
+ !.pylintrc
+ !.rustfmt.toml
++!.gitlab-ci.yml
+ 
+ #
+ # Generated include files
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 953af748c48e..637a1e335f63 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -1,7 +1,5 @@
+ default:
+   image: debian:testing
+-  tags:
+-    - trixie
+ 
+ stages:
+   - build
+@@ -23,7 +21,8 @@ check-devicetrees:
+     ARCH: arm64
+     DEFCONFIG: defconfig
+     CROSS_COMPILE: aarch64-linux-gnu-
+-    DUT_LIST: "mt8370-genio-510-evk \
++    DUT_LIST: "mt8365-evk \
++               mt8370-genio-510-evk \
+                mt8390-genio-700-evk \
+                mt8395-genio-1200-evk \
+                mt8395-radxa-nio-12l "
+@@ -106,6 +105,50 @@ check-devicetrees:
+     paths:
+       - artifacts
+ 
++.build-kselftest-tarball:
++  stage: build
++  cache:
++    when: on_success
++    key: $CI_COMMIT_REF_SLUG
++    paths:
++      - ccache
++  variables:
++    DEBIAN_FRONTEND: noninteractive
++    GIT_SUBMODULE_STRATEGY: normal
++    ARCH: amd64
++    DEFCONFIG: defconfig
++    CCACHE_BASEDIR: $CI_PROJECT_DIR
++    CCACHE_DIR: $CI_PROJECT_DIR/ccache
++  before_script:
++    - dpkg --add-architecture arm64
++    - apt update
++    - apt install -y devscripts
++                     build-essential
++                     crossbuild-essential-arm64
++                     bc
++                     bison
++                     ccache
++                     flex
++                     rsync
++                     kmod
++                     cpio
++                     libelf-dev
++                     libssl-dev
++                     libssl-dev:arm64
++    - mkdir artifacts
++    # Setup ccache
++    - export PATH="/usr/lib/ccache:$PATH"
++    - ccache -s
++  script:
++    - echo 'linaro,optee-tz' >> tools/testing/selftests/dt/compatible_ignore_list
++    - make -C tools/testing/selftests/ TARGETS="dt" gen_tar
++    - mv tools/testing/selftests/kselftest_install/kselftest-packages/kselftest.tar.gz artifacts/
++    - sed -i s,%%KSELFTEST_BUILD_JOB%%,${CI_JOB_ID},g lava/testjob.yaml
++  artifacts:
++    paths:
++      - artifacts
++      - lava/testjob.yaml
++
+ build-arm64-debian-package:
+   extends: .build-debian-package
+   variables:
+@@ -113,6 +156,12 @@ build-arm64-debian-package:
+     CROSS_COMPILE: aarch64-linux-gnu-
+     ADDITIONAL_BUILD_CMD: KBUILD_IMAGE=arch/arm64/boot/Image
+ 
++build-arm64-kselftest:
++  extends: .build-kselftest-tarball
++  variables:
++    ARCH: arm64
++    CROSS_COMPILE: aarch64-linux-gnu-
++
+ generate-tests:
+   image: debian:trixie-slim
+   stage: generate
+@@ -120,6 +169,7 @@ generate-tests:
+     - lightweight
+   dependencies:
+     - build-arm64-debian-package
++    - build-arm64-kselftest
+   before_script:
+     - apt update
+     - apt install -y zstd
+@@ -155,26 +205,355 @@ generate-tests:
+     reports:
+       junit: "*_junit.xml"
+ 
+-lava-test-genio-350:
+-  extends: .lava-test
++.genio-350:
+   variables:
+     DEVICE_TYPE: mt8365-genio-350-evk
+     DTB: mt8365-evk
++    GLMARK2_RENDERER: "Mali-G52 r1 (Panfrost)"
++    GLMARK2_MIN_SCORE: 100
+ 
+-lava-test-genio-510:
+-  extends: .lava-test
++.genio-510:
+   variables:
+     DEVICE_TYPE: mt8370-genio-510-evk
+     DTB: mt8370-genio-510-evk
++    GLMARK2_RENDERER: "Mali-G57 (Panfrost)"
++    GLMARK2_MIN_SCORE: 800
+ 
+-lava-test-genio-700:
+-  extends: .lava-test
++.genio-700:
+   variables:
+     DEVICE_TYPE: mt8390-genio-700-evk
+     DTB: mt8390-genio-700-evk
++    GLMARK2_RENDERER: "Mali-G57 (Panfrost)"
++    GLMARK2_MIN_SCORE: 800
+ 
+-lava-test-genio-1200:
+-  extends: .lava-test
++.genio-1200:
+   variables:
+     DEVICE_TYPE: mt8395-genio-1200-evk
+     DTB: mt8395-genio-1200-evk
++    GLMARK2_RENDERER: "Mali-G57 (Panfrost)"
++    GLMARK2_MIN_SCORE: 1100
++
++.lava-test-dmesg:
++  variables:
++    LAVA_TEST: dmesg
++    LAVA_TEST_DMESG: true
++    FS_VARIANT: minimal
++  allow_failure: true
++
++.lava-test-kselftest-dt:
++  variables:
++    LAVA_TEST: kselftest-dt
++    LAVA_TEST_KSELFTEST_DT: true
++    FS_VARIANT: minimal
++
++.lava-test-glmark2:
++  variables:
++    LAVA_TEST: glmark2
++    LAVA_TEST_GLMARK2: true
++    FS_VARIANT: weston
++
++.lava-test-watchdog:
++  variables:
++    LAVA_TEST: watchdog
++    LAVA_TEST_WATCHDOG: true
++    FS_VARIANT: minimal
++
++.lava-test-wifi:
++  variables:
++    LAVA_TEST: wifi
++    LAVA_TEST_WIFI: true
++    FS_VARIANT: minimal
++
++.lava-test-avvideocompare:
++  variables:
++    LAVA_TEST_AVVIDEOCOMPARE: true
++    FS_VARIANT: gnome
++
++.lava-test-avvideocompare-jpeg:
++  extends:
++    - .lava-test-avvideocompare
++  variables:
++    LAVA_TEST: avvideocompare jpeg
++    AVVIDEOCOMPARE_GST_PIPELINE1: "v4l2jpegenc ! v4l2jpegdec"
++    AVVIDEOCOMPARE_GST_PIPELINE2: "jpegenc ! jpegdec"
++    AVVIDEOCOMPARE_GST_VID_SRC_MEDIA_TYPE: "video/x-raw,framerate=30/1,width=1920,height=1080,format=NV12"
++    AVVIDEOCOMPARE_MIN_SCORE: 0.99
++
++.lava-test-avvideocompare-mdp:
++  extends:
++    - .lava-test-avvideocompare
++  variables:
++    LAVA_TEST: avvideocompare mdp
++    AVVIDEOCOMPARE_GST_PIPELINE1: "v4l2convert ! video/x-raw,format=UYVY"
++    AVVIDEOCOMPARE_GST_PIPELINE2: "videoconvert ! video/x-raw,format=UYVY"
++    AVVIDEOCOMPARE_GST_VID_SRC_MEDIA_TYPE: "video/x-raw,framerate=30/1,width=1920,height=1080,format=NV12"
++    AVVIDEOCOMPARE_MIN_SCORE: 0.999
++
++.lava-test-fluster:
++  variables:
++    FS_VARIANT: gnome
++    LAVA_TEST_FLUSTER: true
++
++.lava-test-fluster-vp8:
++  extends:
++    - .lava-test-fluster
++  variables:
++    LAVA_TEST: fluster vp8
++    TESTSUITE: 'VP8-TEST-VECTORS'
++    DECODERS: 'GStreamer-VP8-V4L2SL-Gst1.0'
++
++.lava-test-fluster-vp9:
++  extends:
++    - .lava-test-fluster
++  variables:
++    LAVA_TEST: fluster vp9
++    TESTSUITE: 'VP9-TEST-VECTORS'
++    DECODERS: 'GStreamer-VP9-V4L2SL-Gst1.0'
++
++.lava-test-fluster-h264:
++  extends:
++    - .lava-test-fluster
++  variables:
++    LAVA_TEST: fluster h264
++    TESTSUITE: 'JVT-AVC_V1'
++    DECODERS: 'GStreamer-H.264-V4L2SL-Gst1.0'
++
++.lava-test-fluster-h265:
++  extends:
++    - .lava-test-fluster
++  variables:
++    LAVA_TEST: fluster h265
++    TESTSUITE: 'JCT-VC-HEVC_V1'
++    DECODERS: 'GStreamer-H.265-V4L2SL-Gst1.0'
++
++.lava-test-fluster-av1:
++  extends:
++    - .lava-test-fluster
++  variables:
++    LAVA_TEST: fluster av1
++    TESTSUITE: 'AV1-TEST-VECTORS'
++    DECODERS: 'GStreamer-AV1-V4L2SL-Gst1.0'
++
++.lava-test-rtcwake:
++  variables:
++    LAVA_TEST: rtcwake
++    LAVA_TEST_RTCWAKE: true
++    FS_VARIANT: minimal
++
++lava-test-dmesg-genio-350:
++  extends:
++    - .lava-test
++    - .lava-test-dmesg
++    - .genio-350
++
++lava-test-dmesg-genio-510:
++  extends:
++    - .lava-test
++    - .lava-test-dmesg
++    - .genio-510
++
++lava-test-dmesg-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-dmesg
++    - .genio-700
++
++lava-test-dmesg-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-dmesg
++    - .genio-1200
++
++lava-test-kselftest-dt-genio-350:
++  extends:
++    - .lava-test
++    - .lava-test-kselftest-dt
++    - .genio-350
++
++lava-test-kselftest-dt-genio-510:
++  extends:
++    - .lava-test
++    - .lava-test-kselftest-dt
++    - .genio-510
++
++lava-test-kselftest-dt-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-kselftest-dt
++    - .genio-700
++
++lava-test-kselftest-dt-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-kselftest-dt
++    - .genio-1200
++
++lava-test-glmark2-genio-350:
++  extends:
++    - .lava-test
++    - .lava-test-glmark2
++    - .genio-350
++
++lava-test-glmark2-genio-510:
++  extends:
++    - .lava-test
++    - .lava-test-glmark2
++    - .genio-510
++
++lava-test-glmark2-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-glmark2
++    - .genio-700
++
++lava-test-glmark2-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-glmark2
++    - .genio-1200
++
++# TODO: Enable once codecs work on Genio 350
++.lava-test-fluster-vp8-genio-350:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-vp8
++    - .genio-350
++
++lava-test-fluster-vp8-genio-510:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-vp8
++    - .genio-510
++
++lava-test-fluster-vp8-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-vp8
++    - .genio-700
++
++lava-test-fluster-vp8-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-vp8
++    - .genio-1200
++
++lava-test-fluster-vp9-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-vp9
++    - .genio-700
++
++# TODO: Enable once h264 works on Genio 700
++.lava-test-fluster-h264-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-h264
++    - .genio-700
++
++lava-test-fluster-h264-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-h264
++    - .genio-1200
++
++lava-test-fluster-h265-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-h265
++    - .genio-700
++
++lava-test-fluster-av1-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-fluster-av1
++    - .genio-700
++
++lava-test-avvideocompare-jpeg-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-avvideocompare-jpeg
++    - .genio-700
++
++lava-test-avvideocompare-jpeg-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-avvideocompare-jpeg
++    - .genio-1200
++
++lava-test-avvideocompare-mdp-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-avvideocompare-mdp
++    - .genio-700
++
++lava-test-avvideocompare-mdp-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-avvideocompare-mdp
++    - .genio-1200
++
++lava-test-rtcwake-genio-350:
++  extends:
++    - .lava-test
++    - .lava-test-rtcwake
++    - .genio-350
++
++# TODO: enable once fixed
++.lava-test-rtcwake-genio-510:
++  extends:
++    - .lava-test
++    - .lava-test-rtcwake
++    - .genio-510
++
++# TODO: enable once fixed
++.lava-test-rtcwake-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-rtcwake
++    - .genio-700
++
++lava-test-rtcwake-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-rtcwake
++    - .genio-1200
++
++# TODO: enable once fixed
++.lava-test-watchdog-genio-350:
++  extends:
++    - .lava-test
++    - .lava-test-watchdog
++    - .genio-350
++
++lava-test-watchdog-genio-510:
++  extends:
++    - .lava-test
++    - .lava-test-watchdog
++    - .genio-510
++
++# TODO: enable once fixed
++.lava-test-watchdog-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-watchdog
++    - .genio-700
++
++# TODO: enable once fixed
++.lava-test-watchdog-genio-1200:
++  extends:
++    - .lava-test
++    - .lava-test-watchdog
++    - .genio-1200
++
++# TODO: enable once fixed
++.lava-test-wifi-genio-350:
++  extends:
++    - .lava-test
++    - .lava-test-wifi
++    - .genio-350
++
++lava-test-wifi-genio-700:
++  extends:
++    - .lava-test
++    - .lava-test-wifi
++    - .genio-700
+diff --git a/lava/testjob.yaml b/lava/testjob.yaml
+index 948eb8224f59..a03e12802a8e 100644
+--- a/lava/testjob.yaml
++++ b/lava/testjob.yaml
+@@ -1,6 +1,6 @@
+ device_type:  {{ job.DEVICE_TYPE }}
+ 
+-job_name: MediaTek AIoT tests {{job.CI_JOB_ID}}
++job_name: MediaTek AIoT {{ job.LAVA_TEST }} test {{job.CI_JOB_ID}}
+ timeouts:
+   job:
+     minutes: 15
+@@ -14,7 +14,10 @@ context:
+ actions:
+   - deploy:
+       timeout:
+-        minutes: 2
++        minutes: 5
++      timeouts:
++        http-download:
++          minutes: 5 {{! Workaround for http-download timeout divided by number of retries}}
+       to: tftp
+       kernel:
+         url: "{{job.CI_PROJECT_URL}}/-/jobs/%%KERNEL_BUILD_JOB%%/artifacts/raw/vmlinuz"
+@@ -25,10 +28,10 @@ actions:
+       dtb:
+         url: "{{job.CI_PROJECT_URL}}/-/jobs/%%KERNEL_BUILD_JOB%%/artifacts/raw/dtbs/mediatek/{{ job.DTB }}.dtb"
+       ramdisk:
+-        url: "https://gitlab.collabora.com/mediatek/aiot/debian-image-recipes/-/jobs/artifacts/main/raw/out/trixie-arm64-minimal-initramfs.cpio.zst?job=build-lava-debian-minimal-fs"
++        url: "https://gitlab.collabora.com/mediatek/aiot/debian-image-recipes/-/jobs/artifacts/main/raw/out/trixie-arm64-{{ job.FS_VARIANT }}-initramfs.cpio.zst?job=build-lava-debian-{{ job.FS_VARIANT }}-fs"
+         compression: zstd
+       nfsrootfs:
+-        url: "https://gitlab.collabora.com/mediatek/aiot/debian-image-recipes/-/jobs/artifacts/main/raw/out/trixie-arm64-minimal-rootfs.tar.zst?job=build-lava-debian-minimal-fs"
++        url: "https://gitlab.collabora.com/mediatek/aiot/debian-image-recipes/-/jobs/artifacts/main/raw/out/trixie-arm64-{{ job.FS_VARIANT }}-rootfs.tar.zst?job=build-lava-debian-{{ job.FS_VARIANT }}-fs"
+         compression: zstd
+ 
+   - boot:
+@@ -41,6 +44,234 @@ actions:
+         username: user
+         password_prompt: 'Password:'
+         password: user
++        login_commands:
++          - sudo su
++          - resolvectl dns end0 $(grep 'nameserver' /proc/net/pnp | cut -d' ' -f2)
++          - systemctl restart systemd-timesyncd
+       prompts:
+         - 'user@debian-trixie(.*)$'
+         - 'root@debian-trixie(.*)#'
++
++{{ #if job.LAVA_TEST_WATCHDOG }}
++  - test:
++      timeout:
++        minutes: 5
++      interactive:
++      - name: wdt-reset
++        prompts: ['root@debian-trixie(.*)#']
++        script:
++        - name: wdt-get-timeout
++          command: "wdt_timeout=$(cat /sys/class/watchdog/watchdog0/timeout)"
++          wait_for_prompt: true
++          failures:
++          - message: "cat: /sys/class/watchdog/watchdog\\d+/timeout: No such file or directory"
++            exception: JobError
++        - name: wdt-trigger-reset
++          command: "sleep $((wdt_timeout + 5)) > /dev/watchdog0"
++          wait_for_prompt: false
++          successes:
++          - message: U-Boot
++{{ /if }}
++{{ #if job.LAVA_TEST_DMESG }}
++  - test:
++      definitions:
++        - from: git
++          name: dmesg
++          path: dmesg/dmesg.yaml
++          repository: https://gitlab.collabora.com/hardware-enablement/common/lava-test-definitions.git
++          revision: main
++          parameters:
++            LEVELS: "crit,alert,emerg,err,warn"
++      timeout:
++        minutes: 10
++{{ /if }}
++{{ #if job.LAVA_TEST_KSELFTEST_DT }}
++  - test:
++      definitions:
++      - from: git
++        name: kselftest-dt
++        parameters:
++          ENV: ''
++          SKIPFILE: /dev/null
++          SKIP_INSTALL: true
++          TESTPROG_URL: "{{job.CI_PROJECT_URL}}/-/jobs/%%KSELFTEST_BUILD_JOB%%/artifacts/raw/artifacts/kselftest.tar.gz"
++          TST_CASENAME: ''
++          TST_CMDFILES: dt
++        path: automated/linux/kselftest/kselftest.yaml
++        repository: https://github.com/kernelci/test-definitions.git
++        revision: kernelci.org
++      timeout:
++        minutes: 10
++{{ /if }}
++{{ #if job.LAVA_TEST_GLMARK2 }}
++  - test:
++      definitions:
++        - from: git
++          name: glmark2
++          path: glmark2/glmark2.yaml
++          repository: https://gitlab.collabora.com/hardware-enablement/common/lava-test-definitions.git
++          revision: main
++          parameters:
++            RENDERER_STRING: {{ job.GLMARK2_RENDERER }}
++            MINIMUM_SCORE: {{ job.GLMARK2_MIN_SCORE }}
++      timeout:
++        minutes: 10
++{{ /if }}
++{{ #if job.LAVA_TEST_WIFI }}
++  - test:
++      definitions:
++        - from: git
++          name: wifi-basic
++          path: wifi-basic/wifi-basic.yaml
++          repository: https://gitlab.collabora.com/hardware-enablement/common/lava-test-definitions.git
++          revision: main
++      timeout:
++        minutes: 10
++{{ /if }}
++{{ #if job.LAVA_TEST_AVVIDEOCOMPARE }}
++  - test:
++      definitions:
++        - from: git
++          name: avvideocompare
++          path: avvideocompare/avvideocompare.yaml
++          repository: https://gitlab.collabora.com/hardware-enablement/common/lava-test-definitions.git
++          revision: main
++          parameters:
++            PIPELINE1: "{{{ job.AVVIDEOCOMPARE_GST_PIPELINE1 }}}"
++            PIPELINE2: "{{{ job.AVVIDEOCOMPARE_GST_PIPELINE2 }}}"
++            VID_SRC_MEDIA_TYPE: "{{{ job.AVVIDEOCOMPARE_GST_VID_SRC_MEDIA_TYPE }}}"
++            MIN_SCORE: "{{{ job.AVVIDEOCOMPARE_MIN_SCORE }}}"
++      timeout:
++        minutes: 10
++{{ /if }}
++{{ #if job.LAVA_TEST_RTCWAKE }}
++  - test:
++      definitions:
++      - from: git
++        name: rtcwake
++        path: rtcwake/rtcwake.yaml
++        repository: https://gitlab.collabora.com/hardware-enablement/common/lava-test-definitions.git
++        revision: main
++      timeout:
++        minutes: 10
++{{ /if }}
++{{ #if job.LAVA_TEST_FLUSTER }}
++  - test:
++      definitions:
++      - from: git
++        name: fluster
++        path: fluster/fluster.yaml
++        repository: https://gitlab.collabora.com/hardware-enablement/common/lava-test-definitions.git
++        revision: main
++        parameters:
++          TESTSUITE: {{ job.TESTSUITE }}
++          DECODERS: {{ job.DECODERS }}
++          SKIP_VECTORS: >
++            vp80-00-comprehensive-002
++            vp80-00-comprehensive-010
++            vp80-00-comprehensive-013
++            vp80-00-comprehensive-015
++
++            vp90-2-02-size-lf-1920x1080.webm
++            vp90-2-05-resize.ivf
++            vp90-2-08-tile-4x4.webm
++            vp90-2-14-resize-10frames-fp-tiles-8-4-2-1.webm
++            vp90-2-14-resize-fp-tiles-1-16.webm
++            vp90-2-14-resize-fp-tiles-1-2-4-8-16.webm
++            vp90-2-14-resize-fp-tiles-1-4.webm
++            vp90-2-14-resize-fp-tiles-16-1.webm
++            vp90-2-14-resize-fp-tiles-16-2.webm
++            vp90-2-14-resize-fp-tiles-16-4.webm
++            vp90-2-14-resize-fp-tiles-16-8-4-2-1.webm
++            vp90-2-14-resize-fp-tiles-16-8.webm
++            vp90-2-14-resize-fp-tiles-1-8.webm
++            vp90-2-14-resize-fp-tiles-2-16.webm
++            vp90-2-14-resize-fp-tiles-2-8.webm
++            vp90-2-14-resize-fp-tiles-4-16.webm
++            vp90-2-14-resize-fp-tiles-4-8.webm
++            vp90-2-14-resize-fp-tiles-8-16.webm
++            vp90-2-14-resize-fp-tiles-8-1.webm
++            vp90-2-14-resize-fp-tiles-8-2.webm
++            vp90-2-14-resize-fp-tiles-8-4.webm
++            vp90-2-15-segkey_adpq.webm
++            vp90-2-18-resize.ivf
++            vp90-2-21-resize_inter_1280x720_5_1-2.webm
++            vp90-2-21-resize_inter_1280x720_5_3-4.webm
++            vp90-2-21-resize_inter_1280x720_7_1-2.webm
++            vp90-2-21-resize_inter_1280x720_7_3-4.webm
++            vp90-2-21-resize_inter_1920x1080_5_1-2.webm
++            vp90-2-21-resize_inter_1920x1080_5_3-4.webm
++            vp90-2-21-resize_inter_1920x1080_7_1-2.webm
++            vp90-2-21-resize_inter_1920x1080_7_3-4.webm
++            vp90-2-21-resize_inter_320x180_5_1-2.webm
++            vp90-2-21-resize_inter_320x180_5_3-4.webm
++            vp90-2-21-resize_inter_320x180_7_1-2.webm
++            vp90-2-21-resize_inter_320x180_7_3-4.webm
++            vp90-2-21-resize_inter_320x240_5_1-2.webm
++            vp90-2-21-resize_inter_320x240_5_3-4.webm
++            vp90-2-21-resize_inter_320x240_7_1-2.webm
++            vp90-2-21-resize_inter_320x240_7_3-4.webm
++            vp90-2-21-resize_inter_640x360_5_1-2.webm
++            vp90-2-21-resize_inter_640x360_5_3-4.webm
++            vp90-2-21-resize_inter_640x360_7_1-2.webm
++            vp90-2-21-resize_inter_640x360_7_3-4.webm
++            vp90-2-21-resize_inter_640x480_5_1-2.webm
++            vp90-2-21-resize_inter_640x480_5_3-4.webm
++            vp90-2-21-resize_inter_640x480_7_1-2.webm
++            vp90-2-21-resize_inter_640x480_7_3-4.webm
++            vp90-2-22-svc_1280x720_3.ivf
++            vp91-2-04-yuv422.webm
++            vp91-2-04-yuv444.webm
++
++            cabac_mot_fld0_full
++            cabac_mot_picaff0_full
++            CABREF3_Sand_D
++            CAFI1_SVA_C
++            cama1_vtc_c
++            cama2_vtc_b
++            cama3_vtc_b
++            CAPA1_TOSHIBA_B
++            CAPAMA3_Sand_F
++            cavlc_mot_fld0_full_B
++            cavlc_mot_picaff0_full_B
++            CVFC1_Sony_C
++            CVFI1_Sony_D
++            CVFI1_SVA_C
++            CVFI2_Sony_H
++            CVFI2_SVA_C
++            CVMAPAQP3_Sony_E
++            CVMP_MOT_FLD_L30_B
++            CVMP_MOT_FRM_L31_B
++            CVNLFI1_Sony_C
++            CVNLFI2_Sony_H
++            CVPA1_TOSHIBA_B
++            FI1_Sony_E
++            FM1_BT_B
++            FM1_FT_E
++            FM2_SVA_C
++            MR3_TANDBERG_B
++            MR4_TANDBERG_C
++            MR5_TANDBERG_C
++            MR6_BT_B
++            MR7_BT_B
++            MR8_BT_B
++            MR9_BT_B
++            Sharp_MP_Field_1_B
++            Sharp_MP_Field_2_B
++            Sharp_MP_Field_3_B
++            Sharp_MP_PAFF_1r2
++            Sharp_MP_PAFF_2r
++            SP1_BT_A
++            sp2_bt_b
++
++            PICSIZE_A_Bossen_1
++            PICSIZE_B_Bossen_1
++            PICSIZE_C_Bossen_1
++            PICSIZE_D_Bossen_1
++            TSUNEQBD_A_MAIN10_Technicolor_2
++
++            av1-1-b8-23-film_grain-50
++            av1-1-b10-23-film_grain-50
++      timeout:
++        minutes: 10
++{{ /if }}
+-- 
+2.43.0
+

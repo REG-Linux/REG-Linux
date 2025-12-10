@@ -1,0 +1,101 @@
+From 9cc21c42c1f9e5b3ff5acb6ee4e5e782d016336d Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Wed, 12 Jun 2024 09:43:02 +0200
+Subject: [PATCH 39/79] scsi: ufs: ufs-mediatek: Remove useless
+ mediatek,ufs-support-va09 property
+
+Remove checking the mediatek,ufs-support-va09 property to decide
+whether to try to support the VA09 regulator handling and change
+the ufs_mtk_init_va09_pwr_ctrl() function to make it call
+devm_regulator_get_optional(): if the regulator is present, then
+we set the UFS_MTK_CAP_VA09_PWR_CTRL, effectively enabling the
+handling of the VA09 regulator based on that.
+
+Also, make sure to pass the return value of the call to
+devm_regulator_get_optional() to the probe function, so that
+if it returns a probe deferral, the appropriate action will be
+taken.
+
+While at it, remove the error print (disguised as info...) when
+the va09 regulator was not found.
+
+Fixes: ac8c2459091c ("scsi: ufs-mediatek: Decouple features from platform bindings")
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ drivers/ufs/host/ufs-mediatek.c | 34 +++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/ufs/host/ufs-mediatek.c b/drivers/ufs/host/ufs-mediatek.c
+index 758a393a9de1..d192f67aad68 100644
+--- a/drivers/ufs/host/ufs-mediatek.c
++++ b/drivers/ufs/host/ufs-mediatek.c
+@@ -655,27 +655,38 @@ static void ufs_mtk_init_boost_crypt(struct ufs_hba *hba)
+ 	return;
+ }
+ 
+-static void ufs_mtk_init_va09_pwr_ctrl(struct ufs_hba *hba)
++static int ufs_mtk_init_va09_pwr_ctrl(struct ufs_hba *hba)
+ {
+ 	struct ufs_mtk_host *host = ufshcd_get_variant(hba);
++	int ret;
+ 
+-	host->reg_va09 = regulator_get(hba->dev, "va09");
+-	if (IS_ERR(host->reg_va09))
+-		dev_info(hba->dev, "failed to get va09");
+-	else
+-		host->caps |= UFS_MTK_CAP_VA09_PWR_CTRL;
++	host->reg_va09 = devm_regulator_get_optional(hba->dev, "va09");
++	if (IS_ERR(host->reg_va09)) {
++		ret = PTR_ERR(host->reg_va09);
++
++		/* Return an error only if this is a deferral */
++		if (ret == -EPROBE_DEFER)
++			return ret;
++
++		return 0;
++	}
++
++	host->caps |= UFS_MTK_CAP_VA09_PWR_CTRL;
++	return 0;
+ }
+ 
+-static void ufs_mtk_init_host_caps(struct ufs_hba *hba)
++static int ufs_mtk_init_host_caps(struct ufs_hba *hba)
+ {
+ 	struct ufs_mtk_host *host = ufshcd_get_variant(hba);
+ 	struct device_node *np = hba->dev->of_node;
++	int ret;
+ 
+ 	if (of_property_read_bool(np, "mediatek,ufs-boost-crypt"))
+ 		ufs_mtk_init_boost_crypt(hba);
+ 
+-	if (of_property_read_bool(np, "mediatek,ufs-support-va09"))
+-		ufs_mtk_init_va09_pwr_ctrl(hba);
++	ret = ufs_mtk_init_va09_pwr_ctrl(hba);
++	if (ret)
++		return ret;
+ 
+ 	if (of_property_read_bool(np, "mediatek,ufs-disable-ah8"))
+ 		host->caps |= UFS_MTK_CAP_DISABLE_AH8;
+@@ -699,6 +710,7 @@ static void ufs_mtk_init_host_caps(struct ufs_hba *hba)
+ 		host->caps |= UFS_MTK_CAP_MCQ_BROKEN_RTC;
+ 
+ 	dev_info(hba->dev, "caps: 0x%x", host->caps);
++	return 0;
+ }
+ 
+ static void ufs_mtk_scale_perf(struct ufs_hba *hba, bool scale_up)
+@@ -1230,7 +1242,9 @@ static int ufs_mtk_init(struct ufs_hba *hba)
+ 	}
+ 
+ 	/* Initialize host capability */
+-	ufs_mtk_init_host_caps(hba);
++	err = ufs_mtk_init_host_caps(hba);
++	if (err)
++		goto out;
+ 
+ 	ufs_mtk_init_mcq_irq(hba);
+ 
+-- 
+2.43.0
+

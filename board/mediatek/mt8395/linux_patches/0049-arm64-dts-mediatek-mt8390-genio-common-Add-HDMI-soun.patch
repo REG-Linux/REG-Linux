@@ -1,0 +1,37 @@
+From a7d3c21ccc02d538ea0ee082dfbb474cd82af5ab Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Mon, 19 May 2025 17:30:02 +0200
+Subject: [PATCH 49/79] arm64: dts: mediatek: mt8390-genio-common: Add HDMI
+ sound output support
+
+Add in the sound node a new dai-link for ETDM3_OUT_BE to add the sound
+output support through the HDMI connector.
+
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+index 5fa1f5fbad18..2062506f6cc5 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+@@ -1344,6 +1344,15 @@ codec {
+ 			sound-dai = <&dmic_codec>;
+ 		};
+ 	};
++
++	dai-link-2 {
++		link-name = "ETDM3_OUT_BE";
++
++		codec {
++			sound-dai = <&hdmi 0>;
++		};
++	};
++
+ };
+ 
+ &spi2 {
+-- 
+2.43.0
+

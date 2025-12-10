@@ -1,0 +1,206 @@
+From 4a8039cdc82bf06dce5e2ec9d9631ebd8b84f741 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Thu, 16 Jan 2025 13:03:28 +0100
+Subject: [PATCH 47/79] arm64: dts: mediatek: mt8390-genio-common: Configure
+ and enable HDMI
+
+Add a node for the HDMI-A connector found on this board, then
+configure the display pipeline and enable the required DPI1
+interface, HDMI controller, its integrated DDC and the HDMI
+PHY to enable support for the HDMI output provided by this EVK.
+
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ .../dts/mediatek/mt8390-genio-common.dtsi     | 141 ++++++++++++++++++
+ 1 file changed, 141 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+index a2cdecd2b903..5fa1f5fbad18 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+@@ -55,6 +55,20 @@ dmic_codec: dmic-codec {
+ 		wakeup-delay-ms = <30>;
+ 	};
+ 
++	connector {
++		compatible = "hdmi-connector";
++		label = "hdmi";
++		type = "a";
++		ddc-i2c-bus = <&hdmi_ddc>;
++		hdmi-pwr-supply = <&hdmi_phy>;
++
++		port {
++			hdmi_connector_in: endpoint {
++				remote-endpoint = <&hdmi0_out>;
++			};
++		};
++	};
++
+ 	firmware {
+ 		optee {
+ 			compatible = "linaro,optee-tz";
+@@ -328,6 +342,18 @@ &dither0_out {
+ 	remote-endpoint = <&dsi0_in>;
+ };
+ 
++&dpi1 {
++	status = "okay";
++};
++
++&dpi1_in {
++	remote-endpoint = <&merge5_out>;
++};
++
++&dpi1_out {
++	remote-endpoint = <&hdmi0_in>;
++};
++
+ &gamma0_out {
+ 	remote-endpoint = <&postmask0_in>;
+ };
+@@ -337,6 +363,55 @@ &gpu {
+ 	status = "okay";
+ };
+ 
++&ethdr0 {
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			ethdr0_in: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&vdosys1_ep_ext>;
++			};
++		};
++
++		port@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			ethdr0_out: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&merge5_in>;
++			};
++		};
++	};
++};
++
++&hdmi {
++	pinctrl-names = "default";
++	pinctrl-0 = <&hdmi_pins>;
++	status = "okay";
++};
++
++&hdmi0_in {
++	remote-endpoint = <&dpi1_out>;
++};
++
++&hdmi0_out {
++	remote-endpoint = <&hdmi_connector_in>;
++};
++
++&hdmi_phy {
++	pinctrl-names = "default";
++	pinctrl-0 = <&hdmi_vreg_pins>;
++	status = "okay";
++};
++
+ &i2c0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&i2c0_pins>;
+@@ -475,6 +550,35 @@ &i2c6 {
+ 	status = "okay";
+ };
+ 
++&merge5 {
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			merge5_in: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&ethdr0_out>;
++			};
++		};
++
++		port@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			merge5_out: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&dpi1_in>;
++			};
++		};
++	};
++};
++
+ &mfg0 {
+ 	domain-supply = <&mt6359_vproc2_buck_reg>;
+ };
+@@ -727,6 +831,31 @@ pins-txd {
+ 		};
+ 	};
+ 
++	hdmi_vreg_pins: hdmi-vreg-pins {
++		pins-pwr {
++			pinmux = <PINMUX_GPIO50__FUNC_O_HDMITX20_PWR5V>;
++			bias-disable;
++		};
++	};
++
++	hdmi_pins: hdmi-pins {
++		pins-hotplug {
++			pinmux = <PINMUX_GPIO51__FUNC_I0_HDMITX20_HTPLG>;
++			bias-pull-down;
++		};
++
++		pins-cec {
++			pinmux = <PINMUX_GPIO52__FUNC_B1_HDMITX20_CEC>;
++			bias-disable;
++		};
++
++		pins-ddc {
++			pinmux = <PINMUX_GPIO53__FUNC_B1_HDMITX20_SCL>,
++				 <PINMUX_GPIO54__FUNC_B1_HDMITX20_SDA>;
++			drive-strength = <10>;
++		};
++	};
++
+ 	i2c0_pins: i2c0-pins {
+ 		pins {
+ 			pinmux = <PINMUX_GPIO56__FUNC_B1_SDA0>,
+@@ -1286,6 +1415,18 @@ connector {
+ 	};
+ };
+ 
++&vdosys1 {
++	port {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		vdosys1_ep_ext: endpoint@1 {
++			reg = <1>;
++			remote-endpoint = <&ethdr0_in>;
++		};
++	};
++};
++
+ &xhci0 {
+ 	status = "okay";
+ };
+-- 
+2.43.0
+
