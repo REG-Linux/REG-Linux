@@ -1,0 +1,36 @@
+From 2e242d1b41b7a33eea223e1716ddb24ce6326a98 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Tue, 20 May 2025 10:57:41 +0200
+Subject: [PATCH 48/79] arm64: dts: mediatek: mt8395-genio-1200-evk: Add HDMI
+ sound output support
+
+Add in the sound node a new dai-link for ETDM3_OUT_BE to add the sound
+output support through the HDMI TX connector.
+
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts b/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts
+index 6f2f4181e030..4c59bbe3d914 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts
+@@ -1193,6 +1193,14 @@ codec {
+ 			sound-dai = <&pmic 0>;
+ 		};
+ 	};
++
++	hdmi-dai-link {
++		link-name = "ETDM3_OUT_BE";
++
++		codec {
++			sound-dai = <&hdmi 0>;
++		};
++	};
+ };
+ 
+ &spi1 {
+-- 
+2.43.0
+

@@ -1,0 +1,128 @@
+From d7771bc4ae0eaffe865fad4164473e1bdee714fb Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Wed, 12 Jun 2024 09:43:04 +0200
+Subject: [PATCH 41/79] scsi: ufs: ufs-mediatek: Remove useless
+ mediatek,ufs-boost-crypt property
+
+There is no need to have a property that activates the inline crypto
+boost feature, as this needs many things: a regulator, three clocks,
+and the mediatek,boost-crypt-microvolt property to be set.
+
+If any one of these is missing, the feature won't be activated,
+hence, it is useless to have yet one more property to enable that.
+
+While at it, also address another two issues:
+1. Give back the return value to the caller and make sure to fail
+   probing if we get an -EPROBE_DEFER or -ENOMEM; and
+2. Free the ufs_mtk_crypt_cfg structure allocated in the crypto
+   boost function if said functionality could not be enabled because
+   it's not supported, as that'd be only wasted memory.
+
+Last but not least, move the devm_kzalloc() call for ufs_mtk_crypt_cfg
+to after getting the dvfsrc-vcore regulator and the boost microvolt
+property, as if those fail there's no reason to even allocate that.
+
+Fixes: ac8c2459091c ("scsi: ufs-mediatek: Decouple features from platform bindings")
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ drivers/ufs/host/ufs-mediatek.c | 55 ++++++++++++++++++---------------
+ 1 file changed, 30 insertions(+), 25 deletions(-)
+
+diff --git a/drivers/ufs/host/ufs-mediatek.c b/drivers/ufs/host/ufs-mediatek.c
+index 9f24c4b76839..623533d3d114 100644
+--- a/drivers/ufs/host/ufs-mediatek.c
++++ b/drivers/ufs/host/ufs-mediatek.c
+@@ -608,51 +608,55 @@ static int ufs_mtk_init_host_clk(struct ufs_hba *hba, const char *name,
+ 	return ret;
+ }
+ 
+-static void ufs_mtk_init_boost_crypt(struct ufs_hba *hba)
++static int ufs_mtk_init_boost_crypt(struct ufs_hba *hba)
+ {
+ 	struct ufs_mtk_host *host = ufshcd_get_variant(hba);
+ 	struct ufs_mtk_crypt_cfg *cfg;
+ 	struct device *dev = hba->dev;
+ 	struct regulator *reg;
+ 	u32 volt;
+-
+-	host->crypt = devm_kzalloc(dev, sizeof(*(host->crypt)),
+-				   GFP_KERNEL);
+-	if (!host->crypt)
+-		goto disable_caps;
++	int ret;
+ 
+ 	reg = devm_regulator_get_optional(dev, "dvfsrc-vcore");
+ 	if (IS_ERR(reg)) {
+-		dev_info(dev, "failed to get dvfsrc-vcore: %ld",
+-			 PTR_ERR(reg));
+-		goto disable_caps;
++		ret = PTR_ERR(reg);
++		if (ret == -EPROBE_DEFER)
++			return ret;
++
++		return 0;
+ 	}
+ 
+-	if (of_property_read_u32(dev->of_node, "mediatek,boost-crypt-microvolt",
+-				 &volt)) {
++	ret = of_property_read_u32(dev->of_node, "mediatek,boost-crypt-microvolt", &volt);
++	if (ret) {
+ 		dev_info(dev, "failed to get mediatek,boost-crypt-microvolt");
+-		goto disable_caps;
++		return 0;
+ 	}
+ 
++	host->crypt = devm_kzalloc(dev, sizeof(*host->crypt), GFP_KERNEL);
++	if (!host->crypt)
++		return -ENOMEM;
++
+ 	cfg = host->crypt;
+-	if (ufs_mtk_init_host_clk(hba, "crypt_mux",
+-				  &cfg->clk_crypt_mux))
+-		goto disable_caps;
++	ret = ufs_mtk_init_host_clk(hba, "crypt_mux", &cfg->clk_crypt_mux);
++	if (ret)
++		goto out;
+ 
+-	if (ufs_mtk_init_host_clk(hba, "crypt_lp",
+-				  &cfg->clk_crypt_lp))
+-		goto disable_caps;
++	ret = ufs_mtk_init_host_clk(hba, "crypt_lp", &cfg->clk_crypt_lp);
++	if (ret)
++		goto out;
+ 
+-	if (ufs_mtk_init_host_clk(hba, "crypt_perf",
+-				  &cfg->clk_crypt_perf))
+-		goto disable_caps;
++	ret = ufs_mtk_init_host_clk(hba, "crypt_perf", &cfg->clk_crypt_perf);
++	if (ret)
++		goto out;
+ 
+ 	cfg->reg_vcore = reg;
+ 	cfg->vcore_volt = volt;
+ 	host->caps |= UFS_MTK_CAP_BOOST_CRYPT_ENGINE;
+ 
+-disable_caps:
+-	return;
++out:
++	if (ret)
++		devm_kfree(dev, host->crypt);
++	return 0;
+ }
+ 
+ static int ufs_mtk_init_va09_pwr_ctrl(struct ufs_hba *hba)
+@@ -681,8 +685,9 @@ static int ufs_mtk_init_host_caps(struct ufs_hba *hba)
+ 	struct device_node *np = hba->dev->of_node;
+ 	int ret;
+ 
+-	if (of_property_read_bool(np, "mediatek,ufs-boost-crypt"))
+-		ufs_mtk_init_boost_crypt(hba);
++	ret = ufs_mtk_init_boost_crypt(hba);
++	if (ret)
++		return ret;
+ 
+ 	ret = ufs_mtk_init_va09_pwr_ctrl(hba);
+ 	if (ret)
+-- 
+2.43.0
+

@@ -1,0 +1,41 @@
+From 484d34022d74ab9e4b957f9af9cc3564c3e13317 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Wed, 12 Jun 2024 09:43:03 +0200
+Subject: [PATCH 40/79] scsi: ufs: ufs-mediatek: Fix property name for crypt
+ boost voltage
+
+Rename "boost-crypt-vcore-min" to "mediatek,boost-crypt-microvolt":
+this is a vendor specific property and needs the "mediatek," prefix,
+moreover, this is not defining a minimum voltage per-se;
+
+Even if technically a call to regulator_set_voltage() does indeed
+internally set a VMIN for a regulator, the API also supports other
+calls to set VMIN-VMAX constraints, so this "vcore-min"->"microvolt"
+rename is performed in order to avoid confusion, other than adding
+the "microvolt" suffix to it (as this does take microvolts!).
+
+Fixes: 590b0d2372fe ("scsi: ufs-mediatek: Support performance mode for inline encryption engine")
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ drivers/ufs/host/ufs-mediatek.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/ufs/host/ufs-mediatek.c b/drivers/ufs/host/ufs-mediatek.c
+index d192f67aad68..9f24c4b76839 100644
+--- a/drivers/ufs/host/ufs-mediatek.c
++++ b/drivers/ufs/host/ufs-mediatek.c
+@@ -628,9 +628,9 @@ static void ufs_mtk_init_boost_crypt(struct ufs_hba *hba)
+ 		goto disable_caps;
+ 	}
+ 
+-	if (of_property_read_u32(dev->of_node, "boost-crypt-vcore-min",
++	if (of_property_read_u32(dev->of_node, "mediatek,boost-crypt-microvolt",
+ 				 &volt)) {
+-		dev_info(dev, "failed to get boost-crypt-vcore-min");
++		dev_info(dev, "failed to get mediatek,boost-crypt-microvolt");
+ 		goto disable_caps;
+ 	}
+ 
+-- 
+2.43.0
+

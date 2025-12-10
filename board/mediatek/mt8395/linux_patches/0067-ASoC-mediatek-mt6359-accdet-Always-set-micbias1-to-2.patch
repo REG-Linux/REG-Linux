@@ -1,0 +1,82 @@
+From 8db266ba42940ec863675285bca75c97b8a3629b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:29 -0300
+Subject: [PATCH 67/79] ASoC: mediatek: mt6359-accdet: Always set micbias1 to
+ 2.8V
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The driver currently reads a mediatek,mic-vol property from DT to
+determine the micbias1 setting to configure in hardware. Since there are
+no current users of the property and the default value (2.8V) is known
+to work on multiple boards, remove the code handling this property and
+instead always configure the micbias1 to 2.8V. The property can be
+properly introduced in the binding in the future if it really turns out
+that different boards need different configurations.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 23 +++--------------------
+ sound/soc/codecs/mt6359-accdet.h |  1 -
+ 2 files changed, 3 insertions(+), 21 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index 83e65b6d5845..a31e084560c7 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -494,11 +494,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 	if (!node)
+ 		return -EINVAL;
+ 
+-	ret = of_property_read_u32(node, "mediatek,mic-vol",
+-				   &priv->data->mic_vol);
+-	if (ret)
+-		priv->data->mic_vol = 8;
+-
+ 	ret = of_property_read_u32(node, "mediatek,mic-mode",
+ 				   &priv->data->mic_mode);
+ 	if (ret)
+@@ -657,22 +652,10 @@ static void mt6359_accdet_init(struct mt6359_accdet *priv)
+ 		      ACCDET_RISE_DELAY));
+ 
+ 	regmap_read(priv->regmap, RG_AUDPWDBMICBIAS1_ADDR, &reg);
+-	if (priv->data->mic_vol <= 7) {
+-		/* micbias1 <= 2.7V */
+-		regmap_write(priv->regmap, RG_AUDPWDBMICBIAS1_ADDR,
+-			     reg | (priv->data->mic_vol << RG_AUDMICBIAS1VREF_SFT) |
+-			     RG_AUDMICBIAS1LOWPEN_MASK_SFT);
+-	} else if (priv->data->mic_vol == 8) {
+-		/* micbias1 = 2.8v */
+-		regmap_write(priv->regmap, RG_AUDPWDBMICBIAS1_ADDR,
+-			     reg | (3 << RG_AUDMICBIAS1HVEN_SFT) |
++	/* micbias1 = 2.8v */
++	regmap_write(priv->regmap, RG_AUDPWDBMICBIAS1_ADDR,
++		     reg | (3 << RG_AUDMICBIAS1HVEN_SFT) |
+ 			     RG_AUDMICBIAS1LOWPEN_MASK_SFT);
+-	} else if (priv->data->mic_vol == 9) {
+-		/* micbias1 = 2.85v */
+-		regmap_write(priv->regmap, RG_AUDPWDBMICBIAS1_ADDR,
+-			     reg | (1 << RG_AUDMICBIAS1HVEN_SFT) |
+-			     RG_AUDMICBIAS1LOWPEN_MASK_SFT);
+-	}
+ 	/* mic mode setting */
+ 	regmap_read(priv->regmap, RG_AUDACCDETMICBIAS0PULLLOW_ADDR, &reg);
+ 	if (priv->data->mic_mode == HEADSET_MODE_1) {
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index b34a46127446..e47a1f2b85f2 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -51,7 +51,6 @@ enum {
+ };
+ 
+ struct dts_data {
+-	unsigned int mic_vol;
+ 	unsigned int mic_mode;
+ 	bool hp_eint_high;
+ 	unsigned int eint_comp_vth;
+-- 
+2.43.0
+

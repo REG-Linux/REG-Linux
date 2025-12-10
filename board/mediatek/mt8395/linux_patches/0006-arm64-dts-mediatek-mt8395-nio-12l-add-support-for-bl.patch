@@ -1,0 +1,74 @@
+From 8c6280647912fc7c58146c7ecd5175a505cb27d9 Mon Sep 17 00:00:00 2001
+From: Julien Massot <julien.massot@collabora.com>
+Date: Fri, 5 Sep 2025 13:52:00 +0200
+Subject: [PATCH 06/79] arm64: dts: mediatek: mt8395-nio-12l: add support for
+ blue and red LEDs
+
+The Radxa NIO 12L board has an RGB LED, of which only red and blue
+are controllable.
+
+Red and blue LEDs: no need to choose, both are enabled.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Julien Massot <julien.massot@collabora.com>
+---
+ .../dts/mediatek/mt8395-radxa-nio-12l.dts     | 29 +++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts b/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
+index d32f973f5e05..2f2f92c5025d 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
+@@ -10,6 +10,7 @@
+ #include <dt-bindings/gpio/gpio.h>
+ #include <dt-bindings/input/input.h>
+ #include <dt-bindings/interrupt-controller/irq.h>
++#include <dt-bindings/leds/common.h>
+ #include <dt-bindings/pinctrl/mt8195-pinfunc.h>
+ #include <dt-bindings/regulator/mediatek,mt6360-regulator.h>
+ #include <dt-bindings/spmi/spmi.h>
+@@ -73,6 +74,26 @@ button-volume-up {
+ 		};
+ 	};
+ 
++	gpio-leds {
++		compatible = "gpio-leds";
++		pinctrl-0 = <&gpio_leds_pins>;
++		pinctrl-names = "default";
++
++		/*
++		 * This board has a RGB LED, of which only R and B
++		 * are controllable.
++		 */
++		led-0 {
++			color = <LED_COLOR_ID_BLUE>;
++			gpios = <&pio 6 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-1 {
++			color = <LED_COLOR_ID_RED>;
++			gpios = <&pio 7 GPIO_ACTIVE_HIGH>;
++		};
++	};
++
+ 	wifi_vreg: regulator-wifi-3v3-en {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "wifi_3v3_en";
+@@ -647,6 +668,14 @@ pins {
+ 		};
+ 	};
+ 
++	gpio_leds_pins: gpio-leds-pins {
++		pins {
++			pinmux = <PINMUX_GPIO6__FUNC_GPIO6>,
++				 <PINMUX_GPIO7__FUNC_GPIO7>;
++			output-low;
++		};
++	};
++
+ 	i2c2_pins: i2c2-pins {
+ 		pins-bus {
+ 			pinmux = <PINMUX_GPIO12__FUNC_SDA2>,
+-- 
+2.43.0
+

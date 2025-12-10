@@ -1,0 +1,35 @@
+From b1981b55fa8b416046f9bfba02bc9b18ea38dabb Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 15 Apr 2025 12:43:17 +0200
+Subject: [PATCH 12/79] drm/mediatek: mtk_hdmi_common: Assign DDC adapter
+ pointer to bridge
+
+In preparation for adding the new HDMI TX v2 IP driver, assign the
+pointer to the DDC adapter to struct drm_bridge during probe.
+
+This commit brings no functional changes.
+
+Reviewed-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi_common.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+index 989479fdfe40..3b589706d61b 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+@@ -412,7 +412,9 @@ struct mtk_hdmi *mtk_hdmi_common_probe(struct platform_device *pdev)
+ 	hdmi->bridge.of_node = pdev->dev.of_node;
+ 	hdmi->bridge.ops = DRM_BRIDGE_OP_DETECT | DRM_BRIDGE_OP_EDID
+ 			 | DRM_BRIDGE_OP_HPD;
++
+ 	hdmi->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
++	hdmi->bridge.ddc = hdmi->ddc_adpt;
+ 	hdmi->bridge.vendor = "MediaTek";
+ 	hdmi->bridge.product = "On-Chip HDMI";
+ 
+-- 
+2.43.0
+

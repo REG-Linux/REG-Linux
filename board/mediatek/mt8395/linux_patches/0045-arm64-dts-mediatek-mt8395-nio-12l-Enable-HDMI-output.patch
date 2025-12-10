@@ -1,0 +1,211 @@
+From a133622733a03b5bbfb864a532560934a01f48c7 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 19 Nov 2024 14:37:11 +0100
+Subject: [PATCH 45/79] arm64: dts: mediatek: mt8395-nio-12l: Enable HDMI
+ output
+
+Add a definition for the on-board HDMI connector, enable and add
+the relevant configuration for the HDMI PHY and controller, and
+define the pins used by those.
+
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ .../dts/mediatek/mt8395-radxa-nio-12l.dts     | 142 ++++++++++++++++++
+ 1 file changed, 142 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts b/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
+index 2f2f92c5025d..6e46280dc099 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8395-radxa-nio-12l.dts
+@@ -38,6 +38,20 @@ chosen {
+ 		stdout-path = "serial0:921600n8";
+ 	};
+ 
++	connector {
++		compatible = "hdmi-connector";
++		label = "hdmi";
++		type = "a";
++		ddc-i2c-bus = <&hdmitx_ddc>;
++		hdmi-pwr-supply = <&hdmi_phy>;
++
++		port {
++			hdmi_connector_in: endpoint {
++				remote-endpoint = <&hdmi0_out>;
++			};
++		};
++	};
++
+ 	firmware {
+ 		optee {
+ 			compatible = "linaro,optee-tz";
+@@ -266,6 +280,18 @@ port@1 {
+ 	};
+ };
+ 
++&dpi1 {
++	status = "okay";
++};
++
++&dpi1_in {
++	remote-endpoint = <&merge5_out>;
++};
++
++&dpi1_out {
++	remote-endpoint = <&hdmi0_in>;
++};
++
+ &eth {
+ 	phy-mode = "rgmii-rxid";
+ 	phy-handle = <&rgmii_phy>;
+@@ -286,11 +312,61 @@ rgmii_phy: ethernet-phy@1 {
+ 	};
+ };
+ 
++&ethdr0 {
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			ethdr0_in: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&vdosys1_ep_ext>;
++			};
++		};
++
++		port@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			ethdr0_out: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&merge5_in>;
++			};
++		};
++	};
++};
++
+ &gpu {
+ 	mali-supply = <&mt6315_7_vbuck1>;
+ 	status = "okay";
+ };
+ 
++&hdmi {
++	pinctrl-names = "default";
++	pinctrl-0 = <&hdmi_pins>;
++	status = "okay";
++};
++
++&hdmi0_in {
++	remote-endpoint = <&dpi1_out>;
++};
++
++&hdmi0_out {
++	remote-endpoint = <&hdmi_connector_in>;
++};
++
++&hdmi_phy {
++	pinctrl-names = "default";
++	pinctrl-0 = <&hdmi_vreg_pins>;
++
++	status = "okay";
++};
++
+ &i2c2 {
+ 	clock-frequency = <400000>;
+ 	pinctrl-0 = <&i2c2_pins>;
+@@ -469,6 +545,35 @@ typec_con_mux: endpoint {
+ 	};
+ };
+ 
++&merge5 {
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			merge5_in: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&ethdr0_out>;
++			};
++		};
++
++		port@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			merge5_out: endpoint@1 {
++				reg = <1>;
++				remote-endpoint = <&dpi1_in>;
++			};
++		};
++	};
++};
++
+ &mfg0 {
+ 	domain-supply = <&mt6315_7_vbuck1>;
+ };
+@@ -676,6 +781,31 @@ pins {
+ 		};
+ 	};
+ 
++	hdmi_vreg_pins: hdmi-vreg-pins {
++		pins-pwr {
++			pinmux = <PINMUX_GPIO31__FUNC_HDMITX20_PWR5V>;
++			bias-disable;
++		};
++	};
++
++	hdmi_pins: hdmi-pins {
++		pins-hotplug {
++			pinmux = <PINMUX_GPIO32__FUNC_HDMITX20_HTPLG>;
++			bias-pull-down;
++		};
++
++		pins-ddc {
++			pinmux = <PINMUX_GPIO34__FUNC_HDMITX20_SCL>,
++				 <PINMUX_GPIO35__FUNC_HDMITX20_SDA>;
++			drive-strength = <10>;
++		};
++
++		pins-cec {
++			pinmux = <PINMUX_GPIO33__FUNC_HDMITX20_CEC>;
++			bias-disable;
++		};
++	};
++
+ 	i2c2_pins: i2c2-pins {
+ 		pins-bus {
+ 			pinmux = <PINMUX_GPIO12__FUNC_SDA2>,
+@@ -1087,6 +1217,18 @@ &ssusb2 {
+ 	status = "okay";
+ };
+ 
++&vdosys1 {
++	port {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		vdosys1_ep_ext: endpoint@1 {
++			reg = <1>;
++			remote-endpoint = <&ethdr0_in>;
++		};
++	};
++};
++
+ &xhci0 {
+ 	vbus-supply = <&otg_vbus_regulator>;
+ 	status = "okay";
+-- 
+2.43.0
+

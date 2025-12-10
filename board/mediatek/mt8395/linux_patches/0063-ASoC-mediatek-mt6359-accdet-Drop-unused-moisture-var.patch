@@ -1,0 +1,41 @@
+From 48d2446b417fa9b13863cf785eeeb36fa13aa7fd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:25 -0300
+Subject: [PATCH 63/79] ASoC: mediatek: mt6359-accdet: Drop unused moisture
+ variables
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The dts_data struct contains several variables for moisture
+configuration that are simply never used. Drop them.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.h | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index afb36c2201b4..f0453b34cf20 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -74,14 +74,9 @@ struct dts_data {
+ 	unsigned int mic_mode;
+ 	bool hp_eint_high;
+ 	struct pwm_deb_settings *pwm_deb;
+-	unsigned int moisture_detect_enable;
+ 	unsigned int eint_detect_mode;
+ 	unsigned int eint_use_ext_res;
+ 	unsigned int eint_comp_vth;
+-	unsigned int moisture_detect_mode;
+-	unsigned int moisture_comp_vth;
+-	unsigned int moisture_comp_vref2;
+-	unsigned int moisture_use_ext_res;
+ };
+ 
+ struct mt6359_accdet {
+-- 
+2.43.0
+

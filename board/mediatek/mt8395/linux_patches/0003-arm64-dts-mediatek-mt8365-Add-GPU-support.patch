@@ -1,0 +1,89 @@
+From 32850548fd158f6a4fd37ee06610b51ae784abf9 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Tue, 21 Oct 2025 09:30:52 +0200
+Subject: [PATCH 03/79] arm64: dts: mediatek: mt8365: Add GPU support
+
+The Mediatek MT8365 SoC has an integrated Arm Mali G52 MC1 GPU
+(Bifrost).
+Add gpu, OPP table, and MFG clock driver nodes in mt8365.dtsi to support
+it using the Panfrost driver.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+(cherry picked from commit 499af66b8f421a1f1612ff84c81a47ca569654b8)
+---
+ arch/arm64/boot/dts/mediatek/mt8365.dtsi | 43 +++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8365.dtsi b/arch/arm64/boot/dts/mediatek/mt8365.dtsi
+index e6d2b3221a3b..a5ca3cda6ef3 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8365.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8365.dtsi
+@@ -267,6 +267,26 @@ clk26m: oscillator {
+ 		clock-output-names = "clk26m";
+ 	};
+ 
++	gpu_opp_table: opp-table-gpu {
++		compatible = "operating-points-v2";
++		opp-shared;
++
++		opp-450000000 {
++			opp-hz = /bits/ 64 <450000000>;
++			opp-microvolt = <650000>;
++		};
++
++		opp-560000000 {
++			opp-hz = /bits/ 64 <560000000>;
++			opp-microvolt = <700000>;
++		};
++
++		opp-800000000 {
++			opp-hz = /bits/ 64 <800000000>;
++			opp-microvolt = <800000>;
++		};
++	};
++
+ 	psci {
+ 		compatible = "arm,psci-1.0";
+ 		method = "smc";
+@@ -292,6 +312,27 @@ gic: interrupt-controller@c000000 {
+ 			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+ 		};
+ 
++		mfgcfg: syscon@13000000 {
++			compatible = "mediatek,mt8365-mfgcfg", "syscon";
++			reg = <0 0x13000000 0 0x1000>;
++			#clock-cells = <1>;
++		};
++
++		gpu: gpu@13040000 {
++			compatible = "mediatek,mt8365-mali", "arm,mali-bifrost";
++			reg = <0 0x13040000 0 0x4000>;
++
++			clocks = <&mfgcfg CLK_MFG_BG3D>;
++			interrupts = <GIC_SPI 203 IRQ_TYPE_LEVEL_LOW>,
++				     <GIC_SPI 202 IRQ_TYPE_LEVEL_LOW>,
++				     <GIC_SPI 201 IRQ_TYPE_LEVEL_LOW>,
++				     <GIC_SPI 204 IRQ_TYPE_LEVEL_LOW>;
++			interrupt-names = "job", "mmu", "gpu", "event";
++			operating-points-v2 = <&gpu_opp_table>;
++			power-domains = <&spm MT8365_POWER_DOMAIN_MFG>;
++			status = "disabled";
++		};
++
+ 		topckgen: syscon@10000000 {
+ 			compatible = "mediatek,mt8365-topckgen", "syscon";
+ 			reg = <0 0x10000000 0 0x1000>;
+@@ -398,7 +439,7 @@ power-domain@MT8365_POWER_DOMAIN_CONN {
+ 					mediatek,infracfg = <&infracfg>;
+ 				};
+ 
+-				power-domain@MT8365_POWER_DOMAIN_MFG {
++				mfg: power-domain@MT8365_POWER_DOMAIN_MFG {
+ 					reg = <MT8365_POWER_DOMAIN_MFG>;
+ 					clocks = <&topckgen CLK_TOP_MFG_SEL>;
+ 					clock-names = "mfg";
+-- 
+2.43.0
+

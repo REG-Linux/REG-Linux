@@ -1,0 +1,45 @@
+From c7cb1da6b3c5a6d6758522141c509c1d46accd12 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 15 Apr 2025 12:43:19 +0200
+Subject: [PATCH 14/79] drm/mediatek: mtk_hdmi_common: Add var to enable
+ interlaced modes
+
+Add an interlace_allowed bool member to struct mtk_hdmi_ver_conf
+which will be used to signal whether interlaced modes are supported
+by the bridge (in our case, the HDMI IP), and enable it for HDMIv2.
+
+Reviewed-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi_common.c | 1 +
+ drivers/gpu/drm/mediatek/mtk_hdmi_common.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+index be63f33d39bf..38986ab61795 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+@@ -421,6 +421,7 @@ struct mtk_hdmi *mtk_hdmi_common_probe(struct platform_device *pdev)
+ 	hdmi->bridge.ddc = hdmi->ddc_adpt;
+ 	hdmi->bridge.vendor = "MediaTek";
+ 	hdmi->bridge.product = "On-Chip HDMI";
++	hdmi->bridge.interlace_allowed = ver_conf->interlace_allowed;
+ 
+ 	ret = devm_drm_bridge_add(dev, &hdmi->bridge);
+ 	if (ret)
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_common.h b/drivers/gpu/drm/mediatek/mtk_hdmi_common.h
+index d3de8afff40f..38d1bdf4c77e 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_common.h
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_common.h
+@@ -131,6 +131,7 @@ struct mtk_hdmi_ver_conf {
+ 	const struct hdmi_codec_ops *codec_ops;
+ 	const char * const *mtk_hdmi_clock_names;
+ 	int num_clocks;
++	bool interlace_allowed;
+ };
+ 
+ struct mtk_hdmi_conf {
+-- 
+2.43.0
+

@@ -1,0 +1,53 @@
+From 7dc62515516933a18c0bdc7055f50806a3f273b3 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 4 Jun 2024 14:30:05 +0200
+Subject: [PATCH 28/79] dt-bindings: mfd: mediatek,mt6357: Describe Auxiliary
+ ADC subdev
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Describe the PMIC-integrated Auxiliary Analog to Digital Converter
+subdevice node.
+Full description is available in the mediatek,mt6359-auxadc.yaml
+binding relative to that hardware.
+
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+[nfraprado: Rebased and droped unused label]
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+(cherry picked from commit 003721fbba2e1b5d5935a5b1b5529f83e7a3e794)
+---
+ .../devicetree/bindings/mfd/mediatek,mt6357.yaml       | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/mfd/mediatek,mt6357.yaml b/Documentation/devicetree/bindings/mfd/mediatek,mt6357.yaml
+index b67fbe0e7a63..9e1251dd5d21 100644
+--- a/Documentation/devicetree/bindings/mfd/mediatek,mt6357.yaml
++++ b/Documentation/devicetree/bindings/mfd/mediatek,mt6357.yaml
+@@ -37,6 +37,11 @@ properties:
+   "#interrupt-cells":
+     const: 2
+ 
++  adc:
++    type: object
++    $ref: /schemas/iio/adc/mediatek,mt6359-auxadc.yaml
++    unevaluatedProperties: false
++
+   mediatek,hp-pull-down:
+     description:
+       Earphone driver positive output stage short to
+@@ -104,6 +109,11 @@ examples:
+             mediatek,micbias0-microvolt = <1700000>;
+             mediatek,micbias1-microvolt = <1700000>;
+ 
++            adc {
++                compatible = "mediatek,mt6357-auxadc";
++                #io-channel-cells = <1>;
++            };
++
+             regulators {
+                 mt6357_vproc_reg: buck-vproc {
+                     regulator-name = "vproc";
+-- 
+2.43.0
+

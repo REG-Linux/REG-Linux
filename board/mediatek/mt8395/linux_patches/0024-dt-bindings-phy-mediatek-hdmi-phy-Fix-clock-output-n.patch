@@ -1,0 +1,73 @@
+From ef8898ee32ba24465e219c41e43c0209646666e8 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Thu, 24 Jul 2025 10:38:51 +0200
+Subject: [PATCH 24/79] dt-bindings: phy: mediatek,hdmi-phy: Fix clock output
+ names for MT8195
+
+For all of the HDMI PHYs compatible with the one found on MT8195
+the output clock has a different datasheet name and specifically
+it is called "hdmi_txpll", differently from the older HDMI PHYs
+which output block is called "hdmitx_dig_cts".
+
+Add a conditional to allow the new clock output name on all of the
+HDMI PHY IPs that are perfectly compatible with MT8195.
+
+Fixes: c78fe548b062 ("dt-bindings: phy: mediatek: hdmi-phy: Add mt8195 compatible")
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ .../bindings/phy/mediatek,hdmi-phy.yaml       | 25 ++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml b/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
+index f3a8b0b745d1..f1207aea8605 100644
+--- a/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
++++ b/Documentation/devicetree/bindings/phy/mediatek,hdmi-phy.yaml
+@@ -26,6 +26,10 @@ properties:
+           - enum:
+               - mediatek,mt7623-hdmi-phy
+           - const: mediatek,mt2701-hdmi-phy
++      - items:
++          - enum:
++              - mediatek,mt8188-hdmi-phy
++          - const: mediatek,mt8195-hdmi-phy
+       - const: mediatek,mt2701-hdmi-phy
+       - const: mediatek,mt8173-hdmi-phy
+       - const: mediatek,mt8195-hdmi-phy
+@@ -41,9 +45,7 @@ properties:
+     items:
+       - const: pll_ref
+ 
+-  clock-output-names:
+-    items:
+-      - const: hdmitx_dig_cts
++  clock-output-names: true
+ 
+   "#phy-cells":
+     const: 0
+@@ -76,6 +78,23 @@ required:
+   - "#phy-cells"
+   - "#clock-cells"
+ 
++if:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - mediatek,mt8195-hdmi-phy
++then:
++  properties:
++    clock-output-names:
++      items:
++        - const: hdmi_txpll
++else:
++  properties:
++    clock-output-names:
++      items:
++        - const: hdmitx_dig_cts
++
+ additionalProperties: false
+ 
+ examples:
+-- 
+2.43.0
+

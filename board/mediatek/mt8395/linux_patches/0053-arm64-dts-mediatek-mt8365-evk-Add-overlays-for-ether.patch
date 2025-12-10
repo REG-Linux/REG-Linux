@@ -1,0 +1,110 @@
+From 1a5dd97f0f2b19e235b225d105e8110ceee50497 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Tue, 15 Apr 2025 13:46:00 +0200
+Subject: [PATCH 53/79] arm64: dts: mediatek: mt8365-evk : Add overlays for
+ ethernet or hdmi support
+
+On the Mediatek Genio 350-EVK board, Ethernet and HDMI (DPI0) are
+sharing pins, and only one functionality can be selected at a time with
+a DIP switch. In the board devicetree, this leads to have dpi0 and
+ethernet nodes disabled by default.
+
+Add overlay files for the mt8365-evk.dts DT so an user can easily
+select a configuration where the Ethernet or HDMI output are enabled
+without modifying or rebuilding device tree.
+
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ arch/arm64/boot/dts/mediatek/Makefile         |  3 +++
+ .../boot/dts/mediatek/mt8365-evk-eth.dtso     | 26 +++++++++++++++++++
+ .../boot/dts/mediatek/mt8365-evk-hdmi.dtso    | 26 +++++++++++++++++++
+ 3 files changed, 55 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/mediatek/mt8365-evk-eth.dtso
+ create mode 100644 arch/arm64/boot/dts/mediatek/mt8365-evk-hdmi.dtso
+
+diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
+index a4df4c21399e..521b1b3402d8 100644
+--- a/arch/arm64/boot/dts/mediatek/Makefile
++++ b/arch/arm64/boot/dts/mediatek/Makefile
+@@ -98,6 +98,8 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8195-cherry-tomato-r3.dtb
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8195-demo.dtb
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8195-evb.dtb
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8365-evk.dtb
++dtb-$(CONFIG_ARCH_MEDIATEK) += mt8365-evk-eth.dtbo
++dtb-$(CONFIG_ARCH_MEDIATEK) += mt8365-evk-hdmi.dtbo
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8370-genio-510-evk.dtb
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8395-genio-1200-evk.dtb
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8390-genio-700-evk.dtb
+@@ -111,4 +113,5 @@ DTC_FLAGS_mt7986a-bananapi-bpi-r3 := -@
+ DTC_FLAGS_mt7986a-bananapi-bpi-r3-mini := -@
+ DTC_FLAGS_mt7988a-bananapi-bpi-r4 := -@
+ DTC_FLAGS_mt7988a-bananapi-bpi-r4-2g5 := -@
++DTC_FLAGS_mt8365-evk := -@
+ DTC_FLAGS_mt8395-radxa-nio-12l := -@
+diff --git a/arch/arm64/boot/dts/mediatek/mt8365-evk-eth.dtso b/arch/arm64/boot/dts/mediatek/mt8365-evk-eth.dtso
+new file mode 100644
+index 000000000000..19a77639d20a
+--- /dev/null
++++ b/arch/arm64/boot/dts/mediatek/mt8365-evk-eth.dtso
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Mediatek Genio 350-EVK Ethernet overlay
++ * Copyright (C) 2025 Collabora Ltd.
++ */
++
++/dts-v1/;
++/plugin/;
++
++/*
++ * Ethernet and HDMI (DPI0) are sharing pins.
++ * Only one can be enabled at a time and require the physical switch
++ * SW2101 to be set on LAN position
++ */
++
++&ethernet {
++    status = "okay";
++};
++
++&dpi0 {
++    status = "disabled";
++};
++
++&it66121_hdmi {
++    status = "disabled";
++};
+diff --git a/arch/arm64/boot/dts/mediatek/mt8365-evk-hdmi.dtso b/arch/arm64/boot/dts/mediatek/mt8365-evk-hdmi.dtso
+new file mode 100644
+index 000000000000..a876c3290345
+--- /dev/null
++++ b/arch/arm64/boot/dts/mediatek/mt8365-evk-hdmi.dtso
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Mediatek Genio 350-EVK HDMI overlay
++ * Copyright (C) 2025 Collabora Ltd.
++ */
++
++/dts-v1/;
++/plugin/;
++
++/*
++ * Ethernet and HDMI (DPI0) are sharing pins.
++ * Only one can be enabled at a time and require the physical switch
++ * SW2101 to be set on HDMI position
++ */
++
++&ethernet {
++    status = "disabled";
++};
++
++&dpi0 {
++    status = "okay";
++};
++
++&it66121_hdmi {
++    status = "okay";
++};
+-- 
+2.43.0
+

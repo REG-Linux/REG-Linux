@@ -1,0 +1,48 @@
+From f8cd062e560807cfaf3e0946bf806bd8a92caa90 Mon Sep 17 00:00:00 2001
+From: Julien Massot <julien.massot@collabora.com>
+Date: Wed, 14 May 2025 10:19:56 +0200
+Subject: [PATCH 30/79] dt-bindings: mfd: mediatek: mt6397: Add
+ #sound-dai-cells property
+
+The 'mt6359.dtsi' file already uses the '#sound-dai-cells' property.
+Add the corresponding property to the binding to fix the following
+dtb-check error:
+
+mediatek/mt8395-radxa-nio-12l.dtb: pmic: '#sound-dai-cells', 'mt6359rtc' do not match any of the regexes: 'pinctrl-[0-9]+'
+from schema $id: http://devicetree.org/schemas/mfd/mediatek,mt6397.yaml#
+
+Fixes: 9bc8353be720 ("arm64: dts: mt6359: Add #sound-dai-cells property")
+Signed-off-by: Julien Massot <julien.massot@collabora.com>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+(cherry picked from commit 82342402646b6454404453a2efa02c8fcce7484f)
+---
+ Documentation/devicetree/bindings/mfd/mediatek,mt6397.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/mfd/mediatek,mt6397.yaml b/Documentation/devicetree/bindings/mfd/mediatek,mt6397.yaml
+index 6a89b479d10f..9580c4ec1ae0 100644
+--- a/Documentation/devicetree/bindings/mfd/mediatek,mt6397.yaml
++++ b/Documentation/devicetree/bindings/mfd/mediatek,mt6397.yaml
+@@ -30,6 +30,9 @@ description: |
+   See the following for pwrap node definitions:
+   Documentation/devicetree/bindings/soc/mediatek/mediatek,pwrap.yaml
+ 
++allOf:
++  - $ref: /schemas/sound/dai-common.yaml#
++
+ properties:
+   compatible:
+     oneOf:
+@@ -53,6 +56,9 @@ properties:
+   "#interrupt-cells":
+     const: 2
+ 
++  '#sound-dai-cells':
++    const: 1
++
+   rtc:
+     type: object
+     $ref: /schemas/rtc/rtc.yaml#
+-- 
+2.43.0
+

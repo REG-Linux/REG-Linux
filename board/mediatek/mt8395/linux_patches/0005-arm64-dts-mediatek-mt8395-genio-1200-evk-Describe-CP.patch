@@ -1,0 +1,71 @@
+From 2522704a67a75fb800a09aed34ae2c58d2c6e833 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Tue, 13 May 2025 11:59:53 -0400
+Subject: [PATCH 05/79] arm64: dts: mediatek: mt8395-genio-1200-evk: Describe
+ CPU supplies
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The Genio 1200 EVK board has the big and little CPU clusters fed by the
+same regulators as MT8195-Cherry boards, so describe them in the same
+way as commit 17b33dd9e4a3 ("arm64: dts: mediatek: cherry: Describe CPU
+supplies").
+
+This prevents the system from hanging during boot in the case that the
+cpufreq-mediatek-hw driver tries to probe before the drivers for the
+regulators have probed (which happens when using the current defconfig).
+
+Fixes: f2b543a191b6 ("arm64: dts: mediatek: add device-tree for Genio 1200 EVK board")
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ .../dts/mediatek/mt8395-genio-1200-evk.dts    | 32 +++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts b/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts
+index cf8cd37f5708..5c504d36f723 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8395-genio-1200-evk.dts
+@@ -201,6 +201,38 @@ &afe {
+ 	status = "okay";
+ };
+ 
++&cpu0 {
++	cpu-supply = <&mt6359_vcore_buck_reg>;
++};
++
++&cpu1 {
++	cpu-supply = <&mt6359_vcore_buck_reg>;
++};
++
++&cpu2 {
++	cpu-supply = <&mt6359_vcore_buck_reg>;
++};
++
++&cpu3 {
++	cpu-supply = <&mt6359_vcore_buck_reg>;
++};
++
++&cpu4 {
++	cpu-supply = <&mt6315_6_vbuck1>;
++};
++
++&cpu5 {
++	cpu-supply = <&mt6315_6_vbuck1>;
++};
++
++&cpu6 {
++	cpu-supply = <&mt6315_6_vbuck1>;
++};
++
++&cpu7 {
++	cpu-supply = <&mt6315_6_vbuck1>;
++};
++
+ &disp_pwm0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&disp_pwm0_pins>;
+-- 
+2.43.0
+

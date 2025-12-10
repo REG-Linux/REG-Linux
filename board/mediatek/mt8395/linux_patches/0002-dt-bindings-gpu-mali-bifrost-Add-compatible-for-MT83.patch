@@ -1,0 +1,34 @@
+From a29ea811c26df00389a0c33545781fd2e2a33378 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Tue, 21 Oct 2025 09:30:51 +0200
+Subject: [PATCH 02/79] dt-bindings: gpu: mali-bifrost: Add compatible for
+ MT8365 SoC
+
+Add a compatible for the MediaTek MT8365 SoC, that has an integrated
+ARM Mali G52 MC1 GPU and compatible with arm,mali-bifrost.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Link: https://patch.msgid.link/20251021-mt8365-enable-gpu-v2-1-17e05cff2c86@collabora.com
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+(cherry picked from commit e0788bbe943dcbe2ef0497df05ce93ad95122163)
+---
+ Documentation/devicetree/bindings/gpu/arm,mali-bifrost.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/gpu/arm,mali-bifrost.yaml b/Documentation/devicetree/bindings/gpu/arm,mali-bifrost.yaml
+index be198182dbfe..db49b8ff8c74 100644
+--- a/Documentation/devicetree/bindings/gpu/arm,mali-bifrost.yaml
++++ b/Documentation/devicetree/bindings/gpu/arm,mali-bifrost.yaml
+@@ -22,6 +22,7 @@ properties:
+               - mediatek,mt8183-mali
+               - mediatek,mt8183b-mali
+               - mediatek,mt8186-mali
++              - mediatek,mt8365-mali
+               - realtek,rtd1619-mali
+               - renesas,r9a07g044-mali
+               - renesas,r9a07g054-mali
+-- 
+2.43.0
+

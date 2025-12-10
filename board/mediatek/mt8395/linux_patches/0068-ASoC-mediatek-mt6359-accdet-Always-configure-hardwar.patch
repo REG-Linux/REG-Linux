@@ -1,0 +1,114 @@
+From d9dbc3986c1d76df5431100ea7c622d67d4671ac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:30 -0300
+Subject: [PATCH 68/79] ASoC: mediatek: mt6359-accdet: Always configure
+ hardware as mic-mode 2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The driver currently reads a mediatek,mic-mode property from DT to
+determine certain register configurations. Since there are no current
+users of the property, the property doesn't directly reflect the
+hardware  and the default value (2) is known to work on
+multiple boards, remove the code handling this property and instead
+always configure the hardware according to the known to work default.
+This property can be properly introduced in the binding in the future
+if it really turns out that different boards need different
+configurations.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 43 +++++---------------------------
+ sound/soc/codecs/mt6359-accdet.h |  5 ----
+ 2 files changed, 6 insertions(+), 42 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index a31e084560c7..12697b02faff 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -494,11 +494,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 	if (!node)
+ 		return -EINVAL;
+ 
+-	ret = of_property_read_u32(node, "mediatek,mic-mode",
+-				   &priv->data->mic_mode);
+-	if (ret)
+-		priv->data->mic_mode = 2;
+-
+ 	priv->data->hp_eint_high = of_property_read_bool(node, "mediatek,hp-eint-high");
+ 
+ 	ret = of_property_read_u32(node, "mediatek,eint-num", &tmp);
+@@ -658,38 +653,12 @@ static void mt6359_accdet_init(struct mt6359_accdet *priv)
+ 			     RG_AUDMICBIAS1LOWPEN_MASK_SFT);
+ 	/* mic mode setting */
+ 	regmap_read(priv->regmap, RG_AUDACCDETMICBIAS0PULLLOW_ADDR, &reg);
+-	if (priv->data->mic_mode == HEADSET_MODE_1) {
+-		/* ACC mode*/
+-		regmap_write(priv->regmap, RG_AUDACCDETMICBIAS0PULLLOW_ADDR,
+-			     reg | RG_ACCDET_MODE_ANA11_MODE1);
+-		/* enable analog fast discharge */
+-		regmap_update_bits(priv->regmap, RG_ANALOGFDEN_ADDR,
+-				   RG_ANALOGFDEN_MASK_SFT,
+-				   BIT(RG_ANALOGFDEN_SFT));
+-		regmap_update_bits(priv->regmap, RG_ACCDETSPARE_ADDR,
+-				   0x3 << 11, 0x3 << 11);
+-	} else if (priv->data->mic_mode == HEADSET_MODE_2) {
+-		/* DCC mode Low cost mode without internal bias */
+-		regmap_write(priv->regmap, RG_AUDACCDETMICBIAS0PULLLOW_ADDR,
+-			     reg | RG_ACCDET_MODE_ANA11_MODE2);
+-		/* enable analog fast discharge */
+-		regmap_update_bits(priv->regmap, RG_ANALOGFDEN_ADDR,
+-				   0x3 << RG_ANALOGFDEN_SFT,
+-				   0x3 << RG_ANALOGFDEN_SFT);
+-	} else if (priv->data->mic_mode == HEADSET_MODE_6) {
+-		/* DCC mode Low cost mode with internal bias,
+-		 * bit8 = 1 to use internal bias
+-		 */
+-		regmap_write(priv->regmap, RG_AUDACCDETMICBIAS0PULLLOW_ADDR,
+-			     reg | RG_ACCDET_MODE_ANA11_MODE6);
+-		regmap_update_bits(priv->regmap, RG_AUDPWDBMICBIAS1_ADDR,
+-				   RG_AUDMICBIAS1DCSW1PEN_MASK_SFT,
+-				   BIT(RG_AUDMICBIAS1DCSW1PEN_SFT));
+-		/* enable analog fast discharge */
+-		regmap_update_bits(priv->regmap, RG_ANALOGFDEN_ADDR,
+-				   0x3 << RG_ANALOGFDEN_SFT,
+-				   0x3 << RG_ANALOGFDEN_SFT);
+-	}
++	/* DCC mode Low cost mode without internal bias */
++	regmap_write(priv->regmap, RG_AUDACCDETMICBIAS0PULLLOW_ADDR,
++		     reg | RG_ACCDET_MODE_ANA11_MODE2);
++	/* enable analog fast discharge */
++	regmap_update_bits(priv->regmap, RG_ANALOGFDEN_ADDR,
++			   0x3 << RG_ANALOGFDEN_SFT, 0x3 << RG_ANALOGFDEN_SFT);
+ 
+ 	config_eint_init_by_mode(priv);
+ 	config_digital_init_by_mode(priv);
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index e47a1f2b85f2..5076533d46cc 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -12,10 +12,6 @@
+ 
+ #define ACCDET_DEVNAME "accdet"
+ 
+-#define HEADSET_MODE_1		(1)
+-#define HEADSET_MODE_2		(2)
+-#define HEADSET_MODE_6		(6)
+-
+ #define MT6359_ACCDET_NUM_BUTTONS 4
+ #define MT6359_ACCDET_JACK_MASK (SND_JACK_HEADPHONE | \
+ 				SND_JACK_HEADSET | \
+@@ -51,7 +47,6 @@ enum {
+ };
+ 
+ struct dts_data {
+-	unsigned int mic_mode;
+ 	bool hp_eint_high;
+ 	unsigned int eint_comp_vth;
+ };
+-- 
+2.43.0
+
