@@ -1,5 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.systemFiles import CONF, SAVES, HOME
+from configgen.controllers import generate_sdl_controller_config
 from os import path, makedirs, environ
 from sys import exit
 from shutil import copy2
@@ -8,8 +10,6 @@ from subprocess import check_output, CalledProcessError
 from toml import load, dump
 from glob import glob
 from re import sub, search, IGNORECASE
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES, HOME
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)

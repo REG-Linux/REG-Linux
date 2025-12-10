@@ -1,15 +1,14 @@
-from generators.Generator import Generator
-from Command import Command
-from systemFiles import ROMS
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.systemFiles import ROMS
+from configgen.controllers import generate_sdl_controller_config
 from os import chdir
-from controllers import generate_sdl_controller_config
-
-JAZZ2_ROMS_DIR = ROMS + "/jazz2"
-JAZZ2_BIN_PATH = "/usr/bin/jazz2"
-
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)
+
+JAZZ2_ROMS_DIR = ROMS + "/jazz2"
+JAZZ2_BIN_PATH = "/usr/bin/jazz2"
 
 
 class Jazz2Generator(Generator):

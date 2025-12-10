@@ -1,9 +1,12 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 from glob import glob
-from controllers import generate_sdl_controller_config
+from utils.logger import get_logger
 
 SH_BIN_PATH = "/bin/bash"
+
+eslog = get_logger(__name__)
 
 
 class ShGenerator(Generator):
