@@ -11,150 +11,150 @@ eslog = get_logger(__name__)
 
 class AmiberryGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # setting up amiberry config file
         setAmiberryConfig(system)
 
-        romType = self.getRomType(rom)
-        if romType != "UNKNOWN":
-            commandArray = [AMIBERRY_BIN_PATH, "-G"]
-            if romType != "WHDL":
-                commandArray.append("--model")
-                commandArray.append(system.config["core"])
+        rom_type = self.get_rom_type(rom)
+        if rom_type != "UNKNOWN":
+            command_array = [AMIBERRY_BIN_PATH, "-G"]
+            if rom_type != "WHDL":
+                command_array.append("--model")
+                command_array.append(system.config["core"])
 
-            if romType == "WHDL":
-                commandArray.append("--autoload")
-                commandArray.append(rom)
-            elif romType == "HDF":
-                commandArray.append("-s")
-                commandArray.append("hardfile2=rw,DH0:" + rom + ",32,1,2,512,0,,uae0")
-                commandArray.append("-s")
-                commandArray.append("uaehf0=hdf,rw,DH0:" + rom + ",32,1,2,512,0,,uae0")
-            elif romType == "CD":
-                commandArray.append("--cdimage")
-                commandArray.append(rom)
-            elif romType == "DISK":
+            if rom_type == "WHDL":
+                command_array.append("--autoload")
+                command_array.append(rom)
+            elif rom_type == "HDF":
+                command_array.append("-s")
+                command_array.append("hardfile2=rw,DH0:" + rom + ",32,1,2,512,0,,uae0")
+                command_array.append("-s")
+                command_array.append("uaehf0=hdf,rw,DH0:" + rom + ",32,1,2,512,0,,uae0")
+            elif rom_type == "CD":
+                command_array.append("--cdimage")
+                command_array.append(rom)
+            elif rom_type == "DISK":
                 # floppies
                 n = 0
-                for img in self.floppiesFromRom(rom):
+                for img in self.floppies_from_rom(rom):
                     if n < 4:
-                        commandArray.append("-" + str(n))
-                        commandArray.append(img)
+                        command_array.append("-" + str(n))
+                        command_array.append(img)
                     n += 1
                 # floppy path
-                commandArray.append("-s")
+                command_array.append("-s")
                 # Use disk folder as floppy path
-                romPathIndex = rom.rfind("/")
-                commandArray.append("amiberry.floppy_path=" + rom[0:romPathIndex])
+                rom_path_index = rom.rfind("/")
+                command_array.append("amiberry.floppy_path=" + rom[0:rom_path_index])
 
             # fps
             if system.config["showFPS"] == "true":
-                commandArray.append("-s")
-                commandArray.append("show_leds=true")
+                command_array.append("-s")
+                command_array.append("show_leds=true")
 
             # disable port 2 (otherwise, the joystick goes on it)
-            commandArray.append("-s")
-            commandArray.append("joyport2=")
+            command_array.append("-s")
+            command_array.append("joyport2=")
 
             # remove interlace artifacts
             if (
                 system.isOptSet("amiberry_flickerfixer")
                 and system.config["amiberry_flickerfixer"] == "true"
             ):
-                commandArray.append("-s")
-                commandArray.append("gfx_flickerfixer=true")
+                command_array.append("-s")
+                command_array.append("gfx_flickerfixer=true")
             else:
-                commandArray.append("-s")
-                commandArray.append("gfx_flickerfixer=false")
+                command_array.append("-s")
+                command_array.append("gfx_flickerfixer=false")
 
             # auto height
             if (
                 system.isOptSet("amiberry_auto_height")
                 and system.config["amiberry_auto_height"] == "true"
             ):
-                commandArray.append("-s")
-                commandArray.append("amiberry.gfx_auto_height=true")
+                command_array.append("-s")
+                command_array.append("amiberry.gfx_auto_height=true")
             else:
-                commandArray.append("-s")
-                commandArray.append("amiberry.gfx_auto_height=false")
+                command_array.append("-s")
+                command_array.append("amiberry.gfx_auto_height=false")
 
             # line mode
             if system.isOptSet("amiberry_linemode"):
                 if system.config["amiberry_linemode"] == "none":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_linemode=none")
+                    command_array.append("-s")
+                    command_array.append("gfx_linemode=none")
                 elif system.config["amiberry_linemode"] == "scanlines":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_linemode=scanlines")
+                    command_array.append("-s")
+                    command_array.append("gfx_linemode=scanlines")
                 elif system.config["amiberry_linemode"] == "double":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_linemode=double")
+                    command_array.append("-s")
+                    command_array.append("gfx_linemode=double")
             else:
-                commandArray.append("-s")
-                commandArray.append("gfx_linemode=double")
+                command_array.append("-s")
+                command_array.append("gfx_linemode=double")
 
             # video resolution
             if system.isOptSet("amiberry_resolution"):
                 if system.config["amiberry_resolution"] == "lores":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_resolution=lores")
+                    command_array.append("-s")
+                    command_array.append("gfx_resolution=lores")
                 elif system.config["amiberry_resolution"] == "superhires":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_resolution=superhires")
+                    command_array.append("-s")
+                    command_array.append("gfx_resolution=superhires")
                 elif system.config["amiberry_resolution"] == "hires":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_resolution=hires")
+                    command_array.append("-s")
+                    command_array.append("gfx_resolution=hires")
             else:
-                commandArray.append("-s")
-                commandArray.append("gfx_resolution=hires")
+                command_array.append("-s")
+                command_array.append("gfx_resolution=hires")
 
             # Scaling method
             if system.isOptSet("amiberry_scalingmethod"):
                 if system.config["amiberry_scalingmethod"] == "automatic":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_lores_mode=false")
-                    commandArray.append("-s")
-                    commandArray.append("amiberry.scaling_method=-1")
+                    command_array.append("-s")
+                    command_array.append("gfx_lores_mode=false")
+                    command_array.append("-s")
+                    command_array.append("amiberry.scaling_method=-1")
                 elif system.config["amiberry_scalingmethod"] == "smooth":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_lores_mode=true")
-                    commandArray.append("-s")
-                    commandArray.append("amiberry.scaling_method=1")
+                    command_array.append("-s")
+                    command_array.append("gfx_lores_mode=true")
+                    command_array.append("-s")
+                    command_array.append("amiberry.scaling_method=1")
                 elif system.config["amiberry_scalingmethod"] == "pixelated":
-                    commandArray.append("-s")
-                    commandArray.append("gfx_lores_mode=true")
-                    commandArray.append("-s")
-                    commandArray.append("amiberry.scaling_method=0")
+                    command_array.append("-s")
+                    command_array.append("gfx_lores_mode=true")
+                    command_array.append("-s")
+                    command_array.append("amiberry.scaling_method=0")
             else:
-                commandArray.append("-s")
-                commandArray.append("gfx_lores_mode=false")
-                commandArray.append("-s")
-                commandArray.append("amiberry.scaling_method=-1")
+                command_array.append("-s")
+                command_array.append("gfx_lores_mode=false")
+                command_array.append("-s")
+                command_array.append("amiberry.scaling_method=-1")
 
             # display vertical centering
-            commandArray.append("-s")
-            commandArray.append("gfx_center_vertical=smart")
+            command_array.append("-s")
+            command_array.append("gfx_center_vertical=smart")
 
             # fix sound buffer and frequency
-            commandArray.append("-s")
-            commandArray.append("sound_max_buff=4096")
-            commandArray.append("-s")
-            commandArray.append("sound_frequency=48000")
+            command_array.append("-s")
+            command_array.append("sound_max_buff=4096")
+            command_array.append("-s")
+            command_array.append("sound_frequency=48000")
 
             return Command(
-                array=commandArray,
+                array=command_array,
                 env={
                     "XDG_DATA_HOME": "/userdata/system/configs/",
                     "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                        playersControllers
+                        players_controllers
                     ),
                 },
             )
         # otherwise, unknown format
         return Command(array=[])
 
-    def floppiesFromRom(self, rom):
+    def floppies_from_rom(self, rom):
         floppies = []
         eslog.debug(f"Looking for floppy images for ROM: {rom}")
 
@@ -192,8 +192,8 @@ class AmiberryGenerator(Generator):
         elif indexDisk != -1:
             # Several disks
             floppies.append(rom)
-            prefix = filepath[0:indexDisk + 6]
-            postfix = filepath[indexDisk + 7:]
+            prefix = filepath[0 : indexDisk + 6]
+            postfix = filepath[indexDisk + 7 :]
             n = 2
             while True:
                 fullfilepath = prefix + str(n) + postfix + fileext
@@ -211,7 +211,7 @@ class AmiberryGenerator(Generator):
         eslog.debug(f"Total floppy images found: {len(floppies)}")
         return floppies
 
-    def getRomType(self, filepath):
+    def get_rom_type(self, filepath):
         eslog.debug(f"Determining ROM type for: {filepath}")
         extension = path.splitext(filepath)[1][1:].lower()
 
@@ -235,7 +235,9 @@ class AmiberryGenerator(Generator):
                     for zipfilename in zip_file.namelist():
                         if zipfilename.find("/") == -1:  # at the root
                             extension = path.splitext(zipfilename)[1][1:]
-                            eslog.debug(f"File in ZIP: {zipfilename}, extension: {extension}")
+                            eslog.debug(
+                                f"File in ZIP: {zipfilename}, extension: {extension}"
+                            )
                             if extension == "info":
                                 eslog.debug("ROM type: WHDL (found .info file)")
                                 return "WHDL"

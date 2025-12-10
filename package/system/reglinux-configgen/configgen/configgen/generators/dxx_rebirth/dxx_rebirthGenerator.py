@@ -18,7 +18,7 @@ class DXX_RebirthGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         directory = path.dirname(rom)
         dxx_rebirth = ""
@@ -46,9 +46,9 @@ class DXX_RebirthGenerator(Generator):
             for i, line in enumerate(lines):
                 # set resolution
                 if line.startswith("ResolutionX="):
-                    lines[i] = f"ResolutionX={gameResolution['width']}\n"
+                    lines[i] = f"ResolutionX={game_resolution['width']}\n"
                 elif line.startswith("ResolutionY="):
-                    lines[i] = f"ResolutionY={gameResolution['height']}\n"
+                    lines[i] = f"ResolutionY={game_resolution['height']}\n"
                 # fullscreen
                 if line.startswith("WindowMode="):
                     lines[i] = "WindowMode=0\n"
@@ -87,21 +87,21 @@ class DXX_RebirthGenerator(Generator):
         else:
             # File doesn't exist, create it with some default values
             with open(rebirthConfigFile, "w") as file:
-                file.write(f"ResolutionX={gameResolution['width']}\n")
-                file.write(f"ResolutionY={gameResolution['height']}\n")
+                file.write(f"ResolutionX={game_resolution['width']}\n")
+                file.write(f"ResolutionY={game_resolution['height']}\n")
                 file.write("WindowMode=0\n")
                 file.write("VSync=0\n")
                 file.write("TexFilt=0\n")
                 file.write("TexAnisotropy=0\n")
                 file.write("Multisample=0\n")
 
-        commandArray = [dxx_rebirth, "-hogdir", directory]
+        command_array = [dxx_rebirth, "-hogdir", directory]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
     # Show mouse for menu / play actions
     def getMouseMode(self, config, rom):
         return True
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

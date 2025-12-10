@@ -18,7 +18,7 @@ from .cannonballConfig import (
 
 class CannonballGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(path.dirname(CANNONBALL_CONFIG_PATH)):
             makedirs(path.dirname(CANNONBALL_CONFIG_PATH))
@@ -44,13 +44,13 @@ class CannonballGenerator(Generator):
         cannonballXml.close()
 
         # command line
-        commandArray = [CANNONBALL_BIN_PATH]
+        command_array = [CANNONBALL_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

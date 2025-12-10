@@ -15,7 +15,7 @@ from .drasticConfig import (
 
 class DrasticGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create the config directory if it doesn't exist
         if not path.exists(DRASTIC_CONFIG_DIR_USER):
@@ -27,12 +27,12 @@ class DrasticGenerator(Generator):
         drasticConfig.close()
 
         chdir(DRASTIC_CONFIG_DIR_USER)
-        commandArray = [DRASTIC_BIN_PATH, rom]
+        command_array = [DRASTIC_BIN_PATH, rom]
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

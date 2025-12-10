@@ -32,7 +32,7 @@ class CemuGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # in case of squashfs/zar, the root directory is passed
         rpxrom = rom
@@ -80,15 +80,15 @@ class CemuGenerator(Generator):
         xml.write(dom_string)
 
         # Set-up the controllers
-        setControllerConfig(system, playersControllers, CEMU_PROFILES_DIR)
+        setControllerConfig(system, players_controllers, CEMU_PROFILES_DIR)
 
-        commandArray = [CEMU_BIN_PATH, "-f", "--force-no-menubar", "-g", rpxrom]
+        command_array = [CEMU_BIN_PATH, "-f", "--force-no-menubar", "-g", rpxrom]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

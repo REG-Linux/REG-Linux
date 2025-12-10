@@ -3,19 +3,29 @@ import subprocess
 from json import load
 from configgen.settings import UnixSettings
 from os import path, makedirs, remove, listdir, unlink, symlink
-from configgen.controllers import getDevicesInformation, gunsBordersSizeName, getGamesMetaData
+from configgen.controllers import (
+    getDevicesInformation,
+    guns_borders_size_name,
+    getGamesMetaData,
+)
 from configgen.utils.videoMode import supportSystemRotation, getAltDecoration
 from xml.etree.ElementTree import parse
 from .libretroOptions import generateCoreSettings, generateHatariConf
 from .libretroMAMEConfig import generateMAMEConfigs
-from configgen.systemFiles import CONF, CONF_INIT, SAVES, ES_SETTINGS, OVERLAY_CONFIG_FILE
+from configgen.systemFiles import (
+    CONF,
+    CONF_INIT,
+    SAVES,
+    ES_SETTINGS,
+    OVERLAY_CONFIG_FILE,
+)
 from configgen.utils.bezels import (
     gunsBorderSize,
     createTransparentBezel,
     getBezelInfos,
     fast_image_size,
     padImage,
-    gunBordersSize,
+    gun_borders_size,
     gunBorderImage,
     gunsBordersColorFomConfig,
     tatooImage,
@@ -1533,7 +1543,7 @@ def createLibretroConfig(
             rom,
             gameResolution,
             system,
-            gunsBordersSizeName(guns, system.config),
+            guns_borders_size_name(guns, system.config),
         )
     except Exception as e:
         # error with bezels, disabling them
@@ -1545,7 +1555,7 @@ def createLibretroConfig(
             rom,
             gameResolution,
             system,
-            gunsBordersSizeName(guns, system.config),
+            guns_borders_size_name(guns, system.config),
         )
         eslog.error(f"Error with bezel {bezel}: {e}")
 
@@ -1745,7 +1755,7 @@ def writeBezelConfig(
     rom,
     gameResolution,
     system,
-    gunsBordersSize,
+    guns_borders_size,
 ):
     # disable the overlay
     # if all steps are passed, enable them
@@ -1765,7 +1775,7 @@ def writeBezelConfig(
     eslog.debug("libretro bezel: {}".format(bezel))
 
     # create a fake bezel if guns need it
-    if bezel is None and gunsBordersSize is not None:
+    if bezel is None and guns_borders_size is not None:
         eslog.debug("guns need border")
         gunBezelFile = "/tmp/bezel_gun_black.png"
         gunBezelInfoFile = "/tmp/bezel_gun_black.info"
@@ -1851,7 +1861,7 @@ def writeBezelConfig(
                 bezelNeedAdaptation = False
             else:
                 if (
-                    gameRatio < 1.6 and gunsBordersSize is None
+                    gameRatio < 1.6 and guns_borders_size is None
                 ):  # let's use bezels only for 16:10, 5:3, 16:9 and wider aspect ratios ; don't skip if gun borders are needed
                     return
                 else:
@@ -1869,7 +1879,7 @@ def writeBezelConfig(
     else:
         # when there is no information about width and height in the .info, assume that the tv is HD 16/9 and infos are core provided
         if (
-            gameRatio < 1.6 and gunsBordersSize is None
+            gameRatio < 1.6 and guns_borders_size is None
         ):  # let's use bezels only for 16:10, 5:3, 16:9 and wider aspect ratios ; don't skip if gun borders are needed
             return
         else:
@@ -2054,15 +2064,15 @@ def writeBezelConfig(
             tatooImage(overlay_png_file, tattoo_output_png, system)
             overlay_png_file = tattoo_output_png
 
-    if gunsBordersSize is not None:
+    if guns_borders_size is not None:
         eslog.debug("Draw gun borders")
         output_png_file = "/tmp/bezel_gunborders.png"
-        innerSize, outerSize = gunBordersSize(gunsBordersSize)
+        inner_size, outer_size = gun_borders_size(guns_borders_size)
         borderSize = gunBorderImage(
             overlay_png_file,
             output_png_file,
-            innerSize,
-            outerSize,
+            inner_size,
+            outer_size,
             gunsBordersColorFomConfig(system.config),
         )
         overlay_png_file = output_png_file

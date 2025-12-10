@@ -15,17 +15,17 @@ class ViceGenerator(Generator):
     # Main entry of the module
     # Return command
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         setViceConfig(system, metadata, guns)
-        setViceControllers(system, playersControllers)
+        setViceControllers(system, players_controllers)
 
-        commandArray = [VICE_BIN_DIR + system.config["core"], rom]
+        command_array = [VICE_BIN_DIR + system.config["core"], rom]
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

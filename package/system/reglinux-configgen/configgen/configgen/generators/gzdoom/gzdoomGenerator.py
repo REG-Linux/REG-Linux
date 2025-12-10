@@ -17,11 +17,11 @@ class GZDoomGenerator(Generator):
     def requiresWayland(self):
         return True
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # check directories exist
         if not path.exists(GZDOOM_CONFIG_DIR):
@@ -49,9 +49,9 @@ class GZDoomGenerator(Generator):
                     "-exec",
                     GZDOOM_SCRIPT_PATH,
                     "-width",
-                    str(gameResolution["width"]),
+                    str(game_resolution["width"]),
                     "-height",
-                    str(gameResolution["height"]),
+                    str(game_resolution["height"]),
                     "-nologo" if system.getOptBoolean("nologo") else "",
                 ]
             )
@@ -64,9 +64,9 @@ class GZDoomGenerator(Generator):
                     "-exec",
                     GZDOOM_SCRIPT_PATH,
                     "-width",
-                    str(gameResolution["width"]),
+                    str(game_resolution["width"]),
                     "-height",
-                    str(gameResolution["height"]),
+                    str(game_resolution["height"]),
                     "-nologo" if system.getOptBoolean("nologo") else "",
                 ]
             )

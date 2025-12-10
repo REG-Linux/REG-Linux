@@ -13,7 +13,7 @@ from .bigpemuConfig import (
 
 class BigPEmuGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create the directory if it doesn't exist
         if not path.exists(BIGPEMU_CONFIG_DIR):
@@ -23,17 +23,17 @@ class BigPEmuGenerator(Generator):
         bigpemuConfig = JSONSettings(BIGPEMU_CONFIG_PATH)
 
         # Update configuration
-        setBigemuConfig(bigpemuConfig, system, gameResolution, playersControllers)
+        setBigemuConfig(bigpemuConfig, system, game_resolution, players_controllers)
 
         # Save the updated configuration
         bigpemuConfig.write()
 
-        commandArray = [BIGPEMU_BIN_PATH, rom]
+        command_array = [BIGPEMU_BIN_PATH, rom]
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

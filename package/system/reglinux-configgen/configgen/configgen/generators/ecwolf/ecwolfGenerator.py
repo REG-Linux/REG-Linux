@@ -16,10 +16,10 @@ ECWOLF_BIN_PATH = "/usr/bin/ecwolf"
 
 class ECWolfGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         ecwolfSaves = ECWOLF_SAVES_DIR + path.basename(rom)
-        commandArray = [ECWOLF_BIN_PATH]  # Binary for command array
+        command_array = [ECWOLF_BIN_PATH]  # Binary for command array
 
         # Create config folders
         if not path.isdir(ECWOLF_CONFIG_DIR):
@@ -46,32 +46,32 @@ class ECWolfGenerator(Generator):
             if fextension == ".ecwolf":
                 try:
                     with open(rom, "r", encoding="utf-8") as f:
-                        commandArray += f.readline().split()
+                        command_array += f.readline().split()
                 except (IOError, IndexError) as e:
                     eslog.error(f"Error reading .ecwolf file {rom}: {e}")
                     # Ensure we handle the case where the file might be empty or inaccessible
                     pass
 
                 # If 1. parameter isn't an argument then assume it's a path
-                if not "--" in commandArray[1]:
+                if not "--" in command_array[1]:
                     try:
-                        chdir(commandArray[1])
+                        chdir(command_array[1])
                     except Exception as e:
                         eslog.error(
-                            f"Error: couldn't go into directory {commandArray[1]} ({e})"
+                            f"Error: couldn't go into directory {command_array[1]} ({e})"
                         )
-                    commandArray.pop(1)
+                    command_array.pop(1)
 
             if fextension == ".pk3":
-                commandArray += ["--file", path.basename(rom)]
+                command_array += ["--file", path.basename(rom)]
 
-        commandArray += ["--savedir", ecwolfSaves]
+        command_array += ["--savedir", ecwolfSaves]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

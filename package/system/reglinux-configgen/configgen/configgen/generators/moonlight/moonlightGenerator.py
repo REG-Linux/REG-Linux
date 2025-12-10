@@ -5,6 +5,7 @@ from shutil import copy
 from configgen.systemFiles import CONF
 from configgen.settings import UnixSettings
 from configgen.controllers import generate_sdl_controller_config
+from configgen.utils.logger import get_logger
 from .moonlightConfig import (
     setMoonlightConfig,
     MOONLIGHT_BIN_PATH,
@@ -14,6 +15,8 @@ from .moonlightConfig import (
     MOONLIGHT_CONFIG_PATH,
 )
 
+eslog = get_logger(__name__)
+
 
 class MoonlightGenerator(Generator):
     def getResolutionMode(self, config):
@@ -22,7 +25,7 @@ class MoonlightGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(MOONLIGHT_CONFIG_DIR + "/staging"):
             makedirs(MOONLIGHT_CONFIG_DIR + "/staging")
@@ -40,18 +43,18 @@ class MoonlightGenerator(Generator):
         # Save the config file
         moonlightConfig.write()
 
-        gameName, confFile = self.getRealGameNameAndConfigFile(rom)
-        commandArray = [MOONLIGHT_BIN_PATH, "stream", "-config", confFile]
-        commandArray.append("-app")
-        commandArray.append(gameName)
-        commandArray.append("-debug")
+        game_name, confFile = self.getRealGameNameAndConfigFile(rom)
+        command_array = [MOONLIGHT_BIN_PATH, "stream", "-config", confFile]
+        command_array.append("-app")
+        command_array.append(game_name)
+        command_array.append("-debug")
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "XDG_DATA_DIRS": CONF,
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 ),
             },
         )

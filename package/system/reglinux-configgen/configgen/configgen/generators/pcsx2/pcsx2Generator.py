@@ -28,7 +28,7 @@ class Pcsx2Generator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Remove older config files if present
         inisDir = path.join(PCSX2_CONFIG_DIR, "inis")
@@ -44,15 +44,15 @@ class Pcsx2Generator(Generator):
         # FIXME Config files
         setPcsx2Reg()
         setPcsx2Config(
-            system, rom, playersControllers, metadata, guns, wheels, playingWithWheel
+            system, rom, players_controllers, metadata, guns, wheels, playingWithWheel
         )
         configureAudio()
 
         # write our own game_controller_db.txt file before launching the game
         dbfile = PCSX2_CONFIG_DIR + "/game_controller_db.txt"
-        write_sdl_db_all_controllers(playersControllers, dbfile)
+        write_sdl_db_all_controllers(players_controllers, dbfile)
 
-        commandArray = (
+        command_array = (
             [PCSX2_BIN_PATH] if rom == "config" else [PCSX2_BIN_PATH, "-nogui", rom]
         )
 
@@ -68,4 +68,4 @@ class Pcsx2Generator(Generator):
         if not path.exists(PCSX2_PATCHES_PATH):
             copy(PCSX2_SOURCE_PATH, PCSX2_PATCHES_PATH)
 
-        return Command(array=commandArray)
+        return Command(array=command_array)

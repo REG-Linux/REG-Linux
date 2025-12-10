@@ -8,7 +8,7 @@ from configgen.controllers import generate_sdl_controller_config
 
 class ETLegacyGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         etLegacyDir = "/userdata/roms/etlegacy/legacy"
         etLegacyFile = "/legacy_2.83-dirty.pk3"
@@ -30,8 +30,8 @@ class ETLegacyGenerator(Generator):
             "seta r_fullscreen": "1",
             "seta r_allowResize": "0",
             "seta r_centerWindow": "1",
-            "seta r_customheight": f'"{gameResolution["height"]}"',
-            "seta r_customwidth": f'"{gameResolution["width"]}"',
+            "seta r_customheight": f'"{game_resolution["height"]}"',
+            "seta r_customwidth": f'"{game_resolution["width"]}"',
         }
 
         # Set language
@@ -79,13 +79,13 @@ class ETLegacyGenerator(Generator):
             if source_version > destination_version:
                 copy(etLegacySource, etLegacyDest)
 
-        commandArray = ["etl"]
+        command_array = ["etl"]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
@@ -94,5 +94,5 @@ class ETLegacyGenerator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

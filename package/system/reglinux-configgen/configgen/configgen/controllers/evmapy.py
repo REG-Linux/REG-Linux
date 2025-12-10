@@ -33,7 +33,7 @@ class Evmapy:
     __started = False
 
     @staticmethod
-    def start(system, emulator, core, rom, playersControllers, guns):
+    def start(system, emulator, core, rom, players_controllers, guns):
         """
         Start the evmapy process with the given configuration.
 
@@ -42,13 +42,13 @@ class Evmapy:
             emulator (str): The emulator being used
             core (str): The emulator core being used
             rom (str): Path to the ROM file or directory
-            playersControllers (dict): Dictionary mapping player numbers to controller objects
+            players_controllers (dict): Dictionary mapping player numbers to controller objects
             guns (dict): Dictionary of light gun configurations
 
         Returns:
             None
         """
-        if Evmapy.__prepare(system, emulator, core, rom, playersControllers, guns):
+        if Evmapy.__prepare(system, emulator, core, rom, players_controllers, guns):
             Evmapy.__started = True
             call(["system-evmapy", "start"])
 
@@ -65,7 +65,7 @@ class Evmapy:
             call(["system-evmapy", "stop"])
 
     @staticmethod
-    def __prepare(system, emulator, core, rom, playersControllers, guns):
+    def __prepare(system, emulator, core, rom, players_controllers, guns):
         """
         Prepare evmapy configuration files for the given system and controllers.
 
@@ -84,7 +84,7 @@ class Evmapy:
             emulator (str): The emulator being used
             core (str): The emulator core being used
             rom (str): Path to the ROM file or directory
-            playersControllers (dict): Dictionary mapping player numbers to controller objects
+            players_controllers (dict): Dictionary mapping player numbers to controller objects
             guns (dict): Dictionary of light gun configurations
 
         Returns:
@@ -178,7 +178,7 @@ class Evmapy:
 
                 # Configure each player's controller
                 nplayer = 1
-                for playercontroller, pad in sorted(playersControllers.items()):
+                for playercontroller, pad in sorted(players_controllers.items()):
                     player_action_key = "actions_player" + str(nplayer)
                     if player_action_key in padActionConfig:
                         # Generate configuration file path for this controller

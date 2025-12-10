@@ -13,7 +13,7 @@ SCUMMVM_BIN_PATH = "/usr/bin/scummvm"
 
 class ScummVMGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # crete /userdata/bios/scummvm/extra folder if it doesn't exist
         if not path.exists(SCUMMVM_EXTRA_DIR):
@@ -51,54 +51,54 @@ class ScummVMGenerator(Generator):
         # pad number
         nplayer = 1
         id = 0
-        for playercontroller, pad in sorted(playersControllers.items()):
+        for playercontroller, pad in sorted(players_controllers.items()):
             if nplayer == 1:
                 id = pad.index
             nplayer += 1
 
-        commandArray = [SCUMMVM_BIN_PATH, "-f"]
+        command_array = [SCUMMVM_BIN_PATH, "-f"]
 
         # set the resolution
-        window_width = str(gameResolution["width"])
-        window_height = str(gameResolution["height"])
-        commandArray.append(f"--window-size={window_width},{window_height}")
+        window_width = str(game_resolution["width"])
+        window_height = str(game_resolution["height"])
+        command_array.append(f"--window-size={window_width},{window_height}")
 
         ## user options
 
         # scale factor
         if system.isOptSet("scumm_scale"):
-            commandArray.append(f"--scale-factor={system.config['scumm_scale']}")
+            command_array.append(f"--scale-factor={system.config['scumm_scale']}")
         else:
-            commandArray.append("--scale-factor=3")
+            command_array.append("--scale-factor=3")
 
         # sclaer mode
         if system.isOptSet("scumm_scaler_mode"):
-            commandArray.append(f"--scaler={system.config['scumm_scaler_mode']}")
+            command_array.append(f"--scaler={system.config['scumm_scaler_mode']}")
         else:
-            commandArray.append("--scaler=normal")
+            command_array.append("--scaler=normal")
 
         #  stretch mode
         if system.isOptSet("scumm_stretch"):
-            commandArray.append(f"--stretch-mode={system.config['scumm_stretch']}")
+            command_array.append(f"--stretch-mode={system.config['scumm_stretch']}")
         else:
-            commandArray.append("--stretch-mode=center")
+            command_array.append("--stretch-mode=center")
 
         # renderer
         if system.isOptSet("scumm_renderer"):
-            commandArray.append(f"--renderer={system.config['scumm_renderer']}")
+            command_array.append(f"--renderer={system.config['scumm_renderer']}")
         else:
-            commandArray.append("--renderer=opengl")
+            command_array.append("--renderer=opengl")
 
         # language
         if system.isOptSet("scumm_language"):
-            commandArray.extend(["-q", f"{system.config['scumm_language']}"])
+            command_array.extend(["-q", f"{system.config['scumm_language']}"])
         else:
-            commandArray.extend(["-q", "en"])
+            command_array.extend(["-q", "en"])
 
         # logging
-        commandArray.append("--logfile=/userdata/system/logs/scummvm.log")
+        command_array.append("--logfile=/userdata/system/logs/scummvm.log")
 
-        commandArray.extend(
+        command_array.extend(
             [
                 f"--joystick={id}",
                 "--screenshotspath=" + SCREENSHOTS,
@@ -108,9 +108,9 @@ class ScummVMGenerator(Generator):
             ]
         )
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         if (
             "scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect"
         ) or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):

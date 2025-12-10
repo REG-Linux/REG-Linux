@@ -21,7 +21,7 @@ class DuckstationGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         duckstatonConfig = ConfigParser(interpolation=None)
         duckstatonConfig.optionxform = lambda optionstr: str(optionstr)
@@ -29,9 +29,9 @@ class DuckstationGenerator(Generator):
         if path.exists(DUCKSTATION_CONFIG_PATH):
             duckstatonConfig.read(DUCKSTATION_CONFIG_PATH)
 
-        setDuckstationConfig(duckstatonConfig, system, playersControllers)
+        setDuckstationConfig(duckstatonConfig, system, players_controllers)
         setDuckstationControllers(
-            duckstatonConfig, system, metadata, guns, playersControllers
+            duckstatonConfig, system, metadata, guns, players_controllers
         )
 
         # Save config
@@ -45,11 +45,11 @@ class DuckstationGenerator(Generator):
             rom = rewriteM3uFullPath(rom)
 
         if path.exists(DUCKSTATION_BIN_PATH):
-            commandArray = [DUCKSTATION_BIN_PATH, rom]
+            command_array = [DUCKSTATION_BIN_PATH, rom]
         else:
-            commandArray = [DUCKSTATION_NOGUI_PATH, "-batch", "-fullscreen", "--", rom]
+            command_array = [DUCKSTATION_NOGUI_PATH, "-batch", "-fullscreen", "--", rom]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
 
 def rewriteM3uFullPath(m3u):  # Rewrite a clean m3u file with valid fullpath
