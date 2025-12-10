@@ -1,0 +1,42 @@
+From 28520ad47cadbbdf4036dd7ffb87eab116f146b3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Thu, 20 Mar 2025 15:40:24 -0400
+Subject: [PATCH 20/79] media: mtk-jpeg: Set V4L2_FMT_FLAG_DYN_RESOLUTION for
+ decoder
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Set V4L2_FMT_FLAG_DYN_RESOLUTION for the decoder. This makes the
+following image decoding gstreamer pipeline succeed rather than hang:
+
+gst-launch-1.0 -v videotestsrc num-buffers=1 !
+video/x-raw,framrate=30/1,width=160,height=128,format=YVYU ! jpegenc !
+jpegparse ! queue ! v4l2jpegdec ! queue ! filesink
+location=out-160x128-YVYU.yuv
+
+Signed-off-by: jianhua.lin <jianhua.lin@mediatek.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+(cherry picked from commit aad8a0e05df0ce9a4a6f9877e96c6a63bc403618)
+---
+ drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c b/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
+index 6268d651bdcf..fb72082e2f33 100644
+--- a/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
++++ b/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
+@@ -226,6 +226,9 @@ static int mtk_jpeg_enum_fmt_vid_out(struct file *file, void *priv,
+ 	struct mtk_jpeg_ctx *ctx = mtk_jpeg_file_to_ctx(file);
+ 	struct mtk_jpeg_dev *jpeg = ctx->jpeg;
+ 
++	if (strcmp((const char *)jpeg->variant->dev_name, "mtk-jpeg-dec") == 0)
++		f->flags = V4L2_FMT_FLAG_DYN_RESOLUTION;
++
+ 	return mtk_jpeg_enum_fmt(jpeg->variant->formats,
+ 				 jpeg->variant->num_formats, f,
+ 				 MTK_JPEG_FMT_FLAG_OUTPUT);
+-- 
+2.43.0
+

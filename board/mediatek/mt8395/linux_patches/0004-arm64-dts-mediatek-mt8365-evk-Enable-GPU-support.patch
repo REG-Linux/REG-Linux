@@ -1,0 +1,46 @@
+From 68a9960aee7470563c248a7f97fb97aa7d912e48 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Tue, 21 Oct 2025 09:30:53 +0200
+Subject: [PATCH 04/79] arm64: dts: mediatek: mt8365-evk: Enable GPU support
+
+Enable for the Mediatek Genio 350-EVK board the support of the
+Arm Mali G52 MC1 GPU integrated in the MT8365 SoC.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+(cherry picked from commit c8dd72788f52d3fde091c0d6249c45b9467b69f6)
+---
+ arch/arm64/boot/dts/mediatek/mt8365-evk.dts | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8365-evk.dts b/arch/arm64/boot/dts/mediatek/mt8365-evk.dts
+index c8418888268d..b5dd5ef9fa11 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8365-evk.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8365-evk.dts
+@@ -284,6 +284,11 @@ eth_phy: ethernet-phy@0 {
+ 	};
+ };
+ 
++&gpu {
++	mali-supply = <&mt6357_vcore_reg>;
++	status = "okay";
++};
++
+ &i2c0 {
+ 	clock-frequency = <100000>;
+ 	pinctrl-0 = <&i2c0_pins>;
+@@ -353,6 +358,10 @@ touchscreen@5d {
+ 	};
+ };
+ 
++&mfg {
++	domain-supply = <&mt6357_vsram_others_reg>;
++};
++
+ &mmc0 {
+ 	assigned-clock-parents = <&topckgen CLK_TOP_MSDCPLL>;
+ 	assigned-clocks = <&topckgen CLK_TOP_MSDC50_0_SEL>;
+-- 
+2.43.0
+

@@ -1,0 +1,38 @@
+From 67c65ef79bc74f3c373babe9a3d85fb002b7b97a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Tue, 4 Mar 2025 18:43:49 -0300
+Subject: [PATCH 73/79] arm64: dts: mediatek: mt8390-genio-common: Add jack
+ detection with accdet
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Enable audio jack detection for the Genio 700 and 510 EVK boards. This
+is handled by the MT6359 ACCDET block, which on these boards has the
+HP_EINT pin pulled high and connected to a normally open 3.5mm jack.
+
+Add a phandle to the accdet in the sound card node so the machine sound
+driver can initialize the accdet.
+
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+index 2062506f6cc5..e1139f400931 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8390-genio-common.dtsi
+@@ -1326,6 +1326,7 @@ &sound {
+ 		"AP DMIC", "AUDGLB",
+ 		"AP DMIC", "MIC_BIAS_0",
+ 		"AP DMIC", "MIC_BIAS_2";
++	mediatek,accdet = <&accdet>;
+ 	mediatek,adsp = <&adsp>;
+ 	status = "okay";
+ 
+-- 
+2.43.0
+

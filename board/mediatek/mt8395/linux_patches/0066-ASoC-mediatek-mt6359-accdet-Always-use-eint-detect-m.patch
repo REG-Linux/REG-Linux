@@ -1,0 +1,306 @@
+From 4de3be3fbf1be8bebfebeca5bc9e9ffe0259a0f4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:28 -0300
+Subject: [PATCH 66/79] ASoC: mediatek: mt6359-accdet: Always use eint detect
+ mode 4
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The driver currently reads a mediatek,eint-detect-mode property from DT,
+which determines certain register configurations. Since there are no
+users of the property, it doesn't directly describe the hardware, and
+the default value (4) is known to work across multiple boards, remove
+the handling for this property and always assume mode 4 is used. The
+property can be properly introduced in the binding in the future if
+different boards actually need different configurations.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 208 +++++++++++--------------------
+ sound/soc/codecs/mt6359-accdet.h |   1 -
+ 2 files changed, 70 insertions(+), 139 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index 6728f1018c99..83e65b6d5845 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -81,31 +81,22 @@ static void recover_eint_setting(struct mt6359_accdet *priv);
+ 
+ static unsigned int adjust_eint_analog_setting(struct mt6359_accdet *priv)
+ {
+-	if (priv->data->eint_detect_mode == 0x3 ||
+-	    priv->data->eint_detect_mode == 0x4) {
+-		/* ESD switches off */
+-		regmap_update_bits(priv->regmap,
+-				   RG_ACCDETSPARE_ADDR, 1 << 8, 0);
+-	}
+-	if (priv->data->eint_detect_mode == 0x4) {
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			/* enable RG_EINT0CONFIGACCDET */
+-			regmap_update_bits(priv->regmap,
+-					   RG_EINT0CONFIGACCDET_ADDR,
+-					   RG_EINT0CONFIGACCDET_MASK_SFT,
+-					   BIT(RG_EINT0CONFIGACCDET_SFT));
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			/* enable RG_EINT1CONFIGACCDET */
+-			regmap_update_bits(priv->regmap,
+-					   RG_EINT1CONFIGACCDET_ADDR,
+-					   RG_EINT1CONFIGACCDET_MASK_SFT,
+-					   BIT(RG_EINT1CONFIGACCDET_SFT));
+-		}
+-		/*select 500k, use internal resistor */
+-		regmap_update_bits(priv->regmap, RG_EINT0HIRENB_ADDR,
+-				   RG_EINT0HIRENB_MASK_SFT,
+-				   BIT(RG_EINT0HIRENB_SFT));
++	/* ESD switches off */
++	regmap_update_bits(priv->regmap, RG_ACCDETSPARE_ADDR, 1 << 8, 0);
++	if (priv->caps & ACCDET_PMIC_EINT0) {
++		/* enable RG_EINT0CONFIGACCDET */
++		regmap_update_bits(priv->regmap, RG_EINT0CONFIGACCDET_ADDR,
++				   RG_EINT0CONFIGACCDET_MASK_SFT,
++				   BIT(RG_EINT0CONFIGACCDET_SFT));
++	} else if (priv->caps & ACCDET_PMIC_EINT1) {
++		/* enable RG_EINT1CONFIGACCDET */
++		regmap_update_bits(priv->regmap, RG_EINT1CONFIGACCDET_ADDR,
++				   RG_EINT1CONFIGACCDET_MASK_SFT,
++				   BIT(RG_EINT1CONFIGACCDET_SFT));
+ 	}
++	/*select 500k, use internal resistor */
++	regmap_update_bits(priv->regmap, RG_EINT0HIRENB_ADDR,
++			   RG_EINT0HIRENB_MASK_SFT, BIT(RG_EINT0HIRENB_SFT));
+ 	return 0;
+ }
+ 
+@@ -123,18 +114,14 @@ static unsigned int adjust_eint_digital_setting(struct mt6359_accdet *priv)
+ 				   ACCDET_EINT1_INVERTER_SW_EN_MASK_SFT, 0);
+ 	}
+ 
+-	if (priv->data->eint_detect_mode == 0x4) {
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			/* set DA stable signal */
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_DA_STABLE_ADDR,
+-					   ACCDET_EINT0_CEN_STABLE_MASK_SFT, 0);
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			/* set DA stable signal */
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_DA_STABLE_ADDR,
+-					   ACCDET_EINT1_CEN_STABLE_MASK_SFT, 0);
+-		}
++	if (priv->caps & ACCDET_PMIC_EINT0) {
++		/* set DA stable signal */
++		regmap_update_bits(priv->regmap, ACCDET_DA_STABLE_ADDR,
++				   ACCDET_EINT0_CEN_STABLE_MASK_SFT, 0);
++	} else if (priv->caps & ACCDET_PMIC_EINT1) {
++		/* set DA stable signal */
++		regmap_update_bits(priv->regmap, ACCDET_DA_STABLE_ADDR,
++				   ACCDET_EINT1_CEN_STABLE_MASK_SFT, 0);
+ 	}
+ 	return 0;
+ }
+@@ -159,27 +146,19 @@ static unsigned int mt6359_accdet_jd_setting(struct mt6359_accdet *priv)
+ 
+ static void recover_eint_analog_setting(struct mt6359_accdet *priv)
+ {
+-	if (priv->data->eint_detect_mode == 0x3 ||
+-	    priv->data->eint_detect_mode == 0x4) {
+-		/* ESD switches on */
+-		regmap_update_bits(priv->regmap, RG_ACCDETSPARE_ADDR,
+-				   1 << 8, 1 << 8);
+-	}
+-	if (priv->data->eint_detect_mode == 0x4) {
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			/* disable RG_EINT0CONFIGACCDET */
+-			regmap_update_bits(priv->regmap,
+-					   RG_EINT0CONFIGACCDET_ADDR,
+-					   RG_EINT0CONFIGACCDET_MASK_SFT, 0);
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			/* disable RG_EINT1CONFIGACCDET */
+-			regmap_update_bits(priv->regmap,
+-					   RG_EINT1CONFIGACCDET_ADDR,
+-					   RG_EINT1CONFIGACCDET_MASK_SFT, 0);
+-		}
+-		regmap_update_bits(priv->regmap, RG_EINT0HIRENB_ADDR,
+-				   RG_EINT0HIRENB_MASK_SFT, 0);
++	/* ESD switches on */
++	regmap_update_bits(priv->regmap, RG_ACCDETSPARE_ADDR, 1 << 8, 1 << 8);
++	if (priv->caps & ACCDET_PMIC_EINT0) {
++		/* disable RG_EINT0CONFIGACCDET */
++		regmap_update_bits(priv->regmap, RG_EINT0CONFIGACCDET_ADDR,
++				   RG_EINT0CONFIGACCDET_MASK_SFT, 0);
++	} else if (priv->caps & ACCDET_PMIC_EINT1) {
++		/* disable RG_EINT1CONFIGACCDET */
++		regmap_update_bits(priv->regmap, RG_EINT1CONFIGACCDET_ADDR,
++				   RG_EINT1CONFIGACCDET_MASK_SFT, 0);
+ 	}
++	regmap_update_bits(priv->regmap, RG_EINT0HIRENB_ADDR,
++			   RG_EINT0HIRENB_MASK_SFT, 0);
+ }
+ 
+ static void recover_eint_digital_setting(struct mt6359_accdet *priv)
+@@ -193,37 +172,30 @@ static void recover_eint_digital_setting(struct mt6359_accdet *priv)
+ 				   ACCDET_EINT1_M_SW_EN_ADDR,
+ 				   ACCDET_EINT1_M_SW_EN_MASK_SFT, 0);
+ 	}
+-	if (priv->data->eint_detect_mode == 0x4) {
++	if (priv->caps & ACCDET_PMIC_EINT0) {
+ 		/* enable eint0cen */
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			/* enable eint0cen */
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_DA_STABLE_ADDR,
+-					   ACCDET_EINT0_CEN_STABLE_MASK_SFT,
+-					   BIT(ACCDET_EINT0_CEN_STABLE_SFT));
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			/* enable eint1cen */
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_DA_STABLE_ADDR,
+-					   ACCDET_EINT1_CEN_STABLE_MASK_SFT,
+-					   BIT(ACCDET_EINT1_CEN_STABLE_SFT));
+-		}
++		regmap_update_bits(priv->regmap, ACCDET_DA_STABLE_ADDR,
++				   ACCDET_EINT0_CEN_STABLE_MASK_SFT,
++				   BIT(ACCDET_EINT0_CEN_STABLE_SFT));
++	} else if (priv->caps & ACCDET_PMIC_EINT1) {
++		/* enable eint1cen */
++		regmap_update_bits(priv->regmap, ACCDET_DA_STABLE_ADDR,
++				   ACCDET_EINT1_CEN_STABLE_MASK_SFT,
++				   BIT(ACCDET_EINT1_CEN_STABLE_SFT));
+ 	}
+ 
+-	if (priv->data->eint_detect_mode != 0x1) {
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			/* enable inverter */
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_EINT0_INVERTER_SW_EN_ADDR,
+-					   ACCDET_EINT0_INVERTER_SW_EN_MASK_SFT,
+-					   BIT(ACCDET_EINT0_INVERTER_SW_EN_SFT));
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			/* enable inverter */
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_EINT1_INVERTER_SW_EN_ADDR,
+-					   ACCDET_EINT1_INVERTER_SW_EN_MASK_SFT,
+-					   BIT(ACCDET_EINT1_INVERTER_SW_EN_SFT));
+-		}
++	if (priv->caps & ACCDET_PMIC_EINT0) {
++		/* enable inverter */
++		regmap_update_bits(priv->regmap,
++				   ACCDET_EINT0_INVERTER_SW_EN_ADDR,
++				   ACCDET_EINT0_INVERTER_SW_EN_MASK_SFT,
++				   BIT(ACCDET_EINT0_INVERTER_SW_EN_SFT));
++	} else if (priv->caps & ACCDET_PMIC_EINT1) {
++		/* enable inverter */
++		regmap_update_bits(priv->regmap,
++				   ACCDET_EINT1_INVERTER_SW_EN_ADDR,
++				   ACCDET_EINT1_INVERTER_SW_EN_MASK_SFT,
++				   BIT(ACCDET_EINT1_INVERTER_SW_EN_SFT));
+ 	}
+ }
+ 
+@@ -534,13 +506,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 
+ 	priv->data->hp_eint_high = of_property_read_bool(node, "mediatek,hp-eint-high");
+ 
+-	ret = of_property_read_u32(node, "mediatek,eint-detect-mode",
+-				   &priv->data->eint_detect_mode);
+-	if (ret) {
+-		/* eint detection mode equals to EINT HW Mode */
+-		priv->data->eint_detect_mode = 0x4;
+-	}
+-
+ 	ret = of_property_read_u32(node, "mediatek,eint-num", &tmp);
+ 	if (ret)
+ 		tmp = 0;
+@@ -592,31 +557,16 @@ static void config_digital_init_by_mode(struct mt6359_accdet *priv)
+ 	/* enable PWM */
+ 	regmap_write(priv->regmap, ACCDET_CMP_PWM_EN_ADDR, 0x67);
+ 	/* enable inverter detection */
+-	if (priv->data->eint_detect_mode == 0x1) {
+-		/* disable inverter detection */
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_EINT0_INVERTER_SW_EN_ADDR,
+-					   ACCDET_EINT0_INVERTER_SW_EN_MASK_SFT,
+-					   0);
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_EINT1_INVERTER_SW_EN_ADDR,
+-					   ACCDET_EINT1_INVERTER_SW_EN_MASK_SFT,
+-					   0);
+-		}
+-	} else {
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_EINT0_INVERTER_SW_EN_ADDR,
+-					   ACCDET_EINT0_INVERTER_SW_EN_MASK_SFT,
+-					   BIT(ACCDET_EINT0_INVERTER_SW_EN_SFT));
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			regmap_update_bits(priv->regmap,
+-					   ACCDET_EINT1_INVERTER_SW_EN_ADDR,
+-					   ACCDET_EINT1_INVERTER_SW_EN_MASK_SFT,
+-					   BIT(ACCDET_EINT1_INVERTER_SW_EN_SFT));
+-		}
++	if (priv->caps & ACCDET_PMIC_EINT0) {
++		regmap_update_bits(priv->regmap,
++				   ACCDET_EINT0_INVERTER_SW_EN_ADDR,
++				   ACCDET_EINT0_INVERTER_SW_EN_MASK_SFT,
++				   BIT(ACCDET_EINT0_INVERTER_SW_EN_SFT));
++	} else if (priv->caps & ACCDET_PMIC_EINT1) {
++		regmap_update_bits(priv->regmap,
++				   ACCDET_EINT1_INVERTER_SW_EN_ADDR,
++				   ACCDET_EINT1_INVERTER_SW_EN_MASK_SFT,
++				   BIT(ACCDET_EINT1_INVERTER_SW_EN_SFT));
+ 	}
+ 
+ 	if (priv->data->hp_eint_high) {
+@@ -649,28 +599,10 @@ static void config_eint_init_by_mode(struct mt6359_accdet *priv)
+ 	regmap_update_bits(priv->regmap, RG_NCP_PDDIS_EN_ADDR,
+ 			   RG_NCP_PDDIS_EN_MASK_SFT, BIT(RG_NCP_PDDIS_EN_SFT));
+ 
+-	if (priv->data->eint_detect_mode == 0x1 ||
+-	    priv->data->eint_detect_mode == 0x2 ||
+-	    priv->data->eint_detect_mode == 0x3) {
+-		if (priv->caps & ACCDET_PMIC_EINT0) {
+-			regmap_update_bits(priv->regmap,
+-					   RG_EINT0CONFIGACCDET_ADDR,
+-					   RG_EINT0CONFIGACCDET_MASK_SFT,
+-					   BIT(RG_EINT0CONFIGACCDET_SFT));
+-		} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-			regmap_update_bits(priv->regmap,
+-					   RG_EINT1CONFIGACCDET_ADDR,
+-					   RG_EINT1CONFIGACCDET_MASK_SFT,
+-					   BIT(RG_EINT1CONFIGACCDET_SFT));
+-		}
+-	}
+-
+-	if (priv->data->eint_detect_mode != 0x1) {
+-		/* current detect set 0.25uA */
+-		regmap_update_bits(priv->regmap, RG_ACCDETSPARE_ADDR,
+-				   0x3 << RG_ACCDETSPARE_SFT,
+-				   0x3 << RG_ACCDETSPARE_SFT);
+-	}
++	/* current detect set 0.25uA */
++	regmap_update_bits(priv->regmap, RG_ACCDETSPARE_ADDR,
++			   0x3 << RG_ACCDETSPARE_SFT,
++			   0x3 << RG_ACCDETSPARE_SFT);
+ 	regmap_write(priv->regmap, RG_EINTCOMPVTH_ADDR,
+ 		     val | priv->data->eint_comp_vth << RG_EINTCOMPVTH_SFT);
+ }
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index 9564e71d89f9..b34a46127446 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -54,7 +54,6 @@ struct dts_data {
+ 	unsigned int mic_vol;
+ 	unsigned int mic_mode;
+ 	bool hp_eint_high;
+-	unsigned int eint_detect_mode;
+ 	unsigned int eint_comp_vth;
+ };
+ 
+-- 
+2.43.0
+

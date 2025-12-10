@@ -1,0 +1,62 @@
+From d8089d9e9aa27b0e19cb63045d4eab78ead8ec7f Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 15 Apr 2025 12:43:16 +0200
+Subject: [PATCH 11/79] drm/mediatek: mtk_hdmi_common: Make CEC support
+ optional
+
+In preparation for adding a new driver for HDMIv2, for which CEC
+is not strictly required, change the of_get_compatible_child()
+failure error to -ENOTSUPP to be able to differentiate between
+error conditions in mtk_hdmi_dt_parse_pdata().
+
+In that case, if -ENOTSUPP is returned, this driver will print
+an informative message saying that CEC support is unavailable,
+as the devicetree node for that was not found, but after that,
+function mtk_hdmi_dt_parse_pdata() will not return error to
+the caller.
+
+This will not change functionality of the mtk_hdmi (v1) driver
+as that is still checking whether CEC is present and, if not,
+will fail probing with an error saying that CEC is required
+by HDMIv1.
+
+Reviewed-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi_common.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+index f28e63716d7c..989479fdfe40 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+@@ -253,12 +253,11 @@ static int mtk_hdmi_get_cec_dev(struct mtk_hdmi *hdmi, struct device *dev, struc
+ 	/* The CEC module handles HDMI hotplug detection */
+ 	cec_np = of_get_compatible_child(np->parent, "mediatek,mt8173-cec");
+ 	if (!cec_np)
+-		return dev_err_probe(dev, -EINVAL, "Failed to find CEC node\n");
++		return dev_err_probe(dev, -ENOTSUPP, "Failed to find CEC node\n");
+ 
+ 	cec_pdev = of_find_device_by_node(cec_np);
+ 	if (!cec_pdev) {
+-		dev_err(hdmi->dev, "Waiting for CEC device %pOF\n",
+-			cec_np);
++		dev_err(hdmi->dev, "Waiting for CEC device %pOF\n", cec_np);
+ 		of_node_put(cec_np);
+ 		return -EPROBE_DEFER;
+ 	}
+@@ -319,7 +318,9 @@ static int mtk_hdmi_dt_parse_pdata(struct mtk_hdmi *hdmi, struct platform_device
+ 		return dev_err_probe(dev, -EINVAL, "Failed to get ddc i2c adapter by node\n");
+ 
+ 	ret = mtk_hdmi_get_cec_dev(hdmi, dev, np);
+-	if (ret)
++	if (ret == -ENOTSUPP)
++		dev_info(dev, "CEC support unavailable: node not found\n");
++	else if (ret)
+ 		return ret;
+ 
+ 	return 0;
+-- 
+2.43.0
+

@@ -1,0 +1,36 @@
+From 0dc02e4aac47db8d33fed5e2f065ac25d756d538 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Wed, 21 May 2025 10:25:20 +0200
+Subject: [PATCH 38/79] phy-mtk-hdmi-8195 fixes
+
+(cherry picked from commit a8b8c67780c8531d13eeea32237b0f83dd283e71)
+(cherry picked from commit bbb1915a3070ef7c5b1c35caf145e6a758fce352)
+---
+ drivers/phy/mediatek/phy-mtk-hdmi-mt8195.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/phy/mediatek/phy-mtk-hdmi-mt8195.c b/drivers/phy/mediatek/phy-mtk-hdmi-mt8195.c
+index b38f3ae26b3f..eadf6f1ced77 100644
+--- a/drivers/phy/mediatek/phy-mtk-hdmi-mt8195.c
++++ b/drivers/phy/mediatek/phy-mtk-hdmi-mt8195.c
+@@ -36,7 +36,7 @@ mtk_phy_tmds_clk_ratio(struct mtk_hdmi_phy *hdmi_phy, bool enable)
+ 	 * clock bit ratio 1:40, under 3.4Gbps, clock bit ratio 1:10
+ 	 */
+ 	if (enable)
+-		mtk_phy_update_field(regs + HDMI20_CLK_CFG, REG_TXC_DIV, 3);
++		mtk_phy_update_field(regs + HDMI20_CLK_CFG, REG_TXC_DIV, 2);
+ 	else
+ 		mtk_phy_clear_bits(regs + HDMI20_CLK_CFG, REG_TXC_DIV);
+ }
+@@ -290,7 +290,7 @@ static int mtk_hdmi_pll_calc(struct mtk_hdmi_phy *hdmi_phy, struct clk_hw *hw,
+ 	posdiv2 = 1;
+ 
+ 	/* Digital clk divider, max /32 */
+-	digital_div = div_u64(ns_hdmipll_ck, posdiv1 * posdiv2 * pixel_clk);
++	digital_div = div64_u64(ns_hdmipll_ck, posdiv1 * posdiv2 * pixel_clk);
+ 	if (!(digital_div <= 32 && digital_div >= 1))
+ 		return -EINVAL;
+ 
+-- 
+2.43.0
+

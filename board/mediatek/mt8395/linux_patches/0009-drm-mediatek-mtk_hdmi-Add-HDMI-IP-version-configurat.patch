@@ -1,0 +1,134 @@
+From 9eb990dada66f0d408683d2664669da0aa209fad Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Tue, 15 Apr 2025 12:43:14 +0200
+Subject: [PATCH 09/79] drm/mediatek: mtk_hdmi: Add HDMI IP version
+ configuration to pdata
+
+In preparation for adding a driver for the HDMIv2 IP and before
+moving the common bits out of this driver, add a new structure
+`mtk_hdmi_ver_conf`, holding pointers to HDMI IP version specific
+drm_bridge_funcs, hdmi_codec_ops and clock array used for probe,
+and nest it into the mtk_hdmi_conf platform data structure.
+
+While at it, also convert all of the direct users of
+mtk_hdmi_bridge_funcs, mtk_hdmi_audio_codec_ops, mtk_hdmi_clk_names
+to use pointers from the ver_conf platform data.
+
+In order to do so, it was also necessary to fill a new version 1
+specific const `mtk_hdmi_v1_ver_conf` and assign it to all of the
+currently supported compatibles for this driver.
+
+This commit brings no functional change.
+
+Reviewed-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi.c | 45 ++++++++++++++++++++++++-----
+ 1 file changed, 37 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi.c b/drivers/gpu/drm/mediatek/mtk_hdmi.c
+index 691e0011a8f9..42edf9cffa88 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi.c
+@@ -144,7 +144,15 @@ struct hdmi_audio_param {
+ 	struct hdmi_codec_params codec_params;
+ };
+ 
++struct mtk_hdmi_ver_conf {
++	const struct drm_bridge_funcs *bridge_funcs;
++	const struct hdmi_codec_ops *codec_ops;
++	const char * const *mtk_hdmi_clock_names;
++	int num_clocks;
++};
++
+ struct mtk_hdmi_conf {
++	const struct mtk_hdmi_ver_conf *ver_conf;
+ 	bool tz_disabled;
+ 	bool cea_modes_only;
+ 	unsigned long max_mode_clock;
+@@ -1602,7 +1610,7 @@ static int mtk_hdmi_register_audio_driver(struct device *dev)
+ 	struct mtk_hdmi *hdmi = dev_get_drvdata(dev);
+ 	struct hdmi_audio_param *aud_param = &hdmi->aud_param;
+ 	struct hdmi_codec_pdata codec_data = {
+-		.ops = &mtk_hdmi_audio_codec_ops,
++		.ops = hdmi->conf->ver_conf->codec_ops,
+ 		.max_i2s_channels = 2,
+ 		.i2s = 1,
+ 		.data = hdmi,
+@@ -1635,24 +1643,32 @@ static int mtk_hdmi_register_audio_driver(struct device *dev)
+ 
+ static int mtk_hdmi_probe(struct platform_device *pdev)
+ {
++	const struct mtk_hdmi_ver_conf *ver_conf;
++	const struct mtk_hdmi_conf *hdmi_conf;
+ 	struct mtk_hdmi *hdmi;
+ 	struct device *dev = &pdev->dev;
+-	const int num_clocks = MTK_HDMI_CLK_COUNT;
+ 	int ret;
+ 
++	hdmi_conf = of_device_get_match_data(dev);
++	if (!hdmi_conf)
++		return -ENODEV;
++
++	ver_conf = hdmi_conf->ver_conf;
++
+ 	hdmi = devm_drm_bridge_alloc(dev, struct mtk_hdmi, bridge,
+-				     &mtk_hdmi_bridge_funcs);
++				     ver_conf->bridge_funcs);
+ 	if (IS_ERR(hdmi))
+ 		return PTR_ERR(hdmi);
+ 
+ 	hdmi->dev = dev;
+-	hdmi->conf = of_device_get_match_data(dev);
++	hdmi->conf = hdmi_conf;
+ 
+-	hdmi->clk = devm_kcalloc(dev, num_clocks, sizeof(*hdmi->clk), GFP_KERNEL);
++	hdmi->clk = devm_kcalloc(dev, ver_conf->num_clocks, sizeof(*hdmi->clk), GFP_KERNEL);
+ 	if (!hdmi->clk)
+ 		return -ENOMEM;
+ 
+-	ret = mtk_hdmi_dt_parse_pdata(hdmi, pdev, mtk_hdmi_clk_names, num_clocks);
++	ret = mtk_hdmi_dt_parse_pdata(hdmi, pdev, ver_conf->mtk_hdmi_clock_names,
++				      ver_conf->num_clocks);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -1713,19 +1729,32 @@ static __maybe_unused int mtk_hdmi_resume(struct device *dev)
+ 
+ static SIMPLE_DEV_PM_OPS(mtk_hdmi_pm_ops, mtk_hdmi_suspend, mtk_hdmi_resume);
+ 
++static const struct mtk_hdmi_ver_conf mtk_hdmi_v1_ver_conf = {
++	.bridge_funcs = &mtk_hdmi_bridge_funcs,
++	.codec_ops = &mtk_hdmi_audio_codec_ops,
++	.mtk_hdmi_clock_names = mtk_hdmi_clk_names,
++	.num_clocks = ARRAY_SIZE(mtk_hdmi_clk_names)
++};
++
+ static const struct mtk_hdmi_conf mtk_hdmi_conf_mt2701 = {
+ 	.tz_disabled = true,
++	.ver_conf = &mtk_hdmi_v1_ver_conf
+ };
+ 
+ static const struct mtk_hdmi_conf mtk_hdmi_conf_mt8167 = {
+-	.max_mode_clock = 148500,
+ 	.cea_modes_only = true,
++	.max_mode_clock = 148500,
++	.ver_conf = &mtk_hdmi_v1_ver_conf
++};
++
++static const struct mtk_hdmi_conf mtk_hdmi_conf_mt8173 = {
++	.ver_conf = &mtk_hdmi_v1_ver_conf
+ };
+ 
+ static const struct of_device_id mtk_hdmi_of_ids[] = {
+ 	{ .compatible = "mediatek,mt2701-hdmi", .data = &mtk_hdmi_conf_mt2701 },
+ 	{ .compatible = "mediatek,mt8167-hdmi", .data = &mtk_hdmi_conf_mt8167 },
+-	{ .compatible = "mediatek,mt8173-hdmi" },
++	{ .compatible = "mediatek,mt8173-hdmi", .data = &mtk_hdmi_conf_mt8173 },
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, mtk_hdmi_of_ids);
+-- 
+2.43.0
+

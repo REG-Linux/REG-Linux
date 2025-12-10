@@ -1,0 +1,71 @@
+From 6a152404b7bd131bb51cf01f049482cbd3eb4820 Mon Sep 17 00:00:00 2001
+From: Macross Chen <macross.chen@mediatek.com>
+Date: Mon, 21 Oct 2024 16:00:43 +0800
+Subject: [PATCH 22/79] media: mtk-jpeg: Copy buffer timestamp from source to
+ destination
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Copy the timestamp from the source buffer to the destination buffer.
+With this change the following MJPEG video encoding and decoding
+gstreamer pipelines succeed, rather than hanging midway, and produce
+videos that playback as expected:
+
+gst-launch-1.0 -v videotestsrc num-buffers=300 !
+video/x-raw,framrate=30/1,width=160,height=128,format=YVYU ! queue !
+v4l2jpegenc ! queue ! jpegparse ! filesink
+location=out-160x128-YVYU.mjpg
+
+gst-launch-1.0 -v videotestsrc num-buffers=300 !
+video/x-raw,framrate=30/1,width=160,height=128,format=YVYU ! jpegenc !
+jpegparse ! queue ! v4l2jpegdec ! queue ! filesink
+location=out-160x128-YVYU.yuv
+
+Signed-off-by: Jianhua Lin <jianhua.lin@mediatek.com>
+Signed-off-by: Macross Chen <macross.chen@mediatek.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+(cherry picked from commit 0b69ee1f36ee9841fbde03fba0c2af4395e96571)
+---
+ drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c b/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
+index 884da03b3f3f..f6972e5168f5 100644
+--- a/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
++++ b/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
+@@ -1033,6 +1033,7 @@ static void mtk_jpeg_enc_device_run(void *priv)
+ 
+ 	src_buf = v4l2_m2m_next_src_buf(ctx->fh.m2m_ctx);
+ 	dst_buf = v4l2_m2m_next_dst_buf(ctx->fh.m2m_ctx);
++	dst_buf->vb2_buf.timestamp = src_buf->vb2_buf.timestamp;
+ 
+ 	ret = pm_runtime_resume_and_get(jpeg->dev);
+ 	if (ret < 0)
+@@ -1329,6 +1330,7 @@ static void mtk_jpeg_job_timeout_work(struct work_struct *work)
+ 	ctx = v4l2_m2m_get_curr_priv(jpeg->m2m_dev);
+ 	src_buf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
+ 	dst_buf = v4l2_m2m_dst_buf_remove(ctx->fh.m2m_ctx);
++	dst_buf->vb2_buf.timestamp = src_buf->vb2_buf.timestamp;
+ 
+ 	jpeg->variant->hw_reset(jpeg->reg_base);
+ 
+@@ -1660,6 +1662,7 @@ static irqreturn_t mtk_jpeg_enc_done(struct mtk_jpeg_dev *jpeg)
+ 
+ 	src_buf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
+ 	dst_buf = v4l2_m2m_dst_buf_remove(ctx->fh.m2m_ctx);
++	dst_buf->vb2_buf.timestamp = src_buf->vb2_buf.timestamp;
+ 
+ 	result_size = mtk_jpeg_enc_get_file_size(jpeg->reg_base,
+ 						 jpeg->variant->support_34bit);
+@@ -1937,6 +1940,7 @@ static irqreturn_t mtk_jpeg_dec_irq(int irq, void *priv)
+ 
+ 	src_buf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
+ 	dst_buf = v4l2_m2m_dst_buf_remove(ctx->fh.m2m_ctx);
++	dst_buf->vb2_buf.timestamp = src_buf->vb2_buf.timestamp;
+ 	jpeg_src_buf = mtk_jpeg_vb2_to_srcbuf(&src_buf->vb2_buf);
+ 
+ 	if (dec_irq_ret >= MTK_JPEG_DEC_RESULT_UNDERFLOW)
+-- 
+2.43.0
+

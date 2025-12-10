@@ -1,0 +1,117 @@
+From 2b7685888b3258cf633e0119274740edffb3207e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:26 -0300
+Subject: [PATCH 64/79] ASoC: mediatek: mt6359-accdet: Always use internal
+ resistor
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The code currently reads a property mediatek,eint-use-ext-res with
+values ranging between 0 and 4. Not only should this be a boolean
+property, but there's no need for it to even be a DT property, seeing as
+all current boards will use the internal resistor anyway. Since there's
+no current dt-binding or Devicetree user of this property, remove its
+handling and make the driver always configure the internal resistor.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 53 +++++++++-----------------------
+ sound/soc/codecs/mt6359-accdet.h |  1 -
+ 2 files changed, 14 insertions(+), 40 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index d78d7516342a..e04cfb9a607a 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -82,14 +82,10 @@ static unsigned int adjust_eint_analog_setting(struct mt6359_accdet *priv)
+ 					   RG_EINT1CONFIGACCDET_MASK_SFT,
+ 					   BIT(RG_EINT1CONFIGACCDET_SFT));
+ 		}
+-		if (priv->data->eint_use_ext_res == 0x3 ||
+-		    priv->data->eint_use_ext_res == 0x4) {
+-			/*select 500k, use internal resistor */
+-			regmap_update_bits(priv->regmap,
+-					   RG_EINT0HIRENB_ADDR,
+-					   RG_EINT0HIRENB_MASK_SFT,
+-					   BIT(RG_EINT0HIRENB_SFT));
+-		}
++		/*select 500k, use internal resistor */
++		regmap_update_bits(priv->regmap, RG_EINT0HIRENB_ADDR,
++				   RG_EINT0HIRENB_MASK_SFT,
++				   BIT(RG_EINT0HIRENB_SFT));
+ 	}
+ 	return 0;
+ }
+@@ -543,13 +539,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 	else if (tmp == 2)
+ 		priv->caps |= ACCDET_PMIC_BI_EINT;
+ 
+-	ret = of_property_read_u32(node, "mediatek,eint-use-ext-res",
+-				   &priv->data->eint_use_ext_res);
+-	if (ret) {
+-		/* eint use internal resister */
+-		priv->data->eint_use_ext_res = 0x0;
+-	}
+-
+ 	ret = of_property_read_u32(node, "mediatek,eint-comp-vth",
+ 				   &priv->data->eint_comp_vth);
+ 	if (ret)
+@@ -651,30 +640,16 @@ static void config_eint_init_by_mode(struct mt6359_accdet *priv)
+ 	if (priv->data->eint_detect_mode == 0x1 ||
+ 	    priv->data->eint_detect_mode == 0x2 ||
+ 	    priv->data->eint_detect_mode == 0x3) {
+-		if (priv->data->eint_use_ext_res == 0x1) {
+-			if (priv->caps & ACCDET_PMIC_EINT0) {
+-				regmap_update_bits(priv->regmap,
+-						   RG_EINT0CONFIGACCDET_ADDR,
+-						   RG_EINT0CONFIGACCDET_MASK_SFT,
+-						   0);
+-			} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-				regmap_update_bits(priv->regmap,
+-						   RG_EINT1CONFIGACCDET_ADDR,
+-						   RG_EINT1CONFIGACCDET_MASK_SFT,
+-						   0);
+-			}
+-		} else {
+-			if (priv->caps & ACCDET_PMIC_EINT0) {
+-				regmap_update_bits(priv->regmap,
+-						   RG_EINT0CONFIGACCDET_ADDR,
+-						   RG_EINT0CONFIGACCDET_MASK_SFT,
+-						   BIT(RG_EINT0CONFIGACCDET_SFT));
+-			} else if (priv->caps & ACCDET_PMIC_EINT1) {
+-				regmap_update_bits(priv->regmap,
+-						   RG_EINT1CONFIGACCDET_ADDR,
+-						   RG_EINT1CONFIGACCDET_MASK_SFT,
+-						   BIT(RG_EINT1CONFIGACCDET_SFT));
+-			}
++		if (priv->caps & ACCDET_PMIC_EINT0) {
++			regmap_update_bits(priv->regmap,
++					   RG_EINT0CONFIGACCDET_ADDR,
++					   RG_EINT0CONFIGACCDET_MASK_SFT,
++					   BIT(RG_EINT0CONFIGACCDET_SFT));
++		} else if (priv->caps & ACCDET_PMIC_EINT1) {
++			regmap_update_bits(priv->regmap,
++					   RG_EINT1CONFIGACCDET_ADDR,
++					   RG_EINT1CONFIGACCDET_MASK_SFT,
++					   BIT(RG_EINT1CONFIGACCDET_SFT));
+ 		}
+ 	}
+ 
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index f0453b34cf20..359a9b93ef3f 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -75,7 +75,6 @@ struct dts_data {
+ 	bool hp_eint_high;
+ 	struct pwm_deb_settings *pwm_deb;
+ 	unsigned int eint_detect_mode;
+-	unsigned int eint_use_ext_res;
+ 	unsigned int eint_comp_vth;
+ };
+ 
+-- 
+2.43.0
+

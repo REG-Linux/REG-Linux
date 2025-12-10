@@ -1,0 +1,45 @@
+From f8bdcfc4f4432e355f5f078dff4a0aad2a1c79a3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:18 -0300
+Subject: [PATCH 56/79] ASoC: mediatek: mt6359-accdet: Add compatible property
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add a compatible property and add it to the module device table for the
+mt6359-accdet platform driver to allow automatic module loading and
+probing when the compatible is present in DT.
+
+Co-developed-by: Andrew Perepech <andrew.perepech@mediatek.com>
+Signed-off-by: Andrew Perepech <andrew.perepech@mediatek.com>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index ed34cc15b80e..9bbd4497e8d4 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -1047,9 +1047,16 @@ static int mt6359_accdet_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
++const struct of_device_id accdet_of_match[] = {
++	{ .compatible = "mediatek,mt6359-accdet", },
++	{ /* sentinel */ },
++};
++MODULE_DEVICE_TABLE(of, accdet_of_match);
++
+ static struct platform_driver mt6359_accdet_driver = {
+ 	.driver = {
+ 		.name = "pmic-codec-accdet",
++		.of_match_table = accdet_of_match,
+ 	},
+ 	.probe = mt6359_accdet_probe,
+ };
+-- 
+2.43.0
+

@@ -1,0 +1,78 @@
+From 76f8098c4dd9118c43c1b3665df44bef3874db99 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Mon, 3 Mar 2025 13:03:30 -0300
+Subject: [PATCH 23/79] media: mtk-jpeg: Support MT8188
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-developed-by: Jianhua Lin <jianhua.lin@mediatek.com>
+Signed-off-by: Jianhua Lin <jianhua.lin@mediatek.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+(cherry picked from commit 8ed4c89734086d9f6e34b1bb8cf26326967a36b1)
+---
+ .../platform/mediatek/jpeg/mtk_jpeg_core.c    | 40 +++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c b/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
+index f6972e5168f5..e310ad4f99de 100644
+--- a/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
++++ b/drivers/media/platform/mediatek/jpeg/mtk_jpeg_core.c
+@@ -2037,6 +2037,38 @@ static const struct mtk_jpeg_variant mtk8195_jpegdec_drvdata = {
+ 	.jpeg_worker = mtk_jpegdec_worker,
+ };
+ 
++static const struct mtk_jpeg_variant mtk8188_jpegenc_drvdata = {
++	.clks = mtk_jpeg_clocks,
++	.num_clks = ARRAY_SIZE(mtk_jpeg_clocks),
++	.formats = mtk_jpeg_enc_formats,
++	.num_formats = MTK_JPEG_ENC_NUM_FORMATS,
++	.qops = &mtk_jpeg_enc_qops,
++	.irq_handler = mtk_jpeg_enc_irq,
++	.hw_reset = mtk_jpeg_enc_reset,
++	.m2m_ops = &mtk_jpeg_enc_m2m_ops,
++	.dev_name = "mtk-jpeg-enc",
++	.ioctl_ops = &mtk_jpeg_enc_ioctl_ops,
++	.out_q_default_fourcc = V4L2_PIX_FMT_YUYV,
++	.cap_q_default_fourcc = V4L2_PIX_FMT_JPEG,
++	.support_34bit = true,
++};
++
++static const struct mtk_jpeg_variant mtk8188_jpegdec_drvdata = {
++	.clks = mt8173_jpeg_dec_clocks,
++	.num_clks = ARRAY_SIZE(mt8173_jpeg_dec_clocks),
++	.formats = mtk_jpeg_dec_formats,
++	.num_formats = MTK_JPEG_DEC_NUM_FORMATS,
++	.qops = &mtk_jpeg_dec_qops,
++	.irq_handler = mtk_jpeg_dec_irq,
++	.hw_reset = mtk_jpeg_dec_reset,
++	.m2m_ops = &mtk_jpeg_dec_m2m_ops,
++	.dev_name = "mtk-jpeg-dec",
++	.ioctl_ops = &mtk_jpeg_dec_ioctl_ops,
++	.out_q_default_fourcc = V4L2_PIX_FMT_JPEG,
++	.cap_q_default_fourcc = V4L2_PIX_FMT_YUV420M,
++	.support_34bit = true,
++};
++
+ static const struct of_device_id mtk_jpeg_match[] = {
+ 	{
+ 		.compatible = "mediatek,mt8173-jpgdec",
+@@ -2058,6 +2090,14 @@ static const struct of_device_id mtk_jpeg_match[] = {
+ 		.compatible = "mediatek,mt8195-jpgdec",
+ 		.data = &mtk8195_jpegdec_drvdata,
+ 	},
++	{
++		.compatible = "mediatek,mt8188-jpgenc",
++		.data = &mtk8188_jpegenc_drvdata,
++	},
++	{
++		.compatible = "mediatek,mt8188-jpgdec",
++		.data = &mtk8188_jpegdec_drvdata,
++	},
+ 	{},
+ };
+ 
+-- 
+2.43.0
+

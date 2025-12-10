@@ -1,0 +1,43 @@
+From 62ddefd40a9b366190e234ceb93f79af98ef3403 Mon Sep 17 00:00:00 2001
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Date: Wed, 12 Jun 2024 09:43:05 +0200
+Subject: [PATCH 42/79] scsi: ufs: ufs-mediatek: Avoid underscores in crypt
+ clock names
+
+Change all of crypt_{mux,lp,perf} clock names to crypt-{mux,lp-perf}:
+retaining compatibility with the old names is ignored as there is no
+user of this driver declaring any of those clocks, and the binding
+also doesn't allow these ones at all.
+
+Fixes: 590b0d2372fe ("scsi: ufs-mediatek: Support performance mode for inline encryption engine")
+Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+ drivers/ufs/host/ufs-mediatek.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/ufs/host/ufs-mediatek.c b/drivers/ufs/host/ufs-mediatek.c
+index 623533d3d114..5eb2e2e74d0f 100644
+--- a/drivers/ufs/host/ufs-mediatek.c
++++ b/drivers/ufs/host/ufs-mediatek.c
+@@ -637,15 +637,15 @@ static int ufs_mtk_init_boost_crypt(struct ufs_hba *hba)
+ 		return -ENOMEM;
+ 
+ 	cfg = host->crypt;
+-	ret = ufs_mtk_init_host_clk(hba, "crypt_mux", &cfg->clk_crypt_mux);
++	ret = ufs_mtk_init_host_clk(hba, "crypt-mux", &cfg->clk_crypt_mux);
+ 	if (ret)
+ 		goto out;
+ 
+-	ret = ufs_mtk_init_host_clk(hba, "crypt_lp", &cfg->clk_crypt_lp);
++	ret = ufs_mtk_init_host_clk(hba, "crypt-lp", &cfg->clk_crypt_lp);
+ 	if (ret)
+ 		goto out;
+ 
+-	ret = ufs_mtk_init_host_clk(hba, "crypt_perf", &cfg->clk_crypt_perf);
++	ret = ufs_mtk_init_host_clk(hba, "crypt-perf", &cfg->clk_crypt_perf);
+ 	if (ret)
+ 		goto out;
+ 
+-- 
+2.43.0
+

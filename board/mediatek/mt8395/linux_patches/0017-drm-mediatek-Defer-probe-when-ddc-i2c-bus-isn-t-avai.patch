@@ -1,0 +1,31 @@
+From c1900a3ce2238be98144ceac852a6bbd645fd973 Mon Sep 17 00:00:00 2001
+From: Sjoerd Simons <sjoerd@collabora.com>
+Date: Mon, 29 Sep 2025 09:33:16 +0200
+Subject: [PATCH 17/79] drm/mediatek: Defer probe when ddc i2c bus isn't
+ available yet
+
+The i2c adapter for ddc might not be available yet due to e.g. its
+module not yet being loaded. To handle that defer probing rather then
+returning a fatal error when probing.
+
+Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+index 9cd7add3dd94..73b1c012aaa8 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi_common.c
+@@ -319,7 +319,7 @@ static int mtk_hdmi_dt_parse_pdata(struct mtk_hdmi *hdmi, struct platform_device
+ 	hdmi->ddc_adpt = of_find_i2c_adapter_by_node(i2c_np);
+ 	of_node_put(i2c_np);
+ 	if (!hdmi->ddc_adpt)
+-		return dev_err_probe(dev, -EINVAL, "Failed to get ddc i2c adapter by node\n");
++		return dev_err_probe(dev, -EPROBE_DEFER, "Failed to get ddc i2c adapter by node\n");
+ 
+ 	ret = mtk_hdmi_get_cec_dev(hdmi, dev, np);
+ 	if (ret == -ENOTSUPP)
+-- 
+2.43.0
+

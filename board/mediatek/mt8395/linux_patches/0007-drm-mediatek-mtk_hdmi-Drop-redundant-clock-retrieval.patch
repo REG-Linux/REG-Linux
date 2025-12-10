@@ -1,0 +1,40 @@
+From b3037b6e88bd1aca2ab180a0b28da0f8bd6fa979 Mon Sep 17 00:00:00 2001
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Date: Tue, 5 Aug 2025 10:48:04 +0200
+Subject: [PATCH 07/79] drm/mediatek: mtk_hdmi: Drop redundant clock retrieval
+ in mtk_hdmi_get_cec_dev
+
+In mtk_hdmi driver, when the CEC device parsing logic was moved from
+mtk_hdmi_dt_parse_pdata function to the new mtk_hdmi_get_cec_dev sub
+function, the call to mtk_hdmi_get_all_clk was kept in both functions,
+whereas it was only called once in the original mtk_hdmi_dt_parse_pdata
+code and does not need to be called a second time.
+So, remove this call from mtk_hdmi_get_cec_dev to keep the same sequence
+as previously.
+
+Fixes: 7485be967f7f ("drm/mediatek: mtk_hdmi: Move CEC device parsing in new function")
+Reviewed-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+---
+ drivers/gpu/drm/mediatek/mtk_hdmi.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_hdmi.c b/drivers/gpu/drm/mediatek/mtk_hdmi.c
+index b766dd5e6c8d..9a2d4a904ff1 100644
+--- a/drivers/gpu/drm/mediatek/mtk_hdmi.c
++++ b/drivers/gpu/drm/mediatek/mtk_hdmi.c
+@@ -1349,11 +1349,6 @@ static int mtk_hdmi_get_cec_dev(struct mtk_hdmi *hdmi, struct device *dev, struc
+ {
+ 	struct platform_device *cec_pdev;
+ 	struct device_node *cec_np;
+-	int ret;
+-
+-	ret = mtk_hdmi_get_all_clk(hdmi, np);
+-	if (ret)
+-		return dev_err_probe(dev, ret, "Failed to get clocks\n");
+ 
+ 	/* The CEC module handles HDMI hotplug detection */
+ 	cec_np = of_get_compatible_child(np->parent, "mediatek,mt8173-cec");
+-- 
+2.43.0
+

@@ -1,0 +1,51 @@
+From 1a208735044a974a4cb52891f0e45483506260ae Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?=
+ <nfraprado@collabora.com>
+Date: Wed, 5 Mar 2025 15:58:24 -0300
+Subject: [PATCH 62/79] ASoC: mediatek: mt6359-accdet: Drop dead code for
+ plugout-debounce
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The mediatek,plugout-debounce property is undocumented in the binding
+and unhandled by the driver. Remove it.
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ sound/soc/codecs/mt6359-accdet.c | 5 -----
+ sound/soc/codecs/mt6359-accdet.h | 1 -
+ 2 files changed, 6 deletions(-)
+
+diff --git a/sound/soc/codecs/mt6359-accdet.c b/sound/soc/codecs/mt6359-accdet.c
+index 6b0178976d91..d78d7516342a 100644
+--- a/sound/soc/codecs/mt6359-accdet.c
++++ b/sound/soc/codecs/mt6359-accdet.c
+@@ -513,11 +513,6 @@ static int mt6359_accdet_parse_dt(struct mt6359_accdet *priv)
+ 	if (ret)
+ 		priv->data->mic_vol = 8;
+ 
+-	ret = of_property_read_u32(node, "mediatek,plugout-debounce",
+-				   &priv->data->plugout_deb);
+-	if (ret)
+-		priv->data->plugout_deb = 1;
+-
+ 	ret = of_property_read_u32(node, "mediatek,mic-mode",
+ 				   &priv->data->mic_mode);
+ 	if (ret)
+diff --git a/sound/soc/codecs/mt6359-accdet.h b/sound/soc/codecs/mt6359-accdet.h
+index be8303009e5c..afb36c2201b4 100644
+--- a/sound/soc/codecs/mt6359-accdet.h
++++ b/sound/soc/codecs/mt6359-accdet.h
+@@ -72,7 +72,6 @@ struct pwm_deb_settings {
+ struct dts_data {
+ 	unsigned int mic_vol;
+ 	unsigned int mic_mode;
+-	unsigned int plugout_deb;
+ 	bool hp_eint_high;
+ 	struct pwm_deb_settings *pwm_deb;
+ 	unsigned int moisture_detect_enable;
+-- 
+2.43.0
+
