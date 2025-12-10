@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
-from systemFiles import SAVES
-from controllers import generate_sdl_controller_config
+from configgen.systemFiles import SAVES
+from configgen.controllers import generate_sdl_controller_config
 
 THEXTECH_SAVES_DIR = SAVES + "/thextech"
 THEXTECH_BIN_PATH = "/usr/bin/thextech"

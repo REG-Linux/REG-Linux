@@ -18,7 +18,7 @@ from configgen.utils.bezels import (
     gunsBordersColorFomConfig,
     fast_image_size,
 )
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

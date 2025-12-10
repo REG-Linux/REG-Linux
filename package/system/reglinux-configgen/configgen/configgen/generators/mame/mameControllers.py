@@ -5,7 +5,7 @@ from codecs import open
 from csv import reader
 from xml.dom.minidom import Document, parse
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

@@ -1,4 +1,4 @@
-from systemFiles import CONF, SAVES, SCREENSHOTS, BIOS
+from configgen.systemFiles import CONF, SAVES, SCREENSHOTS, BIOS
 
 MUPEN_CONFIG_DIR = CONF + "/mupen64plus/"
 MUPEN_CONFIG_PATH = MUPEN_CONFIG_DIR + "mupen64plus.cfg"

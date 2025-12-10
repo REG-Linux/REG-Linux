@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from configparser import ConfigParser
 from os import path, makedirs, chdir
 from shutil import copy
@@ -15,7 +15,7 @@ from .fallout1Config import (
     FALLOUT_CONFIG_SOURCE_PATH,
     FALLOUT_CONFIG_INI_SOURCE_PATH,
 )
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 
 
 class Fallout1Generator(Generator):

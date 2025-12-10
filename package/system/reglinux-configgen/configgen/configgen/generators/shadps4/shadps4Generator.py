@@ -1,7 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 
 SHADPS4_BIN_PATH = "/usr/bin/shadps4/shadps4"
 

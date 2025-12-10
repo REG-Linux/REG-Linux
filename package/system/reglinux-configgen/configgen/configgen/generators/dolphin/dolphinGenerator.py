@@ -3,7 +3,7 @@ from configgen.Command import Command
 from os import path, makedirs, environ
 from configparser import ConfigParser
 from subprocess import CalledProcessError, check_output
-from controllers import gunsNeedCrosses
+from configgen.controllers import gunsNeedCrosses
 from .dolphinControllers import generateControllerConfig
 from .dolphinConfig import (
     getRatioFromConfig,
@@ -14,7 +14,7 @@ from .dolphinConfig import (
     DOLPHIN_GFX_PATH,
     DOLPHIN_SYSCONF_PATH,
 )
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

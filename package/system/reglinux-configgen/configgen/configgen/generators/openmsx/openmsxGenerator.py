@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 import os
 import xml.etree.ElementTree as ET
 import shutil

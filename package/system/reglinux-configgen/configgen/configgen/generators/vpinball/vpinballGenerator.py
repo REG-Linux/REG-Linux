@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, rename
 from configparser import ConfigParser, DuplicateOptionError
 from shutil import copy
-from utils.systemServices import get_service_status
-from controllers import generate_sdl_controller_config
+from configgen.utils.systemServices import get_service_status
+from configgen.controllers import generate_sdl_controller_config
 from . import vpinballWindowing
 from .vpinballConfig import (
     setVpinballConfig,
@@ -16,7 +16,7 @@ from .vpinballConfig import (
     VPINBALL_BIN_PATH,
 )
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

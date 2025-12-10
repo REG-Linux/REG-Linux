@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from .utils import shortNameFromPath
-from systemFiles import ES_GAMES_METADATA
-from utils.logger import get_logger
+from configgen.systemFiles import ES_GAMES_METADATA
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

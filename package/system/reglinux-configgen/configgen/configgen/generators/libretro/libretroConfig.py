@@ -1,15 +1,15 @@
 import sys
 import subprocess
 from json import load
-from settings import UnixSettings
+from configgen.settings import UnixSettings
 from os import path, makedirs, remove, listdir, unlink, symlink
-from controllers import getDevicesInformation, gunsBordersSizeName, getGamesMetaData
-from utils.videoMode import supportSystemRotation, getAltDecoration
+from configgen.controllers import getDevicesInformation, gunsBordersSizeName, getGamesMetaData
+from configgen.utils.videoMode import supportSystemRotation, getAltDecoration
 from xml.etree.ElementTree import parse
 from .libretroOptions import generateCoreSettings, generateHatariConf
 from .libretroMAMEConfig import generateMAMEConfigs
-from systemFiles import CONF, CONF_INIT, SAVES, ES_SETTINGS, OVERLAY_CONFIG_FILE
-from utils.bezels import (
+from configgen.systemFiles import CONF, CONF_INIT, SAVES, ES_SETTINGS, OVERLAY_CONFIG_FILE
+from configgen.utils.bezels import (
     gunsBorderSize,
     createTransparentBezel,
     getBezelInfos,
@@ -29,7 +29,7 @@ retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
 retroarchCores = "/usr/lib/libretro/"
 retroarchBin = "/usr/bin/retroarch"
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

@@ -1,6 +1,6 @@
-from generators.Generator import Generator
+from configgen.generators.Generator import Generator
 from os import makedirs
-from Command import Command
+from configgen.Command import Command
 import controllers as controllersConfig
 
 UQM_BIN_PATH = "/usr/bin/urquan"

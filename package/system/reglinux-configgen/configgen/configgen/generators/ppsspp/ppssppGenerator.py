@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import getenv
 from .ppssppConfig import setPPSSPPConfig, PPSSPP_BIN_PATH
 from .ppssppControllers import setControllerConfig

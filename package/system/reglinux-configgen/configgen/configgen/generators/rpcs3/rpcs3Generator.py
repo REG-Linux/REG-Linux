@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from shutil import copytree, copy2
 from configparser import ConfigParser
 from re import match
@@ -15,7 +15,7 @@ from .rpcs3Config import (
     RPCS3_PS3UPDAT_PATH,
     RPCS3_BIN_PATH,
 )
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

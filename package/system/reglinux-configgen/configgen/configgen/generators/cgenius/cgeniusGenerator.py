@@ -1,6 +1,6 @@
-from generators.Generator import Generator
+from configgen.generators.Generator import Generator
 from os import path, makedirs
-from Command import Command
+from configgen.Command import Command
 from shutil import copy
 from configobj import ConfigObj
 from .cgeniusControllers import setCgeniusControllers

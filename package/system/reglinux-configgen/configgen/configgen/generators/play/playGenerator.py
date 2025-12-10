@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
 from xml.etree.ElementTree import Element, SubElement, ElementTree, parse
-from systemFiles import CONF, SAVES
+from configgen.systemFiles import CONF, SAVES
 
 PLAY_CONFIG_DIR = CONF + "/play"
 PLAY_SAVE_DIR = SAVES + "/play"

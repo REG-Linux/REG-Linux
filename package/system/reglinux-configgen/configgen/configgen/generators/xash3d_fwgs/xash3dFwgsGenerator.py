@@ -1,11 +1,11 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from glob import glob
 from os import path, makedirs, symlink
 from re import compile
 from shutil import copy
-from controllers import generate_sdl_controller_config
-from systemFiles import ROMS
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import ROMS
 
 XASH3D_ROMS_DIR = ROMS + "/xash3d_fwgs"
 XASH3D_HLSDK_LIBS_DIR = "/usr/lib/xash3d/hlsdk"

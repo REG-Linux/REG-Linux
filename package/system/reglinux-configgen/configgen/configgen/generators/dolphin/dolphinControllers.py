@@ -4,7 +4,7 @@ from glob import glob
 from configparser import ConfigParser
 from re import match
 from .dolphinConfig import DOLPHIN_CONFIG_DIR
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

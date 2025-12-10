@@ -1,4 +1,4 @@
-from utils.videoMode import getScreensInfos
+from configgen.utils.videoMode import getScreensInfos
 
 
 def configureWindowing(vpinballSettings, system, gameResolution, hasDmd):

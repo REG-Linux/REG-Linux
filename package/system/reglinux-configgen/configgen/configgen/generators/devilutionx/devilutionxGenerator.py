@@ -1,7 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES, ROMS
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, SAVES, ROMS
 
 DEVILUTIONX_CONFIG_DIR = CONF + "/devilutionx"
 DEVILUTIONX_SAVES_DIR = SAVES + "/devilutionx"

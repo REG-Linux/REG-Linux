@@ -1,4 +1,4 @@
-from systemFiles import CONF
+from configgen.systemFiles import CONF
 
 MOONLIGHT_CONFIG_DIR = CONF + "/moonlight"
 MOONLIGHT_CONFIG_PATH = MOONLIGHT_CONFIG_DIR + "/moonlight.conf"

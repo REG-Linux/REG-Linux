@@ -1,13 +1,13 @@
-from generators.Generator import Generator
-from Command import Command
-from systemFiles import ROMS
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.systemFiles import ROMS
 from os import chdir
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 
 OPENJAZZ_ROMS_DIR = ROMS + "/openjazz"
 OPENJAZZ_BIN_PATH = "/usr/bin/OpenJazz"
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

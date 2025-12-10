@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, chdir
 from shutil import copytree
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from .drasticControllers import setDrasticController
 from .drasticConfig import (
     DRASTIC_CONFIG_DIR,

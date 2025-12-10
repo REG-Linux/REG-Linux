@@ -1,7 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import chdir
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from .cdogsConfig import CDOGS_ROMS_DIR, CDOGS_BIN_PATH, CDOGS_ASSETS_DIR
 
 

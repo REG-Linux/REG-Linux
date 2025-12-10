@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 from .viceConfig import setViceConfig, VICE_BIN_DIR
 from .viceControllers import setViceControllers
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

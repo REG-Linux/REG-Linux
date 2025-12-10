@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, chdir, access, X_OK
 from shutil import copy
 from configparser import ConfigParser
-from controllers import generate_sdl_controller_config
-from systemFiles import ROMS
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import ROMS
 from stat import S_IRWXU, S_IRGRP, S_IXGRP, S_IROTH, S_IXOTH
 
 SONICMANIA_SOURCE_BIN_PATH = "/usr/bin/sonic-mania"

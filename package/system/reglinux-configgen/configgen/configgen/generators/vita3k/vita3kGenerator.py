@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, mkdir, listdir
 from ruamel.yaml import YAML
 from shutil import move
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, SAVES
 
 VITA3K_CONFIG_DIR = CONF + "/vita3k"
 VITA3K_SAVES_DIR = SAVES + "/psvita"

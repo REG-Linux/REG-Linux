@@ -1,7 +1,7 @@
-from systemFiles import CONF, ROMS, SAVES, SCREENSHOTS
+from configgen.systemFiles import CONF, ROMS, SAVES, SCREENSHOTS
 from subprocess import check_output, CalledProcessError
 from os import chdir
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

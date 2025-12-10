@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, mkdir
 from configparser import ConfigParser
 from shutil import copyfile
-from systemFiles import CONF
+from configgen.systemFiles import CONF
 from .flycastConfig import (
     setFlycastConfig,
     FLYCAST_CONFIG_PATH,

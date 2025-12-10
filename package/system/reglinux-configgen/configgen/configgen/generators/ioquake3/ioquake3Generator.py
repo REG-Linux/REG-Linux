@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path
 from shutil import copytree
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from .ioquake3Config import (
     setIoquake3Config,
     IOQUAKE3_BIN_DIR,

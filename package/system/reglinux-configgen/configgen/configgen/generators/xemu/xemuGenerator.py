@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
 from shutil import copyfile
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from .xemuConfig import setXemuConfig, XEMU_BIN_PATH, XEMU_CONFIG_PATH, XEMU_SAVES_DIR
 
 

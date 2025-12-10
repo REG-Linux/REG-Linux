@@ -1,7 +1,7 @@
 from subprocess import run, check_output, CalledProcessError, PIPE
-from systemFiles import CONF, BIOS, ROMS, SAVES
+from configgen.systemFiles import CONF, BIOS, ROMS, SAVES
 from os import environ
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

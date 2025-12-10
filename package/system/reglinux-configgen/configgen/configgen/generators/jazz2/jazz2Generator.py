@@ -3,7 +3,7 @@ from configgen.Command import Command
 from configgen.systemFiles import ROMS
 from configgen.controllers import generate_sdl_controller_config
 from os import chdir
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

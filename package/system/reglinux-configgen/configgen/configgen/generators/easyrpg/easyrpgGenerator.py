@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
-from controllers import generate_sdl_controller_config
-from systemFiles import SAVES
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import SAVES
 
 EASYRPG_SAVE_DIR = SAVES + "/easyrpg"
 EASYRPG_BIN_PATH = "/usr/bin/easyrpg-player"

@@ -16,7 +16,7 @@ from os import path
 import os
 from evdev import InputDevice
 from .mouse import mouseButtonToCode
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

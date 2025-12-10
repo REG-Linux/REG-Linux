@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from configparser import ConfigParser
 from os import path, makedirs
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF
 
 FORCE_CONFIG_DIR = CONF + "/theforceengine"
 FORCE_MODS_DIR = FORCE_CONFIG_DIR + "/Mods"

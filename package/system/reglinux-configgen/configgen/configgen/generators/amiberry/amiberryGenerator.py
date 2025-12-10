@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from zipfile import ZipFile
 from os import path
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from configgen.utils.logger import get_logger
 from .amiberryConfig import setAmiberryConfig, AMIBERRY_BIN_PATH
 

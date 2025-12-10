@@ -4,7 +4,7 @@ import glob
 import configparser
 import re
 from . import dolphinTriforceConfig
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

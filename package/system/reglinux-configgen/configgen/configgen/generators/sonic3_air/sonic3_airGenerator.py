@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
 from shutil import copy
 from json import load, dump
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, SAVES
 
 SONIC3AIR_CONFIG_PATH = "/usr/bin/sonic3-air/config.json"
 SONIC3AIR_OXIGEN_PATH = "/usr/bin/sonic3-air/oxygenproject.json"
