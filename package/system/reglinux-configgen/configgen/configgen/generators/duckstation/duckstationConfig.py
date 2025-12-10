@@ -1,6 +1,6 @@
 from os import path
 from os import environ
-from systemFiles import CONF, BIOS, SAVES, ROMS, SCREENSHOTS, CHEATS
+from configgen.systemFiles import CONF, BIOS, SAVES, ROMS, SCREENSHOTS, CHEATS
 
 DUCKSTATION_CONFIG_PATH = CONF + "/duckstation/settings.ini"
 DUCKSTATION_SAVES_DIR = SAVES + "/duckstation"

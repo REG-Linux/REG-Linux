@@ -1,7 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.systemFiles import CONF
 from os import path
-from systemFiles import CONF
+from utils.logger import get_logger
+
+eslog = get_logger(__name__)
 
 DOSBOXSTAGING_CONFIG_DIR = CONF + "/dosbox"
 DOSBOXSTAGING_CONFIG_PATH = DOSBOXSTAGING_CONFIG_DIR + "/dosbox.conf"

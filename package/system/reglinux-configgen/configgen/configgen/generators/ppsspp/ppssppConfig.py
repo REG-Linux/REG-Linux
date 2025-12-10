@@ -1,6 +1,6 @@
-from settings import UnixSettings
+from configgen.settings import UnixSettings
+from configgen.systemFiles import CONF, HOME_INIT
 from subprocess import check_output, CalledProcessError
-from systemFiles import CONF, HOME_INIT
 from utils.logger import get_logger
 
 eslog = get_logger(__name__)

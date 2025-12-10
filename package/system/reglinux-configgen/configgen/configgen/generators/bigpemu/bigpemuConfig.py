@@ -1,5 +1,8 @@
-from utils.videoMode import getRefreshRate
-from systemFiles import HOME
+from configgen.systemFiles import HOME
+from configgen.utils.videoMode import getRefreshRate
+from utils.logger import get_logger
+
+eslog = get_logger(__name__)
 
 BIGPEMU_CONFIG_DIR = HOME + "/.bigpemu_userdata"
 BIGPEMU_CONFIG_PATH = BIGPEMU_CONFIG_DIR + "/BigPEmuConfig.bigpcfg"

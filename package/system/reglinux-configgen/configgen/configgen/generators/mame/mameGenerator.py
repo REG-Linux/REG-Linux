@@ -1,5 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import gunsBordersSizeName
 from xml.etree.ElementTree import parse
 from shutil import rmtree, copy2
 from csv import reader
@@ -8,9 +9,8 @@ from pathlib import Path
 from os import path, makedirs, listdir, symlink, unlink, chdir, remove
 from xml.dom import minidom
 from subprocess import Popen, PIPE
-from controllers import gunsBordersSizeName
-from utils.videoMode import getScreensInfos
-from utils.bezels import (
+from configgen.utils.videoMode import getScreensInfos
+from configgen.utils.bezels import (
     getBezelInfos,
     createTransparentBezel,
     gunBordersSize,
