@@ -1,5 +1,5 @@
 diff --git a/fs/squashfs/Config.in b/fs/squashfs/Config.in
-index 4f898bfdd4..dd370c5678 100644
+index cb2f5ec969..af43475975 100644
 --- a/fs/squashfs/Config.in
 +++ b/fs/squashfs/Config.in
 @@ -55,6 +55,10 @@ config BR2_TARGET_ROOTFS_SQUASHFS_BS
@@ -19,6 +19,6 @@ index 4f898bfdd4..dd370c5678 100644
  	default "-Xcompression-level 9" if BR2_TARGET_ROOTFS_SQUASHFS4_LZO
 -	default "-Xhc" if BR2_TARGET_ROOTFS_SQUASHFS4_LZ4
 +	default "" if BR2_TARGET_ROOTFS_SQUASHFS4_LZ4
- 	default "-Xbcj arm,armthumb" if BR2_TARGET_ROOTFS_SQUASHFS4_XZ && (BR2_arm || BR_aarch64)
+ 	default "-Xbcj arm,armthumb" if BR2_TARGET_ROOTFS_SQUASHFS4_XZ && (BR2_arm || BR2_aarch64)
  	default "-Xbcj powerpc" if BR2_TARGET_ROOTFS_SQUASHFS4_XZ && (BR2_powerpc || BR2_powerpc64)
  	default "-Xbcj sparc" if BR2_TARGET_ROOTFS_SQUASHFS4_XZ && (BR2_sparc || BR2_sparc64)
