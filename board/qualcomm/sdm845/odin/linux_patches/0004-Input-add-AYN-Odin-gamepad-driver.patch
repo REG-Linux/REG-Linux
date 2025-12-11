@@ -354,7 +354,7 @@ diff -rupbN linux.orig/drivers/input/joystick/odin-gamepad.c linux/drivers/input
 +}
 +
 +static const struct of_device_id odin_gamepad_of_match[] = {
-+	{ .compatible = "ayntec,odin-gamepad", },
++	{ .compatible = "ayntech,odin-gamepad", },
 +	{ /* sentinel */ },
 +};
 +MODULE_DEVICE_TABLE(of, odin_gamepad_of_match);
