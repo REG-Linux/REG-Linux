@@ -109,7 +109,7 @@ define REGLINUX_SYSTEM_INSTALL_LOGS_SERVICE
 	sed -i "s/.*system\.security\.enabled.*/system\.security\.enabled\=0/" $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
 endef
 
-ifneq (,$(findstring y,$(BR2_ENABLE_DEBUG)$(MINI_BUILD)))
+ifneq (,$(filter dev beta,$(REGLINUX_SYSTEM_RELEASE_TYPE)))
 	REGLINUX_SYSTEM_POST_INSTALL_TARGET_HOOKS += REGLINUX_SYSTEM_INSTALL_LOGS_SERVICE
 endif
 
