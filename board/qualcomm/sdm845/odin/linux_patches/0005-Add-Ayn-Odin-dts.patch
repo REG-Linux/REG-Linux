@@ -12,17 +12,20 @@ index 296688f7c..6447992e5 100644
  sdm845-db845c-navigation-mezzanine-dtbs	:= sdm845-db845c.dtb sdm845-db845c-navigation-mezzanine.dtbo
 diff --git a/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
 new file mode 100644
-index 000000000..60b98c13a
+index 000000000..91b92e686
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sdm845-ayn-odin.dts
-@@ -0,0 +1,1312 @@
+@@ -0,0 +1,1466 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022, Teguh Sobirin.
++ * Copyright (c) 2025,Demetris Ierokipides.
 + */
 +
 +/dts-v1/;
 +
++#include <dt-bindings/input/gpio-keys.h>
++#include <dt-bindings/input/input.h>
 +#include <dt-bindings/gpio/gpio.h>
 +#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
 +#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
@@ -54,91 +57,217 @@ index 000000000..60b98c13a
 +		stdout-path = "serial0:115200n8";
 +	};
 +
++/* Fixed crystal oscillator dedicated to MCP2517FD */
++	clk40M: can-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <40000000>;
++	};
++
 +	gpio-keys {
 +		compatible = "gpio-keys";
-+
 +		pinctrl-names = "default";
-+		pinctrl-0 = <&volume_up_gpio>;
++		pinctrl-0 = <&btn_pins>;
++		label = "Odin Gamepad Buttons";
++		
++		/* Button A / East */
++		btn_east {
++			label = "Button A";
++			linux,code = <BTN_EAST>;
++			gpios = <&tlmm 96 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>; 
++		};
++
++		/* Button B / South */
++		btn_south {
++			label = "Button B";
++			linux,code = <BTN_SOUTH>;
++			gpios = <&tlmm 95 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Button X / West */
++		btn_west {
++			label = "Button X";
++			linux,code = <BTN_WEST>;
++			gpios = <&tlmm 41 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Button Y / North */
++		btn_north {
++			label = "Button Y";
++			linux,code = <BTN_NORTH>;
++			gpios = <&tlmm 92 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Left Shoulder / L1 */
++		btn_tl {
++			label = "L1";
++			linux,code = <BTN_TL>;
++			gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Right Shoulder / R1 */
++		btn_tr {
++			label = "R1";
++			linux,code = <BTN_TR>;
++			gpios = <&tlmm 91 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Select */
++		btn_select {
++			label = "Select";
++			linux,code = <BTN_SELECT>;
++			gpios = <&tlmm 0 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Start */
++		btn_start {
++			label = "Start";
++			linux,code = <BTN_START>;
++			gpios = <&tlmm 3 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Left Stick Click / L3 */
++		btn_thumbl {
++			label = "L3";
++			linux,code = <BTN_THUMBL>;
++			gpios = <&tlmm 40 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Right Stick Click / R3 */
++		btn_thumbr {
++			label = "R3";
++			linux,code = <BTN_THUMBR>;
++			gpios = <&tlmm 22 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* D-Pad Up */
++		btn_dpad_up {
++			label = "D-Pad Up";
++			linux,code = <BTN_DPAD_UP>;
++			gpios = <&tlmm 124 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* D-Pad Down */
++		btn_dpad_down {
++			label = "D-Pad Down";
++			linux,code = <BTN_DPAD_DOWN>;
++			gpios = <&tlmm 128 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* D-Pad Left */
++		btn_dpad_left {
++			label = "D-Pad Left";
++			linux,code = <BTN_DPAD_LEFT>;
++			gpios = <&tlmm 52 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* D-Pad Right */
++		btn_dpad_right {
++			label = "D-Pad Right";
++			linux,code = <BTN_DPAD_RIGHT>;
++			gpios = <&tlmm 122 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
++
++		/* Mode Button */
++		btn_mode {
++			label = "Mode";
++			linux,code = <BTN_MODE>;
++			gpios = <&tlmm 49 GPIO_ACTIVE_LOW>;
++			debounce-interval = <10>;
++		};
 +
 +		vol-up {
 +			label = "Volume Up";
 +			linux,code = <KEY_VOLUMEUP>;
 +			gpios = <&pm8998_gpios 6 GPIO_ACTIVE_LOW>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&volume_up_gpio>;
 +		};
 +	};
 +
-+	gamepad {
-+		compatible = "ayntech,odin-gamepad";
-+
-+		dpad-down-gpio = <&tlmm 128 GPIO_ACTIVE_LOW>;
-+		dpad-left-gpio = <&tlmm 52 GPIO_ACTIVE_LOW>;
-+		dpad-right-gpio = <&tlmm 122 GPIO_ACTIVE_LOW>;
-+		dpad-up-gpio = <&tlmm 124 GPIO_ACTIVE_LOW>;
-+		east-btn-gpio = <&tlmm 96 GPIO_ACTIVE_LOW>;
-+		enable-gpio = <&tlmm 88 GPIO_ACTIVE_HIGH>;
-+		l1-btn-gpio = <&tlmm 26 GPIO_ACTIVE_LOW>;
-+		home-btn-gpio = <&tlmm 49 GPIO_ACTIVE_LOW>;
-+		north-btn-gpio = <&tlmm 92 GPIO_ACTIVE_LOW>;
-+		r1-btn-gpio = <&tlmm 91 GPIO_ACTIVE_LOW>;
-+		rear-l-btn-gpio = <&tlmm 116 GPIO_ACTIVE_LOW>;
-+		rear-r-btn-gpio = <&tlmm 24 GPIO_ACTIVE_LOW>;
-+		select-btn-gpio = <&tlmm 0 GPIO_ACTIVE_LOW>;
-+		south-btn-gpio = <&tlmm 95 GPIO_ACTIVE_LOW>;
-+		start-btn-gpio = <&tlmm 3 GPIO_ACTIVE_LOW>;
-+		thumb-l-btn-gpio = <&tlmm 40 GPIO_ACTIVE_LOW>;
-+		thumb-r-rtn-gpio = <&tlmm 22 GPIO_ACTIVE_LOW>;
-+		west-btn-gpio = <&tlmm 41 GPIO_ACTIVE_LOW>;
-+
-+		io-channel-names = "x-axis", "y-axis", "rx-axis",
-+				   "ry-axis", "l2-trigger", "r2-trigger";
-+		io-channels = <&pm8998_adc ADC5_GPIO3>,
-+			      <&pm8998_adc ADC5_GPIO2>,
-+			      <&pm8998_adc ADC5_GPIO5>,
-+			      <&pm8998_adc ADC5_GPIO6_DIV3>,
-+			      <&pm8998_adc ADC5_GPIO1>,
-+			      <&pm8998_adc ADC5_GPIO4>;
++	adc-joystick {
++		compatible = "adc-joystick";
 +		pinctrl-names = "default";
-+		pinctrl-0 = <&btn_pins &btn_en_active>;
++		pinctrl-0 = <&btn_en_active>;
++		
++		poll-interval = <10>; 
 +
-+		x-axis {
-+			abs-range = <1110000>;
-+			abs-flat = <4500>;
-+			abs-fuzz = <8500>;
++		io-channels = <&pm8998_adc ADC5_GPIO2>,
++		              <&pm8998_adc ADC5_GPIO3>,
++		              <&pm8998_adc ADC5_GPIO5>,
++		              <&pm8998_adc ADC5_GPIO6_DIV3>,
++		              <&pm8998_adc ADC5_GPIO1>,
++		              <&pm8998_adc ADC5_GPIO4>;
++
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		/* Left Stick X */
++		axis@0 {
++			reg = <0>;
++			linux,code = <ABS_X>;
++			abs-range = <0 12000>;
++			abs-fuzz = <30>;
++			abs-flat = <30>;
 +		};
 +
-+		y-axis {
-+			abs-range = <1340000>;
-+			inverted;
-+			abs-flat = <4500>;
-+			abs-fuzz = <8500>;
++		/* Left Stick Y */
++		axis@1 {
++			reg = <1>;
++			linux,code = <ABS_Y>;
++			abs-range = <0 12000>;
++			abs-fuzz = <30>;
++			abs-flat = <30>;
 +		};
 +
-+		rx-axis {
-+			abs-range = <1220000>;
-+			inverted;
-+			abs-flat = <4500>;
-+			abs-fuzz = <8500>;
++		/* Right Stick X */
++		axis@2 {
++			reg = <2>;
++			linux,code = <ABS_RX>;
++			abs-range = <0 12000>;
++			abs-fuzz = <30>;
++			abs-flat = <30>;
 +		};
 +
-+		ry-axis {
-+			abs-range = <1180000>;
-+			inverted;
-+			abs-flat = <4500>;
-+			abs-fuzz = <8500>;
++		/* Right Stick Y */
++		axis@3 {
++			reg = <3>;
++			linux,code = <ABS_RY>;
++			abs-range = <0 12000>;
++			abs-fuzz = <30>;
++			abs-flat = <30>;
 +		};
 +
-+		l2-trigger {
-+			abs-range = <1400000>;
-+			inverted;
-+			abs-flat = <4500>;
-+			abs-fuzz = <8500>;
++		/* Left Trigger (L2) */
++		axis@4 {
++			reg = <4>;
++			linux,code = <ABS_Z>;
++			abs-range = <0 12000>;
++			abs-fuzz = <30>;
++			abs-flat = <30>;
 +		};
 +
-+		r2-trigger {
-+			abs-range = <1400000>;
-+			inverted;
-+			abs-flat = <4500>;
-+			abs-fuzz = <8500>;
++		/* Right Trigger (R2) */
++		axis@5 {
++			reg = <5>;
++			linux,code = <ABS_RZ>;
++			abs-range = <0 12000>;
++			abs-fuzz = <30>;
++			abs-flat = <30>;
 +		};
 +	};
 +
@@ -694,6 +823,7 @@ index 000000000..60b98c13a
 +		#address-cells = <1>;
 +		#size-cells = <0>;
 +
++		reset-gpios = <&tlmm 104 GPIO_ACTIVE_LOW>;
 +		interrupts-extended = <&tlmm 125 IRQ_TYPE_EDGE_FALLING>;
 +
 +		pinctrl-names = "default";
@@ -720,6 +850,23 @@ index 000000000..60b98c13a
 +			syna,sensor-type = <1>;
 +			touchscreen-inverted-x;
 +		};
++	};
++};
++
++&spi0 {
++	/*
++	 * TODO
++	 * [   16.605399] sdm845-pinctrl 3400000.pinctrl: pin GPIO_0 already requested by odin-gamepad; cannot claim for 880000.spi
++	 */
++	status = "disabled";
++	cs-gpios = <&tlmm 3 GPIO_ACTIVE_LOW>;
++
++	can@0 {
++		compatible = "microchip,mcp2517fd";
++		reg = <0>;
++		clocks = <&clk40M>;
++		interrupts-extended = <&tlmm 34 IRQ_TYPE_LEVEL_LOW>;
++		spi-max-frequency = <10000000>;
 +	};
 +};
 +
@@ -939,7 +1086,6 @@ index 000000000..60b98c13a
 +
 +&pmi8998_wled {
 +	status = "okay";
-+	qcom,enabled-strings = <0 1>;
 +	qcom,num-strings = <2>;
 +};
 +
@@ -1016,31 +1162,22 @@ index 000000000..60b98c13a
 +};
 +
 +&sound {
-+	compatible = "qcom,db845c-sndcard", "qcom,sdm845-sndcard";
++	compatible = "ayn,odin-sndcard", "qcom,sdm845-sndcard";
 +    pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active>;
 +    pinctrl-1 = <&quat_mi2s_sleep &quat_mi2s_sd0_sleep>;
 +	model = "Odin";
 +
 +	audio-routing =
 +		"RX_BIAS", "MCLK",
-+        "AMIC1", "MIC BIAS1",
-+        "MIC BIAS1", "Handset Mic",
-+        "AMIC2", "MIC BIAS2",
-+        "MIC BIAS2", "Headset Mic",
-+        "AMIC3", "MIC BIAS3",
-+        "MIC BIAS3", "ANCRight Headset Mic",
-+        "AMIC4", "MIC BIAS4",
-+        "MIC BIAS4", "ANCLeft Headset Mic",
-+        "DMIC0", "MIC BIAS1",
-+        "MIC BIAS1", "Digital Mic0",
-+        "DMIC1", "MIC BIAS1",
-+        "MIC BIAS1", "Digital Mic1",
-+        /* WSA Speakers linked via Macros */
++		"AMIC2", "MIC BIAS2",
 +		"SpkrLeft IN", "SPK1 OUT",
-+		"SpkrRight IN", "SPK2 OUT";
++		"SpkrRight IN", "SPK2 OUT",
++		"MM_DL1",  "MultiMedia1 Playback",
++		"MM_DL3",  "MultiMedia3 Playback",
++		"MultiMedia2 Capture", "MM_UL2";
 +
 +		/* USB-C Analog Mux GPIOs */
-+   // qcom,jack-en-gpios = <&tlmm 51 GPIO_ACTIVE_HIGH>; /* atm missing tlmm 51 gpio */
++		qcom,jack-en-gpios = <&tlmm 51 GPIO_ACTIVE_HIGH>;
 +
 + mm1-dai-link {
 +		link-name = "MultiMedia1";
@@ -1277,11 +1414,11 @@ index 000000000..60b98c13a
 +};
 +
 +&wcd9340{
-+	pinctrl-0 = <&wcd_intr_default_odin>;
-+	pinctrl-names = "default";
-+	clock-names = "extclk";
-+	clocks = <&rpmhcc RPMH_LN_BB_CLK2>;
-+	reset-gpios = <&tlmm 64 0>;
++ /*	pinctrl-0 = <&wcd_intr_default_odin>; */
++ /*	pinctrl-names = "default"; */
++ /*	clock-names = "extclk"; */
++ /*	clocks = <&rpmhcc RPMH_LN_BB_CLK2>; */
++	reset-gpios = <&tlmm 64 GPIO_ACTIVE_HIGH>;
 +	vdd-buck-supply = <&vreg_s4a_1p8>;
 +	vdd-buck-sido-supply = <&vreg_s4a_1p8>;
 +	vdd-tx-supply = <&vreg_s4a_1p8>;
@@ -1291,8 +1428,6 @@ index 000000000..60b98c13a
 +	qcom,mbhc-headset-vthreshold-microvolt = <1700000>;
 +	qcom,mbhc-headphone-vthreshold-microvolt = <50000>;
 +
-+};
-+
 +&swm {
 +    status = "okay";
 +
@@ -1300,7 +1435,7 @@ index 000000000..60b98c13a
 +    wsa881x_1: speaker@0,1 {
 +        compatible = "sdw10217201000";
 +        reg = <0 1>;
-+        powerdown-gpios = <&wcdgpio 2 GPIO_ACTIVE_LOW>;
++        powerdown-gpios = <&wcdgpio 1 GPIO_ACTIVE_LOW>;
 +        #sound-dai-cells = <0>;
 +        sound-name-prefix = "SpkrLeft";
 +        vdd-1p8-supply = <&vreg_l15a_1p8>;
@@ -1314,7 +1449,9 @@ index 000000000..60b98c13a
 +        #sound-dai-cells = <0>;
 +        sound-name-prefix = "SpkrRight";
 +        vdd-1p8-supply = <&vreg_l15a_1p8>;
-+    };
++
++		};
++	};
 +};
 +
 +&wifi {
@@ -1328,3 +1465,20 @@ index 000000000..60b98c13a
 +
 +	qcom,snoc-host-cap-8bit-quirk;
 +};
++
++/* PINCTRL - additions to nodes defined in sdm845.dtsi */
++&qup_spi0_default {
++	drive-strength = <6>;
++	bias-disable;
++};
++
++&qup_i2c4_default {
++	drive-strength = <2>;
++	bias-disable;
++};
++
++&qup_i2c5_default {
++	drive-strength = <2>;
++	bias-disable;
++};
++
