@@ -142,12 +142,8 @@ else
 PIPEWIRE_CONF_OPTS += -Dbluez5=disabled
 endif
 
-ifeq ($(BR2_PACKAGE_FFMPEG),y)
-PIPEWIRE_CONF_OPTS += -Dffmpeg=enabled -Dpw-cat-ffmpeg=enabled
-PIPEWIRE_DEPENDENCIES += ffmpeg
-else
+# reglinux we disable ffmpeg support for avoid es-ffmpeg conflict
 PIPEWIRE_CONF_OPTS += -Dffmpeg=disabled -Dpw-cat-ffmpeg=disabled
-endif
 
 ifeq ($(BR2_PACKAGE_NCURSES_WCHAR),y)
 PIPEWIRE_DEPENDENCIES += ncurses
