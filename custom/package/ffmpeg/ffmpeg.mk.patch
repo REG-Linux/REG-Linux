@@ -1,5 +1,5 @@
 diff --git a/package/ffmpeg/ffmpeg.mk b/package/ffmpeg/ffmpeg.mk
-index f218e60067..a2de3990e5 100644
+index f218e60067..7e5de2a90d 100644
 --- a/package/ffmpeg/ffmpeg.mk
 +++ b/package/ffmpeg/ffmpeg.mk
 @@ -4,7 +4,7 @@
@@ -19,18 +19,3 @@ index f218e60067..a2de3990e5 100644
  	--disable-dxva2 \
  	--enable-runtime-cpudetect \
  	--disable-hardcoded-tables \
-@@ -270,6 +269,14 @@ FFMPEG_CONF_OPTS += \
- 	--enable-encoder=libvorbis
- endif
- 
-+# REG
-+ifeq ($(BR2_PACKAGE_LIBV4L),y)
-+FFMPEG_CONF_OPTS += --enable-v4l2-request
-+FFMPEG_DEPENDENCIES += libv4l
-+else
-+FFMPEG_CONF_OPTS += --disable-v4l2-request
-+endif
-+
- ifeq ($(BR2_PACKAGE_LIBVA),y)
- FFMPEG_CONF_OPTS += --enable-vaapi
- FFMPEG_DEPENDENCIES += libva
