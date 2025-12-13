@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/libxcb/libxcb.hash b/package/x11r7/libxcb/libxcb.hash
-index 2e2179e8da..a8267921df 100644
+index 2e2179e8dae..a8267921df1 100644
 --- a/package/x11r7/libxcb/libxcb.hash
 +++ b/package/x11r7/libxcb/libxcb.hash
 @@ -1,5 +1,5 @@

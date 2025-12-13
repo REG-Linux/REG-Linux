@@ -1,5 +1,5 @@
 diff --git a/package/libxmlb/libxmlb.mk b/package/libxmlb/libxmlb.mk
-index 1d5d339e4f..ee39e92052 100644
+index 1d5d339e4f4..ee39e92052b 100644
 --- a/package/libxmlb/libxmlb.mk
 +++ b/package/libxmlb/libxmlb.mk
 @@ -34,3 +34,8 @@ LIBXMLB_CONF_OPTS += -Dlzma=disabled

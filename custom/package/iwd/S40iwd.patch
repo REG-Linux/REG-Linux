@@ -1,5 +1,5 @@
 diff --git a/package/iwd/S40iwd b/package/iwd/S40iwd
-index 6714ca9956..9d6cb4d377 100644
+index 6714ca9956b..9d6cb4d3777 100644
 --- a/package/iwd/S40iwd
 +++ b/package/iwd/S40iwd
 @@ -1,42 +1,65 @@

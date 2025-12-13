@@ -1,5 +1,5 @@
 diff --git a/toolchain/Config.in b/toolchain/Config.in
-index 94723da141..dd6ecba834 100644
+index 94723da1417..dd6ecba8348 100644
 --- a/toolchain/Config.in
 +++ b/toolchain/Config.in
 @@ -647,6 +647,30 @@ config BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12

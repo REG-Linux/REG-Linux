@@ -1,5 +1,5 @@
 diff --git a/package/iwd/iwd.mk b/package/iwd/iwd.mk
-index 3a178795da..1aadfb9ba6 100644
+index 3a178795da9..1aadfb9ba6e 100644
 --- a/package/iwd/iwd.mk
 +++ b/package/iwd/iwd.mk
 @@ -4,7 +4,7 @@

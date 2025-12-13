@@ -1,5 +1,5 @@
 diff --git a/package/libdrm/libdrm.mk b/package/libdrm/libdrm.mk
-index 9d463ca01e..4ec0862044 100644
+index 9d463ca01ea..4ec08620443 100644
 --- a/package/libdrm/libdrm.mk
 +++ b/package/libdrm/libdrm.mk
 @@ -4,7 +4,7 @@

@@ -1,5 +1,5 @@
 diff --git a/package/fmt/fmt.mk b/package/fmt/fmt.mk
-index 113652e911..274324810d 100644
+index 113652e9116..274324810d9 100644
 --- a/package/fmt/fmt.mk
 +++ b/package/fmt/fmt.mk
 @@ -3,8 +3,8 @@

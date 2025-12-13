@@ -1,5 +1,5 @@
 diff --git a/package/libfuse3/libfuse3.mk b/package/libfuse3/libfuse3.mk
-index f5c9dae8f7..ff7070dff5 100644
+index f5c9dae8f75..ff7070dff54 100644
 --- a/package/libfuse3/libfuse3.mk
 +++ b/package/libfuse3/libfuse3.mk
 @@ -30,4 +30,10 @@ define LIBFUSE3_LINUX_CONFIG_FIXUPS

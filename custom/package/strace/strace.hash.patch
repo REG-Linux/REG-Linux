@@ -1,5 +1,5 @@
 diff --git a/package/strace/strace.hash b/package/strace/strace.hash
-index 9ab5715e32..0eb2adce6d 100644
+index 9ab5715e324..0eb2adce6d1 100644
 --- a/package/strace/strace.hash
 +++ b/package/strace/strace.hash
 @@ -1,3 +1,4 @@

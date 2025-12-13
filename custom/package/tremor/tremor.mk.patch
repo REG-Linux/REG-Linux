@@ -1,5 +1,5 @@
 diff --git a/package/tremor/tremor.mk b/package/tremor/tremor.mk
-index a865e681df..0edd0c74ac 100644
+index a865e681df3..0edd0c74ac6 100644
 --- a/package/tremor/tremor.mk
 +++ b/package/tremor/tremor.mk
 @@ -3,9 +3,9 @@

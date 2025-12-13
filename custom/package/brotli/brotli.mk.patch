@@ -1,5 +1,5 @@
 diff --git a/package/brotli/brotli.mk b/package/brotli/brotli.mk
-index 80aa2566b5..62cf2ef5b2 100644
+index 80aa2566b51..62cf2ef5b28 100644
 --- a/package/brotli/brotli.mk
 +++ b/package/brotli/brotli.mk
 @@ -30,3 +30,4 @@ endif

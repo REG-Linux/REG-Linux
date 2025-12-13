@@ -1,5 +1,5 @@
 diff --git a/package/libopenh264/Config.in b/package/libopenh264/Config.in
-index 2b77578a83..79ad1b999d 100644
+index 2b77578a832..79ad1b999d9 100644
 --- a/package/libopenh264/Config.in
 +++ b/package/libopenh264/Config.in
 @@ -2,7 +2,7 @@ config BR2_PACKAGE_LIBOPENH264_ARCH_SUPPORTS

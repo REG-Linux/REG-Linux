@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xlib_libXrandr/xlib_libXrandr.mk b/package/x11r7/xlib_libXrandr/xlib_libXrandr.mk
-index 5e88173ed7..6d3dcf3f88 100644
+index 5e88173ed7b..6d3dcf3f88c 100644
 --- a/package/x11r7/xlib_libXrandr/xlib_libXrandr.mk
 +++ b/package/x11r7/xlib_libXrandr/xlib_libXrandr.mk
 @@ -3,8 +3,8 @@

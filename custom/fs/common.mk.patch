@@ -1,5 +1,5 @@
 diff --git a/fs/common.mk b/fs/common.mk
-index 2f3f8bcc7e..bb4da3d882 100644
+index 2f3f8bcc7e3..bb4da3d882e 100644
 --- a/fs/common.mk
 +++ b/fs/common.mk
 @@ -169,6 +169,7 @@ $$(BINARIES_DIR)/$$(ROOTFS_$(2)_FINAL_IMAGE_NAME): $$(ROOTFS_$(2)_DEPENDENCIES)

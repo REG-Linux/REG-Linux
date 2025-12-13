@@ -1,5 +1,5 @@
 diff --git a/package/sway/Config.in b/package/sway/Config.in
-index d78f792c48..968375583d 100644
+index d78f792c488..968375583df 100644
 --- a/package/sway/Config.in
 +++ b/package/sway/Config.in
 @@ -1,6 +1,5 @@
