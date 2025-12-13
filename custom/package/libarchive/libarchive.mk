@@ -74,17 +74,19 @@ else
 LIBARCHIVE_CONF_OPTS += --without-bz2lib
 endif
 
-ifeq ($(BR2_PACKAGE_EXPAT),y)
-LIBARCHIVE_DEPENDENCIES += expat
-else
+# reglinux no need for expat
+#ifeq ($(BR2_PACKAGE_EXPAT),y)
+#LIBARCHIVE_DEPENDENCIES += expat
+#else
 LIBARCHIVE_CONF_OPTS += --without-expat
-endif
+#endif
 
-ifeq ($(BR2_PACKAGE_LIBICONV),y)
-LIBARCHIVE_DEPENDENCIES += libiconv
-else
+# reglinux no need for libiconv
+#ifeq ($(BR2_PACKAGE_LIBICONV),y)
+#LIBARCHIVE_DEPENDENCIES += libiconv
+#else
 LIBARCHIVE_CONF_OPTS += --without-libiconv-prefix
-endif
+#endif
 
 ifeq ($(BR2_PACKAGE_LIBXML2),y)
 LIBARCHIVE_DEPENDENCIES += libxml2
@@ -106,25 +108,28 @@ else
 LIBARCHIVE_CONF_OPTS += --without-lzo2
 endif
 
-ifeq ($(BR2_PACKAGE_MBEDTLS),y)
-LIBARCHIVE_DEPENDENCIES += mbedtls
-LIBARCHIVE_CONF_OPTS += --with-mbedtls
-else
+# reglinux no need for crypto
+#ifeq ($(BR2_PACKAGE_MBEDTLS),y)
+#LIBARCHIVE_DEPENDENCIES += mbedtls
+#LIBARCHIVE_CONF_OPTS += --with-mbedtls
+#else
 LIBARCHIVE_CONF_OPTS += --without-mbedtls
-endif
+#endif
 
-ifeq ($(BR2_PACKAGE_NETTLE),y)
-LIBARCHIVE_DEPENDENCIES += nettle
-LIBARCHIVE_CONF_OPTS += --with-nettle
-else
+# reglinux no need for crypto
+#ifeq ($(BR2_PACKAGE_NETTLE),y)
+#LIBARCHIVE_DEPENDENCIES += nettle
+#LIBARCHIVE_CONF_OPTS += --with-nettle
+#else
 LIBARCHIVE_CONF_OPTS += --without-nettle
-endif
+#endif
 
-ifeq ($(BR2_PACKAGE_OPENSSL),y)
-LIBARCHIVE_DEPENDENCIES += openssl
-else
+# reglinux no need for crypto
+#ifeq ($(BR2_PACKAGE_OPENSSL),y)
+#LIBARCHIVE_DEPENDENCIES += openssl
+#else
 LIBARCHIVE_CONF_OPTS += --without-openssl
-endif
+#endif
 
 ifeq ($(BR2_PACKAGE_ZLIB),y)
 LIBARCHIVE_DEPENDENCIES += zlib
