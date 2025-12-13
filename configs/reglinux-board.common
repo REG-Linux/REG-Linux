@@ -149,6 +149,9 @@ BR2_PACKAGE_SEATD=y
 # Prefer using prebuilt ScummVM
 #BR2_PACKAGE_SCUMMVM_BUILD_FROM_SOURCE=y
 
+# Prefer using prebuilt REGMSG
+#BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE=y
+
 # Enables ccache
 BR2_CCACHE=y
 

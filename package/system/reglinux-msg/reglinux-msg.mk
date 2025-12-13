@@ -6,6 +6,9 @@
 
 # branch blake3 (with iwd support) is default for now
 REGLINUX_MSG_VERSION = c8048e3087705d7eb0f356453aecd9d663bc116f
+
+ifeq ($(BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE),y)
+
 REGLINUX_MSG_TOKEN = $(shell cat /build/gh_token)
 REGLINUX_MSG_SITE = https://$(REGLINUX_MSG_TOKEN)@github.com/REG-Linux/regmsg
 REGLINUX_MSG_SITE_METHOD = git
@@ -26,3 +29,61 @@ define REGLINUX_MSG_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(cargo-package))
+
+else
+# Download pre compiled files
+
+REGLINUX_MSG_CPU = unknown
+ifeq ($(BR2_arm1176jzf_s),y)
+	REGLINUX_MSG_CPU = arm1176jzf_s
+else ifeq ($(BR2_cortex_a7),y)
+	REGLINUX_MSG_CPU = cortex_a7
+else ifeq ($(BR2_cortex_a9),y)
+	REGLINUX_MSG_CPU = cortex_a9
+else ifeq ($(BR2_cortex_a15_a7),y)
+	REGLINUX_MSG_CPU = cortex_a15_a7
+else ifeq ($(BR2_cortex_a17),y)
+	REGLINUX_MSG_CPU = cortex_a17
+else ifeq ($(BR2_cortex_a35),y)
+	REGLINUX_MSG_CPU = cortex_a35
+else ifeq ($(BR2_cortex_a53),y)
+	REGLINUX_MSG_CPU = cortex_a53
+else ifeq ($(BR2_jz4770),y)
+	REGLINUX_MSG_CPU = jz4770
+else ifeq ($(BR2_cortex_a55),y)
+	REGLINUX_MSG_CPU = cortex_a55
+else ifeq ($(BR2_cortex_a72),y)
+	REGLINUX_MSG_CPU = cortex_a72
+else ifeq ($(BR2_cortex_a72_a53),y)
+	REGLINUX_MSG_CPU = cortex_a72_a53
+else ifeq ($(BR2_cortex_a73_a53),y)
+	REGLINUX_MSG_CPU = cortex_a73_a53
+else ifeq ($(BR2_cortex_a75_a55),y)
+	REGLINUX_MSG_CPU = cortex_a75_a55
+else ifeq ($(BR2_cortex_a76),y)
+	REGLINUX_MSG_CPU = cortex_a76
+else ifeq ($(BR2_cortex_a76_a55),y)
+	REGLINUX_MSG_CPU = cortex_a76_a55
+else ifeq ($(BR2_ARM_CPU_ARMV9A),y) # TODO
+	REGLINUX_MSG_CPU = cortex_a76_a55
+else ifeq ($(BR2_riscv),y)
+	REGLINUX_MSG_CPU = riscv
+else ifeq ($(BR2_saphira),y)
+	REGLINUX_MSG_CPU = saphira
+else ifeq ($(BR2_x86_64),y)
+	REGLINUX_MSG_CPU = x86_64
+else ifeq ($(BR2_x86_64_v3),y)
+	REGLINUX_MSG_CPU = x86_64_v3
+endif
+
+REGLINUX_MSG_SHORT_VERSION := $(shell printf '%s' "$(REGLINUX_MSG_VERSION)" | cut -c1-7)
+REGLINUX_MSG_SITE = https://github.com/REG-Linux/regmsg-binaries/releases/download/$(REGLINUX_MSG_SHORT_VERSION)
+REGLINUX_MSG_SOURCE = reglinux-msg-$(REGLINUX_MSG_SHORT_VERSION)-$(REGLINUX_MSG_CPU).tar.xz
+
+define REGLINUX_MSG_INSTALL_TARGET_CMDS
+	# extract target folder
+	tar -C $(TARGET_DIR)/../ -xvf $(DL_DIR)/$(REGLINUX_MSG_DL_SUBDIR)/$(REGLINUX_MSG_SOURCE) target
+endef
+
+$(eval $(generic-package))
+endif
