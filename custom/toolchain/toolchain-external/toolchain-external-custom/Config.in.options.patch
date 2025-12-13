@@ -1,5 +1,5 @@
 diff --git a/toolchain/toolchain-external/toolchain-external-custom/Config.in.options b/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
-index 2dc04747b3..e9150b2c5a 100644
+index 2dc04747b3d..e9150b2c5ae 100644
 --- a/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
 +++ b/toolchain/toolchain-external/toolchain-external-custom/Config.in.options
 @@ -166,8 +166,32 @@ choice

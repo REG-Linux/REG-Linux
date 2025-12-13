@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xlib_libXext/xlib_libXext.mk b/package/x11r7/xlib_libXext/xlib_libXext.mk
-index 0bb3efa31f..abb97c0dff 100644
+index 0bb3efa31ff..abb97c0dffd 100644
 --- a/package/x11r7/xlib_libXext/xlib_libXext.mk
 +++ b/package/x11r7/xlib_libXext/xlib_libXext.mk
 @@ -3,8 +3,8 @@

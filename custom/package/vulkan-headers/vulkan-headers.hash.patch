@@ -1,5 +1,5 @@
 diff --git a/package/vulkan-headers/vulkan-headers.hash b/package/vulkan-headers/vulkan-headers.hash
-index b38bfcff47..1b7022e864 100644
+index b38bfcff47a..1b7022e8646 100644
 --- a/package/vulkan-headers/vulkan-headers.hash
 +++ b/package/vulkan-headers/vulkan-headers.hash
 @@ -1,3 +1,3 @@

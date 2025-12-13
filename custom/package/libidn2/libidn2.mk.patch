@@ -1,5 +1,5 @@
 diff --git a/package/libidn2/libidn2.mk b/package/libidn2/libidn2.mk
-index 59db3662e4..f52a4e4a40 100644
+index 59db3662e4f..f52a4e4a406 100644
 --- a/package/libidn2/libidn2.mk
 +++ b/package/libidn2/libidn2.mk
 @@ -31,3 +31,5 @@ LIBIDN2_LICENSE += , GPL-3.0+ (program)

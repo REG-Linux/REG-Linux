@@ -1,5 +1,5 @@
 diff --git a/package/vulkan-headers/vulkan-headers.mk b/package/vulkan-headers/vulkan-headers.mk
-index 20b248364d..163d6b0833 100644
+index 20b248364d5..163d6b0833f 100644
 --- a/package/vulkan-headers/vulkan-headers.mk
 +++ b/package/vulkan-headers/vulkan-headers.mk
 @@ -3,13 +3,16 @@

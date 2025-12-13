@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.hash b/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.hash
-index cca2639dc3..e31eab627f 100644
+index cca2639dc31..e31eab627fd 100644
 --- a/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.hash
 +++ b/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.hash
 @@ -1,5 +1,5 @@

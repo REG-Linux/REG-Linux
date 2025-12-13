@@ -1,5 +1,5 @@
 diff --git a/package/rust/rust.hash b/package/rust/rust.hash
-index 19af66e2d6..c60ec4d353 100644
+index 19af66e2d6a..c60ec4d3536 100644
 --- a/package/rust/rust.hash
 +++ b/package/rust/rust.hash
 @@ -1,8 +1,8 @@

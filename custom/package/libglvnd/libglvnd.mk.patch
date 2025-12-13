@@ -1,5 +1,5 @@
 diff --git a/package/libglvnd/libglvnd.mk b/package/libglvnd/libglvnd.mk
-index 95ac19dd91..50e151ad4a 100644
+index 95ac19dd91e..50e151ad4ad 100644
 --- a/package/libglvnd/libglvnd.mk
 +++ b/package/libglvnd/libglvnd.mk
 @@ -4,8 +4,13 @@

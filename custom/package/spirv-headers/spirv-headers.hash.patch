@@ -1,5 +1,5 @@
 diff --git a/package/spirv-headers/spirv-headers.hash b/package/spirv-headers/spirv-headers.hash
-index 136f3df733..b55832efe8 100644
+index 136f3df7336..b55832efe86 100644
 --- a/package/spirv-headers/spirv-headers.hash
 +++ b/package/spirv-headers/spirv-headers.hash
 @@ -1,3 +1,3 @@

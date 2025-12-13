@@ -1,5 +1,5 @@
 diff --git a/package/libsoundtouch/libsoundtouch.mk b/package/libsoundtouch/libsoundtouch.mk
-index 099539250c..f12d0af8c0 100644
+index 099539250c9..f12d0af8c07 100644
 --- a/package/libsoundtouch/libsoundtouch.mk
 +++ b/package/libsoundtouch/libsoundtouch.mk
 @@ -9,7 +9,13 @@ LIBSOUNDTOUCH_SOURCE = soundtouch-$(LIBSOUNDTOUCH_VERSION).tar.gz

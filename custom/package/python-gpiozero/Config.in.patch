@@ -1,5 +1,5 @@
 diff --git a/package/python-gpiozero/Config.in b/package/python-gpiozero/Config.in
-index c5f3880ea9..1944769f7e 100644
+index c5f3880ea9c..1944769f7e7 100644
 --- a/package/python-gpiozero/Config.in
 +++ b/package/python-gpiozero/Config.in
 @@ -1,6 +1,6 @@

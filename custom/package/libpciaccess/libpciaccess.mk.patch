@@ -1,5 +1,5 @@
 diff --git a/package/libpciaccess/libpciaccess.mk b/package/libpciaccess/libpciaccess.mk
-index cd35b27015..6f4f05e42c 100644
+index cd35b270150..6f4f05e42c3 100644
 --- a/package/libpciaccess/libpciaccess.mk
 +++ b/package/libpciaccess/libpciaccess.mk
 @@ -20,3 +20,4 @@ LIBPCIACCESS_CONF_OPTS += -Dzlib=disabled
