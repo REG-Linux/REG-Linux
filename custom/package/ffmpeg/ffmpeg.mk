@@ -269,14 +269,6 @@ FFMPEG_CONF_OPTS += \
 	--enable-encoder=libvorbis
 endif
 
-# REG
-ifeq ($(BR2_PACKAGE_LIBV4L),y)
-FFMPEG_CONF_OPTS += --enable-v4l2-request
-FFMPEG_DEPENDENCIES += libv4l
-else
-FFMPEG_CONF_OPTS += --disable-v4l2-request
-endif
-
 ifeq ($(BR2_PACKAGE_LIBVA),y)
 FFMPEG_CONF_OPTS += --enable-vaapi
 FFMPEG_DEPENDENCIES += libva
