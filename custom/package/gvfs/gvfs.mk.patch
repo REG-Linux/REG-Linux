@@ -1,5 +1,5 @@
 diff --git a/package/gvfs/gvfs.mk b/package/gvfs/gvfs.mk
-index 50efed1abb..a53bf4f54f 100644
+index 50efed1abbf..a53bf4f54fe 100644
 --- a/package/gvfs/gvfs.mk
 +++ b/package/gvfs/gvfs.mk
 @@ -71,12 +71,14 @@ else

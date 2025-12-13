@@ -1,5 +1,5 @@
 diff --git a/fs/squashfs/squashfs.mk b/fs/squashfs/squashfs.mk
-index 3b9d0efbbe..56e63dd0e5 100644
+index 3b9d0efbbe5..56e63dd0e5b 100644
 --- a/fs/squashfs/squashfs.mk
 +++ b/fs/squashfs/squashfs.mk
 @@ -8,16 +8,14 @@ ROOTFS_SQUASHFS_DEPENDENCIES = host-squashfs

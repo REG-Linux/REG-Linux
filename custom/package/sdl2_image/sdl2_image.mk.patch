@@ -1,5 +1,5 @@
 diff --git a/package/sdl2_image/sdl2_image.mk b/package/sdl2_image/sdl2_image.mk
-index e058cd9f74..f5b00ac15b 100644
+index e058cd9f74b..f5b00ac15bd 100644
 --- a/package/sdl2_image/sdl2_image.mk
 +++ b/package/sdl2_image/sdl2_image.mk
 @@ -4,7 +4,8 @@

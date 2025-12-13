@@ -1,5 +1,5 @@
 diff --git a/package/wayland/wayland.mk b/package/wayland/wayland.mk
-index bb5ceabb9c..7dd88bbef5 100644
+index bb5ceabb9c4..7dd88bbef5c 100644
 --- a/package/wayland/wayland.mk
 +++ b/package/wayland/wayland.mk
 @@ -4,7 +4,7 @@

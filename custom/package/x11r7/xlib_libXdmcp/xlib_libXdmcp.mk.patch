@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xlib_libXdmcp/xlib_libXdmcp.mk b/package/x11r7/xlib_libXdmcp/xlib_libXdmcp.mk
-index a79e2615db..0100fb45c4 100644
+index a79e2615dba..0100fb45c4f 100644
 --- a/package/x11r7/xlib_libXdmcp/xlib_libXdmcp.mk
 +++ b/package/x11r7/xlib_libXdmcp/xlib_libXdmcp.mk
 @@ -3,8 +3,8 @@

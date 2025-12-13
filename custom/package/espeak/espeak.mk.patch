@@ -1,5 +1,5 @@
 diff --git a/package/espeak/espeak.mk b/package/espeak/espeak.mk
-index 44893ac9be..fd4c506dc3 100644
+index 44893ac9be3..fd4c506dc35 100644
 --- a/package/espeak/espeak.mk
 +++ b/package/espeak/espeak.mk
 @@ -11,6 +11,9 @@ ESPEAK_SITE = http://downloads.sourceforge.net/project/espeak/espeak/espeak-$(ES

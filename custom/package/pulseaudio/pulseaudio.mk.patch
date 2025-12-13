@@ -1,5 +1,5 @@
 diff --git a/package/pulseaudio/pulseaudio.mk b/package/pulseaudio/pulseaudio.mk
-index 254e05348d..4216344548 100644
+index 254e05348d4..42163445480 100644
 --- a/package/pulseaudio/pulseaudio.mk
 +++ b/package/pulseaudio/pulseaudio.mk
 @@ -197,6 +197,15 @@ endef

@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xcb-util-cursor/xcb-util-cursor.mk b/package/x11r7/xcb-util-cursor/xcb-util-cursor.mk
-index 0fb131693b..1cac8db4db 100644
+index 0fb131693b3..1cac8db4db1 100644
 --- a/package/x11r7/xcb-util-cursor/xcb-util-cursor.mk
 +++ b/package/x11r7/xcb-util-cursor/xcb-util-cursor.mk
 @@ -3,8 +3,8 @@

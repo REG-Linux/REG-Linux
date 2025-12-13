@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/llvm/Config.in b/package/llvm-project/llvm/Config.in
-index 4ee84b3bcc..417f57a273 100644
+index 4ee84b3bcc2..417f57a2732 100644
 --- a/package/llvm-project/llvm/Config.in
 +++ b/package/llvm-project/llvm/Config.in
 @@ -24,6 +24,8 @@ config BR2_PACKAGE_LLVM

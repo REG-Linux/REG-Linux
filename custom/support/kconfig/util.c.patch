@@ -1,5 +1,5 @@
 diff --git a/support/kconfig/util.c b/support/kconfig/util.c
-index 8665f5bb89..c2e7979ac1 100644
+index 8665f5bb89f..c2e7979ac15 100644
 --- a/support/kconfig/util.c
 +++ b/support/kconfig/util.c
 @@ -35,7 +35,7 @@ struct file *file_lookup(const char *name)

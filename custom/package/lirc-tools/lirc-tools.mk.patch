@@ -1,5 +1,5 @@
 diff --git a/package/lirc-tools/lirc-tools.mk b/package/lirc-tools/lirc-tools.mk
-index a3ad6bd5a0..c30c737db8 100644
+index a3ad6bd5a09..c30c737db83 100644
 --- a/package/lirc-tools/lirc-tools.mk
 +++ b/package/lirc-tools/lirc-tools.mk
 @@ -18,6 +18,15 @@ LIRC_TOOLS_AUTORECONF = YES

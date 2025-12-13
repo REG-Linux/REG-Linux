@@ -1,5 +1,5 @@
 diff --git a/package/mono/Config.in b/package/mono/Config.in
-index 0152df8268..2e17ee7e19 100644
+index 0152df8268e..2e17ee7e199 100644
 --- a/package/mono/Config.in
 +++ b/package/mono/Config.in
 @@ -5,8 +5,9 @@ config BR2_PACKAGE_HOST_MONO_ARCH_SUPPORTS

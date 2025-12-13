@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xapp_xeyes/xapp_xeyes.mk b/package/x11r7/xapp_xeyes/xapp_xeyes.mk
-index 3f37aaee8c..889b00b6d7 100644
+index 3f37aaee8c9..889b00b6d78 100644
 --- a/package/x11r7/xapp_xeyes/xapp_xeyes.mk
 +++ b/package/x11r7/xapp_xeyes/xapp_xeyes.mk
 @@ -3,9 +3,9 @@
