@@ -1,6 +1,7 @@
 menu "REG-Linux"
 menu "Emulationstation"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/reglinux-emulationstation/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/es-ffmpeg/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/emulationstation/es-background-musics/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package//emulationstation/es-system/Config.in"
 endmenu
