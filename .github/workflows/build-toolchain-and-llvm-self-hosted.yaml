@@ -61,7 +61,7 @@ jobs:
           - target: s922x
             cpu: cortex_a73_a53
           # arch: aarch64-glibc
-          - target: odin
+          - target: sdm845
             cpu: cortex_a75_a55
           # arch: aarch64-glibc
           - target: bcm2712
