@@ -117,8 +117,9 @@ class RenderConfig(TypedDict, total=False):
 
 
 # Define a flexible config type that can accept additional keys
-SystemConfigDict = Union[SystemConfig, Dict[str, Any]]
-RenderConfigDict = Union[RenderConfig, Dict[str, Any]]
+# Using Dict[str, Any] directly since the config is dynamically modified
+SystemConfigDict = Dict[str, Any]
+RenderConfigDict = Dict[str, Any]
 
 
 class Emulator:

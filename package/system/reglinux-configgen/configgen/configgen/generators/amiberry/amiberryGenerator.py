@@ -1,10 +1,12 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from zipfile import ZipFile
 from os import path
+from zipfile import ZipFile
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
-from .amiberryConfig import setAmiberryConfig, AMIBERRY_BIN_PATH
+
+from .amiberryConfig import AMIBERRY_BIN_PATH, setAmiberryConfig
 
 eslog = get_logger(__name__)
 
