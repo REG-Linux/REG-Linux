@@ -1,5 +1,5 @@
 diff --git a/package/spirv-tools/spirv-tools.mk b/package/spirv-tools/spirv-tools.mk
-index e863911b03..4c6d6831af 100644
+index e863911b035..4c6d6831af3 100644
 --- a/package/spirv-tools/spirv-tools.mk
 +++ b/package/spirv-tools/spirv-tools.mk
 @@ -3,10 +3,9 @@

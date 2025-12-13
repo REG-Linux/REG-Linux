@@ -1,5 +1,5 @@
 diff --git a/package/wireplumber/wireplumber.mk b/package/wireplumber/wireplumber.mk
-index c8cc1ad106..4fff54383d 100644
+index c8cc1ad1060..4fff54383df 100644
 --- a/package/wireplumber/wireplumber.mk
 +++ b/package/wireplumber/wireplumber.mk
 @@ -3,8 +3,8 @@

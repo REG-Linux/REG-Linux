@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/libclc/libclc.mk b/package/llvm-project/libclc/libclc.mk
-index 9f303d6d2f..78b5495b56 100644
+index 9f303d6d2f0..78b5495b564 100644
 --- a/package/llvm-project/libclc/libclc.mk
 +++ b/package/llvm-project/libclc/libclc.mk
 @@ -3,14 +3,22 @@

@@ -1,5 +1,5 @@
 diff --git a/package/stella/stella.mk b/package/stella/stella.mk
-index c48bb593a4..cea8890cc5 100644
+index c48bb593a42..cea8890cc5a 100644
 --- a/package/stella/stella.mk
 +++ b/package/stella/stella.mk
 @@ -4,7 +4,8 @@

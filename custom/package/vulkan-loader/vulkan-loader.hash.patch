@@ -1,5 +1,5 @@
 diff --git a/package/vulkan-loader/vulkan-loader.hash b/package/vulkan-loader/vulkan-loader.hash
-index e09ecda8a9..864d35509a 100644
+index e09ecda8a9d..864d35509a7 100644
 --- a/package/vulkan-loader/vulkan-loader.hash
 +++ b/package/vulkan-loader/vulkan-loader.hash
 @@ -1,3 +1,3 @@

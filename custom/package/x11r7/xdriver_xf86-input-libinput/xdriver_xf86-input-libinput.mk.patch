@@ -1,5 +1,5 @@
 diff --git a/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.mk b/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.mk
-index 381df31fee..e8b32c1b68 100644
+index 381df31fee8..e8b32c1b688 100644
 --- a/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.mk
 +++ b/package/x11r7/xdriver_xf86-input-libinput/xdriver_xf86-input-libinput.mk
 @@ -3,8 +3,8 @@

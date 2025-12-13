@@ -1,5 +1,5 @@
 diff --git a/package/wayland-protocols/wayland-protocols.mk b/package/wayland-protocols/wayland-protocols.mk
-index b04693978d..6d8c5a9b89 100644
+index b04693978d8..6d8c5a9b89c 100644
 --- a/package/wayland-protocols/wayland-protocols.mk
 +++ b/package/wayland-protocols/wayland-protocols.mk
 @@ -4,7 +4,7 @@

@@ -1,5 +1,5 @@
 diff --git a/fs/cpio/init b/fs/cpio/init
-index f74ef7e15f..f4fd25b315 100755
+index f74ef7e15fe..f4fd25b3150 100755
 --- a/fs/cpio/init
 +++ b/fs/cpio/init
 @@ -1,15 +1,182 @@
