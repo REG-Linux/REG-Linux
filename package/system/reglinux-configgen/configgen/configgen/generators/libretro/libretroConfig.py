@@ -1917,7 +1917,7 @@ def writeBezelConfig(
     retroarchConfig["input_overlay_opacity"] = infos["opacity"]
     if retroarchConfig["aspect_ratio_index"] == str(ratioIndexes.index("custom")):
         retroarchConfig["video_viewport_bias_x"] = "0.000000"
-        retroarchConfig["video_viewport_bias_y"] = "1.000000"
+        retroarchConfig["video_viewport_bias_y"] = "0.000000"
 
     # stretch option
     if (
