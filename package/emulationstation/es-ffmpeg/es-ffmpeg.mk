@@ -55,6 +55,7 @@ ES_FFMPEG_LOCAL_ONLY_DECODERS = h264 hevc vp9 vp8 av1 theora mpeg4 mpegvideo mpe
 ES_FFMPEG_LOCAL_ONLY_DEMUXERS = mov matroska mpegts avi asf ogg wav flac mp3
 ES_FFMPEG_LOCAL_ONLY_PARSERS = h264 hevc vp9 vp8 av1 mpeg4video mpegvideo aac ac3 mpegaudio opus vorbis flac
 ES_FFMPEG_LOCAL_ONLY_PROTOCOLS = file
+ES_FFMPEG_LOCAL_ONLY_FILTERS = format aresample aformat asetnsamples
 
 ES_FFMPEG_CONF_OPTS += --libdir=/usr/lib/es-ffmpeg
 
@@ -406,11 +407,12 @@ endif
 
 ifeq ($(BR2_PACKAGE_ES_FFMPEG_LOCAL_ONLY),y)
 ES_FFMPEG_CONF_OPTS += --disable-avdevice
-ES_FFMPEG_CONF_OPTS += --disable-avfilter
+#ES_FFMPEG_CONF_OPTS += --disable-avfilter
 ES_FFMPEG_CONF_OPTS += --disable-indevs
 ES_FFMPEG_CONF_OPTS += --disable-outdevs
-ES_FFMPEG_CONF_OPTS += --disable-filters
 ES_FFMPEG_CONF_OPTS += --disable-bsfs
+ES_FFMPEG_CONF_OPTS += --disable-filters \
+	$(foreach x,$(call qstrip,$(ES_FFMPEG_LOCAL_ONLY_FILTERS)),--enable-filter=$(x))
 ES_FFMPEG_CONF_OPTS += --disable-decoders \
 	$(foreach x,$(call qstrip,$(ES_FFMPEG_LOCAL_ONLY_DECODERS)),--enable-decoder=$(x))
 ES_FFMPEG_CONF_OPTS += --disable-demuxers \
