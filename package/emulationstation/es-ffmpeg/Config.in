@@ -128,6 +128,18 @@ config BR2_PACKAGE_ES_FFMPEG_OUTDEVS
 	bool "Enable output devices"
 	default y
 
+config BR2_PACKAGE_ES_FFMPEG_LOCAL_ONLY
+	bool "Limit ffmpeg to decoding local files"
+	default y
+	help
+	  When enabled, ffmpeg is configured for decoding content stored on
+	  local filesystems only.  That removes input/output device support,
+	  filters and bitstream filters, and restricts the demuxers, parsers and
+	  decoders to the subset needed by EmulationStation so the resulting
+	  binaries stay lean.  Hardware decoder accelerators such as VAAPI or
+	  V4L2 request remain enabled when BR2_PACKAGE_LIBVA or BR2_PACKAGE_LIBV4L
+	  is selected.
+
 config BR2_PACKAGE_ES_FFMPEG_EXTRACONF
 	string "Additional parameters for ./configure"
 	default ""
