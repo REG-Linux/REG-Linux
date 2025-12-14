@@ -16,6 +16,7 @@ mkdir -p \
   /var/opt \
   /var/tmp
 ln -sf /run /var/run
+chmod 755 /var/run
 
 # sixad profile
 ln -sf /etc/sixad.profile /var/lib/sixad/profiles/default
