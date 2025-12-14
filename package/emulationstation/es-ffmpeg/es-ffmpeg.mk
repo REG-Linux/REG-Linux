@@ -51,6 +51,11 @@ ES_FFMPEG_CONF_OPTS = \
 	--disable-symver \
 	--disable-doc \
 
+ES_FFMPEG_LOCAL_ONLY_DECODERS = h264 hevc vp9 vp8 av1 theora mpeg4 mpegvideo mpeg2video mpeg1video aac ac3 mp3 opus vorbis flac pcm_s16le pcm_s16be pcm_u8 mjpeg vc1
+ES_FFMPEG_LOCAL_ONLY_DEMUXERS = mov matroska mpegts avi asf ogg wav flac mp3
+ES_FFMPEG_LOCAL_ONLY_PARSERS = h264 hevc vp9 vp8 av1 mpeg4video mpegvideo aac ac3 mpegaudio opus vorbis flac
+ES_FFMPEG_LOCAL_ONLY_PROTOCOLS = file
+
 ES_FFMPEG_CONF_OPTS += --libdir=/usr/lib/es-ffmpeg
 
 ES_FFMPEG_DEPENDENCIES += host-pkgconf
@@ -397,6 +402,23 @@ ifeq ($(BR2_X86_CPU_HAS_SSE42),y)
 ES_FFMPEG_CONF_OPTS += --enable-sse42
 else
 ES_FFMPEG_CONF_OPTS += --disable-sse42
+endif
+
+ifeq ($(BR2_PACKAGE_ES_FFMPEG_LOCAL_ONLY),y)
+ES_FFMPEG_CONF_OPTS += --disable-avdevice
+ES_FFMPEG_CONF_OPTS += --disable-avfilter
+ES_FFMPEG_CONF_OPTS += --disable-indevs
+ES_FFMPEG_CONF_OPTS += --disable-outdevs
+ES_FFMPEG_CONF_OPTS += --disable-filters
+ES_FFMPEG_CONF_OPTS += --disable-bsfs
+ES_FFMPEG_CONF_OPTS += --disable-decoders \
+	$(foreach x,$(call qstrip,$(ES_FFMPEG_LOCAL_ONLY_DECODERS)),--enable-decoder=$(x))
+ES_FFMPEG_CONF_OPTS += --disable-demuxers \
+	$(foreach x,$(call qstrip,$(ES_FFMPEG_LOCAL_ONLY_DEMUXERS)),--enable-demuxer=$(x))
+ES_FFMPEG_CONF_OPTS += --disable-parsers \
+	$(foreach x,$(call qstrip,$(ES_FFMPEG_LOCAL_ONLY_PARSERS)),--enable-parser=$(x))
+ES_FFMPEG_CONF_OPTS += --disable-protocols \
+	$(foreach x,$(call qstrip,$(ES_FFMPEG_LOCAL_ONLY_PROTOCOLS)),--enable-protocol=$(x))
 endif
 
 ifeq ($(BR2_X86_CPU_HAS_AVX),y)
