@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-ALLLINUXFIRMWARES_VERSION = 20250917
+# Dec 15, 2025
+ALLLINUXFIRMWARES_VERSION = 30979b116b5c5857b72c4332db8db0ff1ca2dc08
 ALLLINUXFIRMWARES_SITE = https://gitlab.com/kernel-firmware/linux-firmware
 ALLLINUXFIRMWARES_SITE_METHOD = git
 
