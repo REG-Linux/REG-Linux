@@ -19,6 +19,7 @@ ifeq ($(PARALLEL_BUILD), y)
 	EXTRA_OPTS += BR2_PER_PACKAGE_DIRECTORIES=y
 	MAKE_OPTS += -j$(MAKE_JLEVEL)
 	MAKE_OPTS += -l$(MAKE_LLEVEL)
+	DOCKER_OPTS += -e MAKEFLAGS="$(MAKEFLAGS)"
 endif
 
 ifeq ($(DEBUG_BUILD), y)
@@ -97,20 +98,20 @@ gh-token:
 	$(if $(findstring $*, $(TARGETS)),,$(error "$* not supported!"))
 
 %-clean: gh-token reglinux-docker-image output-dir-%
-	$(call DOCKER_RUN) make O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
 
 %-config: gh-token reglinux-docker-image output-dir-%
 	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/reglinux-$*
 	@for opt in $(EXTRA_OPTS); do \
 		echo $$opt >> $(PROJECT_DIR)/configs/reglinux-$*_defconfig ; \
 	done
-	$(call DOCKER_RUN) make O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
 
 %-build: gh-token reglinux-docker-image %-config ccache-dir dl-dir
-	$(call DOCKER_RUN) make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
 
 %-source: gh-token reglinux-docker-image %-config ccache-dir dl-dir
-	$(call DOCKER_RUN) make $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
 
 %-cleanbuild: gh-token %-clean %-build
 	@echo
