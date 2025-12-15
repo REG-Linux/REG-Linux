@@ -95,7 +95,7 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&i2c5 {
-+    status = "okay";
++    status = "disabled";
 +
 +    //aw20036_led@3b {
 +    //    compatible = "awinic,aw20036";
@@ -107,35 +107,35 @@ index 000000000000..58d9ab342fe9
 +    //};
 +};
 +
-+&reserved_memory {
++/*&reserved_memory {
 +	splash_region@5c000000 {
 +		reg = <0x0 0x5c000000 0x0 0xf00000>;
 +		no-map;
 +	};
-+};
++};*/
 +
 +&gpi_dma0 {
 +	status = "okay";
 +};
 +
 +&gpu {
-+	status = "disabled";
++	status = "okay";
 +
 +	zap-shader {
-+		firmware-name = "qcom/sm6115/LENOVO/J606F/a610_zap.mbn";
++		firmware-name = "qcom/qrb4210/a610_zap.mbn";
 +	};
 +};
 +
 +&mdss {
-+	status = "disabled";
++	status = "okay";
 +};
 +
 +&mdss_dsi0 {
 +	vdda-supply = <&pm6125_l18>;
-+	status = "disabled";
++	status = "okay";
 +
 +	panel: panel@0 {
-+		compatible = "lenovo,j606f-boe-nt36523w", "novatek,nt36523w";
++		compatible = "truly,bm5460bb1";
 +		reg = <0>;
 +
 +		reset-gpios = <&tlmm 82 GPIO_ACTIVE_LOW>;
@@ -160,7 +160,7 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&mdss_dsi0_phy {
-+	status = "disabled";
++	status = "enabled";
 +};
 +
 +&pm6125_gpios {
@@ -187,17 +187,17 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&remoteproc_adsp {
-+	firmware-name = "qcom/sm6115/LENOVO/J606F/adsp.mbn";
-+	status = "disabled";
++	firmware-name = "qcom/qrb4210/adsp.mbn";
++	status = "okay";
 +};
 +
 +&remoteproc_cdsp {
-+	firmware-name = "qcom/sm6115/LENOVO/J606F/cdsp.mbn";
-+	status = "disabled";
++	firmware-name = "qcom/qrb4210/cdsp.mbn";
++	status = "okay";
 +};
 +
 +&remoteproc_mpss {
-+	status = "disabled";
++	status = "okay";
 +};
 +
 +&rpm_requests {
