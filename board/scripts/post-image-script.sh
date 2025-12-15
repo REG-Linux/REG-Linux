@@ -156,4 +156,5 @@ rm -rf ${GENIMAGE_TMP}
 
 #### update the target dir with some information files
 cp "${TARGET_DIR}/usr/share/reglinux/system.version" "${REGLINUX_BINARIES_DIR}" || exit 1
-"${BR2_EXTERNAL_REGLINUX_PATH}"/scripts/linux/systemsReport.sh "${PWD}" "${REGLINUX_BINARIES_DIR}" || exit 1
+# FIXME systemsReport.sh is not generating the report page.
+#"${BR2_EXTERNAL_REGLINUX_PATH}"/scripts/linux/systemsReport.sh "${PWD}" "${REGLINUX_BINARIES_DIR}" || exit 1
