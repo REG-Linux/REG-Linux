@@ -1,39 +1,55 @@
+from typing import Dict, Any
 from configgen.generators.Generator import Generator
 from configgen.Command import Command
-from configgen.controllers import guns_borders_size_name
 from xml.etree.ElementTree import parse
 from shutil import rmtree, copy2
 from csv import reader
-from PIL import Image
 from pathlib import Path
-from os import path, makedirs, listdir, symlink, unlink, chdir, remove
-from xml.dom import minidom
-from subprocess import Popen, PIPE
+from os import path, makedirs, listdir, symlink, unlink, chdir
 from configgen.utils.videoMode import getScreensInfos
-from configgen.utils.bezels import (
-    getBezelInfos,
-    createTransparentBezel,
-    gun_borders_size,
-    gunBorderImage,
-    gunsBordersColorFomConfig,
-    fast_image_size,
-)
 from configgen.utils.logger import get_logger
+from .mameBezel import setup_mame_bezels
 
-eslog = get_logger(__name__)
+logger = get_logger(__name__)
 
 
 class MameGenerator(Generator):
+    """MAME Generator for creating command arrays and configurations for MAME/MESS emulators."""
+
     # TODO MAME requires a wayland compositor *if* bgfx is used
-    def requiresWayland(self):
+    def requiresWayland(self) -> bool:
+        """Indicates if the generator requires Wayland compositor."""
         return True
 
-    def supportsInternalBezels(self):
+    def supportsInternalBezels(self) -> bool:
+        """Indicates if the generator supports internal bezels."""
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, Any],
+    ) -> Command:
+        """
+        Generate the MAME command array for the specified ROM and system configuration.
+
+        Args:
+            system: System configuration
+            rom: Path to the ROM file
+            players_controllers: Controller configuration for players
+            metadata: Game metadata
+            guns: Light gun configuration
+            wheels: Steering wheel configuration
+            game_resolution: Dictionary containing game resolution information
+
+        Returns:
+            Command object with the appropriate MAME command array
+        """
         # Extract "<romfile.zip>"
         romBasename = path.basename(rom)
         romDirname = path.dirname(rom)
@@ -347,8 +363,8 @@ class MameGenerator(Generator):
             command_array += ["-offscreen_reload"]
 
         # wheels
-        if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
-            pass  # wheels variable was unused
+        # The 'wheels' variable was unused, and the 'pass' statement for system.isOptSet("use_wheels") is unnecessary.
+        # If 'use_wheels' is set and true, no MAME arguments are added here, so the block can be removed.
 
         if system.isOptSet("multiscreens") and system.getOptBoolean("multiscreens"):
             screens = getScreensInfos(system.config)
@@ -402,7 +418,7 @@ class MameGenerator(Generator):
                 command_array += ["-sl7", "cffa202"]
                 if system.isOptSet("gameio") and system.config["gameio"] != "none":
                     if system.config["gameio"] == "joyport" and messModel != "apple2p":
-                        eslog.debug(
+                        logger.debug(
                             "Joyport joystick is only compatible with Apple II Plus"
                         )
                     else:
@@ -681,9 +697,9 @@ class MameGenerator(Generator):
                             ):
                                 autoRunCmd = row[1]
                                 autoRunDelay = 3
-            if autoRunCmd != None:
+            if autoRunCmd is not None:
                 if autoRunCmd.startswith("'"):
-                    autoRunCmd.replace("'", "")
+                    autoRunCmd = autoRunCmd.replace("'", "")
                 command_array += [
                     "-autoboot_delay",
                     str(autoRunDelay),
@@ -691,43 +707,28 @@ class MameGenerator(Generator):
                     autoRunCmd,
                 ]
 
-        # bezels
-        if "bezel" not in system.config.keys() or system.config["bezel"] == "":
-            bezelSet = None
-        else:
-            bezelSet = system.config["bezel"]
-        if system.isOptSet("forceNoBezel") and system.getOptBoolean("forceNoBezel"):
-            bezelSet = None
-        try:
-            guns_borders_size = None
-            if guns_borders_size_name is not None:
-                guns_borders_size = guns_borders_size_name(guns, system.config)
-
-            if messMode != -1:
-                MameGenerator.writeBezelConfig(
-                    bezelSet,
-                    system,
-                    rom,
-                    messSysName[messMode],
-                    game_resolution,
-                    guns_borders_size,
-                )
-            else:
-                MameGenerator.writeBezelConfig(
-                    bezelSet, system, rom, "", game_resolution, guns_borders_size
-                )
-        except Exception:
-            guns_borders_size = None
-            MameGenerator.writeBezelConfig(
-                None, system, rom, "", game_resolution, guns_borders_size
-            )
+        # Setup MAME bezels
+        messSysNameForBezel = (
+            messSysName[messMode] if messMode != -1 else rom
+        )  # Pass ROM name for MAME games, system name for MESS games
+        setup_mame_bezels(system, rom, messSysNameForBezel, game_resolution, guns)
 
         # Change directory to MAME folder (allows data plugin to load properly)
         chdir("/usr/bin/mame")
         return Command(array=command_array, env={"PWD": "/usr/bin/mame/"})
 
     @staticmethod
-    def getRoot(config, name):
+    def getRoot(config: Any, name: str) -> Any:
+        """
+        Get or create an XML root element with the specified name.
+
+        Args:
+            config: XML configuration document
+            name: Name of the root element to get or create
+
+        Returns:
+            The XML element with the specified name
+        """
         xml_section = config.getElementsByTagName(name)
 
         if len(xml_section) == 0:
@@ -739,7 +740,18 @@ class MameGenerator(Generator):
         return xml_section
 
     @staticmethod
-    def getSection(config, xml_root, name):
+    def getSection(config: Any, xml_root: Any, name: str) -> Any:
+        """
+        Get or create an XML section element with the specified name.
+
+        Args:
+            config: XML configuration document
+            xml_root: XML root element
+            name: Name of the section element to get or create
+
+        Returns:
+            The XML element with the specified name
+        """
         xml_section = xml_root.getElementsByTagName(name)
 
         if len(xml_section) == 0:
@@ -751,379 +763,75 @@ class MameGenerator(Generator):
         return xml_section
 
     @staticmethod
-    def removeSection(config, xml_root, name):
+    def removeSection(xml_root: Any, name: str) -> None:
+        """
+        Remove XML section elements with the specified name.
+
+        Args:
+            xml_root: XML root element containing sections to remove
+            name: Name of the section elements to remove
+        """
         xml_section = xml_root.getElementsByTagName(name)
 
         for i in range(0, len(xml_section)):
             old = xml_root.removeChild(xml_section[i])
             old.unlink()
 
-    @staticmethod
-    def writeBezelConfig(
-        bezelSet, system, rom, messSys, game_resolution, guns_borders_size
-    ):
-        romBase = path.splitext(path.basename(rom))[0]  # filename without extension
 
-        if messSys == "":
-            tmpZipDir = (
-                "/var/run/mame_artwork/" + romBase
-            )  # ok, no need to zip, a folder is taken too
-        else:
-            tmpZipDir = (
-                "/var/run/mame_artwork/" + messSys
-            )  # ok, no need to zip, a folder is taken too
-        # clean, in case no bezel is set, and in case we want to recreate it
-        if path.exists(tmpZipDir):
-            rmtree(tmpZipDir)
+def getMameControlScheme(system: Any, romBasename: str) -> str:
+    """
+    Determine the appropriate MAME control scheme for a given system and ROM.
 
-        if bezelSet is None and guns_borders_size is None:
-            return
+    Args:
+        system: System configuration
+        romBasename: Name of the ROM file
 
-        # let's generate the zip file
-        makedirs(tmpZipDir)
-
-        # bezels infos
-        bz_infos = None
-        if bezelSet is None:
-            if guns_borders_size is not None:
-                bz_infos = None
-            else:
-                return
-        else:
-            bz_infos = getBezelInfos(rom, bezelSet, system.name, "mame")
-            if bz_infos is None:
-                if guns_borders_size is None:
-                    return
-
-        # create an empty bezel
-        if bz_infos is None:
-            overlay_png_file = "/tmp/bezel_transmame_black.png"
-            createTransparentBezel(
-                overlay_png_file, game_resolution["width"], game_resolution["height"]
-            )
-            bz_infos = {"png": overlay_png_file}
-
-        # copy the png inside
-        pngFile = None
-        img_width = None
-        img_height = None
-        bz_x = None
-        bz_y = None
-        bz_right = None
-        bz_bottom = None
-        bz_alpha = 1.0
-
-        if "mamezip" in bz_infos and path.exists(bz_infos["mamezip"]):
-            if messSys == "":
-                artFile = "/var/run/mame_artwork/" + romBase + ".zip"
-            else:
-                artFile = "/var/run/mame_artwork/" + messSys + ".zip"
-            if path.exists(artFile):
-                if path.islink(artFile):
-                    unlink(artFile)
-                else:
-                    remove(artFile)
-            symlink(bz_infos["mamezip"], artFile)
-            # hum, not nice if guns need borders
-            return
-        elif "layout" in bz_infos and path.exists(bz_infos["layout"]):
-            symlink(bz_infos["layout"], tmpZipDir + "/default.lay")
-            pngFile = path.split(bz_infos["png"])[1]
-            symlink(bz_infos["png"], tmpZipDir + "/" + pngFile)
-            # Try to get image size for tattoo/gunborders if needed
-            img_width, img_height = fast_image_size(bz_infos["png"])
-        else:
-            pngFile = "default.png"
-            symlink(bz_infos["png"], tmpZipDir + "/default.png")
-            if "info" in bz_infos and path.exists(bz_infos["info"]):
-                bzInfoFile = open(bz_infos["info"], "r")
-                bzInfoText = bzInfoFile.readlines()
-                # Initialize all possibly unbound variables
-                img_width = None
-                img_height = None
-                bz_x = 0
-                bz_y = 0
-                bz_right = 0
-                bz_bottom = 0
-                bz_alpha = 1.0  # Just in case it's not set in the info file
-                for infoLine in bzInfoText:
-                    if len(infoLine) > 7:
-                        infoLineClean = (
-                            (infoLine.replace('"', "")).rstrip(",\n").lstrip()
-                        )
-                        infoLineData = infoLineClean.split(":")
-                        if len(infoLineData) < 2:
-                            continue
-                        key = infoLineData[0].lower()
-                        value = infoLineData[1]
-                        if key == "width":
-                            try:
-                                img_width = int(value)
-                            except Exception:
-                                img_width = None
-                        elif key == "height":
-                            try:
-                                img_height = int(value)
-                            except Exception:
-                                img_height = None
-                        elif key == "top":
-                            try:
-                                bz_y = int(value)
-                            except Exception:
-                                bz_y = 0
-                        elif key == "left":
-                            try:
-                                bz_x = int(value)
-                            except Exception:
-                                bz_x = 0
-                        elif key == "bottom":
-                            try:
-                                bz_bottom = int(value)
-                            except Exception:
-                                bz_bottom = 0
-                        elif key == "right":
-                            try:
-                                bz_right = int(value)
-                            except Exception:
-                                bz_right = 0
-                        elif key == "opacity":
-                            try:
-                                bz_alpha = float(value)
-                            except Exception:
-                                bz_alpha = 1.0
-                bzInfoFile.close()
-                # Provide defaults if any are still None
-                if img_width is None or img_height is None:
-                    img_width, img_height = fast_image_size(bz_infos["png"])
-                if bz_x is None:
-                    bz_x = 0
-                if bz_y is None:
-                    bz_y = 0
-                if bz_right is None:
-                    bz_right = 0
-                if bz_bottom is None:
-                    bz_bottom = 0
-                bz_width = img_width - bz_x - bz_right
-                bz_height = img_height - bz_y - bz_bottom
-            else:
-                img_width, img_height = fast_image_size(bz_infos["png"])
-                try:
-                    _, _, rotate = MameGenerator.getMameMachineSize(romBase, tmpZipDir)
-                except Exception:
-                    rotate = 0
-                # assumes that all bezels are setup for 4:3H or 3:4V aspects
-                if rotate == 270 or rotate == 90:
-                    bz_width = int(img_height * (3 / 4))
-                else:
-                    bz_width = int(img_height * (4 / 3))
-                bz_height = img_height
-                bz_x = int((img_width - bz_width) / 2)
-                bz_y = 0
-                bz_alpha = 1.0
-
-            f = open(tmpZipDir + "/default.lay", "w")
-            f.write('<mamelayout version="2">\n')
-            f.write('<element name="bezel"><image file="default.png" /></element>\n')
-            f.write('<view name="bezel">\n')
-            f.write(
-                '<screen index="0"><bounds x="'
-                + str(bz_x)
-                + '" y="'
-                + str(bz_y)
-                + '" width="'
-                + str(bz_width)
-                + '" height="'
-                + str(bz_height)
-                + '" /></screen>\n'
-            )
-            f.write(
-                '<element ref="bezel"><bounds x="0" y="0" width="'
-                + str(img_width)
-                + '" height="'
-                + str(img_height)
-                + '" alpha="'
-                + str(bz_alpha)
-                + '" /></element>\n'
-            )
-            f.write("</view>\n")
-            f.write("</mamelayout>\n")
-            f.close()
-
-        # At this point, img_width and img_height should be set if needed
-        # For tattoo and gunborders, ensure pngFile, img_width, img_height are set
-        if pngFile is None:
-            if "png" in bz_infos:
-                pngFile = path.split(bz_infos["png"])[1]
-            else:
-                pngFile = "default.png"
-        if img_width is None or img_height is None:
-            try:
-                img_width, img_height = fast_image_size(tmpZipDir + "/" + pngFile)
-            except Exception:
-                img_width, img_height = 1920, 1080  # fallback
-
-        if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
-            tattoo_file = None
-            tattoo = None
-            if system.config["bezel.tattoo"] == "system":
-                try:
-                    tattoo_file = (
-                        "/usr/share/reglinux/controller-overlays/"
-                        + system.name
-                        + ".png"
-                    )
-                    if not path.exists(tattoo_file):
-                        tattoo_file = (
-                            "/usr/share/reglinux/controller-overlays/generic.png"
-                        )
-                    tattoo = Image.open(tattoo_file)
-                except Exception:
-                    eslog.error(f"Error opening controller overlay: {tattoo_file}")
-                    tattoo = None
-            elif system.config["bezel.tattoo"] == "custom" and path.exists(
-                system.config["bezel.tattoo_file"]
-            ):
-                try:
-                    tattoo_file = system.config["bezel.tattoo_file"]
-                    tattoo = Image.open(tattoo_file)
-                except Exception:
-                    eslog.error("Error opening custom file: {}".format("tattoo_file"))
-                    tattoo = None
-            else:
-                try:
-                    tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
-                    tattoo = Image.open(tattoo_file)
-                except Exception:
-                    eslog.error("Error opening custom file: {}".format("tattoo_file"))
-                    tattoo = None
-            if tattoo is not None:
-                output_png_file = "/tmp/bezel_tattooed.png"
-                back = Image.open(tmpZipDir + "/" + pngFile)
-                tattoo = tattoo.convert("RGBA")
-                back = back.convert("RGBA")
-                tw, th = fast_image_size(tattoo_file)
-                tatwidth = int(
-                    240 / 1920 * img_width
-                )  # 240 = half of the difference between 4:3 and 16:9 on 1920px (0.5*1920/16*4)
-                pcent = float(tatwidth / tw)
-                tatheight = int(float(th) * pcent)
-                # Use Image.Resampling.LANCZOS for antialiasing (ANTIALIAS is deprecated)
-                resample_filter = Image.Resampling.LANCZOS
-                tattoo = tattoo.resize((tatwidth, tatheight), resample_filter)
-                alphatat = tattoo.split()[-1]
-                if system.isOptSet("bezel.tattoo_corner"):
-                    corner = system.config["bezel.tattoo_corner"]
-                else:
-                    corner = "NW"
-                if corner.upper() == "NE":
-                    back.paste(
-                        tattoo, (img_width - tatwidth, 20), alphatat
-                    )  # 20 pixels vertical margins (on 1080p)
-                elif corner.upper() == "SE":
-                    back.paste(
-                        tattoo,
-                        (img_width - tatwidth, img_height - tatheight - 20),
-                        alphatat,
-                    )
-                elif corner.upper() == "SW":
-                    back.paste(tattoo, (0, img_height - tatheight - 20), alphatat)
-                else:  # default = NW
-                    back.paste(tattoo, (0, 20), alphatat)
-                imgnew = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 255))
-                imgnew.paste(back, (0, 0, img_width, img_height))
-                imgnew.save(output_png_file, format="PNG")
-
-                try:
-                    remove(tmpZipDir + "/" + pngFile)
-                except Exception:
-                    pass
-                symlink(output_png_file, tmpZipDir + "/" + pngFile)
-
-        # borders for guns
-        if guns_borders_size is not None:
-            output_png_file = "/tmp/bezel_gunborders.png"
-            inner_size, outer_size = gun_borders_size(guns_borders_size)
-            gunBorderImage(
-                tmpZipDir + "/" + pngFile,
-                output_png_file,
-                inner_size,
-                outer_size,
-                gunsBordersColorFomConfig(system.config),
-            )
-            try:
-                remove(tmpZipDir + "/" + pngFile)
-            except Exception:
-                pass
-            symlink(output_png_file, tmpZipDir + "/" + pngFile)
-
-    @staticmethod
-    def getMameMachineSize(machine, tmpdir):
-        proc = Popen(["/usr/bin/mame/mame", "-listxml", machine], stdout=PIPE)
-        (out, err) = proc.communicate()
-        exitcode = proc.returncode
-
-        if exitcode != 0:
-            raise Exception("mame -listxml " + machine + " failed")
-
-        infofile = tmpdir + "/infxml"
-        f = open(infofile, "w")
-        f.write(out.decode())
-        f.close()
-
-        infos = minidom.parse(infofile)
-        display = infos.getElementsByTagName("display")
-
-        for element in display:
-            iwidth = element.getAttribute("width")
-            iheight = element.getAttribute("height")
-            irotate = element.getAttribute("rotate")
-            return int(iwidth), int(iheight), int(irotate)
-
-        raise Exception("display element not found")
-
-
-def getMameControlScheme(system, romBasename):
+    Returns:
+        String representing the control scheme to use
+    """
     # Game list files
-    mameCapcom = "/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"
-    mameKInstinct = "/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"
-    mameMKombat = "/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"
-    mameNeogeo = "/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"
-    mameTwinstick = "/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"
-    mameRotatedstick = "/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"
+    mameCapcom: str = "/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"
+    mameKInstinct: str = "/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"
+    mameMKombat: str = "/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"
+    mameNeogeo: str = "/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"
+    mameTwinstick: str = "/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"
+    mameRotatedstick: str = (
+        "/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"
+    )
 
     # Controls for games with 5-6 buttons or other unusual controls
     if system.isOptSet("altlayout"):
-        controllerType = system.config["altlayout"]  # Option was manually selected
+        controllerType: str = system.config["altlayout"]  # Option was manually selected
     else:
-        controllerType = "auto"
+        controllerType: str = "auto"
 
     if controllerType in ["default", "neomini", "neocd", "twinstick", "qbert"]:
         return controllerType
     else:
         try:
             with open(mameCapcom) as f:
-                capcomList = set(f.read().split())
+                capcomList: set = set(f.read().split())
             with open(mameMKombat) as f:
-                mkList = set(f.read().split())
+                mkList: set = set(f.read().split())
             with open(mameKInstinct) as f:
-                kiList = set(f.read().split())
+                kiList: set = set(f.read().split())
             with open(mameNeogeo) as f:
-                neogeoList = set(f.read().split())
+                neogeoList: set = set(f.read().split())
             with open(mameTwinstick) as f:
-                twinstickList = set(f.read().split())
+                twinstickList: set = set(f.read().split())
             with open(mameRotatedstick) as f:
-                qbertList = set(f.read().split())
+                qbertList: set = set(f.read().split())
         except (IOError, OSError) as e:
-            eslog.error(f"Error reading MAME list files: {e}")
+            logger.error(f"Error reading MAME list files: {e}")
             # Initialize empty sets to avoid breaking the process
-            capcomList = set()
-            mkList = set()
-            kiList = set()
-            neogeoList = set()
-            twinstickList = set()
-            qbertList = set()
+            capcomList: set = set()
+            mkList: set = set()
+            kiList: set = set()
+            neogeoList: set = set()
+            twinstickList: set = set()
+            qbertList: set = set()
 
-        romName = path.splitext(romBasename)[0]
+        romName: str = path.splitext(romBasename)[0]
         if romName in capcomList:
             if controllerType in ["auto", "snes"]:
                 return "sfsnes"
