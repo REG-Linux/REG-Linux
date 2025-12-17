@@ -341,10 +341,6 @@ class LibretroGenerator(Generator):
         # Use command line instead of ROM file for MAME variants
         if system.config["core"] in ["mame", "same_cdi"]:
             dontAppendROM = True
-            if system.config["core"] in ["mame"]:
-                corePath = "lr-" + system.config["core"]
-            else:
-                corePath = system.config["core"]
             command_array.append(
                 f"/var/run/cmdfiles/{path.splitext(path.basename(rom))[0]}.cmd"
             )
