@@ -1,10 +1,10 @@
 diff -Naur a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
 --- a/arch/arm64/boot/dts/qcom/Makefile	2025-03-07 11:04:44.205960671 +0300
 +++ b/arch/arm64/boot/dts/qcom/Makefile	2025-03-07 11:07:20.740496093 +0300
-@@ -299,6 +299,7 @@
- dtb-$(CONFIG_ARCH_QCOM)	+= sm8450-sony-xperia-nagara-pdx223.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm8450-sony-xperia-nagara-pdx224.dtb
- dtb-$(CONFIG_ARCH_QCOM)	+= sm8550-ayaneo-ps.dtb
+@@ -302,6 +302,7 @@
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-ayaneo-pocketdmg.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-ayaneo-pocketds.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-ayaneo-pocketevo.dtb
 +dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-ayn-odin2.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sm8550-hdk.dtb
  dtb-$(CONFIG_ARCH_QCOM)	+= sm8550-mtp.dtb
