@@ -1,11 +1,11 @@
 --- a/CMakeLists.txt	2025-08-11 13:52:33.670981274 +0200
 +++ b/CMakeLists.txt	2025-08-11 13:53:11.481816728 +0200
-@@ -31,7 +31,7 @@
- set(TARADINO_TITLE "Taradino$<$<BOOL:${TARADINO_SHAREWARE}>: (Shareware)>")
- 
- add_executable(taradino ${TARADINO_SOURCES})
--target_link_libraries(taradino PRIVATE $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main> SDL2::SDL2 SDL2_mixer::SDL2_mixer)
-+target_link_libraries(taradino PRIVATE $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main> SDL2::SDL2 SDL2_mixer)
+@@ -47,7 +47,7 @@
+ target_link_libraries(taradino PRIVATE
+ 	$<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+ 	$<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+-	$<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>
++	SDL2_mixer
+ )
  target_compile_definitions(taradino PRIVATE PACKAGE_STRING="${TARADINO_TITLE} ${CMAKE_PROJECT_VERSION}")
  target_compile_definitions(taradino PRIVATE PACKAGE_TARNAME="${CMAKE_PROJECT_NAME}")
- target_include_directories(taradino PRIVATE "${PROJECT_BINARY_DIR}/rott")
