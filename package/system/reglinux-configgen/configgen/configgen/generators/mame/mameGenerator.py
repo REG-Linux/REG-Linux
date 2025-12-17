@@ -8,7 +8,7 @@ from pathlib import Path
 from os import path, makedirs, listdir, symlink, unlink, chdir
 from configgen.utils.videoMode import getScreensInfos
 from configgen.utils.logger import get_logger
-from .mameBezel import setup_mame_bezels
+from ...bezel.mame_bezel_manager import setup_mame_bezels
 
 logger = get_logger(__name__)
 

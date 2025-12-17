@@ -17,7 +17,7 @@ from configgen.systemFiles import (
     SAVES,
     ES_SETTINGS,
 )
-from .libretroBezel import writeBezelConfig
+from ...bezel.libretro_bezel_manager import writeBezelConfig
 
 hatariConf = CONF + "/hatari/hatari.cfg"
 retroarchRoot = CONF + "/retroarch"

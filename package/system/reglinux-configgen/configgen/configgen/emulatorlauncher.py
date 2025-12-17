@@ -20,7 +20,7 @@ import configgen.utils.videoMode as videoMode
 import configgen.utils.gunsUtils as gunsUtils
 import configgen.utils.wheelsUtils as wheelsUtils
 import configgen.utils.windowsManager as windowsManager
-import configgen.utils.bezels as bezelsUtil
+import configgen.bezel.bezel_base as bezelsUtil
 import configgen.controllers as controllers
 import configgen.utils.zar as zar
 from configgen.utils.logger import get_logger
