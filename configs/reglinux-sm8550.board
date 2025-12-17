@@ -29,7 +29,7 @@ BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
 
 # Build the DTB from the kernel sources
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
-BR2_LINUX_KERNEL_INTREE_DTS_NAME="qcom/qcs8550-ayn-odin2 qcom/qcs8550-ayn-odin2portal qcom/sm8550-ayaneo-ps"
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="qcom/qcs8550-ayn-odin2 qcom/qcs8550-ayn-odin2mini qcom/qcs8550-ayn-odin2portal qcom/qcs8550-ayn-thor qcom/qcs8550-ayaneo-pocketace qcom/qcs8550-ayaneo-pocketdmg qcom/qcs8550-ayaneo-pocketds qcom/qcs8550-ayaneo-pocketevo qcom/sm8550-ayaneo-ps"
 
 # Custom CPIO dracut.conf for firwmare
 BR2_TARGET_ROOTFS_CPIO_DRACUT_CONF_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sm8550/dracut.conf"

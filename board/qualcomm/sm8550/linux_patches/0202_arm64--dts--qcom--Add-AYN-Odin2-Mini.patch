@@ -1,9 +1,33 @@
+From 82580def34aa466b2ff118f15b8cc6c83c7664d5 Mon Sep 17 00:00:00 2001
+From: Teguh Sobirin <teguh@sobir.in>
+Date: Mon, 27 Oct 2025 17:38:53 +0800
+Subject: [PATCH] arm64: dts: qcom: Add AYN Odin2 Mini
+
+Signed-off-by: Teguh Sobirin <teguh@sobir.in>
+---
+ arch/arm64/boot/dts/qcom/Makefile             |   1 +
+ .../boot/dts/qcom/qcs8550-ayn-odin2mini.dts   | 192 ++++++++++++++++++
+ 2 files changed, 193 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/qcom/qcs8550-ayn-odin2mini.dts
+
+diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
+index 80e4d5b3a03d..010c44b21573 100644
+--- a/arch/arm64/boot/dts/qcom/Makefile
++++ b/arch/arm64/boot/dts/qcom/Makefile
+@@ -127,6 +127,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= qcs6490-rb3gen2-vision-mezzanine.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs8300-ride.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-aim300-aiot.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-ayn-odin2.dtb
++dtb-$(CONFIG_ARCH_QCOM)	+= qcs8550-ayn-odin2mini.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs9100-ride.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qcs9100-ride-r3.dtb
+ dtb-$(CONFIG_ARCH_QCOM)	+= qdu1000-idp.dtb
 diff --git a/arch/arm64/boot/dts/qcom/qcs8550-ayn-odin2mini.dts b/arch/arm64/boot/dts/qcom/qcs8550-ayn-odin2mini.dts
 new file mode 100644
-index 00000000000000..847df39c39cdcc
+index 000000000000..c3f0219cdb3d
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/qcs8550-ayn-odin2mini.dts
-@@ -0,0 +1,187 @@
+@@ -0,0 +1,192 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
 + * Copyright (c) 2025, Teguh Sobirin.
@@ -80,6 +104,10 @@ index 00000000000000..847df39c39cdcc
 +&display_panel {
 +	compatible = "boe,xm91080g";
 +
++	pinctrl-0 = <&dsi_p_rst_active>, <&dsi_p_te_active>;
++	pinctrl-1 = <&dsi_p_rst_suspend>, <&dsi_p_te_suspend>;
++	pinctrl-names = "default", "sleep";
++
 +	vdd-supply = <&vreg_l11b_1p2>;
 +	vddio-supply = <&vreg_l12b_1p8>;
 +	vci-supply = <&vreg_l13b_3p0>;
@@ -110,8 +138,8 @@ index 00000000000000..847df39c39cdcc
 +		reset-gpios = <&tlmm 24 GPIO_ACTIVE_LOW>;
 +		vdd-supply = <&vreg_l2b_3p0>;
 +
-+		pinctrl-0 = <&ts_int_default &ts_rst_default>;
-+		pinctrl-1 = <&ts_int_sleep &ts_rst_sleep>;
++		pinctrl-0 = <&ts_p_rst_default &ts_p_int_default>;
++		pinctrl-1 = <&ts_p_rst_sleep &ts_p_int_sleep>;
 +		pinctrl-names = "default", "sleep";
 +
 +		touchscreen-size-x = <1920>;
@@ -191,3 +219,7 @@ index 00000000000000..847df39c39cdcc
 +&spk_amp_r {
 +	firmware-name = "qcom/sm8550/ayn/odin2mini/aw883xx_acf.bin";
 +};
++
+-- 
+2.34.1
+

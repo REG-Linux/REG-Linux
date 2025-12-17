@@ -175,7 +175,7 @@ config BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 	default "qualcomm/sdm845/odin"									if BR2_PACKAGE_SYSTEM_TARGET_SDM845
 	default "qualcomm/sm6115/mangmi-air-x"								if BR2_PACKAGE_SYSTEM_TARGET_SM6115
 	default "qualcomm/sm8250/rp5 qualcomm/sm8250/rpmini qualcomm/sm8250/rpflip2"			if BR2_PACKAGE_SYSTEM_TARGET_SM8250
-	default "qualcomm/sm8550/odin2 qualcomm/sm8550/odin2portal qualcomm/sm8550/pockets"		if BR2_PACKAGE_SYSTEM_TARGET_SM8550
+	default "qualcomm/sm8550/ayn-sm8550 qualcomm/sm8550/ayaneo-sm8550"				if BR2_PACKAGE_SYSTEM_TARGET_SM8550
 
 	# Mediatek targets
 	default "mediatek/mt8395/radxa-nio-12l"								if BR2_PACKAGE_SYSTEM_TARGET_MT8395

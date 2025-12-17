@@ -23,7 +23,12 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update" || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"   || exit 1
 
-cp "${BINARIES_DIR}/sm8550-ayaneo-ps.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/"           || exit 1
-cp -f "${BOARD_DIR}/LinuxLoader.cfg"        "${REGLINUX_BINARIES_DIR}/boot/LinuxLoader.cfg"             || exit 1
+cp "${BINARIES_DIR}/sm8550-ayaneo-ps.dtb"		"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketace.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketdmg.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketds.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+cp "${BINARIES_DIR}/qcs8550-ayaneo-pocketevo.dtb"	"${REGLINUX_BINARIES_DIR}/boot/boot/" || exit 1
+
+cp -f "${BOARD_DIR}/LinuxLoader.cfg"        "${REGLINUX_BINARIES_DIR}/boot/LinuxLoader.cfg"   || exit 1
 
 exit 0
