@@ -1,8 +1,7 @@
 from os import path
 from time import sleep
-from subprocess import PIPE, CalledProcessError, run, check_output
+from subprocess import PIPE, CalledProcessError, run
 from csv import reader
-from sys import stdout
 from typing import Optional, List, Dict
 from .logger import get_logger
 
@@ -143,36 +142,50 @@ def changeMouse(mode: bool) -> None:
 
 
 def getGLVersion():
-    try:
-        # Use eglinfo since we are KMS/DRM
-        if not path.exists("/usr/bin/eglinfo"):
-            return 0
-
-        glxVerCmd = 'eglinfo | grep "OpenGL version"'
-        glVerOutput = check_output(glxVerCmd, shell=True).decode(stdout.encoding)
-        glVerString = glVerOutput.split()
-        glVerTemp = glVerString[3].split(".")
+    lines = _get_eglinfo_lines()
+    for line in lines:
+        if "OpenGL version" not in line:
+            continue
+        parts = line.split(":", 1)
+        if len(parts) < 2:
+            continue
+        version_token = parts[1].strip().split()[0]
+        glVerTemp = version_token.split(".")
         if len(glVerTemp) > 2:
-            del glVerTemp[2:]
-        glVersion = float(".".join(glVerTemp))
-        return glVersion
-    except (ValueError, TypeError, CalledProcessError):
-        return 0
+            glVerTemp = glVerTemp[:2]
+        try:
+            return float(".".join(glVerTemp))
+        except (ValueError, TypeError):
+            return 0
+    return 0
 
 
 def getGLVendor():
-    try:
-        # Use eglinfo since we are KMS/DRM
-        if not path.exists("/usr/bin/eglinfo"):
-            return "unknown"
+    lines = _get_eglinfo_lines()
+    for line in lines:
+        if "OpenGL vendor" not in line:
+            continue
+        parts = line.split(":", 1)
+        if len(parts) < 2:
+            continue
+        vendor_token = parts[1].strip().split()[0]
+        return vendor_token.casefold()
+    return "unknown"
 
-        glxVendCmd = 'eglinfo | grep "OpenGL vendor string"'
-        glVendOutput = check_output(glxVendCmd, shell=True).decode(stdout.encoding)
-        glVendString = glVendOutput.split()
-        glVendor = glVendString[3].casefold()
-        return glVendor
-    except (CalledProcessError, IndexError, AttributeError):
-        return "unknown"
+
+def _get_eglinfo_lines() -> List[str]:
+    eglinfo_path = "/usr/bin/eglinfo"
+    if not path.exists(eglinfo_path):
+        return []
+
+    try:
+        result = run([eglinfo_path], stdout=PIPE, stderr=PIPE, text=True, check=True)
+        return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    except CalledProcessError as e:
+        eslog.error(f"Error running {eglinfo_path}: {e.stderr.strip() if e.stderr else e}")
+        return []
+    except FileNotFoundError:
+        return []
 
 
 def getAltDecoration(systemName: str, rom: str, emulator: str) -> str:
