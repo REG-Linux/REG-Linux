@@ -1,6 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
-from settings import UnixSettings
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.settings import UnixSettings
 from .azaharConfig import setAzaharConfig, AZAHAR_BIN_PATH, AZAHAR_CONFIG_PATH
 from .azaharControllers import setAzaharControllers
 
@@ -11,7 +11,7 @@ class AzaharGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Load existing config or create a new one
         azaharConfig = UnixSettings(AZAHAR_CONFIG_PATH)
@@ -19,10 +19,10 @@ class AzaharGenerator(Generator):
         # Update configuration
         setAzaharConfig(azaharConfig, system)
         # TODO: Set controllers
-        setAzaharControllers(azaharConfig, playersControllers)
+        setAzaharControllers(azaharConfig, players_controllers)
 
         # Save the updated configuration
         azaharConfig.write()  # UnixSettings method
 
-        commandArray = [AZAHAR_BIN_PATH, rom]
-        return Command(array=commandArray)
+        command_array = [AZAHAR_BIN_PATH, rom]
+        return Command(array=command_array)

@@ -1,6 +1,6 @@
-from generators.Generator import Generator
+from configgen.generators.Generator import Generator
 from os import makedirs
-from Command import Command
+from configgen.Command import Command
 import controllers as controllersConfig
 
 UQM_BIN_PATH = "/usr/bin/urquan"
@@ -8,7 +8,7 @@ UQM_BIN_PATH = "/usr/bin/urquan"
 
 class UqmGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         directories = [
             "/userdata/saves/uqm",
@@ -22,17 +22,17 @@ class UqmGenerator(Generator):
         with open("/userdata/roms/uqm/version", "a"):  # Create file if does not exist
             pass
 
-        commandArray = [
+        command_array = [
             UQM_BIN_PATH,
             "--contentdir=/userdata/roms/uqm",
             "--configdir=/userdata/saves/uqm",
         ]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

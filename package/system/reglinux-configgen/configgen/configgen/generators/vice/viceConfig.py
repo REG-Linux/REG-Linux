@@ -1,5 +1,5 @@
-from settings import UnixSettings
-from systemFiles import CONF
+from configgen.settings import UnixSettings
+from configgen.systemFiles import CONF
 import os
 
 VICE_CONFIG_DIR = CONF + "/vice"

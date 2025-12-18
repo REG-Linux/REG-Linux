@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
-from settings import UnixSettings
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, BIOS
+from configgen.settings import UnixSettings
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, BIOS
 
 GSPLUS_CONFIG_DIR = CONF + "/GSplus"
 GSPLUS_CONFIG_PATH = GSPLUS_CONFIG_DIR + "/config.txt"
@@ -13,7 +13,7 @@ GSPLUS_BIN_PATH = "/usr/bin/GSplus"
 
 class GSplusGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(GSPLUS_CONFIG_DIR):
             makedirs(GSPLUS_CONFIG_DIR)
@@ -97,13 +97,13 @@ class GSplusGenerator(Generator):
         config.save("g_cfg_rom_path", GSPLUS_BIOS_DIR)
         config.write()
 
-        commandArray = [GSPLUS_BIN_PATH, "-fullscreen"]
+        command_array = [GSPLUS_BIN_PATH, "-fullscreen"]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

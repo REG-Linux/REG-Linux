@@ -1,6 +1,6 @@
 from struct import pack, unpack
 from os import environ
-from systemFiles import CONF, SAVES
+from configgen.systemFiles import CONF, SAVES
 
 DOLPHIN_CONFIG_DIR = CONF + "/dolphin-emu"
 DOLPHIN_CONFIG_PATH = DOLPHIN_CONFIG_DIR + "/Dolphin.ini"
@@ -9,7 +9,7 @@ DOLPHIN_GFX_PATH = DOLPHIN_CONFIG_DIR + "/GFX.ini"
 DOLPHIN_SYSCONF_PATH = DOLPHIN_SAVES_DIR + "/Wii/shared2/sys/SYSCONF"
 DOLPHIN_BIN_PATH = "/usr/bin/dolphin-emu"
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

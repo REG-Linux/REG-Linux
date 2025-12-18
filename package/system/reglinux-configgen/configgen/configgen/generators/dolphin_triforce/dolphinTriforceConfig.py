@@ -1,4 +1,4 @@
-from systemFiles import CONF, SAVES
+from configgen.systemFiles import CONF, SAVES
 
 dolphinTriforceConfig = CONF + "/dolphin-triforce"
 dolphinTriforceData = SAVES + "/dolphin-triforce"

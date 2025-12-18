@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, unlink
 from .mednafenControllers import setMednafenControllers
 from .mednafenConfig import (
@@ -12,7 +12,7 @@ from .mednafenConfig import (
 
 class MednafenGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(MEDNAFEN_CONFIG_DIR):
             makedirs(MEDNAFEN_CONFIG_DIR)
@@ -32,5 +32,5 @@ class MednafenGenerator(Generator):
         # Close config file as we are done
         cfgConfig.close()
 
-        commandArray = [MEDNAFEN_BIN_PATH, rom]
-        return Command(array=commandArray)
+        command_array = [MEDNAFEN_BIN_PATH, rom]
+        return Command(array=command_array)

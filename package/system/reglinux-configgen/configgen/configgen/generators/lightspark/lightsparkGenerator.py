@@ -1,20 +1,20 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 
 LIGHTSPARK_BIN_PATH = "/usr/bin/lightspark"
 
 
 class LightsparkGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [LIGHTSPARK_BIN_PATH, "-s", "local-with-networking", rom]
+        command_array = [LIGHTSPARK_BIN_PATH, "-s", "local-with-networking", rom]
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

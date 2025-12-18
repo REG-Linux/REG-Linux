@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import xml.parsers.expat
 from codecs import open
 from csv import reader
 from os import path, makedirs, remove, listdir, unlink, symlink, linesep
@@ -7,7 +8,7 @@ from zipfile import ZipFile
 from pathlib import Path
 from xml.dom import minidom
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -639,12 +640,28 @@ def getMameControlScheme(system, romBasename):
     if controllerType in ["default", "neomini", "neocd", "twinstick", "qbert"]:
         return controllerType
     else:
-        capcomList = set(open(mameCapcom).read().split())
-        mkList = set(open(mameMKombat).read().split())
-        kiList = set(open(mameKInstinct).read().split())
-        neogeoList = set(open(mameNeogeo).read().split())
-        twinstickList = set(open(mameTwinstick).read().split())
-        qbertList = set(open(mameRotatedstick).read().split())
+        try:
+            with open(mameCapcom) as f:
+                capcomList = set(f.read().split())
+            with open(mameMKombat) as f:
+                mkList = set(f.read().split())
+            with open(mameKInstinct) as f:
+                kiList = set(f.read().split())
+            with open(mameNeogeo) as f:
+                neogeoList = set(f.read().split())
+            with open(mameTwinstick) as f:
+                twinstickList = set(f.read().split())
+            with open(mameRotatedstick) as f:
+                qbertList = set(f.read().split())
+        except (IOError, OSError) as e:
+            eslog.error(f"Error reading MAME list files: {e}")
+            # Initialize empty sets to avoid breaking the process
+            capcomList = set()
+            mkList = set()
+            kiList = set()
+            neogeoList = set()
+            twinstickList = set()
+            qbertList = set()
 
         romName = path.splitext(romBasename)[0]
         if romName in capcomList:
@@ -696,7 +713,14 @@ def generateMAMEPadConfig(
     if path.exists(configFile):
         try:
             config = minidom.parse(configFile)
-        except:
+        except xml.parsers.expat.ExpatError as e:
+            eslog.warning(f"Invalid XML in MAME config file {configFile}: {e}. Reinitializing file.")
+            pass  # reinit the file
+        except FileNotFoundError:
+            eslog.warning(f"MAME config file not found: {configFile}")
+            pass  # reinit the file
+        except Exception as e:
+            eslog.warning(f"Error parsing MAME config file {configFile}: {e}. Reinitializing file.")
             pass  # reinit the file
 
     if system.isOptSet("customcfg"):
@@ -839,7 +863,14 @@ def generateMAMEPadConfig(
         if path.exists(configFile_alt):
             try:
                 config_alt = minidom.parse(configFile_alt)
-            except:
+            except xml.parsers.expat.ExpatError as e:
+                eslog.warning(f"Invalid XML in MAME alt config file {configFile_alt}: {e}. Reinitializing file.")
+                pass  # reinit the file
+            except FileNotFoundError:
+                eslog.warning(f"MAME alt config file not found: {configFile_alt}")
+                pass  # reinit the file
+            except Exception as e:
+                eslog.warning(f"Error parsing MAME alt config file {configFile_alt}: {e}. Reinitializing file.")
                 pass  # reinit the file
 
         perGameCfg = system.getOptBoolean("pergamecfg")

@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 from .viceConfig import setViceConfig, VICE_BIN_DIR
 from .viceControllers import setViceControllers
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -15,17 +15,17 @@ class ViceGenerator(Generator):
     # Main entry of the module
     # Return command
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         setViceConfig(system, metadata, guns)
-        setViceControllers(system, playersControllers)
+        setViceControllers(system, players_controllers)
 
-        commandArray = [VICE_BIN_DIR + system.config["core"], rom]
+        command_array = [VICE_BIN_DIR + system.config["core"], rom]
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

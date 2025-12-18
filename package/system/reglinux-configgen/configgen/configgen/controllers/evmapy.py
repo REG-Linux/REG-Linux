@@ -13,9 +13,10 @@ keyboard key presses or mouse movements.
 from subprocess import call
 from json import load, dumps
 from os import path
+import os
 from evdev import InputDevice
 from .mouse import mouseButtonToCode
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -32,7 +33,7 @@ class Evmapy:
     __started = False
 
     @staticmethod
-    def start(system, emulator, core, rom, playersControllers, guns):
+    def start(system, emulator, core, rom, players_controllers, guns):
         """
         Start the evmapy process with the given configuration.
 
@@ -41,13 +42,13 @@ class Evmapy:
             emulator (str): The emulator being used
             core (str): The emulator core being used
             rom (str): Path to the ROM file or directory
-            playersControllers (dict): Dictionary mapping player numbers to controller objects
+            players_controllers (dict): Dictionary mapping player numbers to controller objects
             guns (dict): Dictionary of light gun configurations
 
         Returns:
             None
         """
-        if Evmapy.__prepare(system, emulator, core, rom, playersControllers, guns):
+        if Evmapy.__prepare(system, emulator, core, rom, players_controllers, guns):
             Evmapy.__started = True
             call(["system-evmapy", "start"])
 
@@ -64,7 +65,7 @@ class Evmapy:
             call(["system-evmapy", "stop"])
 
     @staticmethod
-    def __prepare(system, emulator, core, rom, playersControllers, guns):
+    def __prepare(system, emulator, core, rom, players_controllers, guns):
         """
         Prepare evmapy configuration files for the given system and controllers.
 
@@ -83,7 +84,7 @@ class Evmapy:
             emulator (str): The emulator being used
             core (str): The emulator core being used
             rom (str): Path to the ROM file or directory
-            playersControllers (dict): Dictionary mapping player numbers to controller objects
+            players_controllers (dict): Dictionary mapping player numbers to controller objects
             guns (dict): Dictionary of light gun configurations
 
         Returns:
@@ -116,7 +117,13 @@ class Evmapy:
                 call(["system-evmapy", "clear"])
 
                 # Load the pad action configuration from the keys file
-                padActionConfig = load(open(keysfile))
+                try:
+                    with open(keysfile) as f:
+                        padActionConfig = load(f)
+                except (IOError, OSError) as e:
+                    eslog.error(f"Error loading keys file {keysfile}: {e}")
+                    # Continue with empty padActionConfig to avoid breaking the process
+                    padActionConfig = {}
 
                 # Configure light guns
                 ngun = 1
@@ -171,7 +178,7 @@ class Evmapy:
 
                 # Configure each player's controller
                 nplayer = 1
-                for playercontroller, pad in sorted(playersControllers.items()):
+                for playercontroller, pad in sorted(players_controllers.items()):
                     player_action_key = "actions_player" + str(nplayer)
                     if player_action_key in padActionConfig:
                         # Generate configuration file path for this controller
@@ -699,10 +706,24 @@ class Evmapy:
         Returns:
             tuple: (min_value, max_value) for the axis, or (0, 0) if not found
         """
+        # Validate input parameters
+        if not devicePath or not isinstance(devicePath, str):
+            eslog.warning(f"Invalid device path provided: {devicePath}")
+            return 0, 0
+
+        if not isinstance(axisCode, int):
+            eslog.warning(f"Invalid axis code provided: {axisCode}")
+            return 0, 0
+
         try:
             # Check if the device path exists before attempting to open it
             if not path.exists(devicePath):
                 eslog.warning(f"Device path {devicePath} does not exist")
+                return 0, 0
+
+            # Check if the device path is accessible
+            if not os.access(devicePath, os.R_OK):
+                eslog.warning(f"Device path {devicePath} is not readable")
                 return 0, 0
 
             device = InputDevice(devicePath)
@@ -725,9 +746,13 @@ class Evmapy:
             # Log device not found error
             eslog.warning(f"Device not found at {devicePath}: {e}")
             return 0, 0
+        except OSError as e:
+            # Handle other OS-related errors (like device busy, etc.)
+            eslog.warning(f"OS error accessing device {devicePath}: {e}")
+            return 0, 0
         except Exception as e:
             # Log any other unexpected errors
-            eslog.warning(f"Error reading axis info from {devicePath}: {e}")
+            eslog.warning(f"Unexpected error reading axis info from {devicePath}: {e}")
             return 0, 0
 
         return 0, 0  # Default values if axis not found

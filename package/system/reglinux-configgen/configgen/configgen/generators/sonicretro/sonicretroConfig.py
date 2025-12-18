@@ -1,4 +1,4 @@
-from settings import UnixSettings
+from configgen.settings import UnixSettings
 from os import path
 from hashlib import md5
 

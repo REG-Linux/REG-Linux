@@ -1,37 +1,45 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import chdir
-from systemFiles import ROMS
-from controllers import generate_sdl_controller_config
+from configgen.systemFiles import ROMS
+from configgen.controllers import generate_sdl_controller_config
 
 TYRIAN_ROMS_DIR = ROMS + "tyrian/data"
 TYRIAN_BIN_PATH = "/usr/bin/opentyrian"
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 
 class TyrianGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         try:
             chdir(TYRIAN_ROMS_DIR)
-        except:
+        except FileNotFoundError:
             eslog.error(
-                "ERROR: Game assets not installed. You can get them from the Batocera Content Downloader."
+                f"ERROR: Tyrian ROMs directory not found: {TYRIAN_ROMS_DIR}. Game assets not installed. You can get them from the Batocera Content Downloader."
             )
-        commandArray = [TYRIAN_BIN_PATH]
+        except PermissionError:
+            eslog.error(
+                f"ERROR: Permission denied accessing Tyrian ROMs directory: {TYRIAN_ROMS_DIR}. Check directory permissions."
+            )
+        except OSError as e:
+            eslog.error(
+                f"ERROR: OS error when changing to Tyrian ROMs directory {TYRIAN_ROMS_DIR}: {e}. Game assets may not be installed."
+            )
+        command_array = [TYRIAN_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

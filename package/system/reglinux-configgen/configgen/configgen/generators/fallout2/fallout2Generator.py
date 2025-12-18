@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from configparser import ConfigParser
 from os import path, makedirs, chdir
 from shutil import copy
@@ -15,12 +15,12 @@ from .fallout2Config import (
     FALLOUT_CONFIG_SOURCE_PATH,
     FALLOUT_CONFIG_INI_SOURCE_PATH,
 )
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 
 
 class Fallout2Generator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Check if the directories exist, if not create them
         if not path.exists(FALLOUT_CONFIG_DIR):
@@ -62,7 +62,7 @@ class Fallout2Generator(Generator):
         if path.exists(FALLOUT_CONFIG_INI):
             falloutIniConfig.read(FALLOUT_CONFIG_INI)
 
-        setFalloutIniConfig(falloutIniConfig, gameResolution)
+        setFalloutIniConfig(falloutIniConfig, game_resolution)
 
         with open(FALLOUT_CONFIG_INI, "w") as configfile:
             falloutIniConfig.write(configfile)
@@ -71,13 +71,13 @@ class Fallout2Generator(Generator):
         chdir(FALLOUT_ROMS_DIR)
 
         ## Setup the command
-        commandArray = [FALLOUT_BIN_PATH]
+        command_array = [FALLOUT_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
@@ -86,5 +86,5 @@ class Fallout2Generator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

@@ -1,11 +1,11 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, mkdir
 from platform import uname
-from controllers import generate_sdl_controller_config
-from utils.buildargs import parse_args
-from systemFiles import CONF, SAVES
-from utils.logger import get_logger
+from configgen.controllers import generate_sdl_controller_config
+from configgen.utils.buildargs import parse_args
+from configgen.systemFiles import CONF, SAVES
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -73,7 +73,7 @@ class RazeGenerator(Generator):
         }
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Remove unused arguments: metadata, guns, wheels
         architecture = get_cpu_architecture()
@@ -161,33 +161,33 @@ class RazeGenerator(Generator):
             )
 
         # Launch arguments
-        commandArray = ["raze"]
-        result = parse_args(commandArray, rom)
+        command_array = ["raze"]
+        result = parse_args(command_array, rom)
         if not result.okay:
             raise Exception(result.message)
 
-        commandArray += [
+        command_array += [
             "-exec",
             RAZE_SCRIPT_FILE,
             # Disable controllers because support is poor; we use evmapy instead
             "-nojoy",
             "-width",
-            str(gameResolution["width"]),
+            str(game_resolution["width"]),
             "-height",
-            str(gameResolution["height"]),
+            str(game_resolution["height"]),
             "-nologo" if system.getOptBoolean("nologo") else "",
         ]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9
 
 

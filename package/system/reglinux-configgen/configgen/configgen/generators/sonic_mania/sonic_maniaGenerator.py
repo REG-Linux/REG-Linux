@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, chdir, access, X_OK
 from shutil import copy
 from configparser import ConfigParser
-from controllers import generate_sdl_controller_config
-from systemFiles import ROMS
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import ROMS
 from stat import S_IRWXU, S_IRGRP, S_IXGRP, S_IROTH, S_IXOTH
 
 SONICMANIA_SOURCE_BIN_PATH = "/usr/bin/sonic-mania"
@@ -15,7 +15,7 @@ SONICMANIA_CONFIG_PATH = SONICMANIA_ROMS_DIR + "/Settings.ini"
 
 class SonicManiaGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create the roms directory if it doesn't exist
         if not path.exists(SONICMANIA_ROMS_DIR):
@@ -101,8 +101,8 @@ class SonicManiaGenerator(Generator):
             "exclusiveFS": "y",
             "vsync": selected_vsync,
             "tripleBuffering": selected_buffering,
-            "winWidth": str(gameResolution["width"]),
-            "winHeight": str(gameResolution["height"]),
+            "winWidth": str(game_resolution["width"]),
+            "winHeight": str(game_resolution["height"]),
             "refreshRate": "60",
             "shaderSupport": "y",
             "screenShader": "1",
@@ -120,13 +120,13 @@ class SonicManiaGenerator(Generator):
 
         # Now run
         chdir(SONICMANIA_ROMS_DIR)
-        commandArray = [SONICAMANIA_BIN_PATH]
+        command_array = [SONICAMANIA_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
@@ -135,5 +135,5 @@ class SonicManiaGenerator(Generator):
     def getMouseMode(self, config, rom):
         return False
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

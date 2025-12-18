@@ -1,6 +1,6 @@
 from os import path, makedirs, remove
 from configparser import ConfigParser
-from controllers import gunsNeedCrosses, getGamesMetaData
+from configgen.controllers import gunsNeedCrosses, getGamesMetaData
 
 
 def generateCoreSettings(coreSettings, system, rom, guns, wheels):

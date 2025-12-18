@@ -7,23 +7,23 @@ from typing import Dict, Any, Union, Optional
 try:
     from typing import TypedDict
 except ImportError:
-    from typing_extensions import TypedDict
+    pass
 
 # Import with fallback for different execution contexts
 try:
-    from systemFiles import SYSTEM_CONF, ES_SETTINGS
+    from configgen.systemFiles import SYSTEM_CONF, ES_SETTINGS
 except ImportError:
     # When run as a module within the package
     from .systemFiles import SYSTEM_CONF, ES_SETTINGS
 
 try:
-    from settings import UnixSettings
+    from configgen.settings import UnixSettings
 except ImportError:
     # When run as a module within the package
     from .settings import UnixSettings
 
 try:
-    from utils.logger import get_logger
+    from configgen.utils.logger import get_logger
 except ImportError:
     # When run as a module within the package
     from .utils.logger import get_logger
@@ -31,16 +31,16 @@ except ImportError:
 eslog = get_logger(__name__)
 
 
-# Definindo TypedDicts para estruturas de configuração
+# Defining TypedDicts for configuration structures
 class SystemConfigRequired(TypedDict, total=True):
-    """Campos obrigatórios no SystemConfig"""
+    """Required fields in SystemConfig"""
 
     emulator: str
     core: str
 
 
 class SystemConfigOptional(TypedDict, total=False):
-    """Campos opcionais no SystemConfig"""
+    """Optional fields in SystemConfig"""
 
     videomode: str
     showFPS: str
@@ -100,7 +100,7 @@ class SystemConfigOptional(TypedDict, total=False):
 
 
 class SystemConfig(SystemConfigRequired, SystemConfigOptional):
-    """Configuração do sistema com campos obrigatórios e opcionais"""
+    """System configuration with required and optional fields"""
 
     pass
 
@@ -117,8 +117,9 @@ class RenderConfig(TypedDict, total=False):
 
 
 # Define a flexible config type that can accept additional keys
-SystemConfigDict = Union[SystemConfig, Dict[str, Any]]
-RenderConfigDict = Union[RenderConfig, Dict[str, Any]]
+# Using Dict[str, Any] directly since the config is dynamically modified
+SystemConfigDict = Dict[str, Any]
+RenderConfigDict = Dict[str, Any]
 
 
 class Emulator:
@@ -445,7 +446,20 @@ class Emulator:
                 uimode_value = "Full"
             self.config["uimode"] = uimode_value  # type: ignore
 
-        except Exception:
+        except ET.ParseError as e:
+            eslog.warning(
+                f"Failed to parse EmulationStation settings file {ES_SETTINGS}: {e}"
+            )
+            # Use defaults if ES settings cannot be loaded
+            self.config["showFPS"] = "false"  # type: ignore
+            self.config["uimode"] = "Full"  # type: ignore
+        except FileNotFoundError:
+            eslog.warning(f"EmulationStation settings file not found: {ES_SETTINGS}")
+            # Use defaults if ES settings cannot be loaded
+            self.config["showFPS"] = "false"  # type: ignore
+            self.config["uimode"] = "Full"  # type: ignore
+        except Exception as e:
+            eslog.warning(f"Unexpected error reading EmulationStation settings: {e}")
             # Use defaults if ES settings cannot be loaded
             self.config["showFPS"] = "false"  # type: ignore
             self.config["uimode"] = "Full"  # type: ignore

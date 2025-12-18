@@ -1,6 +1,6 @@
-from generators.Generator import Generator
-from Command import Command
-from settings import UnixSettings
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.settings import UnixSettings
 from os import path, mkdir
 from codecs import open
 from .melondsControllers import setMelondsControllers
@@ -20,7 +20,7 @@ class MelonDSGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Verify the save path exists
         if not path.exists(MELONDS_SAVES_DIR):
@@ -32,11 +32,11 @@ class MelonDSGenerator(Generator):
 
         melondsConfig = UnixSettings(MELONDS_CONFIG_PATH)
 
-        setMelonDSConfig(melondsConfig, system, gameResolution)
-        setMelondsControllers(melondsConfig, playersControllers)
+        setMelonDSConfig(melondsConfig, system, game_resolution)
+        setMelondsControllers(melondsConfig, players_controllers)
 
         # Now write the ini file
         melondsConfig.write()
 
-        commandArray = [MELONDS_BIN_PATH, "-f", rom]
-        return Command(array=commandArray)
+        command_array = [MELONDS_BIN_PATH, "-f", rom]
+        return Command(array=command_array)

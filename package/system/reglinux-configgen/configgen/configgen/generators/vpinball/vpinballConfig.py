@@ -1,4 +1,4 @@
-from systemFiles import CONF
+from configgen.systemFiles import CONF
 
 VPINBALL_CONFIG_DIR = CONF + "/vpinball"
 VPINBALL_CONFIG_PATH = VPINBALL_CONFIG_DIR + "/VPinballX.ini"

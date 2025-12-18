@@ -1,4 +1,7 @@
-from systemFiles import HOME
+from configgen.systemFiles import HOME
+from configgen.utils.logger import get_logger
+
+eslog = get_logger(__name__)
 
 # Define paths for Mednafen configuration and binary
 MEDNAFEN_CONFIG_DIR = HOME + "/.mednafen"

@@ -1,5 +1,6 @@
 from configgen.generators.Generator import Generator
 from configgen.Command import Command
+import xml.parsers.expat
 from codecs import open
 from xml.dom import minidom
 from os import path, mkdir, linesep
@@ -16,7 +17,7 @@ from .cemuConfig import (
     setCemuConfig,
 )
 
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -31,7 +32,7 @@ class CemuGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # in case of squashfs/zar, the root directory is passed
         rpxrom = rom
@@ -55,7 +56,14 @@ class CemuGenerator(Generator):
         if path.exists(CEMU_CONFIG_PATH):
             try:
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
-            except Exception:
+            except xml.parsers.expat.ExpatError as e:
+                eslog.warning(f"Invalid XML in Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.")
+                pass  # reinit the file
+            except FileNotFoundError:
+                eslog.warning(f"Cemu config file not found: {CEMU_CONFIG_PATH}")
+                pass  # reinit the file
+            except Exception as e:
+                eslog.warning(f"Error parsing Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.")
                 pass  # reinit the file
 
         # Create the settings file
@@ -72,15 +80,15 @@ class CemuGenerator(Generator):
         xml.write(dom_string)
 
         # Set-up the controllers
-        setControllerConfig(system, playersControllers, CEMU_PROFILES_DIR)
+        setControllerConfig(system, players_controllers, CEMU_PROFILES_DIR)
 
-        commandArray = [CEMU_BIN_PATH, "-f", "--force-no-menubar", "-g", rpxrom]
+        command_array = [CEMU_BIN_PATH, "-f", "--force-no-menubar", "-g", rpxrom]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

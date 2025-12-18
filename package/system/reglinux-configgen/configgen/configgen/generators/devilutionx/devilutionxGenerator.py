@@ -1,7 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES, ROMS
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, SAVES, ROMS
 
 DEVILUTIONX_CONFIG_DIR = CONF + "/devilutionx"
 DEVILUTIONX_SAVES_DIR = SAVES + "/devilutionx"
@@ -11,9 +11,9 @@ DEVILUTIONX_BIN_PATH = "/usr/bin/devilutionx"
 
 class DevilutionXGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [
+        command_array = [
             DEVILUTIONX_BIN_PATH,
             "--data-dir",
             DEVILUTIONX_ROMS_DIR,
@@ -24,20 +24,20 @@ class DevilutionXGenerator(Generator):
         ]
 
         if rom.endswith("hellfire.mpq"):
-            commandArray.append("--hellfire")
+            command_array.append("--hellfire")
         elif rom.endswith("spawn.mpq"):
-            commandArray.append("--spawn")
+            command_array.append("--spawn")
         else:
-            commandArray.append("--diablo")
+            command_array.append("--diablo")
 
         if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
-            commandArray.append("-f")
+            command_array.append("-f")
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

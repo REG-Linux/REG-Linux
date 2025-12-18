@@ -1,11 +1,11 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from filecmp import cmp
 from shutil import copyfile
 from json import load, dump, dumps
 from evdev import list_devices, InputDevice
 from os import path, makedirs, chmod, environ
-from systemFiles import CONF, BIOS
+from configgen.systemFiles import CONF, BIOS
 
 RYUJINX_CONFIG_DIR = CONF + "/Ryujinx"
 RYUJINX_SYSTEM_DIR = RYUJINX_CONFIG_DIR + "/system"
@@ -73,7 +73,7 @@ class RyujinxGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(RYUJINX_CONFIG_DIR):
             makedirs(RYUJINX_CONFIG_DIR)
@@ -108,7 +108,8 @@ class RyujinxGenerator(Generator):
         if not path.exists(path.dirname(RYUJINX_CONFIG_PATH)):
             makedirs(path.dirname(RYUJINX_CONFIG_PATH))
         try:
-            conf = load(open(RYUJINX_CONFIG_PATH, "r"))
+            with open(RYUJINX_CONFIG_PATH, "r") as f:
+                conf = load(f)
         except:
             conf = {}
 
@@ -172,7 +173,7 @@ class RyujinxGenerator(Generator):
 
         # Now add Controllers
         nplayer = 1
-        for controller, pad in sorted(playersControllers.items()):
+        for controller, pad in sorted(players_controllers.items()):
             if nplayer <= 8:
                 ctrlConf = ryujinxCtrl
                 # we need to get the uuid for ryujinx controllers
@@ -208,11 +209,11 @@ class RyujinxGenerator(Generator):
             nplayer += 1
 
         if rom == "config":
-            commandArray = [RYUJINX_BIN_PATH]
+            command_array = [RYUJINX_BIN_PATH]
         else:
-            commandArray = [RYUJINX_BIN_PATH, rom]
+            command_array = [RYUJINX_BIN_PATH, rom]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
 
 def writeControllerIntoJson(new_controller, filename=RYUJINX_CONFIG_PATH):

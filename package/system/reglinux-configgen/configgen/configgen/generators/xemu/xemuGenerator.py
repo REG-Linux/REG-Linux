@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
 from shutil import copyfile
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from .xemuConfig import setXemuConfig, XEMU_BIN_PATH, XEMU_CONFIG_PATH, XEMU_SAVES_DIR
 
 
@@ -10,9 +10,9 @@ class XemuGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        setXemuConfig(system, rom, playersControllers, gameResolution)
+        setXemuConfig(system, rom, players_controllers, game_resolution)
 
         # copy the hdd if it doesn't exist
         if not path.exists(XEMU_SAVES_DIR + "/xbox_hdd.qcow2"):
@@ -24,19 +24,19 @@ class XemuGenerator(Generator):
             )
 
         # the command to run
-        commandArray = [XEMU_BIN_PATH]
-        commandArray.extend(["-config_path", XEMU_CONFIG_PATH])
+        command_array = [XEMU_BIN_PATH]
+        command_array.extend(["-config_path", XEMU_CONFIG_PATH])
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         if ("xemu_scaling" in config and config["xemu_scaling"] == "stretch") or (
             "xemu_aspect" in config and config["xemu_aspect"] == "16x9"
         ):

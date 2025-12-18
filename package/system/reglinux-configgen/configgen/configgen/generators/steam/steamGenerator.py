@@ -1,7 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 
 
 class SteamGenerator(Generator):
@@ -10,7 +10,7 @@ class SteamGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         basename = path.basename(rom)
         gameId = None
@@ -20,15 +20,15 @@ class SteamGenerator(Generator):
                 gameId = str.strip(f.read())
 
         if gameId is None:
-            commandArray = ["batocera-steam"]
+            command_array = ["batocera-steam"]
         else:
-            commandArray = ["batocera-steam", gameId]
+            command_array = ["batocera-steam", gameId]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

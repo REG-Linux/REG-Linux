@@ -1,8 +1,8 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs
-from controllers import generate_sdl_controller_config
-from systemFiles import SAVES
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import SAVES
 
 EASYRPG_SAVE_DIR = SAVES + "/easyrpg"
 EASYRPG_BIN_PATH = "/usr/bin/easyrpg-player"
@@ -10,37 +10,37 @@ EASYRPG_BIN_PATH = "/usr/bin/easyrpg-player"
 
 class EasyRPGGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [EASYRPG_BIN_PATH]
+        command_array = [EASYRPG_BIN_PATH]
 
         # FPS
         if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
-            commandArray.append("--show-fps")
+            command_array.append("--show-fps")
 
         # Test Play (Debug Mode)
         if system.isOptSet("testplay") and system.getOptBoolean("testplay"):
-            commandArray.append("--test-play")
+            command_array.append("--test-play")
 
         # Game Region (Encoding)
         if system.isOptSet("encoding") and system.config["encoding"] != "autodetect":
-            commandArray.extend(["--encoding", system.config["encoding"]])
+            command_array.extend(["--encoding", system.config["encoding"]])
         else:
-            commandArray.extend(["--encoding", "auto"])
+            command_array.extend(["--encoding", "auto"])
 
         # Save directory
-        savePath = f"{EASYRPG_SAVE_DIR}/{path.basename(rom)}"
-        if not path.exists(savePath):
-            makedirs(savePath)
-        commandArray.extend(["--save-path", savePath])
+        save_path = f"{EASYRPG_SAVE_DIR}/{path.basename(rom)}"
+        if not path.exists(save_path):
+            makedirs(save_path)
+        command_array.extend(["--save-path", save_path])
 
-        commandArray.extend(["--project-path", rom])
+        command_array.extend(["--project-path", rom])
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

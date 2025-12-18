@@ -1,7 +1,7 @@
-from Command import Command
-from generators.Generator import Generator
-from systemFiles import ROMS
-from controllers import generate_sdl_controller_config
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import ROMS
+from configgen.controllers import generate_sdl_controller_config
 
 ROTT_ROMS_DIR = ROMS + "/rott"
 ROTT_BIN_PATH = "/usr/bin/taradino"
@@ -9,16 +9,16 @@ ROTT_BIN_PATH = "/usr/bin/taradino"
 
 class TaradinoGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [ROTT_BIN_PATH]
+        command_array = [ROTT_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "XDG_DATA_DIRS": ROTT_ROMS_DIR,
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 ),
             },
         )

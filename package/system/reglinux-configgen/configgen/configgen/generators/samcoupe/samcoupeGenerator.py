@@ -1,21 +1,21 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 
 SAMCOUPE_BIN_PATH = "/usr/bin/simcoupe"
 
 
 class SamcoupeGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [SAMCOUPE_BIN_PATH, "autoboot", "-disk1", rom]
+        command_array = [SAMCOUPE_BIN_PATH, "autoboot", "-disk1", rom]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
