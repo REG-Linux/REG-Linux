@@ -133,6 +133,10 @@ def writeBezelConfig(
                 gameResolution["width"] == 1080 and gameResolution["height"] == 1920
             ):  # rotated screen (RP5)
                 bezelNeedAdaptation = False
+            elif (
+                gameResolution["width"] == 720 and gameResolution["height"] == 1280
+            ):  # rotated screen (WIN600)
+                bezelNeedAdaptation = False
             else:
                 if (
                     gameRatio < 1.6 and guns_borders_size is None
@@ -140,15 +144,19 @@ def writeBezelConfig(
                     return
                 else:
                     bezelNeedAdaptation = True
-        retroarchConfig["aspect_ratio_index"] = str(
-            RATIO_INDEXES.index("custom")
-        )  # overridden from the beginning of this file
-        if is_ratio_defined("ratio", system.config):
-            if system.config["ratio"] in RATIO_INDEXES:
-                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                    system.config["ratio"]
-                )
-                retroarchConfig["video_aspect_ratio_auto"] = "false"
+        # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
+        if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
+            retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index("4/3")  # Force 4:3 aspect ratio for 720x1280 resolution
+        else:
+            retroarchConfig["aspect_ratio_index"] = str(
+                RATIO_INDEXES.index("custom")
+            )  # overridden from the beginning of this file
+            if is_ratio_defined("ratio", system.config):
+                if system.config["ratio"] in RATIO_INDEXES:
+                    retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                        system.config["ratio"]
+                    )
+                    retroarchConfig["video_aspect_ratio_auto"] = "false"
 
     else:
         # when there's no information about width and height in .info, assume TV is HD 16/9 and information is provided by the core
@@ -178,15 +186,19 @@ def writeBezelConfig(
         ):
             bezelNeedAdaptation = False
         if not shaderBezel:
-            retroarchConfig["aspect_ratio_index"] = str(RATIO_INDEXES.index("custom"))
-            if (
-                is_ratio_defined("ratio", system.config)
-                and system.config["ratio"] in RATIO_INDEXES
-            ):
-                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                    system.config["ratio"]
-                )
-                retroarchConfig["video_aspect_ratio_auto"] = "false"
+            # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
+            if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
+                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index("4/3")  # Force 4:3 aspect ratio for 720x1280 resolution
+            else:
+                retroarchConfig["aspect_ratio_index"] = str(RATIO_INDEXES.index("custom"))
+                if (
+                    is_ratio_defined("ratio", system.config)
+                    and system.config["ratio"] in RATIO_INDEXES
+                ):
+                    retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                        system.config["ratio"]
+                    )
+                    retroarchConfig["video_aspect_ratio_auto"] = "false"
 
     if not shaderBezel:
         retroarchConfig["input_overlay_enable"] = "true"
