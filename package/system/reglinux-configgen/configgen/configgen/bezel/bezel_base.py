@@ -10,8 +10,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PIL.Image import Image as ImageType
-else:
-    ImageType = Image
 from configgen.systemFiles import OVERLAY_USER, OVERLAY_SYSTEM
 from configgen.utils.videoMode import getAltDecoration
 from configgen.utils.logger import get_logger
