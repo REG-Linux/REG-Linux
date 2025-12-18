@@ -126,14 +126,17 @@ EMULATOR_MAPPING = {
     "xenia-canary": ("configgen.generators.xenia.xeniaGenerator", "XeniaGenerator"),
 }
 
-# Preload all generator classes
 PRELOADED_GENERATORS = {}
-for emulator, (module_path, class_name) in EMULATOR_MAPPING.items():
+
+
+def _load_generator_class(emulator: str):
     try:
-        module = import_module(module_path)
-        PRELOADED_GENERATORS[emulator] = getattr(module, class_name)
-    except (ImportError, AttributeError):
-        continue  # Silence errors, or add logs if you want visibility
+        module_path, class_name = EMULATOR_MAPPING[emulator]
+    except KeyError:
+        raise GeneratorNotFoundError(f"No generator found for emulator {emulator}")
+
+    module = import_module(module_path)
+    return getattr(module, class_name)
 
 
 def getGenerator(emulator):
@@ -149,8 +152,18 @@ def getGenerator(emulator):
     Raises:
         GeneratorNotFoundError: If no generator is found for the specified emulator.
     """
-    try:
-        generator_class = PRELOADED_GENERATORS[emulator]
-        return generator_class()
-    except KeyError:
-        raise GeneratorNotFoundError(f"No generator found for emulator {emulator}")
+    generator_class = PRELOADED_GENERATORS.get(emulator)
+    if generator_class is None:
+        try:
+            generator_class = _load_generator_class(emulator)
+        except ImportError as e:
+            raise GeneratorNotFoundError(
+                f"Failed to import generator for {emulator}: {e}"
+            )
+        except AttributeError as e:
+            raise GeneratorNotFoundError(
+                f"Generator class not found for {emulator}: {e}"
+            )
+        PRELOADED_GENERATORS[emulator] = generator_class
+
+    return generator_class()
