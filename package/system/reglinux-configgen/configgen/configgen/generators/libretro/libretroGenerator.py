@@ -50,7 +50,7 @@ class LibretroGenerator(Generator):
                 gameShader = renderConfig["shader-" + str(altDecoration)]
             else:
                 gameShader = renderConfig["shader"]
-        if "shader" in renderConfig and gameShader != None:
+        if "shader" in renderConfig and gameShader is not None:
             if (gfxBackend == "glcore" or gfxBackend == "vulkan") or (
                 system.config["core"] in coreForceSlangShaders
             ):
@@ -301,7 +301,7 @@ class LibretroGenerator(Generator):
         if path.isfile(overlayFile):
             configToAppend.append(overlayFile)
 
-        if "shader" in renderConfig and gameShader != None:
+        if "shader" in renderConfig and gameShader is not None:
             command_array.extend(["--set-shader", video_shader])
 
         # Generate the append
@@ -330,7 +330,7 @@ class LibretroGenerator(Generator):
         command_array.extend(["--verbose"])
 
         if system.name == "scummvm":
-            rom = path.dirname(rom) + "/" + romName[0:-8]
+            rom = path.join(path.dirname(rom), romName[0:-8])
 
         if system.name == "reminiscence":
             with open(rom, "r") as file:
@@ -354,8 +354,19 @@ class LibretroGenerator(Generator):
 def getGFXBackend(system):
     # Start with the selected option
     # Pick glcore or gl based on drivers if not selected
+    VALID_BACKENDS = {
+        "gl",
+        "glcore",
+        "vulkan",
+        "opengl",
+    }  # opengl is legacy alias for gl
+
     if system.isOptSet("gfxbackend"):
         backend = system.config["gfxbackend"]
+        # Validate backend value
+        if backend not in VALID_BACKENDS:
+            eslog.warning(f"Invalid gfxbackend '{backend}', falling back to 'gl'")
+            backend = "gl"
         setManually = True
     else:
         setManually = False

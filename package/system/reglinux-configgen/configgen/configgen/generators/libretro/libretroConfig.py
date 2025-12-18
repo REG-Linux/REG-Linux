@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import fcntl
 from configgen.settings import UnixSettings
 from os import path, makedirs, remove
 from configgen.controllers import (
@@ -264,13 +265,34 @@ def createLibretroConfig(
     if not path.exists(path.dirname(retroarchCore)):
         makedirs(path.dirname(retroarchCore))
 
+    # Use file locking to prevent race conditions when multiple instances
+    # try to create/modify the configuration file simultaneously
+    lockfile = retroarchCore + ".lock"
     try:
-        coreSettings = UnixSettings(retroarchCore, separator=" ")
-    except UnicodeError:
-        # invalid retroarch-core-options.cfg
-        # remove it and try again
-        remove(retroarchCore)
-        coreSettings = UnixSettings(retroarchCore, separator=" ")
+        with open(lockfile, "w") as lock:
+            # Acquire exclusive lock
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            try:
+                coreSettings = UnixSettings(retroarchCore, separator=" ")
+            except UnicodeError:
+                # invalid retroarch-core-options.cfg
+                # remove it and try again
+                eslog.warning(
+                    f"Invalid Unicode in {retroarchCore}, reinitializing file."
+                )
+                if path.exists(retroarchCore):
+                    remove(retroarchCore)
+                coreSettings = UnixSettings(retroarchCore, separator=" ")
+            # Lock is automatically released when file is closed
+    except Exception as e:
+        eslog.error(f"Error acquiring lock for {retroarchCore}: {e}")
+        # Fallback to non-locked operation
+        try:
+            coreSettings = UnixSettings(retroarchCore, separator=" ")
+        except UnicodeError:
+            if path.exists(retroarchCore):
+                remove(retroarchCore)
+            coreSettings = UnixSettings(retroarchCore, separator=" ")
 
     # Create/update retroarch-core-options.cfg
     generateCoreSettings(coreSettings, system, rom, guns, wheels)
@@ -938,7 +960,7 @@ def createLibretroConfig(
             ]
             if (
                 system.config["prboom_controller1"] != "1"
-                or system.config["prboom_controller1"] == "3"
+                and system.config["prboom_controller1"] != "3"
             ):
                 retroarchConfig["input_player1_analog_dpad_mode"] = "0"
             else:
