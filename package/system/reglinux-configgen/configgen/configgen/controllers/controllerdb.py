@@ -5,14 +5,13 @@ Handles loading and matching controller configurations from gamecontrollerdb.txt
 
 from typing import Dict, Any, Tuple, Optional
 import os
-import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from .controller import Controller, Input
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 
-@staticmethod
 def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
     line = line.strip()
     if not line or line.startswith("#"):
@@ -30,7 +29,6 @@ def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
         key, value = input_pair.split(":", 1)
         key = key.strip()
         value = value.strip()
-        # Create Input object for each mapping
         input_obj = Input.from_sdl_mapping(key, value)
         if input_obj:
             inputs[key] = input_obj
@@ -43,39 +41,40 @@ def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
     }
 
 
+def _parse_chunk(lines):
+    chunk_result: Dict[str, Dict[str, Any]] = {}
+    for line in lines:
+        parsed = parse_line(line)
+        if parsed is None:
+            continue
+        guid, config = parsed
+        chunk_result[guid] = config
+    return chunk_result
+
+
 def load_all_controllers_config() -> Dict[str, Dict[str, Any]]:
     """
-    Load all controller configurations from gamecontrollerdb.txt.
-    Hybrid version: synchronous file read, asynchronous parse with concurrency limit.
+    Load all controller configurations from gamecontrollerdb.txt, splitting the input
+    evenly across available cores and parsing each slice in a thread pool.
     """
-    controllerdb = {}
+    controllerdb: Dict[str, Dict[str, Any]] = {}
     filepath = os.environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
 
     try:
         with open(filepath, "r", encoding="utf-8") as f:
-            lines = f.readlines()
+            lines = f.read().splitlines()
+
+        if not lines:
+            return {}
 
         max_concurrency = max(1, os.cpu_count() or 1)
+        chunk_size = max(1, (len(lines) + max_concurrency - 1) // max_concurrency)
+        chunks = [lines[i : i + chunk_size] for i in range(0, len(lines), chunk_size)]
+        worker_count = min(len(chunks), max_concurrency)
 
-        async def run_async_parsing():
-            sem = asyncio.Semaphore(max_concurrency)
-            loop = asyncio.get_running_loop()
-
-            async def process_line(line):
-                async with sem:
-                    # Execute parse_line (blocking) in a thread pool
-                    return await loop.run_in_executor(None, parse_line, line)
-
-            tasks = [process_line(line) for line in lines]
-            return await asyncio.gather(*tasks)
-
-        results = asyncio.run(run_async_parsing())
-
-        for res in results:
-            if res is not None:
-                guid, config = res
-                # TODO RIGHT OR WRONG if guid not in controllerdb:
-                controllerdb[guid] = config
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            for chunk_result in executor.map(_parse_chunk, chunks):
+                controllerdb.update(chunk_result)
 
     except FileNotFoundError:
         eslog.warning(f"Warning: Controller config file {filepath} not found.")
@@ -120,11 +119,10 @@ def _find_best_controller_config(controllers, x, pxguid, pxdev):
     Returns:
         Controller | None: Matched Controller instance or None if not found.
     """
-    for controllerGUID in controllers:
-        controller = controllers[controllerGUID]
-        if controller["guid"] == pxguid:
-            controller_data = controller.copy()
-            controller_data["index"] = x
-            controller_data["dev"] = pxdev
-            return Controller.from_dict(controller_data)
-    return None
+    controller = controllers.get(pxguid)
+    if not controller:
+        return None
+    controller_data = controller.copy()
+    controller_data["index"] = x
+    controller_data["dev"] = pxdev
+    return Controller.from_dict(controller_data)
