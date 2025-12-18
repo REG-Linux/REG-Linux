@@ -4,6 +4,9 @@ from os import path, makedirs, mkdir
 from configparser import ConfigParser
 from shutil import copyfile
 from configgen.systemFiles import CONF
+from configgen.utils.logger import get_logger
+
+eslog = get_logger(__name__)
 from .flycastConfig import (
     setFlycastConfig,
     FLYCAST_CONFIG_PATH,

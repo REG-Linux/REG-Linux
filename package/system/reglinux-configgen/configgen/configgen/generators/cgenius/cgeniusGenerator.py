@@ -2,7 +2,12 @@ from configgen.generators.Generator import Generator
 from os import path, makedirs
 from configgen.Command import Command
 from shutil import copy
-from configobj import ConfigObj
+
+try:
+    from configobj import ConfigObj
+except ImportError:
+    print("configobj module not found. Please install it with: pip install configobj")
+    raise
 from .cgeniusControllers import setCgeniusControllers
 from .cgeniusConfig import (
     CGENIUS_CONFIG_DIR,
