@@ -1,7 +1,11 @@
 from configgen.generators.Generator import Generator
 from configgen.Command import Command
 from os import path, mkdir, listdir
-from ruamel.yaml import YAML
+try:
+    from ruamel.yaml import YAML
+except ImportError:
+    print("ruamel.yaml module not found. Please install it with: pip install ruamel.yaml")
+    raise
 from shutil import move
 from configgen.controllers import generate_sdl_controller_config
 from configgen.systemFiles import CONF, SAVES

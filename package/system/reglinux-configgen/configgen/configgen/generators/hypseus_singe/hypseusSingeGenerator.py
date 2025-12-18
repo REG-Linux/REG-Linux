@@ -216,21 +216,25 @@ class HypseusSingeGenerator(Generator):
             eslog.debug("No .m2v files found in the text file.")
 
         # now get the resolution from the m2v file
-        video_path = rom + "/" + m2v_filename
-        # check the path exists
-        if not path.exists(video_path):
-            eslog.debug("Could not find m2v file in path - {}".format(video_path))
-            video_path = self.find_file(rom, m2v_filename)
+        if m2v_filename is not None:
+            video_path = rom + "/" + m2v_filename
+            # check the path exists
+            if not path.exists(video_path):
+                eslog.debug("Could not find m2v file in path - {}".format(video_path))
+                video_path = self.find_file(rom, m2v_filename)
+        else:
+            eslog.debug("m2v file not found, skipping resolution check")
+            video_path = None
 
-        eslog.debug("Full m2v path is: {}".format(video_path))
-
-        if video_path != None:
+        if video_path is not None:
             video_resolution = self.get_resolution(video_path)
             eslog.debug("Resolution: {}".format(video_resolution))
             if video_resolution == (0, 0):
                 eslog.warning(
                     "Could not determine video resolution, using fallback"
                 )
+        else:
+            video_resolution = None
 
         if system.name == "singe":
             command_array = [

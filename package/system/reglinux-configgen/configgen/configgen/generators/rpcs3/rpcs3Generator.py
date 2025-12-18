@@ -4,7 +4,11 @@ from shutil import copytree, copy2
 from configparser import ConfigParser
 from re import match
 from os import path, makedirs
-from ruamel.yaml import YAML
+try:
+    from ruamel.yaml import YAML
+except ImportError:
+    print("ruamel.yaml module not found. Please install it with: pip install ruamel.yaml")
+    raise
 from subprocess import check_output, CalledProcessError
 from configgen.controllers import generate_sdl_controller_config
 from .rpcs3Controllers import generateControllerConfig

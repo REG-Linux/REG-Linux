@@ -7,7 +7,11 @@ from sys import exit
 from shutil import copy2
 from filecmp import dircmp
 from subprocess import check_output, CalledProcessError
-from toml import load, dump
+try:
+    from toml import load, dump
+except ImportError:
+    print("toml module not found. Please install it with: pip install toml")
+    raise
 from glob import glob
 from re import sub, search, IGNORECASE
 from configgen.utils.logger import get_logger
