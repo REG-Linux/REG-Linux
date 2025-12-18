@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from configparser import ConfigParser
 from os import path, makedirs
 from shutil import copy2
-from systemFiles import CONF
+from configgen.systemFiles import CONF
 
 DOSBOXX_CONFIG_DIR = CONF + "/dosbox"
 DOSBOXX_CONFIG_PATH = DOSBOXX_CONFIG_DIR + "/dosboxx.conf"
@@ -13,25 +13,25 @@ DOSBOXX_BIN_PATH = "/usr/bin/dosbox-x"
 
 class DosBoxxGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Find rom path
         gameDir = rom
         gameConfFile = gameDir + "/dosbox.cfg"
-        configFile = DOSBOXX_CONFIG_PATH
+        config_file = DOSBOXX_CONFIG_PATH
 
         if not path.exists(path.dirname(DOSBOXX_CONFIG_PATH)):
             makedirs(path.dirname(DOSBOXX_CONFIG_PATH))
 
         if path.isfile(gameConfFile):
-            configFile = gameConfFile
+            config_file = gameConfFile
 
         # configuration file
         iniSettings = ConfigParser(interpolation=None)
         iniSettings.optionxform = lambda optionstr: str(optionstr)
 
-        if path.exists(configFile):
-            copy2(configFile, DOSBOXX_CONFIG_CUSTOM_PATH)
+        if path.exists(config_file):
+            copy2(config_file, DOSBOXX_CONFIG_CUSTOM_PATH)
             iniSettings.read(DOSBOXX_CONFIG_CUSTOM_PATH)
 
         # sections
@@ -43,7 +43,7 @@ class DosBoxxGenerator(Generator):
         with open(DOSBOXX_CONFIG_CUSTOM_PATH, "w") as config:
             iniSettings.write(config)
 
-        commandArray = [
+        command_array = [
             DOSBOXX_BIN_PATH,
             "-exit",
             "-c",
@@ -57,4 +57,4 @@ class DosBoxxGenerator(Generator):
             f"-conf {DOSBOXX_CONFIG_CUSTOM_PATH}",
         ]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)

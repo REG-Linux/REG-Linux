@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, symlink
 from shutil import copyfile
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SCREENSHOTS
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, SCREENSHOTS
 
 SDLPOP_CONFIG_DIR = CONF + "/SDLPoP"
 SDLPOP_SCREENSHOTS_DIR = SCREENSHOTS + "/SDLPoP"
@@ -16,9 +16,9 @@ SDLPOP_SOURCE_SCREENSHOTS_DIR = "/usr/share/SDLPoP/screenshots"
 
 class SdlPopGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = ["SDLPoP"]
+        command_array = ["SDLPoP"]
 
         # create sdlpop config directory
         if not path.exists(SDLPOP_CONFIG_DIR):
@@ -44,10 +44,10 @@ class SdlPopGenerator(Generator):
             )
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

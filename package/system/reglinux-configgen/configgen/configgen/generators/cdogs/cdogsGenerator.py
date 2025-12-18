@@ -1,13 +1,13 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import chdir
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 from .cdogsConfig import CDOGS_ROMS_DIR, CDOGS_BIN_PATH, CDOGS_ASSETS_DIR
 
 
 class CdogsGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         try:
             for assetdir in CDOGS_ASSETS_DIR:
@@ -16,13 +16,13 @@ class CdogsGenerator(Generator):
         except FileNotFoundError:
             raise
 
-        commandArray = [CDOGS_BIN_PATH]
+        command_array = [CDOGS_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

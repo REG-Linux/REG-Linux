@@ -1,5 +1,5 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 import os
 import xml.etree.ElementTree as ET
 import shutil
@@ -46,7 +46,7 @@ class OpenmsxGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         share_dir = openMSX_Homedir + "/share"
         source_settings = openMSX_Config + "/settings.xml"
@@ -146,7 +146,7 @@ class OpenmsxGenerator(Generator):
             file.write("\n")
             file.write("# -= Controller config =-\n")
             nplayer = 1
-            for playercontroller, pad in sorted(playersControllers.items()):
+            for playercontroller, pad in sorted(players_controllers.items()):
                 if nplayer <= 2:
                     if nplayer == 1:
                         file.write("plug joyporta joystick1\n")
@@ -205,30 +205,30 @@ class OpenmsxGenerator(Generator):
 
         # now run the rom with the appropriate flags
         file_extension = os.path.splitext(rom)[1].lower()
-        commandArray = ["/usr/bin/openmsx", "-cart", rom, "-script", settings_tcl]
+        command_array = ["/usr/bin/openmsx", "-cart", rom, "-script", settings_tcl]
 
         # set the best machine based on the system
         if system.name in ["msx1", "msx2"]:
-            commandArray[1:1] = ["-machine", "Boosted_MSX2_EN"]
+            command_array[1:1] = ["-machine", "Boosted_MSX2_EN"]
 
         if system.name == "msx2+":
-            commandArray[1:1] = ["-machine", "Boosted_MSX2+_JP"]
+            command_array[1:1] = ["-machine", "Boosted_MSX2+_JP"]
 
         if system.name == "msxturbor":
-            commandArray[1:1] = ["-machine", "Boosted_MSXturboR_with_IDE"]
+            command_array[1:1] = ["-machine", "Boosted_MSXturboR_with_IDE"]
 
         if system.name == "colecovision":
-            commandArray[1:1] = ["-machine", "ColecoVision_SGM"]
+            command_array[1:1] = ["-machine", "ColecoVision_SGM"]
 
         if system.name == "spectravideo":
-            commandArray[1:1] = ["-machine", "Spectravideo_SVI-328"]
+            command_array[1:1] = ["-machine", "Spectravideo_SVI-328"]
 
         if (
             system.isOptSet("hud")
             and os.path.exists("/usr/bin/mangohud")
             and system.config["hud"] != ""
         ):
-            commandArray.insert(0, "mangohud")
+            command_array.insert(0, "mangohud")
 
         # setup the media types
         if file_extension == ".zip":
@@ -242,17 +242,17 @@ class OpenmsxGenerator(Generator):
 
         if file_extension == ".ogv":
             eslog.debug("File is a laserdisc")
-            for i in range(len(commandArray)):
-                if commandArray[i] == "-machine":
-                    commandArray[i + 1] = "Pioneer_PX-7"
-                elif commandArray[i] == "-cart":
-                    commandArray[i] = "-laserdisc"
+            for i in range(len(command_array)):
+                if command_array[i] == "-machine":
+                    command_array[i + 1] = "Pioneer_PX-7"
+                elif command_array[i] == "-cart":
+                    command_array[i] = "-laserdisc"
 
         if file_extension == ".cas":
             eslog.debug("File is a cassette")
-            for i in range(len(commandArray)):
-                if commandArray[i] == "-cart":
-                    commandArray[i] = "-cassetteplayer"
+            for i in range(len(command_array)):
+                if command_array[i] == "-cart":
+                    command_array[i] = "-cassetteplayer"
 
         if file_extension == ".dsk":
             eslog.debug("File is a disk")
@@ -262,9 +262,9 @@ class OpenmsxGenerator(Generator):
                 and system.config["openmsx_disk"] == "hda"
             ):
                 disk_type = "-hda"
-            for i in range(len(commandArray)):
-                if commandArray[i] == "-cart":
-                    commandArray[i] = disk_type
+            for i in range(len(command_array)):
+                if command_array[i] == "-cart":
+                    command_array[i] = disk_type
 
         # handle our own file format for stacked roms / disks
         if file_extension == ".openmsx":
@@ -284,20 +284,20 @@ class OpenmsxGenerator(Generator):
             extension = rom1.split(".")[-1].lower()
             # now start ammending the array
             if extension == "rom":
-                cart_index = commandArray.index("-cart")
-                commandArray[cart_index] = "-carta"
-                commandArray[cart_index + 1] = rom1
+                cart_index = command_array.index("-cart")
+                command_array[cart_index] = "-carta"
+                command_array[cart_index + 1] = rom1
                 # Add the second rom/disk
                 rom2_index = cart_index + 2
-                commandArray.insert(rom2_index, "-cartb")
-                commandArray.insert(rom2_index + 1, rom2)
+                command_array.insert(rom2_index, "-cartb")
+                command_array.insert(rom2_index + 1, rom2)
             elif extension == "dsk":
-                cart_index = commandArray.index("-cart")
-                commandArray[cart_index] = "-diska"
-                commandArray[cart_index + 1] = rom1
+                cart_index = command_array.index("-cart")
+                command_array[cart_index] = "-diska"
+                command_array[cart_index + 1] = rom1
                 # Add the second disk
                 rom2_index = cart_index + 2
-                commandArray.insert(rom2_index, "-diskb")
-                commandArray.insert(rom2_index + 1, rom2)
+                command_array.insert(rom2_index, "-diskb")
+                command_array.insert(rom2_index + 1, rom2)
 
-        return Command(array=commandArray)
+        return Command(array=command_array)

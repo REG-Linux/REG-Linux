@@ -1,10 +1,10 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, mkdir, listdir
 from ruamel.yaml import YAML
 from shutil import move
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF, SAVES
 
 VITA3K_CONFIG_DIR = CONF + "/vita3k"
 VITA3K_SAVES_DIR = SAVES + "/psvita"
@@ -18,7 +18,7 @@ class Vita3kGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create folder
         if not path.isdir(VITA3K_CONFIG_DIR):
@@ -129,7 +129,7 @@ class Vita3kGenerator(Generator):
         # using the -w & -f options prevents Vita3k from re-writing & prompting the user in GUI
         # we want to avoid that so roms load straight away
         if path.isdir(VITA3K_SAVES_DIR + "/ux0/app/" + smplromname):
-            commandArray = [
+            command_array = [
                 VITA3K_BIN_PATH,
                 "-F",
                 "-w",
@@ -141,7 +141,7 @@ class Vita3kGenerator(Generator):
             ]
         else:
             # Game not installed yet, let's open the menu
-            commandArray = [
+            command_array = [
                 VITA3K_BIN_PATH,
                 "-F",
                 "-w",
@@ -152,10 +152,10 @@ class Vita3kGenerator(Generator):
             ]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
@@ -167,5 +167,5 @@ class Vita3kGenerator(Generator):
         else:
             return True
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

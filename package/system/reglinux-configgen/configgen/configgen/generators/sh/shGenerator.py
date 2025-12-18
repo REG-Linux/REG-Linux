@@ -1,14 +1,17 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 from glob import glob
-from controllers import generate_sdl_controller_config
+from configgen.utils.logger import get_logger
 
 SH_BIN_PATH = "/bin/bash"
+
+eslog = get_logger(__name__)
 
 
 class ShGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # in case of squashfs, the root directory is passed
         shInDir = glob(rom + "/run.sh")
@@ -17,13 +20,13 @@ class ShGenerator(Generator):
         else:
             shrom = rom
 
-        commandArray = [SH_BIN_PATH, shrom]
+        command_array = [SH_BIN_PATH, shrom]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

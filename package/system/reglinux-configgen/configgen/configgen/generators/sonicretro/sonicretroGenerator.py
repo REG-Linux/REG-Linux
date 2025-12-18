@@ -1,13 +1,13 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import chdir
 from .sonicretroConfig import setSonicretroConfig
-from controllers import generate_sdl_controller_config
+from configgen.controllers import generate_sdl_controller_config
 
 
 class SonicRetroGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Determine the emulator to use
         if (rom.lower()).endswith("son"):
@@ -19,13 +19,13 @@ class SonicRetroGenerator(Generator):
 
         # Ensure the ROM directory is the current working directory
         chdir(rom)
-        commandArray = [emu]
+        command_array = [emu]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )

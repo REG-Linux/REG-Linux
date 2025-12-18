@@ -1,5 +1,7 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.systemFiles import CONF, SAVES, HOME
+from configgen.controllers import generate_sdl_controller_config
 from os import path, makedirs, environ
 from sys import exit
 from shutil import copy2
@@ -8,9 +10,7 @@ from subprocess import check_output, CalledProcessError
 from toml import load, dump
 from glob import glob
 from re import sub, search, IGNORECASE
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF, SAVES, HOME
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -37,7 +37,7 @@ class XeniaGenerator(Generator):
             copy2(src_path, dest_path)
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         core = system.config["core"]
 
@@ -97,23 +97,27 @@ class XeniaGenerator(Generator):
         if path.splitext(rom)[1] == ".xbox360":
             eslog.debug(f"Found .xbox360 playlist: {rom}")
             pathLead = path.dirname(rom)
-            openFile = open(rom, "r")
-            # Read only the first line of the file.
-            firstLine = openFile.readlines(1)[0]
-            # Strip of any new line characters.
-            firstLine = firstLine.strip("\n").strip("\r")
-            eslog.debug(
-                f"Checking if specified disc installation / XBLA file actually exists..."
-            )
-            xblaFullPath = pathLead + "/" + firstLine
-            if path.exists(xblaFullPath):
-                eslog.debug(f"Found! Switching active rom to: {firstLine}")
-                rom = xblaFullPath
-            else:
-                eslog.error(
-                    f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename."
+            try:
+                with open(rom, "r") as openFile:
+                    # Read only the first line of the file.
+                    firstLine = openFile.readlines(1)[0]
+                    # Strip of any new line characters.
+                    firstLine = firstLine.strip("\n").strip("\r")
+                eslog.debug(
+                    f"Checking if specified disc installation / XBLA file actually exists..."
                 )
-            openFile.close()
+                xblaFullPath = pathLead + "/" + firstLine
+                if path.exists(xblaFullPath):
+                    eslog.debug(f"Found! Switching active rom to: {firstLine}")
+                    rom = xblaFullPath
+                else:
+                    eslog.error(
+                        f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename."
+                    )
+            except (IOError, IndexError) as e:
+                eslog.error(f"Error reading .xbox360 playlist file {rom}: {e}")
+                # Ensure we handle the case where the file might be empty or inaccessible
+                pass
 
         # adjust the config toml file accordingly
         config = {}
@@ -305,18 +309,18 @@ class XeniaGenerator(Generator):
         # now setup the command array for the emulator
         if rom == "config":
             if core == "xenia-canary":
-                commandArray = [XENIA_CANARY_BIN_PATH]
+                command_array = [XENIA_CANARY_BIN_PATH]
             else:
-                commandArray = ["xenia.exe"]
+                command_array = ["xenia.exe"]
         else:
             if core == "xenia-canary":
-                commandArray = [XENIA_CANARY_BIN_PATH, "z:" + rom]
+                command_array = [XENIA_CANARY_BIN_PATH, "z:" + rom]
             else:
-                commandArray = ["xenia.exe", "z:" + rom]
+                command_array = ["xenia.exe", "z:" + rom]
 
         environment = {
             "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                playersControllers
+                players_controllers
             ),
             "VKD3D_SHADER_CACHE_PATH": XENIA_CACHE_DIR,
         }
@@ -339,7 +343,7 @@ class XeniaGenerator(Generator):
                 }
             )
 
-        return Command(array=commandArray, env=environment)
+        return Command(array=command_array, env=environment)
 
     # Show mouse on screen when needed
     # xenia auto-hides

@@ -1,7 +1,7 @@
 from os import environ
 from subprocess import check_output, CalledProcessError
-from systemFiles import CONF
-from utils.logger import get_logger
+from configgen.systemFiles import CONF
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

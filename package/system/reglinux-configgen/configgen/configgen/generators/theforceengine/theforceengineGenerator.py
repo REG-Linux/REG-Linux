@@ -1,9 +1,9 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from configparser import ConfigParser
 from os import path, makedirs
-from controllers import generate_sdl_controller_config
-from systemFiles import CONF
+from configgen.controllers import generate_sdl_controller_config
+from configgen.systemFiles import CONF
 
 FORCE_CONFIG_DIR = CONF + "/theforceengine"
 FORCE_MODS_DIR = FORCE_CONFIG_DIR + "/Mods"
@@ -19,7 +19,7 @@ class TheForceEngineGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Check if the directories exist, if not create them
         if not path.exists(FORCE_CONFIG_DIR):
@@ -49,8 +49,8 @@ class TheForceEngineGenerator(Generator):
         # Windows
         if not forceConfig.has_section("Window"):
             forceConfig.add_section("Window")
-        forceConfig.set("Window", "width", format(gameResolution["width"]))
-        forceConfig.set("Window", "height", format(gameResolution["height"]))
+        forceConfig.set("Window", "width", format(game_resolution["width"]))
+        forceConfig.set("Window", "height", format(game_resolution["height"]))
         # always fullscreen
         forceConfig.set("Window", "fullscreen", "true")
 
@@ -64,9 +64,9 @@ class TheForceEngineGenerator(Generator):
             forceConfig.set("Graphics", "gameWidth", str(res_width))
             forceConfig.set("Graphics", "gameHeight", res_height)
         else:
-            res_width = int(gameResolution["height"] * 4 / 3)
+            res_width = int(game_resolution["height"] * 4 / 3)
             forceConfig.set("Graphics", "gameWidth", str(res_width))
-            forceConfig.set("Graphics", "gameHeight", format(gameResolution["height"]))
+            forceConfig.set("Graphics", "gameHeight", format(game_resolution["height"]))
 
         if system.isOptSet("force_widescreen") and system.getOptBoolean(
             "force_widescreen"
@@ -235,32 +235,32 @@ class TheForceEngineGenerator(Generator):
             forceConfig.write(configfile)
 
         ## Setup the command
-        commandArray = [FORCE_BIN_PATH]
+        command_array = [FORCE_BIN_PATH]
 
         ## Accomodate Mods, skip cutscenes etc
         if (
             system.isOptSet("force_skip_cutscenes")
             and system.config["force_skip_cutscenes"] == "initial"
         ):
-            commandArray.extend(["-c0"])
+            command_array.extend(["-c0"])
         elif (
             system.isOptSet("force_skip_cutscenes")
             and system.getOptBoolean("force_skip_cutscenes") == "skip"
         ):
-            commandArray.extend(["-c"])
+            command_array.extend(["-c"])
         # Add mod zip file if necessary
         if mod_name is not None:
-            commandArray.extend(["-u" + mod_name])
+            command_array.extend(["-u" + mod_name])
 
         # Run - only Dark Forces currently
-        commandArray.extend(["-gDARK"])
+        command_array.extend(["-gDARK"])
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "TFE_DATA_HOME": FORCE_CONFIG_DIR,
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 ),
             },
         )
@@ -269,7 +269,7 @@ class TheForceEngineGenerator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         if "force_widescreen" in config and config["force_widescreen"] == "1":
             return 16 / 9
         return 4 / 3

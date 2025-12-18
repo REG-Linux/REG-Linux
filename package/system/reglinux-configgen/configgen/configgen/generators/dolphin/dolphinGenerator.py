@@ -3,7 +3,7 @@ from configgen.Command import Command
 from os import path, makedirs, environ
 from configparser import ConfigParser
 from subprocess import CalledProcessError, check_output
-from controllers import gunsNeedCrosses
+from configgen.controllers import gunsNeedCrosses
 from .dolphinControllers import generateControllerConfig
 from .dolphinConfig import (
     getRatioFromConfig,
@@ -14,7 +14,7 @@ from .dolphinConfig import (
     DOLPHIN_GFX_PATH,
     DOLPHIN_SYSCONF_PATH,
 )
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -26,7 +26,7 @@ class DolphinGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         if not path.exists(path.dirname(DOLPHIN_CONFIG_PATH)):
             makedirs(path.dirname(DOLPHIN_CONFIG_PATH))
@@ -36,7 +36,7 @@ class DolphinGenerator(Generator):
             makedirs(DOLPHIN_SAVES_DIR + "/StateSaves")
 
         # FIXME Generate the controller config(s)
-        # generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns)
+        # generateControllerConfig(system, players_controllers, metadata, wheels, rom, guns)
 
         # [dolphin.ini]
         dolphinSettings = ConfigParser(interpolation=None)
@@ -166,8 +166,8 @@ class DolphinGenerator(Generator):
                     and system.isOptSet("use_wheels")
                     and system.getOptBoolean("use_wheels")
                     and len(wheels) > 0
-                    and str(i) in playersControllers
-                    and playersControllers[str(i)].dev in wheels
+                    and str(i) in players_controllers
+                    and players_controllers[str(i)].dev in wheels
                 ):
                     dolphinSettings.set("Core", "SIDevice" + str(i - 1), "8")
                 else:
@@ -588,24 +588,24 @@ class DolphinGenerator(Generator):
 
         # Update SYSCONF
         try:
-            updateConfig(system.config, DOLPHIN_SYSCONF_PATH, gameResolution)
+            updateConfig(system.config, DOLPHIN_SYSCONF_PATH, game_resolution)
         except Exception:
             pass  # don't fail in case of SYSCONF update
 
         # Check what version we've got
         if path.isfile(DOLPHIN_BIN_PATH):
             # use the -b 'batch' option for nicer exit
-            commandArray = [DOLPHIN_BIN_PATH, "-b", "-e", rom]
+            command_array = [DOLPHIN_BIN_PATH, "-b", "-e", rom]
         else:
-            commandArray = ["dolphin-emu-nogui", "-e", rom]
+            command_array = ["dolphin-emu-nogui", "-e", rom]
 
         # state_slot option
         if system.isOptSet("state_filename"):
-            commandArray.extend(["--save_state", system.config["state_filename"]])
+            command_array.extend(["--save_state", system.config["state_filename"]])
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform = lambda optionstr: str(optionstr)
@@ -619,7 +619,7 @@ class DolphinGenerator(Generator):
             wii_tv_mode = 0
 
         try:
-            wii_tv_mode = getRatioFromConfig(config, gameResolution)
+            wii_tv_mode = getRatioFromConfig(config, game_resolution)
         except (ValueError, TypeError, AttributeError):
             pass
 
@@ -639,7 +639,7 @@ class DolphinGenerator(Generator):
 
         # Stretched (thus depends on physical screen geometry)
         if dolphin_aspect_ratio == "3":
-            return gameResolution["width"] / gameResolution["height"]
+            return game_resolution["width"] / game_resolution["height"]
 
         return 4 / 3
 

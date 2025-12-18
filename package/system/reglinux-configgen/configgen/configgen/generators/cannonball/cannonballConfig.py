@@ -1,4 +1,4 @@
-from systemFiles import CONF
+from configgen.systemFiles import CONF
 
 CANNONBALL_CONFIG_PATH = CONF + "/cannonball/config.xml"
 CANNONBALL_BIN_PATH = "/usr/bin/cannonball"

@@ -1,4 +1,4 @@
-from systemFiles import CONF, ROMS, SAVES
+from configgen.systemFiles import CONF, ROMS, SAVES
 
 RPCS3_CONFIG_DIR = CONF + "rpcs3"
 RPCS3_SAVES_DIR = SAVES

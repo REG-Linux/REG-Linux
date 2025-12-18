@@ -1,39 +1,55 @@
-from generators.Generator import Generator
-from Command import Command
+from typing import Dict, Any
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from xml.etree.ElementTree import parse
 from shutil import rmtree, copy2
 from csv import reader
-from PIL import Image
 from pathlib import Path
-from os import path, makedirs, listdir, symlink, unlink, chdir, remove
-from xml.dom import minidom
-from subprocess import Popen, PIPE
-from controllers import gunsBordersSizeName
-from utils.videoMode import getScreensInfos
-from utils.bezels import (
-    getBezelInfos,
-    createTransparentBezel,
-    gunBordersSize,
-    gunBorderImage,
-    gunsBordersColorFomConfig,
-    fast_image_size,
-)
-from utils.logger import get_logger
+from os import path, makedirs, listdir, symlink, unlink, chdir
+from configgen.utils.videoMode import getScreensInfos
+from configgen.utils.logger import get_logger
+from ...bezel.mame_bezel_manager import setup_mame_bezels
 
-eslog = get_logger(__name__)
+logger = get_logger(__name__)
 
 
 class MameGenerator(Generator):
+    """MAME Generator for creating command arrays and configurations for MAME/MESS emulators."""
+
     # TODO MAME requires a wayland compositor *if* bgfx is used
-    def requiresWayland(self):
+    def requiresWayland(self) -> bool:
+        """Indicates if the generator requires Wayland compositor."""
         return True
 
-    def supportsInternalBezels(self):
+    def supportsInternalBezels(self) -> bool:
+        """Indicates if the generator supports internal bezels."""
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, Any],
+    ) -> Command:
+        """
+        Generate the MAME command array for the specified ROM and system configuration.
+
+        Args:
+            system: System configuration
+            rom: Path to the ROM file
+            players_controllers: Controller configuration for players
+            metadata: Game metadata
+            guns: Light gun configuration
+            wheels: Steering wheel configuration
+            game_resolution: Dictionary containing game resolution information
+
+        Returns:
+            Command object with the appropriate MAME command array
+        """
         # Extract "<romfile.zip>"
         romBasename = path.basename(rom)
         romDirname = path.dirname(rom)
@@ -98,67 +114,67 @@ class MameGenerator(Generator):
             if path.exists("/userdata/roms/fmtowns/{}.zip".format(romParentPath)):
                 softList = "fmtowns_cd"
 
-        commandArray = ["/usr/bin/mame/mame"]
+        command_array = ["/usr/bin/mame/mame"]
         # MAME options used here are explained as it's not always straightforward
         # A lot more options can be configured, just run mame -showusage and have a look
-        commandArray += ["-skip_gameinfo"]
+        command_array += ["-skip_gameinfo"]
         if messMode == -1:
-            commandArray += [
+            command_array += [
                 "-rompath",
                 romDirname + ";/userdata/bios/mame/;/userdata/bios/",
             ]
         else:
             if softList in subdirSoftList:
-                commandArray += [
+                command_array += [
                     "-rompath",
                     romDirname
                     + ";/userdata/bios/mame/;/userdata/bios/;/userdata/roms/mame/;/var/run/mame_software/",
                 ]
             else:
-                commandArray += [
+                command_array += [
                     "-rompath",
                     romDirname
                     + ";/userdata/bios/mame/;/userdata/bios/;/userdata/roms/mame/",
                 ]
 
         # MAME various paths we can probably do better
-        commandArray += [
+        command_array += [
             "-bgfx_path",
             "/usr/bin/mame/bgfx/",
         ]  # Core bgfx files can be left on ROM filesystem
-        commandArray += [
+        command_array += [
             "-fontpath",
             "/usr/bin/mame/",
         ]  # Fonts can be left on ROM filesystem
-        commandArray += [
+        command_array += [
             "-languagepath",
             "/usr/bin/mame/language/",
         ]  # Translations can be left on ROM filesystem
-        commandArray += [
+        command_array += [
             "-pluginspath",
             "/usr/bin/mame/plugins/;/userdata/saves/mame/plugins",
         ]
-        commandArray += [
+        command_array += [
             "-samplepath",
             "/userdata/bios/mame/samples/",
         ]  # Current reglinux storage location for MAME samples
-        commandArray += [
+        command_array += [
             "-artpath",
             "/var/run/mame_artwork/;/usr/bin/mame/artwork/;/userdata/bios/mame/artwork/;/userdata/decorations/",
         ]  # first for systems ; second for overlays
 
         # Enable cheats
-        commandArray += ["-cheat"]
-        commandArray += [
+        command_array += ["-cheat"]
+        command_array += [
             "-cheatpath",
             "/userdata/cheats/mame/",
         ]  # Should this point to path containing the cheat.7z file
 
         # logs
-        commandArray += ["-verbose"]
+        command_array += ["-verbose"]
 
         # MAME saves a lot of stuff, we need to map this on /userdata/saves/mame/<subfolder> for each one
-        commandArray += ["-nvram_directory", "/userdata/saves/mame/nvram/"]
+        command_array += ["-nvram_directory", "/userdata/saves/mame/nvram/"]
 
         # Set custom config path if option is selected or default path if not
         if system.isOptSet("customcfg"):
@@ -211,89 +227,89 @@ class MameGenerator(Generator):
                     )
                     if not path.exists(cfgPath):
                         makedirs(cfgPath)
-        commandArray += ["-cfg_directory", cfgPath]
-        commandArray += ["-input_directory", "/userdata/saves/mame/input/"]
-        commandArray += ["-state_directory", "/userdata/saves/mame/state/"]
-        commandArray += ["-snapshot_directory", "/userdata/screenshots/"]
-        commandArray += ["-diff_directory", "/userdata/saves/mame/diff/"]
-        commandArray += ["-comment_directory", "/userdata/saves/mame/comments/"]
-        commandArray += ["-homepath", "/userdata/saves/mame/plugins/"]
-        commandArray += ["-ctrlrpath", "/userdata/system/configs/mame/ctrlr/"]
-        commandArray += [
+        command_array += ["-cfg_directory", cfgPath]
+        command_array += ["-input_directory", "/userdata/saves/mame/input/"]
+        command_array += ["-state_directory", "/userdata/saves/mame/state/"]
+        command_array += ["-snapshot_directory", "/userdata/screenshots/"]
+        command_array += ["-diff_directory", "/userdata/saves/mame/diff/"]
+        command_array += ["-comment_directory", "/userdata/saves/mame/comments/"]
+        command_array += ["-homepath", "/userdata/saves/mame/plugins/"]
+        command_array += ["-ctrlrpath", "/userdata/system/configs/mame/ctrlr/"]
+        command_array += [
             "-inipath",
             "/userdata/system/configs/mame/;/userdata/system/configs/mame/ini/",
         ]
-        commandArray += ["-crosshairpath", "/userdata/bios/mame/artwork/crosshairs/"]
+        command_array += ["-crosshairpath", "/userdata/bios/mame/artwork/crosshairs/"]
         if softList != "":
-            commandArray += ["-swpath", softDir]
-            commandArray += ["-hashpath", softDir + "hash/"]
+            command_array += ["-swpath", softDir]
+            command_array += ["-hashpath", softDir + "hash/"]
 
         # TODO These paths are not handled yet
         # TODO -swpath              path to loose software - might use if we want software list MESS support
 
         # BGFX video engine : https://docs.mamedev.org/advanced/bgfx.html
         if system.isOptSet("video") and system.config["video"] == "bgfx":
-            commandArray += ["-video", "bgfx"]
+            command_array += ["-video", "bgfx"]
 
             # BGFX backend
             if (
                 system.isOptSet("bgfxbackend")
                 and system.config["bgfxbackend"] != "automatic"
             ):
-                commandArray += ["-bgfx_backend", system.config["bgfxbackend"]]
+                command_array += ["-bgfx_backend", system.config["bgfxbackend"]]
             else:
-                commandArray += ["-bgfx_backend", "auto"]
+                command_array += ["-bgfx_backend", "auto"]
 
             # BGFX shaders effects
             if (
                 system.isOptSet("bgfxshaders")
                 and system.config["bgfxshaders"] != "default"
             ):
-                commandArray += ["-bgfx_screen_chains", system.config["bgfxshaders"]]
+                command_array += ["-bgfx_screen_chains", system.config["bgfxshaders"]]
             else:
-                commandArray += ["-bgfx_screen_chains", "default"]
+                command_array += ["-bgfx_screen_chains", "default"]
 
         # Other video modes
         elif system.isOptSet("video") and system.config["video"] == "accel":
-            commandArray += ["-video", "accel"]
+            command_array += ["-video", "accel"]
         else:
-            commandArray += ["-video", "opengl"]
+            command_array += ["-video", "opengl"]
 
         # CRT / SwitchRes support
         if system.isOptSet("switchres") and system.getOptBoolean("switchres"):
-            commandArray += ["-modeline_generation"]
-            commandArray += ["-changeres"]
-            commandArray += ["-modesetting"]
-            commandArray += ["-readconfig"]
+            command_array += ["-modeline_generation"]
+            command_array += ["-changeres"]
+            command_array += ["-modesetting"]
+            command_array += ["-readconfig"]
         else:
-            commandArray += [
+            command_array += [
                 "-resolution",
-                "{}x{}".format(gameResolution["width"], gameResolution["height"]),
+                "{}x{}".format(game_resolution["width"], game_resolution["height"]),
             ]
 
         # Refresh rate options to help with screen tearing
         # syncrefresh is unlisted, it requires specific display timings and 99.9% of users will get unplayable games.
         # Leaving it so it can be set manually, for CRT or other arcade-specific display users.
         if system.isOptSet("vsync") and system.getOptBoolean("vsync"):
-            commandArray += ["-waitvsync"]
+            command_array += ["-waitvsync"]
         if system.isOptSet("syncrefresh") and system.getOptBoolean("syncrefresh"):
-            commandArray += ["-syncrefresh"]
+            command_array += ["-syncrefresh"]
 
         # Rotation / TATE options
         if system.isOptSet("rotation") and system.config["rotation"] == "autoror":
-            commandArray += ["-autoror"]
+            command_array += ["-autoror"]
         if system.isOptSet("rotation") and system.config["rotation"] == "autorol":
-            commandArray += ["-autorol"]
+            command_array += ["-autorol"]
 
         # Artwork crop
         if system.isOptSet("artworkcrop") and system.getOptBoolean("artworkcrop"):
-            commandArray += ["-artwork_crop"]
+            command_array += ["-artwork_crop"]
 
         # UI enable - for computer systems, the default sends all keys to the emulated system.
         # This will enable hotkeys, but some keys may pass through to MAME and not be usable in the emulated system.
         # Hotkey + D-Pad Up will toggle this when in use (scroll lock key)
         if not (system.isOptSet("enableui") and not system.getOptBoolean("enableui")):
-            commandArray += ["-ui_active"]
+            command_array += ["-ui_active"]
 
         # Load selected plugins
         pluginsToLoad = []
@@ -307,87 +323,87 @@ class MameGenerator(Generator):
         if system.isOptSet("dataplugin") and system.getOptBoolean("dataplugin"):
             pluginsToLoad += ["data"]
         if len(pluginsToLoad) > 0:
-            commandArray += ["-plugins", "-plugin", ",".join(pluginsToLoad)]
+            command_array += ["-plugins", "-plugin", ",".join(pluginsToLoad)]
 
         # Mouse
         if (system.isOptSet("use_mouse") and system.getOptBoolean("use_mouse")) or not (
             messSysName[messMode] == "" or messMode == -1
         ):
-            commandArray += ["-dial_device", "mouse"]
-            commandArray += ["-trackball_device", "mouse"]
-            commandArray += ["-paddle_device", "mouse"]
-            commandArray += ["-positional_device", "mouse"]
-            commandArray += ["-mouse_device", "mouse"]
-            commandArray += ["-ui_mouse"]
+            command_array += ["-dial_device", "mouse"]
+            command_array += ["-trackball_device", "mouse"]
+            command_array += ["-paddle_device", "mouse"]
+            command_array += ["-positional_device", "mouse"]
+            command_array += ["-mouse_device", "mouse"]
+            command_array += ["-ui_mouse"]
             if not (system.isOptSet("use_guns") and system.getOptBoolean("use_guns")):
-                commandArray += ["-lightgun_device", "mouse"]
-                commandArray += ["-adstick_device", "mouse"]
+                command_array += ["-lightgun_device", "mouse"]
+                command_array += ["-adstick_device", "mouse"]
         else:
-            commandArray += ["-dial_device", "joystick"]
-            commandArray += ["-trackball_device", "joystick"]
-            commandArray += ["-paddle_device", "joystick"]
-            commandArray += ["-positional_device", "joystick"]
-            commandArray += ["-mouse_device", "joystick"]
+            command_array += ["-dial_device", "joystick"]
+            command_array += ["-trackball_device", "joystick"]
+            command_array += ["-paddle_device", "joystick"]
+            command_array += ["-positional_device", "joystick"]
+            command_array += ["-mouse_device", "joystick"]
             if not (system.isOptSet("use_guns") and system.getOptBoolean("use_guns")):
-                commandArray += ["-lightgun_device", "joystick"]
-                commandArray += ["-adstick_device", "joystick"]
+                command_array += ["-lightgun_device", "joystick"]
+                command_array += ["-adstick_device", "joystick"]
         # Multimouse option currently hidden in ES, SDL only detects one mouse.
         # Leaving code intact for testing & possible ManyMouse integration
         if system.isOptSet("multimouse") and system.getOptBoolean("multimouse"):
-            commandArray += ["-multimouse"]
+            command_array += ["-multimouse"]
 
         # guns
         if system.isOptSet("use_guns") and system.getOptBoolean("use_guns"):
-            commandArray += ["-lightgunprovider", "udev"]
-            commandArray += ["-lightgun_device", "lightgun"]
-            commandArray += ["-adstick_device", "lightgun"]
+            command_array += ["-lightgunprovider", "udev"]
+            command_array += ["-lightgun_device", "lightgun"]
+            command_array += ["-adstick_device", "lightgun"]
         if system.isOptSet("offscreenreload") and system.getOptBoolean(
             "offscreenreload"
         ):
-            commandArray += ["-offscreen_reload"]
+            command_array += ["-offscreen_reload"]
 
         # wheels
-        if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
-            pass  # wheels variable was unused
+        # The 'wheels' variable was unused, and the 'pass' statement for system.isOptSet("use_wheels") is unnecessary.
+        # If 'use_wheels' is set and true, no MAME arguments are added here, so the block can be removed.
 
         if system.isOptSet("multiscreens") and system.getOptBoolean("multiscreens"):
             screens = getScreensInfos(system.config)
             if len(screens) > 1:
-                commandArray += ["-numscreens", str(len(screens))]
+                command_array += ["-numscreens", str(len(screens))]
 
         # Finally we pass game name
         # MESS will use the full filename and pass the system & rom type parameters if needed.
         if messSysName[messMode] == "" or messMode == -1:
-            commandArray += [romBasename]
+            command_array += [romBasename]
         else:
             messModel = messSysName[messMode]
             # Alternate system for machines that have different configs (ie computers with different hardware)
             if system.isOptSet("altmodel"):
                 messModel = system.config["altmodel"]
-            commandArray += [messModel]
+            command_array += [messModel]
 
             # TI-99 32k RAM expansion & speech modules - enabled by default
             if system.name == "ti99":
-                commandArray += ["-ioport", "peb"]
+                command_array += ["-ioport", "peb"]
                 if not system.isOptSet("ti99_32kram") or (
                     system.isOptSet("ti99_32kram")
                     and system.getOptBoolean("ti99_32kram")
                 ):
-                    commandArray += ["-ioport:peb:slot2", "32kmem"]
+                    command_array += ["-ioport:peb:slot2", "32kmem"]
                 if not system.isOptSet("ti99_speech") or (
                     system.isOptSet("ti99_speech")
                     and system.getOptBoolean("ti99_speech")
                 ):
-                    commandArray += ["-ioport:peb:slot3", "speech"]
+                    command_array += ["-ioport:peb:slot3", "speech"]
 
             # Laser 310 Memory Expansion & Joystick
             if system.name == "laser310":
-                commandArray += ["-io", "joystick"]
+                command_array += ["-io", "joystick"]
                 if not system.isOptSet("memslot"):
                     laser310mem = "laser_64k"
                 else:
                     laser310mem = system.config["memslot"]
-                commandArray += ["-mem", laser310mem]
+                command_array += ["-mem", laser310mem]
 
             # BBC Joystick
             if system.name == "bbc":
@@ -395,22 +411,22 @@ class MameGenerator(Generator):
                     system.isOptSet("sticktype")
                     and system.config["sticktype"] != "none"
                 ):
-                    commandArray += ["-analogue", system.config["sticktype"]]
+                    command_array += ["-analogue", system.config["sticktype"]]
 
             # Apple II
             if system.name == "apple2":
-                commandArray += ["-sl7", "cffa202"]
+                command_array += ["-sl7", "cffa202"]
                 if system.isOptSet("gameio") and system.config["gameio"] != "none":
                     if system.config["gameio"] == "joyport" and messModel != "apple2p":
-                        eslog.debug(
+                        logger.debug(
                             "Joyport joystick is only compatible with Apple II Plus"
                         )
                     else:
-                        commandArray += ["-gameio", system.config["gameio"]]
+                        command_array += ["-gameio", system.config["gameio"]]
 
             # RAM size (Mac excluded, special handling below)
             if system.name != "macintosh" and system.isOptSet("ramsize"):
-                commandArray += ["-ramsize", str(system.config["ramsize"]) + "M"]
+                command_array += ["-ramsize", str(system.config["ramsize"]) + "M"]
 
             # Mac RAM & Image Reader (if applicable)
             if system.name == "macintosh":
@@ -425,7 +441,7 @@ class MameGenerator(Generator):
                             ramSize = 32
                         if messModel == "maciix" and ramSize == 48:
                             ramSize = 64
-                        commandArray += ["-ramsize", str(ramSize) + "M"]
+                        command_array += ["-ramsize", str(ramSize) + "M"]
                     if messModel == "maciix":
                         imageSlot = "nba"
                         if system.isOptSet("imagereader"):
@@ -434,7 +450,7 @@ class MameGenerator(Generator):
                             else:
                                 imageSlot = system.config["imagereader"]
                         if imageSlot != "":
-                            commandArray += ["-" + imageSlot, "image"]
+                            command_array += ["-" + imageSlot, "image"]
 
             if softList == "":
                 # Boot disk for Macintosh
@@ -455,7 +471,7 @@ class MameGenerator(Generator):
                         bootDisk = (
                             "/userdata/bios/" + system.config["bootdisk"] + ".chd"
                         )
-                    commandArray += [bootType, bootDisk]
+                    command_array += [bootType, bootDisk]
 
                 # Alternate ROM type for systems with mutiple media (ie cassette & floppy)
                 # Mac will auto change floppy 1 to 2 if a boot disk is enabled
@@ -466,27 +482,27 @@ class MameGenerator(Generator):
                             messModel == "fmtmarty"
                             and system.config["altromtype"] == "flop1"
                         ):
-                            commandArray += ["-flop"]
+                            command_array += ["-flop"]
                         else:
-                            commandArray += ["-" + system.config["altromtype"]]
+                            command_array += ["-" + system.config["altromtype"]]
                     elif system.name == "adam":
                         # add some logic based on the rom extension
                         rom_extension = path.splitext(rom)[1].lower()
                         if rom_extension == ".ddp":
-                            commandArray += ["-cass1"]
+                            command_array += ["-cass1"]
                         elif rom_extension == ".dsk":
-                            commandArray += ["-flop1"]
+                            command_array += ["-flop1"]
                         else:
-                            commandArray += ["-cart1"]
+                            command_array += ["-cart1"]
                     elif system.name == "coco":
                         if romExt.casefold() == ".cas":
-                            commandArray += ["-cass"]
+                            command_array += ["-cass"]
                         elif romExt.casefold() == ".dsk":
-                            commandArray += ["-flop1"]
+                            command_array += ["-flop1"]
                         else:
-                            commandArray += ["-cart"]
+                            command_array += ["-cart"]
                     else:
-                        commandArray += ["-" + messRomType[messMode]]
+                        command_array += ["-" + messRomType[messMode]]
                 else:
                     if system.isOptSet("bootdisk"):
                         if (
@@ -501,25 +517,25 @@ class MameGenerator(Generator):
                             "macos701",
                             "macos75",
                         ]:
-                            commandArray += ["-flop2"]
+                            command_array += ["-flop2"]
                         elif system.isOptSet("altromtype"):
-                            commandArray += ["-" + system.config["altromtype"]]
+                            command_array += ["-" + system.config["altromtype"]]
                         else:
-                            commandArray += ["-" + messRomType[messMode]]
+                            command_array += ["-" + messRomType[messMode]]
                     else:
                         if system.isOptSet("altromtype"):
-                            commandArray += ["-" + system.config["altromtype"]]
+                            command_array += ["-" + system.config["altromtype"]]
                         else:
-                            commandArray += ["-" + messRomType[messMode]]
+                            command_array += ["-" + messRomType[messMode]]
                 # Use the full filename for MESS ROMs
-                commandArray += [rom]
+                command_array += [rom]
             else:
                 # Prepare software lists
                 if softList != "":
                     if not path.exists(softDir):
                         makedirs(softDir)
-                    for fileName in listdir(softDir):
-                        checkFile = path.join(softDir, fileName)
+                    for file_name in listdir(softDir):
+                        checkFile = path.join(softDir, file_name)
                         if path.islink(checkFile):
                             unlink(checkFile)
                         if path.isdir(checkFile):
@@ -537,10 +553,10 @@ class MameGenerator(Generator):
                     if softList in subdirSoftList:
                         romPath = Path(romDirname)
                         symlink(str(romPath.parents[0]), softDir + softList, True)
-                        commandArray += [path.basename(romDirname)]
+                        command_array += [path.basename(romDirname)]
                     else:
                         symlink(romDirname, softDir + softList, True)
-                        commandArray += [path.splitext(romBasename)[0]]
+                        command_array += [path.splitext(romBasename)[0]]
 
             # Create & add a blank disk if needed, insert into drive 2
             # or drive 1 if drive 2 is selected manually or FM Towns Marty.
@@ -566,14 +582,14 @@ class MameGenerator(Generator):
                         copy2(blankDisk, targetDisk)
                     # Add other single floppy systems to this if statement
                     if messModel == "fmtmarty":
-                        commandArray += ["-flop", targetDisk]
+                        command_array += ["-flop", targetDisk]
                     elif (
                         system.isOptSet("altromtype")
                         and system.config["altromtype"] == "flop2"
                     ):
-                        commandArray += ["-flop1", targetDisk]
+                        command_array += ["-flop1", targetDisk]
                     else:
-                        commandArray += ["-flop2", targetDisk]
+                        command_array += ["-flop2", targetDisk]
 
             autoRunCmd = ""
             autoRunDelay = 0
@@ -606,7 +622,7 @@ class MameGenerator(Generator):
                         autoRunCmd = "LOADM”“,,R\\n"
                         autoRunDelay = 5
             elif system.name == "coco":
-                romType = "cart"
+                rom_type = "cart"
                 autoRunDelay = 2
 
                 # if using software list, use "usage" for autoRunCmd (if provided)
@@ -631,7 +647,7 @@ class MameGenerator(Generator):
                         or (softList != "" and softList.endswith("cass"))
                         or romExt.casefold() == ".cas"
                     ):
-                        romType = "cass"
+                        rom_type = "cass"
                         if romName.casefold().endswith(".bas"):
                             autoRunCmd = "CLOAD:RUN\\n"
                         else:
@@ -644,7 +660,7 @@ class MameGenerator(Generator):
                         or (softList != "" and softList.endswith("flop"))
                         or romExt.casefold() == ".dsk"
                     ):
-                        romType = "flop"
+                        rom_type = "flop"
                         if romName.casefold().endswith(".bas"):
                             autoRunCmd = 'RUN "{}"\\n'.format(romName)
                         else:
@@ -652,7 +668,7 @@ class MameGenerator(Generator):
 
                 # check for a user override
                 autoRunFile = "system/configs/mame/autoload/{}_{}_autoload.csv".format(
-                    system.name, romType
+                    system.name, rom_type
                 )
                 if path.exists(autoRunFile):
                     openARFile = open(autoRunFile, "r")
@@ -681,53 +697,38 @@ class MameGenerator(Generator):
                             ):
                                 autoRunCmd = row[1]
                                 autoRunDelay = 3
-            if autoRunCmd != None:
+            if autoRunCmd is not None:
                 if autoRunCmd.startswith("'"):
-                    autoRunCmd.replace("'", "")
-                commandArray += [
+                    autoRunCmd = autoRunCmd.replace("'", "")
+                command_array += [
                     "-autoboot_delay",
                     str(autoRunDelay),
                     "-autoboot_command",
                     autoRunCmd,
                 ]
 
-        # bezels
-        if "bezel" not in system.config.keys() or system.config["bezel"] == "":
-            bezelSet = None
-        else:
-            bezelSet = system.config["bezel"]
-        if system.isOptSet("forceNoBezel") and system.getOptBoolean("forceNoBezel"):
-            bezelSet = None
-        try:
-            gunsBordersSize = None
-            if gunsBordersSizeName is not None:
-                gunsBordersSize = gunsBordersSizeName(guns, system.config)
-
-            if messMode != -1:
-                MameGenerator.writeBezelConfig(
-                    bezelSet,
-                    system,
-                    rom,
-                    messSysName[messMode],
-                    gameResolution,
-                    gunsBordersSize,
-                )
-            else:
-                MameGenerator.writeBezelConfig(
-                    bezelSet, system, rom, "", gameResolution, gunsBordersSize
-                )
-        except Exception:
-            gunsBordersSize = None
-            MameGenerator.writeBezelConfig(
-                None, system, rom, "", gameResolution, gunsBordersSize
-            )
+        # Setup MAME bezels
+        messSysNameForBezel = (
+            messSysName[messMode] if messMode != -1 else rom
+        )  # Pass ROM name for MAME games, system name for MESS games
+        setup_mame_bezels(system, rom, messSysNameForBezel, game_resolution, guns)
 
         # Change directory to MAME folder (allows data plugin to load properly)
         chdir("/usr/bin/mame")
-        return Command(array=commandArray, env={"PWD": "/usr/bin/mame/"})
+        return Command(array=command_array, env={"PWD": "/usr/bin/mame/"})
 
     @staticmethod
-    def getRoot(config, name):
+    def getRoot(config: Any, name: str) -> Any:
+        """
+        Get or create an XML root element with the specified name.
+
+        Args:
+            config: XML configuration document
+            name: Name of the root element to get or create
+
+        Returns:
+            The XML element with the specified name
+        """
         xml_section = config.getElementsByTagName(name)
 
         if len(xml_section) == 0:
@@ -739,7 +740,18 @@ class MameGenerator(Generator):
         return xml_section
 
     @staticmethod
-    def getSection(config, xml_root, name):
+    def getSection(config: Any, xml_root: Any, name: str) -> Any:
+        """
+        Get or create an XML section element with the specified name.
+
+        Args:
+            config: XML configuration document
+            xml_root: XML root element
+            name: Name of the section element to get or create
+
+        Returns:
+            The XML element with the specified name
+        """
         xml_section = xml_root.getElementsByTagName(name)
 
         if len(xml_section) == 0:
@@ -751,363 +763,75 @@ class MameGenerator(Generator):
         return xml_section
 
     @staticmethod
-    def removeSection(config, xml_root, name):
+    def removeSection(xml_root: Any, name: str) -> None:
+        """
+        Remove XML section elements with the specified name.
+
+        Args:
+            xml_root: XML root element containing sections to remove
+            name: Name of the section elements to remove
+        """
         xml_section = xml_root.getElementsByTagName(name)
 
         for i in range(0, len(xml_section)):
             old = xml_root.removeChild(xml_section[i])
             old.unlink()
 
-    @staticmethod
-    def writeBezelConfig(
-        bezelSet, system, rom, messSys, gameResolution, gunsBordersSize
-    ):
-        romBase = path.splitext(path.basename(rom))[0]  # filename without extension
 
-        if messSys == "":
-            tmpZipDir = (
-                "/var/run/mame_artwork/" + romBase
-            )  # ok, no need to zip, a folder is taken too
-        else:
-            tmpZipDir = (
-                "/var/run/mame_artwork/" + messSys
-            )  # ok, no need to zip, a folder is taken too
-        # clean, in case no bezel is set, and in case we want to recreate it
-        if path.exists(tmpZipDir):
-            rmtree(tmpZipDir)
+def getMameControlScheme(system: Any, romBasename: str) -> str:
+    """
+    Determine the appropriate MAME control scheme for a given system and ROM.
 
-        if bezelSet is None and gunsBordersSize is None:
-            return
+    Args:
+        system: System configuration
+        romBasename: Name of the ROM file
 
-        # let's generate the zip file
-        makedirs(tmpZipDir)
-
-        # bezels infos
-        bz_infos = None
-        if bezelSet is None:
-            if gunsBordersSize is not None:
-                bz_infos = None
-            else:
-                return
-        else:
-            bz_infos = getBezelInfos(rom, bezelSet, system.name, "mame")
-            if bz_infos is None:
-                if gunsBordersSize is None:
-                    return
-
-        # create an empty bezel
-        if bz_infos is None:
-            overlay_png_file = "/tmp/bezel_transmame_black.png"
-            createTransparentBezel(
-                overlay_png_file, gameResolution["width"], gameResolution["height"]
-            )
-            bz_infos = {"png": overlay_png_file}
-
-        # copy the png inside
-        pngFile = None
-        img_width = None
-        img_height = None
-        bz_x = None
-        bz_y = None
-        bz_right = None
-        bz_bottom = None
-        bz_alpha = 1.0
-
-        if "mamezip" in bz_infos and path.exists(bz_infos["mamezip"]):
-            if messSys == "":
-                artFile = "/var/run/mame_artwork/" + romBase + ".zip"
-            else:
-                artFile = "/var/run/mame_artwork/" + messSys + ".zip"
-            if path.exists(artFile):
-                if path.islink(artFile):
-                    unlink(artFile)
-                else:
-                    remove(artFile)
-            symlink(bz_infos["mamezip"], artFile)
-            # hum, not nice if guns need borders
-            return
-        elif "layout" in bz_infos and path.exists(bz_infos["layout"]):
-            symlink(bz_infos["layout"], tmpZipDir + "/default.lay")
-            pngFile = path.split(bz_infos["png"])[1]
-            symlink(bz_infos["png"], tmpZipDir + "/" + pngFile)
-            # Try to get image size for tattoo/gunborders if needed
-            img_width, img_height = fast_image_size(bz_infos["png"])
-        else:
-            pngFile = "default.png"
-            symlink(bz_infos["png"], tmpZipDir + "/default.png")
-            if "info" in bz_infos and path.exists(bz_infos["info"]):
-                bzInfoFile = open(bz_infos["info"], "r")
-                bzInfoText = bzInfoFile.readlines()
-                # Initialize all possibly unbound variables
-                img_width = None
-                img_height = None
-                bz_x = 0
-                bz_y = 0
-                bz_right = 0
-                bz_bottom = 0
-                bz_alpha = 1.0  # Just in case it's not set in the info file
-                for infoLine in bzInfoText:
-                    if len(infoLine) > 7:
-                        infoLineClean = (
-                            (infoLine.replace('"', "")).rstrip(",\n").lstrip()
-                        )
-                        infoLineData = infoLineClean.split(":")
-                        if len(infoLineData) < 2:
-                            continue
-                        key = infoLineData[0].lower()
-                        value = infoLineData[1]
-                        if key == "width":
-                            try:
-                                img_width = int(value)
-                            except Exception:
-                                img_width = None
-                        elif key == "height":
-                            try:
-                                img_height = int(value)
-                            except Exception:
-                                img_height = None
-                        elif key == "top":
-                            try:
-                                bz_y = int(value)
-                            except Exception:
-                                bz_y = 0
-                        elif key == "left":
-                            try:
-                                bz_x = int(value)
-                            except Exception:
-                                bz_x = 0
-                        elif key == "bottom":
-                            try:
-                                bz_bottom = int(value)
-                            except Exception:
-                                bz_bottom = 0
-                        elif key == "right":
-                            try:
-                                bz_right = int(value)
-                            except Exception:
-                                bz_right = 0
-                        elif key == "opacity":
-                            try:
-                                bz_alpha = float(value)
-                            except Exception:
-                                bz_alpha = 1.0
-                bzInfoFile.close()
-                # Provide defaults if any are still None
-                if img_width is None or img_height is None:
-                    img_width, img_height = fast_image_size(bz_infos["png"])
-                if bz_x is None:
-                    bz_x = 0
-                if bz_y is None:
-                    bz_y = 0
-                if bz_right is None:
-                    bz_right = 0
-                if bz_bottom is None:
-                    bz_bottom = 0
-                bz_width = img_width - bz_x - bz_right
-                bz_height = img_height - bz_y - bz_bottom
-            else:
-                img_width, img_height = fast_image_size(bz_infos["png"])
-                try:
-                    _, _, rotate = MameGenerator.getMameMachineSize(romBase, tmpZipDir)
-                except Exception:
-                    rotate = 0
-                # assumes that all bezels are setup for 4:3H or 3:4V aspects
-                if rotate == 270 or rotate == 90:
-                    bz_width = int(img_height * (3 / 4))
-                else:
-                    bz_width = int(img_height * (4 / 3))
-                bz_height = img_height
-                bz_x = int((img_width - bz_width) / 2)
-                bz_y = 0
-                bz_alpha = 1.0
-
-            f = open(tmpZipDir + "/default.lay", "w")
-            f.write('<mamelayout version="2">\n')
-            f.write('<element name="bezel"><image file="default.png" /></element>\n')
-            f.write('<view name="bezel">\n')
-            f.write(
-                '<screen index="0"><bounds x="'
-                + str(bz_x)
-                + '" y="'
-                + str(bz_y)
-                + '" width="'
-                + str(bz_width)
-                + '" height="'
-                + str(bz_height)
-                + '" /></screen>\n'
-            )
-            f.write(
-                '<element ref="bezel"><bounds x="0" y="0" width="'
-                + str(img_width)
-                + '" height="'
-                + str(img_height)
-                + '" alpha="'
-                + str(bz_alpha)
-                + '" /></element>\n'
-            )
-            f.write("</view>\n")
-            f.write("</mamelayout>\n")
-            f.close()
-
-        # At this point, img_width and img_height should be set if needed
-        # For tattoo and gunborders, ensure pngFile, img_width, img_height are set
-        if pngFile is None:
-            if "png" in bz_infos:
-                pngFile = path.split(bz_infos["png"])[1]
-            else:
-                pngFile = "default.png"
-        if img_width is None or img_height is None:
-            try:
-                img_width, img_height = fast_image_size(tmpZipDir + "/" + pngFile)
-            except Exception:
-                img_width, img_height = 1920, 1080  # fallback
-
-        if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
-            tattoo_file = None
-            tattoo = None
-            if system.config["bezel.tattoo"] == "system":
-                try:
-                    tattoo_file = (
-                        "/usr/share/reglinux/controller-overlays/"
-                        + system.name
-                        + ".png"
-                    )
-                    if not path.exists(tattoo_file):
-                        tattoo_file = (
-                            "/usr/share/reglinux/controller-overlays/generic.png"
-                        )
-                    tattoo = Image.open(tattoo_file)
-                except Exception:
-                    eslog.error(f"Error opening controller overlay: {tattoo_file}")
-                    tattoo = None
-            elif system.config["bezel.tattoo"] == "custom" and path.exists(
-                system.config["bezel.tattoo_file"]
-            ):
-                try:
-                    tattoo_file = system.config["bezel.tattoo_file"]
-                    tattoo = Image.open(tattoo_file)
-                except Exception:
-                    eslog.error("Error opening custom file: {}".format("tattoo_file"))
-                    tattoo = None
-            else:
-                try:
-                    tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
-                    tattoo = Image.open(tattoo_file)
-                except Exception:
-                    eslog.error("Error opening custom file: {}".format("tattoo_file"))
-                    tattoo = None
-            if tattoo is not None:
-                output_png_file = "/tmp/bezel_tattooed.png"
-                back = Image.open(tmpZipDir + "/" + pngFile)
-                tattoo = tattoo.convert("RGBA")
-                back = back.convert("RGBA")
-                tw, th = fast_image_size(tattoo_file)
-                tatwidth = int(
-                    240 / 1920 * img_width
-                )  # 240 = half of the difference between 4:3 and 16:9 on 1920px (0.5*1920/16*4)
-                pcent = float(tatwidth / tw)
-                tatheight = int(float(th) * pcent)
-                # Use Image.Resampling.LANCZOS for antialiasing (ANTIALIAS is deprecated)
-                resample_filter = Image.Resampling.LANCZOS
-                tattoo = tattoo.resize((tatwidth, tatheight), resample_filter)
-                alphatat = tattoo.split()[-1]
-                if system.isOptSet("bezel.tattoo_corner"):
-                    corner = system.config["bezel.tattoo_corner"]
-                else:
-                    corner = "NW"
-                if corner.upper() == "NE":
-                    back.paste(
-                        tattoo, (img_width - tatwidth, 20), alphatat
-                    )  # 20 pixels vertical margins (on 1080p)
-                elif corner.upper() == "SE":
-                    back.paste(
-                        tattoo,
-                        (img_width - tatwidth, img_height - tatheight - 20),
-                        alphatat,
-                    )
-                elif corner.upper() == "SW":
-                    back.paste(tattoo, (0, img_height - tatheight - 20), alphatat)
-                else:  # default = NW
-                    back.paste(tattoo, (0, 20), alphatat)
-                imgnew = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 255))
-                imgnew.paste(back, (0, 0, img_width, img_height))
-                imgnew.save(output_png_file, format="PNG")
-
-                try:
-                    remove(tmpZipDir + "/" + pngFile)
-                except Exception:
-                    pass
-                symlink(output_png_file, tmpZipDir + "/" + pngFile)
-
-        # borders for guns
-        if gunsBordersSize is not None:
-            output_png_file = "/tmp/bezel_gunborders.png"
-            innerSize, outerSize = gunBordersSize(gunsBordersSize)
-            gunBorderImage(
-                tmpZipDir + "/" + pngFile,
-                output_png_file,
-                innerSize,
-                outerSize,
-                gunsBordersColorFomConfig(system.config),
-            )
-            try:
-                remove(tmpZipDir + "/" + pngFile)
-            except Exception:
-                pass
-            symlink(output_png_file, tmpZipDir + "/" + pngFile)
-
-    @staticmethod
-    def getMameMachineSize(machine, tmpdir):
-        proc = Popen(["/usr/bin/mame/mame", "-listxml", machine], stdout=PIPE)
-        (out, err) = proc.communicate()
-        exitcode = proc.returncode
-
-        if exitcode != 0:
-            raise Exception("mame -listxml " + machine + " failed")
-
-        infofile = tmpdir + "/infxml"
-        f = open(infofile, "w")
-        f.write(out.decode())
-        f.close()
-
-        infos = minidom.parse(infofile)
-        display = infos.getElementsByTagName("display")
-
-        for element in display:
-            iwidth = element.getAttribute("width")
-            iheight = element.getAttribute("height")
-            irotate = element.getAttribute("rotate")
-            return int(iwidth), int(iheight), int(irotate)
-
-        raise Exception("display element not found")
-
-
-def getMameControlScheme(system, romBasename):
+    Returns:
+        String representing the control scheme to use
+    """
     # Game list files
-    mameCapcom = "/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"
-    mameKInstinct = "/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"
-    mameMKombat = "/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"
-    mameNeogeo = "/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"
-    mameTwinstick = "/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"
-    mameRotatedstick = "/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"
+    mameCapcom: str = "/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"
+    mameKInstinct: str = "/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"
+    mameMKombat: str = "/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"
+    mameNeogeo: str = "/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"
+    mameTwinstick: str = "/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"
+    mameRotatedstick: str = (
+        "/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"
+    )
 
     # Controls for games with 5-6 buttons or other unusual controls
     if system.isOptSet("altlayout"):
-        controllerType = system.config["altlayout"]  # Option was manually selected
+        controllerType: str = system.config["altlayout"]  # Option was manually selected
     else:
-        controllerType = "auto"
+        controllerType: str = "auto"
 
     if controllerType in ["default", "neomini", "neocd", "twinstick", "qbert"]:
         return controllerType
     else:
-        capcomList = set(open(mameCapcom).read().split())
-        mkList = set(open(mameMKombat).read().split())
-        kiList = set(open(mameKInstinct).read().split())
-        neogeoList = set(open(mameNeogeo).read().split())
-        twinstickList = set(open(mameTwinstick).read().split())
-        qbertList = set(open(mameRotatedstick).read().split())
+        try:
+            with open(mameCapcom) as f:
+                capcomList: set = set(f.read().split())
+            with open(mameMKombat) as f:
+                mkList: set = set(f.read().split())
+            with open(mameKInstinct) as f:
+                kiList: set = set(f.read().split())
+            with open(mameNeogeo) as f:
+                neogeoList: set = set(f.read().split())
+            with open(mameTwinstick) as f:
+                twinstickList: set = set(f.read().split())
+            with open(mameRotatedstick) as f:
+                qbertList: set = set(f.read().split())
+        except (IOError, OSError) as e:
+            logger.error(f"Error reading MAME list files: {e}")
+            # Initialize empty sets to avoid breaking the process
+            capcomList: set = set()
+            mkList: set = set()
+            kiList: set = set()
+            neogeoList: set = set()
+            twinstickList: set = set()
+            qbertList: set = set()
 
-        romName = path.splitext(romBasename)[0]
+        romName: str = path.splitext(romBasename)[0]
         if romName in capcomList:
             if controllerType in ["auto", "snes"]:
                 return "sfsnes"

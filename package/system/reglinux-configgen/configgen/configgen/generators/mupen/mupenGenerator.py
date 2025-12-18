@@ -12,7 +12,7 @@ from .mupenConfig import (
 
 class MupenGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Read the configuration file
         iniConfig = ConfigParser(interpolation=None)
@@ -25,7 +25,7 @@ class MupenGenerator(Generator):
                 makedirs(path.dirname(MUPEN_CONFIG_PATH))
             iniConfig.read(MUPEN_CONFIG_PATH)
 
-        setMupenConfig(iniConfig, system, playersControllers, gameResolution)
+        setMupenConfig(iniConfig, system, players_controllers, game_resolution)
 
         # Save the ini file
         if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
@@ -34,7 +34,7 @@ class MupenGenerator(Generator):
             iniConfig.write(configfile)
 
         # Command
-        commandArray = [
+        command_array = [
             MUPEN_BIN_PATH,
             "--plugindir",
             "/usr/lib/mupen64plus/",
@@ -56,13 +56,13 @@ class MupenGenerator(Generator):
 
         # state_slot option
         if system.isOptSet("state_filename"):
-            commandArray.extend(["--savestate", system.config["state_filename"]])
+            command_array.extend(["--savestate", system.config["state_filename"]])
 
-        commandArray.append(rom)
+        command_array.append(rom)
 
-        return Command(array=commandArray)
+        return Command(array=command_array)
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         if (
             "mupen64plus_ratio" in config and config["mupen64plus_ratio"] == "16/9"
         ) or (

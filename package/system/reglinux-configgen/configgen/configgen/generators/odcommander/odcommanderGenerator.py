@@ -1,11 +1,11 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 
 
 class OdcommanderGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = ["od-commander"]
+        command_array = ["od-commander"]
 
-        return Command(array=commandArray)
+        return Command(array=command_array)

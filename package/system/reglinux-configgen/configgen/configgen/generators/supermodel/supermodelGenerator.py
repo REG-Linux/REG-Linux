@@ -1,12 +1,12 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from os import path, makedirs, listdir, remove, rename
 from io import open
 from re import search
 from shutil import copyfile, copy2
 from configparser import ConfigParser
-from controllers import gunsNeedCrosses, generate_sdl_controller_config
-from systemFiles import CONF
+from configgen.controllers import gunsNeedCrosses, generate_sdl_controller_config
+from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -22,42 +22,42 @@ class SupermodelGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        commandArray = [SUPERMODEL_BIN_PATH, "-fullscreen", "-channels=2"]
+        command_array = [SUPERMODEL_BIN_PATH, "-fullscreen", "-channels=2"]
 
         # legacy3d
         if system.isOptSet("engine3D") and system.config["engine3D"] == "new3d":
-            commandArray.append("-new3d")
+            command_array.append("-new3d")
         else:
-            commandArray.extend(["-multi-texture", "-legacy-scsp", "-legacy3d"])
+            command_array.extend(["-multi-texture", "-legacy-scsp", "-legacy3d"])
 
         # widescreen
         if system.isOptSet("wideScreen") and system.getOptBoolean("wideScreen"):
-            commandArray.append("-wide-screen")
-            commandArray.append("-wide-bg")
+            command_array.append("-wide-screen")
+            command_array.append("-wide-bg")
 
         # quad rendering
         if system.isOptSet("quadRendering") and system.getOptBoolean("quadRendering"):
-            commandArray.append("-quad-rendering")
+            command_array.append("-quad-rendering")
 
         # crosshairs
         if system.isOptSet("crosshairs"):
-            commandArray.append("-crosshairs={}".format(system.config["crosshairs"]))
+            command_array.append("-crosshairs={}".format(system.config["crosshairs"]))
         else:
             if gunsNeedCrosses(guns):
                 if len(guns) == 1:
-                    commandArray.append("-crosshairs={}".format("1"))
+                    command_array.append("-crosshairs={}".format("1"))
                 else:
-                    commandArray.append("-crosshairs={}".format("3"))
+                    command_array.append("-crosshairs={}".format("3"))
 
         # force feedback
         if system.isOptSet("forceFeedback") and system.getOptBoolean("forceFeedback"):
-            commandArray.append("-force-feedback")
+            command_array.append("-force-feedback")
 
         # powerpc frequesncy
         if system.isOptSet("ppcFreq"):
-            commandArray.append("-ppc-frequency={}".format(system.config["ppcFreq"]))
+            command_array.append("-ppc-frequency={}".format(system.config["ppcFreq"]))
 
         # driving controls
         if system.isOptSet("pedalSwap") and system.getOptBoolean("pedalSwap"):
@@ -72,12 +72,12 @@ class SupermodelGenerator(Generator):
             sensitivity = "100"
 
         # resolution
-        commandArray.append(
-            "-res={},{}".format(gameResolution["width"], gameResolution["height"])
+        command_array.append(
+            "-res={},{}".format(game_resolution["width"], game_resolution["height"])
         )
 
         # logs
-        commandArray.extend(["-log-output=/userdata/system/logs/Supermodel.log", rom])
+        command_array.extend(["-log-output=/userdata/system/logs/Supermodel.log", rom])
 
         # copy nvram files
         copy_nvram_files()
@@ -89,14 +89,14 @@ class SupermodelGenerator(Generator):
         copy_xml()
 
         # FIXME: configPadsIni is not used in the original code, but it is called here.
-        # configPadsIni(system, rom, playersControllers, guns, drivingGame, sensitivity)
+        # configPadsIni(system, rom, players_controllers, guns, drivingGame, sensitivity)
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_VIDEODRIVER": "x11",
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 ),
             },
         )
@@ -156,7 +156,7 @@ def copy_xml():
         copy2(source_path, dest_path)
 
 
-def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity):
+def configPadsIni(system, rom, players_controllers, guns, altControl, sensitivity):
     # Reduce cyclomatic complexity by splitting logic into helper functions
 
     def get_template_and_mapping(altControl):
@@ -217,7 +217,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
         value,
         system,
         guns,
-        playersControllers,
+        players_controllers,
         mapping,
         mapping_fallback,
     ):
@@ -254,7 +254,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
                 return True
             elif key == "InputStart1":
                 val = transformElement(
-                    "JOY1_BUTTON9", playersControllers, mapping, mapping_fallback
+                    "JOY1_BUTTON9", players_controllers, mapping, mapping_fallback
                 )
                 if val is not None:
                     val = "," + val
@@ -264,7 +264,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
                 return True
             elif key == "InputCoin1":
                 val = transformElement(
-                    "JOY1_BUTTON10", playersControllers, mapping, mapping_fallback
+                    "JOY1_BUTTON10", players_controllers, mapping, mapping_fallback
                 )
                 if val is not None:
                     val = "," + val
@@ -274,7 +274,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
                 return True
             elif key == "InputAnalogJoyEvent":
                 val = transformElement(
-                    "JOY1_BUTTON2", playersControllers, mapping, mapping_fallback
+                    "JOY1_BUTTON2", players_controllers, mapping, mapping_fallback
                 )
                 if val is not None:
                     val = "," + val
@@ -307,7 +307,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
                     return True
                 elif key == "InputStart2":
                     val = transformElement(
-                        "JOY2_BUTTON9", playersControllers, mapping, mapping_fallback
+                        "JOY2_BUTTON9", players_controllers, mapping, mapping_fallback
                     )
                     if val is not None:
                         val += "," + val
@@ -317,7 +317,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
                     return True
                 elif key == "InputCoin1":
                     val = transformElement(
-                        "JOY2_BUTTON10", playersControllers, mapping, mapping_fallback
+                        "JOY2_BUTTON10", players_controllers, mapping, mapping_fallback
                     )
                     if val is not None:
                         val += "," + val
@@ -327,7 +327,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
                     return True
                 elif key == "InputAnalogJoyEvent2":
                     val = transformElement(
-                        "JOY2_BUTTON2", playersControllers, mapping, mapping_fallback
+                        "JOY2_BUTTON2", players_controllers, mapping, mapping_fallback
                     )
                     if val is not None:
                         val += "," + val
@@ -368,7 +368,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
             targetConfig.set(
                 section,
                 key,
-                transformValue(value, playersControllers, mapping, mapping_fallback),
+                transformValue(value, players_controllers, mapping, mapping_fallback),
             )
 
     # apply guns
@@ -386,7 +386,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
                     value,
                     system,
                     guns,
-                    playersControllers,
+                    players_controllers,
                     mapping,
                     mapping_fallback,
                 )
@@ -407,7 +407,7 @@ def configPadsIni(system, rom, playersControllers, guns, altControl, sensitivity
         targetConfig.write(configfile)
 
 
-def transformValue(value, playersControllers, mapping, mapping_fallback):
+def transformValue(value, players_controllers, mapping, mapping_fallback):
     # remove comments
     cleanValue = value
     matches = search("^([^;]*[^ ])[ ]*;.*$", value)
@@ -418,7 +418,7 @@ def transformValue(value, playersControllers, mapping, mapping_fallback):
         newvalue = ""
         for elt in cleanValue[1:-1].split(","):
             newelt = transformElement(
-                elt, playersControllers, mapping, mapping_fallback
+                elt, players_controllers, mapping, mapping_fallback
             )
             if newelt is not None:
                 if newvalue != "":
@@ -430,7 +430,7 @@ def transformValue(value, playersControllers, mapping, mapping_fallback):
         return cleanValue
 
 
-def transformElement(elt, playersControllers, mapping, mapping_fallback):
+def transformElement(elt, players_controllers, mapping, mapping_fallback):
     # Docs/README.txt
     # JOY1_LEFT  is the same as JOY1_XAXIS_NEG
     # JOY1_RIGHT is the same as JOY1_XAXIS_POS
@@ -440,78 +440,78 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
     matches = search("^JOY([12])_BUTTON([0-9]*)$", elt)
     if matches:
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mapping["button" + matches.group(2)],
         )
     matches = search("^JOY([12])_UP$", elt)
     if matches:
         # check joystick type if it's hat or axis
-        joy_type = hatOrAxis(playersControllers, matches.group(1))
+        joy_type = hatOrAxis(players_controllers, matches.group(1))
         if joy_type == "hat":
             key_up = "up"
         else:
             key_up = "axisY"
         mp = getMappingKeyIncludingFallback(
-            playersControllers, matches.group(1), key_up, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_up, mapping, mapping_fallback
         )
         eslog.debug(mp)
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mp,
             -1,
         )
     matches = search("^JOY([12])_DOWN$", elt)
     if matches:
-        joy_type = hatOrAxis(playersControllers, matches.group(1))
+        joy_type = hatOrAxis(players_controllers, matches.group(1))
         if joy_type == "hat":
             key_down = "down"
         else:
             key_down = "axisY"
         mp = getMappingKeyIncludingFallback(
-            playersControllers, matches.group(1), key_down, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_down, mapping, mapping_fallback
         )
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mp,
             1,
         )
     matches = search("^JOY([12])_LEFT$", elt)
     if matches:
-        joy_type = hatOrAxis(playersControllers, matches.group(1))
+        joy_type = hatOrAxis(players_controllers, matches.group(1))
         if joy_type == "hat":
             key_left = "left"
         else:
             key_left = "axisX"
         mp = getMappingKeyIncludingFallback(
-            playersControllers, matches.group(1), key_left, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_left, mapping, mapping_fallback
         )
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mp,
             -1,
         )
     matches = search("^JOY([12])_RIGHT$", elt)
     if matches:
-        joy_type = hatOrAxis(playersControllers, matches.group(1))
+        joy_type = hatOrAxis(players_controllers, matches.group(1))
         if joy_type == "hat":
             key_right = "right"
         else:
             key_right = "axisX"
         mp = getMappingKeyIncludingFallback(
-            playersControllers, matches.group(1), key_right, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_right, mapping, mapping_fallback
         )
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mp,
             1,
         )
@@ -519,26 +519,26 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
     matches = search("^JOY([12])_(R?[XY])AXIS$", elt)
     if matches:
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mapping["axis" + matches.group(2)],
         )
     matches = search("^JOY([12])_(R?[XYZ])AXIS_NEG$", elt)
     if matches:
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mapping["axis" + matches.group(2)],
             -1,
         )
     matches = search("^JOY([12])_(R?[XYZ])AXIS_POS$", elt)
     if matches:
         return input2input(
-            playersControllers,
+            players_controllers,
             matches.group(1),
-            joy2realjoyid(playersControllers, matches.group(1)),
+            joy2realjoyid(players_controllers, matches.group(1)),
             mapping["axis" + matches.group(2)],
             1,
         )
@@ -548,31 +548,31 @@ def transformElement(elt, playersControllers, mapping, mapping_fallback):
 
 
 def getMappingKeyIncludingFallback(
-    playersControllers, padnum, key, mapping, mapping_fallback
+    players_controllers, padnum, key, mapping, mapping_fallback
 ):
-    if padnum in playersControllers:
+    if padnum in players_controllers:
         if key not in mapping or (
-            key in mapping and mapping[key] not in playersControllers[padnum].inputs
+            key in mapping and mapping[key] not in players_controllers[padnum].inputs
         ):
             if (
                 key in mapping_fallback
-                and mapping_fallback[key] in playersControllers[padnum].inputs
+                and mapping_fallback[key] in players_controllers[padnum].inputs
             ):
                 return mapping_fallback[key]
     return mapping[key]
 
 
-def joy2realjoyid(playersControllers, joy):
-    if joy in playersControllers:
-        return playersControllers[joy].index
+def joy2realjoyid(players_controllers, joy):
+    if joy in players_controllers:
+        return players_controllers[joy].index
     return None
 
 
-def hatOrAxis(playersControllers, player):
+def hatOrAxis(players_controllers, player):
     # default to axis
     type = "axis"
-    if (player) in playersControllers:
-        pad = playersControllers[(player)]
+    if (player) in players_controllers:
+        pad = players_controllers[(player)]
         for button in pad.inputs:
             input = pad.inputs[button]
             if input.type == "hat":
@@ -582,9 +582,9 @@ def hatOrAxis(playersControllers, player):
     return type
 
 
-def input2input(playersControllers, player, joynum, button, axisside=None):
-    if (player) in playersControllers:
-        pad = playersControllers[(player)]
+def input2input(players_controllers, player, joynum, button, axisside=None):
+    if (player) in players_controllers:
+        pad = players_controllers[(player)]
         if button in pad.inputs:
             input = pad.inputs[button]
             if input.type == "button":

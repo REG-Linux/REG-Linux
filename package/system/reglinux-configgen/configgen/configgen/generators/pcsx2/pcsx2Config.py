@@ -5,14 +5,14 @@ from requests import get
 from time import time
 from shutil import copyfile
 from subprocess import check_output, CalledProcessError
-from systemFiles import CONF, BIOS
+from configgen.systemFiles import CONF, BIOS
 from .pcsx2Controllers import (
     getWheelType,
     useEmulatorWheels,
     wheelTypeMapping,
     input2wheel,
 )
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 PCSX2_CONFIG_DIR = CONF + "/PCSX2"
 PCSX2_BIOS_DIR = BIOS + "/ps2"

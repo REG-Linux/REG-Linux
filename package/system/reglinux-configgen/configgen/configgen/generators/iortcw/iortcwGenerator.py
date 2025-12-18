@@ -1,26 +1,26 @@
-from generators.Generator import Generator
-from Command import Command
-from controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
 from .iortcwConfig import setIortcwConfig, IORTCW_BIN_PATH
 
 
 class IORTCWGenerator(Generator):
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        setIortcwConfig(system, gameResolution)
+        setIortcwConfig(system, game_resolution)
 
         # Single Player for now
-        commandArray = [IORTCW_BIN_PATH]
+        command_array = [IORTCW_BIN_PATH]
 
         return Command(
-            array=commandArray,
+            array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    playersControllers
+                    players_controllers
                 )
             },
         )
 
-    def getInGameRatio(self, config, gameResolution, rom):
+    def get_in_game_ratio(self, config, game_resolution, rom):
         return 16 / 9

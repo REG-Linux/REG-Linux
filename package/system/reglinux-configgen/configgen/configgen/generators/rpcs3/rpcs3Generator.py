@@ -1,12 +1,12 @@
-from generators.Generator import Generator
-from Command import Command
+from configgen.generators.Generator import Generator
+from configgen.Command import Command
 from shutil import copytree, copy2
 from configparser import ConfigParser
 from re import match
 from os import path, makedirs
 from ruamel.yaml import YAML
 from subprocess import check_output, CalledProcessError
-from controllers import write_sdl_db_all_controllers
+from configgen.controllers import generate_sdl_controller_config
 from .rpcs3Controllers import generateControllerConfig
 from .rpcs3Config import (
     RPCS3_ICON_TARGET_DIR,
@@ -15,7 +15,7 @@ from .rpcs3Config import (
     RPCS3_PS3UPDAT_PATH,
     RPCS3_BIN_PATH,
 )
-from utils.logger import get_logger
+from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -26,9 +26,9 @@ class Rpcs3Generator(Generator):
         return True
 
     def generate(
-        self, system, rom, playersControllers, metadata, guns, wheels, gameResolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        generateControllerConfig(system, playersControllers, rom)
+        generateControllerConfig(system, players_controllers, rom)
 
         # Taking care of the CurrentSettings.ini file
         if not path.exists(path.dirname(RPCS3_CURRENT_CONFIG_PATH)):
@@ -238,7 +238,7 @@ class Rpcs3Generator(Generator):
         else:
             # If not set, see if the screen ratio is closer to 4:3 or 16:9 and pick that.
             rpcs3ymlconfig["Video"]["Aspect ratio"] = ":".join(
-                map(str, getClosestRatio(gameResolution))
+                map(str, getClosestRatio(game_resolution))
             )
         # Shader compilation
         if system.isOptSet("rpcs3_shadermode"):
@@ -460,32 +460,35 @@ class Rpcs3Generator(Generator):
         else:
             romName = rom + "/PS3_GAME/USRDIR/EBOOT.BIN"
 
-        # write our own gamecontrollerdb.txt file before launching the game
-        dbfile = "/userdata/system/configs/rpcs3/input_configs/gamecontrollerdb.txt"
-        write_sdl_db_all_controllers(playersControllers, dbfile)
-
-        commandArray = [RPCS3_BIN_PATH, romName]
+        command_array = [RPCS3_BIN_PATH, romName]
 
         if not (system.isOptSet("rpcs3_gui") and system.getOptBoolean("rpcs3_gui")):
-            commandArray.append("--no-gui")
+            command_array.append("--no-gui")
 
         # firmware not installed and available : instead of starting the game, install it
         if getFirmwareVersion() is None:
             if path.exists(RPCS3_PS3UPDAT_PATH):
-                commandArray = [RPCS3_BIN_PATH, "--installfw", RPCS3_PS3UPDAT_PATH]
+                command_array = [RPCS3_BIN_PATH, "--installfw", RPCS3_PS3UPDAT_PATH]
 
-        return Command(array=commandArray)
+        return Command(
+            array=command_array,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    players_controllers
+                )
+            },
+        )
 
 
-def getClosestRatio(gameResolution):
-    screenRatio = gameResolution["width"] / gameResolution["height"]
+def getClosestRatio(game_resolution):
+    screenRatio = game_resolution["width"] / game_resolution["height"]
     if screenRatio < 1.6:
         return (4, 3)
     else:
         return (16, 9)
 
 
-def getInGameRatio(self, config, gameResolution, rom):
+def get_in_game_ratio(self, config, game_resolution, rom):
     return 16 / 9
 
 
