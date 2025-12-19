@@ -3,10 +3,9 @@ new file mode 100644
 index 000000000000..58d9ab342fe9
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,778 @@
+@@ -0,0 +1,795 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
-+ * Copyright (c) 2025, ROCKNIX
 + * Copyright (c) 2025, REG-LINUX (https://reglinux.org)
 + * Copyright (c) 2025, Romain Tisserand <romain.tisserand@gmail.com>
 + */
@@ -53,25 +52,6 @@ index 000000000000..58d9ab342fe9
 +			status = "okay";
 +		};*/
 +	};
-+
-+panel_vsp: regulator-panel-vsp {
-+	/* Superseded by the SGM3804 bias driver */
-+	status = "disabled";
-+};
-+
-+	/* TODO DUMMY TO UNBLOCK USB */
-+	vreg_usb_vbus: usb-vbus-regulator {
-+		compatible = "regulator-fixed";
-+		regulator-name = "usb_vbus";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		regulator-always-on;
-+};
-+
-+panel_vsn: regulator-panel-vsn {
-+	/* Superseded by the SGM3804 bias driver */
-+	status = "disabled";
-+};
 +
 +	/* TODO pm6125_pwm is not valid in mainline */
 +	/*panel_backlight: backlight {
@@ -133,7 +113,6 @@ index 000000000000..58d9ab342fe9
 +&i2c1 {
 +	status = "okay";
 +
-+	/* TODO: enable with CONFIG_REGULATOR_SGM3804 */
 +	panel_avdd: regulator@3e {
 +		compatible = "sgmicro,sgm3804";
 +		reg = <0x3e>;
@@ -250,23 +229,45 @@ index 000000000000..58d9ab342fe9
 +		status = "okay";
 +	};
 +
-+	/* TODO: enable with CONFIG_TYPEC_AW35615 */
-+	usb_typec: typec-port-controller@22 {
-+		compatible = "awinic,aw35615";
-+		reg = <0x22>;
-+		interrupts-extended = <&tlmm 39 IRQ_TYPE_LEVEL_LOW>;
-+		int-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
-+		vbus-supply = <&panel_avdd>; /*<&vreg_usb_vbus>;*/
-+		status = "okay";
++		usb_typec: typec-port-controller@22 {
++			compatible = "awinic,aw35615";
++			reg = <0x22>;
++			interrupts-extended = <&tlmm 39 IRQ_TYPE_LEVEL_LOW>;
++			int-n-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
++			vbus-supply = <&panel_avdd>;
++			status = "okay";
 +
-+		connector {
-+			compatible = "usb-c-connector";
-+			power-role = "dual";
-+			data-role = "dual";
-+			try-power-role = "sink";
-+			usb-role-switch;
++			connector {
++				compatible = "usb-c-connector";
++				power-role = "dual";
++				data-role = "dual";
++				try-power-role = "sink";
++				usb-role-switch;
++				op-sink-microwatt = <2500000>;
++				sink-pdos = <PDO_FIXED(5000, 1325, PDO_FIXED_USB_COMM)>;
++				source-pdos = <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					port@0 {
++						reg = <0>;
++
++						usb_typec_hs_in: endpoint {
++							remote-endpoint = <&usb_dwc3_hs>;
++						};
++					};
++
++					port@1 {
++						reg = <1>;
++
++						usb_typec_ss_in: endpoint {
++							remote-endpoint = <&usb_qmpphy_out>;
++						};
++					};
++				};
++			};
 +		};
-+	};
 +
 +	/* TODO: enable with CONFIG_LEDS_AW200XX */
 +	led_left: led-controller@3a {
@@ -454,7 +455,7 @@ index 000000000000..58d9ab342fe9
 +
 +&uart4 {
 +	/* UART routed to the joystick MCU */
-+	status = "disabled";
++	status = "okay";
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&qup_uart4_default>;
 +
@@ -696,7 +697,7 @@ index 000000000000..58d9ab342fe9
 +	mmc-hs400-enhanced-strobe;
 +	no-sd;
 +	no-sdio;
-+	status = "disabled";
++	status = "okay";
 +};
 +
 +&sdhc_2 {
@@ -739,13 +740,29 @@ index 000000000000..58d9ab342fe9
 +
 +&usb_dwc3 {
 +	/* Use defaults from sm6115.dtsi: HS+SS phys, role-switch, OTG */
-+	dpdm-supply = <&sgm41511>;
++	status = "okay";
++	dr_mode = "otg";
++	maximum-speed = "super-speed";
++};
++
++&usb_dwc3_hs {
++	remote-endpoint = <&usb_typec_hs_in>;
++};
++
++&usb_qmpphy_out {
++	remote-endpoint = <&usb_typec_ss_in>;
 +};
 +
 +&usb_hsphy {
 +	vdd-supply = <&pm6125_l4>;
 +	vdda-pll-supply = <&pm6125_l12>;
 +	vdda-phy-dpdm-supply = <&pm6125_l15>;
++	status = "okay";
++};
++
++&usb_qmpphy {
++	vdda-phy-supply = <&pm6125_l4>;
++	vdda-pll-supply = <&pm6125_l12>;
 +	status = "okay";
 +};
 +
