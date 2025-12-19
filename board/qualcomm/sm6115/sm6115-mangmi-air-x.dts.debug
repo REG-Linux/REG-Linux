@@ -1,0 +1,774 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright (c) 2025, ROCKNIX
+ * Copyright (c) 2025, REG-LINUX (https://reglinux.org)
+ * Copyright (c) 2025, Romain Tisserand <romain.tisserand@gmail.com>
+ */
+
+/dts-v1/;
+
+#include "sm6115.dtsi"
+#include "pm6125.dtsi"
+#include "pmi632.dtsi"
+#include <dt-bindings/arm/qcom,ids.h>
+#include <dt-bindings/leds/common.h>
+#include <dt-bindings/sound/qcom,q6afe.h>
+#include <dt-bindings/sound/qcom,q6asm.h>
+#include <dt-bindings/usb/pd.h>
+
+/ {
+	model = "MANGMI Air X";
+	compatible = "mangmi,sm6115-air-x", "qcom,sm6115";
+	chassis-type = "handset";
+
+	qcom,msm-id = <QCOM_ID_SM4250 0x10000>, <QCOM_ID_SM6115 0x10000>;
+	qcom,board-id = <34 2>;
+
+	aliases {
+		mmc0 = &sdhc_2;
+		mmc1 = &sdhc_1;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/*framebuffer: framebuffer@5c000000 {
+			compatible = "simple-framebuffer";
+			reg = <0 0x5c000000 0 (1920 * 1080 * 4)>;
+			width = <1080>;
+			height = <1920>;
+			stride = <(1080 * 4)>;
+			format = "a8r8g8b8";
+			rot = <2>;
+			status = "okay";
+		};*/
+	};
+
+	panel_vsp: regulator-panel-vsp {
+		compatible = "regulator-fixed";
+		regulator-name = "panel_vsp";
+		regulator-min-microvolt = <5500000>;
+		regulator-max-microvolt = <5500000>;
+		gpio = <&tlmm 44 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	panel_vsn: regulator-panel-vsn {
+		compatible = "regulator-fixed";
+		regulator-name = "panel_vsn";
+		regulator-min-microvolt = <5500000>;
+		regulator-max-microvolt = <5500000>;
+		gpio = <&tlmm 45 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	vibra_vcc: regulator-vibra-vcc {
+		compatible = "regulator-fixed";
+		regulator-name = "vibra_vcc";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&tlmm 96 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		status = "disabled";
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&vol_up_n>;
+
+		key-volume-up {
+			label = "Volume Up";
+			linux,code = <KEY_VOLUMEUP>;
+			gpios = <&pm6125_gpios 5 GPIO_ACTIVE_LOW>;
+			debounce-interval = <15>;
+			linux,can-disable;
+			wakeup-source;
+		};
+	};
+};
+
+&gpi_dma0 {
+	status = "okay";
+};
+
+&spmi_bus {
+      /* This hardware only exposes the pm6125 helpers; the PMI632 chips
+       * referenced by pmi632.dtsi are absent, so prevent the kernel driver
+       * from probing the unused USIDs 0x2 and 0x3 (which otherwise flood dmesg
+       * with transaction-failed warnings).
+       */
+      pmic@2 {
+              status = "disabled";
+      };
+
+      pmic@3 {
+              status = "disabled";
+      };
+};
+
+&i2c1 {
+	status = "okay";
+
+	/* TODO: enable with CONFIG_REGULATOR_SGM3804 */
+	panel_avdd: regulator@3e {
+		compatible = "sgmicro,sgm3804";
+		reg = <0x3e>;
+		regulator-name = "panel-avdd";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		status = "disabled";
+	};
+
+	es8326: codec@18 {
+		compatible = "everest,es8326";
+		reg = <0x18>;
+		interrupts-extended = <&tlmm 65 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpios = <&tlmm 66 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+	};
+
+	speaker_amp_left: amplifier@34 {
+		compatible = "awinic,aw882xx";
+		reg = <0x34>;
+		interrupts-extended = <&tlmm 106 IRQ_TYPE_LEVEL_LOW>;
+		status = "disabled";
+	};
+
+	speaker_amp_right: amplifier@35 {
+		compatible = "awinic,aw882xx";
+		reg = <0x35>;
+		interrupts-extended = <&tlmm 107 IRQ_TYPE_LEVEL_LOW>;
+		status = "disabled";
+	};
+
+	/* PMIC expander; keep disabled until driver support is wired */
+	/* TODO: enable with CONFIG_MFD_QCOM_PM8008 and CONFIG_REGULATOR_QCOM_PM8008 */
+	pm8008_8: pmic@8 {
+		compatible = "qcom,pm8008";
+		reg = <0x8>;
+		interrupts-extended = <&tlmm 25 IRQ_TYPE_EDGE_RISING>;
+		status = "disabled";
+
+		pm8008_regulators_8: regulators {
+			compatible = "qcom,pm8008-regulator";
+			pm8008_en-supply = <&vibra_vcc>;
+			status = "disabled";
+		};
+	};
+
+	/* TODO: enable with CONFIG_MFD_QCOM_PM8008 and CONFIG_REGULATOR_QCOM_PM8008 */
+	pm8008_9: pmic@9 {
+		compatible = "qcom,pm8008";
+		reg = <0x9>;
+		interrupts-extended = <&tlmm 25 IRQ_TYPE_EDGE_RISING>;
+		status = "disabled";
+
+		pm8008_regulators_9: regulators {
+			compatible = "qcom,pm8008-regulator";
+			pm8008_en-supply = <&vibra_vcc>;
+			status = "disabled";
+		};
+	};
+};
+
+&i2c2 {
+	/* Touchscreen candidates (keep disabled until the matching hardware is confirmed) */
+	touch_synaptics: touchscreen@20 {
+		compatible = "synaptics,tcm-i2c";
+		reg = <0x20>;
+		interrupts-extended = <&tlmm 80 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&tlmm 71 GPIO_ACTIVE_HIGH>;
+		/* Shares reset/IRQ with other I2C touch candidates below */
+		status = "disabled";
+	};
+
+	touch_focaltech: touchscreen@38 {
+		compatible = "focaltech,fts";
+		reg = <0x38>;
+		interrupts-extended = <&tlmm 80 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&tlmm 71 GPIO_ACTIVE_HIGH>;
+		/* Shares reset/IRQ with other I2C touch candidates */
+		status = "disabled";
+	};
+
+	touch_novatek: touchscreen@62 {
+		compatible = "novatek,nt11205";
+		reg = <0x62>;
+		interrupts-extended = <&tlmm 80 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&tlmm 71 GPIO_ACTIVE_HIGH>;
+		/* Shares reset/IRQ with other I2C touch candidates */
+		status = "disabled";
+	};
+};
+
+&i2c5 {
+	status = "okay";
+
+	sgm41600a: charger@6e {
+		compatible = "sgmicro,sgm41600a";
+		reg = <0x6e>;
+		interrupts-extended = <&tlmm 83 IRQ_TYPE_LEVEL_LOW>;
+		irq-gpios = <&tlmm 83 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+	};
+
+	sgm41511: charger@1a {
+		compatible = "sgmicro,sgm41511";
+		reg = <0x1a>;
+		interrupts-extended = <&tlmm 70 IRQ_TYPE_LEVEL_LOW>;
+		irq-gpios = <&tlmm 70 GPIO_ACTIVE_LOW>;
+		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
+	/* TODO: enable with CONFIG_TYPEC_AW35615 */
+	usb_typec: typec-port-controller@22 {
+		compatible = "awinic,aw35615";
+		reg = <0x22>;
+		interrupts-extended = <&tlmm 39 IRQ_TYPE_LEVEL_LOW>;
+		int-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+
+		connector {
+			compatible = "usb-c-connector";
+			power-role = "dual";
+			data-role = "dual";
+			try-power-role = "sink";
+			usb-role-switch;
+		};
+	};
+
+	/* TODO: enable with CONFIG_LEDS_AW200XX */
+	led_left: led-controller@3a {
+		compatible = "awinic,aw20036";
+		reg = <0x3a>;
+		interrupts-extended = <&tlmm 20 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&tlmm 23 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
+	/* TODO: enable with CONFIG_LEDS_AW200XX */
+	led_right: led-controller@3b {
+		compatible = "awinic,aw20036";
+		reg = <0x3b>;
+		interrupts-extended = <&tlmm 30 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+};
+
+&spmi_bus {
+      /* HACK the kernel driver probing */
+      pmic@2 {
+              status = "disabled";
+      };
+
+      pmic@3 {
+              status = "disabled";
+      };
+};
+
+&mdp {
+	status = "okay";
+};
+
+&gpu {
+	status = "okay";
+
+	zap-shader {
+		firmware-name = "qcom/qrb4210/a610_zap.mbn";
+	};
+};
+
+&mdss {
+	status = "okay";
+};
+
+&mdp {
+	status = "okay";
+};
+
+&mdss_dsi0 {
+	status = "okay";
+
+	panel: panel@0 {
+		/* Placeholder panel to let MSM DRM/DSI bind. */
+		compatible = "lg,acx467akm-7";
+		reg = <0>;
+		dsi-lanes = <4>;
+		mode = <9>;
+
+		panel-timing {
+			clock-frequency = <124416000>;
+			hactive = <1080>;
+			hfront-porch = <16>;
+			hsync-len = <4>;
+			hback-porch = <16>;
+			vactive = <1920>;
+			vfront-porch = <16>;
+			vsync-len = <4>;
+			vback-porch = <16>;
+		};
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mdss_dsi0_out>;
+			};
+		};
+	};
+};
+
+&mdss_dsi0_out {
+	data-lanes = <0 1 2 3>;
+	remote-endpoint = <&panel_in>;
+};
+
+&mdss_dsi0_phy {
+	status = "okay";
+};
+
+&spi2 {
+	/* Himax SPI touch (downstream default), kept disabled until confirmed */
+	touch_himax: touchscreen@0 {
+		compatible = "himax,hxcommon";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+		interrupts-extended = <&tlmm 69 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&tlmm 68 GPIO_ACTIVE_HIGH>;
+		/* Shares reset/IRQ with the Jadard SPI touch stub below */
+		status = "disabled";
+	};
+
+	/* Jadard alternative touch controller */
+	touch_jadard: touchscreen@1 {
+		compatible = "jadard,jd9365";
+		reg = <1>;
+		spi-max-frequency = <6000000>;
+		interrupts-extended = <&tlmm 69 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&tlmm 68 GPIO_ACTIVE_HIGH>;
+		/* Shares reset/IRQ with the Himax SPI touch stub above */
+		status = "disabled";
+	};
+};
+
+&i2c1 {
+	wsa_codec0: amplifier@e {
+		compatible = "qcom,wsa881x-i2c-codec";
+		reg = <0x0e>;
+		status = "disabled";
+	};
+
+	wsa_codec1: amplifier@44 {
+		compatible = "qcom,wsa881x-i2c-codec";
+		reg = <0x44>;
+		status = "disabled";
+	};
+
+	smb1355: charger@8 {
+		compatible = "qcom,smb1355";
+		reg = <0x8>;
+		status = "disabled";
+	};
+};
+
+&tlmm {
+	mcu_ctrl_pins: mcu-ctrl-pins {
+		mux {
+			pins = "gpio22", "gpio25", "gpio26", "gpio27", "gpio28";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio22", "gpio25", "gpio26", "gpio27", "gpio28";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+
+	mcu_key_pins: mcu-key-pins {
+		mux {
+			pins = "gpio18", "gpio24", "gpio34", "gpio36";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio18", "gpio24", "gpio34", "gpio36";
+			drive-strength = <2>;
+			bias-pull-up;
+			input-enable;
+		};
+	};
+
+	gpio_pwm_pins: gpio-pwm-pins {
+		mux {
+			pins = "gpio86";
+			function = "GCC_GP1";
+		};
+
+		config {
+			pins = "gpio86";
+			drive-strength = <8>;
+			bias-disable;
+		};
+	};
+};
+
+&pm6125_gpios {
+	vol_up_n: vol-up-n-state {
+		pins = "gpio5";
+		function = "normal";
+		power-source = <0>;
+		bias-pull-up;
+		input-enable;
+	};
+};
+
+&pon_pwrkey {
+	status = "okay";
+};
+
+&pon_resin {
+	linux,code = <KEY_VOLUMEDOWN>;
+	status = "okay";
+};
+
+&qupv3_id_0 {
+	status = "okay";
+};
+
+&uart4 {
+	/* UART routed to the joystick MCU */
+	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&qup_uart4_default>;
+
+	joystick_mcu_serdev: joystick-mcu {
+		compatible = "mangmi,joystick-mcu";
+		pinctrl-names = "default";
+		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
+		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
+		select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
+		mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
+		start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
+		back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
+		power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
+		boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
+		boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+};
+
+/ {
+	aliases {
+		serial1 = &uart4;
+	};
+};
+
+/ {
+	/* Joystick MCU on QUPv3 SE4 UART (disabled until driver is ready) */
+	joystick_mcu: joystick-mcu {
+		compatible = "mangmi,joystick-mcu";
+		status = "disabled";
+	};
+
+	vibrator {
+		compatible = "pwm-gpio-vibrator";
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio_pwm_pins>;
+		clocks = <&gcc GCC_GP1_CLK>;
+		clock-names = "gpio-pwm-clk";
+		vcc-supply = <&vibra_vcc>;
+		status = "disabled";
+	};
+
+	fuel-gauge@64 {
+		compatible = "cellwise,cw221x";
+		reg = <0x64>;
+		status = "disabled";
+	};
+
+	/* TODO: enable with CONFIG_SENSORS_GPIO_FAN */
+	fan {
+		compatible = "gpio-fan";
+		gpios = <&tlmm 92 GPIO_ACTIVE_HIGH>;
+		cooling-min-state = <0>;
+		cooling-max-state = <1>;
+		cooling-levels = <0 255>;
+		#cooling-cells = <2>;
+		status = "disabled";
+	};
+};
+
+&remoteproc_adsp {
+	firmware-name = "qcom/qrb4210/adsp.mbn";
+	status = "okay";
+};
+
+&remoteproc_cdsp {
+	firmware-name = "qcom/qrb4210/cdsp.mbn";
+	status = "okay";
+};
+
+&remoteproc_mpss {
+	status = "okay";
+};
+
+&rpm_requests {
+	regulators-0 {
+		compatible = "qcom,rpm-pm6125-regulators";
+
+		pm6125_s6: s6 {
+			regulator-min-microvolt = <304000>;
+			regulator-max-microvolt = <1456000>;
+		};
+
+		pm6125_s7: s7 {
+			regulator-min-microvolt = <1280000>;
+			regulator-max-microvolt = <2080000>;
+		};
+
+		pm6125_s8: s8 {
+			regulator-min-microvolt = <1064000>;
+			regulator-max-microvolt = <1304000>;
+		};
+
+		pm6125_l1: l1 {
+			regulator-min-microvolt = <952000>;
+			regulator-max-microvolt = <1152000>;
+		};
+
+		pm6125_l4: l4 {
+			regulator-min-microvolt = <488000>;
+			regulator-max-microvolt = <1000000>;
+		};
+
+		pm6125_l5: l5 {
+			regulator-min-microvolt = <1648000>;
+			regulator-max-microvolt = <3304000>;
+			regulator-allow-set-load;
+		};
+
+		pm6125_l6: l6 {
+			regulator-min-microvolt = <576000>;
+			regulator-max-microvolt = <656000>;
+		};
+
+		pm6125_l7: l7 {
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <1304000>;
+		};
+
+		pm6125_l8: l8 {
+			regulator-min-microvolt = <400000>;
+			regulator-max-microvolt = <728000>;
+		};
+
+		pm6125_l9: l9 {
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <2000000>;
+		};
+
+		pm6125_l10: l10 {
+			regulator-min-microvolt = <1704000>;
+			regulator-max-microvolt = <1904000>;
+		};
+
+		pm6125_l11: l11 {
+			regulator-min-microvolt = <1704000>;
+			regulator-max-microvolt = <1952000>;
+			regulator-allow-set-load;
+		};
+
+		pm6125_l12: l12 {
+			regulator-min-microvolt = <1624000>;
+			regulator-max-microvolt = <1984000>;
+		};
+
+		pm6125_l13: l13 {
+			regulator-min-microvolt = <1504000>;
+			regulator-max-microvolt = <1952000>;
+		};
+
+		pm6125_l14: l14 {
+			regulator-min-microvolt = <1704000>;
+			regulator-max-microvolt = <1904000>;
+		};
+
+		pm6125_l15: l15 {
+			regulator-min-microvolt = <2920000>;
+			regulator-max-microvolt = <3232000>;
+		};
+
+		pm6125_l16: l16 {
+			regulator-min-microvolt = <1704000>;
+			regulator-max-microvolt = <1904000>;
+		};
+
+		pm6125_l17: l17 {
+			regulator-min-microvolt = <1152000>;
+			regulator-max-microvolt = <1384000>;
+		};
+
+		pm6125_l18: l18 {
+			regulator-min-microvolt = <1104000>;
+			regulator-max-microvolt = <1312000>;
+		};
+
+		pm6125_l19: l19 {
+			regulator-min-microvolt = <1624000>;
+			regulator-max-microvolt = <3304000>;
+		};
+
+		pm6125_l20: l20 {
+			regulator-min-microvolt = <1624000>;
+			regulator-max-microvolt = <3304000>;
+		};
+
+		pm6125_l21: l21 {
+			regulator-min-microvolt = <2400000>;
+			regulator-max-microvolt = <3600000>;
+		};
+
+		pm6125_l22: l22 {
+			regulator-min-microvolt = <2952000>;
+			regulator-max-microvolt = <3304000>;
+		};
+
+		pm6125_l23: l23 {
+			regulator-min-microvolt = <3200000>;
+			regulator-max-microvolt = <3400000>;
+		};
+
+		pm6125_l24: l24 {
+			regulator-min-microvolt = <2704000>;
+			regulator-max-microvolt = <3600000>;
+			regulator-allow-set-load;
+		};
+	};
+};
+
+&sdc2_state_off {
+	cd-pins {
+		pins = "gpio88";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-disable;
+	};
+};
+
+&sdc2_state_on {
+	cd-pins {
+		pins = "gpio88";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-up;
+	};
+};
+
+&sdhc_1 {
+	vmmc-supply = <&pm6125_l24>;
+	vqmmc-supply = <&pm6125_l11>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_state_on>;
+	pinctrl-1 = <&sdc1_state_off>;
+	bus-width = <8>;
+	non-removable;
+	mmc-ddr-1_8v;
+	mmc-hs200-1_8v;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	no-sd;
+	no-sdio;
+	status = "disabled";
+};
+
+&sdhc_2 {
+	cd-gpios = <&tlmm 88 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_state_on>;
+	pinctrl-1 = <&sdc2_state_off>;
+	vmmc-supply = <&pm6125_l22>;
+	vqmmc-supply = <&pm6125_l5>;
+	no-sdio;
+	no-mmc;
+	status = "okay";
+};
+
+&sleep_clk {
+	clock-frequency = <32764>;
+};
+
+&tlmm {
+	gpio-reserved-ranges = <0 4>;
+
+	te_active: te-active-state {
+		pins = "gpio81";
+		function = "mdp_vsync";
+		drive-strength = <2>;
+		bias-pull-down;
+	};
+
+	mdss_dsi_active: dsi-active-state {
+		pins = "gpio82";
+		function = "gpio";
+		drive-strength = <8>;
+		bias-disable;
+	};
+};
+
+&usb {
+	status = "okay";
+};
+
+&usb_dwc3 {
+	/* Use defaults from sm6115.dtsi: HS+SS phys, role-switch, OTG */
+	dpdm-supply = <&sgm41511>;
+};
+
+&usb_hsphy {
+	vdd-supply = <&pm6125_l4>;
+	vdda-pll-supply = <&pm6125_l12>;
+	vdda-phy-dpdm-supply = <&pm6125_l15>;
+	status = "okay";
+};
+
+&wifi {
+	vdd-0.8-cx-mx-supply = <&pm6125_l8>;
+	vdd-1.8-xo-supply = <&pm6125_l16>;
+	vdd-1.3-rfa-supply = <&pm6125_l17>;
+	vdd-3.3-ch0-supply = <&pm6125_l23>;
+	status = "okay";
+};
+
+/* Upstream-style Bluetooth node (qcom,wcn3990-bt), kept disabled until hooked to serdev UART */
+&uart4 {
+	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&qup_uart4_default>;
+
+	bluetooth {
+		compatible = "qcom,wcn3990-bt";
+		vddio-supply = <&pm6125_l16>;
+		vddxo-supply = <&pm6125_l9>;
+		vddrf-supply = <&pm6125_l7>;
+		vddch0-supply = <&pm6125_l22>;
+		max-speed = <3200000>;
+		/* Downstream bt-sw-ctrl-gpio; map to enable-gpios here if needed */
+		enable-gpios = <&tlmm 87 GPIO_ACTIVE_HIGH>;
+		/* TODO: set correct firmware-name once available */
+		firmware-name = "wcn3990/bluetooth.mbn";
+		status = "disabled";
+	};
+};
+
+&xo_board {
+	clock-frequency = <19200000>;
+};
