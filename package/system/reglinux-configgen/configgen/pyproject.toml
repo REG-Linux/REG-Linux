@@ -30,3 +30,11 @@ exclude = ["tests*", "docs*"]
 
 [project.scripts]
 reglinux-configgen = "configgen:main"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "basic"
+reportMissingImports = "warning"
+
+venvPath = "."
+venv = ".venv"

@@ -4,6 +4,10 @@ generator classes for various emulators based on a predefined mapping.
 """
 
 from importlib import import_module
+from typing import Dict, Any, Optional, Type, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .generators.Generator import Generator
 
 
 class GeneratorNotFoundError(Exception):
@@ -126,10 +130,10 @@ EMULATOR_MAPPING = {
     "xenia-canary": ("configgen.generators.xenia.xeniaGenerator", "XeniaGenerator"),
 }
 
-PRELOADED_GENERATORS = {}
+PRELOADED_GENERATORS: Dict[str, Type['Generator']] = {}
 
 
-def _load_generator_class(emulator: str):
+def _load_generator_class(emulator: str) -> Type['Generator']:
     try:
         module_path, class_name = EMULATOR_MAPPING[emulator]
     except KeyError:
@@ -139,7 +143,7 @@ def _load_generator_class(emulator: str):
     return getattr(module, class_name)
 
 
-def getGenerator(emulator):
+def getGenerator(emulator: str) -> 'Generator':
     """
     Returns an instance of the appropriate generator class for the specified emulator.
 
@@ -152,7 +156,7 @@ def getGenerator(emulator):
     Raises:
         GeneratorNotFoundError: If no generator is found for the specified emulator.
     """
-    generator_class = PRELOADED_GENERATORS.get(emulator)
+    generator_class: Optional[Type['Generator']] = PRELOADED_GENERATORS.get(emulator)
     if generator_class is None:
         try:
             generator_class = _load_generator_class(emulator)
