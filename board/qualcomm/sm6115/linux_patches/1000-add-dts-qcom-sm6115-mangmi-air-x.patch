@@ -3,7 +3,7 @@ new file mode 100644
 index 000000000000..58d9ab342fe9
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,781 @@
+@@ -0,0 +1,778 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
 + * Copyright (c) 2025, ROCKNIX
@@ -42,7 +42,7 @@ index 000000000000..58d9ab342fe9
 +		#size-cells = <2>;
 +		ranges;
 +
-+		framebuffer: framebuffer@5c000000 {
++		/*framebuffer: framebuffer@5c000000 {
 +			compatible = "simple-framebuffer";
 +			reg = <0 0x5c000000 0 (1920 * 1080 * 4)>;
 +			width = <1080>;
@@ -51,26 +51,27 @@ index 000000000000..58d9ab342fe9
 +			format = "a8r8g8b8";
 +			rot = <2>;
 +			status = "okay";
-+		};
++		};*/
 +	};
 +
-+	panel_vsp: regulator-panel-vsp {
-+		compatible = "regulator-fixed";
-+		regulator-name = "panel_vsp";
-+		regulator-min-microvolt = <5500000>;
-+		regulator-max-microvolt = <5500000>;
-+		gpio = <&tlmm 44 GPIO_ACTIVE_HIGH>;
-+		enable-active-high;
-+	};
++panel_vsp: regulator-panel-vsp {
++	/* Superseded by the SGM3804 bias driver */
++	status = "disabled";
++};
 +
-+	panel_vsn: regulator-panel-vsn {
++	/* TODO DUMMY TO UNBLOCK USB */
++	vreg_usb_vbus: usb-vbus-regulator {
 +		compatible = "regulator-fixed";
-+		regulator-name = "panel_vsn";
-+		regulator-min-microvolt = <5500000>;
-+		regulator-max-microvolt = <5500000>;
-+		gpio = <&tlmm 45 GPIO_ACTIVE_HIGH>;
-+		enable-active-high;
-+	};
++		regulator-name = "usb_vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++};
++
++panel_vsn: regulator-panel-vsn {
++	/* Superseded by the SGM3804 bias driver */
++	status = "disabled";
++};
 +
 +	/* TODO pm6125_pwm is not valid in mainline */
 +	/*panel_backlight: backlight {
@@ -120,13 +121,13 @@ index 000000000000..58d9ab342fe9
 +       * from probing the unused USIDs 0x2 and 0x3 (which otherwise flood dmesg
 +       * with transaction-failed warnings).
 +       */
-+      pmic@2 {
++      /*pmic@2 {
 +              status = "disabled";
 +      };
 +
 +      pmic@3 {
 +              status = "disabled";
-+      };
++      };*/
 +};
 +
 +&i2c1 {
@@ -139,7 +140,12 @@ index 000000000000..58d9ab342fe9
 +		regulator-name = "panel-avdd";
 +		regulator-min-microvolt = <5000000>;
 +		regulator-max-microvolt = <5000000>;
-+		status = "disabled";
++		//reset-gpios = <&tlmm 44 GPIO_ACTIVE_HIGH>,
++		//	      <&tlmm 45 GPIO_ACTIVE_HIGH>;
++		reset-gpios =   <&tlmm 59 GPIO_ACTIVE_HIGH>, <&tlmm 58 GPIO_ACTIVE_HIGH>,
++				<&tlmm 163 GPIO_ACTIVE_HIGH>,<&tlmm 164 GPIO_ACTIVE_HIGH>;
++		vin-supply = <&pm6125_l22>;
++		status = "okay";
 +	};
 +
 +	es8326: codec@18 {
@@ -147,7 +153,7 @@ index 000000000000..58d9ab342fe9
 +		reg = <0x18>;
 +		interrupts-extended = <&tlmm 65 IRQ_TYPE_LEVEL_LOW>;
 +		reset-gpios = <&tlmm 66 GPIO_ACTIVE_LOW>;
-+		status = "disabled";
++		status = "okay";
 +	};
 +
 +	speaker_amp_left: amplifier@34 {
@@ -232,7 +238,7 @@ index 000000000000..58d9ab342fe9
 +		reg = <0x6e>;
 +		interrupts-extended = <&tlmm 83 IRQ_TYPE_LEVEL_LOW>;
 +		irq-gpios = <&tlmm 83 GPIO_ACTIVE_LOW>;
-+		status = "disabled";
++		status = "okay";
 +	};
 +
 +	sgm41511: charger@1a {
@@ -241,7 +247,7 @@ index 000000000000..58d9ab342fe9
 +		interrupts-extended = <&tlmm 70 IRQ_TYPE_LEVEL_LOW>;
 +		irq-gpios = <&tlmm 70 GPIO_ACTIVE_LOW>;
 +		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
-+		status = "disabled";
++		status = "okay";
 +	};
 +
 +	/* TODO: enable with CONFIG_TYPEC_AW35615 */
@@ -250,7 +256,8 @@ index 000000000000..58d9ab342fe9
 +		reg = <0x22>;
 +		interrupts-extended = <&tlmm 39 IRQ_TYPE_LEVEL_LOW>;
 +		int-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
-+		status = "disabled";
++		vbus-supply = <&panel_avdd>; /*<&vreg_usb_vbus>;*/
++		status = "okay";
 +
 +		connector {
 +			compatible = "usb-c-connector";
@@ -268,7 +275,7 @@ index 000000000000..58d9ab342fe9
 +		interrupts-extended = <&tlmm 20 IRQ_TYPE_LEVEL_LOW>;
 +		reset-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
 +		enable-gpios = <&tlmm 23 GPIO_ACTIVE_HIGH>;
-+		status = "disabled";
++		status = "okay";
 +	};
 +
 +	/* TODO: enable with CONFIG_LEDS_AW200XX */
@@ -277,19 +284,8 @@ index 000000000000..58d9ab342fe9
 +		reg = <0x3b>;
 +		interrupts-extended = <&tlmm 30 IRQ_TYPE_LEVEL_LOW>;
 +		reset-gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
-+		status = "disabled";
++		status = "okay";
 +	};
-+};
-+
-+&spmi_bus {
-+      /* HACK the kernel driver probing */
-+      pmic@2 {
-+              status = "disabled";
-+      };
-+
-+      pmic@3 {
-+              status = "disabled";
-+      };
 +};
 +
 +&mdp {
@@ -317,8 +313,8 @@ index 000000000000..58d9ab342fe9
 +		reg = <0>;
 +
 +		vddio-supply = <&pm6125_l9>;
-+		vsp-supply = <&panel_vsp>;
-+		vsn-supply = <&panel_vsn>;
++		vsp-supply = <&panel_avdd>;
++		vsn-supply = <&panel_avdd>;
 +		/*backlight = <&panel_backlight>;*/
 +
 +		enable-gpios = <&tlmm 97 GPIO_ACTIVE_HIGH>;
@@ -758,6 +754,7 @@ index 000000000000..58d9ab342fe9
 +	vdd-1.8-xo-supply = <&pm6125_l16>;
 +	vdd-1.3-rfa-supply = <&pm6125_l17>;
 +	vdd-3.3-ch0-supply = <&pm6125_l23>;
++	/* BREAKS EVERYTHING vdd-3.3-ch1-supply = <&pm6125_l21>;*/
 +	status = "okay";
 +};
 +
