@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PIL.Image import Image as ImageType
+    from configgen.Emulator import Emulator
 from configgen.systemFiles import OVERLAY_USER, OVERLAY_SYSTEM
 from configgen.utils.videoMode import getAltDecoration
 from configgen.utils.logger import get_logger
@@ -33,7 +34,7 @@ class IBezelManager(ABC):
     """Interface for emulator-specific bezel managers."""
 
     @abstractmethod
-    def setup_bezels(self, system, rom, game_resolution: Dict[str, int], guns) -> None:
+    def setup_bezels(self, system: 'Emulator', rom: str, game_resolution: Dict[str, int], guns: list) -> None:
         """Configure the bezels for a specific game."""
         pass
 
@@ -425,7 +426,7 @@ class BezelUtils:
                 raise
 
     @staticmethod
-    def tattoo_image(input_png: str, output_png: str, system) -> None:
+    def tattoo_image(input_png: str, output_png: str, system: 'Emulator') -> None:
         """
         Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
 
