@@ -1,5 +1,5 @@
 diff --git a/package/linux-headers/Config.in.host b/package/linux-headers/Config.in.host
-index 1b49a701de..c3884c25aa 100644
+index 1b49a701de..d486cb7e9f 100644
 --- a/package/linux-headers/Config.in.host
 +++ b/package/linux-headers/Config.in.host
 @@ -49,6 +49,26 @@ config BR2_KERNEL_HEADERS_6_12
@@ -65,7 +65,7 @@ index 1b49a701de..c3884c25aa 100644
  	default "6.6.119"	if BR2_KERNEL_HEADERS_6_6
  	default "6.12.61"	if BR2_KERNEL_HEADERS_6_12
 +	default "6.17.11"	if BR2_KERNEL_HEADERS_6_17
-+	default "6.18"		if BR2_KERNEL_HEADERS_6_18
++	default "6.18.2"	if BR2_KERNEL_HEADERS_6_18
  	default BR2_DEFAULT_KERNEL_VERSION if BR2_KERNEL_HEADERS_VERSION
  	default "custom"	if BR2_KERNEL_HEADERS_CUSTOM_TARBALL
  	default BR2_KERNEL_HEADERS_CUSTOM_REPO_VERSION \
