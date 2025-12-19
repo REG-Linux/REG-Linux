@@ -2,7 +2,7 @@ from os import path
 from time import sleep
 from subprocess import PIPE, CalledProcessError, run
 from csv import reader
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from .logger import get_logger
 
 from .regmsgclient import regmsg_send_message
@@ -79,7 +79,7 @@ def getCurrentResolution(name: Optional[str] = None) -> Dict[str, int]:
         return {"width": 0, "height": 0}
 
 
-def getScreensInfos(config: Dict) -> List[Dict[str, int]]:
+def getScreensInfos(config: Dict[str, str]) -> List[Dict[str, int]]:
     resolution1 = getCurrentResolution()
     outputs = getScreens()
 
@@ -141,7 +141,7 @@ def changeMouse(mode: bool) -> None:
     run(cmd, shell=True, stdout=PIPE)
 
 
-def getGLVersion():
+def getGLVersion() -> float:
     lines = _get_eglinfo_lines()
     for line in lines:
         if "OpenGL version" not in line:
@@ -160,7 +160,7 @@ def getGLVersion():
     return 0
 
 
-def getGLVendor():
+def getGLVendor() -> str:
     lines = _get_eglinfo_lines()
     for line in lines:
         if "OpenGL vendor" not in line:
