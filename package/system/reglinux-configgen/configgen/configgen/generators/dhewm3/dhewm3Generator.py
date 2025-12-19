@@ -17,7 +17,7 @@ class Dhewm3Generator(Generator):
             directory = file.readline().strip().split("/")[0]
 
         # Run command
-        command_array: list[str | Path] = [
+        command_array = [
             DHEWM3_BIN_PATH,
             "+set",
             "fs_basepath",
@@ -26,5 +26,8 @@ class Dhewm3Generator(Generator):
 
         if directory != "base":
             command_array.extend(["+set", "fs_game", str(directory)])
+
+        # Convert any Path objects to strings to ensure all elements are strings
+        command_array = [str(item) for item in command_array]
 
         return Command(array=command_array)

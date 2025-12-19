@@ -23,7 +23,9 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
             configure_commodore_vic(coreSettings, system)
         case "vice_xpet":
             configure_commodore_pet(coreSettings, system)
-        case "puae | puae2021":
+        case "puae":
+            configure_commodore_puae(coreSettings, system)
+        case "puae2021":
             configure_commodore_puae(coreSettings, system)
         case "dolphin":
             configure_dolphin(coreSettings, system)
@@ -43,7 +45,9 @@ def generateCoreSettings(coreSettings, system, rom, guns, wheels):
             configure_dosbox_pure(coreSettings, system)
         case "bluemsx":
             configure_bluemsx(coreSettings, system)
-        case "pce | pce_fast":
+        case "pce":
+            configure_pcengine(coreSettings, system)
+        case "pce_fast":
             configure_pcengine(coreSettings, system)
         case "quasi88":
             configure_quasi88(coreSettings, system)
@@ -1803,10 +1807,10 @@ def configure_melonsds(coreSettings, system):
         )
     else:
         coreSettings.save("melonds_render_mode", '"1"')
-    if system.isOptSet("melondsds_poygon"):
+    if system.isOptSet("melondsds_polygon"):
         coreSettings.save(
             "melonds_opengl_better_polygons",
-            '"' + system.config["melondsds_poygon"] + '"',
+            '"' + system.config["melondsds_polygon"] + '"',
         )
     else:
         coreSettings.save("melonds_opengl_better_polygons", '"disabled"')

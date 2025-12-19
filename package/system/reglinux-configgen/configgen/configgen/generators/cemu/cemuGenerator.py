@@ -3,6 +3,7 @@ from configgen.Command import Command
 import xml.parsers.expat
 from codecs import open
 from xml.dom import minidom
+import xml.etree.ElementTree as ET
 from os import path, mkdir, linesep
 from glob import iglob, escape
 from configgen.controllers import generate_sdl_controller_config
@@ -57,27 +58,32 @@ class CemuGenerator(Generator):
             try:
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
             except xml.parsers.expat.ExpatError as e:
-                eslog.warning(f"Invalid XML in Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.")
+                eslog.warning(
+                    f"Invalid XML in Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file."
+                )
                 pass  # reinit the file
             except FileNotFoundError:
                 eslog.warning(f"Cemu config file not found: {CEMU_CONFIG_PATH}")
                 pass  # reinit the file
             except Exception as e:
-                eslog.warning(f"Error parsing Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.")
+                eslog.warning(
+                    f"Error parsing Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file."
+                )
                 pass  # reinit the file
 
         # Create the settings file
         setCemuConfig(cemuConfig, system)
 
         # Save the config file
-        xml = open(CEMU_CONFIG_PATH, "w")
+        xml_file = open(CEMU_CONFIG_PATH, "w")
 
         # TODO: python 3 - workaround to encode files in utf-8
-        xml = open(CEMU_CONFIG_PATH, "w", "utf-8")
+        xml_file = open(CEMU_CONFIG_PATH, "w", "utf-8")
         dom_string = linesep.join(
             [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()]
         )
-        xml.write(dom_string)
+        xml_file.write(dom_string)
+        xml_file.close()
 
         # Set-up the controllers
         setControllerConfig(system, players_controllers, CEMU_PROFILES_DIR)

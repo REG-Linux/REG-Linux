@@ -4,9 +4,46 @@
 # or to give feedback about state of EmulationStation and active EMULATORS
 # or to give some basic info about your build
 
+# Logging function
+function log_message() {
+    # Only log to system log if running with appropriate privileges
+    if [[ $EUID -eq 0 ]]; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> /var/log/reglinux-swissknife.log
+    else
+        # For non-root users, log to a user-accessible location
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> /tmp/reglinux-swissknife.log
+    fi
+}
+
+# Check if running as root for critical operations
+function check_privileges() {
+    if [[ $EUID -ne 0 && ($1 == "--shutdown" || $1 == "--reboot" || $1 == "--remount") ]]; then
+        echo "Error: This operation requires root privileges."
+        exit 1
+    fi
+}
+
+# Validate directory exists and is accessible
+function validate_directory() {
+    local dir="$1"
+    if [[ ! -d "$dir" ]]; then
+        echo "Error: directory '$dir' not found!"
+        exit 1
+    fi
+}
+
+# Validate file exists and is accessible
+function validate_file() {
+    local file="$1"
+    if [[ ! -f "$file" ]]; then
+        echo "Error: file '$file' not found!"
+        exit 1
+    fi
+}
+
 # Get all childpids from calling process
 function getcpid() {
-local cpids="$(pgrep -P $1)"
+    local cpids="$(pgrep -P $1)"
     for cpid in $cpids; do
         pidarray+=($cpid)
         getcpid $cpid
@@ -19,11 +56,20 @@ function smart_wait() {
     local PID=$2
     local disablekill9=$1
     local watchdog=0
+
+    # Validate PID exists before waiting
+    if [[ ! -e /proc/$PID ]]; then
+        return 0
+    fi
+
     sleep 1
     while [[ -e /proc/$PID ]]; do
         sleep 0.25
         ((watchdog++))
-        [[ $disablekill9 -eq 1 ]] && [[ watchdog -gt 12 ]] && kill -9 $PID
+        [[ $disablekill9 -eq 1 ]] && [[ watchdog -gt 12 ]] && {
+            log_message "Force killing process $PID after timeout"
+            kill -9 $PID
+        }
         [[ watchdog -gt 12 ]] && return
     done
 }
@@ -43,35 +89,65 @@ function check_esrun() {
 # Wine processes currently running?
 function check_winerun() {
     local EXE=$1
-    local ES_PID="$(pgrep -f -n $EXE)"
-    echo $ES_PID
+    local WINE_PID="$(pgrep -f -n "$EXE")"
+    echo $WINE_PID
 }
 
 # Kill emulators running in a proper way! (SAVE SRM STATE!)
 function emu_kill() {
     RC_PID=$(check_emurun)
     if [[ -n $RC_PID ]]; then
-        getcpid $RC_PID
-        for ((z=${#pidarray[*]}-1; z>-1; z--)); do
-            kill ${pidarray[z]}
-            smart_wait 1 ${pidarray[z]}
-        done
-        unset pidarray
+        # Verify this is actually an emulator process before killing
+        if ps -p $RC_PID > /dev/null; then
+            declare -a pidarray
+            getcpid $RC_PID
+            for ((z=${#pidarray[*]}-1; z>-1; z--)); do
+                if ps -p ${pidarray[z]} > /dev/null; then
+                    log_message "Terminating process ${pidarray[z]}"
+                    kill ${pidarray[z]}
+                    smart_wait 1 ${pidarray[z]}
+                fi
+            done
+            unset pidarray
+        fi
     fi
     WINE_PID=$(check_winerun winedevice.exe)
     if [[ -n $WINE_PID ]]; then
+        # Only kill wine processes that are actually related to emulated games
+        local running_processes=$(pgrep -f "wineserver\|winedevice.exe\|plugplay.exe\|svchost.exe\|tabtip.exe\|services.exe\|explorer.exe\|rpcss.exe")
+        if [[ -n "$running_processes" ]]; then
             for P in winedevice.exe plugplay.exe svchost.exe tabtip.exe services.exe explorer.exe rpcss.exe wineserver ; do
-                # the usual (gentle) way keeps Zombie processes, blame wine.
-                killall -9 "$P" 2>/dev/null
+                # Verify process is actually running before killing
+                if pgrep -x "$P" > /dev/null; then
+                    log_message "Force killing wine process: $P"
+                    killall -9 "$P" 2>/dev/null
+                fi
             done
+        fi
+    fi
+}
+
+# Verify service script exists and is executable before running
+function verify_service_script() {
+    local service_script="$1"
+    if [[ ! -f "$service_script" || ! -x "$service_script" ]]; then
+        echo "Error: Service script $service_script not found or not executable!"
+        exit 1
     fi
 }
 
 # ---- MAINS ----
 
+# Log script execution
+log_message "Script executed with arguments: $*"
+
+# Check for required privileges early
+check_privileges "$1"
+
 case ${1,,} in
     --restart)
         ES_PID=$(check_esrun)
+        verify_service_script "/etc/init.d/S31emulationstation"
         /etc/init.d/S31emulationstation stop
         [[ -z $ES_PID ]] || smart_wait 0 $ES_PID
         /etc/init.d/S31emulationstation start
@@ -94,10 +170,12 @@ case ${1,,} in
         [[ -n $RC_PID ]] && emu_kill && sleep 2
 
         ES_PID=$(check_esrun)
-        if [[ "${1,,}" == "--shutdown" && -n $ES_PID ]]; then
+        if [ "${1,,}" = "--shutdown" ] && [ -n "$ES_PID" ]; then
+            verify_service_script "/etc/init.d/S31emulationstation"
             /etc/init.d/S31emulationstation stop
             shutdown -h now
-        elif [[ "${1,,}" == "--reboot" && -n $ES_PID ]]; then
+        elif [ "${1,,}" = "--reboot" ] && [ -n "$ES_PID" ]; then
+            verify_service_script "/etc/init.d/S31emulationstation"
             /etc/init.d/S31emulationstation stop
             reboot
         fi
@@ -138,46 +216,83 @@ case ${1,,} in
     --remount)
         mount_dir="$2"
         [[ -z "$mount_dir" ]] && mount_dir="/boot"
-        ! [[ -d "$mount_dir" ]] && echo "Error: directory '$mount_dir' not found!" && exit 1
+        validate_directory "$mount_dir"
         if ! [[ -w "$mount_dir" ]]; then
             echo "Directory '$mount_dir' is locked... Set it as writeable now!"
-            mount -o remount,rw "$mount_dir" || echo "Error! Directory state not changed!"
+            mount -o remount,rw "$mount_dir" || {
+                echo "Error! Directory state not changed!"
+                log_message "Failed to remount $mount_dir as writable"
+                exit 1
+            }
+            log_message "Successfully remounted $mount_dir as writable"
         else
             echo "Directory '$mount_dir' is writeable... Set it to lock!"
-            mount -o remount,ro "$mount_dir" || echo "Error! Directory state not changed!"
+            mount -o remount,ro "$mount_dir" || {
+                echo "Error! Directory state not changed!"
+                log_message "Failed to remount $mount_dir as read-only"
+                exit 1
+            }
+            log_message "Successfully remounted $mount_dir as read-only"
         fi
     ;;
     --overlay)
-        [[ -f /boot/boot/overlay ]] && echo "Overlay available in /boot/boot/overlay" || { echo "Overlay file not found!"; exit 1; }
+        validate_file "/boot/boot/overlay"
+        echo "Overlay available in /boot/boot/overlay"
         read -p "Do you want to backup overlay file (y/n)? " yn
         case ${yn:0:1} in
             y|Y)
                 BA_OVERLAY="$HOME/$(date +%y%m%d-%s)-overlay.zip"
-                zip -j "$BA_OVERLAY" /boot/boot/overlay || exit 1
-                echo "Created backup to: $BA_OVERLAY"
-                echo "To restore: 'unzip $BA_OVERLAY -d /boot/boot'"
+                if zip -j "$BA_OVERLAY" /boot/boot/overlay; then
+                    echo "Created backup to: $BA_OVERLAY"
+                    echo "To restore: 'unzip $BA_OVERLAY -d /boot/boot'"
+                    log_message "Overlay backup created at $BA_OVERLAY"
+                else
+                    echo "Error creating backup!"
+                    log_message "Failed to create overlay backup"
+                    exit 1
+                fi
            ;;
             *)
                echo "Nothing done!"
+               log_message "Overlay backup cancelled by user"
         esac
     ;;
     --reset-ra)
         if [[ -d "$HOME/configs/retroarch" ]]; then
-            rm -rf $HOME/configs/retroarch
-            echo "Deleted: dir $HOME/configs/retroarch"
+            if rm -rf "$HOME/configs/retroarch"; then
+                echo "Deleted: dir $HOME/configs/retroarch"
+                log_message "Deleted directory: $HOME/configs/retroarch"
+            else
+                echo "Error deleting: dir $HOME/configs/retroarch"
+                log_message "Failed to delete directory: $HOME/configs/retroarch"
+                exit 1
+            fi
         fi
         if [[ -d "$HOME/.config/retroarch" ]]; then
-            rm -rf $HOME/.config/retroarch
-            echo "Deleted: dir $HOME/.config/retroarch"
+            if rm -rf "$HOME/.config/retroarch"; then
+                echo "Deleted: dir $HOME/.config/retroarch"
+                log_message "Deleted directory: $HOME/.config/retroarch"
+            else
+                echo "Error deleting: dir $HOME/.config/retroarch"
+                log_message "Failed to delete directory: $HOME/.config/retroarch"
+                exit 1
+            fi
         fi
         read -p "Do you want to reset RetroArch parameters for 'system.conf' file (y/n)? " yn
         case ${yn:0:1} in
             y|Y)
                 echo "Reseting RetroArch parameter in 'system.conf'"
-                sed -i '/^global.retroarch.*/d' $HOME/system.conf
+                if sed -i '/^global.retroarch.*/d' "$HOME/system.conf"; then
+                    log_message "Reset RetroArch parameters in system.conf"
+                else
+                    echo "Error resetting RetroArch parameters!"
+                    log_message "Failed to reset RetroArch parameters in system.conf"
+                    exit 1
+                fi
             ;;
         esac
         echo "All done! -- Please reboot"
+        log_message "RetroArch reset completed"
     ;;
     *)
         cat <<-_EOF_
@@ -207,3 +322,5 @@ case ${1,,} in
     ;;
 
 esac
+
+log_message "Script execution completed"

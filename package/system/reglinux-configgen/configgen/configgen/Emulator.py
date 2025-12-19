@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from os import path
 import yaml
 from yaml import CLoader as Loader
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Optional, List
 
 try:
     from typing import TypedDict
@@ -311,7 +311,7 @@ class Emulator:
             systems_default = yaml.load(f, Loader=Loader)
 
         # Load architecture-specific configuration if available
-        systems_default_arch = {}
+        systems_default_arch: Dict[str, Any] = {}
         if path.exists(defaultarchyml):
             with open(defaultarchyml, "r") as f:
                 systems_default_arch = yaml.load(f, Loader=Loader) or {}
@@ -330,7 +330,7 @@ class Emulator:
             Emulator.dict_merge(dict_all, systems_default[system])
 
         if system in systems_default_arch:
-            Emulator.dict_merge(dict_all, systems_default_arch[system])
+            Emulator.dict_merge(dict_all, systems_default_arch[system])  # type: ignore
 
         return dict_all
 

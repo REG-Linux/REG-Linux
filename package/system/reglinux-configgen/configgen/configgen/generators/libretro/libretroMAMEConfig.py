@@ -714,14 +714,18 @@ def generateMAMEPadConfig(
         try:
             config = minidom.parse(configFile)
         except xml.parsers.expat.ExpatError as e:
-            eslog.warning(f"Invalid XML in MAME config file {configFile}: {e}. Reinitializing file.")
-            pass  # reinit the file
+            eslog.warning(
+                f"Invalid XML in MAME config file {configFile}: {e}. Reinitializing file."
+            )
+            config = minidom.Document()  # Reinitialize on parse error
         except FileNotFoundError:
             eslog.warning(f"MAME config file not found: {configFile}")
-            pass  # reinit the file
+            config = minidom.Document()  # Reinitialize if file not found
         except Exception as e:
-            eslog.warning(f"Error parsing MAME config file {configFile}: {e}. Reinitializing file.")
-            pass  # reinit the file
+            eslog.warning(
+                f"Error parsing MAME config file {configFile}: {e}. Reinitializing file."
+            )
+            config = minidom.Document()  # Reinitialize on any error
 
     if system.isOptSet("customcfg"):
         customCfg = system.getOptBoolean("customcfg")
@@ -864,13 +868,17 @@ def generateMAMEPadConfig(
             try:
                 config_alt = minidom.parse(configFile_alt)
             except xml.parsers.expat.ExpatError as e:
-                eslog.warning(f"Invalid XML in MAME alt config file {configFile_alt}: {e}. Reinitializing file.")
+                eslog.warning(
+                    f"Invalid XML in MAME alt config file {configFile_alt}: {e}. Reinitializing file."
+                )
                 pass  # reinit the file
             except FileNotFoundError:
                 eslog.warning(f"MAME alt config file not found: {configFile_alt}")
                 pass  # reinit the file
             except Exception as e:
-                eslog.warning(f"Error parsing MAME alt config file {configFile_alt}: {e}. Reinitializing file.")
+                eslog.warning(
+                    f"Error parsing MAME alt config file {configFile_alt}: {e}. Reinitializing file."
+                )
                 pass  # reinit the file
 
         perGameCfg = system.getOptBoolean("pergamecfg")
