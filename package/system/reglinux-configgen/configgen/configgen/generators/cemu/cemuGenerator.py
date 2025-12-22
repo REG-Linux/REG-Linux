@@ -3,10 +3,8 @@ from configgen.Command import Command
 import xml.parsers.expat
 from codecs import open
 from xml.dom import minidom
-import xml.etree.ElementTree as ET
 from os import path, mkdir, linesep
 from glob import iglob, escape
-from configgen.controllers import generate_sdl_controller_config
 from .cemuControllers import setControllerConfig
 from .cemuConfig import (
     CEMU_BIN_PATH,
@@ -75,9 +73,6 @@ class CemuGenerator(Generator):
         setCemuConfig(cemuConfig, system)
 
         # Save the config file
-        xml_file = open(CEMU_CONFIG_PATH, "w")
-
-        # TODO: python 3 - workaround to encode files in utf-8
         xml_file = open(CEMU_CONFIG_PATH, "w", "utf-8")
         dom_string = linesep.join(
             [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()]
@@ -90,11 +85,4 @@ class CemuGenerator(Generator):
 
         command_array = [CEMU_BIN_PATH, "-f", "--force-no-menubar", "-g", rpxrom]
 
-        return Command(
-            array=command_array,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
-            },
-        )
+        return Command(array=command_array)
