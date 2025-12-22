@@ -1,5 +1,8 @@
 import logging
 import sys
+import os
+from typing import Optional
+from logging.handlers import RotatingFileHandler
 
 
 class MaxLevelFilter(logging.Filter):
@@ -11,30 +14,155 @@ class MaxLevelFilter(logging.Filter):
         return record.levelno < self.max_level
 
 
+class LoggerManager:
+    """
+    Enhanced logger manager with additional configuration options.
+    """
+
+    _instances = {}
+
+    def __new__(cls, module_name: str):
+        if module_name not in cls._instances:
+            cls._instances[module_name] = super().__new__(cls)
+        return cls._instances[module_name]
+
+    def __init__(self, module_name: str):
+        self.module_name = module_name
+        self.logger = logging.getLogger(module_name)
+        # Prevent duplicate initialization
+        if hasattr(self, "_initialized"):
+            return
+        self._initialized = True
+
+    def setup_logger(
+        self,
+        level: int = logging.DEBUG,
+        fmt: str = "%(asctime)s %(levelname)s (%(filename)s:%(lineno)d):%(funcName)s %(message)s",
+        enable_file_logging: bool = False,
+        log_file_path: Optional[str] = None,
+        max_file_size: int = 10 * 1024 * 1024,  # 10MB
+        backup_count: int = 3,
+        enable_stdout: bool = True,
+        enable_stderr: bool = True,
+    ) -> logging.Logger:
+        """
+        Setup logger with various configuration options.
+
+        Args:
+            level: Logging level (default: DEBUG)
+            fmt: Log format string
+            enable_file_logging: Enable logging to file
+            log_file_path: Path to log file (default: /tmp/module_name.log)
+            max_file_size: Maximum file size before rotation (in bytes)
+            backup_count: Number of backup files to keep
+            enable_stdout: Enable stdout handler
+            enable_stderr: Enable stderr handler
+        """
+        formatter = logging.Formatter(fmt)
+
+        # Clear existing handlers to prevent duplicates
+        if self.logger.hasHandlers():
+            self.logger.handlers.clear()
+
+        self.logger.setLevel(level)
+
+        # Setup stdout handler for lower level logs
+        if enable_stdout:
+            error_level = logging.WARNING
+            stdout_handler = logging.StreamHandler(sys.stdout)
+            stdout_handler.setFormatter(formatter)
+            stdout_handler.setLevel(logging.DEBUG)
+            stdout_handler.addFilter(MaxLevelFilter(error_level))
+            self.logger.addHandler(stdout_handler)
+
+        # Setup stderr handler for error logs
+        if enable_stderr:
+            stderr_handler = logging.StreamHandler(sys.stderr)
+            stderr_handler.setFormatter(formatter)
+            stderr_handler.setLevel(logging.WARNING)
+            self.logger.addHandler(stderr_handler)
+
+        # Setup file handler with rotation
+        if enable_file_logging:
+            if not log_file_path:
+                log_file_path = f"/tmp/{self.module_name}.log"
+
+            # Create directory if it doesn't exist
+            log_dir = os.path.dirname(log_file_path)
+            if log_dir and not os.path.exists(log_dir):
+                os.makedirs(log_dir, exist_ok=True)
+
+            file_handler = RotatingFileHandler(
+                log_file_path, maxBytes=max_file_size, backupCount=backup_count
+            )
+            file_handler.setFormatter(formatter)
+            file_handler.setLevel(level)
+            self.logger.addHandler(file_handler)
+
+        return self.logger
+
+
 def get_logger(
     module_name: str,
     level: int = logging.DEBUG,
     fmt: str = "%(asctime)s %(levelname)s (%(filename)s:%(lineno)d):%(funcName)s %(message)s",
+    enable_file_logging: bool = False,
+    log_file_path: Optional[str] = None,
+    max_file_size: int = 10 * 1024 * 1024,  # 10MB
+    backup_count: int = 3,
+    enable_stdout: bool = True,
+    enable_stderr: bool = True,
 ) -> logging.Logger:
-    error_level = logging.WARNING
-    formatter = logging.Formatter(fmt)
+    """
+    Get a configured logger instance.
 
-    stdout = logging.StreamHandler(sys.stdout)
-    stdout.setFormatter(formatter)
-    stdout.setLevel(logging.DEBUG)
-    stdout.addFilter(MaxLevelFilter(error_level))
+    Args:
+        module_name: Name of the module requesting the logger
+        level: Logging level (default: DEBUG)
+        fmt: Log format string
+        enable_file_logging: Enable logging to file
+        log_file_path: Path to log file (default: /tmp/module_name.log)
+        max_file_size: Maximum file size before rotation (in bytes)
+        backup_count: Number of backup files to keep
+        enable_stdout: Enable stdout handler
+        enable_stderr: Enable stderr handler
 
-    stderr = logging.StreamHandler(sys.stderr)
-    stderr.setFormatter(formatter)
-    stderr.setLevel(error_level)
+    Returns:
+        Configured logger instance
+    """
+    logger_manager = LoggerManager(module_name)
+    return logger_manager.setup_logger(
+        level=level,
+        fmt=fmt,
+        enable_file_logging=enable_file_logging,
+        log_file_path=log_file_path,
+        max_file_size=max_file_size,
+        backup_count=backup_count,
+        enable_stdout=enable_stdout,
+        enable_stderr=enable_stderr,
+    )
 
-    logger = logging.getLogger(module_name)
-    logger.setLevel(level)
 
-    if logger.hasHandlers():
-        logger.handlers.clear()
+def set_global_log_level(level: int):
+    """
+    Set the global log level for all loggers.
 
-    logger.addHandler(stdout)
-    logger.addHandler(stderr)
+    Args:
+        level: Logging level to set globally
+    """
+    logging.getLogger().setLevel(level)
 
-    return logger
+
+def add_log_context(logger: logging.Logger, **context) -> logging.LoggerAdapter:
+    """
+    Add contextual information to a logger.
+
+    Args:
+        logger: Base logger to add context to
+        **context: Context key-value pairs
+
+    Returns:
+        LoggerAdapter with context
+    """
+    adapter = logging.LoggerAdapter(logger, context)
+    return adapter
