@@ -1,5 +1,5 @@
 from os import path, mkdir, remove
-from xml.etree.cElementTree import SubElement, Element, ElementTree, indent
+from xml.etree.ElementTree import SubElement, Element, ElementTree, indent
 
 
 def setControllerConfig(system, playersControllers, profilesDir):
@@ -148,8 +148,7 @@ def setControllerConfig(system, playersControllers, profilesDir):
     # cemu assign pads by uuid then by index with the same uuid
     # so, if 2 pads have the same uuid, the index is not 0 but 1 for the 2nd one
     # sort pads by index
-    pads_by_index = playersControllers
-    dict(sorted(pads_by_index.items(), key=lambda kv: kv[1].index))
+    pads_by_index = dict(sorted(playersControllers.items(), key=lambda kv: kv[1].index))
     guid_n = {}
     guid_count = {}
     for playercontroller, pad in pads_by_index.items():
@@ -160,7 +159,7 @@ def setControllerConfig(system, playersControllers, profilesDir):
         guid_n[pad.index] = guid_count[pad.guid]
     ###
 
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for playercontroller, pad in pads_by_index.items():
         root = Element("emulated_controller")
 
         # Set type from controller combination

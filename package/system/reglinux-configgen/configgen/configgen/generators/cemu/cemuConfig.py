@@ -233,14 +233,12 @@ def setCemuConfig(cemuConfig, system):
     proc = run(["/usr/bin/cemu/get-audio-device"], stdout=PIPE)
     cemuAudioDevice = proc.stdout.decode("utf-8")
     eslog.debug("*** audio device = {} ***".format(cemuAudioDevice))
-    if (
-        system.isOptSet("cemu_audio_config")
-        and system.getOptBoolean("cemu_audio_config")
+    if system.isOptSet("cemu_audio_config") and system.getOptBoolean(
+        "cemu_audio_config"
     ):
         setSectionConfig(cemuConfig, audio_root, "TVDevice", cemuAudioDevice)
-    elif (
-        system.isOptSet("cemu_audio_config")
-        and not system.getOptBoolean("cemu_audio_config")
+    elif system.isOptSet("cemu_audio_config") and not system.getOptBoolean(
+        "cemu_audio_config"
     ):
         # don't change the config setting
         eslog.debug("*** use config audio device ***")
@@ -249,7 +247,7 @@ def setCemuConfig(cemuConfig, system):
 
 
 # Show mouse for touchscreen actions
-def getMouseMode(self, config, rom):
+def getMouseMode(config, rom):
     if "cemu_touchpad" in config and config["cemu_touchpad"] == "1":
         return True
     else:
