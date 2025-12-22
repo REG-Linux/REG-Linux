@@ -1,8 +1,8 @@
-import logging
 from pathlib import Path
 from configparser import ConfigParser
 from io import StringIO
 from typing import Any, Optional, Union, Dict
+from configgen.utils.logger import get_logger
 
 
 class UnixSettings:
@@ -45,9 +45,7 @@ class UnixSettings:
         )  # Convert filepath to Path object for consistent handling
         self.separator = separator  # Separator for key-value pairs in the file
         self.comment = comment  # Comment character for the configuration file
-        self._logger = logging.getLogger(
-            f"{__name__}.UnixSettings"
-        )  # Logger for this class
+        self._logger = get_logger(f"{__name__}.UnixSettings")  # Logger for this class
         self._had_section = False  # Flag to track if the file contains section headers
         self._initialize_config()  # Initialize the ConfigParser
 
