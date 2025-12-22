@@ -4,13 +4,15 @@ from shutil import copytree, copy2
 from configparser import ConfigParser
 from re import match
 from os import path, makedirs
+
 try:
     from ruamel.yaml import YAML
 except ImportError:
-    print("ruamel.yaml module not found. Please install it with: pip install ruamel.yaml")
+    print(
+        "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml"
+    )
     raise
 from subprocess import check_output, CalledProcessError
-from configgen.controllers import generate_sdl_controller_config
 from .rpcs3Controllers import generateControllerConfig
 from .rpcs3Config import (
     RPCS3_ICON_TARGET_DIR,
@@ -114,22 +116,20 @@ class Rpcs3Generator(Generator):
                 rpcs3ymlconfig["Core"]["Accurate xfloat"] = False
                 rpcs3ymlconfig["Core"]["Approximate xfloat"] = False
         # Set the Default Core Values we need
-        # Force to True for now to account for updates where exiting config file present. (True results in less stutter when a SPU module is in cache)
-        rpcs3ymlconfig["Core"]["SPU Cache"] = (
-            True  # When SPU Cache is True, game performance decreases signficantly. Force it to off. (Depreciated)
-        )
+        # SPU Cache - disabled by default for better performance
+        rpcs3ymlconfig["Core"]["SPU Cache"] = False
         # Preferred SPU Threads
         if system.isOptSet("rpcs3_sputhreads"):
-            rpcs3ymlconfig["Core"]["Preferred SPU Threads"] = system.config[
-                "rpcs3_sputhreads"
-            ]
+            rpcs3ymlconfig["Core"]["Preferred SPU Threads"] = int(
+                system.config["rpcs3_sputhreads"]
+            )
         else:
             rpcs3ymlconfig["Core"]["Preferred SPU Threads"] = 0
         # SPU Loop Detection
         if system.isOptSet("rpcs3_spuloopdetection"):
-            rpcs3ymlconfig["Core"]["SPU loop detection"] = system.config[
+            rpcs3ymlconfig["Core"]["SPU loop detection"] = system.getOptBoolean(
                 "rpcs3_spuloopdetection"
-            ]
+            )
         else:
             rpcs3ymlconfig["Core"]["SPU loop detection"] = False
         # SPU Block Size
@@ -142,9 +142,9 @@ class Rpcs3Generator(Generator):
         # Max Power Saving CPU-Preemptions
         # values are maximum yields per frame threshold
         if system.isOptSet("rpcs3_maxcpu_preemptcount"):
-            rpcs3ymlconfig["Core"]["Max CPU Preempt Count"] = system.config[
-                "rpcs3_maxcpu_preemptcount"
-            ]
+            rpcs3ymlconfig["Core"]["Max CPU Preempt Count"] = int(
+                system.config["rpcs3_maxcpu_preemptcount"]
+            )
         else:
             rpcs3ymlconfig["Core"]["Max CPU Preempt Count"] = 0
 
@@ -236,6 +236,7 @@ class Rpcs3Generator(Generator):
                 rpcs3ymlconfig["Video"]["Renderer"] = "OpenGL"
         except CalledProcessError:
             eslog.debug("Error checking for discrete GPU.")
+
         # System aspect ratio (the setting in the PS3 system itself, not the displayed ratio) a.k.a. TV mode.
         if system.isOptSet("rpcs3_ratio"):
             rpcs3ymlconfig["Video"]["Aspect ratio"] = system.config["rpcs3_ratio"]
@@ -251,14 +252,14 @@ class Rpcs3Generator(Generator):
             rpcs3ymlconfig["Video"]["Shader Mode"] = "Async Shader Recompiler"
         # Vsync
         if system.isOptSet("rpcs3_vsync"):
-            rpcs3ymlconfig["Video"]["VSync"] = system.config["rpcs3_vsync"]
+            rpcs3ymlconfig["Video"]["VSync"] = system.getOptBoolean("rpcs3_vsync")
         else:
             rpcs3ymlconfig["Video"]["VSync"] = False
         # Stretch to display area
         if system.isOptSet("rpcs3_stretchdisplay"):
-            rpcs3ymlconfig["Video"]["Stretch To Display Area"] = system.config[
+            rpcs3ymlconfig["Video"]["Stretch To Display Area"] = system.getOptBoolean(
                 "rpcs3_stretchdisplay"
-            ]
+            )
         else:
             rpcs3ymlconfig["Video"]["Stretch To Display Area"] = False
         # Frame Limit
@@ -272,32 +273,32 @@ class Rpcs3Generator(Generator):
                 ]
                 rpcs3ymlconfig["Video"]["Second Frame Limit"] = 0
             else:
-                rpcs3ymlconfig["Video"]["Second Frame Limit"] = system.config[
-                    "rpcs3_framelimit"
-                ]
+                rpcs3ymlconfig["Video"]["Second Frame Limit"] = float(
+                    system.config["rpcs3_framelimit"]
+                )
                 rpcs3ymlconfig["Video"]["Frame limit"] = "Off"
         else:
             rpcs3ymlconfig["Video"]["Frame limit"] = "Auto"
             rpcs3ymlconfig["Video"]["Second Frame Limit"] = 0
         # Write Color Buffers
         if system.isOptSet("rpcs3_colorbuffers"):
-            rpcs3ymlconfig["Video"]["Write Color Buffers"] = system.config[
+            rpcs3ymlconfig["Video"]["Write Color Buffers"] = system.getOptBoolean(
                 "rpcs3_colorbuffers"
-            ]
+            )
         else:
             rpcs3ymlconfig["Video"]["Write Color Buffers"] = False
         # Disable Vertex Cache
         if system.isOptSet("rpcs3_vertexcache"):
-            rpcs3ymlconfig["Video"]["Disable Vertex Cache"] = system.config[
+            rpcs3ymlconfig["Video"]["Disable Vertex Cache"] = system.getOptBoolean(
                 "rpcs3_vertexcache"
-            ]
+            )
         else:
             rpcs3ymlconfig["Video"]["Disable Vertex Cache"] = False
         # Anisotropic Filtering
         if system.isOptSet("rpcs3_anisotropic"):
-            rpcs3ymlconfig["Video"]["Anisotropic Filter Override"] = system.config[
-                "rpcs3_anisotropic"
-            ]
+            rpcs3ymlconfig["Video"]["Anisotropic Filter Override"] = int(
+                system.config["rpcs3_anisotropic"]
+            )
         else:
             rpcs3ymlconfig["Video"]["Anisotropic Filter Override"] = 0
         # MSAA
@@ -329,9 +330,9 @@ class Rpcs3Generator(Generator):
             rpcs3ymlconfig["Video"]["Resolution"] = "1280x720"
         # Resolution scaling
         if system.isOptSet("rpcs3_resolution_scale"):
-            rpcs3ymlconfig["Video"]["Resolution Scale"] = system.config[
-                "rpcs3_resolution_scale"
-            ]
+            rpcs3ymlconfig["Video"]["Resolution Scale"] = int(
+                system.config["rpcs3_resolution_scale"]
+            )
         else:
             rpcs3ymlconfig["Video"]["Resolution Scale"] = "100"
         # Output Scaling
@@ -343,21 +344,23 @@ class Rpcs3Generator(Generator):
             rpcs3ymlconfig["Video"]["Output Scaling Mode"] = "Bilinear"
         # Number of Shader Compilers
         if system.isOptSet("rpcs3_num_compilers"):
-            rpcs3ymlconfig["Video"]["Shader Compiler Threads"] = system.config[
-                "rpcs3_num_compilers"
-            ]
+            rpcs3ymlconfig["Video"]["Shader Compiler Threads"] = int(
+                system.config["rpcs3_num_compilers"]
+            )
         else:
             rpcs3ymlconfig["Video"]["Shader Compiler Threads"] = 0
         # Multithreaded RSX
         if system.isOptSet("rpcs3_rsx"):
-            rpcs3ymlconfig["Video"]["Multithreaded RSX"] = system.config["rpcs3_rsx"]
+            rpcs3ymlconfig["Video"]["Multithreaded RSX"] = system.getOptBoolean(
+                "rpcs3_rsx"
+            )
         else:
             rpcs3ymlconfig["Video"]["Multithreaded RSX"] = False
         # Async Texture Streaming
         if system.isOptSet("rpcs3_async_texture"):
-            rpcs3ymlconfig["Video"]["Asynchronous Texture Streaming 2"] = system.config[
-                "rpcs3_async_texture"
-            ]
+            rpcs3ymlconfig["Video"]["Asynchronous Texture Streaming 2"] = (
+                system.getOptBoolean("rpcs3_async_texture")
+            )
         else:
             rpcs3ymlconfig["Video"]["Asynchronous Texture Streaming 2"] = False
 
@@ -474,14 +477,7 @@ class Rpcs3Generator(Generator):
             if path.exists(RPCS3_PS3UPDAT_PATH):
                 command_array = [RPCS3_BIN_PATH, "--installfw", RPCS3_PS3UPDAT_PATH]
 
-        return Command(
-            array=command_array,
-            env={
-                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
-            },
-        )
+        return Command(array=command_array)
 
 
 def getClosestRatio(game_resolution):
@@ -492,7 +488,7 @@ def getClosestRatio(game_resolution):
         return (16, 9)
 
 
-def get_in_game_ratio(self, config, game_resolution, rom):
+def get_in_game_ratio(config, game_resolution, rom):
     return 16 / 9
 
 
