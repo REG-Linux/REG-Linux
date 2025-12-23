@@ -1,0 +1,32 @@
+--- a/Externals/cpp-ipc/cpp-ipc/CMakeLists.txt	2025-12-22 04:55:27.000000000 +0100
++++ b/Externals/cpp-ipc/cpp-ipc/CMakeLists.txt	2025-12-23 00:48:17.910414502 +0100
+@@ -38,7 +38,7 @@
+ set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/bin)
+ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+ set(LIBIPC_PROJECT_DIR     ${PROJECT_SOURCE_DIR})
+-
++set(LIBIPC_INCLUDE_DIR	   ${PROJECT_SOURCE_DIR}/include)
+ # Unicode Support
+ add_definitions(-DUNICODE -D_UNICODE)
+ 
+--- a/Source/Core/Core/CMakeLists.txt	2025-12-23 00:50:30.966522456 +0100
++++ b/Source/Core/Core/CMakeLists.txt	2025-12-23 00:51:38.847796030 +0100
+@@ -803,6 +803,7 @@
+ 
+ if(WIN32 OR LINUX)
+   target_sources(core PRIVATE HW/EXI/BBA/IPC.cpp)
++  target_include_directories(core PRIVATE ${LIBIPC_INCLUDE_DIR})
+   target_link_libraries(core PRIVATE cpp-ipc::ipc)
+ endif()
+ 
+--- a/CMakeLists.txt	2025-12-23 01:03:15.443417446 +0100
++++ b/CMakeLists.txt	2025-12-23 01:00:05.681234719 +0100
+@@ -30,7 +30,7 @@
+ 
+ project(dolphin-emu)
+ 
+-if (CMAKE_VERSION VERSION_LESS "3.25" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
++if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+   set(LINUX TRUE)
+ endif()
+ 

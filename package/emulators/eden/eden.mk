@@ -4,7 +4,7 @@
 #
 ################################################################################
 # Version: v0.0.4
-EDEN_VERSION = v0.0.4-rc3
+EDEN_VERSION = v0.0.4
 EDEN_SITE = https://git.eden-emu.dev/eden-emu/eden
 EDEN_SITE_METHOD=git
 EDEN_GIT_SUBMODULES=YES
