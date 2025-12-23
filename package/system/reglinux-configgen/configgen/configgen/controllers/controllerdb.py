@@ -99,14 +99,20 @@ def load_controller_config(controllersInput):
 
     for i, ci in enumerate(controllersInput):
         newController = _find_best_controller_config(
-            controllers, i, ci["guid"], ci["devicepath"]
+            controllers,
+            i,
+            ci["guid"],
+            ci["devicepath"],
+            ci["nbbuttons"],
+            ci["nbhats"],
+            ci["nbaxes"],
         )
         if newController:
             playerControllers[str(i + 1)] = newController
     return playerControllers
 
 
-def _find_best_controller_config(controllers, x, pxguid, pxdev):
+def _find_best_controller_config(controllers, x, pxguid, pxdev, pxbtns, pxhats, pxaxes):
     """
     Finds the best controller match in the loaded database by GUID and returns a Controller instance.
 
@@ -125,4 +131,7 @@ def _find_best_controller_config(controllers, x, pxguid, pxdev):
     controller_data = controller.copy()
     controller_data["index"] = x
     controller_data["dev"] = pxdev
+    controller_data["nbbuttons"] = pxbtns
+    controller_data["nbhats"] = pxhats
+    controller_data["nbaxes"] = pxaxes
     return Controller.from_dict(controller_data)
