@@ -68,14 +68,14 @@
      }
      if (current.get() == nullptr)
          return;
-@@ -396,7 +398,7 @@
+@@ -455,7 +455,7 @@
  
      currentBuf = 0;
  
 -    if (renderer != Renderer::OpenGL3 && renderer != Renderer::Vulkan) {
 +    if (renderer != Renderer::OpenGL3 /*&& renderer != Renderer::Vulkan*/) {
-         imagebufs = rendererWindow->getBuffers();
-         endblit();
+         imagebufs        = rendererWindow->getBuffers();
+         switchInProgress = false;
          emit rendererChanged();
 --- a/src/qt/qt_mainwindow.cpp	2024-07-27 12:49:33.561223257 +0200
 +++ b/src/qt/qt_mainwindow.cpp	2024-07-27 13:05:04.137542031 +0200
