@@ -18,18 +18,14 @@ def JoystickValue(key, pad, joy_max_inputs, new_axis_vals, invertAxis=False):
         value = 1 + (int(pad.index)) * joy_max_inputs + int(input.id)
 
     elif input.type == "hat":
+        input.id = input.id[-1]
         if new_axis_vals:
-            hatfirst = (
-                1
-                + (int(pad.index)) * joy_max_inputs
-                + int(pad.nbbuttons)
-                + 4 * int(input.id)
-            )
-            if input.value == "2":  # SDL_HAT_RIGHT
+            hatfirst = 1 + (int(pad.index)) * joy_max_inputs + int(pad.nbbuttons)
+            if input.id == "2":  # SDL_HAT_RIGHT
                 hatfirst += 3
-            elif input.value == "4":  # SDL_HAT_DOWN
+            elif input.id == "4":  # SDL_HAT_DOWN
                 hatfirst += 1
-            elif input.value == "8":  # SDL_HAT_LEFT
+            elif input.id == "8":  # SDL_HAT_LEFT
                 hatfirst += 2
         else:
             hatfirst = (
@@ -37,13 +33,12 @@ def JoystickValue(key, pad, joy_max_inputs, new_axis_vals, invertAxis=False):
                 + (int(pad.index)) * joy_max_inputs
                 + int(pad.nbbuttons)
                 + 2 * int(pad.nbaxes)
-                + 4 * int(input.id)
             )
-            if input.value == "2":  # SDL_HAT_RIGHT
+            if input.id == "2":  # SDL_HAT_RIGHT
                 hatfirst += 1
-            elif input.value == "4":  # SDL_HAT_DOWN
+            elif input.id == "4":  # SDL_HAT_DOWN
                 hatfirst += 2
-            elif input.value == "8":  # SDL_HAT_LEFT
+            elif input.id == "8":  # SDL_HAT_LEFT
                 hatfirst += 3
         value = hatfirst
 
@@ -56,9 +51,7 @@ def JoystickValue(key, pad, joy_max_inputs, new_axis_vals, invertAxis=False):
         )
         if new_axis_vals:
             axisfirst += int(pad.nbhats) * 4
-        if (invertAxis and int(input.value) < 0) or (
-            not invertAxis and int(input.value) > 0
-        ):
+        if invertAxis:
             axisfirst += 1
         value = axisfirst
 
@@ -83,6 +76,7 @@ def setupControllers(config, playersControllers, joy_max_inputs, new_axis_vals):
         ("y", "SPECIAL"),
         ("start", "START"),
         ("triggerleft", "SCREENSHOT"),
+        ("guide", "ESC"),
     ]
 
     # Analog axis mappings (axis_name, inverted, description)
