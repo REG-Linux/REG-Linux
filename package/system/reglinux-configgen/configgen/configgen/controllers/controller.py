@@ -140,9 +140,9 @@ class Controller:
     type: str = ""
     index: int = -1
     dev: Optional[Any] = None
-    nbaxes: Optional[int] = None
-    nbbuttons: Optional[int] = None
-    nbhats: Optional[int] = None
+    nbaxes: Optional[int] = 0
+    nbbuttons: Optional[int] = 0
+    nbhats: Optional[int] = 0
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Controller":
@@ -153,9 +153,9 @@ class Controller:
             type=data.get("type", ""),
             index=data.get("index", -1),
             dev=data.get("dev", None),
-            nbaxes=data.get("nbaxes", None),
-            nbbuttons=data.get("nbbuttons", None),
-            nbhats=data.get("nbhats", None),
+            nbaxes=data.get("nbaxes", 0),
+            nbbuttons=data.get("nbbuttons", 0),
+            nbhats=data.get("nbhats", 0),
         )
 
     def generate_sdl_game_db_line(self):
