@@ -1,7 +1,7 @@
 import json
-import logging
 from pathlib import Path
 from typing import Any, Optional, Dict
+from configgen.utils.logger import get_logger
 
 
 class JSONSettings:
@@ -27,9 +27,7 @@ class JSONSettings:
             filepath
         )  # Convert filepath to Path object for consistent handling
         self._data: dict[str, Any] = {}  # Internal dictionary to store JSON data
-        self._logger = logging.getLogger(
-            f"{__name__}.JSONSettings"
-        )  # Logger for this class
+        self._logger = get_logger(f"{__name__}.JSONSettings")  # Logger for this class
         if auto_load:
             self.load()  # Load the JSON file if auto_load is True
 
