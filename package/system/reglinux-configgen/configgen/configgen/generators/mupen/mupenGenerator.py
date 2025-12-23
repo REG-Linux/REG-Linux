@@ -25,7 +25,7 @@ class MupenGenerator(Generator):
                 makedirs(path.dirname(MUPEN_CONFIG_PATH))
             iniConfig.read(MUPEN_CONFIG_PATH)
 
-        setMupenConfig(iniConfig, system, players_controllers, game_resolution)
+        setMupenConfig(iniConfig, system, game_resolution)
 
         # Save the ini file
         if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
@@ -62,7 +62,7 @@ class MupenGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(self, config):
         if (
             "mupen64plus_ratio" in config and config["mupen64plus_ratio"] == "16/9"
         ) or (
