@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.8.114
+XEMU_VERSION = v0.8.121
 XEMU_SITE = $(call github,xemu-project,xemu,$(XEMU_VERSION))
 #XEMU_SITE_METHOD = git
 #XEMU_GIT_SUBMODULES = YES
