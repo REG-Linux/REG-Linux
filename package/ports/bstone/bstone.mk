@@ -3,8 +3,8 @@
 # bstone
 #
 ################################################################################
-# Version: Release 1.2.16 on May 14, 2025
-BSTONE_VERSION = v1.2.16
+# Version: Release 1.3.0 on Dec 21, 2025
+BSTONE_VERSION = v1.3.0
 BSTONE_SITE = $(call github,bibendovsky,bstone,$(BSTONE_VERSION))
 
 BSTONE_DEPENDENCIES = openal sdl2
