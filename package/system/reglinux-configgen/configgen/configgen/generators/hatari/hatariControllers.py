@@ -1,5 +1,6 @@
-from os import path, makedirs
 from configparser import ConfigParser
+from os import makedirs, path
+
 from .hatariConfig import HATARI_CONFIG_DIR, HATARI_CONFIG_PATH
 
 
@@ -26,7 +27,7 @@ def setHatariControllers(system, playersControllers):
             config.set(section, "nJoystickMode", "0")
 
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         if nplayer <= 5:
             section = "Joystick" + str(nplayer)
             if not config.has_section(section):

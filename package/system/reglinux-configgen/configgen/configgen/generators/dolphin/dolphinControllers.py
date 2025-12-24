@@ -1,10 +1,12 @@
-from os import path, remove
 from codecs import open
-from glob import glob
 from configparser import ConfigParser
+from glob import glob
+from os import path, remove
 from re import match
-from .dolphinConfig import DOLPHIN_CONFIG_DIR
+
 from configgen.utils.logger import get_logger
+
+from .dolphinConfig import DOLPHIN_CONFIG_DIR
 
 eslog = get_logger(__name__)
 
@@ -26,7 +28,7 @@ def generateControllerConfig(system, playersControllers, metadata, wheels, rom, 
             )  # You can use the gamecube pads on the wii together with wiimotes
         elif (
             system.isOptSet("emulatedwiimotes")
-            and system.getOptBoolean("emulatedwiimotes") == False
+            and not system.getOptBoolean("emulatedwiimotes")
         ):
             # Generate if hardcoded
             generateControllerConfig_realwiimotes("WiimoteNew.ini", "Wiimote")
@@ -35,7 +37,7 @@ def generateControllerConfig(system, playersControllers, metadata, wheels, rom, 
             )  # You can use the gamecube pads on the wii together with wiimotes
         elif (
             system.isOptSet("emulatedwiimotes")
-            and system.getOptBoolean("emulatedwiimotes") == True
+            and system.getOptBoolean("emulatedwiimotes")
         ):
             # Generate if hardcoded
             generateControllerConfig_emulatedwiimotes(
@@ -189,7 +191,7 @@ def generateControllerConfig_emulatedwiimotes(system, playersControllers, wheels
             system.isOptSet("controller_mode")
             and system.config["controller_mode"] == "in"
         )
-        or (system.isOptSet("dsmotion") and system.getOptBoolean("dsmotion") == True)
+        or (system.isOptSet("dsmotion") and system.getOptBoolean("dsmotion"))
     ):
         extraOptions["Extension"] = "Nunchuk"
         wiiMapping["l2"] = "Nunchuk/Buttons/C"
@@ -445,13 +447,11 @@ def generateControllerConfig_guns(filename, anyDefKey, metadata, guns, system, r
                         if mval in gunMapping:
                             for x in gunMapping:
                                 if gunMapping[x] == btn:
-                                    eslog.info("erasing {}".format(x))
+                                    eslog.info(f"erasing {x}")
                                     gunMapping[x] = ""
                         else:
                             eslog.info(
-                                "custom gun mapping ignored for {} => {} (invalid value)".format(
-                                    btn, mval
-                                )
+                                f"custom gun mapping ignored for {btn} => {mval} (invalid value)"
                             )
             # setting values
             for btn in gunButtons:
@@ -459,7 +459,7 @@ def generateControllerConfig_guns(filename, anyDefKey, metadata, guns, system, r
                     for mval in metadata["gun_" + btn].split(","):
                         if mval in gunMapping:
                             gunMapping[mval] = btn
-                            eslog.info("setting {} to {}".format(mval, btn))
+                            eslog.info(f"setting {mval} to {btn}")
 
             # write buttons
             for btn in dolphinMappingNames:
@@ -475,7 +475,7 @@ def generateControllerConfig_guns(filename, anyDefKey, metadata, guns, system, r
                                 )
                             )
                     else:
-                        eslog.debug("cannot map the button {}".format(gunMapping[btn]))
+                        eslog.debug(f"cannot map the button {gunMapping[btn]}")
                 f.write(dolphinMappingNames[btn] + " = `" + val + "`\n")
 
             # map ir
@@ -530,7 +530,7 @@ def generateHotkeys(playersControllers):
     }
 
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         if nplayer == 1:
             f.write("[Hotkeys1]" + "\n")
             f.write("Device = evdev/0/" + pad.name.strip() + "\n")
@@ -626,7 +626,7 @@ def generateControllerConfig_any(
     # In case of two pads having the same name, dolphin wants a number to handle this
     double_pads = dict()
 
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         # Handle x pads having the same name
         if pad.name.strip() in double_pads:
             nsamepad = double_pads[pad.name.strip()]
@@ -641,7 +641,7 @@ def generateControllerConfig_any(
 
         if (
             system.isOptSet("use_pad_profiles")
-            and system.getOptBoolean("use_pad_profiles") == True
+            and system.getOptBoolean("use_pad_profiles")
         ):
             if not generateControllerConfig_any_from_profiles(f, pad, system):
                 generateControllerConfig_any_auto(
@@ -696,7 +696,7 @@ def generateControllerConfig_wheel(f, pad, nplayer):
         "joystick1right": "Main Stick/Right",
     }
 
-    eslog.debug("configuring wheel for pad {}".format(pad.name))
+    eslog.debug(f"configuring wheel for pad {pad.name}")
 
     f.write(
         "Rumble/Motor = Constant\n"
@@ -841,7 +841,7 @@ def generateControllerConfig_any_auto(
                 None,
             )
         # DualShock Motion control
-        if system.isOptSet("dsmotion") and system.getOptBoolean("dsmotion") == True:
+        if system.isOptSet("dsmotion") and system.getOptBoolean("dsmotion"):
             f.write(
                 "IMUGyroscope/Pitch Up = `evdev/"
                 + str(nsamepad).strip()
@@ -928,13 +928,13 @@ def generateControllerConfig_any_auto(
                 + " Motion Sensors:Accel Y+`\n"
             )
         # Mouse to emulate Wiimote
-        if system.isOptSet("mouseir") and system.getOptBoolean("mouseir") == True:
+        if system.isOptSet("mouseir") and system.getOptBoolean("mouseir"):
             f.write("IR/Up = `Cursor Y-`\n")
             f.write("IR/Down = `Cursor Y+`\n")
             f.write("IR/Left = `Cursor X-`\n")
             f.write("IR/Right = `Cursor X+`\n")
         # Rumble option
-        if system.isOptSet("rumble") and system.getOptBoolean("rumble") == True:
+        if system.isOptSet("rumble") and system.getOptBoolean("rumble"):
             f.write("Rumble/Motor = Weak\n")
         # Deadzone setting
         if system.isOptSet(f"deadzone_{nplayer}"):
@@ -988,7 +988,7 @@ def generateControllerConfig_any_from_profiles(f, pad, system):
                         if key != "Device":
                             f.write(f"{key} = {val}\n")
                     return True
-        except (OSError, IOError, ValueError) as e:
+        except (OSError, ValueError) as e:
             eslog.error(f"profile {profileFile} : FAILED - {str(e)}")
 
     return False

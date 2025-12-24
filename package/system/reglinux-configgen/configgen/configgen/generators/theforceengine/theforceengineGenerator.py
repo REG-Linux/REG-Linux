@@ -1,8 +1,9 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from configparser import ConfigParser
-from os import path, makedirs
+from os import makedirs, path
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
 
 FORCE_CONFIG_DIR = CONF + "/theforceengine"
@@ -33,7 +34,7 @@ class TheForceEngineGenerator(Generator):
             mod_name = FORCE_PATCH_PATH
 
         # Open the .tfe rom file for user mods
-        with open(rom, "r") as file:
+        with open(rom) as file:
             # Read the first line and store it as 'first_line'
             first_line = file.readline().strip()
             # use the first_line as mod if the file isn't empty

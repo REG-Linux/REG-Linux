@@ -3,8 +3,9 @@ Controller class and related functions for managing game controller configuratio
 Provides functionality to generate SDL game controller configuration strings.
 """
 
-from typing import Dict, Optional, Any
 from dataclasses import dataclass, field
+from typing import Any, Optional
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -18,7 +19,7 @@ class Input:
     type: str
     id: str
     value: str
-    code: Optional[int] = None
+    code: int | None = None
 
     @classmethod
     def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Optional["Input"]:
@@ -75,7 +76,7 @@ class Input:
             # Additional hat metadata could be stored here if needed
         )
 
-    def sdl_to_linux_input_event(self, guide_equal_back) -> Optional[Dict[str, Any]]:
+    def sdl_to_linux_input_event(self, guide_equal_back) -> dict[str, Any] | None:
         """
         Converts SDL input mapping to a Linux input event structure with complete metadata.
 
@@ -136,23 +137,23 @@ class Input:
 class Controller:
     guid: str
     name: str = ""
-    inputs: Dict[str, Any] = field(default_factory=dict)
+    inputs: dict[str, Any] = field(default_factory=dict)
     type: str = ""
     index: int = -1
-    dev: Optional[Any] = None
-    nbaxes: Optional[int] = 0
-    nbbuttons: Optional[int] = 0
-    nbhats: Optional[int] = 0
+    dev: Any | None = None
+    nbaxes: int | None = 0
+    nbbuttons: int | None = 0
+    nbhats: int | None = 0
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Controller":
+    def from_dict(cls, data: dict[str, Any]) -> "Controller":
         return cls(
             guid=data.get("guid", ""),
             name=data.get("name", ""),
             inputs=data.get("inputs", {}),
             type=data.get("type", ""),
             index=data.get("index", -1),
-            dev=data.get("dev", None),
+            dev=data.get("dev"),
             nbaxes=data.get("nbaxes", 0),
             nbbuttons=data.get("nbbuttons", 0),
             nbhats=data.get("nbhats", 0),
@@ -173,7 +174,7 @@ def _generate_sdl_controller_config(controller: Controller) -> str:
     return ",".join(config)
 
 
-def generate_sdl_controller_config(controllers: Dict) -> str:
+def generate_sdl_controller_config(controllers: dict) -> str:
     """
     Generate SDL game controller configuration for multiple controllers.
 
@@ -189,7 +190,7 @@ def generate_sdl_controller_config(controllers: Dict) -> str:
 
 
 def write_sdl_db_all_controllers(
-    controllers: Dict[str, Any], outputFile: str = "/tmp/gamecontrollerdb.txt"
+    controllers: dict[str, Any], outputFile: str = "/tmp/gamecontrollerdb.txt"
 ) -> str:
     """
     Write SDL game controller configuration to a file.

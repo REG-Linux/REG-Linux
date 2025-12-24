@@ -1,22 +1,23 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
+from os import makedirs, path, remove
+from re import MULTILINE, search
 from shutil import copy
-from os import path, remove, makedirs
-from re import search, MULTILINE
-from configgen.controllers import write_sdl_db_all_controllers
-from .pcsx2Controllers import isPlayingWithWheel
-from .pcsx2Config import (
-    setPcsx2Reg,
-    setPcsx2Config,
-    configureAudio,
-    PCSX2_CONFIG_DIR,
-    PCSX2_SOURCE_PATH,
-    PCSX2_BIN_PATH,
-    PCSX2_PATCHES_PATH,
-    PCSX2_BIOS_DIR,
-)
 
+from configgen.Command import Command
+from configgen.controllers import write_sdl_db_all_controllers
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
+
+from .pcsx2Config import (
+    PCSX2_BIN_PATH,
+    PCSX2_BIOS_DIR,
+    PCSX2_CONFIG_DIR,
+    PCSX2_PATCHES_PATH,
+    PCSX2_SOURCE_PATH,
+    configureAudio,
+    setPcsx2Config,
+    setPcsx2Reg,
+)
+from .pcsx2Controllers import isPlayingWithWheel
 
 eslog = get_logger(__name__)
 

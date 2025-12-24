@@ -1,6 +1,7 @@
+import os
+
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF
-import os
 
 VICE_CONFIG_DIR = CONF + "/vice"
 VICE_CONFIG_PATH = VICE_CONFIG_DIR + "/sdl-vicerc"
@@ -38,7 +39,7 @@ def setViceConfig(system, metadata, guns):
     viceConfig.set(systemCore, "SaveResourcesOnExit", "0")
     viceConfig.set(systemCore, "SoundDeviceName", "alsa")
 
-    if system.isOptSet("noborder") and system.getOptBoolean("noborder") == True:
+    if system.isOptSet("noborder") and system.getOptBoolean("noborder"):
         viceConfig.set(systemCore, "SDLGLAspectMode", "0")
         viceConfig.set(systemCore, "VICBorderMode", "3")
     else:

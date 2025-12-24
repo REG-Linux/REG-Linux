@@ -1,12 +1,15 @@
-from configgen.generators.Generator import Generator
+from os import listdir, mkdir, path
+
 from configgen.Command import Command
-from os import path, mkdir, listdir
+from configgen.generators.Generator import Generator
+
 try:
     from ruamel.yaml import YAML
 except ImportError:
     print("ruamel.yaml module not found. Please install it with: pip install ruamel.yaml")
     raise
 from shutil import move
+
 from configgen.controllers import generate_sdl_controller_config
 from configgen.systemFiles import CONF, SAVES
 
@@ -47,12 +50,12 @@ class Vita3kGenerator(Generator):
             try:
                 from ruamel.yaml.util import load_yaml_guess_indent
 
-                with open(VITA3K_CONFIG_PATH, "r") as stream:
+                with open(VITA3K_CONFIG_PATH) as stream:
                     vita3kymlconfig, indent, block_seq_indent = load_yaml_guess_indent(
                         stream
                     )
             except ImportError:
-                with open(VITA3K_CONFIG_PATH, "r") as stream:
+                with open(VITA3K_CONFIG_PATH) as stream:
                     yaml = YAML()
                     vita3kymlconfig = yaml.load(stream)
                 indent = 2
@@ -79,7 +82,7 @@ class Vita3kGenerator(Generator):
         # Set FXAA
         if (
             system.isOptSet("vita3k_fxaa")
-            and system.getOptBoolean("vita3k_surface") == True
+            and system.getOptBoolean("vita3k_surface")
         ):
             vita3kymlconfig["enable-fxaa"] = "true"
         else:
@@ -87,7 +90,7 @@ class Vita3kGenerator(Generator):
         # Set VSync
         if (
             system.isOptSet("vita3k_vsync")
-            and system.getOptBoolean("vita3k_surface") == False
+            and not system.getOptBoolean("vita3k_surface")
         ):
             vita3kymlconfig["v-sync"] = "false"
         else:
@@ -102,7 +105,7 @@ class Vita3kGenerator(Generator):
         # Set the linear filtering option
         if (
             system.isOptSet("vita3k_linear")
-            and system.getOptBoolean("vita3k_surface") == True
+            and system.getOptBoolean("vita3k_surface")
         ):
             vita3kymlconfig["enable-linear-filter"] = "true"
         else:
@@ -110,7 +113,7 @@ class Vita3kGenerator(Generator):
         # Surface Sync
         if (
             system.isOptSet("vita3k_surface")
-            and system.getOptBoolean("vita3k_surface") == False
+            and not system.getOptBoolean("vita3k_surface")
         ):
             vita3kymlconfig["disable-surface-sync"] = "false"
         else:

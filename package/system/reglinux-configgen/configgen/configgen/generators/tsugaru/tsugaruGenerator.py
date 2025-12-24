@@ -1,8 +1,9 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import path
-from configgen.systemFiles import BIOS
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import BIOS
 
 TSUGARU_BIN_PATH = "/usr/bin/Tsugaru_CUI"
 TSUGARU_BIOS_DIR = BIOS + "/fmtowns"

@@ -1,6 +1,6 @@
-from configgen.generators.Generator import Generator
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import HOME
 
 APPLEWIN_CONFIG_PATH = HOME + "/applewin/applewin.conf"

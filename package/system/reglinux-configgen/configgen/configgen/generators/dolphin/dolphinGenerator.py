@@ -1,20 +1,21 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, environ
 from configparser import ConfigParser
+from os import environ, makedirs, path
 from subprocess import CalledProcessError, check_output
+
+from configgen.Command import Command
 from configgen.controllers import gunsNeedCrosses
-from .dolphinControllers import generateControllerConfig
+from configgen.generators.Generator import Generator
+from configgen.utils.logger import get_logger
+
 from .dolphinConfig import (
-    getRatioFromConfig,
-    updateConfig,
     DOLPHIN_BIN_PATH,
     DOLPHIN_CONFIG_PATH,
-    DOLPHIN_SAVES_DIR,
     DOLPHIN_GFX_PATH,
+    DOLPHIN_SAVES_DIR,
     DOLPHIN_SYSCONF_PATH,
+    getRatioFromConfig,
+    updateConfig,
 )
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -183,7 +184,7 @@ class DolphinGenerator(Generator):
                     not system.isOptSet("dolphin-lightgun-hide-crosshair")
                     and not gunsNeedCrosses(guns)
                 )
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair")
             )
         ):
             dolphinSettings.set(
@@ -267,9 +268,7 @@ class DolphinGenerator(Generator):
                             ).strip()
                             if discrete_index != "":
                                 eslog.debug(
-                                    "Using Discrete GPU Index: {} for Dolphin".format(
-                                        discrete_index
-                                    )
+                                    f"Using Discrete GPU Index: {discrete_index} for Dolphin"
                                 )
                                 dolphinGFXSettings.set(
                                     "Hardware", "Adapter", discrete_index
@@ -296,9 +295,7 @@ class DolphinGenerator(Generator):
                                 ).strip()
                                 if integrated_index != "":
                                     eslog.debug(
-                                        "Using Integrated GPU Index: {} for Dolphin".format(
-                                            integrated_index
-                                        )
+                                        f"Using Integrated GPU Index: {integrated_index} for Dolphin"
                                     )
                                     dolphinGFXSettings.set(
                                         "Hardware", "Adapter", integrated_index
@@ -346,7 +343,7 @@ class DolphinGenerator(Generator):
             and len(guns) > 0
             and (
                 not system.isOptSet("dolphin-lightgun-hide-crosshair")
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair")
             )
         ):
             # erase what can be set by the option hires_textures
@@ -440,7 +437,7 @@ class DolphinGenerator(Generator):
             dolphinGFXSettings.set("Settings", "InternalResolution", "1")
 
         # VSync
-        if system.isOptSet("vsync") and system.getOptBoolean("vsync") == False:
+        if system.isOptSet("vsync") and not system.getOptBoolean("vsync"):
             dolphinGFXSettings.set("Hardware", "VSync", "False")
         else:
             dolphinGFXSettings.set("Hardware", "VSync", "True")

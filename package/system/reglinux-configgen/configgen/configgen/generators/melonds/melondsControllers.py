@@ -16,7 +16,7 @@ def setMelondsControllers(melondsConfig, playersControllers):
     }
 
     val = -1
-    for controller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         # Only use Player 1 controls
         if pad.index != 0:
             continue

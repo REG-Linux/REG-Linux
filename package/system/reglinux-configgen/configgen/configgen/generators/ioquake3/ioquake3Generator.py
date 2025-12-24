@@ -1,13 +1,15 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import path
 from shutil import copytree
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+
 from .ioquake3Config import (
-    setIoquake3Config,
     IOQUAKE3_BIN_DIR,
-    IOQUAKE3_ROMS_DIR,
     IOQUAKE3_BIN_PATH,
+    IOQUAKE3_ROMS_DIR,
+    setIoquake3Config,
 )
 
 
@@ -30,7 +32,7 @@ class IOQuake3Generator(Generator):
         command_array = [IOQUAKE3_BIN_PATH]
 
         # get the game / mod to launch
-        with open(rom, "r") as file:
+        with open(rom) as file:
             command_line = file.readline().strip()
             command_line_words = command_line.split()
 

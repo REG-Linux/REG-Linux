@@ -21,7 +21,7 @@ def setCgeniusControllers(cgeniusConfig, playersControllers):
     # -= Controllers =-
     # Configure the first four controllers
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         if nplayer < 4:
             input_num = "input" + str(pad.index)
             if input_num not in cgeniusConfig:

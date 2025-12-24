@@ -155,7 +155,7 @@ def getB2sConfiguration(system, screens):
 def getB2sdmdConfiguration(system, screens, hasDmd):
     if (
         system.isOptSet("vpinball_b2sdmd")
-        and system.getOptBoolean("vpinball_b2sdmd") == False
+        and not system.getOptBoolean("vpinball_b2sdmd")
     ):  # switchon
         return False
     if hasDmd:
@@ -166,7 +166,7 @@ def getB2sdmdConfiguration(system, screens, hasDmd):
 def getB2sgrillConfiguration(system, screens):
     if (
         system.isOptSet("vpinball_b2sgrill")
-        and system.getOptBoolean("vpinball_b2sgrill") == False
+        and not system.getOptBoolean("vpinball_b2sgrill")
     ):  # switchon
         return False
     return True

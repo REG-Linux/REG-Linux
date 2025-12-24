@@ -1,4 +1,5 @@
 from pyudev import Context
+
 from .utils import dev2int
 
 

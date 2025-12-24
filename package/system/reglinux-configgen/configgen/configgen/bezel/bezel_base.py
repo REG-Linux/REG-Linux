@@ -4,21 +4,23 @@ Module that defines the interfaces and base classes for the bezel system in REG-
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Optional, Tuple
-from PIL import Image
 from typing import TYPE_CHECKING
+
+from PIL import Image
 
 if TYPE_CHECKING:
     from PIL.Image import Image as ImageType
+
     from configgen.Emulator import Emulator
-from configgen.systemFiles import OVERLAY_USER, OVERLAY_SYSTEM
-from configgen.utils.videoMode import getAltDecoration
-from configgen.utils.logger import get_logger
-import struct
+import glob
 import hashlib
 import os
-import glob
 import shutil
+import struct
+
+from configgen.systemFiles import OVERLAY_SYSTEM, OVERLAY_USER
+from configgen.utils.logger import get_logger
+from configgen.utils.videoMode import getAltDecoration
 
 eslog = get_logger(__name__)
 
@@ -34,7 +36,7 @@ class IBezelManager(ABC):
     """Interface for emulator-specific bezel managers."""
 
     @abstractmethod
-    def setup_bezels(self, system: 'Emulator', rom: str, game_resolution: Dict[str, int], guns: list) -> None:
+    def setup_bezels(self, system: 'Emulator', rom: str, game_resolution: dict[str, int], guns: list) -> None:
         """Configure the bezels for a specific game."""
         pass
 
@@ -57,7 +59,7 @@ class BezelUtils:
         return hashlib.md5(key_str.encode()).hexdigest()
 
     @staticmethod
-    def get_cached_image(cache_key: str) -> Optional[str]:
+    def get_cached_image(cache_key: str) -> str | None:
         """
         Retrieve cached image if it exists.
 
@@ -99,7 +101,7 @@ class BezelUtils:
     @staticmethod
     def get_bezel_infos(
         rom: str, bezel: str, system_name: str, emulator: str
-    ) -> Optional[Dict[str, str]]:
+    ) -> dict[str, str] | None:
         """
         Locate the appropriate bezel overlay image and related files based on
         ROM name, system name, and emulator used.
@@ -171,7 +173,7 @@ class BezelUtils:
         return None
 
     @staticmethod
-    def fast_image_size(image_file: str) -> Tuple[int, int]:
+    def fast_image_size(image_file: str) -> tuple[int, int]:
         """
         Return the size (width, height) of a PNG image by reading its header.
         Much faster than using PIL.Image.open().size.
@@ -197,7 +199,7 @@ class BezelUtils:
     @staticmethod
     def resize_with_fill(
         img: "ImageType",
-        target_size: Tuple[int, int],
+        target_size: tuple[int, int],
         stretch: bool = False,
         fillcolor: str = "black",
     ) -> "ImageType":
@@ -213,12 +215,34 @@ class BezelUtils:
         Returns:
             The resized image
         """
-        from PIL import ImageOps
+        from PIL import Image
 
         if stretch:
-            return ImageOps.fit(img, target_size)
+            return img.resize(target_size, Image.Resampling.LANCZOS)
 
-        return ImageOps.pad(img, target_size, color=fillcolor, centering=(0.5, 0.5))
+        # Calculate the aspect ratio
+        img_ratio = img.width / img.height
+        target_ratio = target_size[0] / target_size[1]
+
+        if target_ratio > img_ratio:
+            # Target is wider than image - pad left and right
+            new_height = target_size[1]
+            new_width = int(target_size[1] * img_ratio)
+        else:
+            # Target is taller than image - pad top and bottom
+            new_width = target_size[0]
+            new_height = int(target_size[0] / img_ratio)
+
+        # Resize the image maintaining aspect ratio
+        img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+        # Create a new image with target size and paste the resized image in the center
+        new_img = Image.new(img.mode, target_size, fillcolor)
+        x = (target_size[0] - new_width) // 2
+        y = (target_size[1] - new_height) // 2
+        new_img.paste(img_resized, (x, y))
+
+        return new_img
 
     @staticmethod
     def resize_image(
@@ -295,11 +319,9 @@ class BezelUtils:
 
         try:
             imgin = Image.open(input_png)
-        except (IOError, OSError, Image.UnidentifiedImageError) as e:
+        except (OSError, Image.UnidentifiedImageError) as e:
             eslog.error(f"Error opening input image {input_png}: {e}")
             raise
-
-        from PIL import ImageOps
 
         fillcolor = "black"
         eslog.debug(f"Resizing bezel: image mode {imgin.mode}")
@@ -325,7 +347,7 @@ class BezelUtils:
                     fillcolor=fillcolor,
                 )
                 imgout.save(output_png, mode="RGBA", format="PNG")
-            except (IOError, OSError) as e:
+            except OSError as e:
                 eslog.error(f"Error saving output image {output_png}: {e}")
                 raise
 
@@ -391,11 +413,9 @@ class BezelUtils:
 
         try:
             imgin = Image.open(input_png)
-        except (IOError, OSError, Image.UnidentifiedImageError) as e:
+        except (OSError, Image.UnidentifiedImageError) as e:
             eslog.error(f"Error opening input image {input_png}: {e}")
             raise
-
-        from PIL import ImageOps
 
         fillcolor = "black"
         eslog.debug(f"Padding bezel: image mode {imgin.mode}")
@@ -421,7 +441,7 @@ class BezelUtils:
                     fillcolor=fillcolor,
                 )
                 imgout.save(output_png, mode="RGBA", format="PNG")
-            except (IOError, OSError) as e:
+            except OSError as e:
                 eslog.error(f"Error saving output image {output_png}: {e}")
                 raise
 
@@ -529,7 +549,7 @@ class BezelUtils:
             else:
                 tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
                 tattoo = Image.open(tattoo_file)
-        except (IOError, OSError, Image.UnidentifiedImageError) as e:
+        except (OSError, Image.UnidentifiedImageError) as e:
             eslog.error(f"Error opening tattoo image: {tattoo_file} - {str(e)}")
             raise
 
@@ -573,7 +593,7 @@ class BezelUtils:
         imgnew.paste(back, (0, 0, w, h))
         try:
             imgnew.save(output_png, mode="RGBA", format="PNG")
-        except (IOError, OSError) as e:
+        except OSError as e:
             eslog.error(f"Error saving tattooed output image {output_png}: {e}")
             raise
 
@@ -590,7 +610,7 @@ class BezelUtils:
         output_png: str,
         imgin: "ImageType",
         fillcolor: str,
-        screensize: Tuple[int, int],
+        screensize: tuple[int, int],
         bezel_stretch: bool,
     ) -> None:
         """
@@ -660,12 +680,12 @@ class BezelUtils:
                 imgnew, screensize, stretch=bezel_stretch, fillcolor=fillcolor
             )
             imgout.save(output_png, mode="RGBA", format="PNG")
-        except (IOError, OSError) as e:
+        except OSError as e:
             eslog.error(f"Error saving alpha pasted output image {output_png}: {e}")
             raise
 
     @staticmethod
-    def gun_borders_size(borders_size: str) -> Tuple[int, int]:
+    def gun_borders_size(borders_size: str) -> tuple[int, int]:
         """
         Return preset values for gun border sizes depending on text config.
 
@@ -807,7 +827,7 @@ class BezelUtils:
 
         try:
             back = Image.open(input_png)
-        except (IOError, OSError, Image.UnidentifiedImageError) as e:
+        except (OSError, Image.UnidentifiedImageError) as e:
             eslog.error(f"Error opening input image {input_png}: {e}")
             raise
 
@@ -822,7 +842,7 @@ class BezelUtils:
 
         try:
             imgnew.save(output_png, mode="RGBA", format="PNG")
-        except (IOError, OSError) as e:
+        except OSError as e:
             eslog.error(f"Error saving gun border image {output_png}: {e}")
             raise
 
@@ -854,7 +874,7 @@ class BezelUtils:
         return (h * (inner_border_size_per + outer_border_size_per)) // 100
 
     @staticmethod
-    def guns_borders_color_from_config(config: Dict[str, str]) -> str:
+    def guns_borders_color_from_config(config: dict[str, str]) -> str:
         """
         Return hex color for gun borders from config string.
 
@@ -898,7 +918,7 @@ def clear_bezel_cache() -> None:
 
 def getBezelInfos(
     rom: str, bezel: str, systemName: str, emulator: str
-) -> Optional[Dict[str, str]]:
+) -> dict[str, str] | None:
     """
     Locate the appropriate bezel overlay image and related files based on
     ROM name, system name, and emulator used.
@@ -920,7 +940,7 @@ def getBezelInfos(
     return BezelUtils.get_bezel_infos(rom, bezel, systemName, emulator)
 
 
-def fast_image_size(image_file: str) -> Tuple[int, int]:
+def fast_image_size(image_file: str) -> tuple[int, int]:
     """
     Return the size (width, height) of a PNG image by reading its header.
     Much faster than using PIL.Image.open().size.
@@ -936,7 +956,7 @@ def fast_image_size(image_file: str) -> Tuple[int, int]:
 
 def resize_with_fill(
     img: "ImageType",
-    target_size: Tuple[int, int],
+    target_size: tuple[int, int],
     stretch: bool = False,
     fillcolor: str = "black",
 ) -> "ImageType":
@@ -1041,7 +1061,7 @@ def alphaPaste(
     output_png: str,
     imgin: "ImageType",
     fillcolor: str,
-    screensize: Tuple[int, int],
+    screensize: tuple[int, int],
     bezel_stretch: bool,
 ) -> None:
     """
@@ -1067,7 +1087,7 @@ def alphaPaste(
     )
 
 
-def gun_borders_size(borders_size: str) -> Tuple[int, int]:
+def gun_borders_size(borders_size: str) -> tuple[int, int]:
     """
     Return preset values for gun border sizes depending on text config.
 
@@ -1135,7 +1155,7 @@ def gunsBorderSize(
     return BezelUtils.guns_border_size(w, h, innerBorderSizePer, outerBorderSizePer)
 
 
-def gunsBordersColorFomConfig(config: Dict[str, str]) -> str:
+def gunsBordersColorFomConfig(config: dict[str, str]) -> str:
     """
     Return hex color for gun borders from config string.
 

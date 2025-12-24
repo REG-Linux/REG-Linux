@@ -1,5 +1,6 @@
 from os import environ
-from subprocess import check_output, CalledProcessError
+from subprocess import CalledProcessError, check_output
+
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 

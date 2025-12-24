@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import path
-from .hatariControllers import setHatariControllers
-from .hatariConfig import HATARI_BIOS_PATH, HATARI_BIN_PATH
 
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
+
+from .hatariConfig import HATARI_BIN_PATH, HATARI_BIOS_PATH
+from .hatariControllers import setHatariControllers
 
 eslog = get_logger(__name__)
 

@@ -1,8 +1,10 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import chdir
-from .sonicretroConfig import setSonicretroConfig
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+
+from .sonicretroConfig import setSonicretroConfig
 
 
 class SonicRetroGenerator(Generator):

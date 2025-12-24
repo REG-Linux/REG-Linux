@@ -1,7 +1,8 @@
-from configgen.generators.Generator import Generator
 from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.settings import JSONSettings
-from .ikemenControllers import Keymapping, Joymapping
+
+from .ikemenControllers import Joymapping, Keymapping
 
 IKEMEN_CONFIG_PATH = "/save/config.json"
 IKEMEN_BIN_PATH = "/usr/bin/system-ikemen"

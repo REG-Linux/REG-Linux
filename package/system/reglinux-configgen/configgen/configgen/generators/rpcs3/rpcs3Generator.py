@@ -1,9 +1,10 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from shutil import copytree, copy2
 from configparser import ConfigParser
+from os import makedirs, path
 from re import match
-from os import path, makedirs
+from shutil import copy2, copytree
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 
 try:
     from ruamel.yaml import YAML
@@ -12,16 +13,18 @@ except ImportError:
         "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml"
     )
     raise
-from subprocess import check_output, CalledProcessError
-from .rpcs3Controllers import generateControllerConfig
+from subprocess import CalledProcessError, check_output
+
+from configgen.utils.logger import get_logger
+
 from .rpcs3Config import (
-    RPCS3_ICON_TARGET_DIR,
+    RPCS3_BIN_PATH,
     RPCS3_CONFIG_PATH,
     RPCS3_CURRENT_CONFIG_PATH,
+    RPCS3_ICON_TARGET_DIR,
     RPCS3_PS3UPDAT_PATH,
-    RPCS3_BIN_PATH,
 )
-from configgen.utils.logger import get_logger
+from .rpcs3Controllers import generateControllerConfig
 
 eslog = get_logger(__name__)
 
@@ -63,7 +66,7 @@ class Rpcs3Generator(Generator):
         # Generate a default config if it doesn't exist otherwise just open the existing
         rpcs3ymlconfig = {}
         if path.isfile(RPCS3_CONFIG_PATH):
-            with open(RPCS3_CONFIG_PATH, "r") as stream:
+            with open(RPCS3_CONFIG_PATH) as stream:
                 yaml = YAML(typ="unsafe", pure=True)
                 rpcs3ymlconfig = yaml.load(stream)
 
@@ -179,9 +182,7 @@ class Rpcs3Generator(Generator):
                             ).strip()
                             if discrete_name != "":
                                 eslog.debug(
-                                    "Using Discrete GPU Name: {} for RPCS3".format(
-                                        discrete_name
-                                    )
+                                    f"Using Discrete GPU Name: {discrete_name} for RPCS3"
                                 )
                                 if "Vulkan" not in rpcs3ymlconfig["Video"]:
                                     rpcs3ymlconfig["Video"]["Vulkan"] = {}
@@ -210,9 +211,7 @@ class Rpcs3Generator(Generator):
                                 ).strip()
                                 if integrated_name != "":
                                     eslog.debug(
-                                        "Using Integrated GPU Name: {} for RPCS3".format(
-                                            integrated_name
-                                        )
+                                        f"Using Integrated GPU Name: {integrated_name} for RPCS3"
                                     )
                                     if "Vulkan" not in rpcs3ymlconfig["Video"]:
                                         rpcs3ymlconfig["Video"]["Vulkan"] = {}
@@ -495,13 +494,13 @@ def get_in_game_ratio(config, game_resolution, rom):
 def getFirmwareVersion():
     try:
         with open(
-            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt", "r"
+            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt"
         ) as stream:
             lines = stream.readlines()
         for line in lines:
             matches = match("^release:(.*):", line)
             if matches:
                 return matches[1]
-    except:
+    except Exception:
         return None
     return None

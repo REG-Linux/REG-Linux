@@ -1,6 +1,6 @@
 from configgen.systemFiles import HOME
-from configgen.utils.videoMode import getRefreshRate
 from configgen.utils.logger import get_logger
+from configgen.utils.videoMode import getRefreshRate
 
 eslog = get_logger(__name__)
 

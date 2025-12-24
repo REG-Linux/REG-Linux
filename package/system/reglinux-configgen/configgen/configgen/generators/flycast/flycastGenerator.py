@@ -1,22 +1,24 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, mkdir
 from configparser import ConfigParser
+from os import makedirs, mkdir, path
 from shutil import copyfile
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
-eslog = get_logger(__name__)
 from .flycastConfig import (
-    setFlycastConfig,
+    FLYCAST_BIN_PATH,
+    FLYCAST_BIOS_DIR,
     FLYCAST_CONFIG_PATH,
     FLYCAST_SAVES_DIR,
-    FLYCAST_BIOS_DIR,
-    FLYCAST_VMU_BLANK_PATH,
     FLYCAST_VMU_A1_PATH,
     FLYCAST_VMU_A2_PATH,
-    FLYCAST_BIN_PATH,
+    FLYCAST_VMU_BLANK_PATH,
+    setFlycastConfig,
 )
+
+eslog = get_logger(__name__)
 
 
 class FlycastGenerator(Generator):

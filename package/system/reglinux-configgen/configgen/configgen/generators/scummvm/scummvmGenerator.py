@@ -1,9 +1,10 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
-from glob import glob
 from configparser import ConfigParser
-from configgen.systemFiles import SCREENSHOTS, CONF, BIOS
+from glob import glob
+from os import makedirs, path
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import BIOS, CONF, SCREENSHOTS
 
 SCUMMVM_CONFIG_DIR = CONF + "/scummvm"
 SCUMMVM_CONFIG_PATH = SCUMMVM_CONFIG_DIR + "/scummvm.ini"
@@ -51,7 +52,7 @@ class ScummVMGenerator(Generator):
         # pad number
         nplayer = 1
         id = 0
-        for playercontroller, pad in sorted(players_controllers.items()):
+        for _, pad in sorted(players_controllers.items()):
             if nplayer == 1:
                 id = pad.index
             nplayer += 1

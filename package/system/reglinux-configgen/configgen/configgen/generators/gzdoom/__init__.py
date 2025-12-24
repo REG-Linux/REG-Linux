@@ -3,8 +3,8 @@ Gzdoom generator module for REG-Linux
 This module handles the generation of gzdoom emulator configurations.
 """
 
-from .gzdoomGenerator import GZDoomGenerator
 from .gzdoomConfig import setGzdoomConfig
-from .gzdoomControllers import *
+from .gzdoomControllers import setGzdoomControllers
+from .gzdoomGenerator import GZDoomGenerator
 
-__all__ = ["GZDoomGenerator", "setGzdoomConfig"]
+__all__ = ["GZDoomGenerator", "setGzdoomConfig", "setGzdoomControllers"]

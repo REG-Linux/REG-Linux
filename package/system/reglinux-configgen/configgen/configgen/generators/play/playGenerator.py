@@ -1,7 +1,8 @@
-from configgen.generators.Generator import Generator
+from os import makedirs, path
+from xml.etree.ElementTree import Element, ElementTree, SubElement, parse
+
 from configgen.Command import Command
-from os import path, makedirs
-from xml.etree.ElementTree import Element, SubElement, ElementTree, parse
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
 
 PLAY_CONFIG_DIR = CONF + "/play"
@@ -120,9 +121,7 @@ class PlayGenerator(Generator):
         return Command(array=command_array)
 
     def get_in_game_ratio(self, config, game_resolution, rom):
-        if "play_widescreen" in config and config["play_widescreen"] == "true":
-            return 16 / 9
-        elif "play_mode" in config and config["play_mode"] == "0":
+        if "play_widescreen" in config and config["play_widescreen"] == "true" or "play_mode" in config and config["play_mode"] == "0":
             return 16 / 9
         else:
             return 4 / 3

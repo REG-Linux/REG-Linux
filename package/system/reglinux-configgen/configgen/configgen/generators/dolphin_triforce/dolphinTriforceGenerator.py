@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-import os.path
 import configparser
+import os.path
 from os import environ
-from . import dolphinTriforceControllers
-from . import dolphinTriforceConfig
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+
+from . import dolphinTriforceConfig, dolphinTriforceControllers
 
 
 class DolphinTriforceGenerator(Generator):
@@ -570,9 +571,7 @@ $SeatLoopPatch
 
     def get_in_game_ratio(self, config, game_resolution, rom):
         if "dolphin_aspect_ratio" in config:
-            if config["dolphin_aspect_ratio"] == "1":
-                return 16 / 9
-            elif config["dolphin_aspect_ratio"] == "3" and (
+            if config["dolphin_aspect_ratio"] == "1" or config["dolphin_aspect_ratio"] == "3" and (
                 game_resolution["width"] / float(game_resolution["height"])
                 > ((16.0 / 9.0) - 0.1)
             ):

@@ -3,16 +3,18 @@ Controller database management.
 Handles loading and matching controller configurations from gamecontrollerdb.txt.
 """
 
-from typing import Dict, Any, Tuple, Optional
 import os
 from concurrent.futures import ThreadPoolExecutor
-from .controller import Controller, Input
+from typing import Any
+
 from configgen.utils.logger import get_logger
+
+from .controller import Controller, Input
 
 eslog = get_logger(__name__)
 
 
-def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
+def parse_line(line: str) -> tuple[str, dict[str, Any]] | None:
     line = line.strip()
     if not line or line.startswith("#"):
         return None
@@ -42,7 +44,7 @@ def parse_line(line: str) -> Optional[Tuple[str, Dict[str, Any]]]:
 
 
 def _parse_chunk(lines):
-    chunk_result: Dict[str, Dict[str, Any]] = {}
+    chunk_result: dict[str, dict[str, Any]] = {}
     for line in lines:
         parsed = parse_line(line)
         if parsed is None:
@@ -52,16 +54,16 @@ def _parse_chunk(lines):
     return chunk_result
 
 
-def load_all_controllers_config() -> Dict[str, Dict[str, Any]]:
+def load_all_controllers_config() -> dict[str, dict[str, Any]]:
     """
     Load all controller configurations from gamecontrollerdb.txt, splitting the input
     evenly across available cores and parsing each slice in a thread pool.
     """
-    controllerdb: Dict[str, Dict[str, Any]] = {}
+    controllerdb: dict[str, dict[str, Any]] = {}
     filepath = os.environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
 
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             lines = f.read().splitlines()
 
         if not lines:

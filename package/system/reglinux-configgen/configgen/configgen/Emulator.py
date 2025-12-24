@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 from os import path
+from typing import Any
+
 import yaml
 from yaml import CLoader as Loader
-from typing import Dict, Any, Optional, List
 
 try:
     from typing import TypedDict
@@ -11,10 +12,10 @@ except ImportError:
 
 # Import with fallback for different execution contexts
 try:
-    from configgen.systemFiles import SYSTEM_CONF, ES_SETTINGS
+    from configgen.systemFiles import ES_SETTINGS, SYSTEM_CONF
 except ImportError:
     # When run as a module within the package
-    from .systemFiles import SYSTEM_CONF, ES_SETTINGS
+    from .systemFiles import ES_SETTINGS, SYSTEM_CONF
 
 try:
     from configgen.settings import UnixSettings
@@ -91,7 +92,7 @@ class SystemConfigOptional(TypedDict, total=False):
     audio_dsp_plugin: str
     audio_driver: str
     input_driver: str
-    cheevos_password: Optional[str]
+    cheevos_password: str | None
     # SDL options
     sdlvsync: str
     # Special runtime properties
@@ -118,8 +119,8 @@ class RenderConfig(TypedDict, total=False):
 
 # Define a flexible config type that can accept additional keys
 # Using Dict[str, Any] directly since the config is dynamically modified
-SystemConfigDict = Dict[str, Any]
-RenderConfigDict = Dict[str, Any]
+SystemConfigDict = dict[str, Any]
+RenderConfigDict = dict[str, Any]
 
 
 class Emulator:
@@ -147,7 +148,7 @@ class Emulator:
         self.name: str = name
         self.rom: str = rom
         self.config: SystemConfigDict = {}
-        self.renderconfig: Dict[str, Any] = {}
+        self.renderconfig: dict[str, Any] = {}
 
         # Load system configuration from default YAML files
         self.config = Emulator.get_system_config(
@@ -295,7 +296,7 @@ class Emulator:
     @staticmethod
     def get_generic_config(
         system: str, defaultyml: str, defaultarchyml: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Load and merge generic configuration from YAML files.
 
         Args:
@@ -307,16 +308,16 @@ class Emulator:
             Dict[str, Any]: Merged configuration dictionary.
         """
         # Load default configuration
-        with open(defaultyml, "r") as f:
+        with open(defaultyml) as f:
             systems_default = yaml.load(f, Loader=Loader)
 
         # Load architecture-specific configuration if available
-        systems_default_arch: Dict[str, Any] = {}
+        systems_default_arch: dict[str, Any] = {}
         if path.exists(defaultarchyml):
-            with open(defaultarchyml, "r") as f:
+            with open(defaultarchyml) as f:
                 systems_default_arch = yaml.load(f, Loader=Loader) or {}
 
-        dict_all: Dict[str, Any] = {}
+        dict_all: dict[str, Any] = {}
 
         # Merge default configurations
         if "default" in systems_default:
@@ -399,7 +400,7 @@ class Emulator:
         return str(self.config.get(key, ""))
 
     @staticmethod
-    def updateConfiguration(config: SystemConfigDict, settings: Dict[str, Any]) -> None:
+    def updateConfiguration(config: SystemConfigDict, settings: dict[str, Any]) -> None:
         """Update a configuration dictionary with new settings, ignoring invalid values.
 
         Args:

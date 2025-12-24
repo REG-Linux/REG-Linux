@@ -1,7 +1,8 @@
+import contextlib
+from typing import Any
+
 import zmq
 import zmq.error
-import contextlib
-from typing import Optional, Any
 
 
 class RegMsgClient:
@@ -25,8 +26,8 @@ class RegMsgClient:
         """
         self.address = address
         self.timeout = timeout
-        self.context: Optional[zmq.Context[Any]] = None
-        self.socket: Optional[zmq.Socket[Any]] = None
+        self.context: zmq.Context[Any] | None = None
+        self.socket: zmq.Socket[Any] | None = None
         self._connected = False
 
     def connect(self) -> None:
@@ -116,15 +117,15 @@ class RegMsgClient:
         self.connect()
         return self
 
-    def __exit__(self, exc_type: Optional[type], exc_val: Optional[Exception], exc_tb: Optional[Any]) -> None:
+    def __exit__(self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any | None) -> None:
         """Ensure connection is closed when exiting context manager."""
         self.disconnect()
 
 
 # Compatibility functions to maintain original interface
 # Global context and socket (optional; could also be kept inside a class)
-_context: Optional[zmq.Context[Any]] = None
-_socket: Optional[zmq.Socket[Any]] = None
+_context: zmq.Context[Any] | None = None
+_socket: zmq.Socket[Any] | None = None
 
 
 def regmsg_connect(

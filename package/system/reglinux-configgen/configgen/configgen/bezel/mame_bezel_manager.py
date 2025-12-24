@@ -4,10 +4,10 @@ Module responsible for managing bezel configurations for the MAME emulator.
 
 import os
 import shutil
-from typing import Dict, Optional, Tuple, Any
+
 from PIL import Image
 
-from configgen.bezel.bezel_base import IBezelManager, BezelUtils, eslog
+from configgen.bezel.bezel_base import BezelUtils, IBezelManager
 from configgen.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -19,7 +19,7 @@ TATTOO_VERTICAL_MARGIN = 20  # Vertical margin for tattoo placement
 DEFAULT_RESOLUTION = (1920, 1080)  # Fallback resolution
 
 
-def getMameMachineSize(rom_base: str, tmp_zip_dir: str) -> Tuple[int, int, int]:
+def getMameMachineSize(rom_base: str, tmp_zip_dir: str) -> tuple[int, int, int]:
     """
     Get machine size information for MAME ROM.
 
@@ -43,7 +43,7 @@ def getMameMachineSize(rom_base: str, tmp_zip_dir: str) -> Tuple[int, int, int]:
     return width, height, rotation
 
 
-def setup_mame_bezels(system, rom, messSys: str, game_resolution: Dict[str, int], guns):
+def setup_mame_bezels(system, rom, messSys: str, game_resolution: dict[str, int], guns):
     """
     Set up bezels for MAME games, including handling gun borders and tattoos.
 
@@ -67,7 +67,7 @@ def setup_mame_bezels(system, rom, messSys: str, game_resolution: Dict[str, int]
         writeBezelConfig(None, system, rom, "", game_resolution, None)
 
 
-def _extract_bezel_set(system) -> Optional[str]:
+def _extract_bezel_set(system) -> str | None:
     """
     Extract bezel set from system config.
 
@@ -85,7 +85,7 @@ def _extract_bezel_set(system) -> Optional[str]:
     return bezel_set
 
 
-def _get_guns_borders_size(guns, system_config) -> Optional[str]:
+def _get_guns_borders_size(guns, system_config) -> str | None:
     """
     Get guns borders size from config if guns are available.
 
@@ -104,15 +104,15 @@ def _get_guns_borders_size(guns, system_config) -> Optional[str]:
 
 
 def writeBezelConfig(
-    bezelSet: Optional[str],
+    bezelSet: str | None,
     system,
     rom,
     messSys,
-    game_resolution: Dict[str, int],
-    guns_borders_size: Optional[str],
+    game_resolution: dict[str, int],
+    guns_borders_size: str | None,
 ):
     """Create MAME artwork configuration for bezels."""
-    tmp_zip_dir: Optional[str] = None  # Initialize to None
+    tmp_zip_dir: str | None = None  # Initialize to None
     try:
         rom_base = os.path.splitext(os.path.basename(rom))[0]
         tmp_zip_dir = _get_tmp_directory_path(rom_base, messSys)
@@ -199,7 +199,7 @@ def _get_tmp_directory_path(rom_base: str, mess_sys: str) -> str:
         return f"/var/run/mame_artwork/{rom_base}"
 
 
-def _get_bezel_info(bezel_set: Optional[str], system, rom) -> Optional[Dict]:
+def _get_bezel_info(bezel_set: str | None, system, rom) -> dict | None:
     """
     Get bezel information from the bezel database.
 
@@ -253,8 +253,8 @@ def _create_symlink(src: str, dest: str):
 
 
 def _process_bezel_layout(
-    bz_infos: Dict, rom_base: str, mess_sys: str, tmp_zip_dir: str
-) -> Optional[Tuple]:
+    bz_infos: dict, rom_base: str, mess_sys: str, tmp_zip_dir: str
+) -> tuple | None:
     """
     Process the bezel layout and return positioning information.
 
@@ -287,7 +287,7 @@ def _process_bezel_layout(
     return _create_standard_layout(bz_infos, rom_base, tmp_zip_dir)
 
 
-def _handle_mamezip_case(rom_base: str, mess_sys: str, bz_infos: Dict):
+def _handle_mamezip_case(rom_base: str, mess_sys: str, bz_infos: dict):
     """
     Handle the case where a mamezip file is available.
 
@@ -311,7 +311,7 @@ def _handle_mamezip_case(rom_base: str, mess_sys: str, bz_infos: Dict):
 
 def _parse_bezel_info_file(
     info_path: str, png_path: str
-) -> Tuple[int, int, int, int, int, int, float]:
+) -> tuple[int, int, int, int, int, int, float]:
     """
     Parse bezel info file and return position and size values.
 
@@ -322,7 +322,7 @@ def _parse_bezel_info_file(
     Returns:
         Tuple containing (img_width, img_height, bz_x, bz_y, bz_width, bz_height, bz_alpha)
     """
-    with open(info_path, "r") as bz_info_file:
+    with open(info_path) as bz_info_file:
         bz_info_text = bz_info_file.readlines()
 
         # Initialize defaults
@@ -368,8 +368,8 @@ def _parse_bezel_info_file(
 
 
 def _create_standard_layout(
-    bz_infos: Dict, rom_base: str, tmp_zip_dir: str
-) -> Tuple[str, int, int, int, int, int, int, float]:
+    bz_infos: dict, rom_base: str, tmp_zip_dir: str
+) -> tuple[str, int, int, int, int, int, int, float]:
     """
     Create standard bezel layout from PNG and info file.
 
@@ -593,7 +593,7 @@ def _get_tattoo_path(system):
 
 
 def _apply_gun_borders(
-    tmp_zip_dir: str, png_file: str, borders_size: str, system_config: Dict[str, str]
+    tmp_zip_dir: str, png_file: str, borders_size: str, system_config: dict[str, str]
 ) -> str:
     """
     Apply gun borders to the bezel image and return the new file path.
@@ -631,7 +631,7 @@ class MameBezelManager(IBezelManager):
     """Bezel manager specific to the MAME emulator."""
 
     def setup_bezels(
-        self, system, rom: str, game_resolution: Dict[str, int], guns
+        self, system, rom: str, game_resolution: dict[str, int], guns
     ) -> None:
         """
         Configure the bezels for a specific game.

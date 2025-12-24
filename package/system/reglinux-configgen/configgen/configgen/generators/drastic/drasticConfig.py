@@ -1,4 +1,5 @@
 from os import environ
+
 from configgen.systemFiles import CONF
 
 DRASTIC_CONFIG_DIR = "/usr/share/drastic"

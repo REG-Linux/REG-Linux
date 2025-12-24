@@ -5,26 +5,26 @@ It is responsible for preparing the environment and launching the emulator
 with the appropriate configurations.
 """
 
-from os import path, environ, chdir, makedirs, access, listdir, X_OK
 from argparse import ArgumentParser
-from signal import signal, SIGINT, SIGTERM
-from time import sleep
-from subprocess import Popen, PIPE, call
-from configgen.systemFiles import SAVES
+from os import X_OK, access, chdir, environ, listdir, makedirs, path
+from signal import SIGINT, SIGTERM, signal
+from subprocess import PIPE, Popen, call
 from sys import exit
-from configgen.Emulator import Emulator
 from threading import Thread
-from configgen.controllers import Evmapy
-from configgen.GeneratorImporter import getGenerator
-import configgen.utils.videoMode as videoMode
-import configgen.utils.gunsUtils as gunsUtils
-import configgen.utils.wheelsUtils as wheelsUtils
-import configgen.utils.windowsManager as windowsManager
+from time import sleep
+
 import configgen.bezel.bezel_base as bezelsUtil
 import configgen.controllers as controllers
+import configgen.utils.gunsUtils as gunsUtils
+import configgen.utils.videoMode as videoMode
+import configgen.utils.wheelsUtils as wheelsUtils
+import configgen.utils.windowsManager as windowsManager
 import configgen.utils.zar as zar
+from configgen.controllers import Evmapy
+from configgen.Emulator import Emulator
+from configgen.GeneratorImporter import getGenerator
+from configgen.systemFiles import SAVES
 from configgen.utils.logger import get_logger
-
 from configgen.utils.regmsgclient import regmsg_connect
 
 eslog = get_logger(__name__)

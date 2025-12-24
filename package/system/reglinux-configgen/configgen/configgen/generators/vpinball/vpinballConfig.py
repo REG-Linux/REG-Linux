@@ -13,7 +13,7 @@ def setVpinballConfig(vpinballSettings, system):
     # We keep a switch to allow users with the old unique pinmame to be able to continue using vpinball (switchon)
     if (
         system.isOptSet("vpinball_folders")
-        and system.getOptBoolean("vpinball_folders") == False
+        and not system.getOptBoolean("vpinball_folders")
     ):
         vpinballSettings.set("Standalone", "PinMAMEPath", "")
     else:
@@ -143,7 +143,7 @@ def setVpinballConfig(vpinballSettings, system):
     # Altcolor (switchon)
     if (
         system.isOptSet("vpinball_altcolor")
-        and system.getOptBoolean("vpinball_altcolor") == False
+        and not system.getOptBoolean("vpinball_altcolor")
     ):
         vpinballSettings.set("Standalone", "AltColor", "0")
     else:
@@ -167,7 +167,7 @@ def setVpinballConfig(vpinballSettings, system):
     # Altsound
     if (
         system.isOptSet("vpinball_altsound")
-        and system.getOptBoolean("vpinball_altsound") == False
+        and not system.getOptBoolean("vpinball_altsound")
     ):
         vpinballSettings.set("Standalone", "AltSound", "0")
     else:
@@ -191,7 +191,7 @@ def setVpinballConfig(vpinballSettings, system):
     # Don't use SDL "Add credit" with the South button/plunger and pad2key default mapping
     if (
         system.isOptSet("vpinball_pad_add_credit")
-        and system.getOptBoolean("vpinball_pad_add_credit") == True
+        and system.getOptBoolean("vpinball_pad_add_credit")
     ):
         vpinballSettings.set("Player", "JoyAddCreditKey", "")
     else:

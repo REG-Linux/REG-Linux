@@ -1,10 +1,12 @@
-import os
 import codecs
-import glob
 import configparser
+import glob
+import os
 import re
-from . import dolphinTriforceConfig
+
 from configgen.utils.logger import get_logger
+
+from . import dolphinTriforceConfig
 
 eslog = get_logger(__name__)
 
@@ -111,7 +113,7 @@ def generateHotkeys(playersControllers):
     }
 
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         if nplayer == 1:
             f.write("[Hotkeys1]" + "\n")
             f.write("Device = SDL/0/" + pad.name.strip() + "\n")
@@ -171,7 +173,7 @@ def generateControllerConfig_any(
     # In case of two pads having the same name, dolphin wants a number to handle this
     double_pads = dict()
 
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         # Handle x pads having the same name
         if pad.name.strip() in double_pads:
             nsamepad = double_pads[pad.name.strip()]
@@ -184,7 +186,7 @@ def generateControllerConfig_any(
 
         if (
             system.isOptSet("use_pad_profiles")
-            and system.getOptBoolean("use_pad_profiles") == True
+            and system.getOptBoolean("use_pad_profiles")
         ):
             if not generateControllerConfig_any_from_profiles(f, pad):
                 generateControllerConfig_any_auto(
@@ -282,7 +284,7 @@ def generateControllerConfig_any_auto(
                 None,
             )
         # Rumble option
-        if system.isOptSet("rumble") and system.getOptBoolean("rumble") == True:
+        if system.isOptSet("rumble") and system.getOptBoolean("rumble"):
             f.write("Rumble/Motor = Weak\n")
 
 
@@ -310,7 +312,7 @@ def generateControllerConfig_any_from_profiles(f, pad):
                         if key != "Device":
                             f.write(f"{key} = {val}\n")
                     return True
-        except:
+        except Exception:
             eslog.error(f"profile {profileFile} : FAILED")
 
     return False

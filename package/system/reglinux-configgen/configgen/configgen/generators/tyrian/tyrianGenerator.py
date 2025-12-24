@@ -1,13 +1,13 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import chdir
-from configgen.systemFiles import ROMS
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import ROMS
+from configgen.utils.logger import get_logger
 
 TYRIAN_ROMS_DIR = ROMS + "tyrian/data"
 TYRIAN_BIN_PATH = "/usr/bin/opentyrian"
-
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

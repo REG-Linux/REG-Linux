@@ -1,9 +1,10 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
+from os import makedirs, path
 from shutil import copy
-from configgen.systemFiles import CONF
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import CONF
 
 
 class ETLegacyGenerator(Generator):
@@ -44,7 +45,7 @@ class ETLegacyGenerator(Generator):
 
         # Check if the file exists
         if path.isfile(config_file_path):
-            with open(config_file_path, "r") as config_file:
+            with open(config_file_path) as config_file:
                 lines = config_file.readlines()
 
             # Loop through the options and update the lines

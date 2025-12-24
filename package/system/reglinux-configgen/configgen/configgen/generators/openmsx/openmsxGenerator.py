@@ -1,12 +1,12 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 import os
-import xml.etree.ElementTree as ET
+import re
 import shutil
 import xml.dom.minidom as minidom
-import re
+import xml.etree.ElementTree as ET
 import zipfile
 
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -135,7 +135,7 @@ class OpenmsxGenerator(Generator):
             save_name = re.sub(r"\[[^]]*\]", "", save_name)
             file.write("\n")
             file.write("# -= Save state =-\n")
-            file.write('savestate "{}"\n'.format(save_name))
+            file.write(f'savestate "{save_name}"\n')
             # set the screenshot
             file.write("\n")
             file.write("# -= Screenshots =-\n")
@@ -146,7 +146,7 @@ class OpenmsxGenerator(Generator):
             file.write("\n")
             file.write("# -= Controller config =-\n")
             nplayer = 1
-            for playercontroller, pad in sorted(players_controllers.items()):
+            for _, pad in sorted(players_controllers.items()):
                 if nplayer <= 2:
                     if nplayer == 1:
                         file.write("plug joyporta joystick1\n")
@@ -156,50 +156,34 @@ class OpenmsxGenerator(Generator):
                         input = pad.inputs[x]
                         if input.name == "y":
                             file.write(
-                                'bind "joy{} button{} down" "keymatrixdown 6 0x40"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x40"\n'
                             )
                         if input.name == "x":
                             file.write(
-                                'bind "joy{} button{} down" "keymatrixdown 6 0x80"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x80"\n'
                             )
                         if input.name == "pagedown":
                             file.write(
-                                'bind "joy{} button{} up" "set fastforward off"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} up" "set fastforward off"\n'
                             )
                             file.write(
-                                'bind "joy{} button{} down" "set fastforward on"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "set fastforward on"\n'
                             )
                         if input.name == "select":
                             file.write(
-                                'bind "joy{} button{} down" "toggle pause"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "toggle pause"\n'
                             )
                         if input.name == "start":
                             file.write(
-                                'bind "joy{} button{} down" "main_menu_toggle"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "main_menu_toggle"\n'
                             )
                         if input.name == "l3":
                             file.write(
-                                'bind "joy{} button{} down" "toggle_osd_keyboard"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "toggle_osd_keyboard"\n'
                             )
                         if input.name == "r3":
                             file.write(
-                                'bind "joy{} button{} down" "toggle console"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "toggle console"\n'
                             )
                 nplayer += 1
 
@@ -269,7 +253,7 @@ class OpenmsxGenerator(Generator):
         # handle our own file format for stacked roms / disks
         if file_extension == ".openmsx":
             # read the contents of the file and extract the rom paths
-            with open(rom, "r") as file:
+            with open(rom) as file:
                 lines = file.readlines()
                 rom1 = ""
                 rom1 = lines[0].strip()

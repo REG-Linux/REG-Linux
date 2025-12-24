@@ -1,4 +1,5 @@
 from os import path
+
 from configgen.systemFiles import ROMS
 
 IORTCW_CONFIG_PATH = ROMS + "/iortcw/main/wolfconfig.cfg"
@@ -85,7 +86,7 @@ def setIortcwConfig(system, gameResolution):
 
     # Check if the file exists
     if path.isfile(IORTCW_CONFIG_PATH):
-        with open(IORTCW_CONFIG_PATH, "r") as config_file:
+        with open(IORTCW_CONFIG_PATH) as config_file:
             lines = config_file.readlines()
 
         # Loop through the options and update the lines

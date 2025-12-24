@@ -33,8 +33,35 @@ reglinux-configgen = "configgen:main"
 
 [tool.pyright]
 pythonVersion = "3.12"
-typeCheckingMode = "basic"
-reportMissingImports = "warning"
+typeCheckingMode = "standard"
 
 venvPath = "."
 venv = ".venv"
+
+reportMissingImports = "warning"
+
+# reportUnknownParameterType = true
+# reportUnknownVariableType = true
+# reportUnknownMemberType = true
+
+reportOptionalOperand = "warning"
+reportOptionalSubscript = "warning"
+reportOptionalMemberAccess = "warning"
+
+reportMissingReturn = true
+
+reportUnusedImport = "warning"
+reportUnusedVariable = "warning"
+reportUnusedExpression = "warning"
+
+[tool.ruff]
+target-version = "py312"
+unsafe-fixes = false
+
+[tool.coverage.run]
+branch = true
+source = ["configgen"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

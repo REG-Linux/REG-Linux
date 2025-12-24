@@ -1,7 +1,8 @@
-from configgen.generators.Generator import Generator
+from glob import glob
+
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from glob import glob
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
 
 SH_BIN_PATH = "/bin/bash"

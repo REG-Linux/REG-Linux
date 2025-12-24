@@ -1,6 +1,7 @@
+from subprocess import CalledProcessError, check_output
+
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF, HOME_INIT
-from subprocess import check_output, CalledProcessError
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -46,9 +47,7 @@ def setPPSSPPConfig(system):
                             ).strip()
                             if discrete_name != "":
                                 eslog.debug(
-                                    "Using Discrete GPU Name: {} for PPSSPP".format(
-                                        discrete_name
-                                    )
+                                    f"Using Discrete GPU Name: {discrete_name} for PPSSPP"
                                 )
                                 ppssppConfig.set(
                                     "Graphics", "VulkanDevice", discrete_name
@@ -72,7 +71,7 @@ def setPPSSPPConfig(system):
             eslog.debug("Error executing system-vulkan script.")
 
     # Display FPS
-    if system.isOptSet("showFPS") and system.getOptBoolean("showFPS") == True:
+    if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
         ppssppConfig.set(
             "Graphics", "ShowFPSCounter", "3"
         )  # 1 for Speed%, 2 for FPS, 3 for both
@@ -85,7 +84,7 @@ def setPPSSPPConfig(system):
         ppssppConfig.set("Graphics", "FrameSkip", str(system.config["frameskip"]))
     elif (
         system.isOptSet("rendering_mode")
-        and system.getOptBoolean("rendering_mode") == False
+        and not system.getOptBoolean("rendering_mode")
     ):
         ppssppConfig.set("Graphics", "FrameSkip", "0")
     else:
@@ -94,7 +93,7 @@ def setPPSSPPConfig(system):
     # Buffered rendering
     if (
         system.isOptSet("rendering_mode")
-        and system.getOptBoolean("rendering_mode") == False
+        and not system.getOptBoolean("rendering_mode")
     ):
         ppssppConfig.set("Graphics", "RenderingMode", "0")
         # Have to force autoframeskip off here otherwise PPSSPP sets rendering mode back to 1.
@@ -114,7 +113,7 @@ def setPPSSPPConfig(system):
         # Auto frameskip
         if (
             system.isOptSet("autoframeskip")
-            and system.getOptBoolean("autoframeskip") == False
+            and not system.getOptBoolean("autoframeskip")
         ):
             ppssppConfig.set("Graphics", "AutoFrameSkip", "False")
         else:
@@ -123,7 +122,7 @@ def setPPSSPPConfig(system):
     # VSync Interval
     if (
         system.isOptSet("vsyncinterval")
-        and system.getOptBoolean("vsyncinterval") == False
+        and not system.getOptBoolean("vsyncinterval")
     ):
         ppssppConfig.set("Graphics", "VSyncInterval", "False")
     else:
@@ -172,7 +171,7 @@ def setPPSSPPConfig(system):
     # Forcing Nickname to Anonymous or User name
     if (
         system.isOptSet("retroachievements")
-        and system.getOptBoolean("retroachievements") == True
+        and system.getOptBoolean("retroachievements")
         and system.isOptSet("retroachievements.username")
         and system.config.get("retroachievements.username", "") != ""
     ):
@@ -190,7 +189,7 @@ def setPPSSPPConfig(system):
     ppssppConfig.ensure_section("General")
 
     # Rewinding
-    if system.isOptSet("rewind") and system.getOptBoolean("rewind") == True:
+    if system.isOptSet("rewind") and system.getOptBoolean("rewind"):
         ppssppConfig.set(
             "General", "RewindFlipFrequency", "300"
         )  # 300 = every 5 seconds

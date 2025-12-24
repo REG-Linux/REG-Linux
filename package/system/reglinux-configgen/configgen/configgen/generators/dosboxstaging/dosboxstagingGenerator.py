@@ -1,7 +1,8 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from configgen.systemFiles import CONF
 from os import path
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

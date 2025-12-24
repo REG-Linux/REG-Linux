@@ -1,7 +1,6 @@
 import logging
-import sys
 import os
-from typing import Optional
+import sys
 from logging.handlers import RotatingFileHandler
 
 
@@ -39,7 +38,7 @@ class LoggerManager:
         level: int = logging.DEBUG,
         fmt: str = "%(asctime)s %(levelname)s (%(filename)s:%(lineno)d):%(funcName)s %(message)s",
         enable_file_logging: bool = False,
-        log_file_path: Optional[str] = None,
+        log_file_path: str | None = None,
         max_file_size: int = 10 * 1024 * 1024,  # 10MB
         backup_count: int = 3,
         enable_stdout: bool = True,
@@ -107,7 +106,7 @@ def get_logger(
     level: int = logging.DEBUG,
     fmt: str = "%(asctime)s %(levelname)s (%(filename)s:%(lineno)d):%(funcName)s %(message)s",
     enable_file_logging: bool = False,
-    log_file_path: Optional[str] = None,
+    log_file_path: str | None = None,
     max_file_size: int = 10 * 1024 * 1024,  # 10MB
     backup_count: int = 3,
     enable_stdout: bool = True,
