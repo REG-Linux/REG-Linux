@@ -3,7 +3,7 @@ new file mode 100644
 index 000000000000..58d9ab342fe9
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,828 @@
+@@ -0,0 +1,915 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
 + * Copyright (c) 2025, REG-LINUX (https://reglinux.org)
@@ -36,8 +36,18 @@ index 000000000000..58d9ab342fe9
 +		mmc1 = &sdhc_1;
 +	};
 +
++	usb_vbus_dummy: regulator-usb-vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb-vbus-dummy";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
 +	chosen {
-+ 
++		stdout-path = "serial0:115200n8";
++
 +		#address-cells = <2>;
 +		#size-cells = <2>;
 +		ranges;
@@ -97,34 +107,45 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&spmi_bus {
-+	/* This hardware only exposes the pm6125 helpers; the PMI632 chips
-+	 * referenced by pmi632.dtsi are absent, so prevent the kernel driver
-+	 * from probing the unused USIDs 0x2 and 0x3 (which otherwise flood dmesg
-+	 * with transaction-failed warnings).
-+	 */
-+	pmic@2 {
-+		status = "disabled";
-+	};
++      /* This hardware only exposes the pm6125 helpers; the PMI632 chips
++       * referenced by pmi632.dtsi are absent, so prevent the kernel driver
++       * from probing the unused USIDs 0x2 and 0x3 (which otherwise flood dmesg
++       * with transaction-failed warnings).
++       */
++      pmic@2 {
++              status = "disabled";
++      };
 +
-+	pmic@3 {
-+		status = "disabled";
-+	};
++      pmic@3 {
++              status = "disabled";
++      };
 +};
 +
 +&i2c1 {
 +	status = "okay";
 +
-+	panel_avdd: regulator@3e {
++	sgm3804: regulator@3e {
 +		compatible = "sgmicro,sgm3804";
 +		reg = <0x3e>;
-+		regulator-name = "panel-avdd";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		//reset-gpios =   <&tlmm 59 GPIO_ACTIVE_HIGH>, <&tlmm 58 GPIO_ACTIVE_HIGH>,
-+		//		<&tlmm 163 GPIO_ACTIVE_HIGH>,<&tlmm 164 GPIO_ACTIVE_HIGH>;
-+		reset-gpios = <&tlmm 44 GPIO_ACTIVE_HIGH>, <&tlmm 45 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&tlmm 44 GPIO_ACTIVE_HIGH>,
++			      <&tlmm 45 GPIO_ACTIVE_HIGH>;
 +		vin-supply = <&pm6125_l22>;
 +		status = "okay";
++		regulators {
++			vpos: vpos {
++				regulator-name = "panel-vsp";
++				regulator-min-microvolt = <5500000>;
++				regulator-max-microvolt = <5500000>;
++				regulator-boot-on;
++			};
++
++			vneg: vneg {
++				regulator-name = "panel-vsn";
++				regulator-min-microvolt = <5500000>;
++				regulator-max-microvolt = <5500000>;
++				regulator-boot-on;
++			};
++		};
 +	};
 +
 +	es8326: codec@18 {
@@ -234,7 +255,7 @@ index 000000000000..58d9ab342fe9
 +			reg = <0x22>;
 +			interrupts-extended = <&tlmm 39 IRQ_TYPE_LEVEL_LOW>;
 +			int-n-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
-+			vbus-supply = <&panel_avdd>;
++			vbus-supply = <&usb_vbus_dummy>;
 +			status = "okay";
 +
 +			connector {
@@ -359,22 +380,44 @@ index 000000000000..58d9ab342fe9
 +	};
 +};
 +
-+/*&mdss {
++&mdss {
 +	status = "okay";
-+};*/
++};
 +
 +&mdss_dsi0 {
 +	vdda-supply = <&pm6125_l18>;
-+	status = "disabled";
++	refgen-supply = <&pm6125_l18>;
++	assigned-clocks = <&dispcc DISP_CC_MDSS_BYTE0_CLK_SRC>,
++			  <&dispcc DISP_CC_MDSS_PCLK0_CLK_SRC>;
++	assigned-clock-parents = <&mdss_dsi0_phy DSI_BYTE_PLL_CLK>,
++				 <&mdss_dsi0_phy DSI_PIXEL_PLL_CLK>;
++	qcom,component-on-probe;
++	status = "okay";
 +
 +	panel: panel@0 {
-+		status = "disabled";
-+		/*compatible = "truly,hx83112a";*/
++		status = "okay";
++		compatible = "truly,hx83112a";
 +		reg = <0>;
++		truly,attach-delay-ms = <200>;
++		/* DOES NOT CHANGE truly,defer-attach;*/
++		/* DOES NOT CHANGE truly,force-sleep-before-init; */
++		/* DOES NOT CHANGE truly,readback-after-init;*/
++		/*truly,tx-eot-append;*/
++		truly,reset-delay-ms = <100>;
++		dsi,lanes = <4>;
++		dsi,format = <0>; /* MIPI_DSI_FMT_RGB888 */
++		/* DOES NOT CHANGE qcom,mdss-dsi-t-clk-pre = <0x2d>;
++		qcom,mdss-dsi-t-clk-post = <0x0d>;
++		qcom,mdss-dsi-panel-phy-timings =
++			<0x231e0709 0x0502040a 0x231e0709 0x0502040a
++			 0x231e0709 0x0502040a 0x231e0709 0x0502040a
++			 0x23190708 0x0502040a>;*/
++		/* Interpret the PHY timing words as big-endian bytes */
++		/* DOES NOT CHANGE qcom,mdss-dsi-panel-phy-timings-be;*/
++
 +		iovcc-supply = <&pm6125_l9>;
-+		vddio-supply = <&pm6125_l9>;
-+		vsp-supply = <&panel_avdd>;
-+		vsn-supply = <&panel_avdd>;
++		vsp-supply = <&vpos>;
++		vsn-supply = <&vneg>;
 +		/*backlight = <&panel_backlight>;*/
 +
 +		enable-gpios = <&tlmm 97 GPIO_ACTIVE_HIGH>;
@@ -383,12 +426,15 @@ index 000000000000..58d9ab342fe9
 +
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&te_active &mdss_dsi_active>;
++		/* DOES NOT CHANGE pinctrl-0 = <&mdss_dsi_active>;*/
 +
 +		rotation = <270>;
 +
 +		port {
 +			panel_in: endpoint {
++				data-lanes = <0 1 2 3>;
 +				remote-endpoint = <&mdss_dsi0_out>;
++				status = "okay";
 +			};
 +		};
 +	};
@@ -397,10 +443,11 @@ index 000000000000..58d9ab342fe9
 +&mdss_dsi0_out {
 +	data-lanes = <0 1 2 3>;
 +	remote-endpoint = <&panel_in>;
++	status = "okay";
 +};
 +
 +&mdss_dsi0_phy {
-+	status = "disabled";
++	status = "okay";
 +};
 +
 +&{/soc@0/geniqup@4ac0000/spi@4a88000} {
@@ -413,6 +460,16 @@ index 000000000000..58d9ab342fe9
 +		interrupts-extended = <&tlmm 69 IRQ_TYPE_EDGE_FALLING>;
 +		reset-gpios = <&tlmm 68 GPIO_ACTIVE_LOW>;
 +		status = "okay";
++	};
++
++	/* Jadard alternative touch controller */
++	touch_jadard: touchscreen@1 {
++		compatible = "jadard,jd9365";
++		reg = <1>;
++		spi-max-frequency = <6000000>;
++		interrupts-extended = <&tlmm 69 IRQ_TYPE_EDGE_FALLING>;
++		reset-gpios = <&tlmm 68 GPIO_ACTIVE_HIGH>;
++		/* Shares reset/IRQ with the Himax SPI touch stub above */
 +	};
 +};
 +
@@ -515,11 +572,41 @@ index 000000000000..58d9ab342fe9
 +	status = "okay";
 +};
 +
++/* UART routed to the joystick MCU */
++/*&uart4 {
++
++	status = "disabled";
++	pinctrl-names = "default";
++	pinctrl-0 = <&qup_uart4_default>;
++
++	joystick_mcu_serdev: joystick-mcu {
++		compatible = "mangmi,joystick-mcu";
++		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
++		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
++		select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
++		mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
++		start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
++		back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
++		power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
++		boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
++		boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
++	};
++};*/
++
 +/ {
 +	/* drop serial1 alias while UART4 is reserved for Bluetooth */
++	/*aliases {
++		serial1 = &uart4;
++	};*/
 +};
 +
 +/ {
++	/* Joystick MCU on QUPv3 SE4 UART (disabled until driver is ready) */
++	/*joystick_mcu: joystick-mcu {
++		compatible = "mangmi,joystick-mcu";
++	};*/
++
 +	vibrator {
 +		compatible = "pwm-gpio-vibrator";
 +		pinctrl-names = "default";
