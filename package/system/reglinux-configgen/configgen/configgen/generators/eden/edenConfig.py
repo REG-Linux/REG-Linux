@@ -1,6 +1,7 @@
-from configgen.systemFiles import CONF
 from os import environ
-from subprocess import check_output, CalledProcessError
+from subprocess import CalledProcessError, check_output
+
+from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -136,9 +137,7 @@ def setEdenConfig(edenConfig, system):
                                 ).strip()
                                 if discrete_index != "":
                                     eslog.debug(
-                                        "Using Discrete GPU Index: {} for eden".format(
-                                            discrete_index
-                                        )
+                                        f"Using Discrete GPU Index: {discrete_index} for eden"
                                     )
                                     edenConfig.set(
                                         "Renderer", "vulkan_device", discrete_index

@@ -10,13 +10,16 @@ by translating gamepad button presses and analog stick movements into correspond
 keyboard key presses or mouse movements.
 """
 
-from subprocess import call
-from json import load, dumps
-from os import path
 import os
+from json import dumps, load
+from os import path
+from subprocess import call
+
 from evdev import InputDevice
-from .mouse import mouseButtonToCode
+
 from configgen.utils.logger import get_logger
+
+from .mouse import mouseButtonToCode
 
 eslog = get_logger(__name__)
 
@@ -92,24 +95,20 @@ class Evmapy:
         """
         # Search for configuration files in order of precedence
         for keysfile in [
-            "{}.keys".format(rom),  # ROM-specific configuration
-            "{}/padto.keys".format(rom),  # Configuration inside ROM directory
+            f"{rom}.keys",  # ROM-specific configuration
+            f"{rom}/padto.keys",  # Configuration inside ROM directory
             # Commented out more specific configurations for now
             # "/userdata/system/configs/evmapy/{}.{}.{}.keys".format(system, emulator, core),
             # "/userdata/system/configs/evmapy/{}.{}.keys".format(system, emulator),
-            "/userdata/system/configs/evmapy/{}.keys".format(
-                system
-            ),  # User system config
+            f"/userdata/system/configs/evmapy/{system}.keys",  # User system config
             # System-wide configurations
             # "/usr/share/evmapy/{}.{}.{}.keys".format(system, emulator, core),
-            "/usr/share/evmapy/{}.{}.keys".format(
-                system, emulator
-            ),  # System+emulator config
-            "/usr/share/evmapy/{}.keys".format(system),  # Default system config
+            f"/usr/share/evmapy/{system}.{emulator}.keys",  # System+emulator config
+            f"/usr/share/evmapy/{system}.keys",  # Default system config
         ]:
             # Check if configuration file exists and handle directory ROM case
             if path.exists(keysfile) and not (
-                path.isdir(rom) and keysfile == "{}.keys".format(rom)
+                path.isdir(rom) and keysfile == f"{rom}.keys"
             ):
                 eslog.debug(f"evmapy on {keysfile}")
 
@@ -120,7 +119,7 @@ class Evmapy:
                 try:
                     with open(keysfile) as f:
                         padActionConfig = load(f)
-                except (IOError, OSError) as e:
+                except OSError as e:
                     eslog.error(f"Error loading keys file {keysfile}: {e}")
                     # Continue with empty padActionConfig to avoid breaking the process
                     padActionConfig = {}
@@ -135,9 +134,7 @@ class Evmapy:
                             path.basename(guns[gun]["node"])
                         )
                         eslog.debug(
-                            "config file for keysfile is {} (from {}) - gun".format(
-                                configfile, keysfile
-                            )
+                            f"config file for keysfile is {configfile} (from {keysfile}) - gun"
                         )
 
                         # Initialize gun configuration structure
@@ -178,17 +175,13 @@ class Evmapy:
 
                 # Configure each player's controller
                 nplayer = 1
-                for playercontroller, pad in sorted(players_controllers.items()):
+                for _, pad in sorted(players_controllers.items()):
                     player_action_key = "actions_player" + str(nplayer)
                     if player_action_key in padActionConfig:
                         # Generate configuration file path for this controller
-                        configfile = "/var/run/evmapy/{}.json".format(
-                            path.basename(pad.dev)
-                        )
+                        configfile = f"/var/run/evmapy/{path.basename(pad.dev)}.json"
                         eslog.debug(
-                            "config file for keysfile is {} (from {})".format(
-                                configfile, keysfile
-                            )
+                            f"config file for keysfile is {configfile} (from {keysfile})"
                         )
 
                         # Initialize controller configuration structure
@@ -496,9 +489,7 @@ class Evmapy:
 
         # No configuration file found
         eslog.debug(
-            "no evmapy config file found for system={}, emulator={}".format(
-                system, emulator
-            )
+            f"no evmapy config file found for system={system}, emulator={emulator}"
         )
         return False
 

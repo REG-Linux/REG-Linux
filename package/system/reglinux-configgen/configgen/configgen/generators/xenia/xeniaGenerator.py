@@ -1,19 +1,22 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from configgen.systemFiles import CONF, SAVES, HOME
-from configgen.controllers import generate_sdl_controller_config
-from os import path, makedirs, environ
-from sys import exit
-from shutil import copy2
 from filecmp import dircmp
-from subprocess import check_output, CalledProcessError
+from os import environ, makedirs, path
+from shutil import copy2
+from subprocess import CalledProcessError, check_output
+from sys import exit
+
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import CONF, HOME, SAVES
+
 try:
-    from toml import load, dump
+    from toml import dump, load
 except ImportError:
     print("toml module not found. Please install it with: pip install toml")
     raise
 from glob import glob
-from re import sub, search, IGNORECASE
+from re import IGNORECASE, search, sub
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -57,28 +60,22 @@ class XeniaGenerator(Generator):
                         ["/usr/bin/system-vulkan", "vulkanVersion"], text=True
                     ).strip()
                     if vulkan_version > "1.3":
-                        eslog.debug("Using Vulkan version: {}".format(vulkan_version))
+                        eslog.debug(f"Using Vulkan version: {vulkan_version}")
                     else:
                         if (
                             system.isOptSet("xenia_api")
                             and system.config["xenia_api"] == "D3D12"
                         ):
                             eslog.debug(
-                                "Vulkan version: {} is not compatible with Xenia when using D3D12".format(
-                                    vulkan_version
-                                )
+                                f"Vulkan version: {vulkan_version} is not compatible with Xenia when using D3D12"
                             )
                             eslog.debug(
-                                "You may have performance & graphical errors, switching to native Vulkan {}".format(
-                                    vulkan_version
-                                )
+                                f"You may have performance & graphical errors, switching to native Vulkan {vulkan_version}"
                             )
                             system.config["xenia_api"] = "Vulkan"
                         else:
                             eslog.debug(
-                                "Vulkan version: {} is not recommended with Xenia".format(
-                                    vulkan_version
-                                )
+                                f"Vulkan version: {vulkan_version} is not recommended with Xenia"
                             )
                 except CalledProcessError:
                     eslog.debug("Error checking for Vulkan version.")
@@ -102,13 +99,13 @@ class XeniaGenerator(Generator):
             eslog.debug(f"Found .xbox360 playlist: {rom}")
             pathLead = path.dirname(rom)
             try:
-                with open(rom, "r") as openFile:
+                with open(rom) as openFile:
                     # Read only the first line of the file.
                     firstLine = openFile.readlines(1)[0]
                     # Strip of any new line characters.
                     firstLine = firstLine.strip("\n").strip("\r")
                 eslog.debug(
-                    f"Checking if specified disc installation / XBLA file actually exists..."
+                    "Checking if specified disc installation / XBLA file actually exists..."
                 )
                 xblaFullPath = pathLead + "/" + firstLine
                 if path.exists(xblaFullPath):
@@ -118,7 +115,7 @@ class XeniaGenerator(Generator):
                     eslog.error(
                         f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename."
                     )
-            except (IOError, IndexError) as e:
+            except (OSError, IndexError) as e:
                 eslog.error(f"Error reading .xbox360 playlist file {rom}: {e}")
                 # Ensure we handle the case where the file might be empty or inaccessible
                 pass
@@ -257,7 +254,7 @@ class XeniaGenerator(Generator):
         # run headless ?
         if (
             system.isOptSet("xeniaHeadless")
-            and system.getOptBoolean("xeniaHeadless") == True
+            and system.getOptBoolean("xeniaHeadless")
         ):
             config["UI"] = {"headless": True}
         else:
@@ -298,7 +295,7 @@ class XeniaGenerator(Generator):
                 for file_path in matching_files:
                     eslog.debug(f"Enabling patches for: {file_path}")
                     # load the matchig .patch.toml file
-                    with open(file_path, "r") as f:
+                    with open(file_path) as f:
                         patch_toml = load(f)
                     # modify all occurrences of the `is_enabled` key to `true`
                     for patch in patch_toml.get("patch", []):

@@ -1,9 +1,10 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
+from json import dump, load
+from os import makedirs, path
 from shutil import copy
-from json import load, dump
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
 
 SONIC3AIR_CONFIG_PATH = "/usr/bin/sonic3-air/config.json"
@@ -36,7 +37,7 @@ class Sonic3AIRGenerator(Generator):
 
         # read the json file
         # can't use `import json` as the file is not compliant
-        with open(SONIC3AIR_DEST_CONFIG_PATH, "r") as file:
+        with open(SONIC3AIR_DEST_CONFIG_PATH) as file:
             json_text = file.read()
         # update the "SaveStatesDir"
         json_text = json_text.replace(
@@ -60,7 +61,7 @@ class Sonic3AIRGenerator(Generator):
         # settings json - compliant
         # ensure fullscreen
         if path.exists(SONIC3AIR_SETTINGS_PATH):
-            with open(SONIC3AIR_SETTINGS_PATH, "r") as file:
+            with open(SONIC3AIR_SETTINGS_PATH) as file:
                 settings_data = load(file)
                 settings_data["Fullscreen"] = 1
         else:

@@ -1,9 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, chdir
+from os import chdir, makedirs, path
 from re import search
-from configgen.systemFiles import CONF, SAVES, ROMS
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.settings import UnixSettings
+from configgen.systemFiles import CONF, ROMS, SAVES
+
 from .openborControllers import setControllerConfig
 
 OPENBOR_CONF_DIR = CONF + "/openbor"
@@ -24,7 +26,7 @@ class OpenborGenerator(Generator):
 
         # guess the version to run
         core = system.config["core"]
-        if system.config["core_forced"] == False:
+        if not system.config["core_forced"]:
             core = OpenborGenerator.guessCore(rom)
 
         # config file
@@ -105,7 +107,7 @@ class OpenborGenerator(Generator):
     @staticmethod
     def guessCore(rom):
         versionstr = search(r"\[.*([0-9]{4})\]+", path.basename(rom))
-        if versionstr == None:
+        if versionstr is None:
             return "openbor7530"
         version = int(versionstr.group(1))
 

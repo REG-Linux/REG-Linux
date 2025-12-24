@@ -1,6 +1,7 @@
-from os import path, makedirs, remove
 from configparser import ConfigParser
-from configgen.controllers import gunsNeedCrosses, getGamesMetaData
+from os import makedirs, path, remove
+
+from configgen.controllers import getGamesMetaData, gunsNeedCrosses
 
 
 def generateCoreSettings(coreSettings, system, rom, guns, wheels):
@@ -2672,7 +2673,7 @@ def configure_xrick(coreSettings, system):
     # Crop Borders
     if (
         system.isOptSet("xrick_crop_borders")
-        and system.getOptBoolean("xrick_crop_borders") == False
+        and not system.getOptBoolean("xrick_crop_borders")
     ):
         coreSettings.save("xrick_crop_borders", '"disabled"')
     else:

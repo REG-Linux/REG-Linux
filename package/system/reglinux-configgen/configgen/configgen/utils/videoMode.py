@@ -1,10 +1,9 @@
-from os import path
-from time import sleep
-from subprocess import PIPE, CalledProcessError, run
 from csv import reader
-from typing import Optional, List, Dict, Any
-from .logger import get_logger
+from os import path
+from subprocess import PIPE, CalledProcessError, run
+from time import sleep
 
+from .logger import get_logger
 from .regmsgclient import regmsg_send_message
 
 eslog = get_logger(__name__)
@@ -26,7 +25,7 @@ def changeMode(videomode: str) -> None:
             sleep(1)
 
 
-def getCurrentMode() -> Optional[str]:
+def getCurrentMode() -> str | None:
     try:
         return regmsg_send_message("getMode")
     except Exception as e:
@@ -34,7 +33,7 @@ def getCurrentMode() -> Optional[str]:
         return None
 
 
-def getScreens() -> List[str]:
+def getScreens() -> list[str]:
     """Return a list of screen names detected by regmsg."""
     try:
         result = regmsg_send_message("listOutputs")
@@ -53,12 +52,12 @@ def getScreens() -> List[str]:
         return []
 
 
-def getCurrentResolution(name: Optional[str] = None) -> Dict[str, int]:
+def getCurrentResolution(name: str | None = None) -> dict[str, int]:
     drm_mode_path = "/var/run/drmMode"
 
     if path.exists(drm_mode_path):
         try:
-            with open(drm_mode_path, "r") as f:
+            with open(drm_mode_path) as f:
                 content = f.read().strip()
                 if content:
                     vals = content.split("@")[0].split("x")
@@ -79,7 +78,7 @@ def getCurrentResolution(name: Optional[str] = None) -> Dict[str, int]:
         return {"width": 0, "height": 0}
 
 
-def getScreensInfos(config: Dict[str, str]) -> List[Dict[str, int]]:
+def getScreensInfos(config: dict[str, str]) -> list[dict[str, int]]:
     resolution1 = getCurrentResolution()
     outputs = getScreens()
 
@@ -118,7 +117,7 @@ def minTomaxResolution() -> None:
     regmsg_send_message("minToMaxResolution")
 
 
-def getRefreshRate() -> Optional[str]:
+def getRefreshRate() -> str | None:
     try:
         out = regmsg_send_message("getRefresh")
         if out:
@@ -173,7 +172,7 @@ def getGLVendor() -> str:
     return "unknown"
 
 
-def _get_eglinfo_lines() -> List[str]:
+def _get_eglinfo_lines() -> list[str]:
     eglinfo_path = "/usr/bin/eglinfo"
     if not path.exists(eglinfo_path):
         return []
@@ -212,7 +211,7 @@ def getAltDecoration(systemName: str, rom: str, emulator: str) -> str:
     romName = path.splitext(path.basename(rom))[0].casefold()
 
     try:
-        with open(specialFile, "r") as openFile:
+        with open(specialFile) as openFile:
             specialList = reader(openFile, delimiter=";")
             for row in specialList:
                 if row[0].casefold() == romName:

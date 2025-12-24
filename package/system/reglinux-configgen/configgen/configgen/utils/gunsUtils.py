@@ -1,5 +1,5 @@
+from os import listdir, makedirs, path
 from shutil import copyfile, copytree
-from os import path, makedirs, listdir
 
 
 def precalibration_copyFile(src, dst):
@@ -23,15 +23,15 @@ def precalibration_copyFilesInDir(srcdir, dstdir, startWith, endWith):
 
 
 def precalibration(systemName, emulator, core, rom):
-    dir = "/usr/share/reglinux/guns-precalibrations/{}".format(systemName)
+    dir = f"/usr/share/reglinux/guns-precalibrations/{systemName}"
     if not path.exists(dir):
         return
     baserom = path.basename(rom)
 
     if systemName == "atomiswave":
         for suffix in ["nvmem", "nvmem2"]:
-            src = "{}/reicast/{}.{}".format(dir, baserom, suffix)
-            dst = "/userdata/saves/atomiswave/reicast/{}.{}".format(baserom, suffix)
+            src = f"{dir}/reicast/{baserom}.{suffix}"
+            dst = f"/userdata/saves/atomiswave/reicast/{baserom}.{suffix}"
             precalibration_copyFile(src, dst)
 
     elif systemName == "mame":
@@ -46,30 +46,28 @@ def precalibration(systemName, emulator, core, rom):
 
         if target_dir is not None:
             baserom_noext = path.splitext(baserom)[0]
-            src = "{}/nvram/{}".format(dir, baserom_noext)
-            dst = "/userdata/saves/{}/nvram/{}".format(target_dir, baserom_noext)
+            src = f"{dir}/nvram/{baserom_noext}"
+            dst = f"/userdata/saves/{target_dir}/nvram/{baserom_noext}"
             precalibration_copyDir(src, dst)
-            srcdir = "{}/diff".format(dir)
-            dstdir = "/userdata/saves/{}/diff".format(target_dir)
+            srcdir = f"{dir}/diff"
+            dstdir = f"/userdata/saves/{target_dir}/diff"
             precalibration_copyFilesInDir(srcdir, dstdir, baserom_noext + "_", ".dif")
 
     elif systemName == "naomi":
         for suffix in ["nvmem", "eeprom"]:
-            src = "{}/reicast/{}.{}".format(dir, baserom, suffix)
-            dst = "/userdata/saves/naomi/reicast/{}.{}".format(baserom, suffix)
+            src = f"{dir}/reicast/{baserom}.{suffix}"
+            dst = f"/userdata/saves/naomi/reicast/{baserom}.{suffix}"
             precalibration_copyFile(src, dst)
 
     elif systemName == "supermodel":
         baserom_noext = path.splitext(baserom)[0]
-        src = "{}/NVDATA/{}.nv".format(dir, baserom_noext)
-        dst = "/userdata/saves/supermodel/NVDATA/{}.nv".format(baserom_noext)
+        src = f"{dir}/NVDATA/{baserom_noext}.nv"
+        dst = f"/userdata/saves/supermodel/NVDATA/{baserom_noext}.nv"
         precalibration_copyFile(src, dst)
 
     elif systemName == "namco2x6":
         if emulator == "play":
             baserom_noext = path.splitext(baserom)[0]
-            src = "{}/play/{}".format(dir, baserom_noext)
-            dst = "/userdata/system/configs/play/Play Data Files/arcadesaves/{}.backupram".format(
-                baserom_noext
-            )
+            src = f"{dir}/play/{baserom_noext}"
+            dst = f"/userdata/system/configs/play/Play Data Files/arcadesaves/{baserom_noext}.backupram"
             precalibration_copyFile(src, dst)

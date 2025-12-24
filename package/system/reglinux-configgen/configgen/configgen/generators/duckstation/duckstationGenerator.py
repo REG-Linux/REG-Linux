@@ -1,13 +1,14 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from configgen.systemFiles import ROMS
 from configparser import ConfigParser
-from os import path, makedirs
+from os import makedirs, path
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
+
 from .duckstationConfig import (
-    DUCKSTATION_NOGUI_PATH,
     DUCKSTATION_BIN_PATH,
     DUCKSTATION_CONFIG_PATH,
+    DUCKSTATION_NOGUI_PATH,
     setDuckstationConfig,
 )
 from .duckstationControllers import setDuckstationControllers
@@ -57,7 +58,7 @@ def rewriteM3uFullPath(m3u):  # Rewrite a clean m3u file with valid fullpath
     try:
         with open(m3u) as f:
             firstline = f.readline().rstrip()  # Get first line in m3u
-    except (IOError, OSError) as e:
+    except OSError as e:
         eslog.error(f"Error reading m3u file {m3u}: {e}")
         # Return the original m3u in case of error
         return m3u
@@ -70,14 +71,14 @@ def rewriteM3uFullPath(m3u):  # Rewrite a clean m3u file with valid fullpath
     fulldirname = path.dirname(m3u)
 
     try:
-        with open(m3u, "r") as initialm3u, open(initialfirstdisc, "a") as f1:
+        with open(m3u) as initialm3u, open(initialfirstdisc, "a") as f1:
             for line in initialm3u:
                 if line[0] == "/":  # for /MGScd1.chd
                     newpath = fulldirname + line
                 else:
                     newpath = fulldirname + "/" + line  # for MGScd1.chd
                 f1.write(newpath)
-    except (IOError, OSError) as e:
+    except OSError as e:
         eslog.error(f"Error rewriting m3u file {m3u}: {e}")
         # Return the original m3u in case of error
         return m3u

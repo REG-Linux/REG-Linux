@@ -2,11 +2,11 @@ import xml.etree.ElementTree as ET
 import xml.parsers.expat
 from codecs import open
 from csv import reader
-from os import path, makedirs, remove, listdir, unlink, symlink, linesep
-from shutil import copy2, rmtree
-from zipfile import ZipFile
+from os import linesep, listdir, makedirs, path, remove, symlink, unlink
 from pathlib import Path
+from shutil import copy2, rmtree
 from xml.dom import minidom
+from zipfile import ZipFile
 
 from configgen.utils.logger import get_logger
 
@@ -58,7 +58,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
         # Set up command line for basic systems
         # ie. no media, softlists, etc.
         if system.getOptBoolean("customcfg"):
-            cfgPath = "/userdata/system/configs/{}/custom/".format(corePath)
+            cfgPath = f"/userdata/system/configs/{corePath}/custom/"
         else:
             cfgPath = "/userdata/saves/mame/mame/cfg/"
         if not path.exists(cfgPath):
@@ -75,7 +75,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
         pluginsToLoad = []
         if not (
             system.isOptSet("hiscoreplugin")
-            and system.getOptBoolean("hiscoreplugin") == False
+            and not system.getOptBoolean("hiscoreplugin")
         ):
             pluginsToLoad += ["hiscore"]
         if system.isOptSet("coindropplugin") and system.getOptBoolean("coindropplugin"):
@@ -97,7 +97,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
         # Used for games that require a CD and floppy to both be inserted
         if system.name == "fmtowns" and softList == "":
             romParentPath = path.basename(romDirname)
-            if path.exists("/userdata/roms/fmtowns/{}.zip".format(romParentPath)):
+            if path.exists(f"/userdata/roms/fmtowns/{romParentPath}.zip"):
                 softList = "fmtowns_cd"
 
         # Determine MESS system name (if needed)
@@ -125,7 +125,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
         if messSysName[messMode] == "":
             # Command line for non-arcade, non-system ROMs (lcdgames, plugnplay)
             if system.getOptBoolean("customcfg"):
-                cfgPath = "/userdata/system/configs/{}/custom/".format(corePath)
+                cfgPath = f"/userdata/system/configs/{corePath}/custom/"
             else:
                 cfgPath = "/userdata/saves/mame/mame/cfg/"
             if not path.exists(cfgPath):
@@ -320,10 +320,8 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                 ):
                     if system.name == "fmtowns":
                         blankDisk = "/usr/share/mame/blank.fmtowns"
-                        targetFolder = "/userdata/saves/mame/{}".format(system.name)
-                        targetDisk = "{}/{}.fmtowns".format(
-                            targetFolder, path.splitext(romBasename)[0]
-                        )
+                        targetFolder = f"/userdata/saves/mame/{system.name}"
+                        targetDisk = f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
                         # Add elif statements here for other systems if enabled
                         if not path.exists(targetFolder):
                             makedirs(targetFolder)
@@ -350,17 +348,11 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
 
             # MESS config folder
             if system.getOptBoolean("customcfg"):
-                cfgPath = "/userdata/system/configs/{}/{}/custom/".format(
-                    corePath, messSysName[messMode]
-                )
+                cfgPath = f"/userdata/system/configs/{corePath}/{messSysName[messMode]}/custom/"
             else:
-                cfgPath = "/userdata/saves/mame/mame/cfg/{}/".format(
-                    messSysName[messMode]
-                )
+                cfgPath = f"/userdata/saves/mame/mame/cfg/{messSysName[messMode]}/"
             if system.getOptBoolean("pergamecfg"):
-                cfgPath = "/userdata/system/configs/{}/{}/{}/".format(
-                    corePath, messSysName[messMode], romBasename
-                )
+                cfgPath = f"/userdata/system/configs/{corePath}/{messSysName[messMode]}/{romBasename}/"
             if not path.exists(cfgPath):
                 makedirs(cfgPath)
             commandLine += ["-cfg_directory", cfgPath]
@@ -407,7 +399,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
 
                 # if using software list, use "usage" for autoRunCmd (if provided)
                 if softList != "":
-                    softListFile = "/usr/bin/mame/hash/{}.xml".format(softList)
+                    softListFile = f"/usr/bin/mame/hash/{softList}.xml"
                     if path.exists(softListFile):
                         softwarelist = ET.parse(softListFile)
                         for software in softwarelist.findall("software"):
@@ -442,14 +434,12 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                     ):
                         romType = "flop"
                         if romDrivername.casefold().endswith(".bas"):
-                            autoRunCmd = 'RUN "{}"\\n'.format(romDrivername)
+                            autoRunCmd = f'RUN "{romDrivername}"\\n'
                         else:
-                            autoRunCmd = 'LOADM "{}":EXEC\\n'.format(romDrivername)
+                            autoRunCmd = f'LOADM "{romDrivername}":EXEC\\n'
 
                 # check for a user override
-                autoRunFile = "system/configs/mame/autoload/{}_{}_autoload.csv".format(
-                    system.name, romType
-                )
+                autoRunFile = f"system/configs/mame/autoload/{system.name}_{romType}_autoload.csv"
                 if path.exists(autoRunFile):
                     openARFile = open(autoRunFile, "r")
                     with openARFile:
@@ -478,7 +468,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                                 autoRunCmd = row[1] + "\\n"
                                 autoRunDelay = 3
             commandLine += ["-inipath", "/userdata/saves/mame/mame/ini/"]
-            if autoRunCmd != None:
+            if autoRunCmd is not None:
                 if autoRunCmd.startswith("'"):
                     autoRunCmd.replace("'", "")
                 iniFile = open("/userdata/saves/mame/mame/ini/batocera.ini", "w")
@@ -489,16 +479,12 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
             # or drive 1 if drive 2 is selected manually.
             if system.isOptSet("addblankdisk") and system.getOptBoolean("addblankdisk"):
                 if not path.exists(
-                    "/userdata/saves/lr-mess/{}/{}.dsk".format(
-                        system.name, path.splitext(romBasename)[0]
-                    )
+                    f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk"
                 ):
-                    makedirs("/userdata/saves/lr-mess/{}/".format(system.name))
+                    makedirs(f"/userdata/saves/lr-mess/{system.name}/")
                     copy2(
                         "/usr/share/mame/blank.dsk",
-                        "/userdata/saves/lr-mess/{}/{}.dsk".format(
-                            system.name, path.splitext(romBasename)[0]
-                        ),
+                        f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk",
                     )
                 if (
                     system.isOptSet("altromtype")
@@ -506,16 +492,12 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                 ):
                     commandLine += [
                         "-flop1",
-                        "/userdata/saves/lr-mess/{}/{}.dsk".format(
-                            system.name, path.splitext(romBasename)[0]
-                        ),
+                        f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk",
                     ]
                 else:
                     commandLine += [
                         "-flop2",
-                        "/userdata/saves/lr-mess/{}/{}.dsk".format(
-                            system.name, path.splitext(romBasename)[0]
-                        ),
+                        f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk",
                     ]
 
     # Lightgun reload option
@@ -537,7 +519,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
     # Artwork crop - default to On for lr-mame
     # Exceptions for PDP-1 (status lights) and VGM Player (indicators)
     if not system.isOptSet("artworkcrop"):
-        if not system.name in ["pdp1", "ti99"]:
+        if system.name not in ["pdp1", "ti99"]:
             commandLine += ["-artwork_crop"]
     else:
         if system.getOptBoolean("artworkcrop"):
@@ -566,7 +548,7 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
             remove(path.join(cmdPath, file))
 
     # Write command line file
-    cmdFilename = "{}{}.cmd".format(cmdPath, romDrivername)
+    cmdFilename = f"{cmdPath}{romDrivername}.cmd"
     cmdFile = open(cmdFilename, "w")
     cmdFile.write(" ".join(commandLine))
     cmdFile.close()
@@ -653,7 +635,7 @@ def getMameControlScheme(system, romBasename):
                 twinstickList = set(f.read().split())
             with open(mameRotatedstick) as f:
                 qbertList = set(f.read().split())
-        except (IOError, OSError) as e:
+        except OSError as e:
             eslog.error(f"Error reading MAME list files: {e}")
             # Initialize empty sets to avoid breaking the process
             capcomList = set()
@@ -747,7 +729,7 @@ def generateMAMEPadConfig(
     with openFile:
         controlList = reader(openFile)
         for row in controlList:
-            if not row[0] in controlDict.keys():
+            if row[0] not in controlDict:
                 controlDict[row[0]] = {}
             controlDict[row[0]][row[1]] = row[2]
 
@@ -826,7 +808,7 @@ def generateMAMEPadConfig(
         with openMessFile:
             controlList = reader(openMessFile, delimiter=";")
             for row in controlList:
-                if not row[0] in messControlDict.keys():
+                if row[0] not in messControlDict:
                     messControlDict[row[0]] = {}
                 messControlDict[row[0]][row[1]] = {}
                 currentEntry = messControlDict[row[0]][row[1]]
@@ -1060,7 +1042,7 @@ def generateMAMEPadConfig(
             )  # Select
 
         # Handle special controls only if we're using a system that needs them
-        if useControls in messControlDict.keys() and messSysName in specialControlList:
+        if useControls in messControlDict and messSysName in specialControlList:
             for controlDef in messControlDict[useControls].keys():
                 thisControl = messControlDict[useControls][controlDef]
                 if nplayer == thisControl["player"]:
@@ -1267,7 +1249,7 @@ def generateAnalogPortElement(
     if axis == "":
         stdvalue = config.createTextNode("NONE")
     else:
-        stdvalue = config.createTextNode("JOYCODE_{}_{}".format(padindex, axis))
+        stdvalue = config.createTextNode(f"JOYCODE_{padindex}_{axis}")
     xml_newseq_std.appendChild(stdvalue)
     return xml_port
 

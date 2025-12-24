@@ -9,7 +9,7 @@ and proper environment variable configuration for both Wayland and X11 compatibi
 from os import environ, path
 from subprocess import Popen, TimeoutExpired, run
 from time import sleep
-from typing import Optional
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -35,7 +35,7 @@ class WindowManager:
 
         # Initialize instance attributes
         self.sway_launched = False  # Tracks if Sway compositor is running
-        self.sway_process: Optional[Popen] = None  # Holds the Sway process reference
+        self.sway_process: Popen | None = None  # Holds the Sway process reference
         self.gamescope_launched = False  # Reserved for future Gamescope implementation
         self._initialized = True
 

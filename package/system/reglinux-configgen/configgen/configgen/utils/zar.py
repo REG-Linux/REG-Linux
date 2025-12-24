@@ -1,5 +1,6 @@
-from os import path, mkdir, rmdir, listdir
+from os import listdir, mkdir, path, rmdir
 from subprocess import call
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

@@ -1,5 +1,6 @@
-from configgen.systemFiles import CONF, LOGDIR
 from os import path
+
+from configgen.systemFiles import CONF, LOGDIR
 from configgen.utils.logger import get_logger
 
 GZDOOM_CONFIG_DIR = CONF + "/gzdoom"
@@ -23,7 +24,7 @@ def setGzdoomConfig(system, rom):
     # RPi4 workaround which has both ligl & libgles
     # For arm systems, we want to force OpenGL ES - 3
     if gzdoom_api == "0":
-        with open(GZDOOM_ARCH_PATH, "r") as file:
+        with open(GZDOOM_ARCH_PATH) as file:
             content = file.read().strip()
             if not content == "x86_64":
                 gzdoom_api = "3"
@@ -68,7 +69,7 @@ def setGzdoomConfig(system, rom):
         # configparser wasn't working on the default ini file (non-compliant)
         # it's not a true ini file, use this crude method instead
         line_to_add = "Path=" + path.dirname(rom) + "\n"
-        with open(GZDOOM_CONFIG_PATH, "r") as file:
+        with open(GZDOOM_CONFIG_PATH) as file:
             lines = file.readlines()
             if line_to_add not in lines:
                 for i in range(len(lines)):
@@ -81,7 +82,7 @@ def setGzdoomConfig(system, rom):
             file.writelines(lines)
 
     # also check the config directories are also set
-    with open(GZDOOM_CONFIG_PATH, "r") as file:
+    with open(GZDOOM_CONFIG_PATH) as file:
         lines = file.readlines()
         if GZDOOM_FM_BANKS_PATH not in lines:
             for i in range(len(lines)):

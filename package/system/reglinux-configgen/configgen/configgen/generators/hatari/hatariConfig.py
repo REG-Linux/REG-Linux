@@ -1,4 +1,4 @@
-from configgen.systemFiles import CONF, BIOS
+from configgen.systemFiles import BIOS, CONF
 
 HATARI_CONFIG_DIR = CONF + "/hatari"
 HATARI_CONFIG_PATH = HATARI_CONFIG_DIR + "/hatari.cfg"

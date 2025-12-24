@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from typing import Protocol, Dict, Any, List
+from typing import Any, Protocol
+
 from configgen.Command import Command
 from configgen.Emulator import Emulator
 
@@ -11,11 +12,11 @@ class GeneratorProtocol(Protocol):
         self,
         system: Emulator,
         rom: str,
-        players_controllers: Dict[str, Any],
-        metadata: Dict[str, Any],
-        guns: List[Any],
-        wheels: List[Any],
-        game_resolution: Dict[str, Any],
+        players_controllers: dict[str, Any],
+        metadata: dict[str, Any],
+        guns: list[Any],
+        wheels: list[Any],
+        game_resolution: dict[str, Any],
     ) -> Command:
         """Generate the command to launch the emulator with the specified configurations.
 
@@ -34,7 +35,7 @@ class GeneratorProtocol(Protocol):
         ...
 
 
-class Generator(object):
+class Generator:
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -42,24 +43,24 @@ class Generator(object):
         self,
         system: Emulator,
         rom: str,
-        players_controllers: Dict[str, Any],
-        metadata: Dict[str, Any],
-        guns: List[Any],
-        wheels: List[Any],
-        game_resolution: Dict[str, Any],
+        players_controllers: dict[str, Any],
+        metadata: dict[str, Any],
+        guns: list[Any],
+        wheels: list[Any],
+        game_resolution: dict[str, Any],
     ) -> Command:
         """
         Retrieve the command to start the emulator with the specified configurations.
         """
         return Command(array=[])
 
-    def getResolutionMode(self, config: Dict[str, Any]) -> str:
+    def getResolutionMode(self, config: dict[str, Any]) -> str:
         return config["videomode"]
 
-    def getMouseMode(self, config: Dict[str, Any], rom: str) -> bool:
+    def getMouseMode(self, config: dict[str, Any], rom: str) -> bool:
         return False
 
-    def executionDirectory(self, config: Dict[str, Any], rom: str) -> str:
+    def executionDirectory(self, config: dict[str, Any], rom: str) -> str:
         return None  # type: ignore
 
     # mame or libretro have internal bezels, don't display the one of mangohud
@@ -71,7 +72,7 @@ class Generator(object):
         return False
 
     def getInGameRatio(
-        self, config: Dict[str, Any], gameResolution: Dict[str, Any], rom: str
+        self, config: dict[str, Any], gameResolution: dict[str, Any], rom: str
     ) -> float:
         # put a default value, but it should be overriden by generators
         return 4 / 3

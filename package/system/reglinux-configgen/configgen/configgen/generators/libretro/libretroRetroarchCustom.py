@@ -1,5 +1,7 @@
-from os import path, makedirs, remove
+from os import makedirs, path, remove
+
 from configgen.settings import UnixSettings
+
 from .libretroConfig import retroarchCustom
 
 # ==========================

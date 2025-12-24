@@ -1,8 +1,9 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, symlink
+from os import makedirs, path, symlink
 from shutil import copyfile
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SCREENSHOTS
 
 SDLPOP_CONFIG_DIR = CONF + "/SDLPoP"

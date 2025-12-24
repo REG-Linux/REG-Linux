@@ -1,12 +1,14 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from configparser import ConfigParser
-from os import path, makedirs
+from os import makedirs, path
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+
 from .mupenConfig import (
-    setMupenConfig,
-    MUPEN_CONFIG_PATH,
     MUPEN_BIN_PATH,
     MUPEN_CONFIG_DIR,
+    MUPEN_CONFIG_PATH,
+    setMupenConfig,
 )
 
 

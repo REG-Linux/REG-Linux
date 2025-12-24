@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, mkdir
+from os import mkdir, path
 from platform import uname
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.utils.buildargs import parse_args
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
+from configgen.utils.buildargs import parse_args
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -93,7 +94,7 @@ class RazeGenerator(Generator):
 
         config_backup = []
         if path.exists(RAZE_CONFIG_FILE):
-            with open(RAZE_CONFIG_FILE, "r") as original_file:
+            with open(RAZE_CONFIG_FILE) as original_file:
                 config_backup = original_file.readlines()
 
         with open(RAZE_CONFIG_FILE, "w") as config_file:

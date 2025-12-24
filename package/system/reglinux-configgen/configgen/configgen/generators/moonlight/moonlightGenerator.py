@@ -1,18 +1,20 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
+from os import makedirs, path
 from shutil import copy
-from configgen.systemFiles import CONF
-from configgen.settings import UnixSettings
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.settings import UnixSettings
+from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
+
 from .moonlightConfig import (
-    setMoonlightConfig,
     MOONLIGHT_BIN_PATH,
-    MOONLIGHT_GAMELIST_PATH,
-    MOONLIGHT_STAGING_CONFIG_PATH,
     MOONLIGHT_CONFIG_DIR,
     MOONLIGHT_CONFIG_PATH,
+    MOONLIGHT_GAMELIST_PATH,
+    MOONLIGHT_STAGING_CONFIG_PATH,
+    setMoonlightConfig,
 )
 
 eslog = get_logger(__name__)
@@ -64,7 +66,7 @@ class MoonlightGenerator(Generator):
         romName = path.splitext(path.basename(rom))[0]
         # find the real game name
         try:
-            with open(MOONLIGHT_GAMELIST_PATH, "r") as f:
+            with open(MOONLIGHT_GAMELIST_PATH) as f:
                 gfeGame = None
                 for line in f:
                     try:

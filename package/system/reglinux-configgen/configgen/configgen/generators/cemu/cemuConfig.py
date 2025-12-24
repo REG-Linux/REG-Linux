@@ -1,6 +1,7 @@
-from subprocess import run, check_output, CalledProcessError, PIPE
-from configgen.systemFiles import CONF, BIOS, ROMS, SAVES
 from os import environ
+from subprocess import PIPE, CalledProcessError, check_output, run
+
+from configgen.systemFiles import BIOS, CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -106,9 +107,7 @@ def setCemuConfig(cemuConfig, system):
                             if discrete_uuid != "":
                                 discrete_uuid_num = discrete_uuid.replace("-", "")
                                 eslog.debug(
-                                    "Using Discrete GPU UUID: {} for Cemu".format(
-                                        discrete_uuid_num
-                                    )
+                                    f"Using Discrete GPU UUID: {discrete_uuid_num} for Cemu"
                                 )
                                 setSectionConfig(
                                     cemuConfig,
@@ -232,7 +231,7 @@ def setCemuConfig(cemuConfig, system):
     # pactl list sinks-raw | sed -e s+"^sink=[0-9]* name=\([^ ]*\) .*"+"\1"+ | sed 1q | tr -d '\n'
     proc = run(["/usr/bin/cemu/get-audio-device"], stdout=PIPE)
     cemuAudioDevice = proc.stdout.decode("utf-8")
-    eslog.debug("*** audio device = {} ***".format(cemuAudioDevice))
+    eslog.debug(f"*** audio device = {cemuAudioDevice} ***")
     if system.isOptSet("cemu_audio_config") and system.getOptBoolean(
         "cemu_audio_config"
     ):

@@ -1,13 +1,15 @@
-from configgen.generators.Generator import Generator
+from os import makedirs, path, unlink
+
 from configgen.Command import Command
-from os import path, makedirs, unlink
-from .mednafenControllers import setMednafenControllers
+from configgen.generators.Generator import Generator
+
 from .mednafenConfig import (
-    setMednafenConfig,
+    MEDNAFEN_BIN_PATH,
     MEDNAFEN_CONFIG_DIR,
     MEDNAFEN_CONFIG_PATH,
-    MEDNAFEN_BIN_PATH,
+    setMednafenConfig,
 )
+from .mednafenControllers import setMednafenControllers
 
 
 class MednafenGenerator(Generator):

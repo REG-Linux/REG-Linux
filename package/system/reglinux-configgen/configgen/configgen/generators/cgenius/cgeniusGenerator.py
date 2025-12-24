@@ -1,21 +1,22 @@
-from configgen.generators.Generator import Generator
-from os import path, makedirs
-from configgen.Command import Command
+from os import makedirs, path
 from shutil import copy
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 
 try:
     from configobj import ConfigObj
 except ImportError:
     print("configobj module not found. Please install it with: pip install configobj")
     raise
-from .cgeniusControllers import setCgeniusControllers
 from .cgeniusConfig import (
+    CGENIUS_BIN_PATH,
     CGENIUS_CONFIG_DIR,
     CGENIUS_CONFIG_PATH,
     CGENIUS_ROMS_DIR,
-    CGENIUS_BIN_PATH,
     setCgeniusConfig,
 )
+from .cgeniusControllers import setCgeniusControllers
 
 
 class CGeniusGenerator(Generator):

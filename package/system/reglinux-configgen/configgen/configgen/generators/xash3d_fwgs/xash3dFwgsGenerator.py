@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from glob import glob
-from os import path, makedirs, symlink
+from os import makedirs, path, symlink
 from re import compile
 from shutil import copy
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import ROMS
 
 XASH3D_ROMS_DIR = ROMS + "/xash3d_fwgs"
@@ -54,7 +55,7 @@ def _get_server_lib_basename_from_liblist_gam(game):
     if not path.exists(file):
         return None
     pattern = compile(r'gamedll\w*\s+"(?:dlls[/\\])?([^.]*)')
-    with open(file, "r") as f:
+    with open(file) as f:
         for line in f:
             m = pattern.match(line)
             if m:
@@ -122,7 +123,7 @@ class Xash3dFwgsGenerator(Generator):
         command_array.append(game)
 
         command_array.append("+showfps")
-        command_array.append("1" if system.getOptBoolean("showFPS") == True else "0")
+        command_array.append("1" if system.getOptBoolean("showFPS") else "0")
 
         self._maybeInitConfig(game)
         self._maybeInitSaveDir(game)

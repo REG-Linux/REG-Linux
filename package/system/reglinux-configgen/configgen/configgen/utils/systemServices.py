@@ -1,4 +1,5 @@
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
+
 from .logger import get_logger
 
 eslog = get_logger(__name__)

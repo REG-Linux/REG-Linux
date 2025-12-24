@@ -1,7 +1,8 @@
-from configgen.generators.Generator import Generator
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from .iortcwConfig import setIortcwConfig, IORTCW_BIN_PATH
+from configgen.generators.Generator import Generator
+
+from .iortcwConfig import IORTCW_BIN_PATH, setIortcwConfig
 
 
 class IORTCWGenerator(Generator):

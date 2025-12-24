@@ -1,6 +1,8 @@
-from struct import pack, unpack
 from os import environ
+from struct import pack, unpack
+
 from configgen.systemFiles import CONF, SAVES
+from configgen.utils.logger import get_logger
 
 DOLPHIN_CONFIG_DIR = CONF + "/dolphin-emu"
 DOLPHIN_CONFIG_PATH = DOLPHIN_CONFIG_DIR + "/Dolphin.ini"
@@ -8,8 +10,6 @@ DOLPHIN_SAVES_DIR = SAVES + "/dolphin-emu"
 DOLPHIN_GFX_PATH = DOLPHIN_CONFIG_DIR + "/GFX.ini"
 DOLPHIN_SYSCONF_PATH = DOLPHIN_SAVES_DIR + "/Wii/shared2/sys/SYSCONF"
 DOLPHIN_BIN_PATH = "/usr/bin/dolphin-emu"
-
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -106,7 +106,7 @@ def readWriteFile(filepath, setval):
         offsetSize = (numEntries + 1) * 2  # offsets
         readBytes(f, offsetSize)
 
-        for i in range(0, numEntries):  # entries
+        for _ in range(0, numEntries):  # entries
             readWriteEntry(f, setval)
     finally:
         f.close()

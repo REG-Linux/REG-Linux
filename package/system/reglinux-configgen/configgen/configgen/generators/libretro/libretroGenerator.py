@@ -1,24 +1,25 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, chdir
+from os import chdir, makedirs, path
 from shutil import copyfile
-from configgen.systemFiles import OVERLAYS
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.settings import UnixSettings
+from configgen.systemFiles import OVERLAYS
+from configgen.utils.logger import get_logger
 from configgen.utils.videoMode import getAltDecoration, getGLVendor, getGLVersion
+
 from .libretroConfig import (
     coreForceSlangShaders,
-    retroarchCustom,
-    writeLibretroConfig,
-    retroarchRoot,
-    retroarchCores,
     retroarchBin,
+    retroarchCores,
+    retroarchCustom,
+    retroarchRoot,
+    writeLibretroConfig,
 )
 from .libretroRetroarchCustom import (
     generateRetroarchCustom,
     generateRetroarchCustomPathes,
 )
-
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -57,11 +58,11 @@ class LibretroGenerator(Generator):
                 shaderFilename = gameShader + ".slangp"
             else:
                 shaderFilename = gameShader + ".glslp"
-            eslog.debug("searching shader {}".format(shaderFilename))
+            eslog.debug(f"searching shader {shaderFilename}")
             if path.exists("/userdata/shaders/" + shaderFilename):
                 video_shader_dir = "/userdata/shaders"
                 eslog.debug(
-                    "shader {} found in /userdata/shaders".format(shaderFilename)
+                    f"shader {shaderFilename} found in /userdata/shaders"
                 )
             else:
                 video_shader_dir = "/usr/share/reglinux/shaders"
@@ -71,7 +72,7 @@ class LibretroGenerator(Generator):
                 shaderBezel = True
 
         # Settings system default config file if no user defined one
-        if not "configfile" in system.config:
+        if "configfile" not in system.config:
             # Using system config file
             system.config["configfile"] = retroarchCustom
             # Create retroarchcustom.cfg if does not exists
@@ -145,7 +146,7 @@ class LibretroGenerator(Generator):
             if romExtension == ".dos" or romExtension == ".pc":
                 if (
                     path.exists(path.join(rom, romDOSName + ".bat"))
-                    and not " " in romDOSName
+                    and " " not in romDOSName
                 ):
                     exe = path.join(rom, romDOSName + ".bat")
                 elif path.exists(path.join(rom, "dosbox.bat")) and not path.exists(
@@ -175,7 +176,7 @@ class LibretroGenerator(Generator):
         elif system.name == "pico8":
             romext = path.splitext(romName)[1]
             if romext.lower() == ".m3u":
-                with open(rom, "r") as fpin:
+                with open(rom) as fpin:
                     lines = fpin.readlines()
                 rom = path.dirname(path.abspath(rom)) + "/" + lines[0].strip()
             command_array = [
@@ -333,7 +334,7 @@ class LibretroGenerator(Generator):
             rom = path.join(path.dirname(rom), romName[0:-8])
 
         if system.name == "reminiscence":
-            with open(rom, "r") as file:
+            with open(rom) as file:
                 first_line = file.readline().strip()
             directory_path = "/".join(rom.split("/")[:-1])
             rom = f"{directory_path}/{first_line}"
@@ -345,7 +346,7 @@ class LibretroGenerator(Generator):
                 f"/var/run/cmdfiles/{path.splitext(path.basename(rom))[0]}.cmd"
             )
 
-        if dontAppendROM == False:
+        if not dontAppendROM:
             command_array.append(rom)
 
         return Command(array=command_array)

@@ -1,17 +1,18 @@
-from configgen.generators.Generator import Generator
+from os import makedirs, path, unlink
+
 from configgen.Command import Command
-from os import path, makedirs, unlink
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.utils.logger import get_logger
+
 from .corsixthConfig import (
-    CORSIXTH_CONFIG_DIR,
-    CORSIXTH_SAVES_DIR,
-    CORSIXTH_CONFIG_PATH,
     CORSIXTH_BIN_PATH,
+    CORSIXTH_CONFIG_DIR,
+    CORSIXTH_CONFIG_PATH,
     CORSIXTH_GAME_DATA_DIR,
+    CORSIXTH_SAVES_DIR,
     setCorsixthConfig,
 )
-
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 

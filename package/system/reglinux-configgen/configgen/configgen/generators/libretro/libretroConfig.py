@@ -1,24 +1,27 @@
-import sys
-import subprocess
 import fcntl
-from configgen.settings import UnixSettings
-from os import path, makedirs, remove
+import subprocess
+import sys
+from os import makedirs, path, remove
+from xml.etree.ElementTree import parse
+
 from configgen.controllers import (
     getDevicesInformation,
-    guns_borders_size_name,
     getGamesMetaData,
+    guns_borders_size_name,
 )
-from configgen.utils.videoMode import supportSystemRotation, getAltDecoration
-from xml.etree.ElementTree import parse
-from .libretroOptions import generateCoreSettings, generateHatariConf
-from .libretroMAMEConfig import generateMAMEConfigs
+from configgen.settings import UnixSettings
 from configgen.systemFiles import (
     CONF,
     CONF_INIT,
-    SAVES,
     ES_SETTINGS,
+    SAVES,
 )
+from configgen.utils.logger import get_logger
+from configgen.utils.videoMode import getAltDecoration, supportSystemRotation
+
 from ...bezel.libretro_bezel_manager import writeBezelConfig
+from .libretroMAMEConfig import generateMAMEConfigs
+from .libretroOptions import generateCoreSettings, generateHatariConf
 
 hatariConf = CONF + "/hatari/hatari.cfg"
 retroarchRoot = CONF + "/retroarch"
@@ -27,8 +30,6 @@ retroarchCustom = retroarchRoot + "/retroarchcustom.cfg"
 retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
 retroarchCores = "/usr/lib/libretro/"
 retroarchBin = "/usr/bin/retroarch"
-
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -127,7 +128,6 @@ coreToRetroachievements = {
     "melondsds",
     "mesen",
     "mesens",
-    "mgba",
     "mupen64plus-next",
     "neocd",
     "o2em",
@@ -350,9 +350,7 @@ def createLibretroConfig(
                             ).strip()
                             if discrete_index != "":
                                 eslog.debug(
-                                    "Using Discrete GPU Index: {} for RetroArch".format(
-                                        discrete_index
-                                    )
+                                    f"Using Discrete GPU Index: {discrete_index} for RetroArch"
                                 )
                                 retroarchConfig["vulkan_gpu_index"] = (
                                     '"' + discrete_index + '"'
@@ -399,7 +397,7 @@ def createLibretroConfig(
 
     if (
         system.isOptSet("video_threaded")
-        and system.getOptBoolean("video_threaded") == True
+        and system.getOptBoolean("video_threaded")
     ):
         retroarchConfig["video_threaded"] = "true"
     else:
@@ -407,7 +405,7 @@ def createLibretroConfig(
 
     if (
         system.isOptSet("video_allow_rotate")
-        and system.getOptBoolean("video_allow_rotate") == False
+        and not system.getOptBoolean("video_allow_rotate")
     ):
         retroarchConfig["video_allow_rotate"] = "false"
     else:
@@ -416,7 +414,7 @@ def createLibretroConfig(
     # variable refresh rate
     if (
         system.isOptSet("vrr_runloop_enable")
-        and system.getOptBoolean("vrr_runloop_enable") == True
+        and system.getOptBoolean("vrr_runloop_enable")
     ):
         retroarchConfig["vrr_runloop_enable"] = "true"
     else:
@@ -619,7 +617,7 @@ def createLibretroConfig(
         if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
             deviceInfos = getDevicesInformation()
             nplayer = 1
-            for controller, pad in sorted(controllers.items()):
+            for _, pad in sorted(controllers.items()):
                 if pad.dev in deviceInfos:
                     if deviceInfos[pad.dev]["isWheel"]:
                         retroarchConfig[
@@ -732,7 +730,7 @@ def createLibretroConfig(
 
         controller_list = sorted(controllers.items())
         for i in range(1, min(5, len(controller_list) + 1)):
-            controller, pad = controller_list[i - 1]
+            _, pad = controller_list[i - 1]
             if (
                 pad.guid in valid_megadrive_controller_guids
                 and pad.configName in valid_megadrive_controller_names
@@ -924,7 +922,7 @@ def createLibretroConfig(
 
         controller_list = sorted(controllers.items())
         for i in range(1, min(5, len(controller_list) + 1)):
-            controller, pad = controller_list[i - 1]
+            _, pad = controller_list[i - 1]
             if (
                 pad.guid in valid_n64_controller_guids
                 and pad.configName in valid_n64_controller_names
@@ -1001,7 +999,7 @@ def createLibretroConfig(
 
     # Shader option
     if "shader" in renderConfig:
-        if renderConfig["shader"] != None and renderConfig["shader"] != "none":
+        if renderConfig["shader"] is not None and renderConfig["shader"] != "none":
             retroarchConfig["video_shader_enable"] = "true"
             retroarchConfig["video_smooth"] = (
                 "false"  # seems to be necessary for weaker SBCs
@@ -1034,7 +1032,7 @@ def createLibretroConfig(
     # Rewind option
     retroarchConfig["rewind_enable"] = "false"
     if system.isOptSet("rewind") and system.getOptBoolean("rewind"):
-        if not system.name in systemNoRewind:
+        if system.name not in systemNoRewind:
             retroarchConfig["rewind_enable"] = "true"
         else:
             retroarchConfig["rewind_enable"] = "false"
@@ -1046,19 +1044,19 @@ def createLibretroConfig(
     retroarchConfig["run_ahead_frames"] = "0"
     retroarchConfig["run_ahead_secondary_instance"] = "false"
     if system.isOptSet("runahead") and int(system.config["runahead"]) > 0:
-        if not system.name in systemNoRunahead:
+        if system.name not in systemNoRunahead:
             retroarchConfig["run_ahead_enabled"] = "true"
             retroarchConfig["run_ahead_frames"] = system.config["runahead"]
             if (
                 system.isOptSet("secondinstance")
-                and system.getOptBoolean("secondinstance") == True
+                and system.getOptBoolean("secondinstance")
             ):
                 retroarchConfig["run_ahead_secondary_instance"] = "true"
 
     # Auto frame delay (input delay reduction via frame timing)
     if (
         system.isOptSet("video_frame_delay_auto")
-        and system.getOptBoolean("video_frame_delay_auto") == True
+        and system.getOptBoolean("video_frame_delay_auto")
     ):
         retroarchConfig["video_frame_delay_auto"] = "true"
     else:
@@ -1077,7 +1075,7 @@ def createLibretroConfig(
         retroarchConfig["cheevos_unlock_sound_enable"] = "false"
 
     # Autosave option
-    if system.isOptSet("autosave") and system.getOptBoolean("autosave") == True:
+    if system.isOptSet("autosave") and system.getOptBoolean("autosave"):
         retroarchConfig["savestate_auto_save"] = "true"
         retroarchConfig["savestate_auto_load"] = "true"
     else:
@@ -1111,11 +1109,11 @@ def createLibretroConfig(
 
     if (
         system.isOptSet("retroachievements")
-        and system.getOptBoolean("retroachievements") == True
+        and system.getOptBoolean("retroachievements")
     ):
         if (system.config["core"] in coreToRetroachievements) or (
             system.isOptSet("cheevos_force")
-            and system.getOptBoolean("cheevos_force") == True
+            and system.getOptBoolean("cheevos_force")
         ):
             retroarchConfig["cheevos_enable"] = "true"
             retroarchConfig["cheevos_username"] = systemConfig.get(
@@ -1133,7 +1131,7 @@ def createLibretroConfig(
             # retroachievements_hardcore_mode
             if (
                 system.isOptSet("retroachievements.hardcore")
-                and system.getOptBoolean("retroachievements.hardcore") == True
+                and system.getOptBoolean("retroachievements.hardcore")
             ):
                 retroarchConfig["cheevos_hardcore_mode_enable"] = "true"
             else:
@@ -1141,7 +1139,7 @@ def createLibretroConfig(
             # retroachievements_leaderboards
             if (
                 system.isOptSet("retroachievements.leaderboards")
-                and system.getOptBoolean("retroachievements.leaderboards") == True
+                and system.getOptBoolean("retroachievements.leaderboards")
             ):
                 retroarchConfig["cheevos_leaderboards_enable"] = "true"
             else:
@@ -1149,7 +1147,7 @@ def createLibretroConfig(
             # retroachievements_verbose_mode
             if (
                 system.isOptSet("retroachievements.verbose")
-                and system.getOptBoolean("retroachievements.verbose") == True
+                and system.getOptBoolean("retroachievements.verbose")
             ):
                 retroarchConfig["cheevos_verbose_enable"] = "true"
             else:
@@ -1157,7 +1155,7 @@ def createLibretroConfig(
             # retroachievements_automatic_screenshot
             if (
                 system.isOptSet("retroachievements.screenshot")
-                and system.getOptBoolean("retroachievements.screenshot") == True
+                and system.getOptBoolean("retroachievements.screenshot")
             ):
                 retroarchConfig["cheevos_auto_screenshot"] = "true"
             else:
@@ -1166,7 +1164,6 @@ def createLibretroConfig(
             if (
                 system.isOptSet("retroachievements.challenge_indicators")
                 and system.getOptBoolean("retroachievements.challenge_indicators")
-                == True
             ):
                 retroarchConfig["cheevos_challenge_indicators"] = "true"
             else:
@@ -1174,7 +1171,7 @@ def createLibretroConfig(
             # retroarchievements_encore_mode
             if (
                 system.isOptSet("retroachievements.encore")
-                and system.getOptBoolean("retroachievements.encore") == True
+                and system.getOptBoolean("retroachievements.encore")
             ):
                 retroarchConfig["cheevos_start_active"] = "true"
             else:
@@ -1182,7 +1179,7 @@ def createLibretroConfig(
             # retroarchievements_rich_presence
             if (
                 system.isOptSet("retroachievements.richpresence")
-                and system.getOptBoolean("retroachievements.richpresence") == True
+                and system.getOptBoolean("retroachievements.richpresence")
             ):
                 retroarchConfig["cheevos_richpresence_enable"] = "true"
             else:
@@ -1192,7 +1189,7 @@ def createLibretroConfig(
     else:
         retroarchConfig["cheevos_enable"] = "false"
 
-    if system.isOptSet("integerscale") and system.getOptBoolean("integerscale") == True:
+    if system.isOptSet("integerscale") and system.getOptBoolean("integerscale"):
         retroarchConfig["video_scale_integer"] = "true"
     else:
         retroarchConfig["video_scale_integer"] = "false"
@@ -1257,7 +1254,7 @@ def createLibretroConfig(
         # Netplay hide the gameplay
         if (
             system.isOptSet("netplay_public_announce")
-            and system.getOptBoolean("netplay_public_announce") == False
+            and not system.getOptBoolean("netplay_public_announce")
         ):
             retroarchConfig["netplay_public_announce"] = "false"
         else:
@@ -1266,7 +1263,7 @@ def createLibretroConfig(
         # Enable or disable server spectator mode
         if (
             system.isOptSet("netplay.spectator")
-            and system.getOptBoolean("netplay.spectator") == True
+            and system.getOptBoolean("netplay.spectator")
         ):
             retroarchConfig["netplay_spectator_mode_enable"] = "true"
         else:
@@ -1286,7 +1283,7 @@ def createLibretroConfig(
             retroarchConfig["netplay_use_mitm_server"] = "false"
 
     # Display FPS
-    if system.isOptSet("showFPS") and system.getOptBoolean("showFPS") == True:
+    if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
         retroarchConfig["fps_show"] = "true"
     else:
         retroarchConfig["fps_show"] = "false"
@@ -1306,7 +1303,7 @@ def createLibretroConfig(
     # AI option (service for game translations)
     if (
         system.isOptSet("ai_service_enabled")
-        and system.getOptBoolean("ai_service_enabled") == True
+        and system.getOptBoolean("ai_service_enabled")
     ):
         retroarchConfig["ai_service_enable"] = "true"
         retroarchConfig["ai_service_mode"] = "0"
@@ -1328,7 +1325,7 @@ def createLibretroConfig(
             )
         if (
             system.isOptSet("ai_service_pause")
-            and system.getOptBoolean("ai_service_pause") == True
+            and system.getOptBoolean("ai_service_pause")
         ):
             retroarchConfig["ai_service_pause"] = "true"
         else:
@@ -1594,7 +1591,7 @@ def clearGunInputsForPlayer(n, retroarchConfig):
     ]
     for key in keys:
         for type in ["btn", "mbtn"]:
-            retroarchConfig["input_player{}_{}_{}".format(n, key, type)] = ""
+            retroarchConfig[f"input_player{n}_{key}_{type}"] = ""
 
 
 def configureGunInputsForPlayer(
@@ -1602,7 +1599,7 @@ def configureGunInputsForPlayer(
 ):
     # find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
     pedalsKeys = {1: "c", 2: "v", 3: "b", 4: "n"}
-    pedalcname = "controllers.pedals{}".format(n)
+    pedalcname = f"controllers.pedals{n}"
     pedalkey = None
     if pedalcname in system.config:
         pedalkey = system.config[pedalcname]
@@ -1612,101 +1609,101 @@ def configureGunInputsForPlayer(
     pedalconfig = None
 
     # gun mapping
-    retroarchConfig["input_player{}_mouse_index".format(n)] = gun["id_mouse"]
-    retroarchConfig["input_player{}_gun_trigger_mbtn".format(n)] = 1
-    retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = 2
-    pedalconfig = "input_player{}_gun_offscreen_shot".format(n)
-    retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = 3
+    retroarchConfig[f"input_player{n}_mouse_index"] = gun["id_mouse"]
+    retroarchConfig[f"input_player{n}_gun_trigger_mbtn"] = 1
+    retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = 2
+    pedalconfig = f"input_player{n}_gun_offscreen_shot"
+    retroarchConfig[f"input_player{n}_gun_start_mbtn"] = 3
 
-    retroarchConfig["input_player{}_gun_select_mbtn".format(n)] = 4
-    retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 5
-    retroarchConfig["input_player{}_gun_aux_b_mbtn".format(n)] = 6
-    retroarchConfig["input_player{}_gun_aux_c_mbtn".format(n)] = 7
-    retroarchConfig["input_player{}_gun_dpad_up_mbtn".format(n)] = 8
-    retroarchConfig["input_player{}_gun_dpad_down_mbtn".format(n)] = 9
-    retroarchConfig["input_player{}_gun_dpad_left_mbtn".format(n)] = 10
-    retroarchConfig["input_player{}_gun_dpad_right_mbtn".format(n)] = 11
+    retroarchConfig[f"input_player{n}_gun_select_mbtn"] = 4
+    retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 5
+    retroarchConfig[f"input_player{n}_gun_aux_b_mbtn"] = 6
+    retroarchConfig[f"input_player{n}_gun_aux_c_mbtn"] = 7
+    retroarchConfig[f"input_player{n}_gun_dpad_up_mbtn"] = 8
+    retroarchConfig[f"input_player{n}_gun_dpad_down_mbtn"] = 9
+    retroarchConfig[f"input_player{n}_gun_dpad_left_mbtn"] = 10
+    retroarchConfig[f"input_player{n}_gun_dpad_right_mbtn"] = 11
 
     # custom mapping by core to match more with avaible gun batocera buttons
     # different mapping for ps1 which has only 3 buttons and maps on aux_a and aux_b not available on all guns
     if core == "pcsx_rearmed":
         if "gun_type" in metadata and metadata["gun_type"] == "justifier":
-            retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-            pedalconfig = "input_player{}_gun_aux_a".format(n)
+            retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+            pedalconfig = f"input_player{n}_gun_aux_a"
         else:
-            retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-            pedalconfig = "input_player{}_gun_aux_a".format(n)
-            retroarchConfig["input_player{}_gun_aux_b_mbtn".format(n)] = 3
+            retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_start_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+            pedalconfig = f"input_player{n}_gun_aux_a"
+            retroarchConfig[f"input_player{n}_gun_aux_b_mbtn"] = 3
 
     if core == "fbneo":
-        retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-        pedalconfig = "input_player{}_gun_aux_a".format(n)
+        retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+        pedalconfig = f"input_player{n}_gun_aux_a"
 
     if core == "snes9x":
         if "gun_type" in metadata and metadata["gun_type"] == "justifier":
-            retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = 2
-            pedalconfig = "input_player{}_gun_start".format(n)
+            retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_start_mbtn"] = 2
+            pedalconfig = f"input_player{n}_gun_start"
         else:
-            retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_select_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-            pedalconfig = "input_player{}_gun_aux_a".format(n)
-            retroarchConfig["input_player{}_gun_aux_b_mbtn".format(n)] = 3
-            retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = 4
+            retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_start_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_select_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+            pedalconfig = f"input_player{n}_gun_aux_a"
+            retroarchConfig[f"input_player{n}_gun_aux_b_mbtn"] = 3
+            retroarchConfig[f"input_player{n}_gun_start_mbtn"] = 4
 
     if core == "genesisplusgx":
-        retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_select_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-        pedalconfig = "input_player{}_gun_aux_a".format(n)
-        retroarchConfig["input_player{}_gun_aux_b_mbtn".format(n)] = 3
-        retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = 4
+        retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_start_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_select_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+        pedalconfig = f"input_player{n}_gun_aux_a"
+        retroarchConfig[f"input_player{n}_gun_aux_b_mbtn"] = 3
+        retroarchConfig[f"input_player{n}_gun_start_mbtn"] = 4
 
     if core == "flycast":
         if system.isOptSet("flycast_offscreen_reload") and system.getOptBoolean(
             "flycast_offscreen_reload"
         ):
-            retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_select_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 3
-            retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = 4
-            retroarchConfig["input_player{}_gun_select_mbtn".format(n)] = 5
+            retroarchConfig[f"input_player{n}_gun_start_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_select_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 3
+            retroarchConfig[f"input_player{n}_gun_start_mbtn"] = 4
+            retroarchConfig[f"input_player{n}_gun_select_mbtn"] = 5
         else:
-            retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-            retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-            pedalconfig = "input_player{}_gun_aux_a".format(n)
+            retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+            retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+            pedalconfig = f"input_player{n}_gun_aux_a"
 
     if core == "mame":
-        retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-        pedalconfig = "input_player{}_gun_aux_a".format(n)
-        retroarchConfig["input_player{}_start_mbtn".format(n)] = 3
-        retroarchConfig["input_player{}_select_mbtn".format(n)] = 4
+        retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+        pedalconfig = f"input_player{n}_gun_aux_a"
+        retroarchConfig[f"input_player{n}_start_mbtn"] = 3
+        retroarchConfig[f"input_player{n}_select_mbtn"] = 4
 
     if core == "mame078plus":
-        retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_select_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_aux_b_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = 3
-        retroarchConfig["input_player{}_gun_select_mbtn".format(n)] = 4
+        retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_start_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_select_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_aux_b_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_start_mbtn"] = 3
+        retroarchConfig[f"input_player{n}_gun_select_mbtn"] = 4
 
     if core == "swanstation":
-        retroarchConfig["input_player{}_gun_offscreen_shot_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_start_mbtn".format(n)] = ""
-        retroarchConfig["input_player{}_gun_aux_a_mbtn".format(n)] = 2
-        pedalconfig = "input_player{}_gun_aux_a".format(n)
-        retroarchConfig["input_player{}_gun_aux_b_mbtn".format(n)] = 3
+        retroarchConfig[f"input_player{n}_gun_offscreen_shot_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_start_mbtn"] = ""
+        retroarchConfig[f"input_player{n}_gun_aux_a_mbtn"] = 2
+        pedalconfig = f"input_player{n}_gun_aux_a"
+        retroarchConfig[f"input_player{n}_gun_aux_b_mbtn"] = 3
 
     # pedal
     if pedalconfig is not None and pedalkey is not None:
@@ -1730,23 +1727,23 @@ def configureGunInputsForPlayer(
     # controller mapping
     hatstoname = {"1": "up", "2": "right", "4": "down", "8": "left"}
     nplayer = 1
-    for controller, pad in sorted(controllers.items()):
+    for _, pad in sorted(controllers.items()):
         if nplayer == n:
             for m in mapping:
                 if mapping[m] in pad.inputs:
                     if pad.inputs[mapping[m]].type == "button":
-                        retroarchConfig["input_player{}_{}_btn".format(n, m)] = (
+                        retroarchConfig[f"input_player{n}_{m}_btn"] = (
                             pad.inputs[mapping[m]].id
                         )
                     elif pad.inputs[mapping[m]].type == "hat":
-                        retroarchConfig["input_player{}_{}_btn".format(n, m)] = (
+                        retroarchConfig[f"input_player{n}_{m}_btn"] = (
                             "h0" + hatstoname[pad.inputs[mapping[m]].value]
                         )
                     elif pad.inputs[mapping[m]].type == "axis":
                         aval = "+"
                         if int(pad.inputs[mapping[m]].value) < 0:
                             aval = "-"
-                        retroarchConfig["input_player{}_{}_axis".format(n, m)] = (
+                        retroarchConfig[f"input_player{n}_{m}_axis"] = (
                             aval + pad.inputs[mapping[m]].id
                         )
         nplayer += 1

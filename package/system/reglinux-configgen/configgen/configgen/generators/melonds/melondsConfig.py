@@ -1,4 +1,4 @@
-from configgen.systemFiles import CONF, SAVES, CHEATS
+from configgen.systemFiles import CHEATS, CONF, SAVES
 
 MELONDS_CONFIG_DIR = CONF + "/melonDS"
 MELONDS_CONFIG_PATH = MELONDS_CONFIG_DIR + "/melonDS.ini"

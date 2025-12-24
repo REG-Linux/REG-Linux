@@ -1,8 +1,9 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import mkdir, chdir, path
 from codecs import open
+from os import chdir, mkdir, path
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
 from configgen.utils.logger import get_logger
 
@@ -47,13 +48,13 @@ class ECWolfGenerator(Generator):
                 try:
                     with open(rom, "r", encoding="utf-8") as f:
                         command_array += f.readline().split()
-                except (IOError, IndexError) as e:
+                except (OSError, IndexError) as e:
                     eslog.error(f"Error reading .ecwolf file {rom}: {e}")
                     # Ensure we handle the case where the file might be empty or inaccessible
                     pass
 
                 # If 1. parameter isn't an argument then assume it's a path
-                if not "--" in command_array[1]:
+                if "--" not in command_array[1]:
                     try:
                         chdir(command_array[1])
                     except Exception as e:

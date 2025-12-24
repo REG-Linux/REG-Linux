@@ -1,5 +1,5 @@
-from os import path
 import re
+from os import path
 
 
 def shortNameFromPath(path_name):
@@ -18,9 +18,7 @@ def shortNameFromPath(path_name):
             inpar = True
         elif c == ")":
             inpar = False
-        elif c == "[":
-            inblock = True
-        elif c == "]":
+        elif c == "[" or c == "]":
             inblock = True
     return ret
 

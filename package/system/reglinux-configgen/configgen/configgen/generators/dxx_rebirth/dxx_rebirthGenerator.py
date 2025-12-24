@@ -1,6 +1,7 @@
-from configgen.generators.Generator import Generator
+from os import makedirs, path
+
 from configgen.Command import Command
-from os import path, makedirs
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
 
 DXX_REBIRTH1_CONFIG_DIR = CONF + "/d1x-rebirth"
@@ -40,7 +41,7 @@ class DXX_RebirthGenerator(Generator):
         # Check if the file exists
         if path.isfile(rebirthConfigFile):
             # Read the contents of the file
-            with open(rebirthConfigFile, "r") as file:
+            with open(rebirthConfigFile) as file:
                 lines = file.readlines()
 
             for i, line in enumerate(lines):

@@ -3,8 +3,14 @@ Ppsspp generator module for REG-Linux
 This module handles the generation of ppsspp emulator configurations.
 """
 
-from .ppssppGenerator import PPSSPPGenerator
 from .ppssppConfig import setPPSSPPConfig
-from .ppssppControllers import *
+from .ppssppControllers import axisToCode, optionValue, setControllerConfig
+from .ppssppGenerator import PPSSPPGenerator
 
-__all__ = ["PPSSPPGenerator", "setPPSSPPConfig"]
+__all__ = [
+    "PPSSPPGenerator",
+    "setPPSSPPConfig",
+    "axisToCode",
+    "optionValue",
+    "setControllerConfig",
+]

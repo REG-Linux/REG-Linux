@@ -1,17 +1,17 @@
-from configgen.generators.Generator import Generator
+from os import mkdir, path
+
 from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.settings import UnixSettings
-from os import path, mkdir
-from codecs import open
-from .melondsControllers import setMelondsControllers
+
 from .melondsConfig import (
-    setMelonDSConfig,
     MELONDS_BIN_PATH,
-    MELONDS_SAVES_DIR,
     MELONDS_CHEATS_DIR,
-    MELONDS_CONFIG_DIR,
     MELONDS_CONFIG_PATH,
+    MELONDS_SAVES_DIR,
+    setMelonDSConfig,
 )
+from .melondsControllers import setMelondsControllers
 
 
 class MelonDSGenerator(Generator):

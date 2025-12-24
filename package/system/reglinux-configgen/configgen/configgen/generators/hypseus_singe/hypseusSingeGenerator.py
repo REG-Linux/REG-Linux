@@ -1,11 +1,12 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from typing import Optional, Tuple
 from filecmp import cmp
-from shutil import copyfile, copytree, copy2
-from os import path, walk, mkdir, listdir
+from os import listdir, mkdir, path, walk
+from shutil import copy2, copyfile, copytree
+
 from ffmpeg import probe
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config, guns_borders_size_name
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
 
@@ -25,7 +26,7 @@ eslog = get_logger(__name__)
 class HypseusSingeGenerator(Generator):
     @staticmethod
     def find_m2v_from_txt(txt_file):
-        with open(txt_file, "r") as file:
+        with open(txt_file) as file:
             for line in file:
                 parts = line.strip().split()
                 if parts:
@@ -39,10 +40,10 @@ class HypseusSingeGenerator(Generator):
         if path.exists(path.join(start_path, filename)):
             return path.join(start_path, filename)
 
-        for root, dirs, files in walk(start_path):
+        for root, _, files in walk(start_path):
             if filename in files:
                 eslog.debug(
-                    "Found m2v file in path - {}".format(path.join(root, filename))
+                    f"Found m2v file in path - {path.join(root, filename)}"
                 )
                 return path.join(root, filename)
 
@@ -211,7 +212,7 @@ class HypseusSingeGenerator(Generator):
         m2v_filename = self.find_m2v_from_txt(frameFile)
 
         if m2v_filename:
-            eslog.debug("First .m2v file found: {}".format(m2v_filename))
+            eslog.debug(f"First .m2v file found: {m2v_filename}")
         else:
             eslog.debug("No .m2v files found in the text file.")
 
@@ -220,7 +221,7 @@ class HypseusSingeGenerator(Generator):
             video_path = rom + "/" + m2v_filename
             # check the path exists
             if not path.exists(video_path):
-                eslog.debug("Could not find m2v file in path - {}".format(video_path))
+                eslog.debug(f"Could not find m2v file in path - {video_path}")
                 video_path = self.find_file(rom, m2v_filename)
         else:
             eslog.debug("m2v file not found, skipping resolution check")
@@ -228,7 +229,7 @@ class HypseusSingeGenerator(Generator):
 
         if video_path is not None:
             video_resolution = self.get_resolution(video_path)
-            eslog.debug("Resolution: {}".format(video_resolution))
+            eslog.debug(f"Resolution: {video_resolution}")
             if video_resolution == (0, 0):
                 eslog.warning(
                     "Could not determine video resolution, using fallback"
@@ -311,7 +312,7 @@ class HypseusSingeGenerator(Generator):
             # Initialize with safe default values
             video_width = 0
             video_height = 0
-            video_resolution: Optional[Tuple[int, int]] = (
+            video_resolution: tuple[int, int] | None = (
                 None  # ensures that the variable always exists
             )
 
@@ -410,7 +411,7 @@ class HypseusSingeGenerator(Generator):
         # bezels
         if (
             system.isOptSet("hypseus_bezels")
-            and system.getOptBoolean("hypseus_bezels") == False
+            and not system.getOptBoolean("hypseus_bezels")
         ):
             bezelRequired = False
 
@@ -469,9 +470,9 @@ class HypseusSingeGenerator(Generator):
         # The folder may have a file with the game name and .commands with extra arguments to run the game.
         if path.isfile(commandsFile):
             try:
-                with open(commandsFile, "r") as f:
+                with open(commandsFile) as f:
                     command_array.extend(f.read().split())
-            except (IOError, OSError) as e:
+            except OSError as e:
                 eslog.error(f"Error reading commands file {commandsFile}: {e}")
 
         # We now use SDL controller config

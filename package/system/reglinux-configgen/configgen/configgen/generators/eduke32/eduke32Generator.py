@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, mkdir
 from configparser import ConfigParser
-from configgen.utils.buildargs import parse_args
-from configgen.systemFiles import CONF, SAVES, SCREENSHOTS
+from os import mkdir, path
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import CONF, SAVES, SCREENSHOTS
+from configgen.utils.buildargs import parse_args
 
 
 class EDuke32Generator(Generator):
@@ -35,7 +36,7 @@ class EDuke32Generator(Generator):
         # Configuration options found here: https://wiki.eduke32.com/wiki/Configuration_file_options
         # NB: Not all configuration options listed actually work e.g. showFPS, etc.
         # NB: In eduke32 configs, booleans must be integers
-        with open(config_file, "r") as config:
+        with open(config_file) as config:
             parser.read_file(config)
         if not parser.has_section("Screen Setup"):
             parser.add_section("Screen Setup")

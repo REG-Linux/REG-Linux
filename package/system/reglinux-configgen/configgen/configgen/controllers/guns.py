@@ -1,10 +1,13 @@
-from pyudev import Context
-from re import match
-from evdev.device import InputDevice
-from os import path
 import os
-from .mouse import getMouseButtons
+from os import path
+from re import match
+
+from evdev.device import InputDevice
+from pyudev import Context
+
 from configgen.utils.logger import get_logger
+
+from .mouse import getMouseButtons
 
 eslog = get_logger(__name__)
 
@@ -55,9 +58,7 @@ def getGuns():
         mouse = mouses[eventid]
         device_node = str(mouse.device_node)
 
-        eslog.info(
-            "found mouse {} at {} with id_mouse={}".format(nmouse, device_node, nmouse)
-        )
+        eslog.info(f"found mouse {nmouse} at {device_node} with id_mouse={nmouse}")
 
         if (
             "ID_INPUT_GUN" not in mouse.properties

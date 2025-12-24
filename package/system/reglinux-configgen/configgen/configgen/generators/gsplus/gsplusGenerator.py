@@ -1,9 +1,10 @@
-from configgen.generators.Generator import Generator
+from os import makedirs, path
+
 from configgen.Command import Command
-from os import path, makedirs
-from configgen.settings import UnixSettings
 from configgen.controllers import generate_sdl_controller_config
-from configgen.systemFiles import CONF, BIOS
+from configgen.generators.Generator import Generator
+from configgen.settings import UnixSettings
+from configgen.systemFiles import BIOS, CONF
 
 GSPLUS_CONFIG_DIR = CONF + "/GSplus"
 GSPLUS_CONFIG_PATH = GSPLUS_CONFIG_DIR + "/config.txt"

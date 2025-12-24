@@ -1,6 +1,8 @@
-from os import path, makedirs
-from .rpcs3Config import RPCS3_INPUT_DIR
+from os import makedirs, path
+
 from configgen.utils.logger import get_logger
+
+from .rpcs3Config import RPCS3_INPUT_DIR
 
 eslog = get_logger(__name__)
 
@@ -61,10 +63,10 @@ def generateControllerConfig(system, controllers, rom):
 
     configFileName = f"{RPCS3_INPUT_DIR}/Default.yml"
     with open(configFileName, "w", encoding="utf_8_sig") as f:
-        for controller, pad in sorted(controllers.items()):
+        for _, pad in sorted(controllers.items()):
             if nplayer <= 7:
                 eslog.debug(f"Controller #{nplayer} - {pad.guid}")
-                
+
                 # Check for DualShock / DualSense
                 if (
                     pad.guid in VALID_SONY_GUIDS
@@ -73,7 +75,7 @@ def generateControllerConfig(system, controllers, rom):
                 ):
                     eslog.debug("*** Using DualShock / DualSense configuration ***")
                     configure_sony_controller(f, pad, nplayer, VALID_SONY_GUIDS, ds3player, ds4player, dsplayer)
-                    
+
                     # Update player counters for Sony controllers
                     if pad.guid in VALID_SONY_GUIDS[:4]:  # DS3
                         ds3player += 1
@@ -90,14 +92,14 @@ def generateControllerConfig(system, controllers, rom):
                 else:
                     eslog.debug("*** Using default SDL2 configuration ***")
                     configure_sdl_controller(f, pad, nplayer, controller_counts)
-                
+
                 nplayer += 1
 
 
 def configure_sony_controller(f, pad, nplayer, valid_sony_guids, ds3player, ds4player, dsplayer):
     """Configure Sony controllers (DS3, DS4, DS5)"""
     f.write(f"Player {nplayer} Input:\n")
-    
+
     # Determine controller type and increment appropriate counter
     if pad.guid in valid_sony_guids[:4]:  # DS3
         f.write("  Handler: DualShock 3\n")
@@ -108,7 +110,7 @@ def configure_sony_controller(f, pad, nplayer, valid_sony_guids, ds3player, ds4p
     else:  # DS5
         f.write("  Handler: DualSense\n")
         f.write(f'  Device: "DualSense Pad #{dsplayer}"\n')
-    
+
     # Write standard Sony controller configuration
     f.write("  Config:\n")
     sony_config_lines = [
@@ -188,7 +190,7 @@ def configure_sony_controller(f, pad, nplayer, valid_sony_guids, ds3player, ds4p
         "    Product ID: 616",
         '  Buddy Device: ""'
     ]
-    
+
     for line in sony_config_lines:
         f.write(f"{line}\n")
 
@@ -202,7 +204,7 @@ def configure_evdev_controller(f, pad, nplayer, mapping_dict):
     f.write("    Start: Start\n")
     f.write("    Select: Select\n")
     f.write("    PS Button: Mode\n")
-    
+
     # Map inputs based on the mapping dictionary
     for inputIdx in pad.inputs:
         input = pad.inputs[inputIdx]
@@ -210,9 +212,7 @@ def configure_evdev_controller(f, pad, nplayer, mapping_dict):
             config_name = mapping_dict[input.name]["config_name"]
             event_variations = mapping_dict[input.name]["event_variations"]
             for event_type, value_name in event_variations:
-                if "BTN" in event_type and input.type == "button":
-                    f.write(f"    {config_name}: {value_name}\n")
-                elif "HAT" in event_type and input.type == "hat":
+                if "BTN" in event_type and input.type == "button" or "HAT" in event_type and input.type == "hat":
                     f.write(f"    {config_name}: {value_name}\n")
                 elif "ABS" in event_type and input.type == "axis":
                     # Handle axis for sticks
@@ -235,7 +235,7 @@ def configure_evdev_controller(f, pad, nplayer, mapping_dict):
                         f.write("    Right Stick Right: RX+\n")
                     else:
                         f.write(f"    {config_name}: {value_name}\n")
-    
+
     # Continue with default EVDEV settings
     evdev_config_lines = [
         "    R1: TR",
@@ -273,7 +273,7 @@ def configure_evdev_controller(f, pad, nplayer, mapping_dict):
         "    Color Value G: 0",
         "    Color Value B: 0"
     ]
-    
+
     for line in evdev_config_lines:
         f.write(f"{line}\n")
 
@@ -375,6 +375,6 @@ def configure_sdl_controller(f, pad, nplayer, controller_counts):
         "    Product ID: 616",
         '  Buddy Device: ""'
     ]
-    
+
     for line in sdl_config_lines:
         f.write(f"{line}\n")

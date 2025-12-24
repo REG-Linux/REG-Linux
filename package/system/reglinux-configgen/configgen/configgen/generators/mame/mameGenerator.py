@@ -1,13 +1,15 @@
-from typing import Dict, Any
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from xml.etree.ElementTree import parse
-from shutil import rmtree, copy2
 from csv import reader
+from os import chdir, listdir, makedirs, path, symlink, unlink
 from pathlib import Path
-from os import path, makedirs, listdir, symlink, unlink, chdir
-from configgen.utils.videoMode import getScreensInfos
+from shutil import copy2, rmtree
+from typing import Any
+from xml.etree.ElementTree import parse
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
+from configgen.utils.videoMode import getScreensInfos
+
 from ...bezel.mame_bezel_manager import setup_mame_bezels
 
 logger = get_logger(__name__)
@@ -33,7 +35,7 @@ class MameGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, Any],
+        game_resolution: dict[str, Any],
     ) -> Command:
         """
         Generate the MAME command array for the specified ROM and system configuration.
@@ -83,7 +85,7 @@ class MameGenerator(Generator):
                 makedirs("/userdata/" + checkPath + "/")
 
         messDataFile = "/usr/share/reglinux/configgen/data/mame/messSystems.csv"
-        openFile = open(messDataFile, "r")
+        openFile = open(messDataFile)
         messSystems = []
         messSysName = []
         messRomType = []
@@ -111,7 +113,7 @@ class MameGenerator(Generator):
         # Used for games that require a CD and floppy to both be inserted
         if system.name == "fmtowns" and softList == "":
             romParentPath = path.basename(romDirname)
-            if path.exists("/userdata/roms/fmtowns/{}.zip".format(romParentPath)):
+            if path.exists(f"/userdata/roms/fmtowns/{romParentPath}.zip"):
                 softList = "fmtowns_cd"
 
         command_array = ["/usr/bin/mame/mame"]
@@ -315,7 +317,7 @@ class MameGenerator(Generator):
         pluginsToLoad = []
         if not (
             system.isOptSet("hiscoreplugin")
-            and system.getOptBoolean("hiscoreplugin") == False
+            and not system.getOptBoolean("hiscoreplugin")
         ):
             pluginsToLoad += ["hiscore"]
         if system.isOptSet("coindropplugin") and system.getOptBoolean("coindropplugin"):
@@ -566,10 +568,8 @@ class MameGenerator(Generator):
                 targetDisk = None
                 if system.name == "fmtowns":
                     blankDisk = "/usr/share/mame/blank.fmtowns"
-                    targetFolder = "/userdata/saves/mame/{}".format(system.name)
-                    targetDisk = "{}/{}.fmtowns".format(
-                        targetFolder, path.splitext(romBasename)[0]
-                    )
+                    targetFolder = f"/userdata/saves/mame/{system.name}"
+                    targetDisk = f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
                 # Add elif statements here for other systems if enabled
                 if (
                     blankDisk is not None
@@ -627,7 +627,7 @@ class MameGenerator(Generator):
 
                 # if using software list, use "usage" for autoRunCmd (if provided)
                 if softList != "":
-                    softListFile = "/usr/bin/mame/hash/{}.xml".format(softList)
+                    softListFile = f"/usr/bin/mame/hash/{softList}.xml"
                     if path.exists(softListFile):
                         softwarelist = parse(softListFile)
                         for software in softwarelist.findall("software"):
@@ -662,16 +662,14 @@ class MameGenerator(Generator):
                     ):
                         rom_type = "flop"
                         if romName.casefold().endswith(".bas"):
-                            autoRunCmd = 'RUN "{}"\\n'.format(romName)
+                            autoRunCmd = f'RUN "{romName}"\\n'
                         else:
-                            autoRunCmd = 'LOADM "{}":EXEC\\n'.format(romName)
+                            autoRunCmd = f'LOADM "{romName}":EXEC\\n'
 
                 # check for a user override
-                autoRunFile = "system/configs/mame/autoload/{}_{}_autoload.csv".format(
-                    system.name, rom_type
-                )
+                autoRunFile = f"system/configs/mame/autoload/{system.name}_{rom_type}_autoload.csv"
                 if path.exists(autoRunFile):
-                    openARFile = open(autoRunFile, "r")
+                    openARFile = open(autoRunFile)
                     with openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
@@ -682,12 +680,10 @@ class MameGenerator(Generator):
                 # Check for an override file, otherwise use generic (if it exists)
                 autoRunCmd = messAutoRun[messMode]
                 autoRunFile = (
-                    "/usr/share/reglinux/configgen/data/mame/{}_autoload.csv".format(
-                        softList
-                    )
+                    f"/usr/share/reglinux/configgen/data/mame/{softList}_autoload.csv"
                 )
                 if path.exists(autoRunFile):
-                    openARFile = open(autoRunFile, "r")
+                    openARFile = open(autoRunFile)
                     with openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
@@ -821,7 +817,7 @@ def getMameControlScheme(system: Any, romBasename: str) -> str:
                 twinstickList: set = set(f.read().split())
             with open(mameRotatedstick) as f:
                 qbertList: set = set(f.read().split())
-        except (IOError, OSError) as e:
+        except OSError as e:
             logger.error(f"Error reading MAME list files: {e}")
             # Initialize empty sets to avoid breaking the process
             capcomList: set = set()

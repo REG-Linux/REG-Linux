@@ -1,11 +1,12 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, listdir, remove, rename
-from io import open
-from re import search
-from shutil import copyfile, copy2
+import builtins
 from configparser import ConfigParser
-from configgen.controllers import gunsNeedCrosses, generate_sdl_controller_config
+from os import listdir, makedirs, path, remove, rename
+from re import search
+from shutil import copy2, copyfile
+
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config, gunsNeedCrosses
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
@@ -59,17 +60,6 @@ class SupermodelGenerator(Generator):
         if system.isOptSet("ppcFreq"):
             command_array.append("-ppc-frequency={}".format(system.config["ppcFreq"]))
 
-        # driving controls
-        if system.isOptSet("pedalSwap") and system.getOptBoolean("pedalSwap"):
-            drivingGame = 1
-        else:
-            drivingGame = 0
-
-        # driving sensitivity
-        if system.isOptSet("joystickSensitivity"):
-            sensitivity = system.config["joystickSensitivity"]
-        else:
-            sensitivity = "100"
 
         # resolution
         command_array.append(
@@ -354,7 +344,7 @@ def configPadsIni(system, rom, players_controllers, guns, altControl, sensitivit
     # To prevent ConfigParser from converting to lower case
     templateConfig.optionxform = lambda optionstr: str(optionstr)
     # Fix: Use read_file instead of deprecated readfp
-    with open(templateFile, "r", encoding="utf_8_sig") as fp:
+    with builtins.open(templateFile, encoding="utf_8_sig") as fp:
         templateConfig.read_file(fp)
 
     # target
@@ -403,7 +393,7 @@ def configPadsIni(system, rom, players_controllers, guns, altControl, sensitivit
     # save the ini file
     if not path.exists(path.dirname(targetFile)):
         makedirs(path.dirname(targetFile))
-    with open(targetFile, "w") as configfile:
+    with builtins.open(targetFile, "w") as configfile:
         targetConfig.write(configfile)
 
 

@@ -1,6 +1,6 @@
-from os import path
-from os import environ
-from configgen.systemFiles import CONF, BIOS, SAVES, ROMS, SCREENSHOTS, CHEATS
+from os import environ, path
+
+from configgen.systemFiles import BIOS, CHEATS, CONF, ROMS, SAVES, SCREENSHOTS
 
 DUCKSTATION_CONFIG_PATH = CONF + "/duckstation/settings.ini"
 DUCKSTATION_SAVES_DIR = SAVES + "/duckstation"
@@ -369,12 +369,9 @@ def setDuckstationConfig(duckstatonConfig, system, playersControllers):
     # RetroAchievements
     if (
         system.isOptSet("retroachievements")
-        and system.getOptBoolean("retroachievements") == True
+        and system.getOptBoolean("retroachievements")
     ):
-        headers = {"Content-type": "text/plain", "User-Agent": "REG-Linux"}
-        login_url = "https://retroachievements.org/"
         username = system.config.get("retroachievements.username", "")
-        password = system.config.get("retroachievements.password", "")
         hardcore = system.config.get("retroachievements.hardcore", "")
         presence = system.config.get("retroachievements.richpresence", "")
         indicator = system.config.get("retroachievements.challenge_indicators", "")

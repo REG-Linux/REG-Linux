@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from os import path
-from typing import Dict, List
 
 """Argument parsing helper functions for launching Build Engine source ports Eduke32 and Raze"""
 
@@ -32,9 +31,9 @@ class BuildEngineArg:
     only_one_allowed: bool
 
 
-def parse_args(launch_args: List[str], rom_path: str) -> Result:
+def parse_args(launch_args: list[str], rom_path: str) -> Result:
     # These arguments are all shared by EDuke32 and Raze, with noted differences
-    build_args: Dict[str, BuildEngineArg] = {
+    build_args: dict[str, BuildEngineArg] = {
         e.arg_key: e
         for e in [
             BuildEngineArg("DIR", "-j", False),  # Adds directory to search list
@@ -52,7 +51,7 @@ def parse_args(launch_args: List[str], rom_path: str) -> Result:
             BuildEngineArg("MAP", "-map", True),  # Start specified MAP on launch
         ]
     }
-    with open(rom_path, "r") as file:
+    with open(rom_path) as file:
         lines = file.readlines()
     errors = []
     for i, line in enumerate(lines):

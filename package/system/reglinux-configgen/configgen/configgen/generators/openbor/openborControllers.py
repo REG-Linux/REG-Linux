@@ -91,11 +91,11 @@ def setupControllers(config, playersControllers, joy_max_inputs, new_axis_vals):
     KEYS_PER_PLAYER = 17  # 0-16
 
     # Configure controls for each connected player
-    for idx, (playercontroller, pad) in enumerate(sorted(playersControllers.items())):
+    for idx, (_, pad) in enumerate(sorted(playersControllers.items())):
         key_idx = 0
 
         # Configure button controls
-        for button, description in CONTROL_MAPPINGS:
+        for button, _ in CONTROL_MAPPINGS:
             config.save(
                 f"keys.{idx}.{key_idx}",
                 JoystickValue(button, pad, joy_max_inputs, new_axis_vals),
@@ -103,7 +103,7 @@ def setupControllers(config, playersControllers, joy_max_inputs, new_axis_vals):
             key_idx += 1
 
         # Configure analog axis controls
-        for axis, invert, description in AXIS_MAPPINGS:
+        for axis, invert, _ in AXIS_MAPPINGS:
             config.save(
                 f"keys.{idx}.{key_idx}",
                 JoystickValue(axis, pad, joy_max_inputs, new_axis_vals, invert),

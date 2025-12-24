@@ -2,12 +2,12 @@
 Consolidated Bezel Configuration Writer - Combines common functionality from different emulator managers.
 """
 
-from typing import Dict, Optional, Tuple, Any
-from pathlib import Path
+from json import load
+from os import listdir, makedirs, path, remove, symlink, unlink
+from typing import Any
+
 from configgen.bezel.bezel_base import BezelUtils, eslog
 from configgen.systemFiles import OVERLAY_CONFIG_FILE
-from json import load
-from os import path, makedirs, remove, listdir, unlink, symlink
 
 
 def writeBezelConfig(
@@ -37,7 +37,7 @@ def writeBezelConfig(
     if bezel == "none" or bezel == "":
         bezel = None
 
-    eslog.debug("libretro bezel: {}".format(bezel))
+    eslog.debug(f"libretro bezel: {bezel}")
 
     # create a fake bezel if guns need borders
     if bezel is None and guns_borders_size is not None:
@@ -101,7 +101,7 @@ def writeBezelConfig(
         try:
             with open(overlay_info_file) as f:
                 infos = load(f)
-        except:
+        except Exception:
             infos = {}
     else:
         infos = {}
@@ -178,7 +178,7 @@ def writeBezelConfig(
                 infos["bottom"] = int(infos["height"] * 2 / 1080)
                 infos["right"] = int(infos["width"] * 241 / 1920)
                 bezelNeedAdaptation = True
-            except:
+            except Exception:
                 pass  # well, no reason will be applied.
         if (
             gameResolution["width"] == infos["width"]
@@ -221,7 +221,7 @@ def writeBezelConfig(
     # stretch option
     if (
         system.isOptSet("bezel_stretch")
-        and system.getOptBoolean("bezel_stretch") == True
+        and system.getOptBoolean("bezel_stretch")
     ):
         bezel_stretch = True
     else:
@@ -260,7 +260,7 @@ def writeBezelConfig(
                 else:
                     try:
                         remove(tattoo_output_png)
-                    except:
+                    except Exception:
                         pass
                     create_new_bezel_file = True
             if create_new_bezel_file:
@@ -276,7 +276,7 @@ def writeBezelConfig(
                     for fr in fadapted:
                         try:
                             remove(fr)
-                        except:
+                        except Exception:
                             pass
 
         if bezel_stretch:
@@ -375,9 +375,9 @@ def writeBezelConfig(
         shaderBezelFile = shaderBezelPath + "/bezel.png"
         if not path.exists(shaderBezelPath):
             makedirs(shaderBezelPath)
-            eslog.debug("Creating shader bezel path {}".format(overlay_png_file))
+            eslog.debug(f"Creating shader bezel path {overlay_png_file}")
         if path.exists(shaderBezelFile):
-            eslog.debug("Removing old shader bezel {}".format(shaderBezelFile))
+            eslog.debug(f"Removing old shader bezel {shaderBezelFile}")
             if path.islink(shaderBezelFile):
                 unlink(shaderBezelFile)
             else:
@@ -387,9 +387,7 @@ def writeBezelConfig(
         # Shaders should use this path to find the art.
         symlink(overlay_png_file, shaderBezelFile)
         eslog.debug(
-            "Symlinked bezel file {} to {} for selected shader".format(
-                overlay_png_file, shaderBezelFile
-            )
+            f"Symlinked bezel file {overlay_png_file} to {shaderBezelFile} for selected shader"
         )
 
 
@@ -403,7 +401,7 @@ def writeBezelCfgConfig(cfgFile, overlay_png_file):
     fd.close()
 
 
-def is_ratio_defined(key: str, config_dict: Dict[str, Any]) -> bool:
+def is_ratio_defined(key: str, config_dict: dict[str, Any]) -> bool:
     """Checks if a key is defined in the dictionary."""
     return (
         key in config_dict

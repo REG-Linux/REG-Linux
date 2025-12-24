@@ -1,6 +1,7 @@
-from os import path, makedirs
-from io import open
+import builtins
 from configparser import ConfigParser
+from os import makedirs, path
+
 from configgen.systemFiles import CONF, SAVES
 
 XEMU_SAVES_DIR = SAVES + "/xbox"
@@ -14,16 +15,16 @@ def setXemuConfig(system, rom, playersControllers, gameResolution):
     iniConfig.optionxform = lambda optionstr: str(optionstr)
     if path.exists(XEMU_CONFIG_PATH):
         try:
-            with open(XEMU_CONFIG_PATH, "r", encoding="utf_8_sig") as fp:
+            with builtins.open(XEMU_CONFIG_PATH, encoding="utf_8_sig") as fp:
                 iniConfig.read_file(fp)
-        except (IOError, Exception):
+        except (OSError, Exception):
             pass  # Will create a new config if reading fails
 
     createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
     # save the ini file
     if not path.exists(path.dirname(XEMU_CONFIG_PATH)):
         makedirs(path.dirname(XEMU_CONFIG_PATH))
-    with open(XEMU_CONFIG_PATH, "w") as configfile:
+    with builtins.open(XEMU_CONFIG_PATH, "w") as configfile:
         iniConfig.write(configfile)
 
 
@@ -130,7 +131,7 @@ def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
     for i in range(1, 5):
         iniConfig.remove_option("input.bindings", f"port{i}")
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         if nplayer <= 4:
             iniConfig.set("input.bindings", f"port{nplayer}", '"' + pad.guid + '"')
         nplayer = nplayer + 1

@@ -32,7 +32,7 @@ def getWheelType(metadata, playingWithWheel, config):
 def input2wheel(input, reversedAxis=False):
     if input.type == "button":
         pcsx2_magic_button_offset = 21  # PCSX2/SDLInputSource.cpp : const u32 button = ev->button + std::size(s_sdl_button_names)
-        return "Button{}".format(int(input.id) + pcsx2_magic_button_offset)
+        return f"Button{int(input.id) + pcsx2_magic_button_offset}"
     if input.type == "hat":
         dir = "unknown"
         if input.value == "1":
@@ -43,7 +43,7 @@ def input2wheel(input, reversedAxis=False):
             dir = "South"
         elif input.value == "8":
             dir = "West"
-        return "Hat{}{}".format(input.id, dir)
+        return f"Hat{input.id}{dir}"
     if input.type == "axis":
         pcsx2_magic_axis_offset = 6  # PCSX2/SDLInputSource.cpp : const u32 axis = ev->axis + std::size(s_sdl_axis_names);
         if reversedAxis is None:
@@ -51,4 +51,4 @@ def input2wheel(input, reversedAxis=False):
         dir = "-"
         if reversedAxis:
             dir = "+"
-        return "{}Axis{}".format(dir, int(input.id) + pcsx2_magic_axis_offset)
+        return f"{dir}Axis{int(input.id) + pcsx2_magic_axis_offset}"

@@ -1,6 +1,7 @@
-from configgen.settings import UnixSettings
-from os import path
 from hashlib import md5
+from os import path
+
+from configgen.settings import UnixSettings
 
 
 def setSonicretroConfig(system, emu, rom):

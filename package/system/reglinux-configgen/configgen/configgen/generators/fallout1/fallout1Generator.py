@@ -1,21 +1,23 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from configparser import ConfigParser
-from os import path, makedirs, chdir
+from os import chdir, makedirs, path
 from shutil import copy
+
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+
 from .fallout1Config import (
+    FALLOUT_BIN_PATH,
+    FALLOUT_CONFIG_DIR,
+    FALLOUT_CONFIG_INI,
+    FALLOUT_CONFIG_INI_SOURCE_PATH,
+    FALLOUT_CONFIG_PATH,
+    FALLOUT_CONFIG_SOURCE_PATH,
+    FALLOUT_EXE_SOURCE_PATH,
+    FALLOUT_ROMS_DIR,
     setFalloutConfig,
     setFalloutIniConfig,
-    FALLOUT_CONFIG_DIR,
-    FALLOUT_EXE_SOURCE_PATH,
-    FALLOUT_BIN_PATH,
-    FALLOUT_CONFIG_PATH,
-    FALLOUT_CONFIG_INI,
-    FALLOUT_ROMS_DIR,
-    FALLOUT_CONFIG_SOURCE_PATH,
-    FALLOUT_CONFIG_INI_SOURCE_PATH,
 )
-from configgen.controllers import generate_sdl_controller_config
 
 
 class Fallout1Generator(Generator):

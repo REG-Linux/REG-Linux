@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
-from .utils import shortNameFromPath
+
 from configgen.systemFiles import ES_GAMES_METADATA
 from configgen.utils.logger import get_logger
+
+from .utils import shortNameFromPath
 
 eslog = get_logger(__name__)
 
@@ -12,7 +14,7 @@ def getGamesMetaData(system, rom):
     root = tree.getroot()
     game = shortNameFromPath(rom)
     res = {}
-    eslog.info("looking for game metadata ({}, {})".format(system, game))
+    eslog.info(f"looking for game metadata ({system}, {game})")
 
     targetSystem = system
     # hardcoded list of system for arcade
@@ -46,12 +48,10 @@ def getGamesMetaData(system, rom):
                     if nodegame.get("name") == "default":
                         for child in nodegame:
                             for attribute in child.attrib:
-                                key = "{}_{}".format(child.tag, attribute)
+                                key = f"{child.tag}_{attribute}"
                                 res[key] = child.get(attribute)
                                 eslog.info(
-                                    "found game metadata {}={} (system level)".format(
-                                        key, res[key]
-                                    )
+                                    f"found game metadata {key}={res[key]} (system level)"
                                 )
                         break
                 for nodegame in nodesystem.findall(".//game"):
@@ -63,10 +63,10 @@ def getGamesMetaData(system, rom):
                     ):
                         for child in nodegame:
                             for attribute in child.attrib:
-                                key = "{}_{}".format(child.tag, attribute)
+                                key = f"{child.tag}_{attribute}"
                                 res[key] = child.get(attribute)
                                 eslog.info(
-                                    "found game metadata {}={}".format(key, res[key])
+                                    f"found game metadata {key}={res[key]}"
                                 )
                         return res
     return res

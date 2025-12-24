@@ -1,4 +1,5 @@
-from os import path, makedirs
+from os import makedirs, path
+
 from .viceConfig import VICE_CONTROLLER_PATH
 
 # inputtype:
@@ -49,7 +50,7 @@ def setViceControllers(system, playersControllers):
     listVice.append("")
     listVice.append("!CLEAR")
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         listVice.append("")
         listVice.append("# " + pad.name)
         for x in pad.inputs:

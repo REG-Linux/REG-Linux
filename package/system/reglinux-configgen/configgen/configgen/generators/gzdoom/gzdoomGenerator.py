@@ -1,15 +1,17 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, mkdir
+from os import mkdir, path
 from shlex import split
-from .gzdoomControllers import setGzdoomControllers
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+
 from .gzdoomConfig import (
-    setGzdoomConfig,
     GZDOOM_CONFIG_DIR,
+    GZDOOM_FM_BANKS_PATH,
     GZDOOM_SCRIPT_PATH,
     GZDOOM_SOUND_FONT_PATH,
-    GZDOOM_FM_BANKS_PATH,
+    setGzdoomConfig,
 )
+from .gzdoomControllers import setGzdoomControllers
 
 
 class GZDoomGenerator(Generator):
@@ -39,7 +41,7 @@ class GZDoomGenerator(Generator):
         # define how wads are loaded
         # if we use a custom extension use that instead
         if rom.endswith(".gzdoom"):
-            with open(rom, "r") as f:
+            with open(rom) as f:
                 iwad_command = f.read().strip()
             args = split(iwad_command)
             return Command(

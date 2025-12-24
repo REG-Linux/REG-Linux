@@ -27,34 +27,30 @@ edenAxisMapping = {"lstick": "joystick1", "rstick": "joystick2"}
 def setEdenControllers(edenConfig, system, playersControllers):
     # controllers
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
-        if system.isOptSet("p{}_pad".format(nplayer - 1)):
+    for _, pad in sorted(playersControllers.items()):
+        if system.isOptSet(f"p{nplayer - 1}_pad"):
             edenConfig.set(
                 "Controls",
-                "player_{}_type".format(nplayer - 1),
-                system.config["p{}_pad".format(nplayer)],
+                f"player_{nplayer - 1}_type",
+                system.config[f"p{nplayer}_pad"],
             )
         else:
-            edenConfig.set("Controls", "player_{}_type".format(nplayer - 1), 0)
+            edenConfig.set("Controls", f"player_{nplayer - 1}_type", 0)
         edenConfig.set(
-            "Controls", "player_{}_type\\default".format(nplayer - 1), "false"
+            "Controls", f"player_{nplayer - 1}_type\\default", "false"
         )
 
         for x in edenButtonsMapping:
             edenConfig.set(
                 "Controls",
                 "player_" + str(nplayer - 1) + "_" + x,
-                '"{}"'.format(
-                    setButton(edenButtonsMapping[x], pad.guid, pad.inputs, nplayer - 1)
-                ),
+                f'"{setButton(edenButtonsMapping[x], pad.guid, pad.inputs, nplayer - 1)}"',
             )
         for x in edenAxisMapping:
             edenConfig.set(
                 "Controls",
                 "player_" + str(nplayer - 1) + "_" + x,
-                '"{}"'.format(
-                    setAxis(edenAxisMapping[x], pad.guid, pad.inputs, nplayer - 1)
-                ),
+                f'"{setAxis(edenAxisMapping[x], pad.guid, pad.inputs, nplayer - 1)}"',
             )
         edenConfig.set(
             "Controls", "player_" + str(nplayer - 1) + "_motionleft", '"[empty]"'
@@ -95,16 +91,9 @@ def setButton(key, padGuid, padInputs, port):
         input = padInputs[key]
 
         if input.type == "button":
-            return ("engine:sdl,button:{},guid:{},port:{}").format(
-                input.id, padGuid, port
-            )
+            return (f"engine:sdl,button:{input.id},guid:{padGuid},port:{port}")
         elif input.type == "hat":
-            return ("engine:sdl,hat:{},direction:{},guid:{},port:{}").format(
-                input.id,
-                hatdirectionvalue(input.value),
-                padGuid,
-                port,
-            )
+            return (f"engine:sdl,hat:{input.id},direction:{hatdirectionvalue(input.value)},guid:{padGuid},port:{port}")
         elif input.type == "axis":
             return ("engine:sdl,threshold:{},axis:{},guid:{},port:{},invert:{}").format(
                 0.5, input.id, padGuid, port, "+"
@@ -127,8 +116,8 @@ def setAxis(key, padGuid, padInputs, port):
     elif key == "joystick2" and "joystick2up" in padInputs:
         inputy = padInputs["joystick2up"]
     return (
-        "engine:sdl,range:1.000000,deadzone:0.100000,invert_y:+,invert_x:+,offset_y:-0.000000,axis_y:{},offset_x:-0.000000,axis_x:{},guid:{},port:{}"
-    ).format(inputy, inputx, padGuid, port)
+        f"engine:sdl,range:1.000000,deadzone:0.100000,invert_y:+,invert_x:+,offset_y:-0.000000,axis_y:{inputy},offset_x:-0.000000,axis_x:{inputx},guid:{padGuid},port:{port}"
+    )
 
 
 @staticmethod
