@@ -1,5 +1,13 @@
 --- a/drivers/gpu/drm/panel/Makefile	2025-12-15 17:27:52.854103742 +0100
 +++ b/drivers/gpu/drm/panel/Makefile	2025-12-15 17:15:17.473047457 +0100
+@@ -21,6 +21,7 @@
+ obj-$(CONFIG_DRM_PANEL_HIMAX_HX83102) += panel-himax-hx83102.o
+ obj-$(CONFIG_DRM_PANEL_HIMAX_HX83112A) += panel-himax-hx83112a.o
+ obj-$(CONFIG_DRM_PANEL_HIMAX_HX83112B) += panel-himax-hx83112b.o
++obj-$(CONFIG_DRM_PANEL_TRULY_HX83112A) += panel-hx83112a-truly.o
+ obj-$(CONFIG_DRM_PANEL_HIMAX_HX8394) += panel-himax-hx8394.o
+ obj-$(CONFIG_DRM_PANEL_HYDIS_HV101HD1) += panel-hydis-hv101hd1.o
+ obj-$(CONFIG_DRM_PANEL_ILITEK_IL9322) += panel-ilitek-ili9322.o
 @@ -109,6 +109,7 @@
  obj-$(CONFIG_DRM_PANEL_TPO_TD043MTEA1) += panel-tpo-td043mtea1.o
  obj-$(CONFIG_DRM_PANEL_TPO_TPG110) += panel-tpo-tpg110.o
@@ -10,6 +18,23 @@
  obj-$(CONFIG_DRM_PANEL_VISIONOX_RM692E5) += panel-visionox-rm692e5.o
 --- a/drivers/gpu/drm/panel/Kconfig	2025-12-15 17:27:52.853504692 +0100
 +++ b/drivers/gpu/drm/panel/Kconfig	2025-12-15 17:15:11.657401717 +0100
+@@ -203,6 +203,16 @@
+ 	  Say Y here if you want to enable support for Himax HX83112B-based
+ 	  display panels, such as the one found in the Fairphone 3 smartphone.
+ 
++config DRM_PANEL_TRULY_HX83112A
++	tristate "Truly HX83112A-based 1080p DSI panel"
++	depends on OF
++	depends on DRM_MIPI_DSI
++	depends on BACKLIGHT_CLASS_DEVICE
++	help
++	  Say Y here if you want to enable support for the Truly HX83112A
++	  1080x1920 video mode MIPI-DSI panel driven using the downstream
++	  Android command sequence.
++
+ config DRM_PANEL_HIMAX_HX8394
+ 	tristate "HIMAX HX8394 MIPI-DSI LCD panels"
+ 	depends on OF
 @@ -1088,6 +1088,17 @@
  	  Say Y here if you want to enable support for Truly NT35597 WQXGA Dual DSI
  	  Video Mode panel
@@ -604,4 +629,436 @@
 +
 +MODULE_AUTHOR("Codex <codex@openai.com>");
 +MODULE_DESCRIPTION("Truly BM5460BB1 MIPI DSI 1080p panel");
++MODULE_LICENSE("GPL");
+--- /dev/null	2025-12-18 19:08:09.351909192 +0100
++++ b/drivers/gpu/drm/panel/panel-hx83112a-truly.c	2025-12-19 22:48:23.465418042 +0100
+@@ -0,0 +1,427 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Truly HX83112A 1080x1920 DSI video panel
++ *
++ * Command sequences and timings are taken from the downstream Android
++ * qcom,mdss-dsi-hx83112a_1080p_video panel node.
++ */
++
++#include <linux/delay.h>
++#include <linux/gpio/consumer.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/regulator/consumer.h>
++
++#include <drm/drm_mipi_dsi.h>
++#include <drm/drm_modes.h>
++#include <drm/drm_panel.h>
++#include <drm/drm_probe_helper.h>
++
++struct hx83112a_truly {
++	struct drm_panel panel;
++	struct mipi_dsi_device *dsi;
++	struct regulator *supplies[3];
++	unsigned int num_supplies;
++	struct gpio_desc *reset_gpio;
++	struct gpio_desc *enable_gpio;
++	bool prepared;
++};
++
++static inline struct hx83112a_truly *to_hx83112a_truly(struct drm_panel *panel)
++{
++	return container_of(panel, struct hx83112a_truly, panel);
++}
++
++struct hx83112a_truly_cmd {
++	u8 dtype;
++	u16 wait_ms;
++	const u8 *payload;
++	size_t len;
++};
++
++/* Decoded qcom,mdss-dsi-on-command payloads */
++static const u8 hx83112a_on_cmd0[] = { 0xb9, 0x83, 0x11, 0x2a };
++static const u8 hx83112a_on_cmd1[] = { 0xcf, 0x00, 0x14, 0x00, 0xc0 };
++static const u8 hx83112a_on_cmd2[] = { 0xcc, 0x08 };
++static const u8 hx83112a_on_cmd3[] = { 0xc9, 0x04, 0x0a, 0x8c, 0x01 };
++static const u8 hx83112a_on_cmd4[] = { 0xb1, 0x08, 0x29, 0x29, 0x80, 0x80, 0x4f, 0x4a, 0xaa };
++static const u8 hx83112a_on_cmd5[] = { 0xb2, 0x00, 0x02, 0x00, 0x70, 0x80, 0x00, 0x08, 0x2a, 0x1a, 0x11, 0x15, 0x00, 0x10, 0xa3, 0x87 };
++static const u8 hx83112a_on_cmd6[] = { 0xd2, 0x2c, 0x2c };
++static const u8 hx83112a_on_cmd7[] = { 0xb4, 0x02, 0xd4, 0x02, 0xd4, 0x02, 0xba, 0x04, 0xd4, 0x00, 0x00, 0x04, 0xd4, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00, 0x0c, 0x12, 0x00, 0x2d, 0x0e, 0x0e, 0x13, 0x00, 0x8e };
++static const u8 hx83112a_on_cmd8[] = { 0xc7, 0x00, 0x00, 0x04, 0xe0, 0x33, 0x00, 0x20, 0x40 };
++static const u8 hx83112a_on_cmd9[] = { 0xb6, 0x7b, 0x7b, 0xe3 };
++static const u8 hx83112a_on_cmd10[] = { 0xd3, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x05, 0x04, 0x04, 0x00, 0x1f, 0x0b, 0x0b, 0x0b, 0x0b, 0x32, 0x10, 0x0a, 0x00, 0x0a, 0x32, 0x16, 0x23, 0x06, 0x23, 0x32, 0x10, 0x06, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x07, 0x8b };
++static const u8 hx83112a_on_cmd11[] = { 0xbd, 0x01 };
++static const u8 hx83112a_on_cmd12[] = { 0xcb, 0x25, 0x11, 0x00 };
++static const u8 hx83112a_on_cmd13[] = { 0xbd, 0x00 };
++static const u8 hx83112a_on_cmd14[] = { 0xd5, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x40, 0x40, 0x19, 0x19, 0x18, 0x18, 0x20, 0x20, 0x04, 0x04, 0x03, 0x03, 0x02, 0x02, 0x01, 0x01, 0x00, 0x00, 0x31, 0x31, 0x30, 0x30, 0x2f, 0x2f };
++static const u8 hx83112a_on_cmd15[] = { 0xd6, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x40, 0x40, 0x19, 0x19, 0x18, 0x18, 0x20, 0x20, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x04, 0x04, 0x31, 0x31, 0x30, 0x30, 0x2f, 0x2f };
++static const u8 hx83112a_on_cmd16[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xba, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xba, 0xaa, 0xaa };
++static const u8 hx83112a_on_cmd17[] = { 0xbd, 0x01 };
++static const u8 hx83112a_on_cmd18[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff };
++static const u8 hx83112a_on_cmd19[] = { 0xbd, 0x02 };
++static const u8 hx83112a_on_cmd20[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff };
++static const u8 hx83112a_on_cmd21[] = { 0xbd, 0x03 };
++static const u8 hx83112a_on_cmd22[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xeb, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xeb, 0xff, 0xff };
++static const u8 hx83112a_on_cmd23[] = { 0xbd, 0x00 };
++static const u8 hx83112a_on_cmd24[] = { 0xe7, 0x0f, 0x0f, 0x1e, 0x74, 0x1e, 0x72, 0x00, 0x50, 0x02, 0x02, 0x00, 0x00, 0x02, 0x02, 0x02, 0x05, 0x14, 0x14, 0x32, 0xb9, 0x23, 0xb9, 0x08 };
++static const u8 hx83112a_on_cmd25[] = { 0xbd, 0x01 };
++static const u8 hx83112a_on_cmd26[] = { 0xe7, 0x02, 0x00, 0x80, 0x01, 0x80, 0x0e, 0x85, 0x0f };
++static const u8 hx83112a_on_cmd27[] = { 0xbd, 0x02 };
++static const u8 hx83112a_on_cmd28[] = { 0xe7, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00 };
++static const u8 hx83112a_on_cmd29[] = { 0xbd, 0x00 };
++static const u8 hx83112a_on_cmd30[] = { 0xe9, 0xc3 };
++static const u8 hx83112a_on_cmd31[] = { 0xcb, 0xd2, 0x35 };
++static const u8 hx83112a_on_cmd32[] = { 0xe9, 0x3f };
++static const u8 hx83112a_on_cmd33[] = { 0xc1, 0x01 };
++static const u8 hx83112a_on_cmd34[] = { 0xbd, 0x01 };
++static const u8 hx83112a_on_cmd35[] = { 0xe9, 0xc8 };
++static const u8 hx83112a_on_cmd36[] = { 0xd3, 0x81 };
++static const u8 hx83112a_on_cmd37[] = { 0xe9, 0x3f };
++static const u8 hx83112a_on_cmd38[] = { 0xbd, 0x00 };
++static const u8 hx83112a_on_cmd39[] = { 0xc1, 0x01, 0x00 };
++static const u8 hx83112a_on_cmd40[] = { 0xbd, 0x01 };
++static const u8 hx83112a_on_cmd41[] = { 0xc1, 0xff, 0xf9, 0xf4, 0xee, 0xe9, 0xe3, 0xdf, 0xd5, 0xd0, 0xca, 0xc4, 0xbf, 0xba, 0xb5, 0xb0, 0xab, 0xa6, 0xa2, 0x9d, 0x94, 0x8c, 0x84, 0x7c, 0x75, 0x6d, 0x65, 0x5e, 0x57, 0x50, 0x49, 0x43, 0x3d, 0x36, 0x2f, 0x28, 0x21, 0x1b, 0x15, 0x0e, 0x08, 0x06, 0x05, 0x02, 0x01, 0x00, 0x31, 0x71, 0xcb, 0xe7, 0xca, 0x4c, 0x7f, 0x5c, 0x0b, 0x5b, 0x1b, 0x40 };
++static const u8 hx83112a_on_cmd42[] = { 0xbd, 0x02 };
++static const u8 hx83112a_on_cmd43[] = { 0xc1, 0xff, 0xfa, 0xf4, 0xef, 0xea, 0xe5, 0xe1, 0xd7, 0xd2, 0xcc, 0xc7, 0xc2, 0xbd, 0xb9, 0xb4, 0xaf, 0xab, 0xa6, 0xa2, 0x99, 0x91, 0x89, 0x82, 0x7b, 0x73, 0x6c, 0x65, 0x5e, 0x58, 0x51, 0x4a, 0x45, 0x3f, 0x38, 0x31, 0x2b, 0x25, 0x1e, 0x19, 0x12, 0x0f, 0x0d, 0x0c, 0x0a, 0x0a, 0x09, 0xa1, 0xb6, 0xc5, 0x21, 0x60, 0xeb, 0x18, 0x2c, 0x32, 0x77, 0x40 };
++static const u8 hx83112a_on_cmd44[] = { 0xbd, 0x03 };
++static const u8 hx83112a_on_cmd45[] = { 0xc1, 0xff, 0xfa, 0xf6, 0xf1, 0xec, 0xe7, 0xe3, 0xd9, 0xd4, 0xce, 0xc9, 0xc4, 0xbf, 0xbb, 0xb6, 0xb2, 0xad, 0xa9, 0xa5, 0x9c, 0x94, 0x8c, 0x85, 0x7e, 0x77, 0x71, 0x6a, 0x63, 0x5d, 0x56, 0x50, 0x49, 0x44, 0x3e, 0x38, 0x31, 0x2b, 0x25, 0x1f, 0x18, 0x16, 0x14, 0x13, 0x11, 0x11, 0x30, 0x71, 0x79, 0xd8, 0x51, 0x7b, 0xc6, 0x72, 0xa6, 0x13, 0x9a, 0x00 };
++static const u8 hx83112a_on_cmd46[] = { 0xbd, 0x00 };
++static const u8 hx83112a_on_cmd47[] = { 0x35, 0x00 };
++static const u8 hx83112a_on_cmd48[] = { 0x51, 0x07, 0xff };
++static const u8 hx83112a_on_cmd49[] = { 0x53, 0x24 };
++static const u8 hx83112a_on_cmd50[] = { 0x11 };
++static const u8 hx83112a_on_cmd51[] = { 0x29 };
++#define MIPI_DSI_DCS_LONG_WRITE 		0
++#define MIPI_DSI_DCS_SHORT_WRITE_PARAM  	1
++#define MIPI_DSI_DCS_SHORT_WRITE		2
++static const struct hx83112a_truly_cmd hx83112a_on_cmds[] = {
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd0, ARRAY_SIZE(hx83112a_on_cmd0) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd1, ARRAY_SIZE(hx83112a_on_cmd1) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd2, ARRAY_SIZE(hx83112a_on_cmd2) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd3, ARRAY_SIZE(hx83112a_on_cmd3) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd4, ARRAY_SIZE(hx83112a_on_cmd4) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd5, ARRAY_SIZE(hx83112a_on_cmd5) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd6, ARRAY_SIZE(hx83112a_on_cmd6) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd7, ARRAY_SIZE(hx83112a_on_cmd7) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd8, ARRAY_SIZE(hx83112a_on_cmd8) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd9, ARRAY_SIZE(hx83112a_on_cmd9) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd10, ARRAY_SIZE(hx83112a_on_cmd10) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd11, ARRAY_SIZE(hx83112a_on_cmd11) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd12, ARRAY_SIZE(hx83112a_on_cmd12) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd13, ARRAY_SIZE(hx83112a_on_cmd13) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd14, ARRAY_SIZE(hx83112a_on_cmd14) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd15, ARRAY_SIZE(hx83112a_on_cmd15) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd16, ARRAY_SIZE(hx83112a_on_cmd16) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd17, ARRAY_SIZE(hx83112a_on_cmd17) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd18, ARRAY_SIZE(hx83112a_on_cmd18) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd19, ARRAY_SIZE(hx83112a_on_cmd19) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd20, ARRAY_SIZE(hx83112a_on_cmd20) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd21, ARRAY_SIZE(hx83112a_on_cmd21) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd22, ARRAY_SIZE(hx83112a_on_cmd22) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd23, ARRAY_SIZE(hx83112a_on_cmd23) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd24, ARRAY_SIZE(hx83112a_on_cmd24) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd25, ARRAY_SIZE(hx83112a_on_cmd25) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd26, ARRAY_SIZE(hx83112a_on_cmd26) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd27, ARRAY_SIZE(hx83112a_on_cmd27) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd28, ARRAY_SIZE(hx83112a_on_cmd28) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd29, ARRAY_SIZE(hx83112a_on_cmd29) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd30, ARRAY_SIZE(hx83112a_on_cmd30) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd31, ARRAY_SIZE(hx83112a_on_cmd31) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd32, ARRAY_SIZE(hx83112a_on_cmd32) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd33, ARRAY_SIZE(hx83112a_on_cmd33) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd34, ARRAY_SIZE(hx83112a_on_cmd34) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd35, ARRAY_SIZE(hx83112a_on_cmd35) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd36, ARRAY_SIZE(hx83112a_on_cmd36) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd37, ARRAY_SIZE(hx83112a_on_cmd37) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd38, ARRAY_SIZE(hx83112a_on_cmd38) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd39, ARRAY_SIZE(hx83112a_on_cmd39) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd40, ARRAY_SIZE(hx83112a_on_cmd40) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd41, ARRAY_SIZE(hx83112a_on_cmd41) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd42, ARRAY_SIZE(hx83112a_on_cmd42) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd43, ARRAY_SIZE(hx83112a_on_cmd43) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd44, ARRAY_SIZE(hx83112a_on_cmd44) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd45, ARRAY_SIZE(hx83112a_on_cmd45) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd46, ARRAY_SIZE(hx83112a_on_cmd46) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd47, ARRAY_SIZE(hx83112a_on_cmd47) },
++	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd48, ARRAY_SIZE(hx83112a_on_cmd48) },
++	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd49, ARRAY_SIZE(hx83112a_on_cmd49) },
++	{ MIPI_DSI_DCS_SHORT_WRITE, 120, hx83112a_on_cmd50, ARRAY_SIZE(hx83112a_on_cmd50) },
++	{ MIPI_DSI_DCS_SHORT_WRITE, 50, hx83112a_on_cmd51, ARRAY_SIZE(hx83112a_on_cmd51) },
++};
++
++/* Decoded qcom,mdss-dsi-off-command payloads */
++static const u8 hx83112a_off_cmd0[] = { 0x28 };
++static const u8 hx83112a_off_cmd1[] = { 0x10 };
++
++static const struct hx83112a_truly_cmd hx83112a_off_cmds[] = {
++	{ MIPI_DSI_DCS_SHORT_WRITE, 50, hx83112a_off_cmd0, ARRAY_SIZE(hx83112a_off_cmd0) },
++	{ MIPI_DSI_DCS_SHORT_WRITE, 120, hx83112a_off_cmd1, ARRAY_SIZE(hx83112a_off_cmd1) },
++};
++
++static int hx83112a_truly_send_table(struct hx83112a_truly *ctx,
++				     const struct hx83112a_truly_cmd *cmds,
++				     size_t count)
++{
++	size_t i;
++	int ret;
++
++	for (i = 0; i < count; i++) {
++		const struct hx83112a_truly_cmd *cmd = &cmds[i];
++		const u8 *payload = cmd->payload;
++		size_t len = cmd->len;
++
++		if (!len)
++			return -EINVAL;
++
++		dev_info(ctx->panel.dev,
++			 "cmd[%zu]: dtype=0x%02x len=%zu wait=%ums\n",
++			 i, cmd->dtype, len, cmd->wait_ms);
++
++		switch (cmd->dtype) {
++		case MIPI_DSI_DCS_SHORT_WRITE:
++		case MIPI_DSI_DCS_SHORT_WRITE_PARAM:
++			ret = mipi_dsi_dcs_write(ctx->dsi, payload[0],
++						 len > 1 ? payload + 1 : NULL,
++						 len > 1 ? len - 1 : 0);
++			break;
++		case MIPI_DSI_DCS_LONG_WRITE:
++		default:
++			ret = mipi_dsi_dcs_write_buffer(ctx->dsi, payload, len);
++			break;
++		}
++
++		if (ret < 0)
++			return ret;
++
++		if (cmd->wait_ms)
++			msleep(cmd->wait_ms);
++	}
++
++	return 0;
++}
++
++static void hx83112a_truly_reset(struct hx83112a_truly *ctx)
++{
++	if (!ctx->reset_gpio)
++		return;
++
++	dev_info(ctx->panel.dev, "reset: 1->0->1 with 10ms delays\n");
++	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
++	msleep(10);
++	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
++	msleep(10);
++	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
++	msleep(10);
++}
++
++static int hx83112a_truly_prepare(struct drm_panel *panel)
++{
++	struct hx83112a_truly *ctx = to_hx83112a_truly(panel);
++	unsigned int i;
++	int ret;
++
++	if (ctx->prepared)
++		return 0;
++
++	dev_info(ctx->panel.dev, "prepare: enable regulators, assert enable GPIO, run init cmds\n");
++
++	for (i = 0; i < ctx->num_supplies; i++) {
++		ret = regulator_enable(ctx->supplies[i]);
++		if (ret) {
++			while (i--)
++				regulator_disable(ctx->supplies[i]);
++			return ret;
++		}
++	}
++
++	if (ctx->enable_gpio)
++		gpiod_set_value_cansleep(ctx->enable_gpio, 1);
++
++	hx83112a_truly_reset(ctx);
++
++	ret = hx83112a_truly_send_table(ctx, hx83112a_on_cmds,
++					ARRAY_SIZE(hx83112a_on_cmds));
++	if (ret) {
++		if (ctx->enable_gpio)
++			gpiod_set_value_cansleep(ctx->enable_gpio, 0);
++		while (i--)
++			regulator_disable(ctx->supplies[i]);
++		return ret;
++	}
++
++	ctx->prepared = true;
++
++	dev_info(ctx->panel.dev, "prepare: done\n");
++
++	return 0;
++}
++
++static int hx83112a_truly_unprepare(struct drm_panel *panel)
++{
++	struct hx83112a_truly *ctx = to_hx83112a_truly(panel);
++	unsigned int i;
++	int ret;
++	unsigned long old_flags;
++
++	if (!ctx->prepared)
++		return 0;
++
++	dev_info(ctx->panel.dev, "unprepare: send off cmds in HS, drop enable, disable regulators\n");
++
++	/* Downstream sends off-command in HS mode */
++	old_flags = ctx->dsi->mode_flags;
++	ctx->dsi->mode_flags &= ~MIPI_DSI_MODE_LPM;
++
++	ret = hx83112a_truly_send_table(ctx, hx83112a_off_cmds,
++					ARRAY_SIZE(hx83112a_off_cmds));
++	if (ret)
++		dev_warn(ctx->panel.dev, "Failed to send off sequence: %d\n", ret);
++
++	ctx->dsi->mode_flags = old_flags;
++
++	if (ctx->enable_gpio)
++		gpiod_set_value_cansleep(ctx->enable_gpio, 0);
++
++	for (i = ctx->num_supplies; i > 0; i--)
++		regulator_disable(ctx->supplies[i - 1]);
++
++	if (ctx->reset_gpio)
++		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
++
++	ctx->prepared = false;
++
++	dev_info(ctx->panel.dev, "unprepare: done\n");
++
++	return 0;
++}
++
++static const struct drm_display_mode hx83112a_truly_mode = {
++	.clock = (1080 + 48 + 12 + 16) * (1920 + 44 + 5 + 5) * 60 / 1000,
++	.hdisplay = 1080,
++	.hsync_start = 1080 + 48,
++	.hsync_end = 1080 + 48 + 12,
++	.htotal = 1080 + 48 + 12 + 16,
++	.vdisplay = 1920,
++	.vsync_start = 1920 + 44,
++	.vsync_end = 1920 + 44 + 5,
++	.vtotal = 1920 + 44 + 5 + 5,
++	.width_mm = 68,
++	.height_mm = 121,
++	.type = DRM_MODE_TYPE_DRIVER,
++};
++
++static int hx83112a_truly_get_modes(struct drm_panel *panel,
++				    struct drm_connector *connector)
++{
++	return drm_connector_helper_get_modes_fixed(connector,
++						    &hx83112a_truly_mode);
++}
++
++static const struct drm_panel_funcs hx83112a_truly_funcs = {
++	.prepare = hx83112a_truly_prepare,
++	.unprepare = hx83112a_truly_unprepare,
++	.get_modes = hx83112a_truly_get_modes,
++};
++
++static int hx83112a_truly_probe(struct mipi_dsi_device *dsi)
++{
++	struct device *dev = &dsi->dev;
++	struct hx83112a_truly *ctx;
++	unsigned int i;
++	int ret;
++	static const char * const supply_names[] = { "iovcc", "vsp", "vsn" };
++
++	ctx = devm_drm_panel_alloc(dev, struct hx83112a_truly, panel,
++				   &hx83112a_truly_funcs,
++				   DRM_MODE_CONNECTOR_DSI);
++	if (IS_ERR(ctx))
++		return PTR_ERR(ctx);
++
++	dev_info(dev, "probe start\n");
++
++	for (i = 0; i < ARRAY_SIZE(supply_names); i++) {
++		struct regulator *reg;
++
++		reg = devm_regulator_get_optional(dev, supply_names[i]);
++		if (IS_ERR(reg)) {
++			if (PTR_ERR(reg) == -ENODEV)
++				continue;
++			return dev_err_probe(dev, PTR_ERR(reg),
++					     "Failed to get %s regulator\n",
++					     supply_names[i]);
++		}
++
++		ctx->supplies[ctx->num_supplies++] = reg;
++	}
++
++	ctx->reset_gpio = devm_gpiod_get_optional(dev, "reset",
++						  GPIOD_OUT_HIGH);
++	if (IS_ERR(ctx->reset_gpio))
++		return dev_err_probe(dev, PTR_ERR(ctx->reset_gpio),
++				     "Failed to get reset GPIO\n");
++
++	ctx->enable_gpio = devm_gpiod_get_optional(dev, "enable",
++						   GPIOD_OUT_LOW);
++	if (IS_ERR(ctx->enable_gpio))
++		return dev_err_probe(dev, PTR_ERR(ctx->enable_gpio),
++				     "Failed to get enable GPIO\n");
++
++	ctx->dsi = dsi;
++	mipi_dsi_set_drvdata(dsi, ctx);
++
++	dsi->lanes = 4;
++	dsi->format = MIPI_DSI_FMT_RGB888;
++	dsi->mode_flags = MIPI_DSI_MODE_VIDEO |
++			  /*MIPI_DSI_MODE_VIDEO_SYNC_EVENT |*/
++			  MIPI_DSI_MODE_LPM /*|
++			  MIPI_DSI_MODE_EOT_PACKET*/;
++
++	ctx->panel.prepare_prev_first = true;
++
++	ret = drm_panel_of_backlight(&ctx->panel);
++	if (ret)
++		return dev_err_probe(dev, ret, "Failed to get backlight\n");
++
++	drm_panel_add(&ctx->panel);
++
++	ret = mipi_dsi_attach(dsi);
++	if (ret < 0) {
++		dev_err_probe(dev, ret, "Failed to attach to DSI host\n");
++		drm_panel_remove(&ctx->panel);
++		return ret;
++	}
++
++	dev_info(dev, "probe done\n");
++
++	return 0;
++}
++
++static void hx83112a_truly_remove(struct mipi_dsi_device *dsi)
++{
++	struct hx83112a_truly *ctx = mipi_dsi_get_drvdata(dsi);
++	int ret;
++
++	ret = mipi_dsi_detach(dsi);
++	if (ret < 0)
++		dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
++
++	drm_panel_remove(&ctx->panel);
++}
++
++static const struct of_device_id hx83112a_truly_of_match[] = {
++	{ .compatible = "truly,hx83112a" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, hx83112a_truly_of_match);
++
++static struct mipi_dsi_driver hx83112a_truly_driver = {
++	.probe = hx83112a_truly_probe,
++	.remove = hx83112a_truly_remove,
++	.driver = {
++		.name = "panel-hx83112a-truly",
++		.of_match_table = hx83112a_truly_of_match,
++	},
++};
++module_mipi_dsi_driver(hx83112a_truly_driver);
++
++MODULE_DESCRIPTION("Truly HX83112A 1080p DSI panel driver");
 +MODULE_LICENSE("GPL");
