@@ -8,44 +8,19 @@
  obj-$(CONFIG_DRM_PANEL_HIMAX_HX8394) += panel-himax-hx8394.o
  obj-$(CONFIG_DRM_PANEL_HYDIS_HV101HD1) += panel-hydis-hv101hd1.o
  obj-$(CONFIG_DRM_PANEL_ILITEK_IL9322) += panel-ilitek-ili9322.o
-@@ -109,6 +109,7 @@
- obj-$(CONFIG_DRM_PANEL_TPO_TD043MTEA1) += panel-tpo-td043mtea1.o
- obj-$(CONFIG_DRM_PANEL_TPO_TPG110) += panel-tpo-tpg110.o
- obj-$(CONFIG_DRM_PANEL_TRULY_NT35597_WQXGA) += panel-truly-nt35597.o
-+obj-$(CONFIG_DRM_PANEL_TRULY_BM5460BB1) += panel-truly-bm5460bb1.o
- obj-$(CONFIG_DRM_PANEL_VISIONOX_G2647FB105) += panel-visionox-g2647fb105.o
- obj-$(CONFIG_DRM_PANEL_VISIONOX_RM69299) += panel-visionox-rm69299.o
- obj-$(CONFIG_DRM_PANEL_VISIONOX_RM692E5) += panel-visionox-rm692e5.o
 --- a/drivers/gpu/drm/panel/Kconfig	2025-12-15 17:27:52.853504692 +0100
 +++ b/drivers/gpu/drm/panel/Kconfig	2025-12-15 17:15:11.657401717 +0100
-@@ -203,6 +203,16 @@
- 	  Say Y here if you want to enable support for Himax HX83112B-based
- 	  display panels, such as the one found in the Fairphone 3 smartphone.
+@@ -1088,6 +1088,17 @@
+ 	  Say Y here if you want to enable support for Truly NT35597 WQXGA Dual DSI
+ 	  Video Mode panel
  
 +config DRM_PANEL_TRULY_HX83112A
-+	tristate "Truly HX83112A-based 1080p DSI panel"
++	tristate "Truly HX83112A panel"
 +	depends on OF
 +	depends on DRM_MIPI_DSI
 +	depends on BACKLIGHT_CLASS_DEVICE
 +	help
 +	  Say Y here if you want to enable support for the Truly HX83112A
-+	  1080x1920 video mode MIPI-DSI panel driven using the downstream
-+	  Android command sequence.
-+
- config DRM_PANEL_HIMAX_HX8394
- 	tristate "HIMAX HX8394 MIPI-DSI LCD panels"
- 	depends on OF
-@@ -1088,6 +1088,17 @@
- 	  Say Y here if you want to enable support for Truly NT35597 WQXGA Dual DSI
- 	  Video Mode panel
- 
-+config DRM_PANEL_TRULY_BM5460BB1
-+	tristate "Truly BM5460BB1 panel"
-+	depends on OF
-+	depends on DRM_MIPI_DSI
-+	depends on BACKLIGHT_CLASS_DEVICE
-+	help
-+	  Say Y here if you want to enable support for the Truly BM5460BB1
 +	  1080x1920 video mode MIPI-DSI panel used by the Mangmi Air X (SM6115)
 +	  handheld. The driver uploads the vendor initialization sequence and
 +	  exposes a 60 Hz 1080p mode.
@@ -53,592 +28,18 @@
  config DRM_PANEL_VISIONOX_G2647FB105
  	tristate "Visionox G2647FB105"
  	depends on OF
---- /dev/null	2025-12-15 14:40:19.856737875 +0100
-+++ b/drivers/gpu/drm/panel/panel-truly-bm5460bb1.c	2025-12-15 17:14:55.261644610 +0100
-@@ -0,0 +1,574 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2025 Romain Tisserand <romain.tisserand@gmail.com>
-+ * Copyright 2025 REG-Linux (https://reglinux.org)
-+ * Panel driver for the Truly BM5460BB1 1080p DSI video-mode display.
-+ */
-+
-+#include <linux/delay.h>
-+#include <linux/device.h>
-+#include <linux/gpio/consumer.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/regulator/consumer.h>
-+
-+#include <drm/drm_connector.h>
-+#include <drm/drm_crtc.h>
-+#include <drm/drm_modes.h>
-+#include <drm/drm_mipi_dsi.h>
-+#include <drm/drm_panel.h>
-+
-+struct bm5460bb1_cmd {
-+	const char *desc;
-+	const u8 *data;
-+	size_t len;
-+	u32 delay_ms;
-+};
-+
-+#define BM_CMD(_desc, _delay_ms, _seq...)					\
-+	{									\
-+		.desc = _desc,							\
-+		.data = (const u8[]){ _seq },					\
-+		.len = ARRAY_SIZE(((u8[]){ _seq })),				\
-+		.delay_ms = _delay_ms,						\
-+	}
-+
-+struct bm5460bb1 {
-+	struct drm_panel panel;
-+	struct mipi_dsi_device *dsi;
-+	bool prepared;
-+	bool enabled;
-+	enum drm_panel_orientation orientation;
-+	struct regulator_bulk_data supplies[3];
-+	struct gpio_desc *enable_gpio;
-+	struct gpio_desc *reset_gpio;
-+};
-+
-+/*
-+ * Vendor init sequence (command + payload) grouped by command page.
-+ * The sequence was captured from the vendor BSP; descriptions are provided
-+ * purely to aid bring-up and debugging.
-+ */
-+static const struct bm5460bb1_cmd bm5460bb1_init_cmds[] = {
-+	BM_CMD("unlock vendor command set", 0, 0xdf, 0x95, 0x26, 0xbb),
-+	BM_CMD("select command page 0", 0, 0xde, 0x00),
-+	BM_CMD("p0: power and porch control", 0, 0xb2, 0x01, 0x23, 0x60, 0x88, 0x24),
-+	BM_CMD("p0: display timings", 0, 0xbb, 0x02, 0x11, 0x43, 0x32, 0x15, 0x11, 0x11),
-+	BM_CMD("p0: drive strength", 0, 0xbd, 0x00, 0x27),
-+	BM_CMD("p0: panel voltage control", 0, 0xbc, 0x2e, 0x80, 0xd3),
-+	BM_CMD("p0: VCOM / VGH tuning", 0, 0xbf, 0x3a, 0x21, 0x3f, 0xc3),
-+	BM_CMD("p0: AVDD/AVEE", 0, 0xc0, 0x00, 0xae, 0x01, 0xae, 0x01),
-+	BM_CMD("p0: source bias", 0, 0xc1, 0x00, 0x11, 0x00),
-+	BM_CMD("p0: GOA timings 1", 0,
-+	       0xc3, 0x3b, 0x01, 0x06, 0x00, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01,
-+	       0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x03, 0x3a, 0x40, 0x7a,
-+	       0x80, 0xba, 0x01, 0xc0, 0xff, 0xff, 0x00, 0x05, 0x03, 0x7f,
-+	       0x00, 0x08, 0x00, 0x08, 0x00, 0x08, 0x02, 0x13, 0xff, 0xff,
-+	       0x02, 0x13, 0x03, 0x00, 0x03, 0x02, 0x03, 0x03, 0x00, 0x03,
-+	       0xff, 0xff, 0x00, 0x07, 0xff, 0xff, 0x03, 0x0d, 0x03, 0x0d,
-+	       0x03, 0x0d, 0x03, 0x0d),
-+	BM_CMD("p0: GOA timings 2", 0,
-+	       0xc4, 0x01, 0x06, 0x00, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01,
-+	       0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x03, 0x3a, 0x40, 0x7a,
-+	       0x80, 0xba, 0x01, 0xc0, 0xff, 0xff, 0x00, 0x05, 0x03, 0x7f,
-+	       0x00, 0x08, 0x00, 0x08, 0x00, 0x08, 0x02, 0x13, 0xff, 0xff,
-+	       0x02, 0x13, 0x03, 0x00, 0x03, 0x02, 0x03, 0x03, 0x00, 0x03,
-+	       0xff, 0xff, 0x00, 0x07, 0xff, 0xff, 0x03, 0x0d, 0x03, 0x0d,
-+	       0x03, 0x0d, 0x03, 0x0d),
-+	BM_CMD("p0: GOA and clock routing", 0,
-+	       0xc6, 0x01, 0xb8, 0x00, 0x36, 0x00, 0x07, 0x08, 0x82, 0x01,
-+	       0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	       0x39, 0x00, 0x00, 0x01),
-+	BM_CMD("p0: GOA pull low", 0, 0xc7, 0x40),
-+	BM_CMD("p0: source precharge", 0, 0xc8, 0x35, 0xc0, 0x87, 0x00, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: panel driving strength", 0,
-+	       0xce, 0x00, 0x0c, 0x0c, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: timing tuning 1", 0,
-+	       0xcf, 0x00, 0x3f, 0x3f, 0x3f, 0x00, 0x00, 0x00, 0x00,
-+	       0x0c, 0x00, 0x00, 0x00, 0x33, 0x33, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
-+	       0x00, 0xff, 0xff, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: gamma curve 1", 0,
-+	       0xd0, 0x00, 0x34, 0x35, 0x36, 0x1f, 0x1e, 0x1e, 0x1f,
-+	       0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x01, 0x1f, 0x05, 0x07,
-+	       0x09, 0x0b, 0x1f, 0x1e, 0x1e, 0x1f, 0x1f, 0x1f, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: gamma curve 2", 0,
-+	       0xd1, 0x00, 0x34, 0x35, 0x36, 0x1f, 0x1e, 0x1e, 0x1f,
-+	       0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x00, 0x1f, 0x04, 0x06,
-+	       0x08, 0x0a, 0x1f, 0x1e, 0x1e, 0x1f, 0x1f, 0x1f, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: gamma curve 3", 0,
-+	       0xd2, 0x00, 0x34, 0x35, 0x36, 0x1f, 0x1e, 0x1e,
-+	       0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x00, 0x1f,
-+	       0x06, 0x04, 0x0a, 0x08, 0x1f, 0x1f, 0x1f, 0x1f,
-+	       0x1e, 0x1e, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: gamma curve 4", 0,
-+	       0xd3, 0x00, 0x34, 0x35, 0x36, 0x1f, 0x1e, 0x1e,
-+	       0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x01, 0x1f,
-+	       0x07, 0x05, 0x0b, 0x09, 0x1f, 0x1f, 0x1f, 0x1f,
-+	       0x1e, 0x1e, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: VCOM tuning", 0,
-+	       0xd4, 0x10, 0x10, 0x00, 0x04, 0x00, 0x05, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x11,
-+	       0xe0, 0x01, 0x00, 0x04, 0x01, 0x01, 0x11, 0xe0,
-+	       0x03, 0x00, 0x05, 0x01, 0x01, 0x00, 0x00, 0x08,
-+	       0x00, 0x0a, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00),
-+	BM_CMD("p0: GOA mapping 1", 0,
-+	       0xd5, 0x01, 0x38, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0xe0, 0x00, 0x01, 0x00,
-+	       0x07, 0x32, 0x5a, 0x10, 0x00, 0x05, 0x00, 0x01,
-+	       0x00, 0x30, 0x70, 0x00, 0x06, 0x06, 0x00, 0x71,
-+	       0x00, 0x04, 0x10, 0x04, 0x06, 0x00, 0x00, 0x00,
-+	       0x00, 0x05, 0x05, 0x02, 0x04, 0x00, 0x1b, 0x00,
-+	       0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01,
-+	       0x00, 0x03, 0x00, 0x3a, 0x00, 0x43, 0x00, 0x7a,
-+	       0x00, 0x83, 0x00, 0xba, 0x00, 0x42, 0x00, 0xff,
-+	       0xff, 0xff, 0x3f, 0x3f, 0x00, 0x00, 0x1f, 0xff,
-+	       0x00, 0x00, 0x00, 0x1f, 0xff, 0x00, 0xff, 0xff,
-+	       0xff, 0xff, 0xff, 0xff, 0x00),
-+	BM_CMD("p0: GOA mapping 2", 0,
-+	       0xd7, 0x00, 0x03, 0xc0, 0x00, 0x00, 0x00, 0x00,
-+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xc0,
-+	       0x00, 0x00, 0x00, 0x00),
-+
-+	/* Page 1: gamma tables */
-+	BM_CMD("select command page 1", 0, 0xde, 0x01),
-+	BM_CMD("p1: gamma channel 1", 0,
-+	       0xc1, 0x00, 0x00, 0x00, 0x01, 0x55, 0x55, 0x5a,
-+	       0xaa, 0xaa, 0xa0, 0x00, 0x02, 0x0d, 0x1e, 0x2e,
-+	       0x3e, 0x4c, 0x59, 0x65, 0x7c, 0x8e, 0x9f, 0xae,
-+	       0xe0, 0x07, 0x27, 0x43, 0x5c, 0x74, 0x75, 0x8e,
-+	       0xa5, 0xbe, 0xd9, 0xf6, 0x16, 0x28, 0x32, 0x3c,
-+	       0x41, 0x46, 0x4c, 0x51, 0x57, 0x5e, 0x63, 0x67),
-+	BM_CMD("p1: gamma channel 2", 0,
-+	       0xc2, 0x00, 0x00, 0x00, 0x01, 0x55, 0x55, 0x5a,
-+	       0xaa, 0xaa, 0xa0, 0x00, 0x02, 0x0d, 0x1e, 0x2e,
-+	       0x3e, 0x4c, 0x59, 0x65, 0x7c, 0x8e, 0x9f, 0xae,
-+	       0xe0, 0x07, 0x27, 0x43, 0x5c, 0x74, 0x75, 0x8e,
-+	       0xa5, 0xbe, 0xd9, 0xf6, 0x16, 0x28, 0x32, 0x3c,
-+	       0x41, 0x46, 0x4c, 0x51, 0x57, 0x5e, 0x63, 0x67),
-+	BM_CMD("p1: gamma channel 3", 0,
-+	       0xc3, 0x00, 0x00, 0x00, 0x01, 0x55, 0x55, 0x5a,
-+	       0xaa, 0xaa, 0xa0, 0x00, 0x02, 0x0d, 0x1e, 0x2e,
-+	       0x3e, 0x4c, 0x59, 0x65, 0x7c, 0x8e, 0x9f, 0xae,
-+	       0xe0, 0x07, 0x27, 0x43, 0x5c, 0x74, 0x75, 0x8e,
-+	       0xa5, 0xbe, 0xd9, 0xf6, 0x16, 0x28, 0x32, 0x3c,
-+	       0x41, 0x46, 0x4c, 0x51, 0x57, 0x5e, 0x63, 0x67),
-+	BM_CMD("p1: gamma channel 4", 0,
-+	       0xc4, 0x00, 0x00, 0x00, 0x01, 0x55, 0x55, 0x5a,
-+	       0xaa, 0xaa, 0xa0, 0x00, 0x02, 0x0d, 0x1e, 0x2e,
-+	       0x3e, 0x4c, 0x59, 0x65, 0x7c, 0x8e, 0x9f, 0xae,
-+	       0xe0, 0x07, 0x27, 0x43, 0x5c, 0x74, 0x75, 0x8e,
-+	       0xa5, 0xbe, 0xd9, 0xf6, 0x16, 0x28, 0x32, 0x3c,
-+	       0x41, 0x46, 0x4c, 0x51, 0x57, 0x5e, 0x63, 0x67),
-+	BM_CMD("p1: gamma channel 5", 0,
-+	       0xc5, 0x00, 0x00, 0x00, 0x01, 0x55, 0x55, 0x5a,
-+	       0xaa, 0xaa, 0xa0, 0x00, 0x02, 0x0d, 0x1e, 0x2e,
-+	       0x3e, 0x4c, 0x59, 0x65, 0x7c, 0x8e, 0x9f, 0xae,
-+	       0xe0, 0x07, 0x27, 0x43, 0x5c, 0x74, 0x75, 0x8e,
-+	       0xa5, 0xbe, 0xd9, 0xf6, 0x16, 0x28, 0x32, 0x3c,
-+	       0x41, 0x46, 0x4c, 0x51, 0x57, 0x5e, 0x63, 0x67),
-+	BM_CMD("p1: gamma channel 6", 0,
-+	       0xc6, 0x00, 0x00, 0x00, 0x01, 0x55, 0x55, 0x5a,
-+	       0xaa, 0xaa, 0xa0, 0x00, 0x02, 0x0d, 0x1e, 0x2e,
-+	       0x3e, 0x4c, 0x59, 0x65, 0x7c, 0x8e, 0x9f, 0xae,
-+	       0xe0, 0x07, 0x27, 0x43, 0x5c, 0x74, 0x75, 0x8e,
-+	       0xa5, 0xbe, 0xd9, 0xf6, 0x16, 0x28, 0x32, 0x3c,
-+	       0x41, 0x46, 0x4c, 0x51, 0x57, 0x5e, 0x63, 0x67),
-+
-+	/* Page 2: panel options */
-+	BM_CMD("select command page 2", 0, 0xde, 0x02),
-+	BM_CMD("p2: timing set 1", 0, 0xbb, 0x00, 0x00, 0x00, 0xc0, 0x68),
-+	BM_CMD("p2: lane/format misc", 0, 0xbd, 0x1b),
-+	BM_CMD("p2: source bias enable", 0, 0xc1, 0x20),
-+	BM_CMD("p2: test configuration", 0,
-+	       0xc0, 0x20, 0x00, 0x00, 0x00, 0x00, 0x99, 0x99,
-+	       0x99, 0x99, 0x99, 0x99, 0x99, 0x99),
-+	BM_CMD("p2: MIPI control", 0,
-+	       0xc2, 0x02, 0x42, 0xd0, 0x02, 0x00, 0xc0, 0x41,
-+	       0x72, 0xfb),
-+	BM_CMD("p2: VREG control", 0, 0xc6, 0x47),
-+	BM_CMD("p2: display option", 0, 0xc4, 0x00, 0x11, 0x0f, 0x80, 0x12, 0x01, 0x08),
-+	BM_CMD("p2: MIPI packet and tear", 0,
-+	       0xe5, 0x10, 0xb0, 0xb0, 0xc4, 0x24, 0x30, 0x24,
-+	       0x30, 0x09, 0x04, 0x40, 0x40, 0x00, 0x20, 0x00,
-+	       0x00, 0x00, 0xf8, 0x28, 0x00, 0x00, 0x00),
-+
-+	BM_CMD("return to command page 0", 0, 0xde, 0x00),
-+};
-+
-+static inline struct bm5460bb1 *to_bm5460bb1(struct drm_panel *panel)
-+{
-+	return container_of(panel, struct bm5460bb1, panel);
-+}
-+
-+static int bm5460bb1_send_cmd(struct bm5460bb1 *ctx,
-+			      const struct bm5460bb1_cmd *cmd, size_t idx)
-+{
-+	struct device *dev = &ctx->dsi->dev;
-+	const size_t payload_len = cmd->len > 1 ? cmd->len - 1 : 0;
-+	const char *desc = cmd->desc ? cmd->desc : "vendor";
-+	int ret;
-+
-+	if (!cmd->len) {
-+		dev_err(dev, "init[%zu]: empty command entry (%s)\n", idx, desc);
-+		return -EINVAL;
-+	}
-+
-+	if (payload_len)
-+		dev_dbg(dev, "init[%zu]: cmd=0x%02x (%s) payload=%*ph\n",
-+			idx, cmd->data[0], desc, (int)payload_len, cmd->data + 1);
-+	else
-+		dev_dbg(dev, "init[%zu]: cmd=0x%02x (%s) no payload\n",
-+			idx, cmd->data[0], desc);
-+
-+	ret = mipi_dsi_dcs_write_buffer(ctx->dsi, cmd->data, cmd->len);
-+	if (ret < 0) {
-+		dev_err(dev, "init[%zu]: cmd=0x%02x (%s) failed: %d\n",
-+			idx, cmd->data[0], desc, ret);
-+		return ret;
-+	}
-+
-+	if (ret != cmd->len)
-+		dev_warn(dev, "init[%zu]: cmd=0x%02x (%s) sent %d/%zu bytes\n",
-+			 idx, cmd->data[0], desc, ret, cmd->len);
-+
-+	if (cmd->delay_ms)
-+		msleep(cmd->delay_ms);
-+
-+	return 0;
-+}
-+
-+static int bm5460bb1_send_cmds(struct bm5460bb1 *ctx,
-+			       const struct bm5460bb1_cmd *cmds,
-+			       size_t count)
-+{
-+	size_t i;
-+	int ret;
-+
-+	for (i = 0; i < count; i++) {
-+		ret = bm5460bb1_send_cmd(ctx, &cmds[i], i);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int bm5460bb1_power_on(struct bm5460bb1 *ctx)
-+{
-+	struct device *dev = &ctx->dsi->dev;
-+	int ret;
-+
-+	ret = regulator_bulk_enable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
-+	if (ret) {
-+		dev_err(dev, "power-on: regulators enable failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	if (ctx->enable_gpio) {
-+		gpiod_set_value_cansleep(ctx->enable_gpio, 1);
-+		usleep_range(5000, 6000);
-+	}
-+
-+	if (ctx->reset_gpio) {
-+		/* exit reset after rails are stable */
-+		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-+		usleep_range(10000, 12000);
-+	}
-+
-+	return 0;
-+}
-+
-+static void bm5460bb1_power_off(struct bm5460bb1 *ctx)
-+{
-+	if (ctx->reset_gpio)
-+		gpiod_set_value_cansleep(ctx->reset_gpio, 0);
-+
-+	if (ctx->enable_gpio)
-+		gpiod_set_value_cansleep(ctx->enable_gpio, 0);
-+
-+	regulator_bulk_disable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
-+}
-+
-+static const struct drm_display_mode bm5460bb1_mode = {
-+	.clock = 138528,
-+	.hdisplay = 1080,
-+	.hsync_start = 1080 + 64,
-+	.hsync_end = 1080 + 64 + 4,
-+	.htotal = 1080 + 64 + 4 + 36,
-+	.vdisplay = 1920,
-+	.vsync_start = 1920 + 20,
-+	.vsync_end = 1920 + 20 + 2,
-+	.vtotal = 1920 + 20 + 2 + 8,
-+	.width_mm = 68,
-+	.height_mm = 121,
-+	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
-+};
-+
-+static int bm5460bb1_prepare(struct drm_panel *panel)
-+{
-+	struct bm5460bb1 *ctx = to_bm5460bb1(panel);
-+	struct device *dev = &ctx->dsi->dev;
-+	int ret;
-+
-+	if (ctx->prepared) {
-+		dev_dbg(dev, "prepare: already done\n");
-+		return 0;
-+	}
-+
-+	ret = bm5460bb1_power_on(ctx);
-+	if (ret)
-+		return ret;
-+
-+	dev_dbg(dev, "prepare: pushing %zu initialization commands\n",
-+		ARRAY_SIZE(bm5460bb1_init_cmds));
-+
-+	ret = bm5460bb1_send_cmds(ctx, bm5460bb1_init_cmds,
-+				  ARRAY_SIZE(bm5460bb1_init_cmds));
-+	if (ret) {
-+		bm5460bb1_power_off(ctx);
-+		return ret;
-+	}
-+
-+	ctx->prepared = true;
-+	dev_dbg(dev, "prepare: init sequence complete\n");
-+
-+	return 0;
-+}
-+
-+static int bm5460bb1_enable(struct drm_panel *panel)
-+{
-+	struct bm5460bb1 *ctx = to_bm5460bb1(panel);
-+	struct device *dev = &ctx->dsi->dev;
-+	int ret;
-+
-+	if (ctx->enabled) {
-+		dev_dbg(dev, "enable: already enabled\n");
-+		return 0;
-+	}
-+
-+	dev_dbg(dev, "enable: exiting sleep\n");
-+
-+	ret = mipi_dsi_dcs_exit_sleep_mode(ctx->dsi);
-+	if (ret < 0) {
-+		dev_err(dev, "enable: exit sleep mode failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	msleep(120);
-+
-+	dev_dbg(dev, "enable: turning display on\n");
-+
-+	ret = mipi_dsi_dcs_set_display_on(ctx->dsi);
-+	if (ret < 0) {
-+		dev_err(dev, "enable: set display on failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	ctx->enabled = true;
-+	dev_dbg(dev, "enable: panel is on\n");
-+
-+	return 0;
-+}
-+
-+static int bm5460bb1_disable(struct drm_panel *panel)
-+{
-+	struct bm5460bb1 *ctx = to_bm5460bb1(panel);
-+	struct device *dev = &ctx->dsi->dev;
-+	int ret;
-+
-+	if (!ctx->enabled) {
-+		dev_dbg(dev, "disable: already disabled\n");
-+		return 0;
-+	}
-+
-+	dev_dbg(dev, "disable: turning display off\n");
-+
-+	ret = mipi_dsi_dcs_set_display_off(ctx->dsi);
-+	if (ret < 0) {
-+		dev_err(dev, "disable: set display off failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	msleep(20);
-+
-+	dev_dbg(dev, "disable: entering sleep\n");
-+
-+	ret = mipi_dsi_dcs_enter_sleep_mode(ctx->dsi);
-+	if (ret < 0) {
-+		dev_err(dev, "disable: enter sleep mode failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	msleep(100);
-+
-+	ctx->enabled = false;
-+	dev_dbg(dev, "disable: panel is off\n");
-+
-+	return 0;
-+}
-+
-+static int bm5460bb1_unprepare(struct drm_panel *panel)
-+{
-+	struct bm5460bb1 *ctx = to_bm5460bb1(panel);
-+	struct device *dev = &ctx->dsi->dev;
-+
-+	if (!ctx->prepared) {
-+		dev_dbg(dev, "unprepare: nothing to do\n");
-+		return 0;
-+	}
-+
-+	bm5460bb1_power_off(ctx);
-+	ctx->prepared = false;
-+	dev_dbg(dev, "unprepare: state cleared\n");
-+
-+	return 0;
-+}
-+
-+static int bm5460bb1_get_modes(struct drm_panel *panel,
-+			       struct drm_connector *connector)
-+{
-+	struct bm5460bb1 *ctx = to_bm5460bb1(panel);
-+	struct drm_display_mode *mode;
-+
-+	connector->display_info.bpc = 8;
-+	drm_connector_set_panel_orientation(connector, ctx->orientation);
-+
-+	mode = drm_mode_duplicate(connector->dev, &bm5460bb1_mode);
-+	if (!mode)
-+		return -ENOMEM;
-+
-+	drm_mode_set_name(mode);
-+	drm_mode_probed_add(connector, mode);
-+
-+	return 1;
-+}
-+
-+static enum drm_panel_orientation
-+bm5460bb1_get_orientation(struct drm_panel *panel)
-+{
-+	struct bm5460bb1 *ctx = to_bm5460bb1(panel);
-+
-+	return ctx->orientation;
-+}
-+
-+static const struct drm_panel_funcs bm5460bb1_funcs = {
-+	.prepare = bm5460bb1_prepare,
-+	.enable = bm5460bb1_enable,
-+	.disable = bm5460bb1_disable,
-+	.unprepare = bm5460bb1_unprepare,
-+	.get_modes = bm5460bb1_get_modes,
-+	.get_orientation = bm5460bb1_get_orientation,
-+};
-+
-+static int bm5460bb1_probe(struct mipi_dsi_device *dsi)
-+{
-+	struct bm5460bb1 *ctx;
-+	struct device *dev = &dsi->dev;
-+	static const char * const supply_names[] = { "vddio", "vsp", "vsn" };
-+	int ret;
-+
-+	ctx = devm_kzalloc(&dsi->dev, sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+
-+	ctx->dsi = dsi;
-+
-+	dev_dbg(dev, "probe: initializing panel\n");
-+
-+	drm_panel_init(&ctx->panel, &dsi->dev, &bm5460bb1_funcs,
-+		       DRM_MODE_CONNECTOR_DSI);
-+
-+	ctx->supplies[0].supply = supply_names[0];
-+	ctx->supplies[1].supply = supply_names[1];
-+	ctx->supplies[2].supply = supply_names[2];
-+
-+	ret = devm_regulator_bulk_get(dev, ARRAY_SIZE(supply_names),
-+				      ctx->supplies);
-+	if (ret) {
-+		dev_err(dev, "probe: failed to get regulators: %d\n", ret);
-+		return ret;
-+	}
-+	ctx->supplies[0].supply = supply_names[0];
-+	ctx->supplies[1].supply = supply_names[1];
-+	ctx->supplies[2].supply = supply_names[2];
-+
-+	ctx->enable_gpio = devm_gpiod_get_optional(dev, "enable",
-+						   GPIOD_OUT_LOW);
-+	if (IS_ERR(ctx->enable_gpio))
-+		return PTR_ERR(ctx->enable_gpio);
-+
-+	ctx->reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
-+	if (IS_ERR(ctx->reset_gpio))
-+		return PTR_ERR(ctx->reset_gpio);
-+
-+	ret = of_drm_get_panel_orientation(dsi->dev.of_node,
-+					   &ctx->orientation);
-+	if (ret < 0)
-+		return ret;
-+
-+	dev_dbg(dev, "probe: orientation %d\n", ctx->orientation);
-+
-+	mipi_dsi_set_drvdata(dsi, ctx);
-+
-+	dsi->lanes = 4;
-+	dsi->format = MIPI_DSI_FMT_RGB888;
-+	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_SYNC_PULSE |
-+			  MIPI_DSI_MODE_LPM;
-+
-+	dev_dbg(dev, "probe: lanes=%u format=%u mode_flags=0x%x\n",
-+		dsi->lanes, dsi->format, dsi->mode_flags);
-+
-+	drm_panel_add(&ctx->panel);
-+
-+	ret = mipi_dsi_attach(dsi);
-+	if (ret < 0) {
-+		dev_err(dev, "probe: DSI attach failed: %d\n", ret);
-+		drm_panel_remove(&ctx->panel);
-+		return ret;
-+	}
-+
-+	dev_dbg(dev, "probe: DSI attached\n");
-+
-+	return 0;
-+}
-+
-+static void bm5460bb1_remove(struct mipi_dsi_device *dsi)
-+{
-+	struct bm5460bb1 *ctx = mipi_dsi_get_drvdata(dsi);
-+	struct device *dev = &dsi->dev;
-+
-+	dev_dbg(dev, "remove: detaching panel\n");
-+	mipi_dsi_detach(dsi);
-+	drm_panel_remove(&ctx->panel);
-+}
-+
-+static const struct of_device_id bm5460bb1_of_match[] = {
-+	{ .compatible = "truly,bm5460bb1" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, bm5460bb1_of_match);
-+
-+static struct mipi_dsi_driver bm5460bb1_driver = {
-+	.driver = {
-+		.name = "panel-truly-bm5460bb1",
-+		.of_match_table = bm5460bb1_of_match,
-+	},
-+	.probe = bm5460bb1_probe,
-+	.remove = bm5460bb1_remove,
-+};
-+module_mipi_dsi_driver(bm5460bb1_driver);
-+
-+MODULE_AUTHOR("Codex <codex@openai.com>");
-+MODULE_DESCRIPTION("Truly BM5460BB1 MIPI DSI 1080p panel");
-+MODULE_LICENSE("GPL");
 --- /dev/null	2025-12-18 19:08:09.351909192 +0100
-+++ b/drivers/gpu/drm/panel/panel-hx83112a-truly.c	2025-12-19 22:48:23.465418042 +0100
-@@ -0,0 +1,427 @@
++++ b/drivers/gpu/drm/panel/panel-hx83112a-truly.c	2025-12-22 21:45:24.942697926 +0100
+@@ -0,0 +1,606 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Truly HX83112A 1080x1920 DSI video panel
 + *
 + * Command sequences and timings are taken from the downstream Android
 + * qcom,mdss-dsi-hx83112a_1080p_video panel node.
++ * Copyright (c) 2024 Luca Weiss <luca.weiss@fairphone.com>
++ * Copyright (c) 2025 Romain Tisserand <romain.tisserand@gmail.com>
++ * Copyright (c) 2025 REG-Linux (https://reglinux.org)
 + */
 +
 +#include <linux/delay.h>
@@ -646,226 +47,250 @@
 +#include <linux/module.h>
 +#include <linux/of.h>
 +#include <linux/regulator/consumer.h>
++#include <linux/workqueue.h>
++
++#include <video/mipi_display.h>
 +
 +#include <drm/drm_mipi_dsi.h>
 +#include <drm/drm_modes.h>
 +#include <drm/drm_panel.h>
 +#include <drm/drm_probe_helper.h>
 +
-+struct hx83112a_truly {
++/* Manufacturer specific DSI commands */
++#define HX83112A_SETPOWER1	0xb1
++#define HX83112A_SETDISP	0xb2
++#define HX83112A_SETDRV		0xb4
++#define HX83112A_SETEXTC	0xb9
++#define HX83112A_SETBANK	0xbd
++#define HX83112A_SETPTBA	0xbf
++#define HX83112A_SETDGCLUT	0xc1
++#define HX83112A_SETTCON	0xc7
++#define HX83112A_SETCLOCK	0xcb
++#define HX83112A_SETPANEL	0xcc
++#define HX83112A_SETPOWER2	0xd2
++#define HX83112A_SETGIP0	0xd3
++#define HX83112A_SETGIP1	0xd5
++#define HX83112A_SETGIP2	0xd6
++#define HX83112A_SETGIP3	0xd8
++#define HX83112A_SETTP1		0xe7
++#define HX83112A_UNKNOWN1	0xe9
++#define HX83112A_UNKNOWN2	0xcf
++#define HX83112A_UNKNOWN3	0xc9
++#define HX83112A_UNKNOWN4	0xb6
++
++struct hx83112a_panel {
 +	struct drm_panel panel;
 +	struct mipi_dsi_device *dsi;
-+	struct regulator *supplies[3];
-+	unsigned int num_supplies;
++	struct regulator_bulk_data supplies[3];
++	int num_supplies;
 +	struct gpio_desc *reset_gpio;
 +	struct gpio_desc *enable_gpio;
 +	bool prepared;
++	bool skip_attach;
++	bool attached;
++	bool skip_reset;
++	bool defer_attach;
++	bool force_sleep;
++	bool readback_after_init;
++	unsigned int attach_delay_ms;
++	unsigned int reset_delay_ms;
++	struct delayed_work attach_work;
 +};
 +
-+static inline struct hx83112a_truly *to_hx83112a_truly(struct drm_panel *panel)
++static inline struct hx83112a_panel *to_hx83112a_panel(struct drm_panel *panel)
 +{
-+	return container_of(panel, struct hx83112a_truly, panel);
++	return container_of(panel, struct hx83112a_panel, panel);
 +}
 +
-+struct hx83112a_truly_cmd {
-+	u8 dtype;
-+	u16 wait_ms;
-+	const u8 *payload;
-+	size_t len;
-+};
-+
-+/* Decoded qcom,mdss-dsi-on-command payloads */
-+static const u8 hx83112a_on_cmd0[] = { 0xb9, 0x83, 0x11, 0x2a };
-+static const u8 hx83112a_on_cmd1[] = { 0xcf, 0x00, 0x14, 0x00, 0xc0 };
-+static const u8 hx83112a_on_cmd2[] = { 0xcc, 0x08 };
-+static const u8 hx83112a_on_cmd3[] = { 0xc9, 0x04, 0x0a, 0x8c, 0x01 };
-+static const u8 hx83112a_on_cmd4[] = { 0xb1, 0x08, 0x29, 0x29, 0x80, 0x80, 0x4f, 0x4a, 0xaa };
-+static const u8 hx83112a_on_cmd5[] = { 0xb2, 0x00, 0x02, 0x00, 0x70, 0x80, 0x00, 0x08, 0x2a, 0x1a, 0x11, 0x15, 0x00, 0x10, 0xa3, 0x87 };
-+static const u8 hx83112a_on_cmd6[] = { 0xd2, 0x2c, 0x2c };
-+static const u8 hx83112a_on_cmd7[] = { 0xb4, 0x02, 0xd4, 0x02, 0xd4, 0x02, 0xba, 0x04, 0xd4, 0x00, 0x00, 0x04, 0xd4, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00, 0x0c, 0x12, 0x00, 0x2d, 0x0e, 0x0e, 0x13, 0x00, 0x8e };
-+static const u8 hx83112a_on_cmd8[] = { 0xc7, 0x00, 0x00, 0x04, 0xe0, 0x33, 0x00, 0x20, 0x40 };
-+static const u8 hx83112a_on_cmd9[] = { 0xb6, 0x7b, 0x7b, 0xe3 };
-+static const u8 hx83112a_on_cmd10[] = { 0xd3, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x05, 0x04, 0x04, 0x00, 0x1f, 0x0b, 0x0b, 0x0b, 0x0b, 0x32, 0x10, 0x0a, 0x00, 0x0a, 0x32, 0x16, 0x23, 0x06, 0x23, 0x32, 0x10, 0x06, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x07, 0x8b };
-+static const u8 hx83112a_on_cmd11[] = { 0xbd, 0x01 };
-+static const u8 hx83112a_on_cmd12[] = { 0xcb, 0x25, 0x11, 0x00 };
-+static const u8 hx83112a_on_cmd13[] = { 0xbd, 0x00 };
-+static const u8 hx83112a_on_cmd14[] = { 0xd5, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x40, 0x40, 0x19, 0x19, 0x18, 0x18, 0x20, 0x20, 0x04, 0x04, 0x03, 0x03, 0x02, 0x02, 0x01, 0x01, 0x00, 0x00, 0x31, 0x31, 0x30, 0x30, 0x2f, 0x2f };
-+static const u8 hx83112a_on_cmd15[] = { 0xd6, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x40, 0x40, 0x19, 0x19, 0x18, 0x18, 0x20, 0x20, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x04, 0x04, 0x31, 0x31, 0x30, 0x30, 0x2f, 0x2f };
-+static const u8 hx83112a_on_cmd16[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xba, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xba, 0xaa, 0xaa };
-+static const u8 hx83112a_on_cmd17[] = { 0xbd, 0x01 };
-+static const u8 hx83112a_on_cmd18[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff };
-+static const u8 hx83112a_on_cmd19[] = { 0xbd, 0x02 };
-+static const u8 hx83112a_on_cmd20[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff };
-+static const u8 hx83112a_on_cmd21[] = { 0xbd, 0x03 };
-+static const u8 hx83112a_on_cmd22[] = { 0xd8, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xeb, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xeb, 0xff, 0xff };
-+static const u8 hx83112a_on_cmd23[] = { 0xbd, 0x00 };
-+static const u8 hx83112a_on_cmd24[] = { 0xe7, 0x0f, 0x0f, 0x1e, 0x74, 0x1e, 0x72, 0x00, 0x50, 0x02, 0x02, 0x00, 0x00, 0x02, 0x02, 0x02, 0x05, 0x14, 0x14, 0x32, 0xb9, 0x23, 0xb9, 0x08 };
-+static const u8 hx83112a_on_cmd25[] = { 0xbd, 0x01 };
-+static const u8 hx83112a_on_cmd26[] = { 0xe7, 0x02, 0x00, 0x80, 0x01, 0x80, 0x0e, 0x85, 0x0f };
-+static const u8 hx83112a_on_cmd27[] = { 0xbd, 0x02 };
-+static const u8 hx83112a_on_cmd28[] = { 0xe7, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00 };
-+static const u8 hx83112a_on_cmd29[] = { 0xbd, 0x00 };
-+static const u8 hx83112a_on_cmd30[] = { 0xe9, 0xc3 };
-+static const u8 hx83112a_on_cmd31[] = { 0xcb, 0xd2, 0x35 };
-+static const u8 hx83112a_on_cmd32[] = { 0xe9, 0x3f };
-+static const u8 hx83112a_on_cmd33[] = { 0xc1, 0x01 };
-+static const u8 hx83112a_on_cmd34[] = { 0xbd, 0x01 };
-+static const u8 hx83112a_on_cmd35[] = { 0xe9, 0xc8 };
-+static const u8 hx83112a_on_cmd36[] = { 0xd3, 0x81 };
-+static const u8 hx83112a_on_cmd37[] = { 0xe9, 0x3f };
-+static const u8 hx83112a_on_cmd38[] = { 0xbd, 0x00 };
-+static const u8 hx83112a_on_cmd39[] = { 0xc1, 0x01, 0x00 };
-+static const u8 hx83112a_on_cmd40[] = { 0xbd, 0x01 };
-+static const u8 hx83112a_on_cmd41[] = { 0xc1, 0xff, 0xf9, 0xf4, 0xee, 0xe9, 0xe3, 0xdf, 0xd5, 0xd0, 0xca, 0xc4, 0xbf, 0xba, 0xb5, 0xb0, 0xab, 0xa6, 0xa2, 0x9d, 0x94, 0x8c, 0x84, 0x7c, 0x75, 0x6d, 0x65, 0x5e, 0x57, 0x50, 0x49, 0x43, 0x3d, 0x36, 0x2f, 0x28, 0x21, 0x1b, 0x15, 0x0e, 0x08, 0x06, 0x05, 0x02, 0x01, 0x00, 0x31, 0x71, 0xcb, 0xe7, 0xca, 0x4c, 0x7f, 0x5c, 0x0b, 0x5b, 0x1b, 0x40 };
-+static const u8 hx83112a_on_cmd42[] = { 0xbd, 0x02 };
-+static const u8 hx83112a_on_cmd43[] = { 0xc1, 0xff, 0xfa, 0xf4, 0xef, 0xea, 0xe5, 0xe1, 0xd7, 0xd2, 0xcc, 0xc7, 0xc2, 0xbd, 0xb9, 0xb4, 0xaf, 0xab, 0xa6, 0xa2, 0x99, 0x91, 0x89, 0x82, 0x7b, 0x73, 0x6c, 0x65, 0x5e, 0x58, 0x51, 0x4a, 0x45, 0x3f, 0x38, 0x31, 0x2b, 0x25, 0x1e, 0x19, 0x12, 0x0f, 0x0d, 0x0c, 0x0a, 0x0a, 0x09, 0xa1, 0xb6, 0xc5, 0x21, 0x60, 0xeb, 0x18, 0x2c, 0x32, 0x77, 0x40 };
-+static const u8 hx83112a_on_cmd44[] = { 0xbd, 0x03 };
-+static const u8 hx83112a_on_cmd45[] = { 0xc1, 0xff, 0xfa, 0xf6, 0xf1, 0xec, 0xe7, 0xe3, 0xd9, 0xd4, 0xce, 0xc9, 0xc4, 0xbf, 0xbb, 0xb6, 0xb2, 0xad, 0xa9, 0xa5, 0x9c, 0x94, 0x8c, 0x85, 0x7e, 0x77, 0x71, 0x6a, 0x63, 0x5d, 0x56, 0x50, 0x49, 0x44, 0x3e, 0x38, 0x31, 0x2b, 0x25, 0x1f, 0x18, 0x16, 0x14, 0x13, 0x11, 0x11, 0x30, 0x71, 0x79, 0xd8, 0x51, 0x7b, 0xc6, 0x72, 0xa6, 0x13, 0x9a, 0x00 };
-+static const u8 hx83112a_on_cmd46[] = { 0xbd, 0x00 };
-+static const u8 hx83112a_on_cmd47[] = { 0x35, 0x00 };
-+static const u8 hx83112a_on_cmd48[] = { 0x51, 0x07, 0xff };
-+static const u8 hx83112a_on_cmd49[] = { 0x53, 0x24 };
-+static const u8 hx83112a_on_cmd50[] = { 0x11 };
-+static const u8 hx83112a_on_cmd51[] = { 0x29 };
-+#define MIPI_DSI_DCS_LONG_WRITE 		0
-+#define MIPI_DSI_DCS_SHORT_WRITE_PARAM  	1
-+#define MIPI_DSI_DCS_SHORT_WRITE		2
-+static const struct hx83112a_truly_cmd hx83112a_on_cmds[] = {
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd0, ARRAY_SIZE(hx83112a_on_cmd0) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd1, ARRAY_SIZE(hx83112a_on_cmd1) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd2, ARRAY_SIZE(hx83112a_on_cmd2) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd3, ARRAY_SIZE(hx83112a_on_cmd3) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd4, ARRAY_SIZE(hx83112a_on_cmd4) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd5, ARRAY_SIZE(hx83112a_on_cmd5) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd6, ARRAY_SIZE(hx83112a_on_cmd6) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd7, ARRAY_SIZE(hx83112a_on_cmd7) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd8, ARRAY_SIZE(hx83112a_on_cmd8) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd9, ARRAY_SIZE(hx83112a_on_cmd9) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd10, ARRAY_SIZE(hx83112a_on_cmd10) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd11, ARRAY_SIZE(hx83112a_on_cmd11) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd12, ARRAY_SIZE(hx83112a_on_cmd12) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd13, ARRAY_SIZE(hx83112a_on_cmd13) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd14, ARRAY_SIZE(hx83112a_on_cmd14) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd15, ARRAY_SIZE(hx83112a_on_cmd15) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd16, ARRAY_SIZE(hx83112a_on_cmd16) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd17, ARRAY_SIZE(hx83112a_on_cmd17) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd18, ARRAY_SIZE(hx83112a_on_cmd18) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd19, ARRAY_SIZE(hx83112a_on_cmd19) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd20, ARRAY_SIZE(hx83112a_on_cmd20) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd21, ARRAY_SIZE(hx83112a_on_cmd21) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd22, ARRAY_SIZE(hx83112a_on_cmd22) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd23, ARRAY_SIZE(hx83112a_on_cmd23) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd24, ARRAY_SIZE(hx83112a_on_cmd24) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd25, ARRAY_SIZE(hx83112a_on_cmd25) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd26, ARRAY_SIZE(hx83112a_on_cmd26) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd27, ARRAY_SIZE(hx83112a_on_cmd27) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd28, ARRAY_SIZE(hx83112a_on_cmd28) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd29, ARRAY_SIZE(hx83112a_on_cmd29) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd30, ARRAY_SIZE(hx83112a_on_cmd30) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd31, ARRAY_SIZE(hx83112a_on_cmd31) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd32, ARRAY_SIZE(hx83112a_on_cmd32) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd33, ARRAY_SIZE(hx83112a_on_cmd33) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd34, ARRAY_SIZE(hx83112a_on_cmd34) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd35, ARRAY_SIZE(hx83112a_on_cmd35) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd36, ARRAY_SIZE(hx83112a_on_cmd36) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd37, ARRAY_SIZE(hx83112a_on_cmd37) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd38, ARRAY_SIZE(hx83112a_on_cmd38) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd39, ARRAY_SIZE(hx83112a_on_cmd39) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd40, ARRAY_SIZE(hx83112a_on_cmd40) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd41, ARRAY_SIZE(hx83112a_on_cmd41) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd42, ARRAY_SIZE(hx83112a_on_cmd42) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd43, ARRAY_SIZE(hx83112a_on_cmd43) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd44, ARRAY_SIZE(hx83112a_on_cmd44) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd45, ARRAY_SIZE(hx83112a_on_cmd45) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd46, ARRAY_SIZE(hx83112a_on_cmd46) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd47, ARRAY_SIZE(hx83112a_on_cmd47) },
-+	{ MIPI_DSI_DCS_LONG_WRITE, 0, hx83112a_on_cmd48, ARRAY_SIZE(hx83112a_on_cmd48) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE_PARAM, 0, hx83112a_on_cmd49, ARRAY_SIZE(hx83112a_on_cmd49) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE, 120, hx83112a_on_cmd50, ARRAY_SIZE(hx83112a_on_cmd50) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE, 50, hx83112a_on_cmd51, ARRAY_SIZE(hx83112a_on_cmd51) },
-+};
-+
-+/* Decoded qcom,mdss-dsi-off-command payloads */
-+static const u8 hx83112a_off_cmd0[] = { 0x28 };
-+static const u8 hx83112a_off_cmd1[] = { 0x10 };
-+
-+static const struct hx83112a_truly_cmd hx83112a_off_cmds[] = {
-+	{ MIPI_DSI_DCS_SHORT_WRITE, 50, hx83112a_off_cmd0, ARRAY_SIZE(hx83112a_off_cmd0) },
-+	{ MIPI_DSI_DCS_SHORT_WRITE, 120, hx83112a_off_cmd1, ARRAY_SIZE(hx83112a_off_cmd1) },
-+};
-+
-+static int hx83112a_truly_send_table(struct hx83112a_truly *ctx,
-+				     const struct hx83112a_truly_cmd *cmds,
-+				     size_t count)
++static void hx83112a_panel_reset(struct hx83112a_panel *ctx)
 +{
-+	size_t i;
-+	int ret;
-+
-+	for (i = 0; i < count; i++) {
-+		const struct hx83112a_truly_cmd *cmd = &cmds[i];
-+		const u8 *payload = cmd->payload;
-+		size_t len = cmd->len;
-+
-+		if (!len)
-+			return -EINVAL;
-+
-+		dev_info(ctx->panel.dev,
-+			 "cmd[%zu]: dtype=0x%02x len=%zu wait=%ums\n",
-+			 i, cmd->dtype, len, cmd->wait_ms);
-+
-+		switch (cmd->dtype) {
-+		case MIPI_DSI_DCS_SHORT_WRITE:
-+		case MIPI_DSI_DCS_SHORT_WRITE_PARAM:
-+			ret = mipi_dsi_dcs_write(ctx->dsi, payload[0],
-+						 len > 1 ? payload + 1 : NULL,
-+						 len > 1 ? len - 1 : 0);
-+			break;
-+		case MIPI_DSI_DCS_LONG_WRITE:
-+		default:
-+			ret = mipi_dsi_dcs_write_buffer(ctx->dsi, payload, len);
-+			break;
-+		}
-+
-+		if (ret < 0)
-+			return ret;
-+
-+		if (cmd->wait_ms)
-+			msleep(cmd->wait_ms);
-+	}
-+
-+	return 0;
-+}
-+
-+static void hx83112a_truly_reset(struct hx83112a_truly *ctx)
-+{
-+	if (!ctx->reset_gpio)
-+		return;
-+
-+	dev_info(ctx->panel.dev, "reset: 1->0->1 with 10ms delays\n");
-+	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-+	msleep(10);
++	dev_info(ctx->panel.dev, "reset: start\n");
 +	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
-+	msleep(10);
++	msleep(20);
 +	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-+	msleep(10);
++	msleep(20);
++	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
++	msleep(50);
 +}
 +
-+static int hx83112a_truly_prepare(struct drm_panel *panel)
++static int hx83112a_panel_on(struct hx83112a_panel *ctx)
 +{
-+	struct hx83112a_truly *ctx = to_hx83112a_truly(panel);
++	struct mipi_dsi_multi_context dsi_ctx = { .dsi = ctx->dsi };
++
++	ctx->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
++
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETEXTC, 0x83, 0x11, 0x2a);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_UNKNOWN2, 0x00, 0x14, 0x00, 0xc0);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETPANEL, 0x08);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_UNKNOWN3, 0x04, 0x0a, 0x8c, 0x01);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETPOWER1,
++					0x08, 0x29, 0x29, 0x80, 0x80, 0x4f, 0x4a, 0xaa );
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETDISP,
++					0x00, 0x02, 0x00, 0x70, 0x80, 0x00, 0x08, 0x2a,
++					0x1a, 0x11, 0x15, 0x00, 0x10, 0xa3, 0x87 );
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETPOWER2, 0x2c, 0x2c);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETDRV,
++					0x02, 0xd4, 0x02, 0xd4, 0x02, 0xba, 0x04, 0xd4, 
++					0x00, 0x00, 0x04, 0xd4, 0x00, 0xff, 0x00, 0xff, 
++					0x00, 0x00, 0x0c, 0x12, 0x00, 0x2d, 0x0e, 0x0e,
++					0x13, 0x00, 0x8e);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETTCON,
++					0x00, 0x00, 0x04, 0xe0, 0x33, 0x00, 0x20, 0x40);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_UNKNOWN4, 0x7b, 0x7b, 0xe3);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP0,
++					0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x05,
++					0x04, 0x04, 0x00, 0x1f, 0x0b, 0x0b, 0x0b, 0x0b, 0x32,
++					0x10, 0x0a, 0x00, 0x0a, 0x32, 0x16, 0x23, 0x06, 0x23,
++					0x32, 0x10, 0x06, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00, 0x0a, 0x07, 0x8b);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x01);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETCLOCK, 0x25, 0x11, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP1,
++					0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
++					0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
++					0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x40, 0x40, 0x19,
++					0x19, 0x18, 0x18, 0x20, 0x20, 0x04, 0x04, 0x03, 0x03,
++					0x02, 0x02, 0x01, 0x01, 0x00, 0x00, 0x31, 0x31, 0x30,
++					0x30, 0x2f, 0x2f);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP2,
++					0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
++					0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
++					0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x40, 0x40, 0x19,
++					0x19, 0x18, 0x18, 0x20, 0x20, 0x00, 0x00, 0x01, 0x01,
++					0x02, 0x02, 0x03, 0x03, 0x04, 0x04, 0x31, 0x31, 0x30,
++					0x30, 0x2f, 0x2f);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP3,
++					0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa,
++					0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xba, 0xaa, 0xaa,
++					0xaa, 0xaa, 0xaa, 0xba, 0xaa, 0xaa);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x01);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP3,
++					0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa,
++					0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff,
++					0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x02);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP3,
++					0xaa, 0xaa, 0xaa, 0xea, 0xff, 0xff, 0xaa, 0xaa, 0xaa,
++					0xea, 0xff, 0xff);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x03);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP3,
++					0xaa, 0xaa, 0xaa, 0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa,
++					0xba, 0xff, 0xea, 0xaa, 0xaa, 0xaa, 0xeb, 0xff, 0xff,
++					0xaa, 0xaa, 0xaa, 0xeb, 0xff, 0xff);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETTP1,
++					0x0f, 0x0f, 0x1e, 0x74, 0x1e, 0x72, 0x00, 0x50, 0x02,
++					0x02, 0x00, 0x00, 0x02, 0x02, 0x02, 0x05, 0x14, 0x14,
++					0x32, 0xb9, 0x23, 0xb9, 0x08);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x01);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETTP1,
++					0x02, 0x00, 0x80, 0x01, 0x80, 0x0e, 0x85, 0x0f);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x02);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETTP1,
++					0x00, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00,
++					0x02, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_UNKNOWN1, 0xc3);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETCLOCK, 0xd2, 0x35);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_UNKNOWN1, 0x3f);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETDGCLUT, 0x01);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x01);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_UNKNOWN1, 0xc8);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETGIP0, 0x81);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_UNKNOWN1, 0x3f);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETDGCLUT, 0x01, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x01);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETDGCLUT,
++					0xff, 0xf9, 0xf4, 0xee, 0xe9, 0xe3, 0xdf, 0xd5, 0xd0,
++					0xca, 0xc4, 0xbf, 0xba, 0xb5, 0xb0, 0xab, 0xa6, 0xa2,
++					0x9d, 0x94, 0x8c, 0x84, 0x7c, 0x75, 0x6d, 0x65, 0x5e,
++					0x57, 0x50, 0x49, 0x43, 0x3d, 0x36, 0x2f, 0x28, 0x21,
++					0x1b, 0x15, 0x0e, 0x08, 0x06, 0x05, 0x02, 0x01, 0x00,
++					0x31, 0x71, 0xcb, 0xe7, 0xca, 0x4c, 0x7f, 0x5c, 0x0b,
++					0x5b, 0x1b, 0x40);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x02);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETDGCLUT,
++					0xff, 0xfa, 0xf4, 0xef, 0xea, 0xe5, 0xe1, 0xd7, 0xd2,
++					0xcc, 0xc7, 0xc2, 0xbd, 0xb9, 0xb4, 0xaf, 0xab, 0xa6,
++					0xa2, 0x99, 0x91, 0x89, 0x82, 0x7b, 0x73, 0x6c, 0x65,
++					0x5e, 0x58, 0x51, 0x4a, 0x45, 0x3f, 0x38, 0x31, 0x2b,
++					0x25, 0x1e, 0x19, 0x12, 0x0f, 0x0d, 0x0c, 0x0a, 0x0a,
++					0x09, 0xa1, 0xb6, 0xc5, 0x21, 0x60, 0xeb, 0x18, 0x2c,
++					0x32, 0x77, 0x40);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x03);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETDGCLUT,
++					0xff, 0xfa, 0xf6, 0xf1, 0xec, 0xe7, 0xe3, 0xd9, 0xd4,
++					0xce, 0xc9, 0xc4, 0xbf, 0xbb, 0xb6, 0xb2, 0xad, 0xa9,
++					0xa5, 0x9c, 0x94, 0x8c, 0x85, 0x7e, 0x77, 0x71, 0x6a,
++					0x63, 0x5d, 0x56, 0x50, 0x49, 0x44, 0x3e, 0x38, 0x31,
++					0x2b, 0x25, 0x1f, 0x18, 0x16, 0x14, 0x13, 0x11, 0x11,
++					0x30, 0x71, 0x79, 0xd8, 0x51, 0x7b, 0xc6, 0x72, 0xa6,
++					0x13, 0x9a, 0x00);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, HX83112A_SETBANK, 0x00);
++
++	mipi_dsi_dcs_set_tear_on_multi(&dsi_ctx, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
++	mipi_dsi_dcs_set_display_brightness_multi(&dsi_ctx, 0x07ff);
++	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY, 0x24);
++
++	mipi_dsi_dcs_exit_sleep_mode_multi(&dsi_ctx);
++	mipi_dsi_msleep(&dsi_ctx, 150);
++
++	mipi_dsi_dcs_set_display_on_multi(&dsi_ctx);
++	mipi_dsi_msleep(&dsi_ctx, 50);
++
++	if (dsi_ctx.accum_err)
++		dev_err(ctx->panel.dev, "init sequence failed: %d\n", dsi_ctx.accum_err);
++	else
++		dev_info(ctx->panel.dev, "init sequence done\n");
++
++	return dsi_ctx.accum_err;
++}
++
++static int hx83112a_panel_off(struct hx83112a_panel *ctx)
++{
++	struct mipi_dsi_multi_context dsi_ctx = { .dsi = ctx->dsi };
++
++	mipi_dsi_dcs_set_display_off_multi(&dsi_ctx);
++	mipi_dsi_msleep(&dsi_ctx, 20);
++	mipi_dsi_dcs_enter_sleep_mode_multi(&dsi_ctx);
++	mipi_dsi_msleep(&dsi_ctx, 120);
++
++	return dsi_ctx.accum_err;
++}
++
++static int hx83112a_panel_prepare(struct drm_panel *panel)
++{
++	struct hx83112a_panel *ctx = to_hx83112a_panel(panel);
 +	unsigned int i;
 +	int ret;
++	bool skip_init = of_property_read_bool(ctx->panel.dev->of_node,
++				       "truly,skip-init");
 +
 +	if (ctx->prepared)
 +		return 0;
 +
-+	dev_info(ctx->panel.dev, "prepare: enable regulators, assert enable GPIO, run init cmds\n");
++	dev_info(ctx->panel.dev, "prepare: start\n");
++
++	if (ctx->force_sleep) {
++		struct mipi_dsi_multi_context dsi_ctx = { .dsi = ctx->dsi };
++
++		/* Ensure panel is off even if firmware left it on. */
++		ctx->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
++		mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x28);
++		msleep(20);
++		mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x10);
++		msleep(120);
++	}
 +
 +	for (i = 0; i < ctx->num_supplies; i++) {
-+		ret = regulator_enable(ctx->supplies[i]);
++		ret = regulator_enable(ctx->supplies[i].consumer);
 +		if (ret) {
 +			while (i--)
-+				regulator_disable(ctx->supplies[i]);
++				regulator_disable(ctx->supplies[i].consumer);
 +			return ret;
 +		}
 +	}
@@ -873,55 +298,139 @@
 +	if (ctx->enable_gpio)
 +		gpiod_set_value_cansleep(ctx->enable_gpio, 1);
 +
-+	hx83112a_truly_reset(ctx);
++	if (ctx->skip_reset) {
++		dev_info(ctx->panel.dev, "prepare: skip reset sequence\n");
++	} else {
++		hx83112a_panel_reset(ctx);
++		if (ctx->reset_delay_ms) {
++			dev_info(ctx->panel.dev, "prepare: reset delay %u ms\n",
++				 ctx->reset_delay_ms);
++			msleep(ctx->reset_delay_ms);
++		}
++	}
 +
-+	ret = hx83112a_truly_send_table(ctx, hx83112a_on_cmds,
-+					ARRAY_SIZE(hx83112a_on_cmds));
++	if (ctx->defer_attach && !ctx->skip_attach && !ctx->attached) {
++		dev_info(ctx->panel.dev, "attach: prepare\n");
++		ret = mipi_dsi_attach(ctx->dsi);
++		if (ret < 0) {
++			if (ctx->enable_gpio)
++				gpiod_set_value_cansleep(ctx->enable_gpio, 0);
++			while (i--)
++				regulator_disable(ctx->supplies[i].consumer);
++			return ret;
++		}
++		ctx->attached = true;
++	}
++
++	if (skip_init) {
++		ctx->prepared = true;
++		dev_info(ctx->panel.dev, "prepare: skip init sequence\n");
++		return 0;
++	}
++
++	ret = hx83112a_panel_on(ctx);
 +	if (ret) {
++		dev_err(ctx->panel.dev, "prepare: init failed: %d\n", ret);
 +		if (ctx->enable_gpio)
 +			gpiod_set_value_cansleep(ctx->enable_gpio, 0);
 +		while (i--)
-+			regulator_disable(ctx->supplies[i]);
++			regulator_disable(ctx->supplies[i].consumer);
 +		return ret;
 +	}
 +
 +	ctx->prepared = true;
++
++	if (ctx->readback_after_init) {
++		u8 buf[4];
++		ssize_t rd;
++
++		ctx->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
++
++		rd = mipi_dsi_dcs_read(ctx->dsi, 0x04, buf, 3);
++		if (rd < 0)
++			dev_warn(ctx->panel.dev, "read ID (0x04) failed: %zd\n", rd);
++		else
++			dev_info(ctx->panel.dev, "read ID (0x04): %02x %02x %02x\n",
++				 buf[0], buf[1], buf[2]);
++
++		rd = mipi_dsi_dcs_read(ctx->dsi, 0x0a, buf, 1);
++		if (rd < 0)
++			dev_warn(ctx->panel.dev, "read power mode (0x0a) failed: %zd\n", rd);
++		else
++			dev_info(ctx->panel.dev, "read power mode (0x0a): %02x\n", buf[0]);
++
++		rd = mipi_dsi_dcs_read(ctx->dsi, 0x0b, buf, 1);
++		if (rd < 0)
++			dev_warn(ctx->panel.dev, "read MADCTL (0x0b) failed: %zd\n", rd);
++		else
++			dev_info(ctx->panel.dev, "read MADCTL (0x0b): %02x\n", buf[0]);
++	}
 +
 +	dev_info(ctx->panel.dev, "prepare: done\n");
 +
 +	return 0;
 +}
 +
-+static int hx83112a_truly_unprepare(struct drm_panel *panel)
++static void hx83112a_panel_attach_work(struct work_struct *work)
 +{
-+	struct hx83112a_truly *ctx = to_hx83112a_truly(panel);
++	struct hx83112a_panel *ctx = container_of(to_delayed_work(work),
++						  struct hx83112a_panel,
++						  attach_work);
++	int ret;
++
++	if (ctx->skip_attach || ctx->attached)
++		return;
++
++	dev_info(ctx->panel.dev, "attach: delayed\n");
++	ret = mipi_dsi_attach(ctx->dsi);
++	if (ret < 0) {
++		dev_err(ctx->panel.dev, "attach failed: %d\n", ret);
++		return;
++	}
++
++	ctx->attached = true;
++}
++
++static int hx83112a_panel_unprepare(struct drm_panel *panel)
++{
++	struct hx83112a_panel *ctx = to_hx83112a_panel(panel);
 +	unsigned int i;
 +	int ret;
 +	unsigned long old_flags;
++	bool skip_init = of_property_read_bool(ctx->panel.dev->of_node,
++				       "truly,skip-init");
 +
 +	if (!ctx->prepared)
 +		return 0;
 +
 +	dev_info(ctx->panel.dev, "unprepare: send off cmds in HS, drop enable, disable regulators\n");
 +
-+	/* Downstream sends off-command in HS mode */
-+	old_flags = ctx->dsi->mode_flags;
-+	ctx->dsi->mode_flags &= ~MIPI_DSI_MODE_LPM;
++	if (!skip_init) {
++		/* Downstream sends off-command in HS mode */
++		old_flags = ctx->dsi->mode_flags;
++		ctx->dsi->mode_flags &= ~MIPI_DSI_MODE_LPM;
 +
-+	ret = hx83112a_truly_send_table(ctx, hx83112a_off_cmds,
-+					ARRAY_SIZE(hx83112a_off_cmds));
-+	if (ret)
-+		dev_warn(ctx->panel.dev, "Failed to send off sequence: %d\n", ret);
++		ret = hx83112a_panel_off(ctx);
++		if (ret)
++			dev_warn(ctx->panel.dev, "Failed to send off sequence: %d\n", ret);
 +
-+	ctx->dsi->mode_flags = old_flags;
++		ctx->dsi->mode_flags = old_flags;
++	}
 +
 +	if (ctx->enable_gpio)
 +		gpiod_set_value_cansleep(ctx->enable_gpio, 0);
 +
-+	for (i = ctx->num_supplies; i > 0; i--)
-+		regulator_disable(ctx->supplies[i - 1]);
++	if (ctx->defer_attach && !ctx->skip_attach && ctx->attached) {
++		ret = mipi_dsi_detach(ctx->dsi);
++		if (ret < 0)
++			dev_err(ctx->panel.dev, "Failed to detach from DSI host: %d\n", ret);
++		ctx->attached = false;
++	}
 +
-+	if (ctx->reset_gpio)
++	for (i = ctx->num_supplies; i > 0; i--)
++		regulator_disable(ctx->supplies[i - 1].consumer);
++
++	if (ctx->reset_gpio && !ctx->skip_reset)
 +		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
 +
 +	ctx->prepared = false;
@@ -931,7 +440,7 @@
 +	return 0;
 +}
 +
-+static const struct drm_display_mode hx83112a_truly_mode = {
++static const struct drm_display_mode hx83112a_panel_mode = {
 +	.clock = (1080 + 48 + 12 + 16) * (1920 + 44 + 5 + 5) * 60 / 1000,
 +	.hdisplay = 1080,
 +	.hsync_start = 1080 + 48,
@@ -946,29 +455,33 @@
 +	.type = DRM_MODE_TYPE_DRIVER,
 +};
 +
-+static int hx83112a_truly_get_modes(struct drm_panel *panel,
++static int hx83112a_panel_get_modes(struct drm_panel *panel,
 +				    struct drm_connector *connector)
 +{
-+	return drm_connector_helper_get_modes_fixed(connector,
-+						    &hx83112a_truly_mode);
++	return drm_connector_helper_get_modes_fixed(connector, &hx83112a_panel_mode);
 +}
 +
-+static const struct drm_panel_funcs hx83112a_truly_funcs = {
-+	.prepare = hx83112a_truly_prepare,
-+	.unprepare = hx83112a_truly_unprepare,
-+	.get_modes = hx83112a_truly_get_modes,
++static const struct drm_panel_funcs hx83112a_panel_funcs = {
++	.prepare = hx83112a_panel_prepare,
++	.unprepare = hx83112a_panel_unprepare,
++	.get_modes = hx83112a_panel_get_modes,
 +};
 +
-+static int hx83112a_truly_probe(struct mipi_dsi_device *dsi)
++static int hx83112a_panel_probe(struct mipi_dsi_device *dsi)
 +{
 +	struct device *dev = &dsi->dev;
-+	struct hx83112a_truly *ctx;
++	struct hx83112a_panel *ctx;
 +	unsigned int i;
 +	int ret;
++	bool use_sync_pulse;
++	bool use_burst;
++	bool use_hse;
++	bool continuous_clk;
++	bool use_eot;
 +	static const char * const supply_names[] = { "iovcc", "vsp", "vsn" };
 +
-+	ctx = devm_drm_panel_alloc(dev, struct hx83112a_truly, panel,
-+				   &hx83112a_truly_funcs,
++	ctx = devm_drm_panel_alloc(dev, struct hx83112a_panel, panel,
++				   &hx83112a_panel_funcs,
 +				   DRM_MODE_CONNECTOR_DSI);
 +	if (IS_ERR(ctx))
 +		return PTR_ERR(ctx);
@@ -987,7 +500,9 @@
 +					     supply_names[i]);
 +		}
 +
-+		ctx->supplies[ctx->num_supplies++] = reg;
++		ctx->supplies[ctx->num_supplies].supply = supply_names[i];
++		ctx->supplies[ctx->num_supplies].consumer = reg;
++		ctx->num_supplies++;
 +	}
 +
 +	ctx->reset_gpio = devm_gpiod_get_optional(dev, "reset",
@@ -1005,14 +520,53 @@
 +	ctx->dsi = dsi;
 +	mipi_dsi_set_drvdata(dsi, ctx);
 +
++	use_sync_pulse = of_property_read_bool(dev->of_node,
++					       "truly,video-sync-pulse");
++	use_burst = of_property_read_bool(dev->of_node,
++					  "truly,video-burst");
++	use_hse = of_property_read_bool(dev->of_node,
++					"truly,video-hse");
++	continuous_clk = of_property_read_bool(dev->of_node,
++					       "truly,continuous-clock");
++	use_eot = of_property_read_bool(dev->of_node,
++					"truly,tx-eot-append");
++	if (of_property_present(dev->of_node, "truly,tx-eot-append"))
++		use_eot = true;
++	dev_info(dev, "tx-eot-append=%s\n", use_eot ? "yes" : "no");
++	ctx->force_sleep = of_property_read_bool(dev->of_node,
++						 "truly,force-sleep-before-init");
++	ctx->readback_after_init = of_property_read_bool(dev->of_node,
++							 "truly,readback-after-init");
++
 +	dsi->lanes = 4;
 +	dsi->format = MIPI_DSI_FMT_RGB888;
 +	dsi->mode_flags = MIPI_DSI_MODE_VIDEO |
-+			  /*MIPI_DSI_MODE_VIDEO_SYNC_EVENT |*/
-+			  MIPI_DSI_MODE_LPM /*|
-+			  MIPI_DSI_MODE_EOT_PACKET*/;
++			  (use_sync_pulse ? MIPI_DSI_MODE_VIDEO_SYNC_PULSE :
++			   use_burst ? MIPI_DSI_MODE_VIDEO_BURST : 0) |
++			  (use_hse ? MIPI_DSI_MODE_VIDEO_HSE : 0) |
++			  (continuous_clk ? 0 : MIPI_DSI_CLOCK_NON_CONTINUOUS);
++	if (!use_eot)
++		dsi->mode_flags |= MIPI_DSI_MODE_NO_EOT_PACKET;
++	else
++		dsi->mode_flags &= ~MIPI_DSI_MODE_NO_EOT_PACKET;
++	dev_info(dev, "dsi mode_flags=0x%lx\n", dsi->mode_flags);
 +
 +	ctx->panel.prepare_prev_first = true;
++	ctx->skip_attach = of_property_read_bool(dev->of_node,
++				       "truly,skip-attach");
++	ctx->attached = false;
++	ctx->skip_reset = of_property_read_bool(dev->of_node,
++						"truly,skip-reset");
++	ctx->defer_attach = of_property_read_bool(dev->of_node,
++						  "truly,defer-attach");
++	ctx->attach_delay_ms = 0;
++	of_property_read_u32(dev->of_node, "truly,attach-delay-ms",
++			     &ctx->attach_delay_ms);
++	ctx->reset_delay_ms = 0;
++	of_property_read_u32(dev->of_node, "truly,reset-delay-ms",
++			     &ctx->reset_delay_ms);
++	if (ctx->attach_delay_ms)
++		ctx->defer_attach = true;
 +
 +	ret = drm_panel_of_backlight(&ctx->panel);
 +	if (ret)
@@ -1020,45 +574,66 @@
 +
 +	drm_panel_add(&ctx->panel);
 +
-+	ret = mipi_dsi_attach(dsi);
-+	if (ret < 0) {
-+		dev_err_probe(dev, ret, "Failed to attach to DSI host\n");
-+		drm_panel_remove(&ctx->panel);
-+		return ret;
++	if (ctx->skip_attach) {
++		dev_info(dev, "skip DSI attach\n");
++		return 0;
++	}
++
++	if (!ctx->defer_attach) {
++		dev_info(dev, "attach: probe\n");
++		ret = mipi_dsi_attach(dsi);
++		if (ret < 0) {
++			dev_err_probe(dev, ret, "Failed to attach to DSI host\n");
++			drm_panel_remove(&ctx->panel);
++			return ret;
++		}
++		ctx->attached = true;
 +	}
 +
 +	dev_info(dev, "probe done\n");
 +
++	if (ctx->attach_delay_ms) {
++		INIT_DELAYED_WORK(&ctx->attach_work, hx83112a_panel_attach_work);
++		schedule_delayed_work(&ctx->attach_work,
++				      msecs_to_jiffies(ctx->attach_delay_ms));
++		dev_info(dev, "attach: scheduled in %u ms\n", ctx->attach_delay_ms);
++	}
++
 +	return 0;
 +}
 +
-+static void hx83112a_truly_remove(struct mipi_dsi_device *dsi)
++static void hx83112a_panel_remove(struct mipi_dsi_device *dsi)
 +{
-+	struct hx83112a_truly *ctx = mipi_dsi_get_drvdata(dsi);
++	struct hx83112a_panel *ctx = mipi_dsi_get_drvdata(dsi);
 +	int ret;
 +
-+	ret = mipi_dsi_detach(dsi);
-+	if (ret < 0)
-+		dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
++	if (!ctx->skip_attach && ctx->attached) {
++		ret = mipi_dsi_detach(dsi);
++		if (ret < 0)
++			dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
++	}
++
++	if (ctx->attach_delay_ms)
++		cancel_delayed_work_sync(&ctx->attach_work);
 +
 +	drm_panel_remove(&ctx->panel);
 +}
 +
-+static const struct of_device_id hx83112a_truly_of_match[] = {
++static const struct of_device_id hx83112a_panel_of_match[] = {
 +	{ .compatible = "truly,hx83112a" },
 +	{ /* sentinel */ }
 +};
-+MODULE_DEVICE_TABLE(of, hx83112a_truly_of_match);
++MODULE_DEVICE_TABLE(of, hx83112a_panel_of_match);
 +
-+static struct mipi_dsi_driver hx83112a_truly_driver = {
-+	.probe = hx83112a_truly_probe,
-+	.remove = hx83112a_truly_remove,
++static struct mipi_dsi_driver hx83112a_panel_driver = {
++	.probe = hx83112a_panel_probe,
++	.remove = hx83112a_panel_remove,
 +	.driver = {
 +		.name = "panel-hx83112a-truly",
-+		.of_match_table = hx83112a_truly_of_match,
++		.of_match_table = hx83112a_panel_of_match,
 +	},
 +};
-+module_mipi_dsi_driver(hx83112a_truly_driver);
++module_mipi_dsi_driver(hx83112a_panel_driver);
 +
-+MODULE_DESCRIPTION("Truly HX83112A 1080p DSI panel driver");
++MODULE_DESCRIPTION("DRM driver for HX83112A based Mangmi Air X panel");
 +MODULE_LICENSE("GPL");

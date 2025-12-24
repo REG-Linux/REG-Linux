@@ -45,7 +45,7 @@ new file mode 100644
 index 000000000000..0002c24e9f2c
 --- /dev/null
 +++ b/drivers/regulator/sgm3804-regulator.c
-@@ -0,0 +1,175 @@
+@@ -0,0 +1,227 @@
 +#include <linux/err.h>
 +#include <linux/i2c.h>
 +#include <linux/module.h>
@@ -53,11 +53,12 @@ index 000000000000..0002c24e9f2c
 +#include <linux/regulator/driver.h>
 +#include <linux/regulator/of_regulator.h>
 +#include <linux/gpio/consumer.h>
++#include <linux/of.h>
 +
 +struct sgm3804_data {
 +    struct regmap *regmap;
 +    struct gpio_desc *reset_gpio[2];
-+    bool enabled;
++    int enable_count;
 +};
 +
 +static const struct regmap_config sgm3804_regmap_config = {
@@ -66,13 +67,14 @@ index 000000000000..0002c24e9f2c
 +    .max_register = 0x03,
 +};
 +
-+static int sgm3804_enable(struct regulator_dev *rdev)
++static int sgm3804_hw_enable(struct regulator_dev *rdev)
 +{
 +    struct sgm3804_data *data = rdev_get_drvdata(rdev);
 +    struct regmap *regmap = data->regmap;
-+    int ret;
++    int ret = 0;
 +
-+    pr_info("sgm3804_enable: called\n");
++    if (data->enable_count++ > 0)
++        return 0;
 +
 +    /* Set reset GPIO high to enable the device if available */
 +    if (data->reset_gpio[0]) {
@@ -82,34 +84,27 @@ index 000000000000..0002c24e9f2c
 +        gpiod_set_value_cansleep(data->reset_gpio[1], 1);
 +    }
 +
-+    ret = regmap_write(regmap, 0x00, 0x0c);
++    /* Set both rails to +/-5.5V (code 0x0F) */
++    ret |= regmap_write(regmap, 0x00, 0x0f);
++    ret |= regmap_write(regmap, 0x01, 0x0f);
++    ret |= regmap_write(regmap, 0x03, 0x03);
 +    if (ret) {
-+        pr_err("sgm3804_enable: regmap_write 0x00 failed: %d\n", ret);
++        dev_err(rdev->dev.parent, "Failed to enable SGM3804 regulator\n");
++        data->enable_count--;
 +        return ret;
 +    }
 +
-+    ret = regmap_write(regmap, 0x01, 0x0c);
-+    if (ret) {
-+        pr_err("sgm3804_enable: regmap_write 0x01 failed: %d\n", ret);
-+        return ret;
-+    }
-+
-+    ret = regmap_write(regmap, 0x03, 0x03);
-+    if (ret) {
-+        pr_err("sgm3804_enable: regmap_write 0x03 failed: %d\n", ret);
-+        return ret;
-+    }
-+
-+    pr_info("sgm3804_enable: success\n");
-+    data->enabled = true;
 +    return 0;
 +}
 +
-+static int sgm3804_disable(struct regulator_dev *rdev)
++static int sgm3804_hw_disable(struct regulator_dev *rdev)
 +{
 +    struct sgm3804_data *data = rdev_get_drvdata(rdev);
 +
-+    pr_info("sgm3804_disable: called\n");
++    if (data->enable_count <= 0)
++        return 0;
++    if (--data->enable_count > 0)
++        return 0;
 +
 +    if (data->reset_gpio[0]) {
 +        gpiod_set_value_cansleep(data->reset_gpio[0], 0);
@@ -118,20 +113,28 @@ index 000000000000..0002c24e9f2c
 +        gpiod_set_value_cansleep(data->reset_gpio[1], 0);
 +    }
 +
-+    pr_info("sgm3804_disable: success\n");
-+    data->enabled = false;
 +    return 0;
++}
++
++static int sgm3804_enable(struct regulator_dev *rdev)
++{
++    return sgm3804_hw_enable(rdev);
++}
++
++static int sgm3804_disable(struct regulator_dev *rdev)
++{
++    return sgm3804_hw_disable(rdev);
 +}
 +
 +static int sgm3804_is_enabled(struct regulator_dev *rdev)
 +{
 +    struct sgm3804_data *data = rdev_get_drvdata(rdev);
-+    return data->enabled;
++    return data->enable_count > 0;
 +}
 +
 +static int sgm3804_get_voltage(struct regulator_dev *rdev)
 +{
-+    return 5000000;  // 5V
++    return 5500000;
 +}
 +
 +static const struct regulator_ops sgm3804_ops = {
@@ -141,14 +144,25 @@ index 000000000000..0002c24e9f2c
 +    .get_voltage = sgm3804_get_voltage,
 +};
 +
-+static const struct regulator_desc sgm3804_reg = {
-+    .name = "SGM3804",
++static const struct regulator_desc sgm3804_regulators[] = {
++{
++    .name = "sgm3804-vpos",
 +    .id = 0,
 +    .ops = &sgm3804_ops,
 +    .type = REGULATOR_VOLTAGE,
 +    .n_voltages = 1,
-+    .min_uV = 5000000,
++    .min_uV = 5500000,
 +    .owner = THIS_MODULE,
++},
++{
++    .name = "sgm3804-vneg",
++    .id = 1,
++    .ops = &sgm3804_ops,
++    .type = REGULATOR_VOLTAGE,
++    .n_voltages = 1,
++    .min_uV = 5500000,
++    .owner = THIS_MODULE,
++},
 +};
 +
 +static int sgm3804_i2c_probe(struct i2c_client *i2c)
@@ -156,8 +170,14 @@ index 000000000000..0002c24e9f2c
 +    struct device *dev = &i2c->dev;
 +    struct regulator_config config = { };
 +    struct regulator_dev *rdev;
++    struct of_regulator_match matches[] = {
++        { .name = "vpos" },
++        { .name = "vneg" },
++    };
++    struct device_node *regulators;
 +    struct sgm3804_data *data;
 +    int error;
++    int i;
 +
 +    data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
 +    if (!data)
@@ -176,19 +196,50 @@ index 000000000000..0002c24e9f2c
 +    if (IS_ERR(data->reset_gpio[1]))
 +        dev_warn(dev, "failed to get second reset GPIO\n");
 +
-+    config.dev = dev;
-+    config.regmap = data->regmap;
-+    config.driver_data = data;
-+    config.of_node = dev->of_node;
-+    config.init_data = of_get_regulator_init_data(dev, dev->of_node, &sgm3804_reg);
-+    if (!config.init_data)
-+        return -ENOMEM;
-+    data->enabled = false;
-+    rdev = devm_regulator_register(dev, &sgm3804_reg, &config);
-+    if (IS_ERR(rdev)) {
-+        error = PTR_ERR(rdev);
-+        dev_err(dev, "Failed to register SGM3804 regulator: %d\n", error);
-+        return error;
++    regulators = of_get_child_by_name(dev->of_node, "regulators");
++    if (regulators) {
++        error = of_regulator_match(dev, regulators, matches,
++                                   ARRAY_SIZE(matches));
++        of_node_put(regulators);
++        if (error < 0)
++            return dev_err_probe(dev, error, "Failed to match regulators\n");
++
++        for (i = 0; i < ARRAY_SIZE(matches); i++) {
++            if (!matches[i].init_data || !matches[i].of_node)
++                return dev_err_probe(dev, -EINVAL,
++                                     "Missing regulator data for %s\n",
++                                     matches[i].name);
++
++            config.dev = dev;
++            config.regmap = data->regmap;
++            config.driver_data = data;
++            config.of_node = matches[i].of_node;
++            config.init_data = matches[i].init_data;
++
++            rdev = devm_regulator_register(dev, &sgm3804_regulators[i], &config);
++            if (IS_ERR(rdev)) {
++                error = PTR_ERR(rdev);
++                dev_err(dev, "Failed to register %s regulator: %d\n",
++                        matches[i].name, error);
++                return error;
++            }
++        }
++    } else {
++        config.dev = dev;
++        config.regmap = data->regmap;
++        config.driver_data = data;
++        config.of_node = dev->of_node;
++        config.init_data = of_get_regulator_init_data(dev, dev->of_node,
++                                                      &sgm3804_regulators[0]);
++        if (!config.init_data)
++            return -ENOMEM;
++
++        rdev = devm_regulator_register(dev, &sgm3804_regulators[0], &config);
++        if (IS_ERR(rdev)) {
++            error = PTR_ERR(rdev);
++            dev_err(dev, "Failed to register SGM3804 regulator: %d\n", error);
++            return error;
++        }
 +    }
 +
 +    return 0;
@@ -220,7 +271,5 @@ index 000000000000..0002c24e9f2c
 +
 +MODULE_DESCRIPTION("SGMicro sgm3804 regulator Driver");
 +MODULE_AUTHOR("Kancy Joe <kancy2333@outlook.com>");
++MODULE_AUTHOR("Romain Tisserand <romain.tisserand@gmail.com>");
 +MODULE_LICENSE("GPL");
--- 
-2.50.0
-
