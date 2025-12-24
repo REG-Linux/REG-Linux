@@ -340,7 +340,7 @@ diff -u -N drivers/usb/typec/tcpm/awinic.dtsi "/home/romain/T\303\251l\303\251ch
 +			AW_LOG("vid is not correct, 0x%02x\n", ret);
 +			ret = -ENODEV;
 +		} else {
-+			AW_LOG("vid is correct, 0x%02x\n", ret);
++			/*AW_LOG("vid is correct, 0x%02x\n", ret);*/
 +			break;
 +		}
 +	}
@@ -1824,7 +1824,7 @@ diff -u -N drivers/usb/typec/tcpm/awinic.dtsi "/home/romain/T\303\251l\303\251ch
 +	const char *name;
 +	int ret = 0;
 +
-+	AW_LOG("enter\n");
++	/*AW_LOG("enter\n");*/
 +
 +	ret = aw35615_check_chipid(client);
 +	if (ret < 0) {
@@ -1908,7 +1908,7 @@ diff -u -N drivers/usb/typec/tcpm/awinic.dtsi "/home/romain/T\303\251l\303\251ch
 +	enable_irq_wake(chip->gpio_int_n_irq);
 +	i2c_set_clientdata(client, chip);
 +
-+	AW_LOG("ok\n");
++	/*AW_LOG("ok\n");*/
 +
 +	return ret;
 +
@@ -2271,7 +2271,7 @@ diff -u -N drivers/usb/typec/tcpm/awinic.dtsi "/home/romain/T\303\251l\303\251ch
 +#endif
 +};
 +
-+#define AWINIC_DEBUG
++/*#define AWINIC_DEBUG*/
 +#ifdef AWINIC_DEBUG
 +#define AWINIC_LOG_NAME "aw35615"
 +#define AW_LOG(format, arg...)	 pr_info("[%s] %s %d: " format, AWINIC_LOG_NAME, \

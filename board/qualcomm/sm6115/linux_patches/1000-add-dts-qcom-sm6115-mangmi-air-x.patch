@@ -3,7 +3,7 @@ new file mode 100644
 index 000000000000..58d9ab342fe9
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,795 @@
+@@ -0,0 +1,828 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
 + * Copyright (c) 2025, REG-LINUX (https://reglinux.org)
@@ -16,6 +16,7 @@ index 000000000000..58d9ab342fe9
 +#include "pm6125.dtsi"
 +#include "pmi632.dtsi"
 +#include <dt-bindings/arm/qcom,ids.h>
++#include <dt-bindings/gpio/gpio.h>
 +#include <dt-bindings/leds/common.h>
 +#include <dt-bindings/sound/qcom,q6afe.h>
 +#include <dt-bindings/sound/qcom,q6asm.h>
@@ -30,13 +31,13 @@ index 000000000000..58d9ab342fe9
 +	qcom,board-id = <34 2>;
 +
 +	aliases {
++		serial0 = &{/soc@0/geniqup@4ac0000/serial@4a90000};
 +		mmc0 = &sdhc_2;
 +		mmc1 = &sdhc_1;
 +	};
 +
 +	chosen {
-+		stdout-path = "serial0:115200n8";
-+
++ 
 +		#address-cells = <2>;
 +		#size-cells = <2>;
 +		ranges;
@@ -96,18 +97,18 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&spmi_bus {
-+      /* This hardware only exposes the pm6125 helpers; the PMI632 chips
-+       * referenced by pmi632.dtsi are absent, so prevent the kernel driver
-+       * from probing the unused USIDs 0x2 and 0x3 (which otherwise flood dmesg
-+       * with transaction-failed warnings).
-+       */
-+      /*pmic@2 {
-+              status = "disabled";
-+      };
++	/* This hardware only exposes the pm6125 helpers; the PMI632 chips
++	 * referenced by pmi632.dtsi are absent, so prevent the kernel driver
++	 * from probing the unused USIDs 0x2 and 0x3 (which otherwise flood dmesg
++	 * with transaction-failed warnings).
++	 */
++	pmic@2 {
++		status = "disabled";
++	};
 +
-+      pmic@3 {
-+              status = "disabled";
-+      };*/
++	pmic@3 {
++		status = "disabled";
++	};
 +};
 +
 +&i2c1 {
@@ -119,10 +120,9 @@ index 000000000000..58d9ab342fe9
 +		regulator-name = "panel-avdd";
 +		regulator-min-microvolt = <5000000>;
 +		regulator-max-microvolt = <5000000>;
-+		//reset-gpios = <&tlmm 44 GPIO_ACTIVE_HIGH>,
-+		//	      <&tlmm 45 GPIO_ACTIVE_HIGH>;
-+		reset-gpios =   <&tlmm 59 GPIO_ACTIVE_HIGH>, <&tlmm 58 GPIO_ACTIVE_HIGH>,
-+				<&tlmm 163 GPIO_ACTIVE_HIGH>,<&tlmm 164 GPIO_ACTIVE_HIGH>;
++		//reset-gpios =   <&tlmm 59 GPIO_ACTIVE_HIGH>, <&tlmm 58 GPIO_ACTIVE_HIGH>,
++		//		<&tlmm 163 GPIO_ACTIVE_HIGH>,<&tlmm 164 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&tlmm 44 GPIO_ACTIVE_HIGH>, <&tlmm 45 GPIO_ACTIVE_HIGH>;
 +		vin-supply = <&pm6125_l22>;
 +		status = "okay";
 +	};
@@ -269,7 +269,6 @@ index 000000000000..58d9ab342fe9
 +			};
 +		};
 +
-+	/* TODO: enable with CONFIG_LEDS_AW200XX */
 +	led_left: led-controller@3a {
 +		compatible = "awinic,aw20036";
 +		reg = <0x3a>;
@@ -277,15 +276,74 @@ index 000000000000..58d9ab342fe9
 +		reset-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
 +		enable-gpios = <&tlmm 23 GPIO_ACTIVE_HIGH>;
 +		status = "okay";
++                vcc-supply = <&pm6125_l23>;
++                vio-supply = <&pm6125_l9>;
++                #address-cells = <1>;
++                #size-cells = <0>;
++                led@0 {
++                        reg = <0>;
++                        led-max-microamp = <5000>;
++                        function = LED_FUNCTION_INDICATOR;
++                        label = "stick-left:red";
++                        color = <LED_COLOR_ID_RED>;
++                        default-state = "on";
++                };
++
++                led@1 {
++                        reg = <1>;
++                        led-max-microamp = <5000>;
++                        function = LED_FUNCTION_INDICATOR;
++                        label = "stick-left:green";
++                        color = <LED_COLOR_ID_GREEN>;
++                        default-state = "on";
++                };
++
++                led@2 {
++                        reg = <2>;
++                        led-max-microamp = <5000>;
++                        function = LED_FUNCTION_INDICATOR;
++                        label = "stick-left:blue";
++                        color = <LED_COLOR_ID_BLUE>;
++                        default-state = "on";
++                };
 +	};
 +
-+	/* TODO: enable with CONFIG_LEDS_AW200XX */
 +	led_right: led-controller@3b {
 +		compatible = "awinic,aw20036";
 +		reg = <0x3b>;
 +		interrupts-extended = <&tlmm 30 IRQ_TYPE_LEVEL_LOW>;
 +		reset-gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
 +		status = "okay";
++                vcc-supply = <&pm6125_l23>;
++                vio-supply = <&pm6125_l9>;
++                #address-cells = <1>;
++                #size-cells = <0>;
++                led@0 {
++                        reg = <0>;
++                        led-max-microamp = <5000>;
++                        function = LED_FUNCTION_INDICATOR;
++                        label = "stick-right:red";
++                        color = <LED_COLOR_ID_RED>;
++                        default-state = "on";
++                };
++
++                led@1 {
++                        reg = <1>;
++                        led-max-microamp = <5000>;
++                        function = LED_FUNCTION_INDICATOR;
++                        label = "stick-right:green";
++                        color = <LED_COLOR_ID_GREEN>;
++                        default-state = "on";
++                };
++
++                led@2 {
++                        reg = <2>;
++                        led-max-microamp = <5000>;
++                        function = LED_FUNCTION_INDICATOR;
++                        label = "stick-right:blue";
++                        color = <LED_COLOR_ID_BLUE>;
++                        default-state = "on";
++                };
 +	};
 +};
 +
@@ -301,18 +359,19 @@ index 000000000000..58d9ab342fe9
 +	};
 +};
 +
-+&mdss {
++/*&mdss {
 +	status = "okay";
-+};
++};*/
 +
 +&mdss_dsi0 {
 +	vdda-supply = <&pm6125_l18>;
-+	status = "okay";
++	status = "disabled";
 +
 +	panel: panel@0 {
-+		compatible = "truly,bm5460bb1";
++		status = "disabled";
++		/*compatible = "truly,hx83112a";*/
 +		reg = <0>;
-+
++		iovcc-supply = <&pm6125_l9>;
 +		vddio-supply = <&pm6125_l9>;
 +		vsp-supply = <&panel_avdd>;
 +		vsn-supply = <&panel_avdd>;
@@ -341,30 +400,19 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&mdss_dsi0_phy {
-+	status = "okay";
++	status = "disabled";
 +};
 +
-+&spi2 {
-+	/* Himax SPI touch (downstream default), kept disabled until confirmed */
++&{/soc@0/geniqup@4ac0000/spi@4a88000} {
++	status = "okay";
++	/* Himax SPI touch (downstream default) */
 +	touch_himax: touchscreen@0 {
-+		compatible = "himax,hxcommon";
++		compatible = "himax,hx83112a";
 +		reg = <0>;
-+		spi-max-frequency = <10000000>;
++		spi-max-frequency = <1000000>;
 +		interrupts-extended = <&tlmm 69 IRQ_TYPE_EDGE_FALLING>;
-+		reset-gpios = <&tlmm 68 GPIO_ACTIVE_HIGH>;
-+		/* Shares reset/IRQ with the Jadard SPI touch stub below */
-+		status = "disabled";
-+	};
-+
-+	/* Jadard alternative touch controller */
-+	touch_jadard: touchscreen@1 {
-+		compatible = "jadard,jd9365";
-+		reg = <1>;
-+		spi-max-frequency = <6000000>;
-+		interrupts-extended = <&tlmm 69 IRQ_TYPE_EDGE_FALLING>;
-+		reset-gpios = <&tlmm 68 GPIO_ACTIVE_HIGH>;
-+		/* Shares reset/IRQ with the Himax SPI touch stub above */
-+		status = "disabled";
++		reset-gpios = <&tlmm 68 GPIO_ACTIVE_LOW>;
++		status = "okay";
 +	};
 +};
 +
@@ -381,14 +429,28 @@ index 000000000000..58d9ab342fe9
 +		status = "disabled";
 +	};
 +
-+	smb1355: charger@8 {
++	smb1355: charger@c {
 +		compatible = "qcom,smb1355";
-+		reg = <0x8>;
++		reg = <0x0c>;
 +		status = "disabled";
 +	};
 +};
 +
 +&tlmm {
++	aw20036_left_reset_hog: aw20036-left-reset-hog {
++		gpio-hog;
++		gpios = <21 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "aw20036_left_reset";
++	};
++
++	aw20036_right_reset_hog: aw20036-right-reset-hog {
++		gpio-hog;
++		gpios = <37 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "aw20036_right_reset";
++	};
++
 +	mcu_ctrl_pins: mcu-ctrl-pins {
 +		mux {
 +			pins = "gpio22", "gpio25", "gpio26", "gpio27", "gpio28";
@@ -453,42 +515,11 @@ index 000000000000..58d9ab342fe9
 +	status = "okay";
 +};
 +
-+&uart4 {
-+	/* UART routed to the joystick MCU */
-+	status = "okay";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&qup_uart4_default>;
-+
-+	joystick_mcu_serdev: joystick-mcu {
-+		compatible = "mangmi,joystick-mcu";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
-+		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
-+		select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
-+		mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
-+		start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
-+		back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
-+		power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
-+		reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
-+		boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
-+		boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
-+		status = "disabled";
-+	};
++/ {
++	/* drop serial1 alias while UART4 is reserved for Bluetooth */
 +};
 +
 +/ {
-+	aliases {
-+		serial1 = &uart4;
-+	};
-+};
-+
-+/ {
-+	/* Joystick MCU on QUPv3 SE4 UART (disabled until driver is ready) */
-+	joystick_mcu: joystick-mcu {
-+		compatible = "mangmi,joystick-mcu";
-+		status = "disabled";
-+	};
-+
 +	vibrator {
 +		compatible = "pwm-gpio-vibrator";
 +		pinctrl-names = "default";
@@ -655,6 +686,8 @@ index 000000000000..58d9ab342fe9
 +		pm6125_l23: l23 {
 +			regulator-min-microvolt = <3200000>;
 +			regulator-max-microvolt = <3400000>;
++			regulator-always-on;
++			regulator-boot-on;
 +		};
 +
 +		pm6125_l24: l24 {
@@ -777,7 +810,7 @@ index 000000000000..58d9ab342fe9
 +
 +/* Upstream-style Bluetooth node (qcom,wcn3990-bt), kept disabled until hooked to serdev UART */
 +&uart4 {
-+	status = "disabled";
++	status = "okay";
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&qup_uart4_default>;
 +
@@ -791,8 +824,8 @@ index 000000000000..58d9ab342fe9
 +		/* Downstream bt-sw-ctrl-gpio; map to enable-gpios here if needed */
 +		enable-gpios = <&tlmm 87 GPIO_ACTIVE_HIGH>;
 +		/* TODO: set correct firmware-name once available */
-+		firmware-name = "wcn3990/bluetooth.mbn";
-+		status = "disabled";
++		/* firmware-name = "wcn3990/bluetooth.mbn"; */
++		status = "okay";
 +	};
 +};
 +
