@@ -1,3 +1,0 @@
-# ATH10K
-ath10k/WCN3990/hw1.0/*.bin
-ath10k/WCN3990/hw1.0/wlanmdsp.mbn
