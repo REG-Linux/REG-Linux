@@ -3,6 +3,7 @@ from os import fdopen, kill, pipe
 from re import match
 from signal import SIGTERM
 from subprocess import PIPE, Popen
+from typing import Any, Dict, Tuple
 
 from evdev import device, ecodes
 
@@ -56,7 +57,9 @@ emulatorMapping = {
 }
 
 
-def reconfigure_controllers(players_controllers, system, metadata, device_list):
+def reconfigure_controllers(
+    players_controllers: Any, system: Any, metadata: Any, device_list: Any
+) -> Tuple[Any, Any, Any]:
     eslog.info("wheels reconfiguration")
     eslog.info("before wheel reconfiguration :")
     for _, pad in sorted(players_controllers.items()):
@@ -268,7 +271,7 @@ def reconfigure_controllers(players_controllers, system, metadata, device_list):
     return (procs, players_controllers_new, device_list)
 
 
-def get_wheels_from_device_infos(device_infos):
+def get_wheels_from_device_infos(device_infos: Dict[str, Any]) -> Dict[str, Any]:
     res = {}
     for x in device_infos:
         # Check if device_infos[x] is a dictionary before accessing the key
@@ -279,8 +282,13 @@ def get_wheels_from_device_infos(device_infos):
 
 
 def reconfigure_angle_rotation(
-    dev, wheelAxis, rotationAngle, wantedRotationAngle, wantedDeadzone, wantedMidzone
-):
+    dev: Any,
+    wheelAxis: int | str,
+    rotationAngle: Any,
+    wantedRotationAngle: Any,
+    wantedDeadzone: Any,
+    wantedMidzone: Any,
+) -> tuple[str | None, Any]:
     devInfos = device.InputDevice(dev)
     caps = devInfos.capabilities()
 
@@ -348,7 +356,7 @@ def reconfigure_angle_rotation(
     return (newdev, proc)
 
 
-def reset_controllers(wheel_processes):
+def reset_controllers(wheel_processes: Any) -> None:
     for p in wheel_processes:
         eslog.info(f"killing wheel process {p.pid}")
         kill(p.pid, SIGTERM)

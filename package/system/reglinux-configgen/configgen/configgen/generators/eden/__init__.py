@@ -7,4 +7,11 @@ from .edenConfig import setEdenConfig
 from .edenController import hatdirectionvalue, setAxis, setButton, setEdenControllers
 from .edenGenerator import EdenGenerator
 
-__all__ = ["EdenGenerator", "setEdenConfig", "hatdirectionvalue", "setAxis", "setButton", "setEdenControllers"]
+__all__ = [
+    "EdenGenerator",
+    "setEdenConfig",
+    "hatdirectionvalue",
+    "setAxis",
+    "setButton",
+    "setEdenControllers",
+]

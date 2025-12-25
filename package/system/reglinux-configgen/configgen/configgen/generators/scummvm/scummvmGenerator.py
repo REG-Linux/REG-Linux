@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from glob import glob
 from os import makedirs, path
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -111,7 +112,7 @@ class ScummVMGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(self, config: Any, game_resolution: Dict[str, int], rom: str) -> float:
         if (
             "scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect"
         ) or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):

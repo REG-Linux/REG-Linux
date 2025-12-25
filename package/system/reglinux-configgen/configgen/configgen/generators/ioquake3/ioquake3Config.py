@@ -1,4 +1,5 @@
 from os import makedirs, path, walk
+from typing import Any, Dict
 
 from configgen.systemFiles import CONF, ROMS
 
@@ -9,8 +10,13 @@ IOQUAKE3_CONF_DIR = CONF + "/ioquake3"
 
 
 def writeCfgFile(
-    system, filename, init_line, defaults_to_add, controls_to_add, gameResolution
-):
+    system: Any,
+    filename: str,
+    init_line: str,
+    defaults_to_add: list[str],
+    controls_to_add: list[str],
+    gameResolution: Dict[str, int],
+) -> None:
     if not path.isfile(filename):
         makedirs(path.dirname(filename), exist_ok=True)
 
@@ -65,7 +71,9 @@ def writeCfgFile(
                     file.write(line)
 
 
-def setIoquake3Config(system, rom, playersControllers, gameResolution):
+def setIoquake3Config(
+    system: Any, rom: str, playersControllers: Any, gameResolution: Dict[str, int]
+) -> None:
     # create the cfg files for each quake3 rom / mod folder
     files = []
 

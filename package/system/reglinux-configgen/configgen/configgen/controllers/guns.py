@@ -1,6 +1,7 @@
 import os
 from os import path
 from re import match
+from typing import Any, Dict, List
 
 from evdev.device import InputDevice
 from pyudev import Context
@@ -12,7 +13,7 @@ from .mouse import getMouseButtons
 eslog = get_logger(__name__)
 
 
-def getGuns():
+def getGuns() -> Dict[str, Any]:
     guns = {}
     try:
         context = Context()
@@ -130,7 +131,7 @@ def getGuns():
     return guns
 
 
-def gunsNeedCrosses(guns):
+def gunsNeedCrosses(guns: List[Any]) -> bool:
     # no gun, enable the cross for joysticks, mouses...
     if len(guns) == 0:
         return True
@@ -142,7 +143,7 @@ def gunsNeedCrosses(guns):
 
 
 # returns None is no border is wanted
-def guns_borders_size_name(guns, config):
+def guns_borders_size_name(guns: List[Any], config: Dict[str, Any]) -> Any:
     borders_size = "medium"
     if (
         "controllers.guns.borderssize" in config

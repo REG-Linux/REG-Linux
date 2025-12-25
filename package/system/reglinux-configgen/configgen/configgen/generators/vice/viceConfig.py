@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF
@@ -9,7 +10,7 @@ VICE_CONTROLLER_PATH = VICE_CONFIG_DIR + "/sdl-joymap.vjm"
 VICE_BIN_DIR = "/usr/bin/"
 
 
-def setViceConfig(system, metadata, guns):
+def setViceConfig(system: Any, metadata: Any, guns: Any) -> None:
     # Create directory if it doesn't exist
     os.makedirs(VICE_CONFIG_DIR, exist_ok=True)
 

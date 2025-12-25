@@ -1,4 +1,5 @@
 from configgen.systemFiles import CONF, ROMS
+from typing import Any
 
 CGENIUS_CONFIG_DIR = CONF + "/cgenius"
 CGENIUS_ROMS_DIR = ROMS + "/cgenius/"
@@ -6,7 +7,7 @@ CGENIUS_CONFIG_PATH = CGENIUS_CONFIG_DIR + "/cgenius.cfg"
 CGENIUS_BIN_PATH = "/usr/bin/CGeniusExe"
 
 
-def setCgeniusConfig(cgeniusConfig, system):
+def setCgeniusConfig(cgeniusConfig: Any, system: Any) -> None:
     # Now setup the options we want...
     if "FileHandling" not in cgeniusConfig:
         cgeniusConfig["FileHandling"] = {}
@@ -59,5 +60,5 @@ def setCgeniusConfig(cgeniusConfig, system):
 
 
 # Show mouse on screen for the Config Screen
-def getMouseMode(self, config, rom):
+def getMouseMode(config: Any, rom: str) -> bool:
     return True

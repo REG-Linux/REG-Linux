@@ -1,6 +1,7 @@
 import builtins
 from configparser import ConfigParser
 from os import makedirs, path
+from typing import Any
 
 from configgen.systemFiles import CONF, SAVES
 
@@ -9,7 +10,9 @@ XEMU_CONFIG_PATH = CONF + "/xemu/xemu.toml"
 XEMU_BIN_PATH = "/usr/bin/xemu"
 
 
-def setXemuConfig(system, rom, playersControllers, gameResolution):
+def setXemuConfig(
+    system: Any, rom: str, playersControllers: Any, gameResolution: Any
+) -> None:
     iniConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     iniConfig.optionxform = lambda optionstr: str(optionstr)
@@ -28,7 +31,9 @@ def setXemuConfig(system, rom, playersControllers, gameResolution):
         iniConfig.write(configfile)
 
 
-def createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution):
+def createXemuConfig(
+    iniConfig: Any, system: Any, rom: str, playersControllers: Any, gameResolution: Any
+) -> None:
     # Create INI sections
     if not iniConfig.has_section("general"):
         iniConfig.add_section("general")

@@ -30,7 +30,9 @@ class CannonballGenerator(Generator):
             try:
                 cannoballConfig = minidom.parse(CANNONBALL_CONFIG_PATH)
             except (ExpatError, FileNotFoundError, OSError) as e:
-                eslog.debug(f"Cannonball: Failed to parse config file {CANNONBALL_CONFIG_PATH} - {str(e)}")
+                eslog.debug(
+                    f"Cannonball: Failed to parse config file {CANNONBALL_CONFIG_PATH} - {str(e)}"
+                )
                 pass  # reinit the file
 
         # cannonball config file

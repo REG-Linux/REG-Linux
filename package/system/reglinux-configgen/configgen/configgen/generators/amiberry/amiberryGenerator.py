@@ -1,4 +1,5 @@
 from os import path
+from typing import List
 from zipfile import ZipFile
 
 from configgen.Command import Command
@@ -156,7 +157,7 @@ class AmiberryGenerator(Generator):
         # otherwise, unknown format
         return Command(array=[])
 
-    def floppies_from_rom(self, rom):
+    def floppies_from_rom(self, rom: str) -> List[str]:
         floppies = []
         eslog.debug(f"Looking for floppy images for ROM: {rom}")
 
@@ -213,7 +214,7 @@ class AmiberryGenerator(Generator):
         eslog.debug(f"Total floppy images found: {len(floppies)}")
         return floppies
 
-    def get_rom_type(self, filepath):
+    def get_rom_type(self, filepath: str) -> str:
         eslog.debug(f"Determining ROM type for: {filepath}")
         extension = path.splitext(filepath)[1][1:].lower()
 

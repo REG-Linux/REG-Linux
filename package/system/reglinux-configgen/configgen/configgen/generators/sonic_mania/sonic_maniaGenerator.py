@@ -2,6 +2,7 @@ from configparser import ConfigParser
 from os import X_OK, access, chdir, path
 from shutil import copy
 from stat import S_IRGRP, S_IROTH, S_IRWXU, S_IXGRP, S_IXOTH
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -136,5 +137,7 @@ class SonicManiaGenerator(Generator):
     def getMouseMode(self, config, rom):
         return False
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

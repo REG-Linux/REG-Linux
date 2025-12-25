@@ -91,7 +91,7 @@ class OpenborGenerator(Generator):
         return OpenborGenerator.executeCore(core, rom)
 
     @staticmethod
-    def executeCore(core, rom):
+    def executeCore(core: str, rom: str) -> Command:
         if core == "openbor4432":
             command_array = ["OpenBOR4432", rom]
         elif core == "openbor6412":
@@ -105,7 +105,7 @@ class OpenborGenerator(Generator):
         return Command(array=command_array)
 
     @staticmethod
-    def guessCore(rom):
+    def guessCore(rom: str) -> str:
         versionstr = search(r"\[.*([0-9]{4})\]+", path.basename(rom))
         if versionstr is None:
             return "openbor7530"

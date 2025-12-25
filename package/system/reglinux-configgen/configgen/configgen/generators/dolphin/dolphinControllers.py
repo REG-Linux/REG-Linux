@@ -3,6 +3,7 @@ from configparser import ConfigParser
 from glob import glob
 from os import path, remove
 from re import match
+from typing import Any, Dict, Optional
 
 from configgen.utils.logger import get_logger
 
@@ -12,7 +13,14 @@ eslog = get_logger(__name__)
 
 
 # Create the controller configuration file
-def generateControllerConfig(system, playersControllers, metadata, wheels, rom, guns):
+def generateControllerConfig(
+    system: Any,
+    playersControllers: Any,
+    metadata: Any,
+    wheels: Any,
+    rom: str,
+    guns: Any,
+) -> None:
     # generateHotkeys(playersControllers)
     if system.name == "wii":
         if (
@@ -26,18 +34,16 @@ def generateControllerConfig(system, playersControllers, metadata, wheels, rom, 
             generateControllerConfig_gamecube(
                 system, playersControllers, {}, rom
             )  # You can use the gamecube pads on the wii together with wiimotes
-        elif (
-            system.isOptSet("emulatedwiimotes")
-            and not system.getOptBoolean("emulatedwiimotes")
+        elif system.isOptSet("emulatedwiimotes") and not system.getOptBoolean(
+            "emulatedwiimotes"
         ):
             # Generate if hardcoded
             generateControllerConfig_realwiimotes("WiimoteNew.ini", "Wiimote")
             generateControllerConfig_gamecube(
                 system, playersControllers, {}, rom
             )  # You can use the gamecube pads on the wii together with wiimotes
-        elif (
-            system.isOptSet("emulatedwiimotes")
-            and system.getOptBoolean("emulatedwiimotes")
+        elif system.isOptSet("emulatedwiimotes") and system.getOptBoolean(
+            "emulatedwiimotes"
         ):
             # Generate if hardcoded
             generateControllerConfig_emulatedwiimotes(
@@ -91,7 +97,9 @@ def generateControllerConfig(system, playersControllers, metadata, wheels, rom, 
 # https://docs.libretro.com/library/dolphin/
 
 
-def generateControllerConfig_emulatedwiimotes(system, playersControllers, wheels, rom):
+def generateControllerConfig_emulatedwiimotes(
+    system: Any, playersControllers: Any, wheels: Any, rom: str
+) -> None:
     wiiMapping = {
         "x": "Buttons/2",
         "b": "Buttons/A",
@@ -266,7 +274,9 @@ def generateControllerConfig_emulatedwiimotes(system, playersControllers, wheels
     )
 
 
-def generateControllerConfig_gamecube(system, playersControllers, wheels, rom):
+def generateControllerConfig_gamecube(
+    system: Any, playersControllers: Any, wheels: Any, rom: str
+) -> None:
     gamecubeMapping = {
         "b": "Buttons/B",
         "a": "Buttons/A",
@@ -334,7 +344,7 @@ def removeControllerConfig_gamecube():
         remove(configFileName)
 
 
-def generateControllerConfig_realwiimotes(filename, anyDefKey):
+def generateControllerConfig_realwiimotes(filename: str, anyDefKey: str) -> None:
     configFileName = f"{DOLPHIN_CONFIG_DIR}/{filename}"
     f = open(configFileName, "w", encoding="utf_8_sig")
     nplayer = 1
@@ -347,7 +357,9 @@ def generateControllerConfig_realwiimotes(filename, anyDefKey):
     f.close()
 
 
-def generateControllerConfig_guns(filename, anyDefKey, metadata, guns, system, rom):
+def generateControllerConfig_guns(
+    filename: str, anyDefKey: str, metadata: Any, guns: Any, system: Any, rom: str
+) -> None:
     configFileName = f"{DOLPHIN_CONFIG_DIR}/{filename}"
     f = open(configFileName, "w", encoding="utf_8_sig")
 
@@ -506,7 +518,7 @@ def generateControllerConfig_guns(filename, anyDefKey, metadata, guns, system, r
     f.close()
 
 
-def generateHotkeys(playersControllers):
+def generateHotkeys(playersControllers: Any) -> None:
     configFileName = "{}/{}".format(DOLPHIN_CONFIG_DIR, "Hotkeys.ini")
     f = open(configFileName, "w", encoding="utf_8_sig")
 
@@ -573,7 +585,7 @@ def generateHotkeys(playersControllers):
     f.close()
 
 
-def get_AltMapping(system, nplayer, anyMapping):
+def get_AltMapping(system: Any, nplayer: int, anyMapping: Any) -> Any:
     mapping = anyMapping.copy()
     # Fixes default gamecube style controller mapping for ES (gc A confirm/gc B cancel)
     if (
@@ -608,16 +620,16 @@ def get_AltMapping(system, nplayer, anyMapping):
 
 
 def generateControllerConfig_any(
-    system,
-    playersControllers,
-    wheels,
-    filename,
-    anyDefKey,
-    anyMapping,
-    anyReverseAxes,
-    anyReplacements,
-    extraOptions={},
-):
+    system: Any,
+    playersControllers: Any,
+    wheels: Any,
+    filename: str,
+    anyDefKey: str,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+    anyReplacements: Any,
+    extraOptions: Dict[str, Any] = {},
+) -> None:
     configFileName = f"{DOLPHIN_CONFIG_DIR}/{filename}"
     f = open(configFileName, "w", encoding="utf_8_sig")
     nplayer = 1
@@ -639,9 +651,8 @@ def generateControllerConfig_any(
             "Device = evdev/" + str(nsamepad).strip() + "/" + pad.name.strip() + "\n"
         )
 
-        if (
-            system.isOptSet("use_pad_profiles")
-            and system.getOptBoolean("use_pad_profiles")
+        if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
+            "use_pad_profiles"
         ):
             if not generateControllerConfig_any_from_profiles(f, pad, system):
                 generateControllerConfig_any_auto(
@@ -676,7 +687,7 @@ def generateControllerConfig_any(
     f.close()
 
 
-def generateControllerConfig_wheel(f, pad, nplayer):
+def generateControllerConfig_wheel(f: Any, pad: Any, nplayer: int) -> None:
     wheelMapping = {
         "select": "Buttons/Z",
         "start": "Buttons/Start",
@@ -737,16 +748,16 @@ def generateControllerConfig_wheel(f, pad, nplayer):
 
 
 def generateControllerConfig_any_auto(
-    f,
-    pad,
-    anyMapping,
-    anyReverseAxes,
-    anyReplacements,
-    extraOptions,
-    system,
-    nplayer,
-    nsamepad,
-):
+    f: Any,
+    pad: Any,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+    anyReplacements: Any,
+    extraOptions: Any,
+    system: Any,
+    nplayer: int,
+    nsamepad: int,
+) -> None:
     for opt in extraOptions:
         f.write(opt + " = " + extraOptions[opt] + "\n")
 
@@ -960,7 +971,7 @@ def generateControllerConfig_any_auto(
                 f.write("C-Stick/Gate Size = 88.0\n")
 
 
-def generateControllerConfig_any_from_profiles(f, pad, system):
+def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) -> bool:
     globsearch = ""
     if system.name == "gamecube":
         globsearch = "/userdata/system/configs/dolphin-emu/Profiles/GCPad/*.ini"
@@ -995,16 +1006,16 @@ def generateControllerConfig_any_from_profiles(f, pad, system):
 
 
 def write_key(
-    f,
-    keyname,
-    input_type,
-    input_id,
-    input_value,
-    input_global_id,
-    reverse,
-    hotkey_id,
-    gcz_ids,
-):
+    f: Any,
+    keyname: str,
+    input_type: str,
+    input_id: str,
+    input_value: str,
+    input_global_id: str,
+    reverse: bool,
+    hotkey_id: Optional[str],
+    gcz_ids: Any,
+) -> None:
     f.write(keyname + " = ")
     if hotkey_id is not None:
         f.write("`Button " + str(hotkey_id) + "` & ")

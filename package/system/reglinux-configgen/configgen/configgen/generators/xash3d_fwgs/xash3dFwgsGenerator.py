@@ -14,19 +14,19 @@ XASH3D_DEFAULT_SERVER_LIB = "hl"
 XASH3D_BIN_PATH = "/usr/bin/xash3d"
 
 
-def _rom_dir(game):
+def _rom_dir(game: str) -> str:
     return XASH3D_ROMS_DIR + "/" + game
 
 
-def _config_dir(game):
+def _config_dir(game: str) -> str:
     return "/userdata/system/configs/xash3d_fwgs/" + game
 
 
-def _save_dir(game):
+def _save_dir(game: str) -> str:
     return "/userdata/saves/xash3d_fwgs/" + game
 
 
-def _client_lib_path(server_lib, arch_suffix):
+def _client_lib_path(server_lib: str, arch_suffix: str) -> str:
     return (
         XASH3D_HLSDK_LIBS_DIR
         + "/"
@@ -37,7 +37,7 @@ def _client_lib_path(server_lib, arch_suffix):
     )
 
 
-def _server_lib_path(server_lib, arch_suffix):
+def _server_lib_path(server_lib: str, arch_suffix: str) -> str:
     return (
         XASH3D_HLSDK_LIBS_DIR
         + "/"
@@ -49,7 +49,7 @@ def _server_lib_path(server_lib, arch_suffix):
     )
 
 
-def _get_server_lib_basename_from_liblist_gam(game):
+def _get_server_lib_basename_from_liblist_gam(game: str) -> str | None:
     """Gets the base name of the server library from liblist.gam in the game directory."""
     file = _rom_dir(game) + "/liblist.gam"
     if not path.exists(file):
@@ -63,7 +63,7 @@ def _get_server_lib_basename_from_liblist_gam(game):
     return None
 
 
-def _find_server_lib(server_lib, arch_suffix):
+def _find_server_lib(server_lib: str | None, arch_suffix: str) -> str:
     """Finds and returns the server library.
 
     Falls back to XASH3D_DEFAULT_SERVER_LIB if none is found.
@@ -76,7 +76,7 @@ def _find_server_lib(server_lib, arch_suffix):
     return _server_lib_path(XASH3D_DEFAULT_SERVER_LIB, arch_suffix)
 
 
-def _find_client_lib(server_lib, arch_suffix):
+def _find_client_lib(server_lib: str | None, arch_suffix: str) -> str:
     """Finds and returns the client library.
 
     Falls back to the client library for XASH3D_DEFAULT_SERVER_LIB if none is found.
@@ -140,7 +140,7 @@ class Xash3dFwgsGenerator(Generator):
             },
         )
 
-    def _maybeInitConfig(self, game):
+    def _maybeInitConfig(self, game: str) -> None:
         rom_dir = _rom_dir(game)
         if not path.exists(rom_dir + "/userconfig.cfg"):
             with open(rom_dir + "/userconfig.cfg", "w") as f:
@@ -161,7 +161,7 @@ class Xash3dFwgsGenerator(Generator):
             if not path.exists(rom_dir + "/custom.cfg"):
                 symlink(config_dir + "/custom.cfg", rom_dir + "/custom.cfg")
 
-    def _maybeInitSaveDir(self, game):
+    def _maybeInitSaveDir(self, game: str) -> None:
         rom_dir = _rom_dir(game)
         if not path.isdir(rom_dir + "/save"):
             save_dir = _save_dir(game)

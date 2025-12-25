@@ -53,7 +53,7 @@ class DuckstationGenerator(Generator):
         return Command(array=command_array)
 
 
-def rewriteM3uFullPath(m3u):  # Rewrite a clean m3u file with valid fullpath
+def rewriteM3uFullPath(m3u: str) -> str:  # Rewrite a clean m3u file with valid fullpath
     # get initialm3u
     try:
         with open(m3u) as f:

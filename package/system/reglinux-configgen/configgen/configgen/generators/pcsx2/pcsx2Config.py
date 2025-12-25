@@ -4,6 +4,7 @@ from os import makedirs, path, remove
 from shutil import copyfile
 from subprocess import CalledProcessError, check_output
 from time import time
+from typing import Any, Dict
 
 from requests import get
 
@@ -27,7 +28,9 @@ PCSX2_SOURCE_PATH = "/usr/share/reglinux/datainit/bios/ps2/patches.zip"
 eslog = get_logger(__name__)
 
 
-def getInGameRatio(self, config, gameResolution, rom):
+def getInGameRatio(
+    self: Any, config: Any, gameResolution: Dict[str, int], rom: str
+) -> float:
     if getGfxRatioFromConfig(config, gameResolution) == "16:9" or (
         getGfxRatioFromConfig(config, gameResolution) == "Stretch"
         and gameResolution["width"] / float(gameResolution["height"])
@@ -37,7 +40,7 @@ def getInGameRatio(self, config, gameResolution, rom):
     return 4 / 3
 
 
-def getGfxRatioFromConfig(config, gameResolution):
+def getGfxRatioFromConfig(config: Any, gameResolution: Dict[str, int]) -> str:
     # 2: 4:3 ; 1: 16:9
     if "pcsx2_ratio" in config:
         if config["pcsx2_ratio"] == "16:9":
@@ -84,7 +87,7 @@ def configureAudio():
     f.close()
 
 
-def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWithWheel):
+def setPcsx2Config(system: Any, rom: str, controllers: Any, metadata: Any, guns: Any, wheels: Any, playingWithWheel: Any) -> None:
     configFileName = "{}/{}".format(PCSX2_CONFIG_DIR + "/inis", "PCSX2.ini")
 
     if not path.exists(PCSX2_CONFIG_DIR + "/inis"):
@@ -183,9 +186,8 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
     if not pcsx2INIConfig.has_section("Achievements"):
         pcsx2INIConfig.add_section("Achievements")
     pcsx2INIConfig.set("Achievements", "Enabled", "false")
-    if (
-        system.isOptSet("retroachievements")
-        and system.getOptBoolean("retroachievements")
+    if system.isOptSet("retroachievements") and system.getOptBoolean(
+        "retroachievements"
     ):
         username = system.config.get("retroachievements.username", "")
         hardcore = system.config.get("retroachievements.hardcore", "")
@@ -195,7 +197,10 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
         password = system.config.get("retroachievements.password", "")
         login_cmd = f"dorequest.php?r=login&u={username}&p={password}"
         try:
-            res = get("https://retroachievements.org/" + login_cmd, headers={"Content-type": "text/plain", "User-Agent": "REG-linux"})
+            res = get(
+                "https://retroachievements.org/" + login_cmd,
+                headers={"Content-type": "text/plain", "User-Agent": "REG-linux"},
+            )
             if res.status_code != 200:
                 eslog.warning(
                     f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]"
@@ -288,9 +293,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
                                         "EmuCore/GS", "Adapter", "(Default)"
                                     )
                             except CalledProcessError as e:
-                                eslog.debug(
-                                    f"Error getting discrete GPU Name: {e}"
-                                )
+                                eslog.debug(f"Error getting discrete GPU Name: {e}")
                                 pcsx2INIConfig.set("EmuCore/GS", "Adapter", "(Default)")
                         else:
                             eslog.debug(

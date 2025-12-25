@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 from logging.handlers import RotatingFileHandler
+from typing import Any
 
 
 class MaxLevelFilter(logging.Filter):
@@ -20,12 +21,12 @@ class LoggerManager:
 
     _instances = {}
 
-    def __new__(cls, module_name: str):
+    def __new__(cls, module_name: str) -> "LoggerManager":
         if module_name not in cls._instances:
             cls._instances[module_name] = super().__new__(cls)
         return cls._instances[module_name]
 
-    def __init__(self, module_name: str):
+    def __init__(self, module_name: str) -> None:
         self.module_name = module_name
         self.logger = logging.getLogger(module_name)
         # Prevent duplicate initialization
@@ -152,7 +153,7 @@ def set_global_log_level(level: int):
     logging.getLogger().setLevel(level)
 
 
-def add_log_context(logger: logging.Logger, **context) -> logging.LoggerAdapter:
+def add_log_context(logger: logging.Logger, **context: Any):
     """
     Add contextual information to a logger.
 

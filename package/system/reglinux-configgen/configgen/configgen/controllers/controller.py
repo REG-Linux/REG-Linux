@@ -4,7 +4,7 @@ Provides functionality to generate SDL game controller configuration strings.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from configgen.utils.logger import get_logger
 
@@ -76,7 +76,9 @@ class Input:
             # Additional hat metadata could be stored here if needed
         )
 
-    def sdl_to_linux_input_event(self, guide_equal_back) -> dict[str, Any] | None:
+    def sdl_to_linux_input_event(
+        self, guide_equal_back: bool
+    ) -> Optional[Dict[str, Any]]:
         """
         Converts SDL input mapping to a Linux input event structure with complete metadata.
 
@@ -174,7 +176,7 @@ def _generate_sdl_controller_config(controller: Controller) -> str:
     return ",".join(config)
 
 
-def generate_sdl_controller_config(controllers: dict) -> str:
+def generate_sdl_controller_config(controllers: Dict[str, Any]) -> str:
     """
     Generate SDL game controller configuration for multiple controllers.
 

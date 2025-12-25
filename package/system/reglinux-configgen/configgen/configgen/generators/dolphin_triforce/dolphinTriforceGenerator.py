@@ -1,6 +1,7 @@
 import configparser
 import os.path
 from os import environ
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -10,12 +11,19 @@ from . import dolphinTriforceConfig, dolphinTriforceControllers
 
 class DolphinTriforceGenerator(Generator):
     # this emulator/core requires X server to run
-    def requiresX11(self):
+    def requiresX11(self) -> bool:
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, int],
+    ) -> Command:
         if not os.path.exists(
             os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)
         ):
@@ -569,11 +577,17 @@ $SeatLoopPatch
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         if "dolphin_aspect_ratio" in config:
-            if config["dolphin_aspect_ratio"] == "1" or config["dolphin_aspect_ratio"] == "3" and (
-                game_resolution["width"] / float(game_resolution["height"])
-                > ((16.0 / 9.0) - 0.1)
+            if (
+                config["dolphin_aspect_ratio"] == "1"
+                or config["dolphin_aspect_ratio"] == "3"
+                and (
+                    game_resolution["width"] / float(game_resolution["height"])
+                    > ((16.0 / 9.0) - 0.1)
+                )
             ):
                 return 16 / 9
         return 4 / 3

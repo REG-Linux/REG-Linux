@@ -1,4 +1,5 @@
 from os import environ
+from typing import Any
 
 from configgen.systemFiles import CONF
 
@@ -8,7 +9,7 @@ DRASTIC_CONFIG_PATH = DRASTIC_CONFIG_DIR_USER + "/config/drastic.cfg"
 DRASTIC_BIN_PATH = "/usr/bin/drastic"
 
 
-def setDrasticConfig(drasticConfig, system):
+def setDrasticConfig(drasticConfig: Any, system: Any) -> None:
     # Getting Values from ES
     if system.isOptSet("drastic_hires") and system.config["drastic_hires"] == "1":
         esvaluedrastichires = 1

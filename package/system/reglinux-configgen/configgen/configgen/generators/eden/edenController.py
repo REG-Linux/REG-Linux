@@ -1,3 +1,5 @@
+from typing import Any
+
 # pads
 edenButtonsMapping = {
     "button_a": "a",
@@ -24,7 +26,7 @@ edenButtonsMapping = {
 edenAxisMapping = {"lstick": "joystick1", "rstick": "joystick2"}
 
 
-def setEdenControllers(edenConfig, system, playersControllers):
+def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) -> None:
     # controllers
     nplayer = 1
     for _, pad in sorted(playersControllers.items()):
@@ -36,9 +38,7 @@ def setEdenControllers(edenConfig, system, playersControllers):
             )
         else:
             edenConfig.set("Controls", f"player_{nplayer - 1}_type", 0)
-        edenConfig.set(
-            "Controls", f"player_{nplayer - 1}_type\\default", "false"
-        )
+        edenConfig.set("Controls", f"player_{nplayer - 1}_type\\default", "false")
 
         for x in edenButtonsMapping:
             edenConfig.set(
@@ -85,15 +85,15 @@ def setEdenControllers(edenConfig, system, playersControllers):
 
 
 @staticmethod
-def setButton(key, padGuid, padInputs, port):
+def setButton(key: str, padGuid: str, padInputs: Any, port: int) -> str:
     # it would be better to pass the joystick num instead of the guid because 2 joysticks may have the same guid
     if key in padInputs:
         input = padInputs[key]
 
         if input.type == "button":
-            return (f"engine:sdl,button:{input.id},guid:{padGuid},port:{port}")
+            return f"engine:sdl,button:{input.id},guid:{padGuid},port:{port}"
         elif input.type == "hat":
-            return (f"engine:sdl,hat:{input.id},direction:{hatdirectionvalue(input.value)},guid:{padGuid},port:{port}")
+            return f"engine:sdl,hat:{input.id},direction:{hatdirectionvalue(input.value)},guid:{padGuid},port:{port}"
         elif input.type == "axis":
             return ("engine:sdl,threshold:{},axis:{},guid:{},port:{},invert:{}").format(
                 0.5, input.id, padGuid, port, "+"
@@ -102,7 +102,7 @@ def setButton(key, padGuid, padInputs, port):
 
 
 @staticmethod
-def setAxis(key, padGuid, padInputs, port):
+def setAxis(key: str, padGuid: str, padInputs: Any, port: int) -> str:
     inputx = "0"
     inputy = "0"
 
@@ -115,13 +115,11 @@ def setAxis(key, padGuid, padInputs, port):
         inputy = padInputs["joystick1up"]
     elif key == "joystick2" and "joystick2up" in padInputs:
         inputy = padInputs["joystick2up"]
-    return (
-        f"engine:sdl,range:1.000000,deadzone:0.100000,invert_y:+,invert_x:+,offset_y:-0.000000,axis_y:{inputy},offset_x:-0.000000,axis_x:{inputx},guid:{padGuid},port:{port}"
-    )
+    return f"engine:sdl,range:1.000000,deadzone:0.100000,invert_y:+,invert_x:+,offset_y:-0.000000,axis_y:{inputy},offset_x:-0.000000,axis_x:{inputx},guid:{padGuid},port:{port}"
 
 
 @staticmethod
-def hatdirectionvalue(value):
+def hatdirectionvalue(value: str) -> str:
     if int(value) == 1:
         return "dpup"
     if int(value) == 4:

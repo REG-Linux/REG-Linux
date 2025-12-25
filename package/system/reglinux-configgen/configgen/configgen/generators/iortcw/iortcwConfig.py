@@ -1,4 +1,5 @@
 from os import path
+from typing import Any, Dict
 
 from configgen.systemFiles import ROMS
 
@@ -6,7 +7,7 @@ IORTCW_CONFIG_PATH = ROMS + "/iortcw/main/wolfconfig.cfg"
 IORTCW_BIN_PATH = "/usr/bin/iortcw/iowolfsp"
 
 
-def setIortcwConfig(system, gameResolution):
+def setIortcwConfig(system: Any, gameResolution: Dict[str, int]) -> None:
     # Define the options to add or modify
     options_to_set = {
         "seta r_mode": "-1",

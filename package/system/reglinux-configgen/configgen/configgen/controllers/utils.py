@@ -1,8 +1,9 @@
 import re
 from os import path
+from typing import Any
 
 
-def shortNameFromPath(path_name):
+def shortNameFromPath(path_name: str) -> str:
     redname = path.splitext(path.basename(path_name))[0].lower()
     inpar = False
     inblock = False
@@ -23,7 +24,7 @@ def shortNameFromPath(path_name):
     return ret
 
 
-def dev2int(dev):
+def dev2int(dev: str) -> Any:
     matches = re.match(r"^/dev/input/event([0-9]*)$", dev)
     if matches is None:
         return None

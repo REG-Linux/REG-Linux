@@ -2,27 +2,29 @@ from os import listdir, makedirs, path
 from shutil import copyfile, copytree
 
 
-def precalibration_copyFile(src, dst):
+def precalibration_copyFile(src: str, dst: str) -> None:
     if path.exists(src) and not path.exists(dst):
         if not path.exists(path.dirname(dst)):
             makedirs(path.dirname(dst))
         copyfile(src, dst)
 
 
-def precalibration_copyDir(src, dst):
+def precalibration_copyDir(src: str, dst: str) -> None:
     if path.exists(src) and not path.exists(dst):
         if not path.exists(path.dirname(dst)):
             makedirs(path.dirname(dst))
         copytree(src, dst)
 
 
-def precalibration_copyFilesInDir(srcdir, dstdir, startWith, endWith):
+def precalibration_copyFilesInDir(
+    srcdir: str, dstdir: str, startWith: str, endWith: str
+) -> None:
     for src in listdir(srcdir):
         if src.startswith(startWith):  # and src.endswith(endswith):
             precalibration_copyFile(srcdir + "/" + src, dstdir + "/" + src)
 
 
-def precalibration(systemName, emulator, core, rom):
+def precalibration(systemName: str, emulator: str, core: str, rom: str) -> None:
     dir = f"/usr/share/reglinux/guns-precalibrations/{systemName}"
     if not path.exists(dir):
         return

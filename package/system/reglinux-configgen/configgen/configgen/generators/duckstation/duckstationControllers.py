@@ -1,6 +1,13 @@
+from typing import Any
+
+
 def setDuckstationControllers(
-    duckstatonConfig, system, metadata, guns, playersControllers
-):
+    duckstatonConfig: Any,
+    system: Any,
+    metadata: Any,
+    guns: Any,
+    playersControllers: Any,
+) -> None:
     ## [ControllerPorts]
     if not duckstatonConfig.has_section("ControllerPorts"):
         duckstatonConfig.add_section("ControllerPorts")

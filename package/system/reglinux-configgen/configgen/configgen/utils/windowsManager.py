@@ -9,6 +9,7 @@ and proper environment variable configuration for both Wayland and X11 compatibi
 from os import environ, path
 from subprocess import Popen, TimeoutExpired, run
 from time import sleep
+from typing import Any
 
 from configgen.utils.logger import get_logger
 
@@ -39,7 +40,7 @@ class WindowManager:
         self.gamescope_launched = False  # Reserved for future Gamescope implementation
         self._initialized = True
 
-    def start_sway(self, generator, system) -> bool:
+    def start_sway(self, generator: Any, system: Any) -> bool:
         """
         Starts the Sway compositor and configures the environment for Wayland/X11.
 
@@ -122,7 +123,7 @@ class WindowManager:
                 self.sway_process.terminate()
             return False
 
-    def stop_sway(self, generator, system) -> bool:
+    def stop_sway(self, generator: Any, system: Any) -> bool:
         """
         Gracefully stops the Sway compositor and cleans up the environment.
 
@@ -179,7 +180,7 @@ class WindowManager:
             return False
 
 
-def start_compositor(generator, system) -> None:
+def start_compositor(generator: Any, system: Any) -> None:
     """
     Starts the appropriate compositor based on system availability.
 
@@ -203,7 +204,7 @@ def start_compositor(generator, system) -> None:
     raise RuntimeError("No supported compositor found on this system")
 
 
-def stop_compositor(generator, system) -> None:
+def stop_compositor(generator: Any, system: Any) -> None:
     """
     Stops the currently running compositor.
 

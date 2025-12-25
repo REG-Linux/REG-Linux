@@ -1,5 +1,6 @@
 from os import environ
 from subprocess import PIPE, CalledProcessError, check_output, run
+from typing import Any
 
 from configgen.systemFiles import BIOS, CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
@@ -15,7 +16,7 @@ CEMU_SAVES_DIR = SAVES + "/wiiu"
 CEMU_BIN_PATH = "/usr/bin/cemu/cemu"
 
 
-def setCemuConfig(cemuConfig, system):
+def setCemuConfig(cemuConfig: Any, system: Any) -> None:
     # [ROOT]
     xml_root = getRoot(cemuConfig, "content")
     # Default mlc path
@@ -246,14 +247,14 @@ def setCemuConfig(cemuConfig, system):
 
 
 # Show mouse for touchscreen actions
-def getMouseMode(config, rom):
+def getMouseMode(config: Any, rom: str) -> bool:
     if "cemu_touchpad" in config and config["cemu_touchpad"] == "1":
         return True
     else:
         return False
 
 
-def getRoot(config, name):
+def getRoot(config: Any, name: str):
     xml_section = config.getElementsByTagName(name)
 
     if len(xml_section) == 0:
@@ -265,7 +266,7 @@ def getRoot(config, name):
     return xml_section
 
 
-def setSectionConfig(config, xml_section, name, value):
+def setSectionConfig(config: Any, xml_section: Any, name: str, value: str) -> None:
     xml_elt = xml_section.getElementsByTagName(name)
     if len(xml_elt) == 0:
         xml_elt = config.createElement(name)
@@ -287,7 +288,7 @@ def getLangFromEnvironment():
         return "en_US"
 
 
-def getCemuLang(lang):
+def getCemuLang(lang: str) -> int:
     availableLanguages = {
         "ja_JP": 0,
         "en_US": 1,

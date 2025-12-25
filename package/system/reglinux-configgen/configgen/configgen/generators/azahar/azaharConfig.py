@@ -1,5 +1,6 @@
 from os import environ
 from subprocess import CalledProcessError, check_output
+from typing import Any
 
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
@@ -42,7 +43,7 @@ def getAzaharLangFromEnvironment():
     return region.get(availableLanguages.get(lang, "AUTO"), -1)
 
 
-def setAzaharConfig(azaharConfig, system):
+def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
     # [LAYOUT]
     if "Layout" not in azaharConfig:
         azaharConfig["Layout"] = {}

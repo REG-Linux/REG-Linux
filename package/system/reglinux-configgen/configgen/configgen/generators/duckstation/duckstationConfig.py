@@ -1,4 +1,5 @@
 from os import environ, path
+from typing import Any
 
 from configgen.systemFiles import BIOS, CHEATS, CONF, ROMS, SAVES, SCREENSHOTS
 
@@ -12,7 +13,9 @@ DUCKSTATION_BIN_PATH = "/usr/duckstation/DuckStation.AppImage"
 DUCKSTATION_NOGUI_PATH = "/usr/bin/duckstation-nogui"
 
 
-def setDuckstationConfig(duckstatonConfig, system, playersControllers):
+def setDuckstationConfig(
+    duckstatonConfig: Any, system: Any, playersControllers: Any
+) -> None:
     ## [Main]
     if not duckstatonConfig.has_section("Main"):
         duckstatonConfig.add_section("Main")
@@ -367,9 +370,8 @@ def setDuckstationConfig(duckstatonConfig, system, playersControllers):
     if not duckstatonConfig.has_section("Cheevos"):
         duckstatonConfig.add_section("Cheevos")
     # RetroAchievements
-    if (
-        system.isOptSet("retroachievements")
-        and system.getOptBoolean("retroachievements")
+    if system.isOptSet("retroachievements") and system.getOptBoolean(
+        "retroachievements"
     ):
         username = system.config.get("retroachievements.username", "")
         hardcore = system.config.get("retroachievements.hardcore", "")

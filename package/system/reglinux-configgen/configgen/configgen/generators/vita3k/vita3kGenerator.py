@@ -6,9 +6,12 @@ from configgen.generators.Generator import Generator
 try:
     from ruamel.yaml import YAML
 except ImportError:
-    print("ruamel.yaml module not found. Please install it with: pip install ruamel.yaml")
+    print(
+        "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml"
+    )
     raise
 from shutil import move
+from typing import Any, Dict
 
 from configgen.controllers import generate_sdl_controller_config
 from configgen.systemFiles import CONF, SAVES
@@ -80,17 +83,13 @@ class Vita3kGenerator(Generator):
         else:
             vita3kymlconfig["resolution-multiplier"] = 1
         # Set FXAA
-        if (
-            system.isOptSet("vita3k_fxaa")
-            and system.getOptBoolean("vita3k_surface")
-        ):
+        if system.isOptSet("vita3k_fxaa") and system.getOptBoolean("vita3k_surface"):
             vita3kymlconfig["enable-fxaa"] = "true"
         else:
             vita3kymlconfig["enable-fxaa"] = "false"
         # Set VSync
-        if (
-            system.isOptSet("vita3k_vsync")
-            and not system.getOptBoolean("vita3k_surface")
+        if system.isOptSet("vita3k_vsync") and not system.getOptBoolean(
+            "vita3k_surface"
         ):
             vita3kymlconfig["v-sync"] = "false"
         else:
@@ -103,17 +102,13 @@ class Vita3kGenerator(Generator):
         else:
             vita3kymlconfig["anisotropic-filtering"] = 1
         # Set the linear filtering option
-        if (
-            system.isOptSet("vita3k_linear")
-            and system.getOptBoolean("vita3k_surface")
-        ):
+        if system.isOptSet("vita3k_linear") and system.getOptBoolean("vita3k_surface"):
             vita3kymlconfig["enable-linear-filter"] = "true"
         else:
             vita3kymlconfig["enable-linear-filter"] = "false"
         # Surface Sync
-        if (
-            system.isOptSet("vita3k_surface")
-            and not system.getOptBoolean("vita3k_surface")
+        if system.isOptSet("vita3k_surface") and not system.getOptBoolean(
+            "vita3k_surface"
         ):
             vita3kymlconfig["disable-surface-sync"] = "false"
         else:
@@ -174,5 +169,7 @@ class Vita3kGenerator(Generator):
         else:
             return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

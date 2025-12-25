@@ -5,6 +5,7 @@ from csv import reader
 from os import linesep, listdir, makedirs, path, remove, symlink, unlink
 from pathlib import Path
 from shutil import copy2, rmtree
+from typing import Any, List
 from xml.dom import minidom
 from zipfile import ZipFile
 
@@ -41,7 +42,9 @@ retroPad = {
 }
 
 
-def generateMAMEConfigs(playersControllers, system, rom, guns):
+def generateMAMEConfigs(
+    playersControllers: Any, system: Any, rom: str, guns: Any
+) -> List[str]:
     # Generate command line for MAME
     commandLine = []
     romBasename = path.basename(rom)
@@ -321,7 +324,9 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                     if system.name == "fmtowns":
                         blankDisk = "/usr/share/mame/blank.fmtowns"
                         targetFolder = f"/userdata/saves/mame/{system.name}"
-                        targetDisk = f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
+                        targetDisk = (
+                            f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
+                        )
                         # Add elif statements here for other systems if enabled
                         if not path.exists(targetFolder):
                             makedirs(targetFolder)
@@ -439,7 +444,9 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
                             autoRunCmd = f'LOADM "{romDrivername}":EXEC\\n'
 
                 # check for a user override
-                autoRunFile = f"system/configs/mame/autoload/{system.name}_{romType}_autoload.csv"
+                autoRunFile = (
+                    f"system/configs/mame/autoload/{system.name}_{romType}_autoload.csv"
+                )
                 if path.exists(autoRunFile):
                     openARFile = open(autoRunFile, "r")
                     with openARFile:
@@ -575,8 +582,16 @@ def generateMAMEConfigs(playersControllers, system, rom, guns):
             guns,
         )
 
+    return commandLine
 
-def prepSoftwareList(subdirSoftList, softList, softDir, hashDir, romDirname):
+
+def prepSoftwareList(
+    subdirSoftList: List[str],
+    softList: str,
+    softDir: str,
+    hashDir: str,
+    romDirname: str,
+) -> None:
     if not path.exists(softDir):
         makedirs(softDir)
     # Check for/remove existing symlinks, remove hashfile folder
@@ -604,7 +619,7 @@ def prepSoftwareList(subdirSoftList, softList, softDir, hashDir, romDirname):
         symlink(romDirname, softDir + softList, True)
 
 
-def getMameControlScheme(system, romBasename):
+def getMameControlScheme(system: Any, romBasename: str) -> Any:
     # Game list files
     mameCapcom = "/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"
     mameKInstinct = "/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"
@@ -681,14 +696,14 @@ def getMameControlScheme(system, romBasename):
 
 
 def generateMAMEPadConfig(
-    cfgPath,
-    playersControllers,
-    system,
-    messSysName,
-    romBasename,
-    specialController,
-    guns,
-):
+    cfgPath: str,
+    playersControllers: Any,
+    system: Any,
+    messSysName: str,
+    romBasename: str,
+    specialController: str,
+    guns: Any,
+) -> None:
     # config file
     config = minidom.Document()
     configFile = cfgPath + "default.cfg"
@@ -1138,7 +1153,7 @@ def generateMAMEPadConfig(
         mameXml_alt.close()
 
 
-def reverseMapping(key):
+def reverseMapping(key: str) -> str:
     if key == "joystick1down":
         return "joystick1up"
     if key == "joystick1right":
@@ -1147,12 +1162,20 @@ def reverseMapping(key):
         return "joystick2up"
     if key == "joystick2right":
         return "joystick2left"
-    return None
+    return key  # Return the original key if no match is found
 
 
 def generatePortElement(
-    pad, config, nplayer, padindex, mapping, key, input, reversed, altButtons
-):
+    pad: Any,
+    config: Any,
+    nplayer: int,
+    padindex: int,
+    mapping: str,
+    key: str,
+    input: str,
+    reversed: Any,
+    altButtons: Any,
+) -> Any:
     # Generic input
     xml_port = config.createElement("port")
     xml_port.setAttribute("type", f"P{nplayer}_{mapping}")
@@ -1167,8 +1190,18 @@ def generatePortElement(
 
 
 def generateSpecialPortElement(
-    pad, config, tag, nplayer, padindex, mapping, key, input, reversed, mask, default
-):
+    pad: Any,
+    config: Any,
+    tag: str,
+    nplayer: int,
+    padindex: int,
+    mapping: str,
+    key: str,
+    input: str,
+    reversed: Any,
+    mask: str,
+    default: Any,
+) -> Any:
     # Special button input (ie mouse button to gamepad)
     xml_port = config.createElement("port")
     xml_port.setAttribute("tag", tag)
@@ -1186,8 +1219,18 @@ def generateSpecialPortElement(
 
 
 def generateComboPortElement(
-    pad, config, tag, padindex, mapping, kbkey, key, input, reversed, mask, default
-):
+    pad: Any,
+    config: Any,
+    tag: str,
+    padindex: int,
+    mapping: str,
+    kbkey: str,
+    key: str,
+    input: str,
+    reversed: Any,
+    mask: str,
+    default: Any,
+) -> Any:
     # Maps a keycode + button - for important keyboard keys when available
     xml_port = config.createElement("port")
     xml_port.setAttribute("tag", tag)
@@ -1206,22 +1249,22 @@ def generateComboPortElement(
 
 
 def generateAnalogPortElement(
-    pad,
-    config,
-    tag,
-    nplayer,
-    padindex,
-    mapping,
-    inckey,
-    deckey,
-    mappedinput,
-    mappedinput2,
-    reversed,
-    mask,
-    default,
-    delta,
-    axis="",
-):
+    pad: Any,
+    config: Any,
+    tag: str,
+    nplayer: int,
+    padindex: int,
+    mapping: str,
+    inckey: str,
+    deckey: str,
+    mappedinput: str,
+    mappedinput2: str,
+    reversed: Any,
+    mask: str,
+    default: Any,
+    delta: Any,
+    axis: str = "",
+) -> Any:
     # Mapping analog to digital (mouse, etc)
     xml_port = config.createElement("port")
     xml_port.setAttribute("tag", tag)
@@ -1254,7 +1297,15 @@ def generateAnalogPortElement(
     return xml_port
 
 
-def input2definition(pad, key, input, joycode, reversed, altButtons, ignoreAxis=False):
+def input2definition(
+    pad: Any,
+    key: str,
+    input: str,
+    joycode: Any,
+    reversed: Any,
+    altButtons: Any,
+    ignoreAxis: bool = False,
+) -> str:
     if (
         input.find("BUTTON") != -1
         or input.find("HAT") != -1
@@ -1288,6 +1339,8 @@ def input2definition(pad, key, input, joycode, reversed, altButtons, ignoreAxis=
                 return f"JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
             elif key == "joystick1right" or key == "right":
                 return f"JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
+            else:
+                return f"JOYCODE_{joycode}_{input}"
         else:
             if key == "joystick1up" or key == "up":
                 return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
@@ -1311,7 +1364,7 @@ def input2definition(pad, key, input, joycode, reversed, altButtons, ignoreAxis=
         return "unknown"
 
 
-def getRoot(config, name):
+def getRoot(config: Any, name: str) -> Any:
     xml_section = config.getElementsByTagName(name)
 
     if len(xml_section) == 0:
@@ -1323,7 +1376,7 @@ def getRoot(config, name):
     return xml_section
 
 
-def getSection(config, xml_root, name):
+def getSection(config: Any, xml_root: Any, name: str) -> Any:
     xml_section = xml_root.getElementsByTagName(name)
 
     if len(xml_section) == 0:
@@ -1335,7 +1388,7 @@ def getSection(config, xml_root, name):
     return xml_section
 
 
-def removeSection(config, xml_root, name):
+def removeSection(config: Any, xml_root: Any, name: str) -> None:
     xml_section = xml_root.getElementsByTagName(name)
 
     for i in range(0, len(xml_section)):

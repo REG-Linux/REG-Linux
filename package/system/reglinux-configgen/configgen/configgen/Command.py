@@ -4,9 +4,7 @@ from collections.abc import Mapping
 class Command:
     """Represents a shell command with environment variables and arguments."""
 
-    def __init__(
-        self, array: list[str], env: Mapping[str, str] | None = None
-    ) -> None:
+    def __init__(self, array: list[str], env: Mapping[str, str] | None = None) -> None:
         """
         Initialize a Command instance.
 

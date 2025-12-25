@@ -1,5 +1,6 @@
 from configgen.settings import UnixSettings
 from configgen.systemFiles import BIOS, CONF, LOGDIR, SAVES, SCREENSHOTS
+from typing import Any
 
 AMIBERRY_CONFIG_DIR = CONF + "/amiberry"
 AMIBERRY_BIOS_DIR = BIOS + "/amiga"
@@ -11,7 +12,7 @@ AMIBERRY_CONFIG_PATH = AMIBERRY_CONFIG_DIR + "/conf/amiberry.conf"
 AMIBERRY_BIN_PATH = "/usr/bin/amiberry"
 
 
-def setAmiberryConfig(system):
+def setAmiberryConfig(system: Any) -> None:
     amiberryConfig = UnixSettings(AMIBERRY_CONFIG_PATH)
 
     amiberryConfig.save("default_quit_key", "Escape")

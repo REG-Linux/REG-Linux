@@ -3,6 +3,7 @@ import configparser
 import glob
 import os
 import re
+from typing import Any, Dict, Optional
 
 from configgen.utils.logger import get_logger
 
@@ -12,14 +13,16 @@ eslog = get_logger(__name__)
 
 
 # Create the controller configuration file
-def generateControllerConfig(system, playersControllers, rom):
+def generateControllerConfig(system: Any, playersControllers: Any, rom: str) -> None:
     generateHotkeys(playersControllers)
     generateControllerConfig_gamecube(
         system, playersControllers, rom
     )  # Pass ROM name to allow for per ROM configuration
 
 
-def generateControllerConfig_gamecube(system, playersControllers, rom):
+def generateControllerConfig_gamecube(
+    system: Any, playersControllers: Any, rom: str
+) -> None:
     # Exclude Buttons/Y from mapping as that just resets the system. Buttons/Z is used to insert credit. Therefore it is set to Select.
     gamecubeMapping = {
         "y": "Buttons/B",
@@ -87,7 +90,7 @@ def removeControllerConfig_gamecube():
         os.remove(configFileName)
 
 
-def generateHotkeys(playersControllers):
+def generateHotkeys(playersControllers: Any) -> None:
     configFileName = "{}/{}".format(
         dolphinTriforceConfig.dolphinTriforceConfig, "Config/Hotkeys.ini"
     )
@@ -156,15 +159,15 @@ def generateHotkeys(playersControllers):
 
 
 def generateControllerConfig_any(
-    system,
-    playersControllers,
-    filename,
-    anyDefKey,
-    anyMapping,
-    anyReverseAxes,
-    anyReplacements,
-    extraOptions={},
-):
+    system: Any,
+    playersControllers: Any,
+    filename: str,
+    anyDefKey: str,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+    anyReplacements: Any,
+    extraOptions: Dict[str, Any] = {},
+) -> None:
     configFileName = f"{dolphinTriforceConfig.dolphinTriforceConfig}/{filename}"
     f = codecs.open(configFileName, "w", encoding="utf_8")
     nplayer = 1
@@ -184,9 +187,8 @@ def generateControllerConfig_any(
         f.write("[" + anyDefKey + str(nplayer) + "]" + "\n")
         f.write("Device = SDL/" + str(nsamepad).strip() + "/" + pad.name.strip() + "\n")
 
-        if (
-            system.isOptSet("use_pad_profiles")
-            and system.getOptBoolean("use_pad_profiles")
+        if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
+            "use_pad_profiles"
         ):
             if not generateControllerConfig_any_from_profiles(f, pad):
                 generateControllerConfig_any_auto(
@@ -215,8 +217,14 @@ def generateControllerConfig_any(
 
 
 def generateControllerConfig_any_auto(
-    f, pad, anyMapping, anyReverseAxes, anyReplacements, extraOptions, system
-):
+    f: Any,
+    pad: Any,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+    anyReplacements: Any,
+    extraOptions: Any,
+    system: Any,
+) -> None:
     for opt in extraOptions:
         f.write(opt + " = " + extraOptions[opt] + "\n")
 
@@ -288,7 +296,7 @@ def generateControllerConfig_any_auto(
             f.write("Rumble/Motor = Weak\n")
 
 
-def generateControllerConfig_any_from_profiles(f, pad):
+def generateControllerConfig_any_from_profiles(f: Any, pad: Any) -> bool:
     for profileFile in glob.glob(
         "/userdata/system/configs/dolphin-triforce/Config/Profiles/GCPad/*.ini"
     ):
@@ -319,8 +327,15 @@ def generateControllerConfig_any_from_profiles(f, pad):
 
 
 def write_key(
-    f, keyname, input_type, input_id, input_value, input_global_id, reverse, hotkey_id
-):
+    f: Any,
+    keyname: str,
+    input_type: str,
+    input_id: str,
+    input_value: str,
+    input_global_id: str,
+    reverse: bool,
+    hotkey_id: Optional[str],
+) -> None:
     f.write(keyname + " = ")
     if hotkey_id is not None:
         f.write("`Button " + str(hotkey_id) + "` & ")

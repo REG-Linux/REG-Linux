@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from codecs import open
 from csv import reader
 from os import linesep, path
-from typing import Any
+from typing import Any, Dict
 from xml.dom import minidom
 from xml.dom.minidom import Document, parse
 
@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 def generatePadsConfig(
     cfgPath: str,
-    playersControllers: dict,
+    playersControllers: Dict[str, Any],
     sysName: str,
     altButtons: str,
     customCfg: bool,
@@ -22,7 +22,7 @@ def generatePadsConfig(
     useGuns: bool,
     guns: Any,
     useWheels: bool,
-    wheels: dict,
+    wheels: Dict[str, Any],
     useMouse: bool,
     multiMouse: bool,
     system: Any,
@@ -379,10 +379,10 @@ def _enable_bbc_keyboard(config_alt: minidom.Document, xml_input_alt: Any):
 def _process_players_controllers(
     config: Document,
     xml_input: Any,
-    players_controllers: dict,
+    players_controllers: Dict[str, Any],
     mappings: dict[str, str],
     use_wheels: bool,
-    wheels: dict,
+    wheels: Dict[str, Any],
     gunmappings: dict[str, str],
     mousemappings: dict[str, str],
     multi_mouse: bool,
@@ -393,7 +393,7 @@ def _process_players_controllers(
     config_alt: minidom.Document | None,
     xml_input_alt: Any,
     use_controls: str,
-):
+) -> None:
     """Process configuration for each player's controller."""
     for nplayer, pad in enumerate(sorted(players_controllers.items()), start=1):
         _, pad = pad  # Extract the pad from the tuple
@@ -454,7 +454,11 @@ def _process_players_controllers(
 
 
 def _check_wheel_mapping(
-    pad: Any, nplayer: int, use_wheels: bool, wheels: dict, mappings_use: dict[str, str]
+    pad: Any,
+    nplayer: int,
+    use_wheels: bool,
+    wheels: Dict[str, Any],
+    mappings_use: dict[str, str],
 ) -> bool:
     """
     Check if the pad has a wheel and update mappings accordingly.
@@ -747,11 +751,11 @@ def _process_special_controller_mappings(
 def _configure_additional_guns(
     config: Document,
     xml_input: Any,
-    players_controllers: dict,
+    players_controllers: Dict[str, Any],
     guns: Any,
     gunmappings: dict[str, str],
     system: Any,
-):
+) -> None:
     """Configure additional guns beyond the number of controllers."""
     for gunnum in range(len(players_controllers) + 1, len(guns) + 1):
         pedalkey = _get_pedal_key(gunnum, system)

@@ -1,6 +1,7 @@
 from configparser import ConfigParser, DuplicateOptionError
 from os import makedirs, path, rename
 from shutil import copy
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -104,5 +105,7 @@ class VPinballGenerator(Generator):
             },
         )
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

@@ -1,9 +1,11 @@
+from typing import Any, Dict, Optional
+
 from pyudev import Context
 
 from .utils import dev2int
 
 
-def getDevicesInformation():
+def getDevicesInformation() -> Dict[str, Any]:
     groups = {}
     devices = {}
     context = Context()
@@ -81,7 +83,9 @@ def getDevicesInformation():
     return res
 
 
-def getAssociatedMouse(devicesInformation, dev):
+def getAssociatedMouse(
+    devicesInformation: Dict[str, Any], dev: str
+) -> Optional[Dict[str, Any]]:
     if (
         dev not in devicesInformation
         or devicesInformation[dev]["associatedDevices"] is None

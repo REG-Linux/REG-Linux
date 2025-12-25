@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import Any
 
 from configgen.utils.logger import get_logger
 
@@ -23,7 +24,7 @@ eslog = get_logger(__name__)
 #        return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 
-def squashfs_begin(rom):
+def squashfs_begin(rom: str) -> tuple[bool, str | None, Any]:
     eslog.debug(f"squashfs_begin({rom})")
     rommountpoint = "/var/run/squashfs/" + os.path.basename(rom)[:-9]
 
@@ -63,7 +64,7 @@ def squashfs_begin(rom):
     return True, rommountpoint, rommountpoint
 
 
-def squashfs_end(rommountpoint):
+def squashfs_end(rommountpoint: str) -> bool:
     eslog.debug(f"squashfs_end({rommountpoint})")
 
     # umount
@@ -74,3 +75,4 @@ def squashfs_end(rommountpoint):
 
     # cleaning the empty directory
     os.rmdir(rommountpoint)
+    return True

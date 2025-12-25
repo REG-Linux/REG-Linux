@@ -2,6 +2,7 @@ from filecmp import cmp
 from json import dump, dumps, load
 from os import chmod, environ, makedirs, path
 from shutil import copyfile
+from typing import Any
 
 from evdev import InputDevice, list_devices
 
@@ -218,7 +219,9 @@ class RyujinxGenerator(Generator):
         return Command(array=command_array)
 
 
-def writeControllerIntoJson(new_controller, filename=RYUJINX_CONFIG_PATH):
+def writeControllerIntoJson(
+    new_controller: Any, filename: str = RYUJINX_CONFIG_PATH
+) -> None:
     with open(filename, "r+") as file:
         file_data = load(file)
         file_data["input_config"].append(new_controller)
