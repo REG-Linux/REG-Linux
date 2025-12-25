@@ -40,7 +40,7 @@ venv = ".venv"
 
 reportMissingImports = "warning"
 
-# reportUnknownParameterType = true
+reportUnknownParameterType = true
 # reportUnknownVariableType = true
 # reportUnknownMemberType = true
 

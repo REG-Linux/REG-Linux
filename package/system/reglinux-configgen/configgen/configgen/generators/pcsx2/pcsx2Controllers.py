@@ -1,7 +1,9 @@
+from typing import Any
+
 wheelTypeMapping = {"DrivingForce": "0", "DrivingForcePro": "1", "GTForce": "3"}
 
 
-def isPlayingWithWheel(system, wheels):
+def isPlayingWithWheel(system: Any, wheels: Any) -> bool:
     return (
         system.isOptSet("use_wheels")
         and system.getOptBoolean("use_wheels")
@@ -9,14 +11,14 @@ def isPlayingWithWheel(system, wheels):
     )
 
 
-def useEmulatorWheels(playingWithWheel, wheel_type):
+def useEmulatorWheels(playingWithWheel: Any, wheel_type: str) -> bool:
     if playingWithWheel is False:
         return False
     # the virtual type is the virtual wheel that use a physical wheel to manipulate the pad
     return wheel_type != "Virtual"
 
 
-def getWheelType(metadata, playingWithWheel, config):
+def getWheelType(metadata: Any, playingWithWheel: Any, config: Any) -> str:
     wheel_type = "Virtual"
     if playingWithWheel is False:
         return wheel_type
@@ -29,7 +31,7 @@ def getWheelType(metadata, playingWithWheel, config):
     return wheel_type
 
 
-def input2wheel(input, reversedAxis=False):
+def input2wheel(input: Any, reversedAxis: bool = False) -> str:
     if input.type == "button":
         pcsx2_magic_button_offset = 21  # PCSX2/SDLInputSource.cpp : const u32 button = ev->button + std::size(s_sdl_button_names)
         return f"Button{int(input.id) + pcsx2_magic_button_offset}"
@@ -52,3 +54,4 @@ def input2wheel(input, reversedAxis=False):
         if reversedAxis:
             dir = "+"
         return f"{dir}Axis{int(input.id) + pcsx2_magic_axis_offset}"
+    return "Unknown"  # Valor padrão para outros tipos de entrada

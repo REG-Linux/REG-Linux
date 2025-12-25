@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from os import makedirs, path
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -20,8 +21,15 @@ class TheForceEngineGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, int],
+    ) -> Command:
         # Check if the directories exist, if not create them
         if not path.exists(FORCE_CONFIG_DIR):
             makedirs(FORCE_CONFIG_DIR)
@@ -270,7 +278,9 @@ class TheForceEngineGenerator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         if "force_widescreen" in config and config["force_widescreen"] == "1":
             return 16 / 9
         return 4 / 3

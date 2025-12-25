@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from os import environ, makedirs, path
 from subprocess import CalledProcessError, check_output
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.controllers import gunsNeedCrosses
@@ -23,12 +24,19 @@ eslog = get_logger(__name__)
 class DolphinGenerator(Generator):
     # this emulator/core requires X server to run
     # TODO I think this is wrong and it can runs on wayland...
-    def requiresX11(self):
+    def requiresX11(self) -> bool:
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, int],
+    ) -> Command:
         if not path.exists(path.dirname(DOLPHIN_CONFIG_PATH)):
             makedirs(path.dirname(DOLPHIN_CONFIG_PATH))
 
@@ -602,7 +610,9 @@ class DolphinGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform = lambda optionstr: str(optionstr)

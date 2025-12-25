@@ -1,4 +1,5 @@
 from os import makedirs, path
+from typing import Any
 
 from .viceConfig import VICE_CONTROLLER_PATH
 
@@ -35,7 +36,7 @@ viceJoystick = {
 
 
 # Create the controller configuration file
-def setViceControllers(system, playersControllers):
+def setViceControllers(system: Any, playersControllers: Any) -> None:
     # vic20 uses a slightly different port
     if system.config["core"] == "xvic":
         joy_port = "0"

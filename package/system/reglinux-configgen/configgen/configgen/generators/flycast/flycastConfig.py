@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from configgen.systemFiles import BIOS, CONF, SAVES
 
 FLYCAST_CONFIG_DIR = CONF + "/flycast"
@@ -12,7 +14,9 @@ FLYCAST_VMU_A2_PATH = FLYCAST_SAVES_DIR + "/flycast/vmu_save_A2.bin"
 FLYCAST_BIN_PATH = "/usr/bin/flycast"
 
 
-def setFlycastConfig(flycastConfig, system, gameResolution):
+def setFlycastConfig(
+    flycastConfig: Any, system: Any, gameResolution: Dict[str, int]
+) -> None:
     if not flycastConfig.has_section("input"):
         flycastConfig.add_section("input")
 
@@ -189,7 +193,7 @@ def setFlycastConfig(flycastConfig, system, gameResolution):
             section_option = user_config[8:]
             section_option_splitter = section_option.find(".")
             custom_section = section_option[:section_option_splitter]
-            custom_option = section_option[section_option_splitter + 1:]
+            custom_option = section_option[section_option_splitter + 1 :]
             if not flycastConfig.has_section(custom_section):
                 flycastConfig.add_section(custom_section)
             flycastConfig.set(custom_section, custom_option, system.config[user_config])

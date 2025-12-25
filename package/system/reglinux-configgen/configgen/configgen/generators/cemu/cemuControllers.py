@@ -1,8 +1,9 @@
 from os import mkdir, path, remove
+from typing import Any
 from xml.etree.ElementTree import Element, ElementTree, SubElement, indent
 
 
-def setControllerConfig(system, playersControllers, profilesDir):
+def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) -> None:
     # -= Wii U controller types =-
     GAMEPAD = "Wii U GamePad"
     PRO = "Wii U Pro Controller"
@@ -114,22 +115,22 @@ def setControllerConfig(system, playersControllers, profilesDir):
         },
     }
 
-    def getOption(option, defaultValue):
+    def getOption(option: str, defaultValue: Any) -> Any:
         if system.isOptSet(option):
             return system.config[option]
         else:
             return defaultValue
 
-    def addTextElement(parent, name, value):
+    def addTextElement(parent: Any, name: str, value: str) -> Any:
         element = SubElement(parent, name)
         element.text = value
 
-    def addAnalogControl(parent, name):
+    def addAnalogControl(parent: Any, name: str) -> None:
         element = SubElement(parent, name)
         addTextElement(element, "deadzone", DEFAULT_DEADZONE)
         addTextElement(element, "range", DEFAULT_RANGE)
 
-    def getConfigFileName(controller):
+    def getConfigFileName(controller: Any) -> str:
         return path.join(profilesDir, f"controller{controller}.xml")
 
     # Make controller directory if it doesn't exist

@@ -2,6 +2,8 @@ from subprocess import CalledProcessError, check_output
 
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF, HOME_INIT
+from typing import Any
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -13,7 +15,7 @@ PPSSPP_CONTROLS_SOURCE_PATH = HOME_INIT + "configs/ppsspp/PSP/SYSTEM/controls.in
 PPSSPP_BIN_PATH = "/usr/bin/PPSSPP"
 
 
-def setPPSSPPConfig(system):
+def setPPSSPPConfig(system: Any) -> None:
     ppssppConfig = UnixSettings(PPSSPP_CONFIG_PATH)
 
     ## [GRAPHICS]
@@ -82,19 +84,15 @@ def setPPSSPPConfig(system):
     ppssppConfig.set("Graphics", "FrameSkipType", "0")  # Use number and not percent
     if system.isOptSet("frameskip") and not system.config["frameskip"] == "automatic":
         ppssppConfig.set("Graphics", "FrameSkip", str(system.config["frameskip"]))
-    elif (
-        system.isOptSet("rendering_mode")
-        and not system.getOptBoolean("rendering_mode")
+    elif system.isOptSet("rendering_mode") and not system.getOptBoolean(
+        "rendering_mode"
     ):
         ppssppConfig.set("Graphics", "FrameSkip", "0")
     else:
         ppssppConfig.set("Graphics", "FrameSkip", "2")
 
     # Buffered rendering
-    if (
-        system.isOptSet("rendering_mode")
-        and not system.getOptBoolean("rendering_mode")
-    ):
+    if system.isOptSet("rendering_mode") and not system.getOptBoolean("rendering_mode"):
         ppssppConfig.set("Graphics", "RenderingMode", "0")
         # Have to force autoframeskip off here otherwise PPSSPP sets rendering mode back to 1.
         ppssppConfig.set("Graphics", "AutoFrameSkip", "False")
@@ -111,19 +109,15 @@ def setPPSSPPConfig(system):
         else:
             ppssppConfig.set("Graphics", "InternalResolution", "1")
         # Auto frameskip
-        if (
-            system.isOptSet("autoframeskip")
-            and not system.getOptBoolean("autoframeskip")
+        if system.isOptSet("autoframeskip") and not system.getOptBoolean(
+            "autoframeskip"
         ):
             ppssppConfig.set("Graphics", "AutoFrameSkip", "False")
         else:
             ppssppConfig.set("Graphics", "AutoFrameSkip", "True")
 
     # VSync Interval
-    if (
-        system.isOptSet("vsyncinterval")
-        and not system.getOptBoolean("vsyncinterval")
-    ):
+    if system.isOptSet("vsyncinterval") and not system.getOptBoolean("vsyncinterval"):
         ppssppConfig.set("Graphics", "VSyncInterval", "False")
     else:
         ppssppConfig.set("Graphics", "VSyncInterval", "True")

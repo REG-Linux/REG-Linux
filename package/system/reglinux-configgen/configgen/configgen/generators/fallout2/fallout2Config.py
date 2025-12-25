@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from configgen.systemFiles import CONF, ROMS
 
 FALLOUT_CONFIG_DIR = CONF + "/fallout2"
@@ -10,7 +12,7 @@ FALLOUT_CONFIG_SOURCE_PATH = FALLOUT_ROMS_DIR + "/fallout2.cfg"
 FALLOUT_CONFIG_INI_SOURCE_PATH = FALLOUT_ROMS_DIR + "/f2_res.ini"
 
 
-def setFalloutConfig(falloutConfig, system):
+def setFalloutConfig(falloutConfig: Any, system: Any) -> None:
     if not falloutConfig.has_section("debug"):
         falloutConfig.add_section("debug")
     if not falloutConfig.has_section("preferences"):
@@ -61,7 +63,7 @@ def setFalloutConfig(falloutConfig, system):
         falloutConfig.set("system", "language", "english")
 
 
-def setFalloutIniConfig(falloutIniConfig, gameResolution):
+def setFalloutIniConfig(falloutIniConfig: Any, gameResolution: Dict[str, int]) -> None:
     # [MAIN]
     if not falloutIniConfig.has_section("MAIN"):
         falloutIniConfig.add_section("MAIN")

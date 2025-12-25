@@ -14,6 +14,7 @@ import os
 from json import dumps, load
 from os import path
 from subprocess import call
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from evdev import InputDevice
 
@@ -36,7 +37,14 @@ class Evmapy:
     __started = False
 
     @staticmethod
-    def start(system, emulator, core, rom, players_controllers, guns):
+    def start(
+        system: Any,
+        emulator: str,
+        core: str,
+        rom: str,
+        players_controllers: Dict[str, Any],
+        guns: Dict[str, Any],
+    ) -> None:
         """
         Start the evmapy process with the given configuration.
 
@@ -68,7 +76,14 @@ class Evmapy:
             call(["system-evmapy", "stop"])
 
     @staticmethod
-    def __prepare(system, emulator, core, rom, players_controllers, guns):
+    def __prepare(
+        system: Any,
+        emulator: str,
+        core: str,
+        rom: str,
+        players_controllers: Dict[str, Any],
+        guns: Dict[str, Any],
+    ) -> bool:
         """
         Prepare evmapy configuration files for the given system and controllers.
 
@@ -495,12 +510,12 @@ class Evmapy:
 
     @staticmethod
     def __trigger_mapper(
-        trigger,
-        known_buttons_alias,
-        known_buttons_names,
-        absbasex_positive,
-        absbasey_positive,
-    ):
+        trigger: str,
+        known_buttons_alias: Dict[str, str],
+        known_buttons_names: Dict[str, str],
+        absbasex_positive: int,
+        absbasey_positive: int,
+    ) -> Union[str, List[str]]:
         """
         Map evmapy trigger names to actual controller input names.
 
@@ -540,12 +555,12 @@ class Evmapy:
 
     @staticmethod
     def __trigger_mapper_string(
-        trigger,
-        known_buttons_alias,
-        known_buttons_names,
-        absbasex_positive,
-        absbasey_positive,
-    ):
+        trigger: str,
+        known_buttons_alias: Dict[str, str],
+        known_buttons_names: Dict[str, str],
+        absbasex_positive: int,
+        absbasey_positive: int,
+    ) -> str:
         """
         Map a single trigger string to the appropriate controller input name.
 
@@ -624,7 +639,7 @@ class Evmapy:
         return trigger  # Return unchanged if no mapping found
 
     @staticmethod
-    def __trigger_mapper_mode(trigger):
+    def __trigger_mapper_mode(trigger: str) -> Optional[str]:
         """
         Determine the appropriate mode for a trigger.
 
@@ -643,7 +658,7 @@ class Evmapy:
         return Evmapy.__trigger_mapper_mode_string(trigger)
 
     @staticmethod
-    def __trigger_mapper_mode_string(trigger):
+    def __trigger_mapper_mode_string(trigger: str) -> Optional[str]:
         """
         Determine the mode for a single trigger string.
 
@@ -662,7 +677,7 @@ class Evmapy:
         return None
 
     @staticmethod
-    def __getGunTrigger(trigger, gun):
+    def __getGunTrigger(trigger: str, gun: Dict[str, Any]) -> Any:
         """
         Validate that gun trigger(s) are available on the specified gun device.
 
@@ -686,7 +701,7 @@ class Evmapy:
             return trigger
 
     @staticmethod
-    def __getPadMinMaxAxis(devicePath, axisCode):
+    def __getPadMinMaxAxis(devicePath: str, axisCode: int) -> Tuple[int, int]:
         """
         Get the minimum and maximum values for a specific axis on a controller.
 
@@ -749,7 +764,7 @@ class Evmapy:
         return 0, 0  # Default values if axis not found
 
     @staticmethod
-    def __getPadMinMaxAxisForKeys(min_val, max_val):
+    def __getPadMinMaxAxisForKeys(min_val: int, max_val: int) -> Tuple[float, float]:
         """
         Calculate adjusted axis range for keyboard key simulation.
 

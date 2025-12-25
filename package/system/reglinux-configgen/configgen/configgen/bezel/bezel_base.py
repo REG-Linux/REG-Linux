@@ -4,7 +4,7 @@ Module that defines the interfaces and base classes for the bezel system in REG-
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from PIL import Image
 
@@ -36,7 +36,13 @@ class IBezelManager(ABC):
     """Interface for emulator-specific bezel managers."""
 
     @abstractmethod
-    def setup_bezels(self, system: 'Emulator', rom: str, game_resolution: dict[str, int], guns: list) -> None:
+    def setup_bezels(
+        self,
+        system: "Emulator",
+        rom: str,
+        game_resolution: Dict[str, int],
+        guns: List[Any],
+    ) -> None:
         """Configure the bezels for a specific game."""
         pass
 
@@ -45,7 +51,7 @@ class BezelUtils:
     """Utility class with helper functions for bezel manipulation."""
 
     @staticmethod
-    def generate_cache_key(*args) -> str:
+    def generate_cache_key(*args: Any) -> str:
         """
         Generate a unique cache key based on input parameters.
 
@@ -446,7 +452,7 @@ class BezelUtils:
                 raise
 
     @staticmethod
-    def tattoo_image(input_png: str, output_png: str, system: 'Emulator') -> None:
+    def tattoo_image(input_png: str, output_png: str, system: "Emulator") -> None:
         """
         Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
 
@@ -1039,7 +1045,7 @@ def padImage(
     )
 
 
-def tatooImage(input_png: str, output_png: str, system) -> None:
+def tatooImage(input_png: str, output_png: str, system: "Emulator") -> None:
     """
     Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
 
@@ -1155,7 +1161,7 @@ def gunsBorderSize(
     return BezelUtils.guns_border_size(w, h, innerBorderSizePer, outerBorderSizePer)
 
 
-def gunsBordersColorFomConfig(config: dict[str, str]) -> str:
+def gunsBordersColorFomConfig(config: Dict[str, str]) -> str:
     """
     Return hex color for gun borders from config string.
 

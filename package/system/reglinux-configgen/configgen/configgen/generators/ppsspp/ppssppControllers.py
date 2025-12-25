@@ -1,3 +1,5 @@
+from typing import Any
+
 from configgen.settings import UnixSettings
 
 from .ppssppConfig import PPSSPP_CONTROLS_SOURCE_PATH
@@ -117,7 +119,7 @@ ppssppMapping = {
 
 
 # Create the controller configuration file
-def setControllerConfig(controller):
+def setControllerConfig(controller: Any) -> None:
     ppssppControllers = UnixSettings(PPSSPP_CONTROLS_SOURCE_PATH)
 
     ppssppControllers.ensure_section("ControlMapping")
@@ -189,7 +191,7 @@ def setControllerConfig(controller):
     ppssppControllers.write()
 
 
-def axisToCode(axisId, direction):
+def axisToCode(axisId: int, direction: int) -> int:
     if direction < 0:
         direction = 1
     else:
@@ -198,7 +200,7 @@ def axisToCode(axisId, direction):
 
 
 # determine if the option already exists or not
-def optionValue(config, section, option, value):
+def optionValue(config: Any, section: str, option: str, value: str) -> str:
     if config.has_option(section, option):
         return f"{config.get(section, option)},{value}"
     else:

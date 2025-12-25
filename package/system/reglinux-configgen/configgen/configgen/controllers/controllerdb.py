@@ -5,7 +5,7 @@ Handles loading and matching controller configurations from gamecontrollerdb.txt
 
 import os
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from typing import Any, Dict, List
 
 from configgen.utils.logger import get_logger
 
@@ -43,8 +43,8 @@ def parse_line(line: str) -> tuple[str, dict[str, Any]] | None:
     }
 
 
-def _parse_chunk(lines):
-    chunk_result: dict[str, dict[str, Any]] = {}
+def _parse_chunk(lines: List[str]) -> Dict[str, Dict[str, Any]]:
+    chunk_result: Dict[str, Dict[str, Any]] = {}
     for line in lines:
         parsed = parse_line(line)
         if parsed is None:
@@ -86,7 +86,7 @@ def load_all_controllers_config() -> dict[str, dict[str, Any]]:
     return controllerdb
 
 
-def load_controller_config(controllersInput):
+def load_controller_config(controllersInput: List[Dict[str, str]]) -> Dict[str, Any]:
     """
     Generates player-specific controller objects using the known controller database.
 
@@ -102,7 +102,7 @@ def load_controller_config(controllersInput):
     for i, ci in enumerate(controllersInput):
         newController = _find_best_controller_config(
             controllers,
-            i,
+            str(i),
             ci["guid"],
             ci["devicepath"],
             ci["nbbuttons"],
@@ -114,7 +114,15 @@ def load_controller_config(controllersInput):
     return playerControllers
 
 
-def _find_best_controller_config(controllers, x, pxguid, pxdev, pxbtns, pxhats, pxaxes):
+def _find_best_controller_config(
+    controllers: Dict[str, Any],
+    x: str,
+    pxguid: str,
+    pxdev: str,
+    pxbtns: str,
+    pxhats: str,
+    pxaxes: str,
+) -> Any:
     """
     Finds the best controller match in the loaded database by GUID and returns a Controller instance.
 

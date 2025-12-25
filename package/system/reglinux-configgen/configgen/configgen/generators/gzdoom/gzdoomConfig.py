@@ -1,4 +1,5 @@
 from os import path
+from typing import Any
 
 from configgen.systemFiles import CONF, LOGDIR
 from configgen.utils.logger import get_logger
@@ -15,7 +16,7 @@ GZDOOM_ARCH_PATH = "/usr/share/reglinux/system.arch"
 eslog = get_logger(__name__)
 
 
-def setGzdoomConfig(system, rom):
+def setGzdoomConfig(system: Any, rom: str) -> None:
     if system.isOptSet("gz_api"):
         gzdoom_api = system.config["gz_api"]
     else:

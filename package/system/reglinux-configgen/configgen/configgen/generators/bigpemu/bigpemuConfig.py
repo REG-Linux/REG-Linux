@@ -1,3 +1,5 @@
+from typing import Any
+
 from configgen.systemFiles import HOME
 from configgen.utils.logger import get_logger
 from configgen.utils.videoMode import getRefreshRate
@@ -9,7 +11,9 @@ BIGPEMU_CONFIG_PATH = BIGPEMU_CONFIG_DIR + "/BigPEmuConfig.bigpcfg"
 BIGPEMU_BIN_PATH = "/usr/bigpemu/bigpemu"
 
 
-def setBigemuConfig(bigpemuConfig, system, gameResolution, playersControllers):
+def setBigemuConfig(
+    bigpemuConfig: Any, system: Any, gameResolution: Any, playersControllers: Any
+) -> None:
     # Ensure the necessary structure in the config
     if "BigPEmuConfig" not in bigpemuConfig:
         bigpemuConfig["BigPEmuConfig"] = {}
@@ -41,7 +45,7 @@ def setBigemuConfig(bigpemuConfig, system, gameResolution, playersControllers):
     bigpemuConfig["BigPEmuConfig"]["Video"]["LockAspect"] = 1
 
 
-def getInGameRatio(self, config, gameResolution, rom):
+def getInGameRatio(config: Any, gameResolution: Any, rom: str) -> float:
     if "bigpemu_ratio" in config:
         if config["bigpemu_ratio"] == "8":
             return 16 / 9

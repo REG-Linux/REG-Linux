@@ -1,5 +1,6 @@
 from os import environ
 from subprocess import CalledProcessError, check_output
+from typing import Any
 
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
@@ -11,7 +12,7 @@ EDEN_CONFIG_PATH = EDEN_CONFIG_DIR + "/qt-config.ini"
 EDEN_BIN_PATH = "/usr/bin/eden-cli"
 
 
-def setEdenConfig(edenConfig, system):
+def setEdenConfig(edenConfig: Any, system: Any) -> None:
     # UI section
     edenConfig.ensure_section("UI")
     edenConfig.set("UI", "fullscreen", "true")

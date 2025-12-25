@@ -14,6 +14,7 @@ except ImportError:
     )
     raise
 from subprocess import CalledProcessError, check_output
+from typing import Any, Dict
 
 from configgen.utils.logger import get_logger
 
@@ -35,8 +36,15 @@ class Rpcs3Generator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, int],
+    ) -> Command:
         generateControllerConfig(system, players_controllers, rom)
 
         # Taking care of the CurrentSettings.ini file
@@ -479,7 +487,7 @@ class Rpcs3Generator(Generator):
         return Command(array=command_array)
 
 
-def getClosestRatio(game_resolution):
+def getClosestRatio(game_resolution: Dict[str, int]) -> tuple[int, int]:
     screenRatio = game_resolution["width"] / game_resolution["height"]
     if screenRatio < 1.6:
         return (4, 3)
@@ -487,7 +495,7 @@ def getClosestRatio(game_resolution):
         return (16, 9)
 
 
-def get_in_game_ratio(config, game_resolution, rom):
+def get_in_game_ratio(config: Any, game_resolution: Dict[str, int], rom: str) -> float:
     return 16 / 9
 
 

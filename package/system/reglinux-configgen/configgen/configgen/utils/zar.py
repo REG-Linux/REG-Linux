@@ -1,12 +1,13 @@
 from os import listdir, mkdir, path, rmdir
 from subprocess import call
+from typing import Any
 
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 
-def zar_begin(rom):
+def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
     """
     Mounts a .zar archive using fuse-zar.
 
@@ -68,7 +69,7 @@ def zar_begin(rom):
     return True, rommountpoint, rommountpoint
 
 
-def zar_end(rommountpoint):
+def zar_end(rommountpoint: str) -> bool:
     """
     Unmounts a .zar archive mounted by zar_begin().
 
@@ -91,3 +92,4 @@ def zar_end(rommountpoint):
 
     # Remove the now-empty mount directory
     rmdir(rommountpoint)
+    return True

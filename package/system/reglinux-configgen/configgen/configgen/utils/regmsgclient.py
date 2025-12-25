@@ -117,7 +117,9 @@ class RegMsgClient:
         self.connect()
         return self
 
-    def __exit__(self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any | None) -> None:
+    def __exit__(
+        self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any | None
+    ) -> None:
         """Ensure connection is closed when exiting context manager."""
         self.disconnect()
 

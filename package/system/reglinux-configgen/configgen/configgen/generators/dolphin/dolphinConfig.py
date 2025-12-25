@@ -1,5 +1,6 @@
 from os import environ
 from struct import pack, unpack
+from typing import Any, Dict
 
 from configgen.systemFiles import CONF, SAVES
 from configgen.utils.logger import get_logger
@@ -14,46 +15,46 @@ DOLPHIN_BIN_PATH = "/usr/bin/dolphin-emu"
 eslog = get_logger(__name__)
 
 
-def readBEInt16(f):
+def readBEInt16(f: Any) -> int:
     bytes = f.read(2)
     unpacked = unpack(">H", bytes)
     return unpacked[0]
 
 
-def readBEInt32(f):
+def readBEInt32(f: Any) -> int:
     bytes = f.read(4)
     unpacked = unpack(">L", bytes)
     return unpacked[0]
 
 
-def readBEInt64(f):
+def readBEInt64(f: Any) -> int:
     bytes = f.read(8)
     unpacked = unpack(">Q", bytes)
     return unpacked[0]
 
 
-def readBytes(f, x):
+def readBytes(f: Any, x: int):
     return f.read(x)
 
 
-def readString(f, x):
+def readString(f: Any, x: int) -> str:
     bytes = f.read(x)
     decodedbytes = bytes.decode("utf-8")
     return str(decodedbytes)
 
 
-def readInt8(f):
+def readInt8(f: Any) -> int:
     bytes = f.read(1)
     unpacked = unpack("b", bytes)
     return unpacked[0]
 
 
-def writeInt8(f, x):
+def writeInt8(f: Any, x: int) -> None:
     bytes = pack("b", x)
     f.write(bytes)
 
 
-def readWriteEntry(f, setval):
+def readWriteEntry(f: Any, setval: Any) -> None:
     itemHeader = readInt8(f)
     itemType = (itemHeader & 0xE0) >> 5
     itemNameLength = (itemHeader & 0x1F) + 1
@@ -83,7 +84,8 @@ def readWriteEntry(f, setval):
             itemValue = readBEInt32(f)
         elif itemType == 6:  # long long
             itemValue = readBEInt64(f)
-            readBytes(f, dataSize)
+            if dataSize is not None:
+                readBytes(f, dataSize)
         elif itemType == 7:  # bool
             itemValue = readInt8(f)
         else:
@@ -93,7 +95,7 @@ def readWriteEntry(f, setval):
         eslog.debug(f"{itemName:12s} = {itemValue}")
 
 
-def readWriteFile(filepath, setval):
+def readWriteFile(filepath: str, setval: Any) -> None:
     # open in read read/write depending of the action
     if not setval:
         f = open(filepath, "rb")
@@ -132,7 +134,7 @@ def getWiiLangFromEnvironment():
         return availableLanguages["en_US"]
 
 
-def getRatioFromConfig(config, gameResolution):
+def getRatioFromConfig(config: Any, gameResolution: Dict[str, int]) -> int:
     # Sets the setting available to the Wii's internal NAND. Only has two values:
     # 0: 4:3 ; 1: 16:9
     if "tv_mode" in config:
@@ -144,7 +146,7 @@ def getRatioFromConfig(config, gameResolution):
         return 0
 
 
-def getSensorBarPosition(config):
+def getSensorBarPosition(config: Any) -> int:
     # Sets the setting available to the Wii's internal NAND. Only has two values:
     # 0: BOTTOM ; 1: TOP
     if "sensorbar_position" in config:
@@ -156,7 +158,7 @@ def getSensorBarPosition(config):
         return 0
 
 
-def updateConfig(config, filepath, gameResolution):
+def updateConfig(config: Any, filepath: str, gameResolution: Dict[str, int]) -> None:
     arg_setval = {
         "IPL.LNG": getWiiLangFromEnvironment(),
         "IPL.AR": getRatioFromConfig(config, gameResolution),

@@ -1,4 +1,5 @@
 from os import makedirs, path, remove
+from typing import Any
 
 from configgen.settings import UnixSettings
 
@@ -113,7 +114,7 @@ def generateRetroarchCustom():
     retroarchSettings.write()
 
 
-def generateRetroarchCustomPathes(retroarchSettings):
+def generateRetroarchCustomPathes(retroarchSettings: Any) -> None:
     """
     Save RetroArch custom paths into the configuration.
     This is called separately because paths may vary depending on the system.

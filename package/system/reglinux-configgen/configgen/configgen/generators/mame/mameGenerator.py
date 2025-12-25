@@ -569,7 +569,9 @@ class MameGenerator(Generator):
                 if system.name == "fmtowns":
                     blankDisk = "/usr/share/mame/blank.fmtowns"
                     targetFolder = f"/userdata/saves/mame/{system.name}"
-                    targetDisk = f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
+                    targetDisk = (
+                        f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
+                    )
                 # Add elif statements here for other systems if enabled
                 if (
                     blankDisk is not None

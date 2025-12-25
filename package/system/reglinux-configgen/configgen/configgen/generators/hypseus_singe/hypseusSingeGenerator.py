@@ -1,6 +1,7 @@
 from filecmp import cmp
 from os import listdir, mkdir, path, walk
 from shutil import copy2, copyfile, copytree
+from typing import Any, Dict, Optional
 
 from ffmpeg import probe
 
@@ -25,7 +26,7 @@ eslog = get_logger(__name__)
 
 class HypseusSingeGenerator(Generator):
     @staticmethod
-    def find_m2v_from_txt(txt_file):
+    def find_m2v_from_txt(txt_file: str) -> Optional[str]:
         with open(txt_file) as file:
             for line in file:
                 parts = line.strip().split()
@@ -36,28 +37,24 @@ class HypseusSingeGenerator(Generator):
         return None
 
     @staticmethod
-    def find_file(start_path, filename):
+    def find_file(start_path: str, filename: str) -> Optional[str]:
         if path.exists(path.join(start_path, filename)):
             return path.join(start_path, filename)
 
         for root, _, files in walk(start_path):
             if filename in files:
-                eslog.debug(
-                    f"Found m2v file in path - {path.join(root, filename)}"
-                )
+                eslog.debug(f"Found m2v file in path - {path.join(root, filename)}")
                 return path.join(root, filename)
 
         return None
 
     @staticmethod
-    def get_resolution(video_path):
+    def get_resolution(video_path: str) -> Any:
         try:
             # Try to get video information
             probe_video = probe(video_path)
             if not probe_video or "streams" not in probe_video:
-                eslog.debug(
-                    f"Could not parse the video file: {video_path}"
-                )
+                eslog.debug(f"Could not parse the video file: {video_path}")
                 return 0, 0
 
             # Find the video stream
@@ -98,8 +95,15 @@ class HypseusSingeGenerator(Generator):
 
     # Main entry of the module
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, int],
+    ) -> Command:
         bezel_to_rom = {
             "ace": ["ace", "ace_a", "ace_a2", "ace91", "ace91_euro", "aceeuro"],
             "astron": ["astron", "astronp"],
@@ -139,7 +143,7 @@ class HypseusSingeGenerator(Generator):
             "spacepirates": ["spacepirates", "spacepirates-hd", "space_pirates_hd"],
         }
 
-        def find_bezel(rom_name):
+        def find_bezel(rom_name: str) -> Optional[str]:
             for bezel, rom_names in bezel_to_rom.items():
                 if rom_name in rom_names:
                     return bezel
@@ -157,7 +161,7 @@ class HypseusSingeGenerator(Generator):
             copyfile(HYPSEUS_CONFIG_PATH, HYPSEUS_DATA_DIR + "/custom.ini")
 
         # copy required resources to userdata config folder as needed
-        def copy_resources(source_dir, destination_dir):
+        def copy_resources(source_dir: str, destination_dir: str) -> None:
             if not path.exists(destination_dir):
                 copytree(source_dir, destination_dir)
             else:
@@ -231,9 +235,7 @@ class HypseusSingeGenerator(Generator):
             video_resolution = self.get_resolution(video_path)
             eslog.debug(f"Resolution: {video_resolution}")
             if video_resolution == (0, 0):
-                eslog.warning(
-                    "Could not determine video resolution, using fallback"
-                )
+                eslog.warning("Could not determine video resolution, using fallback")
         else:
             video_resolution = None
 
@@ -409,9 +411,8 @@ class HypseusSingeGenerator(Generator):
                         )  # this is causing issues on some "non-gun" games
 
         # bezels
-        if (
-            system.isOptSet("hypseus_bezels")
-            and not system.getOptBoolean("hypseus_bezels")
+        if system.isOptSet("hypseus_bezels") and not system.getOptBoolean(
+            "hypseus_bezels"
         ):
             bezelRequired = False
 

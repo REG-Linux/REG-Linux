@@ -181,7 +181,9 @@ def _get_eglinfo_lines() -> list[str]:
         result = run([eglinfo_path], stdout=PIPE, stderr=PIPE, text=True, check=True)
         return [line.strip() for line in result.stdout.splitlines() if line.strip()]
     except CalledProcessError as e:
-        eslog.error(f"Error running {eglinfo_path}: {e.stderr.strip() if e.stderr else e}")
+        eslog.error(
+            f"Error running {eglinfo_path}: {e.stderr.strip() if e.stderr else e}"
+        )
         return []
     except FileNotFoundError:
         return []

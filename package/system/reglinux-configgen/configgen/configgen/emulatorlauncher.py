@@ -12,6 +12,7 @@ from subprocess import PIPE, Popen, call
 from sys import exit
 from threading import Thread
 from time import sleep
+from typing import Any, Dict, List, Tuple
 
 import configgen.bezel.bezel_base as bezelsUtil
 import configgen.controllers as controllers
@@ -55,7 +56,7 @@ if path.exists("/var/run/emulatorlauncher.perf"):
 proc = None
 
 
-def main(args, maxnbplayers):
+def main(args: Any, maxnbplayers: int) -> int:
     """
     Entry point to start a ROM, with optional mounting of .zar archive files.
 
@@ -105,7 +106,9 @@ def main(args, maxnbplayers):
         return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 
-def _start_evmapy_async(system, emulator, core, rom_config, players_controllers, guns):
+def _start_evmapy_async(
+    system: Any, emulator: str, core: str, rom: str, players_controllers: Any, guns: Any
+) -> Thread:
     """
     Starts Evmapy asynchronously in a background thread.
 
@@ -126,7 +129,7 @@ def _start_evmapy_async(system, emulator, core, rom_config, players_controllers,
 
     def worker():
         try:
-            Evmapy.start(system, emulator, core, rom_config, players_controllers, guns)
+            Evmapy.start(system, emulator, core, rom, players_controllers, guns)
         except Exception as e:
             eslog.error(f"Evmapy failed: {e}", exc_info=True)
 
@@ -136,7 +139,7 @@ def _start_evmapy_async(system, emulator, core, rom_config, players_controllers,
     return t
 
 
-def _configure_controllers(args, maxnbplayers):
+def _configure_controllers(args: Any, maxnbplayers: int) -> Dict[str, Any]:
     """Configures controllers based on command-line arguments."""
     controllersInput = []
     for p in range(1, maxnbplayers + 1):
@@ -155,11 +158,11 @@ def _configure_controllers(args, maxnbplayers):
     return playersControllers
 
 
-def _setup_system_emulator(args, rom_configuration):
+def _setup_system_emulator(args: Any, rom: str) -> Any:
     """Initializes system and emulator configurations."""
     systemName = args.system
     eslog.debug(f"Running system: {systemName}")
-    system = Emulator(systemName, rom_configuration)
+    system = Emulator(systemName, args.rom)
 
     if args.emulator is not None:
         system.config["emulator"] = args.emulator
@@ -182,7 +185,9 @@ def _setup_system_emulator(args, rom_configuration):
     return system
 
 
-def _configure_special_devices(args, system, rom, metadata, players_controllers):
+def _configure_special_devices(
+    args: Any, system: Any, rom: str, metadata: Any, players_controllers: Any
+) -> Tuple[Any, Any, Any, Any]:
     """Configures light guns and racing wheels."""
     if not system.isOptSet("use_guns") and args.lightgun:
         system.config["use_guns"] = True
@@ -212,7 +217,9 @@ def _configure_special_devices(args, system, rom, metadata, players_controllers)
     return guns, wheels, wheel_processes, players_controllers
 
 
-def _setup_video_and_mouse(system, generator, rom):
+def _setup_video_and_mouse(
+    system: Any, generator: Any, rom: str
+) -> Tuple[Any, bool, bool, Dict[str, int]]:
     """Sets up video mode and mouse visibility for the game."""
     wanted_game_mode = generator.getResolutionMode(system.config)
     system_mode = videoMode.getCurrentMode()
@@ -243,7 +250,7 @@ def _setup_video_and_mouse(system, generator, rom):
     return system_mode, resolution_changed, mouse_changed, game_resolution
 
 
-def _apply_commandline_options(args, system):
+def _apply_commandline_options(args: Any, system: Any) -> None:
     """Applies command-line options like netplay and save states to the system config."""
     if args.netplaymode is not None:
         system.config["netplay.mode"] = args.netplaymode
@@ -264,7 +271,7 @@ def _apply_commandline_options(args, system):
         system.config["state_filename"] = args.state_filename
 
 
-def _setup_environment_variables(system):
+def _setup_environment_variables(system: Any) -> None:
     """Sets up environment variables for the emulator."""
     system.config["sdlvsync"] = (
         "0"
@@ -274,7 +281,7 @@ def _setup_environment_variables(system):
     environ["SDL_RENDER_VSYNC"] = system.config["sdlvsync"]
 
 
-def _execute_external_scripts(system, rom, event_type):
+def _execute_external_scripts(system: Any, rom: str, event_type: str) -> None:
     """Executes external scripts based on the event type."""
     effectiveCore = system.config.get("core", "")
     effectiveRom = rom or ""
@@ -296,7 +303,7 @@ def _execute_external_scripts(system, rom, event_type):
         )
 
 
-def _create_save_directory(system):
+def _create_save_directory(system: Any) -> None:
     """Creates the save directory for the system if it doesn't exist."""
     dirname = path.join(SAVES, system.name)
     if not path.exists(dirname):
@@ -314,7 +321,15 @@ def _cleanup_hud_config():
         eslog.warning(f"Could not remove HUD config file: {e}")
 
 
-def _configure_hud(system, generator, cmd, args, rom, game_resolution, guns):
+def _configure_hud(
+    system: Any,
+    generator: Any,
+    cmd: Any,
+    args: Any,
+    rom: str,
+    game_resolution: Dict[str, int],
+    guns: Any,
+) -> None:
     """Configures and enables MangoHUD if supported."""
     if not (
         system.isOptSet("hud_support")
@@ -353,8 +368,14 @@ def _configure_hud(system, generator, cmd, args, rom, game_resolution, guns):
 
 
 def _setup_evmapy_and_compositor(
-    generator, system, rom, players_controllers, guns, args, rom_configuration
-):
+    generator: Any,
+    system: Any,
+    rom: str,
+    players_controllers: Any,
+    guns: Any,
+    args: Any,
+    rom_configuration: Dict[str, Any],
+) -> Any:
     """
     Sets up Evmapy and compositor before launching the emulator.
 
@@ -375,7 +396,7 @@ def _setup_evmapy_and_compositor(
         args.system,
         system.config["emulator"],
         system.config.get("core", ""),
-        rom_configuration,
+        rom,
         players_controllers,
         guns,
     )
@@ -390,16 +411,16 @@ def _setup_evmapy_and_compositor(
 
 
 def _prepare_emulator_command(
-    generator,
-    system,
-    rom,
-    players_controllers,
-    metadata,
-    guns,
-    wheels,
-    game_resolution,
-    args,
-):
+    generator: Any,
+    system: Any,
+    rom: str,
+    players_controllers: Any,
+    metadata: Any,
+    guns: Any,
+    wheels: Any,
+    game_resolution: Dict[str, int],
+    args: Any,
+) -> Any:
     """
     Prepares the emulator command with all necessary configurations.
 
@@ -434,7 +455,7 @@ def _prepare_emulator_command(
     return cmd
 
 
-def _run_emulator_with_profiler(cmd):
+def _run_emulator_with_profiler(cmd: Any) -> int:
     """
     Runs the emulator command with profiler management.
 
@@ -460,7 +481,9 @@ def _run_emulator_with_profiler(cmd):
     return exitCode
 
 
-def _cleanup_emulator_resources(generator, evmapy_thread, system):
+def _cleanup_emulator_resources(
+    generator: Any, evmapy_thread: Any, system: Any
+) -> None:
     """
     Cleans up resources after the emulator exits.
 
@@ -480,17 +503,17 @@ def _cleanup_emulator_resources(generator, evmapy_thread, system):
 
 
 def _launch_emulator_process(
-    generator,
-    system,
-    rom,
-    players_controllers,
-    metadata,
-    guns,
-    wheels,
-    game_resolution,
-    args,
-    rom_configuration,
-):
+    generator: Any,
+    system: Any,
+    rom: str,
+    players_controllers: Any,
+    metadata: Any,
+    guns: Any,
+    wheels: Any,
+    game_resolution: Dict[str, int],
+    args: Any,
+    rom_configuration: Dict[str, Any],
+) -> int:
     """
     Handles the actual emulator launch process inside a try/finally block.
 
@@ -551,7 +574,12 @@ def _launch_emulator_process(
     return exitCode
 
 
-def _cleanup_system(resolution_changed, system_mode, mouse_changed, wheel_processes):
+def _cleanup_system(
+    resolution_changed: bool,
+    system_mode: Any,
+    mouse_changed: bool,
+    wheel_processes: Any,
+) -> None:
     """Restores system state after the emulator exits."""
     import subprocess  # Import subprocess here to resolve "subprocess" is not defined errors
 
@@ -577,7 +605,9 @@ def _cleanup_system(resolution_changed, system_mode, mouse_changed, wheel_proces
             pass
 
 
-def start_rom(args, maxnbplayers, rom, rom_configuration):
+def start_rom(
+    args: Any, maxnbplayers: int, rom: str, rom_configuration: Dict[str, Any]
+) -> int:
     """
     Prepares the system and launches the emulator for a given ROM.
 
@@ -601,7 +631,7 @@ def start_rom(args, maxnbplayers, rom, rom_configuration):
     """
     # Initial setup
     players_controllers = _configure_controllers(args, maxnbplayers)
-    system = _setup_system_emulator(args, rom_configuration)
+    system = _setup_system_emulator(args, rom)
     metadata = controllers.getGamesMetaData(system.name, rom)
     guns, wheels, wheel_processes, players_controllers = _configure_special_devices(
         args, system, rom, metadata, players_controllers
@@ -653,7 +683,7 @@ def start_rom(args, maxnbplayers, rom, rom_configuration):
     return exit_code
 
 
-def _cleanup_temp_files(*temp_files):
+def _cleanup_temp_files(*temp_files: str) -> None:
     """
     Cleans up temporary files created during bezel processing.
 
@@ -670,7 +700,13 @@ def _cleanup_temp_files(*temp_files):
             eslog.warning(f"Could not remove temporary file {temp_file}: {e}")
 
 
-def getHudBezel(system, generator, rom, game_resolution, borders_size):
+def getHudBezel(
+    system: Any,
+    generator: Any,
+    rom: str,
+    game_resolution: Dict[str, int],
+    borders_size: Any,
+) -> Any:
     """
     Determines and prepares the appropriate bezel image for the HUD.
 
@@ -822,7 +858,7 @@ def getHudBezel(system, generator, rom, game_resolution, borders_size):
         _cleanup_temp_files(*temp_files)
 
 
-def extractGameInfosFromXml(xml):
+def extractGameInfosFromXml(xml: Any) -> Dict[str, Any]:
     """
     Parses a game information XML file to extract game name and thumbnail.
 
@@ -853,7 +889,7 @@ def extractGameInfosFromXml(xml):
     return vals
 
 
-def callExternalScripts(folder, event, args):
+def callExternalScripts(folder: str, event: str, args: List[str]) -> None:
     """
     Executes all executable scripts in a given folder.
 
@@ -890,7 +926,7 @@ def callExternalScripts(folder, event, args):
                 )
 
 
-def hudConfig_protectStr(text):
+def hudConfig_protectStr(text: str) -> str:
     """
     Returns an empty string if the input is None, otherwise returns the input.
 
@@ -903,7 +939,15 @@ def hudConfig_protectStr(text):
     return text or ""
 
 
-def getHudConfig(system, systemName, emulator, core, rom, gameinfos, bezel):
+def getHudConfig(
+    system: Any,
+    systemName: str,
+    emulator: str,
+    core: str,
+    rom: str,
+    gameinfos: Any,
+    bezel: Any,
+) -> str:
     """
     Generates the configuration string for MangoHUD.
 
@@ -973,7 +1017,7 @@ def getHudConfig(system, systemName, emulator, core, rom, gameinfos, bezel):
     return configstr
 
 
-def runCommand(command):
+def runCommand(command: Any) -> int:
     """
     Executes a command in a subprocess.
 
@@ -1028,7 +1072,7 @@ def runCommand(command):
     return exitcode
 
 
-def signal_handler(signal, frame):
+def signal_handler(signal: Any, frame: Any) -> None:
     """
     Handles termination signals (like Ctrl+C) to gracefully kill the emulator process.
     """

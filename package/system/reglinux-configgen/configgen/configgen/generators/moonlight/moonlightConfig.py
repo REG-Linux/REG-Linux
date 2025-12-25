@@ -1,3 +1,5 @@
+from typing import Any
+
 from configgen.systemFiles import CONF
 
 MOONLIGHT_CONFIG_DIR = CONF + "/moonlight"
@@ -12,7 +14,7 @@ MOONLIGHT_MAPPING_PATH[4] = MOONLIGHT_CONFIG_DIR + "/mappingP4.conf"
 MOONLIGHT_BIN_PATH = "/usr/bin/moonlight"
 
 
-def setMoonlightConfig(moonlightConfig, system):
+def setMoonlightConfig(moonlightConfig: Any, system: Any) -> None:
     # resolution
     resolutions = {
         "0": ("1280", "720"),

@@ -1,10 +1,12 @@
+from typing import Any
+
 from configgen.systemFiles import CONF
 
 CANNONBALL_CONFIG_PATH = CONF + "/cannonball/config.xml"
 CANNONBALL_BIN_PATH = "/usr/bin/cannonball"
 
 
-def setCannonballConfig(cannoballConfig, system):
+def setCannonballConfig(cannoballConfig: Any, system: Any) -> None:
     # root
     xml_root = getRoot(cannoballConfig, "config")
 
@@ -32,8 +34,7 @@ def setCannonballConfig(cannoballConfig, system):
         setSectionConfig(cannoballConfig, xml_video, "hires", "0")
 
 
-@staticmethod
-def getRoot(config, name):
+def getRoot(config: Any, name: str):
     xml_section = config.getElementsByTagName(name)
 
     if len(xml_section) == 0:
@@ -45,8 +46,7 @@ def getRoot(config, name):
     return xml_section
 
 
-@staticmethod
-def getSection(config, xml_root, name):
+def getSection(config: Any, xml_root: Any, name: str):
     xml_section = xml_root.getElementsByTagName(name)
 
     if len(xml_section) == 0:
@@ -58,8 +58,7 @@ def getSection(config, xml_root, name):
     return xml_section
 
 
-@staticmethod
-def setSectionConfig(config, xml_section, name, value):
+def setSectionConfig(config: Any, xml_section: Any, name: str, value: str) -> None:
     xml_elt = xml_section.getElementsByTagName(name)
     if len(xml_elt) == 0:
         xml_elt = config.createElement(name)

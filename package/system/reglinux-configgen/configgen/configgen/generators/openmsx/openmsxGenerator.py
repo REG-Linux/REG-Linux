@@ -4,6 +4,7 @@ import shutil
 import xml.dom.minidom as minidom
 import xml.etree.ElementTree as ET
 import zipfile
+from typing import Any
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -15,7 +16,7 @@ openMSX_Homedir = "/userdata/system/configs/openmsx"
 openMSX_Config = "/usr/share/openmsx/"
 
 
-def copy_directory(src, dst):
+def copy_directory(src: str, dst: str) -> None:
     """
     Copy all contents from src directory to dst directory, similar to distutils.dir_util.copy_tree
     This function copies the directory tree from src to dst, creating dst if it doesn't exist
@@ -46,8 +47,15 @@ class OpenmsxGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Any,
+    ) -> Command:
         share_dir = openMSX_Homedir + "/share"
         source_settings = openMSX_Config + "/settings.xml"
         settings_xml = share_dir + "/settings.xml"

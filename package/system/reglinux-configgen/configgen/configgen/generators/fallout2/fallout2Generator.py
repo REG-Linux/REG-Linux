@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from os import chdir, makedirs, path
 from shutil import copy
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -85,8 +86,10 @@ class Fallout2Generator(Generator):
         )
 
     # Show mouse for menu / play actions
-    def getMouseMode(self, config, rom):
+    def getMouseMode(self, config: Any, rom: str) -> bool:
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

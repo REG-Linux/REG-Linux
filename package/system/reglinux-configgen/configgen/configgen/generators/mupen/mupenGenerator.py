@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from os import makedirs, path
+from typing import Any
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -64,7 +65,7 @@ class MupenGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config):
+    def get_in_game_ratio(self, config: Any) -> float:
         if (
             "mupen64plus_ratio" in config and config["mupen64plus_ratio"] == "16/9"
         ) or (

@@ -85,7 +85,7 @@ class HatariGenerator(Generator):
         return Command(array=command_array)
 
     @staticmethod
-    def findBestTos(biosdir, machine, tos_version, language):
+    def findBestTos(biosdir: str, machine: str, tos_version: str, language: str) -> str:
         # all languages by preference, when value is "auto"
         all_languages = ["us", "uk", "de", "es", "fr", "it", "nl", "ru", "se", ""]
 

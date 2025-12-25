@@ -1,10 +1,12 @@
 from hashlib import md5
 from os import path
 
+from typing import Any
+
 from configgen.settings import UnixSettings
 
 
-def setSonicretroConfig(system, emu, rom):
+def setSonicretroConfig(system: Any, emu: str, rom: str) -> None:
     SONICRETRO_CONFIG_PATH = rom + "/settings.ini"
 
     # ini file
@@ -94,7 +96,7 @@ def setSonicretroConfig(system, emu, rom):
     sonicConfig.set("Audio", "SFXVolume", "1.000000")
 
 
-def getMouseMode(self, config, rom):
+def getMouseMode(self: Any, config: Any, rom: str) -> bool:
     # Determine the emulator to use
     if (rom.lower()).endswith("son"):
         emu = "sonic2013"
@@ -114,7 +116,7 @@ def getMouseMode(self, config, rom):
     return enableMouse
 
 
-def __getMD5(self, filename):
+def __getMD5(self: Any, filename: str) -> str:
     rp = path.realpath(filename)
 
     # Use an instance attribute for caching instead of function attribute

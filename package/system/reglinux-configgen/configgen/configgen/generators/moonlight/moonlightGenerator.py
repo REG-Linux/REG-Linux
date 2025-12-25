@@ -1,5 +1,6 @@
 from os import makedirs, path
 from shutil import copy
+from typing import List
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -61,7 +62,7 @@ class MoonlightGenerator(Generator):
             },
         )
 
-    def getRealGameNameAndConfigFile(self, rom):
+    def getRealGameNameAndConfigFile(self, rom: str) -> List[str | None]:
         # Rom's basename without extension
         romName = path.splitext(path.basename(rom))[0]
         # find the real game name
@@ -85,8 +86,12 @@ class MoonlightGenerator(Generator):
             eslog.error(f"Moonlight gamelist file not found: {MOONLIGHT_GAMELIST_PATH}")
             return [None, MOONLIGHT_STAGING_CONFIG_PATH]
         except PermissionError:
-            eslog.error(f"Permission denied accessing Moonlight gamelist file: {MOONLIGHT_GAMELIST_PATH}")
+            eslog.error(
+                f"Permission denied accessing Moonlight gamelist file: {MOONLIGHT_GAMELIST_PATH}"
+            )
             return [None, MOONLIGHT_STAGING_CONFIG_PATH]
         except Exception as e:
-            eslog.error(f"Error reading Moonlight gamelist file {MOONLIGHT_GAMELIST_PATH}: {e}")
+            eslog.error(
+                f"Error reading Moonlight gamelist file {MOONLIGHT_GAMELIST_PATH}: {e}"
+            )
             return [None, MOONLIGHT_STAGING_CONFIG_PATH]

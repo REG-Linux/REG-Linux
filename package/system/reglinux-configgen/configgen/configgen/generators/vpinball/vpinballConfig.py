@@ -1,3 +1,5 @@
+from typing import Any
+
 from configgen.systemFiles import CONF
 
 VPINBALL_CONFIG_DIR = CONF + "/vpinball"
@@ -5,15 +7,15 @@ VPINBALL_CONFIG_PATH = VPINBALL_CONFIG_DIR + "/VPinballX.ini"
 VPINBALL_LOG_PATH = VPINBALL_CONFIG_DIR + "/vpinball.log"
 VPINBALL_PINMAME_PATH = CONF + "/vpinball/pinmame/ini"
 VPINBALL_ASSETS_PATH = "/usr/bin/vpinball/assets/Default_VPinballX.ini"
+
 VPINBALL_BIN_PATH = "/usr/bin/vpinball/VPinballX_GL"
 
 
-def setVpinballConfig(vpinballSettings, system):
+def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     # Tables are organised by folders containing the vpx file, and sub-folders with the roms, altcolor, altsound,...
     # We keep a switch to allow users with the old unique pinmame to be able to continue using vpinball (switchon)
-    if (
-        system.isOptSet("vpinball_folders")
-        and not system.getOptBoolean("vpinball_folders")
+    if system.isOptSet("vpinball_folders") and not system.getOptBoolean(
+        "vpinball_folders"
     ):
         vpinballSettings.set("Standalone", "PinMAMEPath", "")
     else:
@@ -141,9 +143,8 @@ def setVpinballConfig(vpinballSettings, system):
         vpinballSettings.set("Player", "ScreenPlayerZ", "")
 
     # Altcolor (switchon)
-    if (
-        system.isOptSet("vpinball_altcolor")
-        and not system.getOptBoolean("vpinball_altcolor")
+    if system.isOptSet("vpinball_altcolor") and not system.getOptBoolean(
+        "vpinball_altcolor"
     ):
         vpinballSettings.set("Standalone", "AltColor", "0")
     else:
@@ -165,9 +166,8 @@ def setVpinballConfig(vpinballSettings, system):
         vpinballSettings.set("Player", "SoundVolume", "")
 
     # Altsound
-    if (
-        system.isOptSet("vpinball_altsound")
-        and not system.getOptBoolean("vpinball_altsound")
+    if system.isOptSet("vpinball_altsound") and not system.getOptBoolean(
+        "vpinball_altsound"
     ):
         vpinballSettings.set("Standalone", "AltSound", "0")
     else:
@@ -189,9 +189,8 @@ def setVpinballConfig(vpinballSettings, system):
         vpinballSettings.set("Player", "SoundDeviceBG", "")
 
     # Don't use SDL "Add credit" with the South button/plunger and pad2key default mapping
-    if (
-        system.isOptSet("vpinball_pad_add_credit")
-        and system.getOptBoolean("vpinball_pad_add_credit")
+    if system.isOptSet("vpinball_pad_add_credit") and system.getOptBoolean(
+        "vpinball_pad_add_credit"
     ):
         vpinballSettings.set("Player", "JoyAddCreditKey", "")
     else:

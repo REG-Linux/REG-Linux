@@ -16,6 +16,7 @@ except ImportError:
     raise
 from glob import glob
 from re import IGNORECASE, search, sub
+from typing import Any
 
 from configgen.utils.logger import get_logger
 
@@ -33,7 +34,7 @@ class XeniaGenerator(Generator):
         return True
 
     @staticmethod
-    def sync_directories(source_dir, dest_dir):
+    def sync_directories(source_dir: str, dest_dir: str) -> None:
         dcmp = dircmp(source_dir, dest_dir)
         # Files that are only in the source directory or are different
         differing_files = dcmp.diff_files + dcmp.left_only
@@ -44,8 +45,15 @@ class XeniaGenerator(Generator):
             copy2(src_path, dest_path)
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Any,
+    ) -> Command:
         core = system.config["core"]
 
         # check Vulkan first before doing anything
@@ -252,10 +260,7 @@ class XeniaGenerator(Generator):
         if "UI" not in config:
             config["UI"] = {}
         # run headless ?
-        if (
-            system.isOptSet("xeniaHeadless")
-            and system.getOptBoolean("xeniaHeadless")
-        ):
+        if system.isOptSet("xeniaHeadless") and system.getOptBoolean("xeniaHeadless"):
             config["UI"] = {"headless": True}
         else:
             config["UI"] = {"headless": False}

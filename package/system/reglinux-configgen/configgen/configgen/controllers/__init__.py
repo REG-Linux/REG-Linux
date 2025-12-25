@@ -15,5 +15,5 @@ __all__ = [
     "getDevicesInformation",
     "getGamesMetaData",
     "Evmapy",
-    "load_controller_config"
+    "load_controller_config",
 ]

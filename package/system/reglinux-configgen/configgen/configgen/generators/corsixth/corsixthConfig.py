@@ -1,5 +1,6 @@
 from os import chdir
 from subprocess import CalledProcessError, check_output
+from typing import Any
 
 from configgen.systemFiles import CONF, ROMS, SAVES, SCREENSHOTS
 from configgen.utils.logger import get_logger
@@ -22,7 +23,7 @@ CORSIXTH_GAME_DATA_DIR = [
 ]
 
 
-def setCorsixthConfig(corsixthConfig, system, gameResolution):
+def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> None:
     corsixthConfig.write("check_for_updates = false\n")
     corsixthConfig.write("theme_hospital_install = [[" + CORSIXTH_ROMS_DIR + "]]\n")
     corsixthConfig.write("unicode_font = [[" + CORSIXTH_FONT_PATH + "]]\n")
@@ -103,5 +104,7 @@ def setCorsixthConfig(corsixthConfig, system, gameResolution):
         chdir(CORSIXTH_ROMS_DIR + "/MP3")
         corsixthConfig.write("audio_music = [[" + CORSIXTH_ROMS_DIR + "/MP3" + "]]\n")
     except (FileNotFoundError, OSError) as e:
-        eslog.debug(f"Corsixth: Music directory not found: {CORSIXTH_ROMS_DIR}/MP3 - {str(e)}")
+        eslog.debug(
+            f"Corsixth: Music directory not found: {CORSIXTH_ROMS_DIR}/MP3 - {str(e)}"
+        )
         corsixthConfig.write("audio_music = nil\n")

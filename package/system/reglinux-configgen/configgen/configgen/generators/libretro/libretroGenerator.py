@@ -1,5 +1,6 @@
 from os import chdir, makedirs, path
 from shutil import copyfile
+from typing import Any, Dict, Union
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -31,8 +32,15 @@ class LibretroGenerator(Generator):
     # Main entry of the module
     # Configure retroarch and return a command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, int],
+    ) -> Command:
         # Get the graphics backend first
         gfxBackend = getGFXBackend(system)
 
@@ -61,9 +69,7 @@ class LibretroGenerator(Generator):
             eslog.debug(f"searching shader {shaderFilename}")
             if path.exists("/userdata/shaders/" + shaderFilename):
                 video_shader_dir = "/userdata/shaders"
-                eslog.debug(
-                    f"shader {shaderFilename} found in /userdata/shaders"
-                )
+                eslog.debug(f"shader {shaderFilename} found in /userdata/shaders")
             else:
                 video_shader_dir = "/usr/share/reglinux/shaders"
             video_shader = video_shader_dir + "/" + shaderFilename
@@ -352,7 +358,7 @@ class LibretroGenerator(Generator):
         return Command(array=command_array)
 
 
-def getGFXBackend(system):
+def getGFXBackend(system: Any) -> Union[str, Any]:
     # Start with the selected option
     # Pick glcore or gl based on drivers if not selected
     VALID_BACKENDS = {

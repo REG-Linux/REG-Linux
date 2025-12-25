@@ -4,22 +4,22 @@ Consolidated Bezel Configuration Writer - Combines common functionality from dif
 
 from json import load
 from os import listdir, makedirs, path, remove, symlink, unlink
-from typing import Any
+from typing import Any, Dict, Optional
 
 from configgen.bezel.bezel_base import BezelUtils, eslog
 from configgen.systemFiles import OVERLAY_CONFIG_FILE
 
 
 def writeBezelConfig(
-    generator,
-    bezel,
-    shaderBezel,
-    retroarchConfig,
-    rom,
-    gameResolution,
-    system,
-    guns_borders_size,
-):
+    generator: Any,
+    bezel: Optional[str],
+    shaderBezel: bool,
+    retroarchConfig: Dict[str, Any],
+    rom: str,
+    gameResolution: Dict[str, int],
+    system: Any,
+    guns_borders_size: Optional[str],
+) -> None:
     """Writes the bezel configuration to the emulator-specific config file."""
     # Common logic for bezel configuration across different emulators
     # disable the overlay
@@ -146,7 +146,9 @@ def writeBezelConfig(
                     bezelNeedAdaptation = True
         # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
         if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
-            retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index("4/3")  # Force 4:3 aspect ratio for 720x1280 resolution
+            retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                "4/3"
+            )  # Force 4:3 aspect ratio for 720x1280 resolution
         else:
             retroarchConfig["aspect_ratio_index"] = str(
                 RATIO_INDEXES.index("custom")
@@ -188,9 +190,13 @@ def writeBezelConfig(
         if not shaderBezel:
             # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
             if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
-                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index("4/3")  # Force 4:3 aspect ratio for 720x1280 resolution
+                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                    "4/3"
+                )  # Force 4:3 aspect ratio for 720x1280 resolution
             else:
-                retroarchConfig["aspect_ratio_index"] = str(RATIO_INDEXES.index("custom"))
+                retroarchConfig["aspect_ratio_index"] = str(
+                    RATIO_INDEXES.index("custom")
+                )
                 if (
                     is_ratio_defined("ratio", system.config)
                     and system.config["ratio"] in RATIO_INDEXES
@@ -219,10 +225,7 @@ def writeBezelConfig(
         retroarchConfig["video_viewport_bias_y"] = "0.000000"
 
     # stretch option
-    if (
-        system.isOptSet("bezel_stretch")
-        and system.getOptBoolean("bezel_stretch")
-    ):
+    if system.isOptSet("bezel_stretch") and system.getOptBoolean("bezel_stretch"):
         bezel_stretch = True
     else:
         bezel_stretch = False
@@ -391,17 +394,16 @@ def writeBezelConfig(
         )
 
 
-def writeBezelCfgConfig(cfgFile, overlay_png_file):
+def writeBezelCfgConfig(cfgFile: str, overlay_png_file: str) -> None:
     """Writes the bezel configuration file."""
-    fd = open(cfgFile, "w")
-    fd.write("overlays = 1\n")
-    fd.write('overlay0_overlay = "' + overlay_png_file + '"\n')
-    fd.write("overlay0_full_screen = true\n")
-    fd.write("overlay0_descs = 0\n")
-    fd.close()
+    with open(cfgFile, "w") as fd:
+        fd.write("overlays = 1\n")
+        fd.write('overlay0_overlay = "' + overlay_png_file + '"\n')
+        fd.write("overlay0_full_screen = true\n")
+        fd.write("overlay0_descs = 0\n")
 
 
-def is_ratio_defined(key: str, config_dict: dict[str, Any]) -> bool:
+def is_ratio_defined(key: str, config_dict: Dict[str, Any]) -> bool:
     """Checks if a key is defined in the dictionary."""
     return (
         key in config_dict

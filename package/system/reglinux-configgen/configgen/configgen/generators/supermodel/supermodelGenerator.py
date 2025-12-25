@@ -3,6 +3,7 @@ from configparser import ConfigParser
 from os import listdir, makedirs, path, remove, rename
 from re import search
 from shutil import copy2, copyfile
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config, gunsNeedCrosses
@@ -59,7 +60,6 @@ class SupermodelGenerator(Generator):
         # powerpc frequesncy
         if system.isOptSet("ppcFreq"):
             command_array.append("-ppc-frequency={}".format(system.config["ppcFreq"]))
-
 
         # resolution
         command_array.append(
@@ -146,10 +146,17 @@ def copy_xml():
         copy2(source_path, dest_path)
 
 
-def configPadsIni(system, rom, players_controllers, guns, altControl, sensitivity):
+def configPadsIni(
+    system: Any,
+    rom: str,
+    players_controllers: Any,
+    guns: Any,
+    altControl: Any,
+    sensitivity: Any,
+) -> tuple[str, dict[str, str | None]]:
     # Reduce cyclomatic complexity by splitting logic into helper functions
 
-    def get_template_and_mapping(altControl):
+    def get_template_and_mapping(altControl: Any) -> tuple[str, dict[str, str | None]]:
         if bool(altControl):
             templateFile = "/usr/share/supermodel/Supermodel-Driving.ini.template"
             mapping = {
@@ -200,17 +207,21 @@ def configPadsIni(system, rom, players_controllers, guns, altControl, sensitivit
             }
         return templateFile, mapping
 
+    # Chamada da função interna
+    return get_template_and_mapping(altControl)
+
     def apply_guns_to_section(
-        targetConfig,
-        section,
-        key,
-        value,
-        system,
-        guns,
-        players_controllers,
-        mapping,
-        mapping_fallback,
-    ):
+        self,
+        targetConfig: Any,
+        section: str,
+        key: str,
+        value: str,
+        system: Any,
+        guns: Any,
+        players_controllers: Any,
+        mapping: Any,
+        mapping_fallback: Any,
+    ) -> bool:
         # Returns True if handled, False otherwise
         if (
             system.isOptSet("use_guns")
@@ -397,7 +408,9 @@ def configPadsIni(system, rom, players_controllers, guns, altControl, sensitivit
         targetConfig.write(configfile)
 
 
-def transformValue(value, players_controllers, mapping, mapping_fallback):
+def transformValue(
+    value: str, players_controllers: Any, mapping: Any, mapping_fallback: Any
+) -> str:
     # remove comments
     cleanValue = value
     matches = search("^([^;]*[^ ])[ ]*;.*$", value)
@@ -420,7 +433,9 @@ def transformValue(value, players_controllers, mapping, mapping_fallback):
         return cleanValue
 
 
-def transformElement(elt, players_controllers, mapping, mapping_fallback):
+def transformElement(
+    elt: str, players_controllers: Any, mapping: Any, mapping_fallback: Any
+) -> str | None:
     # Docs/README.txt
     # JOY1_LEFT  is the same as JOY1_XAXIS_NEG
     # JOY1_RIGHT is the same as JOY1_XAXIS_POS
@@ -538,8 +553,12 @@ def transformElement(elt, players_controllers, mapping, mapping_fallback):
 
 
 def getMappingKeyIncludingFallback(
-    players_controllers, padnum, key, mapping, mapping_fallback
-):
+    players_controllers: Any,
+    padnum: int | str,
+    key: str,
+    mapping: Any,
+    mapping_fallback: Any,
+) -> str:
     if padnum in players_controllers:
         if key not in mapping or (
             key in mapping and mapping[key] not in players_controllers[padnum].inputs
@@ -552,13 +571,13 @@ def getMappingKeyIncludingFallback(
     return mapping[key]
 
 
-def joy2realjoyid(players_controllers, joy):
+def joy2realjoyid(players_controllers: Any, joy: str | int) -> int | None:
     if joy in players_controllers:
         return players_controllers[joy].index
     return None
 
 
-def hatOrAxis(players_controllers, player):
+def hatOrAxis(players_controllers: Any, player: str | int) -> str:
     # default to axis
     type = "axis"
     if (player) in players_controllers:
@@ -572,47 +591,54 @@ def hatOrAxis(players_controllers, player):
     return type
 
 
-def input2input(players_controllers, player, joynum, button, axisside=None):
+def input2input(
+    players_controllers: Any,
+    player: str | int,
+    joynum: int | None,
+    button: str,
+    axisside: int | str | None = None,
+) -> str | None:
     if (player) in players_controllers:
         pad = players_controllers[(player)]
         if button in pad.inputs:
             input = pad.inputs[button]
-            if input.type == "button":
-                return f"JOY{joynum + 1}_BUTTON{int(input.id) + 1}"
-            elif input.type == "hat":
-                if input.value == "1":
-                    return f"JOY{joynum + 1}_UP,JOY{joynum + 1}_POV1_UP"
-                elif input.value == "2":
-                    return f"JOY{joynum + 1}_RIGHT,JOY{joynum + 1}_POV1_RIGHT"
-                elif input.value == "4":
-                    return f"JOY{joynum + 1}_DOWN,JOY{joynum + 1}_POV1_DOWN"
-                elif input.value == "8":
-                    return f"JOY{joynum + 1}_LEFT,JOY{joynum + 1}_POV1_LEFT"
-            elif input.type == "axis":
-                sidestr = ""
-                if axisside is not None:
-                    if axisside == 1:
-                        if input.value == 1:
-                            sidestr = "_NEG"
+            if joynum is not None:  # Apenas prossegue se joynum não for None
+                if input.type == "button":
+                    return f"JOY{joynum + 1}_BUTTON{int(input.id) + 1}"
+                elif input.type == "hat":
+                    if input.value == "1":
+                        return f"JOY{joynum + 1}_UP,JOY{joynum + 1}_POV1_UP"
+                    elif input.value == "2":
+                        return f"JOY{joynum + 1}_RIGHT,JOY{joynum + 1}_POV1_RIGHT"
+                    elif input.value == "4":
+                        return f"JOY{joynum + 1}_DOWN,JOY{joynum + 1}_POV1_DOWN"
+                    elif input.value == "8":
+                        return f"JOY{joynum + 1}_LEFT,JOY{joynum + 1}_POV1_LEFT"
+                elif input.type == "axis":
+                    sidestr = ""
+                    if axisside is not None:
+                        if axisside == 1:
+                            if input.value == 1:
+                                sidestr = "_NEG"
+                            else:
+                                sidestr = "_POS"
                         else:
-                            sidestr = "_POS"
-                    else:
-                        if input.value == 1:
-                            sidestr = "_POS"
-                        else:
-                            sidestr = "_NEG"
+                            if input.value == 1:
+                                sidestr = "_POS"
+                            else:
+                                sidestr = "_NEG"
 
-                if button == "joystick1left" or button == "left":
-                    return f"JOY{joynum + 1}_XAXIS{sidestr}"
-                elif button == "joystick1up" or button == "up":
-                    return f"JOY{joynum + 1}_YAXIS{sidestr}"
-                elif button == "joystick2left":
-                    return f"JOY{joynum + 1}_RXAXIS{sidestr}"
-                elif button == "joystick2up":
-                    return f"JOY{joynum + 1}_RYAXIS{sidestr}"
-                elif button == "l2":
-                    return f"JOY{joynum + 1}_ZAXIS{sidestr}"
-                elif button == "r2":
-                    return f"JOY{joynum + 1}_RZAXIS{sidestr}"
+                    if button == "joystick1left" or button == "left":
+                        return f"JOY{joynum + 1}_XAXIS{sidestr}"
+                    elif button == "joystick1up" or button == "up":
+                        return f"JOY{joynum + 1}_YAXIS{sidestr}"
+                    elif button == "joystick2left":
+                        return f"JOY{joynum + 1}_RXAXIS{sidestr}"
+                    elif button == "joystick2up":
+                        return f"JOY{joynum + 1}_RYAXIS{sidestr}"
+                    elif button == "l2":
+                        return f"JOY{joynum + 1}_ZAXIS{sidestr}"
+                    elif button == "r2":
+                        return f"JOY{joynum + 1}_RZAXIS{sidestr}"
 
     return None

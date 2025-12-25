@@ -1,9 +1,11 @@
+from typing import Any
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 
-def setCgeniusControllers(cgeniusConfig, playersControllers):
+def setCgeniusControllers(cgeniusConfig: Any, playersControllers: Any) -> None:
     CGENIUS_CTRL = {
         "a": "Fire",
         "b": "Jump",

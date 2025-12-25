@@ -1,4 +1,5 @@
 from os import makedirs, path
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -104,5 +105,7 @@ class DXX_RebirthGenerator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

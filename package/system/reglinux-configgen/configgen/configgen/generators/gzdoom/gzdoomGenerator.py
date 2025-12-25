@@ -1,5 +1,6 @@
 from os import mkdir, path
 from shlex import split
+from typing import Any, Dict
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -19,12 +20,21 @@ class GZDoomGenerator(Generator):
     def requiresWayland(self):
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         return 16 / 9
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Dict[str, int],
+    ) -> Command:
         # check directories exist
         if not path.exists(GZDOOM_CONFIG_DIR):
             mkdir(GZDOOM_CONFIG_DIR)

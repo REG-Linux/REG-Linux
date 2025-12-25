@@ -1,4 +1,7 @@
-def setMelondsControllers(melondsConfig, playersControllers):
+from typing import Any
+
+
+def setMelondsControllers(melondsConfig: Any, playersControllers: Any) -> None:
     # Map controllers
     melonDSMapping = {
         "a": "Joy_A",

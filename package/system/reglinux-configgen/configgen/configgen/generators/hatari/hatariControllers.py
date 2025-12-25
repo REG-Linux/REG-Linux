@@ -1,11 +1,12 @@
 from configparser import ConfigParser
 from os import makedirs, path
+from typing import Any
 
 from .hatariConfig import HATARI_CONFIG_DIR, HATARI_CONFIG_PATH
 
 
 @staticmethod
-def setHatariControllers(system, playersControllers):
+def setHatariControllers(system: Any, playersControllers: Any) -> None:
     config = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     config.optionxform = lambda optionstr: str(optionstr)
