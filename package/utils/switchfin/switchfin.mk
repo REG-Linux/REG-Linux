@@ -3,7 +3,7 @@
 # switchfin
 #
 ################################################################################
-SWITCHFIN_VERSION = 0.7.1
+SWITCHFIN_VERSION = 0.8.2
 SWITCHFIN_SITE = https://github.com/dragonflylee/switchfin
 SWITCHFIN_SITE_METHOD = git
 SWITCHFIN_LICENSE = Apache-2.0
