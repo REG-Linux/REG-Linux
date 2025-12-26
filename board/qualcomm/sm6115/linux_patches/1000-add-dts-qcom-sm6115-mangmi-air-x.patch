@@ -3,7 +3,7 @@ new file mode 100644
 index 000000000000..58d9ab342fe9
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,915 @@
+@@ -0,0 +1,917 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
 + * Copyright (c) 2025, REG-LINUX (https://reglinux.org)
@@ -74,6 +74,14 @@ index 000000000000..58d9ab342fe9
 +		brightness-levels = <0 4 8 16 32 64 128 255>;
 +		default-brightness-level = <6>;
 +	};*/
++
++	panel_backlight: backlight {
++		compatible = "gpio-backlight";
++		gpios = <&pm6125_gpios 8 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&lcd_backlight_ctrl_default>;
++		default-on;
++	};
 +
 +	vibra_vcc: regulator-vibra-vcc {
 +		compatible = "regulator-fixed";
@@ -391,34 +399,20 @@ index 000000000000..58d9ab342fe9
 +			  <&dispcc DISP_CC_MDSS_PCLK0_CLK_SRC>;
 +	assigned-clock-parents = <&mdss_dsi0_phy DSI_BYTE_PLL_CLK>,
 +				 <&mdss_dsi0_phy DSI_PIXEL_PLL_CLK>;
-+	qcom,component-on-probe;
 +	status = "okay";
 +
 +	panel: panel@0 {
 +		status = "okay";
 +		compatible = "truly,hx83112a";
 +		reg = <0>;
-+		truly,attach-delay-ms = <200>;
-+		/* DOES NOT CHANGE truly,defer-attach;*/
-+		/* DOES NOT CHANGE truly,force-sleep-before-init; */
-+		/* DOES NOT CHANGE truly,readback-after-init;*/
-+		/*truly,tx-eot-append;*/
 +		truly,reset-delay-ms = <100>;
 +		dsi,lanes = <4>;
 +		dsi,format = <0>; /* MIPI_DSI_FMT_RGB888 */
-+		/* DOES NOT CHANGE qcom,mdss-dsi-t-clk-pre = <0x2d>;
-+		qcom,mdss-dsi-t-clk-post = <0x0d>;
-+		qcom,mdss-dsi-panel-phy-timings =
-+			<0x231e0709 0x0502040a 0x231e0709 0x0502040a
-+			 0x231e0709 0x0502040a 0x231e0709 0x0502040a
-+			 0x23190708 0x0502040a>;*/
-+		/* Interpret the PHY timing words as big-endian bytes */
-+		/* DOES NOT CHANGE qcom,mdss-dsi-panel-phy-timings-be;*/
 +
 +		iovcc-supply = <&pm6125_l9>;
 +		vsp-supply = <&vpos>;
 +		vsn-supply = <&vneg>;
-+		/*backlight = <&panel_backlight>;*/
++		backlight = <&panel_backlight>;
 +
 +		enable-gpios = <&tlmm 97 GPIO_ACTIVE_HIGH>;
 +		reset-gpios = <&tlmm 82 GPIO_ACTIVE_LOW>;
@@ -426,7 +420,6 @@ index 000000000000..58d9ab342fe9
 +
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&te_active &mdss_dsi_active>;
-+		/* DOES NOT CHANGE pinctrl-0 = <&mdss_dsi_active>;*/
 +
 +		rotation = <270>;
 +
@@ -550,6 +543,15 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&pm6125_gpios {
++	lcd_backlight_ctrl_default: lcd-backlight-ctrl-default {
++		pins = "gpio8";
++		function = "func1";
++		power-source = <0>;
++		qcom,drive-strength = <3>;
++		bias-disable;
++		output-low;
++	};
++
 +	vol_up_n: vol-up-n-state {
 +		pins = "gpio5";
 +		function = "normal";
