@@ -4,11 +4,12 @@
 #
 ################################################################################
 
-VCMI_VERSION = 1.6.8
+VCMI_VERSION = 1.7.0
 VCMI_SITE = https://github.com/vcmi/vcmi.git
 VCMI_SITE_METHOD=git
 VCMI_GIT_SUBMODULES=YES
-VCMI_DEPENDENCIES = minizip sdl2 sdl2_image sdl2_mixer sdl2_ttf ffmpeg tbb boost
+VCMI_DEPENDENCIES =  sdl2 sdl2_image sdl2_mixer sdl2_ttf libsquish
+VCMI_DEPENDENCIES += minizip-zlib ffmpeg tbb boost zstd
 VCMI_SUPPORTS_IN_SOURCE_BUILD = NO
 
 VCMI_CMAKE_BACKEND = ninja
@@ -24,11 +25,14 @@ VCMI_CONF_OPTS += -DENABLE_GOLDMASTER=ON
 VCMI_CONF_OPTS += -DCMAKE_INSTALL_PREFIX="/usr/vcmi/"
 VCMI_CONF_OPTS += -DENABLE_MONOLITHIC_INSTALL=ON
 
+# TODO fix onnxruntime to enable MMAI as it depends on it
+VCMI_CONF_OPTS += -DENABLE_MMAI=OFF
+
 ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
 VCMI_DEPENDENCIES += libexecinfo
 endif
 
-# Settings from CMakePresets.json for portmaster, might be interested
+# Settings from CMakePresets.json for portmaster, might be interesting
 # "VCMI_PORTMASTER": "ON" <= custom directories, let's follow XDG
 # "CMAKE_INSTALL_PREFIX": ".",
 # "FORCE_BUNDLED_FL": "ON",
