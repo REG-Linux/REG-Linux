@@ -112,7 +112,9 @@ class ScummVMGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config: Any, game_resolution: Dict[str, int], rom: str) -> float:
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         if (
             "scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect"
         ) or ("scumm_stretch" in config and config["scumm_stretch"] == "pixel-perfect"):

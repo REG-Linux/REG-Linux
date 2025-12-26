@@ -39,6 +39,11 @@ def writeBezelConfig(
 
     eslog.debug(f"libretro bezel: {bezel}")
 
+    # Initialize variables with default values to satisfy type checker
+    overlay_info_file = ""
+    overlay_png_file = ""
+    bezel_game = False
+
     # create a fake bezel if guns need borders
     if bezel is None and guns_borders_size is not None:
         eslog.debug("guns need border")
@@ -69,7 +74,7 @@ def writeBezelConfig(
             gunBezelFile, gameResolution["width"], gameResolution["height"]
         )
         # if the game needs a specific bezel, to draw border, consider it as a game-specific bezel, like for thebezelproject to avoid caches
-        bz_infos = {
+        bz_infos: dict[str, str | bool | None] = {
             "png": gunBezelFile,
             "info": gunBezelInfoFile,
             "layout": None,
@@ -86,15 +91,29 @@ def writeBezelConfig(
             if cls:
                 emulator_name = getattr(cls, "__name__", "unknown")
         if "libretro" in emulator_name.lower():
-            bz_infos = BezelUtils.get_bezel_infos(rom, bezel, system.name, "libretro")
+            bz_infos_temp = BezelUtils.get_bezel_infos(
+                rom, bezel, system.name, "libretro"
+            )
         else:
-            bz_infos = BezelUtils.get_bezel_infos(rom, bezel, system.name, "mame")
-        if bz_infos is None:
+            bz_infos_temp = BezelUtils.get_bezel_infos(rom, bezel, system.name, "mame")
+
+        # Verificação explícita para garantir que bz_infos não é None
+        if bz_infos_temp is None:
             return
 
-    overlay_info_file = bz_infos["info"]
-    overlay_png_file = bz_infos["png"]
-    bezel_game = bz_infos["specific_to_game"]
+        bz_infos = bz_infos_temp
+
+        # Atribuição segura com checagem de tipo e conversão explícita
+        overlay_info_file_raw = bz_infos.get("info", "")
+        overlay_info_file = (
+            str(overlay_info_file_raw) if overlay_info_file_raw is not None else ""
+        )
+        overlay_png_file_raw = bz_infos.get("png", "")
+        overlay_png_file = (
+            str(overlay_png_file_raw) if overlay_png_file_raw is not None else ""
+        )
+        bezel_game_raw = bz_infos.get("specific_to_game", False)
+        bezel_game = bool(bezel_game_raw) if bezel_game_raw is not None else False
 
     # only the png file is mandatory
     if path.exists(overlay_info_file):
@@ -243,11 +262,11 @@ def writeBezelConfig(
             eslog.debug("Screen resolution smaller than bezel: forcing stretch")
             bezel_stretch = True
         if bezel_game is True:
-            output_png_file = "/tmp/bezel_per_game.png"
+            output_png_file: str = "/tmp/bezel_per_game.png"
             create_new_bezel_file = True
         else:
             # The logic for system bezel caching is no longer always true now that we have tattoos
-            output_png_file = (
+            output_png_file: str = (
                 "/tmp/"
                 + path.splitext(path.basename(overlay_png_file))[0]
                 + "_adapted.png"
@@ -303,8 +322,8 @@ def writeBezelConfig(
             retroarchConfig["video_message_pos_x"] = infos["messagex"] * wratio
             retroarchConfig["video_message_pos_y"] = infos["messagey"] * hratio
         else:
-            xoffset = gameResolution["width"] - infos["width"]
-            yoffset = gameResolution["height"] - infos["height"]
+            xoffset = float(gameResolution["width"] - infos["width"])
+            yoffset = float(gameResolution["height"] - infos["height"])
             retroarchConfig["custom_viewport_x"] = infos["left"] + xoffset / 2
             retroarchConfig["custom_viewport_y"] = infos["top"] + yoffset / 2
             retroarchConfig["custom_viewport_width"] = (
@@ -333,12 +352,12 @@ def writeBezelConfig(
             except Exception as e:
                 eslog.debug(f"Failed to create the adapated image: {e}")
                 return
-        overlay_png_file = (
+        overlay_png_file: str = (
             output_png_file  # substitute with new file (recreated or cached in /tmp)
         )
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
             BezelUtils.tattoo_image(overlay_png_file, tattoo_output_png, system)
-            overlay_png_file = tattoo_output_png
+            overlay_png_file = tattoo_output_png  # type: ignore
     else:
         if viewPortUsed:
             retroarchConfig["custom_viewport_x"] = infos["left"]
@@ -353,7 +372,7 @@ def writeBezelConfig(
         retroarchConfig["video_message_pos_y"] = infos["messagey"]
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
             BezelUtils.tattoo_image(overlay_png_file, tattoo_output_png, system)
-            overlay_png_file = tattoo_output_png
+            overlay_png_file = tattoo_output_png  # type: ignore
 
     if guns_borders_size is not None:
         eslog.debug("Draw gun borders")
@@ -366,7 +385,7 @@ def writeBezelConfig(
             outer_size,
             BezelUtils.guns_borders_color_from_config(system.config),
         )
-        overlay_png_file = output_png_file
+        overlay_png_file = output_png_file  # type: ignore
 
     eslog.debug(f"Bezel file set to {overlay_png_file}")
     writeBezelCfgConfig(overlay_cfg_file, overlay_png_file)

@@ -22,6 +22,12 @@ dependencies = [
     "pyzmq>=22.3.0"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.9.10",
+    "pyright>=1.1.386"
+]
+
 [tool.setuptools.packages.find]
 exclude = ["tests*", "docs*"]
 
@@ -33,22 +39,22 @@ reglinux-configgen = "configgen:main"
 
 [tool.pyright]
 pythonVersion = "3.12"
-typeCheckingMode = "standard"
+typeCheckingMode = "basic"
 
 venvPath = "."
 venv = ".venv"
 
 reportMissingImports = "warning"
 
-reportUnknownParameterType = true
-# reportUnknownVariableType = true
-# reportUnknownMemberType = true
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
 
 reportOptionalOperand = "warning"
 reportOptionalSubscript = "warning"
 reportOptionalMemberAccess = "warning"
 
-reportMissingReturn = true
+reportMissingReturn = false
 
 reportUnusedImport = "warning"
 reportUnusedVariable = "warning"

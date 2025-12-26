@@ -47,11 +47,16 @@ class SupermodelGenerator(Generator):
         if system.isOptSet("crosshairs"):
             command_array.append("-crosshairs={}".format(system.config["crosshairs"]))
         else:
-            if gunsNeedCrosses(guns):
+            # Check if guns is a dictionary (has guns) or a list (empty list if no guns)
+            # If it's an empty list, treat it like an empty dict (no guns, so enable crosses for other devices)
+            if isinstance(guns, dict) and gunsNeedCrosses(guns):
                 if len(guns) == 1:
                     command_array.append("-crosshairs={}".format("1"))
                 else:
                     command_array.append("-crosshairs={}".format("3"))
+            elif isinstance(guns, list) and len(guns) == 0:
+                # Empty list means no guns, so enable crosses for other input devices (like joysticks, mouses...)
+                command_array.append("-crosshairs={}".format("1"))
 
         # force feedback
         if system.isOptSet("forceFeedback") and system.getOptBoolean("forceFeedback"):

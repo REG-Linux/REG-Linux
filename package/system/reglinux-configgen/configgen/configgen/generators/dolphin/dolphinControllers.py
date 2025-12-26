@@ -277,7 +277,7 @@ def generateControllerConfig_emulatedwiimotes(
 def generateControllerConfig_gamecube(
     system: Any, playersControllers: Any, wheels: Any, rom: str
 ) -> None:
-    gamecubeMapping = {
+    gamecubeMapping: dict = {
         "b": "Buttons/B",
         "a": "Buttons/A",
         "y": "Buttons/Y",

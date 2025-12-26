@@ -105,7 +105,7 @@ def _get_guns_borders_size(
     Returns:
         Guns border size identifier if guns are configured, otherwise None
     """
-    if guns is not None:
+    if guns is not None and isinstance(guns, dict):
         from configgen.controllers import guns_borders_size_name
 
         return guns_borders_size_name(guns, system_config)

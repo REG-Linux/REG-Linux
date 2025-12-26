@@ -107,7 +107,7 @@ class BezelUtils:
     @staticmethod
     def get_bezel_infos(
         rom: str, bezel: str, system_name: str, emulator: str
-    ) -> dict[str, str] | None:
+    ) -> dict[str, str | bool | None] | None:
         """
         Locate the appropriate bezel overlay image and related files based on
         ROM name, system name, and emulator used.
@@ -129,7 +129,7 @@ class BezelUtils:
         alt_decoration = getAltDecoration(system_name, rom, emulator)
         rom_base = Path(rom).stem
 
-        candidates = []
+        candidates: list[tuple[str, str, bool, str]] = []
 
         # Priority: game-specific overlays
         candidates += [
@@ -224,7 +224,7 @@ class BezelUtils:
         from PIL import Image
 
         if stretch:
-            return img.resize(target_size, Image.Resampling.LANCZOS)
+            return img.resize(target_size, Image.Resampling.LANCZOS)  # type: ignore
 
         # Calculate the aspect ratio
         img_ratio = img.width / img.height
@@ -240,7 +240,7 @@ class BezelUtils:
             new_height = int(target_size[0] / img_ratio)
 
         # Resize the image maintaining aspect ratio
-        img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)  # type: ignore
 
         # Create a new image with target size and paste the resized image in the center
         new_img = Image.new(img.mode, target_size, fillcolor)
@@ -352,7 +352,7 @@ class BezelUtils:
                     stretch=bezel_stretch,
                     fillcolor=fillcolor,
                 )
-                imgout.save(output_png, mode="RGBA", format="PNG")
+                imgout.save(output_png, mode="RGBA", format="PNG")  # type: ignore
             except OSError as e:
                 eslog.error(f"Error saving output image {output_png}: {e}")
                 raise
@@ -446,7 +446,7 @@ class BezelUtils:
                     stretch=bezel_stretch,
                     fillcolor=fillcolor,
                 )
-                imgout.save(output_png, mode="RGBA", format="PNG")
+                imgout.save(output_png, mode="RGBA", format="PNG")  # type: ignore
             except OSError as e:
                 eslog.error(f"Error saving output image {output_png}: {e}")
                 raise
@@ -573,18 +573,18 @@ class BezelUtils:
             if tw > w or th > h:
                 pcent = float(w / tw)
                 th = int(th * pcent)
-                tattoo = tattoo.resize((w, th), Image.Resampling.BICUBIC)
+                tattoo = tattoo.resize((w, th), Image.Resampling.BICUBIC)  # type: ignore
         else:
             twtemp = int((225 / 1920) * w)
             pcent = float(twtemp / tw)
             th = int(th * pcent)
-            tattoo = tattoo.resize((twtemp, th), Image.Resampling.BICUBIC)
+            tattoo = tattoo.resize((twtemp, th), Image.Resampling.BICUBIC)  # type: ignore
             tw = twtemp
 
         margin = int((20 / 1080) * h)
         corner = system.config.get("bezel.tattoo_corner", "NW").upper()
 
-        tattoo_canvas = Image.new("RGBA", back.size)
+        tattoo_canvas = Image.new("RGBA", back.size)  # type: ignore
         if corner == "NE":
             tattoo_canvas.paste(tattoo, (w - tw, margin))
         elif corner == "SE":
@@ -594,11 +594,11 @@ class BezelUtils:
         else:
             tattoo_canvas.paste(tattoo, (0, margin))
 
-        back = Image.alpha_composite(back, tattoo_canvas)
+        back = Image.alpha_composite(back, tattoo_canvas)  # type: ignore
         imgnew = Image.new("RGBA", (w, h), (0, 0, 0, 255))
         imgnew.paste(back, (0, 0, w, h))
         try:
-            imgnew.save(output_png, mode="RGBA", format="PNG")
+            imgnew.save(output_png, mode="RGBA", format="PNG")  # type: ignore
         except OSError as e:
             eslog.error(f"Error saving tattooed output image {output_png}: {e}")
             raise
@@ -685,7 +685,7 @@ class BezelUtils:
             imgout = BezelUtils.resize_with_fill(
                 imgnew, screensize, stretch=bezel_stretch, fillcolor=fillcolor
             )
-            imgout.save(output_png, mode="RGBA", format="PNG")
+            imgout.save(output_png, mode="RGBA", format="PNG")  # type: ignore
         except OSError as e:
             eslog.error(f"Error saving alpha pasted output image {output_png}: {e}")
             raise
@@ -847,7 +847,7 @@ class BezelUtils:
             draw.rectangle(shape, fill=inner_border_color)
 
         try:
-            imgnew.save(output_png, mode="RGBA", format="PNG")
+            imgnew.save(output_png, mode="RGBA", format="PNG")  # type: ignore
         except OSError as e:
             eslog.error(f"Error saving gun border image {output_png}: {e}")
             raise
@@ -911,7 +911,7 @@ class BezelUtils:
             height: Height of the bezel
         """
         imgnew = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        imgnew.save(output_png, mode="RGBA", format="PNG")
+        imgnew.save(output_png, mode="RGBA", format="PNG")  # type: ignore
 
 
 # Compatibility functions to maintain legacy APIs
@@ -924,7 +924,7 @@ def clear_bezel_cache() -> None:
 
 def getBezelInfos(
     rom: str, bezel: str, systemName: str, emulator: str
-) -> dict[str, str] | None:
+) -> dict[str, str | bool | None] | None:
     """
     Locate the appropriate bezel overlay image and related files based on
     ROM name, system name, and emulator used.

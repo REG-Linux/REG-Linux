@@ -86,7 +86,9 @@ def load_all_controllers_config() -> dict[str, dict[str, Any]]:
     return controllerdb
 
 
-def load_controller_config(controllersInput: List[Dict[str, str]]) -> Dict[str, Any]:
+def load_controller_config(
+    controllersInput: List[Dict[str, str]],
+) -> Dict[str, Dict[str, Any]]:
     """
     Generates player-specific controller objects using the known controller database.
 
@@ -96,7 +98,7 @@ def load_controller_config(controllersInput: List[Dict[str, str]]) -> Dict[str, 
     Returns:
         dict: Dictionary of Controller instances keyed by player number (as strings).
     """
-    playerControllers = dict()
+    playerControllers: Dict[str, Dict[str, Any]] = dict()
     controllers = load_all_controllers_config()
 
     for i, ci in enumerate(controllersInput):

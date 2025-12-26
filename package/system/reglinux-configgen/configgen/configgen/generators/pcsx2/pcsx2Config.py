@@ -87,7 +87,15 @@ def configureAudio():
     f.close()
 
 
-def setPcsx2Config(system: Any, rom: str, controllers: Any, metadata: Any, guns: Any, wheels: Any, playingWithWheel: Any) -> None:
+def setPcsx2Config(
+    system: Any,
+    rom: str,
+    controllers: Any,
+    metadata: Any,
+    guns: Any,
+    wheels: Any,
+    playingWithWheel: Any,
+) -> None:
     configFileName = "{}/{}".format(PCSX2_CONFIG_DIR + "/inis", "PCSX2.ini")
 
     if not path.exists(PCSX2_CONFIG_DIR + "/inis"):
