@@ -1,11 +1,11 @@
---- a/src/arch/sdl/menu_screenshot.c	2025-02-07 22:54:47.367531542 +0100
-+++ b/src/arch/sdl/menu_screenshot.c	2024-12-24 20:12:44.000000000 +0100
-@@ -695,6 +695,8 @@
- static void uiscreenshot_menu_free(ui_menu_entry_t *menu)
+--- a/src/arch/sdl/menu_screenshot.c	2025-12-26 05:35:09.865699906 +0100
++++ b/src/arch/sdl/menu_screenshot.c	2025-12-26 05:35:41.746687824 +0100
+@@ -696,6 +696,8 @@
  {
-     ui_menu_entry_t *entry = menu;
-+    if (entry == NULL)
-+        return;
-     while (entry->string != NULL) {
-         lib_free(entry->string);
-         entry++;
+     if (menu) {
+         ui_menu_entry_t *entry = menu;
++        if (entry == NULL)
++            return;
+         while (entry->string != NULL) {
+             lib_free(entry->string);
+             entry++;

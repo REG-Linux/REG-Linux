@@ -4,14 +4,14 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.8.121
+XEMU_VERSION = v0.8.124
 XEMU_SITE = $(call github,xemu-project,xemu,$(XEMU_VERSION))
 #XEMU_SITE_METHOD = git
 #XEMU_GIT_SUBMODULES = YES
 XEMU_LICENSE = GPLv2
 XEMU_DEPENDENCIES = host-meson host-cmake host-pkgconf host-python3 host-python-distlib
 XEMU_DEPENDENCIES += libcurl libglib2 zlib sdl2 libsamplerate slirp host-python-pyyaml
-XEMU_DEPENDENCIES += libpcap libepoxy libgtk3 json-for-modern-cpp
+XEMU_DEPENDENCIES += libpcap libepoxy libgtk3 json-for-modern-cpp libusb
 
 XEMU_EXTRA_DOWNLOADS = https://github.com/xemu-project/xemu-dashboard/releases/download/v20250806-0635/xbox_hdd.qcow2
 
