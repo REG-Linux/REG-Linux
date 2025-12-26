@@ -248,7 +248,7 @@ diff -u -r -N a/drivers/power/supply/sgm41511_charger.c b/drivers/power/supply/s
 +
 +#define SGM41511_NUM_FIELDS	ARRAY_SIZE(sgm41511_reg_fields)
 +
-+BUILD_BUG_ON(SGM41511_NUM_FIELDS != F_MAX_FIELDS);
++static_assert(SGM41511_NUM_FIELDS == F_MAX_FIELDS);
 +
 +struct sgm41511_device {
 +	struct device *dev;

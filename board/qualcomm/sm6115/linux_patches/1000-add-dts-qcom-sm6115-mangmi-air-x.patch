@@ -246,7 +246,7 @@ index 000000000000..58d9ab342fe9
 +		reg = <0x6e>;
 +		interrupts-extended = <&tlmm 83 IRQ_TYPE_LEVEL_LOW>;
 +		irq-gpios = <&tlmm 83 GPIO_ACTIVE_LOW>;
-+		status = "okay";
++		status = "disabled";
 +	};
 +
 +	sgm41511: charger@1a {
@@ -255,7 +255,7 @@ index 000000000000..58d9ab342fe9
 +		interrupts-extended = <&tlmm 70 IRQ_TYPE_LEVEL_LOW>;
 +		irq-gpios = <&tlmm 70 GPIO_ACTIVE_LOW>;
 +		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
-+		status = "okay";
++		status = "disabled";
 +	};
 +
 +		usb_typec: typec-port-controller@22 {
