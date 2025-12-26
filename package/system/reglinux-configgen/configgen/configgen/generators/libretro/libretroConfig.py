@@ -305,7 +305,7 @@ def createLibretroConfig(
     if system.config["core"] in ["mame", "same_cdi"]:
         generateMAMEConfigs(controllers, system, rom, guns)
 
-    retroarchConfig = dict()
+    retroarchConfig: dict = dict()
     systemConfig = system.config
     renderConfig = system.renderconfig
     systemCore = system.config["core"]

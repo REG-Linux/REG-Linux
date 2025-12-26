@@ -1,7 +1,7 @@
 import os
 from os import path
 from re import match
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from evdev.device import InputDevice
 from pyudev import Context
@@ -14,7 +14,7 @@ eslog = get_logger(__name__)
 
 
 def getGuns() -> Dict[str, Any]:
-    guns = {}
+    guns: Dict[str, Any] = {}
     try:
         context = Context()
     except Exception as e:
@@ -29,7 +29,7 @@ def getGuns() -> Dict[str, Any]:
         return guns
 
     # keep only mouses with /dev/input/eventxx
-    mouses_clean = {}
+    mouses_clean: Dict[int, Any] = {}
     for mouse in mouses:
         try:
             device_node = str(mouse.device_node)
@@ -96,15 +96,15 @@ def getGuns() -> Dict[str, Any]:
 
         # retroarch uses mouse indexes into configuration files using ID_INPUT_MOUSE (TOUCHPAD are listed after mouses)
         try:
-            need_cross = (
+            need_cross: bool = (
                 "ID_INPUT_GUN_NEED_CROSS" in mouse.properties
                 and mouse.properties["ID_INPUT_GUN_NEED_CROSS"] == "1"
             )
-            need_borders = (
+            need_borders: bool = (
                 "ID_INPUT_GUN_NEED_BORDERS" in mouse.properties
                 and mouse.properties["ID_INPUT_GUN_NEED_BORDERS"] == "1"
             )
-            guns[ngun] = {
+            guns[str(ngun)] = {
                 "node": device_node,
                 "id_mouse": nmouse,
                 "need_cross": need_cross,
@@ -114,7 +114,7 @@ def getGuns() -> Dict[str, Any]:
             }
             eslog.info(
                 "found gun {} at {} with id_mouse={} ({})".format(
-                    ngun, device_node, nmouse, guns[ngun]["name"]
+                    ngun, device_node, nmouse, guns[str(ngun)]["name"]
                 )
             )
             nmouse = nmouse + 1
@@ -131,7 +131,7 @@ def getGuns() -> Dict[str, Any]:
     return guns
 
 
-def gunsNeedCrosses(guns: List[Any]) -> bool:
+def gunsNeedCrosses(guns: Dict[str, Any]) -> bool:
     # no gun, enable the cross for joysticks, mouses...
     if len(guns) == 0:
         return True
@@ -143,8 +143,8 @@ def gunsNeedCrosses(guns: List[Any]) -> bool:
 
 
 # returns None is no border is wanted
-def guns_borders_size_name(guns: List[Any], config: Dict[str, Any]) -> Any:
-    borders_size = "medium"
+def guns_borders_size_name(guns: Dict[str, Any], config: Dict[str, Any]) -> Any:
+    borders_size: str = "medium"
     if (
         "controllers.guns.borderssize" in config
         and config["controllers.guns.borderssize"]
@@ -152,7 +152,7 @@ def guns_borders_size_name(guns: List[Any], config: Dict[str, Any]) -> Any:
         borders_size = config["controllers.guns.borderssize"]
 
     # overriden by specific options
-    borders_mode = "normal"
+    borders_mode: str = "normal"
     if (
         "controllers.guns.bordersmode" in config
         and config["controllers.guns.bordersmode"]

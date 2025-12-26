@@ -228,39 +228,39 @@ class Evmapy:
 
                         # Process all inputs from the controller
                         for index in pad.inputs:
-                            input = pad.inputs[index].sdl_to_linux_input_event(
+                            input_obj = pad.inputs[index].sdl_to_linux_input_event(
                                 guide_equal_back
                             )
-                            if input is None:
+                            if input_obj is None:
                                 continue
 
-                            if input["type"] == "button":
+                            if input_obj["type"] == "button":
                                 # Add button to configuration (avoid duplicates)
-                                if input["code"] is not None:
-                                    if input["code"] not in known_buttons_codes:
-                                        known_buttons_names[input["name"]] = True
-                                        known_buttons_codes[input["code"]] = input[
-                                            "name"
-                                        ]
+                                if input_obj["code"] is not None:
+                                    if input_obj["code"] not in known_buttons_codes:
+                                        known_buttons_names[input_obj["name"]] = True
+                                        known_buttons_codes[input_obj["code"]] = (
+                                            input_obj["name"]
+                                        )
                                         padConfig["buttons"].append(
                                             {
-                                                "name": input["name"],
-                                                "code": int(input["code"]),
+                                                "name": input_obj["name"],
+                                                "code": int(input_obj["code"]),
                                             }
                                         )
                                     else:
                                         # Create alias for duplicate button codes
-                                        known_buttons_alias[input["name"]] = (
-                                            known_buttons_codes[input["code"]]
+                                        known_buttons_alias[input_obj["name"]] = (
+                                            known_buttons_codes[input_obj["code"]]
                                         )
 
-                            elif input["type"] == "hat":
+                            elif input_obj["type"] == "hat":
                                 # Handle D-pad (hat) inputs - only process X and Y values once
-                                if int(input["value"]) in [
+                                if int(input_obj["value"]) in [
                                     1,
                                     2,
                                 ]:  # Don't duplicate values
-                                    if int(input["value"]) == 1:
+                                    if int(input_obj["value"]) == 1:
                                         name = "X"
                                         isYAsInt = 0
                                     else:
@@ -268,15 +268,19 @@ class Evmapy:
                                         isYAsInt = 1
 
                                     # Add hat axis min/max buttons
-                                    hat_name_min = "HAT" + input["id"] + name + ":min"
-                                    hat_name_max = "HAT" + input["id"] + name + ":max"
+                                    hat_name_min = (
+                                        "HAT" + input_obj["id"] + name + ":min"
+                                    )
+                                    hat_name_max = (
+                                        "HAT" + input_obj["id"] + name + ":max"
+                                    )
                                     known_buttons_names[hat_name_min] = True
                                     known_buttons_names[hat_name_max] = True
 
                                     padConfig["axes"].append(
                                         {
-                                            "name": "HAT" + input["id"] + name,
-                                            "code": int(input["id"])
+                                            "name": "HAT" + input_obj["id"] + name,
+                                            "code": int(input_obj["id"])
                                             + 16
                                             + isYAsInt,  # 16 = HAT0X in linux/input.h
                                             "min": -1,
@@ -284,54 +288,61 @@ class Evmapy:
                                         }
                                     )
 
-                            elif input["type"] == "axis":
+                            elif input_obj["type"] == "axis":
                                 # Handle analog stick and trigger inputs
                                 if (
-                                    input["code"] not in known_axes_codes
+                                    input_obj["code"] not in known_axes_codes
                                 ):  # Avoid duplicates
-                                    known_axes_codes[input["code"]] = True
-                                    axisId = None
-                                    axisName = None
+                                    known_axes_codes[input_obj["code"]] = True
+                                    axisId: Optional[str] = None
+                                    axisName: Optional[str] = None
 
                                     # Map axis inputs to standardized names
-                                    if input["name"] in [
+                                    if input_obj["name"] in [
                                         "joystick1up",
                                         "joystick1left",
                                     ]:
                                         axisId = "0"  # Left analog stick
-                                    elif input["name"] in [
+                                    elif input_obj["name"] in [
                                         "joystick2up",
                                         "joystick2left",
                                     ]:
                                         axisId = "1"  # Right analog stick
 
-                                    if input["name"] in ["joystick1up", "joystick2up"]:
+                                    if input_obj["name"] in [
+                                        "joystick1up",
+                                        "joystick2up",
+                                    ]:
                                         axisName = "Y"
-                                    elif input["name"] in [
+                                    elif input_obj["name"] in [
                                         "joystick1left",
                                         "joystick2left",
                                     ]:
                                         axisName = "X"
-                                    elif input["name"] in ["up", "down"]:
+                                    elif input_obj["name"] in ["up", "down"]:
                                         # D-pad implemented as axis
                                         axisId = "BASE"
                                         axisName = "Y"
-                                        if input["name"] == "up":
-                                            absbasey_positive = int(input["value"]) >= 0
+                                        if input_obj["name"] == "up":
+                                            absbasey_positive = (
+                                                int(input_obj["value"]) >= 0
+                                            )
                                         else:
                                             axisId = None  # Don't duplicate, configure only for 'up'
-                                    elif input["name"] in ["left", "right"]:
+                                    elif input_obj["name"] in ["left", "right"]:
                                         # D-pad implemented as axis
                                         axisId = "BASE"
                                         axisName = "X"
-                                        if input["name"] == "left":
-                                            absbasex_positive = int(input["value"]) < 0
+                                        if input_obj["name"] == "left":
+                                            absbasex_positive = (
+                                                int(input_obj["value"]) < 0
+                                            )
                                         else:
                                             axisId = None  # Don't duplicate, configure only for 'left'
                                     else:
                                         # Other axes (triggers, etc.)
                                         axisId = "_OTHERS_"
-                                        axisName = input["name"]
+                                        axisName = input_obj["name"]
 
                                     # Add axis configuration if valid
                                     if (
@@ -340,38 +351,41 @@ class Evmapy:
                                             and axisName in ["X", "Y"]
                                         )
                                         or axisId == "_OTHERS_"
-                                    ) and input["code"] is not None:
+                                    ) and input_obj["code"] is not None:
                                         axisMin, axisMax = Evmapy.__getPadMinMaxAxis(
-                                            pad.dev, int(input["code"])
+                                            pad.dev, int(input_obj["code"])
                                         )
 
                                         # Add axis virtual buttons (min, max, val)
-                                        axis_base_name = "ABS" + axisId + axisName
-                                        known_buttons_names[axis_base_name + ":min"] = (
-                                            True
-                                        )
-                                        known_buttons_names[axis_base_name + ":max"] = (
-                                            True
-                                        )
-                                        known_buttons_names[axis_base_name + ":val"] = (
-                                            True
-                                        )
+                                        if axisId is not None and axisName is not None:
+                                            axis_base_name = "ABS" + axisId + axisName
+                                            known_buttons_names[
+                                                axis_base_name + ":min"
+                                            ] = True
+                                            known_buttons_names[
+                                                axis_base_name + ":max"
+                                            ] = True
+                                            known_buttons_names[
+                                                axis_base_name + ":val"
+                                            ] = True
 
-                                        padConfig["axes"].append(
-                                            {
-                                                "name": axis_base_name,
-                                                "code": int(input["code"]),
-                                                "min": axisMin,
-                                                "max": axisMax,
-                                            }
-                                        )
+                                            padConfig["axes"].append(
+                                                {
+                                                    "name": axis_base_name,
+                                                    "code": int(input_obj["code"]),
+                                                    "min": axisMin,
+                                                    "max": axisMax,
+                                                }
+                                            )
 
                         # Process actions from configuration file
-                        padActionsPreDefined = padActionConfig[player_action_key]
-                        padActionsFiltered = []
+                        padActionsPreDefined: List[Any] = padActionConfig[
+                            player_action_key
+                        ]
+                        padActionsFiltered: List[Any] = []
 
                         # Handle mouse events - expand joystick shortcuts to x/y components
-                        padActionsDefined = []
+                        padActionsDefined: List[Any] = []
                         for action in padActionsPreDefined:
                             if (
                                 "type" in action
@@ -381,7 +395,7 @@ class Evmapy:
                             ):
                                 if action["trigger"] == "joystick1":
                                     # Split joystick1 into x and y components
-                                    newaction = action.copy()
+                                    newaction: Dict[str, Any] = action.copy()
                                     newaction["trigger"] = "joystick1x"
                                     newaction["target"] = "X"
                                     padActionsDefined.append(newaction)
@@ -393,7 +407,7 @@ class Evmapy:
 
                                 elif action["trigger"] == "joystick2":
                                     # Split joystick2 into x and y components
-                                    newaction = action.copy()
+                                    newaction: Dict[str, Any] = action.copy()
                                     newaction["trigger"] = "joystick2x"
                                     newaction["target"] = "X"
                                     padActionsDefined.append(newaction)
@@ -470,7 +484,7 @@ class Evmapy:
 
                         # Optimize axis ranges based on usage
                         # Use full axis range for mouse, 50% range for keys
-                        axis_for_mouse = {}
+                        axis_for_mouse: Dict[str, bool] = {}
                         for action in padConfig["actions"]:
                             if "type" in action and action["type"] == "mouse":
                                 if isinstance(action["trigger"], list):
@@ -481,7 +495,7 @@ class Evmapy:
 
                         # Adjust axis ranges for non-mouse actions
                         for axis in padConfig["axes"]:
-                            axis_triggers = [
+                            axis_triggers: List[str] = [
                                 axis["name"] + ":val",
                                 axis["name"] + ":min",
                                 axis["name"] + ":max",
@@ -639,7 +653,7 @@ class Evmapy:
         return trigger  # Return unchanged if no mapping found
 
     @staticmethod
-    def __trigger_mapper_mode(trigger: str) -> Optional[str]:
+    def __trigger_mapper_mode(trigger: Union[str, List[str]]) -> Optional[str]:
         """
         Determine the appropriate mode for a trigger.
 
@@ -677,7 +691,9 @@ class Evmapy:
         return None
 
     @staticmethod
-    def __getGunTrigger(trigger: str, gun: Dict[str, Any]) -> Any:
+    def __getGunTrigger(
+        trigger: Union[str, List[str]], gun: Dict[str, Any]
+    ) -> Optional[Union[str, List[str]]]:
         """
         Validate that gun trigger(s) are available on the specified gun device.
 
@@ -743,7 +759,7 @@ class Evmapy:
                     if isinstance(abs_info, tuple) and len(abs_info) == 2:
                         abs_code, val = abs_info
                         if abs_code == axisCode:
-                            return val.min, val.max
+                            return val.min, val.max  # type: ignore
         except PermissionError as e:
             # Log permission denied error
             eslog.warning(f"Permission denied accessing {devicePath}: {e}")

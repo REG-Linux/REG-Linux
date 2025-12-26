@@ -11,4 +11,10 @@ from .rpcs3Controllers import (
 )
 from .rpcs3Generator import Rpcs3Generator
 
-__all__ = ["Rpcs3Generator", "configure_evdev_controller", "configure_sdl_controller", "configure_sony_controller", "generateControllerConfig"]
+__all__ = [
+    "Rpcs3Generator",
+    "configure_evdev_controller",
+    "configure_sdl_controller",
+    "configure_sony_controller",
+    "generateControllerConfig",
+]

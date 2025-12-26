@@ -135,20 +135,23 @@ class Input:
         return None
 
 
+from typing import Any, Dict, Optional
+
+
 @dataclass
 class Controller:
     guid: str
     name: str = ""
-    inputs: dict[str, Any] = field(default_factory=dict)
+    inputs: Dict[str, Any] = field(default_factory=dict)  # type: ignore
     type: str = ""
     index: int = -1
-    dev: Any | None = None
-    nbaxes: int | None = 0
-    nbbuttons: int | None = 0
-    nbhats: int | None = 0
+    dev: Optional[Any] = None
+    nbaxes: Optional[int] = 0
+    nbbuttons: Optional[int] = 0
+    nbhats: Optional[int] = 0
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Controller":
+    def from_dict(cls, data: Dict[str, Any]) -> "Controller":
         return cls(
             guid=data.get("guid", ""),
             name=data.get("name", ""),

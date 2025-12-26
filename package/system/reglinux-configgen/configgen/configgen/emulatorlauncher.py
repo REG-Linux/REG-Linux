@@ -776,8 +776,11 @@ def getHudBezel(
         # --- Bezel Validation ---
         infos = {}  # Initialize infos here to ensure it's always defined
         try:
-            with open(overlay_info_file) as f:
-                infos = json.load(f)
+            if overlay_info_file and isinstance(overlay_info_file, str):
+                with open(overlay_info_file) as f:
+                    infos = json.load(f)
+            else:
+                eslog.warning(f"Invalid overlay info file: {overlay_info_file}")
         except FileNotFoundError:
             eslog.warning(f"Bezel info file not found: {overlay_info_file}")
         except json.JSONDecodeError as e:
@@ -787,11 +790,17 @@ def getHudBezel(
 
         # Get bezel dimensions either from info file or the image itself.
         if "width" in infos and "height" in infos:
-            bezel_width, bezel_height = infos["width"], infos["height"]
+            bezel_width: int = infos["width"]
+            bezel_height: int = infos["height"]
             eslog.info(f"Bezel size read from {overlay_info_file}")
         else:
-            bezel_width, bezel_height = bezelsUtil.fast_image_size(overlay_png_file)
-            eslog.info(f"Bezel size read from {overlay_png_file}")
+            if overlay_png_file and isinstance(overlay_png_file, str):
+                bezel_width: int = bezelsUtil.fast_image_size(overlay_png_file)[0]
+                bezel_height: int = bezelsUtil.fast_image_size(overlay_png_file)[1]
+                eslog.info(f"Bezel size read from {overlay_png_file}")
+            else:
+                eslog.error(f"Invalid overlay PNG file: {overlay_png_file}")
+                return None
 
         # Define validation thresholds.
         max_ratio_delta = 0.01  # Max difference between screen and bezel aspect ratio.
@@ -818,25 +827,33 @@ def getHudBezel(
             eslog.debug("Bezel needs to be resized")
             output_png_file = "/tmp/bezel.png"
             temp_files.append(output_png_file)
-            try:
-                bezelsUtil.resizeImage(
-                    overlay_png_file,
-                    output_png_file,
-                    game_resolution["width"],
-                    game_resolution["height"],
-                    bezel_stretch,
-                )
-                overlay_png_file = output_png_file
-            except Exception as e:
-                eslog.error(f"Failed to resize the image: {e}")
+            if overlay_png_file and isinstance(overlay_png_file, str):
+                try:
+                    bezelsUtil.resizeImage(
+                        overlay_png_file,
+                        output_png_file,
+                        game_resolution["width"],
+                        game_resolution["height"],
+                        bezel_stretch,
+                    )
+                    overlay_png_file = output_png_file
+                except Exception as e:
+                    eslog.error(f"Failed to resize the image: {e}")
+                    return None
+            else:
+                eslog.error(f"Invalid overlay PNG file for resize: {overlay_png_file}")
                 return None
 
         # Apply a "tattoo" (watermark/logo) to the bezel if configured.
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
             output_png_file = "/tmp/bezel_tattooed.png"
             temp_files.append(output_png_file)
-            bezelsUtil.tatooImage(overlay_png_file, output_png_file, system)
-            overlay_png_file = output_png_file
+            if overlay_png_file and isinstance(overlay_png_file, str):
+                bezelsUtil.tatooImage(overlay_png_file, output_png_file, system)
+                overlay_png_file = output_png_file
+            else:
+                eslog.error(f"Invalid overlay PNG file for tattoo: {overlay_png_file}")
+                return None
 
         # Draw gun borders on the bezel if required.
         if borders_size is not None:
@@ -845,10 +862,16 @@ def getHudBezel(
             temp_files.append(output_png_file)
             inner_size, outer_size = bezelsUtil.gun_borders_size(borders_size)
             color = bezelsUtil.gunsBordersColorFomConfig(system.config)
-            bezelsUtil.gunBorderImage(
-                overlay_png_file, output_png_file, inner_size, outer_size, color
-            )
-            overlay_png_file = output_png_file
+            if overlay_png_file and isinstance(overlay_png_file, str):
+                bezelsUtil.gunBorderImage(
+                    overlay_png_file, output_png_file, inner_size, outer_size, color
+                )
+                overlay_png_file = output_png_file
+            else:
+                eslog.error(
+                    f"Invalid overlay PNG file for gun border: {overlay_png_file}"
+                )
+                return None
 
         eslog.debug(f"Applying bezel {overlay_png_file}")
         return overlay_png_file

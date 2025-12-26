@@ -380,7 +380,7 @@ class Emulator:
         Returns:
             True if the option is set to a truthy value, False otherwise.
         """
-        true_values = {"1", "true", "on", "enabled", True}
+        true_values: set[str | bool] = {"1", "true", "on", "enabled", True}
         value = self.config.get(key)
 
         if isinstance(value, str):

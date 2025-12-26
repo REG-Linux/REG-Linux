@@ -1,10 +1,9 @@
 from os import makedirs, path
+from typing import Any, Dict
 from xml.etree.ElementTree import Element, ElementTree, SubElement, parse
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
-from typing import Any, Dict
-
 from configgen.systemFiles import CONF, SAVES
 
 PLAY_CONFIG_DIR = CONF + "/play"
@@ -122,7 +121,9 @@ class PlayGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config: Any, game_resolution: Dict[str, int], rom: str) -> float:
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: Dict[str, int], rom: str
+    ) -> float:
         if (
             "play_widescreen" in config
             and config["play_widescreen"] == "true"
