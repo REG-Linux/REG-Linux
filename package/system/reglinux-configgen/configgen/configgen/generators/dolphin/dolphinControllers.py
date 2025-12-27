@@ -1,5 +1,5 @@
 from codecs import open
-from os import path, remove
+from pathlib import Path
 from typing import Any
 
 from configgen.utils.logger import get_logger
@@ -246,7 +246,7 @@ def generateControllerConfig_emulatedwiimotes(
 
     # This section allows a per ROM override of the default key options.
     configname = rom + ".cfg"  # Define ROM configuration name
-    if path.isfile(configname):  # File exists
+    if Path(configname).is_file():  # File exists
         import ast
 
         with open(configname) as cconfig:
@@ -313,7 +313,7 @@ def generateControllerConfig_gamecube(
 
     # This section allows a per ROM override of the default key options.
     configname = rom + ".cfg"  # Define ROM configuration name
-    if path.isfile(configname):  # File exists
+    if Path(configname).is_file():  # File exists
         import ast
 
         with open(configname) as cconfig:
@@ -338,8 +338,9 @@ def generateControllerConfig_gamecube(
 
 def removeControllerConfig_gamecube():
     configFileName = "{}/{}".format(DOLPHIN_CONFIG_DIR, "GCPadNew.ini")
-    if path.isfile(configFileName):
-        remove(configFileName)
+    configPath = Path(configFileName)
+    if configPath.is_file():
+        configPath.unlink()
 
 
 def generateControllerConfig_realwiimotes(filename: str, anyDefKey: str) -> None:

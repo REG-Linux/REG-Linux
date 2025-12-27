@@ -1,4 +1,5 @@
 from os import environ
+from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
@@ -8,7 +9,7 @@ from configgen.utils.logger import get_logger
 eslog = get_logger(__name__)
 
 
-AZAHAR_CONFIG_PATH = CONF + "/azahar-emu/qt-config.ini"
+AZAHAR_CONFIG_PATH = str(Path(CONF) / "azahar-emu" / "qt-config.ini")
 AZAHAR_BIN_PATH = "/usr/bin/azahar"
 
 

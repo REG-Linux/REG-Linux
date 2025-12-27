@@ -1,9 +1,9 @@
-from os import path
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import ROMS
 
-IORTCW_CONFIG_PATH = ROMS + "/iortcw/main/wolfconfig.cfg"
+IORTCW_CONFIG_PATH = str(Path(ROMS) / "iortcw" / "main" / "wolfconfig.cfg")
 IORTCW_BIN_PATH = "/usr/bin/iortcw/iowolfsp"
 
 
@@ -86,7 +86,7 @@ def setIortcwConfig(system: Any, gameResolution: dict[str, int]) -> None:
         options_to_set["seta cl_language"] = "0"
 
     # Check if the file exists
-    if path.isfile(IORTCW_CONFIG_PATH):
+    if Path(IORTCW_CONFIG_PATH).is_file():
         with open(IORTCW_CONFIG_PATH) as config_file:
             lines = config_file.readlines()
 

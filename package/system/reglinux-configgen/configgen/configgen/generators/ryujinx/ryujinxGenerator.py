@@ -1,6 +1,7 @@
 from filecmp import cmp
 from json import dump, dumps, load
 from os import chmod, environ, makedirs, path
+from pathlib import Path
 from shutil import copyfile
 from typing import Any
 
@@ -10,11 +11,11 @@ from configgen.Command import Command
 from configgen.generators.Generator import Generator
 from configgen.systemFiles import BIOS, CONF
 
-RYUJINX_CONFIG_DIR = CONF + "/Ryujinx"
-RYUJINX_SYSTEM_DIR = RYUJINX_CONFIG_DIR + "/system"
-RYUJINX_CONFIG_PATH = RYUJINX_CONFIG_DIR + "/Config.json"
-RYUJINX_KEY_PATH = BIOS + "/system/prod.keys"
-RYUJINX_BIN_PATH = RYUJINX_CONFIG_DIR + "/ryujinx"
+RYUJINX_CONFIG_DIR = str(CONF / "Ryujinx")
+RYUJINX_SYSTEM_DIR = str(CONF / "Ryujinx" / "system")
+RYUJINX_CONFIG_PATH = str(CONF / "Ryujinx" / "Config.json")
+RYUJINX_KEY_PATH = str(BIOS / "system" / "prod.keys")
+RYUJINX_BIN_PATH = str(Path(RYUJINX_CONFIG_DIR) / "ryujinx")
 
 ryujinxCtrl = {
     "left_joycon_stick": {

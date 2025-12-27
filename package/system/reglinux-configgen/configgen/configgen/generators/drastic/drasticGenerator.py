@@ -1,4 +1,5 @@
-from os import chdir, path
+from os import chdir
+from pathlib import Path
 from shutil import copytree
 
 from configgen.Command import Command
@@ -20,7 +21,8 @@ class DrasticGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create the config directory if it doesn't exist
-        if not path.exists(DRASTIC_CONFIG_DIR_USER):
+        config_user_dir = Path(DRASTIC_CONFIG_DIR_USER)
+        if not config_user_dir.exists():
             copytree(DRASTIC_CONFIG_DIR, DRASTIC_CONFIG_DIR_USER)
 
         with open(DRASTIC_CONFIG_PATH, "w", encoding="ascii") as drasticConfig:

@@ -1,5 +1,6 @@
 from codecs import open
-from os import linesep, makedirs, path
+from os import linesep
+from pathlib import Path
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
@@ -21,12 +22,14 @@ class CannonballGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        if not path.exists(path.dirname(CANNONBALL_CONFIG_PATH)):
-            makedirs(path.dirname(CANNONBALL_CONFIG_PATH))
+        config_dir_path = Path(CANNONBALL_CONFIG_PATH).parent
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # config file
         cannoballConfig = minidom.Document()
-        if path.exists(CANNONBALL_CONFIG_PATH):
+        config_path = Path(CANNONBALL_CONFIG_PATH)
+        if config_path.exists():
             try:
                 cannoballConfig = minidom.parse(CANNONBALL_CONFIG_PATH)
             except (ExpatError, FileNotFoundError, OSError) as e:

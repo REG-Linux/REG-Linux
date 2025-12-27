@@ -1,4 +1,5 @@
 from os import environ
+from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
@@ -7,9 +8,9 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-EDEN_CONFIG_DIR = CONF + "/eden"
-EDEN_CONFIG_PATH = EDEN_CONFIG_DIR + "/qt-config.ini"
-EDEN_BIN_PATH = "/usr/bin/eden-cli"
+EDEN_CONFIG_DIR = CONF / "eden"
+EDEN_CONFIG_PATH = EDEN_CONFIG_DIR / "qt-config.ini"
+EDEN_BIN_PATH = Path("/usr/bin/eden-cli")
 
 
 def setEdenConfig(edenConfig: Any, system: Any) -> None:
@@ -45,12 +46,14 @@ def setEdenConfig(edenConfig: Any, system: Any) -> None:
     edenConfig.set("UI", "Paths\\gamedirs\\1\\deep_scan\\default", "false")
     edenConfig.set("UI", "Paths\\gamedirs\\1\\expanded", "true")
     edenConfig.set("UI", "Paths\\gamedirs\\1\\expanded\\default", "false")
-    edenConfig.set("UI", "Paths\\gamedirs\\1\\path", "/userdata/roms/switch")
+    edenConfig.set("UI", "Paths\\gamedirs\\1\\path", str(Path("/userdata/roms/switch")))
     edenConfig.set("UI", "Paths\\gamedirs\\size", "1")
 
     edenConfig.set("UI", "Screenshots\\enable_screenshot_save_as", "true")
     edenConfig.set("UI", "Screenshots\\enable_screenshot_save_as\\default", "false")
-    edenConfig.set("UI", "Screenshots\\screenshot_path", "/userdata/screenshots")
+    edenConfig.set(
+        "UI", "Screenshots\\screenshot_path", str(Path("/userdata/screenshots"))
+    )
     edenConfig.set("UI", "Screenshots\\screenshot_path\\default", "false")
 
     # Change controller exit
@@ -68,27 +71,37 @@ def setEdenConfig(edenConfig: Any, system: Any) -> None:
     # Data Storage section
     edenConfig.ensure_section("Data%20Storage")
     edenConfig.set(
-        "Data%20Storage", "dump_directory", "/userdata/system/configs/eden/dump"
+        "Data%20Storage",
+        "dump_directory",
+        str(Path("/userdata/system/configs/eden/dump")),
     )
     edenConfig.set("Data%20Storage", "dump_directory\\default", "false")
 
     edenConfig.set(
-        "Data%20Storage", "load_directory", "/userdata/system/configs/eden/load"
+        "Data%20Storage",
+        "load_directory",
+        str(Path("/userdata/system/configs/eden/load")),
     )
     edenConfig.set("Data%20Storage", "load_directory\\default", "false")
 
     edenConfig.set(
-        "Data%20Storage", "nand_directory", "/userdata/system/configs/eden/nand"
+        "Data%20Storage",
+        "nand_directory",
+        str(Path("/userdata/system/configs/eden/nand")),
     )
     edenConfig.set("Data%20Storage", "nand_directory\\default", "false")
 
     edenConfig.set(
-        "Data%20Storage", "sdmc_directory", "/userdata/system/configs/eden/sdmc"
+        "Data%20Storage",
+        "sdmc_directory",
+        str(Path("/userdata/system/configs/eden/sdmc")),
     )
     edenConfig.set("Data%20Storage", "sdmc_directory\\default", "false")
 
     edenConfig.set(
-        "Data%20Storage", "tas_directory", "/userdata/system/configs/eden/tas"
+        "Data%20Storage",
+        "tas_directory",
+        str(Path("/userdata/system/configs/eden/tas")),
     )
     edenConfig.set("Data%20Storage", "tas_directory\\default", "false")
 

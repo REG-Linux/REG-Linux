@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from os import path
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -175,7 +175,7 @@ class Emulator:
         controllersSettings = recalSettings.loadAll("controllers", True)
         systemSettings = recalSettings.loadAll(self.name)
         folderSettings = recalSettings.loadAll(
-            self.name + '.folder["' + path.dirname(rom) + '"]'
+            self.name + '.folder["' + str(Path(rom).parent) + '"]'
         )
         gameSettings = recalSettings.loadAll(self.name + '["' + gsname + '"]')
 
@@ -216,13 +216,19 @@ class Emulator:
             if shaderset != "none":
                 # Prefer user-defined shader configs if available
                 user_shader_path = (
-                    f"/userdata/shaders/configs/{shaderset}/rendering-defaults.yml"
+                    Path("/userdata/shaders/configs")
+                    / shaderset
+                    / "rendering-defaults.yml"
                 )
-                if path.exists(user_shader_path):
+                if user_shader_path.exists():
                     self.renderconfig = Emulator.get_generic_config(
                         self.name,
-                        user_shader_path,
-                        f"/userdata/shaders/configs/{shaderset}/rendering-defaults-arch.yml",
+                        str(user_shader_path),
+                        str(
+                            Path("/userdata/shaders/configs")
+                            / shaderset
+                            / "rendering-defaults-arch.yml"
+                        ),
                     )
                 else:
                     self.renderconfig = Emulator.get_generic_config(
@@ -257,7 +263,7 @@ class Emulator:
         Returns:
             Sanitized game settings name compatible with EmulationStation.
         """
-        rom = path.basename(rom)
+        rom = Path(rom).name
 
         # Sanitize name by removing invalid characters per EmulationStation rules
         # Using walrus operator for assignment expressions where useful
@@ -319,7 +325,7 @@ class Emulator:
 
         # Load architecture-specific configuration if available
         systems_default_arch: dict[str, Any] = {}
-        if path.exists(defaultarchyml):
+        if Path(defaultarchyml).exists():
             with open(defaultarchyml) as f:
                 systems_default_arch = yaml.load(f, Loader=Loader) or {}
 

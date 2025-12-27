@@ -6,7 +6,8 @@ for gaming and application environments. It handles compositor lifecycle managem
 and proper environment variable configuration for both Wayland and X11 compatibility.
 """
 
-from os import environ, path
+from os import environ
+from pathlib import Path
 from subprocess import Popen, TimeoutExpired, run
 from time import sleep
 from typing import Any
@@ -193,7 +194,7 @@ def start_compositor(generator: Any, system: Any) -> None:
     """
     window_manager = WindowManager()
 
-    if path.exists("/usr/bin/sway"):
+    if Path("/usr/bin/sway").exists():
         if not window_manager.start_sway(generator, system):
             raise RuntimeError(
                 "Failed to start Sway compositor - check logs for details"

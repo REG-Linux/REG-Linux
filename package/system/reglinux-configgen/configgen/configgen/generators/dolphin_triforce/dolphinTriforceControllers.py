@@ -1,8 +1,8 @@
 import codecs
 import configparser
 import glob
-import os
 import re
+from pathlib import Path
 from typing import Any
 
 from configgen.utils.logger import get_logger
@@ -60,7 +60,7 @@ def generateControllerConfig_gamecube(
 
     # This section allows a per ROM override of the default key options.
     configname = rom + ".cfg"  # Define ROM configuration name
-    if os.path.isfile(configname):  # File exists
+    if Path(configname).is_file():  # File exists
         import ast
 
         with open(configname) as cconfig:
@@ -86,8 +86,9 @@ def removeControllerConfig_gamecube():
     configFileName = "{}/{}".format(
         dolphinTriforceConfig.dolphinTriforceConfig, "Config/GCPadNew.ini"
     )
-    if os.path.isfile(configFileName):
-        os.remove(configFileName)
+    configPath = Path(configFileName)
+    if configPath.is_file():
+        configPath.unlink()
 
 
 def generateHotkeys(playersControllers: Any) -> None:

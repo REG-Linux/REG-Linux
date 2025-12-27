@@ -78,7 +78,7 @@ class FlycastGenerator(Generator):
         return Command(
             array=command_array,
             env={
-                "XDG_CONFIG_DIRS": CONF,
+                "XDG_CONFIG_DIRS": str(CONF),
                 "FLYCAST_DATADIR": FLYCAST_SAVES_DIR,
                 "FLYCAST_BIOS_PATH": FLYCAST_BIOS_DIR,
             },

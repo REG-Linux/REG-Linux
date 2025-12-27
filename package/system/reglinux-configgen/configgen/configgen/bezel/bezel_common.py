@@ -4,7 +4,8 @@ Consolidated Bezel Configuration Writer - Combines common functionality from dif
 
 from contextlib import suppress
 from json import load
-from os import listdir, makedirs, path, remove, symlink, unlink
+from os import listdir, remove, symlink
+from pathlib import Path
 from typing import Any
 
 from configgen.bezel.bezel_base import BezelUtils, eslog
@@ -117,7 +118,7 @@ def writeBezelConfig(
         bezel_game = bool(bezel_game_raw) if bezel_game_raw is not None else False
 
     # only the png file is mandatory
-    if path.exists(overlay_info_file):
+    if Path(overlay_info_file).exists():
         try:
             with open(overlay_info_file) as f:
                 infos = load(f)
@@ -268,16 +269,14 @@ def writeBezelConfig(
         else:
             # The logic for system bezel caching is no longer always true now that we have tattoos
             output_png_file: str = (
-                "/tmp/"
-                + path.splitext(path.basename(overlay_png_file))[0]
-                + "_adapted.png"
+                "/tmp/" + Path(overlay_png_file).stem + "_adapted.png"
             )
             if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
                 create_new_bezel_file = True
             else:
-                if (not path.exists(tattoo_output_png)) and path.exists(
-                    output_png_file
-                ):
+                tattoo_output_path = Path(tattoo_output_png)
+                output_path = Path(output_png_file)
+                if (not tattoo_output_path.exists()) and output_path.exists():
                     create_new_bezel_file = False
                     eslog.debug(f"Using cached bezel file {output_png_file}")
                 else:
@@ -288,7 +287,7 @@ def writeBezelConfig(
                 fadapted = [
                     "/tmp/" + f for f in listdir("/tmp/") if (f[-12:] == "_adapted.png")
                 ]
-                fadapted.sort(key=lambda x: path.getmtime(x))
+                fadapted.sort(key=lambda x: Path(x).stat().st_mtime)
                 # Keep only the last 10 generated bezels to save space in tmpfs /tmp
                 if len(fadapted) >= 10:
                     for _ in range(10):
@@ -385,26 +384,26 @@ def writeBezelConfig(
         overlay_png_file = output_png_file  # type: ignore
 
     eslog.debug(f"Bezel file set to {overlay_png_file}")
-    writeBezelCfgConfig(overlay_cfg_file, overlay_png_file)
+    writeBezelCfgConfig(str(overlay_cfg_file), overlay_png_file)
 
     # For shaders that will want to use the Batocera decoration as part of the shader instead of an overlay
     if shaderBezel:
         # Create path if needed, clean old bezels
-        shaderBezelPath = "/var/run/shader_bezels"
-        shaderBezelFile = shaderBezelPath + "/bezel.png"
-        if not path.exists(shaderBezelPath):
-            makedirs(shaderBezelPath)
+        shaderBezelPath = Path("/var/run/shader_bezels")
+        shaderBezelFile = shaderBezelPath / "bezel.png"
+        if not shaderBezelPath.exists():
+            shaderBezelPath.mkdir(parents=True, exist_ok=True)
             eslog.debug(f"Creating shader bezel path {overlay_png_file}")
-        if path.exists(shaderBezelFile):
+        if shaderBezelFile.exists():
             eslog.debug(f"Removing old shader bezel {shaderBezelFile}")
-            if path.islink(shaderBezelFile):
-                unlink(shaderBezelFile)
+            if shaderBezelFile.is_symlink():
+                shaderBezelFile.unlink()
             else:
-                remove(shaderBezelFile)
+                shaderBezelFile.unlink()
 
         # Link bezel png file to the fixed path.
         # Shaders should use this path to find the art.
-        symlink(overlay_png_file, shaderBezelFile)
+        symlink(overlay_png_file, str(shaderBezelFile))
         eslog.debug(
             f"Symlinked bezel file {overlay_png_file} to {shaderBezelFile} for selected shader"
         )

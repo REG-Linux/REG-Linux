@@ -474,14 +474,14 @@ class Rpcs3Generator(Generator):
         else:
             romName = rom + "/PS3_GAME/USRDIR/EBOOT.BIN"
 
-        command_array = [RPCS3_BIN_PATH, romName]
+        command_array = [str(RPCS3_BIN_PATH), romName]
 
         if not (system.isOptSet("rpcs3_gui") and system.getOptBoolean("rpcs3_gui")):
             command_array.append("--no-gui")
 
         # firmware not installed and available : instead of starting the game, install it
         if getFirmwareVersion() is None and path.exists(RPCS3_PS3UPDAT_PATH):
-            command_array = [RPCS3_BIN_PATH, "--installfw", RPCS3_PS3UPDAT_PATH]
+            command_array = [str(RPCS3_BIN_PATH), "--installfw", RPCS3_PS3UPDAT_PATH]
 
         return Command(array=command_array)
 

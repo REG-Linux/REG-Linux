@@ -4,9 +4,9 @@ from typing import Any
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF
 
-VICE_CONFIG_DIR = CONF + "/vice"
-VICE_CONFIG_PATH = VICE_CONFIG_DIR + "/sdl-vicerc"
-VICE_CONTROLLER_PATH = VICE_CONFIG_DIR + "/sdl-joymap.vjm"
+VICE_CONFIG_DIR = str(CONF / "vice")
+VICE_CONFIG_PATH = str(CONF / "vice" / "sdl-vicerc")
+VICE_CONTROLLER_PATH = str(CONF / "vice" / "sdl-joymap.vjm")
 VICE_BIN_DIR = "/usr/bin/"
 
 

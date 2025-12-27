@@ -8,7 +8,7 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-JAZZ2_ROMS_DIR = ROMS + "/jazz2"
+JAZZ2_ROMS_DIR = ROMS / "jazz2"
 JAZZ2_BIN_PATH = "/usr/bin/jazz2"
 
 
@@ -31,7 +31,7 @@ class Jazz2Generator(Generator):
                 f"ERROR: OS error when changing to Jazz2 ROMs directory {JAZZ2_ROMS_DIR}: {e}. Game assets may not be installed."
             )
 
-        command_array = [JAZZ2_BIN_PATH, "-f", JAZZ2_ROMS_DIR + rom]
+        command_array = [JAZZ2_BIN_PATH, "-f", str(JAZZ2_ROMS_DIR / rom)]
 
         return Command(
             array=command_array,

@@ -1,7 +1,7 @@
 import logging
-import os
 import sys
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Any
 
 
@@ -88,9 +88,9 @@ class LoggerManager:
                 log_file_path = f"/tmp/{self.module_name}.log"
 
             # Create directory if it doesn't exist
-            log_dir = os.path.dirname(log_file_path)
-            if log_dir and not os.path.exists(log_dir):
-                os.makedirs(log_dir, exist_ok=True)
+            log_dir = Path(log_file_path).parent
+            if log_dir and not log_dir.exists():
+                log_dir.mkdir(parents=True, exist_ok=True)
 
             file_handler = RotatingFileHandler(
                 log_file_path, maxBytes=max_file_size, backupCount=backup_count

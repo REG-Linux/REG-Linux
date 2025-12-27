@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import xml.parsers.expat
 from codecs import open
 from csv import reader
-from os import linesep, listdir, makedirs, path, remove, symlink, unlink
+from os import linesep, listdir, remove, symlink
 from pathlib import Path
 from shutil import copy2, rmtree
 from typing import Any
@@ -47,9 +47,9 @@ def generateMAMEConfigs(
 ) -> list[str]:
     # Generate command line for MAME
     commandLine = []
-    romBasename = path.basename(rom)
-    romDirname = path.dirname(rom)
-    (romDrivername, romExt) = path.splitext(romBasename)
+    romBasename = Path(rom).name
+    romDirname = str(Path(rom).parent)
+    (romDrivername, romExt) = Path(rom).stem, Path(rom).suffix
     specialController = "none"
 
     if system.config["core"] in ["mame"]:
@@ -61,19 +61,19 @@ def generateMAMEConfigs(
         # Set up command line for basic systems
         # ie. no media, softlists, etc.
         if system.getOptBoolean("customcfg"):
-            cfgPath = f"/userdata/system/configs/{corePath}/custom/"
+            cfgPath = Path("/userdata/system/configs") / corePath / "custom/"
         else:
-            cfgPath = "/userdata/saves/mame/mame/cfg/"
-        if not path.exists(cfgPath):
-            makedirs(cfgPath)
+            cfgPath = Path("/userdata/saves/mame/mame/cfg/")
+        if not cfgPath.exists():
+            cfgPath.mkdir(parents=True, exist_ok=True)
         if system.name == "vis":
             commandLine += ["vis", "-cdrom", f'"{rom}"']
         else:
             commandLine += [romDrivername]
-        commandLine += ["-cfg_directory", cfgPath]
+        commandLine += ["-cfg_directory", str(cfgPath)]
         commandLine += [
             "-rompath",
-            romDirname + ";/userdata/bios/mame/;/userdata/bios/",
+            f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))}",
         ]
         pluginsToLoad = []
         if not (
@@ -99,13 +99,13 @@ def generateMAMEConfigs(
         # Auto softlist for FM Towns if there is a zip that matches the folder name
         # Used for games that require a CD and floppy to both be inserted
         if system.name == "fmtowns" and softList == "":
-            romParentPath = path.basename(romDirname)
-            if path.exists(f"/userdata/roms/fmtowns/{romParentPath}.zip"):
+            romParentPath = Path(romDirname).name
+            if (Path("/userdata/roms/fmtowns") / f"{romParentPath}.zip").exists():
                 softList = "fmtowns_cd"
 
         # Determine MESS system name (if needed)
-        messDataFile = "/usr/share/reglinux/configgen/data/mame/messSystems.csv"
-        with open(messDataFile, "r") as openFile:
+        messDataFile = Path("/usr/share/reglinux/configgen/data/mame/messSystems.csv")
+        with open(str(messDataFile), "r") as openFile:
             messSystems = []
             messSysName = []
             messRomType = []
@@ -127,14 +127,14 @@ def generateMAMEConfigs(
         if messSysName[messMode] == "":
             # Command line for non-arcade, non-system ROMs (lcdgames, plugnplay)
             if system.getOptBoolean("customcfg"):
-                cfgPath = f"/userdata/system/configs/{corePath}/custom/"
+                cfgPath = Path("/userdata/system/configs") / corePath / "custom/"
             else:
-                cfgPath = "/userdata/saves/mame/mame/cfg/"
-            if not path.exists(cfgPath):
-                makedirs(cfgPath)
+                cfgPath = Path("/userdata/saves/mame/mame/cfg/")
+            if not cfgPath.exists():
+                cfgPath.mkdir(parents=True, exist_ok=True)
             commandLine += [romDrivername]
-            commandLine += ["-cfg_directory", cfgPath]
-            commandLine += ["-rompath", romDirname + ";/userdata/bios/"]
+            commandLine += ["-cfg_directory", str(cfgPath)]
+            commandLine += ["-rompath", f"{romDirname};{str(Path('/userdata/bios/'))}"]
         else:
             # Command line for MESS consoles/computers
             # TI-99 32k RAM expansion & speech modules
@@ -184,6 +184,7 @@ def generateMAMEConfigs(
                 commandLine += ["-ramsize", str(system.config["ramsize"]) + "M"]
 
             # Mac RAM & Image Reader (if applicable)
+            imageSlot = ""
             if (
                 system.name == "macintosh"
                 and system.isOptSet("ramsize")
@@ -216,14 +217,14 @@ def generateMAMEConfigs(
                     subdirSoftList,
                     softList,
                     softDir,
-                    "/userdata/bios/mame/hash",
+                    str(Path("/userdata/bios/mame/hash")),
                     romDirname,
                 )
                 if softList in subdirSoftList:
-                    commandLine += [path.basename(romDirname)]
+                    commandLine += [Path(romDirname).name]
                 else:
                     commandLine += [romDrivername]
-                commandLine += ["-rompath", softDir + ";/userdata/bios/"]
+                commandLine += ["-rompath", f"{softDir};{str(Path('/userdata/bios/'))}"]
                 commandLine += ["-swpath", softDir]
                 commandLine += ["-verbose"]
             else:
@@ -240,7 +241,7 @@ def generateMAMEConfigs(
                             commandLine += ["-" + system.config["altromtype"]]
                     elif system.name == "adam":
                         # add some logic based on the extension
-                        rom_extension = path.splitext(rom)[1].lower()
+                        rom_extension = Path(rom).suffix.lower()
                         if rom_extension == ".ddp":
                             commandLine += ["-cass1"]
                         elif rom_extension == ".dsk":
@@ -256,14 +257,14 @@ def generateMAMEConfigs(
                             commandLine += ["-cart"]
                     # try to choose the right floppy for Apple2gs
                     elif system.name == "apple2gs":
-                        rom_extension = path.splitext(rom)[1].lower()
+                        rom_extension = Path(rom).suffix.lower()
                         if rom_extension == ".zip":
                             with ZipFile(rom, "r") as zip_file:
                                 file_list = zip_file.namelist()
                                 # assume only one file in zip
                                 if len(file_list) == 1:
                                     filename = file_list[0]
-                                    rom_extension = path.splitext(filename)[1].lower()
+                                    rom_extension = Path(filename).suffix.lower()
                         if rom_extension in [".2mg", ".2img", ".img", ".image"]:
                             commandLine += ["-flop3"]
                         else:
@@ -296,7 +297,10 @@ def generateMAMEConfigs(
                             commandLine += ["-" + messRomType[messMode]]
                 # Use the full filename for MESS non-softlist ROMs
                 commandLine += [f'"{rom}"']
-                commandLine += ["-rompath", romDirname + ";/userdata/bios/"]
+                commandLine += [
+                    "-rompath",
+                    f"{romDirname};{str(Path('/userdata/bios/'))}",
+                ]
 
                 # Boot disk for Macintosh
                 # Will use Floppy 1 or Hard Drive, depending on the disk.
@@ -308,14 +312,10 @@ def generateMAMEConfigs(
                         "macos75",
                     ]:
                         bootType = "-flop1"
-                        bootDisk = (
-                            '"/userdata/bios/' + system.config["bootdisk"] + '.img"'
-                        )
+                        bootDisk = f'"{str(Path("/userdata/bios") / (system.config["bootdisk"] + ".img"))}"'
                     else:
                         bootType = "-hard"
-                        bootDisk = (
-                            '"/userdata/bios/' + system.config["bootdisk"] + '.chd"'
-                        )
+                        bootDisk = f'"{str(Path("/userdata/bios") / (system.config["bootdisk"] + ".chd"))}"'
                     commandLine += [bootType, bootDisk]
 
                 # Create & add a blank disk if needed, insert into drive 2
@@ -325,27 +325,25 @@ def generateMAMEConfigs(
                     and system.getOptBoolean("addblankdisk")
                     and system.name == "fmtowns"
                 ):
-                    blankDisk = "/usr/share/mame/blank.fmtowns"
-                    targetFolder = f"/userdata/saves/mame/{system.name}"
-                    targetDisk = (
-                        f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
-                    )
+                    blankDisk = Path("/usr/share/mame/blank.fmtowns")
+                    targetFolder = Path("/userdata/saves/mame") / system.name
+                    targetDisk = targetFolder / f"{Path(romBasename).stem}.fmtowns"
                     # Add elif statements here for other systems if enabled
-                    if not path.exists(targetFolder):
-                        makedirs(targetFolder)
-                    if not path.exists(targetDisk):
+                    if not targetFolder.exists():
+                        targetFolder.mkdir(parents=True, exist_ok=True)
+                    if not targetDisk.exists():
                         copy2(blankDisk, targetDisk)
 
                     # Add other single floppy systems to this if statement
                     if messModel == "fmtmarty":
-                        commandLine += ["-flop", targetDisk]
+                        commandLine += ["-flop", str(targetDisk)]
                     elif (
                         system.isOptSet("altromtype")
                         and system.config["altromtype"] == "flop2"
                     ):
-                        commandLine += ["-flop1", targetDisk]
+                        commandLine += ["-flop1", str(targetDisk)]
                     else:
-                        commandLine += ["-flop2", targetDisk]
+                        commandLine += ["-flop2", str(targetDisk)]
 
             # UI enable - for computer systems, the default sends all keys to the emulated system.
             # This will enable hotkeys, but some keys may pass through to MAME and not be usable in the emulated system.
@@ -356,24 +354,36 @@ def generateMAMEConfigs(
 
             # MESS config folder
             if system.getOptBoolean("customcfg"):
-                cfgPath = f"/userdata/system/configs/{corePath}/{messSysName[messMode]}/custom/"
+                cfgPath = (
+                    Path("/userdata/system/configs")
+                    / corePath
+                    / messSysName[messMode]
+                    / "custom/"
+                )
             else:
-                cfgPath = f"/userdata/saves/mame/mame/cfg/{messSysName[messMode]}/"
+                cfgPath = Path("/userdata/saves/mame/mame/cfg") / messSysName[messMode]
             if system.getOptBoolean("pergamecfg"):
-                cfgPath = f"/userdata/system/configs/{corePath}/{messSysName[messMode]}/{romBasename}/"
-            if not path.exists(cfgPath):
-                makedirs(cfgPath)
-            commandLine += ["-cfg_directory", cfgPath]
+                cfgPath = (
+                    Path("/userdata/system/configs")
+                    / corePath
+                    / messSysName[messMode]
+                    / romBasename
+                )
+            if not cfgPath.exists():
+                cfgPath.mkdir(parents=True, exist_ok=True)
+            commandLine += ["-cfg_directory", str(cfgPath)]
 
             # Autostart via ini file
             # Init variables, delete old ini if it exists, prepare ini path
             # lr-mame does NOT support multiple ini paths
             autoRunCmd = ""
             autoRunDelay = 0
-            if not path.exists("/userdata/saves/mame/mame/ini/"):
-                makedirs("/userdata/saves/mame/mame/ini/")
-            if path.exists("/userdata/saves/mame/mame/ini/batocera.ini"):
-                remove("/userdata/saves/mame/mame/ini/batocera.ini")
+            ini_path = Path("/userdata/saves/mame/mame/ini/")
+            if not ini_path.exists():
+                ini_path.mkdir(parents=True, exist_ok=True)
+            batocera_ini_path = ini_path / "batocera.ini"
+            if batocera_ini_path.exists():
+                batocera_ini_path.unlink()
             # bbc has different boots for floppy & cassette, no special boot for carts
             if system.name == "bbc":
                 if system.isOptSet("altromtype") or softList != "":
@@ -412,8 +422,8 @@ def generateMAMEConfigs(
 
                 # if using software list, use "usage" for autoRunCmd (if provided)
                 if softList != "":
-                    softListFile = f"/usr/bin/mame/hash/{softList}.xml"
-                    if path.exists(softListFile):
+                    softListFile = Path("/usr/bin/mame/hash") / f"{softList}.xml"
+                    if softListFile.exists():
                         softwarelist = ET.parse(softListFile)
                         for software in softwarelist.findall("software"):
                             if (
@@ -455,10 +465,11 @@ def generateMAMEConfigs(
 
                 # check for a user override
                 autoRunFile = (
-                    f"system/configs/mame/autoload/{system.name}_{romType}_autoload.csv"
+                    Path("system/configs/mame/autoload")
+                    / f"{system.name}_{romType}_autoload.csv"
                 )
-                if path.exists(autoRunFile):
-                    with open(autoRunFile, "r") as openARFile:
+                if autoRunFile.exists():
+                    with open(str(autoRunFile), "r") as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if (
@@ -471,37 +482,36 @@ def generateMAMEConfigs(
                 # Check for an override file, otherwise use generic (if it exists)
                 autoRunCmd = messAutoRun[messMode]
                 autoRunFile = (
-                    "/usr/share/reglinux/configgen/data/mame/"
-                    + softList
-                    + "_autoload.csv"
+                    Path("/usr/share/reglinux/configgen/data/mame")
+                    / f"{softList}_autoload.csv"
                 )
-                if path.exists(autoRunFile):
-                    with open(autoRunFile, "r") as openARFile:
+                if autoRunFile.exists():
+                    with open(str(autoRunFile), "r") as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
-                            if (
-                                row[0].casefold()
-                                == path.splitext(romBasename)[0].casefold()
-                            ):
+                            if row[0].casefold() == Path(romBasename).stem.casefold():
                                 autoRunCmd = row[1] + "\\n"
                                 autoRunDelay = 3
-            commandLine += ["-inipath", "/userdata/saves/mame/mame/ini/"]
+            commandLine += ["-inipath", str(Path("/userdata/saves/mame/mame/ini/"))]
             if autoRunCmd is not None:
                 if autoRunCmd.startswith("'"):
                     autoRunCmd.replace("'", "")
-                with open("/userdata/saves/mame/mame/ini/batocera.ini", "w") as iniFile:
+                with open(str(batocera_ini_path), "w") as iniFile:
                     iniFile.write("autoboot_command          " + autoRunCmd + "\n")
                     iniFile.write("autoboot_delay            " + str(autoRunDelay))
             # Create & add a blank disk if needed, insert into drive 2
             # or drive 1 if drive 2 is selected manually.
+            blank_disk_path = (
+                Path("/userdata/saves/lr-mess")
+                / system.name
+                / f"{Path(romBasename).stem}.dsk"
+            )
             if system.isOptSet("addblankdisk") and system.getOptBoolean("addblankdisk"):
-                if not path.exists(
-                    f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk"
-                ):
-                    makedirs(f"/userdata/saves/lr-mess/{system.name}/")
+                if not blank_disk_path.exists():
+                    blank_disk_path.parent.mkdir(parents=True, exist_ok=True)
                     copy2(
-                        "/usr/share/mame/blank.dsk",
-                        f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk",
+                        Path("/usr/share/mame/blank.dsk"),
+                        blank_disk_path,
                     )
                 if (
                     system.isOptSet("altromtype")
@@ -509,12 +519,12 @@ def generateMAMEConfigs(
                 ):
                     commandLine += [
                         "-flop1",
-                        f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk",
+                        str(blank_disk_path),
                     ]
                 else:
                     commandLine += [
                         "-flop2",
-                        f"/userdata/saves/lr-mess/{system.name}/{path.splitext(romBasename)[0]}.dsk",
+                        str(blank_disk_path),
                     ]
 
     # Lightgun reload option
@@ -546,33 +556,35 @@ def generateMAMEConfigs(
     if system.name != "ti99":
         commandLine += [
             "-pluginspath",
-            "/usr/bin/mame/plugins/;/userdata/saves/mame/plugins",
+            f"{str(Path('/usr/bin/mame/plugins/'))};{str(Path('/userdata/saves/mame/plugins'))}",
         ]
-        commandLine += ["-homepath", "/userdata/saves/mame/plugins/"]
-        commandLine += ["-samplepath", "/userdata/bios/mame/samples/"]
-    if not path.exists("/userdata/saves/mame/plugins/"):
-        makedirs("/userdata/saves/mame/plugins/")
-    if not path.exists("/userdata/bios/mame/samples/"):
-        makedirs("/userdata/bios/mame/samples/")
+        commandLine += ["-homepath", str(Path("/userdata/saves/mame/plugins/"))]
+        commandLine += ["-samplepath", str(Path("/userdata/bios/mame/samples/"))]
+    plugins_path = Path("/userdata/saves/mame/plugins/")
+    if not plugins_path.exists():
+        plugins_path.mkdir(parents=True, exist_ok=True)
+    samples_path = Path("/userdata/bios/mame/samples/")
+    if not samples_path.exists():
+        samples_path.mkdir(parents=True, exist_ok=True)
 
     # Delete old cmd files & prepare path
-    cmdPath = "/var/run/cmdfiles/"
-    if not path.exists(cmdPath):
-        makedirs(cmdPath)
+    cmdPath = Path("/var/run/cmdfiles/")
+    if not cmdPath.exists():
+        cmdPath.mkdir(parents=True, exist_ok=True)
     cmdFileList = listdir(cmdPath)
     for file in cmdFileList:
         if file.endswith(".cmd"):
-            remove(path.join(cmdPath, file))
+            remove(str(cmdPath / file))
 
     # Write command line file
-    cmdFilename = f"{cmdPath}{romDrivername}.cmd"
-    with open(cmdFilename, "w") as cmdFile:
+    cmdFilename = cmdPath / f"{romDrivername}.cmd"
+    with open(str(cmdFilename), "w") as cmdFile:
         cmdFile.write(" ".join(commandLine))
 
     # Call Controller Config
     if messMode == -1:
         generateMAMEPadConfig(
-            cfgPath,
+            str(cfgPath),
             playersControllers,
             system,
             "",
@@ -582,7 +594,7 @@ def generateMAMEConfigs(
         )
     else:
         generateMAMEPadConfig(
-            cfgPath,
+            str(cfgPath),
             playersControllers,
             system,
             messModel,
@@ -601,41 +613,52 @@ def prepSoftwareList(
     hashDir: str,
     romDirname: str,
 ) -> None:
-    if not path.exists(softDir):
-        makedirs(softDir)
+    softDir_path = Path(softDir)
+    if not softDir_path.exists():
+        softDir_path.mkdir(parents=True, exist_ok=True)
     # Check for/remove existing symlinks, remove hashfile folder
     for fileName in listdir(softDir):
-        checkFile = path.join(softDir, fileName)
-        if path.islink(checkFile):
-            unlink(checkFile)
-        if path.isdir(checkFile):
+        checkFile = Path(softDir) / fileName
+        if checkFile.is_symlink():
+            checkFile.unlink()
+        if checkFile.is_dir():
             rmtree(checkFile)
     # Prepare hashfile path
-    if not path.exists(hashDir):
-        makedirs(hashDir)
+    hashDir_path = Path(hashDir)
+    if not hashDir_path.exists():
+        hashDir_path.mkdir(parents=True, exist_ok=True)
     # Remove existing xml files
     hashFiles = listdir(hashDir)
     for file in hashFiles:
         if file.endswith(".xml"):
-            remove(path.join(hashDir, file))
+            remove(str(Path(hashDir) / file))
     # Copy hashfile
-    copy2("/usr/bin/mame/hash/" + softList + ".xml", hashDir + "/" + softList + ".xml")
+    copy2(
+        str(Path("/usr/bin/mame/hash") / f"{softList}.xml"),
+        str(Path(hashDir) / f"{softList}.xml"),
+    )
     # Link ROM's parent folder if needed, ROM's folder otherwise
     if softList in subdirSoftList:
         romPath = Path(romDirname)
-        symlink(str(romPath.parents[0]), softDir + softList, True)
+        symlink(str(romPath.parents[0]), str(Path(softDir) / softList), True)
     else:
-        symlink(romDirname, softDir + softList, True)
+        symlink(romDirname, str(Path(softDir) / softList), True)
 
 
 def getMameControlScheme(system: Any, romBasename: str) -> Any:
     # Game list files
-    mameCapcom = "/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"
-    mameKInstinct = "/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"
-    mameMKombat = "/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"
-    mameNeogeo = "/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"
-    mameTwinstick = "/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"
-    mameRotatedstick = "/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"
+    mameCapcom = str(Path("/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"))
+    mameKInstinct = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt")
+    )
+    mameMKombat = str(Path("/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"))
+    mameNeogeo = str(Path("/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"))
+    mameTwinstick = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt")
+    )
+    mameRotatedstick = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt")
+    )
 
     # Controls for games with 5-6 buttons or other unusual controls
     if system.isOptSet("altlayout"):
@@ -668,7 +691,7 @@ def getMameControlScheme(system: Any, romBasename: str) -> Any:
         twinstickList = set()
         qbertList = set()
 
-    romName = path.splitext(romBasename)[0]
+    romName = Path(romBasename).stem
     if romName in capcomList:
         if controllerType in ["auto", "snes"]:
             return "sfsnes"
@@ -714,10 +737,10 @@ def generateMAMEPadConfig(
 ) -> None:
     # config file
     config = minidom.Document()
-    configFile = cfgPath + "default.cfg"
-    if path.exists(configFile):
+    configFile = Path(cfgPath) / "default.cfg"
+    if configFile.exists():
         try:
-            config = minidom.parse(configFile)
+            config = minidom.parse(str(configFile))
         except xml.parsers.expat.ExpatError as e:
             eslog.warning(
                 f"Invalid XML in MAME config file {configFile}: {e}. Reinitializing file."
@@ -737,7 +760,7 @@ def generateMAMEPadConfig(
     else:
         customCfg = False
     # Don't overwrite if using custom configs
-    overwriteMAME = not (path.exists(configFile) and customCfg)
+    overwriteMAME = not (configFile.exists() and customCfg)
 
     # Get controller scheme
     altButtons = getMameControlScheme(system, romBasename)
@@ -813,7 +836,7 @@ def generateMAMEPadConfig(
 
     # Initialize config_alt and xml_input_alt outside the conditional block
     config_alt = minidom.Document()
-    configFile_alt = cfgPath + messSysName + ".cfg"
+    configFile_alt = Path(cfgPath) / f"{messSysName}.cfg"
     xml_mameconfig_alt = getRoot(config_alt, "mameconfig")
     xml_mameconfig_alt.setAttribute("version", "10")
     xml_system_alt = getSection(config_alt, xml_mameconfig_alt, "system")
@@ -822,8 +845,10 @@ def generateMAMEPadConfig(
     overwriteSystem = True
     if messSysName in specialControlList:
         # Load mess controls from csv
-        messControlFile = "/usr/share/reglinux/configgen/data/mame/messControls.csv"
-        with open(messControlFile, "r") as openMessFile:
+        messControlFile = Path(
+            "/usr/share/reglinux/configgen/data/mame/messControls.csv"
+        )
+        with open(str(messControlFile), "r") as openMessFile:
             controlList = reader(openMessFile, delimiter=";")
             for row in controlList:
                 if row[0] not in messControlDict:
@@ -863,10 +888,9 @@ def generateMAMEPadConfig(
                     currentEntry["reversed"] = True
 
         config_alt = minidom.Document()
-        configFile_alt = cfgPath + messSysName + ".cfg"
-        if path.exists(configFile_alt):
+        if configFile_alt.exists():
             try:
-                config_alt = minidom.parse(configFile_alt)
+                config_alt = minidom.parse(str(configFile_alt))
             except xml.parsers.expat.ExpatError as e:
                 eslog.warning(
                     f"Invalid XML in MAME alt config file {configFile_alt}: {e}. Reinitializing file."
@@ -882,7 +906,7 @@ def generateMAMEPadConfig(
                 pass  # reinit the file
 
         perGameCfg = system.getOptBoolean("pergamecfg")
-        if path.exists(configFile_alt) and (customCfg or perGameCfg):
+        if configFile_alt.exists() and (customCfg or perGameCfg):
             overwriteSystem = False
         else:
             overwriteSystem = True
@@ -1139,7 +1163,7 @@ def generateMAMEPadConfig(
     # mameXml = open(configFile, "w")
     # TODO: python 3 - workawround to encode files in utf-8
     if overwriteMAME:
-        with open(configFile, "w", encoding="utf-8") as mameXml:
+        with open(str(configFile), "w", encoding="utf-8") as mameXml:
             dom_string = linesep.join(
                 [s for s in config.toprettyxml().splitlines() if s.strip()]
             )  # remove ugly empty lines while minicom adds them...
@@ -1147,7 +1171,7 @@ def generateMAMEPadConfig(
 
     # Write alt config (if used, custom config is turned off or file doesn't exist yet)
     if messSysName in specialControlList and overwriteSystem:
-        with open(configFile_alt, "w", encoding="utf-8") as mameXml_alt:
+        with open(str(configFile_alt), "w", encoding="utf-8") as mameXml_alt:
             dom_string_alt = linesep.join(
                 [s for s in config_alt.toprettyxml().splitlines() if s.strip()]
             )  # remove ugly empty lines while minicom adds them...

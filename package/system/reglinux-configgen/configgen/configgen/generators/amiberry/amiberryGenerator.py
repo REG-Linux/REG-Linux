@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 from zipfile import ZipFile
 
 from configgen.Command import Command
@@ -20,7 +20,7 @@ class AmiberryGenerator(Generator):
 
         rom_type = self.get_rom_type(rom)
         if rom_type != "UNKNOWN":
-            command_array = [AMIBERRY_BIN_PATH, "-G"]
+            command_array = [str(AMIBERRY_BIN_PATH), "-G"]
             if rom_type != "WHDL":
                 command_array.append("--model")
                 command_array.append(system.config["core"])
@@ -159,7 +159,7 @@ class AmiberryGenerator(Generator):
         eslog.debug(f"Looking for floppy images for ROM: {rom}")
 
         # split path and extension
-        filepath, fileext = path.splitext(rom)
+        filepath, fileext = str(Path(rom).with_suffix("")), Path(rom).suffix
 
         #
         indexDisk = filepath.rfind("(Disk 1")
@@ -174,7 +174,7 @@ class AmiberryGenerator(Generator):
             # special case for 0 while numerotation can start at 1
             n = 0
             fullfilepath = fileprefix + str(n) + fileext
-            if path.isfile(fullfilepath):
+            if Path(fullfilepath).is_file():
                 eslog.debug(f"Found floppy image: {fullfilepath}")
                 floppies.append(fullfilepath)
 
@@ -182,7 +182,7 @@ class AmiberryGenerator(Generator):
             n = 1
             while True:
                 fullfilepath = fileprefix + str(n) + fileext
-                if path.isfile(fullfilepath):
+                if Path(fullfilepath).is_file():
                     eslog.debug(f"Found floppy image: {fullfilepath}")
                     floppies.append(fullfilepath)
                     n += 1
@@ -197,7 +197,7 @@ class AmiberryGenerator(Generator):
             n = 2
             while True:
                 fullfilepath = prefix + str(n) + postfix + fileext
-                if path.isfile(fullfilepath):
+                if Path(fullfilepath).is_file():
                     eslog.debug(f"Found floppy image: {fullfilepath}")
                     floppies.append(fullfilepath)
                     n += 1
@@ -213,7 +213,7 @@ class AmiberryGenerator(Generator):
 
     def get_rom_type(self, filepath: str) -> str:
         eslog.debug(f"Determining ROM type for: {filepath}")
-        extension = path.splitext(filepath)[1][1:].lower()
+        extension = Path(filepath).suffix[1:].lower()
 
         if extension == "lha":
             eslog.debug("ROM type: WHDL")
@@ -234,7 +234,7 @@ class AmiberryGenerator(Generator):
                 with ZipFile(filepath) as zip_file:
                     for zipfilename in zip_file.namelist():
                         if zipfilename.find("/") == -1:  # at the root
-                            extension = path.splitext(zipfilename)[1][1:]
+                            extension = Path(zipfilename).suffix[1:]
                             eslog.debug(
                                 f"File in ZIP: {zipfilename}, extension: {extension}"
                             )

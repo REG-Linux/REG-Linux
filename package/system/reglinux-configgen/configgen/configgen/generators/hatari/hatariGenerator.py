@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -48,9 +48,9 @@ class HatariGenerator(Generator):
 
         command_array += ["--machine", machine]
         tos = HatariGenerator.findBestTos(
-            HATARI_BIOS_PATH, machine, tosversion, toslang
+            str(HATARI_BIOS_PATH), machine, tosversion, toslang
         )
-        command_array += ["--tos", f"{HATARI_BIOS_PATH}/{tos}"]
+        command_array += ["--tos", f"{str(HATARI_BIOS_PATH)}/{tos}"]
 
         # RAM (ST Ram) options (0 for 512k, 1 for 1MB)
         memorysize = 0
@@ -58,7 +58,7 @@ class HatariGenerator(Generator):
             memorysize = system.config["ram"]
         command_array += ["--memsize", str(memorysize)]
 
-        rom_extension = path.splitext(rom)[1].lower()
+        rom_extension = Path(rom).suffix.lower()
         if rom_extension == ".hd":
             if (
                 system.isOptSet("hatari_drive")
@@ -69,7 +69,8 @@ class HatariGenerator(Generator):
                 command_array += ["--ide-master", rom]
         elif rom_extension == ".gemdos":
             blank_file = "/userdata/system/configs/hatari/blank.st"
-            if not path.exists(blank_file):
+            blank_path = Path(blank_file)
+            if not blank_path.exists():
                 with open(blank_file, "w"):
                     pass
             command_array += ["--harddrive", rom, blank_file]
@@ -108,7 +109,8 @@ class HatariGenerator(Generator):
                 l_lang.extend(all_languages)
                 for v_language in l_lang:
                     filename = f"tos{v_tos_version}{v_language}.img"
-                    if path.exists(f"{biosdir}/{filename}"):
+                    bios_path = Path(biosdir) / filename
+                    if bios_path.exists():
                         eslog.debug(f"tos filename: {filename}")
                         return filename
                     eslog.warning(f"tos filename {filename} not found")

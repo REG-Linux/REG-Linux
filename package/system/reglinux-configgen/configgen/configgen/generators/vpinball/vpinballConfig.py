@@ -2,10 +2,10 @@ from typing import Any
 
 from configgen.systemFiles import CONF
 
-VPINBALL_CONFIG_DIR = CONF + "/vpinball"
-VPINBALL_CONFIG_PATH = VPINBALL_CONFIG_DIR + "/VPinballX.ini"
-VPINBALL_LOG_PATH = VPINBALL_CONFIG_DIR + "/vpinball.log"
-VPINBALL_PINMAME_PATH = CONF + "/vpinball/pinmame/ini"
+VPINBALL_CONFIG_DIR = str(CONF / "vpinball")
+VPINBALL_CONFIG_PATH = str(CONF / "vpinball" / "VPinballX.ini")
+VPINBALL_LOG_PATH = str(CONF / "vpinball" / "vpinball.log")
+VPINBALL_PINMAME_PATH = str(CONF / "vpinball" / "pinmame" / "ini")
 VPINBALL_ASSETS_PATH = "/usr/bin/vpinball/assets/Default_VPinballX.ini"
 
 VPINBALL_BIN_PATH = "/usr/bin/vpinball/VPinballX_GL"

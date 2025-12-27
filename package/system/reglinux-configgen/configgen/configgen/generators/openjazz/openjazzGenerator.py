@@ -6,7 +6,7 @@ from configgen.generators.Generator import Generator
 from configgen.systemFiles import ROMS
 from configgen.utils.logger import get_logger
 
-OPENJAZZ_ROMS_DIR = ROMS + "/openjazz"
+OPENJAZZ_ROMS_DIR = str(ROMS / "openjazz")
 OPENJAZZ_BIN_PATH = "/usr/bin/OpenJazz"
 
 eslog = get_logger(__name__)

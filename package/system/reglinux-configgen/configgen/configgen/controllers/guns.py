@@ -1,5 +1,5 @@
 import os
-from os import path
+from pathlib import Path
 from re import match
 from typing import Any
 
@@ -73,7 +73,7 @@ def getGuns() -> dict[str, Any]:
 
         # Try to open the device with proper exception handling
         try:
-            if not path.exists(device_node) or not os.access(device_node, os.R_OK):
+            if not Path(device_node).exists() or not os.access(device_node, os.R_OK):
                 eslog.warning(f"Device {device_node} does not exist or is not readable")
                 nmouse = nmouse + 1
                 continue

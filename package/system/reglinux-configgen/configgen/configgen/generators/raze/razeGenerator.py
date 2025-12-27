@@ -1,4 +1,5 @@
 from os import mkdir, path
+from pathlib import Path
 from platform import uname
 from typing import Any
 
@@ -11,10 +12,10 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-RAZE_CONFIG_DIR = CONF + "/raze"
-RAZE_SAVES_DIR = SAVES + "/raze"
-RAZE_CONFIG_FILE = RAZE_CONFIG_DIR + "/raze.ini"
-RAZE_SCRIPT_FILE = RAZE_CONFIG_DIR + "/raze.cfg"
+RAZE_CONFIG_DIR = str(CONF / "raze")
+RAZE_SAVES_DIR = str(SAVES / "raze")
+RAZE_CONFIG_FILE = str(Path(RAZE_CONFIG_DIR) / "raze.ini")
+RAZE_SCRIPT_FILE = str(Path(RAZE_CONFIG_DIR) / "raze.cfg")
 
 
 class RazeGenerator(Generator):

@@ -1,4 +1,4 @@
-from os import makedirs, path
+from pathlib import Path
 from shutil import copyfile
 from typing import Any
 
@@ -18,17 +18,19 @@ class XemuGenerator(Generator):
         setXemuConfig(system, rom, players_controllers, game_resolution)
 
         # copy the hdd if it doesn't exist
-        if not path.exists(XEMU_SAVES_DIR + "/xbox_hdd.qcow2"):
-            if not path.exists(XEMU_SAVES_DIR):
-                makedirs(XEMU_SAVES_DIR)
+        hdd_path = Path(XEMU_SAVES_DIR) / "xbox_hdd.qcow2"
+        if not hdd_path.exists():
+            saves_dir_path = Path(XEMU_SAVES_DIR)
+            if not saves_dir_path.exists():
+                saves_dir_path.mkdir(parents=True, exist_ok=True)
             copyfile(
                 "/usr/share/xemu/data/xbox_hdd.qcow2",
-                XEMU_SAVES_DIR + "/xbox_hdd.qcow2",
+                str(hdd_path),
             )
 
         # the command to run
-        command_array = [XEMU_BIN_PATH]
-        command_array.extend(["-config_path", XEMU_CONFIG_PATH])
+        command_array = [str(XEMU_BIN_PATH)]
+        command_array.extend(["-config_path", str(XEMU_CONFIG_PATH)])
 
         return Command(
             array=command_array,

@@ -19,7 +19,7 @@ build-backend = "setuptools.build_meta"
 name = "reglinux-configgen"
 
 # Project version (semantic versioning recommended)
-version = "0.0.8"
+version = "0.0.9"
 
 # Short, one-line description of the project
 description = "Config generator for REG-Linux"
@@ -117,8 +117,8 @@ reglinux-configgen = "configgen:main"
 # Target Python version for type analysis
 pythonVersion = "3.12"
 
-# Basic type checking (balanced between strictness and practicality)
-typeCheckingMode = "basic"
+# Standard type checking mode
+typeCheckingMode = "standard"
 
 # Virtual environment configuration
 venvPath = "."
@@ -127,8 +127,8 @@ venv = ".venv"
 # Warn when imports cannot be resolved
 reportMissingImports = "warning"
 
-# Disable overly strict unknown-type reports
-reportUnknownParameterType = false
+# Warn reports of unknown type
+reportUnknownParameterType = "warning"
 reportUnknownVariableType = false
 reportUnknownMemberType = false
 
@@ -137,8 +137,8 @@ reportOptionalOperand = "warning"
 reportOptionalSubscript = "warning"
 reportOptionalMemberAccess = "warning"
 
-# Do not require explicit return statements everywhere
-reportMissingReturn = false
+# Warn if not all code paths return a value
+reportMissingReturn = "warning"
 
 # Warn on unused code elements
 reportUnusedImport = "warning"

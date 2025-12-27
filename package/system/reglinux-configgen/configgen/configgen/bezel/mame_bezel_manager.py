@@ -4,6 +4,7 @@ Module responsible for managing bezel configurations for the MAME emulator.
 
 import os
 import shutil
+from pathlib import Path
 from typing import Any
 
 from PIL import Image
@@ -123,11 +124,11 @@ def writeBezelConfig(
     """Create MAME artwork configuration for bezels."""
     tmp_zip_dir: str | None = None  # Initialize to None
     try:
-        rom_base = os.path.splitext(os.path.basename(rom))[0]
+        rom_base = Path(rom).stem
         tmp_zip_dir = _get_tmp_directory_path(rom_base, messSys)
 
         # Clean previous artwork directory
-        if os.path.exists(tmp_zip_dir):
+        if Path(tmp_zip_dir).exists():
             shutil.rmtree(tmp_zip_dir)
 
         if bezelSet is None and guns_borders_size is None:
@@ -184,7 +185,7 @@ def writeBezelConfig(
         logger.error(f"Error in writeBezelConfig: {e}")
         # Ensure the temp directory is cleaned up even if an error occurs
         try:
-            if tmp_zip_dir is not None and os.path.exists(tmp_zip_dir):
+            if tmp_zip_dir is not None and Path(tmp_zip_dir).exists():
                 shutil.rmtree(tmp_zip_dir)
         except Exception:  # Catch any exception during cleanup
             pass  # Ignore errors during cleanup
@@ -203,7 +204,7 @@ def _get_tmp_directory_path(rom_base: str, mess_sys: str) -> str:
         Path to the temporary artwork directory
     """
     if mess_sys != "" and not mess_sys.startswith("/"):
-        return f"/var/run/mame_artwork/{os.path.basename(mess_sys)}"
+        return f"/var/run/mame_artwork/{Path(mess_sys).name}"
     return f"/var/run/mame_artwork/{rom_base}"
 
 
@@ -257,7 +258,8 @@ def _create_symlink(src: str, dest: str):
         src: Source file path
         dest: Destination symlink path
     """
-    if os.path.exists(dest) or os.path.islink(dest):
+    dest_path = Path(dest)
+    if dest_path.exists() or dest_path.is_symlink():
         _safe_file_operation(os.remove, dest)
     _safe_file_operation(os.symlink, src, dest)
 
@@ -279,14 +281,16 @@ def _process_bezel_layout(
         if standard layout is processed, None if mamezip is processed (early return)
     """
     # Handle mamezip case
-    if "mamezip" in bz_infos and os.path.exists(bz_infos["mamezip"]):
+    mamezip_path = Path(bz_infos["mamezip"]) if "mamezip" in bz_infos else None
+    if "mamezip" in bz_infos and mamezip_path and mamezip_path.exists():
         _handle_mamezip_case(rom_base, mess_sys, bz_infos)
         # Return None to indicate early return
         return None
 
     # Handle layout case
-    if "layout" in bz_infos and os.path.exists(bz_infos["layout"]):
-        png_file = os.path.split(bz_infos["png"])[1]
+    layout_path = Path(bz_infos["layout"]) if "layout" in bz_infos else None
+    if "layout" in bz_infos and layout_path and layout_path.exists():
+        png_file = Path(bz_infos["png"]).name
         _create_symlink(bz_infos["layout"], tmp_zip_dir + "/default.lay")
         _create_symlink(bz_infos["png"], tmp_zip_dir + "/" + png_file)
         img_width, img_height = BezelUtils.fast_image_size(bz_infos["png"])
@@ -309,15 +313,16 @@ def _handle_mamezip_case(
         bz_infos: Dictionary containing bezel information with mamezip path
     """
     if mess_sys != "" and not mess_sys.startswith("/"):
-        art_file = f"/var/run/mame_artwork/{os.path.basename(mess_sys)}.zip"
+        art_file = f"/var/run/mame_artwork/{Path(mess_sys).name}.zip"
     else:
         art_file = f"/var/run/mame_artwork/{rom_base}.zip"
 
-    if os.path.exists(art_file):
-        if os.path.islink(art_file):
-            os.unlink(art_file)
+    art_file_path = Path(art_file)
+    if art_file_path.exists():
+        if art_file_path.is_symlink():
+            art_file_path.unlink()
         else:
-            os.remove(art_file)
+            art_file_path.unlink()
     _create_symlink(bz_infos["mamezip"], art_file)
 
 
@@ -396,7 +401,8 @@ def _create_standard_layout(
     png_file = "default.png"
     _create_symlink(bz_infos["png"], tmp_zip_dir + "/default.png")
 
-    if "info" in bz_infos and os.path.exists(bz_infos["info"]):
+    info_path = Path(bz_infos["info"]) if "info" in bz_infos else None
+    if "info" in bz_infos and info_path and info_path.exists():
         # Parse info file for exact dimensions
         img_width, img_height, bz_x, bz_y, bz_width, bz_height, bz_alpha = (
             _parse_bezel_info_file(bz_infos["info"], bz_infos["png"])
@@ -563,16 +569,17 @@ def _load_tattoo_image(system: Any) -> Any:
     tattoo_config = system.config.get("bezel.tattoo", "generic")
     if tattoo_config == "system":
         tattoo_path = f"/usr/share/reglinux/controller-overlays/{system.name}.png"
-        if not os.path.exists(tattoo_path):
+        if not Path(tattoo_path).exists():
             tattoo_path = "/usr/share/reglinux/controller-overlays/generic.png"
-    elif tattoo_config == "custom" and os.path.exists(
-        system.config.get("bezel.tattoo_file", "")
+    elif (
+        tattoo_config == "custom"
+        and Path(system.config.get("bezel.tattoo_file", "")).exists()
     ):
         tattoo_path = system.config["bezel.tattoo_file"]
     else:
         tattoo_path = "/usr/share/reglinux/controller-overlays/generic.png"
 
-    if os.path.exists(tattoo_path):
+    if Path(tattoo_path).exists():
         try:
             return Image.open(tattoo_path)
         except Exception as e:
@@ -593,10 +600,11 @@ def _get_tattoo_path(system: Any) -> str:
     tattoo_config = system.config.get("bezel.tattoo", "generic")
     if tattoo_config == "system":
         tattoo_path = f"/usr/share/reglinux/controller-overlays/{system.name}.png"
-        if not os.path.exists(tattoo_path):
+        if not Path(tattoo_path).exists():
             tattoo_path = "/usr/share/reglinux/controller-overlays/generic.png"
-    elif tattoo_config == "custom" and os.path.exists(
-        system.config.get("bezel.tattoo_file", "")
+    elif (
+        tattoo_config == "custom"
+        and Path(system.config.get("bezel.tattoo_file", "")).exists()
     ):
         tattoo_path = system.config["bezel.tattoo_file"]
     else:

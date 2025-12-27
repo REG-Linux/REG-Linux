@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import HOME
@@ -6,8 +7,8 @@ from configgen.utils.videoMode import getRefreshRate
 
 eslog = get_logger(__name__)
 
-BIGPEMU_CONFIG_DIR = HOME + "/.bigpemu_userdata"
-BIGPEMU_CONFIG_PATH = BIGPEMU_CONFIG_DIR + "/BigPEmuConfig.bigpcfg"
+BIGPEMU_CONFIG_DIR = str(Path(HOME) / ".bigpemu_userdata")
+BIGPEMU_CONFIG_PATH = str(Path(BIGPEMU_CONFIG_DIR) / "BigPEmuConfig.bigpcfg")
 BIGPEMU_BIN_PATH = "/usr/bigpemu/bigpemu"
 
 

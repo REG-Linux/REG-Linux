@@ -1,4 +1,4 @@
-from os import makedirs, path, remove
+from pathlib import Path
 from typing import Any
 
 from configgen.settings import UnixSettings
@@ -96,14 +96,15 @@ def generateRetroarchCustom():
     If the file is corrupted (UnicodeError), it will be recreated.
     """
     # Ensure the target directory exists
-    if not path.exists(path.dirname(retroarchCustom)):
-        makedirs(path.dirname(retroarchCustom))
+    custom_dir = Path(retroarchCustom).parent
+    if not custom_dir.exists():
+        custom_dir.mkdir(parents=True, exist_ok=True)
 
     # Load or recreate the settings handler
     try:
         retroarchSettings = UnixSettings(retroarchCustom, separator=" ")
     except UnicodeError:
-        remove(retroarchCustom)
+        Path(retroarchCustom).unlink()
         retroarchSettings = UnixSettings(retroarchCustom, separator=" ")
 
     # Apply all default settings

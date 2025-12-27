@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from os import makedirs, path
+from pathlib import Path
 from typing import Any
 
 from configgen.Command import Command
@@ -21,24 +21,27 @@ class MupenGenerator(Generator):
         iniConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         iniConfig.optionxform = lambda optionstr: str(optionstr)
-        if path.exists(MUPEN_CONFIG_PATH):
+        config_path = Path(MUPEN_CONFIG_PATH)
+        if config_path.exists():
             iniConfig.read(MUPEN_CONFIG_PATH)
         else:
-            if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
-                makedirs(path.dirname(MUPEN_CONFIG_PATH))
+            config_dir = config_path.parent
+            if not config_dir.exists():
+                config_dir.mkdir(parents=True, exist_ok=True)
             iniConfig.read(MUPEN_CONFIG_PATH)
 
         setMupenConfig(iniConfig, system, game_resolution)
 
         # Save the ini file
-        if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
-            makedirs(path.dirname(MUPEN_CONFIG_PATH))
+        config_dir = config_path.parent
+        if not config_dir.exists():
+            config_dir.mkdir(parents=True, exist_ok=True)
         with open(MUPEN_CONFIG_PATH, "w") as configfile:
             iniConfig.write(configfile)
 
         # Command
         command_array = [
-            MUPEN_BIN_PATH,
+            str(MUPEN_BIN_PATH),
             "--plugindir",
             "/usr/lib/mupen64plus/",
             "--corelib",

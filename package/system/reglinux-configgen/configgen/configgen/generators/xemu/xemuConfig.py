@@ -1,13 +1,13 @@
 import builtins
 from configparser import ConfigParser
-from os import makedirs, path
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import CONF, SAVES
 
-XEMU_SAVES_DIR = SAVES + "/xbox"
-XEMU_CONFIG_PATH = CONF + "/xemu/xemu.toml"
-XEMU_BIN_PATH = "/usr/bin/xemu"
+XEMU_SAVES_DIR = SAVES / "xbox"
+XEMU_CONFIG_PATH = CONF / "xemu" / "xemu.toml"
+XEMU_BIN_PATH = Path("/usr/bin/xemu")
 
 
 def setXemuConfig(
@@ -16,7 +16,7 @@ def setXemuConfig(
     iniConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     iniConfig.optionxform = lambda optionstr: str(optionstr)
-    if path.exists(XEMU_CONFIG_PATH):
+    if XEMU_CONFIG_PATH.exists():
         try:
             with builtins.open(XEMU_CONFIG_PATH, encoding="utf_8_sig") as fp:
                 iniConfig.read_file(fp)
@@ -25,8 +25,9 @@ def setXemuConfig(
 
     createXemuConfig(iniConfig, system, rom, playersControllers, gameResolution)
     # save the ini file
-    if not path.exists(path.dirname(XEMU_CONFIG_PATH)):
-        makedirs(path.dirname(XEMU_CONFIG_PATH))
+    config_dir = XEMU_CONFIG_PATH.parent
+    if not config_dir.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
     with builtins.open(XEMU_CONFIG_PATH, "w") as configfile:
         iniConfig.write(configfile)
 
@@ -66,7 +67,7 @@ def createXemuConfig(
     iniConfig.set("general", "show_welcome", "false")
 
     # Set Screenshot directory
-    iniConfig.set("general", "screenshot_dir", '"/userdata/screenshots"')
+    iniConfig.set("general", "screenshot_dir", str(Path("/userdata/screenshots")))
 
     # Fill sys sections
     if system.isOptSet("xemu_memory"):
@@ -76,13 +77,21 @@ def createXemuConfig(
 
     if system.name == "chihiro":
         iniConfig.set("sys", "mem_limit", '"128"')
-        iniConfig.set("sys.files", "flashrom_path", '"/userdata/bios/cerbios.bin"')
+        iniConfig.set(
+            "sys.files", "flashrom_path", str(Path("/userdata/bios/cerbios.bin"))
+        )
     else:
-        iniConfig.set("sys.files", "flashrom_path", '"/userdata/bios/Complex_4627.bin"')
+        iniConfig.set(
+            "sys.files", "flashrom_path", str(Path("/userdata/bios/Complex_4627.bin"))
+        )
 
-    iniConfig.set("sys.files", "bootrom_path", '"/userdata/bios/mcpx_1.0.bin"')
-    iniConfig.set("sys.files", "hdd_path", '"/userdata/saves/xbox/xbox_hdd.qcow2"')
-    iniConfig.set("sys.files", "eeprom_path", '"/userdata/saves/xbox/xemu_eeprom.bin"')
+    iniConfig.set("sys.files", "bootrom_path", str(Path("/userdata/bios/mcpx_1.0.bin")))
+    iniConfig.set(
+        "sys.files", "hdd_path", str(Path("/userdata/saves/xbox/xbox_hdd.qcow2"))
+    )
+    iniConfig.set(
+        "sys.files", "eeprom_path", str(Path("/userdata/saves/xbox/xemu_eeprom.bin"))
+    )
     iniConfig.set("sys.files", "dvd_path", '"' + rom + '"')
 
     # Audio quality

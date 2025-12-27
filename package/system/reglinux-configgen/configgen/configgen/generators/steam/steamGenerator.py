@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -13,7 +13,7 @@ class SteamGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        basename = path.basename(rom)
+        basename = Path(rom).name
         gameId = None
         if basename != "Steam.steam":
             # read the id inside the file

@@ -1,4 +1,5 @@
-from os import listdir, mkdir, path
+from os import listdir
+from pathlib import Path
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -16,9 +17,9 @@ from typing import Any
 from configgen.controllers import generate_sdl_controller_config
 from configgen.systemFiles import CONF, SAVES
 
-VITA3K_CONFIG_DIR = CONF + "/vita3k"
-VITA3K_SAVES_DIR = SAVES + "/psvita"
-VITA3K_CONFIG_PATH = VITA3K_CONFIG_DIR + "/config.yml"
+VITA3K_CONFIG_DIR = str(CONF / "vita3k")
+VITA3K_SAVES_DIR = str(SAVES / "psvita")
+VITA3K_CONFIG_PATH = str(CONF / "vita3k" / "config.yml")
 VITA3K_BIN_PATH = "/usr/bin/vita3k/Vita3K"
 
 
@@ -31,25 +32,29 @@ class Vita3kGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create folder
-        if not path.isdir(VITA3K_CONFIG_DIR):
-            mkdir(VITA3K_CONFIG_DIR)
-        if not path.isdir(VITA3K_SAVES_DIR):
-            mkdir(VITA3K_SAVES_DIR)
+        config_dir_path = Path(VITA3K_CONFIG_DIR)
+        if not config_dir_path.is_dir():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
+        saves_dir_path = Path(VITA3K_SAVES_DIR)
+        if not saves_dir_path.is_dir():
+            saves_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Move saves if necessary
-        if path.isdir(path.join(VITA3K_CONFIG_DIR, "ux0")):
+        ux0_path = config_dir_path / "ux0"
+        if ux0_path.is_dir():
             # Move all folders from VITA3K_CONFIG_DIR to VITA3K_SAVES_DIR except "data", "lang", and "shaders-builtin"
             for item in listdir(VITA3K_CONFIG_DIR):
                 if item not in ["data", "lang", "shaders-builtin"]:
-                    item_path = path.join(VITA3K_CONFIG_DIR, item)
-                    if path.isdir(item_path):
-                        move(item_path, VITA3K_SAVES_DIR)
+                    item_path = config_dir_path / item
+                    if item_path.is_dir():
+                        move(str(item_path), VITA3K_SAVES_DIR)
 
         # Create the config.yml file if it doesn't exist
         vita3kymlconfig = {}
         indent = 2
         block_seq_indent = 0
-        if path.isfile(VITA3K_CONFIG_PATH):
+        config_path = Path(VITA3K_CONFIG_PATH)
+        if config_path.is_file():
             try:
                 from ruamel.yaml.util import load_yaml_guess_indent
 
@@ -130,7 +135,8 @@ class Vita3kGenerator(Generator):
         # because of the yml formatting, we don't allow Vita3k to modify it
         # using the -w & -f options prevents Vita3k from re-writing & prompting the user in GUI
         # we want to avoid that so roms load straight away
-        if path.isdir(VITA3K_SAVES_DIR + "/ux0/app/" + smplromname):
+        app_path = Path(VITA3K_SAVES_DIR) / "ux0" / "app" / smplromname
+        if app_path.is_dir():
             command_array = [
                 VITA3K_BIN_PATH,
                 "-F",

@@ -1,3 +1,4 @@
+from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
@@ -7,11 +8,13 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-PPSSPP_CONFIG_DIR = CONF + "/ppsspp/PSP/SYSTEM"
-PPSSPP_CONFIG_PATH = PPSSPP_CONFIG_DIR + "/ppsspp.ini"
-PPSSPP_CONTROLS_PATH = PPSSPP_CONFIG_DIR + "/controls.ini"
-PPSSPP_CONTROLS_SOURCE_PATH = HOME_INIT + "configs/ppsspp/PSP/SYSTEM/controls.ini"
-PPSSPP_BIN_PATH = "/usr/bin/PPSSPP"
+PPSSPP_CONFIG_DIR = str(CONF / "ppsspp" / "PSP" / "SYSTEM")
+PPSSPP_CONFIG_PATH = str(CONF / "ppsspp" / "PSP" / "SYSTEM" / "ppsspp.ini")
+PPSSPP_CONTROLS_PATH = str(CONF / "ppsspp" / "PSP" / "SYSTEM" / "controls.ini")
+PPSSPP_CONTROLS_SOURCE_PATH = str(
+    HOME_INIT / "configs" / "ppsspp" / "PSP" / "SYSTEM" / "controls.ini"
+)
+PPSSPP_BIN_PATH = Path("/usr/bin/PPSSPP")
 
 
 def setPPSSPPConfig(system: Any) -> None:

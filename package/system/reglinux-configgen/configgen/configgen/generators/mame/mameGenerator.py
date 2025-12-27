@@ -1,5 +1,5 @@
 from csv import reader
-from os import chdir, listdir, makedirs, path, symlink, unlink
+from os import chdir, listdir, makedirs, symlink, unlink
 from pathlib import Path
 from shutil import copy2, rmtree
 from typing import Any
@@ -52,9 +52,9 @@ class MameGenerator(Generator):
             Command object with the appropriate MAME command array
         """
         # Extract "<romfile.zip>"
-        romBasename = path.basename(rom)
-        romDirname = path.dirname(rom)
-        (romName, romExt) = path.splitext(romBasename)
+        romBasename = Path(rom).name
+        romDirname = str(Path(rom).parent)
+        (romName, romExt) = Path(romBasename).stem, Path(romBasename).suffix
 
         softDir = "/var/run/mame_software/"
         softList = ""
@@ -80,8 +80,9 @@ class MameGenerator(Generator):
             "bios/mame/artwork/crosshairs",
         ]
         for checkPath in mamePaths:
-            if not path.exists("/userdata/" + checkPath + "/"):
-                makedirs("/userdata/" + checkPath + "/")
+            check_path = Path("/userdata") / checkPath
+            if not check_path.exists():
+                check_path.mkdir(parents=True, exist_ok=True)
 
         messDataFile = "/usr/share/reglinux/configgen/data/mame/messSystems.csv"
         with open(messDataFile) as openFile:
@@ -110,8 +111,8 @@ class MameGenerator(Generator):
         # Auto softlist for FM Towns if there is a zip that matches the folder name
         # Used for games that require a CD and floppy to both be inserted
         if system.name == "fmtowns" and softList == "":
-            romParentPath = path.basename(romDirname)
-            if path.exists(f"/userdata/roms/fmtowns/{romParentPath}.zip"):
+            romParentPath = Path(romDirname).name
+            if Path(f"/userdata/roms/fmtowns/{romParentPath}.zip").exists():
                 softList = "fmtowns_cd"
 
         command_array = ["/usr/bin/mame/mame"]
@@ -121,60 +122,58 @@ class MameGenerator(Generator):
         if messMode == -1:
             command_array += [
                 "-rompath",
-                romDirname + ";/userdata/bios/mame/;/userdata/bios/",
+                f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))}",
             ]
         else:
             if softList in subdirSoftList:
                 command_array += [
                     "-rompath",
-                    romDirname
-                    + ";/userdata/bios/mame/;/userdata/bios/;/userdata/roms/mame/;/var/run/mame_software/",
+                    f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))};{str(Path('/userdata/roms/mame/'))};{str(Path('/var/run/mame_software/'))}",
                 ]
             else:
                 command_array += [
                     "-rompath",
-                    romDirname
-                    + ";/userdata/bios/mame/;/userdata/bios/;/userdata/roms/mame/",
+                    f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))};{str(Path('/userdata/roms/mame/'))}",
                 ]
 
         # MAME various paths we can probably do better
         command_array += [
             "-bgfx_path",
-            "/usr/bin/mame/bgfx/",
+            str(Path("/usr/bin/mame/bgfx/")),
         ]  # Core bgfx files can be left on ROM filesystem
         command_array += [
             "-fontpath",
-            "/usr/bin/mame/",
+            str(Path("/usr/bin/mame/")),
         ]  # Fonts can be left on ROM filesystem
         command_array += [
             "-languagepath",
-            "/usr/bin/mame/language/",
+            str(Path("/usr/bin/mame/language/")),
         ]  # Translations can be left on ROM filesystem
         command_array += [
             "-pluginspath",
-            "/usr/bin/mame/plugins/;/userdata/saves/mame/plugins",
+            f"{str(Path('/usr/bin/mame/plugins/'))};{str(Path('/userdata/saves/mame/plugins'))}",
         ]
         command_array += [
             "-samplepath",
-            "/userdata/bios/mame/samples/",
+            str(Path("/userdata/bios/mame/samples/")),
         ]  # Current reglinux storage location for MAME samples
         command_array += [
             "-artpath",
-            "/var/run/mame_artwork/;/usr/bin/mame/artwork/;/userdata/bios/mame/artwork/;/userdata/decorations/",
+            f"{str(Path('/var/run/mame_artwork/'))};{str(Path('/usr/bin/mame/artwork/'))};{str(Path('/userdata/bios/mame/artwork/'))};{str(Path('/userdata/decorations/'))}",
         ]  # first for systems ; second for overlays
 
         # Enable cheats
         command_array += ["-cheat"]
         command_array += [
             "-cheatpath",
-            "/userdata/cheats/mame/",
+            str(Path("/userdata/cheats/mame/")),
         ]  # Should this point to path containing the cheat.7z file
 
         # logs
         command_array += ["-verbose"]
 
         # MAME saves a lot of stuff, we need to map this on /userdata/saves/mame/<subfolder> for each one
-        command_array += ["-nvram_directory", "/userdata/saves/mame/nvram/"]
+        command_array += ["-nvram_directory", str(Path("/userdata/saves/mame/nvram/"))]
 
         # Set custom config path if option is selected or default path if not
         if system.isOptSet("customcfg"):
@@ -184,26 +183,30 @@ class MameGenerator(Generator):
 
         if system.name == "mame":
             if customCfg:
-                cfgPath = "/userdata/system/configs/mame/custom/"
+                cfgPath = Path("/userdata/system/configs/mame/custom/")
             else:
-                cfgPath = "/userdata/system/configs/mame/"
-            if not path.exists("/userdata/system/configs/mame/"):
-                makedirs("/userdata/system/configs/mame/")
+                cfgPath = Path("/userdata/system/configs/mame/")
+            if not Path("/userdata/system/configs/mame/").exists():
+                Path("/userdata/system/configs/mame/").mkdir(
+                    parents=True, exist_ok=True
+                )
         else:
             if customCfg:
                 cfgPath = (
-                    "/userdata/system/configs/mame/"
-                    + messSysName[messMode]
-                    + "/custom/"
+                    Path("/userdata/system/configs/mame/")
+                    / messSysName[messMode]
+                    / "custom/"
                 )
             else:
-                cfgPath = "/userdata/system/configs/mame/" + messSysName[messMode] + "/"
-            if not path.exists(
-                "/userdata/system/configs/mame/" + messSysName[messMode] + "/"
-            ):
-                makedirs("/userdata/system/configs/mame/" + messSysName[messMode] + "/")
-        if not path.exists(cfgPath):
-            makedirs(cfgPath)
+                cfgPath = Path("/userdata/system/configs/mame/") / messSysName[messMode]
+            if not (
+                Path("/userdata/system/configs/mame/") / messSysName[messMode]
+            ).exists():
+                (Path("/userdata/system/configs/mame/") / messSysName[messMode]).mkdir(
+                    parents=True, exist_ok=True
+                )
+        if not cfgPath.exists():
+            cfgPath.mkdir(parents=True, exist_ok=True)
 
         # MAME will create custom configs per game for MAME ROMs and MESS ROMs with no system attached (LCD games, TV games, etc.)
         # This will allow an alternate config path per game for MESS console/computer ROMs that may need additional config.
@@ -212,33 +215,42 @@ class MameGenerator(Generator):
             and system.getOptBoolean("pergamecfg")
             and messMode != -1
             and messSysName[messMode] != ""
-            and not path.exists(
-                "/userdata/system/configs/mame/" + messSysName[messMode] + "/"
-            )
+            and not (
+                Path("/userdata/system/configs/mame/") / messSysName[messMode]
+            ).exists()
         ):
-            makedirs("/userdata/system/configs/mame/" + messSysName[messMode] + "/")
-            cfgPath = (
-                "/userdata/system/configs/mame/"
-                + messSysName[messMode]
-                + "/"
-                + romBasename
-                + "/"
+            (Path("/userdata/system/configs/mame/") / messSysName[messMode]).mkdir(
+                parents=True, exist_ok=True
             )
-            if not path.exists(cfgPath):
-                makedirs(cfgPath)
-        command_array += ["-cfg_directory", cfgPath]
-        command_array += ["-input_directory", "/userdata/saves/mame/input/"]
-        command_array += ["-state_directory", "/userdata/saves/mame/state/"]
-        command_array += ["-snapshot_directory", "/userdata/screenshots/"]
-        command_array += ["-diff_directory", "/userdata/saves/mame/diff/"]
-        command_array += ["-comment_directory", "/userdata/saves/mame/comments/"]
-        command_array += ["-homepath", "/userdata/saves/mame/plugins/"]
-        command_array += ["-ctrlrpath", "/userdata/system/configs/mame/ctrlr/"]
+            cfgPath = (
+                Path("/userdata/system/configs/mame/")
+                / messSysName[messMode]
+                / romBasename
+            )
+            if not cfgPath.exists():
+                cfgPath.mkdir(parents=True, exist_ok=True)
+        command_array += ["-cfg_directory", str(cfgPath)]
+        command_array += ["-input_directory", str(Path("/userdata/saves/mame/input/"))]
+        command_array += ["-state_directory", str(Path("/userdata/saves/mame/state/"))]
+        command_array += ["-snapshot_directory", str(Path("/userdata/screenshots/"))]
+        command_array += ["-diff_directory", str(Path("/userdata/saves/mame/diff/"))]
+        command_array += [
+            "-comment_directory",
+            str(Path("/userdata/saves/mame/comments/")),
+        ]
+        command_array += ["-homepath", str(Path("/userdata/saves/mame/plugins/"))]
+        command_array += [
+            "-ctrlrpath",
+            str(Path("/userdata/system/configs/mame/ctrlr/")),
+        ]
         command_array += [
             "-inipath",
-            "/userdata/system/configs/mame/;/userdata/system/configs/mame/ini/",
+            f"{str(Path('/userdata/system/configs/mame/'))};{str(Path('/userdata/system/configs/mame/ini/'))}",
         ]
-        command_array += ["-crosshairpath", "/userdata/bios/mame/artwork/crosshairs/"]
+        command_array += [
+            "-crosshairpath",
+            str(Path("/userdata/bios/mame/artwork/crosshairs/")),
+        ]
         if softList != "":
             command_array += ["-swpath", softDir]
             command_array += ["-hashpath", softDir + "hash/"]
@@ -488,7 +500,7 @@ class MameGenerator(Generator):
                             command_array += ["-" + system.config["altromtype"]]
                     elif system.name == "adam":
                         # add some logic based on the rom extension
-                        rom_extension = path.splitext(rom)[1].lower()
+                        rom_extension = Path(rom).suffix.lower()
                         if rom_extension == ".ddp":
                             command_array += ["-cass1"]
                         elif rom_extension == ".dsk":
@@ -496,9 +508,9 @@ class MameGenerator(Generator):
                         else:
                             command_array += ["-cart1"]
                     elif system.name == "coco":
-                        if romExt.casefold() == ".cas":
+                        if Path(romBasename).suffix.casefold() == ".cas":
                             command_array += ["-cass"]
-                        elif romExt.casefold() == ".dsk":
+                        elif Path(romBasename).suffix.casefold() == ".dsk":
                             command_array += ["-flop1"]
                         else:
                             command_array += ["-cart"]
@@ -533,31 +545,33 @@ class MameGenerator(Generator):
             else:
                 # Prepare software lists
                 if softList != "":
-                    if not path.exists(softDir):
+                    softDirPath = Path(softDir)
+                    if not softDirPath.exists():
                         makedirs(softDir)
                     for file_name in listdir(softDir):
-                        checkFile = path.join(softDir, file_name)
-                        if path.islink(checkFile):
+                        checkFile = str(softDirPath / file_name)
+                        if Path(checkFile).is_symlink():
                             unlink(checkFile)
-                        if path.isdir(checkFile):
+                        if Path(checkFile).is_dir():
                             rmtree(checkFile)
-                    if not path.exists(softDir + "hash/"):
-                        makedirs(softDir + "hash/")
+                    hashDir = softDirPath / "hash"
+                    if not hashDir.exists():
+                        makedirs(str(hashDir))
                     # Clear existing hashfile links
-                    for hashFile in listdir(softDir + "hash/"):
+                    for hashFile in listdir(str(hashDir)):
                         if hashFile.endswith(".xml"):
-                            unlink(softDir + "hash/" + hashFile)
+                            unlink(str(hashDir / hashFile))
                     symlink(
-                        "/usr/bin/mame/hash/" + softList + ".xml",
-                        softDir + "hash/" + softList + ".xml",
+                        f"/usr/bin/mame/hash/{softList}.xml",
+                        str(hashDir / f"{softList}.xml"),
                     )
                     if softList in subdirSoftList:
                         romPath = Path(romDirname)
-                        symlink(str(romPath.parents[0]), softDir + softList, True)
-                        command_array += [path.basename(romDirname)]
+                        symlink(str(romPath.parent), str(softDirPath / softList), True)
+                        command_array += [Path(romDirname).name]
                     else:
-                        symlink(romDirname, softDir + softList, True)
-                        command_array += [path.splitext(romBasename)[0]]
+                        symlink(romDirname, str(softDirPath / softList), True)
+                        command_array += [Path(romBasename).stem]
 
             # Create & add a blank disk if needed, insert into drive 2
             # or drive 1 if drive 2 is selected manually or FM Towns Marty.
@@ -566,31 +580,29 @@ class MameGenerator(Generator):
                 targetFolder = None
                 targetDisk = None
                 if system.name == "fmtowns":
-                    blankDisk = "/usr/share/mame/blank.fmtowns"
-                    targetFolder = f"/userdata/saves/mame/{system.name}"
-                    targetDisk = (
-                        f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
-                    )
+                    blankDisk = Path("/usr/share/mame/blank.fmtowns")
+                    targetFolder = Path("/userdata/saves/mame") / system.name
+                    targetDisk = targetFolder / f"{Path(romBasename).stem}.fmtowns"
                 # Add elif statements here for other systems if enabled
                 if (
                     blankDisk is not None
                     and targetFolder is not None
                     and targetDisk is not None
                 ):
-                    if not path.exists(targetFolder):
-                        makedirs(targetFolder)
-                    if not path.exists(targetDisk):
+                    if not targetFolder.exists():
+                        targetFolder.mkdir(parents=True, exist_ok=True)
+                    if not targetDisk.exists():
                         copy2(blankDisk, targetDisk)
                     # Add other single floppy systems to this if statement
                     if messModel == "fmtmarty":
-                        command_array += ["-flop", targetDisk]
+                        command_array += ["-flop", str(targetDisk)]
                     elif (
                         system.isOptSet("altromtype")
                         and system.config["altromtype"] == "flop2"
                     ):
-                        command_array += ["-flop1", targetDisk]
+                        command_array += ["-flop1", str(targetDisk)]
                     else:
-                        command_array += ["-flop2", targetDisk]
+                        command_array += ["-flop2", str(targetDisk)]
 
             autoRunCmd = ""
             autoRunDelay = 0
@@ -634,7 +646,7 @@ class MameGenerator(Generator):
                 # if using software list, use "usage" for autoRunCmd (if provided)
                 if softList != "":
                     softListFile = f"/usr/bin/mame/hash/{softList}.xml"
-                    if path.exists(softListFile):
+                    if Path(softListFile).exists():
                         softwarelist = parse(softListFile)
                         for software in softwarelist.findall("software"):
                             if (
@@ -675,8 +687,11 @@ class MameGenerator(Generator):
                             autoRunCmd = f'LOADM "{romName}":EXEC\\n'
 
                 # check for a user override
-                autoRunFile = f"system/configs/mame/autoload/{system.name}_{rom_type}_autoload.csv"
-                if path.exists(autoRunFile):
+                autoRunFile = (
+                    Path("system/configs/mame/autoload")
+                    / f"{system.name}_{rom_type}_autoload.csv"
+                )
+                if autoRunFile.exists():
                     with open(autoRunFile) as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
@@ -690,16 +705,14 @@ class MameGenerator(Generator):
                 # Check for an override file, otherwise use generic (if it exists)
                 autoRunCmd = messAutoRun[messMode]
                 autoRunFile = (
-                    f"/usr/share/reglinux/configgen/data/mame/{softList}_autoload.csv"
+                    Path("/usr/share/reglinux/configgen/data/mame")
+                    / f"{softList}_autoload.csv"
                 )
-                if path.exists(autoRunFile):
+                if autoRunFile.exists():
                     with open(autoRunFile) as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
-                            if (
-                                row[0].casefold()
-                                == path.splitext(romBasename)[0].casefold()
-                            ):
+                            if row[0].casefold() == Path(romBasename).stem.casefold():
                                 autoRunCmd = row[1]
                                 autoRunDelay = 3
             if autoRunCmd is not None:
@@ -795,13 +808,23 @@ def getMameControlScheme(system: Any, romBasename: str) -> str:
         String representing the control scheme to use
     """
     # Game list files
-    mameCapcom: str = "/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"
-    mameKInstinct: str = "/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"
-    mameMKombat: str = "/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"
-    mameNeogeo: str = "/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"
-    mameTwinstick: str = "/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"
-    mameRotatedstick: str = (
-        "/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"
+    mameCapcom: str = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameCapcom.txt")
+    )
+    mameKInstinct: str = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt")
+    )
+    mameMKombat: str = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameMKombat.txt")
+    )
+    mameNeogeo: str = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt")
+    )
+    mameTwinstick: str = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt")
+    )
+    mameRotatedstick: str = str(
+        Path("/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt")
     )
 
     # Controls for games with 5-6 buttons or other unusual controls
@@ -835,7 +858,7 @@ def getMameControlScheme(system: Any, romBasename: str) -> str:
         twinstickList: set = set()
         qbertList: set = set()
 
-    romName: str = path.splitext(romBasename)[0]
+    romName: str = Path(romBasename).stem
     if romName in capcomList:
         if controllerType in ["auto", "snes"]:
             return "sfsnes"
