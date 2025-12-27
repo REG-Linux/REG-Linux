@@ -1,11 +1,18 @@
-diff --git a/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-new file mode 100644
-index 000000000000..58d9ab342fe9
+From romain.tisserand@gmail.com Sat Dec 27 03:09:33 2025
+Subject: [PATCH] arm64: dts: qcom: add sm6115 mangmi air x
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Sat, 27 Dec 2025 03:09:33 +0100
+
+Add the initial device tree for the Mangmi Air X (SM6115).
+
+Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
+
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,917 @@
+@@ -0,0 +1,956 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
++ * Copyright (c) 2025, ROCKNIX
 + * Copyright (c) 2025, REG-LINUX (https://reglinux.org)
 + * Copyright (c) 2025, Romain Tisserand <romain.tisserand@gmail.com>
 + */
@@ -528,6 +535,13 @@ index 000000000000..58d9ab342fe9
 +		};
 +	};
 +
++	qup_uart0_default: qup-uart0-default-state {
++		pins = "gpio2", "gpio3";
++		function = "qup0";
++		drive-strength = <6>;
++		bias-pull-up;
++	};
++
 +	gpio_pwm_pins: gpio-pwm-pins {
 +		mux {
 +			pins = "gpio86";
@@ -572,6 +586,44 @@ index 000000000000..58d9ab342fe9
 +
 +&qupv3_id_0 {
 +	status = "okay";
++	/delete-node/ i2c@4a80000;
++	/delete-node/ spi@4a80000;
++
++	uart0: serial@4a80000 {
++		compatible = "qcom,geni-uart";
++		reg = <0x0 0x04a80000 0x0 0x4000>;
++		interrupts-extended = <&intc GIC_SPI 327 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&gcc GCC_QUPV3_WRAP0_S0_CLK>;
++		clock-names = "se";
++		power-domains = <&rpmpd SM6115_VDDCX>;
++		operating-points-v2 = <&qup_opp_table>;
++		interconnects = <&clk_virt MASTER_QUP_CORE_0 RPM_ALWAYS_TAG
++				 &clk_virt SLAVE_QUP_CORE_0 RPM_ALWAYS_TAG>,
++				<&bimc MASTER_AMPSS_M0 RPM_ALWAYS_TAG
++				 &config_noc SLAVE_QUP_0 RPM_ALWAYS_TAG>;
++		interconnect-names = "qup-core", "qup-config";
++		pinctrl-names = "default";
++		pinctrl-0 = <&qup_uart0_default>;
++		status = "okay";
++	};
++};
++
++&uart0 {
++	current-speed = <1000000>;
++	joystick_mcu: joystick-mcu {
++		compatible = "mangmi,joystick-mcu";
++		pinctrl-names = "default";
++		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
++		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
++		select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
++		mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
++		start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
++		back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
++		power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
++		boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
++		boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
++	};
 +};
 +
 +/* UART routed to the joystick MCU */
@@ -604,11 +656,6 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +/ {
-+	/* Joystick MCU on QUPv3 SE4 UART (disabled until driver is ready) */
-+	/*joystick_mcu: joystick-mcu {
-+		compatible = "mangmi,joystick-mcu";
-+	};*/
-+
 +	vibrator {
 +		compatible = "pwm-gpio-vibrator";
 +		pinctrl-names = "default";
@@ -839,8 +886,6 @@ index 000000000000..58d9ab342fe9
 +};
 +
 +&tlmm {
-+	gpio-reserved-ranges = <0 4>;
-+
 +	te_active: te-active-state {
 +		pins = "gpio81";
 +		function = "mdp_vsync";
