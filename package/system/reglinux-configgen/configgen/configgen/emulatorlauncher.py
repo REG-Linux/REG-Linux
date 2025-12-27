@@ -6,13 +6,14 @@ with the appropriate configurations.
 """
 
 from argparse import ArgumentParser
+from contextlib import suppress
 from os import X_OK, access, chdir, environ, listdir, makedirs, path
 from signal import SIGINT, SIGTERM, signal
 from subprocess import PIPE, Popen, call
 from sys import exit
 from threading import Thread
 from time import sleep
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import configgen.bezel.bezel_base as bezelsUtil
 import configgen.controllers as controllers
@@ -100,10 +101,9 @@ def main(args: Any, maxnbplayers: int) -> int:
 
         return exitCode
 
-    else:
-        # If it's not a .zar file, launch the ROM directly
-        eslog.debug(f"Launching ROM directly {path.basename(args.rom)}")
-        return start_rom(args, maxnbplayers, args.rom, args.rom)
+    # If it's not a .zar file, launch the ROM directly
+    eslog.debug(f"Launching ROM directly {path.basename(args.rom)}")
+    return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 
 def _start_evmapy_async(
@@ -139,7 +139,7 @@ def _start_evmapy_async(
     return t
 
 
-def _configure_controllers(args: Any, maxnbplayers: int) -> Dict[str, Any]:
+def _configure_controllers(args: Any, maxnbplayers: int) -> dict[str, Any]:
     """Configures controllers based on command-line arguments."""
     controllersInput = []
     for p in range(1, maxnbplayers + 1):
@@ -154,8 +154,7 @@ def _configure_controllers(args: Any, maxnbplayers: int) -> Dict[str, Any]:
         }
         controllersInput.append(ci)
 
-    playersControllers = controllers.load_controller_config(controllersInput)
-    return playersControllers
+    return controllers.load_controller_config(controllersInput)
 
 
 def _setup_system_emulator(args: Any, rom: str) -> Any:
@@ -187,7 +186,7 @@ def _setup_system_emulator(args: Any, rom: str) -> Any:
 
 def _configure_special_devices(
     args: Any, system: Any, rom: str, metadata: Any, players_controllers: Any
-) -> Tuple[Any, Any, Any, Any]:
+) -> tuple[Any, Any, Any, Any]:
     """Configures light guns and racing wheels."""
     if not system.isOptSet("use_guns") and args.lightgun:
         system.config["use_guns"] = True
@@ -219,7 +218,7 @@ def _configure_special_devices(
 
 def _setup_video_and_mouse(
     system: Any, generator: Any, rom: str
-) -> Tuple[Any, bool, bool, Dict[str, int]]:
+) -> tuple[Any, bool, bool, dict[str, int]]:
     """Sets up video mode and mouse visibility for the game."""
     wanted_game_mode = generator.getResolutionMode(system.config)
     system_mode = videoMode.getCurrentMode()
@@ -327,7 +326,7 @@ def _configure_hud(
     cmd: Any,
     args: Any,
     rom: str,
-    game_resolution: Dict[str, int],
+    game_resolution: dict[str, int],
     guns: Any,
 ) -> None:
     """Configures and enables MangoHUD if supported."""
@@ -374,7 +373,7 @@ def _setup_evmapy_and_compositor(
     players_controllers: Any,
     guns: Any,
     args: Any,
-    rom_configuration: Dict[str, Any],
+    rom_configuration: dict[str, Any],
 ) -> Any:
     """
     Sets up Evmapy and compositor before launching the emulator.
@@ -418,7 +417,7 @@ def _prepare_emulator_command(
     metadata: Any,
     guns: Any,
     wheels: Any,
-    game_resolution: Dict[str, int],
+    game_resolution: dict[str, int],
     args: Any,
 ) -> Any:
     """
@@ -510,9 +509,9 @@ def _launch_emulator_process(
     metadata: Any,
     guns: Any,
     wheels: Any,
-    game_resolution: Dict[str, int],
+    game_resolution: dict[str, int],
     args: Any,
-    rom_configuration: Dict[str, Any],
+    rom_configuration: dict[str, Any],
 ) -> int:
     """
     Handles the actual emulator launch process inside a try/finally block.
@@ -606,7 +605,7 @@ def _cleanup_system(
 
 
 def start_rom(
-    args: Any, maxnbplayers: int, rom: str, rom_configuration: Dict[str, Any]
+    args: Any, maxnbplayers: int, rom: str, rom_configuration: dict[str, Any]
 ) -> int:
     """
     Prepares the system and launches the emulator for a given ROM.
@@ -704,7 +703,7 @@ def getHudBezel(
     system: Any,
     generator: Any,
     rom: str,
-    game_resolution: Dict[str, int],
+    game_resolution: dict[str, int],
     borders_size: Any,
 ) -> Any:
     """
@@ -881,7 +880,7 @@ def getHudBezel(
         _cleanup_temp_files(*temp_files)
 
 
-def extractGameInfosFromXml(xml: Any) -> Dict[str, Any]:
+def extractGameInfosFromXml(xml: Any) -> dict[str, Any]:
     """
     Parses a game information XML file to extract game name and thumbnail.
 
@@ -912,7 +911,7 @@ def extractGameInfosFromXml(xml: Any) -> Dict[str, Any]:
     return vals
 
 
-def callExternalScripts(folder: str, event: str, args: List[str]) -> None:
+def callExternalScripts(folder: str, event: str, args: list[str]) -> None:
     """
     Executes all executable scripts in a given folder.
 
@@ -1035,9 +1034,7 @@ def getHudConfig(
     configstr = configstr.replace("%SYSTEMNAME%", hudConfig_protectStr(systemName))
     configstr = configstr.replace("%GAMENAME%", hudConfig_protectStr(gameName))
     configstr = configstr.replace("%EMULATORCORE%", hudConfig_protectStr(emulatorstr))
-    configstr = configstr.replace("%THUMBNAIL%", hudConfig_protectStr(gameThumbnail))
-
-    return configstr
+    return configstr.replace("%THUMBNAIL%", hudConfig_protectStr(gameThumbnail))
 
 
 def runCommand(command: Any) -> int:
@@ -1085,11 +1082,8 @@ def runCommand(command: Any) -> int:
     finally:
         # Ensure process resources are properly released
         if proc and proc.poll() is None:  # Process is still running
-            try:
+            with suppress(ProcessLookupError):
                 proc.kill()
-            except ProcessLookupError:
-                # Process already finished, ignore
-                pass
         proc = None  # Clear the global reference
 
     return exitcode

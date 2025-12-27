@@ -1,5 +1,4 @@
 from os import path
-from typing import List
 from zipfile import ZipFile
 
 from configgen.Command import Command
@@ -157,7 +156,7 @@ class AmiberryGenerator(Generator):
         # otherwise, unknown format
         return Command(array=[])
 
-    def floppies_from_rom(self, rom: str) -> List[str]:
+    def floppies_from_rom(self, rom: str) -> list[str]:
         floppies = []
         eslog.debug(f"Looking for floppy images for ROM: {rom}")
 
@@ -221,16 +220,16 @@ class AmiberryGenerator(Generator):
         if extension == "lha":
             eslog.debug("ROM type: WHDL")
             return "WHDL"
-        elif extension == "hdf":
+        if extension == "hdf":
             eslog.debug("ROM type: HDF")
             return "HDF"
-        elif extension in ["iso", "cue", "chd"]:
+        if extension in ["iso", "cue", "chd"]:
             eslog.debug(f"ROM type: CD (extension: {extension})")
             return "CD"
-        elif extension in ["adf", "ipf"]:
+        if extension in ["adf", "ipf"]:
             eslog.debug(f"ROM type: DISK (extension: {extension})")
             return "DISK"
-        elif extension == "zip":
+        if extension == "zip":
             # can be either whdl or adf
             eslog.debug("Processing ZIP file to determine ROM type")
             try:
@@ -244,10 +243,10 @@ class AmiberryGenerator(Generator):
                             if extension == "info":
                                 eslog.debug("ROM type: WHDL (found .info file)")
                                 return "WHDL"
-                            elif extension == "lha":
+                            if extension == "lha":
                                 eslog.debug("ROM type: UNKNOWN (found .lha file)")
                                 return "UNKNOWN"
-                            elif extension == "adf":
+                            if extension == "adf":
                                 eslog.debug("ROM type: DISK (found .adf file)")
                                 return "DISK"
                 # no info or adf file found

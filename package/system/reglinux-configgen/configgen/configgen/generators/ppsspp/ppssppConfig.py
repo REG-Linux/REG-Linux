@@ -1,9 +1,8 @@
 from subprocess import CalledProcessError, check_output
+from typing import Any
 
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF, HOME_INIT
-from typing import Any
-
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)

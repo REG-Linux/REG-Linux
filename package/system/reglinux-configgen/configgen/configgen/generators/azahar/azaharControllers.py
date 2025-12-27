@@ -59,7 +59,7 @@ def setButton(key: str, padGuid: str, padInputs: Any) -> str:
         input = padInputs[key]
         if input.type == "button":
             return f"button:{input.id},guid:{padGuid},engine:sdl"
-        elif input.type == "hat":
+        if input.type == "hat":
             return f"engine:sdl,guid:{padGuid},hat:{input.id},direction:{hatdirectionvalue(input.id[-1])}"
     return ""  # Return empty string if key not found
 

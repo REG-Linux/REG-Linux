@@ -1,14 +1,20 @@
 import xml.etree.ElementTree as ET
 from os import path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 from yaml import CLoader as Loader
 
-try:
+if TYPE_CHECKING:
     from typing import TypedDict
-except ImportError:
-    pass
+else:
+    try:
+        from typing import TypedDict
+    except ImportError:
+        # For older Python versions where TypedDict is not available
+        def TypedDict(name, fields, **kwargs):
+            return dict
+
 
 # Import with fallback for different execution contexts
 try:

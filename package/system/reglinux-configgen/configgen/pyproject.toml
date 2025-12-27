@@ -1,73 +1,221 @@
+# ---------------------------------------------------------------------------
+# Build system configuration
+# Defines how the project is built and which backend is used.
+# ---------------------------------------------------------------------------
 [build-system]
+# Minimum requirements to build the project
 requires = ["setuptools>=80.9.0", "wheel"]
+
+# Backend responsible for building source and wheel distributions
 build-backend = "setuptools.build_meta"
 
+
+# ---------------------------------------------------------------------------
+# Project metadata (PEP 621)
+# Core information consumed by packaging tools (pip, build, hatch, etc.)
+# ---------------------------------------------------------------------------
 [project]
+# Distribution name (must be unique on PyPI)
 name = "reglinux-configgen"
+
+# Project version (semantic versioning recommended)
 version = "0.0.8"
+
+# Short, one-line description of the project
 description = "Config generator for REG-Linux"
+
+# Minimum supported Python version
 requires-python = ">=3.12"
 
+
+# ---------------------------------------------------------------------------
+# Runtime dependencies
+# These packages are required for the project to function.
+# ---------------------------------------------------------------------------
 dependencies = [
+    # YAML parsing and serialization
     "PyYAML>=6.0.2",
+
+    # XML processing
     "lxml>=6.0.0",
+
+    # FFmpeg wrapper for media-related operations
     "ffmpeg-python>=0.2.0",
+
+    # INI-style configuration file handling
     "configobj>=5.0.6",
+
+    # HTTP client library
     "requests>=2.22.0",
+
+    # TOML parsing (legacy support and tooling compatibility)
     "toml>=0.10.2",
+
+    # Image processing (bezels, overlays, resizing, etc.)
     "Pillow>=11.3.0",
+
+    # Linux input device handling
     "evdev>=1.9.2",
+
+    # udev integration for hardware detection
     "pyudev>=0.24.3",
+
+    # Advanced YAML handling (round-trip editing, comments preservation)
     "ruamel.yaml>=0.18.15",
+
+    # ZeroMQ bindings for IPC and messaging
     "pyzmq>=22.3.0"
 ]
 
+
+# ---------------------------------------------------------------------------
+# Optional dependencies
+# Installed via: pip install reglinux-configgen[dev]
+# ---------------------------------------------------------------------------
 [project.optional-dependencies]
 dev = [
+    # Linter and code quality tool
     "ruff>=0.9.10",
+
+    # Static type checker
     "pyright>=1.1.386"
 ]
 
+
+# ---------------------------------------------------------------------------
+# setuptools package discovery
+# Controls which Python packages are included in the distribution.
+# ---------------------------------------------------------------------------
 [tool.setuptools.packages.find]
+# Exclude test and documentation directories from the final package
 exclude = ["tests*", "docs*"]
 
+
+# ---------------------------------------------------------------------------
+# Package data
+# Non-Python files that must be included in the wheel/sdist.
+# ---------------------------------------------------------------------------
 [tool.setuptools.package-data]
+# Include controller configuration files required at runtime
 "configgen.generators.xash3d_fwgs" = ["gamepad.cfg"]
 
+
+# ---------------------------------------------------------------------------
+# Command-line entry points
+# Creates the `reglinux-configgen` executable.
+# ---------------------------------------------------------------------------
 [project.scripts]
+# Maps the CLI command to the main function
 reglinux-configgen = "configgen:main"
 
+
+# ---------------------------------------------------------------------------
+# Pyright configuration
+# Static type checking rules and behavior.
+# ---------------------------------------------------------------------------
 [tool.pyright]
+# Target Python version for type analysis
 pythonVersion = "3.12"
+
+# Basic type checking (balanced between strictness and practicality)
 typeCheckingMode = "basic"
 
+# Virtual environment configuration
 venvPath = "."
 venv = ".venv"
 
+# Warn when imports cannot be resolved
 reportMissingImports = "warning"
 
+# Disable overly strict unknown-type reports
 reportUnknownParameterType = false
 reportUnknownVariableType = false
 reportUnknownMemberType = false
 
+# Warn on unsafe Optional usage
 reportOptionalOperand = "warning"
 reportOptionalSubscript = "warning"
 reportOptionalMemberAccess = "warning"
 
+# Do not require explicit return statements everywhere
 reportMissingReturn = false
 
+# Warn on unused code elements
 reportUnusedImport = "warning"
 reportUnusedVariable = "warning"
 reportUnusedExpression = "warning"
 
+
+# ---------------------------------------------------------------------------
+# Ruff configuration
+# Linting, code quality, and automatic fixes.
+# ---------------------------------------------------------------------------
 [tool.ruff]
+# Target Python version for rule evaluation
 target-version = "py312"
+
+# Allow Ruff to automatically fix issues when possible
+fix = true
+
+# Do not apply potentially dangerous or semantic-changing fixes
 unsafe-fixes = false
 
+# Paths excluded from linting
+exclude = [
+  ".venv",
+  "__pycache__",
+  "build",
+  "dist",
+]
+
+
+# ---------------------------------------------------------------------------
+# Ruff lint rule selection
+# Controls which rule families are enabled.
+# ---------------------------------------------------------------------------
+[tool.ruff.lint]
+select = [
+  # Core Python errors and warnings (pycodestyle, pyflakes)
+  "E", "F", "W",
+
+  # Import sorting and hygiene
+  "I",
+
+  # General code quality and bug detection
+  "B",        # flake8-bugbear
+  "SIM",      # code simplifications
+  "UP",       # Python syntax modernization
+  "PERF",     # performance-related issues
+  "C4",       # comprehension optimizations
+  "RET",      # return statement consistency
+  "TID",      # tidy imports
+]
+
+# Explicitly ignored rules
+ignore = [
+  # Conflicts with auto-formatters (Black, Ruff format)
+  "E203",
+
+  # Line length handled by the formatter, not the linter
+  "E501",
+]
+
+
+# ---------------------------------------------------------------------------
+# Coverage.py configuration
+# Code coverage measurement during test execution.
+# ---------------------------------------------------------------------------
 [tool.coverage.run]
+# Enable branch coverage (if/else paths)
 branch = true
+
+# Measure coverage only for this package
 source = ["configgen"]
 
+
 [tool.coverage.report]
+# Show missing lines in the report
 show_missing = true
+
+# Do not display files that are fully covered
 skip_covered = true

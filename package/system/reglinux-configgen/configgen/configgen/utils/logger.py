@@ -164,5 +164,4 @@ def add_log_context(logger: logging.Logger, **context: Any):
     Returns:
         LoggerAdapter with context
     """
-    adapter = logging.LoggerAdapter(logger, context)
-    return adapter
+    return logging.LoggerAdapter(logger, context)

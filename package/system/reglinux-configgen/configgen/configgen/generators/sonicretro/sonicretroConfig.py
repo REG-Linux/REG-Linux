@@ -1,6 +1,5 @@
 from hashlib import md5
 from os import path
-
 from typing import Any
 
 from configgen.settings import UnixSettings
@@ -125,8 +124,7 @@ def __getMD5(self: Any, filename: str) -> str:
 
     if rp in self._md5_cache:
         return self._md5_cache[rp]
-    else:
-        with open(rp, "rb") as f:
-            md5_hash = md5(f.read()).hexdigest()
-        self._md5_cache[rp] = md5_hash
-        return md5_hash
+    with open(rp, "rb") as f:
+        md5_hash = md5(f.read()).hexdigest()
+    self._md5_cache[rp] = md5_hash
+    return md5_hash

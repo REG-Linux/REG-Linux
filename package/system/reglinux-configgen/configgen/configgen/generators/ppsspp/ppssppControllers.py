@@ -203,5 +203,4 @@ def axisToCode(axisId: int, direction: int) -> int:
 def optionValue(config: Any, section: str, option: str, value: str) -> str:
     if config.has_option(section, option):
         return f"{config.get(section, option)},{value}"
-    else:
-        return value
+    return value

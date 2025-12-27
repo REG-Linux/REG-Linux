@@ -3,7 +3,7 @@ import configparser
 import glob
 import os
 import re
-from typing import Any, Dict, Optional
+from typing import Any
 
 from configgen.utils.logger import get_logger
 
@@ -166,7 +166,7 @@ def generateControllerConfig_any(
     anyMapping: Any,
     anyReverseAxes: Any,
     anyReplacements: Any,
-    extraOptions: Dict[str, Any] = {},
+    extraOptions: dict[str, Any] = {},
 ) -> None:
     configFileName = f"{dolphinTriforceConfig.dolphinTriforceConfig}/{filename}"
     f = codecs.open(configFileName, "w", encoding="utf_8")
@@ -334,7 +334,7 @@ def write_key(
     input_value: str,
     input_global_id: str,
     reverse: bool,
-    hotkey_id: Optional[str],
+    hotkey_id: str | None,
 ) -> None:
     f.write(keyname + " = ")
     if hotkey_id is not None:

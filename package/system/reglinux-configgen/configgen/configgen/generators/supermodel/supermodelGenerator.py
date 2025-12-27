@@ -213,10 +213,9 @@ def configPadsIni(
         return templateFile, mapping
 
     # Chamada da função interna
-    return get_template_and_mapping(altControl)
+    templateFile, mapping = get_template_and_mapping(altControl)
 
     def apply_guns_to_section(
-        self,
         targetConfig: Any,
         section: str,
         key: str,
@@ -236,109 +235,91 @@ def configPadsIni(
             if key == "InputSystem":
                 targetConfig.set(section, key, "evdev")
                 return True
-            elif key == "InputAnalogJoyX":
+            if key == "InputAnalogJoyX":
                 targetConfig.set(section, key, "MOUSE1_XAXIS_INV")
                 return True
-            elif key == "InputAnalogJoyY":
+            if key == "InputAnalogJoyY":
                 targetConfig.set(section, key, "MOUSE1_YAXIS_INV")
                 return True
-            elif key == "InputGunX" or key == "InputAnalogGunX":
+            if key == "InputGunX" or key == "InputAnalogGunX":
                 targetConfig.set(section, key, "MOUSE1_XAXIS")
                 return True
-            elif key == "InputGunY" or key == "InputAnalogGunY":
+            if key == "InputGunY" or key == "InputAnalogGunY":
                 targetConfig.set(section, key, "MOUSE1_YAXIS")
                 return True
-            elif (
+            if (
                 key == "InputTrigger"
                 or key == "InputAnalogTriggerLeft"
                 or key == "InputAnalogJoyTrigger"
             ):
                 targetConfig.set(section, key, "MOUSE1_LEFT_BUTTON")
                 return True
-            elif key == "InputOffscreen" or key == "InputAnalogTriggerRight":
+            if key == "InputOffscreen" or key == "InputAnalogTriggerRight":
                 targetConfig.set(section, key, "MOUSE1_RIGHT_BUTTON")
                 return True
-            elif key == "InputStart1":
+            if key == "InputStart1":
                 val = transformElement(
                     "JOY1_BUTTON9", players_controllers, mapping, mapping_fallback
                 )
-                if val is not None:
-                    val = "," + val
-                else:
-                    val = ""
+                val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "MOUSE1_BUTTONX1" + val)
                 return True
-            elif key == "InputCoin1":
+            if key == "InputCoin1":
                 val = transformElement(
                     "JOY1_BUTTON10", players_controllers, mapping, mapping_fallback
                 )
-                if val is not None:
-                    val = "," + val
-                else:
-                    val = ""
+                val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "MOUSE1_BUTTONX2" + val)
                 return True
-            elif key == "InputAnalogJoyEvent":
+            if key == "InputAnalogJoyEvent":
                 val = transformElement(
                     "JOY1_BUTTON2", players_controllers, mapping, mapping_fallback
                 )
-                if val is not None:
-                    val = "," + val
-                else:
-                    val = ""
+                val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "KEY_S,MOUSE1_MIDDLE_BUTTON" + val)
                 return True
-            elif len(guns) >= 2:
+            if len(guns) >= 2:
                 if key == "InputAnalogJoyX2":
                     targetConfig.set(section, key, "MOUSE2_XAXIS_INV")
                     return True
-                elif key == "InputAnalogJoyY2":
+                if key == "InputAnalogJoyY2":
                     targetConfig.set(section, key, "MOUSE2_YAXIS_INV")
                     return True
-                elif key == "InputGunX2" or key == "InputAnalogGunX2":
+                if key == "InputGunX2" or key == "InputAnalogGunX2":
                     targetConfig.set(section, key, "MOUSE2_XAXIS")
                     return True
-                elif key == "InputGunY2" or key == "InputAnalogGunY2":
+                if key == "InputGunY2" or key == "InputAnalogGunY2":
                     targetConfig.set(section, key, "MOUSE2_YAXIS")
                     return True
-                elif (
+                if (
                     key == "InputTrigger2"
                     or key == "InputAnalogTriggerLeft2"
                     or key == "InputAnalogJoyTrigger2"
                 ):
                     targetConfig.set(section, key, "MOUSE2_LEFT_BUTTON")
                     return True
-                elif key == "InputOffscreen2" or key == "InputAnalogTriggerRight2":
+                if key == "InputOffscreen2" or key == "InputAnalogTriggerRight2":
                     targetConfig.set(section, key, "MOUSE2_RIGHT_BUTTON")
                     return True
-                elif key == "InputStart2":
+                if key == "InputStart2":
                     val = transformElement(
                         "JOY2_BUTTON9", players_controllers, mapping, mapping_fallback
                     )
-                    if val is not None:
-                        val += "," + val
-                    else:
-                        val = ""
+                    val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_BUTTONX1" + val)
                     return True
-                elif key == "InputCoin1":
+                if key == "InputCoin1":
                     val = transformElement(
                         "JOY2_BUTTON10", players_controllers, mapping, mapping_fallback
                     )
-                    if val is not None:
-                        val += "," + val
-                    else:
-                        val = ""
+                    val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_BUTTONX2" + val)
                     return True
-                elif key == "InputAnalogJoyEvent2":
+                if key == "InputAnalogJoyEvent2":
                     val = transformElement(
                         "JOY2_BUTTON2", players_controllers, mapping, mapping_fallback
                     )
-                    if val is not None:
-                        val += "," + val
-                    else:
-                        val = ""
+                    val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_MIDDLE_BUTTON" + val)
                     return True
         return False
@@ -396,9 +377,8 @@ def configPadsIni(
                     mapping,
                     mapping_fallback,
                 )
-                if not handled:
-                    if key == "InputSystem":
-                        targetConfig.set(section, key, "sdl")
+                if not handled and key == "InputSystem":
+                    targetConfig.set(section, key, "sdl")
 
     # Update InputJoy1XSaturation key with the given sensitivity value
     sensitivity = str(int(float(sensitivity)))
@@ -411,6 +391,8 @@ def configPadsIni(
         makedirs(path.dirname(targetFile))
     with builtins.open(targetFile, "w") as configfile:
         targetConfig.write(configfile)
+
+    return templateFile, mapping
 
 
 def transformValue(
@@ -433,9 +415,8 @@ def transformValue(
                     newvalue = newvalue + ","
                 newvalue = newvalue + newelt
         return '"' + newvalue + '"'
-    else:
-        # integers
-        return cleanValue
+    # integers
+    return cleanValue
 
 
 def transformElement(
@@ -459,10 +440,7 @@ def transformElement(
     if matches:
         # check joystick type if it's hat or axis
         joy_type = hatOrAxis(players_controllers, matches.group(1))
-        if joy_type == "hat":
-            key_up = "up"
-        else:
-            key_up = "axisY"
+        key_up = "up" if joy_type == "hat" else "axisY"
         mp = getMappingKeyIncludingFallback(
             players_controllers, matches.group(1), key_up, mapping, mapping_fallback
         )
@@ -477,10 +455,7 @@ def transformElement(
     matches = search("^JOY([12])_DOWN$", elt)
     if matches:
         joy_type = hatOrAxis(players_controllers, matches.group(1))
-        if joy_type == "hat":
-            key_down = "down"
-        else:
-            key_down = "axisY"
+        key_down = "down" if joy_type == "hat" else "axisY"
         mp = getMappingKeyIncludingFallback(
             players_controllers, matches.group(1), key_down, mapping, mapping_fallback
         )
@@ -494,10 +469,7 @@ def transformElement(
     matches = search("^JOY([12])_LEFT$", elt)
     if matches:
         joy_type = hatOrAxis(players_controllers, matches.group(1))
-        if joy_type == "hat":
-            key_left = "left"
-        else:
-            key_left = "axisX"
+        key_left = "left" if joy_type == "hat" else "axisX"
         mp = getMappingKeyIncludingFallback(
             players_controllers, matches.group(1), key_left, mapping, mapping_fallback
         )
@@ -511,10 +483,7 @@ def transformElement(
     matches = search("^JOY([12])_RIGHT$", elt)
     if matches:
         joy_type = hatOrAxis(players_controllers, matches.group(1))
-        if joy_type == "hat":
-            key_right = "right"
-        else:
-            key_right = "axisX"
+        key_right = "right" if joy_type == "hat" else "axisX"
         mp = getMappingKeyIncludingFallback(
             players_controllers, matches.group(1), key_right, mapping, mapping_fallback
         )
@@ -564,15 +533,21 @@ def getMappingKeyIncludingFallback(
     mapping: Any,
     mapping_fallback: Any,
 ) -> str:
-    if padnum in players_controllers:
-        if key not in mapping or (
-            key in mapping and mapping[key] not in players_controllers[padnum].inputs
-        ):
-            if (
-                key in mapping_fallback
-                and mapping_fallback[key] in players_controllers[padnum].inputs
-            ):
-                return mapping_fallback[key]
+    if (
+        padnum in players_controllers
+        and (
+            key not in mapping
+            or (
+                key in mapping
+                and mapping[key] not in players_controllers[padnum].inputs
+            )
+        )
+        and (
+            key in mapping_fallback
+            and mapping_fallback[key] in players_controllers[padnum].inputs
+        )
+    ):
+        return mapping_fallback[key]
     return mapping[key]
 
 
@@ -610,40 +585,34 @@ def input2input(
             if joynum is not None:  # Apenas prossegue se joynum não for None
                 if input.type == "button":
                     return f"JOY{joynum + 1}_BUTTON{int(input.id) + 1}"
-                elif input.type == "hat":
+                if input.type == "hat":
                     if input.value == "1":
                         return f"JOY{joynum + 1}_UP,JOY{joynum + 1}_POV1_UP"
-                    elif input.value == "2":
+                    if input.value == "2":
                         return f"JOY{joynum + 1}_RIGHT,JOY{joynum + 1}_POV1_RIGHT"
-                    elif input.value == "4":
+                    if input.value == "4":
                         return f"JOY{joynum + 1}_DOWN,JOY{joynum + 1}_POV1_DOWN"
-                    elif input.value == "8":
+                    if input.value == "8":
                         return f"JOY{joynum + 1}_LEFT,JOY{joynum + 1}_POV1_LEFT"
                 elif input.type == "axis":
                     sidestr = ""
                     if axisside is not None:
                         if axisside == 1:
-                            if input.value == 1:
-                                sidestr = "_NEG"
-                            else:
-                                sidestr = "_POS"
+                            sidestr = "_NEG" if input.value == 1 else "_POS"
                         else:
-                            if input.value == 1:
-                                sidestr = "_POS"
-                            else:
-                                sidestr = "_NEG"
+                            sidestr = "_POS" if input.value == 1 else "_NEG"
 
                     if button == "joystick1left" or button == "left":
                         return f"JOY{joynum + 1}_XAXIS{sidestr}"
-                    elif button == "joystick1up" or button == "up":
+                    if button == "joystick1up" or button == "up":
                         return f"JOY{joynum + 1}_YAXIS{sidestr}"
-                    elif button == "joystick2left":
+                    if button == "joystick2left":
                         return f"JOY{joynum + 1}_RXAXIS{sidestr}"
-                    elif button == "joystick2up":
+                    if button == "joystick2up":
                         return f"JOY{joynum + 1}_RYAXIS{sidestr}"
-                    elif button == "l2":
+                    if button == "l2":
                         return f"JOY{joynum + 1}_ZAXIS{sidestr}"
-                    elif button == "r2":
+                    if button == "r2":
                         return f"JOY{joynum + 1}_RZAXIS{sidestr}"
 
     return None

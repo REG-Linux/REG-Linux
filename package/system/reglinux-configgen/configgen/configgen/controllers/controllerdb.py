@@ -5,7 +5,7 @@ Handles loading and matching controller configurations from gamecontrollerdb.txt
 
 import os
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, List
+from typing import Any
 
 from configgen.utils.logger import get_logger
 
@@ -43,8 +43,8 @@ def parse_line(line: str) -> tuple[str, dict[str, Any]] | None:
     }
 
 
-def _parse_chunk(lines: List[str]) -> Dict[str, Dict[str, Any]]:
-    chunk_result: Dict[str, Dict[str, Any]] = {}
+def _parse_chunk(lines: list[str]) -> dict[str, dict[str, Any]]:
+    chunk_result: dict[str, dict[str, Any]] = {}
     for line in lines:
         parsed = parse_line(line)
         if parsed is None:
@@ -87,8 +87,8 @@ def load_all_controllers_config() -> dict[str, dict[str, Any]]:
 
 
 def load_controller_config(
-    controllersInput: List[Dict[str, str]],
-) -> Dict[str, Dict[str, Any]]:
+    controllersInput: list[dict[str, str]],
+) -> dict[str, dict[str, Any]]:
     """
     Generates player-specific controller objects using the known controller database.
 
@@ -98,7 +98,7 @@ def load_controller_config(
     Returns:
         dict: Dictionary of Controller instances keyed by player number (as strings).
     """
-    playerControllers: Dict[str, Dict[str, Any]] = dict()
+    playerControllers: dict[str, dict[str, Any]] = {}
     controllers = load_all_controllers_config()
 
     for i, ci in enumerate(controllersInput):
@@ -117,7 +117,7 @@ def load_controller_config(
 
 
 def _find_best_controller_config(
-    controllers: Dict[str, Any],
+    controllers: dict[str, Any],
     x: str,
     pxguid: str,
     pxdev: str,

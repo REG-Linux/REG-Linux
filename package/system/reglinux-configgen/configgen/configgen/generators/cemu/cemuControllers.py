@@ -118,8 +118,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
     def getOption(option: str, defaultValue: Any) -> Any:
         if system.isOptSet(option):
             return system.config[option]
-        else:
-            return defaultValue
+        return defaultValue
 
     def addTextElement(parent: Any, name: str, value: str) -> Any:
         element = SubElement(parent, name)
@@ -152,7 +151,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
     pads_by_index = dict(sorted(playersControllers.items(), key=lambda kv: kv[1].index))
     guid_n = {}
     guid_count = {}
-    for _, pad in pads_by_index.items():
+    for pad in pads_by_index.values():
         if pad.guid in guid_count:
             guid_count[pad.guid] += 1
         else:
@@ -160,7 +159,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
         guid_n[pad.index] = guid_count[pad.guid]
     ###
 
-    for _, pad in pads_by_index.items():
+    for nplayer, pad in enumerate(pads_by_index.values()):
         root = Element("emulated_controller")
 
         # Set type from controller combination
@@ -170,10 +169,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
             and system.config["cemu_controller_combination"] != "0"
         ):
             if system.config["cemu_controller_combination"] == "1":
-                if nplayer == 0:
-                    type = GAMEPAD
-                else:
-                    type = WIIMOTE
+                type = GAMEPAD if nplayer == 0 else WIIMOTE
             elif system.config["cemu_controller_combination"] == "2":
                 type = PRO
             else:
@@ -181,10 +177,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
             if system.config["cemu_controller_combination"] == "4":
                 type = CLASSIC
         else:
-            if nplayer == 0:
-                type = GAMEPAD
-            else:
-                type = PRO
+            type = GAMEPAD if nplayer == 0 else PRO
         addTextElement(root, "type", type)
 
         # Create controller configuration
@@ -214,5 +207,3 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
             indent(tree, space="  ", level=0)
             tree.write(handle, encoding="UTF-8", xml_declaration=True)
             handle.close()
-
-        nplayer += 1

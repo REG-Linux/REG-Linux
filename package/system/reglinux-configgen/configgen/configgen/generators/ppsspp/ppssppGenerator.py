@@ -1,5 +1,4 @@
 from os import getenv
-from typing import Dict
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -47,5 +46,5 @@ class PPSSPPGenerator(Generator):
         return Command(array=command_array, env=environment)
 
     @staticmethod
-    def isLowResolution(game_resolution: Dict[str, int]) -> bool:
+    def isLowResolution(game_resolution: dict[str, int]) -> bool:
         return game_resolution["width"] <= 480 or game_resolution["height"] <= 480

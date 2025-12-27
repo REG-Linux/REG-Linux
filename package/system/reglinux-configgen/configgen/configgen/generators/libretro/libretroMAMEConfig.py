@@ -5,7 +5,7 @@ from csv import reader
 from os import linesep, listdir, makedirs, path, remove, symlink, unlink
 from pathlib import Path
 from shutil import copy2, rmtree
-from typing import Any, List
+from typing import Any
 from xml.dom import minidom
 from zipfile import ZipFile
 
@@ -44,7 +44,7 @@ retroPad = {
 
 def generateMAMEConfigs(
     playersControllers: Any, system: Any, rom: str, guns: Any
-) -> List[str]:
+) -> list[str]:
     # Generate command line for MAME
     commandLine = []
     romBasename = path.basename(rom)
@@ -586,7 +586,7 @@ def generateMAMEConfigs(
 
 
 def prepSoftwareList(
-    subdirSoftList: List[str],
+    subdirSoftList: list[str],
     softList: str,
     softDir: str,
     hashDir: str,
@@ -636,61 +636,60 @@ def getMameControlScheme(system: Any, romBasename: str) -> Any:
 
     if controllerType in ["default", "neomini", "neocd", "twinstick", "qbert"]:
         return controllerType
-    else:
-        try:
-            with open(mameCapcom) as f:
-                capcomList = set(f.read().split())
-            with open(mameMKombat) as f:
-                mkList = set(f.read().split())
-            with open(mameKInstinct) as f:
-                kiList = set(f.read().split())
-            with open(mameNeogeo) as f:
-                neogeoList = set(f.read().split())
-            with open(mameTwinstick) as f:
-                twinstickList = set(f.read().split())
-            with open(mameRotatedstick) as f:
-                qbertList = set(f.read().split())
-        except OSError as e:
-            eslog.error(f"Error reading MAME list files: {e}")
-            # Initialize empty sets to avoid breaking the process
-            capcomList = set()
-            mkList = set()
-            kiList = set()
-            neogeoList = set()
-            twinstickList = set()
-            qbertList = set()
+    try:
+        with open(mameCapcom) as f:
+            capcomList = set(f.read().split())
+        with open(mameMKombat) as f:
+            mkList = set(f.read().split())
+        with open(mameKInstinct) as f:
+            kiList = set(f.read().split())
+        with open(mameNeogeo) as f:
+            neogeoList = set(f.read().split())
+        with open(mameTwinstick) as f:
+            twinstickList = set(f.read().split())
+        with open(mameRotatedstick) as f:
+            qbertList = set(f.read().split())
+    except OSError as e:
+        eslog.error(f"Error reading MAME list files: {e}")
+        # Initialize empty sets to avoid breaking the process
+        capcomList = set()
+        mkList = set()
+        kiList = set()
+        neogeoList = set()
+        twinstickList = set()
+        qbertList = set()
 
-        romName = path.splitext(romBasename)[0]
-        if romName in capcomList:
-            if controllerType in ["auto", "snes"]:
-                return "sfsnes"
-            elif controllerType == "megadrive":
-                return "megadrive"
-            elif controllerType == "fightstick":
-                return "sfstick"
-        elif romName in mkList:
-            if controllerType in ["auto", "snes"]:
-                return "mksnes"
-            elif controllerType == "megadrive":
-                return "mkmegadrive"
-            elif controllerType == "fightstick":
-                return "mkstick"
-        elif romName in kiList:
-            if controllerType in ["auto", "snes"]:
-                return "kisnes"
-            elif controllerType == "megadrive":
-                return "megadrive"
-            elif controllerType == "fightstick":
-                return "sfstick"
-        elif romName in neogeoList:
-            return "neomini"
-        elif romName in twinstickList:
-            return "twinstick"
-        elif romName in qbertList:
-            return "qbert"
-        else:
-            if controllerType == "fightstick":
-                return "fightstick"
+    romName = path.splitext(romBasename)[0]
+    if romName in capcomList:
+        if controllerType in ["auto", "snes"]:
+            return "sfsnes"
+        if controllerType == "megadrive":
+            return "megadrive"
+        if controllerType == "fightstick":
+            return "sfstick"
+    elif romName in mkList:
+        if controllerType in ["auto", "snes"]:
+            return "mksnes"
+        if controllerType == "megadrive":
+            return "mkmegadrive"
+        if controllerType == "fightstick":
+            return "mkstick"
+    elif romName in kiList:
+        if controllerType in ["auto", "snes"]:
+            return "kisnes"
+        if controllerType == "megadrive":
+            return "megadrive"
+        if controllerType == "fightstick":
+            return "sfstick"
+    elif romName in neogeoList:
+        return "neomini"
+    elif romName in twinstickList:
+        return "twinstick"
+    elif romName in qbertList:
+        return "qbert"
+    else:
+        if controllerType == "fightstick":
+            return "fightstick"
 
     return "default"
 
@@ -1314,54 +1313,49 @@ def input2definition(
     ):
         input = input.format(joycode) if "{0}" in input else input
         return f"JOYCODE_{joycode}_{input}"
-    elif input.find("AXIS") != -1:
+    if input.find("AXIS") != -1:
         if altButtons == "qbert":  # Q*Bert Joystick
             if key == "joystick1up" or key == "up":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1up']}_{joycode}_{retroPad['joystick1right']} OR \
                     JOYCODE_{joycode}_{retroPad['up'].format(joycode)} JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
-            elif key == "joystick1down" or key == "down":
+            if key == "joystick1down" or key == "down":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1down']} JOYCODE_{joycode}_{retroPad['joystick1left']} OR \
                     JOYCODE_{joycode}_{retroPad['down'].format(joycode)} JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
-            elif key == "joystick1left" or key == "left":
+            if key == "joystick1left" or key == "left":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1left']} JOYCODE_{joycode}_{retroPad['joystick1up']} OR \
                     JOYCODE_{joycode}_{retroPad['left'].format(joycode)} JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
-            elif key == "joystick1right" or key == "right":
+            if key == "joystick1right" or key == "right":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1right']} JOYCODE_{joycode}_{retroPad['joystick1down']} OR \
                     JOYCODE_{joycode}_{retroPad['right'].format(joycode)} JOYCODE_{joycode}_{retroPad['down'].format(joycode)}"
-            else:
-                return f"JOYCODE_{joycode}_{input}"
-        elif ignoreAxis:
+            return f"JOYCODE_{joycode}_{input}"
+        if ignoreAxis:
             if key == "joystick1up" or key == "up":
                 return f"JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
-            elif key == "joystick1down" or key == "down":
+            if key == "joystick1down" or key == "down":
                 return f"JOYCODE_{joycode}_{retroPad['down'].format(joycode)}"
-            elif key == "joystick1left" or key == "left":
+            if key == "joystick1left" or key == "left":
                 return f"JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
-            elif key == "joystick1right" or key == "right":
+            if key == "joystick1right" or key == "right":
                 return f"JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
-            else:
-                return f"JOYCODE_{joycode}_{input}"
-        else:
-            if key == "joystick1up" or key == "up":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
-            elif key == "joystick1down" or key == "down":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['down'].format(joycode)}"
-            elif key == "joystick1left" or key == "left":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
-            elif key == "joystick1right" or key == "right":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
-            elif key == "joystick2up":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['x']}"
-            elif key == "joystick2down":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['b']}"
-            elif key == "joystick2left":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['y']}"
-            elif key == "joystick2right":
-                return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['a']}"
-            else:
-                return f"JOYCODE_{joycode}_{input}"
-    else:
-        return "unknown"
+            return f"JOYCODE_{joycode}_{input}"
+        if key == "joystick1up" or key == "up":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
+        if key == "joystick1down" or key == "down":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['down'].format(joycode)}"
+        if key == "joystick1left" or key == "left":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
+        if key == "joystick1right" or key == "right":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
+        if key == "joystick2up":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['x']}"
+        if key == "joystick2down":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['b']}"
+        if key == "joystick2left":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['y']}"
+        if key == "joystick2right":
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['a']}"
+        return f"JOYCODE_{joycode}_{input}"
+    return "unknown"
 
 
 def getRoot(config: Any, name: str) -> Any:

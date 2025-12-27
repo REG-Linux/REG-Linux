@@ -1,6 +1,6 @@
 from os import chdir, makedirs, path
 from shutil import copyfile
-from typing import Any, Dict, Union
+from typing import Any
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -39,7 +39,7 @@ class LibretroGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, int],
+        game_resolution: dict[str, int],
     ) -> Command:
         # Get the graphics backend first
         gfxBackend = getGFXBackend(system)
@@ -358,7 +358,7 @@ class LibretroGenerator(Generator):
         return Command(array=command_array)
 
 
-def getGFXBackend(system: Any) -> Union[str, Any]:
+def getGFXBackend(system: Any) -> str | Any:
     # Start with the selected option
     # Pick glcore or gl based on drivers if not selected
     VALID_BACKENDS = {

@@ -1,5 +1,6 @@
-from configgen.systemFiles import CONF, ROMS
 from typing import Any
+
+from configgen.systemFiles import CONF, ROMS
 
 CGENIUS_CONFIG_DIR = CONF + "/cgenius"
 CGENIUS_ROMS_DIR = ROMS + "/cgenius/"

@@ -3,8 +3,9 @@ Module that defines the interfaces and base classes for the bezel system in REG-
 """
 
 from abc import ABC, abstractmethod
+from contextlib import suppress
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any
 
 from PIL import Image
 
@@ -40,8 +41,8 @@ class IBezelManager(ABC):
         self,
         system: "Emulator",
         rom: str,
-        game_resolution: Dict[str, int],
-        guns: List[Any],
+        game_resolution: dict[str, int],
+        guns: list[Any],
     ) -> None:
         """Configure the bezels for a specific game."""
         pass
@@ -99,10 +100,8 @@ class BezelUtils:
         """
         files = glob.glob(str(BEZEL_CACHE_DIR / "*.png"))
         for file in files:
-            try:
-                os.remove(file)
-            except OSError:
-                pass  # Ignore errors when removing cached files
+            with suppress(OSError):
+                os.remove(file)  # Ignore errors when removing cached files
 
     @staticmethod
     def get_bezel_infos(
@@ -1161,7 +1160,7 @@ def gunsBorderSize(
     return BezelUtils.guns_border_size(w, h, innerBorderSizePer, outerBorderSizePer)
 
 
-def gunsBordersColorFomConfig(config: Dict[str, str]) -> str:
+def gunsBordersColorFomConfig(config: dict[str, str]) -> str:
     """
     Return hex color for gun borders from config string.
 

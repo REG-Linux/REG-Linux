@@ -1,7 +1,7 @@
 from configparser import ConfigParser
 from os import environ, makedirs, path
 from subprocess import CalledProcessError, check_output
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import gunsNeedCrosses
@@ -35,7 +35,7 @@ class DolphinGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, int],
+        game_resolution: dict[str, int],
     ) -> Command:
         if not path.exists(path.dirname(DOLPHIN_CONFIG_PATH)):
             makedirs(path.dirname(DOLPHIN_CONFIG_PATH))
@@ -611,7 +611,7 @@ class DolphinGenerator(Generator):
         return Command(array=command_array)
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
@@ -666,5 +666,4 @@ def getGameCubeLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]

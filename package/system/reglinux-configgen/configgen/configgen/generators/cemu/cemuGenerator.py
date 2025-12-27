@@ -74,12 +74,11 @@ class CemuGenerator(Generator):
         setCemuConfig(cemuConfig, system)
 
         # Save the config file
-        xml_file = open(CEMU_CONFIG_PATH, "w", "utf-8")
         dom_string = linesep.join(
             [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()]
         )
-        xml_file.write(dom_string)
-        xml_file.close()
+        with open(CEMU_CONFIG_PATH, "w", encoding="utf-8") as xml_file:
+            xml_file.write(dom_string)
 
         # Set-up the controllers
         setControllerConfig(system, players_controllers, CEMU_PROFILES_DIR)

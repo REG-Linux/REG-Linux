@@ -101,16 +101,15 @@ class RegMsgClient:
 
         try:
             self.socket.send_string(message)
-            reply = self.socket.recv_string()
-            return reply
+            return self.socket.recv_string()
         except zmq.Again:
             raise RuntimeError(
                 f"Timeout in communication with regmsgd (>{self.timeout}ms)"
-            )
+            ) from None
         except zmq.error.ZMQError as e:
-            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}")
+            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}") from e
         except Exception as e:
-            raise RuntimeError(f"Unexpected error sending message: {str(e)}")
+            raise RuntimeError(f"Unexpected error sending message: {str(e)}") from e
 
     def __enter__(self):
         """Enable usage as context manager."""
@@ -173,17 +172,18 @@ def regmsg_send_message(message: str, timeout: int = 5000) -> str:
             _socket.setsockopt(zmq.RCVTIMEO, timeout)
             _socket.setsockopt(zmq.SNDTIMEO, timeout)
             _socket.send_string(message)
-            reply = _socket.recv_string()
-            return reply
+            return _socket.recv_string()
         except zmq.Again:
-            raise RuntimeError(f"Timeout in communication with regmsgd (>{timeout}ms)")
+            raise RuntimeError(
+                f"Timeout in communication with regmsgd (>{timeout}ms)"
+            ) from None
         except zmq.error.ZMQError as e:
-            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}")
+            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}") from e
         except AttributeError:
             # Handle the case where socket methods are not available (is None)
-            raise RuntimeError("Socket is None, cannot send/receive message")
+            raise RuntimeError("Socket is None, cannot send/receive message") from None
         except Exception as e:
-            raise RuntimeError(f"Unexpected error sending message: {str(e)}")
+            raise RuntimeError(f"Unexpected error sending message: {str(e)}") from e
     else:
         # If no global connection exists, create temporarily
         with RegMsgClient(timeout=timeout) as client:

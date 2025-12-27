@@ -11,7 +11,7 @@ except ImportError:
     )
     raise
 from shutil import move
-from typing import Any, Dict
+from typing import Any
 
 from configgen.controllers import generate_sdl_controller_config
 from configgen.systemFiles import CONF, SAVES
@@ -164,12 +164,11 @@ class Vita3kGenerator(Generator):
 
     # Show mouse for touchscreen actions
     def getMouseMode(self, config, rom):
-        if "vita3k_show_pointer" in config and config["vita3k_show_pointer"] == "0":
-            return False
-        else:
-            return True
+        return not (
+            "vita3k_show_pointer" in config and config["vita3k_show_pointer"] == "0"
+        )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         return 16 / 9

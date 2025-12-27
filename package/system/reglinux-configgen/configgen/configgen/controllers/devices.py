@@ -1,17 +1,17 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pyudev import Context
 
 from .utils import dev2int
 
 
-def getDevicesInformation() -> Dict[str, Any]:
-    groups: Dict[str, Any] = {}
-    devices: Dict[str, Any] = {}
+def getDevicesInformation() -> dict[str, Any]:
+    groups: dict[str, Any] = {}
+    devices: dict[str, Any] = {}
     context = Context()
     events = context.list_devices(subsystem="input")
-    mouses: List[int] = []
-    joysticks: List[int] = []
+    mouses: list[int] = []
+    joysticks: list[int] = []
     for ev in events:
         eventId = dev2int(str(ev.device_node))
         if eventId is not None:
@@ -30,7 +30,7 @@ def getDevicesInformation() -> Dict[str, Any]:
                 "ID_INPUT_TOUCHPAD" in ev.properties
                 and ev.properties["ID_INPUT_TOUCHPAD"] == "1"
             )
-            group: Optional[str] = None
+            group: str | None = None
             if "ID_PATH" in ev.properties:
                 group = ev.properties["ID_PATH"]
             if isJoystick or isMouse:
@@ -55,16 +55,16 @@ def getDevicesInformation() -> Dict[str, Any]:
                     groups[group].append(ev.device_node)
     mouses.sort()
     joysticks.sort()
-    res: Dict[str, Any] = {}
+    res: dict[str, Any] = {}
     for device in devices:
         d = devices[device]
-        dgroup: Optional[List[str]] = None
+        dgroup: list[str] | None = None
         if d["group"] is not None and d["group"] in groups:
             dgroup = groups[d["group"]].copy()
             if dgroup is not None and d["node"] in dgroup:
                 dgroup.remove(d["node"])
-        nmouse: Optional[int] = None
-        njoystick: Optional[int] = None
+        nmouse: int | None = None
+        njoystick: int | None = None
         if d["isJoystick"]:
             try:
                 njoystick = joysticks.index(int(device))
@@ -90,8 +90,8 @@ def getDevicesInformation() -> Dict[str, Any]:
 
 
 def getAssociatedMouse(
-    devicesInformation: Dict[str, Any], dev: str
-) -> Optional[Dict[str, Any]]:
+    devicesInformation: dict[str, Any], dev: str
+) -> dict[str, Any] | None:
     if (
         dev not in devicesInformation
         or devicesInformation[dev]["associatedDevices"] is None

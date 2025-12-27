@@ -1,7 +1,7 @@
 import configparser
 import os.path
 from os import environ
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -22,7 +22,7 @@ class DolphinTriforceGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, int],
+        game_resolution: dict[str, int],
     ) -> Command:
         if not os.path.exists(
             os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)
@@ -578,7 +578,7 @@ $SeatLoopPatch
         return Command(array=command_array)
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         if "dolphin_aspect_ratio" in config:
             if (
@@ -607,5 +607,4 @@ def getGameCubeLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]
