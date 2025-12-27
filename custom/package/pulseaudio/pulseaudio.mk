@@ -100,13 +100,8 @@ ifeq ($(BR2_PACKAGE_LIBCAP),y)
 PULSEAUDIO_DEPENDENCIES += libcap
 endif
 
-# gtk3 support needs X11 backend
-ifeq ($(BR2_PACKAGE_LIBGTK3_X11),y)
-PULSEAUDIO_DEPENDENCIES += libgtk3
-PULSEAUDIO_CONF_OPTS += -Dgtk=enabled
-else
+# REG disable gtk3 support
 PULSEAUDIO_CONF_OPTS += -Dgtk=disabled
-endif
 
 ifeq ($(BR2_PACKAGE_LIBSOXR),y)
 PULSEAUDIO_CONF_OPTS += -Dsoxr=enabled

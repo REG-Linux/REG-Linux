@@ -1,0 +1,10 @@
+--- a/app/src/view/mpv_core.cpp	2025-12-19 08:12:06.000000000 +0100
++++ b/app/src/view/mpv_core.cpp	2025-12-27 13:31:59.638084826 +0100
+@@ -28,7 +28,6 @@
+ #include <GLFW/glfw3.h>
+ #if defined(__PS4__) || defined(__PSV__) || defined(__SWITCH__) || defined(ANDROID)
+ #elif defined(__linux__)
+-#define GLFW_EXPOSE_NATIVE_X11
+ #define GLFW_EXPOSE_NATIVE_WAYLAND
+ #include <GLFW/glfw3native.h>
+ #endif
