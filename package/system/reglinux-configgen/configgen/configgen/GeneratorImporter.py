@@ -203,7 +203,9 @@ def _load_generator_class(emulator: str) -> type["Generator"]:
     try:
         module_path, class_name = EMULATOR_MAPPING[emulator]
     except KeyError:
-        raise GeneratorNotFoundError(f"No generator found for emulator {emulator}")
+        raise GeneratorNotFoundError(
+            f"No generator found for emulator {emulator}"
+        ) from None
 
     module = import_module(module_path)
     return getattr(module, class_name)
@@ -229,11 +231,11 @@ def getGenerator(emulator: str) -> "Generator":
         except ImportError as e:
             raise GeneratorNotFoundError(
                 f"Failed to import generator for {emulator}: {e}"
-            )
+            ) from e
         except AttributeError as e:
             raise GeneratorNotFoundError(
                 f"Generator class not found for {emulator}: {e}"
-            )
+            ) from e
         PRELOADED_GENERATORS[emulator] = generator_class
 
     return generator_class()

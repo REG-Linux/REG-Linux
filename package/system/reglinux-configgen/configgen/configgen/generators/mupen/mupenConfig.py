@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from configgen.systemFiles import BIOS, CONF, SAVES, SCREENSHOTS
 
@@ -8,7 +8,7 @@ MUPEN_SAVES_DIR = SAVES + "/n64"
 MUPEN_BIN_PATH = "/usr/bin/mupen64plus"
 
 
-def setMupenConfig(iniConfig: Any, system: Any, gameResolution: Dict[str, int]) -> None:
+def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) -> None:
     if not iniConfig.has_section("Core"):
         iniConfig.add_section("Core")
     iniConfig.set(

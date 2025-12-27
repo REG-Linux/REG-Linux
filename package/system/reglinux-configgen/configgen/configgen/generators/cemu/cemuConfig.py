@@ -248,10 +248,7 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
 
 # Show mouse for touchscreen actions
 def getMouseMode(config: Any, rom: str) -> bool:
-    if "cemu_touchpad" in config and config["cemu_touchpad"] == "1":
-        return True
-    else:
-        return False
+    return "cemu_touchpad" in config and config["cemu_touchpad"] == "1"
 
 
 def getRoot(config: Any, name: str):
@@ -284,8 +281,7 @@ def setSectionConfig(config: Any, xml_section: Any, name: str, value: str) -> No
 def getLangFromEnvironment():
     if "LANG" in environ:
         return environ["LANG"][:5]
-    else:
-        return "en_US"
+    return "en_US"
 
 
 def getCemuLang(lang: str) -> int:
@@ -305,5 +301,4 @@ def getCemuLang(lang: str) -> int:
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]

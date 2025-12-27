@@ -4,7 +4,7 @@ from os import makedirs, path, remove
 from shutil import copyfile
 from subprocess import CalledProcessError, check_output
 from time import time
-from typing import Any, Dict
+from typing import Any
 
 from requests import get
 
@@ -29,7 +29,7 @@ eslog = get_logger(__name__)
 
 
 def getInGameRatio(
-    self: Any, config: Any, gameResolution: Dict[str, int], rom: str
+    self: Any, config: Any, gameResolution: dict[str, int], rom: str
 ) -> float:
     if getGfxRatioFromConfig(config, gameResolution) == "16:9" or (
         getGfxRatioFromConfig(config, gameResolution) == "Stretch"
@@ -40,12 +40,12 @@ def getInGameRatio(
     return 4 / 3
 
 
-def getGfxRatioFromConfig(config: Any, gameResolution: Dict[str, int]) -> str:
+def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
     # 2: 4:3 ; 1: 16:9
     if "pcsx2_ratio" in config:
         if config["pcsx2_ratio"] == "16:9":
             return "16:9"
-        elif config["pcsx2_ratio"] == "full":
+        if config["pcsx2_ratio"] == "full":
             return "Stretch"
     return "4:3"
 
@@ -54,14 +54,14 @@ def setPcsx2Reg():
     configFileName = "{}/{}".format(PCSX2_CONFIG_DIR, "PCSX2-reg.ini")
     if not path.exists(PCSX2_CONFIG_DIR):
         makedirs(PCSX2_CONFIG_DIR)
-    f = open(configFileName, "w")
-    f.write("DocumentsFolderMode=User\n")
-    f.write("CustomDocumentsFolder=/usr/pcsx2/bin\n")
-    f.write("UseDefaultSettingsFolder=enabled\n")
-    f.write("SettingsFolder=/userdata/system/configs/PCSX2/inis\n")
-    f.write("Install_Dir=/usr/pcsx2/bin\n")
-    f.write("RunWizard=0\n")
-    f.close()
+    with open(configFileName, "w") as f:
+        f.write("DocumentsFolderMode=User\n")
+        f.write("CustomDocumentsFolder=/usr/pcsx2/bin\n")
+        f.write("UseDefaultSettingsFolder=enabled\n")
+        f.write("SettingsFolder=/userdata/system/configs/PCSX2/inis\n")
+        f.write("Install_Dir=/usr/pcsx2/bin\n")
+        f.write("RunWizard=0\n")
+        f.close()
 
 
 def configureAudio():
@@ -73,10 +73,10 @@ def configureAudio():
     if path.exists(configFileName):
         return
 
-    f = open(configFileName, "w")
-    f.write("[MIXING]\n")
-    f.write("Interpolation=1\n")
-    f.write("Disable_Effects=0\n")
+    with open(configFileName, "w") as f:
+        f.write("[MIXING]\n")
+        f.write("Interpolation=1\n")
+        f.write("Disable_Effects=0\n")
     f.write("[OUTPUT]\n")
     f.write("Output_Module=SDLAudio\n")
     f.write("[PORTAUDIO]\n")
@@ -102,9 +102,8 @@ def setPcsx2Config(
         makedirs(PCSX2_CONFIG_DIR + "/inis")
 
     if not path.isfile(configFileName):
-        f = open(configFileName, "w")
-        f.write("[UI]\n")
-        f.close()
+        with open(configFileName, "w") as f:
+            f.write("[UI]\n")
 
     pcsx2INIConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case

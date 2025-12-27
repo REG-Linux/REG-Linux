@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from os import makedirs, path
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -28,7 +28,7 @@ class TheForceEngineGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, int],
+        game_resolution: dict[str, int],
     ) -> Command:
         # Check if the directories exist, if not create them
         if not path.exists(FORCE_CONFIG_DIR):
@@ -279,7 +279,7 @@ class TheForceEngineGenerator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         if "force_widescreen" in config and config["force_widescreen"] == "1":
             return 16 / 9

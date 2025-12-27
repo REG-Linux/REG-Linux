@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from configgen.systemFiles import BIOS, CONF, SAVES
 
@@ -15,7 +15,7 @@ FLYCAST_BIN_PATH = "/usr/bin/flycast"
 
 
 def setFlycastConfig(
-    flycastConfig: Any, system: Any, gameResolution: Dict[str, int]
+    flycastConfig: Any, system: Any, gameResolution: dict[str, int]
 ) -> None:
     if not flycastConfig.has_section("input"):
         flycastConfig.add_section("input")

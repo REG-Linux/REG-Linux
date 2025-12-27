@@ -49,7 +49,5 @@ def getInGameRatio(config: Any, gameResolution: Any, rom: str) -> float:
     if "bigpemu_ratio" in config:
         if config["bigpemu_ratio"] == "8":
             return 16 / 9
-        else:
-            return 4 / 3
-    else:
         return 4 / 3
+    return 4 / 3

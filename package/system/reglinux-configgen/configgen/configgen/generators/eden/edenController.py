@@ -92,9 +92,9 @@ def setButton(key: str, padGuid: str, padInputs: Any, port: int) -> str:
 
         if input.type == "button":
             return f"engine:sdl,button:{input.id},guid:{padGuid},port:{port}"
-        elif input.type == "hat":
+        if input.type == "hat":
             return f"engine:sdl,hat:{input.id},direction:{hatdirectionvalue(input.value)},guid:{padGuid},port:{port}"
-        elif input.type == "axis":
+        if input.type == "axis":
             return ("engine:sdl,threshold:{},axis:{},guid:{},port:{},invert:{}").format(
                 0.5, input.id, padGuid, port, "+"
             )
@@ -128,5 +128,4 @@ def hatdirectionvalue(value: str) -> str:
         return "dpright"
     if int(value) == 8:
         return "dpleft"
-    else:
-        return "unknown"
+    return "unknown"

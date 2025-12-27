@@ -1,6 +1,6 @@
 from os import path
 from shutil import copytree
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -49,7 +49,7 @@ class IOQuake3Generator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         if game_resolution["width"] / float(game_resolution["height"]) > (
             (16.0 / 9.0) - 0.1

@@ -1,6 +1,5 @@
 from os import makedirs, path
 from shutil import copy
-from typing import List
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -62,7 +61,7 @@ class MoonlightGenerator(Generator):
             },
         )
 
-    def getRealGameNameAndConfigFile(self, rom: str) -> List[str | None]:
+    def getRealGameNameAndConfigFile(self, rom: str) -> list[str | None]:
         # Rom's basename without extension
         romName = path.splitext(path.basename(rom))[0]
         # find the real game name

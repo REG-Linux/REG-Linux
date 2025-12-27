@@ -63,7 +63,7 @@ def getCurrentResolution(name: str | None = None) -> dict[str, int]:
                     vals = content.split("@")[0].split("x")
                     return {"width": int(vals[0]), "height": int(vals[1])}
         except Exception as e:
-            raise ValueError(f"Error analyzing content of {drm_mode_path}: {e}")
+            raise ValueError(f"Error analyzing content of {drm_mode_path}: {e}") from e
 
     try:
         out = ""
@@ -122,8 +122,7 @@ def getRefreshRate() -> str | None:
         out = regmsg_send_message("getRefresh")
         if out:
             return out.splitlines()[0]
-        else:
-            return None
+        return None
     except Exception as e:
         eslog.error(f"Error fetching refresh rate: {e}")
         return None
@@ -178,7 +177,7 @@ def _get_eglinfo_lines() -> list[str]:
         return []
 
     try:
-        result = run([eglinfo_path], stdout=PIPE, stderr=PIPE, text=True, check=True)
+        result = run([eglinfo_path], capture_output=True, text=True, check=True)
         return [line.strip() for line in result.stdout.splitlines() if line.strip()]
     except CalledProcessError as e:
         eslog.error(

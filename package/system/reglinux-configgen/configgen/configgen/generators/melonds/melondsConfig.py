@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from configgen.systemFiles import CHEATS, CONF, SAVES
 
@@ -10,7 +10,7 @@ MELONDS_BIN_PATH = "/usr/bin/melonDS"
 
 
 def setMelonDSConfig(
-    melondsConfig: Any, system: Any, gameResolution: Dict[str, int]
+    melondsConfig: Any, system: Any, gameResolution: dict[str, int]
 ) -> None:
     if gameResolution["width"] < gameResolution["height"]:
         width, height = gameResolution["height"], gameResolution["width"]

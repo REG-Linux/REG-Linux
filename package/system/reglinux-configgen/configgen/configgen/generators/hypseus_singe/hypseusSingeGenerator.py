@@ -1,7 +1,7 @@
 from filecmp import cmp
 from os import listdir, mkdir, path, walk
 from shutil import copy2, copyfile, copytree
-from typing import Any, Dict, Optional
+from typing import Any
 
 from ffmpeg import probe
 
@@ -26,7 +26,7 @@ eslog = get_logger(__name__)
 
 class HypseusSingeGenerator(Generator):
     @staticmethod
-    def find_m2v_from_txt(txt_file: str) -> Optional[str]:
+    def find_m2v_from_txt(txt_file: str) -> str | None:
         with open(txt_file) as file:
             for line in file:
                 parts = line.strip().split()
@@ -37,7 +37,7 @@ class HypseusSingeGenerator(Generator):
         return None
 
     @staticmethod
-    def find_file(start_path: str, filename: str) -> Optional[str]:
+    def find_file(start_path: str, filename: str) -> str | None:
         if path.exists(path.join(start_path, filename)):
             return path.join(start_path, filename)
 
@@ -102,7 +102,7 @@ class HypseusSingeGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, int],
+        game_resolution: dict[str, int],
     ) -> Command:
         bezel_to_rom = {
             "ace": ["ace", "ace_a", "ace_a2", "ace91", "ace91_euro", "aceeuro"],
@@ -143,7 +143,7 @@ class HypseusSingeGenerator(Generator):
             "spacepirates": ["spacepirates", "spacepirates-hd", "space_pirates_hd"],
         }
 
-        def find_bezel(rom_name: str) -> Optional[str]:
+        def find_bezel(rom_name: str) -> str | None:
             for bezel, rom_names in bezel_to_rom.items():
                 if rom_name in rom_names:
                     return bezel

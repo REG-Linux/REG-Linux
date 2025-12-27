@@ -59,7 +59,7 @@ def setViceConfig(system: Any, metadata: Any, guns: Any) -> None:
     else:
         viceConfig.set(systemCore, "JoyPort1Device", "1")
     viceConfig.set(systemCore, "JoyDevice1", "4")
-    if not systemCore == "VIC20":
+    if systemCore != "VIC20":
         viceConfig.set(systemCore, "JoyDevice2", "4")
     viceConfig.set(systemCore, "JoyMapFile", VICE_CONTROLLER_PATH)
 

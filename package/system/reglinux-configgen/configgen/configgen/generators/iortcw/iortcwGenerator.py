@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -16,7 +16,7 @@ class IORTCWGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, int],
+        game_resolution: dict[str, int],
     ) -> Command:
         setIortcwConfig(system, game_resolution)
 
@@ -33,6 +33,6 @@ class IORTCWGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         return 16 / 9

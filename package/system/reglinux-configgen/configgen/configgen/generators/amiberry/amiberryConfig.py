@@ -1,6 +1,7 @@
+from typing import Any
+
 from configgen.settings import UnixSettings
 from configgen.systemFiles import BIOS, CONF, LOGDIR, SAVES, SCREENSHOTS
-from typing import Any
 
 AMIBERRY_CONFIG_DIR = CONF + "/amiberry"
 AMIBERRY_BIOS_DIR = BIOS + "/amiga"

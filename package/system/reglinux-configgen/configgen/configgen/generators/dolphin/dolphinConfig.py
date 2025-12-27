@@ -1,6 +1,6 @@
 from os import environ
 from struct import pack, unpack
-from typing import Any, Dict
+from typing import Any
 
 from configgen.systemFiles import CONF, SAVES
 from configgen.utils.logger import get_logger
@@ -98,20 +98,29 @@ def readWriteEntry(f: Any, setval: Any) -> None:
 def readWriteFile(filepath: str, setval: Any) -> None:
     # open in read read/write depending of the action
     if not setval:
-        f = open(filepath, "rb")
+        with open(filepath, "rb") as f:
+            try:
+                readString(f, 4)  # read SCv0
+                numEntries = readBEInt16(f)  # num entries
+                offsetSize = (numEntries + 1) * 2  # offsets
+                readBytes(f, offsetSize)
+
+                for _ in range(0, numEntries):  # entries
+                    readWriteEntry(f, setval)
+            finally:
+                f.close()
     else:
-        f = open(filepath, "r+b")
+        with open(filepath, "r+b") as f:
+            try:
+                readString(f, 4)  # read SCv0
+                numEntries = readBEInt16(f)  # num entries
+                offsetSize = (numEntries + 1) * 2  # offsets
+                readBytes(f, offsetSize)
 
-    try:
-        readString(f, 4)  # read SCv0
-        numEntries = readBEInt16(f)  # num entries
-        offsetSize = (numEntries + 1) * 2  # offsets
-        readBytes(f, offsetSize)
-
-        for _ in range(0, numEntries):  # entries
-            readWriteEntry(f, setval)
-    finally:
-        f.close()
+                for _ in range(0, numEntries):  # entries
+                    readWriteEntry(f, setval)
+            finally:
+                f.close()
 
 
 def getWiiLangFromEnvironment():
@@ -130,20 +139,17 @@ def getWiiLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]
 
 
-def getRatioFromConfig(config: Any, gameResolution: Dict[str, int]) -> int:
+def getRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> int:
     # Sets the setting available to the Wii's internal NAND. Only has two values:
     # 0: 4:3 ; 1: 16:9
     if "tv_mode" in config:
         if config["tv_mode"] == "1":
             return 1
-        else:
-            return 0
-    else:
         return 0
+    return 0
 
 
 def getSensorBarPosition(config: Any) -> int:
@@ -152,13 +158,11 @@ def getSensorBarPosition(config: Any) -> int:
     if "sensorbar_position" in config:
         if config["sensorbar_position"] == "1":
             return 1
-        else:
-            return 0
-    else:
         return 0
+    return 0
 
 
-def updateConfig(config: Any, filepath: str, gameResolution: Dict[str, int]) -> None:
+def updateConfig(config: Any, filepath: str, gameResolution: dict[str, int]) -> None:
     arg_setval = {
         "IPL.LNG": getWiiLangFromEnvironment(),
         "IPL.AR": getRatioFromConfig(config, gameResolution),

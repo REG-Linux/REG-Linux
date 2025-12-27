@@ -1,6 +1,6 @@
 from os import makedirs, path
 from shutil import copyfile
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -40,7 +40,7 @@ class XemuGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         if ("xemu_scaling" in config and config["xemu_scaling"] == "stretch") or (
             "xemu_aspect" in config and config["xemu_aspect"] == "16x9"

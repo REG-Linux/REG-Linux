@@ -1,5 +1,5 @@
 from os import chdir
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -43,6 +43,6 @@ class TyrianGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         return 16 / 9

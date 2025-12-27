@@ -1,6 +1,6 @@
 from os import makedirs, path
 from shutil import copy
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -97,6 +97,6 @@ class ETLegacyGenerator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         return 16 / 9

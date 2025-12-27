@@ -114,10 +114,7 @@ def getFlexDmdConfiguration(system: Any, screens: Any, hasDmd: bool) -> str:
         if hasDmd:
             val = "disabled"
     if val == "":
-        if len(screens) > 2:
-            val = "screen3"
-        else:
-            val = "disabled"
+        val = "screen3" if len(screens) > 2 else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
     if len(screens) <= 2 and val == "screen3":
@@ -131,10 +128,7 @@ def getPinmameConfiguration(system: Any, screens: Any) -> str:
     if system.isOptSet("vpinball_pinmame"):
         val = system.config["vpinball_pinmame"]
     if val == "":
-        if len(screens) > 2:
-            val = "screen3"
-        else:
-            val = "disabled"
+        val = "screen3" if len(screens) > 2 else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
     if len(screens) <= 2 and val == "screen3":
@@ -147,10 +141,7 @@ def getB2sConfiguration(system: Any, screens: Any) -> str:
     if system.isOptSet("vpinball_b2s"):
         val = system.config["vpinball_b2s"]
     if val == "":
-        if len(screens) > 1:
-            val = "screen2"
-        else:
-            val = "disabled"
+        val = "screen2" if len(screens) > 1 else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
     return val
@@ -161,17 +152,14 @@ def getB2sdmdConfiguration(system: Any, screens: Any, hasDmd: bool) -> bool:
         "vpinball_b2sdmd"
     ):  # switchon
         return False
-    if hasDmd:
-        return False
-    return True
+    return not hasDmd
 
 
 def getB2sgrillConfiguration(system: Any, screens: Any) -> bool:
-    if system.isOptSet("vpinball_b2sgrill") and not system.getOptBoolean(
-        "vpinball_b2sgrill"
-    ):  # switchon
-        return False
-    return True
+    return not (
+        system.isOptSet("vpinball_b2sgrill")
+        and not system.getOptBoolean("vpinball_b2sgrill")
+    )  # switchon
 
 
 def configurePlayfield(
@@ -537,8 +525,7 @@ def configureB2s(
 # necessary trick because people can plug their 1080p laptop on a 4k TV
 # (and because VPinballX.ini uses absolute pixel coordinates)
 def ConvertToPixel(total_size: int, percentage: float) -> str:
-    pixel_value = str(int(int(total_size) * float(percentage) * 1e-2))
-    return pixel_value
+    return str(int(int(total_size) * float(percentage) * 1e-2))
 
 
 # Calculates the relative height, depending on the screen ratio

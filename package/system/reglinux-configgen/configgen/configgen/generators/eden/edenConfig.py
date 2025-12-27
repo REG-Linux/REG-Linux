@@ -328,8 +328,7 @@ def getLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]
 
 
 @staticmethod
@@ -338,5 +337,4 @@ def getRegionFromEnvironment():
     availableRegions = {"en_US": 1, "ja_JP": 0}
     if lang in availableRegions:
         return availableRegions[lang]
-    else:
-        return 2  # europe
+    return 2  # europe

@@ -2,9 +2,10 @@
 Consolidated Bezel Configuration Writer - Combines common functionality from different emulator managers.
 """
 
+from contextlib import suppress
 from json import load
 from os import listdir, makedirs, path, remove, symlink, unlink
-from typing import Any, Dict, Optional
+from typing import Any
 
 from configgen.bezel.bezel_base import BezelUtils, eslog
 from configgen.systemFiles import OVERLAY_CONFIG_FILE
@@ -12,13 +13,13 @@ from configgen.systemFiles import OVERLAY_CONFIG_FILE
 
 def writeBezelConfig(
     generator: Any,
-    bezel: Optional[str],
+    bezel: str | None,
     shaderBezel: bool,
-    retroarchConfig: Dict[str, Any],
+    retroarchConfig: dict[str, Any],
     rom: str,
-    gameResolution: Dict[str, int],
+    gameResolution: dict[str, int],
     system: Any,
-    guns_borders_size: Optional[str],
+    guns_borders_size: str | None,
 ) -> None:
     """Writes the bezel configuration to the emulator-specific config file."""
     # Common logic for bezel configuration across different emulators
@@ -161,8 +162,7 @@ def writeBezelConfig(
                     gameRatio < 1.6 and guns_borders_size is None
                 ):  # let's use bezels only for aspect ratios 16:10, 5:3, 16:9 and greater; don't skip if gun borders are needed
                     return
-                else:
-                    bezelNeedAdaptation = True
+                bezelNeedAdaptation = True
         # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
         if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
             retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
@@ -172,12 +172,14 @@ def writeBezelConfig(
             retroarchConfig["aspect_ratio_index"] = str(
                 RATIO_INDEXES.index("custom")
             )  # overridden from the beginning of this file
-            if is_ratio_defined("ratio", system.config):
-                if system.config["ratio"] in RATIO_INDEXES:
-                    retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                        system.config["ratio"]
-                    )
-                    retroarchConfig["video_aspect_ratio_auto"] = "false"
+            if (
+                is_ratio_defined("ratio", system.config)
+                and system.config["ratio"] in RATIO_INDEXES
+            ):
+                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                    system.config["ratio"]
+                )
+        retroarchConfig["video_aspect_ratio_auto"] = "false"
 
     else:
         # when there's no information about width and height in .info, assume TV is HD 16/9 and information is provided by the core
@@ -185,22 +187,21 @@ def writeBezelConfig(
             gameRatio < 1.6 and guns_borders_size is None
         ):  # let's use bezels only for aspect ratios 16:10, 5:3, 16:9 and greater; don't skip if gun borders are needed
             return
-        else:
-            # No info about bezel, let's get width and height from the bezel image and apply
-            # the usual 16:9 bezel ratios 1920x1080 (example: theBezelProject)
-            try:
-                infos["width"], infos["height"] = BezelUtils.fast_image_size(
-                    overlay_png_file
-                )
-                infos["top"] = int(infos["height"] * 2 / 1080)
-                infos["left"] = int(
-                    infos["width"] * 241 / 1920
-                )  # 241 = (1920 - (1920 / (4:3))) / 2 + 1 pixel = where viewport begins
-                infos["bottom"] = int(infos["height"] * 2 / 1080)
-                infos["right"] = int(infos["width"] * 241 / 1920)
-                bezelNeedAdaptation = True
-            except Exception:
-                pass  # well, no reason will be applied.
+        # No info about bezel, let's get width and height from the bezel image and apply
+        # the usual 16:9 bezel ratios 1920x1080 (example: theBezelProject)
+        try:
+            infos["width"], infos["height"] = BezelUtils.fast_image_size(
+                overlay_png_file
+            )
+            infos["top"] = int(infos["height"] * 2 / 1080)
+            infos["left"] = int(
+                infos["width"] * 241 / 1920
+            )  # 241 = (1920 - (1920 / (4:3))) / 2 + 1 pixel = where viewport begins
+            infos["bottom"] = int(infos["height"] * 2 / 1080)
+            infos["right"] = int(infos["width"] * 241 / 1920)
+            bezelNeedAdaptation = True
+        except Exception:
+            pass  # well, no reason will be applied.
         if (
             gameResolution["width"] == infos["width"]
             and gameResolution["height"] == infos["height"]
@@ -280,10 +281,8 @@ def writeBezelConfig(
                     create_new_bezel_file = False
                     eslog.debug(f"Using cached bezel file {output_png_file}")
                 else:
-                    try:
+                    with suppress(Exception):
                         remove(tattoo_output_png)
-                    except Exception:
-                        pass
                     create_new_bezel_file = True
             if create_new_bezel_file:
                 fadapted = [
@@ -296,10 +295,8 @@ def writeBezelConfig(
                         fadapted.pop()
                     eslog.debug(f"Removing unused bezel file: {fadapted}")
                     for fr in fadapted:
-                        try:
+                        with suppress(Exception):
                             remove(fr)
-                        except Exception:
-                            pass
 
         if bezel_stretch:
             borderx = 0
@@ -422,7 +419,7 @@ def writeBezelCfgConfig(cfgFile: str, overlay_png_file: str) -> None:
         fd.write("overlay0_descs = 0\n")
 
 
-def is_ratio_defined(key: str, config_dict: Dict[str, Any]) -> bool:
+def is_ratio_defined(key: str, config_dict: dict[str, Any]) -> bool:
     """Checks if a key is defined in the dictionary."""
     return (
         key in config_dict

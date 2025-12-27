@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from codecs import open
 from csv import reader
 from os import linesep, path
-from typing import Any, Dict
+from typing import Any
 from xml.dom import minidom
 from xml.dom.minidom import Document, parse
 
@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 def generatePadsConfig(
     cfgPath: str,
-    playersControllers: Dict[str, Any],
+    playersControllers: dict[str, Any],
     sysName: str,
     altButtons: str,
     customCfg: bool,
@@ -22,7 +22,7 @@ def generatePadsConfig(
     useGuns: bool,
     guns: Any,
     useWheels: bool,
-    wheels: Dict[str, Any],
+    wheels: dict[str, Any],
     useMouse: bool,
     multiMouse: bool,
     system: Any,
@@ -379,10 +379,10 @@ def _enable_bbc_keyboard(config_alt: minidom.Document, xml_input_alt: Any):
 def _process_players_controllers(
     config: Document,
     xml_input: Any,
-    players_controllers: Dict[str, Any],
+    players_controllers: dict[str, Any],
     mappings: dict[str, str],
     use_wheels: bool,
-    wheels: Dict[str, Any],
+    wheels: dict[str, Any],
     gunmappings: dict[str, str],
     mousemappings: dict[str, str],
     multi_mouse: bool,
@@ -457,7 +457,7 @@ def _check_wheel_mapping(
     pad: Any,
     nplayer: int,
     use_wheels: bool,
-    wheels: Dict[str, Any],
+    wheels: dict[str, Any],
     mappings_use: dict[str, str],
 ) -> bool:
     """
@@ -751,7 +751,7 @@ def _process_special_controller_mappings(
 def _configure_additional_guns(
     config: Document,
     xml_input: Any,
-    players_controllers: Dict[str, Any],
+    players_controllers: dict[str, Any],
     guns: Any,
     gunmappings: dict[str, str],
     system: Any,
@@ -1183,14 +1183,14 @@ def input2definition(
 
     if input.type == "button":
         return f"JOYCODE_{joycode}_BUTTON{int(input.id) + 1}"
-    elif input.type == "hat":
+    if input.type == "hat":
         if input.value == "1":
             return f"JOYCODE_{joycode}_HAT1UP"
-        elif input.value == "2":
+        if input.value == "2":
             return f"JOYCODE_{joycode}_HAT1RIGHT"
-        elif input.value == "4":
+        if input.value == "4":
             return f"JOYCODE_{joycode}_HAT1DOWN"
-        elif input.value == "8":
+        if input.value == "8":
             return f"JOYCODE_{joycode}_HAT1LEFT"
     elif input.type == "axis":
         # Determine alternate button for D-Pad and right stick as buttons

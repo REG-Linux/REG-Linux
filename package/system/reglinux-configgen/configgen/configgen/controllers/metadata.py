@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from typing import Any, Dict
+from typing import Any
 
 from configgen.systemFiles import ES_GAMES_METADATA
 from configgen.utils.logger import get_logger
@@ -9,7 +9,7 @@ from .utils import shortNameFromPath
 eslog = get_logger(__name__)
 
 
-def getGamesMetaData(system: Any, rom: str) -> Dict[str, Any]:
+def getGamesMetaData(system: Any, rom: str) -> dict[str, Any]:
     # load the database
     tree = ET.parse(ES_GAMES_METADATA)
     root = tree.getroot()

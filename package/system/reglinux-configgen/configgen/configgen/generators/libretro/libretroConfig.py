@@ -2,7 +2,7 @@ import fcntl
 import subprocess
 import sys
 from os import makedirs, path, remove
-from typing import Any, Dict
+from typing import Any
 from xml.etree.ElementTree import parse
 
 from configgen.controllers import (
@@ -53,7 +53,7 @@ def getInvertButtonsValue():
 
 
 # return true if the option is considered defined
-def defined(key: str, dict: Dict[str, Any]) -> bool:
+def defined(key: str, dict: dict[str, Any]) -> bool:
     return key in dict and isinstance(dict[key], str) and len(dict[key]) > 0
 
 
@@ -202,17 +202,15 @@ def connected_to_internet():
     if process.returncode == 0:
         eslog.debug("Connected to the internet")
         return True
-    else:
-        # Try dns.google if one.one.one.one fails
-        cmd = ["ping", "-c", "1", "-w", "1", "-t", "255", "dns.google"]
-        process = subprocess.Popen(cmd)
-        process.wait()
-        if process.returncode == 0:
-            eslog.debug("Connected to the internet")
-            return True
-        else:
-            eslog.error("Not connected to the internet")
-            return False
+    # Try dns.google if one.one.one.one fails
+    cmd = ["ping", "-c", "1", "-w", "1", "-t", "255", "dns.google"]
+    process = subprocess.Popen(cmd)
+    process.wait()
+    if process.returncode == 0:
+        eslog.debug("Connected to the internet")
+        return True
+    eslog.error("Not connected to the internet")
+    return False
 
 
 def writeLibretroConfig(
@@ -226,7 +224,7 @@ def writeLibretroConfig(
     rom: str,
     bezel: Any,
     shaderBezel: Any,
-    gameResolution: Dict[str, int],
+    gameResolution: dict[str, int],
     gfxBackend: Any,
 ):
     writeLibretroConfigToFile(
@@ -258,9 +256,9 @@ def createLibretroConfig(
     rom: str,
     bezel: Any,
     shaderBezel: Any,
-    gameResolution: Dict[str, int],
+    gameResolution: dict[str, int],
     gfxBackend: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     # retroarch-core-options.cfg
     retroarchCore = retroarchCoreCustom
     if not path.exists(path.dirname(retroarchCore)):
@@ -1736,10 +1734,10 @@ def configureGunInputsForPlayer(
         nplayer += 1
 
 
-def writeLibretroConfigToFile(retroconfig: Any, config: Dict[str, Any]) -> None:
+def writeLibretroConfigToFile(retroconfig: Any, config: dict[str, Any]) -> None:
     for setting in config:
         retroconfig.save(setting, config[setting])
 
 
-def isLowResolution(gameResolution: Dict[str, int]) -> bool:
+def isLowResolution(gameResolution: dict[str, int]) -> bool:
     return gameResolution["width"] < 480 or gameResolution["height"] < 480

@@ -39,12 +39,12 @@ class CannonballGenerator(Generator):
         setCannonballConfig(cannoballConfig, system)
 
         # save the config file
-        cannonballXml = open(CANNONBALL_CONFIG_PATH, "w", "utf-8")
-        dom_string = linesep.join(
-            [s for s in cannoballConfig.toprettyxml().splitlines() if s.strip()]
-        )  # remove ugly empty lines while minicom adds them...
-        cannonballXml.write(dom_string)
-        cannonballXml.close()
+        with open(CANNONBALL_CONFIG_PATH, "w", encoding="utf-8") as cannonballXml:
+            dom_string = linesep.join(
+                [s for s in cannoballConfig.toprettyxml().splitlines() if s.strip()]
+            )  # remove ugly empty lines while minicom adds them...
+            cannonballXml.write(dom_string)
+            cannonballXml.close()
 
         # command line
         command_array = [CANNONBALL_BIN_PATH]

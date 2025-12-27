@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from configgen.systemFiles import CONF, ROMS
 
@@ -63,7 +63,7 @@ def setFalloutConfig(falloutConfig: Any, system: Any) -> None:
         falloutConfig.set("system", "language", "english")
 
 
-def setFalloutIniConfig(falloutIniConfig: Any, gameResolution: Dict[str, int]) -> None:
+def setFalloutIniConfig(falloutIniConfig: Any, gameResolution: dict[str, int]) -> None:
     # [MAIN]
     if not falloutIniConfig.has_section("MAIN"):
         falloutIniConfig.add_section("MAIN")

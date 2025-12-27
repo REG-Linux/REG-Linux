@@ -111,7 +111,6 @@ class HatariGenerator(Generator):
                     if path.exists(f"{biosdir}/{filename}"):
                         eslog.debug(f"tos filename: {filename}")
                         return filename
-                    else:
-                        eslog.warning(f"tos filename {filename} not found")
+                    eslog.warning(f"tos filename {filename} not found")
 
         raise Exception(f"no bios found for machine {machine}")

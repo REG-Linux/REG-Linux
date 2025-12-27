@@ -1,6 +1,6 @@
 from os import mkdir, path
 from shlex import split
-from typing import Any, Dict
+from typing import Any
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -21,7 +21,7 @@ class GZDoomGenerator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         return 16 / 9
 
@@ -33,7 +33,7 @@ class GZDoomGenerator(Generator):
         metadata: Any,
         guns: Any,
         wheels: Any,
-        game_resolution: Dict[str, int],
+        game_resolution: dict[str, int],
     ) -> Command:
         # check directories exist
         if not path.exists(GZDOOM_CONFIG_DIR):
@@ -67,18 +67,17 @@ class GZDoomGenerator(Generator):
                     "-nologo" if system.getOptBoolean("nologo") else "",
                 ]
             )
-        else:
-            return Command(
-                array=[
-                    "gzdoom",
-                    "-iwad",
-                    path.basename(rom),
-                    "-exec",
-                    GZDOOM_SCRIPT_PATH,
-                    "-width",
-                    str(game_resolution["width"]),
-                    "-height",
-                    str(game_resolution["height"]),
-                    "-nologo" if system.getOptBoolean("nologo") else "",
-                ]
-            )
+        return Command(
+            array=[
+                "gzdoom",
+                "-iwad",
+                path.basename(rom),
+                "-exec",
+                GZDOOM_SCRIPT_PATH,
+                "-width",
+                str(game_resolution["width"]),
+                "-height",
+                str(game_resolution["height"]),
+                "-nologo" if system.getOptBoolean("nologo") else "",
+            ]
+        )

@@ -1,7 +1,7 @@
 import os
 from os import path
 from re import match
-from typing import Any, Dict
+from typing import Any
 
 from evdev.device import InputDevice
 from pyudev import Context
@@ -13,8 +13,8 @@ from .mouse import getMouseButtons
 eslog = get_logger(__name__)
 
 
-def getGuns() -> Dict[str, Any]:
-    guns: Dict[str, Any] = {}
+def getGuns() -> dict[str, Any]:
+    guns: dict[str, Any] = {}
     try:
         context = Context()
     except Exception as e:
@@ -29,17 +29,20 @@ def getGuns() -> Dict[str, Any]:
         return guns
 
     # keep only mouses with /dev/input/eventxx
-    mouses_clean: Dict[int, Any] = {}
+    mouses_clean: dict[int, Any] = {}
     for mouse in mouses:
         try:
             device_node = str(mouse.device_node)
             matches = match(r"^/dev/input/event([0-9]*)$", device_node)
-            if matches is not None:
-                if (
+            if (
+                matches is not None
+                and (
                     "ID_INPUT_MOUSE" in mouse.properties
                     and mouse.properties["ID_INPUT_MOUSE"]
-                ) == "1":
-                    mouses_clean[int(matches.group(1))] = mouse
+                )
+                == "1"
+            ):
+                mouses_clean[int(matches.group(1))] = mouse
         except (AttributeError, ValueError) as e:
             eslog.warning(
                 f"Error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}"
@@ -131,19 +134,16 @@ def getGuns() -> Dict[str, Any]:
     return guns
 
 
-def gunsNeedCrosses(guns: Dict[str, Any]) -> bool:
+def gunsNeedCrosses(guns: dict[str, Any]) -> bool:
     # no gun, enable the cross for joysticks, mouses...
     if len(guns) == 0:
         return True
 
-    for gun in guns:
-        if guns[gun]["need_cross"]:
-            return True
-    return False
+    return any(guns[gun]["need_cross"] for gun in guns)
 
 
 # returns None is no border is wanted
-def guns_borders_size_name(guns: Dict[str, Any], config: Dict[str, Any]) -> Any:
+def guns_borders_size_name(guns: dict[str, Any], config: dict[str, Any]) -> Any:
     borders_size: str = "medium"
     if (
         "controllers.guns.borderssize" in config

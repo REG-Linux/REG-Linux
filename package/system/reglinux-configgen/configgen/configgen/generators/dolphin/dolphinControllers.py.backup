@@ -1,5 +1,8 @@
 from codecs import open
+from configparser import ConfigParser
+from glob import glob
 from os import path, remove
+from re import match
 from typing import Any
 
 from configgen.utils.logger import get_logger
@@ -81,11 +84,9 @@ def generateControllerConfig(
             if "wheel_type" in metadata:
                 if metadata["wheel_type"] == "Steering Wheel":
                     used_wheels = wheels
-            elif (
-                "dolphin_wheel_type" in system.config
-                and system.config["dolphin_wheel_type"] == "Steering Wheel"
-            ):
-                used_wheels = wheels
+            elif "dolphin_wheel_type" in system.config:
+                if system.config["dolphin_wheel_type"] == "Steering Wheel":
+                    used_wheels = wheels
         generateControllerConfig_gamecube(
             system, playersControllers, used_wheels, rom
         )  # Pass ROM name to allow for per ROM configuration
@@ -511,252 +512,14 @@ def generateControllerConfig_guns(
                 if "gun_" + spe in metadata:
                     f.write("{} = {}\n".format(specifics[spe], metadata["gun_" + spe]))
         nplayer += 1
+    f.write
     f.close()
 
 
-def generateControllerConfig_any(
-    system: Any,
-    playersControllers: Any,
-    filename: str,
-    anyDefKey: str,
-    anyMapping: Any,
-    anyReverseAxes: Any,
-    anyReplacements: Any,
-    extraOptions: dict[str, Any] | None = None,
-) -> None:
-    import codecs
-
-    from configgen.utils.logger import get_logger
-
-    if extraOptions is None:
-        extraOptions = {}
-
-    eslog = get_logger(__name__)
-
-    configFileName = f"/userdata/system/configs/dolphin/{filename}"
-    with codecs.open(configFileName, "w", encoding="utf_8") as f:
-        eslog.debug(f"Writing controller config to {configFileName}")
-        nplayer = 1
-        nsamepad = 0
-
-        # In case of two pads having the same name, dolphin wants a number to handle this
-        double_pads = {}
-
-        for _, pad in sorted(playersControllers.items()):
-            # Handle x pads having the same name
-            nsamepad = double_pads.get(pad.name.strip(), 0)
-            double_pads[pad.name.strip()] = nsamepad + 1
-
-            f.write("[" + anyDefKey + str(nplayer) + "]" + "\n")
-            f.write(
-                "Device = evdev/"
-                + str(nsamepad).strip()
-                + "/"
-                + pad.name.strip()
-                + "\n"
-            )
-
-            if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
-                "use_pad_profiles"
-            ):
-                if not generateControllerConfig_any_from_profiles(f, pad, system):
-                    generateControllerConfig_any_auto(
-                        f,
-                        pad,
-                        anyMapping,
-                        anyReverseAxes,
-                        anyReplacements,
-                        extraOptions,
-                        system,
-                        nplayer,
-                        nsamepad,
-                    )
-            else:
-                if pad.dev in []:
-                    generateControllerConfig_wheel(f, pad, nplayer)
-                else:
-                    generateControllerConfig_any_auto(
-                        f,
-                        pad,
-                        anyMapping,
-                        anyReverseAxes,
-                        anyReplacements,
-                        extraOptions,
-                        system,
-                        nplayer,
-                        nsamepad,
-                    )
-
-            nplayer += 1
-
-
-def generateControllerConfig_any_auto(
-    f: Any,
-    pad: Any,
-    anyMapping: Any,
-    anyReverseAxes: Any,
-    anyReplacements: Any,
-    extraOptions: Any,
-    system: Any,
-    nplayer: int,
-    nsamepad: int,
-) -> None:
-    for opt in extraOptions:
-        if opt in ["AutoLoadState", "AutoSaveState"]:
-            f.write(opt + " = " + extraOptions[opt] + "\n")
-
-    # Recompute the mapping according to available buttons on the pads and the available replacements
-    currentMapping = anyMapping
-    # Apply replacements
-    if anyReplacements is not None:
-        for x in anyReplacements:
-            if x not in pad.inputs and x in currentMapping:
-                currentMapping[anyReplacements[x]] = currentMapping[x]
-                if x == "joystick1up":
-                    currentMapping[anyReplacements["joystick1down"]] = anyReverseAxes[
-                        currentMapping["joystick1up"]
-                    ]
-                if x == "joystick1left":
-                    currentMapping[anyReplacements["joystick1right"]] = anyReverseAxes[
-                        currentMapping["joystick1left"]
-                    ]
-                if x == "joystick2up":
-                    currentMapping[anyReplacements["joystick2down"]] = anyReverseAxes[
-                        currentMapping["joystick2up"]
-                    ]
-                if x == "joystick2left":
-                    currentMapping[anyReplacements["joystick2right"]] = anyReverseAxes[
-                        currentMapping["joystick2left"]
-                    ]
-
-    for x in pad.inputs:
-        input = pad.inputs[x]
-
-        keyname = None
-        if input.name in currentMapping:
-            keyname = currentMapping[input.name]
-        elif (
-            input.name in anyReplacements
-            and anyReplacements[input.name] in currentMapping
-        ):
-            keyname = currentMapping[anyReplacements[input.name]]
-
-        # Write the configuration for this key
-        if keyname is not None:
-            write_key(
-                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None
-            )
-            if "Triggers" in keyname and input.type == "axis":
-                write_key(
-                    f,
-                    keyname + "-Analog",
-                    input.type,
-                    input.id,
-                    input.value,
-                    pad.nbaxes,
-                    False,
-                    None,
-                )
-        # Write the 2nd part
-        if (
-            input.name
-            in {"joystick1up", "joystick1left", "joystick2up", "joystick2left"}
-            and keyname is not None
-        ):
-            write_key(
-                f,
-                anyReverseAxes[keyname],
-                input.type,
-                input.id,
-                input.value,
-                pad.nbaxes,
-                True,
-                None,
-            )
-        # Rumble option
-        if system.isOptSet("rumble") and system.getOptBoolean("rumble"):
-            f.write("Rumble/Motor = Weak\n")
-
-
-def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) -> bool:
-    import configparser
-    import glob
-    import re
-
-    from configgen.utils.logger import get_logger
-
-    eslog = get_logger(__name__)
-
-    for profileFile in glob.glob(
-        "/userdata/system/configs/dolphin/Config/Profiles/GCPad/*.ini"
-    ):
-        try:
-            eslog.debug(f"Looking profile : {profileFile}")
-            profileConfig = configparser.ConfigParser(interpolation=None)
-            # To prevent ConfigParser from converting to lower case
-            profileConfig.optionxform = lambda optionstr: str(optionstr)
-            profileConfig.read(profileFile)
-            profileDevice = profileConfig.get("Profile", "Device")
-            eslog.debug(f"Profile device : {profileDevice}")
-
-            deviceVals = re.match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
-            if deviceVals is not None and (
-                deviceVals.group(1) == "evdev"
-                and deviceVals.group(2).strip() == pad.name.strip()
-            ):
-                eslog.debug("Eligible profile device found")
-                for key, val in profileConfig.items("Profile"):
-                    if key != "Device":
-                        f.write(f"{key} = {val}\n")
-                return True
-        except Exception:
-            eslog.error(f"profile {profileFile} : FAILED")
-
-    return False
-
-
-def generateControllerConfig_wheel(f: Any, pad: Any, nplayer: int) -> None:
-    # Placeholder implementation for wheel configuration
-    # This function would handle wheel-specific controller configuration
-    f.write(f"# Wheel configuration for player {nplayer}\n")
-    f.write("Extension = Wheel\n")
-
-
-def write_key(
-    f: Any,
-    keyname: str,
-    input_type: str,
-    input_id: str,
-    input_value: str,
-    input_global_id: str,
-    reverse: bool,
-    hotkey_id: str | None,
-) -> None:
-    f.write(keyname + " = ")
-    if hotkey_id is not None:
-        f.write("`Button " + str(hotkey_id) + "` & ")
-    f.write("`")
-    if input_type == "button":
-        f.write("Button " + str(input_id))
-    elif input_type == "hat":
-        if input_value == "1":  # up
-            f.write("Hat 0 N")
-        elif input_value == "4":  # down
-            f.write("Hat 0 S")
-        elif input_value == "8":  # left
-            f.write("Hat 0 W")
-    elif input_type == "axis":
-        if (reverse and input_value == "-1") or (not reverse and input_value == "1"):
-            f.write("Axis " + str(input_id) + "+")
-        else:
-            f.write("Axis " + str(input_id) + "-")
-    f.write("`\n")
-
-
 def generateHotkeys(playersControllers: Any) -> None:
-    configFileName = "{{}}/{{}}"
+    configFileName = "{{}}/{{}}".format(DOLPHIN_CONFIG_DIR, "Hotkeys.ini")
     with open(configFileName, "w", encoding="utf_8_sig") as f:
-        hotkeysMapping = {
+        hotkeysMapping = {{
             "a": "Keys/Reset",
             "b": "Keys/Toggle Pause",
             "x": "Keys/Load from selected slot",
@@ -773,13 +536,15 @@ def generateHotkeys(playersControllers: Any) -> None:
             "joystick1left": None,
             "joystick2up": None,
             "joystick2left": None,
-        }
+        }}
 
         nplayer = 1
         for _, pad in sorted(playersControllers.items()):
             if nplayer == 1:
-                f.write("[Hotkeys1]" + "\n")
-                f.write("Device = evdev/0/" + pad.name.strip() + "\n")
+                f.write("[Hotkeys1]" + "
+")
+                f.write("Device = evdev/0/" + pad.name.strip() + "
+")
 
                 # Search the hotkey button
                 hotkey = None
@@ -811,6 +576,469 @@ def generateHotkeys(playersControllers: Any) -> None:
                         )
 
                         # else:
-                        #    f.write("# undefined key: name="+input.name+", type="+input.type+", id="+str(input.id)+", value="+str(input.value)+"\n")
+                        #    f.write("# undefined key: name="+input.name+", type="+input.type+", id="+str(input.id)+", value="+str(input.value)+"
+")
 
             nplayer += 1
+
+
+
+def get_AltMapping(system: Any, nplayer: int, anyMapping: Any) -> Any:
+    mapping = anyMapping.copy()
+    # Fixes default gamecube style controller mapping for ES (gc A confirm/gc B cancel)
+    if (
+        system.isOptSet(f"dolphin_port_{nplayer}_type")
+        and system.config[f"dolphin_port_{nplayer}_type"] == "6b"
+    ):
+        mapping["a"] = "Buttons/B"
+        mapping["b"] = "Buttons/A"
+
+    # Only apply alt inputs for standard controller type
+    if (
+        not system.isOptSet(f"dolphin_port_{nplayer}_type")
+        or system.config.get(f"dolphin_port_{nplayer}_type") == "6a"
+    ):
+        # Check for alternative mappings settings and adjust
+        if system.isOptSet(f"alt_mappings_{nplayer}"):
+            alt_mapping_type = system.config.get(f"alt_mappings_{nplayer}")
+
+            if alt_mapping_type == "buttons_ccw":
+                mapping["a"] = "Buttons/B"
+                mapping["b"] = "Buttons/Y"
+                mapping["y"] = "Buttons/X"
+                mapping["x"] = "Buttons/A"
+
+            elif alt_mapping_type == "buttons_cw":
+                mapping["a"] = "Buttons/X"
+                mapping["b"] = "Buttons/A"
+                mapping["y"] = "Buttons/B"
+                mapping["x"] = "Buttons/Y"
+
+    return mapping
+
+
+def generateControllerConfig_any(
+    system: Any,
+    playersControllers: Any,
+    wheels: Any,
+    filename: str,
+    anyDefKey: str,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+    anyReplacements: Any,
+    extraOptions: dict[str, Any] = {},
+) -> None:
+    configFileName = f"{DOLPHIN_CONFIG_DIR}/{filename}"
+    with open(configFileName, "w", encoding="utf_8_sig") as f:
+        nplayer = 1
+        nsamepad = 0
+
+        # In case of two pads having the same name, dolphin wants a number to handle this
+        double_pads = {}
+
+        for _, pad in sorted(playersControllers.items()):
+            # Handle x pads having the same name
+            if pad.name.strip() in double_pads:
+                nsamepad = double_pads[pad.name.strip()]
+            else:
+                nsamepad = 0
+            double_pads[pad.name.strip()] = nsamepad + 1
+
+            f.write("[" + anyDefKey + str(nplayer) + "]" + "\n")
+            f.write(
+                "Device = evdev/" + str(nsamepad).strip() + "/" + pad.name.strip() + "\n"
+            )
+
+            if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
+                "use_pad_profiles"
+            ):
+                if not generateControllerConfig_any_from_profiles(f, pad, system):
+                    generateControllerConfig_any_auto(
+                        f,
+                        pad,
+                        anyMapping,
+                        anyReverseAxes,
+                        anyReplacements,
+                        extraOptions,
+                        system,
+                        nplayer,
+                        nsamepad,
+                    )
+            else:
+                if pad.dev in wheels:
+                    generateControllerConfig_wheel(f, pad, nplayer)
+                else:
+                    generateControllerConfig_any_auto(
+                        f,
+                        pad,
+                        anyMapping,
+                        anyReverseAxes,
+                        anyReplacements,
+                        extraOptions,
+                        system,
+                        nplayer,
+                        nsamepad,
+                    )
+
+            nplayer += 1
+        f.close()
+
+
+def generateControllerConfig_wheel(f: Any, pad: Any, nplayer: int) -> None:
+    wheelMapping = {
+    "select": "Buttons/Z",
+    "start": "Buttons/Start",
+    "up": "D-Pad/Up",
+    "down": "D-Pad/Down",
+    "left": "D-Pad/Left",
+    "right": "D-Pad/Right",
+    "a": "Buttons/A",
+    "b": "Buttons/B",
+    "x": "Buttons/X",
+    "y": "Buttons/Y",
+    "pageup": "Triggers/L-Analog",
+        "pagedown": "Triggers/R-Analog",
+        "r2": "Main Stick/Up",
+        "l2": "Main Stick/Down",
+        "joystick1left": "Main Stick/Left",
+        "joystick1right": "Main Stick/Right",
+    }
+
+    eslog.debug(f"configuring wheel for pad {pad.name}")
+
+    f.write(
+        "Rumble/Motor = Constant\n"
+    )  # only Constant works on my wheel. maybe some other values could be good
+    f.write(
+        "Rumble/Motor/Range = -100.\n"
+    )  # value must be negative, otherwise the center is located in extremes (left/right)
+    f.write(
+        "Main Stick/Dead Zone = 0.\n"
+    )  # not really needed while this is the default
+
+    for x in pad.inputs:
+        input = pad.inputs[x]
+        if input.name in wheelMapping:
+            write_key(
+                f,
+                wheelMapping[input.name],
+                input.type,
+                input.id,
+                input.value,
+                pad.nbaxes,
+                False,
+                None,
+                None,
+            )
+            if input.name == "joystick1left" and "joystick1right" in wheelMapping:
+                write_key(
+                    f,
+                    wheelMapping["joystick1right"],
+                    input.type,
+                    input.id,
+                    input.value,
+                    pad.nbaxes,
+                    True,
+                    None,
+                    None,
+                )
+
+
+def generateControllerConfig_any_auto(
+    f: Any,
+    pad: Any,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+    anyReplacements: Any,
+    extraOptions: Any,
+    system: Any,
+    nplayer: int,
+    nsamepad: int,
+) -> None:
+    for opt in extraOptions:
+        f.write(opt + " = " + extraOptions[opt] + "\n")
+
+    # Get alt input mappings and recompute the mapping according to available buttons on the pads and the available replacements
+    currentMapping = get_AltMapping(system, nplayer, anyMapping)
+    # Apply replacements
+    if anyReplacements is not None:
+        for x in anyReplacements:
+            if x not in pad.inputs and x in currentMapping:
+                currentMapping[anyReplacements[x]] = currentMapping[x]
+                if x == "joystick1up":
+                    currentMapping[anyReplacements["joystick1down"]] = anyReverseAxes[
+                        currentMapping["joystick1up"]
+                    ]
+                if x == "joystick1left":
+                    currentMapping[anyReplacements["joystick1right"]] = anyReverseAxes[
+                        currentMapping["joystick1left"]
+                    ]
+                if x == "joystick2up":
+                    currentMapping[anyReplacements["joystick2down"]] = anyReverseAxes[
+                        currentMapping["joystick2up"]
+                    ]
+                if x == "joystick2left":
+                    currentMapping[anyReplacements["joystick2right"]] = anyReverseAxes[
+                        currentMapping["joystick2left"]
+                    ]
+
+    for x in pad.inputs:
+        input = pad.inputs[x]
+
+        keyname = None
+        if input.name in currentMapping:
+            keyname = currentMapping[input.name]
+
+        # Write the configuration for this key
+        if keyname is not None:
+            write_key(
+                f,
+                keyname,
+                input.type,
+                input.id,
+                input.value,
+                pad.nbaxes,
+                False,
+                None,
+                None,
+            )
+            if "Triggers" in keyname and input.type == "axis":
+                write_key(
+                    f,
+                    keyname + "-Analog",
+                    input.type,
+                    input.id,
+                    input.value,
+                    pad.nbaxes,
+                    False,
+                    None,
+                    None,
+                )
+            if "Buttons/Z" in keyname and "pageup" in pad.inputs:
+                # Create dictionary for both L1/R1 to pass to write_key
+                gcz_ids = {
+                    "pageup": pad.inputs["pageup"].id,
+                    "pagedown": pad.inputs["pagedown"].id,
+                }
+                write_key(
+                    f,
+                    keyname,
+                    input.type,
+                    input.id,
+                    input.value,
+                    pad.nbaxes,
+                    False,
+                    None,
+                    gcz_ids,
+                )
+        # Write the 2nd part
+        if (
+            input.name
+            in {"joystick1up", "joystick1left", "joystick2up", "joystick2left"}
+            and keyname is not None
+        ):
+            write_key(
+                f,
+                anyReverseAxes[keyname],
+                input.type,
+                input.id,
+                input.value,
+                pad.nbaxes,
+                True,
+                None,
+                None,
+            )
+        # DualShock Motion control
+        if system.isOptSet("dsmotion") and system.getOptBoolean("dsmotion"):
+            f.write(
+                "IMUGyroscope/Pitch Up = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Gyro X-`\n"
+            )
+            f.write(
+                "IMUGyroscope/Pitch Down = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Gyro X+`\n"
+            )
+            f.write(
+                "IMUGyroscope/Roll Left = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Gyro Z-`\n"
+            )
+            f.write(
+                "IMUGyroscope/Roll Right = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Gyro Z+`\n"
+            )
+            f.write(
+                "IMUGyroscope/Yaw Left = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Gyro Y-`\n"
+            )
+            f.write(
+                "IMUGyroscope/Yaw Right = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Gyro Y+`\n"
+            )
+            f.write("IMUIR/Recenter = `Button 10`\n")
+            f.write(
+                "IMUAccelerometer/Left = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Accel X-`\n"
+            )
+            f.write(
+                "IMUAccelerometer/Right = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Accel X+`\n"
+            )
+            f.write(
+                "IMUAccelerometer/Forward = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Accel Z-`\n"
+            )
+            f.write(
+                "IMUAccelerometer/Backward = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Accel Z+`\n"
+            )
+            f.write(
+                "IMUAccelerometer/Up = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Accel Y-`\n"
+            )
+            f.write(
+                "IMUAccelerometer/Down = `evdev/"
+                + str(nsamepad).strip()
+                + "/"
+                + pad.name.strip()
+                + " Motion Sensors:Accel Y+`\n"
+            )
+        # Mouse to emulate Wiimote
+        if system.isOptSet("mouseir") and system.getOptBoolean("mouseir"):
+            f.write("IR/Up = `Cursor Y-`\n")
+            f.write("IR/Down = `Cursor Y+`\n")
+            f.write("IR/Left = `Cursor X-`\n")
+            f.write("IR/Right = `Cursor X+`\n")
+        # Rumble option
+        if system.isOptSet("rumble") and system.getOptBoolean("rumble"):
+            f.write("Rumble/Motor = Weak\n")
+        # Deadzone setting
+        if system.isOptSet(f"deadzone_{nplayer}"):
+            f.write(
+                f"Main Stick/Dead Zone = {system.config['deadzone_' + str(nplayer)]}\n"
+            )
+            f.write(
+                f"C-Stick/Dead Zone = {system.config['deadzone_' + str(nplayer)]}\n"
+            )
+        else:
+            f.write("Main Stick/Dead Zone = 5.0\n")
+            f.write("C-Stick/Dead Zone = 5.0\n")
+        # JS gate size
+        if (
+            system.isOptSet(f"jsgate_size_{nplayer}")
+            and system.config[f"jsgate_size_{nplayer}"] != "normal"
+        ):
+            if system.config[f"jsgate_size_{nplayer}"] == "smaller":
+                f.write("Main Stick/Gate Size = 64.0\n")
+                f.write("C-Stick/Gate Size = 56.0\n")
+            if system.config[f"jsgate_size_{nplayer}"] == "larger":
+                f.write("Main Stick/Gate Size = 95.0\n")
+                f.write("C-Stick/Gate Size = 88.0\n")
+
+
+def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) -> bool:
+    globsearch = ""
+    if system.name == "gamecube":
+        globsearch = "/userdata/system/configs/dolphin-emu/Profiles/GCPad/*.ini"
+    if system.name == "wii":
+        globsearch = "/userdata/system/configs/dolphin-emu/Profiles/Wiimote/*.ini"
+
+    for profileFile in glob(globsearch):
+        try:
+            eslog.debug(f"Looking profile : {profileFile}")
+            profileConfig = ConfigParser(interpolation=None)
+            # To prevent ConfigParser from converting to lower case
+            profileConfig.optionxform = lambda optionstr: str(optionstr)
+            profileConfig.read(profileFile)
+            profileDevice = profileConfig.get("Profile", "Device")
+            eslog.debug(f"Profile device : {profileDevice}")
+
+            deviceVals = match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
+            if deviceVals is not None:
+                if (
+                    deviceVals.group(1) == "evdev"
+                    and deviceVals.group(2).strip() == pad.name.strip()
+                ):
+                    eslog.debug("Eligible profile device found")
+                    for key, val in profileConfig.items("Profile"):
+                        if key != "Device":
+                            f.write(f"{key} = {val}\n")
+                    return True
+        except (OSError, ValueError) as e:
+            eslog.error(f"profile {profileFile} : FAILED - {str(e)}")
+
+    return False
+
+
+def write_key(
+    f: Any,
+    keyname: str,
+    input_type: str,
+    input_id: str,
+    input_value: str,
+    input_global_id: str,
+    reverse: bool,
+    hotkey_id: str | None,
+    gcz_ids: Any,
+) -> None:
+    f.write(keyname + " = ")
+    if hotkey_id is not None:
+        f.write("`Button " + str(hotkey_id) + "` & ")
+    f.write("`")
+    if input_type == "button":
+        # Map L1 & R1 both to Z with OR operator
+        if keyname == "Buttons/Z" and gcz_ids is not None:
+            f.write(f"Button {gcz_ids['pageup']}`|`Button {gcz_ids['pagedown']}")
+        else:
+            f.write("Button " + str(input_id))
+    elif input_type == "hat":
+        if input_value == "1" or input_value == "4":  # up or down
+            f.write("Axis " + str(int(input_global_id) + 1 + int(input_id) * 2))
+        else:
+            f.write("Axis " + str(int(input_global_id) + int(input_id) * 2))
+        if input_value == "1" or input_value == "8":  # up or left
+            f.write("-")
+        else:
+            f.write("+")
+    elif input_type == "axis":
+        # Ensure full values are used for analog triggers
+        prefix = (
+            "Full " if keyname in {"Triggers/L-Analog", "Triggers/R-Analog"} else ""
+        )
+        if (reverse and input_value == "-1") or (not reverse and input_value == "1"):
+            f.write(f"{prefix}Axis " + str(input_id) + "+")
+        else:
+            f.write(f"{prefix}Axis " + str(input_id) + "-")
+    f.write("`\n")

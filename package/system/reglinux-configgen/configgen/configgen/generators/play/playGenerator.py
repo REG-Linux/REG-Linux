@@ -1,5 +1,5 @@
 from os import makedirs, path
-from typing import Any, Dict
+from typing import Any
 from xml.etree.ElementTree import Element, ElementTree, SubElement, parse
 
 from configgen.Command import Command
@@ -122,7 +122,7 @@ class PlayGenerator(Generator):
         return Command(array=command_array)
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: Dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
         if (
             "play_widescreen" in config
@@ -131,5 +131,4 @@ class PlayGenerator(Generator):
             and config["play_mode"] == "0"
         ):
             return 16 / 9
-        else:
-            return 4 / 3
+        return 4 / 3

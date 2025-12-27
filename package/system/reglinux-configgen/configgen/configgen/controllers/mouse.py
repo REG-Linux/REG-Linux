@@ -1,9 +1,9 @@
-from typing import Any, List, Optional
+from typing import Any
 
 from evdev import ecodes
 
 
-def getMouseButtons(device: Any) -> List[str]:
+def getMouseButtons(device: Any) -> list[str]:
     caps = device.capabilities()
     caps_keys = caps[ecodes.EV_KEY]
     caps_filter = [
@@ -46,7 +46,7 @@ def getMouseButtons(device: Any) -> List[str]:
     return buttons
 
 
-def mouseButtonToCode(button: str) -> Optional[int]:
+def mouseButtonToCode(button: str) -> int | None:
     if button == "left":
         return ecodes.BTN_LEFT
     if button == "right":
