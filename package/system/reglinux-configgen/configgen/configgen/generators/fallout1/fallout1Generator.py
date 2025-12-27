@@ -39,14 +39,16 @@ class Fallout1Generator(Generator):
                 copy(FALLOUT_BIN_PATH, FALLOUT_EXE_SOURCE_PATH)
 
         # Copy cfg file to the config directory
-        if not path.exists(FALLOUT_CONFIG_PATH):
-            if path.exists(FALLOUT_CONFIG_SOURCE_PATH):
-                copy(FALLOUT_CONFIG_SOURCE_PATH, FALLOUT_CONFIG_PATH)
+        if not path.exists(FALLOUT_CONFIG_PATH) and path.exists(
+            FALLOUT_CONFIG_SOURCE_PATH
+        ):
+            copy(FALLOUT_CONFIG_SOURCE_PATH, FALLOUT_CONFIG_PATH)
 
         # Now copy the ini file to the config directory
-        if not path.exists(FALLOUT_CONFIG_INI):
-            if path.exists(FALLOUT_CONFIG_INI_SOURCE_PATH):
-                copy(FALLOUT_CONFIG_INI_SOURCE_PATH, FALLOUT_CONFIG_INI)
+        if not path.exists(FALLOUT_CONFIG_INI) and path.exists(
+            FALLOUT_CONFIG_INI_SOURCE_PATH
+        ):
+            copy(FALLOUT_CONFIG_INI_SOURCE_PATH, FALLOUT_CONFIG_INI)
 
         # CFG Configuration
         falloutConfig = ConfigParser()

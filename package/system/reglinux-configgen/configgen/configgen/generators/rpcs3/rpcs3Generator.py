@@ -480,9 +480,8 @@ class Rpcs3Generator(Generator):
             command_array.append("--no-gui")
 
         # firmware not installed and available : instead of starting the game, install it
-        if getFirmwareVersion() is None:
-            if path.exists(RPCS3_PS3UPDAT_PATH):
-                command_array = [RPCS3_BIN_PATH, "--installfw", RPCS3_PS3UPDAT_PATH]
+        if getFirmwareVersion() is None and path.exists(RPCS3_PS3UPDAT_PATH):
+            command_array = [RPCS3_BIN_PATH, "--installfw", RPCS3_PS3UPDAT_PATH]
 
         return Command(array=command_array)
 

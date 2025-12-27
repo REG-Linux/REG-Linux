@@ -184,19 +184,15 @@ class RyujinxGenerator(Generator):
                 devices = [InputDevice(fn) for fn in list_devices()]
                 for dev in devices:
                     if dev.path == pad.dev:
-                        bustype = "%x" % dev.info.bustype
-                        bustype = bustype.zfill(8)
-                        vendor = "%x" % dev.info.vendor
-                        vendor = vendor.zfill(4)
-                        product = "%x" % dev.info.product
-                        product = product.zfill(4)
+                        bustype = f"{dev.info.bustype:x}".zfill(8)
+                        vendor = f"{dev.info.vendor:x}".zfill(4)
+                        product = f"{dev.info.product:x}".zfill(4)
                         # reverse the poduct id, so 028e becomes 8e02
                         product1 = (product)[-2::]
                         product2 = (product)[:-2]
                         product = product1 + product2
                         # reverse the version id also
-                        version = "%x" % dev.info.version
-                        version = version.zfill(4)
+                        version = f"{dev.info.version:x}".zfill(4)
                         version1 = (version)[-2::]
                         version2 = (version)[:-2]
                         version = version1 + version2

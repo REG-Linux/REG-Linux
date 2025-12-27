@@ -38,12 +38,10 @@ class AmiberryGenerator(Generator):
                 command_array.append(rom)
             elif rom_type == "DISK":
                 # floppies
-                n = 0
-                for img in self.floppies_from_rom(rom):
+                for n, img in enumerate(self.floppies_from_rom(rom)):
                     if n < 4:
                         command_array.append("-" + str(n))
                         command_array.append(img)
-                    n += 1
                 # floppy path
                 command_array.append("-s")
                 # Use disk folder as floppy path

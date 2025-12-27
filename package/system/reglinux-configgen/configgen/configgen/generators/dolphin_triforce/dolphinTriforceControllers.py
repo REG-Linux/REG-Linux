@@ -94,68 +94,64 @@ def generateHotkeys(playersControllers: Any) -> None:
     configFileName = "{}/{}".format(
         dolphinTriforceConfig.dolphinTriforceConfig, "Config/Hotkeys.ini"
     )
-    f = codecs.open(configFileName, "w", encoding="utf_8")
+    with codecs.open(configFileName, "w", encoding="utf_8") as f:
+        hotkeysMapping = {
+            "a": "Keys/Reset",
+            "b": "Keys/Toggle Pause",
+            "x": "Keys/Load from selected slot",
+            "y": "Keys/Save to selected slot",
+            "r2": None,
+            "start": "Keys/Exit",
+            "pageup": "Keys/Take Screenshot",
+            "pagedown": "Keys/Toggle 3D Side-by-side",
+            "up": "Keys/Select State Slot 1",
+            "down": "Keys/Select State Slot 2",
+            "left": None,
+            "right": None,
+            "joystick1up": None,
+            "joystick1left": None,
+            "joystick2up": None,
+            "joystick2left": None,
+        }
 
-    hotkeysMapping = {
-        "a": "Keys/Reset",
-        "b": "Keys/Toggle Pause",
-        "x": "Keys/Load from selected slot",
-        "y": "Keys/Save to selected slot",
-        "r2": None,
-        "start": "Keys/Exit",
-        "pageup": "Keys/Take Screenshot",
-        "pagedown": "Keys/Toggle 3D Side-by-side",
-        "up": "Keys/Select State Slot 1",
-        "down": "Keys/Select State Slot 2",
-        "left": None,
-        "right": None,
-        "joystick1up": None,
-        "joystick1left": None,
-        "joystick2up": None,
-        "joystick2left": None,
-    }
+        nplayer = 1
+        for _, pad in sorted(playersControllers.items()):
+            if nplayer == 1:
+                f.write("[Hotkeys1]" + "\n")
+                f.write("Device = SDL/0/" + pad.name.strip() + "\n")
 
-    nplayer = 1
-    for _, pad in sorted(playersControllers.items()):
-        if nplayer == 1:
-            f.write("[Hotkeys1]" + "\n")
-            f.write("Device = SDL/0/" + pad.name.strip() + "\n")
+                # Search the hotkey button
+                hotkey = None
+                if "hotkey" not in pad.inputs:
+                    return
+                hotkey = pad.inputs["hotkey"]
+                if hotkey.type != "button":
+                    return
 
-            # Search the hotkey button
-            hotkey = None
-            if "hotkey" not in pad.inputs:
-                return
-            hotkey = pad.inputs["hotkey"]
-            if hotkey.type != "button":
-                return
+                for x in pad.inputs:
+                    input = pad.inputs[x]
 
-            for x in pad.inputs:
-                input = pad.inputs[x]
+                    keyname = None
+                    if input.name in hotkeysMapping:
+                        keyname = hotkeysMapping[input.name]
 
-                keyname = None
-                if input.name in hotkeysMapping:
-                    keyname = hotkeysMapping[input.name]
+                    # Write the configuration for this key
+                    if keyname is not None:
+                        write_key(
+                            f,
+                            keyname,
+                            input.type,
+                            input.id,
+                            input.value,
+                            pad.nbaxes,
+                            False,
+                            hotkey.id,
+                        )
 
-                # Write the configuration for this key
-                if keyname is not None:
-                    write_key(
-                        f,
-                        keyname,
-                        input.type,
-                        input.id,
-                        input.value,
-                        pad.nbaxes,
-                        False,
-                        hotkey.id,
-                    )
+                    # else:
+                    #    f.write("# undefined key: name="+input.name+", type="+input.type+", id="+str(input.id)+", value="+str(input.value)+"\n")
 
-                # else:
-                #    f.write("# undefined key: name="+input.name+", type="+input.type+", id="+str(input.id)+", value="+str(input.value)+"\n")
-
-        nplayer += 1
-
-    f.write
-    f.close()
+            nplayer += 1
 
 
 def generateControllerConfig_any(
@@ -166,31 +162,43 @@ def generateControllerConfig_any(
     anyMapping: Any,
     anyReverseAxes: Any,
     anyReplacements: Any,
-    extraOptions: dict[str, Any] = {},
+    extraOptions: dict[str, Any] | None = None,
 ) -> None:
+    if extraOptions is None:
+        extraOptions = {}
+
     configFileName = f"{dolphinTriforceConfig.dolphinTriforceConfig}/{filename}"
-    f = codecs.open(configFileName, "w", encoding="utf_8")
-    nplayer = 1
-    nsamepad = 0
+    with codecs.open(configFileName, "w", encoding="utf_8") as f:
+        nplayer = 1
+        nsamepad = 0
 
-    # In case of two pads having the same name, dolphin wants a number to handle this
-    double_pads = dict()
+        # In case of two pads having the same name, dolphin wants a number to handle this
+        double_pads = {}
 
-    for _, pad in sorted(playersControllers.items()):
-        # Handle x pads having the same name
-        if pad.name.strip() in double_pads:
-            nsamepad = double_pads[pad.name.strip()]
-        else:
-            nsamepad = 0
-        double_pads[pad.name.strip()] = nsamepad + 1
+        for _, pad in sorted(playersControllers.items()):
+            # Handle x pads having the same name
+            nsamepad = double_pads.get(pad.name.strip(), 0)
+            double_pads[pad.name.strip()] = nsamepad + 1
 
-        f.write("[" + anyDefKey + str(nplayer) + "]" + "\n")
-        f.write("Device = SDL/" + str(nsamepad).strip() + "/" + pad.name.strip() + "\n")
+            f.write("[" + anyDefKey + str(nplayer) + "]" + "\n")
+            f.write(
+                "Device = SDL/" + str(nsamepad).strip() + "/" + pad.name.strip() + "\n"
+            )
 
-        if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
-            "use_pad_profiles"
-        ):
-            if not generateControllerConfig_any_from_profiles(f, pad):
+            if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
+                "use_pad_profiles"
+            ):
+                if not generateControllerConfig_any_from_profiles(f, pad):
+                    generateControllerConfig_any_auto(
+                        f,
+                        pad,
+                        anyMapping,
+                        anyReverseAxes,
+                        anyReplacements,
+                        extraOptions,
+                        system,
+                    )
+            else:
                 generateControllerConfig_any_auto(
                     f,
                     pad,
@@ -200,20 +208,8 @@ def generateControllerConfig_any(
                     extraOptions,
                     system,
                 )
-        else:
-            generateControllerConfig_any_auto(
-                f,
-                pad,
-                anyMapping,
-                anyReverseAxes,
-                anyReplacements,
-                extraOptions,
-                system,
-            )
 
-        nplayer += 1
-    f.write
-    f.close()
+            nplayer += 1
 
 
 def generateControllerConfig_any_auto(
@@ -310,16 +306,16 @@ def generateControllerConfig_any_from_profiles(f: Any, pad: Any) -> bool:
             eslog.debug(f"Profile device : {profileDevice}")
 
             deviceVals = re.match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
-            if deviceVals is not None:
-                if (
-                    deviceVals.group(1) == "SDL"
-                    and deviceVals.group(2).strip() == pad.name.strip()
-                ):
-                    eslog.debug("Eligible profile device found")
-                    for key, val in profileConfig.items("Profile"):
-                        if key != "Device":
-                            f.write(f"{key} = {val}\n")
-                    return True
+            if (
+                deviceVals is not None
+                and deviceVals.group(1) == "SDL"
+                and deviceVals.group(2).strip() == pad.name.strip()
+            ):
+                eslog.debug("Eligible profile device found")
+                for key, val in profileConfig.items("Profile"):
+                    if key != "Device":
+                        f.write(f"{key} = {val}\n")
+                return True
         except Exception:
             eslog.error(f"profile {profileFile} : FAILED")
 

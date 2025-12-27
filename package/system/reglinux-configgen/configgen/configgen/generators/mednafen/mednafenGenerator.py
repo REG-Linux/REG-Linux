@@ -24,15 +24,11 @@ class MednafenGenerator(Generator):
             unlink(MEDNAFEN_CONFIG_PATH)
 
         # Create the config file and fill it with basic data
-        cfgConfig = open(MEDNAFEN_CONFIG_PATH, "w")
-
-        # Basic settings
-        setMednafenConfig(cfgConfig)
-        # TODO: Controls configuration
-        setMednafenControllers(cfgConfig)
-
-        # Close config file as we are done
-        cfgConfig.close()
+        with open(MEDNAFEN_CONFIG_PATH, "w") as cfgConfig:
+            # Basic settings
+            setMednafenConfig(cfgConfig)
+            # TODO: Controls configuration
+            setMednafenControllers(cfgConfig)
 
         command_array = [MEDNAFEN_BIN_PATH, rom]
         return Command(array=command_array)

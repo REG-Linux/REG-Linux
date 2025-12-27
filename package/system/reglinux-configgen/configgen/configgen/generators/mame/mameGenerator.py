@@ -5,12 +5,11 @@ from shutil import copy2, rmtree
 from typing import Any
 from xml.etree.ElementTree import parse
 
+from configgen.bezel.mame_bezel_manager import setup_mame_bezels
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
 from configgen.utils.videoMode import getScreensInfos
-
-from ...bezel.mame_bezel_manager import setup_mame_bezels
 
 logger = get_logger(__name__)
 
@@ -85,12 +84,11 @@ class MameGenerator(Generator):
                 makedirs("/userdata/" + checkPath + "/")
 
         messDataFile = "/usr/share/reglinux/configgen/data/mame/messSystems.csv"
-        openFile = open(messDataFile)
-        messSystems = []
-        messSysName = []
-        messRomType = []
-        messAutoRun = []
-        with openFile:
+        with open(messDataFile) as openFile:
+            messSystems = []
+            messSysName = []
+            messRomType = []
+            messAutoRun = []
             messDataList = reader(openFile, delimiter=";", quotechar="'")
             for row in messDataList:
                 messSystems.append(row[0])
@@ -209,26 +207,25 @@ class MameGenerator(Generator):
 
         # MAME will create custom configs per game for MAME ROMs and MESS ROMs with no system attached (LCD games, TV games, etc.)
         # This will allow an alternate config path per game for MESS console/computer ROMs that may need additional config.
-        if system.isOptSet("pergamecfg") and system.getOptBoolean("pergamecfg"):
-            if not messMode == -1:
-                if not messSysName[messMode] == "":
-                    if not path.exists(
-                        "/userdata/system/configs/mame/" + messSysName[messMode] + "/"
-                    ):
-                        makedirs(
-                            "/userdata/system/configs/mame/"
-                            + messSysName[messMode]
-                            + "/"
-                        )
-                    cfgPath = (
-                        "/userdata/system/configs/mame/"
-                        + messSysName[messMode]
-                        + "/"
-                        + romBasename
-                        + "/"
-                    )
-                    if not path.exists(cfgPath):
-                        makedirs(cfgPath)
+        if (
+            system.isOptSet("pergamecfg")
+            and system.getOptBoolean("pergamecfg")
+            and messMode != -1
+            and messSysName[messMode] != ""
+            and not path.exists(
+                "/userdata/system/configs/mame/" + messSysName[messMode] + "/"
+            )
+        ):
+            makedirs("/userdata/system/configs/mame/" + messSysName[messMode] + "/")
+            cfgPath = (
+                "/userdata/system/configs/mame/"
+                + messSysName[messMode]
+                + "/"
+                + romBasename
+                + "/"
+            )
+            if not path.exists(cfgPath):
+                makedirs(cfgPath)
         command_array += ["-cfg_directory", cfgPath]
         command_array += ["-input_directory", "/userdata/saves/mame/input/"]
         command_array += ["-state_directory", "/userdata/saves/mame/state/"]
@@ -408,12 +405,12 @@ class MameGenerator(Generator):
                 command_array += ["-mem", laser310mem]
 
             # BBC Joystick
-            if system.name == "bbc":
-                if (
-                    system.isOptSet("sticktype")
-                    and system.config["sticktype"] != "none"
-                ):
-                    command_array += ["-analogue", system.config["sticktype"]]
+            if (
+                system.name == "bbc"
+                and system.isOptSet("sticktype")
+                and system.config["sticktype"] != "none"
+            ):
+                command_array += ["-analogue", system.config["sticktype"]]
 
             # Apple II
             if system.name == "apple2":
@@ -431,28 +428,30 @@ class MameGenerator(Generator):
                 command_array += ["-ramsize", str(system.config["ramsize"]) + "M"]
 
             # Mac RAM & Image Reader (if applicable)
-            if system.name == "macintosh":
-                if system.isOptSet("ramsize"):
-                    ramSize = int(system.config["ramsize"])
-                    if messModel in ["maciix", "maclc3"]:
-                        if messModel == "maclc3" and ramSize == 2:
-                            ramSize = 4
-                        if messModel == "maclc3" and ramSize > 80:
-                            ramSize = 80
-                        if messModel == "maciix" and ramSize == 16:
-                            ramSize = 32
-                        if messModel == "maciix" and ramSize == 48:
-                            ramSize = 64
-                        command_array += ["-ramsize", str(ramSize) + "M"]
-                    if messModel == "maciix":
-                        imageSlot = "nba"
-                        if system.isOptSet("imagereader"):
-                            if system.config["imagereader"] == "disabled":
-                                imageSlot = ""
-                            else:
-                                imageSlot = system.config["imagereader"]
-                        if imageSlot != "":
-                            command_array += ["-" + imageSlot, "image"]
+            if (
+                system.name == "macintosh"
+                and system.isOptSet("ramsize")
+                and messModel in ["maciix", "maclc3"]
+            ):
+                ramSize = int(system.config["ramsize"])
+                if messModel == "maclc3" and ramSize == 2:
+                    ramSize = 4
+                if messModel == "maclc3" and ramSize > 80:
+                    ramSize = 80
+                if messModel == "maciix" and ramSize == 16:
+                    ramSize = 32
+                if messModel == "maciix" and ramSize == 48:
+                    ramSize = 64
+                command_array += ["-ramsize", str(ramSize) + "M"]
+                if messModel == "maciix":
+                    imageSlot = "nba"
+                    if system.isOptSet("imagereader"):
+                        if system.config["imagereader"] == "disabled":
+                            imageSlot = ""
+                        else:
+                            imageSlot = system.config["imagereader"]
+                    if imageSlot != "":
+                        command_array += ["-" + imageSlot, "image"]
 
             if softList == "":
                 # Boot disk for Macintosh
@@ -615,14 +614,19 @@ class MameGenerator(Generator):
                     autoRunCmd = "*cat\\n\\n\\n\\n*exec !boot\\n"
                     autoRunDelay = 3
             # fm7 boots floppies, needs cassette loading
-            elif system.name == "fm7":
-                if system.isOptSet("altromtype") or softList != "":
-                    if (
+            elif (
+                system.name == "fm7"
+                and (system.isOptSet("altromtype") or softList != "")
+                and (
+                    (
                         system.isOptSet("altromtype")
                         and system.config["altromtype"] == "cass"
-                    ) or softList.endswith("cass"):
-                        autoRunCmd = "LOADM”“,,R\\n"
-                        autoRunDelay = 5
+                    )
+                    or softList.endswith("cass")
+                )
+            ):
+                autoRunCmd = "LOADM”“,,R\\n"
+                autoRunDelay = 5
             elif system.name == "coco":
                 rom_type = "cart"
                 autoRunDelay = 2
@@ -633,11 +637,13 @@ class MameGenerator(Generator):
                     if path.exists(softListFile):
                         softwarelist = parse(softListFile)
                         for software in softwarelist.findall("software"):
-                            if software.attrib != {}:
-                                if software.get("name") == romName:
-                                    for info in software.iter("info"):
-                                        if info.get("name") == "usage":
-                                            autoRunCmd = info.get("value")
+                            if (
+                                software.attrib != {}
+                                and software.get("name") == romName
+                            ):
+                                for info in software.iter("info"):
+                                    if info.get("name") == "usage":
+                                        autoRunCmd = info.get("value")
 
                 # if still undefined, default autoRunCmd based on media type
                 if autoRunCmd == "":
@@ -671,13 +677,15 @@ class MameGenerator(Generator):
                 # check for a user override
                 autoRunFile = f"system/configs/mame/autoload/{system.name}_{rom_type}_autoload.csv"
                 if path.exists(autoRunFile):
-                    openARFile = open(autoRunFile)
-                    with openARFile:
+                    with open(autoRunFile) as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
-                            if row and not row[0].startswith("#"):
-                                if row[0].casefold() == romName.casefold():
-                                    autoRunCmd = row[1] + "\\n"
+                            if (
+                                row
+                                and not row[0].startswith("#")
+                                and row[0].casefold() == romName.casefold()
+                            ):
+                                autoRunCmd = row[1] + "\\n"
             else:
                 # Check for an override file, otherwise use generic (if it exists)
                 autoRunCmd = messAutoRun[messMode]
@@ -685,8 +693,7 @@ class MameGenerator(Generator):
                     f"/usr/share/reglinux/configgen/data/mame/{softList}_autoload.csv"
                 )
                 if path.exists(autoRunFile):
-                    openARFile = open(autoRunFile)
-                    with openARFile:
+                    with open(autoRunFile) as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if (

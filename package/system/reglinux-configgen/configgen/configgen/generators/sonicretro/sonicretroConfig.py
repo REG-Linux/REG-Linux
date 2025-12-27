@@ -97,10 +97,7 @@ def setSonicretroConfig(system: Any, emu: str, rom: str) -> None:
 
 def getMouseMode(self: Any, config: Any, rom: str) -> bool:
     # Determine the emulator to use
-    if (rom.lower()).endswith("son"):
-        emu = "sonic2013"
-    else:
-        emu = "soniccd"
+    emu = "sonic2013" if (rom.lower()).endswith("son") else "soniccd"
 
     mouseRoms = [
         "1bd5ad366df1765c98d20b53c092a528",  # iOS version of SonicCD
@@ -120,7 +117,7 @@ def __getMD5(self: Any, filename: str) -> str:
 
     # Use an instance attribute for caching instead of function attribute
     if not hasattr(self, "_md5_cache"):
-        self._md5_cache = dict()
+        self._md5_cache = {}
 
     if rp in self._md5_cache:
         return self._md5_cache[rp]

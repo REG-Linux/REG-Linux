@@ -25,9 +25,7 @@ def setMelondsControllers(melondsConfig: Any, playersControllers: Any) -> None:
             continue
 
         # Handle controllers where guide and back buttons share the same code
-        guide_equal_back = (
-            True if pad.inputs["guide"].value == pad.inputs["back"].value else False
-        )
+        guide_equal_back = pad.inputs["guide"].value == pad.inputs["back"].value
 
         for index in pad.inputs:
             input = pad.inputs[index].sdl_to_linux_input_event(guide_equal_back)

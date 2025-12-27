@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 from codecs import open
+from contextlib import suppress
 from csv import reader
 from os import linesep, path
 from typing import Any
@@ -122,19 +123,18 @@ def generatePadsConfig(
         and config_alt is not None
     ):
         logger.debug(f"Saving {configFile_alt}")
-        mameXml_alt = open(configFile_alt, "w", "utf-8")
-        dom_string_alt = linesep.join(
-            [s for s in config_alt.toprettyxml().splitlines() if s.strip()]
-        )  # remove ugly empty lines while minicom adds them...
-        mameXml_alt.write(dom_string_alt)
+        with open(configFile_alt, "w", "utf-8") as mameXml_alt:
+            dom_string_alt = linesep.join(
+                [s for s in config_alt.toprettyxml().splitlines() if s.strip()]
+            )  # remove ugly empty lines while minicom adds them...
+            mameXml_alt.write(dom_string_alt)
 
 
 def _load_control_mappings() -> dict[str, dict[str, str]]:
     """Load control mappings from CSV file."""
     control_file = "/usr/share/reglinux/configgen/data/mame/mameControls.csv"
-    open_file = open(control_file, "r")
-    control_dict = {}
-    with open_file:
+    with open(control_file, "r") as open_file:
+        control_dict = {}
         control_list = reader(open_file)
         for row in control_list:
             if row[0] not in control_dict:
@@ -151,10 +151,8 @@ def _initialize_main_config(
     config_file = cfg_path + "default.cfg"
 
     if path.exists(config_file):
-        try:
+        with suppress(ET.ParseError, FileNotFoundError):
             config = parse(config_file)
-        except (ET.ParseError, FileNotFoundError):
-            pass  # reinit the file
 
     overwrite_mame = not (path.exists(config_file) and custom_cfg)
     return config, config_file, overwrite_mame
@@ -163,7 +161,7 @@ def _initialize_main_config(
 def _get_base_mappings(control_dict: dict[str, dict[str, str]]) -> dict[str, str]:
     """Get base control mappings."""
     mappings = {}
-    for control_def in control_dict["default"].keys():
+    for control_def in control_dict["default"]:
         mappings[control_def] = control_dict["default"][control_def]
     return mappings
 
@@ -174,7 +172,7 @@ def _get_gun_mappings(
     """Get gun button mappings if guns are enabled."""
     gunmappings = {}
     if use_guns:
-        for control_def in control_dict["gunbuttons"].keys():
+        for control_def in control_dict["gunbuttons"]:
             gunmappings[control_def] = control_dict["gunbuttons"][control_def]
     return gunmappings
 
@@ -185,7 +183,7 @@ def _get_mouse_mappings(
     """Get mouse button mappings if mouse is enabled."""
     mousemappings = {}
     if use_mouse:
-        for control_def in control_dict["mousebuttons"].keys():
+        for control_def in control_dict["mousebuttons"]:
             mousemappings[control_def] = control_dict["mousebuttons"][control_def]
     return mousemappings
 
@@ -194,7 +192,7 @@ def _update_alt_mappings(
     mappings: dict[str, str], control_dict: dict[str, dict[str, str]], alt_buttons: str
 ):
     """Update mappings with alternative button configuration."""
-    for control_def in control_dict[alt_buttons].keys():
+    for control_def in control_dict[alt_buttons]:
         mappings.update({control_def: control_dict[alt_buttons][control_def]})
 
 
@@ -319,10 +317,8 @@ def _handle_special_controllers(
         path.exists(config_file_alt)
         and cfg_path == f"/userdata/system/configs/mame/{sys_name}/"
     ) or path.exists(config_file_alt):
-        try:
+        with suppress(Exception):
             config_alt = minidom.parse(config_file_alt)
-        except Exception:
-            pass  # reinit the file
 
     per_game_cfg = cfg_path != f"/userdata/system/configs/mame/{sys_name}/"
     overwrite_system = not (
@@ -489,7 +485,12 @@ def _check_wheel_mapping(
                     or mappings_use[x] == "r2"
                     or mappings_use[x] == "joystick1left"
                 ):
-                    mappings_to_remove.append(x)
+                    mappings_to_remove = [
+                        x
+                        for x in mappings_use
+                        if mappings_use[x] == "joystick1up"
+                        or mappings_use[x] == "joystick1left"
+                    ]
             for x in mappings_to_remove:
                 del mappings_use[x]
 
@@ -690,7 +691,7 @@ def _process_special_controller_mappings(
     """Process special controller mappings for specific systems."""
     mess_control_dict = _load_mess_control_mappings()
     if use_controls in mess_control_dict:
-        for control_def in mess_control_dict[use_controls].keys():
+        for control_def in mess_control_dict[use_controls]:
             this_control = mess_control_dict[use_controls][control_def]
             if nplayer == this_control["player"]:
                 if this_control["type"] == "special" or this_control["type"] == "main":
@@ -1170,13 +1171,12 @@ def input2definition(
         5: "RZAXIS",
     }
 
-    if isWheel:
-        if key == "joystick1left" or key == "l2" or key == "r2":
-            suffix = ""
-            if key == "r2":
-                suffix = "_NEG"
-            if key == "l2":
-                suffix = "_NEG"
+    if isWheel and (key == "joystick1left" or key == "l2" or key == "r2"):
+        suffix = ""
+        if key == "r2":
+            suffix = "_NEG"
+        if key == "l2":
+            suffix = "_NEG"
             if int(input.id) in mame_axis_mapping_names:
                 idname = mame_axis_mapping_names[int(input.id)]
                 return f"JOYCODE_{joycode}_{idname}{suffix}"
@@ -1218,11 +1218,10 @@ def input2definition(
         # Button assigment modified - blank "OR" gets removed by MAME if the button is undefined.
         for direction in ["a", "b", "x", "y"]:
             button_directions[direction] = ""
-            if direction in pad.inputs.keys():
-                if pad.inputs[direction].type == "button":
-                    button_directions[direction] = (
-                        f"JOYCODE_{joycode}_BUTTON{int(pad.inputs[direction].id) + 1}"
-                    )
+            if direction in pad.inputs and pad.inputs[direction].type == "button":
+                button_directions[direction] = (
+                    f"JOYCODE_{joycode}_BUTTON{int(pad.inputs[direction].id) + 1}"
+                )
 
         if (
             ignoreAxis
@@ -1258,7 +1257,7 @@ def input2definition(
             if key == "joystick1right" or key == "right":
                 return f"JOYCODE_{joycode}_XAXIS_RIGHT_SWITCH OR {dpad_inputs['right']}"
         # Fix for the workaround
-        for direction in pad.inputs:
+        for _direction in pad.inputs:
             if key == "joystick2up":
                 return (
                     f"JOYCODE_{joycode}_RYAXIS_NEG_SWITCH OR {button_directions['x']}"

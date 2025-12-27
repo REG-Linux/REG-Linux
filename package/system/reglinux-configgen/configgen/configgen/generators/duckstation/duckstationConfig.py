@@ -291,7 +291,7 @@ def setDuckstationConfig(
         duckstatonConfig.set(
             "Display", "AspectRatio", system.config["duckstation_ratio"]
         )
-        if not system.config["duckstation_ratio"] == "4:3":
+        if system.config["duckstation_ratio"] != "4:3":
             system.config["bezel"] = "none"
     else:
         duckstatonConfig.set("Display", "AspectRatio", "Auto (Game Native)")

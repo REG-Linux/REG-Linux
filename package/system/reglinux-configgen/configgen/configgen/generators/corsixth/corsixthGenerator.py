@@ -44,12 +44,8 @@ class CorsixTHGenerator(Generator):
             unlink(CORSIXTH_CONFIG_PATH)
 
         # Create the config file and fill it with basic data
-        corsixth_config_file = open(CORSIXTH_CONFIG_PATH, "w")
-
-        setCorsixthConfig(corsixth_config_file, system, game_resolution)
-
-        # Close config file as we are done
-        corsixth_config_file.close()
+        with open(CORSIXTH_CONFIG_PATH, "w") as corsixth_config_file:
+            setCorsixthConfig(corsixth_config_file, system, game_resolution)
 
         # Launch engine with config file path
         command_array = [CORSIXTH_BIN_PATH, "--config-file=" + CORSIXTH_CONFIG_PATH]
