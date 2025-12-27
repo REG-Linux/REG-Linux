@@ -1,0 +1,52 @@
+diff --git a/package/mpv/mpv.mk b/package/mpv/mpv.mk
+index 8832b68ece..c68ddac43b 100644
+--- a/package/mpv/mpv.mk
++++ b/package/mpv/mpv.mk
+@@ -4,10 +4,11 @@
+ #
+ ################################################################################
+ 
+-MPV_VERSION = 0.35.1
++MPV_VERSION = 0.41.0
+ MPV_SITE = $(call github,mpv-player,mpv,v$(MPV_VERSION))
+ MPV_DEPENDENCIES = \
+ 	host-pkgconf ffmpeg libass zlib \
++	libplacebo libdisplay-info \
+ 	$(if $(BR2_PACKAGE_LIBICONV),libiconv)
+ MPV_LICENSE = GPL-2.0+
+ MPV_LICENSE_FILES = LICENSE.GPL
+@@ -153,22 +154,8 @@ else
+ MPV_CONF_OPTS += -Dpulse=disabled
+ endif
+ 
+-# SDL support
+-# Sdl2 requires 64-bit sync intrinsics
+-ifeq ($(BR2_TOOLCHAIN_HAS_SYNC_8)$(BR2_PACKAGE_SDL2),yy)
+-MPV_CONF_OPTS += -Dsdl2=enabled
++# REG update, sdl2 support is always on
+ MPV_DEPENDENCIES += sdl2
+-else
+-MPV_CONF_OPTS += -Dsdl2=disabled
+-endif
+-
+-# Raspberry Pi support
+-ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
+-MPV_CONF_OPTS += -Drpi=enabled -Dgl=enabled
+-MPV_DEPENDENCIES += rpi-userland
+-else
+-MPV_CONF_OPTS += -Drpi=disabled
+-endif
+ 
+ # va-api support
+ ifeq ($(BR2_PACKAGE_LIBVA)$(BR2_PACKAGE_MPV_SUPPORTS_VAAPI),yy)
+@@ -214,10 +201,4 @@ else
+ MPV_CONF_OPTS += -Dx11=disabled
+ endif
+ 
+-ifeq ($(BR2_TOOLCHAIN_HAS_LIBATOMIC),y)
+-MPV_CONF_OPTS += -Dstdatomic=enabled
+-else
+-MPV_CONF_OPTS += -Dstdatomic=disabled
+-endif
+-
+ $(eval $(meson-package))

@@ -88,6 +88,7 @@ de2d82cc83050c996204524a7038a117  package/libfuse3/libfuse3.mk
 b70f19f860a3ada196b5f5257e646b53  package/libglib2/libglib2.mk
 074893afc0f67a5608f44b53ea6c43a2  package/libglvnd/libglvnd.hash
 e11ebaaac3d50a95c01f479baef197f7  package/libglvnd/libglvnd.mk
+bb9248bf84ab097fdf08e43cdd4c0ef5  package/libgtk3/Config.in
 25e2c104ab0d7b1825fa3528fb313d7f  package/libidn2/libidn2.mk
 b5bcf1c3e1f262b4e38d381a73c38137  package/libopenh264/Config.in
 1f52439b441ae3430f948bac269ffe6f  package/libopenh264/libopenh264.mk
@@ -112,6 +113,9 @@ ae97257be7c5efb404d095b4c3599eec  package/mesa3d/Config.in
 56c99af2aaeed83c243e7455722db56f  package/mesa3d/mesa3d.hash
 d1a6a6a480feea18e590e62dfc47b3ab  package/mesa3d/mesa3d.mk
 3599911b0b68912bc945c3efbc223dbc  package/mono/Config.in
+00445de09c846fce4dd166fc8c264e43  package/mpv/Config.in
+3a3f0c9a08b45f9f4195dd19f41062b2  package/mpv/mpv.hash
+4527b181a9cd593515b722e87eb4caa6  package/mpv/mpv.mk
 ad422751e4a60689e4198ccf4441ae25  package/ncurses/ncurses.mk
 2f684e20c082c44254682f410206d01d  package/nfs-utils/S60nfs
 935d74c65f26325e3cad2e8de8c7be73  package/nfs-utils/nfs-utils.mk
