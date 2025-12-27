@@ -1,0 +1,316 @@
+From romain.tisserand@gmail.com Sat Dec 27 03:09:33 2025
+Subject: [PATCH] input: joystick: add mangmi mcu serdev driver
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Sat, 27 Dec 2025 03:09:33 +0100
+
+Add a serdev-based joystick MCU driver for the Mangmi Air X.
+
+Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
+
+--- a/drivers/input/joystick/Kconfig
++++ b/drivers/input/joystick/Kconfig
+@@ -166,4 +166,16 @@ config JOYSTICK_MAGELLAN
+ 	To compile this driver as a module, choose M here: the
+ 	module will be called magellan.
+ 
++config JOYSTICK_MANGMI_MCU
++	tristate "Mangmi Air X joystick MCU (serdev)"
++	select SERIO
++	depends on OF
++	help
++	  Say Y here to enable the serdev driver for the joystick MCU used by
++	  the Mangmi Air X (SM6115) handheld. The driver decodes 64-byte MCU
++	  packets and exposes them as standard joystick input events.
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called mangmi-mcu.
++
+ config JOYSTICK_SPACEORB
+--- a/drivers/input/joystick/Makefile
++++ b/drivers/input/joystick/Makefile
+@@ -22,6 +22,7 @@ obj-$(CONFIG_JOYSTICK_GRIP_MP)		+= grip_mp.o
+ obj-$(CONFIG_JOYSTICK_GUILLEMOT)	+= guillemot.o
+ obj-$(CONFIG_JOYSTICK_IFORCE)		+= iforce/
+ obj-$(CONFIG_JOYSTICK_INTERACT)		+= interact.o
++obj-$(CONFIG_JOYSTICK_MANGMI_MCU)	+= mangmi-mcu.o
+ obj-$(CONFIG_JOYSTICK_JOYDUMP)		+= joydump.o
+ obj-$(CONFIG_JOYSTICK_MAGELLAN)		+= magellan.o
+ obj-$(CONFIG_JOYSTICK_MAPLE)		+= maplecontrol.o
+--- /dev/null
++++ b/drivers/input/joystick/mangmi-mcu.c
+@@ -0,0 +1,275 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Mangmi Air X joystick MCU serdev driver
++ *
++ * The MCU streams fixed-size 64-byte packets. Button/axis decoding is
++ * based on the vendor dpad-uart.c reference.
++ */
++
++#include <linux/delay.h>
++#include <linux/gpio/consumer.h>
++#include <linux/input.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/property.h>
++#include <linux/printk.h>
++#include <linux/serdev.h>
++#include <linux/unaligned.h>
++
++#define MANGMI_MCU_PKT_LEN 64
++
++struct mangmi_mcu {
++	struct device *dev;
++	struct serdev_device *serdev;
++	struct input_dev *input;
++	struct gpio_desc *stick_en;
++	struct gpio_desc *select;
++	struct gpio_desc *mode;
++	struct gpio_desc *start;
++	struct gpio_desc *back;
++	struct gpio_desc *power;
++	struct gpio_desc *reset;
++	struct gpio_desc *boot0;
++	struct gpio_desc *boot1;
++	unsigned int baud;
++	u8 buf[MANGMI_MCU_PKT_LEN];
++	size_t buf_pos;
++	u32 rx_packets;
++};
++
++static int mangmi_mcu_get_gpio(struct mangmi_mcu *mcu, struct gpio_desc **desc,
++			       const char *name, enum gpiod_flags flags)
++{
++	*desc = devm_gpiod_get_optional(mcu->dev, name, flags);
++	if (IS_ERR(*desc))
++		return dev_err_probe(mcu->dev, PTR_ERR(*desc),
++				     "failed to get %s GPIO\n", name);
++
++	return 0;
++}
++
++static int mangmi_mcu_setup_gpios(struct mangmi_mcu *mcu)
++{
++	int ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->stick_en, "stick-en", GPIOD_OUT_HIGH);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->power, "power", GPIOD_OUT_HIGH);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->reset, "reset", GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->boot0, "boot0", GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->boot1, "boot1", GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->select, "select", GPIOD_IN);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->mode, "mode", GPIOD_IN);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->start, "start", GPIOD_IN);
++	if (ret)
++		return ret;
++
++	ret = mangmi_mcu_get_gpio(mcu, &mcu->back, "back", GPIOD_IN);
++	if (ret)
++		return ret;
++
++	if (mcu->reset) {
++		/* Assert reset (active-low) to force the MCU into a clean state. */
++		gpiod_set_value_cansleep(mcu->reset, 1);
++		usleep_range(20000, 30000);
++		gpiod_set_value_cansleep(mcu->reset, 0);
++	}
++
++	/* Allow MCU to boot before UART traffic starts. */
++	msleep(200);
++
++	return 0;
++}
++
++static void mangmi_mcu_report_packet(struct mangmi_mcu *mcu, const u8 *data)
++{
++	struct input_dev *input = mcu->input;
++	s16 lx, ly, rx, ry;
++	u8 dpad = data[2];
++	u8 buttons = data[3];
++
++	if (data[0] != 0x00)
++		return;
++
++	input_report_abs(input, ABS_HAT0X, !!(dpad & 0x08) - !!(dpad & 0x04));
++	input_report_abs(input, ABS_HAT0Y, !!(dpad & 0x02) - !!(dpad & 0x01));
++
++	input_report_key(input, BTN_START,  dpad & 0x10);
++	input_report_key(input, BTN_SELECT, dpad & 0x20);
++	input_report_key(input, BTN_THUMBL, dpad & 0x40);
++	input_report_key(input, BTN_THUMBR, dpad & 0x80);
++
++	input_report_key(input, BTN_TL,   buttons & 0x01);
++	input_report_key(input, BTN_TR,   buttons & 0x02);
++	input_report_key(input, BTN_MODE, buttons & 0x04);
++	input_report_key(input, BTN_A,    buttons & 0x10);
++	input_report_key(input, BTN_B,    buttons & 0x20);
++	input_report_key(input, BTN_X,    buttons & 0x40);
++	input_report_key(input, BTN_Y,    buttons & 0x80);
++
++	lx = (s16)get_unaligned_le16(&data[6]);
++	ly = (s16)get_unaligned_le16(&data[8]);
++	rx = (s16)get_unaligned_le16(&data[10]);
++	ry = (s16)get_unaligned_le16(&data[12]);
++
++	input_report_abs(input, ABS_X, lx);
++	input_report_abs(input, ABS_Y, ly);
++	input_report_abs(input, ABS_Z, rx);
++	input_report_abs(input, ABS_RZ, ry);
++
++	input_report_abs(input, ABS_BRAKE, data[4]);
++	input_report_abs(input, ABS_GAS, data[5]);
++
++	input_sync(input);
++}
++
++static size_t mangmi_mcu_receive_buf(struct serdev_device *serdev,
++				     const u8 *data, size_t count)
++{
++	struct mangmi_mcu *mcu = serdev_device_get_drvdata(serdev);
++	size_t i;
++
++	for (i = 0; i < count; i++) {
++		u8 byte = data[i];
++
++		if (mcu->buf_pos == 0 && byte != 0x00)
++			continue;
++
++		mcu->buf[mcu->buf_pos++] = byte;
++
++		if (mcu->buf_pos == MANGMI_MCU_PKT_LEN) {
++			if (mcu->rx_packets < 3) {
++				dev_info(mcu->dev, "rx packet %u\n", mcu->rx_packets);
++				print_hex_dump(KERN_INFO, "mcu: ", DUMP_PREFIX_OFFSET,
++					       16, 1, mcu->buf, MANGMI_MCU_PKT_LEN,
++					       false);
++			}
++			mcu->rx_packets++;
++			mangmi_mcu_report_packet(mcu, mcu->buf);
++			mcu->buf_pos = 0;
++		}
++	}
++
++	return count;
++}
++
++static const struct serdev_device_ops mangmi_mcu_serdev_ops = {
++	.receive_buf = mangmi_mcu_receive_buf,
++	.write_wakeup = serdev_device_write_wakeup,
++};
++
++static void mangmi_mcu_setup_input(struct input_dev *input)
++{
++	input_set_abs_params(input, ABS_X, -32768, 32767, 0, 0);
++	input_set_abs_params(input, ABS_Y, -32768, 32767, 0, 0);
++	input_set_abs_params(input, ABS_Z, -32768, 32767, 0, 0);
++	input_set_abs_params(input, ABS_RZ, -32768, 32767, 0, 0);
++	input_set_abs_params(input, ABS_BRAKE, 0, 255, 0, 0);
++	input_set_abs_params(input, ABS_GAS, 0, 255, 0, 0);
++	input_set_abs_params(input, ABS_HAT0X, -1, 1, 0, 0);
++	input_set_abs_params(input, ABS_HAT0Y, -1, 1, 0, 0);
++
++	input_set_capability(input, EV_KEY, BTN_A);
++	input_set_capability(input, EV_KEY, BTN_B);
++	input_set_capability(input, EV_KEY, BTN_X);
++	input_set_capability(input, EV_KEY, BTN_Y);
++	input_set_capability(input, EV_KEY, BTN_TL);
++	input_set_capability(input, EV_KEY, BTN_TR);
++	input_set_capability(input, EV_KEY, BTN_MODE);
++	input_set_capability(input, EV_KEY, BTN_START);
++	input_set_capability(input, EV_KEY, BTN_SELECT);
++	input_set_capability(input, EV_KEY, BTN_THUMBL);
++	input_set_capability(input, EV_KEY, BTN_THUMBR);
++	input_set_capability(input, EV_KEY, KEY_BACK);
++}
++
++static int mangmi_mcu_probe(struct serdev_device *serdev)
++{
++	struct device *dev = &serdev->dev;
++	struct mangmi_mcu *mcu;
++	unsigned int baud = 115200;
++	int ret;
++
++	mcu = devm_kzalloc(dev, sizeof(*mcu), GFP_KERNEL);
++	if (!mcu)
++		return -ENOMEM;
++
++	mcu->dev = dev;
++	mcu->serdev = serdev;
++
++	device_property_read_u32(dev, "current-speed", &baud);
++	mcu->baud = baud;
++
++	ret = mangmi_mcu_setup_gpios(mcu);
++	if (ret)
++		return ret;
++
++	mcu->input = devm_input_allocate_device(dev);
++	if (!mcu->input)
++		return -ENOMEM;
++
++	mcu->input->name = "Mangmi Air X joystick MCU";
++	mcu->input->phys = "serdev";
++	mcu->input->id.bustype = BUS_RS232;
++	mangmi_mcu_setup_input(mcu->input);
++	input_set_drvdata(mcu->input, mcu);
++
++	ret = input_register_device(mcu->input);
++	if (ret)
++		return ret;
++
++	serdev_device_set_drvdata(serdev, mcu);
++	serdev_device_set_client_ops(serdev, &mangmi_mcu_serdev_ops);
++
++	ret = devm_serdev_device_open(dev, serdev);
++	if (ret)
++		return ret;
++
++	ret = serdev_device_set_parity(serdev, SERDEV_PARITY_NONE);
++	if (ret)
++		return ret;
++
++	serdev_device_set_flow_control(serdev, false);
++	serdev_device_set_baudrate(serdev, baud);
++
++	return 0;
++}
++
++static const struct of_device_id mangmi_mcu_of_match[] = {
++	{ .compatible = "mangmi,joystick-mcu" },
++	{},
++};
++MODULE_DEVICE_TABLE(of, mangmi_mcu_of_match);
++
++static struct serdev_device_driver mangmi_mcu_driver = {
++	.driver = {
++		.name = "mangmi-joystick-mcu",
++		.of_match_table = mangmi_mcu_of_match,
++	},
++	.probe = mangmi_mcu_probe,
++};
++module_serdev_device_driver(mangmi_mcu_driver);
++
++MODULE_AUTHOR("REG-Linux");
++MODULE_DESCRIPTION("Mangmi Air X joystick MCU serdev driver");
++MODULE_LICENSE("GPL");

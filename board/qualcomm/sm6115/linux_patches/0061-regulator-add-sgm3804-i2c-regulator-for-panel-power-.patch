@@ -4,6 +4,11 @@ Date: Sat, 5 Jul 2025 23:02:03 +0200
 Subject: [PATCH] regulator: add sgm3804 i2c regulator for panel power
  management.
 
+
+Add sgm3804 regulator support used for panel power.
+
+Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
+
 ---
  drivers/regulator/Kconfig             |   6 +
  drivers/regulator/Makefile            |   1 +
