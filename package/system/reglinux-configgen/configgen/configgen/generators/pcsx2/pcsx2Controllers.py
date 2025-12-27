@@ -54,4 +54,4 @@ def input2wheel(input: Any, reversedAxis: bool = False) -> str:
         if reversedAxis:
             dir = "+"
         return f"{dir}Axis{int(input.id) + pcsx2_magic_axis_offset}"
-    return "Unknown"  # Valor padrão para outros tipos de entrada
+    return "Unknown"  # Default value for other input types

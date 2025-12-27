@@ -5,6 +5,7 @@ from os import makedirs, path, remove
 from typing import Any
 from xml.etree.ElementTree import parse
 
+from configgen.bezel.libretro_bezel_manager import writeBezelConfig
 from configgen.controllers import (
     getDevicesInformation,
     getGamesMetaData,
@@ -20,7 +21,6 @@ from configgen.systemFiles import (
 from configgen.utils.logger import get_logger
 from configgen.utils.videoMode import getAltDecoration, supportSystemRotation
 
-from ...bezel.libretro_bezel_manager import writeBezelConfig
 from .libretroMAMEConfig import generateMAMEConfigs
 from .libretroOptions import generateCoreSettings, generateHatariConf
 
@@ -303,7 +303,7 @@ def createLibretroConfig(
     if system.config["core"] in ["mame", "same_cdi"]:
         generateMAMEConfigs(controllers, system, rom, guns)
 
-    retroarchConfig: dict = dict()
+    retroarchConfig: dict = {}
     systemConfig = system.config
     renderConfig = system.renderconfig
     systemCore = system.config["core"]
@@ -518,10 +518,9 @@ def createLibretroConfig(
             retroarchConfig["input_libretro_device_p1"] = "517"  # CD 32 Pad
 
     ## BlueMSX choices by System
-    if system.name in systemToBluemsx:
-        if system.config["core"] == "bluemsx":
-            retroarchConfig["input_libretro_device_p1"] = systemToP1Device[system.name]
-            retroarchConfig["input_libretro_device_p2"] = systemToP2Device[system.name]
+    if system.name in systemToBluemsx and system.config["core"] == "bluemsx":
+        retroarchConfig["input_libretro_device_p1"] = systemToP1Device[system.name]
+        retroarchConfig["input_libretro_device_p2"] = systemToP2Device[system.name]
 
     ## SNES9x and SNES9x_next (2010) controller
     if system.config["core"] == "snes9x" or system.config["core"] == "snes9x_next":
@@ -612,22 +611,18 @@ def createLibretroConfig(
             deviceInfos = getDevicesInformation()
             nplayer = 1
             for _, pad in sorted(controllers.items()):
-                if pad.dev in deviceInfos:
-                    if deviceInfos[pad.dev]["isWheel"]:
-                        retroarchConfig[
-                            "input_player" + str(nplayer) + "_analog_dpad_mode"
-                        ] = "1"
-                        if (
-                            "wheel_type" in metadata
-                            and metadata["wheel_type"] == "negcon"
-                        ):
-                            retroarchConfig[
-                                "input_libretro_device_p" + str(nplayer)
-                            ] = 773  # Negcon
-                        else:
-                            retroarchConfig[
-                                "input_libretro_device_p" + str(nplayer)
-                            ] = 517  # DualShock Controller
+                if pad.dev in deviceInfos and deviceInfos[pad.dev]["isWheel"]:
+                    retroarchConfig[
+                        "input_player" + str(nplayer) + "_analog_dpad_mode"
+                    ] = "1"
+                    if "wheel_type" in metadata and metadata["wheel_type"] == "negcon":
+                        retroarchConfig["input_libretro_device_p" + str(nplayer)] = (
+                            773  # Negcon
+                        )
+                    else:
+                        retroarchConfig["input_libretro_device_p" + str(nplayer)] = (
+                            517  # DualShock Controller
+                        )
                 nplayer += 1
 
     ## Sega Dreamcast controller
@@ -769,9 +764,13 @@ def createLibretroConfig(
             retroarchConfig["input_libretro_device_p2"] = "1"  # Saturn pad
 
     # wheel
-    if system.config["core"] == "beetle-saturn" and system.name == "saturn":
-        if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
-            retroarchConfig["input_libretro_device_p1"] = "517"  # Arcade Racer
+    if (
+        system.config["core"] == "beetle-saturn"
+        and system.name == "saturn"
+        and system.isOptSet("use_wheels")
+        and system.getOptBoolean("use_wheels")
+    ):
+        retroarchConfig["input_libretro_device_p1"] = "517"  # Arcade Racer
 
     ## NEC PCEngine controller
     if system.config["core"] == "pce" or system.config["core"] == "pce_fast":
@@ -869,10 +868,7 @@ def createLibretroConfig(
         # Otherwise, set to portrait for games listed as 90 degrees, manual (default) if not.
         if not system.isOptSet("wswan_rotate_display"):
             wswanGameRotation = getAltDecoration(system.name, rom, "true")
-            if wswanGameRotation == "90":
-                wswanOrientation = "portrait"
-            else:
-                wswanOrientation = "manual"
+            wswanOrientation = "portrait" if wswanGameRotation == "90" else "manual"
         else:
             wswanOrientation = system.config["wswan_rotate_display"]
         retroarchConfig["wswan_rotate_display"] = wswanOrientation
@@ -1037,14 +1033,15 @@ def createLibretroConfig(
     retroarchConfig["run_ahead_enabled"] = "false"
     retroarchConfig["run_ahead_frames"] = "0"
     retroarchConfig["run_ahead_secondary_instance"] = "false"
-    if system.isOptSet("runahead") and int(system.config["runahead"]) > 0:
-        if system.name not in systemNoRunahead:
-            retroarchConfig["run_ahead_enabled"] = "true"
-            retroarchConfig["run_ahead_frames"] = system.config["runahead"]
-            if system.isOptSet("secondinstance") and system.getOptBoolean(
-                "secondinstance"
-            ):
-                retroarchConfig["run_ahead_secondary_instance"] = "true"
+    if (
+        system.isOptSet("runahead")
+        and int(system.config["runahead"]) > 0
+        and system.name not in systemNoRunahead
+    ):
+        retroarchConfig["run_ahead_enabled"] = "true"
+        retroarchConfig["run_ahead_frames"] = system.config["runahead"]
+        if system.isOptSet("secondinstance") and system.getOptBoolean("secondinstance"):
+            retroarchConfig["run_ahead_secondary_instance"] = "true"
 
     # Auto frame delay (input delay reduction via frame timing)
     if system.isOptSet("video_frame_delay_auto") and system.getOptBoolean(

@@ -16,10 +16,7 @@ class ShGenerator(Generator):
     ):
         # in case of squashfs, the root directory is passed
         shInDir = glob(rom + "/run.sh")
-        if len(shInDir) == 1:
-            shrom = shInDir[0]
-        else:
-            shrom = rom
+        shrom = shInDir[0] if len(shInDir) == 1 else rom
 
         command_array = [SH_BIN_PATH, shrom]
 

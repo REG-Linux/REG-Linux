@@ -81,7 +81,7 @@ def setPPSSPPConfig(system: Any) -> None:
 
     # Frameskip
     ppssppConfig.set("Graphics", "FrameSkipType", "0")  # Use number and not percent
-    if system.isOptSet("frameskip") and not system.config["frameskip"] == "automatic":
+    if system.isOptSet("frameskip") and system.config["frameskip"] != "automatic":
         ppssppConfig.set("Graphics", "FrameSkip", str(system.config["frameskip"]))
     elif system.isOptSet("rendering_mode") and not system.getOptBoolean(
         "rendering_mode"

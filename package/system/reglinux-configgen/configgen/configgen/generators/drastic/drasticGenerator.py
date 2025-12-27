@@ -23,10 +23,9 @@ class DrasticGenerator(Generator):
         if not path.exists(DRASTIC_CONFIG_DIR_USER):
             copytree(DRASTIC_CONFIG_DIR, DRASTIC_CONFIG_DIR_USER)
 
-        drasticConfig = open(DRASTIC_CONFIG_PATH, "w", encoding="ascii")
-        setDrasticConfig(drasticConfig, system)
-        setDrasticController(drasticConfig)
-        drasticConfig.close()
+        with open(DRASTIC_CONFIG_PATH, "w", encoding="ascii") as drasticConfig:
+            setDrasticConfig(drasticConfig, system)
+            setDrasticController(drasticConfig)
 
         chdir(DRASTIC_CONFIG_DIR_USER)
         command_array = [DRASTIC_BIN_PATH, rom]

@@ -98,13 +98,13 @@ def writeBezelConfig(
         else:
             bz_infos_temp = BezelUtils.get_bezel_infos(rom, bezel, system.name, "mame")
 
-        # Verificação explícita para garantir que bz_infos não é None
+        # Explicit check to ensure bz_infos is not None
         if bz_infos_temp is None:
             return
 
         bz_infos = bz_infos_temp
 
-        # Atribuição segura com checagem de tipo e conversão explícita
+        # Safe assignment with type checking and explicit conversion
         overlay_info_file_raw = bz_infos.get("info", "")
         overlay_info_file = (
             str(overlay_info_file_raw) if overlay_info_file_raw is not None else ""

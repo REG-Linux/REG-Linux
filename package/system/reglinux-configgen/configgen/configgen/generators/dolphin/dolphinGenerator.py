@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from contextlib import suppress
 from os import environ, makedirs, path
 from subprocess import CalledProcessError, check_output
 from typing import Any
@@ -592,10 +593,8 @@ class DolphinGenerator(Generator):
             RacConfig.write(rac_configfile)
 
         # Update SYSCONF
-        try:
+        with suppress(Exception):
             updateConfig(system.config, DOLPHIN_SYSCONF_PATH, game_resolution)
-        except Exception:
-            pass  # don't fail in case of SYSCONF update
 
         # Check what version we've got
         if path.isfile(DOLPHIN_BIN_PATH):
@@ -625,10 +624,8 @@ class DolphinGenerator(Generator):
         else:
             wii_tv_mode = 0
 
-        try:
+        with suppress(ValueError, TypeError, AttributeError):
             wii_tv_mode = getRatioFromConfig(config, game_resolution)
-        except (ValueError, TypeError, AttributeError):
-            pass
 
         # Auto
         if dolphin_aspect_ratio == "0":

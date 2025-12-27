@@ -105,12 +105,11 @@ def generateMAMEConfigs(
 
         # Determine MESS system name (if needed)
         messDataFile = "/usr/share/reglinux/configgen/data/mame/messSystems.csv"
-        openFile = open(messDataFile, "r")
-        messSystems = []
-        messSysName = []
-        messRomType = []
-        messAutoRun = []
-        with openFile:
+        with open(messDataFile, "r") as openFile:
+            messSystems = []
+            messSysName = []
+            messRomType = []
+            messAutoRun = []
             messDataList = reader(openFile, delimiter=";", quotechar="'")
             for row in messDataList:
                 messSystems.append(row[0])
@@ -162,13 +161,13 @@ def generateMAMEConfigs(
                 commandLine += ["-mem", laser310mem]
 
             # BBC Joystick
-            if system.name == "bbc":
-                if (
-                    system.isOptSet("sticktype")
-                    and system.config["sticktype"] != "none"
-                ):
-                    commandLine += ["-analogue", system.config["sticktype"]]
-                    specialController = system.config["sticktype"]
+            if (
+                system.name == "bbc"
+                and system.isOptSet("sticktype")
+                and system.config["sticktype"] != "none"
+            ):
+                commandLine += ["-analogue", system.config["sticktype"]]
+                specialController = system.config["sticktype"]
 
             # Apple II
             if system.name == "apple2":
@@ -185,28 +184,31 @@ def generateMAMEConfigs(
                 commandLine += ["-ramsize", str(system.config["ramsize"]) + "M"]
 
             # Mac RAM & Image Reader (if applicable)
-            if system.name == "macintosh":
-                if system.isOptSet("ramsize"):
-                    ramSize = int(system.config["ramsize"])
-                    if messModel in ["maciix", "maclc3"]:
-                        if messModel == "maclc3" and ramSize == 2:
-                            ramSize = 4
-                        if messModel == "maclc3" and ramSize > 80:
-                            ramSize = 80
-                        if messModel == "maciix" and ramSize == 16:
-                            ramSize = 32
-                        if messModel == "maciix" and ramSize == 48:
-                            ramSize = 64
-                        commandLine += ["-ramsize", str(ramSize) + "M"]
+            if (
+                system.name == "macintosh"
+                and system.isOptSet("ramsize")
+                and messModel in ["maciix", "maclc3"]
+            ):
+                ramSize = int(system.config["ramsize"])
+                if messModel in ["maciix", "maclc3"]:
+                    if messModel == "maclc3" and ramSize == 2:
+                        ramSize = 4
+                    if messModel == "maclc3" and ramSize > 80:
+                        ramSize = 80
+                    if messModel == "maciix" and ramSize == 16:
+                        ramSize = 32
+                    if messModel == "maciix" and ramSize == 48:
+                        ramSize = 64
+                    commandLine += ["-ramsize", str(ramSize) + "M"]
                     if messModel == "maciix":
                         imageSlot = "nba"
-                        if system.isOptSet("imagereader"):
-                            if system.config["imagereader"] == "disabled":
-                                imageSlot = ""
-                            else:
-                                imageSlot = system.config["imagereader"]
-                        if imageSlot != "":
-                            commandLine += ["-" + imageSlot, "image"]
+                    if system.isOptSet("imagereader"):
+                        if system.config["imagereader"] == "disabled":
+                            imageSlot = ""
+                        else:
+                            imageSlot = system.config["imagereader"]
+                    if imageSlot != "":
+                        commandLine += ["-" + imageSlot, "image"]
 
             if softList != "":
                 # Software list ROM commands
@@ -318,31 +320,32 @@ def generateMAMEConfigs(
 
                 # Create & add a blank disk if needed, insert into drive 2
                 # or drive 1 if drive 2 is selected manually or FM Towns Marty.
-                if system.isOptSet("addblankdisk") and system.getOptBoolean(
-                    "addblankdisk"
+                if (
+                    system.isOptSet("addblankdisk")
+                    and system.getOptBoolean("addblankdisk")
+                    and system.name == "fmtowns"
                 ):
-                    if system.name == "fmtowns":
-                        blankDisk = "/usr/share/mame/blank.fmtowns"
-                        targetFolder = f"/userdata/saves/mame/{system.name}"
-                        targetDisk = (
-                            f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
-                        )
-                        # Add elif statements here for other systems if enabled
-                        if not path.exists(targetFolder):
-                            makedirs(targetFolder)
-                        if not path.exists(targetDisk):
-                            copy2(blankDisk, targetDisk)
+                    blankDisk = "/usr/share/mame/blank.fmtowns"
+                    targetFolder = f"/userdata/saves/mame/{system.name}"
+                    targetDisk = (
+                        f"{targetFolder}/{path.splitext(romBasename)[0]}.fmtowns"
+                    )
+                    # Add elif statements here for other systems if enabled
+                    if not path.exists(targetFolder):
+                        makedirs(targetFolder)
+                    if not path.exists(targetDisk):
+                        copy2(blankDisk, targetDisk)
 
-                        # Add other single floppy systems to this if statement
-                        if messModel == "fmtmarty":
-                            commandLine += ["-flop", targetDisk]
-                        elif (
-                            system.isOptSet("altromtype")
-                            and system.config["altromtype"] == "flop2"
-                        ):
-                            commandLine += ["-flop1", targetDisk]
-                        else:
-                            commandLine += ["-flop2", targetDisk]
+                    # Add other single floppy systems to this if statement
+                    if messModel == "fmtmarty":
+                        commandLine += ["-flop", targetDisk]
+                    elif (
+                        system.isOptSet("altromtype")
+                        and system.config["altromtype"] == "flop2"
+                    ):
+                        commandLine += ["-flop1", targetDisk]
+                    else:
+                        commandLine += ["-flop2", targetDisk]
 
             # UI enable - for computer systems, the default sends all keys to the emulated system.
             # This will enable hotkeys, but some keys may pass through to MAME and not be usable in the emulated system.
@@ -390,14 +393,19 @@ def generateMAMEConfigs(
                     autoRunCmd = "*cat\\n\\n\\n\\n*exec !boot\\n"
                     autoRunDelay = 3
             # fm7 boots floppies, needs cassette loading
-            elif system.name == "fm7":
-                if system.isOptSet("altromtype") or softList != "":
-                    if (
+            elif (
+                system.name == "fm7"
+                and (system.isOptSet("altromtype") or softList != "")
+                and (
+                    (
                         system.isOptSet("altromtype")
                         and system.config["altromtype"] == "cass"
-                    ) or softList[-4:] == "cass":
-                        autoRunCmd = "LOADM”“,,R\\n"
-                        autoRunDelay = 5
+                    )
+                    or softList[-4:] == "cass"
+                )
+            ):
+                autoRunCmd = "LOADM”“,,R\\n"
+                autoRunDelay = 5
             elif system.name == "coco":
                 romType = "cart"
                 autoRunDelay = 2
@@ -408,11 +416,13 @@ def generateMAMEConfigs(
                     if path.exists(softListFile):
                         softwarelist = ET.parse(softListFile)
                         for software in softwarelist.findall("software"):
-                            if software.attrib != {}:
-                                if software.get("name") == romDrivername:
-                                    for info in software.iter("info"):
-                                        if info.get("name") == "usage":
-                                            autoRunCmd = info.get("value")
+                            if (
+                                software.attrib != {}
+                                and software.get("name") == romDrivername
+                            ):
+                                for info in software.iter("info"):
+                                    if info.get("name") == "usage":
+                                        autoRunCmd = info.get("value")
 
                 # if still undefined, default autoRunCmd based on media type
                 if autoRunCmd == "":
@@ -448,13 +458,15 @@ def generateMAMEConfigs(
                     f"system/configs/mame/autoload/{system.name}_{romType}_autoload.csv"
                 )
                 if path.exists(autoRunFile):
-                    openARFile = open(autoRunFile, "r")
-                    with openARFile:
+                    with open(autoRunFile, "r") as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
-                            if row and not row[0].startswith("#"):
-                                if row[0].casefold() == romDrivername.casefold():
-                                    autoRunCmd = row[1] + "\\n"
+                            if (
+                                row
+                                and not row[0].startswith("#")
+                                and row[0].casefold() == romDrivername.casefold()
+                            ):
+                                autoRunCmd = row[1] + "\\n"
             else:
                 # Check for an override file, otherwise use generic (if it exists)
                 autoRunCmd = messAutoRun[messMode]
@@ -464,8 +476,7 @@ def generateMAMEConfigs(
                     + "_autoload.csv"
                 )
                 if path.exists(autoRunFile):
-                    openARFile = open(autoRunFile, "r")
-                    with openARFile:
+                    with open(autoRunFile, "r") as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if (
@@ -478,10 +489,9 @@ def generateMAMEConfigs(
             if autoRunCmd is not None:
                 if autoRunCmd.startswith("'"):
                     autoRunCmd.replace("'", "")
-                iniFile = open("/userdata/saves/mame/mame/ini/batocera.ini", "w")
-                iniFile.write("autoboot_command          " + autoRunCmd + "\n")
-                iniFile.write("autoboot_delay            " + str(autoRunDelay))
-                iniFile.close()
+                with open("/userdata/saves/mame/mame/ini/batocera.ini", "w") as iniFile:
+                    iniFile.write("autoboot_command          " + autoRunCmd + "\n")
+                    iniFile.write("autoboot_delay            " + str(autoRunDelay))
             # Create & add a blank disk if needed, insert into drive 2
             # or drive 1 if drive 2 is selected manually.
             if system.isOptSet("addblankdisk") and system.getOptBoolean("addblankdisk"):
@@ -520,7 +530,7 @@ def generateMAMEConfigs(
             artPath = "/var/run/mame_artwork/;/usr/bin/mame/artwork/;/userdata/bios/lr-mame/artwork/;/userdata/bios/mame/artwork/;/userdata/decorations/"
         else:
             artPath = "/var/run/mame_artwork/;/usr/bin/mame/artwork/;/userdata/bios/lr-mame/artwork/"
-        if not system.name == "ti99":
+        if system.name != "ti99":
             commandLine += ["-artpath", artPath]
 
     # Artwork crop - default to On for lr-mame
@@ -533,7 +543,7 @@ def generateMAMEConfigs(
             commandLine += ["-artwork_crop"]
 
     # Share plugins & samples with standalone MAME (except TI99)
-    if not system.name == "ti99":
+    if system.name != "ti99":
         commandLine += [
             "-pluginspath",
             "/usr/bin/mame/plugins/;/userdata/saves/mame/plugins",
@@ -556,9 +566,8 @@ def generateMAMEConfigs(
 
     # Write command line file
     cmdFilename = f"{cmdPath}{romDrivername}.cmd"
-    cmdFile = open(cmdFilename, "w")
-    cmdFile.write(" ".join(commandLine))
-    cmdFile.close()
+    with open(cmdFilename, "w") as cmdFile:
+        cmdFile.write(" ".join(commandLine))
 
     # Call Controller Config
     if messMode == -1:
@@ -728,19 +737,15 @@ def generateMAMEPadConfig(
     else:
         customCfg = False
     # Don't overwrite if using custom configs
-    if path.exists(configFile) and customCfg:
-        overwriteMAME = False
-    else:
-        overwriteMAME = True
+    overwriteMAME = not (path.exists(configFile) and customCfg)
 
     # Get controller scheme
     altButtons = getMameControlScheme(system, romBasename)
 
     # Load standard controls from csv
     controlFile = "/usr/share/reglinux/configgen/data/mame/mameControls.csv"
-    openFile = open(controlFile, "r")
-    controlDict = {}
-    with openFile:
+    with open(controlFile, "r") as openFile:
+        controlDict = {}
         controlList = reader(openFile)
         for row in controlList:
             if row[0] not in controlDict:
@@ -749,12 +754,12 @@ def generateMAMEPadConfig(
 
     # Common controls
     mappings = {}
-    for controlDef in controlDict["default"].keys():
+    for controlDef in controlDict["default"]:
         mappings[controlDef] = controlDict["default"][controlDef]
 
     # Buttons that change based on game/setting
     if altButtons in controlDict:
-        for controlDef in controlDict[altButtons].keys():
+        for controlDef in controlDict[altButtons]:
             mappings.update({controlDef: controlDict[altButtons][controlDef]})
 
     xml_mameconfig = getRoot(config, "mameconfig")
@@ -818,8 +823,7 @@ def generateMAMEPadConfig(
     if messSysName in specialControlList:
         # Load mess controls from csv
         messControlFile = "/usr/share/reglinux/configgen/data/mame/messControls.csv"
-        openMessFile = open(messControlFile, "r")
-        with openMessFile:
+        with open(messControlFile, "r") as openMessFile:
             controlList = reader(openMessFile, delimiter=";")
             for row in controlList:
                 if row[0] not in messControlDict:
@@ -1057,7 +1061,7 @@ def generateMAMEPadConfig(
 
         # Handle special controls only if we're using a system that needs them
         if useControls in messControlDict and messSysName in specialControlList:
-            for controlDef in messControlDict[useControls].keys():
+            for controlDef in messControlDict[useControls]:
                 thisControl = messControlDict[useControls][controlDef]
                 if nplayer == thisControl["player"]:
                     if thisControl["type"] == "special":
@@ -1135,21 +1139,19 @@ def generateMAMEPadConfig(
     # mameXml = open(configFile, "w")
     # TODO: python 3 - workawround to encode files in utf-8
     if overwriteMAME:
-        mameXml = open(configFile, "w", encoding="utf-8")
-        dom_string = linesep.join(
-            [s for s in config.toprettyxml().splitlines() if s.strip()]
-        )  # remove ugly empty lines while minicom adds them...
-        mameXml.write(dom_string)
-        mameXml.close()
+        with open(configFile, "w", encoding="utf-8") as mameXml:
+            dom_string = linesep.join(
+                [s for s in config.toprettyxml().splitlines() if s.strip()]
+            )  # remove ugly empty lines while minicom adds them...
+            mameXml.write(dom_string)
 
     # Write alt config (if used, custom config is turned off or file doesn't exist yet)
     if messSysName in specialControlList and overwriteSystem:
-        mameXml_alt = open(configFile_alt, "w", encoding="utf-8")
-        dom_string_alt = linesep.join(
-            [s for s in config_alt.toprettyxml().splitlines() if s.strip()]
-        )  # remove ugly empty lines while minicom adds them...
-        mameXml_alt.write(dom_string_alt)
-        mameXml_alt.close()
+        with open(configFile_alt, "w", encoding="utf-8") as mameXml_alt:
+            dom_string_alt = linesep.join(
+                [s for s in config_alt.toprettyxml().splitlines() if s.strip()]
+            )  # remove ugly empty lines while minicom adds them...
+            mameXml_alt.write(dom_string_alt)
 
 
 def reverseMapping(key: str) -> str:

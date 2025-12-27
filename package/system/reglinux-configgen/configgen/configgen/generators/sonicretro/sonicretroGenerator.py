@@ -12,10 +12,7 @@ class SonicRetroGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Determine the emulator to use
-        if (rom.lower()).endswith("son"):
-            emu = "sonic2013"
-        else:
-            emu = "soniccd"
+        emu = "sonic2013" if (rom.lower()).endswith("son") else "soniccd"
 
         setSonicretroConfig(system, emu, rom)
 

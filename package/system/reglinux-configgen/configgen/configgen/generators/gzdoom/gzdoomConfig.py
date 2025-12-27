@@ -17,17 +17,14 @@ eslog = get_logger(__name__)
 
 
 def setGzdoomConfig(system: Any, rom: str) -> None:
-    if system.isOptSet("gz_api"):
-        gzdoom_api = system.config["gz_api"]
-    else:
-        gzdoom_api = "0"
+    gzdoom_api = system.config["gz_api"] if system.isOptSet("gz_api") else "0"
 
     # RPi4 workaround which has both ligl & libgles
     # For arm systems, we want to force OpenGL ES - 3
     if gzdoom_api == "0":
         with open(GZDOOM_ARCH_PATH) as file:
             content = file.read().strip()
-            if not content == "x86_64":
+            if content != "x86_64":
                 gzdoom_api = "3"
 
     # now set the config

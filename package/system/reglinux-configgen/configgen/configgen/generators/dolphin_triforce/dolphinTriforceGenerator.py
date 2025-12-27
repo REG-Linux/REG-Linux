@@ -324,10 +324,10 @@ class DolphinTriforceGenerator(Generator):
         if not os.path.exists(
             dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini"
         ):
-            dolphinTriforceGameSettingsGFZE01 = open(
+            with open(
                 dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini", "w"
-            )
-            dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
+            ) as dolphinTriforceGameSettingsGFZE01:
+                dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
 $AX
 06003F30 00000284
 818D831C 280C0000
@@ -415,17 +415,15 @@ B0030D06 3C6C0009
 [Gecko_Enabled]
 $AX
 """)
-            dolphinTriforceGameSettingsGFZE01.close()
-
-        # GVSJ8P Virtua Striker 2002
+            # GVSJ8P Virtua Striker 2002
 
         if not os.path.exists(
             dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini"
         ):
-            dolphinTriforceGameSettingsGVSJ8P = open(
+            with open(
                 dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini", "w"
-            )
-            dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
+            ) as dolphinTriforceGameSettingsGVSJ8P:
+                dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
 $DI Seed Blanker
 0x80000000:dword:0x00000000
 0x80000004:dword:0x00000000
@@ -433,17 +431,16 @@ $DI Seed Blanker
 [OnFrame_Enabled]
 $DI Seed Blanker
 """)
-            dolphinTriforceGameSettingsGVSJ8P.close()
 
         # GGPE01 Mario Kart GP 1
 
         if not os.path.exists(
             dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"
         ):
-            dolphinTriforceGameSettingsGGPE01 = open(
+            with open(
                 dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", "w"
-            )
-            dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
+            ) as dolphinTriforceGameSettingsGGPE01:
+                dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
 $Disable crypto
 0x8023D828:dword:0x93A30008
 0x8023D82C:dword:0x93C3000C
@@ -463,17 +460,16 @@ $Loop fix
 [EmuState]
 EmulationIssues = AM-Baseboard
 """)
-            dolphinTriforceGameSettingsGGPE01.close()
 
         # GGPE02 Mario Kart GP 2
 
         if not os.path.exists(
             dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini"
         ):
-            dolphinTriforceGameSettingsGGPE02 = open(
+            with open(
                 dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini", "w"
-            )
-            dolphinTriforceGameSettingsGGPE02.write("""[Display]
+            ) as dolphinTriforceGameSettingsGGPE02:
+                dolphinTriforceGameSettingsGGPE02.write("""[Display]
 ProgressiveScan = 0
 [Wii]
 Widescreen = False
@@ -526,7 +522,6 @@ $GameTestMode Patch
 $SeatLoopPatch
 99 credits
 """)
-            dolphinTriforceGameSettingsGGPE02.close()
 
         # # Cheats aren't in key = value format, so the allow_no_value option is needed.
         # dolphinTriforceGameSettingsGGPE01 = configparser.ConfigParser(interpolation=None, allow_no_value=True,delimiters=';')
@@ -580,16 +575,15 @@ $SeatLoopPatch
     def get_in_game_ratio(
         self, config: Any, game_resolution: dict[str, int], rom: str
     ) -> float:
-        if "dolphin_aspect_ratio" in config:
-            if (
-                config["dolphin_aspect_ratio"] == "1"
-                or config["dolphin_aspect_ratio"] == "3"
-                and (
-                    game_resolution["width"] / float(game_resolution["height"])
-                    > ((16.0 / 9.0) - 0.1)
-                )
-            ):
-                return 16 / 9
+        if "dolphin_aspect_ratio" in config and (
+            config["dolphin_aspect_ratio"] == "1"
+            or config["dolphin_aspect_ratio"] == "3"
+            and (
+                game_resolution["width"] / float(game_resolution["height"])
+                > ((16.0 / 9.0) - 0.1)
+            )
+        ):
+            return 16 / 9
         return 4 / 3
 
 

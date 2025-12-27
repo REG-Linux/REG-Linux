@@ -263,7 +263,6 @@ def generateControllerConfig_emulatedwiimotes(
     generateControllerConfig_any(
         system,
         playersControllers,
-        wheels,
         "WiimoteNew.ini",
         "Wiimote",
         wiiMapping,
@@ -807,7 +806,6 @@ def generateHotkeys(playersControllers: Any) -> None:
                             pad.nbaxes,
                             False,
                             hotkey.id,
-                            None,
                         )
 
                         # else:

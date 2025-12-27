@@ -212,7 +212,7 @@ def configPadsIni(
             }
         return templateFile, mapping
 
-    # Chamada da função interna
+    # Call to the internal function
     templateFile, mapping = get_template_and_mapping(altControl)
 
     def apply_guns_to_section(
@@ -582,7 +582,7 @@ def input2input(
         pad = players_controllers[(player)]
         if button in pad.inputs:
             input = pad.inputs[button]
-            if joynum is not None:  # Apenas prossegue se joynum não for None
+            if joynum is not None:  # Only proceeds if joynum is not None
                 if input.type == "button":
                     return f"JOY{joynum + 1}_BUTTON{int(input.id) + 1}"
                 if input.type == "hat":
