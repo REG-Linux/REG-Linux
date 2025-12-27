@@ -209,6 +209,9 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	select BR2_PACKAGE_LUA
 	select BR2_PACKAGE_LUA_5_4
 
+	# Video player (except CHA, rpi0, mips32, qemu)
+	select BR2_PACKAGE_SWITCHFIN			if !BR2_PACKAGE_SYSTEM_VIRTUAL_TARGET && !BR2_mipsel && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
 	# swap on zram, optional user-enabled service
 	select BR2_PACKAGE_REGLINUX_ZRAMSWAP	# ALL
 
