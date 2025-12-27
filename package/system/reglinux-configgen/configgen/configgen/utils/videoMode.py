@@ -1,5 +1,5 @@
 from csv import reader
-from os import path
+from pathlib import Path
 from subprocess import PIPE, CalledProcessError, run
 from time import sleep
 
@@ -55,7 +55,7 @@ def getScreens() -> list[str]:
 def getCurrentResolution(name: str | None = None) -> dict[str, int]:
     drm_mode_path = "/var/run/drmMode"
 
-    if path.exists(drm_mode_path):
+    if Path(drm_mode_path).exists():
         try:
             with open(drm_mode_path) as f:
                 content = f.read().strip()
@@ -173,7 +173,7 @@ def getGLVendor() -> str:
 
 def _get_eglinfo_lines() -> list[str]:
     eglinfo_path = "/usr/bin/eglinfo"
-    if not path.exists(eglinfo_path):
+    if not Path(eglinfo_path).exists():
         return []
 
     try:
@@ -206,10 +206,10 @@ def getAltDecoration(systemName: str, rom: str, emulator: str) -> str:
         return "0"
 
     specialFile = f"/usr/share/reglinux/configgen/data/special/{systemName}.csv"
-    if not path.exists(specialFile):
+    if not Path(specialFile).exists():
         return "0"
 
-    romName = path.splitext(path.basename(rom))[0].casefold()
+    romName = Path(rom).stem.casefold()
 
     try:
         with open(specialFile) as openFile:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from os import path
+from pathlib import Path
 
 """Argument parsing helper functions for launching Build Engine source ports Eduke32 and Raze"""
 
@@ -76,10 +76,10 @@ def parse_args(launch_args: list[str], rom_path: str) -> Result:
         # Paths that begin with "/" denote absolute path from emulator roms directory e.g. /userdata/roms/raze
         # These paths are expected to exist on physical filesystem
         # Otherwise, no "/", they are expected to exist on the virtual filesystem
-        val_path = (path.dirname(rom_path) + val) if val.startswith("/") else val
+        val_path = (str(Path(rom_path).parent) + val) if val.startswith("/") else val
         build_arg = build_args[key]
         # We will check physical paths exist to be helpful, but virtual paths... who knows
-        if val_path.startswith("/") and not path.exists(val_path):
+        if val_path.startswith("/") and not Path(val_path).exists():
             errors += [ParseError(i, f"{val_path} does not exist")]
             continue
         # Check obvious duplicates; there is never a reason the user would want to do this

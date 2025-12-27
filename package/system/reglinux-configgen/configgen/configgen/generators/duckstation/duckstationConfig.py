@@ -1,16 +1,17 @@
-from os import environ, path
+from os import environ
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import BIOS, CHEATS, CONF, ROMS, SAVES, SCREENSHOTS
 
-DUCKSTATION_CONFIG_PATH = CONF + "/duckstation/settings.ini"
-DUCKSTATION_SAVES_DIR = SAVES + "/duckstation"
-DUCKSTATION_CHEATS_DIR = CHEATS + "/duckstation"
-DUCKSTATION_MEMORY_CARDS_DIR = SAVES + "/duckstation/memcards"
-DUCKSTATION_ROMS_DIR = ROMS + "/psx"
-DUCKSTATION_CACHE_DIR = "/userdata/system/cache/duckstation"
-DUCKSTATION_BIN_PATH = "/usr/duckstation/DuckStation.AppImage"
-DUCKSTATION_NOGUI_PATH = "/usr/bin/duckstation-nogui"
+DUCKSTATION_CONFIG_PATH = CONF / "duckstation" / "settings.ini"
+DUCKSTATION_SAVES_DIR = SAVES / "duckstation"
+DUCKSTATION_CHEATS_DIR = CHEATS / "duckstation"
+DUCKSTATION_MEMORY_CARDS_DIR = SAVES / "duckstation" / "memcards"
+DUCKSTATION_ROMS_DIR = ROMS / "psx"
+DUCKSTATION_CACHE_DIR = Path("/userdata/system/cache/duckstation")
+DUCKSTATION_BIN_PATH = Path("/usr/duckstation/DuckStation.AppImage")
+DUCKSTATION_NOGUI_PATH = Path("/usr/bin/duckstation-nogui")
 
 
 def setDuckstationConfig(
@@ -111,7 +112,7 @@ def setDuckstationConfig(
     ## [BIOS]
     if not duckstatonConfig.has_section("BIOS"):
         duckstatonConfig.add_section("BIOS")
-    duckstatonConfig.set("BIOS", "SearchDirectory", BIOS)
+    duckstatonConfig.set("BIOS", "SearchDirectory", str(BIOS))
     # Boot Logo
     if system.isOptSet("duckstation_PatchFastBoot"):
         duckstatonConfig.set(
@@ -149,17 +150,17 @@ def setDuckstationConfig(
     biosFound = False
     USbiosFile = EUbiosFile = JPbiosFile = None
     for bio in USbios:
-        if path.exists(BIOS + "/" + bio):
+        if (BIOS / bio).exists():
             USbiosFile = bio
             biosFound = True
             break
     for bio in EUbios:
-        if path.exists(BIOS + "/" + bio):
+        if (BIOS / bio).exists():
             EUbiosFile = bio
             biosFound = True
             break
     for bio in JPbios:
-        if path.exists(BIOS + "/" + bio):
+        if (BIOS / bio).exists():
             JPbiosFile = bio
             biosFound = True
             break
@@ -364,7 +365,7 @@ def setDuckstationConfig(
     ## [GameList]
     if not duckstatonConfig.has_section("GameList"):
         duckstatonConfig.add_section("GameList")
-    duckstatonConfig.set("GameList", "RecursivePaths", DUCKSTATION_ROMS_DIR)
+    duckstatonConfig.set("GameList", "RecursivePaths", str(DUCKSTATION_ROMS_DIR))
 
     ## [Cheevos]
     if not duckstatonConfig.has_section("Cheevos"):
@@ -437,16 +438,16 @@ def setDuckstationConfig(
     if not duckstatonConfig.has_section("MemoryCards"):
         duckstatonConfig.add_section("MemoryCards")
     # Set memory card location
-    duckstatonConfig.set("MemoryCards", "Directory", DUCKSTATION_MEMORY_CARDS_DIR)
+    duckstatonConfig.set("MemoryCards", "Directory", str(DUCKSTATION_MEMORY_CARDS_DIR))
 
     ## [Folders]
     if not duckstatonConfig.has_section("Folders"):
         duckstatonConfig.add_section("Folders")
     # Set other folder locations too
-    duckstatonConfig.set("Folders", "Cache", DUCKSTATION_CACHE_DIR)
-    duckstatonConfig.set("Folders", "Screenshots", SCREENSHOTS)
-    duckstatonConfig.set("Folders", "SaveStates", DUCKSTATION_SAVES_DIR)
-    duckstatonConfig.set("Folders", "Cheats", DUCKSTATION_CHEATS_DIR)
+    duckstatonConfig.set("Folders", "Cache", str(DUCKSTATION_CACHE_DIR))
+    duckstatonConfig.set("Folders", "Screenshots", str(SCREENSHOTS))
+    duckstatonConfig.set("Folders", "SaveStates", str(DUCKSTATION_SAVES_DIR))
+    duckstatonConfig.set("Folders", "Cheats", str(DUCKSTATION_CHEATS_DIR))
 
     ## [CDROM]
     if not duckstatonConfig.has_section("CDROM"):

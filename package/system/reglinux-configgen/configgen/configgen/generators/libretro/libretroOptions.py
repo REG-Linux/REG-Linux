@@ -1,5 +1,6 @@
 from configparser import ConfigParser
-from os import makedirs, path, remove
+from os import remove
+from pathlib import Path
 from typing import Any
 
 from configgen.controllers import getGamesMetaData, gunsNeedCrosses
@@ -3135,7 +3136,7 @@ def configure_px68k(coreSettings: Any, system: Any) -> None:
     keropi_config = "/userdata/bios/keropi/config"
     keropi_sram = "/userdata/bios/keropi/sram.dat"
     for f in [keropi_config, keropi_sram]:
-        if path.exists(f):
+        if Path(f).exists():
             remove(f)
     with open(keropi_config, "w") as fd:
         fd.write("[WinX68k]\n")
@@ -3208,7 +3209,7 @@ def configure_fuse(coreSettings: Any, system: Any) -> None:
 
 
 def configure_fbneo(coreSettings: Any, system: Any, rom: str, guns: Any) -> None:
-    romBase = path.splitext(path.basename(rom))[0]  # filename without extension
+    romBase = Path(rom).stem  # filename without extension
     # Diagnostic input
     coreSettings.save("fbneo-diagnostic-input", '"Start + L + R"')
     # Allow RetroAchievements in hardcore mode with FBNeo
@@ -3249,7 +3250,7 @@ def configure_fbneo(coreSettings: Any, system: Any, rom: str, guns: Any) -> None
     # NEOGEO
     if system.name == "neogeo":
         # Neogeo Mode
-        romBase = path.splitext(path.basename(rom))[0]  # filename without extension
+        romBase = Path(rom).stem  # filename without extension
         if system.isOptSet("fbneo-neogeo-mode-switch"):
             coreSettings.save("fbneo-neogeo-mode", '"DIPSWITCH"')
             if system.config["fbneo-neogeo-mode-switch"] == "MVS Asia/Europe":
@@ -3688,11 +3689,12 @@ def generateHatariConf(hatariConf: str) -> None:
     hatariConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     hatariConfig.optionxform = lambda optionstr: str(optionstr)
-    if path.exists(hatariConf):
+    if Path(hatariConf).exists():
         hatariConfig.read(hatariConf)
 
     # update the configuration file
-    if not path.exists(path.dirname(hatariConf)):
-        makedirs(path.dirname(hatariConf))
+    hatari_conf_dir = Path(hatariConf).parent
+    if not hatari_conf_dir.exists():
+        hatari_conf_dir.mkdir(parents=True, exist_ok=True)
     with open(hatariConf, "w") as configfile:
         hatariConfig.write(configfile)

@@ -1,12 +1,13 @@
-from os import makedirs, path, walk
+from os import walk
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import CONF, ROMS
 
 IOQUAKE3_BIN_DIR = "/usr/ioquake3"
 IOQUAKE3_BIN_PATH = "/userdata/roms/quake3/ioquake3"
-IOQUAKE3_ROMS_DIR = ROMS + "/quake3"
-IOQUAKE3_CONF_DIR = CONF + "/ioquake3"
+IOQUAKE3_ROMS_DIR = str(Path(ROMS) / "quake3")
+IOQUAKE3_CONF_DIR = str(Path(CONF) / "ioquake3")
 
 
 def writeCfgFile(
@@ -17,8 +18,8 @@ def writeCfgFile(
     controls_to_add: list[str],
     gameResolution: dict[str, int],
 ) -> None:
-    if not path.isfile(filename):
-        makedirs(path.dirname(filename), exist_ok=True)
+    if not Path(filename).is_file():
+        Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
         with open(filename, "w") as file:
             file.write(init_line)
@@ -82,8 +83,8 @@ def setIoquake3Config(
 
     # add the corresponding config file paths and add them to the `files` list
     for subdirectory in subdirectories:
-        config_directory = path.join(IOQUAKE3_CONF_DIR, subdirectory)
-        config_file = path.join(config_directory, "q3config.cfg")
+        config_directory = str(Path(IOQUAKE3_CONF_DIR) / subdirectory)
+        config_file = str(Path(config_directory) / "q3config.cfg")
         files.append(config_file)
 
     if gameResolution["width"] < gameResolution["height"]:

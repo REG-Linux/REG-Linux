@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -11,7 +11,7 @@ class Shadps4Generator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        command_array = [SHADPS4_BIN_PATH, path.dirname(rom) + "/eboot.bin"]
+        command_array = [SHADPS4_BIN_PATH, str(Path(rom).parent / "eboot.bin")]
 
         return Command(
             array=command_array,

@@ -7,7 +7,7 @@ from configgen.generators.Generator import Generator
 from configgen.systemFiles import ROMS
 from configgen.utils.logger import get_logger
 
-TYRIAN_ROMS_DIR = ROMS + "tyrian/data"
+TYRIAN_ROMS_DIR = str(ROMS / "tyrian" / "data")
 TYRIAN_BIN_PATH = "/usr/bin/opentyrian"
 
 eslog = get_logger(__name__)

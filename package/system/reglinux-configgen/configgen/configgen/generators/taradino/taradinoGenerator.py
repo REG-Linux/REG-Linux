@@ -3,7 +3,7 @@ from configgen.controllers import generate_sdl_controller_config
 from configgen.generators.Generator import Generator
 from configgen.systemFiles import ROMS
 
-ROTT_ROMS_DIR = ROMS + "/rott"
+ROTT_ROMS_DIR = str(ROMS / "rott")
 ROTT_BIN_PATH = "/usr/bin/taradino"
 
 

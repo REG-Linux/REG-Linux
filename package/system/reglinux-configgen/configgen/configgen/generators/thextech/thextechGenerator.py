@@ -5,7 +5,7 @@ from configgen.controllers import generate_sdl_controller_config
 from configgen.generators.Generator import Generator
 from configgen.systemFiles import SAVES
 
-THEXTECH_SAVES_DIR = SAVES + "/thextech"
+THEXTECH_SAVES_DIR = str(SAVES / "thextech")
 THEXTECH_BIN_PATH = "/usr/bin/thextech"
 
 

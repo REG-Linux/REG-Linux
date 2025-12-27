@@ -2,15 +2,15 @@ from typing import Any
 
 from configgen.systemFiles import CONF
 
-MOONLIGHT_CONFIG_DIR = CONF + "/moonlight"
-MOONLIGHT_CONFIG_PATH = MOONLIGHT_CONFIG_DIR + "/moonlight.conf"
-MOONLIGHT_STAGING_CONFIG_PATH = MOONLIGHT_CONFIG_DIR + "/staging/moonlight.conf"
-MOONLIGHT_GAMELIST_PATH = MOONLIGHT_CONFIG_DIR + "/gamelist.txt"
+MOONLIGHT_CONFIG_DIR = str(CONF / "moonlight")
+MOONLIGHT_CONFIG_PATH = str(CONF / "moonlight" / "moonlight.conf")
+MOONLIGHT_STAGING_CONFIG_PATH = str(CONF / "moonlight" / "staging" / "moonlight.conf")
+MOONLIGHT_GAMELIST_PATH = str(CONF / "moonlight" / "gamelist.txt")
 MOONLIGHT_MAPPING_PATH = {
-    1: MOONLIGHT_CONFIG_DIR + "/mappingP1.conf",
-    2: MOONLIGHT_CONFIG_DIR + "/mappingP2.conf",
-    3: MOONLIGHT_CONFIG_DIR + "/mappingP3.conf",
-    4: MOONLIGHT_CONFIG_DIR + "/mappingP4.conf",
+    1: str(CONF / "moonlight" / "mappingP1.conf"),
+    2: str(CONF / "moonlight" / "mappingP2.conf"),
+    3: str(CONF / "moonlight" / "mappingP3.conf"),
+    4: str(CONF / "moonlight" / "mappingP4.conf"),
 }
 MOONLIGHT_BIN_PATH = "/usr/bin/moonlight"
 

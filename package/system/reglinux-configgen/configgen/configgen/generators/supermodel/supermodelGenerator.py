@@ -1,6 +1,7 @@
 import builtins
 from configparser import ConfigParser
-from os import listdir, makedirs, path, remove, rename
+from os import listdir, rename
+from pathlib import Path
 from re import search
 from shutil import copy2, copyfile
 from typing import Any
@@ -13,9 +14,9 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-SUPERMODEL_CONFIG_DIR = CONF + "/supermodel"
-SUPERMODEL_CONFIG_PATH = SUPERMODEL_CONFIG_DIR + "/Supermodel.ini"
-SUPERMODEL_BIN_PATH = "/usr/bin/supermodel"
+SUPERMODEL_CONFIG_DIR = CONF / "supermodel"
+SUPERMODEL_CONFIG_PATH = SUPERMODEL_CONFIG_DIR / "Supermodel.ini"
+SUPERMODEL_BIN_PATH = Path("/usr/bin/supermodel")
 
 
 class SupermodelGenerator(Generator):
@@ -98,55 +99,57 @@ class SupermodelGenerator(Generator):
 
 
 def copy_nvram_files():
-    sourceDir = "/usr/share/supermodel/NVRAM"
-    targetDir = "/userdata/saves/supermodel/NVRAM"
-    if not path.exists(targetDir):
-        makedirs(targetDir)
+    sourceDir = Path("/usr/share/supermodel/NVRAM")
+    targetDir = Path("/userdata/saves/supermodel/NVRAM")
+    if not targetDir.exists():
+        targetDir.mkdir(parents=True, exist_ok=True)
 
     # create nv files which are in source and have a newer modification time than in target
     for file in listdir(sourceDir):
-        extension = path.splitext(file)[1][1:]
+        extension = Path(file).suffix[1:]
         if extension == "nv":
-            sourceFile = path.join(sourceDir, file)
-            targetFile = path.join(targetDir, file)
-            if not path.exists(targetFile):
+            sourceFile = sourceDir / file
+            targetFile = targetDir / file
+            if not targetFile.exists():
                 # if the target file doesn't exist, just copy the source file
                 copyfile(sourceFile, targetFile)
             else:
                 # if the target file exists and has an older modification time than the source file, create a backup and copy the new file
-                if path.getmtime(sourceFile) > path.getmtime(targetFile):
-                    backupFile = targetFile + ".bak"
-                    if path.exists(backupFile):
-                        remove(backupFile)
+                if sourceFile.stat().st_mtime > targetFile.stat().st_mtime:
+                    backupFile = targetDir / (targetFile.name + ".bak")
+                    if backupFile.exists():
+                        backupFile.unlink()
                     rename(targetFile, backupFile)
-                    copyfile(sourceFile, targetFile)
+                    copyfile(sourceFile, backupFile.parent / backupFile.name)
 
 
 def copy_asset_files():
-    sourceDir = "/usr/share/supermodel/Assets"
-    targetDir = "/userdata/system/configs/supermodel/Assets"
-    if not path.exists(sourceDir):
+    sourceDir = Path("/usr/share/supermodel/Assets")
+    targetDir = Path("/userdata/system/configs/supermodel/Assets")
+    if not sourceDir.exists():
         return
-    if not path.exists(targetDir):
-        makedirs(targetDir)
+    if not targetDir.exists():
+        targetDir.mkdir(parents=True, exist_ok=True)
 
     # create asset files which are in source and have a newer modification time than in target
     for file in listdir(sourceDir):
-        sourceFile = path.join(sourceDir, file)
-        targetFile = path.join(targetDir, file)
-        if not path.exists(targetFile) or path.getmtime(sourceFile) > path.getmtime(
-            targetFile
+        sourceFile = sourceDir / file
+        targetFile = targetDir / file
+        if (
+            not targetFile.exists()
+            or sourceFile.stat().st_mtime > targetFile.stat().st_mtime
         ):
             copyfile(sourceFile, targetFile)
 
 
 def copy_xml():
-    source_path = "/usr/share/supermodel/Games.xml"
-    dest_path = "/userdata/system/configs/supermodel/Games.xml"
-    if not path.exists(SUPERMODEL_CONFIG_DIR):
-        makedirs(SUPERMODEL_CONFIG_DIR)
-    if not path.exists(dest_path) or path.getmtime(source_path) > path.getmtime(
-        dest_path
+    source_path = Path("/usr/share/supermodel/Games.xml")
+    dest_path = Path("/userdata/system/configs/supermodel/Games.xml")
+    if not SUPERMODEL_CONFIG_DIR.exists():
+        SUPERMODEL_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    if (
+        not dest_path.exists()
+        or source_path.stat().st_mtime > dest_path.stat().st_mtime
     ):
         copy2(source_path, dest_path)
 
@@ -359,7 +362,7 @@ def configPadsIni(
             )
 
     # apply guns
-    romBase = path.splitext(path.basename(rom))[0]  # filename without extension
+    romBase = Path(rom).stem  # filename without extension
     for section in targetConfig.sections():
         if section.strip() in ["Global", romBase]:
             # for an input system
@@ -387,9 +390,10 @@ def configPadsIni(
             targetConfig.set(section, "InputJoy1XSaturation", sensitivity)
 
     # save the ini file
-    if not path.exists(path.dirname(targetFile)):
-        makedirs(path.dirname(targetFile))
-    with builtins.open(targetFile, "w") as configfile:
+    targetFile_path = Path(targetFile)
+    if not targetFile_path.parent.exists():
+        targetFile_path.parent.mkdir(parents=True, exist_ok=True)
+    with builtins.open(targetFile_path, "w") as configfile:
         targetConfig.write(configfile)
 
     return templateFile, mapping

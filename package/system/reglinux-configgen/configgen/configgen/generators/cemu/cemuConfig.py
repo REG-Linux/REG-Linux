@@ -1,4 +1,5 @@
 from os import environ
+from pathlib import Path
 from subprocess import PIPE, CalledProcessError, check_output, run
 from typing import Any
 
@@ -7,12 +8,12 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-CEMU_CONFIG_DIR = CONF + "/cemu"
-CEMU_CONFIG_PATH = CEMU_CONFIG_DIR + "/settings.xml"
-CEMU_BIOS_DIR = BIOS + "/cemu"
-CEMU_PROFILES_DIR = CEMU_CONFIG_DIR + "/controllerProfiles"
-CEMU_ROMS_DIR = ROMS + "/wiiu"
-CEMU_SAVES_DIR = SAVES + "/wiiu"
+CEMU_CONFIG_DIR = str(Path(CONF) / "cemu")
+CEMU_CONFIG_PATH = str(Path(CEMU_CONFIG_DIR) / "settings.xml")
+CEMU_BIOS_DIR = str(Path(BIOS) / "cemu")
+CEMU_PROFILES_DIR = str(Path(CEMU_CONFIG_DIR) / "controllerProfiles")
+CEMU_ROMS_DIR = str(Path(ROMS) / "wiiu")
+CEMU_SAVES_DIR = str(Path(SAVES) / "wiiu")
 CEMU_BIN_PATH = "/usr/bin/cemu/cemu"
 
 

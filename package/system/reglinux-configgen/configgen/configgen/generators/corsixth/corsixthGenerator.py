@@ -1,4 +1,4 @@
-from os import makedirs, path, unlink
+from pathlib import Path
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -22,17 +22,19 @@ class CorsixTHGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create corsixth config directory if needed
-        if not path.exists(CORSIXTH_CONFIG_DIR):
-            makedirs(CORSIXTH_CONFIG_DIR)
+        config_dir_path = Path(CORSIXTH_CONFIG_DIR)
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Create corsixth savesg directory if needed
-        if not path.exists(CORSIXTH_SAVES_DIR):
-            makedirs(CORSIXTH_SAVES_DIR)
+        saves_dir_path = Path(CORSIXTH_SAVES_DIR)
+        if not saves_dir_path.exists():
+            saves_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Check game data is installed
         try:
             for game_data in CORSIXTH_GAME_DATA_DIR:
-                if not path.exists(game_data):
+                if not Path(game_data).exists():
                     raise FileNotFoundError(
                         f"ERROR: Game data ({game_data}) not found. You can get them from the game Theme Hospital."
                     )
@@ -40,15 +42,16 @@ class CorsixTHGenerator(Generator):
             eslog.exception(e)
 
         # If config file already exists, delete it
-        if path.exists(CORSIXTH_CONFIG_PATH):
-            unlink(CORSIXTH_CONFIG_PATH)
+        config_path = Path(CORSIXTH_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
         # Create the config file and fill it with basic data
         with open(CORSIXTH_CONFIG_PATH, "w") as corsixth_config_file:
             setCorsixthConfig(corsixth_config_file, system, game_resolution)
 
         # Launch engine with config file path
-        command_array = [CORSIXTH_BIN_PATH, "--config-file=" + CORSIXTH_CONFIG_PATH]
+        command_array = [CORSIXTH_BIN_PATH, f"--config-file={CORSIXTH_CONFIG_PATH}"]
 
         return Command(
             array=command_array,

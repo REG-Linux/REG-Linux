@@ -1,11 +1,12 @@
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import BIOS, CONF, SAVES, SCREENSHOTS
 
-MUPEN_CONFIG_DIR = CONF + "/mupen64plus/"
-MUPEN_CONFIG_PATH = MUPEN_CONFIG_DIR + "mupen64plus.cfg"
-MUPEN_SAVES_DIR = SAVES + "/n64"
-MUPEN_BIN_PATH = "/usr/bin/mupen64plus"
+MUPEN_CONFIG_DIR = str(CONF / "mupen64plus")
+MUPEN_CONFIG_PATH = str(CONF / "mupen64plus" / "mupen64plus.cfg")
+MUPEN_SAVES_DIR = str(SAVES / "n64")
+MUPEN_BIN_PATH = Path("/usr/bin/mupen64plus")
 
 
 def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) -> None:
@@ -267,7 +268,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
         iniConfig.add_section("64DD")
     # Filename of the 64DD IPL ROM
     if system.name == "n64dd":
-        iniConfig.set("64DD", "IPL-ROM", BIOS + "/64DD_IPL.bin")
+        iniConfig.set("64DD", "IPL-ROM", str(BIOS / "64DD_IPL.bin"))
     else:
         iniConfig.set("64DD", "IPL-ROM", "")
     iniConfig.set("64DD", "Disk", "")

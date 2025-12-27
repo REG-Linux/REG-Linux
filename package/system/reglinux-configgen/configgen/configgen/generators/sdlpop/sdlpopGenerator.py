@@ -1,4 +1,4 @@
-from os import makedirs, path, symlink
+from pathlib import Path
 from shutil import copyfile
 
 from configgen.Command import Command
@@ -6,10 +6,10 @@ from configgen.controllers import generate_sdl_controller_config
 from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SCREENSHOTS
 
-SDLPOP_CONFIG_DIR = CONF + "/SDLPoP"
-SDLPOP_SCREENSHOTS_DIR = SCREENSHOTS + "/SDLPoP"
-SDLPOP_SOURCE_CFG_PATH = SDLPOP_CONFIG_DIR + "/SDLPoP.cfg"
-SDLPOP_SOURCE_INI_PATH = SDLPOP_CONFIG_DIR + "/SDLPoP.ini"
+SDLPOP_CONFIG_DIR = str(CONF / "SDLPoP")
+SDLPOP_SCREENSHOTS_DIR = str(SCREENSHOTS / "SDLPoP")
+SDLPOP_SOURCE_CFG_PATH = str(CONF / "SDLPoP" / "SDLPoP.cfg")
+SDLPOP_SOURCE_INI_PATH = str(CONF / "SDLPoP" / "SDLPoP.ini")
 SDLPOP_DEST_CFG_PATH = "/usr/share/SDLPoP/cfg/SDLPoP.cfg"
 SDLPOP_DEST_INI_PATH = "/usr/share/SDLPoP/cfg/SDLPoP.ini"
 SDLPOP_SOURCE_SCREENSHOTS_DIR = "/usr/share/SDLPoP/screenshots"
@@ -22,25 +22,31 @@ class SdlPopGenerator(Generator):
         command_array = ["SDLPoP"]
 
         # create sdlpop config directory
-        if not path.exists(SDLPOP_CONFIG_DIR):
-            makedirs(SDLPOP_CONFIG_DIR)
-        if not path.exists(SDLPOP_SOURCE_CFG_PATH):
+        config_dir_path = Path(SDLPOP_CONFIG_DIR)
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
+        source_cfg_path = Path(SDLPOP_SOURCE_CFG_PATH)
+        if not source_cfg_path.exists():
             copyfile(SDLPOP_DEST_CFG_PATH, SDLPOP_SOURCE_CFG_PATH)
-        if not path.exists(SDLPOP_SOURCE_INI_PATH):
+        source_ini_path = Path(SDLPOP_SOURCE_INI_PATH)
+        if not source_ini_path.exists():
             copyfile(SDLPOP_DEST_INI_PATH, SDLPOP_SOURCE_INI_PATH)
         # symbolic link cfg files
-        if not path.exists(SDLPOP_DEST_CFG_PATH):
-            symlink(SDLPOP_SOURCE_CFG_PATH, SDLPOP_DEST_CFG_PATH)
-        if not path.exists(SDLPOP_DEST_INI_PATH):
-            symlink(SDLPOP_SOURCE_INI_PATH, SDLPOP_DEST_INI_PATH)
+        dest_cfg_path = Path(SDLPOP_DEST_CFG_PATH)
+        if not dest_cfg_path.exists():
+            dest_cfg_path.symlink_to(Path(SDLPOP_SOURCE_CFG_PATH))
+        dest_ini_path = Path(SDLPOP_DEST_INI_PATH)
+        if not dest_ini_path.exists():
+            dest_ini_path.symlink_to(Path(SDLPOP_SOURCE_INI_PATH))
         # create screenshots folder in /userdata
-        if not path.exists(SDLPOP_SCREENSHOTS_DIR):
-            makedirs(SDLPOP_SCREENSHOTS_DIR)
+        screenshots_dir_path = Path(SDLPOP_SCREENSHOTS_DIR)
+        if not screenshots_dir_path.exists():
+            screenshots_dir_path.mkdir(parents=True, exist_ok=True)
         # symbolic link screenshot folder too
-        if not path.exists(SDLPOP_SOURCE_SCREENSHOTS_DIR):
-            symlink(
-                SDLPOP_SCREENSHOTS_DIR,
-                SDLPOP_SOURCE_SCREENSHOTS_DIR,
+        source_screenshots_path = Path(SDLPOP_SOURCE_SCREENSHOTS_DIR)
+        if not source_screenshots_path.exists():
+            source_screenshots_path.symlink_to(
+                Path(SDLPOP_SCREENSHOTS_DIR),
                 target_is_directory=True,
             )
 

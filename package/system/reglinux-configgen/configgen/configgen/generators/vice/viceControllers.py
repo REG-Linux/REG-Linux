@@ -1,4 +1,4 @@
-from os import makedirs, path
+from pathlib import Path
 from typing import Any
 
 from .viceConfig import VICE_CONTROLLER_PATH
@@ -40,8 +40,9 @@ def setViceControllers(system: Any, playersControllers: Any) -> None:
     # vic20 uses a slightly different port
     joy_port = "0" if system.config["core"] == "xvic" else "1"
 
-    if not path.exists(path.dirname(VICE_CONTROLLER_PATH)):
-        makedirs(path.dirname(VICE_CONTROLLER_PATH))
+    controller_dir = Path(VICE_CONTROLLER_PATH).parent
+    if not controller_dir.exists():
+        controller_dir.mkdir(parents=True, exist_ok=True)
 
     listVice = []
     listVice.append("# REG-Linux configured controllers")

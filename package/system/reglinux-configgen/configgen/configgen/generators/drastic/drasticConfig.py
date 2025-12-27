@@ -1,11 +1,12 @@
 from os import environ
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import CONF
 
 DRASTIC_CONFIG_DIR = "/usr/share/drastic"
-DRASTIC_CONFIG_DIR_USER = CONF + "/drastic"
-DRASTIC_CONFIG_PATH = DRASTIC_CONFIG_DIR_USER + "/config/drastic.cfg"
+DRASTIC_CONFIG_DIR_USER = str(Path(CONF) / "drastic")
+DRASTIC_CONFIG_PATH = str(Path(DRASTIC_CONFIG_DIR_USER) / "config" / "drastic.cfg")
 DRASTIC_BIN_PATH = "/usr/bin/drastic"
 
 

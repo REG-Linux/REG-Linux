@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from os import makedirs, path
+from pathlib import Path
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -27,7 +27,7 @@ class DuckstationGenerator(Generator):
         duckstatonConfig = ConfigParser(interpolation=None)
         duckstatonConfig.optionxform = lambda optionstr: str(optionstr)
 
-        if path.exists(DUCKSTATION_CONFIG_PATH):
+        if Path(DUCKSTATION_CONFIG_PATH).exists():
             duckstatonConfig.read(DUCKSTATION_CONFIG_PATH)
 
         setDuckstationConfig(duckstatonConfig, system, players_controllers)
@@ -36,16 +36,17 @@ class DuckstationGenerator(Generator):
         )
 
         # Save config
-        if not path.exists(path.dirname(DUCKSTATION_CONFIG_PATH)):
-            makedirs(path.dirname(DUCKSTATION_CONFIG_PATH))
+        config_dir = Path(DUCKSTATION_CONFIG_PATH).parent
+        if not config_dir.exists():
+            config_dir.mkdir(parents=True, exist_ok=True)
         with open(DUCKSTATION_CONFIG_PATH, "w") as configfile:
             duckstatonConfig.write(configfile)
 
         # Test if it's a m3u file
-        if path.splitext(rom)[1] == ".m3u":
+        if Path(rom).suffix == ".m3u":
             rom = rewriteM3uFullPath(rom)
 
-        if path.exists(DUCKSTATION_BIN_PATH):
+        if Path(DUCKSTATION_BIN_PATH).exists():
             command_array = [DUCKSTATION_BIN_PATH, rom]
         else:
             command_array = [DUCKSTATION_NOGUI_PATH, "-batch", "-fullscreen", "--", rom]
@@ -64,11 +65,11 @@ def rewriteM3uFullPath(m3u: str) -> str:  # Rewrite a clean m3u file with valid 
         return m3u
 
     initialfirstdisc = (
-        "/tmp/" + path.splitext(path.basename(firstline))[0] + ".m3u"
+        str(Path("/tmp") / Path(firstline).stem) + ".m3u"
     )  # Generating a temp path with the first iso filename in m3u
 
     # create a temp m3u to bypass Duckstation m3u bad pathfile
-    fulldirname = path.dirname(m3u)
+    fulldirname = str(Path(m3u).parent)
 
     try:
         with open(m3u) as initialm3u, open(initialfirstdisc, "a") as f1:

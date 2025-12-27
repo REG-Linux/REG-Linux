@@ -12,7 +12,7 @@ keyboard key presses or mouse movements.
 
 import os
 from json import dumps, load
-from os import path
+from pathlib import Path
 from subprocess import call
 from typing import Any
 
@@ -113,17 +113,24 @@ class Evmapy:
             f"{rom}.keys",  # ROM-specific configuration
             f"{rom}/padto.keys",  # Configuration inside ROM directory
             # Commented out more specific configurations for now
-            # "/userdata/system/configs/evmapy/{}.{}.{}.keys".format(system, emulator, core),
-            # "/userdata/system/configs/evmapy/{}.{}.keys".format(system, emulator),
-            f"/userdata/system/configs/evmapy/{system}.keys",  # User system config
+            # str(Path("/userdata/system/configs/evmapy") / "{}.{}.{}.keys".format(system, emulator, core)),
+            # str(Path("/userdata/system/configs/evmapy") / "{}.{}.keys".format(system, emulator)),
+            str(
+                Path("/userdata/system/configs/evmapy") / f"{system}.keys"
+            ),  # User system config
             # System-wide configurations
-            # "/usr/share/evmapy/{}.{}.{}.keys".format(system, emulator, core),
-            f"/usr/share/evmapy/{system}.{emulator}.keys",  # System+emulator config
-            f"/usr/share/evmapy/{system}.keys",  # Default system config
+            # str(Path("/usr/share/evmapy") / "{}.{}.{}.keys".format(system, emulator, core)),
+            str(
+                Path("/usr/share/evmapy") / f"{system}.{emulator}.keys"
+            ),  # System+emulator config
+            str(Path("/usr/share/evmapy") / f"{system}.keys"),  # Default system config
         ]:
             # Check if configuration file exists and handle directory ROM case
-            if path.exists(keysfile) and not (
-                path.isdir(rom) and keysfile == f"{rom}.keys"
+            keysfile_path = Path(keysfile)
+            if (
+                (keysfile_path.is_absolute() and keysfile_path.exists())
+                or (not keysfile_path.is_absolute() and Path(keysfile).exists())
+                and not (Path(rom).is_dir() and keysfile == f"{rom}.keys")
             ):
                 eslog.debug(f"evmapy on {keysfile}")
 
@@ -145,8 +152,9 @@ class Evmapy:
                     gun_action_key = "actions_gun" + str(ngun)
                     if gun_action_key in padActionConfig:
                         # Generate configuration file path for this gun
-                        configfile = "/var/run/evmapy/{}.json".format(
-                            path.basename(guns[gun]["node"])
+                        configfile = str(
+                            Path("/var/run/evmapy")
+                            / f"{Path(guns[gun]['node']).name}.json"
                         )
                         eslog.debug(
                             f"config file for keysfile is {configfile} (from {keysfile}) - gun"
@@ -194,7 +202,9 @@ class Evmapy:
                     player_action_key = "actions_player" + str(nplayer)
                     if player_action_key in padActionConfig:
                         # Generate configuration file path for this controller
-                        configfile = f"/var/run/evmapy/{path.basename(pad.dev)}.json"
+                        configfile = str(
+                            Path("/var/run/evmapy") / f"{Path(pad.dev).name}.json"
+                        )
                         eslog.debug(
                             f"config file for keysfile is {configfile} (from {keysfile})"
                         )
@@ -730,7 +740,8 @@ class Evmapy:
 
         try:
             # Check if the device path exists before attempting to open it
-            if not path.exists(devicePath):
+            device_path_obj = Path(devicePath)
+            if not device_path_obj.exists():
                 eslog.warning(f"Device path {devicePath} does not exist")
                 return 0, 0
 

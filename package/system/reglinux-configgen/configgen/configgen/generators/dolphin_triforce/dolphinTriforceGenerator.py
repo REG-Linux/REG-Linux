@@ -1,6 +1,6 @@
 import configparser
-import os.path
 from os import environ
+from pathlib import Path
 from typing import Any
 
 from configgen.Command import Command
@@ -24,16 +24,14 @@ class DolphinTriforceGenerator(Generator):
         wheels: Any,
         game_resolution: dict[str, int],
     ) -> Command:
-        if not os.path.exists(
-            os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)
-        ):
-            os.makedirs(os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni))
+        ini_path = Path(dolphinTriforceConfig.dolphinTriforceIni)
+        if not ini_path.parent.exists():
+            ini_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Dir required for saves
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceData + "/StateSaves"
-        ):
-            os.makedirs(dolphinTriforceConfig.dolphinTriforceData + "/StateSaves")
+        saves_path = Path(dolphinTriforceConfig.dolphinTriforceData) / "StateSaves"
+        if not saves_path.exists():
+            saves_path.mkdir(parents=True, exist_ok=True)
 
         dolphinTriforceControllers.generateControllerConfig(
             system, players_controllers, rom
@@ -44,7 +42,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceSettings.optionxform = lambda optionstr: str(optionstr)
-        if os.path.exists(dolphinTriforceConfig.dolphinTriforceIni):
+        if Path(dolphinTriforceConfig.dolphinTriforceIni).exists():
             dolphinTriforceSettings.read(dolphinTriforceConfig.dolphinTriforceIni)
 
         # Sections
@@ -62,12 +60,12 @@ class DolphinTriforceGenerator(Generator):
         # Define default games path
         if "ISOPaths" not in dolphinTriforceSettings["General"]:
             dolphinTriforceSettings.set(
-                "General", "ISOPath0", "/userdata/roms/triforce"
+                "General", "ISOPath0", str(Path("/userdata/roms/triforce"))
             )
             dolphinTriforceSettings.set("General", "ISOPaths", "1")
         if "GCMPathes" not in dolphinTriforceSettings["General"]:
             dolphinTriforceSettings.set(
-                "General", "GCMPath0", "/userdata/roms/triforce"
+                "General", "GCMPath0", str(Path("/userdata/roms/triforce"))
             )
             dolphinTriforceSettings.set("General", "GCMPathes", "1")
 
@@ -76,12 +74,12 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceSettings.set(
                 "Core",
                 "MemcardAPath",
-                "/userdata/saves/dolphin-triforce/GC/MemoryCardA.USA.raw",
+                str(Path("/userdata/saves/dolphin-triforce/GC/MemoryCardA.USA.raw")),
             )
             dolphinTriforceSettings.set(
                 "Core",
                 "MemcardBPath",
-                "/userdata/saves/dolphin-triforce/GC/MemoryCardB.USA.raw",
+                str(Path("/userdata/saves/dolphin-triforce/GC/MemoryCardB.USA.raw")),
             )
 
         # Draw or not FPS
@@ -316,17 +314,15 @@ class DolphinTriforceGenerator(Generator):
 
         # These cheat files are required to launch Triforce games, and thus should always be present and enabled.
 
-        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings):
-            os.makedirs(dolphinTriforceConfig.dolphinTriforceGameSettings)
+        game_settings_path = Path(dolphinTriforceConfig.dolphinTriforceGameSettings)
+        if not game_settings_path.exists():
+            game_settings_path.mkdir(parents=True, exist_ok=True)
 
         # GFZE01 F-Zero GX (convert to F-Zero AX)
 
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini"
-        ):
-            with open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini", "w"
-            ) as dolphinTriforceGameSettingsGFZE01:
+        gfze01_ini_path = game_settings_path / "GFZE01.ini"
+        if not gfze01_ini_path.exists():
+            with open(gfze01_ini_path, "w") as dolphinTriforceGameSettingsGFZE01:
                 dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
 $AX
 06003F30 00000284
@@ -417,12 +413,9 @@ $AX
 """)
             # GVSJ8P Virtua Striker 2002
 
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini"
-        ):
-            with open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini", "w"
-            ) as dolphinTriforceGameSettingsGVSJ8P:
+        gvsj8p_ini_path = game_settings_path / "GVSJ8P.ini"
+        if not gvsj8p_ini_path.exists():
+            with open(gvsj8p_ini_path, "w") as dolphinTriforceGameSettingsGVSJ8P:
                 dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
 $DI Seed Blanker
 0x80000000:dword:0x00000000
@@ -434,12 +427,9 @@ $DI Seed Blanker
 
         # GGPE01 Mario Kart GP 1
 
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"
-        ):
-            with open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", "w"
-            ) as dolphinTriforceGameSettingsGGPE01:
+        ggpe01_ini_path = game_settings_path / "GGPE01.ini"
+        if not ggpe01_ini_path.exists():
+            with open(ggpe01_ini_path, "w") as dolphinTriforceGameSettingsGGPE01:
                 dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
 $Disable crypto
 0x8023D828:dword:0x93A30008
@@ -463,12 +453,9 @@ EmulationIssues = AM-Baseboard
 
         # GGPE02 Mario Kart GP 2
 
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini"
-        ):
-            with open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini", "w"
-            ) as dolphinTriforceGameSettingsGGPE02:
+        ggpe02_ini_path = game_settings_path / "GGPE02.ini"
+        if not ggpe02_ini_path.exists():
+            with open(ggpe02_ini_path, "w") as dolphinTriforceGameSettingsGGPE02:
                 dolphinTriforceGameSettingsGGPE02.write("""[Display]
 ProgressiveScan = 0
 [Wii]
@@ -554,7 +541,7 @@ $SeatLoopPatch
             "dolphin-triforce",
             "-b",
             "-u",
-            "/userdata/system/configs/dolphin-triforce",
+            str(Path("/userdata/system/configs/dolphin-triforce")),
             "-e",
             rom,
         ]
@@ -563,7 +550,7 @@ $SeatLoopPatch
                 "dolphin-triforce-nogui",
                 "-b",
                 "-u",
-                "/userdata/system/configs/dolphin-triforce",
+                str(Path("/userdata/system/configs/dolphin-triforce")),
                 "-p",
                 system.config["platform"],
                 "-e",

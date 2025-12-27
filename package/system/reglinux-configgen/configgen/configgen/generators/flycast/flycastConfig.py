@@ -1,16 +1,17 @@
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import BIOS, CONF, SAVES
 
-FLYCAST_CONFIG_DIR = CONF + "/flycast"
-FLYCAST_CONFIG_PATH = FLYCAST_CONFIG_DIR + "/emu.cfg"
-FLYCAST_SAVES_DIR = SAVES + "/dreamcast"
-FLYCAST_BIOS_DIR = BIOS + "/dc"
+FLYCAST_CONFIG_DIR = str(Path(CONF) / "flycast")
+FLYCAST_CONFIG_PATH = str(Path(FLYCAST_CONFIG_DIR) / "emu.cfg")
+FLYCAST_SAVES_DIR = str(Path(SAVES) / "dreamcast")
+FLYCAST_BIOS_DIR = str(Path(BIOS) / "dc")
 FLYCAST_VMU_BLANK_PATH = (
     "/usr/share/reglinux/configgen/data/dreamcast/vmu_save_blank.bin"
 )
-FLYCAST_VMU_A1_PATH = FLYCAST_SAVES_DIR + "/flycast/vmu_save_A1.bin"
-FLYCAST_VMU_A2_PATH = FLYCAST_SAVES_DIR + "/flycast/vmu_save_A2.bin"
+FLYCAST_VMU_A1_PATH = str(Path(FLYCAST_SAVES_DIR) / "flycast" / "vmu_save_A1.bin")
+FLYCAST_VMU_A2_PATH = str(Path(FLYCAST_SAVES_DIR) / "flycast" / "vmu_save_A2.bin")
 FLYCAST_BIN_PATH = "/usr/bin/flycast"
 
 

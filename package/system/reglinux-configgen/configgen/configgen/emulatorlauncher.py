@@ -7,7 +7,8 @@ with the appropriate configurations.
 
 from argparse import ArgumentParser
 from contextlib import suppress
-from os import X_OK, access, chdir, environ, listdir, makedirs, path
+from os import X_OK, access, chdir, environ
+from pathlib import Path
 from signal import SIGINT, SIGTERM, signal
 from subprocess import PIPE, Popen, call
 from sys import exit
@@ -47,7 +48,7 @@ profiler = None
 #    to analyze the `/var/run/emulatorlauncher.prof` file.
 
 # Enable the profiler if the performance marker file exists.
-if path.exists("/var/run/emulatorlauncher.perf"):
+if Path("/var/run/emulatorlauncher.perf").exists():
     import cProfile
 
     profiler = cProfile.Profile()
@@ -76,11 +77,11 @@ def main(args: Any, maxnbplayers: int) -> int:
     regmsg_connect()
 
     # Get the file extension in lowercase
-    extension = path.splitext(args.rom)[1][1:].lower()
+    extension = Path(args.rom).suffix[1:].lower()
 
     # Check if it is a .zar archive
     if extension == "zar":
-        eslog.debug(f"Processing zar archive {path.basename(args.rom)}")
+        eslog.debug(f"Processing zar archive {Path(args.rom).name}")
         exitCode = 0
         need_end = False
         rommountpoint = None
@@ -102,7 +103,7 @@ def main(args: Any, maxnbplayers: int) -> int:
         return exitCode
 
     # If it's not a .zar file, launch the ROM directly
-    eslog.debug(f"Launching ROM directly {path.basename(args.rom)}")
+    eslog.debug(f"Launching ROM directly {Path(args.rom).name}")
     return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 
@@ -286,8 +287,8 @@ def _execute_external_scripts(system: Any, rom: str, event_type: str) -> None:
     effectiveRom = rom or ""
 
     script_directories = [
-        "/usr/share/reglinux/configgen/scripts",
-        "/userdata/system/scripts",
+        Path("/usr/share/reglinux/configgen/scripts"),
+        Path("/userdata/system/scripts"),
     ]
 
     # For gameStart events, we want the first directory to be user scripts
@@ -296,7 +297,7 @@ def _execute_external_scripts(system: Any, rom: str, event_type: str) -> None:
 
     for directory in script_directories:
         callExternalScripts(
-            directory,
+            str(directory),
             event_type,
             [system.name, system.config["emulator"], effectiveCore, effectiveRom],
         )
@@ -304,18 +305,17 @@ def _execute_external_scripts(system: Any, rom: str, event_type: str) -> None:
 
 def _create_save_directory(system: Any) -> None:
     """Creates the save directory for the system if it doesn't exist."""
-    dirname = path.join(SAVES, system.name)
-    if not path.exists(dirname):
-        makedirs(dirname)
+    dirname = SAVES / system.name
+    if not dirname.exists():
+        dirname.mkdir(parents=True, exist_ok=True)
 
 
 def _cleanup_hud_config():
     """Cleans up the temporary HUD config file."""
     try:
-        if path.exists("/var/run/hud.config"):
-            from os import remove
-
-            remove("/var/run/hud.config")
+        hud_config_path = Path("/var/run/hud.config")
+        if hud_config_path.exists():
+            hud_config_path.unlink()
     except Exception as e:
         eslog.warning(f"Could not remove HUD config file: {e}")
 
@@ -332,7 +332,7 @@ def _configure_hud(
     """Configures and enables MangoHUD if supported."""
     if not (
         system.isOptSet("hud_support")
-        and path.exists("/usr/bin/mangohud")
+        and Path("/usr/bin/mangohud").exists()
         and system.getOptBoolean("hud_support")
     ):
         return
@@ -359,9 +359,10 @@ def _configure_hud(
             gameinfos,
             hud_bezel,
         )
-        with open("/var/run/hud.config", "w") as f:
+        hud_config_path = Path("/var/run/hud.config")
+        with open(hud_config_path, "w") as f:
             f.write(hudconfig)
-        cmd.env["MANGOHUD_CONFIGFILE"] = "/var/run/hud.config"
+        cmd.env["MANGOHUD_CONFIGFILE"] = str(hud_config_path)
         if not generator.hasInternalMangoHUDCall():
             cmd.array.insert(0, "mangohud")
 
@@ -693,7 +694,7 @@ def _cleanup_temp_files(*temp_files: str) -> None:
 
     for temp_file in temp_files:
         try:
-            if temp_file and path.exists(temp_file):
+            if temp_file and Path(temp_file).exists():
                 os.remove(temp_file)
         except Exception as e:
             eslog.warning(f"Could not remove temporary file {temp_file}: {e}")
@@ -746,11 +747,13 @@ def getHudBezel(
     try:
         # If no bezel is set but effects are needed, create a transparent base.
         if "bezel" not in system.config or system.config["bezel"] in ["", "none"]:
-            overlay_png_file = "/tmp/bezel_transhud_black.png"
-            overlay_info_file = "/tmp/bezel_transhud_black.info"
-            temp_files.extend([overlay_png_file, overlay_info_file])
+            overlay_png_file = Path("/tmp/bezel_transhud_black.png")
+            overlay_info_file = Path("/tmp/bezel_transhud_black.info")
+            temp_files.extend([str(overlay_png_file), str(overlay_info_file)])
             bezelsUtil.createTransparentBezel(
-                overlay_png_file, game_resolution["width"], game_resolution["height"]
+                str(overlay_png_file),
+                game_resolution["width"],
+                game_resolution["height"],
             )
 
             w, h = game_resolution["width"], game_resolution["height"]
@@ -824,13 +827,13 @@ def getHudBezel(
             or bezel_height != game_resolution["height"]
         ):
             eslog.debug("Bezel needs to be resized")
-            output_png_file = "/tmp/bezel.png"
-            temp_files.append(output_png_file)
-            if overlay_png_file and isinstance(overlay_png_file, str):
+            output_png_file = Path("/tmp/bezel.png")
+            temp_files.append(str(output_png_file))
+            if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
                 try:
                     bezelsUtil.resizeImage(
-                        overlay_png_file,
-                        output_png_file,
+                        str(overlay_png_file),
+                        str(output_png_file),
                         game_resolution["width"],
                         game_resolution["height"],
                         bezel_stretch,
@@ -845,10 +848,12 @@ def getHudBezel(
 
         # Apply a "tattoo" (watermark/logo) to the bezel if configured.
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
-            output_png_file = "/tmp/bezel_tattooed.png"
-            temp_files.append(output_png_file)
-            if overlay_png_file and isinstance(overlay_png_file, str):
-                bezelsUtil.tatooImage(overlay_png_file, output_png_file, system)
+            output_png_file = Path("/tmp/bezel_tattooed.png")
+            temp_files.append(str(output_png_file))
+            if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
+                bezelsUtil.tatooImage(
+                    str(overlay_png_file), str(output_png_file), system
+                )
                 overlay_png_file = output_png_file
             else:
                 eslog.error(f"Invalid overlay PNG file for tattoo: {overlay_png_file}")
@@ -857,13 +862,17 @@ def getHudBezel(
         # Draw gun borders on the bezel if required.
         if borders_size is not None:
             eslog.debug("Drawing gun borders")
-            output_png_file = "/tmp/bezel_gunborders.png"
-            temp_files.append(output_png_file)
+            output_png_file = Path("/tmp/bezel_gunborders.png")
+            temp_files.append(str(output_png_file))
             inner_size, outer_size = bezelsUtil.gun_borders_size(borders_size)
             color = bezelsUtil.gunsBordersColorFomConfig(system.config)
-            if overlay_png_file and isinstance(overlay_png_file, str):
+            if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
                 bezelsUtil.gunBorderImage(
-                    overlay_png_file, output_png_file, inner_size, outer_size, color
+                    str(overlay_png_file),
+                    str(output_png_file),
+                    inner_size,
+                    outer_size,
+                    color,
                 )
                 overlay_png_file = output_png_file
             else:
@@ -920,18 +929,22 @@ def callExternalScripts(folder: str, event: str, args: list[str]) -> None:
         event (str): The event name (e.g., "gameStart", "gameStop").
         args (list): A list of arguments to pass to the scripts.
     """
-    if not path.isdir(folder):
+    if not Path(folder).is_dir():
         return
     try:
-        file_list = sorted(listdir(folder))  # Sort for predictable execution order.
+        file_list = sorted(
+            Path(folder).iterdir()
+        )  # Sort for predictable execution order.
     except OSError as e:
         eslog.warning(f"Could not read directory {folder}: {e}")
         return
 
     for file in file_list:
-        filepath = path.join(folder, file)
-        if path.isdir(filepath):
-            callExternalScripts(filepath, event, args)  # Recurse into subdirectories.
+        filepath = Path(folder) / file
+        if Path(filepath).is_dir():
+            callExternalScripts(
+                str(filepath), event, args
+            )  # Recurse into subdirectories.
         elif access(filepath, X_OK):
             eslog.debug(f"Calling external script: {str([filepath, event] + args)}")
             try:
@@ -1180,7 +1193,7 @@ if __name__ == "__main__":
     if profiler:
         try:
             profiler.disable()
-            profiler.dump_stats("/var/run/emulatorlauncher.prof")
+            profiler.dump_stats(str(Path("/var/run/emulatorlauncher.prof")))
         except Exception as e:
             eslog.error(f"Error dumping profiler stats: {e}")
 

@@ -1,5 +1,6 @@
 from configparser import ConfigParser
-from os import X_OK, access, chdir, path
+from os import X_OK, access, chdir
+from pathlib import Path
 from shutil import copy
 from stat import S_IRGRP, S_IROTH, S_IRWXU, S_IXGRP, S_IXOTH
 from typing import Any
@@ -9,10 +10,10 @@ from configgen.controllers import generate_sdl_controller_config
 from configgen.generators.Generator import Generator
 from configgen.systemFiles import ROMS
 
-SONICMANIA_SOURCE_BIN_PATH = "/usr/bin/sonic-mania"
-SONICMANIA_ROMS_DIR = ROMS + "/sonic-mania"
-SONICAMANIA_BIN_PATH = SONICMANIA_ROMS_DIR + "/sonic-mania"
-SONICMANIA_CONFIG_PATH = SONICMANIA_ROMS_DIR + "/Settings.ini"
+SONICMANIA_SOURCE_BIN_PATH = Path("/usr/bin/sonic-mania")
+SONICMANIA_ROMS_DIR = ROMS / "sonic-mania"
+SONICAMANIA_BIN_PATH = SONICMANIA_ROMS_DIR / "sonic-mania"
+SONICMANIA_CONFIG_PATH = SONICMANIA_ROMS_DIR / "Settings.ini"
 
 
 class SonicManiaGenerator(Generator):
@@ -20,48 +21,47 @@ class SonicManiaGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create the roms directory if it doesn't exist
-        if not path.exists(SONICMANIA_ROMS_DIR):
-            import os
-
-            os.makedirs(SONICMANIA_ROMS_DIR, exist_ok=True)
+        SONICMANIA_ROMS_DIR.mkdir(parents=True, exist_ok=True)
 
         # Check if source binary exists and is executable
-        if not path.exists(SONICMANIA_SOURCE_BIN_PATH):
+        if not SONICMANIA_SOURCE_BIN_PATH.exists():
             raise FileNotFoundError(
                 f"Source binary not found: {SONICMANIA_SOURCE_BIN_PATH}"
             )
 
-        if not access(SONICMANIA_SOURCE_BIN_PATH, X_OK):
+        if not access(str(SONICMANIA_SOURCE_BIN_PATH), X_OK):
             raise PermissionError(
                 f"Source binary is not executable: {SONICMANIA_SOURCE_BIN_PATH}"
             )
 
         # Copy the binary if it doesn't exist or is different
         copy_needed = True
-        if path.exists(SONICAMANIA_BIN_PATH):
+        if SONICAMANIA_BIN_PATH.exists():
             # Check if files are different
             import filecmp
 
             if filecmp.cmp(
-                SONICMANIA_SOURCE_BIN_PATH, SONICAMANIA_BIN_PATH, shallow=False
+                str(SONICMANIA_SOURCE_BIN_PATH),
+                str(SONICAMANIA_BIN_PATH),
+                shallow=False,
             ):
                 copy_needed = False
 
         if copy_needed:
-            copy(SONICMANIA_SOURCE_BIN_PATH, SONICAMANIA_BIN_PATH)
+            copy(str(SONICMANIA_SOURCE_BIN_PATH), str(SONICAMANIA_BIN_PATH))
             # Make sure the copied binary is executable
-            if not path.exists(SONICAMANIA_BIN_PATH) or not access(
-                SONICAMANIA_BIN_PATH, X_OK
+            if not SONICAMANIA_BIN_PATH.exists() or not access(
+                str(SONICAMANIA_BIN_PATH), X_OK
             ):
                 import os
 
                 os.chmod(
-                    SONICAMANIA_BIN_PATH,
+                    str(SONICAMANIA_BIN_PATH),
                     S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
                 )
 
         # Verify the copied binary is executable
-        if not access(SONICAMANIA_BIN_PATH, X_OK):
+        if not access(str(SONICAMANIA_BIN_PATH), X_OK):
             raise PermissionError(
                 f"Copied binary is not executable: {SONICAMANIA_BIN_PATH}"
             )
@@ -121,8 +121,8 @@ class SonicManiaGenerator(Generator):
             config.write(configfile)
 
         # Now run
-        chdir(SONICMANIA_ROMS_DIR)
-        command_array = [SONICAMANIA_BIN_PATH]
+        chdir(str(SONICMANIA_ROMS_DIR))
+        command_array = [str(SONICAMANIA_BIN_PATH)]
 
         return Command(
             array=command_array,

@@ -1,5 +1,6 @@
 from configparser import ConfigParser, DuplicateOptionError
-from os import makedirs, path, rename
+from os import rename
+from pathlib import Path
 from shutil import copy
 from typing import Any
 
@@ -32,13 +33,17 @@ class VPinballGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # create vpinball config directory and default config file if they don't exist
-        if not path.exists(VPINBALL_CONFIG_DIR):
-            makedirs(VPINBALL_CONFIG_DIR)
-        if not path.exists(VPINBALL_CONFIG_PATH):
+        config_dir_path = Path(VPINBALL_CONFIG_DIR)
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
+        config_path = Path(VPINBALL_CONFIG_PATH)
+        if not config_path.exists():
             copy(VPINBALL_ASSETS_PATH, VPINBALL_CONFIG_PATH)
-        if not path.exists(VPINBALL_PINMAME_PATH):
-            makedirs(VPINBALL_PINMAME_PATH)
-        if path.exists(VPINBALL_LOG_PATH):
+        pinmame_path = Path(VPINBALL_PINMAME_PATH)
+        if not pinmame_path.exists():
+            pinmame_path.mkdir(parents=True, exist_ok=True)
+        log_path = Path(VPINBALL_LOG_PATH)
+        if log_path.exists():
             rename(VPINBALL_LOG_PATH, VPINBALL_LOG_PATH + ".1")
 
         ## [ VPinballX.ini ] ##

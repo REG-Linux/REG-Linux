@@ -1,4 +1,4 @@
-from os import makedirs, path, remove
+from pathlib import Path
 from re import MULTILINE, search
 from shutil import copy
 
@@ -32,12 +32,12 @@ class Pcsx2Generator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Remove older config files if present
-        inisDir = path.join(PCSX2_CONFIG_DIR, "inis")
+        inisDir = Path(PCSX2_CONFIG_DIR) / "inis"
         files_to_remove = ["PCSX2_ui.ini", "PCSX2_vm.ini", "GS.ini"]
         for filename in files_to_remove:
-            file_path = path.join(inisDir, filename)
-            if path.exists(file_path):
-                remove(file_path)
+            file_path = inisDir / filename
+            if file_path.exists():
+                file_path.unlink()
 
         # FIXME Implement logic to determine if playing with wheel
         playingWithWheel = isPlayingWithWheel(system, wheels)
@@ -50,11 +50,13 @@ class Pcsx2Generator(Generator):
         configureAudio()
 
         # write our own game_controller_db.txt file before launching the game
-        dbfile = PCSX2_CONFIG_DIR + "/game_controller_db.txt"
+        dbfile = str(Path(PCSX2_CONFIG_DIR) / "game_controller_db.txt")
         write_sdl_db_all_controllers(players_controllers, dbfile)
 
         command_array = (
-            [PCSX2_BIN_PATH] if rom == "config" else [PCSX2_BIN_PATH, "-nogui", rom]
+            [str(PCSX2_BIN_PATH)]
+            if rom == "config"
+            else [str(PCSX2_BIN_PATH), "-nogui", str(rom)]
         )
 
         with open("/proc/cpuinfo") as cpuinfo:
@@ -64,9 +66,11 @@ class Pcsx2Generator(Generator):
                 )
 
         # ensure we have the patches.zip file to avoid message.
-        if not path.exists(PCSX2_BIOS_DIR):
-            makedirs(PCSX2_BIOS_DIR)
-        if not path.exists(PCSX2_PATCHES_PATH):
+        bios_dir_path = Path(PCSX2_BIOS_DIR)
+        if not bios_dir_path.exists():
+            bios_dir_path.mkdir(parents=True, exist_ok=True)
+        patches_path = Path(PCSX2_PATCHES_PATH)
+        if not patches_path.exists():
             copy(PCSX2_SOURCE_PATH, PCSX2_PATCHES_PATH)
 
         return Command(array=command_array)

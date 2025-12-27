@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 from shutil import copytree
 from typing import Any
 
@@ -21,13 +21,16 @@ class IOQuake3Generator(Generator):
         setIoquake3Config(system, rom, players_controllers, game_resolution)
 
         # ioquake3 looks for folder either in config or from where it's launched
-        destination_file = path.join(IOQUAKE3_ROMS_DIR, "/ioquake3")
-        source_file = path.join(IOQUAKE3_BIN_DIR, "/ioquake3")
+        destination_file = str(Path(IOQUAKE3_ROMS_DIR) / "ioquake3")
+        source_file = str(Path(IOQUAKE3_BIN_DIR) / "ioquake3")
 
         # therefore copy latest ioquake3 file to rom directory
-        if not path.isfile(destination_file) or path.getmtime(
-            source_file
-        ) > path.getmtime(destination_file):
+        source_path = Path(source_file)
+        dest_path = Path(destination_file)
+        if (
+            not dest_path.is_file()
+            or source_path.stat().st_mtime > dest_path.stat().st_mtime
+        ):
             copytree(IOQUAKE3_BIN_DIR, IOQUAKE3_ROMS_DIR, dirs_exist_ok=True)
 
         command_array = [IOQUAKE3_BIN_PATH]

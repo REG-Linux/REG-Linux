@@ -1,4 +1,4 @@
-from os import makedirs, path, unlink
+from pathlib import Path
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -16,12 +16,14 @@ class MednafenGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        if not path.exists(MEDNAFEN_CONFIG_DIR):
-            makedirs(MEDNAFEN_CONFIG_DIR)
+        config_dir_path = Path(MEDNAFEN_CONFIG_DIR)
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # If config file already exists, delete it
-        if path.exists(MEDNAFEN_CONFIG_PATH):
-            unlink(MEDNAFEN_CONFIG_PATH)
+        config_path = Path(MEDNAFEN_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
         # Create the config file and fill it with basic data
         with open(MEDNAFEN_CONFIG_PATH, "w") as cfgConfig:

@@ -1,4 +1,4 @@
-from os import makedirs, path
+from pathlib import Path
 from shutil import copy
 
 from configgen.Command import Command
@@ -29,11 +29,13 @@ class MoonlightGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        if not path.exists(MOONLIGHT_CONFIG_DIR + "/staging"):
-            makedirs(MOONLIGHT_CONFIG_DIR + "/staging")
+        staging_dir = Path(MOONLIGHT_CONFIG_DIR) / "staging"
+        if not staging_dir.exists():
+            staging_dir.mkdir(parents=True, exist_ok=True)
 
         # If user made config file exists, copy to staging directory for use
-        if path.exists(MOONLIGHT_CONFIG_PATH):
+        config_path = Path(MOONLIGHT_CONFIG_PATH)
+        if config_path.exists():
             copy(MOONLIGHT_CONFIG_PATH, MOONLIGHT_STAGING_CONFIG_PATH)
 
         # Load the config file
@@ -54,7 +56,7 @@ class MoonlightGenerator(Generator):
         return Command(
             array=command_array,
             env={
-                "XDG_DATA_DIRS": CONF,
+                "XDG_DATA_DIRS": str(CONF),
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
                     players_controllers
                 ),
@@ -63,7 +65,7 @@ class MoonlightGenerator(Generator):
 
     def getRealGameNameAndConfigFile(self, rom: str) -> list[str | None]:
         # Rom's basename without extension
-        romName = path.splitext(path.basename(rom))[0]
+        romName = Path(rom).stem
         # find the real game name
         try:
             with open(MOONLIGHT_GAMELIST_PATH) as f:

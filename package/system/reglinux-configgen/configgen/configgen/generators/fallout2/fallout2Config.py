@@ -1,15 +1,16 @@
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import CONF, ROMS
 
-FALLOUT_CONFIG_DIR = CONF + "/fallout2"
-FALLOUT_CONFIG_PATH = FALLOUT_CONFIG_DIR + "/fallout2.cfg"
-FALLOUT_CONFIG_INI = FALLOUT_CONFIG_DIR + "/f2_res.ini"
-FALLOUT_ROMS_DIR = ROMS + "/fallout2-ce"
-FALLOUT_BIN_PATH = "/usr/bin/fallout2-ce"
-FALLOUT_EXE_SOURCE_PATH = FALLOUT_ROMS_DIR + "/fallout2-ce"
-FALLOUT_CONFIG_SOURCE_PATH = FALLOUT_ROMS_DIR + "/fallout2.cfg"
-FALLOUT_CONFIG_INI_SOURCE_PATH = FALLOUT_ROMS_DIR + "/f2_res.ini"
+FALLOUT_CONFIG_DIR = CONF / "fallout2"
+FALLOUT_CONFIG_PATH = FALLOUT_CONFIG_DIR / "fallout2.cfg"
+FALLOUT_CONFIG_INI = FALLOUT_CONFIG_DIR / "f2_res.ini"
+FALLOUT_ROMS_DIR = ROMS / "fallout2-ce"
+FALLOUT_BIN_PATH = Path("/usr/bin/fallout2-ce")
+FALLOUT_EXE_SOURCE_PATH = FALLOUT_ROMS_DIR / "fallout2-ce"
+FALLOUT_CONFIG_SOURCE_PATH = FALLOUT_ROMS_DIR / "fallout2.cfg"
+FALLOUT_CONFIG_INI_SOURCE_PATH = FALLOUT_ROMS_DIR / "f2_res.ini"
 
 
 def setFalloutConfig(falloutConfig: Any, system: Any) -> None:

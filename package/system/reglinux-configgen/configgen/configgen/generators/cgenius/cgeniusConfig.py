@@ -1,10 +1,11 @@
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import CONF, ROMS
 
-CGENIUS_CONFIG_DIR = CONF + "/cgenius"
-CGENIUS_ROMS_DIR = ROMS + "/cgenius/"
-CGENIUS_CONFIG_PATH = CGENIUS_CONFIG_DIR + "/cgenius.cfg"
+CGENIUS_CONFIG_DIR = str(Path(CONF) / "cgenius")
+CGENIUS_ROMS_DIR = str(Path(ROMS) / "cgenius" / "")
+CGENIUS_CONFIG_PATH = str(Path(CGENIUS_CONFIG_DIR) / "cgenius.cfg")
 CGENIUS_BIN_PATH = "/usr/bin/CGeniusExe"
 
 
@@ -15,7 +16,7 @@ def setCgeniusConfig(cgeniusConfig: Any, system: Any) -> None:
 
     cgeniusConfig["FileHandling"]["EnableLogfile"] = "false"
     cgeniusConfig["FileHandling"]["SearchPath1"] = CGENIUS_ROMS_DIR
-    cgeniusConfig["FileHandling"]["SearchPath2"] = CGENIUS_ROMS_DIR + "games"
+    cgeniusConfig["FileHandling"]["SearchPath2"] = str(Path(CGENIUS_ROMS_DIR) / "games")
 
     if "Video" not in cgeniusConfig:
         cgeniusConfig["Video"] = {}

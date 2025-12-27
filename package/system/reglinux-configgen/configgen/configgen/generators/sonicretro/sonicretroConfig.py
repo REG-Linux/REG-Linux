@@ -1,5 +1,5 @@
 from hashlib import md5
-from os import path
+from pathlib import Path
 from typing import Any
 
 from configgen.settings import UnixSettings
@@ -59,9 +59,10 @@ def setSonicretroConfig(system: Any, emu: str, rom: str) -> None:
         # Sonic CD
         "e723aab26026e4e6d4522c4356ef5a98",
     ]
+    game_config_path = Path(rom) / "Data" / "Game" / "GameConfig.bin"
     if (
-        path.isfile(f"{rom}/Data/Game/GameConfig.bin")
-        and system.__getMD5(f"{rom}/Data/Game/GameConfig.bin") in originsGameConfig
+        game_config_path.is_file()
+        and system.__getMD5(str(game_config_path)) in originsGameConfig
     ):
         sonicConfig.set("Game", "GameType", "1")
 
@@ -104,8 +105,9 @@ def getMouseMode(self: Any, config: Any, rom: str) -> bool:
     ]
 
     enableMouse = False
-    if emu == "soniccd" and path.isfile(f"{rom}/Data.rsdk"):
-        enableMouse = self.__getMD5(f"{rom}/Data.rsdk") in mouseRoms
+    data_rsdk_path = Path(rom) / "Data.rsdk"
+    if emu == "soniccd" and data_rsdk_path.is_file():
+        enableMouse = self.__getMD5(str(data_rsdk_path)) in mouseRoms
     else:
         enableMouse = False
 
@@ -113,7 +115,7 @@ def getMouseMode(self: Any, config: Any, rom: str) -> bool:
 
 
 def __getMD5(self: Any, filename: str) -> str:
-    rp = path.realpath(filename)
+    rp = str(Path(filename).resolve())
 
     # Use an instance attribute for caching instead of function attribute
     if not hasattr(self, "_md5_cache"):

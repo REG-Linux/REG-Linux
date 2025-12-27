@@ -1,4 +1,5 @@
-from os import listdir, mkdir, path, rmdir
+from os import listdir, mkdir, rmdir
+from pathlib import Path
 from subprocess import call
 from typing import Any
 
@@ -30,14 +31,18 @@ def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
     eslog.debug(f"zar_begin({rom})")
 
     # Define the mount point based on the archive name
-    rommountpoint = "/var/run/zar/" + path.basename(rom)[:-4]  # remove .zar extension
+    rommountpoint = str(
+        Path("/var/run/zar") / Path(rom).name[:-4]
+    )  # remove .zar extension
 
     # Ensure base /var/run/zar directory exists
-    if not path.exists("/var/run/zar"):
-        mkdir("/var/run/zar")
+    zar_dir = Path("/var/run/zar")
+    if not zar_dir.exists():
+        zar_dir.mkdir(parents=True, exist_ok=True)
 
     # Try to clean up leftover mountpoint if it exists but is empty
-    if path.exists(rommountpoint) and path.isdir(rommountpoint):
+    mountpoint_path = Path(rommountpoint)
+    if mountpoint_path.exists() and mountpoint_path.is_dir():
         eslog.debug(f"zar_begin: {rommountpoint} already exists")
         try:
             rmdir(rommountpoint)
@@ -60,8 +65,8 @@ def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
         raise Exception(f"unable to mount the file {rom} using fuse-zar")
 
     # Check if the archive contains a single file named like the archive
-    romsingle = path.join(rommountpoint, path.basename(rom)[:-4])
-    if len(listdir(rommountpoint)) == 1 and path.exists(romsingle):
+    romsingle = str(Path(rommountpoint) / Path(rom).name[:-4])
+    if len(listdir(rommountpoint)) == 1 and Path(romsingle).exists():
         eslog.debug(f"zar: single rom {romsingle}")
         return True, rommountpoint, romsingle
 

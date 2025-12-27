@@ -1,15 +1,15 @@
-from os import path
+from pathlib import Path
 from typing import Any
 
 from configgen.systemFiles import CONF, LOGDIR
 from configgen.utils.logger import get_logger
 
-GZDOOM_CONFIG_DIR = CONF + "/gzdoom"
-GZDOOM_CONFIG_PATH = GZDOOM_CONFIG_DIR + "/gzdoom.ini"
-GZDOOM_LOG_PATH = LOGDIR + "/gzdoom.log"
-GZDOOM_SCRIPT_PATH = GZDOOM_CONFIG_DIR + "/gzdoom.cfg"
-GZDOOM_SOUND_FONT_PATH = GZDOOM_CONFIG_DIR + "/soundfonts"
-GZDOOM_FM_BANKS_PATH = GZDOOM_CONFIG_DIR + "/fm_banks"
+GZDOOM_CONFIG_DIR = str(Path(CONF) / "gzdoom")
+GZDOOM_CONFIG_PATH = str(Path(GZDOOM_CONFIG_DIR) / "gzdoom.ini")
+GZDOOM_LOG_PATH = str(Path(LOGDIR) / "gzdoom.log")
+GZDOOM_SCRIPT_PATH = str(Path(GZDOOM_CONFIG_DIR) / "gzdoom.cfg")
+GZDOOM_SOUND_FONT_PATH = str(Path(GZDOOM_CONFIG_DIR) / "soundfonts")
+GZDOOM_FM_BANKS_PATH = str(Path(GZDOOM_CONFIG_DIR) / "fm_banks")
 GZDOOM_ARCH_PATH = "/usr/share/reglinux/system.arch"
 
 
@@ -51,7 +51,7 @@ def setGzdoomConfig(system: Any, rom: str) -> None:
         )
 
     # check the directory name is in the ini file
-    if not path.exists(GZDOOM_CONFIG_PATH):
+    if not Path(GZDOOM_CONFIG_PATH).exists():
         with open(GZDOOM_CONFIG_PATH, "w") as file:
             file.write(
                 "[IWADSearch.Directories]\n"
@@ -66,7 +66,7 @@ def setGzdoomConfig(system: Any, rom: str) -> None:
     else:
         # configparser wasn't working on the default ini file (non-compliant)
         # it's not a true ini file, use this crude method instead
-        line_to_add = "Path=" + path.dirname(rom) + "\n"
+        line_to_add = "Path=" + str(Path(rom).parent) + "\n"
         with open(GZDOOM_CONFIG_PATH) as file:
             lines = file.readlines()
             if line_to_add not in lines:

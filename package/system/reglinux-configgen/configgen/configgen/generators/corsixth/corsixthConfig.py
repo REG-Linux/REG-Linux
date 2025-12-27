@@ -1,4 +1,5 @@
 from os import chdir
+from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
@@ -7,28 +8,30 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-CORSIXTH_CONFIG_DIR = CONF + "/CorsixTH"
-CORSIXTH_CONFIG_PATH = CORSIXTH_CONFIG_DIR + "/config.txt"
-CORSIXTH_SAVES_DIR = SAVES + "/corsixth"
-CORSIXTH_ROMS_DIR = ROMS + "/corsixth"
-CORSIXTH_FONT_PATH = "/usr/share/fonts/dejavu/DejaVuSans.ttf"
-CORSIXTH_SCREENSCHOTS_DIR = SCREENSHOTS + "/corsixth"
-CORSIXTH_BIN_PATH = "/usr/bin/corsix-th"
+CORSIXTH_CONFIG_DIR = CONF / "CorsixTH"
+CORSIXTH_CONFIG_PATH = CORSIXTH_CONFIG_DIR / "config.txt"
+CORSIXTH_SAVES_DIR = SAVES / "corsixth"
+CORSIXTH_ROMS_DIR = ROMS / "corsixth"
+CORSIXTH_FONT_PATH = Path("/usr/share/fonts/dejavu/DejaVuSans.ttf")
+CORSIXTH_SCREENSHOTS_DIR = SCREENSHOTS / "corsixth"
+CORSIXTH_BIN_PATH = Path("/usr/bin/corsix-th")
 CORSIXTH_GAME_DATA_DIR = [
-    "/userdata/roms/corsixth/ANIMS",
-    "/userdata/roms/corsixth/DATA",
-    "/userdata/roms/corsixth/INTRO",
-    "/userdata/roms/corsixth/LEVELS",
-    "/userdata/roms/corsixth/QDATA",
+    Path("/userdata/roms/corsixth/ANIMS"),
+    Path("/userdata/roms/corsixth/DATA"),
+    Path("/userdata/roms/corsixth/INTRO"),
+    Path("/userdata/roms/corsixth/LEVELS"),
+    Path("/userdata/roms/corsixth/QDATA"),
 ]
 
 
 def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> None:
     corsixthConfig.write("check_for_updates = false\n")
-    corsixthConfig.write("theme_hospital_install = [[" + CORSIXTH_ROMS_DIR + "]]\n")
-    corsixthConfig.write("unicode_font = [[" + CORSIXTH_FONT_PATH + "]]\n")
-    corsixthConfig.write("savegames = [[" + CORSIXTH_SAVES_DIR + "]]\n")
-    corsixthConfig.write("screenshots = [[" + CORSIXTH_SCREENSCHOTS_DIR + "]]\n")
+    corsixthConfig.write(
+        "theme_hospital_install = [[" + str(CORSIXTH_ROMS_DIR) + "]]\n"
+    )
+    corsixthConfig.write("unicode_font = [[" + str(CORSIXTH_FONT_PATH) + "]]\n")
+    corsixthConfig.write("savegames = [[" + str(CORSIXTH_SAVES_DIR) + "]]\n")
+    corsixthConfig.write("screenshots = [[" + str(CORSIXTH_SCREENSHOTS_DIR) + "]]\n")
 
     # Values coming from ES configuration : Resolution
     corsixthConfig.write("fullscreen = true\n")
@@ -100,11 +103,10 @@ def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> 
     corsixthConfig.write("language = [[" + corsixthLanguage + "]]\n")
 
     # Check custom music is installed
+    music_dir = CORSIXTH_ROMS_DIR / "MP3"
     try:
-        chdir(CORSIXTH_ROMS_DIR + "/MP3")
-        corsixthConfig.write("audio_music = [[" + CORSIXTH_ROMS_DIR + "/MP3" + "]]\n")
+        chdir(str(music_dir))
+        corsixthConfig.write("audio_music = [[" + str(music_dir) + "]]\n")
     except (FileNotFoundError, OSError) as e:
-        eslog.debug(
-            f"Corsixth: Music directory not found: {CORSIXTH_ROMS_DIR}/MP3 - {str(e)}"
-        )
+        eslog.debug(f"Corsixth: Music directory not found: {music_dir} - {str(e)}")
         corsixthConfig.write("audio_music = nil\n")

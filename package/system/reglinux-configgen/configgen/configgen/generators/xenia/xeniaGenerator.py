@@ -1,5 +1,6 @@
 from filecmp import dircmp
-from os import environ, makedirs, path
+from os import environ
+from pathlib import Path
 from shutil import copy2
 from subprocess import CalledProcessError, check_output
 from sys import exit
@@ -22,10 +23,10 @@ from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-XENIA_CONFIG_DIR = CONF + "/xenia"
-XENIA_CACHE_DIR = HOME + "/cache/xenia"
-XENIA_SAVES_DIR = SAVES + "/xbox360"
-XENIA_CANARY_BIN_PATH = "/usr/bin/xenia_canary"
+XENIA_CONFIG_DIR = CONF / "xenia"
+XENIA_CACHE_DIR = HOME / "cache" / "xenia"
+XENIA_SAVES_DIR = SAVES / "xbox360"
+XENIA_CANARY_BIN_PATH = Path("/usr/bin/xenia_canary")
 
 
 class XeniaGenerator(Generator):
@@ -39,8 +40,8 @@ class XeniaGenerator(Generator):
         # Files that are only in the source directory or are different
         differing_files = dcmp.diff_files + dcmp.left_only
         for file in differing_files:
-            src_path = path.join(source_dir, file)
-            dest_path = path.join(dest_dir, file)
+            src_path = Path(source_dir) / file
+            dest_path = Path(dest_dir) / file
             # Copy and overwrite the files from source to destination
             copy2(src_path, dest_path)
 
@@ -95,17 +96,17 @@ class XeniaGenerator(Generator):
         except CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
 
-        if not path.exists(XENIA_CONFIG_DIR):
-            makedirs(XENIA_CONFIG_DIR)
-        if not path.exists(XENIA_CACHE_DIR):
-            makedirs(XENIA_CACHE_DIR)
-        if not path.exists(XENIA_SAVES_DIR):
-            makedirs(XENIA_SAVES_DIR)
+        if not XENIA_CONFIG_DIR.exists():
+            XENIA_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        if not XENIA_CACHE_DIR.exists():
+            XENIA_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        if not XENIA_SAVES_DIR.exists():
+            XENIA_SAVES_DIR.mkdir(parents=True, exist_ok=True)
 
         # are we loading a digital title?
-        if path.splitext(rom)[1] == ".xbox360":
+        if Path(rom).suffix == ".xbox360":
             eslog.debug(f"Found .xbox360 playlist: {rom}")
-            pathLead = path.dirname(rom)
+            pathLead = Path(rom).parent
             try:
                 with open(rom) as openFile:
                     # Read only the first line of the file.
@@ -115,10 +116,10 @@ class XeniaGenerator(Generator):
                 eslog.debug(
                     "Checking if specified disc installation / XBLA file actually exists..."
                 )
-                xblaFullPath = pathLead + "/" + firstLine
-                if path.exists(xblaFullPath):
+                xblaFullPath = pathLead / firstLine
+                if xblaFullPath.exists():
                     eslog.debug(f"Found! Switching active rom to: {firstLine}")
-                    rom = xblaFullPath
+                    rom = str(xblaFullPath)
                 else:
                     eslog.error(
                         f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename."
@@ -131,10 +132,10 @@ class XeniaGenerator(Generator):
         # adjust the config toml file accordingly
         config = {}
         if core == "xenia-canary":
-            toml_file = XENIA_CONFIG_DIR + "/xenia-canary.config.toml"
+            toml_file = XENIA_CONFIG_DIR / "xenia-canary.config.toml"
         else:
-            toml_file = XENIA_CONFIG_DIR + "/xenia.config.toml"
-        if path.isfile(toml_file):
+            toml_file = XENIA_CONFIG_DIR / "xenia.config.toml"
+        if toml_file.is_file():
             with open(toml_file) as f:
                 config = load(f)
 
@@ -282,19 +283,17 @@ class XeniaGenerator(Generator):
             dump(config, f)
 
         # handle patches files to set all matching toml files keys to true
-        rom_name = path.splitext(path.basename(rom))[0]
+        rom_name = Path(rom).stem
         # simplify the name for matching
         rom_name = sub(r"\[.*?\]", "", rom_name)
         rom_name = sub(r"\(.*?\)", "", rom_name)
         if system.isOptSet("xeniaPatches") and system.config["xeniaPatches"] == "True":
             # pattern to search for matching .patch.toml files
-            pattern = path.join(
-                XENIA_CONFIG_DIR, "patches", "*" + rom_name + "*.patch.toml"
-            )
+            pattern = str(XENIA_CONFIG_DIR / "patches" / f"*{rom_name}*.patch.toml")
             matching_files = [
                 file_path
                 for file_path in glob(pattern)
-                if search(rom_name, path.basename(file_path), IGNORECASE)
+                if search(rom_name, Path(file_path).name, IGNORECASE)
             ]
             if matching_files:
                 for file_path in matching_files:
@@ -315,12 +314,12 @@ class XeniaGenerator(Generator):
         # now setup the command array for the emulator
         if rom == "config":
             if core == "xenia-canary":
-                command_array = [XENIA_CANARY_BIN_PATH]
+                command_array = [str(XENIA_CANARY_BIN_PATH)]
             else:
                 command_array = ["xenia.exe"]
         else:
             if core == "xenia-canary":
-                command_array = [XENIA_CANARY_BIN_PATH, "z:" + rom]
+                command_array = [str(XENIA_CANARY_BIN_PATH), "z:" + rom]
             else:
                 command_array = ["xenia.exe", "z:" + rom]
 
@@ -328,11 +327,11 @@ class XeniaGenerator(Generator):
             "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
                 players_controllers
             ),
-            "VKD3D_SHADER_CACHE_PATH": XENIA_CACHE_DIR,
+            "VKD3D_SHADER_CACHE_PATH": str(XENIA_CACHE_DIR),
         }
 
         # ensure nvidia driver used for vulkan
-        if path.exists("/var/tmp/nvidia.prime"):
+        if Path("/var/tmp/nvidia.prime").exists():
             variables_to_remove = [
                 "__NV_PRIME_RENDER_OFFLOAD",
                 "__VK_LAYER_NV_optimus",

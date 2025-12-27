@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from contextlib import suppress
-from os import environ, makedirs, path
+from os import environ
+from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
@@ -38,12 +39,14 @@ class DolphinGenerator(Generator):
         wheels: Any,
         game_resolution: dict[str, int],
     ) -> Command:
-        if not path.exists(path.dirname(DOLPHIN_CONFIG_PATH)):
-            makedirs(path.dirname(DOLPHIN_CONFIG_PATH))
+        config_dir = Path(DOLPHIN_CONFIG_PATH).parent
+        if not config_dir.exists():
+            config_dir.mkdir(parents=True, exist_ok=True)
 
         # Dir required for saves
-        if not path.exists(DOLPHIN_SAVES_DIR + "/StateSaves"):
-            makedirs(DOLPHIN_SAVES_DIR + "/StateSaves")
+        saves_dir = Path(DOLPHIN_SAVES_DIR) / "StateSaves"
+        if not saves_dir.exists():
+            saves_dir.mkdir(parents=True, exist_ok=True)
 
         # FIXME Generate the controller config(s)
         # generateControllerConfig(system, players_controllers, metadata, wheels, rom, guns)
@@ -52,7 +55,8 @@ class DolphinGenerator(Generator):
         dolphinSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinSettings.optionxform = lambda optionstr: str(optionstr)
-        if path.exists(DOLPHIN_CONFIG_PATH):
+        config_path = Path(DOLPHIN_CONFIG_PATH)
+        if config_path.exists():
             dolphinSettings.read(DOLPHIN_CONFIG_PATH)
 
         # Sections
@@ -73,8 +77,10 @@ class DolphinGenerator(Generator):
 
         # Define default games path
         if "ISOPaths" not in dolphinSettings["General"]:
-            dolphinSettings.set("General", "ISOPath0", "/userdata/roms/wii")
-            dolphinSettings.set("General", "ISOPath1", "/userdata/roms/gamecube")
+            dolphinSettings.set("General", "ISOPath0", str(Path("/userdata/roms/wii")))
+            dolphinSettings.set(
+                "General", "ISOPath1", str(Path("/userdata/roms/gamecube"))
+            )
             dolphinSettings.set("General", "ISOPaths", "2")
 
         # Don't ask about statistics
@@ -197,7 +203,9 @@ class DolphinGenerator(Generator):
             )
         ):
             dolphinSettings.set(
-                "General", "CustomTexturesPath", "/usr/share/DolphinCrosshairsPack"
+                "General",
+                "CustomTexturesPath",
+                str(Path("/usr/share/DolphinCrosshairsPack")),
             )
         else:
             dolphinSettings.remove_option("General", "CustomTexturesPath")
@@ -211,11 +219,8 @@ class DolphinGenerator(Generator):
         ):
             # check files exist to avoid crashes
             ipl_regions = ["USA", "EUR", "JAP"]
-            base_path = "/userdata/bios/GC"
-            if any(
-                path.exists(path.join(base_path, region, "IPL.bin"))
-                for region in ipl_regions
-            ):
+            base_path = Path("/userdata/bios/GC")
+            if any((base_path / region / "IPL.bin").exists() for region in ipl_regions):
                 dolphinSettings.set("Core", "SkipIPL", "False")
             else:
                 dolphinSettings.set("Core", "SkipIPL", "True")
@@ -551,7 +556,7 @@ class DolphinGenerator(Generator):
         )
         #
         # Write the configuration to the file
-        hotkey_path = "/userdata/system/configs/dolphin-emu/Hotkeys.ini"
+        hotkey_path = Path("/userdata/system/configs/dolphin-emu/Hotkeys.ini")
         with open(hotkey_path, "w") as configfile:
             hotkeyConfig.write(configfile)
 
@@ -588,7 +593,7 @@ class DolphinGenerator(Generator):
             RacConfig.set("Achievements", "Enabled", "False")
             RacConfig.set("Achievements", "AchievementsEnabled", "False")
         # Write the configuration to the file
-        rac_path = "/userdata/system/configs/dolphin-emu/RetroAchievements.ini"
+        rac_path = Path("/userdata/system/configs/dolphin-emu/RetroAchievements.ini")
         with open(rac_path, "w") as rac_configfile:
             RacConfig.write(rac_configfile)
 
@@ -597,7 +602,7 @@ class DolphinGenerator(Generator):
             updateConfig(system.config, DOLPHIN_SYSCONF_PATH, game_resolution)
 
         # Check what version we've got
-        if path.isfile(DOLPHIN_BIN_PATH):
+        if Path(DOLPHIN_BIN_PATH).is_file():
             # use the -b 'batch' option for nicer exit
             command_array = [DOLPHIN_BIN_PATH, "-b", "-e", rom]
         else:

@@ -1,5 +1,5 @@
-import os
 import subprocess
+from pathlib import Path
 from typing import Any
 
 from configgen.utils.logger import get_logger
@@ -26,28 +26,30 @@ eslog = get_logger(__name__)
 
 def squashfs_begin(rom: str) -> tuple[bool, str | None, Any]:
     eslog.debug(f"squashfs_begin({rom})")
-    rommountpoint = "/var/run/squashfs/" + os.path.basename(rom)[:-9]
+    rom_path = Path(rom)
+    rommountpoint = Path("/var/run/squashfs") / rom_path.name[:-9]
 
-    if not os.path.exists("/var/run/squashfs"):
-        os.mkdir("/var/run/squashfs")
+    squashfs_dir = Path("/var/run/squashfs")
+    if not squashfs_dir.exists():
+        squashfs_dir.mkdir(parents=True, exist_ok=True)
 
     # first, try to clean an empty remaining directory (for example because of a crash)
-    if os.path.exists(rommountpoint) and os.path.isdir(rommountpoint):
+    if rommountpoint.exists() and rommountpoint.is_dir():
         eslog.debug(f"squashfs_begin: {rommountpoint} already exists")
         # try to remove an empty directory, else, run the directory, ignoring the .squashfs
         try:
-            os.rmdir(rommountpoint)
+            rommountpoint.rmdir()
         except (OSError, FileNotFoundError) as e:
             eslog.debug(f"squashfs_begin: failed to rmdir {rommountpoint} - {str(e)}")
-            return False, None, rommountpoint
+            return False, None, str(rommountpoint)
 
     # ok, the base directory doesn't exist, let's create it and mount the squashfs on it
-    os.mkdir(rommountpoint)
-    return_code = subprocess.call(["mount", rom, rommountpoint])
+    rommountpoint.mkdir(parents=True, exist_ok=True)
+    return_code = subprocess.call(["mount", rom, str(rommountpoint)])
     if return_code != 0:
-        eslog.debug(f"squashfs_begin: mounting {rommountpoint} failed")
+        eslog.debug(f"squashfs_begin: mounting {str(rommountpoint)} failed")
         try:
-            os.rmdir(rommountpoint)
+            rommountpoint.rmdir()
         except (OSError, FileNotFoundError) as e:
             eslog.debug(
                 f"squashfs: failed to remove directory {rommountpoint} - {str(e)}"
@@ -56,12 +58,12 @@ def squashfs_begin(rom: str) -> tuple[bool, str | None, Any]:
         raise Exception(f"unable to mount the file {rom}")
 
     # if the squashfs contains a single file with the same name, take it as the rom file
-    romsingle = rommountpoint + "/" + os.path.basename(rom)[:-9]
-    if len(os.listdir(rommountpoint)) == 1 and os.path.exists(romsingle):
+    romsingle = rommountpoint / rom_path.name[:-9]
+    if len(list(rommountpoint.iterdir())) == 1 and romsingle.exists():
         eslog.debug(f"squashfs: single rom {romsingle}")
-        return True, rommountpoint, romsingle
+        return True, str(rommountpoint), str(romsingle)
 
-    return True, rommountpoint, rommountpoint
+    return True, str(rommountpoint), str(rommountpoint)
 
 
 def squashfs_end(rommountpoint: str) -> bool:
@@ -74,5 +76,5 @@ def squashfs_end(rommountpoint: str) -> bool:
         raise Exception(f"unable to umount the file {rommountpoint}")
 
     # cleaning the empty directory
-    os.rmdir(rommountpoint)
+    Path(rommountpoint).rmdir()
     return True

@@ -1,10 +1,10 @@
 import re
-from os import path
+from pathlib import Path
 from typing import Any
 
 
 def shortNameFromPath(path_name: str) -> str:
-    redname = path.splitext(path.basename(path_name))[0].lower()
+    redname = Path(path_name).stem.lower()
     inpar = False
     inblock = False
     ret = ""

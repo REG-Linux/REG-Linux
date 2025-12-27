@@ -1,10 +1,12 @@
+from pathlib import Path
+
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, ROMS
 
 DHEWM3_BIN_PATH = "/usr/bin/dhewm3"
-DHEWM3_CONFIG_DIR = CONF + "/dhewm3"
-DHEWM3_ROMS_DIR = ROMS + "/doom3"
+DHEWM3_CONFIG_DIR = str(Path(CONF) / "dhewm3")
+DHEWM3_ROMS_DIR = str(Path(ROMS) / "doom3")
 
 
 class Dhewm3Generator(Generator):

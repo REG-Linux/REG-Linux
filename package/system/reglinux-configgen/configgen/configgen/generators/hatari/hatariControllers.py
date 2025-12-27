@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from os import makedirs, path
+from pathlib import Path
 from typing import Any
 
 from .hatariConfig import HATARI_CONFIG_DIR, HATARI_CONFIG_PATH
@@ -13,10 +13,12 @@ def setHatariControllers(system: Any, playersControllers: Any) -> None:
 
     padMapping = {1: "y", 2: "b", 3: "a"}
 
-    if not path.exists(HATARI_CONFIG_DIR):
-        makedirs(HATARI_CONFIG_DIR)
+    config_dir_path = Path(HATARI_CONFIG_DIR)
+    if not config_dir_path.exists():
+        config_dir_path.mkdir(parents=True, exist_ok=True)
 
-    if path.isfile(HATARI_CONFIG_PATH):
+    config_path = Path(HATARI_CONFIG_PATH)
+    if config_path.is_file():
         config.read(HATARI_CONFIG_PATH)
 
     # pads

@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from json import loads
-from os import makedirs, path, remove
+from pathlib import Path
 from shutil import copyfile
 from subprocess import CalledProcessError, check_output
 from time import time
@@ -18,11 +18,11 @@ from .pcsx2Controllers import (
     wheelTypeMapping,
 )
 
-PCSX2_CONFIG_DIR = CONF + "/PCSX2"
-PCSX2_BIOS_DIR = BIOS + "/ps2"
-PCSX2_BIN_PATH = "/usr/pcsx2/bin/pcsx2-qt"
-PCSX2_PATCHES_PATH = PCSX2_BIOS_DIR + "/patches.zip"
-PCSX2_SOURCE_PATH = "/usr/share/reglinux/datainit/bios/ps2/patches.zip"
+PCSX2_CONFIG_DIR = CONF / "PCSX2"
+PCSX2_BIOS_DIR = BIOS / "ps2"
+PCSX2_BIN_PATH = Path("/usr/pcsx2/bin/pcsx2-qt")
+PCSX2_PATCHES_PATH = PCSX2_BIOS_DIR / "patches.zip"
+PCSX2_SOURCE_PATH = Path("/usr/share/reglinux/datainit/bios/ps2/patches.zip")
 
 
 eslog = get_logger(__name__)
@@ -51,9 +51,9 @@ def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
 
 
 def setPcsx2Reg():
-    configFileName = "{}/{}".format(PCSX2_CONFIG_DIR, "PCSX2-reg.ini")
-    if not path.exists(PCSX2_CONFIG_DIR):
-        makedirs(PCSX2_CONFIG_DIR)
+    configFileName = PCSX2_CONFIG_DIR / "PCSX2-reg.ini"
+    if not PCSX2_CONFIG_DIR.exists():
+        PCSX2_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     with open(configFileName, "w") as f:
         f.write("DocumentsFolderMode=User\n")
         f.write("CustomDocumentsFolder=/usr/pcsx2/bin\n")
@@ -65,12 +65,13 @@ def setPcsx2Reg():
 
 
 def configureAudio():
-    configFileName = "{}/{}".format(PCSX2_CONFIG_DIR + "/inis", "spu2-x.ini")
-    if not path.exists(PCSX2_CONFIG_DIR + "/inis"):
-        makedirs(PCSX2_CONFIG_DIR + "/inis")
+    config_dir = PCSX2_CONFIG_DIR / "inis"
+    configFileName = config_dir / "spu2-x.ini"
+    if not config_dir.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
 
     # Keep the custom files
-    if path.exists(configFileName):
+    if configFileName.exists():
         return
 
     with open(configFileName, "w") as f:
@@ -96,12 +97,13 @@ def setPcsx2Config(
     wheels: Any,
     playingWithWheel: Any,
 ) -> None:
-    configFileName = "{}/{}".format(PCSX2_CONFIG_DIR + "/inis", "PCSX2.ini")
+    config_dir = PCSX2_CONFIG_DIR / "inis"
+    configFileName = config_dir / "PCSX2.ini"
 
-    if not path.exists(PCSX2_CONFIG_DIR + "/inis"):
-        makedirs(PCSX2_CONFIG_DIR + "/inis")
+    if not config_dir.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
 
-    if not path.isfile(configFileName):
+    if not configFileName.is_file():
         with open(configFileName, "w") as f:
             f.write("[UI]\n")
 
@@ -109,7 +111,7 @@ def setPcsx2Config(
     # To prevent ConfigParser from converting to lower case
     pcsx2INIConfig.optionxform = lambda optionstr: str(optionstr)
 
-    if path.isfile(configFileName):
+    if configFileName.is_file():
         pcsx2INIConfig.read(configFileName)
 
     ## [UI]
@@ -150,8 +152,9 @@ def setPcsx2Config(
     pcsx2INIConfig.set("Folders", "Videos", "../../../saves/ps2/pcsx2/videos")
 
     # create cache folder
-    if not path.exists("/userdata/system/cache/ps2"):
-        makedirs("/userdata/system/cache/ps2")
+    cache_dir = Path("/userdata/system/cache/ps2")
+    if not cache_dir.exists():
+        cache_dir.mkdir(parents=True, exist_ok=True)
 
     ## [EmuCore]
     if not pcsx2INIConfig.has_section("EmuCore"):
@@ -626,36 +629,38 @@ def setPcsx2Config(
         "/usr/pcsx2/bin/resources/textures/SCES-52530/replacements/c321d53987f3986d-eadd4df7c9d76527-00005dd4.png",
         "/usr/pcsx2/bin/resources/textures/SLUS-20927/replacements/c321d53987f3986d-eadd4df7c9d76527-00005dd4.png",
     ]
-    texture_dir = PCSX2_CONFIG_DIR + "/textures"
+    texture_dir = str(Path(PCSX2_CONFIG_DIR) / "textures")
     # copy textures if necessary to PCSX2 config folder
     if (
         system.isOptSet("pcsx2_crisis_fog")
         and system.config["pcsx2_crisis_fog"] == "true"
     ):
         for file_path in fog_files:
-            parent_directory_name = path.basename(path.dirname(path.dirname(file_path)))
-            file_name = path.basename(file_path)
-            texture_directory_path = path.join(
-                texture_dir, parent_directory_name, "replacements"
+            file_path_obj = Path(file_path)
+            parent_directory_name = file_path_obj.parent.parent.name
+            file_name = file_path_obj.name
+            texture_directory_path = (
+                Path(texture_dir) / parent_directory_name / "replacements"
             )
-            makedirs(texture_directory_path, exist_ok=True)
+            texture_directory_path.mkdir(parents=True, exist_ok=True)
 
-            destination_file_path = path.join(texture_directory_path, file_name)
+            destination_file_path = texture_directory_path / file_name
 
-            copyfile(file_path, destination_file_path)
+            copyfile(str(file_path_obj), str(destination_file_path))
         # set texture replacement on regardless of previous setting
         pcsx2INIConfig.set("EmuCore/GS", "LoadTextureReplacements", "true")
     else:
         for file_path in fog_files:
-            parent_directory_name = path.basename(path.dirname(path.dirname(file_path)))
-            file_name = path.basename(file_path)
-            texture_directory_path = path.join(
-                texture_dir, parent_directory_name, "replacements"
+            file_path_obj = Path(file_path)
+            parent_directory_name = file_path_obj.parent.parent.name
+            file_name = file_path_obj.name
+            texture_directory_path = (
+                Path(texture_dir) / parent_directory_name / "replacements"
             )
-            target_file_path = path.join(texture_directory_path, file_name)
+            target_file_path = texture_directory_path / file_name
 
-            if path.isfile(target_file_path):
-                remove(target_file_path)
+            if target_file_path.is_file():
+                target_file_path.unlink()
 
     # wheels
     wtype = getWheelType(metadata, playingWithWheel, system.config)
@@ -877,7 +882,7 @@ def setPcsx2Config(
     if not pcsx2INIConfig.has_section("GameList"):
         pcsx2INIConfig.add_section("GameList")
 
-    pcsx2INIConfig.set("GameList", "RecursivePaths", "/userdata/roms/ps2")
+    pcsx2INIConfig.set("GameList", "RecursivePaths", str(Path("/userdata/roms/ps2")))
 
     with open(configFileName, "w") as configfile:
         pcsx2INIConfig.write(configfile)

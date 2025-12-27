@@ -132,31 +132,40 @@ class BezelUtils:
 
         # Priority: game-specific overlays
         candidates += [
-            ("games", OVERLAY_USER, True, f"{system_name}/{rom_base}"),
-            ("games", OVERLAY_SYSTEM, True, f"{system_name}/{rom_base}"),
-            ("games", OVERLAY_USER, True, rom_base),
-            ("games", OVERLAY_SYSTEM, True, rom_base),
+            ("games", str(OVERLAY_USER), True, f"{system_name}/{rom_base}"),
+            ("games", str(OVERLAY_SYSTEM), True, f"{system_name}/{rom_base}"),
+            ("games", str(OVERLAY_USER), True, rom_base),
+            ("games", str(OVERLAY_SYSTEM), True, rom_base),
         ]
 
         # System-specific overlays (with or without altDecoration)
         if alt_decoration != 0:
             candidates.append(
-                ("systems", OVERLAY_USER, False, f"{system_name}-{alt_decoration}")
+                ("systems", str(OVERLAY_USER), False, f"{system_name}-{alt_decoration}")
             )
-        candidates.append(("systems", OVERLAY_USER, False, system_name))
+        candidates.append(("systems", str(OVERLAY_USER), False, system_name))
         if alt_decoration != 0:
             candidates.append(
-                ("systems", OVERLAY_SYSTEM, False, f"{system_name}-{alt_decoration}")
+                (
+                    "systems",
+                    str(OVERLAY_SYSTEM),
+                    False,
+                    f"{system_name}-{alt_decoration}",
+                )
             )
-        candidates.append(("systems", OVERLAY_SYSTEM, False, system_name))
+        candidates.append(("systems", str(OVERLAY_SYSTEM), False, system_name))
 
         # Default fallback overlays
         if alt_decoration != 0:
-            candidates.append(("", OVERLAY_USER, True, f"default-{alt_decoration}"))
-        candidates.append(("", OVERLAY_USER, True, "default"))
+            candidates.append(
+                ("", str(OVERLAY_USER), True, f"default-{alt_decoration}")
+            )
+        candidates.append(("", str(OVERLAY_USER), True, "default"))
         if alt_decoration != 0:
-            candidates.append(("", OVERLAY_SYSTEM, True, f"default-{alt_decoration}"))
-        candidates.append(("", OVERLAY_SYSTEM, True, "default"))
+            candidates.append(
+                ("", str(OVERLAY_SYSTEM), True, f"default-{alt_decoration}")
+            )
+        candidates.append(("", str(OVERLAY_SYSTEM), True, "default"))
 
         for subfolder, basepath, bezel_game, name in candidates:
             prefix = (

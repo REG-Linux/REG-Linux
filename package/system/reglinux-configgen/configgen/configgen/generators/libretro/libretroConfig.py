@@ -1,7 +1,7 @@
 import fcntl
 import subprocess
 import sys
-from os import makedirs, path, remove
+from pathlib import Path
 from typing import Any
 from xml.etree.ElementTree import parse
 
@@ -24,17 +24,17 @@ from configgen.utils.videoMode import getAltDecoration, supportSystemRotation
 from .libretroMAMEConfig import generateMAMEConfigs
 from .libretroOptions import generateCoreSettings, generateHatariConf
 
-hatariConf = CONF + "/hatari/hatari.cfg"
-retroarchRoot = CONF + "/retroarch"
-retroarchRootInit = CONF_INIT + "/retroarch"
-retroarchCustom = retroarchRoot + "/retroarchcustom.cfg"
-retroarchCoreCustom = retroarchRoot + "/cores/retroarch-core-options.cfg"
+hatariConf = str(Path(CONF) / "hatari" / "hatari.cfg")
+retroarchRoot = str(Path(CONF) / "retroarch")
+retroarchRootInit = str(Path(CONF_INIT) / "retroarch")
+retroarchCustom = str(Path(retroarchRoot) / "retroarchcustom.cfg")
+retroarchCoreCustom = str(Path(retroarchRoot) / "cores" / "retroarch-core-options.cfg")
 retroarchCores = "/usr/lib/libretro/"
 retroarchBin = "/usr/bin/retroarch"
 
 eslog = get_logger(__name__)
 
-sys.path.append(path.abspath(path.join(path.dirname(__file__), "../..")))
+sys.path.append(str(Path(__file__).parent.parent))
 
 
 # Return value for es invertedbuttons
@@ -261,8 +261,9 @@ def createLibretroConfig(
 ) -> dict[str, Any]:
     # retroarch-core-options.cfg
     retroarchCore = retroarchCoreCustom
-    if not path.exists(path.dirname(retroarchCore)):
-        makedirs(path.dirname(retroarchCore))
+    retroarchCoreDir = Path(retroarchCore).parent
+    if not retroarchCoreDir.exists():
+        retroarchCoreDir.mkdir(parents=True, exist_ok=True)
 
     # Use file locking to prevent race conditions when multiple instances
     # try to create/modify the configuration file simultaneously
@@ -279,8 +280,9 @@ def createLibretroConfig(
                 eslog.warning(
                     f"Invalid Unicode in {retroarchCore}, reinitializing file."
                 )
-                if path.exists(retroarchCore):
-                    remove(retroarchCore)
+                retroarchCorePath = Path(retroarchCore)
+                if retroarchCorePath.exists():
+                    retroarchCorePath.unlink()
                 coreSettings = UnixSettings(retroarchCore, separator=" ")
             # Lock is automatically released when file is closed
     except Exception as e:
@@ -289,8 +291,9 @@ def createLibretroConfig(
         try:
             coreSettings = UnixSettings(retroarchCore, separator=" ")
         except UnicodeError:
-            if path.exists(retroarchCore):
-                remove(retroarchCore)
+            retroarchCorePath = Path(retroarchCore)
+            if retroarchCorePath.exists():
+                retroarchCorePath.unlink()
             coreSettings = UnixSettings(retroarchCore, separator=" ")
 
     # Create/update retroarch-core-options.cfg
@@ -425,9 +428,10 @@ def createLibretroConfig(
         "false"  # required at least on x86 x86_64 otherwise, the game is paused at launch
     )
 
-    if not path.exists(CONF + "/retroarch/cache"):
-        makedirs(CONF + "/retroarch/cache")
-    retroarchConfig["cache_directory"] = CONF + "/retroarch/cache"
+    cache_dir = CONF / "retroarch" / "cache"
+    if not cache_dir.exists():
+        cache_dir.mkdir(parents=True, exist_ok=True)
+    retroarchConfig["cache_directory"] = str(cache_dir)
 
     # require for core informations
     retroarchConfig["libretro_directory"] = "/usr/lib/libretro"
@@ -443,8 +447,8 @@ def createLibretroConfig(
     retroarchConfig["sort_savestates_enable"] = (
         "false"  # ensure we don't save system.name + core
     )
-    retroarchConfig["savestate_directory"] = SAVES + system.name
-    retroarchConfig["savefile_directory"] = SAVES + system.name
+    retroarchConfig["savestate_directory"] = str(Path(SAVES) / system.name)
+    retroarchConfig["savefile_directory"] = str(Path(SAVES) / system.name)
 
     # Forced values (so that if the config is not correct, fix it)
     if system.config["core"] == "tgbdual":
