@@ -84,9 +84,10 @@ BR2_PACKAGE_PYTHON_HASHLIB=y
 # disable the mosquitto broker which is on by default
 BR2_PACKAGE_MOSQUITTO_BROKER=n
 
-# always build cairo with PNG support
+# always build cairo with PNG+ZLIB support (hence PDF)
 BR2_PACKAGE_CAIRO=y
 BR2_PACKAGE_CAIRO_PNG=y
+BR2_PACKAGE_CAIRO_ZLIB=y
 
 # force enable ffplay
 BR2_PACKAGE_FFMPEG_FFPLAY=y
