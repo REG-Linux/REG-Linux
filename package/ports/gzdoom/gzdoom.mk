@@ -36,7 +36,7 @@ GZDOOM_CONF_OPTS += -DCMAKE_C_FLAGS="-DLZMA_NO_MT -DZ7_AFFINITY_DISABLE"
 GZDOOM_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS="-L$(STAGING_DIR)/usr/lib -lfts"
 endif
 
-# Add sway check because of Vulkan KMS/DRM devices like vim1s/vim4 (libmali)
+# Enable vulkan only if we have it + Sway
 ifeq ($(BR2_PACKAGE_VULKAN_HEADERS)$(BR2_PACKAGE_VULKAN_LOADER)$(BR2_PACKAGE_SWAY),yyy)
     GZDOOM_CONF_OPTS += -DHAVE_VULKAN=ON
     GZDOOM_DEPENDENCIES += vulkan-headers vulkan-loader
@@ -49,29 +49,12 @@ else
     GZDOOM_CONF_OPTS += -DHAVE_VULKAN=OFF
 endif
 
-# This applies the patches to actually use GLES2.
-# By default, gzdoom attempts to use GLES2 with an OpenGL context.
-# This only works if the system has both OpenGL and GLES2.
-#
-# To fix this, we need to make 2 changes:
-# 1. Set `USE_GLES2` to 1 in gles_system.h
-# 2. Define `__ANDROID__` in gles_system.cpp so that gzdoom loads the gles2 `.so`.
-#
-# Then, at runtime, we set `gl_es = 1` and `vid_preferbackend = 3`.
-#
-# See https://github.com/ZDoom/gzdoom/issues/1485
-define GZDOOM_PATCH_USE_GLES2
-	$(SED) 's%#define USE_GLES2 0%#define USE_GLES2 1%' $(@D)/src/common/rendering/gles/gles_system.h
-	$(SED) '1i #define __ANDROID__' $(@D)/src/common/rendering/gles/gles_system.cpp
-endef
-
-ifneq ($(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY),y)
-    GZDOOM_CONF_OPTS += -DHAVE_GLES2=ON
-    GZDOOM_DEPENDENCIES += libgles
-    GZDOOM_POST_PATCH_HOOKS += GZDOOM_PATCH_USE_GLES2
-else
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
     GZDOOM_CONF_OPTS += -DHAVE_GLES2=OFF
     GZDOOM_DEPENDENCIES += libgl
+else
+    GZDOOM_CONF_OPTS += -DHAVE_GLES2=ON
+    GZDOOM_DEPENDENCIES += libgles
 endif
 
 define GZDOOM_INSTALL_TARGET_CMDS
