@@ -1,9 +1,11 @@
+from typing import Any
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 
-def setAzaharControllers(azaharConfig, playersControllers):
+def setAzaharControllers(azaharConfig: Any, playersControllers: Any) -> None:
     azaharButtons = {
         "button_a": "a",
         "button_b": "b",
@@ -52,16 +54,17 @@ def setAzaharControllers(azaharConfig, playersControllers):
         break
 
 
-def setButton(key, padGuid, padInputs):
+def setButton(key: str, padGuid: str, padInputs: Any) -> str:
     if key in padInputs:
         input = padInputs[key]
         if input.type == "button":
             return f"button:{input.id},guid:{padGuid},engine:sdl"
-        elif input.type == "hat":
+        if input.type == "hat":
             return f"engine:sdl,guid:{padGuid},hat:{input.id},direction:{hatdirectionvalue(input.id[-1])}"
+    return ""  # Return empty string if key not found
 
 
-def setAxis(key, padGuid, padInputs):
+def setAxis(key: str, padGuid: str, padInputs: Any) -> str:
     inputx, inputy = None, None
     if key == "leftx":
         inputx, inputy = padInputs.get("leftx"), padInputs.get("lefty")
@@ -75,7 +78,7 @@ def setAxis(key, padGuid, padInputs):
 
 
 @staticmethod
-def hatdirectionvalue(value):
+def hatdirectionvalue(value: str) -> str:
     if int(value) == 1:
         return "up"
     if int(value) == 4:
@@ -87,7 +90,7 @@ def hatdirectionvalue(value):
     return "unknown"
 
 
-def getMouseMode(self, config, rom):
+def getMouseMode(config: Any, rom: str) -> bool:
     return not (
         "azahar_screen_layout" in config and config["azahar_screen_layout"] == "1-false"
     )

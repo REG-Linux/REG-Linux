@@ -1,17 +1,25 @@
-from configgen.systemFiles import ROMS, CONF
-from os import path, makedirs, walk
+from os import walk
+from pathlib import Path
+from typing import Any
+
+from configgen.systemFiles import CONF, ROMS
 
 IOQUAKE3_BIN_DIR = "/usr/ioquake3"
 IOQUAKE3_BIN_PATH = "/userdata/roms/quake3/ioquake3"
-IOQUAKE3_ROMS_DIR = ROMS + "/quake3"
-IOQUAKE3_CONF_DIR = CONF + "/ioquake3"
+IOQUAKE3_ROMS_DIR = str(Path(ROMS) / "quake3")
+IOQUAKE3_CONF_DIR = str(Path(CONF) / "ioquake3")
 
 
 def writeCfgFile(
-    system, filename, init_line, defaults_to_add, controls_to_add, gameResolution
-):
-    if not path.isfile(filename):
-        makedirs(path.dirname(filename), exist_ok=True)
+    system: Any,
+    filename: str,
+    init_line: str,
+    defaults_to_add: list[str],
+    controls_to_add: list[str],
+    gameResolution: dict[str, int],
+) -> None:
+    if not Path(filename).is_file():
+        Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
         with open(filename, "w") as file:
             file.write(init_line)
@@ -64,7 +72,9 @@ def writeCfgFile(
                     file.write(line)
 
 
-def setIoquake3Config(system, rom, playersControllers, gameResolution):
+def setIoquake3Config(
+    system: Any, rom: str, playersControllers: Any, gameResolution: dict[str, int]
+) -> None:
     # create the cfg files for each quake3 rom / mod folder
     files = []
 
@@ -73,8 +83,8 @@ def setIoquake3Config(system, rom, playersControllers, gameResolution):
 
     # add the corresponding config file paths and add them to the `files` list
     for subdirectory in subdirectories:
-        config_directory = path.join(IOQUAKE3_CONF_DIR, subdirectory)
-        config_file = path.join(config_directory, "q3config.cfg")
+        config_directory = str(Path(IOQUAKE3_CONF_DIR) / subdirectory)
+        config_file = str(Path(config_directory) / "q3config.cfg")
         files.append(config_file)
 
     if gameResolution["width"] < gameResolution["height"]:

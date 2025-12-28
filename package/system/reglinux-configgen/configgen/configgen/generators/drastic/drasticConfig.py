@@ -1,13 +1,16 @@
 from os import environ
+from pathlib import Path
+from typing import Any
+
 from configgen.systemFiles import CONF
 
 DRASTIC_CONFIG_DIR = "/usr/share/drastic"
-DRASTIC_CONFIG_DIR_USER = CONF + "/drastic"
-DRASTIC_CONFIG_PATH = DRASTIC_CONFIG_DIR_USER + "/config/drastic.cfg"
+DRASTIC_CONFIG_DIR_USER = str(Path(CONF) / "drastic")
+DRASTIC_CONFIG_PATH = str(Path(DRASTIC_CONFIG_DIR_USER) / "config" / "drastic.cfg")
 DRASTIC_BIN_PATH = "/usr/bin/drastic"
 
 
-def setDrasticConfig(drasticConfig, system):
+def setDrasticConfig(drasticConfig: Any, system: Any) -> None:
     # Getting Values from ES
     if system.isOptSet("drastic_hires") and system.config["drastic_hires"] == "1":
         esvaluedrastichires = 1
@@ -96,5 +99,4 @@ def getDrasticLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]

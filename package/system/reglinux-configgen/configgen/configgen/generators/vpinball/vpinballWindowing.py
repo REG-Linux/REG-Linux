@@ -1,7 +1,11 @@
+from typing import Any
+
 from configgen.utils.videoMode import getScreensInfos
 
 
-def configureWindowing(vpinballSettings, system, gameResolution, hasDmd):
+def configureWindowing(
+    vpinballSettings: Any, system: Any, gameResolution: Any, hasDmd: bool
+) -> None:
     screens = getScreensInfos(system.config)
 
     # disable full screen to move the window if necessary
@@ -102,7 +106,7 @@ def configureWindowing(vpinballSettings, system, gameResolution, hasDmd):
         )
 
 
-def getFlexDmdConfiguration(system, screens, hasDmd):
+def getFlexDmdConfiguration(system: Any, screens: Any, hasDmd: bool) -> str:
     val = ""
     if system.isOptSet("vpinball_flexdmd"):
         val = system.config["vpinball_flexdmd"]
@@ -110,10 +114,7 @@ def getFlexDmdConfiguration(system, screens, hasDmd):
         if hasDmd:
             val = "disabled"
     if val == "":
-        if len(screens) > 2:
-            val = "screen3"
-        else:
-            val = "disabled"
+        val = "screen3" if len(screens) > 2 else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
     if len(screens) <= 2 and val == "screen3":
@@ -121,16 +122,13 @@ def getFlexDmdConfiguration(system, screens, hasDmd):
     return val
 
 
-def getPinmameConfiguration(system, screens):
+def getPinmameConfiguration(system: Any, screens: Any) -> str:
     # pinmame : same as flexdmd (and both should never be displayed at the same time)
     val = ""
     if system.isOptSet("vpinball_pinmame"):
         val = system.config["vpinball_pinmame"]
     if val == "":
-        if len(screens) > 2:
-            val = "screen3"
-        else:
-            val = "disabled"
+        val = "screen3" if len(screens) > 2 else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
     if len(screens) <= 2 and val == "screen3":
@@ -138,41 +136,35 @@ def getPinmameConfiguration(system, screens):
     return val
 
 
-def getB2sConfiguration(system, screens):
+def getB2sConfiguration(system: Any, screens: Any) -> str:
     val = ""
     if system.isOptSet("vpinball_b2s"):
         val = system.config["vpinball_b2s"]
     if val == "":
-        if len(screens) > 1:
-            val = "screen2"
-        else:
-            val = "disabled"
+        val = "screen2" if len(screens) > 1 else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
     return val
 
 
-def getB2sdmdConfiguration(system, screens, hasDmd):
-    if (
-        system.isOptSet("vpinball_b2sdmd")
-        and system.getOptBoolean("vpinball_b2sdmd") == False
+def getB2sdmdConfiguration(system: Any, screens: Any, hasDmd: bool) -> bool:
+    if system.isOptSet("vpinball_b2sdmd") and not system.getOptBoolean(
+        "vpinball_b2sdmd"
     ):  # switchon
         return False
-    if hasDmd:
-        return False
-    return True
+    return not hasDmd
 
 
-def getB2sgrillConfiguration(system, screens):
-    if (
+def getB2sgrillConfiguration(system: Any, screens: Any) -> bool:
+    return not (
         system.isOptSet("vpinball_b2sgrill")
-        and system.getOptBoolean("vpinball_b2sgrill") == False
-    ):  # switchon
-        return False
-    return True
+        and not system.getOptBoolean("vpinball_b2sgrill")
+    )  # switchon
 
 
-def configurePlayfield(vpinballSettings, screens, playFieldScreen):
+def configurePlayfield(
+    vpinballSettings: Any, screens: Any, playFieldScreen: int | str
+) -> None:
     if screens[playFieldScreen]["width"] < screens[playFieldScreen]["height"]:
         screens[playFieldScreen]["width"], screens[playFieldScreen]["height"] = (
             screens[playFieldScreen]["height"],
@@ -186,15 +178,15 @@ def configurePlayfield(vpinballSettings, screens, playFieldScreen):
 
 
 def configurePinmame(
-    vpinballSettings,
-    pinmame_config,
-    b2s_config,
-    screens,
-    backglassScreen,
-    Rscreen,
-    gameResolution,
-    dmdsize,
-):
+    vpinballSettings: Any,
+    pinmame_config: Any,
+    b2s_config: Any,
+    screens: Any,
+    backglassScreen: Any,
+    Rscreen: Any,
+    gameResolution: Any,
+    dmdsize: Any,
+) -> None:
     WindowName = "PinMAMEWindow"
     Rwindow = 4 / 1  # Usual Ratio for this window
     small, medium, large = 20, 25, 30
@@ -283,7 +275,7 @@ def configurePinmame(
         )
 
 
-def getDMDWindowSize(system, gameResolution):
+def getDMDWindowSize(system: Any, gameResolution: Any) -> list[int]:
     if not system.isOptSet("vpinball_dmdsize"):
         return [1024, 256]  # like 128x32
     if system.config["vpinball_dmdsize"] == "128x16":
@@ -296,15 +288,15 @@ def getDMDWindowSize(system, gameResolution):
 
 
 def configureFlexdmd(
-    vpinballSettings,
-    flexdmd_config,
-    b2s_config,
-    screens,
-    backglassScreen,
-    Rscreen,
-    gameResolution,
-    dmdsize,
-):
+    vpinballSettings: Any,
+    flexdmd_config: Any,
+    b2s_config: Any,
+    screens: Any,
+    backglassScreen: Any,
+    Rscreen: Any,
+    gameResolution: Any,
+    dmdsize: Any,
+) -> None:
     WindowName = "FlexDMDWindow"
     Rwindow = 4 / 1  # Usual Ratio for this window
     small, medium, large = 20, 25, 30
@@ -394,18 +386,18 @@ def configureFlexdmd(
 
 
 def configureB2s(
-    vpinballSettings,
-    flexdmd_config,
-    pinmame_config,
-    b2s_config,
-    b2sdmd_config,
-    b2sgrill_config,
-    screens,
-    backglassScreen,
-    Rscreen,
-    gameResolution,
-    dmdsize,
-):
+    vpinballSettings: Any,
+    flexdmd_config: Any,
+    pinmame_config: Any,
+    b2s_config: Any,
+    b2sdmd_config: Any,
+    b2sgrill_config: Any,
+    screens: Any,
+    backglassScreen: Any,
+    Rscreen: Any,
+    gameResolution: Any,
+    dmdsize: Any,
+) -> None:
     WindowName = "B2SBackglass"
     Rwindow = 4 / 3  # Usual Ratio for this window
     small, medium, large = 20, 25, 30
@@ -532,12 +524,11 @@ def configureB2s(
 # VideogetCurrentResolution to convert from percentage to pixel value
 # necessary trick because people can plug their 1080p laptop on a 4k TV
 # (and because VPinballX.ini uses absolute pixel coordinates)
-def ConvertToPixel(total_size, percentage):
-    pixel_value = str(int(int(total_size) * float(percentage) * 1e-2))
-    return pixel_value
+def ConvertToPixel(total_size: int, percentage: float) -> str:
+    return str(int(int(total_size) * float(percentage) * 1e-2))
 
 
 # Calculates the relative height, depending on the screen ratio
 # (normaly 16/9), the element ratio (4/3 for the b2s) and the relative width
-def RelativeHeightCalculate(Rscreen, Relement, RelativeWidth):
+def RelativeHeightCalculate(Rscreen: float, Relement: float, RelativeWidth: int) -> int:
     return int(Rscreen * RelativeWidth / Relement)

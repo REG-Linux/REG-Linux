@@ -1,5 +1,9 @@
+from typing import Any
+
 from configgen.settings import UnixSettings
-from .ppssppConfig import PPSSPP_CONTROLS_SOURCE_PATH, PPSSPP_CONTROLS_PATH
+
+from .ppssppConfig import PPSSPP_CONTROLS_SOURCE_PATH
+
 # This configgen is based on PPSSPP 1.5.4.
 # Therefore, all code/github references are valid at this version, and may not be valid with later updates
 
@@ -115,7 +119,7 @@ ppssppMapping = {
 
 
 # Create the controller configuration file
-def setControllerConfig(controller):
+def setControllerConfig(controller: Any) -> None:
     ppssppControllers = UnixSettings(PPSSPP_CONTROLS_SOURCE_PATH)
 
     ppssppControllers.ensure_section("ControlMapping")
@@ -187,17 +191,13 @@ def setControllerConfig(controller):
     ppssppControllers.write()
 
 
-def axisToCode(axisId, direction):
-    if direction < 0:
-        direction = 1
-    else:
-        direction = 0
+def axisToCode(axisId: int, direction: int) -> int:
+    direction = 1 if direction < 0 else 0
     return AXIS_BIND_NKCODE_START + axisId * 2 + direction
 
 
 # determine if the option already exists or not
-def optionValue(config, section, option, value):
+def optionValue(config: Any, section: str, option: str, value: str) -> str:
     if config.has_option(section, option):
         return f"{config.get(section, option)},{value}"
-    else:
-        return value
+    return value

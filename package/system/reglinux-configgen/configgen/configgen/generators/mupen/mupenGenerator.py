@@ -1,12 +1,15 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from configparser import ConfigParser
-from os import path, makedirs
+from pathlib import Path
+from typing import Any
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+
 from .mupenConfig import (
-    setMupenConfig,
-    MUPEN_CONFIG_PATH,
     MUPEN_BIN_PATH,
     MUPEN_CONFIG_DIR,
+    MUPEN_CONFIG_PATH,
+    setMupenConfig,
 )
 
 
@@ -18,24 +21,27 @@ class MupenGenerator(Generator):
         iniConfig = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         iniConfig.optionxform = lambda optionstr: str(optionstr)
-        if path.exists(MUPEN_CONFIG_PATH):
+        config_path = Path(MUPEN_CONFIG_PATH)
+        if config_path.exists():
             iniConfig.read(MUPEN_CONFIG_PATH)
         else:
-            if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
-                makedirs(path.dirname(MUPEN_CONFIG_PATH))
+            config_dir = config_path.parent
+            if not config_dir.exists():
+                config_dir.mkdir(parents=True, exist_ok=True)
             iniConfig.read(MUPEN_CONFIG_PATH)
 
         setMupenConfig(iniConfig, system, game_resolution)
 
         # Save the ini file
-        if not path.exists(path.dirname(MUPEN_CONFIG_PATH)):
-            makedirs(path.dirname(MUPEN_CONFIG_PATH))
+        config_dir = config_path.parent
+        if not config_dir.exists():
+            config_dir.mkdir(parents=True, exist_ok=True)
         with open(MUPEN_CONFIG_PATH, "w") as configfile:
             iniConfig.write(configfile)
 
         # Command
         command_array = [
-            MUPEN_BIN_PATH,
+            str(MUPEN_BIN_PATH),
             "--plugindir",
             "/usr/lib/mupen64plus/",
             "--corelib",
@@ -62,7 +68,7 @@ class MupenGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config):
+    def get_in_game_ratio(self, config: Any) -> float:
         if (
             "mupen64plus_ratio" in config and config["mupen64plus_ratio"] == "16/9"
         ) or (

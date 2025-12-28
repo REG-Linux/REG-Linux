@@ -1,7 +1,8 @@
-from configgen.generators.Generator import Generator
+from glob import glob
+
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from glob import glob
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
 
 SH_BIN_PATH = "/bin/bash"
@@ -15,10 +16,7 @@ class ShGenerator(Generator):
     ):
         # in case of squashfs, the root directory is passed
         shInDir = glob(rom + "/run.sh")
-        if len(shInDir) == 1:
-            shrom = shInDir[0]
-        else:
-            shrom = rom
+        shrom = shInDir[0] if len(shInDir) == 1 else rom
 
         command_array = [SH_BIN_PATH, shrom]
 

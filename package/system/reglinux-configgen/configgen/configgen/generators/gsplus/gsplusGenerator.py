@@ -1,13 +1,14 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
-from configgen.settings import UnixSettings
-from configgen.controllers import generate_sdl_controller_config
-from configgen.systemFiles import CONF, BIOS
+from pathlib import Path
 
-GSPLUS_CONFIG_DIR = CONF + "/GSplus"
-GSPLUS_CONFIG_PATH = GSPLUS_CONFIG_DIR + "/config.txt"
-GSPLUS_BIOS_DIR = BIOS
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.settings import UnixSettings
+from configgen.systemFiles import BIOS, CONF
+
+GSPLUS_CONFIG_DIR = str(Path(CONF) / "GSplus")
+GSPLUS_CONFIG_PATH = str(Path(GSPLUS_CONFIG_DIR) / "config.txt")
+GSPLUS_BIOS_DIR = str(BIOS)
 GSPLUS_BIN_PATH = "/usr/bin/GSplus"
 
 
@@ -15,12 +16,13 @@ class GSplusGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        if not path.exists(GSPLUS_CONFIG_DIR):
-            makedirs(GSPLUS_CONFIG_DIR)
+        config_dir_path = Path(GSPLUS_CONFIG_DIR)
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         config = UnixSettings(GSPLUS_CONFIG_PATH, separator=" ")
-        rombase = path.basename(rom)
-        romext = path.splitext(rombase)[1]
+        rombase = Path(rom).name
+        romext = Path(rombase).suffix
 
         if romext.lower() in [".dsk", ".do", ".nib"]:
             config.save("s6d1", rom)

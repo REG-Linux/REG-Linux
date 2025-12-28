@@ -1,9 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
+from pathlib import Path
 from shutil import copy
-from configgen.systemFiles import CONF
+from typing import Any
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import CONF
 
 
 class ETLegacyGenerator(Generator):
@@ -12,17 +14,18 @@ class ETLegacyGenerator(Generator):
     ):
         etLegacyDir = "/userdata/roms/etlegacy/legacy"
         etLegacyFile = "/legacy_2.83-dirty.pk3"
-        etLegacySource = "/usr/share/etlegacy" + etLegacyFile
-        etLegacyDest = etLegacyDir + etLegacyFile
+        etLegacySource = str(Path("/usr/share/etlegacy") / etLegacyFile.lstrip("/"))
+        etLegacyDest = str(Path(etLegacyDir) / etLegacyFile.lstrip("/"))
 
         ## Configuration
 
         # Config file path
-        config_dir = CONF + "/etlegacy/legacy"
-        config_file_path = config_dir + "/etconfig.cfg"
+        config_dir = str(Path(CONF) / "etlegacy" / "legacy")
+        config_file_path = str(Path(config_dir) / "etconfig.cfg")
 
-        if not path.exists(config_dir):
-            makedirs(config_dir)
+        config_dir_path = Path(config_dir)
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Define the options to add or modify
         options_to_set = {
@@ -43,8 +46,8 @@ class ETLegacyGenerator(Generator):
             options_to_set["seta ui_cl_lang"] = "en"
 
         # Check if the file exists
-        if path.isfile(config_file_path):
-            with open(config_file_path, "r") as config_file:
+        if Path(config_file_path).is_file():
+            with open(config_file_path) as config_file:
                 lines = config_file.readlines()
 
             # Loop through the options and update the lines
@@ -67,15 +70,17 @@ class ETLegacyGenerator(Generator):
                     config_file.write(f'{key} "{value}"\n')
 
         # copy mod files needed
-        if not path.exists(etLegacyDir):
-            makedirs(etLegacyDir)
+        et_legacy_dir_path = Path(etLegacyDir)
+        if not et_legacy_dir_path.exists():
+            et_legacy_dir_path.mkdir(parents=True, exist_ok=True)
 
         # copy latest mod file to the rom directory
-        if not path.exists(etLegacyDest):
+        et_legacy_dest_path = Path(etLegacyDest)
+        if not et_legacy_dest_path.exists():
             copy(etLegacySource, etLegacyDest)
         else:
-            source_version = path.getmtime(etLegacySource)
-            destination_version = path.getmtime(etLegacyDest)
+            source_version = Path(etLegacySource).stat().st_mtime
+            destination_version = et_legacy_dest_path.stat().st_mtime
             if source_version > destination_version:
                 copy(etLegacySource, etLegacyDest)
 
@@ -94,5 +99,7 @@ class ETLegacyGenerator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

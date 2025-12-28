@@ -1,7 +1,8 @@
+import contextlib
+from typing import Any
+
 import zmq
 import zmq.error
-import contextlib
-from typing import Optional, Any
 
 
 class RegMsgClient:
@@ -25,8 +26,8 @@ class RegMsgClient:
         """
         self.address = address
         self.timeout = timeout
-        self.context: Optional[zmq.Context[Any]] = None
-        self.socket: Optional[zmq.Socket[Any]] = None
+        self.context: zmq.Context[Any] | None = None
+        self.socket: zmq.Socket[Any] | None = None
         self._connected = False
 
     def connect(self) -> None:
@@ -100,31 +101,32 @@ class RegMsgClient:
 
         try:
             self.socket.send_string(message)
-            reply = self.socket.recv_string()
-            return reply
+            return self.socket.recv_string()
         except zmq.Again:
             raise RuntimeError(
                 f"Timeout in communication with regmsgd (>{self.timeout}ms)"
-            )
+            ) from None
         except zmq.error.ZMQError as e:
-            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}")
+            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}") from e
         except Exception as e:
-            raise RuntimeError(f"Unexpected error sending message: {str(e)}")
+            raise RuntimeError(f"Unexpected error sending message: {str(e)}") from e
 
     def __enter__(self):
         """Enable usage as context manager."""
         self.connect()
         return self
 
-    def __exit__(self, exc_type: Optional[type], exc_val: Optional[Exception], exc_tb: Optional[Any]) -> None:
+    def __exit__(
+        self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any | None
+    ) -> None:
         """Ensure connection is closed when exiting context manager."""
         self.disconnect()
 
 
 # Compatibility functions to maintain original interface
 # Global context and socket (optional; could also be kept inside a class)
-_context: Optional[zmq.Context[Any]] = None
-_socket: Optional[zmq.Socket[Any]] = None
+_context: zmq.Context[Any] | None = None
+_socket: zmq.Socket[Any] | None = None
 
 
 def regmsg_connect(
@@ -170,17 +172,18 @@ def regmsg_send_message(message: str, timeout: int = 5000) -> str:
             _socket.setsockopt(zmq.RCVTIMEO, timeout)
             _socket.setsockopt(zmq.SNDTIMEO, timeout)
             _socket.send_string(message)
-            reply = _socket.recv_string()
-            return reply
+            return _socket.recv_string()
         except zmq.Again:
-            raise RuntimeError(f"Timeout in communication with regmsgd (>{timeout}ms)")
+            raise RuntimeError(
+                f"Timeout in communication with regmsgd (>{timeout}ms)"
+            ) from None
         except zmq.error.ZMQError as e:
-            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}")
+            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}") from e
         except AttributeError:
             # Handle the case where socket methods are not available (is None)
-            raise RuntimeError("Socket is None, cannot send/receive message")
+            raise RuntimeError("Socket is None, cannot send/receive message") from None
         except Exception as e:
-            raise RuntimeError(f"Unexpected error sending message: {str(e)}")
+            raise RuntimeError(f"Unexpected error sending message: {str(e)}") from e
     else:
         # If no global connection exists, create temporarily
         with RegMsgClient(timeout=timeout) as client:

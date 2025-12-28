@@ -2,21 +2,19 @@
 Simplified module responsible for managing bezel configurations for the Libretro emulator.
 """
 
-from configgen.bezel.bezel_base import IBezelManager, BezelUtils, eslog
+from typing import Any
+
+from configgen.bezel.bezel_base import IBezelManager
 from configgen.bezel.bezel_common import (
     writeBezelConfig,
-    is_ratio_defined,
-    RATIO_INDEXES,
 )
-from configgen.systemFiles import OVERLAY_CONFIG_FILE
-from typing import Dict, Optional, Tuple, Any
 
 
 class LibretroBezelManager(IBezelManager):
     """Bezel manager specific to the Libretro emulator."""
 
     def setup_bezels(
-        self, system, rom: str, game_resolution: Dict[str, int], guns
+        self, system: Any, rom: str, game_resolution: dict[str, int], guns: list[Any]
     ) -> None:
         """
         Configure the bezels for a specific game.

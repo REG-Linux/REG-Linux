@@ -1,8 +1,10 @@
+from typing import Any
+
 from .gzdoomConfig import GZDOOM_CONFIG_PATH
 
 
-def setGzdoomControllers(system):
-    with open(GZDOOM_CONFIG_PATH, "r") as file:
+def setGzdoomControllers(system: Any) -> None:
+    with open(GZDOOM_CONFIG_PATH) as file:
         lines = file.readlines()
 
     if system.isOptSet("gz_joystick"):

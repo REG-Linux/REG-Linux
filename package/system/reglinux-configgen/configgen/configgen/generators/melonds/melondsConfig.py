@@ -1,13 +1,18 @@
-from configgen.systemFiles import CONF, SAVES, CHEATS
+from pathlib import Path
+from typing import Any
 
-MELONDS_CONFIG_DIR = CONF + "/melonDS"
-MELONDS_CONFIG_PATH = MELONDS_CONFIG_DIR + "/melonDS.ini"
-MELONDS_SAVES_DIR = SAVES + "/melonds"
-MELONDS_CHEATS_DIR = CHEATS + "/melonDS"
-MELONDS_BIN_PATH = "/usr/bin/melonDS"
+from configgen.systemFiles import CHEATS, CONF, SAVES
+
+MELONDS_CONFIG_DIR = CONF / "melonDS"
+MELONDS_CONFIG_PATH = MELONDS_CONFIG_DIR / "melonDS.ini"
+MELONDS_SAVES_DIR = SAVES / "melonds"
+MELONDS_CHEATS_DIR = CHEATS / "melonDS"
+MELONDS_BIN_PATH = Path("/usr/bin/melonDS")
 
 
-def setMelonDSConfig(melondsConfig, system, gameResolution):
+def setMelonDSConfig(
+    melondsConfig: Any, system: Any, gameResolution: dict[str, int]
+) -> None:
     if gameResolution["width"] < gameResolution["height"]:
         width, height = gameResolution["height"], gameResolution["width"]
     else:
@@ -23,23 +28,23 @@ def setMelonDSConfig(melondsConfig, system, gameResolution):
         "MouseHideSeconds": 5,
         # Set bios locations
         "ExternalBIOSEnable": 1,
-        "BIOS9Path": "/userdata/bios/bios9.bin",
-        "BIOS7Path": "/userdata/bios/bios7.bin",
-        "FirmwarePath": "/userdata/bios/firmware.bin",
-        "DSiBIOS9Path": "/userdata/bios/dsi_bios9.bin",
-        "DSiBIOS7Path": "/userdata/bios/dsi_bios7.bin",
-        "DSiFirmwarePath": "/userdata/bios/dsi_firmware.bin",
-        "DSiNANDPath": "/userdata/bios/dsi_nand.bin",
+        "BIOS9Path": str(Path("/userdata/bios/bios9.bin")),
+        "BIOS7Path": str(Path("/userdata/bios/bios7.bin")),
+        "FirmwarePath": str(Path("/userdata/bios/firmware.bin")),
+        "DSiBIOS9Path": str(Path("/userdata/bios/dsi_bios9.bin")),
+        "DSiBIOS7Path": str(Path("/userdata/bios/dsi_bios7.bin")),
+        "DSiFirmwarePath": str(Path("/userdata/bios/dsi_firmware.bin")),
+        "DSiNANDPath": str(Path("/userdata/bios/dsi_nand.bin")),
         # Set save locations
-        "DLDIFolderPath": "/userdata/saves/melonds",
-        "DSiSDFolderPath": "/userdata/saves/melonds",
-        "MicWavPath": "/userdata/saves/melonds",
-        "SaveFilePath": "/userdata/saves/melonds",
-        "SavestatePath": "/userdata/saves/melonds",
+        "DLDIFolderPath": str(Path("/userdata/saves/melonds")),
+        "DSiSDFolderPath": str(Path("/userdata/saves/melonds")),
+        "MicWavPath": str(Path("/userdata/saves/melonds")),
+        "SaveFilePath": str(Path("/userdata/saves/melonds")),
+        "SavestatePath": str(Path("/userdata/saves/melonds")),
         # Cheater!
-        "CheatFilePath": "/userdata/cheats/melonDS",
+        "CheatFilePath": str(Path("/userdata/cheats/melonDS")),
         # Roms
-        "LastROMFolder": "/userdata/roms/nds",
+        "LastROMFolder": str(Path("/userdata/roms/nds")),
         # Audio
         "AudioInterp": 1,
         "AudioBitrate": 2,

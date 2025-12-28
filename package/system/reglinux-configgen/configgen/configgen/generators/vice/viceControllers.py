@@ -1,4 +1,6 @@
-from os import path, makedirs
+from pathlib import Path
+from typing import Any
+
 from .viceConfig import VICE_CONTROLLER_PATH
 
 # inputtype:
@@ -34,22 +36,20 @@ viceJoystick = {
 
 
 # Create the controller configuration file
-def setViceControllers(system, playersControllers):
+def setViceControllers(system: Any, playersControllers: Any) -> None:
     # vic20 uses a slightly different port
-    if system.config["core"] == "xvic":
-        joy_port = "0"
-    else:
-        joy_port = "1"
+    joy_port = "0" if system.config["core"] == "xvic" else "1"
 
-    if not path.exists(path.dirname(VICE_CONTROLLER_PATH)):
-        makedirs(path.dirname(VICE_CONTROLLER_PATH))
+    controller_dir = Path(VICE_CONTROLLER_PATH).parent
+    if not controller_dir.exists():
+        controller_dir.mkdir(parents=True, exist_ok=True)
 
     listVice = []
     listVice.append("# REG-Linux configured controllers")
     listVice.append("")
     listVice.append("!CLEAR")
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         listVice.append("")
         listVice.append("# " + pad.name)
         for x in pad.inputs:
@@ -64,8 +64,6 @@ def setViceControllers(system, playersControllers):
         listVice.append("")
         nplayer += 1
 
-    f = open(VICE_CONTROLLER_PATH, "w")
-    for i in range(len(listVice)):
-        f.write(str(listVice[i]) + "\n")
-    f.write
-    f.close()
+    with open(VICE_CONTROLLER_PATH, "w") as f:
+        for i in range(len(listVice)):
+            f.write(str(listVice[i]) + "\n")

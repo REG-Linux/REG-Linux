@@ -1,16 +1,18 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from configparser import ConfigParser
-from os import path, makedirs
+from pathlib import Path
+from typing import Any
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
 
-FORCE_CONFIG_DIR = CONF + "/theforceengine"
-FORCE_MODS_DIR = FORCE_CONFIG_DIR + "/Mods"
+FORCE_CONFIG_DIR = CONF / "theforceengine"
+FORCE_MODS_DIR = FORCE_CONFIG_DIR / "Mods"
 FORCE_PATCH_PATH = "df_patch4.zip"  # current patch version
-FORCE_MODS_PATH = FORCE_MODS_DIR + "/" + FORCE_PATCH_PATH
-FORCE_CONFIG_PATH = FORCE_CONFIG_DIR + "/settings.ini"
-FORCE_BIN_PATH = "/usr/bin/theforceengine"
+FORCE_MODS_PATH = FORCE_MODS_DIR / FORCE_PATCH_PATH
+FORCE_CONFIG_PATH = FORCE_CONFIG_DIR / "settings.ini"
+FORCE_BIN_PATH = Path("/usr/bin/theforceengine")
 
 
 class TheForceEngineGenerator(Generator):
@@ -19,21 +21,28 @@ class TheForceEngineGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: dict[str, int],
+    ) -> Command:
         # Check if the directories exist, if not create them
-        if not path.exists(FORCE_CONFIG_DIR):
-            makedirs(FORCE_CONFIG_DIR)
-        if not path.exists(FORCE_MODS_DIR):
-            makedirs(FORCE_MODS_DIR)
+        if not FORCE_CONFIG_DIR.exists():
+            FORCE_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        if not FORCE_MODS_DIR.exists():
+            FORCE_MODS_DIR.mkdir(parents=True, exist_ok=True)
 
         mod_name = None
         # use the patch file if available
-        if path.exists(FORCE_MODS_PATH):
+        if FORCE_MODS_PATH.exists():
             mod_name = FORCE_PATCH_PATH
 
         # Open the .tfe rom file for user mods
-        with open(rom, "r") as file:
+        with open(rom) as file:
             # Read the first line and store it as 'first_line'
             first_line = file.readline().strip()
             # use the first_line as mod if the file isn't empty
@@ -43,7 +52,7 @@ class TheForceEngineGenerator(Generator):
         ## Configure
         forceConfig = ConfigParser()
         forceConfig.optionxform = lambda optionstr: str(optionstr)
-        if path.exists(FORCE_CONFIG_PATH):
+        if FORCE_CONFIG_PATH.exists():
             forceConfig.read(FORCE_CONFIG_PATH)
 
         # Windows
@@ -229,13 +238,14 @@ class TheForceEngineGenerator(Generator):
             forceConfig.add_section("CVar")
 
         ## Update the configuration file
-        if not path.exists(path.dirname(FORCE_CONFIG_PATH)):
-            makedirs(path.dirname(FORCE_CONFIG_PATH))
+        config_dir = FORCE_CONFIG_PATH.parent
+        if not config_dir.exists():
+            config_dir.mkdir(parents=True, exist_ok=True)
         with open(FORCE_CONFIG_PATH, "w") as configfile:
             forceConfig.write(configfile)
 
         ## Setup the command
-        command_array = [FORCE_BIN_PATH]
+        command_array = [str(FORCE_BIN_PATH)]
 
         ## Accomodate Mods, skip cutscenes etc
         if (
@@ -258,7 +268,7 @@ class TheForceEngineGenerator(Generator):
         return Command(
             array=command_array,
             env={
-                "TFE_DATA_HOME": FORCE_CONFIG_DIR,
+                "TFE_DATA_HOME": str(FORCE_CONFIG_DIR),
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
                     players_controllers
                 ),
@@ -269,7 +279,9 @@ class TheForceEngineGenerator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         if "force_widescreen" in config and config["force_widescreen"] == "1":
             return 16 / 9
         return 4 / 3

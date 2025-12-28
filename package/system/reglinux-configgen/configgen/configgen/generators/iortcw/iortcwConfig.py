@@ -1,11 +1,13 @@
-from os import path
+from pathlib import Path
+from typing import Any
+
 from configgen.systemFiles import ROMS
 
-IORTCW_CONFIG_PATH = ROMS + "/iortcw/main/wolfconfig.cfg"
+IORTCW_CONFIG_PATH = str(Path(ROMS) / "iortcw" / "main" / "wolfconfig.cfg")
 IORTCW_BIN_PATH = "/usr/bin/iortcw/iowolfsp"
 
 
-def setIortcwConfig(system, gameResolution):
+def setIortcwConfig(system: Any, gameResolution: dict[str, int]) -> None:
     # Define the options to add or modify
     options_to_set = {
         "seta r_mode": "-1",
@@ -84,8 +86,8 @@ def setIortcwConfig(system, gameResolution):
         options_to_set["seta cl_language"] = "0"
 
     # Check if the file exists
-    if path.isfile(IORTCW_CONFIG_PATH):
-        with open(IORTCW_CONFIG_PATH, "r") as config_file:
+    if Path(IORTCW_CONFIG_PATH).is_file():
+        with open(IORTCW_CONFIG_PATH) as config_file:
             lines = config_file.readlines()
 
         # Loop through the options and update the lines

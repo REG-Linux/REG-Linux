@@ -1,14 +1,16 @@
+import os
+from typing import Any
+
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF
-import os
 
-VICE_CONFIG_DIR = CONF + "/vice"
-VICE_CONFIG_PATH = VICE_CONFIG_DIR + "/sdl-vicerc"
-VICE_CONTROLLER_PATH = VICE_CONFIG_DIR + "/sdl-joymap.vjm"
+VICE_CONFIG_DIR = str(CONF / "vice")
+VICE_CONFIG_PATH = str(CONF / "vice" / "sdl-vicerc")
+VICE_CONTROLLER_PATH = str(CONF / "vice" / "sdl-joymap.vjm")
 VICE_BIN_DIR = "/usr/bin/"
 
 
-def setViceConfig(system, metadata, guns):
+def setViceConfig(system: Any, metadata: Any, guns: Any) -> None:
     # Create directory if it doesn't exist
     os.makedirs(VICE_CONFIG_DIR, exist_ok=True)
 
@@ -38,7 +40,7 @@ def setViceConfig(system, metadata, guns):
     viceConfig.set(systemCore, "SaveResourcesOnExit", "0")
     viceConfig.set(systemCore, "SoundDeviceName", "alsa")
 
-    if system.isOptSet("noborder") and system.getOptBoolean("noborder") == True:
+    if system.isOptSet("noborder") and system.getOptBoolean("noborder"):
         viceConfig.set(systemCore, "SDLGLAspectMode", "0")
         viceConfig.set(systemCore, "VICBorderMode", "3")
     else:
@@ -57,7 +59,7 @@ def setViceConfig(system, metadata, guns):
     else:
         viceConfig.set(systemCore, "JoyPort1Device", "1")
     viceConfig.set(systemCore, "JoyDevice1", "4")
-    if not systemCore == "VIC20":
+    if systemCore != "VIC20":
         viceConfig.set(systemCore, "JoyDevice2", "4")
     viceConfig.set(systemCore, "JoyMapFile", VICE_CONTROLLER_PATH)
 

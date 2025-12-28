@@ -1,14 +1,16 @@
-from configgen.generators.Generator import Generator
+from pathlib import Path
+from typing import Any
+
 from configgen.Command import Command
-from os import path, makedirs
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
 
-DXX_REBIRTH1_CONFIG_DIR = CONF + "/d1x-rebirth"
-DXX_REBIRTH1_CONFIG_PATH = DXX_REBIRTH1_CONFIG_DIR + "/descent.cfg"
+DXX_REBIRTH1_CONFIG_DIR = str(Path(CONF) / "d1x-rebirth")
+DXX_REBIRTH1_CONFIG_PATH = str(Path(DXX_REBIRTH1_CONFIG_DIR) / "descent.cfg")
 DXX_REBIRTH1_BIN_PATH = "/usr/bin/d1x-rebirth"
 
-DXX_REBIRTH2_CONFIG_DIR = CONF + "/d2x-rebirth"
-DXX_REBIRTH2_CONFIG_PATH = DXX_REBIRTH2_CONFIG_DIR + "/descent.cfg"
+DXX_REBIRTH2_CONFIG_DIR = str(Path(CONF) / "d2x-rebirth")
+DXX_REBIRTH2_CONFIG_PATH = str(Path(DXX_REBIRTH2_CONFIG_DIR) / "descent.cfg")
 DXX_REBIRTH2_BIN_PATH = "/usr/bin/d2x-rebirth"
 
 
@@ -20,27 +22,28 @@ class DXX_RebirthGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        directory = path.dirname(rom)
+        directory = str(Path(rom).parent)
         dxx_rebirth = ""
         rebirthConfigDir = ""
         rebirthConfigFile = ""
 
-        if path.splitext(rom)[1] == ".d1x":
+        if Path(rom).suffix == ".d1x":
             dxx_rebirth = DXX_REBIRTH1_BIN_PATH
             rebirthConfigDir = DXX_REBIRTH1_CONFIG_DIR
             rebirthConfigFile = DXX_REBIRTH1_CONFIG_PATH
-        elif path.splitext(rom)[1] == ".d2x":
+        elif Path(rom).suffix == ".d2x":
             dxx_rebirth = DXX_REBIRTH2_BIN_PATH
             rebirthConfigDir = DXX_REBIRTH2_CONFIG_DIR
             rebirthConfigFile = DXX_REBIRTH2_CONFIG_PATH
 
-        if not path.exists(rebirthConfigDir):
-            makedirs(rebirthConfigDir)
+        rebirth_config_dir_path = Path(rebirthConfigDir)
+        if not rebirth_config_dir_path.exists():
+            rebirth_config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Check if the file exists
-        if path.isfile(rebirthConfigFile):
+        if Path(rebirthConfigFile).is_file():
             # Read the contents of the file
-            with open(rebirthConfigFile, "r") as file:
+            with open(rebirthConfigFile) as file:
                 lines = file.readlines()
 
             for i, line in enumerate(lines):
@@ -103,5 +106,7 @@ class DXX_RebirthGenerator(Generator):
     def getMouseMode(self, config, rom):
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

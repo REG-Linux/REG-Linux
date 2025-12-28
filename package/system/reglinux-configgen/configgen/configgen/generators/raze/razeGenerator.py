@@ -1,18 +1,21 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, mkdir
+from os import mkdir, path
+from pathlib import Path
 from platform import uname
+from typing import Any
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.utils.buildargs import parse_args
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
+from configgen.utils.buildargs import parse_args
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-RAZE_CONFIG_DIR = CONF + "/raze"
-RAZE_SAVES_DIR = SAVES + "/raze"
-RAZE_CONFIG_FILE = RAZE_CONFIG_DIR + "/raze.ini"
-RAZE_SCRIPT_FILE = RAZE_CONFIG_DIR + "/raze.cfg"
+RAZE_CONFIG_DIR = str(CONF / "raze")
+RAZE_SAVES_DIR = str(SAVES / "raze")
+RAZE_CONFIG_FILE = str(Path(RAZE_CONFIG_DIR) / "raze.ini")
+RAZE_SCRIPT_FILE = str(Path(RAZE_CONFIG_DIR) / "raze.cfg")
 
 
 class RazeGenerator(Generator):
@@ -93,7 +96,7 @@ class RazeGenerator(Generator):
 
         config_backup = []
         if path.exists(RAZE_CONFIG_FILE):
-            with open(RAZE_CONFIG_FILE, "r") as original_file:
+            with open(RAZE_CONFIG_FILE) as original_file:
                 config_backup = original_file.readlines()
 
         with open(RAZE_CONFIG_FILE, "w") as config_file:
@@ -137,15 +140,18 @@ class RazeGenerator(Generator):
             if not global_settings_found:
                 eslog.debug("Global Settings NOT found")
                 config_file.write("[GlobalSettings]\n")
-                if system.isOptSet("raze_api") and system.config["raze_api"] != "2":
-                    if system.isOptSet("raze_api") and system.config["raze_api"] == "0":
-                        if architecture in ["x86_64", "amd64"]:
-                            config_file.write("gl_es=false\n")
-                        else:
-                            eslog.debug(
-                                f"*** Architecture isn't intel it's: {architecture} therefore es is true ***"
-                            )
-                            config_file.write("gl_es=true\n")
+                if (
+                    system.isOptSet("raze_api")
+                    and system.config["raze_api"] != "2"
+                    and system.config["raze_api"] == "0"
+                ):
+                    if architecture in ["x86_64", "amd64"]:
+                        config_file.write("gl_es=false\n")
+                    else:
+                        eslog.debug(
+                            f"*** Architecture isn't intel it's: {architecture} therefore es is true ***"
+                        )
+                        config_file.write("gl_es=true\n")
                 if system.isOptSet("raze_api"):
                     config_file.write(
                         f"vid_preferbackend={system.config['raze_api']}\n"
@@ -187,7 +193,9 @@ class RazeGenerator(Generator):
             },
         )
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         return 16 / 9
 
 

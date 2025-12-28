@@ -1,16 +1,20 @@
-from pyudev import Context
-from re import match
-from evdev.device import InputDevice
-from os import path
 import os
-from .mouse import getMouseButtons
+from pathlib import Path
+from re import match
+from typing import Any
+
+from evdev.device import InputDevice
+from pyudev import Context
+
 from configgen.utils.logger import get_logger
+
+from .mouse import getMouseButtons
 
 eslog = get_logger(__name__)
 
 
-def getGuns():
-    guns = {}
+def getGuns() -> dict[str, Any]:
+    guns: dict[str, Any] = {}
     try:
         context = Context()
     except Exception as e:
@@ -25,17 +29,20 @@ def getGuns():
         return guns
 
     # keep only mouses with /dev/input/eventxx
-    mouses_clean = {}
+    mouses_clean: dict[int, Any] = {}
     for mouse in mouses:
         try:
             device_node = str(mouse.device_node)
             matches = match(r"^/dev/input/event([0-9]*)$", device_node)
-            if matches is not None:
-                if (
+            if (
+                matches is not None
+                and (
                     "ID_INPUT_MOUSE" in mouse.properties
                     and mouse.properties["ID_INPUT_MOUSE"]
-                ) == "1":
-                    mouses_clean[int(matches.group(1))] = mouse
+                )
+                == "1"
+            ):
+                mouses_clean[int(matches.group(1))] = mouse
         except (AttributeError, ValueError) as e:
             eslog.warning(
                 f"Error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}"
@@ -55,9 +62,7 @@ def getGuns():
         mouse = mouses[eventid]
         device_node = str(mouse.device_node)
 
-        eslog.info(
-            "found mouse {} at {} with id_mouse={}".format(nmouse, device_node, nmouse)
-        )
+        eslog.info(f"found mouse {nmouse} at {device_node} with id_mouse={nmouse}")
 
         if (
             "ID_INPUT_GUN" not in mouse.properties
@@ -68,7 +73,7 @@ def getGuns():
 
         # Try to open the device with proper exception handling
         try:
-            if not path.exists(device_node) or not os.access(device_node, os.R_OK):
+            if not Path(device_node).exists() or not os.access(device_node, os.R_OK):
                 eslog.warning(f"Device {device_node} does not exist or is not readable")
                 nmouse = nmouse + 1
                 continue
@@ -94,15 +99,15 @@ def getGuns():
 
         # retroarch uses mouse indexes into configuration files using ID_INPUT_MOUSE (TOUCHPAD are listed after mouses)
         try:
-            need_cross = (
+            need_cross: bool = (
                 "ID_INPUT_GUN_NEED_CROSS" in mouse.properties
                 and mouse.properties["ID_INPUT_GUN_NEED_CROSS"] == "1"
             )
-            need_borders = (
+            need_borders: bool = (
                 "ID_INPUT_GUN_NEED_BORDERS" in mouse.properties
                 and mouse.properties["ID_INPUT_GUN_NEED_BORDERS"] == "1"
             )
-            guns[ngun] = {
+            guns[str(ngun)] = {
                 "node": device_node,
                 "id_mouse": nmouse,
                 "need_cross": need_cross,
@@ -112,7 +117,7 @@ def getGuns():
             }
             eslog.info(
                 "found gun {} at {} with id_mouse={} ({})".format(
-                    ngun, device_node, nmouse, guns[ngun]["name"]
+                    ngun, device_node, nmouse, guns[str(ngun)]["name"]
                 )
             )
             nmouse = nmouse + 1
@@ -129,20 +134,17 @@ def getGuns():
     return guns
 
 
-def gunsNeedCrosses(guns):
+def gunsNeedCrosses(guns: dict[str, Any]) -> bool:
     # no gun, enable the cross for joysticks, mouses...
     if len(guns) == 0:
         return True
 
-    for gun in guns:
-        if guns[gun]["need_cross"]:
-            return True
-    return False
+    return any(guns[gun]["need_cross"] for gun in guns)
 
 
 # returns None is no border is wanted
-def guns_borders_size_name(guns, config):
-    borders_size = "medium"
+def guns_borders_size_name(guns: dict[str, Any], config: dict[str, Any]) -> Any:
+    borders_size: str = "medium"
     if (
         "controllers.guns.borderssize" in config
         and config["controllers.guns.borderssize"]
@@ -150,7 +152,7 @@ def guns_borders_size_name(guns, config):
         borders_size = config["controllers.guns.borderssize"]
 
     # overriden by specific options
-    borders_mode = "normal"
+    borders_mode: str = "normal"
     if (
         "controllers.guns.bordersmode" in config
         and config["controllers.guns.bordersmode"]

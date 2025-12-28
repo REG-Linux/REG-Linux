@@ -1,13 +1,13 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, linesep
 from codecs import open
+from os import linesep
+from pathlib import Path
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
-from configgen.controllers import generate_sdl_controller_config
-from configgen.utils.logger import get_logger
 
-eslog = get_logger(__name__)
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.utils.logger import get_logger
 
 from .cannonballConfig import (
     CANNONBALL_BIN_PATH,
@@ -15,33 +15,39 @@ from .cannonballConfig import (
     setCannonballConfig,
 )
 
+eslog = get_logger(__name__)
+
 
 class CannonballGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        if not path.exists(path.dirname(CANNONBALL_CONFIG_PATH)):
-            makedirs(path.dirname(CANNONBALL_CONFIG_PATH))
+        config_dir_path = Path(CANNONBALL_CONFIG_PATH).parent
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # config file
         cannoballConfig = minidom.Document()
-        if path.exists(CANNONBALL_CONFIG_PATH):
+        config_path = Path(CANNONBALL_CONFIG_PATH)
+        if config_path.exists():
             try:
                 cannoballConfig = minidom.parse(CANNONBALL_CONFIG_PATH)
             except (ExpatError, FileNotFoundError, OSError) as e:
-                eslog.debug(f"Cannonball: Failed to parse config file {CANNONBALL_CONFIG_PATH} - {str(e)}")
+                eslog.debug(
+                    f"Cannonball: Failed to parse config file {CANNONBALL_CONFIG_PATH} - {str(e)}"
+                )
                 pass  # reinit the file
 
         # cannonball config file
         setCannonballConfig(cannoballConfig, system)
 
         # save the config file
-        cannonballXml = open(CANNONBALL_CONFIG_PATH, "w", "utf-8")
-        dom_string = linesep.join(
-            [s for s in cannoballConfig.toprettyxml().splitlines() if s.strip()]
-        )  # remove ugly empty lines while minicom adds them...
-        cannonballXml.write(dom_string)
-        cannonballXml.close()
+        with open(CANNONBALL_CONFIG_PATH, "w", encoding="utf-8") as cannonballXml:
+            dom_string = linesep.join(
+                [s for s in cannoballConfig.toprettyxml().splitlines() if s.strip()]
+            )  # remove ugly empty lines while minicom adds them...
+            cannonballXml.write(dom_string)
+            cannonballXml.close()
 
         # command line
         command_array = [CANNONBALL_BIN_PATH]

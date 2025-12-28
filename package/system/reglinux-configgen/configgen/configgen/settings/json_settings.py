@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
-from typing import Any, Optional, Dict
+from typing import Any
+
 from configgen.utils.logger import get_logger
 
 
@@ -49,7 +50,7 @@ class JSONSettings:
             except Exception as e:
                 self._logger.error(f"Failed to create JSON file {self.filepath}: {e}")
 
-    def load(self, default: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    def load(self, default: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Load the JSON configuration file into memory.
 
@@ -125,7 +126,7 @@ class JSONSettings:
         """
         return name in self._data
 
-    def get(self, name: str, default: Optional[Any] = None) -> Optional[Any]:
+    def get(self, name: str, default: Any | None = None) -> Any | None:
         """
         Retrieve a value from the configuration data by key.
 
@@ -139,7 +140,7 @@ class JSONSettings:
         """
         return self._data.get(name, default)
 
-    def loadAll(self, name: str, includeName: bool = False) -> Dict[str, str]:
+    def loadAll(self, name: str, includeName: bool = False) -> dict[str, str]:
         """
         Load all key-value pairs with keys starting with a given prefix.
 

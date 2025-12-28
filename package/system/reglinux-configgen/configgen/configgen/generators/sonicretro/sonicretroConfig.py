@@ -1,9 +1,11 @@
-from configgen.settings import UnixSettings
-from os import path
 from hashlib import md5
+from pathlib import Path
+from typing import Any
+
+from configgen.settings import UnixSettings
 
 
-def setSonicretroConfig(system, emu, rom):
+def setSonicretroConfig(system: Any, emu: str, rom: str) -> None:
     SONICRETRO_CONFIG_PATH = rom + "/settings.ini"
 
     # ini file
@@ -57,9 +59,10 @@ def setSonicretroConfig(system, emu, rom):
         # Sonic CD
         "e723aab26026e4e6d4522c4356ef5a98",
     ]
+    game_config_path = Path(rom) / "Data" / "Game" / "GameConfig.bin"
     if (
-        path.isfile(f"{rom}/Data/Game/GameConfig.bin")
-        and system.__getMD5(f"{rom}/Data/Game/GameConfig.bin") in originsGameConfig
+        game_config_path.is_file()
+        and system.__getMD5(str(game_config_path)) in originsGameConfig
     ):
         sonicConfig.set("Game", "GameType", "1")
 
@@ -93,37 +96,34 @@ def setSonicretroConfig(system, emu, rom):
     sonicConfig.set("Audio", "SFXVolume", "1.000000")
 
 
-def getMouseMode(self, config, rom):
+def getMouseMode(self: Any, config: Any, rom: str) -> bool:
     # Determine the emulator to use
-    if (rom.lower()).endswith("son"):
-        emu = "sonic2013"
-    else:
-        emu = "soniccd"
+    emu = "sonic2013" if (rom.lower()).endswith("son") else "soniccd"
 
     mouseRoms = [
         "1bd5ad366df1765c98d20b53c092a528",  # iOS version of SonicCD
     ]
 
     enableMouse = False
-    if emu == "soniccd" and path.isfile(f"{rom}/Data.rsdk"):
-        enableMouse = self.__getMD5(f"{rom}/Data.rsdk") in mouseRoms
+    data_rsdk_path = Path(rom) / "Data.rsdk"
+    if emu == "soniccd" and data_rsdk_path.is_file():
+        enableMouse = self.__getMD5(str(data_rsdk_path)) in mouseRoms
     else:
         enableMouse = False
 
     return enableMouse
 
 
-def __getMD5(self, filename):
-    rp = path.realpath(filename)
+def __getMD5(self: Any, filename: str) -> str:
+    rp = str(Path(filename).resolve())
 
     # Use an instance attribute for caching instead of function attribute
     if not hasattr(self, "_md5_cache"):
-        self._md5_cache = dict()
+        self._md5_cache = {}
 
     if rp in self._md5_cache:
         return self._md5_cache[rp]
-    else:
-        with open(rp, "rb") as f:
-            md5_hash = md5(f.read()).hexdigest()
-        self._md5_cache[rp] = md5_hash
-        return md5_hash
+    with open(rp, "rb") as f:
+        md5_hash = md5(f.read()).hexdigest()
+    self._md5_cache[rp] = md5_hash
+    return md5_hash

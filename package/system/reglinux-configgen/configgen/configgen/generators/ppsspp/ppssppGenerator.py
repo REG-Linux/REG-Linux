@@ -1,7 +1,9 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import getenv
-from .ppssppConfig import setPPSSPPConfig, PPSSPP_BIN_PATH
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+
+from .ppssppConfig import PPSSPP_BIN_PATH, setPPSSPPConfig
 from .ppssppControllers import setControllerConfig
 
 
@@ -23,7 +25,7 @@ class PPSSPPGenerator(Generator):
             break
 
         # The command to run
-        command_array = [PPSSPP_BIN_PATH, "--fullscreen", rom]
+        command_array = [str(PPSSPP_BIN_PATH), "--fullscreen", rom]
 
         # Adapt the menu size to low defenition
         # I've played with this option on PC to fix menu size in Hi-Resolution and it not working fine. I'm almost sure this option break the emulator (Darknior)
@@ -44,5 +46,5 @@ class PPSSPPGenerator(Generator):
         return Command(array=command_array, env=environment)
 
     @staticmethod
-    def isLowResolution(game_resolution):
+    def isLowResolution(game_resolution: dict[str, int]) -> bool:
         return game_resolution["width"] <= 480 or game_resolution["height"] <= 480

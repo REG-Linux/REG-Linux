@@ -1,30 +1,36 @@
 from configparser import ConfigParser
-from os import path, makedirs, remove
 from json import loads
-from requests import get
-from time import time
+from pathlib import Path
 from shutil import copyfile
-from subprocess import check_output, CalledProcessError
-from configgen.systemFiles import CONF, BIOS
-from .pcsx2Controllers import (
-    getWheelType,
-    useEmulatorWheels,
-    wheelTypeMapping,
-    input2wheel,
-)
+from subprocess import CalledProcessError, check_output
+from time import time
+from typing import Any
+
+from requests import get
+
+from configgen.systemFiles import BIOS, CONF
 from configgen.utils.logger import get_logger
 
-PCSX2_CONFIG_DIR = CONF + "/PCSX2"
-PCSX2_BIOS_DIR = BIOS + "/ps2"
-PCSX2_BIN_PATH = "/usr/pcsx2/bin/pcsx2-qt"
-PCSX2_PATCHES_PATH = PCSX2_BIOS_DIR + "/patches.zip"
-PCSX2_SOURCE_PATH = "/usr/share/reglinux/datainit/bios/ps2/patches.zip"
+from .pcsx2Controllers import (
+    getWheelType,
+    input2wheel,
+    useEmulatorWheels,
+    wheelTypeMapping,
+)
+
+PCSX2_CONFIG_DIR = CONF / "PCSX2"
+PCSX2_BIOS_DIR = BIOS / "ps2"
+PCSX2_BIN_PATH = Path("/usr/pcsx2/bin/pcsx2-qt")
+PCSX2_PATCHES_PATH = PCSX2_BIOS_DIR / "patches.zip"
+PCSX2_SOURCE_PATH = Path("/usr/share/reglinux/datainit/bios/ps2/patches.zip")
 
 
 eslog = get_logger(__name__)
 
 
-def getInGameRatio(self, config, gameResolution, rom):
+def getInGameRatio(
+    self: Any, config: Any, gameResolution: dict[str, int], rom: str
+) -> float:
     if getGfxRatioFromConfig(config, gameResolution) == "16:9" or (
         getGfxRatioFromConfig(config, gameResolution) == "Stretch"
         and gameResolution["width"] / float(gameResolution["height"])
@@ -34,43 +40,44 @@ def getInGameRatio(self, config, gameResolution, rom):
     return 4 / 3
 
 
-def getGfxRatioFromConfig(config, gameResolution):
+def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
     # 2: 4:3 ; 1: 16:9
     if "pcsx2_ratio" in config:
         if config["pcsx2_ratio"] == "16:9":
             return "16:9"
-        elif config["pcsx2_ratio"] == "full":
+        if config["pcsx2_ratio"] == "full":
             return "Stretch"
     return "4:3"
 
 
 def setPcsx2Reg():
-    configFileName = "{}/{}".format(PCSX2_CONFIG_DIR, "PCSX2-reg.ini")
-    if not path.exists(PCSX2_CONFIG_DIR):
-        makedirs(PCSX2_CONFIG_DIR)
-    f = open(configFileName, "w")
-    f.write("DocumentsFolderMode=User\n")
-    f.write("CustomDocumentsFolder=/usr/pcsx2/bin\n")
-    f.write("UseDefaultSettingsFolder=enabled\n")
-    f.write("SettingsFolder=/userdata/system/configs/PCSX2/inis\n")
-    f.write("Install_Dir=/usr/pcsx2/bin\n")
-    f.write("RunWizard=0\n")
-    f.close()
+    configFileName = PCSX2_CONFIG_DIR / "PCSX2-reg.ini"
+    if not PCSX2_CONFIG_DIR.exists():
+        PCSX2_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    with open(configFileName, "w") as f:
+        f.write("DocumentsFolderMode=User\n")
+        f.write("CustomDocumentsFolder=/usr/pcsx2/bin\n")
+        f.write("UseDefaultSettingsFolder=enabled\n")
+        f.write("SettingsFolder=/userdata/system/configs/PCSX2/inis\n")
+        f.write("Install_Dir=/usr/pcsx2/bin\n")
+        f.write("RunWizard=0\n")
+        f.close()
 
 
 def configureAudio():
-    configFileName = "{}/{}".format(PCSX2_CONFIG_DIR + "/inis", "spu2-x.ini")
-    if not path.exists(PCSX2_CONFIG_DIR + "/inis"):
-        makedirs(PCSX2_CONFIG_DIR + "/inis")
+    config_dir = PCSX2_CONFIG_DIR / "inis"
+    configFileName = config_dir / "spu2-x.ini"
+    if not config_dir.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
 
     # Keep the custom files
-    if path.exists(configFileName):
+    if configFileName.exists():
         return
 
-    f = open(configFileName, "w")
-    f.write("[MIXING]\n")
-    f.write("Interpolation=1\n")
-    f.write("Disable_Effects=0\n")
+    with open(configFileName, "w") as f:
+        f.write("[MIXING]\n")
+        f.write("Interpolation=1\n")
+        f.write("Disable_Effects=0\n")
     f.write("[OUTPUT]\n")
     f.write("Output_Module=SDLAudio\n")
     f.write("[PORTAUDIO]\n")
@@ -81,22 +88,30 @@ def configureAudio():
     f.close()
 
 
-def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWithWheel):
-    configFileName = "{}/{}".format(PCSX2_CONFIG_DIR + "/inis", "PCSX2.ini")
+def setPcsx2Config(
+    system: Any,
+    rom: str,
+    controllers: Any,
+    metadata: Any,
+    guns: Any,
+    wheels: Any,
+    playingWithWheel: Any,
+) -> None:
+    config_dir = PCSX2_CONFIG_DIR / "inis"
+    configFileName = config_dir / "PCSX2.ini"
 
-    if not path.exists(PCSX2_CONFIG_DIR + "/inis"):
-        makedirs(PCSX2_CONFIG_DIR + "/inis")
+    if not config_dir.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
 
-    if not path.isfile(configFileName):
-        f = open(configFileName, "w")
-        f.write("[UI]\n")
-        f.close()
+    if not configFileName.is_file():
+        with open(configFileName, "w") as f:
+            f.write("[UI]\n")
 
     pcsx2INIConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
     pcsx2INIConfig.optionxform = lambda optionstr: str(optionstr)
 
-    if path.isfile(configFileName):
+    if configFileName.is_file():
         pcsx2INIConfig.read(configFileName)
 
     ## [UI]
@@ -137,8 +152,9 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
     pcsx2INIConfig.set("Folders", "Videos", "../../../saves/ps2/pcsx2/videos")
 
     # create cache folder
-    if not path.exists("/userdata/system/cache/ps2"):
-        makedirs("/userdata/system/cache/ps2")
+    cache_dir = Path("/userdata/system/cache/ps2")
+    if not cache_dir.exists():
+        cache_dir.mkdir(parents=True, exist_ok=True)
 
     ## [EmuCore]
     if not pcsx2INIConfig.has_section("EmuCore"):
@@ -180,21 +196,21 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
     if not pcsx2INIConfig.has_section("Achievements"):
         pcsx2INIConfig.add_section("Achievements")
     pcsx2INIConfig.set("Achievements", "Enabled", "false")
-    if (
-        system.isOptSet("retroachievements")
-        and system.getOptBoolean("retroachievements") == True
+    if system.isOptSet("retroachievements") and system.getOptBoolean(
+        "retroachievements"
     ):
-        headers = {"Content-type": "text/plain", "User-Agent": "REG-linux"}
-        login_url = "https://retroachievements.org/"
         username = system.config.get("retroachievements.username", "")
-        password = system.config.get("retroachievements.password", "")
         hardcore = system.config.get("retroachievements.hardcore", "")
         indicator = system.config.get("retroachievements.challenge_indicators", "")
         presence = system.config.get("retroachievements.richpresence", "")
         leaderbd = system.config.get("retroachievements.leaderboards", "")
+        password = system.config.get("retroachievements.password", "")
         login_cmd = f"dorequest.php?r=login&u={username}&p={password}"
         try:
-            res = get(login_url + login_cmd, headers=headers)
+            res = get(
+                "https://retroachievements.org/" + login_cmd,
+                headers={"Content-type": "text/plain", "User-Agent": "REG-linux"},
+            )
             if res.status_code != 200:
                 eslog.warning(
                     f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]"
@@ -276,9 +292,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
                                 ).strip()
                                 if discrete_name:
                                     eslog.debug(
-                                        "Using Discrete GPU Name: {} for PCSX2".format(
-                                            discrete_name
-                                        )
+                                        f"Using Discrete GPU Name: {discrete_name} for PCSX2"
                                     )
                                     pcsx2INIConfig.set(
                                         "EmuCore/GS", "Adapter", discrete_name
@@ -289,9 +303,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
                                         "EmuCore/GS", "Adapter", "(Default)"
                                     )
                             except CalledProcessError as e:
-                                eslog.debug(
-                                    "Error getting discrete GPU Name: {}".format(e)
-                                )
+                                eslog.debug(f"Error getting discrete GPU Name: {e}")
                                 pcsx2INIConfig.set("EmuCore/GS", "Adapter", "(Default)")
                         else:
                             eslog.debug(
@@ -299,7 +311,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
                             )
                             pcsx2INIConfig.set("EmuCore/GS", "Adapter", "(Default)")
                     except CalledProcessError as e:
-                        eslog.debug("Error checking for discrete GPU: {}".format(e))
+                        eslog.debug(f"Error checking for discrete GPU: {e}")
             else:
                 eslog.debug("User selected or defaulting to OpenGL")
 
@@ -310,7 +322,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
             )
             pcsx2INIConfig.set("EmuCore/GS", "Renderer", "12")
     except CalledProcessError as e:
-        eslog.debug("Error checking for Vulkan driver: {}".format(e))
+        eslog.debug(f"Error checking for Vulkan driver: {e}")
 
     # Ratio
     if system.isOptSet("pcsx2_ratio"):
@@ -549,14 +561,13 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
                 pcsx2INIConfig.add_section("USB1")
             pcsx2INIConfig.set("USB1", "Type", "guncon2")
             nc = 1
-            for controller, pad in sorted(controllers.items()):
-                if nc == 1 and not gun1onport2:
-                    if "start" in pad.inputs:
-                        pcsx2INIConfig.set(
-                            "USB1",
-                            "guncon2_Start",
-                            "SDL-{}/{}".format(pad.index, "Start"),
-                        )
+            for _, pad in sorted(controllers.items()):
+                if nc == 1 and not gun1onport2 and "start" in pad.inputs:
+                    pcsx2INIConfig.set(
+                        "USB1",
+                        "guncon2_Start",
+                        "SDL-{}/{}".format(pad.index, "Start"),
+                    )
                 nc = nc + 1
 
             ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
@@ -571,14 +582,13 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
                 pcsx2INIConfig.add_section("USB2")
             pcsx2INIConfig.set("USB2", "Type", "guncon2")
             nc = 1
-            for controller, pad in sorted(controllers.items()):
-                if nc == 2 or gun1onport2:
-                    if "start" in pad.inputs:
-                        pcsx2INIConfig.set(
-                            "USB2",
-                            "guncon2_Start",
-                            "SDL-{}/{}".format(pad.index, "Start"),
-                        )
+            for _, pad in sorted(controllers.items()):
+                if (nc == 2 or gun1onport2) and "start" in pad.inputs:
+                    pcsx2INIConfig.set(
+                        "USB2",
+                        "guncon2_Start",
+                        "SDL-{}/{}".format(pad.index, "Start"),
+                    )
                 nc = nc + 1
             ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
             if "controllers.pedals2" in system.config:
@@ -619,152 +629,147 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
         "/usr/pcsx2/bin/resources/textures/SCES-52530/replacements/c321d53987f3986d-eadd4df7c9d76527-00005dd4.png",
         "/usr/pcsx2/bin/resources/textures/SLUS-20927/replacements/c321d53987f3986d-eadd4df7c9d76527-00005dd4.png",
     ]
-    texture_dir = PCSX2_CONFIG_DIR + "/textures"
+    texture_dir = str(Path(PCSX2_CONFIG_DIR) / "textures")
     # copy textures if necessary to PCSX2 config folder
     if (
         system.isOptSet("pcsx2_crisis_fog")
         and system.config["pcsx2_crisis_fog"] == "true"
     ):
         for file_path in fog_files:
-            parent_directory_name = path.basename(path.dirname(path.dirname(file_path)))
-            file_name = path.basename(file_path)
-            texture_directory_path = path.join(
-                texture_dir, parent_directory_name, "replacements"
+            file_path_obj = Path(file_path)
+            parent_directory_name = file_path_obj.parent.parent.name
+            file_name = file_path_obj.name
+            texture_directory_path = (
+                Path(texture_dir) / parent_directory_name / "replacements"
             )
-            makedirs(texture_directory_path, exist_ok=True)
+            texture_directory_path.mkdir(parents=True, exist_ok=True)
 
-            destination_file_path = path.join(texture_directory_path, file_name)
+            destination_file_path = texture_directory_path / file_name
 
-            copyfile(file_path, destination_file_path)
+            copyfile(str(file_path_obj), str(destination_file_path))
         # set texture replacement on regardless of previous setting
         pcsx2INIConfig.set("EmuCore/GS", "LoadTextureReplacements", "true")
     else:
         for file_path in fog_files:
-            parent_directory_name = path.basename(path.dirname(path.dirname(file_path)))
-            file_name = path.basename(file_path)
-            texture_directory_path = path.join(
-                texture_dir, parent_directory_name, "replacements"
+            file_path_obj = Path(file_path)
+            parent_directory_name = file_path_obj.parent.parent.name
+            file_name = file_path_obj.name
+            texture_directory_path = (
+                Path(texture_dir) / parent_directory_name / "replacements"
             )
-            target_file_path = path.join(texture_directory_path, file_name)
+            target_file_path = texture_directory_path / file_name
 
-            if path.isfile(target_file_path):
-                remove(target_file_path)
+            if target_file_path.is_file():
+                target_file_path.unlink()
 
     # wheels
     wtype = getWheelType(metadata, playingWithWheel, system.config)
-    eslog.info("PS2 wheel type is {}".format(wtype))
-    if useEmulatorWheels(playingWithWheel, wtype):
-        if len(wheels) >= 1:
-            wheelMapping = {
-                "DrivingForcePro": {
-                    "up": "Pad_DPadUp",
-                    "down": "Pad_DPadDown",
-                    "left": "Pad_DPadLeft",
-                    "right": "Pad_DPadRight",
-                    "start": "Pad_Start",
-                    "select": "Pad_Select",
-                    "a": "Pad_Circle",
-                    "b": "Pad_Cross",
-                    "x": "Pad_Triangle",
-                    "y": "Pad_Square",
-                    "pageup": "Pad_L1",
-                    "pagedown": "Pad_R1",
-                },
-                "DrivingForce": {
-                    "up": "Pad_DPadUp",
-                    "down": "Pad_DPadDown",
-                    "left": "Pad_DPadLeft",
-                    "right": "Pad_DPadRight",
-                    "start": "Pad_Start",
-                    "select": "Pad_Select",
-                    "a": "Pad_Circle",
-                    "b": "Pad_Cross",
-                    "x": "Pad_Triangle",
-                    "y": "Pad_Square",
-                    "pageup": "Pad_L1",
-                    "pagedown": "Pad_R1",
-                },
-                "GTForce": {
-                    "a": "Pad_Y",
-                    "b": "Pad_B",
-                    "x": "Pad_X",
-                    "y": "Pad_A",
-                    "pageup": "Pad_MenuDown",
-                    "pagedown": "Pad_MenuUp",
-                },
-            }
+    eslog.info(f"PS2 wheel type is {wtype}")
+    if useEmulatorWheels(playingWithWheel, wtype) and len(wheels) >= 1:
+        wheelMapping = {
+            "DrivingForcePro": {
+                "up": "Pad_DPadUp",
+                "down": "Pad_DPadDown",
+                "left": "Pad_DPadLeft",
+                "right": "Pad_DPadRight",
+                "start": "Pad_Start",
+                "select": "Pad_Select",
+                "a": "Pad_Circle",
+                "b": "Pad_Cross",
+                "x": "Pad_Triangle",
+                "y": "Pad_Square",
+                "pageup": "Pad_L1",
+                "pagedown": "Pad_R1",
+            },
+            "DrivingForce": {
+                "up": "Pad_DPadUp",
+                "down": "Pad_DPadDown",
+                "left": "Pad_DPadLeft",
+                "right": "Pad_DPadRight",
+                "start": "Pad_Start",
+                "select": "Pad_Select",
+                "a": "Pad_Circle",
+                "b": "Pad_Cross",
+                "x": "Pad_Triangle",
+                "y": "Pad_Square",
+                "pageup": "Pad_L1",
+                "pagedown": "Pad_R1",
+            },
+            "GTForce": {
+                "a": "Pad_Y",
+                "b": "Pad_B",
+                "x": "Pad_X",
+                "y": "Pad_A",
+                "pageup": "Pad_MenuDown",
+                "pagedown": "Pad_MenuUp",
+            },
+        }
 
-            usbx = 1
-            for controller, pad in sorted(controllers.items()):
-                if pad.dev in wheels:
-                    if not pcsx2INIConfig.has_section("USB{}".format(usbx)):
-                        pcsx2INIConfig.add_section("USB{}".format(usbx))
-                    pcsx2INIConfig.set("USB{}".format(usbx), "Type", "Pad")
+        usbx = 1
+        for _, pad in sorted(controllers.items()):
+            if pad.dev in wheels:
+                if not pcsx2INIConfig.has_section(f"USB{usbx}"):
+                    pcsx2INIConfig.add_section(f"USB{usbx}")
+                pcsx2INIConfig.set(f"USB{usbx}", "Type", "Pad")
 
-                    wheel_type = getWheelType(metadata, playingWithWheel, system.config)
+                wheel_type = getWheelType(metadata, playingWithWheel, system.config)
+                pcsx2INIConfig.set(
+                    f"USB{usbx}",
+                    "Pad_subtype",
+                    wheelTypeMapping[wheel_type],
+                )
+
+                if hasattr(pad, "physdev"):  # ffb on the real wheel
                     pcsx2INIConfig.set(
-                        "USB{}".format(usbx),
-                        "Pad_subtype",
-                        wheelTypeMapping[wheel_type],
+                        f"USB{usbx}",
+                        "Pad_FFDevice",
+                        f"SDL-{pad.physid}",
+                    )
+                else:
+                    pcsx2INIConfig.set(
+                        f"USB{usbx}",
+                        "Pad_FFDevice",
+                        f"SDL-{pad.index}",
                     )
 
-                    if hasattr(pad, "physdev"):  # ffb on the real wheel
+                for i in pad.inputs:
+                    if i in wheelMapping[wheel_type]:
                         pcsx2INIConfig.set(
-                            "USB{}".format(usbx),
-                            "Pad_FFDevice",
-                            "SDL-{}".format(pad.physid),
+                            f"USB{usbx}",
+                            wheelMapping[wheel_type][i],
+                            f"SDL-{pad.index}/{input2wheel(pad.inputs[i])}",
                         )
-                    else:
-                        pcsx2INIConfig.set(
-                            "USB{}".format(usbx),
-                            "Pad_FFDevice",
-                            "SDL-{}".format(pad.index),
-                        )
-
-                    for i in pad.inputs:
-                        if i in wheelMapping[wheel_type]:
-                            pcsx2INIConfig.set(
-                                "USB{}".format(usbx),
-                                wheelMapping[wheel_type][i],
-                                "SDL-{}/{}".format(
-                                    pad.index, input2wheel(pad.inputs[i])
-                                ),
-                            )
-                    # wheel
-                    if "joystick1left" in pad.inputs:
-                        pcsx2INIConfig.set(
-                            "USB{}".format(usbx),
-                            "Pad_SteeringLeft",
-                            "SDL-{}/{}".format(
-                                pad.index, input2wheel(pad.inputs["joystick1left"])
-                            ),
-                        )
-                        pcsx2INIConfig.set(
-                            "USB{}".format(usbx),
-                            "Pad_SteeringRight",
-                            "SDL-{}/{}".format(
-                                pad.index,
-                                input2wheel(pad.inputs["joystick1left"], True),
-                            ),
-                        )
-                    # pedals
-                    if "l2" in pad.inputs:
-                        pcsx2INIConfig.set(
-                            "USB{}".format(usbx),
-                            "Pad_Brake",
-                            "SDL-{}/{}".format(
-                                pad.index, input2wheel(pad.inputs["l2"])
-                            ),
-                        )
-                    if "r2" in pad.inputs:
-                        pcsx2INIConfig.set(
-                            "USB{}".format(usbx),
-                            "Pad_Throttle",
-                            "SDL-{}/{}".format(
-                                pad.index, input2wheel(pad.inputs["r2"])
-                            ),
-                        )
-                    usbx = usbx + 1
+                # wheel
+                if "joystick1left" in pad.inputs:
+                    pcsx2INIConfig.set(
+                        f"USB{usbx}",
+                        "Pad_SteeringLeft",
+                        "SDL-{}/{}".format(
+                            pad.index, input2wheel(pad.inputs["joystick1left"])
+                        ),
+                    )
+                    pcsx2INIConfig.set(
+                        f"USB{usbx}",
+                        "Pad_SteeringRight",
+                        "SDL-{}/{}".format(
+                            pad.index,
+                            input2wheel(pad.inputs["joystick1left"], True),
+                        ),
+                    )
+                # pedals
+                if "l2" in pad.inputs:
+                    pcsx2INIConfig.set(
+                        f"USB{usbx}",
+                        "Pad_Brake",
+                        "SDL-{}/{}".format(pad.index, input2wheel(pad.inputs["l2"])),
+                    )
+                if "r2" in pad.inputs:
+                    pcsx2INIConfig.set(
+                        f"USB{usbx}",
+                        "Pad_Throttle",
+                        "SDL-{}/{}".format(pad.index, input2wheel(pad.inputs["r2"])),
+                    )
+                usbx = usbx + 1
 
     ## [Pad]
     if not pcsx2INIConfig.has_section("Pad"):
@@ -776,7 +781,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
     # add multitap as needed
     multiTap = 2
     joystick_count = len(controllers)
-    eslog.debug("Number of Controllers = {}".format(joystick_count))
+    eslog.debug(f"Number of Controllers = {joystick_count}")
     if system.isOptSet("pcsx2_multitap") and system.config["pcsx2_multitap"] == "4":
         if joystick_count > 2 and joystick_count < 5:
             pcsx2INIConfig.set("Pad", "MultitapPort1", "true")
@@ -819,15 +824,15 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
 
     # Now add Controllers
     nplayer = 1
-    for controller, pad in sorted(controllers.items()):
+    for _, pad in sorted(controllers.items()):
         # only configure the number of controllers set
         if nplayer <= multiTap:
             pad_index = nplayer
             if multiTap == 4 and pad.index != 0:
                 # Skip Pad2 in the ini file when MultitapPort1 only
                 pad_index = nplayer + 1
-            pad_num = "Pad{}".format(pad_index)
-            sdl_num = "SDL-" + "{}".format(pad.index)
+            pad_num = f"Pad{pad_index}"
+            sdl_num = "SDL-" + f"{pad.index}"
 
             if not pcsx2INIConfig.has_section(pad_num):
                 pcsx2INIConfig.add_section(pad_num)
@@ -877,7 +882,7 @@ def setPcsx2Config(system, rom, controllers, metadata, guns, wheels, playingWith
     if not pcsx2INIConfig.has_section("GameList"):
         pcsx2INIConfig.add_section("GameList")
 
-    pcsx2INIConfig.set("GameList", "RecursivePaths", "/userdata/roms/ps2")
+    pcsx2INIConfig.set("GameList", "RecursivePaths", str(Path("/userdata/roms/ps2")))
 
     with open(configFileName, "w") as configfile:
         pcsx2INIConfig.write(configfile)

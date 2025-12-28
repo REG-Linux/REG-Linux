@@ -1,4 +1,7 @@
-def setDrasticController(drasticConfig):
+from typing import Any
+
+
+def setDrasticController(drasticConfig: Any) -> None:
     keyboardpart = "".join(
         (
             "controls_a[CONTROL_INDEX_UP]                           = 338          # Arrow Up        \n",

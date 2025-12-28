@@ -3,8 +3,8 @@ Drastic generator module for REG-Linux
 This module handles the generation of drastic emulator configurations.
 """
 
-from .drasticGenerator import DrasticGenerator
 from .drasticConfig import setDrasticConfig
-from .drasticControllers import *
+from .drasticControllers import setDrasticController
+from .drasticGenerator import DrasticGenerator
 
-__all__ = ["DrasticGenerator", "setDrasticConfig"]
+__all__ = ["DrasticGenerator", "setDrasticConfig", "setDrasticController"]

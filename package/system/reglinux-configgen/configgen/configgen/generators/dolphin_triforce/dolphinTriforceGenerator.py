@@ -1,30 +1,37 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-import os.path
 import configparser
 from os import environ
-from . import dolphinTriforceControllers
-from . import dolphinTriforceConfig
+from pathlib import Path
+from typing import Any
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+
+from . import dolphinTriforceConfig, dolphinTriforceControllers
 
 
 class DolphinTriforceGenerator(Generator):
     # this emulator/core requires X server to run
-    def requiresX11(self):
+    def requiresX11(self) -> bool:
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
-        if not os.path.exists(
-            os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni)
-        ):
-            os.makedirs(os.path.dirname(dolphinTriforceConfig.dolphinTriforceIni))
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: dict[str, int],
+    ) -> Command:
+        ini_path = Path(dolphinTriforceConfig.dolphinTriforceIni)
+        if not ini_path.parent.exists():
+            ini_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Dir required for saves
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceData + "/StateSaves"
-        ):
-            os.makedirs(dolphinTriforceConfig.dolphinTriforceData + "/StateSaves")
+        saves_path = Path(dolphinTriforceConfig.dolphinTriforceData) / "StateSaves"
+        if not saves_path.exists():
+            saves_path.mkdir(parents=True, exist_ok=True)
 
         dolphinTriforceControllers.generateControllerConfig(
             system, players_controllers, rom
@@ -35,7 +42,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceSettings.optionxform = lambda optionstr: str(optionstr)
-        if os.path.exists(dolphinTriforceConfig.dolphinTriforceIni):
+        if Path(dolphinTriforceConfig.dolphinTriforceIni).exists():
             dolphinTriforceSettings.read(dolphinTriforceConfig.dolphinTriforceIni)
 
         # Sections
@@ -53,12 +60,12 @@ class DolphinTriforceGenerator(Generator):
         # Define default games path
         if "ISOPaths" not in dolphinTriforceSettings["General"]:
             dolphinTriforceSettings.set(
-                "General", "ISOPath0", "/userdata/roms/triforce"
+                "General", "ISOPath0", str(Path("/userdata/roms/triforce"))
             )
             dolphinTriforceSettings.set("General", "ISOPaths", "1")
         if "GCMPathes" not in dolphinTriforceSettings["General"]:
             dolphinTriforceSettings.set(
-                "General", "GCMPath0", "/userdata/roms/triforce"
+                "General", "GCMPath0", str(Path("/userdata/roms/triforce"))
             )
             dolphinTriforceSettings.set("General", "GCMPathes", "1")
 
@@ -67,12 +74,12 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceSettings.set(
                 "Core",
                 "MemcardAPath",
-                "/userdata/saves/dolphin-triforce/GC/MemoryCardA.USA.raw",
+                str(Path("/userdata/saves/dolphin-triforce/GC/MemoryCardA.USA.raw")),
             )
             dolphinTriforceSettings.set(
                 "Core",
                 "MemcardBPath",
-                "/userdata/saves/dolphin-triforce/GC/MemoryCardB.USA.raw",
+                str(Path("/userdata/saves/dolphin-triforce/GC/MemoryCardB.USA.raw")),
             )
 
         # Draw or not FPS
@@ -307,18 +314,16 @@ class DolphinTriforceGenerator(Generator):
 
         # These cheat files are required to launch Triforce games, and thus should always be present and enabled.
 
-        if not os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings):
-            os.makedirs(dolphinTriforceConfig.dolphinTriforceGameSettings)
+        game_settings_path = Path(dolphinTriforceConfig.dolphinTriforceGameSettings)
+        if not game_settings_path.exists():
+            game_settings_path.mkdir(parents=True, exist_ok=True)
 
         # GFZE01 F-Zero GX (convert to F-Zero AX)
 
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini"
-        ):
-            dolphinTriforceGameSettingsGFZE01 = open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GFZE01.ini", "w"
-            )
-            dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
+        gfze01_ini_path = game_settings_path / "GFZE01.ini"
+        if not gfze01_ini_path.exists():
+            with open(gfze01_ini_path, "w") as dolphinTriforceGameSettingsGFZE01:
+                dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
 $AX
 06003F30 00000284
 818D831C 280C0000
@@ -406,17 +411,12 @@ B0030D06 3C6C0009
 [Gecko_Enabled]
 $AX
 """)
-            dolphinTriforceGameSettingsGFZE01.close()
+            # GVSJ8P Virtua Striker 2002
 
-        # GVSJ8P Virtua Striker 2002
-
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini"
-        ):
-            dolphinTriforceGameSettingsGVSJ8P = open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GVSJ8P.ini", "w"
-            )
-            dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
+        gvsj8p_ini_path = game_settings_path / "GVSJ8P.ini"
+        if not gvsj8p_ini_path.exists():
+            with open(gvsj8p_ini_path, "w") as dolphinTriforceGameSettingsGVSJ8P:
+                dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
 $DI Seed Blanker
 0x80000000:dword:0x00000000
 0x80000004:dword:0x00000000
@@ -424,17 +424,13 @@ $DI Seed Blanker
 [OnFrame_Enabled]
 $DI Seed Blanker
 """)
-            dolphinTriforceGameSettingsGVSJ8P.close()
 
         # GGPE01 Mario Kart GP 1
 
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"
-        ):
-            dolphinTriforceGameSettingsGGPE01 = open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", "w"
-            )
-            dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
+        ggpe01_ini_path = game_settings_path / "GGPE01.ini"
+        if not ggpe01_ini_path.exists():
+            with open(ggpe01_ini_path, "w") as dolphinTriforceGameSettingsGGPE01:
+                dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
 $Disable crypto
 0x8023D828:dword:0x93A30008
 0x8023D82C:dword:0x93C3000C
@@ -454,17 +450,13 @@ $Loop fix
 [EmuState]
 EmulationIssues = AM-Baseboard
 """)
-            dolphinTriforceGameSettingsGGPE01.close()
 
         # GGPE02 Mario Kart GP 2
 
-        if not os.path.exists(
-            dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini"
-        ):
-            dolphinTriforceGameSettingsGGPE02 = open(
-                dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE02.ini", "w"
-            )
-            dolphinTriforceGameSettingsGGPE02.write("""[Display]
+        ggpe02_ini_path = game_settings_path / "GGPE02.ini"
+        if not ggpe02_ini_path.exists():
+            with open(ggpe02_ini_path, "w") as dolphinTriforceGameSettingsGGPE02:
+                dolphinTriforceGameSettingsGGPE02.write("""[Display]
 ProgressiveScan = 0
 [Wii]
 Widescreen = False
@@ -517,7 +509,6 @@ $GameTestMode Patch
 $SeatLoopPatch
 99 credits
 """)
-            dolphinTriforceGameSettingsGGPE02.close()
 
         # # Cheats aren't in key = value format, so the allow_no_value option is needed.
         # dolphinTriforceGameSettingsGGPE01 = configparser.ConfigParser(interpolation=None, allow_no_value=True,delimiters=';')
@@ -550,7 +541,7 @@ $SeatLoopPatch
             "dolphin-triforce",
             "-b",
             "-u",
-            "/userdata/system/configs/dolphin-triforce",
+            str(Path("/userdata/system/configs/dolphin-triforce")),
             "-e",
             rom,
         ]
@@ -559,7 +550,7 @@ $SeatLoopPatch
                 "dolphin-triforce-nogui",
                 "-b",
                 "-u",
-                "/userdata/system/configs/dolphin-triforce",
+                str(Path("/userdata/system/configs/dolphin-triforce")),
                 "-p",
                 system.config["platform"],
                 "-e",
@@ -568,15 +559,18 @@ $SeatLoopPatch
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
-        if "dolphin_aspect_ratio" in config:
-            if config["dolphin_aspect_ratio"] == "1":
-                return 16 / 9
-            elif config["dolphin_aspect_ratio"] == "3" and (
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
+        if "dolphin_aspect_ratio" in config and (
+            config["dolphin_aspect_ratio"] == "1"
+            or config["dolphin_aspect_ratio"] == "3"
+            and (
                 game_resolution["width"] / float(game_resolution["height"])
                 > ((16.0 / 9.0) - 0.1)
-            ):
-                return 16 / 9
+            )
+        ):
+            return 16 / 9
         return 4 / 3
 
 
@@ -594,5 +588,4 @@ def getGameCubeLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]

@@ -1,6 +1,13 @@
+from typing import Any
+
+
 def setDuckstationControllers(
-    duckstatonConfig, system, metadata, guns, playersControllers
-):
+    duckstatonConfig: Any,
+    system: Any,
+    metadata: Any,
+    guns: Any,
+    playersControllers: Any,
+) -> None:
     ## [ControllerPorts]
     if not duckstatonConfig.has_section("ControllerPorts"):
         duckstatonConfig.add_section("ControllerPorts")
@@ -32,16 +39,16 @@ def setDuckstationControllers(
     duckstatonConfig.set("ControllerPorts", "MultitapMode", "Disabled")
     # Now add the controller config based on the ES type & number connected
     nplayer = 1
-    for controller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         if nplayer <= 8:
             # automatically add the multi-tap
             if nplayer > 2:
                 duckstatonConfig.set("ControllerPorts", "MultitapMode", "Port1Only")
                 if nplayer > 4:
                     duckstatonConfig.set("ControllerPorts", "MultitapMode", "BothPorts")
-            pad_num = "Pad{}".format(nplayer)
-            gun_num = "Pointer-{}".format(pad.index)
-            sdl_num = "SDL-{}".format(pad.index)
+            pad_num = f"Pad{nplayer}"
+            gun_num = f"Pointer-{pad.index}"
+            sdl_num = f"SDL-{pad.index}"
             ctrl_num = "Controller" + str(nplayer)
             # SDL2 configs are always the same for controllers
             if system.isOptSet("duckstation_" + ctrl_num):
@@ -123,7 +130,7 @@ def setDuckstationControllers(
                 ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
                 pedalsKeys = {1: "c", 2: "v", 3: "b", 4: "n"}
                 pedalkey = None
-                pedalcname = "controllers.pedals{}".format(nplayer)
+                pedalcname = f"controllers.pedals{nplayer}"
                 if pedalcname in system.config:
                     pedalkey = system.config[pedalcname]
                 else:

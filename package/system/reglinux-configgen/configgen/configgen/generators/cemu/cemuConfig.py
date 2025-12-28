@@ -1,20 +1,23 @@
-from subprocess import run, check_output, CalledProcessError, PIPE
-from configgen.systemFiles import CONF, BIOS, ROMS, SAVES
 from os import environ
+from pathlib import Path
+from subprocess import PIPE, CalledProcessError, check_output, run
+from typing import Any
+
+from configgen.systemFiles import BIOS, CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-CEMU_CONFIG_DIR = CONF + "/cemu"
-CEMU_CONFIG_PATH = CEMU_CONFIG_DIR + "/settings.xml"
-CEMU_BIOS_DIR = BIOS + "/cemu"
-CEMU_PROFILES_DIR = CEMU_CONFIG_DIR + "/controllerProfiles"
-CEMU_ROMS_DIR = ROMS + "/wiiu"
-CEMU_SAVES_DIR = SAVES + "/wiiu"
+CEMU_CONFIG_DIR = str(Path(CONF) / "cemu")
+CEMU_CONFIG_PATH = str(Path(CEMU_CONFIG_DIR) / "settings.xml")
+CEMU_BIOS_DIR = str(Path(BIOS) / "cemu")
+CEMU_PROFILES_DIR = str(Path(CEMU_CONFIG_DIR) / "controllerProfiles")
+CEMU_ROMS_DIR = str(Path(ROMS) / "wiiu")
+CEMU_SAVES_DIR = str(Path(SAVES) / "wiiu")
 CEMU_BIN_PATH = "/usr/bin/cemu/cemu"
 
 
-def setCemuConfig(cemuConfig, system):
+def setCemuConfig(cemuConfig: Any, system: Any) -> None:
     # [ROOT]
     xml_root = getRoot(cemuConfig, "content")
     # Default mlc path
@@ -106,9 +109,7 @@ def setCemuConfig(cemuConfig, system):
                             if discrete_uuid != "":
                                 discrete_uuid_num = discrete_uuid.replace("-", "")
                                 eslog.debug(
-                                    "Using Discrete GPU UUID: {} for Cemu".format(
-                                        discrete_uuid_num
-                                    )
+                                    f"Using Discrete GPU UUID: {discrete_uuid_num} for Cemu"
                                 )
                                 setSectionConfig(
                                     cemuConfig,
@@ -232,7 +233,7 @@ def setCemuConfig(cemuConfig, system):
     # pactl list sinks-raw | sed -e s+"^sink=[0-9]* name=\([^ ]*\) .*"+"\1"+ | sed 1q | tr -d '\n'
     proc = run(["/usr/bin/cemu/get-audio-device"], stdout=PIPE)
     cemuAudioDevice = proc.stdout.decode("utf-8")
-    eslog.debug("*** audio device = {} ***".format(cemuAudioDevice))
+    eslog.debug(f"*** audio device = {cemuAudioDevice} ***")
     if system.isOptSet("cemu_audio_config") and system.getOptBoolean(
         "cemu_audio_config"
     ):
@@ -247,14 +248,11 @@ def setCemuConfig(cemuConfig, system):
 
 
 # Show mouse for touchscreen actions
-def getMouseMode(config, rom):
-    if "cemu_touchpad" in config and config["cemu_touchpad"] == "1":
-        return True
-    else:
-        return False
+def getMouseMode(config: Any, rom: str) -> bool:
+    return "cemu_touchpad" in config and config["cemu_touchpad"] == "1"
 
 
-def getRoot(config, name):
+def getRoot(config: Any, name: str):
     xml_section = config.getElementsByTagName(name)
 
     if len(xml_section) == 0:
@@ -266,7 +264,7 @@ def getRoot(config, name):
     return xml_section
 
 
-def setSectionConfig(config, xml_section, name, value):
+def setSectionConfig(config: Any, xml_section: Any, name: str, value: str) -> None:
     xml_elt = xml_section.getElementsByTagName(name)
     if len(xml_elt) == 0:
         xml_elt = config.createElement(name)
@@ -284,11 +282,10 @@ def setSectionConfig(config, xml_section, name, value):
 def getLangFromEnvironment():
     if "LANG" in environ:
         return environ["LANG"][:5]
-    else:
-        return "en_US"
+    return "en_US"
 
 
-def getCemuLang(lang):
+def getCemuLang(lang: str) -> int:
     availableLanguages = {
         "ja_JP": 0,
         "en_US": 1,
@@ -305,5 +302,4 @@ def getCemuLang(lang):
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]

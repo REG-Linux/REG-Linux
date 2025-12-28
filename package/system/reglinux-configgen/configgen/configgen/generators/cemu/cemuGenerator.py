@@ -1,22 +1,23 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 import xml.parsers.expat
 from codecs import open
+from glob import escape, iglob
+from os import linesep, mkdir, path
 from xml.dom import minidom
-from os import path, mkdir, linesep
-from glob import iglob, escape
-from .cemuControllers import setControllerConfig
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+from configgen.utils.logger import get_logger
+
 from .cemuConfig import (
     CEMU_BIN_PATH,
     CEMU_BIOS_DIR,
     CEMU_CONFIG_DIR,
-    CEMU_SAVES_DIR,
     CEMU_CONFIG_PATH,
     CEMU_PROFILES_DIR,
+    CEMU_SAVES_DIR,
     setCemuConfig,
 )
-
-from configgen.utils.logger import get_logger
+from .cemuControllers import setControllerConfig
 
 eslog = get_logger(__name__)
 
@@ -73,12 +74,11 @@ class CemuGenerator(Generator):
         setCemuConfig(cemuConfig, system)
 
         # Save the config file
-        xml_file = open(CEMU_CONFIG_PATH, "w", "utf-8")
         dom_string = linesep.join(
             [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()]
         )
-        xml_file.write(dom_string)
-        xml_file.close()
+        with open(CEMU_CONFIG_PATH, "w", encoding="utf-8") as xml_file:
+            xml_file.write(dom_string)
 
         # Set-up the controllers
         setControllerConfig(system, players_controllers, CEMU_PROFILES_DIR)

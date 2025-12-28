@@ -1,15 +1,18 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, mkdir
+from os import mkdir, path
 from shlex import split
-from .gzdoomControllers import setGzdoomControllers
+from typing import Any
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+
 from .gzdoomConfig import (
-    setGzdoomConfig,
     GZDOOM_CONFIG_DIR,
+    GZDOOM_FM_BANKS_PATH,
     GZDOOM_SCRIPT_PATH,
     GZDOOM_SOUND_FONT_PATH,
-    GZDOOM_FM_BANKS_PATH,
+    setGzdoomConfig,
 )
+from .gzdoomControllers import setGzdoomControllers
 
 
 class GZDoomGenerator(Generator):
@@ -17,12 +20,21 @@ class GZDoomGenerator(Generator):
     def requiresWayland(self):
         return True
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         return 16 / 9
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: dict[str, int],
+    ) -> Command:
         # check directories exist
         if not path.exists(GZDOOM_CONFIG_DIR):
             mkdir(GZDOOM_CONFIG_DIR)
@@ -39,7 +51,7 @@ class GZDoomGenerator(Generator):
         # define how wads are loaded
         # if we use a custom extension use that instead
         if rom.endswith(".gzdoom"):
-            with open(rom, "r") as f:
+            with open(rom) as f:
                 iwad_command = f.read().strip()
             args = split(iwad_command)
             return Command(
@@ -55,18 +67,17 @@ class GZDoomGenerator(Generator):
                     "-nologo" if system.getOptBoolean("nologo") else "",
                 ]
             )
-        else:
-            return Command(
-                array=[
-                    "gzdoom",
-                    "-iwad",
-                    path.basename(rom),
-                    "-exec",
-                    GZDOOM_SCRIPT_PATH,
-                    "-width",
-                    str(game_resolution["width"]),
-                    "-height",
-                    str(game_resolution["height"]),
-                    "-nologo" if system.getOptBoolean("nologo") else "",
-                ]
-            )
+        return Command(
+            array=[
+                "gzdoom",
+                "-iwad",
+                path.basename(rom),
+                "-exec",
+                GZDOOM_SCRIPT_PATH,
+                "-width",
+                str(game_resolution["width"]),
+                "-height",
+                str(game_resolution["height"]),
+                "-nologo" if system.getOptBoolean("nologo") else "",
+            ]
+        )

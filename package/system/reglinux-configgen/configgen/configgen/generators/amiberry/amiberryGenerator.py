@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 from zipfile import ZipFile
 
 from configgen.Command import Command
@@ -20,7 +20,7 @@ class AmiberryGenerator(Generator):
 
         rom_type = self.get_rom_type(rom)
         if rom_type != "UNKNOWN":
-            command_array = [AMIBERRY_BIN_PATH, "-G"]
+            command_array = [str(AMIBERRY_BIN_PATH), "-G"]
             if rom_type != "WHDL":
                 command_array.append("--model")
                 command_array.append(system.config["core"])
@@ -38,12 +38,10 @@ class AmiberryGenerator(Generator):
                 command_array.append(rom)
             elif rom_type == "DISK":
                 # floppies
-                n = 0
-                for img in self.floppies_from_rom(rom):
+                for n, img in enumerate(self.floppies_from_rom(rom)):
                     if n < 4:
                         command_array.append("-" + str(n))
                         command_array.append(img)
-                    n += 1
                 # floppy path
                 command_array.append("-s")
                 # Use disk folder as floppy path
@@ -156,12 +154,12 @@ class AmiberryGenerator(Generator):
         # otherwise, unknown format
         return Command(array=[])
 
-    def floppies_from_rom(self, rom):
+    def floppies_from_rom(self, rom: str) -> list[str]:
         floppies = []
         eslog.debug(f"Looking for floppy images for ROM: {rom}")
 
         # split path and extension
-        filepath, fileext = path.splitext(rom)
+        filepath, fileext = str(Path(rom).with_suffix("")), Path(rom).suffix
 
         #
         indexDisk = filepath.rfind("(Disk 1")
@@ -176,7 +174,7 @@ class AmiberryGenerator(Generator):
             # special case for 0 while numerotation can start at 1
             n = 0
             fullfilepath = fileprefix + str(n) + fileext
-            if path.isfile(fullfilepath):
+            if Path(fullfilepath).is_file():
                 eslog.debug(f"Found floppy image: {fullfilepath}")
                 floppies.append(fullfilepath)
 
@@ -184,7 +182,7 @@ class AmiberryGenerator(Generator):
             n = 1
             while True:
                 fullfilepath = fileprefix + str(n) + fileext
-                if path.isfile(fullfilepath):
+                if Path(fullfilepath).is_file():
                     eslog.debug(f"Found floppy image: {fullfilepath}")
                     floppies.append(fullfilepath)
                     n += 1
@@ -199,7 +197,7 @@ class AmiberryGenerator(Generator):
             n = 2
             while True:
                 fullfilepath = prefix + str(n) + postfix + fileext
-                if path.isfile(fullfilepath):
+                if Path(fullfilepath).is_file():
                     eslog.debug(f"Found floppy image: {fullfilepath}")
                     floppies.append(fullfilepath)
                     n += 1
@@ -213,40 +211,40 @@ class AmiberryGenerator(Generator):
         eslog.debug(f"Total floppy images found: {len(floppies)}")
         return floppies
 
-    def get_rom_type(self, filepath):
+    def get_rom_type(self, filepath: str) -> str:
         eslog.debug(f"Determining ROM type for: {filepath}")
-        extension = path.splitext(filepath)[1][1:].lower()
+        extension = Path(filepath).suffix[1:].lower()
 
         if extension == "lha":
             eslog.debug("ROM type: WHDL")
             return "WHDL"
-        elif extension == "hdf":
+        if extension == "hdf":
             eslog.debug("ROM type: HDF")
             return "HDF"
-        elif extension in ["iso", "cue", "chd"]:
+        if extension in ["iso", "cue", "chd"]:
             eslog.debug(f"ROM type: CD (extension: {extension})")
             return "CD"
-        elif extension in ["adf", "ipf"]:
+        if extension in ["adf", "ipf"]:
             eslog.debug(f"ROM type: DISK (extension: {extension})")
             return "DISK"
-        elif extension == "zip":
+        if extension == "zip":
             # can be either whdl or adf
             eslog.debug("Processing ZIP file to determine ROM type")
             try:
                 with ZipFile(filepath) as zip_file:
                     for zipfilename in zip_file.namelist():
                         if zipfilename.find("/") == -1:  # at the root
-                            extension = path.splitext(zipfilename)[1][1:]
+                            extension = Path(zipfilename).suffix[1:]
                             eslog.debug(
                                 f"File in ZIP: {zipfilename}, extension: {extension}"
                             )
                             if extension == "info":
                                 eslog.debug("ROM type: WHDL (found .info file)")
                                 return "WHDL"
-                            elif extension == "lha":
+                            if extension == "lha":
                                 eslog.debug("ROM type: UNKNOWN (found .lha file)")
                                 return "UNKNOWN"
-                            elif extension == "adf":
+                            if extension == "adf":
                                 eslog.debug("ROM type: DISK (found .adf file)")
                                 return "DISK"
                 # no info or adf file found

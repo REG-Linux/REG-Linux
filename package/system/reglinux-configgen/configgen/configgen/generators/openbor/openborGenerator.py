@@ -1,14 +1,17 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, chdir
+from os import chdir
+from pathlib import Path
 from re import search
-from configgen.systemFiles import CONF, SAVES, ROMS
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.settings import UnixSettings
+from configgen.systemFiles import CONF, ROMS, SAVES
+
 from .openborControllers import setControllerConfig
 
-OPENBOR_CONF_DIR = CONF + "/openbor"
-OPENBOR_SAVES_DIR = SAVES + "/openbor"
-OPENBOR_ROMS_DIR = ROMS + "/openbor"
+OPENBOR_CONF_DIR = str(CONF / "openbor")
+OPENBOR_SAVES_DIR = str(SAVES / "openbor")
+OPENBOR_ROMS_DIR = str(ROMS / "openbor")
 
 
 class OpenborGenerator(Generator):
@@ -16,15 +19,17 @@ class OpenborGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        if not path.exists(OPENBOR_CONF_DIR):
-            makedirs(OPENBOR_CONF_DIR)
+        conf_dir_path = Path(OPENBOR_CONF_DIR)
+        if not conf_dir_path.exists():
+            conf_dir_path.mkdir(parents=True, exist_ok=True)
 
-        if not path.exists(OPENBOR_SAVES_DIR):
-            makedirs(OPENBOR_SAVES_DIR)
+        saves_dir_path = Path(OPENBOR_SAVES_DIR)
+        if not saves_dir_path.exists():
+            saves_dir_path.mkdir(parents=True, exist_ok=True)
 
         # guess the version to run
         core = system.config["core"]
-        if system.config["core_forced"] == False:
+        if not system.config["core_forced"]:
             core = OpenborGenerator.guessCore(rom)
 
         # config file
@@ -89,7 +94,7 @@ class OpenborGenerator(Generator):
         return OpenborGenerator.executeCore(core, rom)
 
     @staticmethod
-    def executeCore(core, rom):
+    def executeCore(core: str, rom: str) -> Command:
         if core == "openbor4432":
             command_array = ["OpenBOR4432", rom]
         elif core == "openbor6412":
@@ -103,9 +108,9 @@ class OpenborGenerator(Generator):
         return Command(array=command_array)
 
     @staticmethod
-    def guessCore(rom):
-        versionstr = search(r"\[.*([0-9]{4})\]+", path.basename(rom))
-        if versionstr == None:
+    def guessCore(rom: str) -> str:
+        versionstr = search(r"\[.*([0-9]{4})\]+", Path(rom).name)
+        if versionstr is None:
             return "openbor7530"
         version = int(versionstr.group(1))
 

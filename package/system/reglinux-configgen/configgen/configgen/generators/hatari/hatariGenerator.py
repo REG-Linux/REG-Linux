@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path
-from .hatariControllers import setHatariControllers
-from .hatariConfig import HATARI_BIOS_PATH, HATARI_BIN_PATH
+from pathlib import Path
 
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
+
+from .hatariConfig import HATARI_BIN_PATH, HATARI_BIOS_PATH
+from .hatariControllers import setHatariControllers
 
 eslog = get_logger(__name__)
 
@@ -47,9 +48,9 @@ class HatariGenerator(Generator):
 
         command_array += ["--machine", machine]
         tos = HatariGenerator.findBestTos(
-            HATARI_BIOS_PATH, machine, tosversion, toslang
+            str(HATARI_BIOS_PATH), machine, tosversion, toslang
         )
-        command_array += ["--tos", f"{HATARI_BIOS_PATH}/{tos}"]
+        command_array += ["--tos", f"{str(HATARI_BIOS_PATH)}/{tos}"]
 
         # RAM (ST Ram) options (0 for 512k, 1 for 1MB)
         memorysize = 0
@@ -57,7 +58,7 @@ class HatariGenerator(Generator):
             memorysize = system.config["ram"]
         command_array += ["--memsize", str(memorysize)]
 
-        rom_extension = path.splitext(rom)[1].lower()
+        rom_extension = Path(rom).suffix.lower()
         if rom_extension == ".hd":
             if (
                 system.isOptSet("hatari_drive")
@@ -68,7 +69,8 @@ class HatariGenerator(Generator):
                 command_array += ["--ide-master", rom]
         elif rom_extension == ".gemdos":
             blank_file = "/userdata/system/configs/hatari/blank.st"
-            if not path.exists(blank_file):
+            blank_path = Path(blank_file)
+            if not blank_path.exists():
                 with open(blank_file, "w"):
                     pass
             command_array += ["--harddrive", rom, blank_file]
@@ -84,7 +86,7 @@ class HatariGenerator(Generator):
         return Command(array=command_array)
 
     @staticmethod
-    def findBestTos(biosdir, machine, tos_version, language):
+    def findBestTos(biosdir: str, machine: str, tos_version: str, language: str) -> str:
         # all languages by preference, when value is "auto"
         all_languages = ["us", "uk", "de", "es", "fr", "it", "nl", "ru", "se", ""]
 
@@ -107,10 +109,10 @@ class HatariGenerator(Generator):
                 l_lang.extend(all_languages)
                 for v_language in l_lang:
                     filename = f"tos{v_tos_version}{v_language}.img"
-                    if path.exists(f"{biosdir}/{filename}"):
+                    bios_path = Path(biosdir) / filename
+                    if bios_path.exists():
                         eslog.debug(f"tos filename: {filename}")
                         return filename
-                    else:
-                        eslog.warning(f"tos filename {filename} not found")
+                    eslog.warning(f"tos filename {filename} not found")
 
         raise Exception(f"no bios found for machine {machine}")

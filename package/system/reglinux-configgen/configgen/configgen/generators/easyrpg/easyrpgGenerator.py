@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
+from pathlib import Path
+
 from configgen.Command import Command
-from os import path, makedirs
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import SAVES
 
-EASYRPG_SAVE_DIR = SAVES + "/easyrpg"
+EASYRPG_SAVE_DIR = str(Path(SAVES) / "easyrpg")
 EASYRPG_BIN_PATH = "/usr/bin/easyrpg-player"
 
 
@@ -29,9 +30,10 @@ class EasyRPGGenerator(Generator):
             command_array.extend(["--encoding", "auto"])
 
         # Save directory
-        save_path = f"{EASYRPG_SAVE_DIR}/{path.basename(rom)}"
-        if not path.exists(save_path):
-            makedirs(save_path)
+        save_path = str(Path(EASYRPG_SAVE_DIR) / Path(rom).name)
+        save_path_obj = Path(save_path)
+        if not save_path_obj.exists():
+            save_path_obj.mkdir(parents=True, exist_ok=True)
         command_array.extend(["--save-path", save_path])
 
         command_array.extend(["--project-path", rom])

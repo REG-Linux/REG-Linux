@@ -1,44 +1,48 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-import os
-import xml.etree.ElementTree as ET
+import re
 import shutil
 import xml.dom.minidom as minidom
-import re
+import xml.etree.ElementTree as ET
 import zipfile
+from pathlib import Path
+from typing import Any
 
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-openMSX_Homedir = "/userdata/system/configs/openmsx"
-openMSX_Config = "/usr/share/openmsx/"
+openMSX_Homedir = Path("/userdata/system/configs/openmsx")
+openMSX_Config = Path("/usr/share/openmsx/")
 
 
-def copy_directory(src, dst):
+def copy_directory(src: str, dst: str) -> None:
     """
     Copy all contents from src directory to dst directory, similar to distutils.dir_util.copy_tree
     This function copies the directory tree from src to dst, creating dst if it doesn't exist
     """
-    import os
     import shutil
+    from pathlib import Path
 
-    eslog.debug(f"Copying directory from {src} to {dst}")
-    if not os.path.exists(dst):
-        eslog.debug(f"Creating destination directory: {dst}")
-        os.makedirs(dst)
+    src_path = Path(src)
+    dst_path = Path(dst)
 
-    for item in os.listdir(src):
-        src_path = os.path.join(src, item)
-        dst_path = os.path.join(dst, item)
+    eslog.debug(f"Copying directory from {src_path} to {dst_path}")
+    if not dst_path.exists():
+        eslog.debug(f"Creating destination directory: {dst_path}")
+        dst_path.mkdir(parents=True, exist_ok=True)
 
-        if os.path.isdir(src_path):
-            eslog.debug(f"Recursively copying directory: {src_path}")
-            copy_directory(src_path, dst_path)
+    for item in src_path.iterdir():
+        src_item_path = src_path / item
+        dst_item_path = dst_path / item.name
+
+        if src_item_path.is_dir():
+            eslog.debug(f"Recursively copying directory: {src_item_path}")
+            copy_directory(str(src_item_path), str(dst_item_path))
         else:
-            eslog.debug(f"Copying file: {src_path}")
-            shutil.copy2(src_path, dst_path)
-    eslog.debug(f"Directory copy completed from {src} to {dst}")
+            eslog.debug(f"Copying file: {src_item_path}")
+            shutil.copy2(src_item_path, dst_item_path)
+    eslog.debug(f"Directory copy completed from {src_path} to {dst_path}")
 
 
 class OpenmsxGenerator(Generator):
@@ -46,27 +50,35 @@ class OpenmsxGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
-        share_dir = openMSX_Homedir + "/share"
-        source_settings = openMSX_Config + "/settings.xml"
-        settings_xml = share_dir + "/settings.xml"
-        settings_tcl = share_dir + "/script.tcl"
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Any,
+    ) -> Command:
+        share_dir = openMSX_Homedir / "share"
+        source_settings = openMSX_Config / "settings.xml"
+        settings_xml = share_dir / "settings.xml"
+        settings_tcl = share_dir / "script.tcl"
 
         # create folder if needed
-        if not os.path.isdir(openMSX_Homedir):
-            os.mkdir(openMSX_Homedir)
+        if not openMSX_Homedir.is_dir():
+            openMSX_Homedir.mkdir(parents=True, exist_ok=True)
 
         # screenshot folder
-        if not os.path.isdir("/userdata/screenshots/openmsx"):
-            os.mkdir("/userdata/screenshots/openmsx")
+        screenshot_dir = Path("/userdata/screenshots/openmsx")
+        if not screenshot_dir.is_dir():
+            screenshot_dir.mkdir(parents=True, exist_ok=True)
 
         # copy files if needed
-        if not os.path.exists(share_dir):
-            os.makedirs(share_dir, exist_ok=True)
+        if not share_dir.exists():
+            share_dir.mkdir(parents=True, exist_ok=True)
             # Use shutil.copytree with dirs_exist_ok=True to mimic copy_tree behavior
             # For older Python versions that don't support dirs_exist_ok, use a custom function
-            copy_directory(openMSX_Config, share_dir)
+            copy_directory(str(openMSX_Config), str(share_dir))
 
         # always use our settings.xml file as a base
         shutil.copy2(source_settings, share_dir)
@@ -128,25 +140,25 @@ class OpenmsxGenerator(Generator):
                 "filepool add -path /userdata/bios/openmsx -types system_rom -position 2\n"
             )
             # get the rom name (no extension) for the savestate name
-            save_name = os.path.basename(rom)
-            save_name = os.path.splitext(save_name)[0]
+            save_name = Path(rom).name
+            save_name = Path(rom).stem
             # simplify the rom name, remove content between brackets () & []
             save_name = re.sub(r"\([^)]*\)", "", save_name)
             save_name = re.sub(r"\[[^]]*\]", "", save_name)
             file.write("\n")
             file.write("# -= Save state =-\n")
-            file.write('savestate "{}"\n'.format(save_name))
+            file.write(f'savestate "{save_name}"\n')
             # set the screenshot
             file.write("\n")
             file.write("# -= Screenshots =-\n")
             file.write(
-                'bind F5 {screenshot [utils::get_next_numbered_filename /userdata/screenshots/openmsx "[guess_title] " ".png"]}\n'
+                f'bind F5 {{screenshot [utils::get_next_numbered_filename {screenshot_dir} "[guess_title] " ".png"]}}\n'
             )
             # setup the controller
             file.write("\n")
             file.write("# -= Controller config =-\n")
             nplayer = 1
-            for playercontroller, pad in sorted(players_controllers.items()):
+            for _, pad in sorted(players_controllers.items()):
                 if nplayer <= 2:
                     if nplayer == 1:
                         file.write("plug joyporta joystick1\n")
@@ -156,55 +168,39 @@ class OpenmsxGenerator(Generator):
                         input = pad.inputs[x]
                         if input.name == "y":
                             file.write(
-                                'bind "joy{} button{} down" "keymatrixdown 6 0x40"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x40"\n'
                             )
                         if input.name == "x":
                             file.write(
-                                'bind "joy{} button{} down" "keymatrixdown 6 0x80"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x80"\n'
                             )
                         if input.name == "pagedown":
                             file.write(
-                                'bind "joy{} button{} up" "set fastforward off"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} up" "set fastforward off"\n'
                             )
                             file.write(
-                                'bind "joy{} button{} down" "set fastforward on"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "set fastforward on"\n'
                             )
                         if input.name == "select":
                             file.write(
-                                'bind "joy{} button{} down" "toggle pause"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "toggle pause"\n'
                             )
                         if input.name == "start":
                             file.write(
-                                'bind "joy{} button{} down" "main_menu_toggle"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "main_menu_toggle"\n'
                             )
                         if input.name == "l3":
                             file.write(
-                                'bind "joy{} button{} down" "toggle_osd_keyboard"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "toggle_osd_keyboard"\n'
                             )
                         if input.name == "r3":
                             file.write(
-                                'bind "joy{} button{} down" "toggle console"\n'.format(
-                                    nplayer, input.id
-                                )
+                                f'bind "joy{nplayer} button{input.id} down" "toggle console"\n'
                             )
                 nplayer += 1
 
         # now run the rom with the appropriate flags
-        file_extension = os.path.splitext(rom)[1].lower()
+        file_extension = Path(rom).suffix.lower()
         command_array = ["/usr/bin/openmsx", "-cart", rom, "-script", settings_tcl]
 
         # set the best machine based on the system
@@ -225,7 +221,7 @@ class OpenmsxGenerator(Generator):
 
         if (
             system.isOptSet("hud")
-            and os.path.exists("/usr/bin/mangohud")
+            and Path("/usr/bin/mangohud").exists()
             and system.config["hud"] != ""
         ):
             command_array.insert(0, "mangohud")
@@ -234,7 +230,7 @@ class OpenmsxGenerator(Generator):
         if file_extension == ".zip":
             with zipfile.ZipFile(rom, "r") as zip_file:
                 for zip_info in zip_file.infolist():
-                    file_extension = os.path.splitext(zip_info.filename)[1]
+                    file_extension = Path(zip_info.filename).suffix
                     # usually zip files only contain 1 file however break loop if file extension found
                     if file_extension in [".cas", ".dsk", ".ogv"]:
                         eslog.debug(f"Zip file contains: {file_extension}")
@@ -269,17 +265,17 @@ class OpenmsxGenerator(Generator):
         # handle our own file format for stacked roms / disks
         if file_extension == ".openmsx":
             # read the contents of the file and extract the rom paths
-            with open(rom, "r") as file:
+            with open(rom) as file:
                 lines = file.readlines()
                 rom1 = ""
                 rom1 = lines[0].strip()
                 rom2 = ""
                 rom2 = lines[1].strip()
             # get the directory path of the .openmsx file
-            openmsx_dir = os.path.dirname(rom)
+            openmsx_dir = Path(rom).parent
             # prepend the directory path to the .rom/.dsk file paths
-            rom1 = os.path.join(openmsx_dir, rom1)
-            rom2 = os.path.join(openmsx_dir, rom2)
+            rom1 = str(openmsx_dir / rom1)
+            rom2 = str(openmsx_dir / rom2)
             # get the first lines extension
             extension = rom1.split(".")[-1].lower()
             # now start ammending the array

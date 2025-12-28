@@ -1,8 +1,8 @@
 import logging
 import sys
-import os
-from typing import Optional
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
+from typing import Any
 
 
 class MaxLevelFilter(logging.Filter):
@@ -21,12 +21,12 @@ class LoggerManager:
 
     _instances = {}
 
-    def __new__(cls, module_name: str):
+    def __new__(cls, module_name: str) -> "LoggerManager":
         if module_name not in cls._instances:
             cls._instances[module_name] = super().__new__(cls)
         return cls._instances[module_name]
 
-    def __init__(self, module_name: str):
+    def __init__(self, module_name: str) -> None:
         self.module_name = module_name
         self.logger = logging.getLogger(module_name)
         # Prevent duplicate initialization
@@ -39,7 +39,7 @@ class LoggerManager:
         level: int = logging.DEBUG,
         fmt: str = "%(asctime)s %(levelname)s (%(filename)s:%(lineno)d):%(funcName)s %(message)s",
         enable_file_logging: bool = False,
-        log_file_path: Optional[str] = None,
+        log_file_path: str | None = None,
         max_file_size: int = 10 * 1024 * 1024,  # 10MB
         backup_count: int = 3,
         enable_stdout: bool = True,
@@ -88,9 +88,9 @@ class LoggerManager:
                 log_file_path = f"/tmp/{self.module_name}.log"
 
             # Create directory if it doesn't exist
-            log_dir = os.path.dirname(log_file_path)
-            if log_dir and not os.path.exists(log_dir):
-                os.makedirs(log_dir, exist_ok=True)
+            log_dir = Path(log_file_path).parent
+            if log_dir and not log_dir.exists():
+                log_dir.mkdir(parents=True, exist_ok=True)
 
             file_handler = RotatingFileHandler(
                 log_file_path, maxBytes=max_file_size, backupCount=backup_count
@@ -107,7 +107,7 @@ def get_logger(
     level: int = logging.DEBUG,
     fmt: str = "%(asctime)s %(levelname)s (%(filename)s:%(lineno)d):%(funcName)s %(message)s",
     enable_file_logging: bool = False,
-    log_file_path: Optional[str] = None,
+    log_file_path: str | None = None,
     max_file_size: int = 10 * 1024 * 1024,  # 10MB
     backup_count: int = 3,
     enable_stdout: bool = True,
@@ -153,7 +153,7 @@ def set_global_log_level(level: int):
     logging.getLogger().setLevel(level)
 
 
-def add_log_context(logger: logging.Logger, **context) -> logging.LoggerAdapter:
+def add_log_context(logger: logging.Logger, **context: Any):
     """
     Add contextual information to a logger.
 
@@ -164,5 +164,4 @@ def add_log_context(logger: logging.Logger, **context) -> logging.LoggerAdapter:
     Returns:
         LoggerAdapter with context
     """
-    adapter = logging.LoggerAdapter(logger, context)
-    return adapter
+    return logging.LoggerAdapter(logger, context)

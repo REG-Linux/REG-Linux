@@ -1,8 +1,10 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import chdir
-from .sonicretroConfig import setSonicretroConfig
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+
+from .sonicretroConfig import setSonicretroConfig
 
 
 class SonicRetroGenerator(Generator):
@@ -10,10 +12,7 @@ class SonicRetroGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Determine the emulator to use
-        if (rom.lower()).endswith("son"):
-            emu = "sonic2013"
-        else:
-            emu = "soniccd"
+        emu = "sonic2013" if (rom.lower()).endswith("son") else "soniccd"
 
         setSonicretroConfig(system, emu, rom)
 

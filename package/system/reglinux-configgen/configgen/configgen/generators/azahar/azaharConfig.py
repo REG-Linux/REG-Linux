@@ -1,12 +1,15 @@
 from os import environ
-from subprocess import check_output, CalledProcessError
+from pathlib import Path
+from subprocess import CalledProcessError, check_output
+from typing import Any
+
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 
-AZAHAR_CONFIG_PATH = CONF + "/azahar-emu/qt-config.ini"
+AZAHAR_CONFIG_PATH = str(Path(CONF) / "azahar-emu" / "qt-config.ini")
 AZAHAR_BIN_PATH = "/usr/bin/azahar"
 
 
@@ -41,7 +44,7 @@ def getAzaharLangFromEnvironment():
     return region.get(availableLanguages.get(lang, "AUTO"), -1)
 
 
-def setAzaharConfig(azaharConfig, system):
+def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
     # [LAYOUT]
     if "Layout" not in azaharConfig:
         azaharConfig["Layout"] = {}

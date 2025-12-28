@@ -1,10 +1,12 @@
-import configgen.controllers as controllersConfig
-from evdev import device, ecodes
-from subprocess import Popen, PIPE
-from os import pipe, fdopen, kill
-from signal import SIGTERM
+from math import ceil, floor
+from os import fdopen, kill, pipe
 from re import match
-from math import floor, ceil
+from signal import SIGTERM
+from subprocess import PIPE, Popen
+from typing import Any
+
+from evdev import device, ecodes
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -55,13 +57,15 @@ emulatorMapping = {
 }
 
 
-def reconfigure_controllers(players_controllers, system, metadata, device_list):
+def reconfigure_controllers(
+    players_controllers: Any, system: Any, metadata: Any, device_list: Any
+) -> tuple[Any, Any, Any]:
     eslog.info("wheels reconfiguration")
     eslog.info("before wheel reconfiguration :")
-    for playercontroller, pad in sorted(players_controllers.items()):
+    for _, pad in sorted(players_controllers.items()):
         eslog.info(
             "  "
-            + playercontroller
+            + str(pad.index)
             + ". index:"
             + str(pad.index)
             + " dev:"
@@ -74,62 +78,46 @@ def reconfigure_controllers(players_controllers, system, metadata, device_list):
     # no need to sort, but i like keeping the same loop (sorted by players)
     nplayer = 1
     for playercontroller, pad in sorted(players_controllers.items()):
-        if pad.dev in device_list:
-            if device_list[pad.dev]["isWheel"]:
-                eslog.info("Wheel reconfiguration for pad {}".format(pad.name))
-                original_inputs = pad.inputs.copy()
+        if pad.dev in device_list and device_list[pad.dev]["isWheel"]:
+            eslog.info(f"Wheel reconfiguration for pad {pad.name}")
+            original_inputs = pad.inputs.copy()
 
-                # erase target keys
-                for md in metadata:
-                    if md[:6] == "wheel_":
-                        shortmd = md[6:]
-                        if shortmd in wheelMapping:
-                            if (
-                                system.name in emulatorMapping
-                                and metadata[md] in emulatorMapping[system.name]
-                            ):
-                                wheelkey = wheelMapping[shortmd]
-                                if (
-                                    wheelkey
-                                    in players_controllers[playercontroller].inputs
-                                ):
-                                    del players_controllers[playercontroller].inputs[
-                                        wheelkey
-                                    ]
-                                    eslog.info(
-                                        "wheel: erase the key {}".format(wheelkey)
-                                    )
+            # erase target keys
+            for md in metadata:
+                if md[:6] == "wheel_":
+                    shortmd = md[6:]
+                    if shortmd in wheelMapping and (
+                        system.name in emulatorMapping
+                        and metadata[md] in emulatorMapping[system.name]
+                    ):
+                        wheelkey = wheelMapping[shortmd]
+                        if wheelkey in players_controllers[playercontroller].inputs:
+                            del players_controllers[playercontroller].inputs[wheelkey]
+                            eslog.info(f"wheel: erase the key {wheelkey}")
 
-                # fill with the wanted keys
-                for md in metadata:
-                    if md[:6] == "wheel_":
-                        shortmd = md[6:]
-                        if shortmd in wheelMapping:
-                            if (
-                                system.name in emulatorMapping
-                                and metadata[md] in emulatorMapping[system.name]
-                            ):
-                                wheelkey = wheelMapping[shortmd]
-                                wantedkey = emulatorMapping[system.name][metadata[md]]
+            # fill with the wanted keys
+            for md in metadata:
+                if md[:6] == "wheel_":
+                    shortmd = md[6:]
+                    if shortmd in wheelMapping and (
+                        system.name in emulatorMapping
+                        and metadata[md] in emulatorMapping[system.name]
+                    ):
+                        wheelkey = wheelMapping[shortmd]
+                        wantedkey = emulatorMapping[system.name][metadata[md]]
 
-                                if wheelkey in original_inputs:
-                                    players_controllers[playercontroller].inputs[
-                                        wantedkey
-                                    ] = original_inputs[wheelkey]
-                                    players_controllers[playercontroller].inputs[
-                                        wantedkey
-                                    ].name = wantedkey
-                                    eslog.info(
-                                        "wheel: fill key {} with {}".format(
-                                            wantedkey, wheelkey
-                                        )
-                                    )
-                                else:
-                                    eslog.info(
-                                        "wheel: unable to replace {} with {}".format(
-                                            wantedkey, wheelkey
-                                        )
-                                    )
+                        if wheelkey in original_inputs:
+                            players_controllers[playercontroller].inputs[wantedkey] = (
+                                original_inputs[wheelkey]
+                            )
+                            players_controllers[playercontroller].inputs[
+                                wantedkey
+                            ].name = wantedkey
+                            eslog.info(f"wheel: fill key {wantedkey} with {wheelkey}")
+                        else:
+                            eslog.info(
+                                f"wheel: unable to replace {wantedkey} with {wheelkey}"
+                            )
         nplayer += 1
 
     # reconfigure wheel min/max/deadzone
@@ -187,9 +175,7 @@ def reconfigure_controllers(players_controllers, system, metadata, device_list):
                     dev_match = match(r"^/dev/input/event([0-9]*)$", newdev)
                     if dev_match:
                         eslog.info(
-                            "replacing device {} by device {} for player {}".format(
-                                pad.dev, newdev, playercontroller
-                            )
+                            f"replacing device {pad.dev} by device {newdev} for player {playercontroller}"
                         )
                         device_list[newdev] = dict(device_list[pad.dev])
                         device_list[newdev]["eventId"] = int(dev_match.group(1))
@@ -200,9 +186,7 @@ def reconfigure_controllers(players_controllers, system, metadata, device_list):
                         procs.append(p)
                     else:
                         eslog.warning(
-                            "Unexpected device name from wheel calibrator: {}. Killing process.".format(
-                                newdev
-                            )
+                            f"Unexpected device name from wheel calibrator: {newdev}. Killing process."
                         )
                         if p is not None:
                             kill(p.pid, SIGTERM)
@@ -222,17 +206,15 @@ def reconfigure_controllers(players_controllers, system, metadata, device_list):
                 joysticks[int(matches.group(1))] = {"node": p}
         # find new sdl numeration
         joysticksByDev = {}
-        currentId = 0
-        for _, x in sorted(joysticks.items()):
+        for currentId, (_, x) in enumerate(sorted(joysticks.items())):
             joysticksByDev[x["node"]] = currentId
-            currentId += 1
         # renumeration
-        for playercontroller, pad in sorted(players_controllers.items()):
+        for _, pad in sorted(players_controllers.items()):
             if pad.dev in joysticksByDev:
-                players_controllers[playercontroller].index = joysticksByDev[pad.dev]
+                pad.index = joysticksByDev[pad.dev]
                 device_list[pad.dev]["joystick_index"] = joysticksByDev[pad.dev]
         # fill physid
-        for playercontroller, pad in sorted(players_controllers.items()):
+        for _, pad in sorted(players_controllers.items()):
             if (
                 hasattr(pad, "physdev")
                 and pad.physdev in device_list
@@ -245,14 +227,14 @@ def reconfigure_controllers(players_controllers, system, metadata, device_list):
     # reorder players to priorize wheel pads
     players_controllers_new = {}
     nplayer = 1
-    for playercontroller, pad in sorted(players_controllers.items()):
+    for _, pad in sorted(players_controllers.items()):
         if (
             pad.dev in device_list and device_list[pad.dev]["isWheel"]
         ) or pad.dev in newPads:
             pad.player = str(nplayer)
             players_controllers_new[str(nplayer)] = pad
             nplayer += 1
-    for playercontroller, pad in sorted(players_controllers.items()):
+    for _, pad in sorted(players_controllers.items()):
         if not (
             (pad.dev in device_list and device_list[pad.dev]["isWheel"])
             or pad.dev in newPads
@@ -277,7 +259,7 @@ def reconfigure_controllers(players_controllers, system, metadata, device_list):
     return (procs, players_controllers_new, device_list)
 
 
-def get_wheels_from_device_infos(device_infos):
+def get_wheels_from_device_infos(device_infos: dict[str, Any]) -> dict[str, Any]:
     res = {}
     for x in device_infos:
         # Check if device_infos[x] is a dictionary before accessing the key
@@ -288,8 +270,13 @@ def get_wheels_from_device_infos(device_infos):
 
 
 def reconfigure_angle_rotation(
-    dev, wheelAxis, rotationAngle, wantedRotationAngle, wantedDeadzone, wantedMidzone
-):
+    dev: Any,
+    wheelAxis: int | str,
+    rotationAngle: Any,
+    wantedRotationAngle: Any,
+    wantedDeadzone: Any,
+    wantedMidzone: Any,
+) -> tuple[str | None, Any]:
     devInfos = device.InputDevice(dev)
     caps = devInfos.capabilities()
 
@@ -348,7 +335,7 @@ def reconfigure_angle_rotation(
         fd = fdopen(pipeout)
         newdev = fd.readline().rstrip("\n")
         fd.close()
-    except (OSError, IOError) as e:
+    except OSError as e:
         eslog.error(f"Error reading from pipe: {str(e)}")
         kill(proc.pid, SIGTERM)
         proc.communicate()
@@ -357,8 +344,8 @@ def reconfigure_angle_rotation(
     return (newdev, proc)
 
 
-def reset_controllers(wheel_processes):
+def reset_controllers(wheel_processes: Any) -> None:
     for p in wheel_processes:
-        eslog.info("killing wheel process {}".format(p.pid))
+        eslog.info(f"killing wheel process {p.pid}")
         kill(p.pid, SIGTERM)
-        out, err = p.communicate()
+        p.communicate()

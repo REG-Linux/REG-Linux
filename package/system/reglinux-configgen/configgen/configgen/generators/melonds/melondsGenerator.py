@@ -1,17 +1,17 @@
-from configgen.generators.Generator import Generator
+from pathlib import Path
+
 from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.settings import UnixSettings
-from os import path, mkdir
-from codecs import open
-from .melondsControllers import setMelondsControllers
+
 from .melondsConfig import (
-    setMelonDSConfig,
     MELONDS_BIN_PATH,
-    MELONDS_SAVES_DIR,
     MELONDS_CHEATS_DIR,
-    MELONDS_CONFIG_DIR,
     MELONDS_CONFIG_PATH,
+    MELONDS_SAVES_DIR,
+    setMelonDSConfig,
 )
+from .melondsControllers import setMelondsControllers
 
 
 class MelonDSGenerator(Generator):
@@ -23,12 +23,14 @@ class MelonDSGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Verify the save path exists
-        if not path.exists(MELONDS_SAVES_DIR):
-            mkdir(MELONDS_SAVES_DIR)
+        saves_dir_path = Path(MELONDS_SAVES_DIR)
+        if not saves_dir_path.exists():
+            saves_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Verify the cheat path exist
-        if not path.exists(MELONDS_CHEATS_DIR):
-            mkdir(MELONDS_CHEATS_DIR)
+        cheats_dir_path = Path(MELONDS_CHEATS_DIR)
+        if not cheats_dir_path.exists():
+            cheats_dir_path.mkdir(parents=True, exist_ok=True)
 
         melondsConfig = UnixSettings(MELONDS_CONFIG_PATH)
 

@@ -2,24 +2,26 @@
 Consolidated Bezel Configuration Writer - Combines common functionality from different emulator managers.
 """
 
-from typing import Dict, Optional, Tuple, Any
+from contextlib import suppress
+from json import load
+from os import listdir, remove, symlink
 from pathlib import Path
+from typing import Any
+
 from configgen.bezel.bezel_base import BezelUtils, eslog
 from configgen.systemFiles import OVERLAY_CONFIG_FILE
-from json import load
-from os import path, makedirs, remove, listdir, unlink, symlink
 
 
 def writeBezelConfig(
-    generator,
-    bezel,
-    shaderBezel,
-    retroarchConfig,
-    rom,
-    gameResolution,
-    system,
-    guns_borders_size,
-):
+    generator: Any,
+    bezel: str | None,
+    shaderBezel: bool,
+    retroarchConfig: dict[str, Any],
+    rom: str,
+    gameResolution: dict[str, int],
+    system: Any,
+    guns_borders_size: str | None,
+) -> None:
     """Writes the bezel configuration to the emulator-specific config file."""
     # Common logic for bezel configuration across different emulators
     # disable the overlay
@@ -37,7 +39,12 @@ def writeBezelConfig(
     if bezel == "none" or bezel == "":
         bezel = None
 
-    eslog.debug("libretro bezel: {}".format(bezel))
+    eslog.debug(f"libretro bezel: {bezel}")
+
+    # Initialize variables with default values to satisfy type checker
+    overlay_info_file = ""
+    overlay_png_file = ""
+    bezel_game = False
 
     # create a fake bezel if guns need borders
     if bezel is None and guns_borders_size is not None:
@@ -69,7 +76,7 @@ def writeBezelConfig(
             gunBezelFile, gameResolution["width"], gameResolution["height"]
         )
         # if the game needs a specific bezel, to draw border, consider it as a game-specific bezel, like for thebezelproject to avoid caches
-        bz_infos = {
+        bz_infos: dict[str, str | bool | None] = {
             "png": gunBezelFile,
             "info": gunBezelInfoFile,
             "layout": None,
@@ -86,22 +93,36 @@ def writeBezelConfig(
             if cls:
                 emulator_name = getattr(cls, "__name__", "unknown")
         if "libretro" in emulator_name.lower():
-            bz_infos = BezelUtils.get_bezel_infos(rom, bezel, system.name, "libretro")
+            bz_infos_temp = BezelUtils.get_bezel_infos(
+                rom, bezel, system.name, "libretro"
+            )
         else:
-            bz_infos = BezelUtils.get_bezel_infos(rom, bezel, system.name, "mame")
-        if bz_infos is None:
+            bz_infos_temp = BezelUtils.get_bezel_infos(rom, bezel, system.name, "mame")
+
+        # Explicit check to ensure bz_infos is not None
+        if bz_infos_temp is None:
             return
 
-    overlay_info_file = bz_infos["info"]
-    overlay_png_file = bz_infos["png"]
-    bezel_game = bz_infos["specific_to_game"]
+        bz_infos = bz_infos_temp
+
+        # Safe assignment with type checking and explicit conversion
+        overlay_info_file_raw = bz_infos.get("info", "")
+        overlay_info_file = (
+            str(overlay_info_file_raw) if overlay_info_file_raw is not None else ""
+        )
+        overlay_png_file_raw = bz_infos.get("png", "")
+        overlay_png_file = (
+            str(overlay_png_file_raw) if overlay_png_file_raw is not None else ""
+        )
+        bezel_game_raw = bz_infos.get("specific_to_game", False)
+        bezel_game = bool(bezel_game_raw) if bezel_game_raw is not None else False
 
     # only the png file is mandatory
-    if path.exists(overlay_info_file):
+    if Path(overlay_info_file).exists():
         try:
             with open(overlay_info_file) as f:
                 infos = load(f)
-        except:
+        except Exception:
             infos = {}
     else:
         infos = {}
@@ -142,21 +163,24 @@ def writeBezelConfig(
                     gameRatio < 1.6 and guns_borders_size is None
                 ):  # let's use bezels only for aspect ratios 16:10, 5:3, 16:9 and greater; don't skip if gun borders are needed
                     return
-                else:
-                    bezelNeedAdaptation = True
+                bezelNeedAdaptation = True
         # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
         if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
-            retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index("4/3")  # Force 4:3 aspect ratio for 720x1280 resolution
+            retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                "4/3"
+            )  # Force 4:3 aspect ratio for 720x1280 resolution
         else:
             retroarchConfig["aspect_ratio_index"] = str(
                 RATIO_INDEXES.index("custom")
             )  # overridden from the beginning of this file
-            if is_ratio_defined("ratio", system.config):
-                if system.config["ratio"] in RATIO_INDEXES:
-                    retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                        system.config["ratio"]
-                    )
-                    retroarchConfig["video_aspect_ratio_auto"] = "false"
+            if (
+                is_ratio_defined("ratio", system.config)
+                and system.config["ratio"] in RATIO_INDEXES
+            ):
+                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                    system.config["ratio"]
+                )
+        retroarchConfig["video_aspect_ratio_auto"] = "false"
 
     else:
         # when there's no information about width and height in .info, assume TV is HD 16/9 and information is provided by the core
@@ -164,22 +188,21 @@ def writeBezelConfig(
             gameRatio < 1.6 and guns_borders_size is None
         ):  # let's use bezels only for aspect ratios 16:10, 5:3, 16:9 and greater; don't skip if gun borders are needed
             return
-        else:
-            # No info about bezel, let's get width and height from the bezel image and apply
-            # the usual 16:9 bezel ratios 1920x1080 (example: theBezelProject)
-            try:
-                infos["width"], infos["height"] = BezelUtils.fast_image_size(
-                    overlay_png_file
-                )
-                infos["top"] = int(infos["height"] * 2 / 1080)
-                infos["left"] = int(
-                    infos["width"] * 241 / 1920
-                )  # 241 = (1920 - (1920 / (4:3))) / 2 + 1 pixel = where viewport begins
-                infos["bottom"] = int(infos["height"] * 2 / 1080)
-                infos["right"] = int(infos["width"] * 241 / 1920)
-                bezelNeedAdaptation = True
-            except:
-                pass  # well, no reason will be applied.
+        # No info about bezel, let's get width and height from the bezel image and apply
+        # the usual 16:9 bezel ratios 1920x1080 (example: theBezelProject)
+        try:
+            infos["width"], infos["height"] = BezelUtils.fast_image_size(
+                overlay_png_file
+            )
+            infos["top"] = int(infos["height"] * 2 / 1080)
+            infos["left"] = int(
+                infos["width"] * 241 / 1920
+            )  # 241 = (1920 - (1920 / (4:3))) / 2 + 1 pixel = where viewport begins
+            infos["bottom"] = int(infos["height"] * 2 / 1080)
+            infos["right"] = int(infos["width"] * 241 / 1920)
+            bezelNeedAdaptation = True
+        except Exception:
+            pass  # well, no reason will be applied.
         if (
             gameResolution["width"] == infos["width"]
             and gameResolution["height"] == infos["height"]
@@ -188,9 +211,13 @@ def writeBezelConfig(
         if not shaderBezel:
             # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
             if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
-                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index("4/3")  # Force 4:3 aspect ratio for 720x1280 resolution
+                retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
+                    "4/3"
+                )  # Force 4:3 aspect ratio for 720x1280 resolution
             else:
-                retroarchConfig["aspect_ratio_index"] = str(RATIO_INDEXES.index("custom"))
+                retroarchConfig["aspect_ratio_index"] = str(
+                    RATIO_INDEXES.index("custom")
+                )
                 if (
                     is_ratio_defined("ratio", system.config)
                     and system.config["ratio"] in RATIO_INDEXES
@@ -219,10 +246,7 @@ def writeBezelConfig(
         retroarchConfig["video_viewport_bias_y"] = "0.000000"
 
     # stretch option
-    if (
-        system.isOptSet("bezel_stretch")
-        and system.getOptBoolean("bezel_stretch") == True
-    ):
+    if system.isOptSet("bezel_stretch") and system.getOptBoolean("bezel_stretch"):
         bezel_stretch = True
     else:
         bezel_stretch = False
@@ -240,44 +264,38 @@ def writeBezelConfig(
             eslog.debug("Screen resolution smaller than bezel: forcing stretch")
             bezel_stretch = True
         if bezel_game is True:
-            output_png_file = "/tmp/bezel_per_game.png"
+            output_png_file: str = "/tmp/bezel_per_game.png"
             create_new_bezel_file = True
         else:
             # The logic for system bezel caching is no longer always true now that we have tattoos
-            output_png_file = (
-                "/tmp/"
-                + path.splitext(path.basename(overlay_png_file))[0]
-                + "_adapted.png"
+            output_png_file: str = (
+                "/tmp/" + Path(overlay_png_file).stem + "_adapted.png"
             )
             if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
                 create_new_bezel_file = True
             else:
-                if (not path.exists(tattoo_output_png)) and path.exists(
-                    output_png_file
-                ):
+                tattoo_output_path = Path(tattoo_output_png)
+                output_path = Path(output_png_file)
+                if (not tattoo_output_path.exists()) and output_path.exists():
                     create_new_bezel_file = False
                     eslog.debug(f"Using cached bezel file {output_png_file}")
                 else:
-                    try:
+                    with suppress(Exception):
                         remove(tattoo_output_png)
-                    except:
-                        pass
                     create_new_bezel_file = True
             if create_new_bezel_file:
                 fadapted = [
                     "/tmp/" + f for f in listdir("/tmp/") if (f[-12:] == "_adapted.png")
                 ]
-                fadapted.sort(key=lambda x: path.getmtime(x))
+                fadapted.sort(key=lambda x: Path(x).stat().st_mtime)
                 # Keep only the last 10 generated bezels to save space in tmpfs /tmp
                 if len(fadapted) >= 10:
                     for _ in range(10):
                         fadapted.pop()
                     eslog.debug(f"Removing unused bezel file: {fadapted}")
                     for fr in fadapted:
-                        try:
+                        with suppress(Exception):
                             remove(fr)
-                        except:
-                            pass
 
         if bezel_stretch:
             borderx = 0
@@ -300,8 +318,8 @@ def writeBezelConfig(
             retroarchConfig["video_message_pos_x"] = infos["messagex"] * wratio
             retroarchConfig["video_message_pos_y"] = infos["messagey"] * hratio
         else:
-            xoffset = gameResolution["width"] - infos["width"]
-            yoffset = gameResolution["height"] - infos["height"]
+            xoffset = float(gameResolution["width"] - infos["width"])
+            yoffset = float(gameResolution["height"] - infos["height"])
             retroarchConfig["custom_viewport_x"] = infos["left"] + xoffset / 2
             retroarchConfig["custom_viewport_y"] = infos["top"] + yoffset / 2
             retroarchConfig["custom_viewport_width"] = (
@@ -330,12 +348,12 @@ def writeBezelConfig(
             except Exception as e:
                 eslog.debug(f"Failed to create the adapated image: {e}")
                 return
-        overlay_png_file = (
+        overlay_png_file: str = (
             output_png_file  # substitute with new file (recreated or cached in /tmp)
         )
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
             BezelUtils.tattoo_image(overlay_png_file, tattoo_output_png, system)
-            overlay_png_file = tattoo_output_png
+            overlay_png_file = tattoo_output_png  # type: ignore
     else:
         if viewPortUsed:
             retroarchConfig["custom_viewport_x"] = infos["left"]
@@ -350,7 +368,7 @@ def writeBezelConfig(
         retroarchConfig["video_message_pos_y"] = infos["messagey"]
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
             BezelUtils.tattoo_image(overlay_png_file, tattoo_output_png, system)
-            overlay_png_file = tattoo_output_png
+            overlay_png_file = tattoo_output_png  # type: ignore
 
     if guns_borders_size is not None:
         eslog.debug("Draw gun borders")
@@ -363,47 +381,44 @@ def writeBezelConfig(
             outer_size,
             BezelUtils.guns_borders_color_from_config(system.config),
         )
-        overlay_png_file = output_png_file
+        overlay_png_file = output_png_file  # type: ignore
 
     eslog.debug(f"Bezel file set to {overlay_png_file}")
-    writeBezelCfgConfig(overlay_cfg_file, overlay_png_file)
+    writeBezelCfgConfig(str(overlay_cfg_file), overlay_png_file)
 
     # For shaders that will want to use the Batocera decoration as part of the shader instead of an overlay
     if shaderBezel:
         # Create path if needed, clean old bezels
-        shaderBezelPath = "/var/run/shader_bezels"
-        shaderBezelFile = shaderBezelPath + "/bezel.png"
-        if not path.exists(shaderBezelPath):
-            makedirs(shaderBezelPath)
-            eslog.debug("Creating shader bezel path {}".format(overlay_png_file))
-        if path.exists(shaderBezelFile):
-            eslog.debug("Removing old shader bezel {}".format(shaderBezelFile))
-            if path.islink(shaderBezelFile):
-                unlink(shaderBezelFile)
+        shaderBezelPath = Path("/var/run/shader_bezels")
+        shaderBezelFile = shaderBezelPath / "bezel.png"
+        if not shaderBezelPath.exists():
+            shaderBezelPath.mkdir(parents=True, exist_ok=True)
+            eslog.debug(f"Creating shader bezel path {overlay_png_file}")
+        if shaderBezelFile.exists():
+            eslog.debug(f"Removing old shader bezel {shaderBezelFile}")
+            if shaderBezelFile.is_symlink():
+                shaderBezelFile.unlink()
             else:
-                remove(shaderBezelFile)
+                shaderBezelFile.unlink()
 
         # Link bezel png file to the fixed path.
         # Shaders should use this path to find the art.
-        symlink(overlay_png_file, shaderBezelFile)
+        symlink(overlay_png_file, str(shaderBezelFile))
         eslog.debug(
-            "Symlinked bezel file {} to {} for selected shader".format(
-                overlay_png_file, shaderBezelFile
-            )
+            f"Symlinked bezel file {overlay_png_file} to {shaderBezelFile} for selected shader"
         )
 
 
-def writeBezelCfgConfig(cfgFile, overlay_png_file):
+def writeBezelCfgConfig(cfgFile: str, overlay_png_file: str) -> None:
     """Writes the bezel configuration file."""
-    fd = open(cfgFile, "w")
-    fd.write("overlays = 1\n")
-    fd.write('overlay0_overlay = "' + overlay_png_file + '"\n')
-    fd.write("overlay0_full_screen = true\n")
-    fd.write("overlay0_descs = 0\n")
-    fd.close()
+    with open(cfgFile, "w") as fd:
+        fd.write("overlays = 1\n")
+        fd.write('overlay0_overlay = "' + overlay_png_file + '"\n')
+        fd.write("overlay0_full_screen = true\n")
+        fd.write("overlay0_descs = 0\n")
 
 
-def is_ratio_defined(key: str, config_dict: Dict[str, Any]) -> bool:
+def is_ratio_defined(key: str, config_dict: dict[str, Any]) -> bool:
     """Checks if a key is defined in the dictionary."""
     return (
         key in config_dict

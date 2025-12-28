@@ -1,11 +1,13 @@
-from configgen.generators.Generator import Generator
+from pathlib import Path
+
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.systemFiles import CONF, SAVES, ROMS
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import CONF, ROMS, SAVES
 
-DEVILUTIONX_CONFIG_DIR = CONF + "/devilutionx"
-DEVILUTIONX_SAVES_DIR = SAVES + "/devilutionx"
-DEVILUTIONX_ROMS_DIR = ROMS + "/devilutionx"
+DEVILUTIONX_CONFIG_DIR = str(Path(CONF) / "devilutionx")
+DEVILUTIONX_SAVES_DIR = str(Path(SAVES) / "devilutionx")
+DEVILUTIONX_ROMS_DIR = str(Path(ROMS) / "devilutionx")
 DEVILUTIONX_BIN_PATH = "/usr/bin/devilutionx"
 
 

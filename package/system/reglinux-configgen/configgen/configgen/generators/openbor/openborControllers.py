@@ -1,4 +1,7 @@
-def setControllerConfig(config, playersControllers, core):
+from typing import Any
+
+
+def setControllerConfig(config: Any, playersControllers: Any, core: str) -> None:
     if core == "openbor4432":
         setupControllers(config, playersControllers, 32, False)
     elif core == "openbor7142":
@@ -7,7 +10,13 @@ def setControllerConfig(config, playersControllers, core):
         setupControllers(config, playersControllers, 64, False)
 
 
-def JoystickValue(key, pad, joy_max_inputs, new_axis_vals, invertAxis=False):
+def JoystickValue(
+    key: str,
+    pad: Any,
+    joy_max_inputs: Any,
+    new_axis_vals: Any,
+    invertAxis: bool = False,
+) -> Any:
     if key not in pad.inputs:
         return 0
 
@@ -61,7 +70,9 @@ def JoystickValue(key, pad, joy_max_inputs, new_axis_vals, invertAxis=False):
     return value
 
 
-def setupControllers(config, playersControllers, joy_max_inputs, new_axis_vals):
+def setupControllers(
+    config: Any, playersControllers: Any, joy_max_inputs: Any, new_axis_vals: Any
+) -> None:
     # Button control mappings for better readability and maintenance
     CONTROL_MAPPINGS = [
         ("dpup", "MOVEUP"),
@@ -91,11 +102,11 @@ def setupControllers(config, playersControllers, joy_max_inputs, new_axis_vals):
     KEYS_PER_PLAYER = 17  # 0-16
 
     # Configure controls for each connected player
-    for idx, (playercontroller, pad) in enumerate(sorted(playersControllers.items())):
+    for idx, (_, pad) in enumerate(sorted(playersControllers.items())):
         key_idx = 0
 
         # Configure button controls
-        for button, description in CONTROL_MAPPINGS:
+        for button, _ in CONTROL_MAPPINGS:
             config.save(
                 f"keys.{idx}.{key_idx}",
                 JoystickValue(button, pad, joy_max_inputs, new_axis_vals),
@@ -103,7 +114,7 @@ def setupControllers(config, playersControllers, joy_max_inputs, new_axis_vals):
             key_idx += 1
 
         # Configure analog axis controls
-        for axis, invert, description in AXIS_MAPPINGS:
+        for axis, invert, _ in AXIS_MAPPINGS:
             config.save(
                 f"keys.{idx}.{key_idx}",
                 JoystickValue(axis, pad, joy_max_inputs, new_axis_vals, invert),

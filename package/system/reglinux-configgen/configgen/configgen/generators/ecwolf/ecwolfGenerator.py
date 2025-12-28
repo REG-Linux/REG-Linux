@@ -1,16 +1,18 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import mkdir, chdir, path
 from codecs import open
+from os import chdir
+from pathlib import Path
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-ECWOLF_CONFIG_DIR = CONF + "/ecwolf"
-ECWOLF_CONFIG_PATH = ECWOLF_CONFIG_DIR + "/ecwolf.cfg"
-ECWOLF_SAVES_DIR = SAVES + "/ecwolf"
+ECWOLF_CONFIG_DIR = str(Path(CONF) / "ecwolf")
+ECWOLF_CONFIG_PATH = str(Path(ECWOLF_CONFIG_DIR) / "ecwolf.cfg")
+ECWOLF_SAVES_DIR = str(Path(SAVES) / "ecwolf")
 ECWOLF_BIN_PATH = "/usr/bin/ecwolf"
 
 
@@ -18,19 +20,22 @@ class ECWolfGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        ecwolfSaves = ECWOLF_SAVES_DIR + path.basename(rom)
+        ecwolfSaves = str(Path(ECWOLF_SAVES_DIR) / Path(rom).name)
         command_array = [ECWOLF_BIN_PATH]  # Binary for command array
 
         # Create config folders
-        if not path.isdir(ECWOLF_CONFIG_DIR):
-            mkdir(ECWOLF_CONFIG_DIR)
+        config_dir_path = Path(ECWOLF_CONFIG_DIR)
+        if not config_dir_path.is_dir():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Create save folder, according rom name with extension
-        if not path.isdir(ecwolfSaves):
-            mkdir(ecwolfSaves)
+        ecwolf_saves_path = Path(ecwolfSaves)
+        if not ecwolf_saves_path.is_dir():
+            ecwolf_saves_path.mkdir(parents=True, exist_ok=True)
 
         # Use the directory method with ecwolf extension and datafiles (wl6 or sod or nh3) inside
-        if path.isdir(rom):
+        rom_path = Path(rom)
+        if rom_path.is_dir():
             try:
                 chdir(rom)
             # Only game directories, not .ecwolf or .pk3 files
@@ -39,21 +44,21 @@ class ECWolfGenerator(Generator):
 
         # File method .ecwolf (recommended) for command parameters, first argument is path to dataset, next parameters according ecwolf --help
         # File method .pk3, put pk3 files next to wl6 dataset and start the mod in ES
-        if path.isfile(rom):
-            chdir(path.dirname(rom))
-            fextension = (path.splitext(rom)[1]).lower()
+        if rom_path.is_file():
+            chdir(str(rom_path.parent))
+            fextension = rom_path.suffix.lower()
 
             if fextension == ".ecwolf":
                 try:
                     with open(rom, "r", encoding="utf-8") as f:
                         command_array += f.readline().split()
-                except (IOError, IndexError) as e:
+                except (OSError, IndexError) as e:
                     eslog.error(f"Error reading .ecwolf file {rom}: {e}")
                     # Ensure we handle the case where the file might be empty or inaccessible
                     pass
 
                 # If 1. parameter isn't an argument then assume it's a path
-                if not "--" in command_array[1]:
+                if "--" not in command_array[1]:
                     try:
                         chdir(command_array[1])
                     except Exception as e:
@@ -63,7 +68,7 @@ class ECWolfGenerator(Generator):
                     command_array.pop(1)
 
             if fextension == ".pk3":
-                command_array += ["--file", path.basename(rom)]
+                command_array += ["--file", rom_path.name]
 
         command_array += ["--savedir", ecwolfSaves]
 
