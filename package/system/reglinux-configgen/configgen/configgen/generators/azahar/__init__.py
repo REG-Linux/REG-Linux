@@ -3,8 +3,22 @@ Azahar generator module for REG-Linux
 This module handles the generation of azahar emulator configurations.
 """
 
-from .azaharGenerator import AzaharGenerator
 from .azaharConfig import setAzaharConfig
-from .azaharControllers import *
+from .azaharControllers import (
+    getMouseMode,
+    hatdirectionvalue,
+    setAxis,
+    setAzaharControllers,
+    setButton,
+)
+from .azaharGenerator import AzaharGenerator
 
-__all__ = ["AzaharGenerator", "setAzaharConfig"]
+__all__ = [
+    "AzaharGenerator",
+    "setAzaharConfig",
+    "getMouseMode",
+    "hatdirectionvalue",
+    "setAxis",
+    "setAzaharControllers",
+    "setButton",
+]

@@ -1,13 +1,14 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from configparser import ConfigParser
-from os import path, makedirs
+from pathlib import Path
 from shutil import copy2
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
 
-DOSBOXX_CONFIG_DIR = CONF + "/dosbox"
-DOSBOXX_CONFIG_PATH = DOSBOXX_CONFIG_DIR + "/dosboxx.conf"
-DOSBOXX_CONFIG_CUSTOM_PATH = DOSBOXX_CONFIG_DIR + "/dosboxx-custom.conf"
+DOSBOXX_CONFIG_DIR = str(Path(CONF) / "dosbox")
+DOSBOXX_CONFIG_PATH = str(Path(DOSBOXX_CONFIG_DIR) / "dosboxx.conf")
+DOSBOXX_CONFIG_CUSTOM_PATH = str(Path(DOSBOXX_CONFIG_DIR) / "dosboxx-custom.conf")
 DOSBOXX_BIN_PATH = "/usr/bin/dosbox-x"
 
 
@@ -17,20 +18,23 @@ class DosBoxxGenerator(Generator):
     ):
         # Find rom path
         gameDir = rom
-        gameConfFile = gameDir + "/dosbox.cfg"
+        gameConfFile = str(Path(gameDir) / "dosbox.cfg")
         config_file = DOSBOXX_CONFIG_PATH
 
-        if not path.exists(path.dirname(DOSBOXX_CONFIG_PATH)):
-            makedirs(path.dirname(DOSBOXX_CONFIG_PATH))
+        config_path = Path(DOSBOXX_CONFIG_PATH)
+        if not config_path.parent.exists():
+            config_path.parent.mkdir(parents=True, exist_ok=True)
 
-        if path.isfile(gameConfFile):
+        game_conf_file = Path(gameConfFile)
+        if game_conf_file.is_file():
             config_file = gameConfFile
 
         # configuration file
         iniSettings = ConfigParser(interpolation=None)
         iniSettings.optionxform = lambda optionstr: str(optionstr)
 
-        if path.exists(config_file):
+        config_file_path = Path(config_file)
+        if config_file_path.exists():
             copy2(config_file, DOSBOXX_CONFIG_CUSTOM_PATH)
             iniSettings.read(DOSBOXX_CONFIG_CUSTOM_PATH)
 

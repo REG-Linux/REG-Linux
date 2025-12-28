@@ -4,7 +4,7 @@ generator classes for various emulators based on a predefined mapping.
 """
 
 from importlib import import_module
-from typing import Dict, Any, Optional, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .generators.Generator import Generator
@@ -19,16 +19,28 @@ class GeneratorNotFoundError(Exception):
 # Mapping of emulator names to their respective module paths and class names
 EMULATOR_MAPPING = {
     "abuse": ("configgen.generators.abuse.abuseGenerator", "AbuseGenerator"),
-    "amiberry": ("configgen.generators.amiberry.amiberryGenerator", "AmiberryGenerator"),
-    "applewin": ("configgen.generators.applewin.applewinGenerator", "AppleWinGenerator"),
+    "amiberry": (
+        "configgen.generators.amiberry.amiberryGenerator",
+        "AmiberryGenerator",
+    ),
+    "applewin": (
+        "configgen.generators.applewin.applewinGenerator",
+        "AppleWinGenerator",
+    ),
     "azahar": ("configgen.generators.azahar.azaharGenerator", "AzaharGenerator"),
     "bigpemu": ("configgen.generators.bigpemu.bigpemuGenerator", "BigPEmuGenerator"),
-    "cannonball": ("configgen.generators.cannonball.cannonballGenerator", "CannonballGenerator"),
+    "cannonball": (
+        "configgen.generators.cannonball.cannonballGenerator",
+        "CannonballGenerator",
+    ),
     "cdogs": ("configgen.generators.cdogs.cdogsGenerator", "CdogsGenerator"),
     "cemu": ("configgen.generators.cemu.cemuGenerator", "CemuGenerator"),
     "cgenius": ("configgen.generators.cgenius.cgeniusGenerator", "CGeniusGenerator"),
     "eden": ("configgen.generators.eden.edenGenerator", "EdenGenerator"),
-    "corsixth": ("configgen.generators.corsixth.corsixthGenerator", "CorsixTHGenerator"),
+    "corsixth": (
+        "configgen.generators.corsixth.corsixthGenerator",
+        "CorsixTHGenerator",
+    ),
     "devilutionx": (
         "generators.devilutionx.devilutionxGenerator",
         "DevilutionXGenerator",
@@ -56,36 +68,66 @@ EMULATOR_MAPPING = {
     "easyrpg": ("configgen.generators.easyrpg.easyrpgGenerator", "EasyRPGGenerator"),
     "ecwolf": ("configgen.generators.ecwolf.ecwolfGenerator", "ECWolfGenerator"),
     "eduke32": ("configgen.generators.eduke32.eduke32Generator", "EDuke32Generator"),
-    "etlegacy": ("configgen.generators.etlegacy.etlegacyGenerator", "ETLegacyGenerator"),
-    "fallout1-ce": ("configgen.generators.fallout1.fallout1Generator", "Fallout1Generator"),
-    "fallout2-ce": ("configgen.generators.fallout2.fallout2Generator", "Fallout2Generator"),
+    "etlegacy": (
+        "configgen.generators.etlegacy.etlegacyGenerator",
+        "ETLegacyGenerator",
+    ),
+    "fallout1-ce": (
+        "configgen.generators.fallout1.fallout1Generator",
+        "Fallout1Generator",
+    ),
+    "fallout2-ce": (
+        "configgen.generators.fallout2.fallout2Generator",
+        "Fallout2Generator",
+    ),
     "flycast": ("configgen.generators.flycast.flycastGenerator", "FlycastGenerator"),
     "gsplus": ("configgen.generators.gsplus.gsplusGenerator", "GSplusGenerator"),
     "gzdoom": ("configgen.generators.gzdoom.gzdoomGenerator", "GZDoomGenerator"),
     "hcl": ("configgen.generators.hcl.hclGenerator", "HclGenerator"),
     "hatari": ("configgen.generators.hatari.hatariGenerator", "HatariGenerator"),
-    "hurrican": ("configgen.generators.hurrican.hurricanGenerator", "HurricanGenerator"),
+    "hurrican": (
+        "configgen.generators.hurrican.hurricanGenerator",
+        "HurricanGenerator",
+    ),
     "hypseus-singe": (
         "generators.hypseus_singe.hypseusSingeGenerator",
         "HypseusSingeGenerator",
     ),
     "ikemen": ("configgen.generators.ikemen.ikemenGenerator", "IkemenGenerator"),
     "iortcw": ("configgen.generators.iortcw.iortcwGenerator", "IORTCWGenerator"),
-    "ioquake3": ("configgen.generators.ioquake3.ioquake3Generator", "IOQuake3Generator"),
+    "ioquake3": (
+        "configgen.generators.ioquake3.ioquake3Generator",
+        "IOQuake3Generator",
+    ),
     "jazz2": ("configgen.generators.jazz2.jazz2Generator", "Jazz2Generator"),
-    "lightspark": ("configgen.generators.lightspark.lightsparkGenerator", "LightsparkGenerator"),
-    "libretro": ("configgen.generators.libretro.libretroGenerator", "LibretroGenerator"),
+    "lightspark": (
+        "configgen.generators.lightspark.lightsparkGenerator",
+        "LightsparkGenerator",
+    ),
+    "libretro": (
+        "configgen.generators.libretro.libretroGenerator",
+        "LibretroGenerator",
+    ),
     "mame": ("configgen.generators.mame.mameGenerator", "MameGenerator"),
-    "mednafen": ("configgen.generators.mednafen.mednafenGenerator", "MednafenGenerator"),
+    "mednafen": (
+        "configgen.generators.mednafen.mednafenGenerator",
+        "MednafenGenerator",
+    ),
     "melonds": ("configgen.generators.melonds.melondsGenerator", "MelonDSGenerator"),
-    "moonlight": ("configgen.generators.moonlight.moonlightGenerator", "MoonlightGenerator"),
+    "moonlight": (
+        "configgen.generators.moonlight.moonlightGenerator",
+        "MoonlightGenerator",
+    ),
     "mupen64plus": ("configgen.generators.mupen.mupenGenerator", "MupenGenerator"),
     "odcommander": (
         "generators.odcommander.odcommanderGenerator",
         "OdcommanderGenerator",
     ),
     "openbor": ("configgen.generators.openbor.openborGenerator", "OpenborGenerator"),
-    "openjazz": ("configgen.generators.openjazz.openjazzGenerator", "OpenJazzGenerator"),
+    "openjazz": (
+        "configgen.generators.openjazz.openjazzGenerator",
+        "OpenJazzGenerator",
+    ),
     "openmsx": ("configgen.generators.openmsx.openmsxGenerator", "OpenmsxGenerator"),
     "pcsx2": ("configgen.generators.pcsx2.pcsx2Generator", "Pcsx2Generator"),
     "play": ("configgen.generators.play.playGenerator", "PlayGenerator"),
@@ -94,7 +136,10 @@ EMULATOR_MAPPING = {
     "rpcs3": ("configgen.generators.rpcs3.rpcs3Generator", "Rpcs3Generator"),
     "ruffle": ("configgen.generators.ruffle.ruffleGenerator", "RuffleGenerator"),
     "ryujinx": ("configgen.generators.ryujinx.ryujinxGenerator", "RyujinxGenerator"),
-    "samcoupe": ("configgen.generators.samcoupe.samcoupeGenerator", "SamcoupeGenerator"),
+    "samcoupe": (
+        "configgen.generators.samcoupe.samcoupeGenerator",
+        "SamcoupeGenerator",
+    ),
     "scummvm": ("configgen.generators.scummvm.scummvmGenerator", "ScummVMGenerator"),
     "sdlpop": ("configgen.generators.sdlpop.sdlpopGenerator", "SdlPopGenerator"),
     "sh": ("configgen.generators.sh.shGenerator", "ShGenerator"),
@@ -104,24 +149,45 @@ EMULATOR_MAPPING = {
         "generators.sonic_mania.sonic_maniaGenerator",
         "SonicManiaGenerator",
     ),
-    "sonic2013": ("configgen.generators.sonicretro.sonicretroGenerator", "SonicRetroGenerator"),
-    "sonic3-air": ("configgen.generators.sonic3_air.sonic3_airGenerator", "Sonic3AIRGenerator"),
-    "soniccd": ("configgen.generators.sonicretro.sonicretroGenerator", "SonicRetroGenerator"),
+    "sonic2013": (
+        "configgen.generators.sonicretro.sonicretroGenerator",
+        "SonicRetroGenerator",
+    ),
+    "sonic3-air": (
+        "configgen.generators.sonic3_air.sonic3_airGenerator",
+        "Sonic3AIRGenerator",
+    ),
+    "soniccd": (
+        "configgen.generators.sonicretro.sonicretroGenerator",
+        "SonicRetroGenerator",
+    ),
     "stella": ("configgen.generators.stella.stellaGenerator", "StellaGenerator"),
     "steam": ("configgen.generators.steam.steamGenerator", "SteamGenerator"),
-    "supermodel": ("configgen.generators.supermodel.supermodelGenerator", "SupermodelGenerator"),
-    "taradino": ("configgen.generators.taradino.taradinoGenerator", "TaradinoGenerator"),
+    "supermodel": (
+        "configgen.generators.supermodel.supermodelGenerator",
+        "SupermodelGenerator",
+    ),
+    "taradino": (
+        "configgen.generators.taradino.taradinoGenerator",
+        "TaradinoGenerator",
+    ),
     "theforceengine": (
         "generators.theforceengine.theforceengineGenerator",
         "TheForceEngineGenerator",
     ),
-    "thextech": ("configgen.generators.thextech.thextechGenerator", "TheXTechGenerator"),
+    "thextech": (
+        "configgen.generators.thextech.thextechGenerator",
+        "TheXTechGenerator",
+    ),
     "tsugaru": ("configgen.generators.tsugaru.tsugaruGenerator", "TsugaruGenerator"),
     "tyrian": ("configgen.generators.tyrian.tyrianGenerator", "TyrianGenerator"),
     "uqm": ("configgen.generators.uqm.uqmGenerator", "UqmGenerator"),
     "vice": ("configgen.generators.vice.viceGenerator", "ViceGenerator"),
     "vita3k": ("configgen.generators.vita3k.vita3kGenerator", "Vita3kGenerator"),
-    "vpinball": ("configgen.generators.vpinball.vpinballGenerator", "VPinballGenerator"),
+    "vpinball": (
+        "configgen.generators.vpinball.vpinballGenerator",
+        "VPinballGenerator",
+    ),
     "xash3d_fwgs": (
         "generators.xash3d_fwgs.xash3dFwgsGenerator",
         "Xash3dFwgsGenerator",
@@ -130,20 +196,22 @@ EMULATOR_MAPPING = {
     "xenia-canary": ("configgen.generators.xenia.xeniaGenerator", "XeniaGenerator"),
 }
 
-PRELOADED_GENERATORS: Dict[str, Type['Generator']] = {}
+PRELOADED_GENERATORS: dict[str, type["Generator"]] = {}
 
 
-def _load_generator_class(emulator: str) -> Type['Generator']:
+def _load_generator_class(emulator: str) -> type["Generator"]:
     try:
         module_path, class_name = EMULATOR_MAPPING[emulator]
     except KeyError:
-        raise GeneratorNotFoundError(f"No generator found for emulator {emulator}")
+        raise GeneratorNotFoundError(
+            f"No generator found for emulator {emulator}"
+        ) from None
 
     module = import_module(module_path)
     return getattr(module, class_name)
 
 
-def getGenerator(emulator: str) -> 'Generator':
+def getGenerator(emulator: str) -> "Generator":
     """
     Returns an instance of the appropriate generator class for the specified emulator.
 
@@ -156,18 +224,18 @@ def getGenerator(emulator: str) -> 'Generator':
     Raises:
         GeneratorNotFoundError: If no generator is found for the specified emulator.
     """
-    generator_class: Optional[Type['Generator']] = PRELOADED_GENERATORS.get(emulator)
+    generator_class: type[Generator] | None = PRELOADED_GENERATORS.get(emulator)
     if generator_class is None:
         try:
             generator_class = _load_generator_class(emulator)
         except ImportError as e:
             raise GeneratorNotFoundError(
                 f"Failed to import generator for {emulator}: {e}"
-            )
+            ) from e
         except AttributeError as e:
             raise GeneratorNotFoundError(
                 f"Generator class not found for {emulator}: {e}"
-            )
+            ) from e
         PRELOADED_GENERATORS[emulator] = generator_class
 
     return generator_class()

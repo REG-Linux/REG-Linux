@@ -1,8 +1,9 @@
-from os import path, mkdir, remove
-from xml.etree.ElementTree import SubElement, Element, ElementTree, indent
+from os import mkdir, path, remove
+from typing import Any
+from xml.etree.ElementTree import Element, ElementTree, SubElement, indent
 
 
-def setControllerConfig(system, playersControllers, profilesDir):
+def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) -> None:
     # -= Wii U controller types =-
     GAMEPAD = "Wii U GamePad"
     PRO = "Wii U Pro Controller"
@@ -114,23 +115,22 @@ def setControllerConfig(system, playersControllers, profilesDir):
         },
     }
 
-    def getOption(option, defaultValue):
+    def getOption(option: str, defaultValue: Any) -> Any:
         if system.isOptSet(option):
             return system.config[option]
-        else:
-            return defaultValue
+        return defaultValue
 
-    def addTextElement(parent, name, value):
+    def addTextElement(parent: Any, name: str, value: str) -> Any:
         element = SubElement(parent, name)
         element.text = value
 
-    def addAnalogControl(parent, name):
+    def addAnalogControl(parent: Any, name: str) -> None:
         element = SubElement(parent, name)
         addTextElement(element, "deadzone", DEFAULT_DEADZONE)
         addTextElement(element, "range", DEFAULT_RANGE)
 
-    def getConfigFileName(controller):
-        return path.join(profilesDir, "controller{}.xml".format(controller))
+    def getConfigFileName(controller: Any) -> str:
+        return path.join(profilesDir, f"controller{controller}.xml")
 
     # Make controller directory if it doesn't exist
     if not path.isdir(profilesDir):
@@ -151,7 +151,7 @@ def setControllerConfig(system, playersControllers, profilesDir):
     pads_by_index = dict(sorted(playersControllers.items(), key=lambda kv: kv[1].index))
     guid_n = {}
     guid_count = {}
-    for playercontroller, pad in pads_by_index.items():
+    for pad in pads_by_index.values():
         if pad.guid in guid_count:
             guid_count[pad.guid] += 1
         else:
@@ -159,7 +159,7 @@ def setControllerConfig(system, playersControllers, profilesDir):
         guid_n[pad.index] = guid_count[pad.guid]
     ###
 
-    for playercontroller, pad in pads_by_index.items():
+    for nplayer, pad in enumerate(pads_by_index.values()):
         root = Element("emulated_controller")
 
         # Set type from controller combination
@@ -169,10 +169,7 @@ def setControllerConfig(system, playersControllers, profilesDir):
             and system.config["cemu_controller_combination"] != "0"
         ):
             if system.config["cemu_controller_combination"] == "1":
-                if nplayer == 0:
-                    type = GAMEPAD
-                else:
-                    type = WIIMOTE
+                type = GAMEPAD if nplayer == 0 else WIIMOTE
             elif system.config["cemu_controller_combination"] == "2":
                 type = PRO
             else:
@@ -180,17 +177,14 @@ def setControllerConfig(system, playersControllers, profilesDir):
             if system.config["cemu_controller_combination"] == "4":
                 type = CLASSIC
         else:
-            if nplayer == 0:
-                type = GAMEPAD
-            else:
-                type = PRO
+            type = GAMEPAD if nplayer == 0 else PRO
         addTextElement(root, "type", type)
 
         # Create controller configuration
         controllerNode = SubElement(root, "controller")
         addTextElement(controllerNode, "api", API_SDL)
         addTextElement(
-            controllerNode, "uuid", "{}_{}".format(guid_n[pad.index], pad.guid)
+            controllerNode, "uuid", f"{guid_n[pad.index]}_{pad.guid}"
         )  # controller guid
         addTextElement(controllerNode, "display_name", pad.name)  # controller name
         addTextElement(
@@ -213,5 +207,3 @@ def setControllerConfig(system, playersControllers, profilesDir):
             indent(tree, space="  ", level=0)
             tree.write(handle, encoding="UTF-8", xml_declaration=True)
             handle.close()
-
-        nplayer += 1

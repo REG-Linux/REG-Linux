@@ -1,17 +1,21 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from filecmp import cmp
+from json import dump, dumps, load
+from os import chmod, environ, makedirs, path
+from pathlib import Path
 from shutil import copyfile
-from json import load, dump, dumps
-from evdev import list_devices, InputDevice
-from os import path, makedirs, chmod, environ
-from configgen.systemFiles import CONF, BIOS
+from typing import Any
 
-RYUJINX_CONFIG_DIR = CONF + "/Ryujinx"
-RYUJINX_SYSTEM_DIR = RYUJINX_CONFIG_DIR + "/system"
-RYUJINX_CONFIG_PATH = RYUJINX_CONFIG_DIR + "/Config.json"
-RYUJINX_KEY_PATH = BIOS + "/system/prod.keys"
-RYUJINX_BIN_PATH = RYUJINX_CONFIG_DIR + "/ryujinx"
+from evdev import InputDevice, list_devices
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import BIOS, CONF
+
+RYUJINX_CONFIG_DIR = str(CONF / "Ryujinx")
+RYUJINX_SYSTEM_DIR = str(CONF / "Ryujinx" / "system")
+RYUJINX_CONFIG_PATH = str(CONF / "Ryujinx" / "Config.json")
+RYUJINX_KEY_PATH = str(BIOS / "system" / "prod.keys")
+RYUJINX_BIN_PATH = str(Path(RYUJINX_CONFIG_DIR) / "ryujinx")
 
 ryujinxCtrl = {
     "left_joycon_stick": {
@@ -108,9 +112,9 @@ class RyujinxGenerator(Generator):
         if not path.exists(path.dirname(RYUJINX_CONFIG_PATH)):
             makedirs(path.dirname(RYUJINX_CONFIG_PATH))
         try:
-            with open(RYUJINX_CONFIG_PATH, "r") as f:
+            with open(RYUJINX_CONFIG_PATH) as f:
                 conf = load(f)
-        except:
+        except Exception:
             conf = {}
 
         # Set defaults
@@ -173,7 +177,7 @@ class RyujinxGenerator(Generator):
 
         # Now add Controllers
         nplayer = 1
-        for controller, pad in sorted(players_controllers.items()):
+        for _, pad in sorted(players_controllers.items()):
             if nplayer <= 8:
                 ctrlConf = ryujinxCtrl
                 # we need to get the uuid for ryujinx controllers
@@ -181,19 +185,15 @@ class RyujinxGenerator(Generator):
                 devices = [InputDevice(fn) for fn in list_devices()]
                 for dev in devices:
                     if dev.path == pad.dev:
-                        bustype = "%x" % dev.info.bustype
-                        bustype = bustype.zfill(8)
-                        vendor = "%x" % dev.info.vendor
-                        vendor = vendor.zfill(4)
-                        product = "%x" % dev.info.product
-                        product = product.zfill(4)
+                        bustype = f"{dev.info.bustype:x}".zfill(8)
+                        vendor = f"{dev.info.vendor:x}".zfill(4)
+                        product = f"{dev.info.product:x}".zfill(4)
                         # reverse the poduct id, so 028e becomes 8e02
                         product1 = (product)[-2::]
                         product2 = (product)[:-2]
                         product = product1 + product2
                         # reverse the version id also
-                        version = "%x" % dev.info.version
-                        version = version.zfill(4)
+                        version = f"{dev.info.version:x}".zfill(4)
                         version1 = (version)[-2::]
                         version2 = (version)[:-2]
                         version = version1 + version2
@@ -216,7 +216,9 @@ class RyujinxGenerator(Generator):
         return Command(array=command_array)
 
 
-def writeControllerIntoJson(new_controller, filename=RYUJINX_CONFIG_PATH):
+def writeControllerIntoJson(
+    new_controller: Any, filename: str = RYUJINX_CONFIG_PATH
+) -> None:
     with open(filename, "r+") as file:
         file_data = load(file)
         file_data["input_config"].append(new_controller)
@@ -240,5 +242,4 @@ def getLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]

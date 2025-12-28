@@ -1,18 +1,20 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
+from json import dump, load
+from pathlib import Path
 from shutil import copy
-from json import load, dump
+from typing import Any
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
 
 SONIC3AIR_CONFIG_PATH = "/usr/bin/sonic3-air/config.json"
 SONIC3AIR_OXIGEN_PATH = "/usr/bin/sonic3-air/oxygenproject.json"
-SONIC3AIR_CONFIG_DIR = CONF + "/Sonic3AIR"
-SONIC3AIR_DEST_CONFIG_PATH = SONIC3AIR_CONFIG_DIR + "/config.json"
-SONIC3AIR_DEST_OXIGEN_PATH = SONIC3AIR_CONFIG_DIR + "/oxygenproject.json"
-SONIC3AIR_SAVES_DIR = SAVES + "/sonic3-air"
-SONIC3AIR_SETTINGS_PATH = SONIC3AIR_CONFIG_DIR + "/settings.json"
+SONIC3AIR_CONFIG_DIR = str(CONF / "Sonic3AIR")
+SONIC3AIR_DEST_CONFIG_PATH = str(CONF / "Sonic3AIR" / "config.json")
+SONIC3AIR_DEST_OXIGEN_PATH = str(CONF / "Sonic3AIR" / "oxygenproject.json")
+SONIC3AIR_SAVES_DIR = str(SAVES / "sonic3-air")
+SONIC3AIR_SETTINGS_PATH = str(CONF / "Sonic3AIR" / "settings.json")
 SONIC3AIR_BIN_PATH = "/usr/bin/sonic3-air/sonic3air_linux"
 
 
@@ -21,22 +23,27 @@ class Sonic3AIRGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # copy configuration json files so we can manipulate them
-        if not path.exists(SONIC3AIR_DEST_CONFIG_PATH):
-            if not path.exists(SONIC3AIR_CONFIG_DIR):
-                makedirs(SONIC3AIR_CONFIG_DIR)
+        config_dest_path = Path(SONIC3AIR_DEST_CONFIG_PATH)
+        if not config_dest_path.exists():
+            config_dir_path = Path(SONIC3AIR_CONFIG_DIR)
+            if not config_dir_path.exists():
+                config_dir_path.mkdir(parents=True, exist_ok=True)
             copy(SONIC3AIR_CONFIG_PATH, SONIC3AIR_DEST_CONFIG_PATH)
-        if not path.exists(SONIC3AIR_DEST_OXIGEN_PATH):
-            if not path.exists(SONIC3AIR_CONFIG_DIR):
-                makedirs(SONIC3AIR_CONFIG_DIR)
+        oxigen_dest_path = Path(SONIC3AIR_DEST_OXIGEN_PATH)
+        if not oxigen_dest_path.exists():
+            config_dir_path = Path(SONIC3AIR_CONFIG_DIR)
+            if not config_dir_path.exists():
+                config_dir_path.mkdir(parents=True, exist_ok=True)
             copy(SONIC3AIR_OXIGEN_PATH, SONIC3AIR_DEST_OXIGEN_PATH)
 
         # saves dir
-        if not path.exists(SONIC3AIR_SAVES_DIR):
-            makedirs(SONIC3AIR_SAVES_DIR)
+        saves_dir_path = Path(SONIC3AIR_SAVES_DIR)
+        if not saves_dir_path.exists():
+            saves_dir_path.mkdir(parents=True, exist_ok=True)
 
         # read the json file
         # can't use `import json` as the file is not compliant
-        with open(SONIC3AIR_DEST_CONFIG_PATH, "r") as file:
+        with open(SONIC3AIR_DEST_CONFIG_PATH) as file:
             json_text = file.read()
         # update the "SaveStatesDir"
         json_text = json_text.replace(
@@ -59,8 +66,9 @@ class Sonic3AIRGenerator(Generator):
 
         # settings json - compliant
         # ensure fullscreen
-        if path.exists(SONIC3AIR_SETTINGS_PATH):
-            with open(SONIC3AIR_SETTINGS_PATH, "r") as file:
+        settings_path = Path(SONIC3AIR_SETTINGS_PATH)
+        if settings_path.exists():
+            with open(SONIC3AIR_SETTINGS_PATH) as file:
                 settings_data = load(file)
                 settings_data["Fullscreen"] = 1
         else:
@@ -85,5 +93,7 @@ class Sonic3AIRGenerator(Generator):
     def getMouseMode(self, config, rom):
         return False
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

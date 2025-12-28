@@ -1,13 +1,14 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
 from os import chdir
-from configgen.systemFiles import ROMS
+from typing import Any
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-
-TYRIAN_ROMS_DIR = ROMS + "tyrian/data"
-TYRIAN_BIN_PATH = "/usr/bin/opentyrian"
-
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import ROMS
 from configgen.utils.logger import get_logger
+
+TYRIAN_ROMS_DIR = str(ROMS / "tyrian" / "data")
+TYRIAN_BIN_PATH = "/usr/bin/opentyrian"
 
 eslog = get_logger(__name__)
 
@@ -41,5 +42,7 @@ class TyrianGenerator(Generator):
             },
         )
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

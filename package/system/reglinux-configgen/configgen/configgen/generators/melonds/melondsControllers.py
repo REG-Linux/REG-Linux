@@ -1,4 +1,7 @@
-def setMelondsControllers(melondsConfig, playersControllers):
+from typing import Any
+
+
+def setMelondsControllers(melondsConfig: Any, playersControllers: Any) -> None:
     # Map controllers
     melonDSMapping = {
         "a": "Joy_A",
@@ -16,15 +19,13 @@ def setMelondsControllers(melondsConfig, playersControllers):
     }
 
     val = -1
-    for controller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         # Only use Player 1 controls
         if pad.index != 0:
             continue
 
         # Handle controllers where guide and back buttons share the same code
-        guide_equal_back = (
-            True if pad.inputs["guide"].value == pad.inputs["back"].value else False
-        )
+        guide_equal_back = pad.inputs["guide"].value == pad.inputs["back"].value
 
         for index in pad.inputs:
             input = pad.inputs[index].sdl_to_linux_input_event(guide_equal_back)

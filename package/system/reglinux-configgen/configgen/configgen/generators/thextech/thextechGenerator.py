@@ -1,10 +1,11 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
-from configgen.systemFiles import SAVES
-from configgen.controllers import generate_sdl_controller_config
+from os import makedirs, path
 
-THEXTECH_SAVES_DIR = SAVES + "/thextech"
+from configgen.Command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.Generator import Generator
+from configgen.systemFiles import SAVES
+
+THEXTECH_SAVES_DIR = str(SAVES / "thextech")
 THEXTECH_BIN_PATH = "/usr/bin/thextech"
 
 
@@ -21,7 +22,7 @@ class TheXTechGenerator(Generator):
         if system.isOptSet("rendering_mode"):
             command_array.extend(["-r", system.config["rendering_mode"]])
 
-        if system.isOptSet("frameskip") and system.getOptBoolean("frameskip") == False:
+        if system.isOptSet("frameskip") and not system.getOptBoolean("frameskip"):
             command_array.extend(["--no-frameskip"])
         else:
             command_array.extend(["--frameskip"])

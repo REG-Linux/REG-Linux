@@ -1,18 +1,25 @@
-from configgen.generators.Generator import Generator
+from os import listdir
+from pathlib import Path
+
 from configgen.Command import Command
-from os import path, mkdir, listdir
+from configgen.generators.Generator import Generator
+
 try:
     from ruamel.yaml import YAML
 except ImportError:
-    print("ruamel.yaml module not found. Please install it with: pip install ruamel.yaml")
+    print(
+        "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml"
+    )
     raise
 from shutil import move
+from typing import Any
+
 from configgen.controllers import generate_sdl_controller_config
 from configgen.systemFiles import CONF, SAVES
 
-VITA3K_CONFIG_DIR = CONF + "/vita3k"
-VITA3K_SAVES_DIR = SAVES + "/psvita"
-VITA3K_CONFIG_PATH = VITA3K_CONFIG_DIR + "/config.yml"
+VITA3K_CONFIG_DIR = str(CONF / "vita3k")
+VITA3K_SAVES_DIR = str(SAVES / "psvita")
+VITA3K_CONFIG_PATH = str(CONF / "vita3k" / "config.yml")
 VITA3K_BIN_PATH = "/usr/bin/vita3k/Vita3K"
 
 
@@ -25,34 +32,38 @@ class Vita3kGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create folder
-        if not path.isdir(VITA3K_CONFIG_DIR):
-            mkdir(VITA3K_CONFIG_DIR)
-        if not path.isdir(VITA3K_SAVES_DIR):
-            mkdir(VITA3K_SAVES_DIR)
+        config_dir_path = Path(VITA3K_CONFIG_DIR)
+        if not config_dir_path.is_dir():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
+        saves_dir_path = Path(VITA3K_SAVES_DIR)
+        if not saves_dir_path.is_dir():
+            saves_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Move saves if necessary
-        if path.isdir(path.join(VITA3K_CONFIG_DIR, "ux0")):
+        ux0_path = config_dir_path / "ux0"
+        if ux0_path.is_dir():
             # Move all folders from VITA3K_CONFIG_DIR to VITA3K_SAVES_DIR except "data", "lang", and "shaders-builtin"
             for item in listdir(VITA3K_CONFIG_DIR):
                 if item not in ["data", "lang", "shaders-builtin"]:
-                    item_path = path.join(VITA3K_CONFIG_DIR, item)
-                    if path.isdir(item_path):
-                        move(item_path, VITA3K_SAVES_DIR)
+                    item_path = config_dir_path / item
+                    if item_path.is_dir():
+                        move(str(item_path), VITA3K_SAVES_DIR)
 
         # Create the config.yml file if it doesn't exist
         vita3kymlconfig = {}
         indent = 2
         block_seq_indent = 0
-        if path.isfile(VITA3K_CONFIG_PATH):
+        config_path = Path(VITA3K_CONFIG_PATH)
+        if config_path.is_file():
             try:
                 from ruamel.yaml.util import load_yaml_guess_indent
 
-                with open(VITA3K_CONFIG_PATH, "r") as stream:
+                with open(VITA3K_CONFIG_PATH) as stream:
                     vita3kymlconfig, indent, block_seq_indent = load_yaml_guess_indent(
                         stream
                     )
             except ImportError:
-                with open(VITA3K_CONFIG_PATH, "r") as stream:
+                with open(VITA3K_CONFIG_PATH) as stream:
                     yaml = YAML()
                     vita3kymlconfig = yaml.load(stream)
                 indent = 2
@@ -77,17 +88,13 @@ class Vita3kGenerator(Generator):
         else:
             vita3kymlconfig["resolution-multiplier"] = 1
         # Set FXAA
-        if (
-            system.isOptSet("vita3k_fxaa")
-            and system.getOptBoolean("vita3k_surface") == True
-        ):
+        if system.isOptSet("vita3k_fxaa") and system.getOptBoolean("vita3k_surface"):
             vita3kymlconfig["enable-fxaa"] = "true"
         else:
             vita3kymlconfig["enable-fxaa"] = "false"
         # Set VSync
-        if (
-            system.isOptSet("vita3k_vsync")
-            and system.getOptBoolean("vita3k_surface") == False
+        if system.isOptSet("vita3k_vsync") and not system.getOptBoolean(
+            "vita3k_surface"
         ):
             vita3kymlconfig["v-sync"] = "false"
         else:
@@ -100,17 +107,13 @@ class Vita3kGenerator(Generator):
         else:
             vita3kymlconfig["anisotropic-filtering"] = 1
         # Set the linear filtering option
-        if (
-            system.isOptSet("vita3k_linear")
-            and system.getOptBoolean("vita3k_surface") == True
-        ):
+        if system.isOptSet("vita3k_linear") and system.getOptBoolean("vita3k_surface"):
             vita3kymlconfig["enable-linear-filter"] = "true"
         else:
             vita3kymlconfig["enable-linear-filter"] = "false"
         # Surface Sync
-        if (
-            system.isOptSet("vita3k_surface")
-            and system.getOptBoolean("vita3k_surface") == False
+        if system.isOptSet("vita3k_surface") and not system.getOptBoolean(
+            "vita3k_surface"
         ):
             vita3kymlconfig["disable-surface-sync"] = "false"
         else:
@@ -132,7 +135,8 @@ class Vita3kGenerator(Generator):
         # because of the yml formatting, we don't allow Vita3k to modify it
         # using the -w & -f options prevents Vita3k from re-writing & prompting the user in GUI
         # we want to avoid that so roms load straight away
-        if path.isdir(VITA3K_SAVES_DIR + "/ux0/app/" + smplromname):
+        app_path = Path(VITA3K_SAVES_DIR) / "ux0" / "app" / smplromname
+        if app_path.is_dir():
             command_array = [
                 VITA3K_BIN_PATH,
                 "-F",
@@ -166,10 +170,11 @@ class Vita3kGenerator(Generator):
 
     # Show mouse for touchscreen actions
     def getMouseMode(self, config, rom):
-        if "vita3k_show_pointer" in config and config["vita3k_show_pointer"] == "0":
-            return False
-        else:
-            return True
+        return not (
+            "vita3k_show_pointer" in config and config["vita3k_show_pointer"] == "0"
+        )
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         return 16 / 9

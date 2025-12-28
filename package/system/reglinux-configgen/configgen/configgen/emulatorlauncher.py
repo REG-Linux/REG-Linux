@@ -5,26 +5,29 @@ It is responsible for preparing the environment and launching the emulator
 with the appropriate configurations.
 """
 
-from os import path, environ, chdir, makedirs, access, listdir, X_OK
 from argparse import ArgumentParser
-from signal import signal, SIGINT, SIGTERM
-from time import sleep
-from subprocess import Popen, PIPE, call
-from configgen.systemFiles import SAVES
+from contextlib import suppress
+from os import X_OK, access, chdir, environ
+from pathlib import Path
+from signal import SIGINT, SIGTERM, signal
+from subprocess import PIPE, Popen, call
 from sys import exit
-from configgen.Emulator import Emulator
 from threading import Thread
-from configgen.controllers import Evmapy
-from configgen.GeneratorImporter import getGenerator
-import configgen.utils.videoMode as videoMode
-import configgen.utils.gunsUtils as gunsUtils
-import configgen.utils.wheelsUtils as wheelsUtils
-import configgen.utils.windowsManager as windowsManager
+from time import sleep
+from typing import Any
+
 import configgen.bezel.bezel_base as bezelsUtil
 import configgen.controllers as controllers
+import configgen.utils.gunsUtils as gunsUtils
+import configgen.utils.videoMode as videoMode
+import configgen.utils.wheelsUtils as wheelsUtils
+import configgen.utils.windowsManager as windowsManager
 import configgen.utils.zar as zar
+from configgen.controllers import Evmapy
+from configgen.Emulator import Emulator
+from configgen.GeneratorImporter import getGenerator
+from configgen.systemFiles import SAVES
 from configgen.utils.logger import get_logger
-
 from configgen.utils.regmsgclient import regmsg_connect
 
 eslog = get_logger(__name__)
@@ -45,7 +48,7 @@ profiler = None
 #    to analyze the `/var/run/emulatorlauncher.prof` file.
 
 # Enable the profiler if the performance marker file exists.
-if path.exists("/var/run/emulatorlauncher.perf"):
+if Path("/var/run/emulatorlauncher.perf").exists():
     import cProfile
 
     profiler = cProfile.Profile()
@@ -55,7 +58,7 @@ if path.exists("/var/run/emulatorlauncher.perf"):
 proc = None
 
 
-def main(args, maxnbplayers):
+def main(args: Any, maxnbplayers: int) -> int:
     """
     Entry point to start a ROM, with optional mounting of .zar archive files.
 
@@ -74,11 +77,11 @@ def main(args, maxnbplayers):
     regmsg_connect()
 
     # Get the file extension in lowercase
-    extension = path.splitext(args.rom)[1][1:].lower()
+    extension = Path(args.rom).suffix[1:].lower()
 
     # Check if it is a .zar archive
     if extension == "zar":
-        eslog.debug(f"Processing zar archive {path.basename(args.rom)}")
+        eslog.debug(f"Processing zar archive {Path(args.rom).name}")
         exitCode = 0
         need_end = False
         rommountpoint = None
@@ -99,13 +102,14 @@ def main(args, maxnbplayers):
 
         return exitCode
 
-    else:
-        # If it's not a .zar file, launch the ROM directly
-        eslog.debug(f"Launching ROM directly {path.basename(args.rom)}")
-        return start_rom(args, maxnbplayers, args.rom, args.rom)
+    # If it's not a .zar file, launch the ROM directly
+    eslog.debug(f"Launching ROM directly {Path(args.rom).name}")
+    return start_rom(args, maxnbplayers, args.rom, args.rom)
 
 
-def _start_evmapy_async(system, emulator, core, rom_config, players_controllers, guns):
+def _start_evmapy_async(
+    system: Any, emulator: str, core: str, rom: str, players_controllers: Any, guns: Any
+) -> Thread:
     """
     Starts Evmapy asynchronously in a background thread.
 
@@ -126,7 +130,7 @@ def _start_evmapy_async(system, emulator, core, rom_config, players_controllers,
 
     def worker():
         try:
-            Evmapy.start(system, emulator, core, rom_config, players_controllers, guns)
+            Evmapy.start(system, emulator, core, rom, players_controllers, guns)
         except Exception as e:
             eslog.error(f"Evmapy failed: {e}", exc_info=True)
 
@@ -136,7 +140,7 @@ def _start_evmapy_async(system, emulator, core, rom_config, players_controllers,
     return t
 
 
-def _configure_controllers(args, maxnbplayers):
+def _configure_controllers(args: Any, maxnbplayers: int) -> dict[str, Any]:
     """Configures controllers based on command-line arguments."""
     controllersInput = []
     for p in range(1, maxnbplayers + 1):
@@ -151,15 +155,14 @@ def _configure_controllers(args, maxnbplayers):
         }
         controllersInput.append(ci)
 
-    playersControllers = controllers.load_controller_config(controllersInput)
-    return playersControllers
+    return controllers.load_controller_config(controllersInput)
 
 
-def _setup_system_emulator(args, rom_configuration):
+def _setup_system_emulator(args: Any, rom: str) -> Any:
     """Initializes system and emulator configurations."""
     systemName = args.system
     eslog.debug(f"Running system: {systemName}")
-    system = Emulator(systemName, rom_configuration)
+    system = Emulator(systemName, args.rom)
 
     if args.emulator is not None:
         system.config["emulator"] = args.emulator
@@ -182,7 +185,9 @@ def _setup_system_emulator(args, rom_configuration):
     return system
 
 
-def _configure_special_devices(args, system, rom, metadata, players_controllers):
+def _configure_special_devices(
+    args: Any, system: Any, rom: str, metadata: Any, players_controllers: Any
+) -> tuple[Any, Any, Any, Any]:
     """Configures light guns and racing wheels."""
     if not system.isOptSet("use_guns") and args.lightgun:
         system.config["use_guns"] = True
@@ -212,7 +217,9 @@ def _configure_special_devices(args, system, rom, metadata, players_controllers)
     return guns, wheels, wheel_processes, players_controllers
 
 
-def _setup_video_and_mouse(system, generator, rom):
+def _setup_video_and_mouse(
+    system: Any, generator: Any, rom: str
+) -> tuple[Any, bool, bool, dict[str, int]]:
     """Sets up video mode and mouse visibility for the game."""
     wanted_game_mode = generator.getResolutionMode(system.config)
     system_mode = videoMode.getCurrentMode()
@@ -243,7 +250,7 @@ def _setup_video_and_mouse(system, generator, rom):
     return system_mode, resolution_changed, mouse_changed, game_resolution
 
 
-def _apply_commandline_options(args, system):
+def _apply_commandline_options(args: Any, system: Any) -> None:
     """Applies command-line options like netplay and save states to the system config."""
     if args.netplaymode is not None:
         system.config["netplay.mode"] = args.netplaymode
@@ -264,7 +271,7 @@ def _apply_commandline_options(args, system):
         system.config["state_filename"] = args.state_filename
 
 
-def _setup_environment_variables(system):
+def _setup_environment_variables(system: Any) -> None:
     """Sets up environment variables for the emulator."""
     system.config["sdlvsync"] = (
         "0"
@@ -274,14 +281,14 @@ def _setup_environment_variables(system):
     environ["SDL_RENDER_VSYNC"] = system.config["sdlvsync"]
 
 
-def _execute_external_scripts(system, rom, event_type):
+def _execute_external_scripts(system: Any, rom: str, event_type: str) -> None:
     """Executes external scripts based on the event type."""
     effectiveCore = system.config.get("core", "")
     effectiveRom = rom or ""
 
     script_directories = [
-        "/usr/share/reglinux/configgen/scripts",
-        "/userdata/system/scripts",
+        Path("/usr/share/reglinux/configgen/scripts"),
+        Path("/userdata/system/scripts"),
     ]
 
     # For gameStart events, we want the first directory to be user scripts
@@ -290,35 +297,42 @@ def _execute_external_scripts(system, rom, event_type):
 
     for directory in script_directories:
         callExternalScripts(
-            directory,
+            str(directory),
             event_type,
             [system.name, system.config["emulator"], effectiveCore, effectiveRom],
         )
 
 
-def _create_save_directory(system):
+def _create_save_directory(system: Any) -> None:
     """Creates the save directory for the system if it doesn't exist."""
-    dirname = path.join(SAVES, system.name)
-    if not path.exists(dirname):
-        makedirs(dirname)
+    dirname = SAVES / system.name
+    if not dirname.exists():
+        dirname.mkdir(parents=True, exist_ok=True)
 
 
 def _cleanup_hud_config():
     """Cleans up the temporary HUD config file."""
     try:
-        if path.exists("/var/run/hud.config"):
-            from os import remove
-
-            remove("/var/run/hud.config")
+        hud_config_path = Path("/var/run/hud.config")
+        if hud_config_path.exists():
+            hud_config_path.unlink()
     except Exception as e:
         eslog.warning(f"Could not remove HUD config file: {e}")
 
 
-def _configure_hud(system, generator, cmd, args, rom, game_resolution, guns):
+def _configure_hud(
+    system: Any,
+    generator: Any,
+    cmd: Any,
+    args: Any,
+    rom: str,
+    game_resolution: dict[str, int],
+    guns: Any,
+) -> None:
     """Configures and enables MangoHUD if supported."""
     if not (
         system.isOptSet("hud_support")
-        and path.exists("/usr/bin/mangohud")
+        and Path("/usr/bin/mangohud").exists()
         and system.getOptBoolean("hud_support")
     ):
         return
@@ -345,16 +359,23 @@ def _configure_hud(system, generator, cmd, args, rom, game_resolution, guns):
             gameinfos,
             hud_bezel,
         )
-        with open("/var/run/hud.config", "w") as f:
+        hud_config_path = Path("/var/run/hud.config")
+        with open(hud_config_path, "w") as f:
             f.write(hudconfig)
-        cmd.env["MANGOHUD_CONFIGFILE"] = "/var/run/hud.config"
+        cmd.env["MANGOHUD_CONFIGFILE"] = str(hud_config_path)
         if not generator.hasInternalMangoHUDCall():
             cmd.array.insert(0, "mangohud")
 
 
 def _setup_evmapy_and_compositor(
-    generator, system, rom, players_controllers, guns, args, rom_configuration
-):
+    generator: Any,
+    system: Any,
+    rom: str,
+    players_controllers: Any,
+    guns: Any,
+    args: Any,
+    rom_configuration: dict[str, Any],
+) -> Any:
     """
     Sets up Evmapy and compositor before launching the emulator.
 
@@ -375,7 +396,7 @@ def _setup_evmapy_and_compositor(
         args.system,
         system.config["emulator"],
         system.config.get("core", ""),
-        rom_configuration,
+        rom,
         players_controllers,
         guns,
     )
@@ -390,16 +411,16 @@ def _setup_evmapy_and_compositor(
 
 
 def _prepare_emulator_command(
-    generator,
-    system,
-    rom,
-    players_controllers,
-    metadata,
-    guns,
-    wheels,
-    game_resolution,
-    args,
-):
+    generator: Any,
+    system: Any,
+    rom: str,
+    players_controllers: Any,
+    metadata: Any,
+    guns: Any,
+    wheels: Any,
+    game_resolution: dict[str, int],
+    args: Any,
+) -> Any:
     """
     Prepares the emulator command with all necessary configurations.
 
@@ -434,7 +455,7 @@ def _prepare_emulator_command(
     return cmd
 
 
-def _run_emulator_with_profiler(cmd):
+def _run_emulator_with_profiler(cmd: Any) -> int:
     """
     Runs the emulator command with profiler management.
 
@@ -460,7 +481,9 @@ def _run_emulator_with_profiler(cmd):
     return exitCode
 
 
-def _cleanup_emulator_resources(generator, evmapy_thread, system):
+def _cleanup_emulator_resources(
+    generator: Any, evmapy_thread: Any, system: Any
+) -> None:
     """
     Cleans up resources after the emulator exits.
 
@@ -480,17 +503,17 @@ def _cleanup_emulator_resources(generator, evmapy_thread, system):
 
 
 def _launch_emulator_process(
-    generator,
-    system,
-    rom,
-    players_controllers,
-    metadata,
-    guns,
-    wheels,
-    game_resolution,
-    args,
-    rom_configuration,
-):
+    generator: Any,
+    system: Any,
+    rom: str,
+    players_controllers: Any,
+    metadata: Any,
+    guns: Any,
+    wheels: Any,
+    game_resolution: dict[str, int],
+    args: Any,
+    rom_configuration: dict[str, Any],
+) -> int:
     """
     Handles the actual emulator launch process inside a try/finally block.
 
@@ -551,7 +574,12 @@ def _launch_emulator_process(
     return exitCode
 
 
-def _cleanup_system(resolution_changed, system_mode, mouse_changed, wheel_processes):
+def _cleanup_system(
+    resolution_changed: bool,
+    system_mode: Any,
+    mouse_changed: bool,
+    wheel_processes: Any,
+) -> None:
     """Restores system state after the emulator exits."""
     import subprocess  # Import subprocess here to resolve "subprocess" is not defined errors
 
@@ -577,7 +605,9 @@ def _cleanup_system(resolution_changed, system_mode, mouse_changed, wheel_proces
             pass
 
 
-def start_rom(args, maxnbplayers, rom, rom_configuration):
+def start_rom(
+    args: Any, maxnbplayers: int, rom: str, rom_configuration: dict[str, Any]
+) -> int:
     """
     Prepares the system and launches the emulator for a given ROM.
 
@@ -601,7 +631,7 @@ def start_rom(args, maxnbplayers, rom, rom_configuration):
     """
     # Initial setup
     players_controllers = _configure_controllers(args, maxnbplayers)
-    system = _setup_system_emulator(args, rom_configuration)
+    system = _setup_system_emulator(args, rom)
     metadata = controllers.getGamesMetaData(system.name, rom)
     guns, wheels, wheel_processes, players_controllers = _configure_special_devices(
         args, system, rom, metadata, players_controllers
@@ -653,7 +683,7 @@ def start_rom(args, maxnbplayers, rom, rom_configuration):
     return exit_code
 
 
-def _cleanup_temp_files(*temp_files):
+def _cleanup_temp_files(*temp_files: str) -> None:
     """
     Cleans up temporary files created during bezel processing.
 
@@ -664,13 +694,19 @@ def _cleanup_temp_files(*temp_files):
 
     for temp_file in temp_files:
         try:
-            if temp_file and path.exists(temp_file):
+            if temp_file and Path(temp_file).exists():
                 os.remove(temp_file)
         except Exception as e:
             eslog.warning(f"Could not remove temporary file {temp_file}: {e}")
 
 
-def getHudBezel(system, generator, rom, game_resolution, borders_size):
+def getHudBezel(
+    system: Any,
+    generator: Any,
+    rom: str,
+    game_resolution: dict[str, int],
+    borders_size: Any,
+) -> Any:
     """
     Determines and prepares the appropriate bezel image for the HUD.
 
@@ -711,11 +747,13 @@ def getHudBezel(system, generator, rom, game_resolution, borders_size):
     try:
         # If no bezel is set but effects are needed, create a transparent base.
         if "bezel" not in system.config or system.config["bezel"] in ["", "none"]:
-            overlay_png_file = "/tmp/bezel_transhud_black.png"
-            overlay_info_file = "/tmp/bezel_transhud_black.info"
-            temp_files.extend([overlay_png_file, overlay_info_file])
+            overlay_png_file = Path("/tmp/bezel_transhud_black.png")
+            overlay_info_file = Path("/tmp/bezel_transhud_black.info")
+            temp_files.extend([str(overlay_png_file), str(overlay_info_file)])
             bezelsUtil.createTransparentBezel(
-                overlay_png_file, game_resolution["width"], game_resolution["height"]
+                str(overlay_png_file),
+                game_resolution["width"],
+                game_resolution["height"],
             )
 
             w, h = game_resolution["width"], game_resolution["height"]
@@ -740,8 +778,11 @@ def getHudBezel(system, generator, rom, game_resolution, borders_size):
         # --- Bezel Validation ---
         infos = {}  # Initialize infos here to ensure it's always defined
         try:
-            with open(overlay_info_file) as f:
-                infos = json.load(f)
+            if overlay_info_file and isinstance(overlay_info_file, str):
+                with open(overlay_info_file) as f:
+                    infos = json.load(f)
+            else:
+                eslog.warning(f"Invalid overlay info file: {overlay_info_file}")
         except FileNotFoundError:
             eslog.warning(f"Bezel info file not found: {overlay_info_file}")
         except json.JSONDecodeError as e:
@@ -751,11 +792,17 @@ def getHudBezel(system, generator, rom, game_resolution, borders_size):
 
         # Get bezel dimensions either from info file or the image itself.
         if "width" in infos and "height" in infos:
-            bezel_width, bezel_height = infos["width"], infos["height"]
+            bezel_width: int = infos["width"]
+            bezel_height: int = infos["height"]
             eslog.info(f"Bezel size read from {overlay_info_file}")
         else:
-            bezel_width, bezel_height = bezelsUtil.fast_image_size(overlay_png_file)
-            eslog.info(f"Bezel size read from {overlay_png_file}")
+            if overlay_png_file and isinstance(overlay_png_file, str):
+                bezel_width: int = bezelsUtil.fast_image_size(overlay_png_file)[0]
+                bezel_height: int = bezelsUtil.fast_image_size(overlay_png_file)[1]
+                eslog.info(f"Bezel size read from {overlay_png_file}")
+            else:
+                eslog.error(f"Invalid overlay PNG file: {overlay_png_file}")
+                return None
 
         # Define validation thresholds.
         max_ratio_delta = 0.01  # Max difference between screen and bezel aspect ratio.
@@ -780,39 +827,59 @@ def getHudBezel(system, generator, rom, game_resolution, borders_size):
             or bezel_height != game_resolution["height"]
         ):
             eslog.debug("Bezel needs to be resized")
-            output_png_file = "/tmp/bezel.png"
-            temp_files.append(output_png_file)
-            try:
-                bezelsUtil.resizeImage(
-                    overlay_png_file,
-                    output_png_file,
-                    game_resolution["width"],
-                    game_resolution["height"],
-                    bezel_stretch,
-                )
-                overlay_png_file = output_png_file
-            except Exception as e:
-                eslog.error(f"Failed to resize the image: {e}")
+            output_png_file = Path("/tmp/bezel.png")
+            temp_files.append(str(output_png_file))
+            if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
+                try:
+                    bezelsUtil.resizeImage(
+                        str(overlay_png_file),
+                        str(output_png_file),
+                        game_resolution["width"],
+                        game_resolution["height"],
+                        bezel_stretch,
+                    )
+                    overlay_png_file = output_png_file
+                except Exception as e:
+                    eslog.error(f"Failed to resize the image: {e}")
+                    return None
+            else:
+                eslog.error(f"Invalid overlay PNG file for resize: {overlay_png_file}")
                 return None
 
         # Apply a "tattoo" (watermark/logo) to the bezel if configured.
         if system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0":
-            output_png_file = "/tmp/bezel_tattooed.png"
-            temp_files.append(output_png_file)
-            bezelsUtil.tatooImage(overlay_png_file, output_png_file, system)
-            overlay_png_file = output_png_file
+            output_png_file = Path("/tmp/bezel_tattooed.png")
+            temp_files.append(str(output_png_file))
+            if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
+                bezelsUtil.tatooImage(
+                    str(overlay_png_file), str(output_png_file), system
+                )
+                overlay_png_file = output_png_file
+            else:
+                eslog.error(f"Invalid overlay PNG file for tattoo: {overlay_png_file}")
+                return None
 
         # Draw gun borders on the bezel if required.
         if borders_size is not None:
             eslog.debug("Drawing gun borders")
-            output_png_file = "/tmp/bezel_gunborders.png"
-            temp_files.append(output_png_file)
+            output_png_file = Path("/tmp/bezel_gunborders.png")
+            temp_files.append(str(output_png_file))
             inner_size, outer_size = bezelsUtil.gun_borders_size(borders_size)
             color = bezelsUtil.gunsBordersColorFomConfig(system.config)
-            bezelsUtil.gunBorderImage(
-                overlay_png_file, output_png_file, inner_size, outer_size, color
-            )
-            overlay_png_file = output_png_file
+            if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
+                bezelsUtil.gunBorderImage(
+                    str(overlay_png_file),
+                    str(output_png_file),
+                    inner_size,
+                    outer_size,
+                    color,
+                )
+                overlay_png_file = output_png_file
+            else:
+                eslog.error(
+                    f"Invalid overlay PNG file for gun border: {overlay_png_file}"
+                )
+                return None
 
         eslog.debug(f"Applying bezel {overlay_png_file}")
         return overlay_png_file
@@ -822,7 +889,7 @@ def getHudBezel(system, generator, rom, game_resolution, borders_size):
         _cleanup_temp_files(*temp_files)
 
 
-def extractGameInfosFromXml(xml):
+def extractGameInfosFromXml(xml: Any) -> dict[str, Any]:
     """
     Parses a game information XML file to extract game name and thumbnail.
 
@@ -853,7 +920,7 @@ def extractGameInfosFromXml(xml):
     return vals
 
 
-def callExternalScripts(folder, event, args):
+def callExternalScripts(folder: str, event: str, args: list[str]) -> None:
     """
     Executes all executable scripts in a given folder.
 
@@ -862,18 +929,22 @@ def callExternalScripts(folder, event, args):
         event (str): The event name (e.g., "gameStart", "gameStop").
         args (list): A list of arguments to pass to the scripts.
     """
-    if not path.isdir(folder):
+    if not Path(folder).is_dir():
         return
     try:
-        file_list = sorted(listdir(folder))  # Sort for predictable execution order.
+        file_list = sorted(
+            Path(folder).iterdir()
+        )  # Sort for predictable execution order.
     except OSError as e:
         eslog.warning(f"Could not read directory {folder}: {e}")
         return
 
     for file in file_list:
-        filepath = path.join(folder, file)
-        if path.isdir(filepath):
-            callExternalScripts(filepath, event, args)  # Recurse into subdirectories.
+        filepath = Path(folder) / file
+        if Path(filepath).is_dir():
+            callExternalScripts(
+                str(filepath), event, args
+            )  # Recurse into subdirectories.
         elif access(filepath, X_OK):
             eslog.debug(f"Calling external script: {str([filepath, event] + args)}")
             try:
@@ -890,7 +961,7 @@ def callExternalScripts(folder, event, args):
                 )
 
 
-def hudConfig_protectStr(text):
+def hudConfig_protectStr(text: str) -> str:
     """
     Returns an empty string if the input is None, otherwise returns the input.
 
@@ -903,7 +974,15 @@ def hudConfig_protectStr(text):
     return text or ""
 
 
-def getHudConfig(system, systemName, emulator, core, rom, gameinfos, bezel):
+def getHudConfig(
+    system: Any,
+    systemName: str,
+    emulator: str,
+    core: str,
+    rom: str,
+    gameinfos: Any,
+    bezel: Any,
+) -> str:
     """
     Generates the configuration string for MangoHUD.
 
@@ -968,12 +1047,10 @@ def getHudConfig(system, systemName, emulator, core, rom, gameinfos, bezel):
     configstr = configstr.replace("%SYSTEMNAME%", hudConfig_protectStr(systemName))
     configstr = configstr.replace("%GAMENAME%", hudConfig_protectStr(gameName))
     configstr = configstr.replace("%EMULATORCORE%", hudConfig_protectStr(emulatorstr))
-    configstr = configstr.replace("%THUMBNAIL%", hudConfig_protectStr(gameThumbnail))
-
-    return configstr
+    return configstr.replace("%THUMBNAIL%", hudConfig_protectStr(gameThumbnail))
 
 
-def runCommand(command):
+def runCommand(command: Any) -> int:
     """
     Executes a command in a subprocess.
 
@@ -1018,17 +1095,14 @@ def runCommand(command):
     finally:
         # Ensure process resources are properly released
         if proc and proc.poll() is None:  # Process is still running
-            try:
+            with suppress(ProcessLookupError):
                 proc.kill()
-            except ProcessLookupError:
-                # Process already finished, ignore
-                pass
         proc = None  # Clear the global reference
 
     return exitcode
 
 
-def signal_handler(signal, frame):
+def signal_handler(signal: Any, frame: Any) -> None:
     """
     Handles termination signals (like Ctrl+C) to gracefully kill the emulator process.
     """
@@ -1119,7 +1193,7 @@ if __name__ == "__main__":
     if profiler:
         try:
             profiler.disable()
-            profiler.dump_stats("/var/run/emulatorlauncher.prof")
+            profiler.dump_stats(str(Path("/var/run/emulatorlauncher.prof")))
         except Exception as e:
             eslog.error(f"Error dumping profiler stats: {e}")
 

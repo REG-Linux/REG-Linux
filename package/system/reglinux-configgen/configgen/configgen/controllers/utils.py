@@ -1,9 +1,10 @@
-from os import path
 import re
+from pathlib import Path
+from typing import Any
 
 
-def shortNameFromPath(path_name):
-    redname = path.splitext(path.basename(path_name))[0].lower()
+def shortNameFromPath(path_name: str) -> str:
+    redname = Path(path_name).stem.lower()
     inpar = False
     inblock = False
     ret = ""
@@ -18,14 +19,12 @@ def shortNameFromPath(path_name):
             inpar = True
         elif c == ")":
             inpar = False
-        elif c == "[":
-            inblock = True
-        elif c == "]":
+        elif c == "[" or c == "]":
             inblock = True
     return ret
 
 
-def dev2int(dev):
+def dev2int(dev: str) -> Any:
     matches = re.match(r"^/dev/input/event([0-9]*)$", dev)
     if matches is None:
         return None

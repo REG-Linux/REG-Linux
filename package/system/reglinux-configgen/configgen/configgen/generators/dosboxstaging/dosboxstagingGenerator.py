@@ -1,13 +1,14 @@
-from configgen.generators.Generator import Generator
+from pathlib import Path
+
 from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF
-from os import path
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
-DOSBOXSTAGING_CONFIG_DIR = CONF + "/dosbox"
-DOSBOXSTAGING_CONFIG_PATH = DOSBOXSTAGING_CONFIG_DIR + "/dosbox.conf"
+DOSBOXSTAGING_CONFIG_DIR = str(Path(CONF) / "dosbox")
+DOSBOXSTAGING_CONFIG_PATH = str(Path(DOSBOXSTAGING_CONFIG_DIR) / "dosbox.conf")
 DOSBOXSTAGING_BIN_PATH = "/usr/bin/dosbox-staging"
 
 
@@ -17,8 +18,8 @@ class DosBoxStagingGenerator(Generator):
     ):
         # Find rom path
         gameDir = rom
-        batFile = gameDir + "/dosbox.bat"
-        gameConfFile = gameDir + "/dosbox.cfg"
+        batFile = str(Path(gameDir) / "dosbox.bat")
+        gameConfFile = str(Path(gameDir) / "dosbox.cfg")
 
         command_array = [
             DOSBOXSTAGING_BIN_PATH,
@@ -29,7 +30,7 @@ class DosBoxStagingGenerator(Generator):
             "-c",
             f"""set ROOT={gameDir}""",
         ]
-        if path.isfile(gameConfFile):
+        if Path(gameConfFile).is_file():
             command_array.append("-conf")
             command_array.append(f"""{gameConfFile}""")
         else:

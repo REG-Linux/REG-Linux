@@ -1,11 +1,13 @@
+from typing import Any
+
 from configgen.systemFiles import HOME
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 # Define paths for Mednafen configuration and binary
-MEDNAFEN_CONFIG_DIR = HOME + "/.mednafen"
-MEDNAFEN_CONFIG_PATH = MEDNAFEN_CONFIG_DIR + "/mednafen.cfg"
+MEDNAFEN_CONFIG_DIR = str(HOME / ".mednafen")
+MEDNAFEN_CONFIG_PATH = str(HOME / ".mednafen" / "mednafen.cfg")
 MEDNAFEN_BIN_PATH = "/usr/bin/mednafen"
 
 # List of all supported emulation systems
@@ -33,7 +35,7 @@ SYSTEMS = [
 ]
 
 
-def setMednafenConfig(cfgConfig):
+def setMednafenConfig(cfgConfig: Any) -> None:
     # Enable all systems and set fullscreen stretch for each
     for system in SYSTEMS:
         cfgConfig.write(f"{system}.enable 1\n")

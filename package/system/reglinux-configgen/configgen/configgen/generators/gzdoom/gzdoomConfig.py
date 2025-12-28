@@ -1,31 +1,30 @@
+from pathlib import Path
+from typing import Any
+
 from configgen.systemFiles import CONF, LOGDIR
-from os import path
 from configgen.utils.logger import get_logger
 
-GZDOOM_CONFIG_DIR = CONF + "/gzdoom"
-GZDOOM_CONFIG_PATH = GZDOOM_CONFIG_DIR + "/gzdoom.ini"
-GZDOOM_LOG_PATH = LOGDIR + "/gzdoom.log"
-GZDOOM_SCRIPT_PATH = GZDOOM_CONFIG_DIR + "/gzdoom.cfg"
-GZDOOM_SOUND_FONT_PATH = GZDOOM_CONFIG_DIR + "/soundfonts"
-GZDOOM_FM_BANKS_PATH = GZDOOM_CONFIG_DIR + "/fm_banks"
+GZDOOM_CONFIG_DIR = str(Path(CONF) / "gzdoom")
+GZDOOM_CONFIG_PATH = str(Path(GZDOOM_CONFIG_DIR) / "gzdoom.ini")
+GZDOOM_LOG_PATH = str(Path(LOGDIR) / "gzdoom.log")
+GZDOOM_SCRIPT_PATH = str(Path(GZDOOM_CONFIG_DIR) / "gzdoom.cfg")
+GZDOOM_SOUND_FONT_PATH = str(Path(GZDOOM_CONFIG_DIR) / "soundfonts")
+GZDOOM_FM_BANKS_PATH = str(Path(GZDOOM_CONFIG_DIR) / "fm_banks")
 GZDOOM_ARCH_PATH = "/usr/share/reglinux/system.arch"
 
 
 eslog = get_logger(__name__)
 
 
-def setGzdoomConfig(system, rom):
-    if system.isOptSet("gz_api"):
-        gzdoom_api = system.config["gz_api"]
-    else:
-        gzdoom_api = "0"
+def setGzdoomConfig(system: Any, rom: str) -> None:
+    gzdoom_api = system.config["gz_api"] if system.isOptSet("gz_api") else "0"
 
     # RPi4 workaround which has both ligl & libgles
     # For arm systems, we want to force OpenGL ES - 3
     if gzdoom_api == "0":
-        with open(GZDOOM_ARCH_PATH, "r") as file:
+        with open(GZDOOM_ARCH_PATH) as file:
             content = file.read().strip()
-            if not content == "x86_64":
+            if content != "x86_64":
                 gzdoom_api = "3"
 
     # now set the config
@@ -52,7 +51,7 @@ def setGzdoomConfig(system, rom):
         )
 
     # check the directory name is in the ini file
-    if not path.exists(GZDOOM_CONFIG_PATH):
+    if not Path(GZDOOM_CONFIG_PATH).exists():
         with open(GZDOOM_CONFIG_PATH, "w") as file:
             file.write(
                 "[IWADSearch.Directories]\n"
@@ -67,8 +66,8 @@ def setGzdoomConfig(system, rom):
     else:
         # configparser wasn't working on the default ini file (non-compliant)
         # it's not a true ini file, use this crude method instead
-        line_to_add = "Path=" + path.dirname(rom) + "\n"
-        with open(GZDOOM_CONFIG_PATH, "r") as file:
+        line_to_add = "Path=" + str(Path(rom).parent) + "\n"
+        with open(GZDOOM_CONFIG_PATH) as file:
             lines = file.readlines()
             if line_to_add not in lines:
                 for i in range(len(lines)):
@@ -81,7 +80,7 @@ def setGzdoomConfig(system, rom):
             file.writelines(lines)
 
     # also check the config directories are also set
-    with open(GZDOOM_CONFIG_PATH, "r") as file:
+    with open(GZDOOM_CONFIG_PATH) as file:
         lines = file.readlines()
         if GZDOOM_FM_BANKS_PATH not in lines:
             for i in range(len(lines)):

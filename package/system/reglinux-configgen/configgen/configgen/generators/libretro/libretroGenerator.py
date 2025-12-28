@@ -1,24 +1,27 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, chdir
+from os import chdir
+from pathlib import Path
 from shutil import copyfile
-from configgen.systemFiles import OVERLAYS
+from typing import Any
+
+from configgen.Command import Command
+from configgen.generators.Generator import Generator
 from configgen.settings import UnixSettings
+from configgen.systemFiles import OVERLAYS
+from configgen.utils.logger import get_logger
 from configgen.utils.videoMode import getAltDecoration, getGLVendor, getGLVersion
+
 from .libretroConfig import (
     coreForceSlangShaders,
-    retroarchCustom,
-    writeLibretroConfig,
-    retroarchRoot,
-    retroarchCores,
     retroarchBin,
+    retroarchCores,
+    retroarchCustom,
+    retroarchRoot,
+    writeLibretroConfig,
 )
 from .libretroRetroarchCustom import (
     generateRetroarchCustom,
     generateRetroarchCustomPathes,
 )
-
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -30,8 +33,15 @@ class LibretroGenerator(Generator):
     # Main entry of the module
     # Configure retroarch and return a command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: dict[str, int],
+    ) -> Command:
         # Get the graphics backend first
         gfxBackend = getGFXBackend(system)
 
@@ -57,25 +67,24 @@ class LibretroGenerator(Generator):
                 shaderFilename = gameShader + ".slangp"
             else:
                 shaderFilename = gameShader + ".glslp"
-            eslog.debug("searching shader {}".format(shaderFilename))
-            if path.exists("/userdata/shaders/" + shaderFilename):
+            eslog.debug(f"searching shader {shaderFilename}")
+            shader_path = Path("/userdata/shaders") / shaderFilename
+            if shader_path.exists():
                 video_shader_dir = "/userdata/shaders"
-                eslog.debug(
-                    "shader {} found in /userdata/shaders".format(shaderFilename)
-                )
+                eslog.debug(f"shader {shaderFilename} found in /userdata/shaders")
             else:
                 video_shader_dir = "/usr/share/reglinux/shaders"
-            video_shader = video_shader_dir + "/" + shaderFilename
+            video_shader = str(Path(video_shader_dir) / shaderFilename)
             # If the shader filename contains noBezel, activate Shader Bezel mode.
             if "noBezel" in video_shader:
                 shaderBezel = True
 
         # Settings system default config file if no user defined one
-        if not "configfile" in system.config:
+        if "configfile" not in system.config:
             # Using system config file
             system.config["configfile"] = retroarchCustom
             # Create retroarchcustom.cfg if does not exists
-            if not path.isfile(retroarchCustom):
+            if not Path(retroarchCustom).is_file():
                 generateRetroarchCustom()
             #  Write controllers configuration files
             retroconfig = UnixSettings(retroarchCustom, separator=" ")
@@ -108,10 +117,10 @@ class LibretroGenerator(Generator):
             retroconfig.write()
 
             # duplicate config to mapping files while ra now split in 2 parts
-            remapconfigDir = retroarchRoot + "/config/remaps/common"
-            if not path.exists(remapconfigDir):
-                makedirs(remapconfigDir)
-            copyfile(retroarchCustom, remapconfigDir + "/common.rmp")
+            remapconfigDir = Path(retroarchRoot) / "config" / "remaps" / "common"
+            if not remapconfigDir.exists():
+                remapconfigDir.mkdir(parents=True, exist_ok=True)
+            copyfile(retroarchCustom, str(remapconfigDir / "common.rmp"))
 
         # Retroarch core on the filesystem
         retroarchCore = retroarchCores + system.config["core"] + "_libretro.so"
@@ -121,10 +130,10 @@ class LibretroGenerator(Generator):
         infoFile = (
             "/usr/share/libretro/info/" + system.config["core"] + "_libretro.info"
         )
-        if not path.exists(infoFile):
+        if not Path(infoFile).exists():
             raise Exception("missing file " + infoFile)
 
-        romName = path.basename(rom)
+        romName = Path(rom).name
 
         # The command to run
         dontAppendROM = False
@@ -141,17 +150,16 @@ class LibretroGenerator(Generator):
             ]
         # PURE zip games uses the same commandarray of all cores. .pc and .rom  uses owns
         elif system.name == "dos":
-            romDOSName, romExtension = path.splitext(romName)
+            romDOSName, romExtension = Path(romName).stem, Path(romName).suffix
             if romExtension == ".dos" or romExtension == ".pc":
-                if (
-                    path.exists(path.join(rom, romDOSName + ".bat"))
-                    and not " " in romDOSName
-                ):
-                    exe = path.join(rom, romDOSName + ".bat")
-                elif path.exists(path.join(rom, "dosbox.bat")) and not path.exists(
-                    path.join(rom, romDOSName + ".bat")
-                ):
-                    exe = path.join(rom, "dosbox.bat")
+                rom_path = Path(rom)
+                rom_bat_path = rom_path / (romDOSName + ".bat")
+                dosbox_bat_path = rom_path / "dosbox.bat"
+
+                if rom_bat_path.exists() and " " not in romDOSName:
+                    exe = str(rom_bat_path)
+                elif dosbox_bat_path.exists() and not rom_bat_path.exists():
+                    exe = str(dosbox_bat_path)
                 else:
                     exe = rom
                 command_array = [
@@ -173,11 +181,11 @@ class LibretroGenerator(Generator):
                 ]
         # Pico-8 multi-carts (might work only with official Lexaloffe engine right now)
         elif system.name == "pico8":
-            romext = path.splitext(romName)[1]
+            romext = Path(romName).suffix
             if romext.lower() == ".m3u":
-                with open(rom, "r") as fpin:
+                with open(rom) as fpin:
                     lines = fpin.readlines()
-                rom = path.dirname(path.abspath(rom)) + "/" + lines[0].strip()
+                rom = str(Path(rom).parent / lines[0].strip())
             command_array = [
                 retroarchBin,
                 "-L",
@@ -187,7 +195,7 @@ class LibretroGenerator(Generator):
             ]
         # vitaquake2 - choose core based on directory
         elif system.name == "vitaquake2":
-            directory_path = path.dirname(rom)
+            directory_path = str(Path(rom).parent)
             if "xatrix" in directory_path:
                 system.config["core"] = "vitaquake2-xatrix"
             elif "rogue" in directory_path:
@@ -205,7 +213,7 @@ class LibretroGenerator(Generator):
             ]
         # super mario wars - verify assets from Content Downloader
         elif system.name == "superbroswar":
-            romdir = path.dirname(path.abspath(rom))
+            romdir = str(Path(rom).parent)
             assetdirs = [
                 "music/world/Standard",
                 "music/game/Standard/Special",
@@ -288,17 +296,17 @@ class LibretroGenerator(Generator):
 
         # Custom configs - per core
         customCfg = f"{retroarchRoot}/{system.name}.cfg"
-        if path.isfile(customCfg):
+        if Path(customCfg).is_file():
             configToAppend.append(customCfg)
 
         # Custom configs - per game
         customGameCfg = f"{retroarchRoot}/{system.name}/{romName}.cfg"
-        if path.isfile(customGameCfg):
+        if Path(customGameCfg).is_file():
             configToAppend.append(customGameCfg)
 
         # Overlay management
         overlayFile = f"{OVERLAYS}/{system.name}/{romName}.cfg"
-        if path.isfile(overlayFile):
+        if Path(overlayFile).is_file():
             configToAppend.append(overlayFile)
 
         if "shader" in renderConfig and gameShader is not None:
@@ -330,10 +338,10 @@ class LibretroGenerator(Generator):
         command_array.extend(["--verbose"])
 
         if system.name == "scummvm":
-            rom = path.join(path.dirname(rom), romName[0:-8])
+            rom = str(Path(rom).parent / romName[0:-8])
 
         if system.name == "reminiscence":
-            with open(rom, "r") as file:
+            with open(rom) as file:
                 first_line = file.readline().strip()
             directory_path = "/".join(rom.split("/")[:-1])
             rom = f"{directory_path}/{first_line}"
@@ -341,17 +349,15 @@ class LibretroGenerator(Generator):
         # Use command line instead of ROM file for MAME variants
         if system.config["core"] in ["mame", "same_cdi"]:
             dontAppendROM = True
-            command_array.append(
-                f"/var/run/cmdfiles/{path.splitext(path.basename(rom))[0]}.cmd"
-            )
+            command_array.append(f"/var/run/cmdfiles/{Path(rom).stem}.cmd")
 
-        if dontAppendROM == False:
+        if not dontAppendROM:
             command_array.append(rom)
 
         return Command(array=command_array)
 
 
-def getGFXBackend(system):
+def getGFXBackend(system: Any) -> str | Any:
     # Start with the selected option
     # Pick glcore or gl based on drivers if not selected
     VALID_BACKENDS = {

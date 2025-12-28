@@ -1,36 +1,36 @@
-from configgen.generators.Generator import Generator
+from pathlib import Path
+
 from configgen.Command import Command
-from os import path, makedirs, unlink
-from .mednafenControllers import setMednafenControllers
+from configgen.generators.Generator import Generator
+
 from .mednafenConfig import (
-    setMednafenConfig,
+    MEDNAFEN_BIN_PATH,
     MEDNAFEN_CONFIG_DIR,
     MEDNAFEN_CONFIG_PATH,
-    MEDNAFEN_BIN_PATH,
+    setMednafenConfig,
 )
+from .mednafenControllers import setMednafenControllers
 
 
 class MednafenGenerator(Generator):
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
-        if not path.exists(MEDNAFEN_CONFIG_DIR):
-            makedirs(MEDNAFEN_CONFIG_DIR)
+        config_dir_path = Path(MEDNAFEN_CONFIG_DIR)
+        if not config_dir_path.exists():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
 
         # If config file already exists, delete it
-        if path.exists(MEDNAFEN_CONFIG_PATH):
-            unlink(MEDNAFEN_CONFIG_PATH)
+        config_path = Path(MEDNAFEN_CONFIG_PATH)
+        if config_path.exists():
+            config_path.unlink()
 
         # Create the config file and fill it with basic data
-        cfgConfig = open(MEDNAFEN_CONFIG_PATH, "w")
-
-        # Basic settings
-        setMednafenConfig(cfgConfig)
-        # TODO: Controls configuration
-        setMednafenControllers(cfgConfig)
-
-        # Close config file as we are done
-        cfgConfig.close()
+        with open(MEDNAFEN_CONFIG_PATH, "w") as cfgConfig:
+            # Basic settings
+            setMednafenConfig(cfgConfig)
+            # TODO: Controls configuration
+            setMednafenControllers(cfgConfig)
 
         command_array = [MEDNAFEN_BIN_PATH, rom]
         return Command(array=command_array)

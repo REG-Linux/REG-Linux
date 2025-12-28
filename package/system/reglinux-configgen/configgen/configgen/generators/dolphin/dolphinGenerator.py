@@ -1,20 +1,24 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs, environ
 from configparser import ConfigParser
+from contextlib import suppress
+from os import environ
+from pathlib import Path
 from subprocess import CalledProcessError, check_output
+from typing import Any
+
+from configgen.Command import Command
 from configgen.controllers import gunsNeedCrosses
-from .dolphinControllers import generateControllerConfig
+from configgen.generators.Generator import Generator
+from configgen.utils.logger import get_logger
+
 from .dolphinConfig import (
-    getRatioFromConfig,
-    updateConfig,
     DOLPHIN_BIN_PATH,
     DOLPHIN_CONFIG_PATH,
-    DOLPHIN_SAVES_DIR,
     DOLPHIN_GFX_PATH,
+    DOLPHIN_SAVES_DIR,
     DOLPHIN_SYSCONF_PATH,
+    getRatioFromConfig,
+    updateConfig,
 )
-from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
@@ -22,18 +26,27 @@ eslog = get_logger(__name__)
 class DolphinGenerator(Generator):
     # this emulator/core requires X server to run
     # TODO I think this is wrong and it can runs on wayland...
-    def requiresX11(self):
+    def requiresX11(self) -> bool:
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
-        if not path.exists(path.dirname(DOLPHIN_CONFIG_PATH)):
-            makedirs(path.dirname(DOLPHIN_CONFIG_PATH))
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: dict[str, int],
+    ) -> Command:
+        config_dir = Path(DOLPHIN_CONFIG_PATH).parent
+        if not config_dir.exists():
+            config_dir.mkdir(parents=True, exist_ok=True)
 
         # Dir required for saves
-        if not path.exists(DOLPHIN_SAVES_DIR + "/StateSaves"):
-            makedirs(DOLPHIN_SAVES_DIR + "/StateSaves")
+        saves_dir = Path(DOLPHIN_SAVES_DIR) / "StateSaves"
+        if not saves_dir.exists():
+            saves_dir.mkdir(parents=True, exist_ok=True)
 
         # FIXME Generate the controller config(s)
         # generateControllerConfig(system, players_controllers, metadata, wheels, rom, guns)
@@ -42,7 +55,8 @@ class DolphinGenerator(Generator):
         dolphinSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinSettings.optionxform = lambda optionstr: str(optionstr)
-        if path.exists(DOLPHIN_CONFIG_PATH):
+        config_path = Path(DOLPHIN_CONFIG_PATH)
+        if config_path.exists():
             dolphinSettings.read(DOLPHIN_CONFIG_PATH)
 
         # Sections
@@ -63,8 +77,10 @@ class DolphinGenerator(Generator):
 
         # Define default games path
         if "ISOPaths" not in dolphinSettings["General"]:
-            dolphinSettings.set("General", "ISOPath0", "/userdata/roms/wii")
-            dolphinSettings.set("General", "ISOPath1", "/userdata/roms/gamecube")
+            dolphinSettings.set("General", "ISOPath0", str(Path("/userdata/roms/wii")))
+            dolphinSettings.set(
+                "General", "ISOPath1", str(Path("/userdata/roms/gamecube"))
+            )
             dolphinSettings.set("General", "ISOPaths", "2")
 
         # Don't ask about statistics
@@ -183,11 +199,13 @@ class DolphinGenerator(Generator):
                     not system.isOptSet("dolphin-lightgun-hide-crosshair")
                     and not gunsNeedCrosses(guns)
                 )
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair")
             )
         ):
             dolphinSettings.set(
-                "General", "CustomTexturesPath", "/usr/share/DolphinCrosshairsPack"
+                "General",
+                "CustomTexturesPath",
+                str(Path("/usr/share/DolphinCrosshairsPack")),
             )
         else:
             dolphinSettings.remove_option("General", "CustomTexturesPath")
@@ -201,11 +219,8 @@ class DolphinGenerator(Generator):
         ):
             # check files exist to avoid crashes
             ipl_regions = ["USA", "EUR", "JAP"]
-            base_path = "/userdata/bios/GC"
-            if any(
-                path.exists(path.join(base_path, region, "IPL.bin"))
-                for region in ipl_regions
-            ):
+            base_path = Path("/userdata/bios/GC")
+            if any((base_path / region / "IPL.bin").exists() for region in ipl_regions):
                 dolphinSettings.set("Core", "SkipIPL", "False")
             else:
                 dolphinSettings.set("Core", "SkipIPL", "True")
@@ -267,9 +282,7 @@ class DolphinGenerator(Generator):
                             ).strip()
                             if discrete_index != "":
                                 eslog.debug(
-                                    "Using Discrete GPU Index: {} for Dolphin".format(
-                                        discrete_index
-                                    )
+                                    f"Using Discrete GPU Index: {discrete_index} for Dolphin"
                                 )
                                 dolphinGFXSettings.set(
                                     "Hardware", "Adapter", discrete_index
@@ -296,9 +309,7 @@ class DolphinGenerator(Generator):
                                 ).strip()
                                 if integrated_index != "":
                                     eslog.debug(
-                                        "Using Integrated GPU Index: {} for Dolphin".format(
-                                            integrated_index
-                                        )
+                                        f"Using Integrated GPU Index: {integrated_index} for Dolphin"
                                     )
                                     dolphinGFXSettings.set(
                                         "Hardware", "Adapter", integrated_index
@@ -346,7 +357,7 @@ class DolphinGenerator(Generator):
             and len(guns) > 0
             and (
                 not system.isOptSet("dolphin-lightgun-hide-crosshair")
-                or system.getOptBoolean("dolphin-lightgun-hide-crosshair") == True
+                or system.getOptBoolean("dolphin-lightgun-hide-crosshair")
             )
         ):
             # erase what can be set by the option hires_textures
@@ -440,7 +451,7 @@ class DolphinGenerator(Generator):
             dolphinGFXSettings.set("Settings", "InternalResolution", "1")
 
         # VSync
-        if system.isOptSet("vsync") and system.getOptBoolean("vsync") == False:
+        if system.isOptSet("vsync") and not system.getOptBoolean("vsync"):
             dolphinGFXSettings.set("Hardware", "VSync", "False")
         else:
             dolphinGFXSettings.set("Hardware", "VSync", "True")
@@ -545,7 +556,7 @@ class DolphinGenerator(Generator):
         )
         #
         # Write the configuration to the file
-        hotkey_path = "/userdata/system/configs/dolphin-emu/Hotkeys.ini"
+        hotkey_path = Path("/userdata/system/configs/dolphin-emu/Hotkeys.ini")
         with open(hotkey_path, "w") as configfile:
             hotkeyConfig.write(configfile)
 
@@ -582,18 +593,16 @@ class DolphinGenerator(Generator):
             RacConfig.set("Achievements", "Enabled", "False")
             RacConfig.set("Achievements", "AchievementsEnabled", "False")
         # Write the configuration to the file
-        rac_path = "/userdata/system/configs/dolphin-emu/RetroAchievements.ini"
+        rac_path = Path("/userdata/system/configs/dolphin-emu/RetroAchievements.ini")
         with open(rac_path, "w") as rac_configfile:
             RacConfig.write(rac_configfile)
 
         # Update SYSCONF
-        try:
+        with suppress(Exception):
             updateConfig(system.config, DOLPHIN_SYSCONF_PATH, game_resolution)
-        except Exception:
-            pass  # don't fail in case of SYSCONF update
 
         # Check what version we've got
-        if path.isfile(DOLPHIN_BIN_PATH):
+        if Path(DOLPHIN_BIN_PATH).is_file():
             # use the -b 'batch' option for nicer exit
             command_array = [DOLPHIN_BIN_PATH, "-b", "-e", rom]
         else:
@@ -605,7 +614,9 @@ class DolphinGenerator(Generator):
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         dolphinGFXSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinGFXSettings.optionxform = lambda optionstr: str(optionstr)
@@ -618,10 +629,8 @@ class DolphinGenerator(Generator):
         else:
             wii_tv_mode = 0
 
-        try:
+        with suppress(ValueError, TypeError, AttributeError):
             wii_tv_mode = getRatioFromConfig(config, game_resolution)
-        except (ValueError, TypeError, AttributeError):
-            pass
 
         # Auto
         if dolphin_aspect_ratio == "0":
@@ -659,5 +668,4 @@ def getGameCubeLangFromEnvironment():
     }
     if lang in availableLanguages:
         return availableLanguages[lang]
-    else:
-        return availableLanguages["en_US"]
+    return availableLanguages["en_US"]

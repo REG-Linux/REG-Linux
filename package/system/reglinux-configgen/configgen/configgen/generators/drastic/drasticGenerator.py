@@ -1,16 +1,19 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, chdir
+from os import chdir
+from pathlib import Path
 from shutil import copytree
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from .drasticControllers import setDrasticController
+from configgen.generators.Generator import Generator
+
 from .drasticConfig import (
+    DRASTIC_BIN_PATH,
     DRASTIC_CONFIG_DIR,
     DRASTIC_CONFIG_DIR_USER,
     DRASTIC_CONFIG_PATH,
-    DRASTIC_BIN_PATH,
     setDrasticConfig,
 )
+from .drasticControllers import setDrasticController
 
 
 class DrasticGenerator(Generator):
@@ -18,13 +21,13 @@ class DrasticGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create the config directory if it doesn't exist
-        if not path.exists(DRASTIC_CONFIG_DIR_USER):
+        config_user_dir = Path(DRASTIC_CONFIG_DIR_USER)
+        if not config_user_dir.exists():
             copytree(DRASTIC_CONFIG_DIR, DRASTIC_CONFIG_DIR_USER)
 
-        drasticConfig = open(DRASTIC_CONFIG_PATH, "w", encoding="ascii")
-        setDrasticConfig(drasticConfig, system)
-        setDrasticController(drasticConfig)
-        drasticConfig.close()
+        with open(DRASTIC_CONFIG_PATH, "w", encoding="ascii") as drasticConfig:
+            setDrasticConfig(drasticConfig, system)
+            setDrasticController(drasticConfig)
 
         chdir(DRASTIC_CONFIG_DIR_USER)
         command_array = [DRASTIC_BIN_PATH, rom]

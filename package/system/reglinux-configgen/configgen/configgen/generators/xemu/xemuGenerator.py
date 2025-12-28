@@ -1,9 +1,12 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from os import path, makedirs
+from pathlib import Path
 from shutil import copyfile
+from typing import Any
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
-from .xemuConfig import setXemuConfig, XEMU_BIN_PATH, XEMU_CONFIG_PATH, XEMU_SAVES_DIR
+from configgen.generators.Generator import Generator
+
+from .xemuConfig import XEMU_BIN_PATH, XEMU_CONFIG_PATH, XEMU_SAVES_DIR, setXemuConfig
 
 
 class XemuGenerator(Generator):
@@ -15,17 +18,19 @@ class XemuGenerator(Generator):
         setXemuConfig(system, rom, players_controllers, game_resolution)
 
         # copy the hdd if it doesn't exist
-        if not path.exists(XEMU_SAVES_DIR + "/xbox_hdd.qcow2"):
-            if not path.exists(XEMU_SAVES_DIR):
-                makedirs(XEMU_SAVES_DIR)
+        hdd_path = Path(XEMU_SAVES_DIR) / "xbox_hdd.qcow2"
+        if not hdd_path.exists():
+            saves_dir_path = Path(XEMU_SAVES_DIR)
+            if not saves_dir_path.exists():
+                saves_dir_path.mkdir(parents=True, exist_ok=True)
             copyfile(
                 "/usr/share/xemu/data/xbox_hdd.qcow2",
-                XEMU_SAVES_DIR + "/xbox_hdd.qcow2",
+                str(hdd_path),
             )
 
         # the command to run
-        command_array = [XEMU_BIN_PATH]
-        command_array.extend(["-config_path", XEMU_CONFIG_PATH])
+        command_array = [str(XEMU_BIN_PATH)]
+        command_array.extend(["-config_path", str(XEMU_CONFIG_PATH)])
 
         return Command(
             array=command_array,
@@ -36,7 +41,9 @@ class XemuGenerator(Generator):
             },
         )
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
         if ("xemu_scaling" in config and config["xemu_scaling"] == "stretch") or (
             "xemu_aspect" in config and config["xemu_aspect"] == "16x9"
         ):

@@ -1,5 +1,5 @@
-from configgen.generators.Generator import Generator
 from configgen.Command import Command
+from configgen.generators.Generator import Generator
 
 
 class OdcommanderGenerator(Generator):

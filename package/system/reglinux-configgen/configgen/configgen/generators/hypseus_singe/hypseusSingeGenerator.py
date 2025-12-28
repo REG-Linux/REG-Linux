@@ -1,21 +1,24 @@
-from configgen.generators.Generator import Generator
-from configgen.Command import Command
-from typing import Optional, Tuple
 from filecmp import cmp
-from shutil import copyfile, copytree, copy2
-from os import path, walk, mkdir, listdir
+from os import listdir, walk
+from pathlib import Path
+from shutil import copy2, copyfile, copytree
+from typing import Any
+
 from ffmpeg import probe
+
+from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config, guns_borders_size_name
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
 
-DAPHNE_ROM_DIR = ROMS + "/daphne"
-SINGE_ROM_DIR = ROMS + "/singe"
-HYPSEUS_DATA_DIR = CONF + "/hypseus-singe"
+DAPHNE_ROM_DIR = str(Path(ROMS) / "daphne")
+SINGE_ROM_DIR = str(Path(ROMS) / "singe")
+HYPSEUS_DATA_DIR = str(Path(CONF) / "hypseus-singe")
 HYPSEUS_CONFIG_FILE_PATH = "/hypinput.ini"
-HYPSEUS_CONFIG_PATH = HYPSEUS_DATA_DIR + HYPSEUS_CONFIG_FILE_PATH
+HYPSEUS_CONFIG_PATH = str(Path(HYPSEUS_DATA_DIR) / "hypinput.ini")
 HYPSEUS_CONFIG_GAMEPAD_PATH = "/usr/share/hypseus-singe/hypinput_gamepad.ini"
-HYPSEUS_SAVES_DIR = SAVES + "/hypseus"
+HYPSEUS_SAVES_DIR = str(Path(SAVES) / "hypseus")
 HYPSEUS_BIN_PATH = "/usr/bin/hypseus"
 
 
@@ -24,8 +27,8 @@ eslog = get_logger(__name__)
 
 class HypseusSingeGenerator(Generator):
     @staticmethod
-    def find_m2v_from_txt(txt_file):
-        with open(txt_file, "r") as file:
+    def find_m2v_from_txt(txt_file: str) -> str | None:
+        with open(txt_file) as file:
             for line in file:
                 parts = line.strip().split()
                 if parts:
@@ -35,28 +38,26 @@ class HypseusSingeGenerator(Generator):
         return None
 
     @staticmethod
-    def find_file(start_path, filename):
-        if path.exists(path.join(start_path, filename)):
-            return path.join(start_path, filename)
+    def find_file(start_path: str, filename: str) -> str | None:
+        joined_path = Path(start_path) / filename
+        if joined_path.exists():
+            return str(joined_path)
 
-        for root, dirs, files in walk(start_path):
+        for root, _, files in walk(start_path):
             if filename in files:
-                eslog.debug(
-                    "Found m2v file in path - {}".format(path.join(root, filename))
-                )
-                return path.join(root, filename)
+                found_path = Path(root) / filename
+                eslog.debug(f"Found m2v file in path - {str(found_path)}")
+                return str(found_path)
 
         return None
 
     @staticmethod
-    def get_resolution(video_path):
+    def get_resolution(video_path: str) -> Any:
         try:
             # Try to get video information
             probe_video = probe(video_path)
             if not probe_video or "streams" not in probe_video:
-                eslog.debug(
-                    f"Could not parse the video file: {video_path}"
-                )
+                eslog.debug(f"Could not parse the video file: {video_path}")
                 return 0, 0
 
             # Find the video stream
@@ -97,8 +98,15 @@ class HypseusSingeGenerator(Generator):
 
     # Main entry of the module
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
-    ):
+        self,
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: dict[str, int],
+    ) -> Command:
         bezel_to_rom = {
             "ace": ["ace", "ace_a", "ace_a2", "ace91", "ace91_euro", "aceeuro"],
             "astron": ["astron", "astronp"],
@@ -138,37 +146,46 @@ class HypseusSingeGenerator(Generator):
             "spacepirates": ["spacepirates", "spacepirates-hd", "space_pirates_hd"],
         }
 
-        def find_bezel(rom_name):
+        def find_bezel(rom_name: str) -> str | None:
             for bezel, rom_names in bezel_to_rom.items():
                 if rom_name in rom_names:
                     return bezel
             return None
 
-        if not path.isdir(HYPSEUS_DATA_DIR):
-            mkdir(HYPSEUS_DATA_DIR)
-        if not path.exists(HYPSEUS_CONFIG_PATH) or not cmp(
+        hypseus_data_dir_path = Path(HYPSEUS_DATA_DIR)
+        if not hypseus_data_dir_path.is_dir():
+            hypseus_data_dir_path.mkdir(parents=True, exist_ok=True)
+        config_path = Path(HYPSEUS_CONFIG_PATH)
+        if not config_path.exists() or not cmp(
             HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH
         ):
             copyfile(HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH)
 
         # create a custom ini
-        if not path.exists(HYPSEUS_DATA_DIR + "/custom.ini"):
-            copyfile(HYPSEUS_CONFIG_PATH, HYPSEUS_DATA_DIR + "/custom.ini")
+        custom_ini_path = Path(HYPSEUS_DATA_DIR) / "custom.ini"
+        if not custom_ini_path.exists():
+            copyfile(HYPSEUS_CONFIG_PATH, str(custom_ini_path))
 
         # copy required resources to userdata config folder as needed
-        def copy_resources(source_dir, destination_dir):
-            if not path.exists(destination_dir):
+        def copy_resources(source_dir: str, destination_dir: str) -> None:
+            dest_dir_path = Path(destination_dir)
+            if not dest_dir_path.exists():
                 copytree(source_dir, destination_dir)
             else:
+                source_dir_path = Path(source_dir)
                 for item in listdir(source_dir):
-                    source_item = path.join(source_dir, item)
-                    destination_item = path.join(destination_dir, item)
-                    if path.isfile(source_item):
-                        if not path.exists(destination_item) or path.getmtime(
-                            source_item
-                        ) > path.getmtime(destination_item):
+                    source_item = str(source_dir_path / item)
+                    destination_item = str(dest_dir_path / item)
+                    source_item_path = Path(source_item)
+                    destination_item_path = Path(destination_item)
+                    if source_item_path.is_file():
+                        if (
+                            not destination_item_path.exists()
+                            or source_item_path.stat().st_mtime
+                            > destination_item_path.stat().st_mtime
+                        ):
                             copy2(source_item, destination_item)
-                    elif path.isdir(source_item):
+                    elif source_item_path.is_dir():
                         copy_resources(source_item, destination_item)
 
         directories = [
@@ -195,23 +212,23 @@ class HypseusSingeGenerator(Generator):
             copy_resources(directory["source"], directory["destination"])
 
         # extension used .daphne and the file to start the game is in the folder .daphne with the extension .txt
-        romName = path.splitext(path.basename(rom))[0]
-        frameFile = rom + "/" + romName + ".txt"
-        commandsFile = rom + "/" + romName + ".commands"
-        singeFile = rom + "/" + romName + ".singe"
+        romName = Path(rom).stem
+        frameFile = str(Path(rom) / f"{romName}.txt")
+        commandsFile = str(Path(rom) / f"{romName}.commands")
+        singeFile = str(Path(rom) / f"{romName}.singe")
 
         bezelFile = find_bezel(romName.lower())
         if bezelFile is not None:
             bezelFile += ".png"
         else:
             bezelFile = romName.lower() + ".png"
-        bezelPath = HYPSEUS_DATA_DIR + "/bezels/" + bezelFile
+        bezelPath = str(Path(HYPSEUS_DATA_DIR) / "bezels" / bezelFile)
 
         # get the first video file from frameFile to determine the resolution
         m2v_filename = self.find_m2v_from_txt(frameFile)
 
         if m2v_filename:
-            eslog.debug("First .m2v file found: {}".format(m2v_filename))
+            eslog.debug(f"First .m2v file found: {m2v_filename}")
         else:
             eslog.debug("No .m2v files found in the text file.")
 
@@ -219,8 +236,9 @@ class HypseusSingeGenerator(Generator):
         if m2v_filename is not None:
             video_path = rom + "/" + m2v_filename
             # check the path exists
-            if not path.exists(video_path):
-                eslog.debug("Could not find m2v file in path - {}".format(video_path))
+            video_path_obj = Path(video_path)
+            if not video_path_obj.exists():
+                eslog.debug(f"Could not find m2v file in path - {video_path}")
                 video_path = self.find_file(rom, m2v_filename)
         else:
             eslog.debug("m2v file not found, skipping resolution check")
@@ -228,11 +246,9 @@ class HypseusSingeGenerator(Generator):
 
         if video_path is not None:
             video_resolution = self.get_resolution(video_path)
-            eslog.debug("Resolution: {}".format(video_resolution))
+            eslog.debug(f"Resolution: {video_resolution}")
             if video_resolution == (0, 0):
-                eslog.warning(
-                    "Could not determine video resolution, using fallback"
-                )
+                eslog.warning("Could not determine video resolution, using fallback")
         else:
             video_resolution = None
 
@@ -311,7 +327,7 @@ class HypseusSingeGenerator(Generator):
             # Initialize with safe default values
             video_width = 0
             video_height = 0
-            video_resolution: Optional[Tuple[int, int]] = (
+            video_resolution: tuple[int, int] | None = (
                 None  # ensures that the variable always exists
             )
 
@@ -408,14 +424,14 @@ class HypseusSingeGenerator(Generator):
                         )  # this is causing issues on some "non-gun" games
 
         # bezels
-        if (
-            system.isOptSet("hypseus_bezels")
-            and system.getOptBoolean("hypseus_bezels") == False
+        if system.isOptSet("hypseus_bezels") and not system.getOptBoolean(
+            "hypseus_bezels"
         ):
             bezelRequired = False
 
         if bezelRequired:
-            if not path.exists(bezelPath):
+            bezel_path = Path(bezelPath)
+            if not bezel_path.exists():
                 command_array.extend(["-bezel", "default.png"])
             else:
                 command_array.extend(["-bezel", bezelFile])
@@ -467,11 +483,12 @@ class HypseusSingeGenerator(Generator):
             command_array.append("-texturestream")
 
         # The folder may have a file with the game name and .commands with extra arguments to run the game.
-        if path.isfile(commandsFile):
+        commands_file_path = Path(commandsFile)
+        if commands_file_path.is_file():
             try:
-                with open(commandsFile, "r") as f:
+                with open(commandsFile) as f:
                     command_array.extend(f.read().split())
-            except (IOError, OSError) as e:
+            except OSError as e:
                 eslog.error(f"Error reading commands file {commandsFile}: {e}")
 
         # We now use SDL controller config

@@ -1,15 +1,19 @@
-from configgen.generators.Generator import Generator
+from pathlib import Path
+from typing import Any
+from xml.etree.ElementTree import Element, ElementTree, SubElement, parse
+
 from configgen.Command import Command
-from os import path, makedirs
-from xml.etree.ElementTree import Element, SubElement, ElementTree, parse
+from configgen.generators.Generator import Generator
 from configgen.systemFiles import CONF, SAVES
 
-PLAY_CONFIG_DIR = CONF + "/play"
-PLAY_SAVE_DIR = SAVES + "/play"
-PLAY_HOME_DIR = CONF
+PLAY_CONFIG_DIR = str(CONF / "play")
+PLAY_SAVE_DIR = str(SAVES / "play")
+PLAY_HOME_DIR = str(CONF)
 PLAY_BIN_PATH = "/usr/bin/Play"
-PLAY_CONFIG_FILE = PLAY_CONFIG_DIR + "/Play Data Files/config.xml"
-PLAY_INPUT_FILE = PLAY_CONFIG_DIR + "/Play Data Files/inputprofiles/default.xml"
+PLAY_CONFIG_FILE = str(Path(PLAY_CONFIG_DIR) / "Play Data Files" / "config.xml")
+PLAY_INPUT_FILE = str(
+    Path(PLAY_CONFIG_DIR) / "Play Data Files" / "inputprofiles" / "default.xml"
+)
 
 
 class PlayGenerator(Generator):
@@ -21,11 +25,13 @@ class PlayGenerator(Generator):
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
     ):
         # Create config folder
-        if not path.isdir(PLAY_CONFIG_DIR):
-            makedirs(PLAY_CONFIG_DIR)
+        config_dir_path = Path(PLAY_CONFIG_DIR)
+        if not config_dir_path.is_dir():
+            config_dir_path.mkdir(parents=True, exist_ok=True)
         # Create save folder
-        if not path.isdir(PLAY_SAVE_DIR):
-            makedirs(PLAY_SAVE_DIR)
+        save_dir_path = Path(PLAY_SAVE_DIR)
+        if not save_dir_path.is_dir():
+            save_dir_path.mkdir(parents=True, exist_ok=True)
 
         ## Work with the config.xml file
         root = Element("Config")
@@ -52,7 +58,8 @@ class PlayGenerator(Generator):
         }
 
         # Check if the file exists
-        if path.exists(PLAY_CONFIG_FILE):
+        config_file_path = Path(PLAY_CONFIG_FILE)
+        if config_file_path.exists():
             tree = parse(PLAY_CONFIG_FILE)
             root = tree.getroot()
         # Add or update preferences
@@ -94,10 +101,11 @@ class PlayGenerator(Generator):
         tree = ElementTree(root)
 
         # Handle the case when the file doesn't exist
-        if not path.exists(PLAY_CONFIG_FILE):
+        config_file_path = Path(PLAY_CONFIG_FILE)
+        if not config_file_path.exists():
             # Create the directory if it doesn't exist
-            directory = path.dirname(PLAY_CONFIG_FILE)
-            makedirs(directory, exist_ok=True)
+            directory = Path(PLAY_CONFIG_FILE).parent
+            directory.mkdir(parents=True, exist_ok=True)
             # Write the XML to the file
             tree.write(PLAY_CONFIG_FILE)
         else:
@@ -111,18 +119,22 @@ class PlayGenerator(Generator):
             # if zip, it's a namco arcade game
             if rom.lower().endswith("zip"):
                 # strip path & extension
-                rom = path.basename(rom)
-                rom = path.splitext(rom)[0]
+                rom = Path(rom).name
+                rom = Path(rom).stem
                 command_array.extend(["--arcade", rom])
             else:
                 command_array.extend(["--disc", rom])
 
         return Command(array=command_array)
 
-    def get_in_game_ratio(self, config, game_resolution, rom):
-        if "play_widescreen" in config and config["play_widescreen"] == "true":
+    def get_in_game_ratio(
+        self, config: Any, game_resolution: dict[str, int], rom: str
+    ) -> float:
+        if (
+            "play_widescreen" in config
+            and config["play_widescreen"] == "true"
+            or "play_mode" in config
+            and config["play_mode"] == "0"
+        ):
             return 16 / 9
-        elif "play_mode" in config and config["play_mode"] == "0":
-            return 16 / 9
-        else:
-            return 4 / 3
+        return 4 / 3

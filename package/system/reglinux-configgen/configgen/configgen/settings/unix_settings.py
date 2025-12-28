@@ -1,7 +1,8 @@
-from pathlib import Path
 from configparser import ConfigParser
 from io import StringIO
-from typing import Any, Optional, Union, Dict
+from pathlib import Path
+from typing import Any
+
 from configgen.utils.logger import get_logger
 
 
@@ -114,7 +115,7 @@ class UnixSettings:
         if not self.config.has_section(section) and section != "DEFAULT":
             self.config.add_section(section)  # Add section if it doesn't exist
 
-    def set(self, section: str, name: str, value: Union[str, int, float, bool]) -> None:
+    def set(self, section: str, name: str, value: str | int | float | bool) -> None:
         """
         Set a key-value pair in a specific section.
 
@@ -151,7 +152,7 @@ class UnixSettings:
         """
         return self.config.has_option(section, option)
 
-    def load(self, default: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    def load(self, default: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Load the `[DEFAULT]` section into a dictionary.
 
@@ -193,7 +194,7 @@ class UnixSettings:
         """
         return self.write()
 
-    def save(self, name: str, value: Union[str, int, float, bool]) -> None:
+    def save(self, name: str, value: str | int | float | bool) -> None:
         """
         Save a key-value pair in the `[DEFAULT]` section.
 
@@ -227,7 +228,7 @@ class UnixSettings:
         """
         return self.config.has_option("DEFAULT", name)
 
-    def get(self, name: str, default: Optional[Any] = None) -> Optional[Any]:
+    def get(self, name: str, default: Any | None = None) -> Any | None:
         """
         Retrieve a value from the `[DEFAULT]` section.
 
@@ -240,7 +241,7 @@ class UnixSettings:
         """
         return self.config.get("DEFAULT", name, fallback=default)
 
-    def loadAll(self, name: str, includeName: bool = False) -> Dict[str, str]:
+    def loadAll(self, name: str, includeName: bool = False) -> dict[str, str]:
         """
         Load all keys in the `[DEFAULT]` section that start with a given prefix.
 

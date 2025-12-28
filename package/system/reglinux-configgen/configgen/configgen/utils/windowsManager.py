@@ -6,10 +6,12 @@ for gaming and application environments. It handles compositor lifecycle managem
 and proper environment variable configuration for both Wayland and X11 compatibility.
 """
 
-from os import environ, path
+from os import environ
+from pathlib import Path
 from subprocess import Popen, TimeoutExpired, run
 from time import sleep
-from typing import Optional
+from typing import Any
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -26,7 +28,7 @@ class WindowManager:
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(WindowManager, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -35,11 +37,11 @@ class WindowManager:
 
         # Initialize instance attributes
         self.sway_launched = False  # Tracks if Sway compositor is running
-        self.sway_process: Optional[Popen] = None  # Holds the Sway process reference
+        self.sway_process: Popen | None = None  # Holds the Sway process reference
         self.gamescope_launched = False  # Reserved for future Gamescope implementation
         self._initialized = True
 
-    def start_sway(self, generator, system) -> bool:
+    def start_sway(self, generator: Any, system: Any) -> bool:
         """
         Starts the Sway compositor and configures the environment for Wayland/X11.
 
@@ -122,7 +124,7 @@ class WindowManager:
                 self.sway_process.terminate()
             return False
 
-    def stop_sway(self, generator, system) -> bool:
+    def stop_sway(self, generator: Any, system: Any) -> bool:
         """
         Gracefully stops the Sway compositor and cleans up the environment.
 
@@ -179,7 +181,7 @@ class WindowManager:
             return False
 
 
-def start_compositor(generator, system) -> None:
+def start_compositor(generator: Any, system: Any) -> None:
     """
     Starts the appropriate compositor based on system availability.
 
@@ -192,7 +194,7 @@ def start_compositor(generator, system) -> None:
     """
     window_manager = WindowManager()
 
-    if path.exists("/usr/bin/sway"):
+    if Path("/usr/bin/sway").exists():
         if not window_manager.start_sway(generator, system):
             raise RuntimeError(
                 "Failed to start Sway compositor - check logs for details"
@@ -203,7 +205,7 @@ def start_compositor(generator, system) -> None:
     raise RuntimeError("No supported compositor found on this system")
 
 
-def stop_compositor(generator, system) -> None:
+def stop_compositor(generator: Any, system: Any) -> None:
     """
     Stops the currently running compositor.
 

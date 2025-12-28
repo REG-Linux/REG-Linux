@@ -1,9 +1,11 @@
+from typing import Any
+
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
 
 
-def setCgeniusControllers(cgeniusConfig, playersControllers):
+def setCgeniusControllers(cgeniusConfig: Any, playersControllers: Any) -> None:
     CGENIUS_CTRL = {
         "a": "Fire",
         "b": "Jump",
@@ -21,7 +23,7 @@ def setCgeniusControllers(cgeniusConfig, playersControllers):
     # -= Controllers =-
     # Configure the first four controllers
     nplayer = 1
-    for playercontroller, pad in sorted(playersControllers.items()):
+    for _, pad in sorted(playersControllers.items()):
         if nplayer < 4:
             input_num = "input" + str(pad.index)
             if input_num not in cgeniusConfig:
