@@ -88,7 +88,6 @@ de2d82cc83050c996204524a7038a117  package/libfuse3/libfuse3.mk
 b70f19f860a3ada196b5f5257e646b53  package/libglib2/libglib2.mk
 074893afc0f67a5608f44b53ea6c43a2  package/libglvnd/libglvnd.hash
 e11ebaaac3d50a95c01f479baef197f7  package/libglvnd/libglvnd.mk
-bb9248bf84ab097fdf08e43cdd4c0ef5  package/libgtk3/Config.in
 25e2c104ab0d7b1825fa3528fb313d7f  package/libidn2/libidn2.mk
 b5bcf1c3e1f262b4e38d381a73c38137  package/libopenh264/Config.in
 1f52439b441ae3430f948bac269ffe6f  package/libopenh264/libopenh264.mk
