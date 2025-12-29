@@ -1,12 +1,8 @@
----
- drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
 diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
-index 8d97f17ff..307453d98 100644
+index d5cec03eaa8d..0819ed156276 100644
 --- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
 +++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
-@@ -8135,7 +8135,7 @@ void amdgpu_dm_connector_init_helper(struct amdgpu_display_manager *dm,
+@@ -8175,7 +8175,7 @@ void amdgpu_dm_connector_init_helper(struct amdgpu_display_manager *dm,
  	if (!aconnector->mst_root)
  		drm_connector_attach_max_bpc_property(&aconnector->base, 8, 16);
  
@@ -15,5 +11,3 @@ index 8d97f17ff..307453d98 100644
  	aconnector->base.state->max_requested_bpc = aconnector->base.state->max_bpc;
  
  	if (connector_type == DRM_MODE_CONNECTOR_HDMIA) {
--- 
-2.47.1

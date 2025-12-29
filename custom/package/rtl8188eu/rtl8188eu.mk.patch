@@ -1,0 +1,13 @@
+diff --git a/package/rtl8188eu/rtl8188eu.mk b/package/rtl8188eu/rtl8188eu.mk
+index 9c60929d62..5efa5aefec 100644
+--- a/package/rtl8188eu/rtl8188eu.mk
++++ b/package/rtl8188eu/rtl8188eu.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-RTL8188EU_VERSION = f42fc9c45d2086c415dce70d3018031b54a7beef
++RTL8188EU_VERSION = 2ef2819d2d3ef7701a739c66525bca4731c6abbf
+ RTL8188EU_SITE = $(call github,benetti-engineering,rtl8188eu,$(RTL8188EU_VERSION))
+ RTL8188EU_LICENSE = GPL-2.0, proprietary (rtl8188eufw.bin firmware blob)
+ RTL8188EU_LICENSE_FILES = COPYING
