@@ -50,7 +50,7 @@ done
 # Check if the download was successful
 if [ $tries -gt 0 ]; then
     # Array of files to download
-    files=("production.list" "legacy.list" "legacy390.list" "legacy340.list")
+    files=("production.list" "legacy.list")
 
     # Loop through the files and download them
     for file in "${files[@]}"; do

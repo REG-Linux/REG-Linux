@@ -54,6 +54,15 @@ rm -f "${TARGET_DIR}/etc/init.d/S10triggerhappy" || exit 1
 # remove the S40bluetoothd
 rm -f "${TARGET_DIR}/etc/init.d/S40bluetoothd" || exit 1
 
+# drop Vulkan registry data (build-time only)
+rm -rf "${TARGET_DIR}/usr/share/vulkan/registry" || exit 1
+
+# drop MAME history data (UI metadata only)
+rm -rf "${TARGET_DIR}/usr/bin/mame/history" || exit 1
+
+# drop Mesa OpenCL/CLSPV bitcode (OpenCL not enabled in this build)
+rm -rf "${TARGET_DIR}/usr/share/clc" || exit 1
+
 # we want an empty boot directory (grub installation copy some files in the target boot directory)
 rm -rf "${TARGET_DIR}/boot/grub" || exit 1
 
@@ -184,4 +193,3 @@ find system/ \( -type f -o -xtype l \) -mindepth 1 -maxdepth 1 2>/dev/null
 
 rm -f "${TARGET_DIR}/usr/share/reglinux/datainit.squashfs"
 mksquashfs "${TARGET_DIR}/usr/share/reglinux/datainit" "${TARGET_DIR}/usr/share/reglinux/datainit.squashfs" -comp zstd -all-root -no-recovery || exit 1
-
