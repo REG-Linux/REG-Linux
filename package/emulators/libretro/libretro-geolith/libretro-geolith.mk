@@ -4,8 +4,8 @@
 # libretro-geolith
 #
 ################################################################################
-# Version: Commits on Nov 11, 2025
-LIBRETRO_GEOLITH_VERSION = 96b2b5fd4ef9f205bc5e23cb7dbf123e04e13de0
+# Version: Commits on Dec 14, 2025
+LIBRETRO_GEOLITH_VERSION = a137836711bbbd6e279310dc6e91bedc03904016
 LIBRETRO_GEOLITH_SITE = https://github.com/libretro/geolith-libretro.git
 LIBRETRO_GEOLITH_SITE_METHOD = git
 LIBRETRO_GEOLITH_LICENSE = BSD

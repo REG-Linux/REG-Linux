@@ -29,6 +29,7 @@
 --------------------------------  package/mesa3d/0001-meson-Set-proper-value-for-LIBCLC_INCLUDEDIR.patch
 --------------------------------  package/mesa3d/0002-vc4-add-meson-option-to-disable-optional-neon-suppor.patch
 --------------------------------  package/mesa3d/0004-Fix-uClibc-build.patch
+--------------------------------  package/rtl8188eu/0001-Fix-build-with-Linux-6.13.patch
 5eea1ede4288a501e293e3950bb939ad  Makefile
 a28421a9760706d955819e9ce927acbb  arch/Config.in.arm
 27079cca2e6570dffdb72cd5c79cf026  boot/syslinux/syslinux.mk
@@ -157,6 +158,10 @@ a9d1420cc9734b65cbc95471f32631da  package/rockchip-rkbin/rockchip-rkbin.hash
 877a66c23c5a1df8e186f44fa4ff4367  package/rockchip-rkbin/rockchip-rkbin.mk
 b69d8b1eb8ab76b368eb9b6a6b9caee4  package/rpi-firmware/rpi-firmware.hash
 33bd865505be4fcaebe095ff98752d0e  package/rpi-firmware/rpi-firmware.mk
+59935ad1af024bb529bb662f743d3ad4  package/rtl8188eu/rtl8188eu.hash
+6aab056438783a18e99f6876ba398685  package/rtl8188eu/rtl8188eu.mk
+1da7086dbbd922c4e5c056b47f878b87  package/rtl8189fs/rtl8189fs.hash
+68b86a3adc38d5e21edc930ac19330db  package/rtl8189fs/rtl8189fs.mk
 3bfdb1383a94ac2043c32e078a558816  package/rtl8192eu/rtl8192eu.hash
 e67bbd495c642bace7f5dfd78c57a548  package/rtl8192eu/rtl8192eu.mk
 b0e237fcce50eebfb67bdf5a78c753df  package/rust-bin/rust-bin.hash
