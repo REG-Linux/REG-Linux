@@ -24,7 +24,7 @@ def setGzdoomConfig(system: Any, rom: str) -> None:
     if gzdoom_api == "0":
         with open(GZDOOM_ARCH_PATH) as file:
             content = file.read().strip()
-            if content != "x86_64":
+            if content not in ("x86_64", "x86_64_v3"):
                 gzdoom_api = "3"
 
     # now set the config
