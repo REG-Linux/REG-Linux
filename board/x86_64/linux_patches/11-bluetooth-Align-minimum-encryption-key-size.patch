@@ -53,10 +53,10 @@ Cc: stable@vger.kernel.org
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c4c74b82e..6c76ebbf7 100644
+index 3cf0764d5793..7516cdde3373 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -2369,8 +2369,13 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+@@ -2483,8 +2483,13 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
  		return 0;
  	}
  
@@ -73,4 +73,6 @@ index c4c74b82e..6c76ebbf7 100644
  
  	return 1;
 -- 
-2.47.1
+2.20.1
+
+

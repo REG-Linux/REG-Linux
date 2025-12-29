@@ -1,0 +1,13 @@
+diff --git a/package/rtl8189fs/rtl8189fs.mk b/package/rtl8189fs/rtl8189fs.mk
+index 33afb011e1..bfcf27081d 100644
+--- a/package/rtl8189fs/rtl8189fs.mk
++++ b/package/rtl8189fs/rtl8189fs.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-RTL8189FS_VERSION = 94cc959d56c1425fbca4f6e49e949cf58ec5dc8d
++RTL8189FS_VERSION = 0a5d04114fac3c9f48a343cb905fbb6a3f9f5df5
+ RTL8189FS_SITE = $(call github,jwrdegoede,rtl8189ES_linux,$(RTL8189FS_VERSION))
+ RTL8189FS_LICENSE = GPL-2.0
+ 
