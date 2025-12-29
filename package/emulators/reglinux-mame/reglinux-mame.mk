@@ -72,10 +72,10 @@ define REGLINUX_MAME_INSTALL_TARGET_CMDS
 	# copy the prebuilt stuff to rootfs
 	tar --strip-components=5 -xzvf $(@D)/$(REGLINUX_MAME_SOURCE) -C $(TARGET_DIR)
 
-	# remove vgmplay.xml files
-	rm $(TARGET_DIR)/usr/share/lr-mame/hash/vgmplay.xml
+	# remove vgmplay.xml files, symlink hash files
+	rm -Rf $(TARGET_DIR)/usr/share/lr-mame/hash
 	rm $(TARGET_DIR)/usr/bin/mame/hash/vgmplay.xml
-
+	ln -s /usr/bin/mame/hash $(TARGET_DIR)/usr/share/lr-mame/hash
 	# delete the archive from this directory
 	rm $(@D)/$(REGLINUX_MAME_SOURCE)
 

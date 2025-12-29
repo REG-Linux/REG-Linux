@@ -20,6 +20,30 @@ ifneq ($(BR2_x86_64),y)
 else
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/amlogic $(@D)/meson $(@D)/arm $(@D)/rockchip $(@D)/powervr $(@D)/imx $(@D)/nxp $(@D)/qed
     ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ath11k/IPQ*
+    # x86_64 generic: drop server NIC/HBA firmware and capture/pro-audio blobs
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/acenic $(@D)/bnx2 $(@D)/cxgb3 $(@D)/cxgb4 $(@D)/hfi1_* \
+        $(@D)/myricom $(@D)/slicoss $(@D)/sxg $(@D)/tigon $(@D)/tehuti $(@D)/vxge \
+        $(@D)/qlogic $(@D)/ql2100_fw.bin $(@D)/ql2200_fw.bin $(@D)/ql2300_fw.bin \
+        $(@D)/ql2322_fw.bin $(@D)/ql2400_fw.bin $(@D)/ql2500_fw.bin \
+        $(@D)/adaptec $(@D)/advansys $(@D)/isci \
+        $(@D)/dvb* $(@D)/isdbt* $(@D)/tdmb* $(@D)/sms1xxx* $(@D)/v4l-* \
+        $(@D)/as102_* $(@D)/av7110 $(@D)/cpia2 $(@D)/dabusb $(@D)/go7007 $(@D)/s2250* \
+        $(@D)/ttusb-budget $(@D)/usbdux* $(@D)/vicam $(@D)/whiteheat* \
+        $(@D)/emi26 $(@D)/emi62 $(@D)/korg $(@D)/yam $(@D)/yamaha $(@D)/sb16
+    # x86_64 generic: drop older/embedded Wi-Fi families
+    ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/ath6k $(@D)/ath9k_htc $(@D)/carl9170fw \
+        $(@D)/cw1200 $(@D)/libertas $(@D)/mwlwifi $(@D)/mwl8k $(@D)/mrvl $(@D)/rsi \
+        $(@D)/atmel $(@D)/airoha $(@D)/cypress
+    # Optional x86_64 trims (uncomment if you want to reduce size further)
+    # - Enterprise NICs:
+    #   ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/bnxt $(@D)/qed $(@D)/qlogic \
+    #       $(@D)/ql2100_fw.bin $(@D)/ql2200_fw.bin $(@D)/ql2300_fw.bin \
+    #       $(@D)/ql2322_fw.bin $(@D)/ql2400_fw.bin $(@D)/ql2500_fw.bin
+    # - Storage/RAID HBAs:
+    #   ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/mpt* $(@D)/megaraid* $(@D)/lsi* \
+    #       $(@D)/wd* $(@D)/qla* $(@D)/elx* $(@D)/bfa*
+    # - Extra Wi-Fi families (keep ath10k/ath11k/ath12k/iwlwifi/rtw88/rtw89/qca/mediatek):
+    #   ALLLINUXFIRMWARES_REMOVE_FILES += $(@D)/brcm $(@D)/rtlwifi
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MINI),y)
