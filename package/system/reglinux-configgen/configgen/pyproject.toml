@@ -51,6 +51,10 @@ dependencies = [
     # TOML parsing (legacy support and tooling compatibility)
     "toml>=0.10.2",
 
+    # TOML parsing and writing for settings
+    "tomli>=2.0.1",
+    "tomli-w>=1.0.0",
+
     # Image processing (bezels, overlays, resizing, etc.)
     "Pillow>=11.3.0",
 
