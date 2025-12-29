@@ -54,10 +54,14 @@ menu "Audio"
 endmenu
 
 menu "GPU"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/gl4es/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/img-gpu-powervr/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/img-mesa3d/Config.in"
 menu "Vulkan"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/vulkan/glslang/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/vulkan/spirv-cross/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/vulkan/vulkan-utility-libraries/Config.in"
+	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/vulkan/vulkan-validationlayers/Config.in"
 endmenu
 endmenu
 
@@ -439,11 +443,7 @@ menu "GPU"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/nvidia-open-driver/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/nvidia-proprietary-driver/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/nvidia470-legacy-driver/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/vulkan/spirv-cross/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/vulkan/vulkan-utility-libraries/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/vulkan/vulkan-validationlayers/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/batocera-amd/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/gl4es/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/batocera/gpu/nv-codec-headers/Config.in"
 endmenu
 
