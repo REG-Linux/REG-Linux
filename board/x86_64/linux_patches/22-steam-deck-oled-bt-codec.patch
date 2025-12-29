@@ -1,10 +1,5 @@
----
- sound/soc/amd/acp/acp-mach-common.c | 83 +++++++++++++++++++++++++++++
- sound/soc/amd/acp/acp-mach.h        |  3 +-
- 2 files changed, 85 insertions(+), 1 deletion(-)
-
 diff --git a/sound/soc/amd/acp/acp-mach-common.c b/sound/soc/amd/acp/acp-mach-common.c
-index e9ff4815c..413789c90 100644
+index 504d1b8c4c..4fa450dbdc 100644
 --- a/sound/soc/amd/acp/acp-mach-common.c
 +++ b/sound/soc/amd/acp/acp-mach-common.c
 @@ -26,6 +26,7 @@
@@ -15,7 +10,7 @@ index e9ff4815c..413789c90 100644
  #include "acp-mach.h"
  
  #define PCO_PLAT_CLK 48000000
-@@ -1282,6 +1283,78 @@ SND_SOC_DAILINK_DEF(nau8821,
+@@ -1283,6 +1283,78 @@ SND_SOC_DAILINK_DEF(nau8821,
  		    DAILINK_COMP_ARRAY(COMP_CODEC("i2c-NVTN2020:00",
  						  NAU8821_CODEC_DAI)));
  
@@ -94,22 +89,6 @@ index e9ff4815c..413789c90 100644
  /* Declare DMIC codec components */
  SND_SOC_DAILINK_DEF(dmic_codec,
  		DAILINK_COMP_ARRAY(COMP_CODEC("dmic-codec", "dmic-hifi")));
-@@ -1481,6 +1554,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
- 		links[i].platforms = sof_component;
- 		links[i].num_platforms = ARRAY_SIZE(sof_component);
- 		links[i].dpcm_playback = 1;
-+        links[i].dpcm_capture = 1;
- 		links[i].nonatomic = true;
- 		links[i].no_pcm = 1;
- 		if (!drv_data->amp_codec_id) {
-@@ -1513,6 +1587,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
- 		links[i].platforms = sof_component;
- 		links[i].num_platforms = ARRAY_SIZE(sof_component);
- 		links[i].dpcm_playback = 1;
-+        links[i].dpcm_capture = 1;
- 		links[i].nonatomic = true;
- 		links[i].no_pcm = 1;
- 		if (!drv_data->amp_codec_id) {
 @@ -1543,6 +1618,14 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
  			card->codec_conf = rt1019_conf;
  			card->num_configs = ARRAY_SIZE(rt1019_conf);
@@ -126,7 +105,7 @@ index e9ff4815c..413789c90 100644
  	}
  
 diff --git a/sound/soc/amd/acp/acp-mach.h b/sound/soc/amd/acp/acp-mach.h
-index 93d9e3886..d7117ff95 100644
+index a48546d8d4..3b69dfa806 100644
 --- a/sound/soc/amd/acp/acp-mach.h
 +++ b/sound/soc/amd/acp/acp-mach.h
 @@ -27,8 +27,8 @@
@@ -147,5 +126,3 @@ index 93d9e3886..d7117ff95 100644
  	NAU8821,
  	MAX98388,
  	ES83XX,
--- 
-2.47.1
