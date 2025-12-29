@@ -1,6 +1,7 @@
 from pathlib import Path
 from re import MULTILINE, search
 from shutil import copy
+from typing import Any
 
 from configgen.Command import Command
 from configgen.controllers import write_sdl_db_all_controllers
@@ -14,6 +15,7 @@ from .pcsx2Config import (
     PCSX2_PATCHES_PATH,
     PCSX2_SOURCE_PATH,
     configureAudio,
+    getInGameRatio,
     setPcsx2Config,
     setPcsx2Reg,
 )
@@ -27,6 +29,21 @@ class Pcsx2Generator(Generator):
     # TODO check if it works without X (it should)
     def requiresWayland(self):
         return True
+
+    def getInGameRatio(
+        self, config: dict[str, Any], gameResolution: dict[str, Any], rom: str
+    ) -> float:
+        """Calculate the in-game aspect ratio for PCSX2 based on configuration.
+
+        Args:
+            config: Configuration dictionary containing settings
+            gameResolution: Dictionary containing game resolution (width, height)
+            rom: Path to the ROM file being loaded
+
+        Returns:
+            float: The calculated aspect ratio as a fraction (e.g., 4/3, 16/9)
+        """
+        return getInGameRatio(config, gameResolution, rom)
 
     def generate(
         self, system, rom, players_controllers, metadata, guns, wheels, game_resolution

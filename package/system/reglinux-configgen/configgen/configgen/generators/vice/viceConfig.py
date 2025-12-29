@@ -18,7 +18,7 @@ def setViceConfig(system: Any, metadata: Any, guns: Any) -> None:
 
     # Ensure the Version section exists and set the ConfigVersion
     viceConfig.ensure_section("Version")
-    viceConfig.set("Version", "ConfigVersion", "3.9")
+    viceConfig.set("Version", "ConfigVersion", "3.10")
 
     if system.config["core"] == "x64":
         systemCore = "C64"
