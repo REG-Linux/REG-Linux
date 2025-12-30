@@ -1,5 +1,4 @@
 from configparser import ConfigParser
-from json import loads
 from pathlib import Path
 from shutil import copyfile
 from subprocess import CalledProcessError, check_output
@@ -26,28 +25,6 @@ PCSX2_SOURCE_PATH = Path("/usr/share/reglinux/datainit/bios/ps2/patches.zip")
 
 
 eslog = get_logger(__name__)
-
-
-def getInGameRatio(
-    self: Any, config: Any, gameResolution: dict[str, int], rom: str
-) -> float:
-    if getGfxRatioFromConfig(config, gameResolution) == "16:9" or (
-        getGfxRatioFromConfig(config, gameResolution) == "Stretch"
-        and gameResolution["width"] / float(gameResolution["height"])
-        > ((16.0 / 9.0) - 0.1)
-    ):
-        return 16 / 9
-    return 4 / 3
-
-
-def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
-    # 2: 4:3 ; 1: 16:9
-    if "pcsx2_ratio" in config:
-        if config["pcsx2_ratio"] == "16:9":
-            return "16:9"
-        if config["pcsx2_ratio"] == "full":
-            return "Stretch"
-    return "4:3"
 
 
 def setPcsx2Reg():
@@ -78,14 +55,60 @@ def configureAudio():
         f.write("[MIXING]\n")
         f.write("Interpolation=1\n")
         f.write("Disable_Effects=0\n")
-    f.write("[OUTPUT]\n")
-    f.write("Output_Module=SDLAudio\n")
-    f.write("[PORTAUDIO]\n")
-    f.write("HostApi=ALSA\n")
-    f.write("Device=default\n")
-    f.write("[SDL]\n")
-    f.write("HostApi=alsa\n")
-    f.close()
+        f.write("[OUTPUT]\n")
+        f.write("Output_Module=SDLAudio\n")
+        f.write("[PORTAUDIO]\n")
+        f.write("HostApi=ALSA\n")
+        f.write("Device=default\n")
+        f.write("[SDL]\n")
+        f.write("HostApi=alsa\n")
+
+
+# Helper function to set configuration options with default values
+def set_option_with_default(
+    config: ConfigParser,
+    system: Any,
+    section: str,
+    option: str,
+    config_key: str,
+    default_value: str = "false",
+) -> None:
+    """
+    Sets a configuration option with a default value if the option is not set in the system configuration.
+
+    Args:
+        config: The configuration object to set the option on
+        system: The system configuration object
+        section: The section name in the configuration file
+        option: The option name to set
+        config_key: The key in the system configuration to check
+        default_value: The default value to use if the option is not set (default: "false")
+    """
+    if system.isOptSet(config_key):
+        value = system.config[config_key]
+        # For fastboot, we invert the logic (0 disables, 1 enables)
+        if config_key == "pcsx2_fastboot":
+            config.set(section, option, "true" if value != "0" else "false")
+        else:
+            config.set(section, option, value)
+    else:
+        config.set(section, option, default_value)
+
+
+# Helper function to set boolean configuration options
+def set_boolean_option(
+    config: ConfigParser, section: str, option: str, value: str
+) -> None:
+    """
+    Sets a boolean configuration option based on the input value.
+
+    Args:
+        config: The configuration object to set the option on
+        section: The section name in the configuration file
+        option: The option name to set
+        value: The value to convert to boolean ("1" becomes "true", anything else becomes "false")
+    """
+    config.set(section, option, "true" if value == "1" else "false")
 
 
 def setPcsx2Config(
@@ -97,6 +120,18 @@ def setPcsx2Config(
     wheels: Any,
     playingWithWheel: Any,
 ) -> None:
+    """
+    Configures PCSX2 emulator settings based on system configuration.
+
+    Args:
+        system: System configuration object containing settings
+        rom: Path to the ROM file being loaded
+        controllers: Controller configuration data
+        metadata: Metadata about the game
+        guns: Gun configuration data
+        wheels: Wheel configuration data
+        playingWithWheel: Boolean indicating if playing with wheel
+    """
     config_dir = PCSX2_CONFIG_DIR / "inis"
     configFileName = config_dir / "PCSX2.ini"
 
@@ -164,38 +199,43 @@ def setPcsx2Config(
     pcsx2INIConfig.set("EmuCore", "EnableDiscordPresence", "false")
 
     # Fastboot
-    if system.isOptSet("pcsx2_fastboot") and system.config["pcsx2_fastboot"] == "0":
-        pcsx2INIConfig.set("EmuCore", "EnableFastBoot", "true")
+    if system.isOptSet("pcsx2_fastboot"):
+        pcsx2INIConfig.set(
+            "EmuCore",
+            "EnableFastBoot",
+            "true" if system.config["pcsx2_fastboot"] != "0" else "false",
+        )
     else:
         pcsx2INIConfig.set("EmuCore", "EnableFastBoot", "false")
-    # Cheats
-    if system.isOptSet("pcsx2_cheats"):
-        pcsx2INIConfig.set("EmuCore", "EnableCheats", system.config["pcsx2_cheats"])
-    else:
-        pcsx2INIConfig.set("EmuCore", "EnableCheats", "false")
-    # Widescreen Patches
-    if system.isOptSet("pcsx2_EnableWideScreenPatches"):
-        pcsx2INIConfig.set(
-            "EmuCore",
-            "EnableWideScreenPatches",
-            system.config["pcsx2_EnableWideScreenPatches"],
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore", "EnableWideScreenPatches", "false")
-    # No-interlacing Patches
-    if system.isOptSet("pcsx2_interlacing_patches"):
-        pcsx2INIConfig.set(
-            "EmuCore",
-            "EnableNoInterlacingPatches",
-            system.config["pcsx2_interlacing_patches"],
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore", "EnableNoInterlacingPatches", "false")
+
+    # Outras configurações
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore", "EnableCheats", "pcsx2_cheats"
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore",
+        "EnableWideScreenPatches",
+        "pcsx2_EnableWideScreenPatches",
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore",
+        "EnableNoInterlacingPatches",
+        "pcsx2_interlacing_patches",
+    )
 
     ## [Achievements]
     if not pcsx2INIConfig.has_section("Achievements"):
         pcsx2INIConfig.add_section("Achievements")
     pcsx2INIConfig.set("Achievements", "Enabled", "false")
+
+    # Helper function to set boolean configuration options
+    def set_boolean_option(section: str, option: str, value: str) -> None:
+        pcsx2INIConfig.set(section, option, "true" if value == "1" else "false")
+
     if system.isOptSet("retroachievements") and system.getOptBoolean(
         "retroachievements"
     ):
@@ -215,10 +255,10 @@ def setPcsx2Config(
                 eslog.warning(
                     f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]"
                 )
-                pcsx2INIConfig.set("Cheevos", "Enabled", "false")
+                pcsx2INIConfig.set("Achievements", "Enabled", "false")
             else:
                 res.encoding = "utf-8"
-                parsedout = loads(res.json())
+                parsedout = res.json()
                 if not parsedout["Success"]:
                     eslog.warning(
                         f"ERROR: RetroAchievements login failed with ({str(parsedout)})"
@@ -228,24 +268,15 @@ def setPcsx2Config(
                 pcsx2INIConfig.set("Achievements", "Username", username)
                 pcsx2INIConfig.set("Achievements", "Token", token)
                 pcsx2INIConfig.set("Achievements", "LoginTimestamp", str(int(time())))
-                if hardcore == "1":
-                    pcsx2INIConfig.set("Achievements", "ChallengeMode", "true")
-                else:
-                    pcsx2INIConfig.set("Achievements", "ChallengeMode", "false")
-                if indicator == "1":
-                    pcsx2INIConfig.set("Achievements", "PrimedIndicators", "true")
-                else:
-                    pcsx2INIConfig.set("Achievements", "PrimedIndicators", "false")
-                if presence == "1":
-                    pcsx2INIConfig.set("Achievements", "RichPresence", "true")
-                else:
-                    pcsx2INIConfig.set("Achievements", "RichPresence", "false")
-                if leaderbd == "1":
-                    pcsx2INIConfig.set("Achievements", "Leaderboards", "true")
-                else:
-                    pcsx2INIConfig.set("Achievements", "Leaderboards", "false")
+
+                # Using the helper function to set boolean options
+                set_boolean_option("Achievements", "ChallengeMode", hardcore)
+                set_boolean_option("Achievements", "PrimedIndicators", indicator)
+                set_boolean_option("Achievements", "RichPresence", presence)
+                set_boolean_option("Achievements", "Leaderboards", leaderbd)
         except (Exception, ValueError) as e:
             eslog.error(f"ERROR: setting RetroAchievements parameters - {str(e)}")
+
     # set other settings
     pcsx2INIConfig.set("Achievements", "TestMode", "false")
     pcsx2INIConfig.set("Achievements", "UnofficialTestMode", "false")
@@ -324,167 +355,163 @@ def setPcsx2Config(
     except CalledProcessError as e:
         eslog.debug(f"Error checking for Vulkan driver: {e}")
 
-    # Ratio
-    if system.isOptSet("pcsx2_ratio"):
-        pcsx2INIConfig.set("EmuCore/GS", "AspectRatio", system.config["pcsx2_ratio"])
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "AspectRatio", "Auto 4:3/3:2")
-    # Vsync
-    if system.isOptSet("pcsx2_vsync"):
-        pcsx2INIConfig.set("EmuCore/GS", "VsyncEnable", system.config["pcsx2_vsync"])
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "VsyncEnable", "0")
-    # Resolution
-    if system.isOptSet("pcsx2_resolution"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "upscale_multiplier", system.config["pcsx2_resolution"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "upscale_multiplier", "1")
-    # FXAA
-    if system.isOptSet("pcsx2_fxaa"):
-        pcsx2INIConfig.set("EmuCore/GS", "fxaa", system.config["pcsx2_fxaa"])
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "fxaa", "false")
-    # FMV Ratio
-    if system.isOptSet("pcsx2_fmv_ratio"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "FMVAspectRatioSwitch", system.config["pcsx2_fmv_ratio"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "FMVAspectRatioSwitch", "Auto 4:3/3:2")
-    # Mipmapping
-    if system.isOptSet("pcsx2_mipmapping"):
-        pcsx2INIConfig.set("EmuCore/GS", "mipmap_hw", system.config["pcsx2_mipmapping"])
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "mipmap_hw", "-1")
-    # Trilinear Filtering
-    if system.isOptSet("pcsx2_trilinear_filtering"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "TriFilter", system.config["pcsx2_trilinear_filtering"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "TriFilter", "-1")
-    # Anisotropic Filtering
-    if system.isOptSet("pcsx2_anisotropic_filtering"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "MaxAnisotropy", system.config["pcsx2_anisotropic_filtering"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "MaxAnisotropy", "0")
-    # Dithering
-    if system.isOptSet("pcsx2_dithering"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "dithering_ps2", system.config["pcsx2_dithering"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "dithering_ps2", "2")
-    # Texture Preloading
-    if system.isOptSet("pcsx2_texture_loading"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "texture_preloading", system.config["pcsx2_texture_loading"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "texture_preloading", "2")
-    # Deinterlacing
-    if system.isOptSet("pcsx2_deinterlacing"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "deinterlace_mode", system.config["pcsx2_deinterlacing"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "deinterlace_mode", "0")
-    # Anti-Blur
-    if system.isOptSet("pcsx2_blur"):
-        pcsx2INIConfig.set("EmuCore/GS", "pcrtc_antiblur", system.config["pcsx2_blur"])
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "pcrtc_antiblur", "true")
-    # Integer Scaling
-    if system.isOptSet("pcsx2_scaling"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "IntegerScaling", system.config["pcsx2_scaling"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "IntegerScaling", "false")
-    # Blending Accuracy
-    if system.isOptSet("pcsx2_blending"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "accurate_blending_unit", system.config["pcsx2_blending"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "accurate_blending_unit", "1")
-    # Texture Filtering
-    if system.isOptSet("pcsx2_texture_filtering"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "filter", system.config["pcsx2_texture_filtering"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "filter", "2")
-    # Bilinear Filtering
-    if system.isOptSet("pcsx2_bilinear_filtering"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS",
-            "linear_present_mode",
-            system.config["pcsx2_bilinear_filtering"],
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "linear_present_mode", "1")
-    # Load Texture Replacements
-    if system.isOptSet("pcsx2_texture_replacements"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS",
-            "LoadTextureReplacements",
-            system.config["pcsx2_texture_replacements"],
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "LoadTextureReplacements", "false")
-    # OSD messages
-    if system.isOptSet("pcsx2_osd_messages"):
-        pcsx2INIConfig.set(
-            "EmuCore/GS", "OsdShowMessages", system.config["pcsx2_osd_messages"]
-        )
-    else:
-        pcsx2INIConfig.set("EmuCore/GS", "OsdShowMessages", "true")
+    # Configurações de vídeo
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "AspectRatio",
+        "pcsx2_ratio",
+        "Auto 4:3/3:2",
+    )
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore/GS", "VsyncEnable", "pcsx2_vsync", "0"
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "upscale_multiplier",
+        "pcsx2_resolution",
+        "1",
+    )
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore/GS", "fxaa", "pcsx2_fxaa", "false"
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "FMVAspectRatioSwitch",
+        "pcsx2_fmv_ratio",
+        "Auto 4:3/3:2",
+    )
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore/GS", "mipmap_hw", "pcsx2_mipmapping", "-1"
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "TriFilter",
+        "pcsx2_trilinear_filtering",
+        "-1",
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "MaxAnisotropy",
+        "pcsx2_anisotropic_filtering",
+        "0",
+    )
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore/GS", "dithering_ps2", "pcsx2_dithering", "2"
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "texture_preloading",
+        "pcsx2_texture_loading",
+        "2",
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "deinterlace_mode",
+        "pcsx2_deinterlacing",
+        "0",
+    )
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore/GS", "pcrtc_antiblur", "pcsx2_blur", "true"
+    )
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore/GS", "IntegerScaling", "pcsx2_scaling", "false"
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "accurate_blending_unit",
+        "pcsx2_blending",
+        "1",
+    )
+    set_option_with_default(
+        pcsx2INIConfig, system, "EmuCore/GS", "filter", "pcsx2_texture_filtering", "2"
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "linear_present_mode",
+        "pcsx2_bilinear_filtering",
+        "1",
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "LoadTextureReplacements",
+        "pcsx2_texture_replacements",
+        "false",
+    )
+    set_option_with_default(
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "OsdShowMessages",
+        "pcsx2_osd_messages",
+        "true",
+    )
 
     ## [InputSources]
     if not pcsx2INIConfig.has_section("InputSources"):
         pcsx2INIConfig.add_section("InputSources")
 
-    pcsx2INIConfig.set("InputSources", "Keyboard", "true")
-    pcsx2INIConfig.set("InputSources", "Mouse", "true")
-    pcsx2INIConfig.set("InputSources", "SDL", "true")
-    pcsx2INIConfig.set("InputSources", "SDLControllerEnhancedMode", "true")
+    # Define input sources
+    input_sources = {
+        "Keyboard": "true",
+        "Mouse": "true",
+        "SDL": "true",
+        "SDLControllerEnhancedMode": "true",
+    }
+
+    for source, value in input_sources.items():
+        pcsx2INIConfig.set("InputSources", source, value)
 
     ## [Hotkeys]
     if not pcsx2INIConfig.has_section("Hotkeys"):
         pcsx2INIConfig.add_section("Hotkeys")
 
-    pcsx2INIConfig.set("Hotkeys", "ToggleFullscreen", "Keyboard/Alt & Keyboard/Return")
-    pcsx2INIConfig.set("Hotkeys", "CycleAspectRatio", "Keyboard/F6")
-    pcsx2INIConfig.set("Hotkeys", "CycleInterlaceMode", "Keyboard/F5")
-    pcsx2INIConfig.set("Hotkeys", "CycleMipmapMode", "Keyboard/Insert")
-    pcsx2INIConfig.set(
-        "Hotkeys", "GSDumpMultiFrame", "Keyboard/Control & Keyboard/Shift & Keyboard/F8"
-    )
-    pcsx2INIConfig.set("Hotkeys", "Screenshot", "Keyboard/F8")
-    pcsx2INIConfig.set("Hotkeys", "GSDumpSingleFrame", "Keyboard/Shift & Keyboard/F8")
-    pcsx2INIConfig.set("Hotkeys", "ToggleSoftwareRendering", "Keyboard/F9")
-    pcsx2INIConfig.set("Hotkeys", "ZoomIn", "Keyboard/Control & Keyboard/Plus")
-    pcsx2INIConfig.set("Hotkeys", "ZoomOut", "Keyboard/Control & Keyboard/Minus")
-    pcsx2INIConfig.set("Hotkeys", "InputRecToggleMode", "Keyboard/Shift & Keyboard/R")
-    pcsx2INIConfig.set("Hotkeys", "LoadStateFromSlot", "Keyboard/F3")
-    pcsx2INIConfig.set("Hotkeys", "SaveStateToSlot", "Keyboard/F1")
-    pcsx2INIConfig.set("Hotkeys", "NextSaveStateSlot", "Keyboard/F2")
-    pcsx2INIConfig.set(
-        "Hotkeys", "PreviousSaveStateSlot", "Keyboard/Shift & Keyboard/F2"
-    )
-    pcsx2INIConfig.set("Hotkeys", "OpenPauseMenu", "Keyboard/Escape")
-    pcsx2INIConfig.set("Hotkeys", "ToggleFrameLimit", "Keyboard/F4")
-    pcsx2INIConfig.set("Hotkeys", "TogglePause", "Keyboard/Space")
-    pcsx2INIConfig.set(
-        "Hotkeys", "ToggleSlowMotion", "Keyboard/Shift & Keyboard/Backtab"
-    )
-    pcsx2INIConfig.set("Hotkeys", "ToggleTurbo", "Keyboard/Tab")
-    pcsx2INIConfig.set("Hotkeys", "HoldTurbo", "Keyboard/Period")
+    # Define keyboard shortcuts
+    hotkeys = {
+        "ToggleFullscreen": "Keyboard/Alt & Keyboard/Return",
+        "CycleAspectRatio": "Keyboard/F6",
+        "CycleInterlaceMode": "Keyboard/F5",
+        "CycleMipmapMode": "Keyboard/Insert",
+        "GSDumpMultiFrame": "Keyboard/Control & Keyboard/Shift & Keyboard/F8",
+        "Screenshot": "Keyboard/F8",
+        "GSDumpSingleFrame": "Keyboard/Shift & Keyboard/F8",
+        "ToggleSoftwareRendering": "Keyboard/F9",
+        "ZoomIn": "Keyboard/Control & Keyboard/Plus",
+        "ZoomOut": "Keyboard/Control & Keyboard/Minus",
+        "InputRecToggleMode": "Keyboard/Shift & Keyboard/R",
+        "LoadStateFromSlot": "Keyboard/F3",
+        "SaveStateToSlot": "Keyboard/F1",
+        "NextSaveStateSlot": "Keyboard/F2",
+        "PreviousSaveStateSlot": "Keyboard/Shift & Keyboard/F2",
+        "OpenPauseMenu": "Keyboard/Escape",
+        "ToggleFrameLimit": "Keyboard/F4",
+        "TogglePause": "Keyboard/Space",
+        "ToggleSlowMotion": "Keyboard/Shift & Keyboard/Backtab",
+        "ToggleTurbo": "Keyboard/Tab",
+        "HoldTurbo": "Keyboard/Period",
+    }
+
+    for hotkey, value in hotkeys.items():
+        pcsx2INIConfig.set("Hotkeys", hotkey, value)
 
     # clean gun sections
     if (
@@ -775,52 +802,111 @@ def setPcsx2Config(
     if not pcsx2INIConfig.has_section("Pad"):
         pcsx2INIConfig.add_section("Pad")
 
+    # Define multitap settings
     pcsx2INIConfig.set("Pad", "MultitapPort1", "false")
     pcsx2INIConfig.set("Pad", "MultitapPort2", "false")
 
-    # add multitap as needed
-    multiTap = 2
-    joystick_count = len(controllers)
-    eslog.debug(f"Number of Controllers = {joystick_count}")
-    if system.isOptSet("pcsx2_multitap") and system.config["pcsx2_multitap"] == "4":
-        if joystick_count > 2 and joystick_count < 5:
-            pcsx2INIConfig.set("Pad", "MultitapPort1", "true")
-            multiTap = int(system.config["pcsx2_multitap"])
-        elif joystick_count > 4:
-            pcsx2INIConfig.set("Pad", "MultitapPort1", "true")
-            multiTap = 4
-            eslog.debug(
-                "*** You have too many connected controllers for this option, restricting to 4 ***"
-            )
-        else:
-            multiTap = 2
-            eslog.debug(
-                "*** You have the wrong number of connected controllers for this option ***"
-            )
-    elif system.isOptSet("pcsx2_multitap") and system.config["pcsx2_multitap"] == "8":
-        if joystick_count > 4:
-            pcsx2INIConfig.set("Pad", "MultitapPort1", "true")
-            pcsx2INIConfig.set("Pad", "MultitapPort2", "true")
-            multiTap = int(system.config["pcsx2_multitap"])
-        elif joystick_count > 2 and joystick_count < 5:
-            pcsx2INIConfig.set("Pad", "MultitapPort1", "true")
-            multiTap = 4
-            eslog.debug(
-                "*** You don't have enough connected controllers for this option, restricting to 4 ***"
-            )
-        else:
-            multiTap = 2
-            eslog.debug(
-                "*** You don't have enough connected controllers for this option ***"
-            )
-    else:
+    # Function to determine the number of multitaps
+    def get_multitap_config(
+        system: Any, controllers: Any
+    ) -> tuple[int, dict[str, str]]:
         multiTap = 2
+        multitap_settings = {"MultitapPort1": "false", "MultitapPort2": "false"}
+        joystick_count = len(controllers)
+        eslog.debug(f"Number of Controllers = {joystick_count}")
+
+        if system.isOptSet("pcsx2_multitap") and system.config["pcsx2_multitap"] == "4":
+            if joystick_count > 2 and joystick_count < 5:
+                multitap_settings["MultitapPort1"] = "true"
+                multiTap = 4
+            elif joystick_count > 4:
+                multitap_settings["MultitapPort1"] = "true"
+                multiTap = 4
+                eslog.debug(
+                    "*** You have too many connected controllers for this option, restricting to 4 ***"
+                )
+            else:
+                multiTap = 2
+                eslog.debug(
+                    "*** You have the wrong number of connected controllers for this option ***"
+                )
+        elif (
+            system.isOptSet("pcsx2_multitap") and system.config["pcsx2_multitap"] == "8"
+        ):
+            if joystick_count > 4:
+                multitap_settings["MultitapPort1"] = "true"
+                multitap_settings["MultitapPort2"] = "true"
+                multiTap = 8
+            elif joystick_count > 2 and joystick_count < 5:
+                multitap_settings["MultitapPort1"] = "true"
+                multiTap = 4
+                eslog.debug(
+                    "*** You don't have enough connected controllers for this option, restricting to 4 ***"
+                )
+            else:
+                multiTap = 2
+                eslog.debug(
+                    "*** You don't have enough connected controllers for this option ***"
+                )
+
+        return multiTap, multitap_settings
+
+    # Apply multitap settings
+    multiTap, multitap_settings = get_multitap_config(system, controllers)
+    for setting, value in multitap_settings.items():
+        pcsx2INIConfig.set("Pad", setting, value)
 
     # remove the previous [Padx] sections to avoid phantom controllers
     section_names = ["Pad1", "Pad2", "Pad3", "Pad4", "Pad5", "Pad6", "Pad7", "Pad8"]
     for section_name in section_names:
         if pcsx2INIConfig.has_section(section_name):
             pcsx2INIConfig.remove_section(section_name)
+
+    # Default controller settings
+    controller_defaults = {
+        "Type": "DualShock2",
+        "InvertL": "0",
+        "InvertR": "0",
+        "Deadzone": "0",
+        "AxisScale": "1.33",
+        "TriggerDeadzone": "0",
+        "TriggerScale": "1",
+        "LargeMotorScale": "1",
+        "SmallMotorScale": "1",
+        "ButtonDeadzone": "0",
+        "PressureModifier": "0.5",
+    }
+
+    # Button mapping
+    button_mapping = {
+        "Up": "DPadUp",
+        "Right": "DPadRight",
+        "Down": "DPadDown",
+        "Left": "DPadLeft",
+        "Triangle": "Y",
+        "Circle": "B",
+        "Cross": "A",
+        "Square": "X",
+        "Select": "Back",
+        "Start": "Start",
+        "L1": "LeftShoulder",
+        "L2": "+LeftTrigger",
+        "R1": "RightShoulder",
+        "R2": "+RightTrigger",
+        "L3": "LeftStick",
+        "R3": "RightStick",
+        "LUp": "-LeftY",
+        "LRight": "+LeftX",
+        "LDown": "+LeftY",
+        "LLeft": "-LeftX",
+        "RUp": "-RightY",
+        "RRight": "+RightX",
+        "RDown": "+RightY",
+        "RLeft": "-RightX",
+        "Analog": "Guide",
+        "LargeMotor": "LargeMotor",
+        "SmallMotor": "SmallMotor",
+    }
 
     # Now add Controllers
     nplayer = 1
@@ -832,49 +918,18 @@ def setPcsx2Config(
                 # Skip Pad2 in the ini file when MultitapPort1 only
                 pad_index = nplayer + 1
             pad_num = f"Pad{pad_index}"
-            sdl_num = "SDL-" + f"{pad.index}"
+            sdl_num = f"SDL-{pad.index}"
 
             if not pcsx2INIConfig.has_section(pad_num):
                 pcsx2INIConfig.add_section(pad_num)
 
-            pcsx2INIConfig.set(pad_num, "Type", "DualShock2")
-            pcsx2INIConfig.set(pad_num, "InvertL", "0")
-            pcsx2INIConfig.set(pad_num, "InvertR", "0")
-            pcsx2INIConfig.set(pad_num, "Deadzone", "0")
-            pcsx2INIConfig.set(pad_num, "AxisScale", "1.33")
-            pcsx2INIConfig.set(pad_num, "TriggerDeadzone", "0")
-            pcsx2INIConfig.set(pad_num, "TriggerScale", "1")
-            pcsx2INIConfig.set(pad_num, "LargeMotorScale", "1")
-            pcsx2INIConfig.set(pad_num, "SmallMotorScale", "1")
-            pcsx2INIConfig.set(pad_num, "ButtonDeadzone", "0")
-            pcsx2INIConfig.set(pad_num, "PressureModifier", "0.5")
-            pcsx2INIConfig.set(pad_num, "Up", sdl_num + "/DPadUp")
-            pcsx2INIConfig.set(pad_num, "Right", sdl_num + "/DPadRight")
-            pcsx2INIConfig.set(pad_num, "Down", sdl_num + "/DPadDown")
-            pcsx2INIConfig.set(pad_num, "Left", sdl_num + "/DPadLeft")
-            pcsx2INIConfig.set(pad_num, "Triangle", sdl_num + "/Y")
-            pcsx2INIConfig.set(pad_num, "Circle", sdl_num + "/B")
-            pcsx2INIConfig.set(pad_num, "Cross", sdl_num + "/A")
-            pcsx2INIConfig.set(pad_num, "Square", sdl_num + "/X")
-            pcsx2INIConfig.set(pad_num, "Select", sdl_num + "/Back")
-            pcsx2INIConfig.set(pad_num, "Start", sdl_num + "/Start")
-            pcsx2INIConfig.set(pad_num, "L1", sdl_num + "/LeftShoulder")
-            pcsx2INIConfig.set(pad_num, "L2", sdl_num + "/+LeftTrigger")
-            pcsx2INIConfig.set(pad_num, "R1", sdl_num + "/RightShoulder")
-            pcsx2INIConfig.set(pad_num, "R2", sdl_num + "/+RightTrigger")
-            pcsx2INIConfig.set(pad_num, "L3", sdl_num + "/LeftStick")
-            pcsx2INIConfig.set(pad_num, "R3", sdl_num + "/RightStick")
-            pcsx2INIConfig.set(pad_num, "LUp", sdl_num + "/-LeftY")
-            pcsx2INIConfig.set(pad_num, "LRight", sdl_num + "/+LeftX")
-            pcsx2INIConfig.set(pad_num, "LDown", sdl_num + "/+LeftY")
-            pcsx2INIConfig.set(pad_num, "LLeft", sdl_num + "/-LeftX")
-            pcsx2INIConfig.set(pad_num, "RUp", sdl_num + "/-RightY")
-            pcsx2INIConfig.set(pad_num, "RRight", sdl_num + "/+RightX")
-            pcsx2INIConfig.set(pad_num, "RDown", sdl_num + "/+RightY")
-            pcsx2INIConfig.set(pad_num, "RLeft", sdl_num + "/-RightX")
-            pcsx2INIConfig.set(pad_num, "Analog", sdl_num + "/Guide")
-            pcsx2INIConfig.set(pad_num, "LargeMotor", sdl_num + "/LargeMotor")
-            pcsx2INIConfig.set(pad_num, "SmallMotor", sdl_num + "/SmallMotor")
+            # Apply default settings
+            for setting, value in controller_defaults.items():
+                pcsx2INIConfig.set(pad_num, setting, value)
+
+            # Apply button mapping
+            for button, input_name in button_mapping.items():
+                pcsx2INIConfig.set(pad_num, button, f"{sdl_num}/{input_name}")
 
         nplayer += 1
 
@@ -886,3 +941,53 @@ def setPcsx2Config(
 
     with open(configFileName, "w") as configfile:
         pcsx2INIConfig.write(configfile)
+
+
+def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
+    """
+    Maps configuration ratio values to the values used by the ratio calculation function.
+
+    Args:
+        config: Configuration object containing settings
+        gameResolution: Dictionary containing game resolution (width, height)
+
+    Returns:
+        str: The ratio value mapped from the configuration
+    """
+    # Mapping of configuration values to ratio values used in the function
+    if "pcsx2_ratio" in config:
+        ratio_value = config["pcsx2_ratio"]
+        if ratio_value in ["16:9", "16/9"]:
+            return "16:9"
+        if ratio_value in ["full", "stretch", "Stretch"]:
+            return "Stretch"
+        if ratio_value in ["4:3", "4/3"]:
+            return "4:3"
+        if ratio_value in ["16:10", "16/10"]:
+            return "16:10"
+        # Add other values as needed
+    return "4:3"  # Default value
+
+
+def getInGameRatio(
+    config: Any, gameResolution: dict[str, int], rom: str
+) -> float:
+    """
+    Calculates the in-game aspect ratio based on configuration and game resolution.
+
+    Args:
+        config: Configuration object containing settings
+        gameResolution: Dictionary containing game resolution (width, height)
+        rom: Path to the ROM file being loaded
+
+    Returns:
+        float: The calculated aspect ratio as a fraction (e.g., 4/3, 16/9)
+    """
+    ratio_from_config = getGfxRatioFromConfig(config, gameResolution)
+    if ratio_from_config == "16:9" or ratio_from_config == "16:10" or (
+        ratio_from_config == "Stretch"
+        and gameResolution["width"] / float(gameResolution["height"])
+        > ((16.0 / 9.0) - 0.1)
+    ):
+        return 16 / 9
+    return 4 / 3
