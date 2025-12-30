@@ -19,6 +19,7 @@ from .dolphinConfig import (
     getRatioFromConfig,
     updateConfig,
 )
+from .dolphinControllers import generateControllerConfig
 
 eslog = get_logger(__name__)
 
@@ -49,7 +50,9 @@ class DolphinGenerator(Generator):
             saves_dir.mkdir(parents=True, exist_ok=True)
 
         # FIXME Generate the controller config(s)
-        # generateControllerConfig(system, players_controllers, metadata, wheels, rom, guns)
+        generateControllerConfig(
+            system, players_controllers, metadata, wheels, rom, guns
+        )
 
         # [dolphin.ini]
         dolphinSettings = ConfigParser(interpolation=None)
