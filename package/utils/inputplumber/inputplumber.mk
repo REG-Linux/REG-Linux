@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-INPUTPLUMBER_VERSION = v0.66.0
+INPUTPLUMBER_VERSION = v0.70.1
 INPUTPLUMBER_SOURCE = foo-$(INPUTPLUMBER_VERSION).tar.gz
 INPUTPLUMBER_SITE = $(call github,ShadowBlip,InputPlumber,$(INPUTPLUMBER_VERSION))
 INPUTPLUMBER_LICENSE = GPLv3
