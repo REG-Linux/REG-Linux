@@ -83,18 +83,15 @@ def generateControllerConfig_gamecube(
 
 
 def removeControllerConfig_gamecube():
-    configFileName = "{}/{}".format(
-        dolphinTriforceConfig.dolphinTriforceConfig, "Config/GCPadNew.ini"
-    )
+    configFileName = str(Path(dolphinTriforceConfig.dolphinTriforceConfig) / "Config" / "GCPadNew.ini")
     configPath = Path(configFileName)
     if configPath.is_file():
         configPath.unlink()
 
 
 def generateHotkeys(playersControllers: Any) -> None:
-    configFileName = "{}/{}".format(
-        dolphinTriforceConfig.dolphinTriforceConfig, "Config/Hotkeys.ini"
-    )
+    from pathlib import Path
+    configFileName = str(Path(dolphinTriforceConfig.dolphinTriforceConfig) / "Config" / "Hotkeys.ini")
     with codecs.open(configFileName, "w", encoding="utf_8") as f:
         hotkeysMapping = {
             "a": "Keys/Reset",
