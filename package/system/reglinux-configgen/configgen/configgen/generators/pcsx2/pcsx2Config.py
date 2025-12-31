@@ -969,9 +969,7 @@ def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
     return "4:3"  # Default value
 
 
-def getInGameRatio(
-    config: Any, gameResolution: dict[str, int], rom: str
-) -> float:
+def getInGameRatio(config: Any, gameResolution: dict[str, int], rom: str) -> float:
     """
     Calculates the in-game aspect ratio based on configuration and game resolution.
 
@@ -984,10 +982,14 @@ def getInGameRatio(
         float: The calculated aspect ratio as a fraction (e.g., 4/3, 16/9)
     """
     ratio_from_config = getGfxRatioFromConfig(config, gameResolution)
-    if ratio_from_config == "16:9" or ratio_from_config == "16:10" or (
-        ratio_from_config == "Stretch"
-        and gameResolution["width"] / float(gameResolution["height"])
-        > ((16.0 / 9.0) - 0.1)
+    if (
+        ratio_from_config == "16:9"
+        or ratio_from_config == "16:10"
+        or (
+            ratio_from_config == "Stretch"
+            and gameResolution["width"] / float(gameResolution["height"])
+            > ((16.0 / 9.0) - 0.1)
+        )
     ):
         return 16 / 9
     return 4 / 3
