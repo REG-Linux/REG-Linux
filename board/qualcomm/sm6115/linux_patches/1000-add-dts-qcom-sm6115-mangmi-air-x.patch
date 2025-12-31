@@ -1,12 +1,12 @@
-From romain.tisserand@gmail.com Sat Dec 27 03:09:33 2025
-Subject: [PATCH] arm64: dts: qcom: add sm6115 mangmi air x
+From romain.tisserand@gmail.com Tue Dec 30 15:44:06 2025
+Subject: [PATCH] arm64: dts: qcom: add mangmi Air X board
 From: Romain Tisserand <romain.tisserand@gmail.com>
-Date: Sat, 27 Dec 2025 03:09:33 +0100
+Date: Tue, 30 Dec 2025 15:44:06 +0100
 
-Add the initial device tree for the Mangmi Air X (SM6115).
+Add the Mangmi Air X board device tree, including the joystick MCU node.
 
 Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
-
+---
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
 @@ -0,0 +1,956 @@
@@ -611,18 +611,18 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +&uart0 {
 +	current-speed = <1000000>;
 +	joystick_mcu: joystick-mcu {
-+		compatible = "mangmi,joystick-mcu";
++		compatible = "uart,mcu_joystick";
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
 +		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
-+		select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
-+		mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
-+		start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
-+		back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
-+		power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
-+		reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
-+		boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
-+		boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
++		mcu-start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
++		mcu-select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
++		mcu-mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
++		mcu-back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
++		mcu-power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
++		mcu-reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
++		mcu-boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
++		mcu-boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
 +	};
 +};
 +
@@ -634,17 +634,17 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	pinctrl-0 = <&qup_uart4_default>;
 +
 +	joystick_mcu_serdev: joystick-mcu {
-+		compatible = "mangmi,joystick-mcu";
++		compatible = "uart,mcu_joystick";
 +		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
 +		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
-+		select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
-+		mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
-+		start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
-+		back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
-+		power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
-+		reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
-+		boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
-+		boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
++		mcu-start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
++		mcu-select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
++		mcu-mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
++		mcu-back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
++		mcu-power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
++		mcu-reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
++		mcu-boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
++		mcu-boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
 +	};
 +};*/
 +
