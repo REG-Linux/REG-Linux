@@ -12,7 +12,8 @@ class Command:
             array: List of strings representing the command and its arguments.
             env: Dictionary of environment variables. Defaults to None.
         """
-        self.array: list[str] = array
+        # Convert all elements to strings to handle PosixPath objects
+        self.array: list[str] = [str(item) for item in array]
         self.env: dict[str, str] = dict(env) if env is not None else {}
 
     def __str__(self) -> str:
@@ -21,4 +22,6 @@ class Command:
         env_parts = [
             f"{var_name}={var_value}" for var_name, var_value in self.env.items()
         ]
-        return " ".join(env_parts + self.array)
+        # Convert all elements to strings to handle PosixPath objects
+        all_parts = [str(part) for part in (env_parts + self.array)]
+        return " ".join(all_parts)
