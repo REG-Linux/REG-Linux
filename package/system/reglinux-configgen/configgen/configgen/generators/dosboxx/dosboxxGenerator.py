@@ -56,8 +56,9 @@ class DosBoxxGenerator(Generator):
             "c:",
             "-c",
             "dosbox.bat",
-            "-fastbioslogo",
+            "-fastlaunch",
             "-fullscreen",
+            "-nogui",
             f"-conf {DOSBOXX_CONFIG_CUSTOM_PATH}",
         ]
 
