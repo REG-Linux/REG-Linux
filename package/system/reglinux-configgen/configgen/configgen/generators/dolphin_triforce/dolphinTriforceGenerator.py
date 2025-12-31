@@ -6,7 +6,14 @@ from typing import Any
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
 
-from . import dolphinTriforceConfig, dolphinTriforceControllers
+from .dolphinTriforceConfig import (
+    DOLPHIN_TRIFORCE_CONFIG_PATH,
+    DOLPHIN_TRIFORCE_GFX_PATH,
+    DOLPHIN_TRIFORCE_LOG_PATH,
+    DOLPHIN_TRIFORCE_SAVES_DIR,
+    DOLPHIN_TRIFORCE_SETTINGS_DIR,
+)
+from .dolphinTriforceControllers import generateControllerConfig
 
 
 class DolphinTriforceGenerator(Generator):
@@ -24,26 +31,24 @@ class DolphinTriforceGenerator(Generator):
         wheels: Any,
         game_resolution: dict[str, int],
     ) -> Command:
-        ini_path = Path(dolphinTriforceConfig.dolphinTriforceIni)
+        ini_path = Path(DOLPHIN_TRIFORCE_CONFIG_PATH)
         if not ini_path.parent.exists():
             ini_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Dir required for saves
-        saves_path = Path(dolphinTriforceConfig.dolphinTriforceData) / "StateSaves"
+        saves_path = Path(DOLPHIN_TRIFORCE_SAVES_DIR) / "StateSaves"
         if not saves_path.exists():
             saves_path.mkdir(parents=True, exist_ok=True)
 
-        dolphinTriforceControllers.generateControllerConfig(
-            system, players_controllers, rom
-        )
+        generateControllerConfig(system, players_controllers, rom)
 
         ## dolphin.ini ##
 
         dolphinTriforceSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceSettings.optionxform = lambda optionstr: str(optionstr)
-        if Path(dolphinTriforceConfig.dolphinTriforceIni).exists():
-            dolphinTriforceSettings.read(dolphinTriforceConfig.dolphinTriforceIni)
+        if Path(DOLPHIN_TRIFORCE_CONFIG_PATH).exists():
+            dolphinTriforceSettings.read(DOLPHIN_TRIFORCE_CONFIG_PATH)
 
         # Sections
         if not dolphinTriforceSettings.has_section("General"):
@@ -159,7 +164,7 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceSettings.set("Core", "SIDevice0", "11")
 
         # Save dolphin.ini
-        with open(dolphinTriforceConfig.dolphinTriforceIni, "w") as configfile:
+        with open(DOLPHIN_TRIFORCE_CONFIG_PATH, "w") as configfile:
             dolphinTriforceSettings.write(configfile)
 
         ## gfx.ini ##
@@ -167,7 +172,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceGFXSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceGFXSettings.optionxform = lambda optionstr: str(optionstr)
-        dolphinTriforceGFXSettings.read(dolphinTriforceConfig.dolphinTriforceGfxIni)
+        dolphinTriforceGFXSettings.read(DOLPHIN_TRIFORCE_GFX_PATH)
 
         # Add Default Sections
         if not dolphinTriforceGFXSettings.has_section("Settings"):
@@ -289,7 +294,7 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.set("Settings", "MSAA", "0")
 
         # Save gfx.ini
-        with open(dolphinTriforceConfig.dolphinTriforceGfxIni, "w") as configfile:
+        with open(DOLPHIN_TRIFORCE_GFX_PATH, "w") as configfile:
             dolphinTriforceGFXSettings.write(configfile)
 
         ## logger settings ##
@@ -297,7 +302,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceLogSettings = configparser.ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         dolphinTriforceLogSettings.optionxform = lambda optionstr: str(optionstr)
-        dolphinTriforceLogSettings.read(dolphinTriforceConfig.dolphinTriforceLoggerIni)
+        dolphinTriforceLogSettings.read(DOLPHIN_TRIFORCE_LOG_PATH)
 
         # Sections
         if not dolphinTriforceLogSettings.has_section("Logs"):
@@ -307,14 +312,14 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceLogSettings.set("Logs", "DVD", "False")
 
         # Save Logger.ini
-        with open(dolphinTriforceConfig.dolphinTriforceLoggerIni, "w") as configfile:
+        with open(DOLPHIN_TRIFORCE_LOG_PATH, "w") as configfile:
             dolphinTriforceLogSettings.write(configfile)
 
         ## game settings ##
 
         # These cheat files are required to launch Triforce games, and thus should always be present and enabled.
 
-        game_settings_path = Path(dolphinTriforceConfig.dolphinTriforceGameSettings)
+        game_settings_path = Path(DOLPHIN_TRIFORCE_SETTINGS_DIR)
         if not game_settings_path.exists():
             game_settings_path.mkdir(parents=True, exist_ok=True)
 
@@ -514,8 +519,8 @@ $SeatLoopPatch
         # dolphinTriforceGameSettingsGGPE01 = configparser.ConfigParser(interpolation=None, allow_no_value=True,delimiters=';')
         # # To prevent ConfigParser from converting to lower case
         # dolphinTriforceGameSettingsGGPE01.optionxform=lambda optionstr: str(optionstr)
-        # if os.path.exists(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini"):
-        # dolphinTriforceGameSettingsGGPE01.read(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini")
+        # if os.path.exists(DOLPHIN_TRIFORCE_SETTINGS_DIR + "/GGPE01.ini"):
+        # dolphinTriforceGameSettingsGGPE01.read(DOLPHIN_TRIFORCE_SETTINGS_DIR + "/GGPE01.ini")
 
         # # GGPE01 sections
         # if not dolphinTriforceGameSettingsGGPE01.has_section("OnFrame"):
@@ -534,7 +539,7 @@ $SeatLoopPatch
         # dolphinTriforceGameSettingsGGPE01.set("OnFrame_Enabled", "$Emulation Bug Fixes")
 
         # # Save GGPE01.ini
-        # with open(dolphinTriforceConfig.dolphinTriforceGameSettings + "/GGPE01.ini", 'w') as configfile:
+        # with open(DOLPHIN_TRIFORCE_SETTINGS_DIR + "/GGPE01.ini", 'w') as configfile:
         # dolphinTriforceGameSettingsGGPE01.write(configfile)
 
         command_array = [

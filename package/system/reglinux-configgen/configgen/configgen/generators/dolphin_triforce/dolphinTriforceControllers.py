@@ -1,61 +1,50 @@
-import codecs
-import configparser
-import glob
-import re
+from codecs import open
 from pathlib import Path
 from typing import Any
 
 from configgen.utils.logger import get_logger
 
-from . import dolphinTriforceConfig
+from .dolphinTriforceConfig import DOLPHIN_TRIFORCE_CONFIG_DIR
 
 eslog = get_logger(__name__)
 
 
-# Create the controller configuration file
 def generateControllerConfig(system: Any, playersControllers: Any, rom: str) -> None:
-    generateHotkeys(playersControllers)
-    generateControllerConfig_gamecube(
-        system, playersControllers, rom
-    )  # Pass ROM name to allow for per ROM configuration
+    """
+    Generate controller configuration for Triforce controllers.
 
-
-def generateControllerConfig_gamecube(
-    system: Any, playersControllers: Any, rom: str
-) -> None:
-    # Exclude Buttons/Y from mapping as that just resets the system. Buttons/Z is used to insert credit. Therefore it is set to Select.
-    gamecubeMapping = {
-        "y": "Buttons/B",
-        "b": "Buttons/A",
-        "a": "Buttons/X",
-        "select": "Buttons/Z",
+    Args:
+        system: System configuration object
+        playersControllers: Player controllers configuration
+        wheels: Wheel controllers
+        rom: ROM file path
+    """
+    triforce_mapping: dict[str, str | None] = {
+        "b": "Buttons/B",
+        "a": "Buttons/A",
+        "y": "Buttons/Y",
+        "x": "Buttons/X",
+        "rightshoulder": "Buttons/Z",
+        "leftshoulder": None,
         "start": "Buttons/Start",
-        "l2": "Triggers/L",
-        "r2": "Triggers/R",
-        "up": "D-Pad/Up",
-        "down": "D-Pad/Down",
-        "left": "D-Pad/Left",
-        "right": "D-Pad/Right",
-        "joystick1up": "Main Stick/Up",
-        "joystick1left": "Main Stick/Left",
-        "joystick2up": "C-Stick/Up",
-        "joystick2left": "C-Stick/Left",
-        "hotkey": "Buttons/Hotkey",
+        "lefttrigger": "Triggers/L",
+        "righttrigger": "Triggers/R",
+        "dpup": "D-Pad/Up",
+        "dpdown": "D-Pad/Down",
+        "dpleft": "D-Pad/Left",
+        "dpright": "D-Pad/Right",
+        "lefty": "Main Stick/Up",
+        "leftx": "Main Stick/Left",
+        "righty": "C-Stick/Up",
+        "rightx": "C-Stick/Left",
+        "guide": "Buttons/Hotkey",
     }
-    gamecubeReverseAxes = {
+
+    triforce_reverse_axes: dict[str, str] = {
         "Main Stick/Up": "Main Stick/Down",
         "Main Stick/Left": "Main Stick/Right",
         "C-Stick/Up": "C-Stick/Down",
         "C-Stick/Left": "C-Stick/Right",
-    }
-    # If joystick1up is missing on the pad, use up instead, and if l2/r2 is missing, use l1/r1
-    gamecubeReplacements = {
-        "joystick1up": "up",
-        "joystick1left": "left",
-        "joystick1down": "down",
-        "joystick1right": "right",
-        "l2": "pageup",
-        "r2": "pagedown",
     }
 
     # This section allows a per ROM override of the default key options.
@@ -68,48 +57,255 @@ def generateControllerConfig_gamecube(
             while line:
                 entry = "{" + line + "}"
                 res = ast.literal_eval(entry)
-                gamecubeMapping.update(res)
+                triforce_mapping.update(res)
                 line = cconfig.readline()
 
     generateControllerConfig_any(
         system,
         playersControllers,
-        "Config/GCPadNew.ini",
+        "GCPadNew.ini",
         "GCPad",
-        gamecubeMapping,
-        gamecubeReverseAxes,
-        gamecubeReplacements,
+        triforce_mapping,
+        triforce_reverse_axes,
     )
 
 
-def removeControllerConfig_gamecube():
-    configFileName = str(Path(dolphinTriforceConfig.dolphinTriforceConfig) / "Config" / "GCPadNew.ini")
-    configPath = Path(configFileName)
-    if configPath.is_file():
-        configPath.unlink()
+def removeControllerConfig_triforce():
+    """Remove the Triforce controller configuration file."""
+    config_file_path = Path(DOLPHIN_TRIFORCE_CONFIG_DIR) / "Config" / "GCPadNew.ini"
+    if config_file_path.is_file():
+        config_file_path.unlink()
+
+
+def generateControllerConfig_any(
+    system: Any,
+    playersControllers: Any,
+    filename: str,
+    anyDefKey: str,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+) -> None:
+    """
+    Generate controller configuration for any controller type.
+
+    Args:
+        system: System configuration object
+        playersControllers: Player controllers configuration
+        filename: Name of the configuration file
+        anyDefKey: Key for the configuration section
+        anyMapping: Button mapping configuration
+        anyReverseAxes: Reverse axes configuration
+    """
+    import codecs
+
+    from configgen.utils.logger import get_logger
+
+    eslog = get_logger(__name__)
+
+    config_file_path = Path(DOLPHIN_TRIFORCE_CONFIG_DIR) / "Config" / filename
+    with codecs.open(str(config_file_path), "w", encoding="utf_8") as f:
+        eslog.debug(f"Writing controller config to {config_file_path}")
+        nplayer = 1
+
+        # In case of two pads having the same name, dolphin wants a number to handle this
+        double_pads: dict[str, int] = {}
+
+        for _, pad in sorted(playersControllers.items()):
+            # Handle x pads having the same name
+            nsamepad = double_pads.get(pad.name.strip(), 0)
+            double_pads[pad.name.strip()] = nsamepad + 1
+
+            f.write(f"[{anyDefKey}{nplayer}]\n")
+            f.write(f"Device = SDL/{nsamepad}/{pad.name.strip()}\n")
+
+            if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
+                "use_pad_profiles"
+            ):
+                if not generateControllerConfig_any_from_profiles(f, pad, system):
+                    generateControllerConfig_any_auto(
+                        f,
+                        pad,
+                        anyMapping,
+                        anyReverseAxes,
+                        system,
+                        nplayer,
+                        nsamepad,
+                    )
+            else:
+                if pad.dev in []:
+                    generateControllerConfig_wheel(f, pad, nplayer)
+                else:
+                    generateControllerConfig_any_auto(
+                        f,
+                        pad,
+                        anyMapping,
+                        anyReverseAxes,
+                        system,
+                        nplayer,
+                        nsamepad,
+                    )
+
+            nplayer += 1
+
+
+def generateControllerConfig_any_auto(
+    f: Any,
+    pad: Any,
+    anyMapping: Any,
+    anyReverseAxes: Any,
+    system: Any,
+    nplayer: int,
+    nsamepad: int,
+) -> None:
+    """
+    Generate controller configuration automatically based on available inputs.
+
+    Args:
+        f: File object to write the configuration to
+        pad: Controller pad object
+        anyMapping: Button mapping configuration
+        anyReverseAxes: Reverse axes configuration
+        system: System configuration object
+        nplayer: Player number
+        nsamepad: Pad number in case of multiple pads with the same name
+    """
+    # Use the original mapping without replacements
+    current_mapping = anyMapping
+
+    for x in pad.inputs:
+        input = pad.inputs[x]
+        eslog.debug(f"\n ==> Processing input: {input}")
+        keyname = None
+        if input.name in current_mapping:
+            keyname = current_mapping[input.name]
+
+        # Write the configuration for this key
+        if keyname is not None:
+            write_key(
+                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None
+            )
+
+        # Write the 2nd part
+        if input.name in {"lefty", "leftx", "righty", "rightx"} and keyname is not None:
+            write_key(
+                f,
+                anyReverseAxes[keyname],
+                input.type,
+                input.id,
+                input.value,
+                pad.nbaxes,
+                True,
+                None,
+            )
+
+        # Rumble option
+        if system.isOptSet("rumble") and system.getOptBoolean("rumble"):
+            f.write("Rumble/Motor = Weak\n")
+
+
+def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) -> bool:
+    import configparser
+    import glob
+    import re
+
+    from configgen.utils.logger import get_logger
+
+    eslog = get_logger(__name__)
+
+    for profileFile in glob.glob(
+        str(
+            Path(DOLPHIN_TRIFORCE_CONFIG_DIR)
+            / "Config"
+            / "Profiles"
+            / "GCPad"
+            / "*.ini"
+        )
+    ):
+        try:
+            eslog.debug(f"Looking profile : {profileFile}")
+            profileConfig = configparser.ConfigParser(interpolation=None)
+            # To prevent ConfigParser from converting to lower case
+            profileConfig.optionxform = lambda optionstr: str(optionstr)
+            profileConfig.read(profileFile)
+            profileDevice = profileConfig.get("Profile", "Device")
+            eslog.debug(f"Profile device : {profileDevice}")
+
+            deviceVals = re.match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
+            if deviceVals is not None and (
+                deviceVals.group(1) == "SDL"
+                and deviceVals.group(2).strip() == pad.name.strip()
+            ):
+                eslog.debug("Eligible profile device found")
+                for key, val in profileConfig.items("Profile"):
+                    if key != "Device":
+                        f.write(f"{key} = {val}\n")
+                return True
+        except Exception:
+            eslog.error(f"profile {profileFile} : FAILED")
+
+    return False
+
+
+def generateControllerConfig_wheel(f: Any, pad: Any, nplayer: int) -> None:
+    # Placeholder implementation for wheel configuration
+    # This function would handle wheel-specific controller configuration
+    f.write(f"# Wheel configuration for player {nplayer}\n")
+    f.write("Extension = Wheel\n")
+
+
+def write_key(
+    f: Any,
+    keyname: str,
+    input_type: str,
+    input_id: str,
+    input_value: str,
+    input_global_id: str,
+    reverse: bool,
+    hotkey_id: str | None,
+) -> None:
+    f.write(keyname + " = ")
+    if hotkey_id is not None:
+        f.write("`Button " + str(hotkey_id) + "` & ")
+    f.write("`")
+    if input_type == "button":
+        f.write("Button " + str(input_id))
+    elif input_type == "hat":
+        if input_id == "h0.1":  # up
+            f.write("Pad N")
+        elif input_id == "h0.4":  # down
+            f.write("Pad S")
+        elif input_id == "h0.8":  # left
+            f.write("Pad W")
+        elif input_id == "h0.2":  # right
+            f.write("Pad E")
+    elif input_type == "axis":
+        if reverse or "Trigger" in keyname:
+            f.write("Axis " + str(input_id) + "+")
+        else:
+            f.write("Axis " + str(input_id) + "-")
+    f.write("`\n")
 
 
 def generateHotkeys(playersControllers: Any) -> None:
-    from pathlib import Path
-    configFileName = str(Path(dolphinTriforceConfig.dolphinTriforceConfig) / "Config" / "Hotkeys.ini")
-    with codecs.open(configFileName, "w", encoding="utf_8") as f:
+    configFileName = str(Path(DOLPHIN_TRIFORCE_CONFIG_DIR) / "Config" / "Hotkeys.ini")
+    with open(configFileName, "w", encoding="utf_8_sig") as f:
         hotkeysMapping = {
             "a": "Keys/Reset",
             "b": "Keys/Toggle Pause",
             "x": "Keys/Load from selected slot",
             "y": "Keys/Save to selected slot",
-            "r2": None,
+            "triggerright": None,
             "start": "Keys/Exit",
-            "pageup": "Keys/Take Screenshot",
-            "pagedown": "Keys/Toggle 3D Side-by-side",
-            "up": "Keys/Select State Slot 1",
-            "down": "Keys/Select State Slot 2",
-            "left": None,
-            "right": None,
-            "joystick1up": None,
-            "joystick1left": None,
-            "joystick2up": None,
-            "joystick2left": None,
+            "leftshoulder": "Keys/Take Screenshot",
+            "rightshoulder": "Keys/Toggle 3D Side-by-side",
+            "dpup": "Keys/Increase Selected State Slot",
+            "dpdown": "Keys/Decrease Selected State Slot",
+            "dpleft": None,
+            "dpright": None,
+            "lefty": None,
+            "leftx": None,
+            "righty": None,
+            "rightx": None,
         }
 
         nplayer = 1
@@ -120,9 +316,9 @@ def generateHotkeys(playersControllers: Any) -> None:
 
                 # Search the hotkey button
                 hotkey = None
-                if "hotkey" not in pad.inputs:
+                if "guide" not in pad.inputs:
                     return
-                hotkey = pad.inputs["hotkey"]
+                hotkey = pad.inputs["guide"]
                 if hotkey.type != "button":
                     return
 
@@ -145,207 +341,4 @@ def generateHotkeys(playersControllers: Any) -> None:
                             False,
                             hotkey.id,
                         )
-
-                    # else:
-                    #    f.write("# undefined key: name="+input.name+", type="+input.type+", id="+str(input.id)+", value="+str(input.value)+"\n")
-
             nplayer += 1
-
-
-def generateControllerConfig_any(
-    system: Any,
-    playersControllers: Any,
-    filename: str,
-    anyDefKey: str,
-    anyMapping: Any,
-    anyReverseAxes: Any,
-    anyReplacements: Any,
-    extraOptions: dict[str, Any] | None = None,
-) -> None:
-    if extraOptions is None:
-        extraOptions = {}
-
-    configFileName = f"{dolphinTriforceConfig.dolphinTriforceConfig}/{filename}"
-    with codecs.open(configFileName, "w", encoding="utf_8") as f:
-        nplayer = 1
-        nsamepad = 0
-
-        # In case of two pads having the same name, dolphin wants a number to handle this
-        double_pads = {}
-
-        for _, pad in sorted(playersControllers.items()):
-            # Handle x pads having the same name
-            nsamepad = double_pads.get(pad.name.strip(), 0)
-            double_pads[pad.name.strip()] = nsamepad + 1
-
-            f.write("[" + anyDefKey + str(nplayer) + "]" + "\n")
-            f.write(
-                "Device = SDL/" + str(nsamepad).strip() + "/" + pad.name.strip() + "\n"
-            )
-
-            if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
-                "use_pad_profiles"
-            ):
-                if not generateControllerConfig_any_from_profiles(f, pad):
-                    generateControllerConfig_any_auto(
-                        f,
-                        pad,
-                        anyMapping,
-                        anyReverseAxes,
-                        anyReplacements,
-                        extraOptions,
-                        system,
-                    )
-            else:
-                generateControllerConfig_any_auto(
-                    f,
-                    pad,
-                    anyMapping,
-                    anyReverseAxes,
-                    anyReplacements,
-                    extraOptions,
-                    system,
-                )
-
-            nplayer += 1
-
-
-def generateControllerConfig_any_auto(
-    f: Any,
-    pad: Any,
-    anyMapping: Any,
-    anyReverseAxes: Any,
-    anyReplacements: Any,
-    extraOptions: Any,
-    system: Any,
-) -> None:
-    for opt in extraOptions:
-        f.write(opt + " = " + extraOptions[opt] + "\n")
-
-    # Recompute the mapping according to available buttons on the pads and the available replacements
-    currentMapping = anyMapping
-    # Apply replacements
-    if anyReplacements is not None:
-        for x in anyReplacements:
-            if x not in pad.inputs and x in currentMapping:
-                currentMapping[anyReplacements[x]] = currentMapping[x]
-                if x == "joystick1up":
-                    currentMapping[anyReplacements["joystick1down"]] = anyReverseAxes[
-                        currentMapping["joystick1up"]
-                    ]
-                if x == "joystick1left":
-                    currentMapping[anyReplacements["joystick1right"]] = anyReverseAxes[
-                        currentMapping["joystick1left"]
-                    ]
-                if x == "joystick2up":
-                    currentMapping[anyReplacements["joystick2down"]] = anyReverseAxes[
-                        currentMapping["joystick2up"]
-                    ]
-                if x == "joystick2left":
-                    currentMapping[anyReplacements["joystick2right"]] = anyReverseAxes[
-                        currentMapping["joystick2left"]
-                    ]
-
-    for x in pad.inputs:
-        input = pad.inputs[x]
-
-        keyname = None
-        if input.name in currentMapping:
-            keyname = currentMapping[input.name]
-
-        # Write the configuration for this key
-        if keyname is not None:
-            write_key(
-                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None
-            )
-            if "Triggers" in keyname and input.type == "axis":
-                write_key(
-                    f,
-                    keyname + "-Analog",
-                    input.type,
-                    input.id,
-                    input.value,
-                    pad.nbaxes,
-                    False,
-                    None,
-                )
-        # Write the 2nd part
-        if (
-            input.name
-            in {"joystick1up", "joystick1left", "joystick2up", "joystick2left"}
-            and keyname is not None
-        ):
-            write_key(
-                f,
-                anyReverseAxes[keyname],
-                input.type,
-                input.id,
-                input.value,
-                pad.nbaxes,
-                True,
-                None,
-            )
-        # Rumble option
-        if system.isOptSet("rumble") and system.getOptBoolean("rumble"):
-            f.write("Rumble/Motor = Weak\n")
-
-
-def generateControllerConfig_any_from_profiles(f: Any, pad: Any) -> bool:
-    for profileFile in glob.glob(
-        "/userdata/system/configs/dolphin-triforce/Config/Profiles/GCPad/*.ini"
-    ):
-        try:
-            eslog.debug(f"Looking profile : {profileFile}")
-            profileConfig = configparser.ConfigParser(interpolation=None)
-            # To prevent ConfigParser from converting to lower case
-            profileConfig.optionxform = lambda optionstr: str(optionstr)
-            profileConfig.read(profileFile)
-            profileDevice = profileConfig.get("Profile", "Device")
-            eslog.debug(f"Profile device : {profileDevice}")
-
-            deviceVals = re.match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
-            if (
-                deviceVals is not None
-                and deviceVals.group(1) == "SDL"
-                and deviceVals.group(2).strip() == pad.name.strip()
-            ):
-                eslog.debug("Eligible profile device found")
-                for key, val in profileConfig.items("Profile"):
-                    if key != "Device":
-                        f.write(f"{key} = {val}\n")
-                return True
-        except Exception:
-            eslog.error(f"profile {profileFile} : FAILED")
-
-    return False
-
-
-def write_key(
-    f: Any,
-    keyname: str,
-    input_type: str,
-    input_id: str,
-    input_value: str,
-    input_global_id: str,
-    reverse: bool,
-    hotkey_id: str | None,
-) -> None:
-    f.write(keyname + " = ")
-    if hotkey_id is not None:
-        f.write("`Button " + str(hotkey_id) + "` & ")
-    f.write("`")
-    if input_type == "button":
-        f.write("Button " + str(input_id))
-    elif input_type == "hat":
-        if input_value == "1":  # up
-            f.write("Hat 0 N")
-        elif input_value == "4":  # down
-            f.write("Hat 0 S")
-        elif input_value == "8":  # left
-            f.write("Hat 0 W")
-    elif input_type == "axis":
-        if (reverse and input_value == "-1") or (not reverse and input_value == "1"):
-            f.write("Axis " + str(input_id) + "+")
-        else:
-            f.write("Axis " + str(input_id) + "-")
-    f.write("`\n")
