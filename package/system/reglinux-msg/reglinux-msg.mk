@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-# branch blake3 (with iwd support) is default for now
-REGLINUX_MSG_VERSION = c8048e3087705d7eb0f356453aecd9d663bc116f
+# branch: zmq-0.9
+REGLINUX_MSG_VERSION = 4d60bbee9c18c8afb2ed6a7f11ca0f375254438c
 
 ifeq ($(BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE),y)
 
@@ -14,7 +14,7 @@ REGLINUX_MSG_SITE = https://$(REGLINUX_MSG_TOKEN)@github.com/REG-Linux/regmsg
 REGLINUX_MSG_SITE_METHOD = git
 REGLINUX_MSG_LICENSE = MIT
 REGLINUX_MSG_LICENSE_FILES = LICENSE
-REGLINUX_MSG_DEPENDENCIES += libdrm
+REGLINUX_MSG_DEPENDENCIES += libdrm zeromq
 
 RUSTC_TARGET_PROFILE = $(if $(BR2_ENABLE_DEBUG),,release)
 REGLINUX_MSG_LOCATION = target/$(RUSTC_TARGET_NAME)/$(RUSTC_TARGET_PROFILE)
