@@ -1,7 +1,7 @@
-From romain.tisserand@gmail.com Tue Dec 30 20:55:40 2025
+From romain.tisserand@gmail.com Sat, 03 Jan 2026 00:19:19 +0100
 Subject: [PATCH] input: joystick: add mangmi MCU UART driver
 From: Romain Tisserand <romain.tisserand@gmail.com>
-Date: Tue, 30 Dec 2025 20:55:40 +0100
+Date: Sat, 03 Jan 2026 00:19:19 +0100
 
 Port the vendor Mangmi Air X joystick MCU driver to a serdev-based
 implementation and include calibration/sysfs support.
@@ -38,7 +38,12 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +obj-$(CONFIG_JOYSTICK_MANGMI_MCU)	+= mcu_joystick.o
 --- /dev/null
 +++ b/drivers/input/joystick/mcu_joystick.c
-@@ -0,0 +1,1463 @@
+@@ -0,0 +1,1607 @@
++/*
++ * Copyright 2025-2026 REG-Linux (https://reglinux.org)
++ * Copyright 2025-2026 Romain Tisserand <romain.tisserand@gmail.com>
++ */
++
 +#include <linux/types.h>
 +#include <linux/byteorder/little_endian.h>
 +#include <linux/delay.h>
@@ -90,6 +95,8 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +static uint16_t RYmcuValue;
 +
 +static struct mcu_joystick *cali_keys;
++static int rx_log_left_bytes = 64;
++static int __maybe_unused rx_log_left_pkts = 4;
 +
 +enum boot_mode {
 +	main_flash_memory,
@@ -121,24 +128,38 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +{
 +	switch (mode) {
 +	case main_flash_memory:
-+		gpiod_set_value_cansleep(keys->boot0_gpio, 1);
-+		gpiod_set_value_cansleep(keys->boot1_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->boot0_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
 +		break;
 +	case system_memory:
-+		gpiod_set_value_cansleep(keys->boot0_gpio, 0);
-+		gpiod_set_value_cansleep(keys->boot1_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
 +		break;
 +	case on_chip_sram:
-+		gpiod_set_value_cansleep(keys->boot0_gpio, 0);
-+		gpiod_set_value_cansleep(keys->boot1_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->boot1_gpio, 0);
 +		break;
 +	default:
 +		break;
 +	}
 +
-+	gpiod_set_value_cansleep(keys->reset_gpio, 1);
++	gpiod_set_raw_value_cansleep(keys->reset_gpio, 1);
 +	usleep_range(5000, 5100);
-+	gpiod_set_value_cansleep(keys->reset_gpio, 0);
++	gpiod_set_raw_value_cansleep(keys->reset_gpio, 0);
++}
++
++static void mcu_rotate_frame(struct mcu_joystick *keys, const u8 *src, u8 *dst)
++{
++	u8 shift = keys->frame_shift;
++	size_t i;
++
++	if (!shift) {
++		memcpy(dst, src, DPAD_PKT_LEN);
++		return;
++	}
++
++	for (i = 0; i < DPAD_PKT_LEN; i++)
++		dst[i] = src[(i + shift) % DPAD_PKT_LEN];
 +}
 +
 +static void mcu_report_uart_val(struct mcu_joystick *keys,
@@ -170,9 +191,9 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +		return -EINVAL;
 +
 +	if (keys->power_gpio)
-+		gpiod_set_value_cansleep(keys->power_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->power_gpio, 0);
 +	if (keys->stick_en_gpio)
-+		gpiod_set_value_cansleep(keys->stick_en_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->stick_en_gpio, 0);
 +
 +	mcu_resum_flag = false;
 +	dev_dbg(dev, "mcu_joystick is suspended\n");
@@ -187,13 +208,13 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +		return -EINVAL;
 +
 +	if (keys->power_gpio)
-+		gpiod_set_value_cansleep(keys->power_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->power_gpio, 1);
 +	if (keys->stick_en_gpio)
-+		gpiod_set_value_cansleep(keys->stick_en_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->stick_en_gpio, 1);
 +	if (keys->reset_gpio) {
-+		gpiod_set_value_cansleep(keys->reset_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 1);
 +		usleep_range(5000, 5100);
-+		gpiod_set_value_cansleep(keys->reset_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 0);
 +	}
 +
 +	mcu_boot_mode(keys, main_flash_memory);
@@ -219,6 +240,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +static int mcu_joystick_parse_dt(struct device *dev, struct mcu_joystick *keys)
 +{
 +	int ret;
++	u32 frame_shift;
 +
 +	ret = mcu_joystick_get_gpio(dev, &keys->boot0_gpio, "mcu-boot0",
 +				   GPIOD_OUT_LOW);
@@ -264,6 +286,15 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	if (IS_ERR(keys->back_gpio))
 +		return dev_err_probe(dev, PTR_ERR(keys->back_gpio),
 +				     "failed to get mcu-back GPIO\n");
++
++	if (!device_property_read_u32(dev, "mcu-frame-shift", &frame_shift)) {
++		if (frame_shift >= DPAD_PKT_LEN) {
++			dev_warn(dev, "frame-shift %u out of range, clamping\n",
++				 frame_shift);
++			frame_shift %= DPAD_PKT_LEN;
++		}
++		keys->frame_shift = frame_shift;
++	}
 +
 +	return 0;
 +}
@@ -337,6 +368,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +}
 +#endif
 +
++
 +static size_t mcu_joystick_receive_buf(struct serdev_device *serdev,
 +			      const u8 *data, size_t count)
 +{
@@ -349,13 +381,25 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	for (i = 0; i < count; i++) {
 +		u8 byte = data[i];
 +
-+		if (keys->rx_pos == 0 && byte != 0x00)
-+			continue;
++		keys->raw_buf[keys->raw_head++] = byte;
++		if (keys->raw_head >= MCU_RAW_BUF_LEN) {
++			keys->raw_head = 0;
++			keys->raw_full = true;
++		}
++
++		if (rx_log_left_bytes > 0) {
++			dev_info(keys->dev, "mcu rx raw[%d]=0x%02x\n",
++				 64 - rx_log_left_bytes, byte);
++			rx_log_left_bytes--;
++		}
 +
 +		keys->rx_buf[keys->rx_pos++] = byte;
 +
 +		if (keys->rx_pos == DPAD_PKT_LEN) {
-+			mcu_report_uart_val(keys, keys->rx_buf, DPAD_PKT_LEN);
++			mcu_rotate_frame(keys, keys->rx_buf, keys->last_pkt);
++			keys->last_pkt_seq++;
++			keys->last_pkt_valid = true;
++			mcu_report_uart_val(keys, keys->last_pkt, DPAD_PKT_LEN);
 +			keys->rx_pos = 0;
 +		}
 +	}
@@ -383,7 +427,8 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	keys->serdev = serdev;
 +	serdev_device_set_drvdata(serdev, keys);
 +
-+	device_property_read_u32(dev, "current-speed", &baud);
++	if (device_property_read_u32(dev, "current-speed", &baud) && dev->parent)
++		device_property_read_u32(dev->parent, "current-speed", &baud);
 +	keys->baud = baud;
 +
 +	keys->adc_key_code = devm_kcalloc(dev, 4, sizeof(uint32_t), GFP_KERNEL);
@@ -606,7 +651,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	cali_keys->calibration_data.X_cali_center =
 +		(cali_keys->calibration_data.X_cali_max +
 +		 cali_keys->calibration_data.X_cali_min) / 2;
-+	cali_keys->calibration_data.X_offset = 60;
++	cali_keys->calibration_data.X_offset = 150;
 +
 +	cali_keys->linear_data.x_b = 1000;
 +	cali_keys->linear_data.x_a = 0;
@@ -616,7 +661,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	cali_keys->calibration_data.Y_cali_center =
 +		(cali_keys->calibration_data.Y_cali_max +
 +		 cali_keys->calibration_data.Y_cali_min) / 2;
-+	cali_keys->calibration_data.Y_offset = 60;
++	cali_keys->calibration_data.Y_offset = 150;
 +
 +	cali_keys->linear_data.y_b = 1000;
 +	cali_keys->linear_data.y_a = 0;
@@ -626,7 +671,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	cali_keys->calibration_data.Z_cali_center =
 +		(cali_keys->calibration_data.Z_cali_max +
 +		 cali_keys->calibration_data.Z_cali_min) / 2;
-+	cali_keys->calibration_data.Z_offset = 60;
++	cali_keys->calibration_data.Z_offset = 150;
 +
 +	cali_keys->linear_data.z_b = 1000;
 +	cali_keys->linear_data.z_a = 0;
@@ -636,7 +681,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	cali_keys->calibration_data.RZ_cali_center =
 +		(cali_keys->calibration_data.RZ_cali_max +
 +		 cali_keys->calibration_data.RZ_cali_min) / 2;
-+	cali_keys->calibration_data.RZ_offset = 60;
++	cali_keys->calibration_data.RZ_offset = 150;
 +
 +	cali_keys->linear_data.rz_b = 1000;
 +	cali_keys->linear_data.rz_a = 0;
@@ -970,11 +1015,11 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	case ABS_Y:
 +	case ABS_Z:
 +	case ABS_RZ:
-+		input_set_abs_params(input_dev, abs, -32768, 32767, 0, 0);
++		input_set_abs_params(input_dev, abs, -32768, 32767, 64, 256);
 +		break;
 +	case ABS_GAS:
 +	case ABS_BRAKE:
-+		input_set_abs_params(input_dev, abs, 0, 255, 0, 0);
++		input_set_abs_params(input_dev, abs, 0, 255, 4, 8);
 +		break;
 +	case ABS_HAT0X:
 +	case ABS_HAT0Y:
@@ -1126,9 +1171,9 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	int boot1 = 0;
 +
 +	if (keys->boot0_gpio)
-+		boot0 = gpiod_get_value_cansleep(keys->boot0_gpio);
++		boot0 = gpiod_get_raw_value_cansleep(keys->boot0_gpio);
 +	if (keys->boot1_gpio)
-+		boot1 = gpiod_get_value_cansleep(keys->boot1_gpio);
++		boot1 = gpiod_get_raw_value_cansleep(keys->boot1_gpio);
 +
 +	if ((boot1 == 1 && boot0 == 1) || (boot1 == 0 && boot0 == 1)) {
 +		len += snprintf(buf + len, PAGE_SIZE - len,
@@ -1156,31 +1201,31 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	switch (data) {
 +	case 0:
 +		if (keys->stick_en_gpio)
-+			gpiod_set_value_cansleep(keys->stick_en_gpio, 1);
++			gpiod_set_raw_value_cansleep(keys->stick_en_gpio, 1);
 +		if (keys->boot0_gpio)
-+			gpiod_set_value_cansleep(keys->boot0_gpio, 1);
++			gpiod_set_raw_value_cansleep(keys->boot0_gpio, 1);
 +		if (keys->boot1_gpio)
-+			gpiod_set_value_cansleep(keys->boot1_gpio, 1);
++			gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
 +		mcu_isp_flag = false;
 +		break;
 +	case 1:
 +		if (keys->power_gpio)
-+			gpiod_set_value_cansleep(keys->power_gpio, 0);
++			gpiod_set_raw_value_cansleep(keys->power_gpio, 0);
 +		usleep_range(10000, 11000);
 +		if (keys->power_gpio)
-+			gpiod_set_value_cansleep(keys->power_gpio, 1);
++			gpiod_set_raw_value_cansleep(keys->power_gpio, 1);
 +		usleep_range(10000, 11000);
 +		if (keys->boot0_gpio)
-+			gpiod_set_value_cansleep(keys->boot0_gpio, 0);
++			gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
 +		if (keys->boot1_gpio)
-+			gpiod_set_value_cansleep(keys->boot1_gpio, 1);
++			gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
 +		mcu_isp_flag = true;
 +		break;
 +	case 2:
 +		if (keys->boot0_gpio)
-+			gpiod_set_value_cansleep(keys->boot0_gpio, 0);
++			gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
 +		if (keys->boot1_gpio)
-+			gpiod_set_value_cansleep(keys->boot1_gpio, 0);
++			gpiod_set_raw_value_cansleep(keys->boot1_gpio, 0);
 +		mcu_isp_flag = true;
 +		break;
 +	default:
@@ -1188,9 +1233,9 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	}
 +
 +	if (keys->reset_gpio) {
-+		gpiod_set_value_cansleep(keys->reset_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 1);
 +		usleep_range(5000, 5100);
-+		gpiod_set_value_cansleep(keys->reset_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 0);
 +	}
 +
 +	return count;
@@ -1212,6 +1257,101 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	return sprintf(buf, "LT=%d RT=%d\n", LTmcuValue, RTmcuValue);
 +}
 +static DEVICE_ATTR(mcu_trigger_val, 0664, mcu_trigger_val_show, NULL);
++
++static ssize_t mcu_gpio_status_show(struct device *dev,
++				    struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	int boot0 = -1, boot1 = -1, reset = -1, power = -1, stick = -1;
++	int start = -1, select = -1, mode = -1, back = -1;
++
++	if (keys->boot0_gpio)
++		boot0 = gpiod_get_raw_value_cansleep(keys->boot0_gpio);
++	if (keys->boot1_gpio)
++		boot1 = gpiod_get_raw_value_cansleep(keys->boot1_gpio);
++	if (keys->reset_gpio)
++		reset = gpiod_get_raw_value_cansleep(keys->reset_gpio);
++	if (keys->power_gpio)
++		power = gpiod_get_raw_value_cansleep(keys->power_gpio);
++	if (keys->stick_en_gpio)
++		stick = gpiod_get_raw_value_cansleep(keys->stick_en_gpio);
++
++	if (keys->start_gpio)
++		start = gpiod_get_value_cansleep(keys->start_gpio);
++	if (keys->select_gpio)
++		select = gpiod_get_value_cansleep(keys->select_gpio);
++	if (keys->mode_gpio)
++		mode = gpiod_get_value_cansleep(keys->mode_gpio);
++	if (keys->back_gpio)
++		back = gpiod_get_value_cansleep(keys->back_gpio);
++
++	return snprintf(buf, PAGE_SIZE,
++			"boot0=%d boot1=%d reset=%d power=%d stick_en=%d start=%d select=%d mode=%d back=%d\n",
++			boot0, boot1, reset, power, stick, start, select, mode, back);
++}
++static DEVICE_ATTR(gpio_status, 0444, mcu_gpio_status_show, NULL);
++
++static ssize_t mcu_pkt_show(struct device *dev,
++			    struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	if (!keys->last_pkt_valid)
++		return sysfs_emit(buf, "no data\n");
++
++	return sysfs_emit(buf, "seq=%u %*ph\n",
++			  keys->last_pkt_seq, DPAD_PKT_LEN, keys->last_pkt);
++}
++static DEVICE_ATTR(mcu_pkt, 0444, mcu_pkt_show, NULL);
++
++static ssize_t mcu_raw_show(struct device *dev,
++			    struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	size_t head;
++	size_t first;
++	int off;
++
++	if (!keys->raw_full && keys->raw_head == 0)
++		return sysfs_emit(buf, "no data\n");
++
++	if (!keys->raw_full)
++		return sysfs_emit(buf, "%*ph\n", keys->raw_head, keys->raw_buf);
++
++	head = keys->raw_head;
++	if (head == 0)
++		return sysfs_emit(buf, "%*ph\n", MCU_RAW_BUF_LEN, keys->raw_buf);
++
++	first = MCU_RAW_BUF_LEN - head;
++	off = sysfs_emit(buf, "%*ph ", first, keys->raw_buf + head);
++	off += sysfs_emit_at(buf, off, "%*ph\n", head, keys->raw_buf);
++
++	return off;
++}
++static DEVICE_ATTR(mcu_raw, 0444, mcu_raw_show, NULL);
++
++static ssize_t mcu_ids_show(struct device *dev,
++			    struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	int i;
++	int off = 0;
++
++	for (i = 0; i < MCU_ID_COUNT; i++) {
++		if (!keys->id_seen[i])
++			continue;
++
++		off += sysfs_emit_at(buf, off,
++				     "id=0x%02x flags=0x%02x val=0x%04x seen=%u\n",
++				     i, keys->id_flags[i], keys->id_val[i],
++				     keys->id_seen[i]);
++		if (off >= PAGE_SIZE - 64)
++			break;
++	}
++
++	return off;
++}
++static DEVICE_ATTR(mcu_ids, 0444, mcu_ids_show, NULL);
 +
 +static ssize_t mcu_joystick_cali_enable_show(struct device *dev,
 +				    struct device_attribute *attr, char *buf)
@@ -1473,6 +1613,10 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +static struct attribute *mcu_joystick_attributes[] = {
 +	&dev_attr_mcu_stick_val.attr,
 +	&dev_attr_mcu_trigger_val.attr,
++	&dev_attr_gpio_status.attr,
++	&dev_attr_mcu_pkt.attr,
++	&dev_attr_mcu_raw.attr,
++	&dev_attr_mcu_ids.attr,
 +	&dev_attr_boot_set.attr,
 +	&dev_attr_cali_enable.attr,
 +	&dev_attr_joystick_R_Z_cali.attr,
@@ -1500,11 +1644,11 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +}
 +
 +MODULE_DESCRIPTION("MCU joystick driver");
++MODULE_AUTHOR("Romain Tisserand <romain.tisserand@gmail.com>");
 +MODULE_LICENSE("GPL");
-+MODULE_ALIAS("uart:mcu_joystick");
 --- /dev/null
 +++ b/drivers/input/joystick/mcu_joystick.h
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,152 @@
 +#ifndef _MCU_JOYSTICK_H_
 +#define _MCU_JOYSTICK_H_
 +
@@ -1528,6 +1672,9 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +#define mcuIdProduct 0x0428
 +
 +#define DPAD_PKT_LEN 64
++#define MCU_RAW_BUF_LEN 256
++#define MCU_REC_LEN 4
++#define MCU_ID_COUNT 256
 +#define DPAD_GPIO_BTN 1
 +
 +struct joystick_calibration {
@@ -1625,6 +1772,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	struct gpio_desc *back_gpio;
 +	int cali_enable;
 +	bool gpio_irq_enabled;
++	bool uart_report;
 +
 +	struct uart_dpad *dpad;
 +	struct mutex notify_lock;
@@ -1637,6 +1785,17 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	unsigned int baud;
 +	unsigned char rx_buf[DPAD_PKT_LEN];
 +	size_t rx_pos;
++	u8 frame_shift;
++	u8 skip_len;
++	unsigned char last_pkt[DPAD_PKT_LEN];
++	u32 last_pkt_seq;
++	bool last_pkt_valid;
++	unsigned char raw_buf[MCU_RAW_BUF_LEN];
++	u32 raw_head;
++	bool raw_full;
++	u16 id_val[MCU_ID_COUNT];
++	u8 id_flags[MCU_ID_COUNT];
++	u32 id_seen[MCU_ID_COUNT];
 +};
 +
 +extern bool mcu_isp_flag;

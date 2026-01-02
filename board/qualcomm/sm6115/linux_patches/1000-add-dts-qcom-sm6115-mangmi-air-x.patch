@@ -9,7 +9,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 ---
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,956 @@
+@@ -0,0 +1,958 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
 + * Copyright (c) 2025, ROCKNIX
@@ -175,14 +175,14 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +		compatible = "awinic,aw882xx";
 +		reg = <0x34>;
 +		interrupts-extended = <&tlmm 106 IRQ_TYPE_LEVEL_LOW>;
-+		status = "disabled";
++		status = "okay";
 +	};
 +
 +	speaker_amp_right: amplifier@35 {
 +		compatible = "awinic,aw882xx";
 +		reg = <0x35>;
 +		interrupts-extended = <&tlmm 107 IRQ_TYPE_LEVEL_LOW>;
-+		status = "disabled";
++		status = "okay";
 +	};
 +
 +	/* PMIC expander; keep disabled until driver support is wired */
@@ -609,20 +609,21 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +};
 +
 +&uart0 {
-+	current-speed = <1000000>;
++	current-speed = <4000000>;
 +	joystick_mcu: joystick-mcu {
 +		compatible = "uart,mcu_joystick";
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
-+		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
-+		mcu-start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
-+		mcu-select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
-+		mcu-mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
-+		mcu-back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
-+		mcu-power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
++		mcu-frame-shift = <0>;
++		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_LOW>;
++		mcu-start-gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
++		mcu-select-gpios = <&tlmm 24 GPIO_ACTIVE_LOW>;
++		mcu-mode-gpios = <&tlmm 36 GPIO_ACTIVE_LOW>;
++		mcu-back-gpios = <&tlmm 34 GPIO_ACTIVE_LOW>;
++		mcu-power-gpios = <&tlmm 25 GPIO_ACTIVE_LOW>;
 +		mcu-reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
-+		mcu-boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
-+		mcu-boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
++		mcu-boot0-gpios = <&tlmm 27 GPIO_ACTIVE_LOW>;
++		mcu-boot1-gpios = <&tlmm 28 GPIO_ACTIVE_LOW>;
 +	};
 +};
 +
@@ -636,15 +637,15 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	joystick_mcu_serdev: joystick-mcu {
 +		compatible = "uart,mcu_joystick";
 +		pinctrl-0 = <&mcu_ctrl_pins &mcu_key_pins>;
-+		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
-+		mcu-start-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
-+		mcu-select-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
-+		mcu-mode-gpios = <&tlmm 36 GPIO_ACTIVE_HIGH>;
-+		mcu-back-gpios = <&tlmm 34 GPIO_ACTIVE_HIGH>;
-+		mcu-power-gpios = <&tlmm 25 GPIO_ACTIVE_HIGH>;
++		stick-en-gpios = <&tlmm 22 GPIO_ACTIVE_LOW>;
++		mcu-start-gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
++		mcu-select-gpios = <&tlmm 24 GPIO_ACTIVE_LOW>;
++		mcu-mode-gpios = <&tlmm 36 GPIO_ACTIVE_LOW>;
++		mcu-back-gpios = <&tlmm 34 GPIO_ACTIVE_LOW>;
++		mcu-power-gpios = <&tlmm 25 GPIO_ACTIVE_LOW>;
 +		mcu-reset-gpios = <&tlmm 26 GPIO_ACTIVE_LOW>;
-+		mcu-boot0-gpios = <&tlmm 27 GPIO_ACTIVE_HIGH>;
-+		mcu-boot1-gpios = <&tlmm 28 GPIO_ACTIVE_HIGH>;
++		mcu-boot0-gpios = <&tlmm 27 GPIO_ACTIVE_LOW>;
++		mcu-boot1-gpios = <&tlmm 28 GPIO_ACTIVE_LOW>;
 +	};
 +};*/
 +
@@ -695,6 +696,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +};
 +
 +&remoteproc_mpss {
++	firmware-name = "qcom/qrb4210//modem.mbn";
 +	status = "okay";
 +};
 +
