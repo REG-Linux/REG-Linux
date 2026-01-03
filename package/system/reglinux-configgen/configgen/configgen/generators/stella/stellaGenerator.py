@@ -7,7 +7,7 @@ STELLA_BIN_PATH = "/usr/bin/stella"
 
 class StellaGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Launch Stella
         command_array = [STELLA_BIN_PATH, " ", rom]
@@ -16,7 +16,7 @@ class StellaGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

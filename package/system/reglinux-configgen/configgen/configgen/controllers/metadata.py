@@ -52,7 +52,7 @@ def getGamesMetaData(system: Any, rom: str) -> dict[str, Any]:
                                 key = f"{child.tag}_{attribute}"
                                 res[key] = child.get(attribute)
                                 eslog.info(
-                                    f"found game metadata {key}={res[key]} (system level)"
+                                    f"found game metadata {key}={res[key]} (system level)",
                                 )
                         break
                 for nodegame in nodesystem.findall(".//game"):

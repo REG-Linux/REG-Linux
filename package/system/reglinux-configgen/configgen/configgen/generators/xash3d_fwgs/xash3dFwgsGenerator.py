@@ -83,7 +83,7 @@ def _get_arch_suffix():
 
 class Xash3dFwgsGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         game = Path(rom).stem
 
@@ -121,7 +121,7 @@ class Xash3dFwgsGenerator(Generator):
                 "XASH3D_EXTRAS_PAK1": "/usr/share/xash3d/valve/extras.pk3",
                 "LD_LIBRARY_PATH": "/usr/lib/xash3d",
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
+                    players_controllers,
                 ),
             },
         )

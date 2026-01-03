@@ -1,5 +1,4 @@
-"""
-Event Mapper (Evmapy) Module
+"""Event Mapper (Evmapy) Module
 
 This module provides functionality to map gamepad/controller inputs to keyboard events
 for game emulation systems. It handles the configuration and management of input
@@ -26,8 +25,7 @@ eslog = get_logger(__name__)
 
 
 class Evmapy:
-    """
-    Event Mapper class for handling gamepad to keyboard/mouse input mapping.
+    """Event Mapper class for handling gamepad to keyboard/mouse input mapping.
 
     This class manages the process that maps gamepad inputs to keyboard events,
     allowing controllers to be used with games that expect keyboard input.
@@ -45,8 +43,7 @@ class Evmapy:
         players_controllers: dict[str, Any],
         guns: dict[str, Any],
     ) -> None:
-        """
-        Start the evmapy process with the given configuration.
+        """Start the evmapy process with the given configuration.
 
         Args:
             system (str): The game system name (e.g., 'snes', 'nes', 'arcade')
@@ -58,6 +55,7 @@ class Evmapy:
 
         Returns:
             None
+
         """
         if Evmapy.__prepare(system, emulator, core, rom, players_controllers, guns):
             Evmapy.__started = True
@@ -65,11 +63,11 @@ class Evmapy:
 
     @staticmethod
     def stop():
-        """
-        Stop the evmapy process if it's currently running.
+        """Stop the evmapy process if it's currently running.
 
         Returns:
             None
+
         """
         if Evmapy.__started:
             Evmapy.__started = False
@@ -84,8 +82,7 @@ class Evmapy:
         players_controllers: dict[str, Any],
         guns: dict[str, Any],
     ) -> bool:
-        """
-        Prepare evmapy configuration files for the given system and controllers.
+        """Prepare evmapy configuration files for the given system and controllers.
 
         This method searches for configuration files in a specific order of precedence
         and generates the necessary JSON configuration files for each controller.
@@ -107,21 +104,22 @@ class Evmapy:
 
         Returns:
             bool: True if configuration was successfully prepared, False otherwise
+
         """
         # Search for configuration files in order of precedence
         for keysfile in [
             f"{rom}.keys",  # ROM-specific configuration
             f"{rom}/padto.keys",  # Configuration inside ROM directory
             # Commented out more specific configurations for now
-            # str(Path("/userdata/system/configs/evmapy") / "{}.{}.{}.keys".format(system, emulator, core)),
-            # str(Path("/userdata/system/configs/evmapy") / "{}.{}.keys".format(system, emulator)),
+            # str(Path("/userdata/system/configs/evmapy") / f"{system}.{emulator}.{core}.keys"),
+            # str(Path("/userdata/system/configs/evmapy") / f"{system}.{emulator}.keys"),
             str(
-                Path("/userdata/system/configs/evmapy") / f"{system}.keys"
+                Path("/userdata/system/configs/evmapy") / f"{system}.keys",
             ),  # User system config
             # System-wide configurations
-            # str(Path("/usr/share/evmapy") / "{}.{}.{}.keys".format(system, emulator, core)),
+            # str(Path("/usr/share/evmapy") / f"{system}.{emulator}.{core}.keys"),
             str(
-                Path("/usr/share/evmapy") / f"{system}.{emulator}.keys"
+                Path("/usr/share/evmapy") / f"{system}.{emulator}.keys",
             ),  # System+emulator config
             str(Path("/usr/share/evmapy") / f"{system}.keys"),  # Default system config
         ]:
@@ -129,8 +127,8 @@ class Evmapy:
             keysfile_path = Path(keysfile)
             if (
                 (keysfile_path.is_absolute() and keysfile_path.exists())
-                or (not keysfile_path.is_absolute() and Path(keysfile).exists())
-                and not (Path(rom).is_dir() and keysfile == f"{rom}.keys")
+                or ((not keysfile_path.is_absolute() and Path(keysfile).exists())
+                and not (Path(rom).is_dir() and keysfile == f"{rom}.keys"))
             ):
                 eslog.debug(f"evmapy on {keysfile}")
 
@@ -154,10 +152,10 @@ class Evmapy:
                         # Generate configuration file path for this gun
                         configfile = str(
                             Path("/var/run/evmapy")
-                            / f"{Path(guns[gun]['node']).name}.json"
+                            / f"{Path(guns[gun]['node']).name}.json",
                         )
                         eslog.debug(
-                            f"config file for keysfile is {configfile} (from {keysfile}) - gun"
+                            f"config file for keysfile is {configfile} (from {keysfile}) - gun",
                         )
 
                         # Initialize gun configuration structure
@@ -169,7 +167,7 @@ class Evmapy:
                         # Add gun buttons to configuration
                         for button in guns[gun]["buttons"]:
                             padConfig["buttons"].append(
-                                {"name": button, "code": mouseButtonToCode(button)}
+                                {"name": button, "code": mouseButtonToCode(button)},
                             )
                         padConfig["grab"] = False
 
@@ -181,7 +179,7 @@ class Evmapy:
                                 and "target" in action
                             ):
                                 guntrigger = Evmapy.__getGunTrigger(
-                                    action["trigger"], guns[gun]
+                                    action["trigger"], guns[gun],
                                 )
                                 if guntrigger:
                                     newaction = action.copy()
@@ -203,10 +201,10 @@ class Evmapy:
                     if player_action_key in padActionConfig:
                         # Generate configuration file path for this controller
                         configfile = str(
-                            Path("/var/run/evmapy") / f"{Path(pad.dev).name}.json"
+                            Path("/var/run/evmapy") / f"{Path(pad.dev).name}.json",
                         )
                         eslog.debug(
-                            f"config file for keysfile is {configfile} (from {keysfile})"
+                            f"config file for keysfile is {configfile} (from {keysfile})",
                         )
 
                         # Initialize controller configuration structure
@@ -237,7 +235,7 @@ class Evmapy:
                         # Process all inputs from the controller
                         for index in pad.inputs:
                             input_obj = pad.inputs[index].sdl_to_linux_input_event(
-                                guide_equal_back
+                                guide_equal_back,
                             )
                             if input_obj is None:
                                 continue
@@ -254,7 +252,7 @@ class Evmapy:
                                             {
                                                 "name": input_obj["name"],
                                                 "code": int(input_obj["code"]),
-                                            }
+                                            },
                                         )
                                     else:
                                         # Create alias for duplicate button codes
@@ -293,7 +291,7 @@ class Evmapy:
                                             + isYAsInt,  # 16 = HAT0X in linux/input.h
                                             "min": -1,
                                             "max": 1,
-                                        }
+                                        },
                                     )
 
                             elif (
@@ -357,7 +355,7 @@ class Evmapy:
                                     or axisId == "_OTHERS_"
                                 ) and input_obj["code"] is not None:
                                     axisMin, axisMax = Evmapy.__getPadMinMaxAxis(
-                                        pad.dev, int(input_obj["code"])
+                                        pad.dev, int(input_obj["code"]),
                                     )
 
                                     # Add axis virtual buttons (min, max, val)
@@ -379,7 +377,7 @@ class Evmapy:
                                                 "code": int(input_obj["code"]),
                                                 "min": axisMin,
                                                 "max": axisMax,
-                                            }
+                                            },
                                         )
 
                         # Process actions from configuration file
@@ -438,7 +436,7 @@ class Evmapy:
                                 # Set default mode if not specified
                                 if "mode" not in action:
                                     mode = Evmapy.__trigger_mapper_mode(
-                                        action["trigger"]
+                                        action["trigger"],
                                     )
                                     if mode is not None:
                                         action["mode"] = mode
@@ -466,18 +464,17 @@ class Evmapy:
                                                     "ABS_OTHERS_" + val + ":max"
                                                 )
                                         padActionsFiltered.append(action)
-                                else:
-                                    # Single trigger validation
-                                    if trigger in known_buttons_names:
-                                        padActionsFiltered.append(action)
-                                    elif (
-                                        "ABS_OTHERS_" + trigger + ":max"
-                                        in known_buttons_names
-                                    ):
-                                        action["trigger"] = (
-                                            "ABS_OTHERS_" + action["trigger"] + ":max"
-                                        )
-                                        padActionsFiltered.append(action)
+                                # Single trigger validation
+                                elif trigger in known_buttons_names:
+                                    padActionsFiltered.append(action)
+                                elif (
+                                    "ABS_OTHERS_" + trigger + ":max"
+                                    in known_buttons_names
+                                ):
+                                    action["trigger"] = (
+                                        "ABS_OTHERS_" + action["trigger"] + ":max"
+                                    )
+                                    padActionsFiltered.append(action)
 
                         padConfig["actions"] = padActionsFiltered
 
@@ -508,7 +505,7 @@ class Evmapy:
                                 trigger in axis_for_mouse for trigger in axis_triggers
                             ):
                                 min_val, max_val = Evmapy.__getPadMinMaxAxisForKeys(
-                                    axis["min"], axis["max"]
+                                    axis["min"], axis["max"],
                                 )
                                 axis["min"] = min_val
                                 axis["max"] = max_val
@@ -522,7 +519,7 @@ class Evmapy:
 
         # No configuration file found
         eslog.debug(
-            f"no evmapy config file found for system={system}, emulator={emulator}"
+            f"no evmapy config file found for system={system}, emulator={emulator}",
         )
         return False
 
@@ -534,8 +531,7 @@ class Evmapy:
         absbasex_positive: int,
         absbasey_positive: int,
     ) -> str | list[str]:
-        """
-        Map evmapy trigger names to actual controller input names.
+        """Map evmapy trigger names to actual controller input names.
 
         This function translates generic trigger names (like 'up', 'joystick1left')
         to specific controller input names (like 'HAT0Y:max', 'ABS0X:min').
@@ -549,6 +545,7 @@ class Evmapy:
 
         Returns:
             Mapped trigger name(s) - string or list depending on input
+
         """
         if isinstance(trigger, list):
             return [
@@ -577,8 +574,7 @@ class Evmapy:
         absbasex_positive: int,
         absbasey_positive: int,
     ) -> str:
-        """
-        Map a single trigger string to the appropriate controller input name.
+        """Map a single trigger string to the appropriate controller input name.
 
         Args:
             trigger (str): The trigger name to map
@@ -589,6 +585,7 @@ class Evmapy:
 
         Returns:
             str or list: Mapped trigger name(s)
+
         """
         # Standard mapping for analog sticks
         mapping = {
@@ -656,14 +653,14 @@ class Evmapy:
 
     @staticmethod
     def __trigger_mapper_mode(trigger: str | list[str]) -> str | None:
-        """
-        Determine the appropriate mode for a trigger.
+        """Determine the appropriate mode for a trigger.
 
         Args:
             trigger: Trigger name or list of trigger names
 
         Returns:
             str or None: The mode to use for this trigger type
+
         """
         if isinstance(trigger, list):
             for x in trigger:
@@ -675,8 +672,7 @@ class Evmapy:
 
     @staticmethod
     def __trigger_mapper_mode_string(trigger: str) -> str | None:
-        """
-        Determine the mode for a single trigger string.
+        """Determine the mode for a single trigger string.
 
         Analog stick mouse movement should use "any" mode to allow
         movement in any direction without requiring the stick to return
@@ -687,6 +683,7 @@ class Evmapy:
 
         Returns:
             str or None: "any" for analog mouse triggers, None otherwise
+
         """
         if trigger in ["joystick1x", "joystick1y", "joystick2x", "joystick2y"]:
             return "any"
@@ -694,10 +691,9 @@ class Evmapy:
 
     @staticmethod
     def __getGunTrigger(
-        trigger: str | list[str], gun: dict[str, Any]
+        trigger: str | list[str], gun: dict[str, Any],
     ) -> str | list[str] | None:
-        """
-        Validate that gun trigger(s) are available on the specified gun device.
+        """Validate that gun trigger(s) are available on the specified gun device.
 
         Args:
             trigger: Button name or list of button names
@@ -705,6 +701,7 @@ class Evmapy:
 
         Returns:
             The original trigger if valid, None if any button is not available
+
         """
         if isinstance(trigger, list):
             # All buttons in the list must be available
@@ -719,8 +716,7 @@ class Evmapy:
 
     @staticmethod
     def __getPadMinMaxAxis(devicePath: str, axisCode: int) -> tuple[int, int]:
-        """
-        Get the minimum and maximum values for a specific axis on a controller.
+        """Get the minimum and maximum values for a specific axis on a controller.
 
         Args:
             devicePath (str): Path to the controller device (e.g., /dev/input/event0)
@@ -728,6 +724,7 @@ class Evmapy:
 
         Returns:
             tuple: (min_value, max_value) for the axis, or (0, 0) if not found
+
         """
         # Validate input parameters
         if not devicePath or not isinstance(devicePath, str):
@@ -783,8 +780,7 @@ class Evmapy:
 
     @staticmethod
     def __getPadMinMaxAxisForKeys(min_val: int, max_val: int) -> tuple[float, float]:
-        """
-        Calculate adjusted axis range for keyboard key simulation.
+        """Calculate adjusted axis range for keyboard key simulation.
 
         When using analog sticks to simulate key presses (rather than mouse movement),
         we want to use only the middle 50% of the axis range to provide better
@@ -796,6 +792,7 @@ class Evmapy:
 
         Returns:
             tuple: (adjusted_min, adjusted_max) values for key simulation
+
         """
         valrange = (max_val - min_val) / 2  # Range for each side of center
         adjusted_min = min_val + valrange / 2  # 25% in from minimum

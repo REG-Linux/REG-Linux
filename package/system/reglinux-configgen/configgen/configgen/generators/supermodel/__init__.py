@@ -1,5 +1,4 @@
-"""
-Supermodel generator module for REG-Linux
+"""Supermodel generator module for REG-Linux
 This module handles the generation of supermodel emulator configurations.
 """
 

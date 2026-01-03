@@ -1,5 +1,4 @@
-"""
-Window Manager Controller Module
+"""Window Manager Controller Module
 
 This module provides functionality to manage Wayland compositors (primarily Sway)
 for gaming and application environments. It handles compositor lifecycle management
@@ -18,8 +17,7 @@ eslog = get_logger(__name__)
 
 
 class WindowManager:
-    """
-    Manages Wayland compositors (primarily Sway) using the Singleton pattern.
+    """Manages Wayland compositors (primarily Sway) using the Singleton pattern.
     This class centralizes the compositor lifecycle and state management.
     """
 
@@ -42,8 +40,7 @@ class WindowManager:
         self._initialized = True
 
     def start_sway(self, generator: Any, system: Any) -> bool:
-        """
-        Starts the Sway compositor and configures the environment for Wayland/X11.
+        """Starts the Sway compositor and configures the environment for Wayland/X11.
 
         Args:
             generator: An object that may specify X11 requirements (needs requiresX11() method)
@@ -54,8 +51,8 @@ class WindowManager:
 
         Raises:
             SubprocessError: If the Sway process fails to start
-        """
 
+        """
         if self.sway_launched:
             eslog.debug("Sway is already running")
             return True
@@ -71,7 +68,7 @@ class WindowManager:
             )
 
             eslog.debug(
-                "=======>> Sway process started with PID: %d", self.sway_process.pid
+                f"=======>> Sway process started with PID: {self.sway_process.pid}",
             )
 
             # Configure environment variables for Wayland compatibility
@@ -83,7 +80,7 @@ class WindowManager:
                     "SDL_VIDEODRIVER": "wayland",
                     "XDG_SESSION_TYPE": "wayland",
                     "QT_QPA_PLATFORM": "wayland",
-                }
+                },
             )
 
             # Handle X11 fallback if required by the generator
@@ -103,8 +100,7 @@ class WindowManager:
 
             # If we reach here, assume Sway is running
             eslog.debug(
-                "Sway process verification completed successfully after %d attempts",
-                attempt,
+                f"Sway process verification completed successfully after {attempt} attempts",
             )
 
             self.sway_launched = True
@@ -118,15 +114,14 @@ class WindowManager:
             eslog.error("Permission denied when trying to start Sway")
             return False
         except Exception as e:
-            eslog.error(f"Failed to start Sway: {str(e)}")
+            eslog.error(f"Failed to start Sway: {e!s}")
             # Clean up if partial initialization occurred
             if self.sway_process and self.sway_process.poll() is None:
                 self.sway_process.terminate()
             return False
 
     def stop_sway(self, generator: Any, system: Any) -> bool:
-        """
-        Gracefully stops the Sway compositor and cleans up the environment.
+        """Gracefully stops the Sway compositor and cleans up the environment.
 
         Args:
             generator: The same generator object passed to start_sway()
@@ -134,6 +129,7 @@ class WindowManager:
 
         Returns:
             bool: True if Sway stopped successfully, False otherwise
+
         """
         if not self.sway_launched:
             eslog.debug("Sway is not running")
@@ -177,13 +173,12 @@ class WindowManager:
             eslog.error("Timeout while waiting for Sway to exit")
             return False
         except Exception as e:
-            eslog.error(f"Error stopping Sway: {str(e)}")
+            eslog.error(f"Error stopping Sway: {e!s}")
             return False
 
 
 def start_compositor(generator: Any, system: Any) -> None:
-    """
-    Starts the appropriate compositor based on system availability.
+    """Starts the appropriate compositor based on system availability.
 
     Args:
         generator: Object that may specify display requirements
@@ -191,13 +186,14 @@ def start_compositor(generator: Any, system: Any) -> None:
 
     Raises:
         RuntimeError: If no supported compositor is found or fails to start
+
     """
     window_manager = WindowManager()
 
     if Path("/usr/bin/sway").exists():
         if not window_manager.start_sway(generator, system):
             raise RuntimeError(
-                "Failed to start Sway compositor - check logs for details"
+                "Failed to start Sway compositor - check logs for details",
             )
         return
 
@@ -206,8 +202,7 @@ def start_compositor(generator: Any, system: Any) -> None:
 
 
 def stop_compositor(generator: Any, system: Any) -> None:
-    """
-    Stops the currently running compositor.
+    """Stops the currently running compositor.
 
     Args:
         generator: Object that may specify display requirements
@@ -215,13 +210,14 @@ def stop_compositor(generator: Any, system: Any) -> None:
 
     Raises:
         RuntimeError: If compositor fails to stop properly
+
     """
     window_manager = WindowManager()
 
     if window_manager.sway_launched:
         if not window_manager.stop_sway(generator, system):
             raise RuntimeError(
-                "Failed to stop Sway compositor - check logs for details"
+                "Failed to stop Sway compositor - check logs for details",
             )
         return
 

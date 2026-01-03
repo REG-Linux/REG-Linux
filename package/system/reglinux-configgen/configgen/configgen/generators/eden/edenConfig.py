@@ -52,7 +52,7 @@ def setEdenConfig(edenConfig: Any, system: Any) -> None:
     edenConfig.set("UI", "Screenshots\\enable_screenshot_save_as", "true")
     edenConfig.set("UI", "Screenshots\\enable_screenshot_save_as\\default", "false")
     edenConfig.set(
-        "UI", "Screenshots\\screenshot_path", str(Path("/userdata/screenshots"))
+        "UI", "Screenshots\\screenshot_path", str(Path("/userdata/screenshots")),
     )
     edenConfig.set("UI", "Screenshots\\screenshot_path\\default", "false")
 
@@ -132,17 +132,17 @@ def setEdenConfig(edenConfig: Any, system: Any) -> None:
         if system.config["eden_backend"] == "1":
             try:
                 have_vulkan = check_output(
-                    ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+                    ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
                 ).strip()
                 if have_vulkan == "true":
                     eslog.debug("Vulkan driver is available on the system.")
                     try:
                         have_discrete = check_output(
-                            ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                            ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
                         ).strip()
                         if have_discrete == "true":
                             eslog.debug(
-                                "A discrete GPU is available on the system. We will use that for performance"
+                                "A discrete GPU is available on the system. We will use that for performance",
                             )
                             try:
                                 discrete_index = check_output(
@@ -151,27 +151,27 @@ def setEdenConfig(edenConfig: Any, system: Any) -> None:
                                 ).strip()
                                 if discrete_index != "":
                                     eslog.debug(
-                                        f"Using Discrete GPU Index: {discrete_index} for eden"
+                                        f"Using Discrete GPU Index: {discrete_index} for eden",
                                     )
                                     edenConfig.set(
-                                        "Renderer", "vulkan_device", discrete_index
+                                        "Renderer", "vulkan_device", discrete_index,
                                     )
                                     edenConfig.set(
-                                        "Renderer", "vulkan_device\\default", "true"
+                                        "Renderer", "vulkan_device\\default", "true",
                                     )
                                 else:
                                     eslog.debug(
-                                        "Couldn't get discrete GPU index, using default"
+                                        "Couldn't get discrete GPU index, using default",
                                     )
                                     edenConfig.set("Renderer", "vulkan_device", "0")
                                     edenConfig.set(
-                                        "Renderer", "vulkan_device\\default", "true"
+                                        "Renderer", "vulkan_device\\default", "true",
                                     )
                             except CalledProcessError:
                                 eslog.debug("Error getting discrete GPU index")
                         else:
                             eslog.debug(
-                                "Discrete GPU is not available on the system. Using default."
+                                "Discrete GPU is not available on the system. Using default.",
                             )
                             edenConfig.set("Renderer", "vulkan_device", "0")
                             edenConfig.set("Renderer", "vulkan_device\\default", "true")
@@ -197,7 +197,7 @@ def setEdenConfig(edenConfig: Any, system: Any) -> None:
     # Assembly shaders
     if system.isOptSet("eden_shaderbackend"):
         edenConfig.set(
-            "Renderer", "shader_backend", system.config["eden_shaderbackend"]
+            "Renderer", "shader_backend", system.config["eden_shaderbackend"],
         )
     else:
         edenConfig.set("Renderer", "shader_backend", "0")
@@ -259,7 +259,7 @@ def setEdenConfig(edenConfig: Any, system: Any) -> None:
     # Anti aliasing method
     if system.isOptSet("eden_aliasing_method"):
         edenConfig.set(
-            "Renderer", "anti_aliasing", system.config["eden_aliasing_method"]
+            "Renderer", "anti_aliasing", system.config["eden_aliasing_method"],
         )
     else:
         edenConfig.set("Renderer", "anti_aliasing", "0")

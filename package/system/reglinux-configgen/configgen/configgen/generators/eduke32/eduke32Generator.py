@@ -10,7 +10,7 @@ from configgen.utils.buildargs import parse_args
 
 class EDuke32Generator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Core is either eduke32 or fury
         core = system.config["core"]
@@ -60,7 +60,7 @@ class EDuke32Generator(Generator):
                 f'bind "F12" "screenshot"\n'
                 f'screenshot_dir "{SCREENSHOTS}"\n'
                 f'r_showfps "{1 if system.getOptBoolean("showFPS") else 0}"\n'
-                f"echo REG-Linux\n"  # Easy check when debugging
+                f"echo REG-Linux\n",  # Easy check when debugging
             )
         command_array = [
             core,
@@ -79,7 +79,7 @@ class EDuke32Generator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

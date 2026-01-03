@@ -17,8 +17,7 @@ def generateControllerConfig_wii(
     rom: str,
     guns: Any,
 ) -> None:
-    """
-    Create the Wii controller configuration file based on the system and game settings.
+    """Create the Wii controller configuration file based on the system and game settings.
 
     Args:
         system: System configuration object
@@ -27,6 +26,7 @@ def generateControllerConfig_wii(
         wheels: Wheel controllers
         rom: ROM file path
         guns: Light gun controllers
+
     """
     if (
         system.isOptSet("use_guns")
@@ -34,29 +34,29 @@ def generateControllerConfig_wii(
         and len(guns) > 0
     ):
         generateControllerConfig_guns(
-            "WiimoteNew.ini", "Wiimote", metadata, guns, system, rom
+            "WiimoteNew.ini", "Wiimote", metadata, guns, system, rom,
         )
         from .gamecubeControllers import generateControllerConfig_gamecube
 
         generateControllerConfig_gamecube(
-            system, playersControllers, wheels, rom
+            system, playersControllers, wheels, rom,
         )  # You can use the gamecube pads on the wii together with wiimotes
     elif system.isOptSet("emulatedwiimotes") and not system.getOptBoolean(
-        "emulatedwiimotes"
+        "emulatedwiimotes",
     ):
         # Generate if hardcoded
         generateControllerConfig_realwiimotes("WiimoteNew.ini", "Wiimote")
         from .gamecubeControllers import generateControllerConfig_gamecube
 
         generateControllerConfig_gamecube(
-            system, playersControllers, wheels, rom
+            system, playersControllers, wheels, rom,
         )  # You can use the gamecube pads on the wii together with wiimotes
     elif system.isOptSet("emulatedwiimotes") and system.getOptBoolean(
-        "emulatedwiimotes"
+        "emulatedwiimotes",
     ):
         # Generate if hardcoded
         generateControllerConfig_emulatedwiimotes(
-            system, playersControllers, wheels, rom
+            system, playersControllers, wheels, rom,
         )
         from .gamecubeControllers import removeControllerConfig_gamecube
 
@@ -77,7 +77,7 @@ def generateControllerConfig_wii(
     ) or system.isOptSet("sideWiimote"):
         # Generate if auto and name extensions are present
         generateControllerConfig_emulatedwiimotes(
-            system, playersControllers, wheels, rom
+            system, playersControllers, wheels, rom,
         )
         from .gamecubeControllers import removeControllerConfig_gamecube
 
@@ -87,21 +87,21 @@ def generateControllerConfig_wii(
         from .gamecubeControllers import generateControllerConfig_gamecube
 
         generateControllerConfig_gamecube(
-            system, playersControllers, wheels, rom
+            system, playersControllers, wheels, rom,
         )  # You can use the gamecube pads on the wii together with wiimotes
 
 
 def generateControllerConfig_emulatedwiimotes(
-    system: Any, playersControllers: Any, wheels: Any, rom: str
+    system: Any, playersControllers: Any, wheels: Any, rom: str,
 ) -> None:
-    """
-    Generate controller configuration for emulated Wiimotes.
+    """Generate controller configuration for emulated Wiimotes.
 
     Args:
         system: System configuration object
         playersControllers: Player controllers configuration
         wheels: Wheel controllers
         rom: ROM file path
+
     """
     wii_mapping: dict[str, str] = {
         "x": "Buttons/2",
@@ -279,12 +279,12 @@ def generateControllerConfig_emulatedwiimotes(
 
 
 def generateControllerConfig_realwiimotes(filename: str, anyDefKey: str) -> None:
-    """
-    Generate controller configuration for real Wiimotes.
+    """Generate controller configuration for real Wiimotes.
 
     Args:
         filename: Name of the configuration file
         anyDefKey: Key for the configuration section
+
     """
     config_file_path = Path(DOLPHIN_CONFIG_DIR) / filename
     with open(str(config_file_path), "w", encoding="utf_8_sig") as f:
@@ -297,10 +297,9 @@ def generateControllerConfig_realwiimotes(filename: str, anyDefKey: str) -> None
 
 
 def generateControllerConfig_guns(
-    filename: str, anyDefKey: str, metadata: Any, guns: Any, system: Any, rom: str
+    filename: str, anyDefKey: str, metadata: Any, guns: Any, system: Any, rom: str,
 ) -> None:
-    """
-    Generate controller configuration for light guns.
+    """Generate controller configuration for light guns.
 
     Args:
         filename: Name of the configuration file
@@ -309,6 +308,7 @@ def generateControllerConfig_guns(
         guns: Light gun controllers
         system: System configuration object
         rom: ROM file path
+
     """
     config_file_path = Path(DOLPHIN_CONFIG_DIR) / filename
     with open(str(config_file_path), "w", encoding="utf_8_sig") as f:
@@ -406,7 +406,7 @@ def generateControllerConfig_guns(
                                     gun_mapping[x] = ""
                         else:
                             eslog.info(
-                                f"custom gun mapping ignored for {btn} => {mval} (invalid value)"
+                                f"custom gun mapping ignored for {btn} => {mval} (invalid value)",
                             )
             # setting values
             for btn in gun_buttons:
@@ -425,7 +425,7 @@ def generateControllerConfig_guns(
                             val = gun_buttons[gun_mapping[btn]]["code"]
                         else:
                             eslog.debug(
-                                f"gun has not the button {gun_buttons[gun_mapping[btn]]['button']}"
+                                f"gun has not the button {gun_buttons[gun_mapping[btn]]['button']}",
                             )
                     else:
                         eslog.debug(f"cannot map the button {gun_mapping[btn]}")
@@ -468,8 +468,7 @@ def generateControllerConfig_any(
     anyReplacements: Any,
     extraOptions: dict[str, Any] | None = None,
 ) -> None:
-    """
-    Generate controller configuration for any controller type.
+    """Generate controller configuration for any controller type.
 
     Args:
         system: System configuration object
@@ -480,6 +479,7 @@ def generateControllerConfig_any(
         anyReverseAxes: Reverse axes configuration
         anyReplacements: Button replacements configuration
         extraOptions: Additional options for the controller
+
     """
     import codecs
 
@@ -509,7 +509,7 @@ def generateControllerConfig_any(
             f.write(f"Device = SDL/{nsamepad}/{pad.name.strip()}\n")
 
             if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
-                "use_pad_profiles"
+                "use_pad_profiles",
             ):
                 if not generateControllerConfig_any_from_profiles(f, pad, system):
                     generateControllerConfig_any_auto(
@@ -523,21 +523,20 @@ def generateControllerConfig_any(
                         nplayer,
                         nsamepad,
                     )
+            elif pad.dev in []:
+                generateControllerConfig_wheel(f, pad, nplayer)
             else:
-                if pad.dev in []:
-                    generateControllerConfig_wheel(f, pad, nplayer)
-                else:
-                    generateControllerConfig_any_auto(
-                        f,
-                        pad,
-                        anyMapping,
-                        anyReverseAxes,
-                        anyReplacements,
-                        extra_options,
-                        system,
-                        nplayer,
-                        nsamepad,
-                    )
+                generateControllerConfig_any_auto(
+                    f,
+                    pad,
+                    anyMapping,
+                    anyReverseAxes,
+                    anyReplacements,
+                    extra_options,
+                    system,
+                    nplayer,
+                    nsamepad,
+                )
 
             nplayer += 1
 
@@ -553,8 +552,7 @@ def generateControllerConfig_any_auto(
     nplayer: int,
     nsamepad: int,
 ) -> None:
-    """
-    Generate controller configuration automatically based on available inputs.
+    """Generate controller configuration automatically based on available inputs.
 
     Args:
         f: File object to write the configuration to
@@ -566,6 +564,7 @@ def generateControllerConfig_any_auto(
         system: System configuration object
         nplayer: Player number
         nsamepad: Pad number in case of multiple pads with the same name
+
     """
     for opt in extraOptions:
         if opt in ["AutoLoadState", "AutoSaveState"]:
@@ -611,7 +610,7 @@ def generateControllerConfig_any_auto(
         # Write the configuration for this key
         if keyname is not None:
             write_key(
-                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None
+                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None,
             )
             if "Triggers" in keyname and input.type == "axis":
                 write_key(
@@ -651,7 +650,7 @@ def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) ->
     eslog = get_logger(__name__)
 
     for profileFile in glob.glob(
-        str(Path(DOLPHIN_CONFIG_DIR) / "Config" / "Profiles" / "GCPad" / "*.ini")
+        str(Path(DOLPHIN_CONFIG_DIR) / "Config" / "Profiles" / "GCPad" / "*.ini"),
     ):
         try:
             eslog.debug(f"Looking profile : {profileFile}")

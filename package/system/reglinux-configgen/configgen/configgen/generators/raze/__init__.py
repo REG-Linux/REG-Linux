@@ -1,5 +1,4 @@
-"""
-Raze generator module for REG-Linux
+"""Raze generator module for REG-Linux
 This module handles the generation of raze emulator configurations.
 """
 

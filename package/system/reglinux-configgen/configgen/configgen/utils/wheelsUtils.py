@@ -58,7 +58,7 @@ emulatorMapping = {
 
 
 def reconfigure_controllers(
-    players_controllers: Any, system: Any, metadata: Any, device_list: Any
+    players_controllers: Any, system: Any, metadata: Any, device_list: Any,
 ) -> tuple[Any, Any, Any]:
     eslog.info("wheels reconfiguration")
     eslog.info("before wheel reconfiguration :")
@@ -71,7 +71,7 @@ def reconfigure_controllers(
             + " dev:"
             + pad.dev
             + " name:"
-            + pad.name
+            + pad.name,
         )
 
     # reconfigure wheel buttons
@@ -116,7 +116,7 @@ def reconfigure_controllers(
                             eslog.info(f"wheel: fill key {wantedkey} with {wheelkey}")
                         else:
                             eslog.info(
-                                f"wheel: unable to replace {wantedkey} with {wheelkey}"
+                                f"wheel: unable to replace {wantedkey} with {wheelkey}",
                             )
         nplayer += 1
 
@@ -159,7 +159,7 @@ def reconfigure_controllers(
                 + " ; wanted deadzone is "
                 + str(wanted_deadzone)
                 + " ; wanted midzone is "
-                + str(wanted_midzone)
+                + str(wanted_midzone),
             )
             # no need new device in some cases
             if wanted_ra < ra or wanted_deadzone > 0:
@@ -175,7 +175,7 @@ def reconfigure_controllers(
                     dev_match = match(r"^/dev/input/event([0-9]*)$", newdev)
                     if dev_match:
                         eslog.info(
-                            f"replacing device {pad.dev} by device {newdev} for player {playercontroller}"
+                            f"replacing device {pad.dev} by device {newdev} for player {playercontroller}",
                         )
                         device_list[newdev] = dict(device_list[pad.dev])
                         device_list[newdev]["eventId"] = int(dev_match.group(1))
@@ -186,7 +186,7 @@ def reconfigure_controllers(
                         procs.append(p)
                     else:
                         eslog.warning(
-                            f"Unexpected device name from wheel calibrator: {newdev}. Killing process."
+                            f"Unexpected device name from wheel calibrator: {newdev}. Killing process.",
                         )
                         if p is not None:
                             kill(p.pid, SIGTERM)
@@ -253,7 +253,7 @@ def reconfigure_controllers(
             + " dev:"
             + pad.dev
             + " name:"
-            + pad.name
+            + pad.name,
         )
 
     return (procs, players_controllers_new, device_list)
@@ -336,7 +336,7 @@ def reconfigure_angle_rotation(
         newdev = fd.readline().rstrip("\n")
         fd.close()
     except OSError as e:
-        eslog.error(f"Error reading from pipe: {str(e)}")
+        eslog.error(f"Error reading from pipe: {e!s}")
         kill(proc.pid, SIGTERM)
         proc.communicate()
         raise

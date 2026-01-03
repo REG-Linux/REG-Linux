@@ -44,7 +44,7 @@ def parse_args(launch_args: list[str], rom_path: str) -> Result:
             # Replace the main GAME.CON script module; surprisingly this can be a CON, DEF, or INI!
             BuildEngineArg("CON", "-x", True),
             BuildEngineArg(
-                "CON+", "-mx", False
+                "CON+", "-mx", False,
             ),  # Append CON after GAME.CON script module
             BuildEngineArg("DEF", "-h", True),  # Replace the main DEF module
             BuildEngineArg("DEF+", "-mh", False),  # Append DEF after main DEF module
@@ -88,7 +88,7 @@ def parse_args(launch_args: list[str], rom_path: str) -> Result:
                 ParseError(
                     i,
                     f"found another '{build_arg.arg_key}', but there should only be one",
-                )
+                ),
             ]
             continue
         launch_args += [build_arg.cli_opt, val_path]

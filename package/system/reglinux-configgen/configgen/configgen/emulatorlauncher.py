@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This script is the emulator launcher for the Reglinux distribution.
+"""This script is the emulator launcher for the Reglinux distribution.
 It is responsible for preparing the environment and launching the emulator
 with the appropriate configurations.
 """
@@ -17,16 +16,12 @@ from time import sleep
 from typing import Any
 
 import configgen.bezel.bezel_base as bezelsUtil
-import configgen.controllers as controllers
-import configgen.utils.gunsUtils as gunsUtils
-import configgen.utils.videoMode as videoMode
-import configgen.utils.wheelsUtils as wheelsUtils
-import configgen.utils.windowsManager as windowsManager
-import configgen.utils.zar as zar
+from configgen import controllers
 from configgen.controllers import Evmapy
 from configgen.Emulator import Emulator
 from configgen.GeneratorImporter import getGenerator
 from configgen.systemFiles import SAVES
+from configgen.utils import gunsUtils, videoMode, wheelsUtils, windowsManager, zar
 from configgen.utils.logger import get_logger
 from configgen.utils.regmsgclient import regmsg_connect
 
@@ -59,8 +54,7 @@ proc = None
 
 
 def main(args: Any, maxnbplayers: int) -> int:
-    """
-    Entry point to start a ROM, with optional mounting of .zar archive files.
+    """Entry point to start a ROM, with optional mounting of .zar archive files.
 
     If the input ROM file is a .zar archive, this function mounts it using zar.zar_begin(),
     retrieves the actual ROM path (in case of a single-file archive), and launches the ROM.
@@ -72,6 +66,7 @@ def main(args: Any, maxnbplayers: int) -> int:
 
     Returns:
         int: Exit code from the ROM launcher.
+
     """
     # Connect ZeroMQ
     regmsg_connect()
@@ -108,10 +103,9 @@ def main(args: Any, maxnbplayers: int) -> int:
 
 
 def _start_evmapy_async(
-    system: Any, emulator: str, core: str, rom: str, players_controllers: Any, guns: Any
+    system: Any, emulator: str, core: str, rom: str, players_controllers: Any, guns: Any,
 ) -> Thread:
-    """
-    Starts Evmapy asynchronously in a background thread.
+    """Starts Evmapy asynchronously in a background thread.
 
     This prevents the emulator startup from being delayed by Evmapy initialization.
     Evmapy will run in parallel while the emulator is already loading.
@@ -126,6 +120,7 @@ def _start_evmapy_async(
 
     Returns:
         threading.Thread: The thread running Evmapy.
+
     """
 
     def worker():
@@ -186,7 +181,7 @@ def _setup_system_emulator(args: Any, rom: str) -> Any:
 
 
 def _configure_special_devices(
-    args: Any, system: Any, rom: str, metadata: Any, players_controllers: Any
+    args: Any, system: Any, rom: str, metadata: Any, players_controllers: Any,
 ) -> tuple[Any, Any, Any, Any]:
     """Configures light guns and racing wheels."""
     if not system.isOptSet("use_guns") and args.lightgun:
@@ -206,7 +201,7 @@ def _configure_special_devices(
         device_infos = controllers.getDevicesInformation()
         (wheel_processes, players_controllers, device_infos) = (
             wheelsUtils.reconfigure_controllers(
-                players_controllers, system, rom, metadata
+                players_controllers, system, rom, metadata,
             )
         )
         wheels = wheelsUtils.get_wheels_from_device_infos(device_infos)
@@ -218,7 +213,7 @@ def _configure_special_devices(
 
 
 def _setup_video_and_mouse(
-    system: Any, generator: Any, rom: str
+    system: Any, generator: Any, rom: str,
 ) -> tuple[Any, bool, bool, dict[str, int]]:
     """Sets up video mode and mouse visibility for the game."""
     wanted_game_mode = generator.getResolutionMode(system.config)
@@ -376,8 +371,7 @@ def _setup_evmapy_and_compositor(
     args: Any,
     rom_configuration: dict[str, Any],
 ) -> Any:
-    """
-    Sets up Evmapy and compositor before launching the emulator.
+    """Sets up Evmapy and compositor before launching the emulator.
 
     Args:
         generator (Generator): Emulator-specific generator instance.
@@ -390,6 +384,7 @@ def _setup_evmapy_and_compositor(
 
     Returns:
         threading.Thread: The thread running Evmapy.
+
     """
     # Start Evmapy in a separate thread (non-blocking)
     evmapy_thread = _start_evmapy_async(
@@ -421,8 +416,7 @@ def _prepare_emulator_command(
     game_resolution: dict[str, int],
     args: Any,
 ) -> Any:
-    """
-    Prepares the emulator command with all necessary configurations.
+    """Prepares the emulator command with all necessary configurations.
 
     Args:
         generator (Generator): Emulator-specific generator instance.
@@ -437,6 +431,7 @@ def _prepare_emulator_command(
 
     Returns:
         Command: The prepared command object for running the emulator.
+
     """
     # Set execution directory if specified by generator
     effective_rom = rom or ""
@@ -446,7 +441,7 @@ def _prepare_emulator_command(
 
     # Generate the command line for emulator execution
     cmd = generator.generate(
-        system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     )
 
     # Configure MangoHUD if enabled
@@ -456,14 +451,14 @@ def _prepare_emulator_command(
 
 
 def _run_emulator_with_profiler(cmd: Any) -> int:
-    """
-    Runs the emulator command with profiler management.
+    """Runs the emulator command with profiler management.
 
     Args:
         cmd (Command): The command object to run.
 
     Returns:
         int: The exit code from the emulator process.
+
     """
     global profiler
 
@@ -482,15 +477,15 @@ def _run_emulator_with_profiler(cmd: Any) -> int:
 
 
 def _cleanup_emulator_resources(
-    generator: Any, evmapy_thread: Any, system: Any
+    generator: Any, evmapy_thread: Any, system: Any,
 ) -> None:
-    """
-    Cleans up resources after the emulator exits.
+    """Cleans up resources after the emulator exits.
 
     Args:
         generator (Generator): Emulator-specific generator instance.
         evmapy_thread (Thread): The thread running Evmapy.
         system (Emulator): System configuration object.
+
     """
     # Stop Evmapy gracefully
     Evmapy.stop()
@@ -514,8 +509,7 @@ def _launch_emulator_process(
     args: Any,
     rom_configuration: dict[str, Any],
 ) -> int:
-    """
-    Handles the actual emulator launch process inside a try/finally block.
+    """Handles the actual emulator launch process inside a try/finally block.
 
     This function takes care of:
     - Starting Evmapy asynchronously (non-blocking).
@@ -538,6 +532,7 @@ def _launch_emulator_process(
 
     Returns:
         int: Exit code from the emulator process.
+
     """
     global profiler
     exitCode = -1
@@ -546,7 +541,7 @@ def _launch_emulator_process(
     try:
         # Setup Evmapy and compositor
         evmapy_thread = _setup_evmapy_and_compositor(
-            generator, system, rom, players_controllers, guns, args, rom_configuration
+            generator, system, rom, players_controllers, guns, args, rom_configuration,
         )
 
         # Prepare the emulator command
@@ -602,14 +597,12 @@ def _cleanup_system(
             wheelsUtils.reset_controllers(wheel_processes)
         except Exception as e:
             eslog.error(f"Unable to reset wheel controllers: {e}")
-            pass
 
 
 def start_rom(
-    args: Any, maxnbplayers: int, rom: str, rom_configuration: dict[str, Any]
+    args: Any, maxnbplayers: int, rom: str, rom_configuration: dict[str, Any],
 ) -> int:
-    """
-    Prepares the system and launches the emulator for a given ROM.
+    """Prepares the system and launches the emulator for a given ROM.
 
     This function handles:
     - Controller configuration.
@@ -628,13 +621,14 @@ def start_rom(
 
     Returns:
         int: The exit code from the emulator process.
+
     """
     # Initial setup
     players_controllers = _configure_controllers(args, maxnbplayers)
     system = _setup_system_emulator(args, rom)
     metadata = controllers.getGamesMetaData(system.name, rom)
     guns, wheels, wheel_processes, players_controllers = _configure_special_devices(
-        args, system, rom, metadata, players_controllers
+        args, system, rom, metadata, players_controllers,
     )
     generator = getGenerator(system.config["emulator"])
 
@@ -684,11 +678,11 @@ def start_rom(
 
 
 def _cleanup_temp_files(*temp_files: str) -> None:
-    """
-    Cleans up temporary files created during bezel processing.
+    """Cleans up temporary files created during bezel processing.
 
     Args:
         *temp_files: Variable number of temporary file paths to cleanup
+
     """
     import os
 
@@ -707,8 +701,7 @@ def getHudBezel(
     game_resolution: dict[str, int],
     borders_size: Any,
 ) -> Any:
-    """
-    Determines and prepares the appropriate bezel image for the HUD.
+    """Determines and prepares the appropriate bezel image for the HUD.
 
     It checks for bezel compatibility (aspect ratio, coverage) and resizes,
     tattoos, or adds borders to the image as needed.
@@ -722,6 +715,7 @@ def getHudBezel(
 
     Returns:
         str|None: The path to the final bezel image file, or None if no bezel should be used.
+
     """
     # Import json here to ensure it's always available within the function scope
     # for error handling, preventing "json is possibly unbound" diagnostic.
@@ -759,16 +753,16 @@ def getHudBezel(
             w, h = game_resolution["width"], game_resolution["height"]
             with open(overlay_info_file, "w") as fd:
                 fd.write(
-                    f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}'
+                    f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}',
                 )
         else:
             # A bezel is configured, so let's find its files.
             eslog.debug(
-                f"HUD enabled. Trying to apply the bezel {system.config['bezel']}"
+                f"HUD enabled. Trying to apply the bezel {system.config['bezel']}",
             )
             bezel = system.config["bezel"]
             bz_infos = bezelsUtil.getBezelInfos(
-                rom, bezel, system.name, system.config["emulator"]
+                rom, bezel, system.name, system.config["emulator"],
             )
             if bz_infos is None:
                 eslog.debug("No bezel info file found")
@@ -795,14 +789,13 @@ def getHudBezel(
             bezel_width: int = infos["width"]
             bezel_height: int = infos["height"]
             eslog.info(f"Bezel size read from {overlay_info_file}")
+        elif overlay_png_file and isinstance(overlay_png_file, str):
+            bezel_width: int = bezelsUtil.fast_image_size(overlay_png_file)[0]
+            bezel_height: int = bezelsUtil.fast_image_size(overlay_png_file)[1]
+            eslog.info(f"Bezel size read from {overlay_png_file}")
         else:
-            if overlay_png_file and isinstance(overlay_png_file, str):
-                bezel_width: int = bezelsUtil.fast_image_size(overlay_png_file)[0]
-                bezel_height: int = bezelsUtil.fast_image_size(overlay_png_file)[1]
-                eslog.info(f"Bezel size read from {overlay_png_file}")
-            else:
-                eslog.error(f"Invalid overlay PNG file: {overlay_png_file}")
-                return None
+            eslog.error(f"Invalid overlay PNG file: {overlay_png_file}")
+            return None
 
         # Define validation thresholds.
         max_ratio_delta = 0.01  # Max difference between screen and bezel aspect ratio.
@@ -813,14 +806,14 @@ def getHudBezel(
         # Validate aspect ratio (unless gun borders are being added, which might need a different ratio).
         if borders_size is None and abs(screen_ratio - bezel_ratio) > max_ratio_delta:
             eslog.debug(
-                f"Screen ratio ({screen_ratio}) is too far from the bezel one ({bezel_ratio})"
+                f"Screen ratio ({screen_ratio}) is too far from the bezel one ({bezel_ratio})",
             )
             return None
 
         # --- Bezel Processing ---
         # Resize the bezel image if it doesn't match the screen resolution.
         bezel_stretch = system.isOptSet("bezel_stretch") and system.getOptBoolean(
-            "bezel_stretch"
+            "bezel_stretch",
         )
         if (
             bezel_width != game_resolution["width"]
@@ -852,7 +845,7 @@ def getHudBezel(
             temp_files.append(str(output_png_file))
             if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
                 bezelsUtil.tatooImage(
-                    str(overlay_png_file), str(output_png_file), system
+                    str(overlay_png_file), str(output_png_file), system,
                 )
                 overlay_png_file = output_png_file
             else:
@@ -877,7 +870,7 @@ def getHudBezel(
                 overlay_png_file = output_png_file
             else:
                 eslog.error(
-                    f"Invalid overlay PNG file for gun border: {overlay_png_file}"
+                    f"Invalid overlay PNG file for gun border: {overlay_png_file}",
                 )
                 return None
 
@@ -890,14 +883,14 @@ def getHudBezel(
 
 
 def extractGameInfosFromXml(xml: Any) -> dict[str, Any]:
-    """
-    Parses a game information XML file to extract game name and thumbnail.
+    """Parses a game information XML file to extract game name and thumbnail.
 
     Args:
         xml (str): Path to the game info XML file.
 
     Returns:
         dict: A dictionary containing 'name' and 'thumbnail' if found.
+
     """
     import xml.etree.ElementTree as ET
 
@@ -921,19 +914,19 @@ def extractGameInfosFromXml(xml: Any) -> dict[str, Any]:
 
 
 def callExternalScripts(folder: str, event: str, args: list[str]) -> None:
-    """
-    Executes all executable scripts in a given folder.
+    """Executes all executable scripts in a given folder.
 
     Args:
         folder (str): The directory containing the scripts.
         event (str): The event name (e.g., "gameStart", "gameStop").
         args (list): A list of arguments to pass to the scripts.
+
     """
     if not Path(folder).is_dir():
         return
     try:
         file_list = sorted(
-            Path(folder).iterdir()
+            Path(folder).iterdir(),
         )  # Sort for predictable execution order.
     except OSError as e:
         eslog.warning(f"Could not read directory {folder}: {e}")
@@ -943,33 +936,33 @@ def callExternalScripts(folder: str, event: str, args: list[str]) -> None:
         filepath = Path(folder) / file
         if Path(filepath).is_dir():
             callExternalScripts(
-                str(filepath), event, args
+                str(filepath), event, args,
             )  # Recurse into subdirectories.
         elif access(filepath, X_OK):
-            eslog.debug(f"Calling external script: {str([filepath, event] + args)}")
+            eslog.debug(f"Calling external script: {[filepath, event] + args!s}")
             try:
                 result = call([filepath, event] + args)
                 if result != 0:
                     eslog.warning(
-                        f"External script {filepath} returned non-zero exit code: {result}"
+                        f"External script {filepath} returned non-zero exit code: {result}",
                     )
             except OSError as e:
                 eslog.error(f"Failed to execute external script {filepath}: {e}")
             except Exception as e:
                 eslog.error(
-                    f"Unexpected error executing external script {filepath}: {e}"
+                    f"Unexpected error executing external script {filepath}: {e}",
                 )
 
 
 def hudConfig_protectStr(text: str) -> str:
-    """
-    Returns an empty string if the input is None, otherwise returns the input.
+    """Returns an empty string if the input is None, otherwise returns the input.
 
     Args:
         text (str): The string to protect.
 
     Returns:
         str: The original string or an empty string.
+
     """
     return text or ""
 
@@ -983,8 +976,7 @@ def getHudConfig(
     gameinfos: Any,
     bezel: Any,
 ) -> str:
-    """
-    Generates the configuration string for MangoHUD.
+    """Generates the configuration string for MangoHUD.
 
     Args:
         system (Emulator): The current system's configuration object.
@@ -997,6 +989,7 @@ def getHudConfig(
 
     Returns:
         str: The complete MangoHUD configuration string.
+
     """
     configstr = ""
     # Set the bezel as the background image for the HUD.
@@ -1051,14 +1044,14 @@ def getHudConfig(
 
 
 def runCommand(command: Any) -> int:
-    """
-    Executes a command in a subprocess.
+    """Executes a command in a subprocess.
 
     Args:
         command (Command): A Command object containing the command array and environment variables.
 
     Returns:
         int: The exit code of the process.
+
     """
     global proc
 
@@ -1068,9 +1061,9 @@ def runCommand(command: Any) -> int:
     # Combine current environment with command-specific environment variables.
     envvars = {**environ, **command.env}
 
-    eslog.debug(f"command: {str(command)}")
-    eslog.debug(f"command: {str(command.array)}")
-    eslog.debug(f"env: {str(envvars)}")
+    eslog.debug(f"command: {command!s}")
+    eslog.debug(f"command: {command.array!s}")
+    eslog.debug(f"env: {envvars!s}")
     exitcode = -1
 
     proc = Popen(command.array, env=envvars, stdout=PIPE, stderr=PIPE)
@@ -1103,8 +1096,7 @@ def runCommand(command: Any) -> int:
 
 
 def signal_handler(signal: Any, frame: Any) -> None:
-    """
-    Handles termination signals (like Ctrl+C) to gracefully kill the emulator process.
+    """Handles termination signals (like Ctrl+C) to gracefully kill the emulator process.
     """
     global proc
     eslog.debug("Exiting due to signal")
@@ -1126,31 +1118,31 @@ if __name__ == "__main__":
     # Dynamically create arguments for each player's controller.
     for p in range(1, maxnbplayers + 1):
         parser.add_argument(
-            f"-p{p}index", help=f"player {p} controller index", type=int
+            f"-p{p}index", help=f"player {p} controller index", type=int,
         )
         parser.add_argument(
-            f"-p{p}guid", help=f"player {p} controller SDL2 guid", type=str
+            f"-p{p}guid", help=f"player {p} controller SDL2 guid", type=str,
         )
         parser.add_argument(f"-p{p}name", help=f"player {p} controller name", type=str)
         parser.add_argument(
-            f"-p{p}devicepath", help=f"player {p} controller device path", type=str
+            f"-p{p}devicepath", help=f"player {p} controller device path", type=str,
         )
         parser.add_argument(
-            f"-p{p}nbbuttons", help=f"player {p} controller number of buttons", type=str
+            f"-p{p}nbbuttons", help=f"player {p} controller number of buttons", type=str,
         )
         parser.add_argument(
-            f"-p{p}nbhats", help=f"player {p} controller number of hats", type=str
+            f"-p{p}nbhats", help=f"player {p} controller number of hats", type=str,
         )
         parser.add_argument(
-            f"-p{p}nbaxes", help=f"player {p} controller number of axes", type=str
+            f"-p{p}nbaxes", help=f"player {p} controller number of axes", type=str,
         )
 
     # General arguments for system, ROM, and specific features.
     parser.add_argument(
-        "-system", help="Select the system to launch", type=str, required=True
+        "-system", help="Select the system to launch", type=str, required=True,
     )
     parser.add_argument(
-        "-rom", help="Absolute path to the ROM", type=str, required=True
+        "-rom", help="Absolute path to the ROM", type=str, required=True,
     )
     parser.add_argument("-emulator", help="Force a specific emulator", type=str)
     parser.add_argument("-core", help="Force a specific emulator core", type=str)
@@ -1161,7 +1153,7 @@ if __name__ == "__main__":
     parser.add_argument("-netplaysession", help="Netplay session identifier", type=str)
     parser.add_argument("-state_slot", help="Load state from a specific slot", type=str)
     parser.add_argument(
-        "-state_filename", help="Load state from a specific filename", type=str
+        "-state_filename", help="Load state from a specific filename", type=str,
     )
     parser.add_argument("-autosave", help="Enable/disable autosave feature", type=str)
     parser.add_argument("-systemname", help="System's display name", type=str)
@@ -1173,7 +1165,7 @@ if __name__ == "__main__":
         default="/dev/null",
     )
     parser.add_argument(
-        "-lightgun", help="Configure for lightgun usage", action="store_true"
+        "-lightgun", help="Configure for lightgun usage", action="store_true",
     )
     parser.add_argument("-wheel", help="Configure for wheel usage", action="store_true")
 
@@ -1199,6 +1191,6 @@ if __name__ == "__main__":
 
     # A short delay can help ensure resources (like GPU memory) are fully released before returning to the frontend.
     sleep(1)
-    eslog.debug(f"Exiting configgen with status {str(exitcode)}")
+    eslog.debug(f"Exiting configgen with status {exitcode!s}")
 
     exit(exitcode)

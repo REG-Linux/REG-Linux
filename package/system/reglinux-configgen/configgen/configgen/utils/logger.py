@@ -15,8 +15,7 @@ class MaxLevelFilter(logging.Filter):
 
 
 class LoggerManager:
-    """
-    Enhanced logger manager with additional configuration options.
+    """Enhanced logger manager with additional configuration options.
     """
 
     _instances = {}
@@ -45,8 +44,7 @@ class LoggerManager:
         enable_stdout: bool = True,
         enable_stderr: bool = True,
     ) -> logging.Logger:
-        """
-        Setup logger with various configuration options.
+        """Setup logger with various configuration options.
 
         Args:
             level: Logging level (default: DEBUG)
@@ -57,6 +55,7 @@ class LoggerManager:
             backup_count: Number of backup files to keep
             enable_stdout: Enable stdout handler
             enable_stderr: Enable stderr handler
+
         """
         formatter = logging.Formatter(fmt)
 
@@ -93,7 +92,7 @@ class LoggerManager:
                 log_dir.mkdir(parents=True, exist_ok=True)
 
             file_handler = RotatingFileHandler(
-                log_file_path, maxBytes=max_file_size, backupCount=backup_count
+                log_file_path, maxBytes=max_file_size, backupCount=backup_count,
             )
             file_handler.setFormatter(formatter)
             file_handler.setLevel(level)
@@ -113,8 +112,7 @@ def get_logger(
     enable_stdout: bool = True,
     enable_stderr: bool = True,
 ) -> logging.Logger:
-    """
-    Get a configured logger instance.
+    """Get a configured logger instance.
 
     Args:
         module_name: Name of the module requesting the logger
@@ -129,6 +127,7 @@ def get_logger(
 
     Returns:
         Configured logger instance
+
     """
     logger_manager = LoggerManager(module_name)
     return logger_manager.setup_logger(
@@ -144,18 +143,17 @@ def get_logger(
 
 
 def set_global_log_level(level: int):
-    """
-    Set the global log level for all loggers.
+    """Set the global log level for all loggers.
 
     Args:
         level: Logging level to set globally
+
     """
     logging.getLogger().setLevel(level)
 
 
 def add_log_context(logger: logging.Logger, **context: Any):
-    """
-    Add contextual information to a logger.
+    """Add contextual information to a logger.
 
     Args:
         logger: Base logger to add context to
@@ -163,5 +161,6 @@ def add_log_context(logger: logging.Logger, **context: Any):
 
     Returns:
         LoggerAdapter with context
+
     """
     return logging.LoggerAdapter(logger, context)

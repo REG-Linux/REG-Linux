@@ -13,7 +13,7 @@ BIGPEMU_BIN_PATH = "/usr/bigpemu/bigpemu"
 
 
 def setBigemuConfig(
-    bigpemuConfig: Any, system: Any, gameResolution: Any, playersControllers: Any
+    bigpemuConfig: Any, system: Any, gameResolution: Any, playersControllers: Any,
 ) -> None:
     # Ensure the necessary structure in the config
     if "BigPEmuConfig" not in bigpemuConfig:
@@ -38,7 +38,7 @@ def setBigemuConfig(
 
     if system.isOptSet("bigpemu_ratio"):
         bigpemuConfig["BigPEmuConfig"]["Video"]["ScreenAspect"] = int(
-            system.bigpemuConfig["bigpemu_ratio"]
+            system.bigpemuConfig["bigpemu_ratio"],
         )
     else:
         bigpemuConfig["BigPEmuConfig"]["Video"]["ScreenAspect"] = 2

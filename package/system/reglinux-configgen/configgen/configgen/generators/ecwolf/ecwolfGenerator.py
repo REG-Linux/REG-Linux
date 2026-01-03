@@ -18,7 +18,7 @@ ECWOLF_BIN_PATH = "/usr/bin/ecwolf"
 
 class ECWolfGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         ecwolfSaves = str(Path(ECWOLF_SAVES_DIR) / Path(rom).name)
         command_array = [ECWOLF_BIN_PATH]  # Binary for command array
@@ -55,7 +55,6 @@ class ECWolfGenerator(Generator):
                 except (OSError, IndexError) as e:
                     eslog.error(f"Error reading .ecwolf file {rom}: {e}")
                     # Ensure we handle the case where the file might be empty or inaccessible
-                    pass
 
                 # If 1. parameter isn't an argument then assume it's a path
                 if "--" not in command_array[1]:
@@ -63,7 +62,7 @@ class ECWolfGenerator(Generator):
                         chdir(command_array[1])
                     except Exception as e:
                         eslog.error(
-                            f"Error: couldn't go into directory {command_array[1]} ({e})"
+                            f"Error: couldn't go into directory {command_array[1]} ({e})",
                         )
                     command_array.pop(1)
 
@@ -76,7 +75,7 @@ class ECWolfGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

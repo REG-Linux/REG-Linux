@@ -15,7 +15,7 @@ from .mupenConfig import (
 
 class MupenGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Read the configuration file
         iniConfig = ConfigParser(interpolation=None)
@@ -47,7 +47,7 @@ class MupenGenerator(Generator):
             "--corelib",
             "libmupen64plus.so.2.0.0",
             "--gfx",
-            "mupen64plus-video-{}.so".format(system.config["core"]),
+            f"mupen64plus-video-{system.config['core']}.so",
             "--audio",
             "mupen64plus-audio-sdl.so",
             "--input",

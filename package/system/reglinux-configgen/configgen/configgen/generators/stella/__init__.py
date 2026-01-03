@@ -1,5 +1,4 @@
-"""
-Stella generator module for REG-Linux
+"""Stella generator module for REG-Linux
 This module handles the generation of stella emulator configurations.
 """
 

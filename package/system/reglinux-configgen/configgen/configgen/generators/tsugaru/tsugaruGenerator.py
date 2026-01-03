@@ -15,7 +15,7 @@ class TsugaruGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Start emulator fullscreen
         command_array = [TSUGARU_BIN_PATH, TSUGARU_BIOS_DIR]
@@ -44,7 +44,7 @@ class TsugaruGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

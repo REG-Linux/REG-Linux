@@ -13,7 +13,7 @@ DEVILUTIONX_BIN_PATH = "/usr/bin/devilutionx"
 
 class DevilutionXGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         command_array = [
             DEVILUTIONX_BIN_PATH,
@@ -39,7 +39,7 @@ class DevilutionXGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

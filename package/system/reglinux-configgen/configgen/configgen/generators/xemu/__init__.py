@@ -1,5 +1,4 @@
-"""
-Xemu generator module for REG-Linux
+"""Xemu generator module for REG-Linux
 This module handles the generation of xemu emulator configurations.
 """
 

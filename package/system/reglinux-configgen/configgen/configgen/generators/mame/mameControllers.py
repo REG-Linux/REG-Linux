@@ -28,8 +28,7 @@ def generatePadsConfig(
     multiMouse: bool,
     system: Any,
 ):
-    """
-    Generate MAME controller configuration.
+    """Generate MAME controller configuration.
 
     Args:
         cfgPath: Path to the configuration directory
@@ -46,6 +45,7 @@ def generatePadsConfig(
         useMouse: Whether to use mouse
         multiMouse: Whether to use multiple mice
         system: System configuration
+
     """
     # Load control mappings
     control_dict = _load_control_mappings()
@@ -77,7 +77,7 @@ def generatePadsConfig(
     # Handle special controllers
     config_alt, configFile_alt, xml_input_alt, overwriteSystem = (
         _handle_special_controllers(
-            sysName, specialController, cfgPath, customCfg, decorations
+            sysName, specialController, cfgPath, customCfg, decorations,
         )
     )
 
@@ -106,7 +106,7 @@ def generatePadsConfig(
     # Configure additional guns if needed
     if useGuns and len(guns) > len(playersControllers):
         _configure_additional_guns(
-            config, xml_input, playersControllers, guns, gunmappings, system
+            config, xml_input, playersControllers, guns, gunmappings, system,
         )
 
     # Save main config file
@@ -125,7 +125,7 @@ def generatePadsConfig(
         logger.debug(f"Saving {configFile_alt}")
         with open(configFile_alt, "w", "utf-8") as mameXml_alt:
             dom_string_alt = linesep.join(
-                [s for s in config_alt.toprettyxml().splitlines() if s.strip()]
+                [s for s in config_alt.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...
             mameXml_alt.write(dom_string_alt)
 
@@ -144,7 +144,7 @@ def _load_control_mappings() -> dict[str, dict[str, str]]:
 
 
 def _initialize_main_config(
-    cfg_path: str, custom_cfg: bool
+    cfg_path: str, custom_cfg: bool,
 ) -> tuple[Document, str, bool]:
     """Initialize main configuration document and determine overwrite status."""
     config = Document()
@@ -167,7 +167,7 @@ def _get_base_mappings(control_dict: dict[str, dict[str, str]]) -> dict[str, str
 
 
 def _get_gun_mappings(
-    control_dict: dict[str, dict[str, str]], use_guns: bool
+    control_dict: dict[str, dict[str, str]], use_guns: bool,
 ) -> dict[str, str]:
     """Get gun button mappings if guns are enabled."""
     gunmappings = {}
@@ -178,7 +178,7 @@ def _get_gun_mappings(
 
 
 def _get_mouse_mappings(
-    control_dict: dict[str, dict[str, str]], use_mouse: bool
+    control_dict: dict[str, dict[str, str]], use_mouse: bool,
 ) -> dict[str, str]:
     """Get mouse button mappings if mouse is enabled."""
     mousemappings = {}
@@ -189,7 +189,7 @@ def _get_mouse_mappings(
 
 
 def _update_alt_mappings(
-    mappings: dict[str, str], control_dict: dict[str, dict[str, str]], alt_buttons: str
+    mappings: dict[str, str], control_dict: dict[str, dict[str, str]], alt_buttons: str,
 ):
     """Update mappings with alternative button configuration."""
     for control_def in control_dict[alt_buttons]:
@@ -200,7 +200,7 @@ def _configure_crosshairs(config: Document, xml_system: Any, system: Any):
     """Configure crosshairs settings."""
     removeSection(config, xml_system, "crosshairs")
     xml_crosshairs = config.createElement("crosshairs")
-    for p in range(0, 4):
+    for p in range(4):
         xml_crosshair = config.createElement("crosshair")
         xml_crosshair.setAttribute("player", str(p))
         if system.isOptSet("mame_crosshair") and system.config["mame_crosshair"] == "1":
@@ -348,7 +348,7 @@ def _handle_special_controllers(
 
 
 def _configure_lcd_display(
-    config_alt: minidom.Document, xml_system_alt: Any, decorations: str
+    config_alt: minidom.Document, xml_system_alt: Any, decorations: str,
 ):
     """Configure LCD display settings for CD-i."""
     removeSection(config_alt, xml_system_alt, "video")
@@ -456,8 +456,7 @@ def _check_wheel_mapping(
     wheels: dict[str, Any],
     mappings_use: dict[str, str],
 ) -> bool:
-    """
-    Check if the pad has a wheel and update mappings accordingly.
+    """Check if the pad has a wheel and update mappings accordingly.
 
     Args:
         pad: Controller pad object
@@ -468,6 +467,7 @@ def _check_wheel_mapping(
 
     Returns:
         True if the pad is a wheel, False otherwise
+
     """
     is_wheel = False
     if use_wheels:
@@ -508,9 +508,8 @@ def _get_pedal_key(nplayer: int, system: Any) -> str | None:
     pedal_cname = f"controllers.pedals{nplayer}"
     if pedal_cname in system.config:
         pedalkey = system.config[pedal_cname]
-    else:
-        if nplayer in pedals_keys:
-            pedalkey = pedals_keys[nplayer]
+    elif nplayer in pedals_keys:
+        pedalkey = pedals_keys[nplayer]
     return pedalkey
 
 
@@ -548,7 +547,7 @@ def _process_player_mappings(
                         mousemappings,
                         multi_mouse,
                         pedalkey,
-                    )
+                    ),
                 )
             else:
                 xml_input.appendChild(
@@ -567,7 +566,7 @@ def _process_player_mappings(
                         mousemappings,
                         multi_mouse,
                         pedalkey,
-                    )
+                    ),
                 )
         else:
             rmapping = reverseMapping(mappings_use[mapping])
@@ -588,7 +587,7 @@ def _process_player_mappings(
                         mousemappings,
                         multi_mouse,
                         pedalkey,
-                    )
+                    ),
                 )
 
 
@@ -613,7 +612,7 @@ def _add_ui_mappings(
             False,
             "",
             "",
-        )
+        ),
     )  # Down
     xml_input.appendChild(
         generateComboPortElement(
@@ -628,7 +627,7 @@ def _add_ui_mappings(
             False,
             "",
             "",
-        )
+        ),
     )  # Left
     xml_input.appendChild(
         generateComboPortElement(
@@ -643,7 +642,7 @@ def _add_ui_mappings(
             False,
             "",
             "",
-        )
+        ),
     )  # Up
     xml_input.appendChild(
         generateComboPortElement(
@@ -658,7 +657,7 @@ def _add_ui_mappings(
             False,
             "",
             "",
-        )
+        ),
     )  # Right
     xml_input.appendChild(
         generateComboPortElement(
@@ -673,7 +672,7 @@ def _add_ui_mappings(
             False,
             "",
             "",
-        )
+        ),
     )  # Select
 
 
@@ -709,7 +708,7 @@ def _process_special_controller_mappings(
                             this_control["mask"],
                             this_control["default"],
                             pedalkey,
-                        )
+                        ),
                     )
                 elif this_control["type"] == "analog":
                     xml_input_alt.appendChild(
@@ -729,7 +728,7 @@ def _process_special_controller_mappings(
                             this_control["default"],
                             this_control["delta"],
                             this_control["axis"],
-                        )
+                        ),
                     )
                 elif this_control["type"] == "combo":
                     xml_input_alt.appendChild(
@@ -745,7 +744,7 @@ def _process_special_controller_mappings(
                             this_control["reversed"],
                             this_control["mask"],
                             this_control["default"],
-                        )
+                        ),
                     )
 
 
@@ -763,7 +762,7 @@ def _configure_additional_guns(
         addCommonPlayerPorts(config, xml_input, gunnum)
         for mapping in gunmappings:
             gun_port = generateGunPortElement(
-                config, gunnum, mapping, gunmappings, pedalkey
+                config, gunnum, mapping, gunmappings, pedalkey,
             )
             if gun_port is not None:
                 xml_input.appendChild(gun_port)
@@ -773,20 +772,20 @@ def _save_config_file(config: Document, config_file: str):
     """Save the main configuration file."""
     with open(config_file, "w", "utf-8") as mameXml:
         dom_string = linesep.join(
-            [s for s in config.toprettyxml().splitlines() if s.strip()]
+            [s for s in config.toprettyxml().splitlines() if s.strip()],
         )  # remove ugly empty lines while minicom adds them...
         mameXml.write(dom_string)
 
 
 def reverseMapping(key: str) -> str | None:
-    """
-    Get the reverse mapping for a key.
+    """Get the reverse mapping for a key.
 
     Args:
         key: The key to reverse
 
     Returns:
         The reversed key or None if no reverse mapping exists
+
     """
     if key == "joystick1down":
         return "joystick1up"
@@ -815,8 +814,7 @@ def generatePortElement(
     multiMouse: bool,
     pedalkey: str | None,
 ) -> Any:
-    """
-    Generate a port element for the MAME configuration.
+    """Generate a port element for the MAME configuration.
 
     Args:
         pad: Controller pad object
@@ -836,6 +834,7 @@ def generatePortElement(
 
     Returns:
         The generated XML port element
+
     """
     # Generic input
     xml_port = config.createElement("port")
@@ -844,7 +843,7 @@ def generatePortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     keyval = input2definition(
-        pad, key, input, padindex, reversed, altButtons, False, isWheel
+        pad, key, input, padindex, reversed, altButtons, False, isWheel,
     )
     if mapping in gunmappings:
         keyval = keyval + f" OR GUNCODE_{nplayer}_{gunmappings[mapping]}"
@@ -867,8 +866,7 @@ def generateGunPortElement(
     gunmappings: dict[str, str],
     pedalkey: str | None,
 ) -> Any | None:
-    """
-    Generate a port element specifically for gun controls.
+    """Generate a port element specifically for gun controls.
 
     Args:
         config: XML configuration document
@@ -879,6 +877,7 @@ def generateGunPortElement(
 
     Returns:
         The generated XML port element or None if no mapping exists
+
     """
     # Generic input
     xml_port = config.createElement("port")
@@ -918,8 +917,7 @@ def generateSpecialPortElementPlayer(
     multiMouse: bool,
     pedalkey: str | None,
 ) -> Any:
-    """
-    Generate a special port element for player-specific controls.
+    """Generate a special port element for player-specific controls.
 
     Args:
         pad: Controller pad object
@@ -940,6 +938,7 @@ def generateSpecialPortElementPlayer(
 
     Returns:
         The generated XML port element
+
     """
     # Special button input (ie mouse button to gamepad)
     xml_port = config.createElement("port")
@@ -979,8 +978,7 @@ def generateSpecialPortElement(
     default: str,
     pedalkey: str | None,
 ) -> Any:
-    """
-    Generate a special port element.
+    """Generate a special port element.
 
     Args:
         pad: Controller pad object
@@ -998,6 +996,7 @@ def generateSpecialPortElement(
 
     Returns:
         The generated XML port element
+
     """
     # Special button input (ie mouse button to gamepad)
     xml_port = config.createElement("port")
@@ -1009,7 +1008,7 @@ def generateSpecialPortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
-        input2definition(pad, key, input, padindex, reversed, "0")
+        input2definition(pad, key, input, padindex, reversed, "0"),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1028,8 +1027,7 @@ def generateComboPortElement(
     mask: str,
     default: str,
 ) -> Any:
-    """
-    Generate a combo port element.
+    """Generate a combo port element.
 
     Args:
         pad: Controller pad object
@@ -1046,6 +1044,7 @@ def generateComboPortElement(
 
     Returns:
         The generated XML port element
+
     """
     # Maps a keycode + button - for important keyboard keys when available
     xml_port = config.createElement("port")
@@ -1058,7 +1057,7 @@ def generateComboPortElement(
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
         f"KEYCODE_{kbkey} OR "
-        + input2definition(pad, key, input, padindex, reversed, "0")
+        + input2definition(pad, key, input, padindex, reversed, "0"),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1081,8 +1080,7 @@ def generateAnalogPortElement(
     delta: str,
     axis: str = "",
 ) -> Any:
-    """
-    Generate an analog port element.
+    """Generate an analog port element.
 
     Args:
         pad: Controller pad object
@@ -1103,6 +1101,7 @@ def generateAnalogPortElement(
 
     Returns:
         The generated XML port element
+
     """
     # Mapping analog to digital (mouse, etc)
     xml_port = config.createElement("port")
@@ -1115,14 +1114,14 @@ def generateAnalogPortElement(
     xml_newseq_inc.setAttribute("type", "increment")
     xml_port.appendChild(xml_newseq_inc)
     incvalue = config.createTextNode(
-        input2definition(pad, inckey, mappedinput, padindex, reversed, "0", True)
+        input2definition(pad, inckey, mappedinput, padindex, reversed, "0", True),
     )
     xml_newseq_inc.appendChild(incvalue)
     xml_newseq_dec = config.createElement("newseq")
     xml_port.appendChild(xml_newseq_dec)
     xml_newseq_dec.setAttribute("type", "decrement")
     decvalue = config.createTextNode(
-        input2definition(pad, deckey, mappedinput2, padindex, reversed, "0", True)
+        input2definition(pad, deckey, mappedinput2, padindex, reversed, "0", True),
     )
     xml_newseq_dec.appendChild(decvalue)
     xml_newseq_std = config.createElement("newseq")
@@ -1146,8 +1145,7 @@ def input2definition(
     ignoreAxis: bool = False,
     isWheel: bool = False,
 ) -> str:
-    """
-    Convert input to MAME definition string.
+    """Convert input to MAME definition string.
 
     Args:
         pad: Controller pad object
@@ -1161,6 +1159,7 @@ def input2definition(
 
     Returns:
         MAME input definition string
+
     """
     mame_axis_mapping_names = {
         0: "XAXIS",
@@ -1282,8 +1281,7 @@ def input2definition(
 
 
 def _safe_int_conversion(value: Any, default: int = 0) -> int:
-    """
-    Safely convert a value to an integer.
+    """Safely convert a value to an integer.
 
     Args:
         value: The value to convert
@@ -1291,6 +1289,7 @@ def _safe_int_conversion(value: Any, default: int = 0) -> int:
 
     Returns:
         The converted integer or the default value
+
     """
     try:
         return int(value)
@@ -1299,21 +1298,20 @@ def _safe_int_conversion(value: Any, default: int = 0) -> int:
 
 
 def hasStick(pad: Any) -> bool:
-    """
-    Check if the pad has a joystick stick.
+    """Check if the pad has a joystick stick.
 
     Args:
         pad: Controller pad object
 
     Returns:
         True if the pad has a joystick stick, False otherwise
+
     """
     return "joystick1up" in pad.inputs
 
 
 def getRoot(config: Document, name: str) -> Any:
-    """
-    Get or create a root XML element with the specified name.
+    """Get or create a root XML element with the specified name.
 
     Args:
         config: XML configuration document
@@ -1321,6 +1319,7 @@ def getRoot(config: Document, name: str) -> Any:
 
     Returns:
         The XML element with the specified name
+
     """
     xml_section = config.getElementsByTagName(name)
 
@@ -1334,8 +1333,7 @@ def getRoot(config: Document, name: str) -> Any:
 
 
 def getSection(config: Document, xml_root: Any, name: str) -> Any:
-    """
-    Get or create a section XML element with the specified name.
+    """Get or create a section XML element with the specified name.
 
     Args:
         config: XML configuration document
@@ -1344,6 +1342,7 @@ def getSection(config: Document, xml_root: Any, name: str) -> Any:
 
     Returns:
         The XML element with the specified name
+
     """
     xml_section = xml_root.getElementsByTagName(name)
 
@@ -1357,29 +1356,29 @@ def getSection(config: Document, xml_root: Any, name: str) -> Any:
 
 
 def removeSection(config: Document, xml_root: Any, name: str):
-    """
-    Remove a section from the XML.
+    """Remove a section from the XML.
 
     Args:
         config: XML configuration document
         xml_root: Root XML element
         name: Name of the section to remove
+
     """
     xml_section = xml_root.getElementsByTagName(name)
 
-    for i in range(0, len(xml_section)):
+    for i in range(len(xml_section)):
         old = xml_root.removeChild(xml_section[i])
         old.unlink()
 
 
 def addCommonPlayerPorts(config: Document, xml_input: Any, nplayer: int):
-    """
-    Add common player ports for guns.
+    """Add common player ports for guns.
 
     Args:
         config: XML configuration document
         xml_input: Input XML element
         nplayer: Player number
+
     """
     # adstick for guns
     for axis in ["X", "Y"]:

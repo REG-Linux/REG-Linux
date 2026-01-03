@@ -16,7 +16,7 @@ class ViceGenerator(Generator):
     # Main entry of the module
     # Return command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         setViceConfig(system, metadata, guns)
         setViceControllers(system, players_controllers)
@@ -26,7 +26,7 @@ class ViceGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

@@ -6,8 +6,7 @@ import zmq.error
 
 
 class RegMsgClient:
-    """
-    Client for communication with regmsgd service using ZeroMQ.
+    """Client for communication with regmsgd service using ZeroMQ.
 
     This class provides a more robust and safe interface for communicating
     with the regmsgd daemon, with enhanced error handling and connection
@@ -15,14 +14,14 @@ class RegMsgClient:
     """
 
     def __init__(
-        self, address: str = "ipc:///var/run/regmsgd.sock", timeout: int = 5000
+        self, address: str = "ipc:///var/run/regmsgd.sock", timeout: int = 5000,
     ):
-        """
-        Initialize the RegMsg client.
+        """Initialize the RegMsg client.
 
         Args:
             address: IPC socket address for regmsgd
             timeout: Timeout in milliseconds for send/receive operations
+
         """
         self.address = address
         self.timeout = timeout
@@ -80,8 +79,7 @@ class RegMsgClient:
         return self._connected and self.socket is not None and self.context is not None
 
     def send_message(self, message: str) -> str:
-        """
-        Send a message to regmsgd and return the response.
+        """Send a message to regmsgd and return the response.
 
         Args:
             message: Message to be sent
@@ -91,6 +89,7 @@ class RegMsgClient:
 
         Raises:
             RuntimeError: If not connected or communication error occurs
+
         """
         if not self.is_connected():
             raise RuntimeError("Client is not connected. Call connect() first.")
@@ -104,12 +103,12 @@ class RegMsgClient:
             return self.socket.recv_string()
         except zmq.Again:
             raise RuntimeError(
-                f"Timeout in communication with regmsgd (>{self.timeout}ms)"
+                f"Timeout in communication with regmsgd (>{self.timeout}ms)",
             ) from None
         except zmq.error.ZMQError as e:
-            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}") from e
+            raise RuntimeError(f"Error in communication with regmsgd: {e!s}") from e
         except Exception as e:
-            raise RuntimeError(f"Unexpected error sending message: {str(e)}") from e
+            raise RuntimeError(f"Unexpected error sending message: {e!s}") from e
 
     def __enter__(self):
         """Enable usage as context manager."""
@@ -117,7 +116,7 @@ class RegMsgClient:
         return self
 
     def __exit__(
-        self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any | None
+        self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any | None,
     ) -> None:
         """Ensure connection is closed when exiting context manager."""
         self.disconnect()
@@ -130,10 +129,9 @@ _socket: zmq.Socket[Any] | None = None
 
 
 def regmsg_connect(
-    address: str = "ipc:///var/run/regmsgd.sock", timeout: int = 5000
+    address: str = "ipc:///var/run/regmsgd.sock", timeout: int = 5000,
 ) -> RegMsgClient:
-    """
-    Compatibility function to connect to regmsgd.
+    """Compatibility function to connect to regmsgd.
 
     Args:
         address: IPC socket address for regmsgd
@@ -141,6 +139,7 @@ def regmsg_connect(
 
     Returns:
         RegMsgClient instance ready for use
+
     """
     global _context, _socket
     client = RegMsgClient(address, timeout)
@@ -154,8 +153,7 @@ def regmsg_connect(
 
 
 def regmsg_send_message(message: str, timeout: int = 5000) -> str:
-    """
-    Compatibility function to send message to regmsgd.
+    """Compatibility function to send message to regmsgd.
 
     Args:
         message: Message to be sent
@@ -163,6 +161,7 @@ def regmsg_send_message(message: str, timeout: int = 5000) -> str:
 
     Returns:
         Response from regmsgd service
+
     """
     global _socket, _context
 
@@ -175,15 +174,15 @@ def regmsg_send_message(message: str, timeout: int = 5000) -> str:
             return _socket.recv_string()
         except zmq.Again:
             raise RuntimeError(
-                f"Timeout in communication with regmsgd (>{timeout}ms)"
+                f"Timeout in communication with regmsgd (>{timeout}ms)",
             ) from None
         except zmq.error.ZMQError as e:
-            raise RuntimeError(f"Error in communication with regmsgd: {str(e)}") from e
+            raise RuntimeError(f"Error in communication with regmsgd: {e!s}") from e
         except AttributeError:
             # Handle the case where socket methods are not available (is None)
             raise RuntimeError("Socket is None, cannot send/receive message") from None
         except Exception as e:
-            raise RuntimeError(f"Unexpected error sending message: {str(e)}") from e
+            raise RuntimeError(f"Unexpected error sending message: {e!s}") from e
     else:
         # If no global connection exists, create temporarily
         with RegMsgClient(timeout=timeout) as client:
@@ -217,12 +216,12 @@ def regmsg_disconnect() -> None:
 
 @contextlib.contextmanager
 def regmsg_client(address: str = "ipc:///var/run/regmsgd.sock", timeout: int = 5000):
-    """
-    Context manager for safe usage of regmsg client.
+    """Context manager for safe usage of regmsg client.
 
     Args:
         address: IPC socket address for regmsgd
         timeout: Timeout in milliseconds for operations
+
     """
     client = RegMsgClient(address, timeout)
     try:
