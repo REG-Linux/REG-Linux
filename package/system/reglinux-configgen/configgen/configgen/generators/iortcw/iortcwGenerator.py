@@ -27,12 +27,12 @@ class IORTCWGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str,
     ) -> float:
         return 16 / 9

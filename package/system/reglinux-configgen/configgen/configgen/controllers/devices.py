@@ -48,7 +48,7 @@ def getDevicesInformation() -> dict[str, Any]:
                 if "ID_PATH" in ev.properties and group is not None:
                     if isWheel and "WHEEL_ROTATION_ANGLE" in ev.properties:
                         devices[str(eventId)]["wheel_rotation"] = int(
-                            ev.properties["WHEEL_ROTATION_ANGLE"]
+                            ev.properties["WHEEL_ROTATION_ANGLE"],
                         )
                     if group not in groups:
                         groups[group] = []
@@ -90,7 +90,7 @@ def getDevicesInformation() -> dict[str, Any]:
 
 
 def getAssociatedMouse(
-    devicesInformation: dict[str, Any], dev: str
+    devicesInformation: dict[str, Any], dev: str,
 ) -> dict[str, Any] | None:
     if (
         dev not in devicesInformation

@@ -12,7 +12,7 @@ class EdenGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Load existing config or create a new one
         edenConfig = UnixSettings(EDEN_CONFIG_PATH)

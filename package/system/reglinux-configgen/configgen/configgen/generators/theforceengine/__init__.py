@@ -1,5 +1,4 @@
-"""
-Theforceengine generator module for REG-Linux
+"""Theforceengine generator module for REG-Linux
 This module handles the generation of theforceengine emulator configurations.
 """
 

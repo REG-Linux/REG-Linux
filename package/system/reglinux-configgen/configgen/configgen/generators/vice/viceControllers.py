@@ -59,11 +59,10 @@ def setViceControllers(system: Any, playersControllers: Any) -> None:
                     listVice.append(
                         indexValue.replace("#", str(pad.index))
                         .replace("?", str(input.id))
-                        .replace("/", joy_port)
+                        .replace("/", joy_port),
                     )
         listVice.append("")
         nplayer += 1
 
     with open(VICE_CONTROLLER_PATH, "w") as f:
-        for i in range(len(listVice)):
-            f.write(str(listVice[i]) + "\n")
+        f.writelines(str(listVice[i]) + "\n" for i in range(len(listVice)))

@@ -13,14 +13,14 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
     if not iniConfig.has_section("Core"):
         iniConfig.add_section("Core")
     iniConfig.set(
-        "Core", "Version", "1.01"
+        "Core", "Version", "1.01",
     )  # Version is important for the .ini creation otherwise, mupen remove the section
     iniConfig.set("Core", "ScreenshotPath", SCREENSHOTS)
     iniConfig.set("Core", "SaveStatePath", MUPEN_SAVES_DIR)
     iniConfig.set("Core", "SaveSRAMPath", MUPEN_SAVES_DIR)
     iniConfig.set("Core", "SharedDataPath", MUPEN_CONFIG_DIR)
     iniConfig.set(
-        "Core", "SaveFilenameFormat", "1000"
+        "Core", "SaveFilenameFormat", "1000",
     )  # forces savesstates with rom name
     # TODO : Miss Mupen64Plus\hires_texture
 
@@ -32,7 +32,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
         iniConfig.set("Core", "DisableExtraMem", "True")
     else:
         iniConfig.set(
-            "Core", "DisableExtraMem", "False"
+            "Core", "DisableExtraMem", "False",
         )  # Disable 4MB expansion RAM pack. May be necessary for some games
 
     # Create section for Audio-SDL
@@ -87,7 +87,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
     iniConfig.set("Video-General", "ScreenWidth", str(width))
     iniConfig.set("Video-General", "ScreenHeight", str(height))
     iniConfig.set(
-        "Video-General", "Fullscreen", "True"
+        "Video-General", "Fullscreen", "True",
     )  # required at least for drm boards
     iniConfig.set("Video-General", "VerticalSync", "True")
 
@@ -153,10 +153,10 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
             iniConfig.set("Video-Glide64mk2", "filtering", "2")
     else:
         iniConfig.set(
-            "Video-Rice", "Mipmapping", "0"
+            "Video-Rice", "Mipmapping", "0",
         )  # 0=no, 1=nearest, 2=bilinear, 3=trilinear
         iniConfig.set(
-            "Video-Glide64mk2", "filtering", "-1"
+            "Video-Glide64mk2", "filtering", "-1",
         )  # -1=Game default, 0=automatic, 1=force bilinear, 2=force point sampled
 
     # Anisotropic Filtering
@@ -176,11 +176,11 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
         )
     else:
         iniConfig.set(
-            "Video-Rice", "AnisotropicFiltering", "0"
+            "Video-Rice", "AnisotropicFiltering", "0",
         )  # Enable/Disable Anisotropic Filtering for Mipmapping (0=no filtering, 2-16=quality).
         # This is uneffective if Mipmapping is false.
         iniConfig.set(
-            "Video-Glide64mk2", "wrpAnisotropic", "1"
+            "Video-Glide64mk2", "wrpAnisotropic", "1",
         )  # Wrapper Anisotropic Filtering
 
     # Anti-aliasing MSAA
@@ -189,7 +189,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
         and system.config["mupen64plus_AntiAliasing"] != 0
     ):
         iniConfig.set(
-            "Video-Rice", "MultiSampling", system.config["mupen64plus_AntiAliasing"]
+            "Video-Rice", "MultiSampling", system.config["mupen64plus_AntiAliasing"],
         )
         iniConfig.set(
             "Video-Glide64mk2",
@@ -199,7 +199,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
     else:
         iniConfig.set("Video-Rice", "MultiSampling", "0")  # 0=off, 2, 4, 8, 16=quality
         iniConfig.set(
-            "Video-Glide64mk2", "wrpAntiAliasing", "0"
+            "Video-Glide64mk2", "wrpAntiAliasing", "0",
         )  # Enable full-scene anti-aliasing by setting this to a value greater than 1
 
     # Hires textures
@@ -212,7 +212,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
     else:
         iniConfig.set("Video-Rice", "LoadHiResTextures", "False")
         iniConfig.set(
-            "Video-Glide64mk2", "ghq_hirs", "0"
+            "Video-Glide64mk2", "ghq_hirs", "0",
         )  # Hi-res texture pack format (0 for none, 1 for Rice)
 
     # Texture Enhencement XBRZ -> ONLY for RICE
@@ -227,7 +227,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
         )
     else:
         iniConfig.set(
-            "Video-Rice", "TextureEnhancement", "0"
+            "Video-Rice", "TextureEnhancement", "0",
         )  # 0=None, 1=2X, 2=2XSAI, 3=HQ2X, 4=LQ2X, 5=HQ4X, 6=Sharpen, 7=Sharpen More, 8=External, 9=Mirrored
 
     # Frameskip -> ONLY for GLIDE64MK2
@@ -280,7 +280,7 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
     else:
         iniConfig.set("Video-Rice", "ShowFPS", "False")
         iniConfig.set(
-            "Video-Glide64mk2", "show_fps", "8"
+            "Video-Glide64mk2", "show_fps", "8",
         )  # 1=FPS counter, 2=VI/s counter, 4=% speed, 8=FPS transparent
 
     # Custom : allow the user to configure directly mupen64plus.cfg via system.conf via lines like : n64.mupen64plus.section.option=value
@@ -293,5 +293,5 @@ def setMupenConfig(iniConfig: Any, system: Any, gameResolution: dict[str, int]) 
             if not iniConfig.has_section(custom_section):
                 iniConfig.add_section(custom_section)
             iniConfig.set(
-                custom_section, custom_option, str(system.config[user_config])
+                custom_section, custom_option, str(system.config[user_config]),
             )

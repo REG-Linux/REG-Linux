@@ -1,5 +1,4 @@
-"""
-Mupen64Plus generator module for REG-Linux
+"""Mupen64Plus generator module for REG-Linux
 This module handles the generation of Mupen64Plus emulator configurations.
 """
 

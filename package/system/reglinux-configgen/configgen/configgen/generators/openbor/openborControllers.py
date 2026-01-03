@@ -71,7 +71,7 @@ def JoystickValue(
 
 
 def setupControllers(
-    config: Any, playersControllers: Any, joy_max_inputs: Any, new_axis_vals: Any
+    config: Any, playersControllers: Any, joy_max_inputs: Any, new_axis_vals: Any,
 ) -> None:
     # Button control mappings for better readability and maintenance
     CONTROL_MAPPINGS = [

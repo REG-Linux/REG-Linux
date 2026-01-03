@@ -10,14 +10,14 @@ eslog = get_logger(__name__)
 
 
 def generateControllerConfig(system: Any, playersControllers: Any, rom: str) -> None:
-    """
-    Generate controller configuration for Triforce controllers.
+    """Generate controller configuration for Triforce controllers.
 
     Args:
         system: System configuration object
         playersControllers: Player controllers configuration
         wheels: Wheel controllers
         rom: ROM file path
+
     """
     triforce_mapping: dict[str, str | None] = {
         "b": "Buttons/B",
@@ -85,8 +85,7 @@ def generateControllerConfig_any(
     anyMapping: Any,
     anyReverseAxes: Any,
 ) -> None:
-    """
-    Generate controller configuration for any controller type.
+    """Generate controller configuration for any controller type.
 
     Args:
         system: System configuration object
@@ -95,6 +94,7 @@ def generateControllerConfig_any(
         anyDefKey: Key for the configuration section
         anyMapping: Button mapping configuration
         anyReverseAxes: Reverse axes configuration
+
     """
     import codecs
 
@@ -119,7 +119,7 @@ def generateControllerConfig_any(
             f.write(f"Device = SDL/{nsamepad}/{pad.name.strip()}\n")
 
             if system.isOptSet("use_pad_profiles") and system.getOptBoolean(
-                "use_pad_profiles"
+                "use_pad_profiles",
             ):
                 if not generateControllerConfig_any_from_profiles(f, pad, system):
                     generateControllerConfig_any_auto(
@@ -131,19 +131,18 @@ def generateControllerConfig_any(
                         nplayer,
                         nsamepad,
                     )
+            elif pad.dev in []:
+                generateControllerConfig_wheel(f, pad, nplayer)
             else:
-                if pad.dev in []:
-                    generateControllerConfig_wheel(f, pad, nplayer)
-                else:
-                    generateControllerConfig_any_auto(
-                        f,
-                        pad,
-                        anyMapping,
-                        anyReverseAxes,
-                        system,
-                        nplayer,
-                        nsamepad,
-                    )
+                generateControllerConfig_any_auto(
+                    f,
+                    pad,
+                    anyMapping,
+                    anyReverseAxes,
+                    system,
+                    nplayer,
+                    nsamepad,
+                )
 
             nplayer += 1
 
@@ -157,8 +156,7 @@ def generateControllerConfig_any_auto(
     nplayer: int,
     nsamepad: int,
 ) -> None:
-    """
-    Generate controller configuration automatically based on available inputs.
+    """Generate controller configuration automatically based on available inputs.
 
     Args:
         f: File object to write the configuration to
@@ -168,6 +166,7 @@ def generateControllerConfig_any_auto(
         system: System configuration object
         nplayer: Player number
         nsamepad: Pad number in case of multiple pads with the same name
+
     """
     # Use the original mapping without replacements
     current_mapping = anyMapping
@@ -182,7 +181,7 @@ def generateControllerConfig_any_auto(
         # Write the configuration for this key
         if keyname is not None:
             write_key(
-                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None
+                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None,
             )
 
         # Write the 2nd part
@@ -218,8 +217,8 @@ def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) ->
             / "Config"
             / "Profiles"
             / "GCPad"
-            / "*.ini"
-        )
+            / "*.ini",
+        ),
     ):
         try:
             eslog.debug(f"Looking profile : {profileFile}")

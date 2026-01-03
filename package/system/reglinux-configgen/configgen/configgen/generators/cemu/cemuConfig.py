@@ -90,26 +90,26 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
         # Check if we have a discrete GPU & if so, set the UUID
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
                     have_discrete = check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
                     ).strip()
                     if have_discrete == "true":
                         eslog.debug(
-                            "A discrete GPU is available on the system. We will use that for performance"
+                            "A discrete GPU is available on the system. We will use that for performance",
                         )
                         try:
                             discrete_uuid = check_output(
-                                ["/usr/bin/system-vulkan", "discreteUUID"], text=True
+                                ["/usr/bin/system-vulkan", "discreteUUID"], text=True,
                             ).strip()
                             if discrete_uuid != "":
                                 discrete_uuid_num = discrete_uuid.replace("-", "")
                                 eslog.debug(
-                                    f"Using Discrete GPU UUID: {discrete_uuid_num} for Cemu"
+                                    f"Using Discrete GPU UUID: {discrete_uuid_num} for Cemu",
                                 )
                                 setSectionConfig(
                                     cemuConfig,
@@ -123,13 +123,13 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
                             eslog.debug("Error getting discrete GPU UUID!")
                     else:
                         eslog.debug(
-                            "Discrete GPU is not available on the system. Using default."
+                            "Discrete GPU is not available on the system. Using default.",
                         )
                 except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
             else:
                 eslog.debug(
-                    "Vulkan driver is not available on the system. Falling back to OpenGL"
+                    "Vulkan driver is not available on the system. Falling back to OpenGL",
                 )
                 setSectionConfig(cemuConfig, graphic_root, "api", "0")
         except CalledProcessError:
@@ -148,21 +148,21 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
     # Upscale Filter
     if system.isOptSet("cemu_upscale"):
         setSectionConfig(
-            cemuConfig, graphic_root, "UpscaleFilter", system.config["cemu_upscale"]
+            cemuConfig, graphic_root, "UpscaleFilter", system.config["cemu_upscale"],
         )
     else:
         setSectionConfig(cemuConfig, graphic_root, "UpscaleFilter", "2")  # Hermite
     # Downscale Filter
     if system.isOptSet("cemu_downscale"):
         setSectionConfig(
-            cemuConfig, graphic_root, "DownscaleFilter", system.config["cemu_downscale"]
+            cemuConfig, graphic_root, "DownscaleFilter", system.config["cemu_downscale"],
         )
     else:
         setSectionConfig(cemuConfig, graphic_root, "DownscaleFilter", "0")  # Bilinear
     # Aspect Ratio
     if system.isOptSet("cemu_aspect"):
         setSectionConfig(
-            cemuConfig, graphic_root, "FullscreenScaling", system.config["cemu_aspect"]
+            cemuConfig, graphic_root, "FullscreenScaling", system.config["cemu_aspect"],
         )
     else:
         setSectionConfig(cemuConfig, graphic_root, "FullscreenScaling", "0")  # Bilinear
@@ -223,7 +223,7 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
     # Turn audio ONLY on TV
     if system.isOptSet("cemu_audio_channels"):
         setSectionConfig(
-            cemuConfig, audio_root, "TVChannels", system.config["cemu_audio_channels"]
+            cemuConfig, audio_root, "TVChannels", system.config["cemu_audio_channels"],
         )
     else:
         setSectionConfig(cemuConfig, audio_root, "TVChannels", "1")  # Stereo
@@ -231,15 +231,15 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
     setSectionConfig(cemuConfig, audio_root, "TVVolume", "100")
     # Set the audio device - we choose the 1st device as this is more likely the answer
     # pactl list sinks-raw | sed -e s+"^sink=[0-9]* name=\([^ ]*\) .*"+"\1"+ | sed 1q | tr -d '\n'
-    proc = run(["/usr/bin/cemu/get-audio-device"], stdout=PIPE)
+    proc = run(["/usr/bin/cemu/get-audio-device"], check=False, stdout=PIPE)
     cemuAudioDevice = proc.stdout.decode("utf-8")
     eslog.debug(f"*** audio device = {cemuAudioDevice} ***")
     if system.isOptSet("cemu_audio_config") and system.getOptBoolean(
-        "cemu_audio_config"
+        "cemu_audio_config",
     ):
         setSectionConfig(cemuConfig, audio_root, "TVDevice", cemuAudioDevice)
     elif system.isOptSet("cemu_audio_config") and not system.getOptBoolean(
-        "cemu_audio_config"
+        "cemu_audio_config",
     ):
         # don't change the config setting
         eslog.debug("*** use config audio device ***")

@@ -27,7 +27,7 @@ CORSIXTH_GAME_DATA_DIR = [
 def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> None:
     corsixthConfig.write("check_for_updates = false\n")
     corsixthConfig.write(
-        "theme_hospital_install = [[" + str(CORSIXTH_ROMS_DIR) + "]]\n"
+        "theme_hospital_install = [[" + str(CORSIXTH_ROMS_DIR) + "]]\n",
     )
     corsixthConfig.write("unicode_font = [[" + str(CORSIXTH_FONT_PATH) + "]]\n")
     corsixthConfig.write("savegames = [[" + str(CORSIXTH_SAVES_DIR) + "]]\n")
@@ -46,7 +46,7 @@ def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> 
     # Values coming from ES configuration : New Graphics
     if system.isOptSet("cth_new_graphics"):
         corsixthConfig.write(
-            "use_new_graphics = " + system.config["cth_new_graphics"] + "\n"
+            "use_new_graphics = " + system.config["cth_new_graphics"] + "\n",
         )
     else:
         corsixthConfig.write("use_new_graphics = true\n")
@@ -54,7 +54,7 @@ def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> 
     # Values coming from ES configuration : Sandbox Mode
     if system.isOptSet("cth_free_build_mode"):
         corsixthConfig.write(
-            "free_build_mode = " + system.config["cth_free_build_mode"] + "\n"
+            "free_build_mode = " + system.config["cth_free_build_mode"] + "\n",
         )
     else:
         corsixthConfig.write("free_build_mode = false\n")
@@ -93,7 +93,7 @@ def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> 
     # 1. Grab reglinux system language
     try:
         language = check_output(
-            "/usr/bin/system-settings-get system.language", shell=True, text=True
+            "/usr/bin/system-settings-get system.language", shell=True, text=True,
         ).strip()
     except CalledProcessError:
         language = "en_US"
@@ -108,5 +108,5 @@ def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> 
         chdir(str(music_dir))
         corsixthConfig.write("audio_music = [[" + str(music_dir) + "]]\n")
     except (FileNotFoundError, OSError) as e:
-        eslog.debug(f"Corsixth: Music directory not found: {music_dir} - {str(e)}")
+        eslog.debug(f"Corsixth: Music directory not found: {music_dir} - {e!s}")
         corsixthConfig.write("audio_music = nil\n")

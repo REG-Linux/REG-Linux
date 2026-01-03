@@ -1,5 +1,4 @@
-"""
-Drastic generator module for REG-Linux
+"""Drastic generator module for REG-Linux
 This module handles the generation of drastic emulator configurations.
 """
 

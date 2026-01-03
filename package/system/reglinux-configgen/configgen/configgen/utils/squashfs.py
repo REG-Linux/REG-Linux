@@ -40,21 +40,20 @@ def squashfs_begin(rom: str) -> tuple[bool, str | None, Any]:
         try:
             rommountpoint.rmdir()
         except (OSError, FileNotFoundError) as e:
-            eslog.debug(f"squashfs_begin: failed to rmdir {rommountpoint} - {str(e)}")
+            eslog.debug(f"squashfs_begin: failed to rmdir {rommountpoint} - {e!s}")
             return False, None, str(rommountpoint)
 
     # ok, the base directory doesn't exist, let's create it and mount the squashfs on it
     rommountpoint.mkdir(parents=True, exist_ok=True)
     return_code = subprocess.call(["mount", rom, str(rommountpoint)])
     if return_code != 0:
-        eslog.debug(f"squashfs_begin: mounting {str(rommountpoint)} failed")
+        eslog.debug(f"squashfs_begin: mounting {rommountpoint!s} failed")
         try:
             rommountpoint.rmdir()
         except (OSError, FileNotFoundError) as e:
             eslog.debug(
-                f"squashfs: failed to remove directory {rommountpoint} - {str(e)}"
+                f"squashfs: failed to remove directory {rommountpoint} - {e!s}",
             )
-            pass
         raise Exception(f"unable to mount the file {rom}")
 
     # if the squashfs contains a single file with the same name, take it as the rom file

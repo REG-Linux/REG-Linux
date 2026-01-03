@@ -36,8 +36,7 @@ class MameGenerator(Generator):
         wheels: Any,
         game_resolution: dict[str, Any],
     ) -> Command:
-        """
-        Generate the MAME command array for the specified ROM and system configuration.
+        """Generate the MAME command array for the specified ROM and system configuration.
 
         Args:
             system: System configuration
@@ -50,6 +49,7 @@ class MameGenerator(Generator):
 
         Returns:
             Command object with the appropriate MAME command array
+
         """
         # Extract "<romfile.zip>"
         romBasename = Path(rom).name
@@ -122,19 +122,18 @@ class MameGenerator(Generator):
         if messMode == -1:
             command_array += [
                 "-rompath",
-                f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))}",
+                f"{romDirname};{Path('/userdata/bios/mame/')!s};{Path('/userdata/bios/')!s}",
+            ]
+        elif softList in subdirSoftList:
+            command_array += [
+                "-rompath",
+                f"{romDirname};{Path('/userdata/bios/mame/')!s};{Path('/userdata/bios/')!s};{Path('/userdata/roms/mame/')!s};{Path('/var/run/mame_software/')!s}",
             ]
         else:
-            if softList in subdirSoftList:
-                command_array += [
-                    "-rompath",
-                    f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))};{str(Path('/userdata/roms/mame/'))};{str(Path('/var/run/mame_software/'))}",
-                ]
-            else:
-                command_array += [
-                    "-rompath",
-                    f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))};{str(Path('/userdata/roms/mame/'))}",
-                ]
+            command_array += [
+                "-rompath",
+                f"{romDirname};{Path('/userdata/bios/mame/')!s};{Path('/userdata/bios/')!s};{Path('/userdata/roms/mame/')!s}",
+            ]
 
         # MAME various paths we can probably do better
         command_array += [
@@ -151,7 +150,7 @@ class MameGenerator(Generator):
         ]  # Translations can be left on ROM filesystem
         command_array += [
             "-pluginspath",
-            f"{str(Path('/usr/bin/mame/plugins/'))};{str(Path('/userdata/saves/mame/plugins'))}",
+            f"{Path('/usr/bin/mame/plugins/')!s};{Path('/userdata/saves/mame/plugins')!s}",
         ]
         command_array += [
             "-samplepath",
@@ -159,7 +158,7 @@ class MameGenerator(Generator):
         ]  # Current reglinux storage location for MAME samples
         command_array += [
             "-artpath",
-            f"{str(Path('/var/run/mame_artwork/'))};{str(Path('/usr/bin/mame/artwork/'))};{str(Path('/userdata/bios/mame/artwork/'))};{str(Path('/userdata/decorations/'))}",
+            f"{Path('/var/run/mame_artwork/')!s};{Path('/usr/bin/mame/artwork/')!s};{Path('/userdata/bios/mame/artwork/')!s};{Path('/userdata/decorations/')!s}",
         ]  # first for systems ; second for overlays
 
         # Enable cheats
@@ -188,7 +187,7 @@ class MameGenerator(Generator):
                 cfgPath = Path("/userdata/system/configs/mame/")
             if not Path("/userdata/system/configs/mame/").exists():
                 Path("/userdata/system/configs/mame/").mkdir(
-                    parents=True, exist_ok=True
+                    parents=True, exist_ok=True,
                 )
         else:
             if customCfg:
@@ -203,7 +202,7 @@ class MameGenerator(Generator):
                 Path("/userdata/system/configs/mame/") / messSysName[messMode]
             ).exists():
                 (Path("/userdata/system/configs/mame/") / messSysName[messMode]).mkdir(
-                    parents=True, exist_ok=True
+                    parents=True, exist_ok=True,
                 )
         if not cfgPath.exists():
             cfgPath.mkdir(parents=True, exist_ok=True)
@@ -220,7 +219,7 @@ class MameGenerator(Generator):
             ).exists()
         ):
             (Path("/userdata/system/configs/mame/") / messSysName[messMode]).mkdir(
-                parents=True, exist_ok=True
+                parents=True, exist_ok=True,
             )
             cfgPath = (
                 Path("/userdata/system/configs/mame/")
@@ -245,7 +244,7 @@ class MameGenerator(Generator):
         ]
         command_array += [
             "-inipath",
-            f"{str(Path('/userdata/system/configs/mame/'))};{str(Path('/userdata/system/configs/mame/ini/'))}",
+            f"{Path('/userdata/system/configs/mame/')!s};{Path('/userdata/system/configs/mame/ini/')!s}",
         ]
         command_array += [
             "-crosshairpath",
@@ -295,7 +294,7 @@ class MameGenerator(Generator):
         else:
             command_array += [
                 "-resolution",
-                "{}x{}".format(game_resolution["width"], game_resolution["height"]),
+                f"{game_resolution['width']}x{game_resolution['height']}",
             ]
 
         # Refresh rate options to help with screen tearing
@@ -369,7 +368,7 @@ class MameGenerator(Generator):
             command_array += ["-lightgun_device", "lightgun"]
             command_array += ["-adstick_device", "lightgun"]
         if system.isOptSet("offscreenreload") and system.getOptBoolean(
-            "offscreenreload"
+            "offscreenreload",
         ):
             command_array += ["-offscreen_reload"]
 
@@ -430,7 +429,7 @@ class MameGenerator(Generator):
                 if system.isOptSet("gameio") and system.config["gameio"] != "none":
                     if system.config["gameio"] == "joyport" and messModel != "apple2p":
                         logger.debug(
-                            "Joyport joystick is only compatible with Apple II Plus"
+                            "Joyport joystick is only compatible with Apple II Plus",
                         )
                     else:
                         command_array += ["-gameio", system.config["gameio"]]
@@ -516,62 +515,59 @@ class MameGenerator(Generator):
                             command_array += ["-cart"]
                     else:
                         command_array += ["-" + messRomType[messMode]]
-                else:
-                    if system.isOptSet("bootdisk"):
-                        if (
-                            (
-                                system.isOptSet("altromtype")
-                                and system.config["altromtype"] == "flop1"
-                            )
-                            or not system.isOptSet("altromtype")
-                        ) and system.config["bootdisk"] in [
-                            "macos30",
-                            "macos608",
-                            "macos701",
-                            "macos75",
-                        ]:
-                            command_array += ["-flop2"]
-                        elif system.isOptSet("altromtype"):
-                            command_array += ["-" + system.config["altromtype"]]
-                        else:
-                            command_array += ["-" + messRomType[messMode]]
+                elif system.isOptSet("bootdisk"):
+                    if (
+                        (
+                            system.isOptSet("altromtype")
+                            and system.config["altromtype"] == "flop1"
+                        )
+                        or not system.isOptSet("altromtype")
+                    ) and system.config["bootdisk"] in [
+                        "macos30",
+                        "macos608",
+                        "macos701",
+                        "macos75",
+                    ]:
+                        command_array += ["-flop2"]
+                    elif system.isOptSet("altromtype"):
+                        command_array += ["-" + system.config["altromtype"]]
                     else:
-                        if system.isOptSet("altromtype"):
-                            command_array += ["-" + system.config["altromtype"]]
-                        else:
-                            command_array += ["-" + messRomType[messMode]]
+                        command_array += ["-" + messRomType[messMode]]
+                elif system.isOptSet("altromtype"):
+                    command_array += ["-" + system.config["altromtype"]]
+                else:
+                    command_array += ["-" + messRomType[messMode]]
                 # Use the full filename for MESS ROMs
                 command_array += [rom]
-            else:
-                # Prepare software lists
-                if softList != "":
-                    softDirPath = Path(softDir)
-                    if not softDirPath.exists():
-                        makedirs(softDir)
-                    for file_name in listdir(softDir):
-                        checkFile = str(softDirPath / file_name)
-                        if Path(checkFile).is_symlink():
-                            unlink(checkFile)
-                        if Path(checkFile).is_dir():
-                            rmtree(checkFile)
-                    hashDir = softDirPath / "hash"
-                    if not hashDir.exists():
-                        makedirs(str(hashDir))
-                    # Clear existing hashfile links
-                    for hashFile in listdir(str(hashDir)):
-                        if hashFile.endswith(".xml"):
-                            unlink(str(hashDir / hashFile))
-                    symlink(
-                        f"/usr/bin/mame/hash/{softList}.xml",
-                        str(hashDir / f"{softList}.xml"),
-                    )
-                    if softList in subdirSoftList:
-                        romPath = Path(romDirname)
-                        symlink(str(romPath.parent), str(softDirPath / softList), True)
-                        command_array += [Path(romDirname).name]
-                    else:
-                        symlink(romDirname, str(softDirPath / softList), True)
-                        command_array += [Path(romBasename).stem]
+            # Prepare software lists
+            elif softList != "":
+                softDirPath = Path(softDir)
+                if not softDirPath.exists():
+                    makedirs(softDir)
+                for file_name in listdir(softDir):
+                    checkFile = str(softDirPath / file_name)
+                    if Path(checkFile).is_symlink():
+                        unlink(checkFile)
+                    if Path(checkFile).is_dir():
+                        rmtree(checkFile)
+                hashDir = softDirPath / "hash"
+                if not hashDir.exists():
+                    makedirs(str(hashDir))
+                # Clear existing hashfile links
+                for hashFile in listdir(str(hashDir)):
+                    if hashFile.endswith(".xml"):
+                        unlink(str(hashDir / hashFile))
+                symlink(
+                    f"/usr/bin/mame/hash/{softList}.xml",
+                    str(hashDir / f"{softList}.xml"),
+                )
+                if softList in subdirSoftList:
+                    romPath = Path(romDirname)
+                    symlink(str(romPath.parent), str(softDirPath / softList), True)
+                    command_array += [Path(romDirname).name]
+                else:
+                    symlink(romDirname, str(softDirPath / softList), True)
+                    command_array += [Path(romBasename).stem]
 
             # Create & add a blank disk if needed, insert into drive 2
             # or drive 1 if drive 2 is selected manually or FM Towns Marty.
@@ -737,8 +733,7 @@ class MameGenerator(Generator):
 
     @staticmethod
     def getRoot(config: Any, name: str) -> Any:
-        """
-        Get or create an XML root element with the specified name.
+        """Get or create an XML root element with the specified name.
 
         Args:
             config: XML configuration document
@@ -746,6 +741,7 @@ class MameGenerator(Generator):
 
         Returns:
             The XML element with the specified name
+
         """
         xml_section = config.getElementsByTagName(name)
 
@@ -759,8 +755,7 @@ class MameGenerator(Generator):
 
     @staticmethod
     def getSection(config: Any, xml_root: Any, name: str) -> Any:
-        """
-        Get or create an XML section element with the specified name.
+        """Get or create an XML section element with the specified name.
 
         Args:
             config: XML configuration document
@@ -769,6 +764,7 @@ class MameGenerator(Generator):
 
         Returns:
             The XML element with the specified name
+
         """
         xml_section = xml_root.getElementsByTagName(name)
 
@@ -782,23 +778,22 @@ class MameGenerator(Generator):
 
     @staticmethod
     def removeSection(xml_root: Any, name: str) -> None:
-        """
-        Remove XML section elements with the specified name.
+        """Remove XML section elements with the specified name.
 
         Args:
             xml_root: XML root element containing sections to remove
             name: Name of the section elements to remove
+
         """
         xml_section = xml_root.getElementsByTagName(name)
 
-        for i in range(0, len(xml_section)):
+        for i in range(len(xml_section)):
             old = xml_root.removeChild(xml_section[i])
             old.unlink()
 
 
 def getMameControlScheme(system: Any, romBasename: str) -> str:
-    """
-    Determine the appropriate MAME control scheme for a given system and ROM.
+    """Determine the appropriate MAME control scheme for a given system and ROM.
 
     Args:
         system: System configuration
@@ -806,25 +801,26 @@ def getMameControlScheme(system: Any, romBasename: str) -> str:
 
     Returns:
         String representing the control scheme to use
+
     """
     # Game list files
     mameCapcom: str = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameCapcom.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"),
     )
     mameKInstinct: str = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"),
     )
     mameMKombat: str = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameMKombat.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"),
     )
     mameNeogeo: str = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"),
     )
     mameTwinstick: str = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"),
     )
     mameRotatedstick: str = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"),
     )
 
     # Controls for games with 5-6 buttons or other unusual controls

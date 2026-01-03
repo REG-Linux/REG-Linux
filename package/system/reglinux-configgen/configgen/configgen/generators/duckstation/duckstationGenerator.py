@@ -22,7 +22,7 @@ class DuckstationGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         duckstatonConfig = ConfigParser(interpolation=None)
         duckstatonConfig.optionxform = lambda optionstr: str(optionstr)
@@ -32,7 +32,7 @@ class DuckstationGenerator(Generator):
 
         setDuckstationConfig(duckstatonConfig, system, players_controllers)
         setDuckstationControllers(
-            duckstatonConfig, system, metadata, guns, players_controllers
+            duckstatonConfig, system, metadata, guns, players_controllers,
         )
 
         # Save config

@@ -1,5 +1,4 @@
-"""
-Module responsible for managing bezel configurations for the MAME emulator.
+"""Module responsible for managing bezel configurations for the MAME emulator.
 """
 
 import os
@@ -22,8 +21,7 @@ DEFAULT_RESOLUTION = (1920, 1080)  # Fallback resolution
 
 
 def getMameMachineSize(rom_base: str, tmp_zip_dir: str) -> tuple[int, int, int]:
-    """
-    Get machine size information for MAME ROM.
+    """Get machine size information for MAME ROM.
 
     Args:
         rom_base: Base name of the ROM file
@@ -31,6 +29,7 @@ def getMameMachineSize(rom_base: str, tmp_zip_dir: str) -> tuple[int, int, int]:
 
     Returns:
         Tuple of (width, height, rotation) for the MAME machine
+
     """
     # Placeholder implementation - in real scenario this would extract machine info from MAME
     # For now, returning default values to avoid undefined variable error
@@ -52,8 +51,7 @@ def setup_mame_bezels(
     game_resolution: dict[str, int],
     guns: list[Any],
 ) -> None:
-    """
-    Set up bezels for MAME games, including handling gun borders and tattoos.
+    """Set up bezels for MAME games, including handling gun borders and tattoos.
 
     Args:
         system: System configuration object
@@ -61,6 +59,7 @@ def setup_mame_bezels(
         messSys: MESS system name if applicable
         game_resolution: Dictionary containing game resolution (width, height)
         guns: Guns configuration
+
     """
     bezel_set = _extract_bezel_set(system)
 
@@ -68,7 +67,7 @@ def setup_mame_bezels(
         guns_borders_size = _get_guns_borders_size(guns, system.config)
 
         writeBezelConfig(
-            bezel_set, system, rom, messSys, game_resolution, guns_borders_size
+            bezel_set, system, rom, messSys, game_resolution, guns_borders_size,
         )
     except Exception as e:
         logger.warning(f"Error setting up MAME bezels: {e}")
@@ -76,14 +75,14 @@ def setup_mame_bezels(
 
 
 def _extract_bezel_set(system: Any) -> str | None:
-    """
-    Extract bezel set from system config.
+    """Extract bezel set from system config.
 
     Args:
         system: System configuration object
 
     Returns:
         Bezel set name if available and not forced to be disabled, otherwise None
+
     """
     bezel_set = None
     if "bezel" in system.config and system.config["bezel"] != "":
@@ -94,10 +93,9 @@ def _extract_bezel_set(system: Any) -> str | None:
 
 
 def _get_guns_borders_size(
-    guns: list[Any], system_config: dict[str, Any]
+    guns: list[Any], system_config: dict[str, Any],
 ) -> str | None:
-    """
-    Get guns borders size from config if guns are available.
+    """Get guns borders size from config if guns are available.
 
     Args:
         guns: Guns configuration object
@@ -105,6 +103,7 @@ def _get_guns_borders_size(
 
     Returns:
         Guns border size identifier if guns are configured, otherwise None
+
     """
     if guns is not None and isinstance(guns, dict):
         from configgen.controllers import guns_borders_size_name
@@ -173,13 +172,13 @@ def writeBezelConfig(
         # Apply tattoo if required
         if _should_apply_tattoo(system):
             png_file = _apply_tattoo(
-                tmp_zip_dir, png_file, img_width, img_height, system
+                tmp_zip_dir, png_file, img_width, img_height, system,
             )
 
         # Apply gun borders if required
         if guns_borders_size is not None:
             png_file = _apply_gun_borders(
-                tmp_zip_dir, png_file, guns_borders_size, system.config
+                tmp_zip_dir, png_file, guns_borders_size, system.config,
             )
     except Exception as e:
         logger.error(f"Error in writeBezelConfig: {e}")
@@ -193,8 +192,7 @@ def writeBezelConfig(
 
 
 def _get_tmp_directory_path(rom_base: str, mess_sys: str) -> str:
-    """
-    Get the temporary directory path for artwork files.
+    """Get the temporary directory path for artwork files.
 
     Args:
         rom_base: Base name of the ROM file
@@ -202,6 +200,7 @@ def _get_tmp_directory_path(rom_base: str, mess_sys: str) -> str:
 
     Returns:
         Path to the temporary artwork directory
+
     """
     if mess_sys != "" and not mess_sys.startswith("/"):
         return f"/var/run/mame_artwork/{Path(mess_sys).name}"
@@ -209,10 +208,9 @@ def _get_tmp_directory_path(rom_base: str, mess_sys: str) -> str:
 
 
 def _get_bezel_info(
-    bezel_set: str | None, system: Any, rom: str
+    bezel_set: str | None, system: Any, rom: str,
 ) -> dict[str, Any] | None:
-    """
-    Get bezel information from the bezel database.
+    """Get bezel information from the bezel database.
 
     Args:
         bezel_set: Name of the bezel set to use
@@ -221,6 +219,7 @@ def _get_bezel_info(
 
     Returns:
         Dictionary with bezel information if found, otherwise None
+
     """
     if bezel_set is not None:
         try:
@@ -232,8 +231,7 @@ def _get_bezel_info(
 
 
 def _safe_file_operation(operation_func: Any, *args: Any, **kwargs: Any):
-    """
-    Safely perform a file operation and handle exceptions.
+    """Safely perform a file operation and handle exceptions.
 
     Args:
         operation_func: Function to execute that performs the file operation
@@ -242,6 +240,7 @@ def _safe_file_operation(operation_func: Any, *args: Any, **kwargs: Any):
 
     Returns:
         Result of the operation on success, None on failure
+
     """
     try:
         return operation_func(*args, **kwargs)
@@ -251,12 +250,12 @@ def _safe_file_operation(operation_func: Any, *args: Any, **kwargs: Any):
 
 
 def _create_symlink(src: str, dest: str):
-    """
-    Safely create a symlink, removing the destination if it exists.
+    """Safely create a symlink, removing the destination if it exists.
 
     Args:
         src: Source file path
         dest: Destination symlink path
+
     """
     dest_path = Path(dest)
     if dest_path.exists() or dest_path.is_symlink():
@@ -265,10 +264,9 @@ def _create_symlink(src: str, dest: str):
 
 
 def _process_bezel_layout(
-    bz_infos: dict[str, Any], rom_base: str, mess_sys: str, tmp_zip_dir: str
+    bz_infos: dict[str, Any], rom_base: str, mess_sys: str, tmp_zip_dir: str,
 ) -> tuple[str, int, int, int, int, int, int, float] | None:
-    """
-    Process the bezel layout and return positioning information.
+    """Process the bezel layout and return positioning information.
 
     Args:
         bz_infos: Dictionary containing bezel information
@@ -279,6 +277,7 @@ def _process_bezel_layout(
     Returns:
         Tuple containing (png_file, img_width, img_height, bz_x, bz_y, bz_width, bz_height, bz_alpha)
         if standard layout is processed, None if mamezip is processed (early return)
+
     """
     # Handle mamezip case
     mamezip_path = Path(bz_infos["mamezip"]) if "mamezip" in bz_infos else None
@@ -302,15 +301,15 @@ def _process_bezel_layout(
 
 
 def _handle_mamezip_case(
-    rom_base: str, mess_sys: str, bz_infos: dict[str, Any]
+    rom_base: str, mess_sys: str, bz_infos: dict[str, Any],
 ) -> None:
-    """
-    Handle the case where a mamezip file is available.
+    """Handle the case where a mamezip file is available.
 
     Args:
         rom_base: Base name of the ROM file
         mess_sys: MESS system name if applicable
         bz_infos: Dictionary containing bezel information with mamezip path
+
     """
     if mess_sys != "" and not mess_sys.startswith("/"):
         art_file = f"/var/run/mame_artwork/{Path(mess_sys).name}.zip"
@@ -327,10 +326,9 @@ def _handle_mamezip_case(
 
 
 def _parse_bezel_info_file(
-    info_path: str, png_path: str
+    info_path: str, png_path: str,
 ) -> tuple[int, int, int, int, int, int, float]:
-    """
-    Parse bezel info file and return position and size values.
+    """Parse bezel info file and return position and size values.
 
     Args:
         info_path: Path to the bezel info file
@@ -338,6 +336,7 @@ def _parse_bezel_info_file(
 
     Returns:
         Tuple containing (img_width, img_height, bz_x, bz_y, bz_width, bz_height, bz_alpha)
+
     """
     with open(info_path) as bz_info_file:
         bz_info_text = bz_info_file.readlines()
@@ -385,10 +384,9 @@ def _parse_bezel_info_file(
 
 
 def _create_standard_layout(
-    bz_infos: dict[str, Any], rom_base: str, tmp_zip_dir: str
+    bz_infos: dict[str, Any], rom_base: str, tmp_zip_dir: str,
 ) -> tuple[str, int, int, int, int, int, int, float]:
-    """
-    Create standard bezel layout from PNG and info file.
+    """Create standard bezel layout from PNG and info file.
 
     Args:
         bz_infos: Dictionary containing bezel information
@@ -397,6 +395,7 @@ def _create_standard_layout(
 
     Returns:
         Tuple containing (png_file, img_width, img_height, bz_x, bz_y, bz_width, bz_height, bz_alpha)
+
     """
     png_file = "default.png"
     _create_symlink(bz_infos["png"], tmp_zip_dir + "/default.png")
@@ -453,8 +452,7 @@ def _write_layout_file(
     img_height: int,
     bz_alpha: float,
 ):
-    """
-    Write the default layout file for MAME.
+    """Write the default layout file for MAME.
 
     Args:
         tmp_zip_dir: Temporary directory for artwork files
@@ -466,6 +464,7 @@ def _write_layout_file(
         img_width: Width of the full image
         img_height: Height of the full image
         bz_alpha: Alpha transparency value
+
     """
     layout_path = tmp_zip_dir + "/default.lay"
     with open(layout_path, "w") as f:
@@ -474,34 +473,33 @@ def _write_layout_file(
         f.write('<view name="bezel">\n')
         f.write(
             f'<screen index="0"><bounds x="{bz_x}" y="{bz_y}" '
-            f'width="{bz_width}" height="{bz_height}" /></screen>\n'
+            f'width="{bz_width}" height="{bz_height}" /></screen>\n',
         )
         f.write(
             f'<element ref="bezel"><bounds x="0" y="0" width="{img_width}" '
-            f'height="{img_height}" alpha="{bz_alpha}" /></element>\n'
+            f'height="{img_height}" alpha="{bz_alpha}" /></element>\n',
         )
         f.write("</view>\n")
         f.write("</mamelayout>\n")
 
 
 def _should_apply_tattoo(system: Any) -> bool:
-    """
-    Check if a tattoo should be applied based on system configuration.
+    """Check if a tattoo should be applied based on system configuration.
 
     Args:
         system: System configuration object
 
     Returns:
         True if tattoo should be applied, False otherwise
+
     """
     return system.isOptSet("bezel.tattoo") and system.config["bezel.tattoo"] != "0"
 
 
 def _apply_tattoo(
-    tmp_zip_dir: str, png_file: str, img_width: int, img_height: int, system: Any
+    tmp_zip_dir: str, png_file: str, img_width: int, img_height: int, system: Any,
 ) -> str:
-    """
-    Apply tattoo to the bezel image and return the new file path.
+    """Apply tattoo to the bezel image and return the new file path.
 
     Args:
         tmp_zip_dir: Temporary directory for artwork files
@@ -512,6 +510,7 @@ def _apply_tattoo(
 
     Returns:
         Path to the new tattooed PNG file
+
     """
     tattoo = _load_tattoo_image(system)
     if tattoo is None:
@@ -539,7 +538,7 @@ def _apply_tattoo(
             tattoo_canvas.paste(tattoo, (img_width - tat_width, margin))
         elif corner == "SE":
             tattoo_canvas.paste(
-                tattoo, (img_width - tat_width, img_height - tat_height - margin)
+                tattoo, (img_width - tat_width, img_height - tat_height - margin),
             )
         elif corner == "SW":
             tattoo_canvas.paste(tattoo, (0, img_height - tat_height - margin))
@@ -557,14 +556,14 @@ def _apply_tattoo(
 
 
 def _load_tattoo_image(system: Any) -> Any:
-    """
-    Load the tattoo image based on system configuration.
+    """Load the tattoo image based on system configuration.
 
     Args:
         system: System configuration object
 
     Returns:
         Loaded tattoo image or None if not available
+
     """
     tattoo_config = system.config.get("bezel.tattoo", "generic")
     if tattoo_config == "system":
@@ -588,14 +587,14 @@ def _load_tattoo_image(system: Any) -> Any:
 
 
 def _get_tattoo_path(system: Any) -> str:
-    """
-    Get the path to the tattoo image file.
+    """Get the path to the tattoo image file.
 
     Args:
         system: System configuration object
 
     Returns:
         Path to the tattoo image
+
     """
     tattoo_config = system.config.get("bezel.tattoo", "generic")
     if tattoo_config == "system":
@@ -613,10 +612,9 @@ def _get_tattoo_path(system: Any) -> str:
 
 
 def _apply_gun_borders(
-    tmp_zip_dir: str, png_file: str, borders_size: str, system_config: dict[str, str]
+    tmp_zip_dir: str, png_file: str, borders_size: str, system_config: dict[str, str],
 ) -> str:
-    """
-    Apply gun borders to the bezel image and return the new file path.
+    """Apply gun borders to the bezel image and return the new file path.
 
     Args:
         tmp_zip_dir: Temporary directory for artwork files
@@ -626,6 +624,7 @@ def _apply_gun_borders(
 
     Returns:
         Path to the new bezel file with gun borders
+
     """
     output_png_file = "/tmp/bezel_gunborders.png"
     inner_size, outer_size = BezelUtils.gun_borders_size(borders_size)
@@ -651,16 +650,16 @@ class MameBezelManager(IBezelManager):
     """Bezel manager specific to the MAME emulator."""
 
     def setup_bezels(
-        self, system: Any, rom: str, game_resolution: dict[str, int], guns: list[Any]
+        self, system: Any, rom: str, game_resolution: dict[str, int], guns: list[Any],
     ) -> None:
-        """
-        Configure the bezels for a specific game.
+        """Configure the bezels for a specific game.
 
         Args:
             system: System configuration object
             rom: Path to the ROM file
             game_resolution: Dictionary containing game resolution (width, height)
             guns: Guns configuration
+
         """
         # Using default values for parameters not in the interface
         # In a real implementation, these would come from the system configuration

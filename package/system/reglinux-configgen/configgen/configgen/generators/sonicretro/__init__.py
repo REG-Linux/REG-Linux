@@ -1,5 +1,4 @@
-"""
-Sonicretro generator module for REG-Linux
+"""Sonicretro generator module for REG-Linux
 This module handles the generation of sonicretro emulator configurations.
 """
 

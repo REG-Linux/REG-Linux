@@ -73,7 +73,7 @@ def setIortcwConfig(system: Any, gameResolution: dict[str, int]) -> None:
 
     # Skip intro video
     if system.isOptSet("iortcw_skip_video") and system.getOptBoolean(
-        "iortcw_skip_video"
+        "iortcw_skip_video",
     ):
         options_to_set["seta com_introplayed"] = "1"
     else:

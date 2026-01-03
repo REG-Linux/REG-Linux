@@ -9,35 +9,35 @@ and `UnixSettings` for managing INI/Unix-style configuration files.
 ## Features
 
 - **JSONSettings**:
-    - Load, save, and manipulate key-value pairs in JSON files.
-    - Automatic file creation with an empty JSON object if the file doesn't
-      exist.
-    - Support for nested key access using prefix-based filtering.
-    - Dictionary-like access for ease of use.
-    - Error handling with logging for file operations.
+  - Load, save, and manipulate key-value pairs in JSON files.
+  - Automatic file creation with an empty JSON object if the file doesn't
+    exist.
+  - Support for nested key access using prefix-based filtering.
+  - Dictionary-like access for ease of use.
+  - Error handling with logging for file operations.
 
 - **TOMLSettings**:
-    - Load, save, and manipulate key-value pairs in TOML files.
-    - Automatic file creation with an empty TOML file if the file doesn't
-      exist.
-    - Support for nested key access using prefix-based filtering.
-    - Dictionary-like access for ease of use.
-    - Error handling with logging for file operations.
+  - Load, save, and manipulate key-value pairs in TOML files.
+  - Automatic file creation with an empty TOML file if the file doesn't
+    exist.
+  - Support for nested key access using prefix-based filtering.
+  - Dictionary-like access for ease of use.
+  - Error handling with logging for file operations.
 
 - **UnixSettings**:
-    - Manage `.cfg` or `.ini`-style configuration files using Python's
-      `ConfigParser`.
-    - Support for sections and case-sensitive keys.
-    - Automatic wrapping of content in a `[DEFAULT]` section if no sections
-      are present.
-    - Dictionary-like access and prefix-based key filtering.
-    - Configurable key-value separators and comment characters.
+  - Manage `.cfg` or `.ini`-style configuration files using Python's
+    `ConfigParser`.
+  - Support for sections and case-sensitive keys.
+  - Automatic wrapping of content in a `[DEFAULT]` section if no sections
+    are present.
+  - Dictionary-like access and prefix-based key filtering.
+  - Configurable key-value separators and comment characters.
 
 - Common features for all classes:
-    - Methods for saving, retrieving, and removing key-value pairs.
-    - Support for checking the existence of keys.
-    - Logging for file operations and errors.
-    - Type hints for better code clarity and IDE support.
+  - Methods for saving, retrieving, and removing key-value pairs.
+  - Support for checking the existence of keys.
+  - Logging for file operations and errors.
+  - Type hints for better code clarity and IDE support.
 
 ## Installation
 
@@ -187,9 +187,9 @@ settings/
 - `load(default: Optional[dict] = None) -> dict`: Load the `[DEFAULT]`
   section into a dictionary.
 - `write() -> bool`: Write the configuration to the file.
-- `save(name: str, value: Union[str, int, float, bool]) -> None`: Save a
+- `save(name: str, value: str | int | float | bool) -> None`: Save a
   key-value pair in the `[DEFAULT]` section.
-- `set(section: str, name: str, value: Union[str, int, float, bool]) -> None`:
+- `set(section: str, name: str, value: str | int | float | bool) -> None`:
   Set a key-value pair in a specific section.
 - `remove(name: str) -> bool`: Remove a key from the `[DEFAULT]` section.
 - `exists(name: str) -> bool`: Check if a key exists in the `[DEFAULT]`

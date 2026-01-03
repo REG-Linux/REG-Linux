@@ -31,13 +31,12 @@ class GeneratorProtocol(Protocol):
 
         Returns:
             Command object with the emulator command and environment settings
+
         """
         ...
 
 
-class Generator:
-    __metaclass__ = ABCMeta
-
+class Generator(metaclass=ABCMeta):
     @abstractmethod
     def generate(
         self,
@@ -49,8 +48,7 @@ class Generator:
         wheels: list[Any],
         game_resolution: dict[str, Any],
     ) -> Command:
-        """
-        Retrieve the command to start the emulator with the specified configurations.
+        """Retrieve the command to start the emulator with the specified configurations.
         """
         return Command(array=[])
 
@@ -72,7 +70,7 @@ class Generator:
         return False
 
     def getInGameRatio(
-        self, config: dict[str, Any], gameResolution: dict[str, Any], rom: str
+        self, config: dict[str, Any], gameResolution: dict[str, Any], rom: str,
     ) -> float:
         # put a default value, but it should be overriden by generators
         return 4 / 3

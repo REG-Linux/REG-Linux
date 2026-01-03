@@ -48,7 +48,7 @@ def getInvertButtonsValue():
             return elem.get("value") == "true"
         return False  # Return False if not found
     except Exception as e:
-        eslog.debug(f"Libretro: Error reading XML config - {str(e)}")
+        eslog.debug(f"Libretro: Error reading XML config - {e!s}")
         return False  # when file is not yet here or malformed
 
 
@@ -278,7 +278,7 @@ def createLibretroConfig(
                 # invalid retroarch-core-options.cfg
                 # remove it and try again
                 eslog.warning(
-                    f"Invalid Unicode in {retroarchCore}, reinitializing file."
+                    f"Invalid Unicode in {retroarchCore}, reinitializing file.",
                 )
                 retroarchCorePath = Path(retroarchCore)
                 if retroarchCorePath.exists():
@@ -334,25 +334,25 @@ def createLibretroConfig(
     if system.isOptSet("gfxbackend") and system.config["gfxbackend"] == "vulkan":
         try:
             have_vulkan = subprocess.check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
                     have_discrete = subprocess.check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
                     ).strip()
                     if have_discrete == "true":
                         eslog.debug(
-                            "A discrete GPU is available on the system. We will use that for performance"
+                            "A discrete GPU is available on the system. We will use that for performance",
                         )
                         try:
                             discrete_index = subprocess.check_output(
-                                ["/usr/bin/system-vulkan", "discreteIndex"], text=True
+                                ["/usr/bin/system-vulkan", "discreteIndex"], text=True,
                             ).strip()
                             if discrete_index != "":
                                 eslog.debug(
-                                    f"Using Discrete GPU Index: {discrete_index} for RetroArch"
+                                    f"Using Discrete GPU Index: {discrete_index} for RetroArch",
                                 )
                                 retroarchConfig["vulkan_gpu_index"] = (
                                     '"' + discrete_index + '"'
@@ -363,7 +363,7 @@ def createLibretroConfig(
                             eslog.debug("Error getting discrete GPU index")
                     else:
                         eslog.debug(
-                            "Discrete GPU is not available on the system. Using default."
+                            "Discrete GPU is not available on the system. Using default.",
                         )
                 except subprocess.CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
@@ -403,7 +403,7 @@ def createLibretroConfig(
         retroarchConfig["video_threaded"] = "false"
 
     if system.isOptSet("video_allow_rotate") and not system.getOptBoolean(
-        "video_allow_rotate"
+        "video_allow_rotate",
     ):
         retroarchConfig["video_allow_rotate"] = "false"
     else:
@@ -411,7 +411,7 @@ def createLibretroConfig(
 
     # variable refresh rate
     if system.isOptSet("vrr_runloop_enable") and system.getOptBoolean(
-        "vrr_runloop_enable"
+        "vrr_runloop_enable",
     ):
         retroarchConfig["vrr_runloop_enable"] = "true"
     else:
@@ -453,7 +453,7 @@ def createLibretroConfig(
     # Forced values (so that if the config is not correct, fix it)
     if system.config["core"] == "tgbdual":
         retroarchConfig["aspect_ratio_index"] = str(
-            ratioIndexes.index("core")
+            ratioIndexes.index("core"),
         )  # Reset each time in this function
 
     # Disable internal image viewer (ES does it, and pico-8 won't load .p8.png)
@@ -1049,7 +1049,7 @@ def createLibretroConfig(
 
     # Auto frame delay (input delay reduction via frame timing)
     if system.isOptSet("video_frame_delay_auto") and system.getOptBoolean(
-        "video_frame_delay_auto"
+        "video_frame_delay_auto",
     ):
         retroarchConfig["video_frame_delay_auto"] = "true"
     else:
@@ -1076,7 +1076,7 @@ def createLibretroConfig(
         retroarchConfig["savestate_auto_load"] = "false"
 
     if system.isOptSet("incrementalsavestates") and not system.getOptBoolean(
-        "incrementalsavestates"
+        "incrementalsavestates",
     ):
         retroarchConfig["savestate_auto_index"] = "false"
         retroarchConfig["savestate_max_keep"] = "50"
@@ -1101,17 +1101,17 @@ def createLibretroConfig(
     retroarchConfig["cheevos_richpresence_enable"] = "false"
 
     if system.isOptSet("retroachievements") and system.getOptBoolean(
-        "retroachievements"
+        "retroachievements",
     ):
         if (system.config["core"] in coreToRetroachievements) or (
             system.isOptSet("cheevos_force") and system.getOptBoolean("cheevos_force")
         ):
             retroarchConfig["cheevos_enable"] = "true"
             retroarchConfig["cheevos_username"] = systemConfig.get(
-                "retroachievements.username", ""
+                "retroachievements.username", "",
             )
             retroarchConfig["cheevos_password"] = systemConfig.get(
-                "retroachievements.password", ""
+                "retroachievements.password", "",
             )
             retroarchConfig["cheevos_cmd"] = (
                 "/usr/share/reglinux/configgen/call_achievements_hooks.sh"
@@ -1121,49 +1121,49 @@ def createLibretroConfig(
             )
             # retroachievements_hardcore_mode
             if system.isOptSet("retroachievements.hardcore") and system.getOptBoolean(
-                "retroachievements.hardcore"
+                "retroachievements.hardcore",
             ):
                 retroarchConfig["cheevos_hardcore_mode_enable"] = "true"
             else:
                 retroarchConfig["cheevos_hardcore_mode_enable"] = "false"
             # retroachievements_leaderboards
             if system.isOptSet(
-                "retroachievements.leaderboards"
+                "retroachievements.leaderboards",
             ) and system.getOptBoolean("retroachievements.leaderboards"):
                 retroarchConfig["cheevos_leaderboards_enable"] = "true"
             else:
                 retroarchConfig["cheevos_leaderboards_enable"] = "false"
             # retroachievements_verbose_mode
             if system.isOptSet("retroachievements.verbose") and system.getOptBoolean(
-                "retroachievements.verbose"
+                "retroachievements.verbose",
             ):
                 retroarchConfig["cheevos_verbose_enable"] = "true"
             else:
                 retroarchConfig["cheevos_verbose_enable"] = "false"
             # retroachievements_automatic_screenshot
             if system.isOptSet("retroachievements.screenshot") and system.getOptBoolean(
-                "retroachievements.screenshot"
+                "retroachievements.screenshot",
             ):
                 retroarchConfig["cheevos_auto_screenshot"] = "true"
             else:
                 retroarchConfig["cheevos_auto_screenshot"] = "false"
             # retroarchievements_challenge_indicators
             if system.isOptSet(
-                "retroachievements.challenge_indicators"
+                "retroachievements.challenge_indicators",
             ) and system.getOptBoolean("retroachievements.challenge_indicators"):
                 retroarchConfig["cheevos_challenge_indicators"] = "true"
             else:
                 retroarchConfig["cheevos_challenge_indicators"] = "false"
             # retroarchievements_encore_mode
             if system.isOptSet("retroachievements.encore") and system.getOptBoolean(
-                "retroachievements.encore"
+                "retroachievements.encore",
             ):
                 retroarchConfig["cheevos_start_active"] = "true"
             else:
                 retroarchConfig["cheevos_start_active"] = "false"
             # retroarchievements_rich_presence
             if system.isOptSet(
-                "retroachievements.richpresence"
+                "retroachievements.richpresence",
             ) and system.getOptBoolean("retroachievements.richpresence"):
                 retroarchConfig["cheevos_richpresence_enable"] = "true"
             else:
@@ -1198,10 +1198,10 @@ def createLibretroConfig(
             # But client needs netplay_mode = true ... bug ?
             retroarchConfig["netplay_mode"] = "true"
             retroarchConfig["netplay_ip_address"] = systemConfig.get(
-                "netplay.server.ip", ""
+                "netplay.server.ip", "",
             )
             retroarchConfig["netplay_ip_port"] = systemConfig.get(
-                "netplay.server.port", ""
+                "netplay.server.port", "",
             )
             retroarchConfig["netplay_client_swap_input"] = "true"
 
@@ -1237,7 +1237,7 @@ def createLibretroConfig(
 
         # Netplay hide the gameplay
         if system.isOptSet("netplay_public_announce") and not system.getOptBoolean(
-            "netplay_public_announce"
+            "netplay_public_announce",
         ):
             retroarchConfig["netplay_public_announce"] = "false"
         else:
@@ -1245,7 +1245,7 @@ def createLibretroConfig(
 
         # Enable or disable server spectator mode
         if system.isOptSet("netplay.spectator") and system.getOptBoolean(
-            "netplay.spectator"
+            "netplay.spectator",
         ):
             retroarchConfig["netplay_spectator_mode_enable"] = "true"
         else:
@@ -1259,7 +1259,7 @@ def createLibretroConfig(
         ):
             retroarchConfig["netplay_use_mitm_server"] = "true"
             retroarchConfig["netplay_mitm_server"] = systemConfig.get(
-                "netplay.relay", ""
+                "netplay.relay", "",
             )
         else:
             retroarchConfig["netplay_use_mitm_server"] = "false"
@@ -1284,7 +1284,7 @@ def createLibretroConfig(
 
     # AI option (service for game translations)
     if system.isOptSet("ai_service_enabled") and system.getOptBoolean(
-        "ai_service_enabled"
+        "ai_service_enabled",
     ):
         retroarchConfig["ai_service_enable"] = "true"
         retroarchConfig["ai_service_mode"] = "0"
@@ -1305,7 +1305,7 @@ def createLibretroConfig(
                 + chosen_lang
             )
         if system.isOptSet("ai_service_pause") and system.getOptBoolean(
-            "ai_service_pause"
+            "ai_service_pause",
         ):
             retroarchConfig["ai_service_pause"] = "true"
         else:
@@ -1316,7 +1316,7 @@ def createLibretroConfig(
     # Guns
     # clear premapping for each player gun to make new one. Useful for libretro-mame and flycast-dreamcast
     if system.isOptSet("use_guns") and system.getOptBoolean("use_guns"):
-        for g in range(0, len(guns)):
+        for g in range(len(guns)):
             clearGunInputsForPlayer(g + 1, retroarchConfig)
 
     gun_mapping = {
@@ -1338,7 +1338,7 @@ def createLibretroConfig(
                         "mapcorevalue": "ON",
                     },
                 ],
-            }
+            },
         },
         "mesen-s": {"default": {"device": 262, "p2": 0}},
         "mesen": {"default": {"device": 262, "p2": 0}},
@@ -1367,7 +1367,7 @@ def createLibretroConfig(
                         "mapcorevalue": "enabled",
                     },
                 ],
-            }
+            },
         },
         "snes9x_next": {
             "default": {
@@ -1379,9 +1379,9 @@ def createLibretroConfig(
                         "value": "justifier",
                         "mapkey": "device",
                         "mapvalue": "516",
-                    }
+                    },
                 ],
-            }
+            },
         },
         "nestopia": {"default": {"device": 262, "p2": 0}},
         "fceumm": {"default": {"device": 258, "p2": 0}},
@@ -1395,7 +1395,7 @@ def createLibretroConfig(
                         "value": "justifier",
                         "mapkey": "device",
                         "mapvalue": "772",
-                    }
+                    },
                 ],
             },
             "mastersystem": {"device": 260, "p1": 0, "p2": 1},
@@ -1408,7 +1408,7 @@ def createLibretroConfig(
                         "value": "justifier",
                         "mapkey": "device",
                         "mapvalue": "772",
-                    }
+                    },
                 ],
             },
         },
@@ -1430,9 +1430,9 @@ def createLibretroConfig(
                         "value": "justifier",
                         "mapkey": "device",
                         "mapvalue": "516",
-                    }
+                    },
                 ],
-            }
+            },
         },
         "swanstation": {"default": {"device": 260, "p1": 0, "p2": 1}},
         "beetle-saturn": {"default": {"device": 260, "p1": 0, "p2": 1}},
@@ -1446,9 +1446,9 @@ def createLibretroConfig(
                         "value": "stack_light_rifle",
                         "mapcorekey": "vice_joyport_type",
                         "mapcorevalue": "15",
-                    }
-                ]
-            }
+                    },
+                ],
+            },
         },
     }
 
@@ -1489,15 +1489,14 @@ def createLibretroConfig(
                         retroarchConfig["input_libretro_device_p" + str(nplayer)] = (
                             ragunconf["device_p" + str(nplayer)]
                         )
+                    elif "device" in ragunconf:
+                        retroarchConfig[
+                            "input_libretro_device_p" + str(nplayer)
+                        ] = ragunconf["device"]
                     else:
-                        if "device" in ragunconf:
-                            retroarchConfig[
-                                "input_libretro_device_p" + str(nplayer)
-                            ] = ragunconf["device"]
-                        else:
-                            retroarchConfig[
-                                "input_libretro_device_p" + str(nplayer)
-                            ] = ""
+                        retroarchConfig[
+                            "input_libretro_device_p" + str(nplayer)
+                        ] = ""
                     configureGunInputsForPlayer(
                         nplayer,
                         guns[ragunconf["p" + str(nplayer)]],
@@ -1589,9 +1588,8 @@ def configureGunInputsForPlayer(
     pedalkey = None
     if pedalcname in system.config:
         pedalkey = system.config[pedalcname]
-    else:
-        if n in pedalsKeys:
-            pedalkey = pedalsKeys[n]
+    elif n in pedalsKeys:
+        pedalkey = pedalsKeys[n]
     pedalconfig = None
 
     # gun mapping
@@ -1654,7 +1652,7 @@ def configureGunInputsForPlayer(
 
     if core == "flycast":
         if system.isOptSet("flycast_offscreen_reload") and system.getOptBoolean(
-            "flycast_offscreen_reload"
+            "flycast_offscreen_reload",
         ):
             retroarchConfig[f"input_player{n}_gun_start_mbtn"] = ""
             retroarchConfig[f"input_player{n}_gun_select_mbtn"] = ""
