@@ -9,8 +9,7 @@ eslog = get_logger(__name__)
 
 
 def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
-    """
-    Mounts a .zar archive using fuse-zar.
+    """Mounts a .zar archive using fuse-zar.
 
     This function creates a temporary mount point under /var/run/zar/,
     attempts to mount the given .zar file using fuse-zar, and checks if
@@ -27,12 +26,13 @@ def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
 
     Raises:
         Exception: If mounting fails.
+
     """
     eslog.debug(f"zar_begin({rom})")
 
     # Define the mount point based on the archive name
     rommountpoint = str(
-        Path("/var/run/zar") / Path(rom).name[:-4]
+        Path("/var/run/zar") / Path(rom).name[:-4],
     )  # remove .zar extension
 
     # Ensure base /var/run/zar directory exists
@@ -47,7 +47,7 @@ def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
         try:
             rmdir(rommountpoint)
         except (OSError, FileNotFoundError) as e:
-            eslog.debug(f"zar_begin: failed to rmdir {rommountpoint} - {str(e)}")
+            eslog.debug(f"zar_begin: failed to rmdir {rommountpoint} - {e!s}")
             return False, None, rommountpoint
 
     # Create the new mount directory
@@ -60,8 +60,7 @@ def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
         try:
             rmdir(rommountpoint)
         except (OSError, FileNotFoundError) as e:
-            eslog.debug(f"zar: failed to remove directory {rommountpoint} - {str(e)}")
-            pass
+            eslog.debug(f"zar: failed to remove directory {rommountpoint} - {e!s}")
         raise Exception(f"unable to mount the file {rom} using fuse-zar")
 
     # Check if the archive contains a single file named like the archive
@@ -75,8 +74,7 @@ def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
 
 
 def zar_end(rommountpoint: str) -> bool:
-    """
-    Unmounts a .zar archive mounted by zar_begin().
+    """Unmounts a .zar archive mounted by zar_begin().
 
     This function uses fusermount to unmount the FUSE-mounted directory,
     then deletes the temporary mount directory.
@@ -86,6 +84,7 @@ def zar_end(rommountpoint: str) -> bool:
 
     Raises:
         Exception: If unmounting fails.
+
     """
     eslog.debug(f"zar_end({rommountpoint})")
 

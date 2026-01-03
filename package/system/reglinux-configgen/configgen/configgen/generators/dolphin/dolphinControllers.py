@@ -13,8 +13,7 @@ def generateControllerConfig(
     rom: str,
     guns: Any,
 ) -> None:
-    """
-    Create the controller configuration file based on the system and game settings.
+    """Create the controller configuration file based on the system and game settings.
 
     Args:
         system: System configuration object
@@ -23,12 +22,13 @@ def generateControllerConfig(
         wheels: Wheel controllers
         rom: ROM file path
         guns: Light gun controllers
+
     """
     if system.name == "wii":
         from .wiiControllers import generateControllerConfig_wii
 
         generateControllerConfig_wii(
-            system, playersControllers, metadata, wheels, rom, guns
+            system, playersControllers, metadata, wheels, rom, guns,
         )
     elif system.name == "gamecube":
         from .gamecubeControllers import generateControllerConfig_gamecube
@@ -48,7 +48,7 @@ def generateControllerConfig(
             ):
                 used_wheels = wheels
         generateControllerConfig_gamecube(
-            system, playersControllers, used_wheels, rom
+            system, playersControllers, used_wheels, rom,
         )  # Pass ROM name to allow for per ROM configuration
     else:
         raise ValueError(f"Invalid system name: '{system.name}'")

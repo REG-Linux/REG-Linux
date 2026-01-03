@@ -19,7 +19,7 @@ eslog = get_logger(__name__)
 
 class CorsixTHGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Create corsixth config directory if needed
         config_dir_path = Path(CORSIXTH_CONFIG_DIR)
@@ -36,7 +36,7 @@ class CorsixTHGenerator(Generator):
             for game_data in CORSIXTH_GAME_DATA_DIR:
                 if not Path(game_data).exists():
                     raise FileNotFoundError(
-                        f"ERROR: Game data ({game_data}) not found. You can get them from the game Theme Hospital."
+                        f"ERROR: Game data ({game_data}) not found. You can get them from the game Theme Hospital.",
                     )
         except FileNotFoundError as e:
             eslog.exception(e)
@@ -57,7 +57,7 @@ class CorsixTHGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

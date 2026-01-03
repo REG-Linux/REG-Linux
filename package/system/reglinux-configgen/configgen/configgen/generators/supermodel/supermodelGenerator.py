@@ -25,7 +25,7 @@ class SupermodelGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         command_array = [SUPERMODEL_BIN_PATH, "-fullscreen", "-channels=2"]
 
@@ -46,18 +46,17 @@ class SupermodelGenerator(Generator):
 
         # crosshairs
         if system.isOptSet("crosshairs"):
-            command_array.append("-crosshairs={}".format(system.config["crosshairs"]))
-        else:
-            # Check if guns is a dictionary (has guns) or a list (empty list if no guns)
-            # If it's an empty list, treat it like an empty dict (no guns, so enable crosses for other devices)
-            if isinstance(guns, dict) and gunsNeedCrosses(guns):
-                if len(guns) == 1:
-                    command_array.append("-crosshairs={}".format("1"))
-                else:
-                    command_array.append("-crosshairs={}".format("3"))
-            elif isinstance(guns, list) and len(guns) == 0:
-                # Empty list means no guns, so enable crosses for other input devices (like joysticks, mouses...)
-                command_array.append("-crosshairs={}".format("1"))
+            command_array.append(f"-crosshairs={system.config['crosshairs']}")
+        # Check if guns is a dictionary (has guns) or a list (empty list if no guns)
+        # If it's an empty list, treat it like an empty dict (no guns, so enable crosses for other devices)
+        elif isinstance(guns, dict) and gunsNeedCrosses(guns):
+            if len(guns) == 1:
+                command_array.append("-crosshairs=1")
+            else:
+                command_array.append("-crosshairs=3")
+        elif isinstance(guns, list) and len(guns) == 0:
+            # Empty list means no guns, so enable crosses for other input devices (like joysticks, mouses...)
+            command_array.append("-crosshairs=1")
 
         # force feedback
         if system.isOptSet("forceFeedback") and system.getOptBoolean("forceFeedback"):
@@ -65,11 +64,11 @@ class SupermodelGenerator(Generator):
 
         # powerpc frequesncy
         if system.isOptSet("ppcFreq"):
-            command_array.append("-ppc-frequency={}".format(system.config["ppcFreq"]))
+            command_array.append(f"-ppc-frequency={system.config['ppcFreq']}")
 
         # resolution
         command_array.append(
-            "-res={},{}".format(game_resolution["width"], game_resolution["height"])
+            f"-res={game_resolution['width']},{game_resolution['height']}",
         )
 
         # logs
@@ -92,7 +91,7 @@ class SupermodelGenerator(Generator):
             env={
                 "SDL_VIDEODRIVER": "x11",
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
+                    players_controllers,
                 ),
             },
         )
@@ -113,14 +112,13 @@ def copy_nvram_files():
             if not targetFile.exists():
                 # if the target file doesn't exist, just copy the source file
                 copyfile(sourceFile, targetFile)
-            else:
-                # if the target file exists and has an older modification time than the source file, create a backup and copy the new file
-                if sourceFile.stat().st_mtime > targetFile.stat().st_mtime:
-                    backupFile = targetDir / (targetFile.name + ".bak")
-                    if backupFile.exists():
-                        backupFile.unlink()
-                    rename(targetFile, backupFile)
-                    copyfile(sourceFile, backupFile.parent / backupFile.name)
+            # if the target file exists and has an older modification time than the source file, create a backup and copy the new file
+            elif sourceFile.stat().st_mtime > targetFile.stat().st_mtime:
+                backupFile = targetDir / (targetFile.name + ".bak")
+                if backupFile.exists():
+                    backupFile.unlink()
+                rename(targetFile, backupFile)
+                copyfile(sourceFile, backupFile.parent / backupFile.name)
 
 
 def copy_asset_files():
@@ -262,21 +260,21 @@ def configPadsIni(
                 return True
             if key == "InputStart1":
                 val = transformElement(
-                    "JOY1_BUTTON9", players_controllers, mapping, mapping_fallback
+                    "JOY1_BUTTON9", players_controllers, mapping, mapping_fallback,
                 )
                 val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "MOUSE1_BUTTONX1" + val)
                 return True
             if key == "InputCoin1":
                 val = transformElement(
-                    "JOY1_BUTTON10", players_controllers, mapping, mapping_fallback
+                    "JOY1_BUTTON10", players_controllers, mapping, mapping_fallback,
                 )
                 val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "MOUSE1_BUTTONX2" + val)
                 return True
             if key == "InputAnalogJoyEvent":
                 val = transformElement(
-                    "JOY1_BUTTON2", players_controllers, mapping, mapping_fallback
+                    "JOY1_BUTTON2", players_controllers, mapping, mapping_fallback,
                 )
                 val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "KEY_S,MOUSE1_MIDDLE_BUTTON" + val)
@@ -306,21 +304,21 @@ def configPadsIni(
                     return True
                 if key == "InputStart2":
                     val = transformElement(
-                        "JOY2_BUTTON9", players_controllers, mapping, mapping_fallback
+                        "JOY2_BUTTON9", players_controllers, mapping, mapping_fallback,
                     )
                     val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_BUTTONX1" + val)
                     return True
                 if key == "InputCoin1":
                     val = transformElement(
-                        "JOY2_BUTTON10", players_controllers, mapping, mapping_fallback
+                        "JOY2_BUTTON10", players_controllers, mapping, mapping_fallback,
                     )
                     val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_BUTTONX2" + val)
                     return True
                 if key == "InputAnalogJoyEvent2":
                     val = transformElement(
-                        "JOY2_BUTTON2", players_controllers, mapping, mapping_fallback
+                        "JOY2_BUTTON2", players_controllers, mapping, mapping_fallback,
                     )
                     val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_MIDDLE_BUTTON" + val)
@@ -400,7 +398,7 @@ def configPadsIni(
 
 
 def transformValue(
-    value: str, players_controllers: Any, mapping: Any, mapping_fallback: Any
+    value: str, players_controllers: Any, mapping: Any, mapping_fallback: Any,
 ) -> str:
     # remove comments
     cleanValue = value
@@ -412,7 +410,7 @@ def transformValue(
         newvalue = ""
         for elt in cleanValue[1:-1].split(","):
             newelt = transformElement(
-                elt, players_controllers, mapping, mapping_fallback
+                elt, players_controllers, mapping, mapping_fallback,
             )
             if newelt is not None:
                 if newvalue != "":
@@ -424,7 +422,7 @@ def transformValue(
 
 
 def transformElement(
-    elt: str, players_controllers: Any, mapping: Any, mapping_fallback: Any
+    elt: str, players_controllers: Any, mapping: Any, mapping_fallback: Any,
 ) -> str | None:
     # Docs/README.txt
     # JOY1_LEFT  is the same as JOY1_XAXIS_NEG
@@ -446,7 +444,7 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_up = "up" if joy_type == "hat" else "axisY"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_up, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_up, mapping, mapping_fallback,
         )
         eslog.debug(mp)
         return input2input(
@@ -461,7 +459,7 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_down = "down" if joy_type == "hat" else "axisY"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_down, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_down, mapping, mapping_fallback,
         )
         return input2input(
             players_controllers,
@@ -475,7 +473,7 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_left = "left" if joy_type == "hat" else "axisX"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_left, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_left, mapping, mapping_fallback,
         )
         return input2input(
             players_controllers,
@@ -489,7 +487,7 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_right = "right" if joy_type == "hat" else "axisX"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_right, mapping, mapping_fallback
+            players_controllers, matches.group(1), key_right, mapping, mapping_fallback,
         )
         return input2input(
             players_controllers,

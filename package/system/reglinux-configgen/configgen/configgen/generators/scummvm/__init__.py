@@ -1,5 +1,4 @@
-"""
-Scummvm generator module for REG-Linux
+"""Scummvm generator module for REG-Linux
 This module handles the generation of scummvm emulator configurations.
 """
 

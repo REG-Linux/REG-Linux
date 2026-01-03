@@ -55,11 +55,10 @@ class LibretroGenerator(Generator):
         if altDecoration == "0":
             if "shader" in renderConfig:
                 gameShader = renderConfig["shader"]
+        elif ("shader-" + str(altDecoration)) in renderConfig:
+            gameShader = renderConfig["shader-" + str(altDecoration)]
         else:
-            if ("shader-" + str(altDecoration)) in renderConfig:
-                gameShader = renderConfig["shader-" + str(altDecoration)]
-            else:
-                gameShader = renderConfig["shader"]
+            gameShader = renderConfig["shader"]
         if "shader" in renderConfig and gameShader is not None:
             if (gfxBackend == "glcore" or gfxBackend == "vulkan") or (
                 system.config["core"] in coreForceSlangShaders
@@ -272,7 +271,7 @@ class LibretroGenerator(Generator):
                 chdir(romdir)
             except FileNotFoundError:
                 eslog.error(
-                    "ERROR: Game assets not installed. You can get them from the Batocera Content Downloader."
+                    "ERROR: Game assets not installed. You can get them from the Batocera Content Downloader.",
                 )
                 raise
 
@@ -329,7 +328,7 @@ class LibretroGenerator(Generator):
                 command_array.extend(["--port", system.config["netplay.server.port"]])
             if "netplay.server.session" in system.config:
                 command_array.extend(
-                    ["--mitm-session", system.config["netplay.server.session"]]
+                    ["--mitm-session", system.config["netplay.server.session"]],
                 )
             if "netplay.nickname" in system.config:
                 command_array.extend(["--nick", system.config["netplay.nickname"]])

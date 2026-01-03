@@ -73,8 +73,7 @@ def set_option_with_default(
     config_key: str,
     default_value: str = "false",
 ) -> None:
-    """
-    Sets a configuration option with a default value if the option is not set in the system configuration.
+    """Sets a configuration option with a default value if the option is not set in the system configuration.
 
     Args:
         config: The configuration object to set the option on
@@ -83,6 +82,7 @@ def set_option_with_default(
         option: The option name to set
         config_key: The key in the system configuration to check
         default_value: The default value to use if the option is not set (default: "false")
+
     """
     if system.isOptSet(config_key):
         value = system.config[config_key]
@@ -97,16 +97,16 @@ def set_option_with_default(
 
 # Helper function to set boolean configuration options
 def set_boolean_option(
-    config: ConfigParser, section: str, option: str, value: str
+    config: ConfigParser, section: str, option: str, value: str,
 ) -> None:
-    """
-    Sets a boolean configuration option based on the input value.
+    """Sets a boolean configuration option based on the input value.
 
     Args:
         config: The configuration object to set the option on
         section: The section name in the configuration file
         option: The option name to set
         value: The value to convert to boolean ("1" becomes "true", anything else becomes "false")
+
     """
     config.set(section, option, "true" if value == "1" else "false")
 
@@ -120,8 +120,7 @@ def setPcsx2Config(
     wheels: Any,
     playingWithWheel: Any,
 ) -> None:
-    """
-    Configures PCSX2 emulator settings based on system configuration.
+    """Configures PCSX2 emulator settings based on system configuration.
 
     Args:
         system: System configuration object containing settings
@@ -131,6 +130,7 @@ def setPcsx2Config(
         guns: Gun configuration data
         wheels: Wheel configuration data
         playingWithWheel: Boolean indicating if playing with wheel
+
     """
     config_dir = PCSX2_CONFIG_DIR / "inis"
     configFileName = config_dir / "PCSX2.ini"
@@ -210,7 +210,7 @@ def setPcsx2Config(
 
     # Outras configurações
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore", "EnableCheats", "pcsx2_cheats"
+        pcsx2INIConfig, system, "EmuCore", "EnableCheats", "pcsx2_cheats",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -237,7 +237,7 @@ def setPcsx2Config(
         pcsx2INIConfig.set(section, option, "true" if value == "1" else "false")
 
     if system.isOptSet("retroachievements") and system.getOptBoolean(
-        "retroachievements"
+        "retroachievements",
     ):
         username = system.config.get("retroachievements.username", "")
         hardcore = system.config.get("retroachievements.hardcore", "")
@@ -253,7 +253,7 @@ def setPcsx2Config(
             )
             if res.status_code != 200:
                 eslog.warning(
-                    f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]"
+                    f"ERROR: RetroAchievements.org responded with #{res.status_code} [{res.reason}]",
                 )
                 pcsx2INIConfig.set("Achievements", "Enabled", "false")
             else:
@@ -261,7 +261,7 @@ def setPcsx2Config(
                 parsedout = res.json()
                 if not parsedout["Success"]:
                     eslog.warning(
-                        f"ERROR: RetroAchievements login failed with ({str(parsedout)})"
+                        f"ERROR: RetroAchievements login failed with ({parsedout!s})",
                     )
                 token = parsedout["Token"]
                 pcsx2INIConfig.set("Achievements", "Enabled", "true")
@@ -275,7 +275,7 @@ def setPcsx2Config(
                 set_boolean_option("Achievements", "RichPresence", presence)
                 set_boolean_option("Achievements", "Leaderboards", leaderbd)
         except (Exception, ValueError) as e:
-            eslog.error(f"ERROR: setting RetroAchievements parameters - {str(e)}")
+            eslog.error(f"ERROR: setting RetroAchievements parameters - {e!s}")
 
     # set other settings
     pcsx2INIConfig.set("Achievements", "TestMode", "false")
@@ -295,7 +295,7 @@ def setPcsx2Config(
     # Check Vulkan first to be sure
     try:
         have_vulkan = check_output(
-            ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+            ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
         ).strip()
         if have_vulkan == "true":
             eslog.debug("Vulkan driver is available on the system.")
@@ -310,11 +310,11 @@ def setPcsx2Config(
                     renderer = "14"
                     try:
                         have_discrete = check_output(
-                            ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                            ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
                         ).strip()
                         if have_discrete == "true":
                             eslog.debug(
-                                "A discrete GPU is available on the system. We will use that for performance"
+                                "A discrete GPU is available on the system. We will use that for performance",
                             )
                             try:
                                 discrete_name = check_output(
@@ -323,22 +323,22 @@ def setPcsx2Config(
                                 ).strip()
                                 if discrete_name:
                                     eslog.debug(
-                                        f"Using Discrete GPU Name: {discrete_name} for PCSX2"
+                                        f"Using Discrete GPU Name: {discrete_name} for PCSX2",
                                     )
                                     pcsx2INIConfig.set(
-                                        "EmuCore/GS", "Adapter", discrete_name
+                                        "EmuCore/GS", "Adapter", discrete_name,
                                     )
                                 else:
                                     eslog.debug("Couldn't get discrete GPU Name")
                                     pcsx2INIConfig.set(
-                                        "EmuCore/GS", "Adapter", "(Default)"
+                                        "EmuCore/GS", "Adapter", "(Default)",
                                     )
                             except CalledProcessError as e:
                                 eslog.debug(f"Error getting discrete GPU Name: {e}")
                                 pcsx2INIConfig.set("EmuCore/GS", "Adapter", "(Default)")
                         else:
                             eslog.debug(
-                                "Discrete GPU is not available on the system. Using default."
+                                "Discrete GPU is not available on the system. Using default.",
                             )
                             pcsx2INIConfig.set("EmuCore/GS", "Adapter", "(Default)")
                     except CalledProcessError as e:
@@ -349,7 +349,7 @@ def setPcsx2Config(
             pcsx2INIConfig.set("EmuCore/GS", "Renderer", renderer)
         else:
             eslog.debug(
-                "Vulkan driver is not available on the system. Falling back to OpenGL"
+                "Vulkan driver is not available on the system. Falling back to OpenGL",
             )
             pcsx2INIConfig.set("EmuCore/GS", "Renderer", "12")
     except CalledProcessError as e:
@@ -365,7 +365,7 @@ def setPcsx2Config(
         "Auto 4:3/3:2",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "VsyncEnable", "pcsx2_vsync", "0"
+        pcsx2INIConfig, system, "EmuCore/GS", "VsyncEnable", "pcsx2_vsync", "0",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -376,7 +376,7 @@ def setPcsx2Config(
         "1",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "fxaa", "pcsx2_fxaa", "false"
+        pcsx2INIConfig, system, "EmuCore/GS", "fxaa", "pcsx2_fxaa", "false",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -387,7 +387,7 @@ def setPcsx2Config(
         "Auto 4:3/3:2",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "mipmap_hw", "pcsx2_mipmapping", "-1"
+        pcsx2INIConfig, system, "EmuCore/GS", "mipmap_hw", "pcsx2_mipmapping", "-1",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -406,7 +406,7 @@ def setPcsx2Config(
         "0",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "dithering_ps2", "pcsx2_dithering", "2"
+        pcsx2INIConfig, system, "EmuCore/GS", "dithering_ps2", "pcsx2_dithering", "2",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -425,10 +425,10 @@ def setPcsx2Config(
         "0",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "pcrtc_antiblur", "pcsx2_blur", "true"
+        pcsx2INIConfig, system, "EmuCore/GS", "pcrtc_antiblur", "pcsx2_blur", "true",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "IntegerScaling", "pcsx2_scaling", "false"
+        pcsx2INIConfig, system, "EmuCore/GS", "IntegerScaling", "pcsx2_scaling", "false",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -439,7 +439,7 @@ def setPcsx2Config(
         "1",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "filter", "pcsx2_texture_filtering", "2"
+        pcsx2INIConfig, system, "EmuCore/GS", "filter", "pcsx2_texture_filtering", "2",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -527,27 +527,27 @@ def setPcsx2Config(
     ):
         pcsx2INIConfig.remove_option("USB2", "Type")
     if pcsx2INIConfig.has_section("USB1") and pcsx2INIConfig.has_option(
-        "USB1", "guncon2_Start"
+        "USB1", "guncon2_Start",
     ):
         pcsx2INIConfig.remove_option("USB1", "guncon2_Start")
     if pcsx2INIConfig.has_section("USB2") and pcsx2INIConfig.has_option(
-        "USB2", "guncon2_Start"
+        "USB2", "guncon2_Start",
     ):
         pcsx2INIConfig.remove_option("USB2", "guncon2_Start")
     if pcsx2INIConfig.has_section("USB1") and pcsx2INIConfig.has_option(
-        "USB1", "guncon2_C"
+        "USB1", "guncon2_C",
     ):
         pcsx2INIConfig.remove_option("USB1", "guncon2_C")
     if pcsx2INIConfig.has_section("USB2") and pcsx2INIConfig.has_option(
-        "USB2", "guncon2_C"
+        "USB2", "guncon2_C",
     ):
         pcsx2INIConfig.remove_option("USB2", "guncon2_C")
     if pcsx2INIConfig.has_section("USB1") and pcsx2INIConfig.has_option(
-        "USB1", "guncon2_numdevice"
+        "USB1", "guncon2_numdevice",
     ):
         pcsx2INIConfig.remove_option("USB1", "guncon2_numdevice")
     if pcsx2INIConfig.has_section("USB2") and pcsx2INIConfig.has_option(
-        "USB2", "guncon2_numdevice"
+        "USB2", "guncon2_numdevice",
     ):
         pcsx2INIConfig.remove_option("USB2", "guncon2_numdevice")
 
@@ -593,7 +593,7 @@ def setPcsx2Config(
                     pcsx2INIConfig.set(
                         "USB1",
                         "guncon2_Start",
-                        "SDL-{}/{}".format(pad.index, "Start"),
+                        f"SDL-{pad.index}/Start",
                     )
                 nc = nc + 1
 
@@ -614,7 +614,7 @@ def setPcsx2Config(
                     pcsx2INIConfig.set(
                         "USB2",
                         "guncon2_Start",
-                        "SDL-{}/{}".format(pad.index, "Start"),
+                        f"SDL-{pad.index}/Start",
                     )
                 nc = nc + 1
             ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
@@ -771,30 +771,25 @@ def setPcsx2Config(
                     pcsx2INIConfig.set(
                         f"USB{usbx}",
                         "Pad_SteeringLeft",
-                        "SDL-{}/{}".format(
-                            pad.index, input2wheel(pad.inputs["joystick1left"])
-                        ),
+                        f"SDL-{pad.index}/{input2wheel(pad.inputs['joystick1left'])}",
                     )
                     pcsx2INIConfig.set(
                         f"USB{usbx}",
                         "Pad_SteeringRight",
-                        "SDL-{}/{}".format(
-                            pad.index,
-                            input2wheel(pad.inputs["joystick1left"], True),
-                        ),
+                        f"SDL-{pad.index}/{input2wheel(pad.inputs['joystick1left'], True)}",
                     )
                 # pedals
                 if "l2" in pad.inputs:
                     pcsx2INIConfig.set(
                         f"USB{usbx}",
                         "Pad_Brake",
-                        "SDL-{}/{}".format(pad.index, input2wheel(pad.inputs["l2"])),
+                        f"SDL-{pad.index}/{input2wheel(pad.inputs['l2'])}",
                     )
                 if "r2" in pad.inputs:
                     pcsx2INIConfig.set(
                         f"USB{usbx}",
                         "Pad_Throttle",
-                        "SDL-{}/{}".format(pad.index, input2wheel(pad.inputs["r2"])),
+                        f"SDL-{pad.index}/{input2wheel(pad.inputs['r2'])}",
                     )
                 usbx = usbx + 1
 
@@ -808,7 +803,7 @@ def setPcsx2Config(
 
     # Function to determine the number of multitaps
     def get_multitap_config(
-        system: Any, controllers: Any
+        system: Any, controllers: Any,
     ) -> tuple[int, dict[str, str]]:
         multiTap = 2
         multitap_settings = {"MultitapPort1": "false", "MultitapPort2": "false"}
@@ -823,12 +818,12 @@ def setPcsx2Config(
                 multitap_settings["MultitapPort1"] = "true"
                 multiTap = 4
                 eslog.debug(
-                    "*** You have too many connected controllers for this option, restricting to 4 ***"
+                    "*** You have too many connected controllers for this option, restricting to 4 ***",
                 )
             else:
                 multiTap = 2
                 eslog.debug(
-                    "*** You have the wrong number of connected controllers for this option ***"
+                    "*** You have the wrong number of connected controllers for this option ***",
                 )
         elif (
             system.isOptSet("pcsx2_multitap") and system.config["pcsx2_multitap"] == "8"
@@ -841,12 +836,12 @@ def setPcsx2Config(
                 multitap_settings["MultitapPort1"] = "true"
                 multiTap = 4
                 eslog.debug(
-                    "*** You don't have enough connected controllers for this option, restricting to 4 ***"
+                    "*** You don't have enough connected controllers for this option, restricting to 4 ***",
                 )
             else:
                 multiTap = 2
                 eslog.debug(
-                    "*** You don't have enough connected controllers for this option ***"
+                    "*** You don't have enough connected controllers for this option ***",
                 )
 
         return multiTap, multitap_settings
@@ -944,8 +939,7 @@ def setPcsx2Config(
 
 
 def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
-    """
-    Maps configuration ratio values to the values used by the ratio calculation function.
+    """Maps configuration ratio values to the values used by the ratio calculation function.
 
     Args:
         config: Configuration object containing settings
@@ -953,6 +947,7 @@ def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
 
     Returns:
         str: The ratio value mapped from the configuration
+
     """
     # Mapping of configuration values to ratio values used in the function
     if "pcsx2_ratio" in config:
@@ -970,8 +965,7 @@ def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
 
 
 def getInGameRatio(config: Any, gameResolution: dict[str, int], rom: str) -> float:
-    """
-    Calculates the in-game aspect ratio based on configuration and game resolution.
+    """Calculates the in-game aspect ratio based on configuration and game resolution.
 
     Args:
         config: Configuration object containing settings
@@ -980,6 +974,7 @@ def getInGameRatio(config: Any, gameResolution: dict[str, int], rom: str) -> flo
 
     Returns:
         float: The calculated aspect ratio as a fraction (e.g., 4/3, 16/9)
+
     """
     ratio_from_config = getGfxRatioFromConfig(config, gameResolution)
     if (

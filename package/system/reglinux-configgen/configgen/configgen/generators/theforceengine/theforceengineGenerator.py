@@ -78,7 +78,7 @@ class TheForceEngineGenerator(Generator):
             forceConfig.set("Graphics", "gameHeight", format(game_resolution["height"]))
 
         if system.isOptSet("force_widescreen") and system.getOptBoolean(
-            "force_widescreen"
+            "force_widescreen",
         ):
             forceConfig.set("Graphics", "widescreen", "true")
         else:
@@ -110,14 +110,14 @@ class TheForceEngineGenerator(Generator):
             forceConfig.set("Graphics", "useBilinear", "false")
 
         if system.isOptSet("force_mipmapping") and system.getOptBoolean(
-            "force_mipmapping"
+            "force_mipmapping",
         ):
             forceConfig.set("Graphics", "useMipmapping", "true")
         else:
             forceConfig.set("Graphics", "useMipmapping", "false")
 
         if system.isOptSet("force_crosshair") and system.getOptBoolean(
-            "force_crosshair"
+            "force_crosshair",
         ):
             forceConfig.set("Graphics", "reticleEnable", "true")
         else:
@@ -154,14 +154,14 @@ class TheForceEngineGenerator(Generator):
             forceConfig.add_section("Sound")
 
         if system.isOptSet("force_menu_sound") and system.getOptBoolean(
-            "force_menu_sound"
+            "force_menu_sound",
         ):
             forceConfig.set("Sound", "disableSoundInMenus", "true")
         else:
             forceConfig.set("Sound", "disableSoundInMenus", "false")
 
         if system.isOptSet("force_digital_audio") and system.getOptBoolean(
-            "force_digital_audio"
+            "force_digital_audio",
         ):
             forceConfig.set("Sound", "use16Channels", "true")
         else:
@@ -192,7 +192,7 @@ class TheForceEngineGenerator(Generator):
         )
 
         if system.isOptSet("force_fight_music") and system.getOptBoolean(
-            "force_fight_music"
+            "force_fight_music",
         ):
             forceConfig.set("Dark_Forces", "disableFightMusic", "true")
         else:
@@ -222,7 +222,7 @@ class TheForceEngineGenerator(Generator):
             forceConfig.set("Dark_Forces", "bobaFettFacePlayer", "false")
 
         if system.isOptSet("force_smooth_vues") and system.getOptBoolean(
-            "force_smooth_vues"
+            "force_smooth_vues",
         ):
             forceConfig.set("Dark_Forces", "smoothVUEs", "true")
         else:
@@ -270,7 +270,7 @@ class TheForceEngineGenerator(Generator):
             env={
                 "TFE_DATA_HOME": str(FORCE_CONFIG_DIR),
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
+                    players_controllers,
                 ),
             },
         )
@@ -280,7 +280,7 @@ class TheForceEngineGenerator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str,
     ) -> float:
         if "force_widescreen" in config and config["force_widescreen"] == "1":
             return 16 / 9

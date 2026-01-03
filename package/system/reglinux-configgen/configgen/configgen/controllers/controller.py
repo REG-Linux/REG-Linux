@@ -1,5 +1,4 @@
-"""
-Controller class and related functions for managing game controller configurations.
+"""Controller class and related functions for managing game controller configurations.
 Provides functionality to generate SDL game controller configuration strings.
 """
 
@@ -23,8 +22,7 @@ class Input:
 
     @classmethod
     def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Optional["Input"]:
-        """
-        Factory method to create an Input instance from SDL controller mapping string.
+        """Factory method to create an Input instance from SDL controller mapping string.
 
         Handles all SDL controller mapping types (buttons, axes, and hats) according to:
         https://github.com/gabomdq/SDL_GameControllerDB/blob/master/README.md#entries
@@ -43,6 +41,7 @@ class Input:
             >>> Input.from_sdl_mapping("a", "b0")      # Button 0 (A button)
             >>> Input.from_sdl_mapping("leftx", "a0")  # Axis 0 (Left X)
             >>> Input.from_sdl_mapping("dpup", "h0.1") # Hat 0 Up
+
         """
         # Validate input parameters
         if not sdl_key or not sdl_value:
@@ -77,8 +76,7 @@ class Input:
         )
 
     def sdl_to_linux_input_event(self, guide_equal_back: bool) -> dict[str, Any] | None:
-        """
-        Converts SDL input mapping to a Linux input event structure with complete metadata.
+        """Converts SDL input mapping to a Linux input event structure with complete metadata.
 
         Returns:
             A dictionary containing:
@@ -87,8 +85,8 @@ class Input:
                 - id: SDL numeric identifier (e.g. "0", "1")
                 - value: Original SDL mapping string (e.g. "b0", "a1", "h0.1")
                 - code: Linux event code (e.g. 304 for BTN_SOUTH)
-        """
 
+        """
         # Linux event codes: https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h
         sdl_to_linux = {
             # Buttons
@@ -175,14 +173,14 @@ def _generate_sdl_controller_config(controller: Controller) -> str:
 
 
 def generate_sdl_controller_config(controllers: dict[str, Any]) -> str:
-    """
-    Generate SDL game controller configuration for multiple controllers.
+    """Generate SDL game controller configuration for multiple controllers.
 
     Args:
         controllers: Dictionary of Controller instances
 
     Returns:
         Newline-separated configuration strings
+
     """
     return "\n".join(
         controller.generate_sdl_game_db_line() for controller in controllers.values()
@@ -190,10 +188,9 @@ def generate_sdl_controller_config(controllers: dict[str, Any]) -> str:
 
 
 def write_sdl_db_all_controllers(
-    controllers: dict[str, Any], outputFile: str = "/tmp/gamecontrollerdb.txt"
+    controllers: dict[str, Any], outputFile: str = "/tmp/gamecontrollerdb.txt",
 ) -> str:
-    """
-    Write SDL game controller configuration to a file.
+    """Write SDL game controller configuration to a file.
 
     Args:
         controllers: Dictionary of Controller instances
@@ -201,6 +198,7 @@ def write_sdl_db_all_controllers(
 
     Returns:
         Path to the output file
+
     """
     # Using the walrus operator for assignment expressions
     config_str = generate_sdl_controller_config(controllers)

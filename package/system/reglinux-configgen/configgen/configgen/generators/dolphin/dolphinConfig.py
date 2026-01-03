@@ -69,12 +69,12 @@ def writeInt8(f: Any, value: int) -> None:
 
 
 def readWriteEntry(f: Any, setval: dict[str, Any]) -> None:
-    """
-    Read or write an entry in the SYSCONF file.
+    """Read or write an entry in the SYSCONF file.
 
     Args:
         f: File object to read from or write to
         setval: Dictionary of values to set in the file
+
     """
     item_header = readInt8(f)
     item_type = ItemType((item_header & 0xE0) >> 5)
@@ -88,41 +88,40 @@ def readWriteEntry(f: Any, setval: dict[str, Any]) -> None:
             writeInt8(f, item_value)
         else:
             raise ValueError(f"Item type {item_type} is not writable")
+    elif item_type == ItemType.BIG_ARRAY:
+        data_size = readBEInt16(f) + 1
+        readBytes(f, data_size)
+        item_value = "[Big Array]"
+    elif item_type == ItemType.SMALL_ARRAY:
+        data_size = readInt8(f) + 1
+        readBytes(f, data_size)
+        item_value = "[Small Array]"
+    elif item_type == ItemType.BYTE:
+        item_value = readInt8(f)
+    elif item_type == ItemType.SHORT:
+        item_value = readBEInt16(f)
+    elif item_type == ItemType.LONG:
+        item_value = readBEInt32(f)
+    elif item_type == ItemType.LONG_LONG:
+        item_value = readBEInt64(f)
+        if data_size is not None:
+            readBytes(f, data_size)
+    elif item_type == ItemType.BOOL:
+        item_value = readInt8(f)
     else:
-        if item_type == ItemType.BIG_ARRAY:
-            data_size = readBEInt16(f) + 1
-            readBytes(f, data_size)
-            item_value = "[Big Array]"
-        elif item_type == ItemType.SMALL_ARRAY:
-            data_size = readInt8(f) + 1
-            readBytes(f, data_size)
-            item_value = "[Small Array]"
-        elif item_type == ItemType.BYTE:
-            item_value = readInt8(f)
-        elif item_type == ItemType.SHORT:
-            item_value = readBEInt16(f)
-        elif item_type == ItemType.LONG:
-            item_value = readBEInt32(f)
-        elif item_type == ItemType.LONG_LONG:
-            item_value = readBEInt64(f)
-            if data_size is not None:
-                readBytes(f, data_size)
-        elif item_type == ItemType.BOOL:
-            item_value = readInt8(f)
-        else:
-            raise ValueError(f"Unknown item type: {item_type}")
+        raise ValueError(f"Unknown item type: {item_type}")
 
     if not setval or item_name in setval:
         eslog.debug(f"{item_name:12s} = {item_value}")
 
 
 def readWriteFile(filepath: str | Path, setval: dict[str, Any]) -> None:
-    """
-    Read or write the SYSCONF file.
+    """Read or write the SYSCONF file.
 
     Args:
         filepath: Path to the file to read or write
         setval: Dictionary of values to set in the file
+
     """
     # Open in read or read/write depending on the action
     mode = "r+b" if setval else "rb"
@@ -155,8 +154,7 @@ def getWiiLangFromEnvironment() -> int:
 
 
 def getRatioFromConfig(config: dict[str, Any], gameResolution: dict[str, int]) -> int:
-    """
-    Get the aspect ratio from the configuration.
+    """Get the aspect ratio from the configuration.
 
     Args:
         config: Configuration dictionary
@@ -164,6 +162,7 @@ def getRatioFromConfig(config: dict[str, Any], gameResolution: dict[str, int]) -
 
     Returns:
         0 for 4:3, 1 for 16:9
+
     """
     # Sets the setting available to the Wii's internal NAND. Only has two values:
     # 0: 4:3 ; 1: 16:9
@@ -173,14 +172,14 @@ def getRatioFromConfig(config: dict[str, Any], gameResolution: dict[str, int]) -
 
 
 def getSensorBarPosition(config: dict[str, Any]) -> int:
-    """
-    Get the sensor bar position from the configuration.
+    """Get the sensor bar position from the configuration.
 
     Args:
         config: Configuration dictionary
 
     Returns:
         0 for BOTTOM, 1 for TOP
+
     """
     # Sets the setting available to the Wii's internal NAND. Only has two values:
     # 0: BOTTOM ; 1: TOP
@@ -190,15 +189,15 @@ def getSensorBarPosition(config: dict[str, Any]) -> int:
 
 
 def updateConfig(
-    config: dict[str, Any], filepath: str | Path, gameResolution: dict[str, int]
+    config: dict[str, Any], filepath: str | Path, gameResolution: dict[str, int],
 ) -> None:
-    """
-    Update the SYSCONF file with the specified configuration.
+    """Update the SYSCONF file with the specified configuration.
 
     Args:
         config: Configuration dictionary
         filepath: Path to the SYSCONF file
         gameResolution: Game resolution dictionary
+
     """
     arg_setval = {
         "IPL.LNG": getWiiLangFromEnvironment(),

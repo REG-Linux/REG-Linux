@@ -23,10 +23,8 @@ def writeCfgFile(
 
         with open(filename, "w") as file:
             file.write(init_line)
-            for line in defaults_to_add:
-                file.write(line)
-            for line in controls_to_add:
-                file.write(line)
+            file.writelines(defaults_to_add)
+            file.writelines(controls_to_add)
     else:
         if gameResolution["width"] < gameResolution["height"]:
             width, height = gameResolution["height"], gameResolution["width"]
@@ -73,7 +71,7 @@ def writeCfgFile(
 
 
 def setIoquake3Config(
-    system: Any, rom: str, playersControllers: Any, gameResolution: dict[str, int]
+    system: Any, rom: str, playersControllers: Any, gameResolution: dict[str, int],
 ) -> None:
     # create the cfg files for each quake3 rom / mod folder
     files = []

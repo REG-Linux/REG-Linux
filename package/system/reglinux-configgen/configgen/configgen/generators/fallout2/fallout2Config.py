@@ -34,21 +34,21 @@ def setFalloutConfig(falloutConfig: Any, system: Any) -> None:
 
     if system.isOptSet("fout2_game_difficulty"):
         falloutConfig.set(
-            "preferences", "game_difficulty", system.config["fout2_game_difficulty"]
+            "preferences", "game_difficulty", system.config["fout2_game_difficulty"],
         )
     else:
         falloutConfig.set("preferences", "game_difficulty", "1")
 
     if system.isOptSet("fout2_combat_difficulty"):
         falloutConfig.set(
-            "preferences", "combat_difficulty", system.config["fout2_combat_difficulty"]
+            "preferences", "combat_difficulty", system.config["fout2_combat_difficulty"],
         )
     else:
         falloutConfig.set("preferences", "combat_difficulty", "1")
 
     if system.isOptSet("fout2_violence_level"):
         falloutConfig.set(
-            "preferences", "violence_level", system.config["fout2_violence_level"]
+            "preferences", "violence_level", system.config["fout2_violence_level"],
         )
     else:
         falloutConfig.set("preferences", "violence_level", "2")

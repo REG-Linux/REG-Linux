@@ -21,7 +21,7 @@ class GZDoomGenerator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str,
     ) -> float:
         return 16 / 9
 
@@ -65,7 +65,7 @@ class GZDoomGenerator(Generator):
                     "-height",
                     str(game_resolution["height"]),
                     "-nologo" if system.getOptBoolean("nologo") else "",
-                ]
+                ],
             )
         return Command(
             array=[
@@ -79,5 +79,5 @@ class GZDoomGenerator(Generator):
                 "-height",
                 str(game_resolution["height"]),
                 "-nologo" if system.getOptBoolean("nologo") else "",
-            ]
+            ],
         )

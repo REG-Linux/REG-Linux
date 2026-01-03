@@ -1,5 +1,4 @@
-"""
-Ryujinx generator module for REG-Linux
+"""Ryujinx generator module for REG-Linux
 This module handles the generation of ryujinx emulator configurations.
 """
 

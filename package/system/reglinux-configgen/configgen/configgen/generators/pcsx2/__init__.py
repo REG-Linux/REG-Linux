@@ -1,5 +1,4 @@
-"""
-Pcsx2 generator module for REG-Linux
+"""Pcsx2 generator module for REG-Linux
 This module handles the generation of pcsx2 emulator configurations.
 """
 
@@ -14,9 +13,9 @@ from .pcsx2Generator import Pcsx2Generator
 
 __all__ = [
     "Pcsx2Generator",
-    "setPcsx2Config",
     "getWheelType",
     "input2wheel",
     "isPlayingWithWheel",
+    "setPcsx2Config",
     "useEmulatorWheels",
 ]

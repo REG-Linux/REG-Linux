@@ -20,7 +20,7 @@ def precalibration_copyDir(src: str, dst: str) -> None:
 
 
 def precalibration_copyFilesInDir(
-    srcdir: str, dstdir: str, startWith: str, endWith: str
+    srcdir: str, dstdir: str, startWith: str, endWith: str,
 ) -> None:
     srcdir_path = Path(srcdir)
     dstdir_path = Path(dstdir)
@@ -39,7 +39,7 @@ def precalibration(systemName: str, emulator: str, core: str, rom: str) -> None:
         for suffix in ["nvmem", "nvmem2"]:
             src = str(dir_path / "reicast" / f"{baserom}.{suffix}")
             dst = str(
-                Path("/userdata/saves/atomiswave/reicast") / f"{baserom}.{suffix}"
+                Path("/userdata/saves/atomiswave/reicast") / f"{baserom}.{suffix}",
             )
             precalibration_copyFile(src, dst)
 
@@ -79,6 +79,6 @@ def precalibration(systemName: str, emulator: str, core: str, rom: str) -> None:
         src = str(dir_path / "play" / baserom_noext)
         dst = str(
             Path("/userdata/system/configs/play/Play Data Files/arcadesaves")
-            / f"{baserom_noext}.backupram"
+            / f"{baserom_noext}.backupram",
         )
         precalibration_copyFile(src, dst)

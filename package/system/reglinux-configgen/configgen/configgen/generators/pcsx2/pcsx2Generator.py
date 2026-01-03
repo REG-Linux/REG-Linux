@@ -31,7 +31,7 @@ class Pcsx2Generator(Generator):
         return True
 
     def getInGameRatio(
-        self, config: dict[str, Any], gameResolution: dict[str, Any], rom: str
+        self, config: dict[str, Any], gameResolution: dict[str, Any], rom: str,
     ) -> float:
         """Calculate the in-game aspect ratio for PCSX2 based on configuration.
 
@@ -42,11 +42,12 @@ class Pcsx2Generator(Generator):
 
         Returns:
             float: The calculated aspect ratio as a fraction (e.g., 4/3, 16/9)
+
         """
         return getInGameRatio(config, gameResolution, rom)
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Remove older config files if present
         inisDir = Path(PCSX2_CONFIG_DIR) / "inis"
@@ -62,7 +63,7 @@ class Pcsx2Generator(Generator):
         # FIXME Config files
         setPcsx2Reg()
         setPcsx2Config(
-            system, rom, players_controllers, metadata, guns, wheels, playingWithWheel
+            system, rom, players_controllers, metadata, guns, wheels, playingWithWheel,
         )
         configureAudio()
 
@@ -79,7 +80,7 @@ class Pcsx2Generator(Generator):
         with open("/proc/cpuinfo") as cpuinfo:
             if not search(r"^flags\s*:.*\ssse4_1\W", cpuinfo.read(), MULTILINE):
                 eslog.warning(
-                    "CPU does not support SSE4.1 which is required by pcsx2.  The emulator will likely crash with SIGILL (illegal instruction)."
+                    "CPU does not support SSE4.1 which is required by pcsx2.  The emulator will likely crash with SIGILL (illegal instruction).",
                 )
 
         # ensure we have the patches.zip file to avoid message.

@@ -20,7 +20,7 @@ class MelonDSGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Verify the save path exists
         saves_dir_path = Path(MELONDS_SAVES_DIR)

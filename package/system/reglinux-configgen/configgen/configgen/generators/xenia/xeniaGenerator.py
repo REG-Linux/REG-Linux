@@ -60,37 +60,36 @@ class XeniaGenerator(Generator):
         # check Vulkan first before doing anything
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
                     vulkan_version = check_output(
-                        ["/usr/bin/system-vulkan", "vulkanVersion"], text=True
+                        ["/usr/bin/system-vulkan", "vulkanVersion"], text=True,
                     ).strip()
                     if vulkan_version > "1.3":
                         eslog.debug(f"Using Vulkan version: {vulkan_version}")
+                    elif (
+                        system.isOptSet("xenia_api")
+                        and system.config["xenia_api"] == "D3D12"
+                    ):
+                        eslog.debug(
+                            f"Vulkan version: {vulkan_version} is not compatible with Xenia when using D3D12",
+                        )
+                        eslog.debug(
+                            f"You may have performance & graphical errors, switching to native Vulkan {vulkan_version}",
+                        )
+                        system.config["xenia_api"] = "Vulkan"
                     else:
-                        if (
-                            system.isOptSet("xenia_api")
-                            and system.config["xenia_api"] == "D3D12"
-                        ):
-                            eslog.debug(
-                                f"Vulkan version: {vulkan_version} is not compatible with Xenia when using D3D12"
-                            )
-                            eslog.debug(
-                                f"You may have performance & graphical errors, switching to native Vulkan {vulkan_version}"
-                            )
-                            system.config["xenia_api"] = "Vulkan"
-                        else:
-                            eslog.debug(
-                                f"Vulkan version: {vulkan_version} is not recommended with Xenia"
-                            )
+                        eslog.debug(
+                            f"Vulkan version: {vulkan_version} is not recommended with Xenia",
+                        )
                 except CalledProcessError:
                     eslog.debug("Error checking for Vulkan version.")
             else:
                 eslog.debug(
-                    "*** Vulkan driver required is not available on the system!!! ***"
+                    "*** Vulkan driver required is not available on the system!!! ***",
                 )
                 exit()
         except CalledProcessError:
@@ -114,7 +113,7 @@ class XeniaGenerator(Generator):
                     # Strip of any new line characters.
                     firstLine = firstLine.strip("\n").strip("\r")
                 eslog.debug(
-                    "Checking if specified disc installation / XBLA file actually exists..."
+                    "Checking if specified disc installation / XBLA file actually exists...",
                 )
                 xblaFullPath = pathLead / firstLine
                 if xblaFullPath.exists():
@@ -122,12 +121,11 @@ class XeniaGenerator(Generator):
                     rom = str(xblaFullPath)
                 else:
                     eslog.error(
-                        f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename."
+                        f"Disc installation/XBLA title {firstLine} from {rom} not found, check path or filename.",
                     )
             except (OSError, IndexError) as e:
                 eslog.error(f"Error reading .xbox360 playlist file {rom}: {e}")
                 # Ensure we handle the case where the file might be empty or inaccessible
-                pass
 
         # adjust the config toml file accordingly
         config = {}
@@ -192,32 +190,32 @@ class XeniaGenerator(Generator):
         config["GPU"]["vsync_fps"] = int(system.config.get("xenia_vsync_fps", 60))
         # page state
         config["GPU"]["clear_memory_page_state"] = system.config.get(
-            "xenia_page_state", False
+            "xenia_page_state", False,
         )
         # render target path
         config["GPU"]["render_target_path_d3d12"] = system.config.get(
-            "xenia_target_path", "rtv"
+            "xenia_target_path", "rtv",
         )
         # query occlusion
         config["GPU"]["query_occlusion_fake_sample_count"] = int(
-            system.config.get("xenia_query_occlusion", 1000)
+            system.config.get("xenia_query_occlusion", 1000),
         )
         # readback resolve
         config["GPU"]["d3d12_readback_resolve"] = system.config.get(
-            "xenia_readback_resolve", False
+            "xenia_readback_resolve", False,
         )
         # cache
         config["GPU"]["texture_cache_memory_limit_hard"] = int(
-            system.config.get("xenia_limit_hard", 768)
+            system.config.get("xenia_limit_hard", 768),
         )
         config["GPU"]["texture_cache_memory_limit_render_to_texture"] = int(
-            system.config.get("xenia_limit_render_to_texture", 24)
+            system.config.get("xenia_limit_render_to_texture", 24),
         )
         config["GPU"]["texture_cache_memory_limit_soft"] = int(
-            system.config.get("xenia_limit_soft", 384)
+            system.config.get("xenia_limit_soft", 384),
         )
         config["GPU"]["texture_cache_memory_limit_soft_lifetime"] = int(
-            system.config.get("xenia_limit_soft_lifetime", 30)
+            system.config.get("xenia_limit_soft_lifetime", 30),
         )
         # add node General
         if "General" not in config:
@@ -317,15 +315,14 @@ class XeniaGenerator(Generator):
                 command_array = [str(XENIA_CANARY_BIN_PATH)]
             else:
                 command_array = ["xenia.exe"]
+        elif core == "xenia-canary":
+            command_array = [str(XENIA_CANARY_BIN_PATH), "z:" + rom]
         else:
-            if core == "xenia-canary":
-                command_array = [str(XENIA_CANARY_BIN_PATH), "z:" + rom]
-            else:
-                command_array = ["xenia.exe", "z:" + rom]
+            command_array = ["xenia.exe", "z:" + rom]
 
         environment = {
             "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                players_controllers
+                players_controllers,
             ),
             "VKD3D_SHADER_CACHE_PATH": str(XENIA_CACHE_DIR),
         }
@@ -345,7 +342,7 @@ class XeniaGenerator(Generator):
                 {
                     "VK_ICD_FILENAMES": "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
                     "VK_LAYER_PATH": "/usr/share/vulkan/explicit_layer.d",
-                }
+                },
             )
 
         return Command(array=command_array, env=environment)

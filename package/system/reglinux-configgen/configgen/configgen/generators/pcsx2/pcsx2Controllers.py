@@ -49,7 +49,7 @@ def input2wheel(input: Any, reversedAxis: bool = False) -> str:
     if input.type == "axis":
         pcsx2_magic_axis_offset = 6  # PCSX2/SDLInputSource.cpp : const u32 axis = ev->axis + std::size(s_sdl_axis_names);
         if reversedAxis is None:
-            return "{}Axis{}~".format("Full", int(input.id) + pcsx2_magic_axis_offset)
+            return f"FullAxis{int(input.id) + pcsx2_magic_axis_offset}~"
         dir = "-"
         if reversedAxis:
             dir = "+"

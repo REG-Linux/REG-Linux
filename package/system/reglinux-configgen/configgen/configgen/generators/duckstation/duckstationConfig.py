@@ -15,14 +15,14 @@ DUCKSTATION_NOGUI_PATH = Path("/usr/bin/duckstation-nogui")
 
 
 def setDuckstationConfig(
-    duckstatonConfig: Any, system: Any, playersControllers: Any
+    duckstatonConfig: Any, system: Any, playersControllers: Any,
 ) -> None:
     ## [Main]
     if not duckstatonConfig.has_section("Main"):
         duckstatonConfig.add_section("Main")
     # Settings, Language and ConfirmPowerOff
     duckstatonConfig.set(
-        "Main", "SettingsVersion", "3"
+        "Main", "SettingsVersion", "3",
     )  # Probably to be updated in the future
     duckstatonConfig.set("Main", "InhibitScreensaver", "true")
     duckstatonConfig.set("Main", "StartPaused", "false")
@@ -38,14 +38,14 @@ def setDuckstationConfig(
     # overclock
     if system.isOptSet("duckstation_clocking"):
         duckstatonConfig.set(
-            "Main", "EmulationSpeed", system.config["duckstation_clocking"]
+            "Main", "EmulationSpeed", system.config["duckstation_clocking"],
         )
     else:
         duckstatonConfig.set("Main", "EmulationSpeed", "1")
     # host refresh rate
     if system.isOptSet("duckstation_hrr"):
         duckstatonConfig.set(
-            "Main", "SyncToHostRefreshRate", system.config["duckstation_hrr"]
+            "Main", "SyncToHostRefreshRate", system.config["duckstation_hrr"],
         )
     else:
         duckstatonConfig.set("Main", "SyncToHostRefreshRate", "false")
@@ -59,7 +59,7 @@ def setDuckstationConfig(
         and system.config["duckstation_rewind"] == "120"
     ):
         duckstatonConfig.set(
-            "Main", "RewindSaveSlots", "120"
+            "Main", "RewindSaveSlots", "120",
         )  # Total duration available in sec
     elif (
         system.isOptSet("duckstation_rewind")
@@ -116,7 +116,7 @@ def setDuckstationConfig(
     # Boot Logo
     if system.isOptSet("duckstation_PatchFastBoot"):
         duckstatonConfig.set(
-            "BIOS", "PatchFastBoot", system.config["duckstation_PatchFastBoot"]
+            "BIOS", "PatchFastBoot", system.config["duckstation_PatchFastBoot"],
         )
     else:
         duckstatonConfig.set("BIOS", "PatchFastBoot", "false")
@@ -179,7 +179,7 @@ def setDuckstationConfig(
     # ExecutionMode
     if system.isOptSet("duckstation_executionmode"):
         duckstatonConfig.set(
-            "CPU", "ExecutionMode", system.config["duckstation_executionmode"]
+            "CPU", "ExecutionMode", system.config["duckstation_executionmode"],
         )
     else:
         duckstatonConfig.set("CPU", "ExecutionMode", "Recompiler")
@@ -207,21 +207,21 @@ def setDuckstationConfig(
     # Internal resolution
     if system.isOptSet("duckstation_resolution_scale"):
         duckstatonConfig.set(
-            "GPU", "ResolutionScale", system.config["duckstation_resolution_scale"]
+            "GPU", "ResolutionScale", system.config["duckstation_resolution_scale"],
         )
     else:
         duckstatonConfig.set("GPU", "ResolutionScale", "1")
     # WideScreen Hack
     if system.isOptSet("duckstation_widescreen_hack"):
         duckstatonConfig.set(
-            "GPU", "WidescreenHack", system.config["duckstation_widescreen_hack"]
+            "GPU", "WidescreenHack", system.config["duckstation_widescreen_hack"],
         )
     else:
         duckstatonConfig.set("GPU", "WidescreenHack", "false")
     # Force 60hz
     if system.isOptSet("duckstation_60hz"):
         duckstatonConfig.set(
-            "GPU", "ForceNTSCTimings", system.config["duckstation_60hz"]
+            "GPU", "ForceNTSCTimings", system.config["duckstation_60hz"],
         )
     else:
         duckstatonConfig.set("GPU", "ForceNTSCTimings", "false")
@@ -231,7 +231,7 @@ def setDuckstationConfig(
         and system.config["duckstation_texture_filtering"] != "Nearest"
     ):
         duckstatonConfig.set(
-            "GPU", "TextureFilter", system.config["duckstation_texture_filtering"]
+            "GPU", "TextureFilter", system.config["duckstation_texture_filtering"],
         )
     else:
         duckstatonConfig.set("GPU", "TextureFilter", "Nearest")
@@ -240,10 +240,10 @@ def setDuckstationConfig(
         duckstatonConfig.set("GPU", "PGXPEnable", system.config["duckstation_pgxp"])
         duckstatonConfig.set("GPU", "PGXPCulling", system.config["duckstation_pgxp"])
         duckstatonConfig.set(
-            "GPU", "PGXPTextureCorrection", system.config["duckstation_pgxp"]
+            "GPU", "PGXPTextureCorrection", system.config["duckstation_pgxp"],
         )
         duckstatonConfig.set(
-            "GPU", "PGXPPreserveProjFP", system.config["duckstation_pgxp"]
+            "GPU", "PGXPPreserveProjFP", system.config["duckstation_pgxp"],
         )
     else:
         duckstatonConfig.set("GPU", "PGXPEnable", "true")
@@ -253,21 +253,21 @@ def setDuckstationConfig(
     # True Color
     if system.isOptSet("duckstation_truecolour"):
         duckstatonConfig.set(
-            "GPU", "TrueColor", system.config["duckstation_truecolour"]
+            "GPU", "TrueColor", system.config["duckstation_truecolour"],
         )
     else:
         duckstatonConfig.set("GPU", "TrueColor", "false")
     # Scaled Dithering
     if system.isOptSet("duckstation_dithering"):
         duckstatonConfig.set(
-            "GPU", "ScaledDithering", system.config["duckstation_dithering"]
+            "GPU", "ScaledDithering", system.config["duckstation_dithering"],
         )
     else:
         duckstatonConfig.set("GPU", "ScaledDithering", "true")
     # Disable Interlacing
     if system.isOptSet("duckstation_interlacing"):
         duckstatonConfig.set(
-            "GPU", "DisableInterlacing", system.config["duckstation_interlacing"]
+            "GPU", "DisableInterlacing", system.config["duckstation_interlacing"],
         )
     else:
         duckstatonConfig.set("GPU", "DisableInterlacing", "false")
@@ -280,7 +280,7 @@ def setDuckstationConfig(
             duckstatonConfig.set("GPU", "Multisamples", multisamples)
         else:
             duckstatonConfig.set(
-                "GPU", "Multisamples", system.config["duckstation_antialiasing"]
+                "GPU", "Multisamples", system.config["duckstation_antialiasing"],
             )
             duckstatonConfig.set("GPU", "PerSampleShading", "false")
 
@@ -290,7 +290,7 @@ def setDuckstationConfig(
     # Aspect Ratio
     if system.isOptSet("duckstation_ratio"):
         duckstatonConfig.set(
-            "Display", "AspectRatio", system.config["duckstation_ratio"]
+            "Display", "AspectRatio", system.config["duckstation_ratio"],
         )
         if system.config["duckstation_ratio"] != "4:3":
             system.config["bezel"] = "none"
@@ -304,7 +304,7 @@ def setDuckstationConfig(
     # CropMode
     if system.isOptSet("duckstation_CropMode"):
         duckstatonConfig.set(
-            "Display", "CropMode", system.config["duckstation_CropMode"]
+            "Display", "CropMode", system.config["duckstation_CropMode"],
         )
     else:
         duckstatonConfig.set("Display", "CropMode", "Overscan")
@@ -313,28 +313,28 @@ def setDuckstationConfig(
     # OSD Messages
     if system.isOptSet("duckstation_osd"):
         duckstatonConfig.set(
-            "Display", "ShowOSDMessages", system.config["duckstation_osd"]
+            "Display", "ShowOSDMessages", system.config["duckstation_osd"],
         )
     else:
         duckstatonConfig.set("Display", "ShowOSDMessages", "false")
     # Optimal frame pacing
     if system.isOptSet("duckstation_ofp"):
         duckstatonConfig.set(
-            "Display", "DisplayAllFrames", system.config["duckstation_ofp"]
+            "Display", "DisplayAllFrames", system.config["duckstation_ofp"],
         )
     else:
         duckstatonConfig.set("Display", "DisplayAllFrames", "false")
     # Integer Scaling
     if system.isOptSet("duckstation_integer"):
         duckstatonConfig.set(
-            "Display", "IntegerScaling", system.config["duckstation_integer"]
+            "Display", "IntegerScaling", system.config["duckstation_integer"],
         )
     else:
         duckstatonConfig.set("Display", "IntegerScaling", "false")
     # Linear Filtering
     if system.isOptSet("duckstation_linear"):
         duckstatonConfig.set(
-            "Display", "LinearFiltering", system.config["duckstation_linear"]
+            "Display", "LinearFiltering", system.config["duckstation_linear"],
         )
     else:
         duckstatonConfig.set("Display", "LinearFiltering", "false")
@@ -357,7 +357,7 @@ def setDuckstationConfig(
         duckstatonConfig.add_section("Audio")
     if system.isOptSet("duckstation_audio_mode"):
         duckstatonConfig.set(
-            "Audio", "StretchMode", system.config["duckstation_audio_mode"]
+            "Audio", "StretchMode", system.config["duckstation_audio_mode"],
         )
     else:
         duckstatonConfig.set("Audio", "StretchMode", "TimeStretch")
@@ -372,7 +372,7 @@ def setDuckstationConfig(
         duckstatonConfig.add_section("Cheevos")
     # RetroAchievements
     if system.isOptSet("retroachievements") and system.getOptBoolean(
-        "retroachievements"
+        "retroachievements",
     ):
         username = system.config.get("retroachievements.username", "")
         hardcore = system.config.get("retroachievements.hardcore", "")
@@ -385,13 +385,13 @@ def setDuckstationConfig(
         duckstatonConfig.set("Cheevos", "Token", token)
         if hardcore == "1":
             duckstatonConfig.set(
-                "Cheevos", "ChallengeMode", "true"
+                "Cheevos", "ChallengeMode", "true",
             )  # For "hardcore" retroachievement points (no save, no rewind...)
         else:
             duckstatonConfig.set("Cheevos", "ChallengeMode", "false")
         if presence == "1":
             duckstatonConfig.set(
-                "Cheevos", "RichPresence", "true"
+                "Cheevos", "RichPresence", "true",
             )  # Enable rich presence information will be collected and sent to the server where supported
         else:
             duckstatonConfig.set("Cheevos", "RichPresence", "false")
@@ -417,7 +417,7 @@ def setDuckstationConfig(
         and system.config["duckstation_custom_textures"] == "0"
     ):
         duckstatonConfig.set(
-            "TextureReplacements", "EnableVRAMWriteReplacements", "false"
+            "TextureReplacements", "EnableVRAMWriteReplacements", "false",
         )
         duckstatonConfig.set("TextureReplacements", "PreloadTextures", "false")
     elif (
@@ -425,12 +425,12 @@ def setDuckstationConfig(
         and system.config["duckstation_custom_textures"] == "preload"
     ):
         duckstatonConfig.set(
-            "TextureReplacements", "EnableVRAMWriteReplacements", "true"
+            "TextureReplacements", "EnableVRAMWriteReplacements", "true",
         )
         duckstatonConfig.set("TextureReplacements", "PreloadTextures", "true")
     else:
         duckstatonConfig.set(
-            "TextureReplacements", "EnableVRAMWriteReplacements", "true"
+            "TextureReplacements", "EnableVRAMWriteReplacements", "true",
         )
         duckstatonConfig.set("TextureReplacements", "PreloadTextures", "false")
 

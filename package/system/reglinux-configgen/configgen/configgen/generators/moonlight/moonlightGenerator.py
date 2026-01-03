@@ -27,7 +27,7 @@ class MoonlightGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         staging_dir = Path(MOONLIGHT_CONFIG_DIR) / "staging"
         if not staging_dir.exists():
@@ -58,7 +58,7 @@ class MoonlightGenerator(Generator):
             env={
                 "XDG_DATA_DIRS": str(CONF),
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
+                    players_controllers,
                 ),
             },
         )
@@ -88,11 +88,11 @@ class MoonlightGenerator(Generator):
             return [None, MOONLIGHT_STAGING_CONFIG_PATH]
         except PermissionError:
             eslog.error(
-                f"Permission denied accessing Moonlight gamelist file: {MOONLIGHT_GAMELIST_PATH}"
+                f"Permission denied accessing Moonlight gamelist file: {MOONLIGHT_GAMELIST_PATH}",
             )
             return [None, MOONLIGHT_STAGING_CONFIG_PATH]
         except Exception as e:
             eslog.error(
-                f"Error reading Moonlight gamelist file {MOONLIGHT_GAMELIST_PATH}: {e}"
+                f"Error reading Moonlight gamelist file {MOONLIGHT_GAMELIST_PATH}: {e}",
             )
             return [None, MOONLIGHT_STAGING_CONFIG_PATH]

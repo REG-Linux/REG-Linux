@@ -10,7 +10,7 @@ from configgen.systemFiles import CONF
 
 class ETLegacyGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         etLegacyDir = "/userdata/roms/etlegacy/legacy"
         etLegacyFile = "/legacy_2.83-dirty.pk3"
@@ -90,8 +90,8 @@ class ETLegacyGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )
 
@@ -100,6 +100,6 @@ class ETLegacyGenerator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str,
     ) -> float:
         return 16 / 9

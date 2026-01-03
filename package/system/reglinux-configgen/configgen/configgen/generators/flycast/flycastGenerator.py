@@ -25,7 +25,7 @@ class FlycastGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Write emu.cfg to map joysticks, init with the default emu.cfg
         flycastConfig = ConfigParser(interpolation=None)
@@ -37,14 +37,14 @@ class FlycastGenerator(Generator):
                 flycastConfig.read(FLYCAST_CONFIG_PATH)
             except UnicodeDecodeError as e:
                 eslog.warning(
-                    f"Failed to decode config file {FLYCAST_CONFIG_PATH}: {e}. Using default config."
+                    f"Failed to decode config file {FLYCAST_CONFIG_PATH}: {e}. Using default config.",
                 )
-                pass  # give up the file
+                # give up the file
             except Exception as e:
                 eslog.warning(
-                    f"Error reading config file {FLYCAST_CONFIG_PATH}: {e}. Using default config."
+                    f"Error reading config file {FLYCAST_CONFIG_PATH}: {e}. Using default config.",
                 )
-                pass  # give up the file
+                # give up the file
 
         setFlycastConfig(flycastConfig, system, game_resolution)
 
