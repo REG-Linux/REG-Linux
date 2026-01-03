@@ -11,7 +11,7 @@ THEXTECH_BIN_PATH = "/usr/bin/thextech"
 
 class TheXTechGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         if not path.exists(THEXTECH_SAVES_DIR):
             makedirs(THEXTECH_SAVES_DIR)
@@ -33,7 +33,7 @@ class TheXTechGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

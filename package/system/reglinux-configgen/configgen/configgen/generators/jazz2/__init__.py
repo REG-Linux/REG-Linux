@@ -1,5 +1,4 @@
-"""
-Jazz2 generator module for REG-Linux
+"""Jazz2 generator module for REG-Linux
 This module handles the generation of jazz2 emulator configurations.
 """
 

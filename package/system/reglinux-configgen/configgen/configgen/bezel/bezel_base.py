@@ -1,5 +1,4 @@
-"""
-Module that defines the interfaces and base classes for the bezel system in REG-Linux.
+"""Module that defines the interfaces and base classes for the bezel system in REG-Linux.
 """
 
 from abc import ABC, abstractmethod
@@ -45,7 +44,6 @@ class IBezelManager(ABC):
         guns: list[Any],
     ) -> None:
         """Configure the bezels for a specific game."""
-        pass
 
 
 class BezelUtils:
@@ -53,28 +51,28 @@ class BezelUtils:
 
     @staticmethod
     def generate_cache_key(*args: Any) -> str:
-        """
-        Generate a unique cache key based on input parameters.
+        """Generate a unique cache key based on input parameters.
 
         Args:
             *args: Variable arguments to create the key string
 
         Returns:
             str: MD5 hash of the arguments
+
         """
         key_str = "_".join(str(arg) for arg in args)
         return hashlib.md5(key_str.encode()).hexdigest()
 
     @staticmethod
     def get_cached_image(cache_key: str) -> str | None:
-        """
-        Retrieve cached image if it exists.
+        """Retrieve cached image if it exists.
 
         Args:
             cache_key: The key for the cached image
 
         Returns:
             Path to cached image if exists, else None
+
         """
         cached_path = BEZEL_CACHE_DIR / f"{cache_key}.png"
         if cached_path.exists():
@@ -83,20 +81,19 @@ class BezelUtils:
 
     @staticmethod
     def save_to_cache(image_path: str, cache_key: str) -> None:
-        """
-        Save an image to the cache.
+        """Save an image to the cache.
 
         Args:
             image_path: Path to the image to cache
             cache_key: The key for the cached image
+
         """
         cached_path = BEZEL_CACHE_DIR / f"{cache_key}.png"
         shutil.copy2(image_path, str(cached_path))
 
     @staticmethod
     def clear_bezel_cache() -> None:
-        """
-        Clear all cached bezel images to free up space.
+        """Clear all cached bezel images to free up space.
         """
         files = glob.glob(str(BEZEL_CACHE_DIR / "*.png"))
         for file in files:
@@ -105,10 +102,9 @@ class BezelUtils:
 
     @staticmethod
     def get_bezel_infos(
-        rom: str, bezel: str, system_name: str, emulator: str
+        rom: str, bezel: str, system_name: str, emulator: str,
     ) -> dict[str, str | bool | None] | None:
-        """
-        Locate the appropriate bezel overlay image and related files based on
+        """Locate the appropriate bezel overlay image and related files based on
         ROM name, system name, and emulator used.
 
         The search follows a prioritized list:
@@ -124,6 +120,7 @@ class BezelUtils:
 
         Returns:
             Dictionary containing paths to bezel files and metadata, or None if not found
+
         """
         alt_decoration = getAltDecoration(system_name, rom, emulator)
         rom_base = Path(rom).stem
@@ -141,7 +138,7 @@ class BezelUtils:
         # System-specific overlays (with or without altDecoration)
         if alt_decoration != 0:
             candidates.append(
-                ("systems", str(OVERLAY_USER), False, f"{system_name}-{alt_decoration}")
+                ("systems", str(OVERLAY_USER), False, f"{system_name}-{alt_decoration}"),
             )
         candidates.append(("systems", str(OVERLAY_USER), False, system_name))
         if alt_decoration != 0:
@@ -151,19 +148,19 @@ class BezelUtils:
                     str(OVERLAY_SYSTEM),
                     False,
                     f"{system_name}-{alt_decoration}",
-                )
+                ),
             )
         candidates.append(("systems", str(OVERLAY_SYSTEM), False, system_name))
 
         # Default fallback overlays
         if alt_decoration != 0:
             candidates.append(
-                ("", str(OVERLAY_USER), True, f"default-{alt_decoration}")
+                ("", str(OVERLAY_USER), True, f"default-{alt_decoration}"),
             )
         candidates.append(("", str(OVERLAY_USER), True, "default"))
         if alt_decoration != 0:
             candidates.append(
-                ("", str(OVERLAY_SYSTEM), True, f"default-{alt_decoration}")
+                ("", str(OVERLAY_SYSTEM), True, f"default-{alt_decoration}"),
             )
         candidates.append(("", str(OVERLAY_SYSTEM), True, "default"))
 
@@ -188,8 +185,7 @@ class BezelUtils:
 
     @staticmethod
     def fast_image_size(image_file: str) -> tuple[int, int]:
-        """
-        Return the size (width, height) of a PNG image by reading its header.
+        """Return the size (width, height) of a PNG image by reading its header.
         Much faster than using PIL.Image.open().size.
 
         Args:
@@ -197,6 +193,7 @@ class BezelUtils:
 
         Returns:
             Tuple with (width, height) of the image, or (-1, -1) if error
+
         """
         img_path = Path(image_file)
         if not img_path.exists():
@@ -217,8 +214,7 @@ class BezelUtils:
         stretch: bool = False,
         fillcolor: str = "black",
     ) -> "ImageType":
-        """
-        Resize an image with padding or stretching.
+        """Resize an image with padding or stretching.
 
         Args:
             img: Source image
@@ -228,6 +224,7 @@ class BezelUtils:
 
         Returns:
             The resized image
+
         """
         from PIL import Image
 
@@ -266,8 +263,7 @@ class BezelUtils:
         screen_height: int,
         bezel_stretch: bool = False,
     ) -> None:
-        """
-        Resize a bezel image to match screen size, maintaining alpha if needed.
+        """Resize a bezel image to match screen size, maintaining alpha if needed.
 
         Args:
             input_png: Input PNG file path
@@ -280,6 +276,7 @@ class BezelUtils:
             ValueError: If input or output path is None or empty
             FileNotFoundError: If input image does not exist
             IOError: If there's an error opening or saving the image
+
         """
         # Validate input parameters
         if not input_png or not output_png:
@@ -294,7 +291,7 @@ class BezelUtils:
 
         # Generate cache key based on input parameters
         cache_key = BezelUtils.generate_cache_key(
-            "resize", input_png, screen_width, screen_height, bezel_stretch
+            "resize", input_png, screen_width, screen_height, bezel_stretch,
         )
 
         # Check if image is already cached
@@ -306,12 +303,12 @@ class BezelUtils:
                 shutil.copy2(cached_path, output_png)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied copying cached bezel from {cached_path} to {output_png}: {e}"
+                    f"Permission denied copying cached bezel from {cached_path} to {output_png}: {e}",
                 )
                 raise
             except OSError as e:
                 eslog.error(
-                    f"OS error copying cached bezel from {cached_path} to {output_png}: {e}"
+                    f"OS error copying cached bezel from {cached_path} to {output_png}: {e}",
                 )
                 raise
             return
@@ -324,7 +321,7 @@ class BezelUtils:
                 output_dir.mkdir(parents=True, exist_ok=True)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied creating output directory {output_dir}: {e}"
+                    f"Permission denied creating output directory {output_dir}: {e}",
                 )
                 raise
             except OSError as e:
@@ -382,8 +379,7 @@ class BezelUtils:
         bezel_height: int,
         bezel_stretch: bool = False,
     ) -> None:
-        """
-        Pad the bezel image to match screen size.
+        """Pad the bezel image to match screen size.
 
         Args:
             input_png: Input PNG file path
@@ -398,6 +394,7 @@ class BezelUtils:
             ValueError: If input or output path is None or empty
             FileNotFoundError: If input image does not exist
             IOError: If there's an error opening or saving the image
+
         """
         # Validate input parameters
         if not input_png or not output_png:
@@ -418,7 +415,7 @@ class BezelUtils:
                 output_dir.mkdir(parents=True, exist_ok=True)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied creating output directory {output_dir}: {e}"
+                    f"Permission denied creating output directory {output_dir}: {e}",
                 )
                 raise
             except OSError as e:
@@ -461,8 +458,7 @@ class BezelUtils:
 
     @staticmethod
     def tattoo_image(input_png: str, output_png: str, system: "Emulator") -> None:
-        """
-        Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
+        """Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
 
         Args:
             input_png: Input PNG file path
@@ -473,6 +469,7 @@ class BezelUtils:
             ValueError: If input or output path is None or empty
             FileNotFoundError: If input image does not exist
             IOError: If there's an error opening or saving the image
+
         """
         # Validate input parameters
         if not input_png or not output_png:
@@ -493,7 +490,7 @@ class BezelUtils:
                 output_dir.mkdir(parents=True, exist_ok=True)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied creating output directory {output_dir}: {e}"
+                    f"Permission denied creating output directory {output_dir}: {e}",
                 )
                 raise
             except OSError as e:
@@ -522,7 +519,7 @@ class BezelUtils:
             system.config.get("bezel.resize_tattoo", "default"),
             system.config.get("bezel.tattoo_corner", "NW"),
             BezelUtils.fast_image_size(
-                input_png
+                input_png,
             ),  # Include input image size in cache key
         )
 
@@ -535,12 +532,12 @@ class BezelUtils:
                 shutil.copy2(cached_path, output_png)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied copying cached tattooed bezel from {cached_path} to {output_png}: {e}"
+                    f"Permission denied copying cached tattooed bezel from {cached_path} to {output_png}: {e}",
                 )
                 raise
             except OSError as e:
                 eslog.error(
-                    f"OS error copying cached tattooed bezel from {cached_path} to {output_png}: {e}"
+                    f"OS error copying cached tattooed bezel from {cached_path} to {output_png}: {e}",
                 )
                 raise
             return
@@ -564,7 +561,7 @@ class BezelUtils:
                 tattoo_file = "/usr/share/reglinux/controller-overlays/generic.png"
                 tattoo = Image.open(tattoo_file)
         except (OSError, Image.UnidentifiedImageError) as e:
-            eslog.error(f"Error opening tattoo image: {tattoo_file} - {str(e)}")
+            eslog.error(f"Error opening tattoo image: {tattoo_file} - {e!s}")
             raise
 
         back = Image.open(input_png).convert("RGBA")
@@ -627,8 +624,7 @@ class BezelUtils:
         screensize: tuple[int, int],
         bezel_stretch: bool,
     ) -> None:
-        """
-        Paste the alpha channel from an image into a resized canvas.
+        """Paste the alpha channel from an image into a resized canvas.
         Handles non-RGBA images and crops to match aspect ratio.
 
         Args:
@@ -644,6 +640,7 @@ class BezelUtils:
             FileNotFoundError: If input image does not exist
             Exception: If image has no transparency channel
             IOError: If there's an error saving the image
+
         """
         # Validate input parameters
         if not input_png or not output_png:
@@ -664,7 +661,7 @@ class BezelUtils:
                 output_dir.mkdir(parents=True, exist_ok=True)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied creating output directory {output_dir}: {e}"
+                    f"Permission denied creating output directory {output_dir}: {e}",
                 )
                 raise
             except OSError as e:
@@ -691,7 +688,7 @@ class BezelUtils:
         imgnew.paste(alpha, (0, 0, ix, iy))
         try:
             imgout = BezelUtils.resize_with_fill(
-                imgnew, screensize, stretch=bezel_stretch, fillcolor=fillcolor
+                imgnew, screensize, stretch=bezel_stretch, fillcolor=fillcolor,
             )
             imgout.save(output_png, mode="RGBA", format="PNG")  # type: ignore
         except OSError as e:
@@ -700,14 +697,14 @@ class BezelUtils:
 
     @staticmethod
     def gun_borders_size(borders_size: str) -> tuple[int, int]:
-        """
-        Return preset values for gun border sizes depending on text config.
+        """Return preset values for gun border sizes depending on text config.
 
         Args:
             borders_size: Text configuration for border size
 
         Returns:
             Tuple with inner and outer border sizes
+
         """
         if borders_size == "thin":
             return 1, 0
@@ -726,8 +723,7 @@ class BezelUtils:
         inner_border_color: str = "#ffffff",
         outer_border_color: str = "#000000",
     ) -> int:
-        """
-        Draws outer and inner borders on the bezel image for lightgun detection.
+        """Draws outer and inner borders on the bezel image for lightgun detection.
 
         Args:
             input_png: Input PNG file path
@@ -744,6 +740,7 @@ class BezelUtils:
             ValueError: If input or output path is None or empty
             FileNotFoundError: If input image does not exist
             IOError: If there's an error saving the image
+
         """
         # Validate input parameters
         if not input_png or not output_png:
@@ -764,7 +761,7 @@ class BezelUtils:
                 output_dir.mkdir(parents=True, exist_ok=True)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied creating output directory {output_dir}: {e}"
+                    f"Permission denied creating output directory {output_dir}: {e}",
                 )
                 raise
             except OSError as e:
@@ -791,12 +788,12 @@ class BezelUtils:
                 shutil.copy2(cached_path, output_png)
             except PermissionError as e:
                 eslog.error(
-                    f"Permission denied copying cached gun border bezel from {cached_path} to {output_png}: {e}"
+                    f"Permission denied copying cached gun border bezel from {cached_path} to {output_png}: {e}",
                 )
                 raise
             except OSError as e:
                 eslog.error(
-                    f"OS error copying cached gun border bezel from {cached_path} to {output_png}: {e}"
+                    f"OS error copying cached gun border bezel from {cached_path} to {output_png}: {e}",
                 )
                 raise
             w, h = BezelUtils.fast_image_size(input_png)
@@ -871,10 +868,9 @@ class BezelUtils:
 
     @staticmethod
     def guns_border_size(
-        w: int, h: int, inner_border_size_per: int = 2, outer_border_size_per: int = 3
+        w: int, h: int, inner_border_size_per: int = 2, outer_border_size_per: int = 3,
     ) -> int:
-        """
-        Calculate combined border height used for lightgun overlay.
+        """Calculate combined border height used for lightgun overlay.
 
         Args:
             w: Width
@@ -884,19 +880,20 @@ class BezelUtils:
 
         Returns:
             Combined border size
+
         """
         return (h * (inner_border_size_per + outer_border_size_per)) // 100
 
     @staticmethod
     def guns_borders_color_from_config(config: dict[str, str]) -> str:
-        """
-        Return hex color for gun borders from config string.
+        """Return hex color for gun borders from config string.
 
         Args:
             config: Configuration dictionary
 
         Returns:
             Hex color string
+
         """
         color_key = config.get("controllers.guns.borderscolor")
         if color_key is None:
@@ -910,13 +907,13 @@ class BezelUtils:
 
     @staticmethod
     def create_transparent_bezel(output_png: str, width: int, height: int) -> None:
-        """
-        Create a fully transparent bezel PNG of given size.
+        """Create a fully transparent bezel PNG of given size.
 
         Args:
             output_png: Output PNG file path
             width: Width of the bezel
             height: Height of the bezel
+
         """
         imgnew = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         imgnew.save(output_png, mode="RGBA", format="PNG")  # type: ignore
@@ -924,17 +921,15 @@ class BezelUtils:
 
 # Compatibility functions to maintain legacy APIs
 def clear_bezel_cache() -> None:
-    """
-    Clear all cached bezel images to free up space.
+    """Clear all cached bezel images to free up space.
     """
     BezelUtils.clear_bezel_cache()
 
 
 def getBezelInfos(
-    rom: str, bezel: str, systemName: str, emulator: str
+    rom: str, bezel: str, systemName: str, emulator: str,
 ) -> dict[str, str | bool | None] | None:
-    """
-    Locate the appropriate bezel overlay image and related files based on
+    """Locate the appropriate bezel overlay image and related files based on
     ROM name, system name, and emulator used.
 
     The search follows a prioritized list:
@@ -950,13 +945,13 @@ def getBezelInfos(
 
     Returns:
         Dictionary containing paths to bezel files and metadata, or None if not found
+
     """
     return BezelUtils.get_bezel_infos(rom, bezel, systemName, emulator)
 
 
 def fast_image_size(image_file: str) -> tuple[int, int]:
-    """
-    Return the size (width, height) of a PNG image by reading its header.
+    """Return the size (width, height) of a PNG image by reading its header.
     Much faster than using PIL.Image.open().size.
 
     Args:
@@ -964,6 +959,7 @@ def fast_image_size(image_file: str) -> tuple[int, int]:
 
     Returns:
         Tuple with (width, height) of the image, or (-1, -1) if error
+
     """
     return BezelUtils.fast_image_size(image_file)
 
@@ -974,8 +970,7 @@ def resize_with_fill(
     stretch: bool = False,
     fillcolor: str = "black",
 ) -> "ImageType":
-    """
-    Resize an image with padding or stretching.
+    """Resize an image with padding or stretching.
 
     Args:
         img: Source image
@@ -985,6 +980,7 @@ def resize_with_fill(
 
     Returns:
         The resized image
+
     """
     return BezelUtils.resize_with_fill(img, target_size, stretch, fillcolor)
 
@@ -996,8 +992,7 @@ def resizeImage(
     screen_height: int,
     bezel_stretch: bool = False,
 ) -> None:
-    """
-    Resize a bezel image to match screen size, maintaining alpha if needed.
+    """Resize a bezel image to match screen size, maintaining alpha if needed.
 
     Args:
         input_png: Input PNG file path
@@ -1010,9 +1005,10 @@ def resizeImage(
         ValueError: If input or output path is None or empty
         FileNotFoundError: If input image does not exist
         IOError: If there's an error opening or saving the image
+
     """
     BezelUtils.resize_image(
-        input_png, output_png, screen_width, screen_height, bezel_stretch
+        input_png, output_png, screen_width, screen_height, bezel_stretch,
     )
 
 
@@ -1025,8 +1021,7 @@ def padImage(
     bezel_height: int,
     bezel_stretch: bool = False,
 ) -> None:
-    """
-    Pad the bezel image to match screen size.
+    """Pad the bezel image to match screen size.
 
     Args:
         input_png: Input PNG file path
@@ -1041,6 +1036,7 @@ def padImage(
         ValueError: If input or output path is None or empty
         FileNotFoundError: If input image does not exist
         IOError: If there's an error opening or saving the image
+
     """
     BezelUtils.pad_image(
         input_png,
@@ -1054,8 +1050,7 @@ def padImage(
 
 
 def tatooImage(input_png: str, output_png: str, system: "Emulator") -> None:
-    """
-    Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
+    """Overlay a controller image ("tattoo") on top of the bezel, depending on system config.
 
     Args:
         input_png: Input PNG file path
@@ -1066,6 +1061,7 @@ def tatooImage(input_png: str, output_png: str, system: "Emulator") -> None:
         ValueError: If input or output path is None or empty
         FileNotFoundError: If input image does not exist
         IOError: If there's an error opening or saving the image
+
     """
     BezelUtils.tattoo_image(input_png, output_png, system)
 
@@ -1078,8 +1074,7 @@ def alphaPaste(
     screensize: tuple[int, int],
     bezel_stretch: bool,
 ) -> None:
-    """
-    Paste the alpha channel from an image into a resized canvas.
+    """Paste the alpha channel from an image into a resized canvas.
     Handles non-RGBA images and crops to match aspect ratio.
 
     Args:
@@ -1095,21 +1090,22 @@ def alphaPaste(
         FileNotFoundError: If input image does not exist
         Exception: If image has no transparency channel
         IOError: If there's an error saving the image
+
     """
     BezelUtils.alpha_paste(
-        input_png, output_png, imgin, fillcolor, screensize, bezel_stretch
+        input_png, output_png, imgin, fillcolor, screensize, bezel_stretch,
     )
 
 
 def gun_borders_size(borders_size: str) -> tuple[int, int]:
-    """
-    Return preset values for gun border sizes depending on text config.
+    """Return preset values for gun border sizes depending on text config.
 
     Args:
         borders_size: Text configuration for border size
 
     Returns:
         Tuple with inner and outer border sizes
+
     """
     return BezelUtils.gun_borders_size(borders_size)
 
@@ -1122,8 +1118,7 @@ def gunBorderImage(
     innerBorderColor: str = "#ffffff",
     outerBorderColor: str = "#000000",
 ) -> int:
-    """
-    Draws outer and inner borders on the bezel image for lightgun detection.
+    """Draws outer and inner borders on the bezel image for lightgun detection.
 
     Args:
         input_png: Input PNG file path
@@ -1140,6 +1135,7 @@ def gunBorderImage(
         ValueError: If input or output path is None or empty
         FileNotFoundError: If input image does not exist
         IOError: If there's an error saving the image
+
     """
     return BezelUtils.gun_border_image(
         input_png,
@@ -1152,10 +1148,9 @@ def gunBorderImage(
 
 
 def gunsBorderSize(
-    w: int, h: int, innerBorderSizePer: int = 2, outerBorderSizePer: int = 3
+    w: int, h: int, innerBorderSizePer: int = 2, outerBorderSizePer: int = 3,
 ) -> int:
-    """
-    Calculate combined border height used for lightgun overlay.
+    """Calculate combined border height used for lightgun overlay.
 
     Args:
         w: Width
@@ -1165,30 +1160,31 @@ def gunsBorderSize(
 
     Returns:
         Combined border size
+
     """
     return BezelUtils.guns_border_size(w, h, innerBorderSizePer, outerBorderSizePer)
 
 
 def gunsBordersColorFomConfig(config: dict[str, str]) -> str:
-    """
-    Return hex color for gun borders from config string.
+    """Return hex color for gun borders from config string.
 
     Args:
         config: Configuration dictionary
 
     Returns:
         Hex color string
+
     """
     return BezelUtils.guns_borders_color_from_config(config)
 
 
 def createTransparentBezel(output_png: str, width: int, height: int) -> None:
-    """
-    Create a fully transparent bezel PNG of given size.
+    """Create a fully transparent bezel PNG of given size.
 
     Args:
         output_png: Output PNG file path
         width: Width of the bezel
         height: Height of the bezel
+
     """
     BezelUtils.create_transparent_bezel(output_png, width, height)

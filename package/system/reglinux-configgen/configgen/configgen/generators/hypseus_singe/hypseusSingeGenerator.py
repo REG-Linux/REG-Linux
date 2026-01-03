@@ -46,7 +46,7 @@ class HypseusSingeGenerator(Generator):
         for root, _, files in walk(start_path):
             if filename in files:
                 found_path = Path(root) / filename
-                eslog.debug(f"Found m2v file in path - {str(found_path)}")
+                eslog.debug(f"Found m2v file in path - {found_path!s}")
                 return str(found_path)
 
         return None
@@ -157,7 +157,7 @@ class HypseusSingeGenerator(Generator):
             hypseus_data_dir_path.mkdir(parents=True, exist_ok=True)
         config_path = Path(HYPSEUS_CONFIG_PATH)
         if not config_path.exists() or not cmp(
-            HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH
+            HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH,
         ):
             copyfile(HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH)
 
@@ -384,7 +384,7 @@ class HypseusSingeGenerator(Generator):
         if system.name == "singe":
             # Blend Sprites (Singe)
             if system.isOptSet("singe_sprites") and system.getOptBoolean(
-                "singe_sprites"
+                "singe_sprites",
             ):
                 command_array.append("-blend_sprites")
 
@@ -408,24 +408,22 @@ class HypseusSingeGenerator(Generator):
                     command_array.extend(["-sinden", "4", border_color])
                 else:
                     command_array.extend(["-sinden", "6", border_color])
-            else:
-                if len(guns) > 0:  # enable manymouse for guns
-                    command_array.extend(["-manymouse"])  # sinden implies manymouse
-                    if xratio is not None:
-                        command_array.extend(
-                            ["-xratio", str(xratio)]
-                        )  # accuracy correction based on ratio
-                else:
-                    if system.isOptSet("singe_abs") and system.getOptBoolean(
-                        "singe_abs"
-                    ):
-                        command_array.extend(
-                            ["-manymouse"]
-                        )  # this is causing issues on some "non-gun" games
+            elif len(guns) > 0:  # enable manymouse for guns
+                command_array.extend(["-manymouse"])  # sinden implies manymouse
+                if xratio is not None:
+                    command_array.extend(
+                        ["-xratio", str(xratio)],
+                    )  # accuracy correction based on ratio
+            elif system.isOptSet("singe_abs") and system.getOptBoolean(
+                "singe_abs",
+            ):
+                command_array.extend(
+                    ["-manymouse"],
+                )  # this is causing issues on some "non-gun" games
 
         # bezels
         if system.isOptSet("hypseus_bezels") and not system.getOptBoolean(
-            "hypseus_bezels"
+            "hypseus_bezels",
         ):
             bezelRequired = False
 
@@ -462,7 +460,7 @@ class HypseusSingeGenerator(Generator):
             and system.config["hypseus_scanlines"] > "0"
         ):
             command_array.extend(
-                ["-scanlines", "-scanline_shunt", system.config["hypseus_scanlines"]]
+                ["-scanlines", "-scanline_shunt", system.config["hypseus_scanlines"]],
             )
 
         # Hide crosshair in supported games (e.g. ActionMax, ALG)
@@ -478,7 +476,7 @@ class HypseusSingeGenerator(Generator):
 
         # Enable SDL_TEXTUREACCESS_STREAMING, can aid SBC's with SDL2 => 2.0.16
         if system.isOptSet("hypseus_texturestream") and system.getOptBoolean(
-            "hypseus_texturestream"
+            "hypseus_texturestream",
         ):
             command_array.append("-texturestream")
 
@@ -496,7 +494,7 @@ class HypseusSingeGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
+                    players_controllers,
                 ),
                 "SDL_JOYSTICK_HIDAPI": "0",
             },

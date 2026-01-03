@@ -11,7 +11,7 @@ XEMU_BIN_PATH = Path("/usr/bin/xemu")
 
 
 def setXemuConfig(
-    system: Any, rom: str, playersControllers: Any, gameResolution: Any
+    system: Any, rom: str, playersControllers: Any, gameResolution: Any,
 ) -> None:
     # Create TOML settings instance
     settings = TOMLSettings(XEMU_CONFIG_PATH, auto_load=False)

@@ -18,7 +18,7 @@ SONICMANIA_CONFIG_PATH = SONICMANIA_ROMS_DIR / "Settings.ini"
 
 class SonicManiaGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Create the roms directory if it doesn't exist
         SONICMANIA_ROMS_DIR.mkdir(parents=True, exist_ok=True)
@@ -26,12 +26,12 @@ class SonicManiaGenerator(Generator):
         # Check if source binary exists and is executable
         if not SONICMANIA_SOURCE_BIN_PATH.exists():
             raise FileNotFoundError(
-                f"Source binary not found: {SONICMANIA_SOURCE_BIN_PATH}"
+                f"Source binary not found: {SONICMANIA_SOURCE_BIN_PATH}",
             )
 
         if not access(str(SONICMANIA_SOURCE_BIN_PATH), X_OK):
             raise PermissionError(
-                f"Source binary is not executable: {SONICMANIA_SOURCE_BIN_PATH}"
+                f"Source binary is not executable: {SONICMANIA_SOURCE_BIN_PATH}",
             )
 
         # Copy the binary if it doesn't exist or is different
@@ -51,7 +51,7 @@ class SonicManiaGenerator(Generator):
             copy(str(SONICMANIA_SOURCE_BIN_PATH), str(SONICAMANIA_BIN_PATH))
             # Make sure the copied binary is executable
             if not SONICAMANIA_BIN_PATH.exists() or not access(
-                str(SONICAMANIA_BIN_PATH), X_OK
+                str(SONICAMANIA_BIN_PATH), X_OK,
             ):
                 import os
 
@@ -63,7 +63,7 @@ class SonicManiaGenerator(Generator):
         # Verify the copied binary is executable
         if not access(str(SONICAMANIA_BIN_PATH), X_OK):
             raise PermissionError(
-                f"Copied binary is not executable: {SONICAMANIA_BIN_PATH}"
+                f"Copied binary is not executable: {SONICAMANIA_BIN_PATH}",
             )
 
         ## Configuration
@@ -128,8 +128,8 @@ class SonicManiaGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )
 
@@ -138,6 +138,6 @@ class SonicManiaGenerator(Generator):
         return False
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str,
     ) -> float:
         return 16 / 9

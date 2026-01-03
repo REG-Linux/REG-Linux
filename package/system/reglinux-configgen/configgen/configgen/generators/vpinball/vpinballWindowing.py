@@ -4,7 +4,7 @@ from configgen.utils.videoMode import getScreensInfos
 
 
 def configureWindowing(
-    vpinballSettings: Any, system: Any, gameResolution: Any, hasDmd: bool
+    vpinballSettings: Any, system: Any, gameResolution: Any, hasDmd: bool,
 ) -> None:
     screens = getScreensInfos(system.config)
 
@@ -30,14 +30,13 @@ def configureWindowing(
     if system.isOptSet("vpinball_inverseplayfieldandb2s"):
         if system.getOptBoolean("vpinball_inverseplayfieldandb2s"):
             reverse_playfield_and_b2s = True
-    else:
-        # auto : if the screen 2 is vertical while the first screen is not, inverse
-        if (
-            len(screens) >= 2
-            and screens[0]["width"] > screens[0]["height"]
-            and screens[1]["width"] < screens[1]["height"]
-        ):
-            reverse_playfield_and_b2s = True
+    # auto : if the screen 2 is vertical while the first screen is not, inverse
+    elif (
+        len(screens) >= 2
+        and screens[0]["width"] > screens[0]["height"]
+        and screens[1]["width"] < screens[1]["height"]
+    ):
+        reverse_playfield_and_b2s = True
 
     playFieldScreen = 0
     backglassScreen = 1
@@ -57,11 +56,10 @@ def configureWindowing(
     # playfiled mode
     if system.isOptSet("vpinball_playfieldmode"):
         vpinballSettings.set("Player", "BGSet", system.config["vpinball_playfieldmode"])
+    elif screens[playFieldScreen]["width"] < screens[playFieldScreen]["height"]:
+        vpinballSettings.set("Player", "BGSet", "1")  # pincab / cabinet
     else:
-        if screens[playFieldScreen]["width"] < screens[playFieldScreen]["height"]:
-            vpinballSettings.set("Player", "BGSet", "1")  # pincab / cabinet
-        else:
-            vpinballSettings.set("Player", "BGSet", "0")  # desktop mode
+        vpinballSettings.set("Player", "BGSet", "0")  # desktop mode
 
     # PinMame
     if pinmame_config != "manual":
@@ -110,9 +108,8 @@ def getFlexDmdConfiguration(system: Any, screens: Any, hasDmd: bool) -> str:
     val = ""
     if system.isOptSet("vpinball_flexdmd"):
         val = system.config["vpinball_flexdmd"]
-    else:
-        if hasDmd:
-            val = "disabled"
+    elif hasDmd:
+        val = "disabled"
     if val == "":
         val = "screen3" if len(screens) > 2 else "disabled"
     if len(screens) <= 1 and val == "screen2":
@@ -149,7 +146,7 @@ def getB2sConfiguration(system: Any, screens: Any) -> str:
 
 def getB2sdmdConfiguration(system: Any, screens: Any, hasDmd: bool) -> bool:
     if system.isOptSet("vpinball_b2sdmd") and not system.getOptBoolean(
-        "vpinball_b2sdmd"
+        "vpinball_b2sdmd",
     ):  # switchon
         return False
     return not hasDmd
@@ -163,7 +160,7 @@ def getB2sgrillConfiguration(system: Any, screens: Any) -> bool:
 
 
 def configurePlayfield(
-    vpinballSettings: Any, screens: Any, playFieldScreen: int | str
+    vpinballSettings: Any, screens: Any, playFieldScreen: int | str,
 ) -> None:
     if screens[playFieldScreen]["width"] < screens[playFieldScreen]["height"]:
         screens[playFieldScreen]["width"], screens[playFieldScreen]["height"] = (
@@ -205,11 +202,11 @@ def configurePinmame(
                 WindowName + "X",
                 str(
                     screens[backglassScreen]["x"]
-                    + (screens[backglassScreen]["width"] - dmdsize[0]) // 2
+                    + (screens[backglassScreen]["width"] - dmdsize[0]) // 2,
                 ),
             )
             vpinballSettings.set(
-                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"])
+                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"]),
             )
             vpinballSettings.set("Standalone", WindowName + "Width", str(dmdsize[0]))
             vpinballSettings.set("Standalone", WindowName + "Height", str(dmdsize[1]))
@@ -219,10 +216,10 @@ def configurePinmame(
             y = (screens[backglassScreen]["height"] - height) // 2
             vpinballSettings.set("Standalone", WindowName, "1")
             vpinballSettings.set(
-                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"])
+                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"]),
             )
             vpinballSettings.set(
-                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"] + y)
+                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"] + y),
             )
             vpinballSettings.set("Standalone", WindowName + "Width", str(width))
             vpinballSettings.set("Standalone", WindowName + "Height", str(height))
@@ -230,10 +227,10 @@ def configurePinmame(
         vpinballSettings.set("Standalone", WindowName + "X", str(screens[2]["x"]))
         vpinballSettings.set("Standalone", WindowName + "Y", str(screens[2]["y"]))
         vpinballSettings.set(
-            "Standalone", WindowName + "Width", str(screens[2]["width"])
+            "Standalone", WindowName + "Width", str(screens[2]["width"]),
         )
         vpinballSettings.set(
-            "Standalone", WindowName + "Height", str(screens[2]["height"])
+            "Standalone", WindowName + "Height", str(screens[2]["height"]),
         )
     else:
         if pinmame_config == "topright_small":
@@ -258,10 +255,10 @@ def configurePinmame(
         # apply settings
         height = RelativeHeightCalculate(Rscreen, Rwindow, width)
         vpinballSettings.set(
-            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x)
+            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x),
         )
         vpinballSettings.set(
-            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y)
+            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y),
         )
         vpinballSettings.set(
             "Standalone",
@@ -316,11 +313,11 @@ def configureFlexdmd(
                 WindowName + "X",
                 str(
                     screens[backglassScreen]["x"]
-                    + (screens[backglassScreen]["width"] - dmdsize[0]) // 2
+                    + (screens[backglassScreen]["width"] - dmdsize[0]) // 2,
                 ),
             )
             vpinballSettings.set(
-                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"])
+                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"]),
             )
             vpinballSettings.set("Standalone", WindowName + "Width", str(dmdsize[0]))
             vpinballSettings.set("Standalone", WindowName + "Height", str(dmdsize[1]))
@@ -330,10 +327,10 @@ def configureFlexdmd(
             y = (screens[backglassScreen]["height"] - height) // 2
             vpinballSettings.set("Standalone", WindowName, "1")
             vpinballSettings.set(
-                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"])
+                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"]),
             )
             vpinballSettings.set(
-                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"] + y)
+                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"] + y),
             )
             vpinballSettings.set("Standalone", WindowName + "Width", str(width))
             vpinballSettings.set("Standalone", WindowName + "Height", str(height))
@@ -341,10 +338,10 @@ def configureFlexdmd(
         vpinballSettings.set("Standalone", WindowName + "X", str(screens[2]["x"]))
         vpinballSettings.set("Standalone", WindowName + "Y", str(screens[2]["y"]))
         vpinballSettings.set(
-            "Standalone", WindowName + "Width", str(screens[2]["width"])
+            "Standalone", WindowName + "Width", str(screens[2]["width"]),
         )
         vpinballSettings.set(
-            "Standalone", WindowName + "Height", str(screens[2]["height"])
+            "Standalone", WindowName + "Height", str(screens[2]["height"]),
         )
     else:
         if flexdmd_config == "topright_small":
@@ -368,10 +365,10 @@ def configureFlexdmd(
         # apply settings
         height = RelativeHeightCalculate(Rscreen, Rwindow, width)
         vpinballSettings.set(
-            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x)
+            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x),
         )
         vpinballSettings.set(
-            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y)
+            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y),
         )
         vpinballSettings.set(
             "Standalone",
@@ -418,7 +415,7 @@ def configureB2s(
             flexdmd_config == "screen2" or pinmame_config == "screen2"
         ):  # share with dmd screen
             vpinballSettings.set(
-                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"])
+                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"]),
             )
             vpinballSettings.set("Standalone", WindowName + "Y", str(dmdsize[1]))
             vpinballSettings.set(
@@ -433,10 +430,10 @@ def configureB2s(
             )
         else:
             vpinballSettings.set(
-                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"])
+                "Standalone", WindowName + "X", str(screens[backglassScreen]["x"]),
             )
             vpinballSettings.set(
-                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"])
+                "Standalone", WindowName + "Y", str(screens[backglassScreen]["y"]),
             )
             vpinballSettings.set(
                 "Standalone",
@@ -470,10 +467,10 @@ def configureB2s(
         # apply settings
         height = RelativeHeightCalculate(Rscreen, Rwindow, width)
         vpinballSettings.set(
-            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x)
+            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x),
         )
         vpinballSettings.set(
-            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y)
+            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y),
         )
         vpinballSettings.set(
             "Standalone",
@@ -492,10 +489,10 @@ def configureB2s(
         Rwindow = 3  # Usual Ratio for this window
         height = RelativeHeightCalculate(Rscreen, Rwindow, width)
         vpinballSettings.set(
-            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x)
+            "Standalone", WindowName + "X", ConvertToPixel(gameResolution["width"], x),
         )
         vpinballSettings.set(
-            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y)
+            "Standalone", WindowName + "Y", ConvertToPixel(gameResolution["height"], y),
         )
         vpinballSettings.set(
             "Standalone",

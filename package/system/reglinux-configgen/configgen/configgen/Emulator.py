@@ -1,20 +1,9 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any, TypedDict
 
 import yaml
 from yaml import CLoader as Loader
-
-if TYPE_CHECKING:
-    from typing import TypedDict
-else:
-    try:
-        from typing import TypedDict
-    except ImportError:
-        # For older Python versions where TypedDict is not available
-        def TypedDict(name, fields, **kwargs):
-            return dict
-
 
 # Import with fallback for different execution contexts
 try:
@@ -109,7 +98,6 @@ class SystemConfigOptional(TypedDict, total=False):
 class SystemConfig(SystemConfigRequired, SystemConfigOptional):
     """System configuration with required and optional fields"""
 
-    pass
 
 
 class RenderConfig(TypedDict, total=False):
@@ -124,7 +112,7 @@ class RenderConfig(TypedDict, total=False):
 
 
 # Define a flexible config type that can accept additional keys
-# Using Dict[str, Any] directly since the config is dynamically modified
+# Using dict[str, Any] directly since the config is dynamically modified
 SystemConfigDict = dict[str, Any]
 RenderConfigDict = dict[str, Any]
 
@@ -139,6 +127,7 @@ class Emulator:
         name: The name of the system (e.g., 'nes', 'snes').
         config: Configuration dictionary for the emulator and options.
         renderconfig: Rendering configuration (e.g., shaders).
+
     """
 
     def __init__(self, name: str, rom: str) -> None:
@@ -150,6 +139,7 @@ class Emulator:
 
         Raises:
             Exception: If no emulator is defined in the configuration.
+
         """
         self.name: str = name
         self.rom: str = rom
@@ -175,7 +165,7 @@ class Emulator:
         controllersSettings = recalSettings.loadAll("controllers", True)
         systemSettings = recalSettings.loadAll(self.name)
         folderSettings = recalSettings.loadAll(
-            self.name + '.folder["' + str(Path(rom).parent) + '"]'
+            self.name + '.folder["' + str(Path(rom).parent) + '"]',
         )
         gameSettings = recalSettings.loadAll(self.name + '["' + gsname + '"]')
 
@@ -227,7 +217,7 @@ class Emulator:
                         str(
                             Path("/userdata/shaders/configs")
                             / shaderset
-                            / "rendering-defaults-arch.yml"
+                            / "rendering-defaults-arch.yml",
                         ),
                     )
                 else:
@@ -247,7 +237,7 @@ class Emulator:
         # Load renderer-specific settings for backward compatibility
         systemSettings = recalSettings.loadAll(self.name + "-renderer")
         gameSettings = recalSettings.loadAll(
-            self.name + '["' + gsname + '"]' + "-renderer"
+            self.name + '["' + gsname + '"]' + "-renderer",
         )
 
         # Update renderconfig with renderer settings
@@ -262,6 +252,7 @@ class Emulator:
 
         Returns:
             Sanitized game settings name compatible with EmulationStation.
+
         """
         rom = Path(rom).name
 
@@ -295,6 +286,7 @@ class Emulator:
         Args:
             dest: The dictionary to update.
             src: The dictionary to merge into dest.
+
         """
         stack = [(dest, src)]
         while stack:
@@ -307,7 +299,7 @@ class Emulator:
 
     @staticmethod
     def get_generic_config(
-        system: str, defaultyml: str, defaultarchyml: str
+        system: str, defaultyml: str, defaultarchyml: str,
     ) -> dict[str, Any]:
         """Load and merge generic configuration from YAML files.
 
@@ -318,6 +310,7 @@ class Emulator:
 
         Returns:
             Dict[str, Any]: Merged configuration dictionary.
+
         """
         # Load default configuration
         with open(defaultyml) as f:
@@ -349,7 +342,7 @@ class Emulator:
 
     @staticmethod
     def get_system_config(
-        system: str, defaultyml: str, defaultarchyml: str
+        system: str, defaultyml: str, defaultarchyml: str,
     ) -> SystemConfigDict:
         """Load system-specific configuration, including emulator and core settings.
 
@@ -360,6 +353,7 @@ class Emulator:
 
         Returns:
             Dict[str, Any]: System configuration dictionary with emulator, core, and options.
+
         """
         dict_all = Emulator.get_generic_config(system, defaultyml, defaultarchyml)
 
@@ -380,6 +374,7 @@ class Emulator:
 
         Returns:
             True if the key exists in the config, False otherwise.
+
         """
         return key in self.config
 
@@ -391,6 +386,7 @@ class Emulator:
 
         Returns:
             True if the option is set to a truthy value, False otherwise.
+
         """
         true_values: set[str | bool] = {"1", "true", "on", "enabled", True}
         value = self.config.get(key)
@@ -408,6 +404,7 @@ class Emulator:
 
         Returns:
             The option value as a string, or empty string if not set.
+
         """
         return str(self.config.get(key, ""))
 
@@ -418,6 +415,7 @@ class Emulator:
         Args:
             config: The configuration dictionary to update.
             settings: The new settings to apply.
+
         """
         # Remove invalid settings ("default", "auto", or empty)
         # Using walrus operator to avoid re-evaluating settings[k]
@@ -461,7 +459,7 @@ class Emulator:
 
         except ET.ParseError as e:
             eslog.warning(
-                f"Failed to parse EmulationStation settings file {ES_SETTINGS}: {e}"
+                f"Failed to parse EmulationStation settings file {ES_SETTINGS}: {e}",
             )
             # Use defaults if ES settings cannot be loaded
             self.config["showFPS"] = "false"  # type: ignore

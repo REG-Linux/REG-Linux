@@ -1,5 +1,4 @@
-"""
-Ikemen generator module for REG-Linux
+"""Ikemen generator module for REG-Linux
 This module handles the generation of ikemen emulator configurations.
 """
 

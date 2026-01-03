@@ -42,7 +42,7 @@ def setDrasticController(drasticConfig: Any) -> None:
             "controls_a[CONTROL_INDEX_UI_PAGE_UP]                   = 331          # PageUp          \n",
             "controls_a[CONTROL_INDEX_UI_PAGE_DOWN]                 = 334          # PageDown        \n",
             "controls_a[CONTROL_INDEX_UI_SWITCH]                    = 117          # U                 ",
-        )
+        ),
     )
 
     padpart = "".join(
@@ -85,7 +85,7 @@ def setDrasticController(drasticConfig: Any) -> None:
             "controls_b[CONTROL_INDEX_UI_PAGE_UP]                   = 65535   \n",
             "controls_b[CONTROL_INDEX_UI_PAGE_DOWN]                 = 65535   \n",
             "controls_b[CONTROL_INDEX_UI_SWITCH]                    = 65535     ",
-        )
+        ),
     )
 
     drasticConfig.write(keyboardpart)

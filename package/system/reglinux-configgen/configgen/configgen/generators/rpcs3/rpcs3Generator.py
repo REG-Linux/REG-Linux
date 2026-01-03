@@ -10,7 +10,7 @@ try:
     from ruamel.yaml import YAML
 except ImportError:
     print(
-        "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml"
+        "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml",
     )
     raise
 from subprocess import CalledProcessError, check_output
@@ -132,14 +132,14 @@ class Rpcs3Generator(Generator):
         # Preferred SPU Threads
         if system.isOptSet("rpcs3_sputhreads"):
             rpcs3ymlconfig["Core"]["Preferred SPU Threads"] = int(
-                system.config["rpcs3_sputhreads"]
+                system.config["rpcs3_sputhreads"],
             )
         else:
             rpcs3ymlconfig["Core"]["Preferred SPU Threads"] = 0
         # SPU Loop Detection
         if system.isOptSet("rpcs3_spuloopdetection"):
             rpcs3ymlconfig["Core"]["SPU loop detection"] = system.getOptBoolean(
-                "rpcs3_spuloopdetection"
+                "rpcs3_spuloopdetection",
             )
         else:
             rpcs3ymlconfig["Core"]["SPU loop detection"] = False
@@ -154,7 +154,7 @@ class Rpcs3Generator(Generator):
         # values are maximum yields per frame threshold
         if system.isOptSet("rpcs3_maxcpu_preemptcount"):
             rpcs3ymlconfig["Core"]["Max CPU Preempt Count"] = int(
-                system.config["rpcs3_maxcpu_preemptcount"]
+                system.config["rpcs3_maxcpu_preemptcount"],
             )
         else:
             rpcs3ymlconfig["Core"]["Max CPU Preempt Count"] = 0
@@ -164,7 +164,7 @@ class Rpcs3Generator(Generator):
         # Check Vulkan first to be sure
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
@@ -178,19 +178,19 @@ class Rpcs3Generator(Generator):
                     rpcs3ymlconfig["Video"]["Renderer"] = "Vulkan"
                 try:
                     have_discrete = check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
                     ).strip()
                     if have_discrete == "true":
                         eslog.debug(
-                            "A discrete GPU is available on the system. We will use that for performance"
+                            "A discrete GPU is available on the system. We will use that for performance",
                         )
                         try:
                             discrete_name = check_output(
-                                ["/usr/bin/system-vulkan", "discreteName"], text=True
+                                ["/usr/bin/system-vulkan", "discreteName"], text=True,
                             ).strip()
                             if discrete_name != "":
                                 eslog.debug(
-                                    f"Using Discrete GPU Name: {discrete_name} for RPCS3"
+                                    f"Using Discrete GPU Name: {discrete_name} for RPCS3",
                                 )
                                 if "Vulkan" not in rpcs3ymlconfig["Video"]:
                                     rpcs3ymlconfig["Video"]["Vulkan"] = {}
@@ -203,14 +203,14 @@ class Rpcs3Generator(Generator):
                             eslog.debug("Error getting discrete GPU Name")
                     else:
                         eslog.debug(
-                            "Discrete GPU is not available on the system. Trying integrated."
+                            "Discrete GPU is not available on the system. Trying integrated.",
                         )
                         have_integrated = check_output(
-                            ["/usr/bin/system-vulkan", "hasIntegrated"], text=True
+                            ["/usr/bin/system-vulkan", "hasIntegrated"], text=True,
                         ).strip()
                         if have_integrated == "true":
                             eslog.debug(
-                                "Using integrated GPU to provide Vulkan. Beware of performance"
+                                "Using integrated GPU to provide Vulkan. Beware of performance",
                             )
                             try:
                                 integrated_name = check_output(
@@ -219,7 +219,7 @@ class Rpcs3Generator(Generator):
                                 ).strip()
                                 if integrated_name != "":
                                     eslog.debug(
-                                        f"Using Integrated GPU Name: {integrated_name} for RPCS3"
+                                        f"Using Integrated GPU Name: {integrated_name} for RPCS3",
                                     )
                                     if "Vulkan" not in rpcs3ymlconfig["Video"]:
                                         rpcs3ymlconfig["Video"]["Vulkan"] = {}
@@ -232,13 +232,13 @@ class Rpcs3Generator(Generator):
                                 eslog.debug("Error getting integrated GPU index")
                         else:
                             eslog.debug(
-                                "Integrated GPU is not available on the system. Cannot enable Vulkan."
+                                "Integrated GPU is not available on the system. Cannot enable Vulkan.",
                             )
                 except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
             else:
                 eslog.debug(
-                    "Vulkan driver is not available on the system. Falling back to OpenGL"
+                    "Vulkan driver is not available on the system. Falling back to OpenGL",
                 )
                 rpcs3ymlconfig["Video"]["Renderer"] = "OpenGL"
         except CalledProcessError:
@@ -250,7 +250,7 @@ class Rpcs3Generator(Generator):
         else:
             # If not set, see if the screen ratio is closer to 4:3 or 16:9 and pick that.
             rpcs3ymlconfig["Video"]["Aspect ratio"] = ":".join(
-                map(str, getClosestRatio(game_resolution))
+                map(str, getClosestRatio(game_resolution)),
             )
         # Shader compilation
         if system.isOptSet("rpcs3_shadermode"):
@@ -265,7 +265,7 @@ class Rpcs3Generator(Generator):
         # Stretch to display area
         if system.isOptSet("rpcs3_stretchdisplay"):
             rpcs3ymlconfig["Video"]["Stretch To Display Area"] = system.getOptBoolean(
-                "rpcs3_stretchdisplay"
+                "rpcs3_stretchdisplay",
             )
         else:
             rpcs3ymlconfig["Video"]["Stretch To Display Area"] = False
@@ -281,7 +281,7 @@ class Rpcs3Generator(Generator):
                 rpcs3ymlconfig["Video"]["Second Frame Limit"] = 0
             else:
                 rpcs3ymlconfig["Video"]["Second Frame Limit"] = float(
-                    system.config["rpcs3_framelimit"]
+                    system.config["rpcs3_framelimit"],
                 )
                 rpcs3ymlconfig["Video"]["Frame limit"] = "Off"
         else:
@@ -290,21 +290,21 @@ class Rpcs3Generator(Generator):
         # Write Color Buffers
         if system.isOptSet("rpcs3_colorbuffers"):
             rpcs3ymlconfig["Video"]["Write Color Buffers"] = system.getOptBoolean(
-                "rpcs3_colorbuffers"
+                "rpcs3_colorbuffers",
             )
         else:
             rpcs3ymlconfig["Video"]["Write Color Buffers"] = False
         # Disable Vertex Cache
         if system.isOptSet("rpcs3_vertexcache"):
             rpcs3ymlconfig["Video"]["Disable Vertex Cache"] = system.getOptBoolean(
-                "rpcs3_vertexcache"
+                "rpcs3_vertexcache",
             )
         else:
             rpcs3ymlconfig["Video"]["Disable Vertex Cache"] = False
         # Anisotropic Filtering
         if system.isOptSet("rpcs3_anisotropic"):
             rpcs3ymlconfig["Video"]["Anisotropic Filter Override"] = int(
-                system.config["rpcs3_anisotropic"]
+                system.config["rpcs3_anisotropic"],
             )
         else:
             rpcs3ymlconfig["Video"]["Anisotropic Filter Override"] = 0
@@ -338,7 +338,7 @@ class Rpcs3Generator(Generator):
         # Resolution scaling
         if system.isOptSet("rpcs3_resolution_scale"):
             rpcs3ymlconfig["Video"]["Resolution Scale"] = int(
-                system.config["rpcs3_resolution_scale"]
+                system.config["rpcs3_resolution_scale"],
             )
         else:
             rpcs3ymlconfig["Video"]["Resolution Scale"] = "100"
@@ -352,14 +352,14 @@ class Rpcs3Generator(Generator):
         # Number of Shader Compilers
         if system.isOptSet("rpcs3_num_compilers"):
             rpcs3ymlconfig["Video"]["Shader Compiler Threads"] = int(
-                system.config["rpcs3_num_compilers"]
+                system.config["rpcs3_num_compilers"],
             )
         else:
             rpcs3ymlconfig["Video"]["Shader Compiler Threads"] = 0
         # Multithreaded RSX
         if system.isOptSet("rpcs3_rsx"):
             rpcs3ymlconfig["Video"]["Multithreaded RSX"] = system.getOptBoolean(
-                "rpcs3_rsx"
+                "rpcs3_rsx",
             )
         else:
             rpcs3ymlconfig["Video"]["Multithreaded RSX"] = False
@@ -400,7 +400,7 @@ class Rpcs3Generator(Generator):
         # audio buffer duration
         if system.isOptSet("rpcs3_audiobuffer_duration"):
             rpcs3ymlconfig["Audio"]["Desired Audio Buffer Duration"] = int(
-                system.config["rpcs3_audiobuffer_duration"]
+                system.config["rpcs3_audiobuffer_duration"],
             )
         else:
             rpcs3ymlconfig["Audio"]["Desired Audio Buffer Duration"] = 100
@@ -416,7 +416,7 @@ class Rpcs3Generator(Generator):
         # time stretching threshold
         if system.isOptSet("rpcs3_timestretch_threshold"):
             rpcs3ymlconfig["Audio"]["Time Stretching Threshold"] = int(
-                system.config["rpcs3_timestretch_threshold"]
+                system.config["rpcs3_timestretch_threshold"],
             )
         else:
             rpcs3ymlconfig["Audio"]["Time Stretching Threshold"] = 75
@@ -500,7 +500,7 @@ def get_in_game_ratio(config: Any, game_resolution: dict[str, int], rom: str) ->
 def getFirmwareVersion():
     try:
         with open(
-            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt"
+            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt",
         ) as stream:
             lines = stream.readlines()
         for line in lines:

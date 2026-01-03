@@ -53,10 +53,10 @@ def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) ->
                 f'"{setAxis(edenAxisMapping[x], pad.guid, pad.inputs, nplayer - 1)}"',
             )
         edenConfig.set(
-            "Controls", "player_" + str(nplayer - 1) + "_motionleft", '"[empty]"'
+            "Controls", "player_" + str(nplayer - 1) + "_motionleft", '"[empty]"',
         )
         edenConfig.set(
-            "Controls", "player_" + str(nplayer - 1) + "_motionright", '"[empty]"'
+            "Controls", "player_" + str(nplayer - 1) + "_motionright", '"[empty]"',
         )
         edenConfig.set("Controls", "player_" + str(nplayer - 1) + "_connected", "true")
         edenConfig.set(
@@ -65,7 +65,7 @@ def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) ->
             "false",
         )
         edenConfig.set(
-            "Controls", "player_" + str(nplayer - 1) + "_vibration_enabled", "true"
+            "Controls", "player_" + str(nplayer - 1) + "_vibration_enabled", "true",
         )
         edenConfig.set(
             "Controls",
@@ -80,7 +80,7 @@ def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) ->
     for y in range(nplayer, 9):
         edenConfig.set("Controls", "player_" + str(y - 1) + "_connected", "false")
         edenConfig.set(
-            "Controls", "player_" + str(y - 1) + "_connected\\default", "false"
+            "Controls", "player_" + str(y - 1) + "_connected\\default", "false",
         )
 
 
@@ -95,9 +95,7 @@ def setButton(key: str, padGuid: str, padInputs: Any, port: int) -> str:
         if input.type == "hat":
             return f"engine:sdl,hat:{input.id},direction:{hatdirectionvalue(input.value)},guid:{padGuid},port:{port}"
         if input.type == "axis":
-            return ("engine:sdl,threshold:{},axis:{},guid:{},port:{},invert:{}").format(
-                0.5, input.id, padGuid, port, "+"
-            )
+            return f"engine:sdl,threshold:{0.5},axis:{input.id},guid:{padGuid},port:{port},invert:{'+'}"
     return ""
 
 

@@ -109,7 +109,7 @@ def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
 
     if system.isOptSet("azahar_graphics_api"):
         azaharConfig.set(
-            "Renderer", "graphics_api", system.config["azahar_graphics_api"]
+            "Renderer", "graphics_api", system.config["azahar_graphics_api"],
         )
     else:
         azaharConfig.set("Renderer", "graphics_api", "1")
@@ -120,21 +120,21 @@ def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
     ):
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True
+                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available.")
                 try:
                     have_discrete = check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True
+                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
                     ).strip()
                     if have_discrete == "true":
                         discrete_index = check_output(
-                            ["/usr/bin/system-vulkan", "discreteIndex"], text=True
+                            ["/usr/bin/system-vulkan", "discreteIndex"], text=True,
                         ).strip()
                         if discrete_index:
                             azaharConfig.set(
-                                "Renderer", "physical_device", discrete_index
+                                "Renderer", "physical_device", discrete_index,
                             )
                 except CalledProcessError:
                     eslog.debug("Error checking for discrete GPU.")
@@ -152,7 +152,7 @@ def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
 
     if system.isOptSet("azahar_resolution_factor"):
         azaharConfig.set(
-            "Renderer", "resolution_factor", system.config["azahar_resolution_factor"]
+            "Renderer", "resolution_factor", system.config["azahar_resolution_factor"],
         )
     else:
         azaharConfig.set("Renderer", "resolution_factor", "1")

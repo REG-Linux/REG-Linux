@@ -43,7 +43,7 @@ retroPad = {
 
 
 def generateMAMEConfigs(
-    playersControllers: Any, system: Any, rom: str, guns: Any
+    playersControllers: Any, system: Any, rom: str, guns: Any,
 ) -> list[str]:
     # Generate command line for MAME
     commandLine = []
@@ -73,7 +73,7 @@ def generateMAMEConfigs(
         commandLine += ["-cfg_directory", str(cfgPath)]
         commandLine += [
             "-rompath",
-            f"{romDirname};{str(Path('/userdata/bios/mame/'))};{str(Path('/userdata/bios/'))}",
+            f"{romDirname};{Path('/userdata/bios/mame/')!s};{Path('/userdata/bios/')!s}",
         ]
         pluginsToLoad = []
         if not (
@@ -134,7 +134,7 @@ def generateMAMEConfigs(
                 cfgPath.mkdir(parents=True, exist_ok=True)
             commandLine += [romDrivername]
             commandLine += ["-cfg_directory", str(cfgPath)]
-            commandLine += ["-rompath", f"{romDirname};{str(Path('/userdata/bios/'))}"]
+            commandLine += ["-rompath", f"{romDirname};{Path('/userdata/bios/')!s}"]
         else:
             # Command line for MESS consoles/computers
             # TI-99 32k RAM expansion & speech modules
@@ -142,7 +142,7 @@ def generateMAMEConfigs(
             if system.name == "ti99":
                 commandLine += ["-ioport", "peb"]
                 if system.isOptSet("ti99_32kram") and system.getOptBoolean(
-                    "ti99_32kram"
+                    "ti99_32kram",
                 ):
                     commandLine += ["-ioport:peb:slot2", "32kmem"]
                 if not system.isOptSet("ti99_speech") or (
@@ -224,7 +224,7 @@ def generateMAMEConfigs(
                     commandLine += [Path(romDirname).name]
                 else:
                     commandLine += [romDrivername]
-                commandLine += ["-rompath", f"{softDir};{str(Path('/userdata/bios/'))}"]
+                commandLine += ["-rompath", f"{softDir};{Path('/userdata/bios/')!s}"]
                 commandLine += ["-swpath", softDir]
                 commandLine += ["-verbose"]
             else:
@@ -271,35 +271,33 @@ def generateMAMEConfigs(
                             commandLine += ["-flop1"]
                     else:
                         commandLine += ["-" + messRomType[messMode]]
-                else:
-                    if system.isOptSet("bootdisk"):
-                        if (
-                            (
-                                system.isOptSet("altromtype")
-                                and system.config["altromtype"] == "flop1"
-                            )
-                            or not system.isOptSet("altromtype")
-                        ) and system.config["bootdisk"] in [
-                            "macos30",
-                            "macos608",
-                            "macos701",
-                            "macos75",
-                        ]:
-                            commandLine += ["-flop2"]
-                        elif system.isOptSet("altromtype"):
-                            commandLine += ["-" + system.config["altromtype"]]
-                        else:
-                            commandLine += ["-" + messRomType[messMode]]
+                elif system.isOptSet("bootdisk"):
+                    if (
+                        (
+                            system.isOptSet("altromtype")
+                            and system.config["altromtype"] == "flop1"
+                        )
+                        or not system.isOptSet("altromtype")
+                    ) and system.config["bootdisk"] in [
+                        "macos30",
+                        "macos608",
+                        "macos701",
+                        "macos75",
+                    ]:
+                        commandLine += ["-flop2"]
+                    elif system.isOptSet("altromtype"):
+                        commandLine += ["-" + system.config["altromtype"]]
                     else:
-                        if system.isOptSet("altromtype"):
-                            commandLine += ["-" + system.config["altromtype"]]
-                        else:
-                            commandLine += ["-" + messRomType[messMode]]
+                        commandLine += ["-" + messRomType[messMode]]
+                elif system.isOptSet("altromtype"):
+                    commandLine += ["-" + system.config["altromtype"]]
+                else:
+                    commandLine += ["-" + messRomType[messMode]]
                 # Use the full filename for MESS non-softlist ROMs
                 commandLine += [f'"{rom}"']
                 commandLine += [
                     "-rompath",
-                    f"{romDirname};{str(Path('/userdata/bios/'))}",
+                    f"{romDirname};{Path('/userdata/bios/')!s}",
                 ]
 
                 # Boot disk for Macintosh
@@ -312,10 +310,10 @@ def generateMAMEConfigs(
                         "macos75",
                     ]:
                         bootType = "-flop1"
-                        bootDisk = f'"{str(Path("/userdata/bios") / (system.config["bootdisk"] + ".img"))}"'
+                        bootDisk = f'"{Path("/userdata/bios") / (system.config["bootdisk"] + ".img")!s}"'
                     else:
                         bootType = "-hard"
-                        bootDisk = f'"{str(Path("/userdata/bios") / (system.config["bootdisk"] + ".chd"))}"'
+                        bootDisk = f'"{Path("/userdata/bios") / (system.config["bootdisk"] + ".chd")!s}"'
                     commandLine += [bootType, bootDisk]
 
                 # Create & add a blank disk if needed, insert into drive 2
@@ -548,15 +546,14 @@ def generateMAMEConfigs(
     if not system.isOptSet("artworkcrop"):
         if system.name not in ["pdp1", "ti99"]:
             commandLine += ["-artwork_crop"]
-    else:
-        if system.getOptBoolean("artworkcrop"):
-            commandLine += ["-artwork_crop"]
+    elif system.getOptBoolean("artworkcrop"):
+        commandLine += ["-artwork_crop"]
 
     # Share plugins & samples with standalone MAME (except TI99)
     if system.name != "ti99":
         commandLine += [
             "-pluginspath",
-            f"{str(Path('/usr/bin/mame/plugins/'))};{str(Path('/userdata/saves/mame/plugins'))}",
+            f"{Path('/usr/bin/mame/plugins/')!s};{Path('/userdata/saves/mame/plugins')!s}",
         ]
         commandLine += ["-homepath", str(Path("/userdata/saves/mame/plugins/"))]
         commandLine += ["-samplepath", str(Path("/userdata/bios/mame/samples/"))]
@@ -649,15 +646,15 @@ def getMameControlScheme(system: Any, romBasename: str) -> Any:
     # Game list files
     mameCapcom = str(Path("/usr/share/reglinux/configgen/data/mame/mameCapcom.txt"))
     mameKInstinct = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameKInstinct.txt"),
     )
     mameMKombat = str(Path("/usr/share/reglinux/configgen/data/mame/mameMKombat.txt"))
     mameNeogeo = str(Path("/usr/share/reglinux/configgen/data/mame/mameNeogeo.txt"))
     mameTwinstick = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameTwinstick.txt"),
     )
     mameRotatedstick = str(
-        Path("/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt")
+        Path("/usr/share/reglinux/configgen/data/mame/mameRotatedstick.txt"),
     )
 
     # Controls for games with 5-6 buttons or other unusual controls
@@ -719,9 +716,8 @@ def getMameControlScheme(system: Any, romBasename: str) -> Any:
         return "twinstick"
     elif romName in qbertList:
         return "qbert"
-    else:
-        if controllerType == "fightstick":
-            return "fightstick"
+    elif controllerType == "fightstick":
+        return "fightstick"
 
     return "default"
 
@@ -743,7 +739,7 @@ def generateMAMEPadConfig(
             config = minidom.parse(str(configFile))
         except xml.parsers.expat.ExpatError as e:
             eslog.warning(
-                f"Invalid XML in MAME config file {configFile}: {e}. Reinitializing file."
+                f"Invalid XML in MAME config file {configFile}: {e}. Reinitializing file.",
             )
             config = minidom.Document()  # Reinitialize on parse error
         except FileNotFoundError:
@@ -751,7 +747,7 @@ def generateMAMEPadConfig(
             config = minidom.Document()  # Reinitialize if file not found
         except Exception as e:
             eslog.warning(
-                f"Error parsing MAME config file {configFile}: {e}. Reinitializing file."
+                f"Error parsing MAME config file {configFile}: {e}. Reinitializing file.",
             )
             config = minidom.Document()  # Reinitialize on any error
 
@@ -846,7 +842,7 @@ def generateMAMEPadConfig(
     if messSysName in specialControlList:
         # Load mess controls from csv
         messControlFile = Path(
-            "/usr/share/reglinux/configgen/data/mame/messControls.csv"
+            "/usr/share/reglinux/configgen/data/mame/messControls.csv",
         )
         with open(str(messControlFile), "r") as openMessFile:
             controlList = reader(openMessFile, delimiter=";")
@@ -893,17 +889,17 @@ def generateMAMEPadConfig(
                 config_alt = minidom.parse(str(configFile_alt))
             except xml.parsers.expat.ExpatError as e:
                 eslog.warning(
-                    f"Invalid XML in MAME alt config file {configFile_alt}: {e}. Reinitializing file."
+                    f"Invalid XML in MAME alt config file {configFile_alt}: {e}. Reinitializing file.",
                 )
-                pass  # reinit the file
+                # reinit the file
             except FileNotFoundError:
                 eslog.warning(f"MAME alt config file not found: {configFile_alt}")
-                pass  # reinit the file
+                # reinit the file
             except Exception as e:
                 eslog.warning(
-                    f"Error parsing MAME alt config file {configFile_alt}: {e}. Reinitializing file."
+                    f"Error parsing MAME alt config file {configFile_alt}: {e}. Reinitializing file.",
                 )
-                pass  # reinit the file
+                # reinit the file
 
         perGameCfg = system.getOptBoolean("pergamecfg")
         if configFile_alt.exists() and (customCfg or perGameCfg):
@@ -972,7 +968,7 @@ def generateMAMEPadConfig(
                             False,
                             "",
                             "",
-                        )
+                        ),
                     )
                 else:
                     xml_input.appendChild(
@@ -986,7 +982,7 @@ def generateMAMEPadConfig(
                             retroPad[mappings_use[mapping]],
                             False,
                             altButtons,
-                        )
+                        ),
                     )
             else:
                 rmapping = reverseMapping(mappings_use[mapping])
@@ -1002,7 +998,7 @@ def generateMAMEPadConfig(
                             retroPad[rmapping],
                             True,
                             altButtons,
-                        )
+                        ),
                     )
 
         # UI Mappings
@@ -1020,7 +1016,7 @@ def generateMAMEPadConfig(
                     False,
                     "",
                     "",
-                )
+                ),
             )  # Down
             xml_input.appendChild(
                 generateComboPortElement(
@@ -1035,7 +1031,7 @@ def generateMAMEPadConfig(
                     False,
                     "",
                     "",
-                )
+                ),
             )  # Left
             xml_input.appendChild(
                 generateComboPortElement(
@@ -1050,7 +1046,7 @@ def generateMAMEPadConfig(
                     False,
                     "",
                     "",
-                )
+                ),
             )  # Up
             xml_input.appendChild(
                 generateComboPortElement(
@@ -1065,7 +1061,7 @@ def generateMAMEPadConfig(
                     False,
                     "",
                     "",
-                )
+                ),
             )  # Right
             xml_input.appendChild(
                 generateComboPortElement(
@@ -1080,7 +1076,7 @@ def generateMAMEPadConfig(
                     False,
                     "",
                     "",
-                )
+                ),
             )  # Select
 
         # Handle special controls only if we're using a system that needs them
@@ -1102,7 +1098,7 @@ def generateMAMEPadConfig(
                                 thisControl["reversed"],
                                 thisControl["mask"],
                                 thisControl["default"],
-                            )
+                            ),
                         )
                     elif thisControl["type"] == "main":
                         xml_input.appendChild(
@@ -1118,7 +1114,7 @@ def generateMAMEPadConfig(
                                 thisControl["reversed"],
                                 thisControl["mask"],
                                 thisControl["default"],
-                            )
+                            ),
                         )
                     elif thisControl["type"] == "analog":
                         xml_input_alt.appendChild(
@@ -1138,7 +1134,7 @@ def generateMAMEPadConfig(
                                 thisControl["default"],
                                 thisControl["delta"],
                                 thisControl["axis"],
-                            )
+                            ),
                         )
                     elif thisControl["type"] == "combo":
                         xml_input_alt.appendChild(
@@ -1154,7 +1150,7 @@ def generateMAMEPadConfig(
                                 thisControl["reversed"],
                                 thisControl["mask"],
                                 thisControl["default"],
-                            )
+                            ),
                         )
 
         nplayer = nplayer + 1
@@ -1165,7 +1161,7 @@ def generateMAMEPadConfig(
     if overwriteMAME:
         with open(str(configFile), "w", encoding="utf-8") as mameXml:
             dom_string = linesep.join(
-                [s for s in config.toprettyxml().splitlines() if s.strip()]
+                [s for s in config.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...
             mameXml.write(dom_string)
 
@@ -1173,7 +1169,7 @@ def generateMAMEPadConfig(
     if messSysName in specialControlList and overwriteSystem:
         with open(str(configFile_alt), "w", encoding="utf-8") as mameXml_alt:
             dom_string_alt = linesep.join(
-                [s for s in config_alt.toprettyxml().splitlines() if s.strip()]
+                [s for s in config_alt.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...
             mameXml_alt.write(dom_string_alt)
 
@@ -1208,7 +1204,7 @@ def generatePortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
-        input2definition(pad, key, input, padindex, reversed, altButtons)
+        input2definition(pad, key, input, padindex, reversed, altButtons),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1237,7 +1233,7 @@ def generateSpecialPortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
-        input2definition(pad, key, input, padindex, reversed, 0)
+        input2definition(pad, key, input, padindex, reversed, 0),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1267,7 +1263,7 @@ def generateComboPortElement(
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
         f"KEYCODE_{kbkey} OR "
-        + input2definition(pad, key, input, padindex, reversed, 0)
+        + input2definition(pad, key, input, padindex, reversed, 0),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1301,14 +1297,14 @@ def generateAnalogPortElement(
     xml_newseq_inc.setAttribute("type", "increment")
     xml_port.appendChild(xml_newseq_inc)
     incvalue = config.createTextNode(
-        input2definition(pad, inckey, mappedinput, padindex, reversed, 0, True)
+        input2definition(pad, inckey, mappedinput, padindex, reversed, 0, True),
     )
     xml_newseq_inc.appendChild(incvalue)
     xml_newseq_dec = config.createElement("newseq")
     xml_port.appendChild(xml_newseq_dec)
     xml_newseq_dec.setAttribute("type", "decrement")
     decvalue = config.createTextNode(
-        input2definition(pad, deckey, mappedinput2, padindex, reversed, 0, True)
+        input2definition(pad, deckey, mappedinput2, padindex, reversed, 0, True),
     )
     xml_newseq_dec.appendChild(decvalue)
     xml_newseq_std = config.createElement("newseq")
@@ -1337,41 +1333,41 @@ def input2definition(
         or input == "START"
         or input == "SELECT"
     ):
-        input = input.format(joycode) if "{0}" in input else input
+        input = input.replace("{0}", joycode) if "{0}" in input else input
         return f"JOYCODE_{joycode}_{input}"
     if input.find("AXIS") != -1:
         if altButtons == "qbert":  # Q*Bert Joystick
             if key == "joystick1up" or key == "up":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1up']}_{joycode}_{retroPad['joystick1right']} OR \
-                    JOYCODE_{joycode}_{retroPad['up'].format(joycode)} JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
+                    JOYCODE_{joycode}_{retroPad['up'].replace('{0}', joycode)} JOYCODE_{joycode}_{retroPad['right'].replace('{0}', joycode)}"
             if key == "joystick1down" or key == "down":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1down']} JOYCODE_{joycode}_{retroPad['joystick1left']} OR \
-                    JOYCODE_{joycode}_{retroPad['down'].format(joycode)} JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
+                    JOYCODE_{joycode}_{retroPad['down'].replace('{0}', joycode)} JOYCODE_{joycode}_{retroPad['left'].replace('{0}', joycode)}"
             if key == "joystick1left" or key == "left":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1left']} JOYCODE_{joycode}_{retroPad['joystick1up']} OR \
-                    JOYCODE_{joycode}_{retroPad['left'].format(joycode)} JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
+                    JOYCODE_{joycode}_{retroPad['left'].replace('{0}', joycode)} JOYCODE_{joycode}_{retroPad['up'].replace('{0}', joycode)}"
             if key == "joystick1right" or key == "right":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1right']} JOYCODE_{joycode}_{retroPad['joystick1down']} OR \
-                    JOYCODE_{joycode}_{retroPad['right'].format(joycode)} JOYCODE_{joycode}_{retroPad['down'].format(joycode)}"
+                    JOYCODE_{joycode}_{retroPad['right'].replace('{0}', joycode)} JOYCODE_{joycode}_{retroPad['down'].replace('{0}', joycode)}"
             return f"JOYCODE_{joycode}_{input}"
         if ignoreAxis:
             if key == "joystick1up" or key == "up":
-                return f"JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
+                return f"JOYCODE_{joycode}_{retroPad['up'].replace('{0}', joycode)}"
             if key == "joystick1down" or key == "down":
-                return f"JOYCODE_{joycode}_{retroPad['down'].format(joycode)}"
+                return f"JOYCODE_{joycode}_{retroPad['down'].replace('{0}', joycode)}"
             if key == "joystick1left" or key == "left":
-                return f"JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
+                return f"JOYCODE_{joycode}_{retroPad['left'].replace('{0}', joycode)}"
             if key == "joystick1right" or key == "right":
-                return f"JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
+                return f"JOYCODE_{joycode}_{retroPad['right'].replace('{0}', joycode)}"
             return f"JOYCODE_{joycode}_{input}"
         if key == "joystick1up" or key == "up":
-            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['up'].format(joycode)}"
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['up'].replace('{0}', joycode)}"
         if key == "joystick1down" or key == "down":
-            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['down'].format(joycode)}"
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['down'].replace('{0}', joycode)}"
         if key == "joystick1left" or key == "left":
-            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['left'].format(joycode)}"
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['left'].replace('{0}', joycode)}"
         if key == "joystick1right" or key == "right":
-            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['right'].format(joycode)}"
+            return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['right'].replace('{0}', joycode)}"
         if key == "joystick2up":
             return f"JOYCODE_{joycode}_{retroPad[key]} OR JOYCODE_{joycode}_{retroPad['x']}"
         if key == "joystick2down":
@@ -1411,6 +1407,6 @@ def getSection(config: Any, xml_root: Any, name: str) -> Any:
 def removeSection(config: Any, xml_root: Any, name: str) -> None:
     xml_section = xml_root.getElementsByTagName(name)
 
-    for i in range(0, len(xml_section)):
+    for i in range(len(xml_section)):
         old = xml_root.removeChild(xml_section[i])
         old.unlink()

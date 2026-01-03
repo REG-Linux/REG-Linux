@@ -83,7 +83,7 @@ def getScreensInfos(config: dict[str, str]) -> list[dict[str, int]]:
     outputs = getScreens()
 
     res = [
-        {"width": resolution1["width"], "height": resolution1["height"], "x": 0, "y": 0}
+        {"width": resolution1["width"], "height": resolution1["height"], "x": 0, "y": 0},
     ]
 
     if "videooutput2" in config and len(outputs) > 1:
@@ -94,7 +94,7 @@ def getScreensInfos(config: dict[str, str]) -> list[dict[str, int]]:
                 "height": resolution2["height"],
                 "x": resolution1["width"],
                 "y": 0,
-            }
+            },
         )
 
         if "videooutput3" in config and len(outputs) > 2:
@@ -105,7 +105,7 @@ def getScreensInfos(config: dict[str, str]) -> list[dict[str, int]]:
                     "height": resolution3["height"],
                     "x": resolution1["width"] + resolution2["width"],
                     "y": 0,
-                }
+                },
             )
 
     eslog.debug("Screens:")
@@ -129,14 +129,14 @@ def getRefreshRate() -> str | None:
 
 
 def supportSystemRotation() -> bool:
-    result = run(["regmsg screen", "supportSystemRotation"], stdout=PIPE)
+    result = run(["regmsg screen", "supportSystemRotation"], check=False, stdout=PIPE)
     return result.returncode == 0
 
 
 def changeMouse(mode: bool) -> None:
     eslog.debug(f"changeMouseMode({mode})")
     cmd = "system-mouse show" if mode else "system-mouse hide"
-    run(cmd, shell=True, stdout=PIPE)
+    run(cmd, check=False, shell=True, stdout=PIPE)
 
 
 def getGLVersion() -> float:
@@ -181,7 +181,7 @@ def _get_eglinfo_lines() -> list[str]:
         return [line.strip() for line in result.stdout.splitlines() if line.strip()]
     except CalledProcessError as e:
         eslog.error(
-            f"Error running {eglinfo_path}: {e.stderr.strip() if e.stderr else e}"
+            f"Error running {eglinfo_path}: {e.stderr.strip() if e.stderr else e}",
         )
         return []
     except FileNotFoundError:

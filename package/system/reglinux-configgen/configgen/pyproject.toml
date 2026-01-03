@@ -110,7 +110,7 @@ exclude = ["tests*", "docs*"]
 # ---------------------------------------------------------------------------
 [project.scripts]
 # Maps the CLI command to the main function
-reglinux-configgen = "configgen:main"
+reglinux-configgen = "configgen.emulatorlauncher:main"
 
 
 # ---------------------------------------------------------------------------

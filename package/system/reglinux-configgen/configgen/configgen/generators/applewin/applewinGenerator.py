@@ -11,7 +11,7 @@ APPLEWIN_BIN_PATH = "/usr/bin/applewin"
 
 class AppleWinGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         command_array = [APPLEWIN_BIN_PATH, "--no-imgui", "--d1", rom]
 
@@ -19,7 +19,7 @@ class AppleWinGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

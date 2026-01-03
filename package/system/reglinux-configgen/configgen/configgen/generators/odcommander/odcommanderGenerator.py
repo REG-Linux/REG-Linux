@@ -4,7 +4,7 @@ from configgen.generators.Generator import Generator
 
 class OdcommanderGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         command_array = ["od-commander"]
 

@@ -7,7 +7,7 @@ SOLARUS_BIN_PATH = "/usr/bin/solarus-run"
 
 class SolarusGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # basis
         command_array = [
@@ -25,7 +25,7 @@ class SolarusGenerator(Generator):
             env={
                 "SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS": "0",
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
+                    players_controllers,
                 ),
             },
         )

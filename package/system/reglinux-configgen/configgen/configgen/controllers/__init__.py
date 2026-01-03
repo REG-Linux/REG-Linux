@@ -7,13 +7,13 @@ from .guns import getGuns, guns_borders_size_name, gunsNeedCrosses
 from .metadata import getGamesMetaData
 
 __all__ = [
+    "Evmapy",
     "generate_sdl_controller_config",
-    "write_sdl_db_all_controllers",
+    "getDevicesInformation",
+    "getGamesMetaData",
     "getGuns",
     "gunsNeedCrosses",
     "guns_borders_size_name",
-    "getDevicesInformation",
-    "getGamesMetaData",
-    "Evmapy",
     "load_controller_config",
+    "write_sdl_db_all_controllers",
 ]

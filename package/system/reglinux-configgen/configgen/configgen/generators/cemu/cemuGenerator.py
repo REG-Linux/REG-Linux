@@ -32,7 +32,7 @@ class CemuGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # in case of squashfs/zar, the root directory is passed
         rpxrom = rom
@@ -58,24 +58,24 @@ class CemuGenerator(Generator):
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
             except xml.parsers.expat.ExpatError as e:
                 eslog.warning(
-                    f"Invalid XML in Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file."
+                    f"Invalid XML in Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.",
                 )
-                pass  # reinit the file
+                # reinit the file
             except FileNotFoundError:
                 eslog.warning(f"Cemu config file not found: {CEMU_CONFIG_PATH}")
-                pass  # reinit the file
+                # reinit the file
             except Exception as e:
                 eslog.warning(
-                    f"Error parsing Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file."
+                    f"Error parsing Cemu config file {CEMU_CONFIG_PATH}: {e}. Reinitializing file.",
                 )
-                pass  # reinit the file
+                # reinit the file
 
         # Create the settings file
         setCemuConfig(cemuConfig, system)
 
         # Save the config file
         dom_string = linesep.join(
-            [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()]
+            [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()],
         )
         with open(CEMU_CONFIG_PATH, "w", encoding="utf-8") as xml_file:
             xml_file.write(dom_string)

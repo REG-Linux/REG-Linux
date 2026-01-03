@@ -15,7 +15,7 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     # Tables are organised by folders containing the vpx file, and sub-folders with the roms, altcolor, altsound,...
     # We keep a switch to allow users with the old unique pinmame to be able to continue using vpinball (switchon)
     if system.isOptSet("vpinball_folders") and not system.getOptBoolean(
-        "vpinball_folders"
+        "vpinball_folders",
     ):
         vpinballSettings.set("Standalone", "PinMAMEPath", "")
     else:
@@ -25,7 +25,7 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     if system.isOptSet("vpinball_balltrail"):
         vpinballSettings.set("Player", "BallTrail", "1")
         vpinballSettings.set(
-            "Player", "BallTrailStrength", system.config["vpinball_balltrail"]
+            "Player", "BallTrailStrength", system.config["vpinball_balltrail"],
         )
     else:
         vpinballSettings.set("Player", "BallTrail", "0")
@@ -34,7 +34,7 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     # Visual Nugde Strength
     if system.isOptSet("vpinball_nudgestrength"):
         vpinballSettings.set(
-            "Player", "NudgeStrength", system.config["vpinball_nudgestrength"]
+            "Player", "NudgeStrength", system.config["vpinball_nudgestrength"],
         )
     else:
         vpinballSettings.set("Player", "NudgeStrength", "")
@@ -42,7 +42,7 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     # Performance settings
     if system.isOptSet("vpinball_maxframerate"):
         vpinballSettings.set(
-            "Player", "MaxFramerate", system.config["vpinball_maxframerate"]
+            "Player", "MaxFramerate", system.config["vpinball_maxframerate"],
         )
     else:
         vpinballSettings.set("Player", "MaxFramerate", "")
@@ -96,19 +96,19 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
 
     # custom display physical setup
     if system.isOptSet("vpinball_customphysicalsetup") and system.getOptBoolean(
-        "vpinball_customphysicalsetup"
+        "vpinball_customphysicalsetup",
     ):
         # Width
         if system.isOptSet("vpinball_screenwidth"):
             vpinballSettings.set(
-                "Player", "ScreenWidth", system.config["vpinball_screenwidth"]
+                "Player", "ScreenWidth", system.config["vpinball_screenwidth"],
             )
         else:
             vpinballSettings.set("Player", "ScreenWidth", "")
         # Height
         if system.isOptSet("vpinball_screenheight"):
             vpinballSettings.set(
-                "Player", "ScreenHeight", system.config["vpinball_screenheight"]
+                "Player", "ScreenHeight", system.config["vpinball_screenheight"],
             )
         else:
             vpinballSettings.set("Player", "ScreenHeight", "")
@@ -124,14 +124,14 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
         # Y
         if system.isOptSet("vpinball_screenplayery"):
             vpinballSettings.set(
-                "Player", "ScreenPlayerY", system.config["vpinball_screenplayery"]
+                "Player", "ScreenPlayerY", system.config["vpinball_screenplayery"],
             )
         else:
             vpinballSettings.set("Player", "ScreenPlayerY", "")
         # Z
         if system.isOptSet("vpinball_screenplayerz"):
             vpinballSettings.set(
-                "Player", "ScreenPlayerZ", system.config["vpinball_screenplayerz"]
+                "Player", "ScreenPlayerZ", system.config["vpinball_screenplayerz"],
             )
         else:
             vpinballSettings.set("Player", "ScreenPlayerZ", "")
@@ -144,7 +144,7 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
 
     # Altcolor (switchon)
     if system.isOptSet("vpinball_altcolor") and not system.getOptBoolean(
-        "vpinball_altcolor"
+        "vpinball_altcolor",
     ):
         vpinballSettings.set("Standalone", "AltColor", "0")
     else:
@@ -153,21 +153,21 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     # Sound balance
     if system.isOptSet("vpinball_musicvolume"):
         vpinballSettings.set(
-            "Player", "MusicVolume", system.config["vpinball_musicvolume"]
+            "Player", "MusicVolume", system.config["vpinball_musicvolume"],
         )
     else:
         vpinballSettings.set("Player", "MusicVolume", "")
 
     if system.isOptSet("vpinball_soundvolume"):
         vpinballSettings.set(
-            "Player", "SoundVolume", system.config["vpinball_soundvolume"]
+            "Player", "SoundVolume", system.config["vpinball_soundvolume"],
         )
     else:
         vpinballSettings.set("Player", "SoundVolume", "")
 
     # Altsound
     if system.isOptSet("vpinball_altsound") and not system.getOptBoolean(
-        "vpinball_altsound"
+        "vpinball_altsound",
     ):
         vpinballSettings.set("Standalone", "AltSound", "0")
     else:
@@ -177,20 +177,20 @@ def setVpinballConfig(vpinballSettings: Any, system: Any) -> None:
     # /usr/bin/vpinball/VPinballX_GL -listsnd
     if system.isOptSet("vpinball_sounddevice"):
         vpinballSettings.set(
-            "Player", "SoundDevice", system.config["vpinball_sounddevice"]
+            "Player", "SoundDevice", system.config["vpinball_sounddevice"],
         )
     else:
         vpinballSettings.set("Player", "SoundDevice", "")
     if system.isOptSet("vpinball_sounddevicebg"):
         vpinballSettings.set(
-            "Player", "SoundDeviceBG", system.config["vpinball_sounddevicebg"]
+            "Player", "SoundDeviceBG", system.config["vpinball_sounddevicebg"],
         )
     else:
         vpinballSettings.set("Player", "SoundDeviceBG", "")
 
     # Don't use SDL "Add credit" with the South button/plunger and pad2key default mapping
     if system.isOptSet("vpinball_pad_add_credit") and system.getOptBoolean(
-        "vpinball_pad_add_credit"
+        "vpinball_pad_add_credit",
     ):
         vpinballSettings.set("Player", "JoyAddCreditKey", "")
     else:

@@ -9,7 +9,7 @@ from .cdogsConfig import CDOGS_ASSETS_DIR, CDOGS_BIN_PATH, CDOGS_ROMS_DIR
 
 class CdogsGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         try:
             for assetdir in CDOGS_ASSETS_DIR:
@@ -24,7 +24,7 @@ class CdogsGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

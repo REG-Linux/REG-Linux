@@ -1,5 +1,4 @@
-"""
-Cannonball generator module for REG-Linux
+"""Cannonball generator module for REG-Linux
 This module handles the generation of cannonball emulator configurations.
 """
 

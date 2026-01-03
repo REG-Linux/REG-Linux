@@ -13,7 +13,7 @@ eslog = get_logger(__name__)
 
 class AmiberryGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # setting up amiberry config file
         setAmiberryConfig(system)
@@ -147,7 +147,7 @@ class AmiberryGenerator(Generator):
                 env={
                     "XDG_DATA_HOME": "/userdata/system/configs/",
                     "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                        players_controllers
+                        players_controllers,
                     ),
                 },
             )
@@ -161,7 +161,6 @@ class AmiberryGenerator(Generator):
         # split path and extension
         filepath, fileext = str(Path(rom).with_suffix("")), Path(rom).suffix
 
-        #
         indexDisk = filepath.rfind("(Disk 1")
 
         # from one file (x1.zip), get the list of all existing files with the same extension
@@ -236,7 +235,7 @@ class AmiberryGenerator(Generator):
                         if zipfilename.find("/") == -1:  # at the root
                             extension = Path(zipfilename).suffix[1:]
                             eslog.debug(
-                                f"File in ZIP: {zipfilename}, extension: {extension}"
+                                f"File in ZIP: {zipfilename}, extension: {extension}",
                             )
                             if extension == "info":
                                 eslog.debug("ROM type: WHDL (found .info file)")
@@ -251,7 +250,7 @@ class AmiberryGenerator(Generator):
                 eslog.debug("ROM type: UNKNOWN (no .info/.lha/.adf found in ZIP)")
                 return "UNKNOWN"
             except Exception as e:
-                eslog.error(f"Error reading ZIP file {filepath}: {str(e)}")
+                eslog.error(f"Error reading ZIP file {filepath}: {e!s}")
                 return "UNKNOWN"
 
         eslog.debug(f"ROM type: UNKNOWN (extension: {extension})")

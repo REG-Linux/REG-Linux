@@ -11,7 +11,7 @@ ABUSE_BIN_PATH = Path("/usr/bin/abuse")
 
 class AbuseGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         command_array = [str(ABUSE_BIN_PATH), "-datadir", str(ABUSE_DATA_DIR)]
 
@@ -19,7 +19,7 @@ class AbuseGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

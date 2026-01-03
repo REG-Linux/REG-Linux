@@ -47,7 +47,7 @@ def setGzdoomConfig(system: Any, rom: str) -> None:
             f"logfile {GZDOOM_LOG_PATH}\n"
             f"vid_fps {'true' if system.getOptBoolean('showFPS') else 'false'}\n"
             f"{extra_config}"
-            "echo REG-Linux\n"  # easy check that script ran in console
+            "echo REG-Linux\n",  # easy check that script ran in console
         )
 
     # check the directory name is in the ini file
@@ -61,7 +61,7 @@ def setGzdoomConfig(system: Any, rom: str) -> None:
                 "[SoundfontSearch.Directories]\n"
                 "Path=" + GZDOOM_SOUND_FONT_PATH + "\n"
                 "Path=" + GZDOOM_FM_BANKS_PATH + "\n"
-                "[GlobalSettings]\n"
+                "[GlobalSettings]\n",
             )
     else:
         # configparser wasn't working on the default ini file (non-compliant)

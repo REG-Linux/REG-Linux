@@ -11,7 +11,7 @@ class PPSSPPGenerator(Generator):
     # Main entry of the module
     # Configure PPSSPP and return a command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         setPPSSPPConfig(system)
 
@@ -34,7 +34,7 @@ class PPSSPPGenerator(Generator):
 
         # state_slot option
         if system.isOptSet("state_filename"):
-            command_array.append("--state={}".format(system.config["state_filename"]))
+            command_array.append(f"--state={system.config['state_filename']}")
 
         # Adjust SDL_VIDEODRIVER to run through wayland or kmsdrm
         environment = {}

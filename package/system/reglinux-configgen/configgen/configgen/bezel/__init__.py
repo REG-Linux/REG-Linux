@@ -4,14 +4,14 @@
 from . import bezel_base, bezel_common, libretro_bezel_manager, mame_bezel_manager
 
 __all__ = [
+    "BezelUtils",
+    "IBezelManager",
+    "LibretroBezelManager",
+    "MameBezelManager",
     "bezel_base",
     "bezel_common",
     "libretro_bezel_manager",
     "mame_bezel_manager",
-    "IBezelManager",
-    "BezelUtils",
-    "LibretroBezelManager",
-    "MameBezelManager",
 ]
 
 # Import the main classes and utilities

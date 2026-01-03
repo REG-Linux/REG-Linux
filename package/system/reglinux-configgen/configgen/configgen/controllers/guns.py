@@ -45,12 +45,12 @@ def getGuns() -> dict[str, Any]:
                 mouses_clean[int(matches.group(1))] = mouse
         except (AttributeError, ValueError) as e:
             eslog.warning(
-                f"Error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}"
+                f"Error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}",
             )
             continue
         except Exception as e:
             eslog.warning(
-                f"Unexpected error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}"
+                f"Unexpected error processing mouse device {mouse.device_node if hasattr(mouse, 'device_node') else 'unknown'}: {e}",
             )
             continue
 
@@ -116,15 +116,13 @@ def getGuns() -> dict[str, Any]:
                 "buttons": buttons,
             }
             eslog.info(
-                "found gun {} at {} with id_mouse={} ({})".format(
-                    ngun, device_node, nmouse, guns[str(ngun)]["name"]
-                )
+                f"found gun {ngun} at {device_node} with id_mouse={nmouse} ({guns[str(ngun)]['name']})",
             )
             nmouse = nmouse + 1
             ngun = ngun + 1
         except Exception as e:
             eslog.warning(
-                f"Error processing gun properties for device {device_node}: {e}"
+                f"Error processing gun properties for device {device_node}: {e}",
             )
             nmouse = nmouse + 1
             continue
@@ -146,8 +144,7 @@ def gunsNeedCrosses(guns: dict[str, Any]) -> bool:
 def guns_borders_size_name(guns: dict[str, Any], config: dict[str, Any]) -> Any:
     borders_size: str = "medium"
     if (
-        "controllers.guns.borderssize" in config
-        and config["controllers.guns.borderssize"]
+        config.get("controllers.guns.borderssize")
     ):
         borders_size = config["controllers.guns.borderssize"]
 

@@ -1,10 +1,10 @@
 import re
 import shutil
-import xml.dom.minidom as minidom
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 from typing import Any
+from xml.dom import minidom
 
 from configgen.Command import Command
 from configgen.generators.Generator import Generator
@@ -17,8 +17,7 @@ openMSX_Config = Path("/usr/share/openmsx/")
 
 
 def copy_directory(src: str, dst: str) -> None:
-    """
-    Copy all contents from src directory to dst directory, similar to distutils.dir_util.copy_tree
+    """Copy all contents from src directory to dst directory, similar to distutils.dir_util.copy_tree
     This function copies the directory tree from src to dst, creating dst if it doesn't exist
     """
     import shutil
@@ -100,7 +99,7 @@ class OpenmsxGenerator(Generator):
         else:
             # Log the error but continue processing
             eslog.warning(
-                "Could not find 'settings' element in XML, skipping fullspeedwhenloading setting"
+                "Could not find 'settings' element in XML, skipping fullspeedwhenloading setting",
             )
 
         # Create the bindings element
@@ -123,7 +122,7 @@ class OpenmsxGenerator(Generator):
             # purdify the XML
             xml_string = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
             formatted_xml = "\n".join(
-                [line for line in xml_string.split("\n") if line.strip()]
+                [line for line in xml_string.split("\n") if line.strip()],
             )
             f.write(formatted_xml)
 
@@ -134,10 +133,10 @@ class OpenmsxGenerator(Generator):
         # set the tcl file options - we can add other options later
         with open(settings_tcl, "a") as file:
             file.write(
-                "filepool add -path /userdata/bios/Machines -types system_rom -position 1\n"
+                "filepool add -path /userdata/bios/Machines -types system_rom -position 1\n",
             )
             file.write(
-                "filepool add -path /userdata/bios/openmsx -types system_rom -position 2\n"
+                "filepool add -path /userdata/bios/openmsx -types system_rom -position 2\n",
             )
             # get the rom name (no extension) for the savestate name
             save_name = Path(rom).name
@@ -152,7 +151,7 @@ class OpenmsxGenerator(Generator):
             file.write("\n")
             file.write("# -= Screenshots =-\n")
             file.write(
-                f'bind F5 {{screenshot [utils::get_next_numbered_filename {screenshot_dir} "[guess_title] " ".png"]}}\n'
+                f'bind F5 {{screenshot [utils::get_next_numbered_filename {screenshot_dir} "[guess_title] " ".png"]}}\n',
             )
             # setup the controller
             file.write("\n")
@@ -168,34 +167,34 @@ class OpenmsxGenerator(Generator):
                         input = pad.inputs[x]
                         if input.name == "y":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x40"\n'
+                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x40"\n',
                             )
                         if input.name == "x":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x80"\n'
+                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x80"\n',
                             )
                         if input.name == "pagedown":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} up" "set fastforward off"\n'
+                                f'bind "joy{nplayer} button{input.id} up" "set fastforward off"\n',
                             )
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "set fastforward on"\n'
+                                f'bind "joy{nplayer} button{input.id} down" "set fastforward on"\n',
                             )
                         if input.name == "select":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "toggle pause"\n'
+                                f'bind "joy{nplayer} button{input.id} down" "toggle pause"\n',
                             )
                         if input.name == "start":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "main_menu_toggle"\n'
+                                f'bind "joy{nplayer} button{input.id} down" "main_menu_toggle"\n',
                             )
                         if input.name == "l3":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "toggle_osd_keyboard"\n'
+                                f'bind "joy{nplayer} button{input.id} down" "toggle_osd_keyboard"\n',
                             )
                         if input.name == "r3":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "toggle console"\n'
+                                f'bind "joy{nplayer} button{input.id} down" "toggle console"\n',
                             )
                 nplayer += 1
 

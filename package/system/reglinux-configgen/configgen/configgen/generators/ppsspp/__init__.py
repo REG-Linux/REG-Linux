@@ -1,5 +1,4 @@
-"""
-Ppsspp generator module for REG-Linux
+"""Ppsspp generator module for REG-Linux
 This module handles the generation of ppsspp emulator configurations.
 """
 
@@ -9,8 +8,8 @@ from .ppssppGenerator import PPSSPPGenerator
 
 __all__ = [
     "PPSSPPGenerator",
-    "setPPSSPPConfig",
     "axisToCode",
     "optionValue",
     "setControllerConfig",
+    "setPPSSPPConfig",
 ]

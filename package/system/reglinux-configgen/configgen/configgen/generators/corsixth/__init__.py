@@ -1,5 +1,4 @@
-"""
-Corsixth generator module for REG-Linux
+"""Corsixth generator module for REG-Linux
 This module handles the generation of corsixth emulator configurations.
 """
 

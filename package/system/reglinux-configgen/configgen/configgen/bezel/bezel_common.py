@@ -1,5 +1,4 @@
-"""
-Consolidated Bezel Configuration Writer - Combines common functionality from different emulator managers.
+"""Consolidated Bezel Configuration Writer - Combines common functionality from different emulator managers.
 """
 
 from contextlib import suppress
@@ -69,11 +68,11 @@ def writeBezelConfig(
         with open(gunBezelInfoFile, "w") as fd:
             fd.write(
                 "{"
-                + f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
-                + "}"
+                 f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
+                 "}",
             )
         BezelUtils.create_transparent_bezel(
-            gunBezelFile, gameResolution["width"], gameResolution["height"]
+            gunBezelFile, gameResolution["width"], gameResolution["height"],
         )
         # if the game needs a specific bezel, to draw border, consider it as a game-specific bezel, like for thebezelproject to avoid caches
         bz_infos: dict[str, str | bool | None] = {
@@ -94,7 +93,7 @@ def writeBezelConfig(
                 emulator_name = getattr(cls, "__name__", "unknown")
         if "libretro" in emulator_name.lower():
             bz_infos_temp = BezelUtils.get_bezel_infos(
-                rom, bezel, system.name, "libretro"
+                rom, bezel, system.name, "libretro",
             )
         else:
             bz_infos_temp = BezelUtils.get_bezel_infos(rom, bezel, system.name, "mame")
@@ -167,18 +166,18 @@ def writeBezelConfig(
         # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
         if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
             retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                "4/3"
+                "4/3",
             )  # Force 4:3 aspect ratio for 720x1280 resolution
         else:
             retroarchConfig["aspect_ratio_index"] = str(
-                RATIO_INDEXES.index("custom")
+                RATIO_INDEXES.index("custom"),
             )  # overridden from the beginning of this file
             if (
                 is_ratio_defined("ratio", system.config)
                 and system.config["ratio"] in RATIO_INDEXES
             ):
                 retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                    system.config["ratio"]
+                    system.config["ratio"],
                 )
         retroarchConfig["video_aspect_ratio_auto"] = "false"
 
@@ -192,11 +191,11 @@ def writeBezelConfig(
         # the usual 16:9 bezel ratios 1920x1080 (example: theBezelProject)
         try:
             infos["width"], infos["height"] = BezelUtils.fast_image_size(
-                overlay_png_file
+                overlay_png_file,
             )
             infos["top"] = int(infos["height"] * 2 / 1080)
             infos["left"] = int(
-                infos["width"] * 241 / 1920
+                infos["width"] * 241 / 1920,
             )  # 241 = (1920 - (1920 / (4:3))) / 2 + 1 pixel = where viewport begins
             infos["bottom"] = int(infos["height"] * 2 / 1080)
             infos["right"] = int(infos["width"] * 241 / 1920)
@@ -212,18 +211,18 @@ def writeBezelConfig(
             # Ensure 720x1280 resolution uses 4:3 aspect ratio to prevent bezel misalignment
             if gameResolution["width"] == 720 and gameResolution["height"] == 1280:
                 retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                    "4/3"
+                    "4/3",
                 )  # Force 4:3 aspect ratio for 720x1280 resolution
             else:
                 retroarchConfig["aspect_ratio_index"] = str(
-                    RATIO_INDEXES.index("custom")
+                    RATIO_INDEXES.index("custom"),
                 )
                 if (
                     is_ratio_defined("ratio", system.config)
                     and system.config["ratio"] in RATIO_INDEXES
                 ):
                     retroarchConfig["aspect_ratio_index"] = RATIO_INDEXES.index(
-                        system.config["ratio"]
+                        system.config["ratio"],
                     )
                     retroarchConfig["video_aspect_ratio_auto"] = "false"
 
@@ -405,7 +404,7 @@ def writeBezelConfig(
         # Shaders should use this path to find the art.
         symlink(overlay_png_file, str(shaderBezelFile))
         eslog.debug(
-            f"Symlinked bezel file {overlay_png_file} to {shaderBezelFile} for selected shader"
+            f"Symlinked bezel file {overlay_png_file} to {shaderBezelFile} for selected shader",
         )
 
 

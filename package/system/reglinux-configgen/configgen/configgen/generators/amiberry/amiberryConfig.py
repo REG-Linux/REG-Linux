@@ -32,7 +32,7 @@ def setAmiberryConfig(system: Any) -> None:
         system.config.get("amiberry_vkbd_transparency", "60"),
     )
     amiberryConfig.save(
-        "default_vkbd_language", system.config.get("amiberry_vkbd_language", "US")
+        "default_vkbd_language", system.config.get("amiberry_vkbd_language", "US"),
     )
     amiberryConfig.save("default_vkbd_toggle", "leftstick")
     amiberryConfig.save("default_fullscreen_mode", "1")

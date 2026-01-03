@@ -12,7 +12,7 @@ PLAY_HOME_DIR = str(CONF)
 PLAY_BIN_PATH = "/usr/bin/Play"
 PLAY_CONFIG_FILE = str(Path(PLAY_CONFIG_DIR) / "Play Data Files" / "config.xml")
 PLAY_INPUT_FILE = str(
-    Path(PLAY_CONFIG_DIR) / "Play Data Files" / "inputprofiles" / "default.xml"
+    Path(PLAY_CONFIG_DIR) / "Play Data Files" / "inputprofiles" / "default.xml",
 )
 
 
@@ -22,7 +22,7 @@ class PlayGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Create config folder
         config_dir_path = Path(PLAY_CONFIG_DIR)
@@ -76,7 +76,7 @@ class PlayGenerator(Generator):
                 if pref_name == "ps2.limitframerate" and system.isOptSet("play_vsync"):
                     pref_element.attrib["Value"] = system.config["play_vsync"]
                 if pref_name == "renderer.widescreen" and system.isOptSet(
-                    "play_widescreen"
+                    "play_widescreen",
                 ):
                     pref_element.attrib["Value"] = system.config["play_widescreen"]
                 if pref_name == "system.language" and system.isOptSet("play_language"):
@@ -84,11 +84,11 @@ class PlayGenerator(Generator):
                 if pref_name == "video.gshandler" and system.isOptSet("play_api"):
                     pref_element.attrib["Value"] = system.config["play_api"]
                 if pref_name == "renderer.opengl.resfactor" and system.isOptSet(
-                    "play_scale"
+                    "play_scale",
                 ):
                     pref_element.attrib["Value"] = system.config["play_scale"]
                 if pref_name == "renderer.presentationmode" and system.isOptSet(
-                    "play_mode"
+                    "play_mode",
                 ):
                     pref_element.attrib["Value"] = system.config["play_mode"]
                 if (
@@ -128,13 +128,13 @@ class PlayGenerator(Generator):
         return Command(array=command_array)
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str,
     ) -> float:
         if (
-            "play_widescreen" in config
-            and config["play_widescreen"] == "true"
-            or "play_mode" in config
-            and config["play_mode"] == "0"
+            ("play_widescreen" in config
+            and config["play_widescreen"] == "true")
+            or ("play_mode" in config
+            and config["play_mode"] == "0")
         ):
             return 16 / 9
         return 4 / 3

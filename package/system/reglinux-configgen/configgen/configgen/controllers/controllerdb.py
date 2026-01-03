@@ -1,5 +1,4 @@
-"""
-Controller database management.
+"""Controller database management.
 Handles loading and matching controller configurations from gamecontrollerdb.txt.
 """
 
@@ -55,8 +54,7 @@ def _parse_chunk(lines: list[str]) -> dict[str, dict[str, Any]]:
 
 
 def load_all_controllers_config() -> dict[str, dict[str, Any]]:
-    """
-    Load all controller configurations from gamecontrollerdb.txt, splitting the input
+    """Load all controller configurations from gamecontrollerdb.txt, splitting the input
     evenly across available cores and parsing each slice in a thread pool.
     """
     controllerdb: dict[str, dict[str, Any]] = {}
@@ -89,14 +87,14 @@ def load_all_controllers_config() -> dict[str, dict[str, Any]]:
 def load_controller_config(
     controllersInput: list[dict[str, str]],
 ) -> dict[str, dict[str, Any]]:
-    """
-    Generates player-specific controller objects using the known controller database.
+    """Generates player-specific controller objects using the known controller database.
 
     Args:
         controllersInput (list): List of controller input descriptors containing "guid" and "devicepath".
 
     Returns:
         dict: Dictionary of Controller instances keyed by player number (as strings).
+
     """
     playerControllers: dict[str, dict[str, Any]] = {}
     controllers = load_all_controllers_config()
@@ -125,8 +123,7 @@ def _find_best_controller_config(
     pxhats: str,
     pxaxes: str,
 ) -> Any:
-    """
-    Finds the best controller match in the loaded database by GUID and returns a Controller instance.
+    """Finds the best controller match in the loaded database by GUID and returns a Controller instance.
 
     Args:
         controllers (dict): Dictionary of available controller configurations.
@@ -136,6 +133,7 @@ def _find_best_controller_config(
 
     Returns:
         Controller | None: Matched Controller instance or None if not found.
+
     """
     controller = controllers.get(pxguid)
     if not controller:

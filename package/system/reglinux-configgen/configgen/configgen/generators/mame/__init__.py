@@ -1,5 +1,4 @@
-"""
-Mame generator module for REG-Linux
+"""Mame generator module for REG-Linux
 This module handles the generation of mame emulator configurations.
 """
 

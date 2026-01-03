@@ -8,7 +8,7 @@ try:
     from ruamel.yaml import YAML
 except ImportError:
     print(
-        "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml"
+        "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml",
     )
     raise
 from shutil import move
@@ -29,7 +29,7 @@ class Vita3kGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         # Create folder
         config_dir_path = Path(VITA3K_CONFIG_DIR)
@@ -60,7 +60,7 @@ class Vita3kGenerator(Generator):
 
                 with open(VITA3K_CONFIG_PATH) as stream:
                     vita3kymlconfig, indent, block_seq_indent = load_yaml_guess_indent(
-                        stream
+                        stream,
                     )
             except ImportError:
                 with open(VITA3K_CONFIG_PATH) as stream:
@@ -83,7 +83,7 @@ class Vita3kGenerator(Generator):
         # Set the resolution multiplier
         if system.isOptSet("vita3k_resolution"):
             vita3kymlconfig["resolution-multiplier"] = int(
-                system.config["vita3k_resolution"]
+                system.config["vita3k_resolution"],
             )
         else:
             vita3kymlconfig["resolution-multiplier"] = 1
@@ -94,7 +94,7 @@ class Vita3kGenerator(Generator):
             vita3kymlconfig["enable-fxaa"] = "false"
         # Set VSync
         if system.isOptSet("vita3k_vsync") and not system.getOptBoolean(
-            "vita3k_surface"
+            "vita3k_surface",
         ):
             vita3kymlconfig["v-sync"] = "false"
         else:
@@ -102,7 +102,7 @@ class Vita3kGenerator(Generator):
         # Set the anisotropic filtering
         if system.isOptSet("vita3k_anisotropic"):
             vita3kymlconfig["anisotropic-filtering"] = int(
-                system.config["vita3k_anisotropic"]
+                system.config["vita3k_anisotropic"],
             )
         else:
             vita3kymlconfig["anisotropic-filtering"] = 1
@@ -113,7 +113,7 @@ class Vita3kGenerator(Generator):
             vita3kymlconfig["enable-linear-filter"] = "false"
         # Surface Sync
         if system.isOptSet("vita3k_surface") and not system.getOptBoolean(
-            "vita3k_surface"
+            "vita3k_surface",
         ):
             vita3kymlconfig["disable-surface-sync"] = "false"
         else:
@@ -163,8 +163,8 @@ class Vita3kGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )
 
@@ -175,6 +175,6 @@ class Vita3kGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str
+        self, config: Any, game_resolution: dict[str, int], rom: str,
     ) -> float:
         return 16 / 9

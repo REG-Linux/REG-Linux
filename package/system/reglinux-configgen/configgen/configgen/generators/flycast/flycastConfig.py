@@ -16,7 +16,7 @@ FLYCAST_BIN_PATH = "/usr/bin/flycast"
 
 
 def setFlycastConfig(
-    flycastConfig: Any, system: Any, gameResolution: dict[str, int]
+    flycastConfig: Any, system: Any, gameResolution: dict[str, int],
 ) -> None:
     if not flycastConfig.has_section("input"):
         flycastConfig.add_section("input")
@@ -37,7 +37,7 @@ def setFlycastConfig(
     # set render resolution - default 480 (Native)
     if system.isOptSet("flycast_render_resolution"):
         flycastConfig.set(
-            "config", "rend.Resolution", str(system.config["flycast_render_resolution"])
+            "config", "rend.Resolution", str(system.config["flycast_render_resolution"]),
         )
     else:
         flycastConfig.set("config", "rend.Resolution", "480")
@@ -45,7 +45,7 @@ def setFlycastConfig(
     # wide screen mode - default off
     if system.isOptSet("flycast_ratio"):
         flycastConfig.set(
-            "config", "rend.WideScreen", str(system.config["flycast_ratio"])
+            "config", "rend.WideScreen", str(system.config["flycast_ratio"]),
         )
     else:
         flycastConfig.set("config", "rend.WideScreen", "no")
@@ -53,7 +53,7 @@ def setFlycastConfig(
     # rotate option - default off
     if system.isOptSet("flycast_rotate"):
         flycastConfig.set(
-            "config", "rend.Rotate90", str(system.config["flycast_rotate"])
+            "config", "rend.Rotate90", str(system.config["flycast_rotate"]),
         )
     else:
         flycastConfig.set("config", "rend.Rotate90", "no")
@@ -110,7 +110,7 @@ def setFlycastConfig(
     # language
     if system.isOptSet("flycast_language"):
         flycastConfig.set(
-            "config", "Dreamcast.Language", str(system.config["flycast_language"])
+            "config", "Dreamcast.Language", str(system.config["flycast_language"]),
         )
     else:
         flycastConfig.set("config", "Dreamcast.Language", "1")
@@ -118,7 +118,7 @@ def setFlycastConfig(
     # region
     if system.isOptSet("flycast_region"):
         flycastConfig.set(
-            "config", "Dreamcast.Region", str(system.config["flycast_language"])
+            "config", "Dreamcast.Region", str(system.config["flycast_language"]),
         )
     else:
         flycastConfig.set("config", "Dreamcast.Region", "1")
@@ -126,13 +126,13 @@ def setFlycastConfig(
     # save / load states
     if system.isOptSet("flycast_loadstate"):
         flycastConfig.set(
-            "config", "Dreamcast.AutoLoadState", str(system.config["flycast_loadstate"])
+            "config", "Dreamcast.AutoLoadState", str(system.config["flycast_loadstate"]),
         )
     else:
         flycastConfig.set("config", "Dreamcast.AutoLoadState", "no")
     if system.isOptSet("flycast_savestate"):
         flycastConfig.set(
-            "config", "Dreamcast.AutoSaveState", str(system.config["flycast_savestate"])
+            "config", "Dreamcast.AutoSaveState", str(system.config["flycast_savestate"]),
         )
     else:
         flycastConfig.set("config", "Dreamcast.AutoSaveState", "no")
@@ -140,7 +140,7 @@ def setFlycastConfig(
     # windows CE
     if system.isOptSet("flycast_winCE"):
         flycastConfig.set(
-            "config", "Dreamcast.ForceWindowsCE", str(system.config["flycast_winCE"])
+            "config", "Dreamcast.ForceWindowsCE", str(system.config["flycast_winCE"]),
         )
     else:
         flycastConfig.set("config", "Dreamcast.ForceWindowsCE", "no")
@@ -148,7 +148,7 @@ def setFlycastConfig(
     # DSP
     if system.isOptSet("flycast_DSP"):
         flycastConfig.set(
-            "config", "aica.DSPEnabled", str(system.config["flycast_DSP"])
+            "config", "aica.DSPEnabled", str(system.config["flycast_DSP"]),
         )
     else:
         flycastConfig.set("config", "aica.DSPEnabled", "no")

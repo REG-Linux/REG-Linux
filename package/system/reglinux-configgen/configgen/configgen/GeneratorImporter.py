@@ -1,5 +1,4 @@
-"""
-GeneratorImporter module provides functionality to dynamically import and instantiate
+"""GeneratorImporter module provides functionality to dynamically import and instantiate
 generator classes for various emulators based on a predefined mapping.
 """
 
@@ -13,7 +12,6 @@ if TYPE_CHECKING:
 class GeneratorNotFoundError(Exception):
     """Exception raised when no generator is found for the specified emulator."""
 
-    pass
 
 
 # Mapping of emulator names to their respective module paths and class names
@@ -204,7 +202,7 @@ def _load_generator_class(emulator: str) -> type["Generator"]:
         module_path, class_name = EMULATOR_MAPPING[emulator]
     except KeyError:
         raise GeneratorNotFoundError(
-            f"No generator found for emulator {emulator}"
+            f"No generator found for emulator {emulator}",
         ) from None
 
     module = import_module(module_path)
@@ -212,8 +210,7 @@ def _load_generator_class(emulator: str) -> type["Generator"]:
 
 
 def getGenerator(emulator: str) -> "Generator":
-    """
-    Returns an instance of the appropriate generator class for the specified emulator.
+    """Returns an instance of the appropriate generator class for the specified emulator.
 
     Args:
         emulator (str): The name of the emulator for which to retrieve the generator.
@@ -223,6 +220,7 @@ def getGenerator(emulator: str) -> "Generator":
 
     Raises:
         GeneratorNotFoundError: If no generator is found for the specified emulator.
+
     """
     generator_class: type[Generator] | None = PRELOADED_GENERATORS.get(emulator)
     if generator_class is None:
@@ -230,11 +228,11 @@ def getGenerator(emulator: str) -> "Generator":
             generator_class = _load_generator_class(emulator)
         except ImportError as e:
             raise GeneratorNotFoundError(
-                f"Failed to import generator for {emulator}: {e}"
+                f"Failed to import generator for {emulator}: {e}",
             ) from e
         except AttributeError as e:
             raise GeneratorNotFoundError(
-                f"Generator class not found for {emulator}: {e}"
+                f"Generator class not found for {emulator}: {e}",
             ) from e
         PRELOADED_GENERATORS[emulator] = generator_class
 

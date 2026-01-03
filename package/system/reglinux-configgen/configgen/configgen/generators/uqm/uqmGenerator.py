@@ -10,7 +10,7 @@ UQM_BIN_PATH = "/usr/bin/urquan"
 
 class UqmGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution
+        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
     ):
         directories = [
             "/userdata/saves/uqm",
@@ -34,7 +34,7 @@ class UqmGenerator(Generator):
             array=command_array,
             env={
                 "SDL_GAMECONTROLLERCONFIG": controllersConfig.generate_sdl_controller_config(
-                    players_controllers
-                )
+                    players_controllers,
+                ),
             },
         )

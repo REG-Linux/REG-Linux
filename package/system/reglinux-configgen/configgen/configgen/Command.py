@@ -5,12 +5,12 @@ class Command:
     """Represents a shell command with environment variables and arguments."""
 
     def __init__(self, array: list[str], env: Mapping[str, str] | None = None) -> None:
-        """
-        Initialize a Command instance.
+        """Initialize a Command instance.
 
         Args:
             array: List of strings representing the command and its arguments.
             env: Dictionary of environment variables. Defaults to None.
+
         """
         # Convert all elements to strings to handle PosixPath objects
         self.array: list[str] = [str(item) for item in array]
