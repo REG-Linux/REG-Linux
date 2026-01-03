@@ -1,7 +1,7 @@
-From romain.tisserand@gmail.com Sat, 03 Jan 2026 00:19:19 +0100
+From romain.tisserand@gmail.com Sat, 03 Jan 2026 00:41:33 +0100
 Subject: [PATCH] input: joystick: add mangmi MCU UART driver
 From: Romain Tisserand <romain.tisserand@gmail.com>
-Date: Sat, 03 Jan 2026 00:19:19 +0100
+Date: Sat, 03 Jan 2026 00:41:33 +0100
 
 Port the vendor Mangmi Air X joystick MCU driver to a serdev-based
 implementation and include calibration/sysfs support.
@@ -38,13 +38,14 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +obj-$(CONFIG_JOYSTICK_MANGMI_MCU)	+= mcu_joystick.o
 --- /dev/null
 +++ b/drivers/input/joystick/mcu_joystick.c
-@@ -0,0 +1,1607 @@
+@@ -0,0 +1,1705 @@
 +/*
 + * Copyright 2025-2026 REG-Linux (https://reglinux.org)
 + * Copyright 2025-2026 Romain Tisserand <romain.tisserand@gmail.com>
 + */
 +
 +#include <linux/types.h>
++#include <linux/debugfs.h>
 +#include <linux/byteorder/little_endian.h>
 +#include <linux/delay.h>
 +#include <linux/gpio/consumer.h>
@@ -56,6 +57,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +#include <linux/property.h>
 +#include <linux/pm.h>
 +#include <linux/serdev.h>
++#include <linux/seq_file.h>
 +#include <linux/slab.h>
 +#include <linux/string.h>
 +#include <linux/sysfs.h>
@@ -95,8 +97,6 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +static uint16_t RYmcuValue;
 +
 +static struct mcu_joystick *cali_keys;
-+static int rx_log_left_bytes = 64;
-+static int __maybe_unused rx_log_left_pkts = 4;
 +
 +enum boot_mode {
 +	main_flash_memory,
@@ -123,6 +123,8 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +
 +static int mcu_sysfs_create_group(struct device *dev);
 +static void mcu_sysfs_remove_group(struct device *dev);
++static void mcu_debugfs_init(struct mcu_joystick *keys);
++static void mcu_debugfs_remove(struct mcu_joystick *keys);
 +
 +static void mcu_boot_mode(struct mcu_joystick *keys, enum boot_mode mode)
 +{
@@ -387,12 +389,6 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +			keys->raw_full = true;
 +		}
 +
-+		if (rx_log_left_bytes > 0) {
-+			dev_info(keys->dev, "mcu rx raw[%d]=0x%02x\n",
-+				 64 - rx_log_left_bytes, byte);
-+			rx_log_left_bytes--;
-+		}
-+
 +		keys->rx_buf[keys->rx_pos++] = byte;
 +
 +		if (keys->rx_pos == DPAD_PKT_LEN) {
@@ -475,6 +471,8 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	if (err)
 +		goto err_unregister_gpio;
 +
++	mcu_debugfs_init(keys);
++
 +	calibration_data_init(dev);
 +
 +	err = mcu_joystick_resume(dev);
@@ -485,6 +483,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	return 0;
 +
 +err_sysfs:
++	mcu_debugfs_remove(keys);
 +	mcu_sysfs_remove_group(dev);
 +err_unregister_gpio:
 +#ifdef DPAD_GPIO_BTN
@@ -499,6 +498,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +{
 +	struct mcu_joystick *keys = serdev_device_get_drvdata(serdev);
 +
++	mcu_debugfs_remove(keys);
 +	mcu_sysfs_remove_group(&serdev->dev);
 +
 +#ifdef DPAD_GPIO_BTN
@@ -1243,25 +1243,48 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +static DEVICE_ATTR(boot_set, 0664, mcu_joystick_boot_show,
 +		   mcu_joystick_boot_store);
 +
-+static ssize_t mcu_stick_val_show(struct device *dev,
-+				  struct device_attribute *attr, char *buf)
++static int mcu_stick_val_show(struct seq_file *s, void *data)
 +{
-+	return sprintf(buf, "%d %d %d %d\n",
-+		       LXmcuValue, LYmcuValue, RXmcuValue, RYmcuValue);
++	seq_printf(s, "%d %d %d %d\n",
++		   LXmcuValue, LYmcuValue, RXmcuValue, RYmcuValue);
++	return 0;
 +}
-+static DEVICE_ATTR(mcu_stick_val, 0664, mcu_stick_val_show, NULL);
 +
-+static ssize_t mcu_trigger_val_show(struct device *dev,
-+				    struct device_attribute *attr, char *buf)
++static int mcu_stick_val_open(struct inode *inode, struct file *file)
 +{
-+	return sprintf(buf, "LT=%d RT=%d\n", LTmcuValue, RTmcuValue);
++	return single_open(file, mcu_stick_val_show, inode->i_private);
 +}
-+static DEVICE_ATTR(mcu_trigger_val, 0664, mcu_trigger_val_show, NULL);
 +
-+static ssize_t mcu_gpio_status_show(struct device *dev,
-+				    struct device_attribute *attr, char *buf)
++static const struct file_operations mcu_stick_val_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_stick_val_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_trigger_val_show(struct seq_file *s, void *data)
 +{
-+	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	seq_printf(s, "LT=%d RT=%d\n", LTmcuValue, RTmcuValue);
++	return 0;
++}
++
++static int mcu_trigger_val_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_trigger_val_show, inode->i_private);
++}
++
++static const struct file_operations mcu_trigger_val_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_trigger_val_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_gpio_status_show(struct seq_file *s, void *data)
++{
++	struct mcu_joystick *keys = s->private;
 +	int boot0 = -1, boot1 = -1, reset = -1, power = -1, stick = -1;
 +	int start = -1, select = -1, mode = -1, back = -1;
 +
@@ -1285,73 +1308,123 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	if (keys->back_gpio)
 +		back = gpiod_get_value_cansleep(keys->back_gpio);
 +
-+	return snprintf(buf, PAGE_SIZE,
-+			"boot0=%d boot1=%d reset=%d power=%d stick_en=%d start=%d select=%d mode=%d back=%d\n",
-+			boot0, boot1, reset, power, stick, start, select, mode, back);
++	seq_printf(s,
++		   "boot0=%d boot1=%d reset=%d power=%d stick_en=%d start=%d select=%d mode=%d back=%d\n",
++		   boot0, boot1, reset, power, stick, start, select, mode, back);
++	return 0;
 +}
-+static DEVICE_ATTR(gpio_status, 0444, mcu_gpio_status_show, NULL);
 +
-+static ssize_t mcu_pkt_show(struct device *dev,
-+			    struct device_attribute *attr, char *buf)
++static int mcu_gpio_status_open(struct inode *inode, struct file *file)
 +{
-+	struct mcu_joystick *keys = dev_get_drvdata(dev);
-+
-+	if (!keys->last_pkt_valid)
-+		return sysfs_emit(buf, "no data\n");
-+
-+	return sysfs_emit(buf, "seq=%u %*ph\n",
-+			  keys->last_pkt_seq, DPAD_PKT_LEN, keys->last_pkt);
++	return single_open(file, mcu_gpio_status_show, inode->i_private);
 +}
-+static DEVICE_ATTR(mcu_pkt, 0444, mcu_pkt_show, NULL);
 +
-+static ssize_t mcu_raw_show(struct device *dev,
-+			    struct device_attribute *attr, char *buf)
++static const struct file_operations mcu_gpio_status_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_gpio_status_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_pkt_show(struct seq_file *s, void *data)
 +{
-+	struct mcu_joystick *keys = dev_get_drvdata(dev);
-+	size_t head;
-+	size_t first;
-+	int off;
++	struct mcu_joystick *keys = s->private;
 +
-+	if (!keys->raw_full && keys->raw_head == 0)
-+		return sysfs_emit(buf, "no data\n");
++	if (!keys->last_pkt_valid) {
++		seq_puts(s, "no data\n");
++		return 0;
++	}
 +
-+	if (!keys->raw_full)
-+		return sysfs_emit(buf, "%*ph\n", keys->raw_head, keys->raw_buf);
++	seq_printf(s, "seq=%u %*ph\n",
++		   keys->last_pkt_seq, DPAD_PKT_LEN, keys->last_pkt);
++	return 0;
++}
++
++static int mcu_pkt_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_pkt_show, inode->i_private);
++}
++
++static const struct file_operations mcu_pkt_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_pkt_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_raw_show(struct seq_file *s, void *data)
++{
++	struct mcu_joystick *keys = s->private;
++	int head;
++	int first;
++
++	if (!keys->raw_full && keys->raw_head == 0) {
++		seq_puts(s, "no data\n");
++		return 0;
++	}
++
++	if (!keys->raw_full) {
++		seq_printf(s, "%*ph\n", (int)keys->raw_head, keys->raw_buf);
++		return 0;
++	}
 +
 +	head = keys->raw_head;
-+	if (head == 0)
-+		return sysfs_emit(buf, "%*ph\n", MCU_RAW_BUF_LEN, keys->raw_buf);
++	if (head == 0) {
++		seq_printf(s, "%*ph\n", MCU_RAW_BUF_LEN, keys->raw_buf);
++		return 0;
++	}
 +
 +	first = MCU_RAW_BUF_LEN - head;
-+	off = sysfs_emit(buf, "%*ph ", first, keys->raw_buf + head);
-+	off += sysfs_emit_at(buf, off, "%*ph\n", head, keys->raw_buf);
-+
-+	return off;
++	seq_printf(s, "%*ph ", first, keys->raw_buf + head);
++	seq_printf(s, "%*ph\n", head, keys->raw_buf);
++	return 0;
 +}
-+static DEVICE_ATTR(mcu_raw, 0444, mcu_raw_show, NULL);
 +
-+static ssize_t mcu_ids_show(struct device *dev,
-+			    struct device_attribute *attr, char *buf)
++static int mcu_raw_open(struct inode *inode, struct file *file)
 +{
-+	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	return single_open(file, mcu_raw_show, inode->i_private);
++}
++
++static const struct file_operations mcu_raw_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_raw_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_ids_show(struct seq_file *s, void *data)
++{
++	struct mcu_joystick *keys = s->private;
 +	int i;
-+	int off = 0;
 +
 +	for (i = 0; i < MCU_ID_COUNT; i++) {
 +		if (!keys->id_seen[i])
 +			continue;
 +
-+		off += sysfs_emit_at(buf, off,
-+				     "id=0x%02x flags=0x%02x val=0x%04x seen=%u\n",
-+				     i, keys->id_flags[i], keys->id_val[i],
-+				     keys->id_seen[i]);
-+		if (off >= PAGE_SIZE - 64)
-+			break;
++		seq_printf(s,
++			   "id=0x%02x flags=0x%02x val=0x%04x seen=%u\n",
++			   i, keys->id_flags[i], keys->id_val[i],
++			   keys->id_seen[i]);
 +	}
 +
-+	return off;
++	return 0;
 +}
-+static DEVICE_ATTR(mcu_ids, 0444, mcu_ids_show, NULL);
++
++static int mcu_ids_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_ids_show, inode->i_private);
++}
++
++static const struct file_operations mcu_ids_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_ids_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
 +
 +static ssize_t mcu_joystick_cali_enable_show(struct device *dev,
 +				    struct device_attribute *attr, char *buf)
@@ -1611,12 +1684,6 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +		   joystick_input_name_show, joystick_input_name_store);
 +
 +static struct attribute *mcu_joystick_attributes[] = {
-+	&dev_attr_mcu_stick_val.attr,
-+	&dev_attr_mcu_trigger_val.attr,
-+	&dev_attr_gpio_status.attr,
-+	&dev_attr_mcu_pkt.attr,
-+	&dev_attr_mcu_raw.attr,
-+	&dev_attr_mcu_ids.attr,
 +	&dev_attr_boot_set.attr,
 +	&dev_attr_cali_enable.attr,
 +	&dev_attr_joystick_R_Z_cali.attr,
@@ -1643,12 +1710,43 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	sysfs_remove_group(&dev->kobj, &mcu_joystick_attr_group);
 +}
 +
++static void mcu_debugfs_init(struct mcu_joystick *keys)
++{
++	struct dentry *dir;
++
++	dir = debugfs_create_dir(dev_name(keys->dev), NULL);
++	if (IS_ERR_OR_NULL(dir)) {
++		keys->debugfs_dir = NULL;
++		return;
++	}
++
++	keys->debugfs_dir = dir;
++	debugfs_create_file("mcu_stick_val", 0444, dir, keys,
++			    &mcu_stick_val_fops);
++	debugfs_create_file("mcu_trigger_val", 0444, dir, keys,
++			    &mcu_trigger_val_fops);
++	debugfs_create_file("gpio_status", 0444, dir, keys,
++			    &mcu_gpio_status_fops);
++	debugfs_create_file("mcu_pkt", 0444, dir, keys, &mcu_pkt_fops);
++	debugfs_create_file("mcu_raw", 0444, dir, keys, &mcu_raw_fops);
++	debugfs_create_file("mcu_ids", 0444, dir, keys, &mcu_ids_fops);
++}
++
++static void mcu_debugfs_remove(struct mcu_joystick *keys)
++{
++	if (!keys->debugfs_dir)
++		return;
++
++	debugfs_remove_recursive(keys->debugfs_dir);
++	keys->debugfs_dir = NULL;
++}
++
 +MODULE_DESCRIPTION("MCU joystick driver");
 +MODULE_AUTHOR("Romain Tisserand <romain.tisserand@gmail.com>");
 +MODULE_LICENSE("GPL");
 --- /dev/null
 +++ b/drivers/input/joystick/mcu_joystick.h
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,155 @@
 +#ifndef _MCU_JOYSTICK_H_
 +#define _MCU_JOYSTICK_H_
 +
@@ -1659,6 +1757,8 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +#include <linux/mutex.h>
 +#include <linux/serdev.h>
 +#include <linux/types.h>
++
++struct dentry;
 +
 +#define ADC_X 0x00
 +#define ADC_Y 0x01
@@ -1760,6 +1860,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +struct mcu_joystick {
 +	struct device *dev;
 +	struct serdev_device *serdev;
++	struct dentry *debugfs_dir;
 +
 +	struct gpio_desc *boot0_gpio;
 +	struct gpio_desc *boot1_gpio;
