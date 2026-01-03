@@ -9,7 +9,7 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 ---
 --- /dev/null
 +++ b/arch/arm64/boot/dts/qcom/sm6115-mangmi-air-x.dts
-@@ -0,0 +1,958 @@
+@@ -0,0 +1,1051 @@
 +// SPDX-License-Identifier: BSD-3-Clause
 +/*
 + * Copyright (c) 2025, ROCKNIX
@@ -50,6 +50,53 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +		regulator-max-microvolt = <5000000>;
 +		regulator-always-on;
 +		regulator-boot-on;
++	};
++
++	sound {
++		compatible = "qcom,qrb4210-rb2-sndcard";
++		model = "MANGMI Air X";
++		pinctrl-names = "default";
++		pinctrl-0 = <&lpi_i2s2_active>;
++
++		mm1-dai-link {
++			link-name = "MultiMedia1";
++
++			cpu {
++				sound-dai = <&q6asmdai MSM_FRONTEND_DAI_MULTIMEDIA1>;
++			};
++		};
++
++		mm2-dai-link {
++			link-name = "MultiMedia2";
++
++			cpu {
++				sound-dai = <&q6asmdai MSM_FRONTEND_DAI_MULTIMEDIA2>;
++			};
++		};
++
++		mm3-dai-link {
++			link-name = "MultiMedia3";
++
++			cpu {
++				sound-dai = <&q6asmdai MSM_FRONTEND_DAI_MULTIMEDIA3>;
++			};
++		};
++
++		es8326-be {
++			link-name = "Secondary MI2S";
++
++			cpu {
++				sound-dai = <&q6afedai SECONDARY_MI2S_RX>;
++			};
++
++			platform {
++				sound-dai = <&q6routing>;
++			};
++
++			codec {
++				sound-dai = <&es8326>;
++			};
++		};
 +	};
 +
 +	chosen {
@@ -166,6 +213,9 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	es8326: codec@18 {
 +		compatible = "everest,es8326";
 +		reg = <0x18>;
++		#sound-dai-cells = <0>;
++		clocks = <&q6afecc LPASS_CLK_ID_WSA_CORE_MCLK LPASS_CLK_ATTRIBUTE_COUPLE_NO>;
++		clock-names = "mclk";
 +		interrupts-extended = <&tlmm 65 IRQ_TYPE_LEVEL_LOW>;
 +		reset-gpios = <&tlmm 66 GPIO_ACTIVE_LOW>;
 +		status = "okay";
@@ -700,6 +750,13 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	status = "okay";
 +};
 +
++&q6afedai {
++	dai@20 {
++		reg = <SECONDARY_MI2S_RX>;
++		qcom,sd-lines = <0>;
++	};
++};
++
 +&rpm_requests {
 +	regulators-0 {
 +		compatible = "qcom,rpm-pm6125-regulators";
@@ -881,6 +938,42 @@ Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
 +	no-sdio;
 +	no-mmc;
 +	status = "okay";
++};
++
++&lpass_tlmm {
++	lpi_i2s2_active: lpi-i2s2-active-state {
++		sck-pins {
++			pins = "gpio10";
++			function = "i2s2_clk";
++			bias-disable;
++			drive-strength = <8>;
++			output-high;
++		};
++
++		ws-pins {
++			pins = "gpio11";
++			function = "i2s2_ws";
++			bias-disable;
++			drive-strength = <8>;
++			output-high;
++		};
++
++		data-pins {
++			pins = "gpio12";
++			function = "i2s2_data";
++			bias-disable;
++			drive-strength = <8>;
++			output-high;
++		};
++
++		ext-mclk1-pins {
++			pins = "gpio18";
++			function = "wsa_mclk";
++			bias-disable;
++			drive-strength = <16>;
++			output-high;
++		};
++	};
 +};
 +
 +&sleep_clk {
