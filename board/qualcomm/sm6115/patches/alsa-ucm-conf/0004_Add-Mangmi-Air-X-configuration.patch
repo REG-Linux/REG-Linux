@@ -1,0 +1,100 @@
+From 9a1a9f2f2f9f2f9f2f9f2f9f2f9f2f9f2f9f2f9f Mon Sep 17 00:00:00 2001
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Sat, 3 Jan 2026 13:15:00 +0100
+Subject: [PATCH] Add MANGMI Air X configuration
+
+---
+ ucm2/Qualcomm/sm6115/HiFi-MangmiAirX.conf | 36 +++++++++++++++++++++++++++++++
+ ucm2/Qualcomm/sm6115/MangmiAirX.conf      | 18 +++++++++++++++
+ ucm2/conf.d/X/MANGMI-Air-X.conf           |  1 +
+ ucm2/conf.d/X/X.conf                      |  1 +
+ 4 files changed, 56 insertions(+)
+ create mode 100644 ucm2/Qualcomm/sm6115/HiFi-MangmiAirX.conf
+ create mode 100644 ucm2/Qualcomm/sm6115/MangmiAirX.conf
+ create mode 120000 ucm2/conf.d/X/MANGMI-Air-X.conf
+ create mode 120000 ucm2/conf.d/X/X.conf
+
+diff --git a/ucm2/Qualcomm/sm6115/HiFi-MangmiAirX.conf b/ucm2/Qualcomm/sm6115/HiFi-MangmiAirX.conf
+new file mode 100644
+index 0000000..430605d
+--- /dev/null
++++ b/ucm2/Qualcomm/sm6115/HiFi-MangmiAirX.conf
+@@ -0,0 +1,36 @@
++# Use case configuration for MANGMI Air X.
++
++SectionVerb {
++
++	EnableSequence [
++		cset "name='SEC_MI2S_RX Audio Mixer MultiMedia1' 1"
++	]
++
++	DisableSequence [
++		cset "name='SEC_MI2S_RX Audio Mixer MultiMedia1' 0"
++	]
++
++	Value {
++		TQ "HiFi"
++	}
++}
++
++SectionDevice."Headphones" {
++	Comment "Headphones Playback"
++
++	Value {
++		PlaybackPriority 200
++		PlaybackPCM "hw:${CardId},0"
++		PlaybackMixer "default:${CardId}"
++	}
++}
++
++SectionDevice."Speaker" {
++	Comment "Speaker Playback"
++
++	Value {
++		PlaybackPriority 100
++		PlaybackPCM "hw:${CardId},0"
++		PlaybackMixer "default:${CardId}"
++	}
++}
+diff --git a/ucm2/Qualcomm/sm6115/MangmiAirX.conf b/ucm2/Qualcomm/sm6115/MangmiAirX.conf
+new file mode 100644
+index 0000000..427fa99
+--- /dev/null
++++ b/ucm2/Qualcomm/sm6115/MangmiAirX.conf
+@@ -0,0 +1,18 @@
++Syntax 4
++
++SectionUseCase."HiFi" {
++	File "/Qualcomm/sm6115/HiFi-MangmiAirX.conf"
++	Comment "HiFi quality Music."
++}
++
++BootSequence [
++	cset "name='SEC_MI2S_RX Audio Mixer MultiMedia1' 1"
++	cset "name='DAC' 80%"
++	cset "name='HPL' 80%"
++	cset "name='HPR' 80%"
++	cset "name='SPKL' 80%"
++	cset "name='SPKR' 80%"
++]
++
++Include.card-init.File "/lib/card-init.conf"
++Include.ctl-remap.File "/lib/ctl-remap.conf"
+diff --git a/ucm2/conf.d/X/MANGMI-Air-X.conf b/ucm2/conf.d/X/MANGMI-Air-X.conf
+new file mode 120000
+index 0000000..31cd4c1
+--- /dev/null
++++ b/ucm2/conf.d/X/MANGMI-Air-X.conf
+@@ -0,0 +1 @@
++../../Qualcomm/sm6115/MangmiAirX.conf
+\ No newline at end of file
+diff --git a/ucm2/conf.d/X/X.conf b/ucm2/conf.d/X/X.conf
+new file mode 120000
+index 0000000..55c9b1c
+--- /dev/null
++++ b/ucm2/conf.d/X/X.conf
+@@ -0,0 +1 @@
++MANGMI-Air-X.conf
+\ No newline at end of file
+-- 
+2.43.1
