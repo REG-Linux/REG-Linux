@@ -1,0 +1,13 @@
+diff --git a/src/Common/CMakeLists.txt b/src/Common/CMakeLists.txt
+index 971dfd8..e7f642d 100644
+--- a/src/Common/CMakeLists.txt
++++ b/src/Common/CMakeLists.txt
+@@ -46,7 +46,7 @@ PRIVATE
+ )
+ endif()
+ 
+-if(LINUX)
++if(UNIX)
+ 	target_sources(CemuCommon PRIVATE
+ 		ExceptionHandler/ELFSymbolTable.cpp
+ 		ExceptionHandler/ELFSymbolTable.h
