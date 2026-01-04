@@ -8,7 +8,7 @@ index 202fc5cc74..248f42241a 100644
  
 -# When updating the version, please also update mesa3d-headers
 -MESA3D_VERSION = 24.0.9
-+MESA3D_VERSION = 25.3.2
++MESA3D_VERSION = 25.3.3
  MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
  MESA3D_SITE = https://archive.mesa3d.org
 +
