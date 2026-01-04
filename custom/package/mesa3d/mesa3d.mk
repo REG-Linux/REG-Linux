@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA3D_VERSION = 25.3.2
+MESA3D_VERSION = 25.3.3
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://archive.mesa3d.org
 
