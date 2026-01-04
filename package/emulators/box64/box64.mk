@@ -3,8 +3,8 @@
 # BOX64 emulator
 #
 ################################################################################
-# Version.: Release on Oct 14th, 2025
-BOX64_VERSION = v0.3.8
+# Version.: Release on Jan 3rd, 2026
+BOX64_VERSION = v0.4.0
 BOX64_SITE = https://github.com/ptitseb/box64
 BOX64_SITE_METHOD=git
 BOX64_LICENSE = GPLv3
@@ -26,7 +26,7 @@ else  ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3399),y)
 BOX64_CONF_OPTS += -DRK3399=ON
 else  ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_RK3588),y)
 BOX64_CONF_OPTS += -DRK3588=ON
-else  ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_S922X)$(BR2_PACKAGE_SYSTEM_TARGET_A3GEN2),y)
+else  ifeq ($(BR2_cortex_a73_a53),y)
 BOX64_CONF_OPTS += -DODROIDN2=ON
 else  ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
 BOX64_CONF_OPTS += -DM1=ON

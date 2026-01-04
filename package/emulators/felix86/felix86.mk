@@ -3,8 +3,8 @@
 # Felix86 emulator
 #
 ################################################################################
-# Version.: Release on Oct 4, 2025
-FELIX86_VERSION = 25.10
+# Version.: Release on Jan 1st, 2026
+FELIX86_VERSION = 26.01
 FELIX86_SITE = https://github.com/OFFTKP/felix86
 FELIX86_SITE_METHOD=git
 FELIX86_LICENSE = GPLv3
