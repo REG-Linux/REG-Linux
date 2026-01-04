@@ -90,13 +90,15 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
         # Check if we have a discrete GPU & if so, set the UUID
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
+                ["/usr/bin/system-vulkan", "hasVulkan"],
+                text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
                     have_discrete = check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
+                        ["/usr/bin/system-vulkan", "hasDiscrete"],
+                        text=True,
                     ).strip()
                     if have_discrete == "true":
                         eslog.debug(
@@ -104,7 +106,8 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
                         )
                         try:
                             discrete_uuid = check_output(
-                                ["/usr/bin/system-vulkan", "discreteUUID"], text=True,
+                                ["/usr/bin/system-vulkan", "discreteUUID"],
+                                text=True,
                             ).strip()
                             if discrete_uuid != "":
                                 discrete_uuid_num = discrete_uuid.replace("-", "")
@@ -148,21 +151,30 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
     # Upscale Filter
     if system.isOptSet("cemu_upscale"):
         setSectionConfig(
-            cemuConfig, graphic_root, "UpscaleFilter", system.config["cemu_upscale"],
+            cemuConfig,
+            graphic_root,
+            "UpscaleFilter",
+            system.config["cemu_upscale"],
         )
     else:
         setSectionConfig(cemuConfig, graphic_root, "UpscaleFilter", "2")  # Hermite
     # Downscale Filter
     if system.isOptSet("cemu_downscale"):
         setSectionConfig(
-            cemuConfig, graphic_root, "DownscaleFilter", system.config["cemu_downscale"],
+            cemuConfig,
+            graphic_root,
+            "DownscaleFilter",
+            system.config["cemu_downscale"],
         )
     else:
         setSectionConfig(cemuConfig, graphic_root, "DownscaleFilter", "0")  # Bilinear
     # Aspect Ratio
     if system.isOptSet("cemu_aspect"):
         setSectionConfig(
-            cemuConfig, graphic_root, "FullscreenScaling", system.config["cemu_aspect"],
+            cemuConfig,
+            graphic_root,
+            "FullscreenScaling",
+            system.config["cemu_aspect"],
         )
     else:
         setSectionConfig(cemuConfig, graphic_root, "FullscreenScaling", "0")  # Bilinear
@@ -223,7 +235,10 @@ def setCemuConfig(cemuConfig: Any, system: Any) -> None:
     # Turn audio ONLY on TV
     if system.isOptSet("cemu_audio_channels"):
         setSectionConfig(
-            cemuConfig, audio_root, "TVChannels", system.config["cemu_audio_channels"],
+            cemuConfig,
+            audio_root,
+            "TVChannels",
+            system.config["cemu_audio_channels"],
         )
     else:
         setSectionConfig(cemuConfig, audio_root, "TVChannels", "1")  # Stereo

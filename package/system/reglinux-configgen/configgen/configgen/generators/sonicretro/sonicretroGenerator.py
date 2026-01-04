@@ -9,7 +9,14 @@ from .sonicretroConfig import setSonicretroConfig
 
 class SonicRetroGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Determine the emulator to use
         emu = "sonic2013" if (rom.lower()).endswith("son") else "soniccd"

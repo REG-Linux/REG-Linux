@@ -213,7 +213,10 @@ def configure_sony_controller(
 
 
 def configure_evdev_controller(
-    f: Any, pad: Any, nplayer: int, mapping_dict: Any,
+    f: Any,
+    pad: Any,
+    nplayer: int,
+    mapping_dict: Any,
 ) -> None:
     """Configure EVDEV controllers"""
     f.write(f"Player {nplayer} Input:\n")
@@ -231,11 +234,8 @@ def configure_evdev_controller(
             config_name = mapping_dict[input.name]["config_name"]
             event_variations = mapping_dict[input.name]["event_variations"]
             for event_type, value_name in event_variations:
-                if (
-                    ("BTN" in event_type
-                    and input.type == "button")
-                    or ("HAT" in event_type
-                    and input.type == "hat")
+                if ("BTN" in event_type and input.type == "button") or (
+                    "HAT" in event_type and input.type == "hat"
                 ):
                     f.write(f"    {config_name}: {value_name}\n")
                 elif "ABS" in event_type and input.type == "axis":
@@ -303,7 +303,10 @@ def configure_evdev_controller(
 
 
 def configure_sdl_controller(
-    f: Any, pad: Any, nplayer: int, controller_counts: Any,
+    f: Any,
+    pad: Any,
+    nplayer: int,
+    controller_counts: Any,
 ) -> None:
     """Configure SDL controllers (default fallback)"""
     f.write(f"Player {nplayer} Input:\n")

@@ -25,7 +25,14 @@ class SupermodelGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         command_array = [SUPERMODEL_BIN_PATH, "-fullscreen", "-channels=2"]
 
@@ -260,21 +267,30 @@ def configPadsIni(
                 return True
             if key == "InputStart1":
                 val = transformElement(
-                    "JOY1_BUTTON9", players_controllers, mapping, mapping_fallback,
+                    "JOY1_BUTTON9",
+                    players_controllers,
+                    mapping,
+                    mapping_fallback,
                 )
                 val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "MOUSE1_BUTTONX1" + val)
                 return True
             if key == "InputCoin1":
                 val = transformElement(
-                    "JOY1_BUTTON10", players_controllers, mapping, mapping_fallback,
+                    "JOY1_BUTTON10",
+                    players_controllers,
+                    mapping,
+                    mapping_fallback,
                 )
                 val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "MOUSE1_BUTTONX2" + val)
                 return True
             if key == "InputAnalogJoyEvent":
                 val = transformElement(
-                    "JOY1_BUTTON2", players_controllers, mapping, mapping_fallback,
+                    "JOY1_BUTTON2",
+                    players_controllers,
+                    mapping,
+                    mapping_fallback,
                 )
                 val = "," + val if val is not None else ""
                 targetConfig.set(section, key, "KEY_S,MOUSE1_MIDDLE_BUTTON" + val)
@@ -304,21 +320,30 @@ def configPadsIni(
                     return True
                 if key == "InputStart2":
                     val = transformElement(
-                        "JOY2_BUTTON9", players_controllers, mapping, mapping_fallback,
+                        "JOY2_BUTTON9",
+                        players_controllers,
+                        mapping,
+                        mapping_fallback,
                     )
                     val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_BUTTONX1" + val)
                     return True
                 if key == "InputCoin1":
                     val = transformElement(
-                        "JOY2_BUTTON10", players_controllers, mapping, mapping_fallback,
+                        "JOY2_BUTTON10",
+                        players_controllers,
+                        mapping,
+                        mapping_fallback,
                     )
                     val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_BUTTONX2" + val)
                     return True
                 if key == "InputAnalogJoyEvent2":
                     val = transformElement(
-                        "JOY2_BUTTON2", players_controllers, mapping, mapping_fallback,
+                        "JOY2_BUTTON2",
+                        players_controllers,
+                        mapping,
+                        mapping_fallback,
                     )
                     val = val + "," + val if val is not None else ""
                     targetConfig.set(section, key, "MOUSE2_MIDDLE_BUTTON" + val)
@@ -398,7 +423,10 @@ def configPadsIni(
 
 
 def transformValue(
-    value: str, players_controllers: Any, mapping: Any, mapping_fallback: Any,
+    value: str,
+    players_controllers: Any,
+    mapping: Any,
+    mapping_fallback: Any,
 ) -> str:
     # remove comments
     cleanValue = value
@@ -410,7 +438,10 @@ def transformValue(
         newvalue = ""
         for elt in cleanValue[1:-1].split(","):
             newelt = transformElement(
-                elt, players_controllers, mapping, mapping_fallback,
+                elt,
+                players_controllers,
+                mapping,
+                mapping_fallback,
             )
             if newelt is not None:
                 if newvalue != "":
@@ -422,7 +453,10 @@ def transformValue(
 
 
 def transformElement(
-    elt: str, players_controllers: Any, mapping: Any, mapping_fallback: Any,
+    elt: str,
+    players_controllers: Any,
+    mapping: Any,
+    mapping_fallback: Any,
 ) -> str | None:
     # Docs/README.txt
     # JOY1_LEFT  is the same as JOY1_XAXIS_NEG
@@ -444,7 +478,11 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_up = "up" if joy_type == "hat" else "axisY"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_up, mapping, mapping_fallback,
+            players_controllers,
+            matches.group(1),
+            key_up,
+            mapping,
+            mapping_fallback,
         )
         eslog.debug(mp)
         return input2input(
@@ -459,7 +497,11 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_down = "down" if joy_type == "hat" else "axisY"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_down, mapping, mapping_fallback,
+            players_controllers,
+            matches.group(1),
+            key_down,
+            mapping,
+            mapping_fallback,
         )
         return input2input(
             players_controllers,
@@ -473,7 +515,11 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_left = "left" if joy_type == "hat" else "axisX"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_left, mapping, mapping_fallback,
+            players_controllers,
+            matches.group(1),
+            key_left,
+            mapping,
+            mapping_fallback,
         )
         return input2input(
             players_controllers,
@@ -487,7 +533,11 @@ def transformElement(
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_right = "right" if joy_type == "hat" else "axisX"
         mp = getMappingKeyIncludingFallback(
-            players_controllers, matches.group(1), key_right, mapping, mapping_fallback,
+            players_controllers,
+            matches.group(1),
+            key_right,
+            mapping,
+            mapping_fallback,
         )
         return input2input(
             players_controllers,

@@ -11,7 +11,14 @@ EASYRPG_BIN_PATH = "/usr/bin/easyrpg-player"
 
 class EasyRPGGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         command_array = [EASYRPG_BIN_PATH]
 

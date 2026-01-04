@@ -187,7 +187,8 @@ class MameGenerator(Generator):
                 cfgPath = Path("/userdata/system/configs/mame/")
             if not Path("/userdata/system/configs/mame/").exists():
                 Path("/userdata/system/configs/mame/").mkdir(
-                    parents=True, exist_ok=True,
+                    parents=True,
+                    exist_ok=True,
                 )
         else:
             if customCfg:
@@ -202,7 +203,8 @@ class MameGenerator(Generator):
                 Path("/userdata/system/configs/mame/") / messSysName[messMode]
             ).exists():
                 (Path("/userdata/system/configs/mame/") / messSysName[messMode]).mkdir(
-                    parents=True, exist_ok=True,
+                    parents=True,
+                    exist_ok=True,
                 )
         if not cfgPath.exists():
             cfgPath.mkdir(parents=True, exist_ok=True)
@@ -219,7 +221,8 @@ class MameGenerator(Generator):
             ).exists()
         ):
             (Path("/userdata/system/configs/mame/") / messSysName[messMode]).mkdir(
-                parents=True, exist_ok=True,
+                parents=True,
+                exist_ok=True,
             )
             cfgPath = (
                 Path("/userdata/system/configs/mame/")

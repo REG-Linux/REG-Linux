@@ -27,7 +27,14 @@ class MoonlightGenerator(Generator):
     # Main entry of the module
     # Configure fba and return a command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         staging_dir = Path(MOONLIGHT_CONFIG_DIR) / "staging"
         if not staging_dir.exists():

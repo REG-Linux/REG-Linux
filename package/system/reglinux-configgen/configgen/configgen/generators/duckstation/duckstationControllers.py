@@ -53,7 +53,9 @@ def setDuckstationControllers(
             # SDL2 configs are always the same for controllers
             if system.isOptSet("duckstation_" + ctrl_num):
                 duckstatonConfig.set(
-                    pad_num, "Type", system.config["duckstation_" + ctrl_num],
+                    pad_num,
+                    "Type",
+                    system.config["duckstation_" + ctrl_num],
                 )
             else:
                 duckstatonConfig.set(pad_num, "Type", "DigitalController")
@@ -151,14 +153,18 @@ def setDuckstationControllers(
                 ):
                     duckstatonConfig.set(pad_num, "Trigger", sdl_num + "/+RightTrigger")
                     duckstatonConfig.set(
-                        pad_num, "ShootOffscreen", sdl_num + "/+LeftTrigger",
+                        pad_num,
+                        "ShootOffscreen",
+                        sdl_num + "/+LeftTrigger",
                     )
                     duckstatonConfig.set(pad_num, "A", sdl_num + "/A")
                     duckstatonConfig.set(pad_num, "B", sdl_num + "/B")
             # Guns crosshair
             if system.isOptSet("duckstation_crosshair"):
                 duckstatonConfig.set(
-                    pad_num, "CrosshairScale", system.config["duckstation_crosshair"],
+                    pad_num,
+                    "CrosshairScale",
+                    system.config["duckstation_crosshair"],
                 )
             else:
                 duckstatonConfig.set(pad_num, "CrosshairScale", "0")

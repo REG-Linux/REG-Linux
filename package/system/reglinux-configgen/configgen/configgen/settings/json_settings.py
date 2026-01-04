@@ -39,10 +39,12 @@ class JSONSettings:
         if not self.filepath.exists():
             try:
                 self.filepath.parent.mkdir(
-                    parents=True, exist_ok=True,
+                    parents=True,
+                    exist_ok=True,
                 )  # Create parent directories
                 self.filepath.write_text(
-                    "{}", encoding="utf-8",
+                    "{}",
+                    encoding="utf-8",
                 )  # Create empty JSON file
                 self._logger.info(f"Created new JSON file: {self.filepath}")
             except Exception as e:
@@ -81,7 +83,10 @@ class JSONSettings:
         try:
             with self.filepath.open("w", encoding="utf-8") as f:
                 json.dump(
-                    self._data, f, indent=indent, ensure_ascii=False,
+                    self._data,
+                    f,
+                    indent=indent,
+                    ensure_ascii=False,
                 )  # Write data to file
             return True
         except Exception as e:

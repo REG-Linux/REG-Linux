@@ -334,13 +334,15 @@ def createLibretroConfig(
     if system.isOptSet("gfxbackend") and system.config["gfxbackend"] == "vulkan":
         try:
             have_vulkan = subprocess.check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
+                ["/usr/bin/system-vulkan", "hasVulkan"],
+                text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
                     have_discrete = subprocess.check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
+                        ["/usr/bin/system-vulkan", "hasDiscrete"],
+                        text=True,
                     ).strip()
                     if have_discrete == "true":
                         eslog.debug(
@@ -348,7 +350,8 @@ def createLibretroConfig(
                         )
                         try:
                             discrete_index = subprocess.check_output(
-                                ["/usr/bin/system-vulkan", "discreteIndex"], text=True,
+                                ["/usr/bin/system-vulkan", "discreteIndex"],
+                                text=True,
                             ).strip()
                             if discrete_index != "":
                                 eslog.debug(
@@ -1108,10 +1111,12 @@ def createLibretroConfig(
         ):
             retroarchConfig["cheevos_enable"] = "true"
             retroarchConfig["cheevos_username"] = systemConfig.get(
-                "retroachievements.username", "",
+                "retroachievements.username",
+                "",
             )
             retroarchConfig["cheevos_password"] = systemConfig.get(
-                "retroachievements.password", "",
+                "retroachievements.password",
+                "",
             )
             retroarchConfig["cheevos_cmd"] = (
                 "/usr/share/reglinux/configgen/call_achievements_hooks.sh"
@@ -1198,10 +1203,12 @@ def createLibretroConfig(
             # But client needs netplay_mode = true ... bug ?
             retroarchConfig["netplay_mode"] = "true"
             retroarchConfig["netplay_ip_address"] = systemConfig.get(
-                "netplay.server.ip", "",
+                "netplay.server.ip",
+                "",
             )
             retroarchConfig["netplay_ip_port"] = systemConfig.get(
-                "netplay.server.port", "",
+                "netplay.server.port",
+                "",
             )
             retroarchConfig["netplay_client_swap_input"] = "true"
 
@@ -1259,7 +1266,8 @@ def createLibretroConfig(
         ):
             retroarchConfig["netplay_use_mitm_server"] = "true"
             retroarchConfig["netplay_mitm_server"] = systemConfig.get(
-                "netplay.relay", "",
+                "netplay.relay",
+                "",
             )
         else:
             retroarchConfig["netplay_use_mitm_server"] = "false"
@@ -1490,13 +1498,11 @@ def createLibretroConfig(
                             ragunconf["device_p" + str(nplayer)]
                         )
                     elif "device" in ragunconf:
-                        retroarchConfig[
-                            "input_libretro_device_p" + str(nplayer)
-                        ] = ragunconf["device"]
+                        retroarchConfig["input_libretro_device_p" + str(nplayer)] = (
+                            ragunconf["device"]
+                        )
                     else:
-                        retroarchConfig[
-                            "input_libretro_device_p" + str(nplayer)
-                        ] = ""
+                        retroarchConfig["input_libretro_device_p" + str(nplayer)] = ""
                     configureGunInputsForPlayer(
                         nplayer,
                         guns[ragunconf["p" + str(nplayer)]],

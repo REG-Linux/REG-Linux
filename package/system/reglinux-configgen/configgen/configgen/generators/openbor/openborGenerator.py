@@ -17,7 +17,14 @@ OPENBOR_ROMS_DIR = str(ROMS / "openbor")
 class OpenborGenerator(Generator):
     # Main entry of the module
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         conf_dir_path = Path(OPENBOR_CONF_DIR)
         if not conf_dir_path.exists():

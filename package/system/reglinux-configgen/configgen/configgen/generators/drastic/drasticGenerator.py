@@ -18,7 +18,14 @@ from .drasticControllers import setDrasticController
 
 class DrasticGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Create the config directory if it doesn't exist
         config_user_dir = Path(DRASTIC_CONFIG_DIR_USER)
