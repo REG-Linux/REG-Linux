@@ -77,7 +77,11 @@ def generatePadsConfig(
     # Handle special controllers
     config_alt, configFile_alt, xml_input_alt, overwriteSystem = (
         _handle_special_controllers(
-            sysName, specialController, cfgPath, customCfg, decorations,
+            sysName,
+            specialController,
+            cfgPath,
+            customCfg,
+            decorations,
         )
     )
 
@@ -106,7 +110,12 @@ def generatePadsConfig(
     # Configure additional guns if needed
     if useGuns and len(guns) > len(playersControllers):
         _configure_additional_guns(
-            config, xml_input, playersControllers, guns, gunmappings, system,
+            config,
+            xml_input,
+            playersControllers,
+            guns,
+            gunmappings,
+            system,
         )
 
     # Save main config file
@@ -144,7 +153,8 @@ def _load_control_mappings() -> dict[str, dict[str, str]]:
 
 
 def _initialize_main_config(
-    cfg_path: str, custom_cfg: bool,
+    cfg_path: str,
+    custom_cfg: bool,
 ) -> tuple[Document, str, bool]:
     """Initialize main configuration document and determine overwrite status."""
     config = Document()
@@ -167,7 +177,8 @@ def _get_base_mappings(control_dict: dict[str, dict[str, str]]) -> dict[str, str
 
 
 def _get_gun_mappings(
-    control_dict: dict[str, dict[str, str]], use_guns: bool,
+    control_dict: dict[str, dict[str, str]],
+    use_guns: bool,
 ) -> dict[str, str]:
     """Get gun button mappings if guns are enabled."""
     gunmappings = {}
@@ -178,7 +189,8 @@ def _get_gun_mappings(
 
 
 def _get_mouse_mappings(
-    control_dict: dict[str, dict[str, str]], use_mouse: bool,
+    control_dict: dict[str, dict[str, str]],
+    use_mouse: bool,
 ) -> dict[str, str]:
     """Get mouse button mappings if mouse is enabled."""
     mousemappings = {}
@@ -189,7 +201,9 @@ def _get_mouse_mappings(
 
 
 def _update_alt_mappings(
-    mappings: dict[str, str], control_dict: dict[str, dict[str, str]], alt_buttons: str,
+    mappings: dict[str, str],
+    control_dict: dict[str, dict[str, str]],
+    alt_buttons: str,
 ):
     """Update mappings with alternative button configuration."""
     for control_def in control_dict[alt_buttons]:
@@ -348,7 +362,9 @@ def _handle_special_controllers(
 
 
 def _configure_lcd_display(
-    config_alt: minidom.Document, xml_system_alt: Any, decorations: str,
+    config_alt: minidom.Document,
+    xml_system_alt: Any,
+    decorations: str,
 ):
     """Configure LCD display settings for CD-i."""
     removeSection(config_alt, xml_system_alt, "video")
@@ -762,7 +778,11 @@ def _configure_additional_guns(
         addCommonPlayerPorts(config, xml_input, gunnum)
         for mapping in gunmappings:
             gun_port = generateGunPortElement(
-                config, gunnum, mapping, gunmappings, pedalkey,
+                config,
+                gunnum,
+                mapping,
+                gunmappings,
+                pedalkey,
             )
             if gun_port is not None:
                 xml_input.appendChild(gun_port)
@@ -843,7 +863,14 @@ def generatePortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     keyval = input2definition(
-        pad, key, input, padindex, reversed, altButtons, False, isWheel,
+        pad,
+        key,
+        input,
+        padindex,
+        reversed,
+        altButtons,
+        False,
+        isWheel,
     )
     if mapping in gunmappings:
         keyval = keyval + f" OR GUNCODE_{nplayer}_{gunmappings[mapping]}"

@@ -20,7 +20,14 @@ SONIC3AIR_BIN_PATH = "/usr/bin/sonic3-air/sonic3air_linux"
 
 class Sonic3AIRGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # copy configuration json files so we can manipulate them
         config_dest_path = Path(SONIC3AIR_DEST_CONFIG_PATH)
@@ -58,7 +65,8 @@ class Sonic3AIRGenerator(Generator):
             str(game_resolution["width"]) + " x " + str(game_resolution["height"])
         )
         json_text = json_text.replace(
-            f'"WindowSize": "{current_resolution}"', f'"WindowSize": "{new_resolution}"',
+            f'"WindowSize": "{current_resolution}"',
+            f'"WindowSize": "{new_resolution}"',
         )
 
         with open(SONIC3AIR_DEST_CONFIG_PATH, "w") as file:
@@ -94,6 +102,9 @@ class Sonic3AIRGenerator(Generator):
         return False
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         return 16 / 9

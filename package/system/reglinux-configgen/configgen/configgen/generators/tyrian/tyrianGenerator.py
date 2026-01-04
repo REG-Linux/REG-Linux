@@ -15,7 +15,14 @@ eslog = get_logger(__name__)
 
 class TyrianGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         try:
             chdir(TYRIAN_ROMS_DIR)
@@ -43,6 +50,9 @@ class TyrianGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         return 16 / 9

@@ -20,7 +20,14 @@ eslog = get_logger(__name__)
 
 class CannonballGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         config_dir_path = Path(CANNONBALL_CONFIG_PATH).parent
         if not config_dir_path.exists():

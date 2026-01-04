@@ -17,7 +17,14 @@ SDLPOP_SOURCE_SCREENSHOTS_DIR = "/usr/share/SDLPoP/screenshots"
 
 class SdlPopGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         command_array = ["SDLPoP"]
 

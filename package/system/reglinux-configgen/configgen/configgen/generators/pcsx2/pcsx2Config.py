@@ -97,7 +97,10 @@ def set_option_with_default(
 
 # Helper function to set boolean configuration options
 def set_boolean_option(
-    config: ConfigParser, section: str, option: str, value: str,
+    config: ConfigParser,
+    section: str,
+    option: str,
+    value: str,
 ) -> None:
     """Sets a boolean configuration option based on the input value.
 
@@ -210,7 +213,11 @@ def setPcsx2Config(
 
     # Outras configurações
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore", "EnableCheats", "pcsx2_cheats",
+        pcsx2INIConfig,
+        system,
+        "EmuCore",
+        "EnableCheats",
+        "pcsx2_cheats",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -295,7 +302,8 @@ def setPcsx2Config(
     # Check Vulkan first to be sure
     try:
         have_vulkan = check_output(
-            ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
+            ["/usr/bin/system-vulkan", "hasVulkan"],
+            text=True,
         ).strip()
         if have_vulkan == "true":
             eslog.debug("Vulkan driver is available on the system.")
@@ -310,7 +318,8 @@ def setPcsx2Config(
                     renderer = "14"
                     try:
                         have_discrete = check_output(
-                            ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
+                            ["/usr/bin/system-vulkan", "hasDiscrete"],
+                            text=True,
                         ).strip()
                         if have_discrete == "true":
                             eslog.debug(
@@ -326,12 +335,16 @@ def setPcsx2Config(
                                         f"Using Discrete GPU Name: {discrete_name} for PCSX2",
                                     )
                                     pcsx2INIConfig.set(
-                                        "EmuCore/GS", "Adapter", discrete_name,
+                                        "EmuCore/GS",
+                                        "Adapter",
+                                        discrete_name,
                                     )
                                 else:
                                     eslog.debug("Couldn't get discrete GPU Name")
                                     pcsx2INIConfig.set(
-                                        "EmuCore/GS", "Adapter", "(Default)",
+                                        "EmuCore/GS",
+                                        "Adapter",
+                                        "(Default)",
                                     )
                             except CalledProcessError as e:
                                 eslog.debug(f"Error getting discrete GPU Name: {e}")
@@ -365,7 +378,12 @@ def setPcsx2Config(
         "Auto 4:3/3:2",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "VsyncEnable", "pcsx2_vsync", "0",
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "VsyncEnable",
+        "pcsx2_vsync",
+        "0",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -376,7 +394,12 @@ def setPcsx2Config(
         "1",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "fxaa", "pcsx2_fxaa", "false",
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "fxaa",
+        "pcsx2_fxaa",
+        "false",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -387,7 +410,12 @@ def setPcsx2Config(
         "Auto 4:3/3:2",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "mipmap_hw", "pcsx2_mipmapping", "-1",
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "mipmap_hw",
+        "pcsx2_mipmapping",
+        "-1",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -406,7 +434,12 @@ def setPcsx2Config(
         "0",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "dithering_ps2", "pcsx2_dithering", "2",
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "dithering_ps2",
+        "pcsx2_dithering",
+        "2",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -425,10 +458,20 @@ def setPcsx2Config(
         "0",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "pcrtc_antiblur", "pcsx2_blur", "true",
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "pcrtc_antiblur",
+        "pcsx2_blur",
+        "true",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "IntegerScaling", "pcsx2_scaling", "false",
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "IntegerScaling",
+        "pcsx2_scaling",
+        "false",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -439,7 +482,12 @@ def setPcsx2Config(
         "1",
     )
     set_option_with_default(
-        pcsx2INIConfig, system, "EmuCore/GS", "filter", "pcsx2_texture_filtering", "2",
+        pcsx2INIConfig,
+        system,
+        "EmuCore/GS",
+        "filter",
+        "pcsx2_texture_filtering",
+        "2",
     )
     set_option_with_default(
         pcsx2INIConfig,
@@ -527,27 +575,33 @@ def setPcsx2Config(
     ):
         pcsx2INIConfig.remove_option("USB2", "Type")
     if pcsx2INIConfig.has_section("USB1") and pcsx2INIConfig.has_option(
-        "USB1", "guncon2_Start",
+        "USB1",
+        "guncon2_Start",
     ):
         pcsx2INIConfig.remove_option("USB1", "guncon2_Start")
     if pcsx2INIConfig.has_section("USB2") and pcsx2INIConfig.has_option(
-        "USB2", "guncon2_Start",
+        "USB2",
+        "guncon2_Start",
     ):
         pcsx2INIConfig.remove_option("USB2", "guncon2_Start")
     if pcsx2INIConfig.has_section("USB1") and pcsx2INIConfig.has_option(
-        "USB1", "guncon2_C",
+        "USB1",
+        "guncon2_C",
     ):
         pcsx2INIConfig.remove_option("USB1", "guncon2_C")
     if pcsx2INIConfig.has_section("USB2") and pcsx2INIConfig.has_option(
-        "USB2", "guncon2_C",
+        "USB2",
+        "guncon2_C",
     ):
         pcsx2INIConfig.remove_option("USB2", "guncon2_C")
     if pcsx2INIConfig.has_section("USB1") and pcsx2INIConfig.has_option(
-        "USB1", "guncon2_numdevice",
+        "USB1",
+        "guncon2_numdevice",
     ):
         pcsx2INIConfig.remove_option("USB1", "guncon2_numdevice")
     if pcsx2INIConfig.has_section("USB2") and pcsx2INIConfig.has_option(
-        "USB2", "guncon2_numdevice",
+        "USB2",
+        "guncon2_numdevice",
     ):
         pcsx2INIConfig.remove_option("USB2", "guncon2_numdevice")
 
@@ -803,7 +857,8 @@ def setPcsx2Config(
 
     # Function to determine the number of multitaps
     def get_multitap_config(
-        system: Any, controllers: Any,
+        system: Any,
+        controllers: Any,
     ) -> tuple[int, dict[str, str]]:
         multiTap = 2
         multitap_settings = {"MultitapPort1": "false", "MultitapPort2": "false"}

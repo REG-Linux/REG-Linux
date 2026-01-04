@@ -103,7 +103,12 @@ def main(args: Any, maxnbplayers: int) -> int:
 
 
 def _start_evmapy_async(
-    system: Any, emulator: str, core: str, rom: str, players_controllers: Any, guns: Any,
+    system: Any,
+    emulator: str,
+    core: str,
+    rom: str,
+    players_controllers: Any,
+    guns: Any,
 ) -> Thread:
     """Starts Evmapy asynchronously in a background thread.
 
@@ -181,7 +186,11 @@ def _setup_system_emulator(args: Any, rom: str) -> Any:
 
 
 def _configure_special_devices(
-    args: Any, system: Any, rom: str, metadata: Any, players_controllers: Any,
+    args: Any,
+    system: Any,
+    rom: str,
+    metadata: Any,
+    players_controllers: Any,
 ) -> tuple[Any, Any, Any, Any]:
     """Configures light guns and racing wheels."""
     if not system.isOptSet("use_guns") and args.lightgun:
@@ -201,7 +210,10 @@ def _configure_special_devices(
         device_infos = controllers.getDevicesInformation()
         (wheel_processes, players_controllers, device_infos) = (
             wheelsUtils.reconfigure_controllers(
-                players_controllers, system, rom, metadata,
+                players_controllers,
+                system,
+                rom,
+                metadata,
             )
         )
         wheels = wheelsUtils.get_wheels_from_device_infos(device_infos)
@@ -213,7 +225,9 @@ def _configure_special_devices(
 
 
 def _setup_video_and_mouse(
-    system: Any, generator: Any, rom: str,
+    system: Any,
+    generator: Any,
+    rom: str,
 ) -> tuple[Any, bool, bool, dict[str, int]]:
     """Sets up video mode and mouse visibility for the game."""
     wanted_game_mode = generator.getResolutionMode(system.config)
@@ -441,7 +455,13 @@ def _prepare_emulator_command(
 
     # Generate the command line for emulator execution
     cmd = generator.generate(
-        system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     )
 
     # Configure MangoHUD if enabled
@@ -477,7 +497,9 @@ def _run_emulator_with_profiler(cmd: Any) -> int:
 
 
 def _cleanup_emulator_resources(
-    generator: Any, evmapy_thread: Any, system: Any,
+    generator: Any,
+    evmapy_thread: Any,
+    system: Any,
 ) -> None:
     """Cleans up resources after the emulator exits.
 
@@ -541,7 +563,13 @@ def _launch_emulator_process(
     try:
         # Setup Evmapy and compositor
         evmapy_thread = _setup_evmapy_and_compositor(
-            generator, system, rom, players_controllers, guns, args, rom_configuration,
+            generator,
+            system,
+            rom,
+            players_controllers,
+            guns,
+            args,
+            rom_configuration,
         )
 
         # Prepare the emulator command
@@ -600,7 +628,10 @@ def _cleanup_system(
 
 
 def start_rom(
-    args: Any, maxnbplayers: int, rom: str, rom_configuration: dict[str, Any],
+    args: Any,
+    maxnbplayers: int,
+    rom: str,
+    rom_configuration: dict[str, Any],
 ) -> int:
     """Prepares the system and launches the emulator for a given ROM.
 
@@ -628,7 +659,11 @@ def start_rom(
     system = _setup_system_emulator(args, rom)
     metadata = controllers.getGamesMetaData(system.name, rom)
     guns, wheels, wheel_processes, players_controllers = _configure_special_devices(
-        args, system, rom, metadata, players_controllers,
+        args,
+        system,
+        rom,
+        metadata,
+        players_controllers,
     )
     generator = getGenerator(system.config["emulator"])
 
@@ -762,7 +797,10 @@ def getHudBezel(
             )
             bezel = system.config["bezel"]
             bz_infos = bezelsUtil.getBezelInfos(
-                rom, bezel, system.name, system.config["emulator"],
+                rom,
+                bezel,
+                system.name,
+                system.config["emulator"],
             )
             if bz_infos is None:
                 eslog.debug("No bezel info file found")
@@ -845,7 +883,9 @@ def getHudBezel(
             temp_files.append(str(output_png_file))
             if overlay_png_file and isinstance(overlay_png_file, (str, Path)):
                 bezelsUtil.tatooImage(
-                    str(overlay_png_file), str(output_png_file), system,
+                    str(overlay_png_file),
+                    str(output_png_file),
+                    system,
                 )
                 overlay_png_file = output_png_file
             else:
@@ -936,7 +976,9 @@ def callExternalScripts(folder: str, event: str, args: list[str]) -> None:
         filepath = Path(folder) / file
         if Path(filepath).is_dir():
             callExternalScripts(
-                str(filepath), event, args,
+                str(filepath),
+                event,
+                args,
             )  # Recurse into subdirectories.
         elif access(filepath, X_OK):
             eslog.debug(f"Calling external script: {[filepath, event] + args!s}")
@@ -1096,8 +1138,7 @@ def runCommand(command: Any) -> int:
 
 
 def signal_handler(signal: Any, frame: Any) -> None:
-    """Handles termination signals (like Ctrl+C) to gracefully kill the emulator process.
-    """
+    """Handles termination signals (like Ctrl+C) to gracefully kill the emulator process."""
     global proc
     eslog.debug("Exiting due to signal")
     if proc:
@@ -1118,31 +1159,49 @@ if __name__ == "__main__":
     # Dynamically create arguments for each player's controller.
     for p in range(1, maxnbplayers + 1):
         parser.add_argument(
-            f"-p{p}index", help=f"player {p} controller index", type=int,
+            f"-p{p}index",
+            help=f"player {p} controller index",
+            type=int,
         )
         parser.add_argument(
-            f"-p{p}guid", help=f"player {p} controller SDL2 guid", type=str,
+            f"-p{p}guid",
+            help=f"player {p} controller SDL2 guid",
+            type=str,
         )
         parser.add_argument(f"-p{p}name", help=f"player {p} controller name", type=str)
         parser.add_argument(
-            f"-p{p}devicepath", help=f"player {p} controller device path", type=str,
+            f"-p{p}devicepath",
+            help=f"player {p} controller device path",
+            type=str,
         )
         parser.add_argument(
-            f"-p{p}nbbuttons", help=f"player {p} controller number of buttons", type=str,
+            f"-p{p}nbbuttons",
+            help=f"player {p} controller number of buttons",
+            type=str,
         )
         parser.add_argument(
-            f"-p{p}nbhats", help=f"player {p} controller number of hats", type=str,
+            f"-p{p}nbhats",
+            help=f"player {p} controller number of hats",
+            type=str,
         )
         parser.add_argument(
-            f"-p{p}nbaxes", help=f"player {p} controller number of axes", type=str,
+            f"-p{p}nbaxes",
+            help=f"player {p} controller number of axes",
+            type=str,
         )
 
     # General arguments for system, ROM, and specific features.
     parser.add_argument(
-        "-system", help="Select the system to launch", type=str, required=True,
+        "-system",
+        help="Select the system to launch",
+        type=str,
+        required=True,
     )
     parser.add_argument(
-        "-rom", help="Absolute path to the ROM", type=str, required=True,
+        "-rom",
+        help="Absolute path to the ROM",
+        type=str,
+        required=True,
     )
     parser.add_argument("-emulator", help="Force a specific emulator", type=str)
     parser.add_argument("-core", help="Force a specific emulator core", type=str)
@@ -1153,7 +1212,9 @@ if __name__ == "__main__":
     parser.add_argument("-netplaysession", help="Netplay session identifier", type=str)
     parser.add_argument("-state_slot", help="Load state from a specific slot", type=str)
     parser.add_argument(
-        "-state_filename", help="Load state from a specific filename", type=str,
+        "-state_filename",
+        help="Load state from a specific filename",
+        type=str,
     )
     parser.add_argument("-autosave", help="Enable/disable autosave feature", type=str)
     parser.add_argument("-systemname", help="System's display name", type=str)
@@ -1165,7 +1226,9 @@ if __name__ == "__main__":
         default="/dev/null",
     )
     parser.add_argument(
-        "-lightgun", help="Configure for lightgun usage", action="store_true",
+        "-lightgun",
+        help="Configure for lightgun usage",
+        action="store_true",
     )
     parser.add_argument("-wheel", help="Configure for wheel usage", action="store_true")
 

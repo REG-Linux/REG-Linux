@@ -15,7 +15,14 @@ from .mupenConfig import (
 
 class MupenGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Read the configuration file
         iniConfig = ConfigParser(interpolation=None)

@@ -7,7 +7,14 @@ LIGHTSPARK_BIN_PATH = "/usr/bin/lightspark"
 
 class LightsparkGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         command_array = [LIGHTSPARK_BIN_PATH, "-s", "local-with-networking", rom]
         return Command(

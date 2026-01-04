@@ -13,7 +13,14 @@ IKEMEN_BIN_PATH = Path("/usr/bin/system-ikemen")
 
 class IkemenGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Convert rom to Path if it's not already
         rom_path = Path(rom) if not isinstance(rom, Path) else rom

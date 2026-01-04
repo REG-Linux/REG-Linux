@@ -1,5 +1,4 @@
-"""Module that defines the interfaces and base classes for the bezel system in REG-Linux.
-"""
+"""Module that defines the interfaces and base classes for the bezel system in REG-Linux."""
 
 from abc import ABC, abstractmethod
 from contextlib import suppress
@@ -93,8 +92,7 @@ class BezelUtils:
 
     @staticmethod
     def clear_bezel_cache() -> None:
-        """Clear all cached bezel images to free up space.
-        """
+        """Clear all cached bezel images to free up space."""
         files = glob.glob(str(BEZEL_CACHE_DIR / "*.png"))
         for file in files:
             with suppress(OSError):
@@ -102,7 +100,10 @@ class BezelUtils:
 
     @staticmethod
     def get_bezel_infos(
-        rom: str, bezel: str, system_name: str, emulator: str,
+        rom: str,
+        bezel: str,
+        system_name: str,
+        emulator: str,
     ) -> dict[str, str | bool | None] | None:
         """Locate the appropriate bezel overlay image and related files based on
         ROM name, system name, and emulator used.
@@ -138,7 +139,12 @@ class BezelUtils:
         # System-specific overlays (with or without altDecoration)
         if alt_decoration != 0:
             candidates.append(
-                ("systems", str(OVERLAY_USER), False, f"{system_name}-{alt_decoration}"),
+                (
+                    "systems",
+                    str(OVERLAY_USER),
+                    False,
+                    f"{system_name}-{alt_decoration}",
+                ),
             )
         candidates.append(("systems", str(OVERLAY_USER), False, system_name))
         if alt_decoration != 0:
@@ -291,7 +297,11 @@ class BezelUtils:
 
         # Generate cache key based on input parameters
         cache_key = BezelUtils.generate_cache_key(
-            "resize", input_png, screen_width, screen_height, bezel_stretch,
+            "resize",
+            input_png,
+            screen_width,
+            screen_height,
+            bezel_stretch,
         )
 
         # Check if image is already cached
@@ -688,7 +698,10 @@ class BezelUtils:
         imgnew.paste(alpha, (0, 0, ix, iy))
         try:
             imgout = BezelUtils.resize_with_fill(
-                imgnew, screensize, stretch=bezel_stretch, fillcolor=fillcolor,
+                imgnew,
+                screensize,
+                stretch=bezel_stretch,
+                fillcolor=fillcolor,
             )
             imgout.save(output_png, mode="RGBA", format="PNG")  # type: ignore
         except OSError as e:
@@ -868,7 +881,10 @@ class BezelUtils:
 
     @staticmethod
     def guns_border_size(
-        w: int, h: int, inner_border_size_per: int = 2, outer_border_size_per: int = 3,
+        w: int,
+        h: int,
+        inner_border_size_per: int = 2,
+        outer_border_size_per: int = 3,
     ) -> int:
         """Calculate combined border height used for lightgun overlay.
 
@@ -921,13 +937,15 @@ class BezelUtils:
 
 # Compatibility functions to maintain legacy APIs
 def clear_bezel_cache() -> None:
-    """Clear all cached bezel images to free up space.
-    """
+    """Clear all cached bezel images to free up space."""
     BezelUtils.clear_bezel_cache()
 
 
 def getBezelInfos(
-    rom: str, bezel: str, systemName: str, emulator: str,
+    rom: str,
+    bezel: str,
+    systemName: str,
+    emulator: str,
 ) -> dict[str, str | bool | None] | None:
     """Locate the appropriate bezel overlay image and related files based on
     ROM name, system name, and emulator used.
@@ -1008,7 +1026,11 @@ def resizeImage(
 
     """
     BezelUtils.resize_image(
-        input_png, output_png, screen_width, screen_height, bezel_stretch,
+        input_png,
+        output_png,
+        screen_width,
+        screen_height,
+        bezel_stretch,
     )
 
 
@@ -1093,7 +1115,12 @@ def alphaPaste(
 
     """
     BezelUtils.alpha_paste(
-        input_png, output_png, imgin, fillcolor, screensize, bezel_stretch,
+        input_png,
+        output_png,
+        imgin,
+        fillcolor,
+        screensize,
+        bezel_stretch,
     )
 
 
@@ -1148,7 +1175,10 @@ def gunBorderImage(
 
 
 def gunsBorderSize(
-    w: int, h: int, innerBorderSizePer: int = 2, outerBorderSizePer: int = 3,
+    w: int,
+    h: int,
+    innerBorderSizePer: int = 2,
+    outerBorderSizePer: int = 3,
 ) -> int:
     """Calculate combined border height used for lightgun overlay.
 

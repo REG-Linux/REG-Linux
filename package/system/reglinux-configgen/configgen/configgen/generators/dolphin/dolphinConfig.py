@@ -189,7 +189,9 @@ def getSensorBarPosition(config: dict[str, Any]) -> int:
 
 
 def updateConfig(
-    config: dict[str, Any], filepath: str | Path, gameResolution: dict[str, int],
+    config: dict[str, Any],
+    filepath: str | Path,
+    gameResolution: dict[str, int],
 ) -> None:
     """Update the SYSCONF file with the specified configuration.
 

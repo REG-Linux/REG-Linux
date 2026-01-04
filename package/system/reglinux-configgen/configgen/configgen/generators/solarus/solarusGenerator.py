@@ -7,7 +7,14 @@ SOLARUS_BIN_PATH = "/usr/bin/solarus-run"
 
 class SolarusGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # basis
         command_array = [

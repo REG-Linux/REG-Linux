@@ -1,5 +1,4 @@
-"""Module responsible for managing bezel configurations for the MAME emulator.
-"""
+"""Module responsible for managing bezel configurations for the MAME emulator."""
 
 import os
 import shutil
@@ -67,7 +66,12 @@ def setup_mame_bezels(
         guns_borders_size = _get_guns_borders_size(guns, system.config)
 
         writeBezelConfig(
-            bezel_set, system, rom, messSys, game_resolution, guns_borders_size,
+            bezel_set,
+            system,
+            rom,
+            messSys,
+            game_resolution,
+            guns_borders_size,
         )
     except Exception as e:
         logger.warning(f"Error setting up MAME bezels: {e}")
@@ -93,7 +97,8 @@ def _extract_bezel_set(system: Any) -> str | None:
 
 
 def _get_guns_borders_size(
-    guns: list[Any], system_config: dict[str, Any],
+    guns: list[Any],
+    system_config: dict[str, Any],
 ) -> str | None:
     """Get guns borders size from config if guns are available.
 
@@ -172,13 +177,20 @@ def writeBezelConfig(
         # Apply tattoo if required
         if _should_apply_tattoo(system):
             png_file = _apply_tattoo(
-                tmp_zip_dir, png_file, img_width, img_height, system,
+                tmp_zip_dir,
+                png_file,
+                img_width,
+                img_height,
+                system,
             )
 
         # Apply gun borders if required
         if guns_borders_size is not None:
             png_file = _apply_gun_borders(
-                tmp_zip_dir, png_file, guns_borders_size, system.config,
+                tmp_zip_dir,
+                png_file,
+                guns_borders_size,
+                system.config,
             )
     except Exception as e:
         logger.error(f"Error in writeBezelConfig: {e}")
@@ -208,7 +220,9 @@ def _get_tmp_directory_path(rom_base: str, mess_sys: str) -> str:
 
 
 def _get_bezel_info(
-    bezel_set: str | None, system: Any, rom: str,
+    bezel_set: str | None,
+    system: Any,
+    rom: str,
 ) -> dict[str, Any] | None:
     """Get bezel information from the bezel database.
 
@@ -264,7 +278,10 @@ def _create_symlink(src: str, dest: str):
 
 
 def _process_bezel_layout(
-    bz_infos: dict[str, Any], rom_base: str, mess_sys: str, tmp_zip_dir: str,
+    bz_infos: dict[str, Any],
+    rom_base: str,
+    mess_sys: str,
+    tmp_zip_dir: str,
 ) -> tuple[str, int, int, int, int, int, int, float] | None:
     """Process the bezel layout and return positioning information.
 
@@ -301,7 +318,9 @@ def _process_bezel_layout(
 
 
 def _handle_mamezip_case(
-    rom_base: str, mess_sys: str, bz_infos: dict[str, Any],
+    rom_base: str,
+    mess_sys: str,
+    bz_infos: dict[str, Any],
 ) -> None:
     """Handle the case where a mamezip file is available.
 
@@ -326,7 +345,8 @@ def _handle_mamezip_case(
 
 
 def _parse_bezel_info_file(
-    info_path: str, png_path: str,
+    info_path: str,
+    png_path: str,
 ) -> tuple[int, int, int, int, int, int, float]:
     """Parse bezel info file and return position and size values.
 
@@ -384,7 +404,9 @@ def _parse_bezel_info_file(
 
 
 def _create_standard_layout(
-    bz_infos: dict[str, Any], rom_base: str, tmp_zip_dir: str,
+    bz_infos: dict[str, Any],
+    rom_base: str,
+    tmp_zip_dir: str,
 ) -> tuple[str, int, int, int, int, int, int, float]:
     """Create standard bezel layout from PNG and info file.
 
@@ -497,7 +519,11 @@ def _should_apply_tattoo(system: Any) -> bool:
 
 
 def _apply_tattoo(
-    tmp_zip_dir: str, png_file: str, img_width: int, img_height: int, system: Any,
+    tmp_zip_dir: str,
+    png_file: str,
+    img_width: int,
+    img_height: int,
+    system: Any,
 ) -> str:
     """Apply tattoo to the bezel image and return the new file path.
 
@@ -538,7 +564,8 @@ def _apply_tattoo(
             tattoo_canvas.paste(tattoo, (img_width - tat_width, margin))
         elif corner == "SE":
             tattoo_canvas.paste(
-                tattoo, (img_width - tat_width, img_height - tat_height - margin),
+                tattoo,
+                (img_width - tat_width, img_height - tat_height - margin),
             )
         elif corner == "SW":
             tattoo_canvas.paste(tattoo, (0, img_height - tat_height - margin))
@@ -612,7 +639,10 @@ def _get_tattoo_path(system: Any) -> str:
 
 
 def _apply_gun_borders(
-    tmp_zip_dir: str, png_file: str, borders_size: str, system_config: dict[str, str],
+    tmp_zip_dir: str,
+    png_file: str,
+    borders_size: str,
+    system_config: dict[str, str],
 ) -> str:
     """Apply gun borders to the bezel image and return the new file path.
 
@@ -650,7 +680,11 @@ class MameBezelManager(IBezelManager):
     """Bezel manager specific to the MAME emulator."""
 
     def setup_bezels(
-        self, system: Any, rom: str, game_resolution: dict[str, int], guns: list[Any],
+        self,
+        system: Any,
+        rom: str,
+        game_resolution: dict[str, int],
+        guns: list[Any],
     ) -> None:
         """Configure the bezels for a specific game.
 

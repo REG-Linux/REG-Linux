@@ -13,7 +13,14 @@ eslog = get_logger(__name__)
 
 class AmiberryGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # setting up amiberry config file
         setAmiberryConfig(system)

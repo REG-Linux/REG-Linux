@@ -48,8 +48,7 @@ class Generator(metaclass=ABCMeta):
         wheels: list[Any],
         game_resolution: dict[str, Any],
     ) -> Command:
-        """Retrieve the command to start the emulator with the specified configurations.
-        """
+        """Retrieve the command to start the emulator with the specified configurations."""
         return Command(array=[])
 
     def getResolutionMode(self, config: dict[str, Any]) -> str:
@@ -70,7 +69,10 @@ class Generator(metaclass=ABCMeta):
         return False
 
     def getInGameRatio(
-        self, config: dict[str, Any], gameResolution: dict[str, Any], rom: str,
+        self,
+        config: dict[str, Any],
+        gameResolution: dict[str, Any],
+        rom: str,
     ) -> float:
         # put a default value, but it should be overriden by generators
         return 4 / 3

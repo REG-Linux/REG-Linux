@@ -1,5 +1,4 @@
-"""Consolidated Bezel Configuration Writer - Combines common functionality from different emulator managers.
-"""
+"""Consolidated Bezel Configuration Writer - Combines common functionality from different emulator managers."""
 
 from contextlib import suppress
 from json import load
@@ -68,11 +67,13 @@ def writeBezelConfig(
         with open(gunBezelInfoFile, "w") as fd:
             fd.write(
                 "{"
-                 f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
-                 "}",
+                f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
+                "}",
             )
         BezelUtils.create_transparent_bezel(
-            gunBezelFile, gameResolution["width"], gameResolution["height"],
+            gunBezelFile,
+            gameResolution["width"],
+            gameResolution["height"],
         )
         # if the game needs a specific bezel, to draw border, consider it as a game-specific bezel, like for thebezelproject to avoid caches
         bz_infos: dict[str, str | bool | None] = {
@@ -93,7 +94,10 @@ def writeBezelConfig(
                 emulator_name = getattr(cls, "__name__", "unknown")
         if "libretro" in emulator_name.lower():
             bz_infos_temp = BezelUtils.get_bezel_infos(
-                rom, bezel, system.name, "libretro",
+                rom,
+                bezel,
+                system.name,
+                "libretro",
             )
         else:
             bz_infos_temp = BezelUtils.get_bezel_infos(rom, bezel, system.name, "mame")

@@ -14,7 +14,9 @@ class RegMsgClient:
     """
 
     def __init__(
-        self, address: str = "ipc:///var/run/regmsgd.sock", timeout: int = 5000,
+        self,
+        address: str = "ipc:///var/run/regmsgd.sock",
+        timeout: int = 5000,
     ):
         """Initialize the RegMsg client.
 
@@ -116,7 +118,10 @@ class RegMsgClient:
         return self
 
     def __exit__(
-        self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any | None,
+        self,
+        exc_type: type | None,
+        exc_val: Exception | None,
+        exc_tb: Any | None,
     ) -> None:
         """Ensure connection is closed when exiting context manager."""
         self.disconnect()
@@ -129,7 +134,8 @@ _socket: zmq.Socket[Any] | None = None
 
 
 def regmsg_connect(
-    address: str = "ipc:///var/run/regmsgd.sock", timeout: int = 5000,
+    address: str = "ipc:///var/run/regmsgd.sock",
+    timeout: int = 5000,
 ) -> RegMsgClient:
     """Compatibility function to connect to regmsgd.
 

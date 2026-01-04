@@ -90,7 +90,8 @@ def getDevicesInformation() -> dict[str, Any]:
 
 
 def getAssociatedMouse(
-    devicesInformation: dict[str, Any], dev: str,
+    devicesInformation: dict[str, Any],
+    dev: str,
 ) -> dict[str, Any] | None:
     if (
         dev not in devicesInformation

@@ -12,7 +12,14 @@ eslog = get_logger(__name__)
 
 class ShGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # in case of squashfs, the root directory is passed
         shInDir = glob(rom + "/run.sh")

@@ -20,7 +20,10 @@ def precalibration_copyDir(src: str, dst: str) -> None:
 
 
 def precalibration_copyFilesInDir(
-    srcdir: str, dstdir: str, startWith: str, endWith: str,
+    srcdir: str,
+    dstdir: str,
+    startWith: str,
+    endWith: str,
 ) -> None:
     srcdir_path = Path(srcdir)
     dstdir_path = Path(dstdir)

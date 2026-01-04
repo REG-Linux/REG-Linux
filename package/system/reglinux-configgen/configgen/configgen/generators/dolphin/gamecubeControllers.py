@@ -10,7 +10,10 @@ eslog = get_logger(__name__)
 
 
 def generateControllerConfig_gamecube(
-    system: Any, playersControllers: Any, wheels: Any, rom: str,
+    system: Any,
+    playersControllers: Any,
+    wheels: Any,
+    rom: str,
 ) -> None:
     """Generate controller configuration for GameCube controllers.
 
@@ -183,7 +186,14 @@ def generateControllerConfig_any_auto(
         # Write the configuration for this key
         if keyname is not None:
             write_key(
-                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None,
+                f,
+                keyname,
+                input.type,
+                input.id,
+                input.value,
+                pad.nbaxes,
+                False,
+                None,
             )
 
         # Write the 2nd part
