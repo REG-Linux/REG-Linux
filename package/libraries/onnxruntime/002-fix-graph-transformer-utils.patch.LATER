@@ -1,0 +1,20 @@
+--- a/onnxruntime/core/optimizer/graph_transformer_utils.cc	2025-12-26 07:06:53.814905769 +0100
++++ b/onnxruntime/core/optimizer/graph_transformer_utils.cc	2025-12-26 07:07:38.507826192 +0100
+@@ -202,7 +202,7 @@
+     TransformerLevel level,
+     const SessionOptions& session_options,
+     const IExecutionProvider& cpu_execution_provider, /*required by constant folding*/
+-    const logging::Logger& logger,
++    [[maybe_unused]] const logging::Logger& logger,
+     const InlinedHashSet<std::string>& rules_and_transformers_to_disable,
+     [[maybe_unused]] concurrency::ThreadPool* intra_op_thread_pool) {
+   InlinedVector<std::unique_ptr<GraphTransformer>> transformers;
+@@ -472,7 +472,7 @@
+     const SessionOptions& session_options,
+     const SatApplyContextVariant& apply_context,
+     const IExecutionProvider& cpu_execution_provider,
+-    const logging::Logger& logger,
++    [[maybe_unused]] const logging::Logger& logger,
+     const InlinedHashSet<std::string>& rules_and_transformers_to_disable,
+     [[maybe_unused]] concurrency::ThreadPool* intra_op_thread_pool) {
+   InlinedVector<std::unique_ptr<GraphTransformer>> transformers;

@@ -1,8 +1,28 @@
 diff --git a/package/qt6/qt6base/qt6base.mk b/package/qt6/qt6base/qt6base.mk
-index 51a4f1b5be..95e1416829 100644
+index 51a4f1b5be..75c2f7122a 100644
 --- a/package/qt6/qt6base/qt6base.mk
 +++ b/package/qt6/qt6base/qt6base.mk
-@@ -199,7 +199,8 @@ QT6BASE_CONF_OPTS += \
+@@ -82,7 +82,8 @@ HOST_QT6BASE_DEPENDENCIES = \
+ 	host-double-conversion \
+ 	host-libb2 \
+ 	host-pcre2 \
+-	host-zlib
++	host-zlib \
++	host-wayland
+ 
+ HOST_QT6BASE_CONF_OPTS = \
+ 	-DFEATURE_xml=ON \
+@@ -93,7 +94,8 @@ HOST_QT6BASE_CONF_OPTS = \
+ 	-DFEATURE_system_doubleconversion=ON \
+ 	-DFEATURE_system_libb2=ON \
+ 	-DFEATURE_system_pcre2=ON \
+-	-DFEATURE_system_zlib=ON
++	-DFEATURE_system_zlib=ON \
++	-DFEATURE_qtwaylandscanner=ON
+ 
+ ifeq ($(BR2_PACKAGE_HOST_QT6BASE_CONCURRENT),y)
+ HOST_QT6BASE_CONF_OPTS += -DFEATURE_concurrent=ON
+@@ -199,7 +201,8 @@ QT6BASE_CONF_OPTS += \
  	-DFEATURE_xcb=ON \
  	-DFEATURE_xcb_xlib=ON \
  	-DFEATURE_xkbcommon=ON \
@@ -12,7 +32,7 @@ index 51a4f1b5be..95e1416829 100644
  QT6BASE_DEPENDENCIES += \
  	libxcb \
  	libxkbcommon \
-@@ -208,7 +209,8 @@ QT6BASE_DEPENDENCIES += \
+@@ -208,7 +211,8 @@ QT6BASE_DEPENDENCIES += \
  	xcb-util-image \
  	xcb-util-keysyms \
  	xcb-util-renderutil \

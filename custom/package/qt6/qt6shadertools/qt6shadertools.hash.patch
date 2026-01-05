@@ -1,12 +1,12 @@
 diff --git a/package/qt6/qt6shadertools/qt6shadertools.hash b/package/qt6/qt6shadertools/qt6shadertools.hash
-index 015ec5b96f0..fc9a40f9c4c 100644
+index 015ec5b96f..9186a4d327 100644
 --- a/package/qt6/qt6shadertools/qt6shadertools.hash
 +++ b/package/qt6/qt6shadertools/qt6shadertools.hash
 @@ -1,5 +1,5 @@
 -# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qtshadertools-everywhere-src-6.8.1.tar.xz.sha256
 -sha256  55b70cd632473a8043c74ba89310f7ba9c5041d253bc60e7ae1fa789169c4846  qtshadertools-everywhere-src-6.8.1.tar.xz
-+# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.3/submodules/qtshadertools-everywhere-src-6.8.3.tar.xz.sha256
-+sha256  f6ec88bf42deba84d8f6b5d0914636ceed4749ccb51d1945b2f79b322b7ecf47  qtshadertools-everywhere-src-6.8.3.tar.xz
++# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.1/submodules/qtshadertools-everywhere-src-6.10.1.tar.xz.sha256
++sha256  b67894a63352b53dad0d46f5300c62b8cd6783db575492d6b25d4fdc9af55bb6  qtshadertools-everywhere-src-6.10.1.tar.xz
  
  # Hashes for license files:
  sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt
