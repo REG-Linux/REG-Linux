@@ -151,6 +151,7 @@ ebc495a9f0e515ea57680c847fd0fdbf  package/qt6/qt6shadertools/qt6shadertools.hash
 8739ff9f283d7ab61682559af2f7fd19  package/qt6/qt6tools/qt6tools.hash
 8f34a68a04270e8a85075b47c3f83d44  package/qt6/qt6virtualkeyboard/qt6virtualkeyboard.hash
 2ccd9f3fb14d1c9c092bfddfbcefd2d5  package/qt6/qt6wayland/qt6wayland.hash
+1adef7111a7cf070b43938878361bff4  package/qt6/qt6wayland/qt6wayland.mk
 687ba7d7bc4c6d0a822f795dccc7fc63  package/qt6/qt6websockets/qt6websockets.hash
 b0ca41a8eff161f5ba5ba9516fad91db  package/rng-tools/rng-tools.mk
 a9d1420cc9734b65cbc95471f32631da  package/rockchip-rkbin/rockchip-rkbin.hash

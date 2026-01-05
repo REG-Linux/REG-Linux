@@ -82,7 +82,8 @@ HOST_QT6BASE_DEPENDENCIES = \
 	host-double-conversion \
 	host-libb2 \
 	host-pcre2 \
-	host-zlib
+	host-zlib \
+	host-wayland
 
 HOST_QT6BASE_CONF_OPTS = \
 	-DFEATURE_xml=ON \
@@ -93,7 +94,8 @@ HOST_QT6BASE_CONF_OPTS = \
 	-DFEATURE_system_doubleconversion=ON \
 	-DFEATURE_system_libb2=ON \
 	-DFEATURE_system_pcre2=ON \
-	-DFEATURE_system_zlib=ON
+	-DFEATURE_system_zlib=ON \
+	-DFEATURE_qtwaylandscanner=ON
 
 ifeq ($(BR2_PACKAGE_HOST_QT6BASE_CONCURRENT),y)
 HOST_QT6BASE_CONF_OPTS += -DFEATURE_concurrent=ON
