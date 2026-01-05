@@ -138,7 +138,6 @@ config BR2_PACKAGE_REGLINUX_MINI_SYSTEMS
 	#select BR2_PACKAGE_LIBRETRO_MRBOOM		# ALL
 
 	# Rick Dangerous
-	# TODO no sound broken core
 	#select BR2_PACKAGE_LIBRETRO_XRICK		# ALL
 
 	# Flashback

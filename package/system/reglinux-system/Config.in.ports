@@ -19,7 +19,6 @@ config BR2_PACKAGE_REGLINUX_PORTS_SYSTEMS
 	select BR2_PACKAGE_CGENIUS			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
 
 	# Rick Dangerous
-	# TODO no sound broken core
 	select BR2_PACKAGE_LIBRETRO_XRICK		# ALL
 
 	# Flashback
