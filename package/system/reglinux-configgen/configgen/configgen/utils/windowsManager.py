@@ -136,13 +136,35 @@ class WindowManager:
             return True
 
         try:
-            # Send exit command to Sway
-            run(["swaymsg", "exit"], check=True, timeout=5)
+            # Send exit command to Sway - don't use check=True to avoid exception on non-zero exit
+            result = run(["swaymsg", "exit"], timeout=5)
 
-            # Wait for process termination
+            # Check if the command executed but failed (non-zero exit code)
+            if result.returncode != 0:
+                eslog.warning(
+                    f"swaymsg exit returned non-zero exit code: {result.returncode}"
+                )
+                # Continue with cleanup even if swaymsg failed, as Sway might have already terminated
+
+            # Wait for process termination with a timeout
             if self.sway_process:
-                self.sway_process.wait(timeout=5)
-                self.sway_process = None
+                try:
+                    self.sway_process.wait(
+                        timeout=2
+                    )  # Shorter timeout for process termination
+                except TimeoutExpired:
+                    eslog.warning(
+                        "Sway process did not terminate within timeout, attempting to kill"
+                    )
+                    try:
+                        self.sway_process.kill()
+                        self.sway_process.wait(
+                            timeout=1
+                        )  # Wait a bit more for the kill to complete
+                    except Exception:
+                        pass  # If we can't kill it, continue with cleanup
+                finally:
+                    self.sway_process = None
 
             # Clean up environment variables
             for var in [
@@ -164,16 +186,98 @@ class WindowManager:
             return True
 
         except FileNotFoundError:
-            eslog.error("Swaymsg executable not found when trying to stop Sway")
-            return False
+            eslog.warning(
+                "Swaymsg executable not found when trying to stop Sway, attempting to clean up process directly"
+            )
+            # Try to clean up the process directly if swaymsg is not available
+            if self.sway_process:
+                try:
+                    self.sway_process.terminate()
+                    self.sway_process.wait(timeout=2)
+                except TimeoutExpired:
+                    try:
+                        self.sway_process.kill()
+                        self.sway_process.wait(timeout=1)
+                    except Exception:
+                        pass  # If we can't kill it, continue with cleanup
+                finally:
+                    self.sway_process = None
+
+            # Clean up environment variables even if swaymsg is not available
+            for var in [
+                "WAYLAND_DISPLAY",
+                "XDG_RUNTIME_DIR",
+                "SWAYSOCK",
+                "SDL_VIDEODRIVER",
+            ]:
+                environ.pop(var, None)
+
+            environ.update({"XDG_SESSION_TYPE": "drm", "QT_QPA_PLATFORM": "xcb"})
+
+            if generator.requiresX11():
+                environ.pop("DISPLAY", None)
+
+            self.sway_launched = False
+            return True
         except PermissionError:
             eslog.error("Permission denied when trying to stop Sway")
             return False
         except TimeoutExpired:
-            eslog.error("Timeout while waiting for Sway to exit")
-            return False
+            eslog.warning(
+                "Timeout while waiting for Sway to exit, attempting force kill"
+            )
+            # Force kill the process if it doesn't respond
+            if self.sway_process:
+                try:
+                    self.sway_process.kill()
+                    self.sway_process.wait(timeout=1)
+                except Exception:
+                    pass  # If we can't kill it, continue with cleanup
+                finally:
+                    self.sway_process = None
+
+            # Still clean up environment variables
+            for var in [
+                "WAYLAND_DISPLAY",
+                "XDG_RUNTIME_DIR",
+                "SWAYSOCK",
+                "SDL_VIDEODRIVER",
+            ]:
+                environ.pop(var, None)
+
+            environ.update({"XDG_SESSION_TYPE": "drm", "QT_QPA_PLATFORM": "xcb"})
+
+            if generator.requiresX11():
+                environ.pop("DISPLAY", None)
+
+            self.sway_launched = False
+            return True
         except Exception as e:
             eslog.error(f"Error stopping Sway: {e!s}")
+            # Perform cleanup even if there was an error
+            if self.sway_process:
+                try:
+                    self.sway_process.kill()
+                except Exception:
+                    pass  # Ignore errors during force kill
+                finally:
+                    self.sway_process = None
+
+            # Clean up environment variables
+            for var in [
+                "WAYLAND_DISPLAY",
+                "XDG_RUNTIME_DIR",
+                "SWAYSOCK",
+                "SDL_VIDEODRIVER",
+            ]:
+                environ.pop(var, None)
+
+            environ.update({"XDG_SESSION_TYPE": "drm", "QT_QPA_PLATFORM": "xcb"})
+
+            if generator.requiresX11():
+                environ.pop("DISPLAY", None)
+
+            self.sway_launched = False
             return False
 
 
@@ -208,16 +312,17 @@ def stop_compositor(generator: Any, system: Any) -> None:
         generator: Object that may specify display requirements
         system: System context object
 
-    Raises:
-        RuntimeError: If compositor fails to stop properly
+    Note:
+        This function logs failures but does not raise exceptions to ensure
+        emulator cleanup continues even if compositor stopping fails.
 
     """
     window_manager = WindowManager()
 
     if window_manager.sway_launched:
         if not window_manager.stop_sway(generator, system):
-            raise RuntimeError(
-                "Failed to stop Sway compositor - check logs for details",
+            eslog.warning(
+                "Sway compositor did not stop cleanly, but continuing with cleanup",
             )
         return
 
