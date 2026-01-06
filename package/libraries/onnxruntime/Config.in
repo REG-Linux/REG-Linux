@@ -1,0 +1,9 @@
+config BR2_PACKAGE_ONNXRUNTIME
+	bool "onnxruntime"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on BR2_PACKAGE_PROTOBUF
+	select BR2_PACKAGE_LIBABSEIL_CPP
+	help
+	  ONNX Runtime inference engine (CPU only)
+
+	  Minimal C++ runtime built via upstream cmake/.

@@ -1,12 +1,12 @@
 diff --git a/package/qt6/qt6svg/qt6svg.hash b/package/qt6/qt6svg/qt6svg.hash
-index cd7a148fb70..d3791056d63 100644
+index cd7a148fb7..e6fb83323e 100644
 --- a/package/qt6/qt6svg/qt6svg.hash
 +++ b/package/qt6/qt6svg/qt6svg.hash
 @@ -1,5 +1,5 @@
 -# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qtsvg-everywhere-src-6.8.1.tar.xz.sha256
 -sha256  3d0de73596e36b2daa7c48d77c4426bb091752856912fba720215f756c560dd0  qtsvg-everywhere-src-6.8.1.tar.xz
-+# Hash from: https://download.qt.io/official_releases/qt/6.8/6.8.3/submodules/qtsvg-everywhere-src-6.8.3.tar.xz.sha256
-+sha256  35eb516460f00f264eb504baa253432384351cf23fb9980a5857190e8deef438  qtsvg-everywhere-src-6.8.3.tar.xz
++# Hash from: https://download.qt.io/official_releases/qt/6.10/6.10.1/submodules/qtsvg-everywhere-src-6.10.1.tar.xz.sha256
++sha256  c02f355a58f3bbcf404a628bf488b6aeb2d84a94c269afdb86f6e529343ab01f  qtsvg-everywhere-src-6.10.1.tar.xz
  
  # Hashes for license files:
  sha256  9f0490f18656c6f2435bd14f603ef0c96434d1825615363dce43abb42ed1dcce  LICENSES/BSD-3-Clause.txt
