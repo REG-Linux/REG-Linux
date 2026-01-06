@@ -17,13 +17,13 @@ from typing import Any
 
 import configgen.bezel.bezel_base as bezelsUtil
 from configgen import controllers
+from configgen.client import regmsg_connect
 from configgen.controllers import Evmapy
 from configgen.Emulator import Emulator
 from configgen.GeneratorImporter import getGenerator
 from configgen.systemFiles import SAVES
 from configgen.utils import gunsUtils, videoMode, wheelsUtils, windowsManager, zar
 from configgen.utils.logger import get_logger
-from configgen.utils.regmsgclient import regmsg_connect
 
 eslog = get_logger(__name__)
 
