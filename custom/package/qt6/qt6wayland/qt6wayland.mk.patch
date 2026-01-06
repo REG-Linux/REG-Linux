@@ -1,0 +1,18 @@
+diff --git a/package/qt6/qt6wayland/qt6wayland.mk b/package/qt6/qt6wayland/qt6wayland.mk
+index 29fc25edb0..f8ab1f3d12 100644
+--- a/package/qt6/qt6wayland/qt6wayland.mk
++++ b/package/qt6/qt6wayland/qt6wayland.mk
+@@ -52,10 +52,12 @@ QT6WAYLAND_CONF_OPTS += -DFEATURE_wayland_server=OFF
+ endif
+ 
+ HOST_QT6WAYLAND_CONF_OPTS = \
++	-DFEATURE_wayland=ON \
++	-DFEATURE_waylandscanner=ON \
+ 	-DFEATURE_wayland_client=OFF \
+ 	-DFEATURE_wayland_server=OFF
+ 
+-HOST_QT6WAYLAND_DEPENDENCIES = host-qt6base
++HOST_QT6WAYLAND_DEPENDENCIES = host-qt6base host-qt6tools host-wayland-protocols
+ 
+ $(eval $(cmake-package))
+ $(eval $(host-cmake-package))

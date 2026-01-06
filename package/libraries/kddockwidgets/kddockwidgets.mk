@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-KDDOCKWIDGETS_VERSION = v2.2.5
+KDDOCKWIDGETS_VERSION = v2.4.0
 KDDOCKWIDGETS_SITE = $(call github,KDAB,KDDockWidgets,$(KDDOCKWIDGETS_VERSION))
 KDDOCKWIDGETS_DEPENDENCIES = reglinux-qt6 spdlog fmt json-for-modern-cpp
 KDDOCKWIDGETS_SUPPORTS_IN_SOURCE_BUILD = NO

@@ -7,7 +7,7 @@
 CDOGS_VERSION = 2.3.2
 CDOGS_SITE = $(call github,cxong,cdogs-sdl,$(CDOGS_VERSION))
 
-CDOGS_DEPENDENCIES = sdl2 sdl2_mixer python-protobuf enet
+CDOGS_DEPENDENCIES = sdl2 sdl2_mixer enet
 CDOGS_LICENSE = GPL-2.0
 
 CDOGS_SUPPORTS_IN_SOURCE_BUILD = NO
