@@ -78,6 +78,7 @@ class RegMsgClient:
 
         Returns:
             True if the socket file exists, False otherwise
+
         """
         return os.path.exists(self.address)
 
@@ -86,6 +87,7 @@ class RegMsgClient:
 
         Args:
             timeout: New timeout value in milliseconds
+
         """
         self.timeout = timeout
         if self.socket is not None:
