@@ -28,7 +28,12 @@ def generateControllerConfig(
         from .wiiControllers import generateControllerConfig_wii
 
         generateControllerConfig_wii(
-            system, playersControllers, metadata, wheels, rom, guns,
+            system,
+            playersControllers,
+            metadata,
+            wheels,
+            rom,
+            guns,
         )
     elif system.name == "gamecube":
         from .gamecubeControllers import generateControllerConfig_gamecube
@@ -48,7 +53,10 @@ def generateControllerConfig(
             ):
                 used_wheels = wheels
         generateControllerConfig_gamecube(
-            system, playersControllers, used_wheels, rom,
+            system,
+            playersControllers,
+            used_wheels,
+            rom,
         )  # Pass ROM name to allow for per ROM configuration
     else:
         raise ValueError(f"Invalid system name: '{system.name}'")

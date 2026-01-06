@@ -14,7 +14,14 @@ GSPLUS_BIN_PATH = "/usr/bin/GSplus"
 
 class GSplusGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         config_dir_path = Path(GSPLUS_CONFIG_DIR)
         if not config_dir_path.exists():

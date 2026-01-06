@@ -184,11 +184,15 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
         controllerNode = SubElement(root, "controller")
         addTextElement(controllerNode, "api", API_SDL)
         addTextElement(
-            controllerNode, "uuid", f"{guid_n[pad.index]}_{pad.guid}",
+            controllerNode,
+            "uuid",
+            f"{guid_n[pad.index]}_{pad.guid}",
         )  # controller guid
         addTextElement(controllerNode, "display_name", pad.name)  # controller name
         addTextElement(
-            controllerNode, "rumble", getOption("cemu_rumble", "0"),
+            controllerNode,
+            "rumble",
+            getOption("cemu_rumble", "0"),
         )  # % chosen
         addAnalogControl(controllerNode, "axis")
         addAnalogControl(controllerNode, "rotation")

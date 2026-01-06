@@ -24,7 +24,14 @@ from .fallout1Config import (
 
 class Fallout1Generator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Check if the directories exist, if not create them
         config_dir_path = Path(FALLOUT_CONFIG_DIR)
@@ -95,6 +102,9 @@ class Fallout1Generator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         return 16 / 9

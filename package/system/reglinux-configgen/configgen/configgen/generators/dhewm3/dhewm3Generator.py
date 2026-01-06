@@ -11,7 +11,14 @@ DHEWM3_ROMS_DIR = str(Path(ROMS) / "doom3")
 
 class Dhewm3Generator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Read the path within the .d3 rom file
         with open(rom) as file:

@@ -12,7 +12,14 @@ eslog = get_logger(__name__)
 
 class HatariGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         model_mapping = {
             "520st_auto": {"machine": "st", "tos": "auto"},
@@ -48,7 +55,10 @@ class HatariGenerator(Generator):
 
         command_array += ["--machine", machine]
         tos = HatariGenerator.findBestTos(
-            str(HATARI_BIOS_PATH), machine, tosversion, toslang,
+            str(HATARI_BIOS_PATH),
+            machine,
+            tosversion,
+            toslang,
         )
         command_array += ["--tos", f"{HATARI_BIOS_PATH!s}/{tos}"]
 

@@ -14,7 +14,14 @@ JAZZ2_BIN_PATH = "/usr/bin/jazz2"
 
 class Jazz2Generator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         try:
             chdir(JAZZ2_ROMS_DIR)

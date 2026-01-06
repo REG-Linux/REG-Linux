@@ -34,12 +34,20 @@ def generateControllerConfig_wii(
         and len(guns) > 0
     ):
         generateControllerConfig_guns(
-            "WiimoteNew.ini", "Wiimote", metadata, guns, system, rom,
+            "WiimoteNew.ini",
+            "Wiimote",
+            metadata,
+            guns,
+            system,
+            rom,
         )
         from .gamecubeControllers import generateControllerConfig_gamecube
 
         generateControllerConfig_gamecube(
-            system, playersControllers, wheels, rom,
+            system,
+            playersControllers,
+            wheels,
+            rom,
         )  # You can use the gamecube pads on the wii together with wiimotes
     elif system.isOptSet("emulatedwiimotes") and not system.getOptBoolean(
         "emulatedwiimotes",
@@ -49,14 +57,20 @@ def generateControllerConfig_wii(
         from .gamecubeControllers import generateControllerConfig_gamecube
 
         generateControllerConfig_gamecube(
-            system, playersControllers, wheels, rom,
+            system,
+            playersControllers,
+            wheels,
+            rom,
         )  # You can use the gamecube pads on the wii together with wiimotes
     elif system.isOptSet("emulatedwiimotes") and system.getOptBoolean(
         "emulatedwiimotes",
     ):
         # Generate if hardcoded
         generateControllerConfig_emulatedwiimotes(
-            system, playersControllers, wheels, rom,
+            system,
+            playersControllers,
+            wheels,
+            rom,
         )
         from .gamecubeControllers import removeControllerConfig_gamecube
 
@@ -77,7 +91,10 @@ def generateControllerConfig_wii(
     ) or system.isOptSet("sideWiimote"):
         # Generate if auto and name extensions are present
         generateControllerConfig_emulatedwiimotes(
-            system, playersControllers, wheels, rom,
+            system,
+            playersControllers,
+            wheels,
+            rom,
         )
         from .gamecubeControllers import removeControllerConfig_gamecube
 
@@ -87,12 +104,18 @@ def generateControllerConfig_wii(
         from .gamecubeControllers import generateControllerConfig_gamecube
 
         generateControllerConfig_gamecube(
-            system, playersControllers, wheels, rom,
+            system,
+            playersControllers,
+            wheels,
+            rom,
         )  # You can use the gamecube pads on the wii together with wiimotes
 
 
 def generateControllerConfig_emulatedwiimotes(
-    system: Any, playersControllers: Any, wheels: Any, rom: str,
+    system: Any,
+    playersControllers: Any,
+    wheels: Any,
+    rom: str,
 ) -> None:
     """Generate controller configuration for emulated Wiimotes.
 
@@ -297,7 +320,12 @@ def generateControllerConfig_realwiimotes(filename: str, anyDefKey: str) -> None
 
 
 def generateControllerConfig_guns(
-    filename: str, anyDefKey: str, metadata: Any, guns: Any, system: Any, rom: str,
+    filename: str,
+    anyDefKey: str,
+    metadata: Any,
+    guns: Any,
+    system: Any,
+    rom: str,
 ) -> None:
     """Generate controller configuration for light guns.
 
@@ -610,7 +638,14 @@ def generateControllerConfig_any_auto(
         # Write the configuration for this key
         if keyname is not None:
             write_key(
-                f, keyname, input.type, input.id, input.value, pad.nbaxes, False, None,
+                f,
+                keyname,
+                input.type,
+                input.id,
+                input.value,
+                pad.nbaxes,
+                False,
+                None,
             )
             if "Triggers" in keyname and input.type == "axis":
                 write_key(

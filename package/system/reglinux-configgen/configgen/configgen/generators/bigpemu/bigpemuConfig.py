@@ -13,7 +13,10 @@ BIGPEMU_BIN_PATH = "/usr/bigpemu/bigpemu"
 
 
 def setBigemuConfig(
-    bigpemuConfig: Any, system: Any, gameResolution: Any, playersControllers: Any,
+    bigpemuConfig: Any,
+    system: Any,
+    gameResolution: Any,
+    playersControllers: Any,
 ) -> None:
     # Ensure the necessary structure in the config
     if "BigPEmuConfig" not in bigpemuConfig:

@@ -53,10 +53,14 @@ def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) ->
                 f'"{setAxis(edenAxisMapping[x], pad.guid, pad.inputs, nplayer - 1)}"',
             )
         edenConfig.set(
-            "Controls", "player_" + str(nplayer - 1) + "_motionleft", '"[empty]"',
+            "Controls",
+            "player_" + str(nplayer - 1) + "_motionleft",
+            '"[empty]"',
         )
         edenConfig.set(
-            "Controls", "player_" + str(nplayer - 1) + "_motionright", '"[empty]"',
+            "Controls",
+            "player_" + str(nplayer - 1) + "_motionright",
+            '"[empty]"',
         )
         edenConfig.set("Controls", "player_" + str(nplayer - 1) + "_connected", "true")
         edenConfig.set(
@@ -65,7 +69,9 @@ def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) ->
             "false",
         )
         edenConfig.set(
-            "Controls", "player_" + str(nplayer - 1) + "_vibration_enabled", "true",
+            "Controls",
+            "player_" + str(nplayer - 1) + "_vibration_enabled",
+            "true",
         )
         edenConfig.set(
             "Controls",
@@ -80,7 +86,9 @@ def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) ->
     for y in range(nplayer, 9):
         edenConfig.set("Controls", "player_" + str(y - 1) + "_connected", "false")
         edenConfig.set(
-            "Controls", "player_" + str(y - 1) + "_connected\\default", "false",
+            "Controls",
+            "player_" + str(y - 1) + "_connected\\default",
+            "false",
         )
 
 

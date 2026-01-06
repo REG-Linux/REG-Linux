@@ -143,9 +143,7 @@ def gunsNeedCrosses(guns: dict[str, Any]) -> bool:
 # returns None is no border is wanted
 def guns_borders_size_name(guns: dict[str, Any], config: dict[str, Any]) -> Any:
     borders_size: str = "medium"
-    if (
-        config.get("controllers.guns.borderssize")
-    ):
+    if config.get("controllers.guns.borderssize"):
         borders_size = config["controllers.guns.borderssize"]
 
     # overriden by specific options

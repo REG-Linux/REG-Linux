@@ -188,7 +188,8 @@ def generate_sdl_controller_config(controllers: dict[str, Any]) -> str:
 
 
 def write_sdl_db_all_controllers(
-    controllers: dict[str, Any], outputFile: str = "/tmp/gamecontrollerdb.txt",
+    controllers: dict[str, Any],
+    outputFile: str = "/tmp/gamecontrollerdb.txt",
 ) -> str:
     """Write SDL game controller configuration to a file.
 

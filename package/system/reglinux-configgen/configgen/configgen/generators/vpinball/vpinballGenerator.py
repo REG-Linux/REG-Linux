@@ -30,7 +30,14 @@ class VPinballGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # create vpinball config directory and default config file if they don't exist
         config_dir_path = Path(VPINBALL_CONFIG_DIR)
@@ -75,7 +82,10 @@ class VPinballGenerator(Generator):
 
         # windows
         vpinballWindowing.configureWindowing(
-            vpinballSettings, system, game_resolution, hasDmd,
+            vpinballSettings,
+            system,
+            game_resolution,
+            hasDmd,
         )
 
         # DMDServer
@@ -111,6 +121,9 @@ class VPinballGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         return 16 / 9

@@ -16,7 +16,14 @@ from .ioquake3Config import (
 
 class IOQuake3Generator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         setIoquake3Config(system, rom, players_controllers, game_resolution)
 
@@ -52,7 +59,10 @@ class IOQuake3Generator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         if game_resolution["width"] / float(game_resolution["height"]) > (
             (16.0 / 9.0) - 0.1

@@ -16,7 +16,14 @@ class ViceGenerator(Generator):
     # Main entry of the module
     # Return command
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         setViceConfig(system, metadata, guns)
         setViceControllers(system, players_controllers)

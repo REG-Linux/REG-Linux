@@ -15,7 +15,14 @@ SCUMMVM_BIN_PATH = "/usr/bin/scummvm"
 
 class ScummVMGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # crete /userdata/bios/scummvm/extra folder if it doesn't exist
         extra_dir_path = Path(SCUMMVM_EXTRA_DIR)
@@ -117,7 +124,10 @@ class ScummVMGenerator(Generator):
         return Command(array=command_array)
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         if (
             "scumm_stretch" in config and config["scumm_stretch"] == "fit_force_aspect"

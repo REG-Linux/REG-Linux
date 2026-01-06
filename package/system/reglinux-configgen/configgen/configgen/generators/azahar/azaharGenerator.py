@@ -12,7 +12,14 @@ class AzaharGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Load existing config or create a new one
         azaharConfig = UnixSettings(AZAHAR_CONFIG_PATH)

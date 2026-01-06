@@ -33,13 +33,15 @@ def setPPSSPPConfig(system: Any) -> None:
         # Check if we have a discrete GPU & if so, set the Name
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
+                ["/usr/bin/system-vulkan", "hasVulkan"],
+                text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
                     have_discrete = check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
+                        ["/usr/bin/system-vulkan", "hasDiscrete"],
+                        text=True,
                     ).strip()
                     if have_discrete == "true":
                         eslog.debug(
@@ -47,14 +49,17 @@ def setPPSSPPConfig(system: Any) -> None:
                         )
                         try:
                             discrete_name = check_output(
-                                ["/usr/bin/system-vulkan", "discreteName"], text=True,
+                                ["/usr/bin/system-vulkan", "discreteName"],
+                                text=True,
                             ).strip()
                             if discrete_name != "":
                                 eslog.debug(
                                     f"Using Discrete GPU Name: {discrete_name} for PPSSPP",
                                 )
                                 ppssppConfig.set(
-                                    "Graphics", "VulkanDevice", discrete_name,
+                                    "Graphics",
+                                    "VulkanDevice",
+                                    discrete_name,
                                 )
                             else:
                                 eslog.debug("Couldn't get discrete GPU Name")
@@ -77,7 +82,9 @@ def setPPSSPPConfig(system: Any) -> None:
     # Display FPS
     if system.isOptSet("showFPS") and system.getOptBoolean("showFPS"):
         ppssppConfig.set(
-            "Graphics", "ShowFPSCounter", "3",
+            "Graphics",
+            "ShowFPSCounter",
+            "3",
         )  # 1 for Speed%, 2 for FPS, 3 for both
     else:
         ppssppConfig.set("Graphics", "ShowFPSCounter", "0")
@@ -127,21 +134,27 @@ def setPPSSPPConfig(system: Any) -> None:
     # Texture Scaling Level
     if system.isOptSet("texture_scaling_level"):
         ppssppConfig.set(
-            "Graphics", "TexScalingLevel", system.config["texture_scaling_level"],
+            "Graphics",
+            "TexScalingLevel",
+            system.config["texture_scaling_level"],
         )
     else:
         ppssppConfig.set("Graphics", "TexScalingLevel", "1")
     # Texture Scaling Type
     if system.isOptSet("texture_scaling_type"):
         ppssppConfig.set(
-            "Graphics", "TexScalingType", system.config["texture_scaling_type"],
+            "Graphics",
+            "TexScalingType",
+            system.config["texture_scaling_type"],
         )
     else:
         ppssppConfig.set("Graphics", "TexScalingType", "0")
     # Texture Deposterize
     if system.isOptSet("texture_deposterize"):
         ppssppConfig.set(
-            "Graphics", "TexDeposterize", system.config["texture_deposterize"],
+            "Graphics",
+            "TexDeposterize",
+            system.config["texture_deposterize"],
         )
     else:
         ppssppConfig.set("Graphics", "TexDeposterize", "True")
@@ -149,14 +162,18 @@ def setPPSSPPConfig(system: Any) -> None:
     # Anisotropic Filtering
     if system.isOptSet("anisotropic_filtering"):
         ppssppConfig.set(
-            "Graphics", "AnisotropyLevel", system.config["anisotropic_filtering"],
+            "Graphics",
+            "AnisotropyLevel",
+            system.config["anisotropic_filtering"],
         )
     else:
         ppssppConfig.set("Graphics", "AnisotropyLevel", "3")
     # Texture Filtering
     if system.isOptSet("texture_filtering"):
         ppssppConfig.set(
-            "Graphics", "TextureFiltering", system.config["texture_filtering"],
+            "Graphics",
+            "TextureFiltering",
+            system.config["texture_filtering"],
         )
     else:
         ppssppConfig.set("Graphics", "TextureFiltering", "1")
@@ -187,7 +204,9 @@ def setPPSSPPConfig(system: Any) -> None:
     # Rewinding
     if system.isOptSet("rewind") and system.getOptBoolean("rewind"):
         ppssppConfig.set(
-            "General", "RewindFlipFrequency", "300",
+            "General",
+            "RewindFlipFrequency",
+            "300",
         )  # 300 = every 5 seconds
     else:
         ppssppConfig.set("General", "RewindFlipFrequency", "0")
@@ -214,7 +233,9 @@ def setPPSSPPConfig(system: Any) -> None:
             custom_option = section_option[section_option_splitter + 1 :]
             ppssppConfig.ensure_section(custom_section)
             ppssppConfig.set(
-                custom_section, custom_option, str(system.config[user_config]),
+                custom_section,
+                custom_option,
+                str(system.config[user_config]),
             )
 
     ppssppConfig.write()

@@ -51,10 +51,12 @@ class TOMLSettings:
         if not self.filepath.exists():
             try:
                 self.filepath.parent.mkdir(
-                    parents=True, exist_ok=True,
+                    parents=True,
+                    exist_ok=True,
                 )  # Create parent directories
                 self.filepath.write_text(
-                    "# Configuration file\n", encoding="utf-8",
+                    "# Configuration file\n",
+                    encoding="utf-8",
                 )  # Create empty TOML file
                 self._logger.info(f"Created new TOML file: {self.filepath}")
             except Exception as e:

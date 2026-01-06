@@ -77,7 +77,14 @@ class RyujinxGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         if not path.exists(RYUJINX_CONFIG_DIR):
             makedirs(RYUJINX_CONFIG_DIR)
@@ -217,7 +224,8 @@ class RyujinxGenerator(Generator):
 
 
 def writeControllerIntoJson(
-    new_controller: Any, filename: str = RYUJINX_CONFIG_PATH,
+    new_controller: Any,
+    filename: str = RYUJINX_CONFIG_PATH,
 ) -> None:
     with open(filename, "r+") as file:
         file_data = load(file)

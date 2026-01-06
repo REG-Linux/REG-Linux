@@ -58,7 +58,10 @@ emulatorMapping = {
 
 
 def reconfigure_controllers(
-    players_controllers: Any, system: Any, metadata: Any, device_list: Any,
+    players_controllers: Any,
+    system: Any,
+    metadata: Any,
+    device_list: Any,
 ) -> tuple[Any, Any, Any]:
     eslog.info("wheels reconfiguration")
     eslog.info("before wheel reconfiguration :")

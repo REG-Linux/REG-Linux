@@ -15,7 +15,14 @@ from .bigpemuConfig import (
 
 class BigPEmuGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Create the directory if it doesn't exist
         if not path.exists(BIGPEMU_CONFIG_DIR):

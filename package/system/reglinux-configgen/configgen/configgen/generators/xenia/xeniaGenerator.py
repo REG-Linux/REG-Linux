@@ -60,13 +60,15 @@ class XeniaGenerator(Generator):
         # check Vulkan first before doing anything
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
+                ["/usr/bin/system-vulkan", "hasVulkan"],
+                text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
                 try:
                     vulkan_version = check_output(
-                        ["/usr/bin/system-vulkan", "vulkanVersion"], text=True,
+                        ["/usr/bin/system-vulkan", "vulkanVersion"],
+                        text=True,
                     ).strip()
                     if vulkan_version > "1.3":
                         eslog.debug(f"Using Vulkan version: {vulkan_version}")
@@ -190,11 +192,13 @@ class XeniaGenerator(Generator):
         config["GPU"]["vsync_fps"] = int(system.config.get("xenia_vsync_fps", 60))
         # page state
         config["GPU"]["clear_memory_page_state"] = system.config.get(
-            "xenia_page_state", False,
+            "xenia_page_state",
+            False,
         )
         # render target path
         config["GPU"]["render_target_path_d3d12"] = system.config.get(
-            "xenia_target_path", "rtv",
+            "xenia_target_path",
+            "rtv",
         )
         # query occlusion
         config["GPU"]["query_occlusion_fake_sample_count"] = int(
@@ -202,7 +206,8 @@ class XeniaGenerator(Generator):
         )
         # readback resolve
         config["GPU"]["d3d12_readback_resolve"] = system.config.get(
-            "xenia_readback_resolve", False,
+            "xenia_readback_resolve",
+            False,
         )
         # cache
         config["GPU"]["texture_cache_memory_limit_hard"] = int(

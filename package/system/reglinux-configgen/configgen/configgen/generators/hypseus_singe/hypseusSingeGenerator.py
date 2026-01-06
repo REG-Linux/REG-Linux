@@ -157,7 +157,8 @@ class HypseusSingeGenerator(Generator):
             hypseus_data_dir_path.mkdir(parents=True, exist_ok=True)
         config_path = Path(HYPSEUS_CONFIG_PATH)
         if not config_path.exists() or not cmp(
-            HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH,
+            HYPSEUS_CONFIG_GAMEPAD_PATH,
+            HYPSEUS_CONFIG_PATH,
         ):
             copyfile(HYPSEUS_CONFIG_GAMEPAD_PATH, HYPSEUS_CONFIG_PATH)
 

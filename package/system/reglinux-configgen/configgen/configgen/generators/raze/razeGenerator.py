@@ -76,7 +76,14 @@ class RazeGenerator(Generator):
         }
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Remove unused arguments: metadata, guns, wheels
         architecture = get_cpu_architecture()
@@ -90,7 +97,10 @@ class RazeGenerator(Generator):
             with open(RAZE_CONFIG_FILE, "w") as config:
                 for section in self.config_defaults:
                     config.write(f"[{section}]\n")
-                    config.writelines(f"{key}={value}\n" for key, value in self.config_defaults[section].items())
+                    config.writelines(
+                        f"{key}={value}\n"
+                        for key, value in self.config_defaults[section].items()
+                    )
                     config.write("\n")
 
         config_backup = []
@@ -193,7 +203,10 @@ class RazeGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         return 16 / 9
 
