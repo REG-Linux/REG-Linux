@@ -18,7 +18,14 @@ ECWOLF_BIN_PATH = "/usr/bin/ecwolf"
 
 class ECWolfGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         ecwolfSaves = str(Path(ECWOLF_SAVES_DIR) / Path(rom).name)
         command_array = [ECWOLF_BIN_PATH]  # Binary for command array

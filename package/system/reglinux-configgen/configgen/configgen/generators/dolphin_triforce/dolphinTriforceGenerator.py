@@ -65,12 +65,16 @@ class DolphinTriforceGenerator(Generator):
         # Define default games path
         if "ISOPaths" not in dolphinTriforceSettings["General"]:
             dolphinTriforceSettings.set(
-                "General", "ISOPath0", str(Path("/userdata/roms/triforce")),
+                "General",
+                "ISOPath0",
+                str(Path("/userdata/roms/triforce")),
             )
             dolphinTriforceSettings.set("General", "ISOPaths", "1")
         if "GCMPathes" not in dolphinTriforceSettings["General"]:
             dolphinTriforceSettings.set(
-                "General", "GCMPath0", str(Path("/userdata/roms/triforce")),
+                "General",
+                "GCMPath0",
+                str(Path("/userdata/roms/triforce")),
             )
             dolphinTriforceSettings.set("General", "GCMPathes", "1")
 
@@ -133,10 +137,14 @@ class DolphinTriforceGenerator(Generator):
 
         # Language
         dolphinTriforceSettings.set(
-            "Core", "SelectedLanguage", str(getGameCubeLangFromEnvironment()),
+            "Core",
+            "SelectedLanguage",
+            str(getGameCubeLangFromEnvironment()),
         )  # Wii
         dolphinTriforceSettings.set(
-            "Core", "GameCubeLanguage", str(getGameCubeLangFromEnvironment()),
+            "Core",
+            "GameCubeLanguage",
+            str(getGameCubeLangFromEnvironment()),
         )  # GC
 
         # Enable MMU
@@ -187,7 +195,9 @@ class DolphinTriforceGenerator(Generator):
         # Graphics setting Aspect Ratio
         if system.isOptSet("dolphin_aspect_ratio"):
             dolphinTriforceGFXSettings.set(
-                "Settings", "AspectRatio", system.config["dolphin_aspect_ratio"],
+                "Settings",
+                "AspectRatio",
+                system.config["dolphin_aspect_ratio"],
             )
         else:
             # set to zero, which is 'Auto' in Dolphin & REG-Linux
@@ -232,7 +242,9 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.set("Hacks", "XFBToTextureEnable", "True")
             dolphinTriforceGFXSettings.set("Enhancements", "ForceFiltering", "True")
             dolphinTriforceGFXSettings.set(
-                "Enhancements", "ArbitraryMipmapDetection", "True",
+                "Enhancements",
+                "ArbitraryMipmapDetection",
+                "True",
             )
             dolphinTriforceGFXSettings.set("Enhancements", "DisableCopyFilter", "True")
             dolphinTriforceGFXSettings.set("Enhancements", "ForceTrueColor", "True")
@@ -241,7 +253,8 @@ class DolphinTriforceGenerator(Generator):
                 dolphinTriforceGFXSettings.remove_option("Hacks", "BBoxEnable")
                 dolphinTriforceGFXSettings.remove_option("Hacks", "DeferEFBCopies")
                 dolphinTriforceGFXSettings.remove_option(
-                    "Hacks", "EFBEmulateFormatChanges",
+                    "Hacks",
+                    "EFBEmulateFormatChanges",
                 )
                 dolphinTriforceGFXSettings.remove_option("Hacks", "EFBScaledCopy")
                 dolphinTriforceGFXSettings.remove_option("Hacks", "EFBToTextureEnable")
@@ -249,22 +262,28 @@ class DolphinTriforceGenerator(Generator):
                 dolphinTriforceGFXSettings.remove_option("Hacks", "XFBToTextureEnable")
             if dolphinTriforceGFXSettings.has_section("Enhancements"):
                 dolphinTriforceGFXSettings.remove_option(
-                    "Enhancements", "ForceFiltering",
+                    "Enhancements",
+                    "ForceFiltering",
                 )
                 dolphinTriforceGFXSettings.remove_option(
-                    "Enhancements", "ArbitraryMipmapDetection",
+                    "Enhancements",
+                    "ArbitraryMipmapDetection",
                 )
                 dolphinTriforceGFXSettings.remove_option(
-                    "Enhancements", "DisableCopyFilter",
+                    "Enhancements",
+                    "DisableCopyFilter",
                 )
                 dolphinTriforceGFXSettings.remove_option(
-                    "Enhancements", "ForceTrueColor",
+                    "Enhancements",
+                    "ForceTrueColor",
                 )
 
         # Internal resolution settings
         if system.isOptSet("internal_resolution"):
             dolphinTriforceGFXSettings.set(
-                "Settings", "EFBScale", system.config["internal_resolution"],
+                "Settings",
+                "EFBScale",
+                system.config["internal_resolution"],
             )
         else:
             dolphinTriforceGFXSettings.set("Settings", "EFBScale", "2")
@@ -272,7 +291,9 @@ class DolphinTriforceGenerator(Generator):
         # VSync
         if system.isOptSet("vsync"):
             dolphinTriforceGFXSettings.set(
-                "Hardware", "VSync", str(system.getOptBoolean("vsync")),
+                "Hardware",
+                "VSync",
+                str(system.getOptBoolean("vsync")),
             )
         else:
             dolphinTriforceGFXSettings.set("Hardware", "VSync", "True")
@@ -280,7 +301,9 @@ class DolphinTriforceGenerator(Generator):
         # Anisotropic filtering
         if system.isOptSet("anisotropic_filtering"):
             dolphinTriforceGFXSettings.set(
-                "Enhancements", "MaxAnisotropy", system.config["anisotropic_filtering"],
+                "Enhancements",
+                "MaxAnisotropy",
+                system.config["anisotropic_filtering"],
             )
         else:
             dolphinTriforceGFXSettings.set("Enhancements", "MaxAnisotropy", "0")
@@ -288,7 +311,9 @@ class DolphinTriforceGenerator(Generator):
         # Anti aliasing
         if system.isOptSet("antialiasing"):
             dolphinTriforceGFXSettings.set(
-                "Settings", "MSAA", system.config["antialiasing"],
+                "Settings",
+                "MSAA",
+                system.config["antialiasing"],
             )
         else:
             dolphinTriforceGFXSettings.set("Settings", "MSAA", "0")
@@ -565,15 +590,20 @@ $SeatLoopPatch
         return Command(array=command_array)
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         if "dolphin_aspect_ratio" in config and (
             config["dolphin_aspect_ratio"] == "1"
-            or (config["dolphin_aspect_ratio"] == "3"
-            and (
-                game_resolution["width"] / float(game_resolution["height"])
-                > ((16.0 / 9.0) - 0.1)
-            ))
+            or (
+                config["dolphin_aspect_ratio"] == "3"
+                and (
+                    game_resolution["width"] / float(game_resolution["height"])
+                    > ((16.0 / 9.0) - 0.1)
+                )
+            )
         ):
             return 16 / 9
         return 4 / 3

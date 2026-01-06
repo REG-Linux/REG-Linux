@@ -31,7 +31,10 @@ class UnixSettings:
     )
 
     def __init__(
-        self, filepath: str | Path, separator: str = "", comment: str = "#",
+        self,
+        filepath: str | Path,
+        separator: str = "",
+        comment: str = "#",
     ) -> None:
         """Initialize the UnixSettings instance.
 
@@ -58,7 +61,8 @@ class UnixSettings:
         if not self.filepath.exists():
             try:
                 self.filepath.parent.mkdir(
-                    parents=True, exist_ok=True,
+                    parents=True,
+                    exist_ok=True,
                 )  # Create parent directories
                 self.filepath.write_text("", encoding="utf-8")  # Create empty file
                 self._logger.info(f"Created new INI/CFG file: {self.filepath}")
@@ -74,7 +78,9 @@ class UnixSettings:
         and permit keys without values.
         """
         self.config = ConfigParser(
-            interpolation=None, strict=False, allow_no_value=True,
+            interpolation=None,
+            strict=False,
+            allow_no_value=True,
         )
         self.config.optionxform = lambda optionstr: str(optionstr)  # Preserve key case
         self._load_file()  # Load the configuration file
@@ -175,7 +181,8 @@ class UnixSettings:
         try:
             with self.filepath.open("w", encoding="utf-8") as f:
                 self.config.write(
-                    f, space_around_delimiters=bool(self.separator),
+                    f,
+                    space_around_delimiters=bool(self.separator),
                 )  # Write to file
             return True
         except Exception as e:

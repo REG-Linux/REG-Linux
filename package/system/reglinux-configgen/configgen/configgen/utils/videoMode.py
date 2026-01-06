@@ -83,7 +83,12 @@ def getScreensInfos(config: dict[str, str]) -> list[dict[str, int]]:
     outputs = getScreens()
 
     res = [
-        {"width": resolution1["width"], "height": resolution1["height"], "x": 0, "y": 0},
+        {
+            "width": resolution1["width"],
+            "height": resolution1["height"],
+            "x": 0,
+            "y": 0,
+        },
     ]
 
     if "videooutput2" in config and len(outputs) > 1:

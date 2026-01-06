@@ -14,7 +14,14 @@ DOSBOXSTAGING_BIN_PATH = "/usr/bin/dosbox-staging"
 
 class DosBoxStagingGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Find rom path
         gameDir = rom

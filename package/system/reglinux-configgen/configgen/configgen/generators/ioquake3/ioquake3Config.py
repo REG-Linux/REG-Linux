@@ -71,7 +71,10 @@ def writeCfgFile(
 
 
 def setIoquake3Config(
-    system: Any, rom: str, playersControllers: Any, gameResolution: dict[str, int],
+    system: Any,
+    rom: str,
+    playersControllers: Any,
+    gameResolution: dict[str, int],
 ) -> None:
     # create the cfg files for each quake3 rom / mod folder
     files = []

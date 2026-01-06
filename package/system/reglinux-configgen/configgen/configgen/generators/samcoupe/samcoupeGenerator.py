@@ -7,7 +7,14 @@ SAMCOUPE_BIN_PATH = "/usr/bin/simcoupe"
 
 class SamcoupeGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         command_array = [SAMCOUPE_BIN_PATH, "autoboot", "-disk1", rom]
 

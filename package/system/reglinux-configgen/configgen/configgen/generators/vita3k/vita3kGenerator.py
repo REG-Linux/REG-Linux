@@ -29,7 +29,14 @@ class Vita3kGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Create folder
         config_dir_path = Path(VITA3K_CONFIG_DIR)
@@ -175,6 +182,9 @@ class Vita3kGenerator(Generator):
         )
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         return 16 / 9

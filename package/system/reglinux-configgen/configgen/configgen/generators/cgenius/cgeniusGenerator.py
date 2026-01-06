@@ -21,7 +21,14 @@ from .cgeniusControllers import setCgeniusControllers
 
 class CGeniusGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Create the config directory if it doesn't exist
         if not path.exists(CGENIUS_CONFIG_DIR):

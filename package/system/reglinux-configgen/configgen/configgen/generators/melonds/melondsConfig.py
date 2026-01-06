@@ -11,7 +11,9 @@ MELONDS_BIN_PATH = Path("/usr/bin/melonDS")
 
 
 def setMelonDSConfig(
-    melondsConfig: Any, system: Any, gameResolution: dict[str, int],
+    melondsConfig: Any,
+    system: Any,
+    gameResolution: dict[str, int],
 ) -> None:
     if gameResolution["width"] < gameResolution["height"]:
         width, height = gameResolution["height"], gameResolution["width"]

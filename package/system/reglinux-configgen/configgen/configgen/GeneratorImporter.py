@@ -13,7 +13,6 @@ class GeneratorNotFoundError(Exception):
     """Exception raised when no generator is found for the specified emulator."""
 
 
-
 # Mapping of emulator names to their respective module paths and class names
 EMULATOR_MAPPING = {
     "abuse": ("configgen.generators.abuse.abuseGenerator", "AbuseGenerator"),

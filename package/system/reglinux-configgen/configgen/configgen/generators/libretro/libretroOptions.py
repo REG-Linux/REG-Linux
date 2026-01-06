@@ -7,7 +7,11 @@ from configgen.controllers import getGamesMetaData, gunsNeedCrosses
 
 
 def generateCoreSettings(
-    coreSettings: Any, system: Any, rom: str, guns: Any, wheels: Any,
+    coreSettings: Any,
+    system: Any,
+    rom: str,
+    guns: Any,
+    wheels: Any,
 ) -> None:
     match system.config["core"]:
         case "cap32":
@@ -178,7 +182,8 @@ def configure_cap32(coreSettings: Any, system: Any) -> None:
     # language
     if system.isOptSet("cap32_language"):
         coreSettings.save(
-            "cap32_lang_layout", '"' + system.config["cap32_language"] + '"',
+            "cap32_lang_layout",
+            '"' + system.config["cap32_language"] + '"',
         )
     else:
         coreSettings.save("cap32_lang_layout", '"english"')
@@ -190,21 +195,24 @@ def configure_atari_800(coreSettings: Any, system: Any) -> None:
         # Let user overide Atari System
         if system.isOptSet("atari800_system"):
             coreSettings.save(
-                "atari800_system", '"' + system.config["atari800_system"] + '"',
+                "atari800_system",
+                '"' + system.config["atari800_system"] + '"',
             )
         else:
             coreSettings.save("atari800_system", '"800XL (64K)"')
         # Video Standard
         if system.isOptSet("atari800_ntscpal"):
             coreSettings.save(
-                "atari800_ntscpal", '"' + system.config["atari800_ntscpal"] + '"',
+                "atari800_ntscpal",
+                '"' + system.config["atari800_ntscpal"] + '"',
             )
         else:
             coreSettings.save("atari800_ntscpal", '"NTSC"')
         # SIO Acceleration
         if system.isOptSet("atari800_sioaccel"):
             coreSettings.save(
-                "atari800_sioaccel", '"' + system.config["atari800_sioaccel"] + '"',
+                "atari800_sioaccel",
+                '"' + system.config["atari800_sioaccel"] + '"',
             )
         else:
             coreSettings.save("atari800_sioaccel", '"enabled"')
@@ -219,7 +227,8 @@ def configure_atari_800(coreSettings: Any, system: Any) -> None:
         # Internal resolution
         if system.isOptSet("atari800_resolution"):
             coreSettings.save(
-                "atari800_resolution", '"' + system.config["atari800_resolution"] + '"',
+                "atari800_resolution",
+                '"' + system.config["atari800_resolution"] + '"',
             )
         else:
             coreSettings.save("atari800_resolution", '""')  # Default : 336x240
@@ -239,7 +248,8 @@ def configure_atari_800(coreSettings: Any, system: Any) -> None:
         # Joy Hack (for robotron)
         if system.isOptSet("atari800_opt2"):
             coreSettings.save(
-                "atari800_opt2", '"' + system.config["atari800_opt2"] + '"',
+                "atari800_opt2",
+                '"' + system.config["atari800_opt2"] + '"',
             )
         else:
             coreSettings.save("atari800_opt2", '"disabled"')
@@ -249,7 +259,8 @@ def configure_virtual_jaguar(coreSettings: Any, system: Any) -> None:
     # Fast Blitter (Older, Faster, Less compatible)
     if system.isOptSet("usefastblitter"):
         coreSettings.save(
-            "virtualjaguar_usefastblitter", '"' + system.config["usefastblitter"] + '"',
+            "virtualjaguar_usefastblitter",
+            '"' + system.config["usefastblitter"] + '"',
         )
     else:
         coreSettings.save("virtualjaguar_usefastblitter", '"enabled"')
@@ -261,7 +272,8 @@ def configure_virtual_jaguar(coreSettings: Any, system: Any) -> None:
     # Doom Res Hack
     if system.isOptSet("doom_res_hack"):
         coreSettings.save(
-            "virtualjaguar_doom_res_hack", '"' + system.config["doom_res_hack"] + '"',
+            "virtualjaguar_doom_res_hack",
+            '"' + system.config["doom_res_hack"] + '"',
         )
     else:
         coreSettings.save("virtualjaguar_doom_res_hack", '"disabled"')
@@ -295,7 +307,8 @@ def configure_commodore_64(coreSettings: Any, system: Any, guns: Any) -> None:
     # Aspect Ratio
     if system.isOptSet("vice_aspect_ratio"):
         coreSettings.save(
-            "vice_aspect_ratio", '"' + system.config["vice_aspect_ratio"] + '"',
+            "vice_aspect_ratio",
+            '"' + system.config["vice_aspect_ratio"] + '"',
         )
     else:
         coreSettings.save("vice_aspect_ratio", '"pal"')
@@ -311,14 +324,16 @@ def configure_commodore_64(coreSettings: Any, system: Any, guns: Any) -> None:
     # External palette
     if system.isOptSet("vice_external_palette"):
         coreSettings.save(
-            "vice_external_palette", '"' + system.config["vice_external_palette"] + '"',
+            "vice_external_palette",
+            '"' + system.config["vice_external_palette"] + '"',
         )
     else:
         coreSettings.save("vice_external_palette", '"colodore"')
     # Button options
     if system.isOptSet("vice_retropad_options"):
         coreSettings.save(
-            "vice_retropad_options", '"' + system.config["vice_retropad_options"] + '"',
+            "vice_retropad_options",
+            '"' + system.config["vice_retropad_options"] + '"',
         )
     else:
         coreSettings.save("vice_retropad_options", '"jump"')
@@ -337,7 +352,8 @@ def configure_commodore_64(coreSettings: Any, system: Any, guns: Any) -> None:
         coreSettings.save("vice_joyport_type", '"14"')
     elif system.isOptSet("vice_joyport_type"):
         coreSettings.save(
-            "vice_joyport_type", '"' + system.config["vice_joyport_type"] + '"',
+            "vice_joyport_type",
+            '"' + system.config["vice_joyport_type"] + '"',
         )
     else:
         coreSettings.save("vice_joyport_type", '"1"')
@@ -381,7 +397,8 @@ def configure_commodore_128(coreSettings: Any, system: Any) -> None:
     # Aspect Ratio
     if system.isOptSet("vice_aspect_ratio"):
         coreSettings.save(
-            "vice_aspect_ratio", '"' + system.config["vice_aspect_ratio"] + '"',
+            "vice_aspect_ratio",
+            '"' + system.config["vice_aspect_ratio"] + '"',
         )
     else:
         coreSettings.save("vice_aspect_ratio", '"pal"')
@@ -397,14 +414,16 @@ def configure_commodore_128(coreSettings: Any, system: Any) -> None:
     # External palette
     if system.isOptSet("vice_external_palette"):
         coreSettings.save(
-            "vice_external_palette", '"' + system.config["vice_external_palette"] + '"',
+            "vice_external_palette",
+            '"' + system.config["vice_external_palette"] + '"',
         )
     else:
         coreSettings.save("vice_external_palette", '"colodore"')
     # Button options
     if system.isOptSet("vice_retropad_options"):
         coreSettings.save(
-            "vice_retropad_options", '"' + system.config["vice_retropad_options"] + '"',
+            "vice_retropad_options",
+            '"' + system.config["vice_retropad_options"] + '"',
         )
     else:
         coreSettings.save("vice_retropad_options", '"disabled"')
@@ -416,7 +435,8 @@ def configure_commodore_128(coreSettings: Any, system: Any) -> None:
     # Select Controller Type
     if system.isOptSet("vice_joyport_type"):
         coreSettings.save(
-            "vice_joyport_type", '"' + system.config["vice_joyport_type"] + '"',
+            "vice_joyport_type",
+            '"' + system.config["vice_joyport_type"] + '"',
         )
     else:
         coreSettings.save("vice_joyport_type", '"1"')
@@ -450,7 +470,8 @@ def configure_commodore_plus(coreSettings: Any, system: Any) -> None:
     # Aspect Ratio
     if system.isOptSet("vice_aspect_ratio"):
         coreSettings.save(
-            "vice_aspect_ratio", '"' + system.config["vice_aspect_ratio"] + '"',
+            "vice_aspect_ratio",
+            '"' + system.config["vice_aspect_ratio"] + '"',
         )
     else:
         coreSettings.save("vice_aspect_ratio", '"pal"')
@@ -474,7 +495,8 @@ def configure_commodore_plus(coreSettings: Any, system: Any) -> None:
     # Button options
     if system.isOptSet("vice_retropad_options"):
         coreSettings.save(
-            "vice_retropad_options", '"' + system.config["vice_retropad_options"] + '"',
+            "vice_retropad_options",
+            '"' + system.config["vice_retropad_options"] + '"',
         )
     else:
         coreSettings.save("vice_retropad_options", '"disabled"')
@@ -486,7 +508,8 @@ def configure_commodore_plus(coreSettings: Any, system: Any) -> None:
     # Select Controller Type
     if system.isOptSet("vice_joyport_type"):
         coreSettings.save(
-            "vice_joyport_type", '"' + system.config["vice_joyport_type"] + '"',
+            "vice_joyport_type",
+            '"' + system.config["vice_joyport_type"] + '"',
         )
     else:
         coreSettings.save("vice_joyport_type", '"1"')
@@ -520,7 +543,8 @@ def configure_commodore_vic(coreSettings: Any, system: Any) -> None:
     # Aspect Ratio
     if system.isOptSet("vice_aspect_ratio"):
         coreSettings.save(
-            "vice_aspect_ratio", '"' + system.config["vice_aspect_ratio"] + '"',
+            "vice_aspect_ratio",
+            '"' + system.config["vice_aspect_ratio"] + '"',
         )
     else:
         coreSettings.save("vice_aspect_ratio", '"pal"')
@@ -544,7 +568,8 @@ def configure_commodore_vic(coreSettings: Any, system: Any) -> None:
     # Button options
     if system.isOptSet("vice_retropad_options"):
         coreSettings.save(
-            "vice_retropad_options", '"' + system.config["vice_retropad_options"] + '"',
+            "vice_retropad_options",
+            '"' + system.config["vice_retropad_options"] + '"',
         )
     else:
         coreSettings.save("vice_retropad_options", '"disabled"')
@@ -556,7 +581,8 @@ def configure_commodore_vic(coreSettings: Any, system: Any) -> None:
     # Select Controller Type
     if system.isOptSet("vice_joyport_type"):
         coreSettings.save(
-            "vice_joyport_type", '"' + system.config["vice_joyport_type"] + '"',
+            "vice_joyport_type",
+            '"' + system.config["vice_joyport_type"] + '"',
         )
     else:
         coreSettings.save("vice_joyport_type", '"1"')
@@ -590,7 +616,8 @@ def configure_commodore_pet(coreSettings: Any, system: Any) -> None:
     # Aspect Ratio
     if system.isOptSet("vice_aspect_ratio"):
         coreSettings.save(
-            "vice_aspect_ratio", '"' + system.config["vice_aspect_ratio"] + '"',
+            "vice_aspect_ratio",
+            '"' + system.config["vice_aspect_ratio"] + '"',
         )
     else:
         coreSettings.save("vice_aspect_ratio", '"pal"')
@@ -614,7 +641,8 @@ def configure_commodore_pet(coreSettings: Any, system: Any) -> None:
     # Button options
     if system.isOptSet("vice_retropad_options"):
         coreSettings.save(
-            "vice_retropad_options", '"' + system.config["vice_retropad_options"] + '"',
+            "vice_retropad_options",
+            '"' + system.config["vice_retropad_options"] + '"',
         )
     else:
         coreSettings.save("vice_retropad_options", '"disabled"')
@@ -626,7 +654,8 @@ def configure_commodore_pet(coreSettings: Any, system: Any) -> None:
     # Select Controller Type
     if system.isOptSet("vice_joyport_type"):
         coreSettings.save(
-            "vice_joyport_type", '"' + system.config["vice_joyport_type"] + '"',
+            "vice_joyport_type",
+            '"' + system.config["vice_joyport_type"] + '"',
         )
     else:
         coreSettings.save("vice_joyport_type", '"1"')
@@ -659,14 +688,16 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
     # CPU Compatibility
     if system.isOptSet("cpu_compatibility"):
         coreSettings.save(
-            "puae_cpu_compatibility", '"' + system.config["cpu_compatibility"] + '"',
+            "puae_cpu_compatibility",
+            '"' + system.config["cpu_compatibility"] + '"',
         )
     else:
         coreSettings.save("puae_cpu_compatibility", '"normal"')
     # CPU Multiplier (Overclock)
     if system.isOptSet("cpu_throttle"):
         coreSettings.save(
-            "puae_cpu_throttle", '"' + system.config["cpu_throttle"] + '"',
+            "puae_cpu_throttle",
+            '"' + system.config["cpu_throttle"] + '"',
         )
         coreSettings.save("puae_cpu_multiplier", '"0"')
     else:
@@ -680,7 +711,8 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
         if system.isOptSet("cpu_multiplier"):
             coreSettings.save("puae_cpu_throttle", '"0.0"')
             coreSettings.save(
-                "puae_cpu_multiplier", '"' + system.config["cpu_multiplier"] + '"',
+                "puae_cpu_multiplier",
+                '"' + system.config["cpu_multiplier"] + '"',
             )
         else:
             coreSettings.save("puae_cpu_throttle", '"0.0"')
@@ -688,14 +720,16 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
     # Standard Video
     if system.isOptSet("video_standard"):
         coreSettings.save(
-            "puae_video_standard", '"' + system.config["video_standard"] + '"',
+            "puae_video_standard",
+            '"' + system.config["video_standard"] + '"',
         )
     else:
         coreSettings.save("puae_video_standard", '"PAL auto"')
     # Video Resolution
     if system.isOptSet("video_resolution"):
         coreSettings.save(
-            "puae_video_resolution", '"' + system.config["video_resolution"] + '"',
+            "puae_video_resolution",
+            '"' + system.config["video_resolution"] + '"',
         )
     else:
         coreSettings.save("puae_video_resolution", '"hires"')
@@ -708,7 +742,8 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
     # Frameskip
     if system.isOptSet("gfx_framerate"):
         coreSettings.save(
-            "puae_gfx_framerate", '"' + system.config["gfx_framerate"] + '"',
+            "puae_gfx_framerate",
+            '"' + system.config["gfx_framerate"] + '"',
         )
     else:
         coreSettings.save("puae_gfx_framerate", '"disabled"')
@@ -720,7 +755,8 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
     # Jump on B
     if system.isOptSet("pad_options"):
         coreSettings.save(
-            "puae_retropad_options", '"' + system.config["pad_options"] + '"',
+            "puae_retropad_options",
+            '"' + system.config["pad_options"] + '"',
         )
     elif system.name == "amigacdtv":
         coreSettings.save("puae_retropad_options", '"disabled"')
@@ -731,7 +767,8 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
         # Floppy Turbo Speed
         if system.isOptSet("puae_floppy_speed"):
             coreSettings.save(
-                "puae_floppy_speed", '"' + system.config["puae_floppy_speed"] + '"',
+                "puae_floppy_speed",
+                '"' + system.config["puae_floppy_speed"] + '"',
             )
         else:
             coreSettings.save("puae_floppy_speed", '"100"')
@@ -746,7 +783,8 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
         # Whdload Launcher
         if system.isOptSet("whdload"):
             coreSettings.save(
-                "puae_use_whdload_prefs", '"' + system.config["whdload"] + '"',
+                "puae_use_whdload_prefs",
+                '"' + system.config["whdload"] + '"',
             )
         else:
             coreSettings.save("puae_use_whdload_prefs", '"config"')
@@ -771,7 +809,8 @@ def configure_commodore_puae(coreSettings: Any, system: Any) -> None:
         # CD Turbo Speed
         if system.isOptSet("puae_cd_speed"):
             coreSettings.save(
-                "puae_cd_speed", '"' + system.config["puae_cd_speed"] + '"',
+                "puae_cd_speed",
+                '"' + system.config["puae_cd_speed"] + '"',
             )
         else:
             coreSettings.save("puae_cd_speed", '"100"')
@@ -796,28 +835,32 @@ def configure_dolphin(coreSettings: Any, system: Any) -> None:
     # Wii Resolution Scale
     if system.isOptSet("wii_resolution"):
         coreSettings.save(
-            "dolphin_efb_scale", '"' + system.config["wii_resolution"] + '"',
+            "dolphin_efb_scale",
+            '"' + system.config["wii_resolution"] + '"',
         )
     else:
         coreSettings.save("dolphin_efb_scale", '"x1 (640 x 528)"')
     # Anisotropic Filtering
     if system.isOptSet("wii_anisotropic"):
         coreSettings.save(
-            "dolphin_max_anisotropy", '"' + system.config["wii_anisotropic"] + '"',
+            "dolphin_max_anisotropy",
+            '"' + system.config["wii_anisotropic"] + '"',
         )
     else:
         coreSettings.save("dolphin_max_anisotropy", '"x1"')
     # Wii Tv Mode
     if system.isOptSet("wii_widescreen"):
         coreSettings.save(
-            "dolphin_widescreen", '"' + system.config["wii_widescreen"] + '"',
+            "dolphin_widescreen",
+            '"' + system.config["wii_widescreen"] + '"',
         )
     else:
         coreSettings.save("dolphin_widescreen", '"enabled"')
     # Widescreen Hack
     if system.isOptSet("wii_widescreen_hack"):
         coreSettings.save(
-            "dolphin_widescreen_hack", '"' + system.config["wii_widescreen_hack"] + '"',
+            "dolphin_widescreen_hack",
+            '"' + system.config["wii_widescreen_hack"] + '"',
         )
     else:
         coreSettings.save("dolphin_widescreen_hack", '"disabled"')
@@ -854,21 +897,24 @@ def configure_o2em(coreSettings: Any, system: Any) -> None:
     # Swap Gamepad
     if system.isOptSet("o2em_swap_gamepads"):
         coreSettings.save(
-            "o2em_swap_gamepads", '"' + system.config["o2em_swap_gamepads"] + '"',
+            "o2em_swap_gamepads",
+            '"' + system.config["o2em_swap_gamepads"] + '"',
         )
     else:
         coreSettings.save("o2em_swap_gamepads", '"disabled"')
     # Crop Overscan
     if system.isOptSet("o2em_crop_overscan"):
         coreSettings.save(
-            "o2em_crop_overscan", '"' + system.config["o2em_crop_overscan"] + '"',
+            "o2em_crop_overscan",
+            '"' + system.config["o2em_crop_overscan"] + '"',
         )
     else:
         coreSettings.save("o2em_crop_overscan", '"enabled"')
     # Ghosting effect
     if system.isOptSet("o2em_mix_frames"):
         coreSettings.save(
-            "o2em_mix_frames", '"' + system.config["o2em_mix_frames"] + '"',
+            "o2em_mix_frames",
+            '"' + system.config["o2em_mix_frames"] + '"',
         )
     else:
         coreSettings.save("o2em_mix_frames", '"disabled"')
@@ -879,7 +925,8 @@ def configure_o2em(coreSettings: Any, system: Any) -> None:
     ):
         coreSettings.save("o2em_low_pass_filter", '"enabled"')
         coreSettings.save(
-            "o2em_low_pass_range", '"' + system.config["o2em_low_pass_range"] + '"',
+            "o2em_low_pass_range",
+            '"' + system.config["o2em_low_pass_range"] + '"',
         )
     else:
         coreSettings.save("o2em_low_pass_filter", '"disabled"')
@@ -894,7 +941,8 @@ def configure_mame(coreSettings: Any, system: Any) -> None:
     # CPU Overclock
     if system.isOptSet("mame_cpu_overclock"):
         coreSettings.save(
-            "mame_cpu_overclock", '"' + system.config["mame_cpu_overclock"] + '"',
+            "mame_cpu_overclock",
+            '"' + system.config["mame_cpu_overclock"] + '"',
         )
     else:
         coreSettings.save("mame_cpu_overclock", '"default"')
@@ -935,7 +983,8 @@ def configure_samecdi(coreSettings: Any, system: Any) -> None:
     # Video Resolution
     if system.isOptSet("same_cdi_altres"):
         coreSettings.save(
-            "same_cdi_altres", '"' + system.config["same_cdi_altres"] + '"',
+            "same_cdi_altres",
+            '"' + system.config["same_cdi_altres"] + '"',
         )
     else:
         coreSettings.save("same_cdi_altres", '"640x480"')
@@ -959,7 +1008,8 @@ def configure_mame2003_plus(coreSettings: Any, system: Any, guns: Any) -> None:
     # Control Mapping
     if system.isOptSet("mame2003-plus_analog"):
         coreSettings.save(
-            "mame2003-plus_analog", '"' + system.config["mame2003-plus_analog"] + '"',
+            "mame2003-plus_analog",
+            '"' + system.config["mame2003-plus_analog"] + '"',
         )
     else:
         coreSettings.save("mame2003-plus_analog", '"digital"')
@@ -1062,7 +1112,8 @@ def configure_dosbox_pure(coreSettings: Any, system: Any) -> None:
         and system.config["pure_cpu_type"] != "automatic"
     ):
         coreSettings.save(
-            "dosbox_pure_cpu_type", '"' + system.config["pure_cpu_type"] + '"',
+            "dosbox_pure_cpu_type",
+            '"' + system.config["pure_cpu_type"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_cpu_type", '"auto"')
@@ -1072,35 +1123,40 @@ def configure_dosbox_pure(coreSettings: Any, system: Any) -> None:
         and system.config["pure_cpu_core"] != "automatic"
     ):
         coreSettings.save(
-            "dosbox_pure_cpu_core", '"' + system.config["pure_cpu_core"] + '"',
+            "dosbox_pure_cpu_core",
+            '"' + system.config["pure_cpu_core"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_cpu_core", '"auto"')
     # Emulated performance (CPU Cycles)
     if system.isOptSet("pure_cycles") and system.config["pure_cycles"] != "automatic":
         coreSettings.save(
-            "dosbox_pure_cycles", '"' + system.config["pure_cycles"] + '"',
+            "dosbox_pure_cycles",
+            '"' + system.config["pure_cycles"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_cycles", '"auto"')
     # Graphics Chip type
     if system.isOptSet("pure_machine"):
         coreSettings.save(
-            "dosbox_pure_machine", '"' + system.config["pure_machine"] + '"',
+            "dosbox_pure_machine",
+            '"' + system.config["pure_machine"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_machine", '"svga"')
     # Memory size
     if system.isOptSet("pure_memory_size"):
         coreSettings.save(
-            "dosbox_pure_memory_size", '"' + system.config["pure_memory_size"] + '"',
+            "dosbox_pure_memory_size",
+            '"' + system.config["pure_memory_size"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_memory_size", '"16"')
     # Save state
     if system.isOptSet("pure_savestate"):
         coreSettings.save(
-            "dosbox_pure_savestate", '"' + system.config["pure_savestate"] + '"',
+            "dosbox_pure_savestate",
+            '"' + system.config["pure_savestate"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_savestate", '"on"')
@@ -1115,7 +1171,8 @@ def configure_dosbox_pure(coreSettings: Any, system: Any) -> None:
     # Automatic Gamepad Mapping
     if system.isOptSet("pure_auto_mapping"):
         coreSettings.save(
-            "dosbox_pure_auto_mapping", '"' + system.config["pure_auto_mapping"] + '"',
+            "dosbox_pure_auto_mapping",
+            '"' + system.config["pure_auto_mapping"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_auto_mapping", '"true"')
@@ -1138,7 +1195,8 @@ def configure_dosbox_pure(coreSettings: Any, system: Any) -> None:
     # SoundBlaster Type
     if system.isOptSet("pure_sblaster_type"):
         coreSettings.save(
-            "dosbox_pure_sblaster_type", '"' + system.config["pure_sblaster_type"] + '"',
+            "dosbox_pure_sblaster_type",
+            '"' + system.config["pure_sblaster_type"] + '"',
         )
     else:
         coreSettings.save("dosbox_pure_sblaster_type", '"sb16"')
@@ -1182,7 +1240,8 @@ def configure_bluemsx(coreSettings: Any, system: Any) -> None:
     # Zoom, Hide Video Border
     if system.isOptSet("bluemsx_overscan"):
         coreSettings.save(
-            "bluemsx_overscan", '"' + system.config["bluemsx_overscan"] + '"',
+            "bluemsx_overscan",
+            '"' + system.config["bluemsx_overscan"] + '"',
         )
     else:
         coreSettings.save("bluemsx_overscan", '"MSX2"')
@@ -1192,7 +1251,8 @@ def configure_pcengine(coreSettings: Any, system: Any) -> None:
     # Remove 16-sprites-per-scanline hardware limit
     if system.isOptSet("pce_nospritelimit"):
         coreSettings.save(
-            "pce_nospritelimit", '"' + system.config["pce_nospritelimit"] + '"',
+            "pce_nospritelimit",
+            '"' + system.config["pce_nospritelimit"] + '"',
         )
     else:
         coreSettings.save("pce_nospritelimit", '"enabled"')
@@ -1231,21 +1291,24 @@ def configure_np2kai(coreSettings: Any, system: Any) -> None:
     # CPU Feature
     if system.isOptSet("np2kai_cpu_feature"):
         coreSettings.save(
-            "np2kai_cpu_feature", '"' + system.config["np2kai_cpu_feature"] + '"',
+            "np2kai_cpu_feature",
+            '"' + system.config["np2kai_cpu_feature"] + '"',
         )
     else:
         coreSettings.save("np2kai_cpu_feature", '"Intel 80386"')
     # CPU Clock Multiplier
     if system.isOptSet("np2kai_clk_mult"):
         coreSettings.save(
-            "np2kai_clk_mult", '"' + system.config["np2kai_clk_mult"] + '"',
+            "np2kai_clk_mult",
+            '"' + system.config["np2kai_clk_mult"] + '"',
         )
     else:
         coreSettings.save("np2kai_clk_mult", '"4"')
     # RAM Size
     if system.isOptSet("np2kai_ExMemory"):
         coreSettings.save(
-            "np2kai_ExMemory", '"' + system.config["np2kai_ExMemory"] + '"',
+            "np2kai_ExMemory",
+            '"' + system.config["np2kai_ExMemory"] + '"',
         )
     else:
         coreSettings.save("np2kai_ExMemory", '"3"')
@@ -1273,7 +1336,8 @@ def configure_np2kai(coreSettings: Any, system: Any) -> None:
     # Sound Board
     if system.isOptSet("np2kai_SNDboard"):
         coreSettings.save(
-            "np2kai_SNDboard", '"' + system.config["np2kai_SNDboard"] + '"',
+            "np2kai_SNDboard",
+            '"' + system.config["np2kai_SNDboard"] + '"',
         )
     else:
         coreSettings.save("np2kai_SNDboard", '"PC9801-26K + 86"')
@@ -1296,7 +1360,8 @@ def configure_mednafen_supergrafx(coreSettings: Any, system: Any) -> None:
     # Remove 16-sprites-per-scanline hardware limit
     if system.isOptSet("sgx_nospritelimit"):
         coreSettings.save(
-            "sgx_nospritelimit", '"' + system.config["sgx_nospritelimit"] + '"',
+            "sgx_nospritelimit",
+            '"' + system.config["sgx_nospritelimit"] + '"',
         )
     else:
         coreSettings.save("sgx_nospritelimit", '"enabled"')
@@ -1306,14 +1371,18 @@ def configure_pcfx(coreSettings: Any, system: Any) -> None:
     # Remove 16-sprites-per-scanline hardware limit
     if system.isOptSet("pcfx_nospritelimit"):
         coreSettings.save(
-            "pcfx_nospritelimit", '"' + system.config["pcfx_nospritelimit"] + '"',
+            "pcfx_nospritelimit",
+            '"' + system.config["pcfx_nospritelimit"] + '"',
         )
     else:
         coreSettings.save("pcfx_nospritelimit", '"enabled"')
 
 
 def configure_mupen64plus_next(
-    coreSettings: Any, system: Any, rom: str, wheels: Any,
+    coreSettings: Any,
+    system: Any,
+    rom: str,
+    wheels: Any,
 ) -> None:
     # Threaded Rendering
     coreSettings.save("mupen64plus-ThreadedRenderer", '"True"')
@@ -1416,7 +1485,8 @@ def configure_mupen64plus_next(
                 coreSettings.save("mupen64plus-pak1", '"memory"')
         else:
             coreSettings.save(
-                "mupen64plus-pak1", '"' + system.config["mupen64plus-pak1"] + '"',
+                "mupen64plus-pak1",
+                '"' + system.config["mupen64plus-pak1"] + '"',
             )
     else:
         coreSettings.save("mupen64plus-pak1", '"memory"')
@@ -1429,7 +1499,8 @@ def configure_mupen64plus_next(
                 coreSettings.save("mupen64plus-pak2", '"none"')
         else:
             coreSettings.save(
-                "mupen64plus-pak2", '"' + system.config["mupen64plus-pak2"] + '"',
+                "mupen64plus-pak2",
+                '"' + system.config["mupen64plus-pak2"] + '"',
             )
     else:
         coreSettings.save("mupen64plus-pak2", '"none"')
@@ -1442,7 +1513,8 @@ def configure_mupen64plus_next(
                 coreSettings.save("mupen64plus-pak3", '"none"')
         else:
             coreSettings.save(
-                "mupen64plus-pak3", '"' + system.config["mupen64plus-pak3"] + '"',
+                "mupen64plus-pak3",
+                '"' + system.config["mupen64plus-pak3"] + '"',
             )
     else:
         coreSettings.save("mupen64plus-pak3", '"none"')
@@ -1455,35 +1527,40 @@ def configure_mupen64plus_next(
                 coreSettings.save("mupen64plus-pak4", '"none"')
         else:
             coreSettings.save(
-                "mupen64plus-pak4", '"' + system.config["mupen64plus-pak4"] + '"',
+                "mupen64plus-pak4",
+                '"' + system.config["mupen64plus-pak4"] + '"',
             )
     else:
         coreSettings.save("mupen64plus-pak4", '"none"')
     # RDP Plugin
     if system.isOptSet("mupen64plus-rdpPlugin"):
         coreSettings.save(
-            "mupen64plus-rdp-plugin", '"' + system.config["mupen64plus-rdpPlugin"] + '"',
+            "mupen64plus-rdp-plugin",
+            '"' + system.config["mupen64plus-rdpPlugin"] + '"',
         )
     else:
         coreSettings.save("mupen64plus-rdp-plugin", '"gliden64"')
     # RSP Plugin
     if system.isOptSet("mupen64plus-rspPlugin"):
         coreSettings.save(
-            "mupen64plus-rsp-plugin", '"' + system.config["mupen64plus-rspPlugin"] + '"',
+            "mupen64plus-rsp-plugin",
+            '"' + system.config["mupen64plus-rspPlugin"] + '"',
         )
     else:
         coreSettings.save("mupen64plus-rsp-plugin", '"hle"')
     # CPU Core
     if system.isOptSet("mupen64plus-cpuCore"):
         coreSettings.save(
-            "mupen64plus-cpucore", '"' + system.config["mupen64plus-cpuCore"] + '"',
+            "mupen64plus-cpucore",
+            '"' + system.config["mupen64plus-cpuCore"] + '"',
         )
     else:
         coreSettings.save("mupen64plus-cpucore", '"dynamic_recompiler"')
     # Framerate
     if system.isOptSet("mupen64plus-Framerate"):
         coreSettings.save(
-            "mupen64plus-Framerate", '"' + system.config["mupen64plus-Framerate"] + '"',
+            "mupen64plus-Framerate",
+            '"' + system.config["mupen64plus-Framerate"] + '"',
         )
     else:
         coreSettings.save("mupen64plus-Framerate", '"Original"')
@@ -1521,7 +1598,10 @@ def configure_mupen64plus_next(
 
 
 def configure_parallel_n64(
-    coreSettings: Any, system: Any, rom: str, wheels: Any,
+    coreSettings: Any,
+    system: Any,
+    rom: str,
+    wheels: Any,
 ) -> None:
     coreSettings.save("parallel-n64-64dd-hardware", '"disabled"')
     coreSettings.save("parallel-n64-boot-device", '"Default"')
@@ -1594,7 +1674,8 @@ def configure_parallel_n64(
                 coreSettings.save("parallel-n64-pak1", '"memory"')
         else:
             coreSettings.save(
-                "parallel-n64-pak1", '"' + system.config["parallel-n64-pak1"] + '"',
+                "parallel-n64-pak1",
+                '"' + system.config["parallel-n64-pak1"] + '"',
             )
     else:
         coreSettings.save("parallel-n64-pak1", '"memory"')
@@ -1607,7 +1688,8 @@ def configure_parallel_n64(
                 coreSettings.save("parallel-n64-pak2", '"none"')
         else:
             coreSettings.save(
-                "parallel-n64-pak2", '"' + system.config["parallel-n64-pak2"] + '"',
+                "parallel-n64-pak2",
+                '"' + system.config["parallel-n64-pak2"] + '"',
             )
     else:
         coreSettings.save("parallel-n64-pak2", '"none"')
@@ -1620,7 +1702,8 @@ def configure_parallel_n64(
                 coreSettings.save("parallel-n64-pak3", '"none"')
         else:
             coreSettings.save(
-                "parallel-n64-pak3", '"' + system.config["parallel-n64-pak3"] + '"',
+                "parallel-n64-pak3",
+                '"' + system.config["parallel-n64-pak3"] + '"',
             )
     else:
         coreSettings.save("parallel-n64-pak3", '"none"')
@@ -1633,7 +1716,8 @@ def configure_parallel_n64(
                 coreSettings.save("parallel-n64-pak4", '"none"')
         else:
             coreSettings.save(
-                "parallel-n64-pak4", '"' + system.config["parallel-n64-pak4"] + '"',
+                "parallel-n64-pak4",
+                '"' + system.config["parallel-n64-pak4"] + '"',
             )
     else:
         coreSettings.save("parallel-n64-pak4", '"none"')
@@ -1683,7 +1767,8 @@ def configure_desmume(coreSettings: Any, system: Any) -> None:
     # Anti-aliasing (MSAA)
     if system.isOptSet("multisampling"):
         coreSettings.save(
-            "desmume_gfx_multisampling", '"' + system.config["multisampling"] + '"',
+            "desmume_gfx_multisampling",
+            '"' + system.config["multisampling"] + '"',
         )
     else:
         coreSettings.save("desmume_gfx_multisampling", '"disabled"')
@@ -1698,21 +1783,24 @@ def configure_desmume(coreSettings: Any, system: Any) -> None:
     # Textures Upscaling (XBRZ)
     if system.isOptSet("texture_scaling"):
         coreSettings.save(
-            "desmume_gfx_texture_scaling", '"' + system.config["texture_scaling"] + '"',
+            "desmume_gfx_texture_scaling",
+            '"' + system.config["texture_scaling"] + '"',
         )
     else:
         coreSettings.save("desmume_gfx_texture_scaling", '"1"')
     # Frame Skip
     if system.isOptSet("frameskip_desmume"):
         coreSettings.save(
-            "desmume_frameskip", '"' + system.config["frameskip_desmume"] + '"',
+            "desmume_frameskip",
+            '"' + system.config["frameskip_desmume"] + '"',
         )
     else:
         coreSettings.save("desmume_frameskip", '"0"')
     # Screen Layout
     if system.isOptSet("screens_layout"):
         coreSettings.save(
-            "desmume_screens_layout", '"' + system.config["screens_layout"] + '"',
+            "desmume_screens_layout",
+            '"' + system.config["screens_layout"] + '"',
         )
     else:
         coreSettings.save("desmume_screens_layout", '"top/bottom"')
@@ -1722,14 +1810,16 @@ def configure_melonds(coreSettings: Any, system: Any) -> None:
     # Console Mode
     if system.isOptSet("melonds_console_mode"):
         coreSettings.save(
-            "melonds_console_mode", '"' + system.config["melonds_console_mode"] + '"',
+            "melonds_console_mode",
+            '"' + system.config["melonds_console_mode"] + '"',
         )
     else:
         coreSettings.save("melonds_console_mode", '"DS"')
     # Language
     if system.isOptSet("melonds_language"):
         coreSettings.save(
-            "melonds_language", '"' + system.config["melonds_language"] + '"',
+            "melonds_language",
+            '"' + system.config["melonds_language"] + '"',
         )
     else:
         coreSettings.save("melonds_language", '"English"')
@@ -1746,14 +1836,16 @@ def configure_melonds(coreSettings: Any, system: Any) -> None:
     # Emulate Stylus on Right Stick
     if system.isOptSet("melonds_touch_mode"):
         coreSettings.save(
-            "melonds_touch_mode", '"' + system.config["melonds_touch_mode"] + '"',
+            "melonds_touch_mode",
+            '"' + system.config["melonds_touch_mode"] + '"',
         )
     else:
         coreSettings.save("melonds_touch_mode", '"Joystick"')
     # Boot game directly
     if system.isOptSet("melonds_boot_directly"):
         coreSettings.save(
-            "melonds_boot_directly", '"' + system.config["melonds_boot_directly"] + '"',
+            "melonds_boot_directly",
+            '"' + system.config["melonds_boot_directly"] + '"',
         )
     else:
         coreSettings.save("melonds_boot_directly", '"enabled"')
@@ -1783,7 +1875,8 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
     # System Settings
     if system.isOptSet("melondsds_console_mode"):
         coreSettings.save(
-            "melonds_console_mode", '"' + system.config["melonds_console_mode"] + '"',
+            "melonds_console_mode",
+            '"' + system.config["melonds_console_mode"] + '"',
         )
     else:
         coreSettings.save("melonds_console_mode", '"DS"')
@@ -1791,7 +1884,8 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
     # Video Settings
     if system.isOptSet("melondsds_render_mode"):
         coreSettings.save(
-            "melonds_render_mode", '"' + system.config["melondsds_render_mode"] + '"',
+            "melonds_render_mode",
+            '"' + system.config["melondsds_render_mode"] + '"',
         )
     else:
         coreSettings.save("melonds_render_mode", '"software"')
@@ -1811,7 +1905,8 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
         coreSettings.save("melonds_opengl_better_polygons", '"disabled"')
     if system.isOptSet("melondsds_filtering"):
         coreSettings.save(
-            "melonds_opengl_filtering", '"' + system.config["melondsds_filtering"] + '"',
+            "melonds_opengl_filtering",
+            '"' + system.config["melondsds_filtering"] + '"',
         )
     else:
         coreSettings.save("melonds_opengl_filtering", '"nearest"')
@@ -1819,7 +1914,8 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
     # Screen Settings
     if system.isOptSet("melondsds_cursor"):
         coreSettings.save(
-            "melonds_show_cursor", '"' + system.config["melondsds_cursor"] + '"',
+            "melonds_show_cursor",
+            '"' + system.config["melondsds_cursor"] + '"',
         )
     else:
         coreSettings.save("melonds_show_cursor", '"nearest"')
@@ -1832,7 +1928,8 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
         coreSettings.save("melonds_cursor_timeout", '"3"')
     if system.isOptSet("melondsds_touchmode"):
         coreSettings.save(
-            "melonds_touch_mode", '"' + system.config["melondsds_touchmode"] + '"',
+            "melonds_touch_mode",
+            '"' + system.config["melondsds_touchmode"] + '"',
         )
     else:
         coreSettings.save("melonds_touch_mode", '"auto"')
@@ -1844,13 +1941,15 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
     # Firmware Settings
     if system.isOptSet("melondsds_dns"):
         coreSettings.save(
-            "melonds_firmware_wfc_dns", '"' + system.config["melondsds_dns"] + '"',
+            "melonds_firmware_wfc_dns",
+            '"' + system.config["melondsds_dns"] + '"',
         )
     else:
         coreSettings.save("melonds_firmware_wfc_dns", '"178.62.43.212"')
     if system.isOptSet("melondsds_language"):
         coreSettings.save(
-            "melonds_firmware_language", '"' + system.config["melondsds_language"] + '"',
+            "melonds_firmware_language",
+            '"' + system.config["melondsds_language"] + '"',
         )
     else:
         coreSettings.save("melonds_firmware_language", '"default"')
@@ -1863,13 +1962,15 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
         coreSettings.save("melonds_firmware_favorite_color", '"default"')
     if system.isOptSet("melondsds_month"):
         coreSettings.save(
-            "melonds_firmware_birth_month", '"' + system.config["melondsds_month"] + '"',
+            "melonds_firmware_birth_month",
+            '"' + system.config["melondsds_month"] + '"',
         )
     else:
         coreSettings.save("melonds_firmware_birth_month", '"default"')
     if system.isOptSet("melondsds_day"):
         coreSettings.save(
-            "melonds_firmware_birth_day", '"' + system.config["melondsds_day"] + '"',
+            "melonds_firmware_birth_day",
+            '"' + system.config["melondsds_day"] + '"',
         )
     else:
         coreSettings.save("melonds_firmware_birth_day", '"default"')
@@ -1898,7 +1999,8 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
         coreSettings.save("melonds_show_current_layout", '"disabled"')
     if system.isOptSet("melondsds_show_mic"):
         coreSettings.save(
-            "melonds_show_mic_state", '"' + system.config["melondsds_show_mic"] + '"',
+            "melonds_show_mic_state",
+            '"' + system.config["melondsds_show_mic"] + '"',
         )
     else:
         coreSettings.save("melonds_show_mic_state", '"disabled"')
@@ -1911,7 +2013,8 @@ def configure_melonsds(coreSettings: Any, system: Any) -> None:
         coreSettings.save("melonds_show_camera_state", '"disabled"')
     if system.isOptSet("melondsds_show_lid"):
         coreSettings.save(
-            "melonds_show_lid_state", '"' + system.config["melondsds_show_lid"] + '"',
+            "melonds_show_lid_state",
+            '"' + system.config["melondsds_show_lid"] + '"',
         )
     else:
         coreSettings.save("melonds_show_lid_state", '"disabled"')
@@ -1934,14 +2037,16 @@ def configure_gambatte(coreSettings: Any, system: Any) -> None:
     # GB / GBC: Use official Bootlogo
     if system.isOptSet("gb_bootloader"):
         coreSettings.save(
-            "gambatte_gb_bootloader", '"' + system.config["gb_bootloader"] + '"',
+            "gambatte_gb_bootloader",
+            '"' + system.config["gb_bootloader"] + '"',
         )
     else:
         coreSettings.save("gambatte_gb_bootloader", '"enabled"')
     # GB / GBC: Interframe Blending (LCD ghosting effects)
     if system.isOptSet("gb_mix_frames"):
         coreSettings.save(
-            "gambatte_mix_frames", '"' + system.config["gb_mix_frames"] + '"',
+            "gambatte_mix_frames",
+            '"' + system.config["gb_mix_frames"] + '"',
         )
     else:
         coreSettings.save("gambatte_mix_frames", '"disabled"')
@@ -1989,7 +2094,8 @@ def configure_gambatte(coreSettings: Any, system: Any) -> None:
                 )
         else:
             coreSettings.save(
-                "gambatte_gb_colorization", '"internal"',
+                "gambatte_gb_colorization",
+                '"internal"',
             )  # It's an empty file, set to Classic Green
             coreSettings.save("gambatte_gb_internal_palette", '"Special 1"')
 
@@ -2019,7 +2125,8 @@ def configure_mgba(coreSettings: Any, system: Any) -> None:
             and system.config["color_correction"] != "False"
         ):
             coreSettings.save(
-                "mgba_color_correction", '"' + system.config["color_correction"] + '"',
+                "mgba_color_correction",
+                '"' + system.config["color_correction"] + '"',
             )
         else:
             coreSettings.save("mgba_color_correction", '"OFF"')
@@ -2036,7 +2143,8 @@ def configure_mgba(coreSettings: Any, system: Any) -> None:
         # GBA: Frameskip
         if system.isOptSet("frameskip_mgba"):
             coreSettings.save(
-                "mgba_frameskip", '"' + system.config["frameskip_mgba"] + '"',
+                "mgba_frameskip",
+                '"' + system.config["frameskip_mgba"] + '"',
             )
         else:
             coreSettings.save("mgba_frameskip", '"0"')
@@ -2074,13 +2182,15 @@ def configure_vba_m(coreSettings: Any, system: Any) -> None:
         # GB / GBC: Use Super Game Boy borders
         if system.isOptSet("showborders_gb") and system.name == "gb":
             coreSettings.save(
-                "vbam_showborders", '"' + system.config["showborders_gb"] + '"',
+                "vbam_showborders",
+                '"' + system.config["showborders_gb"] + '"',
             )
             # Force SGB mode, "sgb2" is same
             coreSettings.save("vbam_gbHardware", '"sgb"')
         elif system.isOptSet("showborders_gbc") and system.name == "gbc":
             coreSettings.save(
-                "vbam_showborders", '"' + system.config["showborders_gbc"] + '"',
+                "vbam_showborders",
+                '"' + system.config["showborders_gbc"] + '"',
             )
             # Force SGB mode, "sgb2" is same
             coreSettings.save("vbam_gbHardware", '"sgb"')
@@ -2089,11 +2199,13 @@ def configure_vba_m(coreSettings: Any, system: Any) -> None:
         # GB / GBC: Color Correction
         if system.isOptSet("gbcoloroption_gb") and system.name == "gb":
             coreSettings.save(
-                "vbam_gbcoloroption", '"' + system.config["gbcoloroption_gb"] + '"',
+                "vbam_gbcoloroption",
+                '"' + system.config["gbcoloroption_gb"] + '"',
             )
         elif system.isOptSet("gbcoloroption_gbc") and system.name == "gbc":
             coreSettings.save(
-                "vbam_gbcoloroption", '"' + system.config["gbcoloroption_gbc"] + '"',
+                "vbam_gbcoloroption",
+                '"' + system.config["gbcoloroption_gbc"] + '"',
             )
         else:
             coreSettings.save("vbam_gbcoloroption", '"disabled"')
@@ -2102,21 +2214,24 @@ def configure_vba_m(coreSettings: Any, system: Any) -> None:
         # GBA: Solar sensor level, Boktai 1: The Sun is in Your Hand
         if system.isOptSet("solarsensor"):
             coreSettings.save(
-                "vbam_solarsensor", '"' + system.config["solarsensor"] + '"',
+                "vbam_solarsensor",
+                '"' + system.config["solarsensor"] + '"',
             )
         else:
             coreSettings.save("vbam_solarsensor", '"0"')
         # GBA: Sensor Sensitivity (Gyroscope) (%)
         if system.isOptSet("gyro_sensitivity"):
             coreSettings.save(
-                "vbam_gyro_sensitivity", '"' + system.config["gyro_sensitivity"] + '"',
+                "vbam_gyro_sensitivity",
+                '"' + system.config["gyro_sensitivity"] + '"',
             )
         else:
             coreSettings.save("vbam_gyro_sensitivity", '"10"')
         # GBA: Sensor Sensitivity (Tilt) (%)
         if system.isOptSet("tilt_sensitivity"):
             coreSettings.save(
-                "vbam_tilt_sensitivity", '"' + system.config["tilt_sensitivity"] + '"',
+                "vbam_tilt_sensitivity",
+                '"' + system.config["tilt_sensitivity"] + '"',
             )
         else:
             coreSettings.save("vbam_tilt_sensitivity", '"10"')
@@ -2185,7 +2300,8 @@ def configure_nestopia(coreSettings: Any, system: Any, guns: Any) -> None:
     # Palette Choice
     if system.isOptSet("nestopia_palette"):
         coreSettings.save(
-            "nestopia_palette", '"' + system.config["nestopia_palette"] + '"',
+            "nestopia_palette",
+            '"' + system.config["nestopia_palette"] + '"',
         )
     else:
         coreSettings.save("nestopia_palette", '"consumer"')
@@ -2200,7 +2316,8 @@ def configure_nestopia(coreSettings: Any, system: Any, guns: Any) -> None:
     # CPU Overclock
     if system.isOptSet("nestopia_overclock"):
         coreSettings.save(
-            "nestopia_overclock", '"' + system.config["nestopia_overclock"] + '"',
+            "nestopia_overclock",
+            '"' + system.config["nestopia_overclock"] + '"',
         )
     else:
         coreSettings.save("nestopia_overclock", '"1x"')
@@ -2232,7 +2349,8 @@ def configure_fceumm(coreSettings: Any, system: Any, guns: Any) -> None:
     # gun cross
     if system.isOptSet("fceumm_show_crosshair"):
         coreSettings.save(
-            "fceumm_show_crosshair", '"' + system.config["fceumm_show_crosshair"] + '"',
+            "fceumm_show_crosshair",
+            '"' + system.config["fceumm_show_crosshair"] + '"',
         )
     else:
         status = '"enabled"' if gunsNeedCrosses(guns) else '"disabled"'
@@ -2284,21 +2402,24 @@ def configure_fceumm(coreSettings: Any, system: Any, guns: Any) -> None:
     # NTSC Filter
     if system.isOptSet("fceumm_ntsc_filter"):
         coreSettings.save(
-            "fceumm_ntsc_filter", '"' + system.config["fceumm_ntsc_filter"] + '"',
+            "fceumm_ntsc_filter",
+            '"' + system.config["fceumm_ntsc_filter"] + '"',
         )
     else:
         coreSettings.save("fceumm_ntsc_filter", '"disabled"')
     # Sound Quality
     if system.isOptSet("fceumm_sndquality"):
         coreSettings.save(
-            "fceumm_sndquality", '"' + system.config["fceumm_sndquality"] + '"',
+            "fceumm_sndquality",
+            '"' + system.config["fceumm_sndquality"] + '"',
         )
     else:
         coreSettings.save("fceumm_sndquality", '"Low"')
     # PPU Overclocking
     if system.isOptSet("fceumm_overclocking"):
         coreSettings.save(
-            "fceumm_overclocking", '"' + system.config["fceumm_overclocking"] + '"',
+            "fceumm_overclocking",
+            '"' + system.config["fceumm_overclocking"] + '"',
         )
     else:
         coreSettings.save("fceumm_overclocking", '"disabled"')
@@ -2312,21 +2433,24 @@ def configure_mesen(coreSettings: Any, system: Any) -> None:
     # Screen rotation (for homebrew)
     if system.isOptSet("mesen_screenrotation"):
         coreSettings.save(
-            "mesen_screenrotation", '"' + system.config["mesen_screenrotation"] + '"',
+            "mesen_screenrotation",
+            '"' + system.config["mesen_screenrotation"] + '"',
         )
     else:
         coreSettings.save("mesen_screenrotation", '"None"')
     # NTSC Filter
     if system.isOptSet("mesen_ntsc_filter"):
         coreSettings.save(
-            "mesen_ntsc_filter", '"' + system.config["mesen_ntsc_filter"] + '"',
+            "mesen_ntsc_filter",
+            '"' + system.config["mesen_ntsc_filter"] + '"',
         )
     else:
         coreSettings.save("mesen_ntsc_filter", '"Disabled"')
     # Sprite limit removal
     if system.isOptSet("mesen_nospritelimit"):
         coreSettings.save(
-            "mesen_nospritelimit", '"' + system.config["mesen_nospritelimit"] + '"',
+            "mesen_nospritelimit",
+            '"' + system.config["mesen_nospritelimit"] + '"',
         )
     else:
         coreSettings.save("mesen_nospritelimit", '"disabled"')
@@ -2364,14 +2488,16 @@ def configure_mesen(coreSettings: Any, system: Any) -> None:
     # NES CPU Overclock
     if system.isOptSet("mesen_overclock"):
         coreSettings.save(
-            "mesen_overclock", '"' + system.config["mesen_overclock"] + '"',
+            "mesen_overclock",
+            '"' + system.config["mesen_overclock"] + '"',
         )
     else:
         coreSettings.save("mesen_overclock", '"None"')
     # Overclocking type (compatibility)
     if system.isOptSet("mesen_overclock_type"):
         coreSettings.save(
-            "mesen_overclock_type", '"' + system.config["mesen_overclock_type"] + '"',
+            "mesen_overclock_type",
+            '"' + system.config["mesen_overclock_type"] + '"',
         )
     else:
         coreSettings.save("mesen_overclock_type", '"Before NMI (Recommended)"')
@@ -2381,14 +2507,16 @@ def configure_pokemini(coreSettings: Any, system: Any) -> None:
     # LCD Filter
     if system.isOptSet("pokemini_lcdfilter"):
         coreSettings.save(
-            "pokemini_lcdfilter", '"' + system.config["pokemini_lcdfilter"] + '"',
+            "pokemini_lcdfilter",
+            '"' + system.config["pokemini_lcdfilter"] + '"',
         )
     else:
         coreSettings.save("pokemini_lcdfilter", '"dotmatrix"')
     # LCD Ghosting Effects
     if system.isOptSet("pokemini_lcdmode"):
         coreSettings.save(
-            "pokemini_lcdmode", '"' + system.config["pokemini_lcdmode"] + '"',
+            "pokemini_lcdmode",
+            '"' + system.config["pokemini_lcdmode"] + '"',
         )
     else:
         coreSettings.save("pokemini_lcdmode", '"analog"')
@@ -2406,28 +2534,32 @@ def configure_snes9x(coreSettings: Any, system: Any, guns: Any) -> None:
     # Reduce Slowdown (Hack, Unsafe)
     if system.isOptSet("reduce_slowdown"):
         coreSettings.save(
-            "snes9x_overclock_cycles", '"' + system.config["reduce_slowdown"] + '"',
+            "snes9x_overclock_cycles",
+            '"' + system.config["reduce_slowdown"] + '"',
         )
     else:
         coreSettings.save("snes9x_overclock_cycles", '"disabled"')
     # SuperFX Overclocking
     if system.isOptSet("overclock_superfx"):
         coreSettings.save(
-            "snes9x_overclock_superfx", '"' + system.config["overclock_superfx"] + '"',
+            "snes9x_overclock_superfx",
+            '"' + system.config["overclock_superfx"] + '"',
         )
     else:
         coreSettings.save("snes9x_overclock_superfx", '"100%"')
     # Hi-Res Blending
     if system.isOptSet("hires_blend"):
         coreSettings.save(
-            "snes9x_hires_blend", '"' + system.config["hires_blend"] + '"',
+            "snes9x_hires_blend",
+            '"' + system.config["hires_blend"] + '"',
         )
     else:
         coreSettings.save("snes9x_hires_blend", '"disabled"')
     # Blargg NTSC Filter
     if system.isOptSet("snes9x_blargg_filter"):
         coreSettings.save(
-            "snes9x_blargg", '"' + system.config["snes9x_blargg_filter"] + '"',
+            "snes9x_blargg",
+            '"' + system.config["snes9x_blargg_filter"] + '"',
         )
     else:
         coreSettings.save("snes9x_blargg", '"disabled"')
@@ -2478,14 +2610,16 @@ def configure_snes9x_next(coreSettings: Any, system: Any, guns: Any) -> None:
     # SuperFX Overclocking
     if system.isOptSet("2010_overclock_superfx"):
         coreSettings.save(
-            "snes9x_2010_overclock", '"' + system.config["2010_overclock_superfx"] + '"',
+            "snes9x_2010_overclock",
+            '"' + system.config["2010_overclock_superfx"] + '"',
         )
     else:
         coreSettings.save("snes9x_2010_overclock", '"10 MHz (Default)"')
     # Blargg NTSC Filter
     if system.isOptSet("snes9x_2010_blargg_filter"):
         coreSettings.save(
-            "snes9x_2010_blargg", '"' + system.config["snes9x_2010_blargg_filter"] + '"',
+            "snes9x_2010_blargg",
+            '"' + system.config["snes9x_2010_blargg_filter"] + '"',
         )
     else:
         coreSettings.save("snes9x_2010_blargg", '"disabled"')
@@ -2510,7 +2644,8 @@ def configure_bsnes(coreSettings: Any, system: Any, guns: Any) -> None:
     # Video Filters
     if system.isOptSet("bsnes_video_filter"):
         coreSettings.save(
-            "bsnes_video_filter", '"' + system.config["bsnes_video_filter"] + '"',
+            "bsnes_video_filter",
+            '"' + system.config["bsnes_video_filter"] + '"',
         )
     else:
         coreSettings.save("bsnes_video_filter", '"disabled"')
@@ -2526,7 +2661,8 @@ def configure_mesen_s(coreSettings: Any, system: Any) -> None:
         coreSettings.save("mesen-s_gbmodel", '"Game Boy Color"')
     elif system.isOptSet("mesen-s_gbmodel"):
         coreSettings.save(
-            "mesen-s_gbmodel", '"' + system.config["mesen-s_gbmodel"] + '"',
+            "mesen-s_gbmodel",
+            '"' + system.config["mesen-s_gbmodel"] + '"',
         )
     else:
         coreSettings.save("mesen-s_gbmodel", '"Auto"')
@@ -2538,7 +2674,8 @@ def configure_mesen_s(coreSettings: Any, system: Any) -> None:
     # NTSC Filter
     if system.isOptSet("mesen-s_ntsc_filter"):
         coreSettings.save(
-            "mesen-s_ntsc_filter", '"' + system.config["mesen-s_ntsc_filter"] + '"',
+            "mesen-s_ntsc_filter",
+            '"' + system.config["mesen-s_ntsc_filter"] + '"',
         )
     else:
         coreSettings.save("mesen-s_ntsc_filter", '"disabled"')
@@ -2561,7 +2698,8 @@ def configure_mesen_s(coreSettings: Any, system: Any) -> None:
     # SNES CPU Overclock
     if system.isOptSet("mesen-s_overclock"):
         coreSettings.save(
-            "mesen-s_overclock", '"' + system.config["mesen-s_overclock"] + '"',
+            "mesen-s_overclock",
+            '"' + system.config["mesen-s_overclock"] + '"',
         )
     else:
         coreSettings.save("mesen-s_overclock", '"None"')
@@ -2592,7 +2730,8 @@ def configure_vb(coreSettings: Any, system: Any) -> None:
     # 3D Glasses Color Mode
     if system.isOptSet("3d_color_mode"):
         coreSettings.save(
-            "vb_anaglyph_preset", '"' + system.config["3d_color_mode"] + '"',
+            "vb_anaglyph_preset",
+            '"' + system.config["3d_color_mode"] + '"',
         )
     else:
         coreSettings.save("vb_anaglyph_preset", '"disabled"')
@@ -2604,21 +2743,24 @@ def configure_opera(coreSettings: Any, system: Any, rom: str) -> None:
     # High Resolution (640x480)
     if system.isOptSet("high_resolution"):
         coreSettings.save(
-            "opera_high_resolution", '"' + system.config["high_resolution"] + '"',
+            "opera_high_resolution",
+            '"' + system.config["high_resolution"] + '"',
         )
     else:
         coreSettings.save("opera_high_resolution", '"enabled"')
     # CPU Overclock
     if system.isOptSet("cpu_overclock"):
         coreSettings.save(
-            "opera_cpu_overclock", '"' + system.config["cpu_overclock"] + '"',
+            "opera_cpu_overclock",
+            '"' + system.config["cpu_overclock"] + '"',
         )
     else:
         coreSettings.save("opera_cpu_overclock", '"1.0x (12.50Mhz)"')
     # Active Input Devices Fix
     if system.isOptSet("active_devices"):
         coreSettings.save(
-            "opera_active_devices", '"' + system.config["active_devices"] + '"',
+            "opera_active_devices",
+            '"' + system.config["active_devices"] + '"',
         )
     else:
         coreSettings.save("opera_active_devices", '"1"')
@@ -2643,7 +2785,8 @@ def configure_opera(coreSettings: Any, system: Any, rom: str) -> None:
     # If ROM includes the word Disc, assume it's a multi disc game, and enable shared nvram if the option isn't set.
     if system.isOptSet("opera_nvram_storage"):
         coreSettings.save(
-            "opera_nvram_storage", '"' + system.config["opera_nvram_storage"] + '"',
+            "opera_nvram_storage",
+            '"' + system.config["opera_nvram_storage"] + '"',
         )
     elif "disc" in rom.casefold():
         coreSettings.save("opera_nvram_storage", '"shared"')
@@ -2696,7 +2839,8 @@ def configure_scummvm(coreSettings: Any, system: Any) -> None:
     # Speed Hack (safe)
     if system.isOptSet("scummvm_speed_hack"):
         coreSettings.save(
-            "scummvm_speed_hack", '"' + system.config["scummvm_speed_hack"] + '"',
+            "scummvm_speed_hack",
+            '"' + system.config["scummvm_speed_hack"] + '"',
         )
     else:
         coreSettings.save("scummvm_speed_hack", '"enabled"')
@@ -2761,7 +2905,8 @@ def configure_flycast(coreSettings: Any, system: Any, guns: Any, wheels: Any) ->
     # Textures Mip-mapping (blur)
     if system.isOptSet("reicast_mipmapping"):
         coreSettings.save(
-            "reicast_mipmapping", '"' + system.config["reicast_mipmapping"] + '"',
+            "reicast_mipmapping",
+            '"' + system.config["reicast_mipmapping"] + '"',
         )
     else:
         coreSettings.save("reicast_mipmapping", '"disabled"')
@@ -2776,7 +2921,8 @@ def configure_flycast(coreSettings: Any, system: Any, guns: Any, wheels: Any) ->
     # Texture Upscaling (xBRZ)
     if system.isOptSet("reicast_texupscale"):
         coreSettings.save(
-            "reicast_texupscale", '"' + system.config["reicast_texupscale"] + '"',
+            "reicast_texupscale",
+            '"' + system.config["reicast_texupscale"] + '"',
         )
     else:
         coreSettings.save("reicast_texupscale", '"1"')
@@ -2791,7 +2937,8 @@ def configure_flycast(coreSettings: Any, system: Any, guns: Any, wheels: Any) ->
     # Force Windows CE Mode
     if system.isOptSet("reicast_force_wince"):
         coreSettings.save(
-            "reicast_force_wince", '"' + system.config["reicast_force_wince"] + '"',
+            "reicast_force_wince",
+            '"' + system.config["reicast_force_wince"] + '"',
         )
     else:
         coreSettings.save("reicast_force_wince", '"disabled"')
@@ -2824,7 +2971,8 @@ def configure_flycast(coreSettings: Any, system: Any, guns: Any, wheels: Any) ->
     # Bios
     if system.isOptSet("reicast_language"):
         coreSettings.save(
-            "reicast_language", '"' + system.config["reicast_language"] + '"',
+            "reicast_language",
+            '"' + system.config["reicast_language"] + '"',
         )
     else:
         coreSettings.save("reicast_language", '"Default"')
@@ -2867,7 +3015,8 @@ def configure_genesisplusgx(coreSettings: Any, system: Any, guns: Any) -> None:
     # https://arcadetv.github.io/msu-md-patches/wiki/Lockout-screen.html
     if system.isOptSet("gpgx_region"):
         coreSettings.save(
-            "genesis_plus_region_detect", '"' + system.config["gpgx_region"] + '"',
+            "genesis_plus_region_detect",
+            '"' + system.config["gpgx_region"] + '"',
         )
     else:
         coreSettings.save("genesis_plus_region_detect", '"auto"')
@@ -2895,11 +3044,13 @@ def configure_genesisplusgx(coreSettings: Any, system: Any, guns: Any) -> None:
     # Show Lightgun Crosshair
     if system.isOptSet("gun_cursor_md") and system.name == "megadrive":
         coreSettings.save(
-            "genesis_plus_gx_gun_cursor", '"' + system.config["gun_cursor_md"] + '"',
+            "genesis_plus_gx_gun_cursor",
+            '"' + system.config["gun_cursor_md"] + '"',
         )
     elif system.isOptSet("gun_cursor_ms") and system.name == "mastersystem":
         coreSettings.save(
-            "genesis_plus_gx_gun_cursor", '"' + system.config["gun_cursor_ms"] + '"',
+            "genesis_plus_gx_gun_cursor",
+            '"' + system.config["gun_cursor_ms"] + '"',
         )
     else:
         status = '"enabled"' if gunsNeedCrosses(guns) else '"disabled"'
@@ -2907,7 +3058,8 @@ def configure_genesisplusgx(coreSettings: Any, system: Any, guns: Any) -> None:
     # Megadrive FM (YM2612)
     if system.isOptSet("gpgx_fm"):
         coreSettings.save(
-            "genesis_plus_gx_ym2612", '"' + system.config["gpgx_fm"] + '"',
+            "genesis_plus_gx_ym2612",
+            '"' + system.config["gpgx_fm"] + '"',
         )
     else:
         coreSettings.save("genesis_plus_gx_ym2612", '"mame (ym2612)"')
@@ -2923,14 +3075,16 @@ def configure_genesisplusgx(coreSettings: Any, system: Any, guns: Any) -> None:
     # Game Gear LCD Ghosting Filter
     if system.isOptSet("lcd_filter"):
         coreSettings.save(
-            "genesis_plus_gx_lcd_filter", '"' + system.config["lcd_filter"] + '"',
+            "genesis_plus_gx_lcd_filter",
+            '"' + system.config["lcd_filter"] + '"',
         )
     else:
         coreSettings.save("genesis_plus_gx_lcd_filter", '"disabled"')
     # Game Gear Extended Screen
     if system.isOptSet("gg_extra"):
         coreSettings.save(
-            "genesis_plus_gx_gg_extra", '"' + system.config["gg_extra"] + '"',
+            "genesis_plus_gx_gg_extra",
+            '"' + system.config["gg_extra"] + '"',
         )
     else:
         coreSettings.save("genesis_plus_gx_gg_extra", '"disabled"')
@@ -2941,7 +3095,8 @@ def configure_genesisplusgx(coreSettings: Any, system: Any, guns: Any) -> None:
     # Needs to be forced to sega/mega cd for MSU-MD to work.
     if system.isOptSet("gpgx_cd_add_on"):
         coreSettings.save(
-            "genesis_plus_gx_add_on", '"' + system.config["gpgx_cd_add_on"] + '"',
+            "genesis_plus_gx_add_on",
+            '"' + system.config["gpgx_cd_add_on"] + '"',
         )
     elif system.name == "msu-md":
         coreSettings.save("genesis_plus_gx_add_on", '"sega/mega cd"')
@@ -2952,7 +3107,8 @@ def configure_genesisplusgx(coreSettings: Any, system: Any, guns: Any) -> None:
     # That is, the default level 100 will make the CD audio drown out the cartridge sound effects.
     if system.isOptSet("gpgx_cdda_volume"):
         coreSettings.save(
-            "genesis_plus_gx_cdda_volume", '"' + system.config["gpgx_cdda_volume"] + '"',
+            "genesis_plus_gx_cdda_volume",
+            '"' + system.config["gpgx_cdda_volume"] + '"',
         )
     elif system.name == "msu-md":
         coreSettings.save("genesis_plus_gx_cdda_volume", '"70"')
@@ -2988,14 +3144,16 @@ def configure_picodrive(coreSettings: Any, system: Any) -> None:
     # 6 Button Controller 1
     if system.isOptSet("picodrive_controller1"):
         coreSettings.save(
-            "picodrive_sprlim", '"' + system.config["picodrive_controller1"] + '"',
+            "picodrive_sprlim",
+            '"' + system.config["picodrive_controller1"] + '"',
         )
     else:
         coreSettings.save("picodrive_input1", '"6 button pad"')
     # 6 Button Controller 2
     if system.isOptSet("picodrive_controller2"):
         coreSettings.save(
-            "picodrive_input2", '"' + system.config["picodrive_controller2"] + '"',
+            "picodrive_input2",
+            '"' + system.config["picodrive_controller2"] + '"',
         )
     else:
         coreSettings.save("picodrive_input2", '"6 button pad"')
@@ -3012,7 +3170,8 @@ def configure_yabasanshiro(coreSettings: Any, system: Any) -> None:
     # Video Resolution
     if system.isOptSet("resolution_mode"):
         coreSettings.save(
-            "yabasanshiro_resolution_mode", '"' + system.config["resolution_mode"] + '"',
+            "yabasanshiro_resolution_mode",
+            '"' + system.config["resolution_mode"] + '"',
         )
     else:
         coreSettings.save("yabasanshiro_resolution_mode", '"original"')
@@ -3049,21 +3208,24 @@ def configure_kronos(coreSettings: Any, system: Any, guns: Any) -> None:
     # Video Resolution
     if system.isOptSet("kronos_resolution"):
         coreSettings.save(
-            "kronos_resolution_mode", '"' + system.config["kronos_resolution"] + '"',
+            "kronos_resolution_mode",
+            '"' + system.config["kronos_resolution"] + '"',
         )
     else:
         coreSettings.save("kronos_resolution_mode", '"original"')
     # Mesh mode
     if system.isOptSet("kronos_meshmode"):
         coreSettings.save(
-            "kronos_meshmode", '"' + system.config["kronos_meshmode"] + '"',
+            "kronos_meshmode",
+            '"' + system.config["kronos_meshmode"] + '"',
         )
     else:
         coreSettings.save("kronos_meshmode", '"disabled"')
     # Banding mode
     if system.isOptSet("kronos_bandingmode"):
         coreSettings.save(
-            "kronos_bandingmode", '"' + system.config["kronos_bandingmode"] + '"',
+            "kronos_bandingmode",
+            '"' + system.config["kronos_bandingmode"] + '"',
         )
     else:
         coreSettings.save("kronos_bandingmode", '"disabled"')
@@ -3095,14 +3257,18 @@ def configure_kronos(coreSettings: Any, system: Any, guns: Any) -> None:
     # BIOS langauge
     if system.isOptSet("kronos_language_id"):
         coreSettings.save(
-            "kronos_language_id", '"' + system.config["kronos_language_id"] + '"',
+            "kronos_language_id",
+            '"' + system.config["kronos_language_id"] + '"',
         )
     else:
         coreSettings.save("kronos_language_id", '"English"')
 
 
 def configure_beetle_saturn(
-    coreSettings: Any, system: Any, guns: Any, wheels: Any,
+    coreSettings: Any,
+    system: Any,
+    guns: Any,
+    wheels: Any,
 ) -> None:
     # gun
     if system.isOptSet("beetle-saturn_crosshair"):
@@ -3122,7 +3288,8 @@ def configure_beetle_saturn(
         coreSettings.save("beetle_saturn_analog_stick_deadzone", '"0%"')
     else:
         coreSettings.save(
-            "beetle_saturn_analog_stick_deadzone", '"15%"',
+            "beetle_saturn_analog_stick_deadzone",
+            '"15%"',
         )  # default value
 
 
@@ -3152,7 +3319,8 @@ def configure_px68k(coreSettings: Any, system: Any) -> None:
     # Frame Skip
     if system.isOptSet("px68k_frameskip"):
         coreSettings.save(
-            "px68k_frameskip", '"' + system.config["px68k_frameskip"] + '"',
+            "px68k_frameskip",
+            '"' + system.config["px68k_frameskip"] + '"',
         )
     else:
         coreSettings.save("px68k_frameskip", '"Full Frame"')
@@ -3197,7 +3365,8 @@ def configure_fuse(coreSettings: Any, system: Any) -> None:
     # Zoom, Hide Video Border
     if system.isOptSet("fuse_hide_border"):
         coreSettings.save(
-            "fuse_hide_border", '"' + system.config["fuse_hide_border"] + '"',
+            "fuse_hide_border",
+            '"' + system.config["fuse_hide_border"] + '"',
         )
     else:
         coreSettings.save("fuse_hide_border", '"disabled"')
@@ -3220,7 +3389,8 @@ def configure_fbneo(coreSettings: Any, system: Any, rom: str, guns: Any) -> None
     # Frameskip
     if system.isOptSet("fbneo-frameskip"):
         coreSettings.save(
-            "fbneo-frameskip", '"' + system.config["fbneo-frameskip"] + '"',
+            "fbneo-frameskip",
+            '"' + system.config["fbneo-frameskip"] + '"',
         )
     else:
         coreSettings.save("fbneo-frameskip", '"0"')
@@ -3255,7 +3425,8 @@ def configure_fbneo(coreSettings: Any, system: Any, rom: str, guns: Any) -> None
                 )
             elif system.config["fbneo-neogeo-mode-switch"] == "MVS USA":
                 coreSettings.save(
-                    "fbneo-dipswitch-" + romBase + "-BIOS", '"MVS USA ver. 5 (2 slot)"',
+                    "fbneo-dipswitch-" + romBase + "-BIOS",
+                    '"MVS USA ver. 5 (2 slot)"',
                 )
             elif system.config["fbneo-neogeo-mode-switch"] == "MVS Japan":
                 coreSettings.save(
@@ -3274,7 +3445,8 @@ def configure_fbneo(coreSettings: Any, system: Any, rom: str, guns: Any) -> None
         # Memory card mode
         if system.isOptSet("fbneo-memcard-mode"):
             coreSettings.save(
-                "fbneo-memcard-mode", '"' + system.config["fbneo-memcard-mode"] + '"',
+                "fbneo-memcard-mode",
+                '"' + system.config["fbneo-memcard-mode"] + '"',
             )
         else:
             coreSettings.save("fbneo-memcard-mode", '"per-game"')
@@ -3304,7 +3476,8 @@ def configure_neocd(coreSettings: Any, system: Any) -> None:
 def configure_ppsspp(coreSettings: Any, system: Any) -> None:
     if system.isOptSet("ppsspp_resolution"):
         coreSettings.save(
-            "ppsspp_internal_resolution", '"' + system.config["ppsspp_resolution"] + '"',
+            "ppsspp_internal_resolution",
+            '"' + system.config["ppsspp_resolution"] + '"',
         )
     else:
         coreSettings.save("ppsspp_internal_resolution", '"480x272"')
@@ -3319,7 +3492,8 @@ def configure_mednafen_psx(coreSettings: Any, system: Any) -> None:
         )
     else:
         coreSettings.save(
-            "beetle_psx_hw_cpu_freq_scale", '"110%"',
+            "beetle_psx_hw_cpu_freq_scale",
+            '"110%"',
         )  # If not 110% NO options are working!
     # Show official Bootlogo
     if system.isOptSet("beetle_psx_hw_skip_bios"):
@@ -3480,7 +3654,8 @@ def configure_pcsx2(coreSettings: Any, system: Any) -> None:
     # Fast Boot
     if system.isOptSet("lr_pcsx2_fast_boot"):
         coreSettings.save(
-            "pcsx2_fast_boot", '"' + system.config["lr_pcsx2_fast_boot"] + '"',
+            "pcsx2_fast_boot",
+            '"' + system.config["lr_pcsx2_fast_boot"] + '"',
         )
     else:
         coreSettings.save("pcsx2_fast_boot", '"disabled"')
@@ -3505,7 +3680,8 @@ def configure_pcsx_rearmed(coreSettings: Any, system: Any, guns: Any) -> None:
     # Frameskip
     if system.isOptSet("frameskip_pcsx"):
         coreSettings.save(
-            "pcsx_rearmed_frameskip", '"' + system.config["frameskip_pcsx"] + '"',
+            "pcsx_rearmed_frameskip",
+            '"' + system.config["frameskip_pcsx"] + '"',
         )
     else:
         coreSettings.save("pcsx_rearmed_frameskip", '"0"')
@@ -3516,7 +3692,8 @@ def configure_pcsx_rearmed(coreSettings: Any, system: Any, guns: Any) -> None:
     # Multitap
     if system.isOptSet("pcsx_rearmed_multitap"):
         coreSettings.save(
-            "pcsx_rearmed_multitap", '"' + system.config["pcsx_rearmed_multitap"] + '"',
+            "pcsx_rearmed_multitap",
+            '"' + system.config["pcsx_rearmed_multitap"] + '"',
         )
     else:
         coreSettings.save("pcsx_rearmed_multitap", '"disabled"')
@@ -3573,14 +3750,16 @@ def configure_potator(coreSettings: Any, system: Any) -> None:
     # Watara Color Palette
     if system.isOptSet("watara_palette"):
         coreSettings.save(
-            "potator_palette", '"' + system.config["watara_palette"] + '"',
+            "potator_palette",
+            '"' + system.config["watara_palette"] + '"',
         )
     else:
         coreSettings.save("potator_palette", "gameking")
     # Watara Ghosting
     if system.isOptSet("watara_ghosting"):
         coreSettings.save(
-            "potator_lcd_ghosting", '"' + system.config["watara_ghosting"] + '"',
+            "potator_lcd_ghosting",
+            '"' + system.config["watara_ghosting"] + '"',
         )
     else:
         coreSettings.save("potator_lcd_ghosting", "0")
@@ -3590,7 +3769,8 @@ def configure_prboom(coreSettings: Any, system: Any) -> None:
     # Internal resolution
     if system.isOptSet("prboom-resolution"):
         coreSettings.save(
-            "prboom-resolution", '"' + system.config["prboom-resolution"] + '"',
+            "prboom-resolution",
+            '"' + system.config["prboom-resolution"] + '"',
         )
     else:
         coreSettings.save("prboom-resolution", '"320x200"')
@@ -3600,7 +3780,8 @@ def configure_tyrquake(coreSettings: Any, system: Any) -> None:
     # Resolution
     if system.isOptSet("tyrquake_resolution"):
         coreSettings.save(
-            "tyrquake_resolution", '"' + system.config["tyrquake_resolution"] + '"',
+            "tyrquake_resolution",
+            '"' + system.config["tyrquake_resolution"] + '"',
         )
     else:
         coreSettings.save("tyrquake_resolution", '"640x480"')
@@ -3610,14 +3791,16 @@ def configure_tyrquake(coreSettings: Any, system: Any) -> None:
         and system.config["tyrquake_framerate"] != "automatic"
     ):
         coreSettings.save(
-            "tyrquake_framerate", '"' + system.config["tyrquake_framerate"] + '"',
+            "tyrquake_framerate",
+            '"' + system.config["tyrquake_framerate"] + '"',
         )
     else:
         coreSettings.save("tyrquake_framerate", '"Auto"')
     # Rumble
     if system.isOptSet("tyrquake_rumble"):
         coreSettings.save(
-            "tyrquake_rumble", '"' + system.config["tyrquake_rumble"] + '"',
+            "tyrquake_rumble",
+            '"' + system.config["tyrquake_rumble"] + '"',
         )
     else:
         coreSettings.save("tyrquake_rumble", '"disabled"')
@@ -3639,7 +3822,8 @@ def configure_hatarib(coreSettings: Any, system: Any) -> None:
     # Machine Type
     if system.isOptSet("hatarib_machine"):
         coreSettings.save(
-            "hatarib_machine", '"' + system.config["hatarib_machine"] + '"',
+            "hatarib_machine",
+            '"' + system.config["hatarib_machine"] + '"',
         )
     else:
         coreSettings.save("hatarib_machine", '"0"')
@@ -3661,7 +3845,8 @@ def configure_hatarib(coreSettings: Any, system: Any) -> None:
     # Pause Screen
     if system.isOptSet("hatarib_pause"):
         coreSettings.save(
-            "hatarib_pause_osk", '"' + system.config["hatarib_pause"] + '"',
+            "hatarib_pause_osk",
+            '"' + system.config["hatarib_pause"] + '"',
         )
     else:
         coreSettings.save("hatarib_pause_osk", '"2"')
@@ -3673,7 +3858,8 @@ def configure_hatarib(coreSettings: Any, system: Any) -> None:
     # Borders
     if system.isOptSet("hatarib_borders"):
         coreSettings.save(
-            "hatarib_borders", '"' + system.config["hatarib_borders"] + '"',
+            "hatarib_borders",
+            '"' + system.config["hatarib_borders"] + '"',
         )
     else:
         coreSettings.save("hatarib_borders", '"0"')

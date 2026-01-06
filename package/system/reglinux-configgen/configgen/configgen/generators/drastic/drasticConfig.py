@@ -58,24 +58,22 @@ def setDrasticConfig(drasticConfig: Any, system: Any) -> None:
         "rtc_custom_time" + " = 0",
         "frameskip_type" + " = " + str(esvaluedrasticframeskiptype),  # None/Manual/Auto
         "frameskip_value" + " = " + str(esvaluedrasticframeskipvalue),  # 1-9
-        "safe_frameskip"
-         " = 1",  # Needed for automatic frameskipping to actually work.
+        "safe_frameskip = 1",  # Needed for automatic frameskipping to actually work.
         "disable_edge_marking"
-         " = 1",  # will prevent edge marking. It draws outlines around some 3D models to give a cel-shaded effect. Since DraStic doesn't emulate anti-aliasing, it'll cause edges to look harsher than they may on a real DS.
+        " = 1",  # will prevent edge marking. It draws outlines around some 3D models to give a cel-shaded effect. Since DraStic doesn't emulate anti-aliasing, it'll cause edges to look harsher than they may on a real DS.
         "fix_main_2d_screen"
-         " = "
+        " = "
         + str(
             esvaluedrasticfix2d,
         ),  # Top Screen will always be the Action Screen (for 2d games like Sonic)
         "hires_3d" + " = " + str(esvaluedrastichires),  # High Resolution 3D Rendering
         "threaded_3d"
-         " = "
+        " = "
         + str(
             esvaluedrasticthreaded,
         ),  # MultiThreaded 3D Rendering - Improves perf in 3D - can cause glitch.
         "screen_orientation"
-         " = "
-        + str(esvaluedrasticscreenorientation),  # Vertical/Horizontal/OneScreen
+        " = " + str(esvaluedrasticscreenorientation),  # Vertical/Horizontal/OneScreen
         "screen_scaling" + " = 0",  # No Scaling/Stretch Aspect/1x2x/2x1x/TvSplit
         "screen_swap " + " = 0",
     ]

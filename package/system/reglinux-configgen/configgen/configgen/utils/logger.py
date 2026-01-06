@@ -15,8 +15,7 @@ class MaxLevelFilter(logging.Filter):
 
 
 class LoggerManager:
-    """Enhanced logger manager with additional configuration options.
-    """
+    """Enhanced logger manager with additional configuration options."""
 
     _instances = {}
 
@@ -92,7 +91,9 @@ class LoggerManager:
                 log_dir.mkdir(parents=True, exist_ok=True)
 
             file_handler = RotatingFileHandler(
-                log_file_path, maxBytes=max_file_size, backupCount=backup_count,
+                log_file_path,
+                maxBytes=max_file_size,
+                backupCount=backup_count,
             )
             file_handler.setFormatter(formatter)
             file_handler.setLevel(level)

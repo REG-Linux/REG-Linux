@@ -22,7 +22,14 @@ class PlayGenerator(Generator):
         return True
 
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Create config folder
         config_dir_path = Path(PLAY_CONFIG_DIR)
@@ -128,13 +135,13 @@ class PlayGenerator(Generator):
         return Command(array=command_array)
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
-        if (
-            ("play_widescreen" in config
-            and config["play_widescreen"] == "true")
-            or ("play_mode" in config
-            and config["play_mode"] == "0")
+        if ("play_widescreen" in config and config["play_widescreen"] == "true") or (
+            "play_mode" in config and config["play_mode"] == "0"
         ):
             return 16 / 9
         return 4 / 3

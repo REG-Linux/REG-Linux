@@ -280,7 +280,10 @@ class TheForceEngineGenerator(Generator):
         return True
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         if "force_widescreen" in config and config["force_widescreen"] == "1":
             return 16 / 9

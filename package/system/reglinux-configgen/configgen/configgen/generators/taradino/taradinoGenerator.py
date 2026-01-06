@@ -9,7 +9,14 @@ ROTT_BIN_PATH = "/usr/bin/taradino"
 
 class TaradinoGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         command_array = [ROTT_BIN_PATH]
 

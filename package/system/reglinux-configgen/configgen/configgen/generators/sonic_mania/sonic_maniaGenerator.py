@@ -18,7 +18,14 @@ SONICMANIA_CONFIG_PATH = SONICMANIA_ROMS_DIR / "Settings.ini"
 
 class SonicManiaGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         # Create the roms directory if it doesn't exist
         SONICMANIA_ROMS_DIR.mkdir(parents=True, exist_ok=True)
@@ -51,7 +58,8 @@ class SonicManiaGenerator(Generator):
             copy(str(SONICMANIA_SOURCE_BIN_PATH), str(SONICAMANIA_BIN_PATH))
             # Make sure the copied binary is executable
             if not SONICAMANIA_BIN_PATH.exists() or not access(
-                str(SONICAMANIA_BIN_PATH), X_OK,
+                str(SONICAMANIA_BIN_PATH),
+                X_OK,
             ):
                 import os
 
@@ -138,6 +146,9 @@ class SonicManiaGenerator(Generator):
         return False
 
     def get_in_game_ratio(
-        self, config: Any, game_resolution: dict[str, int], rom: str,
+        self,
+        config: Any,
+        game_resolution: dict[str, int],
+        rom: str,
     ) -> float:
         return 16 / 9

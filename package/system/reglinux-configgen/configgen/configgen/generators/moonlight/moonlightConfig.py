@@ -24,7 +24,8 @@ def setMoonlightConfig(moonlightConfig: Any, system: Any) -> None:
     }
     if system.isOptSet("moonlight_resolution"):
         width, height = resolutions.get(
-            system.config["moonlight_resolution"], ("1280", "720"),
+            system.config["moonlight_resolution"],
+            ("1280", "720"),
         )
     else:
         width, height = "1280", "720"

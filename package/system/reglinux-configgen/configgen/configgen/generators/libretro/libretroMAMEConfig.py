@@ -43,7 +43,10 @@ retroPad = {
 
 
 def generateMAMEConfigs(
-    playersControllers: Any, system: Any, rom: str, guns: Any,
+    playersControllers: Any,
+    system: Any,
+    rom: str,
+    guns: Any,
 ) -> list[str]:
     # Generate command line for MAME
     commandLine = []

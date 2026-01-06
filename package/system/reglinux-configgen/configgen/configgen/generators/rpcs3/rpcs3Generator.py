@@ -164,7 +164,8 @@ class Rpcs3Generator(Generator):
         # Check Vulkan first to be sure
         try:
             have_vulkan = check_output(
-                ["/usr/bin/system-vulkan", "hasVulkan"], text=True,
+                ["/usr/bin/system-vulkan", "hasVulkan"],
+                text=True,
             ).strip()
             if have_vulkan == "true":
                 eslog.debug("Vulkan driver is available on the system.")
@@ -178,7 +179,8 @@ class Rpcs3Generator(Generator):
                     rpcs3ymlconfig["Video"]["Renderer"] = "Vulkan"
                 try:
                     have_discrete = check_output(
-                        ["/usr/bin/system-vulkan", "hasDiscrete"], text=True,
+                        ["/usr/bin/system-vulkan", "hasDiscrete"],
+                        text=True,
                     ).strip()
                     if have_discrete == "true":
                         eslog.debug(
@@ -186,7 +188,8 @@ class Rpcs3Generator(Generator):
                         )
                         try:
                             discrete_name = check_output(
-                                ["/usr/bin/system-vulkan", "discreteName"], text=True,
+                                ["/usr/bin/system-vulkan", "discreteName"],
+                                text=True,
                             ).strip()
                             if discrete_name != "":
                                 eslog.debug(
@@ -206,7 +209,8 @@ class Rpcs3Generator(Generator):
                             "Discrete GPU is not available on the system. Trying integrated.",
                         )
                         have_integrated = check_output(
-                            ["/usr/bin/system-vulkan", "hasIntegrated"], text=True,
+                            ["/usr/bin/system-vulkan", "hasIntegrated"],
+                            text=True,
                         ).strip()
                         if have_integrated == "true":
                             eslog.debug(

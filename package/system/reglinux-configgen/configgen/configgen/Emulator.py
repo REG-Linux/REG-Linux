@@ -10,7 +10,7 @@ try:
     from configgen.systemFiles import ES_SETTINGS, SYSTEM_CONF
 except ImportError:
     # When run as a module within the package
-    from .systemFiles import ES_SETTINGS, SYSTEM_CONF
+    from .systemFiles import ES_SETTINGS, SYSTEM_CONF  # type: ignore
 
 try:
     from configgen.settings import UnixSettings
@@ -97,7 +97,6 @@ class SystemConfigOptional(TypedDict, total=False):
 
 class SystemConfig(SystemConfigRequired, SystemConfigOptional):
     """System configuration with required and optional fields"""
-
 
 
 class RenderConfig(TypedDict, total=False):
@@ -299,7 +298,9 @@ class Emulator:
 
     @staticmethod
     def get_generic_config(
-        system: str, defaultyml: str, defaultarchyml: str,
+        system: str,
+        defaultyml: str,
+        defaultarchyml: str,
     ) -> dict[str, Any]:
         """Load and merge generic configuration from YAML files.
 
@@ -342,7 +343,9 @@ class Emulator:
 
     @staticmethod
     def get_system_config(
-        system: str, defaultyml: str, defaultarchyml: str,
+        system: str,
+        defaultyml: str,
+        defaultarchyml: str,
     ) -> SystemConfigDict:
         """Load system-specific configuration, including emulator and core settings.
 

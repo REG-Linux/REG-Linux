@@ -11,7 +11,14 @@ THEXTECH_BIN_PATH = "/usr/bin/thextech"
 
 class TheXTechGenerator(Generator):
     def generate(
-        self, system, rom, players_controllers, metadata, guns, wheels, game_resolution,
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
     ):
         if not path.exists(THEXTECH_SAVES_DIR):
             makedirs(THEXTECH_SAVES_DIR)

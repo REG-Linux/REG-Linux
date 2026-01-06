@@ -125,10 +125,9 @@ class Evmapy:
         ]:
             # Check if configuration file exists and handle directory ROM case
             keysfile_path = Path(keysfile)
-            if (
-                (keysfile_path.is_absolute() and keysfile_path.exists())
-                or ((not keysfile_path.is_absolute() and Path(keysfile).exists())
-                and not (Path(rom).is_dir() and keysfile == f"{rom}.keys"))
+            if (keysfile_path.is_absolute() and keysfile_path.exists()) or (
+                (not keysfile_path.is_absolute() and Path(keysfile).exists())
+                and not (Path(rom).is_dir() and keysfile == f"{rom}.keys")
             ):
                 eslog.debug(f"evmapy on {keysfile}")
 
@@ -179,7 +178,8 @@ class Evmapy:
                                 and "target" in action
                             ):
                                 guntrigger = Evmapy.__getGunTrigger(
-                                    action["trigger"], guns[gun],
+                                    action["trigger"],
+                                    guns[gun],
                                 )
                                 if guntrigger:
                                     newaction = action.copy()
@@ -355,7 +355,8 @@ class Evmapy:
                                     or axisId == "_OTHERS_"
                                 ) and input_obj["code"] is not None:
                                     axisMin, axisMax = Evmapy.__getPadMinMaxAxis(
-                                        pad.dev, int(input_obj["code"]),
+                                        pad.dev,
+                                        int(input_obj["code"]),
                                     )
 
                                     # Add axis virtual buttons (min, max, val)
@@ -505,7 +506,8 @@ class Evmapy:
                                 trigger in axis_for_mouse for trigger in axis_triggers
                             ):
                                 min_val, max_val = Evmapy.__getPadMinMaxAxisForKeys(
-                                    axis["min"], axis["max"],
+                                    axis["min"],
+                                    axis["max"],
                                 )
                                 axis["min"] = min_val
                                 axis["max"] = max_val
@@ -691,7 +693,8 @@ class Evmapy:
 
     @staticmethod
     def __getGunTrigger(
-        trigger: str | list[str], gun: dict[str, Any],
+        trigger: str | list[str],
+        gun: dict[str, Any],
     ) -> str | list[str] | None:
         """Validate that gun trigger(s) are available on the specified gun device.
 

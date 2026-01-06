@@ -93,7 +93,9 @@ def setCorsixthConfig(corsixthConfig: Any, system: Any, gameResolution: Any) -> 
     # 1. Grab reglinux system language
     try:
         language = check_output(
-            "/usr/bin/system-settings-get system.language", shell=True, text=True,
+            "/usr/bin/system-settings-get system.language",
+            shell=True,
+            text=True,
         ).strip()
     except CalledProcessError:
         language = "en_US"
