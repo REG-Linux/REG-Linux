@@ -92,6 +92,7 @@ CONFIG_PATHS = {
 
 def generateRetroarchCustom():
     """Generate the RetroArch custom configuration file.
+
     If the file is corrupted (UnicodeError), it will be recreated.
     """
     # Ensure the target directory exists
@@ -116,6 +117,7 @@ def generateRetroarchCustom():
 
 def generateRetroarchCustomPathes(retroarchSettings: Any) -> None:
     """Save RetroArch custom paths into the configuration.
+
     This is called separately because paths may vary depending on the system.
     """
     for key, value in CONFIG_PATHS.items():

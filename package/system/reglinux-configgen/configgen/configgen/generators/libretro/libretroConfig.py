@@ -53,8 +53,12 @@ def getInvertButtonsValue():
 
 
 # return true if the option is considered defined
-def defined(key: str, dict: dict[str, Any]) -> bool:
-    return key in dict and isinstance(dict[key], str) and len(dict[key]) > 0
+def defined(key: str, config_dict: dict[str, Any]) -> bool:
+    return (
+        key in config_dict
+        and isinstance(config_dict[key], str)
+        and len(config_dict[key]) > 0
+    )
 
 
 # Warning the values in the array must be exactly at the same index than
@@ -1575,8 +1579,8 @@ def clearGunInputsForPlayer(n: int, retroarchConfig: Any) -> Any:
         "gun_dpad_right",
     ]
     for key in keys:
-        for type in ["btn", "mbtn"]:
-            retroarchConfig[f"input_player{n}_{key}_{type}"] = ""
+        for input_type in ["btn", "mbtn"]:
+            retroarchConfig[f"input_player{n}_{key}_{input_type}"] = ""
 
 
 def configureGunInputsForPlayer(

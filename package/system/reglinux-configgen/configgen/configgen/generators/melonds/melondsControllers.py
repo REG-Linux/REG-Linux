@@ -28,12 +28,12 @@ def setMelondsControllers(melondsConfig: Any, playersControllers: Any) -> None:
         guide_equal_back = pad.inputs["guide"].value == pad.inputs["back"].value
 
         for index in pad.inputs:
-            input = pad.inputs[index].sdl_to_linux_input_event(guide_equal_back)
-            if input is None or input["name"] not in melonDSMapping:
+            input_obj = pad.inputs[index].sdl_to_linux_input_event(guide_equal_back)
+            if input_obj is None or input_obj["name"] not in melonDSMapping:
                 continue
-            option = melonDSMapping[input["name"]]
+            option = melonDSMapping[input_obj["name"]]
             # Workaround - SDL numbers?
-            val = input["id"][0]
+            val = input_obj["id"][0]
             if val == "h":
                 if option == "Joy_Up":
                     val = 257

@@ -20,7 +20,7 @@ def writeBezelConfig(
     system: Any,
     guns_borders_size: str | None,
 ) -> None:
-    """Writes the bezel configuration to the emulator-specific config file."""
+    """Write the bezel configuration to the emulator-specific config file."""
     # Common logic for bezel configuration across different emulators
     # disable the overlay
     # if all steps are successfully completed, enable them
@@ -413,7 +413,7 @@ def writeBezelConfig(
 
 
 def writeBezelCfgConfig(cfgFile: str, overlay_png_file: str) -> None:
-    """Writes the bezel configuration file."""
+    """Write the bezel configuration file."""
     with open(cfgFile, "w") as fd:
         fd.write("overlays = 1\n")
         fd.write('overlay0_overlay = "' + overlay_png_file + '"\n')
@@ -422,7 +422,7 @@ def writeBezelCfgConfig(cfgFile: str, overlay_png_file: str) -> None:
 
 
 def is_ratio_defined(key: str, config_dict: dict[str, Any]) -> bool:
-    """Checks if a key is defined in the dictionary."""
+    """Check if a key is defined in the dictionary."""
     return (
         key in config_dict
         and isinstance(config_dict[key], str)

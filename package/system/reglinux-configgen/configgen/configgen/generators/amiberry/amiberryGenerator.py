@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 from zipfile import ZipFile
 
 from configgen.Command import Command
@@ -14,20 +15,20 @@ eslog = get_logger(__name__)
 class AmiberryGenerator(Generator):
     def generate(
         self,
-        system,
-        rom,
-        players_controllers,
-        metadata,
-        guns,
-        wheels,
-        game_resolution,
-    ):
+        system: Any,
+        rom: str,
+        players_controllers: Any,
+        metadata: Any,
+        guns: Any,
+        wheels: Any,
+        game_resolution: Any,
+    ) -> Command:
         # setting up amiberry config file
         setAmiberryConfig(system)
 
         rom_type = self.get_rom_type(rom)
         if rom_type != "UNKNOWN":
-            command_array = [str(AMIBERRY_BIN_PATH), "-G"]
+            command_array: list[str] = [str(AMIBERRY_BIN_PATH), "-G"]
             if rom_type != "WHDL":
                 command_array.append("--model")
                 command_array.append(system.config["core"])
@@ -162,7 +163,7 @@ class AmiberryGenerator(Generator):
         return Command(array=[])
 
     def floppies_from_rom(self, rom: str) -> list[str]:
-        floppies = []
+        floppies: list[str] = []
         eslog.debug(f"Looking for floppy images for ROM: {rom}")
 
         # split path and extension

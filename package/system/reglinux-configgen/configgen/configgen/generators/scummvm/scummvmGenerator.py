@@ -63,10 +63,10 @@ class ScummVMGenerator(Generator):
 
         # pad number
         nplayer = 1
-        id = 0
+        joystick_id = 0
         for _, pad in sorted(players_controllers.items()):
             if nplayer == 1:
-                id = pad.index
+                joystick_id = pad.index
             nplayer += 1
 
         command_array = [SCUMMVM_BIN_PATH, "-f"]
@@ -113,7 +113,7 @@ class ScummVMGenerator(Generator):
 
         command_array.extend(
             [
-                f"--joystick={id}",
+                f"--joystick={joystick_id}",
                 "--screenshotspath=" + str(SCREENSHOTS),
                 "--extrapath=" + str(SCUMMVM_EXTRA_DIR),
                 f"--path={romPath}",

@@ -1,5 +1,5 @@
 import xml.parsers.expat
-from codecs import open
+from codecs import open as codecs_open
 from glob import escape, iglob
 from os import linesep, mkdir, path
 from xml.dom import minidom
@@ -84,7 +84,7 @@ class CemuGenerator(Generator):
         dom_string = linesep.join(
             [s for s in cemuConfig.toprettyxml().splitlines() if s.strip()],
         )
-        with open(CEMU_CONFIG_PATH, "w", encoding="utf-8") as xml_file:
+        with codecs_open(CEMU_CONFIG_PATH, "w", encoding="utf-8") as xml_file:
             xml_file.write(dom_string)
 
         # Set-up the controllers

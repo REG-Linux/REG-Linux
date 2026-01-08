@@ -1,4 +1,5 @@
-"""Openbor generator module for REG-Linux
+"""Openbor generator module for REG-Linux.
+
 This module handles the generation of openbor emulator configurations.
 """
 

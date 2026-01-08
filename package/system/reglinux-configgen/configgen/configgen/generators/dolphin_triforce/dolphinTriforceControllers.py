@@ -1,4 +1,4 @@
-from codecs import open
+from codecs import open as codecs_open
 from pathlib import Path
 from typing import Any
 
@@ -52,7 +52,7 @@ def generateControllerConfig(system: Any, playersControllers: Any, rom: str) -> 
     if Path(configname).is_file():  # File exists
         import ast
 
-        with open(configname) as cconfig:
+        with codecs_open(configname) as cconfig:
             line = cconfig.readline()
             while line:
                 entry = "{" + line + "}"
@@ -172,33 +172,36 @@ def generateControllerConfig_any_auto(
     current_mapping = anyMapping
 
     for x in pad.inputs:
-        input = pad.inputs[x]
-        eslog.debug(f"\n ==> Processing input: {input}")
+        input_obj = pad.inputs[x]
+        eslog.debug(f"\n ==> Processing input: {input_obj}")
         keyname = None
-        if input.name in current_mapping:
-            keyname = current_mapping[input.name]
+        if input_obj.name in current_mapping:
+            keyname = current_mapping[input_obj.name]
 
         # Write the configuration for this key
         if keyname is not None:
             write_key(
                 f,
                 keyname,
-                input.type,
-                input.id,
-                input.value,
+                input_obj.type,
+                input_obj.id,
+                input_obj.value,
                 pad.nbaxes,
                 False,
                 None,
             )
 
         # Write the 2nd part
-        if input.name in {"lefty", "leftx", "righty", "rightx"} and keyname is not None:
+        if (
+            input_obj.name in {"lefty", "leftx", "righty", "rightx"}
+            and keyname is not None
+        ):
             write_key(
                 f,
                 anyReverseAxes[keyname],
-                input.type,
-                input.id,
-                input.value,
+                input_obj.type,
+                input_obj.id,
+                input_obj.value,
                 pad.nbaxes,
                 True,
                 None,
@@ -294,7 +297,7 @@ def write_key(
 
 def generateHotkeys(playersControllers: Any) -> None:
     configFileName = str(Path(DOLPHIN_TRIFORCE_CONFIG_DIR) / "Config" / "Hotkeys.ini")
-    with open(configFileName, "w", encoding="utf_8_sig") as f:
+    with codecs_open(configFileName, "w", encoding="utf_8_sig") as f:
         hotkeysMapping = {
             "a": "Keys/Reset",
             "b": "Keys/Toggle Pause",
@@ -329,20 +332,20 @@ def generateHotkeys(playersControllers: Any) -> None:
                     return
 
                 for x in pad.inputs:
-                    input = pad.inputs[x]
+                    input_obj = pad.inputs[x]
 
                     keyname = None
-                    if input.name in hotkeysMapping:
-                        keyname = hotkeysMapping[input.name]
+                    if input_obj.name in hotkeysMapping:
+                        keyname = hotkeysMapping[input_obj.name]
 
                     # Write the configuration for this key
                     if keyname is not None:
                         write_key(
                             f,
                             keyname,
-                            input.type,
-                            input.id,
-                            input.value,
+                            input_obj.type,
+                            input_obj.id,
+                            input_obj.value,
                             pad.nbaxes,
                             False,
                             hotkey.id,

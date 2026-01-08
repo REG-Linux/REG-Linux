@@ -1,4 +1,5 @@
-"""Cgenius generator module for REG-Linux
+"""Cgenius generator module for REG-Linux.
+
 This module handles the generation of cgenius emulator configurations.
 """
 

@@ -1,4 +1,5 @@
-"""Pcsx2 generator module for REG-Linux
+"""Pcsx2 generator module for REG-Linux.
+
 This module handles the generation of pcsx2 emulator configurations.
 """
 

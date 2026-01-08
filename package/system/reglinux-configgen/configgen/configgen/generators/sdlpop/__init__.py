@@ -1,4 +1,5 @@
-"""Sdlpop generator module for REG-Linux
+"""Sdlpop generator module for REG-Linux.
+
 This module handles the generation of sdlpop emulator configurations.
 """
 

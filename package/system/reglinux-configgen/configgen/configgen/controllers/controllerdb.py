@@ -1,4 +1,5 @@
 """Controller database management.
+
 Handles loading and matching controller configurations from gamecontrollerdb.txt.
 """
 
@@ -54,9 +55,7 @@ def _parse_chunk(lines: list[str]) -> dict[str, dict[str, Any]]:
 
 
 def load_all_controllers_config() -> dict[str, dict[str, Any]]:
-    """Load all controller configurations from gamecontrollerdb.txt, splitting the input
-    evenly across available cores and parsing each slice in a thread pool.
-    """
+    """Load all controller configurations from gamecontrollerdb.txt, splitting the input evenly across available cores and parsing each slice in a thread pool."""
     controllerdb: dict[str, dict[str, Any]] = {}
     filepath = os.environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
 
@@ -87,7 +86,7 @@ def load_all_controllers_config() -> dict[str, dict[str, Any]]:
 def load_controller_config(
     controllersInput: list[dict[str, str]],
 ) -> dict[str, dict[str, Any]]:
-    """Generates player-specific controller objects using the known controller database.
+    """Generate player-specific controller objects using the known controller database.
 
     Args:
         controllersInput (list): List of controller input descriptors containing "guid" and "devicepath".
@@ -123,13 +122,16 @@ def _find_best_controller_config(
     pxhats: str,
     pxaxes: str,
 ) -> Any:
-    """Finds the best controller match in the loaded database by GUID and returns a Controller instance.
+    """Find the best controller match in the loaded database by GUID and returns a Controller instance.
 
     Args:
         controllers (dict): Dictionary of available controller configurations.
         x (str): Player index (as string).
         pxguid (str): GUID of the connected controller.
         pxdev (str): Device path of the connected controller.
+        pxbtns (str): Number of buttons on the controller.
+        pxhats (str): Number of hats on the controller.
+        pxaxes (str): Number of axes on the controller.
 
     Returns:
         Controller | None: Matched Controller instance or None if not found.
