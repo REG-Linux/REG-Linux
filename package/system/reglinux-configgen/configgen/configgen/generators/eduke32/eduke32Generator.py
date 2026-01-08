@@ -27,9 +27,9 @@ class EDuke32Generator(Generator):
 
         # A script file with console commands that are always ran when the game starts
         script_file = f"{config_dir}/autoexec.cfg"
-        for dir in [config_dir, saves_dir]:
-            if not path.exists(dir):
-                mkdir(dir)
+        for directory in [config_dir, saves_dir]:
+            if not path.exists(directory):
+                mkdir(directory)
 
         if not path.exists(config_file):
             with open(config_file, "x"):

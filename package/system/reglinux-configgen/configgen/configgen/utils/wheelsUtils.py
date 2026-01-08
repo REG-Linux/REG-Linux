@@ -283,10 +283,12 @@ def reconfigure_angle_rotation(
     devInfos = device.InputDevice(dev)
     caps = devInfos.capabilities()
 
-    absmin = None
-    absmax = None
+    absmin: int | None = None
+    absmax: int | None = None
     for item in caps.get(ecodes.EV_ABS, []):
         if isinstance(item, tuple) and len(item) == 2:
+            v: int
+            absinfo: Any
             v, absinfo = item
             if v == wheelAxis:
                 absmin = absinfo.min
@@ -296,28 +298,28 @@ def reconfigure_angle_rotation(
         eslog.warning("unable to get min/max of " + dev)
         return (None, None)
 
-    totalRange = absmax - absmin
-    newmin = absmin
-    newmax = absmax
+    totalRange: int = absmax - absmin
+    newmin: int = absmin
+    newmax: int = absmax
     if wantedRotationAngle < rotationAngle:
-        newRange = floor(totalRange * wantedRotationAngle / rotationAngle)
+        newRange: int = floor(totalRange * wantedRotationAngle / rotationAngle)
         newmin = absmin + ceil((totalRange - newRange) / 2)
         newmax = absmax - floor((totalRange - newRange) / 2)
 
-    newdz = 0
+    newdz: int = 0
     if wantedDeadzone > 0 and wantedDeadzone > wantedMidzone:
         newdz = floor(totalRange * wantedDeadzone / rotationAngle)
         newmin -= newdz // 2
         newmax += newdz // 2
 
-    newmz = 0
+    newmz: int = 0
     if wantedMidzone > 0:
         newmz = floor(totalRange * wantedMidzone / rotationAngle)
         newmin += newmz // 2
         newmax -= newmz // 2
 
     pipeout, pipein = pipe()
-    cmd = [
+    cmd: list[str] = [
         "batocera-wheel-calibrator",
         "-d",
         dev,

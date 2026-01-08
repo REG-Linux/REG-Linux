@@ -1,4 +1,4 @@
-from codecs import open
+from codecs import open as codecs_open
 from pathlib import Path
 from typing import Any
 
@@ -278,7 +278,7 @@ def generateControllerConfig_emulatedwiimotes(
     if Path(configname).is_file():  # File exists
         import ast
 
-        with open(configname) as cconfig:
+        with codecs_open(configname) as cconfig:
             line = cconfig.readline()
             while line:
                 entry = "{" + line + "}"
@@ -310,7 +310,7 @@ def generateControllerConfig_realwiimotes(filename: str, anyDefKey: str) -> None
 
     """
     config_file_path = Path(DOLPHIN_CONFIG_DIR) / filename
-    with open(str(config_file_path), "w", encoding="utf_8_sig") as f:
+    with codecs_open(str(config_file_path), "w", encoding="utf_8_sig") as f:
         nplayer = 1
         while nplayer <= 4:
             f.write(f"[{anyDefKey}{nplayer}]\n")
@@ -339,7 +339,7 @@ def generateControllerConfig_guns(
 
     """
     config_file_path = Path(DOLPHIN_CONFIG_DIR) / filename
-    with open(str(config_file_path), "w", encoding="utf_8_sig") as f:
+    with codecs_open(str(config_file_path), "w", encoding="utf_8_sig") as f:
         # In case of two pads having the same name, dolphin wants a number to handle this
         double_pads: dict[str, int] = {}
 
@@ -623,49 +623,52 @@ def generateControllerConfig_any_auto(
                     ]
 
     for x in pad.inputs:
-        input = pad.inputs[x]
+        input_obj = pad.inputs[x]
 
         keyname = None
-        if input.name in current_mapping:
-            keyname = current_mapping[input.name]
+        if input_obj.name in current_mapping:
+            keyname = current_mapping[input_obj.name]
         elif (
             anyReplacements is not None
-            and input.name in anyReplacements
-            and anyReplacements[input.name] in current_mapping
+            and input_obj.name in anyReplacements
+            and anyReplacements[input_obj.name] in current_mapping
         ):
-            keyname = current_mapping[anyReplacements[input.name]]
+            keyname = current_mapping[anyReplacements[input_obj.name]]
 
         # Write the configuration for this key
         if keyname is not None:
             write_key(
                 f,
                 keyname,
-                input.type,
-                input.id,
-                input.value,
+                input_obj.type,
+                input_obj.id,
+                input_obj.value,
                 pad.nbaxes,
                 False,
                 None,
             )
-            if "Triggers" in keyname and input.type == "axis":
+            if "Triggers" in keyname and input_obj.type == "axis":
                 write_key(
                     f,
                     keyname + "-Analog",
-                    input.type,
-                    input.id,
-                    input.value,
+                    input_obj.type,
+                    input_obj.id,
+                    input_obj.value,
                     pad.nbaxes,
                     False,
                     None,
                 )
         # Write the 2nd part
-        if input.name in {"lefty", "leftx", "righty", "rightx"} and keyname is not None:
+        if (
+            input_obj.name in {"lefty", "leftx", "righty", "rightx"}
+            and keyname is not None
+        ):
             write_key(
                 f,
                 anyReverseAxes[keyname],
-                input.type,
-                input.id,
-                input.value,
+                input_obj.type,
+                input_obj.id,
+                input_obj.value,
                 pad.nbaxes,
                 True,
                 None,
@@ -754,7 +757,7 @@ def write_key(
 
 def generateHotkeys(playersControllers: Any) -> None:
     configFileName = str(Path(DOLPHIN_CONFIG_DIR) / "Hotkeys.ini")
-    with open(configFileName, "w", encoding="utf_8_sig") as f:
+    with codecs_open(configFileName, "w", encoding="utf_8_sig") as f:
         hotkeysMapping = {
             "a": "Keys/Reset",
             "b": "Keys/Toggle Pause",
@@ -789,20 +792,20 @@ def generateHotkeys(playersControllers: Any) -> None:
                     return
 
                 for x in pad.inputs:
-                    input = pad.inputs[x]
+                    input_obj = pad.inputs[x]
 
                     keyname = None
-                    if input.name in hotkeysMapping:
-                        keyname = hotkeysMapping[input.name]
+                    if input_obj.name in hotkeysMapping:
+                        keyname = hotkeysMapping[input_obj.name]
 
                     # Write the configuration for this key
                     if keyname is not None:
                         write_key(
                             f,
                             keyname,
-                            input.type,
-                            input.id,
-                            input.value,
+                            input_obj.type,
+                            input_obj.id,
+                            input_obj.value,
                             pad.nbaxes,
                             False,
                             hotkey.id,

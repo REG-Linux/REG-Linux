@@ -1,19 +1,21 @@
 from typing import Any
 
-from pyudev import Context
+from pyudev import Context, Device, Enumerator
 
 from .utils import dev2int
 
 
 def getDevicesInformation() -> dict[str, Any]:
-    groups: dict[str, Any] = {}
+    groups: dict[str, list[str]] = {}
     devices: dict[str, Any] = {}
     context = Context()
-    events = context.list_devices(subsystem="input")
+    events: Enumerator = context.list_devices(subsystem="input")
     mouses: list[int] = []
     joysticks: list[int] = []
     for ev in events:
-        eventId = dev2int(str(ev.device_node))
+        ev: Device
+        device_node_str: str = str(ev.device_node) if ev.device_node is not None else ""
+        eventId: int | None = dev2int(device_node_str)
         if eventId is not None:
             isJoystick: bool = (
                 "ID_INPUT_JOYSTICK" in ev.properties
@@ -52,7 +54,8 @@ def getDevicesInformation() -> dict[str, Any]:
                         )
                     if group not in groups:
                         groups[group] = []
-                    groups[group].append(ev.device_node)
+                    if ev.device_node is not None:
+                        groups[group].append(ev.device_node)
     mouses.sort()
     joysticks.sort()
     res: dict[str, Any] = {}

@@ -1,4 +1,5 @@
-"""Dosboxx generator module for REG-Linux
+"""Dosboxx generator module for REG-Linux.
+
 This module handles the generation of dosboxx emulator configurations.
 """
 

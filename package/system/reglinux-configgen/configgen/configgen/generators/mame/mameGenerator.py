@@ -19,11 +19,11 @@ class MameGenerator(Generator):
 
     # TODO MAME requires a wayland compositor *if* bgfx is used
     def requiresWayland(self) -> bool:
-        """Indicates if the generator requires Wayland compositor."""
+        """Indicate if the generator requires Wayland compositor."""
         return True
 
     def supportsInternalBezels(self) -> bool:
-        """Indicates if the generator supports internal bezels."""
+        """Indicate if the generator supports internal bezels."""
         return True
 
     def generate(

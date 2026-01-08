@@ -53,12 +53,12 @@ def setViceControllers(system: Any, playersControllers: Any) -> None:
         listVice.append("")
         listVice.append("# " + pad.name)
         for x in pad.inputs:
-            input = pad.inputs[x]
+            controller_input = pad.inputs[x]
             for indexName, indexValue in viceJoystick.items():
-                if indexName == input.name:
+                if indexName == controller_input.name:
                     listVice.append(
                         indexValue.replace("#", str(pad.index))
-                        .replace("?", str(input.id))
+                        .replace("?", str(controller_input.id))
                         .replace("/", joy_port),
                     )
         listVice.append("")

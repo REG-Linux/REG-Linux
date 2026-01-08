@@ -1,4 +1,5 @@
 """Controller class and related functions for managing game controller configurations.
+
 Provides functionality to generate SDL game controller configuration strings.
 """
 
@@ -22,7 +23,7 @@ class Input:
 
     @classmethod
     def from_sdl_mapping(cls, sdl_key: str, sdl_value: str) -> Optional["Input"]:
-        """Factory method to create an Input instance from SDL controller mapping string.
+        """Create an Input instance from SDL controller mapping string.
 
         Handles all SDL controller mapping types (buttons, axes, and hats) according to:
         https://github.com/gabomdq/SDL_GameControllerDB/blob/master/README.md#entries
@@ -76,7 +77,7 @@ class Input:
         )
 
     def sdl_to_linux_input_event(self, guide_equal_back: bool) -> dict[str, Any] | None:
-        """Converts SDL input mapping to a Linux input event structure with complete metadata.
+        """Convert SDL input mapping to a Linux input event structure with complete metadata.
 
         Returns:
             A dictionary containing:
@@ -195,7 +196,7 @@ def write_sdl_db_all_controllers(
 
     Args:
         controllers: Dictionary of Controller instances
-        output_file: Path to output file
+        outputFile: Path to output file
 
     Returns:
         Path to the output file

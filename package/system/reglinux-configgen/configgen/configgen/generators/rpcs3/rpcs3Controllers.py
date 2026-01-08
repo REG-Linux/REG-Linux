@@ -114,7 +114,7 @@ def configure_sony_controller(
     ds4player: int,
     dsplayer: int,
 ) -> None:
-    """Configure Sony controllers (DS3, DS4, DS5)"""
+    """Configure Sony controllers (DS3, DS4, DS5)."""
     f.write(f"Player {nplayer} Input:\n")
 
     # Determine controller type and increment appropriate counter
@@ -218,7 +218,7 @@ def configure_evdev_controller(
     nplayer: int,
     mapping_dict: Any,
 ) -> None:
-    """Configure EVDEV controllers"""
+    """Configure EVDEV controllers."""
     f.write(f"Player {nplayer} Input:\n")
     f.write("  Handler: Evdev\n")
     f.write(f"  Device: {pad.dev}\n")
@@ -229,16 +229,16 @@ def configure_evdev_controller(
 
     # Map inputs based on the mapping dictionary
     for inputIdx in pad.inputs:
-        input = pad.inputs[inputIdx]
-        if input.name in mapping_dict:
-            config_name = mapping_dict[input.name]["config_name"]
-            event_variations = mapping_dict[input.name]["event_variations"]
+        input_obj = pad.inputs[inputIdx]
+        if input_obj.name in mapping_dict:
+            config_name = mapping_dict[input_obj.name]["config_name"]
+            event_variations = mapping_dict[input_obj.name]["event_variations"]
             for event_type, value_name in event_variations:
-                if ("BTN" in event_type and input.type == "button") or (
-                    "HAT" in event_type and input.type == "hat"
+                if ("BTN" in event_type and input_obj.type == "button") or (
+                    "HAT" in event_type and input_obj.type == "hat"
                 ):
                     f.write(f"    {config_name}: {value_name}\n")
-                elif "ABS" in event_type and input.type == "axis":
+                elif "ABS" in event_type and input_obj.type == "axis":
                     # Handle axis for sticks
                     if config_name == "Left Stick Up":
                         f.write(f"    {config_name}: {value_name}\n")
@@ -308,7 +308,7 @@ def configure_sdl_controller(
     nplayer: int,
     controller_counts: Any,
 ) -> None:
-    """Configure SDL controllers (default fallback)"""
+    """Configure SDL controllers (default fallback)."""
     f.write(f"Player {nplayer} Input:\n")
     f.write("  Handler: SDL\n")
     # workaround controllers with commas in their name - like Nintendo

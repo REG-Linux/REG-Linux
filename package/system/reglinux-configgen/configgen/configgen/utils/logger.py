@@ -43,7 +43,7 @@ class LoggerManager:
         enable_stdout: bool = True,
         enable_stderr: bool = True,
     ) -> logging.Logger:
-        """Setup logger with various configuration options.
+        """Set up logger with various configuration options.
 
         Args:
             level: Logging level (default: DEBUG)

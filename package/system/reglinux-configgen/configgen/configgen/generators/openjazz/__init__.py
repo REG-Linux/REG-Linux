@@ -1,4 +1,5 @@
-"""Openjazz generator module for REG-Linux
+"""Openjazz generator module for REG-Linux.
+
 This module handles the generation of openjazz emulator configurations.
 """
 

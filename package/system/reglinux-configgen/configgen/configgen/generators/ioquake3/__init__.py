@@ -1,4 +1,5 @@
-"""Ioquake3 generator module for REG-Linux
+"""Ioquake3 generator module for REG-Linux.
+
 This module handles the generation of ioquake3 emulator configurations.
 """
 

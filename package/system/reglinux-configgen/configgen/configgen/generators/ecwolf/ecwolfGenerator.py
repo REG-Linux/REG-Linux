@@ -1,4 +1,4 @@
-from codecs import open
+from codecs import open as codecs_open
 from os import chdir
 from pathlib import Path
 
@@ -57,7 +57,7 @@ class ECWolfGenerator(Generator):
 
             if fextension == ".ecwolf":
                 try:
-                    with open(rom, "r", encoding="utf-8") as f:
+                    with codecs_open(rom, "r", encoding="utf-8") as f:
                         command_array += f.readline().split()
                 except (OSError, IndexError) as e:
                     eslog.error(f"Error reading .ecwolf file {rom}: {e}")

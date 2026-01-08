@@ -31,27 +31,27 @@ def getWheelType(metadata: Any, playingWithWheel: Any, config: Any) -> str:
     return wheel_type
 
 
-def input2wheel(input: Any, reversedAxis: bool = False) -> str:
-    if input.type == "button":
+def input2wheel(input_param: Any, reversedAxis: bool = False) -> str:
+    if input_param.type == "button":
         pcsx2_magic_button_offset = 21  # PCSX2/SDLInputSource.cpp : const u32 button = ev->button + std::size(s_sdl_button_names)
-        return f"Button{int(input.id) + pcsx2_magic_button_offset}"
-    if input.type == "hat":
-        dir = "unknown"
-        if input.value == "1":
-            dir = "North"
-        elif input.value == "2":
-            dir = "East"
-        elif input.value == "4":
-            dir = "South"
-        elif input.value == "8":
-            dir = "West"
-        return f"Hat{input.id}{dir}"
-    if input.type == "axis":
+        return f"Button{int(input_param.id) + pcsx2_magic_button_offset}"
+    if input_param.type == "hat":
+        direction = "unknown"
+        if input_param.value == "1":
+            direction = "North"
+        elif input_param.value == "2":
+            direction = "East"
+        elif input_param.value == "4":
+            direction = "South"
+        elif input_param.value == "8":
+            direction = "West"
+        return f"Hat{input_param.id}{direction}"
+    if input_param.type == "axis":
         pcsx2_magic_axis_offset = 6  # PCSX2/SDLInputSource.cpp : const u32 axis = ev->axis + std::size(s_sdl_axis_names);
         if reversedAxis is None:
-            return f"FullAxis{int(input.id) + pcsx2_magic_axis_offset}~"
-        dir = "-"
+            return f"FullAxis{int(input_param.id) + pcsx2_magic_axis_offset}~"
+        direction_sign = "-"
         if reversedAxis:
-            dir = "+"
-        return f"{dir}Axis{int(input.id) + pcsx2_magic_axis_offset}"
+            direction_sign = "+"
+        return f"{direction_sign}Axis{int(input_param.id) + pcsx2_magic_axis_offset}"
     return "Unknown"  # Default value for other input types

@@ -1,4 +1,5 @@
-"""Samcoupe generator module for REG-Linux
+"""Samcoupe generator module for REG-Linux.
+
 This module handles the generation of samcoupe emulator configurations.
 """
 
