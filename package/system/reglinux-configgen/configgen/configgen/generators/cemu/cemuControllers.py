@@ -163,22 +163,22 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
         root = Element("emulated_controller")
 
         # Set type from controller combination
-        type = PRO  # default
+        controller_type = PRO  # default
         if (
             system.isOptSet("cemu_controller_combination")
             and system.config["cemu_controller_combination"] != "0"
         ):
             if system.config["cemu_controller_combination"] == "1":
-                type = GAMEPAD if nplayer == 0 else WIIMOTE
+                controller_type = GAMEPAD if nplayer == 0 else WIIMOTE
             elif system.config["cemu_controller_combination"] == "2":
-                type = PRO
+                controller_type = PRO
             else:
-                type = WIIMOTE
+                controller_type = WIIMOTE
             if system.config["cemu_controller_combination"] == "4":
-                type = CLASSIC
+                controller_type = CLASSIC
         else:
-            type = GAMEPAD if nplayer == 0 else PRO
-        addTextElement(root, "type", type)
+            controller_type = GAMEPAD if nplayer == 0 else PRO
+        addTextElement(root, "type", controller_type)
 
         # Create controller configuration
         controllerNode = SubElement(root, "controller")
@@ -200,7 +200,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
 
         # Apply the appropriate button mappings
         mappingsNode = SubElement(controllerNode, "mappings")
-        for key, value in BUTTON_MAPPINGS[type].items():
+        for key, value in BUTTON_MAPPINGS[controller_type].items():
             entryNode = SubElement(mappingsNode, "entry")
             addTextElement(entryNode, "mapping", key)
             addTextElement(entryNode, "button", value)

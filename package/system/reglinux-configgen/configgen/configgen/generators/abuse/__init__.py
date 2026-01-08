@@ -1,4 +1,5 @@
-"""Abuse generator module for REG-Linux
+"""Abuse generator module for REG-Linux.
+
 This module handles the generation of abuse emulator configurations.
 """
 

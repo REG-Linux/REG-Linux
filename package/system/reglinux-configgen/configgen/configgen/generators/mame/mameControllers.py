@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-from codecs import open
 from contextlib import suppress
 from csv import reader
 from os import linesep, path
@@ -132,7 +131,7 @@ def generatePadsConfig(
         and config_alt is not None
     ):
         logger.debug(f"Saving {configFile_alt}")
-        with open(configFile_alt, "w", "utf-8") as mameXml_alt:
+        with open(configFile_alt, "w", encoding="utf-8") as mameXml_alt:
             dom_string_alt = linesep.join(
                 [s for s in config_alt.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...
@@ -142,7 +141,7 @@ def generatePadsConfig(
 def _load_control_mappings() -> dict[str, dict[str, str]]:
     """Load control mappings from CSV file."""
     control_file = "/usr/share/reglinux/configgen/data/mame/mameControls.csv"
-    with open(control_file, "r") as open_file:
+    with open(control_file) as open_file:
         control_dict = {}
         control_list = reader(open_file)
         for row in control_list:
@@ -274,7 +273,7 @@ def _load_mess_control_mappings() -> dict[str, Any]:
     """Load MESS control mappings from CSV file."""
     mess_control_file = "/usr/share/reglinux/configgen/data/mame/messControls.csv"
     mess_control_dict = {}
-    with open(mess_control_file, "r") as open_mess_file:
+    with open(mess_control_file) as open_mess_file:
         control_list = reader(open_mess_file, delimiter=";")
         for row in control_list:
             if row[0] not in mess_control_dict:
@@ -790,7 +789,7 @@ def _configure_additional_guns(
 
 def _save_config_file(config: Document, config_file: str):
     """Save the main configuration file."""
-    with open(config_file, "w", "utf-8") as mameXml:
+    with open(config_file, "w", encoding="utf-8") as mameXml:
         dom_string = linesep.join(
             [s for s in config.toprettyxml().splitlines() if s.strip()],
         )  # remove ugly empty lines while minicom adds them...
@@ -825,8 +824,8 @@ def generatePortElement(
     padindex: int,
     mapping: str,
     key: str,
-    input: Any,
-    reversed: bool,
+    input_param: Any,
+    reversed_param: bool,
     altButtons: str,
     gunmappings: dict[str, str],
     isWheel: bool,
@@ -843,8 +842,8 @@ def generatePortElement(
         padindex: Index of the pad
         mapping: Input mapping name
         key: Input key
-        input: Input object
-        reversed: Whether the input is reversed
+        input_param: Input object
+        reversed_param: Whether the input is reversed
         altButtons: Alternative buttons configuration
         gunmappings: Gun mappings
         isWheel: Whether this is a wheel controller
@@ -865,9 +864,9 @@ def generatePortElement(
     keyval = input2definition(
         pad,
         key,
-        input,
+        input_param,
         padindex,
-        reversed,
+        reversed_param,
         altButtons,
         False,
         isWheel,
@@ -935,8 +934,8 @@ def generateSpecialPortElementPlayer(
     padindex: int,
     mapping: str,
     key: str,
-    input: Any,
-    reversed: bool,
+    input_param: Any,
+    reversed_param: bool,
     mask: str,
     default: str,
     gunmappings: dict[str, str],
@@ -954,8 +953,8 @@ def generateSpecialPortElementPlayer(
         padindex: Index of the pad
         mapping: Input mapping name
         key: Input key
-        input: Input object
-        reversed: Whether the input is reversed
+        input_param: Input object
+        reversed_param: Whether the input is reversed
         mask: Mask value
         default: Default value
         gunmappings: Gun mappings
@@ -976,7 +975,7 @@ def generateSpecialPortElementPlayer(
     xml_newseq = config.createElement("newseq")
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
-    keyval = input2definition(pad, key, input, padindex, reversed, "0")
+    keyval = input2definition(pad, key, input_param, padindex, reversed_param, "0")
     if mapping in gunmappings:
         keyval = keyval + f" OR GUNCODE_{nplayer}_{gunmappings[mapping]}"
         if gunmappings[mapping] == "BUTTON2" and pedalkey is not None:
@@ -999,8 +998,8 @@ def generateSpecialPortElement(
     padindex: int,
     mapping: str,
     key: str,
-    input: Any,
-    reversed: bool,
+    input_param: Any,
+    reversed_param: bool,
     mask: str,
     default: str,
     pedalkey: str | None,
@@ -1015,8 +1014,8 @@ def generateSpecialPortElement(
         padindex: Index of the pad
         mapping: Input mapping name
         key: Input key
-        input: Input object
-        reversed: Whether the input is reversed
+        input_param: Input object
+        reversed_param: Whether the input is reversed
         mask: Mask value
         default: Default value
         pedalkey: Pedal key for gun controls
@@ -1035,7 +1034,7 @@ def generateSpecialPortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
-        input2definition(pad, key, input, padindex, reversed, "0"),
+        input2definition(pad, key, input_param, padindex, reversed_param, "0"),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1049,8 +1048,8 @@ def generateComboPortElement(
     mapping: str,
     kbkey: str,
     key: str,
-    input: Any,
-    reversed: bool,
+    input_param: Any,
+    reversed_param: bool,
     mask: str,
     default: str,
 ) -> Any:
@@ -1064,8 +1063,8 @@ def generateComboPortElement(
         mapping: Input mapping name
         kbkey: Keyboard key
         key: Input key
-        input: Input object
-        reversed: Whether the input is reversed
+        input_param: Input object
+        reversed_param: Whether the input is reversed
         mask: Mask value
         default: Default value
 
@@ -1084,7 +1083,7 @@ def generateComboPortElement(
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
         f"KEYCODE_{kbkey} OR "
-        + input2definition(pad, key, input, padindex, reversed, "0"),
+        + input2definition(pad, key, input_param, padindex, reversed_param, "0"),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1101,7 +1100,7 @@ def generateAnalogPortElement(
     deckey: str,
     mappedinput: Any,
     mappedinput2: Any,
-    reversed: bool,
+    reversed_param: bool,
     mask: str,
     default: str,
     delta: str,
@@ -1120,7 +1119,7 @@ def generateAnalogPortElement(
         deckey: Key for decrement action
         mappedinput: First mapped input
         mappedinput2: Second mapped input
-        reversed: Whether the input is reversed
+        reversed_param: Whether the input is reversed
         mask: Mask value
         default: Default value
         delta: Delta value for analog controls
@@ -1141,14 +1140,16 @@ def generateAnalogPortElement(
     xml_newseq_inc.setAttribute("type", "increment")
     xml_port.appendChild(xml_newseq_inc)
     incvalue = config.createTextNode(
-        input2definition(pad, inckey, mappedinput, padindex, reversed, "0", True),
+        input2definition(pad, inckey, mappedinput, padindex, reversed_param, "0", True),
     )
     xml_newseq_inc.appendChild(incvalue)
     xml_newseq_dec = config.createElement("newseq")
     xml_port.appendChild(xml_newseq_dec)
     xml_newseq_dec.setAttribute("type", "decrement")
     decvalue = config.createTextNode(
-        input2definition(pad, deckey, mappedinput2, padindex, reversed, "0", True),
+        input2definition(
+            pad, deckey, mappedinput2, padindex, reversed_param, "0", True
+        ),
     )
     xml_newseq_dec.appendChild(decvalue)
     xml_newseq_std = config.createElement("newseq")
@@ -1165,9 +1166,9 @@ def generateAnalogPortElement(
 def input2definition(
     pad: Any,
     key: str,
-    input: Any,
+    input_param: Any,
     joycode: int,
-    reversed: bool,
+    reversed_param: bool,
     altButtons: str,
     ignoreAxis: bool = False,
     isWheel: bool = False,
@@ -1177,9 +1178,9 @@ def input2definition(
     Args:
         pad: Controller pad object
         key: Input key
-        input: Input object
+        input_param: Input object
         joycode: Joystick code
-        reversed: Whether the input is reversed
+        reversed_param: Whether the input is reversed
         altButtons: Alternative buttons configuration
         ignoreAxis: Whether to ignore axis inputs
         isWheel: Whether this is a wheel controller
@@ -1203,22 +1204,22 @@ def input2definition(
             suffix = "_NEG"
         if key == "l2":
             suffix = "_NEG"
-            if int(input.id) in mame_axis_mapping_names:
-                idname = mame_axis_mapping_names[int(input.id)]
+            if int(input_param.id) in mame_axis_mapping_names:
+                idname = mame_axis_mapping_names[int(input_param.id)]
                 return f"JOYCODE_{joycode}_{idname}{suffix}"
 
-    if input.type == "button":
-        return f"JOYCODE_{joycode}_BUTTON{int(input.id) + 1}"
-    if input.type == "hat":
-        if input.value == "1":
+    if input_param.type == "button":
+        return f"JOYCODE_{joycode}_BUTTON{int(input_param.id) + 1}"
+    if input_param.type == "hat":
+        if input_param.value == "1":
             return f"JOYCODE_{joycode}_HAT1UP"
-        if input.value == "2":
+        if input_param.value == "2":
             return f"JOYCODE_{joycode}_HAT1RIGHT"
-        if input.value == "4":
+        if input_param.value == "4":
             return f"JOYCODE_{joycode}_HAT1DOWN"
-        if input.value == "8":
+        if input_param.value == "8":
             return f"JOYCODE_{joycode}_HAT1LEFT"
-    elif input.type == "axis":
+    elif input_param.type == "axis":
         # Determine alternate button for D-Pad and right stick as buttons
         dpad_inputs = {}
         for direction in ["up", "down", "left", "right"]:
@@ -1300,8 +1301,8 @@ def input2definition(
                 return (
                     f"JOYCODE_{joycode}_RXAXIS_POS_SWITCH OR {button_directions['a']}"
                 )
-            if int(input.id) in mame_axis_mapping_names:
-                idname = mame_axis_mapping_names[int(input.id)]
+            if int(input_param.id) in mame_axis_mapping_names:
+                idname = mame_axis_mapping_names[int(input_param.id)]
                 return f"JOYCODE_{joycode}_{idname}_POS_SWITCH"
 
     return "unknown"

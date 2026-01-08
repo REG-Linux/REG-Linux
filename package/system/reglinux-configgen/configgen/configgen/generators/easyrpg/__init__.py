@@ -1,4 +1,5 @@
-"""Easyrpg generator module for REG-Linux
+"""Easyrpg generator module for REG-Linux.
+
 This module handles the generation of easyrpg emulator configurations.
 """
 

@@ -37,17 +37,17 @@ class RegMsgClient:
             return
 
         self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.REQ)
-
-        # Additional safety check to ensure socket exists before use
-        if self.socket is None:
-            raise RuntimeError("Socket is None after context creation")
+        socket = self.context.socket(zmq.REQ)
+        if socket is None:
+            raise RuntimeError("Failed to create ZMQ socket")
 
         # Configure timeout to avoid indefinite hangs
-        self.socket.setsockopt(zmq.RCVTIMEO, self.timeout)
-        self.socket.setsockopt(zmq.SNDTIMEO, self.timeout)
+        socket.setsockopt(zmq.RCVTIMEO, self.timeout)
+        socket.setsockopt(zmq.SNDTIMEO, self.timeout)
 
-        self.socket.connect(self.address)
+        socket.connect(self.address)
+
+        self.socket = socket
         self._connected = True
 
     def disconnect(self) -> None:

@@ -1,4 +1,5 @@
-"""Amiberry generator module for REG-Linux
+"""Amiberry generator module for REG-Linux.
+
 This module handles the generation of amiberry emulator configurations.
 """
 

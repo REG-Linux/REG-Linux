@@ -4,7 +4,7 @@
 # ---------------------------------------------------------------------------
 [build-system]
 # Minimum requirements to build the project
-requires = ["setuptools>=80.9.0", "wheel"]
+requires = ["setuptools>=69.5.1", "wheel"]
 
 # Backend responsible for building source and wheel distributions
 build-backend = "setuptools.build_meta"
@@ -51,8 +51,7 @@ dependencies = [
     # TOML parsing (legacy support and tooling compatibility)
     "toml>=0.10.2",
 
-    # TOML parsing and writing for settings
-    "tomli>=2.0.1",
+    # TOML writing for settings
     "tomli-w>=1.0.0",
 
     # Image processing (bezels, overlays, resizing, etc.)
@@ -128,27 +127,6 @@ typeCheckingMode = "standard"
 venvPath = "."
 venv = ".venv"
 
-# Warn when imports cannot be resolved
-reportMissingImports = "warning"
-
-# Warn reports of unknown type
-reportUnknownParameterType = "warning"
-reportUnknownVariableType = false
-reportUnknownMemberType = false
-
-# Warn on unsafe Optional usage
-reportOptionalOperand = "warning"
-reportOptionalSubscript = "warning"
-reportOptionalMemberAccess = "warning"
-
-# Warn if not all code paths return a value
-reportMissingReturn = "warning"
-
-# Warn on unused code elements
-reportUnusedImport = "warning"
-reportUnusedVariable = "warning"
-reportUnusedExpression = "warning"
-
 
 # ---------------------------------------------------------------------------
 # Ruff configuration
@@ -174,6 +152,17 @@ exclude = [
 
 
 # ---------------------------------------------------------------------------
+# Ruff Formatter configuration
+# ---------------------------------------------------------------------------
+[tool.ruff.format]
+# Use `backticks` for strings that do not contain quotes.
+quote-style = "double"
+
+# Use `\n` for line endings.
+line-ending = "lf"
+
+
+# ---------------------------------------------------------------------------
 # Ruff lint rule selection
 # Controls which rule families are enabled.
 # ---------------------------------------------------------------------------
@@ -185,6 +174,9 @@ select = [
   # Import sorting and hygiene
   "I",
 
+  # flake8-builtins
+  "A",
+
   # General code quality and bug detection
   "B",        # flake8-bugbear
   "SIM",      # code simplifications
@@ -193,6 +185,9 @@ select = [
   "C4",       # comprehension optimizations
   "RET",      # return statement consistency
   "TID",      # tidy imports
+
+  # Docstring conventions
+  "D",
 ]
 
 # Explicitly ignored rules
@@ -202,6 +197,24 @@ ignore = [
 
   # Line length handled by the formatter, not the linter
   "E501",
+
+  # Missing docstring in public module
+  "D100",
+  # Missing docstring in public package
+  "D104",
+  # Missing docstring in __init__
+  "D107",
+  # Missing docstring in public function
+  "D103",
+  # Missing docstring in public class
+  "D101",
+  # Missing docstring in public method
+  "D102",
+  # Conflicting docstring rules
+  "D203",
+  "D211",
+  "D212",
+  "D213",
 ]
 
 
@@ -215,7 +228,6 @@ branch = true
 
 # Measure coverage only for this package
 source = ["configgen"]
-
 
 [tool.coverage.report]
 # Show missing lines in the report

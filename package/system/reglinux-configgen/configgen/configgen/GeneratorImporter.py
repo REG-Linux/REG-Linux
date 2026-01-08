@@ -1,6 +1,4 @@
-"""GeneratorImporter module provides functionality to dynamically import and instantiate
-generator classes for various emulators based on a predefined mapping.
-"""
+"""GeneratorImporter module provides functionality to dynamically import and instantiate generator classes for various emulators based on a predefined mapping."""
 
 from importlib import import_module
 from typing import TYPE_CHECKING
@@ -209,7 +207,7 @@ def _load_generator_class(emulator: str) -> type["Generator"]:
 
 
 def getGenerator(emulator: str) -> "Generator":
-    """Returns an instance of the appropriate generator class for the specified emulator.
+    """Return an instance of the appropriate generator class for the specified emulator.
 
     Args:
         emulator (str): The name of the emulator for which to retrieve the generator.

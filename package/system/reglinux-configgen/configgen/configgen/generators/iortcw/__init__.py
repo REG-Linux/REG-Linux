@@ -1,4 +1,5 @@
-"""Iortcw generator module for REG-Linux
+"""Iortcw generator module for REG-Linux.
+
 This module handles the generation of iortcw emulator configurations.
 """
 

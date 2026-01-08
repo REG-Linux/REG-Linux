@@ -4,7 +4,7 @@ from re import match
 from typing import Any
 
 from evdev.device import InputDevice
-from pyudev import Context
+from pyudev import Context, Device, Enumerator
 
 from configgen.utils.logger import get_logger
 
@@ -23,16 +23,20 @@ def getGuns() -> dict[str, Any]:
 
     # guns are mouses, just filter on them
     try:
-        mouses = context.list_devices(subsystem="input")
+        mouses: Enumerator = context.list_devices(subsystem="input")
     except Exception as e:
         eslog.error(f"Failed to list input devices: {e}")
         return guns
 
     # keep only mouses with /dev/input/eventxx
-    mouses_clean: dict[int, Any] = {}
-    for mouse in mouses:
+    mouses_clean: dict[int, Device] = {}
+    mouses_list = list(mouses)
+    for mouse in mouses_list:
+        mouse: Device
         try:
-            device_node = str(mouse.device_node)
+            device_node = (
+                str(mouse.device_node) if mouse.device_node is not None else ""
+            )
             matches = match(r"^/dev/input/event([0-9]*)$", device_node)
             if (
                 matches is not None
@@ -54,13 +58,13 @@ def getGuns() -> dict[str, Any]:
             )
             continue
 
-    mouses = mouses_clean
+    mouses_dict: dict[int, Device] = mouses_clean
 
     nmouse = 0
     ngun = 0
-    for eventid in sorted(mouses):
-        mouse = mouses[eventid]
-        device_node = str(mouse.device_node)
+    for eventid in sorted(mouses_dict):
+        mouse: Device = mouses_dict[eventid]
+        device_node = str(mouse.device_node) if mouse.device_node is not None else ""
 
         eslog.info(f"found mouse {nmouse} at {device_node} with id_mouse={nmouse}")
 

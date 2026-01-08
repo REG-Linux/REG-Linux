@@ -96,14 +96,14 @@ def setEdenControllers(edenConfig: Any, system: Any, playersControllers: Any) ->
 def setButton(key: str, padGuid: str, padInputs: Any, port: int) -> str:
     # it would be better to pass the joystick num instead of the guid because 2 joysticks may have the same guid
     if key in padInputs:
-        input = padInputs[key]
+        input_obj = padInputs[key]
 
-        if input.type == "button":
-            return f"engine:sdl,button:{input.id},guid:{padGuid},port:{port}"
-        if input.type == "hat":
-            return f"engine:sdl,hat:{input.id},direction:{hatdirectionvalue(input.value)},guid:{padGuid},port:{port}"
-        if input.type == "axis":
-            return f"engine:sdl,threshold:{0.5},axis:{input.id},guid:{padGuid},port:{port},invert:{'+'}"
+        if input_obj.type == "button":
+            return f"engine:sdl,button:{input_obj.id},guid:{padGuid},port:{port}"
+        if input_obj.type == "hat":
+            return f"engine:sdl,hat:{input_obj.id},direction:{hatdirectionvalue(input_obj.value)},guid:{padGuid},port:{port}"
+        if input_obj.type == "axis":
+            return f"engine:sdl,threshold:{0.5},axis:{input_obj.id},guid:{padGuid},port:{port},invert:{'+'}"
     return ""
 
 

@@ -17,7 +17,8 @@ openMSX_Config = Path("/usr/share/openmsx/")
 
 
 def copy_directory(src: str, dst: str) -> None:
-    """Copy all contents from src directory to dst directory, similar to distutils.dir_util.copy_tree
+    """Copy all contents from src directory to dst directory, similar to distutils.dir_util.copy_tree.
+
     This function copies the directory tree from src to dst, creating dst if it doesn't exist
     """
     import shutil
@@ -164,37 +165,37 @@ class OpenmsxGenerator(Generator):
                     if nplayer == 2:
                         file.write("plug joyportb joystick2\n")
                     for x in pad.inputs:
-                        input = pad.inputs[x]
-                        if input.name == "y":
+                        input_obj = pad.inputs[x]
+                        if input_obj.name == "y":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x40"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} down" "keymatrixdown 6 0x40"\n',
                             )
-                        if input.name == "x":
+                        if input_obj.name == "x":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "keymatrixdown 6 0x80"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} down" "keymatrixdown 6 0x80"\n',
                             )
-                        if input.name == "pagedown":
+                        if input_obj.name == "pagedown":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} up" "set fastforward off"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} up" "set fastforward off"\n',
                             )
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "set fastforward on"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} down" "set fastforward on"\n',
                             )
-                        if input.name == "select":
+                        if input_obj.name == "select":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "toggle pause"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} down" "toggle pause"\n',
                             )
-                        if input.name == "start":
+                        if input_obj.name == "start":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "main_menu_toggle"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} down" "main_menu_toggle"\n',
                             )
-                        if input.name == "l3":
+                        if input_obj.name == "l3":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "toggle_osd_keyboard"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} down" "toggle_osd_keyboard"\n',
                             )
-                        if input.name == "r3":
+                        if input_obj.name == "r3":
                             file.write(
-                                f'bind "joy{nplayer} button{input.id} down" "toggle console"\n',
+                                f'bind "joy{nplayer} button{input_obj.id} down" "toggle console"\n',
                             )
                 nplayer += 1
 

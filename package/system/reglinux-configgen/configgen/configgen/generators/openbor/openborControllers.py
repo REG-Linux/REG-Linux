@@ -21,20 +21,20 @@ def JoystickValue(
         return 0
 
     value = 0
-    input = pad.inputs[key]
+    input_obj = pad.inputs[key]
 
-    if input.type == "button":
-        value = 1 + (int(pad.index)) * joy_max_inputs + int(input.id)
+    if input_obj.type == "button":
+        value = 1 + (int(pad.index)) * joy_max_inputs + int(input_obj.id)
 
-    elif input.type == "hat":
-        input.id = input.id[-1]
+    elif input_obj.type == "hat":
+        input_obj.id = input_obj.id[-1]
         if new_axis_vals:
             hatfirst = 1 + (int(pad.index)) * joy_max_inputs + int(pad.nbbuttons)
-            if input.id == "2":  # SDL_HAT_RIGHT
+            if input_obj.id == "2":  # SDL_HAT_RIGHT
                 hatfirst += 3
-            elif input.id == "4":  # SDL_HAT_DOWN
+            elif input_obj.id == "4":  # SDL_HAT_DOWN
                 hatfirst += 1
-            elif input.id == "8":  # SDL_HAT_LEFT
+            elif input_obj.id == "8":  # SDL_HAT_LEFT
                 hatfirst += 2
         else:
             hatfirst = (
@@ -43,20 +43,20 @@ def JoystickValue(
                 + int(pad.nbbuttons)
                 + 2 * int(pad.nbaxes)
             )
-            if input.id == "2":  # SDL_HAT_RIGHT
+            if input_obj.id == "2":  # SDL_HAT_RIGHT
                 hatfirst += 1
-            elif input.id == "4":  # SDL_HAT_DOWN
+            elif input_obj.id == "4":  # SDL_HAT_DOWN
                 hatfirst += 2
-            elif input.id == "8":  # SDL_HAT_LEFT
+            elif input_obj.id == "8":  # SDL_HAT_LEFT
                 hatfirst += 3
         value = hatfirst
 
-    elif input.type == "axis":
+    elif input_obj.type == "axis":
         axisfirst = (
             1
             + (int(pad.index)) * joy_max_inputs
             + int(pad.nbbuttons)
-            + 2 * int(input.id)
+            + 2 * int(input_obj.id)
         )
         if new_axis_vals:
             axisfirst += int(pad.nbhats) * 4
@@ -64,7 +64,7 @@ def JoystickValue(
             axisfirst += 1
         value = axisfirst
 
-    if input.type != "keyboard":
+    if input_obj.type != "keyboard":
         value += 600
 
     return value

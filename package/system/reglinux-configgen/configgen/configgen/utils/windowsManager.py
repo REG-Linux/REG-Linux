@@ -1,4 +1,4 @@
-"""Window Manager Controller Module
+"""Window Manager Controller Module.
 
 This module provides functionality to manage Wayland compositors (primarily Sway)
 for gaming and application environments. It handles compositor lifecycle management
@@ -18,6 +18,7 @@ eslog = get_logger(__name__)
 
 class WindowManager:
     """Manages Wayland compositors (primarily Sway) using the Singleton pattern.
+
     This class centralizes the compositor lifecycle and state management.
     """
 
@@ -40,7 +41,7 @@ class WindowManager:
         self._initialized = True
 
     def start_sway(self, generator: Any, system: Any) -> bool:
-        """Starts the Sway compositor and configures the environment for Wayland/X11.
+        """Start the Sway compositor and configure the environment for Wayland/X11.
 
         Args:
             generator: An object that may specify X11 requirements (needs requiresX11() method)
@@ -282,7 +283,7 @@ class WindowManager:
 
 
 def start_compositor(generator: Any, system: Any) -> None:
-    """Starts the appropriate compositor based on system availability.
+    """Start the appropriate compositor based on system availability.
 
     Args:
         generator: Object that may specify display requirements
@@ -306,7 +307,7 @@ def start_compositor(generator: Any, system: Any) -> None:
 
 
 def stop_compositor(generator: Any, system: Any) -> None:
-    """Stops the currently running compositor.
+    """Stop the currently running compositor.
 
     Args:
         generator: Object that may specify display requirements

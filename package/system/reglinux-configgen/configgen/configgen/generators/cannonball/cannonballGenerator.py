@@ -1,4 +1,4 @@
-from codecs import open
+from codecs import open as codecs_open
 from os import linesep
 from pathlib import Path
 from xml.dom import minidom
@@ -49,7 +49,9 @@ class CannonballGenerator(Generator):
         setCannonballConfig(cannoballConfig, system)
 
         # save the config file
-        with open(CANNONBALL_CONFIG_PATH, "w", encoding="utf-8") as cannonballXml:
+        with codecs_open(
+            CANNONBALL_CONFIG_PATH, "w", encoding="utf-8"
+        ) as cannonballXml:
             dom_string = linesep.join(
                 [s for s in cannoballConfig.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...

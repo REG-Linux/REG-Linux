@@ -73,7 +73,7 @@ def set_option_with_default(
     config_key: str,
     default_value: str = "false",
 ) -> None:
-    """Sets a configuration option with a default value if the option is not set in the system configuration.
+    """Set a configuration option with a default value if the option is not set in the system configuration.
 
     Args:
         config: The configuration object to set the option on
@@ -102,7 +102,7 @@ def set_boolean_option(
     option: str,
     value: str,
 ) -> None:
-    """Sets a boolean configuration option based on the input value.
+    """Set a boolean configuration option based on the input value.
 
     Args:
         config: The configuration object to set the option on
@@ -123,7 +123,7 @@ def setPcsx2Config(
     wheels: Any,
     playingWithWheel: Any,
 ) -> None:
-    """Configures PCSX2 emulator settings based on system configuration.
+    """Configure PCSX2 emulator settings based on system configuration.
 
     Args:
         system: System configuration object containing settings
@@ -994,7 +994,7 @@ def setPcsx2Config(
 
 
 def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
-    """Maps configuration ratio values to the values used by the ratio calculation function.
+    """Map configuration ratio values to the values used by the ratio calculation function.
 
     Args:
         config: Configuration object containing settings
@@ -1020,7 +1020,7 @@ def getGfxRatioFromConfig(config: Any, gameResolution: dict[str, int]) -> str:
 
 
 def getInGameRatio(config: Any, gameResolution: dict[str, int], rom: str) -> float:
-    """Calculates the in-game aspect ratio based on configuration and game resolution.
+    """Calculate the in-game aspect ratio based on configuration and game resolution.
 
     Args:
         config: Configuration object containing settings

@@ -29,14 +29,14 @@ eslog = get_logger(__name__)
 
 # Defining TypedDicts for configuration structures
 class SystemConfigRequired(TypedDict, total=True):
-    """Required fields in SystemConfig"""
+    """Required fields in SystemConfig."""
 
     emulator: str
     core: str
 
 
 class SystemConfigOptional(TypedDict, total=False):
-    """Optional fields in SystemConfig"""
+    """Optional fields in SystemConfig."""
 
     videomode: str
     showFPS: str
@@ -96,7 +96,7 @@ class SystemConfigOptional(TypedDict, total=False):
 
 
 class SystemConfig(SystemConfigRequired, SystemConfigOptional):
-    """System configuration with required and optional fields"""
+    """System configuration with required and optional fields."""
 
 
 class RenderConfig(TypedDict, total=False):

@@ -1,4 +1,5 @@
-"""Shadps4 generator module for REG-Linux
+"""Shadps4 generator module for REG-Linux.
+
 This module handles the generation of shadps4 emulator configurations.
 """
 
