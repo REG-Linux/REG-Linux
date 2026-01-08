@@ -1,4 +1,5 @@
-"""Dxx_Rebirth generator module for REG-Linux
+"""Dxx_Rebirth generator module for REG-Linux.
+
 This module handles the generation of dxx_rebirth emulator configurations.
 """
 

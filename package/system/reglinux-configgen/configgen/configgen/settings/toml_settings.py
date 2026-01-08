@@ -5,13 +5,13 @@ from configgen.utils.logger import get_logger
 
 # Import TOML libraries with type annotations
 try:
-    import tomli
+    import toml
     import tomli_w
 except ImportError:
     import sys
 
     print(
-        "Error: tomli and tomli_w modules are required for TOMLSettings",
+        "Error: toml and tomli_w modules are required for TOMLSettings",
         file=sys.stderr,
     )
     raise
@@ -75,8 +75,8 @@ class TOMLSettings:
         """
         self._ensure_file_exists()  # Ensure the file exists before loading
         try:
-            with self.filepath.open("rb") as f:
-                self._data = tomli.load(f)  # Load TOML data into _data
+            with self.filepath.open("r", encoding="utf-8") as f:
+                self._data = toml.load(f)  # Load TOML data into _data
         except Exception as e:
             self._logger.error(f"Failed to load TOML {self.filepath}: {e}")
             self._data = default or {}  # Use default or empty dict on failure

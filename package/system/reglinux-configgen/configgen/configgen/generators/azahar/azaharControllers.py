@@ -56,11 +56,11 @@ def setAzaharControllers(azaharConfig: Any, playersControllers: Any) -> None:
 
 def setButton(key: str, padGuid: str, padInputs: Any) -> str:
     if key in padInputs:
-        input = padInputs[key]
-        if input.type == "button":
-            return f"button:{input.id},guid:{padGuid},engine:sdl"
-        if input.type == "hat":
-            return f"engine:sdl,guid:{padGuid},hat:{input.id},direction:{hatdirectionvalue(input.id[-1])}"
+        input_obj = padInputs[key]
+        if input_obj.type == "button":
+            return f"button:{input_obj.id},guid:{padGuid},engine:sdl"
+        if input_obj.type == "hat":
+            return f"engine:sdl,guid:{padGuid},hat:{input_obj.id},direction:{hatdirectionvalue(input_obj.id[-1])}"
     return ""  # Return empty string if key not found
 
 

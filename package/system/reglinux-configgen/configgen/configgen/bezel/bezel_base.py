@@ -105,8 +105,7 @@ class BezelUtils:
         system_name: str,
         emulator: str,
     ) -> dict[str, str | bool | None] | None:
-        """Locate the appropriate bezel overlay image and related files based on
-        ROM name, system name, and emulator used.
+        """Locate the appropriate bezel overlay image and related files based on ROM name, system name, and emulator used.
 
         The search follows a prioritized list:
         1. Game-specific user/system overlays
@@ -192,6 +191,7 @@ class BezelUtils:
     @staticmethod
     def fast_image_size(image_file: str) -> tuple[int, int]:
         """Return the size (width, height) of a PNG image by reading its header.
+
         Much faster than using PIL.Image.open().size.
 
         Args:
@@ -635,6 +635,7 @@ class BezelUtils:
         bezel_stretch: bool,
     ) -> None:
         """Paste the alpha channel from an image into a resized canvas.
+
         Handles non-RGBA images and crops to match aspect ratio.
 
         Args:
@@ -947,8 +948,7 @@ def getBezelInfos(
     systemName: str,
     emulator: str,
 ) -> dict[str, str | bool | None] | None:
-    """Locate the appropriate bezel overlay image and related files based on
-    ROM name, system name, and emulator used.
+    """Locate the appropriate bezel overlay image and related files based on ROM name, system name, and emulator used.
 
     The search follows a prioritized list:
     1. Game-specific user/system overlays
@@ -970,6 +970,7 @@ def getBezelInfos(
 
 def fast_image_size(image_file: str) -> tuple[int, int]:
     """Return the size (width, height) of a PNG image by reading its header.
+
     Much faster than using PIL.Image.open().size.
 
     Args:
@@ -1097,6 +1098,7 @@ def alphaPaste(
     bezel_stretch: bool,
 ) -> None:
     """Paste the alpha channel from an image into a resized canvas.
+
     Handles non-RGBA images and crops to match aspect ratio.
 
     Args:

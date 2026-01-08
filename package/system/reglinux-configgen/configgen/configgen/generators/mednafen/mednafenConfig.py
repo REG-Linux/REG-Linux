@@ -65,5 +65,5 @@ def setMednafenConfig(cfgConfig: Any) -> None:
     }
 
     # Write all key bindings to config
-    for command, (device, id, key) in key_bindings.items():
-        cfgConfig.write(f"command.{command} {device} {id} {key}\n")
+    for command, (device, id_val, key) in key_bindings.items():
+        cfgConfig.write(f"command.{command} {device} {id_val} {key}\n")

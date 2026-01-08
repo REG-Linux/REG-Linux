@@ -20,7 +20,7 @@ def getMouseButtons(device: Any) -> list[str]:
         ecodes.BTN_8,
     ]
     caps_intersection = list(set(caps_keys) & set(caps_filter))
-    buttons = []
+    buttons: list[str] = []
     if ecodes.BTN_LEFT in caps_intersection:
         buttons.append("left")
     if ecodes.BTN_RIGHT in caps_intersection:

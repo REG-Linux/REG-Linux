@@ -3,7 +3,7 @@ from os import environ
 from pathlib import Path
 from shutil import copy2
 from subprocess import CalledProcessError, check_output
-from sys import exit
+from sys import exit as sys_exit
 
 from configgen.Command import Command
 from configgen.controllers import generate_sdl_controller_config
@@ -93,7 +93,7 @@ class XeniaGenerator(Generator):
                 eslog.debug(
                     "*** Vulkan driver required is not available on the system!!! ***",
                 )
-                exit()
+                sys_exit()
         except CalledProcessError:
             eslog.debug("Error executing system-vulkan script.")
 

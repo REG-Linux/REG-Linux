@@ -1,4 +1,5 @@
-"""Libretro generator module for REG-Linux
+"""Libretro generator module for REG-Linux.
+
 This module handles the generation of libretro emulator configurations.
 """
 

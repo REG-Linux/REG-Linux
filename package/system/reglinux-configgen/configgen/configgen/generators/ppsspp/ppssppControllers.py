@@ -126,53 +126,53 @@ def setControllerConfig(controller: Any) -> None:
 
     # Parse controller inputs
     for index in controller.inputs:
-        input = controller.inputs[index]
+        controller_input = controller.inputs[index]
         if (
-            input.name not in ppssppMapping
-            or input.type not in ppssppMapping[input.name]
+            controller_input.name not in ppssppMapping
+            or controller_input.type not in ppssppMapping[controller_input.name]
         ):
             continue
 
-        var = ppssppMapping[input.name][input.type]
+        var = ppssppMapping[controller_input.name][controller_input.type]
         # Convert controller.index to integer
         padnum = int(controller.index)
 
-        if input.type == "button":
-            pspcode = sdlNameToNKCode[input.name]
+        if controller_input.type == "button":
+            pspcode = sdlNameToNKCode[controller_input.name]
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
             val = optionValue(ppssppControllers, "ControlMapping", var, val)
             ppssppControllers.set("ControlMapping", var, val)
 
-        elif input.type == "axis":
+        elif controller_input.type == "axis":
             # Get the axis code
-            nkAxisId = SDLJoyAxisMap[input.id]
+            nkAxisId = SDLJoyAxisMap[controller_input.id]
             # Apply the magic axis formula
-            pspcode = axisToCode(nkAxisId, int(input.value))
+            pspcode = axisToCode(nkAxisId, int(controller_input.value))
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
             val = optionValue(ppssppControllers, "ControlMapping", var, val)
             ppssppControllers.set("ControlMapping", var, val)
 
             # Skip the rest if it's an axis dpad
-            if input.name in ["up", "down", "left", "right"]:
+            if controller_input.name in ["up", "down", "left", "right"]:
                 continue
             # Also need to do the opposite direction manually. The input.id is the same as up/left, but the direction is opposite
-            if input.name == "lefty":
-                var = ppssppMapping["joystick1down"][input.type]
-            elif input.name == "leftx":
-                var = ppssppMapping["joystick1right"][input.type]
-            elif input.name == "righty":
-                var = ppssppMapping["joystick2down"][input.type]
-            elif input.name == "rightx":
-                var = ppssppMapping["joystick2right"][input.type]
+            if controller_input.name == "lefty":
+                var = ppssppMapping["joystick1down"][controller_input.type]
+            elif controller_input.name == "leftx":
+                var = ppssppMapping["joystick1right"][controller_input.type]
+            elif controller_input.name == "righty":
+                var = ppssppMapping["joystick2down"][controller_input.type]
+            elif controller_input.name == "rightx":
+                var = ppssppMapping["joystick2right"][controller_input.type]
 
-            pspcode = axisToCode(nkAxisId, -int(input.value))
+            pspcode = axisToCode(nkAxisId, -int(controller_input.value))
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
             val = optionValue(ppssppControllers, "ControlMapping", var, val)
             ppssppControllers.set("ControlMapping", var, val)
 
-        elif input.type == "hat" and input.name in SDLHatMap:
-            var = ppssppMapping[input.name][input.type]
-            pspcode = SDLHatMap[input.name]
+        elif controller_input.type == "hat" and controller_input.name in SDLHatMap:
+            var = ppssppMapping[controller_input.name][controller_input.type]
+            pspcode = SDLHatMap[controller_input.name]
             val = f"{DEVICE_ID_PAD_0 + padnum}-{pspcode}"
             val = optionValue(ppssppControllers, "ControlMapping", var, val)
             ppssppControllers.set("ControlMapping", var, val)

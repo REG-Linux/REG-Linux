@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
-from codecs import open
 from csv import reader
 from os import linesep, listdir, remove, symlink
 from pathlib import Path
@@ -49,7 +48,7 @@ def generateMAMEConfigs(
     guns: Any,
 ) -> list[str]:
     # Generate command line for MAME
-    commandLine = []
+    commandLine: list[str] = []
     romBasename = Path(rom).name
     romDirname = str(Path(rom).parent)
     (romDrivername, romExt) = Path(rom).stem, Path(rom).suffix
@@ -78,7 +77,7 @@ def generateMAMEConfigs(
             "-rompath",
             f"{romDirname};{Path('/userdata/bios/mame/')!s};{Path('/userdata/bios/')!s}",
         ]
-        pluginsToLoad = []
+        pluginsToLoad: list[str] = []
         if not (
             system.isOptSet("hiscoreplugin")
             and not system.getOptBoolean("hiscoreplugin")
@@ -108,7 +107,7 @@ def generateMAMEConfigs(
 
         # Determine MESS system name (if needed)
         messDataFile = Path("/usr/share/reglinux/configgen/data/mame/messSystems.csv")
-        with open(str(messDataFile), "r") as openFile:
+        with open(str(messDataFile)) as openFile:
             messSystems = []
             messSysName = []
             messRomType = []
@@ -122,7 +121,7 @@ def generateMAMEConfigs(
         messMode = messSystems.index(system.name)
 
         # Alternate system for machines that have different configs (ie computers with different hardware)
-        messModel = messSysName[messMode]
+        messModel: str = messSysName[messMode]
         if system.isOptSet("altmodel"):
             messModel = system.config["altmodel"]
         commandLine += [messModel]
@@ -470,7 +469,7 @@ def generateMAMEConfigs(
                     / f"{system.name}_{romType}_autoload.csv"
                 )
                 if autoRunFile.exists():
-                    with open(str(autoRunFile), "r") as openARFile:
+                    with open(str(autoRunFile)) as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if (
@@ -487,7 +486,7 @@ def generateMAMEConfigs(
                     / f"{softList}_autoload.csv"
                 )
                 if autoRunFile.exists():
-                    with open(str(autoRunFile), "r") as openARFile:
+                    with open(str(autoRunFile)) as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if row[0].casefold() == Path(romBasename).stem.casefold():
@@ -766,7 +765,7 @@ def generateMAMEPadConfig(
 
     # Load standard controls from csv
     controlFile = "/usr/share/reglinux/configgen/data/mame/mameControls.csv"
-    with open(controlFile, "r") as openFile:
+    with open(controlFile) as openFile:
         controlDict = {}
         controlList = reader(openFile)
         for row in controlList:
@@ -847,7 +846,7 @@ def generateMAMEPadConfig(
         messControlFile = Path(
             "/usr/share/reglinux/configgen/data/mame/messControls.csv",
         )
-        with open(str(messControlFile), "r") as openMessFile:
+        with open(str(messControlFile)) as openMessFile:
             controlList = reader(openMessFile, delimiter=";")
             for row in controlList:
                 if row[0] not in messControlDict:
@@ -1196,8 +1195,8 @@ def generatePortElement(
     padindex: int,
     mapping: str,
     key: str,
-    input: str,
-    reversed: Any,
+    input_param: str,
+    reversed_param: Any,
     altButtons: Any,
 ) -> Any:
     # Generic input
@@ -1207,7 +1206,7 @@ def generatePortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
-        input2definition(pad, key, input, padindex, reversed, altButtons),
+        input2definition(pad, key, input_param, padindex, reversed_param, altButtons),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1221,8 +1220,8 @@ def generateSpecialPortElement(
     padindex: int,
     mapping: str,
     key: str,
-    input: str,
-    reversed: Any,
+    input_param: str,
+    reversed_param: Any,
     mask: str,
     default: Any,
 ) -> Any:
@@ -1236,7 +1235,7 @@ def generateSpecialPortElement(
     xml_newseq.setAttribute("type", "standard")
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
-        input2definition(pad, key, input, padindex, reversed, 0),
+        input2definition(pad, key, input_param, padindex, reversed_param, 0),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1250,8 +1249,8 @@ def generateComboPortElement(
     mapping: str,
     kbkey: str,
     key: str,
-    input: str,
-    reversed: Any,
+    input_param: str,
+    reversed_param: Any,
     mask: str,
     default: Any,
 ) -> Any:
@@ -1266,7 +1265,7 @@ def generateComboPortElement(
     xml_port.appendChild(xml_newseq)
     value = config.createTextNode(
         f"KEYCODE_{kbkey} OR "
-        + input2definition(pad, key, input, padindex, reversed, 0),
+        + input2definition(pad, key, input_param, padindex, reversed_param, 0),
     )
     xml_newseq.appendChild(value)
     return xml_port
@@ -1283,7 +1282,7 @@ def generateAnalogPortElement(
     deckey: str,
     mappedinput: str,
     mappedinput2: str,
-    reversed: Any,
+    reversed_param: Any,
     mask: str,
     default: Any,
     delta: Any,
@@ -1300,14 +1299,14 @@ def generateAnalogPortElement(
     xml_newseq_inc.setAttribute("type", "increment")
     xml_port.appendChild(xml_newseq_inc)
     incvalue = config.createTextNode(
-        input2definition(pad, inckey, mappedinput, padindex, reversed, 0, True),
+        input2definition(pad, inckey, mappedinput, padindex, reversed_param, 0, True),
     )
     xml_newseq_inc.appendChild(incvalue)
     xml_newseq_dec = config.createElement("newseq")
     xml_port.appendChild(xml_newseq_dec)
     xml_newseq_dec.setAttribute("type", "decrement")
     decvalue = config.createTextNode(
-        input2definition(pad, deckey, mappedinput2, padindex, reversed, 0, True),
+        input2definition(pad, deckey, mappedinput2, padindex, reversed_param, 0, True),
     )
     xml_newseq_dec.appendChild(decvalue)
     xml_newseq_std = config.createElement("newseq")
@@ -1324,21 +1323,23 @@ def generateAnalogPortElement(
 def input2definition(
     pad: Any,
     key: str,
-    input: str,
+    input_param: str,
     joycode: Any,
-    reversed: Any,
+    reversed_param: Any,
     altButtons: Any,
     ignoreAxis: bool = False,
 ) -> str:
     if (
-        input.find("BUTTON") != -1
-        or input.find("HAT") != -1
-        or input == "START"
-        or input == "SELECT"
+        input_param.find("BUTTON") != -1
+        or input_param.find("HAT") != -1
+        or input_param == "START"
+        or input_param == "SELECT"
     ):
-        input = input.replace("{0}", joycode) if "{0}" in input else input
-        return f"JOYCODE_{joycode}_{input}"
-    if input.find("AXIS") != -1:
+        input_param = (
+            input_param.replace("{0}", joycode) if "{0}" in input_param else input_param
+        )
+        return f"JOYCODE_{joycode}_{input_param}"
+    if input_param.find("AXIS") != -1:
         if altButtons == "qbert":  # Q*Bert Joystick
             if key == "joystick1up" or key == "up":
                 return f"JOYCODE_{joycode}_{retroPad['joystick1up']}_{joycode}_{retroPad['joystick1right']} OR \

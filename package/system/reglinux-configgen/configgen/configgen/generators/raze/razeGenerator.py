@@ -89,9 +89,9 @@ class RazeGenerator(Generator):
         architecture = get_cpu_architecture()
         eslog.debug(f"*** Detected architecture is: {architecture} ***")
 
-        for dir in [RAZE_CONFIG_DIR, RAZE_SAVES_DIR]:
-            if not path.exists(dir):
-                mkdir(dir)
+        for directory in [RAZE_CONFIG_DIR, RAZE_SAVES_DIR]:
+            if not path.exists(directory):
+                mkdir(directory)
 
         if not path.exists(RAZE_CONFIG_FILE):
             with open(RAZE_CONFIG_FILE, "w") as config:

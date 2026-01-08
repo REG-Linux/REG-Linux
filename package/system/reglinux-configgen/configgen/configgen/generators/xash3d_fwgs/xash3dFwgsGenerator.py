@@ -1,7 +1,7 @@
 from glob import glob
 from os import symlink
 from pathlib import Path
-from re import compile
+from re import compile as re_compile
 from shutil import copy
 
 from configgen.Command import Command
@@ -36,11 +36,11 @@ def _server_lib_path(server_lib: str, arch_suffix: str) -> Path:
 
 
 def _get_server_lib_basename_from_liblist_gam(game: str) -> str | None:
-    """Gets the base name of the server library from liblist.gam in the game directory."""
+    """Get the base name of the server library from liblist.gam in the game directory."""
     file_path = _rom_dir(game) / "liblist.gam"
     if not file_path.exists():
         return None
-    pattern = compile(r'gamedll\w*\s+"(?:dlls[/\\])?([^.]*)')
+    pattern = re_compile(r'gamedll\w*\s+"(?:dlls[/\\])?([^.]*)')
     with open(file_path) as f:
         for line in f:
             m = pattern.match(line)
@@ -50,7 +50,7 @@ def _get_server_lib_basename_from_liblist_gam(game: str) -> str | None:
 
 
 def _find_server_lib(server_lib: str | None, arch_suffix: str) -> Path:
-    """Finds and returns the server library.
+    """Find and return the server library.
 
     Falls back to XASH3D_DEFAULT_SERVER_LIB if none is found.
     """
@@ -63,7 +63,7 @@ def _find_server_lib(server_lib: str | None, arch_suffix: str) -> Path:
 
 
 def _find_client_lib(server_lib: str | None, arch_suffix: str) -> Path:
-    """Finds and returns the client library.
+    """Find and return the client library.
 
     Falls back to the client library for XASH3D_DEFAULT_SERVER_LIB if none is found.
     """
@@ -76,7 +76,7 @@ def _find_client_lib(server_lib: str | None, arch_suffix: str) -> Path:
 
 
 def _get_arch_suffix():
-    """Returns the architecture suffix, e.g. _amd64, based on a known server library."""
+    """Return the architecture suffix, e.g. _amd64, based on a known server library."""
     path_prefix = XASH3D_HLSDK_LIBS_DIR / "hl" / "dlls" / "hl"
     return glob(str(path_prefix) + "*.so")[0][len(str(path_prefix)) : -3]
 

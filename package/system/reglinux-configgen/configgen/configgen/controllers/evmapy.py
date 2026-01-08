@@ -1,4 +1,4 @@
-"""Event Mapper (Evmapy) Module
+"""Event Mapper (Evmapy) Module.
 
 This module provides functionality to map gamepad/controller inputs to keyboard events
 for game emulation systems. It handles the configuration and management of input
@@ -137,11 +137,11 @@ class Evmapy:
                 # Load the pad action configuration from the keys file
                 try:
                     with open(keysfile) as f:
-                        padActionConfig = load(f)
+                        padActionConfig: dict[str, Any] = load(f)
                 except OSError as e:
                     eslog.error(f"Error loading keys file {keysfile}: {e}")
                     # Continue with empty padActionConfig to avoid breaking the process
-                    padActionConfig = {}
+                    padActionConfig: dict[str, Any] = {}
 
                 # Configure light guns
                 ngun = 1
@@ -158,7 +158,7 @@ class Evmapy:
                         )
 
                         # Initialize gun configuration structure
-                        padConfig = {}
+                        padConfig: dict[str, Any] = {}
                         padConfig["buttons"] = []
                         padConfig["axes"] = []
                         padConfig["actions"] = []
@@ -171,7 +171,11 @@ class Evmapy:
                         padConfig["grab"] = False
 
                         # Process gun actions from the configuration
-                        for action in padActionConfig[gun_action_key]:
+                        gun_actions: list[dict[str, Any]] = padActionConfig[
+                            gun_action_key
+                        ]
+                        for action in gun_actions:
+                            action: dict[str, Any]
                             if (
                                 "trigger" in action
                                 and "type" in action
@@ -182,7 +186,7 @@ class Evmapy:
                                     guns[gun],
                                 )
                                 if guntrigger:
-                                    newaction = action.copy()
+                                    newaction: dict[str, Any] = action.copy()
                                     # Remove description field as it's not needed in runtime config
                                     if "description" in newaction:
                                         del newaction["description"]
@@ -208,7 +212,7 @@ class Evmapy:
                         )
 
                         # Initialize controller configuration structure
-                        padConfig = {}
+                        padConfig: dict[str, Any] = {}
                         padConfig["axes"] = []
                         padConfig["buttons"] = []
                         padConfig["grab"] = False
@@ -222,10 +226,18 @@ class Evmapy:
                         )
 
                         # Initialize tracking dictionaries for controller inputs
-                        known_buttons_names = {}  # Buttons available on this controller
-                        known_buttons_codes = {}  # Map button codes to names
-                        known_buttons_alias = {}  # Alternative names for buttons
-                        known_axes_codes = {}  # Axes available on this controller
+                        known_buttons_names: dict[
+                            str, Any
+                        ] = {}  # Buttons available on this controller
+                        known_buttons_codes: dict[
+                            int, str
+                        ] = {}  # Map button codes to names
+                        known_buttons_alias: dict[
+                            str, str
+                        ] = {}  # Alternative names for buttons
+                        known_axes_codes: dict[
+                            int, bool
+                        ] = {}  # Axes available on this controller
 
                         # Handle controllers where guide and back buttons share the same code
                         guide_equal_back = (
@@ -382,13 +394,13 @@ class Evmapy:
                                         )
 
                         # Process actions from configuration file
-                        padActionsPreDefined: list[Any] = padActionConfig[
+                        padActionsPreDefined: list[dict[str, Any]] = padActionConfig[
                             player_action_key
                         ]
-                        padActionsFiltered: list[Any] = []
+                        padActionsFiltered: list[dict[str, Any]] = []
 
                         # Handle mouse events - expand joystick shortcuts to x/y components
-                        padActionsDefined: list[Any] = []
+                        padActionsDefined: list[dict[str, Any]] = []
                         for action in padActionsPreDefined:
                             if (
                                 "type" in action
@@ -456,14 +468,15 @@ class Evmapy:
                                             allfound = False
                                     if allfound:
                                         # Rewrite axis buttons for special axes
-                                        for i, val in enumerate(trigger):
-                                            if (
-                                                "ABS_OTHERS_" + val + ":max"
-                                                in known_buttons_names
-                                            ):
-                                                action["trigger"][i] = (
+                                        if isinstance(action["trigger"], list):
+                                            for i, val in enumerate(trigger):
+                                                if (
                                                     "ABS_OTHERS_" + val + ":max"
-                                                )
+                                                    in known_buttons_names
+                                                ):
+                                                    action["trigger"][i] = (
+                                                        "ABS_OTHERS_" + val + ":max"
+                                                    )
                                         padActionsFiltered.append(action)
                                 # Single trigger validation
                                 elif trigger in known_buttons_names:
@@ -472,9 +485,7 @@ class Evmapy:
                                     "ABS_OTHERS_" + trigger + ":max"
                                     in known_buttons_names
                                 ):
-                                    action["trigger"] = (
-                                        "ABS_OTHERS_" + action["trigger"] + ":max"
-                                    )
+                                    action["trigger"] = "ABS_OTHERS_" + trigger + ":max"
                                     padActionsFiltered.append(action)
 
                         padConfig["actions"] = padActionsFiltered
@@ -491,19 +502,28 @@ class Evmapy:
                             if "type" in action and action["type"] == "mouse":
                                 if isinstance(action["trigger"], list):
                                     for x in action["trigger"]:
-                                        axis_for_mouse[x] = True
+                                        if isinstance(x, str):
+                                            axis_for_mouse[x] = True
                                 else:
-                                    axis_for_mouse[action["trigger"]] = True
+                                    trigger_value = action["trigger"]
+                                    if isinstance(trigger_value, str):
+                                        axis_for_mouse[trigger_value] = True
 
                         # Adjust axis ranges for non-mouse actions
                         for axis in padConfig["axes"]:
+                            axis_name: str = (
+                                axis["name"]
+                                if isinstance(axis, dict) and "name" in axis
+                                else ""
+                            )
                             axis_triggers: list[str] = [
-                                axis["name"] + ":val",
-                                axis["name"] + ":min",
-                                axis["name"] + ":max",
+                                axis_name + ":val",
+                                axis_name + ":min",
+                                axis_name + ":max",
                             ]
                             if not any(
-                                trigger in axis_for_mouse for trigger in axis_triggers
+                                isinstance(trigger, str) and trigger in axis_for_mouse
+                                for trigger in axis_triggers
                             ):
                                 min_val, max_val = Evmapy.__getPadMinMaxAxisForKeys(
                                     axis["min"],
@@ -529,7 +549,7 @@ class Evmapy:
     def __trigger_mapper(
         trigger: str,
         known_buttons_alias: dict[str, str],
-        known_buttons_names: dict[str, str],
+        known_buttons_names: dict[str, Any],
         absbasex_positive: int,
         absbasey_positive: int,
     ) -> str | list[str]:
@@ -541,7 +561,7 @@ class Evmapy:
         Args:
             trigger: Either a string or list of trigger names to map
             known_buttons_alias (dict): Button aliases for this controller
-            known_buttons_names (dict): Available button names for this controller
+            known_buttons_names (dict): Available button names for this controller (key existence checked only)
             absbasex_positive (bool): Whether right is positive for base X axis
             absbasey_positive (bool): Whether down is positive for base Y axis
 
@@ -572,7 +592,7 @@ class Evmapy:
     def __trigger_mapper_string(
         trigger: str,
         known_buttons_alias: dict[str, str],
-        known_buttons_names: dict[str, str],
+        known_buttons_names: dict[str, Any],
         absbasex_positive: int,
         absbasey_positive: int,
     ) -> str:
@@ -581,7 +601,7 @@ class Evmapy:
         Args:
             trigger (str): The trigger name to map
             known_buttons_alias (dict): Button aliases for this controller
-            known_buttons_names (dict): Available button names for this controller
+            known_buttons_names (dict): Available button names for this controller (key existence checked only)
             absbasex_positive (bool): Whether right is positive for base X axis
             absbasey_positive (bool): Whether down is positive for base Y axis
 

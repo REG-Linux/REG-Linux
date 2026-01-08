@@ -1,4 +1,5 @@
-"""Flycast generator module for REG-Linux
+"""Flycast generator module for REG-Linux.
+
 This module handles the generation of flycast emulator configurations.
 """
 

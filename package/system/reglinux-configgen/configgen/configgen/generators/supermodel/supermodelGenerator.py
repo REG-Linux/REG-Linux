@@ -611,16 +611,16 @@ def joy2realjoyid(players_controllers: Any, joy: str | int) -> int | None:
 
 def hatOrAxis(players_controllers: Any, player: str | int) -> str:
     # default to axis
-    type = "axis"
+    input_type = "axis"
     if (player) in players_controllers:
         pad = players_controllers[(player)]
         for button in pad.inputs:
-            input = pad.inputs[button]
-            if input.type == "hat":
-                type = "hat"
-            elif input.type == "axis":
-                type = "axis"
-    return type
+            controller_input = pad.inputs[button]
+            if controller_input.type == "hat":
+                input_type = "hat"
+            elif controller_input.type == "axis":
+                input_type = "axis"
+    return input_type
 
 
 def input2input(
@@ -633,26 +633,26 @@ def input2input(
     if (player) in players_controllers:
         pad = players_controllers[(player)]
         if button in pad.inputs:
-            input = pad.inputs[button]
+            controller_input = pad.inputs[button]
             if joynum is not None:  # Only proceeds if joynum is not None
-                if input.type == "button":
-                    return f"JOY{joynum + 1}_BUTTON{int(input.id) + 1}"
-                if input.type == "hat":
-                    if input.value == "1":
+                if controller_input.type == "button":
+                    return f"JOY{joynum + 1}_BUTTON{int(controller_input.id) + 1}"
+                if controller_input.type == "hat":
+                    if controller_input.value == "1":
                         return f"JOY{joynum + 1}_UP,JOY{joynum + 1}_POV1_UP"
-                    if input.value == "2":
+                    if controller_input.value == "2":
                         return f"JOY{joynum + 1}_RIGHT,JOY{joynum + 1}_POV1_RIGHT"
-                    if input.value == "4":
+                    if controller_input.value == "4":
                         return f"JOY{joynum + 1}_DOWN,JOY{joynum + 1}_POV1_DOWN"
-                    if input.value == "8":
+                    if controller_input.value == "8":
                         return f"JOY{joynum + 1}_LEFT,JOY{joynum + 1}_POV1_LEFT"
-                elif input.type == "axis":
+                elif controller_input.type == "axis":
                     sidestr = ""
                     if axisside is not None:
                         if axisside == 1:
-                            sidestr = "_NEG" if input.value == 1 else "_POS"
+                            sidestr = "_NEG" if controller_input.value == 1 else "_POS"
                         else:
-                            sidestr = "_POS" if input.value == 1 else "_NEG"
+                            sidestr = "_POS" if controller_input.value == 1 else "_NEG"
 
                     if button == "joystick1left" or button == "left":
                         return f"JOY{joynum + 1}_XAXIS{sidestr}"
