@@ -65,9 +65,6 @@ dependencies = [
 
     # Advanced YAML handling (round-trip editing, comments preservation)
     "ruamel.yaml>=0.18.15",
-
-    # ZeroMQ bindings for IPC and messaging
-    "pyzmq>=22.3.0"
 ]
 
 

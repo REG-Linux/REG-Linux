@@ -3,8 +3,9 @@ from pathlib import Path
 from subprocess import PIPE, CalledProcessError, run
 from time import sleep
 
+from configgen.client import regmsg_send_message
+
 from .logger import get_logger
-from .regmsgclient import regmsg_send_message
 
 eslog = get_logger(__name__)
 
@@ -134,8 +135,12 @@ def getRefreshRate() -> str | None:
 
 
 def supportSystemRotation() -> bool:
-    result = run(["regmsg screen", "supportSystemRotation"], check=False, stdout=PIPE)
-    return result.returncode == 0
+    try:
+        result = regmsg_send_message("screen supportSystemRotation")
+        return result.strip().lower() == "true"
+    except Exception as e:
+        eslog.error(f"Error checking for system rotation support: {e}")
+        return False
 
 
 def changeMouse(mode: bool) -> None:
