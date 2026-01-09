@@ -2,6 +2,8 @@ name: Trigger regmsg compiler
 
 on:
   push:
+    branches:
+      - master
     paths:
       - 'package/system/reglinux-msg/**'
       - 'package/boot/plymouth/**'
