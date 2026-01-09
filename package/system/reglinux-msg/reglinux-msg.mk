@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-# branch: zmq-0.9
-REGLINUX_MSG_VERSION = 4d60bbee9c18c8afb2ed6a7f11ca0f375254438c
+# branch: main
+REGLINUX_MSG_VERSION = 9ba4685c37d461cfea70cc0cb71c15ac95fcdbd9
 
 ifeq ($(BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE),y)
 
@@ -14,7 +14,7 @@ REGLINUX_MSG_SITE = https://$(REGLINUX_MSG_TOKEN)@github.com/REG-Linux/regmsg
 REGLINUX_MSG_SITE_METHOD = git
 REGLINUX_MSG_LICENSE = MIT
 REGLINUX_MSG_LICENSE_FILES = LICENSE
-REGLINUX_MSG_DEPENDENCIES += libdrm zeromq
+REGLINUX_MSG_DEPENDENCIES += libdrm
 
 RUSTC_TARGET_PROFILE = $(if $(BR2_ENABLE_DEBUG),,release)
 REGLINUX_MSG_LOCATION = target/$(RUSTC_TARGET_NAME)/$(RUSTC_TARGET_PROFILE)
