@@ -1,5 +1,4 @@
 from configparser import ConfigParser, DuplicateOptionError
-from os import rename
 from pathlib import Path
 from shutil import copy
 from typing import Any
@@ -51,7 +50,7 @@ class VPinballGenerator(Generator):
             pinmame_path.mkdir(parents=True, exist_ok=True)
         log_path = Path(VPINBALL_LOG_PATH)
         if log_path.exists():
-            rename(VPINBALL_LOG_PATH, VPINBALL_LOG_PATH + ".1")
+            Path(VPINBALL_LOG_PATH).rename(VPINBALL_LOG_PATH + ".1")
 
         # [ VPinballX.ini ] ##
         try:
@@ -103,7 +102,7 @@ class VPinballGenerator(Generator):
             vpinballSettings.set("Standalone", "DMDServer", "0")
 
         # Save VPinballX.ini
-        with open(VPINBALL_CONFIG_PATH, "w", encoding="utf-8") as configfile:
+        with Path(VPINBALL_CONFIG_PATH).open("w", encoding="utf-8") as configfile:
             vpinballSettings.write(configfile)
 
         # set the config path to be sure

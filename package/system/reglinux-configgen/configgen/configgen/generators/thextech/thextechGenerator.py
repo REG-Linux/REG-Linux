@@ -1,0 +1,47 @@
+
+import pathlib
+
+from configgen.command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.generator import Generator
+from configgen.systemFiles import SAVES
+
+THEXTECH_SAVES_DIR = str(SAVES / "thextech")
+THEXTECH_BIN_PATH = "/usr/bin/thextech"
+
+
+class TheXTechGenerator(Generator):
+    def generate(
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
+    ):
+        if not pathlib.Path(THEXTECH_SAVES_DIR).exists():
+            pathlib.Path(THEXTECH_SAVES_DIR).mkdir(parents=True)
+
+        command_array = [THEXTECH_BIN_PATH, "-u", THEXTECH_SAVES_DIR]
+
+        # rendering_mode: sw, hw (default), vsync
+        if system.isOptSet("rendering_mode"):
+            command_array.extend(["-r", system.config["rendering_mode"]])
+
+        if system.isOptSet("frameskip") and not system.getOptBoolean("frameskip"):
+            command_array.extend(["--no-frameskip"])
+        else:
+            command_array.extend(["--frameskip"])
+
+        command_array.extend(["-c", rom])
+
+        return Command(
+            array=command_array,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    players_controllers,
+                ),
+            },
+        )

@@ -117,7 +117,7 @@ class PlayGenerator(Generator):
             tree.write(PLAY_CONFIG_FILE)
         else:
             # File exists, write the XML to the existing file
-            with open(PLAY_CONFIG_FILE, "wb") as file:
+            with Path(PLAY_CONFIG_FILE).open("wb") as file:
                 tree.write(file)
 
         command_array = [PLAY_BIN_PATH, "--fullscreen"]

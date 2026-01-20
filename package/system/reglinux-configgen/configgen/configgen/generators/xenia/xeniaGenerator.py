@@ -109,7 +109,7 @@ class XeniaGenerator(Generator):
             eslog.debug(f"Found .xbox360 playlist: {rom}")
             pathLead = Path(rom).parent
             try:
-                with open(rom, encoding="utf-8") as openFile:
+                with Path(rom).open(encoding="utf-8") as openFile:
                     # Read only the first line of the file.
                     firstLine = openFile.readlines(1)[0]
                     # Strip of any new line characters.
@@ -136,7 +136,7 @@ class XeniaGenerator(Generator):
         else:
             toml_file = XENIA_CONFIG_DIR / "xenia.config.toml"
         if toml_file.is_file():
-            with open(toml_file, encoding="utf-8") as f:
+            with Path(toml_file).open(encoding="utf-8") as f:
                 config = load(f)
 
         # [ Now adjust the config file defaults & options we want ]
@@ -282,7 +282,7 @@ class XeniaGenerator(Generator):
             config["XConfig"] = {"user_language": 1}
 
         # now write the updated toml
-        with open(toml_file, "w", encoding="utf-8") as f:
+        with Path(toml_file).open("w", encoding="utf-8") as f:
             dump(config, f)
 
         # handle patches files to set all matching toml files keys to true
@@ -302,14 +302,14 @@ class XeniaGenerator(Generator):
                 for file_path in matching_files:
                     eslog.debug(f"Enabling patches for: {file_path}")
                     # load the matchig .patch.toml file
-                    with open(file_path, encoding="utf-8") as f:
+                    with Path(file_path).open(encoding="utf-8") as f:
                         patch_toml = load(f)
                     # modify all occurrences of the `is_enabled` key to `true`
                     for patch in patch_toml.get("patch", []):
                         if "is_enabled" in patch:
                             patch["is_enabled"] = True
                     # save the updated .patch.toml file
-                    with open(file_path, "w", encoding="utf-8") as f:
+                    with Path(file_path).open("w", encoding="utf-8") as f:
                         dump(patch_toml, f)
             else:
                 eslog.debug(f"No patch file found for {rom_name}")

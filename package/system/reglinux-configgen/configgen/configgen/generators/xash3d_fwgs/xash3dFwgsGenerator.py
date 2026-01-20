@@ -1,5 +1,4 @@
 from glob import glob
-from os import symlink
 from pathlib import Path
 from re import compile as re_compile
 from shutil import copy
@@ -41,7 +40,7 @@ def _get_server_lib_basename_from_liblist_gam(game: str) -> str | None:
     if not file_path.exists():
         return None
     pattern = re_compile(r'gamedll\w*\s+"(?:dlls[/\\])?([^.]*)')
-    with open(file_path, encoding="utf-8") as f:
+    with Path(file_path).open(encoding="utf-8") as f:
         for line in f:
             m = pattern.match(line)
             if m:
@@ -137,8 +136,7 @@ class Xash3dFwgsGenerator(Generator):
         rom_dir = _rom_dir(game)
         userconfig_path = rom_dir / "userconfig.cfg"
         if not userconfig_path.exists():
-            with open(userconfig_path, "w", encoding="utf-8") as f:
-                f.write("exec gamepad.cfg\nexec custom.cfg\n")
+            Path(userconfig_path).write_text("exec gamepad.cfg\nexec custom.cfg\n", encoding="utf-8")
 
         gamepad_path = rom_dir / "gamepad.cfg"
         if not gamepad_path.exists():
@@ -153,11 +151,10 @@ class Xash3dFwgsGenerator(Generator):
         if not custom_cfg_path.exists():
             if not config_dir.exists():
                 config_dir.mkdir(parents=True, exist_ok=True)
-            with open(custom_cfg_path, "w", encoding="utf-8") as f:
-                f.write("\n")
+            Path(custom_cfg_path).write_text("\n", encoding="utf-8")
             rom_custom_cfg_path = rom_dir / "custom.cfg"
             if not rom_custom_cfg_path.exists():
-                symlink(str(custom_cfg_path), str(rom_custom_cfg_path))
+                Path(str(rom_custom_cfg_path)).symlink_to(str(custom_cfg_path))
 
     def _maybeInitSaveDir(self, game: str) -> None:
         rom_dir = _rom_dir(game)
@@ -167,4 +164,4 @@ class Xash3dFwgsGenerator(Generator):
             if not save_dir.exists():
                 save_dir.mkdir(parents=True, exist_ok=True)
             if not save_path.exists():
-                symlink(str(save_dir), str(save_path))
+                Path(str(save_path)).symlink_to(str(save_dir))

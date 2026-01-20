@@ -45,7 +45,7 @@ class ScummVMGenerator(Generator):
         config_dir_path = config_path.parent
         if not config_dir_path.exists():
             config_dir_path.mkdir(parents=True, exist_ok=True)
-        with open(SCUMMVM_CONFIG_PATH, "w") as configfile:
+        with Path(SCUMMVM_CONFIG_PATH).open("w") as configfile:
             scummConfig.write(configfile)
 
         # Find rom path

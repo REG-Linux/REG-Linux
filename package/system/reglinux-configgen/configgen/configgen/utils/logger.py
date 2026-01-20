@@ -33,7 +33,7 @@ class BrokenPipeHandler(logging.Handler):
             # Gracefully handle broken pipe by redirecting to devnull
             devnull = os.open(os.devnull, os.O_WRONLY)
             os.dup2(
-                devnull, self.stream.fileno()
+                devnull, self.stream.fileno(),
             )  # Replace the broken pipe with devnull
             os.close(devnull)
         except Exception:

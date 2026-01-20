@@ -63,5 +63,5 @@ def setHatariControllers(system: Any, playersControllers: Any) -> None:
     else:
         config.set("Screen", "bShowStatusbar", "FALSE")
 
-    with open(HATARI_CONFIG_PATH, "w") as configfile:
+    with Path(HATARI_CONFIG_PATH).open("w") as configfile:
         config.write(configfile)

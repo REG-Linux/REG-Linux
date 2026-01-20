@@ -87,7 +87,7 @@ def setIortcwConfig(system: Any, gameResolution: dict[str, int]) -> None:
 
     # Check if the file exists
     if Path(IORTCW_CONFIG_PATH).is_file():
-        with open(IORTCW_CONFIG_PATH) as config_file:
+        with Path(IORTCW_CONFIG_PATH).open() as config_file:
             lines = config_file.readlines()
 
         # Loop through the options and update the lines
@@ -101,10 +101,10 @@ def setIortcwConfig(system: Any, gameResolution: dict[str, int]) -> None:
                         lines[i] = f'{key} "{value}"\n'
 
         # Write the modified content back to the file
-        with open(IORTCW_CONFIG_PATH, "w") as config_file:
+        with Path(IORTCW_CONFIG_PATH).open("w") as config_file:
             config_file.writelines(lines)
     else:
         # File doesn't exist, create it and add the options
-        with open(IORTCW_CONFIG_PATH, "w") as config_file:
+        with Path(IORTCW_CONFIG_PATH).open("w") as config_file:
             for key, value in options_to_set.items():
                 config_file.write(f'{key} "{value}"\n')

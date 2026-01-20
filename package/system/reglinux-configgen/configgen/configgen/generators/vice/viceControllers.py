@@ -63,5 +63,5 @@ def setViceControllers(system: Any, playersControllers: Any) -> None:
                     )
         listVice.append("")
 
-    with open(VICE_CONTROLLER_PATH, "w") as f:
+    with Path(VICE_CONTROLLER_PATH).open("w") as f:
         f.writelines(str(listVice[i]) + "\n" for i in range(len(listVice)))

@@ -69,7 +69,7 @@ class Vita3kGenerator(Generator):
         if config_path.is_file():
             try:
                 if load_yaml_guess_indent is not None:
-                    with open(VITA3K_CONFIG_PATH, encoding="utf-8") as stream:
+                    with Path(VITA3K_CONFIG_PATH).open(encoding="utf-8") as stream:
                         vita3kymlconfig, indent, block_seq_indent = (
                             load_yaml_guess_indent(
                                 stream,
@@ -78,7 +78,7 @@ class Vita3kGenerator(Generator):
                 else:
                     raise ImportError
             except (ImportError, TypeError):
-                with open(VITA3K_CONFIG_PATH, encoding="utf-8") as stream:
+                with Path(VITA3K_CONFIG_PATH).open(encoding="utf-8") as stream:
                     yaml = YAML()
                     vita3kymlconfig = yaml.load(stream)
                 indent = 2
@@ -141,7 +141,7 @@ class Vita3kGenerator(Generator):
         yaml.explicit_end = True
         yaml.indent(mapping=indent, sequence=indent, offset=block_seq_indent)
 
-        with open(VITA3K_CONFIG_PATH, "w", encoding="utf-8") as fp:
+        with Path(VITA3K_CONFIG_PATH).open("w", encoding="utf-8") as fp:
             yaml.dump(vita3kymlconfig, fp)
 
         # Simplify the rom name (strip the directory & extension)

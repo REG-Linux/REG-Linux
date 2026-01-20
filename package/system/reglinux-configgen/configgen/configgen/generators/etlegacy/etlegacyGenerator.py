@@ -54,7 +54,7 @@ class ETLegacyGenerator(Generator):
 
         # Check if the file exists
         if Path(config_file_path).is_file():
-            with open(config_file_path) as config_file:
+            with Path(config_file_path).open() as config_file:
                 lines = config_file.readlines()
 
             # Loop through the options and update the lines
@@ -68,11 +68,11 @@ class ETLegacyGenerator(Generator):
                             lines[i] = f'{key} "{value}"\n'
 
             # Write the modified content back to the file
-            with open(config_file_path, "w") as config_file:
+            with Path(config_file_path).open("w") as config_file:
                 config_file.writelines(lines)
         else:
             # File doesn't exist, create it and add the options
-            with open(config_file_path, "w") as config_file:
+            with Path(config_file_path).open("w") as config_file:
                 for key, value in options_to_set.items():
                     config_file.write(f'{key} "{value}"\n')
 

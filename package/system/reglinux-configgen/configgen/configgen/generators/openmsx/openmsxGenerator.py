@@ -118,7 +118,7 @@ class OpenmsxGenerator(Generator):
             eslog.warning("Could not add bindings to root element")
 
         # Write the updated xml to the file
-        with open(settings_xml, "w") as f:
+        with Path(settings_xml).open("w") as f:
             f.write("<!DOCTYPE settings SYSTEM 'settings.dtd'>\n")
             # purdify the XML
             xml_string = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
@@ -128,11 +128,10 @@ class OpenmsxGenerator(Generator):
             f.write(formatted_xml)
 
         # setup the blank tcl file
-        with open(settings_tcl, "w") as file:
-            file.write("")
+        Path(settings_tcl).write_text("")
 
         # set the tcl file options - we can add other options later
-        with open(settings_tcl, "a") as file:
+        with Path(settings_tcl).open("a") as file:
             file.write(
                 "filepool add -path /userdata/bios/Machines -types system_rom -position 1\n",
             )
@@ -263,7 +262,7 @@ class OpenmsxGenerator(Generator):
         # handle our own file format for stacked roms / disks
         if file_extension == ".openmsx":
             # read the contents of the file and extract the rom paths
-            with open(rom) as file:
+            with Path(rom).open() as file:
                 lines = file.readlines()
                 rom1 = ""
                 rom1 = lines[0].strip()

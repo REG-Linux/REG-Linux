@@ -42,7 +42,7 @@ class TheForceEngineGenerator(Generator):
             mod_name = FORCE_PATCH_PATH
 
         # Open the .tfe rom file for user mods
-        with open(rom) as file:
+        with Path(rom).open() as file:
             # Read the first line and store it as 'first_line'
             first_line = file.readline().strip()
             # use the first_line as mod if the file isn't empty
@@ -241,7 +241,7 @@ class TheForceEngineGenerator(Generator):
         config_dir = FORCE_CONFIG_PATH.parent
         if not config_dir.exists():
             config_dir.mkdir(parents=True, exist_ok=True)
-        with open(FORCE_CONFIG_PATH, "w") as configfile:
+        with Path(FORCE_CONFIG_PATH).open("w") as configfile:
             forceConfig.write(configfile)
 
         # Setup the command

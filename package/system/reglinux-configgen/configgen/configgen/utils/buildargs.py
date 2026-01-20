@@ -56,7 +56,7 @@ def parse_args(launch_args: list[str], rom_path: str) -> Result:
             BuildEngineArg("MAP", "-map", True),  # Start specified MAP on launch
         ]
     }
-    with open(rom_path, encoding="utf-8") as file:
+    with Path(rom_path).open(encoding="utf-8") as file:
         lines = file.readlines()
     errors = []
     for i, original_line in enumerate(lines):

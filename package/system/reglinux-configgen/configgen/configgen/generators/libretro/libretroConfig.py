@@ -273,7 +273,7 @@ def createLibretroConfig(
     # try to create/modify the configuration file simultaneously
     lockfile = retroarchCore + ".lock"
     try:
-        with open(lockfile, "w") as lock:
+        with Path(lockfile).open("w") as lock:
             # Acquire exclusive lock
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:

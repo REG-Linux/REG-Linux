@@ -172,7 +172,7 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceSettings.set("Core", "SIDevice0", "11")
 
         # Save dolphin.ini
-        with open(DOLPHIN_TRIFORCE_CONFIG_PATH, "w") as configfile:
+        with Path(DOLPHIN_TRIFORCE_CONFIG_PATH).open("w") as configfile:
             dolphinTriforceSettings.write(configfile)
 
         # gfx.ini ##
@@ -319,7 +319,7 @@ class DolphinTriforceGenerator(Generator):
             dolphinTriforceGFXSettings.set("Settings", "MSAA", "0")
 
         # Save gfx.ini
-        with open(DOLPHIN_TRIFORCE_GFX_PATH, "w") as configfile:
+        with Path(DOLPHIN_TRIFORCE_GFX_PATH).open("w") as configfile:
             dolphinTriforceGFXSettings.write(configfile)
 
         # logger settings ##
@@ -337,7 +337,7 @@ class DolphinTriforceGenerator(Generator):
         dolphinTriforceLogSettings.set("Logs", "DVD", "False")
 
         # Save Logger.ini
-        with open(DOLPHIN_TRIFORCE_LOG_PATH, "w") as configfile:
+        with Path(DOLPHIN_TRIFORCE_LOG_PATH).open("w") as configfile:
             dolphinTriforceLogSettings.write(configfile)
 
         # game settings ##
@@ -352,8 +352,7 @@ class DolphinTriforceGenerator(Generator):
 
         gfze01_ini_path = game_settings_path / "GFZE01.ini"
         if not gfze01_ini_path.exists():
-            with open(gfze01_ini_path, "w") as dolphinTriforceGameSettingsGFZE01:
-                dolphinTriforceGameSettingsGFZE01.write("""[Gecko]
+            Path(gfze01_ini_path).write_text("""[Gecko]
 $AX
 06003F30 00000284
 818D831C 280C0000
@@ -445,8 +444,7 @@ $AX
 
         gvsj8p_ini_path = game_settings_path / "GVSJ8P.ini"
         if not gvsj8p_ini_path.exists():
-            with open(gvsj8p_ini_path, "w") as dolphinTriforceGameSettingsGVSJ8P:
-                dolphinTriforceGameSettingsGVSJ8P.write("""[OnFrame]
+            Path(gvsj8p_ini_path).write_text("""[OnFrame]
 $DI Seed Blanker
 0x80000000:dword:0x00000000
 0x80000004:dword:0x00000000
@@ -459,8 +457,7 @@ $DI Seed Blanker
 
         ggpe01_ini_path = game_settings_path / "GGPE01.ini"
         if not ggpe01_ini_path.exists():
-            with open(ggpe01_ini_path, "w") as dolphinTriforceGameSettingsGGPE01:
-                dolphinTriforceGameSettingsGGPE01.write("""[OnFrame]
+            Path(ggpe01_ini_path).write_text("""[OnFrame]
 $Disable crypto
 0x8023D828:dword:0x93A30008
 0x8023D82C:dword:0x93C3000C
@@ -485,8 +482,7 @@ EmulationIssues = AM-Baseboard
 
         ggpe02_ini_path = game_settings_path / "GGPE02.ini"
         if not ggpe02_ini_path.exists():
-            with open(ggpe02_ini_path, "w") as dolphinTriforceGameSettingsGGPE02:
-                dolphinTriforceGameSettingsGGPE02.write("""[Display]
+            Path(ggpe02_ini_path).write_text("""[Display]
 ProgressiveScan = 0
 [Wii]
 Widescreen = False

@@ -68,7 +68,7 @@ class Fallout1Generator(Generator):
 
         setFalloutConfig(falloutConfig, system)
 
-        with open(FALLOUT_CONFIG_PATH, "w") as configfile:
+        with Path(FALLOUT_CONFIG_PATH).open("w") as configfile:
             falloutConfig.write(configfile)
 
         # INI Configuration
@@ -79,7 +79,7 @@ class Fallout1Generator(Generator):
 
         setFalloutIniConfig(falloutIniConfig, game_resolution)
 
-        with open(FALLOUT_CONFIG_INI, "w") as configfile:
+        with Path(FALLOUT_CONFIG_INI).open("w") as configfile:
             falloutIniConfig.write(configfile)
 
         # IMPORTANT: Move dir before executing

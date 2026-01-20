@@ -219,7 +219,7 @@ class BezelUtils:
                 ):
                     return -1, -1
                 return struct.unpack(
-                    ">ii", head[PNG_IHDR_OFFSET : PNG_IHDR_OFFSET + PNG_IHDR_SIZE]
+                    ">ii", head[PNG_IHDR_OFFSET : PNG_IHDR_OFFSET + PNG_IHDR_SIZE],
                 )
         except (OSError, struct.error):
             return -1, -1

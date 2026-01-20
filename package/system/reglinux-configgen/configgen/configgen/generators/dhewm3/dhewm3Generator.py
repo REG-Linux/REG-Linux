@@ -1,0 +1,41 @@
+from pathlib import Path
+
+from configgen.command import Command
+from configgen.generators.generator import Generator
+from configgen.systemFiles import CONF, ROMS
+
+DHEWM3_BIN_PATH = "/usr/bin/dhewm3"
+DHEWM3_CONFIG_DIR = str(Path(CONF) / "dhewm3")
+DHEWM3_ROMS_DIR = str(Path(ROMS) / "doom3")
+
+
+class Dhewm3Generator(Generator):
+    def generate(
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
+    ):
+        # Read the path within the .d3 rom file
+        with Path(rom).open() as file:
+            directory = file.readline().strip().split("/")[0]
+
+        # Run command
+        command_array = [
+            DHEWM3_BIN_PATH,
+            "+set",
+            "fs_basepath",
+            str(DHEWM3_ROMS_DIR),
+        ]
+
+        if directory != "base":
+            command_array.extend(["+set", "fs_game", str(directory)])
+
+        # Convert any Path objects to strings to ensure all elements are strings
+        command_array = [str(item) for item in command_array]
+
+        return Command(array=command_array)

@@ -1,5 +1,6 @@
+import pathlib
 from configparser import ConfigParser
-from os import makedirs, mkdir, path
+from os import path
 from shutil import copyfile
 
 from configgen.command import Command
@@ -39,7 +40,7 @@ class FlycastGenerator(Generator):
         flycastConfig.optionxform = lambda optionstr: (
             optionstr
         )  # preserve case sensitivity
-        if path.exists(FLYCAST_CONFIG_PATH):
+        if pathlib.Path(FLYCAST_CONFIG_PATH).exists():
             try:
                 flycastConfig.read(FLYCAST_CONFIG_PATH)
             except UnicodeDecodeError as e:
@@ -56,22 +57,22 @@ class FlycastGenerator(Generator):
         setFlycastConfig(flycastConfig, system, game_resolution)
 
         # update the configuration file
-        if not path.exists(path.dirname(FLYCAST_CONFIG_PATH)):
-            makedirs(path.dirname(FLYCAST_CONFIG_PATH))
-        with open(FLYCAST_CONFIG_PATH, "w+") as cfgfile:
+        if not pathlib.Path(path.dirname(FLYCAST_CONFIG_PATH)).exists():
+            pathlib.Path(path.dirname(FLYCAST_CONFIG_PATH)).mkdir(parents=True)
+        with pathlib.Path(FLYCAST_CONFIG_PATH).open("w+") as cfgfile:
             flycastConfig.write(cfgfile)
             cfgfile.close()
 
         # internal config
-        if not path.isdir(FLYCAST_SAVES_DIR):
-            mkdir(FLYCAST_SAVES_DIR)
-        if not path.isdir(FLYCAST_SAVES_DIR + "/flycast"):
-            mkdir(FLYCAST_SAVES_DIR + "/flycast")
+        if not pathlib.Path(FLYCAST_SAVES_DIR).is_dir():
+            pathlib.Path(FLYCAST_SAVES_DIR).mkdir()
+        if not pathlib.Path(FLYCAST_SAVES_DIR + "/flycast").is_dir():
+            pathlib.Path(FLYCAST_SAVES_DIR + "/flycast").mkdir()
         # vmuA1
-        if not path.isfile(FLYCAST_VMU_A1_PATH):
+        if not pathlib.Path(FLYCAST_VMU_A1_PATH).is_file():
             copyfile(FLYCAST_VMU_BLANK_PATH, FLYCAST_VMU_A1_PATH)
         # vmuA2
-        if not path.isfile(FLYCAST_VMU_A2_PATH):
+        if not pathlib.Path(FLYCAST_VMU_A2_PATH).is_file():
             copyfile(FLYCAST_VMU_BLANK_PATH, FLYCAST_VMU_A2_PATH)
 
         # the command to run

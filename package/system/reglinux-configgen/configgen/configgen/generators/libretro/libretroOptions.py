@@ -1,5 +1,4 @@
 from configparser import ConfigParser
-from os import remove
 from pathlib import Path
 from typing import Any
 
@@ -3299,8 +3298,8 @@ def configure_px68k(coreSettings: Any, system: Any) -> None:
     keropi_sram = "/userdata/bios/keropi/sram.dat"
     for f in [keropi_config, keropi_sram]:
         if Path(f).exists():
-            remove(f)
-    with open(keropi_config, "w") as fd:
+            Path(f).unlink()
+    with Path(keropi_config).open("w") as fd:
         fd.write("[WinX68k]\n")
         fd.write("StartDir=/userdata/roms/x68000\n")
 
@@ -3876,5 +3875,5 @@ def generateHatariConf(hatariConf: str) -> None:
     hatari_conf_dir = Path(hatariConf).parent
     if not hatari_conf_dir.exists():
         hatari_conf_dir.mkdir(parents=True, exist_ok=True)
-    with open(hatariConf, "w") as configfile:
+    with Path(hatariConf).open("w") as configfile:
         hatariConfig.write(configfile)

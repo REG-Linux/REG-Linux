@@ -61,12 +61,8 @@ class SonicManiaGenerator(Generator):
                 str(SONICAMANIA_BIN_PATH),
                 X_OK,
             ):
-                import os
 
-                os.chmod(
-                    str(SONICAMANIA_BIN_PATH),
-                    S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
-                )
+                Path(str(SONICAMANIA_BIN_PATH)).chmod(S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
 
         # Verify the copied binary is executable
         if not access(str(SONICAMANIA_BIN_PATH), X_OK):
@@ -125,7 +121,7 @@ class SonicManiaGenerator(Generator):
             "sfxVolume": "1.000000",
         }
         # Save the ini file
-        with open(SONICMANIA_CONFIG_PATH, "w") as configfile:
+        with Path(SONICMANIA_CONFIG_PATH).open("w") as configfile:
             config.write(configfile)
 
         # Now run

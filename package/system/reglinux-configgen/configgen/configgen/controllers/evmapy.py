@@ -41,7 +41,7 @@ class Evmapy:
         core: str,
         rom: str,
         players_controllers: dict[str, Any],
-        guns: dict[str, Any],
+        guns: dict[str, Any] | list[dict[str, Any]],
     ) -> None:
         """Start the evmapy process with the given configuration.
 
@@ -80,7 +80,7 @@ class Evmapy:
         core: str,
         rom: str,
         players_controllers: dict[str, Any],
-        guns: dict[str, Any],
+        guns: dict[str, Any] | list[dict[str, Any]],
     ) -> bool:
         """Prepare evmapy configuration files for the given system and controllers.
 
@@ -136,7 +136,7 @@ class Evmapy:
 
                 # Load the pad action configuration from the keys file
                 try:
-                    with open(keysfile) as f:
+                    with Path(keysfile).open() as f:
                         padActionConfig: dict[str, Any] = load(f)
                 except OSError as e:
                     eslog.error(f"Error loading keys file {keysfile}: {e}")
@@ -144,13 +144,37 @@ class Evmapy:
                     padActionConfig: dict[str, Any] = {}
 
                 # Configure light guns
-                for ngun, (_, gun) in enumerate(guns.items(), start=1):
+                # Handle both dict and list formats for backwards compatibility
+                if isinstance(guns, dict):
+                    # For dict format: enumerate the items to get consistent indexing
+                    guns_enum = enumerate(guns.items(), start=1)
+                else:
+                    # For list format: enumerate the list to get index and value
+                    guns_enum = enumerate(guns, start=1)
+
+                for item in guns_enum:
+                    if isinstance(guns, dict):
+                        # For dict format: item is (index, (key, value))
+                        ngun, (_, gun) = item
+                        # Type guard to ensure gun is a dict
+                        if not isinstance(gun, dict):
+                            continue
+                        gun_node = gun["node"]
+                        gun_buttons = gun["buttons"]
+                    else:
+                        # For list format: item is (index, value)
+                        ngun, gun = item
+                        # Type guard to ensure gun is a dict
+                        if not isinstance(gun, dict):
+                            continue
+                        gun_node = gun["node"]
+                        gun_buttons = gun["buttons"]
+
                     gun_action_key = "actions_gun" + str(ngun)
                     if gun_action_key in padActionConfig:
                         # Generate configuration file path for this gun
                         configfile = str(
-                            Path("/var/run/evmapy")
-                            / f"{Path(guns[gun]['node']).name}.json",
+                            Path("/var/run/evmapy") / f"{Path(gun_node).name}.json",
                         )
                         eslog.debug(
                             f"config file for keysfile is {configfile} (from {keysfile}) - gun",
@@ -163,7 +187,7 @@ class Evmapy:
                         padConfig["actions"] = []
 
                         # Add gun buttons to configuration
-                        for button in guns[gun]["buttons"]:
+                        for button in gun_buttons:
                             padConfig["buttons"].append(
                                 {"name": button, "code": mouseButtonToCode(button)},
                             )
@@ -182,8 +206,9 @@ class Evmapy:
                             ):
                                 guntrigger = Evmapy.__getGunTrigger(
                                     action["trigger"],
-                                    guns[gun],
+                                    gun,
                                 )
+
                                 if guntrigger:
                                     newaction: dict[str, Any] = action.copy()
                                     # Remove description field as it's not needed in runtime config
@@ -192,12 +217,12 @@ class Evmapy:
                                     padConfig["actions"].append(newaction)
 
                         # Write gun configuration to file
-                        with open(configfile, "w") as fd:
-                            fd.write(dumps(padConfig, indent=4))
+                        Path(configfile).write_text(dumps(padConfig, indent=4))
 
                 # Configure each player's controller
                 for nplayer, (_, pad) in enumerate(
-                    sorted(players_controllers.items()), start=1
+                    sorted(players_controllers.items()),
+                    start=1,
                 ):
                     player_action_key = "actions_player" + str(nplayer)
                     if player_action_key in padActionConfig:
@@ -535,8 +560,7 @@ class Evmapy:
                                 axis["max"] = max_val
 
                         # Write controller configuration to file
-                        with open(configfile, "w") as fd:
-                            fd.write(dumps(padConfig, indent=4))
+                        Path(configfile).write_text(dumps(padConfig, indent=4))
 
                 return True
 

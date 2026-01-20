@@ -1,0 +1,45 @@
+from pathlib import Path
+
+from configgen.command import Command
+from configgen.controllers import generate_sdl_controller_config
+from configgen.generators.generator import Generator
+
+
+class SteamGenerator(Generator):
+    # this emulator/core requires a X server to run
+    def requiresX11(self):
+        return True
+
+    def generate(
+        self,
+        system,
+        rom,
+        players_controllers,
+        metadata,
+        guns,
+        wheels,
+        game_resolution,
+    ):
+        basename = Path(rom).name
+        gameId = None
+        if basename != "Steam.steam":
+            # read the id inside the file
+            with Path(rom).open() as f:
+                gameId = str.strip(f.read())
+
+        if gameId is None:
+            command_array = ["batocera-steam"]
+        else:
+            command_array = ["batocera-steam", gameId]
+
+        return Command(
+            array=command_array,
+            env={
+                "SDL_GAMECONTROLLERCONFIG": generate_sdl_controller_config(
+                    players_controllers,
+                ),
+            },
+        )
+
+    def getMouseMode(self, config, rom):
+        return True

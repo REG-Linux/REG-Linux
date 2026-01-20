@@ -236,7 +236,7 @@ def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) ->
             profileDevice = profileConfig.get("Profile", "Device")
             eslog.debug(f"Profile device : {profileDevice}")
 
-            deviceVals = re.match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
+            deviceVals = re.match(r"^([^/]*)/[0-9]*/(.*)$", profileDevice)
             if deviceVals is not None and (
                 deviceVals.group(1) == "SDL"
                 and deviceVals.group(2).strip() == pad.name.strip()

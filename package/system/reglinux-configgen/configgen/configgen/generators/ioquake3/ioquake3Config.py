@@ -21,7 +21,7 @@ def writeCfgFile(
     if not Path(filename).is_file():
         Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
-        with open(filename, "w") as file:
+        with Path(filename).open("w") as file:
             file.write(init_line)
             file.writelines(defaults_to_add)
             file.writelines(controls_to_add)
@@ -31,7 +31,7 @@ def writeCfgFile(
         else:
             width, height = gameResolution["width"], gameResolution["height"]
 
-        with open(filename, "r+") as file:
+        with Path(filename).open("r+") as file:
             lines = file.readlines()
             file.seek(0)
             for line in lines:

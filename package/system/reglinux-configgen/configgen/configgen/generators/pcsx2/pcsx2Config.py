@@ -31,7 +31,7 @@ def setPcsx2Reg():
     configFileName = PCSX2_CONFIG_DIR / "PCSX2-reg.ini"
     if not PCSX2_CONFIG_DIR.exists():
         PCSX2_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    with open(configFileName, "w") as f:
+    with Path(configFileName).open("w") as f:
         f.write("DocumentsFolderMode=User\n")
         f.write("CustomDocumentsFolder=/usr/pcsx2/bin\n")
         f.write("UseDefaultSettingsFolder=enabled\n")
@@ -51,7 +51,7 @@ def configureAudio():
     if configFileName.exists():
         return
 
-    with open(configFileName, "w") as f:
+    with Path(configFileName).open("w") as f:
         f.write("[MIXING]\n")
         f.write("Interpolation=1\n")
         f.write("Disable_Effects=0\n")
@@ -142,8 +142,7 @@ def setPcsx2Config(
         config_dir.mkdir(parents=True, exist_ok=True)
 
     if not configFileName.is_file():
-        with open(configFileName, "w") as f:
-            f.write("[UI]\n")
+        Path(configFileName).write_text("[UI]\n")
 
     pcsx2INIConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
@@ -986,7 +985,7 @@ def setPcsx2Config(
 
     pcsx2INIConfig.set("GameList", "RecursivePaths", str(Path("/userdata/roms/ps2")))
 
-    with open(configFileName, "w") as configfile:
+    with Path(configFileName).open("w") as configfile:
         pcsx2INIConfig.write(configfile)
 
 

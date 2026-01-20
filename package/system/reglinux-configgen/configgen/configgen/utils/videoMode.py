@@ -32,7 +32,7 @@ def changeMode(videomode: str) -> None:
                     or "master rights" in result
                 ):
                     eslog.warning(
-                        "DRM/KMS permission issue detected - continuing without video mode change"
+                        "DRM/KMS permission issue detected - continuing without video mode change",
                     )
                     return  # Don't raise an error for DRM permission issues
                 raise CalledProcessError(1, f"setMode {videomode}", result)
@@ -44,7 +44,7 @@ def changeMode(videomode: str) -> None:
             # Check if this is a DRM permission issue
             if "DRM" in str(e) or "master rights" in str(e):
                 eslog.warning(
-                    "DRM/KMS permission issue detected - continuing without video mode change"
+                    "DRM/KMS permission issue detected - continuing without video mode change",
                 )
                 return  # Don't retry for DRM permission issues
             if i == max_tries - 1:
@@ -82,7 +82,7 @@ def getScreens() -> list[str]:
 
         if isinstance(result, str):
             lines = [line.strip() for line in result.splitlines() if line.strip()]
-            return lines if lines else [result.strip()]
+            return lines or [result.strip()]
 
         return [str(result).strip()]
 
@@ -96,7 +96,7 @@ def getCurrentResolution(name: str | None = None) -> dict[str, int]:
 
     if Path(drm_mode_path).exists():
         try:
-            with open(drm_mode_path, encoding="utf-8") as f:
+            with Path(drm_mode_path).open(encoding="utf-8") as f:
                 content = f.read().strip()
                 if content:
                     vals = content.split("@")[0].split("x")
@@ -175,14 +175,14 @@ def minTomaxResolution() -> None:
             # Check if this is a DRM permission issue and log appropriately
             if "limited DRM rights" in result or "no screen detected" in result:
                 eslog.warning(
-                    "DRM/KMS permission issue detected - continuing without resolution change"
+                    "DRM/KMS permission issue detected - continuing without resolution change",
                 )
     except Exception as e:
         eslog.error(f"Exception in minToMaxResolution: {e}")
         # Check if this is a DRM permission issue
         if "DRM" in str(e) or "master rights" in str(e):
             eslog.warning(
-                "DRM/KMS permission issue detected - continuing without resolution change"
+                "DRM/KMS permission issue detected - continuing without resolution change",
             )
 
 
@@ -301,7 +301,7 @@ def getAltDecoration(systemName: str, rom: str, emulator: str) -> str:
     romName = Path(rom).stem.casefold()
 
     try:
-        with open(specialFile, encoding="utf-8") as openFile:
+        with Path(specialFile).open(encoding="utf-8") as openFile:
             specialList = reader(openFile, delimiter=";")
             for row in specialList:
                 if row[0].casefold() == romName:
