@@ -1,0 +1,700 @@
+### Mobile systems ###
+config BR2_PACKAGE_REGLINUX_MOBILE_SYSTEMS
+	 bool "REG-Linux mobile systems support"
+
+	# Symbian OS / Nokia N-Gage emulator
+	# TODO does not build anymore
+	# select BR2_PACKAGE_EKA2L1		if BR2_x86_64 || ((BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3)
+
+
+### Multi platform systems ###
+config BR2_PACKAGE_REGLINUX_MULTI_SYSTEMS
+    bool "REG-Linux multisystems emulators support"
+
+    # Box86 user-mode x86 emulation for ARM
+    # Unused so far...
+    # select BR2_PACKAGE_BOX86			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_arm && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+
+    # Box64 user-mode x64_64 emulation for AArch64 / RV64
+    select BR2_PACKAGE_BOX64			if BR2_RISCV_64
+
+    # Felix86 user-mode x86/x86_64 emulation for RV64 (needs GLX, Vulkan, X11)
+    select BR2_PACKAGE_FELIX86			if BR2_RISCV_64 && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_REGLINUX_VULKAN
+
+    # CLK - Clock Signal emulator
+    select BR2_PACKAGE_CLK			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL
+
+    # Mednafen
+    select BR2_PACKAGE_MEDNAFEN			if !BR2_PACKAGE_REGLINUX_RELEASE && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_mipsel
+    # Configurable cores for Mednafen
+    # TODO those are artificial dependencies to avoid configs-defaults-XXX.yml issues
+    select BR2_PACKAGE_MEDNAFEN_PCFX		if BR2_PACKAGE_MEDNAFEN && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+    select BR2_PACKAGE_MEDNAFEN_PSX		if BR2_PACKAGE_MEDNAFEN && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+    select BR2_PACKAGE_MEDNAFEN_SATURN		if BR2_PACKAGE_MEDNAFEN && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_cortex_a35 && !BR2_cortex_a53 && !BR2_riscv
+
+    # Ares (OpenGL 3.3+ or Vulkan or wgpu)
+    select BR2_PACKAGE_ARES			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_REGLINUX_VULKAN
+
+#### Sega Dreamcast, Naomi and Atomiswave ####
+config BR2_PACKAGE_REGLINUX_SEGADC
+	bool "REG-Linux dreamcast/naomi/atomiswave emulators/cores"
+
+	# Dreamcast / Naomi / Atomiswave emulation
+    select BR2_PACKAGE_FLYCAST            if !BR2_RISCV_64                      && \
+                                             !BR2_mipsel                        && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_CHA     && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_H3      && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_SUN50I  && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_BCM2836 && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_BCM2837 && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_RK3128  && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_RK3328  && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_S812    && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_S905
+
+    select BR2_PACKAGE_LIBRETRO_FLYCAST   if !BR2_RISCV_64                      && \
+                                             !BR2_mipsel                        && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_CHA     && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_H3      && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_SUN50I  && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_BCM2836 && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_BCM2837 && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_RK3128  && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_RK3328  && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_S812    && \
+                                             !BR2_PACKAGE_SYSTEM_TARGET_S905
+
+	help
+	  Sega Dreamcast and Naomi/Atomiswave emulation support
+
+#### Arcade cores ####
+config BR2_PACKAGE_REGLINUX_ARCADE_SYSTEMS
+	bool "REG-Linux arcade emulators packages selection"
+
+	# Final Burn Alpha
+	select BR2_PACKAGE_LIBRETRO_FBALPHA	if BR2_PACKAGE_SYSTEM_TARGET_BCM2835 || BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	# Final Burn NEO
+	select BR2_PACKAGE_LIBRETRO_FBNEO	# ALL
+
+	# Naomi and Atomiswave
+	select BR2_PACKAGE_REGLINUX_SEGADC	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+
+	# Laserdic emulation
+	select BR2_PACKAGE_HYPSEUS_SINGE	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	select BR2_PACKAGE_HYPSEUS_SINGE_BEZELS if BR2_PACKAGE_HYPSEUS_SINGE
+
+	# Standalone Sega Model 3 emulator
+	select BR2_PACKAGE_SUPERMODEL		if BR2_PACKAGE_REGLINUX_XWAYLAND
+	# REG remove supermodel legacy : use Legacy3D engine and/or Zink instead
+
+	# Mainline MAME (GroovyMAME + libretro cores)
+	select BR2_PACKAGE_MAME				if  BR2_PACKAGE_MAME_BUILD_FROM_SOURCE && BR2_ARCH_IS_64
+	select BR2_PACKAGE_LIBRETRO_MAME		if  BR2_PACKAGE_MAME_BUILD_FROM_SOURCE && BR2_ARCH_IS_64
+	# Prebuilt MAME + lr-mame archive
+	select BR2_PACKAGE_REGLINUX_MAME		if !BR2_PACKAGE_MAME_BUILD_FROM_SOURCE && BR2_ARCH_IS_64
+
+	# Only include lr-mame2010 core if no (prebuilt) lr-mame
+	select BR2_PACKAGE_LIBRETRO_MAME2010		if !BR2_ARCH_IS_64 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	# Very old libretrp MAME core only for weakest devices
+	select BR2_PACKAGE_LIBRETRO_IMAME		if BR2_PACKAGE_SYSTEM_TARGET_BCM2835 || BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	# Popular lr-mame2003-plus core everywhere
+	select BR2_PACKAGE_LIBRETRO_MAME2003_PLUS	# ALL
+
+	help
+	  Arcade cores/emulators
+
+#### Handheld consoles ####
+config BR2_PACKAGE_REGLINUX_HANDHELD_SYSTEMS
+	bool "REG-Linux handheld emulation packages"
+
+	# Gameboy / Gameboy Color
+	select BR2_PACKAGE_LIBRETRO_GAMBATTE		# ALL
+	select BR2_PACKAGE_LIBRETRO_GEARBOY		# ALL
+	# Sameboy is accuracy-focused, can be slow on low end, let's limit and revisit later
+	select BR2_PACKAGE_LIBRETRO_SAMEBOY		if BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
+
+	# GBA
+	select BR2_PACKAGE_LIBRETRO_MGBA		# ALL
+	select BR2_PACKAGE_LIBRETRO_VBA_M		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && \
+							   !BR2_PACKAGE_SYSTEM_TARGET_H3      && \
+							   !BR2_PACKAGE_SYSTEM_TARGET_CHA     && \
+							   !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	select BR2_PACKAGE_LIBRETRO_GPSP		if BR2_PACKAGE_SYSTEM_TARGET_BCM2835 || BR2_PACKAGE_SYSTEM_TARGET_JZ4770 # for slow machines
+
+	# NDS
+	select BR2_PACKAGE_LIBRETRO_DESMUME		if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY
+
+	select BR2_PACKAGE_MELONDS			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || (BR2_aarch64 && BR2_PACKAGE_HAS_GLES3 && !BR2_PACKAGE_SYSTEM_TARGET_RK3326)
+	select BR2_PACKAGE_LIBRETRO_MELONDS_DS		if  BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY  || (BR2_aarch64 && BR2_PACKAGE_HAS_LIBGL)
+	select BR2_PACKAGE_LIBRETRO_MELONDS		if  !BR2_PACKAGE_LIBRETRO_MELONDS_DS && (BR2_aarch64 && BR2_PACKAGE_HAS_GLES3 && !BR2_PACKAGE_SYSTEM_TARGET_RK3326)
+
+	select BR2_PACKAGE_DRASTIC			if ((BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3)
+
+	# 3DS
+	# Azahar replaces Citra and Lime3DS
+	select BR2_PACKAGE_AZAHAR			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2711    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_S922X      || \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+
+	select BR2_PACKAGE_PANDA3DS			if !BR2_PACKAGE_REGLINUX_RELEASE        && \
+							   (BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   (BR2_aarch64 && BR2_PACKAGE_HAS_GLES3))
+
+	select BR2_PACKAGE_LIBRETRO_PANDA3DS		if !BR2_PACKAGE_REGLINUX_RELEASE        && \
+							   (BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   (BR2_aarch64 && BR2_PACKAGE_HAS_GLES3))
+
+	# PSP
+	# Note: JZ4770 compiles and links fine, just too slow
+	select BR2_PACKAGE_PPSSPP			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+	select BR2_PACKAGE_LIBRETRO_PPSSPP		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	# Neo Geo Pocket
+	select BR2_PACKAGE_LIBRETRO_BEETLE_NGP		# ALL
+
+	# Atari Lynx
+	select BR2_PACKAGE_LIBRETRO_BEETLE_LYNX		# ALL
+	select BR2_PACKAGE_LIBRETRO_HANDY		# ALL
+	# Holani core is Rust-based, and requires host-clang because of bindggen issue (and incompatible with musl)
+	select BR2_PACKAGE_LIBRETRO_HOLANI		if BR2_ARCH_IS_64 && BR2_PACKAGE_CLANG && !BR2_TOOLCHAIN_USES_MUSL
+
+	# Wonderswan
+	select BR2_PACKAGE_LIBRETRO_BEETLE_WSWAN	# ALL
+
+	# Pokemon Mini
+	select BR2_PACKAGE_LIBRETRO_POKEMINI		# ALL
+
+	# Game and Watch
+	select BR2_PACKAGE_LIBRETRO_GW			# ALL
+
+	# Watara
+	select BR2_PACKAGE_LIBRETRO_WATARA		# ALL
+
+	# Arduboy
+	select BR2_PACKAGE_LIBRETRO_ARDUOUS		# ALL
+
+	# Sony PS Vita
+	# Note: needs testing
+	select BR2_PACKAGE_VITA3K			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712
+	# MegaDuck
+	select BR2_PACKAGE_LIBRETRO_SAMEDUCK		# ALL
+
+	help
+	  Handheld cores/emulators
+
+#### MSDOS emulation ####
+config BR2_PACKAGE_REGLINUX_MSDOS_SYSTEMS
+	bool "REG-Linux MS/DOS emulation packages"
+
+	select BR2_PACKAGE_DOSBOX_X				if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_RK3326	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_BCM2836	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_BCM2837	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_RK3128	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_H3	# dos
+
+	select BR2_PACKAGE_DOSBOX_STAGING			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_BCM2836	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_H3	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_RK3128	&& \
+								   !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	select BR2_PACKAGE_LIBRETRO_DOSBOX_PURE			# ALL
+
+	# 86Box uses Qt5/6 for UI but requires X11 right now
+	select BR2_PACKAGE_86BOX				if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL && (BR2_x86_64 || BR2_aarch64)
+
+	help
+	 MS/DOS cores/emulators
+
+#### Vintage computer systems ####
+config BR2_PACKAGE_REGLINUX_COMPUTER_SYSTEMS
+	bool "REG-Linux vintage computers emulation packages"
+
+	# CAPS image support (IPF)
+	select BR2_PACKAGE_LIBCAPSIMAGE		# ALL
+
+	# Commodore 64/128/VIC20/PET/Plus4
+	select BR2_PACKAGE_VICE			# ALL
+	select BR2_PACKAGE_VICE_X64SC		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_BCM2711    || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_RK3399     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_S922X      || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+	select BR2_PACKAGE_VICE_XSCPU64		if BR2_PACKAGE_VICE_X64SC
+	select BR2_PACKAGE_VICE_X64DTV		if BR2_PACKAGE_VICE_X64SC
+
+	select BR2_PACKAGE_LIBRETRO_VICE		# ALL
+	select BR2_PACKAGE_LIBRETRO_VICE_X64SC		if BR2_PACKAGE_VICE_X64SC
+	select BR2_PACKAGE_LIBRETRO_VICE_XSCPU64	if BR2_PACKAGE_VICE_X64SC
+	select BR2_PACKAGE_LIBRETRO_VICE_X64DTV		if BR2_PACKAGE_VICE_X64SC
+
+	# Commodore Amiga
+	select BR2_PACKAGE_AMIBERRY		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+                                                   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+	select BR2_PACKAGE_AMIBERRY_LITE	if !BR2_PACKAGE_AMIBERRY && !BR2_mipsel && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	select BR2_PACKAGE_LIBRETRO_PUAE	# ALL
+	select BR2_PACKAGE_LIBRETRO_PUAE2021	if !BR2_ARCH_IS_64
+	select BR2_PACKAGE_LIBRETRO_UAE4ARM	if BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+
+	# Apple 2
+	select BR2_PACKAGE_APPLEWIN		# ALL
+	select BR2_PACKAGE_LIBRETRO_APPLEWIN	# ALL
+	select BR2_PACKAGE_IZAPPLE2		if !BR2_PACKAGE_REGLINUX_RELEASE && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	# Apple 2 GS
+	select BR2_PACKAGE_GSPLUS		# ALL
+
+	# Atari 800 computers
+	select BR2_PACKAGE_LIBRETRO_ATARI800	# ALL
+
+	# Tangerine Oric computers
+	select BR2_PACKAGE_ORICUTRON		if !BR2_PACKAGE_REGLINUX_RELEASE # ALL
+
+	# Sinclair ZX Spectrum
+	select BR2_PACKAGE_LIBRETRO_FUSE	# ALL
+
+	# Amstrad CPC
+	# TODO fixup later
+	# select BR2_PACKAGE_SUGARBOX		if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && BR2_PACKAGE_REGLINUX_HAS_QT6
+	select BR2_PACKAGE_LIBRETRO_CAP32	# ALL
+
+	# Sinclair ZX80/81
+	select BR2_PACKAGE_LIBRETRO_81		# ALL
+
+	# Atari ST/TT/Falcon
+	select BR2_PACKAGE_HATARI		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_RK3128
+	select BR2_PACKAGE_LIBRETRO_HATARIB	if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770 && !BR2_PACKAGE_SYSTEM_TARGET_RK3128
+	select BR2_PACKAGE_LIBRETRO_HATARI	if !BR2_PACKAGE_LIBRETRO_HATARIB
+
+	# MSX range
+	select BR2_PACKAGE_LIBRETRO_BLUEMSX	# ALL
+	select BR2_PACKAGE_LIBRETRO_FMSX	# ALL
+	select BR2_PACKAGE_OPENMSX		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+
+	# SAM Coupe
+	select BR2_PACKAGE_SIMCOUPE		# ALL
+
+	# Thomson 8-bit
+	select BR2_PACKAGE_LIBRETRO_THEODORE	# ALL
+
+	# Japanese PC clones
+	select BR2_PACKAGE_LIBRETRO_PC88	# ALL
+	select BR2_PACKAGE_LIBRETRO_PC98	# ALL
+
+	# Sharp X68000 computer
+	select BR2_PACKAGE_LIBRETRO_PX68K	# ALL
+
+	# Sharp X1 computer
+	select BR2_PACKAGE_LIBRETRO_XMIL	# ALL
+
+	# Fujistu FM-Towns computers range
+	select BR2_PACKAGE_TSUGARU		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+						   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+						   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+						   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+						   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+						   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+						   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+
+	# Macintosh
+	select BR2_PACKAGE_LIBRETRO_MINIVMAC	# ALL
+
+	help
+	  Old computers
+
+### Console systems ###
+config BR2_PACKAGE_REGLINUX_CONSOLE_SYSTEMS
+	bool "REG-Linux console emulators/cores"
+
+	# Nintendo 64
+	select BR2_PACKAGE_REGLINUX_MUPEN64		if !BR2_mipsel && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA # mupen64 (n64) runs too slow or not wanted
+	select BR2_PACKAGE_LIBRETRO_MUPEN64PLUS_NEXT	if !BR2_mipsel && !BR2_RISCV_64 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_CHA # mupen64 (n64) runs too slow or not wanted
+
+	select BR2_PACKAGE_LIBRETRO_PARALLEL_N64	if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3399		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S905GEN3		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_T527		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3568		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S922X		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2711		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712
+
+	# Gopher 64
+	# Requires rust, GL, clang, x86_64_v3
+	# TODO AArch64 armv8.2a fails cross-compiling parallel-rdp
+	# TODO x86_64 builds fail in DEBUG
+	# select BR2_PACKAGE_GOPHER64			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_HAS_LIBGL && BR2_PACKAGE_CLANG && BR2_x86_x86_64_v3
+
+	# Dreamcast
+	select BR2_PACKAGE_REGLINUX_SEGADC		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+
+	# PSX
+	# Duckstation flavors : AppImage/Qt (current), AppImage/mini (current), GPL source code (older)
+	select BR2_PACKAGE_DUCKSTATION_MINI		if (BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
+	select BR2_PACKAGE_DUCKSTATION			if !BR2_PACKAGE_DUCKSTATION_MINI && (BR2_x86_64 || BR2_arm || BR2_aarch64) && BR2_PACKAGE_HAS_GLES3
+	# TODO: for some reason, GL wrongly selected on K1, disable until proper fix
+	select BR2_PACKAGE_DUCKSTATION_GPL		if !BR2_PACKAGE_DUCKSTATION && !BR2_PACKAGE_DUCKSTATION_MINI && BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_GLES3 && !BR2_PACKAGE_SYSTEM_TARGET_K1
+	# PCSX-ReARMed libretro core (well-maintained by notaz)
+	select BR2_PACKAGE_LIBRETRO_PCSX		# ALL
+	# libretro-swanstation core (forked from old duckstation)
+	# disabled right now for release on non-x86, other conditions still apply as it's slow
+	select BR2_PACKAGE_LIBRETRO_SWANSTATION		if (!BR2_PACKAGE_REGLINUX_RELEASE && !BR2_x86_64) && !BR2_mipsel && !BR2_cortex_a7 && !BR2_RISCV_64 && !BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	# libretro-beetle-psx core (forked from old mednafen psx)
+	select BR2_PACKAGE_LIBRETRO_BEETLE_PSX		if !BR2_mipsel && !BR2_cortex_a7 && !BR2_cortex_a53 && \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835               && \
+							   !BR2_PACKAGE_SYSTEM_TARGET_RK3326
+
+	# Saturn
+	select BR2_PACKAGE_LIBRETRO_BEETLE_SATURN	if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712 || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490 || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI   || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+
+	select BR2_PACKAGE_LIBRETRO_KRONOS		if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490 || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+
+	select BR2_PACKAGE_LIBRETRO_YABASANSHIRO	if !BR2_RISCV_64 && \
+							(BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || BR2_PACKAGE_HAS_GLES3)
+
+	select BR2_PACKAGE_YMIR				if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_CLANG && ( \
+							   BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3 || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712   || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490   || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395 )
+
+	# Nintendo Gamecube / Wii
+	select BR2_PACKAGE_DOLPHIN_EMU			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S9GEN4
+
+	# Triforce Arcade System (Dolphin fork)
+	select BR2_PACKAGE_DOLPHIN_TRIFORCE		if BR2_PACKAGE_DOLPHIN_EMU && BR2_PER_PACKAGE_DIRECTORIES
+
+	# Nintendo Switch
+	select BR2_PACKAGE_EDEN				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588
+	select BR2_PACKAGE_RYUJINX			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588
+
+	# Microsoft XBOX
+	select BR2_PACKAGE_XEMU				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+
+	# Microsoft Xbox 360
+	select BR2_PACKAGE_XENIA_CANARY			if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
+
+	# Sony PS2
+	select BR2_PACKAGE_PCSX2			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM6115	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+	select BR2_PACKAGE_PLAY				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395     || \
+                                                           BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+                                                           BR2_PACKAGE_SYSTEM_TARGET_SM8250     || \
+                                                           BR2_PACKAGE_SYSTEM_TARGET_SM8550     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+	select BR2_PACKAGE_LIBRETRO_PLAY		if BR2_PACKAGE_PLAY && BR2_PER_PACKAGE_DIRECTORIES
+
+	# Sony PS3
+	select BR2_PACKAGE_RPCS3			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+
+	# Sony PS4
+	select BR2_PACKAGE_SHADPS4			if BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
+
+	# Wii U
+	select BR2_PACKAGE_CEMU				if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712    || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588     || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI      || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550
+
+
+	# Panasonic 3DO
+	select BR2_PACKAGE_LIBRETRO_OPERA		if !BR2_PACKAGE_SYSTEM_TARGET_JZ4770		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2836		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2837		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_S812		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_S905		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_S905GEN2		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_RK3288		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_RK3326		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_RK3328		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_CHA		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_H3		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_SUN50I		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_H616		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_H700
+
+
+	# Atari Jaguar
+	select BR2_PACKAGE_LIBRETRO_VIRTUALJAGUAR	if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2711	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_TH1520	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_JH7110	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_K1		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S922X	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S9GEN4	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+
+	# Note: BigPEmu runs through box64 on non-x64 architectures until we have native binaries
+	select BR2_PACKAGE_BIGPEMU			if BR2_PACKAGE_HAS_LIBGL && (BR2_x86_64 || BR2_aarch64 || BR2_PACKAGE_BOX64)
+
+	# NEC PC-FX
+	# Note : We need to fix this package once for good instead of disabling / patching / hacking (x86 asm wronly triggered)
+	select BR2_PACKAGE_LIBRETRO_BEETLE_PCFX		if !BR2_mipsel					&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2835		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2836		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_BCM2837		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_H3		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_CHA		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_RK3326		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_S905		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_SUN50I		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_H616		&& \
+							   !BR2_PACKAGE_SYSTEM_TARGET_H700
+
+	# SNK Neo Geo AES / MVS
+	# Note: Accuracy-focused, beware of speed
+	select BR2_PACKAGE_LIBRETRO_GEOLITH		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+
+	# SNK Neo Geo CD
+	select BR2_PACKAGE_LIBRETRO_NEOCD		# ALL
+
+	# Nintendo Virtual Boy
+	select BR2_PACKAGE_LIBRETRO_BEETLE_VB		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# Coleco Colecovision
+	select BR2_PACKAGE_LIBRETRO_GEARCOLECO		# ALL
+
+	# Sega 8-bit/16-range (Mark III / Master System, Game Gear, Genesis / Megadrive, SegaCD / MegaCD, 32X)
+	select BR2_PACKAGE_LIBRETRO_PICODRIVE		# ALL
+	select BR2_PACKAGE_LIBRETRO_GENESISPLUSGX	# ALL
+        # BlastEm! is accuracy-focused, can be slow on low end, let's limit and revisit later
+        select BR2_PACKAGE_LIBRETRO_BLASTEM             if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
+        # ClownMDEmu is accuracy-focused, disable on slow platforms
+        select BR2_PACKAGE_LIBRETRO_CLOWNMDEMU          if !BR2_PACKAGE_REGLINUX_RELEASE && BR2_ARCH_IS_64 && !BR2_cortex_a55 && !BR2_cortex_a53 && !BR2_cortex_a35 && !BR2_riscv
+	select BR2_PACKAGE_LIBRETRO_SMSPLUS_GX		# ALL
+	select BR2_PACKAGE_LIBRETRO_GEARSYSTEM		# ALL
+
+	# Atari 2600
+	select BR2_PACKAGE_STELLA			if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+	select BR2_PACKAGE_LIBRETRO_STELLA		if !BR2_PACKAGE_SYSTEM_TARGET_BCM2835 && !BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+	select BR2_PACKAGE_LIBRETRO_STELLA2014		if !BR2_PACKAGE_LIBRETRO_STELLA
+
+	# Atari 5200
+	select BR2_PACKAGE_LIBRETRO_A5200		# ALL
+
+	# Atari 7800
+	select BR2_PACKAGE_LIBRETRO_PROSYSTEM		# ALL
+
+	# NEC PC-Engine / TurboGrafx / SuperGrafx range
+	select BR2_PACKAGE_LIBRETRO_BEETLE_PCE		if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2711 || \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712 || \
+							   BR2_PACKAGE_SYSTEM_TARGET_S922X   || \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490 || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM6115  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550  || \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI   || \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+	select BR2_PACKAGE_LIBRETRO_BEETLE_PCE_FAST     if !BR2_PACKAGE_LIBRETRO_BEETLE_PCE
+	select BR2_PACKAGE_LIBRETRO_BEETLE_SUPERGRAFX	# ALL
+	select BR2_PACKAGE_LIBRETRO_GEARGRAFX		# ALL
+
+	# Vectrex
+	select BR2_PACKAGE_LIBRETRO_VECX		# ALL
+
+	# Magnavox Odyssey
+	select BR2_PACKAGE_LIBRETRO_O2EM		# ALL
+
+	# Intellivision
+	select BR2_PACKAGE_LIBRETRO_FREEINTV		# ALL
+
+	# Nintendo NES / Famicom
+	select BR2_PACKAGE_LIBRETRO_FCEUMM		# ALL
+	select BR2_PACKAGE_LIBRETRO_NESTOPIA		# ALL
+	select BR2_PACKAGE_LIBRETRO_MESEN		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3288		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3399		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3568		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S905GEN3		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_T527		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S922X		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2711		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395
+
+	# Super Nintendo / Super Famicom
+	select BR2_PACKAGE_SNES9X			if !BR2_PACKAGE_REGLINUX_RELEASE && (BR2_ARCH_IS_64 && BR2_PACKAGE_HAS_LIBGL)
+
+	select BR2_PACKAGE_LIBRETRO_SNES9X		if (!BR2_mipsel && !BR2_arm1176jzf_s)
+	select BR2_PACKAGE_LIBRETRO_SNES9X_NEXT		if BR2_mipsel || (!BR2_arm1176jzf_s && !BR2_PACKAGE_LIBRETRO_SNES9X)
+	select BR2_PACKAGE_LIBRETRO_POCKETSNES		if BR2_arm1176jzf_s
+
+	select BR2_PACKAGE_LIBRETRO_BSNES		if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2711	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S922X	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2
+
+	select BR2_PACKAGE_LIBRETRO_BSNES_JG		if BR2_PACKAGE_LIBRETRO_BSNES
+
+	select BR2_PACKAGE_LIBRETRO_MESENS              if BR2_PACKAGE_SYSTEM_TARGET_X86_64_ANY	|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_S922X		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_BCM2712		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3588		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_QCS6490		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8250		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SM8550		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_ASAHI		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_MT8395		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_RK3399		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_A3GEN2
+
+	# Fairchild Channel F
+	select BR2_PACKAGE_LIBRETRO_FREECHAF		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# Super Cassette Vision
+	select BR2_PACKAGE_LIBRETRO_EMUSCV		if !BR2_PACKAGE_SYSTEM_TARGET_CHA
+
+	# Uzebox
+	select BR2_PACKAGE_LIBRETRO_UZEM		if !BR2_PACKAGE_SYSTEM_TARGET_H3 && !BR2_PACKAGE_SYSTEM_TARGET_CHA # speed issue on weak SBCs
+
+	# Philips CD-I (MAME-based emulator)
+	select BR2_PACKAGE_LIBRETRO_SAME_CDI		if BR2_ARCH_IS_64
+
+	help
+	  All avaible systems for the selected architecture
+
+### Nintendo 64 specific config ###
+config BR2_PACKAGE_REGLINUX_MUPEN64
+	bool "REG-Linux Mupen64 packages selection"
+
+	# Core module
+	select BR2_PACKAGE_MUPEN64PLUS_CORE
+
+	# Console (command-line) front-end user interface
+	select BR2_PACKAGE_MUPEN64PLUS_UI_CONSOLE
+
+	# Input plugin
+	select BR2_PACKAGE_MUPEN64PLUS_INPUT_SDL
+
+	# RSP processor plugin
+	select BR2_PACKAGE_MUPEN64PLUS_RSP_HLE
+
+	# Audio plugin
+	select BR2_PACKAGE_MUPEN64PLUS_AUDIO_SDL
+
+	# Video plugin
+	select BR2_PACKAGE_MUPEN64PLUS_VIDEO_GLIDE64MK2
+	select BR2_PACKAGE_MUPEN64PLUS_GLIDEN64
+	select BR2_PACKAGE_MUPEN64PLUS_VIDEO_RICE	if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY || BR2_PACKAGE_HAS_GLES3
+
+	help
+	  Mupen64
+
+### ### ###
