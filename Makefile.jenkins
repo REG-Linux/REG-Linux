@@ -33,8 +33,6 @@ endif
 DOCKER_REPO := reglinux
 IMAGE_NAME  := reglinux-build
 
-DOCKER_RUN_PULL := $(shell docker run --help 2>/dev/null | grep -q -- --pull && echo "$(DOCKER_RUN_PULL) )
-
 TARGETS := $(sort $(shell find $(PROJECT_DIR)/configs/ -name 'r*' | sed -n 's/.*\/reglinux-\(.*\).board/\1/p'))
 UID := $(shell id -u)
 GID := $(shell id -g)
@@ -54,7 +52,7 @@ vars:
 	@echo "Make options:       $(MAKE_OPTS)"
 
 define DOCKER_RUN
-	@$(DOCKER) run $(DOCKER_RUN_PULL) --init --rm \
+	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
@@ -72,7 +70,7 @@ build-docker-image:
 	@touch .ba-docker-image-available
 
 .ba-docker-image-available:
-	@$(DOCKER) $(DOCKER_RUN_PULL) $(DOCKER_REPO)/$(IMAGE_NAME)
+	@$(DOCKER) pull $(DOCKER_REPO)/$(IMAGE_NAME)
 	@touch .ba-docker-image-available
 
 reglinux-docker-image: merge .ba-docker-image-available
