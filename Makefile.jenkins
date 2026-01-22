@@ -1,0 +1,200 @@
+PROJECT_DIR	:= $(shell pwd)
+DL_DIR		?= $(PROJECT_DIR)/dl
+OUTPUT_DIR	?= $(PROJECT_DIR)/output
+CCACHE_DIR	?= $(PROJECT_DIR)/buildroot-ccache
+LOCAL_MK	?= $(PROJECT_DIR)/reglinux.mk
+EXTRA_OPTS	?=
+DOCKER_OPTS	?=
+NPROC		:= $(shell nproc)
+MAKE_JLEVEL	?= $(NPROC)
+MAKE_LLEVEL	?= $(shell echo $$(($(NPROC) * 1)))
+BATCH_MODE	?=
+PARALLEL_BUILD	?= y
+DEBUG_BUILD	?= y
+DOCKER		?= docker
+
+-include $(LOCAL_MK)
+
+ifeq ($(PARALLEL_BUILD), y)
+	EXTRA_OPTS += BR2_PER_PACKAGE_DIRECTORIES=y
+	MAKE_OPTS += -j$(MAKE_JLEVEL)
+	MAKE_OPTS += -l$(MAKE_LLEVEL)
+	DOCKER_OPTS += -e MAKEFLAGS="$(MAKEFLAGS)"
+endif
+
+ifeq ($(DEBUG_BUILD), y)
+	EXTRA_OPTS += BR2_ENABLE_DEBUG=y
+endif
+
+ifndef BATCH_MODE
+	DOCKER_OPTS += -i
+endif
+
+DOCKER_REPO := reglinux
+IMAGE_NAME  := reglinux-build
+
+DOCKER_RUN_PULL := $(shell docker run --help 2>/dev/null | grep -q -- --pull && echo "$(DOCKER_RUN_PULL) )
+
+TARGETS := $(sort $(shell find $(PROJECT_DIR)/configs/ -name 'r*' | sed -n 's/.*\/reglinux-\(.*\).board/\1/p'))
+UID := $(shell id -u)
+GID := $(shell id -g)
+
+$(if $(shell which $(DOCKER) 2>/dev/null),, $(error "$(DOCKER) not found!"))
+
+UC = $(shell echo '$1' | tr '[:lower:]' '[:upper:]')
+
+vars:
+	@echo "Supported targets:  $(TARGETS)"
+	@echo "Project directory:  $(PROJECT_DIR)"
+	@echo "Download directory: $(DL_DIR)"
+	@echo "Build directory:    $(OUTPUT_DIR)"
+	@echo "ccache directory:   $(CCACHE_DIR)"
+	@echo "Extra options:      $(EXTRA_OPTS)"
+	@echo "Docker options:     $(DOCKER_OPTS)"
+	@echo "Make options:       $(MAKE_OPTS)"
+
+define DOCKER_RUN
+	@$(DOCKER) run $(DOCKER_RUN_PULL) --init --rm \
+		-v $(PROJECT_DIR):/build \
+		-v $(DL_DIR):/build/buildroot/dl \
+		-v $(OUTPUT_DIR)/$*:/$* \
+		-v $(CCACHE_DIR):$(HOME)/.buildroot-ccache \
+		-u $(UID):$(GID) \
+		-v /etc/passwd:/etc/passwd:ro \
+		-v /etc/group:/etc/group:ro \
+		-e MPLCONFIGDIR=/tmp/matplotlib-config \
+		$(DOCKER_OPTS) \
+		$(DOCKER_REPO)/$(IMAGE_NAME)
+endef
+
+build-docker-image:
+	$(DOCKER) build . -t $(DOCKER_REPO)/$(IMAGE_NAME)
+	@touch .ba-docker-image-available
+
+.ba-docker-image-available:
+	@$(DOCKER) $(DOCKER_RUN_PULL) $(DOCKER_REPO)/$(IMAGE_NAME)
+	@touch .ba-docker-image-available
+
+reglinux-docker-image: merge .ba-docker-image-available
+
+update-docker-image:
+	-@rm .ba-docker-image-available > /dev/null
+	@$(MAKE) reglinux-docker-image
+
+publish-docker-image:
+	@$(DOCKER) push $(DOCKER_REPO)/$(IMAGE_NAME):latest
+
+output-dir-%: %-supported
+	@mkdir -p $(OUTPUT_DIR)/$*
+
+ccache-dir:
+	@mkdir -p $(CCACHE_DIR)
+
+dl-dir:
+	@mkdir -p $(DL_DIR)
+
+gh-token:
+	@cp ~/gh_token $(PROJECT_DIR)/gh_token
+
+%-supported:
+	$(if $(findstring $*, $(TARGETS)),,$(error "$* not supported!"))
+
+%-clean: gh-token reglinux-docker-image output-dir-%
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot clean
+
+%-config: gh-token reglinux-docker-image output-dir-%
+	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/reglinux-$*
+	@for opt in $(EXTRA_OPTS); do \
+		echo $$opt >> $(PROJECT_DIR)/configs/reglinux-$*_defconfig ; \
+	done
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot reglinux-$*_defconfig
+
+%-build: gh-token reglinux-docker-image %-config ccache-dir dl-dir
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot $(CMD)
+
+%-source: gh-token reglinux-docker-image %-config ccache-dir dl-dir
+	@$(DOCKER_RUN) $(MAKE) $(MAKE_OPTS) O=/$* BR2_EXTERNAL=/build -C /build/buildroot source
+
+%-cleanbuild: gh-token %-clean %-build
+	@echo
+
+%-pkg:
+	$(if $(PKG),,$(error "PKG not specified!"))
+	@$(MAKE) $*-build CMD=$(PKG)
+
+%-webserver: output-dir-%
+	$(if $(wildcard $(OUTPUT_DIR)/$*/images/reglinux/*),,$(error "$* not built!"))
+	$(if $(shell which python 2>/dev/null),,$(error "python not found!"))
+ifeq ($(strip $(BOARD)),)
+	$(if $(wildcard $(OUTPUT_DIR)/$*/images/reglinux/images/$*/.*),,$(error "Directory not found: $(OUTPUT_DIR)/$*/images/reglinux/images/$*"))
+	python3 -m http.server --directory $(OUTPUT_DIR)/$*/images/reglinux/images/$*/
+else
+	$(if $(wildcard $(OUTPUT_DIR)/$*/images/reglinux/images/$(BOARD)/.*),,$(error "Directory not found: $(OUTPUT_DIR)/$*/images/reglinux/images/$(BOARD)"))
+	python3 -m http.server --directory $(OUTPUT_DIR)/$*/images/reglinux/images/$(BOARD)/
+endif
+
+%-rsync: output-dir-%
+	$(eval TMP := $(call UC, $*)_IP)
+	$(if $(shell which rsync 2>/dev/null),, $(error "rsync not found!"))
+	$(if $($(TMP)),,$(error "$(TMP) not set!"))
+	rsync -e "ssh -o 'UserKnownHostsFile /dev/null' -o StrictHostKeyChecking=no" -av $(OUTPUT_DIR)/$*/target/ root@$($(TMP)):/
+
+%-tail: output-dir-%
+	@tail -F $(OUTPUT_DIR)/$*/build/build-time.log
+
+%-snapshot: %-supported
+	$(if $(shell which btrfs 2>/dev/null),, $(error "btrfs not found!"))
+	@mkdir -p $(OUTPUT_DIR)/snapshots
+	-@sudo btrfs sub del $(OUTPUT_DIR)/snapshots/$*-toolchain
+	@btrfs subvolume snapshot -r $(OUTPUT_DIR)/$* $(OUTPUT_DIR)/snapshots/$*-toolchain
+
+%-rollback: %-supported
+	$(if $(shell which btrfs 2>/dev/null),, $(error "btrfs not found!"))
+	-@sudo btrfs sub del $(OUTPUT_DIR)/$*
+	@btrfs subvolume snapshot $(OUTPUT_DIR)/snapshots/$*-toolchain $(OUTPUT_DIR)/$*
+
+%-flash: %-supported
+	$(if $(DEV),,$(error "DEV not specified!"))
+	@gzip -dc $(OUTPUT_DIR)/$*/images/reglinux/images/$*/reglinux-*.img.gz | sudo dd of=$(DEV) bs=5M status=progress
+	@sync
+
+%-upgrade: %-supported
+	$(if $(DEV),,$(error "DEV not specified!"))
+	-@sudo umount /tmp/mount
+	-@mkdir /tmp/mount
+	@sudo mount $(DEV)1 /tmp/mount
+	-@sudo rm /tmp/mount/boot/reglinux
+	@sudo tar xvf $(OUTPUT_DIR)/$*/images/reglinux/boot.tar.xz -C /tmp/mount --no-same-owner
+	@sudo umount /tmp/mount
+	-@rmdir /tmp/mount
+
+%-toolchain: %-supported
+	$(if $(shell which btrfs 2>/dev/null),, $(error "btrfs not found!"))
+	-@sudo btrfs sub del $(OUTPUT_DIR)/$*
+	@btrfs subvolume create $(OUTPUT_DIR)/$*
+	@$(MAKE) $*-config
+	@$(MAKE) $*-build CMD=toolchain
+	@$(MAKE) $*-build CMD=llvm
+	@$(MAKE) $*-snapshot
+
+%-find-build-dups: %-supported
+	@find $(OUTPUT_DIR)/$*/build -maxdepth 1 -type d -printf '%T@ %p %f\n' | sed -r 's:\-[0-9a-f\.]+$$::' | sort -k3 -k1 | uniq -f 2 -d | cut -d' ' -f2
+
+%-remove-build-dups: %-supported
+	@while [ -n "`find $(OUTPUT_DIR)/$*/build -maxdepth 1 -type d -printf '%T@ %p %f\n' | sed -r 's:\-[0-9a-f\.]+$$::' | sort -k3 -k1 | uniq -f 2 -d | cut -d' ' -f2 | grep .`" ]; do \
+		find $(OUTPUT_DIR)/$*/build -maxdepth 1 -type d -printf '%T@ %p %f\n' | sed -r 's:\-[0-9a-f\.]+$$::' | sort -k3 -k1 | uniq -f 2 -d | cut -d' ' -f2 | xargs rm -rf ; \
+	done
+
+find-dl-dups:
+	@find $(DL_DIR) -maxdepth 2 -type f -name "*.zip" -o -name "*.tar.*" -printf '%T@ %p %f\n' | sed -r 's:\-[0-9a-f\.]+(\.zip|\.tar\.[2a-z]+)$$::' | sort -k3 -k1 | uniq -f 2 -d | cut -d' ' -f2
+
+remove-dl-dups:
+	@while [ -n "`find $(DL_DIR) -maxdepth 2 -type f -name "*.zip" -o -name "*.tar.*" -printf '%T@ %p %f\n' | sed -r 's:\-[0-9a-f\.]+(\.zip|\.tar\.[2a-z]+)$$::' | sort -k3 -k1 | uniq -f 2 -d | cut -d' ' -f2 | grep .`" ] ; do \
+		find $(DL_DIR) -maxdepth 2 -type f -name "*.zip" -o -name "*.tar.*" -printf '%T@ %p %f\n' | sed -r 's:\-[0-9a-f\.]+(\.zip|\.tar\.[2a-z]+)$$::' | sort -k3 -k1 | uniq -f 2 -d | cut -d' ' -f2 | xargs rm -rf ; \
+	done
+
+merge:
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/mergeToBR.sh
+
+generate:
+	CUSTOM_DIR=$(PWD)/custom BUILDROOT_DIR=$(PWD)/buildroot $(PWD)/scripts/linux/generateCustom.sh
