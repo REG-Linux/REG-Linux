@@ -1,0 +1,103 @@
+diff --git a/package/pipewire/pipewire.mk b/package/pipewire/pipewire.mk
+index c1dc2aa0cc..44b6c0a36f 100644
+--- a/package/pipewire/pipewire.mk
++++ b/package/pipewire/pipewire.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-PIPEWIRE_VERSION = 1.2.8
++PIPEWIRE_VERSION = 1.4.9
+ PIPEWIRE_SOURCE = pipewire-$(PIPEWIRE_VERSION).tar.bz2
+ PIPEWIRE_SITE = https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/$(PIPEWIRE_VERSION)
+ PIPEWIRE_LICENSE = MIT, LGPL-2.1+ (libspa-alsa), GPL-2.0 (libjackserver)
+@@ -13,6 +13,8 @@ PIPEWIRE_INSTALL_STAGING = YES
+ PIPEWIRE_DEPENDENCIES = host-pkgconf $(TARGET_NLS_DEPENDENCIES)
+ PIPEWIRE_LDFLAGS = $(TARGET_NLS_LIBS)
+ 
++# reglinux - no session manager
++# we use the wireplumber package
+ PIPEWIRE_CONF_OPTS += \
+ 	-Ddocs=disabled \
+ 	-Dman=disabled \
+@@ -20,7 +22,6 @@ PIPEWIRE_CONF_OPTS += \
+ 	-Dspa-plugins=enabled \
+ 	-Daudiomixer=enabled \
+ 	-Daudioconvert=enabled \
+-	-Dbluez5-codec-lc3=disabled \
+ 	-Dbluez5-codec-lc3plus=disabled \
+ 	-Dcontrol=enabled \
+ 	-Daudiotestsrc=enabled \
+@@ -30,16 +31,25 @@ PIPEWIRE_CONF_OPTS += \
+ 	-Dvideoconvert=enabled \
+ 	-Dvideotestsrc=enabled \
+ 	-Dvolume=enabled \
+-	-Dvulkan=disabled \
+-	-Dsession-managers=[] \
++	-Dsession-managers= \
+ 	-Dlegacy-rtkit=false \
+ 	-Davb=disabled \
+ 	-Droc=disabled \
+ 	-Dlibcanberra=disabled \
+ 	-Dlibmysofa=disabled \
+ 	-Dlibffado=disabled \
+-	-Dflatpak=disabled \
+-	-Dsnap=disabled
++	-Dsnap=disabled \
++	-Dsdl2=disabled
++
++# reglinux
++PIPEWIRE_CONF_OPTS += --wrap-mode=default
++
++# reglinux
++ifeq ($(BR2_PACKAGE_FLATPAK),y)
++PIPEWIRE_CONF_OPTS += -Dflatpak=enabled
++else
++PIPEWIRE_CONF_OPTS += -Dflatpak=disabled
++endif
+ 
+ ifeq ($(BR2_PACKAGE_DBUS),y)
+ PIPEWIRE_CONF_OPTS += -Ddbus=enabled
+@@ -132,12 +142,8 @@ else
+ PIPEWIRE_CONF_OPTS += -Dbluez5=disabled
+ endif
+ 
+-ifeq ($(BR2_PACKAGE_FFMPEG),y)
+-PIPEWIRE_CONF_OPTS += -Dffmpeg=enabled -Dpw-cat-ffmpeg=enabled
+-PIPEWIRE_DEPENDENCIES += ffmpeg
+-else
++# reglinux we disable ffmpeg support for avoid es-ffmpeg conflict
+ PIPEWIRE_CONF_OPTS += -Dffmpeg=disabled -Dpw-cat-ffmpeg=disabled
+-endif
+ 
+ ifeq ($(BR2_PACKAGE_NCURSES_WCHAR),y)
+ PIPEWIRE_DEPENDENCIES += ncurses
+@@ -191,6 +197,14 @@ else
+ PIPEWIRE_CONF_OPTS += -Dlibusb=disabled
+ endif
+ 
++# reglinux
++ifeq ($(BR2_PACKAGE_MESA3D_VULKAN_DRIVER)$(BR2_PACKAGE_VULKAN_LOADER),yy)
++PIPEWIRE_CONF_OPTS += -Dvulkan=enabled
++PIPEWIRE_DEPENDENCIES += mesa3d vulkan-loader
++else
++PIPEWIRE_CONF_OPTS += -Dvulkan=disabled
++endif
++
+ ifeq ($(BR2_PACKAGE_LIBSNDFILE),y)
+ PIPEWIRE_CONF_OPTS += -Dpw-cat=enabled -Dsndfile=enabled
+ PIPEWIRE_DEPENDENCIES += libsndfile
+@@ -219,13 +233,6 @@ else
+ PIPEWIRE_CONF_OPTS += -Dreadline=disabled
+ endif
+ 
+-ifeq ($(BR2_PACKAGE_SDL2),y)
+-PIPEWIRE_DEPENDENCIES += sdl2
+-PIPEWIRE_CONF_OPTS += -Dsdl2=enabled
+-else
+-PIPEWIRE_CONF_OPTS += -Dsdl2=disabled
+-endif
+-
+ ifeq ($(BR2_PACKAGE_PIPEWIRE_COMPRESS_OFFLOAD),y)
+ PIPEWIRE_CONF_OPTS += -Dcompress-offload=enabled
+ PIPEWIRE_DEPENDENCIES += tinycompress
