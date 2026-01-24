@@ -211,6 +211,8 @@ b2d78dfc8d6b5be706a235b7f1bba038  package/vulkan-tools/vulkan-tools.hash
 3f65b4abd2fb4e5b2f835bca26b0bcb7  package/vulkan-tools/vulkan-tools.mk
 88da0f39a3a0a5baaf24742d6c1bb8f7  package/wayland-protocols/wayland-protocols.hash
 7002edade861d2fb1083110068ef68e2  package/wayland-protocols/wayland-protocols.mk
+cca43cc461fb2fd9a74e52c81e355a2e  package/wayland-utils/wayland-utils.hash
+2f1021b91dfa60bc65d0ed4651dc88ee  package/wayland-utils/wayland-utils.mk
 a54f143410a07bffef9266cf66a08a54  package/wayland/wayland.hash
 6ca139da9be6d861c95bc9946f127958  package/wayland/wayland.mk
 f9f04d92bb8ffcf08f5a3c63014ad1a6  package/wireplumber/wireplumber.hash

@@ -1,0 +1,12 @@
+diff --git a/package/wayland-utils/wayland-utils.hash b/package/wayland-utils/wayland-utils.hash
+index fd14b986bc..bcde4e41eb 100644
+--- a/package/wayland-utils/wayland-utils.hash
++++ b/package/wayland-utils/wayland-utils.hash
+@@ -1,4 +1,4 @@
+-# From https://lists.freedesktop.org/archives/wayland-devel/2023-June/042736.html
+-sha256  d9278c22554586881802540751bcc42569262bf80cd9ac9b0fd12ff4bd09a9e4  wayland-utils-1.2.0.tar.xz
+-sha512  dc69a2d88215b54486954bd9f6e91cd158b0c0b94dccd2c863477cf6b1e83a83db4466f0718aa7d2be4de8d06484c0672c79318bc5c2b1f082f893fe795c2c00  wayland-utils-1.2.0.tar.xz
++# From https://lore.freedesktop.org/wayland-devel/PYI3dMM1Up6w60L4AJsbLLbyUpppLU9FGUonZ74lUtPT6gVM6AziehZe0WYmO_pALnQHMNjPensIE3LSW4njxUWjB3r8G7nGigLcCC4FqWY=@emersion.fr/#r
++sha256  a39d0e65617c6ae186d768c223f57060a3a435f6f9f02d03074f945313bfcf0d  wayland-utils-1.3.0.tar.xz
++sha512  45c930cf496ed7d6648eb472579298b76d8df6db6d877344f266272cacdecff6be34f4ee0483c951444225aee32c67cee5701553ab7afbd16ba71b1239bb08ac  wayland-utils-1.3.0.tar.xz
+ sha256  1eba39c11640014a5841dd3017e5245fc31f47e1cf43a3287a286dd6a8de8a1a  COPYING
