@@ -1,0 +1,14 @@
+config BR2_PACKAGE_LIBRETRO_GEARLYNX
+    bool "libretro-gearlynx"
+	depends on BR2_INSTALL_LIBSTDCPP
+
+      help
+        Gearlynx is a cross-platform 
+        Atari Lynx emulator 
+        written in C++ that runs on Windows, 
+        macOS, Linux, BSD and RetroArch.
+
+	  https://github.com/drhelius/Gearlynx
+
+comment "LIBRETRO_GEARLYNX needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
