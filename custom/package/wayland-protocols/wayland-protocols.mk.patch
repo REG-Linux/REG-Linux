@@ -1,0 +1,21 @@
+diff --git a/package/wayland-protocols/wayland-protocols.mk b/package/wayland-protocols/wayland-protocols.mk
+index b04693978d..bc54bcd74e 100644
+--- a/package/wayland-protocols/wayland-protocols.mk
++++ b/package/wayland-protocols/wayland-protocols.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-WAYLAND_PROTOCOLS_VERSION = 1.39
++WAYLAND_PROTOCOLS_VERSION = 1.47
+ WAYLAND_PROTOCOLS_SITE = https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/$(WAYLAND_PROTOCOLS_VERSION)/downloads
+ WAYLAND_PROTOCOLS_SOURCE = wayland-protocols-$(WAYLAND_PROTOCOLS_VERSION).tar.xz
+ WAYLAND_PROTOCOLS_LICENSE = MIT
+@@ -17,3 +17,7 @@ WAYLAND_PROTOCOLS_DEPENDENCIES = host-wayland
+ WAYLAND_PROTOCOLS_CONF_OPTS = -Dtests=false
+ 
+ $(eval $(meson-package))
++
++# reglinux - declare an host package for host-mesa3d
++HOST_WAYLAND_PROTOCOLS_DEPENDENCIES += host-wayland
++$(eval $(host-meson-package))
