@@ -1,5 +1,5 @@
 diff --git a/package/wayland-utils/wayland-utils.hash b/package/wayland-utils/wayland-utils.hash
-index fd14b986bc..bcde4e41eb 100644
+index fd14b986bc..3cd818acc0 100644
 --- a/package/wayland-utils/wayland-utils.hash
 +++ b/package/wayland-utils/wayland-utils.hash
 @@ -1,4 +1,4 @@
