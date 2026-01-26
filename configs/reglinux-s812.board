@@ -1,0 +1,53 @@
+include toolchain-gcc14-musl.common
+include reglinux-board.common
+
+# Target definition
+BR2_arm=y
+BR2_cortex_a9=y
+BR2_ARM_EABIHF=y
+BR2_ARM_ENABLE_NEON=y
+BR2_ARM_ENABLE_VFP=y
+BR2_ARM_FPU_NEON=y
+BR2_PACKAGE_SYSTEM_TARGET_S812=y
+BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
+#BR2_TARGET_GENERIC_GETTY_PORT="tty1"
+BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/gles $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/musl $(BR2_EXTERNAL_REGLINUX_PATH)/board/amlogic/s812/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/amlogic/s812/fsoverlay"
+BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
+
+# Kernel headers
+BR2_KERNEL_HEADERS_6_18=y
+
+# Kernel
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.7"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/amlogic/s812/linux_patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux_patches/arm"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="$(BR2_EXTERNAL_REGLINUX_PATH)/board/amlogic/s812/linux-defconfig.config"
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config"
+BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
+
+# Build the DTB from the kernel sources
+BR2_LINUX_KERNEL_DTS_SUPPORT=y
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="amlogic/meson8m2-mxiii amlogic/meson8m2-mxiii-plus amlogic/meson8m2-m8s amlogic/meson8m2-m8s-plus amlogic/meson8m2-wetek-core amlogic/meson8-minix-neo-x8 amlogic/meson8-tronsmart-s82 amlogic/meson8m2-wetek-core"
+
+# S812 needed kernel changes
+BR2_LINUX_KERNEL_UIMAGE=y
+BR2_LINUX_KERNEL_UIMAGE_LOADADDR="0x00208000"
+
+# S812 u-boot tools for aml-uboot scripts
+BR2_PACKAGE_UBOOT_TOOLS_MKIMAGE=y
+
+# GPU
+BR2_PACKAGE_SYSTEM_LIMA_MESA3D=y
+
+# Allow wayland
+BR2_PACKAGE_REGLINUX_SWAY=y
+
+# spi flash support
+BR2_PACKAGE_MTD=y
+
+# Filesystem
+BR2_TARGET_ROOTFS_CPIO_UIMAGE=y

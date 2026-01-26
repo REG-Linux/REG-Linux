@@ -1,0 +1,48 @@
+include toolchain-gcc14-glibc.common
+include reglinux-board.common
+
+# Target definition
+BR2_aarch64=y
+BR2_cortex_a75_a55=y
+BR2_ARM_FPU_NEON_FP_ARMV8=y
+BR2_PACKAGE_SYSTEM_TARGET_SDM845=y
+BR2_TARGET_OPTIMIZATION="-pipe -fsigned-char"
+BR2_TARGET_GENERIC_GETTY_PORT="ttyMSM0"
+BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
+BR2_GLOBAL_PATCH_DIR="$(BR2_EXTERNAL_REGLINUX_PATH)/board/patches $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/patches/aarch64 $(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sdm845/odin/patches"
+BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_REGLINUX_PATH)/board/fsoverlay $(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sdm845/odin/fsoverlay"
+
+# Kernel headers
+BR2_KERNEL_HEADERS_6_18=y
+
+# Kernel
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.7"
+BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sdm845/odin/linux_patches"
+BR2_LINUX_KERNEL_USE_ARCH_DEFAULT_CONFIG=y
+BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sdm845/odin/linux-defconfig-fragment.config $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config"
+BR2_LINUX_KERNEL_DTS_SUPPORT=y
+BR2_LINUX_KERNEL_INTREE_DTS_NAME="qcom/sdm845-ayn-odin"
+
+# Custom CPIO dracut.conf for firwmare
+BR2_TARGET_ROOTFS_CPIO_DRACUT_CONF_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sdm845/dracut.conf"
+
+# System
+BR2_TARGET_ROOTFS_SQUASHFS4_ZSTD=y
+
+# GPU
+BR2_PACKAGE_SYSTEM_FREEDRENO_MESA3D=y
+
+# Enable Wayland
+BR2_PACKAGE_REGLINUX_SWAY=y
+BR2_PACKAGE_REGLINUX_XWAYLAND=y
+
+# Bootloader
+BR2_TARGET_GRUB2=y
+BR2_TARGET_GRUB2_ARM64_EFI=y
+BR2_TARGET_GRUB2_BUILTIN_MODULES_EFI="boot linux ext2 fat squash4 part_msdos part_gpt normal efi_gop search search_fs_file search_fs_uuid search_label chain reboot"
+BR2_PACKAGE_EFIVAR=y
+
+# Filesystem
+BR2_TARGET_ROOTFS_CPIO_LZ4=y
