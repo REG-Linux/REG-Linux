@@ -1,0 +1,35 @@
+diff --git a/package/pulseaudio/pulseaudio.mk b/package/pulseaudio/pulseaudio.mk
+index 254e05348d..4573561916 100644
+--- a/package/pulseaudio/pulseaudio.mk
++++ b/package/pulseaudio/pulseaudio.mk
+@@ -100,13 +100,8 @@ ifeq ($(BR2_PACKAGE_LIBCAP),y)
+ PULSEAUDIO_DEPENDENCIES += libcap
+ endif
+ 
+-# gtk3 support needs X11 backend
+-ifeq ($(BR2_PACKAGE_LIBGTK3_X11),y)
+-PULSEAUDIO_DEPENDENCIES += libgtk3
+-PULSEAUDIO_CONF_OPTS += -Dgtk=enabled
+-else
++# REG disable gtk3 support
+ PULSEAUDIO_CONF_OPTS += -Dgtk=disabled
+-endif
+ 
+ ifeq ($(BR2_PACKAGE_LIBSOXR),y)
+ PULSEAUDIO_CONF_OPTS += -Dsoxr=enabled
+@@ -197,6 +192,15 @@ endef
+ PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_REMOVE_VALA \
+ 	PULSEAUDIO_REMOVE_CONSOLE_KIT
+ 
++# reglinux - add the pactl util
++PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_ADD_PACTL
++
++define PULSEAUDIO_ADD_PACTL
++	cp $(@D)/buildroot-build/src/utils/pactl $(TARGET_DIR)/usr/bin/
++	ln -sf /usr/lib/pulseaudio/libpulsecommon-$(PULSEAUDIO_VERSION).so \
++	    $(TARGET_DIR)/usr/lib/libpulsecommon-$(PULSEAUDIO_VERSION).so
++endef
++
+ ifeq ($(BR2_PACKAGE_PULSEAUDIO_DAEMON),y)
+ define PULSEAUDIO_USERS
+ 	pulse -1 pulse -1 * /var/run/pulse - audio,pulse-access
