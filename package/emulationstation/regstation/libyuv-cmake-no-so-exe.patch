@@ -1,0 +1,57 @@
+--- a/external/libyuv/CMakeLists.txt	2024-04-06 18:36:01.708146657 +0200
++++ b/external/libyuv/CMakeLists.txt	2024-04-06 18:36:33.356935473 +0200
+@@ -12,7 +12,6 @@
+ SET ( ly_tst_dir	${ly_base_dir}/unit_test )
+ SET ( ly_lib_name	yuv )
+ SET ( ly_lib_static	${ly_lib_name} )
+-SET ( ly_lib_shared	${ly_lib_name}_shared )
+ 
+ FILE ( GLOB_RECURSE	ly_source_files ${ly_src_dir}/*.cc )
+ LIST ( SORT			ly_source_files )
+@@ -29,26 +29,6 @@
+ # this creates the static library (.a)
+ ADD_LIBRARY				( ${ly_lib_static} STATIC ${ly_source_files} )
+ 
+-# this creates the shared library (.so)
+-ADD_LIBRARY				( ${ly_lib_shared} SHARED ${ly_source_files} )
+-SET_TARGET_PROPERTIES	( ${ly_lib_shared} PROPERTIES OUTPUT_NAME "${ly_lib_name}" )
+-SET_TARGET_PROPERTIES	( ${ly_lib_shared} PROPERTIES PREFIX "lib" )
+-if(WIN32)
+-  SET_TARGET_PROPERTIES	( ${ly_lib_shared} PROPERTIES IMPORT_PREFIX "lib" )
+-endif()
+-
+-# this creates the cpuid tool
+-ADD_EXECUTABLE      ( cpuid ${ly_base_dir}/util/cpuid.c )
+-TARGET_LINK_LIBRARIES  ( cpuid ${ly_lib_static} )
+-
+-# this creates the conversion tool
+-ADD_EXECUTABLE			( yuvconvert ${ly_base_dir}/util/yuvconvert.cc )
+-TARGET_LINK_LIBRARIES	( yuvconvert ${ly_lib_static} )
+-
+-# this creates the yuvconstants tool
+-ADD_EXECUTABLE      ( yuvconstants ${ly_base_dir}/util/yuvconstants.c )
+-TARGET_LINK_LIBRARIES  ( yuvconstants ${ly_lib_static} )
+-
+ find_package ( JPEG )
+ if (JPEG_FOUND)
+   include_directories( ${JPEG_INCLUDE_DIR} )
+@@ -32,7 +31,6 @@
+ find_package ( JPEG )
+ if (JPEG_FOUND)
+   include_directories( ${JPEG_INCLUDE_DIR} )
+-  target_link_libraries( ${ly_lib_shared} ${JPEG_LIBRARY} )
+   add_definitions( -DHAVE_JPEG )
+ endif()
+
+@@ -98,11 +78,6 @@
+ 
+ 
+ # install the conversion tool, .so, .a, and all the header files
+-INSTALL ( PROGRAMS ${CMAKE_BINARY_DIR}/yuvconvert			DESTINATION bin )
+ INSTALL ( TARGETS ${ly_lib_static}						DESTINATION lib )
+-INSTALL ( TARGETS ${ly_lib_shared} LIBRARY				DESTINATION lib RUNTIME DESTINATION bin )
+ INSTALL ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
+ 
+-# create the .deb and .rpm packages using cpack
+-INCLUDE ( CM_linux_packages.cmake )
+-
