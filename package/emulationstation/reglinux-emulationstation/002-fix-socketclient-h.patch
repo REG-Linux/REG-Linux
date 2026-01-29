@@ -1,0 +1,16 @@
+--- a/es-core/src/SocketClient.h	2026-01-13 21:52:20.497369324 +0100
++++ b/es-core/src/SocketClient.h	2026-01-13 21:52:31.024429534 +0100
+@@ -10,11 +10,11 @@
+     enum class Status {
+         OK,
+         ERR,
+-        UNKNOWN
++        S_UNKNOWN
+     };
+ 
+     struct Response {
+-        Status status = Status::UNKNOWN;
++        Status status = Status::S_UNKNOWN;
+         std::string payload;
+ 
+         bool ok() const { return status == Status::OK; }
