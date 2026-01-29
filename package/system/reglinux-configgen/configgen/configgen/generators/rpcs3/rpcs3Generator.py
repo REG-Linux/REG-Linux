@@ -504,7 +504,9 @@ def get_in_game_ratio(config: Any, game_resolution: dict[str, int], rom: str) ->
 
 def getFirmwareVersion():
     try:
-        with pathlib.Path("/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt").open() as stream:
+        with pathlib.Path(
+            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt"
+        ).open() as stream:
             lines = stream.readlines()
         for line in lines:
             matches = match(r"^release:(.*):", line)

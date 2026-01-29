@@ -29,7 +29,7 @@ def setHatariControllers(system: Any, playersControllers: Any) -> None:
             config.set(section, "nJoyId", "-1")
             config.set(section, "nJoystickMode", "0")
 
-    for nplayer, pad in enumerate(sorted(playersControllers.items()), start=1):
+    for nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
         if nplayer <= 5:
             section = "Joystick" + str(nplayer)
             if not config.has_section(section):

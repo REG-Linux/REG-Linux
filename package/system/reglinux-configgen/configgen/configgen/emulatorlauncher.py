@@ -222,11 +222,11 @@ def _configure_special_devices(
         eslog.info("Wheels disabled.")
         wheels = []
 
-    # Corrigindo o tipo para garantir consistência
+    # Fixing the type to ensure consistency
     guns = guns if isinstance(guns, (list, dict)) else []
     wheels = wheels if isinstance(wheels, (list, dict)) else []
 
-    # Garantir que o retorno tenha os tipos corretos
+    # Ensuring the return has the correct types
     guns_result: dict[str, Any] | list[Any] = (
         guns if isinstance(guns, (dict, list)) else []
     )
@@ -808,7 +808,9 @@ def getHudBezel(
             )
 
             w, h = game_resolution["width"], game_resolution["height"]
-            Path(overlay_info_file).write_text(f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}')
+            Path(overlay_info_file).write_text(
+                f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}'
+            )
         else:
             # A bezel is configured, so let's find its files.
             eslog.debug(

@@ -560,13 +560,19 @@ class MameGenerator(Generator):
                 for hashFile in listdir(str(hashDir)):
                     if hashFile.endswith(".xml"):
                         Path(str(hashDir / hashFile)).unlink()
-                Path(str(hashDir / f"{softList}.xml")).symlink_to(f"/usr/bin/mame/hash/{softList}.xml")
+                Path(str(hashDir / f"{softList}.xml")).symlink_to(
+                    f"/usr/bin/mame/hash/{softList}.xml"
+                )
                 if softList in subdirSoftList:
                     romPath = Path(romDirname)
-                    Path(str(softDirPath / softList)).symlink_to(str(romPath.parent), target_is_directory=True)
+                    Path(str(softDirPath / softList)).symlink_to(
+                        str(romPath.parent), target_is_directory=True
+                    )
                     command_array += [Path(romDirname).name]
                 else:
-                    Path(str(softDirPath / softList)).symlink_to(romDirname, target_is_directory=True)
+                    Path(str(softDirPath / softList)).symlink_to(
+                        romDirname, target_is_directory=True
+                    )
                     command_array += [Path(romBasename).stem]
 
             # Create & add a blank disk if needed, insert into drive 2

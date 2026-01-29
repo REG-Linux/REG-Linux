@@ -638,9 +638,13 @@ def prepSoftwareList(
     # Link ROM's parent folder if needed, ROM's folder otherwise
     if softList in subdirSoftList:
         romPath = Path(romDirname)
-        Path(str(Path(softDir) / softList)).symlink_to(str(romPath.parents[0]), target_is_directory=True)
+        Path(str(Path(softDir) / softList)).symlink_to(
+            str(romPath.parents[0]), target_is_directory=True
+        )
     else:
-        Path(str(Path(softDir) / softList)).symlink_to(romDirname, target_is_directory=True)
+        Path(str(Path(softDir) / softList)).symlink_to(
+            romDirname, target_is_directory=True
+        )
 
 
 def getMameControlScheme(system: Any, romBasename: str) -> Any:

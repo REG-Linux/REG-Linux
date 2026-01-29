@@ -48,7 +48,7 @@ def setViceControllers(system: Any, playersControllers: Any) -> None:
     listVice.append("# REG-Linux configured controllers")
     listVice.append("")
     listVice.append("!CLEAR")
-    for _nplayer, pad in enumerate(sorted(playersControllers.items()), start=1):
+    for _nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
         listVice.append("")
         listVice.append("# " + pad.name)
         for x in pad.inputs:

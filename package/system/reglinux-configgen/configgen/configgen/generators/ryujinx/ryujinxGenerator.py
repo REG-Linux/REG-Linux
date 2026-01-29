@@ -183,7 +183,8 @@ class RyujinxGenerator(Generator):
 
         # Now add Controllers
         for nplayer, (_, pad) in enumerate(
-            sorted(players_controllers.items()), start=1,
+            sorted(players_controllers.items()),
+            start=1,
         ):
             if nplayer <= 8:
                 ctrlConf = ryujinxCtrl

@@ -52,14 +52,16 @@ def setGzdoomConfig(system: Any, rom: str) -> None:
 
     # check the directory name is in the ini file
     if not Path(GZDOOM_CONFIG_PATH).exists():
-        Path(GZDOOM_CONFIG_PATH).write_text("[IWADSearch.Directories]\n"
-                "Path=/userdata/roms/gzdoom\n"
-                "[FileSearch.Directories]\n"
-                "Path=/userdata/roms/gzdoom\n"
-                "[SoundfontSearch.Directories]\n"
-                "Path=" + GZDOOM_SOUND_FONT_PATH + "\n"
-                "Path=" + GZDOOM_FM_BANKS_PATH + "\n"
-                "[GlobalSettings]\n")
+        Path(GZDOOM_CONFIG_PATH).write_text(
+            "[IWADSearch.Directories]\n"
+            "Path=/userdata/roms/gzdoom\n"
+            "[FileSearch.Directories]\n"
+            "Path=/userdata/roms/gzdoom\n"
+            "[SoundfontSearch.Directories]\n"
+            "Path=" + GZDOOM_SOUND_FONT_PATH + "\n"
+            "Path=" + GZDOOM_FM_BANKS_PATH + "\n"
+            "[GlobalSettings]\n"
+        )
     else:
         # configparser wasn't working on the default ini file (non-compliant)
         # it's not a true ini file, use this crude method instead

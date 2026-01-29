@@ -18,7 +18,9 @@ def setCgeniusConfig(cgeniusConfig: Any, system: Any) -> None:
     cgeniusConfig.set("FileHandling", "EnableLogfile", "false")
     cgeniusConfig.set("FileHandling", "SearchPath1", CGENIUS_ROMS_DIR)
     cgeniusConfig.set(
-        "FileHandling", "SearchPath2", str(Path(CGENIUS_ROMS_DIR) / "games"),
+        "FileHandling",
+        "SearchPath2",
+        str(Path(CGENIUS_ROMS_DIR) / "games"),
     )
 
     if not cgeniusConfig.has_section("Video"):

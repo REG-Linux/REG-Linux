@@ -149,9 +149,9 @@ def createXemuConfig(
             and f"port{i}" in config_data["input.bindings"]
         ):
             del config_data["input.bindings"][f"port{i}"]
-    for nplayer, pad in enumerate(sorted(playersControllers.items()), start=1):
+    for nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
         if nplayer <= MAX_PLAYERS:
-            config_data["input.bindings"][f"port{nplayer}"] = pad[1].guid
+            config_data["input.bindings"][f"port{nplayer}"] = pad.guid
 
     # Network
     # Documentation: https://github.com/xemu-project/xemu/blob/master/config_spec.yml

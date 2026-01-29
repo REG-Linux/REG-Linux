@@ -64,9 +64,11 @@ def writeBezelConfig(
             left = (w - (h - 2 * h5) * 4 / 3) // 2
             right = left
 
-        Path(gunBezelInfoFile).write_text("{"
-                f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
-                "}")
+        Path(gunBezelInfoFile).write_text(
+            "{"
+            f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
+            "}"
+        )
         BezelUtils.create_transparent_bezel(
             gunBezelFile,
             gameResolution["width"],

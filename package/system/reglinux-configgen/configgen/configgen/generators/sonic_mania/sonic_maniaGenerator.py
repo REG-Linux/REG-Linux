@@ -61,8 +61,9 @@ class SonicManiaGenerator(Generator):
                 str(SONICAMANIA_BIN_PATH),
                 X_OK,
             ):
-
-                Path(str(SONICAMANIA_BIN_PATH)).chmod(S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
+                Path(str(SONICAMANIA_BIN_PATH)).chmod(
+                    S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH
+                )
 
         # Verify the copied binary is executable
         if not access(str(SONICAMANIA_BIN_PATH), X_OK):

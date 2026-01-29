@@ -136,7 +136,9 @@ class Xash3dFwgsGenerator(Generator):
         rom_dir = _rom_dir(game)
         userconfig_path = rom_dir / "userconfig.cfg"
         if not userconfig_path.exists():
-            Path(userconfig_path).write_text("exec gamepad.cfg\nexec custom.cfg\n", encoding="utf-8")
+            Path(userconfig_path).write_text(
+                "exec gamepad.cfg\nexec custom.cfg\n", encoding="utf-8"
+            )
 
         gamepad_path = rom_dir / "gamepad.cfg"
         if not gamepad_path.exists():

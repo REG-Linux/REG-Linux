@@ -1,4 +1,3 @@
-
 import pathlib
 
 import controllers as controllersConfig
@@ -29,7 +28,9 @@ class UqmGenerator(Generator):
         for directory in directories:
             pathlib.Path(directory).mkdir(exist_ok=True, parents=True)
 
-        with pathlib.Path("/userdata/roms/uqm/version").open("a"):  # Create file if does not exist
+        with pathlib.Path("/userdata/roms/uqm/version").open(
+            "a"
+        ):  # Create file if does not exist
             pass
 
         command_array = [

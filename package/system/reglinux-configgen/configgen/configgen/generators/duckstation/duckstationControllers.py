@@ -38,7 +38,7 @@ def setDuckstationControllers(
     # Start with mutitap disabled
     duckstatonConfig.set("ControllerPorts", "MultitapMode", "Disabled")
     # Now add the controller config based on the ES type & number connected
-    for nplayer, pad in enumerate(sorted(playersControllers.items()), start=1):
+    for nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
         if nplayer <= 8:
             # automatically add the multi-tap
             if nplayer > 2:

@@ -109,7 +109,9 @@ def generateControllerConfig_any(
         # In case of two pads having the same name, dolphin wants a number to handle this
         double_pads: dict[str, int] = {}
 
-        for nplayer, pad in enumerate(sorted(playersControllers.items()), start=1):
+        for nplayer, (_key, pad) in enumerate(
+            sorted(playersControllers.items()), start=1
+        ):
             # Handle x pads having the same name
             nsamepad = double_pads.get(pad.name.strip(), 0)
             double_pads[pad.name.strip()] = nsamepad + 1
@@ -314,7 +316,9 @@ def generateHotkeys(playersControllers: Any) -> None:
             "rightx": None,
         }
 
-        for nplayer, pad in enumerate(sorted(playersControllers.items()), start=1):
+        for nplayer, (_key, pad) in enumerate(
+            sorted(playersControllers.items()), start=1
+        ):
             if nplayer == 1:
                 f.write("[Hotkeys1]" + "\n")
                 f.write("Device = SDL/0/" + pad.name.strip() + "\n")

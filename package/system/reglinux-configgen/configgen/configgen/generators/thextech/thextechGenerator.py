@@ -1,4 +1,3 @@
-
 import pathlib
 
 from configgen.command import Command
