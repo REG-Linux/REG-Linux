@@ -39,6 +39,7 @@ a28421a9760706d955819e9ce927acbb  arch/Config.in.arm
 68b27177f9fe560b74f0c9e4c4fd53e1  fs/cpio/init
 850faee828ef363e5af756b6e2a409a9  fs/squashfs/Config.in
 8635723306eb367f07b3b8fc57243880  fs/squashfs/squashfs.mk
+e4506cca077a794fdc3c4d73adabde88  linux/Config.in
 990b46dd8357dcdf4dad6a7e71b98e8e  linux/linux.hash
 8204566d5b45ae5805473a68ee0eda2c  package/Config.in
 6521d70e92c2c2d8864d46e01c27b6d4  package/Config.in.host
