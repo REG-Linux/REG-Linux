@@ -1,0 +1,5 @@
+# qcs6490 default values
+
+# Audio defaults
+audio.device=alsa_output._sys_devices_platform_sound_sound_card0.HiFi__HDMI__sink
+audio.profile=HiFi@alsa_card._sys_devices_platform_sound_sound_card0
