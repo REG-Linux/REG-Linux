@@ -37,6 +37,7 @@ endif
 
 ifeq ($(MINI_BUILD), y)
 	MAKE_OPTS += MINI_BUILD=y
+	DOCKER_OPTS += -e MINI_BUILD=y
 endif
 
 ifndef BATCH_MODE
@@ -188,7 +189,7 @@ dl-dir:
 
 %-config: reglinux-docker-image output-dir-%
 	@echo "Configuring $*..."
-	@$(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/reglinux-$*
+	@MINI_BUILD=$(MINI_BUILD) $(PROJECT_DIR)/configs/createDefconfig.sh $(PROJECT_DIR)/configs/reglinux-$*
 	@for opt in $(EXTRA_OPTS); do \
 		echo $$opt >> $(PROJECT_DIR)/configs/reglinux-$*_defconfig ; \
 	done
