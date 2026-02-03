@@ -11,6 +11,7 @@ MTP_MOUNT="/dev/ffs-umtp"
 ADB_MOUNT="/dev/usb-ffs/adb"
 UMTP_CONF="/etc/umtprd/umtprd.conf"
 GAME_MARKER="/var/run/reglinux-game.running"
+BOOT_CONF="/boot/system-boot.conf"
 
 is_rk3566() {
     for compat in /proc/device-tree/compatible /sys/firmware/devicetree/base/compatible; do
@@ -158,7 +159,15 @@ set_role() {
 
 get_config_key() {
     [ -x /usr/bin/regmsg ] || return 0
-    /usr/bin/regmsg systemconf getconfigkey "$1" 2>/dev/null
+    value="$(/usr/bin/regmsg systemconf getconfigkey "$1" 2>/dev/null || true)"
+    if [ -n "${value}" ]; then
+        printf '%s\n' "${value}"
+        return 0
+    fi
+    [ -r "${BOOT_CONF}" ] || return 0
+    awk -F'=' -v k="$1" '
+        $0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}
+    ' "${BOOT_CONF}"
 }
 
 normalize_mode() {

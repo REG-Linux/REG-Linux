@@ -1,2 +1,4 @@
 export HOSTNAME="$(hostname)"
-export PS1='${USER}@${HOSTNAME} $(pwd)$ '
+if [ -n "${PS1-}" ]; then
+    PS1='\u@\h \w$ '
+fi

@@ -1,0 +1,129 @@
+#!/bin/dash
+
+case "$1" in
+    start)
+        TOTALSTEPS=0
+        CURRENTSTEP=0
+
+        # Read list of files/dirs to check
+        # Directories deleted by user will be recreated when booting.
+        # The user can delete the content or add its own files.
+        # To reset the directory or update it, the user has to remove the directory
+        # (we are unable to differenciate new files from REG-linux update from a file removed by the user)
+        LIST=""
+        EMPTYSHARE=""
+        while IFS= read -r files && [ -n "$files" ]; do
+            { [ -e "/userdata/$files" ] && EMPTYSHARE="no"; } || LIST="$files $LIST"
+        done < /usr/share/reglinux/datainit.list
+
+        SYSVER=""
+        USRVER=""
+        [ -r "/usr/share/reglinux/system.version" ] && IFS= read -r SYSVER < "/usr/share/reglinux/system.version" 2>/dev/null
+        [ -r "/userdata/system/data.version" ] && IFS= read -r USRVER < "/userdata/system/data.version" 2>/dev/null
+        if [ -n "$EMPTYSHARE" ] && [ "$SYSVER" != "$USRVER" ]; then
+            LIST="$LIST 'roms/*/_info.txt' '*/readme.txt' 'bios/' 'roms/iortcw/main/' 'system/'"
+            EXCLUDELIST="-ex '... gamecontrollerdb.txt' '... system.conf' '... es_settings.cfg' \; "
+        else
+            EXCLUDELIST=""
+        fi
+        if [ -n "$LIST" ]; then
+            TOTALSTEPS=$((TOTALSTEPS + 3))
+            CURRENTSTEP=100
+
+            # Start UPDATING splash
+            if [ "$(system-part share)" = "tmpfs" ]; then
+                /usr/bin/plymouth change-mode --system-reset
+            else
+                /usr/bin/plymouth change-mode --updates
+            fi
+            /usr/bin/plymouth system-update --progress $((CURRENTSTEP / TOTALSTEPS))
+
+            mkdir -p /userdata/system/logs
+
+            LOGFILE="/userdata/system/logs/extracted.files.log"
+            if [ -n "$EMPTYSHARE" ]; then
+                /usr/bin/plymouth display-message --text="Updating BIOS and other files in /userdata"
+                printf '%s\n%s\n\n' \
+                    "Updating BIOS and other files in /userdata" \
+                    "unsquashfs -f -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" \
+                    > "$LOGFILE"
+                eval "unsquashfs -f -i -d /userdata $EXCLUDELIST /usr/share/reglinux/datainit.squashfs $LIST" >> "$LOGFILE" 2>&1
+            else
+                /usr/bin/plymouth display-message --text="Extracting files to /userdata"
+                printf '%s\n%s\n\n' \
+                    "Extracting files to /userdata" \
+                    "unsquashfs -f -d /userdata /usr/share/reglinux/datainit.squashfs" \
+                    > "$LOGFILE"
+                unsquashfs -f -i -d /userdata /usr/share/reglinux/datainit.squashfs >> "$LOGFILE" 2>&1
+            fi
+            # Save version to avoid redoing on every boot
+            cp /usr/share/reglinux/system.version /userdata/system/data.version 2>/dev/null
+
+            CURRENTSTEP=$((CURRENTSTEP + 100))
+            /usr/bin/plymouth system-update --progress $((CURRENTSTEP / TOTALSTEPS))
+            /usr/bin/plymouth display-message --text="Creating special folders and links"
+        fi
+        # udev: symlink for persistent rules
+        mkdir -p /userdata/system/udev/rules.d
+        rm -rf /run/udev/rules.d
+        ln -s /userdata/system/udev/rules.d /run/udev/rules.d
+
+        # machine-id handling
+        MACHINE_ID_FILE="/userdata/system/machine-id"
+        [ -e "$MACHINE_ID_FILE" ] || dbus-uuidgen --ensure="$MACHINE_ID_FILE"
+        ln -sf "$MACHINE_ID_FILE" /var/lib/dbus/machine-id
+        ln -sf "$MACHINE_ID_FILE" /etc/machine-id
+
+        # Load system.conf to regmsg daemon
+        # One-time sync of USB gadget defaults from /boot/system-boot.conf
+        USB_BOOT_SYNC_MARKER="/userdata/system/.cache/usb-boot-sync.done"
+        if [ -r /boot/system-boot.conf ] && [ ! -f "${USB_BOOT_SYNC_MARKER}" ] && [ -w /userdata/system/system.conf ]; then
+            for key in system.usb.mtp system.usb.adb system.usb.mode; do
+                boot_val="$(awk -F= -v k="${key}" '$0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}' /boot/system-boot.conf)"
+                if [ -n "${boot_val}" ] && ! grep -q -E "^[[:space:]]*${key}=" /userdata/system/system.conf; then
+                    /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf "${key}" "${boot_val}" >/dev/null 2>&1 || true
+                fi
+            done
+            mkdir -p /userdata/system/.cache
+            touch "${USB_BOOT_SYNC_MARKER}"
+        fi
+
+        if [ -s /userdata/system/system.conf ]; then
+            if [ ! -f /var/run/regmsgd.sock ]; then
+                # Waits for the daemon to start
+                count=0
+                while [ "$count" -lt 20 ]; do
+                    # Check if the daemon is running more efficiently
+                    if [ -f /var/run/regmsgd.pid ]; then
+                        break
+                    fi
+                    sleep 0.2
+                    count=$((count + 1))
+                done
+            fi
+            /usr/bin/regmsg systemconf loadconfig /userdata/system/system.conf
+        fi
+
+        # Run user script if exists
+        if [ -x /boot/postshare.sh ]; then
+            if [ "$TOTALSTEPS" -gt 0 ]; then
+                TOTALSTEPS=$((TOTALSTEPS + 1))
+                CURRENTSTEP=$((CURRENTSTEP + 100))
+                /usr/bin/plymouth system-update --progress $((CURRENTSTEP / TOTALSTEPS))
+                /usr/bin/plymouth display-message --text="Running postshare script"
+            fi
+            /boot/postshare.sh start
+        fi
+
+        if [ "$TOTALSTEPS" -gt 0 ]; then
+            /usr/bin/plymouth system-update --progress 100
+            /usr/bin/plymouth display-message --text=" "
+            /usr/bin/plymouth change-mode --boot-up
+            /usr/bin/plymouth --show-splash
+        fi
+        ;;
+    stop)
+        # call user script with stop condition
+        [ -x /boot/postshare.sh ] && /boot/postshare.sh stop
+        ;;
+esac
