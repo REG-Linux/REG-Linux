@@ -1,0 +1,29 @@
+#!/bin/dash
+
+mode="$("/usr/bin/regmsg" systemconf getconfigkey system.usb.mode 2>/dev/null)"
+if [ -n "${mode}" ]; then
+    case "${mode}" in
+        mtp|file_transfer) : ;;
+        *) exit 0 ;;
+    esac
+else
+    enabled="$("/usr/bin/regmsg" systemconf getconfigkey system.usb.mtp 2>/dev/null)"
+    [ "${enabled}" = "0" ] && exit 0
+fi
+
+case "$1" in
+    start)
+        /usr/bin/usbgadget --start
+        ;;
+    stop)
+        /usr/bin/usbgadget stop
+        ;;
+    restart|reload)
+        /usr/bin/usbgadget stop
+        /usr/bin/usbgadget --start
+        ;;
+    *)
+        printf '%s\n' "Usage: $0 {start|stop|restart}" >&2
+        exit 1
+        ;;
+esac

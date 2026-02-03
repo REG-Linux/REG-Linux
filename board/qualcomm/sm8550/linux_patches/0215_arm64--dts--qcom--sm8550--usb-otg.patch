@@ -1,0 +1,24 @@
+--- a/arch/arm64/boot/dts/qcom/qcs8550-ayn-common.dtsi
++++ b/arch/arm64/boot/dts/qcom/qcs8550-ayn-common.dtsi
+@@ -1566,6 +1566,7 @@
+ 
+ &usb_1 {
+ 	status = "okay";
++	dr_mode = "otg";
+ };
+ 
+ &usb_1_dwc3_hs {
+ 	remote-endpoint = <&pmic_glink_hs_in>;
+ };
+--- a/arch/arm64/boot/dts/qcom/qcs8550-ayaneo-pocket-common.dtsi
++++ b/arch/arm64/boot/dts/qcom/qcs8550-ayaneo-pocket-common.dtsi
+@@ -1448,6 +1448,7 @@
+ 
+ &usb_1 {
+ 	status = "okay";
++	dr_mode = "otg";
+ };
+ 
+ &usb_1_dwc3_hs {
+ 	remote-endpoint = <&pmic_glink_hs_in>;
+ };

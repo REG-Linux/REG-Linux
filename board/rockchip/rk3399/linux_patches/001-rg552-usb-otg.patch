@@ -1,0 +1,9 @@
+--- a/arch/arm64/boot/dts/rockchip/rk3399-anbernic-rg552.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3399-anbernic-rg552.dts
+@@ -1347,7 +1347,7 @@
+ 
+ &usbdrd_dwc3_0 {
+-    dr_mode = "host";
++    dr_mode = "otg";
+     status = "okay";
+ };
