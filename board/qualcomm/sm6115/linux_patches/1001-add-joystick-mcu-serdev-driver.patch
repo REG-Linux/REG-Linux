@@ -1,0 +1,1904 @@
+From romain.tisserand@gmail.com Sat, 03 Jan 2026 00:41:33 +0100
+Subject: [PATCH] input: joystick: add mangmi MCU UART driver
+From: Romain Tisserand <romain.tisserand@gmail.com>
+Date: Sat, 03 Jan 2026 00:41:33 +0100
+
+Port the vendor Mangmi Air X joystick MCU driver to a serdev-based
+implementation and include calibration/sysfs support.
+
+Signed-off-by: Romain Tisserand <romain.tisserand@gmail.com>
+---
+--- a/drivers/input/joystick/Kconfig
++++ b/drivers/input/joystick/Kconfig
+@@ -166,6 +166,18 @@
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called magellan.
+ 
++config JOYSTICK_MANGMI_MCU
++	tristate "Mangmi Air X joystick MCU (serdev)"
++	depends on OF && SERIAL_DEV_BUS
++	help
++	  Say Y here to enable the serdev driver for the joystick MCU used
++	  by the Mangmi Air X (SM6115) handheld. The driver parses the UART
++	  reports, applies calibration mapping, and exposes a joystick input
++	  device with optional GPIO buttons.
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called mcu_joystick.
++
+ config JOYSTICK_SPACEORB
+ 	tristate "SpaceTec SpaceOrb/Avenger 6dof controllers"
+ 	select SERIO
+--- a/drivers/input/joystick/Makefile
++++ b/drivers/input/joystick/Makefile
+@@ -41,3 +41,4 @@
+ obj-$(CONFIG_JOYSTICK_WALKERA0701)	+= walkera0701.o
+ obj-$(CONFIG_JOYSTICK_XPAD)		+= xpad.o
+ obj-$(CONFIG_JOYSTICK_ZHENHUA)		+= zhenhua.o
++obj-$(CONFIG_JOYSTICK_MANGMI_MCU)	+= mcu_joystick.o
+--- /dev/null
++++ b/drivers/input/joystick/mcu_joystick.c
+@@ -0,0 +1,1705 @@
++/*
++ * Copyright 2025-2026 REG-Linux (https://reglinux.org)
++ * Copyright 2025-2026 Romain Tisserand <romain.tisserand@gmail.com>
++ */
++
++#include <linux/types.h>
++#include <linux/debugfs.h>
++#include <linux/byteorder/little_endian.h>
++#include <linux/delay.h>
++#include <linux/gpio/consumer.h>
++#include <linux/input.h>
++#include <linux/interrupt.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/property.h>
++#include <linux/pm.h>
++#include <linux/serdev.h>
++#include <linux/seq_file.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/sysfs.h>
++
++#include "mcu_joystick.h"
++
++bool mcu_isp_flag;
++static bool mcu_resum_flag;
++
++static uint16_t caliMcuLTValueMin = 2800;
++static uint16_t caliMcuLTValueMax = 4000;
++
++static uint16_t caliMcuRTValueMin = 2900;
++static uint16_t caliMcuRTValueMax = 4000;
++
++static int16_t caliLXmcuValueMin = 900;
++static int16_t caliLXmcuValueMax = 3300;
++
++static int16_t caliLYmcuValueMin = 900;
++static int16_t caliLYmcuValueMax = 3300;
++
++static int16_t caliRXmcuValueMin = 900;
++static int16_t caliRXmcuValueMax = 3300;
++
++static int16_t caliRYmcuValueMin = 900;
++static int16_t caliRYmcuValueMax = 3300;
++
++#define UINT8_MAX 0xff
++#define INT16_MIN (-32767 - 1)
++#define INT16_MAX 32767
++
++static uint16_t LTmcuValue;
++static uint16_t RTmcuValue;
++static uint16_t LXmcuValue;
++static uint16_t LYmcuValue;
++static uint16_t RXmcuValue;
++static uint16_t RYmcuValue;
++
++static struct mcu_joystick *cali_keys;
++
++enum boot_mode {
++	main_flash_memory,
++	system_memory,
++	on_chip_sram,
++};
++
++static void calibration_data_init(struct device *dev);
++static int get_linear_mapping(int code, int value);
++static int get_Dead_Zone_mapping(int code, int value);
++static int get_calibration_offset(int code);
++static int get_define_min(int code, int value);
++static int get_define_max(int code, int value);
++
++static void trigger_map(unsigned char *data, struct device *dev);
++static void sticks_map(unsigned char *data, struct device *dev);
++
++static int dpad_connect(struct device *dev, struct uart_dpad **dpad,
++			uint16_t idVendor, uint16_t idProduct);
++static void dpad_disconnect(struct uart_dpad **dpad);
++static void dpad_process_packet(struct uart_dpad *dpad, struct input_dev *dev,
++				unsigned char *data);
++static irqreturn_t dpad_gpio_irq_handler(int irq, void *data);
++
++static int mcu_sysfs_create_group(struct device *dev);
++static void mcu_sysfs_remove_group(struct device *dev);
++static void mcu_debugfs_init(struct mcu_joystick *keys);
++static void mcu_debugfs_remove(struct mcu_joystick *keys);
++
++static void mcu_boot_mode(struct mcu_joystick *keys, enum boot_mode mode)
++{
++	switch (mode) {
++	case main_flash_memory:
++		gpiod_set_raw_value_cansleep(keys->boot0_gpio, 1);
++		gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
++		break;
++	case system_memory:
++		gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
++		break;
++	case on_chip_sram:
++		gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
++		gpiod_set_raw_value_cansleep(keys->boot1_gpio, 0);
++		break;
++	default:
++		break;
++	}
++
++	gpiod_set_raw_value_cansleep(keys->reset_gpio, 1);
++	usleep_range(5000, 5100);
++	gpiod_set_raw_value_cansleep(keys->reset_gpio, 0);
++}
++
++static void mcu_rotate_frame(struct mcu_joystick *keys, const u8 *src, u8 *dst)
++{
++	u8 shift = keys->frame_shift;
++	size_t i;
++
++	if (!shift) {
++		memcpy(dst, src, DPAD_PKT_LEN);
++		return;
++	}
++
++	for (i = 0; i < DPAD_PKT_LEN; i++)
++		dst[i] = src[(i + shift) % DPAD_PKT_LEN];
++}
++
++static void mcu_report_uart_val(struct mcu_joystick *keys,
++				unsigned char *rx_buf, int size)
++{
++	struct uart_dpad *dpad = NULL;
++
++	(void)size;
++
++	if (mcu_isp_flag || !mcu_resum_flag)
++		return;
++
++	if (!keys || !keys->dpad)
++		return;
++
++	dpad = keys->dpad;
++
++	trigger_map(rx_buf, keys->dev);
++	sticks_map(rx_buf, keys->dev);
++
++	dpad_process_packet(dpad, dpad->input_dev, rx_buf);
++}
++
++static int mcu_joystick_suspend(struct device *dev)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	if (!keys)
++		return -EINVAL;
++
++	if (keys->power_gpio)
++		gpiod_set_raw_value_cansleep(keys->power_gpio, 0);
++	if (keys->stick_en_gpio)
++		gpiod_set_raw_value_cansleep(keys->stick_en_gpio, 0);
++
++	mcu_resum_flag = false;
++	dev_dbg(dev, "mcu_joystick is suspended\n");
++	return 0;
++}
++
++static int mcu_joystick_resume(struct device *dev)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	if (!keys)
++		return -EINVAL;
++
++	if (keys->power_gpio)
++		gpiod_set_raw_value_cansleep(keys->power_gpio, 1);
++	if (keys->stick_en_gpio)
++		gpiod_set_raw_value_cansleep(keys->stick_en_gpio, 1);
++	if (keys->reset_gpio) {
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 1);
++		usleep_range(5000, 5100);
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 0);
++	}
++
++	mcu_boot_mode(keys, main_flash_memory);
++	mcu_resum_flag = true;
++	dev_dbg(dev, "mcu_joystick is resumed\n");
++	return 0;
++}
++
++static int mcu_joystick_get_gpio(struct device *dev, struct gpio_desc **desc,
++				 const char *name, enum gpiod_flags flags)
++{
++	*desc = devm_gpiod_get_optional(dev, name, flags);
++	if (IS_ERR(*desc))
++		return dev_err_probe(dev, PTR_ERR(*desc),
++				     "failed to get %s GPIO\n", name);
++
++	if (!*desc)
++		return -EINVAL;
++
++	return 0;
++}
++
++static int mcu_joystick_parse_dt(struct device *dev, struct mcu_joystick *keys)
++{
++	int ret;
++	u32 frame_shift;
++
++	ret = mcu_joystick_get_gpio(dev, &keys->boot0_gpio, "mcu-boot0",
++				   GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	ret = mcu_joystick_get_gpio(dev, &keys->boot1_gpio, "mcu-boot1",
++				   GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	ret = mcu_joystick_get_gpio(dev, &keys->power_gpio, "mcu-power",
++				   GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	ret = mcu_joystick_get_gpio(dev, &keys->stick_en_gpio, "stick-en",
++				   GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	ret = mcu_joystick_get_gpio(dev, &keys->reset_gpio, "mcu-reset",
++				   GPIOD_OUT_LOW);
++	if (ret)
++		return ret;
++
++	keys->start_gpio = devm_gpiod_get_optional(dev, "mcu-start", GPIOD_IN);
++	if (IS_ERR(keys->start_gpio))
++		return dev_err_probe(dev, PTR_ERR(keys->start_gpio),
++				     "failed to get mcu-start GPIO\n");
++
++	keys->select_gpio = devm_gpiod_get_optional(dev, "mcu-select", GPIOD_IN);
++	if (IS_ERR(keys->select_gpio))
++		return dev_err_probe(dev, PTR_ERR(keys->select_gpio),
++				     "failed to get mcu-select GPIO\n");
++
++	keys->mode_gpio = devm_gpiod_get_optional(dev, "mcu-mode", GPIOD_IN);
++	if (IS_ERR(keys->mode_gpio))
++		return dev_err_probe(dev, PTR_ERR(keys->mode_gpio),
++				     "failed to get mcu-mode GPIO\n");
++
++	keys->back_gpio = devm_gpiod_get_optional(dev, "mcu-back", GPIOD_IN);
++	if (IS_ERR(keys->back_gpio))
++		return dev_err_probe(dev, PTR_ERR(keys->back_gpio),
++				     "failed to get mcu-back GPIO\n");
++
++	if (!device_property_read_u32(dev, "mcu-frame-shift", &frame_shift)) {
++		if (frame_shift >= DPAD_PKT_LEN) {
++			dev_warn(dev, "frame-shift %u out of range, clamping\n",
++				 frame_shift);
++			frame_shift %= DPAD_PKT_LEN;
++		}
++		keys->frame_shift = frame_shift;
++	}
++
++	return 0;
++}
++
++#ifdef DPAD_GPIO_BTN
++static int dpad_gpio_irq_register(struct mcu_joystick *keys)
++{
++	struct uart_dpad *dpad = keys->dpad;
++	struct dpad_gpio_data *data = &keys->dpad->btn_data;
++	int ret;
++
++	if (!keys->start_gpio || !keys->select_gpio ||
++	    !keys->mode_gpio || !keys->back_gpio)
++		return 0;
++
++	data->start_gpio = keys->start_gpio;
++	data->select_gpio = keys->select_gpio;
++	data->mode_gpio = keys->mode_gpio;
++	data->back_gpio = keys->back_gpio;
++
++	data->select_irq = gpiod_to_irq(data->select_gpio);
++	ret = request_irq(data->select_irq, dpad_gpio_irq_handler,
++			  IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING | IRQF_ONESHOT,
++			  "mcu-select", dpad);
++	if (ret)
++		return ret;
++
++	data->start_irq = gpiod_to_irq(data->start_gpio);
++	ret = request_irq(data->start_irq, dpad_gpio_irq_handler,
++			  IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING | IRQF_ONESHOT,
++			  "mcu-start", dpad);
++	if (ret)
++		return ret;
++
++	data->mode_irq = gpiod_to_irq(data->mode_gpio);
++	ret = request_irq(data->mode_irq, dpad_gpio_irq_handler,
++			  IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING | IRQF_ONESHOT,
++			  "mcu-mode", dpad);
++	if (ret)
++		return ret;
++
++	data->back_irq = gpiod_to_irq(data->back_gpio);
++	ret = request_irq(data->back_irq, dpad_gpio_irq_handler,
++			  IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING | IRQF_ONESHOT,
++			  "mcu-back", dpad);
++	if (ret)
++		return ret;
++
++	keys->gpio_irq_enabled = true;
++	return 0;
++}
++
++static void dpad_gpio_irq_unregister(struct mcu_joystick *keys)
++{
++	struct dpad_gpio_data *data;
++
++	if (!keys->dpad)
++		return;
++
++	if (!keys->gpio_irq_enabled)
++		return;
++
++	data = &keys->dpad->btn_data;
++
++	free_irq(data->select_irq, keys->dpad);
++	free_irq(data->start_irq, keys->dpad);
++	free_irq(data->mode_irq, keys->dpad);
++	free_irq(data->back_irq, keys->dpad);
++
++	keys->gpio_irq_enabled = false;
++}
++#endif
++
++
++static size_t mcu_joystick_receive_buf(struct serdev_device *serdev,
++			      const u8 *data, size_t count)
++{
++	struct mcu_joystick *keys = serdev_device_get_drvdata(serdev);
++	size_t i;
++
++	if (!keys || mcu_isp_flag || !mcu_resum_flag)
++		return count;
++
++	for (i = 0; i < count; i++) {
++		u8 byte = data[i];
++
++		keys->raw_buf[keys->raw_head++] = byte;
++		if (keys->raw_head >= MCU_RAW_BUF_LEN) {
++			keys->raw_head = 0;
++			keys->raw_full = true;
++		}
++
++		keys->rx_buf[keys->rx_pos++] = byte;
++
++		if (keys->rx_pos == DPAD_PKT_LEN) {
++			mcu_rotate_frame(keys, keys->rx_buf, keys->last_pkt);
++			keys->last_pkt_seq++;
++			keys->last_pkt_valid = true;
++			mcu_report_uart_val(keys, keys->last_pkt, DPAD_PKT_LEN);
++			keys->rx_pos = 0;
++		}
++	}
++
++	return count;
++}
++
++static const struct serdev_device_ops mcu_joystick_serdev_ops = {
++	.receive_buf = mcu_joystick_receive_buf,
++	.write_wakeup = serdev_device_write_wakeup,
++};
++
++static int mcu_joystick_probe(struct serdev_device *serdev)
++{
++	struct device *dev = &serdev->dev;
++	struct mcu_joystick *keys;
++	unsigned int baud = 115200;
++	int err;
++
++	keys = devm_kzalloc(dev, sizeof(*keys), GFP_KERNEL);
++	if (!keys)
++		return -ENOMEM;
++
++	keys->dev = dev;
++	keys->serdev = serdev;
++	serdev_device_set_drvdata(serdev, keys);
++
++	if (device_property_read_u32(dev, "current-speed", &baud) && dev->parent)
++		device_property_read_u32(dev->parent, "current-speed", &baud);
++	keys->baud = baud;
++
++	keys->adc_key_code = devm_kcalloc(dev, 4, sizeof(uint32_t), GFP_KERNEL);
++	if (!keys->adc_key_code)
++		return -ENOMEM;
++
++	keys->adc_key_value = devm_kcalloc(dev, 4, sizeof(uint16_t), GFP_KERNEL);
++	if (!keys->adc_key_value)
++		return -ENOMEM;
++
++	mutex_init(&keys->notify_lock);
++
++	err = mcu_joystick_parse_dt(dev, keys);
++	if (err) {
++		dev_err(dev, "parse dts err\n");
++		return err;
++	}
++
++	serdev_device_set_client_ops(serdev, &mcu_joystick_serdev_ops);
++
++	err = devm_serdev_device_open(dev, serdev);
++	if (err)
++		return err;
++
++	err = serdev_device_set_parity(serdev, SERDEV_PARITY_NONE);
++	if (err)
++		return err;
++
++	serdev_device_set_flow_control(serdev, false);
++	serdev_device_set_baudrate(serdev, baud);
++
++	keys->screen_on = true;
++	err = dpad_connect(dev, &keys->dpad, mcuIdVendor, mcuIdProduct);
++	if (err)
++		return err;
++
++#ifdef DPAD_GPIO_BTN
++	err = dpad_gpio_irq_register(keys);
++	if (err)
++		goto err_disconnect;
++#endif
++
++	err = mcu_sysfs_create_group(dev);
++	if (err)
++		goto err_unregister_gpio;
++
++	mcu_debugfs_init(keys);
++
++	calibration_data_init(dev);
++
++	err = mcu_joystick_resume(dev);
++	if (err)
++		goto err_sysfs;
++
++	dev_info(dev, "mcu_joystick_probe ok\n");
++	return 0;
++
++err_sysfs:
++	mcu_debugfs_remove(keys);
++	mcu_sysfs_remove_group(dev);
++err_unregister_gpio:
++#ifdef DPAD_GPIO_BTN
++	dpad_gpio_irq_unregister(keys);
++#endif
++err_disconnect:
++	dpad_disconnect(&keys->dpad);
++	return err;
++}
++
++static void mcu_joystick_remove(struct serdev_device *serdev)
++{
++	struct mcu_joystick *keys = serdev_device_get_drvdata(serdev);
++
++	mcu_debugfs_remove(keys);
++	mcu_sysfs_remove_group(&serdev->dev);
++
++#ifdef DPAD_GPIO_BTN
++	dpad_gpio_irq_unregister(keys);
++#endif
++	dpad_disconnect(&keys->dpad);
++
++	mutex_destroy(&keys->notify_lock);
++}
++
++static const struct of_device_id mcu_joystick_of_match[] = {
++	{ .compatible = "uart,mcu_joystick" },
++	{}
++};
++MODULE_DEVICE_TABLE(of, mcu_joystick_of_match);
++
++static const struct dev_pm_ops mcu_joystick_pm_ops = {
++	.suspend = mcu_joystick_suspend,
++	.resume = mcu_joystick_resume,
++};
++
++static struct serdev_device_driver mcu_joystick_driver = {
++	.driver = {
++		.name = "mcu_joystick",
++		.of_match_table = mcu_joystick_of_match,
++		.pm = &mcu_joystick_pm_ops,
++	},
++	.probe = mcu_joystick_probe,
++	.remove = mcu_joystick_remove,
++};
++module_serdev_device_driver(mcu_joystick_driver);
++
++static int32_t map(int32_t x, int32_t in_min, int32_t in_max,
++		   int32_t out_min, int32_t out_max)
++{
++	if (x < in_min)
++		return out_min;
++	if (x > in_max)
++		return out_max;
++
++	return abs(x - in_min) * abs(out_max - out_min) /
++	       abs(in_max - in_min) + out_min;
++}
++
++static void trigger_map(unsigned char *data, struct device *dev)
++{
++	LTmcuValue = (data[14] << 8) | data[4];
++	RTmcuValue = (data[15] << 8) | data[5];
++
++	data[4] = (uint8_t)map(LTmcuValue, caliMcuLTValueMin,
++			      caliMcuLTValueMax, 0, UINT8_MAX);
++	data[5] = (uint8_t)map(RTmcuValue, caliMcuRTValueMin,
++			      caliMcuRTValueMax, 0, UINT8_MAX);
++
++	data[14] = 0;
++	data[15] = 0;
++}
++
++static void sticks_map(unsigned char *data, struct device *dev)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	int i;
++	int16_t xLeftStickValue, yLeftStickValue;
++	int16_t xRightStickValue, yRightStickValue;
++
++	if (!keys) {
++		pr_err("%s get joystick data failed\n", __func__);
++		return;
++	}
++
++	LXmcuValue = (data[7] << 8) | data[6];
++	LYmcuValue = (data[9] << 8) | data[8];
++	RXmcuValue = (data[11] << 8) | data[10];
++	RYmcuValue = (data[13] << 8) | data[12];
++
++	keys->adc_key_value[0] = LXmcuValue;
++	keys->adc_key_value[1] = LYmcuValue;
++	keys->adc_key_value[2] = RXmcuValue;
++	keys->adc_key_value[3] = RYmcuValue;
++
++	for (i = 0; i < 4; i++) {
++		keys->adc_key_value[i] =
++			get_linear_mapping(keys->adc_key_code[i],
++					   keys->adc_key_value[i]);
++		if (abs(keys->adc_key_value[i] -
++			 (get_define_max(keys->adc_key_code[i],
++					 keys->adc_key_value[i]) +
++			  get_define_min(keys->adc_key_code[i],
++					 keys->adc_key_value[i])) / 2) <=
++			get_calibration_offset(keys->adc_key_code[i])) {
++			keys->adc_key_value[i] =
++				(get_define_max(keys->adc_key_code[i],
++					       keys->adc_key_value[i]) +
++				 get_define_min(keys->adc_key_code[i],
++					       keys->adc_key_value[i])) / 2;
++		} else {
++			keys->adc_key_value[i] =
++				get_Dead_Zone_mapping(keys->adc_key_code[i],
++						      keys->adc_key_value[i]);
++		}
++
++		if (keys->adc_key_value[i] <
++		    get_define_min(keys->adc_key_code[i],
++				   keys->adc_key_value[i]))
++			keys->adc_key_value[i] =
++				get_define_min(keys->adc_key_code[i],
++					       keys->adc_key_value[i]);
++		else if (keys->adc_key_value[i] >=
++			 get_define_max(keys->adc_key_code[i],
++					 keys->adc_key_value[i]))
++			keys->adc_key_value[i] =
++				get_define_max(keys->adc_key_code[i],
++					       keys->adc_key_value[i]);
++	}
++
++	xLeftStickValue = (int16_t)map(keys->adc_key_value[0],
++			     caliLXmcuValueMin, caliLXmcuValueMax,
++			     INT16_MIN, INT16_MAX);
++	yLeftStickValue = (int16_t)map(keys->adc_key_value[1],
++			     caliLYmcuValueMin, caliLYmcuValueMax,
++			     INT16_MIN, INT16_MAX);
++	xRightStickValue = (int16_t)map(keys->adc_key_value[2],
++			      caliRXmcuValueMin, caliRXmcuValueMax,
++			      INT16_MIN, INT16_MAX);
++	yRightStickValue = (int16_t)map(keys->adc_key_value[3],
++			      caliRYmcuValueMin, caliRYmcuValueMax,
++			      INT16_MIN, INT16_MAX);
++
++	data[6] = xLeftStickValue & 0xff;
++	data[7] = xLeftStickValue >> 8;
++	data[8] = yLeftStickValue & 0xff;
++	data[9] = yLeftStickValue >> 8;
++	data[10] = xRightStickValue & 0xff;
++	data[11] = xRightStickValue >> 8;
++	data[12] = yRightStickValue & 0xff;
++	data[13] = yRightStickValue >> 8;
++}
++
++static void calibration_data_init(struct device *dev)
++{
++	cali_keys = dev_get_drvdata(dev);
++
++	cali_keys->adc_key_code[0] = ADC_X;
++	cali_keys->adc_key_code[1] = ADC_Y;
++	cali_keys->adc_key_code[2] = ADC_Z;
++	cali_keys->adc_key_code[3] = ADC_RZ;
++
++	cali_keys->calibration_data.X_cali_max = caliLXmcuValueMax;
++	cali_keys->calibration_data.X_cali_min = caliLXmcuValueMin;
++	cali_keys->calibration_data.X_cali_center =
++		(cali_keys->calibration_data.X_cali_max +
++		 cali_keys->calibration_data.X_cali_min) / 2;
++	cali_keys->calibration_data.X_offset = 150;
++
++	cali_keys->linear_data.x_b = 1000;
++	cali_keys->linear_data.x_a = 0;
++
++	cali_keys->calibration_data.Y_cali_max = caliLYmcuValueMax;
++	cali_keys->calibration_data.Y_cali_min = caliLYmcuValueMin;
++	cali_keys->calibration_data.Y_cali_center =
++		(cali_keys->calibration_data.Y_cali_max +
++		 cali_keys->calibration_data.Y_cali_min) / 2;
++	cali_keys->calibration_data.Y_offset = 150;
++
++	cali_keys->linear_data.y_b = 1000;
++	cali_keys->linear_data.y_a = 0;
++
++	cali_keys->calibration_data.Z_cali_max = caliRXmcuValueMax;
++	cali_keys->calibration_data.Z_cali_min = caliRXmcuValueMin;
++	cali_keys->calibration_data.Z_cali_center =
++		(cali_keys->calibration_data.Z_cali_max +
++		 cali_keys->calibration_data.Z_cali_min) / 2;
++	cali_keys->calibration_data.Z_offset = 150;
++
++	cali_keys->linear_data.z_b = 1000;
++	cali_keys->linear_data.z_a = 0;
++
++	cali_keys->calibration_data.RZ_cali_max = caliRYmcuValueMax;
++	cali_keys->calibration_data.RZ_cali_min = caliRYmcuValueMin;
++	cali_keys->calibration_data.RZ_cali_center =
++		(cali_keys->calibration_data.RZ_cali_max +
++		 cali_keys->calibration_data.RZ_cali_min) / 2;
++	cali_keys->calibration_data.RZ_offset = 150;
++
++	cali_keys->linear_data.rz_b = 1000;
++	cali_keys->linear_data.rz_a = 0;
++}
++
++static int get_define_min(int code, int value)
++{
++	switch (code) {
++	case ADC_X:
++		return value = caliLXmcuValueMin;
++	case ADC_Y:
++		return value = caliLYmcuValueMin;
++	case ADC_Z:
++		return value = caliRXmcuValueMin;
++	case ADC_RZ:
++		return value = caliRYmcuValueMin;
++	default:
++		return 0;
++	}
++}
++
++static int get_define_max(int code, int value)
++{
++	switch (code) {
++	case ADC_X:
++		return value = caliLXmcuValueMax;
++	case ADC_Y:
++		return value = caliLYmcuValueMax;
++	case ADC_Z:
++		return value = caliRXmcuValueMax;
++	case ADC_RZ:
++		return value = caliRYmcuValueMax;
++	default:
++		return 0;
++	}
++}
++
++static int get_linear_mapping(int code, int value)
++{
++	switch (code) {
++	case ADC_X:
++		return value = cali_keys->linear_data.x_a +
++			(value * cali_keys->linear_data.x_b) / 1000;
++	case ADC_Y:
++		value = cali_keys->linear_data.y_a +
++			(value * cali_keys->linear_data.y_b) / 1000;
++		return value = caliLYmcuValueMax + caliLYmcuValueMin - value;
++	case ADC_Z:
++		return value = cali_keys->linear_data.z_a +
++			(value * cali_keys->linear_data.z_b) / 1000;
++	case ADC_RZ:
++		value = cali_keys->linear_data.rz_a +
++			(value * cali_keys->linear_data.rz_b) / 1000;
++		return value = caliRYmcuValueMax + caliRYmcuValueMin - value;
++	default:
++		return 0;
++	}
++}
++
++static int get_Dead_Zone_mapping(int code, int value)
++{
++	int center_cail = 0, center_acturl = 0;
++
++	center_cail = (caliLXmcuValueMax + caliLXmcuValueMin) / 2;
++	switch (code) {
++	case ADC_X:
++		if (value < (center_cail - cali_keys->calibration_data.X_offset)) {
++			center_acturl = center_cail -
++				cali_keys->calibration_data.X_offset;
++			cali_keys->linear_data.x_b_min =
++				((center_cail - caliLXmcuValueMin) * 1000 /
++				 (center_acturl - caliLXmcuValueMin));
++			cali_keys->linear_data.x_a_min = caliLXmcuValueMin -
++				(caliLXmcuValueMin * cali_keys->linear_data.x_b_min) /
++				1000;
++			return value = cali_keys->linear_data.x_a_min +
++				(value * cali_keys->linear_data.x_b_min) / 1000;
++		} else if (value > (center_cail +
++			   cali_keys->calibration_data.X_offset)) {
++			center_acturl = center_cail +
++				cali_keys->calibration_data.X_offset;
++			cali_keys->linear_data.x_b_max =
++				((caliLXmcuValueMax - center_cail) * 1000 /
++				 (caliLXmcuValueMax - center_acturl));
++			cali_keys->linear_data.x_a_max = caliLXmcuValueMax -
++				(caliLXmcuValueMax * cali_keys->linear_data.x_b_max) /
++				1000;
++			return value = cali_keys->linear_data.x_a_max +
++				(value * cali_keys->linear_data.x_b_max) / 1000;
++		}
++		break;
++	case ADC_Y:
++		if (value < (center_cail - cali_keys->calibration_data.Y_offset)) {
++			center_acturl = center_cail -
++				cali_keys->calibration_data.Y_offset;
++			cali_keys->linear_data.y_b_min =
++				((center_cail - caliLYmcuValueMin) * 1000 /
++				 (center_acturl - caliLYmcuValueMin));
++			cali_keys->linear_data.y_a_min = caliLYmcuValueMin -
++				(caliLYmcuValueMin * cali_keys->linear_data.y_b_min) /
++				1000;
++			return value = cali_keys->linear_data.y_a_min +
++				(value * cali_keys->linear_data.y_b_min) / 1000;
++		} else if (value > (center_cail +
++			   cali_keys->calibration_data.Y_offset)) {
++			center_acturl = center_cail +
++				cali_keys->calibration_data.Y_offset;
++			cali_keys->linear_data.y_b_max =
++				((caliLYmcuValueMax - center_cail) * 1000 /
++				 (caliLYmcuValueMax - center_acturl));
++			cali_keys->linear_data.y_a_max = caliLYmcuValueMax -
++				(caliLYmcuValueMax * cali_keys->linear_data.y_b_max) /
++				1000;
++			return value = cali_keys->linear_data.y_a_max +
++				(value * cali_keys->linear_data.y_b_max) / 1000;
++		}
++		break;
++	case ADC_Z:
++		if (value < (center_cail - cali_keys->calibration_data.Z_offset)) {
++			center_acturl = center_cail -
++				cali_keys->calibration_data.Z_offset;
++			cali_keys->linear_data.z_b_min =
++				((center_cail - caliRXmcuValueMin) * 1000 /
++				 (center_acturl - caliRXmcuValueMin));
++			cali_keys->linear_data.z_a_min = caliRXmcuValueMin -
++				(caliRXmcuValueMin * cali_keys->linear_data.z_b_min) /
++				1000;
++			return value = cali_keys->linear_data.z_a_min +
++				(value * cali_keys->linear_data.z_b_min) / 1000;
++		} else if (value > (center_cail +
++			   cali_keys->calibration_data.Z_offset)) {
++			center_acturl = center_cail +
++				cali_keys->calibration_data.Z_offset;
++			cali_keys->linear_data.z_b_max =
++				((caliRXmcuValueMax - center_cail) * 1000 /
++				 (caliRXmcuValueMax - center_acturl));
++			cali_keys->linear_data.z_a_max = caliRXmcuValueMax -
++				(caliRXmcuValueMax * cali_keys->linear_data.z_b_max) /
++				1000;
++			return value = cali_keys->linear_data.z_a_max +
++				(value * cali_keys->linear_data.z_b_max) / 1000;
++		}
++		break;
++	case ADC_RZ:
++		if (value < (center_cail - cali_keys->calibration_data.RZ_offset)) {
++			center_acturl = center_cail -
++				cali_keys->calibration_data.RZ_offset;
++			cali_keys->linear_data.rz_b_min =
++				((center_cail - caliRYmcuValueMin) * 1000 /
++				 (center_acturl - caliRYmcuValueMin));
++			cali_keys->linear_data.rz_a_min = caliRYmcuValueMin -
++				(caliRYmcuValueMin * cali_keys->linear_data.rz_b_min) /
++				1000;
++			return value = cali_keys->linear_data.rz_a_min +
++				(value * cali_keys->linear_data.rz_b_min) / 1000;
++		} else if (value > (center_cail +
++			   cali_keys->calibration_data.RZ_offset)) {
++			center_acturl = center_cail +
++				cali_keys->calibration_data.RZ_offset;
++			cali_keys->linear_data.rz_b_max =
++				((caliRYmcuValueMax - center_cail) * 1000 /
++				 (caliRYmcuValueMax - center_acturl));
++			cali_keys->linear_data.rz_a_max = caliRYmcuValueMax -
++				(caliRYmcuValueMax * cali_keys->linear_data.rz_b_max) /
++				1000;
++			return value = cali_keys->linear_data.rz_a_max +
++				(value * cali_keys->linear_data.rz_b_max) / 1000;
++		}
++		break;
++	default:
++		return 0;
++	}
++
++	return 0;
++}
++
++static int get_calibration_offset(int code)
++{
++	switch (code) {
++	case ADC_X:
++		return cali_keys->calibration_data.X_offset;
++	case ADC_Y:
++		return cali_keys->calibration_data.Y_offset;
++	case ADC_Z:
++		return cali_keys->calibration_data.Z_offset;
++	case ADC_RZ:
++		return cali_keys->calibration_data.RZ_offset;
++	default:
++		return 0;
++	}
++}
++
++static const struct dpad_device {
++	u16 idVendor;
++	u16 idProduct;
++	char *name;
++} dpad_device[] = {
++	{ 0x4001, 0x0428, "AIR X Controller" },
++	{ 0x0000, 0x0000, "Generic X-Box pad" }
++};
++
++static const signed short dpad_common_btn[] = {
++	BTN_A, BTN_B, BTN_X, BTN_Y,
++	BTN_START, BTN_SELECT, BTN_THUMBL, BTN_THUMBR,
++	KEY_BACK,
++	-1
++};
++
++static const signed short dpad_btn[] = {
++	BTN_TL, BTN_TR,
++	BTN_MODE,
++	-1
++};
++
++static const signed short dpad_abs[] = {
++	ABS_X, ABS_Y,
++	ABS_Z, ABS_RZ,
++	-1
++};
++
++static const signed short dpad_abs_pad[] = {
++	ABS_HAT0X, ABS_HAT0Y,
++	-1
++};
++
++static const signed short dpad_abs_triggers[] = {
++	ABS_GAS, ABS_BRAKE,
++	-1
++};
++
++static int dpad_init_input(struct uart_dpad *dpad, uint16_t idVendor,
++			   uint16_t idProduct);
++static void dpad_deinit_input(struct uart_dpad *dpad);
++
++static void dpad_process_packet(struct uart_dpad *dpad, struct input_dev *dev,
++				unsigned char *data)
++{
++	if (data[0] != 0x00)
++		return;
++
++	input_report_abs(dev, ABS_HAT0X,
++			 !!(data[2] & 0x08) - !!(data[2] & 0x04));
++	input_report_abs(dev, ABS_HAT0Y,
++			 !!(data[2] & 0x02) - !!(data[2] & 0x01));
++
++#ifndef DPAD_GPIO_BTN
++	input_report_key(dev, BTN_START, data[2] & 0x10);
++	input_report_key(dev, BTN_SELECT, data[2] & 0x20);
++#endif
++	input_report_key(dev, BTN_THUMBL, data[2] & 0x40);
++	input_report_key(dev, BTN_THUMBR, data[2] & 0x80);
++
++	input_report_key(dev, BTN_A, data[3] & 0x10);
++	input_report_key(dev, BTN_B, data[3] & 0x20);
++	input_report_key(dev, BTN_X, data[3] & 0x40);
++	input_report_key(dev, BTN_Y, data[3] & 0x80);
++	input_report_key(dev, BTN_TL, data[3] & 0x01);
++	input_report_key(dev, BTN_TR, data[3] & 0x02);
++#ifndef DPAD_GPIO_BTN
++	input_report_key(dev, BTN_MODE, data[3] & 0x04);
++#endif
++
++	mutex_lock(&dpad->report_lock);
++	input_report_abs(dev, ABS_X,
++			 (__s16)le16_to_cpup((__le16 *)(data + 6)));
++	input_report_abs(dev, ABS_Y,
++			 (__s16)le16_to_cpup((__le16 *)(data + 8)));
++
++	input_report_abs(dev, ABS_Z,
++			 (__s16)le16_to_cpup((__le16 *)(data + 10)));
++	input_report_abs(dev, ABS_RZ,
++			 (__s16)le16_to_cpup((__le16 *)(data + 12)));
++
++	input_report_abs(dev, ABS_BRAKE, data[4]);
++	input_report_abs(dev, ABS_GAS, data[5]);
++
++	mutex_unlock(&dpad->report_lock);
++	input_sync(dev);
++}
++
++#ifdef DPAD_GPIO_BTN
++static irqreturn_t dpad_gpio_irq_handler(int irq, void *data)
++{
++	struct uart_dpad *dpad = data;
++	struct dpad_gpio_data *btn_data = &dpad->btn_data;
++	int value;
++
++	if (irq == btn_data->start_irq) {
++		value = gpiod_get_value(btn_data->start_gpio);
++		input_report_key(dpad->input_dev, BTN_START, value);
++		input_sync(dpad->input_dev);
++	} else if (irq == btn_data->select_irq) {
++		value = gpiod_get_value(btn_data->select_gpio);
++		input_report_key(dpad->input_dev, BTN_SELECT, value);
++		input_sync(dpad->input_dev);
++	} else if (irq == btn_data->mode_irq) {
++		value = gpiod_get_value(btn_data->mode_gpio);
++		input_report_key(dpad->input_dev, BTN_MODE, value);
++		input_sync(dpad->input_dev);
++	} else if (irq == btn_data->back_irq) {
++		value = gpiod_get_value(btn_data->back_gpio);
++		input_report_key(dpad->input_dev, KEY_BACK, value);
++		input_sync(dpad->input_dev);
++	}
++
++	return IRQ_HANDLED;
++}
++#endif
++
++static int dpad_start_input(struct uart_dpad *dpad) { return 0; }
++static void dpad_stop_input(struct uart_dpad *dpad) { }
++
++static int dpad_open(struct input_dev *dev)
++{
++	struct uart_dpad *dpad = input_get_drvdata(dev);
++
++	return dpad_start_input(dpad);
++}
++
++static void dpad_close(struct input_dev *dev)
++{
++	struct uart_dpad *dpad = input_get_drvdata(dev);
++
++	dpad_stop_input(dpad);
++}
++
++static void dpad_set_up_abs(struct input_dev *input_dev, signed short abs)
++{
++	switch (abs) {
++	case ABS_X:
++	case ABS_Y:
++	case ABS_Z:
++	case ABS_RZ:
++		input_set_abs_params(input_dev, abs, -32768, 32767, 64, 256);
++		break;
++	case ABS_GAS:
++	case ABS_BRAKE:
++		input_set_abs_params(input_dev, abs, 0, 255, 4, 8);
++		break;
++	case ABS_HAT0X:
++	case ABS_HAT0Y:
++		input_set_abs_params(input_dev, abs, -1, 1, 0, 0);
++		break;
++	default:
++		input_set_abs_params(input_dev, abs, 0, 0, 0, 0);
++		break;
++	}
++}
++
++static void dpad_deinit_input(struct uart_dpad *dpad)
++{
++	if (!dpad->input_created)
++		return;
++
++	input_unregister_device(dpad->input_dev);
++	input_free_device(dpad->input_dev);
++
++	dpad->input_dev = NULL;
++	dpad->input_created = false;
++	mutex_destroy(&dpad->report_lock);
++}
++
++static int dpad_init_input(struct uart_dpad *dpad, uint16_t idVendor,
++			   uint16_t idProduct)
++{
++	struct input_dev *input_dev;
++	int i, error;
++
++	if (dpad->input_created)
++		return 0;
++
++	input_dev = devm_input_allocate_device(dpad->dev);
++	if (!input_dev)
++		return -ENOMEM;
++
++	dpad->input_dev = input_dev;
++	input_dev->name = dpad->name;
++	input_dev->phys = dpad->phys;
++	input_dev->dev.parent = dpad->dev;
++
++	input_dev->id.bustype = BUS_USB;
++	input_dev->id.vendor = idVendor;
++	input_dev->id.product = idProduct;
++	input_dev->id.version = 0x0100;
++
++	input_set_drvdata(input_dev, dpad);
++
++	input_dev->open = dpad_open;
++	input_dev->close = dpad_close;
++
++	mutex_init(&dpad->report_lock);
++	for (i = 0; dpad_abs[i] >= 0; i++)
++		dpad_set_up_abs(input_dev, dpad_abs[i]);
++
++	for (i = 0; dpad_common_btn[i] >= 0; i++)
++		input_set_capability(input_dev, EV_KEY, dpad_common_btn[i]);
++
++	for (i = 0; dpad_btn[i] >= 0; i++)
++		input_set_capability(input_dev, EV_KEY, dpad_btn[i]);
++
++	for (i = 0; dpad_abs_pad[i] >= 0; i++)
++		dpad_set_up_abs(input_dev, dpad_abs_pad[i]);
++
++	for (i = 0; dpad_abs_triggers[i] >= 0; i++)
++		dpad_set_up_abs(input_dev, dpad_abs_triggers[i]);
++
++	error = input_register_device(dpad->input_dev);
++	if (error)
++		goto err;
++
++	dpad->input_created = true;
++	return 0;
++
++err:
++	input_free_device(input_dev);
++	return error;
++}
++
++static int dpad_connect(struct device *dev, struct uart_dpad **dpad_input,
++			uint16_t idVendor, uint16_t idProduct)
++{
++	int i, error;
++	struct uart_dpad *dpad;
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	if (!keys) {
++		dev_err(dev, "get mcu_joystick data fail\n");
++		return -EINVAL;
++	}
++
++	if (*dpad_input) {
++		dpad_deinit_input(*dpad_input);
++		kfree(*dpad_input);
++		*dpad_input = NULL;
++	}
++
++	dpad = kzalloc(sizeof(*dpad), GFP_KERNEL);
++	if (!dpad)
++		return -ENOMEM;
++
++	*dpad_input = dpad;
++	dpad->dev = dev;
++	for (i = 0; dpad_device[i].idVendor != 0x0000; i++) {
++		if ((idVendor == dpad_device[i].idVendor) &&
++		    (idProduct == dpad_device[i].idProduct)) {
++			keys->joystick_name[0] = '\0';
++			strscpy(keys->joystick_name, dpad_device[i].name,
++				sizeof(keys->joystick_name));
++			dpad->name = keys->joystick_name;
++			break;
++		}
++	}
++
++	if (dpad->name == NULL)
++		dpad->name = dpad_device[i].name;
++
++	snprintf(dpad->phys, sizeof(dpad->phys), "input/%s", dpad->name);
++
++	error = dpad_init_input(dpad, idVendor, idProduct);
++	if (error) {
++		dev_err(dev, "dpad_init_input failed\n");
++		kfree(dpad);
++		*dpad_input = NULL;
++		return error;
++	}
++
++	return 0;
++}
++
++static void dpad_disconnect(struct uart_dpad **dpad)
++{
++	if (!dpad || !*dpad)
++		return;
++
++	dpad_deinit_input(*dpad);
++
++	kfree(*dpad);
++	*dpad = NULL;
++}
++
++static ssize_t mcu_joystick_boot_show(struct device *dev,
++				      struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	int boot0 = 0;
++	int boot1 = 0;
++
++	if (keys->boot0_gpio)
++		boot0 = gpiod_get_raw_value_cansleep(keys->boot0_gpio);
++	if (keys->boot1_gpio)
++		boot1 = gpiod_get_raw_value_cansleep(keys->boot1_gpio);
++
++	if ((boot1 == 1 && boot0 == 1) || (boot1 == 0 && boot0 == 1)) {
++		len += snprintf(buf + len, PAGE_SIZE - len,
++				"boot_set =0 main flash mode\n");
++	} else if (boot1 == 1 && boot0 == 0) {
++		len += snprintf(buf + len, PAGE_SIZE - len,
++				"boot_set =1 ISP mode\n");
++	} else if (boot1 == 0 && boot0 == 0) {
++		len += snprintf(buf + len, PAGE_SIZE - len, "boot_set =2\n");
++	} else {
++		len += snprintf(buf + len, PAGE_SIZE - len, "mode err\n");
++	}
++
++	return len;
++}
++
++static ssize_t mcu_joystick_boot_store(struct device *dev,
++				       struct device_attribute *attr,
++				       const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	unsigned int data;
++
++	sscanf(buf, "%d", &data);
++	switch (data) {
++	case 0:
++		if (keys->stick_en_gpio)
++			gpiod_set_raw_value_cansleep(keys->stick_en_gpio, 1);
++		if (keys->boot0_gpio)
++			gpiod_set_raw_value_cansleep(keys->boot0_gpio, 1);
++		if (keys->boot1_gpio)
++			gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
++		mcu_isp_flag = false;
++		break;
++	case 1:
++		if (keys->power_gpio)
++			gpiod_set_raw_value_cansleep(keys->power_gpio, 0);
++		usleep_range(10000, 11000);
++		if (keys->power_gpio)
++			gpiod_set_raw_value_cansleep(keys->power_gpio, 1);
++		usleep_range(10000, 11000);
++		if (keys->boot0_gpio)
++			gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
++		if (keys->boot1_gpio)
++			gpiod_set_raw_value_cansleep(keys->boot1_gpio, 1);
++		mcu_isp_flag = true;
++		break;
++	case 2:
++		if (keys->boot0_gpio)
++			gpiod_set_raw_value_cansleep(keys->boot0_gpio, 0);
++		if (keys->boot1_gpio)
++			gpiod_set_raw_value_cansleep(keys->boot1_gpio, 0);
++		mcu_isp_flag = true;
++		break;
++	default:
++		break;
++	}
++
++	if (keys->reset_gpio) {
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 1);
++		usleep_range(5000, 5100);
++		gpiod_set_raw_value_cansleep(keys->reset_gpio, 0);
++	}
++
++	return count;
++}
++static DEVICE_ATTR(boot_set, 0664, mcu_joystick_boot_show,
++		   mcu_joystick_boot_store);
++
++static int mcu_stick_val_show(struct seq_file *s, void *data)
++{
++	seq_printf(s, "%d %d %d %d\n",
++		   LXmcuValue, LYmcuValue, RXmcuValue, RYmcuValue);
++	return 0;
++}
++
++static int mcu_stick_val_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_stick_val_show, inode->i_private);
++}
++
++static const struct file_operations mcu_stick_val_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_stick_val_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_trigger_val_show(struct seq_file *s, void *data)
++{
++	seq_printf(s, "LT=%d RT=%d\n", LTmcuValue, RTmcuValue);
++	return 0;
++}
++
++static int mcu_trigger_val_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_trigger_val_show, inode->i_private);
++}
++
++static const struct file_operations mcu_trigger_val_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_trigger_val_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_gpio_status_show(struct seq_file *s, void *data)
++{
++	struct mcu_joystick *keys = s->private;
++	int boot0 = -1, boot1 = -1, reset = -1, power = -1, stick = -1;
++	int start = -1, select = -1, mode = -1, back = -1;
++
++	if (keys->boot0_gpio)
++		boot0 = gpiod_get_raw_value_cansleep(keys->boot0_gpio);
++	if (keys->boot1_gpio)
++		boot1 = gpiod_get_raw_value_cansleep(keys->boot1_gpio);
++	if (keys->reset_gpio)
++		reset = gpiod_get_raw_value_cansleep(keys->reset_gpio);
++	if (keys->power_gpio)
++		power = gpiod_get_raw_value_cansleep(keys->power_gpio);
++	if (keys->stick_en_gpio)
++		stick = gpiod_get_raw_value_cansleep(keys->stick_en_gpio);
++
++	if (keys->start_gpio)
++		start = gpiod_get_value_cansleep(keys->start_gpio);
++	if (keys->select_gpio)
++		select = gpiod_get_value_cansleep(keys->select_gpio);
++	if (keys->mode_gpio)
++		mode = gpiod_get_value_cansleep(keys->mode_gpio);
++	if (keys->back_gpio)
++		back = gpiod_get_value_cansleep(keys->back_gpio);
++
++	seq_printf(s,
++		   "boot0=%d boot1=%d reset=%d power=%d stick_en=%d start=%d select=%d mode=%d back=%d\n",
++		   boot0, boot1, reset, power, stick, start, select, mode, back);
++	return 0;
++}
++
++static int mcu_gpio_status_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_gpio_status_show, inode->i_private);
++}
++
++static const struct file_operations mcu_gpio_status_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_gpio_status_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_pkt_show(struct seq_file *s, void *data)
++{
++	struct mcu_joystick *keys = s->private;
++
++	if (!keys->last_pkt_valid) {
++		seq_puts(s, "no data\n");
++		return 0;
++	}
++
++	seq_printf(s, "seq=%u %*ph\n",
++		   keys->last_pkt_seq, DPAD_PKT_LEN, keys->last_pkt);
++	return 0;
++}
++
++static int mcu_pkt_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_pkt_show, inode->i_private);
++}
++
++static const struct file_operations mcu_pkt_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_pkt_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_raw_show(struct seq_file *s, void *data)
++{
++	struct mcu_joystick *keys = s->private;
++	int head;
++	int first;
++
++	if (!keys->raw_full && keys->raw_head == 0) {
++		seq_puts(s, "no data\n");
++		return 0;
++	}
++
++	if (!keys->raw_full) {
++		seq_printf(s, "%*ph\n", (int)keys->raw_head, keys->raw_buf);
++		return 0;
++	}
++
++	head = keys->raw_head;
++	if (head == 0) {
++		seq_printf(s, "%*ph\n", MCU_RAW_BUF_LEN, keys->raw_buf);
++		return 0;
++	}
++
++	first = MCU_RAW_BUF_LEN - head;
++	seq_printf(s, "%*ph ", first, keys->raw_buf + head);
++	seq_printf(s, "%*ph\n", head, keys->raw_buf);
++	return 0;
++}
++
++static int mcu_raw_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_raw_show, inode->i_private);
++}
++
++static const struct file_operations mcu_raw_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_raw_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int mcu_ids_show(struct seq_file *s, void *data)
++{
++	struct mcu_joystick *keys = s->private;
++	int i;
++
++	for (i = 0; i < MCU_ID_COUNT; i++) {
++		if (!keys->id_seen[i])
++			continue;
++
++		seq_printf(s,
++			   "id=0x%02x flags=0x%02x val=0x%04x seen=%u\n",
++			   i, keys->id_flags[i], keys->id_val[i],
++			   keys->id_seen[i]);
++	}
++
++	return 0;
++}
++
++static int mcu_ids_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, mcu_ids_show, inode->i_private);
++}
++
++static const struct file_operations mcu_ids_fops = {
++	.owner = THIS_MODULE,
++	.open = mcu_ids_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static ssize_t mcu_joystick_cali_enable_show(struct device *dev,
++				    struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return sprintf(buf, "%d\n", keys->cali_enable);
++}
++
++static ssize_t mcu_joystick_cali_enable_store(struct device *dev,
++				     struct device_attribute *attr,
++				     const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	unsigned int data;
++
++	sscanf(buf, "%d", &data);
++	keys->cali_enable = data;
++
++	return count;
++}
++
++static DEVICE_ATTR(cali_enable, 0664, mcu_joystick_cali_enable_show,
++		   mcu_joystick_cali_enable_store);
++
++static ssize_t mcu_joystick_R_Z_cali_store(struct device *dev,
++					   struct device_attribute *attr,
++					   const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	unsigned int databuf[3] = { 0, 0, 0 };
++
++	if (sscanf(buf, "%d %d %d", &databuf[0], &databuf[1],
++		   &databuf[2]) == 3) {
++		keys->calibration_data.Z_cali_min = databuf[0];
++		keys->calibration_data.Z_cali_max = databuf[1];
++		keys->calibration_data.Z_cali_center = databuf[2];
++	}
++
++	keys->linear_data.z_b = ((caliRXmcuValueMax - caliRXmcuValueMin) * 1000 /
++		(keys->calibration_data.Z_cali_max -
++		 keys->calibration_data.Z_cali_min));
++	keys->linear_data.z_a = caliRXmcuValueMax -
++		(keys->calibration_data.Z_cali_max * keys->linear_data.z_b) /
++		1000;
++
++	return count;
++}
++
++static ssize_t mcu_joystick_R_Z_cali_show(struct device *dev,
++					  struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d %d %d \n",
++			keys->calibration_data.Z_cali_min,
++			keys->calibration_data.Z_cali_max,
++			keys->calibration_data.Z_cali_center);
++}
++
++static DEVICE_ATTR(joystick_R_Z_cali, 0664,
++		   mcu_joystick_R_Z_cali_show, mcu_joystick_R_Z_cali_store);
++
++static ssize_t mcu_joystick_R_RZ_cali_store(struct device *dev,
++					    struct device_attribute *attr,
++					    const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	unsigned int databuf[3] = { 0, 0, 0 };
++
++	if (sscanf(buf, "%d %d %d", &databuf[0], &databuf[1],
++		   &databuf[2]) == 3) {
++		keys->calibration_data.RZ_cali_min = databuf[0];
++		keys->calibration_data.RZ_cali_max = databuf[1];
++		keys->calibration_data.RZ_cali_center = databuf[2];
++	}
++
++	keys->linear_data.rz_b = ((caliRYmcuValueMax - caliRYmcuValueMin) * 1000 /
++		(keys->calibration_data.RZ_cali_max -
++		 keys->calibration_data.RZ_cali_min));
++	keys->linear_data.rz_a = caliRYmcuValueMax -
++		(keys->calibration_data.RZ_cali_max * keys->linear_data.rz_b) /
++		1000;
++
++	return count;
++}
++
++static ssize_t mcu_joystick_R_RZ_cali_show(struct device *dev,
++					   struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d %d %d \n",
++			keys->calibration_data.RZ_cali_min,
++			keys->calibration_data.RZ_cali_max,
++			keys->calibration_data.RZ_cali_center);
++}
++static DEVICE_ATTR(joystick_R_RZ_cali, 0664,
++		   mcu_joystick_R_RZ_cali_show, mcu_joystick_R_RZ_cali_store);
++
++static ssize_t mcu_joystick_L_X_cali_store(struct device *dev,
++					   struct device_attribute *attr,
++					   const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	unsigned int databuf[3] = { 0, 0, 0 };
++
++	if (sscanf(buf, "%d %d %d", &databuf[0], &databuf[1],
++		   &databuf[2]) == 3) {
++		keys->calibration_data.X_cali_min = databuf[0];
++		keys->calibration_data.X_cali_max = databuf[1];
++		keys->calibration_data.X_cali_center = databuf[2];
++	}
++
++	keys->linear_data.x_b = ((caliLXmcuValueMax - caliLXmcuValueMin) * 1000 /
++		(keys->calibration_data.X_cali_max -
++		 keys->calibration_data.X_cali_min));
++	keys->linear_data.x_a = caliLXmcuValueMax -
++		(keys->calibration_data.X_cali_max * keys->linear_data.x_b) /
++		1000;
++
++	return count;
++}
++
++static ssize_t mcu_joystick_L_X_cali_show(struct device *dev,
++					  struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d %d %d %d\n",
++			keys->calibration_data.X_cali_min,
++			keys->calibration_data.X_cali_max,
++			keys->calibration_data.X_cali_center,
++			keys->calibration_data.X_offset);
++}
++
++static DEVICE_ATTR(joystick_L_X_cali, 0664,
++		   mcu_joystick_L_X_cali_show, mcu_joystick_L_X_cali_store);
++
++static ssize_t mcu_joystick_L_Y_cali_store(struct device *dev,
++					   struct device_attribute *attr,
++					   const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	unsigned int databuf[3] = { 0, 0, 0 };
++
++	if (sscanf(buf, "%d %d %d", &databuf[0], &databuf[1],
++		   &databuf[2]) == 3) {
++		keys->calibration_data.Y_cali_min = databuf[0];
++		keys->calibration_data.Y_cali_max = databuf[1];
++		keys->calibration_data.Y_cali_center = databuf[2];
++	}
++
++	keys->linear_data.y_b = ((caliLYmcuValueMax - caliLYmcuValueMin) * 1000 /
++		(keys->calibration_data.Y_cali_max -
++		 keys->calibration_data.Y_cali_min));
++	keys->linear_data.y_a = caliLYmcuValueMax -
++		(keys->calibration_data.Y_cali_max * keys->linear_data.y_b) /
++		1000;
++
++	return count;
++}
++
++static ssize_t mcu_joystick_L_Y_cali_show(struct device *dev,
++					  struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d %d %d \n",
++			keys->calibration_data.Y_cali_min,
++			keys->calibration_data.Y_cali_max,
++			keys->calibration_data.Y_cali_center);
++}
++static DEVICE_ATTR(joystick_L_Y_cali, 0664,
++		   mcu_joystick_L_Y_cali_show, mcu_joystick_L_Y_cali_store);
++
++static ssize_t joystick_L_offset_store(struct device *dev,
++				       struct device_attribute *attr,
++				       const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	int databuf[2] = { 0, 0 };
++
++	if (sscanf(buf, "%d %d", &databuf[0], &databuf[1]) == 2) {
++		keys->calibration_data.X_offset = (databuf[0] * 150) / 100;
++		keys->calibration_data.Y_offset = (databuf[1] * 150) / 100;
++	}
++
++	return count;
++}
++
++static ssize_t joystick_L_offset_show(struct device *dev,
++				      struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d %d\n",
++			keys->calibration_data.X_offset,
++			keys->calibration_data.Y_offset);
++}
++static DEVICE_ATTR(joystick_L_offset, 0664,
++		   joystick_L_offset_show, joystick_L_offset_store);
++
++static ssize_t joystick_R_offset_store(struct device *dev,
++				       struct device_attribute *attr,
++				       const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++	int databuf[2] = { 0, 0 };
++
++	if (sscanf(buf, "%d %d", &databuf[0], &databuf[1]) == 2) {
++		keys->calibration_data.Z_offset = (databuf[0] * 150) / 100;
++		keys->calibration_data.RZ_offset = (databuf[1] * 150) / 100;
++	}
++
++	return count;
++}
++
++static ssize_t joystick_R_offset_show(struct device *dev,
++				      struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d %d\n",
++			keys->calibration_data.Z_offset,
++			keys->calibration_data.RZ_offset);
++}
++static DEVICE_ATTR(joystick_R_offset, 0664,
++		   joystick_R_offset_show, joystick_R_offset_store);
++
++static ssize_t joystick_input_name_show(struct device *dev,
++					struct device_attribute *attr, char *buf)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%s\n", keys->joystick_name);
++}
++
++static ssize_t joystick_input_name_store(struct device *dev,
++					 struct device_attribute *attr,
++					 const char *buf, size_t count)
++{
++	struct mcu_joystick *keys = dev_get_drvdata(dev);
++
++	if (count >= MAX_CUSTOM_INPUT_LEN) {
++		dev_err(dev, "Input string too long\n");
++		return -EINVAL;
++	}
++
++	dpad_disconnect(&keys->dpad);
++	strncpy(keys->joystick_name, buf, count);
++	keys->joystick_name[count] = '\0';
++	dpad_connect(dev, &keys->dpad, mcuIdVendor, mcuIdProduct);
++	return count;
++}
++static DEVICE_ATTR(joystick_input_name, 0664,
++		   joystick_input_name_show, joystick_input_name_store);
++
++static struct attribute *mcu_joystick_attributes[] = {
++	&dev_attr_boot_set.attr,
++	&dev_attr_cali_enable.attr,
++	&dev_attr_joystick_R_Z_cali.attr,
++	&dev_attr_joystick_R_RZ_cali.attr,
++	&dev_attr_joystick_L_X_cali.attr,
++	&dev_attr_joystick_L_Y_cali.attr,
++	&dev_attr_joystick_L_offset.attr,
++	&dev_attr_joystick_R_offset.attr,
++	&dev_attr_joystick_input_name.attr,
++	NULL,
++};
++
++static const struct attribute_group mcu_joystick_attr_group = {
++	.attrs = mcu_joystick_attributes,
++};
++
++static int mcu_sysfs_create_group(struct device *dev)
++{
++	return sysfs_create_group(&dev->kobj, &mcu_joystick_attr_group);
++}
++
++static void mcu_sysfs_remove_group(struct device *dev)
++{
++	sysfs_remove_group(&dev->kobj, &mcu_joystick_attr_group);
++}
++
++static void mcu_debugfs_init(struct mcu_joystick *keys)
++{
++	struct dentry *dir;
++
++	dir = debugfs_create_dir(dev_name(keys->dev), NULL);
++	if (IS_ERR_OR_NULL(dir)) {
++		keys->debugfs_dir = NULL;
++		return;
++	}
++
++	keys->debugfs_dir = dir;
++	debugfs_create_file("mcu_stick_val", 0444, dir, keys,
++			    &mcu_stick_val_fops);
++	debugfs_create_file("mcu_trigger_val", 0444, dir, keys,
++			    &mcu_trigger_val_fops);
++	debugfs_create_file("gpio_status", 0444, dir, keys,
++			    &mcu_gpio_status_fops);
++	debugfs_create_file("mcu_pkt", 0444, dir, keys, &mcu_pkt_fops);
++	debugfs_create_file("mcu_raw", 0444, dir, keys, &mcu_raw_fops);
++	debugfs_create_file("mcu_ids", 0444, dir, keys, &mcu_ids_fops);
++}
++
++static void mcu_debugfs_remove(struct mcu_joystick *keys)
++{
++	if (!keys->debugfs_dir)
++		return;
++
++	debugfs_remove_recursive(keys->debugfs_dir);
++	keys->debugfs_dir = NULL;
++}
++
++MODULE_DESCRIPTION("MCU joystick driver");
++MODULE_AUTHOR("Romain Tisserand <romain.tisserand@gmail.com>");
++MODULE_LICENSE("GPL");
+--- /dev/null
++++ b/drivers/input/joystick/mcu_joystick.h
+@@ -0,0 +1,155 @@
++#ifndef _MCU_JOYSTICK_H_
++#define _MCU_JOYSTICK_H_
++
++#include <linux/device.h>
++#include <linux/gpio/consumer.h>
++#include <linux/input.h>
++#include <linux/interrupt.h>
++#include <linux/mutex.h>
++#include <linux/serdev.h>
++#include <linux/types.h>
++
++struct dentry;
++
++#define ADC_X 0x00
++#define ADC_Y 0x01
++#define ADC_Z 0x02
++#define ADC_RZ 0x03
++
++#define MAX_CUSTOM_INPUT_LEN 64
++
++/* XBOX360 */
++#define mcuIdVendor 0x4001
++#define mcuIdProduct 0x0428
++
++#define DPAD_PKT_LEN 64
++#define MCU_RAW_BUF_LEN 256
++#define MCU_REC_LEN 4
++#define MCU_ID_COUNT 256
++#define DPAD_GPIO_BTN 1
++
++struct joystick_calibration {
++	int X_cali_max;
++	int X_cali_min;
++	int X_cali_center;
++	int X_offset;
++
++	int Y_cali_max;
++	int Y_cali_min;
++	int Y_cali_center;
++	int Y_offset;
++
++	int Z_cali_max;
++	int Z_cali_min;
++	int Z_cali_center;
++	int Z_offset;
++
++	int RZ_cali_max;
++	int RZ_cali_min;
++	int RZ_cali_center;
++	int RZ_offset;
++};
++
++struct linear_const {
++	int x_a;
++	int x_b;
++	int x_a_min;
++	int x_b_min;
++	int x_a_max;
++	int x_b_max;
++	int y_a;
++	int y_b;
++	int y_a_min;
++	int y_b_min;
++	int y_a_max;
++	int y_b_max;
++	int z_a;
++	int z_b;
++	int z_a_min;
++	int z_b_min;
++	int z_a_max;
++	int z_b_max;
++	int rz_a;
++	int rz_b;
++	int rz_a_min;
++	int rz_b_min;
++	int rz_a_max;
++	int rz_b_max;
++};
++
++#ifdef DPAD_GPIO_BTN
++struct dpad_gpio_data {
++	struct gpio_desc *start_gpio;
++	struct gpio_desc *select_gpio;
++	struct gpio_desc *mode_gpio;
++	struct gpio_desc *back_gpio;
++	int back_irq;
++	int start_irq;
++	int select_irq;
++	int mode_irq;
++};
++#endif
++
++struct uart_dpad {
++	struct input_dev *input_dev;
++	struct device *dev;
++	bool input_created;
++
++	unsigned char *idata;
++
++	char phys[64];
++
++	const char *name;
++
++	struct mutex report_lock;
++
++#ifdef DPAD_GPIO_BTN
++	struct dpad_gpio_data btn_data;
++#endif
++};
++
++struct mcu_joystick {
++	struct device *dev;
++	struct serdev_device *serdev;
++	struct dentry *debugfs_dir;
++
++	struct gpio_desc *boot0_gpio;
++	struct gpio_desc *boot1_gpio;
++	struct gpio_desc *reset_gpio;
++	struct gpio_desc *power_gpio;
++	struct gpio_desc *stick_en_gpio;
++	struct gpio_desc *start_gpio;
++	struct gpio_desc *select_gpio;
++	struct gpio_desc *mode_gpio;
++	struct gpio_desc *back_gpio;
++	int cali_enable;
++	bool gpio_irq_enabled;
++	bool uart_report;
++
++	struct uart_dpad *dpad;
++	struct mutex notify_lock;
++	struct joystick_calibration calibration_data;
++	struct linear_const linear_data;
++	bool screen_on;
++	char joystick_name[MAX_CUSTOM_INPUT_LEN];
++	uint32_t *adc_key_code;
++	uint16_t *adc_key_value;
++	unsigned int baud;
++	unsigned char rx_buf[DPAD_PKT_LEN];
++	size_t rx_pos;
++	u8 frame_shift;
++	u8 skip_len;
++	unsigned char last_pkt[DPAD_PKT_LEN];
++	u32 last_pkt_seq;
++	bool last_pkt_valid;
++	unsigned char raw_buf[MCU_RAW_BUF_LEN];
++	u32 raw_head;
++	bool raw_full;
++	u16 id_val[MCU_ID_COUNT];
++	u8 id_flags[MCU_ID_COUNT];
++	u32 id_seen[MCU_ID_COUNT];
++};
++
++extern bool mcu_isp_flag;
++
++#endif
