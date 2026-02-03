@@ -1,0 +1,15 @@
+config BR2_PACKAGE_CANNONBALL
+	bool "cannonball"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_TINYXML2
+	select BR2_PACKAGE_LIBEXECINFO	if BR2_TOOLCHAIN_USES_MUSL
+	select BR2_PACKAGE_LIBBACKTRACE	if BR2_TOOLCHAIN_USES_MUSL
+	help
+	  Cannonball - OutRun Engine
+
+	  https://github.com/djyt/cannonball
+
+comment "Cannonball needs a toolchain w/ C++, and following libraries : sdl2, boost"
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_PACKAGE_SDL2 || !BR2_PACKAGE_BOOST
