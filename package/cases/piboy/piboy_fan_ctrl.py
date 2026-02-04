@@ -16,20 +16,21 @@ fplo = 110
 fplolo = 90
 fpdefault = 75
 
-#Read Fan.ini file
-if os.path.isfile('/usr/share/piboy/fan.ini'):
-	from configparser import ConfigParser
-	config_object = ConfigParser()
-	config_object.read("/usr/share/piboy/fan.ini")
+# Read Fan.ini file
+if os.path.isfile("/usr/share/piboy/fan.ini"):
+    from configparser import ConfigParser
 
-	userinfo = config_object["FAN"]
+    config_object = ConfigParser()
+    config_object.read("/usr/share/piboy/fan.ini")
 
-	fphihi = (userinfo["75DegC"])
-	fphi = (userinfo["70DegC"])
-	fpmed = (userinfo["65DegC"])
-	fplo = (userinfo["60DegC"])
-	fplolo = (userinfo["55DegC"])
-	fpdefault = (userinfo["50DegC"])
+    userinfo = config_object["FAN"]
+
+    fphihi = userinfo["75DegC"]
+    fphi = userinfo["70DegC"]
+    fpmed = userinfo["65DegC"]
+    fplo = userinfo["60DegC"]
+    fplolo = userinfo["55DegC"]
+    fpdefault = userinfo["50DegC"]
 
 # Fan Controller
 try:

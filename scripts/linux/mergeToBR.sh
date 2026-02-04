@@ -32,11 +32,12 @@ declare -x foundError
 #   → outputs the help message
 function printUsage() {
   echo -e "${c_yellow}Usage${c_reset}
-    $(basename "$0") [-c|--check-only] [-f|--force] [-h|--help]
+    $(basename "$0") [-c|--check-only] [-f|--force] [-u|--update-md5] [-h|--help]
 
 ${c_yellow}Parameters${c_reset}
   -c, --check-only   check that changes can be applied, but don't actually apply them
   -f, --force        apply changes, even if not all of them can be applied
+  -u, --update-md5   update MD5 hashes in the list.hash file when target files differ
   -h, --help         display this message
 
 ${c_yellow}Overview${c_reset}
@@ -161,8 +162,24 @@ function checkFileToPatch() {
   elif isFileIdentical "${file}"; then
     printIgnore "${c_white}${file}${c_reset} already patched"
   elif ! hasExpectedChecksum "${file}" "${hash}"; then
-    foundError=1
-    printError "${c_white}${file}${c_reset} target file does not have expected MD5 checksum"
+    if [[ ${optionUpdateMd5} = 1 ]]; then
+      # Get the current MD5 hash of the target file
+      current_hash=$(md5sum "${BUILDROOT_DIR}/${file}" | cut -d' ' -f1)
+      printWarning "${c_white}${file}${c_reset} target file does not have expected MD5 checksum, updating hash from ${hash} to ${current_hash}"
+      updateHashInFile "${file}" "${current_hash}"
+
+      # Let's try to apply the patch after updating the hash
+      if ! patch --dry-run --silent -p0 "${BUILDROOT_DIR}/${file}" < "${CUSTOM_DIR}/${file}.patch" > /dev/null; then
+        foundError=1
+        printError "${c_white}${file}${c_reset} patch fails to apply even after hash update"
+      else
+        filesToPatch+=("${file}")
+        printSuccess "${c_white}${file}${c_reset} can be patched (hash updated)"
+      fi
+    else
+      foundError=1
+      printError "${c_white}${file}${c_reset} target file does not have expected MD5 checksum"
+    fi
   else
     # Let's try to apply the patch
     if ! patch --dry-run --silent -p0 "${BUILDROOT_DIR}/${file}" < "${CUSTOM_DIR}/${file}.patch" > /dev/null; then
@@ -207,6 +224,43 @@ function removeFiles() {
   fi
 }
 
+# updateHashInFile <file> <new_hash>
+#   → updates the hash for a specific file in the hashFile
+function updateHashInFile() {
+  local -r file=$1
+  local -r new_hash=$2
+  local temp_hash_file="${hashFile}.tmp"
+
+  # Create temporary file with updated hash
+  while IFS= read -r line; do
+    if [[ -n "$line" && ! "$line" =~ ^# ]]; then
+      # Extract the hash (first 32 characters before first space) and filename (after "  ")
+      if [[ "$line" =~ ^[a-fA-F0-9]{32}\ \ .*$ ]]; then
+        # This is a line with an MD5 hash, extract the filename part after "  "
+        local line_hash=$(echo "$line" | cut -d' ' -f1)
+        local line_file=$(echo "$line" | cut -d' ' -f3-)
+
+        if [[ "${line_file}" == "${file}" ]]; then
+          # This is the line with the hash for our file, update it
+          echo "${new_hash}  ${file}"
+        else
+          # Keep the original line
+          echo "${line}"
+        fi
+      else
+        # Not a hash line, keep it as is
+        echo "${line}"
+      fi
+    else
+      # Comment or empty line, keep it as is
+      echo "${line}"
+    fi
+  done < "${hashFile}" > "${temp_hash_file}"
+
+  # Replace the original file with the updated one
+  mv "${temp_hash_file}" "${hashFile}"
+}
+
 # applyPatches
 #   → actually apply patches to Buildroot tree
 function applyPatches() {
@@ -233,6 +287,9 @@ while [[ -n $1 ]]; do
       ;;
     "-c"|"--check-only")
       optionCheckOnly=1
+      ;;
+    "-u"|"--update-md5")
+      optionUpdateMd5=1
       ;;
     "-h"|"--help"|*)
       printUsage
@@ -289,6 +346,28 @@ while read -u 3 -r line; do
     fi
   fi
 done 3< <(grep -Ev '(^ *$|^#)' "${hashFile}")
+
+# If update MD5 option is enabled and no errors found, we might want to update all hashes
+if [[ ${optionUpdateMd5} = 1 ]]; then
+  printTitle "2b. Updating MD5 hashes if needed"
+
+  # Process the hash file again to check for any files that could have updated hashes
+  while read -u 4 -r line; do
+    hash=$(echo "${line}" | cut -d ' ' -f 1)
+    file=$(echo "${line}" | cut -d ' ' -f 3)
+
+    if [[ "${hash}" != "--------------------------------" ]] && [[ "${hash}" != "++++++++++++++++++++++++++++++++" ]] && [[ ${hash} =~ [[:alnum:]]{32} ]]; then
+      # This is a file with an MD5 hash, check if the current file has a different hash
+      if [[ -f ${BUILDROOT_DIR}/${file} ]]; then
+        current_hash=$(md5sum "${BUILDROOT_DIR}/${file}" | cut -d' ' -f1)
+        if [[ "${hash}" != "${current_hash}" ]]; then
+          printWarning "${c_white}${file}${c_reset} has different hash, updating from ${hash} to ${current_hash}"
+          updateHashInFile "${file}" "${current_hash}"
+        fi
+      fi
+    fi
+  done 4< <(grep -Ev '(^ *$|^#)' "${hashFile}")
+fi
 
 if [[ ${optionCheckOnly} = 1 ]]; then
   exit ${foundError}

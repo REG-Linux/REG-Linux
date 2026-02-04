@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any
 from xml.dom import minidom
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -118,7 +118,7 @@ class OpenmsxGenerator(Generator):
             eslog.warning("Could not add bindings to root element")
 
         # Write the updated xml to the file
-        with open(settings_xml, "w") as f:
+        with Path(settings_xml).open("w") as f:
             f.write("<!DOCTYPE settings SYSTEM 'settings.dtd'>\n")
             # purdify the XML
             xml_string = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
@@ -128,11 +128,10 @@ class OpenmsxGenerator(Generator):
             f.write(formatted_xml)
 
         # setup the blank tcl file
-        with open(settings_tcl, "w") as file:
-            file.write("")
+        Path(settings_tcl).write_text("")
 
         # set the tcl file options - we can add other options later
-        with open(settings_tcl, "a") as file:
+        with Path(settings_tcl).open("a") as file:
             file.write(
                 "filepool add -path /userdata/bios/Machines -types system_rom -position 1\n",
             )
@@ -157,8 +156,7 @@ class OpenmsxGenerator(Generator):
             # setup the controller
             file.write("\n")
             file.write("# -= Controller config =-\n")
-            nplayer = 1
-            for _, pad in sorted(players_controllers.items()):
+            for nplayer, pad in enumerate(sorted(players_controllers.items()), start=1):
                 if nplayer <= 2:
                     if nplayer == 1:
                         file.write("plug joyporta joystick1\n")
@@ -197,7 +195,6 @@ class OpenmsxGenerator(Generator):
                             file.write(
                                 f'bind "joy{nplayer} button{input_obj.id} down" "toggle console"\n',
                             )
-                nplayer += 1
 
         # now run the rom with the appropriate flags
         file_extension = Path(rom).suffix.lower()
@@ -265,7 +262,7 @@ class OpenmsxGenerator(Generator):
         # handle our own file format for stacked roms / disks
         if file_extension == ".openmsx":
             # read the contents of the file and extract the rom paths
-            with open(rom) as file:
+            with Path(rom).open() as file:
                 lines = file.readlines()
                 rom1 = ""
                 rom1 = lines[0].strip()

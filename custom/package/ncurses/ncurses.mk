@@ -18,7 +18,7 @@ NCURSES_CPE_ID_VENDOR = gnu
 NCURSES_CPE_ID_VERSION = $(NCURSES_VERSION_MAJOR)$(if $(NCURSES_SNAPSHOT_DATE),.$(NCURSES_SNAPSHOT_DATE))
 NCURSES_CONFIG_SCRIPTS = ncurses$(NCURSES_LIB_SUFFIX)6-config
 
-# batocera - add the termlib option for RPCS3
+# reglinux - add the termlib option for RPCS3
 NCURSES_CONF_OPTS = \
 	--without-cxx \
 	--without-cxx-binding \

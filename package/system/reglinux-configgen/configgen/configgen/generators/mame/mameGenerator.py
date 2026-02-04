@@ -1,13 +1,13 @@
 from csv import reader
-from os import chdir, listdir, makedirs, symlink, unlink
+from os import chdir, listdir
 from pathlib import Path
 from shutil import copy2, rmtree
 from typing import Any
 from xml.etree.ElementTree import parse
 
 from configgen.bezel.mame_bezel_manager import setup_mame_bezels
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 from configgen.utils.videoMode import getScreensInfos
 
@@ -85,7 +85,7 @@ class MameGenerator(Generator):
                 check_path.mkdir(parents=True, exist_ok=True)
 
         messDataFile = "/usr/share/reglinux/configgen/data/mame/messSystems.csv"
-        with open(messDataFile) as openFile:
+        with Path(messDataFile).open() as openFile:
             messSystems = []
             messSysName = []
             messRomType = []
@@ -546,30 +546,33 @@ class MameGenerator(Generator):
             elif softList != "":
                 softDirPath = Path(softDir)
                 if not softDirPath.exists():
-                    makedirs(softDir)
+                    Path(softDir).mkdir(parents=True)
                 for file_name in listdir(softDir):
                     checkFile = str(softDirPath / file_name)
                     if Path(checkFile).is_symlink():
-                        unlink(checkFile)
+                        Path(checkFile).unlink()
                     if Path(checkFile).is_dir():
                         rmtree(checkFile)
                 hashDir = softDirPath / "hash"
                 if not hashDir.exists():
-                    makedirs(str(hashDir))
+                    Path(str(hashDir)).mkdir(parents=True)
                 # Clear existing hashfile links
                 for hashFile in listdir(str(hashDir)):
                     if hashFile.endswith(".xml"):
-                        unlink(str(hashDir / hashFile))
-                symlink(
-                    f"/usr/bin/mame/hash/{softList}.xml",
-                    str(hashDir / f"{softList}.xml"),
+                        Path(str(hashDir / hashFile)).unlink()
+                Path(str(hashDir / f"{softList}.xml")).symlink_to(
+                    f"/usr/bin/mame/hash/{softList}.xml"
                 )
                 if softList in subdirSoftList:
                     romPath = Path(romDirname)
-                    symlink(str(romPath.parent), str(softDirPath / softList), True)
+                    Path(str(softDirPath / softList)).symlink_to(
+                        str(romPath.parent), target_is_directory=True
+                    )
                     command_array += [Path(romDirname).name]
                 else:
-                    symlink(romDirname, str(softDirPath / softList), True)
+                    Path(str(softDirPath / softList)).symlink_to(
+                        romDirname, target_is_directory=True
+                    )
                     command_array += [Path(romBasename).stem]
 
             # Create & add a blank disk if needed, insert into drive 2
@@ -691,7 +694,7 @@ class MameGenerator(Generator):
                     / f"{system.name}_{rom_type}_autoload.csv"
                 )
                 if autoRunFile.exists():
-                    with open(autoRunFile) as openARFile:
+                    with Path(autoRunFile).open() as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if (
@@ -708,7 +711,7 @@ class MameGenerator(Generator):
                     / f"{softList}_autoload.csv"
                 )
                 if autoRunFile.exists():
-                    with open(autoRunFile) as openARFile:
+                    with Path(autoRunFile).open() as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if row[0].casefold() == Path(romBasename).stem.casefold():
@@ -835,20 +838,20 @@ def getMameControlScheme(system: Any, romBasename: str) -> str:
     if controllerType in ["default", "neomini", "neocd", "twinstick", "qbert"]:
         return controllerType
     try:
-        with open(mameCapcom) as f:
+        with Path(mameCapcom).open() as f:
             capcomList: set = set(f.read().split())
-        with open(mameMKombat) as f:
+        with Path(mameMKombat).open() as f:
             mkList: set = set(f.read().split())
-        with open(mameKInstinct) as f:
+        with Path(mameKInstinct).open() as f:
             kiList: set = set(f.read().split())
-        with open(mameNeogeo) as f:
+        with Path(mameNeogeo).open() as f:
             neogeoList: set = set(f.read().split())
-        with open(mameTwinstick) as f:
+        with Path(mameTwinstick).open() as f:
             twinstickList: set = set(f.read().split())
-        with open(mameRotatedstick) as f:
+        with Path(mameRotatedstick).open() as f:
             qbertList: set = set(f.read().split())
     except OSError as e:
-        logger.error(f"Error reading MAME list files: {e}")
+        logger.error("Error reading MAME list files: %s", e)
         # Initialize empty sets to avoid breaking the process
         capcomList: set = set()
         mkList: set = set()

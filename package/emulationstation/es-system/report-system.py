@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 
+
 class SortedListEncoder(json.JSONEncoder):
     def encode(self, obj):
         def sort_lists(item):
@@ -19,10 +20,11 @@ class SortedListEncoder(json.JSONEncoder):
                 return {k: sort_lists(v) for k, v in item.items()}
             else:
                 return item
+
         return super(SortedListEncoder, self).encode(sort_lists(obj))
 
-class EsSystemConf:
 
+class EsSystemConf:
     @staticmethod
     def hasRedFlag(nb_variants, nb_explanations, nb_all_explanations):
         if nb_variants == 0 and nb_all_explanations == 0:
@@ -51,12 +53,16 @@ class EsSystemConf:
         explanations = yaml.safe_load(open(explanationsYaml, "r"))
         result_archs = {}
 
-        systemsConfig = yaml.safe_load(open(defaultsDir + "/configgen-defaults.yml", "r"))
+        systemsConfig = yaml.safe_load(
+            open(defaultsDir + "/configgen-defaults.yml", "r")
+        )
 
         for configFile in os.listdir(configsDir):
             arch = configFile.replace("config_", "")
             config = EsSystemConf.loadConfig(configsDir + "/" + configFile)
-            archSystemsConfig = yaml.safe_load(open(defaultsDir + "/configgen-defaults-" + arch + ".yml", "r"))
+            archSystemsConfig = yaml.safe_load(
+                open(defaultsDir + "/configgen-defaults-" + arch + ".yml", "r")
+            )
             # case when there is no arch file
             if archSystemsConfig is None:
                 archSystemsConfig = {}
@@ -77,9 +83,21 @@ class EsSystemConf:
                 elif EsSystemConf.keys_exists(systemsConfig, system, "core"):
                     defaultCore = systemsConfig[system]["core"]
 
-                emulators = EsSystemConf.listEmulators(arch, system, rules[system], explanations, config, defaultEmulator, defaultCore)
+                emulators = EsSystemConf.listEmulators(
+                    arch,
+                    system,
+                    rules[system],
+                    explanations,
+                    config,
+                    defaultEmulator,
+                    defaultCore,
+                )
                 if any(emulators["emulators"]):
-                    emulators["red_flag"] = EsSystemConf.hasRedFlag(emulators["nb_variants"], emulators["nb_explanations"], emulators["nb_all_explanations"])
+                    emulators["red_flag"] = EsSystemConf.hasRedFlag(
+                        emulators["nb_variants"],
+                        emulators["nb_explanations"],
+                        emulators["nb_all_explanations"],
+                    )
                     result_systems[system] = emulators
             for board in boards:
                 result_archs[board] = result_systems
@@ -121,7 +139,9 @@ class EsSystemConf:
         return False
 
     @staticmethod
-    def listEmulators(arch, system, data, explanationsYaml, config, defaultEmulator, defaultCore):
+    def listEmulators(
+        arch, system, data, explanationsYaml, config, defaultEmulator, defaultCore
+    ):
         emulators_result = {}
         nb_variants = 0
         nb_all_variants = 0
@@ -140,24 +160,47 @@ class EsSystemConf:
             for core in sorted(emulatorData):
                 result_cores[core] = {}
                 nb_all_variants += 1
-                if EsSystemConf.isValidRequirements(config, emulatorData[core]["requireAnyOf"]):
+                if EsSystemConf.isValidRequirements(
+                    config, emulatorData[core]["requireAnyOf"]
+                ):
                     result_cores[core]["enabled"] = True
                     nb_variants += 1
                     # tell why this core is selected
-                    if EsSystemConf.keys_exists(explanationsYaml, arch, system, emulator, core, "explanation"):
-                        result_cores[core]["explanation"] = explanationsYaml[arch][system][emulator][core]["explanation"]
+                    if EsSystemConf.keys_exists(
+                        explanationsYaml, arch, system, emulator, core, "explanation"
+                    ):
+                        result_cores[core]["explanation"] = explanationsYaml[arch][
+                            system
+                        ][emulator][core]["explanation"]
                         nb_explanations += 1
-                    elif EsSystemConf.keys_exists(explanationsYaml, "default", system, emulator, core, "explanation"):
-                        result_cores[core]["explanation"] = explanationsYaml["default"][system][emulator][core]["explanation"]
+                    elif EsSystemConf.keys_exists(
+                        explanationsYaml,
+                        "default",
+                        system,
+                        emulator,
+                        core,
+                        "explanation",
+                    ):
+                        result_cores[core]["explanation"] = explanationsYaml["default"][
+                            system
+                        ][emulator][core]["explanation"]
                         nb_explanations += 1
                     else:
                         result_cores[core]["explanation"] = None
                     # flags - flags are cumulative
                     setFlags = []
-                    if EsSystemConf.keys_exists(explanationsYaml, arch, system, emulator, core, "flags"):
-                        setFlags += explanationsYaml[arch][system][emulator][core]["flags"]
-                    if EsSystemConf.keys_exists(explanationsYaml, "default", system, emulator, core, "flags"):
-                        setFlags += explanationsYaml["default"][system][emulator][core]["flags"]
+                    if EsSystemConf.keys_exists(
+                        explanationsYaml, arch, system, emulator, core, "flags"
+                    ):
+                        setFlags += explanationsYaml[arch][system][emulator][core][
+                            "flags"
+                        ]
+                    if EsSystemConf.keys_exists(
+                        explanationsYaml, "default", system, emulator, core, "flags"
+                    ):
+                        setFlags += explanationsYaml["default"][system][emulator][core][
+                            "flags"
+                        ]
                     result_cores[core]["flags"] = setFlags
                     # default or not
                     if emulator == defaultEmulator and core == defaultCore:
@@ -168,18 +211,35 @@ class EsSystemConf:
                 else:
                     # explanations tell why a core is not enabled too
                     result_cores[core]["enabled"] = False
-                    if EsSystemConf.keys_exists(explanationsYaml, arch, system, emulator, core, "explanation"):
-                        result_cores[core]["explanation"] = explanationsYaml[arch][system][emulator][core]["explanation"]
+                    if EsSystemConf.keys_exists(
+                        explanationsYaml, arch, system, emulator, core, "explanation"
+                    ):
+                        result_cores[core]["explanation"] = explanationsYaml[arch][
+                            system
+                        ][emulator][core]["explanation"]
                         nb_all_explanations += 1
-                    elif EsSystemConf.keys_exists(explanationsYaml, "default", system, emulator, core, "explanation"):
-                        result_cores[core]["explanation"] = explanationsYaml["default"][system][emulator][core]["explanation"]
+                    elif EsSystemConf.keys_exists(
+                        explanationsYaml,
+                        "default",
+                        system,
+                        emulator,
+                        core,
+                        "explanation",
+                    ):
+                        result_cores[core]["explanation"] = explanationsYaml["default"][
+                            system
+                        ][emulator][core]["explanation"]
                         nb_all_explanations += 1
                     else:
                         result_cores[core]["explanation"] = None
             emulators_result[emulator] = result_cores
 
         if nb_variants > 0 and defaultFound == False:
-            raise Exception("default core ({}/{}) not enabled for {}/{}" . format(defaultEmulator, defaultCore, arch, system))
+            raise Exception(
+                "default core ({}/{}) not enabled for {}/{}".format(
+                    defaultEmulator, defaultCore, arch, system
+                )
+            )
 
         result = {}
         result["name"] = data["name"]
@@ -192,13 +252,15 @@ class EsSystemConf:
 
     @staticmethod
     def keys_exists(element, *keys):
-        '''
+        """
         Check if *keys (nested) exists in `element` (dict).
-        '''
+        """
         if not isinstance(element, dict):
-            raise AttributeError('keys_exists() expects dict as first argument.')
+            raise AttributeError("keys_exists() expects dict as first argument.")
         if len(keys) == 0:
-            raise AttributeError('keys_exists() expects at least two arguments, one given.')
+            raise AttributeError(
+                "keys_exists() expects at least two arguments, one given."
+            )
 
         _element = element
         for key in keys:
@@ -208,11 +270,18 @@ class EsSystemConf:
                 return False
         return True
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("yml",              help="es_systems.yml definition file")
+    parser.add_argument("yml", help="es_systems.yml definition file")
     parser.add_argument("explanationsYaml", help="explanations.yml definition file")
-    parser.add_argument("defaultsDir",      help="directory containing defaults cores configs")
-    parser.add_argument("configsDir",       help="directory containing config buildroot files")
+    parser.add_argument(
+        "defaultsDir", help="directory containing defaults cores configs"
+    )
+    parser.add_argument(
+        "configsDir", help="directory containing config buildroot files"
+    )
     args = parser.parse_args()
-    EsSystemConf.generate(args.yml, args.explanationsYaml, args.configsDir, args.defaultsDir)
+    EsSystemConf.generate(
+        args.yml, args.explanationsYaml, args.configsDir, args.defaultsDir
+    )

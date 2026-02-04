@@ -11,54 +11,60 @@ CGENIUS_BIN_PATH = "/usr/bin/CGeniusExe"
 
 def setCgeniusConfig(cgeniusConfig: Any, system: Any) -> None:
     # Now setup the options we want...
-    if "FileHandling" not in cgeniusConfig:
-        cgeniusConfig["FileHandling"] = {}
+    # Ensure sections exist
+    if not cgeniusConfig.has_section("FileHandling"):
+        cgeniusConfig.add_section("FileHandling")
 
-    cgeniusConfig["FileHandling"]["EnableLogfile"] = "false"
-    cgeniusConfig["FileHandling"]["SearchPath1"] = CGENIUS_ROMS_DIR
-    cgeniusConfig["FileHandling"]["SearchPath2"] = str(Path(CGENIUS_ROMS_DIR) / "games")
+    cgeniusConfig.set("FileHandling", "EnableLogfile", "false")
+    cgeniusConfig.set("FileHandling", "SearchPath1", CGENIUS_ROMS_DIR)
+    cgeniusConfig.set(
+        "FileHandling",
+        "SearchPath2",
+        str(Path(CGENIUS_ROMS_DIR) / "games"),
+    )
 
-    if "Video" not in cgeniusConfig:
-        cgeniusConfig["Video"] = {}
+    if not cgeniusConfig.has_section("Video"):
+        cgeniusConfig.add_section("Video")
+
     # aspect
     if system.isOptSet("cgenius_aspect"):
-        cgeniusConfig["Video"]["aspect"] = system.config["cgenius_aspect"]
+        cgeniusConfig.set("Video", "aspect", system.config["cgenius_aspect"])
     else:
-        cgeniusConfig["Video"]["aspect"] = "4:3"
+        cgeniusConfig.set("Video", "aspect", "4:3")
     # we always want fullscreen
-    cgeniusConfig["Video"]["fullscreen"] = "true"
+    cgeniusConfig.set("Video", "fullscreen", "true")
     # filter
     if system.isOptSet("cgenius_filter"):
-        cgeniusConfig["Video"]["filter"] = system.config["cgenius_filter"]
+        cgeniusConfig.set("Video", "filter", system.config["cgenius_filter"])
     else:
-        cgeniusConfig["Video"]["filter"] = "none"
+        cgeniusConfig.set("Video", "filter", "none")
     # quality
     if system.isOptSet("cgenius_quality"):
-        cgeniusConfig["Video"]["OGLfilter"] = system.config["cgenius_quality"]
+        cgeniusConfig.set("Video", "OGLfilter", system.config["cgenius_quality"])
     else:
-        cgeniusConfig["Video"]["OGLfilter"] = "nearest"
+        cgeniusConfig.set("Video", "OGLfilter", "nearest")
     # render resolution
     if system.isOptSet("cgenius_render"):
         if system.config["cgenius_render"] == "200":
-            cgeniusConfig["Video"]["gameHeight"] = "200"
-            cgeniusConfig["Video"]["gameWidth"] = "320"
+            cgeniusConfig.set("Video", "gameHeight", "200")
+            cgeniusConfig.set("Video", "gameWidth", "320")
         if system.config["cgenius_render"] == "240":
-            cgeniusConfig["Video"]["gameHeight"] = "240"
-            cgeniusConfig["Video"]["gameWidth"] = "320"
+            cgeniusConfig.set("Video", "gameHeight", "240")
+            cgeniusConfig.set("Video", "gameWidth", "320")
         if system.config["cgenius_render"] == "360":
-            cgeniusConfig["Video"]["gameHeight"] = "360"
-            cgeniusConfig["Video"]["gameWidth"] = "640"
+            cgeniusConfig.set("Video", "gameHeight", "360")
+            cgeniusConfig.set("Video", "gameWidth", "640")
         if system.config["cgenius_render"] == "480":
-            cgeniusConfig["Video"]["gameHeight"] = "480"
-            cgeniusConfig["Video"]["gameWidth"] = "640"
+            cgeniusConfig.set("Video", "gameHeight", "480")
+            cgeniusConfig.set("Video", "gameWidth", "640")
     else:
-        cgeniusConfig["Video"]["gameHeight"] = "200"
-        cgeniusConfig["Video"]["gameWidth"] = "320"
+        cgeniusConfig.set("Video", "gameHeight", "200")
+        cgeniusConfig.set("Video", "gameWidth", "320")
     # mouse
     if system.isOptSet("cgenius_cursor"):
-        cgeniusConfig["Video"]["ShowCursor"] = system.config["cgenius_cursor"]
+        cgeniusConfig.set("Video", "ShowCursor", system.config["cgenius_cursor"])
     else:
-        cgeniusConfig["Video"]["ShowCursor"] = "false"
+        cgeniusConfig.set("Video", "ShowCursor", "false")
 
 
 # Show mouse on screen for the Config Screen

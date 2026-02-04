@@ -1,0 +1,13 @@
+diff --git a/package/wayland-utils/wayland-utils.mk b/package/wayland-utils/wayland-utils.mk
+index efeb7e57a8..82f36c16d0 100644
+--- a/package/wayland-utils/wayland-utils.mk
++++ b/package/wayland-utils/wayland-utils.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-WAYLAND_UTILS_VERSION = 1.2.0
++WAYLAND_UTILS_VERSION = 1.3.0
+ WAYLAND_UTILS_SITE = https://gitlab.freedesktop.org/wayland/wayland-utils/-/releases/$(WAYLAND_UTILS_VERSION)/downloads
+ WAYLAND_UTILS_SOURCE = wayland-utils-$(WAYLAND_UTILS_VERSION).tar.xz
+ WAYLAND_UTILS_LICENSE = MIT

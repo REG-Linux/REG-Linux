@@ -18,6 +18,7 @@ config BR2_PACKAGE_SWAY
 	select BR2_PACKAGE_PANGO
 	select BR2_PACKAGE_XKEYBOARD_CONFIG # runtime
 	select BR2_PACKAGE_LIBDECOR
+	select BR2_PACKAGE_BASU
 	help
 	  i3-compatible Wayland compositor
 	  Note:

@@ -82,8 +82,7 @@ if  BR2_PACKAGE_SYSTEM_TARGET_X86_ANY		|| \
     BR2_PACKAGE_SYSTEM_TARGET_H3		|| \
     BR2_PACKAGE_SYSTEM_TARGET_CHA		|| \
     BR2_PACKAGE_SYSTEM_TARGET_MINI		|| \
-    BR2_PACKAGE_SYSTEM_TARGET_H5		|| \
-    BR2_PACKAGE_SYSTEM_TARGET_H6		|| \
+    BR2_PACKAGE_SYSTEM_TARGET_SUN50I		|| \
     BR2_PACKAGE_SYSTEM_TARGET_XU4
 	config BR2_PACKAGE_HAS_GLES2
 	bool "target has gles2 support"
@@ -105,6 +104,7 @@ if BR2_PACKAGE_SYSTEM_TARGET_X86_ANY          || \
    BR2_PACKAGE_SYSTEM_TARGET_ROCKCHIP_GLES3   || \
    BR2_PACKAGE_SYSTEM_TARGET_SDM845           || \
    BR2_PACKAGE_SYSTEM_TARGET_SM6115           || \
+   BR2_PACKAGE_SYSTEM_TARGET_QCS6490          || \
    BR2_PACKAGE_SYSTEM_TARGET_SM8250           || \
    BR2_PACKAGE_SYSTEM_TARGET_SM8550           || \
    BR2_PACKAGE_SYSTEM_TARGET_MT8395           || \
@@ -124,8 +124,8 @@ config BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 													if BR2_PACKAGE_SYSTEM_TARGET_H3
 	default "allwinner/h3/cha"									if BR2_PACKAGE_SYSTEM_TARGET_CHA
 	default "allwinner/h3/mini"									if BR2_PACKAGE_SYSTEM_TARGET_MINI
-	default "allwinner/h5/tritium-h5 allwinner/h5/orangepi-pc2"					if BR2_PACKAGE_SYSTEM_TARGET_H5
-	default "allwinner/h6/orangepi-3-lts allwinner/h6/orangepi-3 allwinner/h6/orangepi-one-plus"	if BR2_PACKAGE_SYSTEM_TARGET_H6
+	default "allwinner/sun50i/tritium-h5 allwinner/sun50i/orangepi-pc2 allwinner/sun50i/orangepi-3-lts allwinner/sun50i/orangepi-3 allwinner/sun50i/orangepi-one-plus" \
+													if BR2_PACKAGE_SYSTEM_TARGET_SUN50I
 	default "allwinner/h616/orangepi-zero2 allwinner/h616/orangepi-zero2w allwinner/h616/orangepi-zero3 allwinner/h616/bananapi-m4-berry allwinner/h616/x96-mate" \
 													if BR2_PACKAGE_SYSTEM_TARGET_H616
 	default "allwinner/h700/anbernic-h700"								if BR2_PACKAGE_SYSTEM_TARGET_H700
@@ -142,14 +142,6 @@ config BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 													if BR2_PACKAGE_SYSTEM_TARGET_S922X
 	default "amlogic/s9gen4/khadas-vim1s"								if BR2_PACKAGE_SYSTEM_TARGET_S9GEN4
 	default "amlogic/a3gen2/khadas-vim4"								if BR2_PACKAGE_SYSTEM_TARGET_A3GEN2
-
-	# Broadcom targets
-	default "broadcom/bcm2835"									if BR2_PACKAGE_SYSTEM_TARGET_BCM2835
-	default "broadcom/bcm2836"									if BR2_PACKAGE_SYSTEM_TARGET_BCM2836
-	default "broadcom/bcm2837"									if BR2_PACKAGE_SYSTEM_TARGET_BCM2837
-	default "broadcom/bcm2711"									if BR2_PACKAGE_SYSTEM_TARGET_BCM2711
-	default "broadcom/bcm2712"									if BR2_PACKAGE_SYSTEM_TARGET_BCM2712
-
 	# Rockchip targets
 	default "rockchip/rk3128/ps5000 rockchip/rk3128/ps7000 rockchip/rk3128/powkiddy-a13"		if BR2_PACKAGE_SYSTEM_TARGET_RK3128
 	default "rockchip/rk3288/tinkerboard rockchip/rk3288/miqi"					if BR2_PACKAGE_SYSTEM_TARGET_RK3288
@@ -157,43 +149,51 @@ config BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 	default "rockchip/rk3328/rock64 rockchip/rk3328/renegade"					if BR2_PACKAGE_SYSTEM_TARGET_RK3328
 	default "rockchip/rk3399/anbernic-rg552 rockchip/rk3399/rockpro64 rockchip/rk3399/orangepi-800 rockchip/rk3399/rock960 rockchip/rk3399/rock-pi-4 rockchip/rk3399/orangepi-4-lts rockchip/rk3399/nanopi-m4v2 rockchip/rk3399/hugsun-x99 rockchip/rk3399/tinkerboard2" \
 													if BR2_PACKAGE_SYSTEM_TARGET_RK3399
-	default "rockchip/rk3568/odroid-m1 rockchip/rk3568/rock-3a rockchip/rk3568/rock-3c rockchip/rk3568/anbernic-rgxx3 rockchip/rk3568/firefly-station-m2 rockchip/rk3568/firefly-station-p2" \
+	default "rockchip/rk3568/powkiddy-x55 rockchip/rk3568/odroid-m1 rockchip/rk3568/rock-3a rockchip/rk3568/rock-3c rockchip/rk3568/anbernic-rgxx3 rockchip/rk3568/firefly-station-m2 rockchip/rk3568/firefly-station-p2" \
 													if BR2_PACKAGE_SYSTEM_TARGET_RK3568
 	default "rockchip/rk3588/gameforce-ace rockchip/rk3588/orangepi-5 rockchip/rk3588/rock-5c rockchip/rk3588/rock-5b rockchip/rk3588/rock-5a rockchip/rk3588/orangepi-5b rockchip/rk3588/orangepi-5-plus rockchip/rk3588/bananapi-m7 rockchip/rk3588/indiedroid-nova rockchip/rk3588/khadas-edge-2" \
 													if BR2_PACKAGE_SYSTEM_TARGET_RK3588
 	# disabled RK3588 boards we don't own and can't test: rockchip/rk3588/quartzpro64 rockchip/rk3588/mekotronics-r58 rockchip/rk3588/firefly-station-m3
 
+	# Broadcom targets
+	default "broadcom/bcm2835"						if BR2_PACKAGE_SYSTEM_TARGET_BCM2835
+	default "broadcom/bcm2836"						if BR2_PACKAGE_SYSTEM_TARGET_BCM2836
+	default "broadcom/bcm2837"						if BR2_PACKAGE_SYSTEM_TARGET_BCM2837
+	default "broadcom/bcm2711"						if BR2_PACKAGE_SYSTEM_TARGET_BCM2711
+	default "broadcom/bcm2712"						if BR2_PACKAGE_SYSTEM_TARGET_BCM2712
+
 	# Samsung targets
-	default "samsung/exynos5422/odroidxu4"								if BR2_PACKAGE_SYSTEM_TARGET_XU4
+	default "samsung/exynos5422/odroidxu4"					if BR2_PACKAGE_SYSTEM_TARGET_XU4
 
 	# Generic x86 targets
-	default "x86"											if BR2_PACKAGE_SYSTEM_TARGET_X86
-	default "x86_64"										if BR2_PACKAGE_SYSTEM_TARGET_X86_64
-	default "x86_64_v3"										if BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
+	default "x86"								if BR2_PACKAGE_SYSTEM_TARGET_X86
+	default "x86_64"							if BR2_PACKAGE_SYSTEM_TARGET_X86_64
+	default "x86_64_v3"							if BR2_PACKAGE_SYSTEM_TARGET_X86_64_V3
 
 	# Qualcomm targets
-	default "qualcomm/sdm845/odin"									if BR2_PACKAGE_SYSTEM_TARGET_SDM845
-	default "qualcomm/sm6115/mangmi-air-x"								if BR2_PACKAGE_SYSTEM_TARGET_SM6115
-	default "qualcomm/sm8250/rp5 qualcomm/sm8250/rpmini qualcomm/sm8250/rpflip2"			if BR2_PACKAGE_SYSTEM_TARGET_SM8250
-	default "qualcomm/sm8550/odin2 qualcomm/sm8550/odin2portal qualcomm/sm8550/pockets"		if BR2_PACKAGE_SYSTEM_TARGET_SM8550
+	default "qualcomm/sdm845/odin"						if BR2_PACKAGE_SYSTEM_TARGET_SDM845
+	default "qualcomm/sm6115/mangmi-air-x"					if BR2_PACKAGE_SYSTEM_TARGET_SM6115
+	default "qualcomm/qcs6490/radxa-dragon-q6a"				if BR2_PACKAGE_SYSTEM_TARGET_QCS6490
+	default "qualcomm/sm8250/retroid-sm8250"				if BR2_PACKAGE_SYSTEM_TARGET_SM8250
+	default "qualcomm/sm8550/ayn-sm8550 qualcomm/sm8550/ayaneo-sm8550"	if BR2_PACKAGE_SYSTEM_TARGET_SM8550
 
 	# Mediatek targets
-	default "mediatek/mt8395/radxa-nio-12l"								if BR2_PACKAGE_SYSTEM_TARGET_MT8395
+	default "mediatek/mt8395/radxa-nio-12l"					if BR2_PACKAGE_SYSTEM_TARGET_MT8395
 
 	# Starfive targets
-	default "starfive/jh7110"									if BR2_PACKAGE_SYSTEM_TARGET_JH7110
+	default "starfive/jh7110"						if BR2_PACKAGE_SYSTEM_TARGET_JH7110
 
 	# SpacemiT targets
-	default "spacemit/k1/bananapi-f3"								if BR2_PACKAGE_SYSTEM_TARGET_K1
+	default "spacemit/k1/bananapi-f3"					if BR2_PACKAGE_SYSTEM_TARGET_K1
 
 	# T-Head targets
-	default "thead/th1520"										if BR2_PACKAGE_SYSTEM_TARGET_TH1520
+	default "thead/th1520"							if BR2_PACKAGE_SYSTEM_TARGET_TH1520
 
 	# Asahi target
-	default "asahi"											if BR2_PACKAGE_SYSTEM_TARGET_ASAHI
+	default "asahi"								if BR2_PACKAGE_SYSTEM_TARGET_ASAHI
 
 	# MIPS32el target
-	default "ingenic/jz4770"									if BR2_PACKAGE_SYSTEM_TARGET_JZ4770
+	default "ingenic/jz4770"						if BR2_PACKAGE_SYSTEM_TARGET_JZ4770
 
 	choice
 	prompt "REG-Linux target"
@@ -279,11 +279,8 @@ config BR2_PACKAGE_SYSTEM_TARGET_CHA
 config BR2_PACKAGE_SYSTEM_TARGET_MINI
 	bool "mini"
 
-config BR2_PACKAGE_SYSTEM_TARGET_H5
-	bool "h5"
-
-config BR2_PACKAGE_SYSTEM_TARGET_H6
-	bool "h6"
+config BR2_PACKAGE_SYSTEM_TARGET_SUN50I
+	bool "sun50i"
 
 config BR2_PACKAGE_SYSTEM_TARGET_H616
 	bool "h616"
@@ -324,6 +321,9 @@ config BR2_PACKAGE_SYSTEM_TARGET_SDM845
 config BR2_PACKAGE_SYSTEM_TARGET_SM6115
 	bool "sm6115"
 
+config BR2_PACKAGE_SYSTEM_TARGET_QCS6490
+	bool "qcs6490"
+
 config BR2_PACKAGE_SYSTEM_TARGET_SM8250
 	bool "sm8250"
 
@@ -347,4 +347,3 @@ config BR2_PACKAGE_SYSTEM_TARGET_TH1520
 	bool "th1520"
 
 endchoice
-

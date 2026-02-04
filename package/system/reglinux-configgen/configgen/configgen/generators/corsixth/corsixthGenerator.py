@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
 from .corsixthConfig import (
@@ -54,7 +54,7 @@ class CorsixTHGenerator(Generator):
             config_path.unlink()
 
         # Create the config file and fill it with basic data
-        with open(CORSIXTH_CONFIG_PATH, "w") as corsixth_config_file:
+        with Path(CORSIXTH_CONFIG_PATH).open("w") as corsixth_config_file:
             setCorsixthConfig(corsixth_config_file, system, game_resolution)
 
         # Launch engine with config file path

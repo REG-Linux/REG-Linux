@@ -1,5 +1,5 @@
 diff --git a/package/qemu/qemu.mk b/package/qemu/qemu.mk
-index 3a2f69ea3c3..595411b50c5 100644
+index 3a2f69ea3c..595411b50c 100644
 --- a/package/qemu/qemu.mk
 +++ b/package/qemu/qemu.mk
 @@ -528,3 +528,11 @@ $(eval $(host-generic-package))

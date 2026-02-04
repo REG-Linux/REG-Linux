@@ -1,0 +1,316 @@
+--- a/src/plugins/renderers/drm/plugin.c
++++ b/src/plugins/renderers/drm/plugin.c
+@@ -47,6 +47,11 @@
+ #include <xf86drm.h>
+ #include <xf86drmMode.h>
+ 
++#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(__aarch64__)
++#include <arm_neon.h>
++#define PLY_HAVE_NEON 1
++#endif
++
+ #include "ply-array.h"
+ #include "ply-buffer.h"
+ #include "ply-event-loop.h"
+@@ -85,6 +90,7 @@
+         uint32_t                scan_out_buffer_id;
+         bool                    scan_out_buffer_needs_reset;
+         bool                    uses_hw_rotation;
++        ply_pixel_buffer_rotation_t rotation;
+ 
+         int                     gamma_size;
+         uint16_t               *gamma;
+@@ -597,6 +603,9 @@
+                        int                     gamma_size)
+ {
+         ply_renderer_head_t *head;
++        unsigned long buffer_width;
++        unsigned long buffer_height;
++        ply_pixel_buffer_rotation_t buffer_rotation;
+         int i, step;
+ 
+         head = calloc (1, sizeof(ply_renderer_head_t));
+@@ -607,6 +616,7 @@
+         head->console_buffer_id = console_buffer_id;
+         head->connector0_mode = output->mode;
+         head->uses_hw_rotation = output->uses_hw_rotation;
++        head->rotation = output->rotation;
+ 
+         head->area.x = 0;
+         head->area.y = 0;
+@@ -628,7 +638,20 @@
+         ply_renderer_head_add_connector (head, output);
+         assert (ply_array_get_size (head->connector_ids) > 0);
+ 
+-        head->pixel_buffer = ply_pixel_buffer_new_with_device_rotation (head->area.width, head->area.height, output->rotation);
++        buffer_width = head->area.width;
++        buffer_height = head->area.height;
++        buffer_rotation = output->rotation;
++
++        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE ||
++            head->rotation == PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE) {
++                buffer_width = head->area.height;
++                buffer_height = head->area.width;
++                buffer_rotation = PLY_PIXEL_BUFFER_ROTATE_UPRIGHT;
++        }
++
++        head->pixel_buffer = ply_pixel_buffer_new_with_device_rotation (buffer_width,
++                                                                        buffer_height,
++                                                                        buffer_rotation);
+         ply_pixel_buffer_set_device_scale (head->pixel_buffer, output->device_scale);
+ 
+         ply_trace ("Creating %ldx%ld renderer head", head->area.width, head->area.height);
+@@ -842,6 +865,65 @@
+         }
+ }
+ 
++#if defined(PLY_HAVE_NEON)
++static inline uint32x4_t
++neon_reverse_u32x4 (uint32x4_t v)
++{
++        v = vrev64q_u32 (v);
++        return vextq_u32 (v, v, 2);
++}
++
++static inline void
++neon_transpose_4x4_u32 (uint32x4_t r0,
++                        uint32x4_t r1,
++                        uint32x4_t r2,
++                        uint32x4_t r3,
++                        uint32x4_t *c0,
++                        uint32x4_t *c1,
++                        uint32x4_t *c2,
++                        uint32x4_t *c3)
++{
++        uint32x2x2_t t0 = vtrn_u32 (vget_low_u32 (r0), vget_low_u32 (r1));
++        uint32x2x2_t t1 = vtrn_u32 (vget_low_u32 (r2), vget_low_u32 (r3));
++        uint32x2x2_t t2 = vtrn_u32 (vget_high_u32 (r0), vget_high_u32 (r1));
++        uint32x2x2_t t3 = vtrn_u32 (vget_high_u32 (r2), vget_high_u32 (r3));
++
++        *c0 = vcombine_u32 (t0.val[0], t1.val[0]);
++        *c1 = vcombine_u32 (t0.val[1], t1.val[1]);
++        *c2 = vcombine_u32 (t2.val[0], t3.val[0]);
++        *c3 = vcombine_u32 (t2.val[1], t3.val[1]);
++}
++#endif
++
++static bool
++head_needs_software_rotation (ply_renderer_head_t *head)
++{
++        return !head->uses_hw_rotation &&
++               (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE ||
++                head->rotation == PLY_PIXEL_BUFFER_ROTATE_COUNTER_CLOCKWISE);
++}
++
++static void
++rotate_area_for_head (ply_renderer_head_t *head,
++                      ply_rectangle_t    *source_area,
++                      ply_rectangle_t    *rotated_area)
++{
++        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                rotated_area->x = (long) head->area.width -
++                                  (long) source_area->height -
++                                  source_area->y;
++                rotated_area->y = source_area->x;
++        } else {
++                rotated_area->x = source_area->y;
++                rotated_area->y = (long) head->area.height -
++                                  (long) source_area->width -
++                                  source_area->x;
++        }
++
++        rotated_area->width = source_area->height;
++        rotated_area->height = source_area->width;
++}
++
+ static void
+ ply_renderer_head_flush_area (ply_renderer_head_t *head,
+                               ply_rectangle_t     *area_to_flush,
+@@ -859,6 +941,171 @@
+ }
+ 
+ static void
++ply_renderer_head_flush_area_rotated (ply_renderer_head_t *head,
++                                      ply_rectangle_t     *area_to_flush,
++                                      char                *map_address)
++{
++        ply_pixel_buffer_t *pixel_buffer;
++        uint32_t *shadow_buffer;
++        unsigned long source_width;
++        int scale;
++        long x;
++        long y;
++
++        pixel_buffer = head->pixel_buffer;
++        shadow_buffer = ply_pixel_buffer_get_argb32_data (pixel_buffer);
++        scale = ply_pixel_buffer_get_device_scale (pixel_buffer);
++        source_width = ply_pixel_buffer_get_width (pixel_buffer) * scale;
++
++#if defined(PLY_HAVE_NEON)
++        unsigned long src_row_stride = source_width * BYTES_PER_PIXEL;
++
++        if (area_to_flush->width >= 4 && area_to_flush->height >= 4) {
++                long x0 = area_to_flush->x;
++                long y0 = area_to_flush->y;
++                long x1 = x0 + (long) area_to_flush->width;
++                long y1 = y0 + (long) area_to_flush->height;
++                long x1_vec = x1 - ((x1 - x0) & 3);
++                long y1_vec = y1 - ((y1 - y0) & 3);
++
++                if (x1_vec > x0 && y1_vec > y0) {
++                        for (y = y0; y < y1_vec; y += 4) {
++                                for (x = x0; x < x1_vec; x += 4) {
++                                        long src_x0;
++                                        long src_y0;
++                                        const uint8_t *src0;
++                                        const uint8_t *src1;
++                                        const uint8_t *src2;
++                                        const uint8_t *src3;
++                                        uint32x4_t r0;
++                                        uint32x4_t r1;
++                                        uint32x4_t r2;
++                                        uint32x4_t r3;
++                                        uint32x4_t c0;
++                                        uint32x4_t c1;
++                                        uint32x4_t c2;
++                                        uint32x4_t c3;
++                                        uint8_t *dst0;
++                                        uint8_t *dst1;
++                                        uint8_t *dst2;
++                                        uint8_t *dst3;
++
++                                        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                                                src_x0 = y;
++                                                src_y0 = (long) head->area.width - x - 4;
++                                        } else {
++                                                src_x0 = (long) head->area.height - y - 4;
++                                                src_y0 = x;
++                                        }
++
++                                        src0 = (const uint8_t *) (shadow_buffer +
++                                                                  (unsigned long) src_y0 * source_width +
++                                                                  (unsigned long) src_x0);
++                                        src1 = src0 + src_row_stride;
++                                        src2 = src1 + src_row_stride;
++                                        src3 = src2 + src_row_stride;
++
++                                        r0 = vreinterpretq_u32_u8 (vld1q_u8 (src0));
++                                        r1 = vreinterpretq_u32_u8 (vld1q_u8 (src1));
++                                        r2 = vreinterpretq_u32_u8 (vld1q_u8 (src2));
++                                        r3 = vreinterpretq_u32_u8 (vld1q_u8 (src3));
++
++                                        neon_transpose_4x4_u32 (r0, r1, r2, r3, &c0, &c1, &c2, &c3);
++
++                                        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                                                c0 = neon_reverse_u32x4 (c0);
++                                                c1 = neon_reverse_u32x4 (c1);
++                                                c2 = neon_reverse_u32x4 (c2);
++                                                c3 = neon_reverse_u32x4 (c3);
++                                        } else {
++                                                uint32x4_t tmp;
++
++                                                tmp = c0;
++                                                c0 = c3;
++                                                c3 = tmp;
++                                                tmp = c1;
++                                                c1 = c2;
++                                                c2 = tmp;
++                                        }
++
++                                        dst0 = (uint8_t *) map_address +
++                                               y * head->row_stride +
++                                               x * BYTES_PER_PIXEL;
++                                        dst1 = dst0 + head->row_stride;
++                                        dst2 = dst1 + head->row_stride;
++                                        dst3 = dst2 + head->row_stride;
++
++                                        vst1q_u8 (dst0, vreinterpretq_u8_u32 (c0));
++                                        vst1q_u8 (dst1, vreinterpretq_u8_u32 (c1));
++                                        vst1q_u8 (dst2, vreinterpretq_u8_u32 (c2));
++                                        vst1q_u8 (dst3, vreinterpretq_u8_u32 (c3));
++                                }
++                        }
++                }
++
++                for (y = y0; y < y1_vec; y++) {
++                        uint32_t *dst_row = (uint32_t *) &map_address[y * head->row_stride];
++
++                        for (x = x1_vec; x < x1; x++) {
++                                unsigned long src_x;
++                                unsigned long src_y;
++
++                                if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                                        src_x = (unsigned long) y;
++                                        src_y = head->area.width - 1 - (unsigned long) x;
++                                } else {
++                                        src_x = head->area.height - 1 - (unsigned long) y;
++                                        src_y = (unsigned long) x;
++                                }
++
++                                dst_row[x] = shadow_buffer[src_y * source_width + src_x];
++                        }
++                }
++
++                for (y = y1_vec; y < y1; y++) {
++                        uint32_t *dst_row = (uint32_t *) &map_address[y * head->row_stride];
++
++                        for (x = x0; x < x1; x++) {
++                                unsigned long src_x;
++                                unsigned long src_y;
++
++                                if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                                        src_x = (unsigned long) y;
++                                        src_y = head->area.width - 1 - (unsigned long) x;
++                                } else {
++                                        src_x = head->area.height - 1 - (unsigned long) y;
++                                        src_y = (unsigned long) x;
++                                }
++
++                                dst_row[x] = shadow_buffer[src_y * source_width + src_x];
++                        }
++                }
++
++                return;
++        }
++#endif
++
++        for (y = area_to_flush->y; y < area_to_flush->y + (long) area_to_flush->height; y++) {
++                uint32_t *dst_row = (uint32_t *) &map_address[y * head->row_stride];
++
++                for (x = area_to_flush->x; x < area_to_flush->x + (long) area_to_flush->width; x++) {
++                        unsigned long src_x;
++                        unsigned long src_y;
++
++                        if (head->rotation == PLY_PIXEL_BUFFER_ROTATE_CLOCKWISE) {
++                                src_x = (unsigned long) y;
++                                src_y = head->area.width - 1 - (unsigned long) x;
++                        } else {
++                                src_x = head->area.height - 1 - (unsigned long) y;
++                                src_y = (unsigned long) x;
++                        }
++
++                        dst_row[x] = shadow_buffer[src_y * source_width + src_x];
++                }
++        }
++}
++
++static void
+ free_heads (ply_renderer_backend_t *backend)
+ {
+         ply_list_node_t *node;
+@@ -1742,7 +1989,14 @@
+         while (node != NULL) {
+                 area_to_flush = (ply_rectangle_t *) ply_list_node_get_data (node);
+ 
+-                ply_renderer_head_flush_area (head, area_to_flush, map_address);
++                if (head_needs_software_rotation (head)) {
++                        ply_rectangle_t rotated_area;
++
++                        rotate_area_for_head (head, area_to_flush, &rotated_area);
++                        ply_renderer_head_flush_area_rotated (head, &rotated_area, map_address);
++                } else {
++                        ply_renderer_head_flush_area (head, area_to_flush, map_address);
++                }
+                 dirty = true;
+ 
+                 node = ply_list_get_next_node (areas_to_flush, node);

@@ -1,9 +1,0 @@
-config BR2_PACKAGE_PD_MAPPER
-	bool "pd-mapper"
-	select BR2_PACKAGE_QRTR
-	select BR2_PACKAGE_XZ
-
-	help
-	  Qualcomm Protection Domain mapper.
-
-	  https://github.com/andersson/pd-mapper

@@ -7,9 +7,9 @@
 +#ifdef WITH_MP3
  #include <mpg123.h>         // to enable mp3 file music
 +#endif
+ 
  #include "sdl2/wav123.hpp"  // WAV "mpg123-like" decoder
  #include <cctype>
- #include <algorithm>        // for std::min & std::clamp
 @@ -62,6 +64,7 @@
      return e == ext;
  }

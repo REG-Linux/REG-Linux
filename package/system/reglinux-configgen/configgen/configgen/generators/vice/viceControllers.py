@@ -48,8 +48,7 @@ def setViceControllers(system: Any, playersControllers: Any) -> None:
     listVice.append("# REG-Linux configured controllers")
     listVice.append("")
     listVice.append("!CLEAR")
-    nplayer = 1
-    for _, pad in sorted(playersControllers.items()):
+    for _nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
         listVice.append("")
         listVice.append("# " + pad.name)
         for x in pad.inputs:
@@ -57,12 +56,12 @@ def setViceControllers(system: Any, playersControllers: Any) -> None:
             for indexName, indexValue in viceJoystick.items():
                 if indexName == controller_input.name:
                     listVice.append(
-                        indexValue.replace("#", str(pad.index))
+                        indexValue
+                        .replace("#", str(pad.index))
                         .replace("?", str(controller_input.id))
                         .replace("/", joy_port),
                     )
         listVice.append("")
-        nplayer += 1
 
-    with open(VICE_CONTROLLER_PATH, "w") as f:
+    with Path(VICE_CONTROLLER_PATH).open("w") as f:
         f.writelines(str(listVice[i]) + "\n" for i in range(len(listVice)))

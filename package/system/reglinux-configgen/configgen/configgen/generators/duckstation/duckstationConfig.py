@@ -19,7 +19,7 @@ def setDuckstationConfig(
     system: Any,
     playersControllers: Any,
 ) -> None:
-    ## [Main]
+    # [Main]
     if not duckstatonConfig.has_section("Main"):
         duckstatonConfig.add_section("Main")
     # Settings, Language and ConfirmPowerOff
@@ -110,7 +110,7 @@ def setDuckstationConfig(
     # Language
     duckstatonConfig.set("Main", "Language", getLangFromEnvironment())
 
-    ## [Console]
+    # [Console]
     if not duckstatonConfig.has_section("Console"):
         duckstatonConfig.add_section("Console")
     # Region
@@ -119,7 +119,7 @@ def setDuckstationConfig(
     else:
         duckstatonConfig.set("Console", "Region", "Auto")
 
-    ## [BIOS]
+    # [BIOS]
     if not duckstatonConfig.has_section("BIOS"):
         duckstatonConfig.add_section("BIOS")
     duckstatonConfig.set("BIOS", "SearchDirectory", str(BIOS))
@@ -185,7 +185,7 @@ def setDuckstationConfig(
     if JPbiosFile is not None:
         duckstatonConfig.set("BIOS", "PathNTSCJ", JPbiosFile)
 
-    ## [CPU]
+    # [CPU]
     if not duckstatonConfig.has_section("CPU"):
         duckstatonConfig.add_section("CPU")
     # ExecutionMode
@@ -198,7 +198,7 @@ def setDuckstationConfig(
     else:
         duckstatonConfig.set("CPU", "ExecutionMode", "Recompiler")
 
-    ## [GPU]
+    # [GPU]
     if not duckstatonConfig.has_section("GPU"):
         duckstatonConfig.add_section("GPU")
     # Renderer
@@ -318,7 +318,7 @@ def setDuckstationConfig(
             )
             duckstatonConfig.set("GPU", "PerSampleShading", "false")
 
-    ## [Display]
+    # [Display]
     if not duckstatonConfig.has_section("Display"):
         duckstatonConfig.add_section("Display")
     # Aspect Ratio
@@ -398,7 +398,7 @@ def setDuckstationConfig(
     else:
         duckstatonConfig.set("Display", "Stretch", "false")
 
-    ## [Audio]
+    # [Audio]
     if not duckstatonConfig.has_section("Audio"):
         duckstatonConfig.add_section("Audio")
     if system.isOptSet("duckstation_audio_mode"):
@@ -410,12 +410,12 @@ def setDuckstationConfig(
     else:
         duckstatonConfig.set("Audio", "StretchMode", "TimeStretch")
 
-    ## [GameList]
+    # [GameList]
     if not duckstatonConfig.has_section("GameList"):
         duckstatonConfig.add_section("GameList")
     duckstatonConfig.set("GameList", "RecursivePaths", str(DUCKSTATION_ROMS_DIR))
 
-    ## [Cheevos]
+    # [Cheevos]
     if not duckstatonConfig.has_section("Cheevos"):
         duckstatonConfig.add_section("Cheevos")
     # RetroAchievements
@@ -460,7 +460,7 @@ def setDuckstationConfig(
     else:
         duckstatonConfig.set("Cheevos", "Enabled", "false")
 
-    ## [TextureReplacements]
+    # [TextureReplacements]
     if not duckstatonConfig.has_section("TextureReplacements"):
         duckstatonConfig.add_section("TextureReplacements")
     # Texture Replacement saves\textures\psx game id - by default in Normal
@@ -492,13 +492,13 @@ def setDuckstationConfig(
         )
         duckstatonConfig.set("TextureReplacements", "PreloadTextures", "false")
 
-    ## [MemoryCards]
+    # [MemoryCards]
     if not duckstatonConfig.has_section("MemoryCards"):
         duckstatonConfig.add_section("MemoryCards")
     # Set memory card location
     duckstatonConfig.set("MemoryCards", "Directory", str(DUCKSTATION_MEMORY_CARDS_DIR))
 
-    ## [Folders]
+    # [Folders]
     if not duckstatonConfig.has_section("Folders"):
         duckstatonConfig.add_section("Folders")
     # Set other folder locations too
@@ -507,7 +507,7 @@ def setDuckstationConfig(
     duckstatonConfig.set("Folders", "SaveStates", str(DUCKSTATION_SAVES_DIR))
     duckstatonConfig.set("Folders", "Cheats", str(DUCKSTATION_CHEATS_DIR))
 
-    ## [CDROM]
+    # [CDROM]
     if not duckstatonConfig.has_section("CDROM"):
         duckstatonConfig.add_section("CDROM")
     if system.isOptSet("duckstation_boot_without_sbi"):

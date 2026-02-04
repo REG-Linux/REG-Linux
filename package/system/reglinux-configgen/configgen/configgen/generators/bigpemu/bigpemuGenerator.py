@@ -1,8 +1,8 @@
-from os import makedirs, path
+import pathlib
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.settings import JSONSettings
 
 from .bigpemuConfig import (
@@ -25,8 +25,8 @@ class BigPEmuGenerator(Generator):
         game_resolution,
     ):
         # Create the directory if it doesn't exist
-        if not path.exists(BIGPEMU_CONFIG_DIR):
-            makedirs(BIGPEMU_CONFIG_DIR)
+        if not pathlib.Path(BIGPEMU_CONFIG_DIR).exists():
+            pathlib.Path(BIGPEMU_CONFIG_DIR).mkdir(parents=True)
 
         # Load existing configuration or create a new one
         bigpemuConfig = JSONSettings(BIGPEMU_CONFIG_PATH)

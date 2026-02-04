@@ -3,9 +3,9 @@ from re import MULTILINE, search
 from shutil import copy
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import write_sdl_db_all_controllers
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
 from .pcsx2Config import (
@@ -93,7 +93,7 @@ class Pcsx2Generator(Generator):
             else [str(PCSX2_BIN_PATH), "-nogui", str(rom)]
         )
 
-        with open("/proc/cpuinfo") as cpuinfo:
+        with Path("/proc/cpuinfo").open() as cpuinfo:
             if not search(r"^flags\s*:.*\ssse4_1\W", cpuinfo.read(), MULTILINE):
                 eslog.warning(
                     "CPU does not support SSE4.1 which is required by pcsx2.  The emulator will likely crash with SIGILL (illegal instruction).",

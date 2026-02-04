@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA3D_VERSION = 25.3.3
+MESA3D_VERSION = 26.0.0-rc2
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://archive.mesa3d.org
 
@@ -337,6 +337,9 @@ HOST_MESA3D_CONF_OPTS += -Dcpp_rtti=true
 endif
 ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST),y)
 HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=panfrost
+endif
+ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
+HOST_MESA3D_CONF_OPTS += -Dtools=asahi
 endif
 
 # reglinux hack to fix prebuilt llvm/clang

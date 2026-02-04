@@ -184,10 +184,10 @@ else ifeq ($(BR2_riscv),y)
 	REGLINUX_CLANG_CPU = riscv
 else ifeq ($(BR2_saphira),y)
 	REGLINUX_CLANG_CPU = saphira
+else ifeq ($(BR2_x86_x86_64_v3),y)
+	REGLINUX_CLANG_CPU = x86_64_v3
 else ifeq ($(BR2_x86_64),y)
 	REGLINUX_CLANG_CPU = x86_64
-else ifeq ($(BR2_x86_64_v3),y)
-	REGLINUX_CLANG_CPU = x86_64_v3
 endif
 
 CLANG_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(CLANG_VERSION)

@@ -1,5 +1,5 @@
 diff --git a/package/pigpio/pigpio.mk b/package/pigpio/pigpio.mk
-index e34974972a9..18ccdf568bc 100644
+index e34974972a..18ccdf568b 100644
 --- a/package/pigpio/pigpio.mk
 +++ b/package/pigpio/pigpio.mk
 @@ -38,9 +38,10 @@ define PIGPIO_INSTALL_STAGING_CMDS

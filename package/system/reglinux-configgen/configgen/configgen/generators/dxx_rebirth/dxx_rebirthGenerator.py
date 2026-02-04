@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Any
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF
 
 DXX_REBIRTH1_CONFIG_DIR = str(Path(CONF) / "d1x-rebirth")
@@ -50,7 +50,7 @@ class DXX_RebirthGenerator(Generator):
         # Check if the file exists
         if Path(rebirthConfigFile).is_file():
             # Read the contents of the file
-            with open(rebirthConfigFile) as file:
+            with Path(rebirthConfigFile).open() as file:
                 lines = file.readlines()
 
             for i, line in enumerate(lines):
@@ -91,12 +91,12 @@ class DXX_RebirthGenerator(Generator):
                     else:
                         lines[i] = "Multisample=0\n"
 
-            with open(rebirthConfigFile, "w") as file:
+            with Path(rebirthConfigFile).open("w") as file:
                 file.writelines(lines)
 
         else:
             # File doesn't exist, create it with some default values
-            with open(rebirthConfigFile, "w") as file:
+            with Path(rebirthConfigFile).open("w") as file:
                 file.write(f"ResolutionX={game_resolution['width']}\n")
                 file.write(f"ResolutionY={game_resolution['height']}\n")
                 file.write("WindowMode=0\n")

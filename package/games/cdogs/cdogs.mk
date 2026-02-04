@@ -3,8 +3,8 @@
 # C-Dogs
 #
 ################################################################################
-# Version.: Release 2.3.2 on Aug 23, 2025
-CDOGS_VERSION = 2.3.2
+# Version.: Release 2.4.0 on Jan 26, 2026
+CDOGS_VERSION = 2.4.0
 CDOGS_SITE = $(call github,cxong,cdogs-sdl,$(CDOGS_VERSION))
 
 CDOGS_DEPENDENCIES = sdl2 sdl2_mixer enet

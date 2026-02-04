@@ -1,5 +1,5 @@
 diff --git a/package/usbmount/usbmount.mk b/package/usbmount/usbmount.mk
-index 538602fdcbd..d99324245ff 100644
+index 538602fdcb..d99324245f 100644
 --- a/package/usbmount/usbmount.mk
 +++ b/package/usbmount/usbmount.mk
 @@ -22,7 +22,8 @@ define USBMOUNT_INSTALL_TARGET_CMDS

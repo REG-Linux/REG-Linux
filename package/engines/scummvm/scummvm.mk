@@ -3,12 +3,12 @@
 # scummvm
 #
 ################################################################################
-# Version: 2.9.1 - Unreleased yet so no codename yet
-SCUMMVM_VERSION = v2.9.1
+# Version: 2026.1.0
+SCUMMVM_VERSION = v2026.1.0
 SCUMMVM_SITE = $(call github,scummvm,scummvm,$(SCUMMVM_VERSION))
 SCUMMVM_LICENSE = GPLv2
 SCUMMVM_DEPENDENCIES += sdl2 zlib libpng freetype libjpeg-bato
-SCUMMVM_DEPENDENCIES += libogg flac libmad faad2
+SCUMMVM_DEPENDENCIES += libogg flac libmad faad2 giflib
 SCUMMVM_DEPENDENCIES += libmpeg2 libtheora
 
 SCUMMVM_ADDITIONAL_FLAGS += -I$(STAGING_DIR)/usr/include -lpthread -lm

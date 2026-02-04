@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-October/003428.html
-sha256  0caf99b0d60970f81ce41c7ba694e5eaaf833227bb2cbcdb2f6dc9666a663c57  xcb-util-cursor-0.1.5.tar.xz
-sha512  e2d14c3f0ab117524ba90d1a992b61717ccee04bc9e66c587a6a0f10571f15e89fc5db3413882ca7ce14ebc07b6b7b0a4ddecd59ba910e6ca654ea9b1c705ed5  xcb-util-cursor-0.1.5.tar.xz
-# Locally computed
-sha256  0dde91ae1d443105dc9e13cbaed6674c36683b7095836ad9ddfce26be270aad5  COPYING

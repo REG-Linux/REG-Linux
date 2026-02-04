@@ -9,7 +9,7 @@ config BR2_PACKAGE_NVIDIA_OPEN_DRIVER
 	depends on BR2_x86_64
 	depends on BR2_TOOLCHAIN_USES_GLIBC
 	select BR2_PACKAGE_NVIDIA470_LEGACY_DRIVER
-	select BR2_PACKAGE_NVIDIA_PROPRIETARY_DRIVER
+	select BR2_PACKAGE_NVIDIA580_LEGACY_DRIVER
 	help
 	  The binary-only driver blob for NVidia cards.
 	  This is the userland part only.
@@ -17,6 +17,32 @@ config BR2_PACKAGE_NVIDIA_OPEN_DRIVER
 	  http://www.nvidia.com/
 
 if BR2_PACKAGE_NVIDIA_OPEN_DRIVER
+
+config BR2_PACKAGE_NVIDIA_OPEN_DRIVER_XORG
+	bool "X.org drivers"
+	default n
+	depends on BR2_x86_64
+	# recursive dependency select BR2_PACKAGE_MESA3D
+	select BR2_PACKAGE_XWAYLAND
+	select BR2_PACKAGE_XLIB_LIBX11
+	select BR2_PACKAGE_XLIB_LIBXEXT
+	select BR2_PACKAGE_HAS_LIBGL
+	select BR2_PACKAGE_HAS_LIBEGL
+
+if BR2_PACKAGE_NVIDIA_OPEN_DRIVER_XORG
+
+config BR2_PACKAGE_NVIDIA_OPEN_DRIVER_PRIVATE_LIBS
+	bool "Install private libraries"
+	help
+	  Two libraries require special agreement with NVidia to
+	  develop code linking to those libraries: libnvidia-ifr.so
+	  and libnvidia-fbc.so (to grab and encode an OpenGL buffer or
+	  an X framebuffer.)
+
+	  Say 'y' here if you plan on running a program that uses
+	  those private libraries.
+
+endif # BR2_PACKAGE_NVIDIA_OPEN_DRIVER_XORG
 
 config BR2_PACKAGE_NVIDIA_OPEN_DRIVER_CUDA
 	bool "CUDA support"

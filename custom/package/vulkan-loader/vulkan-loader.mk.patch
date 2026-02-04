@@ -1,5 +1,5 @@
 diff --git a/package/vulkan-loader/vulkan-loader.mk b/package/vulkan-loader/vulkan-loader.mk
-index 7aceb207b53..04286ebb687 100644
+index 7aceb207b5..04286ebb68 100644
 --- a/package/vulkan-loader/vulkan-loader.mk
 +++ b/package/vulkan-loader/vulkan-loader.mk
 @@ -4,8 +4,8 @@

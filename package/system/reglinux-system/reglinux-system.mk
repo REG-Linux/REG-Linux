@@ -13,7 +13,7 @@ REGLINUX_SYSTEM_SOURCE=
 ### Beta release MUST BE marked as "prerelease" ( tag is version = YY.MM-beta-[1-9] )
 ### Stable release must be marked as "latest" ( tag is version = YY.MM.[0-9] )
 
-REGLINUX_SYSTEM_ID_VERSION = 25.12
+REGLINUX_SYSTEM_ID_VERSION = 26.01
 REGLINUX_SYSTEM_RELEASE_TYPE=dev
 REGLINUX_SYSTEM_VERSION = $(REGLINUX_SYSTEM_ID_VERSION)-$(REGLINUX_SYSTEM_RELEASE_TYPE)
 REGLINUX_SYSTEM_DATE_TIME = $(shell date "+%Y/%m/%d %H:%M")
@@ -45,10 +45,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_CHA),y)
 	REGLINUX_SYSTEM_ARCH=h3
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H3),y)
 	REGLINUX_SYSTEM_ARCH=h3
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H5),y)
-	REGLINUX_SYSTEM_ARCH=h5
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H6),y)
-	REGLINUX_SYSTEM_ARCH=h6
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SUN50I),y)
+	REGLINUX_SYSTEM_ARCH=sun50i
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H616),y)
 	REGLINUX_SYSTEM_ARCH=h616
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_H700),y)
@@ -85,6 +83,8 @@ else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SDM845),y)
 	REGLINUX_SYSTEM_ARCH=sdm845
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM6115),y)
 	REGLINUX_SYSTEM_ARCH=sm6115
+else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_QCS6490),y)
+	REGLINUX_SYSTEM_ARCH=qcs6490
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8250),y)
 	REGLINUX_SYSTEM_ARCH=sm8250
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
@@ -106,11 +106,16 @@ endif
 define REGLINUX_SYSTEM_INSTALL_LOGS_SERVICE
 	$(INSTALL) -m 0755 -D $(BR2_EXTERNAL_REGLINUX_PATH)/package/system/reglinux-system/LOGS $(TARGET_DIR)/usr/share/reglinux/services/LOGS
 	sed -i "s/system\.services\=SAMBA/system\.services\=LOGS SAMBA/" $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
-	sed -i "s/.*system\.security\.enabled.*/system\.security\.enabled\=0/" $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
+endef
+
+define REGLINUX_SYSTEM_ENABLE_SECURITY
+	sed -i "s/.*system\.security\.enabled.*/system\.security\.enabled\=1/" $(TARGET_DIR)/usr/share/reglinux/datainit/system/system.conf
 endef
 
 ifneq (,$(filter dev beta,$(REGLINUX_SYSTEM_RELEASE_TYPE)))
 	REGLINUX_SYSTEM_POST_INSTALL_TARGET_HOOKS += REGLINUX_SYSTEM_INSTALL_LOGS_SERVICE
+else
+	REGLINUX_SYSTEM_POST_INSTALL_TARGET_HOOKS += REGLINUX_SYSTEM_ENABLE_SECURITY
 endif
 
 define REGLINUX_SYSTEM_INSTALL_TARGET_CMDS

@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -12,6 +13,32 @@ class MaxLevelFilter(logging.Filter):
 
     def filter(self, record: logging.LogRecord) -> bool:
         return record.levelno < self.max_level
+
+
+class BrokenPipeHandler(logging.Handler):
+    """Custom handler that gracefully handles BrokenPipeError when writing to stdout/stderr."""
+
+    def __init__(self, stream):
+        super().__init__()
+        self.stream = stream
+        self.terminator = "\n"
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            stream = self.stream
+            stream.write(msg + self.terminator)
+            self.flush()
+        except BrokenPipeError:
+            # Gracefully handle broken pipe by redirecting to devnull
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(
+                devnull,
+                self.stream.fileno(),
+            )  # Replace the broken pipe with devnull
+            os.close(devnull)
+        except Exception:
+            self.handleError(record)
 
 
 class LoggerManager:
@@ -67,7 +94,7 @@ class LoggerManager:
         # Setup stdout handler for lower level logs
         if enable_stdout:
             error_level = logging.WARNING
-            stdout_handler = logging.StreamHandler(sys.stdout)
+            stdout_handler = BrokenPipeHandler(sys.stdout)
             stdout_handler.setFormatter(formatter)
             stdout_handler.setLevel(logging.DEBUG)
             stdout_handler.addFilter(MaxLevelFilter(error_level))
@@ -75,7 +102,7 @@ class LoggerManager:
 
         # Setup stderr handler for error logs
         if enable_stderr:
-            stderr_handler = logging.StreamHandler(sys.stderr)
+            stderr_handler = BrokenPipeHandler(sys.stderr)
             stderr_handler.setFormatter(formatter)
             stderr_handler.setLevel(logging.WARNING)
             self.logger.addHandler(stderr_handler)

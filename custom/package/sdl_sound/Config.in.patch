@@ -1,5 +1,5 @@
 diff --git a/package/sdl_sound/Config.in b/package/sdl_sound/Config.in
-index 6da19853e04..d7e85201156 100644
+index 6da19853e0..d7e8520115 100644
 --- a/package/sdl_sound/Config.in
 +++ b/package/sdl_sound/Config.in
 @@ -1,6 +1,6 @@

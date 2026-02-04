@@ -3,11 +3,11 @@
 # cannonball
 #
 ################################################################################
-# Version.: Commits on Oct 16, 2025
-CANNONBALL_VERSION = aa77386ebe4a5d32e1b1d2b682aa52f3a1f76b5b
+# Version.: Commits on Feb 1, 2026
+CANNONBALL_VERSION = v1.4
 CANNONBALL_SITE = $(call github,J1mbo,cannonball-se,$(CANNONBALL_VERSION))
 CANNONBALL_LICENSE = GPLv2
-CANNONBALL_DEPENDENCIES = sdl2 boost
+CANNONBALL_DEPENDENCIES = sdl2 boost tinyxml2
 
 CANNONBALL_TARGET = sdl2gles
 
@@ -61,7 +61,5 @@ define CANNONBALL_INSTALL_TARGET_CMDS
 	cp -f $(BR2_EXTERNAL_REGLINUX_PATH)/package/ports/cannonball/cannonball.cannonball.keys \
 	    $(TARGET_DIR)/usr/share/evmapy
 endef
-
-CANNONBALL_SUBDIR = cmake
 
 $(eval $(cmake-package))

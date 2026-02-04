@@ -1,0 +1,11 @@
+config BR2_PACKAGE_QUAKESPASM
+	bool "QuakeSpasm"
+	depends on BR2_PACKAGE_SDL2
+	depends on BR2_PACKAGE_SDL2_MIXER
+	depends on BR2_PACKAGE_HAS_LIBGL
+	# TODO depends on BR2_PACKAGE_HAS_LIBGLES || BR2_PACKAGE_HAS_LIBGL
+	help
+	  QuakeSpasm is a modern, portable Quake 1 source port
+	  using OpenGL / GLES and SDL2.
+
+	  Game data (pak0.pak / pak1.pak) must be provided separately.

@@ -1,0 +1,40 @@
+#!/bin/dash
+
+BOOT_CONF="/boot/system-boot.conf"
+
+get_key() {
+    value="$("/usr/bin/regmsg" systemconf getconfigkey "$1" 2>/dev/null || true)"
+    if [ -n "${value}" ]; then
+        printf '%s\n' "${value}"
+        return 0
+    fi
+    [ -r "${BOOT_CONF}" ] || return 0
+    awk -F'=' -v k="$1" '
+        $0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}
+    ' "${BOOT_CONF}"
+}
+
+mode="$(get_key system.usb.mode)"
+if [ -n "${mode}" ]; then
+    [ "${mode}" = "adb" ] || exit 0
+else
+    enabled="$(get_key system.usb.adb)"
+    [ "${enabled}" = "1" ] || exit 0
+fi
+
+case "$1" in
+    start)
+        /usr/bin/usbgadget adb
+        ;;
+    stop)
+        /usr/bin/usbgadget stop
+        ;;
+    restart|reload)
+        /usr/bin/usbgadget stop
+        /usr/bin/usbgadget adb
+        ;;
+    *)
+        printf '%s\n' "Usage: $0 {start|stop|restart}" >&2
+        exit 1
+        ;;
+esac

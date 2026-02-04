@@ -1,0 +1,23 @@
+name: Trigger QT6 compiler
+
+on:
+  push:
+    branches:
+      - wip
+    paths:
+      - 'package/libraries/reglinux-qt6/**'
+      - 'custom/package/qt6/**'
+
+jobs:
+  trigger-qt6-workflow:
+    runs-on: ubuntu-latest
+    name: Trigger remote workflow
+    steps:
+      - name: Trigger QT6 compilation workflow
+        run: |
+          curl -L \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.REG_TOKEN }}" \
+          https://api.github.com/repos/REG-Linux/REG-Qt6-binaries/dispatches \
+          -d '{"event_type":"trigger-workflow"}'

@@ -6,9 +6,9 @@ from typing import Any
 
 from ffmpeg import probe
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config, guns_borders_size_name
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF, ROMS, SAVES
 from configgen.utils.logger import get_logger
 
@@ -28,7 +28,7 @@ eslog = get_logger(__name__)
 class HypseusSingeGenerator(Generator):
     @staticmethod
     def find_m2v_from_txt(txt_file: str) -> str | None:
-        with open(txt_file) as file:
+        with Path(txt_file).open() as file:
             for line in file:
                 parts = line.strip().split()
                 if parts:
@@ -485,7 +485,7 @@ class HypseusSingeGenerator(Generator):
         commands_file_path = Path(commandsFile)
         if commands_file_path.is_file():
             try:
-                with open(commandsFile) as f:
+                with Path(commandsFile).open() as f:
                     command_array.extend(f.read().split())
             except OSError as e:
                 eslog.error(f"Error reading commands file {commandsFile}: {e}")

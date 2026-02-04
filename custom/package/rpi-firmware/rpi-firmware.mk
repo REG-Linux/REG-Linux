@@ -3,9 +3,8 @@
 # rpi-firmware
 #
 ################################################################################
-# Version.: 6.12.62
 # Please keep in sync with configs/raspberrypi*_deconfig
-RPI_FIRMWARE_VERSION = 4aa2a51fecb99ce16fe591391f6779174b9b5bea
+RPI_FIRMWARE_VERSION = 8afbe608658d2ad0093df191afb6135d6a8326bc
 RPI_FIRMWARE_SITE = $(call github,raspberrypi,firmware,$(RPI_FIRMWARE_VERSION))
 RPI_FIRMWARE_LICENSE = BSD-3-Clause
 RPI_FIRMWARE_LICENSE_FILES = boot/LICENCE.broadcom

@@ -5,7 +5,7 @@
 ################################################################################
 
 # branch: main
-REGLINUX_MSG_VERSION = 9ba4685c37d461cfea70cc0cb71c15ac95fcdbd9
+REGLINUX_MSG_VERSION = ab66ca5b5428be65bf232c0623d14db456245acb
 
 ifeq ($(BR2_PACKAGE_REGLINUX_MSG_BUILD_FROM_SOURCE),y)
 
@@ -25,7 +25,7 @@ define REGLINUX_MSG_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/$(REGLINUX_MSG_LOCATION)/regmsgd			$(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D $(@D)/$(REGLINUX_MSG_LOCATION)/regmsg_shell		$(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D $(@D)/target/$(RUSTC_TARGET_PROFILE)/libdrmhook.so	$(TARGET_DIR)/usr/lib/
-	$(INSTALL) -D $(@D)/target/$(RUSTC_TARGET_PROFILE)/S06regmsgd		$(TARGET_DIR)/etc/init.d/
+	$(INSTALL) -D $(@D)/target/$(RUSTC_TARGET_PROFILE)/S06regmsgd		$(TARGET_DIR)/etc/init.d/S06regmsgd
 endef
 
 $(eval $(cargo-package))
@@ -70,10 +70,10 @@ else ifeq ($(BR2_riscv),y)
 	REGLINUX_MSG_CPU = riscv
 else ifeq ($(BR2_saphira),y)
 	REGLINUX_MSG_CPU = saphira
+else ifeq ($(BR2_x86_x86_64_v3),y)
+	REGLINUX_MSG_CPU = x86_64_v3
 else ifeq ($(BR2_x86_64),y)
 	REGLINUX_MSG_CPU = x86_64
-else ifeq ($(BR2_x86_64_v3),y)
-	REGLINUX_MSG_CPU = x86_64_v3
 endif
 
 REGLINUX_MSG_SHORT_VERSION := $(shell printf '%s' "$(REGLINUX_MSG_VERSION)" | cut -c1-7)

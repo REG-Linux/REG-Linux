@@ -1,12 +1,11 @@
 from configparser import ConfigParser, DuplicateOptionError
-from os import rename
 from pathlib import Path
 from shutil import copy
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 from configgen.utils.systemServices import get_service_status
 
@@ -51,19 +50,27 @@ class VPinballGenerator(Generator):
             pinmame_path.mkdir(parents=True, exist_ok=True)
         log_path = Path(VPINBALL_LOG_PATH)
         if log_path.exists():
-            rename(VPINBALL_LOG_PATH, VPINBALL_LOG_PATH + ".1")
+            Path(VPINBALL_LOG_PATH).rename(VPINBALL_LOG_PATH + ".1")
 
-        ## [ VPinballX.ini ] ##
+        # [ VPinballX.ini ] ##
         try:
             vpinballSettings = ConfigParser(interpolation=None, allow_no_value=True)
-            vpinballSettings.optionxform = lambda optionstr: str(optionstr)
+
+            def preserve_case(optionstr):
+                return str(optionstr)
+
+            vpinballSettings.optionxform = preserve_case
             vpinballSettings.read(VPINBALL_CONFIG_PATH)
         except DuplicateOptionError as e:
             eslog.debug(f"Error reading VPinballX.ini: {e}")
             eslog.debug("*** Using default VPinballX.ini file ***")
             copy(VPINBALL_ASSETS_PATH, VPINBALL_CONFIG_PATH)
             vpinballSettings = ConfigParser(interpolation=None, allow_no_value=True)
-            vpinballSettings.optionxform = lambda optionstr: str(optionstr)
+
+            def preserve_case(optionstr):
+                return str(optionstr)
+
+            vpinballSettings.optionxform = preserve_case
             vpinballSettings.read(VPINBALL_CONFIG_PATH)
 
         # init sections
@@ -95,7 +102,7 @@ class VPinballGenerator(Generator):
             vpinballSettings.set("Standalone", "DMDServer", "0")
 
         # Save VPinballX.ini
-        with open(VPINBALL_CONFIG_PATH, "w") as configfile:
+        with Path(VPINBALL_CONFIG_PATH).open("w", encoding="utf-8") as configfile:
             vpinballSettings.write(configfile)
 
         # set the config path to be sure

@@ -4,9 +4,9 @@ from pathlib import Path
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
 from .cannonballConfig import (
@@ -50,7 +50,9 @@ class CannonballGenerator(Generator):
 
         # save the config file
         with codecs_open(
-            CANNONBALL_CONFIG_PATH, "w", encoding="utf-8"
+            CANNONBALL_CONFIG_PATH,
+            "w",
+            encoding="utf-8",
         ) as cannonballXml:
             dom_string = linesep.join(
                 [s for s in cannoballConfig.toprettyxml().splitlines() if s.strip()],

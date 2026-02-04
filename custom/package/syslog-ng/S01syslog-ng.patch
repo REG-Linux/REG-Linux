@@ -1,5 +1,5 @@
 diff --git a/package/syslog-ng/S01syslog-ng b/package/syslog-ng/S01syslog-ng
-index 2ced6f8b001..31825c6bb17 100644
+index 2ced6f8b00..31825c6bb1 100644
 --- a/package/syslog-ng/S01syslog-ng
 +++ b/package/syslog-ng/S01syslog-ng
 @@ -1,62 +1,38 @@

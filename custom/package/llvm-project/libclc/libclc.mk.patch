@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/libclc/libclc.mk b/package/llvm-project/libclc/libclc.mk
-index 9f303d6d2f0..78b5495b564 100644
+index 9f303d6d2f..a50f6dd4fa 100644
 --- a/package/llvm-project/libclc/libclc.mk
 +++ b/package/llvm-project/libclc/libclc.mk
 @@ -3,14 +3,22 @@
@@ -99,10 +99,10 @@ index 9f303d6d2f0..78b5495b564 100644
 +	REGLINUX_LIBCLC_CPU = riscv
 +else ifeq ($(BR2_saphira),y)
 +	REGLINUX_LIBCLC_CPU = saphira
++else ifeq ($(BR2_x86_x86_64_v3),y)
++	REGLINUX_LIBCLC_CPU = x86_64_v3
 +else ifeq ($(BR2_x86_64),y)
 +	REGLINUX_LIBCLC_CPU = x86_64
-+else ifeq ($(BR2_x86_64_v3),y)
-+	REGLINUX_LIBCLC_CPU = x86_64_v3
 +endif
 +
 +LIBCLC_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(LIBCLC_VERSION)

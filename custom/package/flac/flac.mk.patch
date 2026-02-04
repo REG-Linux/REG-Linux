@@ -1,5 +1,5 @@
 diff --git a/package/flac/flac.mk b/package/flac/flac.mk
-index 6bac9ef8a7b..cc7f4ce6169 100644
+index 6bac9ef8a7..cc7f4ce616 100644
 --- a/package/flac/flac.mk
 +++ b/package/flac/flac.mk
 @@ -13,6 +13,9 @@ FLAC_LICENSE = Xiph BSD-like (libFLAC), GPL-2.0+ (tools), LGPL-2.1+ (other libra

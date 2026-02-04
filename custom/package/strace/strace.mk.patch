@@ -1,5 +1,5 @@
 diff --git a/package/strace/strace.mk b/package/strace/strace.mk
-index 7bf1c24c1a4..bcb9767cd7f 100644
+index 7bf1c24c1a..bcb9767cd7 100644
 --- a/package/strace/strace.mk
 +++ b/package/strace/strace.mk
 @@ -4,7 +4,8 @@

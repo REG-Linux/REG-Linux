@@ -1,5 +1,5 @@
 diff --git a/package/libfreeimage/libfreeimage.mk b/package/libfreeimage/libfreeimage.mk
-index 4775f92109a..b0003c954bb 100644
+index 4775f92109..b0003c954b 100644
 --- a/package/libfreeimage/libfreeimage.mk
 +++ b/package/libfreeimage/libfreeimage.mk
 @@ -19,8 +19,22 @@ define LIBFREEIMAGE_EXTRACT_CMDS

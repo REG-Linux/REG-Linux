@@ -1,8 +1,8 @@
 diff --git a/package/sway/sway.mk b/package/sway/sway.mk
-index 74614b0c7f4..09c45769c0a 100644
+index 74614b0c7f..9e44c07da3 100644
 --- a/package/sway/sway.mk
 +++ b/package/sway/sway.mk
-@@ -4,17 +4,16 @@
+@@ -4,17 +4,20 @@
  #
  ################################################################################
  
@@ -12,18 +12,21 @@ index 74614b0c7f4..09c45769c0a 100644
  SWAY_LICENSE = MIT
  SWAY_LICENSE_FILES = LICENSE
 -SWAY_DEPENDENCIES = systemd host-pkgconf wlroots json-c pcre cairo pango
-+SWAY_DEPENDENCIES = host-pkgconf wlroots json-c pcre cairo pango
++SWAY_DEPENDENCIES = host-pkgconf wlroots json-c pcre cairo pango basu
  SWAY_CONF_OPTS = \
++	--buildtype=release \
++	-Dtray=disabled \
  	-Dwerror=false \
++	-Dbash-completions=false \
  	-Dzsh-completions=false \
  	-Dfish-completions=false \
--	-Dman-pages=disabled \
+ 	-Dman-pages=disabled \
 -	-Dsd-bus-provider=libsystemd
-+	-Dman-pages=disabled
++	-Dsd-bus-provider=basu
  
  ifeq ($(BR2_PACKAGE_GDK_PIXBUF),y)
  SWAY_CONF_OPTS += -Dgdk-pixbuf=enabled
-@@ -53,4 +52,11 @@ else
+@@ -53,4 +56,11 @@ else
  SWAY_CONF_OPTS += -Dtray=disabled
  endif
  

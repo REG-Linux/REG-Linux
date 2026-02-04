@@ -19,10 +19,10 @@ import configgen.bezel.bezel_base as bezelsUtil
 from configgen import controllers
 from configgen.client import regmsg_connect
 from configgen.controllers import Evmapy
-from configgen.Emulator import Emulator
-from configgen.GeneratorImporter import getGenerator
+from configgen.emulator import Emulator
+from configgen.generator_importer import getGenerator
 from configgen.systemFiles import SAVES
-from configgen.utils import gunsUtils, videoMode, wheelsUtils, windowsManager, zar
+from configgen.utils import gunsUtils, videoMode, wheelsUtils, windows_manager, zar
 from configgen.utils.logger import get_logger
 
 eslog = get_logger(__name__)
@@ -222,11 +222,11 @@ def _configure_special_devices(
         eslog.info("Wheels disabled.")
         wheels = []
 
-    # Corrigindo o tipo para garantir consistência
+    # Fixing the type to ensure consistency
     guns = guns if isinstance(guns, (list, dict)) else []
     wheels = wheels if isinstance(wheels, (list, dict)) else []
 
-    # Garantir que o retorno tenha os tipos corretos
+    # Ensuring the return has the correct types
     guns_result: dict[str, Any] | list[Any] = (
         guns if isinstance(guns, (dict, list)) else []
     )
@@ -301,6 +301,18 @@ def _setup_environment_variables(system: Any) -> None:
         else "1"
     )
     environ["SDL_RENDER_VSYNC"] = system.config["sdlvsync"]
+
+    # Set keyboard and locale environment variables to prevent xkbcommon errors
+    # Use minimal locale to avoid compose file issues
+    environ["LC_ALL"] = "C"
+    environ["LANG"] = "C"
+    environ["LANGUAGE"] = "C"
+    environ["LC_CTYPE"] = "C"
+
+    # Set XKB configuration to prevent compose file errors
+    environ["XKB_DEFAULT_OPTIONS"] = ""
+    # Also set XKB to avoid compose file lookup
+    environ["XKB_LOG_LEVEL"] = "critical"
 
 
 def _execute_external_scripts(system: Any, rom: str, event_type: str) -> None:
@@ -382,8 +394,7 @@ def _configure_hud(
             hud_bezel,
         )
         hud_config_path = Path("/var/run/hud.config")
-        with open(hud_config_path, "w") as f:
-            f.write(hudconfig)
+        Path(hud_config_path).write_text(hudconfig)
         cmd.env["MANGOHUD_CONFIGFILE"] = str(hud_config_path)
         if not generator.hasInternalMangoHUDCall():
             cmd.array.insert(0, "mangohud")
@@ -427,7 +438,7 @@ def _setup_evmapy_and_compositor(
     if (
         generator.requiresWayland() or generator.requiresX11()
     ) and "WAYLAND_DISPLAY" not in environ:
-        windowsManager.start_compositor(generator, system)
+        windows_manager.start_compositor(generator, system)
 
     return evmapy_thread
 
@@ -529,7 +540,7 @@ def _cleanup_emulator_resources(
 
     # Stop compositor if it was started
     if generator.requiresWayland() or generator.requiresX11():
-        windowsManager.stop_compositor(generator, system)
+        windows_manager.stop_compositor(generator, system)
 
 
 def _launch_emulator_process(
@@ -732,12 +743,10 @@ def _cleanup_temp_files(*temp_files: str) -> None:
         *temp_files: Variable number of temporary file paths to cleanup
 
     """
-    import os
-
     for temp_file in temp_files:
         try:
             if temp_file and Path(temp_file).exists():
-                os.remove(temp_file)
+                Path(temp_file).unlink()
         except Exception as e:
             eslog.warning(f"Could not remove temporary file {temp_file}: {e}")
 
@@ -799,10 +808,9 @@ def getHudBezel(
             )
 
             w, h = game_resolution["width"], game_resolution["height"]
-            with open(overlay_info_file, "w") as fd:
-                fd.write(
-                    f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}',
-                )
+            Path(overlay_info_file).write_text(
+                f'{{"width":{w}, "height":{h}, "opacity":1.0, "messagex":0.22, "messagey":0.12}}'
+            )
         else:
             # A bezel is configured, so let's find its files.
             eslog.debug(
@@ -824,7 +832,7 @@ def getHudBezel(
         infos = {}  # Initialize infos here to ensure it's always defined
         try:
             if overlay_info_file and isinstance(overlay_info_file, str):
-                with open(overlay_info_file) as f:
+                with Path(overlay_info_file).open() as f:
                     infos = json.load(f)
             else:
                 eslog.warning(f"Invalid overlay info file: {overlay_info_file}")
@@ -994,19 +1002,23 @@ def callExternalScripts(folder: str, event: str, args: list[str]) -> None:
                 args,
             )  # Recurse into subdirectories.
         elif access(filepath, X_OK):
-            eslog.debug(f"Calling external script: {[filepath, event] + args!s}")
+            with suppress(BrokenPipeError):
+                eslog.debug(f"Calling external script: {[filepath, event] + args!s}")
             try:
                 result = call([filepath, event] + args)
                 if result != 0:
-                    eslog.warning(
-                        f"External script {filepath} returned non-zero exit code: {result}",
-                    )
+                    with suppress(BrokenPipeError):
+                        eslog.warning(
+                            f"External script {filepath} returned non-zero exit code: {result}",
+                        )
             except OSError as e:
-                eslog.error(f"Failed to execute external script {filepath}: {e}")
+                with suppress(BrokenPipeError):
+                    eslog.error(f"Failed to execute external script {filepath}: {e}")
             except Exception as e:
-                eslog.error(
-                    f"Unexpected error executing external script {filepath}: {e}",
-                )
+                with suppress(BrokenPipeError):
+                    eslog.error(
+                        f"Unexpected error executing external script {filepath}: {e}",
+                    )
 
 
 def hudConfig_protectStr(text: str) -> str:
@@ -1127,19 +1139,24 @@ def runCommand(command: Any) -> int:
         exitcode = proc.returncode
         # Decode and log stdout/stderr.
         if out:
-            eslog.debug(out.decode(errors="ignore"))
+            with suppress(BrokenPipeError):
+                eslog.debug(out.decode(errors="ignore"))
         if err:
-            eslog.error(err.decode(errors="ignore"))
+            with suppress(BrokenPipeError):
+                eslog.error(err.decode(errors="ignore"))
     except BrokenPipeError:
         # This can happen if the parent process (like `head`) closes the pipe.
-        eslog.debug("Broken pipe when communicating with emulator process")
+        with suppress(BrokenPipeError):
+            eslog.debug("Broken pipe when communicating with emulator process")
     except OSError as e:
-        eslog.error(f"OS error when communicating with emulator process: {e}")
+        with suppress(BrokenPipeError):
+            eslog.error(f"OS error when communicating with emulator process: {e}")
     except Exception as e:
-        eslog.error(
-            f"Unexpected error when communicating with emulator process: {e}",
-            exc_info=True,
-        )
+        with suppress(BrokenPipeError):
+            eslog.error(
+                f"Unexpected error when communicating with emulator process: {e}",
+                exc_info=True,
+            )
     finally:
         # Ensure process resources are properly released
         if proc and proc.poll() is None:  # Process is still running
@@ -1267,6 +1284,7 @@ if __name__ == "__main__":
 
     # A short delay can help ensure resources (like GPU memory) are fully released before returning to the frontend.
     sleep(1)
-    eslog.debug(f"Exiting configgen with status {exitcode!s}")
+    with suppress(BrokenPipeError):
+        eslog.debug(f"Exiting configgen with status {exitcode!s}")
 
     exit(exitcode)

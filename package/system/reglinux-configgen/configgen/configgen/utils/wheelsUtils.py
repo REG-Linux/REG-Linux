@@ -79,7 +79,6 @@ def reconfigure_controllers(
 
     # reconfigure wheel buttons
     # no need to sort, but i like keeping the same loop (sorted by players)
-    nplayer = 1
     for playercontroller, pad in sorted(players_controllers.items()):
         if pad.dev in device_list and device_list[pad.dev]["isWheel"]:
             eslog.info(f"Wheel reconfiguration for pad {pad.name}")
@@ -121,7 +120,6 @@ def reconfigure_controllers(
                             eslog.info(
                                 f"wheel: unable to replace {wantedkey} with {wheelkey}",
                             )
-        nplayer += 1
 
     # reconfigure wheel min/max/deadzone
     procs = []
@@ -263,13 +261,11 @@ def reconfigure_controllers(
 
 
 def get_wheels_from_device_infos(device_infos: dict[str, Any]) -> dict[str, Any]:
-    res = {}
-    for x in device_infos:
-        # Check if device_infos[x] is a dictionary before accessing the key
-        device_info = device_infos[x]
-        if isinstance(device_info, dict) and device_info.get("isWheel"):
-            res[x] = device_info
-    return res
+    return {
+        x: device_info
+        for x, device_info in device_infos.items()
+        if isinstance(device_info, dict) and device_info.get("isWheel")
+    }
 
 
 def reconfigure_angle_rotation(
@@ -286,7 +282,7 @@ def reconfigure_angle_rotation(
     absmin: int | None = None
     absmax: int | None = None
     for item in caps.get(ecodes.EV_ABS, []):
-        if isinstance(item, tuple) and len(item) == 2:
+        if isinstance(item, tuple) and len(item) == 2:  # noqa: PLR2004
             v: int
             absinfo: Any
             v, absinfo = item

@@ -1,6 +1,0 @@
-config BR2_PACKAGE_HAS_LIBMALI
-	bool
-
-config BR2_PACKAGE_PROVIDES_LIBMALI
-	string
-	depends on BR2_PACKAGE_HAS_LIBMALI

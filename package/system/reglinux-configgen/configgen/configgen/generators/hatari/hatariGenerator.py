@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
 from .hatariConfig import HATARI_BIN_PATH, HATARI_BIOS_PATH
@@ -81,7 +81,7 @@ class HatariGenerator(Generator):
             blank_file = "/userdata/system/configs/hatari/blank.st"
             blank_path = Path(blank_file)
             if not blank_path.exists():
-                with open(blank_file, "w"):
+                with Path(blank_file).open("w"):
                     pass
             command_array += ["--harddrive", rom, blank_file]
         else:

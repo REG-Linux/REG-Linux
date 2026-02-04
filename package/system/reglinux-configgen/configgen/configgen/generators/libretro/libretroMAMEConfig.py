@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
 from csv import reader
-from os import linesep, listdir, remove, symlink
+from os import linesep, listdir
 from pathlib import Path
 from shutil import copy2, rmtree
 from typing import Any
@@ -107,7 +107,7 @@ def generateMAMEConfigs(
 
         # Determine MESS system name (if needed)
         messDataFile = Path("/usr/share/reglinux/configgen/data/mame/messSystems.csv")
-        with open(str(messDataFile)) as openFile:
+        with Path(str(messDataFile)).open() as openFile:
             messSystems = []
             messSysName = []
             messRomType = []
@@ -469,7 +469,7 @@ def generateMAMEConfigs(
                     / f"{system.name}_{romType}_autoload.csv"
                 )
                 if autoRunFile.exists():
-                    with open(str(autoRunFile)) as openARFile:
+                    with Path(str(autoRunFile)).open() as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if (
@@ -486,7 +486,7 @@ def generateMAMEConfigs(
                     / f"{softList}_autoload.csv"
                 )
                 if autoRunFile.exists():
-                    with open(str(autoRunFile)) as openARFile:
+                    with Path(str(autoRunFile)).open() as openARFile:
                         autoRunList = reader(openARFile, delimiter=";", quotechar="'")
                         for row in autoRunList:
                             if row[0].casefold() == Path(romBasename).stem.casefold():
@@ -496,7 +496,7 @@ def generateMAMEConfigs(
             if autoRunCmd is not None:
                 if autoRunCmd.startswith("'"):
                     autoRunCmd.replace("'", "")
-                with open(str(batocera_ini_path), "w") as iniFile:
+                with Path(str(batocera_ini_path)).open("w") as iniFile:
                     iniFile.write("autoboot_command          " + autoRunCmd + "\n")
                     iniFile.write("autoboot_delay            " + str(autoRunDelay))
             # Create & add a blank disk if needed, insert into drive 2
@@ -573,12 +573,11 @@ def generateMAMEConfigs(
     cmdFileList = listdir(cmdPath)
     for file in cmdFileList:
         if file.endswith(".cmd"):
-            remove(str(cmdPath / file))
+            Path(str(cmdPath / file)).unlink()
 
     # Write command line file
     cmdFilename = cmdPath / f"{romDrivername}.cmd"
-    with open(str(cmdFilename), "w") as cmdFile:
-        cmdFile.write(" ".join(commandLine))
+    Path(str(cmdFilename)).write_text(" ".join(commandLine))
 
     # Call Controller Config
     if messMode == -1:
@@ -630,7 +629,7 @@ def prepSoftwareList(
     hashFiles = listdir(hashDir)
     for file in hashFiles:
         if file.endswith(".xml"):
-            remove(str(Path(hashDir) / file))
+            Path(str(Path(hashDir) / file)).unlink()
     # Copy hashfile
     copy2(
         str(Path("/usr/bin/mame/hash") / f"{softList}.xml"),
@@ -639,9 +638,13 @@ def prepSoftwareList(
     # Link ROM's parent folder if needed, ROM's folder otherwise
     if softList in subdirSoftList:
         romPath = Path(romDirname)
-        symlink(str(romPath.parents[0]), str(Path(softDir) / softList), True)
+        Path(str(Path(softDir) / softList)).symlink_to(
+            str(romPath.parents[0]), target_is_directory=True
+        )
     else:
-        symlink(romDirname, str(Path(softDir) / softList), True)
+        Path(str(Path(softDir) / softList)).symlink_to(
+            romDirname, target_is_directory=True
+        )
 
 
 def getMameControlScheme(system: Any, romBasename: str) -> Any:
@@ -668,17 +671,17 @@ def getMameControlScheme(system: Any, romBasename: str) -> Any:
     if controllerType in ["default", "neomini", "neocd", "twinstick", "qbert"]:
         return controllerType
     try:
-        with open(mameCapcom) as f:
+        with Path(mameCapcom).open() as f:
             capcomList = set(f.read().split())
-        with open(mameMKombat) as f:
+        with Path(mameMKombat).open() as f:
             mkList = set(f.read().split())
-        with open(mameKInstinct) as f:
+        with Path(mameKInstinct).open() as f:
             kiList = set(f.read().split())
-        with open(mameNeogeo) as f:
+        with Path(mameNeogeo).open() as f:
             neogeoList = set(f.read().split())
-        with open(mameTwinstick) as f:
+        with Path(mameTwinstick).open() as f:
             twinstickList = set(f.read().split())
-        with open(mameRotatedstick) as f:
+        with Path(mameRotatedstick).open() as f:
             qbertList = set(f.read().split())
     except OSError as e:
         eslog.error(f"Error reading MAME list files: {e}")
@@ -765,7 +768,7 @@ def generateMAMEPadConfig(
 
     # Load standard controls from csv
     controlFile = "/usr/share/reglinux/configgen/data/mame/mameControls.csv"
-    with open(controlFile) as openFile:
+    with Path(controlFile).open() as openFile:
         controlDict = {}
         controlList = reader(openFile)
         for row in controlList:
@@ -846,7 +849,7 @@ def generateMAMEPadConfig(
         messControlFile = Path(
             "/usr/share/reglinux/configgen/data/mame/messControls.csv",
         )
-        with open(str(messControlFile)) as openMessFile:
+        with Path(str(messControlFile)).open() as openMessFile:
             controlList = reader(openMessFile, delimiter=";")
             for row in controlList:
                 if row[0] not in messControlDict:
@@ -1161,7 +1164,7 @@ def generateMAMEPadConfig(
     # mameXml = open(configFile, "w")
     # TODO: python 3 - workawround to encode files in utf-8
     if overwriteMAME:
-        with open(str(configFile), "w", encoding="utf-8") as mameXml:
+        with Path(str(configFile)).open("w", encoding="utf-8") as mameXml:
             dom_string = linesep.join(
                 [s for s in config.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...
@@ -1169,7 +1172,7 @@ def generateMAMEPadConfig(
 
     # Write alt config (if used, custom config is turned off or file doesn't exist yet)
     if messSysName in specialControlList and overwriteSystem:
-        with open(str(configFile_alt), "w", encoding="utf-8") as mameXml_alt:
+        with Path(str(configFile_alt)).open("w", encoding="utf-8") as mameXml_alt:
             dom_string_alt = linesep.join(
                 [s for s in config_alt.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...

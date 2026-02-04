@@ -5,6 +5,9 @@ from typing import Any
 from configgen.settings import TOMLSettings
 from configgen.systemFiles import CONF, SAVES
 
+# Constants
+MAX_PLAYERS = 4
+
 XEMU_SAVES_DIR = SAVES / "xbox"
 XEMU_CONFIG_PATH = CONF / "xemu" / "xemu.toml"
 XEMU_BIN_PATH = Path("/usr/bin/xemu")
@@ -146,11 +149,9 @@ def createXemuConfig(
             and f"port{i}" in config_data["input.bindings"]
         ):
             del config_data["input.bindings"][f"port{i}"]
-    nplayer = 1
-    for _, pad in sorted(playersControllers.items()):
-        if nplayer <= 4:
+    for nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
+        if nplayer <= MAX_PLAYERS:
             config_data["input.bindings"][f"port{nplayer}"] = pad.guid
-        nplayer = nplayer + 1
 
     # Network
     # Documentation: https://github.com/xemu-project/xemu/blob/master/config_spec.yml

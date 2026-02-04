@@ -1,6 +1,6 @@
 # Qualcomm SM8550 Board Support
 
-This folder contains the REG-Linux board support artifacts for Qualcomm SM8550-based handhelds such as the AYN Odin2, Odin2 Portal and (eventually) the AYANEO Pocket line. All outputs expect a LinuxLoader-based boot chain and require flashing a custom bootloader that hands control to the `boot/LinuxLoader.cfg` shipped for each board. The AYANEO Pocket S target currently lacks an Android bootloader (ABL), so it cannot boot even though the image staging steps are set up here.
+This folder contains the REG-Linux board support artifacts for Qualcomm SM8550-based handhelds such as the AYN Odin2, Odin2 Portal and (eventually) the AYANEO Pocket line. All outputs expect a GRUB-based boot chain and require flashing a custom bootloader that hands control to the `boot/grub.cfg` shipped for each board. The AYANEO Pocket S target currently lacks an Android bootloader (ABL), so it cannot boot even though the image staging steps are set up here.
 
 ## Layout
 
@@ -11,10 +11,10 @@ This folder contains the REG-Linux board support artifacts for Qualcomm SM8550-b
 - `fsoverlay` contains the file-system overlay that ships with the initramfs (fan-daemon startup script, Bluetooth MAC derivation, udev rules for the bundled gamepads and other device-node tweaks plus the supported firmware tree).
 
 ### Board-specific artifacts
-Each board directory (`odin2`, `odin2portal`, `pockets`) exposes:
+Each board directory (`ayn-sm8550`, `ayaneo-sm8550`) exposes:
 1. A `create-boot-script.sh` that copies the kernel image, initramfs, modules, firmware bundle, rescue image and the board’s DTB into `REGLINUX_BINARIES_DIR/boot/boot` so that the final `reglinux.img` contains everything LinuxLoader expects.
 2. `genimage.cfg`, which defines a 2 GB FAT boot partition named `REGLINUX` and a 512 MB `userdata` ext4 partition, then wraps them in an HD image that the bootloader can flash.
-3. `LinuxLoader.cfg`, the bootloader configuration that points LinuxLoader at the staged kernel/initrd/DTB and tweaks options such as `DisableDisplayHW`, `Target=Linux`, USB host mode and volume-up behavior.
+3. `grub.cfg`, the bootloader configuration and menu.
 
 ### Device targets
 - **AYN Odin2** (and similar SM8550 units): `create-boot-script.sh` copies `qcs8550-ayn-odin2.dtb`, and the bootloader uses the stock `cmdline="clk_ignore_unused pd_ignore_unused quiet rw rootwait label=REGLINUX"`.

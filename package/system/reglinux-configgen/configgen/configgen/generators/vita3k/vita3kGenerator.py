@@ -1,8 +1,8 @@
 from os import listdir
 from pathlib import Path
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 
 try:
     from ruamel.yaml import YAML
@@ -16,6 +16,11 @@ from typing import Any
 
 from configgen.controllers import generate_sdl_controller_config
 from configgen.systemFiles import CONF, SAVES
+
+try:
+    from ruamel.yaml.util import load_yaml_guess_indent
+except ImportError:
+    load_yaml_guess_indent = None
 
 VITA3K_CONFIG_DIR = str(CONF / "vita3k")
 VITA3K_SAVES_DIR = str(SAVES / "psvita")
@@ -51,7 +56,7 @@ class Vita3kGenerator(Generator):
         if ux0_path.is_dir():
             # Move all folders from VITA3K_CONFIG_DIR to VITA3K_SAVES_DIR except "data", "lang", and "shaders-builtin"
             for item in listdir(VITA3K_CONFIG_DIR):
-                if item not in ["data", "lang", "shaders-builtin"]:
+                if item not in {"data", "lang", "shaders-builtin"}:
                     item_path = config_dir_path / item
                     if item_path.is_dir():
                         move(str(item_path), VITA3K_SAVES_DIR)
@@ -63,14 +68,17 @@ class Vita3kGenerator(Generator):
         config_path = Path(VITA3K_CONFIG_PATH)
         if config_path.is_file():
             try:
-                from ruamel.yaml.util import load_yaml_guess_indent
-
-                with open(VITA3K_CONFIG_PATH) as stream:
-                    vita3kymlconfig, indent, block_seq_indent = load_yaml_guess_indent(
-                        stream,
-                    )
-            except ImportError:
-                with open(VITA3K_CONFIG_PATH) as stream:
+                if load_yaml_guess_indent is not None:
+                    with Path(VITA3K_CONFIG_PATH).open(encoding="utf-8") as stream:
+                        vita3kymlconfig, indent, block_seq_indent = (
+                            load_yaml_guess_indent(
+                                stream,
+                            )
+                        )
+                else:
+                    raise ImportError
+            except (ImportError, TypeError):
+                with Path(VITA3K_CONFIG_PATH).open(encoding="utf-8") as stream:
                     yaml = YAML()
                     vita3kymlconfig = yaml.load(stream)
                 indent = 2
@@ -133,7 +141,7 @@ class Vita3kGenerator(Generator):
         yaml.explicit_end = True
         yaml.indent(mapping=indent, sequence=indent, offset=block_seq_indent)
 
-        with open(VITA3K_CONFIG_PATH, "w") as fp:
+        with Path(VITA3K_CONFIG_PATH).open("w", encoding="utf-8") as fp:
             yaml.dump(vita3kymlconfig, fp)
 
         # Simplify the rom name (strip the directory & extension)

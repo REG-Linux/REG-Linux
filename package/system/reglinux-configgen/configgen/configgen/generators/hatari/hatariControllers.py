@@ -29,8 +29,7 @@ def setHatariControllers(system: Any, playersControllers: Any) -> None:
             config.set(section, "nJoyId", "-1")
             config.set(section, "nJoystickMode", "0")
 
-    nplayer = 1
-    for _, pad in sorted(playersControllers.items()):
+    for nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
         if nplayer <= 5:
             section = "Joystick" + str(nplayer)
             if not config.has_section(section):
@@ -50,7 +49,6 @@ def setHatariControllers(system: Any, playersControllers: Any) -> None:
                 config.set(section, "nButton3", str(pad.inputs[padMapping[3]].id))
             else:
                 config.set(section, "nButton3", "2")
-        nplayer += 1
 
     # Log
     if not config.has_section("Log"):
@@ -65,5 +63,5 @@ def setHatariControllers(system: Any, playersControllers: Any) -> None:
     else:
         config.set("Screen", "bShowStatusbar", "FALSE")
 
-    with open(HATARI_CONFIG_PATH, "w") as configfile:
+    with Path(HATARI_CONFIG_PATH).open("w") as configfile:
         config.write(configfile)

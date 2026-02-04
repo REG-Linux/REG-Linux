@@ -4,9 +4,9 @@ from pathlib import Path
 from shutil import copy
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 
 from .fallout2Config import (
     FALLOUT_BIN_PATH,
@@ -68,10 +68,10 @@ class Fallout2Generator(Generator):
 
         setFalloutConfig(falloutConfig, system)
 
-        with open(FALLOUT_CONFIG_PATH, "w") as configfile:
+        with Path(FALLOUT_CONFIG_PATH).open("w") as configfile:
             falloutConfig.write(configfile)
 
-        ## INI Configuration
+        # INI Configuration
         falloutIniConfig = ConfigParser()
         falloutIniConfig.optionxform = lambda optionstr: str(optionstr)
         config_ini_path = Path(FALLOUT_CONFIG_INI)
@@ -80,13 +80,13 @@ class Fallout2Generator(Generator):
 
         setFalloutIniConfig(falloutIniConfig, game_resolution)
 
-        with open(FALLOUT_CONFIG_INI, "w") as configfile:
+        with Path(FALLOUT_CONFIG_INI).open("w") as configfile:
             falloutIniConfig.write(configfile)
 
         # IMPORTANT: Move dir before executing
         chdir(FALLOUT_ROMS_DIR)
 
-        ## Setup the command
+        # Setup the command
         command_array = [str(FALLOUT_BIN_PATH)]
 
         return Command(

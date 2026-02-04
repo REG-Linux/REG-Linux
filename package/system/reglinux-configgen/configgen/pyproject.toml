@@ -42,9 +42,6 @@ dependencies = [
     # FFmpeg wrapper for media-related operations
     "ffmpeg-python>=0.2.0",
 
-    # INI-style configuration file handling
-    "configobj>=5.0.6",
-
     # HTTP client library
     "requests>=2.22.0",
 
@@ -152,8 +149,11 @@ exclude = [
 # Ruff Formatter configuration
 # ---------------------------------------------------------------------------
 [tool.ruff.format]
-# Use `backticks` for strings that do not contain quotes.
-quote-style = "double"
+# Enable preview style formatting
+preview = true
+
+# Use double quotes for strings
+quote-style = 'double'
 
 # Use `\n` for line endings.
 line-ending = "lf"
@@ -164,27 +164,23 @@ line-ending = "lf"
 # Controls which rule families are enabled.
 # ---------------------------------------------------------------------------
 [tool.ruff.lint]
+preview = true
 select = [
   # Core Python errors and warnings (pycodestyle, pyflakes)
   "E", "F", "W",
 
-  # Import sorting and hygiene
-  "I",
-
-  # flake8-builtins
-  "A",
-
   # General code quality and bug detection
+  "A",        # flake8-builtins
   "B",        # flake8-bugbear
-  "SIM",      # code simplifications
-  "UP",       # Python syntax modernization
-  "PERF",     # performance-related issues
+  "D",        # Docstring conventions
+  "I",        # Import sorting and hygiene
   "C4",       # comprehension optimizations
+  "PERF",     # performance-related issues
+  "PT",       # flake8-pytest-style rules
   "RET",      # return statement consistency
+  "SIM",      # code simplifications
   "TID",      # tidy imports
-
-  # Docstring conventions
-  "D",
+  "UP",       # Python syntax modernization
 ]
 
 # Explicitly ignored rules
@@ -212,6 +208,11 @@ ignore = [
   "D211",
   "D212",
   "D213",
+
+  # Module level import not at top of file
+  "E402",
+  # Redefining name from outer scope
+  "F811",
 ]
 
 

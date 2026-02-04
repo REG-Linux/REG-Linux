@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-August/003417.html
-sha256  3a3d14cd895dc75b59ae2783b888031956a0bac7a1eff16d240dbb9d5df3e398  xf86-input-libinput-1.4.0.tar.xz
-sha512  b286b5425aeda5cfecd1de7f59663d169b95ffc55474dfbf28c2e13e5221cbeecd472d40b6094c0a937f83db67bf58a7fe0e07d25b6a6945d3fd669e717fc0bf  xf86-input-libinput-1.4.0.tar.xz
-# Locally computed
-sha256  4114220b281561e80f3422f0e7ae8d3e1fc85131ffc2e3b6265119e66f1adb27  COPYING

@@ -1,0 +1,27 @@
+diff --git a/daemon/gamemode-dbus.c b/daemon/gamemode-dbus.c
+index db1f8c0..6b407c5 100644
+--- a/daemon/gamemode-dbus.c
++++ b/daemon/gamemode-dbus.c
+@@ -644,7 +644,7 @@ void game_mode_context_loop(GameModeContext *context)
+ 	int ret = 0;
+ 
+-	/* Connect to the session bus */
++	/* Connect to the system bus */
+-	ret = sd_bus_open_user(&bus);
++	ret = sd_bus_open_system(&bus);
+ 
+ 	if (ret < 0) {
+ 		FATAL_ERROR("Failed to connect to the bus: %s\n", strerror(-ret));
+diff --git a/lib/client_impl.c b/lib/client_impl.c
+index a31db37..7e0a2b8 100644
+--- a/lib/client_impl.c
++++ b/lib/client_impl.c
+@@ -163,7 +163,7 @@ static DBusConnection *hop_on_the_bus(void)
+ 
+ 	dbus_error_init(&err);
+ 
+-	bus = dbus_bus_get(DBUS_BUS_SESSION, &err);
++	bus = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
+ 
+ 	if (bus == NULL) {
+ 		log_error("Could not connect to bus: %s", err.message);

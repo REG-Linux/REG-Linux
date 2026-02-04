@@ -1,5 +1,5 @@
 diff --git a/package/sway/Config.in b/package/sway/Config.in
-index d78f792c488..968375583df 100644
+index d78f792c48..93a2f6d70c 100644
 --- a/package/sway/Config.in
 +++ b/package/sway/Config.in
 @@ -1,6 +1,5 @@
@@ -9,11 +9,12 @@ index d78f792c488..968375583df 100644
  	depends on !BR2_STATIC_LIBS # wlroots
  	depends on BR2_TOOLCHAIN_HAS_THREADS # pango, wlroots
  	depends on BR2_PACKAGE_HAS_LIBEGL # wlroots
-@@ -18,6 +17,7 @@ config BR2_PACKAGE_SWAY
+@@ -18,6 +17,8 @@ config BR2_PACKAGE_SWAY
  	select BR2_PACKAGE_CAIRO_PNG
  	select BR2_PACKAGE_PANGO
  	select BR2_PACKAGE_XKEYBOARD_CONFIG # runtime
 +	select BR2_PACKAGE_LIBDECOR
++	select BR2_PACKAGE_BASU
  	help
  	  i3-compatible Wayland compositor
  	  Note:

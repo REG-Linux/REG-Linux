@@ -1,10 +1,10 @@
 from configparser import ConfigParser
-from os import makedirs, path
+from os import path
 from re import match
 from shutil import copy2, copytree
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 
 try:
     from ruamel.yaml import YAML
@@ -13,6 +13,7 @@ except ImportError:
         "ruamel.yaml module not found. Please install it with: pip install ruamel.yaml",
     )
     raise
+import pathlib
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
@@ -48,13 +49,13 @@ class Rpcs3Generator(Generator):
         generateControllerConfig(system, players_controllers, rom)
 
         # Taking care of the CurrentSettings.ini file
-        if not path.exists(path.dirname(RPCS3_CURRENT_CONFIG_PATH)):
-            makedirs(path.dirname(RPCS3_CURRENT_CONFIG_PATH))
+        if not pathlib.Path(path.dirname(RPCS3_CURRENT_CONFIG_PATH)).exists():
+            pathlib.Path(path.dirname(RPCS3_CURRENT_CONFIG_PATH)).mkdir(parents=True)
 
         rpcsCurrentSettings = ConfigParser(interpolation=None)
         # To prevent ConfigParser from converting to lower case
         rpcsCurrentSettings.optionxform = lambda optionstr: str(optionstr)
-        if path.exists(RPCS3_CURRENT_CONFIG_PATH):
+        if pathlib.Path(RPCS3_CURRENT_CONFIG_PATH).exists():
             rpcsCurrentSettings.read(RPCS3_CURRENT_CONFIG_PATH)
 
         # Sets Gui Settings to close completely and disables some popups
@@ -65,16 +66,16 @@ class Rpcs3Generator(Generator):
         rpcsCurrentSettings.set("main_window", "infoBoxEnabledInstallPUP", "false")
         rpcsCurrentSettings.set("main_window", "infoBoxEnabledWelcome", "false")
 
-        with open(RPCS3_CURRENT_CONFIG_PATH, "w") as configfile:
+        with pathlib.Path(RPCS3_CURRENT_CONFIG_PATH).open("w") as configfile:
             rpcsCurrentSettings.write(configfile)
 
-        if not path.exists(path.dirname(RPCS3_CONFIG_PATH)):
-            makedirs(path.dirname(RPCS3_CONFIG_PATH))
+        if not pathlib.Path(path.dirname(RPCS3_CONFIG_PATH)).exists():
+            pathlib.Path(path.dirname(RPCS3_CONFIG_PATH)).mkdir(parents=True)
 
         # Generate a default config if it doesn't exist otherwise just open the existing
         rpcs3ymlconfig = {}
-        if path.isfile(RPCS3_CONFIG_PATH):
-            with open(RPCS3_CONFIG_PATH) as stream:
+        if pathlib.Path(RPCS3_CONFIG_PATH).is_file():
+            with pathlib.Path(RPCS3_CONFIG_PATH).open() as stream:
                 yaml = YAML(typ="unsafe", pure=True)
                 rpcs3ymlconfig = yaml.load(stream)
 
@@ -452,7 +453,7 @@ class Rpcs3Generator(Generator):
         )
         rpcs3ymlconfig["Miscellaneous"]["Show trophy popups"] = False
 
-        with open(RPCS3_CONFIG_PATH, "w") as file:
+        with pathlib.Path(RPCS3_CONFIG_PATH).open("w") as file:
             yaml = YAML(typ="unsafe", pure=True)
             yaml.default_flow_style = False
             yaml.dump(rpcs3ymlconfig, file)
@@ -460,14 +461,14 @@ class Rpcs3Generator(Generator):
         # copy icon files to config
         icon_source = "/usr/share/rpcs3/Icons/"
         icon_target = RPCS3_ICON_TARGET_DIR
-        if not path.exists(icon_target):
-            makedirs(icon_target)
+        if not pathlib.Path(icon_target).exists():
+            pathlib.Path(icon_target).mkdir(parents=True)
         copytree(icon_source, icon_target, dirs_exist_ok=True, copy_function=copy2)
 
         # determine the rom name
         romName = None
         if rom.endswith(".psn"):
-            with open(rom) as fp:
+            with pathlib.Path(rom).open() as fp:
                 for line in fp:
                     if len(line) >= 9:
                         romName = (
@@ -484,7 +485,7 @@ class Rpcs3Generator(Generator):
             command_array.append("--no-gui")
 
         # firmware not installed and available : instead of starting the game, install it
-        if getFirmwareVersion() is None and path.exists(RPCS3_PS3UPDAT_PATH):
+        if getFirmwareVersion() is None and pathlib.Path(RPCS3_PS3UPDAT_PATH).exists():
             command_array = [str(RPCS3_BIN_PATH), "--installfw", RPCS3_PS3UPDAT_PATH]
 
         return Command(array=command_array)
@@ -503,12 +504,12 @@ def get_in_game_ratio(config: Any, game_resolution: dict[str, int], rom: str) ->
 
 def getFirmwareVersion():
     try:
-        with open(
-            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt",
-        ) as stream:
+        with pathlib.Path(
+            "/userdata/system/configs/rpcs3/dev_flash/vsh/etc/version.txt"
+        ).open() as stream:
             lines = stream.readlines()
         for line in lines:
-            matches = match("^release:(.*):", line)
+            matches = match(r"^release:(.*):", line)
             if matches:
                 return matches[1]
     except Exception:

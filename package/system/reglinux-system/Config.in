@@ -88,7 +88,8 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 	# minimal system required packages
 	select BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 	select BR2_PACKAGE_BASH				# bash shell, used as the interactive shell
-	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	# emulationstation
+	select BR2_PACKAGE_REGLINUX_EMULATIONSTATION	if BR2_PACKAGE_REGLINUX_RELEASE  # emulationstation
+	select BR2_PACKAGE_REGSTATION			if !BR2_PACKAGE_REGLINUX_RELEASE # emulationstation
 	select BR2_PACKAGE_ES_THEME_CANVAS		# emulationstation theme
 	select BR2_PACKAGE_ES_BACKGROUND_MUSICS		# emulationstation musics
 	select BR2_PACKAGE_BATOCERA_ES_SYSTEM		# emulation station es_systems.cfg generator + default roms
@@ -240,6 +241,7 @@ config BR2_PACKAGE_REGLINUX_SYSTEM
 						    BR2_PACKAGE_SYSTEM_TARGET_S905GEN3  || \
 						    BR2_PACKAGE_SYSTEM_TARGET_S922X     || \
 						    BR2_PACKAGE_SYSTEM_TARGET_SM6115	|| \
+						    BR2_PACKAGE_SYSTEM_TARGET_QCS6490	|| \
 						    BR2_PACKAGE_SYSTEM_TARGET_SM8250	|| \
 						    BR2_PACKAGE_SYSTEM_TARGET_SM8550	|| \
 						    BR2_PACKAGE_SYSTEM_TARGET_JH7110	|| \
@@ -424,8 +426,7 @@ config BR2_PACKAGE_SYSTEM_LINUX_FIRMWARES
 
 	# orangepi firmware
 	select BR2_PACKAGE_FIRMWARE_ORANGEPI		if BR2_PACKAGE_SYSTEM_TARGET_H3		|| \
-							   BR2_PACKAGE_SYSTEM_TARGET_H5		|| \
-							   BR2_PACKAGE_SYSTEM_TARGET_H6		|| \
+							   BR2_PACKAGE_SYSTEM_TARGET_SUN50I		|| \
 							   BR2_PACKAGE_SYSTEM_TARGET_H616
 
 config BR2_PACKAGE_REGLINUX_SDL2

@@ -59,12 +59,18 @@ define REGLINUX_SCRIPTS_INSTALL_TARGET_CMDS
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-gameforce                   $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-shutdown                    $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-services                    $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/usbgadget                          $(TARGET_DIR)/usr/bin/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-usb                          $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-planemode                   $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-switch-screen-checker       $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-switch-screen-checker-delayed     $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-ikemen                      $(TARGET_DIR)/usr/bin/
     install -m 0644 $(REGLINUX_SCRIPTS_PATH)/rules/80-switch-screen.rules               $(TARGET_DIR)/etc/udev/rules.d
     mkdir -p $(TARGET_DIR)/etc/udev/rules.d
+    install -m 0644 $(REGLINUX_SCRIPTS_PATH)/rules/80-usbgadget.rules                    $(TARGET_DIR)/etc/udev/rules.d
+    mkdir -p $(TARGET_DIR)/usr/share/reglinux/services
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/services/MTP                               $(TARGET_DIR)/usr/share/reglinux/services/
+    install -m 0755 $(REGLINUX_SCRIPTS_PATH)/services/ADB                               $(TARGET_DIR)/usr/share/reglinux/services/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-amd-tdp                     $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-get-nvidia-list             $(TARGET_DIR)/usr/bin/
     install -m 0755 $(REGLINUX_SCRIPTS_PATH)/scripts/system-led-effects                 $(TARGET_DIR)/usr/bin/

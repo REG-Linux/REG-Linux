@@ -1,5 +1,5 @@
 diff --git a/package/Config.in.host b/package/Config.in.host
-index bf04f5fa974..7d012b03296 100644
+index bf04f5fa97..7d012b0329 100644
 --- a/package/Config.in.host
 +++ b/package/Config.in.host
 @@ -130,4 +130,10 @@ menu "Host utilities"

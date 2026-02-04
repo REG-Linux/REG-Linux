@@ -15,8 +15,54 @@ endef
 REGLINUX_QT6_POST_BUILD_HOOKS = REGLINUX_QT6_COMPUTE_STAGING_DIR
 
 else
-REGLINUX_QT6_VERSION = 6.8.3
-REGLINUX_QT6_SITE = $(call github,REG-Linux,REG-Qt6,$(REGLINUX_QT6_VERSION))
+# Prebuilt Qt6 package
+
+REGLINUX_QT6_CPU = unknown
+ifeq ($(BR2_arm1176jzf_s),y)
+	REGLINUX_QT6_CPU = arm1176jzf_s
+else ifeq ($(BR2_cortex_a7),y)
+	REGLINUX_QT6_CPU = cortex_a7
+else ifeq ($(BR2_cortex_a9),y)
+	REGLINUX_QT6_CPU = cortex_a9
+else ifeq ($(BR2_cortex_a15_a7),y)
+	REGLINUX_QT6_CPU = cortex_a15_a7
+else ifeq ($(BR2_cortex_a17),y)
+	REGLINUX_QT6_CPU = cortex_a17
+else ifeq ($(BR2_cortex_a35),y)
+	REGLINUX_QT6_CPU = cortex_a35
+else ifeq ($(BR2_cortex_a53),y)
+	REGLINUX_QT6_CPU = cortex_a53
+else ifeq ($(BR2_jz4770),y)
+	REGLINUX_QT6_CPU = jz4770
+else ifeq ($(BR2_cortex_a55),y)
+	REGLINUX_QT6_CPU = cortex_a55
+else ifeq ($(BR2_cortex_a72),y)
+	REGLINUX_QT6_CPU = cortex_a72
+else ifeq ($(BR2_cortex_a72_a53),y)
+	REGLINUX_QT6_CPU = cortex_a72_a53
+else ifeq ($(BR2_cortex_a73_a53),y)
+	REGLINUX_QT6_CPU = cortex_a73_a53
+else ifeq ($(BR2_cortex_a75_a55),y)
+	REGLINUX_QT6_CPU = cortex_a75_a55
+else ifeq ($(BR2_cortex_a76),y)
+	REGLINUX_QT6_CPU = cortex_a76
+else ifeq ($(BR2_cortex_a76_a55),y)
+	REGLINUX_QT6_CPU = cortex_a76_a55
+else ifeq ($(BR2_ARM_CPU_ARMV9A),y)
+	REGLINUX_QT6_CPU = cortex_a76_a55
+else ifeq ($(BR2_riscv),y)
+	REGLINUX_QT6_CPU = riscv
+else ifeq ($(BR2_saphira),y)
+	REGLINUX_QT6_CPU = saphira
+else ifeq ($(BR2_x86_x86_64_v3),y)
+	REGLINUX_QT6_CPU = x86_64_v3
+else ifeq ($(BR2_x86_64),y)
+	REGLINUX_QT6_CPU = x86_64
+endif
+
+REGLINUX_QT6_VERSION = 6.10.1
+REGLINUX_QT6_SITE = https://github.com/REG-Linux/REG-Qt6-binaries/releases/download/$(REGLINUX_QT6_VERSION)
+REGLINUX_QT6_SOURCE = reglinux-qt6-$(REGLINUX_QT6_VERSION)-$(REGLINUX_QT6_CPU).tar.xz
 
 REGLINUX_QT6_DEPENDENCIES = host-double-conversion double-conversion host-libb2 libb2 host-pcre2 pcre2 host-zlib zlib icu
 REGLINUX_QT6_DEPENDENCIES += fontconfig libglib2 libpng freetype dbus
@@ -33,80 +79,9 @@ ifeq ($(BR2_PACKAGE_REGLINUX_XWAYLAND),y)
 REGLINUX_QT6_DEPENDENCIES += libxkbcommon xcb-util-cursor xcb-util-keysyms
 endif
 
-REGLINUX_QT6_ARCH = unknown
-# Cortex A17
-ifeq ($(BR2_cortex_a17),y)
-REGLINUX_QT6_ARCH = rk3288
-# Cortex A53
-else ifeq ($(BR2_cortex_a53),y)
-REGLINUX_QT6_ARCH = h5
-# Cortex A35
-else ifeq ($(BR2_cortex_a35),y)
-REGLINUX_QT6_ARCH = rk3326
-# Cortex A55
-else ifeq ($(BR2_cortex_a55),y)
-REGLINUX_QT6_ARCH = s905gen3
-# Cortex A72
-else ifeq ($(BR2_cortex_a72),y)
-REGLINUX_QT6_ARCH = bcm2711
-# Cortex A72.A53
-else ifeq ($(BR2_cortex_a72_a53),y)
-REGLINUX_QT6_ARCH = rk3399
-# Cortex A73.A53
-else ifeq ($(BR2_cortex_a73_a53),y)
-REGLINUX_QT6_ARCH = s922x
-# ODIN HACK
-else ifeq ($(BR2_cortex_a75_a55),y)
-REGLINUX_QT6_ARCH = s922x
-# Cortex A76
-else ifeq ($(BR2_cortex_a76),y)
-REGLINUX_QT6_ARCH = bcm2712
-# Cortex A76.A55
-else ifeq ($(BR2_cortex_a76_a55),y)
-ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
-REGLINUX_QT6_ARCH = sm8250
-else
-REGLINUX_QT6_ARCH = rk3588
-endif
-# SM8550 TODO, just use sm8250
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_SM8550),y)
-REGLINUX_QT6_ARCH = sm8250
-# Mediatek MT8395 is cortex-a78.cortex-a55
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_MT8395),y)
-REGLINUX_QT6_ARCH = rk3588
-# Asahi Linux
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_ASAHI),y)
-REGLINUX_QT6_ARCH = asahi
-# RISC-V 64 (rv64gc, aka imafd)
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_JH7110)$(BR2_PACKAGE_SYSTEM_TARGET_TH1520),y)
-REGLINUX_QT6_ARCH = jh7110
-# RISC-V 64 with vector extensions (aka imafdv)
-else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_K1),y)
-REGLINUX_QT6_ARCH = k1
-# X86-64-v3 subarchitecture
-else ifeq ($(BR2_x86_x86_64_v3),y)
-REGLINUX_QT6_ARCH = x86_64_v3
-# X86_64 architecture
-else ifeq ($(BR2_x86_64),y)
-REGLINUX_QT6_ARCH = x86_64
-endif
-
-# Compute the archive source file name
-REGLINUX_QT6_SOURCE = reglinux-qt6-$(REGLINUX_QT6_VERSION)-$(REGLINUX_QT6_ARCH).tar.gz
-
-define REGLINUX_QT6_DOWNLOAD_ARCHIVE
-	echo "Downloading https://github.com/REG-Linux/REG-Qt6/releases/download/$(REGLINUX_QT6_VERSION)/$(REGLINUX_QT6_SOURCE)"
-	cd $(@D) && wget https://github.com/REG-Linux/REG-Qt6/releases/download/$(REGLINUX_QT6_VERSION)/$(REGLINUX_QT6_SOURCE)
-endef
-
-REGLINUX_QT6_POST_BUILD_HOOKS = REGLINUX_QT6_DOWNLOAD_ARCHIVE
-
 define REGLINUX_QT6_INSTALL_TARGET_CMDS
-	# copy the prebuilt stuff to rootfs
-	tar xzvf $(@D)/$(REGLINUX_QT6_SOURCE) -C $(HOST_DIR)/../
-
-	# delete the archive from this directory
-	rm $(@D)/$(REGLINUX_QT6_SOURCE)
+	# extract target folder
+	tar xvf $(DL_DIR)/$(REGLINUX_QT6_DL_SUBDIR)/$(REGLINUX_QT6_SOURCE) -C $(HOST_DIR)/../
 endef
 
 endif

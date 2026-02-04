@@ -1,15 +1,16 @@
 config BR2_PACKAGE_BATOCERA_NVIDIA
     bool "batocera-nvidia"
 
-    depends on BR2_PACKAGE_XWAYLAND
+    select BR2_PACKAGE_XWAYLAND
 
     # drivers
     select BR2_PACKAGE_NVIDIA_OPEN_DRIVER      # the latest driver
+    select BR2_PACKAGE_NVIDIA580_LEGACY_DRIVER # the legacy 580.xx driver
     select BR2_PACKAGE_NVIDIA470_LEGACY_DRIVER # the legacy 470.xx driver
 
     # kernel modules
     select BR2_PACKAGE_NVIDIA_OPEN_DRIVER_MODULE
-    select BR2_PACKAGE_NVIDIA_PROPRIETARY_DRIVER_MODULE # addition production kernel modules
+    select BR2_PACKAGE_NVIDIA580_LEGACY_DRIVER_MODULE
     select BR2_PACKAGE_NVIDIA470_LEGACY_DRIVER_MODULE
 
     # cuda

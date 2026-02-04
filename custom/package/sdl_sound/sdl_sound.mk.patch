@@ -1,5 +1,5 @@
 diff --git a/package/sdl_sound/sdl_sound.mk b/package/sdl_sound/sdl_sound.mk
-index c6028e79106..c203af1d762 100644
+index c6028e7910..c203af1d76 100644
 --- a/package/sdl_sound/sdl_sound.mk
 +++ b/package/sdl_sound/sdl_sound.mk
 @@ -10,7 +10,7 @@ SDL_SOUND_SITE = http://icculus.org/SDL_sound/downloads

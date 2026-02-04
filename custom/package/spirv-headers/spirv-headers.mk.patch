@@ -1,5 +1,5 @@
 diff --git a/package/spirv-headers/spirv-headers.mk b/package/spirv-headers/spirv-headers.mk
-index 9f84c42b2dc..66677dddd93 100644
+index 9f84c42b2d..66677dddd9 100644
 --- a/package/spirv-headers/spirv-headers.mk
 +++ b/package/spirv-headers/spirv-headers.mk
 @@ -3,10 +3,9 @@

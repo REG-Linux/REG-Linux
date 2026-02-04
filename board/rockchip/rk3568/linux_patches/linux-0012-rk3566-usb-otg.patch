@@ -1,0 +1,23 @@
+--- a/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rgxx3.dtsi
++++ b/arch/arm64/boot/dts/rockchip/rk3566-anbernic-rgxx3.dtsi
+@@ -607,7 +607,7 @@
+ };
+ 
+ &usb_host0_xhci {
+-	dr_mode = "peripheral";
++	dr_mode = "otg";
+ 	phys = <&usb2phy0_otg>;
+ 	phy-names = "usb2-phy";
+ 	status = "okay";
+--- a/arch/arm64/boot/dts/rockchip/rk3566-powkiddy-rk2023.dtsi
++++ b/arch/arm64/boot/dts/rockchip/rk3566-powkiddy-rk2023.dtsi
+@@ -790,7 +790,7 @@
+ };
+ 
+ &usb_host0_xhci {
+-	dr_mode = "peripheral";
++	dr_mode = "otg";
+ 	phys = <&usb2phy0_otg>;
+ 	phy-names = "usb2-phy";
+ 	status = "okay";
+ };

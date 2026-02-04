@@ -2,8 +2,8 @@ from configparser import ConfigParser
 from pathlib import Path
 from typing import Any
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 
 from .mupenConfig import (
     MUPEN_BIN_PATH,
@@ -43,7 +43,7 @@ class MupenGenerator(Generator):
         config_dir = config_path.parent
         if not config_dir.exists():
             config_dir.mkdir(parents=True, exist_ok=True)
-        with open(MUPEN_CONFIG_PATH, "w") as configfile:
+        with Path(MUPEN_CONFIG_PATH).open("w") as configfile:
             iniConfig.write(configfile)
 
         # Command

@@ -1,5 +1,5 @@
 diff --git a/package/ntfs-3g/ntfs-3g.mk b/package/ntfs-3g/ntfs-3g.mk
-index 62c515d50f6..b1bceb0fda0 100644
+index 62c515d50f..b1bceb0fda 100644
 --- a/package/ntfs-3g/ntfs-3g.mk
 +++ b/package/ntfs-3g/ntfs-3g.mk
 @@ -33,4 +33,11 @@ ifneq ($(BR2_PACKAGE_NTFS_3G_NTFSPROGS),y)

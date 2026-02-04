@@ -1,5 +1,5 @@
 diff --git a/package/mesa3d/mesa3d.mk b/package/mesa3d/mesa3d.mk
-index 202fc5cc74..ba6877dbca 100644
+index 202fc5cc74..18856b2512 100644
 --- a/package/mesa3d/mesa3d.mk
 +++ b/package/mesa3d/mesa3d.mk
 @@ -4,10 +4,10 @@
@@ -8,7 +8,7 @@ index 202fc5cc74..ba6877dbca 100644
  
 -# When updating the version, please also update mesa3d-headers
 -MESA3D_VERSION = 24.0.9
-+MESA3D_VERSION = 25.3.3
++MESA3D_VERSION = 26.0.0-rc2
  MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
  MESA3D_SITE = https://archive.mesa3d.org
 +
@@ -264,7 +264,7 @@ index 202fc5cc74..ba6877dbca 100644
  MESA3D_CFLAGS = $(TARGET_CFLAGS)
  
  # m68k needs 32-bit offsets in switch tables to build
-@@ -254,12 +317,36 @@ endif
+@@ -254,12 +317,39 @@ endif
  ifeq ($(BR2_PACKAGE_LIBGLVND),y)
  ifneq ($(BR2_PACKAGE_MESA3D_OPENGL_GLX)$(BR2_PACKAGE_MESA3D_OPENGL_EGL),)
  MESA3D_DEPENDENCIES += libglvnd
@@ -291,6 +291,9 @@ index 202fc5cc74..ba6877dbca 100644
 +endif
 +ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_PANFROST),y)
 +HOST_MESA3D_CONF_OPTS += -Dgallium-drivers=panfrost
++endif
++ifeq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_ASAHI),y)
++HOST_MESA3D_CONF_OPTS += -Dtools=asahi
 +endif
 +
 +# reglinux hack to fix prebuilt llvm/clang

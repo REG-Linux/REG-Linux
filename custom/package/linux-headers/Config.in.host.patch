@@ -1,27 +1,11 @@
 diff --git a/package/linux-headers/Config.in.host b/package/linux-headers/Config.in.host
-index 1b49a701de..3217498d7b 100644
+index 1b49a701de..3aa77ad630 100644
 --- a/package/linux-headers/Config.in.host
 +++ b/package/linux-headers/Config.in.host
-@@ -49,6 +49,26 @@ config BR2_KERNEL_HEADERS_6_12
+@@ -49,6 +49,10 @@ config BR2_KERNEL_HEADERS_6_12
  	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
  	select BR2_KERNEL_HEADERS_LATEST
  
-+config BR2_KERNEL_HEADERS_6_13
-+	bool "Linux 6.13.x kernel headers"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
-+
-+config BR2_KERNEL_HEADERS_6_15
-+	bool "Linux 6.15.x kernel headers"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_15
-+
-+config BR2_KERNEL_HEADERS_6_16
-+	bool "Linux 6.16.x kernel headers"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_16
-+
-+config BR2_KERNEL_HEADERS_6_17
-+	bool "Linux 6.17.x kernel headers"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_17
-+
 +config BR2_KERNEL_HEADERS_6_18
 +	bool "Linux 6.18.x kernel headers"
 +	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_18
@@ -29,7 +13,7 @@ index 1b49a701de..3217498d7b 100644
  config BR2_KERNEL_HEADERS_VERSION
  	bool "Manually specified Linux version"
  	help
-@@ -125,6 +145,30 @@ choice
+@@ -125,6 +129,10 @@ choice
  	  If your kernel headers are more recent than the latest version
  	  in the choice, then select the latest version.
  
@@ -37,35 +21,20 @@ index 1b49a701de..3217498d7b 100644
 +	bool "6.18.x"
 +	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_18
 +
-+config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_17
-+	bool "6.17.x"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_17
-+
-+config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_16
-+	bool "6.16.x"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_16
-+
-+config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_15
-+	bool "6.15.x"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_15
-+
-+config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_14
-+	bool "6.14.x"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_14
-+
-+config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_13
-+	bool "6.13.x"
-+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_13
-+
  config BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_12
  	bool "6.12.x or later"
  	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_12
-@@ -434,6 +478,8 @@ config BR2_DEFAULT_KERNEL_HEADERS
- 	default "6.1.159"	if BR2_KERNEL_HEADERS_6_1
- 	default "6.6.119"	if BR2_KERNEL_HEADERS_6_6
- 	default "6.12.61"	if BR2_KERNEL_HEADERS_6_12
-+	default "6.17.11"	if BR2_KERNEL_HEADERS_6_17
-+	default "6.18.3"	if BR2_KERNEL_HEADERS_6_18
+@@ -431,9 +439,10 @@ config BR2_DEFAULT_KERNEL_HEADERS
+ 	default "5.4.302"	if BR2_KERNEL_HEADERS_5_4
+ 	default "5.10.247"	if BR2_KERNEL_HEADERS_5_10
+ 	default "5.15.197"	if BR2_KERNEL_HEADERS_5_15
+-	default "6.1.159"	if BR2_KERNEL_HEADERS_6_1
+-	default "6.6.119"	if BR2_KERNEL_HEADERS_6_6
+-	default "6.12.61"	if BR2_KERNEL_HEADERS_6_12
++	default "6.1.161"	if BR2_KERNEL_HEADERS_6_1
++	default "6.6.122"	if BR2_KERNEL_HEADERS_6_6
++	default "6.12.68"	if BR2_KERNEL_HEADERS_6_12
++	default "6.18.8"	if BR2_KERNEL_HEADERS_6_18
  	default BR2_DEFAULT_KERNEL_VERSION if BR2_KERNEL_HEADERS_VERSION
  	default "custom"	if BR2_KERNEL_HEADERS_CUSTOM_TARBALL
  	default BR2_KERNEL_HEADERS_CUSTOM_REPO_VERSION \

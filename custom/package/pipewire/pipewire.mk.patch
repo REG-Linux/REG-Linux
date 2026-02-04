@@ -1,7 +1,16 @@
 diff --git a/package/pipewire/pipewire.mk b/package/pipewire/pipewire.mk
-index c1dc2aa0cc..1e033292a4 100644
+index c1dc2aa0cc..44b6c0a36f 100644
 --- a/package/pipewire/pipewire.mk
 +++ b/package/pipewire/pipewire.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-PIPEWIRE_VERSION = 1.2.8
++PIPEWIRE_VERSION = 1.4.9
+ PIPEWIRE_SOURCE = pipewire-$(PIPEWIRE_VERSION).tar.bz2
+ PIPEWIRE_SITE = https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/$(PIPEWIRE_VERSION)
+ PIPEWIRE_LICENSE = MIT, LGPL-2.1+ (libspa-alsa), GPL-2.0 (libjackserver)
 @@ -13,6 +13,8 @@ PIPEWIRE_INSTALL_STAGING = YES
  PIPEWIRE_DEPENDENCIES = host-pkgconf $(TARGET_NLS_DEPENDENCIES)
  PIPEWIRE_LDFLAGS = $(TARGET_NLS_LIBS)

@@ -5,12 +5,13 @@
 import fileinput
 import re
 
+
 def do_startVersion(infos, version, date, title):
     n = infos["n"]
     if infos["level"] != 0:
         raise Exception("start of version doesn't start at level 0")
-    infos["n"] = infos["n"]+1
-    infos["level"] = infos["level"]+1
+    infos["n"] = infos["n"] + 1
+    infos["level"] = infos["level"] + 1
 
     strtitle = "Batocera"
     if version is not None:
@@ -22,80 +23,96 @@ def do_startVersion(infos, version, date, title):
 
     if infos["n"] > 1:
         print("<br />")
-    
-    print("<div class=\"mb-4\" id=\"accordion\" role=\"tablist\" aria-multiselectable=\"true\">")
-    print(" <div class=\"card\">")
-    print("  <div class=\"card-header\" role=\"tab\" id=\"heading{}\">".format(n))
-    print("   <h5 class=\"mb-0\">")
-    print("    <a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#collapse{}\" style=\"color:#2E2EFF\" aria-expanded=\"true\" aria-controls=\"collapse{}\" aria-label="">{}</a>".format(n, n, strtitle))
+
+    print(
+        '<div class="mb-4" id="accordion" role="tablist" aria-multiselectable="true">'
+    )
+    print(' <div class="card">')
+    print('  <div class="card-header" role="tab" id="heading{}">'.format(n))
+    print('   <h5 class="mb-0">')
+    print(
+        '    <a data-toggle="collapse" data-parent="#accordion" href="#collapse{}" style="color:#2E2EFF" aria-expanded="true" aria-controls="collapse{}" aria-label='
+        ">{}</a>".format(n, n, strtitle)
+    )
     print("   </h5>")
     print("  </div>")
-    print("  <div id=\"collapse{}\" class=\"collapse".format(n))
-    if n== 0:
-        print(" show")      
-    print("\" role=\"tabpanel\" aria-labelledby=\"heading{}\">".format(n))
-    print("   <div class=\"card-body\">")
+    print('  <div id="collapse{}" class="collapse'.format(n))
+    if n == 0:
+        print(" show")
+    print('" role="tabpanel" aria-labelledby="heading{}">'.format(n))
+    print('   <div class="card-body">')
+
 
 def do_endVersion(infos):
     print("  </div>")
     print(" </div>")
     print("</div>")
-    
-    infos["level"] = infos["level"]-1
+
+    infos["level"] = infos["level"] - 1
     if infos["level"] != 0:
         raise Exception("end of version doesn't end at level 0")
+
 
 def do_start_section(line):
     print("   <b>{}</b>".format(line))
 
+
 def do_end_section():
     pass
+
 
 def do_start_items():
     print("   <ul>")
 
+
 def do_end_items():
     print("   </ul>")
+
 
 def do_start_subitems():
     print("       <ul>")
 
+
 def do_end_subitems():
     print("       </ul>")
+
 
 def do_item(line):
     print("     <li>{}</li>".format(line))
 
+
 def do_subitem(line):
     print("         <li>{}</li>".format(line))
-    
+
+
 def do_comment(line):
     print("<div>{}</div>".format(line))
 
+
 def readChangeLogLine(infos, line):
     # version
-    m = re.search('^# (..../../..) - batocera\.linux', line)
+    m = re.search("^# (..../../..) - batocera\.linux", line)
     if m is not None:
-        m = re.search('^# (..../../..) - batocera\.linux ([0-9\.]*) - (.*)$', line)
+        m = re.search("^# (..../../..) - batocera\.linux ([0-9\.]*) - (.*)$", line)
         if m is not None:
-            vdate    = m.group(1)
+            vdate = m.group(1)
             vversion = m.group(2)
-            vtitle   = m.group(3)
+            vtitle = m.group(3)
         else:
-            m = re.search('^# (..../../..) - batocera\.linux ([0-9\.]*)$', line)
+            m = re.search("^# (..../../..) - batocera\.linux ([0-9\.]*)$", line)
             if m is not None:
-                vdate    = m.group(1)
+                vdate = m.group(1)
                 vversion = m.group(2)
-                vtitle   = None
+                vtitle = None
             else:
-                m = re.search('^# (..../../..) - batocera\.linux$', line)
+                m = re.search("^# (..../../..) - batocera\.linux$", line)
                 if m is not None:
-                    vdate    = m.group(1)
+                    vdate = m.group(1)
                     vversion = None
-                    vtitle   = None
+                    vtitle = None
                 else:
                     raise Exception("invalid format " + line)
-        
+
         if infos["nsubitems"] > 0:
             infos["nsubitems"] = 0
             do_end_subitems()
@@ -105,7 +122,7 @@ def readChangeLogLine(infos, line):
         if infos["in_section"]:
             do_end_section()
             infos["in_section"] = False
-        do_startVersion(infos, vversion, vdate, vtitle);
+        do_startVersion(infos, vversion, vdate, vtitle)
         return
 
     # end of version
@@ -123,7 +140,7 @@ def readChangeLogLine(infos, line):
         return
 
     # section
-    m = re.search('^### ([a-zA-Z].*)$', line)
+    m = re.search("^### ([a-zA-Z].*)$", line)
     if m is not None:
         if infos["nsubitems"] > 0:
             infos["nsubitems"] = 0
@@ -137,7 +154,7 @@ def readChangeLogLine(infos, line):
         return
 
     # item
-    m = re.search('^- ([a-zA-Z0-9/\*].*)$', line)
+    m = re.search("^- ([a-zA-Z0-9/\*].*)$", line)
     if m is not None:
         if infos["nsubitems"] > 0:
             infos["nsubitems"] = 0
@@ -150,7 +167,7 @@ def readChangeLogLine(infos, line):
         return
 
     # subitem
-    m = re.search('^  - ([a-zA-Z0-9/\*].*)$', line)
+    m = re.search("^  - ([a-zA-Z0-9/\*].*)$", line)
     if m is not None:
         if infos["nsubitems"] == 0:
             do_start_subitems()
@@ -159,15 +176,16 @@ def readChangeLogLine(infos, line):
         return
 
     # comments
-    m = re.search('^  ([a-zA-Z0-9/\*].*)$', line)
+    m = re.search("^  ([a-zA-Z0-9/\*].*)$", line)
     if m is not None:
         do_comment(m.group(1))
         return
 
     raise Exception("invalid line : /" + line + "/")
 
-infos = { "n": 0, "level": 0, "in_section": False, "nitems": 0, "nsubitems": 0}
+
+infos = {"n": 0, "level": 0, "in_section": False, "nitems": 0, "nsubitems": 0}
 for line in fileinput.input():
-    #print(line.strip("\n"))
+    # print(line.strip("\n"))
     readChangeLogLine(infos, line.strip("\n"))
 do_endVersion(infos)

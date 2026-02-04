@@ -2,8 +2,8 @@ from configparser import ConfigParser
 from pathlib import Path
 from shutil import copy2
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF
 
 DOSBOXX_CONFIG_DIR = str(Path(CONF) / "dosbox")
@@ -51,7 +51,7 @@ class DosBoxxGenerator(Generator):
         iniSettings.set("sdl", "output", "opengl")
 
         # save
-        with open(DOSBOXX_CONFIG_CUSTOM_PATH, "w") as config:
+        with Path(DOSBOXX_CONFIG_CUSTOM_PATH).open("w") as config:
             iniSettings.write(config)
 
         command_array = [

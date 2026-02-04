@@ -1,5 +1,5 @@
 diff --git a/package/rockchip-rkbin/rockchip-rkbin.mk b/package/rockchip-rkbin/rockchip-rkbin.mk
-index 49271084eb9..6eea1eb0b58 100644
+index 49271084eb..6eea1eb0b5 100644
 --- a/package/rockchip-rkbin/rockchip-rkbin.mk
 +++ b/package/rockchip-rkbin/rockchip-rkbin.mk
 @@ -4,7 +4,8 @@

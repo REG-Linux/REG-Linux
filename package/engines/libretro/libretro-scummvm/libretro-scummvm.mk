@@ -3,8 +3,8 @@
 # libretro-scummvm
 #
 ################################################################################
-# Version: 2.9.1 - Unreleased yet so no codename yet
-LIBRETRO_SCUMMVM_VERSION = v2.9.1
+# Version: 2026.1.0
+LIBRETRO_SCUMMVM_VERSION = v2026.1.0
 LIBRETRO_SCUMMVM_SITE = $(call github,scummvm,scummvm,$(LIBRETRO_SCUMMVM_VERSION))
 LIBRETRO_SCUMMVM_LICENSE = GPLv2
 
@@ -25,8 +25,6 @@ LIBRETRO_SCUMMVM_PLATFORM = armv cortexa9 neon hardfloat
 else ifeq ($(BR2_PACKAGE_SYSTEM_TARGET_XU4),y)
 LIBRETRO_SCUMMVM_PLATFORM = armv neon hardfloat
 LIBRETRO_SCUMMVM_MAKE_OPTS += FORCE_OPENGLES2=1
-# TODO revisit later this hack since AGS building fails...
-LIBRETRO_SCUMMVM_MAKE_OPTS += LITE=1
 else
 LIBRETRO_SCUMMVM_PLATFORM = unix
 ifeq ($(BR2_ARCH_IS_64),y)

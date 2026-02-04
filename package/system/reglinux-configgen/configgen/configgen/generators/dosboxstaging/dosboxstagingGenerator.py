@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 

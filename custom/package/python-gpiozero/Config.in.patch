@@ -1,12 +1,12 @@
 diff --git a/package/python-gpiozero/Config.in b/package/python-gpiozero/Config.in
-index c5f3880ea9c..1944769f7e7 100644
+index c5f3880ea9..3c2f1ac159 100644
 --- a/package/python-gpiozero/Config.in
 +++ b/package/python-gpiozero/Config.in
 @@ -1,6 +1,6 @@
  config BR2_PACKAGE_PYTHON_GPIOZERO
  	bool "python-gpiozero"
 -	depends on BR2_arm
-+	depends on BR2_arm || BR2_aarch64 # REG
++	depends on BR2_arm || BR2_aarch64
  	select BR2_PACKAGE_PYTHON_COLORZERO # runtime
  	help
  	  A simple interface to GPIO devices with Raspberry Pi.

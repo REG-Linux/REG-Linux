@@ -2,9 +2,9 @@ from configparser import ConfigParser
 from pathlib import Path
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF
 
 FORCE_CONFIG_DIR = CONF / "theforceengine"
@@ -42,14 +42,14 @@ class TheForceEngineGenerator(Generator):
             mod_name = FORCE_PATCH_PATH
 
         # Open the .tfe rom file for user mods
-        with open(rom) as file:
+        with Path(rom).open() as file:
             # Read the first line and store it as 'first_line'
             first_line = file.readline().strip()
             # use the first_line as mod if the file isn't empty
             if first_line:
                 mod_name = first_line
 
-        ## Configure
+        # Configure
         forceConfig = ConfigParser()
         forceConfig.optionxform = lambda optionstr: str(optionstr)
         if FORCE_CONFIG_PATH.exists():
@@ -237,17 +237,17 @@ class TheForceEngineGenerator(Generator):
         if not forceConfig.has_section("CVar"):
             forceConfig.add_section("CVar")
 
-        ## Update the configuration file
+        # Update the configuration file
         config_dir = FORCE_CONFIG_PATH.parent
         if not config_dir.exists():
             config_dir.mkdir(parents=True, exist_ok=True)
-        with open(FORCE_CONFIG_PATH, "w") as configfile:
+        with Path(FORCE_CONFIG_PATH).open("w") as configfile:
             forceConfig.write(configfile)
 
-        ## Setup the command
+        # Setup the command
         command_array = [str(FORCE_BIN_PATH)]
 
-        ## Accomodate Mods, skip cutscenes etc
+        # Accomodate Mods, skip cutscenes etc
         if (
             system.isOptSet("force_skip_cutscenes")
             and system.config["force_skip_cutscenes"] == "initial"

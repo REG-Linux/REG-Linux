@@ -1,5 +1,5 @@
 diff --git a/package/alsa-utils/Config.in b/package/alsa-utils/Config.in
-index 3429d0b4065..91216626e1c 100644
+index 3429d0b406..91216626e1 100644
 --- a/package/alsa-utils/Config.in
 +++ b/package/alsa-utils/Config.in
 @@ -97,4 +97,8 @@ config BR2_PACKAGE_ALSA_UTILS_SPEAKER_TEST

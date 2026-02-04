@@ -1,5 +1,5 @@
 diff --git a/package/wayland-protocols/wayland-protocols.mk b/package/wayland-protocols/wayland-protocols.mk
-index b04693978d8..6d8c5a9b89c 100644
+index b04693978d..bc54bcd74e 100644
 --- a/package/wayland-protocols/wayland-protocols.mk
 +++ b/package/wayland-protocols/wayland-protocols.mk
 @@ -4,7 +4,7 @@
@@ -7,7 +7,7 @@ index b04693978d8..6d8c5a9b89c 100644
  ################################################################################
  
 -WAYLAND_PROTOCOLS_VERSION = 1.39
-+WAYLAND_PROTOCOLS_VERSION = 1.43
++WAYLAND_PROTOCOLS_VERSION = 1.47
  WAYLAND_PROTOCOLS_SITE = https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/$(WAYLAND_PROTOCOLS_VERSION)/downloads
  WAYLAND_PROTOCOLS_SOURCE = wayland-protocols-$(WAYLAND_PROTOCOLS_VERSION).tar.xz
  WAYLAND_PROTOCOLS_LICENSE = MIT

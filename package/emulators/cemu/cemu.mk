@@ -5,7 +5,7 @@
 ################################################################################
 
 # Unstable because of WIP aarch64 upstreamed support
-CEMU_VERSION = 7330cdf3a9cdf109a5368ab36cc0543a945b08ee
+CEMU_VERSION = 4fe73a3582187e721619eb728c7c1ae3e28c0375
 CEMU_SITE = https://github.com/cemu-project/Cemu
 CEMU_LICENSE = GPLv2
 CEMU_SITE_METHOD=git
