@@ -31,7 +31,7 @@ def setPcsx2Reg():
     configFileName = PCSX2_CONFIG_DIR / "PCSX2-reg.ini"
     if not PCSX2_CONFIG_DIR.exists():
         PCSX2_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    with open(configFileName, "w") as f:
+    with Path(configFileName).open("w") as f:
         f.write("DocumentsFolderMode=User\n")
         f.write("CustomDocumentsFolder=/usr/pcsx2/bin\n")
         f.write("UseDefaultSettingsFolder=enabled\n")
@@ -51,7 +51,7 @@ def configureAudio():
     if configFileName.exists():
         return
 
-    with open(configFileName, "w") as f:
+    with Path(configFileName).open("w") as f:
         f.write("[MIXING]\n")
         f.write("Interpolation=1\n")
         f.write("Disable_Effects=0\n")
@@ -142,8 +142,7 @@ def setPcsx2Config(
         config_dir.mkdir(parents=True, exist_ok=True)
 
     if not configFileName.is_file():
-        with open(configFileName, "w") as f:
-            f.write("[UI]\n")
+        Path(configFileName).write_text("[UI]\n")
 
     pcsx2INIConfig = ConfigParser(interpolation=None)
     # To prevent ConfigParser from converting to lower case
@@ -152,7 +151,7 @@ def setPcsx2Config(
     if configFileName.is_file():
         pcsx2INIConfig.read(configFileName)
 
-    ## [UI]
+    # [UI]
     if not pcsx2INIConfig.has_section("UI"):
         pcsx2INIConfig.add_section("UI")
 
@@ -168,7 +167,7 @@ def setPcsx2Config(
     pcsx2INIConfig.set("UI", "HideMainWindowWhenRunning", "true")
     pcsx2INIConfig.set("UI", "DoubleClickTogglesFullscreen", "false")
 
-    ## [Folders]
+    # [Folders]
     if not pcsx2INIConfig.has_section("Folders"):
         pcsx2INIConfig.add_section("Folders")
 
@@ -194,7 +193,7 @@ def setPcsx2Config(
     if not cache_dir.exists():
         cache_dir.mkdir(parents=True, exist_ok=True)
 
-    ## [EmuCore]
+    # [EmuCore]
     if not pcsx2INIConfig.has_section("EmuCore"):
         pcsx2INIConfig.add_section("EmuCore")
 
@@ -234,7 +233,7 @@ def setPcsx2Config(
         "pcsx2_interlacing_patches",
     )
 
-    ## [Achievements]
+    # [Achievements]
     if not pcsx2INIConfig.has_section("Achievements"):
         pcsx2INIConfig.add_section("Achievements")
     pcsx2INIConfig.set("Achievements", "Enabled", "false")
@@ -290,11 +289,11 @@ def setPcsx2Config(
     pcsx2INIConfig.set("Achievements", "Notifications", "true")
     pcsx2INIConfig.set("Achievements", "SoundEffects", "true")
 
-    ## [Filenames]
+    # [Filenames]
     if not pcsx2INIConfig.has_section("Filenames"):
         pcsx2INIConfig.add_section("Filenames")
 
-    ## [EMUCORE/GS]
+    # [EMUCORE/GS]
     if not pcsx2INIConfig.has_section("EmuCore/GS"):
         pcsx2INIConfig.add_section("EmuCore/GS")
 
@@ -514,7 +513,7 @@ def setPcsx2Config(
         "true",
     )
 
-    ## [InputSources]
+    # [InputSources]
     if not pcsx2INIConfig.has_section("InputSources"):
         pcsx2INIConfig.add_section("InputSources")
 
@@ -529,7 +528,7 @@ def setPcsx2Config(
     for source, value in input_sources.items():
         pcsx2INIConfig.set("InputSources", source, value)
 
-    ## [Hotkeys]
+    # [Hotkeys]
     if not pcsx2INIConfig.has_section("Hotkeys"):
         pcsx2INIConfig.add_section("Hotkeys")
 
@@ -651,7 +650,7 @@ def setPcsx2Config(
                     )
                 nc = nc + 1
 
-            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
+            # find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
             if "controllers.pedals1" in system.config:
                 pedalkey = system.config["controllers.pedals1"]
             else:
@@ -671,7 +670,7 @@ def setPcsx2Config(
                         f"SDL-{pad.index}/Start",
                     )
                 nc = nc + 1
-            ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
+            # find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
             if "controllers.pedals2" in system.config:
                 pedalkey = system.config["controllers.pedals2"]
             else:
@@ -847,7 +846,7 @@ def setPcsx2Config(
                     )
                 usbx = usbx + 1
 
-    ## [Pad]
+    # [Pad]
     if not pcsx2INIConfig.has_section("Pad"):
         pcsx2INIConfig.add_section("Pad")
 
@@ -959,8 +958,7 @@ def setPcsx2Config(
     }
 
     # Now add Controllers
-    nplayer = 1
-    for _, pad in sorted(controllers.items()):
+    for nplayer, pad in enumerate(sorted(controllers.items()), start=1):
         # only configure the number of controllers set
         if nplayer <= multiTap:
             pad_index = nplayer
@@ -981,15 +979,13 @@ def setPcsx2Config(
             for button, input_name in button_mapping.items():
                 pcsx2INIConfig.set(pad_num, button, f"{sdl_num}/{input_name}")
 
-        nplayer += 1
-
-    ## [GameList]
+    # [GameList]
     if not pcsx2INIConfig.has_section("GameList"):
         pcsx2INIConfig.add_section("GameList")
 
     pcsx2INIConfig.set("GameList", "RecursivePaths", str(Path("/userdata/roms/ps2")))
 
-    with open(configFileName, "w") as configfile:
+    with Path(configFileName).open("w") as configfile:
         pcsx2INIConfig.write(configfile)
 
 

@@ -362,10 +362,10 @@ else ifeq ($(BR2_riscv),y)
 	REGLINUX_LLVM_CPU = riscv
 else ifeq ($(BR2_saphira),y)
 	REGLINUX_LLVM_CPU = saphira
+else ifeq ($(BR2_x86_x86_64_v3),y)
+	REGLINUX_LLVM_CPU = x86_64_v3
 else ifeq ($(BR2_x86_64),y)
 	REGLINUX_LLVM_CPU = x86_64
-else ifeq ($(BR2_x86_64_v3),y)
-	REGLINUX_LLVM_CPU = x86_64_v3
 endif
 
 LLVM_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(LLVM_VERSION)

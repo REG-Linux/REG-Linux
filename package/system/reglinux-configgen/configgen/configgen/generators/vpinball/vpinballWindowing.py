@@ -2,6 +2,9 @@ from typing import Any
 
 from configgen.utils.videoMode import getScreensInfos
 
+# Constants
+SCREEN_COUNT_THRESHOLD = 2
+
 
 def configureWindowing(
     vpinballSettings: Any,
@@ -35,7 +38,7 @@ def configureWindowing(
             reverse_playfield_and_b2s = True
     # auto : if the screen 2 is vertical while the first screen is not, inverse
     elif (
-        len(screens) >= 2
+        len(screens) >= SCREEN_COUNT_THRESHOLD
         and screens[0]["width"] > screens[0]["height"]
         and screens[1]["width"] < screens[1]["height"]
     ):
@@ -113,11 +116,11 @@ def getFlexDmdConfiguration(system: Any, screens: Any, hasDmd: bool) -> str:
         val = system.config["vpinball_flexdmd"]
     elif hasDmd:
         val = "disabled"
-    if val == "":
-        val = "screen3" if len(screens) > 2 else "disabled"
+    if not val:
+        val = "screen3" if len(screens) > SCREEN_COUNT_THRESHOLD else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
-    if len(screens) <= 2 and val == "screen3":
+    if len(screens) <= SCREEN_COUNT_THRESHOLD and val == "screen3":
         val = "disabled"
     return val
 
@@ -127,11 +130,11 @@ def getPinmameConfiguration(system: Any, screens: Any) -> str:
     val = ""
     if system.isOptSet("vpinball_pinmame"):
         val = system.config["vpinball_pinmame"]
-    if val == "":
-        val = "screen3" if len(screens) > 2 else "disabled"
+    if not val:
+        val = "screen3" if len(screens) > SCREEN_COUNT_THRESHOLD else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"
-    if len(screens) <= 2 and val == "screen3":
+    if len(screens) <= SCREEN_COUNT_THRESHOLD and val == "screen3":
         val = "disabled"
     return val
 
@@ -140,7 +143,7 @@ def getB2sConfiguration(system: Any, screens: Any) -> str:
     val = ""
     if system.isOptSet("vpinball_b2s"):
         val = system.config["vpinball_b2s"]
-    if val == "":
+    if not val:
         val = "screen2" if len(screens) > 1 else "disabled"
     if len(screens) <= 1 and val == "screen2":
         val = "disabled"

@@ -2,7 +2,7 @@
 
 from contextlib import suppress
 from json import load
-from os import listdir, remove, symlink
+from os import listdir
 from pathlib import Path
 from typing import Any
 
@@ -64,12 +64,11 @@ def writeBezelConfig(
             left = (w - (h - 2 * h5) * 4 / 3) // 2
             right = left
 
-        with open(gunBezelInfoFile, "w") as fd:
-            fd.write(
-                "{"
-                f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
-                "}",
-            )
+        Path(gunBezelInfoFile).write_text(
+            "{"
+            f' "width":{w}, "height":{h}, "top":{top}, "left":{left}, "bottom":{bottom}, "right":{right}, "opacity":1.0000000, "messagex":0.220000, "messagey":0.120000'
+            "}"
+        )
         BezelUtils.create_transparent_bezel(
             gunBezelFile,
             gameResolution["width"],
@@ -123,7 +122,7 @@ def writeBezelConfig(
     # only the png file is mandatory
     if Path(overlay_info_file).exists():
         try:
-            with open(overlay_info_file) as f:
+            with Path(overlay_info_file).open() as f:
                 infos = load(f)
         except Exception:
             infos = {}
@@ -284,7 +283,7 @@ def writeBezelConfig(
                     eslog.debug(f"Using cached bezel file {output_png_file}")
                 else:
                     with suppress(Exception):
-                        remove(tattoo_output_png)
+                        Path(tattoo_output_png).unlink()
                     create_new_bezel_file = True
             if create_new_bezel_file:
                 fadapted = [
@@ -298,7 +297,7 @@ def writeBezelConfig(
                     eslog.debug(f"Removing unused bezel file: {fadapted}")
                     for fr in fadapted:
                         with suppress(Exception):
-                            remove(fr)
+                            Path(fr).unlink()
 
         if bezel_stretch:
             borderx = 0
@@ -406,7 +405,7 @@ def writeBezelConfig(
 
         # Link bezel png file to the fixed path.
         # Shaders should use this path to find the art.
-        symlink(overlay_png_file, str(shaderBezelFile))
+        Path(str(shaderBezelFile)).symlink_to(overlay_png_file)
         eslog.debug(
             f"Symlinked bezel file {overlay_png_file} to {shaderBezelFile} for selected shader",
         )
@@ -414,7 +413,7 @@ def writeBezelConfig(
 
 def writeBezelCfgConfig(cfgFile: str, overlay_png_file: str) -> None:
     """Write the bezel configuration file."""
-    with open(cfgFile, "w") as fd:
+    with Path(cfgFile).open("w") as fd:
         fd.write("overlays = 1\n")
         fd.write('overlay0_overlay = "' + overlay_png_file + '"\n')
         fd.write("overlay0_full_screen = true\n")

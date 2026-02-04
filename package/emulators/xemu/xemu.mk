@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-XEMU_VERSION = v0.8.124
+XEMU_VERSION = v0.8.133
 XEMU_SITE = $(call github,xemu-project,xemu,$(XEMU_VERSION))
 #XEMU_SITE_METHOD = git
 #XEMU_GIT_SUBMODULES = YES
@@ -78,12 +78,13 @@ ifeq ($(BR2_PACKAGE_REGLINUX_VULKAN),y)
 XEMU_DEPENDENCIES += vulkan-headers vulkan-loader
 endif
 
+# AVX2 flags is no more in latest versions
 # AVX2 is only available on x86_64_v3 or more
-ifeq ($(BR2_x86_x86_64_v3),y)
-XEMU_CONF_OPTS += --enable-avx2
-else
-XEMU_CONF_OPTS += --disable-avx2
-endif
+#ifeq ($(BR2_x86_x86_64_v3),y)
+#XEMU_CONF_OPTS += --enable-avx2
+#else
+#XEMU_CONF_OPTS += --disable-avx2
+#endif
 
 define XEMU_CONFIGURE_CMDS
 	cd $(@D) && $(TARGET_CONFIGURE_OPTS) ./configure $(XEMU_CONF_OPTS)

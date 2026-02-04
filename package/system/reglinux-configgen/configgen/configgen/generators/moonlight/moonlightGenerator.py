@@ -1,9 +1,9 @@
 from pathlib import Path
 from shutil import copy
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
@@ -75,7 +75,7 @@ class MoonlightGenerator(Generator):
         romName = Path(rom).stem
         # find the real game name
         try:
-            with open(MOONLIGHT_GAMELIST_PATH) as f:
+            with Path(MOONLIGHT_GAMELIST_PATH).open() as f:
                 gfeGame = None
                 for line in f:
                     try:

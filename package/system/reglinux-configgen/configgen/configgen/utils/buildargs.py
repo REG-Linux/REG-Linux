@@ -3,6 +3,9 @@ from pathlib import Path
 
 """Argument parsing helper functions for launching Build Engine source ports Eduke32 and Raze"""
 
+# Constants
+MAX_EQUALS_PER_LINE = 2
+
 
 @dataclass()
 class ParseError:
@@ -53,20 +56,20 @@ def parse_args(launch_args: list[str], rom_path: str) -> Result:
             BuildEngineArg("MAP", "-map", True),  # Start specified MAP on launch
         ]
     }
-    with open(rom_path) as file:
+    with Path(rom_path).open(encoding="utf-8") as file:
         lines = file.readlines()
     errors = []
-    for i, line in enumerate(lines):
-        line = line.strip()
+    for i, original_line in enumerate(lines):
+        line = original_line.strip()
         if line.startswith("#") or line.startswith("//"):
             continue
         split = line.split("=")
         key = None
         val = None
-        if len(split) > 2:
+        if len(split) > MAX_EQUALS_PER_LINE:
             errors += [ParseError(i, "found another '=', but there should only be one")]
             continue
-        if len(split) == 2:
+        if len(split) == MAX_EQUALS_PER_LINE:
             key = split[0].strip().upper()
             val = split[1].strip()
         if not key or not val:

@@ -25,21 +25,20 @@ if TYPE_CHECKING:
         name: str
         keys: dict[str, list[int] | int | str]
 
-
     class JsonHotkeysContext(TypedDict):
         name: str
         keys: dict[str, list[str] | str]
 
 
-DEVICE_NAME: Final   = "batocera hotkeys"
+DEVICE_NAME: Final = "batocera hotkeys"
 GDEFAULTCONTEXT_FILE: Final = Path("/etc/hotkeygen/default_context.conf")
 GCOMMONCONTEXT_FILE: Final = Path("/etc/hotkeygen/common_context.conf")
 GDEFAULTMAPPING_FILE: Final = Path("/etc/hotkeygen/default_mapping.conf")
 
 GCONTEXT_FILE: Final = Path("/var/run/hotkeygen.context")
-GPID_FILE: Final     = Path("/var/run/hotkeygen.pid")
-GSYSTEM_DIR: Final   = Path("/usr/share/hotkeygen")
-GUSER_DIR: Final     = Path("/userdata/system/configs/hotkeygen")
+GPID_FILE: Final = Path("/var/run/hotkeygen.pid")
+GSYSTEM_DIR: Final = Path("/usr/share/hotkeygen")
+GUSER_DIR: Final = Path("/userdata/system/configs/hotkeygen")
 
 GUSERCOMMONCONTEXT_FILE: Final = GUSER_DIR / Path("common_context.conf")
 GUSERDEFAULTMAPPING_FILE: Final = GUSER_DIR / Path("default_mapping.conf")
@@ -48,8 +47,11 @@ gdebug = False
 
 ECODES_NAMES: Final[dict[int, str]] = {
     # add BTN_ to that joysticks buttons can run hotkeys (but keep generating only KEY_ events)
-    key_code: key_name for key_name, key_code in ecodes.ecodes.items() if key_name.startswith("KEY_") or key_name.startswith("BTN_")
+    key_code: key_name
+    for key_name, key_code in ecodes.ecodes.items()
+    if key_name.startswith("KEY_") or key_name.startswith("BTN_")
 }
+
 
 # default context is for es
 def get_default_context() -> HotkeysContext:
@@ -60,7 +62,8 @@ def get_default_context() -> HotkeysContext:
     else:
         return {"name": "", "keys": {}}
 
-def get_common_context_keys() -> dict[str, int|str]:
+
+def get_common_context_keys() -> dict[str, int | str]:
     keys = {}
     userkeys = {}
 
@@ -75,6 +78,7 @@ def get_common_context_keys() -> dict[str, int|str]:
             userkeys = load_context_keys(data)
 
     return keys | userkeys
+
 
 def get_context() -> HotkeysContext | None:
     if GCONTEXT_FILE.exists():
@@ -97,7 +101,10 @@ def get_context() -> HotkeysContext | None:
             print_context(context)
         return context
 
-def load_context_keys(keys: dict[str, list[str] | str]) -> dict[str, list[int] | int | str]:
+
+def load_context_keys(
+    keys: dict[str, list[str] | str],
+) -> dict[str, list[int] | int | str]:
     res = {}
     for action, key_code_names in keys.items():
         if isinstance(key_code_names, list):
@@ -120,20 +127,22 @@ def load_context_keys(keys: dict[str, list[str] | str]) -> dict[str, list[int] |
                 res[action] = key_code_names
     return res
 
+
 def load_context(data: JsonHotkeysContext) -> HotkeysContext:
     if "name" not in data:
         raise Exception("no name section found")
     if "keys" not in data:
         raise Exception("no keys section found")
 
-    context: HotkeysContext = { "name": data["name"], "keys": {} }
+    context: HotkeysContext = {"name": data["name"], "keys": {}}
     context["keys"] = load_context_keys(data["keys"])
     if gdebug:
         print_context(context)
     return context
 
+
 def save_context(context: HotkeysContext, gcontext_file: Path) -> None:
-    save: JsonHotkeysContext = { "name": context["name"], "keys": {} }
+    save: JsonHotkeysContext = {"name": context["name"], "keys": {}}
     for action, key_codes in context["keys"].items():
         if isinstance(key_codes, list):
             save["keys"][action] = [ECODES_NAMES[key] for key in key_codes]
@@ -145,6 +154,7 @@ def save_context(context: HotkeysContext, gcontext_file: Path) -> None:
     with gcontext_file.open("w") as fd:
         json.dump(save, fd, indent=2)
 
+
 def print_context(context: HotkeysContext) -> None:
     print(f"Context [{context['name']}]:")
     for action, keys in context["keys"].items():
@@ -155,9 +165,11 @@ def print_context(context: HotkeysContext) -> None:
         else:
             print(f"  {action:-<20}-> {ECODES_NAMES[keys]}")
 
+
 def get_device_config_filename(device: evdev.InputDevice) -> str:
-    name = re.sub('[^a-zA-Z0-9_]', '', device.name.replace(' ', '_'))
+    name = re.sub("[^a-zA-Z0-9_]", "", device.name.replace(" ", "_"))
     return f"{name}-{device.info.vendor:02x}-{device.info.product:02x}.mapping"
+
 
 def get_mapping_full_path(device: evdev.InputDevice) -> Path | None:
     fullpath = None
@@ -169,6 +181,7 @@ def get_mapping_full_path(device: evdev.InputDevice) -> Path | None:
     elif (GSYSTEM_DIR / fname).exists():
         fullpath = GSYSTEM_DIR / fname
     return fullpath
+
 
 def get_mapping(device: evdev.InputDevice) -> dict[int, str]:
     if device is None:
@@ -198,6 +211,7 @@ def get_mapping(device: evdev.InputDevice) -> dict[int, str]:
 
         return load_mapping(data | userdata)
 
+
 def load_mapping(data: dict[str, str]) -> dict[int, str]:
     try:
         mapping: dict[int, str] = {}
@@ -211,12 +225,18 @@ def load_mapping(data: dict[str, str]) -> dict[int, str]:
         print(f"fail to load mapping : {e}")
         return {}
 
-def get_mapping_associations(mapping: Mapping[int, str], caps: evdev._CapabilitiesWithAbsInfo):
+
+def get_mapping_associations(
+    mapping: Mapping[int, str], caps: evdev._CapabilitiesWithAbsInfo
+):
     capskeys = set(caps[ecodes.EV_KEY])
     return {key: value for key, value in mapping.items() if key in capskeys}
 
+
 def print_mapping(
-    mapping: Mapping[int, str], associations: Mapping[int, str], context: HotkeysContext | None = None
+    mapping: Mapping[int, str],
+    associations: Mapping[int, str],
+    context: HotkeysContext | None = None,
 ) -> None:
     for k in mapping:
         if k in associations:
@@ -231,9 +251,13 @@ def print_mapping(
                             f"  {ECODES_NAMES[k]:-<15}-> {associations[k]:-<15}-> {key_names}"
                         )
                     if isinstance(key_codes, str):
-                        print(f"  {ECODES_NAMES[k]:-<15}-> {associations[k]:-<15}-> {key_codes}")
+                        print(
+                            f"  {ECODES_NAMES[k]:-<15}-> {associations[k]:-<15}-> {key_codes}"
+                        )
                     else:
-                        print(f"  {ECODES_NAMES[k]:-<15}-> {associations[k]:-<15}-> {ECODES_NAMES[key_codes]}")
+                        print(
+                            f"  {ECODES_NAMES[k]:-<15}-> {associations[k]:-<15}-> {ECODES_NAMES[key_codes]}"
+                        )
                 else:
                     print(f"  {ECODES_NAMES[k]:-<15}-> {associations[k]:15}")
 
@@ -242,7 +266,7 @@ def send_keys(target: evdev.UInput, keys: int | list[int] | str) -> None:
     if isinstance(keys, list):
         for x in keys:
             if gdebug:
-               print(f"sending EV_KEY {x} 1")
+                print(f"sending EV_KEY {x} 1")
             target.write(ecodes.EV_KEY, x, 1)
             target.syn()
         # time required for emulators (like mame) based on states and not on events
@@ -266,6 +290,7 @@ def send_keys(target: evdev.UInput, keys: int | list[int] | str) -> None:
         target.write(ecodes.EV_KEY, keys, 0)
         target.syn()
 
+
 def do_send(key: str) -> None:
     if gdebug:
         print(f"Sending {key}")
@@ -275,19 +300,22 @@ def do_send(key: str) -> None:
         if mapping[code] == key:
             if gdebug:
                 print(f"sending {key}")
-            sender = evdev.UInput(name="virtual keyboard", events={ ecodes.EV_KEY: [code] })
+            sender = evdev.UInput(
+                name="virtual keyboard", events={ecodes.EV_KEY: [code]}
+            )
             send_keys(sender, code)
+
 
 def read_pid() -> str:
     with GPID_FILE.open() as fd:
-        return fd.read().replace('\n', '')
+        return fd.read().replace("\n", "")
 
-def do_new_context(context_name: str | None = None, context_json: str | None = None) -> None:
+
+def do_new_context(
+    context_name: str | None = None, context_json: str | None = None
+) -> None:
     if context_name is not None and context_json is not None:
-        context = load_context({
-            'name': context_name,
-            'keys': json.loads(context_json)
-        })
+        context = load_context({"name": context_name, "keys": json.loads(context_json)})
         # update the config file
         save_context(context, GCONTEXT_FILE)
     else:
@@ -307,8 +335,10 @@ def do_list() -> None:
     if context is not None:
         print_context(context)
 
-    for device in udev_context.list_devices(subsystem='input'):
-        if device.device_node is not None and device.device_node.startswith("/dev/input/event"):
+    for device in udev_context.list_devices(subsystem="input"):
+        if device.device_node is not None and device.device_node.startswith(
+            "/dev/input/event"
+        ):
             dev = evdev.InputDevice(device.device_node)
             if dev.name != DEVICE_NAME:
                 caps = dev.capabilities()
@@ -318,12 +348,17 @@ def do_list() -> None:
 
                     fullpath = get_mapping_full_path(dev)
                     if fullpath:
-                        print(f"# device {device.device_node} [{dev.name}] ({fullpath})")
+                        print(
+                            f"# device {device.device_node} [{dev.name}] ({fullpath})"
+                        )
                     else:
                         fname = get_device_config_filename(dev)
-                        print(f"# device {device.device_node} [{dev.name}] (no {fname} file found)")
+                        print(
+                            f"# device {device.device_node} [{dev.name}] (no {fname} file found)"
+                        )
                     if associations:
                         print_mapping(mapping, associations, context)
+
 
 @dataclass(slots=True)
 class Daemon:
@@ -331,8 +366,12 @@ class Daemon:
 
     context: HotkeysContext | None = field(init=False, default=None)
     running: bool = field(init=False, default=False)
-    input_devices: dict[str, evdev.InputDevice] = field(init=False, default_factory=dict)
-    input_devices_by_fd: dict[int, evdev.InputDevice] = field(init=False, default_factory=dict)
+    input_devices: dict[str, evdev.InputDevice] = field(
+        init=False, default_factory=dict
+    )
+    input_devices_by_fd: dict[int, evdev.InputDevice] = field(
+        init=False, default_factory=dict
+    )
     mappings_by_fd: dict[int, dict[int, str]] = field(init=False, default_factory=dict)
     udev_context: pyudev.Context = field(init=False)
     monitor: pyudev.Monitor = field(init=False)
@@ -342,17 +381,26 @@ class Daemon:
     def __post_init__(self) -> None:
         self.udev_context = pyudev.Context()
         self.monitor = pyudev.Monitor.from_netlink(self.udev_context)
-        self.monitor.filter_by(subsystem='input')
+        self.monitor.filter_by(subsystem="input")
 
         self.poll = select.poll()
 
         # target virtual keyboard
         self.target = evdev.UInput(
-            name=DEVICE_NAME, events={ ecodes.EV_KEY: [x for x in range(ecodes.KEY_MAX) if x in ECODES_NAMES and ECODES_NAMES[x][:4] == "KEY_" ] }
+            name=DEVICE_NAME,
+            events={
+                ecodes.EV_KEY: [
+                    x
+                    for x in range(ecodes.KEY_MAX)
+                    if x in ECODES_NAMES and ECODES_NAMES[x][:4] == "KEY_"
+                ]
+            },
         )
 
     def __handle_actions(self, action: str, device: pyudev.Device) -> None:
-        if device.device_node is not None and device.device_node.startswith("/dev/input/event"):
+        if device.device_node is not None and device.device_node.startswith(
+            "/dev/input/event"
+        ):
             if action == "add":
                 input_device = evdev.InputDevice(device.device_node)
 
@@ -365,11 +413,15 @@ class Daemon:
 
                         if associations:
                             if gdebug:
-                                print(f"Adding device {device.device_node}: {input_device.name}")
+                                print(
+                                    f"Adding device {device.device_node}: {input_device.name}"
+                                )
                                 print_mapping(mapping, associations)
 
                             self.input_devices[device.device_node] = input_device
-                            self.input_devices_by_fd[input_device.fileno()] = input_device
+                            self.input_devices_by_fd[input_device.fileno()] = (
+                                input_device
+                            )
                             self.mappings_by_fd[input_device.fileno()] = mapping
                             self.poll.register(input_device, select.POLLIN)
             elif action == "remove":
@@ -377,7 +429,9 @@ class Daemon:
 
                 if input_device is not None:
                     if gdebug:
-                        print(f"Removing device {device.device_node}: {input_device.name}")
+                        print(
+                            f"Removing device {device.device_node}: {input_device.name}"
+                        )
 
                     self.poll.unregister(input_device)
                     del self.mappings_by_fd[input_device.fileno()]
@@ -417,8 +471,8 @@ class Daemon:
         self.poll.register(self.monitor, select.POLLIN)
 
         # adding existing devices in the poll
-        for device in self.udev_context.list_devices(subsystem='input'):
-            self.__handle_actions('add', device)
+        for device in self.udev_context.list_devices(subsystem="input"):
+            self.__handle_actions("add", device)
 
         # to read new contexts
         signal.signal(signal.SIGHUP, self.__handle_sighup)
@@ -433,12 +487,14 @@ class Daemon:
                     else:
                         event = self.input_devices_by_fd[fd].read_one()
                         if (
-                            event is not None and
-                            event.type == ecodes.EV_KEY and
-                            event.value == 0 and  # limit to key down
-                            event.code in self.mappings_by_fd[fd]
+                            event is not None
+                            and event.type == ecodes.EV_KEY
+                            and event.value == 0  # limit to key down
+                            and event.code in self.mappings_by_fd[fd]
                         ):
-                            self.__handle_event(event, self.mappings_by_fd[fd][event.code])
+                            self.__handle_event(
+                                event, self.mappings_by_fd[fd][event.code]
+                            )
                 except (OSError, KeyError):
                     if fd == self.monitor.fileno():
                         raise
@@ -446,7 +502,9 @@ class Daemon:
                         # error on a single device
                         if fd in self.input_devices_by_fd:
                             input_device = self.input_devices_by_fd[fd]
-                            print(f"error on device {input_device.name} ({input_device.path}), closing.")
+                            print(
+                                f"error on device {input_device.name} ({input_device.path}), closing."
+                            )
                             del self.mappings_by_fd[fd]
                             del self.input_devices_by_fd[fd]
                             del self.input_devices[input_device.path]
@@ -459,13 +517,16 @@ class Daemon:
                     self.target.close()
                     raise
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="hotkeygen")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--list", action="store_true")
     parser.add_argument("--send")
     parser.add_argument("--default-context", action="store_true")
-    parser.add_argument("--new-context", nargs=2, metavar=("new-context-name", "new-context-json"))
+    parser.add_argument(
+        "--new-context", nargs=2, metavar=("new-context-name", "new-context-json")
+    )
     parser.add_argument("--permanent", action="store_true")
     args = parser.parse_args()
     if args.debug:

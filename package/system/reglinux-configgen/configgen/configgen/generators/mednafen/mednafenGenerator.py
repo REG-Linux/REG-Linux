@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 
 from .mednafenConfig import (
     MEDNAFEN_BIN_PATH,
@@ -33,7 +33,7 @@ class MednafenGenerator(Generator):
             config_path.unlink()
 
         # Create the config file and fill it with basic data
-        with open(MEDNAFEN_CONFIG_PATH, "w") as cfgConfig:
+        with Path(MEDNAFEN_CONFIG_PATH).open("w") as cfgConfig:
             # Basic settings
             setMednafenConfig(cfgConfig)
             # TODO: Controls configuration

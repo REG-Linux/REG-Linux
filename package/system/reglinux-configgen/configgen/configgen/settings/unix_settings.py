@@ -82,7 +82,11 @@ class UnixSettings:
             strict=False,
             allow_no_value=True,
         )
-        self.config.optionxform = lambda optionstr: str(optionstr)  # Preserve key case
+
+        def preserve_case(optionstr):
+            return str(optionstr)
+
+        self.config.optionxform = preserve_case  # Preserve key case
         self._load_file()  # Load the configuration file
 
     def _load_file(self) -> None:

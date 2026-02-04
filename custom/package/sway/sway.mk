@@ -8,12 +8,16 @@ SWAY_VERSION = 1.11
 SWAY_SITE = https://github.com/swaywm/sway/releases/download/$(SWAY_VERSION)
 SWAY_LICENSE = MIT
 SWAY_LICENSE_FILES = LICENSE
-SWAY_DEPENDENCIES = host-pkgconf wlroots json-c pcre cairo pango
+SWAY_DEPENDENCIES = host-pkgconf wlroots json-c pcre cairo pango basu
 SWAY_CONF_OPTS = \
+	--buildtype=release \
+	-Dtray=disabled \
 	-Dwerror=false \
+	-Dbash-completions=false \
 	-Dzsh-completions=false \
 	-Dfish-completions=false \
-	-Dman-pages=disabled
+	-Dman-pages=disabled \
+	-Dsd-bus-provider=basu
 
 ifeq ($(BR2_PACKAGE_GDK_PIXBUF),y)
 SWAY_CONF_OPTS += -Dgdk-pixbuf=enabled

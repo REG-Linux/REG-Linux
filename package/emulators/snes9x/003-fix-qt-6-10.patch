@@ -1,0 +1,131 @@
+From cdffce2e32bfc0305fd5489831d09b5e730bed9b Mon Sep 17 00:00:00 2001
+From: BearOso <bearoso@gmail.com>
+Date: Sat, 11 Oct 2025 21:46:42 -0500
+Subject: [PATCH] qt: Update compatibility for Qt 6.10.
+
+---
+ qt/src/EmuCanvasOpenGL.cpp | 13 +++++++------
+ qt/src/EmuCanvasVulkan.cpp | 13 ++++++-------
+ qt/src/EmuMainWindow.cpp   |  6 ++----
+ 3 files changed, 15 insertions(+), 17 deletions(-)
+
+diff --git a/qt/src/EmuCanvasOpenGL.cpp b/qt/src/EmuCanvasOpenGL.cpp
+index 7df927106..f6a5abb8c 100644
+--- a/qt/src/EmuCanvasOpenGL.cpp
++++ b/qt/src/EmuCanvasOpenGL.cpp
+@@ -1,6 +1,5 @@
+ #include "EmuCanvasOpenGL.hpp"
+ #include <QtGui/QGuiApplication>
+-#include <qpa/qplatformnativeinterface.h>
+ #include <QTimer>
+ #include <QMessageBox>
+ #include "common/video/opengl_context.hpp"
+@@ -129,7 +129,7 @@
+         return true;
+ 
+     auto platform = QGuiApplication::platformName();
+-    auto pni = QGuiApplication::platformNativeInterface();
++    auto app = reinterpret_cast<QGuiApplication *>(QGuiApplication::instance());
+     QGuiApplication::sync();
+ #ifndef _WIN32
+     if (platform == "wayland")
+@@ -134,8 +134,9 @@
+ #ifndef _WIN32
+     if (platform == "wayland")
+     {
+-        auto display = (wl_display *)pni->nativeResourceForWindow("display", windowHandle());
+-        auto surface = (wl_surface *)pni->nativeResourceForWindow("surface", main_window->windowHandle());
++        auto iface = app->nativeInterface<QNativeInterface::QWaylandApplication>();
++        auto display = iface->display();
++        auto surface = (wl_surface *)main_window->winId();
+         auto wayland_egl_context = new WaylandEGLContext();
+         int s = devicePixelRatio();
+ 
+@@ -151,7 +151,8 @@ bool EmuCanvasOpenGL::createContext()
+     }
+     else if (platform == "xcb")
+     {
+-        auto display = (Display *)pni->nativeResourceForWindow("display", windowHandle());
++        auto iface = app->nativeInterface<QNativeInterface::QX11Application>();
++        auto display = iface->display();
+         auto xid = (Window)winId();
+ 
+         auto glx_context = new GTKGLXContext();
+diff --git a/qt/src/EmuCanvasVulkan.cpp b/qt/src/EmuCanvasVulkan.cpp
+index 5f2493256..1b7c18eb8 100644
+--- a/qt/src/EmuCanvasVulkan.cpp
++++ b/qt/src/EmuCanvasVulkan.cpp
+@@ -1,5 +1,4 @@
+ #include <QtGui/QGuiApplication>
+-#include <qpa/qplatformnativeinterface.h>
+ #include <QTimer>
+ #include <QtEvents>
+ #include <QMessageBox>
+@@ -9,8 +9,6 @@
+ #include "snes9x_imgui.h"
+ #include "imgui_impl_vulkan.h"
+ 
+-using namespace QNativeInterface;
+-
+ EmuCanvasVulkan::EmuCanvasVulkan(EmuConfig *config, QWidget *parent, QWidget *main_window)
+     : EmuCanvas(config, parent, main_window)
+ {
+@@ -80,9 +78,9 @@
+         return true;
+ 
+     platform = QGuiApplication::platformName();
+-    auto pni = QGuiApplication::platformNativeInterface();
+     setVisible(true);
+     QGuiApplication::sync();
++    auto app = reinterpret_cast<QGuiApplication *>(QGuiApplication::instance());
+ 
+     context = std::make_unique<Vulkan::Context>();
+ 
+@@ -94,9 +94,10 @@
+ #else
+     if (platform == "wayland")
+     {
++        auto iface = app->nativeInterface<QNativeInterface::QWaylandApplication>();
++        auto display = iface->display();
++        auto surface = (wl_surface *)main_window->winId();
+         wayland_surface = std::make_unique<WaylandSurface>();
+-        auto display = (wl_display *)pni->nativeResourceForWindow("display", window);
+-        auto surface = (wl_surface *)pni->nativeResourceForWindow("surface", main_window->windowHandle());
+         wayland_surface->attach(display, surface, { parent->x() - main_window->x(), parent->y() - main_window->y(), width(), height(), static_cast<int>(devicePixelRatio()) });
+         auto [scaled_width, scaled_height] = wayland_surface->get_size();
+         if (!context->init_wayland(display, wayland_surface->child, scaled_width, scaled_height, config->display_device_index))
+@@ -117,7 +115,8 @@ bool EmuCanvasVulkan::createContext()
+     }
+     else if (platform == "xcb")
+     {
+-        auto display = (Display *)pni->nativeResourceForWindow("display", window);
++        auto iface = app->nativeInterface<QNativeInterface::QX11Application>();
++        auto display = iface->display();
+         auto xid = (Window)winId();
+ 
+         if (!context->init_Xlib() ||
+diff --git a/qt/src/EmuMainWindow.cpp b/qt/src/EmuMainWindow.cpp
+index 6842a4e58..97b7b932b 100644
+--- a/qt/src/EmuMainWindow.cpp
++++ b/qt/src/EmuMainWindow.cpp
+@@ -5,7 +5,6 @@
+ #include <QtEvents>
+ #include <QGuiApplication>
+ #include <qnamespace.h>
+-#include <qpa/qplatformnativeinterface.h>
+ 
+ #ifdef Q_OS_WIN
+ #include <dwmapi.h>
+@@ -378,10 +377,9 @@ void EmuMainWindow::setBypassCompositor(bool bypass)
+ #ifndef _WIN32
+     if (QGuiApplication::platformName() == "xcb")
+     {
+-        auto pni = QGuiApplication::platformNativeInterface();
+-
+         uint32_t value = bypass;
+-        auto display = (Display *)pni->nativeResourceForWindow("display", windowHandle());
++        auto iface = app->qtapp->nativeInterface<QNativeInterface::QX11Application>();
++        auto display = iface->display();
+         auto xid = winId();
+         Atom net_wm_bypass_compositor = XInternAtom(display, "_NET_WM_BYPASS_COMPOSITOR", False);
+         XChangeProperty(display, xid, net_wm_bypass_compositor, 6, 32, PropModeReplace, (unsigned char *)&value, 1);

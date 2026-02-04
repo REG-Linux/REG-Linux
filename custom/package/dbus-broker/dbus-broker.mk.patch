@@ -1,5 +1,5 @@
 diff --git a/package/dbus-broker/dbus-broker.mk b/package/dbus-broker/dbus-broker.mk
-index 0bbdd304af0..070ec0e2b5f 100644
+index 0bbdd304af..070ec0e2b5 100644
 --- a/package/dbus-broker/dbus-broker.mk
 +++ b/package/dbus-broker/dbus-broker.mk
 @@ -24,8 +24,9 @@ DBUS_BROKER_LICENSE_FILES = \

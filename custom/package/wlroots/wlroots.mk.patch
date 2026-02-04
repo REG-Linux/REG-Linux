@@ -1,5 +1,5 @@
 diff --git a/package/wlroots/wlroots.mk b/package/wlroots/wlroots.mk
-index e0f1e1053e..d2f89707ce 100644
+index e0f1e1053e..49d5d3d01e 100644
 --- a/package/wlroots/wlroots.mk
 +++ b/package/wlroots/wlroots.mk
 @@ -4,7 +4,7 @@
@@ -11,7 +11,20 @@ index e0f1e1053e..d2f89707ce 100644
  WLROOTS_SITE = https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/$(WLROOTS_VERSION)/downloads
  WLROOTS_LICENSE = MIT
  WLROOTS_LICENSE_FILES = LICENSE
-@@ -31,6 +31,10 @@ WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
+@@ -24,13 +24,21 @@ WLROOTS_DEPENDENCIES = \
+ 	seatd \
+ 	udev \
+ 	wayland \
+-	wayland-protocols
++	wayland-protocols \
++	libdrm
+ 
+-WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
++WLROOTS_CONF_OPTS = \
++	--buildtype=release \
++	-Dexamples=false \
++	-Dxcb-errors=disabled
+ 
  WLROOTS_RENDERERS = gles2
  WLROOTS_BACKENDS = libinput drm
  
@@ -22,7 +35,7 @@ index e0f1e1053e..d2f89707ce 100644
  ifeq ($(BR2_PACKAGE_WLROOTS_X11),y)
  WLROOTS_BACKENDS += x11
  WLROOTS_DEPENDENCIES += libxcb xcb-util-wm xcb-util-renderutil xlib_libX11
-@@ -43,7 +47,12 @@ else
+@@ -43,7 +51,12 @@ else
  WLROOTS_CONF_OPTS += -Dxwayland=disabled
  endif
  

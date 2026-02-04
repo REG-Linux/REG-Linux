@@ -2,7 +2,7 @@
 [ "$(/usr/bin/regmsg systemconf getconfigkey system.samba.enabled)" = "0" ] && { printf '%s\n' "SMB services: disabled"; exit 0; }
 
 start() {
-    { [ "$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)" = "0" ] && CONFIGFILE="/etc/ksmbd/ksmbd.conf"; } || CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"
+    { [ "$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)" = "1" ] && CONFIGFILE="/etc/ksmbd/ksmbd-secure.conf"; } || CONFIGFILE="/etc/ksmbd/ksmbd.conf"
 
     printf 'Starting SMB services: '
     if modprobe ksmbd && ksmbd.mountd --config="$CONFIGFILE" && touch /var/lock/subsys/smb 2>/dev/null; then

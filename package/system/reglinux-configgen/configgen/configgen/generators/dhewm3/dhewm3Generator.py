@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF, ROMS
 
 DHEWM3_BIN_PATH = "/usr/bin/dhewm3"
@@ -21,7 +21,7 @@ class Dhewm3Generator(Generator):
         game_resolution,
     ):
         # Read the path within the .d3 rom file
-        with open(rom) as file:
+        with Path(rom).open() as file:
             directory = file.readline().strip().split("/")[0]
 
         # Run command

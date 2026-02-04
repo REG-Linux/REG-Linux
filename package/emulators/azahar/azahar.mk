@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-AZAHAR_VERSION = 2123.3
+AZAHAR_VERSION = 2124.3
 AZAHAR_SITE = https://github.com/azahar-emu/azahar.git
 AZAHAR_SITE_METHOD = git
 AZAHAR_GIT_SUBMODULES=YES
@@ -42,16 +42,15 @@ AZAHAR_CONF_OPTS += -DENABLE_SSE42=OFF
 endif
 
 # Qt vs SDL frontend
+AZAHAR_BIN = azahar
 ifeq ($(BR2_PACKAGE_REGLINUX_HAS_QT6),y)
     AZAHAR_DEPENDENCIES += reglinux-qt6
     AZAHAR_CONF_OPTS += -DENABLE_QT=ON
     AZAHAR_CONF_OPTS += -DENABLE_QT_TRANSLATION=ON
     AZAHAR_CONF_OPTS += -DENABLE_QT_UPDATER=OFF
-    AZAHAR_BIN = azahar
 else
     AZAHAR_CONF_OPTS += -DENABLE_QT=OFF
     AZAHAR_CONF_OPTS += -DENABLE_SDL2_FRONTEND=ON
-    AZAHAR_BIN = azahar-cli
 endif
 
 # Vulkan support

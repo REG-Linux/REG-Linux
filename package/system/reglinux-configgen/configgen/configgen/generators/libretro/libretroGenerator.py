@@ -3,8 +3,8 @@ from pathlib import Path
 from shutil import copyfile
 from typing import Any
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
 from configgen.systemFiles import OVERLAYS
 from configgen.utils.logger import get_logger
@@ -182,7 +182,7 @@ class LibretroGenerator(Generator):
         elif system.name == "pico8":
             romext = Path(romName).suffix
             if romext.lower() == ".m3u":
-                with open(rom) as fpin:
+                with Path(rom).open() as fpin:
                     lines = fpin.readlines()
                 rom = str(Path(rom).parent / lines[0].strip())
             command_array = [
@@ -340,7 +340,7 @@ class LibretroGenerator(Generator):
             rom = str(Path(rom).parent / romName[0:-8])
 
         if system.name == "reminiscence":
-            with open(rom) as file:
+            with Path(rom).open() as file:
                 first_line = file.readline().strip()
             directory_path = "/".join(rom.split("/")[:-1])
             rom = f"{directory_path}/{first_line}"

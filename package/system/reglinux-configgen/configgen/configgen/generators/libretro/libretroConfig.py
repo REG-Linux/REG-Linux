@@ -273,7 +273,7 @@ def createLibretroConfig(
     # try to create/modify the configuration file simultaneously
     lockfile = retroarchCore + ".lock"
     try:
-        with open(lockfile, "w") as lock:
+        with Path(lockfile).open("w") as lock:
             # Acquire exclusive lock
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:
@@ -492,7 +492,7 @@ def createLibretroConfig(
     # prevent displaying "QUICK MENU" with "No Items" after DOSBox Pure, TyrQuake and PrBoom games exit
     retroarchConfig["load_dummy_on_core_shutdown"] = '"false"'
 
-    ## Specific choices
+    # Specific choices
     if system.config["core"] in coreToP1Device:
         retroarchConfig["input_libretro_device_p1"] = coreToP1Device[
             system.config["core"]
@@ -502,7 +502,7 @@ def createLibretroConfig(
             system.config["core"]
         ]
 
-    ## AMIGA BIOS files are in /userdata/bios/amiga
+    # AMIGA BIOS files are in /userdata/bios/amiga
     if (
         (system.config["core"] == "puae")
         or (system.config["core"] == "puae2021")
@@ -510,7 +510,7 @@ def createLibretroConfig(
     ):
         retroarchConfig["system_directory"] = '"/userdata/bios/amiga/"'
 
-    ## AMIGA OCS-ECS/AGA/CD32
+    # AMIGA OCS-ECS/AGA/CD32
     if system.config["core"] == "puae" or system.config["core"] == "puae2021":
         if system.name != "amigacd32":
             if system.isOptSet("controller1_puae"):
@@ -528,12 +528,12 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p1"] = "517"  # CD 32 Pad
 
-    ## BlueMSX choices by System
+    # BlueMSX choices by System
     if system.name in systemToBluemsx and system.config["core"] == "bluemsx":
         retroarchConfig["input_libretro_device_p1"] = systemToP1Device[system.name]
         retroarchConfig["input_libretro_device_p2"] = systemToP2Device[system.name]
 
-    ## SNES9x and SNES9x_next (2010) controller
+    # SNES9x and SNES9x_next (2010) controller
     if system.config["core"] == "snes9x" or system.config["core"] == "snes9x_next":
         if system.isOptSet("controller1_snes9x"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -566,7 +566,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p3"] = "1"
 
-    ## NES controller
+    # NES controller
     if system.config["core"] == "fceumm":
         if system.isOptSet("controller1_nes"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -581,7 +581,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p2"] = "1"
 
-    ## PlayStation controller
+    # PlayStation controller
     if system.config["core"] == "mednafen_psx":  # Madnafen
         if system.isOptSet("beetle_psx_hw_Controller1"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -620,8 +620,7 @@ def createLibretroConfig(
         # wheel
         if system.isOptSet("use_wheels") and system.getOptBoolean("use_wheels"):
             deviceInfos = getDevicesInformation()
-            nplayer = 1
-            for _, pad in sorted(controllers.items()):
+            for nplayer, pad in enumerate(sorted(controllers.items()), start=1):
                 if pad.dev in deviceInfos and deviceInfos[pad.dev]["isWheel"]:
                     retroarchConfig[
                         "input_player" + str(nplayer) + "_analog_dpad_mode"
@@ -634,9 +633,8 @@ def createLibretroConfig(
                         retroarchConfig["input_libretro_device_p" + str(nplayer)] = (
                             517  # DualShock Controller
                         )
-                nplayer += 1
 
-    ## Sega Dreamcast controller
+    # Sega Dreamcast controller
     if system.config["core"] == "flycast":
         if system.isOptSet("controller1_dc"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -671,7 +669,7 @@ def createLibretroConfig(
         ):
             retroarchConfig["input_libretro_device_p1"] = "2049"  # Race Controller
 
-    ## Sega Megadrive controller
+    # Sega Megadrive controller
     if system.config["core"] == "genesisplusgx" and system.name == "megadrive":
         if system.isOptSet("controller1_md"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -686,7 +684,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p2"] = "513"  # 6 button
 
-    ## Sega Megadrive style controller remap
+    # Sega Megadrive style controller remap
     if system.config["core"] in ["genesisplusgx", "picodrive"]:
         valid_megadrive_controller_guids = [
             # 8bitdo m30
@@ -741,7 +739,7 @@ def createLibretroConfig(
             ):
                 update_megadrive_controller_config(i)
 
-    ## Sega Mastersystem controller
+    # Sega Mastersystem controller
     if system.config["core"] == "genesisplusgx" and system.name == "mastersystem":
         if system.isOptSet("controller1_ms"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -756,7 +754,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p2"] = "769"
 
-    ## Sega Saturn controller
+    # Sega Saturn controller
     if (
         system.config["core"] in ["yabasanshiro", "beetle-saturn"]
         and system.name == "saturn"
@@ -783,7 +781,7 @@ def createLibretroConfig(
     ):
         retroarchConfig["input_libretro_device_p1"] = "517"  # Arcade Racer
 
-    ## NEC PCEngine controller
+    # NEC PCEngine controller
     if system.config["core"] == "pce" or system.config["core"] == "pce_fast":
         if system.isOptSet("controller1_pce"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -792,7 +790,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p1"] = "1"
 
-    ## WII controller
+    # WII controller
     if system.config["core"] == "dolphin" or system.config["core"] == "dolphin":
         # Controller 1 Type
         if system.isOptSet("controller1_wii"):
@@ -823,7 +821,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p4"] = "1"
 
-    ## MS-DOS controller
+    # MS-DOS controller
     if system.config["core"] == "dosbox_pure":  # Dosbox-Pure
         if system.isOptSet("controller1_dosbox_pure"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -842,7 +840,7 @@ def createLibretroConfig(
             else:
                 retroarchConfig["input_player2_analog_dpad_mode"] = "3"
 
-    ## PS1 Swanstation
+    # PS1 Swanstation
     if system.config["core"] == "swanstation":
         if system.isOptSet("swanstation_Controller1"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -873,7 +871,7 @@ def createLibretroConfig(
             retroarchConfig["input_libretro_device_p2"] = "1"
             retroarchConfig["input_player2_analog_dpad_mode"] = "0"
 
-    ## Wonder Swan & Wonder Swan Color
+    # Wonder Swan & Wonder Swan Color
     if system.config["core"] == "mednafen_wswan":  # Beetle Wonderswan
         # If set manually, proritize that.
         # Otherwise, set to portrait for games listed as 90 degrees, manual (default) if not.
@@ -884,7 +882,7 @@ def createLibretroConfig(
             wswanOrientation = system.config["wswan_rotate_display"]
         retroarchConfig["wswan_rotate_display"] = wswanOrientation
 
-    ## N64 Controller Remap
+    # N64 Controller Remap
     if system.config["core"] in ["mupen64plus-next", "parallel_n64"]:
         valid_n64_controller_guids = [
             # official nintendo switch n64 controller
@@ -934,8 +932,8 @@ def createLibretroConfig(
             ):
                 update_n64_controller_config(i)
 
-    ## PORTS
-    ## Quake
+    # PORTS
+    # Quake
     if system.config["core"] == "tyrquake":
         if system.isOptSet("tyrquake_controller1"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -951,7 +949,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p1"] = "1"
 
-    ## DOOM
+    # DOOM
     if system.config["core"] == "prboom":
         if system.isOptSet("prboom_controller1"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -967,7 +965,7 @@ def createLibretroConfig(
         else:
             retroarchConfig["input_libretro_device_p1"] = "1"
 
-    ## ZX Spectrum
+    # ZX Spectrum
     if system.config["core"] == "fuse":
         if system.isOptSet("controller1_zxspec"):
             retroarchConfig["input_libretro_device_p1"] = system.config[
@@ -1720,8 +1718,7 @@ def configureGunInputsForPlayer(
 
     # controller mapping
     hatstoname = {"1": "up", "2": "right", "4": "down", "8": "left"}
-    nplayer = 1
-    for _, pad in sorted(controllers.items()):
+    for nplayer, pad in enumerate(sorted(controllers.items()), start=1):
         if nplayer == n:
             for m in mapping:
                 if mapping[m] in pad.inputs:
@@ -1740,7 +1737,6 @@ def configureGunInputsForPlayer(
                         retroarchConfig[f"input_player{n}_{m}_axis"] = (
                             aval + pad.inputs[mapping[m]].id
                         )
-        nplayer += 1
 
 
 def writeLibretroConfigToFile(retroconfig: Any, config: dict[str, Any]) -> None:

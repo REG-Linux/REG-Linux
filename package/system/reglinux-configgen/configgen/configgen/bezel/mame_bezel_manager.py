@@ -74,7 +74,7 @@ def setup_mame_bezels(
             guns_borders_size,
         )
     except Exception as e:
-        logger.warning(f"Error setting up MAME bezels: {e}")
+        logger.warning("Error setting up MAME bezels: %s", e)
         writeBezelConfig(None, system, rom, "", game_resolution, None)
 
 
@@ -139,7 +139,7 @@ def writeBezelConfig(
             return
 
         # Create artwork directory
-        os.makedirs(tmp_zip_dir)
+        Path(tmp_zip_dir).mkdir(parents=True)
 
         # Get bezel information
         bz_infos = _get_bezel_info(bezelSet, system, rom)
@@ -193,7 +193,7 @@ def writeBezelConfig(
                 system.config,
             )
     except Exception as e:
-        logger.error(f"Error in writeBezelConfig: {e}")
+        logger.error("Error in writeBezelConfig: %s", e)
         # Ensure the temp directory is cleaned up even if an error occurs
         try:
             if tmp_zip_dir is not None and Path(tmp_zip_dir).exists():
@@ -239,7 +239,7 @@ def _get_bezel_info(
         try:
             return BezelUtils.get_bezel_infos(rom, bezel_set, system.name, "mame")
         except Exception as e:
-            logger.warning(f"Error getting bezel info for {rom}: {e}")
+            logger.warning("Error getting bezel info for %s: %s", rom, e)
             return None
     return None
 
@@ -259,7 +259,7 @@ def _safe_file_operation(operation_func: Any, *args: Any, **kwargs: Any):
     try:
         return operation_func(*args, **kwargs)
     except OSError as e:
-        logger.warning(f"File operation failed: {e}")
+        logger.warning("File operation failed: %s", e)
         return None
 
 
@@ -358,7 +358,7 @@ def _parse_bezel_info_file(
         Tuple containing (img_width, img_height, bz_x, bz_y, bz_width, bz_height, bz_alpha)
 
     """
-    with open(info_path) as bz_info_file:
+    with Path(info_path).open() as bz_info_file:
         bz_info_text = bz_info_file.readlines()
 
         # Initialize defaults
@@ -394,7 +394,7 @@ def _parse_bezel_info_file(
                         bz_alpha = float(value)
                 except ValueError:
                     # Log error but continue processing
-                    logger.warning(f"Invalid value for {key}: {value}")
+                    logger.warning("Invalid value for %s: %s", key, value)
                     continue
 
         bz_width = img_width - bz_x - bz_right
@@ -489,7 +489,7 @@ def _write_layout_file(
 
     """
     layout_path = tmp_zip_dir + "/default.lay"
-    with open(layout_path, "w") as f:
+    with Path(layout_path).open("w") as f:
         f.write('<mamelayout version="2">\n')
         f.write('<element name="bezel"><image file="default.png" /></element>\n')
         f.write('<view name="bezel">\n')
@@ -575,7 +575,7 @@ def _apply_tattoo(
         result = Image.alpha_composite(back, tattoo_canvas)
         result.save(output_png_file, mode="RGBA", format="PNG")
     except Exception as e:
-        logger.warning(f"Failed to apply tattoo: {e}")
+        logger.warning("Failed to apply tattoo: %s", e)
         # If tattoo fails, return original file
         return png_file
 
@@ -609,7 +609,7 @@ def _load_tattoo_image(system: Any) -> Any:
         try:
             return Image.open(tattoo_path)
         except Exception as e:
-            logger.warning(f"Error loading tattoo image {tattoo_path}: {e}")
+            logger.warning("Error loading tattoo image %s: %s", tattoo_path, e)
     return None
 
 
@@ -671,7 +671,7 @@ def _apply_gun_borders(
         )
         return output_png_file
     except Exception as e:
-        logger.warning(f"Failed to apply gun borders: {e}")
+        logger.warning("Failed to apply gun borders: %s", e)
         # If gun borders fail, return original file
         return png_file
 

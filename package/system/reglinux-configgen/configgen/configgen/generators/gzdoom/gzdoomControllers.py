@@ -1,10 +1,11 @@
+import pathlib
 from typing import Any
 
 from .gzdoomConfig import GZDOOM_CONFIG_PATH
 
 
 def setGzdoomControllers(system: Any) -> None:
-    with open(GZDOOM_CONFIG_PATH) as file:
+    with pathlib.Path(GZDOOM_CONFIG_PATH).open() as file:
         lines = file.readlines()
 
     if system.isOptSet("gz_joystick"):
@@ -27,7 +28,8 @@ def setGzdoomControllers(system: Any) -> None:
         else:
             for i, line in enumerate(lines):
                 if line.strip() == "[GlobalSettings]":
-                    lines.insert(i + 1, f"use_joystick={set_gz_joystick}\n")
+                    lines[i + 1 : i + 1] = [f"use_joystick={set_gz_joystick}\n"]
+                    break  # Assuming we only want to insert after the first occurrence
 
-    with open(GZDOOM_CONFIG_PATH, "w") as file:
+    with pathlib.Path(GZDOOM_CONFIG_PATH).open("w") as file:
         file.writelines(lines)

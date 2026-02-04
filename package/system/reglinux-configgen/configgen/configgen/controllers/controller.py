@@ -3,6 +3,7 @@
 Provides functionality to generate SDL game controller configuration strings.
 """
 
+import pathlib
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -204,6 +205,5 @@ def write_sdl_db_all_controllers(
     """
     # Using the walrus operator for assignment expressions
     config_str = generate_sdl_controller_config(controllers)
-    with open(outputFile, "w") as text_file:
-        text_file.write(config_str)
+    pathlib.Path(outputFile).write_text(config_str)
     return outputFile

@@ -1,8 +1,8 @@
-from os import makedirs, path
+import pathlib
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.systemFiles import SAVES
 
 THEXTECH_SAVES_DIR = str(SAVES / "thextech")
@@ -20,8 +20,8 @@ class TheXTechGenerator(Generator):
         wheels,
         game_resolution,
     ):
-        if not path.exists(THEXTECH_SAVES_DIR):
-            makedirs(THEXTECH_SAVES_DIR)
+        if not pathlib.Path(THEXTECH_SAVES_DIR).exists():
+            pathlib.Path(THEXTECH_SAVES_DIR).mkdir(parents=True)
 
         command_array = [THEXTECH_BIN_PATH, "-u", THEXTECH_SAVES_DIR]
 

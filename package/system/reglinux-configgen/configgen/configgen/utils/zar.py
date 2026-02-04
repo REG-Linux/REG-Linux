@@ -1,4 +1,5 @@
-from os import listdir, mkdir, rmdir
+"""Utility module for handling zar archives in RegLinux."""
+
 from pathlib import Path
 from subprocess import call
 from typing import Any
@@ -45,27 +46,28 @@ def zar_begin(rom: str) -> tuple[bool, str | None, Any]:
     if mountpoint_path.exists() and mountpoint_path.is_dir():
         eslog.debug(f"zar_begin: {rommountpoint} already exists")
         try:
-            rmdir(rommountpoint)
+            mountpoint_path.rmdir()
         except (OSError, FileNotFoundError) as e:
             eslog.debug(f"zar_begin: failed to rmdir {rommountpoint} - {e!s}")
             return False, None, rommountpoint
 
     # Create the new mount directory
-    mkdir(rommountpoint)
+    mountpoint_path.mkdir(parents=True, exist_ok=True)
 
     # Mount the archive using fuse-zar
     return_code = call(["fuse-zar", rom, rommountpoint])
     if return_code != 0:
         eslog.debug(f"zar_begin: mounting {rommountpoint} failed")
         try:
-            rmdir(rommountpoint)
+            Path(rommountpoint).rmdir()
         except (OSError, FileNotFoundError) as e:
             eslog.debug(f"zar: failed to remove directory {rommountpoint} - {e!s}")
-        raise Exception(f"unable to mount the file {rom} using fuse-zar")
+        error_msg = f"unable to mount the file {rom} using fuse-zar"
+        raise Exception(error_msg)
 
     # Check if the archive contains a single file named like the archive
     romsingle = str(Path(rommountpoint) / Path(rom).name[:-4])
-    if len(listdir(rommountpoint)) == 1 and Path(romsingle).exists():
+    if len(list(Path(rommountpoint).iterdir())) == 1 and Path(romsingle).exists():
         eslog.debug(f"zar: single rom {romsingle}")
         return True, rommountpoint, romsingle
 
@@ -92,8 +94,9 @@ def zar_end(rommountpoint: str) -> bool:
     return_code = call(["fusermount3", "-u", rommountpoint])
     if return_code != 0:
         eslog.debug(f"zar_end: unmounting {rommountpoint} failed")
-        raise Exception(f"unable to unmount the file {rommountpoint}")
+        error_msg = f"unable to unmount the file {rommountpoint}"
+        raise Exception(error_msg)
 
     # Remove the now-empty mount directory
-    rmdir(rommountpoint)
+    Path(rommountpoint).rmdir()
     return True

@@ -1,0 +1,49 @@
+--- a/CMake/Packages/FindFFmpeg.cmake	2025-12-02 00:21:10.685698295 +0100
++++ b/CMake/Packages/FindFFmpeg.cmake	2025-12-13 14:57:54.149712764 +0100
+@@ -12,11 +12,36 @@
+ 
+ # Macro to find headers and library directories.
+ # Example: FFMPEG_FIND(AVFORMAT avformat avformat.h)
++set(FFMPEG_ROOT "" CACHE PATH "Location of FFMPEG")
++
++if(NOT FFMPEG_ROOT AND DEFINED FFMPEG_DIR AND FFMPEG_DIR)
++	set(FFMPEG_ROOT "${FFMPEG_DIR}")
++elseif(NOT FFMPEG_ROOT AND DEFINED ENV{FFMPEG_DIR} AND "$ENV{FFMPEG_DIR}")
++	set(FFMPEG_ROOT "$ENV{FFMPEG_DIR}")
++endif()
++
++if(FFMPEG_ROOT)
++	set(ENV{FFMPEG_DIR} "${FFMPEG_ROOT}")
++	set(FFMPEG_PKG_CONFIG_DIRS
++		"${FFMPEG_ROOT}/pkgconfig"
++		"${FFMPEG_ROOT}/lib/pkgconfig"
++		"${FFMPEG_ROOT}/lib64/pkgconfig"
++		"${FFMPEG_ROOT}/lib/x86_64-linux-gnu/pkgconfig"
++		"${FFMPEG_ROOT}/lib/i386-linux-gnu/pkgconfig"
++	)
++	foreach(_ffmpeg_pc_path ${FFMPEG_PKG_CONFIG_DIRS})
++		if(EXISTS "${_ffmpeg_pc_path}")
++			list(PREPEND PKG_CONFIG_PATH "${_ffmpeg_pc_path}")
++			set(ENV{PKG_CONFIG_PATH}
++				"${_ffmpeg_pc_path}:$ENV{PKG_CONFIG_PATH}")
++		endif()
++	endforeach()
++endif()
++
+ macro(FFMPEG_FIND varname shortname headername)
+     find_path(FFMPEG_${varname}_INCLUDE_DIRS lib${shortname}/${headername}
+         PATHS
+         ${FFMPEG_ROOT}/include
+-        $ENV{FFMPEG_DIR}/include
+         ~/Library/Frameworks
+         /Library/Frameworks
+         /usr/local/include
+@@ -47,8 +72,6 @@
+ 
+ endmacro(FFMPEG_FIND)
+ 
+-set(FFMPEG_ROOT "$ENV{FFMPEG_DIR}" CACHE PATH "Location of FFMPEG")
+-
+ FFMPEG_FIND(LIBAVCODEC avcodec avcodec.h)
+ FFMPEG_FIND(LIBAVFILTER avfilter avfilter.h)
+ FFMPEG_FIND(LIBAVFORMAT avformat avformat.h)

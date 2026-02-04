@@ -5,7 +5,7 @@ start() {
     SYNCTHING_LOG="/userdata/system/logs/syncthing.log"
 
     # check if syncthing web ui should be accessible from outside (default is "no")
-    { [ "$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)"  = "0" ] && SYNCTHING_GUI="http://0.0.0.0:8384"; } || SYNCTHING_GUI="http://127.0.0.1:8384"
+    { [ "$(/usr/bin/regmsg systemconf getconfigkey system.security.enabled)"  = "1" ] && SYNCTHING_GUI="http://127.0.0.1:8384"; } || SYNCTHING_GUI="http://0.0.0.0:8384"
 
     # create config directory if not present
     [ -d $SYNCTHING_CONFIG ] || mkdir /userdata/system/configs/syncthing/

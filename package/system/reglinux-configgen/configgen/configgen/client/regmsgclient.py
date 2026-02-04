@@ -1,10 +1,32 @@
 import contextlib
-import os
+import pathlib
 import socket
 import struct
 
 # Default socket path for regmsgd
 DEFAULT_SOCKET_PATH = "/var/run/regmsgd.sock"
+
+
+def parse_regmsg_response(response: str) -> tuple[bool, str]:
+    """Parse regmsg response and return (success, content).
+
+    Args:
+        response: Raw response from regmsg (with OK/ERR prefix)
+
+    Returns:
+        Tuple of (success flag, content)
+
+    """
+    if response.startswith("OK "):
+        return True, response[3:]  # Remove "OK " prefix
+    if response.startswith("ERR "):
+        return False, response[4:]  # Remove "ERR " prefix
+    if response == "OK":
+        return True, ""  # Empty content after "OK"
+    if response == "ERR":
+        return False, ""  # Empty content after "ERR"
+    # Handle response without prefix (could be legacy format)
+    return True, response
 
 
 class RegMsgClient:
@@ -55,7 +77,7 @@ class RegMsgClient:
             with contextlib.suppress(OSError):
                 sock.close()
             raise RuntimeError(
-                f"Failed to connect to regmsgd at {self.address}: {e!s}"
+                f"Failed to connect to regmsgd at {self.address}: {e!s}",
             ) from e
 
     def disconnect(self) -> None:
@@ -80,7 +102,7 @@ class RegMsgClient:
             True if the socket file exists, False otherwise
 
         """
-        return os.path.exists(self.address)
+        return pathlib.Path(self.address).exists()
 
     def set_timeout(self, timeout: int) -> None:
         """Update the timeout value for the current connection.
@@ -137,7 +159,7 @@ class RegMsgClient:
             raise RuntimeError(f"Error in communication with regmsgd: {e!s}") from e
         except UnicodeDecodeError:
             raise RuntimeError(
-                "Invalid response format: non-UTF-8 data received"
+                "Invalid response format: non-UTF-8 data received",
             ) from None
         except struct.error:
             raise RuntimeError("Invalid response length format") from None

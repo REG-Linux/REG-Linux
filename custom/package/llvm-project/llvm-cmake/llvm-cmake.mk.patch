@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/llvm-cmake/llvm-cmake.mk b/package/llvm-project/llvm-cmake/llvm-cmake.mk
-index 33b6ba8339b..1be63a9cbe7 100644
+index 33b6ba8339..1be63a9cbe 100644
 --- a/package/llvm-project/llvm-cmake/llvm-cmake.mk
 +++ b/package/llvm-project/llvm-cmake/llvm-cmake.mk
 @@ -10,8 +10,9 @@ LLVM_CMAKE_SOURCE = cmake-$(LLVM_CMAKE_VERSION).src.tar.xz

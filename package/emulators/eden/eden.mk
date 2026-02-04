@@ -3,8 +3,8 @@
 # EDEN
 #
 ################################################################################
-# Version: v0.0.4
-EDEN_VERSION = v0.0.4
+
+EDEN_VERSION = v0.1.1
 EDEN_SITE = https://git.eden-emu.dev/eden-emu/eden
 EDEN_SITE_METHOD=git
 EDEN_GIT_SUBMODULES=YES
@@ -32,6 +32,7 @@ EDEN_CONF_OPTS += -DYUZU_CHECK_SUBMODULES=OFF
 EDEN_CONF_OPTS += -DYUZU_USE_CPM=OFF
 EDEN_CONF_OPTS += -DENABLE_CUBEB=OFF
 EDEN_CONF_OPTS += -DENABLE_LIBUSB=ON
+EDEN_CONF_OPTS += -DENABLE_LTO=ON
 EDEN_CONF_OPTS += -DYUZU_USE_BUNDLED_FFMPEG=OFF
 ifeq ($(BR2_aarch64),y)
 EDEN_CONF_ENV += ARCHITECTURE_arm64=1

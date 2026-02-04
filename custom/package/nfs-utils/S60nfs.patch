@@ -1,5 +1,5 @@
 diff --git a/package/nfs-utils/S60nfs b/package/nfs-utils/S60nfs
-index 4183ff62682..7cb7923bb69 100644
+index 4183ff6268..7cb7923bb6 100644
 --- a/package/nfs-utils/S60nfs
 +++ b/package/nfs-utils/S60nfs
 @@ -1,72 +1,45 @@

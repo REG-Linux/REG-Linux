@@ -1,0 +1,22 @@
+#!/bin/dash
+[ "$1" != "start" ] && exit 0
+
+BOOT_CONF="/boot/system-boot.conf"
+
+get_key() {
+    awk -F= -v k="$1" '
+        $0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}
+    ' "${BOOT_CONF}" 2>/dev/null
+}
+
+mode="$(get_key system.usb.mode)"
+adb="$(get_key system.usb.adb)"
+
+case "${mode}" in
+    adb)
+        /usr/bin/usbgadget adb
+        exit 0
+        ;;
+esac
+
+[ "${adb}" = "1" ] && /usr/bin/usbgadget adb

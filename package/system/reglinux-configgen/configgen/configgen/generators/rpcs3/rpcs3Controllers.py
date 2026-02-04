@@ -1,4 +1,4 @@
-from os import makedirs, path
+import pathlib
 from typing import Any
 
 from configgen.utils.logger import get_logger
@@ -48,8 +48,8 @@ INPUT_MAPPING = [
 
 
 def generateControllerConfig(system: Any, controllers: Any, rom: str) -> None:
-    if not path.isdir(RPCS3_INPUT_DIR):
-        makedirs(RPCS3_INPUT_DIR)
+    if not pathlib.Path(RPCS3_INPUT_DIR).is_dir():
+        pathlib.Path(RPCS3_INPUT_DIR).mkdir(parents=True)
 
     # Create mapping dictionary from input mapping list
     mapping_dict = {}
@@ -63,7 +63,7 @@ def generateControllerConfig(system: Any, controllers: Any, rom: str) -> None:
     controller_counts = {}
 
     configFileName = f"{RPCS3_INPUT_DIR}/Default.yml"
-    with open(configFileName, "w", encoding="utf_8_sig") as f:
+    with pathlib.Path(configFileName).open("w", encoding="utf_8_sig") as f:
         for _, pad in sorted(controllers.items()):
             if nplayer <= 7:
                 eslog.debug(f"Controller #{nplayer} - {pad.guid}")

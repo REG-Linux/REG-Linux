@@ -15,14 +15,14 @@ CONF: Final[Path] = HOME / "configs"  # User config files (writable)
 
 # Standard user media and data directories
 SCREENSHOTS: Final[Path] = Path(
-    "/userdata/screenshots"
+    "/userdata/screenshots",
 )  # Directory to save screenshots
 RECORDINGS: Final[Path] = Path(
-    "/userdata/recordings"
+    "/userdata/recordings",
 )  # Directory to save video recordings
 BIOS: Final[Path] = Path("/userdata/bios")  # BIOS files directory (used by emulators)
 OVERLAYS: Final[Path] = Path(
-    "/userdata/overlays"
+    "/userdata/overlays",
 )  # Overlay images directory (custom visuals/UI)
 ROMS: Final[Path] = Path("/userdata/roms")  # Game ROMs directory
 SAVES: Final[Path] = Path("/userdata/saves")  # Save files directory

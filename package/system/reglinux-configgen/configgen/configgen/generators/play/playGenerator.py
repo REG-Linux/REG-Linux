@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import Any
 from xml.etree.ElementTree import Element, ElementTree, SubElement, parse
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF, SAVES
 
 PLAY_CONFIG_DIR = str(CONF / "play")
@@ -40,7 +40,7 @@ class PlayGenerator(Generator):
         if not save_dir_path.is_dir():
             save_dir_path.mkdir(parents=True, exist_ok=True)
 
-        ## Work with the config.xml file
+        # Work with the config.xml file
         root = Element("Config")
 
         # Dictionary of preferences and defaults
@@ -117,7 +117,7 @@ class PlayGenerator(Generator):
             tree.write(PLAY_CONFIG_FILE)
         else:
             # File exists, write the XML to the existing file
-            with open(PLAY_CONFIG_FILE, "wb") as file:
+            with Path(PLAY_CONFIG_FILE).open("wb") as file:
                 tree.write(file)
 
         command_array = [PLAY_BIN_PATH, "--fullscreen"]

@@ -21,7 +21,7 @@ def writeCfgFile(
     if not Path(filename).is_file():
         Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
-        with open(filename, "w") as file:
+        with Path(filename).open("w") as file:
             file.write(init_line)
             file.writelines(defaults_to_add)
             file.writelines(controls_to_add)
@@ -31,11 +31,11 @@ def writeCfgFile(
         else:
             width, height = gameResolution["width"], gameResolution["height"]
 
-        with open(filename, "r+") as file:
+        with Path(filename).open("r+") as file:
             lines = file.readlines()
             file.seek(0)
             for line in lines:
-                ## Set defaults every time
+                # Set defaults every time
                 # resolution
                 if line.startswith("seta r_mode"):
                     line = 'seta r_mode "-1"\n'
@@ -52,7 +52,7 @@ def writeCfgFile(
                 elif line.startswith("seta cl_allowdownload"):
                     line = 'seta cl_allowDownload "1"\n'
 
-                ## User options
+                # User options
                 elif line.startswith("seta com_hunkMegs"):
                     if system.isOptSet("ioquake3_mem"):
                         line = f'seta com_hunkMegs "{system.config["ioquake3_mem"]}"\n'

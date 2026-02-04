@@ -5,7 +5,7 @@
 ################################################################################
 # Note: shaderc patch required from:
 # https://github.com/PCSX2/pcsx2/blob/master/.github/workflows/scripts/common/shaderc-changes.patch
-SHADERC_VERSION = v2024.1
+SHADERC_VERSION = v2025.3
 SHADERC_SITE = $(call github,google,shaderc,$(SHADERC_VERSION))
 SHADERC_LICENSE = Apache License v2
 SHADERC_LICENSE_FILES = LICENSE

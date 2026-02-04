@@ -4,6 +4,7 @@ Handles loading and matching controller configurations from gamecontrollerdb.txt
 """
 
 import os
+import pathlib
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
@@ -60,7 +61,7 @@ def load_all_controllers_config() -> dict[str, dict[str, Any]]:
     filepath = os.environ.get("SDL_GAMECONTROLLERCONFIG_FILE", "gamecontrollerdb.txt")
 
     try:
-        with open(filepath, encoding="utf-8") as f:
+        with pathlib.Path(filepath).open(encoding="utf-8") as f:
             lines = f.read().splitlines()
 
         if not lines:

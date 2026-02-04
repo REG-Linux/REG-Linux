@@ -11,9 +11,7 @@ This directory holds the Qualcomm SM8250 (Retroid Pocket family) board support f
 - `linux_patches/` – flat list of kernel patches (0000–9999 and named patches) that tune the SM8250 kernel for Retroid hardware: board-specific DTS entries, power-management fixes, audio tweaks, GPU/firmware adjustments, etc. When a board patch is updated, reapply the series to ensure it lines up with your kernel source version.
 - `patches/` – package-level patches used by REGLinux: `alsa-lib` enables extended name hints, `alsa-ucm-conf` adds the Retroid UCM profile and legacy loader compatibility, `groovymame` removes the Xrandr dependency, `pipewire` increases the PulseAudio buffer size, and `vita3k` keeps `xxHash` from using the dispatch shim.
 
-## Board-specific pieces (`rp5/`, `rpflip2/`, `rpmini/`)
-
-Each subdirectory mirrors the others:
+## Board-specific pieces (`retroid-sm8250/`)
 
 1. `create-boot-script.sh` – invoked by the build toolchain with `HOST_DIR BOARD_DIR BUILD_DIR BINARIES_DIR TARGET_DIR REGLINUX_BINARIES_DIR`. It copies the kernel `Image`, `rootfs.cpio.lz4`, `reglinux.update`, module/firmware/rescue updates, and the board-specific DTB into `boot/boot/`, then overwrites `efi-part/EFI/BOOT/grub.cfg` with the local version and stages the EFI payload into the final image area.
 2. `genimage.cfg` – describes the disk image (`reglinux.img`) layout: a 2 GiB FAT32 `boot.vfat` (label `REGLINUX`) with no extra files other than `@files`, plus a 512 MiB `userdata.ext4` volume (label `SHARE`). `reglinux.img` simply concatenates these partitions.

@@ -2,8 +2,8 @@ from os import chdir
 from pathlib import Path
 from re import search
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.settings import UnixSettings
 from configgen.systemFiles import CONF, ROMS, SAVES
 

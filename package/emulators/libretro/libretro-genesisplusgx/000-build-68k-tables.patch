@@ -1,0 +1,99 @@
+diff --git a/Makefile.libretro b/Makefile.libretro
+index 4b3bc0d..1040cea 100644
+--- a/Makefile.libretro
++++ b/Makefile.libretro
+@@ -610,6 +610,7 @@ LIBRETRO_CFLAGS += $(BPP_DEFINES) \
+ 		$(PLATFORM_DEFINES) \
+ 		-D__LIBRETRO__ \
+ 		-DUSE_LIBRETRO_VFS \
++		-DBUILD_TABLES \
+ 		-DM68K_OVERCLOCK_SHIFT=20 \
+ 		-DZ80_OVERCLOCK_SHIFT=20 \
+ 		-DHAVE_YM3438_CORE \
+diff --git a/core/m68k/m68kcpu.c b/core/m68k/m68kcpu.c
+index 36112a5..b5fe731 100644
+--- a/core/m68k/m68kcpu.c
++++ b/core/m68k/m68kcpu.c
+@@ -11,23 +11,21 @@ extern int vdp_68k_irq_ack(int int_level);
+ /* ================================ INCLUDES ============================== */
+ /* ======================================================================== */
+ 
+-#ifndef BUILD_TABLES
+-#include "m68ki_cycles.h"
+-#endif
+-
+-#include "m68kconf.h"
+-#include "m68kcpu.h"
+-#include "m68kops.h"
++#ifndef BUILD_TABLES
++#include "m68ki_cycles.h"
++#else
++static unsigned char m68ki_cycles[0x10000];
++#endif
++
++#include "m68kconf.h"
++#include "m68kcpu.h"
++#include "m68kops.h"
+ 
+ /* ======================================================================== */
+ /* ================================= DATA ================================= */
+ /* ======================================================================== */
+ 
+-#ifdef BUILD_TABLES
+-static unsigned char m68ki_cycles[0x10000];
+-#endif
+-
+-static int irq_latency;
++static int irq_latency;
+ 
+ m68ki_cpu_core m68k;
+ 
+diff --git a/core/m68k/s68kcpu.c b/core/m68k/s68kcpu.c
+index 7c9a95d..37cdb80 100644
+--- a/core/m68k/s68kcpu.c
++++ b/core/m68k/s68kcpu.c
+@@ -13,6 +13,8 @@ extern int scd_68k_irq_ack(int level);
+ 
+ #ifndef BUILD_TABLES
+ #include "s68ki_cycles.h"
++#else
++static unsigned char m68ki_cycles[0x10000];
+ #endif
+ 
+ #include "s68kconf.h"
+@@ -23,9 +25,6 @@ extern int scd_68k_irq_ack(int level);
+ /* ================================= DATA ================================= */
+ /* ======================================================================== */
+ 
+-#ifdef BUILD_TABLES
+-static unsigned char s68ki_cycles[0x10000];
+-#endif
+ static int irq_latency;
+ 
+ /* IRQ priority */
+diff --git a/sdl/Makefile.sdl1 b/sdl/Makefile.sdl1
+index 83e6319..9e62916 100644
+--- a/sdl/Makefile.sdl1
++++ b/sdl/Makefile.sdl1
+@@ -35,7 +35,7 @@ CFLAGS    = `sdl-config --cflags` -march=native -O6 -fomit-frame-pointer -Wall -
+ #-g -ggdb -pg
+ #-fomit-frame-pointer
+ #LDFLAGS   = -pg
+-DEFINES   = -DLSB_FIRST -DUSE_16BPP_RENDERING -DUSE_LIBTREMOR -DUSE_LIBCHDR -DMAXROMSIZE=33554432 -DHAVE_YM3438_CORE -DHAVE_OPLL_CORE -DENABLE_SUB_68K_ADDRESS_ERROR_EXCEPTIONS -DZ7_ST -DZSTD_DISABLE_ASM
++DEFINES   = -DLSB_FIRST -DUSE_16BPP_RENDERING -DUSE_LIBTREMOR -DUSE_LIBCHDR -DMAXROMSIZE=33554432 -DHAVE_YM3438_CORE -DHAVE_OPLL_CORE -DENABLE_SUB_68K_ADDRESS_ERROR_EXCEPTIONS -DZ7_ST -DZSTD_DISABLE_ASM -DBUILD_TABLES
+ 
+ ifneq ($(OS),Windows_NT)
+ DEFINES += -DHAVE_ALLOCA_H
+diff --git a/sdl/Makefile.sdl2 b/sdl/Makefile.sdl2
+index a468069..296da47 100644
+--- a/sdl/Makefile.sdl2
++++ b/sdl/Makefile.sdl2
+@@ -35,7 +35,7 @@ CFLAGS    = `sdl2-config --cflags` -march=native -O6 -fomit-frame-pointer -Wall
+ #-g -ggdb -pg
+ #-fomit-frame-pointer
+ #LDFLAGS   = -pg
+-DEFINES   = -DLSB_FIRST -DUSE_16BPP_RENDERING -DUSE_LIBTREMOR -DUSE_LIBCHDR -DMAXROMSIZE=33554432 -DHAVE_YM3438_CORE -DHAVE_OPLL_CORE -DENABLE_SUB_68K_ADDRESS_ERROR_EXCEPTIONS -DZ7_ST -DZSTD_DISABLE_ASM
++DEFINES   = -DLSB_FIRST -DUSE_16BPP_RENDERING -DUSE_LIBTREMOR -DUSE_LIBCHDR -DMAXROMSIZE=33554432 -DHAVE_YM3438_CORE -DHAVE_OPLL_CORE -DENABLE_SUB_68K_ADDRESS_ERROR_EXCEPTIONS -DZ7_ST -DZSTD_DISABLE_ASM -DBUILD_TABLES
+ 
+ 
+ ifneq ($(OS),Windows_NT)

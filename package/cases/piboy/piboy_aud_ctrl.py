@@ -3,6 +3,7 @@
 import time
 import sys
 import os
+
 # Configuration
 WAIT_TIME = 0.5  # [s] Time to wait between each refresh
 sndVol = 0
@@ -17,7 +18,7 @@ try:
         sndVolFile.close()
         if abs(sndVol - sndVolOld) > hyst:
             # Set Volume
-            #sndSet = "amixer sset 'Headphone' " + str(sndVol) + "% > /dev/null"
+            # sndSet = "amixer sset 'Headphone' " + str(sndVol) + "% > /dev/null"
             sndSet = "batocera-audio setSystemVolume " + str(sndVol)
             os.system(sndSet)
 

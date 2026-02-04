@@ -1,5 +1,5 @@
 diff --git a/package/pulseaudio/pulseaudio.mk b/package/pulseaudio/pulseaudio.mk
-index 254e05348d..3380effab9 100644
+index 254e05348d..4573561916 100644
 --- a/package/pulseaudio/pulseaudio.mk
 +++ b/package/pulseaudio/pulseaudio.mk
 @@ -100,13 +100,8 @@ ifeq ($(BR2_PACKAGE_LIBCAP),y)
@@ -21,7 +21,7 @@ index 254e05348d..3380effab9 100644
  PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_REMOVE_VALA \
  	PULSEAUDIO_REMOVE_CONSOLE_KIT
  
-+# batocera - add the pactl util
++# reglinux - add the pactl util
 +PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_ADD_PACTL
 +
 +define PULSEAUDIO_ADD_PACTL

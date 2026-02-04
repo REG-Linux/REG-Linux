@@ -125,7 +125,7 @@ def readWriteFile(filepath: str | Path, setval: dict[str, Any]) -> None:
     """
     # Open in read or read/write depending on the action
     mode = "r+b" if setval else "rb"
-    with open(filepath, mode) as f:
+    with Path(filepath).open(mode) as f:
         readString(f, 4)  # Read SCv0
         num_entries = readBEInt16(f)  # Number of entries
         offset_size = (num_entries + 1) * 2  # Offsets

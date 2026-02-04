@@ -157,23 +157,6 @@ index 111111111111..222222222222 100644
  		break;
  	case DP_STATE_EXIT_PRIME:
  		if (typec_cable_altmode_exit(dp->plug_prime, TYPEC_PLUG_SOP_P))
-@@ -733,8 +775,14 @@ int dp_altmode_probe(struct typec_altmode *alt)
- 	if (!(DP_CAP_PIN_ASSIGN_DFP_D(port->vdo) &
- 	      DP_CAP_PIN_ASSIGN_UFP_D(alt->vdo)) &&
- 	    !(DP_CAP_PIN_ASSIGN_UFP_D(port->vdo) &
--	      DP_CAP_PIN_ASSIGN_DFP_D(alt->vdo)))
--		return -ENODEV;
-+	      DP_CAP_PIN_ASSIGN_DFP_D(alt->vdo))) {
-+            dev_err(&alt->dev, "No compatible pin configuration found:"\
-+                    "%04lx -> %04lx, %04lx <- %04lx",
-+                    DP_CAP_PIN_ASSIGN_DFP_D(port->vdo), DP_CAP_PIN_ASSIGN_UFP_D(alt->vdo),
-+                    DP_CAP_PIN_ASSIGN_UFP_D(port->vdo), DP_CAP_PIN_ASSIGN_DFP_D(alt->vdo));
-+            return -ENODEV;
-+	}
-+
- 
- 	dp = devm_kzalloc(&alt->dev, sizeof(*dp), GFP_KERNEL);
- 	if (!dp)
 diff --git a/drivers/usb/typec/tcpm/tcpm.c b/drivers/usb/typec/tcpm/tcpm.c
 index 111111111111..222222222222 100644
 --- a/drivers/usb/typec/tcpm/tcpm.c

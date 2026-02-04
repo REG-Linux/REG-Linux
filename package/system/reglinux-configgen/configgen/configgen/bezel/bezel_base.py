@@ -5,15 +5,13 @@ from contextlib import suppress
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 if TYPE_CHECKING:
     from PIL.Image import Image as ImageType
 
-    from configgen.Emulator import Emulator
-import glob
+    from configgen.emulator import Emulator
 import hashlib
-import os
 import shutil
 import struct
 
@@ -24,11 +22,19 @@ from configgen.utils.videoMode import getAltDecoration
 eslog = get_logger(__name__)
 
 # Constants
-BEZEL_CACHE_DIR = Path("/tmp/bezel_cache")
+BEZEL_CACHE_DIR = Path.home() / ".cache" / "reglinux" / "bezel_cache"
 if not BEZEL_CACHE_DIR.exists():
     BEZEL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 DEFAULT_RESOLUTION = (1920, 1080)
+
+# Magic value constants
+PNG_HEADER_LENGTH = 32
+PNG_SIGNATURE = 0x0D0A1A0A
+STRUCT_SIZE = 8
+PNG_IHDR_OFFSET = 16
+PNG_IHDR_SIZE = 8
+ASPECT_RATIO_TOLERANCE = 0.01
 
 
 class IBezelManager(ABC):
@@ -60,7 +66,7 @@ class BezelUtils:
 
         """
         key_str = "_".join(str(arg) for arg in args)
-        return hashlib.md5(key_str.encode()).hexdigest()
+        return hashlib.sha256(key_str.encode()).hexdigest()
 
     @staticmethod
     def get_cached_image(cache_key: str) -> str | None:
@@ -93,10 +99,10 @@ class BezelUtils:
     @staticmethod
     def clear_bezel_cache() -> None:
         """Clear all cached bezel images to free up space."""
-        files = glob.glob(str(BEZEL_CACHE_DIR / "*.png"))
+        files = list(BEZEL_CACHE_DIR.glob("*.png"))
         for file in files:
             with suppress(OSError):
-                os.remove(file)  # Ignore errors when removing cached files
+                file.unlink()  # Ignore errors when removing cached files
 
     @staticmethod
     def get_bezel_infos(
@@ -206,10 +212,16 @@ class BezelUtils:
             return -1, -1
         try:
             with img_path.open("rb") as fhandle:
-                head = fhandle.read(32)
-                if len(head) != 32 or struct.unpack(">i", head[4:8])[0] != 0x0D0A1A0A:
+                head = fhandle.read(PNG_HEADER_LENGTH)
+                if (
+                    len(head) != PNG_HEADER_LENGTH
+                    or struct.unpack(">i", head[4:8])[0] != PNG_SIGNATURE
+                ):
                     return -1, -1
-                return struct.unpack(">ii", head[16:24])
+                return struct.unpack(
+                    ">ii",
+                    head[PNG_IHDR_OFFSET : PNG_IHDR_OFFSET + PNG_IHDR_SIZE],
+                )
         except (OSError, struct.error):
             return -1, -1
 
@@ -232,8 +244,6 @@ class BezelUtils:
             The resized image
 
         """
-        from PIL import Image
-
         if stretch:
             return img.resize(target_size, Image.Resampling.LANCZOS)  # type: ignore
 
@@ -689,7 +699,7 @@ class BezelUtils:
         i_ratio = float(ix) / float(iy)
         s_ratio = float(sx) / float(sy)
 
-        if i_ratio - s_ratio > 0.01:
+        if i_ratio - s_ratio > ASPECT_RATIO_TOLERANCE:
             new_x = int(ix * s_ratio / i_ratio)
             delta = int(ix - new_x)
             alpha = alpha.crop((delta // 2, 0, new_x + delta // 2, iy))
@@ -815,14 +825,59 @@ class BezelUtils:
             inner_border_size = max(1, w * inner_border_size_per // 100)
             return outer_border_size + inner_border_size
 
-        from PIL import ImageDraw
-
         w, h = BezelUtils.fast_image_size(input_png)
         if w <= 0 or h <= 0:
             eslog.error(f"Invalid image dimensions for {input_png}: {w}x{h}")
             raise ValueError(f"Invalid image dimensions for {input_png}: {w}x{h}")
 
         outer_border_size = max(1, h * outer_border_size_per // 100)
+        inner_border_size = max(1, w * inner_border_size_per // 100)
+
+        try:
+            back = Image.open(input_png)
+        except (OSError, Image.UnidentifiedImageError) as e:
+            eslog.error(f"Error opening input image {input_png}: {e}")
+            raise
+
+        imgnew = Image.new("RGBA", (w, h), (0, 0, 0, 255))
+        imgnew.paste(back, (0, 0, w, h))
+
+        BezelUtils._draw_borders(
+            imgnew,
+            w,
+            h,
+            inner_border_size,
+            outer_border_size,
+            inner_border_color,
+            outer_border_color,
+        )
+
+        try:
+            imgnew.save(output_png, mode="RGBA", format="PNG")  # type: ignore
+        except OSError as e:
+            eslog.error(f"Error saving gun border image {output_png}: {e}")
+            raise
+
+        # Save the result to cache
+        try:
+            BezelUtils.save_to_cache(output_png, cache_key)
+        except Exception as e:
+            eslog.warning(f"Failed to save gun border bezel to cache: {e}")
+            # Continue execution even if cache save fails
+
+        return outer_border_size + inner_border_size
+
+    @staticmethod
+    def _draw_borders(
+        imgnew: "ImageType",
+        w: int,
+        h: int,
+        inner_border_size: int,
+        outer_border_size: int,
+        inner_border_color: str,
+        outer_border_color: str,
+    ) -> None:
+        """Draw borders on the image."""
         outer_shapes = [
             [(0, 0), (w, outer_border_size)],
             [(w - outer_border_size, 0), (w, h)],
@@ -830,7 +885,6 @@ class BezelUtils:
             [(0, 0), (outer_border_size, h)],
         ]
 
-        inner_border_size = max(1, w * inner_border_size_per // 100)
         inner_shapes = [
             [
                 (outer_border_size, outer_border_size),
@@ -850,35 +904,12 @@ class BezelUtils:
             ],
         ]
 
-        try:
-            back = Image.open(input_png)
-        except (OSError, Image.UnidentifiedImageError) as e:
-            eslog.error(f"Error opening input image {input_png}: {e}")
-            raise
-
-        imgnew = Image.new("RGBA", (w, h), (0, 0, 0, 255))
-        imgnew.paste(back, (0, 0, w, h))
         draw = ImageDraw.Draw(imgnew)
 
         for shape in outer_shapes:
             draw.rectangle(shape, fill=outer_border_color)
         for shape in inner_shapes:
             draw.rectangle(shape, fill=inner_border_color)
-
-        try:
-            imgnew.save(output_png, mode="RGBA", format="PNG")  # type: ignore
-        except OSError as e:
-            eslog.error(f"Error saving gun border image {output_png}: {e}")
-            raise
-
-        # Save the result to cache
-        try:
-            BezelUtils.save_to_cache(output_png, cache_key)
-        except Exception as e:
-            eslog.warning(f"Failed to save gun border bezel to cache: {e}")
-            # Continue execution even if cache save fails
-
-        return outer_border_size + inner_border_size
 
     @staticmethod
     def guns_border_size(

@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-August/003414.html
-sha256  a75a1848ad2a89a82d841a51be56ce988ff3c63a8d6bf4383ae3219d8d915119  xcb-proto-1.16.0.tar.xz
-sha512  54906f379a7aa2cbbfbbe54764c02dbf522ca8f6c54e07d4faae471aac3aee25d0359be38c808c8da887de228aed745582a78b2f56714b023bca8f3513b24972  xcb-proto-1.16.0.tar.xz
-# Locally computed
-sha256  c5ffbfeaa501071ceeb97b7de2c0d703fdaa35de01c0fb6cbac1c28453a3e9fd  COPYING

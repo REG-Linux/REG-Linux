@@ -8,7 +8,7 @@ def setDuckstationControllers(
     guns: Any,
     playersControllers: Any,
 ) -> None:
-    ## [ControllerPorts]
+    # [ControllerPorts]
     if not duckstatonConfig.has_section("ControllerPorts"):
         duckstatonConfig.add_section("ControllerPorts")
     duckstatonConfig.set("ControllerPorts", "ControllerSettingsMigrated", "true")
@@ -26,7 +26,7 @@ def setDuckstationControllers(
     duckstatonConfig.set("InputSources", "XInput", "false")
     duckstatonConfig.set("InputSources", "RawInput", "false")
 
-    ## [Pad]
+    # [Pad]
     # Clear existing Pad(x) configs
     for i in range(1, 9):
         if duckstatonConfig.has_section("Pad" + str(i)):
@@ -38,8 +38,7 @@ def setDuckstationControllers(
     # Start with mutitap disabled
     duckstatonConfig.set("ControllerPorts", "MultitapMode", "Disabled")
     # Now add the controller config based on the ES type & number connected
-    nplayer = 1
-    for _, pad in sorted(playersControllers.items()):
+    for nplayer, (_key, pad) in enumerate(sorted(playersControllers.items()), start=1):
         if nplayer <= 8:
             # automatically add the multi-tap
             if nplayer > 2:
@@ -129,7 +128,7 @@ def setDuckstationControllers(
                     duckstatonConfig.set(pad_num, "Type", "GunCon")
                     duckstatonConfig.set(pad_num, "Trigger", gun_num + "/LeftButton")
 
-                ### find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
+                # find a keyboard key to simulate the action of the player (always like button 2) ; search in system.conf, else default config
                 pedalsKeys = {1: "c", 2: "v", 3: "b", 4: "n"}
                 pedalkey = None
                 pedalcname = f"controllers.pedals{nplayer}"
@@ -176,10 +175,8 @@ def setDuckstationControllers(
                 duckstatonConfig.set(pad_num, "Right", sdl_num + "/B")
                 duckstatonConfig.set(pad_num, "Left", sdl_num + "/A")
                 duckstatonConfig.set(pad_num, "RelativeMouseMode", sdl_num + "true")
-        # Next controller
-        nplayer += 1
 
-    ## [Hotkeys]
+    # [Hotkeys]
     if not duckstatonConfig.has_section("Hotkeys"):
         duckstatonConfig.add_section("Hotkeys")
     # Force defaults to be aligned with evmapy

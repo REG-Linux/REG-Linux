@@ -62,7 +62,7 @@ def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
     azaharConfig.set("Layout", "swap_screen\\default", "false")
     azaharConfig.set("Layout", "layout_option\\default", "false")
 
-    ## [SYSTEM]if "Layout" not in azaharConfig:
+    # [SYSTEM]if "Layout" not in azaharConfig:
     if "System" not in azaharConfig:
         azaharConfig["System"] = {}
     if (
@@ -76,7 +76,7 @@ def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
     azaharConfig.set("System", "region_value", str(getAzaharLangFromEnvironment()))
     azaharConfig.set("System", "region_value\\default", "false")
 
-    ## [UI]
+    # [UI]
     if "UI" not in azaharConfig:
         azaharConfig["UI"] = {}
     azaharConfig.set("UI", "fullscreen", "true")
@@ -100,7 +100,7 @@ def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
     azaharConfig.set("UI", "Updater\\check_for_update_on_start", "false")
     azaharConfig.set("UI", "Updater\\check_for_update_on_start\\default", "false")
 
-    ## [RENDERER]
+    # [RENDERER]
     if "Renderer" not in azaharConfig:
         azaharConfig["Renderer"] = {}
     azaharConfig.set("Renderer", "use_hw_renderer", "true")
@@ -184,12 +184,12 @@ def setAzaharConfig(azaharConfig: Any, system: Any) -> None:
     else:
         azaharConfig.set("Renderer", "use_frame_limit", "true")
 
-    ## [WEB SERVICE]
+    # [WEB SERVICE]
     if "WebService" not in azaharConfig:
         azaharConfig["WebService"] = {}
     azaharConfig.set("WebService", "enable_telemetry", "false")
 
-    ## [UTILITY]
+    # [UTILITY]
     if "Utility" not in azaharConfig:
         azaharConfig["Utility"] = {}
     if (

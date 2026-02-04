@@ -1,4 +1,5 @@
-from os import mkdir, path, remove
+import pathlib
+from os import path
 from typing import Any
 from xml.etree.ElementTree import Element, ElementTree, SubElement, indent
 
@@ -133,16 +134,16 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
         return path.join(profilesDir, f"controller{controller}.xml")
 
     # Make controller directory if it doesn't exist
-    if not path.isdir(profilesDir):
-        mkdir(profilesDir)
+    if not pathlib.Path(profilesDir).is_dir():
+        pathlib.Path(profilesDir).mkdir()
 
     # Purge old controller files
     for counter in range(8):
         configFileName = getConfigFileName(counter)
-        if path.isfile(configFileName):
-            remove(configFileName)
+        if pathlib.Path(configFileName).is_file():
+            pathlib.Path(configFileName).unlink()
 
-    ## CONTROLLER: Create the config xml files
+    # CONTROLLER: Create the config xml files
     nplayer = 0
 
     # cemu assign pads by uuid then by index with the same uuid
@@ -206,7 +207,7 @@ def setControllerConfig(system: Any, playersControllers: Any, profilesDir: str) 
             addTextElement(entryNode, "button", value)
 
         # Save to file
-        with open(getConfigFileName(nplayer), "wb") as handle:
+        with pathlib.Path(getConfigFileName(nplayer)).open("wb") as handle:
             tree = ElementTree(root)
             indent(tree, space="  ", level=0)
             tree.write(handle, encoding="UTF-8", xml_declaration=True)

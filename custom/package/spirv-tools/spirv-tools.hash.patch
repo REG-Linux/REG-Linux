@@ -1,5 +1,5 @@
 diff --git a/package/spirv-tools/spirv-tools.hash b/package/spirv-tools/spirv-tools.hash
-index 65cb9c619b9..7608f42cb6d 100644
+index 65cb9c619b..7608f42cb6 100644
 --- a/package/spirv-tools/spirv-tools.hash
 +++ b/package/spirv-tools/spirv-tools.hash
 @@ -1,3 +1,3 @@

@@ -1,5 +1,5 @@
 diff --git a/package/pugixml/pugixml.mk b/package/pugixml/pugixml.mk
-index 3935526af6f..1a657e3eaf8 100644
+index 3935526af6..1a657e3eaf 100644
 --- a/package/pugixml/pugixml.mk
 +++ b/package/pugixml/pugixml.mk
 @@ -4,7 +4,7 @@

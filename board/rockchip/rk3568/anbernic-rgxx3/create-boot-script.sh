@@ -29,13 +29,19 @@ cp "${BINARIES_DIR}/modules"            "${REGLINUX_BINARIES_DIR}/boot/boot/modu
 cp "${BINARIES_DIR}/firmware"           "${REGLINUX_BINARIES_DIR}/boot/boot/firmware.update"    || exit 1
 cp "${BINARIES_DIR}/rescue"             "${REGLINUX_BINARIES_DIR}/boot/boot/rescue.update"      || exit 1
 
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353p.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353p.dtb"  || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353ps.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353ps.dtb" || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353v.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353v.dtb"  || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg353vs.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353vs.dtb" || exit 1
-cp "${BINARIES_DIR}/rk3566-anbernic-rg503.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg503.dtb"   || exit 1
+# Anbernic RK3566 based devices
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353p.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353p.dtb"   || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353ps.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353ps.dtb"  || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353v.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353v.dtb"   || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg353vs.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg353vs.dtb"  || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg503.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg503.dtb"    || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg-arc-d.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg-arc-d.dtb" || exit 1
+cp "${BINARIES_DIR}/rk3566-anbernic-rg-arc-s.dtb"   "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-anbernic-rg-arc-s.dtb" || exit 1
+cp "${BINARIES_DIR}/rk3568-anbernic-rg-ds.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/rk3568-anbernic-rg-ds.dtb"    || exit 1
 
+# Powkiddy clones
 cp "${BINARIES_DIR}/rk3566-powkiddy-rgb10max3.dtb"  "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-powkiddy-rgb10max3.dtb" || exit 1
+cp "${BINARIES_DIR}/rk3566-powkiddy-rgb20sx.dtb"    "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-powkiddy-rgb20sx.dtb"   || exit 1
 cp "${BINARIES_DIR}/rk3566-powkiddy-rgb30.dtb"      "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-powkiddy-rgb30.dtb"     || exit 1
 cp "${BINARIES_DIR}/rk3566-powkiddy-rk2023.dtb"     "${REGLINUX_BINARIES_DIR}/boot/boot/rk3566-powkiddy-rk2023.dtb"    || exit 1
 # Powkiddy X55 needs a specific U-Boot hence target / image, so we do NOT include it here
@@ -46,7 +52,7 @@ cp "${BOARD_DIR}/boot/extlinux.conf"        "${REGLINUX_BINARIES_DIR}/boot/boot/
 UBOOT_DIR="$(dirname "${REGLINUX_BINARIES_DIR}")/uboot-anbernic-rgxx3"
 cp "${UBOOT_DIR}/u-boot-rockchip.bin" "${REGLINUX_BINARIES_DIR}/boot/boot/u-boot-rockchip.bin" || exit 1
 [ -f "${UBOOT_DIR}/u-boot.itb" ] && cp "${UBOOT_DIR}/u-boot.itb" "${REGLINUX_BINARIES_DIR}/boot/boot/u-boot.itb"
-cp "${BOARD_DIR}/boot/boot.cmd"                               "${REGLINUX_BINARIES_DIR}/boot/boot.cmd"   || exit 1
-cp "${BOARD_DIR}/boot/boot.scr"                               "${REGLINUX_BINARIES_DIR}/boot/boot.scr"   || exit 1
+cp "${BOARD_DIR}/boot/boot.cmd" "${REGLINUX_BINARIES_DIR}/boot/boot.cmd"   || exit 1
+cp "${BOARD_DIR}/boot/boot.scr" "${REGLINUX_BINARIES_DIR}/boot/boot.scr"   || exit 1
 
 exit 0

@@ -10,7 +10,7 @@
 log="/userdata/system/logs/amd-tdp.log"
 
 # check we have a max system TDP value
-CPU_TDP=$(/usr/bin/system-settings-get system.cpu.tdp)
+CPU_TDP="$(/usr/bin/regmsg systemconf getconfigkey system.cpu.tdp)"
 
 # if not, we exit as the CPU is not supported by the TDP values
 if [ -z "$CPU_TDP" ]; then
@@ -28,7 +28,7 @@ set_tdp() {
 handle_tdp() {
     TDP_PERCENTAGE=$1
     ROM_NAME=$2
-    MAX_TDP=$(/usr/bin/system-settings-get system.cpu.tdp)
+    MAX_TDP=$(/usr/bin/regmsg systemconf getconfigkey system.cpu.tdp)
     # Check if MAX_TDP is defined and non-empty
     if [ -n "$MAX_TDP" ]; then
         # round the value up or down to make bash happy
@@ -56,10 +56,16 @@ fi
 # handle gameStop event
 if [ "$EVENT" == "gameStop" ]; then
     # set either user global setting or default tdp
-    TDP_SETTING=$(printf "%.0f" "$(/usr/bin/system-settings-get global.tdp)")
+    GLOBAL_TDP_VALUE=$(/usr/bin/regmsg systemconf getconfigkey global.tdp)
+    if [ -n "${GLOBAL_TDP_VALUE}" ] && [ "${GLOBAL_TDP_VALUE}" != "null" ] && [[ "${GLOBAL_TDP_VALUE}" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+        TDP_SETTING=$(printf "%.0f" "${GLOBAL_TDP_VALUE}")
+    else
+        TDP_SETTING=""
+    fi
+
     if [ -z "${TDP_SETTING}" ]; then
-        TDP_SETTING="$(/usr/bin/system-settings-get system.cpu.tdp)"
-        
+        TDP_SETTING="$(/usr/bin/regmsg systemconf getconfigkey system.cpu.tdp)"
+
         if [ -n "$TDP_SETTING" ]; then
             set_tdp "${TDP_SETTING}" "STOP"
         else
@@ -76,15 +82,20 @@ fi
 # check for user set system specific setting
 if [ -n "${SYSTEM_NAME}" ]; then
     # check for rom specific config
-    TDP_SETTING=$(/usr/bin/system-settings-get "${SYSTEM_NAME}[\"${ROM_NAME}\"].tdp")
+    TDP_SETTING=$(/usr/bin/regmsg systemconf getconfigkey "${SYSTEM_NAME}[\"${ROM_NAME}\"].tdp")
     if [ -z "${TDP_SETTING}" ]; then
-        TDP_SETTING="$(/usr/bin/system-settings-get ${SYSTEM_NAME}.tdp)"
+        TDP_SETTING="$(/usr/bin/regmsg systemconf getconfigkey ${SYSTEM_NAME}.tdp)"
     fi
 fi
 
 # If no user set system specific setting check for user set global setting
 if [ -z "${TDP_SETTING}" ]; then
-    TDP_SETTING=$(printf "%.0f" "$(/usr/bin/system-settings-get global.tdp)")
+    GLOBAL_TDP_VALUE=$(/usr/bin/regmsg systemconf getconfigkey global.tdp)
+    if [ -n "${GLOBAL_TDP_VALUE}" ] && [ "${GLOBAL_TDP_VALUE}" != "null" ] && [[ "${GLOBAL_TDP_VALUE}" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+        TDP_SETTING=$(printf "%.0f" "${GLOBAL_TDP_VALUE}")
+    else
+        TDP_SETTING=""
+    fi
 fi
 
 # If no value is found ensure tdp is default before exiting
@@ -95,7 +106,7 @@ if [ -z "${TDP_SETTING}" ]; then
     else
         echo "No TDP setting defined, cannot set TDP." >> $log
         exit 1
-    fi    
+    fi
     exit 0
 fi
 

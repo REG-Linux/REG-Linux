@@ -18,7 +18,7 @@ BR2_KERNEL_HEADERS_6_18=y
 # Kernel
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION=y
-BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.3"
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="6.18.8"
 BR2_LINUX_KERNEL_PATCH="$(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sdm845/odin/linux_patches"
 BR2_LINUX_KERNEL_USE_ARCH_DEFAULT_CONFIG=y
 BR2_LINUX_KERNEL_CONFIG_FRAGMENT_FILES="$(BR2_EXTERNAL_REGLINUX_PATH)/board/qualcomm/sdm845/odin/linux-defconfig-fragment.config $(BR2_EXTERNAL_REGLINUX_PATH)/board/reglinux/linux-defconfig-reglinux.config"
@@ -43,6 +43,11 @@ BR2_TARGET_GRUB2=y
 BR2_TARGET_GRUB2_ARM64_EFI=y
 BR2_TARGET_GRUB2_BUILTIN_MODULES_EFI="boot linux ext2 fat squash4 part_msdos part_gpt normal efi_gop search search_fs_file search_fs_uuid search_label chain reboot"
 BR2_PACKAGE_EFIVAR=y
+
+# Userspace daemons
+BR2_PACKAGE_QRTR=y
+BR2_PACKAGE_RMTFS=y
+BR2_PACKAGE_TQFTPSERV=y
 
 # Filesystem
 BR2_TARGET_ROOTFS_CPIO_LZ4=y

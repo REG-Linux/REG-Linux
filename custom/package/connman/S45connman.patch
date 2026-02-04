@@ -1,5 +1,5 @@
 diff --git a/package/connman/S45connman b/package/connman/S45connman
-index c8e913d3a13..2b7e06a1dff 100644
+index c8e913d3a1..2b7e06a1df 100644
 --- a/package/connman/S45connman
 +++ b/package/connman/S45connman
 @@ -1,37 +1,17 @@

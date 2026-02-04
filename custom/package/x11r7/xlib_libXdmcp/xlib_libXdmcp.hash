@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2022-November/003260.html
-sha256  d8a5222828c3adab70adf69a5583f1d32eb5ece04304f7f8392b6a353aa2228c  libXdmcp-1.1.5.tar.xz
-sha512  d7a1d70a58b7d34ddd01a91d3ccbc086a36626b7081cfcbb150d24288c6adad612b042ba7ea63a218595afb2ee04384c0f8ba84ee3c6bd29913724b54e898d83  libXdmcp-1.1.5.tar.xz
-# Locally computed
-sha256  8a3c3f35b0dbcb60a4e242b9e4394a352a65bb27deb2938ea1e2e62a626e16e9  COPYING

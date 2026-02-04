@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-August/003415.html
-sha256  4348566aa0fbf196db5e0a576321c65966189210cb51328ea2bb2be39c711d71  libxcb-1.16.tar.xz
-sha512  002fbc126c6f09eb7db5e4197cd0572d495f64b6de714a76d9a024fe3e13122c1cfc7c55207c0dee76cc63fcccf87b37db513223eadaf760af2bd2a926443bf8  libxcb-1.16.tar.xz
-# Locally computed
-sha256  c5ffbfeaa501071ceeb97b7de2c0d703fdaa35de01c0fb6cbac1c28453a3e9fd  COPYING

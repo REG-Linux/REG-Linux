@@ -2,9 +2,9 @@ from pathlib import Path
 from shutil import copytree
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 
 from .ioquake3Config import (
     IOQUAKE3_BIN_DIR,
@@ -43,7 +43,7 @@ class IOQuake3Generator(Generator):
         command_array = [IOQUAKE3_BIN_PATH]
 
         # get the game / mod to launch
-        with open(rom) as file:
+        with Path(rom).open() as file:
             command_line = file.readline().strip()
             command_line_words = command_line.split()
 

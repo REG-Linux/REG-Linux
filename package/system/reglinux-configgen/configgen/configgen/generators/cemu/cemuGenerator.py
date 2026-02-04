@@ -1,11 +1,12 @@
+import pathlib
 import xml.parsers.expat
 from codecs import open as codecs_open
 from glob import escape, iglob
-from os import linesep, mkdir, path
+from os import linesep, path
 from xml.dom import minidom
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
 from .cemuConfig import (
@@ -48,19 +49,19 @@ class CemuGenerator(Generator):
             rpxrom = paths[0]
 
         # bios pack
-        if not path.isdir(CEMU_BIOS_DIR):
-            mkdir(CEMU_BIOS_DIR)
-        if not path.isdir(CEMU_CONFIG_DIR):
-            mkdir(CEMU_CONFIG_DIR)
+        if not pathlib.Path(CEMU_BIOS_DIR).is_dir():
+            pathlib.Path(CEMU_BIOS_DIR).mkdir()
+        if not pathlib.Path(CEMU_CONFIG_DIR).is_dir():
+            pathlib.Path(CEMU_CONFIG_DIR).mkdir()
         # graphic packs
-        if not path.isdir(CEMU_SAVES_DIR + "/graphicPacks"):
-            mkdir(CEMU_SAVES_DIR + "/graphicPacks")
-        if not path.isdir(CEMU_CONFIG_DIR + "/controllerProfiles"):
-            mkdir(CEMU_CONFIG_DIR + "/controllerProfiles")
+        if not pathlib.Path(CEMU_SAVES_DIR + "/graphicPacks").is_dir():
+            pathlib.Path(CEMU_SAVES_DIR + "/graphicPacks").mkdir()
+        if not pathlib.Path(CEMU_CONFIG_DIR + "/controllerProfiles").is_dir():
+            pathlib.Path(CEMU_CONFIG_DIR + "/controllerProfiles").mkdir()
 
         # Config file
         cemuConfig = minidom.Document()
-        if path.exists(CEMU_CONFIG_PATH):
+        if pathlib.Path(CEMU_CONFIG_PATH).exists():
             try:
                 cemuConfig = minidom.parse(CEMU_CONFIG_PATH)
             except xml.parsers.expat.ExpatError as e:

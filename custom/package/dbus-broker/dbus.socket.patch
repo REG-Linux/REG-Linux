@@ -1,5 +1,5 @@
 diff --git a/package/dbus-broker/dbus.socket b/package/dbus-broker/dbus.socket
-index 5c373cf4503..0303bfbde6d 100644
+index 5c373cf450..0303bfbde6 100644
 --- a/package/dbus-broker/dbus.socket
 +++ b/package/dbus-broker/dbus.socket
 @@ -2,4 +2,4 @@

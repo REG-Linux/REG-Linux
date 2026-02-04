@@ -38,12 +38,12 @@ done
 # Loop over 64-bit archs (except x86)
 # rk3326 is cortex_a35/musl
 # s9gen4 is cortex_a35/glibc
-# h5 can be used for h6, h616, h700, s905, s905gen2, rk3328 (cortex_a53/musl)
+# sun50i can be used for h616, h700, s905, s905gen2, rk3328 (cortex_a53/musl)
 # s905gen3 can be used for rk3566/rk3568 (cortex_a55/glibc)
 # s922x can be used for a3gen2 (cortex_a73_a53/glibc)
 # rk3588 can be used for sm8250 (cortex_a76_a55)
 # sm8550 is ARMv9 / glibc
-for arch in h5 bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x s9gen4 sm8550 asahi jh7110 k1; do
+for arch in sun50i bcm2711 bcm2712 rk3326 rk3399 rk3588 s905gen3 s922x s9gen4 sm8550 asahi jh7110 k1; do
 	# Clean
 	make ${arch}-clean
 	# Build

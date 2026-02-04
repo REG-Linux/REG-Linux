@@ -1,5 +1,5 @@
---- a/cmake/CMakeLists.txt	2025-09-09 12:44:52.285439564 +0200
-+++ b/cmake/CMakeLists.txt	2025-09-09 12:45:54.455449170 +0200
+--- a/CMakeLists.txt	2025-09-09 12:44:52.285439564 +0200
++++ b/CMakeLists.txt	2025-09-09 12:45:54.455449170 +0200
 @@ -68,6 +68,10 @@
  # --- Source directory base ---
  set(main_cpp_base ../src/main)

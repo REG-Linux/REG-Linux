@@ -1,14 +1,14 @@
 from filecmp import cmp
 from json import dump, dumps, load
-from os import chmod, environ, makedirs, path
+from os import environ, path
 from pathlib import Path
 from shutil import copyfile
 from typing import Any
 
 from evdev import InputDevice, list_devices
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.systemFiles import BIOS, CONF
 
 RYUJINX_CONFIG_DIR = str(CONF / "Ryujinx")
@@ -86,10 +86,10 @@ class RyujinxGenerator(Generator):
         wheels,
         game_resolution,
     ):
-        if not path.exists(RYUJINX_CONFIG_DIR):
-            makedirs(RYUJINX_CONFIG_DIR)
-        if not path.exists(RYUJINX_SYSTEM_DIR):
-            makedirs(RYUJINX_SYSTEM_DIR)
+        if not Path(RYUJINX_CONFIG_DIR).exists():
+            Path(RYUJINX_CONFIG_DIR).mkdir(parents=True)
+        if not Path(RYUJINX_SYSTEM_DIR).exists():
+            Path(RYUJINX_SYSTEM_DIR).mkdir(parents=True)
 
         # Copy file & make executable (workaround)
         files_to_copy = [
@@ -107,19 +107,19 @@ class RyujinxGenerator(Generator):
         ]
 
         for src, dest, mode in files_to_copy:
-            if not path.exists(dest) or not cmp(src, dest):
+            if not Path(dest).exists() or not cmp(src, dest):
                 copyfile(src, dest)
-                chmod(dest, mode)
+                Path(dest).chmod(mode)
 
         # Copy the prod.keys file to where ryujinx reads it
-        if path.exists(RYUJINX_KEY_PATH):
+        if Path(RYUJINX_KEY_PATH).exists():
             copyfile(RYUJINX_KEY_PATH, RYUJINX_CONFIG_DIR + "/system/prod.keys")
 
         # [Configuration]
-        if not path.exists(path.dirname(RYUJINX_CONFIG_PATH)):
-            makedirs(path.dirname(RYUJINX_CONFIG_PATH))
+        if not Path(path.dirname(RYUJINX_CONFIG_PATH)).exists():
+            Path(path.dirname(RYUJINX_CONFIG_PATH)).mkdir(parents=True)
         try:
-            with open(RYUJINX_CONFIG_PATH) as f:
+            with Path(RYUJINX_CONFIG_PATH).open() as f:
                 conf = load(f)
         except Exception:
             conf = {}
@@ -179,12 +179,13 @@ class RyujinxGenerator(Generator):
 
         # write / update the config file
         js_out = dumps(conf, indent=2)
-        with open(RYUJINX_CONFIG_PATH, "w") as jout:
-            jout.write(js_out)
+        Path(RYUJINX_CONFIG_PATH).write_text(js_out)
 
         # Now add Controllers
-        nplayer = 1
-        for _, pad in sorted(players_controllers.items()):
+        for nplayer, (_, pad) in enumerate(
+            sorted(players_controllers.items()),
+            start=1,
+        ):
             if nplayer <= 8:
                 ctrlConf = ryujinxCtrl
                 # we need to get the uuid for ryujinx controllers
@@ -213,7 +214,6 @@ class RyujinxGenerator(Generator):
                         # write the controller to the file
                         writeControllerIntoJson(ctrlConf)
                         break
-            nplayer += 1
 
         if rom == "config":
             command_array = [RYUJINX_BIN_PATH]
@@ -227,7 +227,7 @@ def writeControllerIntoJson(
     new_controller: Any,
     filename: str = RYUJINX_CONFIG_PATH,
 ) -> None:
-    with open(filename, "r+") as file:
+    with Path(filename).open("r+") as file:
         file_data = load(file)
         file_data["input_config"].append(new_controller)
         file.seek(0)

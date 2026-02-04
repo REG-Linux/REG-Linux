@@ -1,5 +1,5 @@
 diff --git a/support/kconfig/confdata.c b/support/kconfig/confdata.c
-index 9ab980edd85..f8af85a91cc 100644
+index 9ab980edd8..f8af85a91c 100644
 --- a/support/kconfig/confdata.c
 +++ b/support/kconfig/confdata.c
 @@ -744,7 +744,7 @@ int conf_write(const char *name)

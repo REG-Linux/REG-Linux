@@ -523,12 +523,13 @@ def generateControllerConfig_any(
     config_file_path = Path(DOLPHIN_CONFIG_DIR) / filename
     with codecs.open(str(config_file_path), "w", encoding="utf_8") as f:
         eslog.debug(f"Writing controller config to {config_file_path}")
-        nplayer = 1
 
         # In case of two pads having the same name, dolphin wants a number to handle this
         double_pads: dict[str, int] = {}
 
-        for _, pad in sorted(playersControllers.items()):
+        for nplayer, (_key, pad) in enumerate(
+            sorted(playersControllers.items()), start=1
+        ):
             # Handle x pads having the same name
             nsamepad = double_pads.get(pad.name.strip(), 0)
             double_pads[pad.name.strip()] = nsamepad + 1
@@ -565,8 +566,6 @@ def generateControllerConfig_any(
                     nplayer,
                     nsamepad,
                 )
-
-            nplayer += 1
 
 
 def generateControllerConfig_any_auto(
@@ -699,7 +698,7 @@ def generateControllerConfig_any_from_profiles(f: Any, pad: Any, system: Any) ->
             profileDevice = profileConfig.get("Profile", "Device")
             eslog.debug(f"Profile device : {profileDevice}")
 
-            deviceVals = re.match("^([^/]*)/[0-9]*/(.*)$", profileDevice)
+            deviceVals = re.match(r"^([^/]*)/[0-9]*/(.*)$", profileDevice)
             if deviceVals is not None and (
                 deviceVals.group(1) == "SDL"
                 and deviceVals.group(2).strip() == pad.name.strip()
@@ -777,8 +776,9 @@ def generateHotkeys(playersControllers: Any) -> None:
             "rightx": None,
         }
 
-        nplayer = 1
-        for _, pad in sorted(playersControllers.items()):
+        for nplayer, (_key, pad) in enumerate(
+            sorted(playersControllers.items()), start=1
+        ):
             if nplayer == 1:
                 f.write("[Hotkeys1]" + "\n")
                 f.write("Device = SDL/0/" + pad.name.strip() + "\n")
@@ -813,5 +813,3 @@ def generateHotkeys(playersControllers: Any) -> None:
 
                         # else:
                         #    f.write("# undefined key: name="+input.name+", type="+input.type+", id="+str(input.id)+", value="+str(input.value)+"\n")
-
-            nplayer += 1

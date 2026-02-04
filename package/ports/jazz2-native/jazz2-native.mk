@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-JAZZ2_NATIVE_VERSION = 3.4.0
+JAZZ2_NATIVE_VERSION = 3.5.0
 JAZZ2_NATIVE_SITE = https://github.com/deathkiller/jazz2-native.git
 JAZZ2_NATIVE_SITE_METHOD = git
 JAZZ2_NATIVE_GIT_SUBMODULES = YES
@@ -26,6 +26,11 @@ ifeq ($(BR2_PACKAGE_XORG7)$(BR2_PACKAGE_HAS_LIBGL),yy)
 else
     JAZZ2_NATIVE_CONF_OPTS += -DNCINE_PREFERRED_BACKEND=SDL2
     JAZZ2_NATIVE_CONF_OPTS += -DNCINE_WITH_OPENGLES=ON
+endif
+
+ifeq ($(BR2_PACKAGE_ODROIDC5_LIBMALI),y)
+    JAZZ2_NATIVE_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS=-lmali
+    JAZZ2_NATIVE_CONF_OPTS += -DCMAKE_SHARED_LINKER_FLAGS=-lmali
 endif
 
 define JAZZ2_NATIVE_EVMAPY

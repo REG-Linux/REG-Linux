@@ -5,9 +5,9 @@ from shutil import copy
 from stat import S_IRGRP, S_IROTH, S_IRWXU, S_IXGRP, S_IXOTH
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.systemFiles import ROMS
 
 SONICMANIA_SOURCE_BIN_PATH = Path("/usr/bin/sonic-mania")
@@ -61,11 +61,8 @@ class SonicManiaGenerator(Generator):
                 str(SONICAMANIA_BIN_PATH),
                 X_OK,
             ):
-                import os
-
-                os.chmod(
-                    str(SONICAMANIA_BIN_PATH),
-                    S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
+                Path(str(SONICAMANIA_BIN_PATH)).chmod(
+                    S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH
                 )
 
         # Verify the copied binary is executable
@@ -74,7 +71,7 @@ class SonicManiaGenerator(Generator):
                 f"Copied binary is not executable: {SONICAMANIA_BIN_PATH}",
             )
 
-        ## Configuration
+        # Configuration
 
         # VSync
         if system.isOptSet("smania_vsync"):
@@ -92,7 +89,7 @@ class SonicManiaGenerator(Generator):
         else:
             selected_language = "0"
 
-        ## Create the Settings.ini file
+        # Create the Settings.ini file
         config = ConfigParser()
         config.optionxform = lambda optionstr: str(optionstr)
         # Game
@@ -125,7 +122,7 @@ class SonicManiaGenerator(Generator):
             "sfxVolume": "1.000000",
         }
         # Save the ini file
-        with open(SONICMANIA_CONFIG_PATH, "w") as configfile:
+        with Path(SONICMANIA_CONFIG_PATH).open("w") as configfile:
             config.write(configfile)
 
         # Now run

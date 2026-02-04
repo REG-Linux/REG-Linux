@@ -75,6 +75,19 @@ case "$1" in
         ln -sf "$MACHINE_ID_FILE" /etc/machine-id
 
         # Load system.conf to regmsg daemon
+        # One-time sync of USB gadget defaults from /boot/system-boot.conf
+        USB_BOOT_SYNC_MARKER="/userdata/system/.cache/usb-boot-sync.done"
+        if [ -r /boot/system-boot.conf ] && [ ! -f "${USB_BOOT_SYNC_MARKER}" ] && [ -w /userdata/system/system.conf ]; then
+            for key in system.usb.mtp system.usb.adb system.usb.mode; do
+                boot_val="$(awk -F= -v k="${key}" '$0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}' /boot/system-boot.conf)"
+                if [ -n "${boot_val}" ] && ! grep -q -E "^[[:space:]]*${key}=" /userdata/system/system.conf; then
+                    /usr/bin/regmsg systemconf setconfigkey /userdata/system/system.conf "${key}" "${boot_val}" >/dev/null 2>&1 || true
+                fi
+            done
+            mkdir -p /userdata/system/.cache
+            touch "${USB_BOOT_SYNC_MARKER}"
+        fi
+
         if [ -s /userdata/system/system.conf ]; then
             if [ ! -f /var/run/regmsgd.sock ]; then
                 # Waits for the daemon to start

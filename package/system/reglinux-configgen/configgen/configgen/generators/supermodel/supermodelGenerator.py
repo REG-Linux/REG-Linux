@@ -1,14 +1,13 @@
-import builtins
 from configparser import ConfigParser
-from os import listdir, rename
+from os import listdir
 from pathlib import Path
 from re import search
 from shutil import copy2, copyfile
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config, gunsNeedCrosses
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.systemFiles import CONF
 from configgen.utils.logger import get_logger
 
@@ -124,7 +123,7 @@ def copy_nvram_files():
                 backupFile = targetDir / (targetFile.name + ".bak")
                 if backupFile.exists():
                     backupFile.unlink()
-                rename(targetFile, backupFile)
+                Path(targetFile).rename(backupFile)
                 copyfile(sourceFile, backupFile.parent / backupFile.name)
 
 
@@ -367,7 +366,7 @@ def configPadsIni(
     # To prevent ConfigParser from converting to lower case
     templateConfig.optionxform = lambda optionstr: str(optionstr)
     # Fix: Use read_file instead of deprecated readfp
-    with builtins.open(templateFile, encoding="utf_8_sig") as fp:
+    with Path(templateFile).open(encoding="utf_8_sig") as fp:
         templateConfig.read_file(fp)
 
     # target
@@ -416,7 +415,7 @@ def configPadsIni(
     targetFile_path = Path(targetFile)
     if not targetFile_path.parent.exists():
         targetFile_path.parent.mkdir(parents=True, exist_ok=True)
-    with builtins.open(targetFile_path, "w") as configfile:
+    with Path(targetFile_path).open("w") as configfile:
         targetConfig.write(configfile)
 
     return templateFile, mapping
@@ -430,7 +429,7 @@ def transformValue(
 ) -> str:
     # remove comments
     cleanValue = value
-    matches = search("^([^;]*[^ ])[ ]*;.*$", value)
+    matches = search(r"^([^;]*[^ ])[ ]*;.*$", value)
     if matches:
         cleanValue = matches.group(1)
 
@@ -464,7 +463,7 @@ def transformElement(
     # JOY1_UP    is the same as JOY1_YAXIS_NEG
     # JOY1_DOWN  is the same as JOY1_YAXIS_POS
 
-    matches = search("^JOY([12])_BUTTON([0-9]*)$", elt)
+    matches = search(r"^JOY([12])_BUTTON([0-9]*)$", elt)
     if matches:
         return input2input(
             players_controllers,
@@ -472,7 +471,7 @@ def transformElement(
             joy2realjoyid(players_controllers, matches.group(1)),
             mapping["button" + matches.group(2)],
         )
-    matches = search("^JOY([12])_UP$", elt)
+    matches = search(r"^JOY([12])_UP$", elt)
     if matches:
         # check joystick type if it's hat or axis
         joy_type = hatOrAxis(players_controllers, matches.group(1))
@@ -492,7 +491,7 @@ def transformElement(
             mp,
             -1,
         )
-    matches = search("^JOY([12])_DOWN$", elt)
+    matches = search(r"^JOY([12])_DOWN$", elt)
     if matches:
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_down = "down" if joy_type == "hat" else "axisY"
@@ -510,7 +509,7 @@ def transformElement(
             mp,
             1,
         )
-    matches = search("^JOY([12])_LEFT$", elt)
+    matches = search(r"^JOY([12])_LEFT$", elt)
     if matches:
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_left = "left" if joy_type == "hat" else "axisX"
@@ -528,7 +527,7 @@ def transformElement(
             mp,
             -1,
         )
-    matches = search("^JOY([12])_RIGHT$", elt)
+    matches = search(r"^JOY([12])_RIGHT$", elt)
     if matches:
         joy_type = hatOrAxis(players_controllers, matches.group(1))
         key_right = "right" if joy_type == "hat" else "axisX"
@@ -547,7 +546,7 @@ def transformElement(
             1,
         )
 
-    matches = search("^JOY([12])_(R?[XY])AXIS$", elt)
+    matches = search(r"^JOY([12])_(R?[XY])AXIS$", elt)
     if matches:
         return input2input(
             players_controllers,
@@ -555,7 +554,7 @@ def transformElement(
             joy2realjoyid(players_controllers, matches.group(1)),
             mapping["axis" + matches.group(2)],
         )
-    matches = search("^JOY([12])_(R?[XYZ])AXIS_NEG$", elt)
+    matches = search(r"^JOY([12])_(R?[XYZ])AXIS_NEG$", elt)
     if matches:
         return input2input(
             players_controllers,
@@ -564,7 +563,7 @@ def transformElement(
             mapping["axis" + matches.group(2)],
             -1,
         )
-    matches = search("^JOY([12])_(R?[XYZ])AXIS_POS$", elt)
+    matches = search(r"^JOY([12])_(R?[XYZ])AXIS_POS$", elt)
     if matches:
         return input2input(
             players_controllers,

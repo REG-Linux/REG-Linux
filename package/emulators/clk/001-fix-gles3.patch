@@ -1,0 +1,77 @@
+Signed-off-by: Romain TISSERAND <romain.tisserand@gmail.com>
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -57,8 +57,26 @@
+ 	enable_language(OBJC OBJCXX SWIFT)
+ 	# TODO: Build the Mac version.
+ else()
+-	find_package(OpenGL REQUIRED)
+-	target_link_libraries(clksignal PRIVATE OpenGL::GL)
++	# Prefer desktop OpenGL; fall back to GLES3 via GLESv2 when OpenGL isn't available.
++	find_package(OpenGL QUIET)
++	if(OpenGL_FOUND AND TARGET OpenGL::GL)
++		target_link_libraries(clksignal PRIVATE OpenGL::GL)
++	else()
++		find_path(GLES3_INCLUDE_DIR GLES3/gl3.h)
++		find_library(GLESv2_LIBRARY NAMES GLESv2)
++
++		if(NOT GLES3_INCLUDE_DIR OR NOT GLESv2_LIBRARY)
++			message(FATAL_ERROR "OpenGL not found and GLES3 headers/libGLESv2 not available")
++		endif()
++
++		add_library(GLES3::GLES3 INTERFACE IMPORTED)
++		set_target_properties(GLES3::GLES3 PROPERTIES
++			INTERFACE_INCLUDE_DIRECTORIES "${GLES3_INCLUDE_DIR}"
++			INTERFACE_LINK_LIBRARIES "${GLESv2_LIBRARY}"
++		)
++		target_link_libraries(clksignal PRIVATE GLES3::GLES3)
++		target_compile_definitions(clksignal PRIVATE "CLK_USE_GLES3")
++	endif()
+ 	if(APPLE)
+ 		target_compile_definitions(clksignal PRIVATE "GL_SILENCE_DEPRECATION" "IGNORE_APPLE")
+ 	endif()
+--- a/Outputs/OpenGL/OpenGL.hpp
++++ b/Outputs/OpenGL/OpenGL.hpp
+@@ -24,8 +24,13 @@
+ 	#endif
+ #else
+ #define GL_GLEXT_PROTOTYPES
+-#include <GL/gl.h>
+-#include <GL/glext.h>
++#if defined(CLK_USE_GLES3)
++	#include <GLES3/gl3.h>
++	#include <GLES3/gl3ext.h>
++#else
++	#include <GL/gl.h>
++	#include <GL/glext.h>
++#endif
+ #endif
+ 
+ #ifndef NDEBUG
+--- a/Outputs/OpenGL/Primitives/TextureTarget.cpp
++++ b/Outputs/OpenGL/Primitives/TextureTarget.cpp
+@@ -60,10 +60,12 @@
+ 		switch(framebuffer_status) {
+ 			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+ 				throw std::runtime_error("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
++#if !defined(CLK_USE_GLES3)
+ 			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+ 				throw std::runtime_error("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+ 			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+ 				throw std::runtime_error("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
++#endif
+ 			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+ 				throw std::runtime_error("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+ 			case GL_FRAMEBUFFER_UNSUPPORTED:
+--- a/Outputs/OpenGL/Primitives/Shader.cpp
++++ b/Outputs/OpenGL/Primitives/Shader.cpp
+@@ -44,6 +44,8 @@
+ 				R"glsl(
+ 					#version 300 es
+ 					precision highp float;
++					precision highp int;
++					precision highp uint;
+ 					precision highp usampler2D;
+ 				)glsl",
+ 				source.c_str()

@@ -1,8 +1,8 @@
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 
 from .iortcwConfig import IORTCW_BIN_PATH, setIortcwConfig
 

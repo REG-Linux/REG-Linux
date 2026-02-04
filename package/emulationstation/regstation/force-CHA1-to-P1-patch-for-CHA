@@ -1,0 +1,24 @@
+--- a/emulationstation-standalone
++++ b/emulationstation-standalone
+@@ -128,6 +128,21 @@
+     exit 1
+ fi
+ 
++# Make sure Player 1 uses CHA1 and Player 2 uses CHA2
++for JOYINDEX in /dev/input/js[0-9]
++do
++    eval $(udevadm info -q property $JOYINDEX | grep -m1 'ID_MODEL=')
++    DEVPATH=$(udevadm info -q property $JOYINDEX | sed -n -e 's|^DEVPATH=\(.*\)/0003:1C5.*$|/sys\1|p')
++    case $ID_MODEL in
++        CHA1)
++            sed -i "s|\"INPUT P1PATH\".*|\"INPUT P1PATH\" value\=\"$DEVPATH\" /\>|" /userdata/system/configs/emulationstation/es_settings.cfg
++        ;;
++        CHA2)
++            sed -i "s|\"INPUT P2PATH\".*|\"INPUT P2PATH\" value\=\"$DEVPATH\" /\>|" /userdata/system/configs/emulationstation/es_settings.cfg
++        ;;
++    esac
++done
++
+ # Main loop to handle EmulationStation execution and reboots
+ while [ -e "$RESTART_FLAG" ]; do
+     set_language

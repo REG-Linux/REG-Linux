@@ -1,5 +1,5 @@
 diff --git a/package/llvm-project/llvm/llvm.mk b/package/llvm-project/llvm/llvm.mk
-index b0515474d80..b47aa8c0709 100644
+index b0515474d8..4c0fbaf56c 100644
 --- a/package/llvm-project/llvm/llvm.mk
 +++ b/package/llvm-project/llvm/llvm.mk
 @@ -5,6 +5,9 @@
@@ -68,10 +68,10 @@ index b0515474d80..b47aa8c0709 100644
 +	REGLINUX_LLVM_CPU = riscv
 +else ifeq ($(BR2_saphira),y)
 +	REGLINUX_LLVM_CPU = saphira
++else ifeq ($(BR2_x86_x86_64_v3),y)
++	REGLINUX_LLVM_CPU = x86_64_v3
 +else ifeq ($(BR2_x86_64),y)
 +	REGLINUX_LLVM_CPU = x86_64
-+else ifeq ($(BR2_x86_64_v3),y)
-+	REGLINUX_LLVM_CPU = x86_64_v3
 +endif
 +
 +LLVM_SITE = https://github.com/REG-Linux/REG-llvm-binaries/releases/download/$(LLVM_VERSION)

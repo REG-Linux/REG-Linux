@@ -1,11 +1,11 @@
---- a/cmake/CMakeLists.txt	2025-08-27 07:52:46.000000000 +0200
-+++ b/cmake/CMakeLists.txt	2025-09-09 12:00:43.608862085 +0200
-@@ -282,6 +282,8 @@
-     # link EGL/GLES2
-     PkgConfig::EGL
-     PkgConfig::GLESv2
-+    execinfo
-+    backtrace
+--- a/CMakeLists.txt	2025-08-27 07:52:46.000000000 +0200
++++ b/CMakeLists.txt	2025-09-09 12:00:43.608862085 +0200
+@@ -368,6 +368,8 @@
+   $<$<PLATFORM_ID:Windows>:unofficial::angle::libGLESv2>
+   $<$<NOT:$<PLATFORM_ID:Windows>>:PkgConfig::EGL>
+   $<$<NOT:$<PLATFORM_ID:Windows>>:PkgConfig::GLESv2>
++  execinfo
++  backtrace
  )
  
  # --- Linux: udev for joystick hotplugging ---

@@ -1,4 +1,4 @@
-import os
+import pathlib
 from typing import Any
 
 from configgen.settings import UnixSettings
@@ -12,7 +12,7 @@ VICE_BIN_DIR = "/usr/bin/"
 
 def setViceConfig(system: Any, metadata: Any, guns: Any) -> None:
     # Create directory if it doesn't exist
-    os.makedirs(VICE_CONFIG_DIR, exist_ok=True)
+    pathlib.Path(VICE_CONFIG_DIR).mkdir(exist_ok=True, parents=True)
 
     viceConfig = UnixSettings(VICE_CONFIG_PATH)
 

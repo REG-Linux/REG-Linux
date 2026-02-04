@@ -3,8 +3,8 @@
 # scummvm
 #
 ################################################################################
-# Version: 2.9.1 - Unreleased yet so no codename yet
-REGLINUX_SCUMMVM_VERSION = v2.9.1
+# Version: 2026.1.0
+REGLINUX_SCUMMVM_VERSION = v2026.1.0
 REGLINUX_SCUMMVM_SITE = $(call github,REG-Linux,REG-ScummVM,$(REGLINUX_SCUMMVM_VERSION))
 REGLINUX_SCUMMVM_LICENSE = GPLv2
 

@@ -1,9 +1,10 @@
-from os import mkdir, path
+import pathlib
+from os import path
 from shlex import split
 from typing import Any
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 
 from .gzdoomConfig import (
     GZDOOM_CONFIG_DIR,
@@ -39,14 +40,14 @@ class GZDoomGenerator(Generator):
         game_resolution: dict[str, int],
     ) -> Command:
         # check directories exist
-        if not path.exists(GZDOOM_CONFIG_DIR):
-            mkdir(GZDOOM_CONFIG_DIR)
+        if not pathlib.Path(GZDOOM_CONFIG_DIR).exists():
+            pathlib.Path(GZDOOM_CONFIG_DIR).mkdir()
 
-        if not path.exists(GZDOOM_SOUND_FONT_PATH):
-            mkdir(GZDOOM_SOUND_FONT_PATH)
+        if not pathlib.Path(GZDOOM_SOUND_FONT_PATH).exists():
+            pathlib.Path(GZDOOM_SOUND_FONT_PATH).mkdir()
 
-        if not path.exists(GZDOOM_FM_BANKS_PATH):
-            mkdir(GZDOOM_FM_BANKS_PATH)
+        if not pathlib.Path(GZDOOM_FM_BANKS_PATH).exists():
+            pathlib.Path(GZDOOM_FM_BANKS_PATH).mkdir()
 
         setGzdoomConfig(system, rom)
         setGzdoomControllers(system)
@@ -54,7 +55,7 @@ class GZDoomGenerator(Generator):
         # define how wads are loaded
         # if we use a custom extension use that instead
         if rom.endswith(".gzdoom"):
-            with open(rom) as f:
+            with pathlib.Path(rom).open() as f:
                 iwad_command = f.read().strip()
             args = split(iwad_command)
             return Command(

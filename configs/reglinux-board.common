@@ -9,6 +9,9 @@ BR2_SSP_NONE=y
 # Binary for initramfs
 BR2_PACKAGE_BUSYBOX=y
 
+# rng-tools for entropy
+BR2_PACKAGE_RNG_TOOLS=y
+
 # prefer linux tools over busybox tools
 BR2_PACKAGE_BC=y
 BR2_PACKAGE_COREUTILS=y
@@ -73,10 +76,6 @@ BR2_TARGET_LOCALTIME="Europe/Paris"
 # Initramfs decompression support
 BR2_LINUX_KERNEL_LZ4=y
 
-# ZeroMQ
-BR2_PACKAGE_ZEROMQ=y
-BR2_PACKAGE_PYTHON_PYZMQ=y
-
 # Python choices
 BR2_PACKAGE_PYTHON3_PY_PYC=y
 BR2_PACKAGE_PYTHON_HASHLIB=y
@@ -129,6 +128,10 @@ BR2_PACKAGE_REGLINUX_SDL3=y
 
 # Always build MTP support
 BR2_PACKAGE_UMTP_RESPONDER=y
+
+# Always build ADB daemon for USB gadget mode
+BR2_PACKAGE_ANDROID_TOOLS=y
+BR2_PACKAGE_ANDROID_TOOLS_ADBD=y
 
 # Always build wayland protocols and seatd
 BR2_PACKAGE_WAYLAND=y

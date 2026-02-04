@@ -20,7 +20,7 @@ PPSSPP_BIN_PATH = Path("/usr/bin/PPSSPP")
 def setPPSSPPConfig(system: Any) -> None:
     ppssppConfig = UnixSettings(PPSSPP_CONFIG_PATH)
 
-    ## [GRAPHICS]
+    # [GRAPHICS]
     ppssppConfig.ensure_section("Graphics")
 
     # Graphics Backend
@@ -178,7 +178,7 @@ def setPPSSPPConfig(system: Any) -> None:
     else:
         ppssppConfig.set("Graphics", "TextureFiltering", "1")
 
-    ## [SYSTEM PARAM]
+    # [SYSTEM PARAM]
     ppssppConfig.ensure_section("SystemParam")
 
     # Forcing Nickname to Anonymous or User name
@@ -198,7 +198,7 @@ def setPPSSPPConfig(system: Any) -> None:
     # Disable Encrypt Save (permit to exchange save with different machines)
     ppssppConfig.set("SystemParam", "EncryptSave", "False")
 
-    ## [GENERAL]
+    # [GENERAL]
     ppssppConfig.ensure_section("General")
 
     # Rewinding
@@ -218,7 +218,7 @@ def setPPSSPPConfig(system: Any) -> None:
     # Don't check for a new version
     ppssppConfig.set("General", "CheckForNewVersion", "False")
 
-    ## [UPGRADE] - don't upgrade
+    # [UPGRADE] - don't upgrade
     ppssppConfig.ensure_section("Upgrade")
     ppssppConfig.set("Upgrade", "UpgradeMessage", "")
     ppssppConfig.set("Upgrade", "UpgradeVersion", "")

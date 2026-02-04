@@ -1,5 +1,5 @@
 diff --git a/package/sdl2/sdl2.mk b/package/sdl2/sdl2.mk
-index 67a4978e225..065ed0119e9 100644
+index 67a4978e22..065ed0119e 100644
 --- a/package/sdl2/sdl2.mk
 +++ b/package/sdl2/sdl2.mk
 @@ -4,7 +4,8 @@

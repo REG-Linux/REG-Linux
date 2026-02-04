@@ -24,9 +24,13 @@ WLROOTS_DEPENDENCIES = \
 	seatd \
 	udev \
 	wayland \
-	wayland-protocols
+	wayland-protocols \
+	libdrm
 
-WLROOTS_CONF_OPTS = -Dexamples=false -Dxcb-errors=disabled
+WLROOTS_CONF_OPTS = \
+	--buildtype=release \
+	-Dexamples=false \
+	-Dxcb-errors=disabled
 
 WLROOTS_RENDERERS = gles2
 WLROOTS_BACKENDS = libinput drm

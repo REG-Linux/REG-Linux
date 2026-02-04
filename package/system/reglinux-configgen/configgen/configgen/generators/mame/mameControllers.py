@@ -1,7 +1,8 @@
+import pathlib
 import xml.etree.ElementTree as ET
 from contextlib import suppress
 from csv import reader
-from os import linesep, path
+from os import linesep
 from typing import Any
 from xml.dom import minidom
 from xml.dom.minidom import Document, parse
@@ -119,7 +120,7 @@ def generatePadsConfig(
 
     # Save main config file
     if overwrite_mame:
-        logger.debug(f"Saving {config_file}")
+        logger.debug("Saving %s", config_file)
         _save_config_file(config, config_file)
 
     # Save alternative config if needed
@@ -130,8 +131,8 @@ def generatePadsConfig(
         and configFile_alt is not None
         and config_alt is not None
     ):
-        logger.debug(f"Saving {configFile_alt}")
-        with open(configFile_alt, "w", encoding="utf-8") as mameXml_alt:
+        logger.debug("Saving %s", configFile_alt)
+        with pathlib.Path(configFile_alt).open("w", encoding="utf-8") as mameXml_alt:
             dom_string_alt = linesep.join(
                 [s for s in config_alt.toprettyxml().splitlines() if s.strip()],
             )  # remove ugly empty lines while minicom adds them...
@@ -141,7 +142,7 @@ def generatePadsConfig(
 def _load_control_mappings() -> dict[str, dict[str, str]]:
     """Load control mappings from CSV file."""
     control_file = "/usr/share/reglinux/configgen/data/mame/mameControls.csv"
-    with open(control_file) as open_file:
+    with pathlib.Path(control_file).open() as open_file:
         control_dict = {}
         control_list = reader(open_file)
         for row in control_list:
@@ -159,11 +160,11 @@ def _initialize_main_config(
     config = Document()
     config_file = cfg_path + "default.cfg"
 
-    if path.exists(config_file):
+    if pathlib.Path(config_file).exists():
         with suppress(ET.ParseError, FileNotFoundError):
             config = parse(config_file)
 
-    overwrite_mame = not (path.exists(config_file) and custom_cfg)
+    overwrite_mame = not (pathlib.Path(config_file).exists() and custom_cfg)
     return config, config_file, overwrite_mame
 
 
@@ -265,7 +266,7 @@ def _determine_control_set(sys_name: str, special_controller: str) -> str:
             use_controls = f"apple2-{special_controller}"
     else:
         use_controls = sys_name
-    logger.debug(f"Using {use_controls} for controller config.")
+    logger.debug("Using %s for controller config.", use_controls)
     return use_controls
 
 
@@ -273,7 +274,7 @@ def _load_mess_control_mappings() -> dict[str, Any]:
     """Load MESS control mappings from CSV file."""
     mess_control_file = "/usr/share/reglinux/configgen/data/mame/messControls.csv"
     mess_control_dict = {}
-    with open(mess_control_file) as open_mess_file:
+    with pathlib.Path(mess_control_file).open() as open_mess_file:
         control_list = reader(open_mess_file, delimiter=";")
         for row in control_list:
             if row[0] not in mess_control_dict:
@@ -327,15 +328,15 @@ def _handle_special_controllers(
     config_file_alt = cfg_path + sys_name + ".cfg"
 
     if (
-        path.exists(config_file_alt)
+        pathlib.Path(config_file_alt).exists()
         and cfg_path == f"/userdata/system/configs/mame/{sys_name}/"
-    ) or path.exists(config_file_alt):
+    ) or pathlib.Path(config_file_alt).exists():
         with suppress(Exception):
             config_alt = minidom.parse(config_file_alt)
 
     per_game_cfg = cfg_path != f"/userdata/system/configs/mame/{sys_name}/"
     overwrite_system = not (
-        path.exists(config_file_alt) and (custom_cfg or per_game_cfg)
+        pathlib.Path(config_file_alt).exists() and (custom_cfg or per_game_cfg)
     )
 
     xml_mameconfig_alt = getRoot(config_alt, "mameconfig")
@@ -489,7 +490,7 @@ def _check_wheel_mapping(
         for w in wheels:
             if wheels[w]["joystick_index"] == pad.index:
                 is_wheel = True
-                logger.debug(f"player {nplayer} has a wheel")
+                logger.debug("player %s has a wheel", nplayer)
                 break
         if is_wheel:
             # Remove certain mappings for wheel
@@ -789,7 +790,7 @@ def _configure_additional_guns(
 
 def _save_config_file(config: Document, config_file: str):
     """Save the main configuration file."""
-    with open(config_file, "w", encoding="utf-8") as mameXml:
+    with pathlib.Path(config_file).open("w", encoding="utf-8") as mameXml:
         dom_string = linesep.join(
             [s for s in config.toprettyxml().splitlines() if s.strip()],
         )  # remove ugly empty lines while minicom adds them...
@@ -1148,7 +1149,13 @@ def generateAnalogPortElement(
     xml_newseq_dec.setAttribute("type", "decrement")
     decvalue = config.createTextNode(
         input2definition(
-            pad, deckey, mappedinput2, padindex, reversed_param, "0", True
+            pad,
+            deckey,
+            mappedinput2,
+            padindex,
+            reversed_param,
+            "0",
+            True,
         ),
     )
     xml_newseq_dec.appendChild(decvalue)

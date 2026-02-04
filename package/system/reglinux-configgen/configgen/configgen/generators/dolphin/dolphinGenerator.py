@@ -5,9 +5,9 @@ from pathlib import Path
 from subprocess import CalledProcessError, check_output
 from typing import Any
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import gunsNeedCrosses
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 from configgen.utils.logger import get_logger
 
 from .dolphinConfig import (
@@ -271,7 +271,7 @@ class DolphinGenerator(Generator):
             dolphin_settings.set("DSP", "EnableJIT", "False")
 
         # Save dolphin.ini
-        with open(DOLPHIN_CONFIG_PATH, "w") as configfile:
+        with Path(DOLPHIN_CONFIG_PATH).open("w") as configfile:
             dolphin_settings.write(configfile)
 
         # [gfx.ini]
@@ -540,7 +540,7 @@ class DolphinGenerator(Generator):
             dolphin_gfx_settings.set("Hacks", "FastTextureSampling", "True")
 
         # Save gfx.ini
-        with open(DOLPHIN_GFX_PATH, "w") as configfile:
+        with Path(DOLPHIN_GFX_PATH).open("w") as configfile:
             dolphin_gfx_settings.write(configfile)
 
         # Hotkeys.ini - overwrite to avoid issues
@@ -623,7 +623,7 @@ class DolphinGenerator(Generator):
         #
         # Write the configuration to the file
         hotkey_path = Path("/userdata/system/configs/dolphin-emu/Hotkeys.ini")
-        with open(hotkey_path, "w") as configfile:
+        with Path(hotkey_path).open("w") as configfile:
             hotkey_config.write(configfile)
 
         # Retroachievements
@@ -661,7 +661,7 @@ class DolphinGenerator(Generator):
             rac_config.set("Achievements", "AchievementsEnabled", "False")
         # Write the configuration to the file
         rac_path = Path("/userdata/system/configs/dolphin-emu/RetroAchievements.ini")
-        with open(rac_path, "w") as rac_configfile:
+        with Path(rac_path).open("w") as rac_configfile:
             rac_config.write(rac_configfile)
 
         # Update SYSCONF

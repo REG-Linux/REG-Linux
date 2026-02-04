@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBRETRO_CLOWNMDEMU_VERSION = v1.5
+LIBRETRO_CLOWNMDEMU_VERSION = v1.6.3
 LIBRETRO_CLOWNMDEMU_SITE = https://github.com/Clownacy/clownmdemu-libretro
 LIBRETRO_CLOWNMDEMU_SITE_METHOD=git
 LIBRETRO_CLOWNMDEMU_GIT_SUBMODULES=YES

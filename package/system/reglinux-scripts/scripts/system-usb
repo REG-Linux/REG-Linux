@@ -1,0 +1,121 @@
+#!/bin/sh
+
+CONFIGFILE="/userdata/system/system.conf"
+BOOT_CONF="/boot/system-boot.conf"
+
+usage() {
+    printf '%s\n' \
+        "usage: system-usb [command] [args]" \
+        "  status" \
+        "  mode [mtp|adb|mass_storage|disabled|auto]" \
+        "  adb [on|off]" \
+        "  apply" \
+        "  stop"
+    exit 1
+}
+
+get_key() {
+    value="$(/usr/bin/regmsg systemconf getconfigkey "$1" 2>/dev/null || true)"
+    if [ -n "${value}" ]; then
+        printf '%s\n' "${value}"
+        return 0
+    fi
+    [ -r "${BOOT_CONF}" ] || return 0
+    awk -F'=' -v k="$1" '
+        $0 !~ /^[[:space:]]*#/ && $1 == k {print $2; exit}
+    ' "${BOOT_CONF}"
+}
+
+set_key() {
+    /usr/bin/regmsg systemconf setconfigkey "${CONFIGFILE}" "$1" "$2" >/dev/null 2>&1
+}
+
+service_enable() {
+    [ -x /usr/bin/system-services ] || return 0
+    /usr/bin/system-services enable "$1" >/dev/null 2>&1 || true
+}
+
+service_disable() {
+    [ -x /usr/bin/system-services ] || return 0
+    /usr/bin/system-services disable "$1" >/dev/null 2>&1 || true
+}
+
+set_services_exclusive() {
+    # Ensure only the requested USB gadget service is enabled
+    case "$1" in
+        adb)
+            service_disable MTP
+            service_enable ADB
+            ;;
+        mtp|file_transfer)
+            service_disable ADB
+            service_enable MTP
+            ;;
+    esac
+}
+
+[ -z "$1" ] && usage
+
+case "$1" in
+    status)
+        mode_override="$(get_key system.usb.mode)"
+        mtp_enabled="$(get_key system.usb.mtp)"
+        adb_enabled="$(get_key system.usb.adb)"
+        gadget_status="disabled"
+        if [ -x /usr/bin/usbgadget ]; then
+            gadget_status="$(/usr/bin/usbgadget status 2>/dev/null)"
+        fi
+        echo "system.usb.mode=${mode_override}"
+        echo "system.usb.mtp=${mtp_enabled:-0}"
+        echo "system.usb.adb=${adb_enabled:-0}"
+        echo "gadget=${gadget_status}"
+        ;;
+    mode)
+        if [ -z "$2" ]; then
+            get_key system.usb.mode
+            exit 0
+        fi
+        case "$2" in
+            mtp|adb|mass_storage|disabled)
+                set_key system.usb.mode "$2"
+                set_services_exclusive "$2"
+                ;;
+            auto|off)
+                set_key system.usb.mode ""
+                ;;
+            *)
+                usage
+                ;;
+        esac
+        ;;
+    adb)
+        if [ -z "$2" ]; then
+            get_key system.usb.adb
+            exit 0
+        fi
+        case "$2" in
+            on|1|true)
+                set_key system.usb.adb 1
+                set_services_exclusive adb
+                ;;
+            off|0|false)
+                set_key system.usb.adb 0
+                [ "$(get_key system.usb.mode)" = "adb" ] || service_disable ADB
+                ;;
+            *)
+                usage
+                ;;
+        esac
+        ;;
+    apply)
+        [ -x /usr/bin/usbgadget ] && /usr/bin/usbgadget --start
+        ;;
+    stop)
+        [ -x /usr/bin/usbgadget ] && /usr/bin/usbgadget stop
+        ;;
+    *)
+        usage
+        ;;
+esac
+
+exit 0

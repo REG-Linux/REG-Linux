@@ -2,9 +2,9 @@ from os import chdir
 from pathlib import Path
 from shutil import copytree
 
-from configgen.Command import Command
+from configgen.command import Command
 from configgen.controllers import generate_sdl_controller_config
-from configgen.generators.Generator import Generator
+from configgen.generators.generator import Generator
 
 from .drasticConfig import (
     DRASTIC_BIN_PATH,
@@ -32,7 +32,7 @@ class DrasticGenerator(Generator):
         if not config_user_dir.exists():
             copytree(DRASTIC_CONFIG_DIR, DRASTIC_CONFIG_DIR_USER)
 
-        with open(DRASTIC_CONFIG_PATH, "w", encoding="ascii") as drasticConfig:
+        with Path(DRASTIC_CONFIG_PATH).open("w", encoding="ascii") as drasticConfig:
             setDrasticConfig(drasticConfig, system)
             setDrasticController(drasticConfig)
 

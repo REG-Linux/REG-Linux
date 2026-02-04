@@ -3,8 +3,8 @@ from glob import glob
 from pathlib import Path
 from typing import Any
 
-from configgen.Command import Command
-from configgen.generators.Generator import Generator
+from configgen.command import Command
+from configgen.generators.generator import Generator
 from configgen.systemFiles import BIOS, CONF, SCREENSHOTS
 
 SCUMMVM_CONFIG_DIR = str(CONF / "scummvm")
@@ -45,7 +45,7 @@ class ScummVMGenerator(Generator):
         config_dir_path = config_path.parent
         if not config_dir_path.exists():
             config_dir_path.mkdir(parents=True, exist_ok=True)
-        with open(SCUMMVM_CONFIG_PATH, "w") as configfile:
+        with Path(SCUMMVM_CONFIG_PATH).open("w") as configfile:
             scummConfig.write(configfile)
 
         # Find rom path
@@ -62,12 +62,10 @@ class ScummVMGenerator(Generator):
             romName = rom_path.stem
 
         # pad number
-        nplayer = 1
         joystick_id = 0
-        for _, pad in sorted(players_controllers.items()):
+        for nplayer, pad in enumerate(sorted(players_controllers.items()), start=1):
             if nplayer == 1:
                 joystick_id = pad.index
-            nplayer += 1
 
         command_array = [SCUMMVM_BIN_PATH, "-f"]
 
@@ -76,7 +74,7 @@ class ScummVMGenerator(Generator):
         window_height = str(game_resolution["height"])
         command_array.append(f"--window-size={window_width},{window_height}")
 
-        ## user options
+        # user options
 
         # scale factor
         if system.isOptSet("scumm_scale"):

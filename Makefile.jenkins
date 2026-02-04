@@ -52,7 +52,7 @@ vars:
 	@echo "Make options:       $(MAKE_OPTS)"
 
 define DOCKER_RUN
-	@$(DOCKER) run --pull=always --init --rm \
+	@$(DOCKER) run --init --rm \
 		-v $(PROJECT_DIR):/build \
 		-v $(DL_DIR):/build/buildroot/dl \
 		-v $(OUTPUT_DIR)/$*:/$* \
@@ -70,7 +70,7 @@ build-docker-image:
 	@touch .ba-docker-image-available
 
 .ba-docker-image-available:
-	@$(DOCKER) --pull=always $(DOCKER_REPO)/$(IMAGE_NAME)
+	@$(DOCKER) pull $(DOCKER_REPO)/$(IMAGE_NAME)
 	@touch .ba-docker-image-available
 
 reglinux-docker-image: merge .ba-docker-image-available

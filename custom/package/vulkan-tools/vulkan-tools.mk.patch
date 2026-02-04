@@ -1,5 +1,5 @@
 diff --git a/package/vulkan-tools/vulkan-tools.mk b/package/vulkan-tools/vulkan-tools.mk
-index 9f5bf46b798..3bd55d96d5e 100644
+index 9f5bf46b79..3bd55d96d5 100644
 --- a/package/vulkan-tools/vulkan-tools.mk
 +++ b/package/vulkan-tools/vulkan-tools.mk
 @@ -3,22 +3,29 @@
