@@ -39,7 +39,6 @@ menu "Boot"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/boot/uboot-tinkerboard2/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/boot/uboot-vim1s/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/boot/uboot-vim4/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/boot/uboot-odroidc5/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/boot/ubiboot/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/boot/mininit/Config.in"
 endmenu
@@ -57,7 +56,6 @@ endmenu
 
 menu "GPU"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/gl4es/Config.in"
-	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/odroidc5-libmali/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/img-gpu-powervr/Config.in"
 	source "$BR2_EXTERNAL_REGLINUX_PATH/package/gpu/img-mesa3d/Config.in"
 menu "Vulkan"

@@ -67,8 +67,7 @@ if BR2_PACKAGE_SYSTEM_TARGET_S905GEN2	|| \
    BR2_PACKAGE_SYSTEM_TARGET_S905GEN3 || \
    BR2_PACKAGE_SYSTEM_TARGET_S922X	|| \
    BR2_PACKAGE_SYSTEM_TARGET_A3GEN2	|| \
-   BR2_PACKAGE_SYSTEM_TARGET_S9GEN4	|| \
-   BR2_PACKAGE_SYSTEM_TARGET_ODROIDC5
+   BR2_PACKAGE_SYSTEM_TARGET_S9GEN4
 	config BR2_PACKAGE_SYSTEM_TARGET_AMLOGIC_GLES3
 	bool "amlogic gles3"
 	default y
@@ -143,8 +142,6 @@ config BR2_TARGET_REGLINUX_IMAGES_DEFINITIONS
 													if BR2_PACKAGE_SYSTEM_TARGET_S922X
 	default "amlogic/s9gen4/khadas-vim1s"								if BR2_PACKAGE_SYSTEM_TARGET_S9GEN4
 	default "amlogic/a3gen2/khadas-vim4"								if BR2_PACKAGE_SYSTEM_TARGET_A3GEN2
-	default "amlogic/odroidc5"									if BR2_PACKAGE_SYSTEM_TARGET_ODROIDC5
-
 	# Rockchip targets
 	default "rockchip/rk3128/ps5000 rockchip/rk3128/ps7000 rockchip/rk3128/powkiddy-a13"		if BR2_PACKAGE_SYSTEM_TARGET_RK3128
 	default "rockchip/rk3288/tinkerboard rockchip/rk3288/miqi"					if BR2_PACKAGE_SYSTEM_TARGET_RK3288
@@ -270,9 +267,6 @@ config BR2_PACKAGE_SYSTEM_TARGET_A3GEN2
 
 config BR2_PACKAGE_SYSTEM_TARGET_S922X
 	bool "s922x"
-
-config BR2_PACKAGE_SYSTEM_TARGET_ODROIDC5
-	bool "odroidc5"
 
 # Allwinner
 # ------------------------------------

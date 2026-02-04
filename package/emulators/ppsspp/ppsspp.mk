@@ -109,11 +109,6 @@ endif
 PPSSPP_CONF_OPTS += -DCMAKE_C_FLAGS="$(PPSSPP_TARGET_CFLAGS)"
 PPSSPP_CONF_OPTS += -DCMAKE_CXX_FLAGS="$(PPSSPP_TARGET_CFLAGS)"
 
-ifeq ($(BR2_PACKAGE_ODROIDC5_LIBMALI),y)
-    PPSSPP_CONF_OPTS += -DCMAKE_EXE_LINKER_FLAGS=-lmali
-    PPSSPP_CONF_OPTS += -DCMAKE_SHARED_LINKER_FLAGS=-lmali
-endif
-
 define PPSSPP_UPDATE_INCLUDES
 	sed -i 's/unknown/"$(shell echo $(PPSSPP_VERSION) | cut -c 1-7)"/g' $(@D)/git-version.cmake
 	sed -i "s+/opt/vc+$(STAGING_DIR)/usr+g" $(@D)/CMakeLists.txt

@@ -9,11 +9,6 @@ OPENLARA_SITE = https://github.com/XProger/OpenLara
 OPENLARA_SITE_METHOD=git
 OPENLARA_DEPENDENCIES = zlib openal sdl2
 
-ifeq ($(BR2_PACKAGE_ODROIDC5_LIBMALI),y)
-OPENLARA_DEPENDENCIES += odroidc5-libmali
-OPENLARA_LIBMALI += -lmali
-endif
-
 # SDL2 + GL build
 ifeq ($(BR2_x86_64),y)
 define OPENLARA_BUILD_CMDS
